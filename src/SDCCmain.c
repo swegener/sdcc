@@ -96,13 +96,11 @@ char buffer[PATH_MAX * 2];
 #define LENGTH(_a)      (sizeof(_a)/sizeof(*(_a)))
 
 #define OPTION_HELP             "--help"
-#define OPTION_STACK_8BIT       "--stack-8bit"
 #define OPTION_OUT_FMT_IHX      "--out-fmt-ihx"
 #define OPTION_OUT_FMT_S19      "--out-fmt-s19"
 #define OPTION_LARGE_MODEL      "--model-large"
 #define OPTION_MEDIUM_MODEL     "--model-medium"
 #define OPTION_SMALL_MODEL      "--model-small"
-#define OPTION_FLAT24_MODEL     "--model-flat24"
 #define OPTION_DUMP_ALL         "--dumpall"
 #define OPTION_PEEP_FILE        "--peep-file"
 #define OPTION_LIB_PATH         "--lib-path"
@@ -113,7 +111,6 @@ char buffer[PATH_MAX * 2];
 #define OPTION_IDATA_LOC        "--idata-loc"
 #define OPTION_XRAM_LOC         "--xram-loc"
 #define OPTION_CODE_LOC         "--code-loc"
-#define OPTION_STACK_SIZE       "--stack-size"
 #define OPTION_IRAM_SIZE        "--iram-size"
 #define OPTION_XRAM_SIZE        "--xram-size"
 #define OPTION_CODE_SIZE        "--code-size"
@@ -125,15 +122,12 @@ char buffer[PATH_MAX * 2];
 #define OPTION_DISABLE_WARNING  "--disable-warning"
 #define OPTION_NO_GCSE          "--nogcse"
 #define OPTION_SHORT_IS_8BITS   "--short-is-8bits"
-#define OPTION_TINI_LIBID       "--tini-libid"
 #define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
 #define OPTION_NO_CCODE_IN_ASM  "--no-c-code-in-asm"
 #define OPTION_ICODE_IN_ASM     "--i-code-in-asm"
 #define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
 #define OPTION_MSVC_ERROR_STYLE "--vc"
 #define OPTION_USE_STDOUT       "--use-stdout"
-#define OPTION_PACK_IRAM        "--pack-iram"
-#define OPTION_NO_PACK_IRAM     "--no-pack-iram"
 #define OPTION_NO_PEEP_COMMENTS "--no-peep-comments"
 #define OPTION_VERBOSE_ASM      "--fverbose-asm"
 #define OPTION_OPT_CODE_SPEED   "--opt-code-speed"
@@ -189,11 +183,6 @@ optionsTable[] = {
     { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
     { 0,    OPTION_MEDIUM_MODEL,    NULL, "external paged data space is used" },
     { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
-#if !OPT_DISABLE_DS390
-    { 0,    OPTION_FLAT24_MODEL,    NULL, "use the flat24 model for the ds390 (default)" },
-    { 0,    OPTION_STACK_8BIT,      NULL, "use the 8bit stack for the ds390 (not supported yet)" },
-    { 0,    "--stack-10bit",        &options.stack10bit, "use the 10bit stack for ds390 (default)" },
-#endif
     { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
     { 0,    "--int-long-reent",     &options.intlong_rent, "Use reenterant calls on the int and long support functions" },
@@ -204,26 +193,11 @@ optionsTable[] = {
     { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
     { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
-#if !OPT_DISABLE_DS390
-    { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"},
-#endif
     { 0,    "--stack-probe",        &options.stack_probe,"insert call to function __stack_probe at each function prologue"},
-#if !OPT_DISABLE_TININative
-    { 0,    "--tini-libid",         NULL,"<nnnn> LibraryID used in -mTININative"},
-#endif
-#if !OPT_DISABLE_DS390
-    { 0,    "--protect-sp-update",  &options.protect_sp_update,"DS390 - will disable interrupts during ESP:SP updates"},
-#endif
-#if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51
-    { 0,    "--parms-in-bank1",     &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"},
-#endif
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
     { 0,    OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
     { 0,    OPTION_VERBOSE_ASM,     &options.verboseAsm, "include code generator comments"},
-#if !OPT_DISABLE_Z80 || !OPT_DISABLE_GBZ80
-    { 0,    "--no-std-crt0", &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
-#endif
     { 0,    OPTION_SHORT_IS_8BITS,  NULL, "Make short 8 bits (for old times sake)" },
     { 0,    OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment" },
     { 0,    OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
@@ -270,13 +244,6 @@ optionsTable[] = {
     { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
     { 0,    OPTION_DATA_LOC,        NULL, "<nnnn> Direct data start location" },
     { 0,    OPTION_IDATA_LOC,       NULL, NULL },
-#if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51 || !OPT_DISABLE_PIC
-    { 0,    OPTION_STACK_SIZE,      NULL,"MCS51/DS390/PIC - Tells the linker to allocate this space for stack"},
-#endif
-#if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51
-    { 0,    OPTION_PACK_IRAM,       NULL,"MCS51/DS390 - Tells the linker to pack variables in internal ram (default)"},
-    { 0,    OPTION_NO_PACK_IRAM,    &options.no_pack_iram,"MCS51/DS390 - Tells the linker not to pack variables in internal ram"},
-#endif
 
     /* End of options */
     { 0,    NULL }
@@ -922,12 +889,6 @@ parseCmdLine (int argc, char **argv)
               exit (EXIT_SUCCESS);
             }
 
-          if (strcmp (argv[i], OPTION_STACK_8BIT) == 0)
-            {
-              options.stack10bit = 0;
-              continue;
-            }
-
           if (strcmp (argv[i], OPTION_OUT_FMT_IHX) == 0)
             {
               options.out_fmt = 0;
@@ -955,12 +916,6 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_SMALL_MODEL) == 0)
             {
               _setModel (MODEL_SMALL, argv[i]);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_FLAT24_MODEL) == 0)
-            {
-              _setModel (MODEL_FLAT24, argv[i]);
               continue;
             }
 
@@ -1010,12 +965,6 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_STACK_LOC) == 0)
             {
               options.stack_loc = getIntArg(OPTION_STACK_LOC, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STACK_SIZE) == 0)
-            {
-              options.stack_size = getIntArg(OPTION_STACK_SIZE, argv, &i, argc);
               continue;
             }
 
@@ -1120,12 +1069,6 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (&argv[i][1], OPTION_SHORT_IS_8BITS) == 0)
             {
               options.shortis8bits=1;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_TINI_LIBID) == 0)
-            {
-              options.tini_libid = getIntArg(OPTION_TINI_LIBID, argv, &i, argc);
               continue;
             }
 

@@ -18,6 +18,25 @@ static char _defaultRules[] =
 #include "peeph.rul"
 };
 
+#define OPTION_STACK_8BIT       "--stack-8bit"
+#define OPTION_FLAT24_MODEL     "--model-flat24"
+#define OPTION_STACK_SIZE       "--stack-size"
+
+static OPTION _ds390_options[] =
+  {
+    { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds390 (default)" },
+    { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds390 (not supported yet)" },
+    { 0, OPTION_STACK_SIZE,     NULL, "Tells the linker to allocate this space for stack"},
+    { 0, "--pack-iram",         NULL, "Tells the linker to pack variables in internal ram (default)"},
+    { 0, "--no-pack-iram",      &options.no_pack_iram,"Tells the linker not to pack variables in internal ram"},
+    { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds390 (default)" },
+    { 0, "--use-accelerator",   &options.useAccelerator,"generate code for ds390 arithmetic accelerator"},
+    { 0, "--protect-sp-update", &options.protect_sp_update,"will disable interrupts during ESP:SP updates"},
+    { 0, "--parms-in-bank1",    &options.parms_in_bank1,"use Bank1 for parameter passing"},
+    { 0, NULL }
+  };
+
+
 /* list of key words used by msc51 */
 static char *_ds390_keywords[] =
 {
@@ -52,19 +71,19 @@ static char *_ds390_keywords[] =
 static builtins __ds390_builtins[] = {
     { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
-    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int) 	    */
+    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int)         */
     /* __builtin_inp - used to read from a memory mapped port, increment first pointer */
     { "__builtin_inp","v",3,{"cx*","cx*","i"}},        /* void __builtin_inp        (xdata char *,xdata char *,int) */
     /* __builtin_inp - used to write to a memory mapped port, increment first pointer */
     { "__builtin_outp","v",3,{"cx*","cx*","i"}},       /* void __builtin_outp       (xdata char *,xdata char *,int) */
-    { "__builtin_swapw","us",1,{"us"}},		       /* unsigned short __builtin_swapw (unsigned short) */
+    { "__builtin_swapw","us",1,{"us"}},                /* unsigned short __builtin_swapw (unsigned short) */
     { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
-    { NULL , NULL,0, {NULL}} 			   /* mark end of table */
+    { NULL , NULL,0, {NULL}}                       /* mark end of table */
 };
 void ds390_assignRegisters (ebbIndex * ebbi);
 
-static int regParmFlg = 0;	/* determine if we can register a parameter */
+static int regParmFlg = 0;      /* determine if we can register a parameter */
 
 static void
 _ds390_init (void)
@@ -84,29 +103,29 @@ _ds390_regparm (sym_link * l, bool reentrant)
     if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
         return 0;
     if (options.parms_in_bank1 == 0) {
-	/* simple can pass only the first parameter in a register */
-	if (regParmFlg)
-	    return 0;
+        /* simple can pass only the first parameter in a register */
+        if (regParmFlg)
+            return 0;
 
-	regParmFlg = 1;
-	return 1;
+        regParmFlg = 1;
+        return 1;
     } else {
-	int size = getSize(l);
-	int remain ;
+        int size = getSize(l);
+        int remain ;
 
-	/* first one goes the usual way to DPTR */
-	if (regParmFlg == 0) {
-	    regParmFlg += 4 ;
-	    return 1;
-	}
-	/* second one onwards goes to RB1_0 thru RB1_7 */
+        /* first one goes the usual way to DPTR */
+        if (regParmFlg == 0) {
+            regParmFlg += 4 ;
+            return 1;
+        }
+        /* second one onwards goes to RB1_0 thru RB1_7 */
         remain = regParmFlg - 4;
-	if (size > (8 - remain)) {
-	    regParmFlg = 12 ;
-	    return 0;
-	}
-	regParmFlg += size ;
-	return regParmFlg - size + 1;
+        if (size > (8 - remain)) {
+            regParmFlg = 12 ;
+            return 0;
+        }
+        regParmFlg += size ;
+        return regParmFlg - size + 1;
     }
 }
 
@@ -116,6 +135,21 @@ _ds390_parseOptions (int *pargc, char **argv, int *i)
   /* TODO: allow port-specific command line options to specify
    * segment names here.
    */
+  if (!strcmp (argv[*i], OPTION_STACK_8BIT))
+    {
+      options.stack10bit = 0;
+      return TRUE;
+    }
+  else if (!strcmp (argv[*i], OPTION_FLAT24_MODEL))
+    {
+      options.model = MODEL_FLAT24;
+      return TRUE;
+    }
+  else if (!strcmp (argv[*i], OPTION_STACK_SIZE))
+    {
+      options.stack_size = getIntArg (OPTION_STACK_SIZE, argv, i, *pargc);
+      return TRUE;
+    }
   return FALSE;
 }
 
@@ -131,7 +165,7 @@ _ds390_finaliseOptions (void)
    */
   if (options.model != MODEL_FLAT24)  {
       fprintf (stderr,
-	       "*** warning: ds390 port small and large model experimental.\n");
+               "*** warning: ds390 port small and large model experimental.\n");
       if (options.model == MODEL_LARGE)
       {
         port->mem.default_local_map = xdata;
@@ -147,13 +181,13 @@ _ds390_finaliseOptions (void)
     port->s.fptr_size = 3;
     port->s.gptr_size = 4;
 
-    port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
+    port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead += 2;	/* This acounts for the extra byte
-				 * of return addres on the stack.
-				 * but is ugly. There must be a
-				 * better way.
-				 */
+    port->stack.call_overhead += 2;     /* This acounts for the extra byte
+                                 * of return addres on the stack.
+                                 * but is ugly. There must be a
+                                 * better way.
+                                 */
 
     port->mem.default_local_map = xdata;
     port->mem.default_globl_map = xdata;
@@ -161,16 +195,16 @@ _ds390_finaliseOptions (void)
     if (!options.stack10bit)
     {
     fprintf (stderr,
-	     "*** error: ds390 port only supports the 10 bit stack mode.\n");
+             "*** error: ds390 port only supports the 10 bit stack mode.\n");
     } else {
-	if (!options.stack_loc) options.stack_loc = 0x400008;
+        if (!options.stack_loc) options.stack_loc = 0x400008;
     }
 
     /* generate native code 16*16 mul/div */
     if (options.useAccelerator)
-	    port->support.muldiv=2;
+            port->support.muldiv=2;
     else
-	    port->support.muldiv=1;
+            port->support.muldiv=1;
 
      /* Fixup the memory map for the stack; it is now in
      * far space and requires a FPOINTER to access it.
@@ -179,7 +213,7 @@ _ds390_finaliseOptions (void)
     istack->ptrType = FPOINTER;
 
     if (options.parms_in_bank1) {
-	addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
+        addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
     }
   }  /* MODEL_FLAT24 */
 }
@@ -226,9 +260,9 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("mc\t=\t0xD5\n", of);
       fputs ("F1\t=\t0xD1\t; user flag\n", of);
       if (options.parms_in_bank1) {
-	  int i ;
-	  for (i=0; i < 8 ; i++ )
-	      fprintf (of,"b1_%d\t=\t0x%02X\n",i,8+i);
+          int i ;
+          for (i=0; i < 8 ; i++ )
+              fprintf (of,"b1_%d\t=\t0x%02X\n",i,8+i);
       }
 }
 
@@ -267,13 +301,13 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
   for (i = 0; i < maxInterrupts; i++)
     {
       if (interrupts[i])
-	{
-	  dbuf_printf (oBuf, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
-	}
+        {
+          dbuf_printf (oBuf, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+        }
       else
-	{
-	  dbuf_printf (oBuf, "\treti\n\t.ds\t7\n");
-	}
+        {
+          dbuf_printf (oBuf, "\treti\n\t.ds\t7\n");
+        }
     }
 
   dbuf_printf (oBuf, "__reset_vect:\n\tljmp\t__sdcc_gsinit_startup\n");
@@ -327,9 +361,9 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
        so we will cse only if they are local (i.e. both ic & pdic belong to
        the same basic block */
     if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
-	/* then if they are the same Basic block then ok */
-	if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
-	else return 0;
+        /* then if they are the same Basic block then ok */
+        if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
+        else return 0;
     }
 
     /* for others it is cheaper to do the cse */
@@ -395,15 +429,15 @@ instructionSize(char *inst, char *op1, char *op2)
       if (*(inst+3)=='c') return 1; /* movc */
       if (IS_C (op1) || IS_C (op2)) return 2;
       if (IS_A (op1))
-	{
-	  if (IS_Rn (op2) || IS_atRi (op2)) return 1;
-	  return 2;
-	}
+        {
+          if (IS_Rn (op2) || IS_atRi (op2)) return 1;
+          return 2;
+        }
       if (IS_Rn(op1) || IS_atRi(op1))
-	{
-	  if (IS_A(op2)) return 1;
-	  return 2;
-	}
+        {
+          if (IS_A(op2)) return 1;
+          return 2;
+        }
       if (strcmp (op1, "dptr") == 0) return 3+isflat24;
       if (IS_A (op2) || IS_Rn (op2) || IS_atRi (op2)) return 2;
       return 3;
@@ -426,7 +460,7 @@ instructionSize(char *inst, char *op1, char *op2)
   if (ISINST ("jb")) return 3;
   if (ISINST ("jnb")) return 3;
   if (ISINST ("jbc")) return 3;
-  if (ISINST ("jmp")) return 1;	// always jmp @a+dptr
+  if (ISINST ("jmp")) return 1; // always jmp @a+dptr
   if (ISINST ("jz")) return 2;
   if (ISINST ("jnz")) return 2;
   if (ISINST ("cjne")) return 3;
@@ -455,15 +489,15 @@ instructionSize(char *inst, char *op1, char *op2)
     {
       if (IS_C(op1)) return 2;
       if (IS_A(op1))
-	{
-	  if (IS_Rn(op2) || IS_atRi(op2)) return 1;
-	  return 2;
-	}
+        {
+          if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+          return 2;
+        }
       else
-	{
-	  if (IS_A(op2)) return 2;
-	  return 3;
-	}
+        {
+          if (IS_A(op2)) return 2;
+          return 3;
+        }
     }
   if (ISINST ("clr") || ISINST ("setb") || ISINST ("cpl"))
     {
@@ -570,8 +604,8 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
     *dot = '\0';
 
   opdat = bsearch (op, ds390operandDataTable,
-		   sizeof(ds390operandDataTable)/sizeof(ds390operanddata),
-		   sizeof(ds390operanddata), ds390operandCompare);
+                   sizeof(ds390operandDataTable)/sizeof(ds390operanddata),
+                   sizeof(ds390operanddata), ds390operandCompare);
 
   if (opdat)
     {
@@ -581,17 +615,17 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
   if (!strcmp(op, "dptr"))
     {
       if (!currentDPS)
-	{
-	  regIdx1 = DPL_IDX;
-	  regIdx2 = DPH_IDX;
-	  regIdx3 = DPX_IDX;
-	}
+        {
+          regIdx1 = DPL_IDX;
+          regIdx2 = DPH_IDX;
+          regIdx3 = DPX_IDX;
+        }
       else
-	{
-	  regIdx1 = DPL1_IDX;
-	  regIdx2 = DPH1_IDX;
-	  regIdx3 = DPX1_IDX;
-	}
+        {
+          regIdx1 = DPL1_IDX;
+          regIdx2 = DPH1_IDX;
+          regIdx3 = DPX1_IDX;
+        }
     }
 
   if (strchr(optype,'r'))
@@ -619,22 +653,22 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
       if (!strcmp(op, "@r1"))
         aln->regsRead = bitVectSetBit (aln->regsRead, R1_IDX);
       if (strstr(op, "dptr"))
-	{
-	  if (!currentDPS)
-	    {
-	      aln->regsRead = bitVectSetBit (aln->regsRead, DPL_IDX);
-	      aln->regsRead = bitVectSetBit (aln->regsRead, DPH_IDX);
-	      aln->regsRead = bitVectSetBit (aln->regsRead, DPX_IDX);
-	    }
-	  else
-	    {
-	      aln->regsRead = bitVectSetBit (aln->regsRead, DPL1_IDX);
-	      aln->regsRead = bitVectSetBit (aln->regsRead, DPH1_IDX);
-	      aln->regsRead = bitVectSetBit (aln->regsRead, DPX1_IDX);
-	    }
-	}
+        {
+          if (!currentDPS)
+            {
+              aln->regsRead = bitVectSetBit (aln->regsRead, DPL_IDX);
+              aln->regsRead = bitVectSetBit (aln->regsRead, DPH_IDX);
+              aln->regsRead = bitVectSetBit (aln->regsRead, DPX_IDX);
+            }
+          else
+            {
+              aln->regsRead = bitVectSetBit (aln->regsRead, DPL1_IDX);
+              aln->regsRead = bitVectSetBit (aln->regsRead, DPH1_IDX);
+              aln->regsRead = bitVectSetBit (aln->regsRead, DPX1_IDX);
+            }
+        }
       if (strstr(op, "a+"))
-	aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
+        aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
     }
 }
 
@@ -723,7 +757,7 @@ asmLineNodeFromLineNode (lineNode *ln, int currentDPS)
         break;
       else
         if (opsize < sizeof(inst))
-	  *op++ = tolower(*p), opsize++;
+          *op++ = tolower(*p), opsize++;
     }
   *op = '\0';
 
@@ -755,8 +789,8 @@ asmLineNodeFromLineNode (lineNode *ln, int currentDPS)
   aln->regsWritten = newBitVect (END_IDX);
 
   opdat = bsearch (inst, ds390opcodeDataTable,
-		   sizeof(ds390opcodeDataTable)/sizeof(ds390opcodedata),
-		   sizeof(ds390opcodedata), ds390opcodeCompare);
+                   sizeof(ds390opcodeDataTable)/sizeof(ds390opcodedata),
+                   sizeof(ds390opcodedata), ds390opcodeCompare);
 
   if (opdat)
     {
@@ -828,22 +862,22 @@ PORT ds390_port =
 {
   TARGET_ID_DS390,
   "ds390",
-  "DS80C390",			/* Target name */
+  "DS80C390",                   /* Target name */
   NULL,
   {
     glue,
-    TRUE,			/* Emit glue around main */
+    TRUE,                       /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
     MODEL_SMALL
   },
   {
     _asmCmd,
     NULL,
-    "-plosgffc",		/* Options with debug */
-    "-plosgff",			/* Options without debug */
+    "-plosgffc",                /* Options with debug */
+    "-plosgff",                 /* Options without debug */
     0,
     ".asm",
-    NULL			/* no do_assemble function */
+    NULL                        /* no do_assemble function */
   },
   {
     _linkCmd,
@@ -859,12 +893,12 @@ PORT ds390_port =
     getRegsWritten
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },		/* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
   {
     "XSEG    (XDATA)",
@@ -880,12 +914,12 @@ PORT ds390_port =
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
     "HOME    (CODE)",
-    "XISEG   (XDATA)",		// initialized xdata
-    "XINIT   (CODE)",		// a code copy of xiseg
-    "CONST   (CODE)",		// const_name - const data (code or not)
-    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
-    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata/pdata
-    "IABS    (ABS,DATA)",	// iabs_name - absolute idata/data
+    "XISEG   (XDATA)",          // initialized xdata
+    "XINIT   (CODE)",           // a code copy of xiseg
+    "CONST   (CODE)",           // const_name - const data (code or not)
+    "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
+    "IABS    (ABS,DATA)",       // iabs_name - absolute idata/data
     NULL,
     NULL,
     1
@@ -912,7 +946,7 @@ PORT ds390_port =
   "_",
   _ds390_init,
   _ds390_parseOptions,
-  NULL,
+  _ds390_options,
   NULL,
   _ds390_finaliseOptions,
   _ds390_setDefaultOptions,
@@ -920,38 +954,69 @@ PORT ds390_port =
   _ds390_getRegName,
   _ds390_keywords,
   _ds390_genAssemblerPreamble,
-  NULL,				/* no genAssemblerEnd */
+  NULL,                         /* no genAssemblerEnd */
   _ds390_genIVT,
   _ds390_genXINIT,
-  NULL, 			/* genInitStartup */
+  NULL,                         /* genInitStartup */
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
   NULL,
   _ds390_nativeMulCheck,
-  hasExtBitOp,			/* hasExtBitOp */
-  oclsExpense,			/* oclsExpense */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
   FALSE,
-  TRUE,				/* little endian */
-  0,				/* leave lt */
-  0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
-  0,				/* leave == */
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
   __ds390_builtins,             /* table of builtin functions */
-  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
-  1,				/* reset labelKey to 1 */
-  1,				/* globals & local static allowed */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
   PORT_MAGIC
 };
 
 /*---------------------------------------------------------------------------------*/
-/*  				 TININative specific 			   	   */
+/*                               TININative specific                               */
 /*---------------------------------------------------------------------------------*/
-/* Globals */
+
+#define OPTION_TINI_LIBID "--tini-libid"
+
+static OPTION _tininative_options[] =
+  {
+    { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds390 (default)" },
+    { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds390 (not supported yet)" },
+    { 0, OPTION_STACK_SIZE,     NULL, "Tells the linker to allocate this space for stack"},
+    { 0, "--pack-iram",         NULL, "Tells the linker to pack variables in internal ram (default)"},
+    { 0, "--no-pack-iram",      &options.no_pack_iram,"Tells the linker not to pack variables in internal ram"},
+    { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds390 (default)" },
+    { 0, "--use-accelerator",   &options.useAccelerator,"generate code for ds390 arithmetic accelerator"},
+    { 0, "--protect-sp-update", &options.protect_sp_update,"will disable interrupts during ESP:SP updates"},
+    { 0, "--parms-in-bank1",    &options.parms_in_bank1,"use Bank1 for parameter passing"},
+    { 0, OPTION_TINI_LIBID,     NULL, "<nnnn> LibraryID used in -mTININative"},
+    { 0, NULL }
+  };
+
+static bool
+_tininative_parseOptions (int *pargc, char **argv, int *i)
+{
+  if (_ds390_parseOptions (pargc, argv, i))
+    return TRUE;
+
+  if (!strcmp (argv[*i], OPTION_TINI_LIBID))
+    {
+      options.tini_libid = getIntArg (OPTION_TINI_LIBID, argv, i, *pargc);
+      return TRUE;
+    }
+  return FALSE;
+}
+
 static void _tininative_init (void)
 {
     asm_addTree (&asm_a390_mapping);
@@ -970,35 +1035,35 @@ static void _tininative_finaliseOptions (void)
      * adjust pointer sizes.
      */
     if (options.model != MODEL_FLAT24)  {
-	options.model = MODEL_FLAT24 ;
-	fprintf(stderr,"TININative supports only MODEL FLAT24\n");
+        options.model = MODEL_FLAT24 ;
+        fprintf(stderr,"TININative supports only MODEL FLAT24\n");
     }
     port->s.fptr_size = 3;
     port->s.gptr_size = 4;
 
-    port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
+    port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead += 2;	/* This acounts for the extra byte
-					 * of return addres on the stack.
-					 * but is ugly. There must be a
-					 * better way.
-					 */
+    port->stack.call_overhead += 2;     /* This acounts for the extra byte
+                                         * of return addres on the stack.
+                                         * but is ugly. There must be a
+                                         * better way.
+                                         */
 
     port->mem.default_local_map = xdata;
     port->mem.default_globl_map = xdata;
 
     if (!options.stack10bit) {
-	options.stack10bit = 1;
-	fprintf(stderr,"TININative supports only stack10bit \n");
+        options.stack10bit = 1;
+        fprintf(stderr,"TININative supports only stack10bit \n");
     }
 
     if (!options.stack_loc) options.stack_loc = 0x400008;
 
     /* generate native code 16*16 mul/div */
     if (options.useAccelerator)
-	port->support.muldiv=2;
+        port->support.muldiv=2;
     else
-	port->support.muldiv=1;
+        port->support.muldiv=1;
 
     /* Fixup the memory map for the stack; it is now in
      * far space and requires a FPOINTER to access it.
@@ -1012,6 +1077,7 @@ static int _tininative_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int m
 {
     return TRUE;
 }
+
 static void _tininative_genAssemblerPreamble (FILE * of)
 {
     fputs("$include(tini.inc)\n", of);
@@ -1027,13 +1093,13 @@ static void _tininative_genAssemblerPreamble (FILE * of)
     fputs("LibraryID:\n",of);
     fputs("\tdb \"DS\"\n",of);
     if (options.tini_libid) {
-	fprintf(of,"\tdb 0,0,0%02xh,0%02xh,0%02xh,0%02xh\n",
-		(options.tini_libid>>24 & 0xff),
-		(options.tini_libid>>16 & 0xff),
-		(options.tini_libid>>8 & 0xff),
-		(options.tini_libid  & 0xff));
+        fprintf(of,"\tdb 0,0,0%02xh,0%02xh,0%02xh,0%02xh\n",
+                (options.tini_libid>>24 & 0xff),
+                (options.tini_libid>>16 & 0xff),
+                (options.tini_libid>>8 & 0xff),
+                (options.tini_libid  & 0xff));
     } else {
-	fprintf(of,"\tdb 0,0,0,0,0,1\n");
+        fprintf(of,"\tdb 0,0,0,0,0,1\n");
     }
 
 }
@@ -1045,20 +1111,20 @@ static void _tininative_genAssemblerEnd (FILE * of)
 static void _tininative_do_assemble (set *asmOptions)
 {
     static const char *macroCmd[] = {
-	"macro","$1.a51",NULL
+        "macro","$1.a51",NULL
     };
     static const char *a390Cmd[] = {
-	"a390","$1.mpp",NULL
+        "a390","$1.mpp",NULL
     };
     char buffer[100];
 
     buildCmdLine(buffer,macroCmd,dstFileName,NULL,NULL,NULL);
     if (my_system(buffer)) {
-	exit(1);
+        exit(1);
     }
     buildCmdLine(buffer,a390Cmd,dstFileName,NULL,NULL,asmOptions);
     if (my_system(buffer)) {
-	exit(1);
+        exit(1);
     }
 }
 
@@ -1095,7 +1161,7 @@ static char *_tininative_keywords[] =
 static builtins __tininative_builtins[] = {
     { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
-    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int) 	    */
+    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int)         */
     /* TINI NatLib */
     { "NatLib_LoadByte","c",1,{"c"}},                  /* char  Natlib_LoadByte  (0 based parameter number)         */
     { "NatLib_LoadShort","s",1,{"c"}},                 /* short Natlib_LoadShort (0 based parameter number)         */
@@ -1112,13 +1178,13 @@ static builtins __tininative_builtins[] = {
     { "MM_XMalloc","i",1,{"l"}},                       /* int  MM_XMalloc (long)                */
     { "MM_Malloc","i",1,{"i"}},                        /* int  MM_Malloc  (int)                 */
     { "MM_ApplicationMalloc","i",1,{"i"}},             /* int  MM_ApplicationMalloc  (int)      */
-    { "MM_Free","i",1,{"i"}},                          /* int  MM_Free  (int)      		*/
-    { "MM_Deref","cx*",1,{"i"}},                       /* char *MM_Free  (int)      		*/
+    { "MM_Free","i",1,{"i"}},                          /* int  MM_Free  (int)                   */
+    { "MM_Deref","cx*",1,{"i"}},                       /* char *MM_Free  (int)                  */
     { "MM_UnrestrictedPersist","c",1,{"i"}},           /* char  MM_UnrestrictedPersist  (int)   */
     /* System functions */
     { "System_ExecJavaProcess","c",2,{"cx*","i"}},     /* char System_ExecJavaProcess (char *,int) */
-    { "System_GetRTCRegisters","v",1,{"cx*"}},	       /* void System_GetRTCRegisters (char *) */
-    { "System_SetRTCRegisters","v",1,{"cx*"}},	       /* void System_SetRTCRegisters (char *) */
+    { "System_GetRTCRegisters","v",1,{"cx*"}},         /* void System_GetRTCRegisters (char *) */
+    { "System_SetRTCRegisters","v",1,{"cx*"}},         /* void System_SetRTCRegisters (char *) */
     { "System_ThreadSleep","v",2,{"l","c"}},           /* void System_ThreadSleep (long,char)  */
     { "System_ThreadSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ThreadSleep_ExitCriticalSection (long,char)  */
     { "System_ProcessSleep","v",2,{"l","c"}},           /* void System_ProcessSleep (long,char)  */
@@ -1133,30 +1199,31 @@ static builtins __tininative_builtins[] = {
     { "System_RemovePoll","c",1,{"vF*"}},              /* char System_RemovePoll ((void *func pointer)()) */
     { "System_GetCurrentProcessId","c",0,{NULL}},      /* char System_GetCurrentProcessId() */
     { "System_GetCurrentThreadId","c",0,{NULL}},       /* char System_GetCurrentThreadId() */
-    { NULL , NULL,0, {NULL}} 			   /* mark end of table */
+    { NULL , NULL,0, {NULL}}                       /* mark end of table */
 };
 
 static const char *_a390Cmd[] =
 {
   "macro", "$l", "$3", "$1.a51", NULL
 };
+
 PORT tininative_port =
 {
   TARGET_ID_DS390,
   "TININative",
-  "DS80C390",			/* Target name */
-	NULL,			/* processor */
+  "DS80C390",                   /* Target name */
+        NULL,                   /* processor */
   {
     glue,
-    FALSE,			/* Emit glue around main */
+    FALSE,                      /* Emit glue around main */
     MODEL_FLAT24,
     MODEL_FLAT24
   },
   {
     _a390Cmd,
     NULL,
-    "-l",		/* Options with debug */
-    "-l",		/* Options without debug */
+    "-l",               /* Options with debug */
+    "-l",               /* Options without debug */
     0,
     ".a51",
     _tininative_do_assemble
@@ -1175,11 +1242,11 @@ PORT tininative_port =
     getRegsWritten
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 1, 3, 3, 1, 4, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },		/* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
   {
     "XSEG    (XDATA)",
@@ -1197,10 +1264,10 @@ PORT tininative_port =
     "HOME    (CODE)",
     NULL,
     NULL,
-    "CONST   (CODE)",		// const_name - const data (code or not)
-    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
-    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata/pdata
-    "IABS    (ABS,DATA)",	// iabs_name - absolute idata/data
+    "CONST   (CODE)",           // const_name - const data (code or not)
+    "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
+    "IABS    (ABS,DATA)",       // iabs_name - absolute idata/data
     NULL,
     NULL,
     1
@@ -1226,8 +1293,8 @@ PORT tininative_port =
   },
   "",
   _tininative_init,
-  _ds390_parseOptions,
-  NULL,
+  _tininative_parseOptions,
+  _tininative_options,
   NULL,
   _tininative_finaliseOptions,
   _tininative_setDefaultOptions,
@@ -1238,28 +1305,28 @@ PORT tininative_port =
   _tininative_genAssemblerEnd,
   _tininative_genIVT,
   NULL,
-  NULL, 			/* genInitStartup */
+  NULL,                         /* genInitStartup */
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
   NULL,
   NULL,
-  hasExtBitOp,			/* hasExtBitOp */
-  oclsExpense,			/* oclsExpense */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
   FALSE,
-  TRUE,				/* little endian */
-  0,				/* leave lt */
-  0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
-  0,				/* leave == */
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
   __tininative_builtins,        /* table of builtin functions */
-  FPOINTER,			/* treat unqualified pointers as far pointers */
-  0,				/* DONOT reset labelKey */
-  0,				/* globals & local static NOT allowed */
+  FPOINTER,                     /* treat unqualified pointers as far pointers */
+  0,                            /* DONOT reset labelKey */
+  0,                            /* globals & local static NOT allowed */
   PORT_MAGIC
 };
 
@@ -1281,6 +1348,23 @@ _ds400_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 }
 
 
+/*---------------------------------------------------------------------------------*/
+/*                               _ds400 specific                                   */
+/*---------------------------------------------------------------------------------*/
+
+static OPTION _ds400_options[] =
+  {
+    { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds400 (default)" },
+    { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds400 (not supported yet)" },
+    { 0, OPTION_STACK_SIZE,     NULL, "Tells the linker to allocate this space for stack"},
+    { 0, "--pack-iram",         NULL, "Tells the linker to pack variables in internal ram (default)"},
+    { 0, "--no-pack-iram",      &options.no_pack_iram,"Tells the linker not to pack variables in internal ram"},
+    { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds400 (default)" },
+    { 0, "--use-accelerator",   &options.useAccelerator,"generate code for ds400 arithmetic accelerator"},
+    { 0, "--protect-sp-update", &options.protect_sp_update,"will disable interrupts during ESP:SP updates"},
+    { 0, "--parms-in-bank1",    &options.parms_in_bank1,"use Bank1 for parameter passing"},
+    { 0, NULL }
+  };
 
 static void
 _ds400_finaliseOptions (void)
@@ -1298,7 +1382,7 @@ _ds400_finaliseOptions (void)
    */
   if (options.model != MODEL_FLAT24)  {
       fprintf (stderr,
-	       "*** warning: ds400 port small and large model experimental.\n");
+               "*** warning: ds400 port small and large model experimental.\n");
       if (options.model == MODEL_LARGE)
       {
         port->mem.default_local_map = xdata;
@@ -1314,13 +1398,13 @@ _ds400_finaliseOptions (void)
     port->s.fptr_size = 3;
     port->s.gptr_size = 4;
 
-    port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
+    port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead += 2;	/* This acounts for the extra byte
-				 * of return addres on the stack.
-				 * but is ugly. There must be a
-				 * better way.
-				 */
+    port->stack.call_overhead += 2;     /* This acounts for the extra byte
+                                 * of return addres on the stack.
+                                 * but is ugly. There must be a
+                                 * better way.
+                                 */
 
     port->mem.default_local_map = xdata;
     port->mem.default_globl_map = xdata;
@@ -1328,17 +1412,17 @@ _ds400_finaliseOptions (void)
     if (!options.stack10bit)
     {
     fprintf (stderr,
-	     "*** error: ds400 port only supports the 10 bit stack mode.\n");
+             "*** error: ds400 port only supports the 10 bit stack mode.\n");
     } else {
-	if (!options.stack_loc) options.stack_loc = 0xffdc00;
-	// assumes IDM1:0 = 1:0, CMA = 1.
+        if (!options.stack_loc) options.stack_loc = 0xffdc00;
+        // assumes IDM1:0 = 1:0, CMA = 1.
     }
 
     /* generate native code 16*16 mul/div */
     if (options.useAccelerator)
-	    port->support.muldiv=2;
+            port->support.muldiv=2;
     else
-	    port->support.muldiv=1;
+            port->support.muldiv=1;
 
      /* Fixup the memory map for the stack; it is now in
      * far space and requires a FPOINTER to access it.
@@ -1347,7 +1431,7 @@ _ds400_finaliseOptions (void)
     istack->ptrType = FPOINTER;
 
     if (options.parms_in_bank1) {
-	addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
+        addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
     }
 
     // the DS400 rom calling interface uses register bank 3.
@@ -1361,11 +1445,11 @@ static void _ds400_generateRomDataArea(FILE *fp, bool isMain)
     /* Only do this for the file containing main() */
     if (isMain)
     {
-	fprintf(fp, "%s", iComments2);
-	fprintf(fp, "; the direct data area used by the DS80c400 ROM code.\n");
-	fprintf(fp, "%s", iComments2);
-	fprintf(fp, ".area ROMSEG (ABS,CON,DATA)\n\n");
-	fprintf(fp, ".ds 24 ; 24 bytes of directs used starting at 0x68\n\n");
+        fprintf(fp, "%s", iComments2);
+        fprintf(fp, "; the direct data area used by the DS80c400 ROM code.\n");
+        fprintf(fp, "%s", iComments2);
+        fprintf(fp, ".area ROMSEG (ABS,CON,DATA)\n\n");
+        fprintf(fp, ".ds 24 ; 24 bytes of directs used starting at 0x68\n\n");
     }
 }
 
@@ -1379,22 +1463,22 @@ PORT ds400_port =
 {
   TARGET_ID_DS400,
   "ds400",
-  "DS80C400",			/* Target name */
+  "DS80C400",                   /* Target name */
   NULL,
   {
     glue,
-    TRUE,			/* Emit glue around main */
+    TRUE,                       /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
     MODEL_SMALL
   },
   {
     _asmCmd,
     NULL,
-    "-plosgffc",		/* Options with debug */
-    "-plosgff",			/* Options without debug */
+    "-plosgffc",                /* Options with debug */
+    "-plosgff",                 /* Options without debug */
     0,
     ".asm",
-    NULL			/* no do_assemble function */
+    NULL                        /* no do_assemble function */
   },
   {
     _linkCmd,
@@ -1410,12 +1494,12 @@ PORT ds400_port =
     getRegsWritten
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
 
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },		/* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
   {
     "XSEG    (XDATA)",
@@ -1433,10 +1517,10 @@ PORT ds400_port =
     "HOME    (CODE)",
     "XISEG   (XDATA)", // initialized xdata
     "XINIT   (CODE)", // a code copy of xiseg
-    "CONST   (CODE)",		// const_name - const data (code or not)
-    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
-    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata/pdata
-    "IABS    (ABS,DATA)",	// iabs_name - absolute idata/data
+    "CONST   (CODE)",           // const_name - const data (code or not)
+    "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
+    "IABS    (ABS,DATA)",       // iabs_name - absolute idata/data
     NULL,
     NULL,
     1
@@ -1463,7 +1547,7 @@ PORT ds400_port =
   "_",
   _ds390_init,
   _ds390_parseOptions,
-  NULL,
+  _ds400_options,
   NULL,
   _ds400_finaliseOptions,
   _ds390_setDefaultOptions,
@@ -1471,30 +1555,30 @@ PORT ds400_port =
   _ds390_getRegName,
   _ds390_keywords,
   _ds390_genAssemblerPreamble,
-  NULL,				/* no genAssemblerEnd */
+  NULL,                         /* no genAssemblerEnd */
   _ds400_genIVT,
   _ds390_genXINIT,
-  NULL, 			/* genInitStartup */
+  NULL,                         /* genInitStartup */
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
   NULL,
   _ds390_nativeMulCheck,
-  hasExtBitOp,			/* hasExtBitOp */
-  oclsExpense,			/* oclsExpense */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
   FALSE,
-  TRUE,				/* little endian */
-  0,				/* leave lt */
-  0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
-  0,				/* leave == */
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
   __ds390_builtins,             /* table of builtin functions */
-  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
-  1,				/* reset labelKey to 1 */
-  1,				/* globals & local static allowed */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
   PORT_MAGIC
 };

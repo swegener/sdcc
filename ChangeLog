@@ -2,6 +2,9 @@
 
 	* as/link/z80/lklibr.c: fixed mingw build warning
 	  lklibr.c:575: warning: implicit declaration of function 'tolower'
+	* src/SDCCmain.c, src/ds390/main.c, src/mcs51/main.c, src/pic/main.c,
+	  src/z80/main.c: move target specific options from src/SDCCmain.c
+	  to src/<target>/main.c
 
 2007-06-09 Borut Razem <borut.razem AT siol.net>
 

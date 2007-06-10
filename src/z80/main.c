@@ -37,6 +37,7 @@
 #define OPTION_CALLEE_SAVES_BC "--callee-saves-bc"
 #define OPTION_PORTMODE        "--portmode="
 #define OPTION_ASM             "--asm="
+#define OPTION_NO_STD_CRT0     "--no-std-crt0"
 
 
 static char _z80_defaultRules[] =
@@ -56,20 +57,22 @@ Z80_OPTS z80_opts;
 static OPTION _z80_options[] =
   {
     { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_PORTMODE,        NULL,                    "Determine PORT I/O mode (z80/z180)" },
-    { 0, OPTION_ASM,             NULL,                    "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
-    { 0, OPTION_CODE_SEG,        NULL,                    "<name> use this name for the code segment" },
-    { 0, OPTION_CONST_SEG,       NULL,                    "<name> use this name for the const segment" },
+    { 0, OPTION_PORTMODE,        NULL, "Determine PORT I/O mode (z80/z180)" },
+    { 0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
+    { 0, OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment" },
+    { 0, OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
+    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
     { 0, NULL }
   };
 
 static OPTION _gbz80_options[] = 
   {
-    { 0, OPTION_BO,              NULL,                    "<num> use code bank <num>" },
-    { 0, OPTION_BA,              NULL,                    "<num> use data bank <num>" },
+    { 0, OPTION_BO,              NULL, "<num> use code bank <num>" },
+    { 0, OPTION_BA,              NULL, "<num> use data bank <num>" },
     { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_CODE_SEG,        NULL,                    "<name> use this name for the code segment"  },
-    { 0, OPTION_CONST_SEG,       NULL,                    "<name> use this name for the const segment" },
+    { 0, OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment"  },
+    { 0, OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
+    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
     { 0, NULL }
   };
 

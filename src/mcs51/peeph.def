@@ -740,17 +740,18 @@ replace {
 	jc	%5
 } if operandsLiteral(%1)
 
-replace {
-	clr	c
-	mov	a,%1
-	subb	a,#%2
-	mov	%3,c
-} by {
-	;	Peephole 132.d	optimized genCmpGt by inverse logic
-	mov	a,#0x100 - %2
-	add	a,%1
-	mov	%3,c
-} if operandsNotRelated('0x00' %2), operandsLiteral(%2)
+// disabled. See bug1734654.c
+//replace {
+//	clr	c
+//	mov	a,%1
+//	subb	a,#%2
+//	mov	%3,c
+//} by {
+//	;	Peephole 132.d	optimized genCmpGt by inverse logic
+//	mov	a,#0x100 - %2
+//	add	a,%1
+//	mov	%3,c
+//} if operandsNotRelated('0x00' %2), operandsLiteral(%2)
 
 replace {
 	clr	c

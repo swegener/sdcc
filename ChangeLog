@@ -1,3 +1,14 @@
+2007-06-12 Raphael Neider <rneider AT web.de>
+
+	* support/scripts/inc2h.pl: conditionally emit defines for SFR bits,
+	  suppress bit defines if NO_BIT_DEFINES is #define'd
+	* device/include/pic/pic*.h: recreated all headers to include
+	  conditional bit defines
+	* device/include/pic/pic16f886.h,
+	* device/include/pic/pic16f887.h: fixed based on newer .inc file
+	* device/include/pic/recreate.sh: script to recreate the complete
+	  device library files based on the currently supported devices
+
 2007-06-12 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic16/main.c, src/SDCCargs.h, SDCCmain.c,

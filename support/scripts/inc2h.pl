@@ -551,6 +551,7 @@ foreach my $reg (sort keys %bits)
   #}
   
   # emit defines for individual bits
+  $structs .= "#ifndef NO_BIT_DEFINES\n";
   for (my $i=0; $i < 8; $i++)
   {
     my @names = @{$bits{$reg}->{oct($i)}};
@@ -558,6 +559,7 @@ foreach my $reg (sort keys %bits)
       $structs .= sprintf("#define %-20s ${reg}_bits.$field\n", $field);
     } # foreach
   }
+  $structs .= "#endif /* NO_BIT_DEFINES */\n";
   $structs .= "\n";
 } # foreach
 

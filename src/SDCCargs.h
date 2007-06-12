@@ -29,13 +29,23 @@
 #ifndef SDCCARGS_H
 #define SDCCARGS_H
 
+/** Specifies option argument types.  */
+enum cl_opt_arg_type {
+  /*  */
+  CLAT_BOOLEAN,
+  CLAT_INTEGER,
+  CLAT_STRING,
+  CLAT_SET
+};
+
 /** Table of all options supported by all ports.
     This table provides:
       * A reference for all options.
       * An easy way to maintain help for the options.
       * Automatic support for setting flags on simple options.
 */
-typedef struct {
+typedef struct
+  {
     /** The short option character e.g. 'h' for -h.  0 for none. */
     char shortOpt;
     /** Long option e.g. "--help".  Includes the -- prefix.  NULL for
@@ -44,10 +54,12 @@ typedef struct {
     /** Pointer to an int that will be incremented every time the
         option is encountered.  May be NULL.
     */
-    int *pparameter;
+    void *pparameter;
     /** Help text to go with this option.  May be NULL. */
     const char *help;
-} OPTION;
+    /** Optin argument type */
+    enum cl_opt_arg_type arg_type;
+  } OPTION;
 
 char *getStringArg(const char *szStart, char **argv, int *pi, int argc);
 int getIntArg(const char *szStart, char **argv, int *pi, int argc);

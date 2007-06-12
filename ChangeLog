@@ -1,3 +1,10 @@
+2007-06-12 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic16/main.c, src/SDCCargs.h, SDCCmain.c,
+	  support/regression/Makefile.in, support/scripts/build.mak,
+	  support/scripts/Makefile.snapshot:
+	  use new svn URL scheme
+
 2007-06-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: disabled rule 132.d to fix #1734654

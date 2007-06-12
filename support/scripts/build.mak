@@ -26,7 +26,7 @@ COMPILE_MODE = linux-mingw32
 SDCC_OR_GBDK = sdcc
 
 ROOT_GBDK = :pserver:anonymous@cvs.gbdk.sourceforge.net:/cvsroot/gbdk
-ROOT_SDCC = https://svn.sourceforge.net/svnroot/sdcc
+ROOT_SDCC = https://sdcc.svn.sourceforge.net/svnroot/sdcc
 
 ifeq ($(COMPILE_MODE),linux-linux)
 # For Linux

@@ -768,77 +768,114 @@ tryHandleUnsupportedOpt(char **argv, int *pi)
 }
 
 static bool
-scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt, char **argv, int *pi)
+scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt, char **argv, int *pi, int argc)
 {
   int i;
+
   for (i = 0;
        optionsTable[i].shortOpt != 0 || optionsTable[i].longOpt != NULL
        || optionsTable[i].help != NULL;
        i++)
     {
-      if (optionsTable[i].shortOpt == shortOpt ||
-          (longOpt && optionsTable[i].longOpt &&
-           strcmp(optionsTable[i].longOpt, longOpt) == 0))
+      if (optionsTable[i].shortOpt == shortOpt)
         {
-
-          /* If it is a flag then we can handle it here */
           if (optionsTable[i].pparameter != NULL)
             {
-              if (optionsTable[i].shortOpt == shortOpt)
-                {
-                  verifyShortOption(argv[*pi]);
-                }
+              verifyShortOption(argv[*pi]);
 
-              (*optionsTable[i].pparameter)++;
-              return 1;
+              (*(int *)optionsTable[i].pparameter)++;
             }
-          else {
-            /* Not a flag.  Handled manually later. */
-            return 0;
-          }
+          else
+            {
+              /* Not a flag.  Handled manually later. */
+              return FALSE;
+            }
+        }
+      else
+        {
+          size_t len = strlen(optionsTable[i].longOpt);
+
+          if (longOpt &&
+            (optionsTable[i].arg_type != CLAT_BOOLEAN ||
+            optionsTable[i].arg_type == CLAT_BOOLEAN && len == strlen(longOpt) && optionsTable[i].longOpt) &&
+            strncmp(optionsTable[i].longOpt, longOpt, len) == 0)
+            {
+              /* If it is a flag then we can handle it here */
+              if (optionsTable[i].pparameter != NULL)
+                {
+                  switch (optionsTable[i].arg_type)
+                    {
+                    case CLAT_BOOLEAN:
+                      (*(int *)optionsTable[i].pparameter)++;
+                      break;
+
+                    case CLAT_INTEGER:
+                      *(int *)optionsTable[i].pparameter = getIntArg (optionsTable[i].longOpt, argv, pi, argc);
+                      break;
+
+                    case CLAT_STRING:
+                      if (*(char **)optionsTable[i].pparameter)
+                        Safe_free(*(char **)optionsTable[i].pparameter);
+                      *(char **)optionsTable[i].pparameter = Safe_strdup(getStringArg (optionsTable[i].longOpt, argv, pi, argc));
+                      break;
+
+                    case CLAT_SET:
+                      if (*(set **)optionsTable[i].pparameter)
+                        deleteSet((set **)optionsTable[i].pparameter);
+                      setParseWithComma((set **)optionsTable[i].pparameter, getStringArg(optionsTable[i].longOpt, argv, &i, argc));
+                      break;
+                    }
+                  return TRUE;
+                }
+              else
+                {
+                  /* Not a flag.  Handled manually later. */
+                  return FALSE;
+                }
+            }
         }
     }
   /* Didn't find in the table */
-  return 0;
+  return FALSE;
 }
 
 static bool
-tryHandleSimpleOpt(char **argv, int *pi)
+tryHandleSimpleOpt(char **argv, int *pi, int argc)
 {
-    if (argv[*pi][0] == '-')
-        {
-            const char *longOpt = "";
-            char shortOpt = -1;
+  if (argv[*pi][0] == '-')
+    {
+      const char *longOpt = "";
+      char shortOpt = -1;
 
-            if (argv[*pi][1] == '-')
-                {
-                    /* Long option. */
-                    longOpt = argv[*pi];
-                }
-            else
-                {
-                    shortOpt = argv[*pi][1];
-                }
-
-            if (scanOptionsTable(optionsTable, shortOpt, longOpt, argv, pi))
-              {
-                return 1;
-              }
-            else if (port && port->poptions &&
-                     scanOptionsTable(port->poptions, shortOpt, longOpt, argv, pi))
-              {
-                return 1;
-              }
-            else
-              {
-                return 0;
-              }
-        }
-    else
+      if (argv[*pi][1] == '-')
         {
-            /* Not an option, so can't be handled. */
-            return 0;
+          /* Long option. */
+          longOpt = argv[*pi];
         }
+      else
+        {
+          shortOpt = argv[*pi][1];
+        }
+
+      if (scanOptionsTable(optionsTable, shortOpt, longOpt, argv, pi, argc))
+        {
+          return TRUE;
+        }
+      else if (port && port->poptions &&
+               scanOptionsTable(port->poptions, shortOpt, longOpt, argv, pi, argc))
+        {
+          return TRUE;
+        }
+      else
+        {
+          return FALSE;
+        }
+    }
+  else
+    {
+      /* Not an option, so can't be handled. */
+      return FALSE;
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -866,7 +903,7 @@ parseCmdLine (int argc, char **argv)
           continue;
         }
 
-      if (tryHandleSimpleOpt(argv, &i) == TRUE)
+      if (tryHandleSimpleOpt(argv, &i, argc) == TRUE)
         {
           continue;
         }

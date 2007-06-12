@@ -16,7 +16,7 @@
 
 # Dependancies:
 #   * The sdcc-extra package, available from svn.
-#       o svn co https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra
+#       o svn co https://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra
 #       o Provides the emulators
 #   * The gbdk-lib package from gbdk.
 #       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib

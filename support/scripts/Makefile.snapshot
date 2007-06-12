@@ -1,5 +1,5 @@
 # Simple weekly tarball generator
-SVNROOT = https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc
+SVNROOT = https://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc
 DATE = `date +%Y%m%d`
 WWWROOT = /home/michaelh/www
 SNAP = $(WWWROOT)/snapshots

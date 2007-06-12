@@ -599,7 +599,7 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
     /* check for arguments that have associated an integer variable */
     while(pic16_optionsTable[j].pparameter) {
       if(ISOPT( pic16_optionsTable[j].longOpt )) {
-        (*pic16_optionsTable[j].pparameter)++;
+        (*(int *)pic16_optionsTable[j].pparameter)++;
         return TRUE;
       }
       j++;

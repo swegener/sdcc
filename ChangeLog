@@ -4,6 +4,8 @@
 	  support/regression/Makefile.in, support/scripts/build.mak,
 	  support/scripts/Makefile.snapshot:
 	  use new svn URL scheme
+	* doc/sdccman.lyx: SDCC Wiki moved to
+	  http://sdcc.wiki.sourceforge.net/
 
 2007-06-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

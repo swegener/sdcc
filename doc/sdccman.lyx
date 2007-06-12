@@ -32447,18 +32447,18 @@ Historically there often were long delays between official releases and
 \end_inset
 
 .
- A release wiki
+ The SDCC Wiki
 \begin_inset LatexCommand \index{wiki}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{Release wiki}
+\begin_inset LatexCommand \index{SDCC Wiki}
 
 \end_inset
 
  at 
-\begin_inset LatexCommand \url{http://sdcc.sf.net/release_wiki/}
+\begin_inset LatexCommand \url{http://sdcc.wiki.sourceforge.net/}
 
 \end_inset
 
@@ -36372,13 +36372,13 @@ As mentioned in the optimization section the peep-hole optimizer is rule
 \end_layout
 
 \begin_layout Standard
-More information is available in a wiki
+More information is available on SDCC Wiki
 \begin_inset LatexCommand \index{wiki}
 
 \end_inset
 
  (preliminary link 
-\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/release_wiki/index.php?page=SDCC+internals+and+porting}
+\begin_inset LatexCommand \url{http://sdcc.wiki.sourceforge.net/SDCC+internals+and+porting}
 
 \end_inset
 

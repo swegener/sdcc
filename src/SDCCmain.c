@@ -793,11 +793,11 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
         }
       else
         {
-          size_t len = strlen(optionsTable[i].longOpt);
+          size_t len = optionsTable[i].longOpt ? strlen(optionsTable[i].longOpt) : 0;
 
           if (longOpt &&
             (optionsTable[i].arg_type != CLAT_BOOLEAN ||
-            optionsTable[i].arg_type == CLAT_BOOLEAN && len == strlen(longOpt) && optionsTable[i].longOpt) &&
+            (optionsTable[i].arg_type == CLAT_BOOLEAN && len == strlen(longOpt) && optionsTable[i].longOpt)) &&
             strncmp(optionsTable[i].longOpt, longOpt, len) == 0)
             {
               /* If it is a flag then we can handle it here */

@@ -1,3 +1,7 @@
+2007-06-13 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCmain.c: prevent NULL pointer dereference, avoid warning
+
 2007-06-12 Raphael Neider <rneider AT web.de>
 
 	* support/scripts/inc2h.pl: conditionally emit defines for SFR bits,

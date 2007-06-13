@@ -1367,6 +1367,16 @@ replace {
 	mov	%1,a
 } if notVolatile %2
 
+// applies to f.e. testfwk.c
+replace {
+	mov	r%1,a
+	mov	ar%2,r%1
+} by {
+	mov	r%1,a
+	;	peephole 177.i	optimized mov sequence
+	mov	r%2,a
+}
+
 replace {
 	mov	a,%1
 	mov	b,a

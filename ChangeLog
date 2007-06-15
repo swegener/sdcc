@@ -1,3 +1,13 @@
+2007-06-15 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/devices.inc,
+	* device/lib/pic16/pics.all,
+	* device/include/pic16/pic18fregs.h,
+	* device/include/pic16/pic18f[24][45]20.h,
+	* device/lib/pic16/libdev/pic18f[24][45]20.c: added support for
+	  18f2420, 18f2520, and 18f4420 devices, updated 18f4520 definitions
+	* device/lib/pic16/Makefile.in: faster cleanup
+
 2007-06-13 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added 177.i (mov from a is slightly cheaper)

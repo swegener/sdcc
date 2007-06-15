@@ -49,8 +49,8 @@ all : install
 
 install : recurse
 
-clean : recurse
-	$(Q)-$(RMDIR) "$(top_pic16builddir)/$(builddir)"
+clean : 
+	$(Q)$(RM) $(top_pic16builddir)/bin/ $(top_pic16builddir)/build/
 
 distclean: clean
 	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common pics.build

@@ -4369,6 +4369,27 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* the type is value of the colon operator (on the right) */
       assert (IS_COLON_OP (tree->right));
 
+      if (IS_AST_LIT_VALUE (tree->right->left) && IS_AST_LIT_VALUE (tree->right->right))
+        {
+          double valTrue = AST_LIT_VALUE (tree->right->left);
+          double valFalse = AST_LIT_VALUE (tree->right->right);
+
+          if ((valTrue == 1) && (valFalse == 0) &&
+              ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT)))
+            {
+              /* assign cond to result */
+              return decorateType (tree->left, resultTypeProp);
+            }
+          else if ((valTrue == 0) && (valFalse == 1))
+            {
+              /* assign !cond to result */
+              tree->opval.op = '!';
+              tree->decorated = 0;
+              tree->right = NULL;
+              return decorateType (tree, resultTypeProp);
+            }
+        }
+
       /* if they are equal then replace the tree */
       if (!astHasVolatile (tree->right) &&
           isAstEqual (tree->right->left, tree->right->right))

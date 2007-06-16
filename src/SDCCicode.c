@@ -3147,33 +3147,6 @@ geniCodeConditional (ast * tree,int lvl)
   operand *result = newiTempOperand (tree->right->ftype, 0);
   operand *opTrue, *opFalse;
 
-  if (IS_AST_LIT_VALUE (astTrue) && IS_AST_LIT_VALUE (astFalse))
-    {
-      double valTrue = AST_LIT_VALUE (astTrue);
-      double valFalse = AST_LIT_VALUE (astFalse);
-
-      if (IS_BIT (operandType (result)))
-        {
-          if ((valTrue != 0) && (valFalse == 0))
-            {
-              /* assign cond to result */
-              geniCodeAssign (result, geniCodeRValue (cond, FALSE), 0, 0);
-              return result;
-            }
-          else if ((valTrue == 0) && (valFalse != 0))
-            {
-              /* assign !cond to result */
-              result = geniCodeUnary (geniCodeRValue (cond, FALSE), '!');
-              return result;
-            }
-          else
-            {
-              /* they have the same boolean value, make them equal */
-              astFalse = astTrue;
-            }
-        }
-    }
-
   ic = newiCodeCondition (geniCodeRValue (cond, FALSE), NULL, falseLabel);
   ADDTOCHAIN (ic);
 

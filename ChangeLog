@@ -1,3 +1,10 @@
+2007-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (decorateType),
+	* src/SDCCicode.c (geniCodeConditional): moved optimization for '?' from
+	  iCode to ast level to fix bug 1738367
+	* support/regression/tests/bug1738367.c: new, added
+
 2007-06-15 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/devices.inc,

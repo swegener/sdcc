@@ -24,18 +24,18 @@
 
 /** Definition of the structures used by the options parser.  The port
     may implement one of these for any options it wants parsed
-    automatically. 
+    automatically.
 */
 #ifndef SDCCARGS_H
 #define SDCCARGS_H
 
 /** Specifies option argument types.  */
 enum cl_opt_arg_type {
-  /*  */
-  CLAT_BOOLEAN,
+  CLAT_BOOLEAN = 0, /* has to be zero! */
   CLAT_INTEGER,
   CLAT_STRING,
-  CLAT_SET
+  CLAT_SET,
+  CLAT_ADD_SET
 };
 
 /** Table of all options supported by all ports.

@@ -27,13 +27,14 @@ static char _defaultRules[] =
 
 pic14_options_t pic14_options;
 extern int debug_verbose; /* from pcode.c */
+extern char *udata_section_name;
 
 static OPTION _pic14_poptions[] =
   {
     { 0, "--debug-xtra",   &debug_verbose, "show more debug info in assembly output" },
     { 0, "--no-pcode-opt", &pic14_options.disable_df, "disable (slightly faulty) optimization on pCode" },
-    { 0, OPTION_STACK_SIZE, NULL, "sets the size if the argument passing stack (default: 16, minimum: 4)" },
-    { 0, OPTION_UDATA_SECTION_NAME, NULL, "set udata section name" },
+    { 0, OPTION_STACK_SIZE, &options.stack_size, "sets the size if the argument passing stack (default: 16, minimum: 4)", CLAT_INTEGER },
+    { 0, OPTION_UDATA_SECTION_NAME, &udata_section_name, "set udata section name", CLAT_STRING },
     { 0, NULL, NULL, NULL }
   };
 
@@ -100,30 +101,12 @@ _pic14_regparm (sym_link * l, bool reentrant)
   return 1;
 }
 
-extern char *udata_section_name;
-
 static bool
 _pic14_parseOptions (int *pargc, char **argv, int *i)
 {
     /* TODO: allow port-specific command line options to specify
     * segment names here.
     */
-    
-    /* This is a temporary hack, to solve problems with some processors
-     * that do not have udata section. It will be changed when a more
-     * robust solution is figured out -- VR 27-11-2003 FIXME
-     */
-  if (!strcmp (argv[*i], OPTION_UDATA_SECTION_NAME))
-    {
-      if (udata_section_name) Safe_free(udata_section_name);
-      udata_section_name = Safe_strdup(getStringArg (OPTION_UDATA_SECTION_NAME, argv, i, *pargc));
-      return TRUE;
-    }
-  else if (!strcmp (argv[*i], OPTION_STACK_SIZE))
-    {
-      options.stack_size = getIntArg (OPTION_STACK_SIZE, argv, i, *pargc);
-      return TRUE;
-    }
     return FALSE;
 }
 

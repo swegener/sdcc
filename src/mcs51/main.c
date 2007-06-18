@@ -20,7 +20,7 @@ static char _defaultRules[] =
 
 static OPTION _mcs51_options[] =
   {
-    { 0, OPTION_STACK_SIZE,  NULL, "Tells the linker to allocate this space for stack"},
+    { 0, OPTION_STACK_SIZE,  &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
     { 0, "--parms-in-bank1", &options.parms_in_bank1, "use Bank1 for parameter passing"},
     { 0, "--pack-iram",      NULL, "Tells the linker to pack variables in internal ram (default)"},
     { 0, "--no-pack-iram",   &options.no_pack_iram, "Tells the linker not to pack variables in internal ram"},
@@ -124,11 +124,6 @@ _mcs51_parseOptions (int *pargc, char **argv, int *i)
   /* TODO: allow port-specific command line options to specify
    * segment names here.
    */
-  if (!strcmp (argv[*i], OPTION_STACK_SIZE))
-    {
-      options.stack_size = getIntArg(OPTION_STACK_SIZE, argv, i, *pargc);
-      return TRUE;
-    }
   return FALSE;
 }
 

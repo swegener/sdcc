@@ -440,6 +440,8 @@ struct
    "Only pointers may be qualified with 'restrict'" },
 { E_BAD_INLINE, ERROR_LEVEL_ERROR,
    "Only functions may be qualified with 'inline'" },
+{ E_BAD_INT_ARGUMENT, ERROR_LEVEL_ERROR,
+   "Bad integer argument for option %s." },
 };
 
 /*

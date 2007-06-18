@@ -59,8 +59,8 @@ static OPTION _z80_options[] =
     { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
     { 0, OPTION_PORTMODE,        NULL, "Determine PORT I/O mode (z80/z180)" },
     { 0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
-    { 0, OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment" },
-    { 0, OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
+    { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
+    { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
     { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
     { 0, NULL }
   };
@@ -70,8 +70,8 @@ static OPTION _gbz80_options[] =
     { 0, OPTION_BO,              NULL, "<num> use code bank <num>" },
     { 0, OPTION_BA,              NULL, "<num> use data bank <num>" },
     { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment"  },
-    { 0, OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
+    { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
+    { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
     { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
     { 0, NULL }
   };
@@ -462,18 +462,6 @@ _parseOptions (int *pargc, char **argv, int *i)
               z80_opts.port_mode = 180;
               return TRUE;
             }
-        }
-      else if (!strcmp (argv[*i], OPTION_CODE_SEG))
-        {
-          if (options.code_seg) Safe_free(options.code_seg);
-          options.code_seg = Safe_strdup(getStringArg (OPTION_CODE_SEG, argv, i, *pargc));
-          return TRUE;
-        }
-      else if (!strcmp (argv[*i], OPTION_CONST_SEG))
-        {
-          if (options.const_seg) Safe_free(options.const_seg);
-          options.const_seg = Safe_strdup(getStringArg (OPTION_CONST_SEG, argv, i, *pargc));
-          return TRUE;
         }
   }
   return FALSE;

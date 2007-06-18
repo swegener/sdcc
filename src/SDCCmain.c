@@ -153,7 +153,6 @@ optionsTable[] = {
     { 'I',  NULL,                   NULL, "Add to the include (*.h) path, as in -Ipath" },
     { 'A',  NULL,                   NULL, NULL },
     { 'U',  NULL,                   NULL, NULL },
-    { 'C',  NULL,                   NULL, "Preprocessor option" },
     { 'M',  NULL,                   NULL, "Preprocessor option" },
     { 'W',  NULL,                   NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)" },
     { 'S',  NULL,                   &noAssemble, "Compile only; do not assemble or link" },
@@ -189,7 +188,7 @@ optionsTable[] = {
     { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the float support functions" },
     { 0,    "--main-return",        &options.mainreturn, "Issue a return after main()" },
     { 0,    "--xram-movc",          &options.xram_movc, "Use movc instead of movx to read xram (xdata)" },
-    { 0,    OPTION_CALLEE_SAVES,    NULL, "<func[,func,...]> Cause the called function to save registers insted of the caller" },
+    { 0,    OPTION_CALLEE_SAVES,    &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers insted of the caller", CLAT_SET },
     { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
     { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
@@ -213,7 +212,7 @@ optionsTable[] = {
     { 0,    "--no-peep",            &options.nopeep, "Disable the peephole assembly file optimisation" },
     { 0,    "--no-reg-params",      &options.noRegParams, "On some ports, disable passing some parameters in registers" },
     { 0,    "--peep-asm",           &options.asmpeep, "Enable peephole optimization on inline assembly" },
-    { 0,    OPTION_PEEP_FILE,       NULL, "<file> use this extra peephole file" },
+    { 0,    OPTION_PEEP_FILE,       &options.peep_file, "<file> use this extra peephole file", CLAT_STRING },
     { 0,    OPTION_OPT_CODE_SPEED,  NULL, "Optimize for code speed rather than size" },
     { 0,    OPTION_OPT_CODE_SIZE,   NULL, "Optimize for code size rather than speed" },
 
@@ -232,18 +231,18 @@ optionsTable[] = {
     { 0,    NULL,                   NULL, "Linker options" },
     { 'l',  NULL,                   NULL, "Include the given library in the link" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
-    { 0,    OPTION_LIB_PATH,        NULL, "<path> use this path to search for libraries" },
+    { 0,    OPTION_LIB_PATH,        &libPathsSet, "<path> use this path to search for libraries", CLAT_ADD_SET },
     { 0,    OPTION_OUT_FMT_IHX,     NULL, "Output in Intel hex format" },
     { 0,    OPTION_OUT_FMT_S19,     NULL, "Output in S19 hex format" },
-    { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
-    { 0,    OPTION_XRAM_SIZE,       NULL, "<nnnn> External Ram size" },
-    { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
-    { 0,    OPTION_XSTACK_LOC,      NULL, "<nnnn> External Stack start location" },
-    { 0,    OPTION_CODE_LOC,        NULL, "<nnnn> Code Segment Location" },
-    { 0,    OPTION_CODE_SIZE,       NULL, "<nnnn> Code Segment size" },
-    { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
-    { 0,    OPTION_DATA_LOC,        NULL, "<nnnn> Direct data start location" },
-    { 0,    OPTION_IDATA_LOC,       NULL, NULL },
+    { 0,    OPTION_XRAM_LOC,        &options.xdata_loc, "<nnnn> External Ram start location", CLAT_INTEGER },
+    { 0,    OPTION_XRAM_SIZE,       &options.xram_size, "<nnnn> External Ram size", CLAT_INTEGER },
+    { 0,    OPTION_IRAM_SIZE,       &options.iram_size, "<nnnn> Internal Ram size", CLAT_INTEGER },
+    { 0,    OPTION_XSTACK_LOC,      &options.xstack_loc, "<nnnn> External Stack start location", CLAT_INTEGER },
+    { 0,    OPTION_CODE_LOC,        &options.code_loc, "<nnnn> Code Segment Location", CLAT_INTEGER },
+    { 0,    OPTION_CODE_SIZE,       &options.code_size, "<nnnn> Code Segment size", CLAT_INTEGER },
+    { 0,    OPTION_STACK_LOC,       &options.stack_loc, "<nnnn> Stack pointer initial value", CLAT_INTEGER },
+    { 0,    OPTION_DATA_LOC,        &options.data_loc, "<nnnn> Direct data start location", CLAT_INTEGER },
+    { 0,    OPTION_IDATA_LOC,       &options.idata_loc, NULL, CLAT_INTEGER },
 
     /* End of options */
     { 0,    NULL }
@@ -343,7 +342,7 @@ _setPort (const char *name)
     }
   /* Error - didnt find */
   werror (E_UNKNOWN_TARGET, name);
-  exit (1);
+  exit (EXIT_FAILURE);
 }
 
 /* Override the default processor with the one specified
@@ -437,7 +436,7 @@ printVersionInfo (FILE *stream)
 #elif defined(__BORLANDC__)
            " (BORLANDC)\n"
 #else
-           " (UNIX) \n"
+           " (UNIX)\n"
 #endif
     , getBuildNumber() );
 }
@@ -624,7 +623,7 @@ processFile (char *s)
 
           dbuf_destroy (&path);
 
-          exit (1);
+          exit (EXIT_FAILURE);
         }
 
       /* get rid of any path information
@@ -712,7 +711,18 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
 int
 getIntArg(const char *szStart, char **argv, int *pi, int argc)
 {
-  return (int)floatFromVal(constVal(getStringArg(szStart, argv, pi, argc)));
+  char *p;
+  int val;
+  char *str = getStringArg(szStart, argv, pi, argc);
+
+  val = strtol(str, &p, 0);
+  if (p == str || *p != '\0')
+    {
+      werror (E_BAD_INT_ARGUMENT, szStart);
+      /* Die here rather than checking for errors later. */
+      exit (EXIT_FAILURE);
+    }
+  return val;
 }
 
 static void
@@ -784,21 +794,18 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
               verifyShortOption(argv[*pi]);
 
               (*(int *)optionsTable[i].pparameter)++;
-            }
-          else
-            {
-              /* Not a flag.  Handled manually later. */
-              return FALSE;
+
+              return TRUE;
             }
         }
       else
         {
-          size_t len = optionsTable[i].longOpt ? strlen(optionsTable[i].longOpt) : 0;
+          size_t len = optionsTable[i].longOpt ? strlen (optionsTable[i].longOpt) : 0;
 
           if (longOpt &&
             (optionsTable[i].arg_type != CLAT_BOOLEAN ||
-            (optionsTable[i].arg_type == CLAT_BOOLEAN && len == strlen(longOpt) && optionsTable[i].longOpt)) &&
-            strncmp(optionsTable[i].longOpt, longOpt, len) == 0)
+            (optionsTable[i].arg_type == CLAT_BOOLEAN && len == strlen (longOpt) && optionsTable[i].longOpt)) &&
+            strncmp (optionsTable[i].longOpt, longOpt, len) == 0)
             {
               /* If it is a flag then we can handle it here */
               if (optionsTable[i].pparameter != NULL)
@@ -816,13 +823,19 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
                     case CLAT_STRING:
                       if (*(char **)optionsTable[i].pparameter)
                         Safe_free(*(char **)optionsTable[i].pparameter);
-                      *(char **)optionsTable[i].pparameter = Safe_strdup(getStringArg (optionsTable[i].longOpt, argv, pi, argc));
+                      *(char **)optionsTable[i].pparameter = Safe_strdup (getStringArg (optionsTable[i].longOpt, argv, pi, argc));
                       break;
 
                     case CLAT_SET:
                       if (*(set **)optionsTable[i].pparameter)
-                        deleteSet((set **)optionsTable[i].pparameter);
-                      setParseWithComma((set **)optionsTable[i].pparameter, getStringArg(optionsTable[i].longOpt, argv, &i, argc));
+                        {
+                          deleteSet ((set **)optionsTable[i].pparameter);
+                        }
+                      setParseWithComma ((set **)optionsTable[i].pparameter, getStringArg (optionsTable[i].longOpt, argv, pi, argc));
+                      break;
+
+                    case CLAT_ADD_SET:
+                      addSet((set **)optionsTable[i].pparameter, Safe_strdup (getStringArg (optionsTable[i].longOpt, argv, pi, argc)));
                       break;
                     }
                   return TRUE;
@@ -968,83 +981,10 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_PEEP_FILE) == 0)
-            {
-              options.peep_file = getStringArg(OPTION_PEEP_FILE, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_LIB_PATH) == 0)
-            {
-              addSet(&libPathsSet, Safe_strdup(getStringArg(OPTION_LIB_PATH, argv, &i, argc)));
-              continue;
-            }
-
           if (strcmp (argv[i], OPTION_VERSION) == 0)
             {
               printVersionInfo (stdout);
               exit (EXIT_SUCCESS);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_CALLEE_SAVES) == 0)
-            {
-              setParseWithComma(&options.calleeSavesSet, getStringArg(OPTION_CALLEE_SAVES, argv, &i, argc));
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_XSTACK_LOC) == 0)
-            {
-              options.xstack_loc = getIntArg(OPTION_XSTACK_LOC, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STACK_LOC) == 0)
-            {
-              options.stack_loc = getIntArg(OPTION_STACK_LOC, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_XRAM_LOC) == 0)
-            {
-              options.xdata_loc = getIntArg(OPTION_XRAM_LOC, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_IRAM_SIZE) == 0)
-            {
-              options.iram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
-            {
-              options.xram_size = getIntArg(OPTION_XRAM_SIZE, argv, &i, argc);
-              options.xram_size_set = TRUE;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_CODE_SIZE) == 0)
-            {
-              options.code_size = getIntArg(OPTION_CODE_SIZE, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_DATA_LOC) == 0)
-            {
-              options.data_loc = getIntArg(OPTION_DATA_LOC, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_IDATA_LOC) == 0)
-            {
-              options.idata_loc = getIntArg(OPTION_IDATA_LOC, argv, &i, argc);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_CODE_LOC) == 0)
-            {
-              options.code_loc = getIntArg(OPTION_CODE_LOC, argv, &i, argc);
               continue;
             }
 
@@ -1264,7 +1204,7 @@ parseCmdLine (int argc, char **argv)
               verifyShortOption(argv[i]);
 
               printVersionInfo (stdout);
-              exit (0);
+              exit (EXIT_SUCCESS);
               break;
 
               /* preprocessor options */
@@ -1275,11 +1215,6 @@ parseCmdLine (int argc, char **argv)
                   addSet(&preArgvSet, Safe_strdup("-MM"));
                 else
                   addSet(&preArgvSet, Safe_strdup("-M"));
-                break;
-              }
-            case 'C':
-              {
-                addSet(&preArgvSet, Safe_strdup("-C"));
                 break;
               }
 
@@ -1369,7 +1304,7 @@ parseCmdLine (int argc, char **argv)
       if (!dstFileName)
         {
           werror (E_NEED_OPT_O_IN_C1);
-          exit (1);
+          exit (EXIT_FAILURE);
         }
     }
   /* if no dstFileName given with -o, we've to find one: */
@@ -1511,7 +1446,7 @@ linkEdit (char **envp)
       if (!(lnkfile = fopen (linkerScriptFileName, "w")))
         {
           werror (E_FILE_OPEN_ERR, linkerScriptFileName);
-          exit (1);
+          exit (EXIT_FAILURE);
         }
 
       if (TARGET_Z80_LIKE)
@@ -1944,7 +1879,7 @@ linkEdit (char **envp)
     }
   if (system_ret)
     {
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 }
 
@@ -1981,7 +1916,7 @@ assemble (char **envp)
         /* either system() or the assembler itself has reported an error
            perror ("Cannot exec assembler");
         */
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     /* TODO: most assembler don't have a -o parameter */
     /* -o option overrides default name? */
@@ -2113,16 +2048,16 @@ preProcess (char **envp)
 
       if (preProcOnly) {
         if (my_system (buffer)) {
-          exit (1);
+          exit (EXIT_FAILURE);
         }
 
-        exit (0);
+        exit (EXIT_SUCCESS);
       }
 
       yyin = my_popen (buffer);
       if (yyin == NULL) {
           perror ("Preproc file not found");
-          exit (1);
+          exit (EXIT_FAILURE);
       }
     }
 
@@ -2335,7 +2270,7 @@ sig_handler (int signal)
       break;
     }
   fprintf (stderr, "Caught signal %d: %s\n", signal, sig_string);
-  exit (1);
+  exit (EXIT_FAILURE);
 }
 
 /*
@@ -2349,10 +2284,11 @@ main (int argc, char **argv, char **envp)
   /* turn all optimizations off by default */
   memset (&optimize, 0, sizeof (struct optimize));
 
-  if (NUM_PORTS==0) {
-    fprintf (stderr, "Build error: no ports are enabled.\n");
-    exit (1);
-  }
+  if (NUM_PORTS==0)
+    {
+      fprintf (stderr, "Build error: no ports are enabled.\n");
+      exit (EXIT_FAILURE);
+    }
 
   /* install signal handler;
      it's only purpose is to call exit() to remove temp files */
@@ -2404,11 +2340,11 @@ main (int argc, char **argv, char **envp)
   setBinPaths(argv[0]);
   setDataPaths(argv[0]);
 
-  if(port->initPaths)
-        port->initPaths();
+  if (port->initPaths)
+    port->initPaths();
 
-  if(options.printSearchDirs)
-        doPrintSearchDirs();
+  if (options.printSearchDirs)
+    doPrintSearchDirs();
 
   /* if no input then printUsage & exit */
   if (!options.c1mode && !fullSrcFileName && peekSet(relFilesSet) == NULL)
@@ -2454,17 +2390,17 @@ main (int argc, char **argv, char **envp)
       }
 
       if (port->general.do_glue != NULL)
-        (*port->general.do_glue)();
+        (*port->general.do_glue) ();
       else
         {
           /* this shouldn't happen */
-          assert(FALSE);
+          assert (FALSE);
           /* in case of NDEBUG */
-          glue();
+          glue ();
         }
 
       if (fatalError) {
-        exit (1);
+        exit (EXIT_FAILURE);
       }
 
       if (!options.c1mode && !noAssemble)

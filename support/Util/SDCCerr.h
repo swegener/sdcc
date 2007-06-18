@@ -209,6 +209,7 @@ SDCCERR - SDCC Standard error handler
 #define W_BAD_PRAGMA_ARGUMENTS        191 /* #pragma %s: bad argument(s); pragma ignored */
 #define E_BAD_RESTRICT                192 /* Only pointers may be qualified with 'restrict' */
 #define E_BAD_INLINE                  193 /* Only functions may be qualified with 'inline' */
+#define E_BAD_INT_ARGUMENT            194 /* Bad integer option argument. */
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 
 /** Describes the maximum error level that will be logged.  Any level

@@ -26,13 +26,13 @@ static OPTION _ds390_options[] =
   {
     { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds390 (default)" },
     { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds390 (not supported yet)" },
-    { 0, OPTION_STACK_SIZE,     NULL, "Tells the linker to allocate this space for stack"},
+    { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
     { 0, "--pack-iram",         NULL, "Tells the linker to pack variables in internal ram (default)"},
-    { 0, "--no-pack-iram",      &options.no_pack_iram,"Tells the linker not to pack variables in internal ram"},
+    { 0, "--no-pack-iram",      &options.no_pack_iram, "Tells the linker not to pack variables in internal ram"},
     { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds390 (default)" },
-    { 0, "--use-accelerator",   &options.useAccelerator,"generate code for ds390 arithmetic accelerator"},
-    { 0, "--protect-sp-update", &options.protect_sp_update,"will disable interrupts during ESP:SP updates"},
-    { 0, "--parms-in-bank1",    &options.parms_in_bank1,"use Bank1 for parameter passing"},
+    { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds390 arithmetic accelerator"},
+    { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
+    { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
     { 0, NULL }
   };
 
@@ -143,11 +143,6 @@ _ds390_parseOptions (int *pargc, char **argv, int *i)
   else if (!strcmp (argv[*i], OPTION_FLAT24_MODEL))
     {
       options.model = MODEL_FLAT24;
-      return TRUE;
-    }
-  else if (!strcmp (argv[*i], OPTION_STACK_SIZE))
-    {
-      options.stack_size = getIntArg (OPTION_STACK_SIZE, argv, i, *pargc);
       return TRUE;
     }
   return FALSE;
@@ -992,30 +987,16 @@ static OPTION _tininative_options[] =
   {
     { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds390 (default)" },
     { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds390 (not supported yet)" },
-    { 0, OPTION_STACK_SIZE,     NULL, "Tells the linker to allocate this space for stack"},
+    { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
     { 0, "--pack-iram",         NULL, "Tells the linker to pack variables in internal ram (default)"},
-    { 0, "--no-pack-iram",      &options.no_pack_iram,"Tells the linker not to pack variables in internal ram"},
+    { 0, "--no-pack-iram",      &options.no_pack_iram, "Tells the linker not to pack variables in internal ram"},
     { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds390 (default)" },
-    { 0, "--use-accelerator",   &options.useAccelerator,"generate code for ds390 arithmetic accelerator"},
-    { 0, "--protect-sp-update", &options.protect_sp_update,"will disable interrupts during ESP:SP updates"},
-    { 0, "--parms-in-bank1",    &options.parms_in_bank1,"use Bank1 for parameter passing"},
-    { 0, OPTION_TINI_LIBID,     NULL, "<nnnn> LibraryID used in -mTININative"},
+    { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds390 arithmetic accelerator"},
+    { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
+    { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
+    { 0, OPTION_TINI_LIBID,     &options.tini_libid, "<nnnn> LibraryID used in -mTININative", CLAT_INTEGER },
     { 0, NULL }
   };
-
-static bool
-_tininative_parseOptions (int *pargc, char **argv, int *i)
-{
-  if (_ds390_parseOptions (pargc, argv, i))
-    return TRUE;
-
-  if (!strcmp (argv[*i], OPTION_TINI_LIBID))
-    {
-      options.tini_libid = getIntArg (OPTION_TINI_LIBID, argv, i, *pargc);
-      return TRUE;
-    }
-  return FALSE;
-}
 
 static void _tininative_init (void)
 {
@@ -1293,7 +1274,7 @@ PORT tininative_port =
   },
   "",
   _tininative_init,
-  _tininative_parseOptions,
+  _ds390_parseOptions,
   _tininative_options,
   NULL,
   _tininative_finaliseOptions,
@@ -1356,13 +1337,13 @@ static OPTION _ds400_options[] =
   {
     { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds400 (default)" },
     { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds400 (not supported yet)" },
-    { 0, OPTION_STACK_SIZE,     NULL, "Tells the linker to allocate this space for stack"},
+    { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
     { 0, "--pack-iram",         NULL, "Tells the linker to pack variables in internal ram (default)"},
-    { 0, "--no-pack-iram",      &options.no_pack_iram,"Tells the linker not to pack variables in internal ram"},
+    { 0, "--no-pack-iram",      &options.no_pack_iram, "Tells the linker not to pack variables in internal ram"},
     { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds400 (default)" },
-    { 0, "--use-accelerator",   &options.useAccelerator,"generate code for ds400 arithmetic accelerator"},
-    { 0, "--protect-sp-update", &options.protect_sp_update,"will disable interrupts during ESP:SP updates"},
-    { 0, "--parms-in-bank1",    &options.parms_in_bank1,"use Bank1 for parameter passing"},
+    { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds400 arithmetic accelerator"},
+    { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
+    { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
     { 0, NULL }
   };
 

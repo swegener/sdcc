@@ -1,3 +1,13 @@
+2007-06-18 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: removed option -C since SDCC compiler doesn't know
+	  how to handle comments, so they have to be removed by the
+	  preprocessor; fixed bug #1738926:SDCC #4852: broken option -V
+	* src/SDCCmain.c, src/SDCCargs.h, src/ds390/main.c, src/mcs15/main.c,
+	  src/pic16/main.c, src/pic/main.c, src/z80/main.c,
+	  support/Util/SDCCerr.c, support/Util/SDCCerr.h:
+	  table driven option hadling
+
 2007-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (decorateType),

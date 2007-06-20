@@ -6151,6 +6151,32 @@ inlineFindParm (ast * parms, int index)
   return inlineFindParmRecurse (parms, &index);
 }
 
+/*-----------------------------------------------------------------*/
+/* inlineFindMaxBlockno - find maximum block number in an ast tree */
+/*-----------------------------------------------------------------*/
+static int
+inlineFindMaxBlockno (ast * tree, int maxBlockno)
+{
+  int tempBlockno;
+
+  if (!tree)
+    return maxBlockno;
+
+  tempBlockno = inlineFindMaxBlockno (tree->left, maxBlockno);
+  if (tempBlockno > maxBlockno)
+    maxBlockno = tempBlockno;
+
+  tempBlockno = inlineFindMaxBlockno (tree->right, maxBlockno);
+  if (tempBlockno > maxBlockno)
+    maxBlockno = tempBlockno;
+
+  if (tree->block > maxBlockno)
+    maxBlockno = tree->block;
+  return maxBlockno;
+}
+
+
+
 
 /*-----------------------------------------------------------------*/
 /* expandInlineFuncs - replace calls to inline functions with the  */
@@ -6329,6 +6355,7 @@ createFunction (symbol * name, ast * body)
   int stack = 0;
   sym_link *fetype;
   iCode *piCode = NULL;
+  int savedBlockno;
 
   if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "SDCCast.c:createFunction(%s)\n", name->name);
@@ -6385,7 +6412,10 @@ createFunction (symbol * name, ast * body)
     reentrant++;
 
   inlineState.count = 0;
+  savedBlockno = currBlockno;
+  currBlockno = inlineFindMaxBlockno (body, 0);
   expandInlineFuncs (body, NULL);
+  currBlockno = savedBlockno;
 
   if (FUNC_ISINLINE (name->type))
     name->funcTree = copyAst (body);

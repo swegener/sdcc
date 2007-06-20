@@ -1,3 +1,7 @@
+2007-06-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+	* src/SDCCast.c (inlineFindMaxBlockno, createFunction): fixed
+	  bug 1731741
+
 2007-06-18 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c: removed option -C since SDCC compiler doesn't know

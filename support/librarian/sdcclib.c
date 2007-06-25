@@ -28,11 +28,13 @@ char ProgName[PATH_MAX];
 char LibName[PATH_MAX];
 char LibNameTmp[PATH_MAX];
 char IndexName[PATH_MAX];
-char RelName[PATH_MAX];
 char AdbName[PATH_MAX];
 char ListName[PATH_MAX];
 
-#define version "1.0"
+char **RelName;
+int NumRelFiles=0;
+
+#define version "1.1"
 
 #define OPT_ADD_REL 0
 #define OPT_EXT_REL 1
@@ -49,7 +51,6 @@ int action=0;
 FILE *lib, *newlib, *rel, *adb, *libindex;
 char FLine[MAXLINE+1];
 char ModName[MAXLINE+1];
-int state=0;
 
 void GetNameFromPath(char * path, char * name)
 {
@@ -93,12 +94,12 @@ int set_options (char * opt)
 {
 	int rvalue=0, unknown=0;
 	static char Help[] =
-	"Usage: %s [-options] library relfile\n\n"
+	"Usage: %s [-options] library relfile1 relfile2 relfile3 ...\n\n"
 	"available options:\n"
-	"a - Adds relfile to library.  If relfile exists, replaces it.\n"
+	"a - Adds relfile(s) to library.  If relfile exists, replaces it.\n"
    	"l - Adds relfile list to library.\n"
-	"d - Deletes relfile from library.\n"
-	"e - Extracts relfile from library.\n"
+	"d - Deletes relfile(s) from library.\n"
+	"e - Extracts relfile(s) from library.\n"
 	"s - Dumps symbols of library.\n"
 	"m - Dumps modules of library.\n"
 	"v - Displays program version.\n"
@@ -169,19 +170,48 @@ void ProcLineOptions (int argc, char **argv)
                     if(action==OPT_ADD_LIST)
                         strcpy(ListName, argv[j]);
                     else
-					    strcpy(RelName, argv[j]);
+					{
+						NumRelFiles=1;
+						RelName = (char **) calloc (1, sizeof (char *));
+						if(RelName==NULL)
+						{
+							printf("ERROR: Insuficient memory.\n");
+							exit(2);
+						}
+						RelName[0]=(char *)malloc(PATH_MAX);
+						if(RelName[0]==NULL)
+						{
+							printf("ERROR: Insuficient memory.\n");
+							exit(2);
+						}
+					    strcpy(RelName[0], argv[j]);
+					}
 				break;
 
 				default:
 					cont_par++;
+					NumRelFiles++;
+					RelName = (char **) realloc (RelName, NumRelFiles * sizeof (char *));
+					if(RelName==NULL)
+					{
+						printf("ERROR: Insuficient memory.\n");
+						exit(2);
+					}
+					RelName[NumRelFiles-1]=(char *)malloc(PATH_MAX);
+					if(RelName[NumRelFiles-1]==NULL)
+					{
+						printf("ERROR: Insuficient memory.\n");
+						exit(2);
+					}
+				    strcpy(RelName[NumRelFiles-1], argv[j]);
 				break;
 			}
 		}
 	}
 
-	if ( (cont_par!=2) && (action<OPT_DUMP_SYM) )
+	if ( (cont_par<2) && (action<OPT_DUMP_SYM) )
 	{
-		printf("ERROR: Too %s arguments.\n", cont_par<2?"few":"many");
+		printf("ERROR: Too few arguments.\n");
 		set_options("h"); /*Show help and exit*/
 	}
 	else if ( (cont_par!=1) && (action>=OPT_DUMP_SYM) )
@@ -191,9 +221,10 @@ void ProcLineOptions (int argc, char **argv)
 	}
 }
 
-void AddRel(void)
+void AddRel(char * RelName)
 {
     int inrel=0;
+	int state=0;
     long newlibpos, indexsize;
     char symname[MAXLINE+1];
     char c;
@@ -380,8 +411,10 @@ void AddRel(void)
     remove(IndexName);
 }
 
-void ExtractRel(void)
+void ExtractRel(char * RelName)
 {
+	int state=0;
+
     strcpy(AdbName, RelName);
     ChangeExtension(AdbName, "adb");
 
@@ -395,7 +428,7 @@ void ExtractRel(void)
     rel=fopen(RelName, "w");
     if(rel==NULL)
     {
-        printf("ERROR: Couldn't create file '%s'\n", RelName);
+        printf("ERROR: Couldn't create file '%s'\n", RelName[0]);
         fclose(lib);
         return;
     }
@@ -456,6 +489,8 @@ void ExtractRel(void)
 
 void DumpSymbols(void)
 {
+	int state=0;
+
     lib=fopen(LibName, "r");
     if(lib==NULL)
     {
@@ -537,6 +572,7 @@ void AddList(void)
     char *as;
     char CmdLine[1024];
     char SrcName[PATH_MAX];
+	char RelName[PATH_MAX];
 
     list=fopen(ListName, "r");
     if(list==NULL)
@@ -593,7 +629,7 @@ void AddList(void)
             }
 
             printf("Adding: %s\n", RelName);
-            AddRel();
+            AddRel(RelName);
         }
     }
     action=OPT_ADD_LIST;
@@ -602,6 +638,7 @@ void AddList(void)
 
 int main(int argc, char **argv)
 {
+	int j;
 	ProcLineOptions (argc, argv);
 
 	switch(action)
@@ -610,7 +647,10 @@ int main(int argc, char **argv)
 	        action=OPT_ADD_REL;
 		case OPT_ADD_REL:
 		case OPT_DEL_REL:
-		    AddRel();
+			for(j=0; j<NumRelFiles; j++) AddRel(RelName[j]);
+			//Clean up
+			for(j=0; j<NumRelFiles; j++) free(RelName[j]);
+			free(RelName);
 		break;
 		
         case OPT_ADD_LIST:
@@ -618,7 +658,10 @@ int main(int argc, char **argv)
         break;
 
 		case OPT_EXT_REL:
-            ExtractRel();
+            for(j=0; j<NumRelFiles; j++) ExtractRel(RelName[j]);
+			//Clean up
+			for(j=0; j<NumRelFiles; j++) free(RelName[j]);
+			free(RelName);
         break;
         
 		case OPT_DUMP_SYM:

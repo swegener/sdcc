@@ -1,3 +1,8 @@
+2007-06-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* support/librarian/sdcclib.c: Added feature Requests [1510635]
+	  Multiple infiles for sdcclib.
+
 2007-06-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 	* src/SDCCast.c (inlineFindMaxBlockno, createFunction): fixed
 	  bug 1731741

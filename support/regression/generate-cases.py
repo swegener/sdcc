@@ -107,8 +107,7 @@ class InstanceGenerator:
 
         n = 0;
         for fun in self.functions:
-            # Turn the function definition into a pointer
-            fun = re.sub(r'\(\w+\)', '', fun)
+            # Turn the function definition into a function call
             fout.write("  __prints(\"Running " + fun + "\\n\");\n");
             fout.write('  ' + fun + "();\n")
             n += 1;
@@ -157,8 +156,9 @@ class InstanceGenerator:
                     None
             else:
                 # Pull out any test function names
-                if re.search(r'^\W*test\w*\W*\(\W*void\W*\)', line) != None:
-                    self.functions.append(line)
+                m = re.match(r'^(?:\W*void\W+)?\W*(test\w*)\W*\(\W*void\W*\)', line)
+                if m != None:
+                    self.functions.append(m.group(1))
 
     def generate(self):
         """Main function.  Generates all of the instances."""

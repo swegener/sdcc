@@ -1,7 +1,10 @@
 2007-06-26 Borut Razem <borut.razem AT siol.net>
 
-	* support/regression/generate-cases.py: display warning if function list
-	  is empty
+	* support/regression/generate-cases.py: display warning if function
+	  list is empty; implemented more flexible rule for detection of
+	  testing functions, allowing return type 'void' in the same line as
+	  the function name in the function definition
+	* support/regression/tests/bug-1654060.c: corrected test
 
 2007-06-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

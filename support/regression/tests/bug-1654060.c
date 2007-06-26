@@ -21,6 +21,6 @@ void testTypedef(void)
 
   ASSERT(c1 == 'A');
   ASSERT(i1 == 12345);
-  ASSERT(c1 == 'B');
-  ASSERT(i1 == 21435);
+  ASSERT(c2 == 'B');
+  ASSERT(i2 == 21435);
 }

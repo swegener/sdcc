@@ -428,7 +428,7 @@ void ExtractRel(char * RelName)
     rel=fopen(RelName, "w");
     if(rel==NULL)
     {
-        printf("ERROR: Couldn't create file '%s'\n", RelName[0]);
+        printf("ERROR: Couldn't create file '%s'\n", RelName);
         fclose(lib);
         return;
     }

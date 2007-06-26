@@ -118,6 +118,7 @@ class InstanceGenerator:
         fout.write(testfunsuite);
         
         fout.close()
+        return n
 
     def readfile(self):
         """Read in all of the input file."""
@@ -163,7 +164,8 @@ class InstanceGenerator:
         """Main function.  Generates all of the instances."""
         self.readfile()
         self.parse()
-        self.writetemplate()
+        if self.writetemplate() == 0:
+            sys.stderr.write("Empty function list in " + outdir + "!\n")
 
         # Create the output directory if it doesn't exist
         createdir(outdir)

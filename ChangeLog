@@ -1,3 +1,8 @@
+2007-06-26 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/generate-cases.py: display warning if function list
+	  is empty
+
 2007-06-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* support/librarian/sdcclib.c: Added feature Requests [1510635]

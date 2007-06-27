@@ -1,3 +1,7 @@
+2007-06-27 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
+
+	* device/include/mcs51/p89c66x.h: NXP header file, OK to change licence
+
 2007-06-26 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/generate-cases.py: display warning if function

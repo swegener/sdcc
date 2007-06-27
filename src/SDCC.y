@@ -520,14 +520,14 @@ declaration_specifiers
      else
        $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
    }
-   | function_specifier				    { $$ = $1; }
+   | function_specifier                             { $$ = $1; }
    | function_specifier declaration_specifiers          { 
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
        sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
-	 lnk = lnk->next;
+         lnk = lnk->next;
        lnk->next = mergeSpec($1,lnk->next, "function_specifier declaration_specifiers - skipped");
        $$ = $2 ;
      }
@@ -1115,23 +1115,32 @@ declarator2
          }
    | declarator3 '[' constant_expr ']'
          {
-            sym_link   *p ;
-                        value *tval;
+            sym_link *p;
+            value *tval;
+            int size;
 
-            tval = constExprValue($3,TRUE);
+            tval = constExprValue($3, TRUE);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
-            DCL_TYPE(p) = ARRAY ;
-            if ( !tval || (SPEC_SCLS(tval->etype) != S_LITERAL)) {
-               werror(E_CONST_EXPECTED) ;
-               /* Assume a single item array to limit the cascade */
-               /* of additional errors. */
-               DCL_ELEM(p) = 1;
-            }
-            else {
-               DCL_ELEM(p) = (int) floatFromVal(tval) ;
-            }
-            addDecl($1,0,p);
+            DCL_TYPE(p) = ARRAY;
+
+            if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
+              {
+                werror(E_CONST_EXPECTED);
+                /* Assume a single item array to limit the cascade */
+                /* of additional errors. */
+                size = 1;
+              }
+            else
+              {
+                if ((size = (int)floatFromVal(tval)) < 0)
+                  {
+                    werror(E_NEGATIVE_ARRAY_SIZE, $1->name);
+                    size = 1;
+                  }
+              }
+            DCL_ELEM(p) = size;
+            addDecl($1, 0, p);
          }
    ;
 
@@ -1194,40 +1203,40 @@ pointer
          }
    | unqualified_pointer type_specifier_list pointer
          {
-	     $$ = $1 ;  	     
-	     if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {
-		 DCL_PTR_CONST($1) = SPEC_CONST($2);
-		 DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
-		 DCL_PTR_RESTRICT($1) = SPEC_RESTRICT($2);
-		 switch (SPEC_SCLS($2)) {
-		 case S_XDATA:
-		     DCL_TYPE($3) = FPOINTER;
-		     break;
-		 case S_IDATA:
-		     DCL_TYPE($3) = IPOINTER ;
-		     break;
-		 case S_PDATA:
-		     DCL_TYPE($3) = PPOINTER ;
-		     break;
-		 case S_DATA:
-		     DCL_TYPE($3) = POINTER ;
-		     break;
-		 case S_CODE:
-		     DCL_TYPE($3) = CPOINTER ;
-		     break;
-		 case S_EEPROM:
-		     DCL_TYPE($3) = EEPPOINTER;
-		     break;
-		 default:
-		   // this could be just "constant" 
-		   // werror(W_PTR_TYPE_INVALID);
-		     ;
-		 }
-	     }
-	     else 
-		 werror (W_PTR_TYPE_INVALID);
-	     $$->next = $3 ;
-	 }
+             $$ = $1 ;               
+             if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {
+                 DCL_PTR_CONST($1) = SPEC_CONST($2);
+                 DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
+                 DCL_PTR_RESTRICT($1) = SPEC_RESTRICT($2);
+                 switch (SPEC_SCLS($2)) {
+                 case S_XDATA:
+                     DCL_TYPE($3) = FPOINTER;
+                     break;
+                 case S_IDATA:
+                     DCL_TYPE($3) = IPOINTER ;
+                     break;
+                 case S_PDATA:
+                     DCL_TYPE($3) = PPOINTER ;
+                     break;
+                 case S_DATA:
+                     DCL_TYPE($3) = POINTER ;
+                     break;
+                 case S_CODE:
+                     DCL_TYPE($3) = CPOINTER ;
+                     break;
+                 case S_EEPROM:
+                     DCL_TYPE($3) = EEPPOINTER;
+                     break;
+                 default:
+                   // this could be just "constant" 
+                   // werror(W_PTR_TYPE_INVALID);
+                     ;
+                 }
+             }
+             else 
+                 werror (W_PTR_TYPE_INVALID);
+             $$->next = $3 ;
+         }
    ;
 
 unqualified_pointer
@@ -1718,4 +1727,3 @@ identifier
    : IDENTIFIER   { $$ = newSymbol ($1,NestLevel) ; }
    ;
 %%
-

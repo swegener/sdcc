@@ -21,12 +21,12 @@
 
 #include "SDCCerr.h"
 
-#define USE_STDOUT_FOR_ERRORS		0
+#define USE_STDOUT_FOR_ERRORS   0
 
 #if USE_STDOUT_FOR_ERRORS
-#define DEFAULT_ERROR_OUT	stdout
+#define DEFAULT_ERROR_OUT       stdout
 #else
-#define DEFAULT_ERROR_OUT	stderr
+#define DEFAULT_ERROR_OUT       stderr
 #endif
 
 struct SDCCERRG _SDCCERRG; 
@@ -39,11 +39,11 @@ extern int fatalError ;
  * entry in the array. It is only included in order to make 
  * human error lookup easier.
  */
-struct  
+struct
 {
-    int			errIndex;
-    ERROR_LOG_LEVEL	errType;
-    const char		*errText;
+    int                 errIndex;
+    ERROR_LOG_LEVEL     errType;
+    const char          *errText;
 } ErrTab [] =
 {
 { E_DUPLICATE, ERROR_LEVEL_ERROR,
@@ -195,11 +195,11 @@ struct
 { E_INT_ARGS, ERROR_LEVEL_ERROR,
    "interrupt routine cannot have arguments, arguments ingored" },
 { E_INCLUDE_MISSING, ERROR_LEVEL_ERROR,
-   "critical compiler #include file missing.		" },
+   "critical compiler #include file missing.            " },
 { E_NO_MAIN, ERROR_LEVEL_ERROR,
    "function 'main' undefined" },
 { E_EXTERN_INIT, ERROR_LEVEL_ERROR,
-   "'extern' variable '%s' cannot be initialised	" },
+   "'extern' variable '%s' cannot be initialised        " },
 { E_PRE_PROC_FAILED, ERROR_LEVEL_ERROR,
    "Pre-Processor %s" },
 { E_DUP_FAILED, ERROR_LEVEL_ERROR,
@@ -366,7 +366,7 @@ struct
 { W_SYMBOL_NAME_TOO_LONG, ERROR_LEVEL_WARNING,
     "symbol name too long, truncated to %d chars" },
 { W_CAST_STRUCT_PTR,ERROR_LEVEL_WARNING,
-	  "cast of struct %s * to struct %s * " },
+          "cast of struct %s * to struct %s * " },
 { W_LIT_OVERFLOW, ERROR_LEVEL_WARNING,
     "overflow in implicit constant conversion" },
 { E_PARAM_NAME_OMITTED, ERROR_LEVEL_ERROR,
@@ -441,7 +441,9 @@ struct
 { E_BAD_INLINE, ERROR_LEVEL_ERROR,
    "Only functions may be qualified with 'inline'" },
 { E_BAD_INT_ARGUMENT, ERROR_LEVEL_ERROR,
-   "Bad integer argument for option %s." },
+   "Bad integer argument for option %s" },
+{ E_NEGATIVE_ARRAY_SIZE, ERROR_LEVEL_ERROR,
+   "Size of array '%s' is negative" },
 };
 
 /*
@@ -499,17 +501,17 @@ void vwerror (int errNum, va_list marker)
         switch(ErrTab[errNum].errType)
         {
             case ERROR_LEVEL_ERROR:
-            	fprintf(_SDCCERRG.out, "error %d: ", errNum);
-            	break;
+                fprintf(_SDCCERRG.out, "error %d: ", errNum);
+                break;
             case ERROR_LEVEL_WARNING:
             case ERROR_LEVEL_PEDANTIC:
                 fprintf(_SDCCERRG.out, "warning %d: ", errNum);
-            	break;
+                break;
             case ERROR_LEVEL_INFO:
-            	fprintf(_SDCCERRG.out, "info %d: ", errNum);
-            	break;
-	    default:
-	    	break;            	
+                fprintf(_SDCCERRG.out, "info %d: ", errNum);
+                break;
+            default:
+                break;                  
         }
     
         vfprintf(_SDCCERRG.out, ErrTab[errNum].errText,marker);

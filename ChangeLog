@@ -4,6 +4,8 @@
 	  in warning
 	* configure.in, configure, sdccconf_in.h: find out the endianess of
 	  host machine
+	* src/SDCC.y: fixed bug #1744146: Crash when compiling array of
+	  negative size
 
 2007-06-27 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 

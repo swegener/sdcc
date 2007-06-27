@@ -54,20 +54,22 @@
 #undef TYPE_UWORD
 #undef TYPE_UDWORD
 
-/* find out the endianess of host machine */
+/*
+ * find out the endianess of host machine
+ * in order to be able to make Mac OS X unified binaries
+ */
 #if __BIG_ENDIAN__ || _BIG_ENDIAN
 /* 1) trust the compiler */
 # define WORDS_BIGENDIAN 1
 #elif __LITTLE_ENDIAN__
-/* just in case ... */
-#undef WORDS_BIGENDIAN
+/* do nothing */
 #elif (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
 /* 2) trust the header files */
 # if BYTE_ORDER == BIG_ENDIAN 
 #   define WORDS_BIGENDIAN 1
 # endif
 #else 
-/* 3) assume that host machine has the same endianess as the build machine */
+/* 3) trust the configure; this actually doesn't work for unified Mac OS X binaries :-( */
 # undef BUILD_WORDS_BIGENDIAN
 # if (defined BUILD_WORDS_BIGENDIAN && BUILD_WORDS_BIGENDIAN)
 #   define WORDS_BIGENDIAN  1

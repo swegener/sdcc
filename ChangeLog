@@ -1,3 +1,10 @@
+2007-06-27 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/generate-cases.py: corrected the file name
+	  in warning
+	* configure.in, configure, sdccconf_in.h: find out the endianess of
+	  host machine
+
 2007-06-27 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 
 	* device/include/mcs51/p89c66x.h: NXP header file, OK to change licence
@@ -11,7 +18,6 @@
 	* support/regression/tests/bug-1654060.c: corrected test
 	* support/librarian/sdcclib.c: fixed warning:
 	  format '%s' expects type 'char *', but argument 2 has type 'int'
-
 
 2007-06-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

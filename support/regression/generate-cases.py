@@ -165,7 +165,7 @@ class InstanceGenerator:
         self.readfile()
         self.parse()
         if self.writetemplate() == 0:
-            sys.stderr.write("Empty function list in " + outdir + "!\n")
+            sys.stderr.write("Empty function list in " + self.inname + "!\n")
 
         # Create the output directory if it doesn't exist
         createdir(outdir)

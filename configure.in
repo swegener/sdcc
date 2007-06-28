@@ -380,7 +380,7 @@ AC_DEFINE_UNQUOTED(TYPE_UDWORD, unsigned $TYPE_DWORD)
 # SDCC_BUILD_BIGENDIAN ([ACTION-IF-TRUE], [ACTION-IF-FALSE], [ACTION-IF-UNKNOWN])
 # -------------------------------------------------------------------------
 AC_DEFUN([SDCC_BUILD_BIGENDIAN],
-[AC_CACHE_CHECK(whether build machine byte ordering is bigendian, sdcc_cv_build_bigendian,
+[AC_CACHE_CHECK(whether host machine byte ordering is bigendian, sdcc_cv_build_bigendian,
 [# See if sys/param.h defines the BYTE_ORDER macro.
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <sys/types.h>
 #include <sys/param.h>

@@ -12156,11 +12156,13 @@ if test "$CC" = "i586-mingw32msvc-gcc"; then
   ac_cv_sizeof_long_long=4
 fi
 
-if test "$cross_compiling" = "no"
-then
-    { echo "$as_me:$LINENO: checking whether byte ordering is bigendian" >&5
-echo $ECHO_N "checking whether byte ordering is bigendian... $ECHO_C" >&6; }
-if test "${ac_cv_c_bigendian+set}" = set; then
+# SDCC_BUILD_BIGENDIAN ([ACTION-IF-TRUE], [ACTION-IF-FALSE], [ACTION-IF-UNKNOWN])
+# -------------------------------------------------------------------------
+# SDCC_BUILD_BIGENDIAN
+
+{ echo "$as_me:$LINENO: checking whether host machine byte ordering is bigendian" >&5
+echo $ECHO_N "checking whether host machine byte ordering is bigendian... $ECHO_C" >&6; }
+if test "${sdcc_cv_build_bigendian+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   # See if sys/param.h defines the BYTE_ORDER macro.
@@ -12240,12 +12242,12 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 	 test -z "$ac_cxx_werror_flag" ||
 	 test ! -s conftest.err
        } && test -s conftest.$ac_objext; then
-  ac_cv_c_bigendian=yes
+  sdcc_cv_build_bigendian=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_c_bigendian=no
+	sdcc_cv_build_bigendian=no
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -12256,7 +12258,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 	# It does not; compile a test program.
 if test "$cross_compiling" = yes; then
   # try to guess the endianness by grepping values into an object file
-  ac_cv_c_bigendian=unknown
+  sdcc_cv_build_bigendian=unknown
   cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -12295,14 +12297,14 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 	 test ! -s conftest.err
        } && test -s conftest.$ac_objext; then
   if grep BIGenDianSyS conftest.$ac_objext >/dev/null ; then
-  ac_cv_c_bigendian=yes
+  sdcc_cv_build_bigendian=yes
 fi
 if grep LiTTleEnDian conftest.$ac_objext >/dev/null ; then
-  if test "$ac_cv_c_bigendian" = unknown; then
-    ac_cv_c_bigendian=no
+  if test "$sdcc_cv_build_bigendian" = unknown; then
+    sdcc_cv_build_bigendian=no
   else
     # finding both strings is unlikely to happen, but who knows?
-    ac_cv_c_bigendian=unknown
+    sdcc_cv_build_bigendian=unknown
   fi
 fi
 else
@@ -12358,14 +12360,14 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_c_bigendian=no
+  sdcc_cv_build_bigendian=no
 else
   echo "$as_me: program exited with status $ac_status" >&5
 echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 ( exit $ac_status )
-ac_cv_c_bigendian=yes
+sdcc_cv_build_bigendian=yes
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
 fi
@@ -12375,34 +12377,25 @@ fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
-{ echo "$as_me:$LINENO: result: $ac_cv_c_bigendian" >&5
-echo "${ECHO_T}$ac_cv_c_bigendian" >&6; }
-case $ac_cv_c_bigendian in
+{ echo "$as_me:$LINENO: result: $sdcc_cv_build_bigendian" >&5
+echo "${ECHO_T}$sdcc_cv_build_bigendian" >&6; }
+case $sdcc_cv_build_bigendian in
   yes)
 
 cat >>confdefs.h <<\_ACEOF
-#define WORDS_BIGENDIAN 1
+#define BUILD_WORDS_BIGENDIAN 1
 _ACEOF
  ;;
   no)
      ;;
   *)
     { { echo "$as_me:$LINENO: error: unknown endianness
-presetting ac_cv_c_bigendian=no (or yes) will help" >&5
+presetting sdcc_cv_build_bigendian=no (or yes) will help" >&5
 echo "$as_me: error: unknown endianness
-presetting ac_cv_c_bigendian=no (or yes) will help" >&2;}
+presetting sdcc_cv_build_bigendian=no (or yes) will help" >&2;}
    { (exit 1); exit 1; }; } ;;
 esac
 
-else
-#echo "CROSS ENDIAN"
-    if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
-        ac_cv_c_bigendian=no
-    else
-        : # FIXME
-    fi
-#echo "CROSS ENDIAN DONE"
-fi
 
 { echo "$as_me:$LINENO: checking whether preprocessor accepts -MM or -M" >&5
 echo $ECHO_N "checking whether preprocessor accepts -MM or -M... $ECHO_C" >&6; }

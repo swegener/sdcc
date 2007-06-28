@@ -1,3 +1,8 @@
+2007-06-28 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/configure.in, sim/ucsim/configure, sim/ucsim/ddconfig_in.h:
+	  find out the endianess of host machine for ucsim
+
 2007-06-27 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/generate-cases.py: corrected the file name

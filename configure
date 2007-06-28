@@ -6042,8 +6042,8 @@ _ACEOF
 # -------------------------------------------------------------------------
 # SDCC_BUILD_BIGENDIAN
 
-{ echo "$as_me:$LINENO: checking whether build machine byte ordering is bigendian" >&5
-echo $ECHO_N "checking whether build machine byte ordering is bigendian... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking whether host machine byte ordering is bigendian" >&5
+echo $ECHO_N "checking whether host machine byte ordering is bigendian... $ECHO_C" >&6; }
 if test "${sdcc_cv_build_bigendian+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else

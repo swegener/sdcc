@@ -98,9 +98,31 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TYPE_UBYTE unsigned TYPE_BYTE
 #define TYPE_UWORD unsigned TYPE_WORD
 #define TYPE_UDWORD unsigned TYPE_DWORD
-#undef WORDS_BIGENDIAN
 #undef _M_
 #undef _A_
+
+/*
+ * find out the endianess of host machine
+ * in order to be able to make Mac OS X unified binaries
+ */
+#if __BIG_ENDIAN__ || _BIG_ENDIAN
+/* 1) trust the compiler */
+# define WORDS_BIGENDIAN 1
+#elif __LITTLE_ENDIAN__
+/* do nothing */
+#elif (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
+/* 2) trust the header files */
+# if BYTE_ORDER == BIG_ENDIAN 
+#   define WORDS_BIGENDIAN 1
+# endif
+#else 
+/* 3) trust the configure; this actually doesn't work for unified Mac OS X binaries :-( */
+# undef BUILD_WORDS_BIGENDIAN
+# if (defined BUILD_WORDS_BIGENDIAN && BUILD_WORDS_BIGENDIAN)
+#   define WORDS_BIGENDIAN  1
+# endif
+/* 4) assume that host is a little endian machine */
+#endif
 
 #undef VERSIONSTR
 #undef VERSIONHI

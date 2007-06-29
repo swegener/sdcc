@@ -235,7 +235,7 @@ optionsTable[] = {
     { 0,    OPTION_OUT_FMT_IHX,     NULL, "Output in Intel hex format" },
     { 0,    OPTION_OUT_FMT_S19,     NULL, "Output in S19 hex format" },
     { 0,    OPTION_XRAM_LOC,        &options.xdata_loc, "<nnnn> External Ram start location", CLAT_INTEGER },
-    { 0,    OPTION_XRAM_SIZE,       &options.xram_size, "<nnnn> External Ram size", CLAT_INTEGER },
+    { 0,    OPTION_XRAM_SIZE,       NULL, "<nnnn> External Ram size" },
     { 0,    OPTION_IRAM_SIZE,       &options.iram_size, "<nnnn> Internal Ram size", CLAT_INTEGER },
     { 0,    OPTION_XSTACK_LOC,      &options.xstack_loc, "<nnnn> External Stack start location", CLAT_INTEGER },
     { 0,    OPTION_CODE_LOC,        &options.code_loc, "<nnnn> Code Segment Location", CLAT_INTEGER },
@@ -988,7 +988,14 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_NO_GCSE) == 0)
+          if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
+            {
+              options.xram_size = getIntArg(OPTION_XRAM_SIZE, argv, &i, argc);
+              options.xram_size_set = TRUE;
+              continue;
+            }
+
+            if (strcmp (argv[i], OPTION_NO_GCSE) == 0)
             {
               optimize.global_cse = 0;
               continue;
@@ -2284,7 +2291,7 @@ main (int argc, char **argv, char **envp)
   /* turn all optimizations off by default */
   memset (&optimize, 0, sizeof (struct optimize));
 
-  if (NUM_PORTS==0)
+  if (NUM_PORTS == 0)
     {
       fprintf (stderr, "Build error: no ports are enabled.\n");
       exit (EXIT_FAILURE);
@@ -2296,7 +2303,7 @@ main (int argc, char **argv, char **envp)
     {
       signal (SIGABRT, sig_handler);
       signal (SIGTERM, sig_handler);
-      signal (SIGINT , sig_handler);
+      signal (SIGINT, sig_handler);
       signal (SIGSEGV, sig_handler);
     }
 

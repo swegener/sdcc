@@ -1,3 +1,8 @@
+2007-06-29 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: fixed bug
+	  #1744746: SDCC #4867: broken option --xram-size
+
 2007-06-28 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/configure.in, sim/ucsim/configure, sim/ucsim/ddconfig_in.h:

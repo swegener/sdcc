@@ -103,7 +103,7 @@ SFR(P2,         0xA0);      // Port 2
 SFR(SPI0CFG,    0xA1);      // SPI Configuration
 SFR(SPI0CKR,    0xA2);      // SPI Clock Rate Control
 SFR(SPI0DAT,    0xA3);      // SPI Data
-SFR(SFRNEXT,    0xA7);      // SFR Page Select
+SFR(SFRPAGE,    0xA7);      // SFR Page Select
 SFR(IE,         0xA8);      // Interrupt Enable
    SBIT(EX0,      0xA8, 0); // Enable External Interrupt 0
    SBIT(ET0,      0xA8, 1); // Enable Timer 0 Interrupt
@@ -164,7 +164,7 @@ SFR(TMR2CN,     0xC8);      // Timer/Counter 2 Control
    SBIT(TF2CEN,   0xC8, 4); // Timer 2 Low-Frequency Oscillator Capture Enable
    SBIT(TF2LEN,   0xC8, 5); // Timer 2 Low Byte Interrupt Enable
    SBIT(TF2L,     0xC8, 6); // Timer 2 Low Byte Overflow Flag
-   SBIT(TF2L,     0xC8, 7); // Timer 2 High Byte Overflow Flag
+   SBIT(TF2H,     0xC8, 7); // Timer 2 High Byte Overflow Flag
 SFR16(TMR2RL,   0xCA);      // Timer/Counter 2 Reload Word
    SFR(TMR2RLL,   0xCA);    // Timer/Counter 2 Reload Low Byte
    SFR(TMR2RLH,   0xCB);    // Timer/Counter 2 Reload High Byte
@@ -239,9 +239,9 @@ SFR16(PCA0,     0xF9);      // PCA Counter Word
 SFR16(PCA0CP0,  0xFB);      // PCA Capture 0 Word
    SFR(PCA0CPL0,  0xFB);    // PCA Capture 0 Low Byte
    SFR(PCA0CPH0,  0xFC);    // PCA Capture 0 High Byte
-SFR16(PCA0CP5,  0xFD);      // PCA Capture 5 Word
-   SFR(PCA0CPL5,  0xFD);    // PCA Capture 5 Low Byte
-   SFR(PCA0CPH5,  0xFE);    // PCA Capture 5 High Byte
+SFR16(PCA0CP4,  0xFD);      // PCA Capture 4 Word
+   SFR(PCA0CPL4,  0xFD);    // PCA Capture 4 Low Byte
+   SFR(PCA0CPH4,  0xFE);    // PCA Capture 4 High Byte
 SFR(VDM0CN,     0xFF);      // VDD Monitor Control
 
 /*  Page 0x00 */

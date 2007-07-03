@@ -3,6 +3,7 @@
 	* src/mcs51/gen.c, src/avr/gen.c, src/pic/gen.c, src/z80/gen.c,
 	  src/pic16/gen.c, src/hc08/gen.c, src/ds390/gen.c: fixed RFE
 	  #1746528: SDCC should ignore ':' in inline assembler comments
+	* device/include/typeof.h: fixed bug #1747142: typeof.h needs fixing
 
 2007-07-02 Maarten Brock <sourceforge.brock AT dse.nl>
 

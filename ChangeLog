@@ -1,6 +1,7 @@
 2007-07-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/C8051F360.h: fixed bug #1746410, thanks Chris Jones
+	* device/lib/mcs51/crtxclear.asm: do not set __XPAGE unconditionally
 
 2007-06-29 Borut Razem <borut.razem AT siol.net>
 

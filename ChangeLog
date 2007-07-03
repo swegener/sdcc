@@ -1,3 +1,9 @@
+2007-07-03 Borut Razem <borut.razem AT siol.net>
+
+	* src/mcs51/gen.c, src/avr/gen.c, src/pic/gen.c, src/z80/gen.c,
+	  src/pic16/gen.c, src/hc08/gen.c, src/ds390/gen.c: fixed RFE
+	  #1746528: SDCC should ignore ':' in inline assembler comments
+
 2007-07-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/C8051F360.h: fixed bug #1746410, thanks Chris Jones

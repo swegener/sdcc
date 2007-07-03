@@ -8481,112 +8481,119 @@ static void genXor (iCode *ic, iCode *ifx)
 static void genInline (iCode *ic)
 {
   char *buffer, *bp, *bp1;
+  bool inComment = FALSE;
     
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-	_G.inLine += (!options.asmpeep);
+  _G.inLine += (!options.asmpeep);
 
-	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-	strcpy(buffer,IC_INLINE(ic));
-	
-	while((bp1=strstr(bp, "\\n"))) {
-	  *bp1++ = '\n';
-	  *bp1++ = ' ';
-	  bp = bp1;
-        }
-        bp = bp1 = buffer;
+  buffer = bp = bp1 = Safe_strdup (IC_INLINE (ic));
+  
+  while((bp1=strstr(bp, "\\n"))) {
+    *bp1++ = '\n';
+    *bp1++ = ' ';
+    bp = bp1;
+  }
+  bp = bp1 = buffer;
 
 #if 0
   /* This is an experimental code for #pragma inline
      and is temporarily disabled for 2.5.0 release */
-        if(asmInlineMap)
-        {
-          symbol *sym;
-          char *s;
-          char *cbuf;
-          int cblen;
+  if(asmInlineMap)
+  {
+    symbol *sym;
+    char *s;
+    char *cbuf;
+    int cblen;
 
-            cbuf = Safe_strdup(buffer);
-            cblen = strlen(buffer)+1;
-            memset(cbuf, 0, cblen);
+      cbuf = Safe_strdup(buffer);
+      cblen = strlen(buffer)+1;
+      memset(cbuf, 0, cblen);
 
-            bp = buffer;
-            bp1 = cbuf;
-            while(*bp) {
-              if(*bp != '%')*bp1++ = *bp++;
-              else {
-                int i;
+      bp = buffer;
+      bp1 = cbuf;
+      while(*bp) {
+        if(*bp != '%')*bp1++ = *bp++;
+        else {
+          int i;
 
-                  bp++;
-                  i = *bp - '0';
-                  if(i>elementsInSet(asmInlineMap))break;
-                  
-                  bp++;
-                  s = indexSet(asmInlineMap, i);
-                  DEBUGpc("searching symbol s = `%s'", s);
-                  sym = findSym(SymbolTab, NULL, s);
+            bp++;
+            i = *bp - '0';
+            if(i>elementsInSet(asmInlineMap))break;
+            
+            bp++;
+            s = indexSet(asmInlineMap, i);
+            DEBUGpc("searching symbol s = `%s'", s);
+            sym = findSym(SymbolTab, NULL, s);
 
-                  if(sym->reqv) {
-                    strcat(bp1, sym->reqv->operand.symOperand->regs[0]->name);
-                  } else {
-                    strcat(bp1, sym->rname);
-                  }
-                  
-                  while(*bp1)bp1++;
-              }
-              
-              if(strlen(bp1) > cblen - 16) {
-                int i = strlen(cbuf);
-                cblen += 50;
-                cbuf = realloc(cbuf, cblen);
-                memset(cbuf+i, 0, 50);
-                bp1 = cbuf + i;
-              }
+            if(sym->reqv) {
+              strcat(bp1, sym->reqv->operand.symOperand->regs[0]->name);
+            } else {
+              strcat(bp1, sym->rname);
             }
             
-            free(buffer);
-            buffer = Safe_strdup( cbuf );
-            free(cbuf);
-            
-            bp = bp1 = buffer;
+            while(*bp1)bp1++;
         }
+        
+        if(strlen(bp1) > cblen - 16) {
+          int i = strlen(cbuf);
+          cblen += 50;
+          cbuf = realloc(cbuf, cblen);
+          memset(cbuf+i, 0, 50);
+          bp1 = cbuf + i;
+        }
+      }
+      
+      free(buffer);
+      buffer = Safe_strdup( cbuf );
+      free(cbuf);
+      
+      bp = bp1 = buffer;
+  }
 #endif  /* 0 */
 
-	/* emit each line as a code */
-	while (*bp) {
-		if (*bp == '\n') {
-			*bp++ = '\0';
+  /* emit each line as a code */
+  while (*bp)
+    {
+      switch (*bp)
+        {
+        case ';':
+          inComment = TRUE;
+          ++bp;
+          break;
 
-			if(*bp1)
-				pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL)); // inline directly, no process
-			bp1 = bp;
-		} else {
-			if (*bp == ':') {
-				bp++;
-				*bp = '\0';
-				bp++;
+        case '\n':
+          inComment = FALSE;
+          *bp++ = '\0';
+          if (*bp1)
+            pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL)); // inline directly, no process
+          bp1 = bp;
+          break;
 
-				/* print label, use this special format with NULL directive
-				 * to denote that the argument should not be indented with tab */
-				pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(NULL, bp1)); // inline directly, no process
-				bp1 = bp;
-			} if (*bp == ';') {
-				/* advance to end of line (prevent splitting of comments at ':' */
-				while (*bp && *bp != '\n') {
-					bp++;
-				} // while
-			} else
-				bp++;
-		}
-	}
+        default:
+          /* Add \n for labels, not dirs such as c:\mydir */
+          if (!inComment && (*bp == ':') && (isspace((unsigned char)bp[1])))
+            {
+              ++bp;
+              *bp = '\0';
+              ++bp;
+              /* print label, use this special format with NULL directive
+               * to denote that the argument should not be indented with tab */
+              pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(NULL, bp1)); // inline directly, no process
+              bp1 = bp;
+            }
+          else
+            ++bp;
+          break;
+        }
+    }
 
-	if ((bp1 != bp) && *bp1)
-		pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL)); // inline directly, no process
+  if ((bp1 != bp) && *bp1)
+    pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL)); // inline directly, no process
 
+  Safe_free (buffer);
 
-    Safe_free(buffer);
-
-    _G.inLine -= (!options.asmpeep);
+  _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/

@@ -6213,42 +6213,53 @@ release :
 static void genInline (iCode *ic)
 {
   char *buffer, *bp, *bp1;
+  bool inComment = FALSE;
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
   _G.inLine += (!options.asmpeep);
 
-  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-  strcpy(buffer,IC_INLINE(ic));
+  buffer = bp = bp1 = Safe_strdup (IC_INLINE (ic));
 
-  /* emit each line as a code */
-  while (*bp) {
-    if (*bp == '\n') {
-      *bp++ = '\0';
-      
-      if(*bp1)
-        addpCode2pBlock(pb, newpCodeAsmDir(bp1, NULL)); // inline directly, no process
-      bp1 = bp;
-    } else {
-      if (*bp == ':') {
-        bp++;
-        *bp = '\0';
-        bp++;
+  while (*bp)
+    {
+      switch (*bp)
+        {
+        case ';':
+          inComment = TRUE;
+          ++bp;
+          break;
 
-        /* print label, use this special format with NULL directive
-         * to denote that the argument should not be indented with tab */
-        addpCode2pBlock(pb, newpCodeAsmDir(NULL, bp1)); // inline directly, no process
+        case '\n':
+          inComment = FALSE;
+          *bp++ = '\0';
+          if (*bp1)
+            addpCode2pBlock(pb, newpCodeAsmDir(bp1, NULL)); // inline directly, no process
+          bp1 = bp;
+          break;
 
-        bp1 = bp;
-      } else
-        bp++;
+        default:
+          /* Add \n for labels, not dirs such as c:\mydir */
+          if (!inComment && (*bp == ':') && (isspace((unsigned char)bp[1])))
+            {
+              ++bp;
+              *bp = '\0';
+              ++bp;
+              /* print label, use this special format with NULL directive
+               * to denote that the argument should not be indented with tab */
+              addpCode2pBlock(pb, newpCodeAsmDir(NULL, bp1)); // inline directly, no process
+              bp1 = bp;
+            }
+          else
+            ++bp;
+          break;
+        }
     }
-  }
   if ((bp1 != bp) && *bp1)
     addpCode2pBlock(pb, newpCodeAsmDir(bp1, NULL)); // inline directly, no process
 
-  Safe_free(buffer);
+  Safe_free (buffer);
 
   _G.inLine -= (!options.asmpeep);
 }

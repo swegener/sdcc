@@ -2948,36 +2948,51 @@ genXor (iCode * ic, iCode * ifx)
 static void
 genInline (iCode * ic)
 {
-	char *buffer, *bp, *bp1;
+  char *buffer, *bp, *bp1;
+  bool inComment = FALSE;
 
-	_G.inLine += (!options.asmpeep);
+  _G.inLine += (!options.asmpeep);
 
-	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-	strcpy (buffer, IC_INLINE (ic));
+  buffer = bp = bp1 = Safe_strdup (IC_INLINE (ic));
 
-	/* emit each line as a code */
-	while (*bp) {
-		if (*bp == '\n') {
-			*bp++ = '\0';
-			emitcode (bp1, "");
-			bp1 = bp;
-		}
-		else {
-			if (*bp == ':') {
-				bp++;
-				*bp = '\0';
-				bp++;
-				emitcode (bp1, "");
-				bp1 = bp;
-			}
-			else
-				bp++;
-		}
-	}
-	if (bp1 != bp)
-		emitcode (bp1, "");
-	/*     emitcode("",buffer); */
-	_G.inLine -= (!options.asmpeep);
+  /* emit each line as a code */
+  while (*bp)
+    {
+      switch (*bp)
+        {
+        case ';':
+          inComment = TRUE;
+          ++bp;
+          break;
+
+        case '\n':
+          inComment = FALSE;
+          *bp++ = '\0';
+          emitcode (bp1, "");
+          bp1 = bp;
+          break;
+
+        default:
+          /* Add \n for labels, not dirs such as c:\mydir */
+          if (!inComment && (*bp == ':') && (isspace((unsigned char)bp[1])))
+            {
+              ++bp;
+              *bp = '\0';
+              ++bp;
+              emitcode (bp1, "");
+              bp1 = bp;
+            }
+          else
+            ++bp;
+          break;
+        }
+    }
+    if (bp1 != bp)
+      emitcode (bp1, "");
+
+    Safe_free (buffer);
+
+    _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/

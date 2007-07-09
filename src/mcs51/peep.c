@@ -221,11 +221,21 @@ isFunc (const lineNode *pl)
 static bool
 isCallerSaveFunc (const lineNode *pl)
 {
+  sym_link *ftype;
+
   if (!isFunc (pl))
     return FALSE;
-  if (FUNC_CALLEESAVES(OP_SYM_TYPE(IC_LEFT(pl->ic))))
+  // let's assume calls to literally given locations use the default
+  // most notably :  (*(void (*)()) 0) ();  see bug 1749275
+  if (IS_VALOP (IC_LEFT (pl->ic)))
+    return !options.all_callee_saves;
+
+  ftype = OP_SYM_TYPE(IC_LEFT(pl->ic));
+  if (IS_FUNCPTR (ftype))
+    ftype = ftype->next;
+  if (FUNC_CALLEESAVES(ftype))
     return FALSE;
-  if (FUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(pl->ic))))
+  if (FUNC_ISNAKED(ftype))
     return FALSE;
   return TRUE;
 }

@@ -5,6 +5,8 @@
 #include <testfwk.h>
 #include <stdbool.h>
 
+#ifdef __bool_true_false_are_defined
+
 union USUINT {
     unsigned int value;
     struct {
@@ -80,10 +82,14 @@ bool NotZero(unsigned int t)
     return (t != 0);
 }
 
+#endif //__bool_true_false_are_defined
+
 void
 testBug(void)
 {
+#ifdef __bool_true_false_are_defined
     rx_index = 1;
     ASSERT (VerifyCRC());
     ASSERT (NotZero(300));
+#endif //__bool_true_false_are_defined
 }

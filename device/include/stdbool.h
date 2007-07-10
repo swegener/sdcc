@@ -21,17 +21,20 @@
 #ifndef __SDC51_STDBOOL_H
 #define __SDC51_STDBOOL_H 1
 
-#define _Bool BOOL
-
-#define bool BOOL
 #define true 1
 #define false 0
-#define __bool_true_false_are_defined 1
+
+// Only define bool for ports that really support it to the full extend.
+// For other ports only define BOOL which can be used in most cases,
+// but can result in unexpected behaviour
 
 #if defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80) || defined (SDCC_pic14) || defined (SDCC_pic16)
  #define BOOL char
 #else
- #define BOOL __bit
+ #define _Bool __bit
+ #define BOOL  __bit
+ #define bool  _Bool
+ #define __bool_true_false_are_defined 1
 #endif
 
 #endif

@@ -1,3 +1,13 @@
+2007-07-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdbool.h: do not define __bool_true_false_are_defined
+	  and bool for targets that do not fully support it.
+	* support/regression/tests/bug1546986.c,
+	* support/regression/tests/bug1723128.c,
+	* support/regression/tests/bug1734654.c,
+	* support/regression/tests/bug1738367.c,
+	* support/regression/tests/constantRange.c: only use bool if allowed
+
 2007-07-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peep.c (isCallerSaveFunc): fixed bug 1749275, thanks Robert

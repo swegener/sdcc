@@ -122,6 +122,8 @@ testConstantRange (void)
 void
 testFoo1(void)
 {
+#ifdef __bool_true_false_are_defined
+
 #if defined(PORT_HOST)
    volatile bool sb, ub;
 #else
@@ -172,6 +174,7 @@ testFoo1(void)
 
   ASSERT (! (-1 >= INT_CAST ub));
   ASSERT (  ( 0 >= ub));
+#endif //__bool_true_false_are_defined
 }
 
 void

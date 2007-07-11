@@ -2136,7 +2136,7 @@ compareType (sym_link * dest, sym_link * src)
              instead of the next two lines, but the regression tests fail with
              them; I guess it's a problem with replaceCheaperOp  */
           getSize (dest) == getSize (src) &&
-          !(!IS_BIT (dest) && IS_BIT (src)))
+          (IS_BIT (dest) == IS_BIT (src)))
         return 1;
       else if (IS_ARITHMETIC (dest) && IS_ARITHMETIC (src))
         return -1;

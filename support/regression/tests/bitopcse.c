@@ -1,39 +1,41 @@
 /* Test CSE with |&^
 
-    type: bit, char, short, long
+    type: bool, char, short, long
  */
 #include <testfwk.h>
+#include <stdbool.h>
 
 /* This is not only a regression test, the focus of this test
    is more on the generated code (volatile!). */
 
-#define _{type}
+#define TYPE_{type}
 
+#if defined(TYPE_bool) && !defined(SDCC)
+#  define UNSIGNED
+#else
+#  define UNSIGNED unsigned
+#endif
 
-#if defined(_bit) || defined(SDCC_hc08)
+#if defined(TYPE_bool) || defined(SDCC_hc08)
 #  define _data
 #else
 #  define _data idata
 #endif
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80) || defined(SDCC_hc08) || defined(SDCC_pic16)
-#  define NO_BIT_TYPE
-#endif
-
-#if defined(_bit) && !defined(NO_BIT_TYPE)
+#if defined(TYPE_bool) && defined(__bool_true_false_are_defined)
 #  define MASK 1
-#elif defined(_bit) && defined(NO_BIT_TYPE)
+#elif defined(TYPE_bool) && !defined(__bool_true_false_are_defined)
 #  if defined(PORT_HOST)
 #    define MASK 0xffffffff
 #  else
 #    define MASK 0xffff
 #  endif
-#  define bit int
-#elif defined(_char)
+#  define bool int
+#elif defined(TYPE_char)
 #  define MASK 0xff
-#elif defined(_short)
+#elif defined(TYPE_short)
 #  define MASK 0xffff
-#elif defined(_long)
+#elif defined(TYPE_long)
 #  define MASK 0xffffffff
 #else
 #  warning Unknown type
@@ -43,14 +45,14 @@
 const unsigned long mask = MASK;
 
       volatile          {type}  v;
-      volatile unsigned {type} uv;
+      volatile UNSIGNED {type} uv;
 /* an array would be nicer, but an array of bits isn't possible */
 _data                   {type}  a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 ,
                                 a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
                                 a20;
-_data          unsigned {type} ua0, ua1, ua2, ua3, ua4, ua5, ua6;
+_data          UNSIGNED {type} ua0, ua1, ua2, ua3, ua4, ua5, ua6;
 _data                   {type}  b;
-_data volatile unsigned {type} ub = 0xbe;
+_data volatile UNSIGNED {type} ub = 0xbe;
 
 void
 testcse(void)
@@ -110,23 +112,17 @@ testcse(void)
    ASSERT( a0  ==  0);
    ASSERT( a1  ==  0);
    ASSERT( a2  ==  b);
-#if defined(_bit) && !defined(NO_BIT_TYPE)
+#if defined(TYPE_bool) && defined(__bool_true_false_are_defined)
    ASSERT( a3  == 1);
-#else
-   ASSERT( a3  == ({type}) 0x33);
-#endif
-   ASSERT(ua0  == ub);
-#if defined(_bit) && !defined(NO_BIT_TYPE)
    ASSERT(ua1  == 1);
-#else
-   ASSERT(ua1  == ({type}) 0x7b);
-#endif
-   ASSERT( a4  ==  b);
-#if defined(_bit) && !defined(NO_BIT_TYPE)
    ASSERT( a5  == 1);
 #else
+   ASSERT( a3  == ({type}) 0x33);
+   ASSERT(ua1  == ({type}) 0x7b);
    ASSERT( a5  == ({type}) 0x33);
 #endif
+   ASSERT(ua0  == ub);
+   ASSERT( a4  ==  b);
    ASSERT( a6  ==  0);
    // ASSERT( a7 == );
    // ASSERT(ua2 == );

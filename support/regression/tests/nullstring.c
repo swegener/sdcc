@@ -4,12 +4,6 @@
 */
 #include <testfwk.h>
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-# define data
-# define xdata
-# define code
-#endif
-
 {storage} char string1[] = "";
 {storage} char string2[] = "a\0b\0c";
 {storage} char string3[5] = "a\0b\0c";
@@ -24,11 +18,11 @@ testStringArray(void)
   ASSERT(sizeof(string3)==5);
   ASSERT(string1[0]==0);
   ASSERT(string2[5]==0);
-  
+
   ASSERT(string2[0]=='a');
   ASSERT(string2[2]=='b');
-  ASSERT(string2[4]=='c');  
-  
+  ASSERT(string2[4]=='c');
+
 }
 
 void

@@ -37,7 +37,6 @@ testReverse(void)
 void
 testAddFunc(void)
 {
-#ifndef SDCC_z80
   char buf[5];
   unsigned char count = 0;
 
@@ -45,7 +44,4 @@ testAddFunc(void)
   ASSERT(count == 1 &&
          buf[0] == '5' &&
          buf[1] == '\0');
-#else
-  ASSERT(1);
-#endif
 }

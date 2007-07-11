@@ -1,3 +1,17 @@
+2007-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (compareType): fixed bugs 1738367 and 1745717 with patch
+	  from Robert Larice, thanks
+	* support/regression/tests/bitopcse.c,
+	* support/regression/tests/bitvars.c,
+	* support/regression/tests/bug-908454.c: use <stdbool.h> for the bit types
+	* support/regression/tests/bug-927659.c: enabled test for z80
+	* support/regression/tests/bug1738367.c: added extra tests by Frieder
+	* support/regression/tests/bug1745717.c: new, added
+	* support/regression/tests/literalop.c,
+	* support/regression/tests/nullstring.c: removed storage definitions that
+	  are now in testfwk.h
+
 2007-07-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdbool.h: do not define __bool_true_false_are_defined

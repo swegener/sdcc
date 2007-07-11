@@ -10,17 +10,7 @@
 #pragma disable_warning 180 //no warning about using complement on bit/unsigned char
 #endif
 
-#if defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80) || defined (SDCC_pic14) || defined (SDCC_pic16)
-/* sdcc tagrets not supporting bit type */
-#define NO_BITS
-#endif
-
-#if defined (__GNUC__) && defined (__alpha__) && (__GNUC__ < 3)
-/* since this fails on GCC 2.95.4 on alpha... */
-#define NO_BITS
-#endif
-
-#ifndef NO_BITS
+#ifdef __bool_true_false_are_defined
 
 #define TYPE_{type}
 
@@ -36,12 +26,12 @@ char complement(bool a, bool b)
 
 {type} _0 = 0, _1 = 1, _ff = 0xFF, _ffff = -1;
 
-#endif
+#endif //__bool_true_false_are_defined
 
 void
 testBits(void)
 {
-#ifndef NO_BITS
+#ifdef __bool_true_false_are_defined
   bool x = 2;
   ASSERT (foo(x,3,4) == 6);
 
@@ -65,5 +55,5 @@ testBits(void)
     ASSERT (complement (~_ffff, 0));
 #endif
 
-#endif
+#endif //__bool_true_false_are_defined
 }

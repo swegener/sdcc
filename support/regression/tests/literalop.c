@@ -14,11 +14,6 @@
 typedef   signed {type} stype;
 typedef unsigned {type} utype;
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-#  define idata
-#  define code
-#endif
-
 volatile char is8 = 8;
 
   signed char  sc;

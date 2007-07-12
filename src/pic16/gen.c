@@ -11977,7 +11977,7 @@ static void genNearPointerSet (operand *right,
 	    
         DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
         while (size--) {
-          if (AOP_TYPE(right) == AOP_LIT) {
+          if (is_LitOp(right)) {
             pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),offset));
             if (size) {
               pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_postinc0));

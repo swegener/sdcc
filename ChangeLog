@@ -1,3 +1,7 @@
+2007-07-12 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genNearPointerSet): fixed handling of literals
+
 2007-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (compareType): fixed bugs 1738367 and 1745717 with patch

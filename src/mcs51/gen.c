@@ -7455,7 +7455,7 @@ genXor (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit ^ bit;
-              if (IS_SYMOP (left) && OP_SYMBOL (left) && OP_SYMBOL (left)->accuse)
+              if (IS_OP_ACCUSE (left))
                 {// left already is in the carry
                   operand *tmp = right;
                   right = left;
@@ -7463,7 +7463,7 @@ genXor (iCode * ic, iCode * ifx)
                 }
               else
                 {
-                  emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+                  toCarry (right);
                 }
             }
           else
@@ -10535,7 +10535,7 @@ genDataPointerSet (operand * right,
 
   l = aopGet (result, 0, FALSE, TRUE);
   l++; //remove #
-  size = AOP_SIZE (result);
+  size = max (AOP_SIZE (right), AOP_SIZE (result));
   while (size--)
     {
       if (offset)
@@ -10551,7 +10551,7 @@ genDataPointerSet (operand * right,
 }
 
 /*-----------------------------------------------------------------*/
-/* genNearPointerSet - emitcode for near pointer put                */
+/* genNearPointerSet - emitcode for near pointer put               */
 /*-----------------------------------------------------------------*/
 static void
 genNearPointerSet (operand * right,

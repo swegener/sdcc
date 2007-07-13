@@ -7,7 +7,7 @@
 	* src/SDCCicode.h: made operand.aggr2ptr 2 bits wide,
 	  added operandSize prototype
 	* src/mcs51/gen.c (aopOp): use operandSize to fix bug 868103,
-	  (genDataPointerSet): use size of result,
+	  (genDataPointerSet): use max of size of right and result,
 	  (gencjne): added parameter useCarry for optimization,
 	  (genCmpEq): use carry if appropriate,
 	  (genXor): check if operand already in carry

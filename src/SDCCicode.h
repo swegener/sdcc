@@ -75,7 +75,8 @@ typedef struct operand
   {
     OPTYPE type;                /* type of operand */
     unsigned int isaddr:1;      /* is an address   */
-    unsigned int aggr2ptr:1;    /* must change aggregate to pointer to aggregate */
+    unsigned int aggr2ptr:2;    /* 1: must change aggregate to pointer to aggregate */
+                                /* 2: aggregate has been changed to pointer to aggregate */
     unsigned int isvolatile:1;  /* is a volatile operand */
     unsigned int isGlobal:1;    /* is a global operand */
     unsigned int isPtr:1;       /* is assigned a pointer */
@@ -322,6 +323,7 @@ symbol *newiTempLabel (char *);
 symbol *newiTempLoopHeaderLabel (bool);
 iCode *newiCode (int, operand *, operand *);
 sym_link *operandType (operand *);
+unsigned int operandSize (operand *);
 operand *operandFromValue (value *);
 operand *operandFromSymbol (symbol *);
 operand *operandFromLink (sym_link *);

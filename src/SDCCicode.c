@@ -820,6 +820,24 @@ operandType (operand * op)
 }
 
 /*-----------------------------------------------------------------*/
+/* operandSize - returns size of an operand in bytes               */
+/*-----------------------------------------------------------------*/
+unsigned int 
+operandSize (operand * op)
+{
+  sym_link *type;
+
+  /* if nothing return 0 */
+  if (!op)
+    return 0;
+
+  type = operandType (op);
+  if (op->aggr2ptr == 2)
+    type = type->next;
+  return getSize (type);
+}
+
+/*-----------------------------------------------------------------*/
 /* isParamterToCall - will return 1 if op is a parameter to args   */
 /*-----------------------------------------------------------------*/
 int
@@ -3204,7 +3222,9 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
   if (left->isaddr && IS_PTR (ltype) && IS_ITEMP (left) &&
       compareType (ltype, rtype) <= 0)
     {
-      if (compareType (ltype->next, rtype) < 0)
+      if (left->aggr2ptr)
+        right = geniCodeCast (ltype, right, TRUE);
+      else if (compareType (ltype->next, rtype) < 0)
         right = geniCodeCast (ltype->next, right, TRUE);
     }
   else if (compareType (ltype, rtype) < 0)
@@ -4291,7 +4311,7 @@ ast2iCode (ast * tree,int lvl)
                             tree->opval.op);
       */
       {
-        operand *leftOp, *rightOp;
+		operand *leftOp, *rightOp;
 
         leftOp  = geniCodeRValue (left , FALSE);
         rightOp = geniCodeRValue (right, FALSE);

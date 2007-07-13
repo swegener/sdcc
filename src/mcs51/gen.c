@@ -969,7 +969,7 @@ aopOp (operand * op, iCode * ic, bool result)
       if (sym->remat)
         {
           sym->aop = op->aop = aop = aopForRemat (sym);
-          aop->size = getSize (sym->type);
+          aop->size = operandSize (op);
           return;
         }
 
@@ -6116,7 +6116,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 /* gencjne - compare and jump if not equal                         */
 /*-----------------------------------------------------------------*/
 static void
-gencjne (operand * left, operand * right, symbol * lbl)
+gencjne (operand * left, operand * right, symbol * lbl, bool useCarry)
 {
   symbol *tlbl = newiTempLabel (NULL);
 
@@ -6124,10 +6124,16 @@ gencjne (operand * left, operand * right, symbol * lbl)
 
   gencjneshort (left, right, lbl);
 
-  emitcode ("mov", "a,%s", one);
+  if (useCarry)
+      SETC;
+  else
+      MOVA (one);
   emitcode ("sjmp", "%05d$", tlbl->key + 100);
   emitLabel (lbl);
-  emitcode ("clr", "a");
+  if (useCarry)
+      CLRC;
+  else
+      MOVA (zero);
   emitLabel (tlbl);
 }
 
@@ -6288,12 +6294,13 @@ genCmpEq (iCode * ic, iCode * ifx)
     }
   else
     {
-      gencjne (left, right, newiTempLabel (NULL));
       if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
         {
-          aopPut (result, "a", 0);
+          gencjne (left, right, newiTempLabel (NULL), TRUE);
+          aopPut (result, "c", 0);
           goto release;
         }
+      gencjne (left, right, newiTempLabel (NULL), FALSE);
       if (ifx)
         {
           genIfxJump (ifx, "a", left, right, result);
@@ -7448,7 +7455,16 @@ genXor (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit ^ bit;
-              emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+              if (IS_SYMOP (left) && OP_SYMBOL (left) && OP_SYMBOL (left)->accuse)
+                {// left already is in the carry
+                  operand *tmp = right;
+                  right = left;
+                  left = tmp;
+                }
+              else
+                {
+                  emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+                }
             }
           else
             {
@@ -10519,7 +10535,7 @@ genDataPointerSet (operand * right,
 
   l = aopGet (result, 0, FALSE, TRUE);
   l++; //remove #
-  size = AOP_SIZE (right);
+  size = AOP_SIZE (result);
   while (size--)
     {
       if (offset)
@@ -10530,8 +10546,8 @@ genDataPointerSet (operand * right,
                 aopGet (right, offset++, FALSE, FALSE));
     }
 
-  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -10660,9 +10676,10 @@ genNearPointerSet (operand * right,
     }
 
   /* done */
-  if (pi) pi->generated = 1;
-  freeAsmop (result, NULL, ic, TRUE);
+  if (pi)
+    pi->generated = 1;
   freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/

@@ -188,7 +188,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 #endif
   for (lic = ic; lic; lic = lic->next)
     {
-      int siaddr;
+      int isaddr;
 
       /* do the special cases first */
       if (lic->op == IFX)
@@ -199,9 +199,9 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 
               bitVectUnSetBit (OP_USES (from), lic->key);
               OP_USES(to)=bitVectSetBit (OP_USES (to), lic->key);
-              siaddr = IC_COND (lic)->isaddr;
+              isaddr = IC_COND (lic)->isaddr;
               IC_COND (lic) = operandFromOperand (to);
-              IC_COND (lic)->isaddr = siaddr;
+              IC_COND (lic)->isaddr = isaddr;
 
             }
           continue;
@@ -215,9 +215,9 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 
               bitVectUnSetBit (OP_USES (from), lic->key);
               OP_USES(to)=bitVectSetBit (OP_USES (to), lic->key);
-              siaddr = IC_COND (lic)->isaddr;
+              isaddr = IC_COND (lic)->isaddr;
               IC_JTCOND (lic) = operandFromOperand (to);
-              IC_JTCOND (lic)->isaddr = siaddr;
+              IC_JTCOND (lic)->isaddr = isaddr;
 
             }
           continue;
@@ -246,9 +246,9 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
               bitVectUnSetBit (OP_DEFS (from), lic->key);
               OP_DEFS(to)=bitVectSetBit (OP_DEFS (to), lic->key);
             }
-          siaddr = IC_RESULT (lic)->isaddr;
+          isaddr = IC_RESULT (lic)->isaddr;
           IC_RESULT (lic) = operandFromOperand (to);
-          IC_RESULT (lic)->isaddr = siaddr;
+          IC_RESULT (lic)->isaddr = isaddr;
         }
 
       if (IS_SYMOP (to) &&
@@ -256,9 +256,9 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
         {
           bitVectUnSetBit (OP_USES (from), lic->key);
           OP_USES(to)=bitVectSetBit (OP_USES (to), lic->key);
-          siaddr = IC_RIGHT (lic)->isaddr;
+          isaddr = IC_RIGHT (lic)->isaddr;
           IC_RIGHT (lic) = operandFromOperand (to);
-          IC_RIGHT (lic)->isaddr = siaddr;
+          IC_RIGHT (lic)->isaddr = isaddr;
         }
 
       if (IS_SYMOP (to) &&
@@ -266,9 +266,9 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
         {
           bitVectUnSetBit (OP_USES (from), lic->key);
           OP_USES(to)=bitVectSetBit (OP_USES (to), lic->key);
-          siaddr = IC_LEFT (lic)->isaddr;
+          isaddr = IC_LEFT (lic)->isaddr;
           IC_LEFT (lic) = operandFromOperand (to);
-          IC_LEFT (lic)->isaddr = siaddr;
+          IC_LEFT (lic)->isaddr = isaddr;
         }
     }
 }
@@ -1980,11 +1980,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
               IC_LEFT (ic)->aggr2ptr = 0;
               fixUpTypes (ic);
             }
-          else if (IC_LEFT (ic)->aggr2ptr)
+          else if (IC_LEFT (ic)->aggr2ptr == 1)
             {/* band aid for kludge */
               setOperandType (IC_LEFT (ic),
                               aggrToPtr (operandType (IC_LEFT (ic)), TRUE));
-              IC_LEFT (ic)->aggr2ptr = 0;
+              IC_LEFT (ic)->aggr2ptr++;
               fixUpTypes (ic);
             }
         }
@@ -1997,11 +1997,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
                               aggrToPtr (operandType (IC_RESULT (ic)), FALSE));
               IC_RESULT (ic)->aggr2ptr = 0;
             }
-          else if (IC_RESULT (ic)->aggr2ptr)
+          else if (IC_RESULT (ic)->aggr2ptr == 1)
             {/* band aid for kludge */
               setOperandType (IC_RESULT (ic),
                               aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
-              IC_RESULT (ic)->aggr2ptr = 0;
+              IC_RESULT (ic)->aggr2ptr++;
             }
         }
 
@@ -2090,7 +2090,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
             }
         }
 
-      /*right operand */
+      /* right operand */
       if (IS_SYMOP (IC_RIGHT (ic)) && !computeOnly)
         {
 
@@ -2202,7 +2202,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           deleteItemIf (&cseSet, ifOperandsHave, IC_RESULT (ic));
           /* delete any previous definitions */
           ebb->defSet = bitVectCplAnd (ebb->defSet, OP_DEFS (IC_RESULT (ic)));
-
         }
 
       /* add the left & right to the defUse set */
@@ -2211,7 +2210,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           OP_USES(IC_LEFT (ic))=
             bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
           setUsesDefs (IC_LEFT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
-
         }
 
       if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
@@ -2219,7 +2217,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           OP_USES(IC_RIGHT (ic))=
             bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
           setUsesDefs (IC_RIGHT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
-
         }
 
       /* for the result it is special case, put the result */

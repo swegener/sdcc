@@ -1,3 +1,18 @@
+2007-07-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCcse.c (replaceAllSymBySym): renamed siaddr to isaddr,
+	  (cseBBlock): remember aggr2ptr has been used
+	* src/SDCCicode.c (operandSize): added function to handle aggr2ptr,
+	  (geniCodeAssign): fixed bug 868103
+	* src/SDCCicode.h: made operand.aggr2ptr 2 bits wide,
+	  added operandSize prototype
+	* src/mcs51/gen.c (aopOp): use operandSize to fix bug 868103,
+	  (genDataPointerSet): use size of result,
+	  (gencjne): added parameter useCarry for optimization,
+	  (genCmpEq): use carry if appropriate,
+	  (genXor): check if operand already in carry
+	* support/regression/tests/bug-868103.c: enabled test
+
 2007-07-12 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genNearPointerSet): fixed handling of literals

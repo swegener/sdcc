@@ -326,6 +326,9 @@ VOID relr(VOID)
                 return;
             }
             reli = symval(s[rindex]);
+        } else if ((IS_R_J11(mode) || IS_R_J19(mode)) && (rindex == 0xFFFF)) {
+            /* absolute acall/ajmp address */
+            reli = 0;
         } else {
             if (rindex >= hp->h_narea) {
                 fprintf(stderr, "R area error\n");
@@ -555,7 +558,7 @@ VOID relr(VOID)
 
             if (rflag)
             {
-                ihxEntendedLinearAddress(extendedAddress);
+                ihxExtendedLinearAddress(extendedAddress);
             }
             else if (extendedAddress)
             {

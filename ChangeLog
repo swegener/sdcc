@@ -1,3 +1,15 @@
+2007-07-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/aslink.h,
+	* as/link/hc08/lkihx.c,
+	* as/link/hc08/lkrloc.c,
+	* as/link/mcs51/lkihx.c,
+	* as/link/mcs51/lkrloc.c: renamed ihxEntendedLinearAddress to
+	  ihxExtendedLinearAddress
+	* as/link/mcs51/lkrloc.c (relr),
+	* as/mcs51/asout.c (outr11, outr19): handle absolute destination for
+	  acall/ajmp, see bug 830513
+
 2007-07-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCcse.c (replaceAllSymBySym): renamed siaddr to isaddr,

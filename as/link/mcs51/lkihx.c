@@ -22,7 +22,7 @@
  *  lkihx.c contains the following functions:
  *      VOID    hexRecord(addr, rtvalIndex)
  *      VOID    ihx(i)
- *      VOID    ihxEntendedLinearAddress(a)
+ *      VOID    ihxExtendedLinearAddress(a)
  *
  *  local variables: hexPageOverrun, lastHexAddr
  */
@@ -113,7 +113,7 @@ unsigned int lastHexAddr = 0;
  *
  *  functions called:
  *      int     fprintf()           c_library
- *      ihxEntendedLinearAddress()  lkihx.c
+ *      ihxExtendedLinearAddress()  lkihx.c
  *      hexRecord()                 lkihx.c     (recursion)
  *
  *  side effects:
@@ -138,7 +138,7 @@ hexRecord(unsigned addr, int rtvalIndex)
 
     if ( (lastHexAddr > addr) && (rflag) ) {
         overrun = hexPageOverrun + 1;
-        ihxEntendedLinearAddress(lastExtendedAddress + overrun);
+        ihxExtendedLinearAddress(lastExtendedAddress + overrun);
         hexPageOverrun = overrun;
         hexRecord(addr, rtvalIndex);
         return;
@@ -155,7 +155,7 @@ hexRecord(unsigned addr, int rtvalIndex)
                 if (rflag) {
                     fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
                     overrun = hexPageOverrun + 1;
-                    ihxEntendedLinearAddress(lastExtendedAddress + overrun);
+                    ihxExtendedLinearAddress(lastExtendedAddress + overrun);
                     hexPageOverrun = overrun;
                     hexRecord(0, i + 1);
                     return;
@@ -223,11 +223,11 @@ ihxNewArea()
     lastHexAddr = 0;
 }
 
-/*)Function ihxEntendedLinearAddress(i)
+/*)Function ihxExtendedLinearAddress(i)
  *
  *      Addr_T  i           16 bit extended linear address.
  *
- *  The function ihxEntendedLinearAddress() writes an extended
+ *  The function ihxExtendedLinearAddress() writes an extended
  *  linear address record (type 04) to the output file.
  *
  *  local variables:
@@ -244,7 +244,7 @@ ihxNewArea()
  *      hexPageOverrun and lastHexAddr is cleared
  */
 VOID
-ihxEntendedLinearAddress(Addr_T a)
+ihxExtendedLinearAddress(Addr_T a)
 {
     Addr_T  chksum;
 

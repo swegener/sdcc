@@ -1363,41 +1363,48 @@ byte3(int n)
  * 11 bit address.  This form of address is used only on the 8051 and 8048.
  */
 VOID
-outr11(esp, op, r)
-register struct expr *esp;
-int op;
-int r;
+outr11(register struct expr *esp, int op, int r)
 {
         register int n;
 
         if (pass == 2) {
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
-                        /* equated absolute destination.  Assume value
-                         * relative to current area */
-                        esp->e_base.e_ap = dot.s_area;
-                }
+                        /* Absolute destination.
+                         * Listing shows only the address.
+                         */
+                        out_lw(esp->e_addr,0);
+                        if (oflag) {
+                                outchk(3, 0);
+                                out_tw(esp->e_addr);
+                                *txtp++ = op;
 
-                /* Relocatable destination.  Build THREE
-                 * byte output: relocatable word, followed
-                 * by op-code.  Linker will combine them.
-                 * Listing shows only the address.
-                 */
-                r |= R_WORD | esp->e_rlcf;
-                out_lw(esp->e_addr,r|R_RELOC);
-                if (oflag) {
-                        outchk(3, 5);
-                        out_tw(esp->e_addr);
-                        *txtp++ = op;
-
-                        if (esp->e_flag) {
-                                n = esp->e_base.e_sp->s_ref;
-                                r |= R_SYM;
-                        } else {
-                                n = esp->e_base.e_ap->a_ref;
+                                write_rmode(r);
+                                *relp++ = txtp - txt - 3;
+                                out_rw(0xFFFF);
                         }
-                        write_rmode(r);
-                        *relp++ = txtp - txt - 3;
-                        out_rw(n);
+                } else {
+                        /* Relocatable destination.  Build THREE
+                         * byte output: relocatable word, followed
+                         * by op-code.  Linker will combine them.
+                         * Listing shows only the address.
+                         */
+                        r |= R_WORD | esp->e_rlcf;
+                        out_lw(esp->e_addr,r|R_RELOC);
+                        if (oflag) {
+                                outchk(3, 5);
+                                out_tw(esp->e_addr);
+                                *txtp++ = op;
+
+                                if (esp->e_flag) {
+                                        n = esp->e_base.e_sp->s_ref;
+                                        r |= R_SYM;
+                                } else {
+                                        n = esp->e_base.e_ap->a_ref;
+                                }
+                                write_rmode(r);
+                                *relp++ = txtp - txt - 3;
+                                out_rw(n);
+                        }
                 }
         }
         dot.s_addr += 2;
@@ -1417,32 +1424,42 @@ outr19(struct expr * esp, int op, int r)
 
         if (pass == 2) {
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
-                        /* equated absolute destination.  Assume value
-                         * relative to current area */
-                        esp->e_base.e_ap = dot.s_area;
-                }
+                        /* Absolute destination.
+                         * Listing shows only the address.
+                         */
+                        out_lw(esp->e_addr,0);
+                        if (oflag) {
+                                outchk(4, 0);
+                                out_t24(esp->e_addr);
+                                *txtp++ = op;
 
-                /* Relocatable destination.  Build FOUR
-                 * byte output: relocatable 24-bit entity, followed
-                 * by op-code.  Linker will combine them.
-                 * Listing shows only the address.
-                 */
-                r |= R_WORD | esp->e_rlcf;
-                out_l24(esp->e_addr,r|R_RELOC);
-                if (oflag) {
-                        outchk(4, 5);
-                        out_t24(esp->e_addr);
-                        *txtp++ = op;
-
-                        if (esp->e_flag) {
-                                n = esp->e_base.e_sp->s_ref;
-                                r |= R_SYM;
-                        } else {
-                                n = esp->e_base.e_ap->a_ref;
+                                write_rmode(r);
+                                *relp++ = txtp - txt - 4;
+                                out_rw(0xFFFF);
                         }
-                        write_rmode(r);
-                        *relp++ = txtp - txt - 4;
-                        out_rw(n);
+                } else {
+                        /* Relocatable destination.  Build FOUR
+                         * byte output: relocatable 24-bit entity, followed
+                         * by op-code.  Linker will combine them.
+                         * Listing shows only the address.
+                         */
+                        r |= R_WORD | esp->e_rlcf;
+                        out_l24(esp->e_addr,r|R_RELOC);
+                        if (oflag) {
+                                outchk(4, 5);
+                                out_t24(esp->e_addr);
+                                *txtp++ = op;
+
+                                if (esp->e_flag) {
+                                        n = esp->e_base.e_sp->s_ref;
+                                        r |= R_SYM;
+                                } else {
+                                        n = esp->e_base.e_ap->a_ref;
+                                }
+                                write_rmode(r);
+                                *relp++ = txtp - txt - 4;
+                                out_rw(n);
+                        }
                 }
         }
         dot.s_addr += 3;

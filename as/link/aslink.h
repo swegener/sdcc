@@ -808,7 +808,7 @@ extern  VOID            s19();
 
 /* lkihx.c */
 extern  VOID            ihx();
-extern  VOID            ihxEntendedLinearAddress(Addr_T);
+extern  VOID            ihxExtendedLinearAddress(Addr_T);
 extern  VOID            ihxNewArea();
 
 /* lkstore.c */

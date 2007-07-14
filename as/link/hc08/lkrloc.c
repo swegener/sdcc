@@ -549,7 +549,7 @@ VOID relr(VOID)
 		    
 		    if (rflag)
 		    {
-		    	ihxEntendedLinearAddress(extendedAddress);
+		    	ihxExtendedLinearAddress(extendedAddress);
 		    }
 		    else if (extendedAddress)
 		    {

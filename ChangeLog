@@ -1,3 +1,7 @@
+2007-07-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug1678803.c: new, added
+
 2007-07-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/aslink.h,

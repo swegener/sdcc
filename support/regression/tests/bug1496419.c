@@ -1,5 +1,5 @@
 /*
-   bug1057979.c
+   bug1496419.c
 */
 
 #include <testfwk.h>
@@ -19,3 +19,7 @@ const NODE node1 = {NULL, NULL};
 //triggers a loop allocating space for symbols node1
 //and zzz
 const NODE zzz = {&node1, &zzz};
+
+void testBug(void)
+{
+}

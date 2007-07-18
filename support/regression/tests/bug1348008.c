@@ -14,3 +14,7 @@ void IRQ_ISR(void) interrupt
 }
 
 #endif
+
+void testBug(void)
+{
+}

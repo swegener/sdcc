@@ -1411,8 +1411,9 @@ initialComments (FILE * afile)
   time_t t;
   time (&t);
   fprintf (afile, "%s", iComments1);
-  fprintf (afile, "; Version " SDCC_VERSION_STR " #%s (%s)\n", getBuildNumber(), __DATE__);
-  fprintf (afile, "; This file generated %s", asctime (localtime (&t)));
+  fprintf (afile, "; Version " SDCC_VERSION_STR " #%s (%s) (%s)\n",
+           getBuildNumber(), __DATE__, getBuildEnvironment());
+  fprintf (afile, "; This file was generated %s", asctime (localtime (&t)));
   fprintf (afile, "%s", iComments2);
 }
 

@@ -102,6 +102,9 @@ char *strncatz (char *dest, const char *src, size_t n);
 /* return SDCC build number */
 const char *getBuildNumber (void);
 
+/* return environment used to build SDCC */
+const char *getBuildEnvironment(void);
+
 /* snprintf, by hook or by crook. */
 size_t SDCCsnprintf (char *, size_t, const char *, ...);
 

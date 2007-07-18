@@ -527,12 +527,16 @@ createStackSpil (symbol * sym)
     {
       SPEC_SCLS (sloc->etype) = S_DATA;
     }
+  else if (SPEC_SCLS (sloc->etype) == S_SBIT)
+    {
+      SPEC_SCLS (sloc->etype) = S_BIT;
+    }
   SPEC_EXTR (sloc->etype) = 0;
   SPEC_STAT (sloc->etype) = 0;
   SPEC_VOLATILE(sloc->etype) = 0;
   SPEC_ABSA(sloc->etype) = 0;
 
-  /* we don't allow it to be allocated`
+  /* we don't allow it to be allocated
      onto the external stack since : so we
      temporarily turn it off ; we also
      turn off memory model to prevent
@@ -2656,7 +2660,7 @@ bool isCommutativeOp(unsigned int op)
 /* operandUsesAcc - determines whether the code generated for this */
 /*                  operand will have to use the accumulator       */
 /*-----------------------------------------------------------------*/
-bool operandUsesAcc(operand *op)
+bool operandUsesAcc(operand *op, bool allowBitspace)
 {
   if (!op)
     return FALSE;
@@ -2686,7 +2690,7 @@ bool operandUsesAcc(operand *op)
     if (sym->iaccess && symspace->paged)
       return TRUE;  /* must fetch paged indirect sym via accumulator */
 
-    if (IN_BITSPACE(symspace))
+    if (!allowBitspace && IN_BITSPACE(symspace))
       return TRUE;  /* fetching bit vars uses the accumulator */
 
     if (IN_FARSPACE(symspace) || IN_CODESPACE(symspace))
@@ -2739,7 +2743,6 @@ packRegsForAccUse (iCode * ic)
   if (IS_BITWISE_OP (ic) &&
       getSize (operandType (IC_RESULT (ic))) > 1)
     return;
-
 
   /* has only one definition */
   if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
@@ -2810,10 +2813,10 @@ packRegsForAccUse (iCode * ic)
     goto accuse;
 
   /* if the other operand uses the accumulator then we cannot */
-  if ( (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
-        operandUsesAcc(IC_RIGHT(uic))) ||
+  if ( (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
+        operandUsesAcc (IC_RIGHT (uic), IS_BIT (operandType (IC_LEFT (uic))))) ||
        (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
-        operandUsesAcc(IC_LEFT(uic))) )
+        operandUsesAcc (IC_LEFT (uic), IS_BIT (operandType (IC_RIGHT (uic))))) )
     return;
 
   /* make sure this is on the left side if not commutative */

@@ -62,7 +62,7 @@ void f()
   }
 }
 
-void test_Peephole251()
+void test_Peephole251(void)
 {
   var = 12;
   f();

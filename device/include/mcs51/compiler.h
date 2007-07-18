@@ -160,10 +160,10 @@
 # define SFR32E(name, fulladdr) /* not supported */
 
 /** default
-  * unknown compiler
+  * unrecognized compiler
  */
-#elif
-# warning unknown compiler
+#else
+# warning unrecognized compiler
 # define SBIT(name, addr, bit)  volatile bool           name
 # define SFR(name, addr)        volatile unsigned char  name
 # define SFRX(name, addr)       volatile unsigned char  name

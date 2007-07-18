@@ -48,3 +48,7 @@ unsigned char b=0xfe-BAD(3);
 return (a + b);
 }
 #endif
+
+void testBug(void)
+{
+}

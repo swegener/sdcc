@@ -424,21 +424,8 @@ printVersionInfo (FILE *stream)
 #ifdef SDCC_SUB_VERSION_STR
            "/" SDCC_SUB_VERSION_STR
 #endif
-           " #%s (" __DATE__ ")"
-#ifdef __CYGWIN__
-           " (CYGWIN)\n"
-#elif defined __MINGW32__
-           " (MINGW32)\n"
-#elif defined __DJGPP__
-           " (DJGPP)\n"
-#elif defined(_MSC_VER)
-           " (MSVC)\n"
-#elif defined(__BORLANDC__)
-           " (BORLANDC)\n"
-#else
-           " (UNIX)\n"
-#endif
-    , getBuildNumber() );
+           " #%s (" __DATE__ ") (%s)",
+           getBuildNumber(), getBuildEnvironment() );
 }
 
 static void

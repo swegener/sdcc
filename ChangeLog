@@ -1,3 +1,24 @@
+2007-07-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* configure.in,
+	* doc/sdccman.lyx: bumped version to 2.7.3
+	* device/include/mcs51/compiler.h: fixed elif->else
+	* src/mcs51/gen.c (genAnd, genOr): handle accuse for pure bit operands
+	* src/mcs51/ralloc.c (createStackSpil): fixed SCLS bug with sloc for sbit,
+	  (operandUsesAcc, packRegsForAccUse): added parameter allowBitspace to
+	   enable accuse for bit operands
+	* src/SDCCmain.c (printVersionInfo),
+	* src/SDCCutil.c (getBuildEnvironment): factored out creation of build
+	  environment descriptor
+	* src/SDCCutil.h: added getBuildEnvironment
+	* src/SDCCglue.c (initialComments): use getBuildEnvironment
+	* support/regression/tests/bug1464657.c: enabled test test_Peephole251
+	* support/regression/tests/bug-408972.c: enabled test leftShiftLong
+	* support/regression/tests/bug1348008.c,
+	* support/regression/tests/bug1496419.c,
+	* support/regression/tests/bug1503067.c,
+	* support/regression/tests/preproc.c: added empty tests
+
 2007-07-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1678803.c: new, added

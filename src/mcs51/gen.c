@@ -6634,8 +6634,15 @@ genAnd (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit & bit;
-              emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-              emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+              if (IS_OP_ACCUSE (left))
+                {
+                  emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
+                }
+			  else
+                {
+                  emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+                  emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
             }
           else
             {
@@ -7056,8 +7063,15 @@ genOr (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit | bit;
-              emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-              emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
+              if (IS_OP_ACCUSE (left))
+                {
+                  emitcode ("orl", "c,%s", AOP (right)->aopu.aop_dir);
+                }
+			  else
+                {
+                  emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+                  emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
             }
           else
             {

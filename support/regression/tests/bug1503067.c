@@ -4,3 +4,7 @@
 
 const int SPRITE = 0;
 int sprite = 1;
+
+void testBug(void)
+{
+}

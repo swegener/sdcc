@@ -1,7 +1,7 @@
 #!/bin/sh
 
 AC_PREREQ(2.60)
-AC_INIT([sdcc], [2.7.2], [sdcc-devel@lists.sourceforge.net])
+AC_INIT([sdcc], [2.7.3], [sdcc-devel@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([Makefile.in])
 AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
 

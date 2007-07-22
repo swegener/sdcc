@@ -1,13 +1,23 @@
 #!/bin/sh
 
 AC_PREREQ(2.60)
-AC_INIT([sdcc], [2.7.3], [sdcc-devel@lists.sourceforge.net])
+AC_INIT(.version)
 AC_CONFIG_SRCDIR([Makefile.in])
 AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
 
 AC_PROG_AWK
 
-VERSION=$PACKAGE_VERSION
+AC_MSG_CHECKING(version of the package)
+if test -f ${srcdir}/.version; then
+  { read VERSION; } < ${srcdir}/.version
+  AC_MSG_RESULT($VERSION)
+elif test -f ../.version; then
+  { read VERSION; } < ../.version
+  AC_MSG_RESULT($VERSION)
+else
+  VERSION="0.0.0"
+  AC_MSG_RESULT(unknown using 0.0.0)
+fi
 VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
 VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
 VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`

@@ -1,7 +1,7 @@
 #!/usr/bin/awk
 
 # configure_vc.awk - Genarate sdcc_vc.h using sdcc_vc_in.h as template
-#                    and insert the version number definitions from configure.in
+#                    and insert the version number definitions from .version
 #
 # Written By - Borut Razem borut.razem@siol.net
 #
@@ -22,19 +22,12 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 BEGIN {
-  # get the values from configure.in
-
-  while (getline <"configure.in" > 0) {
-    if ($0 ~ "^AC_INIT\\(.*\\)") {
-      package = gensub("^AC_INIT\\(\\[([^]]*)\\].*", "\\1", "1", $0);
-      version = gensub("^AC_INIT\\(\\[[^]]*\\], \\[([^]]*)\\].*", "\\1", "1", $0);
-      bugreport = gensub("^AC_INIT\\(\\[[^]]*\\], \\[[^]]*\\], \\[([^]]*)\\].*", "\\1", "1", $0);
-
-      version_high = gensub(/^([^.]*).([^.]*).([^.]*)/, "\\1", "1", version)
-      version_lo = gensub(/^([^.]*).([^.]*).([^.]*)/, "\\2", "1", version)
-      version_patch = gensub(/^([^.]*).([^.]*).([^.]*)/, "\\3", "1", version)
-    }
-  }
+  # get the values from .version
+  FS=".";
+  getline <".version";
+  version_high = $1;
+  version_lo = $2;
+  version_patch = $3;
 
   print "/*"
   print " * sdcc_vc.h"
@@ -60,7 +53,7 @@ BEGIN {
 }
 
 /^#undef SDCC_VERSION_STR$/ {
-  print("#define SDCC_VERSION_STR " "\"" version "\"");
+  print("#define SDCC_VERSION_STR " "\"" version_high "." version_lo "." version_patch "\"");
   next
 }
 

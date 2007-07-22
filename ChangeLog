@@ -1,3 +1,9 @@
+2007-07-22 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure: re-introduced .version
+	* sdcc.spec, doc/INSTALL.txt: they are used only for releases;
+	  the version reverted to 2.7.0
+
 2007-07-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* configure.in,

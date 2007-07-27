@@ -24,6 +24,7 @@ static OPTION _mcs51_options[] =
     { 0, "--parms-in-bank1", &options.parms_in_bank1, "use Bank1 for parameter passing"},
     { 0, "--pack-iram",      NULL, "Tells the linker to pack variables in internal ram (default)"},
     { 0, "--no-pack-iram",   &options.no_pack_iram, "Tells the linker not to pack variables in internal ram"},
+    { 0, "--acall-ajmp",     &options.acall_ajmp, "Use acall/ajmp instead of lcall/ljmp" },
     { 0, NULL }
   };
 

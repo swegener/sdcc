@@ -263,6 +263,7 @@ struct options
     int parms_in_bank1;         /* DS390 - use reg bank1 to pass parameters */
     int stack_size;             /* MCS51/DS390 - Tells the linker to allocate this space for stack */
     int no_pack_iram;           /* MCS51/DS390 - Tells the linker not to pack variables in internal ram */
+    int acall_ajmp;             /* MCS51 - Use acall/ajmp instead of lcall/ljmp */
     /* starting address of the segments */
     int xstack_loc;             /* initial location of external stack */
     int stack_loc;              /* initial value of internal stack pointer */

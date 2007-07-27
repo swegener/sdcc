@@ -133,8 +133,13 @@ FBYNAME (xramMovcOption)
   return (options.xram_movc && (strcmp(port->target,"mcs51") == 0));
 }
 
-
-
+/*-----------------------------------------------------------------*/
+/* useAcallAjmp - Enable replacement of lcall/ljmp with acall/ajmp */
+/*-----------------------------------------------------------------*/
+FBYNAME (useAcallAjmp)
+{
+  return (options.acall_ajmp && (strcmp(port->target,"mcs51") == 0));
+}
 
 
 
@@ -1205,6 +1210,9 @@ callFuncByName (char *fname,
     },
     {
       "labelRefCountChange", labelRefCountChange
+    },
+    {
+      "useAcallAjmp", useAcallAjmp
     }
   };
   int   i;

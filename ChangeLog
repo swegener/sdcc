@@ -1,3 +1,8 @@
+2007-07-27 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* src/SDCCglobl.h, src/SDCCpeeph.c, src/mcs51/main.c, src/mcs51/peeph.def:
+	  Added option --acall-ajmp: replaces lcall/ljmp with acall/ajmp.
+
 2007-07-22 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure: re-introduced .version

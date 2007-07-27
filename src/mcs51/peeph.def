@@ -4627,6 +4627,22 @@ replace {
 	ret
 }
 
+// for programs less than 2k
+replace {
+	lcall	%1
+} by {
+	;	Peephole 400.d	replaced lcall with acall
+	acall	%1
+} if useAcallAjmp
+
+// for programs less than 2k
+replace {
+	ljmp	%1
+} by {
+	;	Peephole 400.e	replaced ljmp with ajmp
+	ajmp	%1
+} if useAcallAjmp
+
 
 // should be one of the last peepholes
 replace{

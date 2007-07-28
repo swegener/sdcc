@@ -1,5 +1,10 @@
 2007-07-28 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
+	* doc/sdccman.lyx: Documented --acall-ajmp and described new features
+	  in sdcclib.
+
+2007-07-28 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
 	* src/SDCCglobl.h, src/SDCCpeeph.c, src/SDCCglue.c, src/mcs51/main.c,
 	  src/mcs51/peeph.def: Added option --acall-ajmp: replaces lcall/ljmp
 	  with acall/ajmp.

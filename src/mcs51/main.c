@@ -192,16 +192,17 @@ _mcs51_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
   int i;
 
-  dbuf_printf (oBuf, "\tljmp\t__sdcc_gsinit_startup\n");
+  dbuf_printf (oBuf, "\t%cjmp\t__sdcc_gsinit_startup\n", options.acall_ajmp?'a':'l');
+  if((options.acall_ajmp)&&(maxInterrupts)) dbuf_printf (oBuf, "\t.ds\t1\n");
 
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
     {
       if (interrupts[i])
         {
-          dbuf_printf (oBuf, "\tljmp\t%s\n", interrupts[i]->rname);
+          dbuf_printf (oBuf, "\t%cjmp\t%s\n", options.acall_ajmp?'a':'l', interrupts[i]->rname);
           if ( i != maxInterrupts - 1 )
-            dbuf_printf (oBuf, "\t.ds\t5\n");
+            dbuf_printf (oBuf, "\t.ds\t%d\n", options.acall_ajmp?6:5);
         }
       else
         {

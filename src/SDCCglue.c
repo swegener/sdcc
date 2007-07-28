@@ -1894,10 +1894,10 @@ glue (void)
               fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
             }
 
-          fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");
+          fprintf (asmFile, "\t%ccall\t__sdcc_external_startup\n", options.acall_ajmp?'a':'l');
           fprintf (asmFile, "\tmov\ta,dpl\n");
           fprintf (asmFile, "\tjz\t__sdcc_init_data\n");
-          fprintf (asmFile, "\tljmp\t__sdcc_program_startup\n");
+          fprintf (asmFile, "\t%cjmp\t__sdcc_program_startup\n", options.acall_ajmp?'a':'l');
           fprintf (asmFile, "__sdcc_init_data:\n");
 
           // if the port can copy the XINIT segment to XISEG
@@ -1916,7 +1916,7 @@ glue (void)
        * by the ugly shucking and jiving about 20 lines ago.
        */
       tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
-      fprintf (asmFile, "\tljmp\t__sdcc_program_startup\n");
+      fprintf (asmFile, "\t%cjmp\t__sdcc_program_startup\n", options.acall_ajmp?'a':'l');
     }
 
   fprintf (asmFile,
@@ -1934,12 +1934,12 @@ glue (void)
       /* put in jump or call to main */
       if (options.mainreturn)
         {
-          fprintf (asmFile, "\tljmp\t_main\n");   /* needed? */
+          fprintf (asmFile, "\t%cjmp\t_main\n", options.acall_ajmp?'a':'l');   /* needed? */
           fprintf (asmFile, ";\treturn from main will return to caller\n");
         }
       else
         {
-          fprintf (asmFile, "\tlcall\t_main\n");
+          fprintf (asmFile, "\t%ccall\t_main\n", options.acall_ajmp?'a':'l');
           fprintf (asmFile, ";\treturn from main will lock up\n");
           fprintf (asmFile, "\tsjmp .\n");
         }

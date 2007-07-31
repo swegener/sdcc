@@ -1,3 +1,8 @@
+2007-07-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/include/hc08/mc68hc908apxx.h: new header contributed by
+	  Lucas Loizaga, with minor modifications. Thanks!
+
 2007-07-28 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* doc/sdccman.lyx: Documented --acall-ajmp and described new features
@@ -152,6 +157,7 @@
 	  Multiple infiles for sdcclib.
 
 2007-06-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCast.c (inlineFindMaxBlockno, createFunction): fixed
 	  bug 1731741
 

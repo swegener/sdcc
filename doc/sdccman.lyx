@@ -1,4 +1,4 @@
-#LyX 1.5.0 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -45,9 +45,7 @@
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
-\output_changes false
-\author ""
-\author ""
+\output_changes true
 \end_header
 
 \begin_body
@@ -691,7 +689,10 @@ The latest SDCC version can be downloaded from
 \end_inset
 
 .
+
+\series bold
  
+\series default
 \emph on
 Please note: the compiler will probably always be some steps ahead of this
  documentation
@@ -863,7 +864,7 @@ the default directory for gcc-builds where include, library and documentation
 
 \begin_layout Itemize
 char type parameters to vararg
-\begin_inset LatexCommand \index{vararg, va\\_arg}
+\begin_inset LatexCommand \index{vararg, va\_arg}
 
 \end_inset
 
@@ -962,7 +963,7 @@ bit
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sbit}
+\begin_inset LatexCommand \index{\_\_sbit}
 
 \end_inset
 
@@ -995,7 +996,7 @@ bit b;
 \InsetSpace ~
 \InsetSpace ~
 b = ~
-\begin_inset LatexCommand \index{\\~\\/ Operator}
+\begin_inset LatexCommand \index{\~\/ Operator}
 
 \end_inset
 
@@ -3875,9 +3876,7 @@ Bring up a command line terminal, such as xterm.
 \begin_layout Enumerate
 
 \series medium
-Unpack the file using a command like:
-\series default
- 
+Unpack the file using a command like: 
 \family sans
 \series bold
 "tar -xvzf sdcc-src-yyyymmdd-rrrr.tar.bz2
@@ -3902,9 +3901,7 @@ Change directory into the main SDCC directory, for example type:
 \begin_layout Enumerate
 
 \series medium
-Type
-\series default
- 
+Type 
 \family sans
 \series bold
 "./configure
@@ -3917,9 +3914,7 @@ Type
 \begin_layout Enumerate
 
 \series medium
-Type
-\series default
- 
+Type 
 \family sans
 \series bold
 "make
@@ -3936,9 +3931,7 @@ Type
 \begin_layout Enumerate
 
 \series medium
-Type
-\series default
- 
+Type 
 \family sans
 \series bold
 "make install"
@@ -4903,9 +4896,9 @@ If it doesn't run, or gives a message about not finding sdcc program, then
  Make sure that the sdcc bin directory is in your executable search path
  defined by the PATH environment setting (
 \series medium
-see
+see 
 \series default
- section 
+section 
 \begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
 
 \end_inset
@@ -4923,9 +4916,9 @@ Install trouble-shooting for suggestions
 \newline
 
 \series medium
-SDCC
+SDCC 
 \series default
- is commonly installed as described in section 
+is commonly installed as described in section 
 \begin_inset Quotes sld
 \end_inset
 
@@ -4940,9 +4933,9 @@ Install and search paths
 
 \series medium
 Make sure the compiler works on a very simple example.
- Type in the following test.c program using your favorite
+ Type in the following test.c program using your favorite 
 \series default
- ASCII 
+ASCII 
 \series medium
 editor:
 \end_layout
@@ -4968,9 +4961,7 @@ test=0;
 \begin_layout Standard
 
 \series medium
-Compile this using the following command:
-\series default
- 
+Compile this using the following command: 
 \family sans
 \series bold
 "sdcc -c test.c".
@@ -4991,9 +4982,7 @@ If all goes well, the compiler will generate a test.asm and test.rel file.
 
 \series medium
 The next step is to try it with the linker.
- Type in
-\series default
- 
+ Type in 
 \family sans
 \series bold
 "sdcc test.c
@@ -5009,21 +4998,21 @@ The next step is to try it with the linker.
  
 \series medium
 (no test.ihx, and the linker generates warnings), then the problem is most
- likely that
+ likely that 
 \series default
- SDCC 
+SDCC
 \series medium
-cannot find the
+ cannot find the 
 \series default
- /
+/
 \series medium
 usr/local/share/sdcc/lib directory
 \series default
  
 \series medium
-(see
+(see 
 \series default
- section 
+section 
 \begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
 
 \end_inset
@@ -5039,15 +5028,15 @@ Install trouble-shooting for suggestions).
 \newline
 
 \series medium
-The final test is to ensure
+The final test is to ensure 
 \series default
- SDCC 
+SDCC
 \series medium
-can use the
+ can use the 
 \series default
- standard 
+standard
 \series medium
-header files and libraries.
+ header files and libraries.
  Edit test.c and change it to the following:
 \end_layout
 
@@ -5074,9 +5063,7 @@ strcpy(str1, "testing");
 \begin_layout Standard
 
 \series medium
-Compile this by typing
-\series default
- 
+Compile this by typing 
 \family sans
 \series bold
 "sdcc test.c"
@@ -5085,17 +5072,17 @@ Compile this by typing
 .
  This should generate a test.ihx output file, and it should give no warnings
  such as not finding the string.h file.
- If it cannot find the string.h file, then the problem is that
+ If it cannot find the string.h file, then the problem is that 
 \series default
- SDCC 
+SDCC
 \series medium
-cannot find the /usr/local/share/sdcc/include directory
+ cannot find the /usr/local/share/sdcc/include directory
 \series default
  
 \series medium
-(see the
+(see the 
 \series default
- section 
+section 
 \begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
 
 \end_inset
@@ -5124,7 +5111,7 @@ status collapsed
 -print-search-dirs
 \series default
 
-\begin_inset LatexCommand \index{-\\/-print-search-dirs}
+\begin_inset LatexCommand \index{-\/-print-search-dirs}
 
 \end_inset
 
@@ -5302,9 +5289,9 @@ asx8051 - The assembler for 8051 type processors.
 \begin_layout Itemize
 as-z80
 \series bold
-,
+, 
 \series default
- as-gbz80 - The Z80 and GameBoy Z80 assemblers.
+as-gbz80 - The Z80 and GameBoy Z80 assemblers.
 \end_layout
 
 \begin_layout Itemize
@@ -5314,9 +5301,9 @@ aslink -The linker for 8051 type processors.
 \begin_layout Itemize
 link-z80
 \series bold
-,
+, 
 \series default
- link-gbz80 - The Z80 and GameBoy Z80 linkers.
+link-gbz80 - The Z80 and GameBoy Z80 linkers.
 \end_layout
 
 \begin_layout Itemize
@@ -5614,7 +5601,7 @@ status collapsed
 \end_inset
 
 -out-fmt-s19
-\begin_inset LatexCommand \index{-\\/-out-fmt-s19}
+\begin_inset LatexCommand \index{-\/-out-fmt-s19}
 
 \end_inset
 
@@ -5630,10 +5617,10 @@ objdump
 
 \end_inset
 
- or 
+ or
 \family sans
 \shape italic
-srecord
+ srecord
 \family default
 \shape default
 
@@ -5686,7 +5673,7 @@ status collapsed
 \end_inset
 
 -debug
-\begin_inset LatexCommand \index{-\\/-debug}
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset
 
@@ -5747,9 +5734,9 @@ status collapsed
 \end_inset
 
 -debug).
- The (Intel) 
+ The (Intel)
 \emph on
-a
+ a
 \emph default
 bsolute 
 \emph on
@@ -5850,19 +5837,19 @@ packihx
 \newline
 
 \newline
- 
+
 \family sans
 \series bold
-packihx sourcefile.ihx >sourcefile.hex
+ packihx sourcefile.ihx >sourcefile.hex
 \family default
 \series default
 
 \newline
 
 \newline
-The separately available 
+The separately available
 \emph on
-srecord
+ srecord
 \emph default
 
 \begin_inset LatexCommand \index{srecord (bin, hex, ... tool)}
@@ -6042,9 +6029,9 @@ foo2.rel
 \newline
 Alternatively, 
 \emph on
-foomain.c
+foomain.c 
 \emph default
- can be separately compiled as well: 
+can be separately compiled as well: 
 \family sans
 \series bold
 
@@ -6066,7 +6053,10 @@ The file containing the
 \emph on
 main()
 \emph default
- function 
+ function
+\emph on
+ 
+\emph default
 \noun on
 must
 \noun default
@@ -6115,9 +6105,9 @@ Some reusable routines may be compiled into a library, see the documentation
 \emph on
 foomain.c
 \emph default
- and a library 
+ and a library
 \emph on
-foolib.lib
+ foolib.lib
 \emph default
  in the directory 
 \emph on
@@ -6137,9 +6127,9 @@ sdcc foomain.c foolib.lib -L mylib
 
 \family default
 \series default
-Note here that 
+Note here that
 \emph on
-mylib
+ mylib
 \emph default
  must be an absolute path name.
 \newline
@@ -6289,6 +6279,7 @@ sdcclib libint.lib _moduint.rel
 \family sans
 \series bold
 sdcclib libint.lib _mulint.rel
+\family default
 \series default
 
 \newline
@@ -6297,6 +6288,9 @@ sdcclib libint.lib _mulint.rel
 
 \begin_layout Standard
 Or, if you preffer:
+\family sans
+\series bold
+
 \newline
 
 \end_layout
@@ -6306,6 +6300,9 @@ Or, if you preffer:
 \family sans
 \series bold
 sdcclib libint.lib _divsint.rel _divuint.rel _modsint.rel _moduint.rel _mulint.rel
+\family default
+\series default
+
 \newline
 
 \end_layout
@@ -6315,6 +6312,9 @@ If the file already exists in the library, it will be replaced.
  If a list of .rel files is available, you can tell sdcclib to add those
  files to a library.
  For example, if the file 'myliblist.txt' contains
+\family sans
+\series bold
+
 \newline
 
 \end_layout
@@ -6352,6 +6352,7 @@ _moduint.rel
 \family sans
 \series bold
 _mulint.rel
+\family default
 \series default
 
 \newline
@@ -6359,7 +6360,10 @@ _mulint.rel
 \end_layout
 
 \begin_layout Standard
-Use 
+Use
+\family sans
+\series bold
+
 \newline
 
 \end_layout
@@ -6369,13 +6373,17 @@ Use
 \family sans
 \series bold
 sdcclib -l libint.lib myliblist.txt
+\family default
+\series default
+
 \newline
 
 \end_layout
 
 \begin_layout Standard
-Additionally, you can instruct sdcclib to compile the files before adding
- them to the library by setting environment variables SDCCLIB_CC
+Additionally, you can instruct sdcclib to compiles the files before adding
+ them to the library.
+ This is achieved using the environment variables SDCCLIB_CC
 \begin_inset LatexCommand \index{SDCCLIB_CC}
 
 \end_inset
@@ -6387,6 +6395,9 @@ Additionally, you can instruct sdcclib to compile the files before adding
 
 .
  For example:
+\family sans
+\series bold
+
 \newline
 
 \end_layout
@@ -6395,46 +6406,7 @@ Additionally, you can instruct sdcclib to compile the files before adding
 
 \family sans
 \series bold
-set SDCCLIB_CC
-\begin_inset LatexCommand \index{SDCCLIB_CC}
-
-\end_inset
-
-=sdcc -
-\family default
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\family sans
--use-stdout -
-\family default
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\family sans
--model-small -c
+set SDCCLIB_CC=sdcc -c
 \end_layout
 
 \begin_layout Standard
@@ -6442,6 +6414,9 @@ status collapsed
 \family sans
 \series bold
 sdcclib -l libint.lib myliblist.txt
+\family default
+\series default
+
 \newline
 
 \end_layout
@@ -6601,7 +6576,7 @@ status collapsed
 \end_inset
 
 -debug
-\begin_inset LatexCommand \index{-\\/-debug}
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset
 
@@ -7014,10 +6989,12 @@ Preprocessor Options
 \end_inset
 
 
-\series default
 \size large
+\bar under
  
+\series default
 \size default
+\bar default
 Like `-M' but the output mentions only the user header files included with
  `#include 
 \begin_inset Quotes eld
@@ -7101,10 +7078,12 @@ file"'.
 \end_inset
 
 
-\series default
 \size large
+\bar under
  
+\series default
 \size default
+\bar default
 Like `-dD' except that the macro arguments and contents are omitted.
  Only `#define name' is included in the output.
 \end_layout
@@ -7131,11 +7110,10 @@ Like `-dD' except that the macro arguments and contents are omitted.
 
 \end_inset
 
-
-\series default
-\bar default
  
+\series default
 \size default
+\bar default
 Pedantic parse numbers so that situations like 0xfe-LO_B(3) are parsed properly
  and the macro LO_B(3) gets expanded.
  See also #pragma pedantic_parse_number 
@@ -7250,12 +7228,12 @@ status collapsed
 
 \series bold
 -lib-path
-\begin_inset LatexCommand \index{-\\/-lib-path <path>}
+\begin_inset LatexCommand \index{-\/-lib-path <path>}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{-L -\\/-lib-path}
+\begin_inset LatexCommand \index{-L -\/-lib-path}
 
 \end_inset
 
@@ -7294,7 +7272,7 @@ status collapsed
 -xram-loc
 \series default
 
-\begin_inset LatexCommand \index{-\\/-xram-loc <Value>}
+\begin_inset LatexCommand \index{-\/-xram-loc <Value>}
 
 \end_inset
 
@@ -7354,7 +7332,7 @@ status collapsed
 -code-loc
 \series default
 
-\begin_inset LatexCommand \index{-\\/-code-loc <Value>}
+\begin_inset LatexCommand \index{-\/-code-loc <Value>}
 
 \end_inset
 
@@ -7420,7 +7398,7 @@ status collapsed
 -stack-loc
 \series default
 
-\begin_inset LatexCommand \index{-\\/-stack-loc <Value>}
+\begin_inset LatexCommand \index{-\/-stack-loc <Value>}
 
 \end_inset
 
@@ -7485,7 +7463,7 @@ status collapsed
 \series default
 \InsetSpace ~
 
-\begin_inset LatexCommand \index{-\\/-pack-iram}
+\begin_inset LatexCommand \index{-\/-pack-iram}
 
 \end_inset
 
@@ -7509,7 +7487,7 @@ status collapsed
 \series default
 \InsetSpace ~
 
-\begin_inset LatexCommand \index{-\\/-no-pack-iram}
+\begin_inset LatexCommand \index{-\/-no-pack-iram}
 
 \end_inset
 
@@ -7536,7 +7514,7 @@ status collapsed
 -xstack-loc
 \series default
 
-\begin_inset LatexCommand \index{-\\/-xstack-loc <Value>}
+\begin_inset LatexCommand \index{-\/-xstack-loc <Value>}
 
 \end_inset
 
@@ -7606,7 +7584,7 @@ status collapsed
 -data-loc
 \series default
 
-\begin_inset LatexCommand \index{-\\/-data-loc <Value>}
+\begin_inset LatexCommand \index{-\/-data-loc <Value>}
 
 \end_inset
 
@@ -7685,7 +7663,7 @@ status collapsed
 -idata-loc
 \series default
 
-\begin_inset LatexCommand \index{-\\/-idata-loc <Value>}
+\begin_inset LatexCommand \index{-\/-idata-loc <Value>}
 
 \end_inset
 
@@ -7779,12 +7757,15 @@ status collapsed
 \end_inset
 
 -out-fmt-ihx
-\begin_inset LatexCommand \index{-\\/-out-fmt-ihx}
+\begin_inset LatexCommand \index{-\/-out-fmt-ihx}
 
 \end_inset
 
+
+\bar under
  
 \series default
+\bar default
 The linker output (final object code) is in Intel Hex format.
 \begin_inset LatexCommand \index{Intel hex format}
 
@@ -7817,12 +7798,15 @@ status collapsed
 \end_inset
 
 -out-fmt-s19
-\begin_inset LatexCommand \index{-\\/-out-fmt-s19}
+\begin_inset LatexCommand \index{-\/-out-fmt-s19}
 
 \end_inset
 
+
+\bar under
  
 \series default
+\bar default
 The linker output (final object code) is in Motorola S19 format
 \begin_inset LatexCommand \index{Motorola S19 format}
 
@@ -7850,17 +7834,20 @@ status collapsed
 \end_inset
 
 -out-fmt-elf
-\begin_inset LatexCommand \index{-\\/-out-fmt-s19}
+\begin_inset LatexCommand \index{-\/-out-fmt-s19}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{HC08!Options!-\\/-out-fmt-elf}
+\begin_inset LatexCommand \index{HC08!Options!-\/-out-fmt-elf}
 
 \end_inset
 
+
+\bar under
  
 \series default
+\bar default
 The linker output (final object code) is in ELF format
 \begin_inset LatexCommand \index{ELF format}
 
@@ -7947,15 +7934,17 @@ status collapsed
 \end_inset
 
 -model-small
-\begin_inset LatexCommand \index{-\\/-model-small}
+\begin_inset LatexCommand \index{-\/-model-small}
 
 \end_inset
 
 
 \series default
 \size large
+\emph on
  
 \size default
+\emph default
 Generate code for Small Model programs, see section Memory Models for more
  details.
  This is the default model.
@@ -7979,7 +7968,7 @@ status collapsed
 \end_inset
 
 -model-medium
-\begin_inset LatexCommand \index{-\\/-model-medium}
+\begin_inset LatexCommand \index{-\/-model-medium}
 
 \end_inset
 
@@ -8010,7 +7999,7 @@ status collapsed
 \end_inset
 
 -model-large
-\begin_inset LatexCommand \index{-\\/-model-large}
+\begin_inset LatexCommand \index{-\/-model-large}
 
 \end_inset
 
@@ -8041,7 +8030,7 @@ status collapsed
 \end_inset
 
 -xstack
-\begin_inset LatexCommand \index{-\\/-xstack}
+\begin_inset LatexCommand \index{-\/-xstack}
 
 \end_inset
 
@@ -8084,7 +8073,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{-\\/-iram-size <Value>}
+\begin_inset LatexCommand \index{-\/-iram-size <Value>}
 
 \end_inset
 
@@ -8113,7 +8102,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{-\\/-xram-size <Value>}
+\begin_inset LatexCommand \index{-\/-xram-size <Value>}
 
 \end_inset
 
@@ -8142,7 +8131,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{-\\/-code-size <Value>}
+\begin_inset LatexCommand \index{-\/-code-size <Value>}
 
 \end_inset
 
@@ -8171,7 +8160,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{-\\/-stack-size <Value>}
+\begin_inset LatexCommand \index{-\/-stack-size <Value>}
 
 \end_inset
 
@@ -8199,7 +8188,7 @@ status collapsed
 \series default
 \InsetSpace ~
 
-\begin_inset LatexCommand \index{-\\/-pack-iram}
+\begin_inset LatexCommand \index{-\/-pack-iram}
 
 \end_inset
 
@@ -8229,7 +8218,7 @@ status collapsed
 \series default
 \InsetSpace ~
 
-\begin_inset LatexCommand \index{-\\/-no-pack-iram}
+\begin_inset LatexCommand \index{-\/-no-pack-iram}
 
 \end_inset
 
@@ -8257,7 +8246,7 @@ status collapsed
 \series default
 \InsetSpace ~
 
-\begin_inset LatexCommand \index{-\\/-acall-ajmp}
+\begin_inset LatexCommand \index{-\/-acall-ajmp}
 
 \end_inset
 
@@ -8265,7 +8254,7 @@ status collapsed
  acall/ajmp.
  Only use this option if your code is in the same 2k block of memory.
  You may need to use this option for some 8051 derivatives which lack the
- lcall/ljmp instructions.
+ lcall/ljmp instructions..
 \end_layout
 
 \begin_layout Standard
@@ -8309,14 +8298,16 @@ status collapsed
 -model-flat24
 \series default
 
-\begin_inset LatexCommand \index{DS390!Options!-\\/-model-flat24}
+\begin_inset LatexCommand \index{DS390!Options!-\/-model-flat24}
 
 \end_inset
 
 
 \size large
+\emph on
  
 \size default
+\emph default
 Generate 24-bit flat mode code.
  This is the one and only that the ds390 code generator supports right now
  and is default when using 
@@ -8345,7 +8336,7 @@ status collapsed
 \end_inset
 
 -protect-sp-update
-\begin_inset LatexCommand \index{DS390!Options!-\\/-protect-sp-update}
+\begin_inset LatexCommand \index{DS390!Options!-\/-protect-sp-update}
 
 \end_inset
 
@@ -8374,7 +8365,7 @@ status collapsed
 -stack-10bit
 \series default
 
-\begin_inset LatexCommand \index{DS390!Options!-\\/-stack-10bit}
+\begin_inset LatexCommand \index{DS390!Options!-\/-stack-10bit}
 
 \end_inset
 
@@ -8413,7 +8404,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -8436,7 +8427,7 @@ status collapsed
 \end_inset
 
 -xstack
-\begin_inset LatexCommand \index{-\\/-xstack}
+\begin_inset LatexCommand \index{-\/-xstack}
 
 \end_inset
 
@@ -8510,7 +8501,7 @@ status collapsed
 \end_inset
 
 -stack-probe
-\begin_inset LatexCommand \index{DS390!Options!-\\/-stack-probe}
+\begin_inset LatexCommand \index{DS390!Options!-\/-stack-probe}
 
 \end_inset
 
@@ -8525,7 +8516,7 @@ status collapsed
 \series bold
 -
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Standard
 
@@ -8537,7 +8528,7 @@ status collapsed
 \end_inset
 
 -tini-libid
-\begin_inset LatexCommand \index{DS390!Options!-\\/-tini-libid}
+\begin_inset LatexCommand \index{DS390!Options!-\/-tini-libid}
 
 \end_inset
 
@@ -8565,7 +8556,7 @@ status collapsed
 \end_inset
 
 -use-accelerator
-\begin_inset LatexCommand \index{DS390!Options!-\\/-use-accelerator}
+\begin_inset LatexCommand \index{DS390!Options!-\/-use-accelerator}
 
 \end_inset
 
@@ -8616,14 +8607,16 @@ status collapsed
 -callee-saves-bc
 \series default
 
-\begin_inset LatexCommand \index{Z80!Options!-\\/-callee-saves-bc}
+\begin_inset LatexCommand \index{Z80!Options!-\/-callee-saves-bc}
 
 \end_inset
 
 
 \size large
+\emph on
  
 \size default
+\emph default
 Force a called function to always save BC.
 \end_layout
 
@@ -8647,7 +8640,7 @@ status collapsed
 -no-std-crt0
 \series default
 
-\begin_inset LatexCommand \index{Z80!Options!-\\/-no-std-crt0}
+\begin_inset LatexCommand \index{Z80!Options!-\/-no-std-crt0}
 
 \end_inset
 
@@ -8675,7 +8668,7 @@ status collapsed
 -portmode=
 \series default
 <Value>
-\begin_inset LatexCommand \index{Z80!Options!-\\/-portmode=<Value>}
+\begin_inset LatexCommand \index{Z80!Options!-\/-portmode=<Value>}
 
 \end_inset
 
@@ -8702,7 +8695,7 @@ status collapsed
 -asm=
 \series default
 <Value>
-\begin_inset LatexCommand \index{Z80!Options!-\\/-asm=<Value>}
+\begin_inset LatexCommand \index{Z80!Options!-\/-asm=<Value>}
 
 \end_inset
 
@@ -8730,7 +8723,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{Z80!Options!-\\/-codeseg <Value>}
+\begin_inset LatexCommand \index{Z80!Options!-\/-codeseg <Value>}
 
 \end_inset
 
@@ -8758,7 +8751,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{Z80!Options!-\\/-constseg <Value>}
+\begin_inset LatexCommand \index{Z80!Options!-\/-constseg <Value>}
 
 \end_inset
 
@@ -8807,14 +8800,16 @@ status collapsed
 -callee-saves-bc
 \series default
 
-\begin_inset LatexCommand \index{GBZ80!Options!-\\/-callee-saves-bc}
+\begin_inset LatexCommand \index{GBZ80!Options!-\/-callee-saves-bc}
 
 \end_inset
 
 
 \size large
+\emph on
  
 \size default
+\emph default
 Force a called function to always save BC.
 \end_layout
 
@@ -8869,7 +8864,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{GBZ80!Options!-\\/-codeseg <Value>}
+\begin_inset LatexCommand \index{GBZ80!Options!-\/-codeseg <Value>}
 
 \end_inset
 
@@ -8897,7 +8892,7 @@ status collapsed
 \series default
 \InsetSpace ~
 <Value>
-\begin_inset LatexCommand \index{GBZ80!Options!-\\/-constseg <Value>}
+\begin_inset LatexCommand \index{GBZ80!Options!-\/-constseg <Value>}
 
 \end_inset
 
@@ -8943,7 +8938,7 @@ status collapsed
 \end_inset
 
 -nogcse
-\begin_inset LatexCommand \index{-\\/-nogcse}
+\begin_inset LatexCommand \index{-\/-nogcse}
 
 \end_inset
 
@@ -8969,7 +8964,7 @@ ations, sloc
  will indicate the number of extra bytes it allocated.
  It is recommended that this option NOT be used, #pragma\InsetSpace ~
 nogcse
-\begin_inset LatexCommand \index{\\#pragma nogcse}
+\begin_inset LatexCommand \index{\#pragma nogcse}
 
 \end_inset
 
@@ -8999,7 +8994,7 @@ status collapsed
 \end_inset
 
 -noinvariant
-\begin_inset LatexCommand \index{-\\/-noinvariant}
+\begin_inset LatexCommand \index{-\/-noinvariant}
 
 \end_inset
 
@@ -9016,7 +9011,7 @@ status collapsed
 .
  It is recommended that this option NOT be used, #pragma\InsetSpace ~
 noinvariant
-\begin_inset LatexCommand \index{\\#pragma noinvariant}
+\begin_inset LatexCommand \index{\#pragma noinvariant}
 
 \end_inset
 
@@ -9041,7 +9036,7 @@ status collapsed
 \end_inset
 
 -noinduction
-\begin_inset LatexCommand \index{-\\/-noinduction}
+\begin_inset LatexCommand \index{-\/-noinduction}
 
 \end_inset
 
@@ -9051,7 +9046,7 @@ status collapsed
  for more details.
  It is recommended that this option is NOT used, #pragma\InsetSpace ~
 noinduction
-\begin_inset LatexCommand \index{\\#pragma noinduction}
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset
 
@@ -9076,15 +9071,17 @@ status collapsed
 \end_inset
 
 -nojtbound
-\begin_inset LatexCommand \index{-\\/-nojtbound}
+\begin_inset LatexCommand \index{-\/-nojtbound}
 
 \end_inset
 
 
 \size large
+\bar under
  
 \series default
 \size default
+\bar default
  Will not generate boundary condition check when switch statements
 \begin_inset LatexCommand \index{switch statement}
 
@@ -9100,7 +9097,7 @@ status collapsed
 Switch Statements for more details.
  It is recommended that this option is NOT used, #pragma\InsetSpace ~
 nojtbound
-\begin_inset LatexCommand \index{\\#pragma nojtbound}
+\begin_inset LatexCommand \index{\#pragma nojtbound}
 
 \end_inset
 
@@ -9126,7 +9123,7 @@ status collapsed
 \end_inset
 
 -noloopreverse
-\begin_inset LatexCommand \index{-\\/-noloopreverse}
+\begin_inset LatexCommand \index{-\/-noloopreverse}
 
 \end_inset
 
@@ -9163,7 +9160,7 @@ status collapsed
 nolabelopt
 \series default
  
-\begin_inset LatexCommand \index{-\\/-nolabelopt }
+\begin_inset LatexCommand \index{-\/-nolabelopt }
 
 \end_inset
 
@@ -9188,7 +9185,7 @@ status collapsed
 \end_inset
 
 -no-xinit-opt
-\begin_inset LatexCommand \index{-\\/-no-xinit-opt}
+\begin_inset LatexCommand \index{-\/-no-xinit-opt}
 
 \end_inset
 
@@ -9221,7 +9218,7 @@ status collapsed
 \end_inset
 
 -nooverlay
-\begin_inset LatexCommand \index{-\\/-nooverlay}
+\begin_inset LatexCommand \index{-\/-nooverlay}
 
 \end_inset
 
@@ -9249,7 +9246,7 @@ status collapsed
 \end_inset
 
 -no-peep
-\begin_inset LatexCommand \index{-\\/-no-peep}
+\begin_inset LatexCommand \index{-\/-no-peep}
 
 \end_inset
 
@@ -9278,7 +9275,7 @@ status collapsed
 -peep-file
 \series default
 
-\begin_inset LatexCommand \index{-\\/-peep-file}
+\begin_inset LatexCommand \index{-\/-peep-file}
 
 \end_inset
 
@@ -9312,7 +9309,7 @@ status collapsed
 \end_inset
 
 -peep-asm
-\begin_inset LatexCommand \index{-\\/-peep-asm}
+\begin_inset LatexCommand \index{-\/-peep-asm}
 
 \end_inset
 
@@ -9347,7 +9344,7 @@ status collapsed
 \end_inset
 
 -opt-code-speed
-\begin_inset LatexCommand \index{-\\/-opt-code-speed}
+\begin_inset LatexCommand \index{-\/-opt-code-speed}
 
 \end_inset
 
@@ -9375,7 +9372,7 @@ status collapsed
 \end_inset
 
 -opt-code-size
-\begin_inset LatexCommand \index{-\\/-opt-code-size}
+\begin_inset LatexCommand \index{-\/-opt-code-size}
 
 \end_inset
 
@@ -9420,12 +9417,12 @@ status collapsed
 \end_inset
 
 -compile-only
-\begin_inset LatexCommand \index{-\\/-compile-only}
+\begin_inset LatexCommand \index{-\/-compile-only}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{-c -\\/-compile-only}
+\begin_inset LatexCommand \index{-c -\/-compile-only}
 
 \end_inset
 
@@ -9456,7 +9453,7 @@ status collapsed
 
 \series bold
 -c1mode
-\begin_inset LatexCommand \index{-\\/-c1mode}
+\begin_inset LatexCommand \index{-\/-c1mode}
 
 \end_inset
 
@@ -9492,13 +9489,17 @@ status collapsed
 
 \end_inset
 
-
+ 
 \series default
- The output path where everything will be placed or the file name used for
+The output path where everything will be placed or the file name used for
  all generated output files.
  If the parameter is a path, it must have a trailing slash (or backslash
  for the Windows binaries) to be recognized as a path.
- Note for Windows users: if the path contains spaces, it should be surrounded
+
+\emph on
+ 
+\emph default
+Note for Windows users: if the path contains spaces, it should be surrounded
  by quotes.
  The trailing backslash should be doubled in order to prevent escaping the
  final quote, for example: 
@@ -9578,15 +9579,17 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
 
 \series default
 \size large
+\emph on
  
 \size default
+\emph default
 All functions in the source file will be compiled as 
 \emph on
 reentrant
@@ -9667,7 +9670,7 @@ status collapsed
 \end_inset
 
 -callee-saves
-\begin_inset LatexCommand \index{-\\/-callee-saves}
+\begin_inset LatexCommand \index{-\/-callee-saves}
 
 \end_inset
 
@@ -9728,7 +9731,7 @@ status collapsed
 -callee-saves option string.
  Also see #pragma\InsetSpace ~
 callee_saves 
-\begin_inset LatexCommand \index{\\#pragma callee\\_saves}
+\begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset
 
@@ -9758,13 +9761,17 @@ status collapsed
 \end_inset
 
 -all-callee-saves
-\begin_inset LatexCommand \index{-\\/-all-callee-saves}
+\begin_inset LatexCommand \index{-\/-all-callee-saves}
 
 \end_inset
 
-
+ 
 \series default
- Function of -
+Function of
+\series bold
+ 
+\series default
+-
 \begin_inset ERT
 status collapsed
 
@@ -9798,12 +9805,15 @@ status collapsed
 \end_inset
 
 -debug
-\begin_inset LatexCommand \index{-\\/-debug}
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset
 
+
+\bar under
  
 \series default
+\bar default
 When this option is used the compiler will generate debug information.
  The debug information collected in a file with .cdb extension can be used
  with the SDCDB.
@@ -9826,10 +9836,12 @@ When this option is used the compiler will generate debug information.
 \end_inset
 
 
-\series default
 \size large
+\bar under
  
+\series default
 \size default
+\bar default
 Stop after the stage of compilation proper; do not assemble.
  The output is an assembler code file for the input file specified.
 \end_layout
@@ -9852,7 +9864,7 @@ status collapsed
 \end_inset
 
 -int-long-reent
-\begin_inset LatexCommand \index{-\\/-int-long-reent}
+\begin_inset LatexCommand \index{-\/-int-long-reent}
 
 \end_inset
 
@@ -9881,12 +9893,15 @@ status collapsed
 \end_inset
 
 -cyclomatic
-\begin_inset LatexCommand \index{-\\/-cyclomatic}
+\begin_inset LatexCommand \index{-\/-cyclomatic}
 
 \end_inset
 
+
+\bar under
  
 \series default
+\bar default
 This option will cause the compiler to generate an information message for
  each function in the source file.
  The message contains some 
@@ -9925,7 +9940,7 @@ status collapsed
 \end_inset
 
 -float-reent
-\begin_inset LatexCommand \index{-\\/-float-reent}
+\begin_inset LatexCommand \index{-\/-float-reent}
 
 \end_inset
 
@@ -9958,24 +9973,24 @@ status collapsed
 \end_inset
 
 -funsigned-char
-\begin_inset LatexCommand \index{-\\/-funsigned-char}
+\begin_inset LatexCommand \index{-\/-funsigned-char}
 
 \end_inset
 
 
 \series default
- The default signedness for every type is 
+ The default signedness for every type is
 \family typewriter
-signed
+ signed
 \family default
 .
- In some embedded environments the default signedness of 
+ In some embedded environments the default signedness of
 \family typewriter
-char
+ char
 \family default
- is 
+ is
 \family typewriter
-unsigned
+ unsigned
 \family default
 .
  To set the signess for characters to unsigned, use the option -
@@ -10019,7 +10034,7 @@ status collapsed
 \end_inset
 
 -main-return
-\begin_inset LatexCommand \index{-\\/-main-return}
+\begin_inset LatexCommand \index{-\/-main-return}
 
 \end_inset
 
@@ -10061,7 +10076,7 @@ status collapsed
 \end_inset
 
 -nostdinc
-\begin_inset LatexCommand \index{-\\/-nostdinc}
+\begin_inset LatexCommand \index{-\/-nostdinc}
 
 \end_inset
 
@@ -10089,7 +10104,7 @@ status collapsed
 \end_inset
 
 -nostdlib
-\begin_inset LatexCommand \index{-\\/-nostdlib}
+\begin_inset LatexCommand \index{-\/-nostdlib}
 
 \end_inset
 
@@ -10121,7 +10136,7 @@ status collapsed
 \end_inset
 
 -verbose
-\begin_inset LatexCommand \index{-\\/-verbose}
+\begin_inset LatexCommand \index{-\/-verbose}
 
 \end_inset
 
@@ -10162,7 +10177,7 @@ status collapsed
 \end_inset
 
 -no-c-code-in-asm
-\begin_inset LatexCommand \index{-\\/-no-c-code-in-asm}
+\begin_inset LatexCommand \index{-\/-no-c-code-in-asm}
 
 \end_inset
 
@@ -10190,7 +10205,7 @@ status collapsed
 \end_inset
 
 -fverbose-asm
-\begin_inset LatexCommand \index{-\\/-no-gen-comments}
+\begin_inset LatexCommand \index{-\/-no-gen-comments}
 
 \end_inset
 
@@ -10217,7 +10232,7 @@ status collapsed
 \end_inset
 
 -no-peep-comments
-\begin_inset LatexCommand \index{-\\/-no-peep-comments}
+\begin_inset LatexCommand \index{-\/-no-peep-comments}
 
 \end_inset
 
@@ -10261,7 +10276,7 @@ status collapsed
 \end_inset
 
 -i-code-in-asm
-\begin_inset LatexCommand \index{-\\/-i-code-in-asm}
+\begin_inset LatexCommand \index{-\/-i-code-in-asm}
 
 \end_inset
 
@@ -10294,7 +10309,7 @@ status collapsed
 \end_inset
 
 
-\begin_inset LatexCommand \index{-\\/-less-pedantic}
+\begin_inset LatexCommand \index{-\/-less-pedantic}
 
 \end_inset
 
@@ -10338,7 +10353,7 @@ status collapsed
 
 -disable-warning\InsetSpace ~
 <nnnn>
-\begin_inset LatexCommand \index{-\\/-disable-warning}
+\begin_inset LatexCommand \index{-\/-disable-warning}
 
 \end_inset
 
@@ -10365,7 +10380,7 @@ status collapsed
 \end_inset
 
 -print-search-dirs
-\begin_inset LatexCommand \index{-\\/-print-search-dirs}
+\begin_inset LatexCommand \index{-\/-print-search-dirs}
 
 \end_inset
 
@@ -10392,7 +10407,7 @@ status collapsed
 \end_inset
 
 -vc
-\begin_inset LatexCommand \index{-\\/-vc}
+\begin_inset LatexCommand \index{-\/-vc}
 
 \end_inset
 
@@ -10432,7 +10447,7 @@ status collapsed
 \end_inset
 
 -use-stdout
-\begin_inset LatexCommand \index{-\\/-use-stdout}
+\begin_inset LatexCommand \index{-\/-use-stdout}
 
 \end_inset
 
@@ -10486,7 +10501,7 @@ status collapsed
 \end_inset
 
 -std-sdcc89
-\begin_inset LatexCommand \index{-\\/-std-sdcc89}
+\begin_inset LatexCommand \index{-\/-std-sdcc89}
 
 \end_inset
 
@@ -10514,7 +10529,7 @@ status collapsed
 \end_inset
 
 -std-c89
-\begin_inset LatexCommand \index{-\\/-std-c89}
+\begin_inset LatexCommand \index{-\/-std-c89}
 
 \end_inset
 
@@ -10542,7 +10557,7 @@ status collapsed
 \end_inset
 
 -std-sdcc99
-\begin_inset LatexCommand \index{-\\/-std-sdcc99}
+\begin_inset LatexCommand \index{-\/-std-sdcc99}
 
 \end_inset
 
@@ -10570,7 +10585,7 @@ status collapsed
 \end_inset
 
 -std-c99
-\begin_inset LatexCommand \index{-\\/-std-sdcc99}
+\begin_inset LatexCommand \index{-\/-std-sdcc99}
 
 \end_inset
 
@@ -10600,7 +10615,7 @@ status collapsed
 -codeseg
 \series default
 
-\begin_inset LatexCommand \index{-\\/-codeseg <Value>}
+\begin_inset LatexCommand \index{-\/-codeseg <Value>}
 
 \end_inset
 
@@ -10638,7 +10653,7 @@ status collapsed
 -constseg
 \series default
 
-\begin_inset LatexCommand \index{-\\/-constseg <Value>}
+\begin_inset LatexCommand \index{-\/-constseg <Value>}
 
 \end_inset
 
@@ -10674,7 +10689,7 @@ status collapsed
 \end_inset
 
 -fdollars-in-identifiers
-\begin_inset LatexCommand \index{-\\/-fdollars-in-identifiers}
+\begin_inset LatexCommand \index{-\/-fdollars-in-identifiers}
 
 \end_inset
 
@@ -10703,7 +10718,7 @@ status collapsed
 -more-pedantic
 \series default
 
-\begin_inset LatexCommand \index{-\\/-more-pedantic}
+\begin_inset LatexCommand \index{-\/-more-pedantic}
 
 \end_inset
 
@@ -10824,7 +10839,7 @@ status collapsed
 -short-is-8bits
 \series default
 
-\begin_inset LatexCommand \index{-\\/-short-is-8bits}
+\begin_inset LatexCommand \index{-\/-short-is-8bits}
 
 \end_inset
 
@@ -10912,7 +10927,7 @@ status collapsed
 \end_inset
 
 -dumpraw
-\begin_inset LatexCommand \index{-\\/-dumpraw}
+\begin_inset LatexCommand \index{-\/-dumpraw}
 
 \end_inset
 
@@ -10952,7 +10967,7 @@ status collapsed
 \end_inset
 
 -dumpgcse
-\begin_inset LatexCommand \index{-\\/-dumpgcse}
+\begin_inset LatexCommand \index{-\/-dumpgcse}
 
 \end_inset
 
@@ -10986,7 +11001,7 @@ status collapsed
 \end_inset
 
 -dumpdeadcode
-\begin_inset LatexCommand \index{-\\/-dumpdeadcode}
+\begin_inset LatexCommand \index{-\/-dumpdeadcode}
 
 \end_inset
 
@@ -11020,7 +11035,7 @@ status collapsed
 \end_inset
 
 -dumploop
-\begin_inset LatexCommand \index{-\\/-dumploop}
+\begin_inset LatexCommand \index{-\/-dumploop}
 
 \end_inset
 
@@ -11057,7 +11072,7 @@ status collapsed
 \end_inset
 
 -dumprange
-\begin_inset LatexCommand \index{-\\/-dumprange}
+\begin_inset LatexCommand \index{-\/-dumprange}
 
 \end_inset
 
@@ -11094,7 +11109,7 @@ status collapsed
 \end_inset
 
 -dumlrange
-\begin_inset LatexCommand \index{-\\/-dumlrange}
+\begin_inset LatexCommand \index{-\/-dumlrange}
 
 \end_inset
 
@@ -11126,12 +11141,15 @@ status collapsed
 \end_inset
 
 -dumpregassign
-\begin_inset LatexCommand \index{-\\/-dumpregassign}
+\begin_inset LatexCommand \index{-\/-dumpregassign}
 
 \end_inset
 
+
+\bar under
  
 \series default
+\bar default
 Will create a dump of iCodes, after register assignment
 \begin_inset LatexCommand \index{Register assignment}
 
@@ -11160,7 +11178,7 @@ status collapsed
 \end_inset
 
 -dumplrange
-\begin_inset LatexCommand \index{-\\/-dumplrange}
+\begin_inset LatexCommand \index{-\/-dumplrange}
 
 \end_inset
 
@@ -11187,15 +11205,17 @@ status collapsed
 \end_inset
 
 -dumpall
-\begin_inset LatexCommand \index{-\\/-dumpall}
+\begin_inset LatexCommand \index{-\/-dumpall}
 
 \end_inset
 
 
 \size large
+\bar under
  
 \series default
 \size default
+\bar default
 Will cause all the above mentioned dumps to be created.
 \end_layout
 
@@ -11252,7 +11272,7 @@ status collapsed
 -
 \series default
 use-stdout
-\begin_inset LatexCommand \index{-\\/-use-stdout}
+\begin_inset LatexCommand \index{-\/-use-stdout}
 
 \end_inset
 
@@ -11277,7 +11297,7 @@ status collapsed
 
 \emph default
 -vc
-\begin_inset LatexCommand \index{-\\/-vc}
+\begin_inset LatexCommand \index{-\/-vc}
 
 \end_inset
 
@@ -11359,7 +11379,7 @@ SDCC recognizes the following environment variables:
 
 \series bold
 SDCC_LEAVE_SIGNALS
-\begin_inset LatexCommand \index{SDCC\\_LEAVE\\_SIGNALS}
+\begin_inset LatexCommand \index{SDCC\_LEAVE\_SIGNALS}
 
 \end_inset
 
@@ -11400,7 +11420,7 @@ TMPDIR
 
 \series bold
 SDCC_HOME
-\begin_inset LatexCommand \index{SDCC\\_HOME}
+\begin_inset LatexCommand \index{SDCC\_HOME}
 
 \end_inset
 
@@ -11428,7 +11448,7 @@ SDCC_HOME
 
 \series bold
 SDCC_INCLUDE
-\begin_inset LatexCommand \index{SDCC\\_INCLUDE}
+\begin_inset LatexCommand \index{SDCC\_INCLUDE}
 
 \end_inset
 
@@ -11456,7 +11476,7 @@ Search Paths
 
 \series bold
 SDCC_LIB
-\begin_inset LatexCommand \index{SDCC\\_LIB}
+\begin_inset LatexCommand \index{SDCC\_LIB}
 
 \end_inset
 
@@ -11514,7 +11534,7 @@ data
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_data (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_data (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -11524,7 +11544,7 @@ data
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_near (storage class)}
+\begin_inset LatexCommand \index{\_\_near (storage class)}
 
 \end_inset
 
@@ -11585,7 +11605,7 @@ xdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_xdata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_xdata (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -11595,7 +11615,7 @@ xdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_far (storage class)}
+\begin_inset LatexCommand \index{\_\_far (storage class)}
 
 \end_inset
 
@@ -11663,7 +11683,7 @@ idata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_idata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_idata (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -11732,7 +11752,7 @@ pdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_pdata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_pdata (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -11821,7 +11841,7 @@ status collapsed
 \end_inset
 
 -xstack
-\begin_inset LatexCommand \index{-\\/-xstack}
+\begin_inset LatexCommand \index{-\/-xstack}
 
 \end_inset
 
@@ -11836,7 +11856,7 @@ code
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_code}
+\begin_inset LatexCommand \index{\_\_code}
 
 \end_inset
 
@@ -11951,7 +11971,7 @@ bit
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_bit}
+\begin_inset LatexCommand \index{\_\_bit}
 
 \end_inset
 
@@ -12022,7 +12042,7 @@ sfr
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sfr}
+\begin_inset LatexCommand \index{\_\_sfr}
 
 \end_inset
 
@@ -12032,7 +12052,7 @@ sfr
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sfr16}
+\begin_inset LatexCommand \index{\_\_sfr16}
 
 \end_inset
 
@@ -12042,12 +12062,12 @@ sfr
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sfr32}
+\begin_inset LatexCommand \index{\_\_sfr32}
 
 \end_inset
 
  / sbit
-\begin_inset LatexCommand \index{\\_\\_sbit}
+\begin_inset LatexCommand \index{\_\_sbit}
 
 \end_inset
 
@@ -12062,9 +12082,9 @@ sfr
 \begin_layout Standard
 Like the bit keyword, 
 \emph on
-sfr / sfr16 / sfr32 / sbit
+sfr / sfr16 / sfr32 / sbit 
 \emph default
- signify both a data-type and storage class, they are used to describe the
+signify both a data-type and storage class, they are used to describe the
  
 \emph on
 s
@@ -12097,7 +12117,7 @@ __sfr __at
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -12125,7 +12145,7 @@ __sbit __at
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -12145,9 +12165,9 @@ __sbit __at
 
 \begin_layout Standard
 Special function registers which are located on an address dividable by
- 8 are bit-addressable, an 
+ 8 are bit-addressable, an
 \emph on
-sbit
+ sbit
 \emph default
  addresses a specific bit within these sfr.
 \newline
@@ -12173,9 +12193,9 @@ Please note, if you use a header file which was written for another compiler
  then the sfr / sfr16 / sfr32 / sbit Storage Class extensions will most
  likely be 
 \emph on
-not
+not 
 \emph default
- compatible.
+compatible.
  Specifically the syntax 
 \family typewriter
 \InsetSpace ~
@@ -12202,10 +12222,8 @@ status collapsed
 \end_inset
 
 .
-
-\family default
  
-\series bold
+\family default
 Nevertheless it is possible to write header files
 \begin_inset LatexCommand \index{Header files}
 
@@ -12395,7 +12413,7 @@ idata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_idata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_idata (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -12410,7 +12428,7 @@ xdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_xdata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_xdata (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -12425,7 +12443,7 @@ data
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_data (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_data (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -12464,7 +12482,7 @@ using
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_using (mcs51, ds390 register bank)}
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
 
 \end_inset
 
@@ -12476,7 +12494,7 @@ using
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_interrupt}
+\begin_inset LatexCommand \index{\_\_interrupt}
 
 \end_inset
 
@@ -12520,7 +12538,7 @@ status collapsed
 \end_inset
 
 -data-loc
-\begin_inset LatexCommand \index{-\\/-data-loc <Value>}
+\begin_inset LatexCommand \index{-\/-data-loc <Value>}
 
 \end_inset
 
@@ -12542,7 +12560,7 @@ status collapsed
 \end_inset
 
 -iram-size
-\begin_inset LatexCommand \index{-\\/-iram-size <Value>}
+\begin_inset LatexCommand \index{-\/-iram-size <Value>}
 
 \end_inset
 
@@ -12577,7 +12595,7 @@ status collapsed
 \end_inset
 
 -stack-loc
-\begin_inset LatexCommand \index{-\\/-stack-loc <Value>}
+\begin_inset LatexCommand \index{-\/-stack-loc <Value>}
 
 \end_inset
 
@@ -12603,7 +12621,7 @@ status collapsed
 \end_inset
 
 -xdata-loc
-\begin_inset LatexCommand \index{-\\/-xdata-loc<Value>}
+\begin_inset LatexCommand \index{-\/-xdata-loc<Value>}
 
 \end_inset
 
@@ -12625,7 +12643,7 @@ status collapsed
 \end_inset
 
 -xram-size
-\begin_inset LatexCommand \index{-\\/-xram-size <Value>}
+\begin_inset LatexCommand \index{-\/-xram-size <Value>}
 
 \end_inset
 
@@ -12644,7 +12662,7 @@ status collapsed
 \end_inset
 
 -code-loc
-\begin_inset LatexCommand \index{-\\/-code-loc <Value>}
+\begin_inset LatexCommand \index{-\/-code-loc <Value>}
 
 \end_inset
 
@@ -12662,7 +12680,7 @@ status collapsed
 \end_inset
 
 -code-size
-\begin_inset LatexCommand \index{-\\/-code-size <Value>}
+\begin_inset LatexCommand \index{-\/-code-size <Value>}
 
 \end_inset
 
@@ -12713,7 +12731,7 @@ sfr
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sfr}
+\begin_inset LatexCommand \index{\_\_sfr}
 
 \end_inset
 
@@ -12793,7 +12811,7 @@ banked sfr
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sfr}
+\begin_inset LatexCommand \index{\_\_sfr}
 
 \end_inset
 
@@ -12817,7 +12835,7 @@ sfr banked at
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -12860,7 +12878,7 @@ sfr
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_sfr}
+\begin_inset LatexCommand \index{\_\_sfr}
 
 \end_inset
 
@@ -12892,13 +12910,13 @@ status collapsed
 \end_inset
 
 -portmode
-\begin_inset LatexCommand \index{Z180!Options!-\\/-portmode}
+\begin_inset LatexCommand \index{Z180!Options!-\/-portmode}
 
 \end_inset
 
 =180 (80) and a compiler #pragma\InsetSpace ~
 portmode
-\begin_inset LatexCommand \index{Z180!Pragmas!\\#pragma portmode}
+\begin_inset LatexCommand \index{Z180!Pragmas!\#pragma portmode}
 
 \end_inset
 
@@ -12935,7 +12953,7 @@ data
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_data (hc08 storage class)}
+\begin_inset LatexCommand \index{\_\_data (hc08 storage class)}
 
 \end_inset
 
@@ -12960,7 +12978,7 @@ xdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_xdata (hc08 storage class)}
+\begin_inset LatexCommand \index{\_\_xdata (hc08 storage class)}
 
 \end_inset
 
@@ -12996,7 +13014,7 @@ at
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -13014,7 +13032,7 @@ xdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_xdata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{\_\_xdata (mcs51, ds390 storage class)}
 
 \end_inset
 
@@ -13024,7 +13042,7 @@ xdata
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -13367,7 +13385,7 @@ __bit __at
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -13487,9 +13505,9 @@ They can be placed on the stack
 
 \end_inset
 
- by using the 
+ by using the
 \emph on
--
+ -
 \begin_inset ERT
 status collapsed
 
@@ -13503,7 +13521,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -13515,7 +13533,7 @@ status collapsed
 stackauto
 \emph default
 
-\begin_inset LatexCommand \index{\\#pragma stackauto}
+\begin_inset LatexCommand \index{\#pragma stackauto}
 
 \end_inset
 
@@ -13551,11 +13569,11 @@ unsigned char foo(char i) __reentrant
 \begin_layout Standard
 Since stack space on 8051 is limited, the 
 \emph on
-reentrant
+reentrant 
 \emph default
- keyword or the 
+keyword or the
 \emph on
--
+ -
 \begin_inset ERT
 status collapsed
 
@@ -13647,9 +13665,9 @@ i
 \emph on
 bvar
 \emph default
- in bit addressable space and 
+ in bit addressable space and
 \emph on
-j
+ j
 \emph default
  in internal ram.
  When compiled with 
@@ -13767,7 +13785,7 @@ status collapsed
 
  should be preceded by a #pragma\InsetSpace ~
 nooverlay
-\begin_inset LatexCommand \index{\\#pragma nooverlay}
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset
 
@@ -13805,7 +13823,7 @@ tion
 #pragma save 
 \newline
 #pragma nooverlay
-\begin_inset LatexCommand \index{\\#pragma nooverlay}
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset
 
@@ -13936,7 +13954,7 @@ interrupt
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_interrupt}
+\begin_inset LatexCommand \index{\_\_interrupt}
 
 \end_inset
 
@@ -13965,7 +13983,7 @@ using
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_using (mcs51, ds390 register bank)}
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
 
 \end_inset
 
@@ -14173,9 +14191,9 @@ A special note here, int (16 bit) and long (32 bit) integer division
  operations are implemented using external support routines.
  If an interrupt service routine needs to do any of these operations then
  the support routines (as mentioned in a following section) will have to
- be recompiled using the 
+ be recompiled using the
 \emph on
--
+ -
 \begin_inset ERT
 status collapsed
 
@@ -14189,7 +14207,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -14213,7 +14231,7 @@ status collapsed
 -int-long-reent
 \emph default
 
-\begin_inset LatexCommand \index{-\\/-int-long-reent}
+\begin_inset LatexCommand \index{-\/-int-long-reent}
 
 \end_inset
 
@@ -14242,13 +14260,9 @@ status collapsed
  See f.e.
  the cast 
 \family typewriter
-\series bold
 (unsigned char)(tail-1)
 \family default
-\series default
- 
-\series bold
-within the if clause in section 
+ within the if clause in section 
 \begin_inset LatexCommand \ref{sub:A-Step-by Assembler Introduction}
 
 \end_inset
@@ -14262,7 +14276,7 @@ Calling other functions from an interrupt service routine is not recommended,
  Note that when some function is called from an interrupt service routine
  it should be preceded by a #pragma\InsetSpace ~
 nooverlay
-\begin_inset LatexCommand \index{\\#pragma nooverlay}
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset
 
@@ -14271,9 +14285,9 @@ nooverlay
  while the interrupt service routine might be active.
  They also must not be called from low priority interrupt service routines
  while a high priority interrupt service routine might be active.
- You could use semaphores or make the function 
+ You could use semaphores or make the function
 \emph on
-critical
+ critical
 \emph default
  if all parameters are passed in registers.
 \newline
@@ -14605,7 +14619,7 @@ using
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_using (mcs51, ds390 register bank)}
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
 
 \end_inset
 
@@ -14779,7 +14793,7 @@ int foo () __critical
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_critical}
+\begin_inset LatexCommand \index{\_\_critical}
 
 \end_inset
 
@@ -14996,7 +15010,7 @@ On other architectures which have seperate opcodes for enabling and disabling
 
 \family typewriter
 #define CLI _asm
-\begin_inset LatexCommand \index{\\_asm}
+\begin_inset LatexCommand \index{\_asm}
 
 \end_inset
 
@@ -15005,7 +15019,7 @@ On other architectures which have seperate opcodes for enabling and disabling
 cli\InsetSpace ~
 \InsetSpace ~
 _endasm
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
@@ -15114,7 +15128,15 @@ Some architectures (mcs51/ds390) have an atomic
 
 \end_inset
 
- bit test and clear instruction.
+ bit test and
+\emph on
+ 
+\emph default
+clear
+\emph on
+ 
+\emph default
+instruction.
  These type of instructions are typically used in preemptive multitasking
  systems, where a routine f.e.
  claims the use of a data structure ('acquires a lock
@@ -15215,7 +15237,7 @@ using
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_using (mcs51, ds390 register bank)}
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
 
 \end_inset
 
@@ -15270,19 +15292,19 @@ possible exception: if a function is called ONLY from 'interrupt' functions
 \newline
 
 \emph on
-(pending: Note, nowadays the
+(pending: Note, nowadays the 
 \emph default
- using 
+using
 \emph on
-attribute has an effect on
+ attribute has an effect on
 \emph default
  
 \emph on
-the generated code for a
+the generated code for a 
 \emph default
- non-interrupt 
+non-interrupt
 \emph on
-function
+ function
 \emph default
 .
 \emph on
@@ -16215,13 +16237,16 @@ sjmp .
 One of these modules (crtstart.asm) contains a call to the C routine 
 \emph on
 _sdcc_external_startup()
-\begin_inset LatexCommand \index{\\_sdcc\\_external\\_startup()}
+\begin_inset LatexCommand \index{\_sdcc\_external\_startup()}
 
 \end_inset
 
 
+\series bold
 \emph default
- at the start of the CODE area.
+ 
+\series default
+at the start of the CODE area.
  This routine is also in the runtime library
 \begin_inset LatexCommand \index{Runtime library}
 
@@ -16273,7 +16298,7 @@ status collapsed
 \end_inset
 
 -iram-size
-\begin_inset LatexCommand \index{-\\/-iram-size <Value>}
+\begin_inset LatexCommand \index{-\/-iram-size <Value>}
 
 \end_inset
 
@@ -16306,7 +16331,7 @@ status collapsed
 opt
 \emph default
 
-\begin_inset LatexCommand \index{-\\/-no-xinit-opt}
+\begin_inset LatexCommand \index{-\/-no-xinit-opt}
 
 \end_inset
 
@@ -16328,7 +16353,7 @@ status collapsed
 -main-return
 \emph default
 
-\begin_inset LatexCommand \index{-\\/-main-return}
+\begin_inset LatexCommand \index{-\/-main-return}
 
 \end_inset
 
@@ -16397,7 +16422,7 @@ status collapsed
 -no-std-crt0
 \emph default
 
-\begin_inset LatexCommand \index{-\\/-no-std-crt0}
+\begin_inset LatexCommand \index{-\/-no-std-crt0}
 
 \end_inset
 
@@ -16445,7 +16470,7 @@ unsigned char __far
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_far (storage class)}
+\begin_inset LatexCommand \index{\_\_far (storage class)}
 
 \end_inset
 
@@ -16455,7 +16480,7 @@ unsigned char __far
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_at}
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset
 
@@ -16541,16 +16566,10 @@ section
 \end_inset
 
  about
-\family default
- 
-\family typewriter
 \series bold
-volatile
-\family default
+ volatile
 \series default
- 
-\family typewriter
-*/
+ */
 \newline
 
 \newline
@@ -16564,17 +16583,11 @@ void to_buffer( unsigned char c )
 \InsetSpace ~
 if( head != (unsigned char)(tail-1)
  )\InsetSpace ~
-/* cast
-\family default
- 
-\family typewriter
+/* cast 
 \series bold
 needed
-\family default
 \series default
- 
-\family typewriter
-to avoid promotion
+ to avoid promotion
 \begin_inset LatexCommand \index{promotion to signed int}
 
 \end_inset
@@ -16699,12 +16712,12 @@ void to_buffer_asm(
 \InsetSpace ~
 \InsetSpace ~
 _asm
-\begin_inset LatexCommand \index{\\_asm}
+\begin_inset LatexCommand \index{\_asm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_asm}
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset
 
@@ -16719,17 +16732,11 @@ mov\InsetSpace ~
 r2,dpl 
 \newline
 ;buffer.c if( head != (unsigned char)(tail-1) ) \InsetSpace ~
-/* cast
-\family default
- 
-\family typewriter
+/* cast 
 \series bold
 needed
-\family default
 \series default
- 
-\family typewriter
-to avoid promotion
+ to avoid promotion
 \begin_inset LatexCommand \index{promotion to signed int}
 
 \end_inset
@@ -16855,12 +16862,12 @@ ret
 \InsetSpace ~
 \InsetSpace ~
 _endasm
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_endasm}
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset
 
@@ -16938,12 +16945,12 @@ c; // to avoid warning: unreferenced function argument
 \InsetSpace ~
 \InsetSpace ~
 _asm
-\begin_inset LatexCommand \index{\\_asm}
+\begin_inset LatexCommand \index{\_asm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_asm}
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset
 
@@ -17136,12 +17143,12 @@ t_b_end$:
 \InsetSpace ~
 \InsetSpace ~
 _endasm
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_endasm}
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset
 
@@ -17179,12 +17186,12 @@ The inline assembler code can contain any valid code understood by the assembler
 The compiler does not do any validation of the code within the 
 \family typewriter
 _asm
-\begin_inset LatexCommand \index{\\_asm}
+\begin_inset LatexCommand \index{\_asm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_asm}
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset
 
@@ -17192,12 +17199,12 @@ _asm
  _endasm
 \size footnotesize
 
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_endasm}
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset
 
@@ -17235,7 +17242,7 @@ status collapsed
 -
 \emph on
 peep-asm
-\begin_inset LatexCommand \index{-\\/-peep-asm}
+\begin_inset LatexCommand \index{-\/-peep-asm}
 
 \end_inset
 
@@ -17275,19 +17282,19 @@ Naked Functions
 A special keyword may be associated with a function declaring it as 
 \emph on
 _naked
-\begin_inset LatexCommand \index{\\_naked}
+\begin_inset LatexCommand \index{\_naked}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_naked}
+\begin_inset LatexCommand \index{\_\_naked}
 
 \end_inset
 
 .
-
+ 
 \emph default
- The 
+The 
 \emph on
 _naked
 \emph default
@@ -17334,7 +17341,7 @@ void simpleInterrupt(void) __interrupt
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_interrupt}
+\begin_inset LatexCommand \index{\_\_interrupt}
 
 \end_inset
 
@@ -17361,12 +17368,12 @@ void nakedInterrupt(void) __interrupt (2) __naked
 \InsetSpace ~
 \InsetSpace ~
 _asm
-\begin_inset LatexCommand \index{\\_asm}
+\begin_inset LatexCommand \index{\_asm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_asm}
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset
 
@@ -17403,12 +17410,12 @@ reti\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 _endasm
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_endasm}
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset
 
@@ -17424,29 +17431,17 @@ For an 8051 target, the generated simpleInterrupt looks like:
 \begin_layout Verse
 
 \family typewriter
-Note, this is an
-\family default
- 
-\family typewriter
+Note, this is an 
 \emph on
 outdated
-\family default
 \emph default
- 
-\family typewriter
-example, recent versions of SDCC generate
+ example, recent versions of SDCC generate
 \newline
-the
-\family default
- 
-\family typewriter
+the 
 \emph on
 same
-\family default
 \emph default
- 
-\family typewriter
-code for simpleInterrupt() and nakedInterrupt()!
+ code for simpleInterrupt() and nakedInterrupt()!
 \newline
 
 \newline
@@ -17476,8 +17471,8 @@ b
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-pus
-h\InsetSpace ~
+pu
+sh\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -17628,7 +17623,7 @@ reti\InsetSpace ~
 
 \begin_layout Standard
 The related directive #pragma exclude
-\begin_inset LatexCommand \index{\\#pragma exclude}
+\begin_inset LatexCommand \index{\#pragma exclude}
 
 \end_inset
 
@@ -17704,12 +17699,12 @@ The numeric part of local labels does not need to have 5 digits (although
 
 \family typewriter
 _asm
-\begin_inset LatexCommand \index{\\_asm}
+\begin_inset LatexCommand \index{\_asm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_asm}
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset
 
@@ -17739,12 +17734,12 @@ djnz\InsetSpace ~
 b,00001$ 
 \newline
 _endasm
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_endasm}
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset
 
@@ -17844,12 +17839,12 @@ _asm
 \InsetSpace ~
 \InsetSpace ~
 _endasm
-\begin_inset LatexCommand \index{\\_endasm}
+\begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_endasm}
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset
 
@@ -17907,11 +17902,11 @@ DPL, DPH
 
 \end_inset
 
-
+ 
 \emph default
- and 
+and
 \emph on
-ACC
+ ACC
 \begin_inset LatexCommand \index{ACC (mcs51, ds390 register)}
 
 \end_inset
@@ -17958,9 +17953,9 @@ DPH
 \emph on
 DPL
 \emph default
-, 
+,
 \emph on
-B
+ B
 \emph default
  and 
 \emph on
@@ -18066,7 +18061,7 @@ status collapsed
 \end_inset
 
 -callee-saves
-\begin_inset LatexCommand \index{-\\/-callee-saves}
+\begin_inset LatexCommand \index{-\/-callee-saves}
 
 \end_inset
 
@@ -18914,7 +18909,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -18936,7 +18931,7 @@ status collapsed
 \end_inset
 
 -int-long-reent
-\begin_inset LatexCommand \index{-\\/-int-long-reent}
+\begin_inset LatexCommand \index{-\/-int-long-reent}
 
 \end_inset
 
@@ -19704,9 +19699,9 @@ getchar()
 
 \end_inset
 
-
+ 
 \family default
- and 
+and 
 \family typewriter
 putchar()
 \begin_inset LatexCommand \index{putchar()}
@@ -19785,18 +19780,18 @@ printf()
 \end_layout
 
 \begin_layout Standard
-The default 
+The default
 \family typewriter
-printf()
+ printf()
 \begin_inset LatexCommand \index{printf()}
 
 \end_inset
 
 
 \family default
- implementation in 
+ implementation in
 \family typewriter
-printf_large.c
+ printf_large.c
 \family default
  does not support float (except on ds390).
  To enable this recompile it with the option 
@@ -19815,16 +19810,16 @@ status collapsed
 \end_inset
 
 DUSE_FLOATS=1
-\begin_inset LatexCommand \index{USE\\_FLOATS}
+\begin_inset LatexCommand \index{USE\_FLOATS}
 
 \end_inset
 
 
 \emph default
  on the command line.
- Use 
+ Use
 \emph on
--
+ -
 \begin_inset ERT
 status collapsed
 
@@ -19838,7 +19833,7 @@ status collapsed
 \end_inset
 
 -model-large
-\begin_inset LatexCommand \index{-\\/-model-large}
+\begin_inset LatexCommand \index{-\/-model-large}
 
 \end_inset
 
@@ -19851,7 +19846,7 @@ status collapsed
 If you're short on code memory you might want to use 
 \family typewriter
 printf_small()
-\begin_inset LatexCommand \index{printf\\_small()}
+\begin_inset LatexCommand \index{printf\_small()}
 
 \end_inset
 
@@ -19861,15 +19856,15 @@ printf_small()
 \emph on
 instead
 \emph default
- of 
+ of
 \family typewriter
-printf().
+ printf().
 
 \family default
  For the mcs51 there additionally are assembly versions 
 \family typewriter
 printf_tiny()
-\begin_inset LatexCommand \index{printf\\_tiny() (mcs51)}
+\begin_inset LatexCommand \index{printf\_tiny() (mcs51)}
 
 \end_inset
 
@@ -19878,16 +19873,16 @@ printf_tiny()
  (subset of printf using less than 270 bytes) and 
 \family typewriter
 printf_fast()
-\begin_inset LatexCommand \index{printf\\_fast() (mcs51)}
+\begin_inset LatexCommand \index{printf\_fast() (mcs51)}
 
 \end_inset
 
-
+ 
 \family default
- and 
+and
 \family typewriter
-printf_fast_f()
-\begin_inset LatexCommand \index{printf\\_fast\\_f() (mcs51)}
+ printf_fast_f()
+\begin_inset LatexCommand \index{printf\_fast\_f() (mcs51)}
 
 \end_inset
 
@@ -21284,7 +21279,7 @@ status collapsed
 \end_inset
 
 -xstack option
-\begin_inset LatexCommand \index{-\\/-xstack}
+\begin_inset LatexCommand \index{-\/-xstack}
 
 \end_inset
 
@@ -21331,7 +21326,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -21498,7 +21493,7 @@ SDCC supports the
 save
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma save}
+\begin_inset LatexCommand \index{\#pragma save}
 
 \end_inset
 
@@ -21513,7 +21508,7 @@ restore.
 restore
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma restore}
+\begin_inset LatexCommand \index{\#pragma restore}
 
 \end_inset
 
@@ -21533,7 +21528,7 @@ save.
 callee_saves
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma callee\\_saves}
+\begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset
 
@@ -21583,7 +21578,7 @@ status collapsed
 
 ), the function names specified in #pragma\InsetSpace ~
 callee_saves
-\begin_inset LatexCommand \index{\\#pragma callee\\_saves}
+\begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset
 
@@ -21596,7 +21591,7 @@ callee_saves
 exclude
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma exclude}
+\begin_inset LatexCommand \index{\#pragma exclude}
 
 \end_inset
 
@@ -21629,18 +21624,18 @@ outines.
  To enable the normal register saving for ISR functions use #pragma\InsetSpace ~
 exclude\InsetSpace ~
 none
-\begin_inset LatexCommand \index{\\#pragma exclude}
+\begin_inset LatexCommand \index{\#pragma exclude}
 
 \end_inset
 
 .
  See also the related keyword _naked
-\begin_inset LatexCommand \index{\\_naked}
+\begin_inset LatexCommand \index{\_naked}
 
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\_\\_naked}
+\begin_inset LatexCommand \index{\_\_naked}
 
 \end_inset
 
@@ -21658,7 +21653,7 @@ less_pedantic
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\#pragma less\\_pedantic}
+\begin_inset LatexCommand \index{\#pragma less\_pedantic}
 
 \end_inset
 
@@ -21779,7 +21774,7 @@ function '[function name]', # edges [number] , # nodes [number] , cyclomatic
 disable_warning
 \series default
  <nnnn>
-\begin_inset LatexCommand \index{\\#pragma disable\\_warning}
+\begin_inset LatexCommand \index{\#pragma disable\_warning}
 
 \end_inset
 
@@ -21792,7 +21787,7 @@ disable_warning
 nogcse
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma nogcse}
+\begin_inset LatexCommand \index{\#pragma nogcse}
 
 \end_inset
 
@@ -21805,7 +21800,7 @@ nogcse
 noinduction
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma noinduction}
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset
 
@@ -21818,7 +21813,7 @@ noinduction
 noinvariant
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma noinvariant}
+\begin_inset LatexCommand \index{\#pragma noinvariant}
 
 \end_inset
 
@@ -21837,7 +21832,7 @@ noinvariant
 noiv
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma noiv}
+\begin_inset LatexCommand \index{\#pragma noiv}
 
 \end_inset
 
@@ -21872,7 +21867,7 @@ about interrupts.
 nojtbound
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma nojtbound}
+\begin_inset LatexCommand \index{\#pragma nojtbound}
 
 \end_inset
 
@@ -21892,7 +21887,7 @@ nojtbound
 noloopreverse
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma noloopreverse}
+\begin_inset LatexCommand \index{\#pragma noloopreverse}
 
 \end_inset
 
@@ -21905,7 +21900,7 @@ noloopreverse
 nooverlay
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma nooverlay}
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset
 
@@ -21919,7 +21914,7 @@ nooverlay
 stackauto
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma stackauto}
+\begin_inset LatexCommand \index{\#pragma stackauto}
 
 \end_inset
 
@@ -21937,7 +21932,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -21955,7 +21950,7 @@ status collapsed
 opt_code_speed
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma opt\\_code\\_speed}
+\begin_inset LatexCommand \index{\#pragma opt\_code\_speed}
 
 \end_inset
 
@@ -21970,7 +21965,7 @@ opt_code_speed
 opt_code_size
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma opt\\_code\\_size}
+\begin_inset LatexCommand \index{\#pragma opt\_code\_size}
 
 \end_inset
 
@@ -21985,7 +21980,7 @@ opt_code_size
 opt_code_balanced
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma opt\\_code\\_balanced}
+\begin_inset LatexCommand \index{\#pragma opt\_code\_balanced}
 
 \end_inset
 
@@ -22001,7 +21996,7 @@ opt_code_balanced
 std_sdcc89
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma std\\_sdcc89}
+\begin_inset LatexCommand \index{\#pragma std\_sdcc89}
 
 \end_inset
 
@@ -22015,7 +22010,7 @@ std_sdcc89
 std_c89
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma std\\_c89}
+\begin_inset LatexCommand \index{\#pragma std\_c89}
 
 \end_inset
 
@@ -22029,7 +22024,7 @@ std_c89
 std_sdcc99
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma std\\_sdcc99}
+\begin_inset LatexCommand \index{\#pragma std\_sdcc99}
 
 \end_inset
 
@@ -22043,7 +22038,7 @@ std_sdcc99
 std_c99
 \series default
  
-\begin_inset LatexCommand \index{\\#pragma std\\_c99}
+\begin_inset LatexCommand \index{\#pragma std\_c99}
 
 \end_inset
 
@@ -22057,7 +22052,7 @@ std_c99
 codeseg
 \series default
  <name>
-\begin_inset LatexCommand \index{\\#pragma codeseg}
+\begin_inset LatexCommand \index{\#pragma codeseg}
 
 \end_inset
 
@@ -22085,7 +22080,7 @@ status collapsed
 constseg
 \series default
  <name>
-\begin_inset LatexCommand \index{\\#pragma constseg}
+\begin_inset LatexCommand \index{\#pragma constseg}
 
 \end_inset
 
@@ -22127,7 +22122,7 @@ pedantic_parse_number
 \end_inset
 
 
-\begin_inset LatexCommand \index{\\#pragma pedantic\\_parse\\_number}
+\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
 
 \end_inset
 
@@ -22161,16 +22156,16 @@ status collapsed
  
 \newline
 Below is an example on how to use this pragma.
- 
+
 \emph on
-Note: this functionality is not in conformance with standard!
+ Note: this functionality is not in conformance with standard!
 \end_layout
 
 \begin_layout Verse
 
 \family typewriter
 #pragma pedantic_parse_number +
-\begin_inset LatexCommand \index{\\#pragma pedantic\\_parse\\_number}
+\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
 
 \end_inset
 
@@ -22210,7 +22205,7 @@ return c;
 preproc_asm
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma preproc\\_asm}
+\begin_inset LatexCommand \index{\#pragma preproc\_asm}
 
 \end_inset
 
@@ -22226,7 +22221,7 @@ preproc_asm
 
 \family typewriter
 #pragma preproc_asm -
-\begin_inset LatexCommand \index{\\#pragma preproc\\_asm}
+\begin_inset LatexCommand \index{\#pragma preproc\_asm}
 
 \end_inset
 
@@ -22288,7 +22283,7 @@ void foo (void)
 sdcc_hash
 \series default
 
-\begin_inset LatexCommand \index{\\#pragma sdcc\\_hash}
+\begin_inset LatexCommand \index{\#pragma sdcc\_hash}
 
 \end_inset
 
@@ -22310,7 +22305,7 @@ Default is off.
 #pragma preproc_asm +
 \newline
 #pragma sdcc_hash +
-\begin_inset LatexCommand \index{\\#pragma sdcc\\_hash}
+\begin_inset LatexCommand \index{\#pragma sdcc\_hash}
 
 \end_inset
 
@@ -22370,7 +22365,7 @@ ons which might cause the compiler to generate extra stack and/or data space
 
 \family typewriter
 #pragma save
-\begin_inset LatexCommand \index{\\#pragma save}
+\begin_inset LatexCommand \index{\#pragma save}
 
 \end_inset
 
@@ -22384,7 +22379,7 @@ ons which might cause the compiler to generate extra stack and/or data space
 /* save the current settings */ 
 \newline
 #pragma nogcse
-\begin_inset LatexCommand \index{\\#pragma nogcse}
+\begin_inset LatexCommand \index{\#pragma nogcse}
 
 \end_inset
 
@@ -22396,7 +22391,7 @@ ons which might cause the compiler to generate extra stack and/or data space
 /* turnoff global subexpression elimination */ 
 \newline
 #pragma noinduction
-\begin_inset LatexCommand \index{\\#pragma noinduction}
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset
 
@@ -22423,7 +22418,7 @@ int foo ()
 } 
 \newline
 #pragma restore
-\begin_inset LatexCommand \index{\\#pragma restore}
+\begin_inset LatexCommand \index{\#pragma restore}
 
 \end_inset
 
@@ -22448,7 +22443,7 @@ Defines Created by the Compiler
 
 \begin_layout Standard
 The compiler creates the following #defines
-\begin_inset LatexCommand \index{\\#defines}
+\begin_inset LatexCommand \index{\#defines}
 
 \end_inset
 
@@ -22525,17 +22520,17 @@ Always defined.
 
 \begin_layout Standard
 SDCC_mcs51
-\begin_inset LatexCommand \index{SDCC\\_mcs51}
+\begin_inset LatexCommand \index{SDCC\_mcs51}
 
 \end_inset
 
  or SDCC_ds390
-\begin_inset LatexCommand \index{SDCC\\_ds390}
+\begin_inset LatexCommand \index{SDCC\_ds390}
 
 \end_inset
 
  or SDCC_z80
-\begin_inset LatexCommand \index{SDCC\\_z80}
+\begin_inset LatexCommand \index{SDCC\_z80}
 
 \end_inset
 
@@ -22560,22 +22555,22 @@ depending on the model used (e.g.: -mds390)
 
 \begin_layout Standard
 __mcs51
-\begin_inset LatexCommand \index{\\_\\_mcs51}
+\begin_inset LatexCommand \index{\_\_mcs51}
 
 \end_inset
 
 , __ds390
-\begin_inset LatexCommand \index{\\_\\_ds390}
+\begin_inset LatexCommand \index{\_\_ds390}
 
 \end_inset
 
 , __hc08
-\begin_inset LatexCommand \index{\\_\\_hc08}
+\begin_inset LatexCommand \index{\_\_hc08}
 
 \end_inset
 
 , __z80
-\begin_inset LatexCommand \index{\\_\\_z80}
+\begin_inset LatexCommand \index{\_\_z80}
 
 \end_inset
 
@@ -22601,7 +22596,7 @@ depending on the model used (e.g.
 
 \begin_layout Standard
 SDCC_STACK_AUTO
-\begin_inset LatexCommand \index{SDCC\\_STACK\\_AUTO}
+\begin_inset LatexCommand \index{SDCC\_STACK\_AUTO}
 
 \end_inset
 
@@ -22643,7 +22638,7 @@ status collapsed
 
 \begin_layout Standard
 SDCC_MODEL_SMALL
-\begin_inset LatexCommand \index{SDCC\\_MODEL\\_SMALL}
+\begin_inset LatexCommand \index{SDCC\_MODEL\_SMALL}
 
 \end_inset
 
@@ -22685,7 +22680,7 @@ status collapsed
 
 \begin_layout Standard
 SDCC_MODEL_MEDIUM
-\begin_inset LatexCommand \index{SDCC\\_MODEL\\_MEDIUM}
+\begin_inset LatexCommand \index{SDCC\_MODEL\_MEDIUM}
 
 \end_inset
 
@@ -22727,7 +22722,7 @@ status collapsed
 
 \begin_layout Standard
 SDCC_MODEL_LARGE
-\begin_inset LatexCommand \index{SDCC\\_MODEL\\_LARGE}
+\begin_inset LatexCommand \index{SDCC\_MODEL\_LARGE}
 
 \end_inset
 
@@ -22769,7 +22764,7 @@ status collapsed
 
 \begin_layout Standard
 SDCC_USE_XSTACK
-\begin_inset LatexCommand \index{SDCC\\_USE\\_XSTACK}
+\begin_inset LatexCommand \index{SDCC\_USE\_XSTACK}
 
 \end_inset
 
@@ -22811,7 +22806,7 @@ status collapsed
 
 \begin_layout Standard
 SDCC_STACK_TENBIT
-\begin_inset LatexCommand \index{SDCC\\_STACK\\_TENBIT}
+\begin_inset LatexCommand \index{SDCC\_STACK\_TENBIT}
 
 \end_inset
 
@@ -22840,7 +22835,7 @@ when
 
 \begin_layout Standard
 SDCC_MODEL_FLAT24
-\begin_inset LatexCommand \index{SDCC\\_MODEL\\_FLAT24}
+\begin_inset LatexCommand \index{SDCC\_MODEL\_FLAT24}
 
 \end_inset
 
@@ -22930,7 +22925,7 @@ sfr
  should define an sfr with the name _XPAGE
 \family typewriter
 
-\begin_inset LatexCommand \index{\\_XPAGE (mcs51)}
+\begin_inset LatexCommand \index{\_XPAGE (mcs51)}
 
 \end_inset
 
@@ -23484,9 +23479,9 @@ mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS) libsdcc.lib
 \end_layout
 
 \begin_layout Standard
-Please note that indentations within a 
+Please note that indentations within a
 \family typewriter
-Makefile
+ Makefile
 \family default
  have to be done with a tabulator character.
 \end_layout
@@ -23528,7 +23523,7 @@ status collapsed
 \end_inset
 
 -debug-xtra
-\begin_inset LatexCommand \index{PIC14!Options!-\\/-debug-extra}
+\begin_inset LatexCommand \index{PIC14!Options!-\/-debug-extra}
 
 \end_inset
 
@@ -23550,7 +23545,7 @@ status collapsed
 \end_inset
 
 -no-pcode-opt
-\begin_inset LatexCommand \index{PIC14!Options!-\\/-no-pcode-opt}
+\begin_inset LatexCommand \index{PIC14!Options!-\/-no-pcode-opt}
 
 \end_inset
 
@@ -23572,7 +23567,7 @@ status collapsed
 \end_inset
 
 -stack-loc
-\begin_inset LatexCommand \index{PIC14!Options!-\\/-stack-loc}
+\begin_inset LatexCommand \index{PIC14!Options!-\/-stack-loc}
 
 \end_inset
 
@@ -23595,7 +23590,7 @@ status collapsed
 \end_inset
 
 -stack-size
-\begin_inset LatexCommand \index{PIC14!Options!-\\/-stack-size}
+\begin_inset LatexCommand \index{PIC14!Options!-\/-stack-size}
 
 \end_inset
 
@@ -23814,7 +23809,7 @@ status collapsed
 \end_inset
 
 -callee-saves
-\begin_inset LatexCommand \index{PIC16!Options!-\\/-callee-saves}
+\begin_inset LatexCommand \index{PIC16!Options!-\/-callee-saves}
 
 \end_inset
 
@@ -23849,7 +23844,7 @@ status collapsed
 \end_inset
 
 -fommit-frame-pointer
-\begin_inset LatexCommand \index{PIC16!Options!-\\/-fommit-frame-pointer}
+\begin_inset LatexCommand \index{PIC16!Options!-\/-fommit-frame-pointer}
 
 \end_inset
 
@@ -24277,7 +24272,7 @@ status collapsed
 \end_inset
 
 -debug
-\begin_inset LatexCommand \index{-\\/-debug}
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset
 
@@ -24836,7 +24831,7 @@ The PIC16
 
 \begin_layout Description
 stack
-\begin_inset LatexCommand \index{PIC16!Pragmas!\\#pragma stack}
+\begin_inset LatexCommand \index{PIC16!Pragmas!\#pragma stack}
 
 \end_inset
 
@@ -24909,7 +24904,7 @@ If the stack_size field is omitted then a stack is created with the default
 
 \begin_layout Description
 code
-\begin_inset LatexCommand \index{PIC16!Pragmas!\\#pragma code}
+\begin_inset LatexCommand \index{PIC16!Pragmas!\#pragma code}
 
 \end_inset
 
@@ -26792,9 +26787,9 @@ extern FILE * stdout;
 The FILE type is actually a generic pointer which defines one more type
  of generic pointers, the 
 \emph on
-stream
+stream 
 \emph default
- pointer.
+pointer.
  This new type has the format:
 \end_layout
 
@@ -27181,9 +27176,9 @@ putchar dummy function.
 \begin_layout Standard
 In order to increase performance 
 \emph on
-putchar
+putchar 
 \emph default
- is declared in stdio.h as having its parameter in WREG (it has the wparam
+is declared in stdio.h as having its parameter in WREG (it has the wparam
  keyword).
  In stdio.h exists the macro PUTCHAR(arg) that defines the putchar function
  in a user-friendly way.
@@ -27299,9 +27294,9 @@ extern unsigned int vfprintf(FILE *fp, char *fmt, va_list ap);
 \begin_layout Standard
 For sprintf and vsprintf 
 \emph on
-buf
+buf 
 \emph default
- should normally be a data pointer where the resulting string will be placed.
+should normally be a data pointer where the resulting string will be placed.
  No range checking is done so the user should allocate the necessery buffer.
  For fprintf and vfprintf 
 \emph on
@@ -27809,9 +27804,9 @@ Additionally there are two more macros to simplify the declaration of the
 \labelwidthstring 00.00.0000
 
 \series medium
-SIGHANDLER(handler)
+SIGHANDLER(handler) 
 \series default
- this declares the function prototype for the 
+this declares the function prototype for the 
 \emph on
 handler
 \emph default
@@ -28324,7 +28319,7 @@ status collapsed
 \end_inset
 
 -debug
-\begin_inset LatexCommand \index{-\\/-debug}
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset
 
@@ -28856,9 +28851,9 @@ ion is complete.
 \newline
 
 \family typewriter
-(load-file sdcdbsrc.el)
+(load-file sdcdbsrc.el) 
 \family default
- 
+
 \newline
 
 \newline
@@ -29988,16 +29983,16 @@ int
  more often than other compilers.
  Eventually insert explicit casts to 
 \family typewriter
-(char)
+(char) 
 \family default
- or 
+or
 \family typewriter
-(unsigned char)
+ (unsigned char)
 \family default
 .
  Also check that the ~\InsetSpace ~
 operator
-\begin_inset LatexCommand \index{\\~\\/ Operator}
+\begin_inset LatexCommand \index{\~\/ Operator}
 
 \end_inset
 
@@ -30037,7 +30032,7 @@ check whether timing loops result in proper timing (or preferably consider
 
 \begin_layout Itemize
 check for differences in printf parameters (some compilers push (va_arg
-\begin_inset LatexCommand \index{vararg, va\\_arg}
+\begin_inset LatexCommand \index{vararg, va\_arg}
 
 \end_inset
 
@@ -30596,9 +30591,9 @@ SDCC Compiler User Guide
 \begin_inset Text
 
 \begin_layout Standard
-You're reading it right now 
+You're reading it right now
 \emph on
-\InsetSpace ~
+ \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 
@@ -30632,9 +30627,9 @@ Changelog of SDCC
 \begin_inset Text
 
 \begin_layout Standard
-sdcc/Changelog 
+sdcc/Changelog
 \emph on
-\InsetSpace ~
+ \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 
@@ -30960,9 +30955,9 @@ cdbfileformat.pd
 \emph default
 \bar default
 \noun default
-f 
+f
 \emph on
-\InsetSpace ~
+ \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 
@@ -32302,7 +32297,7 @@ status collapsed
 \end_inset
 
 -dumpall
-\begin_inset LatexCommand \index{-\\/-dumpall}
+\begin_inset LatexCommand \index{-\/-dumpall}
 
 \end_inset
 
@@ -32468,9 +32463,10 @@ diff -u sourcefile.c.orig sourcefile.c >my_changes.patch
 \end_inset
 
 
-\family default
 \series default
- will do.
+ 
+\family default
+will do.
 \end_layout
 
 \begin_layout Section
@@ -32649,18 +32645,18 @@ Examples
 You'll find some small examples in the directory 
 \emph on
 sdcc/device/examples/.
-
+ 
 \emph default
- More examples and libraries are available at 
+More examples and libraries are available at
 \emph on
-The SDCC Open Knowledge Resource 
+ The SDCC Open Knowledge Resource 
 \begin_inset LatexCommand \url{http://sdccokr.dl9sec.de/}
 
 \end_inset
 
-
+ 
 \emph default
- web site or at 
+web site or at 
 \begin_inset LatexCommand \url{http://www.pjrc.com/tech/8051/}
 
 \end_inset
@@ -33203,9 +33199,9 @@ Two types of loop optimizations are done by SDCC
 \emph on
 loop invariant
 \emph default
- lifting and 
+ lifting and
 \emph on
-strength reduction
+ strength reduction
 \emph default
  of loop induction variables.
  In addition to the strength reduction the optimizer marks the induction
@@ -33241,7 +33237,7 @@ status collapsed
 
 -noinduction option) or for a given function only using #pragma\InsetSpace ~
 noinduction
-\begin_inset LatexCommand \index{\\#pragma noinduction}
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset
 
@@ -34114,7 +34110,7 @@ There might be reasons which SDCC cannot know about to either favour or
 
 \begin_layout Standard
 The pragma nojtbound
-\begin_inset LatexCommand \index{\\#pragma nojtbound}
+\begin_inset LatexCommand \index{\#pragma nojtbound}
 
 \end_inset
 
@@ -34277,9 +34273,9 @@ char i;\InsetSpace ~
 ...
  
 \newline
-i = ((i << 1) | (i >> 7));
+i = ((i << 1) | (i >> 7)); 
 \family default
- 
+
 \newline
 
 \family typewriter
@@ -34352,9 +34348,9 @@ int j;
 ...
  
 \newline
-i = ((i << 4) | (i >> 4));
+i = ((i << 4) | (i >> 4)); 
 \family default
- 
+
 \newline
 
 \family typewriter
@@ -34410,7 +34406,11 @@ dptr
 
 \end_inset
 
--datapointer so little-endian is the more efficient byte order.
+-datapointer
+\emph on
+ 
+\emph default
+so little-endian is the more efficient byte order.
 \end_layout
 
 \end_inset
@@ -35645,7 +35645,7 @@ status collapsed
 \end_inset
 
 -peep-file
-\begin_inset LatexCommand \index{-\\/-peep-file}
+\begin_inset LatexCommand \index{-\/-peep-file}
 
 \end_inset
 
@@ -35804,7 +35804,7 @@ status collapsed
 
 \emph default
 -acall-ajmp
-\begin_inset LatexCommand \index{ajmp}
+\begin_inset LatexCommand \index{-\/-acall-ajmp}
 
 \end_inset
 
@@ -36038,11 +36038,11 @@ g the variable bindings is passed as a parameter).
  Currently implemented are 
 \emph on
 labelInRange, labelRefCount, labelIsReturnOnly, operandsNotSame, xramMovcOption,
- 24bitMode, portIsDS390, 24bitModeAndPortDS390
+ 24bitMode, portIsDS390, 24bitModeAndPortDS390 
 \emph default
- and 
+and
 \emph on
-notVolatile
+ notVolatile
 \emph default
 .
 \end_layout
@@ -36123,7 +36123,7 @@ status collapsed
 \end_inset
 
 -stack-auto
-\begin_inset LatexCommand \index{-\\/-stack-auto}
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset
 
@@ -36190,18 +36190,12 @@ s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
 
 \series bold
 struct
-\family default
 \series default
- 
-\family typewriter
-s foo1 (
+ s foo1 (
 \series bold
 struct
-\family default
 \series default
- 
-\family typewriter
-s parms) /* invalid in SDCC although allowed in ANSI */
+ s parms) /* invalid in SDCC although allowed in ANSI */
 \newline
 { 
 \newline
@@ -36279,7 +36273,7 @@ not supported.
 
 \begin_layout Itemize
 Old K&R style
-\begin_inset LatexCommand \index{K\\&R style}
+\begin_inset LatexCommand \index{K\&R style}
 
 \end_inset
 
@@ -36319,11 +36313,8 @@ Most enhancements in C99 are not supported, e.g.:
 for (
 \series bold
 int
-\family default
 \series default
- 
-\family typewriter
-i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
+ i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
 \end_layout
 
 \end_deeper
@@ -36343,17 +36334,11 @@ inline
 \end_inset
 
 
-\family default
 \series default
- 
-\family typewriter
-int increment (int a) { return a+1; } /* inlines the increment without function
- call overhead */
+ int increment (int a) { return a+1; } /* inlines the increment without
+ function call overhead */
 \newline
-int *
-\family default
- 
-\family typewriter
+int * 
 \series bold
 restrict
 \begin_inset LatexCommand \index{inline (not supported)}
@@ -36361,11 +36346,8 @@ restrict
 \end_inset
 
 
-\family default
 \series default
- 
-\family typewriter
-p; /* accepted but ignored */
+ p; /* accepted but ignored */
 \end_layout
 
 \end_deeper
@@ -36387,7 +36369,7 @@ status collapsed
 \end_inset
 
 -std-c89
-\begin_inset LatexCommand \index{-\\/-std-c89}
+\begin_inset LatexCommand \index{-\/-std-c89}
 
 \end_inset
 
@@ -36405,7 +36387,7 @@ status collapsed
 \end_inset
 
 -std-c99
-\begin_inset LatexCommand \index{-\\/-std-c99}
+\begin_inset LatexCommand \index{-\/-std-c99}
 
 \end_inset
 
@@ -36419,7 +36401,7 @@ t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
  '_naked'.
  Compliant equivalents of these keywords are always available in a form
  that begin with two underscores
-\begin_inset LatexCommand \index{\\_\\_ (prefix for extended keywords)}
+\begin_inset LatexCommand \index{\_\_ (prefix for extended keywords)}
 
 \end_inset
 
@@ -36625,11 +36607,8 @@ The anatomy of the compiler
 
 \shape italic
 This is an excerpt from an article published in Circuit Cellar Magazine
- in
-\shape default
- 
+ in 
 \series bold
-\shape italic
 August 2000
 \series default
 .
@@ -38612,21 +38591,12 @@ None
 \shape slanted
 \size footnotesize
 see f.e.
-
-\shape default
  
 \family typewriter
-\shape slanted
 gen51Code()
 \family default
-\shape default
- 
-\shape slanted
-in
-\shape default
- 
+ in 
 \family typewriter
-\shape slanted
 src/mcs51/gen.c
 \end_layout
 

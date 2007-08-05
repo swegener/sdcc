@@ -1,3 +1,8 @@
+2007-08-05 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* doc/sdccman.lyx: Same changes made 2007-07-28 but using lyx 1.4.4
+	  instead of lyx 1.5.0.
+
 2007-07-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/include/hc08/mc68hc908apxx.h: new header contributed by

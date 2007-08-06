@@ -1,3 +1,8 @@
+2007-08-06 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: removed two index entries which prevented the
+	  generation of sdcc doc archive
+
 2007-08-05 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* doc/sdccman.lyx: Same changes made 2007-07-28 but using lyx 1.4.4

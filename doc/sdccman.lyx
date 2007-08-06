@@ -6383,17 +6383,7 @@ sdcclib -l libint.lib myliblist.txt
 \begin_layout Standard
 Additionally, you can instruct sdcclib to compiles the files before adding
  them to the library.
- This is achieved using the environment variables SDCCLIB_CC
-\begin_inset LatexCommand \index{SDCCLIB_CC}
-
-\end_inset
-
- and/or SDCCLIB_AS
-\begin_inset LatexCommand \index{SDCCLIB_AS}
-
-\end_inset
-
-.
+ This is achieved using the environment variables SDCCLIB_CC and/or SDCCLIB_AS.
  For example:
 \family sans
 \series bold

@@ -1,3 +1,8 @@
+2007-08-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sdccconf_in.h: update the endian test so that SPARC Solaris
+	  does not throw syntax errors
+
 2007-08-06 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: removed two index entries which prevented the

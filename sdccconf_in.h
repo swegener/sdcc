@@ -58,7 +58,10 @@
  * find out the endianess of host machine
  * in order to be able to make Mac OS X unified binaries
  */
-#if __BIG_ENDIAN__ || _BIG_ENDIAN
+/* This is tricky since these might be defined with a blank replacement list */
+/* such as on SPARC Solaris. However, configure gets it right, so it's ok */
+/* that (_BIG_ENDIAN+0) is false, even though it is defined. */
+#if (__BIG_ENDIAN__+0) || (_BIG_ENDIAN+0)
 /* 1) trust the compiler */
 # define WORDS_BIGENDIAN 1
 #elif __LITTLE_ENDIAN__

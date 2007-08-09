@@ -54,7 +54,7 @@ __sfr __at (0xA2) AUXR1;	//Auxiliary function register 1
 	#define DPS 0x01		//Data pointer select.
 
 __sfr __at (0x97) CKRL;     //Clock Reload Register
-__sfr __at (0x8F) CKCKON0;  //Clock control Register 0
+__sfr __at (0x8F) CKCON0;   //Clock control Register 0
     #define WDTX2 0x40      //Watch Dog Clock speed '1'=12 ck/cy, '0'=6 ck/cy
     #define PCAX2 0x20      //Programmable Counter Array Clock speed '1'=12 ck/cy, '0'=6 ck/cy
     #define SIX2  0x10      //Enhanced UART Clock (Mode 0 and 2) speed '1'=12 ck/cy, '0'=6 ck/cy
@@ -62,7 +62,7 @@ __sfr __at (0x8F) CKCKON0;  //Clock control Register 0
     #define T1X2  0x04      //Timer1 Clock speed '1'=12 ck/cy, '0'=6 ck/cy
     #define T0X2  0x02      //Timer0 Clock speed '1'=12 ck/cy, '0'=6 ck/cy
     #define X2    0x01      //CPU Clock '0'=12 ck/cy, '1'=6 ck/cy
-__sfr __at (0x8F) CKCKON1;  //Clock control Register 1
+__sfr __at (0x8F) CKCON1;   //Clock control Register 1
     #define XPIX2 0x01      //SPI Clock speed '1'=12 ck/cy, '0'=6 ck/cy
 
 __sfr __at (0xFA) CCAP0H;	//Module 0 Capture HIGH. 

@@ -1,7 +1,7 @@
 2007-08-11 Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/SDCCerr.c, support/Util/SDCCerr.h, src/src.dsp,
-	  src/Makefile.in, src/Makefile.bcc:
+	  src/Makefile.in, src/Makefile.bcc, support/scripts/listerr.c:
 	  support/Util/SDCCerr.[ch] moved to src
 	* as/hc08/as_hc08.dsp, as/link/hc08/link_hc08.dsp,
 	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
@@ -9,6 +9,8 @@
 	  device/examples/serialcomm/windows/serialcomm.dsp,
 	  support/librarian/librarian.dsp:
 	  removed linking of unused odbc32.lib and odbccp32.lib
+	* support/scripts/winres.h:
+	  added for compilation with Visual C++ 2005 Express Edition
 
 2007-08-09 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

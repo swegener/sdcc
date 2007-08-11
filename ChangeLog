@@ -1,3 +1,15 @@
+2007-08-11 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/SDCCerr.c, support/Util/SDCCerr.h, src/src.dsp,
+	  src/Makefile.in, src/Makefile.bcc:
+	  support/Util/SDCCerr.[ch] moved to src
+	* as/hc08/as_hc08.dsp, as/link/hc08/link_hc08.dsp,
+	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
+	  device/examples/ds390/tinitalk/tinitalk.dsp,
+	  device/examples/serialcomm/windows/serialcomm.dsp,
+	  support/librarian/librarian.dsp:
+	  removed linking of unused odbc32.lib and odbccp32.lib
+
 2007-08-09 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed.h: Fixed typo in declarations of CKCON0

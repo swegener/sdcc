@@ -181,7 +181,7 @@ SOURCE=.\SDCCdwarf2.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\support\Util\SDCCerr.c
+SOURCE=.\SDCCerr.c
 # End Source File
 # Begin Source File
 
@@ -321,7 +321,7 @@ SOURCE=.\SDCCdwarf2.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\support\Util\SDCCerr.h
+SOURCE=.\SDCCerr.h
 # End Source File
 # Begin Source File
 

@@ -1,3 +1,7 @@
+2007-08-12 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/Makefile.in: support/Util/SDCCerr.[ch] moved to src
+
 2007-08-11 Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/SDCCerr.c, support/Util/SDCCerr.h, src/src.dsp,

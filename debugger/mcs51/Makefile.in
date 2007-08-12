@@ -34,8 +34,8 @@ LIBDIRS         =
 
 OBJECTS		= sdcdb.o symtab.o simi.o \
 		  break.o cmd.o
-SLIBOBJS	= NewAlloc.o SDCCerr.o
-SDCCOBJS	= SDCCset.o SDCChasht.o
+SLIBOBJS	= NewAlloc.o
+SDCCOBJS	= SDCCset.o SDCChasht.o SDCCerr.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 SLIBSOURCES	= $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))

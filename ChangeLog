@@ -1,3 +1,8 @@
+2007-08-22 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f1220.h,
+	* device/lib/pic16/libdev/pic18f1220.c: applied patch #1776191
+
 2007-08-12 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/Makefile.in: support/Util/SDCCerr.[ch] moved to src

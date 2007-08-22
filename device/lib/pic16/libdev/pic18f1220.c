@@ -114,6 +114,8 @@ __sfr __at (0xfd3) OSCCON;
 volatile __OSCCONbits_t __at (0xfd3) OSCCONbits;
 
 __sfr __at (0xfd5) T0CON;
+volatile __T0CONbits_t __at (0xfd5) T0CONbits;
+
 __sfr __at (0xfd6) TMR0L;
 __sfr __at (0xfd7) TMR0H;
 __sfr __at (0xfd8) STATUS;

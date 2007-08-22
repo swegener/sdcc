@@ -348,10 +348,10 @@ typedef union {
 		unsigned CCP1M1:1;
 		unsigned CCP1M2:1;
 		unsigned CCP1M3:1;
-		unsigned DCCP1Y:1;
-		unsigned DCCP1X:1;
-		unsigned :1;
-		unsigned :1;
+		unsigned DC1B0:1;
+		unsigned DC1B1:1;
+		unsigned P1M0:1;
+		unsigned P1M1:1;
 	};
 } __CCP1CONbits_t;
 
@@ -365,9 +365,9 @@ typedef union {
 		unsigned ADCS0:1;
 		unsigned ADCS1:1;
 		unsigned ADCS2:1;
-		unsigned :1;
-		unsigned :1;
-		unsigned :1;
+		unsigned ACQT0:1;
+		unsigned ACQT1:1;
+		unsigned ACQT2:1;
 		unsigned :1;
 		unsigned ADFM:1;
 	};
@@ -382,9 +382,9 @@ typedef union {
 		unsigned PCFG1:1;
 		unsigned PCFG2:1;
 		unsigned PCFG3:1;
-		unsigned VCFG0:1;
-		unsigned VCFG1:1;
-		unsigned :1;
+		unsigned PCFG4:1;
+		unsigned PCFG5:1;
+		unsigned PCFG6:1;
 		unsigned :1;
 	};
 } __ADCON1bits_t;
@@ -532,6 +532,20 @@ typedef union {
 extern volatile __OSCCONbits_t __at (0xfd3) OSCCONbits;
 
 extern __sfr __at (0xfd5) T0CON;
+typedef union {
+        struct {
+                unsigned T0PS0          : 1;
+                unsigned T0PS1          : 1;
+                unsigned T0PS2          : 1;
+                unsigned PSA            : 1;
+                unsigned T0SE           : 1;
+                unsigned T0CS           : 1;
+                unsigned T08BIT         : 1;
+                unsigned TMR0ON         : 1;
+        };
+} __T0CONbits_t;
+extern volatile __T0CONbits_t __at (0xfd5) T0CONbits;
+
 extern __sfr __at (0xfd6) TMR0L;
 extern __sfr __at (0xfd7) TMR0H;
 extern __sfr __at (0xfd8) STATUS;

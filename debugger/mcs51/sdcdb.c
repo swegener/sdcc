@@ -27,6 +27,9 @@
 #include "break.h"
 #include "cmd.h"
 #include "newalloc.h"
+#if defined HAVE_LIBREADLINE && HAVE_LIBREADLINE != -1
+#define HAVE_READLINE_COMPLETITION  1
+#endif
 #ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -62,7 +65,7 @@ int lineno = 0;
 int fatalError = 0;
 
 static void commandLoop(FILE *cmdfile);
-#ifdef HAVE_LIBREADLINE
+#ifdef HAVE_READLINE_COMPLETITION
 char *completionCmdSource(const char *text, int state);
 char *completionCmdFile(const char *text, int state);
 char *completionCmdInfo(const char *text, int state);
@@ -86,18 +89,18 @@ char *completionCmdSetOption(const char *text, int state);
 #define completionCmdUnDisplay NULL
 #define completionCmdSetUserBp NULL
 #define completionCmdSetOption NULL
-#endif /* HAVE_LIBREADLINE */
+#endif /* HAVE_READLINE_COMPLETITION */
 
 /* command table */
 struct cmdtab
 {
     char      *cmd ;  /* command the user will enter */
     int (*cmdfunc)(char *,context *);   /* function to execute when command is entered */
-#ifdef HAVE_LIBREADLINE
+#ifdef HAVE_READLINE_COMPLETITION
     rl_compentry_func_t *completion_func;
 #else
     void *dummy;
-#endif  /* HAVE_LIBREADLINE */
+#endif  /* HAVE_READLINE_COMPLETITION */
     char *htxt ;    /* short help text */
 
 } cmdTab[] = {
@@ -958,7 +961,7 @@ void stopCommandList()
     stopcmdlist = 1;
 }
 
-#ifdef HAVE_LIBREADLINE
+#ifdef HAVE_READLINE_COMPLETITION
 // helper function for doing readline completion.
 // input: toknum=index of token to find (0=first token)
 // output: *start=first character index of the token,
@@ -1419,7 +1422,7 @@ char *completionMain(const char *text, int state)
 
     return (*compl_func)(text,state);
 }
-#endif  /* HAVE_LIBREADLINE */
+#endif  /* HAVE_READLINE_COMPLETITION */
 
 /*-----------------------------------------------------------------*/
 /* commandLoop - the main command loop or loop over command file   */
@@ -1433,7 +1436,9 @@ static void commandLoop(FILE *cmdfile)
     FILE *old_rl_instream, *old_rl_outstream;
     actualcmdfile = cmdfile;
 
+#ifdef HAVE_READLINE_COMPLETITION
     rl_completion_entry_function = completionMain;
+#endif  /* HAVE_READLINE_COMPLETITION */
     rl_readline_name = "sdcdb"; // Allow conditional parsing of the ~/.inputrc file.
 
     // save readline's input/output streams

@@ -1,3 +1,8 @@
+2007-08-23 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/sdcdb.c: fixed compilation with older readline
+	  library versions without the completition functionality
+
 2007-08-22 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f1220.h,

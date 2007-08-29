@@ -1,3 +1,13 @@
+2007-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genFarPointerSet),
+	* src/hc08/ralloc.c (packRegisters),
+	* src/mcs51/ralloc.c (packRegisters),
+	* src/SDCCcse.c (cseBBlock): check if result is a symbol first to fix
+	  bug 1750318
+	* src/SDCCicode.h: POINTER_SET can be true for literals too
+	* support/regression/tests/bug1750318.c: new, added
+
 2007-08-23 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/sdcdb.c: fixed compilation with older readline

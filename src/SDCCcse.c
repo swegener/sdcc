@@ -2023,7 +2023,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           /* update the spill location for this */
           updateSpillLocation (ic,0);
 
-          if (POINTER_SET (ic) &&
+          if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)) &&
               !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))
             {
               pdop = NULL;
@@ -2132,7 +2132,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           IS_ITEMP (IC_RESULT (ic)) &&
           !computeOnly)
         {
-            applyToSet (cseSet, findPrevIc, ic, &pdic);
+          applyToSet (cseSet, findPrevIc, ic, &pdic);
           if (pdic && compareType (operandType (IC_RESULT (pdic)),
                                  operandType (IC_RESULT (ic))) != 1)
             pdic = NULL;
@@ -2169,6 +2169,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
          mine and type is a pointer then delete
          pointerGets to take care of aliasing */
       if (ASSIGNMENT (ic) &&
+		  IS_SYMOP (IC_RESULT (ic)) &&
           OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))) &&
           IS_PTR (operandType (IC_RESULT (ic))))
         {
@@ -2197,7 +2198,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* delete from the cseSet anything that has */
       /* operands matching the result of this     */
       /* except in case of pointer access         */
-      if (!(POINTER_SET (ic)) && IC_RESULT (ic))
+      if (!(POINTER_SET (ic)) && IS_SYMOP (IC_RESULT (ic)))
         {
           deleteItemIf (&cseSet, ifOperandsHave, IC_RESULT (ic));
           /* delete any previous definitions */
@@ -2221,7 +2222,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* for the result it is special case, put the result */
       /* in the defuseSet if it a pointer or array access  */
-      if (POINTER_SET (defic))
+      if (POINTER_SET (defic) && IS_SYMOP (IC_RESULT (ic)))
         {
           OP_USES(IC_RESULT (ic))=
             bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
@@ -2240,15 +2241,17 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           addSetHead (&ptrSetSet, newCseDef (IC_RESULT (ic), ic));
         }
       else
-        /* add the result to defintion set */ if (IC_RESULT (ic))
         {
-          OP_DEFS(IC_RESULT (ic))=
-            bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-          ebb->defSet = bitVectSetBit (ebb->defSet, ic->key);
-          ebb->outDefs = bitVectCplAnd (ebb->outDefs, OP_DEFS (IC_RESULT (ic)));
-          ebb->ldefs = bitVectSetBit (ebb->ldefs, ic->key);
+          /* add the result to definition set */
+          if (IS_SYMOP (IC_RESULT (ic)))
+            {
+              OP_DEFS(IC_RESULT (ic))=
+                bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+              ebb->defSet = bitVectSetBit (ebb->defSet, ic->key);
+              ebb->outDefs = bitVectCplAnd (ebb->outDefs, OP_DEFS (IC_RESULT (ic)));
+              ebb->ldefs = bitVectSetBit (ebb->ldefs, ic->key);
+            }
         }
-
 
       /* if this is an addressof instruction then */
       /* put the symbol in the address of list &  */

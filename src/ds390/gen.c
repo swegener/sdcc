@@ -11592,7 +11592,8 @@ genFarPointerSet (operand * right,
           _endLazyDPSEvaluation ();
       }
       pi->generated=1;
-  } else if ((OP_SYMBOL(result)->ruonly || AOP_INDPTRn(result)) &&
+  } else if (IS_SYMOP (result) &&
+             (OP_SYMBOL(result)->ruonly || AOP_INDPTRn(result)) &&
              AOP_SIZE(right) > 1 &&
              (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) {
 

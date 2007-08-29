@@ -3048,10 +3048,10 @@ packRegisters (eBBlock ** ebpp, int blockno)
         }
 
       /* mark the pointer usages */
-      if (POINTER_SET (ic))
+      if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)))
         OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
-      if (POINTER_GET (ic) && IS_SYMOP(IC_LEFT (ic)))
+      if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic)))
         OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
       if (!SKIP_IC2 (ic))
@@ -3136,6 +3136,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
       /* if pointer set & left has a size more than
          one and right is not in far space */
       if (POINTER_SET (ic) &&
+          IS_SYMOP (IC_RESULT (ic)) &&
           !isOperandInFarSpace (IC_RIGHT (ic)) &&
           !OP_SYMBOL (IC_RESULT (ic))->remat &&
           !IS_OP_RUONLY (IC_RIGHT (ic)) &&

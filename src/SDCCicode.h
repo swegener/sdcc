@@ -105,8 +105,8 @@ extern operand *validateOpType(operand          *op,
                                const char       *file,
                                unsigned         line);
 
-#define OP_SYMBOL(op) validateOpType(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand
-#define OP_VALUE(op)  validateOpType(op, "OP_VALUE", #op, VALUE, __FILE__, __LINE__)->operand.valOperand
+#define OP_SYMBOL(op)      validateOpType(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand
+#define OP_VALUE(op)       validateOpType(op, "OP_VALUE", #op, VALUE, __FILE__, __LINE__)->operand.valOperand
 #define OP_SYM_TYPE(op)    validateOpType(op, "OP_SYM_TYPE", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->type
 #define OP_SYM_ETYPE(op)   validateOpType(op, "OP_SYM_ETYPE", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->etype
 #define SPIL_LOC(op)       validateOpType(op, "SPIL_LOC", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->usl.spillLoc
@@ -241,12 +241,12 @@ iCodeTable;
 #define IS_TRUE_SYMOP(op) (op && IS_SYMOP(op) && !IS_ITEMP(op))
 
 #define POINTER_SET(ic) ( ic && ic->op == '='           \
-                             && IS_ITEMP(IC_RESULT(ic)) \
+                             && (IS_ITEMP(IC_RESULT(ic)) || IS_OP_LITERAL(IC_RESULT(ic)))\
                              && IC_RESULT(ic)->isaddr )
 
 #define POINTER_GET(ic) ( ic && ic->op == GET_VALUE_AT_ADDRESS  \
-                             &&  (IS_ITEMP(IC_LEFT(ic)) || IS_OP_LITERAL(IC_LEFT(ic)))\
-                             &&  IC_LEFT(ic)->isaddr )
+                             && (IS_ITEMP(IC_LEFT(ic)) || IS_OP_LITERAL(IC_LEFT(ic)))\
+                             && IC_LEFT(ic)->isaddr )
 
 #define IS_ARITHMETIC_OP(x) (x && (x->op == '+' || \
                                    x->op == '-' || \

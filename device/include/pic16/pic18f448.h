@@ -2061,11 +2061,11 @@ extern volatile __TRISDbits_t __at (0xf95) TRISDbits;
 extern __sfr __at (0xf96) TRISE;
 typedef union {
 	struct {
-		unsigned :1;
 		unsigned TRISE0:1;
 		unsigned TRISE1:1;
 		unsigned TRISE2:1;
 		unsigned :1;
+		unsigned PSPMODE:1;
 		unsigned IBOV:1;
 		unsigned OBF:1;
 		unsigned IBF:1;
@@ -2613,6 +2613,21 @@ typedef union {
 extern volatile __OSCCONbits_t __at (0xfd3) OSCCONbits;
 
 extern __sfr __at (0xfd5) T0CON;
+typedef union {
+	struct {
+		unsigned T0PS0:1;
+		unsigned T0PS1:1;
+		unsigned T0PS2:1;
+		unsigned PSA:1;
+		unsigned T0SE:1;
+		unsigned T0CS:1;
+		unsigned T08BIT:1;
+		unsigned TMR0ON:1;
+	};
+} __T0CONbits_t;
+
+extern volatile __T0CONbits_t __at (0xfd5) T0CONbits;
+
 extern __sfr __at (0xfd6) TMR0L;
 extern __sfr __at (0xfd7) TMR0H;
 extern __sfr __at (0xfd8) STATUS;

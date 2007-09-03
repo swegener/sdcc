@@ -1,3 +1,13 @@
+2007-09-03 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f248.h,
+	* device/include/pic16/pic18f258.h,
+	* device/include/pic16/pic18f448.h,
+	* device/lib/pic16/libdev/pic18f248.c,
+	* device/lib/pic16/libdev/pic18f258.c,
+	* device/lib/pic16/libdev/pic18f448.c: fixed TRISEbits,
+	  added T0CONbits, fixes #1786891
+
 2007-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genFarPointerSet),

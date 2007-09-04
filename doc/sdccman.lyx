@@ -1,4 +1,4 @@
-#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.2 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -15898,6 +15898,17 @@ mov a,r0
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
+orl a,#(l_PSEG
+ >> 8)
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
 jz 00006$
 \newline
 \InsetSpace ~
@@ -15908,8 +15919,7 @@ jz 00006$
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov
- r1,#s_PSEG
+mov r1,#s_PSEG
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -15932,7 +15942,8 @@ mov __XPAGE,#(s_PSEG >> 8)
 clr a
 \newline
 00005$:\InsetSpace ~
-movx @r1,a
+movx
+ @r1,a
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -15954,8 +15965,7 @@ inc r1
 \InsetSpace ~
 djnz r0,00005$
 \newline
-0
-0006$:
+00006$:
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -15985,7 +15995,8 @@ mov a,r0
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-orl a,#(l_XSEG >> 8)
+orl a,#(l_XSEG >>
+ 8)
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -16005,8 +16016,7 @@ jz 00008$
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov r1,#((l_XSEG
- + 255) >> 8)
+mov r1,#((l_XSEG + 255) >> 8)
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -16029,7 +16039,8 @@ mov dptr,#s_XSEG
 clr a
 \newline
 00007$:\InsetSpace ~
-movx @dptr,a
+movx
+ @dptr,a
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -16059,8 +16070,7 @@ djnz r0,00007$
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-djnz
- r1,00007$
+djnz r1,00007$
 \newline
 00008$:
 \end_layout
@@ -16353,6 +16363,75 @@ status collapsed
 \end_inset
 
  about MCS51-variants.
+\newline
+
+\end_layout
+
+\begin_layout Standard
+While these initialization modules are meant as generic startup code there
+ might be the need for customization.
+ Let's assume the return value of 
+\emph on
+_sdcc_external_startup()
+\emph default
+ in 
+\emph on
+crtstart.asm
+\emph default
+ should not be checked (or 
+\emph on
+_sdcc_external_startup()
+\emph default
+ should not be called at all).
+ The recommended way would be to copy 
+\emph on
+crtstart.asm
+\emph default
+ (f.e.
+ from 
+\begin_inset LatexCommand \url{http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/device/lib/mcs51/crtstart.asm}
+
+\end_inset
+
+) into the source directory, adapt it there, then assemble it with 
+\emph on
+asx8051 -plosgff
+\begin_inset Foot
+status open
+
+\begin_layout Standard
+\begin_inset Quotes sld
+\end_inset
+
+-plosgff
+\begin_inset Quotes srd
+\end_inset
+
+ are the assembler options used in 
+\begin_inset LatexCommand \url{http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/lib/mcs51/Makefile.in?view=markup }
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ crtstart.asm
+\emph default
+ and when linking your project explicitely specify 
+\emph on
+crtstart.rel
+\emph default
+.
+ As a bonus a listing of the relocated object file 
+\emph on
+crtstart.rst
+\emph default
+ is generated.
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -30993,7 +31072,7 @@ Related open source tools
 \begin_layout Standard
 \align left
 \begin_inset Tabular
-<lyxtabular version="3" rows="14" columns="3">
+<lyxtabular version="3" rows="16" columns="3">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
@@ -31500,6 +31579,102 @@ Debugger, serves nicely as GUI to SDCDB
 
 \begin_layout Standard
 \begin_inset LatexCommand \url{http://www.gnu.org/software/ddd/}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+d52
+\begin_inset LatexCommand \index{d52}
+
+\end_inset
+
+
+\begin_inset LatexCommand \index{d52 (disassembler)}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+Disassembler, can count instruction cycles
+\begin_inset LatexCommand \index{instruction cycles (count)}
+
+\end_inset
+
+, use with options -pnd
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand \url{http://www.8052.com/users/disasm/}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+cmake
+\begin_inset LatexCommand \index{cmake}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+Cross platform build system, generates Makefiles
+\begin_inset LatexCommand \index{Makefile}
+
+\end_inset
+
+ and project workspaces
+\begin_inset LatexCommand \index{project workspace}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand \url{http://www.cmake.org}
 
 \end_inset
 

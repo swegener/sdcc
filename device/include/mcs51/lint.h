@@ -39,6 +39,7 @@
     #define __at(x)             /* use "__at (0xab)" instead of "__at 0xab" */
     #define __using(x)
     #define __interrupt(x)
+    #define __naked
 
     #define data
     #define near 
@@ -54,6 +55,7 @@
     #define at(x)
     #define using(x)
     #define interrupt(x)
+    #define naked
 
     /* The tool Splint is available at http://www.splint.org
        Other tools might also be used for statically checking c-sources.

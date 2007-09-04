@@ -48,7 +48,6 @@ extern int noAlloc;
 extern set *publics;
 extern set *externs;
 extern unsigned maxInterrupts;
-extern int maxRegBank;
 extern symbol *mainf;
 extern char *VersionString;
 extern struct dbuf_s *codeOutBuf;

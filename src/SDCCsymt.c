@@ -2356,8 +2356,8 @@ inCalleeSaveList(char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* aggregateToPointer:  change an agggregate type function      */
-/*         argument to a pointer to that type.     */
+/* aggregateToPointer:     change an aggregate type function       */
+/*                         argument to a pointer to that type.     */
 /*-----------------------------------------------------------------*/
 value *
 aggregateToPointer (value * val)
@@ -2486,7 +2486,6 @@ checkFunction (symbol * sym, symbol *csym)
       werror (E_SHADOWREGS_NO_ISR, sym->name);
     }
 
-
   for (argCnt=1, acargs = FUNC_ARGS(sym->type); 
        acargs; 
        acargs=acargs->next, argCnt++) {
@@ -2538,6 +2537,9 @@ checkFunction (symbol * sym, symbol *csym)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "using");
     }
+
+  /*JCF: Mark the register bank as used*/
+  RegBankUsed[FUNC_REGBANK (sym->type)] = 1;
 
   if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {

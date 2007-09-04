@@ -33,7 +33,6 @@ memmap *home = NULL;            /* Unswitchable code bank      */
    symbols in a single overlay */
 set *ovrSetSets = NULL;
 
-int maxRegBank = 0;
 int fatalError = 0;             /* fatal error flag                   */
 
 /*-----------------------------------------------------------------*/
@@ -915,9 +914,9 @@ allocVariables (symbol * symChain)
 
           SPEC_EXTR (sym->etype) = 0;
           addSym (TypedefTab, sym, sym->name, sym->level, sym->block, 0);
-          continue;             /* go to the next one         */
+          continue;             /* go to the next one */
         }
-      /* make sure it already exist */
+      /* make sure it already exists */
       csym = findSymWithLevel (SymbolTab, sym);
       if (!csym || (csym && csym->level != sym->level))
         csym = sym;
@@ -925,21 +924,15 @@ allocVariables (symbol * symChain)
       /* check the declaration */
       checkDecl (csym,0);
 
-      /* if this is a function or a pointer to function */
-      /* then args  processing  */
+      /* if this is a function or a pointer to a */
+      /* function then do args processing        */
       if (funcInChain (csym->type))
         {
           processFuncArgs (csym);
-
-          /* if register bank specified then update maxRegBank */
-          if (maxRegBank < FUNC_REGBANK (csym->type))
-            maxRegBank = FUNC_REGBANK (csym->type);
-          /*JCF: Mark the register bank as used*/
-          RegBankUsed[FUNC_REGBANK(csym->type)]=1;
         }
 
       /* if this is a extern variable then change the */
-      /* level to zero temporarily                                    */
+      /* level to zero temporarily                    */
       if (IS_EXTERN (csym->etype) || IS_FUNC (csym->type))
         {
           saveLevel = csym->level;
@@ -951,7 +944,7 @@ allocVariables (symbol * symChain)
       if (IS_LITERAL (sym->etype))
         continue;
 
-      /* generate the actual declaration  */
+      /* generate the actual declaration */
       if (csym->level)
         {
           allocLocal (csym);

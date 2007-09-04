@@ -1,5 +1,11 @@
 2007-09-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/pic16/glue.c,
+	* src/pic/glue.c,
+	* src/SDCCmem.h: removed maxRegBank
+	* src/SDCCmem.c (allocVariables): removed maxRegBank and moved setting
+	  RegBankUsed[] to checkFunction() in SDCCsymt.c to fix bug 1759839
+	* src/SDCCsymt.c (checkFunction): set RegBankUsed[] here
 	* src/mcs51/peep.c (isCallerSaveFunc, termScanAtFunc): changed function
 	  name and behaviour to handle banked functions
 	  (scan4op): and use it to fix bug 1786213

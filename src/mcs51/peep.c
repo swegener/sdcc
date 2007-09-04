@@ -37,7 +37,8 @@ typedef enum
   S4O_RD_OP,
   S4O_TERM,
   S4O_VISITED,
-  S4O_ABORT
+  S4O_ABORT,
+  S4O_CONTINUE
 } S4O_RET;
 
 static struct
@@ -215,16 +216,18 @@ isFunc (const lineNode *pl)
 }
 
 /*-----------------------------------------------------------------*/
-/* isCallerSaveFunc - returns TRUE if it's a 'normal' function     */
-/* call and it's a 'caller save' (not 'callee save' or 'naked')    */
+/* termScanAtFunc - returns S4O_TERM if it's a 'normal' function   */
+/* call and it's a 'caller save'. returns S4O_CONTINUE if it's     */
+/* 'callee save' or 'naked'. returns S4O_ABORT if it's 'banked'    */
+/* uses the register for the destination.                          */
 /*-----------------------------------------------------------------*/
-static bool
-isCallerSaveFunc (const lineNode *pl)
+static S4O_RET
+termScanAtFunc (const lineNode *pl, int rIdx)
 {
   sym_link *ftype;
 
   if (!isFunc (pl))
-    return FALSE;
+    return S4O_CONTINUE;
   // let's assume calls to literally given locations use the default
   // most notably :  (*(void (*)()) 0) ();  see bug 1749275
   if (IS_VALOP (IC_LEFT (pl->ic)))
@@ -234,10 +237,13 @@ isCallerSaveFunc (const lineNode *pl)
   if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
   if (FUNC_CALLEESAVES(ftype))
-    return FALSE;
+    return S4O_CONTINUE;
   if (FUNC_ISNAKED(ftype))
-    return FALSE;
-  return TRUE;
+    return S4O_CONTINUE;
+  if (FUNC_BANKED(ftype) &&
+      (rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX))
+    return S4O_ABORT;
+  return S4O_TERM;
 }
 
 /*-----------------------------------------------------------------*/
@@ -285,9 +291,23 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
   char *p;
   int len;
   bool isConditionalJump;
+  int rIdx;
+  S4O_RET ret;
 
   /* pReg points to e.g. "ar0"..."ar7" */
   len = strlen (pReg);
+
+  /* get index into pReg table */
+  for (rIdx = 0; rIdx < mcs51_nRegs; ++rIdx)
+    if (strcmp (regs8051[rIdx].name, pReg + 1) == 0)
+      break;
+
+  /* sanity check */
+  if (rIdx >= mcs51_nRegs)
+    {
+      D(fprintf (stderr, DEADMOVEERROR);)
+      return S4O_ABORT;
+    }
 
   for (; *pl; *pl = (*pl)->next)
     {
@@ -327,20 +347,6 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
           if (strstr (p, pReg + 1))
             {
               /* ok, let's have a closer look */
-
-              /* get index into pReg table */
-              int rIdx;
-
-              for (rIdx = 0; rIdx < mcs51_nRegs; ++rIdx)
-                if (strcmp (regs8051[rIdx].name, pReg + 1) == 0)
-                  break;
-
-              /* sanity check */
-              if (rIdx >= mcs51_nRegs)
-                {
-                  D(fprintf (stderr, DEADMOVEERROR);)
-                  return S4O_ABORT;
-                }
 
               /* does opcode read from pReg? */
               if (bitVectBitValue (port->peep.getRegsRead ((*pl)), rIdx))
@@ -382,8 +388,9 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
             if (strncmp ("acall", (*pl)->line, 5) == 0)
               {
                 /* for comments see 'lcall' */
-                if (isCallerSaveFunc (*pl))
-                  return S4O_TERM;
+                ret = termScanAtFunc (*pl, rIdx);
+                if (ret != S4O_CONTINUE)
+                  return ret;
                 break;
               }
             if (strncmp ("ajmp", (*pl)->line, 4) == 0)
@@ -430,20 +437,21 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
           case 'l':
             if (strncmp ("lcall", (*pl)->line, 5) == 0)
               {
-                if (isCallerSaveFunc (*pl))
-                  {
-                    /* If it's a 'normal' 'caller save' function call, all
-                       registers have been saved until the 'lcall'. The
-                       'life range' of all registers end at the lcall,
-                       and we can terminate our search.
-                    */
-                    return S4O_TERM;
-                  }
-                /* If it's a 'callee save' function call, registers are saved
+                ret = termScanAtFunc (*pl, rIdx);
+                /* If it's a 'normal' 'caller save' function call, all
+                   registers have been saved until the 'lcall'. The
+                   'life range' of all registers end at the lcall,
+                   and we can terminate our search.
+                 * If the function is 'banked', the registers r0, r1 and r2
+                   are used to tell the trampoline the destination. After
+                   that their 'life range' ends just like the other registers.
+                 * If it's a 'callee save' function call, registers are saved
                    by the callee. We've got no information, if the register
                    might live beyond the lcall. Therefore we've to continue
                    the search.
                 */
+                if (ret != S4O_CONTINUE)
+                  return ret;
                 break;
               }
             if (strncmp ("ljmp", (*pl)->line, 4) == 0)
@@ -468,8 +476,9 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
                 if (isFunc (*pl))
                   {
                     /* for comments see 'lcall' */
-                    if (isCallerSaveFunc (*pl))
-                      return S4O_TERM;
+                    ret = termScanAtFunc (*pl, rIdx);
+                    if (ret != S4O_CONTINUE)
+                      return ret;
                     break;
                   }
 

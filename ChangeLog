@@ -1,3 +1,9 @@
+2007-09-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/peep.c (isCallerSaveFunc, termScanAtFunc): changed function
+	  name and behaviour to handle banked functions
+	  (scan4op): and use it to fix bug 1786213
+
 2007-09-03 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f248.h,

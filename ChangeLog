@@ -1,7 +1,12 @@
+2007-09-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genReceive): fixed bug 1788177
+	* support/regression/tests/bug1788177.c: new, added
+
 2007-09-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-        * doc/sdccman.lyx: mentioned d52 and cmake, customizing startup code
-        * device/include/mcs51/lint.h added keyword __naked
+	* doc/sdccman.lyx: mentioned d52 and cmake, customizing startup code
+	* device/include/mcs51/lint.h added keyword __naked
 
 2007-09-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

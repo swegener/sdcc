@@ -11630,7 +11630,10 @@ genReceive (iCode * ic)
     }
   else if (ic->argreg > 12)
     { /* bit parameters */
-      if (OP_SYMBOL (IC_RESULT (ic))->regs[0]->rIdx != ic->argreg-5)
+      regs *reg = OP_SYMBOL (IC_RESULT (ic))->regs[0];
+
+      BitBankUsed = 1;
+      if (!reg || reg->rIdx != ic->argreg-5)
         {
           aopOp (IC_RESULT (ic), ic, FALSE);
           emitcode ("mov", "c,%s", rb1regs[ic->argreg-5]);

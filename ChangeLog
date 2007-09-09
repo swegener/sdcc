@@ -1,3 +1,8 @@
+2007-09-09 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/SDCCutil.c: print newline after printVersionInfo(),
+	  distingush between i386 and ppc Mac OS X versions
+
 2007-09-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genReceive): fixed bug 1788177

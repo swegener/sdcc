@@ -424,7 +424,7 @@ printVersionInfo (FILE *stream)
 #ifdef SDCC_SUB_VERSION_STR
            "/" SDCC_SUB_VERSION_STR
 #endif
-           " #%s (" __DATE__ ") (%s)",
+           " #%s (" __DATE__ ") (%s)\n",
            getBuildNumber(), getBuildEnvironment() );
 }
 

@@ -406,6 +406,12 @@ const char *getBuildEnvironment(void)
   return "MSVC";
 #elif defined(__BORLANDC__)
   return "BORLANDC";
+#elif defined(__APPLE__)
+# if defined(__i386__)
+  return "Mac OS X i386";
+# else
+  return "Mac OS X ppc";
+#endif
 #else
   return "UNIX";
 #endif

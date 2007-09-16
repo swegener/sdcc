@@ -31,6 +31,6 @@ extern char _MALLOC_SPEC *heap;
 void free(unsigned char _MALLOC_SPEC *buf)
 {
   /* mark block as deallocated */
-  ((_malloc_rec *)((unsigned int)buf - 1))->bits.alloc = 0;
+  ((_MALLOC_SPEC _malloc_rec *)((unsigned int)buf - 1))->bits.alloc = 0;
 }
 

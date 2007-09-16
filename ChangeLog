@@ -1,3 +1,24 @@
+2007-09-16 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f2431.h,
+	* device/include/pic16/pic18f25j10.h,
+	* device/include/pic16/pic18f4431.h,
+	* device/include/pic16/pic18f45j10.h: adopted common include style
+	* device/include/pic16/pic18f1320.h,
+	* device/include/pic16/pic18f2320.h,
+	* device/include/pic16/pic18f2525.h,
+	* device/include/pic16/pic18f4320.h,
+	* device/include/pic16/pic18f4525.h: NEW, just include proper .h file
+	* device/include/pic16/pic18fregs.h: prepared for automatic include
+	  file selection by having DEVICE.h for every DEVICE
+	* device/lib/pic16/libdev/pic18f2320.c,
+	* device/lib/pic16/libdev/pic18f4320.c: just include proper .c file
+
+	* device/lib/pic16/configure.in,
+	* device/lib/pic16/configure: use rm -rf instead of rmdir
+	* device/lib/pic16/Makefile.in: use RMDIR to remove build directories
+	* device/lib/pic16/libc/stdlib/free.c: avoid warning on pointer cast
+
 2007-09-09 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/SDCCutil.c: print newline after printVersionInfo(),

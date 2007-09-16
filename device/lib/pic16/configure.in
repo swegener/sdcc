@@ -30,7 +30,7 @@ AC_CHECK_PROG(LS,	ls,	ls, :)
 AC_CHECK_PROG(SED,	sed,	sed, :)
 AC_PROG_EGREP
 AC_CHECK_PROG(MKDIR,	mkdir,	[mkdir -p], :)
-AC_CHECK_PROG(RMDIR,	rmdir,	rmdir, :)
+AC_CHECK_PROG(RMDIR,	rm,	[rm -rf], :)
 
 AC_PROG_MAKE_SET
 

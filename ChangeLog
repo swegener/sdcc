@@ -1,5 +1,31 @@
 2007-09-16 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/device.c (pic16_dump_usection): do not reserve 0 bytes,
+	  as this raises a ton of gpasm warnings, just emit a second label
+	* src/pic16/devices.inc,
+	* device/lib/pic16/pics.all,
+	* device/lib/pic16/libdev/pic18f2585.c,
+	* device/lib/pic16/libdev/pic18f2680.c,
+	* device/lib/pic16/libdev/pic18f2682.c,
+	* device/lib/pic16/libdev/pic18f2685.c,
+	* device/lib/pic16/libdev/pic18f4585.c,
+	* device/lib/pic16/libdev/pic18f4680.c,
+	* device/lib/pic16/libdev/pic18f4682.c,
+	* device/lib/pic16/libdev/pic18f4685.c,
+	* device/include/pic16/pic18f2585.h,
+	* device/include/pic16/pic18f2680.h,
+	* device/include/pic16/pic18f2682.h,
+	* device/include/pic16/pic18f2685.h,
+	* device/include/pic16/pic18f4585.h,
+	* device/include/pic16/pic18f4680.h,
+	* device/include/pic16/pic18f4682.h,
+	* device/include/pic16/pic18f4685.h,
+	* device/include/pic16/pic18fregs.h: added 18f2585, 18f2680,
+	  18f2682, 18f2685, 18f4585, 18f4680, 18f4682, 18f4685,
+	  patch contributed by Anton Strobl, applied with changes
+
+2007-09-16 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic16/pic18f2431.h,
 	* device/include/pic16/pic18f25j10.h,
 	* device/include/pic16/pic18f4431.h,

@@ -2624,7 +2624,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       if (IS_LITERAL (RTYPE (tree)))
         {
-          int arrayIndex = (int) floatFromVal (valFromType (RETYPE (tree)));
+          int arrayIndex = (int) ulFromVal (valFromType (RETYPE (tree)));
           int arraySize = DCL_ELEM (LTYPE (tree));
           if (arraySize && arrayIndex >= arraySize)
             {
@@ -3099,7 +3099,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* rearrange the tree */
       if (IS_LITERAL (RTYPE (tree))
           /* avoid infinite loop */
-          && (TYPE_TARGET_ULONG) floatFromVal (tree->right->opval.val) != 1)
+          && (TYPE_TARGET_ULONG) ulFromVal (tree->right->opval.val) != 1)
         {
           ast *parent;
           ast *litTree = searchLitOp (tree, &parent, "/");
@@ -3543,7 +3543,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* rearrange the tree */
       if (IS_LITERAL (RTYPE (tree))
           /* avoid infinite loop */
-          && (TYPE_TARGET_ULONG) floatFromVal (tree->right->opval.val) != 0)
+          && (TYPE_TARGET_ULONG) ulFromVal (tree->right->opval.val) != 0)
         {
           ast *litTree, *litParent;
           litTree = searchLitOp (tree, &litParent, "+-");
@@ -3770,7 +3770,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
       if (IS_LITERAL (RTYPE (tree)) &&
-          ((TYPE_TARGET_ULONG) floatFromVal (valFromType (RETYPE (tree)))) >=
+          ((TYPE_TARGET_ULONG) ulFromVal (valFromType (RETYPE (tree)))) >=
           (getSize (TETYPE (tree)) * 8))
         {
           if (tree->opval.op==LEFT_OP ||
@@ -3841,7 +3841,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                       TTYPE (tree) = tree->opval.val->type;
                       tree->values.literalFromCast = 1;
               } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) &&
-                         ((int)floatFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
+                         ((int) ulFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
                       sym_link *rest = LTYPE(tree)->next;
                       werrorfl (tree->filename, tree->lineno, W_LITERAL_GENERIC);
                       TTYPE(tree) = newLink(DECLARATOR);
@@ -4135,7 +4135,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (tree->opval.op == '>' &&
           SPEC_USIGN(LETYPE(tree)) &&
           IS_LITERAL(RTYPE(tree))  &&
-          ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0)
+          ((int) ulFromVal (valFromType (RETYPE (tree)))) == 0)
         {
           if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT))
             {
@@ -4194,14 +4194,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (IS_LITERAL (RTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)) &&
               /* the value range of a 'unsigned char' is 0...255;
                  if the actual value is < 128 it can be changed to signed */
-              (int) floatFromVal (valFromType (RETYPE (tree))) < 128)
+              (int) ulFromVal (valFromType (RETYPE (tree))) < 128)
             {
               /* now we've got 2 'signed char'! */
               SPEC_USIGN (RETYPE (tree)) = 0;
             }
                    /* same test for the left operand: */
           else if (IS_LITERAL (LTYPE (tree)) && IS_UNSIGNED (LTYPE (tree)) &&
-              (int) floatFromVal (valFromType (LETYPE (tree))) < 128)
+              (int) ulFromVal (valFromType (LETYPE (tree))) < 128)
             {
               SPEC_USIGN (LETYPE (tree)) = 0;
             }
@@ -4401,7 +4401,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
          but faster to do it here */
       if (IS_LITERAL (LTYPE (tree)))
         {
-          if (((int) floatFromVal (valFromType (LETYPE (tree)))) != 0)
+          if (((int) ulFromVal (valFromType (LETYPE (tree)))) != 0)
             return decorateType (tree->right->left, resultTypeProp);
           else
             return decorateType (tree->right->right, resultTypeProp);
@@ -5024,8 +5024,8 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
     {
       /* also order the cases according to value */
       value *pval = NULL;
-      int cVal = (int) floatFromVal (caseVal->opval.val);
-      while (val && (int) floatFromVal (val) < cVal)
+      int cVal = (int) ulFromVal (caseVal->opval.val);
+      while (val && (int) ulFromVal (val) < cVal)
         {
           pval = val;
           val = val->next;
@@ -5036,7 +5036,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
         {
           pval->next = caseVal->opval.val;
         }
-      else if ((int) floatFromVal (val) == cVal)
+      else if ((int) ulFromVal (val) == cVal)
         {
           werrorfl (caseVal->filename, caseVal->lineno, E_DUPLICATE_LABEL,
                     "case");
@@ -5063,7 +5063,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
   SNPRINTF(caseLbl, sizeof(caseLbl),
            "_case_%d_%d",
            swStat->values.switchVals.swNum,
-           (int) floatFromVal (caseVal->opval.val));
+           (int) ulFromVal (caseVal->opval.val));
 
   rexpr = createLabel (newSymbol (caseLbl, 0), stmnt);
   rexpr->lineno = 0;
@@ -5801,7 +5801,7 @@ optimizeCompare (ast * root)
     {
 
       /* if right side > 1 then comparison may never succeed */
-      if ((litValue = (int) floatFromVal (vright)) > 1)
+      if ((litValue = (int) ulFromVal (vright)) > 1)
         {
           werror (W_BAD_COMPARE);
           goto noOptimize;
@@ -6603,10 +6603,10 @@ void ast_print (ast * tree, FILE *outfile, int indent)
     if (IS_LITERAL (tree->opval.val->etype)) {
       fprintf(outfile,"CONSTANT (%p) value = ", tree);
       if (SPEC_USIGN (tree->opval.val->etype))
-        fprintf(outfile,"%u", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val));
+        fprintf(outfile,"%u", (TYPE_TARGET_ULONG) ulFromVal(tree->opval.val));
       else
-        fprintf(outfile,"%d", (TYPE_TARGET_LONG) floatFromVal(tree->opval.val));
-      fprintf(outfile,", 0x%x, %f", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val),
+        fprintf(outfile,"%d", (TYPE_TARGET_LONG) ulFromVal(tree->opval.val));
+      fprintf(outfile,", 0x%x, %f", (TYPE_TARGET_ULONG) ulFromVal(tree->opval.val),
         floatFromVal(tree->opval.val));
     } else if (tree->opval.val->sym) {
       /* if the undefined flag is set then give error message */
@@ -7171,9 +7171,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
       for (val = tree->values.switchVals.swVals; val ; val = val->next) {
         INDENT(indent+2,outfile);
         fprintf(outfile,"CASE 0x%x GOTO _case_%d_%d\n",
-          (int) floatFromVal(val),
+          (int) ulFromVal(val),
           tree->values.switchVals.swNum,
-          (int) floatFromVal(val));
+          (int) ulFromVal(val));
       }
       ast_print(tree->right,outfile,indent);
     }

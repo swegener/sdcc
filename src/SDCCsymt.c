@@ -3694,10 +3694,10 @@ newEnumType (symbol *enumlist)
       
   /* Determine the range of the enumerated values */
   sym = enumlist;
-  min = max = (int) floatFromVal (valFromType (sym->type));
+  min = max = (int) ulFromVal (valFromType (sym->type));
   for (sym = sym->next; sym; sym = sym->next)
     {
-      v = (int) floatFromVal (valFromType (sym->type));
+      v = (int) ulFromVal (valFromType (sym->type));
       if (v<min)
         min = v;
       if (v>max)

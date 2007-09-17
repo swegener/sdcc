@@ -198,7 +198,7 @@ function_attribute
 function_attributes
    :  USING constant_expr {
                         $$ = newLink(SPECIFIER) ;
-                        FUNC_REGBANK($$) = (int) floatFromVal(constExprValue($2,TRUE));
+                        FUNC_REGBANK($$) = (int) ulFromVal(constExprValue($2,TRUE));
                      }
    |  REENTRANT      {  $$ = newLink (SPECIFIER);
                         FUNC_ISREENT($$)=1;
@@ -580,7 +580,7 @@ function_specifier
 Interrupt_storage
    : INTERRUPT { $$ = INTNO_UNSPEC ; }
    | INTERRUPT constant_expr
-        { int intno = (int) floatFromVal(constExprValue($2,TRUE));
+        { int intno = (int) ulFromVal(constExprValue($2,TRUE));
           if ((intno >= 0) && (intno <= INTNO_MAX))
             $$ = intno;
           else
@@ -598,7 +598,7 @@ type_specifier
            /* add this to the storage class specifier  */
            SPEC_ABSA($1) = 1;   /* set the absolute addr flag */
            /* now get the abs addr from value */
-           SPEC_ADDR($1) = (unsigned) floatFromVal(constExprValue($3,TRUE)) ;
+           SPEC_ADDR($1) = (unsigned int) ulFromVal(constExprValue($3,TRUE)) ;
         }
    ;
 
@@ -918,7 +918,7 @@ struct_declarator
    | ':' constant_expr  {
                            unsigned int bitsize;
                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ;
-                           bitsize= (unsigned int) floatFromVal(constExprValue($2,TRUE));
+                           bitsize = (unsigned int) ulFromVal(constExprValue($2,TRUE));
                            if (bitsize > (port->s.int_size * 8)) {
                              bitsize = port->s.int_size * 8;
                              werror(E_BITFLD_SIZE, bitsize);
@@ -930,7 +930,7 @@ struct_declarator
    | declarator ':' constant_expr
                         {
                           unsigned int bitsize;
-                          bitsize= (unsigned int) floatFromVal(constExprValue($3,TRUE));
+                          bitsize = (unsigned int) ulFromVal(constExprValue($3,TRUE));
                           if (bitsize > (port->s.int_size * 8)) {
                             bitsize = port->s.int_size * 8;
                             werror(E_BITFLD_SIZE, bitsize);
@@ -1028,7 +1028,7 @@ opt_assign_expr
                                 {
                                   werror(E_ENUM_NON_INTEGER);
                                   SNPRINTF(lbuff, sizeof(lbuff),
-                                          "%d",(int) floatFromVal(val));
+                                          "%d", (int) ulFromVal(val));
                                   val = constVal(lbuff);
                                 }
                               $$ = cenum = val ;
@@ -1036,7 +1036,7 @@ opt_assign_expr
    |                       {
                               if (cenum)  {
                                  SNPRINTF(lbuff, sizeof(lbuff),
-                                          "%d",(int) floatFromVal(cenum)+1);
+                                          "%d", (int) ulFromVal(cenum)+1);
                                  $$ = cenum = constVal(lbuff);
                               }
                               else {
@@ -1133,7 +1133,7 @@ declarator2
               }
             else
               {
-                if ((size = (int)floatFromVal(tval)) < 0)
+                if ((size = (int) ulFromVal(tval)) < 0)
                   {
                     werror(E_NEGATIVE_ARRAY_SIZE, $1->name);
                     size = 1;
@@ -1349,7 +1349,7 @@ abstract_declarator2
                                        value *val ;
                                        $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY ;
-                                       DCL_ELEM($$) = (int) floatFromVal(val = constExprValue($2,TRUE));
+                                       DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($2,TRUE));
                                     }
    | abstract_declarator2 '[' ']'   {
                                        $$ = newLink (DECLARATOR);
@@ -1362,7 +1362,7 @@ abstract_declarator2
                                        value *val ;
                                        $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY ;
-                                       DCL_ELEM($$) = (int) floatFromVal(val = constExprValue($3,TRUE));
+                                       DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($3,TRUE));
                                        $$->next = $1 ;
                                     }
    | '(' ')'                        { $$ = NULL;}

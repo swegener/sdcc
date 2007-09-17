@@ -84,14 +84,14 @@ unsigned int pic16aopLiteral (value *val, int offset)
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
   if (!(IS_FLOAT(val->type) || IS_FIXED(val->type))) {
-    unsigned long v = (unsigned long) floatFromVal(val);
+    unsigned long v = ulFromVal (val);
 
     return ( (v >> (offset * 8)) & 0xff);
   }
 
   if(IS_FIXED16X16(val->type)) {
     unsigned long v = (unsigned long)fixed16x16FromDouble( floatFromVal( val ) );
-    
+
     return ( (v >> (offset * 8)) & 0xff);
   }
 
@@ -119,77 +119,77 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
   symbol *sym;
 //  int i, size, bitvars = 0;;
 
-//	fprintf(stderr, "%s:%d map name= %s\n", __FUNCTION__, __LINE__, map->sname);
-	
-	if(addPublics)
-		dbuf_printf (&map->oBuf, ";\t.area\t%s\n", map->sname);
-		/* print the area name */
+//      fprintf(stderr, "%s:%d map name= %s\n", __FUNCTION__, __LINE__, map->sname);
 
-	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
+        if(addPublics)
+                dbuf_printf (&map->oBuf, ";\t.area\t%s\n", map->sname);
+                /* print the area name */
+
+        for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
 #if 0
-		fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\tregister: 0x%x\tfunction: %d\n",
-			__FUNCTION__,
-			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
-			IS_AGGREGATE(sym->type), (SPEC_SCLS(sym->etype) == S_REGISTER), IS_FUNC(sym->type));
-		printTypeChain( sym->type, stderr );
-		fprintf(stderr, "\n");
+                fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\tregister: 0x%x\tfunction: %d\n",
+                        __FUNCTION__,
+                        map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
+                        IS_AGGREGATE(sym->type), (SPEC_SCLS(sym->etype) == S_REGISTER), IS_FUNC(sym->type));
+                printTypeChain( sym->type, stderr );
+                fprintf(stderr, "\n");
 #endif
 
-		/* if extern then add to externs */
-		if (IS_EXTERN (sym->etype)) {
-			/* reduce overhead while linking by not declaring
-			 * extern unused external functions (usually declared
-			 * in header files) */
-			if(IS_FUNC(sym->type) && !sym->used)continue;
-			
-			/* make sure symbol is not in publics section */
-			if(!checkSym(publics, sym))
-				checkAddSym(&externs, sym);
-			continue;
-		}
-		
-		/* if allocation required check is needed
-		 * then check if the symbol really requires
-		 * allocation only for local variables */
-		 if (arFlag && !IS_AGGREGATE (sym->type) &&
-			!(sym->_isparm && !IS_REGPARM (sym->etype)) &&
-			!sym->allocreq && sym->level) {
+                /* if extern then add to externs */
+                if (IS_EXTERN (sym->etype)) {
+                        /* reduce overhead while linking by not declaring
+                         * extern unused external functions (usually declared
+                         * in header files) */
+                        if(IS_FUNC(sym->type) && !sym->used)continue;
 
-//			fprintf(stderr, "%s:%d special case, continuing...\n", __FILE__, __LINE__);
+                        /* make sure symbol is not in publics section */
+                        if(!checkSym(publics, sym))
+                                checkAddSym(&externs, sym);
+                        continue;
+                }
 
-			continue;
-		}
+                /* if allocation required check is needed
+                 * then check if the symbol really requires
+                 * allocation only for local variables */
+                 if (arFlag && !IS_AGGREGATE (sym->type) &&
+                        !(sym->_isparm && !IS_REGPARM (sym->etype)) &&
+                        !sym->allocreq && sym->level) {
 
-		/* if global variable & not static or extern
-		 * and addPublics allowed then add it to the public set */
-		if ((sym->used) && (sym->level == 0 ||
-			(sym->_isparm && !IS_REGPARM (sym->etype))) &&
-			addPublics &&
-			!IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
-		  
-			checkAddSym(&publics, sym);
-		} else
+//                      fprintf(stderr, "%s:%d special case, continuing...\n", __FILE__, __LINE__);
+
+                        continue;
+                }
+
+                /* if global variable & not static or extern
+                 * and addPublics allowed then add it to the public set */
+                if ((sym->used) && (sym->level == 0 ||
+                        (sym->_isparm && !IS_REGPARM (sym->etype))) &&
+                        addPublics &&
+                        !IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
+
+                        checkAddSym(&publics, sym);
+                } else
                         /* new version */
-			if(IS_STATIC(sym->etype)
-				&& !sym->ival) /* && !sym->level*/ {
-			  regs *reg;
+                        if(IS_STATIC(sym->etype)
+                                && !sym->ival) /* && !sym->level*/ {
+                          regs *reg;
                           sectSym *ssym;
                           int found=0;
 
 //                            debugf("adding symbol %s\n", sym->name);
-#define SET_IMPLICIT	1
+#define SET_IMPLICIT    1
 
 #if SET_IMPLICIT
-				if(IS_STRUCT(sym->type))
-					sym->implicit = 1;
+                                if(IS_STRUCT(sym->type))
+                                        sym->implicit = 1;
 #endif
 
-				reg = pic16_allocDirReg( operandFromSymbol( sym ));
-				
-				if(reg) {
+                                reg = pic16_allocDirReg( operandFromSymbol( sym ));
+
+                                if(reg) {
                                   for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
-				    if(!strcmp(ssym->name, reg->name))found=1;
+                                    if(!strcmp(ssym->name, reg->name))found=1;
                                   }
 
                                   if(!found)
@@ -197,92 +197,92 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 #if 0
                                   else
                                     debugf("Did find %s in pic16_rel_udata already. Check!\n", reg->name);
-//				    checkAddSym(&publics, sym);
+//                                  checkAddSym(&publics, sym);
 #endif
 
                                 }
-			}
+                        }
 
-		/* if extern then do nothing or is a function
-		 * then do nothing */
-		if (IS_FUNC (sym->type) && !IS_STATIC(sym->etype)) {
-			if(SPEC_OCLS(sym->etype) == code) {
-//				fprintf(stderr, "%s:%d: symbol added: %s\n", __FILE__, __LINE__, sym->rname);
-				checkAddSym(&publics, sym);
-			}
-			continue;
-		}
+                /* if extern then do nothing or is a function
+                 * then do nothing */
+                if (IS_FUNC (sym->type) && !IS_STATIC(sym->etype)) {
+                        if(SPEC_OCLS(sym->etype) == code) {
+//                              fprintf(stderr, "%s:%d: symbol added: %s\n", __FILE__, __LINE__, sym->rname);
+                                checkAddSym(&publics, sym);
+                        }
+                        continue;
+                }
 
-		/* if is has an absolute address then generate
-		an equate for this no need to allocate space */
-		if (SPEC_ABSA (sym->etype)) {
-//				fprintf (stderr,"; %s == 0x%04x\t\treqv= %p nRegs= %d\n",
-//					sym->name, SPEC_ADDR (sym->etype), sym->reqv, sym->regType);
+                /* if is has an absolute address then generate
+                an equate for this no need to allocate space */
+                if (SPEC_ABSA (sym->etype)) {
+//                              fprintf (stderr,"; %s == 0x%04x\t\treqv= %p nRegs= %d\n",
+//                                      sym->name, SPEC_ADDR (sym->etype), sym->reqv, sym->regType);
 
-			dbuf_printf (&map->oBuf, "%s\tEQU\t0x%04x\n",
-				sym->rname,
-				SPEC_ADDR (sym->etype));
+                        dbuf_printf (&map->oBuf, "%s\tEQU\t0x%04x\n",
+                                sym->rname,
+                                SPEC_ADDR (sym->etype));
 
-			/* emit only if it is global */
-			if(sym->level == 0) {
-			  regs *reg;
+                        /* emit only if it is global */
+                        if(sym->level == 0) {
+                          regs *reg;
 
-				reg = pic16_dirregWithName( sym->name );
-				if(!reg) {
-					/* here */
-//					fprintf(stderr, "%s:%d: implicit add of symbol = %s\n",
-//							__FUNCTION__, __LINE__, sym->name);
+                                reg = pic16_dirregWithName( sym->name );
+                                if(!reg) {
+                                        /* here */
+//                                      fprintf(stderr, "%s:%d: implicit add of symbol = %s\n",
+//                                                      __FUNCTION__, __LINE__, sym->name);
 
-					/* if IS_STRUCT is omitted the following
-					 * fixes structures but break char/int etc */
+                                        /* if IS_STRUCT is omitted the following
+                                         * fixes structures but break char/int etc */
 #if SET_IMPLICIT
-					if(IS_STRUCT(sym->type))
-						sym->implicit = 1;		// mark as implicit
+                                        if(IS_STRUCT(sym->type))
+                                                sym->implicit = 1;              // mark as implicit
 #endif
-					if(!sym->ival) {
-						reg = pic16_allocDirReg( operandFromSymbol(sym) );
-						if(reg) {
-							if(checkAddReg(&pic16_fix_udata, reg)) {
-								/* and add to globals list if not exist */
-								addSet(&publics, sym);
-							}
-						}
-					} else
-						addSet(&publics, sym);
-				}
-			}
-		} else {
-			if(!sym->used && (sym->level == 0)) {
-			  regs *reg;
+                                        if(!sym->ival) {
+                                                reg = pic16_allocDirReg( operandFromSymbol(sym) );
+                                                if(reg) {
+                                                        if(checkAddReg(&pic16_fix_udata, reg)) {
+                                                                /* and add to globals list if not exist */
+                                                                addSet(&publics, sym);
+                                                        }
+                                                }
+                                        } else
+                                                addSet(&publics, sym);
+                                }
+                        }
+                } else {
+                        if(!sym->used && (sym->level == 0)) {
+                          regs *reg;
 
-				/* symbol not used, just declared probably, but its in
-				 * level 0, so we must declare it fine as global */
-				
-//				fprintf(stderr, "EXTRA symbol declaration sym= %s\n", sym->name);
+                                /* symbol not used, just declared probably, but its in
+                                 * level 0, so we must declare it fine as global */
+
+//                              fprintf(stderr, "EXTRA symbol declaration sym= %s\n", sym->name);
 
 #if SET_IMPLICIT
-				if(IS_STRUCT(sym->type))
-					sym->implicit = 1;		// mark as implicit
+                                if(IS_STRUCT(sym->type))
+                                        sym->implicit = 1;              // mark as implicit
 #endif
-				if(!sym->ival) {
-					if(IS_AGGREGATE(sym->type)) {
-						reg=pic16_allocRegByName(sym->rname, getSize( sym->type ), NULL);
-					} else {
-						reg = pic16_allocDirReg( operandFromSymbol( sym ) );
-					}
+                                if(!sym->ival) {
+                                        if(IS_AGGREGATE(sym->type)) {
+                                                reg=pic16_allocRegByName(sym->rname, getSize( sym->type ), NULL);
+                                        } else {
+                                                reg = pic16_allocDirReg( operandFromSymbol( sym ) );
+                                        }
 
-					{
-					  sectSym *ssym;
-					  int found=0;
-				  
+                                        {
+                                          sectSym *ssym;
+                                          int found=0;
+
 #if 0
-					  	fprintf(stderr, "%s:%d sym->rname: %s reg: %p reg->name: %s\n", __FILE__, __LINE__,
-					  		sym->rname, reg, (reg?reg->name:"<<NULL>>"));
+                                                fprintf(stderr, "%s:%d sym->rname: %s reg: %p reg->name: %s\n", __FILE__, __LINE__,
+                                                        sym->rname, reg, (reg?reg->name:"<<NULL>>"));
 #endif
 
                                                 if(reg) {
-					  	  for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
-					  	    if(!strcmp(ssym->name, reg->name))found=1;
+                                                  for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
+                                                    if(!strcmp(ssym->name, reg->name))found=1;
                                                   }
 
                                                   if(!found)
@@ -290,84 +290,84 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                                                       addSetHead(&publics, sym);
                                                     }
                                                 }
-					}
+                                        }
 
 
-		
-				} else
 
-					addSetHead(&publics, sym);
-			}
+                                } else
 
-#if 0
-			/* allocate space */
-			/* If this is a bit variable, then allocate storage after 8 bits have been declared */
-			/* unlike the 8051, the pic does not have a separate bit area. So we emulate bit ram */
-			/* by grouping the bits together into groups of 8 and storing them in the normal ram. */
-			if (IS_BITVAR (sym->etype)) {
-				bitvars++;
-			} else {
-				dbuf_printf (map->oBuf, "\t%s\n", sym->rname);
-				if ((size = (unsigned int) getSize (sym->type) & 0xffff) > 1) {
-					for (i = 1; i < size; i++)
-						dbuf_printf (map->oBuf, "\t%s_%d\n", sym->rname, i);
-				}
-			}
-			dbuf_printf (map->oBuf, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
-#endif
-		}
-	
-		/* FIXME -- VR Fix the following, so that syms to be placed
-		 * in the idata section and let linker decide about their fate */
-
-		/* if it has an initial value then do it only if
-			it is a global variable */
-
-		if (sym->ival
-		  && ((sym->level == 0)
-		      || IS_STATIC(sym->etype)) ) {
-		  ast *ival = NULL;
+                                        addSetHead(&publics, sym);
+                        }
 
 #if 0
-			if(SPEC_OCLS(sym->etype)==data) {
-				fprintf(stderr, "%s: sym %s placed in data segment\n", map->sname, sym->name);
-			}
+                        /* allocate space */
+                        /* If this is a bit variable, then allocate storage after 8 bits have been declared */
+                        /* unlike the 8051, the pic does not have a separate bit area. So we emulate bit ram */
+                        /* by grouping the bits together into groups of 8 and storing them in the normal ram. */
+                        if (IS_BITVAR (sym->etype)) {
+                                bitvars++;
+                        } else {
+                                dbuf_printf (map->oBuf, "\t%s\n", sym->rname);
+                                if ((size = (unsigned int) getSize (sym->type) & 0xffff) > 1) {
+                                        for (i = 1; i < size; i++)
+                                                dbuf_printf (map->oBuf, "\t%s_%d\n", sym->rname, i);
+                                }
+                        }
+                        dbuf_printf (map->oBuf, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
+#endif
+                }
 
-			if(SPEC_OCLS(sym->etype)==code) {
-				fprintf(stderr, "%s: sym %s placed in code segment\n", map->sname, sym->name);
-			}
+                /* FIXME -- VR Fix the following, so that syms to be placed
+                 * in the idata section and let linker decide about their fate */
+
+                /* if it has an initial value then do it only if
+                        it is a global variable */
+
+                if (sym->ival
+                  && ((sym->level == 0)
+                      || IS_STATIC(sym->etype)) ) {
+                  ast *ival = NULL;
+
+#if 0
+                        if(SPEC_OCLS(sym->etype)==data) {
+                                fprintf(stderr, "%s: sym %s placed in data segment\n", map->sname, sym->name);
+                        }
+
+                        if(SPEC_OCLS(sym->etype)==code) {
+                                fprintf(stderr, "%s: sym %s placed in code segment\n", map->sname, sym->name);
+                        }
 #endif
 
 #if 0
-			fprintf(stderr, "'%s': sym '%s' has initial value SPEC_ABSA: %d, IS_AGGREGATE: %d\n",
-				map->sname, sym->name, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type));
+                        fprintf(stderr, "'%s': sym '%s' has initial value SPEC_ABSA: %d, IS_AGGREGATE: %d\n",
+                                map->sname, sym->name, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type));
 #endif
 
-			if (IS_AGGREGATE (sym->type)) {
-				if(SPEC_ABSA(sym->etype))
-					addSet(&fix_idataSymSet, copySymbol(sym));
-				else
-					addSet(&rel_idataSymSet, copySymbol(sym));
-//				ival = initAggregates (sym, sym->ival, NULL);
-			} else {
-				if(SPEC_ABSA(sym->etype))
-					addSet(&fix_idataSymSet, copySymbol(sym));
-				else
-					addSet(&rel_idataSymSet, copySymbol(sym));
+                        if (IS_AGGREGATE (sym->type)) {
+                                if(SPEC_ABSA(sym->etype))
+                                        addSet(&fix_idataSymSet, copySymbol(sym));
+                                else
+                                        addSet(&rel_idataSymSet, copySymbol(sym));
+//                              ival = initAggregates (sym, sym->ival, NULL);
+                        } else {
+                                if(SPEC_ABSA(sym->etype))
+                                        addSet(&fix_idataSymSet, copySymbol(sym));
+                                else
+                                        addSet(&rel_idataSymSet, copySymbol(sym));
 
-//					ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
-//						decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE));
-			}
+//                                      ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
+//                                              decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE));
+                        }
 
-			if(ival) {
-				setAstLineno(ival, sym->lineDef);
-				codeOutBuf = &statsg->oBuf;
-				GcurMemmap = statsg;
-				eBBlockFromiCode (iCodeFromAst (ival));
-				sym->ival = NULL;
-			}
-		}
-	}
+                        if(ival) {
+                                setAstLineno(ival, sym->lineDef);
+                                codeOutBuf = &statsg->oBuf;
+                                GcurMemmap = statsg;
+                                eBBlockFromiCode (iCodeFromAst (ival));
+                                sym->ival = NULL;
+                        }
+                }
+        }
 }
 
 
@@ -385,14 +385,14 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
 
   expr = decorateType(resolveSymbols( list2expr (ilist) ), FALSE);
 //  expr = list2expr( ilist );
-  
+
   if (!expr)
     goto wrong;
-  
+
   /* try it the old way first */
   if (expr->etype && (val = constExprValue (expr, FALSE)))
     return val;
-  
+
   /* ( ptr + constant ) */
   if (IS_AST_OP (expr) &&
       (expr->opval.op == '+' || expr->opval.op == '-') &&
@@ -404,7 +404,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
                            expr->right,
                            expr->opval.op);
   }
-  
+
   /* (char *)&a */
   if (IS_AST_OP(expr) && expr->opval.op==CAST &&
       IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
@@ -520,10 +520,10 @@ void _pic16_printPointerType (const char *name, char ptype, void *p)
 {
   char buf[256];
 
-	sprintf(buf, "LOW(%s)", name);
-	pic16_emitDS(buf, ptype, p);
-	sprintf(buf, "HIGH(%s)", name);
-	pic16_emitDS(buf, ptype, p);
+        sprintf(buf, "LOW(%s)", name);
+        pic16_emitDS(buf, ptype, p);
+        sprintf(buf, "HIGH(%s)", name);
+        pic16_emitDS(buf, ptype, p);
 }
 
 /*-----------------------------------------------------------------*/
@@ -542,7 +542,7 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
   char ptype, void *p)
 {
   char buf[256];
-  
+
     _pic16_printPointerType (iname, ptype, p);
 
     switch( itype ) {
@@ -569,12 +569,12 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
 
 
 /* set to 0 to disable debug messages */
-#define DEBUG_PRINTIVAL	0
+#define DEBUG_PRINTIVAL 0
 
 /*-----------------------------------------------------------------*/
 /* pic16_printIvalType - generates ival for int/char               */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype, void *p)
 {
   value *val;
@@ -628,7 +628,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
 /*--------------------------------------------------------------------*/
 /* pic16_printIvalChar - generates initital value for character array */
 /*--------------------------------------------------------------------*/
-static int 
+static int
 pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, char ptype, void *p)
 {
   value *val;
@@ -669,7 +669,7 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
         for(remain=0; remain<ilen; remain++)
           pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
 
-	  /* fill array with 0x00 */
+          /* fill array with 0x00 */
           while(len--) {
             pic16_emitDB(0x00, ptype, p);
           }
@@ -679,7 +679,7 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
         for(remain=0; remain<DCL_ELEM (type); remain++)
           pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
       }
-      
+
 
 //      if((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0) {
 //      }
@@ -696,9 +696,9 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
 /*-----------------------------------------------------------------*/
 /* pic16_printIvalArray - generates code for array initialization        */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
-		char ptype, void *p)
+                char ptype, void *p)
 {
   initList *iloop;
   int lcnt = 0, size = 0;
@@ -720,8 +720,8 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
     }
 
     if(pic16_printIvalChar (sym, type,
-		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
-		       SPEC_CVAL (sym->etype).v_char, ptype, p))
+                       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
+                       SPEC_CVAL (sym->etype).v_char, ptype, p))
       return;
   }
   /* not the special case             */
@@ -744,16 +744,16 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       /* if not array limits given & we */
       /* are out of initialisers then   */
       if (!DCL_ELEM (type) && !iloop)
-	break;
+        break;
 
       /* no of elements given and we    */
       /* have generated for all of them */
       if (!--lcnt) {
-	/* if initializers left */
-	if (iloop) {
-	  werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
-	}
-	break;
+        /* if initializers left */
+        if (iloop) {
+          werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
+        }
+        break;
       }
     }
 
@@ -793,7 +793,7 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
       size = ((SPEC_BLEN (lsym->etype) / 8) +
               (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
     }
-    i = (unsigned long)floatFromVal(val);
+    i = ulFromVal (val);
     i <<= SPEC_BSTR (lsym->etype);
     ival |= i;
     if (! ( lsym->next &&
@@ -805,29 +805,29 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
   } while (1);
   switch (size) {
   case 1:
-	pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-	break;
+        pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
+        break;
 
   case 2:
-	pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-	pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
+        pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
+        pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
     break;
 
   case 4: /* EEP: why is this db and not dw? */
-	pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-	pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
-	pic16_emitDB(BYTE_IN_LONG(ival, 2), ptype, p);
-	pic16_emitDB(BYTE_IN_LONG(ival, 3), ptype, p);
+        pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
+        pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
+        pic16_emitDB(BYTE_IN_LONG(ival, 2), ptype, p);
+        pic16_emitDB(BYTE_IN_LONG(ival, 3), ptype, p);
     break;
   default:
-	/* VR - only 1,2,4 size long can be handled???? Why? */
-  	fprintf(stderr, "%s:%d: unhandled case. Contact author.\n", __FILE__, __LINE__);
-  	assert(0);
+        /* VR - only 1,2,4 size long can be handled???? Why? */
+        fprintf(stderr, "%s:%d: unhandled case. Contact author.\n", __FILE__, __LINE__);
+        assert(0);
   }
   *sym = lsym;
   *ilist = lilist;
 }
- 
+
 
 /*-----------------------------------------------------------------*/
 /* printIvalStruct - generates initial value for structures        */
@@ -896,7 +896,7 @@ void pic16_printIvalUnion (symbol * sym, sym_link * type,
 
   if (i == 1 && size >= 0 && size <= sizeof(long))
   {
-    unsigned long val = (unsigned long)floatFromVal(list2val(ilist));
+    unsigned long val = ulFromVal (list2val(ilist));
     while (size--)
     {
       pic16_emitDB(val, ptype, p);
@@ -942,7 +942,7 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
     {
       if (size == 1)            /* This appears to be Z80 specific?? */
         {
-	  pic16_emitDS(val->name, ptype, p);
+          pic16_emitDS(val->name, ptype, p);
         }
       else if (size == 2)
         {
@@ -966,7 +966,7 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
         {
           fprintf (stderr, "*** internal error: unknown size in "
                    "printIvalCharPtr.\n");
-	  assert(0);
+          assert(0);
         }
     }
   else
@@ -975,16 +975,16 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
       switch (size)
         {
         case 1:
-	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+          pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
           break;
         case 2:
-	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-	  pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
+          pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+          pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
           break;
         case 3:
-	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-	  pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-	  pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
+          pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+          pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
+          pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
           break;
 
         default:
@@ -992,9 +992,9 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
         }
     }
 
-  if (val->sym && val->sym->isstrlit) {	// && !isinSet(statsg->syms, val->sym)) {
-  	if(ptype == 'p' && !isinSet(statsg->syms, val->sym))addSet (&statsg->syms, val->sym);
-  	else if(ptype == 'f' /*&& !isinSet(rel_idataSymSet, val->sym)*/)addSet(&rel_idataSymSet, val->sym);
+  if (val->sym && val->sym->isstrlit) { // && !isinSet(statsg->syms, val->sym)) {
+        if(ptype == 'p' && !isinSet(statsg->syms, val->sym))addSet (&statsg->syms, val->sym);
+        else if(ptype == 'f' /*&& !isinSet(rel_idataSymSet, val->sym)*/)addSet(&rel_idataSymSet, val->sym);
   }
 
   return 1;
@@ -1046,14 +1046,14 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
       pic16_printGPointerType (val->sym->rname, DCL_TYPE(val->type), ptype, p);
 
       if(IS_FUNC(val->sym->type) && !val->sym->used && !IS_STATIC(val->sym->etype)) {
-        
+
         if(!checkSym(publics, val->sym))
-	  if(checkAddSym(&externs, val->sym) && (ptype == 'f')) {
-	    /* this has not been declared as extern
-	     * so declare it as a 'late extern' just after the symbol */
-	    fprintf((FILE *)p, ";\tdeclare symbol as extern\n");
-	    fprintf((FILE *)p, "\textern\t%s\n", val->sym->rname);
-	    fprintf((FILE *)p, ";\tcontinue variable declaration\n");
+          if(checkAddSym(&externs, val->sym) && (ptype == 'f')) {
+            /* this has not been declared as extern
+             * so declare it as a 'late extern' just after the symbol */
+            fprintf((FILE *)p, ";\tdeclare symbol as extern\n");
+            fprintf((FILE *)p, "\textern\t%s\n", val->sym->rname);
+            fprintf((FILE *)p, ";\tcontinue variable declaration\n");
           }
       }
   }
@@ -1071,8 +1071,8 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
   int size;
 
 #if 0
-	fprintf(stderr, "%s:%d initialising pointer: %s size: %d\n", __FILE__, __LINE__,
-		sym->rname, getSize(sym->type));
+        fprintf(stderr, "%s:%d initialising pointer: %s size: %d\n", __FILE__, __LINE__,
+                sym->rname, getSize(sym->type));
 #endif
 
   /* if deep then   */
@@ -1106,7 +1106,7 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
       switch (getSize (type))
         {
         case 1:
-            pic16_emitDB((unsigned int)floatFromVal(val) & 0xff, ptype, p);
+            pic16_emitDB((unsigned int) ulFromVal (val) & 0xff, ptype, p);
             break;
         case 2:
             pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
@@ -1118,8 +1118,8 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
             pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
             break;
         default:
-        	fprintf(stderr, "%s:%d size = %d\n", __FILE__, __LINE__, getSize(type));
-        	assert(0);
+                fprintf(stderr, "%s:%d size = %d\n", __FILE__, __LINE__, getSize(type));
+                assert(0);
         }
       return;
     }
@@ -1140,7 +1140,7 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
       pic16_printGPointerType (val->name, (IS_PTR(type)?DCL_TYPE(type):PTR_TYPE(SPEC_OCLS(sym->etype))),
                           ptype, p);
     } else
-    	assert(0);
+        assert(0);
   return;
 }
 
@@ -1152,16 +1152,16 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
 void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p)
 {
 //  sym_link *itype;
-  
+
   if (!p)
     return;
 
 #if 0
-	fprintf(stderr, "%s:%d generating init for %s\n", __FILE__, __LINE__, sym->name);
-	fprintf(stderr, "%s: IS_STRUCT: %d  IS_ARRAY: %d  IS_PTR: %d  IS_SPEC: %d\n", sym->name,
-		IS_STRUCT(type), IS_ARRAY(type), IS_PTR(type), IS_SPEC(type));
+        fprintf(stderr, "%s:%d generating init for %s\n", __FILE__, __LINE__, sym->name);
+        fprintf(stderr, "%s: IS_STRUCT: %d  IS_ARRAY: %d  IS_PTR: %d  IS_SPEC: %d\n", sym->name,
+                IS_STRUCT(type), IS_ARRAY(type), IS_PTR(type), IS_SPEC(type));
 #endif
-	
+
   /* if structure then */
   if (IS_STRUCT (type))
     {
@@ -1169,7 +1169,7 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
         {
           //fprintf(stderr,"%s union\n",__FUNCTION__);
           pic16_printIvalUnion (sym, type, ilist, ptype, p);
-	} else {
+        } else {
           //fprintf(stderr,"%s struct\n",__FUNCTION__);
           pic16_printIvalStruct (sym, type, ilist, ptype, p);
         }
@@ -1179,7 +1179,7 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
   /* if this is an array */
   if (IS_ARRAY (type))
     {
-//	fprintf(stderr,"%s array\n",__FUNCTION__);
+//      fprintf(stderr,"%s array\n",__FUNCTION__);
       pic16_printIvalArray (sym, type, ilist, ptype, p);
       return;
     }
@@ -1229,7 +1229,7 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
   /* if type is SPECIFIER */
   if (IS_SPEC (type))
     {
-//	fprintf(stderr,"%s spec\n",__FUNCTION__);
+//      fprintf(stderr,"%s spec\n",__FUNCTION__);
       pic16_printIvalType (sym, type, ilist, ptype, p);
       return;
     }
@@ -1271,154 +1271,154 @@ pic16emitStaticSeg (memmap * map)
     {
 
 #if 0
-	fprintf(stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
+        fprintf(stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
 CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
-		map->sname, sym->name, sym->used, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type),
-		IS_CODE(sym->etype), IN_CODESPACE( SPEC_OCLS(sym->etype)), IS_CONSTANT(sym->etype),
-		IS_PTR_CONST(sym->etype), SPEC_CONST(sym->etype));
-	printTypeChain( sym->type, stderr );
-	fprintf(stderr, "\n");
+                map->sname, sym->name, sym->used, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type),
+                IS_CODE(sym->etype), IN_CODESPACE( SPEC_OCLS(sym->etype)), IS_CONSTANT(sym->etype),
+                IS_PTR_CONST(sym->etype), SPEC_CONST(sym->etype));
+        printTypeChain( sym->type, stderr );
+        fprintf(stderr, "\n");
 #endif
 
         if(SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))) {
-		pic16_assignConfigWordValue(SPEC_ADDR(sym->etype),
-			(int) floatFromVal(list2val(sym->ival)));
+                pic16_assignConfigWordValue(SPEC_ADDR(sym->etype),
+                        (int) ulFromVal (list2val(sym->ival)));
 
-		continue;
+                continue;
         }
 
         if(SPEC_ABSA(sym->etype) && PIC16_IS_IDLOC_ADDRESS(SPEC_ADDR(sym->etype))) {
-		pic16_assignIdByteValue(SPEC_ADDR(sym->etype),
-			(char) floatFromVal(list2val(sym->ival)));
+                pic16_assignIdByteValue(SPEC_ADDR(sym->etype),
+                        (char) ulFromVal (list2val(sym->ival)));
 
-		continue;
+                continue;
         }
 
-	/* if it is "extern" then do nothing */
-	if (IS_EXTERN (sym->etype)/* && !SPEC_ABSA(sym->etype)*/) {
-		checkAddSym(&externs, sym);
-	  continue;
-	}
+        /* if it is "extern" then do nothing */
+        if (IS_EXTERN (sym->etype)/* && !SPEC_ABSA(sym->etype)*/) {
+                checkAddSym(&externs, sym);
+          continue;
+        }
 
-	/* if it is not static add it to the public
-	   table */
-	if (!IS_STATIC (sym->etype)) {
-		/* do not emit if it is a config word declaration */
-		checkAddSym(&publics, sym);
-	}
+        /* if it is not static add it to the public
+           table */
+        if (!IS_STATIC (sym->etype)) {
+                /* do not emit if it is a config word declaration */
+                checkAddSym(&publics, sym);
+        }
 
       /* print extra debug info if required */
       if (options.debug || sym->level == 0) {
-	  /* NOTE to me - cdbFile may be null in which case,
-	   * the sym name will be printed to stdout. oh well */
-	   debugFile->writeSymbol(sym);
+          /* NOTE to me - cdbFile may be null in which case,
+           * the sym name will be printed to stdout. oh well */
+           debugFile->writeSymbol(sym);
       }
-	 
+
       /* if it has an absolute address */
       if (SPEC_ABSA (sym->etype)) {
-//		fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
-//			__FILE__, __LINE__, sym->name);
-			
-	  /* if it has an initial value */
-	  if (sym->ival)
-	    {
-	      pBlock *pb;
+//              fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
+//                      __FILE__, __LINE__, sym->name);
+
+          /* if it has an initial value */
+          if (sym->ival)
+            {
+              pBlock *pb;
               symbol *asym;
               absSym *abSym;
               pCode *pcf;
-              
+
               /* symbol has absolute address and initial value */
-	      noAlloc++;
-	      resolveIvalSym (sym->ival, sym->type);
-	      asym = newSymbol(sym->rname, 0);
-	      abSym = Safe_calloc(1, sizeof(absSym));
-	      strcpy(abSym->name, sym->rname);
-	      abSym->address = SPEC_ADDR( sym->etype );
-	      addSet(&absSymSet, abSym);
-	      
-	      pb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute Ival"));
-	      pic16_addpBlock(pb);
+              noAlloc++;
+              resolveIvalSym (sym->ival, sym->type);
+              asym = newSymbol(sym->rname, 0);
+              abSym = Safe_calloc(1, sizeof(absSym));
+              strcpy(abSym->name, sym->rname);
+              abSym->address = SPEC_ADDR( sym->etype );
+              addSet(&absSymSet, abSym);
 
-	      pcf = pic16_newpCodeFunction(moduleName, asym->name);
-	      PCF(pcf)->absblock = 1;
-	      
-	      pic16_addpCode2pBlock(pb,pcf);
-	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
-	      //fprintf(stderr, "%s:%d [1] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
-	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
+              pb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute Ival"));
+              pic16_addpBlock(pb);
+
+              pcf = pic16_newpCodeFunction(moduleName, asym->name);
+              PCF(pcf)->absblock = 1;
+
+              pic16_addpCode2pBlock(pb,pcf);
+              pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+              //fprintf(stderr, "%s:%d [1] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
+              pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
 
-	      pic16_addpCode2pBlock(pb, pic16_newpCodeFunction(NULL, NULL));
-	      noAlloc--;
-	    }
-	  else
-	    {
+              pic16_addpCode2pBlock(pb, pic16_newpCodeFunction(NULL, NULL));
+              noAlloc--;
+            }
+          else
+            {
 
-	      /* symbol has absolute address but no initial value */
-	      
-	      /* allocate space */
-	      dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
+              /* symbol has absolute address but no initial value */
 
-	      /* special case for character strings */
-	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-		  SPEC_CVAL (sym->etype).v_char) {
+              /* allocate space */
+              dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
 
-//		fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
+              /* special case for character strings */
+              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
+                  SPEC_CVAL (sym->etype).v_char) {
 
-		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
-	      } else {
-	        fprintf (stderr, "%s:%u(%s): do not know how to intialize symbol %s\n", __FILE__, __LINE__, __FUNCTION__, sym->rname);
-	      	assert(0);
-	      }
-	    }
-  
-	} else {
-//		fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
-//			__FILE__, __LINE__, sym->name);
+//              fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
 
-		
-	  /* if it has an initial value */
-	  if (sym->ival) {
-	      pBlock *pb;
+                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
+              } else {
+                fprintf (stderr, "%s:%u(%s): do not know how to intialize symbol %s\n", __FILE__, __LINE__, __FUNCTION__, sym->rname);
+                assert(0);
+              }
+            }
 
-	      /* symbol doesn't have absolute address but has initial value */
-	      dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
-	      noAlloc++;
-	      resolveIvalSym (sym->ival, sym->type);
+        } else {
+//              fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
+//                      __FILE__, __LINE__, sym->name);
 
-	      pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
-	      pic16_addpBlock(pb);
 
-	      if(!didcode) {
-	      	/* make sure that 'code' directive is emitted before, once */
-	      	pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir("code", NULL));
-	      	
-	      	didcode++;
-	      }
+          /* if it has an initial value */
+          if (sym->ival) {
+              pBlock *pb;
 
-	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
-	      //fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
-	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
+              /* symbol doesn't have absolute address but has initial value */
+              dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
+              noAlloc++;
+              resolveIvalSym (sym->ival, sym->type);
+
+              pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
+              pic16_addpBlock(pb);
+
+              if(!didcode) {
+                /* make sure that 'code' directive is emitted before, once */
+                pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir("code", NULL));
+
+                didcode++;
+              }
+
+              pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+              //fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
+              pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
-	      noAlloc--;
-	    } else {
+              noAlloc--;
+            } else {
 
-	      /* symbol doesn't have absolute address and no initial value */
-	      /* allocate space */
-//	      fprintf(stderr, "%s:%d [3] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
-	      dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
-	      /* special case for character strings */
-	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-		  SPEC_CVAL (sym->etype).v_char) {
-		
-//		fprintf(stderr, "%s:%d printing code string for %s\n", __FILE__, __LINE__, sym->rname);
+              /* symbol doesn't have absolute address and no initial value */
+              /* allocate space */
+//            fprintf(stderr, "%s:%d [3] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
+              dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
+              /* special case for character strings */
+              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
+                  SPEC_CVAL (sym->etype).v_char) {
 
-		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
-	      } else {
-	        assert(0);
-	      }
-	    }
-	}
+//              fprintf(stderr, "%s:%d printing code string for %s\n", __FILE__, __LINE__, sym->rname);
+
+                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
+              } else {
+                assert(0);
+              }
+            }
+        }
     }
 
 }
@@ -1431,22 +1431,22 @@ void pic16_emitConfigRegs(FILE *of)
 {
   int i;
 
-	for(i=0;i<=(pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart);i++)
-		if(pic16->cwInfo.crInfo[i].emit)	//mask != -1)
-			fprintf (of, "\t__config 0x%x, 0x%hhx\n",
-				pic16->cwInfo.confAddrStart+i,
-				pic16->cwInfo.crInfo[i].value);
+        for(i=0;i<=(pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart);i++)
+                if(pic16->cwInfo.crInfo[i].emit)        //mask != -1)
+                        fprintf (of, "\t__config 0x%x, 0x%hhx\n",
+                                pic16->cwInfo.confAddrStart+i,
+                                pic16->cwInfo.crInfo[i].value);
 }
 
 void pic16_emitIDRegs(FILE *of)
 {
   int i;
 
-	for(i=0;i<=(pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart);i++)
-		if(pic16->idInfo.irInfo[i].emit)
-			fprintf (of, "\t__idlocs 0x%06x, 0x%hhx\n",
-				pic16->idInfo.idAddrStart+i,
-				pic16->idInfo.irInfo[i].value);
+        for(i=0;i<=(pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart);i++)
+                if(pic16->idInfo.irInfo[i].emit)
+                        fprintf (of, "\t__idlocs 0x%06x, 0x%hhx\n",
+                                pic16->idInfo.idAddrStart+i,
+                                pic16->idInfo.irInfo[i].value);
 }
 
 
@@ -1472,28 +1472,28 @@ pic16emitMaps ()
 static void
 pic16createInterruptVect (struct dbuf_s * vBuf)
 {
-	/* if the main is only a prototype ie. no body then do nothing */
+        /* if the main is only a prototype ie. no body then do nothing */
 #if 0
-	if (!IFFUNC_HASBODY(mainf->type)) {
-		/* if ! compile only then main function should be present */
-		if (!options.cc_only)
-			werror (E_NO_MAIN);
-		return;
-	}
+        if (!IFFUNC_HASBODY(mainf->type)) {
+                /* if ! compile only then main function should be present */
+                if (!options.cc_only)
+                        werror (E_NO_MAIN);
+                return;
+        }
 #endif
 #if 0
-	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
-		dbuf_printf (vBuf, ";\t.area\t%s\n", CODE_NAME);
-		dbuf_printf (vBuf, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
+        if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
+                dbuf_printf (vBuf, ";\t.area\t%s\n", CODE_NAME);
+                dbuf_printf (vBuf, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
 
-		/* this is an overkill since WE are the port,
-		 * and we know if we have a genIVT function! */
-		if(port->genIVT) {
-			port->genIVT(vFile, interrupts, maxInterrupts);
-		}
-	}
+                /* this is an overkill since WE are the port,
+                 * and we know if we have a genIVT function! */
+                if(port->genIVT) {
+                        port->genIVT(vFile, interrupts, maxInterrupts);
+                }
+        }
 #endif
-	
+
 }
 
 
@@ -1503,19 +1503,19 @@ pic16createInterruptVect (struct dbuf_s * vBuf)
 static void
 pic16initialComments (FILE * afile)
 {
-	initialComments (afile);
-	fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
-	if(xinst)
-	  fprintf (afile, "; * Extended Instruction Set\n");
-	  
-	if(pic16_mplab_comp)
-		fprintf(afile, "; * MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
-	fprintf (afile, iComments2);
+        initialComments (afile);
+        fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
+        if(xinst)
+          fprintf (afile, "; * Extended Instruction Set\n");
 
-	if(options.debug) {
-		fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]%s\"\n",
-				SDCC_VERSION_STR, getBuildNumber(), (!xinst?"":" {extended}") );
-	}
+        if(pic16_mplab_comp)
+                fprintf(afile, "; * MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
+        fprintf (afile, iComments2);
+
+        if(options.debug) {
+                fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]%s\"\n",
+                                SDCC_VERSION_STR, getBuildNumber(), (!xinst?"":" {extended}") );
+        }
 }
 
 int
@@ -1561,14 +1561,14 @@ pic16printPublics (FILE *afile)
 {
   symbol *sym;
 
-	fprintf (afile, "\n%s", iComments2);
-	fprintf (afile, "; public variables in this module\n");
-	fprintf (afile, "%s", iComments2);
+        fprintf (afile, "\n%s", iComments2);
+        fprintf (afile, "; public variables in this module\n");
+        fprintf (afile, "%s", iComments2);
 
-	for(sym = setFirstItem (publics); sym; sym = setNextItem (publics))
-	  /* sanity check */
-	  if(!IS_STATIC(sym->etype))
-	  	pic16_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
+        for(sym = setFirstItem (publics); sym; sym = setNextItem (publics))
+          /* sanity check */
+          if(!IS_STATIC(sym->etype))
+                pic16_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1579,19 +1579,19 @@ pic16_printExterns(FILE *afile)
 {
   symbol *sym;
 
-  	/* print nothing if no externs to declare */
-	if(!elementsInSet(externs) && !elementsInSet(pic16_builtin_functions))
-		return;
+        /* print nothing if no externs to declare */
+        if(!elementsInSet(externs) && !elementsInSet(pic16_builtin_functions))
+                return;
 
-	fprintf(afile, "\n%s", iComments2);
-	fprintf(afile, "; extern variables in this module\n");
-	fprintf(afile, "%s", iComments2);
-	
-	for(sym = setFirstItem(externs); sym; sym = setNextItem(externs))
-		pic16_emitSymbolIfNew(afile, "\textern %s\n", sym->rname, 1);
+        fprintf(afile, "\n%s", iComments2);
+        fprintf(afile, "; extern variables in this module\n");
+        fprintf(afile, "%s", iComments2);
 
-	for(sym = setFirstItem(pic16_builtin_functions); sym; sym = setNextItem(pic16_builtin_functions))
-		pic16_emitSymbolIfNew(afile, "\textern _%s\n", sym->name, 1);
+        for(sym = setFirstItem(externs); sym; sym = setNextItem(externs))
+                pic16_emitSymbolIfNew(afile, "\textern %s\n", sym->rname, 1);
+
+        for(sym = setFirstItem(pic16_builtin_functions); sym; sym = setNextItem(pic16_builtin_functions))
+                pic16_emitSymbolIfNew(afile, "\textern _%s\n", sym->name, 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1613,70 +1613,70 @@ pic16emitOverlay (struct dbuf_s *aBuf)
       symbol *sym;
 
       if (elementsInSet (ovrset))
-	{
-	  /* this dummy area is used to fool the assembler
-	     otherwise the assembler will append each of these
-	     declarations into one chunk and will not overlay
-	     sad but true */
-	  dbuf_printf (aBuf, ";\t.area _DUMMY\n");
-	  /* output the area informtion */
-	  dbuf_printf (aBuf, ";\t.area\t%s\n", port->mem.overlay_name);	/* MOF */
-	}
+        {
+          /* this dummy area is used to fool the assembler
+             otherwise the assembler will append each of these
+             declarations into one chunk and will not overlay
+             sad but true */
+          dbuf_printf (aBuf, ";\t.area _DUMMY\n");
+          /* output the area informtion */
+          dbuf_printf (aBuf, ";\t.area\t%s\n", port->mem.overlay_name); /* MOF */
+        }
 
       for (sym = setFirstItem (ovrset); sym;
-	   sym = setNextItem (ovrset))
-	{
+           sym = setNextItem (ovrset))
+        {
 
-	  /* if extern then do nothing */
-	  if (IS_EXTERN (sym->etype))
-	    continue;
+          /* if extern then do nothing */
+          if (IS_EXTERN (sym->etype))
+            continue;
 
-	  /* if allocation required check is needed
-	     then check if the symbol really requires
-	     allocation only for local variables */
-	  if (!IS_AGGREGATE (sym->type) &&
-	      !(sym->_isparm && !IS_REGPARM (sym->etype))
-	      && !sym->allocreq && sym->level)
-	    continue;
+          /* if allocation required check is needed
+             then check if the symbol really requires
+             allocation only for local variables */
+          if (!IS_AGGREGATE (sym->type) &&
+              !(sym->_isparm && !IS_REGPARM (sym->etype))
+              && !sym->allocreq && sym->level)
+            continue;
 
-	  /* if global variable & not static or extern
-	     and addPublics allowed then add it to the public set */
-	  if ((sym->_isparm && !IS_REGPARM (sym->etype))
-	      && !IS_STATIC (sym->etype)) {
-//	      fprintf(stderr, "%s:%d %s accessed\n", __FILE__, __LINE__, __FUNCTION__);
-	      checkAddSym(&publics, sym);
-//	    addSetHead (&publics, sym);
-	  }
+          /* if global variable & not static or extern
+             and addPublics allowed then add it to the public set */
+          if ((sym->_isparm && !IS_REGPARM (sym->etype))
+              && !IS_STATIC (sym->etype)) {
+//            fprintf(stderr, "%s:%d %s accessed\n", __FILE__, __LINE__, __FUNCTION__);
+              checkAddSym(&publics, sym);
+//          addSetHead (&publics, sym);
+          }
 
-	  /* if extern then do nothing or is a function
-	     then do nothing */
-	  if (IS_FUNC (sym->type))
-	    continue;
+          /* if extern then do nothing or is a function
+             then do nothing */
+          if (IS_FUNC (sym->type))
+            continue;
 
 
-	  /* if is has an absolute address then generate
-	     an equate for this no need to allocate space */
-	  if (SPEC_ABSA (sym->etype))
-	    {
+          /* if is has an absolute address then generate
+             an equate for this no need to allocate space */
+          if (SPEC_ABSA (sym->etype))
+            {
 
-	      if (options.debug || sym->level == 0)
-		dbuf_printf (aBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+              if (options.debug || sym->level == 0)
+                dbuf_printf (aBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 
-	      dbuf_printf (aBuf, "%s\t=\t0x%04x\n",
-		       sym->rname,
-		       SPEC_ADDR (sym->etype));
-	    }
-	  else
-	    {
-	      if (options.debug || sym->level == 0)
-		dbuf_printf (aBuf, "==.\n");
+              dbuf_printf (aBuf, "%s\t=\t0x%04x\n",
+                       sym->rname,
+                       SPEC_ADDR (sym->etype));
+            }
+          else
+            {
+              if (options.debug || sym->level == 0)
+                dbuf_printf (aBuf, "==.\n");
 
-	      /* allocate space */
-	      dbuf_printf (aBuf, "%s:\n", sym->rname);
-	      dbuf_printf (aBuf, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
-	    }
+              /* allocate space */
+              dbuf_printf (aBuf, "%s:\n", sym->rname);
+              dbuf_printf (aBuf, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
+            }
 
-	}
+        }
     }
 }
 
@@ -1689,7 +1689,7 @@ void emitStatistics(FILE *asmFile)
   ramsize = pic16 ? pic16->RAMsize : 0x200;
   ramsize -= 256; /* ignore access bank and SFRs */
   if (ramsize == 0) ramsize = 64; /* prevent division by zero (below) */
-	
+
   fprintf (asmFile, "\n\n; Statistics:\n");
   fprintf (asmFile, "; code size:\t%5ld (0x%04lx) bytes (%5.2f%%)\n;           \t%5ld (0x%04lx) words\n",
     isize, isize, (isize*100.0)/(128UL << 10),
@@ -1778,7 +1778,7 @@ pic16glue ()
 #if 1
     if(pic16_options.dumpcalltree) {
       FILE *cFile;
-        
+
         sprintf(buffer, dstFileName);
         strcat(buffer, ".calltree");
         cFile = fopen(buffer, "w");
@@ -1807,7 +1807,7 @@ pic16glue ()
       werror (E_FILE_OPEN_ERR, buffer);
       exit (1);
     }
-    
+
     /* initial comments */
     pic16initialComments (asmFile);
 
@@ -1819,7 +1819,7 @@ pic16glue ()
     if(port->genAssemblerPreamble) {
       port->genAssemblerPreamble(asmFile);
     }
-	
+
     /* Put all variables into a cblock */
     pic16_AnalyzeBanking();
 
@@ -1833,7 +1833,7 @@ pic16glue ()
     if(pic16_options.opt_banksel > 1) {
       pic16_OptimizeBanksel();
     }
-	    
+
     /* turn GOTOs into BRAs -- added by RN 2004-11-16 */
     if(pic16_options.opt_flags & OF_OPTIMIZE_GOTO) {
       pic16_OptimizeJumps();
@@ -1844,7 +1844,7 @@ pic16glue ()
 
     /* print the extern variables to this module */
     pic16_printExterns(asmFile);
-	
+
     pic16_writeUsedRegs(asmFile);
 
 #if 0
@@ -1859,7 +1859,7 @@ pic16glue ()
     }
 #endif
 
-#if 0	
+#if 0
     /* no xdata in pic */
     /* copy xtern ram data */
     fprintf (asmFile, "%s", iComments2);
@@ -1883,15 +1883,15 @@ pic16glue ()
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&vBuf, asmFile);
     }
-    
+
     /* copy global & static initialisations */
     fprintf (asmFile, "\n%s", iComments2);
     fprintf (asmFile, "; global & static initialisations\n");
     fprintf (asmFile, "%s", iComments2);
-    
+
     if(pic16_debug_verbose)
       fprintf(asmFile, "; A code from now on!\n");
-    
+
     pic16_copypCode(asmFile, 'A');
 
     if(pic16_options.no_crt) {
@@ -1908,7 +1908,7 @@ pic16glue ()
 
     if(pic16_debug_verbose)
       fprintf(asmFile, "; dbName from now on!\n");
-    
+
     pic16_copypCode(asmFile, statsg->dbName);
 
     if(pic16_options.no_crt) {
@@ -1916,7 +1916,7 @@ pic16glue ()
         fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
       }
     }
-	
+
     if(pic16_debug_verbose)
       fprintf(asmFile, "; X code from now on!\n");
 
@@ -1928,7 +1928,7 @@ pic16glue ()
     pic16_copypCode(asmFile, 'M');
 
     pic16_copypCode(asmFile, code->dbName);
-    
+
     pic16_copypCode(asmFile, 'P');
 
     emitStatistics(asmFile);

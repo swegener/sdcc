@@ -117,7 +117,7 @@ aopLiteralLong (value * val, int offset, int size)
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
   if (!IS_FLOAT (val->type)) {
-    unsigned long v = (unsigned long) floatFromVal (val);
+    unsigned long v = ulFromVal (val);
 
     v >>= (offset * 8);
     switch (size) {
@@ -698,7 +698,7 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
       size = ((SPEC_BLEN (lsym->etype) / 8) + 
               (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
     }
-    i = (unsigned long)floatFromVal(val);
+    i = ulFromVal(val);
     i <<= SPEC_BSTR (lsym->etype);
     ival |= i;
     if (! ( lsym->next &&
@@ -1083,7 +1083,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
       switch (getSize (type))
         {
         case 1:
-          dbuf_tprintf (oBuf, "\t!db !constbyte\n", (unsigned int) floatFromVal (val) & 0xff);
+          dbuf_tprintf (oBuf, "\t!db !constbyte\n", (unsigned int) ulFromVal (val) & 0xff);
           break;
         case 2:
           if (port->use_dw_for_init)

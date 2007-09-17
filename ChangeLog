@@ -1,3 +1,15 @@
+2007-09-16 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.y, src/SDCCast.c, src/SDCCcse.c, src/SDCCglue.c, src/SDCCicode.c,
+	  src/SDCCopt.c, src/SDCCsymt.c, src/SDCCval.c, src/SDCCval.h,
+	  src/hc08/gen.c, src/avr/gen.c, src/ds390/gen.c, src/mcs51/gen.c,
+	  src/pic/gen.c, src/pic/genarith.c, src/pic/glue.c, src/pic/ralloc.c,
+	  src/pic16/gen.c, src/pic16/genarith.c, src/pic16/genutils.c,
+	  src/pic16/glue.c, src/pic16/main.c, src/z80/gen.c, src/z80/ralloc.c:
+	  fixed bug #1739860 - sdcc does not work correctly on some platforms
+	  (not finished)
+	  introduced and used ulFromVal(), double2ul(), used strtod() instead sscanf()
+
 2007-09-17 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/device.c: reverted to previous version

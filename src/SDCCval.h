@@ -25,15 +25,19 @@
 
 #include "SDCCsymt.h"
 
+
+/* double to unsigned long conversion */
+#define double2ul(val)  (((val) < 0) ? (unsigned long) -((long) -(val)) : (unsigned long) (val))
+
 /* value wrapper */
 typedef struct value
   {
-    char name[SDCC_NAME_MAX + 1];	/* operand accessing this value */
-    sym_link *type;		/* start of type chain     */
-    sym_link *etype;		/* end of type chain       */
-    symbol *sym;		/* Original Symbol         */
-    struct value *next;		/* used in initializer list */
-    unsigned vArgs:1;		/* arg list ended with variable arg           */
+    char name[SDCC_NAME_MAX + 1]; /* operand accessing this value     */
+    sym_link *type;               /* start of type chain              */
+    sym_link *etype;              /* end of type chain                */
+    symbol *sym;                  /* Original Symbol                  */
+    struct value *next;           /* used in initializer list         */
+    unsigned vArgs:1;             /* arg list ended with variable arg */
 
   }
 value;
@@ -61,8 +65,8 @@ typedef struct initList
     char *filename;
     union
       {
-	struct ast *node;
-	struct initList *deep;
+        struct ast *node;
+        struct initList *deep;
       }
     init;
 
@@ -80,7 +84,7 @@ typedef enum
   }
 CCR_RESULT;
 
-#define  IS_VARG(x)		(x->vArgs)
+#define  IS_VARG(x)             (x->vArgs)
 
 /* forward definitions for the symbol table related functions */
 void initValue ();
@@ -95,6 +99,7 @@ value *charVal (const char *);
 value *symbolVal (symbol *);
 void printVal (value *);
 double floatFromVal (value *);
+unsigned long ulFromVal (value *);
 
 /* convert a fixed16x16 type to double */
 double doubleFromFixed16x16(TYPE_TARGET_ULONG value);

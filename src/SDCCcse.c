@@ -1172,7 +1172,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               default:
                 return;
               }
-            if (((unsigned) operandLitValue (IC_RIGHT (ic)) & val) == val)
+            if (((unsigned) double2ul (operandLitValue (IC_RIGHT (ic))) & val) == val)
             {
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1240,7 +1240,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               default:
                 return;
               }
-            if (((unsigned) operandLitValue (IC_RIGHT (ic)) & val) == val)
+            if (((unsigned) double2ul (operandLitValue (IC_RIGHT (ic))) & val) == val)
               {
                 if (IS_OP_VOLATILE (IC_LEFT (ic)))
                 {
@@ -1892,7 +1892,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
           /* and also iTemps derived from globals */
           deleteItemIf (&cseSet, ifFromGlobal);
-          
+
           /* Delete iTemps derived from symbols whose address */
           /* has been taken */
           deleteItemIf (&cseSet, ifFromAddrTaken);
@@ -2169,7 +2169,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
          mine and type is a pointer then delete
          pointerGets to take care of aliasing */
       if (ASSIGNMENT (ic) &&
-		  IS_SYMOP (IC_RESULT (ic)) &&
+                  IS_SYMOP (IC_RESULT (ic)) &&
           OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))) &&
           IS_PTR (operandType (IC_RESULT (ic))))
         {

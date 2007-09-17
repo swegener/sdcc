@@ -4166,7 +4166,7 @@ genPlusIncr (iCode * ic)
   if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
     return FALSE;
 
-  icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+  icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
   D(emitcode (";","genPlusIncr"));
 
@@ -4491,7 +4491,7 @@ genPlus (iCode * ic)
       /* if result in bit space */
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
         {
-          if ((unsigned long) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) != 0L)
+          if (ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) != 0L)
             emitcode ("cpl", "c");
           outBitC (IC_RESULT (ic));
         }
@@ -4551,7 +4551,7 @@ genPlus (iCode * ic)
   /* if the lower bytes of a literal are zero skip the addition */
   if (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT )
     {
-       while ((0 == ((unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) & (0xff << skip_bytes*8))) &&
+       while ((0 == ((unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) & (0xff << skip_bytes*8))) &&
               (skip_bytes+1 < size))
          {
            skip_bytes++;
@@ -4634,7 +4634,7 @@ genMinusDec (iCode * ic)
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
-  if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
+  if ((icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
   D (emitcode (";", "genMinusDec"));
@@ -4858,7 +4858,7 @@ genMinus (iCode * ic)
       unsigned long lit = 0L;
       bool useCarry = FALSE;
 
-      lit = (unsigned long) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+      lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
       lit = -(long) lit;
 
       while (size--)
@@ -5058,7 +5058,7 @@ genMultOneByte (operand * left,
       if (AOP_TYPE(left) == AOP_LIT)
         {
           /* signed literal */
-          signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+          signed char val = (char) ulFromVal (AOP (left)->aopu.aop_lit);
           if (val < 0)
             compiletimeSign = TRUE;
         }
@@ -5072,7 +5072,7 @@ genMultOneByte (operand * left,
       if (AOP_TYPE(right) == AOP_LIT)
         {
           /* signed literal */
-          signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+          signed char val = (char) ulFromVal (AOP (right)->aopu.aop_lit);
           if (val < 0)
             compiletimeSign ^= TRUE;
         }
@@ -5093,7 +5093,7 @@ genMultOneByte (operand * left,
   /* save the signs of the operands */
   if (AOP_TYPE(right) == AOP_LIT)
     {
-      signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+      signed char val = (char) ulFromVal (AOP (right)->aopu.aop_lit);
 
       if (!rUnsigned && val < 0)
         emitcode ("mov", "b,#0x%02x", -val);
@@ -5119,7 +5119,7 @@ genMultOneByte (operand * left,
 
   if (AOP_TYPE(left) == AOP_LIT)
     {
-      signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+      signed char val = (char) ulFromVal (AOP (left)->aopu.aop_lit);
 
       if (!lUnsigned && val < 0)
         emitcode ("mov", "a,#0x%02x", -val);
@@ -5326,7 +5326,7 @@ genDivOneByte (operand * left,
       if (AOP_TYPE(left) == AOP_LIT)
         {
           /* signed literal */
-          signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+          signed char val = (char) ulFromVal (AOP (left)->aopu.aop_lit);
           if (val < 0)
             compiletimeSign = TRUE;
         }
@@ -5340,7 +5340,7 @@ genDivOneByte (operand * left,
       if (AOP_TYPE(right) == AOP_LIT)
         {
           /* signed literal */
-          signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+          signed char val = (char) ulFromVal (AOP (right)->aopu.aop_lit);
           if (val < 0)
             compiletimeSign ^= TRUE;
         }
@@ -5361,7 +5361,7 @@ genDivOneByte (operand * left,
   /* save the signs of the operands */
   if (AOP_TYPE(right) == AOP_LIT)
     {
-      signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+      signed char val = (char) ulFromVal (AOP (right)->aopu.aop_lit);
 
       if (!rUnsigned && val < 0)
         emitcode ("mov", "b,#0x%02x", -val);
@@ -5387,7 +5387,7 @@ genDivOneByte (operand * left,
 
   if (AOP_TYPE(left) == AOP_LIT)
     {
-      signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+      signed char val = (char) ulFromVal (AOP (left)->aopu.aop_lit);
 
       if (!lUnsigned && val < 0)
         emitcode ("mov", "a,#0x%02x", -val);
@@ -5664,7 +5664,7 @@ genModOneByte (operand * left,
   /* sign adjust left side */
   if (AOP_TYPE(left) == AOP_LIT)
     {
-      signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+      signed char val = (char) ulFromVal (AOP (left)->aopu.aop_lit);
 
       if (!lUnsigned && val < 0)
         {
@@ -5857,7 +5857,7 @@ genCmp (operand * left, operand * right,
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+              lit = ulFromVal (AOP (right)->aopu.aop_lit);
               /* optimize if(x < 0) or if(x >= 0) */
               if (lit == 0L)
                 {
@@ -6058,7 +6058,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
     }
 
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   /* if the right side is a literal then anything goes */
   if (AOP_TYPE (right) == AOP_LIT &&
@@ -6173,7 +6173,7 @@ genCmpEq (iCode * ic, iCode * ifx)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              unsigned long lit = (unsigned long) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+              unsigned long lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
               if (lit == 0L)
                 {
                   emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
@@ -6253,7 +6253,7 @@ genCmpEq (iCode * ic, iCode * ifx)
     {
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          unsigned long lit = (unsigned long) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+          unsigned long lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
           if (lit == 0L)
             {
               emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
@@ -6595,7 +6595,7 @@ genAnd (iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -7026,7 +7026,7 @@ genOr (iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -7412,7 +7412,7 @@ genXor (iCode * ic, iCode * ifx)
     }
 
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -7918,7 +7918,7 @@ genGetAbit (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, FALSE);
 
-  shCount = (int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+  shCount = (int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
   /* get the needed byte into a */
   MOVA (aopGet (left, shCount / 8, FALSE, FALSE));
@@ -7990,7 +7990,7 @@ genGetByte (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, FALSE);
 
-  offset = (int)floatFromVal (AOP (right)->aopu.aop_lit) / 8;
+  offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
   aopPut (result,
           aopGet (left, offset, FALSE, FALSE),
           0);
@@ -8018,7 +8018,7 @@ genGetWord (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, FALSE);
 
-  offset = (int)floatFromVal (AOP (right)->aopu.aop_lit) / 8;
+  offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
   aopPut (result,
           aopGet (left, offset, FALSE, FALSE),
           0);
@@ -8955,7 +8955,7 @@ genLeftShiftLiteral (operand * left,
                      operand * result,
                      iCode * ic)
 {
-  int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
   D (emitcode (";", "genLeftShiftLiteral"));
@@ -9347,7 +9347,7 @@ genRightShiftLiteral (operand * left,
                       iCode * ic,
                       int sign)
 {
-  int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
   D (emitcode (";", "genRightShiftLiteral"));
@@ -10428,7 +10428,7 @@ genPackBits (sym_link * etype,
         {
           /* Case with a bitfield length <8 and literal source
           */
-          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
           litval <<= bstr;
           litval &= (~mask) & 0xff;
           emitPtrByteGet (rname, p_type, FALSE);
@@ -10499,7 +10499,7 @@ genPackBits (sym_link * etype,
         {
           /* Case with partial byte and literal source
           */
-          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
           litval >>= (blen-rlen);
           litval &= (~mask) & 0xff;
           emitPtrByteGet (rname, p_type, FALSE);
@@ -11154,7 +11154,7 @@ genAssign (iCode * ic)
   size = AOP_SIZE (result);
   offset = 0;
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   if ((size > 1) &&
       (AOP_TYPE (result) != AOP_REG) &&

@@ -604,7 +604,7 @@ int pic16_genCmp_special(operand *left, operand *right, operand *result,
     
     if(isAOP_REGlike(left) && isAOP_LIT(right)) {
       /* comparing register vs. literal */
-      lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+      lit = ulFromVal(AOP(right)->aopu.aop_lit);
       
       
       if(size == 1) {

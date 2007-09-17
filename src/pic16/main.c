@@ -1030,7 +1030,7 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     /* also allow literals [-128..256) for left/right operands */
     if (IS_VALOP(IC_LEFT(ic)))
     {
-      long l = (long)floatFromVal( OP_VALUE( IC_LEFT(ic) ) );
+      long l = (long) ulFromVal ( OP_VALUE( IC_LEFT(ic) ) );
       sizeL = 4;
       //printf( "%s: val(left) = %ld\n", __FUNCTION__, l );
       if (l >= -128 && l < 256)
@@ -1042,7 +1042,7 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     }
     if (IS_VALOP( IC_RIGHT(ic) ))
     {
-      long l = (long)floatFromVal( OP_VALUE( IC_RIGHT(ic) ) );
+      long l = (long) ulFromVal ( OP_VALUE( IC_RIGHT(ic) ) );
       sizeR = 4;
       //printf( "%s: val(right) = %ld\n", __FUNCTION__, l );
       if (l >= -128 && l < 256)
@@ -1067,7 +1067,7 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     /* What about literals? */
     if (IS_VALOP( IC_LEFT(ic) ))
     {
-      long l = (long)floatFromVal( OP_VALUE( IC_LEFT(ic) ) );
+      long l = (long) ulFromVal ( OP_VALUE( IC_LEFT(ic) ) );
       sizeL = 4;
       //printf( "%s: val(left) = %ld\n", __FUNCTION__, l );
       if (l >= -128 && l < 256)
@@ -1079,7 +1079,7 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     }
     if (IS_VALOP( IC_RIGHT(ic) ))
     {
-      long l = (long)floatFromVal( OP_VALUE( IC_RIGHT(ic) ) );
+      long l = (long) ulFromVal ( OP_VALUE( IC_RIGHT(ic) ) );
       sizeR = 4;
       //printf( "%s: val(right) = %ld\n", __FUNCTION__, l );
       if (l >= -128 && l < 256)

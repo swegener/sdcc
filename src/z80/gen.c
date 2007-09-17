@@ -1260,7 +1260,7 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
         /* otherwise it is fairly simple */
         if (!IS_FLOAT (val->type))
           {
-            unsigned long v = (unsigned long) floatFromVal (val);
+            unsigned long v = ulFromVal (val);
 
             if (offset == 2)
               {
@@ -3500,7 +3500,7 @@ genPlusIncr (iCode * ic)
 
   emitDebug ("; genPlusIncr");
 
-  icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+  icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
   /* If result is a pair */
   if (resultId != PAIR_INVALID)
@@ -3960,7 +3960,7 @@ genMinusDec (iCode * ic)
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
-  if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 2)
+  if ((icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 2)
     return FALSE;
 
   size = getDataSize (IC_RESULT (ic));
@@ -4050,7 +4050,7 @@ genMinus (iCode * ic)
     }
   else
     {
-      lit = (unsigned long) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+      lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
       lit = -(long) lit;
     }
 
@@ -4183,7 +4183,7 @@ genMult (iCode * ic)
 
   wassertl (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT, "Right must be a literal");
 
-  val = (int)floatFromVal ( AOP (IC_RIGHT (ic))->aopu.aop_lit);
+  val = (int) ulFromVal ( AOP (IC_RIGHT (ic))->aopu.aop_lit);
   //  wassertl (val > 0, "Multiply must be positive");
   wassertl (val != 1, "Can't multiply by 1");
 
@@ -4474,7 +4474,7 @@ _getPairIdName (PAIR_ID id)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+              lit = ulFromVal (AOP (right)->aopu.aop_lit);
               /* optimize if(x < 0) or if(x >= 0) */
               if (lit == 0L)
                 {
@@ -4505,8 +4505,7 @@ _getPairIdName (PAIR_ID id)
               bool fDidXor = FALSE;
               if (AOP_TYPE (left) == AOP_LIT)
                 {
-                  unsigned long lit = (unsigned long)
-                  floatFromVal (AOP (left)->aopu.aop_lit);
+                  unsigned long lit = ulFromVal (AOP (left)->aopu.aop_lit);
                   emit2 ("ld %s,!immedbyte", _fTmp[0],
                          0x80 ^ (unsigned int) ((lit >> ((size - 1) * 8)) & 0x0FFL));
                 }
@@ -4519,8 +4518,7 @@ _getPairIdName (PAIR_ID id)
                 }
               if (AOP_TYPE (right) == AOP_LIT)
                 {
-                  unsigned long lit = (unsigned long)
-                  floatFromVal (AOP (right)->aopu.aop_lit);
+                  unsigned long lit = ulFromVal (AOP (right)->aopu.aop_lit);
                   emit2 ("ld %s,!immedbyte", _fTmp[1],
                          0x80 ^ (unsigned int) ((lit >> ((size - 1) * 8)) & 0x0FFL));
                 }
@@ -4603,7 +4601,7 @@ genCmp (operand * left, operand * right,
 
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+          lit = ulFromVal (AOP (right)->aopu.aop_lit);
           /* optimize if(x < 0) or if(x >= 0) */
           if (lit == 0)
             {
@@ -4775,7 +4773,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   /* if the right side is a literal then anything goes */
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
       if (lit == 0)
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
@@ -5160,7 +5158,7 @@ genAnd (iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -5351,7 +5349,7 @@ genOr (iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -5509,7 +5507,7 @@ genXor (iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -6085,7 +6083,7 @@ genLeftShiftLiteral (operand * left,
                      operand * result,
                      iCode * ic)
 {
-  int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
   freeAsmop (right, NULL, ic);
@@ -6342,7 +6340,7 @@ genRightShiftLiteral (operand * left,
                       iCode * ic,
                       int sign)
 {
-  int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
   freeAsmop (right, NULL, ic);
@@ -6800,7 +6798,7 @@ genPackBits (sym_link * etype,
         {
           /* Case with a bitfield length <8 and literal source
           */
-          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
           litval <<= bstr;
           litval &= (~mask) & 0xff;
           emit2 ("ld a,!*pair", _pairs[pair].name);
@@ -6865,7 +6863,7 @@ genPackBits (sym_link * etype,
         {
           /* Case with partial byte and literal source
           */
-          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
           litval >>= (blen-rlen);
           litval &= (~mask) & 0xff;
           emit2 ("ld a,!*pair", _pairs[pair].name);
@@ -7201,7 +7199,7 @@ genAssign (iCode * ic)
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
     }
 
   if (isPair (AOP (result)))
@@ -8471,7 +8469,7 @@ fetchLitSpecial (asmop * aop, bool negate, bool xor)
   wassert (aop->type == AOP_LIT);
   wassert (!IS_FLOAT (val->type));
 
-  v = (unsigned long) floatFromVal (val);
+  v = ulFromVal (val);
 
   if (xor)
     v ^= 0x8000;

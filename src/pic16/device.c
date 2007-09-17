@@ -212,7 +212,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 			}
 
 			if(r1 && (init_addr == r1->address)) {
-				fprintf(of, "\n%s\n", r->name);
+				fprintf(of, "\n%s\tres\t0\n", r->name);
 			} else {
 				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
 				deb_addr += r->size;

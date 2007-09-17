@@ -1,3 +1,8 @@
+2007-09-17 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/device.c: reverted to previous version
+	* device/lib/pic16/Makefile.common.in: quieten gpasm via -Wa,-q
+
 2007-09-16 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/device.c (pic16_dump_usection): do not reserve 0 bytes,

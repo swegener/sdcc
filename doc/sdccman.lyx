@@ -31076,7 +31076,7 @@ Related open source tools
 <features>
 <column alignment="left" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="40col%">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -31675,6 +31675,15 @@ Cross platform build system, generates Makefiles
 
 \begin_layout Standard
 \begin_inset LatexCommand \url{http://www.cmake.org}
+
+\end_inset
+
+ \InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+and a dedicated wiki entry: 
+\begin_inset LatexCommand \url{http://www.cmake.org/Wiki/CmakeSdcc}
 
 \end_inset
 

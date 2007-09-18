@@ -1,3 +1,8 @@
+2007-09-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: there's a dedicated wiki page for cmake and sdcc, thanks
+	  Alexander Neundorf
+
 2007-09-18 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCval.c: fixed MSVC warning C4146: unary minus operator

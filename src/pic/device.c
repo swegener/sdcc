@@ -278,10 +278,14 @@ static PIC_device *find_device(char *pic_name)
 	/* read line by line */
 	pic_buf[sizeof(pic_buf)-1] = '\0';
 	while (fgets(pic_buf, sizeof(pic_buf)-1, pic_file) != NULL && !done) {
+		unsigned llen;
+		llen = strlen (pic_buf);
 		
 		/* remove trailing spaces */
-		while (isspace(pic_buf[strlen(pic_buf)-1]))
-			pic_buf[strlen(pic_buf)-1] = '\0';
+		while (llen && isspace(pic_buf[llen-1])) {
+			pic_buf[llen-1] = '\0';
+			llen--;
+		}
 		
 		/* remove leading spaces */
 		for (pic_buf_pos = pic_buf; isspace(*pic_buf_pos); pic_buf_pos++)

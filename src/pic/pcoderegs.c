@@ -848,7 +848,7 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 							
 						}
 					}
-					rset1 = rset1->next;
+					rset1 = rset2;
 				}
 			}
 		}

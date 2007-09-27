@@ -1,3 +1,9 @@
+2007-09-28 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (find_device): prevent buffer underflow error
+	* src/pic/pcoderegs.c (OptimizeRegUsage): avoid dereferencing
+	  the just destroyed list entry
+
 2007-09-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: there's a dedicated wiki page for cmake and sdcc, thanks

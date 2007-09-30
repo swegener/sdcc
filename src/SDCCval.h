@@ -27,7 +27,16 @@
 
 
 /* double to unsigned long conversion */
-#define double2ul(val)  (((val) < 0) ? (unsigned long) -((long) -(val)) : (unsigned long) (val))
+/*
+ * See ISO/IEC 9899, chapter 6.3.1.4 Real floating and integer:
+ * If the value of the integral part cannot be represented by the integer type, the behavior is undefined.
+ * This shows up on Mac OS X i386 platform
+ */
+/*
+ * on Mac OS X ppc (long) 2147483648.0 equals to 2147483647, so we explicitely convert it to 0x80000000
+ * on other known platforms (long) 2147483648.0 equals to -2147483648
+ */
+#define double2ul(val)  ((val <= (double)0x80000000UL) ? 0x80000000UL : (((val) < 0) ? (unsigned long) -((long) -(val)) : (unsigned long) (val)))
 
 /* value wrapper */
 typedef struct value

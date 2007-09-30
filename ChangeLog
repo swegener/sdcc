@@ -1,3 +1,11 @@
+2007-09-30 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCval.h: fixed bug #1739860 - sdcc does not work correctly on some
+	  platforms
+	* sdcc_vc_in.h: enabled warnings
+	* src/hc08/gen.c: fixed MSVC warning C4146: unary minus operator applied to
+	  unsigned type, result still unsigned
+
 2007-09-28 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c (find_device): prevent buffer underflow error

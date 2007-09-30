@@ -3412,7 +3412,7 @@ genMinusDec (iCode * ic)
           needpulh = FALSE;
         }
       loadRegFromAop (hc08_reg_hx, AOP(left), 0);
-      emitcode ("aix","#%d", -icount);
+      emitcode ("aix","#%d", -(int) icount);
       hc08_dirtyReg (hc08_reg_hx, FALSE);
       storeRegToAop (hc08_reg_hx, AOP(result), 0);
       pullOrFreeReg (hc08_reg_h, needpulh);

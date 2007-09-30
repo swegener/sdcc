@@ -241,7 +241,7 @@ termScanAtFunc (const lineNode *pl, int rIdx)
   if (FUNC_ISNAKED(ftype))
     return S4O_CONTINUE;
   if (FUNC_BANKED(ftype) &&
-      (rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX))
+      ((rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX)))
     return S4O_ABORT;
   return S4O_TERM;
 }

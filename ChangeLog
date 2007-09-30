@@ -5,6 +5,7 @@
 	* sdcc_vc_in.h: enabled warnings
 	* src/hc08/gen.c: fixed MSVC warning C4146: unary minus operator applied to
 	  unsigned type, result still unsigned
+	* src/mcs51/peep.c: fixed gcc warning: suggest parentheses around && within ||
 
 2007-09-28 Raphael Neider <rneider AT web.de>
 

@@ -6,16 +6,16 @@
   under the terms of the GNU General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-  
+
   In other words, you are welcome to use, share and improve this program.
   You are forbidden to forbid anyone else to use, share and improve
   what you give them.   Help stamp out software-hoarding!  
@@ -30,13 +30,13 @@
 /*
  * See ISO/IEC 9899, chapter 6.3.1.4 Real floating and integer:
  * If the value of the integral part cannot be represented by the integer type, the behavior is undefined.
- * This shows up on Mac OS X i386 platform
+ * This shows up on Mac OS X i386 platform which useus SSE unit instead of the x87 FPU for floating-point operations
  */
-#if defined(__APPLE__) && defined(__i386__)
-#define double2ul(val)  (((val) < 0) ? (unsigned long) -((long) -(val)) : (unsigned long) (val))
-#else
-#define double2ul(val)  ((unsigned long) (val))
-#endif
+/*
+ * on Mac OS X ppc (long) 2147483648.0 equals to 2147483647, so we explicitely convert it to 0x80000000
+ * on other known platforms (long) 2147483648.0 equals to -2147483648
+ */
+#define double2ul(val)  (((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val))
 
 /* value wrapper */
 typedef struct value
@@ -57,7 +57,6 @@ typedef struct literalList
     unsigned  count;
     struct literalList *next;
 } literalList;
-
 
 enum
   {

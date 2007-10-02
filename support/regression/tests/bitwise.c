@@ -36,3 +36,13 @@ testTwoOpBitwise(void)
     ASSERT(({type})(~left) == ({type})0xFFFFC208);
 #endif
 }
+
+static void
+testBug_1777758(void)
+{
+  char ep = -1;
+
+  ep &= ~0x80;
+
+  ASSERT(ep == 127);
+}

@@ -1,6 +1,8 @@
 2007-10-02 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCval.h: unified double2ul macro for all platforms
+	* src/SDCCval.c: fixed bug #1777758 - applied Maarten's patch
+	* support/regression/tests/bitwise.c: added regtest for bug #1777758
 
 2007-09-30 Borut Razem <borut.razem AT siol.net>
 

@@ -1824,8 +1824,11 @@ valCastLiteral (sym_link * dtype, double fval)
       break;
 
     case V_BITFIELD:
-      SPEC_CVAL (val->etype).v_uint = ((TYPE_TARGET_UINT) l) &
-        (0xffffu >> (16 - SPEC_BLEN (val->etype)));
+      l &= (0xffffffffu >> (32 - SPEC_BLEN (val->etype)));
+      if (SPEC_USIGN (val->etype))
+        SPEC_CVAL (val->etype).v_uint = (TYPE_TARGET_UINT) l;
+      else
+        SPEC_CVAL (val->etype).v_int = (TYPE_TARGET_INT) l;
       break;
 
     case V_CHAR:

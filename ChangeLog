@@ -1,3 +1,8 @@
+2007-10-06 Borut Razem <borut.razem AT siol.net>
+
+	* .version, doc/sdccman.lyx: bumped version to 2.7.4 to indicate the full
+	   support of universal binaries on Mac OS X
+
 2007-10-02 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCval.h: unified double2ul macro for all platforms

@@ -1,3 +1,19 @@
+2007-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (leftRightUseAcc): use macro IS_OP_ACCUSE
+	* src/SDCCast.c (decorateType): optimize bit=cond?1:0, RFE 1738430
+	* support/regression/tests/bug-223113.c,
+	* support/regression/tests/bug-426632.c,
+	* support/regression/tests/bug-468811.c,
+	* support/regression/tests/bug-477835.c,
+	* support/regression/tests/bug-478094.c,
+	* support/regression/tests/bug-499644.c,
+	* support/regression/tests/bug-524209.c,
+	* support/regression/tests/bug-524211.c,
+	* support/regression/tests/packcast.c,
+	* support/regression/tests/structidx.c: added empty tests
+	* support/regression/tests/bug-607243.c: enabled test
+
 2007-10-06 Borut Razem <borut.razem AT siol.net>
 
 	* .version, doc/sdccman.lyx: bumped version to 2.7.4 to indicate the full

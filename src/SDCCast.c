@@ -1225,7 +1225,7 @@ ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
 
 /*-----------------------------------------------------------------*/
 /* gatherAutoInit - creates assignment expressions for initial     */
-/*    values                 */
+/*                  values                                         */
 /*-----------------------------------------------------------------*/
 static ast *
 gatherAutoInit (symbol * autoChain)
@@ -2535,7 +2535,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
        upon tree->opval.op, if resultType can be propagated */
     resultTypeProp = resultTypePropagate (tree, resultType);
 
-    if (tree->opval.op == '?')
+    if ((tree->opval.op == '?') && (resultTypeProp != RESULT_TYPE_BIT))
       dtl = decorateType (tree->left, RESULT_TYPE_IFX);
     else
       dtl = decorateType (tree->left, resultTypeProp);
@@ -3650,7 +3650,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT))
             {
-              /* remove double '!!X' by 'X' */
+              /* replace double '!!X' by 'X' */
               return tree->left->left;
             }
           /* remove double '!!X' by 'X ? 1 : 0' */
@@ -4369,6 +4369,19 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* the type is value of the colon operator (on the right) */
       assert (IS_COLON_OP (tree->right));
 
+      /* If already known then replace the tree : optimizer will do it
+         but faster to do it here. If done before decorating tree->right
+         this can save generating unused const strings. */
+      if (IS_LITERAL (LTYPE (tree)))
+        {
+          if (((int) ulFromVal (valFromType (LETYPE (tree)))) != 0)
+            return decorateType (tree->right->left, resultTypeProp);
+          else
+            return decorateType (tree->right->right, resultTypeProp);
+        }
+
+      tree->right = decorateType (tree->right,  resultTypeProp);
+
       if (IS_AST_LIT_VALUE (tree->right->left) && IS_AST_LIT_VALUE (tree->right->right))
         {
           double valTrue = AST_LIT_VALUE (tree->right->left);
@@ -4378,6 +4391,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT)))
             {
               /* assign cond to result */
+              tree->left->decorated = 0;
               return decorateType (tree->left, resultTypeProp);
             }
           else if ((valTrue == 0) && (valFalse == 1))
@@ -4391,27 +4405,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* if they are equal then replace the tree */
-      if (!astHasVolatile (tree->right) &&
-          isAstEqual (tree->right->left, tree->right->right))
+      if (isAstEqual (tree->right->left, tree->right->right))
         {
-          return decorateType (tree->right->left, resultTypeProp);
+          return tree->right->left;
         }
 
-      /* if already known then replace the tree : optimizer will do it
-         but faster to do it here */
-      if (IS_LITERAL (LTYPE (tree)))
-        {
-          if (((int) ulFromVal (valFromType (LETYPE (tree)))) != 0)
-            return decorateType (tree->right->left, resultTypeProp);
-          else
-            return decorateType (tree->right->right, resultTypeProp);
-        }
-      else
-        {
-          tree->right = decorateType (tree->right, resultTypeProp);
-          TTYPE (tree) = RTYPE (tree);
-          TETYPE (tree) = getSpec (TTYPE (tree));
-        }
+      TTYPE (tree) = RTYPE (tree);
+      TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
     case ':':

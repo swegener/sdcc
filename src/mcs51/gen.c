@@ -543,7 +543,7 @@ leftRightUseAcc(iCode *ic)
   if (ic->op == IFX)
     {
       op = IC_COND (ic);
-      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+      if (IS_OP_ACCUSE (op))
         {
           accuse = 1;
           size = getSize (OP_SYMBOL (op)->type);
@@ -554,7 +554,7 @@ leftRightUseAcc(iCode *ic)
   else if (ic->op == JUMPTABLE)
     {
       op = IC_JTCOND (ic);
-      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+      if (IS_OP_ACCUSE (op))
         {
           accuse = 1;
           size = getSize (OP_SYMBOL (op)->type);
@@ -565,7 +565,7 @@ leftRightUseAcc(iCode *ic)
   else
     {
       op = IC_LEFT (ic);
-      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+      if (IS_OP_ACCUSE (op))
         {
           accuse = 1;
           size = getSize (OP_SYMBOL (op)->type);
@@ -573,7 +573,7 @@ leftRightUseAcc(iCode *ic)
             accuseSize = size;
         }
       op = IC_RIGHT (ic);
-      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+      if (IS_OP_ACCUSE (op))
         {
           accuse = 1;
           size = getSize (OP_SYMBOL (op)->type);

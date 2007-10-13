@@ -30,3 +30,7 @@ getWidth(void)
 {
   return cursors[current_cursor].w;
 }
+
+void testBug(void)
+{
+}

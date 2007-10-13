@@ -23,3 +23,7 @@ testCastPack(char x)
         }
     }
 }
+
+void testBug(void)
+{
+}

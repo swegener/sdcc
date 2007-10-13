@@ -28,3 +28,7 @@ void foo(void)
 {
 }
 #endif
+
+void testBug(void)
+{
+}

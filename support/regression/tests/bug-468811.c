@@ -18,7 +18,7 @@ set_sprite_tile(UINT8 nb, UINT8 tile)
 #define MIN_SY		5U		/* min y (char) */
 #define MAX_SY		(MIN_SY+13U)	/* max y (char) */
 
-#define DEF_SP		30U		/* sprite null char code */	
+#define DEF_SP		30U		/* sprite null char code */
 
 /* player */
 #define MIN_PX		(MIN_SX*8U+8U)	/* min x (dot) */
@@ -71,4 +71,8 @@ void enemys()
       set_sprite_tile( i*2+DEF_ES1, DEF_1EC1+(ex[i]-MAX_SX*8-12)+7 );
     }
   }
+}
+
+void testBug(void)
+{
 }

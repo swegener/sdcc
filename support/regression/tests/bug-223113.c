@@ -3,23 +3,27 @@
  */
 #include <testfwk.h>
 
-int putch( int Ch ) 
-{ 
-  return( Ch ); 
-} 
+int putch( int Ch )
+{
+  return( Ch );
+}
 
-int puts( char *Str ) 
-{ 
-  char *Ptr; 
-   
+int puts( char *Str )
+{
+  char *Ptr;
+
   for( Ptr = Str; *Ptr != '\0'; Ptr++ ) {
-    putch( *Ptr ); 
-  } 
-   
-  return( (Ptr - Str) ); 
-} 
+    putch( *Ptr );
+  }
 
-void __main( void ) 
-{ 
-  puts( "hello world\n" ); 
+  return( (Ptr - Str) );
+}
+
+void __main( void )
+{
+  puts( "hello world\n" );
+}
+
+void testBug(void)
+{
 }

@@ -31,3 +31,6 @@ void checkCast(void *pIn)
   _scan((StringBuffer *)p);
 }
 
+void testBug(void)
+{
+}

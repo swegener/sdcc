@@ -29,3 +29,7 @@ fptr2(void (*fp)(void))
   for (i = 0; i < 50; i++)
     dummy(fp2);
 }
+
+void testBug(void)
+{
+}

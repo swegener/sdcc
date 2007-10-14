@@ -7,6 +7,10 @@
 	* src/SDCCast.h: replaced AST_LIT_VALUE with AST_FLOAT_VALUE and
 	  AST_ULONG_VALUE
 	* src/SDCCast.c (decorateType): improved optimization of tri-op
+	* src/SDCCerr.c (vwerror, setWError),
+	* src/SDCCerr.h,
+	* src/SDCCmain.c (parseCmdLine): added option --Werror to treat all
+	  warnings as errors, thanks Stas Sergeev for PATCH 1813211
 
 2007-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
 

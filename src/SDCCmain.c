@@ -120,6 +120,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_NO_LOOP_IND      "--noinduction"
 #define OPTION_LESS_PEDANTIC    "--less-pedantic"
 #define OPTION_DISABLE_WARNING  "--disable-warning"
+#define OPTION_WERROR           "--Werror"
 #define OPTION_NO_GCSE          "--nogcse"
 #define OPTION_SHORT_IS_8BITS   "--short-is-8bits"
 #define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
@@ -167,6 +168,7 @@ optionsTable[] = {
     { 0,    "--nostdinc",           &options.nostdinc, "Do not include the standard include directory in the search path" },
     { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
     { 0,    OPTION_DISABLE_WARNING, NULL, "<nnnn> Disable specific warning" },
+    { 0,    OPTION_WERROR,          NULL, "Treat the warnings as errors" },
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
     { 0,    "--cyclomatic",         &options.cyclomatic, "Display complexity of compiled functions" },
     { 0,    OPTION_STD_C89,         NULL, "Use C89 standard only" },
@@ -1034,6 +1036,13 @@ parseCmdLine (int argc, char **argv)
                 {
                   setWarningDisabled(w);
                 }
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_WERROR) == 0)
+            {
+              setWError(1);
+              addSet(&preArgvSet, Safe_strdup("-Werror"));
               continue;
             }
 

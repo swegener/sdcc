@@ -238,6 +238,7 @@ struct SDCCERRG {
     ERROR_LOG_LEVEL logLevel;
     FILE *out;
     int style;                        /* 1=MSVC */
+    int werror;                       /* treat the warnings as errors */
     char disabled[MAX_ERROR_WARNING]; /* 1=warning disabled*/
 };
 
@@ -309,5 +310,12 @@ disabled - Disable output of specified warning
 */
 
 void setWarningDisabled (int errNum) ;
+
+/*
+-------------------------------------------------------------------------------
+Set the flag to treat warnings as errors
+-------------------------------------------------------------------------------
+*/
+void setWError (int flag);
 
 #endif

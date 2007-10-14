@@ -484,7 +484,7 @@ void vwerror (int errNum, va_list marker)
     }
 
     if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!_SDCCERRG.disabled[errNum])) {
-        if ( ErrTab[errNum].errType == ERROR_LEVEL_ERROR )
+        if ( ErrTab[errNum].errType == ERROR_LEVEL_ERROR || _SDCCERRG.werror )
             fatalError++ ;
   
         if ( filename && lineno ) {
@@ -505,7 +505,10 @@ void vwerror (int errNum, va_list marker)
                 break;
             case ERROR_LEVEL_WARNING:
             case ERROR_LEVEL_PEDANTIC:
-                fprintf(_SDCCERRG.out, "warning %d: ", errNum);
+                if (_SDCCERRG.werror)
+                    fprintf(_SDCCERRG.out, "error %d: ", errNum);
+                else
+                    fprintf(_SDCCERRG.out, "warning %d: ", errNum);
                 break;
             case ERROR_LEVEL_INFO:
                 fprintf(_SDCCERRG.out, "info %d: ", errNum);
@@ -598,4 +601,15 @@ void setWarningDisabled (int errNum)
 {
     if ((errNum < MAX_ERROR_WARNING) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
         _SDCCERRG.disabled[errNum] = 1;
+}
+
+/*
+-------------------------------------------------------------------------------
+Set the flag to treat warnings as errors
+-------------------------------------------------------------------------------
+*/
+
+void setWError (int flag)
+{
+    _SDCCERRG.werror = flag;
 }

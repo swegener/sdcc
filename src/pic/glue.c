@@ -1672,7 +1672,7 @@ parseIvalAst (ast *node, int *inCodeSpace) {
         DEBUGprintf ("%s: AST_VALUE\n", __FUNCTION__);
         if (IS_AST_LIT_VALUE(node)) {
             buffer = Safe_alloc(LEN);
-            SNPRINTF(buffer, LEN, "0x%lx", (long)AST_LIT_VALUE(node));
+            SNPRINTF(buffer, LEN, "0x%lx", AST_ULONG_VALUE (node));
         } else if (IS_AST_SYM_VALUE(node)) {
             assert ( AST_SYMBOL(node) );
             /*

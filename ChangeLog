@@ -1,3 +1,13 @@
+2007-10-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/p89lpc938.h: new, added, thanks Kyle Guinn
+	* src/pic/glue.c,
+	* src/SDCCval.c,
+	* src/SDCCast.c,
+	* src/SDCCast.h: replaced AST_LIT_VALUE with AST_FLOAT_VALUE and
+	  AST_ULONG_VALUE
+	* src/SDCCast.c (decorateType): improved optimization of tri-op
+
 2007-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (leftRightUseAcc): use macro IS_OP_ACCUSE

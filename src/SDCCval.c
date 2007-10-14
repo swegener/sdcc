@@ -133,7 +133,7 @@ convertIListToConstList(initList *src, literalList **lList)
     iLoop = src->init.deep;
     while (iLoop)
     {
-        double val = AST_LIT_VALUE(iLoop->init.node);
+        double val = AST_FLOAT_VALUE(iLoop->init.node);
 
         if (last && last->literalValue == val)
         {
@@ -696,7 +696,7 @@ value *constVal (const char *s)
 
   val = newValue ();            /* alloc space for value   */
 
-  val->type = val->etype = newLink (SPECIFIER); /* create the spcifier */
+  val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
   SPEC_SCLS (val->type) = S_LITERAL;
   /* let's start with a signed char */
   SPEC_NOUN (val->type) = V_CHAR;
@@ -808,7 +808,7 @@ value *constVal (const char *s)
 }
 
 /*------------------------------------------------------------------*/
-/* strVal - converts a string constant to a value       */
+/* strVal - converts a string constant to a value                   */
 /*------------------------------------------------------------------*/
 value *
 strVal (const char *s)
@@ -918,7 +918,7 @@ copyValue (value * src)
 }
 
 /*------------------------------------------------------------------*/
-/* charVal - converts a character constant to a value       */
+/* charVal - converts a character constant to a value               */
 /*------------------------------------------------------------------*/
 value *
 charVal (const char *s)
@@ -1943,7 +1943,7 @@ valForArray (ast * arrExpr)
     }
 
   SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
-           (int) AST_LIT_VALUE (arrExpr->right) * size);
+           AST_ULONG_VALUE (arrExpr->right) * size);
 
   val->type = newLink (DECLARATOR);
   if (SPEC_SCLS (arrExpr->left->etype) == S_CODE)
@@ -2049,7 +2049,7 @@ valForCastAggr (ast * aexpr, sym_link * type, ast * cnst, int op)
 
   SNPRINTF (val->name, sizeof(val->name), "(%s %c %d)",
            AST_SYMBOL (aexpr)->rname, op,
-           getSize (type->next) * (int) AST_LIT_VALUE (cnst));
+           getSize (type->next) * AST_ULONG_VALUE (cnst));
 
   val->type = type;
   val->etype = getSpec (val->type);

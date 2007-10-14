@@ -1685,7 +1685,7 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
           if (IS_AST_SYM_VALUE (loopExpr->left) &&
               isSymbolEqual (*sym, AST_SYMBOL (loopExpr->left)) &&
               IS_AST_LIT_VALUE (loopExpr->right) &&
-              (int) AST_LIT_VALUE (loopExpr->right) != 1)
+              AST_ULONG_VALUE (loopExpr->right) != 1)
             return TRUE;
         }
     }
@@ -4382,25 +4382,30 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       tree->right = decorateType (tree->right,  resultTypeProp);
 
-      if (IS_AST_LIT_VALUE (tree->right->left) && IS_AST_LIT_VALUE (tree->right->right))
+      if (IS_AST_LIT_VALUE (tree->right->left) && IS_AST_LIT_VALUE (tree->right->right) &&
+          ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT)))
         {
-          double valTrue = AST_LIT_VALUE (tree->right->left);
-          double valFalse = AST_LIT_VALUE (tree->right->right);
+          double valTrue = AST_FLOAT_VALUE (tree->right->left);
+          double valFalse = AST_FLOAT_VALUE (tree->right->right);
 
-          if ((valTrue == 1) && (valFalse == 0) &&
-              ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT)))
+          if ((valTrue != 0) && (valFalse == 0))
             {
               /* assign cond to result */
               tree->left->decorated = 0;
               return decorateType (tree->left, resultTypeProp);
             }
-          else if ((valTrue == 0) && (valFalse == 1))
+          else if ((valTrue == 0) && (valFalse != 0))
             {
               /* assign !cond to result */
               tree->opval.op = '!';
               tree->decorated = 0;
               tree->right = NULL;
               return decorateType (tree, resultTypeProp);
+            }
+          else
+            {
+              /* they have the same boolean value, make them equal */
+              tree->right->left = tree->right->right;
             }
         }
 
@@ -5367,7 +5372,7 @@ isBitAndPow2 (ast * tree)
   if (!IS_AST_LIT_VALUE (tree->right))
     return -1;
 
-  return powof2 ((TYPE_TARGET_ULONG)AST_LIT_VALUE (tree->right));
+  return powof2 (AST_ULONG_VALUE (tree->right));
 }
 
 /*-----------------------------------------------------------------*/
@@ -5376,14 +5381,14 @@ isBitAndPow2 (ast * tree)
 ast *
 optimizeGetHbit (ast * tree, RESULT_TYPE resultType)
 {
-  int i, j;
+  unsigned int i, j;
   ast * expr;
 
   expr = isShiftRightLitVal_BitAndLitVal(tree);
   if (expr)
     {
-      if ((AST_LIT_VALUE (tree->right) != 1) ||
-          ((i = (int) AST_LIT_VALUE (tree->left->right)) !=
+      if ((AST_ULONG_VALUE (tree->right) != 1) ||
+          ((i = AST_ULONG_VALUE (tree->left->right)) !=
           (j = (getSize (TTYPE (expr)) * 8 - 1))))
         expr = NULL;
     }
@@ -5416,7 +5421,7 @@ optimizeGetAbit (ast * tree, RESULT_TYPE resultType)
   expr = isShiftRightLitVal_BitAndLitVal(tree);
   if (expr)
     {
-  if (AST_LIT_VALUE (tree->right) != 1)
+  if (AST_ULONG_VALUE (tree->right) != 1)
         expr = NULL;
       count = tree->left->right;
     }
@@ -5454,9 +5459,9 @@ optimizeGetByte (ast * tree, RESULT_TYPE resultType)
   expr = isShiftRightLitVal_BitAndLitVal(tree);
   if (expr)
     {
-      i = (unsigned int) AST_LIT_VALUE (tree->left->right);
+      i = AST_ULONG_VALUE (tree->left->right);
       count = tree->left->right;
-      if (AST_LIT_VALUE (tree->right) != 0xFF)
+      if (AST_ULONG_VALUE (tree->right) != 0xFF)
         expr = NULL;
     }
   if (!expr && resultType == RESULT_TYPE_CHAR)
@@ -5464,7 +5469,7 @@ optimizeGetByte (ast * tree, RESULT_TYPE resultType)
       /* if this is a right shift over a multiple of 8 */
       if (IS_RIGHT_OP (tree) && IS_AST_LIT_VALUE (tree->right))
         {
-          i = (unsigned int) AST_LIT_VALUE (tree->right);
+          i = AST_ULONG_VALUE (tree->right);
           count = tree->right;
             expr = tree->left;
         }
@@ -5493,9 +5498,9 @@ optimizeGetWord (ast * tree, RESULT_TYPE resultType)
   expr = isShiftRightLitVal_BitAndLitVal(tree);
   if (expr)
     {
-      i = (unsigned int) AST_LIT_VALUE (tree->left->right);
+      i = AST_ULONG_VALUE (tree->left->right);
       count = tree->left->right;
-      if (AST_LIT_VALUE (tree->right) != 0xFFFF)
+      if (AST_ULONG_VALUE (tree->right) != 0xFFFF)
         expr = NULL;
     }
   if (!expr && resultType == RESULT_TYPE_INT)
@@ -5503,7 +5508,7 @@ optimizeGetWord (ast * tree, RESULT_TYPE resultType)
       /* if this is a right shift over a multiple of 8 */
       if (IS_RIGHT_OP (tree) && IS_AST_LIT_VALUE (tree->right))
         {
-          i = (unsigned int) AST_LIT_VALUE (tree->right);
+          i = AST_ULONG_VALUE (tree->right);
           count = tree->right;
             expr = tree->left;
         }
@@ -5559,10 +5564,10 @@ optimizeRRCRLC (ast * root)
                        root->right->left))
         goto tryNext0;
 
-      if (AST_LIT_VALUE (root->left->right) != 1)
+      if (AST_ULONG_VALUE (root->left->right) != 1)
         goto tryNext0;
 
-      if (AST_LIT_VALUE (root->right->right) !=
+      if (AST_ULONG_VALUE (root->right->right) !=
           (getSize (TTYPE (root->left->left)) * 8 - 1))
         goto tryNext0;
 
@@ -5594,10 +5599,10 @@ tryNext0:
                        root->right->left))
         goto tryNext1;
 
-      if (AST_LIT_VALUE (root->right->right) != 1)
+      if (AST_ULONG_VALUE (root->right->right) != 1)
         goto tryNext1;
 
-      if (AST_LIT_VALUE (root->left->right) !=
+      if (AST_ULONG_VALUE (root->left->right) !=
           (getSize (TTYPE (root->left->left)) * 8 - 1))
         goto tryNext1;
 
@@ -5630,10 +5635,10 @@ tryNext1:
                        root->right->left))
         goto tryNext2;
 
-      if (AST_LIT_VALUE (root->left->right) != 1)
+      if (AST_ULONG_VALUE (root->left->right) != 1)
         goto tryNext2;
 
-      if (AST_LIT_VALUE (root->right->right) !=
+      if (AST_ULONG_VALUE (root->right->right) !=
           (getSize (TTYPE (root->left->left)) * 8 - 1))
         goto tryNext2;
 
@@ -5665,10 +5670,10 @@ tryNext2:
                        root->right->left))
         return root;
 
-      if (AST_LIT_VALUE (root->right->right) != 1)
+      if (AST_ULONG_VALUE (root->right->right) != 1)
         return root;
 
-      if (AST_LIT_VALUE (root->left->right) !=
+      if (AST_ULONG_VALUE (root->left->right) !=
           (getSize (TTYPE (root->left->left)) * 8 - 1))
         return root;
 
@@ -5719,11 +5724,11 @@ optimizeSWAP (ast * root)
                        root->right->left))
         return root;
 
-      if (AST_LIT_VALUE (root->left->right) !=
+      if (AST_ULONG_VALUE (root->left->right) !=
           (getSize (TTYPE (root->left->left)) * 4))
         return root;
 
-      if (AST_LIT_VALUE (root->right->right) !=
+      if (AST_ULONG_VALUE (root->right->right) !=
           (getSize (TTYPE (root->left->left)) * 4))
         return root;
 

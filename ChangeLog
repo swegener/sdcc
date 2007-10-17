@@ -1,3 +1,7 @@
+2007-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: documented option --Werror
+
 2007-10-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/p89lpc938.h: new, added, thanks Kyle Guinn

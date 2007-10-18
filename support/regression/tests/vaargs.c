@@ -64,7 +64,7 @@ returnThirdArg(int marker, ...)
 }
 
 void
-disabled_testArgs(void)
+testArgs(void)
 {
     int marker = 12;
 
@@ -75,6 +75,6 @@ disabled_testArgs(void)
     ASSERT(returnSecondArg(marker, ({type1})1, ({type2})-23, ({type3})64) == -23);
     ASSERT(returnSecondArg(marker, ({type1})1, ({type2})8, ({type3})64) == 8);
 
-    ASSERT(returnThirdArg(marker, -33, -34, -35) == -35);
-    ASSERT(returnThirdArg(marker, -33, -34, 35) == 35);
+    ASSERT(returnThirdArg(marker, ({type1})-33, ({type2})-34, ({type3})-35) == -35);
+    ASSERT(returnThirdArg(marker, ({type1})-33, ({type2})-34, ({type3})35) == 35);
 }

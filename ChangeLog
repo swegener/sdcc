@@ -1,3 +1,8 @@
+2007-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/using.c: new, added
+	* support/regression/tests/vaargs.c: fixed and enabled test
+
 2007-10-18 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCglue.c: fixed bug #983491 - Merge duplicate strings function

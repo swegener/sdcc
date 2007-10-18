@@ -1,3 +1,9 @@
+2007-10-18 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCglue.c: fixed bug #983491 - Merge duplicate strings function
+	  is ineffective
+	* support/regression/tests/bug-983491.c: added regtest for bug #983491
+
 2007-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented option --Werror

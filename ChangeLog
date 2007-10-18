@@ -1,6 +1,8 @@
 2007-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented option --Werror
+	* src/SDCCsymt.c (checkFunction): fixed bug 1815418 by setting
+	  RegBankUsed[] earlier
 
 2007-10-14 Maarten Brock <sourceforge.brock AT dse.nl>
 

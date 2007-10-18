@@ -2507,6 +2507,9 @@ checkFunction (symbol * sym, symbol *csym)
   }
   argCnt--;
 
+  /*JCF: Mark the register bank as used*/
+  RegBankUsed[FUNC_REGBANK (sym->type)] = 1;
+
   if (!csym && !(csym = findSym (SymbolTab, sym, sym->name)))
     return 1;                   /* not defined nothing more to check  */
 
@@ -2537,9 +2540,6 @@ checkFunction (symbol * sym, symbol *csym)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "using");
     }
-
-  /*JCF: Mark the register bank as used*/
-  RegBankUsed[FUNC_REGBANK (sym->type)] = 1;
 
   if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {

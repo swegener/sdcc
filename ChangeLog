@@ -1,3 +1,9 @@
+2007-10-19 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic16/glue.c: fixed bug #983491 - "Merge duplicate strings
+	  function is ineffective" for pic16 tareget
+	* support/scripts/listerr.c: corrected include path 
+
 2007-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/using.c: new, added

@@ -1,7 +1,7 @@
 /*
  * listerr.c - program to create the list of errors and warnings list from SDCCerr.c
  *
- * gcc -I ../Util listerr.c -o listerr
+ * gcc -I ../../src listerr.c -o listerr
  */
 
 #include <stdio.h>

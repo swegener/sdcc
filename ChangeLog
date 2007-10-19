@@ -3,6 +3,8 @@
 	* src/pic16/glue.c: fixed bug #983491 - "Merge duplicate strings
 	  function is ineffective" for pic16 tareget
 	* support/scripts/listerr.c: corrected include path 
+	* device/lib/_itoa.c: fixed bug #1806402 - _itoa and _uitoa leak to
+	  adjacent memory
 
 2007-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

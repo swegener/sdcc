@@ -13,27 +13,30 @@
  radix  ->  Base of value (e.g.: 2 for binary, 10 for decimal, 16 for hex)
 ---------------------------------------------------------------------------*/
 
-#define NUMBER_OF_DIGITS 16
-
 void _uitoa(unsigned int value, char* string, unsigned char radix)
 {
-unsigned char index, i;
-/* char buffer[NUMBER_OF_DIGITS]; */ /* space for NUMBER_OF_DIGITS + '\0' */
+  signed char index = 0, i = 0;
 
-  index = NUMBER_OF_DIGITS;
-  i = 0;
-
+  /* generate the number in reverse order */
   do {
-    string[--index] = '0' + (value % radix);
-    if ( string[index] > '9') string[index] += 'A' - '9' - 1;
+    string[index] = '0' + (value % radix);
+    if (string[index] > '9')
+        string[index] += 'A' - '9' - 1;
     value /= radix;
+    ++index;
   } while (value != 0);
 
-  do {
-    string[i++] = string[index++];
-  } while ( index < NUMBER_OF_DIGITS );
+  /* null terminate the string */
+  string[index--] = '\0';
 
-  string[i] = 0; /* string terminator */
+  /* reverse the order of digits */
+  while (index > i) {
+    char tmp = string[i];
+    string[i] = string[index];
+    string[index] = tmp;
+    ++i;
+    --index;
+  }
 }
 
 void _itoa(int value, char* string, unsigned char radix)

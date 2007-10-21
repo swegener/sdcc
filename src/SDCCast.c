@@ -1533,13 +1533,13 @@ constExprValue (ast * cexpr, int check)
           cexpr->opval.op == CAST &&
           IS_LITERAL (cexpr->right->ftype))
         {
-        return valCastLiteral (cexpr->ftype,
-                               floatFromVal (cexpr->right->opval.val));
+          return valCastLiteral (cexpr->ftype,
+                                 floatFromVal (cexpr->right->opval.val));
         }
 
       if (IS_AST_VALUE (cexpr))
         {
-        return cexpr->opval.val;
+          return cexpr->opval.val;
         }
 
       if (check)
@@ -1572,7 +1572,6 @@ isLabelInAst (symbol * label, ast * tree)
 
   return isLabelInAst (label, tree->right) &&
     isLabelInAst (label, tree->left);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2281,17 +2280,21 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
       case AND_OP:
       case OR_OP:
       case '!':
-        return resultType;
       case '=':
       case '?':
       case ':':
       case '|':
       case '^':
       case '~':
+      case LEFT_OP:
+      case LABEL:
+        return resultType;
       case '*':
       case '+':
       case '-':
-      case LABEL:
+        if ((IS_AST_VALUE (tree->left)  && !IS_INTEGRAL (tree->left->opval.val->etype)) ||
+            (IS_AST_VALUE (tree->right) && !IS_INTEGRAL (tree->right->opval.val->etype)))
+          return RESULT_TYPE_NONE;
         return resultType;
       case '&':
         if (!tree->right)
@@ -3273,8 +3276,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      tree->left  = addCast (tree->left,  resultType, FALSE);
-      tree->right = addCast (tree->right, resultType, FALSE);
+      tree->left  = addCast (tree->left,  resultTypeProp, FALSE);
+      tree->right = addCast (tree->right, resultTypeProp, FALSE);
       TETYPE (tree) = getSpec (TTYPE (tree) =
                                    computeType (LTYPE (tree),
                                                 RTYPE (tree),
@@ -3343,8 +3346,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
           tree->type = EX_VALUE;
-          tree->left  = addCast (tree->left,  resultType, TRUE);
-          tree->right = addCast (tree->right, resultType, TRUE);
+          tree->left  = addCast (tree->left,  resultTypeProp, TRUE);
+          tree->right = addCast (tree->right, resultTypeProp, TRUE);
           tree->opval.val = valPlus (valFromType (LETYPE (tree)),
                                      valFromType (RETYPE (tree)));
           tree->right = tree->left = NULL;
@@ -3414,8 +3417,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                  LTYPE (tree));
       else
         {
-          tree->left  = addCast (tree->left,  resultType, TRUE);
-          tree->right = addCast (tree->right, resultType, TRUE);
+          tree->left  = addCast (tree->left,  resultTypeProp, TRUE);
+          tree->right = addCast (tree->right, resultTypeProp, TRUE);
           TETYPE (tree) = getSpec (TTYPE (tree) =
                                      computeType (LTYPE (tree),
                                                   RTYPE (tree),
@@ -3449,7 +3452,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
               return tree;
             }
-          tree->left  = addCast (tree->left, resultType, TRUE);
+          tree->left  = addCast (tree->left, resultTypeProp, TRUE);
           TETYPE (tree) = getSpec (TTYPE (tree) =
                                      computeType (LTYPE (tree),
                                                   NULL,
@@ -3493,8 +3496,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
           tree->type = EX_VALUE;
-          tree->left  = addCast (tree->left,  resultType, TRUE);
-          tree->right = addCast (tree->right, resultType, TRUE);
+          tree->left  = addCast (tree->left,  resultTypeProp, TRUE);
+          tree->right = addCast (tree->right, resultTypeProp, TRUE);
           tree->opval.val = valMinus (valFromType (LETYPE (tree)),
                                       valFromType (RETYPE (tree)));
           tree->right = tree->left = NULL;
@@ -3526,8 +3529,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                  LTYPE (tree));
       else
         {
-          tree->left  = addCast (tree->left,  resultType, TRUE);
-          tree->right = addCast (tree->right, resultType, TRUE);
+          tree->left  = addCast (tree->left,  resultTypeProp, TRUE);
+          tree->right = addCast (tree->right, resultTypeProp, TRUE);
 
           TETYPE (tree) = getSpec (TTYPE (tree) =
                                      computeType (LTYPE (tree),
@@ -3608,7 +3611,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->opval.val = valComplement (valFromType (LETYPE (tree)));
           tree->left = NULL;
           TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
-          return addCast (tree, resultType, TRUE);
+          return addCast (tree, resultTypeProp, TRUE);
         }
 
       if (resultType == RESULT_TYPE_BIT &&
@@ -3626,7 +3629,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->opval.val = constVal ("1");
         }
       else
-        tree->left = addCast (tree->left, resultType, TRUE);
+        tree->left = addCast (tree->left, resultTypeProp, TRUE);
       LRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));
       return tree;
@@ -3716,7 +3719,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       /* make smaller type only if it's a LEFT_OP */
       if (tree->opval.op == LEFT_OP)
-        tree->left = addCast (tree->left, resultType, TRUE);
+        tree->left = addCast (tree->left, resultTypeProp, TRUE);
 
       /* if they are both literal then */
       /* rewrite the tree */

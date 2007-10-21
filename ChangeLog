@@ -1,8 +1,14 @@
+2007-10-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (resultTypePropagate): do propagate for LEFT_OP, do not
+	  propagate for *,+,- with float, fixed bug 1816470
+	  (decorateType): cast to resultTypeProp instead of resultType
+
 2007-10-19 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic16/glue.c: fixed bug #983491 - "Merge duplicate strings
 	  function is ineffective" for pic16 tareget
-	* support/scripts/listerr.c: corrected include path 
+	* support/scripts/listerr.c: corrected include path
 	* device/lib/_itoa.c: fixed bug #1806402 - _itoa and _uitoa leak to
 	  adjacent memory
 

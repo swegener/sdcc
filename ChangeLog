@@ -1,3 +1,7 @@
+2007-10-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug1816470.c: new, added
+
 2007-10-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (resultTypePropagate): do propagate for LEFT_OP, do not

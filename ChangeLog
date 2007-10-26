@@ -1,6 +1,7 @@
 2007-10-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* src/mcs51/peeph.def: moved rules 257.x to 253.x and re-enabled 253.b
+	* src/mcs51/peeph.def: moved rules 257.x to 253.x and re-enabled 253.b,
+	  added new rules 265 - 270
 	* support/regression/tests/bug1721024.c:new, added
 
 2007-10-25 Maarten Brock <sourceforge.brock AT dse.nl>

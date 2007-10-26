@@ -4582,6 +4582,85 @@ replace {
 } if labelRefCount(%3 1), labelRefCountChange(%3 -1)
 
 
+replace {
+	mov	%1,c
+	cpl	%1
+} by {
+	;	Peephole 265	optimized mov/cpl sequence (carry differs)
+	cpl	c
+	mov	%1,c
+} if notVolatile(%1)
+
+replace {
+	mov	%1,c
+	jb	%1,%2
+} by {
+	;	Peephole 266.a	optimized mov/jump sequence
+	mov	%1,c
+        jc	%2
+} if notVolatile(%1)
+
+replace {
+	mov	%1,c
+	jnb	%1,%2
+} by {
+	;	Peephole 266.b	optimized mov/jump sequence
+	mov	%1,c
+        jnc	%2
+} if notVolatile(%1)
+
+replace {
+	jnc	%1
+	setb	%2
+	sjmp	%3
+%1:
+	clr	%2
+%3:
+} by {
+	;	Peephole 267.a	optimized mov bit sequence
+	mov	%2,c
+%1:
+%3:
+} if labelRefCount(%1 1), labelRefCountChange(%1 -1), labelRefCountChange(%3 -1)
+
+replace {
+	jc	%1
+	clr	%2
+	sjmp	%3
+%1:
+	setb	%2
+%3:
+} by {
+	;	Peephole 267.b	optimized mov bit sequence
+	mov	%2,c
+%1:
+%3:
+} if labelRefCount(%1 1), labelRefCountChange(%1 -1), labelRefCountChange(%3 -1)
+
+replace {
+	mov	%1,c
+	mov	%1,c
+} by {
+	;	Peephole 268	removed redundant mov
+	mov	%1,c
+} if notVolatile(%1)
+
+replace {
+	mov	%1,c
+	mov	c,%1
+} by {
+	;	Peephole 269	removed redundant mov
+	mov	%1,c
+} if notVolatile(%1)
+
+//accessing struct/array on stack
+replace {
+	add	a,#%1
+	add	a,#%2
+} by {
+	;	Peephole 270	removed redundant add
+	add	a,#%1+%2
+}
 replace restart {
 	pop	ar%1
 } by {

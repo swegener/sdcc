@@ -1,3 +1,15 @@
+2007-10-28 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/mcs51-large/spec.mk,
+	  support/regression/ports/mcs51-xstack-auto/spec.mk,
+	  support/regression/ports/mcs51-stack-auto/spec.mk,
+	  support/regression/ports/mcs51-medium/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/mcs51-common/*,
+	  support/regression/ports/mcs51-small/*:
+	  mcs51 renamed to mcs51-common, created mcs51-small
+
 2007-10-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peeph.def: moved rules 257.x to 253.x and re-enabled 253.b,

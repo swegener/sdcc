@@ -1,8 +1,8 @@
-# Port specification for the mcs51 port running with uCsim
+# Port specification for the mcs51-xstack-auto port running with uCsim
 #
 # model small xstack-auto
 
-include $(PORTS_DIR)/mcs51/spec.mk
+include $(PORTS_DIR)/mcs51-common/spec.mk
 
 LIBSRCDIR   = $(top_srcdir)/device/lib
 LIBBUILDDIR = $(top_builddir)/device/lib
@@ -10,10 +10,6 @@ LIBDIR      = $(PORT_CASES_DIR)/lib
 
 LIBSDCCFLAGS+= --stack-auto --xstack --std-c99
 SDCCFLAGS   += --stack-auto --xstack --std-sdcc99
-
-# use C sources from mcs51
-$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51/%.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _decdptr.c _divsint.c _divslong.c _divuint.c \

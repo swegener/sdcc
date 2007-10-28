@@ -1488,14 +1488,14 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopForRemat - rematerialzes an object                           */
+/* aopForRemat - rematerializes an object                          */
 /*-----------------------------------------------------------------*/
 static asmop *
 aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = NULL;
-  int ptr_type=0;
+  int ptr_type = 0;
   int val = 0;
 
   for (;;)
@@ -1504,17 +1504,18 @@ aopForRemat (symbol * sym)
         val += (int) operandLitValue (IC_RIGHT (ic));
       else if (ic->op == '-')
         val -= (int) operandLitValue (IC_RIGHT (ic));
-      else if (IS_CAST_ICODE(ic)) {
-              sym_link *from_type = operandType(IC_RIGHT(ic));
-              aop->aopu.aop_immd.from_cast_remat = 1;
-              ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-              ptr_type = DCL_TYPE(from_type);
-              if (ptr_type == IPOINTER) {
-                // bug #481053
-                ptr_type = POINTER;
-              }
-              continue ;
-      } else break;
+      else if (IS_CAST_ICODE(ic))
+        {
+          sym_link *from_type = operandType(IC_RIGHT(ic));
+          ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+          ptr_type = DCL_TYPE(from_type);
+          if (ptr_type == IPOINTER)
+            {// bug #481053
+              ptr_type = POINTER;
+            }
+          continue ;
+        }
+      else break;
 
       ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
     }
@@ -1522,37 +1523,35 @@ aopForRemat (symbol * sym)
   if (ic->op == ADDRESS_OF)
     {
       if (val)
-        sprintf (buffer, "(%s %c 0x%04x)",
-                 OP_SYMBOL (IC_LEFT (ic))->rname,
-                 val >= 0 ? '+' : '-',
-                 abs (val) & 0xffff);
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "(%s %c 0x%04x)",
+                    OP_SYMBOL (IC_LEFT (ic))->rname,
+                    val >= 0 ? '+' : '-',
+                    abs (val) & 0xffff);
+        }
       else
-        strcpy (buffer, OP_SYMBOL (IC_LEFT (ic))->rname);
+        {
+          strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
+        }
 
       aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
-      strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
+      aop->aopu.aop_immd.aop_immd1 = Safe_strdup(buffer);
       /* set immd2 field if required */
-      if (aop->aopu.aop_immd.from_cast_remat)
-        {
-          sprintf(buffer,"#0x%02x",ptr_type);
-          aop->aopu.aop_immd.aop_immd2 = Safe_calloc (1, strlen (buffer) + 1);
-          strcpy (aop->aopu.aop_immd.aop_immd2, buffer);
-        }
     }
   else if (ic->op == '=')
     {
       val += (int) operandLitValue (IC_RIGHT (ic));
       val &= 0xffff;
-      sprintf (buffer, "0x%04x", val);
+      SNPRINTF (buffer, sizeof(buffer), "0x%04x", val);
       aop = newAsmop (AOP_LIT);
       aop->aopu.aop_lit = constVal (buffer);
     }
   else
-    werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-            "unexpected rematerialization");
-
-
+    {
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+              "unexpected rematerialization");
+    }
 
   return aop;
 }
@@ -2026,10 +2025,14 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       return zero;
       
     case AOP_IMMD:
-      if (aop->aopu.aop_immd.from_cast_remat && (loffset == (aop->size-1))) {
-              sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
-      } else if (bit16)
-        sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
+      if (aop->aopu.aop_immd.from_cast_remat && (loffset == (aop->size-1)))
+        {
+          sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
+        }
+      else if (bit16)
+        {
+          sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
+        }
       else if (loffset)
         {
           if (loffset!=1)

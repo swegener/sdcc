@@ -1,3 +1,11 @@
+2007-10-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdarg.h: fixed bug in va_start macro for --xstack
+	* src/hc08/gen.c (aopForRemat): aop->aopu.aop_immd.from_cast_remat not set,
+	  aop->aopu.aop_immd.aop_immd2 not filled with (generic) pointer type
+	* src/SDCCicode.c (geniCodeCast): fixed bug 880197
+	* support/regression/tests/bug-880197.c: new, added
+
 2007-10-28 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in,

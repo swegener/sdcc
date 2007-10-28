@@ -2067,7 +2067,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       !IS_FIXED (type) &&
       !IS_FIXED (optype) &&
       ((IS_SPEC (type) && IS_SPEC (optype)) ||
-       (!IS_SPEC (type) && !IS_SPEC (optype))))
+       (IS_DECL (type) && IS_DECL (optype) && DCL_TYPE (type) == DCL_TYPE (optype))))
     {
       ic = newiCode ('=', NULL, op);
       IC_RESULT (ic) = newiTempOperand (type, 0);

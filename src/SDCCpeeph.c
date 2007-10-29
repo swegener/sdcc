@@ -821,7 +821,9 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
             op = IC_COND (cl->ic);
             if (IS_SYMOP (op) &&
                 ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
-                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+                  (OP_SYMBOL (op)->isspilt &&
+                   SPIL_LOC (op) &&
+                   !strcmp(SPIL_LOC (op)->rname, symname)) ))
               {
                 return !op->isvolatile;
               }
@@ -829,7 +831,9 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
             op = IC_JTCOND (cl->ic);
             if (IS_SYMOP (op) &&
                 ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
-                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+                  (OP_SYMBOL (op)->isspilt &&
+                   SPIL_LOC (op) &&
+                   !strcmp(SPIL_LOC (op)->rname, symname)) ))
               {
                 return !op->isvolatile;
               }
@@ -837,21 +841,27 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
             op = IC_LEFT (cl->ic);
             if (IS_SYMOP (op) &&
                 ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
-                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+                  (OP_SYMBOL (op)->isspilt &&
+                   SPIL_LOC (op) &&
+                   !strcmp(SPIL_LOC (op)->rname, symname)) ))
               {
                 return !op->isvolatile;
               }
             op = IC_RIGHT (cl->ic);
             if (IS_SYMOP (op) &&
                 ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
-                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+                  (OP_SYMBOL (op)->isspilt &&
+                   SPIL_LOC (op) &&
+                   !strcmp(SPIL_LOC (op)->rname, symname)) ))
               {
                 return !op->isvolatile;
               }
             op = IC_RESULT (cl->ic);
             if (IS_SYMOP (op) &&
                 ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
-                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+                  (OP_SYMBOL (op)->isspilt &&
+                   SPIL_LOC (op) &&
+                   !strcmp(SPIL_LOC (op)->rname, symname)) ))
               {
                 return !op->isvolatile;
               }

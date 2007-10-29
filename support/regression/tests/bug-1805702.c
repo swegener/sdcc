@@ -1,6 +1,8 @@
 /* bug-1805702.c
  */
 
+/* disabled */
+#if 0
 #include <testfwk.h>
 
 int foo;
@@ -13,3 +15,4 @@ test(void)
 
   ASSERT(foo == 10);
 }
+#endif

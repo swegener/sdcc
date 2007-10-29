@@ -99,16 +99,6 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
 }
 
 /*-----------------------------------------------------------------*/
-/* flat24bitModeAndPortDS390 -                                     */
-/*-----------------------------------------------------------------*/
-FBYNAME (flat24bitModeAndPortDS390)
-{
-    return (((strcmp(port->target,"ds390") == 0) ||
-             (strcmp(port->target,"ds400") == 0)) &&
-            (options.model == MODEL_FLAT24));
-}
-
-/*-----------------------------------------------------------------*/
 /* portIsDS390 - return true if port is DS390                      */
 /*-----------------------------------------------------------------*/
 FBYNAME (portIsDS390)
@@ -140,8 +130,6 @@ FBYNAME (useAcallAjmp)
 {
   return (options.acall_ajmp && (strcmp(port->target,"mcs51") == 0));
 }
-
-
 
 /*-----------------------------------------------------------------*/
 /* labelInRange - will check to see if label %5 is within range    */
@@ -181,7 +169,6 @@ FBYNAME (labelInRange)
 
   return TRUE;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* labelJTInRange - will check to see if label %5 and up are       */
@@ -225,7 +212,6 @@ FBYNAME (labelJTInRange)
     }
   return TRUE;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* labelIsReturnOnly - Check if label %5 is followed by RET        */
@@ -280,7 +266,6 @@ FBYNAME (labelIsReturnOnly)
     return TRUE;
   return FALSE;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* labelIsUncondJump - Check if label %5 is followed by an         */
@@ -365,7 +350,6 @@ FBYNAME (labelIsUncondJump)
   return TRUE;
 }
 
-
 /*-----------------------------------------------------------------*/
 /* okToRemoveSLOC - Check if label %1 is a SLOC and not other      */
 /* usage of it in the code depends on a value from this section    */
@@ -411,7 +395,7 @@ FBYNAME (deadMove)
   if (port->peep.deadMove)
     return port->peep.deadMove (reg, currPl, head);
 
-  fprintf (stderr, "Function deadMove not initialized in port structure\n"); 
+  fprintf (stderr, "Function deadMove not initialized in port structure\n");
   return FALSE;
 }
 
@@ -524,7 +508,6 @@ FBYNAME (operandsNotSame6)
   else
     return TRUE;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* operandsNotSame7- check if any pair of %1,%2,%3,.. are the same */
@@ -696,7 +679,6 @@ FBYNAME (labelRefCount)
   return rc;
 }
 
-
 /* labelRefCountChange:
  * takes two parameters: a variable (bound to a label name)
  * and a signed int for changing the reference count.
@@ -773,7 +755,6 @@ FBYNAME (labelRefCountChange)
   return rc;
 }
 
-
 /* Within the context of the lines currPl through endPl, determine
 ** if the variable var contains a symbol that is volatile. Returns
 ** TRUE only if it is certain that this was not volatile (the symbol
@@ -838,22 +819,42 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
           {
           case IFX:
             op = IC_COND (cl->ic);
-            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-              return !op->isvolatile;
+            if (IS_SYMOP (op) &&
+                ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
+                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+              {
+                return !op->isvolatile;
+              }
           case JUMPTABLE:
             op = IC_JTCOND (cl->ic);
-            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-              return !op->isvolatile;
+            if (IS_SYMOP (op) &&
+                ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
+                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+              {
+                return !op->isvolatile;
+              }
           default:
             op = IC_LEFT (cl->ic);
-            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-              return !op->isvolatile;
+            if (IS_SYMOP (op) &&
+                ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
+                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+              {
+                return !op->isvolatile;
+              }
             op = IC_RIGHT (cl->ic);
-            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-              return !op->isvolatile;
+            if (IS_SYMOP (op) &&
+                ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
+                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+              {
+                return !op->isvolatile;
+              }
             op = IC_RESULT (cl->ic);
-            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-              return !op->isvolatile;
+            if (IS_SYMOP (op) &&
+                ( !strcmp(OP_SYMBOL (op)->rname, symname) ||
+                  (OP_SYMBOL (op)->isspilt && !strcmp(SPIL_LOC (op)->rname, symname)) ))
+              {
+                return !op->isvolatile;
+              }
           }
       }
   }
@@ -952,14 +953,12 @@ FBYNAME (notVolatile)
 
   return TRUE;
 
-
 error:
   fprintf (stderr,
            "*** internal error: notVolatile peephole restriction"
            " malformed: %s\n", cmdLine);
   return FALSE;
 }
-
 
 /*------------------------------------------------------------------*/
 /* setFromConditionArgs - parse a peephole condition's arguments    */
@@ -1041,7 +1040,6 @@ operandBaseName (const char *op)
   return op;
 }
 
-
 /*-------------------------------------------------------------------*/
 /* operandsNotRelated - returns true if the condition's operands are */
 /* not related (taking into account register name aliases). N-way    */
@@ -1082,7 +1080,6 @@ FBYNAME (operandsNotRelated)
   return TRUE;
 }
 
-
 /*-------------------------------------------------------------------*/
 /* operandsLiteral - returns true of the condition's operands are    */
 /* literals.                                                         */
@@ -1115,7 +1112,80 @@ FBYNAME (operandsLiteral)
   return TRUE;
 }
 
-
+static const struct ftab
+{
+  char *fname;
+  int (*func) (hTab *, lineNode *, lineNode *, lineNode *, char *);
+}
+ftab[] =                                // sorted on the number of times used
+{                                       // in the peephole rules on 2007-10-29
+  {
+    "labelRefCount", labelRefCount                  //105
+  },
+  {
+    "notVolatile", notVolatile                      //85
+  },
+  {
+    "labelRefCountChange", labelRefCountChange      //74
+  },
+  {
+    "labelInRange", labelInRange                    //37
+  },
+  {
+    "labelJTInRange", labelJTInRange                //13
+  },
+  {
+    "operandsNotRelated", operandsNotRelated        //9
+  },
+  {
+    "24bitMode", flat24bitMode                      //9
+  },
+  {
+    "operandsNotSame", operandsNotSame              //8
+  },
+  {
+    "operandsNotSame3", operandsNotSame3
+  },
+  {
+    "operandsNotSame4", operandsNotSame4
+  },
+  {
+    "operandsNotSame5", operandsNotSame5
+  },
+  {
+    "operandsNotSame6", operandsNotSame6
+  },
+  {
+    "operandsNotSame7", operandsNotSame7
+  },
+  {
+    "operandsNotSame8", operandsNotSame8
+  },
+  {
+    "xramMovcOption", xramMovcOption
+  },
+  {
+    "portIsDS390", portIsDS390
+  },
+  {
+    "labelIsReturnOnly", labelIsReturnOnly
+  },
+  {
+    "labelIsUncondJump", labelIsUncondJump
+  },
+  {
+    "okToRemoveSLOC", okToRemoveSLOC
+  },
+  {
+    "deadMove", deadMove
+  },
+  {
+    "operandsLiteral", operandsLiteral
+  },
+  {
+    "useAcallAjmp", useAcallAjmp
+  }
+};
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
@@ -1126,95 +1196,6 @@ callFuncByName (char *fname,
                 lineNode * endPl,
                 lineNode * head)
 {
-  struct ftab
-  {
-    char *fname;
-    int (*func) (hTab *, lineNode *, lineNode *, lineNode *, char *);
-  }
-  ftab[] =
-  {
-    {
-      "labelInRange", labelInRange
-    }
-    ,
-    {
-      "labelJTInRange", labelJTInRange
-    }
-    ,
-    {
-      "operandsNotSame", operandsNotSame
-    }
-    ,
-    {
-      "operandsNotSame3", operandsNotSame3
-    }
-    ,
-    {
-      "operandsNotSame4", operandsNotSame4
-    }
-    ,
-    {
-      "operandsNotSame5", operandsNotSame5
-    }
-    ,
-    {
-      "operandsNotSame6", operandsNotSame6
-    }
-    ,
-    {
-      "operandsNotSame7", operandsNotSame7
-    }
-    ,
-    {
-      "operandsNotSame8", operandsNotSame8
-    }
-    ,
-    {
-      "24bitMode", flat24bitMode
-    }
-    ,
-    {
-      "xramMovcOption", xramMovcOption
-    }
-    ,
-    {
-      "labelRefCount", labelRefCount
-    }
-    ,
-    {
-      "portIsDS390", portIsDS390
-    },
-    {
-      "labelIsReturnOnly", labelIsReturnOnly
-    },
-    {
-      "labelIsUncondJump", labelIsUncondJump
-    },
-    {
-      "okToRemoveSLOC", okToRemoveSLOC
-    },
-    {
-      "deadMove", deadMove
-    },
-    {
-      "24bitModeAndPortDS390", flat24bitModeAndPortDS390
-    },
-    {
-      "notVolatile", notVolatile
-    },
-    {
-      "operandsNotRelated", operandsNotRelated
-    },
-    {
-      "operandsLiteral", operandsLiteral
-    },
-    {
-      "labelRefCountChange", labelRefCountChange
-    },
-    {
-      "useAcallAjmp", useAcallAjmp
-    }
-  };
   int   i;
   char  *cmdCopy, *funcName, *funcArgs, *cmdTerm;
   char  c;
@@ -1571,18 +1552,18 @@ top:
       newPeepRule (match, replace, lines, restart);
     }
   else
-    {  
+    {
       if (*bp && strncmp (bp, "replace", 7))
         {
           /* not the start of a new peeprule, so "if" should be here */
-          
+
           char strbuff[1000];
           char *cp;
-          
+
           /* go to the start of the line following "{" of the "by" token */
           while (*rp && (*rp == '\n'))
             rp++;
-            
+
           /* copy text of rule starting with line after "by {" */
           cp = strbuff;
           while (*rp && (rp < bp) && ((cp - strbuff) < sizeof(strbuff)))
@@ -1597,7 +1578,7 @@ top:
           return;
         }
       newPeepRule (match, replace, NULL, restart);
-    }    
+    }
   goto top;
 
 }

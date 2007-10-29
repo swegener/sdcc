@@ -1,3 +1,12 @@
+2007-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/peeph.def: replaced 24bitModeAndPortDS390 by
+	  24bitMode, portIsDS390
+	* src/mcs51/gen.c (genOr): optimized for RFE 1750727
+	* src/SDCCpeeph.c (flat24bitModeAndPortDS390): removed
+	  (notVolatileVariable): also check sloc names,
+	  (callFuncByName): moved ftab[] out of function and sorted it by use
+
 2007-10-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdarg.h: fixed bug in va_start macro for --xstack

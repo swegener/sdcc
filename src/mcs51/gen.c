@@ -4171,7 +4171,7 @@ genPlusIncr (iCode * ic)
   D(emitcode (";","genPlusIncr"));
 
   /* if increment >=16 bits in register or direct space */
-  if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG || 
+  if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG ||
         AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ||
         (IS_AOP_PREG (IC_LEFT(ic)) && !AOP_NEEDSACC (IC_LEFT(ic))) ) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
@@ -4640,7 +4640,7 @@ genMinusDec (iCode * ic)
   D (emitcode (";", "genMinusDec"));
 
   /* if decrement >=16 bits in register or direct space */
-  if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG || 
+  if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG ||
         AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ||
         (IS_AOP_PREG (IC_LEFT(ic)) && !AOP_NEEDSACC (IC_LEFT(ic))) ) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
@@ -6638,7 +6638,7 @@ genAnd (iCode * ic, iCode * ifx)
                 {
                   emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
                 }
-			  else
+              else
                 {
                   emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
                   emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
@@ -7067,7 +7067,7 @@ genOr (iCode * ic, iCode * ifx)
                 {
                   emitcode ("orl", "c,%s", AOP (right)->aopu.aop_dir);
                 }
-			  else
+              else
                 {
                   emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
                   emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
@@ -7076,22 +7076,20 @@ genOr (iCode * ic, iCode * ifx)
           else
             {
               // c = bit | val;
-              symbol *tlbl = newiTempLabel (NULL);
-              if (!((AOP_TYPE (result) == AOP_CRY) && ifx))
-                emitcode ("setb", "c");
-              emitcode ("jb", "%s,%05d$",
-                        AOP (left)->aopu.aop_dir, tlbl->key + 100);
-              toBoolean (right);
-              emitcode ("jnz", "%05d$", tlbl->key + 100);
               if ((AOP_TYPE (result) == AOP_CRY) && ifx)
                 {
+                  symbol *tlbl = newiTempLabel (NULL);
+                  emitcode ("jb", "%s,%05d$",
+                            AOP (left)->aopu.aop_dir, tlbl->key + 100);
+                  toBoolean (right);
+                  emitcode ("jnz", "%05d$", tlbl->key + 100);
                   jmpTrueOrFalse (ifx, tlbl, left, right, result);
                   goto release;
                 }
               else
                 {
-                  CLRC;
-                  emitLabel (tlbl);
+                  toCarry (right);
+                  emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
                 }
             }
         }

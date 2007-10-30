@@ -1,10 +1,10 @@
 /* bug-1805702.c
  */
 
-/* disabled */
-#if 0
 #include <testfwk.h>
 
+/* disabled */
+#if 0
 int foo;
 extern int foo;
 

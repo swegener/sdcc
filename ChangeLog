@@ -1,3 +1,10 @@
+2007-10-31 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCsymt.c: fixed (hopeful properly) bug
+	  #1805702 - order of extern matters
+	* support/regression/tests/bug-1805702.c: enabled regtest for bug
+	  #1805702
+
 2007-10-29 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCsymt.c: reverted bad fixed of bug #1805702

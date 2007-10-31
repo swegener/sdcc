@@ -1082,11 +1082,7 @@ addSymChain (symbol ** symHead)
             DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
         }
 
-      /* if already exists in the symbol table then check if
-           one of them is an extern definition;
-         if yes then then check if the type match;
-         if the types match then delete the current entry and
-           add the new entry */
+      /* if already exists in the symbol table on the same level */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
           csym->level == sym->level)
         {
@@ -1097,9 +1093,9 @@ addSymChain (symbol ** symHead)
             error = 1;
           else
             {
-              /* If the previous definition was for an array with incomplete */
-              /* type, and the new definition has completed the type, update */
-              /* the original type to match */
+              /* If the previous definition was for an array with incomplete
+                 type, and the new definition has completed the type, update
+                 the original type to match */
               if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==ARRAY
                   && IS_DECL(sym->type) && DCL_TYPE(sym->type)==ARRAY)
                 {
@@ -1155,6 +1151,14 @@ addSymChain (symbol ** symHead)
 
           if (csym->ival && !sym->ival)
             sym->ival = csym->ival;
+
+          if (!csym->cdef && !sym->cdef && IS_EXTERN (sym->etype))
+            {
+              /* if none of symbols is a compiler defined function
+                 and at least one is not extern
+                 then set the new symbol to non extern */
+              SPEC_EXTR(sym->etype) = SPEC_EXTR(csym->etype);
+            }
 
           /* delete current entry */
           deleteSym (SymbolTab, csym, csym->name);

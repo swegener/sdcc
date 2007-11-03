@@ -712,7 +712,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopForRemat - rematerialzes an object                           */
+/* aopForRemat - rematerializes an object                          */
 /*-----------------------------------------------------------------*/
 static asmop *
 aopForRemat (symbol * sym)
@@ -728,13 +728,15 @@ aopForRemat (symbol * sym)
         val += (int) operandLitValue (IC_RIGHT (ic));
       else if (ic->op == '-')
         val -= (int) operandLitValue (IC_RIGHT (ic));
-      else if (IS_CAST_ICODE(ic)) {
-              sym_link *from_type = operandType(IC_RIGHT(ic));
-              aop->aopu.aop_immd.from_cast_remat = 1;
-              ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-              ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type), NULL, NULL);
-              continue;
-      } else break;
+      else if (IS_CAST_ICODE(ic))
+        {
+          sym_link *from_type = operandType(IC_RIGHT(ic));
+          aop->aopu.aop_immd.from_cast_remat = 1;
+          ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+          ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type), NULL, NULL);
+          continue;
+        }
+      else break;
 
       ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
     }
@@ -1857,9 +1859,12 @@ outBitC (operand * result)
     }
   else
     {
-      emitcode ("clr", "a");
-      emitcode ("rlc", "a");
-      outAcc (result);
+      if (getDataSize (result))
+        {
+          emitcode ("clr", "a");
+          emitcode ("rlc", "a");
+          outAcc (result);
+        }
     }
 }
 
@@ -10352,7 +10357,9 @@ genPointerGet (iCode * ic, iCode *pi, iCode *ifx)
   etype = getSpec (type);
   /* if left is of type of pointer then it is simple */
   if (IS_PTR (type) && !IS_FUNC (type->next))
-    p_type = DCL_TYPE (type);
+    {
+      p_type = DCL_TYPE (type);
+    }
   else
     {
       /* we have to go by the storage class */

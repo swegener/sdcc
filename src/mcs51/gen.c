@@ -1857,14 +1857,11 @@ outBitC (operand * result)
       if (!IS_OP_RUONLY (result))
         aopPut (result, "c", 0);
     }
-  else
+  else if (AOP_TYPE (result) != AOP_DUMMY)
     {
-      if (getDataSize (result))
-        {
-          emitcode ("clr", "a");
-          emitcode ("rlc", "a");
-          outAcc (result);
-        }
+      emitcode ("clr", "a");
+      emitcode ("rlc", "a");
+      outAcc (result);
     }
 }
 

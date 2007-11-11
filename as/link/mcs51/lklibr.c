@@ -24,7 +24,7 @@
 #include <ctype.h>
 #include "aslink.h"
 
-/*)Module       lklibr.c
+/*)Module   lklibr.c
  *
  *  The module lklibr.c contains the functions which
  *  (1) specify the path(s) to library files [.LIB]
@@ -68,7 +68,7 @@ struct slibraryfile {
 /* First entry in the library object symbol cache */
 pmlibraryfile libr=NULL;
 
-int buildlibraryindex();
+int buildlibraryindex(void);
 void freelibraryindex (void);
 #endif /* INDEXLIB */
 
@@ -97,7 +97,7 @@ void freelibraryindex (void);
  */
 
 VOID
-addpath()
+addpath(void)
 {
     struct lbpath *lbph, *lbp;
 
@@ -107,7 +107,9 @@ addpath()
     } else {
         lbp = lbphead;
         while (lbp->next)
+        {
             lbp = lbp->next;
+        }
         lbp->next = lbph;
     }
     unget(getnb());
@@ -143,7 +145,7 @@ addpath()
  */
 
 VOID
-addlib()
+addlib(void)
 {
     struct lbpath *lbph;
     int foundcount=0;
@@ -217,11 +219,11 @@ int addfile(char * path, char * libfil)
     if (path != NULL)
     {
         str = (char *) new (strlen(path) + strlen(libfil) + 6);
-        strcpy(str,path);
+        strcpy(str, path);
 #ifdef  OTHERSYSTEM
-        if (strlen(str) && (str[strlen(str)-1] != '/') && (str[strlen(str)-1] != '\\'))
+        if (strlen(str) && (str[strlen(str)-1] != '/') && (str[strlen(str)-1] != LKDIRSEP))
         {
-            strcat(str,"/");
+            strcat(str, LKDIRSEPSTR);
         }
 #endif
     }
@@ -231,7 +233,7 @@ int addfile(char * path, char * libfil)
     }
 
 #ifdef  OTHERSYSTEM
-    if ((libfil[0] == '/') || (libfil[0] == '\\'))
+    if ((libfil[0] == '/') || (libfil[0] == LKDIRSEP))
     {
         libfil++;
         libfilinc=1;
@@ -255,14 +257,14 @@ int addfile(char * path, char * libfil)
         if(fp != NULL)
         {
             /*Bingo!  'libfil' is the absolute path of the library*/
-           strcpy(str, libfil);
+            strcpy(str, libfil);
             path=NULL;/*This way 'libfil' and 'path' will be rebuilt from 'str'*/
         }
     }
 
     if(path==NULL)
     {
-        /*'path' can not be null since it is needed to find the '.rel' files associated with
+        /*'path' can not be null since it is needed to find the object files associated with
         the library.  So, get 'path' from 'str' and then chop it off and recreate 'libfil'.
         That way putting 'path' and 'libfil' together will result into the original filepath
         as contained in 'str'.*/
@@ -271,7 +273,7 @@ int addfile(char * path, char * libfil)
         strcpy(path, str);
         for(j=strlen(path)-1; j>=0; j--)
         {
-            if((path[j] == '/') || (path[j] == '\\'))
+            if((path[j] == '/') || (path[j] == LKDIRSEP))
             {
                 strcpy(libfil, &path[j+1]);
                 path[j+1]=0;
@@ -293,13 +295,15 @@ int addfile(char * path, char * libfil)
         {
             lbn = lbnhead;
             while (lbn->next)
+            {
                 lbn = lbn->next;
+            }
             lbn->next = lbnh;
         }
 
         lbnh->path = path;
         lbnh->libfil = (char *) new (strlen(libfil) + 1);
-        strcpy(lbnh->libfil,libfil);
+        strcpy(lbnh->libfil, libfil);
         lbnh->libspc = str;
         return 1;
     }
@@ -342,10 +346,10 @@ int addfile(char * path, char * libfil)
  */
 
 VOID
-search()
+search(void)
 {
     register struct sym *sp;
-    register int i,symfnd;
+    register int i, symfnd;
 
     /*
      * Look for undefined symbols.  Keep
@@ -400,7 +404,7 @@ void LoadRel(char * libfname, FILE * libfp, char * ModName)
                     if(EQ(str, ModName)) state=1;
                     else
                     {
-                        fprintf(stderr, "?Aslink-Error-Bad offset in library file %s(%s)\n",
+                        fprintf(stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n",
                             libfname, ModName);
                         lkexit(1);
                     }
@@ -418,9 +422,9 @@ void LoadRel(char * libfname, FILE * libfp, char * ModName)
     }
 }
 
-/*Load an .adb file embedded in a sdcclib file.  If there is
+/*Load an .adb file embedded in a sdcclib file. If there is
 something between <ADB> and </ADB> returns 1, otherwise returns 0.
-This way the aomf51 will not have uselless empty modules. */
+This way the aomf51 will not have useless empty modules. */
 
 int LoadAdb(FILE * libfp)
 {
@@ -447,7 +451,7 @@ int LoadAdb(FILE * libfp)
     return ToReturn;
 }
 
-/*Check for a symbol in a SDCC library.  If found, add the embedded .rel and
+/*Check for a symbol in a SDCC library. If found, add the embedded .rel and
 .adb files from the library.  The library must be created with the SDCC
 librarian 'sdcclib' since the linking process depends on the correct file offsets
 embedded in the library file.*/
@@ -512,7 +516,7 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
                         /*As in the original library format, it is assumed that the .rel
                         files reside in the same directory as the lib files.*/
                         strcat(DirLib, ModName);
-                        sprintf(&DirLib[strlen(DirLib)], "%crel", FSEPX);
+                        sprintf(&DirLib[strlen(DirLib)], "%c%s", FSEPX, LKOBJEXT);
 
                         /*If this module has been loaded already don't load it again.*/
                         lbf = lbfhead;
@@ -534,7 +538,9 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
                         {
                             lbf = lbfhead;
                             while (lbf->next)
-                            lbf = lbf->next;
+                            {
+                                lbf = lbf->next;
+                            }
                             lbf->next = lbfh;
                         }
 
@@ -678,7 +684,9 @@ int fndsym( char *name )
                     {
                         lbf = lbfhead;
                         while (lbf->next)
-                        lbf = lbf->next;
+                        {
+                            lbf = lbf->next;
+                        }
                         lbf->next = lbfh;
                     }
                     lbfh->libspc = ThisLibr->libspc;
@@ -733,7 +741,7 @@ int fndsym( char *name )
                     {
                         if(numfound==1)
                         {
-                            fprintf(stderr, "?Aslink-Warning-Definition of public symbol '%s'"
+                            fprintf(stderr, "?ASlink-Warning-Definition of public symbol '%s'"
                                    " found more than once:\n", name);
                             fprintf(stderr, "   Library: '%s', Module: '%s'\n",
                                     FirstFound->libspc, FirstFound->relfil);
@@ -808,7 +816,7 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
                     This->relfil=(char *)new(strlen(ModName)+1);
                     strcpy(This->relfil, ModName);
 
-                    sprintf(buff, "%s%s%crel", DirLib, ModName, FSEPX);
+                    sprintf(buff, "%s%s%c%s", DirLib, ModName, FSEPX, LKOBJEXT);
                     This->filename=(char *)new(strlen(buff)+1);
                     strcpy(This->filename, buff);
 
@@ -870,12 +878,11 @@ int buildlibraryindex(void)
     /*
      * Search through every library in the linked list "lbnhead".
      */
-
     for (lbnh=lbnhead; lbnh; lbnh=lbnh->next)
     {
         if ((libfp = fopen(lbnh->libspc, "r")) == NULL)
         {
-            fprintf(stderr, "?Aslink-Error-Cannot open library file %s\n",
+            fprintf(stderr, "?ASlink-Error-Cannot open library file %s\n",
                 lbnh->libspc);
             lkexit(1);
         }
@@ -895,9 +902,9 @@ int buildlibraryindex(void)
             {
                 strcpy(str, path);
 #ifdef  OTHERSYSTEM
-                if (strlen(str) && (str[strlen(str)-1] != '/') && (str[strlen(str)-1] != '\\'))
+                if (strlen(str) && (str[strlen(str)-1] != '/') && (str[strlen(str)-1] != LKDIRSEP))
                 {
-                    strcat(str,"/");
+                    strcat(str, LKDIRSEPSTR);
                 }
 #endif
             }
@@ -915,18 +922,18 @@ int buildlibraryindex(void)
 
             /*From here down, build the index for the original library format*/
 
-            if (relfil[0] == '\\')
+            if ((relfil[0] == '/') || (relfil[0] == LKDIRSEP))
             {
-                strcat(str,relfil+1);
+                strcat(str, relfil+1);
             }
             else
             {
-                strcat(str,relfil);
+                strcat(str, relfil);
             }
 
             if(strchr(relfil, FSEPX) == NULL)
             {
-                sprintf(&str[strlen(str)], "%crel", FSEPX);
+                sprintf(&str[strlen(str)], "%c%s", FSEPX, LKOBJEXT);
             }
 
             if ((fp = fopen(str, "r")) != NULL)
@@ -953,7 +960,7 @@ int buildlibraryindex(void)
                 strcpy(This->filename, str);
 
                 /*Start a new linked list of symbols for this module:*/
-                This->symbols=ThisSym=NULL;
+                This->symbols = ThisSym = NULL;
 
                 /*
                  * Read in the object file.  Look for lines that
@@ -1003,7 +1010,7 @@ int buildlibraryindex(void)
             } /* Closes if object file opened OK */
             else
             {
-                fprintf(stderr, "?Aslink-Warning-Cannot open library module %s\n", str);
+                fprintf(stderr, "?ASlink-Warning-Cannot open library module %s\n", str);
             }
         } /* Ends while - processing all in libr */
         fclose(libfp);
@@ -1043,8 +1050,7 @@ void freelibraryindex (void)
 #else /* INDEXLIB */
 
 int
-fndsym(name)
-char *name;
+fndsym(char *name)
 {
     FILE *libfp, *fp;
     struct lbname *lbnh;
@@ -1064,7 +1070,7 @@ char *name;
     {
         if ((libfp = fopen(lbnh->libspc, "r")) == NULL)
         {
-            fprintf(stderr, "?Aslink-Error-Cannot open library file %s\n",
+            fprintf(stderr, "?ASlink-Error-Cannot open library file %s\n",
                 lbnh->libspc);
             lkexit(1);
         }
@@ -1085,9 +1091,9 @@ char *name;
                 str = (char *) new (strlen(path)+strlen(relfil)+6);
                 strcpy(str,path);
 #ifdef  OTHERSYSTEM
-                if (strlen(str) && (str[strlen(str)-1] != '/') && (str[strlen(str)-1] != '\\'))
+                if (strlen(str) && (str[strlen(str)-1] != '/') && (str[strlen(str)-1] != LKDIRSEP))
                 {
-                    strcat(str,"/");
+                    strcat(str, LKDIRSEPSTR);
                 }
 #endif
             }
@@ -1096,6 +1102,7 @@ char *name;
                 str = (char *) new (strlen(relfil) + 5);
             }
 
+            /*See if this is a library with embedded files*/
             if(strcmp(relfil, "<SDCCLIB>")==0)
             {
                 result=SdccLib(lbnh->libspc, libfp, str, name);
@@ -1107,23 +1114,22 @@ char *name;
             }
 
             /*From here down is the support for libraries in the original format*/
-            if (relfil[0] == '\\')
+            if ((relfil[0] == '/') || (relfil[0] == LKDIRSEP))
             {
-                strcat(str,relfil+1);
+                strcat(str, relfil+1);
             }
             else
             {
-                strcat(str,relfil);
+                strcat(str, relfil);
             }
 
             if(strchr(relfil, FSEPX) == NULL)
             {
-                sprintf(&str[strlen(str)], "%crel", FSEPX);
+                sprintf(&str[strlen(str)], "%c%s", FSEPX, LKOBJEXT);
             }
 
             if ((fp = fopen(str, "r")) != NULL)
             {
-
                 /*
                  * Read in the object file.  Look for lines that
                  * begin with "S" and end with "D".  These are
@@ -1139,22 +1145,24 @@ char *name;
                     /*
                      * Skip everything that's not a symbol record.
                      */
-                    if (buf[0] != 'S') continue;
+                    if (buf[0] != 'S')
+                        continue;
 
                     /*
-                    * When a 'T line' is found terminate file scan.
-                    * All 'S line's preceed 'T line's in .REL files.
-                    */
-                    if (buf[0] == 'T') break;
+                     * When a 'T line' is found terminate file scan.
+                     * All 'S line's preceed 'T line's in .REL files.
+                     */
+                    if (buf[0] == 'T')
+                        break;
 
                     sscanf(buf, "S %s %c", symname, &c);
 
                     /*
-                    * If we find a symbol definition for the
-                    * symbol we're looking for, load in the
-                    * file and add it to lbfhead so it gets
-                    * loaded on pass number 2.
-                    */
+                     * If we find a symbol definition for the
+                     * symbol we're looking for, load in the
+                     * file and add it to lbfhead so it gets
+                     * loaded on pass number 2.
+                     */
                     if (strncmp(symname, name, NCPS) == 0 && c == 'D')
                     {
                         lbfh = (struct lbfile *) new (sizeof(struct lbfile));
@@ -1166,7 +1174,9 @@ char *name;
                         {
                             lbf = lbfhead;
                             while (lbf->next)
-                            lbf = lbf->next;
+                            {
+                                lbf = lbf->next;
+                            }
                             lbf->next = lbfh;
                         }
 
@@ -1192,27 +1202,45 @@ char *name;
                         loadfile(str);
                         return (1);
                     }
-                }
+                } /* Closes while - read object file */
                 fclose(fp);
+            } /* Closes if object file opened OK */
+            else
+            {
+                fprintf(stderr, "?ASlink-Warning-Cannot open library module %s\n", str);
             }
             free(str);
-        }
+        } /* Ends while - processing all in libr */
         fclose(libfp);
-    }
+    } /* Ends good open of libr file */
     return(0);
 }
 
-#endif /*INDEXLIB*/
+#endif /* INDEXLIB */
 
 void loadfile_SdccLib(char * libspc, char * module, long offset)
 {
     FILE *fp;
 
-    if ((fp = fopen(libspc,"r")) != NULL)
+#ifdef __CYGWIN__
+    char posix_path[PATH_MAX];
+    void cygwin_conv_to_full_posix_path(char * win_path, char * posix_path);
+    cygwin_conv_to_full_posix_path(libspc, posix_path);
+    fp = fopen(posix_path, "r");
+#else
+    fp = fopen(libspc,"r");
+#endif
+
+    if (fp != NULL)
     {
         fseek(fp, offset, SEEK_SET);
         LoadRel(libspc, fp, module);
         fclose(fp);
+    }
+    else
+    {
+        fprintf(stderr, "?ASlink-Error-Opening library '%s'\n", libspc);
+        lkexit(1);
     }
 }
 
@@ -1235,7 +1263,7 @@ void loadfile_SdccLib(char * libspc, char * module, long offset)
  */
 
 VOID
-library()
+library(void)
 {
     struct lbfile *lbfh;
 
@@ -1269,7 +1297,7 @@ library()
  *      char    str[]       file input line
  *
  *  global variables:
- *      char    *ip     pointer to linker input string
+ *      char    *ip         pointer to linker input string
  *
  *   functions called:
  *      int     fclose()    c_library
@@ -1283,19 +1311,34 @@ library()
  */
 
 VOID
-loadfile(filspc)
-char *filspc;
+loadfile(char *filspc)
 {
     FILE *fp;
     char str[NINPUT+2];
 
-    if ((fp = fopen(filspc,"r")) != NULL) {
-        while (fgets(str, NINPUT, fp) != NULL) {
+#ifdef __CYGWIN__
+    char posix_path[PATH_MAX];
+    void cygwin_conv_to_full_posix_path(char * win_path, char * posix_path);
+    cygwin_conv_to_full_posix_path(filspc, posix_path);
+    fp = fopen(posix_path, "r");
+#else
+    fp = fopen(filspc,"r");
+#endif
+
+    if (fp != NULL)
+    {
+        while (fgets(str, NINPUT, fp) != NULL)
+        {
             str[NINPUT+1] = '\0';
             chop_crlf(str);
             ip = str;
             link_main();
         }
         fclose(fp);
+    }
+    else
+    {
+        fprintf(stderr, "?ASlink-Error-Opening library '%s'\n", filspc);
+        lkexit(1);
     }
 }

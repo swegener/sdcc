@@ -508,7 +508,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 			} else
 			if (ftype == F_REL) {
 				sfp = afile(fid, LKOBJEXT, 0);
-				/* if a .cdb file exists then copy it over */
+				/* if a .adb file exists then copy it over */
 				if (dflag && sfp && dfp && pass == 0) {
 					FILE *xfp = afile(fid,"adb",0); //JCF: Nov 30, 2002
 					if (xfp) {

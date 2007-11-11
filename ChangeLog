@@ -1,3 +1,28 @@
+2007-11-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/hc08/asmain.c,
+	* as/z80/asmain.c: cosmetic changes
+	* as/hc08/alloc.h,
+	* as/mcs51/alloc.h,
+	* as/z80/alloc.h: removed
+	* as/hc08/assym.c,
+	* as/mcs51/assym.c: replaced alloc.h with stdlib.h
+	* as/link/aslink.h: added LKDIRSEP and, LKDIRSEPSTR
+	* as/link/hc08/Makefile.in,
+	* as/link/mcs51/Makefile.in,
+	* as/link/z80/Makefile.in: added -DUNIX to CFLAGS
+	* as/link/lklex.c,
+	* as/link/mcs51/lkarea.c,
+	* as/link/mcs51/lkmain.c: cosmetic changes
+	* as/link/hc08/lklibr.c,
+	* as/link/z80/lklibr.c,
+	* as/link/mcs51/lklibr.c: used LKDIRSEP, LKDIRSEPSTR and LKOBJEXT,
+	  used cygwin_conv_to_full_posix_path,
+	  added warnings, cosmetic changes, brought more in sync
+	  changed old K&R into ANSI function declarations
+	* as/link/z80/lklibr.c (loadAdb): added
+	* as/link/z80/lkmain.c: removed -- option from usage text
+
 2007-11-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (outBitC): optimized for no result

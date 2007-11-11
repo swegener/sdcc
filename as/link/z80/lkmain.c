@@ -1420,9 +1420,6 @@ char *usetxt[] = {
         "\n",
 #endif
         "Startup:",
-#ifdef SDK
-        "  --   [Commands]              Non-interactive command line input",
-#endif /* SDK */
         "  -c                           Command line input",
         "  -f   file[LNK]               File input",
         "  -p   Prompt and echo of file[LNK] to stdout (default)",

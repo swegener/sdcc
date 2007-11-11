@@ -1022,7 +1022,7 @@ loop:
 	 */
 	default:
 		machine(mp);
-		/* if cdb information the generate the line info */
+		/* if cdb information then generate the line info */
 		if (cflag && (pass == 1))
 		    DefineCDB_Line();
 

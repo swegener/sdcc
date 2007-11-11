@@ -8,7 +8,7 @@
  * 721 Berkeley St.
  * Kent, Ohio  44240
  *
- * 28-Oct-97 JLH: 
+ * 28-Oct-97 JLH:
  *	     - lookup: Use StoreString for sym construction
  *	     - change symeq() to do length-independent string compare
  *	     - change hash() to do length-independent hash calculation
@@ -21,11 +21,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
-#if defined(_MSC_VER)
-#include <malloc.h>
-#else
-#include <alloc.h>
-#endif
+#include <stdlib.h>
 #include "asm.h"
 
 /*)Module	assym.c
@@ -385,7 +381,7 @@ register char *p1, *p2;
  *	side effects:
  *		none
  */
- 
+
 int
 hash(p)
 register char *p;

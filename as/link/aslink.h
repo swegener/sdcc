@@ -56,29 +56,40 @@
         $(STACK) = 2000
 */
 
+#if defined  decus
 /* DECUS C void definition */
 /* File/extension seperator */
 
-#ifdef  decus
-#define VOID    char
-#define FSEPX   '.'
-#endif
+#define VOID        char
+#define FSEPX       '.'
 
+#elif defined  PDOS
 /* PDOS C void definition */
 /* File/extension seperator */
 
-#ifdef  PDOS
-#define VOID    char
-#define FSEPX   ':'
-#endif
+#define VOID        char
+#define FSEPX       ':'
 
-/* Default void definition */
+#elif defined UNIX
+/* UNIX void definition */
 /* File/extension seperator */
 
-#ifndef VOID
-#define VOID    void
-#define FSEPX   '.'
+#define VOID        void
+#define FSEPX       '.'
+#define LKDIRSEP    '/'
+#define LKDIRSEPSTR "/"
 #define OTHERSYSTEM
+
+#else
+/* DOS/WINDOWS void definition */
+/* File/extension seperator */
+
+#define VOID        void
+#define FSEPX       '.'
+#define LKDIRSEP    '\\'
+#define LKDIRSEPSTR "\\"
+#define OTHERSYSTEM
+
 #endif
 
 /*

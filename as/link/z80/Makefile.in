@@ -23,7 +23,7 @@ SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)
 BINS	= $(BUILDDIR)link$(EXT)$(EXEEXT)
 
 CPPFLAGS+= -I.. -I$(srcdir)/..
-CFLAGS	+= $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
+CFLAGS	+= $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DSDK
 CFLAGS	+= -funsigned-char -DUNIX
 CFLAGS	+= -I$(top_builddir)/as/$(PORT) -I$(SLIB)
 

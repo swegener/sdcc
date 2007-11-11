@@ -567,7 +567,7 @@ loop:
 		goto loop;
 	}
 	/*
-	 * If the first character is a letter then assume a lable,
+	 * If the first character is a letter then assume a label,
 	 * symbol, assembler directive, or assembler mnemonic is
 	 * being processed.
 	 */
@@ -577,7 +577,7 @@ loop:
                 } else {
 			qerr();
 		}
-        }
+	}
 	getid(id, c);
 	c = getnb();
 	/*

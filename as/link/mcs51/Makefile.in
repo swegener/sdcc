@@ -34,7 +34,7 @@ EXEEXT          = @EXEEXT@
 VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
-CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB
+CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -DUNIX
 M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@
 

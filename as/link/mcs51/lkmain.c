@@ -289,7 +289,7 @@ main(int argc, char *argv[])
             break;
         if (pflag && sfp != stdin)
             fprintf(stdout, "%s\n", ip);
-               if (*ip == '\0' || parse())
+        if (*ip == '\0' || parse())
             break;
     }
 
@@ -308,7 +308,7 @@ main(int argc, char *argv[])
         SaveLinkedFilePath(linkp->f_idp); //Must be the first one...
         dfp = afile(linkp->f_idp,"cdb",1); //JCF: Nov 30, 2002
         if (dfp == NULL)
-        lkexit(1);
+            lkexit(1);
     }
 
     for (pass=0; pass<2; ++pass) {

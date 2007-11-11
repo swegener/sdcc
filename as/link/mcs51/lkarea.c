@@ -1043,7 +1043,7 @@ Addr_T lnksect2 (struct area *tap, int locIndex)
                     {
                         taxp->a_addr = j-k+1;
                         for(j=taxp->a_addr; (j<(int)(taxp->a_addr+taxp->a_size)) && (j<0x30); j++)
-                        idatamap[j]=fchar;
+                            idatamap[j]=fchar;
                     }
                     else /*Couldn't find a chunk big enough: report the problem.*/
                     {

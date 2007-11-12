@@ -1,7 +1,8 @@
 2007-11-12 Borut Razem <borut.razem AT siol.net>
 
 	* as\z80\asmain.c, as\z80\asm.h, as\z80\assym.c, as\z80\asdata.c,
-	  as\z80\asout.c: fixed bug #1817005 - as-z80 chokes on long labels
+	  as\z80\asout.c, as\z80\aslist.c:
+	  fixed bug #1817005 - as-z80 chokes on long labels
 
 2007-11-10 Maarten Brock <sourceforge.brock AT dse.nl>
 

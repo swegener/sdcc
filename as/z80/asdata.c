@@ -146,7 +146,7 @@ char    module[NCPS];   /*      module name string
  *      struct  mne
  *      {
  *              struct  mne *m_mp;      Hash link
- *              char    m_id[NCPS];     Mnemonic
+ *              char    *m_id;          Mnemonic
  *              char    m_type;         Mnemonic subtype
  *              char    m_flag;         Mnemonic flags
  *              Addr_T  m_valu;         Value
@@ -171,7 +171,7 @@ struct  mne     *mnehash[NHASH];
  *      {
  *              struct  sym  *s_sp;     Hash link
  *              struct  tsym *s_tsym;   Temporary symbol link
- *              char    s_id[NCPS];     Symbol
+ *              char    *s_id;          Symbol
  *              char    s_type;         Symbol subtype
  *              char    s_flag;         Symbol flags
  *              struct  area *s_area;   Area line, 0 if absolute

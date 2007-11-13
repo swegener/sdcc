@@ -1,3 +1,8 @@
+2007-11-13 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/bug-1817005.c:
+	  added regtest for bug #1817005 - as-z80 chokes on long labels
+
 2007-11-12 Borut Razem <borut.razem AT siol.net>
 
 	* as\z80\asmain.c, as\z80\asm.h, as\z80\assym.c, as\z80\asdata.c,

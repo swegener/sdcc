@@ -81,7 +81,7 @@ initSymt ()
 
 }
 /*-----------------------------------------------------------------*/
-/* newBucket - allocates & returns a new bucket        */
+/* newBucket - allocates & returns a new bucket                    */
 /*-----------------------------------------------------------------*/
 bucket *
 newBucket ()
@@ -118,7 +118,7 @@ addSym (bucket ** stab,
         int checkType)
 {
   int i;                        /* index into the hash Table */
-  bucket *bp;                   /* temp bucket    *         */
+  bucket *bp;                   /* temp bucket    *          */
 
   if (checkType) {
     symbol *csym = (symbol *)sym;
@@ -141,8 +141,8 @@ addSym (bucket ** stab,
   /* get a free entry */
   bp = Safe_alloc ( sizeof (bucket));
 
-  bp->sym = sym;                /* update the symbol pointer  */
-  bp->level = level;            /* update the nest level      */
+  bp->sym = sym;                /* update the symbol pointer */
+  bp->level = level;            /* update the nest level     */
   bp->block = block;
   strncpyz (bp->name, sname, sizeof(bp->name)); /* copy the name into place */
 
@@ -163,7 +163,7 @@ addSym (bucket ** stab,
 }
 
 /*-----------------------------------------------------------------*/
-/* deleteSym - deletes a symbol from the hash Table  entry     */
+/* deleteSym - deletes a symbol from the hash Table entry          */
 /*-----------------------------------------------------------------*/
 void
 deleteSym (bucket ** stab, void *sym, char *sname)
@@ -203,7 +203,7 @@ deleteSym (bucket ** stab, void *sym, char *sname)
 }
 
 /*-----------------------------------------------------------------*/
-/* findSym - finds a symbol in a table           */
+/* findSym - finds a symbol in a table                             */
 /*-----------------------------------------------------------------*/
 void *
 findSym (bucket ** stab, void *sym, const char *sname)
@@ -690,9 +690,9 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   return dest;
 }
 
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 /* genSymName - generates and returns a name used for anonymous vars */
-/*------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 char *
 genSymName (int level)
 {
@@ -747,7 +747,7 @@ newFloatLink ()
 }
 
 /*------------------------------------------------------------------*/
-/* newFixed16x16Link - a new Float type                                  */
+/* newFixed16x16Link - a new Float type                             */
 /*------------------------------------------------------------------*/
 sym_link *
 newFixed16x16Link ()
@@ -1007,7 +1007,7 @@ copySymbol (symbol * src)
 }
 
 /*------------------------------------------------------------------*/
-/* reverseSyms - reverses the links for a symbol chain      */
+/* reverseSyms - reverses the links for a symbol chain              */
 /*------------------------------------------------------------------*/
 symbol *
 reverseSyms (symbol * sym)
@@ -1032,7 +1032,7 @@ reverseSyms (symbol * sym)
 }
 
 /*------------------------------------------------------------------*/
-/* reverseLink - reverses the links for a type chain        */
+/* reverseLink - reverses the links for a type chain                */
 /*------------------------------------------------------------------*/
 sym_link *
 reverseLink (sym_link * type)
@@ -1685,14 +1685,14 @@ changePointer (sym_link * p)
 }
 
 /*------------------------------------------------------------------*/
-/* checkDecl - does semantic validation of a declaration                   */
+/* checkDecl - does semantic validation of a declaration            */
 /*------------------------------------------------------------------*/
 int
 checkDecl (symbol * sym, int isProto)
 {
 
-  checkSClass (sym, isProto);           /* check the storage class      */
-  changePointer (sym->type);          /* change pointers if required */
+  checkSClass (sym, isProto);        /* check the storage class     */
+  changePointer (sym->type);         /* change pointers if required */
 
   /* if this is an array without any dimension
      then update the dimension from the initial value */
@@ -2090,7 +2090,12 @@ compareType (sym_link * dest, sym_link * src)
               (IS_GENPTR (dest) ||
                ((DCL_TYPE(src) == POINTER) && (DCL_TYPE(dest) == IPOINTER))
              ))
-            return -1;
+            {
+              if (compareType (dest->next, src->next))
+                return -1;
+              else
+                return 0;
+            }
           if (IS_PTR (dest) && IS_ARRAY (src))
             {
               value *val=aggregateToPointer (valFromType(src));
@@ -2108,6 +2113,9 @@ compareType (sym_link * dest, sym_link * src)
       else
         return 0;
     }
+
+  if (IS_PTR (src) && IS_VOID (dest))
+    return -1;
 
   /* if one is a specifier and the other is not */
   if ((IS_SPEC (src) && !IS_SPEC (dest)) ||
@@ -2343,7 +2351,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
 }
 
 /*------------------------------------------------------------------*/
-/* inCalleeSaveList - return 1 if found in callee save list          */
+/* inCalleeSaveList - return 1 if found in callee save list         */
 /*------------------------------------------------------------------*/
 static int
 calleeCmp(void *p1, void *p2)

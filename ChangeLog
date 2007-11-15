@@ -1,3 +1,9 @@
+2007-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdarg.h: added and removed some casts
+	* src/SDCCsymt.c (compareType): Fully check types between generic and
+	  non-generic pointers, also accept ptr-ptr to void-ptr assignments
+
 2007-11-13 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bug-1817005.c:
@@ -9,7 +15,7 @@
 	  as\z80\asout.c, as\z80\aslist.c:
 	  fixed bug #1817005 - as-z80 chokes on long labels
 
-2007-11-10 Maarten Brock <sourceforge.brock AT dse.nl>
+2007-11-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/hc08/asmain.c,
 	* as/z80/asmain.c: cosmetic changes

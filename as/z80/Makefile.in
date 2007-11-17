@@ -5,7 +5,7 @@ top_srcdir   = @top_srcdir@
 
 include $(top_builddir)/Makefile.common
 
-OBJDIR = obj/$(EXT)
+OBJDIR = obj$(EXT)
 
 ASXXLIB = $(srcdir)/../asxxsrc
 

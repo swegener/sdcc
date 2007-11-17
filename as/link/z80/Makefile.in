@@ -5,42 +5,60 @@ top_srcdir   = @top_srcdir@
 
 include $(top_builddir)/Makefile.common
 
-OBJDIR	= obj$(EXT)
+OBJDIR = obj$(EXT)
 
-SLIBSRC	= NewAlloc.c
+ASXXLIB = $(srcdir)/../../asxxsrc
 
-SRC	= lkmain.c lkarea.c lkihx.c \
-	  lklibr.c lkrloc.c lks19.c \
-	  lkgb.c lkgg.c \
-	  ../lkaomf51.c ../lkdata.c \
-	  ../lkeval.c ../lkhead.c ../lklex.c ../lklist.c \
-	  ../lknoice.c ../lkstore.c ../lksym.c \
-	  ../../asxxsrc/strcmpi.c
+ASXXLIBSRC = strcmpi.c
 
-OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
-SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)
+LKLIB = $(srcdir)/..
 
-BINS	= $(BUILDDIR)link$(EXT)$(EXEEXT)
+LKLIBSRC = lkaomf51.c lkdata.c lkeval.c \
+           lkhead.c lklex.c lklist.c \
+           lknoice.c lkstore.c lksym.c
 
-CPPFLAGS+= -I.. -I$(srcdir)/..
-CFLAGS	+= $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DSDK
-CFLAGS	+= -funsigned-char -DUNIX
-CFLAGS	+= -I$(top_builddir)/as/$(PORT) -I$(SLIB)
+SRC = lkmain.c lkarea.c lkihx.c \
+      lklibr.c lkrloc.c lks19.c \
+      lkgb.c lkgg.c
+
+LKSOURCES = $(SRC) $(LKLIBSRC:%.c=$(LKLIB)/%.c) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
+
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
+LKOBJS = $(LKLIBSRC:%.c=$(OBJDIR)/%.o)
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
+LKOBJECTS = $(OBJS) $(LKOBJS) $(ASXXLIBOBJS)
+
+BINS = $(BUILDDIR)link$(EXT)$(EXEEXT)
+
+CPPFLAGS += -I.. -I$(srcdir)/..
+CFLAGS += $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DSDK
+CFLAGS += -funsigned-char -DUNIX
+CFLAGS += -I$(top_builddir)/as/$(PORT)
 
 LDFLAGS = @LDFLAGS@ -lm $(EXTRALIBS)
 
-all:	$(BINS)
+all: $(BINS)
 
-$(BINS): $(OBJDIR) $(OBJS) $(SLIBOBJS)
-	$(CC) -g -o $(BINS) $(OBJS) $(SLIBOBJS) $(LDFLAGS)
+$(BINS): $(LKOBJECTS)
+	$(CC) -g -o $(BINS) $(LKOBJECTS) $(LDFLAGS)
 
-$(OBJDIR):
+# We need a '.stamp'-file in $(OBJDIR), because the time stamp
+# of $(OBJDIR) itself is always updated, when a file in $(OBJDIR)
+# is updated. A rule like
+#	$(OBJDIR)/anyfile: $(OBJDIR)
+# will always force a remake (at least on Linux ext2).
+
+$(OBJDIR)/.stamp:
 	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
 
-$(OBJDIR)/%.o:	%.c
+$(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o:	$(SLIB)/%.c
+$(OBJDIR)/%.o: $(LKLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 _link-z80:

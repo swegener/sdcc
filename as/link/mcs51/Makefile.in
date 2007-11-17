@@ -33,19 +33,33 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
-CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -DUNIX
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir)/.. -I$(top_builddir)
+CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -DUNIX -I$(srcdir)/.. -I$(top_builddir)
 M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@
 
-LKOBJECTS       = lkmain.o lkarea.o lkihx.o \
-                  lklibr.o lkrloc.o lks19.o \
-                  lkmem.o \
-                  ../lkaomf51.o ../lkdata.o \
-                  ../lkeval.o ../lkhead.o ../lklex.o ../lklist.o \
-                  ../lknoice.o ../lkstore.o ../lksym.o \
-                  ../../asxxsrc/strcmpi.o
-LKSOURCES       = $(patsubst %.o,%.c,$(LKOBJECTS))
+OBJDIR = obj
+
+ASXXLIB = $(srcdir)/../../asxxsrc
+
+LKLIB = $(srcdir)/..
+
+ASXXLIBSRC = strcmpi.c
+
+LKLIBSRC = lkaomf51.c lkdata.c lkeval.c \
+           lkhead.c lklex.c lklist.c \
+           lknoice.c lkstore.c lksym.c
+
+SRC = lkmain.c lkarea.c lkihx.c \
+      lklibr.c lkrloc.c lks19.c \
+      lkmem.c
+
+LKSOURCES = $(SRC) $(LKLIBSRC:%.c=$(LKLIB)/%.c) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
+
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
+LKOBJS = $(LKLIBSRC:%.c=$(OBJDIR)/%.o)
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
+LKOBJECTS = $(OBJS) $(LKOBJS) $(ASXXLIBOBJS)
 
 ASLINK          = $(top_builddir)/bin/aslink$(EXEEXT)
 
@@ -90,7 +104,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(LKSOURCES) $(srcdir)/../*.h $(top_builddir)/*.h $(top_srcdir)/*.h
+Makefile.dep: $(LKSOURCES) $(LKLIB)/*.h $(top_builddir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
@@ -101,8 +115,18 @@ include $(srcdir)/clean.mk
 
 # My rules
 # --------
-.c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+$(OBJDIR)/.stamp:
+	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
+
+$(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(LKLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 
 # Remaking configuration

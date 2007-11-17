@@ -1270,8 +1270,10 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
                   dbuf_tprintf (oBuf, "\t!org\n", SPEC_ADDR (sym->etype));
                 }
               dbuf_printf (oBuf, "%s:\n", sym->rname);
+              ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
               printIval (sym, sym->type, sym->ival, oBuf);
+              --noAlloc;
               /* if sym is a simple string and sym->ival is a string,
                  WE don't need it anymore */
               if (IS_ARRAY(sym->type) && IS_CHAR(sym->type->next) &&

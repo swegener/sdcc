@@ -1,3 +1,9 @@
+2007-11-17 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCglue.c, src/pic16/glue.c: reverted fix for bug
+	  #983491 - "Merge duplicate strings function is ineffective"
+	* support/regression/tests/bug-983491.c: regtest disabled
+
 2007-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdarg.h: added and removed some casts

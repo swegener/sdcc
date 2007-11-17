@@ -1383,6 +1383,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 
               /* symbol doesn't have absolute address but has initial value */
               dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
+              ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
 
               pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
@@ -1399,6 +1400,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
               //fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
               pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
+              --noAlloc;
             } else {
 
               /* symbol doesn't have absolute address and no initial value */

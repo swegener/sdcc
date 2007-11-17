@@ -1,5 +1,10 @@
 2007-11-17 Raphael Neider <rneider AT web.de>
 
+	* src/pic/main.c (_asmCmd): include debug arguments (-g as $3)
+	* src/pic/glue.c (picglue): emit .file if --debug is given
+
+2007-11-17 Raphael Neider <rneider AT web.de>
+
 	* src/pic16/genarith.c (pic16_genPlus, pic16_genMinus): take special
 	care when left or right operand resides in result, fixes #1830220
 

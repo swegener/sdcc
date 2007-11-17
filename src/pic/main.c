@@ -358,7 +358,7 @@ static const char *_linkCmd[] =
 
 static const char *_asmCmd[] =
 {
-  "gpasm", "$l", "-c", "\"$1.asm\"", NULL
+  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", NULL
     
 };
 
@@ -448,8 +448,8 @@ PORT pic_port =
   {
     _asmCmd,
     NULL,
-    NULL,
-    NULL,
+    "-g",	    /* options with --debug */
+    NULL,	    /* options without --debug */
     //"-plosgffc",  /* Options with debug */
     //"-plosgff",   /* Options without debug */
     0,

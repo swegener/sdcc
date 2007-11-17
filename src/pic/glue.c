@@ -1457,7 +1457,8 @@ picglue ()
         pic14initialComments (asmFile);
         
         /* print module name */
-        fprintf (asmFile, ";\t.module %s\n", moduleName);
+        fprintf (asmFile, "%s\t.file\t\"%s\"\n",
+	    options.debug ? "" : ";", fullSrcFileName);
         
         /* Let the port generate any global directives, etc. */
         if (port->genAssemblerPreamble)

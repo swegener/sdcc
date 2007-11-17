@@ -681,9 +681,6 @@ extern  VOID            out_t24(int);
 extern  VOID            outr11();       /* JLH */
 extern  VOID            outr19(struct expr *, int, int);
 
-/* asstore.c */
-extern char *StoreString( char *str );
-
 /* asnoice.c */
 extern void DefineNoICE_Line();
 extern void DefineCDB_Line();

@@ -45,7 +45,7 @@ ASXXLIB = $(srcdir)/../asxxsrc
 ASXXLIBSRC = strcmpi.c assym.c
 
 SRC = asmain.c aslex.c assubr.c asnoice.c \
-      asexpr.c asdata.c aslist.c asout.c asstore.c \
+      asexpr.c asdata.c aslist.c asout.c \
       i51ext.c i51pst.c i51mch.c i51adr.c
 
 ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)

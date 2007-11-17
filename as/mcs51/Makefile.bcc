@@ -5,7 +5,7 @@ PRJDIR          = ../..
 !include $(PRJDIR)/Bcc.inc
 
 ASOBJECTS       = asmain.obj aslex.obj assubr.obj asnoice.obj \
-                  asexpr.obj asdata.obj aslist.obj asout.obj asstore.obj \
+                  asexpr.obj asdata.obj aslist.obj asout.obj \
                   i51ext.obj i51pst.obj i51mch.obj i51adr.obj \
                   ../asxxsrc/strcmpi.obj ../asxxsrc/assym.obj
 

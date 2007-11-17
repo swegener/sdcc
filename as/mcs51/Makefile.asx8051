@@ -5,7 +5,7 @@ INCROOT=.
 CFLAGS=-ggdb -O2 -I $(INCROOT)
 TARGETS=$(SDCCDIR)/bin/asx8051
 ALLOBJECTS= asmain.o aslex.o assym.o assubr.o asnoice.o \
-            asexpr.o asdata.o aslist.o asout.o asstore.o \
+            asexpr.o asdata.o aslist.o asout.o \
             i51ext.o i51pst.o i51mch.o i51adr.o strcmpi.o
 
 all:: $(TARGETS)
@@ -39,9 +39,6 @@ asout.o   : asout.c  asm.h
 
 asnoice.o : asnoice.c asm.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o asnoice.o asnoice.c
-
-asstore.o : asstore.c asm.h
-	$(CC) $(CFLAGS) $(LDFLAGS) -c -o asstore.o asstore.c
 
 i51ext.o  : i51ext.c asm.h i8051.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o i51ext.o i51ext.c

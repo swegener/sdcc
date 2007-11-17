@@ -115,10 +115,6 @@ SOURCE=.\asout.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\asstore.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\assubr.c
 # End Source File
 # Begin Source File

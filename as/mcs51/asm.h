@@ -623,6 +623,7 @@ extern  struct  mne *   mlookup();
 extern  int             hash();
 extern  struct  sym *   lookup();
 extern  VOID *          new();
+extern  char *          strsto(char *str);
 extern  int             symeq();
 extern  VOID            syminit();
 extern  VOID            symglob();

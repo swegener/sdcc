@@ -7,17 +7,17 @@ VERSIONHI       = @VERSIONHI@
 VERSIONLO       = @VERSIONLO@
 VERSIONP        = @VERSIONP@
 
-SHELL		= /bin/sh
-CC		= @CC@
-CPP		= @CPP@
-INSTALL		= @INSTALL@
+SHELL           = /bin/sh
+CC              = @CC@
+CPP             = @CPP@
+INSTALL         = @INSTALL@
 STRIP           = @STRIP@
 
-top_builddir	= @top_builddir@
-top_srcdir	= @top_srcdir@
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
 
-srcdir		= @srcdir@
-prefix		= @prefix@
+srcdir          = @srcdir@
+prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
@@ -33,18 +33,28 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(srcdir)
-CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB
-M_OR_MM		= @M_OR_MM@
-LDFLAGS		= @LDFLAGS@
+CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir)
+CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -I. -I$(srcdir)
+M_OR_MM         = @M_OR_MM@
+LDFLAGS         = @LDFLAGS@
 
-ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
-		  asexpr.o asdata.o aslist.o asout.o asstore.o \
-		  i51ext.o i51pst.o i51mch.o i51adr.o \
-		  ../strcmpi.o
-ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
+OBJDIR = obj
 
-ASX8051		= $(top_builddir)/bin/asx8051$(EXEEXT)
+ASXXLIB = $(srcdir)/../asxxsrc
+
+ASXXLIBSRC = strcmpi.c assym.c
+
+SRC = asmain.c aslex.c assubr.c asnoice.c \
+      asexpr.c asdata.c aslist.c asout.c asstore.c \
+      i51ext.c i51pst.c i51mch.c i51adr.c
+
+ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
+                  
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
+ASOBJECTS = $(OBJS) $(ASXXLIBOBJS)
+
+ASX8051 = $(top_builddir)/bin/asx8051$(EXEEXT)
 
 transform       = @program_transform_name@
 
@@ -87,7 +97,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(ASSOURCES) $(srcdir)/*.h $(top_builddir)/*.h $(top_srcdir)/*.h
+Makefile.dep: $(ASSOURCES) $(srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
@@ -98,8 +108,15 @@ include $(srcdir)/clean.mk
 
 # My rules
 # --------
-.c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+$(OBJDIR)/.stamp:
+	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
+
+$(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 
 # Remaking configuration

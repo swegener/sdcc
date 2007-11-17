@@ -8,6 +8,19 @@
 	* src/SDCCglue.c, src/pic16/glue.c: reverted fix for bug
 	  #983491 - "Merge duplicate strings function is ineffective"
 	* support/regression/tests/bug-983491.c: regtest disabled
+	* as/asxxsrc: created
+	  as/asxxsrc/assym.c, as/asxxsrc/strcmpi.c: moved
+	  as/hc08/assym.c, as/mcs51/assym.c, as/strcmpi.c,
+	  as/z80/assym.c: deleted
+	  as/hc08/Makefile.bcc, as/hc08/Makefile.in, as/hc08/as_hc08.dsp,
+	  as/hc08/asm.h, as/link/hc08/Makefile.bcc, as/link/hc08/Makefile.in,
+	  as/link/hc08/link_hc08.dsp, as/link/mcs51/Makefile.bcc,
+	  as/link/mcs51/Makefile.in, as/link/mcs51/aslink.dsp,
+	  as/link/z80/Makefile.in, as/link/z80/linkgbz80.dsp,
+	  as/link/z80/linkz80.dsp, as/mcs51/Makefile.bcc, as/mcs51/Makefile.in,
+	  as/mcs51/asm.h, as/mcs51/asx8051.dsp, as/z80/Makefile.bcc,
+	  as/z80/Makefile.in, as/z80/as_gbz80.dsp, as/z80/as_z80.dsp: modified
+	  created as/asxxsrc directory, assym.c and strcpi.c moved into it
 
 2007-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
 

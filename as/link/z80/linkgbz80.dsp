@@ -174,7 +174,7 @@ SOURCE=..\lksym.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\strcmpi.c
+SOURCE=..\..\asxxsrc\strcmpi.c
 # End Source File
 # End Group
 # Begin Group "Header Files"

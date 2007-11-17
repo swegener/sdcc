@@ -44,7 +44,7 @@ LKOBJECTS       = lkmain.o lkarea.o lkihx.o \
                   ../lkaomf51.o ../lkdata.o \
                   ../lkeval.o ../lkhead.o ../lklex.o ../lklist.o \
                   ../lknoice.o ../lkstore.o ../lksym.o \
-                  ../../strcmpi.o
+                  ../../asxxsrc/strcmpi.o
 LKSOURCES       = $(patsubst %.o,%.c,$(LKOBJECTS))
 
 ASLINK          = $(top_builddir)/bin/aslink$(EXEEXT)

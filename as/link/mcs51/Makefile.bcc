@@ -10,7 +10,7 @@ LKOBJECTS       = lkmain.obj lkarea.obj lkihx.obj \
                   ../lkaomf51.obj ../lkdata.obj \
                   ../lkeval.obj ../lkhead.obj ../lklex.obj ../lklist.obj \
                   ../lknoice.obj ../lkstore.obj ../lksym.obj \
-                  ../../strcmpi.obj
+                  ../../asxxsrc/strcmpi.obj
 
 ASLINK          = $(PRJDIR)/bin/aslink.exe
 

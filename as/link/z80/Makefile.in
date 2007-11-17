@@ -15,7 +15,7 @@ SRC	= lkmain.c lkarea.c lkihx.c \
 	  ../lkaomf51.c ../lkdata.c \
 	  ../lkeval.c ../lkhead.c ../lklex.c ../lklist.c \
 	  ../lknoice.c ../lkstore.c ../lksym.c \
-	  ../../strcmpi.c
+	  ../../asxxsrc/strcmpi.c
 
 OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
 SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)

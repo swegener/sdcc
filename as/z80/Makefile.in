@@ -5,31 +5,35 @@ top_srcdir   = @top_srcdir@
 
 include $(top_builddir)/Makefile.common
 
-OBJDIR	= obj/$(EXT)
+OBJDIR = obj/$(EXT)
 
-SDC	= .
+ASXXLIB = $(srcdir)/../asxxsrc
 
-SLIBSRC	= NewAlloc.c ../strcmpi.c
+ASXXLIBSRC = strcmpi.c assym.c
 
-SRC	= asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
-	  assubr.c assym.c z80adr.c z80ext.c z80mch.c z80pst.c
+SRC = asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
+      assubr.c z80adr.c z80ext.c z80mch.c z80pst.c
 
-OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
-SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)
+ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
 
-BINS	= $(BUILDDIR)/as$(EXT)$(EXEEXT)
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
-CFLAGS	+= $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
-CFLAGS	+= -funsigned-char
-CFLAGS	+= -I$(SLIB)
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
+
+ASOBJECTS = $(OBJS) $(ASXXLIBOBJS)
+
+BINS = $(BUILDDIR)/as$(EXT)$(EXEEXT)
+
+CFLAGS += $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
+CFLAGS += -funsigned-char
 
 LDFLAGS = @LDFLAGS@ -lm $(EXTRALIBS)
 
-all:	dep $(BINS)
+all: dep $(BINS)
 
 dep: Makefile.dep
 
-Makefile.dep: $(SRC) $(srcdir)/*.h
+Makefile.dep: $(ASSOURCES) $(srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) > Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
@@ -47,14 +51,13 @@ $(OBJDIR)/.stamp:
 	mkdir -p $(OBJDIR)
 	touch $(OBJDIR)/.stamp
 
-$(BINS): $(OBJS) $(SLIBOBJS)
-	$(CC) -o $(BINS) $(OBJS) $(SLIBOBJS) $(LDFLAGS)
+$(BINS): $(ASOBJECTS)
+	$(CC) -o $(BINS) $(ASOBJECTS) $(LDFLAGS)
 
-
-$(OBJDIR)/%.o:	%.c $(OBJDIR)/.stamp
+$(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o:	$(SLIB)/%.c $(OBJDIR)/.stamp
+$(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 _as-z80:

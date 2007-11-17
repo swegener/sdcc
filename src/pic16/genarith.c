@@ -1336,6 +1336,13 @@ void pic16_genPlus (iCode *ic)
                 } else {
                         // add regs
 
+			if (pic16_sameRegs(AOP(left), AOP(result))
+			    && (AOP_SIZE(left) < AOP_SIZE(result)))
+			{
+			    // extend left operand, sign-bit still intact
+			    pic16_addSign (result, AOP_SIZE(left), !SPEC_USIGN(getSpec(operandType(left))));
+			}
+
                         // add first bytes
                         for(i=0; i<size; i++) {
                                 if (AOP_TYPE(right) != AOP_ACC)
@@ -1363,26 +1370,27 @@ void pic16_genPlus (iCode *ic)
                           // get right operand into WREG
                           if (i < AOP_SIZE(right)) {
                             pic16_mov2w (AOP(right), i);
-                          } else {
-                            // right is too short
+			  } else {
+                            // right is too short, not overwritten with result
                             pic16_emitpcode (POC_CLRF, pic16_popCopyReg (&pic16_pc_wreg));
                             if (!SPEC_USIGN(getSpec(operandType(right)))) {
                               // right operand is signed
+			      // Make sure that right's sign is not yet overwritten
+			      assert (!pic16_sameRegs (AOP(right), AOP(result)));
                               pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),AOP_SIZE(right)-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
                               pic16_emitpcode(POC_SETF, pic16_popCopyReg (&pic16_pc_wreg));
                             }
                           }
 
                           // get left+WREG+CARRY into result
-                          if (i < AOP_SIZE(left)) {
-                            if (pic16_sameRegs (AOP(left), AOP(result))) {
-                              pic16_emitpcode (POC_ADDWFC, pic16_popGet (AOP(result), i));
-                            } else {
-                              pic16_emitpcode (POC_ADDFWC, pic16_popGet (AOP(left), i));
-                              pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
-                            }
+			  if (pic16_sameRegs (AOP(left), AOP(result))) {
+			    // left might have been extended in result above
+			    pic16_emitpcode (POC_ADDWFC, pic16_popGet (AOP(result), i));
+			  } else if (i < AOP_SIZE(left)) {
+                            pic16_emitpcode (POC_ADDFWC, pic16_popGet (AOP(left), i));
+                            pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
                           } else {
-                            // left is too short
+                            // left is too short, not overwritten with result
                             pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), i));
                             if (!SPEC_USIGN(getSpec(operandType(left)))) {
                               // left operand is signed
@@ -1610,44 +1618,6 @@ void pic16_genMinus (iCode *ic)
     lit = - (long)lit;
 
     genAddLit ( ic,  lit);
-
-#if 0
-    /* add the first byte: */
-    pic16_emitcode("movlw","0x%x", lit & 0xff);
-    pic16_emitcode("addwf","%s,f", pic16_aopGet(AOP(IC_LEFT(ic)),0,FALSE,FALSE));
-    pic16_emitpcode(POC_MOVLW,  pic16_popGetLit(lit & 0xff));
-    pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(IC_LEFT(ic)),0));
-
-
-    offset = 1;
-    size--;
-
-    while(size-- > 0) {
-
-      lit >>= 8;
-
-      if(lit & 0xff) {
-
-        if((lit & 0xff) == 0xff) {
-          pic16_emitpcode(POC_MOVLW,  pic16_popGetLit(0xff));
-          emitSKPC;
-          pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
-        } else {
-          pic16_emitpcode(POC_MOVLW,  pic16_popGetLit(lit & 0xff));
-          emitSKPNC;
-          pic16_emitpcode(POC_MOVLW,  pic16_popGetLit((lit+1) & 0xff));
-          pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
-        }
-
-      } else {
-        /* do the rlf known zero trick here */
-        pic16_emitpcode(POC_MOVLW,  pic16_popGetLit(1));
-        emitSKPNC;
-        pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
-      }
-      offset++;
-    }
-#endif
   } else if(AOP_TYPE(IC_RIGHT(ic)) == AOP_CRY) {
     // bit subtraction
 
@@ -1772,6 +1742,19 @@ void pic16_genMinus (iCode *ic)
                    pic16_AopType(AOP_TYPE(IC_LEFT(ic))),
                    pic16_AopType(AOP_TYPE(IC_RIGHT(ic))));
 
+    if ((AOP_SIZE(IC_LEFT(ic)) < AOP_SIZE(IC_RESULT(ic)))
+	    && pic16_sameRegs (AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
+	// extend left in result
+	pic16_addSign (IC_RESULT(ic), AOP_SIZE(IC_LEFT(ic)), !SPEC_USIGN(getSpec(operandType(IC_LEFT(ic)))));
+    }
+
+    if ((AOP_SIZE(IC_RIGHT(ic)) < AOP_SIZE(IC_RESULT(ic)))
+	    && pic16_sameRegs (AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic)))) {
+	// extend right in result---fails if left resides in result as well...
+	assert ((IC_LEFT(ic) == IC_RIGHT(ic)) || !pic16_sameRegs (AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))));
+	pic16_addSign (IC_RESULT(ic), AOP_SIZE(IC_RIGHT(ic)), !SPEC_USIGN(getSpec(operandType(IC_RIGHT(ic)))));
+    }
+
     if(AOP_TYPE(IC_LEFT(ic)) == AOP_ACC) {
       DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
       pic16_emitpcode(POC_SUBFW, pic16_popGet(AOP(IC_RIGHT(ic)),0));
@@ -1817,10 +1800,13 @@ void pic16_genMinus (iCode *ic)
     offset = 1;
     size--;
 
-    while(size--){
-      if (offset < AOP_SIZE(IC_RIGHT(ic)))
+    while (size--) {
+      if (pic16_sameRegs (AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic)))) {
+        pic16_mov2w (AOP(IC_RESULT(ic)), offset);
+      } else if (offset < AOP_SIZE(IC_RIGHT(ic)))
         pic16_mov2w(AOP(IC_RIGHT(ic)),offset);
       else {
+	// right operand is too short, not overwritten with result
         pic16_emitpcode (POC_CLRF, pic16_popCopyReg (&pic16_pc_wreg));
         if (!SPEC_USIGN(operandType(IC_RIGHT(ic)))) {
           // signed -- sign extend the right operand
@@ -1830,26 +1816,22 @@ void pic16_genMinus (iCode *ic)
       }
       if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
         pic16_emitpcode(POC_SUBWFB_D1, pic16_popGet(AOP(IC_RESULT(ic)),offset));
+      } else if (offset < AOP_SIZE(IC_LEFT(ic))) {
+        pic16_emitpcode(POC_SUBWFB_D0,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
+        pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
       } else {
-        if (offset < AOP_SIZE(IC_LEFT(ic))) {
-          pic16_emitpcode(POC_SUBWFB_D0,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
-          pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-        } else {
-          // zero extend the left operand
-          pic16_emitpcode (POC_CLRF, pic16_popGet(AOP(IC_RESULT(ic)), offset));
-          if (!SPEC_USIGN(operandType(IC_LEFT(ic)))) {
-            // signed -- sign extend the left operand
-            pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_LEFT(ic)),AOP_SIZE(IC_LEFT(ic))-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-            pic16_emitpcode (POC_SETF, pic16_popGet(AOP(IC_RESULT(ic)), offset)); // keep CARRY/#BORROW bit intact!
-          }
-          pic16_emitpcode(POC_SUBWFB_D1, pic16_popGet(AOP(IC_RESULT(ic)),offset));
+        // left operand is too short, not overwritten with result
+        pic16_emitpcode (POC_CLRF, pic16_popGet(AOP(IC_RESULT(ic)), offset));
+        if (!SPEC_USIGN(operandType(IC_LEFT(ic)))) {
+          // signed -- sign extend the left operand
+          pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_LEFT(ic)),AOP_SIZE(IC_LEFT(ic))-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
+          pic16_emitpcode (POC_SETF, pic16_popGet(AOP(IC_RESULT(ic)), offset)); // keep CARRY/#BORROW bit intact!
         }
+        pic16_emitpcode(POC_SUBWFB_D1, pic16_popGet(AOP(IC_RESULT(ic)),offset));
       }
       offset++;
     }
-
   }
-
 
   //    adjustArithmeticResult(ic);
 

@@ -1,3 +1,8 @@
+2007-11-17 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/genarith.c (pic16_genPlus, pic16_genMinus): take special
+	care when left or right operand resides in result, fixes #1830220
+
 2007-11-17 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCglue.c, src/pic16/glue.c: reverted fix for bug

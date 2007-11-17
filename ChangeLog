@@ -24,7 +24,8 @@
 	  as/link/z80/Makefile.in, as/link/z80/linkgbz80.dsp,
 	  as/link/z80/linkz80.dsp, as/mcs51/Makefile.bcc, as/mcs51/Makefile.in,
 	  as/mcs51/asm.h, as/mcs51/asx8051.dsp, as/z80/Makefile.bcc,
-	  as/z80/Makefile.in, as/z80/as_gbz80.dsp, as/z80/as_z80.dsp: modified
+	  as/z80/Makefile.in, as/z80/as_gbz80.dsp, as/z80/as_z80.dsp,
+	  as/z80/Makefile.as_hc08, as/mcs51/Makefile.asx8051: modified
 	  created as/asxxsrc directory, assym.c and strcpi.c moved into it
 
 2007-11-15 Maarten Brock <sourceforge.brock AT dse.nl>

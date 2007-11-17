@@ -16,7 +16,7 @@
 	* as/asxxsrc: created
 	  as/asxxsrc/assym.c, as/asxxsrc/strcmpi.c: moved
 	  as/hc08/assym.c, as/mcs51/assym.c, as/strcmpi.c,
-	  as/z80/assym.c: deleted
+	  as/z80/assym.c, as/hc08/asstore.c, as/mcs51/asstore.c: deleted
 	  as/hc08/Makefile.bcc, as/hc08/Makefile.in, as/hc08/as_hc08.dsp,
 	  as/hc08/asm.h, as/link/hc08/Makefile.bcc, as/link/hc08/Makefile.in,
 	  as/link/hc08/link_hc08.dsp, as/link/mcs51/Makefile.bcc,

@@ -1,3 +1,8 @@
+2007-12-01 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/cmd.src/cmdmem.cc, sim/ucsim/cmd.src/mem.cc:
+	  corrected handling of the highest_valid_address
+
 2007-11-17 Raphael Neider <rneider AT web.de>
 
 	* src/pic/main.c (_asmCmd): include debug arguments (-g as $3)

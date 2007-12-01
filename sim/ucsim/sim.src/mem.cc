@@ -2,27 +2,27 @@
  * Simulator of microcontrollers (mem.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
 
-/* 
+/*
    This file is part of microcontroller simulator: ucsim.
-    
+
    UCSIM is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    UCSIM is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with UCSIM; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place - Suite 330, Boston, MA 
+   Software Foundation, 59 Temple Place - Suite 330, Boston, MA
    02111-1307, USA.
 */
 /*@1@*/
@@ -175,12 +175,12 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
   if (stop > hva)
     stop= hva;
   while ((start <= stop) &&
-         (start < hva))
+         (start <= hva))
     {
       con->dd_printf(addr_format, start); con->dd_printf(" ");
       for (i= 0;
            (i < bpl) &&
-             (start+i < hva) &&
+             (start+i <= hva) &&
              (start+i <= stop);
            i++)
         {
@@ -198,7 +198,7 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
           i++;
         }
       for (i= 0; (i < bpl) &&
-             (start+i < hva) &&
+             (start+i <= hva) &&
              (start+i <= stop);
            i++)
         {
@@ -236,7 +236,7 @@ cl_memory::search_next(bool case_sensitive,
     a= 0;
   else
     a= *addr;
-  
+
   if (a+len > size)
     return(DD_FALSE);
 
@@ -361,7 +361,7 @@ cl_hw_operator::read(enum hw_cath skip)
   if (next_operator)
     next_operator->read();
 
-  return(d);  
+  return(d);
 }
 
 t_mem
@@ -538,9 +538,9 @@ cl_memory_cell::read(enum hw_cath skip)
     return(operators->read(skip));
   return(*data);
 }
- 
+
 t_mem
-cl_memory_cell::get(void) 
+cl_memory_cell::get(void)
 {
   return(*data);
 }
@@ -717,7 +717,7 @@ cl_address_space::~cl_address_space(void)
   delete dummy;
 }
 
-  
+
 t_mem
 cl_address_space::read(t_addr addr)
 {
@@ -997,7 +997,7 @@ cl_address_space::set_brk(t_addr addr, class cl_brk *brk)
     default:
       //e= '.';
       op= 0;
-      break;  
+      break;
     }
   if (op)
     cell->append_operator(op);
@@ -1255,7 +1255,7 @@ bool
 cl_address_decoder::shrink_out_of(t_addr begin, t_addr end)
 {
   t_addr a= as_begin;
-  
+
   if (!address_space)
     return(DD_TRUE);
   if (begin > a)

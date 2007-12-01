@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (cmd.src/cmdmem.cc)
  *
  * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -151,7 +151,7 @@ COMMAND_DO_WORK_UC(cl_memory_createaddressdecoder_cmd)
                                  cmdline->param(4) };
   class cl_memory *as= 0, *chip= 0;
   t_addr as_begin= 0, as_end= 0, chip_begin= 0;
-  
+
   if (cmdline->syntax_match(uc, MEMORY MEMORY)) {
     as= params[0]->value.memory.memory;
     as_end= as->highest_valid_address();
@@ -201,7 +201,7 @@ COMMAND_DO_WORK_UC(cl_memory_createaddressdecoder_cmd)
   else if (chip_begin >= chip->get_size())
     con->dd_printf("Wrong chip area specification\n");
   else if (as_begin < as->start_address ||
-           as_end >= as->highest_valid_address())
+           as_end > as->highest_valid_address())
     con->dd_printf("Specified area is out of address space\n");
   else if (as_end-as_begin > chip->get_size()-chip_begin)
     con->dd_printf("Specified area is out of chip size\n");

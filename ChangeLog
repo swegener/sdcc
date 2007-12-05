@@ -1,3 +1,8 @@
+2007-12-05 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: fixed bug #1844509 - Correction to Manual 4.6.9
+	  Adding new PIC16
+
 2007-12-01 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/cmdmem.cc, sim/ucsim/cmd.src/mem.cc:

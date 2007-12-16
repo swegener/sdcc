@@ -38,7 +38,8 @@ void __printn(int n);
 code const char *__getSuiteName(void);
 void __runSuite(void);
 
-#define ASSERT(_a)  (__numTests++, (_a) ? (void)0 : __fail("Assertion failed", #_a, __FILE__, __LINE__))
+#define ASSERT(_a)  (++__numTests, (_a) ? (void)0 : __fail("Assertion failed", #_a, __FILE__, __LINE__))
+#define ASSERT_FAILS(_a)  (__numTests++, (_a) ? 0 : (__fail("Assertion failed", #_a, __FILE__, __LINE__), 1))
 #define FAIL()      FAILM("Failure")
 #define FAILM(_a)   __fail(_a, #_a, __FILE__, __LINE__)
 

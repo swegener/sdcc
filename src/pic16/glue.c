@@ -520,10 +520,10 @@ void _pic16_printPointerType (const char *name, char ptype, void *p)
 {
   char buf[256];
 
-        sprintf(buf, "LOW(%s)", name);
-        pic16_emitDS(buf, ptype, p);
-        sprintf(buf, "HIGH(%s)", name);
-        pic16_emitDS(buf, ptype, p);
+  sprintf (buf, "LOW(%s)", name);
+  pic16_emitDS (buf, ptype, p);
+  sprintf (buf, "HIGH(%s)", name);
+  pic16_emitDS (buf, ptype, p);
 }
 
 /*-----------------------------------------------------------------*/
@@ -543,28 +543,33 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
 {
   char buf[256];
 
-    _pic16_printPointerType (iname, ptype, p);
+  _pic16_printPointerType (iname, ptype, p);
 
-    switch( itype ) {
+  switch (itype)
+    {
+    case CPOINTER:
+    case FUNCTION:
+      sprintf (buf, "UPPER(%s)", iname);
+      pic16_emitDS (buf, ptype, p);
+      break;
+
+    case GPOINTER:
+    case POINTER:
+      sprintf (buf, "0x80");
+      pic16_emitDS (buf, ptype, p);
+      break;
+
+    /*
+     * FPOINTER and IPOINTER are not used in pic16 port
       case FPOINTER:
-      case CPOINTER:
-      case GPOINTER:
-      case FUNCTION:
-        {
-          sprintf(buf, "UPPER(%s)", iname);
-          pic16_emitDS(buf, ptype, p);
-        }; break;
-      case POINTER:
       case IPOINTER:
-        sprintf(buf, "0x80");
-        pic16_emitDS(buf, ptype, p);
-        break;
-      default:
-        debugf("itype = %d\n", itype );
-        assert( 0 );
+     */
+    default:
+      debugf ("itype = %d\n", itype );
+      assert (0);
     }
 
-    //pic16_flushDB(ptype, p); /* might break char* const arr[] = {...}; */
+  //pic16_flushDB(ptype, p); /* might break char* const arr[] = {...}; */
 }
 
 

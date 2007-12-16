@@ -4,6 +4,8 @@
 	 device/include/; this also fixes bitopcse.c regression test for pic16
 	 target
 	* support/regression/fwk/inclusw/testfwk.h: added macro ASSERT_FAILED
+	* src/pic16/glue.c: fixed bug #1851855: generic static pointer
+	  dereference doesn't work; covered by regression test bug1399290
 
 2007-12-05 Borut Razem <borut.razem AT siol.net>
 

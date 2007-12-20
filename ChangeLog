@@ -1,3 +1,7 @@
+2007-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (computeType): fixed bug, thanks Fan Weiguang
+
 2007-12-16 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/pic16/stdbool.h: removed, since already exists in

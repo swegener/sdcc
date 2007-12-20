@@ -1869,7 +1869,7 @@ computeType (sym_link * type1, sym_link * type2,
   /* if both are bitvars choose the larger one */
   else if (IS_BITVAR (etype1) && IS_BITVAR (etype2))
     rType = SPEC_BLEN (etype1) >= SPEC_BLEN (etype2) ?
-            copyLinkChain (type1) : copyLinkChain (type1);
+            copyLinkChain (type1) : copyLinkChain (type2);
 
   /* if only one of them is a bit variable then the other one prevails */
   else if (IS_BITVAR (etype1) && !IS_BITVAR (etype2))

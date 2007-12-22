@@ -501,8 +501,10 @@ static const char *stringLiteral(void)
                       dbuf_destroy(&linebuf);
                     }
                   else
-                    unput(ch);
-                  break;
+                    {
+                      unput(ch);
+                      goto out;
+                    }
 
                 default:
                   count_char(ch);

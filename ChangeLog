@@ -1,3 +1,7 @@
+2007-12-22 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.lex: fixed bug #1852894: # character hangs the compiler
+
 2007-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (computeType): fixed bug, thanks Fan Weiguang

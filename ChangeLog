@@ -6,8 +6,10 @@
 	  as/z80/as_z80.dsp, as/hc08/Makefile.in, as/mcs51/Makefile.in,
 	  as/z80/Makefile.in: moved aslex.c to asxxsrc
 	* as/hc08/aslex.c, as/z80/aslex.c: deleted
-	* as/z80/asmain.c, as/hc08/asmain.c, as/mcs51/asmain.c:
+	* as/hc08/asmain.c, as/mcs51/asmain.c:
 	  added missing initialization of a_addr field
+	* support/regression/tests/long_asm_line.c: added regtest for long
+	  assembler line
 
 2007-12-22 Borut Razem <borut.razem AT siol.net>
 

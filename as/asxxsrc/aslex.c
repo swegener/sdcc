@@ -380,7 +380,7 @@ getmap(d)
  */
 
 char *
-readlin(char *str, int n, FILE *infp)
+readlin(char *str, size_t n, FILE *infp)
 {
   int c;
   char *s;
@@ -392,28 +392,36 @@ readlin(char *str, int n, FILE *infp)
       return NULL;
     }
 
-  s = str;
-  while (--n && (c = getc(infp)) != '\n' && c != EOF)
-    *s++ = c;
-
-  /* chop CR */
-  if (s > str && *(s - 1) == '\r')
-    --s;
-
-  /* terminate the line */
-  *s = '\0';
-
-  /* eat characters until the end of line */
-  while (c != '\n' && c != EOF)
-    c = getc(infp);
-
-  /* if the EOF is not at the beginning of the line, return the line;
-     return NULL at the next call of redlin */
-  if (c == EOF)
+  if (n > 0)
     {
-      if (s == str)
-        return NULL;
-      eof_f = 1;
+    s = str;
+    if (n > 1)
+      {
+        while (--n && (c = getc(infp)) != '\n' && c != EOF)
+          *s++ = c;
+      }
+    else
+      c = ' ';  /* initialize it to something for the caharacter eating step */
+
+    /* chop CR */
+    if (s > str && *(s - 1) == '\r')
+      --s;
+
+    /* terminate the line */
+    *s = '\0';
+
+    /* eat characters until the end of line */
+    while (c != '\n' && c != EOF)
+      c = getc(infp);
+
+    /* if the EOF is not at the beginning of the line, return the line;
+       return NULL at the next call of redlin */
+    if (c == EOF)
+      {
+        if (s == str)
+          return NULL;
+        eof_f = 1;
+      }
     }
 
   return str;

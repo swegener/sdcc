@@ -9,9 +9,9 @@ OBJDIR = obj$(EXT)
 
 ASXXLIB = $(srcdir)/../asxxsrc
 
-ASXXLIBSRC = strcmpi.c assym.c
+ASXXLIBSRC = strcmpi.c assym.c aslex.c
 
-SRC = asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
+SRC = asdata.c asexpr.c aslist.c asmain.c asout.c \
       assubr.c z80adr.c z80ext.c z80mch.c z80pst.c
 
 ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)

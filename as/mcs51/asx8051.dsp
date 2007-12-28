@@ -96,7 +96,7 @@ SOURCE=.\asexpr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\aslex.c
+SOURCE=..\asxxsrc\aslex.c
 # End Source File
 # Begin Source File
 

@@ -1,3 +1,14 @@
+2007-12-28 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/aslex.c: moved from as/mcs51/aslex.c;
+	  introduced (readlin) - long lines are turuncated
+	* as/hc08/as_hc08.dsp, as/mcs51/asx8051.dsp, as/z80/as_gbz80.dsp,
+	  as/z80/as_z80.dsp, as/hc08/Makefile.in, as/mcs51/Makefile.in,
+	  as/z80/Makefile.in: moved aslex.c to asxxsrc
+	* as/hc08/aslex.c, as/z80/aslex.c: deleted
+	* as/z80/asmain.c, as/hc08/asmain.c, as/mcs51/asmain.c:
+	  added missing initialization of a_addr field
+
 2007-12-22 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.lex: fixed bug #1852894: # character hangs the compiler

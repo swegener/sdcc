@@ -915,6 +915,7 @@ loop:
                         ap->a_ap = areap;
                         ap->a_id = strsto(id);
                         ap->a_ref = areap->a_ref + 1;
+                        ap->a_addr = 0;
                         ap->a_size = 0;
                         ap->a_fuzz = 0;
                         ap->a_flag = uaf ? uf : (A_CON|A_REL);

@@ -42,9 +42,9 @@ OBJDIR = obj
 
 ASXXLIB = $(srcdir)/../asxxsrc
 
-ASXXLIBSRC = strcmpi.c assym.c
+ASXXLIBSRC = strcmpi.c assym.c aslex.c
 
-SRC = asmain.c aslex.c assubr.c asnoice.c \
+SRC = asmain.c assubr.c asnoice.c \
       asexpr.c asdata.c aslist.c asout.c \
       i51ext.c i51pst.c i51mch.c i51adr.c
 

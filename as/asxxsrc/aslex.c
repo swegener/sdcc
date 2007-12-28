@@ -382,7 +382,7 @@ getmap(d)
 char *
 readlin(char *str, size_t n, FILE *infp)
 {
-  int c;
+  int c = ' ';  /* initialize it to something for the caharacter eating step */
   char *s;
   static char eof_f = 0;
 
@@ -400,8 +400,6 @@ readlin(char *str, size_t n, FILE *infp)
         while (--n && (c = getc(infp)) != '\n' && c != EOF)
           *s++ = c;
       }
-    else
-      c = ' ';  /* initialize it to something for the caharacter eating step */
 
     /* chop CR */
     if (s > str && *(s - 1) == '\r')

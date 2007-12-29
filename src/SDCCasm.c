@@ -179,7 +179,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
 }
 
 void
-dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat,...)
+dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat, ...)
 {
   va_list ap;
   va_start (ap, szFormat);
@@ -188,7 +188,7 @@ dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat,...)
 }
 
 void
-tsprintf (char *buffer, size_t len, const char *szFormat,...)
+tsprintf (char *buffer, size_t len, const char *szFormat, ...)
 {
   va_list ap;
   struct dbuf_s dbuf;
@@ -207,7 +207,7 @@ tsprintf (char *buffer, size_t len, const char *szFormat,...)
 }
 
 void
-tfprintf (FILE *fp, const char *szFormat,...)
+tfprintf (FILE *fp, const char *szFormat, ...)
 {
   va_list ap;
   struct dbuf_s dbuf;
@@ -279,11 +279,28 @@ static int
 skipLine (FILE *infp)
 {
   int c;
+  static char is_eof = 0;
+  size_t len = 0;
+
+  if (is_eof)
+    return 0;
 
   while ((c = getc(infp)) != '\n' && EOF != c)
-    ;
+    ++len;
 
-  return EOF != c;
+  if (EOF == c)
+    {
+      if (len)
+        {
+          /* EOF in the middle of the line */
+          is_eof = 1;
+          return 1;
+        }  
+      else
+        return 0;
+    }
+  else
+    return 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -302,7 +319,7 @@ printCLine (const char *srcFile, int lineno)
   if (!dbufInitialized)
     {
       dbuf_init (&line, 1024);
-      dbuf_init (&lastSrcFile, 1024);
+      dbuf_init (&lastSrcFile, PATH_MAX);
       dbufInitialized = 1;
     }
   else
@@ -321,62 +338,67 @@ printCLine (const char *srcFile, int lineno)
           dbuf_set_length (&lastSrcFile, 0);
           dbuf_append_str (&lastSrcFile, srcFile);
         }
-      }
-
-  if (!inFile && !(inFile = fopen(srcFile, "r")))
-    {
-      /* can't open the file:
-         don't panic, just return the error message */
-      dbuf_printf(&line, "ERROR: %s", strerror(errno));
-
-      return dbuf_c_str (&line);
     }
-  else
+
+  if (!inFile)
     {
-      if (lineno < inLineNo)
+      if (!(inFile = fopen(srcFile, "r")))
         {
-          /* past the lineno: rewind the file pointer */
-          fseek (inFile, 0, SEEK_SET);
-          inLineNo = 0;
-          /* rewinds++; */
+          /* can't open the file:
+             don't panic, just return the error message */
+          dbuf_printf(&line, "ERROR: %s", strerror(errno));
+
+          return dbuf_c_str (&line);
+        }
+      else
+        {
+          dbuf_set_length (&lastSrcFile, 0);
+          dbuf_append_str (&lastSrcFile, srcFile);
+        }
+    }
+
+  if (inLineNo > lineno)
+    {
+      /* past the lineno: rewind the file pointer */
+      rewind (inFile);
+      inLineNo = 0;
+      /* rewinds++; */
+    }
+
+   /* skip lines until lineno */
+  while (inLineNo + 1 < lineno)
+    {
+      if (!skipLine (inFile))
+        goto err_no_line;
+      ++inLineNo;
+    }
+
+   /* get the line */
+  if (dbuf_getline (&line, inFile))
+    {
+      const char *inLineString = dbuf_c_str (&line);
+      size_t len = strlen (inLineString);
+
+      ++inLineNo;
+
+      /* remove the trailing NL */
+      if ('\n' == inLineString[len - 1])
+        {
+          dbuf_set_length (&line, len - 1);
+          inLineString = dbuf_c_str (&line);
         }
 
-       /* skip lines until lineno */
-      while (inLineNo + 1 < lineno)
-        {
-          if (!skipLine (inFile))
-            goto err_no_line;
-        }
+      /* skip leading spaces */
+      while (isspace (*inLineString))
+        inLineString++;
 
-       /* get the line */
-      if (dbuf_getline (&line, inFile))
-        {
-          inLineNo++;
-          if (inLineNo == lineno)
-            {
-              const char *inLineString = dbuf_c_str (&line);
-              size_t len = strlen (inLineString);
-
-              /* remove the trailing NL */
-              if ('\n' == inLineString[len - 1])
-                {
-                  dbuf_set_length (&line, len - 1);
-                  inLineString = dbuf_c_str (&line);
-                }
-
-              /* skip leading spaces */
-              while (isspace (*inLineString))
-                inLineString++;
-
-              return inLineString;
-            }
-        }
+      return inLineString;
+    }
 
 err_no_line:
-      dbuf_printf(&line, "ERROR: no line number %d in file %s", lineno, srcFile);
+  dbuf_printf(&line, "ERROR: no line number %d in file %s", lineno, srcFile);
 
-      return dbuf_c_str (&line);
-  }
+  return dbuf_c_str (&line);
 }
 
 static const ASM_MAPPING _asxxxx_mapping[] =
@@ -415,19 +437,19 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   },
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
-  {"los","(%s & 0xFF)"},
-  {"his","(%s >> 8)"},
-  {"hihis","(%s >> 16)"},
-  {"hihihis","(%s >> 24)"},
-  {"lod","(%d & 0xFF)"},
-  {"hid","(%d >> 8)"},
-  {"hihid","(%d >> 16)"},
-  {"hihihid","(%d >> 24)"},
-  {"lol","(%05d$ & 0xFF)"},
-  {"hil","(%05d$ >> 8)"},
-  {"hihil","(%05d$ >> 16)"},
-  {"hihihil","(%05d$ >> 24)"},
-  {"equ","="},
+  {"los", "(%s & 0xFF)"},
+  {"his", "(%s >> 8)"},
+  {"hihis", "(%s >> 16)"},
+  {"hihihis", "(%s >> 24)"},
+  {"lod", "(%d & 0xFF)"},
+  {"hid", "(%d >> 8)"},
+  {"hihid", "(%d >> 16)"},
+  {"hihihid", "(%d >> 24)"},
+  {"lol", "(%05d$ & 0xFF)"},
+  {"hil", "(%05d$ >> 8)"},
+  {"hihil", "(%05d$ >> 16)"},
+  {"hihihil", "(%05d$ >> 24)"},
+  {"equ", "="},
   {"org", ".org 0x%04X"},
   {NULL, NULL}
 };
@@ -508,19 +530,19 @@ static const ASM_MAPPING _a390_mapping[] =
   },
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
-  {"los","(%s & 0FFh)"},
-  {"his","((%s / 256) & 0FFh)"},
-  {"hihis","((%s / 65536) & 0FFh)"},
-  {"hihihis","((%s / 16777216) & 0FFh)"},
-  {"lod","(%d & 0FFh)"},
-  {"hid","((%d / 256) & 0FFh)"},
-  {"hihid","((%d / 65536) & 0FFh)"},
-  {"hihihid","((%d / 16777216) & 0FFh)"},
-  {"lol","(L%05d & 0FFh)"},
-  {"hil","((L%05d / 256) & 0FFh)"},
-  {"hihil","((L%05d / 65536) & 0FFh)"},
-  {"hihihil","((L%09d / 16777216) & 0FFh)"},
-  {"equ"," equ"},
+  {"los", "(%s & 0FFh)"},
+  {"his", "((%s / 256) & 0FFh)"},
+  {"hihis", "((%s / 65536) & 0FFh)"},
+  {"hihihis", "((%s / 16777216) & 0FFh)"},
+  {"lod", "(%d & 0FFh)"},
+  {"hid", "((%d / 256) & 0FFh)"},
+  {"hihid", "((%d / 65536) & 0FFh)"},
+  {"hihihid", "((%d / 16777216) & 0FFh)"},
+  {"lol", "(L%05d & 0FFh)"},
+  {"hil", "((L%05d / 256) & 0FFh)"},
+  {"hihil", "((L%05d / 65536) & 0FFh)"},
+  {"hihihil", "((L%09d / 16777216) & 0FFh)"},
+  {"equ", " equ"},
   {"org", ".org 0x%04X"},
   {NULL, NULL}
 };
@@ -561,19 +583,19 @@ static const ASM_MAPPING _xa_asm_mapping[] =
   },
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
-  {"los","(%s & 0FFh)"},
-  {"his","((%s / 256) & 0FFh)"},
-  {"hihis","((%s / 65536) & 0FFh)"},
-  {"hihihis","((%s / 16777216) & 0FFh)"},
-  {"lod","(%d & 0FFh)"},
-  {"hid","((%d / 256) & 0FFh)"},
-  {"hihid","((%d / 65536) & 0FFh)"},
-  {"hihihid","((%d / 16777216) & 0FFh)"},
-  {"lol","(L%05d & 0FFh)"},
-  {"hil","((L%05d / 256) & 0FFh)"},
-  {"hihil","((L%05d / 65536) & 0FFh)"},
-  {"hihihil","((L%09d / 16777216) & 0FFh)"},
-  {"equ"," equ"},
+  {"los", "(%s & 0FFh)"},
+  {"his", "((%s / 256) & 0FFh)"},
+  {"hihis", "((%s / 65536) & 0FFh)"},
+  {"hihihis", "((%s / 16777216) & 0FFh)"},
+  {"lod", "(%d & 0FFh)"},
+  {"hid", "((%d / 256) & 0FFh)"},
+  {"hihid", "((%d / 65536) & 0FFh)"},
+  {"hihihid", "((%d / 16777216) & 0FFh)"},
+  {"lol", "(L%05d & 0FFh)"},
+  {"hil", "((L%05d / 256) & 0FFh)"},
+  {"hihil", "((L%05d / 65536) & 0FFh)"},
+  {"hihihil", "((L%09d / 16777216) & 0FFh)"},
+  {"equ", " equ"},
   {NULL, NULL}
 };
 

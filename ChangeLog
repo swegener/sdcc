@@ -8,12 +8,6 @@
 	  src/pic/gen.c, src/z80/gen.c, src/xa51/gen.c, src/pic16/ralloc.c,
 	  src/pic16/pcode.[ch]: added const qualifier
 
-M      src/SDCCglue.c
-M      
-M      
-M      
-M      
-
 2007-12-28 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/aslex.c: moved from as/mcs51/aslex.c;

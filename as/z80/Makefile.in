@@ -20,13 +20,13 @@ SRC = asmain.c assubr.c \
       z80ext.c z80pst.c z80mch.c z80adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
-ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
+ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
 
-AASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
+ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 BINS = $(BUILDDIR)/as$(EXT)$(EXEEXT)
 
-CFLAGS += $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
+CFLAGS += $(CPPFLAGS) $(OPTS) -I. -I$(srcdir)/../../support/Util -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS += -funsigned-char
 
 LDFLAGS = @LDFLAGS@ -lm $(EXTRALIBS)
@@ -60,6 +60,9 @@ $(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(UTILLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 _as-z80:

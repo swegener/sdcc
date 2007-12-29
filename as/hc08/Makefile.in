@@ -34,7 +34,7 @@ EXEEXT          = @EXEEXT@
 VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir)
-CFLAGS          = @CFLAGS@ -Wall -I. -I$(srcdir)
+CFLAGS          = @CFLAGS@ -Wall -I. -I$(srcdir) -I$(srcdir)/../../support/Util
 M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@
 
@@ -53,9 +53,9 @@ SRC = asmain.c assubr.c asnoice.c \
       m08ext.c m08pst.c m08mch.c m08adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
-ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
+ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
 
-AASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
+ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 ASHC08 = $(top_builddir)/bin/as-hc08$(EXEEXT)
 
@@ -119,6 +119,9 @@ $(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(UTILLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 

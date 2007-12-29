@@ -34,7 +34,7 @@ EXEEXT          = @EXEEXT@
 VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir)
-CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -I. -I$(srcdir)
+CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../../support/Util
 M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@
 
@@ -53,9 +53,9 @@ SRC = asmain.c assubr.c asnoice.c \
       i51ext.c i51pst.c i51mch.c i51adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
-ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
+ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
 
-AASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
+ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 ASX8051 = $(top_builddir)/bin/asx8051$(EXEEXT)
 
@@ -119,6 +119,9 @@ $(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(UTILLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 

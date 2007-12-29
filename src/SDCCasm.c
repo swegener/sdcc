@@ -247,6 +247,7 @@ printILine (iCode *ic)
 {
   char *verbalICode;
   struct dbuf_s tmpBuf;
+  size_t len;
   iCodeTable *icTab = getTableEntry (ic->op);
 
   dbuf_init (&tmpBuf, 1024);
@@ -259,13 +260,15 @@ printILine (iCode *ic)
       icTab->iCodePrint (&tmpBuf, ic, icTab->printName);
     }
 
+  len = dbuf_get_length (&tmpBuf);
+
   /* null terminate the buffer */
   dbuf_c_str (&tmpBuf);
   verbalICode = dbuf_detach (&tmpBuf);
 
   /* kill the trailing NL */
-  if ('\n' == verbalICode[strlen(verbalICode) - 1])
-    verbalICode[strlen(verbalICode) - 1] = '\0';
+  if (len > 0 && '\n' == verbalICode[len - 1])
+    verbalICode[--len] = '\0';
 
   /* and throw it up */
   return verbalICode;
@@ -295,7 +298,7 @@ skipLine (FILE *infp)
           /* EOF in the middle of the line */
           is_eof = 1;
           return 1;
-        }  
+        }
       else
         return 0;
     }
@@ -315,6 +318,7 @@ printCLine (const char *srcFile, int lineno)
   static struct dbuf_s lastSrcFile;
   static char dbufInitialized = 0;
   static int inLineNo = 0;
+  size_t len;
 
   if (!dbufInitialized)
     {
@@ -374,17 +378,16 @@ printCLine (const char *srcFile, int lineno)
     }
 
    /* get the line */
-  if (dbuf_getline (&line, inFile))
+  if (0 != (len = dbuf_getline (&line, inFile)))
     {
       const char *inLineString = dbuf_c_str (&line);
-      size_t len = strlen (inLineString);
 
       ++inLineNo;
 
       /* remove the trailing NL */
-      if ('\n' == inLineString[len - 1])
+      if (len > 0 &&'\n' == inLineString[len - 1])
         {
-          dbuf_set_length (&line, len - 1);
+          dbuf_set_length (&line, --len);
           inLineString = dbuf_c_str (&line);
         }
 

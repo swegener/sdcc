@@ -40,19 +40,22 @@ LDFLAGS         = @LDFLAGS@
 
 OBJDIR = obj
 
-ASXXLIB = $(srcdir)/../asxxsrc
+UTILLIB = $(srcdir)/../../support/Util
+UTILSRC = dbuf.c dbuf_string.c
+UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
+ASXXLIB = $(srcdir)/../asxxsrc
 ASXXLIBSRC = strcmpi.c assym.c aslex.c
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
 SRC = asmain.c assubr.c asnoice.c \
       asexpr.c asdata.c aslist.c asout.c \
       i51ext.c i51pst.c i51mch.c i51adr.c
-
-ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
-                  
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
-ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
-ASOBJECTS = $(OBJS) $(ASXXLIBOBJS)
+
+ASSOURCES = %(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
+
+AASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 ASX8051 = $(top_builddir)/bin/asx8051$(EXEEXT)
 

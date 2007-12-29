@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#include "dbuf_string.h"
 #include "asm.h"
 
 /*)Module       aslex.c
@@ -356,75 +357,6 @@ getmap(d)
         return (c);
 }
 
-/*)Function     char *  readlin()
- *
- *              char *  str             poinetr to beginning of the buffer
- *              size_t  n               size of the buffer
- *              FILE *  infp            input file pointer
- *
- *      The function readlin() reads a line from a file to the buffer s.
- *      The buffer length is n. If the line is truncterd to n -1 caharecters
- *      if it is longer the n - 1 characters.
- *      Trailing LF or CR/LF are removed from str, if present.
- *
- *      local variables:
- *              int c                   character read from the file
- *              char *s                 buffer pointer
- *              satic char eof_f        EOF flag
- *
- *      global variables:
- *              none
- *
- *      called functions:
- *              int     getc            c-library
- */
-
-char *
-readlin(char *str, size_t n, FILE *infp)
-{
-  int c = ' ';  /* initialize it to something for the caharacter eating step */
-  char *s;
-  static char eof_f = 0;
-
-  if (eof_f)
-    {
-      eof_f = 0;
-      return NULL;
-    }
-
-  if (n > 0)
-    {
-    s = str;
-    if (n > 1)
-      {
-        while (--n && (c = getc(infp)) != '\n' && c != EOF)
-          *s++ = c;
-      }
-
-    /* chop CR */
-    if (s > str && *(s - 1) == '\r')
-      --s;
-
-    /* terminate the line */
-    *s = '\0';
-
-    /* eat characters until the end of line */
-    while (c != '\n' && c != EOF)
-      c = getc(infp);
-
-    /* if the EOF is not at the beginning of the line, return the line;
-       return NULL at the next call of redlin */
-    if (c == EOF)
-      {
-        if (s == str)
-          return NULL;
-        eof_f = 1;
-      }
-    }
-
-  return str;
-}
-
 /*)Function     int     as_getline()
  *
  *      The function as_getline() reads a line of assembler-source text
@@ -442,7 +374,7 @@ readlin(char *str, size_t n, FILE *infp)
  *              int     i               string length
  *
  *      global variables:
- *              char    ib[]            string buffer containing
+ *              const char ib[]         string buffer containing
  *                                      assembler-source text line
  *              char    ifp[]           array of file handles for
  *                                      include files
@@ -459,6 +391,10 @@ readlin(char *str, size_t n, FILE *infp)
  *              int     inpfil          maximum input file index
  *
  *      called functions:
+ *              int     dbuf_init()
+ *              int     dbuf_set_length()
+ *              int     dbuf_getline()
+ *              const char * dbuf_c_str()
  *              int     fclose()        c-library
  *              char *  fgets()         c-library
  *              int     strlen()        c-library
@@ -472,29 +408,64 @@ readlin(char *str, size_t n, FILE *infp)
  */
 
 int
-as_getline()
+as_getline(void)
 {
-loop:   if (incfil >= 0) {
-                if (readlin(ib, sizeof ib, ifp[incfil]) == NULL) {
-                        fclose(ifp[incfil]);
-                        ifp[incfil--] = NULL;
-                        lop = NLPP;
-                        goto loop;
-                } else {
-                        ++incline[incfil];
-                }
-        } else {
-                if (readlin(ib, sizeof ib, sfp[cfile]) == NULL) {
-                        if (++cfile <= inpfil) {
-                                srcline[cfile] = 0;
-                                goto loop;
-                        }
-                        return (0);
-                } else {
-                        ++srcline[cfile];
-                }
+  static struct dbuf_s dbuf;
+  static char dbufInitialized = 0;
+  size_t len;
+
+  if (!dbufInitialized)
+    {
+      dbuf_init (&dbuf, 1024);
+      dbufInitialized = 1;
+    }
+  else
+    dbuf_set_length (&dbuf, 0);
+
+loop:
+  if (incfil >= 0)
+    {
+      if ((len = dbuf_getline (&dbuf, ifp[incfil])) == 0)
+        {
+          fclose (ifp[incfil]);
+          ifp[incfil--] = NULL;
+          lop = NLPP;
+          goto loop;
         }
-        return (1);
+      else
+        {
+          ++incline[incfil];
+        }
+    }
+  else
+    {
+      if ((len = dbuf_getline (&dbuf, sfp[cfile])) == 0)
+        {
+          if (++cfile <= inpfil)
+            {
+              srcline[cfile] = 0;
+              goto loop;
+            }
+          return 0;
+        }
+      else
+        {
+          ++srcline[cfile];
+        }
+    }
+  ib = dbuf_c_str (&dbuf);
+
+  /* remove the trailing NL */
+  if (len > 0 && '\n' == ib[len - 1])
+    {
+      --len;
+      if (len > 0 && '\r' == ib[len - 1])
+        --len;
+      dbuf_set_length (&dbuf, len);
+      ib = dbuf_c_str (&dbuf);
+    }
+
+  return 1;
 }
 
 /*)Function     int     more()

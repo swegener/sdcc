@@ -324,7 +324,7 @@ VOID
 term(register struct expr *esp)
 {
         register int c, n;
-        register char *jp;
+        register const char *jp;
         char id[NCPS];
         struct sym  *sp;
         struct tsym *tp;

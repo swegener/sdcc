@@ -403,10 +403,10 @@ extern  char    *ep;            /*      pointer into error list
                                  */
 extern  char    eb[NERR];       /*      array of generated error codes
                                  */
-extern  char    *ip;            /*      pointer into the assembler-source
+extern  const char *ip;         /*      pointer into the assembler-source
                                  *      text line in ib[]
                                  */
-extern  char    ib[NINPUT];     /*      assembler-source text line
+extern  const char *ib;         /*      assembler-source text line
                                  */
 extern  char    *cp;            /*      pointer to assembler output
                                  *      array cb[]

@@ -7,6 +7,16 @@
 	* src/ds390/gen.c, src/hc08/gen.c, src/mcs51/gen.c, src/pic16/gen.c,
 	  src/pic/gen.c, src/z80/gen.c, src/xa51/gen.c, src/pic16/ralloc.c,
 	  src/pic16/pcode.[ch]: added const qualifier
+	* as/hc08/Makefile.bcc, as/hc08/Makefile.in, as/hc08/as_hc08.dsp,
+	  as/mcs51/Makefile.bcc, as/mcs51/Makefile.in, as/mcs51/asx8051.dsp,
+	  as/z80/Makefile.bcc, as/z80/Makefile.in, as/z80/as_gbz80.dsp,
+	  as/z80/as_z80.dsp: added dbuf.[ch] and dbuf_string[ch] to project
+	* as/asxxsrc/aslex.c: use dbuf_getline()
+	* as/hc08/asdata.c, as/hc08/asexpr.c, as/hc08/asm.h, as/hc08/m08adr.c,
+	  as/mcs51/asdata.c, as/mcs51/asexpr.c, as/mcs51/asm.h,
+	  as/mcs51/i51adr.c, as/z80/asdata.c, as/z80/asexpr.c, as/z80/aslist.c,
+	  as/z80/asm.h, as/z80/z80adr.c:
+	  changed type of ib and ip to const char *
 
 2007-12-28 Borut Razem <borut.razem AT siol.net>
 

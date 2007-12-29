@@ -600,7 +600,6 @@ lstsym(fp)
 FILE *fp;
 {
         register int c, i, j, k;
-        register char *ptr;
         int nmsym, narea;
         struct sym *sp;
         struct sym **p;

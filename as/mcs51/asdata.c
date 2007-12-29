@@ -109,10 +109,10 @@ char    *ep;                    /*      pointer into error list
                                  */
 char    eb[NERR];               /*      array of generated error codes
                                  */
-char    *ip;                    /*      pointer into the assembler-source
+const char *ip;                 /*      pointer into the assembler-source
                                  *      text line in ib[]
                                  */
-char    ib[NINPUT];             /*      assembler-source text line
+const char *ib;                 /*      assembler-source text line
                                  */
 char    *cp;                    /*      pointer to assembler output
                                  *      array cb[]

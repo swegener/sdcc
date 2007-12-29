@@ -7,7 +7,8 @@ PRJDIR          = ../..
 ASOBJECTS       = asmain.obj aslex.obj assubr.obj asnoice.obj \
                   asexpr.obj asdata.obj aslist.obj asout.obj \
                   h08ext.obj h08pst.obj h08mch.obj h08adr.obj \
-                  ../asxxsrc/strcmpi.obj ../asxxsrc/assym.obj
+                  ../asxxsrc/strcmpi.obj ../asxxsrc/assym.obj \
+                  ../../support/Util/dbuf.obj ../../support/Util/dbuf_string.obj
 
 ASX8051         = $(PRJDIR)/bin/asx8051.exe
 

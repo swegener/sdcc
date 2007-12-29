@@ -8138,7 +8138,7 @@ genZ80Code (iCode * lic)
         }
       if (options.iCodeInAsm)
         {
-          char *iLine = printILine(ic);
+          const char *iLine = printILine(ic);
           emit2 (";ic:%d: %s", ic->key, iLine);
           dbuf_free(iLine);
         }

@@ -23,7 +23,6 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
-#include "asm.h"
 #include <time.h>
 #include "newalloc.h"
 #include <fcntl.h>

@@ -3802,7 +3802,7 @@ pCodeFlowLink *pic16_newpCodeFlowLink(pCodeFlow *pcflow)
 /* pic16_newpCodeCSource - create a new pCode Source Symbol        */
 /*-----------------------------------------------------------------*/
 
-pCode *pic16_newpCodeCSource(int ln, char *f, char *l)
+pCode *pic16_newpCodeCSource(int ln, const char *f, const char *l)
 {
 
   pCodeCSource *pccs;

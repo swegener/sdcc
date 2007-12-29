@@ -1,3 +1,19 @@
+2007-12-29 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCasm.[ch]: renamed from asm[ch], use dbuf_getline(), ...
+	* src/src.dsp, src/Makefile.bcc, src/Makefile.in, src/common.h,
+	  src/SDCCglue.c, src/xa51/main.c: asm.[ch] renamed to SDCCasm.[ch]
+	* support/Util/dbuf_string.[ch]: added function dbuf_getline()
+	* src/ds390/gen.c, src/hc08/gen.c, src/mcs51/gen.c, src/pic16/gen.c,
+	  src/pic/gen.c, src/z80/gen.c, src/xa51/gen.c, src/pic16/ralloc.c,
+	  src/pic16/pcode.[ch]: added const qualifier
+
+M      src/SDCCglue.c
+M      
+M      
+M      
+M      
+
 2007-12-28 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/aslex.c: moved from as/mcs51/aslex.c;

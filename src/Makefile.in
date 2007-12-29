@@ -32,7 +32,7 @@ OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
 		  SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o \
-		  asm.o SDCCmacro.o SDCCutil.o SDCCdebug.o cdbFile.o SDCCdwarf2.o\
+		  SDCCasm.o SDCCmacro.o SDCCutil.o SDCCdebug.o cdbFile.o SDCCdwarf2.o\
 		  SDCCerr.o
 
 SPECIAL		= SDCCy.h 

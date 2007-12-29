@@ -11832,7 +11832,7 @@ gen51Code (iCode * lic)
       if (options.iCodeInAsm) {
         char regsInUse[80];
         int i;
-        char *iLine;
+        const char *iLine;
 
         #if 0
         for (i=0; i<8; i++) {

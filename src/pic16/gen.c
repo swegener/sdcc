@@ -13641,12 +13641,12 @@ void genpic16Code (iCode *lic)
       }
 
       if(options.iCodeInAsm) {
-        char *iLine;
+        const char *iLine;
 
-          /* insert here code to print iCode as comment */
-          iLine = printILine(ic);
-          pic16_emitpcomment("ic:%d: %s", ic->seq, iLine);
-          dbuf_free(iLine);
+        /* insert here code to print iCode as comment */
+        iLine = printILine(ic);
+        pic16_emitpcomment("ic:%d: %s", ic->seq, iLine);
+        dbuf_free(iLine);
       }
 
       /* if the result is marked as

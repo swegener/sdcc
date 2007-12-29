@@ -42,7 +42,7 @@ static char *_xa51_keywords[] =
   NULL
 };
 
-/* rewinds declared in asm.c, function printCLine().
+/* rewinds declared in SDCCasm.c, function printCLine().
  * Currently commented out.
  *
  * extern int rewinds;
@@ -55,7 +55,7 @@ void   _xa51_genAssemblerEnd (FILE * of)
 
 void xa51_assignRegisters (ebbIndex *);
 
-static int regParmFlg = 0;	/* determine if we can register a parameter */
+static int regParmFlg = 0;      /* determine if we can register a parameter */
 
 static void
 _xa51_init (void)
@@ -130,16 +130,16 @@ _xa51_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 
 /* Generate code to copy XINIT to XISEG */
 static void _xa51_genXINIT (FILE * of) {
-  fprintf (of, ";	_xa51_genXINIT() start\n");
-  fprintf (of, "	mov	r0,#l_XINIT\n");
-  fprintf (of, "	beq	00002$\n");
-  fprintf (of, "	mov	r1,#s_XINIT\n");
+  fprintf (of, ";       _xa51_genXINIT() start\n");
+  fprintf (of, "        mov     r0,#l_XINIT\n");
+  fprintf (of, "        beq     00002$\n");
+  fprintf (of, "        mov     r1,#s_XINIT\n");
   fprintf (of, "        mov     r2,#s_XISEG\n");
   fprintf (of, "00001$: movc    r3l,[r1+]\n");
   fprintf (of, "        mov     [r2+],r3l\n");
   fprintf (of, "        djnz    r0,00001$\n");
   fprintf (of, "00002$:\n");
-  fprintf (of, ";	_xa51_genXINIT() end\n");
+  fprintf (of, ";       _xa51_genXINIT() end\n");
 }
 
 static void
@@ -178,16 +178,16 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
-    
-    /* if bitwise | add & subtract then no since xa51 is pretty good at it 
+
+    /* if bitwise | add & subtract then no since xa51 is pretty good at it
        so we will cse only if they are local (i.e. both ic & pdic belong to
        the same basic block */
     if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
-	/* then if they are the same Basic block then ok */
-	if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
-	else return 0;
+        /* then if they are the same Basic block then ok */
+        if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
+        else return 0;
     }
-	
+
     /* for others it is cheaper to do the cse */
     return 1;
 }
@@ -211,7 +211,7 @@ oclsExpense (struct memmap *oclass)
 {
   if (IN_FARSPACE(oclass))
     return 1;
-    
+
   return 0;
 }
 
@@ -238,22 +238,22 @@ PORT xa51_port =
 {
   TARGET_ID_XA51,
   "xa51",
-  "MCU 80C51XA",       		/* Target name */
-  NULL,				/* Processor name */
+  "MCU 80C51XA",                /* Target name */
+  NULL,                         /* Processor name */
   {
     glue,
-    FALSE,			/* Emit glue around main */
+    FALSE,                      /* Emit glue around main */
     MODEL_PAGE0,
     MODEL_PAGE0
   },
   {
     _asmCmd,
     NULL,
-    "",				/* Options with debug */
-    "",				/* Options without debug */
+    "",                         /* Options with debug */
+    "",                         /* Options without debug */
     0,
     ".asm",
-    NULL			/* no do_assemble function */
+    NULL                        /* no do_assemble function */
   },
   {
     _linkCmd,
@@ -266,11 +266,11 @@ PORT xa51_port =
     _defaultRules
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 2, 2, 3, 1, 4, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },		/* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
   {
     "XSEG    (XDATA)",
     "STACK   (XDATA)",
@@ -287,10 +287,10 @@ PORT xa51_port =
     "HOME    (CODE)",
     "XISEG   (XDATA)", // initialized xdata
     "XINIT   (CODE)", // a code copy of xiseg
-    "CONST   (CODE)",		// const_name - const data (code or not)
-    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
-    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata
-    "IABS    (ABS,DATA)",	// iabs_name - absolute data
+    "CONST   (CODE)",           // const_name - const data (code or not)
+    "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata
+    "IABS    (ABS,DATA)",       // iabs_name - absolute data
     NULL, // default local map
     NULL, // default global map
     1
@@ -335,27 +335,27 @@ PORT xa51_port =
   _xa51_genAssemblerEnd,
   _xa51_genIVT,
   _xa51_genXINIT,
-  NULL, 			/* genInitStartup */
+  NULL,                         /* genInitStartup */
   _xa51_reset_regparm,
   _xa51_regparm,
   NULL, // process_pragma()
   NULL, // getMangledFunctionName()
   NULL, // hasNativeMulFor()
-  hasExtBitOp,			/* hasExtBitOp */
-  oclsExpense,			/* oclsExpense */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
   TRUE, // use_dw_for_init
-  TRUE,				/* little endian */
-  0,				/* leave lt */
-  0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
-  0,				/* leave == */
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
-  NULL, 			/* no builtin functions */
-  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
-  1,				/* reset labelKey to 1 */
-  1,				/* globals & local static allowed */
+  NULL,                         /* no builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
   PORT_MAGIC
 };

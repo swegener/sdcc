@@ -13,7 +13,7 @@ OBJECTS         = SDCCy.obj SDCClex.obj SDCChasht.obj SDCCmain.obj \
                   SDCCicode.obj SDCCbitv.obj SDCCset.obj SDCClabel.obj \
                   SDCCBBlock.obj SDCCloop.obj SDCCcse.obj SDCCcflow.obj SDCCdflow.obj \
                   SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj \
-                  asm.obj SDCCutil.obj SDCCmacro.obj SDCCdebug.obj cdbFile.obj SDCCerr.obj
+                  SDCCasm.obj SDCCutil.obj SDCCmacro.obj SDCCdebug.obj cdbFile.obj SDCCerr.obj
 
 SLIBOBJS        = $(SLIB)/NewAlloc.obj $(SLIB)/MySystem.obj $(SLIB)/BuildCmd.obj $(SLIB)/dbuf.obj
 

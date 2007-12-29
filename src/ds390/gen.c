@@ -14240,7 +14240,7 @@ gen390Code (iCode * lic)
           cln = ic->lineno;
         }
       if (options.iCodeInAsm) {
-        char *iLine = printILine(ic);
+        const char *iLine = printILine(ic);
         emitcode(";", "ic:%d: %s", ic->key, iLine);
         dbuf_free(iLine);
       }
@@ -14466,7 +14466,7 @@ gen390Code (iCode * lic)
 
         default:
             /* This should never happen, right? */
-            fprintf(stderr, "*** Probable error: unsupported op 0x%x (%c) in %s @ %d\n", 
+            fprintf(stderr, "*** Probable error: unsupported op 0x%x (%c) in %s @ %d\n",
                     ic->op, ic->op, __FILE__, __LINE__);
             ic = ic;
         }

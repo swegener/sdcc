@@ -8,16 +8,16 @@
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
 -------------------------------------------------------------------------*/
 
 //#include "ralloc.h"
@@ -28,12 +28,12 @@ struct regs;
 
    The post code generation is an assembler optimizer. The assembly code
    produced by all of the previous steps is fully functional. This step
-   will attempt to analyze the flow of the assembly code and agressively 
+   will attempt to analyze the flow of the assembly code and agressively
    optimize it. The peep hole optimizer attempts to do the same thing.
    As you may recall, the peep hole optimizer replaces blocks of assembly
    with more optimal blocks (e.g. removing redundant register loads).
    However, the peep hole optimizer has to be somewhat conservative since
-   an assembly program has implicit state information that's unavailable 
+   an assembly program has implicit state information that's unavailable
    when only a few instructions are examined.
      Consider this example:
 
@@ -56,7 +56,7 @@ struct regs;
    example3:
      movwf  t1
      movf   t1,w     ; This  movf can be removed
-     xorwf  t2,w     ; since xorwf will over write Z 
+     xorwf  t2,w     ; since xorwf will over write Z
      skpz
       return
 
@@ -68,14 +68,14 @@ struct regs;
 
 /***********************************************************************
  * debug stuff
- * 
+ *
  * The DFPRINTF macro will call fprintf if PCODE_DEBUG is defined.
  * The macro is used like:
  *
  * DPRINTF(("%s #%d\n","test", 1));
  *
  * The double parenthesis (()) are necessary
- * 
+ *
  ***********************************************************************/
 //#define PCODE_DEBUG
 
@@ -133,7 +133,7 @@ struct regs;
 
 
 /***********************************************************************
- *  Operand types 
+ *  Operand types
  ***********************************************************************/
 #define POT_RESULT  0
 #define POT_LEFT    1
@@ -157,14 +157,14 @@ struct regs;
 
 
 
-typedef enum 
+typedef enum
 {
   PO_NONE=0,         // No operand e.g. NOP
   PO_W,              // The working register (as a destination)
   PO_WREG,           // The working register (as a file register)
   PO_STATUS,         // The 'STATUS' register
   PO_BSR,            // The 'BSR' register
-  PO_FSR0,           // The "file select register" (in PIC18 family it's one 
+  PO_FSR0,           // The "file select register" (in PIC18 family it's one
                      // of three)
   PO_INDF0,          // The Indirect register
   PO_INTCON,         // Interrupt Control register
@@ -195,14 +195,14 @@ typedef enum
  *  PIC_OPCODE
  *
  *  This is not a list of the PIC's opcodes per se, but instead
- *  an enumeration of all of the different types of pic opcodes. 
+ *  an enumeration of all of the different types of pic opcodes.
  *
  ***********************************************************************/
 
 typedef enum
 {
   POC_WILD=-1,   /* Wild card - used in the pCode peep hole optimizer
-		  * to represent ANY pic opcode */
+                  * to represent ANY pic opcode */
   POC_ADDLW=0,
   POC_ADDWF,
   POC_ADDFW,
@@ -317,10 +317,10 @@ typedef enum
   PC_LABEL,       /* assembly label         */
   PC_FLOW,        /* flow analysis          */
   PC_FUNCTION,    /* Function start or end  */
-  PC_WILD,        /* wildcard - an opcode place holder used 
-		   * in the pCode peep hole optimizer */
+  PC_WILD,        /* wildcard - an opcode place holder used
+                   * in the pCode peep hole optimizer */
   PC_CSOURCE,     /* C-Source Line  */
-  PC_ASMDIR,	  /* Assembler directive */
+  PC_ASMDIR,      /* Assembler directive */
   PC_BAD,         /* Mark the pCode object as being bad */
   PC_INFO         /* pCode information node, used primarily in optimizing */
 } PC_TYPE;
@@ -366,7 +366,7 @@ typedef enum
 /************************************************/
 /***************  Structures ********************/
 /************************************************/
-/* These are here as forward references - the 
+/* These are here as forward references - the
  * full definition of these are below           */
 struct pCode;
 struct pCodeWildBlock;
@@ -392,7 +392,7 @@ typedef struct pBranch
 {
   struct pCode   *pc;    // Next pCode in a branch
   struct pBranch *next;  /* If more than one branch
-			  * the next one is here */
+                          * the next one is here */
 
 } pBranch;
 
@@ -400,7 +400,7 @@ typedef struct pBranch
   pCodeOp
 
   pCode Operand structure.
-  For those assembly instructions that have arguments, 
+  For those assembly instructions that have arguments,
   the pCode will have a pCodeOp in which the argument
   can be stored. For example
 
@@ -414,7 +414,7 @@ typedef struct pCodeOp
 {
   PIC_OPTYPE type;
   char *name;
-  
+
 } pCodeOp;
 
 #if 0
@@ -423,7 +423,7 @@ typedef struct pCodeOpBit
   pCodeOp pcop;
   int bit;
   unsigned int inBitSpace: 1; /* True if in bit space, else
-				 just a bit of a register */
+                                 just a bit of a register */
 } pCodeOpBit;
 #endif
 
@@ -431,7 +431,7 @@ typedef struct pCodeOpLit
 {
   pCodeOp pcop;
   int lit;
-  pCodeOp *arg2;	/* needed as pCodeOpLit and pCodeOpLit2 are not separable via their type (PO_LITERAL) */
+  pCodeOp *arg2;        /* needed as pCodeOpLit and pCodeOpLit2 are not separable via their type (PO_LITERAL) */
 } pCodeOpLit;
 
 typedef struct pCodeOpLit2
@@ -471,9 +471,9 @@ typedef struct pCodeOpReg
 
 typedef struct pCodeOp2
 {
-  pCodeOp pcop;		// describes this pCodeOp
-  pCodeOp *pcopL;	// reference to left pCodeOp (src)
-  pCodeOp *pcopR;	// reference to right pCodeOp (dest)
+  pCodeOp pcop;         // describes this pCodeOp
+  pCodeOp *pcopL;       // reference to left pCodeOp (src)
+  pCodeOp *pcopR;       // reference to right pCodeOp (dest)
 } pCodeOp2;
 
 typedef struct pCodeOpRegBit
@@ -482,7 +482,7 @@ typedef struct pCodeOpRegBit
   int bit;                // 0-7 bit number.
   PIC_OPTYPE subtype;     // The type of this register.
   unsigned int inBitSpace: 1; /* True if in bit space, else
-				 just a bit of a register */
+                                 just a bit of a register */
 } pCodeOpRegBit;
 
 
@@ -493,13 +493,13 @@ typedef struct pCodeOpWild
   struct pCodeWildBlock *pcwb;
 
   int id;                 /* index into an array of char *'s that will match
-			   * the wild card. The array is in *pcp. */
+                           * the wild card. The array is in *pcp. */
   pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
-			   * card will be expanded */
+                           * card will be expanded */
   pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
-			   * opcode we matched */
+                           * opcode we matched */
 
-  pCodeOp *pcop2;	  /* second operand if exists */
+  pCodeOp *pcop2;         /* second operand if exists */
 
 } pCodeOpWild;
 
@@ -507,9 +507,9 @@ typedef struct pCodeOpWild
 typedef struct pCodeOpOpt
 {
   pCodeOp pcop;
-  
+
   OPT_TYPE type;          /* optimization node type */
-  
+
   char *key;              /* key by which a block is identified */
 } pCodeOpOpt;
 
@@ -518,7 +518,7 @@ typedef struct pCodeOpLocalReg
   pCodeOp pcop;
 
   LR_TYPE type;
-} pCodeOpLocalReg;  
+} pCodeOpLocalReg;
 
 /*************************************************
     pCode
@@ -589,7 +589,7 @@ typedef struct pCodeCSource
 /*************************************************
     pCodeFlow
 
-  The Flow object is used as marker to separate 
+  The Flow object is used as marker to separate
  the assembly code into contiguous chunks. In other
  words, everytime an instruction cause or potentially
  causes a branch, a Flow object will be inserted into
@@ -605,19 +605,19 @@ typedef struct pCodeFlow
   pCode  pc;
 
   pCode *end;   /* Last pCode in this flow. Note that
-		   the first pCode is pc.next */
+                   the first pCode is pc.next */
 
-  /*  set **uses;   * map the pCode instruction inCond and outCond conditions 
-		 * in this array of set's. The reason we allocate an 
-		 * array of pointers instead of declaring each type of 
-		 * usage is because there are port dependent usage definitions */
+  /*  set **uses;   * map the pCode instruction inCond and outCond conditions
+                 * in this array of set's. The reason we allocate an
+                 * array of pointers instead of declaring each type of
+                 * usage is because there are port dependent usage definitions */
   //int nuses;    /* number of uses sets */
 
   set *from;    /* flow blocks that can send control to this flow block */
   set *to;      /* flow blocks to which this one can send control */
   struct pCodeFlow *ancestor; /* The most immediate "single" pCodeFlow object that
-			       * executes prior to this one. In many cases, this 
-			       * will be just the previous */
+                               * executes prior to this one. In many cases, this
+                               * will be just the previous */
 
   int inCond;   /* Input conditions - stuff assumed defined at entry */
   int outCond;  /* Output conditions - stuff modified by flow block */
@@ -630,12 +630,12 @@ typedef struct pCodeFlow
 
   set *registers;/* Registers used in this flow */
 
-  struct defmap_s *defmap;	/* chronologically ordered list of definitions performed
-			   in this flow (most recent at the front) */
-  struct defmap_s *in_vals;	/* definitions of all symbols reaching this flow
-  				 * symbols with multiple different definitions are stored
-				 * with an assigned value of 0. */
-  struct defmap_s *out_vals;	/* definitions valid AFTER thie flow */
+  struct defmap_s *defmap;      /* chronologically ordered list of definitions performed
+                           in this flow (most recent at the front) */
+  struct defmap_s *in_vals;     /* definitions of all symbols reaching this flow
+                                 * symbols with multiple different definitions are stored
+                                 * with an assigned value of 0. */
+  struct defmap_s *out_vals;    /* definitions valid AFTER thie flow */
 
 } pCodeFlow;
 
@@ -695,15 +695,15 @@ typedef struct pCodeInstruction
   unsigned int isLit:     1;   /* True if this instruction has an literal operand */
   unsigned int isAccess:   1;   /* True if this instruction has an access RAM operand */
   unsigned int isFastCall: 1;   /* True if this instruction has a fast call/return mode select operand */
-  unsigned int is2MemOp: 1;	/* True is second operand is a memory operand VR - support for MOVFF */
-  unsigned int is2LitOp: 1;	/* True if instruction takes 2 literal operands VR - support for LFSR */
+  unsigned int is2MemOp: 1;     /* True is second operand is a memory operand VR - support for MOVFF */
+  unsigned int is2LitOp: 1;     /* True if instruction takes 2 literal operands VR - support for LFSR */
 
   PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
   unsigned int inCond;   // Input conditions for this instruction
   unsigned int outCond;  // Output conditions for this instruction
 
-#define PCI_MAGIC	0x6e12
-  unsigned int pci_magic;	// sanity check for pci initialization
+#define PCI_MAGIC       0x6e12
+  unsigned int pci_magic;       // sanity check for pci initialization
 } pCodeInstruction;
 
 
@@ -715,7 +715,7 @@ typedef struct pCodeInstruction
 typedef struct pCodeAsmDir
 {
   pCodeInstruction pci;
-  
+
   char *directive;
   char *arg;
 } pCodeAsmDir;
@@ -732,7 +732,7 @@ typedef struct pCodeLabel
 
   char *label;
   int key;
-  int force;		/* label cannot be optimized out */
+  int force;            /* label cannot be optimized out */
 
 } pCodeLabel;
 
@@ -747,9 +747,9 @@ typedef struct pCodeFunction
 
   char *modname;
   char *fname;     /* If NULL, then this is the end of
-		      a function. Otherwise, it's the
-		      start and the name is contained
-		      here */
+                      a function. Otherwise, it's the
+                      start and the name is contained
+                      here */
 
   pBranch *from;       // pCodes that execute before this one
   pBranch *to;         // pCodes that execute after
@@ -760,7 +760,7 @@ typedef struct pCodeFunction
   int absblock;    /* hack to emulate a block pCodes in absolute position
                       but not inside a function */
   int stackusage;  /* stack positions used in function */
-  
+
 } pCodeFunction;
 
 
@@ -773,9 +773,9 @@ typedef struct pCodeWild
 
   pCodeInstruction  pci;
 
-  int    id;     /* Index into the wild card array of a peepBlock 
-		  * - this wild card will get expanded into that pCode
-		  *   that is stored at this index */
+  int    id;     /* Index into the wild card array of a peepBlock
+                  * - this wild card will get expanded into that pCode
+                  *   that is stored at this index */
 
   /* Conditions on wild pcode instruction */
   int    mustBeBitSkipInst:1;
@@ -790,18 +790,18 @@ typedef struct pCodeWild
 
 /*************************************************
     pInfo
-    
+
     Here are stored generic informaton
 *************************************************/
 typedef struct pCodeInfo
 {
   pCodeInstruction pci;
-  
-  INFO_TYPE type;	/* info node type */
-  
-  pCodeOp *oper1;	/* info node arguments */
+
+  INFO_TYPE type;       /* info node type */
+
+  pCodeOp *oper1;       /* info node arguments */
 } pCodeInfo;
-  
+
 
 /*************************************************
     pBlock
@@ -901,23 +901,23 @@ typedef struct pCodePeep {
 
 
   /* (Note: a wildcard register is a place holder. Any register
-   * can be replaced by the wildcard when the pcode is being 
+   * can be replaced by the wildcard when the pcode is being
    * compared to the target. */
 
   /* Post Conditions. A post condition is a condition that
    * must be either true or false before the peep rule is
    * accepted. For example, a certain rule may be accepted
-   * if and only if the Z-bit is not used as an input to 
+   * if and only if the Z-bit is not used as an input to
    * the subsequent instructions in a pCode chain.
    */
-  unsigned int postFalseCond;  
+  unsigned int postFalseCond;
   unsigned int postTrueCond;
 
 } pCodePeep;
 
 /*************************************************
 
-  pCode peep command definitions 
+  pCode peep command definitions
 
  Here are some special commands that control the
 way the peep hole optimizer behaves
@@ -953,7 +953,7 @@ typedef struct peepCommand {
 #define PCFLINK(x)((pCodeFlowLink *)(x))
 #define PCW(x)    ((pCodeWild *)(x))
 #define PCCS(x)   ((pCodeCSource *)(x))
-#define PCAD(x)	  ((pCodeAsmDir *)(x))
+#define PCAD(x)   ((pCodeAsmDir *)(x))
 #define PCINF(x)  ((pCodeInfo *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
@@ -987,13 +987,13 @@ typedef struct peepCommand {
 #define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
 #define isPCW(x)        ((PCODE(x)->type == PC_WILD))
 #define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
-#define isPCAD(x)	((PCODE(x)->type == PC_ASMDIR))
+#define isPCAD(x)       ((PCODE(x)->type == PC_ASMDIR))
 #define isPCINFO(x)     ((PCODE(x)->type == PC_INFO))
 
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
 #define isBSR_REG(r)    ((r)->pc_type == PO_BSR)
-#define isACCESS_BANK(r)	(r->accessBank)
+#define isACCESS_BANK(r)        (r->accessBank)
 
 
 
@@ -1009,7 +1009,7 @@ pCode *pic16_newpCodeInlineP(char *cP);            // Create a new pCode given a
 pCode *pic16_newpCodeFunction(char *g, char *f);   // Create a new function
 pCode *pic16_newpCodeLabel(char *name,int key);    // Create a new label given a key
 pCode *pic16_newpCodeLabelFORCE(char *name, int key); // Same as newpCodeLabel but label cannot be optimized out
-pCode *pic16_newpCodeCSource(int ln, char *f, char *l); // Create a new symbol line 
+pCode *pic16_newpCodeCSource(int ln, const char *f, const char *l); // Create a new symbol line
 pBlock *pic16_newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock
 void pic16_printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file
 void pic16_addpCode2pBlock(pBlock *pb, pCode *pc); // Add a pCode to a pBlock
@@ -1024,11 +1024,11 @@ void pCodePeepInit(void);
 void pic16_pBlockConvert2ISR(pBlock *pb);
 void pic16_pBlockConvert2Absolute(pBlock *pb);
 void pic16_initDB(void);
-void pic16_emitDB(int c, char ptype, void *p);		  // Add DB directives to a pBlock
+void pic16_emitDB(int c, char ptype, void *p);            // Add DB directives to a pBlock
 void pic16_emitDS(char *s, char ptype, void *p);
-void pic16_flushDB(char ptype, void *p);			  // Add pending DB data to a pBlock
+void pic16_flushDB(char ptype, void *p);                          // Add pending DB data to a pBlock
 
-pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...); 
+pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...);
 
 pCodeOp *pic16_newpCodeOpLabel(char *name, int key);
 pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space);
@@ -1067,9 +1067,9 @@ extern char *LR_TYPE_STR[];
 
 #ifndef debugf
 //#define debugf(frm, rest...)       _debugf(__FILE__, __LINE__, frm, rest)
-#define debugf(frm, rest)	_debugf(__FILE__, __LINE__, frm, rest)
-#define debugf2(frm, arg1, arg2)	_debugf(__FILE__, __LINE__, frm, arg1, arg2)
-#define debugf3(frm, arg1, arg2, arg3)	_debugf(__FILE__, __LINE__, frm, arg1, arg2, arg3)
+#define debugf(frm, rest)       _debugf(__FILE__, __LINE__, frm, rest)
+#define debugf2(frm, arg1, arg2)        _debugf(__FILE__, __LINE__, frm, arg1, arg2)
+#define debugf3(frm, arg1, arg2, arg3)  _debugf(__FILE__, __LINE__, frm, arg1, arg2, arg3)
 
 #endif
 

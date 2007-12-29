@@ -1,20 +1,43 @@
-/** @file asm.c
-    Provides output functions that modify the output string
+/*-------------------------------------------------------------------------
+  SDCCasm.c - header file for all types of stuff to support different assemblers.
+
+
+  Written By - Michael Hope <michaelh@juju.net.nz> 2000
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!
+-------------------------------------------------------------------------*/
+
+/*  Provides output functions that modify the output string
     based on the input tokens and the assembler token mapping
     specification loaded.
 
     Note that the functions below only handle digit format modifiers.
     eg %02X is ok, but %lu and %.4u will fail.
 */
+
 #include <errno.h>
 
 #include "common.h"
-#include "asm.h"
 #include "dbuf_string.h"
 
 /* A 'token' is like !blah or %24f and is under the programmers
    control. */
-#define MAX_TOKEN_LEN           64
 
 static hTab *_h;
 
@@ -56,8 +79,6 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
   static int count;
   struct dbuf_s tmpDBuf;
   const char *noTokens;
-  char *p;
-  char token[MAX_TOKEN_LEN];
   const char *sz = format;
 
   dbuf_init(&tmpDBuf, INITIAL_INLINEASM);
@@ -70,36 +91,38 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
           /* Start of a token.  Search until the first
              [non alpha, *] and call it a token. */
           const char *t;
-          p = token;
+          struct dbuf_s token;
+
+          dbuf_init (&token, 64);
           sz++;
           while (isalpha ((unsigned char)*sz) || *sz == '*')
             {
-              *p++ = *sz++;
+              dbuf_append (&token, sz++, 1);
             }
-          *p = '\0';
           /* Now find the token in the token list */
-          if ((t = shash_find (_h, token)))
+          if ((t = shash_find (_h, dbuf_c_str(&token))))
             {
-              dbuf_append_str(&tmpDBuf, t);
+              dbuf_append_str (&tmpDBuf, t);
             }
           else
             {
-              fprintf (stderr, "Cant find token \"%s\"\n", token);
+              fprintf (stderr, "Cant find token \"%s\"\n", dbuf_c_str(&token));
               wassert (0);
             }
+          dbuf_destroy (&token);
         }
       else
         {
-          dbuf_append_char(&tmpDBuf, *sz++);
+          dbuf_append_char (&tmpDBuf, *sz++);
         }
     }
 
   /* Second pass: Expand any macros that we own */
-  noTokens = dbuf_c_str(&tmpDBuf);
-  sz = noTokens;
+  dbuf_c_str (&tmpDBuf);
+  sz = noTokens = dbuf_detach (&tmpDBuf);
 
   /* recycle tmpDBuf */
-  dbuf_init(&tmpDBuf, INITIAL_INLINEASM);
+  dbuf_init (&tmpDBuf, INITIAL_INLINEASM);
 
   while (*sz)
     {
@@ -111,50 +134,48 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
             {
             case 'C':
               // Code segment name.
-              dbuf_append_str(&tmpDBuf, CODE_NAME);
+              dbuf_append_str (&tmpDBuf, CODE_NAME);
               sz++;
               break;
 
             case 'F':
               // Source file name.
-              dbuf_append_str(&tmpDBuf, fullSrcFileName);
+              dbuf_append_str (&tmpDBuf, fullSrcFileName);
               sz++;
               break;
 
             case 'N':
               // Current function name.
-              dbuf_append_str(&tmpDBuf, currFunc->rname);
+              dbuf_append_str (&tmpDBuf, currFunc->rname);
               sz++;
               break;
 
             case 'I':
               // Unique ID.
-              dbuf_printf(&tmpDBuf, "%u", ++count);
+              dbuf_printf (&tmpDBuf, "%u", ++count);
               sz++;
               break;
 
             default:
               // Not one of ours.  Copy until the end.
-              dbuf_append_char(&tmpDBuf, '%');
+              dbuf_append_char (&tmpDBuf, '%');
               while (!isalpha ((unsigned char)*sz))
-                dbuf_append_char(&tmpDBuf, *sz++);
+                dbuf_append_char (&tmpDBuf, *sz++);
 
-              dbuf_append_char(&tmpDBuf, *sz++);
+              dbuf_append_char (&tmpDBuf, *sz++);
             }
         }
       else
         {
-          dbuf_append_char(&tmpDBuf, *sz++);
+          dbuf_append_char (&tmpDBuf, *sz++);
         }
     }
 
-  dbuf_free(noTokens);
+  dbuf_free (noTokens);
 
-  sz = dbuf_c_str(&tmpDBuf);
+  dbuf_vprintf (dbuf, dbuf_c_str (&tmpDBuf), ap);
 
-  dbuf_vprintf(dbuf, sz, ap);
-
-  dbuf_destroy(&tmpDBuf);
+  dbuf_destroy (&tmpDBuf);
 }
 
 void
@@ -163,7 +184,7 @@ dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat,...)
   va_list ap;
   va_start (ap, szFormat);
   dbuf_tvprintf (dbuf, szFormat, ap);
-  va_end(ap);
+  va_end (ap);
 }
 
 void
@@ -173,16 +194,16 @@ tsprintf (char *buffer, size_t len, const char *szFormat,...)
   struct dbuf_s dbuf;
   size_t copyLen;
 
-  dbuf_init(&dbuf, INITIAL_INLINEASM);
+  dbuf_init (&dbuf, INITIAL_INLINEASM);
 
   va_start (ap, szFormat);
   dbuf_tvprintf (&dbuf, szFormat, ap);
-  va_end(ap);
+  va_end (ap);
 
-  copyLen = min(len - 1, dbuf_get_length(&dbuf));
-  memcpy(buffer, dbuf_get_buf(&dbuf), copyLen);
+  copyLen = min (len - 1, dbuf_get_length (&dbuf));
+  memcpy (buffer, dbuf_get_buf (&dbuf), copyLen);
   buffer[copyLen] = '\0';
-  dbuf_destroy(&dbuf);
+  dbuf_destroy (&dbuf);
 }
 
 void
@@ -192,19 +213,19 @@ tfprintf (FILE *fp, const char *szFormat,...)
   struct dbuf_s dbuf;
   size_t len;
 
-  dbuf_init(&dbuf, INITIAL_INLINEASM);
+  dbuf_init (&dbuf, INITIAL_INLINEASM);
 
   va_start (ap, szFormat);
   dbuf_tvprintf (&dbuf, szFormat, ap);
-  va_end(ap);
+  va_end (ap);
 
-  len = dbuf_get_length(&dbuf);
-  fwrite(dbuf_get_buf(&dbuf), 1, len, fp);
-  dbuf_destroy(&dbuf);
+  len = dbuf_get_length (&dbuf);
+  fwrite(dbuf_get_buf (&dbuf), 1, len, fp);
+  dbuf_destroy (&dbuf);
 }
 
 void
-asm_addTree (const ASM_MAPPINGS * pMappings)
+asm_addTree (const ASM_MAPPINGS *pMappings)
 {
   const ASM_MAPPING *pMap;
 
@@ -221,25 +242,26 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
 /*-----------------------------------------------------------------*/
 /* printILine - return the readable i-code for this ic             */
 /*-----------------------------------------------------------------*/
-char *
+const char *
 printILine (iCode *ic)
 {
   char *verbalICode;
   struct dbuf_s tmpBuf;
-  iCodeTable *icTab=getTableEntry(ic->op);
+  iCodeTable *icTab = getTableEntry (ic->op);
 
-  dbuf_init(&tmpBuf, 1024);
+  dbuf_init (&tmpBuf, 1024);
 
   if (INLINEASM == ic->op)
     dbuf_append (&tmpBuf, "inline", (sizeof "inline") - 1);
-  else {
-    /* stuff the temporary file with the readable icode */
-    icTab->iCodePrint(&tmpBuf, ic, icTab->printName);
-  }
+  else
+    {
+      /* stuff the temporary file with the readable icode */
+      icTab->iCodePrint (&tmpBuf, ic, icTab->printName);
+    }
 
   /* null terminate the buffer */
-  dbuf_c_str(&tmpBuf);
-  verbalICode = dbuf_detach(&tmpBuf);
+  dbuf_c_str (&tmpBuf);
+  verbalICode = dbuf_detach (&tmpBuf);
 
   /* kill the trailing NL */
   if ('\n' == verbalICode[strlen(verbalICode) - 1])
@@ -249,52 +271,112 @@ printILine (iCode *ic)
   return verbalICode;
 }
 
+
+/*-----------------------------------------------------------------*/
+/* skipLine - skip the line from file infp                         */
+/*-----------------------------------------------------------------*/
+static int
+skipLine (FILE *infp)
+{
+  int c;
+
+  while ((c = getc(infp)) != '\n' && EOF != c)
+    ;
+
+  return EOF != c;
+}
+
 /*-----------------------------------------------------------------*/
 /* printCLine - return the c-code for this lineno                  */
 /*-----------------------------------------------------------------*/
 /* int rewinds=0; */
-char *
-printCLine (char *srcFile, int lineno)
+const char *
+printCLine (const char *srcFile, int lineno)
 {
-  static FILE *inFile=NULL;
-  static char inLineString[1024];
-  static int inLineNo=0;
-  static char lastSrcFile[PATH_MAX];
-  char *ilsP=inLineString;
+  static FILE *inFile = NULL;
+  static struct dbuf_s line;
+  static struct dbuf_s lastSrcFile;
+  static char dbufInitialized = 0;
+  static int inLineNo = 0;
 
-  if (inFile) {
-    if (strcmp (lastSrcFile, srcFile) != 0) {
-      fclose (inFile);
-      inFile = NULL;
-      inLineNo = 0;
-      strncpyz (lastSrcFile, srcFile, PATH_MAX);
+  if (!dbufInitialized)
+    {
+      dbuf_init (&line, 1024);
+      dbuf_init (&lastSrcFile, 1024);
+      dbufInitialized = 1;
     }
-  }
-  if (!inFile && !(inFile = fopen(srcFile, "r"))) {
-    /* can't open the file:
-       don't panic, just return the error message */
-    SDCCsnprintf(inLineString, sizeof(inLineString), "ERROR: %s", strerror(errno));
-  }
-  else {
-    if (lineno<inLineNo) {
-      fseek (inFile, 0, SEEK_SET);
-      inLineNo=0;
-      /* rewinds++; */
+  else
+    {
+      /* empty the dynamic buffer */
+      dbuf_set_length (&line, 0);
     }
-    while (fgets (inLineString, 1024, inFile)) {
-      inLineNo++;
-      if (inLineNo==lineno) {
-        // remove the trailing NL
-        inLineString[strlen(inLineString)-1]='\0';
-        break;
+
+  if (inFile)
+    {
+      if (strcmp (dbuf_c_str (&lastSrcFile), srcFile) != 0)
+        {
+          fclose (inFile);
+          inFile = NULL;
+          inLineNo = 0;
+          dbuf_set_length (&lastSrcFile, 0);
+          dbuf_append_str (&lastSrcFile, srcFile);
+        }
       }
+
+  if (!inFile && !(inFile = fopen(srcFile, "r")))
+    {
+      /* can't open the file:
+         don't panic, just return the error message */
+      dbuf_printf(&line, "ERROR: %s", strerror(errno));
+
+      return dbuf_c_str (&line);
     }
+  else
+    {
+      if (lineno < inLineNo)
+        {
+          /* past the lineno: rewind the file pointer */
+          fseek (inFile, 0, SEEK_SET);
+          inLineNo = 0;
+          /* rewinds++; */
+        }
+
+       /* skip lines until lineno */
+      while (inLineNo + 1 < lineno)
+        {
+          if (!skipLine (inFile))
+            goto err_no_line;
+        }
+
+       /* get the line */
+      if (dbuf_getline (&line, inFile))
+        {
+          inLineNo++;
+          if (inLineNo == lineno)
+            {
+              const char *inLineString = dbuf_c_str (&line);
+              size_t len = strlen (inLineString);
+
+              /* remove the trailing NL */
+              if ('\n' == inLineString[len - 1])
+                {
+                  dbuf_set_length (&line, len - 1);
+                  inLineString = dbuf_c_str (&line);
+                }
+
+              /* skip leading spaces */
+              while (isspace (*inLineString))
+                inLineString++;
+
+              return inLineString;
+            }
+        }
+
+err_no_line:
+      dbuf_printf(&line, "ERROR: no line number %d in file %s", lineno, srcFile);
+
+      return dbuf_c_str (&line);
   }
-
-  while (isspace ((unsigned char)*ilsP))
-    ilsP++;
-
-  return ilsP;
 }
 
 static const ASM_MAPPING _asxxxx_mapping[] =

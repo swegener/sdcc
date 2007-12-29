@@ -10546,7 +10546,7 @@ void genpic14Code (iCode *lic)
         }
 
         if (options.iCodeInAsm) {
-                  char *iLine = printILine(ic);
+          const char *iLine = printILine(ic);
           emitpComment ("[ICODE] %s:%d: %s", ic->filename, ic->lineno, printILine (ic));
                   dbuf_free(iLine);
         }

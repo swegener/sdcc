@@ -35,8 +35,8 @@
 #include "SDCCpeeph.h"
 #include "SDCCdebug.h"
 #include "SDCCutil.h"
+#include "SDCCasm.h"
 
-#include "asm.h"
 #include "port.h"
 
 #include "newalloc.h"

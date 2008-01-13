@@ -1,12 +1,12 @@
 2008-01-13 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added Uninstall/reinstall page, ...
-	*src/SDCCicode.c: fixed bug #1870216 - Error 122: dividing by zero
+	* src/SDCCicode.c: fixed bug #1870216 - Error 122: dividing by zero
 
 2007-12-30 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic16/gen.c: fixed implementation of bitwise operations for
-	  pic16targer
+	  pic16 target
 	* support/regression/tests/bitwise.c: added test cases
 
 2007-12-29 Borut Razem <borut.razem AT siol.net>

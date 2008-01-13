@@ -1,3 +1,7 @@
+2008-01-13 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added Uninstall/reinstall page, ...
+
 2007-12-29 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCasm.[ch]: renamed from asm[ch], use dbuf_getline(), ...

@@ -1226,28 +1226,29 @@ operandOperation (operand * left, operand * right,
                                                    operandLitValue (right)));
       break;
     case '/':
-      if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0)
+      if (IS_UNSIGNED (type))
         {
-          werror (E_DIVIDE_BY_ZERO);
-          retval = right;
-
+          if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0)
+            {
+              werror (E_DIVIDE_BY_ZERO);
+              retval = right;
+            }
+          SPEC_USIGN (let) = 1;
+          SPEC_USIGN (ret) = 1;
+          retval = operandFromValue (valCastLiteral (type,
+                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) /
+                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))));
         }
       else
         {
-          if (IS_UNSIGNED (type))
+          if (operandLitValue (right) == 0)
             {
-              SPEC_USIGN (let) = 1;
-              SPEC_USIGN (ret) = 1;
-              retval = operandFromValue (valCastLiteral (type,
-                                        (TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) /
-                                        (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))));
+              werror (E_DIVIDE_BY_ZERO);
+              retval = right;
             }
-          else
-            {
-              retval = operandFromValue (valCastLiteral (type,
-                                                     operandLitValue (left) /
-                                                     operandLitValue (right)));
-            }
+          retval = operandFromValue (valCastLiteral (type,
+                                                 operandLitValue (left) /
+                                                 operandLitValue (right)));
         }
       break;
     case '%':

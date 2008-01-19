@@ -25,10 +25,11 @@ machine(struct mne *mp)
 {
         register unsigned op;
         register int t, t1, v1;
-        struct expr e, e1;
+        struct expr e, e1, e2;
 
         clrexpr(&e);
         clrexpr(&e1);
+        clrexpr(&e2);
 
         op = mp->m_valu;
         switch (mp->m_type) {
@@ -57,7 +58,7 @@ machine(struct mne *mp)
                 break;
 
         case S_JMP16:
-                /* LCALl or LJMP. In Flat24 mode, this is a 24 bit
+                /* LCALL or LJMP. In Flat24 mode, this is a 24 bit
                  * destination; in 8051 mode, this is a 16 bit
                  * destination.
                  */
@@ -413,16 +414,12 @@ machine(struct mne *mp)
                 t = addr(&e);
                 if ((t != S_DIR) && (t != S_EXT))
                         aerr();
-                outab(op);
-                outrb(&e, R_PAG0);
-
                 comma();
                 expr(&e1, 0);
+                outab(op);
+                outrb(&e, R_PAG0);
                 if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        if ( e1.e_addr == dot.s_addr)
-                                v1 = -3;
-                        else
-                                v1 = e1.e_addr - dot.s_addr - 1;
+                        v1 = e1.e_addr - dot.s_addr - 1;
                         if (pass==2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
@@ -435,13 +432,10 @@ machine(struct mne *mp)
 
         case S_BR:
                 /* Relative branch */
-                outab(op);
                 expr(&e1, 0);
+                outab(op);
                 if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        if ( e1.e_addr == dot.s_addr)
-                                v1 = -2;
-                        else
-                                v1 = e1.e_addr - dot.s_addr - 1;
+                        v1 = e1.e_addr - dot.s_addr - 1;
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
@@ -457,6 +451,8 @@ machine(struct mne *mp)
                 t = addr(&e);
                 comma();
                 t1 = addr(&e1);
+                comma();
+                expr(&e2, 0);
                 switch (t) {
                 case S_A:
                         if (t1 == S_IMMED) {
@@ -490,51 +486,42 @@ machine(struct mne *mp)
                 }
 
                 /* branch destination */
-                comma();
-                expr(&e1, 0);
-                if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        if ( e1.e_addr == dot.s_addr)
-                                v1 = -3;
-                        else
-                                v1 = e1.e_addr - dot.s_addr - 1;
+                if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
+                        v1 = e2.e_addr - dot.s_addr - 1;
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
                 } else {
-                        outrb(&e1, R_PCR);
+                        outrb(&e2, R_PCR);
                 }
-                if (e1.e_mode != S_USER)
+                if (e2.e_mode != S_USER)
                         rerr();
                 break;
 
         case S_DJNZ:
                 /* Dir,dest;  Reg,dest */
                 t = addr(&e);
+                comma();
+                expr(&e1, 0);
                 switch (t) {
 
                 case S_DIR:
                 case S_EXT:
                         outab(op + 5);
                         outrb(&e, R_PAG0);
-                        v1 = -3;
                         break;
 
                 case S_REG:
                         outab(op + 8 + e.e_addr);
-                        v1 = -2;
                         break;
 
                 default:
                         aerr();
-                        v1 = 0;
                 }
 
                 /* branch destination */
-                comma();
-                expr(&e1, 0);
                 if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        if ( e1.e_addr != dot.s_addr)
-                                v1 = e1.e_addr - dot.s_addr - 1;
+                        v1 = e1.e_addr - dot.s_addr - 1;
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);

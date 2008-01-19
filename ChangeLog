@@ -1,3 +1,8 @@
+2008-01-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/asx8051.dsp: removed define SDK
+	* as/mcs51/i51mch.c (machine): fixed bug 1865114
+
 2008-01-13 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added Uninstall/reinstall page, ...

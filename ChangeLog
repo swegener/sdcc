@@ -1,3 +1,9 @@
+2008-01-20 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCcse.c: partially fixed enhancement request
+	  #1793872 - multiply by -1 not collapsed
+	* support/regression/tests/arithcsi.c: added regression test
+
 2008-01-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/asx8051.dsp: removed define SDK

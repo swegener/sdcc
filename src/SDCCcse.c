@@ -957,8 +957,9 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case '*':
       if (IS_OP_LITERAL (IC_LEFT (ic)))
         {
+         double leftValue = operandLitValue (IC_LEFT (ic));
 
-          if (operandLitValue (IC_LEFT (ic)) == 0.0)
+          if (leftValue == 0.0)
             {
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -966,7 +967,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               SET_RESULT_RIGHT (ic);
               return;
             }
-          if (operandLitValue (IC_LEFT (ic)) == 1.0)
+          if (leftValue == 1.0)
             {
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
@@ -987,12 +988,21 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                 }
               return;
             }
+          if (leftValue == -1.0)
+            {
+              /* convert -1 * x to -x */
+              ic->op = UNARYMINUS;
+              IC_LEFT (ic) = IC_RIGHT (ic);
+              IC_RIGHT (ic) = NULL;
+              return;
+            }
         }
 
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
+          double rightValue = operandLitValue (IC_RIGHT (ic));
 
-          if (operandLitValue (IC_RIGHT (ic)) == 0.0)
+          if (rightValue == 0.0)
             {
               ic->op = '=';
               IC_LEFT (ic) = NULL;
@@ -1000,7 +1010,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               return;
             }
 
-          if (operandLitValue (IC_RIGHT (ic)) == 1.0)
+          if (rightValue == 1.0)
             {
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
@@ -1024,6 +1034,13 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                   IC_LEFT (ic)->isLiteral = 0;
                   setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
                 }
+              return;
+            }
+          if (rightValue == -1.0)
+            {
+              /* convert x * -1 to -x */
+              ic->op = UNARYMINUS;
+              IC_RIGHT (ic) = NULL;
               return;
             }
         }

@@ -162,7 +162,7 @@ getSid (char *id)
  *	The function getfid() scans the current input text line from
  *	the current position copying the next string into the external
  *	string buffer (str).  The string ends when end of line is found.
- *	Trailing spacers are removed. The maximum number of characters
+ *	Trailing spaces are removed. The maximum number of characters
  *	copied is PATH_MAX. If the input string is larger than PATH_MAX
  *	characters then the string is truncated. The string is NULL
  *	terminated.
@@ -186,9 +186,7 @@ getSid (char *id)
  */
 
 VOID
-getfid(str, c)
-register int c;
-char *str;
+getfid(char *str, register int c)
 {
 	register char *p;
 
@@ -261,8 +259,7 @@ getnb()
  */
 
 VOID
-skip(c)
-register int c;
+skip(register int c)
 {
 	if (c < 0)
 		c = getnb();
@@ -332,7 +329,7 @@ get()
  */
 
 VOID
-unget(c)
+unget(int c)
 {
 	if (c != 0)
 		--ip;
@@ -370,7 +367,7 @@ unget(c)
  */
 
 int
-getmap(d)
+getmap(int d)
 {
 	register int c, n, v;
 
@@ -628,8 +625,7 @@ endline()
  */
 
 VOID
-chop_crlf(str)
-char *str;
+chop_crlf(char *str)
 {
 	register int i;
 

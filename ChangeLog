@@ -2,6 +2,10 @@
 
 	* as/mcs51/asx8051.dsp: removed define SDK
 	* as/mcs51/i51mch.c (machine): fixed bug 1865114
+	* device/include/asm/ds390/features.h: fixed bug with ds390 & stack-auto
+	* as/link/lklex.c,
+	* as/link/mcs51/lkmain.c: used LKDIRSEP, LKDIRSEPSTR and LKOBJEXT,
+	  cosmetic changes, brought more in sync, changed old K&R to ANSI
 
 2008-01-13 Borut Razem <borut.razem AT siol.net>
 

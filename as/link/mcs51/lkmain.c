@@ -9,7 +9,7 @@
  * Kent, Ohio  44240
  *
  * 31-Oct-97 JLH:
- *           - add jflag and jfp to control NoICE output file genration
+ *           - add jflag and jfp to control NoICE output file generation
  *  3-Nov-97 JLH:
  *           - use a_type == 0 as "virgin area" flag: set == 1 if -b
  */
@@ -421,6 +421,8 @@ main(int argc, char *argv[])
 #endif
 
     lkexit(lkerr);
+
+    /* Never get here. */
     return 0;
 }
 
@@ -459,14 +461,6 @@ lkexit(int i)
     if (sfp != NULL) fclose(sfp);
     if (tfp != NULL) fclose(tfp);
     if (dfp != NULL) fclose(dfp);
-    /*if (dfp != NULL)
-        FILE *xfp = afile(linkp->f_idp,"cdb",1);
-        dfp = freopen("temp.cdb","r",dfp);
-        copyfile(xfp,dfp);
-        fclose(xfp);
-        fclose(dfp);
-        remove("temp.cdb");
-    }*/
     exit(i);
 }
 
@@ -602,7 +596,6 @@ link_main()
         }
     }
 }
-
 
 /*)Function VOID    map()
  *
@@ -853,6 +846,7 @@ parse()
                 case 'R':
                     rflag = 1;
                     break;
+
                 case 'x':
                 case 'X':
                     xflag = 0;
@@ -928,10 +922,10 @@ parse()
             if ( c == ';')
                 return(0);
         } else
-               if (ctype[c] & ILL) {
-                       fprintf(stderr, "Invalid input");
-                       lkexit(1);
-               } else {
+        if (ctype[c] & ILL) {
+            fprintf(stderr, "Invalid input");
+            lkexit(1);
+        } else {
             if (linkp == NULL) {
                 linkp = (struct lfile *)
                     new (sizeof (struct lfile));
@@ -1152,13 +1146,11 @@ setgbl()
             v = expr(0);
             sp = lkpsym(id, 0);
             if (sp == NULL) {
-                fprintf(stderr,
-                "No definition of symbol %s\n", id);
+                fprintf(stderr, "No definition of symbol %s\n", id);
                 lkerr++;
             } else {
                 if (sp->s_flag & S_DEF) {
-                    fprintf(stderr,
-                    "Redefinition of symbol %s\n", id);
+                    fprintf(stderr, "Redefinition of symbol %s\n", id);
                     lkerr++;
                     sp->s_axp = NULL;
                 }
@@ -1173,7 +1165,7 @@ setgbl()
     }
 }
 
-/*)Function FILE *  afile(fn,, ft, wf)
+/*)Function FILE *  afile(fn, ft, wf)
  *
  *      char *  fn      file specification string
  *      char *  ft      file type string
@@ -1213,13 +1205,23 @@ afile(char *fn, char *ft, int wf)
 {
     FILE *fp;
     char fb[PATH_MAX];
-    char *omode = (wf ? (wf == 2 ? "a" : "w") : "r");
+    char *omode;
     int i;
+
+    switch (wf) {
+        case 0: omode = "r"; break;
+        case 1: omode = "w"; break;
+        case 2: omode = "a"; break;
+        case 3: omode = "rb"; break;
+        case 4: omode = "wb"; break;
+        case 5: omode = "ab"; break;
+        default: omode = "r"; break;
+    }
 
     /*Look backward the name path and get rid of the extension, if any*/
     i=strlen(fn);
-    for(; (fn[i]!='.')&&(fn[i]!='\\')&&(fn[i]!='/')&&(i>0); i--);
-    if( (fn[i]=='.') && strcmp(ft, "lnk") )
+    for(; (fn[i]!=FSEPX)&&(fn[i]!=LKDIRSEP)&&(fn[i]!='/')&&(i>0); i--);
+    if( (fn[i]==FSEPX) && strcmp(ft, "lnk") )
     {
         strncpy(fb, fn, i);
         fb[i]=0;
@@ -1230,18 +1232,19 @@ afile(char *fn, char *ft, int wf)
     }
 
     /*Add the extension*/
-    if (fb[i] != '.')
+    if (fb[i] != FSEPX)
     {
-        strcat(fb, ".");
-        strcat(fb, strlen(ft)?ft:"rel");
+        fb[i] = FSEPX;
+        fb[i+1] = 0;
+        strcat(fb, strlen(ft)?ft:LKOBJEXT);
     }
 
     fp = fopen(fb, omode);
     if (fp==NULL)
     {
-        if (strcmp(ft,"adb"))/*Do not complaint for optional adb files*/
+        if (strcmp(ft,"adb"))/*Do not complain for optional adb files*/
         {
-            fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
+            fprintf(stderr, "%s: cannot %s.\n", fb, (wf%3)==1?"create":"open");
             lkerr++;
         }
     }
@@ -1433,8 +1436,7 @@ usage()
  *  side effects:
  *      none
  */
-VOID copyfile (dest,src)
-FILE *src,*dest ;
+VOID copyfile (FILE *dest, FILE *src)
 {
     int ch;
 

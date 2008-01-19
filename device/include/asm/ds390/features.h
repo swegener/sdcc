@@ -19,6 +19,8 @@
 #if defined(SDCC_STACK_AUTO)
   #if defined(SDCC_USE_XSTACK)
     #define _AUTOMEM __pdata
+  #elif defined(SDCC_STACK_TENBIT)
+    #define _AUTOMEM __xdata
   #else
     #define _AUTOMEM __idata
   #endif

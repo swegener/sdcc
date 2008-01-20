@@ -4,10 +4,12 @@
     attr: volatile,
  */
 
+#include <testfwk.h>
+
 void
 test_arithCse(void)
 {
-  (attr) {type} res;
+  {attr} {type} res;
   {attr} {type} i = 10;
 
   /* addition with 0 */

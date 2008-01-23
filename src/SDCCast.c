@@ -391,6 +391,9 @@ ast * createRMW (ast *target, unsigned op, ast *operand)
         tempvar1 = replaceAstWithTemporary(&(target->left));
       if (hasSEFcalls(target->right))
         tempvar2 = replaceAstWithTemporary(&(target->right));
+    } else if ((target->opval.op == INC_OP) || (target->opval.op == DEC_OP)) {
+      /* illegal pre/post-increment/decrement */
+      werrorfl (target->filename, target->lineno, E_LVALUE_REQUIRED, "=");
     } else {
       /* we would have to handle '.', but it is not generated any more */
       wassertl(target->opval.op != '.', "obsolete opcode in tree");
@@ -1104,8 +1107,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast *rootVal)
                         && IS_ARRAY (iexpr->ftype)))
     return newNode ('=', sym, iexpr);
 
-  /* left side is an array so we have to assign each */
-  /* element                                         */
+  /* left side is an array so we have to assign each element */
   if ((IS_LITERAL (iexpr->etype) ||
        SPEC_SCLS (iexpr->etype) == S_CODE)
       && IS_ARRAY (iexpr->ftype))
@@ -1553,7 +1555,7 @@ constExprValue (ast * cexpr, int check)
     {
       return cexpr->opval.val;
     }
-   return NULL;
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,7 @@
+2008-01-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (createRMW): fixed bug 1582651
+
 2008-01-20 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCcse.c: partially fixed enhancement request

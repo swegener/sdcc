@@ -715,8 +715,8 @@ typedef union {
     unsigned char RA3:1;
     unsigned char RA4:1;
     unsigned char RA5:1;
-    unsigned char :1;
-    unsigned char :1;
+    unsigned char RA6:1;
+    unsigned char RA7:1;
   };
 } __PORTA_bits_t;
 extern volatile __PORTA_bits_t __at(PORTA_ADDR) PORTA_bits;
@@ -728,6 +728,8 @@ extern volatile __PORTA_bits_t __at(PORTA_ADDR) PORTA_bits;
 #define RA3                  PORTA_bits.RA3
 #define RA4                  PORTA_bits.RA4
 #define RA5                  PORTA_bits.RA5
+#define RA6                  PORTA_bits.RA6
+#define RA7                  PORTA_bits.RA7
 #endif /* NO_BIT_DEFINES */
 
 // ----- PORTB bits --------------------

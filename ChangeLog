@@ -1,3 +1,20 @@
+2008-01-24 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic16f88.h: added RA6 and RA7
+	* device/lib/pic/libdev/disabled_pic16f886.c,
+	* device/lib/pic/libdev/disabled_pic16f887.c: renamed and enabled
+
+	* src/pic16/devices.inc,
+	* device/include/pic16/pic18f2423.h,
+	* device/include/pic16/pic18f2523.h,
+	* device/include/pic16/pic18fregs.h,
+	* device/lib/pic16/pics.all
+	* device/lib/pic16/libdev/pic18f2423.c,
+	* device/lib/pic16/libdev/pic18f2523.c: added 18f2423 and 18f2523
+	* device/lib/pic16/libio/i2c.ignore,
+	* device/lib/pic16/libio/usart.ignore,
+	* device/lib/pic16/libio/adc.ignore: ignore new devices
+
 2008-01-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (createRMW): fixed bug 1582651

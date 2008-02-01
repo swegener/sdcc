@@ -1,3 +1,8 @@
+2008-02-01 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic16f886.h,
+	* device/include/pic/pic16f887.h: added RA6 and RA7
+
 2008-01-24 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic16f88.h: added RA6 and RA7

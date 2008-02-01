@@ -31,9 +31,9 @@
 
 struct SDCCERRG _SDCCERRG; 
 
-extern char *filename ;
-extern int lineno ;
-extern int fatalError ;
+extern char *filename;
+extern int lineno;
+extern int fatalError;
 
 /* Currently the errIndex field must match the position of the 
  * entry in the array. It is only included in order to make 
@@ -107,7 +107,7 @@ struct
 { E_UNARY_OP, ERROR_LEVEL_ERROR,
    "'unary %c': illegal operand" },
 { E_CONV_ERR, ERROR_LEVEL_ERROR,
-   "convertion error: integral promotion failed" },
+   "conversion error: integral promotion failed" },
 { E_INT_REQD, ERROR_LEVEL_ERROR,
    "type must be INT for bit field definition" },
 { E_BITFLD_SIZE, ERROR_LEVEL_ERROR,
@@ -233,8 +233,8 @@ struct
    "storage class CANNOT be specified for bit variable '%s'" },
 { E_EXTERN_MISMATCH, ERROR_LEVEL_ERROR,
    "extern definition for '%s' mismatches with declaration." },
-{ W_NONRENT_ARGS, ERROR_LEVEL_WARNING,
-   "Functions called via pointers must be 'reentrant' to take arguments" },
+{ E_NONRENT_ARGS, ERROR_LEVEL_ERROR,
+   "Functions called via pointers must be 'reentrant' to take this many arguments" },
 { W_DOUBLE_UNSUPPORTED, ERROR_LEVEL_WARNING,
    "type 'double' not supported assuming 'float'" },
 { W_COMP_RANGE, ERROR_LEVEL_WARNING,
@@ -467,7 +467,7 @@ void setErrorLogLevel (ERROR_LOG_LEVEL level)
 
 /*
 -------------------------------------------------------------------------------
-vwerror - Output a standard eror message with variable number of arguements
+vwerror - Output a standard error message with variable number of arguments
 
 -------------------------------------------------------------------------------
 */
@@ -525,7 +525,7 @@ void vwerror (int errNum, va_list marker)
 }
 /*
 -------------------------------------------------------------------------------
-werror - Output a standard eror message with variable number of arguements
+werror - Output a standard error message with variable number of arguments
 
 -------------------------------------------------------------------------------
 */
@@ -540,7 +540,7 @@ void werror (int errNum, ...)
 
 /*
 -------------------------------------------------------------------------------
-werrorfl - Output a standard eror message with variable number of arguements.
+werrorfl - Output a standard error message with variable number of arguments.
            Use a specified filename and line number instead of the default.
 
 -------------------------------------------------------------------------------
@@ -566,7 +566,7 @@ void werrorfl (char *newFilename, int newLineno, int errNum, ...)
 
 /*
 -------------------------------------------------------------------------------
-fatal - Output a standard eror message with variable number of arguements and
+fatal - Output a standard error message with variable number of arguments and
         call exit()
 -------------------------------------------------------------------------------
 */

@@ -569,7 +569,7 @@ resolveSymbols (ast * tree)
 
       symbol *csym = findSymWithLevel (SymbolTab, tree->opval.val->sym);
 
-      /* if found in the symbol table & they r not the same */
+      /* if found in the symbol table & they are not the same */
       if (csym && tree->opval.val->sym != csym)
         {
           tree->opval.val->sym = csym;
@@ -578,8 +578,8 @@ resolveSymbols (ast * tree)
         }
 
       /* if not found in the symbol table */
-      /* mark it as undefined assume it is */
-      /* an integer in data space         */
+      /* mark it as undefined & assume it */
+      /* is an integer in data space      */
       if (!csym && !tree->opval.val->sym->implicit)
         {
 
@@ -783,15 +783,15 @@ processParms (ast *func,
   else
     functype = func->ftype;
 
-  /* if the function is being called via a pointer &   */
-  /* it has not been defined a reentrant then we cannot */
-  /* have parameters                                   */
+  /* if the function is being called via a pointer &  */
+  /* it has not been defined reentrant then we cannot */
+  /* have parameters                                  */
   /* PIC16 port can... */
   if (!TARGET_IS_PIC16)
     {
       if (func->type != EX_VALUE && !IFFUNC_ISREENT (functype) && !options.stackAuto)
         {
-          werror (W_NONRENT_ARGS);
+          werror (E_NONRENT_ARGS);
           fatalError++;
           return 1;
         }
@@ -930,6 +930,18 @@ processParms (ast *func,
   (*actParm)->etype = getSpec ((*actParm)->ftype = copyLinkChain ((*actParm)->ftype));
   SPEC_REGPARM ((*actParm)->etype) = SPEC_REGPARM (defParm->etype);
   SPEC_ARGREG  ((*actParm)->etype) = SPEC_ARGREG (defParm->etype);
+
+  /* if the function is being called via a pointer &  */
+  /* this parameter is not passed in registers        */
+  /* then the function must be defined reentrant      */
+  if (IS_FUNCPTR (func->ftype) && !SPEC_REGPARM ((*actParm)->etype) &&
+      !IFFUNC_ISREENT (functype) && !options.stackAuto)
+    {
+      werror (E_NONRENT_ARGS);
+      fatalError++;
+      return 1;
+    }
+
   (*parmNumber)++;
   return 0;
 }

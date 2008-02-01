@@ -107,7 +107,7 @@ SDCCERR - SDCC Standard error handler
 #define E_SFR_ADDR_RANGE               89 /* sfr address out of range */
 #define E_BITVAR_STORAGE               90 /* storage given for 'bit' variable */
 #define E_EXTERN_MISMATCH              91 /* extern declaration mismatches */
-#define W_NONRENT_ARGS                 92 /* fptr non reentrant has args */
+#define E_NONRENT_ARGS                 92 /* fptr non reentrant has args */
 #define W_DOUBLE_UNSUPPORTED           93 /* 'double' not supported yet */
 #define W_COMP_RANGE                   94 /* comparison is always %s due to limited range of data type */
 #define W_FUNC_NO_RETURN               95 /* no return statement found */

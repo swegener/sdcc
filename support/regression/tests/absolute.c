@@ -4,6 +4,12 @@
 */
 #include <testfwk.h>
 
+typedef struct
+{
+	int a,b;
+} TestStruct;
+
+{mem} volatile at(0xCABC) TestStruct TestVar = {0,0};
 {mem} at(0xCAB7) char u;
 {mem} at(0xCAB7) char x = 'x';
 {mem} at(0xCAB9) char y = 'y';

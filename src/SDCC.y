@@ -521,7 +521,7 @@ declaration_specifiers
        $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
    }
    | function_specifier                             { $$ = $1; }
-   | function_specifier declaration_specifiers          { 
+   | function_specifier declaration_specifiers          {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
@@ -1040,7 +1040,7 @@ opt_assign_expr
                                  $$ = cenum = constVal(lbuff);
                               }
                               else {
-                                 $$ = cenum = constVal("0");
+                                 $$ = cenum = constCharVal(0);
                               }
                            }
    ;
@@ -1203,7 +1203,7 @@ pointer
          }
    | unqualified_pointer type_specifier_list pointer
          {
-             $$ = $1 ;               
+             $$ = $1 ;
              if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {
                  DCL_PTR_CONST($1) = SPEC_CONST($2);
                  DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
@@ -1228,12 +1228,12 @@ pointer
                      DCL_TYPE($3) = EEPPOINTER;
                      break;
                  default:
-                   // this could be just "constant" 
+                   // this could be just "constant"
                    // werror(W_PTR_TYPE_INVALID);
                      ;
                  }
              }
-             else 
+             else
                  werror (W_PTR_TYPE_INVALID);
              $$->next = $3 ;
          }

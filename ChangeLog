@@ -1,3 +1,10 @@
+2008-02-09 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCval.c, src/SDCCval.h:
+	  code cleaning, added function constChrVal()
+	* src/SDCCglue.c, src/pic/glue.c, src/pic16/glue.c, src/SDCCast.c, src/SDCC.y:
+	  call constChrVal() instead constVal()
+
 2008-02-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (resolveSymbols): added reentrancy check for parameters

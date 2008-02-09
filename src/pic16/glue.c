@@ -601,7 +601,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
 
   if (!(val = list2val (ilist))) {
     // assuming a warning has been thrown
-    val=constVal("0");
+    val = constCharVal (0);
   }
 
   if (val->type != type) {
@@ -1025,7 +1025,7 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
 
   if (!val) {
     // an error has been thrown already
-    val=constVal("0");
+    val = constCharVal (0);
   }
 
   if (IS_LITERAL(val->etype)) {

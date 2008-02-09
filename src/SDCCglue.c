@@ -110,7 +110,7 @@ aopLiteralLong (value * val, int offset, int size)
 
   if (!val) {
     // assuming we have been warned before
-    val=constVal("0");
+    val = constCharVal (0);
   }
 
   /* if it is a float then it gets tricky */
@@ -630,7 +630,7 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, struct dbuf_s * o
 
   if (!(val = list2val (ilist))) {
     // assuming a warning has been thrown
-    val=constVal("0");
+    val = constCharVal (0);
   }
 
   if (val->type != type) {
@@ -881,7 +881,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
 
   if (!val) {
     // an error has been thrown already
-    val=constVal("0");
+    val = constCharVal (0);
   }
 
   if (IS_LITERAL(val->etype)) {

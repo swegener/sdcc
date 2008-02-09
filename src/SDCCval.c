@@ -36,7 +36,7 @@ int cNestLevel;
 /* newValue - allocates and returns a new value        */
 /*-----------------------------------------------------------------*/
 value *
-newValue ()
+newValue (void)
 {
   value *val;
 
@@ -639,7 +639,7 @@ valueFromLit (double lit)
 /* constFloatVal - converts a FLOAT constant to value              */
 /*-----------------------------------------------------------------*/
 value *
-constFloatVal (char *s)
+constFloatVal (const char *s)
 {
   value *val = newValue ();
   double sval;
@@ -649,7 +649,7 @@ constFloatVal (char *s)
   if (p == s)
     {
       werror (E_INVALID_FLOAT_CONST, s);
-      return constVal ("0");
+      return constCharVal (0);
     }
 
   val->type = val->etype = newLink (SPECIFIER);
@@ -664,7 +664,7 @@ constFloatVal (char *s)
 /* constFixed16x16Val - converts a FIXED16X16 constant to value    */
 /*-----------------------------------------------------------------*/
 value *
-constFixed16x16Val (char *s)
+constFixed16x16Val (const char *s)
 {
   value *val = newValue ();
   double sval;
@@ -674,7 +674,7 @@ constFixed16x16Val (char *s)
   if (p == s)
     {
       werror (E_INVALID_FLOAT_CONST, s);
-      return constVal ("0");
+      return constCharVal (0);
     }
 
   val->type = val->etype = newLink (SPECIFIER);
@@ -691,7 +691,8 @@ constFixed16x16Val (char *s)
 value *constVal (const char *s)
 {
   value *val;
-  short hex = 0, octal = 0;
+  bool hex = FALSE, octal = FALSE;
+  char *p;
   double dval;
 
   val = newValue ();            /* alloc space for value   */
@@ -702,84 +703,108 @@ value *constVal (const char *s)
   SPEC_NOUN (val->type) = V_CHAR;
   SPEC_USIGN (val->type) = 0;
 
-  hex = ((strchr (s, 'x') || strchr (s, 'X')) ? 1 : 0);
-
-  /* set the octal flag   */
-  if (!hex && *s == '0' && *(s + 1))
-    octal = 1;
+  if (s[0] == '0')
+    {
+      if (s[1] == 'x' || s[1] == 'X')
+        hex = TRUE;
+      else if (isdigit(s[1]))
+        octal = TRUE;
+    }
 
   errno = 0;
-  if (hex || octal) {
-    unsigned long sval;
-    sval = strtoul (s, NULL, 0);
-    dval = sval;
-    if (errno) {
-      dval = 4294967295.0;
-      werror (W_INVALID_INT_CONST, s, dval);
+  if (hex || octal)
+    {
+      dval = strtoul (s, &p, 0);
+      if (errno)
+        {
+          dval = 4294967295.0;
+          werror (W_INVALID_INT_CONST, s, dval);
+        }
     }
-  } else {
-    dval = strtod(s, NULL);
-  }
+  else
+    {
+      dval = strtod(s, &p);
+    }
 
   /* Setup the flags first */
   /* set the unsigned flag if 'uU' is found */
-  if (strchr (s, 'u') || strchr (s, 'U')) {
-    SPEC_USIGN (val->type) = 1;
-  }
+  if (strchr (p, 'u') || strchr (p, 'U'))
+    {
+      SPEC_USIGN (val->type) = 1;
+    }
 
   /* set the b_long flag if 'lL' is found */
-  if (strchr (s, 'l') || strchr (s, 'L')) {
-    SPEC_NOUN (val->type) = V_INT;
-    SPEC_LONG (val->type) = 1;
-  } else {
-    if (dval<0) { /* "-28u" will still be signed and negative */
-      if (dval<-128) { /* check if we have to promote to int */
-        SPEC_NOUN (val->type) = V_INT;
-      }
-      if (dval<-32768) { /* check if we have to promote to long int */
-        SPEC_LONG (val->type) = 1;
-      }
-    } else { /* >=0 */
-      if (dval>0xff ||  /* check if we have to promote to int */
-          SPEC_USIGN (val->type)) { /* if it's unsigned, we can't use unsigned
-                                     char. After an integral promotion it will
-                                     be a signed int; this certainly isn't what
-                                     the programer wants */
-        SPEC_NOUN (val->type) = V_INT;
-      }
-      else { /* store char's always as unsigned; this helps other optimizations */
-        SPEC_USIGN (val->type) = 1;
-      }
-      if (dval>0xffff && SPEC_USIGN (val->type)) { /* check if we have to promote to long */
-        SPEC_LONG (val->type) = 1;
-      }
-      else if (dval>0x7fff && !SPEC_USIGN (val->type)) { /* check if we have to promote to long int */
-        if ((hex || octal) && /* hex or octal constants may be stored in unsigned type */
-            dval<=0xffff) {
-          SPEC_USIGN (val->type) = 1;
-        } else {
-          SPEC_LONG (val->type) = 1;
-          if (dval>0x7fffffff) {
-            SPEC_USIGN (val->type) = 1;
-          }
-        }
-      }
+  if (strchr (p, 'l') || strchr (p, 'L'))
+    {
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_LONG (val->type) = 1;
     }
-  }
+  else
+    {
+      if (dval < 0)
+        { /* "-28u" will still be signed and negative */
+          if (dval < -128)
+            { /* check if we have to promote to int */
+              SPEC_NOUN (val->type) = V_INT;
+            }
+          if (dval < -32768)
+            { /* check if we have to promote to long int */
+              SPEC_LONG (val->type) = 1;
+            }
+        }
+      else
+        { /* >=0 */
+          if (dval > 0xff ||  /* check if we have to promote to int */
+            SPEC_USIGN (val->type))
+            { /* if it's unsigned, we can't use unsigned
+                 char. After an integral promotion it will
+                 be a signed int; this certainly isn't what
+                 the programer wants */
+              SPEC_NOUN (val->type) = V_INT;
+            }
+          else
+            { /* store char's always as unsigned; this helps other optimizations */
+              SPEC_USIGN (val->type) = 1;
+            }
+          if (dval > 0xffff && SPEC_USIGN (val->type))
+            { /* check if we have to promote to long */
+              SPEC_LONG (val->type) = 1;
+            }
+          else if (dval > 0x7fff && !SPEC_USIGN (val->type))
+            { /* check if we have to promote to long int */
+              if ((hex || octal) && /* hex or octal constants may be stored in unsigned type */
+                dval <= 0xffff)
+                {
+                  SPEC_USIGN (val->type) = 1;
+                }
+              else
+                {
+                  SPEC_LONG (val->type) = 1;
+                  if (dval > 0x7fffffff)
+                    {
+                      SPEC_USIGN (val->type) = 1;
+                    }
+                }
+            }
+        }
+    }
 
   /* check for out of range */
-  if (dval<-2147483648.0) {
-    dval = -2147483648.0;
-    werror (W_INVALID_INT_CONST, s, dval);
-  }
-  if (dval>2147483647.0 && !SPEC_USIGN (val->type)) {
-    dval = 2147483647.0;
-    werror (W_INVALID_INT_CONST, s, dval);
-  }
-  if (dval>4294967295.0) {
-    dval = 4294967295.0;
-    werror (W_INVALID_INT_CONST, s, dval);
-  }
+  if (dval < -2147483648.0)
+    {
+      dval = -2147483648.0;
+      werror (W_INVALID_INT_CONST, s, dval);
+    }
+  if (dval > 2147483647.0 && !SPEC_USIGN (val->type))
+    {
+      dval = 2147483647.0;
+      werror (W_INVALID_INT_CONST, s, dval);
+    }
+  if (dval > 4294967295.0)
+    {
+      dval = 4294967295.0;
+      werror (W_INVALID_INT_CONST, s, dval);
+    }
 
   if (SPEC_LONG (val->type))
     {
@@ -803,6 +828,20 @@ value *constVal (const char *s)
           SPEC_CVAL (val->type).v_int = (TYPE_TARGET_INT) double2ul (dval);
         }
     }
+
+  return val;
+}
+
+value *constCharVal (unsigned char v)
+{
+  value *val = newValue ();            /* alloc space for value   */
+
+  val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
+  SPEC_SCLS (val->type) = S_LITERAL;
+  /* let's start with a signed char */
+  SPEC_NOUN (val->type) = V_CHAR;
+  SPEC_USIGN (val->type) = 1;
+  SPEC_CVAL (val->type).v_uint = v;
 
   return val;
 }
@@ -923,55 +962,34 @@ copyValue (value * src)
 value *
 charVal (const char *s)
 {
-  value *val;
-
-  val = newValue ();
-
-  val->type = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->type) = V_CHAR;
-  SPEC_USIGN(val->type) = 1;
-  SPEC_SCLS (val->type) = S_LITERAL;
-
-  s++;                          /* get rid of quotation */
+  /* get rid of quotation */
   /* if \ then special processing */
-  if (*s == '\\')
+  if (*++s == '\\')
     {
-      s++;                      /* go beyond the backslash  */
-      switch (*s)
+      switch (*++s)             /* go beyond the backslash  */
         {
         case 'n':
-          SPEC_CVAL (val->type).v_uint = '\n';
-          break;
+          return constCharVal ('\n');
         case 't':
-          SPEC_CVAL (val->type).v_uint = '\t';
-          break;
+          return constCharVal ('\t');
         case 'v':
-          SPEC_CVAL (val->type).v_uint = '\v';
-          break;
+          return constCharVal ('\v');
         case 'b':
-          SPEC_CVAL (val->type).v_uint = '\b';
-          break;
+          return constCharVal ('\b');
         case 'r':
-          SPEC_CVAL (val->type).v_uint = '\r';
-          break;
+          return constCharVal ('\r');
         case 'f':
-          SPEC_CVAL (val->type).v_uint = '\f';
-          break;
+          return constCharVal ('\f');
         case 'a':
-          SPEC_CVAL (val->type).v_uint = '\a';
-          break;
+          return constCharVal ('\a');
         case '\\':
-          SPEC_CVAL (val->type).v_uint = '\\';
-          break;
+          return constCharVal ('\\');
         case '\?':
-          SPEC_CVAL (val->type).v_uint = '\?';
-          break;
+          return constCharVal ('\?');
         case '\'':
-          SPEC_CVAL (val->type).v_uint = '\'';
-          break;
+          return constCharVal ('\'');
         case '\"':
-          SPEC_CVAL (val->type).v_uint = '\"';
-          break;
+          return constCharVal ('\"');
 
         case '0' :
         case '1' :
@@ -981,22 +999,17 @@ charVal (const char *s)
         case '5' :
         case '6' :
         case '7' :
-          SPEC_CVAL (val->type).v_uint = octalEscape(&s);
-          break;
+          return constCharVal (octalEscape (&s));
 
         case 'x':
-          SPEC_CVAL (val->type).v_uint = hexEscape(&s) ;
-          break;
+          return constCharVal (hexEscape (&s));
 
         default:
-          SPEC_CVAL (val->type).v_uint = (unsigned char)*s;
-          break;
+           return constCharVal (*s);
         }
     }
   else                          /* not a backslash */
-    SPEC_CVAL (val->type).v_uint = (unsigned char)*s;
-
-  return val;
+    return constCharVal (*s);
 }
 
 /*------------------------------------------------------------------*/
@@ -1143,14 +1156,14 @@ double doubleFromFixed16x16(TYPE_TARGET_ULONG value)
   double tmp=0, exp=2;
 
     tmp = (value & 0xffff0000) >> 16;
-    
+
     while(value) {
       value &= 0xffff;
       if(value & 0x8000)tmp += 1/exp;
       exp *= 2;
       value <<= 1;
     }
-  
+
   return (tmp);
 #else
   return ((double)(value * 1.0) / (double)(1UL << 16));
@@ -1167,14 +1180,14 @@ TYPE_TARGET_ULONG fixed16x16FromDouble(double value)
     tmp = floor( value );
     res = tmp << 16;
     value -= tmp;
-    
+
     tmp = 0;
     while(pos--) {
       value *= 2;
       if(value >= 1.0)tmp |= (1 << pos);
       value -= floor( value );
     }
-  
+
     res |= tmp;
 
   return (res);

@@ -18,7 +18,7 @@
 
   In other words, you are welcome to use, share and improve this program.
   You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!  
+  what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 #ifndef SDCCVAL_H
 #define SDCCVAL_H
@@ -95,9 +95,9 @@ CCR_RESULT;
 #define  IS_VARG(x)             (x->vArgs)
 
 /* forward definitions for the symbol table related functions */
-void initValue ();
-value *newValue ();
+value *newValue (void);
 value *constVal (const char *);
+value *constCharVal (unsigned char);
 value *reverseVal (value *);
 value *reverseValWithType (value *);
 value *copyValue (value *);
@@ -139,8 +139,8 @@ value *list2val (initList *);
 struct ast *list2expr (initList *);
 void resolveIvalSym (initList *, sym_link *);
 value *valFromType (sym_link *);
-value *constFloatVal (char *);
-value *constFixed16x16Val (char *);
+value *constFloatVal (const char *);
+value *constFixed16x16Val (const char *);
 int getNelements (sym_link *, initList *);
 value *valForArray (struct ast *);
 value *valForStructElem (struct ast *, struct ast *);

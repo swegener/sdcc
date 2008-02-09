@@ -1651,7 +1651,7 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
             {
 
               *end = newNode ('+', condExpr->left->right,
-                              newAst_VALUE (constVal ("1")));
+                              newAst_VALUE (constCharVal (1)));
               break;
             }
           return FALSE;
@@ -2072,7 +2072,7 @@ replLoopSym (ast * body, symbol * sym)
           body->type = EX_OP;
           body->opval.op = '-';
           body->left = newAst_VALUE (symbolVal (sym));
-          body->right = newAst_VALUE (constVal ("1"));
+          body->right = newAst_VALUE (constCharVal (1));
 
         }
 
@@ -2124,7 +2124,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
                                          newNode (NULLOP,
                                                   newNode (SUB_ASSIGN,
                                                            newAst_VALUE (symbolVal (sym)),
-                                                           newAst_VALUE (constVal ("1"))),
+                                                           newAst_VALUE (constCharVal (1))),
                                                   rloop))));
 
   rloop->lineno=init->lineno;
@@ -3131,7 +3131,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                             copyAst (tree->right));
                   litTree->right->lineno = tree->lineno;
 
-                  tree->right->opval.val = constVal ("1");
+                  tree->right->opval.val = constCharVal (1);
                   decorateType (parent, resultType);
                 }
               else
@@ -3525,7 +3525,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           tree->type = EX_VALUE;
           tree->left = tree->right = NULL;
-          tree->opval.val = constVal ("0");
+          tree->opval.val = constCharVal (0);
           TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
           return tree;
         }
@@ -3640,7 +3640,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           /* optimize bit-result, even if we optimize a buggy source */
           tree->type = EX_VALUE;
-          tree->opval.val = constVal ("1");
+          tree->opval.val = constCharVal (1);
         }
       else
         tree->left = addCast (tree->left, resultTypeProp, TRUE);
@@ -3674,8 +3674,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->opval.op = '?';
           tree->left  = tree->left->left;
           tree->right = newNode (':',
-                                  newAst_VALUE (constVal ("1")),
-                                  newAst_VALUE (constVal ("0")));
+                                  newAst_VALUE (constCharVal (1)),
+                                  newAst_VALUE (constCharVal (0)));
           tree->right->lineno = tree->lineno;
           tree->decorated = 0;
           return decorateType (tree, resultType);
@@ -3797,7 +3797,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                       (tree->opval.op == LEFT_OP ? "left" : "right"));
               tree->type = EX_VALUE;
               tree->left = tree->right = NULL;
-              tree->opval.val = constVal ("0");
+              tree->opval.val = constCharVal (0);
               TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
               return tree;
             }
@@ -4139,8 +4139,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 if (!options.lessPedantic)
                   werrorfl (tree->filename, tree->lineno, W_COMP_RANGE,
                           ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
-                return decorateType (newAst_VALUE (constVal (
-                                   ccr_result == CCR_ALWAYS_TRUE ? "1" : "0")),
+                return decorateType (newAst_VALUE (constCharVal (
+                                   ccr_result == CCR_ALWAYS_TRUE ? 1 : 0)),
                                                    resultType);
               case CCR_OK:
               default:
@@ -4164,7 +4164,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           /* (unsigned value) ? 1 : 0 */
           tree->opval.op = '?';
           tree->right = newNode (':',
-                                  newAst_VALUE (constVal ("1")),
+                                  newAst_VALUE (constCharVal (1)),
                                   tree->right); /* val 0 */
           tree->right->lineno = tree->lineno;
           tree->right->left->lineno = tree->lineno;
@@ -5795,12 +5795,12 @@ optimizeCompare (ast * root)
         case '>':
         case '<':
         case NE_OP:
-          optExpr = newAst_VALUE (constVal ("0"));
+          optExpr = newAst_VALUE (constCharVal (0));
           break;
         case GE_OP:
         case LE_OP:
         case EQ_OP:
-          optExpr = newAst_VALUE (constVal ("1"));
+          optExpr = newAst_VALUE (constCharVal (1));
           break;
         }
 
@@ -5950,7 +5950,7 @@ static void
 fixupInlineLabel (symbol * sym)
 {
   char name[SDCC_NAME_MAX + 1];
-  
+
   SNPRINTF(name, sizeof(name), "%s_%d", sym->name, inlineState.count);
   strcpy (sym->name, name);
 }
@@ -5968,7 +5968,7 @@ copyAstLoc (ast * dest, ast * src)
   dest->level = src->level;
   dest->block = src->block;
   dest->seqPoint = src->seqPoint;
-  
+
 }
 
 

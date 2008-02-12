@@ -2071,7 +2071,15 @@ compareType (sym_link * dest, sym_link * src)
                 return -1;
               if (IS_FUNC (dest->next) && IS_VOID(src->next))
                 return -1;
-              return compareType (dest->next, src->next);
+              if (IS_VOID (src->next) && IS_VOID (dest->next))
+                return 1;
+              if ((IS_VOID (src->next) && !IS_VOID (dest->next)) ||
+                  (!IS_VOID (src->next) && IS_VOID (dest->next)) )
+                return -1;
+              if (compareType (dest->next, src->next) == 1)
+                return 1;
+              else
+                return 0;
             }
 
           if (DCL_TYPE (src) == DCL_TYPE (dest))
@@ -2080,7 +2088,15 @@ compareType (sym_link * dest, sym_link * src)
                 {
                   //checkFunction(src,dest);
                 }
-              return compareType (dest->next, src->next);
+              if (IS_VOID (src->next) && IS_VOID (dest->next))
+                return 1;
+              if ((IS_VOID (src->next) && !IS_VOID (dest->next)) ||
+                  (!IS_VOID (src->next) && IS_VOID (dest->next)) )
+                return -1;
+              if (compareType (dest->next, src->next) == 1)
+                return 1;
+              else
+                return 0;
             }
           if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next))
             {

@@ -1,3 +1,7 @@
+2008-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (compareType): fixed bug 1309013
+
 2008-02-09 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCval.c, src/SDCCval.h:

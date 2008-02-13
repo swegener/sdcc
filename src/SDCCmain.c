@@ -1309,6 +1309,15 @@ parseCmdLine (int argc, char **argv)
           werror (E_NEED_OPT_O_IN_C1);
           exit (EXIT_FAILURE);
         }
+      else
+        {
+          char *p;
+
+          moduleName = Safe_strdup(dstFileName);
+          for (p = moduleName; *p; ++p)
+            if (!isalnum ((unsigned char)*p))
+              *p = '_';
+        }
     }
   /* if no dstFileName given with -o, we've to find one: */
   if (!dstFileName)
@@ -2069,7 +2078,7 @@ preProcess (char **envp)
 
 /* Set bin paths */
 static void
-setBinPaths(const char *argv0)
+setBinPaths (const char *argv0)
 {
   const char *p;
   char buf[PATH_MAX];
@@ -2085,22 +2094,22 @@ setBinPaths(const char *argv0)
   /* do it in reverse mode, so that addSetHead() can be used
      instead of slower addSet() */
 
-  if ((p = getBinPath(argv0)) != NULL)
-    addSetHead(&binPathSet, (void *)p);
+  if ((p = getBinPath (argv0)) != NULL)
+    addSetHead (&binPathSet, (void *)p);
 
-  if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
-    SNPRINTF(buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
-    addSetHead(&binPathSet, Safe_strdup(buf));
+  if ((p = getenv (SDCC_DIR_NAME)) != NULL) {
+    SNPRINTF (buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
+    addSetHead (&binPathSet, Safe_strdup (buf));
   }
 }
 
 /* Set system include path */
 static void
-setIncludePath(void)
+setIncludePath (void)
 {
   char *p;
-  char *p2=NULL;
-  set *tempSet=NULL;
+  char *p2 = NULL;
+  set *tempSet = NULL;
 
   /*
    * Search logic:
@@ -2118,28 +2127,28 @@ setIncludePath(void)
   if (options.nostdinc)
       return;
 
-  tempSet = appendStrSet(dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
-  includeDirsSet = appendStrSet(tempSet, NULL, DIR_SEPARATOR_STRING);
-  includeDirsSet = appendStrSet(includeDirsSet, NULL, port->target);
-  mergeSets(&includeDirsSet, tempSet);
+  tempSet = appendStrSet (dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
+  includeDirsSet = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
+  includeDirsSet = appendStrSet (includeDirsSet, NULL, port->target);
+  mergeSets (&includeDirsSet, tempSet);
 
-  if ((p = getenv(SDCC_INCLUDE_NAME)) != NULL)
-  {
-    addSetHead(&includeDirsSet, p);
-    p2=Safe_alloc(strlen(p)+strlen(DIR_SEPARATOR_STRING)+strlen(port->target)+1);
-    if(p2!=NULL)
+  if ((p = getenv (SDCC_INCLUDE_NAME)) != NULL)
     {
-        strcpy(p2, p);
-        strcat(p2, DIR_SEPARATOR_STRING);
-        strcat(p2, port->target);
-        addSetHead(&includeDirsSet, p2);
+      addSetHead(&includeDirsSet, p);
+      p2=Safe_alloc(strlen(p)+strlen(DIR_SEPARATOR_STRING)+strlen(port->target)+1);
+      if (p2 != NULL)
+        {
+          strcpy (p2, p);
+          strcat (p2, DIR_SEPARATOR_STRING);
+          strcat (p2, port->target);
+          addSetHead (&includeDirsSet, p2);
+        }
     }
-  }
 }
 
 /* Set system lib path */
 static void
-setLibPath(void)
+setLibPath (void)
 {
   char *p;
 
@@ -2155,15 +2164,15 @@ setLibPath(void)
   if (options.nostdlib)
       return;
 
-  libDirsSet = appendStrSet(dataDirsSet, NULL, LIB_DIR_SUFFIX);
+  libDirsSet = appendStrSet (dataDirsSet, NULL, LIB_DIR_SUFFIX);
 
-  if ((p = getenv(SDCC_LIB_NAME)) != NULL)
-    addSetHead(&libDirsSet, p);
+  if ((p = getenv (SDCC_LIB_NAME)) != NULL)
+    addSetHead (&libDirsSet, p);
 }
 
 /* Set data path */
 static void
-setDataPaths(const char *argv0)
+setDataPaths (const char *argv0)
 {
   const char *p;
   char buf[PATH_MAX];
@@ -2176,28 +2185,28 @@ setDataPaths(const char *argv0)
    * 3. - DATADIR (only on *nix)
    */
 
-  if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
-    SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR, p);
-    addSet(&dataDirsSet, Safe_strdup(buf));
+  if ((p = getenv (SDCC_DIR_NAME)) != NULL) {
+    SNPRINTF (buf, sizeof buf, "%s" PREFIX2DATA_DIR, p);
+    addSet (&dataDirsSet, Safe_strdup (buf));
   }
 
-  if ((p = getBinPath(argv0)) != NULL) {
-    SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR, p);
-    free((void *)p);
-    addSet(&dataDirsSet, Safe_strdup(buf));
+  if ((p = getBinPath (argv0)) != NULL) {
+    SNPRINTF (buf, sizeof buf, "%s" BIN2DATA_DIR, p);
+    Safe_free ((void *)p);
+    addSet (&dataDirsSet, Safe_strdup(buf));
   }
 
 #ifdef _WIN32
-  if (peekSet(dataDirsSet) == NULL) {
+  if (peekSet (dataDirsSet) == NULL) {
     /* this should never happen... */
-    wassertl(0, "Can't get binary path");
+    wassertl (0, "Can't get binary path");
   }
 #else
-  addSet(&dataDirsSet, Safe_strdup(DATADIR));
+  addSet (&dataDirsSet, Safe_strdup (DATADIR));
 #endif
 
-  setIncludePath();
-  setLibPath();
+  setIncludePath ();
+  setLibPath ();
 }
 
 static void
@@ -2295,7 +2304,7 @@ main (int argc, char **argv, char **envp)
 
   /* install signal handler;
      it's only purpose is to call exit() to remove temp files */
-  if (!getenv("SDCC_LEAVE_SIGNALS"))
+  if (!getenv ("SDCC_LEAVE_SIGNALS"))
     {
       signal (SIGABRT, sig_handler);
       signal (SIGTERM, sig_handler);
@@ -2312,8 +2321,8 @@ main (int argc, char **argv, char **envp)
   _findPort (argc, argv);
 
 #ifdef JAMIN_DS390
-  if (strcmp(port->target, "mcs51") == 0) {
-    printf("DS390 jammed in A\n");
+  if (strcmp (port->target, "mcs51") == 0) {
+    printf ("DS390 jammed in A\n");
     _setPort ("ds390");
     ds390_jammed = 1;
   }
@@ -2340,8 +2349,8 @@ main (int argc, char **argv, char **envp)
 
   initValues ();
 
-  setBinPaths(argv[0]);
-  setDataPaths(argv[0]);
+  setBinPaths (argv[0]);
+  setDataPaths (argv[0]);
 
   if (port->initPaths)
     port->initPaths();
@@ -2385,12 +2394,12 @@ main (int argc, char **argv, char **envp)
 
       yyparse ();
 
-      if (pclose(yyin))
-        fatalError = 1;
+      if (!options.c1mode)
+        if (pclose(yyin))
+          fatalError = 1;
 
-      if (fatalError) {
+      if (fatalError)
         exit (EXIT_FAILURE);
-      }
 
       if (port->general.do_glue != NULL)
         (*port->general.do_glue) ();
@@ -2402,9 +2411,8 @@ main (int argc, char **argv, char **envp)
           glue ();
         }
 
-      if (fatalError) {
+      if (fatalError)
         exit (EXIT_FAILURE);
-      }
 
       if (!options.c1mode && !noAssemble)
         {
@@ -2416,13 +2424,13 @@ main (int argc, char **argv, char **envp)
   closeDumpFiles();
 
   if (options.debug && debugFile)
-    debugFile->closeFile();
+    debugFile->closeFile ();
 
   if (!options.cc_only &&
       !fatalError &&
       !noAssemble &&
       !options.c1mode &&
-      (fullSrcFileName || peekSet(relFilesSet) != NULL))
+      (fullSrcFileName || peekSet (relFilesSet) != NULL))
     {
       if (options.verbose)
         printf ("sdcc: Calling linker...\n");

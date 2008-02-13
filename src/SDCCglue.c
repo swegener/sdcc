@@ -1585,18 +1585,11 @@ glue (void)
   char moduleBuf[PATH_MAX];
   int mcs51_like;
 
-  dbuf_init(&vBuf, 4096);
-  dbuf_init(&ovrBuf, 4096);
+  dbuf_init (&vBuf, 4096);
+  dbuf_init (&ovrBuf, 4096);
 
-  if(port->general.glue_up_main &&
-    (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400))
-    {
-      mcs51_like=1; /*So it has bits, sfr, sbits, data, idata, etc...*/
-    }
-  else
-    {
-      mcs51_like=0;
-    }
+  mcs51_like = (port->general.glue_up_main &&
+    (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400));
 
   /* print the global struct definitions */
   if (options.debug)
@@ -1614,7 +1607,7 @@ glue (void)
   /* do the overlay segments */
   emitOverlay (&ovrBuf);
 
-  outputDebugSymbols();
+  outputDebugSymbols ();
 
   /* now put it all together into the assembler file */
   /* create the assembler file name */
@@ -1633,21 +1626,20 @@ glue (void)
   if (!(asmFile = fopen (scratchFileName, "w")))
     {
       werror (E_FILE_OPEN_ERR, scratchFileName);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /* initial comments */
   initialComments (asmFile);
 
   /* print module name */
-  tfprintf (asmFile, "\t!module\n",
-    spacesToUnderscores (moduleBuf, moduleName, sizeof moduleBuf));
-  if(mcs51_like)
+  tfprintf (asmFile, "\t!module\n", moduleName);
+  if (mcs51_like)
     {
       fprintf (asmFile, "\t.optsdcc -m%s", port->target);
 
       switch(options.model)
-      {
+        {
         case MODEL_SMALL:   fprintf (asmFile, " --model-small");   break;
         case MODEL_COMPACT: fprintf (asmFile, " --model-compact"); break;
         case MODEL_MEDIUM:  fprintf (asmFile, " --model-medium");  break;
@@ -1655,7 +1647,7 @@ glue (void)
         case MODEL_FLAT24:  fprintf (asmFile, " --model-flat24");  break;
         case MODEL_PAGE0:   fprintf (asmFile, " --model-page0");   break;
         default: break;
-      }
+        }
       /*if(options.stackAuto)      fprintf (asmFile, " --stack-auto");*/
       if(options.useXstack)      fprintf (asmFile, " --xstack");
       /*if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent");*/
@@ -1664,7 +1656,7 @@ glue (void)
       if(options.parms_in_bank1) fprintf (asmFile, " --parms-in-bank1");
       fprintf (asmFile, "\n");
     }
-  else if(TARGET_Z80_LIKE || TARGET_IS_HC08)
+  else if (TARGET_Z80_LIKE || TARGET_IS_HC08)
     {
       fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
     }
@@ -1682,7 +1674,7 @@ glue (void)
   if (port->assembler.externGlobal)
     printExterns (asmFile);
 
-  if(( mcs51_like )
+  if (( mcs51_like )
      ||( TARGET_IS_Z80 )) /*.p.t.20030924 need to output SFR table for Z80 as well */
     {
       /* copy the sfr segment */
@@ -1692,7 +1684,7 @@ glue (void)
       dbuf_write_and_destroy (&sfr->oBuf, asmFile);
     }
 
-  if(mcs51_like)
+  if (mcs51_like)
     {
       /* copy the sbit segment */
       fprintf (asmFile, "%s", iComments2);
@@ -1701,21 +1693,21 @@ glue (void)
       dbuf_write_and_destroy (&sfrbit->oBuf, asmFile);
 
       /*JCF: Create the areas for the register banks*/
-      if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
+      if (RegBankUsed[0] || RegBankUsed[1] || RegBankUsed[2] || RegBankUsed[3])
         {
           fprintf (asmFile, "%s", iComments2);
           fprintf (asmFile, "; overlayable register banks\n");
           fprintf (asmFile, "%s", iComments2);
-          if(RegBankUsed[0])
+          if (RegBankUsed[0])
             fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
-          if(RegBankUsed[1]||options.parms_in_bank1)
+          if (RegBankUsed[1] || options.parms_in_bank1)
             fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
-          if(RegBankUsed[2])
+          if (RegBankUsed[2])
             fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
-          if(RegBankUsed[3])
+          if (RegBankUsed[3])
             fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
         }
-      if(BitBankUsed)
+      if (BitBankUsed)
         {
           fprintf (asmFile, "%s", iComments2);
           fprintf (asmFile, "; overlayable bit register bank\n");
@@ -1750,7 +1742,7 @@ glue (void)
     }
 
   /* create the stack segment MOF */
-  if (mainf && IFFUNC_HASBODY(mainf->type))
+  if (mainf && IFFUNC_HASBODY (mainf->type))
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; Stack segment in internal ram \n");
@@ -1760,7 +1752,7 @@ glue (void)
     }
 
   /* create the idata segment */
-  if ( (idata) && (mcs51_like) )
+  if ((idata) && (mcs51_like))
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; indirectly addressable internal ram data\n");
@@ -1769,7 +1761,7 @@ glue (void)
     }
 
   /* create the absolute idata/data segment */
-  if ( (i_abs) && (mcs51_like) )
+  if ((i_abs) && (mcs51_like))
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; absolute internal ram data\n");
@@ -1797,7 +1789,7 @@ glue (void)
     }
 
   /* if external stack then reserve space for it */
-  if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack)
+  if (mainf && IFFUNC_HASBODY (mainf->type) && options.useXstack)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; external stack \n");
@@ -1838,7 +1830,7 @@ glue (void)
     }
 
   /* copy the interrupt vector table */
-  if (mainf && IFFUNC_HASBODY(mainf->type))
+  if (mainf && IFFUNC_HASBODY (mainf->type))
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; interrupt vector \n");
@@ -1862,11 +1854,11 @@ glue (void)
   tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);
 
-  if (mainf && IFFUNC_HASBODY(mainf->type))
+  if (mainf && IFFUNC_HASBODY (mainf->type))
     {
       if (port->genInitStartup)
         {
-           port->genInitStartup(asmFile);
+           port->genInitStartup (asmFile);
         }
       else
         {
@@ -1902,13 +1894,13 @@ glue (void)
           // if the port can copy the XINIT segment to XISEG
           if (port->genXINIT)
             {
-              port->genXINIT(asmFile);
+              port->genXINIT (asmFile);
             }
         }
     }
   dbuf_write_and_destroy (&statsg->oBuf, asmFile);
 
-  if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type))
+  if (port->general.glue_up_main && mainf && IFFUNC_HASBODY (mainf->type))
     {
       /* This code is generated in the post-static area.
        * This area is guaranteed to follow the static area
@@ -1925,7 +1917,7 @@ glue (void)
   tfprintf (asmFile, "\t!areahome\n", HOME_NAME);
   dbuf_write_and_destroy (&home->oBuf, asmFile);
 
-  if (mainf && IFFUNC_HASBODY(mainf->type))
+  if (mainf && IFFUNC_HASBODY (mainf->type))
     {
       /* entry point @ start of HOME */
       fprintf (asmFile, "__sdcc_program_startup:\n");
@@ -1952,7 +1944,7 @@ glue (void)
 
   if (port->genAssemblerEnd)
     {
-      port->genAssemblerEnd(asmFile);
+      port->genAssemblerEnd (asmFile);
     }
   fclose (asmFile);
 }

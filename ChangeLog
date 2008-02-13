@@ -1,3 +1,7 @@
+2008-02-13 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/SDCCglue.c: fixed --c1mode
+
 2008-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (compareType): fixed bug 1309013

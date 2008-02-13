@@ -1549,30 +1549,6 @@ emitOverlay (struct dbuf_s * aBuf)
     }
 }
 
-
-/*-----------------------------------------------------------------*/
-/* spacesToUnderscores - replace spaces with underscores        */
-/*-----------------------------------------------------------------*/
-static char *
-spacesToUnderscores (char *dest, const char *src, size_t len)
-{
-  unsigned int i;
-  char *p;
-
-  assert(dest != NULL);
-  assert(src != NULL);
-  assert(len > 0);
-
-  --len;
-  for (p = dest, i = 0; *src != '\0' && i < len; ++src, ++i) {
-    *p++ = isspace((unsigned char)*src) ? '_' : *src;
-  }
-  *p = '\0';
-
-  return dest;
-}
-
-
 /*-----------------------------------------------------------------*/
 /* glue - the final glue that hold the whole thing together        */
 /*-----------------------------------------------------------------*/
@@ -1582,7 +1558,6 @@ glue (void)
   struct dbuf_s vBuf;
   struct dbuf_s ovrBuf;
   FILE *asmFile;
-  char moduleBuf[PATH_MAX];
   int mcs51_like;
 
   dbuf_init (&vBuf, 4096);

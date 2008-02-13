@@ -26,7 +26,7 @@
 #include "common.h"
 
 int eBBNum = 0;
-set *graphEdges = NULL;		/* list of edges in this flow graph */
+set *graphEdges = NULL;         /* list of edges in this flow graph */
 
 struct _dumpFiles dumpFiles[] = {
   {DUMP_RAW0, ".dumpraw0", NULL},
@@ -90,7 +90,7 @@ FILE *createDumpFile (int id) {
   struct _dumpFiles *dumpFilesPtr=dumpFiles;
   static int dumpIndex=0;
   static char dumpIndexStr[32];
-  
+
   while (dumpFilesPtr->id) {
     if (dumpFilesPtr->id==id)
       break;
@@ -116,7 +116,7 @@ FILE *createDumpFile (int id) {
       werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);
     }
-  } 
+  }
 
 #if 0
   fprintf(dumpFilesPtr->filePtr, "Dump file index: %d\n", dumpIndex);
@@ -141,7 +141,7 @@ void closeDumpFiles() {
 /*-----------------------------------------------------------------*/
 /* dumpLiveRanges - dump liverange information into a file         */
 /*-----------------------------------------------------------------*/
-void 
+void
 dumpLiveRanges (int id, hTab * liveRanges)
 {
   FILE *file;
@@ -153,27 +153,27 @@ dumpLiveRanges (int id, hTab * liveRanges)
   } else {
     file = stdout;
   }
-  
-  if (currFunc) 
+
+  if (currFunc)
       fprintf(file,"------------- Func %s -------------\n",currFunc->name);
   for (sym = hTabFirstItem (liveRanges, &k); sym;
        sym = hTabNextItem (liveRanges, &k))
     {
 
       fprintf (file, "%s [k%d lr%d:%d so:%d]{ re%d rm%d}",
-	       (sym->rname[0] ? sym->rname : sym->name),
-	       sym->key,
-	       sym->liveFrom, sym->liveTo,
-	       sym->stack,
-	       sym->isreqv, sym->remat
-	);
+               (sym->rname[0] ? sym->rname : sym->name),
+               sym->key,
+               sym->liveFrom, sym->liveTo,
+               sym->stack,
+               sym->isreqv, sym->remat
+        );
 
       fprintf (file, "{");
       printTypeChain (sym->type, file);
       if (sym->usl.spillLoc)
-	{
-	  fprintf (file, "}{ sir@ %s", sym->usl.spillLoc->rname);
-	}
+        {
+          fprintf (file, "}{ sir@ %s", sym->usl.spillLoc->rname);
+        }
       fprintf (file, "} clashes with ");
       bitVectDebugOn(sym->clashes,file);
       fprintf (file, "\n");
@@ -186,7 +186,7 @@ dumpLiveRanges (int id, hTab * liveRanges)
 /*-----------------------------------------------------------------*/
 /* dumpEbbsToFileExt - writeall the basic blocks to a file         */
 /*-----------------------------------------------------------------*/
-void 
+void
 dumpEbbsToFileExt (int id, ebbIndex * ebbi)
 {
   FILE *of;
@@ -206,37 +206,37 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
     {
       fprintf (of, "\n----------------------------------------------------------------\n");
       fprintf (of, "Basic Block %s (df:%d bb:%d lvl:%d): loopDepth=%d%s%s%s\n",
-	       ebbs[i]->entryLabel->name,
-	       ebbs[i]->dfnum, ebbs[i]->bbnum, ebbs[i]->entryLabel->level,
-	       ebbs[i]->depth,
-	       ebbs[i]->noPath ? " noPath" : "",
-	       ebbs[i]->partOfLoop ? " partOfLoop" : "",
-	       ebbs[i]->isLastInLoop ? " isLastInLoop" : "");
+               ebbs[i]->entryLabel->name,
+               ebbs[i]->dfnum, ebbs[i]->bbnum, ebbs[i]->entryLabel->level,
+               ebbs[i]->depth,
+               ebbs[i]->noPath ? " noPath" : "",
+               ebbs[i]->partOfLoop ? " partOfLoop" : "",
+               ebbs[i]->isLastInLoop ? " isLastInLoop" : "");
 
       // a --nolabelopt makes this more readable
       fprintf (of, "\nsuccessors: ");
-      for (bb=setFirstItem(ebbs[i]->succList); 
-	   bb; 
-	   bb=setNextItem(ebbs[i]->succList)) {
-	fprintf (of, "%s ", bb->entryLabel->name);
+      for (bb=setFirstItem(ebbs[i]->succList);
+           bb;
+           bb=setNextItem(ebbs[i]->succList)) {
+        fprintf (of, "%s ", bb->entryLabel->name);
       }
       fprintf (of, "\npredecessors: ");
-      for (bb=setFirstItem(ebbs[i]->predList); 
-	   bb; 
-	   bb=setNextItem(ebbs[i]->predList)) {
-	fprintf (of, "%s ", bb->entryLabel->name);
+      for (bb=setFirstItem(ebbs[i]->predList);
+           bb;
+           bb=setNextItem(ebbs[i]->predList)) {
+        fprintf (of, "%s ", bb->entryLabel->name);
       }
       {
-	int d;
-	fprintf (of, "\ndominators: ");
-	for (d=0; d<ebbs[i]->domVect->size; d++) {
-	  if (bitVectBitValue(ebbs[i]->domVect, d)) {
-	    fprintf (of, "%s ", ebbi->bbOrder[d]->entryLabel->name); //ebbs[d]->entryLabel->name);
-	  }
-	}
+        int d;
+        fprintf (of, "\ndominators: ");
+        for (d=0; d<ebbs[i]->domVect->size; d++) {
+          if (bitVectBitValue(ebbs[i]->domVect, d)) {
+            fprintf (of, "%s ", ebbi->bbOrder[d]->entryLabel->name); //ebbs[d]->entryLabel->name);
+          }
+        }
       }
       fprintf (of, "\n");
-  
+
       fprintf (of, "\ndefines bitVector :");
       bitVectDebugOn (ebbs[i]->defSet, of);
       fprintf (of, "\nlocal defines bitVector :");
@@ -253,10 +253,10 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
 #endif
 
       if (ebbs[i]->isLastInLoop) {
-	      fprintf (of, "\nInductions Set bitvector :");
-	      bitVectDebugOn (ebbs[i]->linds, of);
+              fprintf (of, "\nInductions Set bitvector :");
+              bitVectDebugOn (ebbs[i]->linds, of);
       }
-      
+
       fprintf (of, "\ninExprs:");
       for (cseSet = ebbs[i]->inExprs; cseSet; cseSet=cseSet->next) {
         cseDef *item=cseSet->item;
@@ -278,7 +278,7 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
         if (item->fromGlobal)
           fprintf (of, "g");
       }
-      
+
       fprintf (of, "\n----------------------------------------------------------------\n");
       printiCChain (ebbs[i]->sch, of);
     }
@@ -292,7 +292,7 @@ eBBlock *
 iCode2eBBlock (iCode * ic)
 {
   iCode *loop;
-  eBBlock *ebb = neweBBlock ();	/* allocate an entry */
+  eBBlock *ebb = neweBBlock (); /* allocate an entry */
 
   /* put the first one unconditionally */
   ebb->sch = ic;
@@ -315,13 +315,13 @@ iCode2eBBlock (iCode * ic)
       ebb->ech = ebb->sch;
       return ebb;
     }
-  
+
   /* if this is a function call */
   if (ic->op == CALL || ic->op == PCALL)
     {
       ebb->hasFcall = 1;
       if (currFunc)
-	FUNC_HASFCALL(currFunc->type) = 1;
+        FUNC_HASFCALL(currFunc->type) = 1;
     }
 
   if ((ic->next && ic->next->op == LABEL) ||
@@ -337,22 +337,22 @@ iCode2eBBlock (iCode * ic)
 
       /* if this is the last one */
       if (!loop->next)
-	break;
+        break;
       /* if this is a function call */
       if (loop->op == CALL || loop->op == PCALL)
-	{
-	  ebb->hasFcall = 1;
-	  if (currFunc)
-	    FUNC_HASFCALL(currFunc->type) = 1;
-	}
+        {
+          ebb->hasFcall = 1;
+          if (currFunc)
+            FUNC_HASFCALL(currFunc->type) = 1;
+        }
 
       /* if the next one is a label */
       /* if this is a goto or ifx */
       if (loop->next->op == LABEL ||
-	  loop->op == GOTO ||
-	  loop->op == JUMPTABLE ||
-	  loop->op == IFX)
-	break;
+          loop->op == GOTO ||
+          loop->op == JUMPTABLE ||
+          loop->op == IFX)
+        break;
     }
 
   /* mark the end of the chain */
@@ -374,7 +374,7 @@ eBBWithEntryLabel (ebbIndex * ebbi, symbol * eLabel)
   for (i = 0; i < count; i++)
     {
       if (isSymbolEqual (ebbs[i]->entryLabel, eLabel))
-	return ebbs[i];
+        return ebbs[i];
     }
 
   return NULL;
@@ -416,21 +416,22 @@ edgesTo (eBBlock * to)
 /*-----------------------------------------------------------------*/
 /* addiCodeToeBBlock - will add an iCode to the end of a block     */
 /*-----------------------------------------------------------------*/
-void 
+void
 addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
 {
   ic->prev = ic->next = NULL;
   /* if the insert point is given */
   if (ip)
     {
+      ic->filename = ip->filename;
       ic->lineno = ip->lineno;
       ic->prev = ip->prev;
       ip->prev = ic;
       ic->next = ip;
       if (!ic->prev)
-	ebp->sch = ic;
+        ebp->sch = ic;
       else
-	ic->prev->next = ic;
+        ic->prev->next = ic;
       return;
     }
 
@@ -447,14 +448,15 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
   if (ebp->ech->op == GOTO || ebp->ech->op == JUMPTABLE
       || ebp->ech->op == RETURN)
     {
+      ic->filename = ebp->ech->filename;
       ic->lineno = ebp->ech->lineno;
       ic->prev = ebp->ech->prev;
       ebp->ech->prev = ic;
       ic->next = ebp->ech;
-      if (!ic->prev)		/* was the last only on in the block */
-	ebp->sch = ic;
+      if (!ic->prev)            /* was the last only on in the block */
+        ebp->sch = ic;
       else
-	ic->prev->next = ic;
+        ic->prev->next = ic;
       return;
     }
 
@@ -481,14 +483,15 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
 /*    else */
 /*        ipoint = ebp->ech ; */
       ipoint = ebp->ech;
+      ic->filename = ipoint->filename;
       ic->lineno = ipoint->lineno;
       ic->prev = ipoint->prev;
       ipoint->prev = ic;
       ic->next = ipoint;
       if (!ic->prev)
-	ebp->sch = ic;
+        ebp->sch = ic;
       else
-	ic->prev->next = ic;
+        ic->prev->next = ic;
       return;
     }
 
@@ -505,7 +508,7 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
 /*-----------------------------------------------------------------*/
 /* remiCodeFromeBBlock - remove an iCode from BBlock               */
 /*-----------------------------------------------------------------*/
-void 
+void
 remiCodeFromeBBlock (eBBlock * ebb, iCode * ic)
 {
   wassert (ic->seq>=ebb->fSeq && ic->seq<=ebb->lSeq);
@@ -529,7 +532,7 @@ iCodeBreakDown (iCode * ic)
   eBBlock **ebbs = NULL;
   iCode *loop = ic;
   ebbIndex *ebbi;
-  
+
   ebbi = Safe_alloc (sizeof (ebbIndex));
   ebbi->count = 0;
   ebbi->dfOrder = NULL; /* no depth first order information yet */
@@ -546,10 +549,10 @@ iCodeBreakDown (iCode * ic)
       eBBlock *ebb = iCode2eBBlock (loop);
       loop = ebb->ech->next;
 
-      ebb->ech->next = NULL;	/* mark the end of this chain */
+      ebb->ech->next = NULL;    /* mark the end of this chain */
       if (loop)
-	loop->prev = NULL;
-      ebb->bbnum = ebbi->count;	/* save this block number     */
+        loop->prev = NULL;
+      ebb->bbnum = ebbi->count; /* save this block number     */
       /* put it in the array */
       ebbs[(ebbi->count)++] = ebb;
 
@@ -567,64 +570,65 @@ iCodeBreakDown (iCode * ic)
       /* be a loop, add a preheader to the block it  */
       /* goes to  if it does not already have one    */
       if (ebbs[(ebbi->count) - 1]->ech &&
-	  (ebbs[(ebbi->count) - 1]->ech->op == GOTO ||
-	   ebbs[(ebbi->count) - 1]->ech->op == IFX))
-	{
+          (ebbs[(ebbi->count) - 1]->ech->op == GOTO ||
+           ebbs[(ebbi->count) - 1]->ech->op == IFX))
+        {
 
-	  symbol *label;
-	  eBBlock *destBlock;
+          symbol *label;
+          eBBlock *destBlock;
 
-	  if (ebbs[(ebbi->count) - 1]->ech->op == GOTO)
-	    label = IC_LABEL (ebbs[(ebbi->count) - 1]->ech);
-	  else if (!(label = IC_TRUE (ebbs[(ebbi->count) - 1]->ech)))
-	    label = IC_FALSE (ebbs[(ebbi->count) - 1]->ech);
+          if (ebbs[(ebbi->count) - 1]->ech->op == GOTO)
+            label = IC_LABEL (ebbs[(ebbi->count) - 1]->ech);
+          else if (!(label = IC_TRUE (ebbs[(ebbi->count) - 1]->ech)))
+            label = IC_FALSE (ebbs[(ebbi->count) - 1]->ech);
 
-	  if ((destBlock = eBBWithEntryLabel (ebbi, label)) &&
-	      destBlock->preHeader == NULL &&
-	      otherPathsPresent (ebbs, destBlock))
-	    {
+          if ((destBlock = eBBWithEntryLabel (ebbi, label)) &&
+              destBlock->preHeader == NULL &&
+              otherPathsPresent (ebbs, destBlock))
+            {
 
-	      symbol *preHeaderLabel  = newiTempLoopHeaderLabel (1);
-	      int i, j;
-	      eBBlock *pBlock;
+              symbol *preHeaderLabel  = newiTempLoopHeaderLabel (1);
+              int i, j;
+              eBBlock *pBlock;
 
-	      /* go thru all block replacing the entryLabel with new label */
-	      /* till we reach the block , then we insert a new ebblock    */
-	      for (i = 0; i < (ebbi->count); i++)
-		{
-		  if (ebbs[i] == destBlock)
-		    break;
-		  replaceLabel (ebbs[i], label, preHeaderLabel);
-		}
+              /* go thru all block replacing the entryLabel with new label */
+              /* till we reach the block , then we insert a new ebblock    */
+              for (i = 0; i < (ebbi->count); i++)
+                {
+                  if (ebbs[i] == destBlock)
+                    break;
+                  replaceLabel (ebbs[i], label, preHeaderLabel);
+                }
 
-	      (ebbi->count)++;
+              (ebbi->count)++;
 
-	      /* if we have stopped at the block , allocate for an extra one */
+              /* if we have stopped at the block , allocate for an extra one */
 
-	      ebbs = Safe_realloc (ebbs, (ebbi->count + 1) * sizeof (eBBlock *));
-	      ebbi->bbOrder = ebbs;
+              ebbs = Safe_realloc (ebbs, (ebbi->count + 1) * sizeof (eBBlock *));
+              ebbi->bbOrder = ebbs;
 
-	      ebbs[ebbi->count] = 0;
+              ebbs[ebbi->count] = 0;
 
-	      /* then move the block down one count */
-	      pBlock = ebbs[j = i];
-	      for (i += 1; i < (ebbi->count); i++)
-		{
-		  eBBlock *xBlock;
+              /* then move the block down one count */
+              pBlock = ebbs[j = i];
+              for (i += 1; i < (ebbi->count); i++)
+                {
+                  eBBlock *xBlock;
 
-		  xBlock = ebbs[i];
-		  ebbs[i] = pBlock;
-		  ebbs[i]->bbnum = i;
-		  pBlock = xBlock;
-		}
+                  xBlock = ebbs[i];
+                  ebbs[i] = pBlock;
+                  ebbs[i]->bbnum = i;
+                  pBlock = xBlock;
+                }
 
-	      destBlock->preHeader = ebbs[j] = neweBBlock ();
-	      ebbs[j]->bbnum = j;
-	      ebbs[j]->entryLabel = preHeaderLabel;
-	      ebbs[j]->sch = ebbs[j]->ech = newiCodeLabelGoto (LABEL, preHeaderLabel);
-	      ebbs[j]->sch->lineno = destBlock->sch->lineno;
-	    }
-	}
+              destBlock->preHeader = ebbs[j] = neweBBlock ();
+              ebbs[j]->bbnum = j;
+              ebbs[j]->entryLabel = preHeaderLabel;
+              ebbs[j]->sch = ebbs[j]->ech = newiCodeLabelGoto (LABEL, preHeaderLabel);
+              ebbs[j]->sch->filename = destBlock->sch->filename;
+              ebbs[j]->sch->lineno = destBlock->sch->lineno;
+            }
+        }
     }
 
   /* mark the end */
@@ -637,7 +641,7 @@ iCodeBreakDown (iCode * ic)
 /* replaceSymBySym : - replace operand by operand in blocks        */
 /*                     replaces only left & right in blocks        */
 /*-----------------------------------------------------------------*/
-void 
+void
 replaceSymBySym (set * sset, operand * src, operand * dest)
 {
   set *loop;
@@ -651,58 +655,58 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
       rBlock = loop->item;
       /* for all instructions in this block do */
       for (ic = rBlock->sch; ic; ic = ic->next)
-	{
+        {
 
-	  /* if we find usage */
-	  if (ic->op == IFX && isOperandEqual (src, IC_COND (ic)))
-	    {
-	      bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
-	      IC_COND (ic) = operandFromOperand (dest);
-	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
-	      continue;
-	    }
+          /* if we find usage */
+          if (ic->op == IFX && isOperandEqual (src, IC_COND (ic)))
+            {
+              bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
+              IC_COND (ic) = operandFromOperand (dest);
+              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+              continue;
+            }
 
-	  if (isOperandEqual (IC_RIGHT (ic), src))
-	    {
-	      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-	      IC_RIGHT (ic) = operandFromOperand (dest);
-	      IC_RIGHT (ic)->isaddr = 0;
-	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
-	    }
+          if (isOperandEqual (IC_RIGHT (ic), src))
+            {
+              bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+              IC_RIGHT (ic) = operandFromOperand (dest);
+              IC_RIGHT (ic)->isaddr = 0;
+              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+            }
 
-	  if (isOperandEqual (IC_LEFT (ic), src))
-	    {
-	      bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
-	      if (POINTER_GET (ic) && IS_ITEMP (dest))
-		{
-		  IC_LEFT (ic) = operandFromOperand (dest);
-		  IC_LEFT (ic)->isaddr = 1;
-		}
-	      else
-		{
-		  IC_LEFT (ic) = operandFromOperand (dest);
-		  IC_LEFT (ic)->isaddr = 0;
-		}
-	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
-	    }
+          if (isOperandEqual (IC_LEFT (ic), src))
+            {
+              bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+              if (POINTER_GET (ic) && IS_ITEMP (dest))
+                {
+                  IC_LEFT (ic) = operandFromOperand (dest);
+                  IC_LEFT (ic)->isaddr = 1;
+                }
+              else
+                {
+                  IC_LEFT (ic) = operandFromOperand (dest);
+                  IC_LEFT (ic)->isaddr = 0;
+                }
+              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+            }
 
-	  /* special case for pointer sets */
-	  if (POINTER_SET (ic) &&
-	      isOperandEqual (IC_RESULT (ic), src))
-	    {
-	      bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
-	      IC_RESULT (ic) = operandFromOperand (dest);
-	      IC_RESULT (ic)->isaddr = 1;
-	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
-	    }
-	}
+          /* special case for pointer sets */
+          if (POINTER_SET (ic) &&
+              isOperandEqual (IC_RESULT (ic), src))
+            {
+              bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+              IC_RESULT (ic) = operandFromOperand (dest);
+              IC_RESULT (ic)->isaddr = 1;
+              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+            }
+        }
     }
 }
 
 /*-----------------------------------------------------------------*/
 /* replaceLabel - replace reference to one label by another        */
 /*-----------------------------------------------------------------*/
-void 
+void
 replaceLabel (eBBlock * ebp, symbol * fromLbl, symbol * toLbl)
 {
   iCode *ic;
@@ -713,20 +717,20 @@ replaceLabel (eBBlock * ebp, symbol * fromLbl, symbol * toLbl)
   for (ic = ebp->sch; ic; ic = ic->next)
     {
       switch (ic->op)
-	{
+        {
 
-	case GOTO:
-	  if (isSymbolEqual (IC_LABEL (ic), fromLbl))
-	    IC_LABEL (ic) = toLbl;
-	  break;
+        case GOTO:
+          if (isSymbolEqual (IC_LABEL (ic), fromLbl))
+            IC_LABEL (ic) = toLbl;
+          break;
 
-	case IFX:
-	  if (IC_TRUE (ic) && isSymbolEqual (IC_TRUE (ic), fromLbl))
-	    IC_TRUE (ic) = toLbl;
-	  else if (isSymbolEqual (IC_FALSE (ic), fromLbl))
-	    IC_FALSE (ic) = toLbl;
-	  break;
-	}
+        case IFX:
+          if (IC_TRUE (ic) && isSymbolEqual (IC_TRUE (ic), fromLbl))
+            IC_TRUE (ic) = toLbl;
+          else if (isSymbolEqual (IC_FALSE (ic), fromLbl))
+            IC_FALSE (ic) = toLbl;
+          break;
+        }
     }
 
   return;
@@ -747,12 +751,12 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
   for (; i < count; i++)
     {
       if (ebbs[i]->sch == NULL)
-	continue;
+        continue;
 
       if (ebbs[i]->noPath &&
-	  (ebbs[i]->entryLabel != entryLabel &&
-	   ebbs[i]->entryLabel != returnLabel))
-	{
+          (ebbs[i]->entryLabel != entryLabel &&
+           ebbs[i]->entryLabel != returnLabel))
+        {
           iCode *ic = NULL;
           bool foundNonlabel = 0;
           ic=ebbs[i]->sch;
@@ -770,10 +774,10 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
           while (ic);
           if (foundNonlabel && ic)
             {
-	      werrorfl (ic->filename, ic->lineno, W_CODE_UNREACH);
+              werrorfl (ic->filename, ic->lineno, W_CODE_UNREACH);
               continue;
             }
-	}
+        }
 
       lic->next = ebbs[i]->sch;
       lic->next->prev = lic;
@@ -788,7 +792,7 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
 /* otherPathsPresent - determines if there is a path from _entry   */
 /*      to this block in a half constructed set of blocks          */
 /*-----------------------------------------------------------------*/
-int 
+int
 otherPathsPresent (eBBlock ** ebbs, eBBlock * this)
 {
   int i;
@@ -800,25 +804,25 @@ otherPathsPresent (eBBlock ** ebbs, eBBlock * this)
 
       /* if there is a reference to the entry label of this block */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
-	  switch (ic->op)
-	    {
-	    case GOTO:
-	      if (IC_LABEL (ic)->key == this->entryLabel->key)
-		return 1;
-	      break;
+        {
+          switch (ic->op)
+            {
+            case GOTO:
+              if (IC_LABEL (ic)->key == this->entryLabel->key)
+                return 1;
+              break;
 
-	    case IFX:
-	      if (IC_TRUE (ic))
-		{
-		  if (IC_TRUE (ic)->key == this->entryLabel->key)
-		    return 1;
-		}
-	      else if (IC_FALSE (ic)->key == this->entryLabel->key)
-		return 1;
-	      break;
-	    }
-	}
+            case IFX:
+              if (IC_TRUE (ic))
+                {
+                  if (IC_TRUE (ic)->key == this->entryLabel->key)
+                    return 1;
+                }
+              else if (IC_FALSE (ic)->key == this->entryLabel->key)
+                return 1;
+              break;
+            }
+        }
     }
 
   /* comes here means we have not found it yet */

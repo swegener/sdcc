@@ -360,7 +360,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                         }
 
                         if(ival) {
-                                setAstLineno(ival, sym->lineDef);
+                                setAstFileLine (ival, sym->fileDef, sym->lineDef);
                                 codeOutBuf = &statsg->oBuf;
                                 GcurMemmap = statsg;
                                 eBBlockFromiCode (iCodeFromAst (ival));

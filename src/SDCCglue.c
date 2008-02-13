@@ -293,7 +293,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
           if (ival) {
             // set ival's lineno to where the symbol was defined
-            setAstLineno (ival, lineno=sym->lineDef);
+            setAstFileLine (ival, filename = sym->fileDef, lineno = sym->lineDef);
             // check if this is not a constant expression
             if (!constExprTree(ival)) {
               werror (E_CONST_EXPECTED, "found expression");

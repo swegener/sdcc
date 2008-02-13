@@ -1135,6 +1135,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             {
               iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
               IC_RESULT (newic) = IC_LEFT (ic);
+              newic->filename = ic->filename;
               newic->lineno = ic->lineno;
               addiCodeToeBBlock (ebp, newic, ic->next);
             }
@@ -1162,6 +1163,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                 {
                   iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
                   IC_RESULT (newic) = IC_LEFT (ic);
+                  newic->filename = ic->filename;
                   newic->lineno = ic->lineno;
                   addiCodeToeBBlock (ebp, newic, ic->next);
                 }
@@ -1209,6 +1211,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             {
               iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
               IC_RESULT (newic) = IC_LEFT (ic);
+              newic->filename = ic->filename;
               newic->lineno = ic->lineno;
               addiCodeToeBBlock (ebp, newic, ic->next);
             }
@@ -1263,6 +1266,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                 {
                   iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
                   IC_RESULT (newic) = IC_LEFT (ic);
+                  newic->filename = ic->filename;
                   newic->lineno = ic->lineno;
                   addiCodeToeBBlock (ebp, newic, ic->next);
                 }
@@ -1283,11 +1287,13 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             {
               iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
               IC_RESULT (newic) = IC_LEFT (ic);
+              newic->filename = ic->filename;
               newic->lineno = ic->lineno;
               addiCodeToeBBlock (ebp, newic, ic->next);
 
               newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
               IC_RESULT (newic) = IC_LEFT (ic);
+              newic->filename = ic->filename;
               newic->lineno = ic->lineno;
               addiCodeToeBBlock (ebp, newic, ic->next);
             }

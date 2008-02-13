@@ -84,12 +84,11 @@ static ast *
 newAst_ (unsigned type)
 {
   ast *ex;
-  static int oldLineno = 0;
 
   ex = Safe_alloc ( sizeof (ast));
 
   ex->type = type;
-  ex->lineno = (noLineno ? oldLineno : lexLineno);
+  ex->lineno = (noLineno ? 0 : lexLineno);
   ex->filename = lexFilename;
   ex->level = NestLevel;
   ex->block = currBlockno;
@@ -223,6 +222,7 @@ copyAst (ast * src)
   dest = Safe_alloc ( sizeof (ast));
 
   dest->type = src->type;
+  dest->filename = src->filename;
   dest->lineno = src->lineno;
   dest->level = src->level;
   dest->funcName = src->funcName;
@@ -616,17 +616,18 @@ resolveChildren:
   return tree;
 }
 
-/*-----------------------------------------------------------------*/
-/* setAstLineno - walks a ast tree & sets the line number          */
-/*-----------------------------------------------------------------*/
-int setAstLineno (ast * tree, int lineno)
+/*------------------------------------------------------------------------*/
+/* setAstFileLine - walks a ast tree & sets the file name and line number */
+/*------------------------------------------------------------------------*/
+int setAstFileLine (ast * tree, char *filename, int lineno)
 {
   if (!tree)
     return 0;
 
+  tree->filename = filename;
   tree->lineno = lineno;
-  setAstLineno (tree->left, lineno);
-  setAstLineno (tree->right, lineno);
+  setAstFileLine (tree->left, filename, lineno);
+  setAstFileLine (tree->right, filename, lineno);
   return 0;
 }
 
@@ -886,6 +887,7 @@ processParms (ast *func,
           /* cast required; change this op to a cast. */
           (*actParm)->decorated = 0;
            *actParm = newNode (CAST, newType, *actParm);
+          (*actParm)->filename = (*actParm)->right->filename;
           (*actParm)->lineno = (*actParm)->right->lineno;
 
           decorateType (*actParm, RESULT_TYPE_NONE);
@@ -1298,7 +1300,7 @@ gatherAutoInit (symbol * autoChain)
                             list2expr (sym->ival));
           }
 
-          setAstLineno (work, sym->lineDef);
+          setAstFileLine (work, sym->fileDef, sym->lineDef);
 
           sym->ival = NULL;
           if (staticAutos)
@@ -1319,8 +1321,9 @@ gatherAutoInit (symbol * autoChain)
           }
 
           /* update lineno for error msg */
+          filename = sym->fileDef;
           lineno = sym->lineDef;
-          setAstLineno (ilist->init.node, sym->lineDef);
+          setAstFileLine (ilist->init.node, sym->fileDef, sym->lineDef);
 
           if (IS_AGGREGATE (sym->type)) {
             work = initAggregates (sym, sym->ival, NULL);
@@ -1335,7 +1338,7 @@ gatherAutoInit (symbol * autoChain)
           }
 
           // just to be sure
-          setAstLineno (work, sym->lineDef);
+          setAstFileLine (work, sym->fileDef, sym->lineDef);
 
           sym->ival = NULL;
           if (init)
@@ -1375,16 +1378,18 @@ stringToSymbol (value * val)
   unsigned int size;
 
   // have we heard this before?
-  for (sp=statsg->syms; sp; sp=sp->next) {
-    sym=sp->item;
-    size = getSize (sym->type);
-    if (sym->isstrlit && size == getSize (val->type) &&
-        !memcmp(SPEC_CVAL(sym->etype).v_char, SPEC_CVAL(val->etype).v_char, size)) {
-      // yes, this is old news. Don't publish it again.
-      sym->isstrlit++; // but raise the usage count
-      return symbolVal(sym);
+  for (sp = statsg->syms; sp; sp = sp->next)
+    {
+      sym = sp->item;
+      size = getSize (sym->type);
+      if (sym->isstrlit && size == getSize (val->type) &&
+          !memcmp (SPEC_CVAL (sym->etype).v_char, SPEC_CVAL (val->etype).v_char, size))
+        {
+          // yes, this is old news. Don't publish it again.
+          sym->isstrlit++; // but raise the usage count
+          return symbolVal (sym);
+        }
     }
-  }
 
   SNPRINTF (name, sizeof(name), "_str_%d", charLbl++);
   sym = newSymbol (name, 0);    /* make it @ level 0 */
@@ -2112,7 +2117,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
                             end));
 
   replLoopSym (loop->left, sym);
-  setAstLineno (rloop, init->lineno);
+  setAstFileLine (rloop, init->filename, init->lineno);
 
   rloop = newNode (NULLOP,
                    newNode ('=',
@@ -2275,6 +2280,7 @@ addCast (ast *tree, RESULT_TYPE resultType, bool promote)
     }
   tree->decorated = 0;
   tree = newNode (CAST, newAst_LINK (newLink), tree);
+  tree->filename = tree->right->filename;
   tree->lineno = tree->right->lineno;
   /* keep unsigned type during cast to smaller type,
      but not when promoting from char to int */
@@ -2466,6 +2472,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 /*----------------------------*/
 /*   leaf has been reached    */
 /*----------------------------*/
+  filename = tree->filename;
   lineno = tree->lineno;
   /* if this is of type value */
   /* just get the type        */
@@ -3129,6 +3136,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                   litTree->right = newNode ('*',
                                             litTree->right,
                                             copyAst (tree->right));
+                  litTree->right->filename = tree->filename;
                   litTree->right->lineno = tree->lineno;
 
                   tree->right->opval.val = constCharVal (1);
@@ -3676,6 +3684,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->right = newNode (':',
                                   newAst_VALUE (constCharVal (1)),
                                   newAst_VALUE (constCharVal (0)));
+          tree->right->filename = tree->filename;
           tree->right->lineno = tree->lineno;
           tree->decorated = 0;
           return decorateType (tree, resultType);
@@ -3994,6 +4003,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           allocGlobal (sym);
 
           newTree->left = newAst_VALUE(symbolVal(sym));
+          newTree->left->filename = tree->filename;
           newTree->left->lineno = tree->lineno;
           LTYPE (newTree) = sym->type;
           LETYPE (newTree) = sym->etype;
@@ -4166,7 +4176,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->right = newNode (':',
                                   newAst_VALUE (constCharVal (1)),
                                   tree->right); /* val 0 */
+          tree->right->filename = tree->filename;
           tree->right->lineno = tree->lineno;
+          tree->right->left->filename = tree->filename;
           tree->right->left->lineno = tree->lineno;
           tree->decorated = 0;
           return decorateType (tree, resultType);
@@ -4271,6 +4283,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             tree->opval.op = transformedOp;
             tree->decorated = 0;
             tree = newNode ('!', tree, NULL);
+            tree->filename = tree->left->filename;
             tree->lineno = tree->left->lineno;
             return decorateType (tree, resultType);
           }
@@ -4965,6 +4978,7 @@ createBlock (symbol * decl, ast * body)
   ex->values.sym = decl;
 
   ex->level++;
+  ex->filename = NULL;
   ex->lineno = 0;
   return ex;
 }
@@ -5001,6 +5015,7 @@ createLabel (symbol * label, ast * stmnt)
   label->islbl = 1;
   label->key = labelKey++;
   rValue = newNode (LABEL, newAst_VALUE (symbolVal (label)), stmnt);
+  rValue->filename = NULL;
   rValue->lineno = 0;
 
   return rValue;
@@ -5088,6 +5103,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
            (int) ulFromVal (caseVal->opval.val));
 
   rexpr = createLabel (newSymbol (caseLbl, 0), stmnt);
+  rexpr->filename = 0;
   rexpr->lineno = 0;
   return rexpr;
 }
@@ -5323,10 +5339,12 @@ createWhile (symbol * trueLabel, symbol * continueLabel,
   /* put the continue label */
   condExpr = backPatchLabels (condExpr, trueLabel, falseLabel);
   condExpr = createLabel (continueLabel, condExpr);
+  condExpr->filename = NULL;
   condExpr->lineno = 0;
 
   /* put the body label in front of the body */
   whileBody = createLabel (trueLabel, whileBody);
+  whileBody->filename = NULL;
   whileBody->lineno = 0;
   /* put a jump to continue at the end of the body */
   /* and put break label at the end of the body */
@@ -5963,8 +5981,8 @@ fixupInlineLabel (symbol * sym)
 static void
 copyAstLoc (ast * dest, ast * src)
 {
-  dest->lineno = src->lineno;
   dest->filename = src->filename;
+  dest->lineno = src->lineno;
   dest->level = src->level;
   dest->block = src->block;
   dest->seqPoint = src->seqPoint;

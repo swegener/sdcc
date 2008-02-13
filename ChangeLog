@@ -1,6 +1,10 @@
 2008-02-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/SDCCglue.c: fixed --c1mode
+	* src/pic16/glue.c, src/SDCCast.c, src/SDCCast.h, src/SDCCBBlock.c,
+	  src/SDCCcse.c, src/SDCCglue.c, src/SDCCicode.c, src/SDCCloop.c,
+	  src/SDCCopt.c,  src/SDCCval.c:
+	  fixed bug #1890273: SDCC Warning 154 shows wrong filename
 
 2008-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

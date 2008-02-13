@@ -561,8 +561,8 @@ newiCode (int op, operand * left, operand * right)
   ic = Safe_alloc ( sizeof (iCode));
 
   ic->seqPoint = seqPoint;
-  ic->lineno = lineno;
   ic->filename = filename;
+  ic->lineno = lineno;
   ic->block = block;
   ic->level = scopeLevel;
   ic->op = op;
@@ -701,8 +701,8 @@ copyiCode (iCode * ic)
 {
   iCode *nic = newiCode (ic->op, NULL, NULL);
 
-  nic->lineno = ic->lineno;
   nic->filename = ic->filename;
+  nic->lineno = ic->lineno;
   nic->block = ic->block;
   nic->level = ic->level;
   nic->parmBytes = ic->parmBytes;
@@ -822,7 +822,7 @@ operandType (operand * op)
 /*-----------------------------------------------------------------*/
 /* operandSize - returns size of an operand in bytes               */
 /*-----------------------------------------------------------------*/
-unsigned int 
+unsigned int
 operandSize (operand * op)
 {
   sym_link *type;
@@ -3525,6 +3525,7 @@ geniCodeFunctionBody (ast * tree,int lvl)
   iCode *ic;
   operand *func;
   sym_link *fetype;
+  char *savefilename;
   int savelineno;
 
   /* reset the auto generation */
@@ -3536,15 +3537,19 @@ geniCodeFunctionBody (ast * tree,int lvl)
   func = ast2iCode (tree->left,lvl+1);
   fetype = getSpec (operandType (func));
 
+  savefilename = filename;
   savelineno = lineno;
+  filename = OP_SYMBOL (func)->fileDef;
   lineno = OP_SYMBOL (func)->lineDef;
   /* create an entry label */
   geniCodeLabel (entryLabel);
+  filename = savefilename;
   lineno = savelineno;
 
   /* create a proc icode */
   ic = newiCode (FUNCTION, func, NULL);
-  lineno=ic->lineno = OP_SYMBOL (func)->lineDef;
+  filename = ic->filename = OP_SYMBOL (func)->fileDef;
+  lineno = ic->lineno = OP_SYMBOL (func)->lineDef;
   ic->tree = tree;
 
   ADDTOCHAIN (ic);

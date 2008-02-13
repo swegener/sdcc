@@ -2,7 +2,7 @@
     vfprintf.c - source file for reduced version of printf
 
     Modified for pic16 port, by Vangelis Rokas, 2005 (vrokas@otenet.gr)
-    
+
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
     This library is free software; you can redistribute it and/or modify it
@@ -66,7 +66,7 @@ unsigned int vfprintf(FILE *stream, char *fmt, va_list ap)
   unsigned char fchar, nosign;
   unsigned char upcase;
   unsigned int count=0;
-  unsigned char *str, *ch;
+  char *str, *ch;
   __data char *str1;
   long val;
 //  static char buffer[16];
@@ -81,7 +81,7 @@ unsigned int vfprintf(FILE *stream, char *fmt, va_list ap)
 
 //    va_start(ap,fmt);
   ch = fmt;
-    
+
   while( *ch ) {      //for (; *fmt ; fmt++ )
     if (*ch == '%') {
       flong = 0;

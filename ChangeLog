@@ -1,3 +1,9 @@
+2008-02-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/pic16/stdlib.h,
+	* device/lib/pic16/libc/stdlib/ltoa.c,
+	* device/lib/pic16/libc/stdio/vfprintf.c: ascii strings are char*
+
 2008-02-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/SDCCglue.c: fixed --c1mode

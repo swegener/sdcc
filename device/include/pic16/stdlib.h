@@ -2,7 +2,7 @@
   stdlib.h - ANSI functions forward declarations
 
    Ported to PIC16 port by Vangelis Rokas, 2004 (vrokas@otenet.gr)
-   
+
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it
@@ -71,8 +71,8 @@ void uitoa(unsigned int, __data char *, unsigned char);
 void itoa(int, __data char*, unsigned char);
 
 /* convert an unsigned/signed long integer to ASCII string */
-void ultoa(unsigned long, __data unsigned char *, unsigned char);
-void ltoa(long, __data unsigned char*, unsigned char);
+void ultoa(unsigned long, __data char *, unsigned char);
+void ltoa(long, __data char*, unsigned char);
 
 /* helper functions: convert a float to ASCII string */
 extern char x_ftoa(float, __data char *, unsigned char, unsigned char);

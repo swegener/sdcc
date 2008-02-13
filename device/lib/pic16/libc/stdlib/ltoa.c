@@ -21,14 +21,14 @@ extern void io_str(char *);
 #endif
 
 
-void ultoa(unsigned long value, __data unsigned char* str, unsigned char radix)
+void ultoa(unsigned long value, __data char* str, unsigned char radix)
 {
   unsigned int index;
   unsigned char ch;
   unsigned char buffer[NUMBER_OF_DIGITS];  /* space for NUMBER_OF_DIGITS + '\0' */
 
     index = NUMBER_OF_DIGITS;
-  
+
     do {
       ch = '0' + (value % radix);
       if ( ch > '9') ch += 'a' - '9' - 1;
@@ -50,7 +50,7 @@ void ultoa(unsigned long value, __data unsigned char* str, unsigned char radix)
     *str = 0;  /* string terminator */
 }
 
-void ltoa(long value, __data unsigned char* str, unsigned char radix)
+void ltoa(long value, __data char* str, unsigned char radix)
 {
 #if _DEBUG
   io_str( "ltoa: " );

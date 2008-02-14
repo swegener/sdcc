@@ -2044,8 +2044,28 @@ computeType (sym_link * type1, sym_link * type2,
   return rType;
 }
 
+int
+comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
+{
+  int res;
+
+  if (IS_VOID (src->next) && IS_VOID (dest->next))
+    return 1;
+  if ((IS_VOID (src->next) && !IS_VOID (dest->next)) ||
+      (!IS_VOID (src->next) && IS_VOID (dest->next)) )
+    return -1;
+  res = compareType (dest->next, src->next);
+  if (res == 1)
+    return bMustCast ? -1 : 1;
+  else if (res == -2)
+    return -2;
+  else
+    return 0;
+}
+
 /*--------------------------------------------------------------------*/
-/* compareType - will do type check return 1 if match, -1 if castable */
+/* compareType - will do type check return 1 if match, 0 if no match, */
+/*               -1 if castable, -2 if only signedness differs        */
 /*--------------------------------------------------------------------*/
 int
 compareType (sym_link * dest, sym_link * src)
@@ -2071,15 +2091,7 @@ compareType (sym_link * dest, sym_link * src)
                 return -1;
               if (IS_FUNC (dest->next) && IS_VOID(src->next))
                 return -1;
-              if (IS_VOID (src->next) && IS_VOID (dest->next))
-                return 1;
-              if ((IS_VOID (src->next) && !IS_VOID (dest->next)) ||
-                  (!IS_VOID (src->next) && IS_VOID (dest->next)) )
-                return -1;
-              if (compareType (dest->next, src->next) == 1)
-                return 1;
-              else
-                return 0;
+              return comparePtrType(dest, src, FALSE);
             }
 
           if (DCL_TYPE (src) == DCL_TYPE (dest))
@@ -2088,15 +2100,7 @@ compareType (sym_link * dest, sym_link * src)
                 {
                   //checkFunction(src,dest);
                 }
-              if (IS_VOID (src->next) && IS_VOID (dest->next))
-                return 1;
-              if ((IS_VOID (src->next) && !IS_VOID (dest->next)) ||
-                  (!IS_VOID (src->next) && IS_VOID (dest->next)) )
-                return -1;
-              if (compareType (dest->next, src->next) == 1)
-                return 1;
-              else
-                return 0;
+              return comparePtrType(dest, src, FALSE);
             }
           if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next))
             {
@@ -2107,10 +2111,7 @@ compareType (sym_link * dest, sym_link * src)
                ((DCL_TYPE(src) == POINTER) && (DCL_TYPE(dest) == IPOINTER))
              ))
             {
-              if (compareType (dest->next, src->next))
-                return -1;
-              else
-                return 0;
+              return comparePtrType(dest, src, TRUE);
             }
           if (IS_PTR (dest) && IS_ARRAY (src))
             {
@@ -2182,7 +2183,7 @@ compareType (sym_link * dest, sym_link * src)
     return -1;
 
   if (SPEC_USIGN (dest) != SPEC_USIGN (src))
-    return -1;
+    return -2;
 
   return 1;
 }

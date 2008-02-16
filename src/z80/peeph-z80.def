@@ -151,22 +151,31 @@ replace restart {
 	jp	%1,%5
 } by {
 	ret	%1
-	; peephole z12 replaced jump by return.
+	; peephole z11a replaced jump by return.
 } if labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 // Should be one of the last ones. Opens the code to further peephole optimization.
 replace restart {
 %1:
 } by {
-	; peephole z13 removed unused label %1.
+	; peephole z12 removed unused label %1.
 } if labelRefCount(%1 0)
+
+// Applying z11 or z11a followed by z12 will often leave a dead ret at the end of the function. Remove it.
+replace {
+	jp	%5
+	ret
+} by {
+	jp	%5
+	; peephole z13 removed unused ret.
+}
 
 // These should be the last rules, so that the peepholes above need to look at jp only.
 replace {
 	jp	%5
 } by {
 	jr	%5
-	; peephole z14 changed absolute to relative conditional jump.
+	; peephole z14 changed absolute to relative unconditional jump.
 } if labelInRange()
 
 replace {

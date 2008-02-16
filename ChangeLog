@@ -1,6 +1,15 @@
 2008-02-16 Borut Razem <borut.razem AT siol.net>
 
-	* 
+	* as/z80/asmain.c, as/z80/asm.h, as/z80/asdata.c,
+	  as/link/z80/lkmain.c, as/z80/as_gbz80.dsp, as/z80/as_z80.dsp,
+	  as/z80/Makefile.in. as/z80/Makefile.bcc: 
+	  applied patch #1893393: patch for as-z80 and link-z80 to generate
+	  cdb, thanks to Armin Diehl
+	* as/*/asnoice.c, as/hc08/as_hc08.dsp, as/hc08/Makefile.in,
+	  as/mcs51/asx8051.dsp, as/mcs51/Makefile.in:
+	  asnoice.c moved to as/asxxsrc/asnoice.c
+	* src/z80/peeph-gbz80.def: applied patch
+	  #1880235: Z80 return peephole, thanks to Philipp Krause
 
 2008-02-14 Maarten Brock <sourceforge.brock AT dse.nl>
 

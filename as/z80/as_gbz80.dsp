@@ -112,6 +112,10 @@ SOURCE=.\asmain.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\asxxsrc\asnoice.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\asout.c
 # ADD CPP /D "GAMEBOY"
 # End Source File

@@ -107,7 +107,7 @@ SOURCE=.\asmain.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\asnoice.c
+SOURCE=..\asxxsrc\asnoice.c
 # End Source File
 # Begin Source File
 

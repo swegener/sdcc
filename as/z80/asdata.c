@@ -73,9 +73,13 @@ int     pass;           /*      assembler pass number
                          */
 int     lflag;          /*      -l, generate listing flag
                          */
+int     cflag;          /*      -c, generate sdcdb debug info
+                         */
 int     gflag;          /*      -g, make undefined symbols global flag
                          */
 int     aflag;          /*      -a, make all symbols global flag
+                         */
+int     jflag;          /*      -j, generate debug information flag
                          */
 int     oflag;          /*      -o, generate relocatable output flag
                          */

@@ -11,6 +11,7 @@
 
 /*
  * Extensions: P. Felber
+ * 13-Feb-08 AD -j and -c as in 8051 as
  */
 
 #include <stdio.h>
@@ -110,6 +111,7 @@
  *                                      line number
  *              int     lop             current line number on page
  *              int     oflag           -o, generate relocatable output flag
+ *              int     jflag           -j, generate debug info flag
  *              int     page            current page number
  *              int     pflag           enable listing pagination
  *              int     pass            assembler pass number
@@ -196,9 +198,20 @@ main(int argc, char **argv)
                                         ++aflag;
                                         break;
 
+                                case 'c':
+                                case 'C':
+                                    ++cflag;
+                                    break;
+
                                 case 'g':
                                 case 'G':
                                         ++gflag;
+                                        break;
+
+                                case 'j':               /* JLH: debug info */
+                                case 'J':
+                                        ++jflag;
+                                        ++oflag;        /* force object */
                                         break;
 
                                 case 'l':
@@ -999,6 +1012,17 @@ loop:
          * all the assembler mnemonics.
          */
         default:
+                /* if cdb information then generate the line info */
+                if (cflag && (pass == 1))
+                    DefineCDB_Line();
+
+                /* JLH: if -j, generate a line number symbol */
+                if (jflag && (pass == 1))
+                {
+                   DefineNoICE_Line();
+                }
+
+
                 machine(mp);
         }
         goto loop;
@@ -1160,13 +1184,14 @@ phase(struct area *ap, Addr_T a)
 
 char *usetxt[] = {
 #ifdef SDK
-        "Usage: [-dqxgalopsf] outfile file1 [file2 file3 ...]",
+        "Usage: [-dqxjgalopscf] outfile file1 [file2 file3 ...]",
 #else /* SDK */
-        "Usage: [-dqxgalopsf] file1 [file2 file3 ...]",
+        "Usage: [-dqxjgalopscf] file1 [file2 file3 ...]",
 #endif /* SDK */
         "  d    decimal listing",
         "  q    octal   listing",
         "  x    hex     listing (default)",
+        "  j    add line number and debug information to file", /* JLH */
         "  g    undefined symbols made global",
         "  a    all user symbols made global",
 #ifdef SDK
@@ -1178,6 +1203,7 @@ char *usetxt[] = {
         "  o    create object output file1[REL]",
         "  s    create symbol output file1[SYM]",
 #endif /* SDK */
+        "  c    generate sdcdb debug information",
         "  p    disable listing pagination",
         "  f    flag relocatable references by  `   in listing file",
         " ff    flag relocatable references by mode in listing file",

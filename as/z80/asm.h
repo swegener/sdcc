@@ -22,7 +22,7 @@
  * Extensions: P. Felber
  */
 
-#define VERSION "V01.75"
+#define VERSION "V01.75 + SDCC mods"
 
 /*
  * Case Sensitivity Flag
@@ -65,6 +65,33 @@
 #define VOID    void
 #define FSEPX   '.'
 #define OTHERSYSTEM
+#endif
+
+/*
+ * PATH_MAX
+ */
+#include <limits.h>
+#ifndef PATH_MAX                                /* POSIX, but not required   */
+#if defined(_MSC_VER) || defined(__BORLANDC__)  /* Microsoft C or Borland C*/
+#include <stdlib.h>
+#define PATH_MAX        _MAX_PATH
+#else
+#define PATH_MAX                                /* define a reasonable value */
+#endif
+#endif
+
+#ifdef _WIN32       /* WIN32 native */
+
+#  define NATIVE_WIN32          1
+#  ifdef __MINGW32__  /* GCC MINGW32 depends on configure */
+#    include "../../sdccconf.h"
+#  else
+#    include "../../sdcc_vc.h"
+#    define PATH_MAX  _MAX_PATH
+#  endif
+
+#else               /* Assume Un*x style system */
+#  include "../../sdccconf.h"
 #endif
 
 /*
@@ -361,10 +388,14 @@ extern  int     pass;           /*      assembler pass number
                                  */
 extern  int     lflag;          /*      -l, generate listing flag
                                  */
+extern  int     cflag;          /*      -c, generate sdcdb debug information
+                                 */
 extern  int     gflag;          /*      -g, make undefined symbols global flag
                                  */
 extern  int     aflag;          /*      -a, make all symbols global flag
                                  */
+extern  int     jflag;          /*      -j, generate debug information flag
+                                */
 extern  int     oflag;          /*      -o, generate relocatable output flag
                                  */
 extern  int     sflag;          /*      -s, generate symbol table flag
@@ -592,6 +623,10 @@ extern  VOID            out_lb();
 extern  VOID            out_lw();
 extern  VOID            out_rw();
 extern  VOID            out_tw();
+
+/* asnoice.c */
+extern void DefineNoICE_Line();
+extern void DefineCDB_Line();
 
 
 /* Machine dependent variables */

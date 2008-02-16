@@ -7,6 +7,7 @@
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ * 31-Feb-2008 AD added -y to create cdb file for non gameboy
  */
 
 /*
@@ -320,6 +321,14 @@ main(int argc, char *argv[])
 #endif /* GAMEBOY */
 
         syminit();
+
+        if (dflag){
+            SaveLinkedFilePath(linkp->f_idp); //Must be the first one...
+            dfp = afile(linkp->f_idp,"cdb",1);
+            if (dfp == NULL)
+                lkexit(1);
+        }
+
         for (pass=0; pass<2; ++pass) {
                 cfp = NULL;
                 sfp = NULL;
@@ -449,6 +458,7 @@ lkexit(int i)
         if (rfp != NULL) fclose(rfp);
         if (sfp != NULL) fclose(sfp);
         if (tfp != NULL) fclose(tfp);
+        if (dfp != NULL) fclose(dfp);
         exit(i);
 }
 
@@ -976,11 +986,15 @@ parse()
                                 case 'J':
                                         ++symflag;
                                         break;
-                                case 'z':
                                 case 'Z':
                                         oflag = 3;
                                         break;
 #endif /* SDK */
+#ifndef GAMEBOY
+                                case 'z':
+                                        dflag = 1;
+                                        return(0);
+#endif
                                 case 'm':
                                 case 'M':
                                         ++mflag;
@@ -1039,7 +1053,6 @@ parse()
                                 case 'L':
                                         addlib();
                                         return(0);
-
                                 default:
                                         fprintf(stderr, "Invalid option\n");
                                         lkexit(1);
@@ -1404,8 +1417,11 @@ afile(char *fn, char *ft, int wf)
 #else /* SDK */
         if ((fp = fopen(fb, wf?"w":"r")) == NULL) {
 #endif /* SDK */
+            if (strcmp(ft,"adb"))/*Do not complaint for optional adb files*/
+            {
                 fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
                 lkerr++;
+            }
         }
         return (fp);
 }
@@ -1451,11 +1467,14 @@ char *usetxt[] = {
         "Output:",
         "  -i   Intel Hex as file[IHX]",
         "  -s   Motorola S19 as file[S19]",
+#ifndef GAMEBOY
+        "  -z   Produce SDCdb debug as file[cdb]",
+#endif
 #ifdef SDK
 #ifdef GAMEGEAR
-        "  -z   Gamegear image as file[GG]",
+        "  -Z   Gamegear image as file[GG]",
 #else
-        "  -z   Gameboy image as file[GB]",
+        "  -Z   Gameboy image as file[GB]",
 #endif /* GAMEGEAR */
 #endif /* SDK */
         "List:",

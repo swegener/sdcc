@@ -4,10 +4,11 @@ PRJDIR          = ../..
 
 !include $(PRJDIR)/Bcc.inc
 
-ASOBJECTS       = asmain.obj aslex.obj assubr.obj asnoice.obj \
+ASOBJECTS       = asmain.obj aslex.obj assubr.obj \
                   asexpr.obj asdata.obj aslist.obj asout.obj \
                   i51ext.obj i51pst.obj i51mch.obj i51adr.obj \
                   ../asxxsrc/strcmpi.obj ../asxxsrc/assym.obj \
+                  ../asxxsrc/asnoice.obj \
                   ../../support/Util/dbuf.obj ../../support/Util/dbuf_string.obj
 
 ASX8051         = $(PRJDIR)/bin/asx8051.exe

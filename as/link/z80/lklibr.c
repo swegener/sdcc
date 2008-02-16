@@ -559,6 +559,12 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
                         fseek(libfp, lbfh->offset, SEEK_SET);
                         LoadRel(PathLib, libfp, ModName);
 
+                        /* if cdb information required & .adb file present */
+                        if (dflag && dfp)
+                        {
+                            if(LoadAdb(libfp))
+                                SaveLinkedFilePath(DirLib);
+                        }
                         return 1; /*Found the symbol, so success!*/
                     }
                 }
@@ -699,6 +705,17 @@ int fndsym( char *name )
                     }
                     else
                     { /*For a stand alone object file*/
+                        /* if cdb information required & adb file present */
+                        if (dflag && dfp)
+                        {
+                            FILE *xfp = afile(lbfh->filspc, "adb",0);
+                            if (xfp)
+                            {
+                                SaveLinkedFilePath(lbfh->filspc);
+                                copyfile(dfp, xfp);
+                                fclose(xfp);
+                            }
+                        }
                         loadfile(lbfh->filspc);
                     }
                     ThisLibr->loaded=1;
@@ -937,7 +954,7 @@ int buildlibraryindex(void)
                 }
                 This->next = NULL;
                 This->loaded=-1;
-                This->offset=-1; /*There should be a rel file*/
+                This->offset=-1; /*We have a stand alone .rel file*/
                 This->libspc = lbnh->libspc;
 
                 This->relfil=(char *)new(strlen(relfil)+1);
@@ -1174,6 +1191,18 @@ fndsym(char *name)
                         strcpy(lbfh->relfil,relfil);
                         fclose(fp);
                         fclose(libfp);
+
+                        /* if cdb information required & adb file present */
+                        if (dflag && dfp)
+                        {
+                            FILE *xfp = afile(str,"adb",0); //JCF: Nov 30, 2002
+                            if (xfp)
+                            {
+                                SaveLinkedFilePath(str);
+                                copyfile(dfp,xfp);
+                                fclose(xfp);
+                            }
+                        }
                         loadfile(str);
                         return (1);
                     }

@@ -526,7 +526,7 @@ _setValues(void)
 
   if (IS_GB)
     {
-      setMainValue ("z80outputtypeflag", "-z");
+      setMainValue ("z80outputtypeflag", "-Z");
       setMainValue ("z80outext", ".gb");
     }
   else
@@ -717,7 +717,7 @@ PORT z80_port =
   {
     NULL,
     ASMCMD,
-    "-plosgff",                 /* Options with debug */
+    "-plosgffc",                /* Options with debug */
     "-plosgff",                 /* Options without debug */
     0,
     ".asm"
@@ -838,7 +838,7 @@ PORT gbz80_port =
   {
     NULL,
     ASMCMD,
-    "-plosgff",                 /* Options with debug */
+    "-plosgffc",                /* Options with debug */
     "-plosgff",                 /* Options without debug */
     0,
     ".asm",

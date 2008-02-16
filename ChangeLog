@@ -1,8 +1,19 @@
+2008-02-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/mcs51/aslink.dsp: removed SDK define
+	* as/link/z80/clean.mk: brought in sync with other ports
+	* as/link/z80/lklibr.c (SdccLib, fndsym): handle the dflag here too
+	* as/hc08/Makefile.bcc,
+	* as/mcs51/Makefile.bcc,
+	* as/z80/Makefile.bcc: noice.c was moved to as/asxxsrc/
+	* src/z80/main.c (_setValues): use the now capitalized -Z,
+	  (z80_port, gbz80_port): generate debug information when asked
+
 2008-02-16 Borut Razem <borut.razem AT siol.net>
 
 	* as/z80/asmain.c, as/z80/asm.h, as/z80/asdata.c,
 	  as/link/z80/lkmain.c, as/z80/as_gbz80.dsp, as/z80/as_z80.dsp,
-	  as/z80/Makefile.in. as/z80/Makefile.bcc: 
+	  as/z80/Makefile.in. as/z80/Makefile.bcc:
 	  applied patch #1893393: patch for as-z80 and link-z80 to generate
 	  cdb, thanks to Armin Diehl
 	* as/*/asnoice.c, as/hc08/as_hc08.dsp, as/hc08/Makefile.in,

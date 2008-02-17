@@ -1,3 +1,9 @@
+2008-02-17 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic16f88.h,
+	* device/include/pic/pic16f886.h,
+	* device/include/pic/pic16f887.h: added TRISA6 and TRISA7
+
 2008-02-17 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/peeph.def: applied patch

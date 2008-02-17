@@ -1568,8 +1568,8 @@ typedef union {
     unsigned char TRISA3:1;
     unsigned char TRISA4:1;
     unsigned char TRISA5:1;
-    unsigned char :1;
-    unsigned char :1;
+    unsigned char TRISA6:1;
+    unsigned char TRISA7:1;
   };
 } __TRISA_bits_t;
 extern volatile __TRISA_bits_t __at(TRISA_ADDR) TRISA_bits;
@@ -1581,6 +1581,8 @@ extern volatile __TRISA_bits_t __at(TRISA_ADDR) TRISA_bits;
 #define TRISA3               TRISA_bits.TRISA3
 #define TRISA4               TRISA_bits.TRISA4
 #define TRISA5               TRISA_bits.TRISA5
+#define TRISA6               TRISA_bits.TRISA6
+#define TRISA7               TRISA_bits.TRISA7
 #endif /* NO_BIT_DEFINES */
 
 // ----- TRISB bits --------------------

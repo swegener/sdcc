@@ -1,3 +1,8 @@
+2008-02-17 Borut Razem <borut.razem AT siol.net>
+
+	* src/z80/peeph.def: applied patch
+	  #1893626: Optimize tail calls on Z80, thanks to Philipp Krause
+
 2008-02-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/mcs51/aslink.dsp: removed SDK define

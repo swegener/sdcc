@@ -702,4 +702,21 @@ replace restart {
 	; peephole 64 moved addition of constant 0x%3%2 to bc to constant.
 }
 
+replace restart {
+	call	%1
+	ret
+} by {
+	jp	%1
+	; peephole 65 replaced call at end of function by jump.
+}
 
+// Callee saves ix.
+replace restart {
+	call	%1
+	pop	ix
+	ret
+} by {
+	pop	ix
+	jp	%1
+	; peephole 66 replaced call at end of function by jump moving call beyond pop ix.
+}

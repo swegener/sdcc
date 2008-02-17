@@ -317,23 +317,10 @@ void pic16_DumpAop(char *prefix, asmop *aop)
 		DEBUGpic16_emitcode (";", " %s type:AOP_DIR",prefix);
 		DEBUGpic16_emitcode (";", " %s aopu.aop_dir:%s",prefix,aop->aopu.aop_dir);
 	}
-	if (aop->type == AOP_DPTR)
-		DEBUGpic16_emitcode (";", " %s type:AOP_DPTR",prefix);
-	if (aop->type == AOP_DPTR2)
-		DEBUGpic16_emitcode (";", " %s type:AOP_DPTR2",prefix);
-	if (aop->type == AOP_R0)
-		DEBUGpic16_emitcode (";", " %s type:AOP_R0",prefix);
-	if (aop->type == AOP_R1)
-		DEBUGpic16_emitcode (";", " %s type:AOP_R1",prefix);
 	if (aop->type == AOP_STK)
 		DEBUGpic16_emitcode (";", " %s type:AOP_STK",prefix);
 	if (aop->type == AOP_STA)
 		DEBUGpic16_emitcode (";", " %s type:AOP_STA",prefix);
-	if (aop->type == AOP_IMMD)
-	{
-		DEBUGpic16_emitcode (";", " %s type:AOP_IMMD",prefix);
-		DEBUGpic16_emitcode (";", " %s aopu.aop_immd:%s",prefix,aop->aopu.aop_immd);
-	}
 	if (aop->type == AOP_STR)
 	{
 		DEBUGpic16_emitcode (";", " %s type:AOP_STR",prefix);

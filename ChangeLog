@@ -1,5 +1,13 @@
 2008-02-17 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/genarith.c,
+	* src/pic16/gen.c,
+	* src/pic16/gen.h,
+	* src/pic16/genutils.c: removed unused legacy code,
+	  removed unused fields from struct asmop and struct _G
+
+2008-02-17 Raphael Neider <rneider AT web.de>
+
 	* src/pic16/gen.c (AccRsh): cosmetic changes,
 	  (shiftR1Left2ResultSigned,shiftR1Left2Result,shiftL1Left2Result,
 	  genRightShiftLiteral): fixed to work with SFRs as result by

@@ -62,14 +62,7 @@ const char *pic16_AopType(short type)
   case AOP_LIT:         return "AOP_LIT";
   case AOP_REG:         return "AOP_REG";
   case AOP_DIR:         return "AOP_DIR";
-  case AOP_DPTR:        return "AOP_DPTR";
-  case AOP_DPTR2:       return "AOP_DPTR2";
-  case AOP_FSR0:        return "AOP_FSR0";
-  case AOP_FSR2:        return "AOP_FSR2";
-  case AOP_R0:          return "AOP_R0";
-  case AOP_R1:          return "AOP_R1";
   case AOP_STK:         return "AOP_STK";
-  case AOP_IMMD:        return "AOP_IMMD";
   case AOP_STR:         return "AOP_STR";
   case AOP_CRY:         return "AOP_CRY";
   case AOP_ACC:         return "AOP_ACC";
@@ -211,9 +204,6 @@ bool pic16_genPlusIncr (iCode *ic)
         (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) ) {
 
       pic16_emitpcode(POC_BCF, pic16_popGet(AOP(IC_RESULT(ic)),0));
-      pic16_emitcode("bcf","(%s >> 3), (%s & 7)",
-               AOP(IC_RESULT(ic))->aopu.aop_dir,
-               AOP(IC_RESULT(ic))->aopu.aop_dir);
       if(icount)
         pic16_emitpcode(POC_XORLW,pic16_popGetLit(1));
       //pic16_emitcode("xorlw","1");
@@ -223,9 +213,6 @@ bool pic16_genPlusIncr (iCode *ic)
 
       emitSKPZ;
       pic16_emitpcode(POC_BSF, pic16_popGet(AOP(IC_RESULT(ic)),0));
-      pic16_emitcode("bsf","(%s >> 3), (%s & 7)",
-               AOP(IC_RESULT(ic))->aopu.aop_dir,
-               AOP(IC_RESULT(ic))->aopu.aop_dir);
 
       return TRUE;
     }
@@ -301,16 +288,6 @@ void pic16_genPlusBits (iCode *ic)
     pic16_emitpcode(POC_XORLW, pic16_popGetLit(1));
     pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(IC_LEFT(ic)),0));
     pic16_emitpcode(POC_XORLW, pic16_popGetLit(1));
-
-    pic16_emitcode("clrw","");
-    pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                   AOP(IC_RIGHT(ic))->aopu.aop_dir,
-                   AOP(IC_RIGHT(ic))->aopu.aop_dir);
-    pic16_emitcode("xorlw","1");
-    pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                   AOP(IC_LEFT(ic))->aopu.aop_dir,
-                   AOP(IC_LEFT(ic))->aopu.aop_dir);
-    pic16_emitcode("xorlw","1");
     break;
   case AOP_REG:
     pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
@@ -327,23 +304,6 @@ void pic16_genPlusBits (iCode *ic)
     pic16_emitpcode(POC_XORWF, pic16_popGet(AOP(IC_RESULT(ic)),0));
     pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(IC_LEFT(ic)),0));
     pic16_emitpcode(POC_XORWF, pic16_popGet(AOP(IC_RESULT(ic)),0));
-
-    pic16_emitcode("movlw","(1 << (%s & 7))",
-                   AOP(IC_RESULT(ic))->aopu.aop_dir,
-                   AOP(IC_RESULT(ic))->aopu.aop_dir);
-    pic16_emitcode("bcf","(%s >> 3), (%s & 7)",
-                   AOP(IC_RESULT(ic))->aopu.aop_dir,
-                   AOP(IC_RESULT(ic))->aopu.aop_dir);
-    pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                   AOP(IC_RIGHT(ic))->aopu.aop_dir,
-                   AOP(IC_RIGHT(ic))->aopu.aop_dir);
-    pic16_emitcode("xorwf","(%s >>3),f",
-                   AOP(IC_RESULT(ic))->aopu.aop_dir);
-    pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                   AOP(IC_LEFT(ic))->aopu.aop_dir,
-                   AOP(IC_LEFT(ic))->aopu.aop_dir);
-    pic16_emitcode("xorwf","(%s>>3),f",
-                   AOP(IC_RESULT(ic))->aopu.aop_dir);
     break;
   }
 
@@ -702,13 +662,16 @@ static void genAddLit (iCode *ic, int lit)
         }
       }
 
+//    } else if (pic16_isLitAop(AOP(left))) {
+//      // adding two literals
+//      assert ( !"adding two literals is not yet supported" );
     } else {
       int clear_carry=0;
 
       /* left is not the accumulator */
       if(lit & 0xff) {
-        pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
-        pic16_emitpcode(POC_ADDFW, pic16_popGet(AOP(left),0));
+        pic16_mov2w(AOP(left),0);
+        pic16_emitpcode(POC_ADDLW, pic16_popGetLit(lit & 0xff));
       } else {
         pic16_mov2w(AOP(left),0);
         /* We don't know the state of the carry bit at this point */
@@ -1175,31 +1138,15 @@ void pic16_genPlus (iCode *ic)
 
                                 pic16_emitpcode(POC_BTFSC , pic16_popGet(AOP(right),0));
                                 pic16_emitpcode(POC_INCF ,  pic16_popGet(AOP(result),0));
-
-                                pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                                                AOP(right)->aopu.aop_dir,
-                                                AOP(right)->aopu.aop_dir);
-                                pic16_emitcode(" incf","%s,f", pic16_aopGet(AOP(result),0,FALSE,FALSE));
                         } else { // not same
 
                                 if(AOP_TYPE(left) == AOP_ACC) {
                                         pic16_emitpcode(POC_BTFSC , pic16_popGet(AOP(right),0));
                                         pic16_emitpcode(POC_XORLW , pic16_popGetLit(1));
-
-                                        pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                                        AOP(right)->aopu.aop_dir,
-                                        AOP(right)->aopu.aop_dir);
-                                        pic16_emitcode(" xorlw","1");
                                 } else {
                                         pic16_mov2w(AOP(left),0);
                                         pic16_emitpcode(POC_BTFSC , pic16_popGet(AOP(right),0));
                                         pic16_emitpcode(POC_INCFW , pic16_popGet(AOP(left),0));
-
-                                        pic16_emitcode("movf","%s,w", pic16_aopGet(AOP(left),0,FALSE,FALSE));
-                                        pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                                        AOP(right)->aopu.aop_dir,
-                                        AOP(right)->aopu.aop_dir);
-                                        pic16_emitcode(" incf","%s,w", pic16_aopGet(AOP(left),0,FALSE,FALSE));
                                 }
 
                                 if(AOP_TYPE(result) != AOP_ACC) {
@@ -1211,7 +1158,6 @@ void pic16_genPlus (iCode *ic)
                                                 pic16_emitpcode(POC_BSF ,   pic16_popGet(AOP(result),0));
                                         } else {
                                                 pic16_emitpcode(POC_MOVWF ,   pic16_popGet(AOP(result),0));
-                                                pic16_emitcode("movwf","%s", pic16_aopGet(AOP(result),0,FALSE,FALSE));
                                         }
                                 }
                         }
@@ -1223,35 +1169,17 @@ void pic16_genPlus (iCode *ic)
                                 emitCLRZ;
                                 pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(right),0));
                                 pic16_emitpcode(POC_INCF,  pic16_popGet(AOP(result),0));
-
-                                pic16_emitcode("clrz","");
-
-                                pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                                                AOP(right)->aopu.aop_dir,
-                                                AOP(right)->aopu.aop_dir);
-                                pic16_emitcode(" incf","%s,f", pic16_aopGet(AOP(result),0,FALSE,FALSE));
-
                         } else {
                                 emitCLRZ; // needed here as well: INCFW is not always executed, Z is undefined then
                                 pic16_mov2w(AOP(left),0);
                                 pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(right),0));
                                 pic16_emitpcode(POC_INCFW, pic16_popGet(AOP(left),0));
-                                //pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(right),0,FALSE,FALSE));
                                 emitMOVWF(right,0);
-
-                                pic16_emitcode("movf","%s,w", pic16_aopGet(AOP(left),0,FALSE,FALSE));
-                                pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                                                AOP(right)->aopu.aop_dir,
-                                                AOP(right)->aopu.aop_dir);
-                                pic16_emitcode(" incf","%s,w", pic16_aopGet(AOP(left),0,FALSE,FALSE));
-                                pic16_emitcode("movwf","%s", pic16_aopGet(AOP(result),0,FALSE,FALSE));
-
                         }
 
                         while(--size){
                                 emitSKPZ;
                                 pic16_emitpcode(POC_INCF,  pic16_popGet(AOP(result),offset++));
-                                //pic16_emitcode(" incf","%s,f", pic16_aopGet(AOP(right),offset++,FALSE,FALSE));
                         }
 
                 }
@@ -1545,32 +1473,6 @@ void pic16_addSign(operand *result, int offset, int sign)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic16_genMinusBits - generates code for subtraction  of two bits      */
-/*-----------------------------------------------------------------*/
-void pic16_genMinusBits (iCode *ic)
-{
-    symbol *lbl = newiTempLabel(NULL);
-
-    FENTRY;
-    if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY){
-        pic16_emitcode("mov","c,%s",AOP(IC_LEFT(ic))->aopu.aop_dir);
-        pic16_emitcode("jnb","%s,%05d_DS_",AOP(IC_RIGHT(ic))->aopu.aop_dir,(lbl->key+100));
-        pic16_emitcode("cpl","c");
-        pic16_emitcode("","%05d_DS_:",(lbl->key+100));
-        pic16_outBitC(IC_RESULT(ic));
-    }
-    else{
-        pic16_emitcode("mov","c,%s",AOP(IC_RIGHT(ic))->aopu.aop_dir);
-        pic16_emitcode("subb","a,acc");
-        pic16_emitcode("jnb","%s,%05d_DS_",AOP(IC_LEFT(ic))->aopu.aop_dir,(lbl->key+100));
-        pic16_emitcode("inc","a");
-        pic16_emitcode("","%05d_DS_:",(lbl->key+100));
-        pic16_aopPut(AOP(IC_RESULT(ic)),"a",0);
-        pic16_addSign(IC_RESULT(ic), MSB16, !IS_UNSIGNED(operandType(IC_RESULT(ic))));
-    }
-}
-
-/*-----------------------------------------------------------------*/
 /* pic16_genMinus - generates code for subtraction                       */
 /*-----------------------------------------------------------------*/
 void pic16_genMinus (iCode *ic)
@@ -1631,18 +1533,12 @@ void pic16_genMinus (iCode *ic)
 
         pic16_emitpcode(POC_BTFSC , pic16_popGet(AOP(IC_RIGHT(ic)),0));
         pic16_emitpcode(POC_DECF ,  pic16_popGet(AOP(IC_RESULT(ic)),0));
-
-        pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                 AOP(IC_RIGHT(ic))->aopu.aop_dir,
-                 AOP(IC_RIGHT(ic))->aopu.aop_dir);
-        pic16_emitcode(" incf","%s,f", pic16_aopGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE));
       } else {
 
         if(AOP_TYPE(IC_LEFT(ic)) == AOP_ACC) {
           pic16_emitpcode(POC_BTFSC , pic16_popGet(AOP(IC_RIGHT(ic)),0));
           pic16_emitpcode(POC_XORLW , pic16_popGetLit(1));
-        }else  if( (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD) ||
-              (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) ) {
+        }else  if( (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) ) {
 
           lit = ulFromVal (AOP(IC_LEFT(ic))->aopu.aop_lit);
 
@@ -1691,8 +1587,7 @@ void pic16_genMinus (iCode *ic)
       }
 
     }
-  } else   if(// (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD) ||
-              (AOP(IC_LEFT(ic))->type == AOP_LIT) &&
+  } else   if((AOP(IC_LEFT(ic))->type == AOP_LIT) &&
               (AOP_TYPE(IC_RIGHT(ic)) != AOP_ACC)) {
 
     lit = ulFromVal (AOP(IC_LEFT(ic))->aopu.aop_lit);
@@ -1770,8 +1665,7 @@ void pic16_genMinus (iCode *ic)
         if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) )
           pic16_emitpcode(POC_SUBWF, pic16_popGet(AOP(IC_LEFT(ic)),0));
         else {
-          if( (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD) ||
-              (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) ) {
+          if( (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) ) {
             pic16_emitpcode(POC_SUBLW, pic16_popGet(AOP(IC_LEFT(ic)),0));
           } else {
             pic16_emitpcode(POC_SUBFW, pic16_popGet(AOP(IC_LEFT(ic)),0));

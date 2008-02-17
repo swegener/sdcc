@@ -8,6 +8,8 @@
 
 	* src/z80/peeph.def: applied patch
 	  #1893626: Optimize tail calls on Z80, thanks to Philipp Krause
+	* src/z80/gen.c, src/z80/peeph.def: applied patch
+	  #1893510: Improve logical left shift on Z80, thanks to Philipp Krause
 
 2008-02-16 Maarten Brock <sourceforge.brock AT dse.nl>
 

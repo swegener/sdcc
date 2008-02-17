@@ -456,6 +456,22 @@ replace restart {
 	ld	%1,a
 } if notVolatile(%1)
 
+// sdcc does not use the H flag. sla resets it, while add sets it.
+// To ensure that the state of the H flag is not changed by this
+// peephole uncomment the add %3, %4 at the end (since it overwrite the H flag).
+replace restart {
+	ld	%1, a
+	sla	%1
+	ld	a, %2
+	//add	%3, %4
+} by {
+	add	a, a
+	; peephole 42a shifts in accumulator insted of %1
+	ld	%1, a
+	ld	a, %2
+	//add	%3, %4
+}
+
 replace restart {
 	ld	%1,a
 	ld	a,%2

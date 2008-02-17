@@ -6010,13 +6010,25 @@ shiftL1Left2Result (operand * left, int offl,
                     operand * result, int offr, int shCount)
 {
   const char *l;
-  l = aopGet (AOP (left), offl, FALSE);
-  _moveA (l);
-  /* shift left accumulator */
-  AccLsh (shCount);
-  aopPut (AOP (result), "a", offr);
-}
 
+  /* If operand and result are the same we can shift in place.
+     However shifting in acc using add is cheaper than shifting
+     in place using sla; when shifting by more than 2 shifting in
+     acc is worth the additional effort for loading from/to acc. */
+  if (sameRegs (AOP (left), AOP (result)) && shCount <= 2 && offr == offl)
+    {
+      while (shCount--)
+        emit2 ("sla %s", aopGet (AOP (result), 0, FALSE));
+    }
+  else
+    {
+      l = aopGet (AOP (left), offl, FALSE);
+      _moveA (l);
+      /* shift left accumulator */
+      AccLsh (shCount);
+      aopPut (AOP (result), "a", offr);
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* genlshTwo - left shift two bytes by known amount                */

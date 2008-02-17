@@ -28,7 +28,7 @@ CXXFLAGS        = @CXXFLAGS@ -Wall
 LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@ -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim
+LIBS		= @LIBS@ -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@

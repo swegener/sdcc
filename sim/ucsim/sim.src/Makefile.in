@@ -46,7 +46,7 @@ OBJECTS         = stack.o mem.o sim.o itsrc.o brk.o arg.o \
 all: checkconf sim_lib
 
 test_mem_speed: $(top_builddir)/lib*.a test_mem_speed.o
-	$(CXX) -o $@ test_mem_speed.o -L$(top_builddir) -Wl,--start-group -lsim -lutil -lcmd -Wl,--end-group
+	$(CXX) -o $@ test_mem_speed.o -L$(top_builddir) -Wl,--start-group -lsim -lucsimutil -lcmd -Wl,--end-group
 
 sim.src: all
 

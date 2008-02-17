@@ -13,7 +13,7 @@
 	  genRightShiftLiteral): fixed to work with SFRs as result by
 	  assigning only once to result,
 	  removed a lot of unused/excluded code fragments
-	
+
 2008-02-17 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic16f88.h,
@@ -26,6 +26,11 @@
 	  #1893626: Optimize tail calls on Z80, thanks to Philipp Krause
 	* src/z80/gen.c, src/z80/peeph.def: applied patch
 	  #1893510: Improve logical left shift on Z80, thanks to Philipp Krause
+	* sim/ucsim/avr.src/Makefile.in, sim/ucsim/hc08.src/Makefile.in,
+	  sim/ucsim/s51.src/Makefile.in, sim/ucsim/sim.src/Makefile.in,
+	  sim/ucsim/xa.src/Makefile.in, sim/ucsim/z80.src/Makefile.in,
+	  sim/ucsim/main_in.mk: renamed libutil.a to libucsimutil.a in order to
+	  enable compilation on Mac OS X 10.5 (Leopard) and XCode v3.0
 
 2008-02-16 Maarten Brock <sourceforge.brock AT dse.nl>
 

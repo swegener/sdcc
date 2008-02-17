@@ -32,7 +32,7 @@ SDCC		= sdcc
 SDCFLAGS	= --debug --stack-after-data --model-small
 SDCPPFLAGS	= 
 
-LIBS		= -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim @LIBS@
+LIBS		= -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd @LIBS@
 DL		= @DL@
 dl_ok		= @dl_ok@
 

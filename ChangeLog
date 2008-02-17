@@ -1,5 +1,13 @@
 2008-02-17 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/gen.c (AccRsh): cosmetic changes,
+	  (shiftR1Left2ResultSigned,shiftR1Left2Result,shiftL1Left2Result,
+	  genRightShiftLiteral): fixed to work with SFRs as result by
+	  assigning only once to result,
+	  removed a lot of unused/excluded code fragments
+	
+2008-02-17 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic/pic16f88.h,
 	* device/include/pic/pic16f886.h,
 	* device/include/pic/pic16f887.h: added TRISA6 and TRISA7

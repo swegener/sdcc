@@ -1490,10 +1490,10 @@ linkEdit (char **envp)
           /* if code size specified */
           if (options.code_size)
             fprintf (lnkfile, "-w 0x%04x\n", options.code_size);
-
-          if (options.debug)
-            fprintf (lnkfile, "-z\n");
         }
+
+      if (options.debug)
+        fprintf (lnkfile, "-z\n");
 
 #define WRITE_SEG_LOC(N, L) \
   if (N) \

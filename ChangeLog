@@ -1,3 +1,7 @@
+2008-02-18 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/s51.src/Makefile.in: fixed error made in previous commit
+
 2008-02-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c (linkEdit): emit -z when using --debug for z80

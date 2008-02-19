@@ -61,7 +61,7 @@ void pic16_peepRules2pCode(peepRule *);
 #endif
 
 /*-----------------------------------------------------------------*/
-/* pcDistance - afinds a label back ward or forward                */
+/* pcDistance - finds a label backward or forward                  */
 /*-----------------------------------------------------------------*/
 
 static int
@@ -74,16 +74,19 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
   SNPRINTF (buff, sizeof(buff), "%s:", lbl);
   while (pl)
     {
-
       if (pl->line &&
           !pl->isComment &&
           !pl->isLabel &&
-          !pl->isDebug) {
-                if (port->peep.getSize) {
-                        dist += port->peep.getSize(pl);
-                } else {
-                        dist += 3;
-                }
+          !pl->isDebug)
+        {
+          if (port->peep.getSize)
+            {
+              dist += port->peep.getSize(pl);
+            }
+          else
+            {
+              dist += 3;
+            }
         }
 
       if (strncmp (pl->line, buff, strlen (buff)) == 0)
@@ -155,7 +158,7 @@ FBYNAME (labelInRange)
     return FALSE;
 
   /* calculate the label distance : the jump for reladdr can be
-     +/- 127 bytes, here Iam assuming that an average 8051
+     +/- 127 bytes, here I am assuming that an average 8051
      instruction is 2 bytes long, so if the label is more than
      63 intructions away, the label is considered out of range
      for a relative jump. we could get more precise this will
@@ -1045,6 +1048,9 @@ operandBaseName (const char *op)
         return "a";
       if (!strncmp (op, "ar", 2) && ISCHARDIGIT(*(op+2)) && !*(op+3))
         return op+1;
+      // bug 1739475, temp fix
+      if (op[0] == '@')
+        return operandBaseName(op+1);
     }
 
   return op;

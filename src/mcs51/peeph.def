@@ -1317,7 +1317,7 @@ replace {
 } by {
 	;	Peephole 177.c	removed redundant mov
 	mov	%1,%3
-} if notVolatile %1 %2
+} if notVolatile(%1 %2),operandsNotRelated(%1 %3)
 
 // applies to f.e. bug-408972.c
 // not before peephole 177.c
@@ -4661,6 +4661,24 @@ replace {
 	;	Peephole 270	removed redundant add
 	add	a,#%1+%2
 }
+
+replace {
+	jz	%1
+	mov	%2,%4
+	sjmp	%3
+%1:
+	mov	%2,#0x00
+%3:
+} by {
+	jz	%1
+	;	Peephole 271	optimized ternary operation (acc different)
+	mov	a,%4
+%1:
+	mov	%2,a
+%3:
+} if operandsNotRelated('a' 'dptr' %2), labelRefCount(%1 1), labelRefCountChange(%3 -1)
+
+
 replace restart {
 	pop	ar%1
 } by {

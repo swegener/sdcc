@@ -1,3 +1,10 @@
+2008-02-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c (operandBaseName): added check for @Ri
+	* src/mcs51/peeph.def (rule 177.c): added operandsNotRelated(%1 %3)
+	  fixes bug 1739475, thanks Robert Larice
+	  (rule 271): new, added
+
 2008-02-18 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/s51.src/Makefile.in: fixed error made in previous commit

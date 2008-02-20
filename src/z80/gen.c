@@ -1508,8 +1508,18 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
           }
         else
           {
-            emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
-            emit2 ("ld %s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
+            /* Swapping register contents within register pair */
+            if(!strcmp(aopGet (aop, offset, FALSE), _pairs[pairId].h))
+              {
+                emit2 ("ld a,%s",aopGet (aop, offset + 1, FALSE));
+                emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
+                emit2 ("ld %s,a", _pairs[pairId].h);
+              }
+            else
+              {
+                emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
+                emit2 ("ld %s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
+              }
           }
         /* PENDING: check? */
         if (pairId == PAIR_HL)

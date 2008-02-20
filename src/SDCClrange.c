@@ -457,18 +457,24 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
       /* computeLiveRanges() is called twice */
       if (emitWarnings)
         {
-          werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
-                    IS_ITEMP (op) ? OP_SYMBOL (op)->prereqv->name :
-                                    OP_SYMBOL (op)->name);
           if (IS_ITEMP (op))
             {
-              OP_SYMBOL (op)->prereqv->reqv = NULL;
-              OP_SYMBOL (op)->prereqv->allocreq = 1;
+              if (OP_SYMBOL (op)->prereqv)
+                {
+                  werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
+                            OP_SYMBOL (op)->prereqv->name);
+                  OP_SYMBOL (op)->prereqv->reqv = NULL;
+                  OP_SYMBOL (op)->prereqv->allocreq = 1;
+                }
+            }
+          else
+            {
+              werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
+                        OP_SYMBOL (op)->name);
             }
         }
       /* is this block part of a loop? */
-      if (IS_ITEMP (op) &&
-          ebp->depth != 0)
+      if (IS_ITEMP (op) && ebp->depth != 0)
         {
           /* extend the life range to the outermost loop */
           unvisitBlocks(ebbs, count);

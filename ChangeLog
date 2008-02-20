@@ -1,5 +1,9 @@
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c: fixed bugs #1596270, #1736867
+
+2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c: fixed bug in register pair loading when swapping register contents,
           mostly fixes #1596270
 

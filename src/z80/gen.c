@@ -3922,28 +3922,57 @@ genPlus (iCode * ic)
 
   setupToPreserveCarry (ic);
 
-  while (size--)
+  /* This is ugly, but it fixes the worst code generation bug on Z80. */
+  /* Probably something similar has to be done for addition of larger numbers, too. */
+  if(size == 2)
     {
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC)
+      _moveA (aopGet (AOP (IC_LEFT (ic)), 0, FALSE));
+      emit2 ("add a,%s", aopGet (AOP (IC_RIGHT (ic)), 0, FALSE));
+      if(strcmp (aopGet (AOP (IC_RESULT (ic)), 0, FALSE), aopGet (AOP (IC_LEFT (ic)), 1, FALSE)))
         {
-          _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
-          if (offset == 0)
-            emit2 ("add a,%s",
-                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-          else
-            emit2 ("adc a,%s",
-                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+          aopPut (AOP (IC_RESULT (ic)), "a", 0);
+          _moveA (aopGet (AOP (IC_LEFT (ic)), 1, FALSE));
         }
       else
         {
-          _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
-          if (offset == 0)
-            emit2 ("add a,%s",
-                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+          emitDebug ("; Addition result is in same register as operand of next addition.");
+          if(strchr (aopGet (AOP (IC_RESULT (ic)), 0, FALSE), 'c') ||
+             strchr (aopGet (AOP (IC_RESULT (ic)), 0, FALSE), 'b') )
+            {
+              emit2 ("push de");
+              emit2 ("ld e, a");
+              emit2 ("ld a, %s", aopGet (AOP (IC_LEFT (ic)), 1, FALSE));
+              emit2 ("ld d, a");
+              emit2 ("ld a, e");
+              emit2 ("ld %s, a", aopGet (AOP (IC_RESULT (ic)), 0, FALSE));
+              emit2 ("ld a, d");
+              emit2 ("pop de");
+            }
           else
-            emit2 ("adc a,%s",
-                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+            {
+              emit2 ("push bc");
+              emit2 ("ld c, a");
+              emit2 ("ld a, %s", aopGet (AOP (IC_LEFT (ic)), 1, FALSE));
+              emit2 ("ld b, a");
+              emit2 ("ld a, c");
+              emit2 ("ld %s, a", aopGet (AOP (IC_RESULT (ic)), 0, FALSE));
+              emit2 ("ld a, b");
+              emit2 ("pop bc");
+            }
+          
         }
+      emit2 ("adc a,%s", aopGet (AOP (IC_RIGHT (ic)), 1, FALSE));
+      aopPut (AOP (IC_RESULT (ic)), "a", 1);
+      goto release;
+    }
+
+  while (size--)
+    {
+      _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
+      if (offset == 0)
+        emit2 ("add a,%s", aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+      else
+        emit2 ("adc a,%s", aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);
     }
 

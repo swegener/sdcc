@@ -1,3 +1,15 @@
+2008-02-21 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/xa51/spec.mk:
+	  added CFLAGS when compiling timeout
+
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bugs-1596270-1736867.c: Regression test for #1596270, #1736867
@@ -14,7 +26,7 @@
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c: fixed bug in register pair loading when swapping register contents,
-          mostly fixes #1596270
+	  mostly fixes #1596270
 
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 

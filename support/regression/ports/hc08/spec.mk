@@ -41,6 +41,6 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	-grep -n FAIL $@ /dev/null || true
 
 $(CASES_DIR)/timeout: fwk/lib/timeout.c
-	$(CC) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 _clean:

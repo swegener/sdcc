@@ -46,6 +46,6 @@ $(PORT_CASES_DIR)/fwk.lib:
 
 
 gen/timeout: $(srcdir)/fwk/lib/timeout.c
-	$(CC) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 _clean:

@@ -1,3 +1,7 @@
+2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bugs-1596270-1736867.c: Regression test for #1596270, #1736867
+
 2008-02-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCClrange.c (findPrevUse): fixed bug 1888147

@@ -998,10 +998,14 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
 
     }
 
-  if (iloop) {
-    werrorfl (sym->opval.val->sym->fileDef, sym->opval.val->sym->lineDef,
-              W_EXCESS_INITIALIZERS, "struct",
-              sym->opval.val->sym->name);
+  if (iloop)
+    {
+      if (IS_AST_VALUE (sym))
+        werrorfl (sym->opval.val->sym->fileDef, sym->opval.val->sym->lineDef,
+                  W_EXCESS_INITIALIZERS, "struct",
+                  sym->opval.val->sym->name);
+      else
+        werrorfl (sym->filename, sym->lineno, E_INIT_COUNT);
   }
 
   return rast;

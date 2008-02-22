@@ -4231,7 +4231,9 @@ genMult (iCode * ic)
     _G.stack.pushedDE = TRUE;
   }
 
-  if ( AOP_SIZE (IC_LEFT (ic)) == 1 && !SPEC_USIGN (getSpec (operandType ( IC_LEFT (ic)))))
+  if (byteResult)
+    emit2 ("ld a,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
+  else if ( AOP_SIZE (IC_LEFT (ic)) == 1 && !SPEC_USIGN (getSpec (operandType ( IC_LEFT (ic)))))
     {
       emit2 ("ld e,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
       if (!byteResult)
@@ -4249,25 +4251,33 @@ genMult (iCode * ic)
 
   i = val;
 
-  /* Fully unroled version of mul.s.  Not the most efficient.
-   */
   for (count = 0; count < 16; count++)
     {
       if (count != 0 && active)
         {
-          emit2 ("add hl,hl");
+          if (byteResult)
+            emit2 ("add a,a");
+          else
+            emit2 ("add hl,hl");
         }
       if (i & 0x8000U)
         {
           if (active == FALSE)
             {
-              emit2 ("ld l,e");
-              if (!byteResult)
-                emit2 ("ld h,d");
+              if (byteResult)
+                emit2("ld e,a");
+              else
+                {
+                  emit2 ("ld l,e");
+                  emit2 ("ld h,d");
+                }
             }
           else
             {
-              emit2 ("add hl,de");
+              if (byteResult)
+                emit2 ("add a,e");
+              else
+                emit2 ("add hl,de");
             }
           active = TRUE;
         }
@@ -4283,7 +4293,7 @@ genMult (iCode * ic)
     }
 
   if (byteResult)
-    aopPut (AOP (IC_RESULT (ic)), _pairs[PAIR_HL].l, 0);
+    aopPut (AOP (IC_RESULT (ic)), "a", 0);
   else
     commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
 

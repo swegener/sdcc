@@ -1,7 +1,12 @@
 2008-02-22 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c (genMult): Rewrote 8-bit multiplication by constant,
+          implements #1898231
+
+2008-02-22 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/z80/mul.s: Rewrote __muluchar_rrx_s, to improve 8-bit mult.,
-          implements #1896290.
+          implements #1896290
 
 2008-02-22 Maarten Brock <sourceforge.brock AT dse.nl>
 

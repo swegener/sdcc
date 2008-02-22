@@ -1,6 +1,26 @@
-	;; Originally from GBDK by Pascal Felber.
+        .area   _CODE
 
-	.area	_CODE
+; This multiplication routine is similar to the one
+; from Rodnay Zaks, "Programming the Z80".
+
+__muluchar_rrx_s::
+        ld      hl, #2
+        add     hl, sp
+        ld      e, (hl)
+        inc     hl
+        ld      h, (hl)
+        ld      l, #0
+        ld      d, l
+        ld      b, #8
+muluchar_rrx_s_loop:
+        add     hl, hl
+        jr      nc, muluchar_rrx_s_noadd
+        add     hl, de
+muluchar_rrx_s_noadd:
+        djnz    muluchar_rrx_s_loop
+        ret
+
+;; Originally from GBDK by Pascal Felber.
 
 __mulschar_rrx_s::
         ld      hl,#2
@@ -24,22 +44,6 @@ __mulschar_rrx_hds::
         rla
         sbc     a,a
         ld      d,a
-
-        jp      .mul16
-
-__muluchar_rrx_s::
-        ld      hl,#2
-        add     hl,sp
-
-        ld      e,(hl)
-
-        inc     hl
-        ld      c,(hl)
-
-        ;; Clear the top
-        xor     a
-        ld      d,a
-        ld      b,a
 
         jp      .mul16
 

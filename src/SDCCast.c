@@ -854,9 +854,6 @@ processParms (ast *func,
       ast *newType = NULL;
       sym_link *ftype;
 
-      int isCast = IS_CAST_OP (*actParm);
-      int isAstLitValue = (IS_AST_LIT_VALUE (*actParm));
-
       if (IS_CAST_OP (*actParm) ||
         (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, removedCast)) ||
         (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, literalFromCast)))

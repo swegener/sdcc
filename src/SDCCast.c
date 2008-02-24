@@ -227,6 +227,7 @@ copyAst (ast * src)
   dest->level = src->level;
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
+  dest->actualArgument = src->actualArgument;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -837,6 +838,9 @@ processParms (ast *func,
         }
     }
 
+  /* mark the actual parameter */
+  (*actParm)->actualArgument = 1;
+
   /* decorate parameter */
   resultType = defParm ? getResultTypeFromType (defParm->type) :
                          RESULT_TYPE_NONE;
@@ -854,8 +858,11 @@ processParms (ast *func,
       ast *newType = NULL;
       sym_link *ftype;
 
+      int isCast = IS_CAST_OP (*actParm);
+      int isAstLitValue = (IS_AST_LIT_VALUE (*actParm));
+
       if (IS_CAST_OP (*actParm)
-          || (IS_AST_LIT_VALUE (*actParm) && (*actParm)->values.literalFromCast))
+        || (IS_AST_LIT_VALUE (*actParm) && (*actParm)->values.literalFromCast))
         {
           /* Parameter was explicitly typecast; don't touch it. */
           return 0;
@@ -3834,9 +3841,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       changePointer(LTYPE(tree));
       checkTypeSanity(LETYPE(tree), "(cast)");
 
-      /* if 'from' and 'to' are the same remove the superfluous cast, */
-      /* this helps other optimizations */
-      if (compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
+
+      /* if not an actual argument and
+       * if 'from' and 'to' are the same remove the superfluous cast,
+       * this helps other optimizations */
+      if (!tree->actualArgument && compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
         {
           return tree->right;
         }
@@ -4153,9 +4162,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 if (!options.lessPedantic)
                   werrorfl (tree->filename, tree->lineno, W_COMP_RANGE,
                           ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
-                return decorateType (newAst_VALUE (constCharVal (
-                                   (unsigned char)(ccr_result == CCR_ALWAYS_TRUE ? 1 : 0))),
-                                                   resultType);
+                return decorateType (newAst_VALUE (constCharVal ((unsigned char)(ccr_result == CCR_ALWAYS_TRUE))), resultType);
               case CCR_OK:
               default:
                 break;
@@ -6306,7 +6313,7 @@ expandInlineFuncs (ast * tree, ast * block)
               ast * assigntree;
               symbol * parm;
               ast * passedarg = inlineFindParm (tree->right, argIndex);
-              
+
               if (!passedarg)
                 {
                   werror(E_TOO_FEW_PARMS);

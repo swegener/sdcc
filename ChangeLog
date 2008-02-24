@@ -1,3 +1,7 @@
+2008-02-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (expandInlineFuncs): fixed bug 1875869
+
 2008-02-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c (genMult): Rewrote 8-bit multiplication by constant,

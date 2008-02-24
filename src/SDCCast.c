@@ -4154,7 +4154,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                   werrorfl (tree->filename, tree->lineno, W_COMP_RANGE,
                           ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
                 return decorateType (newAst_VALUE (constCharVal (
-                                   ccr_result == CCR_ALWAYS_TRUE ? 1 : 0)),
+                                   (unsigned char)(ccr_result == CCR_ALWAYS_TRUE ? 1 : 0))),
                                                    resultType);
               case CCR_OK:
               default:
@@ -6303,14 +6303,19 @@ expandInlineFuncs (ast * tree, ast * block)
           while (args)
             {
               symbol * temparg;
-              ast * passedarg;
               ast * assigntree;
-              symbol * parm = copySymbol (args->sym);
+              symbol * parm;
+              ast * passedarg = inlineFindParm (tree->right, argIndex);
+              
+              if (!passedarg)
+                {
+                  werror(E_TOO_FEW_PARMS);
+                  break;
+                }
 
               temparg = inlineTempVar (args->sym->type, tree->level+1);
               inlineAddDecl (temparg, inlinetree, FALSE);
 
-              passedarg = inlineFindParm (tree->right, argIndex);
               assigntree = newNode ('=',
                                     newAst_VALUE (symbolVal (temparg)),
                                     passedarg);
@@ -6318,6 +6323,7 @@ expandInlineFuncs (ast * tree, ast * block)
                                            assigntree,
                                            inlinetree->right);
 
+              parm = copySymbol (args->sym);
               inlineAddDecl (parm, inlinetree2, FALSE);
               parm->_isparm = 0;
 

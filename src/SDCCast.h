@@ -50,7 +50,6 @@ typedef struct ast
     unsigned lvalue:1;
     unsigned initMode:1;
     unsigned reversed:1;
-    unsigned actualArgument:1;  /* actual function argument */
     int level;                  /* level for expr */
     int block;                  /* block number   */
     int seqPoint;               /* sequence point */
@@ -85,15 +84,19 @@ typedef struct ast
             struct ast *initExpr;       /* init portion */
             struct ast *condExpr;       /* conditional portion */
             struct ast *loopExpr;       /* iteration portion   */
-            symbol *trueLabel;  /* entry point into body */
-            symbol *falseLabel; /* exit point */
+            symbol *trueLabel;          /* entry point into body */
+            symbol *falseLabel;         /* exit point */
             symbol *continueLabel;      /* conditional check   */
-            symbol *condLabel;  /* conditional label   */
+            symbol *condLabel;          /* conditional label   */
           }
         forVals;
-        unsigned literalFromCast;       /* true if this is an EX_VALUE of LITERAL
+        struct
+          {
+            unsigned literalFromCast:1; /* true if this is an EX_VALUE of LITERAL
                                          * type resulting from a typecast.
                                          */
+            unsigned removedCast:1;     /* true if the explicit cast has been removed */
+          };
         int argreg;                     /* argreg number when operand type == EX_OPERAND */
       }
     values;
@@ -114,50 +117,50 @@ ast;
 
 /* easy access macros   */
 #define IS_AST_OP(x)            ((x) && (x)->type == EX_OP)
-#define IS_CALLOP(x)            (IS_AST_OP(x) && x->opval.op == CALL)
-#define IS_BITOR(x)             (IS_AST_OP(x) && x->opval.op == '|')
-#define IS_BITAND(x)            (IS_AST_OP(x) && x->opval.op == '&' && \
-                                 x->left && x->right )
-#define IS_FOR_STMT(x)          (IS_AST_OP(x) && x->opval.op == FOR)
-#define IS_LEFT_OP(x)           (IS_AST_OP(x) && x->opval.op == LEFT_OP)
-#define IS_RIGHT_OP(x)          (IS_AST_OP(x) && x->opval.op == RIGHT_OP)
+#define IS_CALLOP(x)            (IS_AST_OP(x) && (x)->opval.op == CALL)
+#define IS_BITOR(x)             (IS_AST_OP(x) && (x)->opval.op == '|')
+#define IS_BITAND(x)            (IS_AST_OP(x) && (x)->opval.op == '&' && \
+                                 (x)->left && (x)->right )
+#define IS_FOR_STMT(x)          (IS_AST_OP(x) && (x)->opval.op == FOR)
+#define IS_LEFT_OP(x)           (IS_AST_OP(x) && (x)->opval.op == LEFT_OP)
+#define IS_RIGHT_OP(x)          (IS_AST_OP(x) && (x)->opval.op == RIGHT_OP)
 #define IS_AST_VALUE(x)         ((x) && (x)->type == EX_VALUE && (x)->opval.val)
-#define IS_AST_LINK(x)          (x->type == EX_LINK)
-#define IS_AST_NOT_OPER(x)      (x && IS_AST_OP(x) && x->opval.op == '!')
-#define IS_ARRAY_OP(x)          (IS_AST_OP(x) && x->opval.op == '[')
+#define IS_AST_LINK(x)          ((x)->type == EX_LINK)
+#define IS_AST_NOT_OPER(x)      (x && IS_AST_OP(x) && (x)->opval.op == '!')
+#define IS_ARRAY_OP(x)          (IS_AST_OP(x) && (x)->opval.op == '[')
 #define IS_COMPARE_OP(x)        (IS_AST_OP(x)           &&              \
-                                  (x->opval.op == '>'   ||              \
-                                   x->opval.op == '<'   ||              \
-                                   x->opval.op == LE_OP ||              \
-                                   x->opval.op == GE_OP ||              \
-                                   x->opval.op == EQ_OP ||              \
-                                   x->opval.op == NE_OP ))
+                                  ((x)->opval.op == '>'   ||            \
+                                   (x)->opval.op == '<'   ||            \
+                                   (x)->opval.op == LE_OP ||            \
+                                   (x)->opval.op == GE_OP ||            \
+                                   (x)->opval.op == EQ_OP ||            \
+                                   (x)->opval.op == NE_OP ))
 #define IS_CAST_OP(x)           (IS_AST_OP(x) && (x)->opval.op == CAST)
-#define IS_TERNARY_OP(x)        (IS_AST_OP(x) && x->opval.op == '?')
-#define IS_COLON_OP(x)          (IS_AST_OP(x) && x->opval.op == ':')
-#define IS_ADDRESS_OF_OP(x)     (IS_AST_OP(x)            &&              \
-                                 x->opval.op == '&'      &&              \
-                                 x->right == NULL )
+#define IS_TERNARY_OP(x)        (IS_AST_OP(x) && (x)->opval.op == '?')
+#define IS_COLON_OP(x)          (IS_AST_OP(x) && (x)->opval.op == ':')
+#define IS_ADDRESS_OF_OP(x)     (IS_AST_OP(x)            &&             \
+                                 (x)->opval.op == '&'      &&           \
+                                 (x)->right == NULL )
 #define IS_AST_LIT_VALUE(x)     (IS_AST_VALUE(x) && \
                                  IS_LITERAL((x)->opval.val->etype))
-#define IS_AST_SYM_VALUE(x)     (IS_AST_VALUE(x) && x->opval.val->sym)
-#define AST_FLOAT_VALUE(x)      (floatFromVal(x->opval.val))
-#define AST_ULONG_VALUE(x)      (ulFromVal(x->opval.val))
-#define AST_SYMBOL(x)           (x->opval.val->sym)
-#define AST_VALUE(x)            (x->opval.val)
-#define AST_VALUES(x,y)         (x->values.y)
-#define AST_FOR(x,y)            x->values.forVals.y
-#define AST_ARGREG(x)           x->values.argreg
+#define IS_AST_SYM_VALUE(x)     (IS_AST_VALUE(x) && (x)->opval.val->sym)
+#define AST_FLOAT_VALUE(x)      (floatFromVal((x)->opval.val))
+#define AST_ULONG_VALUE(x)      (ulFromVal((x)->opval.val))
+#define AST_SYMBOL(x)           ((x)->opval.val->sym)
+#define AST_VALUE(x)            ((x)->opval.val)
+#define AST_VALUES(x,y)         ((x)->values.y)
+#define AST_FOR(x,y)            ((x)->values.forVals.y)
+#define AST_ARGREG(x)           ((x)->values.argreg)
 
-#define IS_AST_PARAM(x)         (IS_AST_OP(x) && x->opval.op == PARAM)
+#define IS_AST_PARAM(x)         (IS_AST_OP(x) && (x)->opval.op == PARAM)
 
-#define  CAN_EVAL(x)    (     x ==  '[' || x == '.' || x == PTR_OP ||   \
-              x ==  '&' || x == '|' || x == '^'    || x == '*' || \
-              x ==  '-' || x == '+' || x == '~'    ||   \
-              x ==  '!' || x == LEFT_OP || x == RIGHT_OP ||       \
-              x ==  '/' || x == '%' || x == '>' || x == '<'    || \
-              x == LE_OP || x == GE_OP || x == EQ_OP || x == NE_OP || \
-              x == AND_OP || x == OR_OP || x == '='  )
+#define  CAN_EVAL(x)    (      (x) == '['     || (x) == '.'      || (x) == PTR_OP || \
+              (x) ==  '&'   || (x) == '|'     || (x) == '^'      || (x) == '*'    || \
+              (x) ==  '-'   || (x) == '+'     || (x) == '~'      ||                  \
+              (x) ==  '!'   || (x) == LEFT_OP || (x) == RIGHT_OP ||                  \
+              (x) ==  '/'   || (x) == '%'     || (x) == '>'      || (x) == '<'    || \
+              (x) == LE_OP  || (x) == GE_OP   || (x) == EQ_OP    || (x) == NE_OP  || \
+              (x) == AND_OP || (x) == OR_OP   || (x) == '='  )
 
 #define  LEFT_FIRST(x) ( x  ==  AND_OP  ||      x       ==      OR_OP   )
 
@@ -165,13 +168,13 @@ ast;
                                          werror(W_NO_SIDE_EFFECTS,op);  \
                                          return rVal    ;               \
                                      }
-#define IS_MODIFYING_OP(x) ( x == INC_OP || x == DEC_OP || x == '=' ||  \
-                        x == AND_ASSIGN || x== OR_ASSIGN || x == XOR_ASSIGN )
+#define IS_MODIFYING_OP(x) ( (x) == INC_OP || (x) == DEC_OP || (x) == '=' ||  \
+                        (x) == AND_ASSIGN || x== OR_ASSIGN || (x) == XOR_ASSIGN )
 
-#define IS_ASSIGN_OP(x) ( x == '=' || x == ADD_ASSIGN || x == SUB_ASSIGN ||\
-                          x == MUL_ASSIGN || x == DIV_ASSIGN || x == XOR_ASSIGN ||\
-                          x == AND_ASSIGN || x == OR_ASSIGN || x == INC_OP || x == DEC_OP)
-#define IS_DEREF_OP(x) (( x->opval.op == '*' && x->right == NULL) || x->opval.op == '.')
+#define IS_ASSIGN_OP(x) ( (x) == '=' || (x) == ADD_ASSIGN || (x) == SUB_ASSIGN ||\
+                          (x) == MUL_ASSIGN || (x) == DIV_ASSIGN || (x) == XOR_ASSIGN ||\
+                          (x) == AND_ASSIGN || (x) == OR_ASSIGN || (x) == INC_OP || (x) == DEC_OP)
+#define IS_DEREF_OP(x) (( (x)->opval.op == '*' && (x)->right == NULL) || (x)->opval.op == '.')
 
 /* forward declarations for global variables */
 extern ast *staticAutos;

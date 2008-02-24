@@ -227,7 +227,6 @@ copyAst (ast * src)
   dest->level = src->level;
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
-  dest->actualArgument = src->actualArgument;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -838,9 +837,6 @@ processParms (ast *func,
         }
     }
 
-  /* mark the actual parameter */
-  (*actParm)->actualArgument = 1;
-
   /* decorate parameter */
   resultType = defParm ? getResultTypeFromType (defParm->type) :
                          RESULT_TYPE_NONE;
@@ -861,8 +857,9 @@ processParms (ast *func,
       int isCast = IS_CAST_OP (*actParm);
       int isAstLitValue = (IS_AST_LIT_VALUE (*actParm));
 
-      if (IS_CAST_OP (*actParm)
-        || (IS_AST_LIT_VALUE (*actParm) && (*actParm)->values.literalFromCast))
+      if (IS_CAST_OP (*actParm) ||
+        (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, removedCast)) ||
+        (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, literalFromCast)))
         {
           /* Parameter was explicitly typecast; don't touch it. */
           return 0;
@@ -3842,11 +3839,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       checkTypeSanity(LETYPE(tree), "(cast)");
 
 
-      /* if not an actual argument and
-       * if 'from' and 'to' are the same remove the superfluous cast,
+      /* if 'from' and 'to' are the same remove the superfluous cast,
        * this helps other optimizations */
-      if (!tree->actualArgument && compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
+      if (compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
         {
+          /* mark that the explicit cast has been removed,
+           * for proper processing (no integer promotion) of explicitly typecasted variable arguments */
+          tree->right->values.removedCast = 1;
           return tree->right;
         }
 

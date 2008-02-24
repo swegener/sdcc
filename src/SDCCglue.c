@@ -704,7 +704,7 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
           (IS_BITFIELD(lsym->next->type)) &&
           (SPEC_BSTR(lsym->next->etype)))) break;
     lsym = lsym->next;
-    lilist = lilist->next;
+    lilist = lilist ? lilist->next : NULL;
   } while (1);
   switch (size) {
   case 1:
@@ -714,9 +714,9 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
   case 2:
     dbuf_tprintf (oBuf, "\t!dw !constword\n",ival);
     break;
-  case 4: /* EEP: why is this db and not dw? */
-    dbuf_tprintf (oBuf, "\t!db  !constword,!constword\n",
-             (ival >> 8) & 0xffff, (ival & 0xffff));
+  case 4:
+    dbuf_tprintf (oBuf, "\t!dw  !constword,!constword\n",
+             (ival >> 16) & 0xffff, (ival & 0xffff));
     break;
   }
   *sym = lsym;
@@ -1531,7 +1531,8 @@ emitOverlay (struct dbuf_s * aBuf)
                        sym->rname,
                        SPEC_ADDR (sym->etype));
             }
-          else {
+          else
+            {
               int size = getSize(sym->type);
 
               if (size==0) {

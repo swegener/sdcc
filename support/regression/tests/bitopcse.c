@@ -16,7 +16,7 @@
 #  define UNSIGNED unsigned
 #endif
 
-#if defined(TYPE_bool) || defined(SDCC_hc08)
+#if defined(TYPE_bool)
 #  define _data
 #else
 #  define _data idata

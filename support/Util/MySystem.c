@@ -321,6 +321,11 @@ my_system(const char *cmd)
   }
 
   e = system(cmdLine);
+
+  if (options.verboseExec && e) {
+      printf("+ %s returned errorcode %d\n", cmdLine, e);
+  }
+
   Safe_free(cmdLine);
 
   return e;

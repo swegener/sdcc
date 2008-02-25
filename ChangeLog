@@ -1,3 +1,9 @@
+2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genPagedPointerSet): fixed bug 1670148
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: added expf.c
+	* support/regression/tests/bug1670148.c: new, added
+
 2008-02-25 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed2.h: fixed bug 1901469.

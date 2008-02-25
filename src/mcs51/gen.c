@@ -10603,39 +10603,36 @@ genNearPointerSet (operand * right,
      then don't need anything more */
   if (!AOP_INPREG (AOP (result)))
     {
-        if (
-            //AOP_TYPE (result) == AOP_STK
-            IS_AOP_PREG(result)
-            )
+      if (IS_AOP_PREG (result))
         {
-            // Aha, it is a pointer, just in disguise.
-            rname = aopGet (result, 0, FALSE, FALSE);
-            if (*rname != '@')
+          // Aha, it is a pointer, just in disguise.
+          rname = aopGet (result, 0, FALSE, FALSE);
+          if (*rname != '@')
             {
-                fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
-                        __FILE__, __LINE__);
+              fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
+                      __FILE__, __LINE__);
             }
-            else
+          else
             {
-                // Expected case.
-                emitcode ("mov", "a%s,%s", rname + 1, rname);
-                rname++;  // skip the '@'.
+              // Expected case.
+              emitcode ("mov", "a%s,%s", rname + 1, rname);
+              rname++;  // skip the '@'.
             }
         }
-        else
+      else
         {
-            /* otherwise get a free pointer register */
-            aop = newAsmop (0);
-            preg = getFreePtr (ic, &aop, FALSE);
-            emitcode ("mov", "%s,%s",
-                      preg->name,
-                      aopGet (result, 0, FALSE, TRUE));
-            rname = preg->name;
+          /* otherwise get a free pointer register */
+          aop = newAsmop (0);
+          preg = getFreePtr (ic, &aop, FALSE);
+          emitcode ("mov", "%s,%s",
+                    preg->name,
+                    aopGet (result, 0, FALSE, TRUE));
+          rname = preg->name;
         }
     }
-    else
+  else
     {
-        rname = aopGet (result, 0, FALSE, FALSE);
+      rname = aopGet (result, 0, FALSE, FALSE);
     }
 
   aopOp (right, ic, FALSE);
@@ -10723,16 +10720,37 @@ genPagedPointerSet (operand * right,
      then don't need anything more */
   if (!AOP_INPREG (AOP (result)))
     {
-      /* otherwise get a free pointer register */
-      aop = newAsmop (0);
-      preg = getFreePtr (ic, &aop, FALSE);
-      emitcode ("mov", "%s,%s",
-                preg->name,
-                aopGet (result, 0, FALSE, TRUE));
-      rname = preg->name;
+      if (IS_AOP_PREG (result))
+        {
+          // Aha, it is a pointer, just in disguise.
+          rname = aopGet (result, 0, FALSE, FALSE);
+          if (*rname != '@')
+            {
+              fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
+                      __FILE__, __LINE__);
+            }
+          else
+            {
+              // Expected case.
+              emitcode ("mov", "a%s,%s", rname + 1, rname);
+              rname++;  // skip the '@'.
+            }
+        }
+      else
+        {
+          /* otherwise get a free pointer register */
+          aop = newAsmop (0);
+          preg = getFreePtr (ic, &aop, FALSE);
+          emitcode ("mov", "%s,%s",
+                    preg->name,
+                    aopGet (result, 0, FALSE, TRUE));
+          rname = preg->name;
+        }
     }
   else
-    rname = aopGet (result, 0, FALSE, FALSE);
+    {
+      rname = aopGet (result, 0, FALSE, FALSE);
+    }
 
   aopOp (right, ic, FALSE);
 
@@ -10741,7 +10759,7 @@ genPagedPointerSet (operand * right,
     genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, rname, PPOINTER);
   else
     {
-      /* we have can just get the values */
+      /* we can just get the values */
       int size = AOP_SIZE (right);
       int offset = 0;
 
@@ -10750,10 +10768,8 @@ genPagedPointerSet (operand * right,
           l = aopGet (right, offset, FALSE, TRUE);
           MOVA (l);
           emitcode ("movx", "@%s,a", rname);
-
           if (size || pi)
             emitcode ("inc", "%s", rname);
-
           offset++;
         }
     }
@@ -10772,10 +10788,11 @@ genPagedPointerSet (operand * right,
          if size > 0 && this could be used again
          we have to point it back to where it
          belongs */
-      if (AOP_SIZE (right) > 1 &&
+      if ((AOP_SIZE (right) > 1 &&
           !OP_SYMBOL (result)->remat &&
           (OP_SYMBOL (result)->liveTo > ic->seq ||
-           ic->depth))
+            ic->depth)) &&
+          !pi)
         {
           int size = AOP_SIZE (right) - 1;
           while (size--)
@@ -10784,9 +10801,10 @@ genPagedPointerSet (operand * right,
     }
 
   /* done */
-  if (pi) pi->generated = 1;
-  freeAsmop (result, NULL, ic, TRUE);
+  if (pi)
+    pi->generated = 1;
   freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/

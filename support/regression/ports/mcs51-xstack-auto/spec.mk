@@ -18,7 +18,7 @@ SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _fsadd.c _fssub.c _fsdiv.c _fsmul.c \
           _fseq.c _fsneq.c _fsgt.c _fslt.c _fscmp.c \
           fabsf.c sqrtf.c logf.c log10f.c powf.c tanf.c \
-          errno.c frexpf.c ldexpf.c tancotf.c \
+          errno.c frexpf.c ldexpf.c expf.c tancotf.c \
           _fsget1arg.c _fsget2args.c _fsnormalize.c \
           _fsreturnval.c _fsrshift.c _fsswapargs.c \
           _gptrget.c _gptrput.c \

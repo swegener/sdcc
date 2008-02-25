@@ -62,7 +62,7 @@ __sfr __at (0x8F) CKCON0;   //Clock control Register 0
     #define T1X2  0x04      //Timer1 Clock speed '1'=12 ck/cy, '0'=6 ck/cy
     #define T0X2  0x02      //Timer0 Clock speed '1'=12 ck/cy, '0'=6 ck/cy
     #define X2    0x01      //CPU Clock '0'=12 ck/cy, '1'=6 ck/cy
-__sfr __at (0x8F) CKCON1;   //Clock control Register 1
+__sfr __at (0xAF) CKCON1;   //Clock control Register 1
     #define XPIX2 0x01      //SPI Clock speed '1'=12 ck/cy, '0'=6 ck/cy
 
 __sfr __at (0xFA) CCAP0H;	//Module 0 Capture HIGH. 

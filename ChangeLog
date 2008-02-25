@@ -1,3 +1,7 @@
+2008-02-25 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/at89c51ed2.h: fixed bug 1901469.
+
 2008-02-24 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCast.c, src/SDCCast.h: fixed bug #1874922: explicit typecast

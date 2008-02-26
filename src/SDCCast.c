@@ -854,9 +854,12 @@ processParms (ast *func,
       ast *newType = NULL;
       sym_link *ftype;
 
-      if (IS_CAST_OP (*actParm) ||
+      /* don't perform integer promotion of explicitly typecasted variable arguments
+       * if sdcc extensions are enabled */
+      if (options.std_sdcc && 
+        (IS_CAST_OP (*actParm) ||
         (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, removedCast)) ||
-        (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, literalFromCast)))
+        (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, literalFromCast))))
         {
           /* Parameter was explicitly typecast; don't touch it. */
           return 0;

@@ -1,3 +1,8 @@
+2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (isSpiltOnStack): fixed bug 1565152
+	* support/regression/tests/bug1565152.c: new, added
+
 2008-02-26 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCast.c, doc/adccman.lyx: fixed RFE #1901171: inerger promotion

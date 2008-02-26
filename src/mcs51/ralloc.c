@@ -578,6 +578,7 @@ createStackSpil (symbol * sym)
 
 /*-----------------------------------------------------------------*/
 /* isSpiltOnStack - returns true if the spil location is on stack  */
+/*                  or otherwise needs a pointer register          */
 /*-----------------------------------------------------------------*/
 static bool
 isSpiltOnStack (symbol * sym)
@@ -595,6 +596,9 @@ isSpiltOnStack (symbol * sym)
 
   if (!sym->usl.spillLoc)
     return FALSE;
+
+  if (sym->usl.spillLoc->onStack || sym->usl.spillLoc->iaccess)
+    return TRUE;
 
   etype = getSpec (sym->usl.spillLoc->type);
   if (IN_STACK (etype))
@@ -664,7 +668,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
       selectS = liveRangesWith (lrcs, bitType, ebp, ic);
       
       for (sym = setFirstItem (selectS); sym; sym = setNextItem (selectS))
-    {
+        {
           bitVectUnSetBit (lrcs, sym->key);
         }
     }

@@ -157,11 +157,7 @@ D
 \emph default
 evice
 \emph on
-C
-\emph default
-
-\emph on
-C
+CC
 \emph default
 ompiler) is free open source, retargettable, optimizing ANSI-C compiler
  by
@@ -193,12 +189,11 @@ Sandeep Dutta
 , an open source retargetable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
 rollers and underlying hardware effectively.
-
 \newline
 
 \newline
-In addition to the MCU specific optimizations SDCC also does a host of
- standard optimizations like:
+In addition to the MCU specific
+ optimizations SDCC also does a host of standard optimizations like:
 \end_layout
 
 \begin_layout Itemize
@@ -233,17 +228,16 @@ switch
 \begin_layout Standard
 For the back-end SDCC uses a global register allocation scheme which should
  be well suited for other 8 bit MCUs.
-
 \newline
 
 \newline
-The peep hole optimizer uses a rule based substitution mechanism which
- is MCU independent.
-
+The peep hole optimizer uses a rule
+ based substitution mechanism which is MCU independent.
 \newline
 
 \newline
-Supported data-types are:
+Supported data-types
+ are:
 \end_layout
 
 \begin_layout Standard
@@ -672,7 +666,6 @@ status collapsed
 -cyclomatic) to report the relative complexity of a function.
  These functions can then be further optimized, or hand coded in assembly
  if needed.
-
 \newline
 
 \newline
@@ -683,16 +676,11 @@ SDCC also comes with a companion source level debugger SDCDB.
 
 \newline
 The latest SDCC version can be downloaded from
-
 \begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
 
 \end_inset
 
 .
-
-\series bold
-
-\series default
 \emph on
 Please note: the compiler will probably always be some steps ahead of this
  documentation
@@ -818,7 +806,6 @@ Newer versions have usually numerous bug fixes compared with the previous
 \end_inset
 
  for ANSI-Compliance).
-
 \begin_inset Note Note
 status collapsed
 
@@ -2892,10 +2879,10 @@ italics
 \emph default
 , see section above).
  Further search paths are determined by environment variables during runtime.
-
 \newline
-The paths searched when running the compiler are as follows (the first
- catch wins):
+The
+ paths searched when running the compiler are as follows (the first catch
+ wins):
 \newline
 
 \newline
@@ -3411,7 +3398,6 @@ model
 \shape default
  is auto-appended by the compiler (e.g.
  small, large, z80, ds390 etc.).
-
 \newline
 
 \end_layout
@@ -4253,12 +4239,12 @@ bin_vc.
 bin_vc to sdcc
 \backslash
 bin before running SDCC.
-
 \newline
 
 \newline
-WARNING: Visual studio is very picky with line terminations; it expects
- the 0x0d, 0x0a DOS style line endings, not the 0x0a Unix style line endings.
+WARNING: Visual studio is very picky with line terminatio
+ns; it expects the 0x0d, 0x0a DOS style line endings, not the 0x0a Unix
+ style line endings.
  When using the Subversion repository it's easiest to configure the svn
  client to convert automatically for you.
  If however you are getting a message such as "This makefile was not generated
@@ -4466,7 +4452,6 @@ es may not be correctly calculated.
 \family sans
 \series bold
 find .
-
 \backslash
 ( -name '*.obj' -o -name '*.lib' -o -name '*.rul'
 \backslash
@@ -4673,7 +4658,6 @@ This is not only usefull for building different binaries, e.g.
  file untouched in the source directory.
  Simply copy it to the build directory, edit it, enter `make clean', `rm
  Makefile.dep' and `make'.
-
 \series bold
 make
 \series default
@@ -4756,7 +4740,6 @@ If you should know why please drop us a note
 \end_inset
 
 .
-
 \newline
 You'll find the pdf version
 \begin_inset LatexCommand \index{PDF version of this document}
@@ -4769,7 +4752,6 @@ You'll find the pdf version
 \end_inset
 
 .
-
 \newline
 A html version
 \begin_inset LatexCommand \index{HTML version of this document}
@@ -4784,7 +4766,6 @@ A html version
 .
 \newline
 This documentation is in some aspects different from a commercial documentation:
-
 \end_layout
 
 \begin_layout Itemize
@@ -4912,7 +4893,6 @@ status collapsed
 \family default
 \series default
  at the prompt, and the program should run and output its version like:
-
 \newline
 
 \family typewriter
@@ -4995,10 +4975,7 @@ Compile this using the following command:
 \family sans
 \series bold
 "sdcc -c test.c".
-
 \family default
-\series default
-
 \series medium
 If all goes well, the compiler will generate a test.asm and test.rel file.
  Congratulations, you've just compiled your first program with SDCC.
@@ -5023,12 +5000,8 @@ The next step is to try it with the linker.
 .
  If all goes well the compiler will link with the libraries and produce
  a test.ihx output file.
- If this step fails
-\series default
-
-\series medium
-(no test.ihx, and the linker generates warnings), then the problem is most
- likely that
+ If this step fails(no test.ihx, and the linker generates warnings), then
+ the problem is most likely that
 \series default
 SDCC
 \series medium
@@ -5036,11 +5009,7 @@ SDCC
 \series default
 /
 \series medium
-usr/local/share/sdcc/lib directory
-\series default
-
-\series medium
-(see
+usr/local/share/sdcc/lib directory(see
 \series default
 section
 \begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
@@ -5106,11 +5075,7 @@ Compile this by typing
 \series default
 SDCC
 \series medium
- cannot find the /usr/local/share/sdcc/include directory
-\series default
-
-\series medium
-(see the
+ cannot find the /usr/local/share/sdcc/include directory(see the
 \series default
 section
 \begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
@@ -5299,9 +5264,9 @@ You
  At the time of this writing, we find the following programs for gcc-builds:
 \newline
 
-
 \newline
-In <installdir>/bin:
+In
+ <installdir>/bin:
 \end_layout
 
 \begin_layout Itemize
@@ -5854,7 +5819,6 @@ In most cases this won't be needed but the Intel Hex file
  which is generated by SDCC might include lines of varying length and the
  addresses within the file are not guaranteed to be strictly ascending.
  If your toolchain or a bootloader does not like this you can use the tool
-
 \family typewriter
 packihx
 \family default
@@ -5894,7 +5858,6 @@ The separately available
 
  of various flavours (crc, add, xor) and to perform other manipulations
  (convert, split, crop, offset, ...).
-
 \newline
 
 \newline
@@ -5995,10 +5958,6 @@ n.c (contains more functions and the function main)
 
 \size default
 The first two files will need to be compiled separately with the commands:
-\size footnotesize
-
-\size default
-
 \newline
 
 \newline
@@ -6084,9 +6043,6 @@ The file containing the
 main()
 \emph default
  function
-\emph on
-
-\emph default
 \noun on
 must
 \noun default
@@ -7009,12 +6965,7 @@ Preprocessor Options
 \end_inset
 
 
-\size large
-\bar under
-
 \series default
-\size default
-\bar default
 Like `-M' but the output mentions only the user header files included with
  `#include
 \begin_inset Quotes eld
@@ -7098,12 +7049,7 @@ file"'.
 \end_inset
 
 
-\size large
-\bar under
-
 \series default
-\size default
-\bar default
 Like `-dD' except that the macro arguments and contents are omitted.
  Only `#define name' is included in the output.
 \end_layout
@@ -7782,10 +7728,7 @@ status collapsed
 \end_inset
 
 
-\bar under
-
 \series default
-\bar default
 The linker output (final object code) is in Intel Hex format.
 \begin_inset LatexCommand \index{Intel hex format}
 
@@ -7823,10 +7766,7 @@ status collapsed
 \end_inset
 
 
-\bar under
-
 \series default
-\bar default
 The linker output (final object code) is in Motorola S19 format
 \begin_inset LatexCommand \index{Motorola S19 format}
 
@@ -7864,10 +7804,7 @@ status collapsed
 \end_inset
 
 
-\bar under
-
 \series default
-\bar default
 The linker output (final object code) is in ELF format
 \begin_inset LatexCommand \index{ELF format}
 
@@ -7960,11 +7897,6 @@ status collapsed
 
 
 \series default
-\size large
-\emph on
-
-\size default
-\emph default
 Generate code for Small Model programs, see section Memory Models for more
  details.
  This is the default model.
@@ -8322,12 +8254,6 @@ status collapsed
 
 \end_inset
 
-
-\size large
-\emph on
-
-\size default
-\emph default
 Generate 24-bit flat mode code.
  This is the one and only that the ds390 code generator supports right now
  and is default when using
@@ -8555,7 +8481,6 @@ status open
 
 \series default
  <nnnn> LibraryID used in -mTININative.
-
 \end_layout
 
 \begin_layout List
@@ -8583,7 +8508,6 @@ status collapsed
 
 \series default
  generate code for DS390 Arithmetic Accelerator.
-
 \end_layout
 
 \begin_layout Standard
@@ -8631,12 +8555,6 @@ status collapsed
 
 \end_inset
 
-
-\size large
-\emph on
-
-\size default
-\emph default
 Force a called function to always save BC.
 \end_layout
 
@@ -8824,12 +8742,6 @@ status collapsed
 
 \end_inset
 
-
-\size large
-\emph on
-
-\size default
-\emph default
 Force a called function to always save BC.
 \end_layout
 
@@ -9096,12 +9008,7 @@ status collapsed
 \end_inset
 
 
-\size large
-\bar under
-
 \series default
-\size default
-\bar default
  Will not generate boundary condition check when switch statements
 \begin_inset LatexCommand \index{switch statement}
 
@@ -9149,9 +9056,6 @@ status collapsed
 
 
 \series default
-\size large
-
-\size default
 Will not do loop reversal
 \begin_inset LatexCommand \index{Loop reversing}
 
@@ -9514,13 +9418,8 @@ status collapsed
 The output path where everything will be placed or the file name used for
  all generated output files.
  If the parameter is a path, it must have a trailing slash (or backslash
- for the Windows binaries) to be recognized as a path.
-
-\emph on
-
-\emph default
-Note for Windows users: if the path contains spaces, it should be surrounded
- by quotes.
+ for the Windows binaries) to be recognized as a path.Note for Windows users:
+ if the path contains spaces, it should be surrounded by quotes.
  The trailing backslash should be doubled in order to prevent escaping the
  final quote, for example:
 \emph on
@@ -9566,7 +9465,6 @@ output 1
 \emph default
 .
  The path using slashes for directory delimiters can be used too, for example:
-
 \emph on
 -o
 \begin_inset Quotes sld
@@ -9605,11 +9503,6 @@ status collapsed
 
 
 \series default
-\size large
-\emph on
-
-\size default
-\emph default
 All functions in the source file will be compiled as
 \emph on
 reentrant
@@ -9669,7 +9562,6 @@ status open
 
 \series default
 -float-reent.
-
 \end_layout
 
 \begin_layout List
@@ -9787,11 +9679,7 @@ status collapsed
 
 
 \series default
-Function of
-\series bold
-
-\series default
--
+Function of-
 \begin_inset ERT
 status collapsed
 
@@ -9830,10 +9718,7 @@ status collapsed
 \end_inset
 
 
-\bar under
-
 \series default
-\bar default
 When this option is used the compiler will generate debug information.
  The debug information collected in a file with .cdb extension can be used
  with the SDCDB.
@@ -9856,12 +9741,7 @@ When this option is used the compiler will generate debug information.
 \end_inset
 
 
-\size large
-\bar under
-
 \series default
-\size default
-\bar default
 Stop after the stage of compilation proper; do not assemble.
  The output is an assembler code file for the input file specified.
 \end_layout
@@ -9918,10 +9798,7 @@ status collapsed
 \end_inset
 
 
-\bar under
-
 \series default
-\bar default
 This option will cause the compiler to generate an information message for
  each function in the source file.
  The message contains some
@@ -10802,7 +10679,6 @@ more
 
 .
  To make your source files parseable by splint you will have to include
-
 \family sans
 lint.h
 \family default
@@ -10846,7 +10722,6 @@ __interrupt\InsetSpace ~
 
 \family default
 ).
-
 \newline
 Splint has an excellent on line manual at
 \begin_inset LatexCommand \url{http://www.splint.org/manual/}
@@ -11088,9 +10963,6 @@ status collapsed
 
 
 \series default
-\size large
-
-\size default
 Will create a dump of iCodes, after loop optimizations
 \begin_inset LatexCommand \index{Loop optimization}
 
@@ -11125,9 +10997,6 @@ status collapsed
 
 
 \series default
-\size large
-
-\size default
 Will create a dump of iCodes, after live range analysis
 \begin_inset LatexCommand \index{Live range analysis}
 
@@ -11193,10 +11062,7 @@ status collapsed
 \end_inset
 
 
-\bar under
-
 \series default
-\bar default
 Will create a dump of iCodes, after register assignment
 \begin_inset LatexCommand \index{Register assignment}
 
@@ -11257,12 +11123,7 @@ status collapsed
 \end_inset
 
 
-\size large
-\bar under
-
 \series default
-\size default
-\bar default
 Will cause all the above mentioned dumps to be created.
 \end_layout
 
@@ -12058,10 +11919,9 @@ _test_bit
 \begin_layout Standard
 The bit addressable memory consists of 128 bits which are located from 0x20
  to 0x2f in data memory.
-
 \newline
-Apart from this 8051 specific storage class most architectures support
- ANSI-C bitfields
+Apart from this 8051 specific storage class most
+ architectures support ANSI-C bitfields
 \begin_inset LatexCommand \index{bitfields}
 
 \end_inset
@@ -12132,7 +11992,6 @@ Like the bit keyword,
 sfr / sfr16 / sfr32 / sbit
 \emph default
 signify both a data-type and storage class, they are used to describe the
-
 \emph on
 s
 \emph default
@@ -12269,7 +12128,6 @@ status collapsed
 \end_inset
 
 .
-
 \family default
 Nevertheless it is possible to write header files
 \begin_inset LatexCommand \index{Header files}
@@ -12287,7 +12145,6 @@ Nevertheless it is possible to write header files
 \end_inset
 
 ).
-
 \end_layout
 
 \begin_layout Subsubsection
@@ -12375,16 +12232,15 @@ char (* __data fp)(void);
 
 \begin_layout Standard
 Well you get the idea.
-
 \newline
 
 \newline
-All unqualified pointers are treated as 3-byte (4-byte for the ds390)
+All unqualified pointers are treated as 3-byte (4-byte
+ for the ds390)
 \emph on
 generic
 \emph default
  pointers.
-
 \size small
 
 \newline
@@ -12520,10 +12376,6 @@ Normally SDCC will only use the first bank
  banks of registers (keyword
 \emph on
 using
-\emph default
-
-\emph on
-
 \begin_inset LatexCommand \index{using (mcs51, ds390 register bank)}
 
 \end_inset
@@ -12620,7 +12472,6 @@ data
 idata
 \emph default
 ).
-
 \newline
 
 \end_layout
@@ -12824,7 +12675,6 @@ utput memory.
 sfr at 0x78 IoPort;\InsetSpace ~
 \InsetSpace ~
 /* define a var in I/O space at 78h called IoPort */
-
 \end_layout
 
 \begin_layout Standard
@@ -13036,7 +12886,6 @@ xdata
 The xdata storage class declares a variable that can reside anywhere in
  memory.
  This is the default if no storage class is specified.
-
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -13304,7 +13153,6 @@ If needed adapt polarity of clock,
 */
 \newline
 unsigned char spi_io(unsigned char out_byte)
-
 \newline
 {
 \newline
@@ -13312,7 +13160,8 @@ unsigned char spi_io(unsigned char out_byte)
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-unsigned char i=8;
+un
+signed char i=8;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -13348,8 +13197,7 @@ out_byte <<= 1;
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-MCLK =
- 1;
+MCLK = 1;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -13359,7 +13207,8 @@ MCLK =
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-/* _asm nop _endasm; */\InsetSpace ~
+/* _asm
+ nop _endasm; */\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -13391,8 +13240,7 @@ if(MISO)
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-out_byte +=
- 1;
+out_byte += 1;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -13408,7 +13256,8 @@ MCLK = 0;
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-} while(--i);
+}
+ while(--i);
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -13543,7 +13392,6 @@ static
 \end_inset
 
 .
-
 \newline
 
 \newline
@@ -13608,7 +13456,6 @@ unsigned char foo(char i) __reentrant
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -13698,7 +13545,6 @@ __data __at
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -13892,8 +13738,8 @@ P3 = errcd;
 \newline
 
 \newline
-void
- some_isr () __interrupt
+void some_isr
+ () __interrupt
 \begin_inset LatexCommand \index{interrupt}
 
 \end_inset
@@ -13919,7 +13765,6 @@ set_error(10);
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -13987,7 +13832,6 @@ void timer_isr (void) __interrupt (1) __using (1)
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -14038,9 +13882,9 @@ using
 \emph default
  can be used to tell the compiler to use the specified register bank when
  generating code for this function.
-
 \newline
-Interrupt service routines open the door for some very interesting bugs:
+Interrupt service routines open the door
+ for some very interesting bugs:
 \end_layout
 
 \begin_layout Subsubsection
@@ -14097,10 +13941,10 @@ atomic
  the processor needs more than one instruction for the access and could
  be interrupted while accessing the variable) the interrupt must be disabled
  during the access to avoid inconsistent data.
-
 \newline
-Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs
- and should be protected by disabling interrupts.
+Access to 16 or 32 bit variables
+ is obviously not atomic on 8 bit CPUs and should be protected by disabling
+ interrupts.
  You're not automatically on the safe side if you use 8 bit variables though.
  We need an example here: f.e.
  on the 8051 the harmless looking
@@ -14138,7 +13982,6 @@ flags\InsetSpace ~
 
  from within an interrupt routine might get lost if the interrupt occurs
  at the wrong time.
-
 \begin_inset Quotes sld
 \end_inset
 
@@ -14160,7 +14003,6 @@ counter
 \newline
 Bugs like these are hard to reproduce and can
  cause a lot of trouble.
-
 \end_layout
 
 \begin_layout Subsubsection
@@ -14283,7 +14125,6 @@ status collapsed
 \end_inset
 
  compiler option.
-
 \newline
 Note, the type promotion
 \begin_inset LatexCommand \index{type promotion}
@@ -14781,7 +14622,6 @@ void nmi_isr (void) critical interrupt
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -14853,14 +14693,12 @@ int foo () __critical
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -15102,7 +14940,6 @@ interrupt mask
 
 \emph default
  register.
-
 \end_layout
 
 \begin_layout Standard
@@ -15157,7 +14994,6 @@ interrupt priorities
 \end_inset
 
  and don't add complexity unless you have to.
-
 \end_layout
 
 \begin_layout Subsection
@@ -15175,15 +15011,7 @@ Some architectures (mcs51/ds390) have an atomic
 
 \end_inset
 
- bit test and
-\emph on
-
-\emph default
-clear
-\emph on
-
-\emph default
-instruction.
+ bit test andclearinstruction.
  These type of instructions are typically used in preemptive multitasking
  systems, where a routine f.e.
  claims the use of a data structure ('acquires a lock
@@ -15201,7 +15029,6 @@ instruction.
 \end_inset
 
  don't have to be disabled for the locking operation.
-
 \end_layout
 
 \begin_layout Standard
@@ -15237,13 +15064,13 @@ resource_is_free=0;
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-resource_is_free=1;
+resource_is_free=
+1;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -15343,11 +15170,7 @@ possible exception: if a function is called ONLY from 'interrupt' functions
 \emph default
 using
 \emph on
- attribute has an effect on
-\emph default
-
-\emph on
-the generated code for a
+ attribute has an effect onthe generated code for a
 \emph default
 non-interrupt
 \emph on
@@ -15404,7 +15227,6 @@ It is most efficient if your ISR calls no other functions.
  called functions use bank zero.
  It is very inefficient to call a function using a different, non-zero bank
  from an ISR.
-
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -16299,10 +16121,7 @@ _sdcc_external_startup()
 \end_inset
 
 
-\series bold
 \emph default
-
-\series default
 at the start of the CODE area.
  This routine is also in the runtime library
 \begin_inset LatexCommand \index{Runtime library}
@@ -16553,7 +16372,6 @@ status collapsed
 \end_inset
 
  and provide your own crt0.o.
-
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -16919,9 +16737,9 @@ cjne a,ar3,00106$
 ret
 \newline
 00106$:
-
 \newline
-;buffer.c buf[ head++ ] = c; /* access to a 256 byte aligned array */
+;buffer.c
+ buf[ head++ ] = c; /* access to a 256 byte aligned array */
 \begin_inset LatexCommand \index{Aligned array}
 
 \end_inset
@@ -16973,7 +16791,6 @@ a,r2
 \InsetSpace ~
 \InsetSpace ~
 movx @dptr,a
-
 \newline
 00103$:
 \newline
@@ -16987,7 +16804,8 @@ ret
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-_endasm
+_end
+asm
 \begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
@@ -17091,7 +16909,6 @@ _asm
 \InsetSpace ~
 \InsetSpace ~
 ; save used registers here.
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17101,8 +16918,8 @@ _asm
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-; If we were still using r2,r3 we would have to push them here.
-
+; If we were still using r2,r3 we would have to
+ push them here.
 \newline
 ; if( head != (unsigned char)(tail-1) )
 \newline
@@ -17137,6 +16954,7 @@ dec\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 xrl\InsetSpace ~
+
  a,_head
 \newline
 \InsetSpace ~
@@ -17147,8 +16965,7 @@ xrl\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-; we
- could do an ANL a,#0x0f here to use a smaller buffer (see below)
+; we could do an ANL a,#0x0f here to use a smaller buffer (see below)
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17160,6 +16977,7 @@ xrl\InsetSpace ~
 \InsetSpace ~
 jz\InsetSpace ~
 \InsetSpace ~
+
  t_b_end$
 \newline
 \InsetSpace ~
@@ -17172,8 +16990,7 @@ jz\InsetSpace ~
 \InsetSpace ~
 ;
 \newline
-;
- buf[ head++ ] = c;
+; buf[ head++ ] = c;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17191,7 +17008,8 @@ mov\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-; dpl holds lower byte of function argument
+; dpl holds lower byte of function
+ argument
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17202,7 +17020,6 @@ mov\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 mov\InsetSpace ~
-
  dpl,_head \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -17216,9 +17033,9 @@ mov\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov\InsetSpace ~
- dph,#(_bu
-f>>8)
+m
+ov\InsetSpace ~
+ dph,#(_buf>>8)
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17249,8 +17066,8 @@ _head
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-; we could do an ANL _head,#0x0f here to use a
- smaller buffer (see above)
+; we could do an ANL _head,#0x0f here
+ to use a smaller buffer (see above)
 \newline
 t_b_end$:
 \newline
@@ -17268,7 +17085,8 @@ t_b_end$:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-_endasm
+_endas
+m
 \begin_inset LatexCommand \index{\_endasm}
 
 \end_inset
@@ -17346,7 +17164,6 @@ _asm
 \end_inset
 
  has to be done manually.
-
 \end_layout
 
 \begin_layout Standard
@@ -17418,7 +17235,6 @@ _naked
 \end_inset
 
 .
-
 \emph default
 The
 \emph on
@@ -17778,7 +17594,6 @@ Use of Labels within Inline Assembler
 SDCC allows the use of in-line assembler with a few restrictions regarding
  labels.
  All labels defined within inline assembler code have to be of the form
-
 \emph on
 nnnnn$
 \emph default
@@ -17920,18 +17735,17 @@ ljmp 0003$
 \InsetSpace ~
 \InsetSpace ~
 _endasm;
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-/* some more c code */
+/* some
+ more c code */
 \newline
 clabel:\InsetSpace ~
 \InsetSpace ~
-/* inline assembler cannot reference this
- label */
+/* inline assembler cannot reference this label */
 \begin_inset Foot
 status open
 
@@ -18046,7 +17860,6 @@ and
 \end_inset
 
 of function; according to the following scheme: one byte return value in
-
 \emph on
 DPL
 \emph default
@@ -18223,7 +18036,6 @@ _naked
 _using
 \family default
  modifier).
-
 \end_layout
 
 \begin_layout Standard
@@ -18344,8 +18156,7 @@ _asm_func_PARM_2:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-.ds
- 1
+.ds 1
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -18355,7 +18166,8 @@ _asm_func_PARM_2:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-.area CSEG
+.area
+ CSEG
 \newline
 _asm_func:
 \newline
@@ -18519,13 +18331,13 @@ int
  c_func (unsigned char i, unsigned char j, unsigned char k) reentrant
 \newline
 {
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-return asm_func(i,j,k);
+return
+ asm_func(i,j,k);
 \newline
 }
 \newline
@@ -18574,8 +18386,8 @@ _bp,sp\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-;stack contains: _bp, return
- address, second parameter, third parameter
+;stack contains: _bp, return address,
+ second parameter, third parameter
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -19761,7 +19573,6 @@ These floating point routines (
 not
 \emph default
  sinf(), cosf(), ...) for the mcs51 are implemented in assembler.
-
 \end_layout
 
 \end_inset
@@ -19978,7 +19789,6 @@ printf_small()
 
 
 \family default
-
 \emph on
 instead
 \emph default
@@ -21550,12 +21360,11 @@ status collapsed
 -model-large
 \emph default
  option, variables will by default be placed into the XDATA segment.
-
 \newline
 
 \newline
-Segments may be placed anywhere in the 4 meg address space using the usual
- -
+Segments
+ may be placed anywhere in the 4 meg address space using the usual -
 \begin_inset ERT
 status collapsed
 
@@ -21809,7 +21618,6 @@ status collapsed
 \end_inset
 
 .
-
 \newline
 More specifically, the following warnings will be disabled:
 \shape italic
@@ -21828,7 +21636,6 @@ conditional flow changed by optimizer: so said EVELYN the modified DOG
 function '[function name]' must return value
 \shape default
  (59).
-
 \newline
 Furthermore, warnings of less importance (of PEDANTIC and INFO warning
  level) are disabled, too, namely:
@@ -22113,7 +21920,6 @@ opt_code_balanced
 - The compiler will attempt to generate code that is both compact and fast,
  as long as meeting one goal is not a detriment to the other (this is the
  default).
-
 \end_layout
 
 \begin_layout Itemize
@@ -22279,7 +22085,6 @@ status collapsed
 \end_inset
 
 .
-
 \newline
 Below is an example on how to use this pragma.
 
@@ -22385,7 +22190,6 @@ void foo (void)
 \InsetSpace ~
 \InsetSpace ~
  ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -22396,7 +22200,6 @@ void foo (void)
 \InsetSpace ~
 \InsetSpace ~
  ...
-
 \newline
 }
 \newline
@@ -22484,7 +22287,6 @@ ons which might cause the compiler to generate extra stack and/or data space
  This usually happens in large functions.
  Pragma directives should be used as shown in the following example, they
  are used to control options and optimizations for a given function.
-
 \end_layout
 
 \begin_layout Verse
@@ -22530,7 +22332,6 @@ int foo ()
 \InsetSpace ~
  \InsetSpace ~
  ...
-
 \newline
 \InsetSpace ~
  \InsetSpace ~
@@ -22538,8 +22339,8 @@ int foo ()
 \newline
 \InsetSpace ~
  \InsetSpace ~
- ...
 
+ ...
 \newline
 }
 \newline
@@ -23014,7 +22815,6 @@ MCS51 processors are available from many vendors and come in many different
  flavours.
  While they might differ considerably in respect to Special Function Registers
  the core MCS51 is usually not modified or is kept compatible.
-
 \end_layout
 
 \begin_layout Subsection
@@ -23154,7 +22954,6 @@ The DS80C400
 \end_inset
 
 .
-
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -23429,7 +23228,6 @@ Each device is described in two files: pic16f*.h
  These files primarily define SFRs, structs to access their bits, and symbolic
  configuration options.
  Both files can be generated from gputils' .inc files using the perl script
-
 \family typewriter
 support/scripts/inc2h.pl
 \family default
@@ -23591,7 +23389,6 @@ mpasmwin /q /o $*.asm
 
 \newline
 $(PRJ).hex: $(OBJS)
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -23601,7 +23398,8 @@ $(PRJ).hex: $(OBJS)
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS) libsdcc.lib
+mplink
+ /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS) libsdcc.lib
 \end_layout
 
 \begin_layout Standard
@@ -23761,7 +23559,6 @@ error: missing definition for symbol ``__gptrget1''
 The PIC14 port uses library routines to provide more complex operations
  like multiplication, division/modulus and (generic) pointer dereferencing.
  In order to add these routines to your project, you must link with PIC14's
-
 \family typewriter
 libsdcc.lib
 \family default
@@ -24127,7 +23924,6 @@ status collapsed
 \labelwidthstring 00.00.0000
 2 tries to check the location of (even different) symbols and removes BANKSELs
  if they are in the same bank.
-
 \newline
 
 \emph on
@@ -24500,7 +24296,6 @@ OPTIMIZE_BITFIELD_POINTER_GET When this variable exists, reading of structure
  of bitfields.
  (i.e., 80 bytes of code space are saved when compiling malloc.c with this
  option).
-
 \end_layout
 
 \begin_layout Description
@@ -24618,7 +24413,6 @@ pic18fxxxx
 
 \begin_layout Standard
 MCU Identification.
-
 \emph on
 xxxx
 \emph default
@@ -24735,7 +24529,6 @@ __18Fxxxx
 
 \begin_layout Standard
 MCU Identification.
-
 \emph on
 xxxx
 \emph default
@@ -27308,7 +27101,6 @@ is declared in stdio.h as having its parameter in WREG (it has the wparam
  keyword).
  In stdio.h exists the macro PUTCHAR(arg) that defines the putchar function
  in a user-friendly way.
-
 \emph on
 arg
 \emph default
@@ -27891,7 +27683,6 @@ In order to simplify signal handling, a number of macros is provided:
 \labelwidthstring 00.00.0000
 DEF_INTHIGH(name) begin the definition of the interrupt dispatch table for
  high priority interrupts.
-
 \emph on
 name
 \emph default
@@ -27902,7 +27693,6 @@ name
 \labelwidthstring 00.00.0000
 DEF_INTLOW(name) begin the definition of the interrupt dispatch table fo
  low priority interrupt.
-
 \emph on
 name
 \emph default
@@ -28184,7 +27974,6 @@ status collapsed
 \end_inset
 
 ) on how to handle syntax extensions like __xdata, __at(), ...
-
 \end_layout
 
 \begin_layout Itemize
@@ -28243,7 +28032,6 @@ use an on-target monitor.
  via a serial line and allows to set program counter, to single step through
  a program and read/write memory locations.
  For the 8051 good examples of monitors are paulmon and cmon51 (see section
-
 \begin_inset LatexCommand \ref{sec:Related-open-source-tools}
 
 \end_inset
@@ -28309,7 +28097,6 @@ mulator
  Usually very expensive.
  And very nice to have too.
  And usually locks you (for years...) to the devices the ICE can emulate.
-
 \end_layout
 
 \begin_layout Itemize
@@ -28318,10 +28105,10 @@ use a remote debugger.
  and a complete debugger is too bulky for the target system.
  Therefore usually a debugger on the host system connects to an on-target
  debugging stub which accepts only primitive commands.
-
 \newline
-Terms to enter into your favourite search engine could be 'remote debugging',
- 'gdb stub' or 'inferior debugger'.
+Terms to enter into
+ your favourite search engine could be 'remote debugging', 'gdb stub' or
+ 'inferior debugger'.
  (is there one?)
 \end_layout
 
@@ -28330,7 +28117,6 @@ use an on target hardware debugger.
  Some of the more modern MCUs include hardware support for setting break
  points and monitoring/changing variables by using dedicated hardware pins.
  This facility doesn't require additional code to run on the target and
-
 \emph on
 usually
 \emph default
@@ -28346,7 +28132,6 @@ usually
 \end_inset
 
 ) as input file.
-
 \end_layout
 
 \begin_layout Standard
@@ -28599,7 +28384,6 @@ status collapsed
 
 -directory=/home/src1:/home/src2.
  Note there can be no spaces in the option.
-
 \end_layout
 
 \begin_layout Itemize
@@ -28883,7 +28667,6 @@ raphics File
  The debugging session might not run as smoothly as the screenshot suggests.
  The debugger allows setting of breakpoints, displaying and changing variables,
  single stepping through C and assembler code.
-
 \newline
 The source was compiled with
 \family sans
@@ -28912,12 +28695,6 @@ status collapsed
 \family sans
 \series bold
 -debug ddd_example.c
-\family default
-\series default
-
-\family sans
-\series bold
-
 \newline
 
 \family default
@@ -29002,12 +28779,12 @@ ESC-x sdcdbsrc
 
 \newline
 You will prompted to enter the file name to be debugged.
-
 \newline
 
 \newline
-The command line options that are passed to the simulator directly are
- bound to default values in the file sdcdbsrc.el.
+The command line
+ options that are passed to the simulator directly are bound to default
+ values in the file sdcdbsrc.el.
  The variables are listed below, these values maybe changed as required.
 \end_layout
 
@@ -29130,8 +28907,8 @@ n\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcdb-next-fro
-m-src\InsetSpace ~
+sdcdb-next-from-s
+rc\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29187,8 +28964,8 @@ c\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcdb-cont-f
-rom-src\InsetSpace ~
+sdcdb-cont-from-s
+rc\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29244,8 +29021,8 @@ SDCDB step command
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcdb-w
-hatis-c-sexp\InsetSpace ~
+sdcdb-whatis-
+c-sexp\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29336,8 +29113,8 @@ sdcdbsrc-delete\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-SDCD
-B Delete all breakpoints if no arg
+SDCDB
+ Delete all breakpoints if no arg
 \newline
 ;;\InsetSpace ~
 \InsetSpace ~
@@ -29404,8 +29181,8 @@ m\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcdbsrc
--frame\InsetSpace ~
+sdcdbsrc-fr
+ame\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29470,7 +29247,6 @@ SDCDB Display current frame if no arg,
 \InsetSpace ~
 \InsetSpace ~
 given or display frame arg
-
 \newline
 ;;\InsetSpace ~
 \InsetSpace ~
@@ -29519,7 +29295,8 @@ given or display frame arg
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-buffer point
+buffer
+ point
 \newline
 ;;\InsetSpace ~
 !\InsetSpace ~
@@ -29565,8 +29342,7 @@ p\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcdb-prin
-t-c-sexp\InsetSpace ~
+sdcdb-print-c-sexp\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29577,7 +29353,8 @@ t-c-sexp\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-SDCDB print command for data at
+SDC
+DB print command for data at
 \newline
 ;;\InsetSpace ~
 \InsetSpace ~
@@ -29654,8 +29431,8 @@ sdcdbsrc-goto-sdcdb\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-Got
-o the SDCDB output buffer
+Goto the
+ SDCDB output buffer
 \newline
 ;;\InsetSpace ~
 t\InsetSpace ~
@@ -29689,14 +29466,14 @@ sdcdbsrc-mode\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-Toggles Sdcdbsrc mode (turns it
- off)
+Toggles Sdcdbsrc mode (turns it off)
 \newline
 ;;
 \newline
 ;;\InsetSpace ~
 C-c\InsetSpace ~
-C-f\InsetSpace ~
+C
+-f\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29728,8 +29505,7 @@ SPC\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcdb-brea
-k\InsetSpace ~
+sdcdb-break\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29747,7 +29523,8 @@ k\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-Set break for line with point
+Set break
+ for line with point
 \newline
 ;;\InsetSpace ~
 ESC\InsetSpace ~
@@ -29793,8 +29570,8 @@ m\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdc
-dbsrc-srcmode\InsetSpace ~
+sdcdbsrc-srcmod
+e\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -29896,7 +29673,6 @@ uc * uc
 (int) uc * (int) uc = (int) 0xfe * (int) 0xfe = (int) 0xfc04 = -1024
 \family default
 .
-
 \newline
 Another one:
 \end_layout
@@ -30058,7 +29834,6 @@ first
 last
 \emph default
  relate to time and not to lower/upper memory location here, so this is
-
 \emph on
 not
 \emph default
@@ -32453,7 +32228,6 @@ SDCC has grown to be a large project.
  You can help by reporting the bugs and helping other SDCC users.
  There are lots of ways to contribute, and we encourage you to take part
  in making SDCC a great software package.
-
 \end_layout
 
 \begin_layout Standard
@@ -32538,12 +32312,10 @@ status collapsed
 
 \begin_layout Enumerate
 Attach the code you are compiling with SDCC.
-
 \end_layout
 
 \begin_layout Enumerate
 Specify the exact command you use to run SDCC, or attach your Makefile.
-
 \end_layout
 
 \begin_layout Enumerate
@@ -32554,12 +32326,10 @@ sdcc -v
 \family default
 \series default
 "), your platform, and operating system.
-
 \end_layout
 
 \begin_layout Enumerate
 Provide an exact copy of any error message or incorrect output.
-
 \end_layout
 
 \begin_layout Enumerate
@@ -32694,9 +32464,8 @@ diff -u sourcefile.c.orig sourcefile.c >my_changes.patch
 \end_inset
 
 
-\series default
-
 \family default
+\series default
 will do.
 \end_layout
 
@@ -32799,7 +32568,6 @@ status open
 
  number.
  Subversion allows to download the source of recent or previous versions
-
 \begin_inset LatexCommand \url{http://sourceforge.net/svn/?group_id=599}
 
 \end_inset
@@ -32876,7 +32644,6 @@ Examples
 You'll find some small examples in the directory
 \emph on
 sdcc/device/examples/.
-
 \emph default
 More examples and libraries are available at
 \emph on
@@ -32987,7 +32754,6 @@ sdcc/support/regression
 make
 \family default
  in this directory (or f.e.
-
 \family sans
 \series bold
 
@@ -33106,7 +32872,6 @@ be able to insert excursions about skills like using a revision control
 \end_inset
 
 .
-
 \newline
 And if there should be a shortage of ideas then you can always point students
  to the ever-growing feature request list
@@ -33187,7 +32952,6 @@ Optimizations
 \begin_layout Standard
 SDCC performs a host of standard optimizations in addition to some MCU specific
  optimizations.
-
 \end_layout
 
 \begin_layout Subsection
@@ -33306,8 +33070,8 @@ i = 1; \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 global = 1;\InsetSpace ~
-/* dead
- store */
+/* dead store
+ */
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -33558,8 +33322,8 @@ ar[itemp1] = itemp2;
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-itemp1
- += 5;
+itemp1 +=
+ 5;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -33694,8 +33458,8 @@ i /= 2;\InsetSpace ~
 \InsetSpace ~
  i >>= 1;
 \newline
-i
- = j - j;\InsetSpace ~
+i =
+ j - j;\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -33819,7 +33583,6 @@ case 4: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 0: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -33851,7 +33614,6 @@ case 5: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 1: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -33913,8 +33675,8 @@ case 6: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-case 3: ...
-
+case
+ 3: ...
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -33946,7 +33708,6 @@ case 7: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 4: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -33978,7 +33739,6 @@ case 8: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 5: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -34010,7 +33770,6 @@ case 9: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 6: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -34041,12 +33800,12 @@ case 10: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 7: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-case 11: ...\InsetSpace ~
+case
+ 11: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -34072,7 +33831,6 @@ case 11: ...\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 case 8: ...
-
 \newline
 }\InsetSpace ~
 \InsetSpace ~
@@ -34129,7 +33887,6 @@ e.
 If the case labels are not in numerical sequence ('gaps' between cases)
  SDCC checks whether a jump table with additionally inserted dummy cases
  is still attractive.
-
 \end_layout
 
 \begin_layout Itemize
@@ -34153,72 +33910,59 @@ switch (i) {
 \InsetSpace ~
 \InsetSpace ~
 case 1: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 2: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 3: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 4: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 5: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 6: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 7: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
-case 101: ...
-
+case
+ 101: ...
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 102: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 103: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 104: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 105: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 106: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 107: ...
-
 \newline
 }
 \end_layout
@@ -34235,37 +33979,30 @@ switch (i) {
 \InsetSpace ~
 \InsetSpace ~
 case 1: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 2: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 3: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 4: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 5: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 6: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 7: ...
-
 \newline
 }
 \end_layout
@@ -34282,37 +34019,31 @@ switch (i) {
 \InsetSpace ~
 \InsetSpace ~
 case 101: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 102: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 103: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 104: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 105: ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
-case 106: ...
-
+case 106:
+ ...
 \newline
 \InsetSpace ~
 \InsetSpace ~
 case 107: ...
-
 \newline
 }
 \end_layout
@@ -34390,7 +34121,6 @@ g.
 unsigned char i;
 \newline
 ...
-
 \newline
 i >>= 4;
 \newline
@@ -34427,7 +34157,6 @@ In general SDCC will never setup a loop if the shift count is known.
 unsigned int i;
 \newline
 ...
-
 \newline
 i >>= 9;
 \newline
@@ -34502,7 +34231,6 @@ char i;\InsetSpace ~
 /* unsigned is needed for rotation */
 \newline
 ...
-
 \newline
 i = ((i << 1) | (i >> 7));
 \family default
@@ -34577,7 +34305,6 @@ unsigned
 int j;
 \newline
 ...
-
 \newline
 i = ((i << 4) | (i >> 4));
 \family default
@@ -34637,11 +34364,7 @@ dptr
 
 \end_inset
 
--datapointer
-\emph on
-
-\emph default
-so little-endian is the more efficient byte order.
+-datapointerso little-endian is the more efficient byte order.
 \end_layout
 
 \end_inset
@@ -34703,7 +34426,6 @@ bit hob2, hob3, aob2,
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -34716,11 +34438,11 @@ hob2 = (gint >> 15) & 1;
 \InsetSpace ~
 \InsetSpace ~
 hob3 = gint & 0x8000;
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
-aob1 = (gint >> 9) & 1;
+aob1
+ = (gint >> 9) & 1;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -34733,7 +34455,6 @@ aob3 = gint & 0x0800;
 \InsetSpace ~
 \InsetSpace ~
 ..
-
 \newline
 }
 \end_layout
@@ -34846,7 +34567,6 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
  64\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -34855,6 +34575,7 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
+
  anl\InsetSpace ~
 \InsetSpace ~
  a,#0x01
@@ -34929,7 +34650,6 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
  67\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -34940,6 +34660,7 @@ will generate the following code:
 \InsetSpace ~
  mov\InsetSpace ~
 \InsetSpace ~
+
  a,(_gint + 1)
 \newline
 0013 33\InsetSpace ~
@@ -34998,7 +34719,6 @@ will generate the following code:
  mov\InsetSpace ~
 \InsetSpace ~
  _foo_hob2_1_1,c
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -35026,7 +34746,8 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
  66 ;\InsetSpace ~
- hob.c 9
+ hob.c
+ 9
 \newline
 0016 E5*01\InsetSpace ~
 \InsetSpace ~
@@ -35100,7 +34821,6 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
  69\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35111,7 +34831,8 @@ will generate the following code:
 \InsetSpace ~
  mov\InsetSpace ~
 \InsetSpace ~
- _foo_hob3_1_1,c
+ _foo_hob3_1_1
+,c
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -35168,8 +34889,7 @@ will generate the following code:
 \InsetSpace ~
  a,(_gint + 1)
 \newline
-001D
- 03\InsetSpace ~
+001D 03\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35215,6 +34935,7 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
+
  73\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35253,7 +34974,6 @@ will generate the following code:
  mov\InsetSpace ~
 \InsetSpace ~
  _foo_aob1_1_1,a
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -35298,6 +35018,7 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
+
  76\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35355,7 +35076,6 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
  78\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35393,7 +35113,8 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
- 79 ;\InsetSpace ~
+ 79
+ ;\InsetSpace ~
  hob.c 12
 \newline
 0027 E5*01\InsetSpace ~
@@ -35423,8 +35144,7 @@ will generate the following code:
 \InsetSpace ~
  a,(_gint + 1)
 \newline
-0029
- A2 E3\InsetSpace ~
+0029 A2 E3\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35451,7 +35171,8 @@ will generate the following code:
 \InsetSpace ~
  c,acc[3]
 \newline
-002B 92*03\InsetSpace ~
+002B
+ 92*03\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35535,17 +35256,16 @@ foo () {
 \newline
 \InsetSpace ~
 \InsetSpace ~
-unsigned char hob1,
- hob2;
+unsigned char hob1, hob2;
 \newline
 \InsetSpace ~
 \InsetSpace ~
-unsigned int how1, how2;
+unsig
+ned int how1, how2;
 \newline
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -35557,8 +35277,8 @@ hob2 = glong >> 24;
 \newline
 \InsetSpace ~
 \InsetSpace ~
-how1 = (glong >> 16) & 0xFFFF;
-
+how1 = (glong
+ >> 16) & 0xFFFF;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -35567,7 +35287,6 @@ how2 = glong >> 8;
 \InsetSpace ~
 \InsetSpace ~
 ..
-
 \newline
 }
 \end_layout
@@ -35657,10 +35376,10 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
  93 ;\InsetSpace ~
- hob.c
- 16
+ hob.c 16
 \newline
-003A 85*05*07\InsetSpace ~
+003A
+ 85*05*07\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35724,7 +35443,6 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
  96\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35733,6 +35451,7 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
+
  mov\InsetSpace ~
 \InsetSpace ~
  _foo_how1_1_1,(_glong + 2)
@@ -35759,8 +35478,8 @@ will generate the following code:
 \InsetSpace ~
  mov\InsetSpace ~
 \InsetSpace ~
- (_foo_how1_1_1 +
- 1),(_glong + 3)
+ (_foo_how1_1_1 + 1),(_glong
+ + 3)
 \newline
 0043 85*03*0A\InsetSpace ~
 \InsetSpace ~
@@ -35798,7 +35517,6 @@ will generate the following code:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
  99\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -35809,6 +35527,7 @@ will generate the following code:
 \InsetSpace ~
  mov\InsetSpace ~
 \InsetSpace ~
+
  (_foo_how2_1_1 + 1),(_glong + 2)
 \end_layout
 
@@ -36243,7 +35962,6 @@ sjmp %5
 
 \begin_layout Standard
 The optimizer does a look-up of a function name table defined in function
-
 \emph on
 callFuncByName
 \emph default
@@ -36316,7 +36034,7 @@ ANSI-Compliance
 \begin_layout Standard
 The latest publically available version of the standard
 \emph on
-ISO/IEC 9899 - Programming languages - C
+ ISO/IEC 9899 - Programming languages - C
 \emph default
  should be available at:
 \begin_inset LatexCommand \url{http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899}
@@ -36401,20 +36119,19 @@ foo()
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
+s1 = s2 ; /* is invalid in SDCC although allowed
+ in ANSI */
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \newline
@@ -36435,20 +36152,19 @@ struct
 \InsetSpace ~
 \InsetSpace ~
 struct s rets;
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-return rets; /* is invalid in SDCC although allowed in ANSI */
+return
+ rets; /* is invalid in SDCC although allowed in ANSI */
 \newline
 }
 \end_layout
@@ -36527,7 +36243,6 @@ int i,j; /* is valid
 \InsetSpace ~
 \InsetSpace ~
 ...
-
 \newline
 }
 \end_layout
@@ -36586,7 +36301,7 @@ restrict
 Certain words that are valid identifiers in the standard may be reserved
  words in SDCC unless the
 \series bold
--
+ -
 \begin_inset ERT
 status collapsed
 
@@ -36640,6 +36355,135 @@ t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
  '__data' instead of 'data'.
 \end_layout
 
+\begin_layout Itemize
+integer promotion of variable arguments is not performed if the argument
+ is explicitly taypecasted unless the
+\series bold
+ -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset
+
+ or -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset
+
+
+\series default
+ command line options are used.
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+void vararg_func (char *str, ...) { atr; }
+\newline
+
+\newline
+void main (void)
+\newline
+{
+\newline
+\InsetSpace ~
+\InsetSpace ~
+char c = 10;
+\newline
+
+\newline
+\InsetSpace ~
+\InsetSpace ~
+/* argument
+ u is promoted to int before
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+* passing to function */
+\newline
+\InsetSpace ~
+\InsetSpace ~
+vararg_func (
+\begin_inset Quotes sld
+\end_inset
+
+%c
+\begin_inset Quotes srd
+\end_inset
+
+, c);
+\newline
+
+\newline
+\InsetSpace ~
+\InsetSpace ~
+/* argument u is not promoted to int,
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+* it is passed as char to function
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+*
+ if --std-cXX is not defined;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+* is promoted to int before passing
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+* to function
+ if --std-cXX is defined */
+\newline
+\InsetSpace ~
+\InsetSpace ~
+vararg_func (
+\begin_inset Quotes sld
+\end_inset
+
+%bc
+\begin_inset Quotes srd
+\end_inset
+
+, (char)u);
+\newline
+}
+\end_layout
+
+\end_deeper
 \begin_layout Section
 Cyclomatic Complexity
 \begin_inset LatexCommand \index{Cyclomatic complexity}
@@ -36661,7 +36505,6 @@ Cyclomatic complexity of a function is defined as the number of independent
  code in a function.
  Large functions can have low complexity, and small functions can have large
  complexity levels.
-
 \newline
 
 \newline
@@ -36853,7 +36696,6 @@ per friendly), but pretty well exposes the guts of it all.
 The current version of SDCC can generate code for Intel 8051 and Z80 MCU.
  It is fairly easy to retarget for other 8-bit MCU.
  Here we take a look at some of the internals of the compiler.
-
 \end_layout
 
 \begin_layout Paragraph*
@@ -36969,7 +36811,6 @@ The register allocation determines the type and number of registers needed
  basic block being processed, if there are any found then it will push that
  operand and use the registers in this block, the operand will then be popped
  at the end of the basic block.
-
 \end_layout
 
 \begin_layout Standard
@@ -36996,7 +36837,6 @@ Figure II gives a table of iCode
  example, the z80 port does not use registers to pass parameters so the
  SEND and RECV iCode operations will not be generated, and it also does
  not support JUMPTABLES.
-
 \newline
 
 \end_layout
@@ -38822,7 +38662,6 @@ None
 \shape slanted
 \size footnotesize
 see f.e.
-
 \family typewriter
 gen51Code()
 \family default
@@ -38939,8 +38778,8 @@ mul = 0;
 \newline
 14.\InsetSpace ~
 \InsetSpace ~
-/* compiler detects i,j to be induction
- variables */
+/* compiler detects i,j to be induction variables
+ */
 \newline
 15.\InsetSpace ~
 \InsetSpace ~
@@ -40342,7 +40181,6 @@ All product names mentioned herein may be trademarks
 \end_inset
 
  of their respective companies.
-
 \end_layout
 
 \begin_layout Section*

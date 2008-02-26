@@ -99,8 +99,12 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 ;--------------------------------
 ; Header Files
 
-!include "MUI2.nsh"
-!include "WordFunc.nsh"
+!define MULTIUSER_EXECUTIONLEVEL Highest
+!define MULTIUSER_MUI
+!define MULTIUSER_INSTALLMODE_COMMANDLINE
+!include MultiUser.nsh
+!include MUI2.nsh
+!include WordFunc.nsh
 
 ;--------------------------------
 ; Functions
@@ -130,6 +134,9 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 !ifdef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
 Page custom PageReinstall PageLeaveReinstall
 !endif
+
+; MultiUser page
+!insertmacro MULTIUSER_PAGE_INSTALLMODE
 
 ; StartMenu page
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER ${PRODUCT_NAME}
@@ -170,9 +177,9 @@ InstallDir "$PROGRAMFILES\SDCC"
 ;;;;ShowInstDetails show
 ;;;;ShowUnInstDetails show
 
-!ifndef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
-; Old unistallation method
 Function .onInit
+!ifndef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
+  ; Old unistallation method
   ;Uninstall the old version, if present
   ReadRegStr $R0 HKLM \
   "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" \
@@ -198,8 +205,13 @@ inst:
   Abort
 
 done:
-FunctionEnd
 !endif
+  !insertmacro MULTIUSER_INIT
+FunctionEnd
+
+Function un.onInit
+  !insertmacro MULTIUSER_UNINIT
+FunctionEnd
 
 Section -Common
   SetOutPath "$INSTDIR"
@@ -857,26 +869,17 @@ Function AddToPath
     Goto +2
     ; On NT: read PATH from registry
     ReadRegStr $1 HKCU "Environment" "PATH"
-  Push "$1;"
-  Push "$0;"
-  Call StrStr
-  Pop $2
+  ${StrStr} $2 "$1;" "$0;"
   StrCmp $2 "" "" AddToPath_done
-  Push "$1;"
-  Push "$0\;"
-  Call StrStr
-  Pop $2
+
+  ${StrStr} $2 "$1;" "$0\;"
   StrCmp $2 "" "" AddToPath_done
+
   GetFullPathName /SHORT $3 $0
-  Push "$1;"
-  Push "$3;"
-  Call StrStr
-  Pop $2
+  ${StrStr} $2 "$1;" "$3;"
   StrCmp $2 "" "" AddToPath_done
-  Push "$1;"
-  Push "$3\;"
-  Call StrStr
-  Pop $2
+
+  ${StrStr} $2 "$1;" "$03\;"
   StrCmp $2 "" "" AddToPath_done
 
   StrCmp $4 1 AddToPath_NT
@@ -893,6 +896,8 @@ Function AddToPath
     Goto AddToPath_done
 
   AddToPath_NT:
+    ;System PATH variable is at:
+    ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
     ReadRegStr $1 HKCU "Environment" "PATH"
     StrCpy $2 $1 1 -1  ; copy last char
     StrCmp $2 ";" 0 +2 ; if last char == ;
@@ -962,14 +967,13 @@ Function un.RemoveFromPath
       Goto unRemoveFromPath_done
 
   unRemoveFromPath_NT:
+    ;System PATH variable is at:
+    ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
     ReadRegStr $1 HKCU "Environment" "PATH"
     StrCpy $5 $1 1 -1 ; copy last char
     StrCmp $5 ";" +2  ; if last char != ;
       StrCpy $1 "$1;" ; append ;
-    Push $1
-    Push "$0;"
-    Call un.StrStr    ; Find `$0;` in $1
-    Pop $2            ; pos of our dir
+    ${UnStrStr} $2 $1 "$0;"	; Find `$0;` in $1
     StrCmp $2 "" unRemoveFromPath_done
       ; else, it is in path
       ; $0 - path to add
@@ -1033,52 +1037,6 @@ FunctionEnd
 !macroend
 !insertmacro IsNT ""
 !insertmacro IsNT "un."
-
-; StrStr
-; input, top of stack = string to search for
-;        top of stack-1 = string to search in
-; output, top of stack (replaces with the portion of the string remaining)
-; modifies no other variables.
-;
-; Usage:
-;   Push "this is a long ass string"
-;   Push "ass"
-;   Call StrStr
-;   Pop $R0
-;  ($R0 at this point is "ass string")
-
-!macro StrStr un
-Function ${un}StrStr
-Exch $R1   ; st=haystack,old$R1, $R1=needle
-  Exch     ; st=old$R1,haystack
-  Exch $R2 ; st=old$R1,old$R2, $R2=haystack
-  Push $R3
-  Push $R4
-  Push $R5
-  StrLen $R3 $R1
-  StrCpy $R4 0
-  ; $R1=needle
-  ; $R2=haystack
-  ; $R3=len(needle)
-  ; $R4=cnt
-  ; $R5=tmp
-  loop:
-    StrCpy $R5 $R2 $R3 $R4
-    StrCmp $R5 $R1 done
-    StrCmp $R5 "" done
-    IntOp $R4 $R4 + 1
-    Goto loop
-done:
-  StrCpy $R1 $R2 "" $R4
-  Pop $R5
-  Pop $R4
-  Pop $R3
-  Pop $R2
-  Exch $R1
-FunctionEnd
-!macroend
-!insertmacro StrStr ""
-!insertmacro StrStr "un."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  Uninstall/Reinstall page functions                                         ;

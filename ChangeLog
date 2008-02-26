@@ -2,6 +2,8 @@
 
 	* src/SDCCast.c, doc/adccman.lyx: fixed RFE #1901171: inerger promotion
 	  of casted varargs
+	* support/scripts/sdcc.nsi: added MULTIUSER page,
+	  NSIS upgraded to version 2.35
 
 2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
 

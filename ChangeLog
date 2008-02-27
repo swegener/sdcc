@@ -7,6 +7,7 @@
 	    ifxJump to fix bug 1838000
 	* src/SDCCsymt.c (aggregateToPointer): fix problem for xstack
 	* support/regression/tests/bug1838000.c: new, added
+	* device/include/mcs51/cc1110.h: new, added, thanks to Pravin Angolkar
 
 2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
 

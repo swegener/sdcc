@@ -9729,7 +9729,7 @@ emitPtrByteSet (char *rname, int p_type, char *src)
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
-static void
+static char*
 genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
 {
   int offset = 0;       /* result byte offset */
@@ -9738,7 +9738,8 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
   sym_link *etype;      /* bitfield type information */
   int blen;             /* bitfield length */
   int bstr;             /* bitfield starting bit within byte */
-  char buffer[10];
+  static char* const accBits[] = {"acc.0", "acc.1", "acc.2", "acc.3",
+                                  "acc.4", "acc.5", "acc.6", "acc.7"};
 
   D(emitcode (";", "genUnpackBits"));
 
@@ -9752,18 +9753,15 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
       emitPtrByteGet (rname, ptype, FALSE);
       if (blen == 1)
         {
-          SNPRINTF (buffer, sizeof(buffer),
-                    "acc.%d", bstr);
-          genIfxJump (ifx, buffer, NULL, NULL, NULL);
+          return accBits[bstr];;
         }
       else
         {
           if (blen < 8)
             emitcode ("anl", "a,#0x%02x",
                       (((unsigned char) -1) >> (8 - blen)) << bstr);
-          genIfxJump (ifx, "a", NULL, NULL, NULL);
+          return "a";
         }
-      return;
     }
   wassert (!ifx);
 
@@ -9832,6 +9830,7 @@ finish:
       while (rsize--)
         aopPut (result, source, offset++);
     }
+  return NULL;
 }
 
 
@@ -9885,9 +9884,9 @@ genNearPointerGet (operand * left,
   asmop *aop = NULL;
   regs *preg = NULL;
   char *rname;
+  char *ifxCond = "a";
   sym_link *rtype, *retype;
   sym_link *ltype = operandType (left);
-  char buffer[80];
 
   D (emitcode (";", "genNearPointerGet"));
 
@@ -9907,6 +9906,9 @@ genNearPointerGet (operand * left,
       genDataPointerGet (left, result, ic);
       return;
     }
+
+  //aopOp (result, ic, FALSE);
+  aopOp (result, ic, result?TRUE:FALSE);
 
  /* if the value is already in a pointer register
      then don't need anything more */
@@ -9942,12 +9944,9 @@ genNearPointerGet (operand * left,
   else
     rname = aopGet (left, 0, FALSE, FALSE);
 
-  //aopOp (result, ic, FALSE);
-  aopOp (result, ic, result?TRUE:FALSE);
-
   /* if bitfield then unpack the bits */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, rname, POINTER, ifx);
+    ifxCond = genUnpackBits (result, rname, POINTER, ifx);
   else
     {
       /* we have can just get the values */
@@ -9965,6 +9964,8 @@ genNearPointerGet (operand * left,
             }
           else
             {
+              char buffer[80];
+
               SNPRINTF (buffer, sizeof(buffer), "@%s", rname);
               aopPut (result, buffer, offset);
             }
@@ -10003,7 +10004,7 @@ genNearPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, "a", left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result);
     }
 
   /* done */
@@ -10025,6 +10026,7 @@ genPagedPointerGet (operand * left,
   asmop *aop = NULL;
   regs *preg = NULL;
   char *rname;
+  char *ifxCond = "a";
   sym_link *rtype, *retype;
 
   D (emitcode (";", "genPagedPointerGet"));
@@ -10033,6 +10035,8 @@ genPagedPointerGet (operand * left,
   retype = getSpec (rtype);
 
   aopOp (left, ic, FALSE);
+
+  aopOp (result, ic, FALSE);
 
   /* if the value is already in a pointer register
      then don't need anything more */
@@ -10049,11 +10053,9 @@ genPagedPointerGet (operand * left,
   else
     rname = aopGet (left, 0, FALSE, FALSE);
 
-  aopOp (result, ic, FALSE);
-
   /* if bitfield then unpack the bits */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, rname, PPOINTER, ifx);
+    ifxCond = genUnpackBits (result, rname, PPOINTER, ifx);
   else
     {
       /* we have can just get the values */
@@ -10102,7 +10104,7 @@ genPagedPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, "a", left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result);
     }
 
   /* done */
@@ -10179,6 +10181,7 @@ genFarPointerGet (operand * left,
                   operand * result, iCode * ic, iCode * pi, iCode * ifx)
 {
   int size, offset;
+  char *ifxCond = "a";
   sym_link *retype = getSpec (operandType (result));
 
   D (emitcode (";", "genFarPointerGet"));
@@ -10191,7 +10194,7 @@ genFarPointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, "dptr", FPOINTER, ifx);
+    ifxCond = genUnpackBits (result, "dptr", FPOINTER, ifx);
   else
     {
       size = AOP_SIZE (result);
@@ -10216,7 +10219,7 @@ genFarPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, "a", left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -10231,6 +10234,7 @@ genCodePointerGet (operand * left,
                     operand * result, iCode * ic, iCode *pi, iCode *ifx)
 {
   int size, offset;
+  char *ifxCond = "a";
   sym_link *retype = getSpec (operandType (result));
 
   D (emitcode (";", "genCodePointerGet"));
@@ -10243,7 +10247,7 @@ genCodePointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, "dptr", CPOINTER, ifx);
+    ifxCond = genUnpackBits (result, "dptr", CPOINTER, ifx);
   else
     {
       size = AOP_SIZE (result);
@@ -10269,7 +10273,7 @@ genCodePointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, "a", left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -10284,6 +10288,7 @@ genGenPointerGet (operand * left,
                   operand * result, iCode * ic, iCode *pi, iCode *ifx)
 {
   int size, offset;
+  char *ifxCond = "a";
   sym_link *retype = getSpec (operandType (result));
 
   D (emitcode (";", "genGenPointerGet"));
@@ -10297,7 +10302,7 @@ genGenPointerGet (operand * left,
   /* if bit then unpack */
   if (IS_BITFIELD (retype))
     {
-      genUnpackBits (result, "dptr", GPOINTER, ifx);
+      ifxCond = genUnpackBits (result, "dptr", GPOINTER, ifx);
     }
   else
     {
@@ -10323,7 +10328,7 @@ genGenPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, "a", left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -10788,10 +10793,9 @@ genPagedPointerSet (operand * right,
          if size > 0 && this could be used again
          we have to point it back to where it
          belongs */
-      if ((AOP_SIZE (right) > 1 &&
+      if (AOP_SIZE (right) > 1 &&
           !OP_SYMBOL (result)->remat &&
-          (OP_SYMBOL (result)->liveTo > ic->seq ||
-            ic->depth)) &&
+          (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth) &&
           !pi)
         {
           int size = AOP_SIZE (right) - 1;

@@ -2424,6 +2424,8 @@ aggregateToPointer (value * val)
           }
           break;
         case S_AUTO:
+          DCL_TYPE (val->type) = PTR_TYPE(SPEC_OCLS(val->etype));
+          break;
         case S_DATA:
         case S_REGISTER:
           DCL_TYPE (val->type) = POINTER;

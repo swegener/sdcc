@@ -1,3 +1,13 @@
+2008-02-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genUnpackBits): don't generate ifxJump, instead return
+	  ifx condition
+	  (genNearPointerGet, genPagedPointerGet, genFarPointerGet,
+	  genCodePointerGet, genGenPointerGet): cleanup aop before generating
+	    ifxJump to fix bug 1838000
+	* src/SDCCsymt.c (aggregateToPointer): fix problem for xstack
+	* support/regression/tests/bug1838000.c: new, added
+
 2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (isSpiltOnStack): fixed bug 1565152
@@ -60,7 +70,8 @@
 
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
-	* support/regression/tests/bugs-1596270-1736867.c: Regression test for #1596270, #1736867
+	* support/regression/tests/bugs-1596270-1736867.c: Regression test for
+	  #1596270, #1736867
 
 2008-02-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -73,14 +84,14 @@
 
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/gen.c: fixed bug in register pair loading when swapping register contents,
-	  mostly fixes #1596270
+	* src/z80/gen.c: fixed bug in register pair loading when swapping register
+	  contents, mostly fixes #1596270
 
 2008-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph.def,
-	* src/z80/peeph-z80.def: moved peephole that breaks gbz80 to z80-specific peepholes,
-	  fixes #1806565
+	* src/z80/peeph-z80.def: moved peephole that breaks gbz80 to z80-specific
+	  peepholes, fixes #1806565
 
 2008-02-20 Maarten Brock <sourceforge.brock AT dse.nl>
 

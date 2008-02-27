@@ -1,3 +1,9 @@
+2008-02-27 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: corrected installation directory for
+	  current user installation mode
+	* doc/README.txt: added Philipp Klaus Krause to the developers list
+
 2008-02-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genUnpackBits): don't generate ifxJump, instead return
@@ -9,17 +15,17 @@
 	* support/regression/tests/bug1838000.c: new, added
 	* device/include/mcs51/cc1110.h: new, added, thanks to Pravin Angolkar
 
-2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
-
-	* src/mcs51/ralloc.c (isSpiltOnStack): fixed bug 1565152
-	* support/regression/tests/bug1565152.c: new, added
-
 2008-02-26 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCast.c, doc/adccman.lyx: fixed RFE #1901171: inerger promotion
 	  of casted varargs
 	* support/scripts/sdcc.nsi: added MULTIUSER page,
 	  NSIS upgraded to version 2.35
+
+2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (isSpiltOnStack): fixed bug 1565152
+	* support/regression/tests/bug1565152.c: new, added
 
 2008-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
 

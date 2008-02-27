@@ -99,6 +99,7 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 ;--------------------------------
 ; Header Files
 
+!define MULTIUSER_INSTALLMODE_INSTDIR SDCC
 !define MULTIUSER_EXECUTIONLEVEL Highest
 !define MULTIUSER_MUI
 !define MULTIUSER_INSTALLMODE_COMMANDLINE
@@ -173,7 +174,6 @@ Var MUI_STARTMENUPAGE_VARIABLE
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 BrandingText ""
 OutFile "setup.exe"
-InstallDir "$PROGRAMFILES\SDCC"
 ;;;;ShowInstDetails show
 ;;;;ShowUnInstDetails show
 

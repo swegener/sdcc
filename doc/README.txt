@@ -5,7 +5,8 @@ $Id$
 
 Welcome to SDCC, free open source, retargettable, optimizing ANSI C compiler
 that supports a growing list of processors including the Intel mcs51
-family, the Zilog z80, the Maxim ds390 and the Motorola HC08.
+family, the Zilog z80, the Maxim ds390 and ds400, the Motorola HC08 and the
+PIC16 and PIC18 familiy.
 
 See share/sdcc/doc/INSTALL.txt for the installation instructions for
 the binary kits.
@@ -38,41 +39,42 @@ questions on the user mailing list.  See:
 Notes:
 * The ds400, pic14 and pic16 are currently experimental, but work is in
 progress. Please check http://sdcc.sourceforge.net/snap.php for snapshots.
-* The TININative, gbz80, avr and xa51 ports are no longer maintained.
+* The TININative, gbz80, avr and xa51 targets are no longer maintained.
 
 Roadmap:
-COPYING		- GPL v2
-as/		- Assembler, derrived from asxxxx
+COPYING         - GPL v2
+as/             - Assembler, derrived from asxxxx
 debugger/
-device/		- Device libraries and examples
-doc/		- sdcc and port specific documentation
-link/		- Linker, also derrived from asxxxx
-sim/		- Simulator (mcs51 only)
-src/		- Source to the C compiler and ports
-support/	- Libraries and apps that may not be provided by your system.
+device/         - Device libraries and examples
+doc/            - sdcc and target specific documentation
+link/           - Linker, also derrived from asxxxx
+sim/            - Simulator (mcs51 only)
+src/            - Source to the C compiler and targets
+support/        - Libraries and apps that may not be provided by your system.
 
 
 Authors and interested persons:
 * Sandeep Dutta (sandeep AT users.sourceforge.net)
 
-* Jean Loius-VERN     <jlvern AT writeme.com>
-* Daniel Drotos       <drdani AT mazsola.iit.uni-miskolc.hu>
-* Kevin Vigor         <kevin AT vigor.nu>
-* Johan Knol          <johan.knol AT iduna.nl>
-* Scott Dattalo       <scott AT dattalo.com>
-* Karl Bongers        <karl AT turbobit.com>
-* Bernhard Held       <bernhard AT bernhardheld.de>
-* Frieder Ferlemann   <frieder.ferlemann AT web.de>
-* Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
-* Borut Razem         <borut.razem AT siol.net>
-* Vangelis Rokas      <vrokas AT otenet.gr>
-* Erik Petrich        <epetrich AT ivorytower.norman.ok.us>
-* Paul Stoffregen     <paul AT pjrc.com>
-* Michael Hope        <michaelh AT juju.net.nz> <nz_michaelh AT yahoo.com>
-* Maarten Brock       <sourceforge.brock AT dse.nl>
-* Raphael Neider      <RNeider AT web.de>
-* Hans-Juergen Dorn   <hans.dorn AT apl-landau.de>
-* Klaus Flittner      <klaus_flittner AT gmx.de>
+* Jean Loius-VERN      <jlvern AT writeme.com>
+* Daniel Drotos        <drdani AT mazsola.iit.uni-miskolc.hu>
+* Kevin Vigor          <kevin AT vigor.nu>
+* Johan Knol           <johan.knol AT iduna.nl>
+* Scott Dattalo        <scott AT dattalo.com>
+* Karl Bongers         <karl AT turbobit.com>
+* Bernhard Held        <bernhard AT bernhardheld.de>
+* Frieder Ferlemann    <frieder.ferlemann AT web.de>
+* Jesus Calvino-Fraga  <jesusc AT ece.ubc.ca>
+* Borut Razem          <borut.razem AT siol.net>
+* Vangelis Rokas       <vrokas AT otenet.gr>
+* Erik Petrich         <epetrich AT ivorytower.norman.ok.us>
+* Paul Stoffregen      <paul AT pjrc.com>
+* Michael Hope         <michaelh AT juju.net.nz> <nz_michaelh AT yahoo.com>
+* Maarten Brock        <sourceforge.brock AT dse.nl>
+* Raphael Neider       <RNeider AT web.de>
+* Hans-Juergen Dorn    <hans.dorn AT apl-landau.de>
+* Klaus Flittner       <klaus_flittner AT gmx.de>
+* Philipp Klaus Krause <pkk AT spth.de>
 
 SDCC includes code from:
 * Alan Baldwin      <baldwin AT shop-pdp.kent.edu>
@@ -84,3 +86,5 @@ SDCC includes code from:
 * Pascal Felber
    Some of the Z80 related files are borrowed from the Gameboy
    Development Kit (GBDK).
+* The GCC developement team http://gcc.gnu.org/
+   The basis of sdcpp preprocessor

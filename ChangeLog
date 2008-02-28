@@ -1,3 +1,7 @@
+2008-02-28 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: cosmetic changes
+
 2008-02-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (fillGaps): fixed bug 1839671
@@ -22,7 +26,7 @@
 
 2008-02-26 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCCast.c, doc/adccman.lyx: fixed RFE #1901171: inerger promotion
+	* src/SDCCast.c, doc/sdccman.lyx: fixed RFE #1901171: inerger promotion
 	  of casted varargs
 	* support/scripts/sdcc.nsi: added MULTIUSER page,
 	  NSIS upgraded to version 2.35

@@ -36641,7 +36641,7 @@ t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
 \end_layout
 
 \begin_layout Itemize
-integer promotion of variable arguments is not performed if the argument
+Integer promotion of variable arguments is not performed if the argument
  is explicitly taypecasted unless the
 \series bold
  -
@@ -36689,7 +36689,7 @@ status collapsed
 \begin_layout Verse
 
 \family typewriter
-void vararg_func (char *str, ...) { atr; }
+void vararg_func (char *str, ...) { str; }
 \newline
 
 \newline
@@ -36715,21 +36715,14 @@ char c = 10;
 \newline
 \InsetSpace ~
 \InsetSpace ~
-vararg_func (
-\begin_inset Quotes sld
-\end_inset
-
-%c
-\begin_inset Quotes srd
-\end_inset
-
-, c);
+vararg_func ("%c", c);
 \newline
 
 \newline
 \InsetSpace ~
 \InsetSpace ~
-/* argument u is not promoted to int,
+/*
+ argument u is not promoted to int,
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -36739,8 +36732,8 @@ vararg_func (
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-*
- if --std-cXX is not defined;
+* if
+ --std-cXX is not defined;
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -36755,15 +36748,7 @@ vararg_func (
 \newline
 \InsetSpace ~
 \InsetSpace ~
-vararg_func (
-\begin_inset Quotes sld
-\end_inset
-
-%bc
-\begin_inset Quotes srd
-\end_inset
-
-, (char)u);
+vararg_func ("%bc", (char)u);
 \newline
 }
 \end_layout

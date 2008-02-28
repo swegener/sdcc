@@ -1,3 +1,7 @@
+2008-02-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (fillGaps): fixed bug 1839671
+
 2008-02-27 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: corrected installation directory for

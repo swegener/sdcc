@@ -1510,6 +1510,10 @@ static void fillGaps()
 
         if (!sym->spillA || !sym->clashes || sym->remat) continue ;
 
+        /* if spilt in direct space the original rname is lost */
+        if (sym->usl.spillLoc && (IN_DIRSPACE (SPEC_OCLS (sym->usl.spillLoc->etype))))
+            continue;
+
         /* find the liveRanges this one clashes with, that are
            still assigned to registers & mark the registers as used*/
         for ( i = 0 ; i < sym->clashes->size ; i ++) {
@@ -3225,7 +3229,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
       /* pack registers for accumulator use, when the
          result of an arithmetic or bit wise operation
          has only one use, that use is immediately following
-         the defintion and the using iCode has only one
+         the definition and the using iCode has only one
          operand or has two operands but one is literal &
          the result of that operation is not on stack then
          we can leave the result of this operation in acc:b

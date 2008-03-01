@@ -80,6 +80,30 @@
 
 !ifdef SDCC.DEBUG
   Var SDCC.FunctionName
+  Var SDCC.StrStack0
+  Var SDCC.StrStack1
+  Var SDCC.StrStack2
+  Var SDCC.StrStack3
+  Var SDCC.StrStack4
+
+!define SDCC.PushStr "!insertmacro MACRO_SDCC_PushStr"
+!macro MACRO_SDCC_PushStr NAME
+  StrCpy $SDCC.StrStack4 $SDCC.StrStack3
+  StrCpy $SDCC.StrStack3 $SDCC.StrStack2
+  StrCpy $SDCC.StrStack2 $SDCC.StrStack1
+  StrCpy $SDCC.StrStack1 $SDCC.StrStack0
+  StrCpy $SDCC.StrStack0 $SDCC.FunctionName
+  StrCpy $SDCC.FunctionName ${NAME}
+!macroend
+
+!define SDCC.PopStr "!insertmacro MACRO_SDCC_PopStr"
+!macro MACRO_SDCC_PopStr
+  StrCpy $SDCC.FunctionName $SDCC.StrStack0
+  StrCpy $SDCC.StrStack0 $SDCC.StrStack1
+  StrCpy $SDCC.StrStack1 $SDCC.StrStack2
+  StrCpy $SDCC.StrStack2 $SDCC.StrStack3
+  StrCpy $SDCC.StrStack3 $SDCC.StrStack4
+!macroend
 !endif
 
 !define DebugMsg "!insertmacro MACRO_SDCC_DebugMsg"
@@ -93,14 +117,14 @@
 !macro MACRO_SDCC_Function NAME
   Function "${NAME}"
   !ifdef SDCC.DEBUG
-    StrCpy $SDCC.FunctionName ${NAME}
+    ${SDCC.PushStr} ${NAME}
   !endif
 !macroend
 
 !define FunctionEnd "!insertmacro MACRO_SDCC_FunctionEnd"
 !macro MACRO_SDCC_FunctionEnd
   !ifdef SDCC.DEBUG
-    StrCpy $SDCC.FunctionName ""
+    ${SDCC.PopStr}
   !endif
   FunctionEnd
 !macroend

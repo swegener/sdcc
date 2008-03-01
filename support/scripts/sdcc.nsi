@@ -72,6 +72,38 @@
 # - cd /home/groups/s/sd/sdcc/htdocs/snapshots/i586-mingw32msvc-setup
 # - put sdcc_yyyymmdd_setup.exe
 # - quit
+#
+# For debugging define -DSDCC.DEBUG command line option
+
+;--------------------------------
+; Debugging Macros
+
+!ifdef SDCC.DEBUG
+  Var SDCC.FunctionName
+!endif
+
+!define DebugMsg "!insertmacro MACRO_SDCC_DebugMsg"
+!macro MACRO_SDCC_DebugMsg MSG
+  !ifdef SDCC.DEBUG
+    MessageBox MB_OK "*** $SDCC.FunctionName: ${MSG} ***"
+  !endif
+!macroend
+
+!define Function "!insertmacro MACRO_SDCC_Function"
+!macro MACRO_SDCC_Function NAME
+  Function "${NAME}"
+  !ifdef SDCC.DEBUG
+    StrCpy $SDCC.FunctionName ${NAME}
+  !endif
+!macroend
+
+!define FunctionEnd "!insertmacro MACRO_SDCC_FunctionEnd"
+!macro MACRO_SDCC_FunctionEnd
+  !ifdef SDCC.DEBUG
+    StrCpy $SDCC.FunctionName ""
+  !endif
+  FunctionEnd
+!macroend
 
 
 !define PRODUCT_NAME "SDCC"
@@ -99,13 +131,11 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 ;--------------------------------
 ; Header Files
 
-!define MULTIUSER_INSTALLMODE_INSTDIR SDCC
-!define MULTIUSER_EXECUTIONLEVEL Highest
-!define MULTIUSER_MUI
-!define MULTIUSER_INSTALLMODE_COMMANDLINE
-!include MultiUser.nsh
 !include MUI2.nsh
 !include WordFunc.nsh
+!include StrFunc.nsh
+${StrStr}
+${UnStrStr}
 
 ;--------------------------------
 ; Functions
@@ -115,12 +145,14 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 !endif
 
 ;--------------------------------
-; Configuration
+; Variables
 
-!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+Var SDCC.PathToRemove
 
 ;--------------------------------
 ; Configuration
+
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -133,16 +165,13 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 
 ; Uninstall/reinstall page
 !ifdef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
-Page custom PageReinstall PageLeaveReinstall
+Page custom SDCC.PageReinstall SDCC.PageLeaveReinstall
 !endif
-
-; MultiUser page
-!insertmacro MULTIUSER_PAGE_INSTALLMODE
 
 ; StartMenu page
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER ${PRODUCT_NAME}
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM"
-!define MUI_STARTMENUPAGE_REGISTRY_KEY ${PRODUCT_UNINST_KEY}
+!define MUI_STARTMENUPAGE_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "NSIS:StartMenuDir"
 !define MUI_STARTMENUPAGE_NODISABLE
 Var MUI_STARTMENUPAGE_VARIABLE
@@ -156,13 +185,30 @@ Var MUI_STARTMENUPAGE_VARIABLE
 !insertmacro MUI_PAGE_DIRECTORY
 
 ; Instfiles page
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "SDCC.InstFilesLeave"
 !insertmacro MUI_PAGE_INSTFILES
+
+${Function} SDCC.InstFilesLeave
+  ; Remove old path if reinstallation
+  ${If} $SDCC.PathToRemove != ""
+    ${DebugMsg} "removing path $SDCC.PathToRemove"
+    Push $SDCC.PathToRemove
+    Call SDCC.RemoveFromPath
+  ${EndIf}
+${FunctionEnd}
 
 ; Finish page
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "Add $INSTDIR\bin to the PATH"
-!define MUI_FINISHPAGE_SHOWREADME_FUNCTION AddBinToPath
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION SDCC.AddBinToPath
 !define MUI_FINISHPAGE_SHOWREADME
 !insertmacro MUI_PAGE_FINISH
+
+${Function} SDCC.AddBinToPath
+  ; Add new path
+  ${DebugMsg} "adding path $INSTDIR\bin"
+  Push "$INSTDIR\bin"
+  Call SDCC.AddToPath
+${FunctionEnd}
 
 ; Uninstaller pages
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -174,16 +220,18 @@ Var MUI_STARTMENUPAGE_VARIABLE
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 BrandingText ""
 OutFile "setup.exe"
+InstallDir "$PROGRAMFILES\SDCC"
 ;;;;ShowInstDetails show
 ;;;;ShowUnInstDetails show
 
-Function .onInit
+
+${Function} .onInit
+  ${DebugMsg} "Pre INSTDIR = $INSTDIR"
+
 !ifndef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
   ; Old unistallation method
-  ;Uninstall the old version, if present
-  ReadRegStr $R0 HKLM \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" \
-  "UninstallString"
+  ; Uninstall the old version, if present
+  ReadRegStr $R0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
   StrCmp $R0 "" inst
 
   MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
@@ -205,13 +253,36 @@ inst:
   Abort
 
 done:
-!endif
-  !insertmacro MULTIUSER_INIT
-FunctionEnd
+!else
+  ; If the registry key exists it is an uninstallation or reinstallation:
+  ;  take the old installation directory
+  Push $R2
 
-Function un.onInit
-  !insertmacro MULTIUSER_UNINIT
-FunctionEnd
+  ReadRegStr $R2 HKLM "${PRODUCT_UNINST_KEY}" "InstallLocation"
+  ${IfNot} ${Errors}
+    StrCpy $INSTDIR $R2
+    StrCpy $SDCC.PathToRemove "$INSTDIR\bin"
+  ${EndIf}
+
+  Pop $R2
+!endif
+  ${DebugMsg} "Post INSTDIR = $INSTDIR"
+${FunctionEnd}
+
+${Function} un.onInit
+
+  ${DebugMsg} "Pre INSTDIR = $INSTDIR"
+
+  Push $R2
+  ReadRegStr $R2 HKLM "${PRODUCT_UNINST_KEY}" "InstallLocation"
+  ${IfNot} ${Errors}
+    StrCpy $INSTDIR $R2
+  ${EndIf}
+  Pop $R2
+
+  ${DebugMsg} "Post INSTDIR = $INSTDIR"
+
+${FunctionEnd}
 
 Section -Common
   SetOutPath "$INSTDIR"
@@ -625,12 +696,13 @@ Section -PostInstall
   WriteRegDword HKLM "Software\${PRODUCT_NAME}" "VersionBuild" "${VER_BUILD}"
 !endif
 
-  WriteRegStr HKLM ${PRODUCT_UNINST_KEY} "DisplayName" "${PRODUCT_NAME}"
-  WriteRegStr HKLM ${PRODUCT_UNINST_KEY} "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM ${PRODUCT_UNINST_KEY} "Publisher" "sdcc.sourceforge.net"
-  WriteRegStr HKLM ${PRODUCT_UNINST_KEY} "URLInfoAbout" "http://sdcc.sourceforge.net/"
-  WriteRegStr HKLM ${PRODUCT_UNINST_KEY} "HelpLink" "http://sdcc.sourceforge.net/"
-  WriteRegStr HKLM ${PRODUCT_UNINST_KEY} "URLUpdateInfo" "http://sdcc.sourceforge.net/"
+  WriteRegExpandStr HKLM "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegExpandStr HKLM "${PRODUCT_UNINST_KEY}" "InstallLocation" "$INSTDIR"
+  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
+  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "Publisher" "sdcc.sourceforge.net"
+  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "http://sdcc.sourceforge.net/"
+  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "HelpLink" "http://sdcc.sourceforge.net/"
+  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLUpdateInfo" "http://sdcc.sourceforge.net/"
 
   WriteUninstaller "$INSTDIR\uninstall.exe"
 SectionEnd
@@ -824,11 +896,12 @@ Section Uninstall
 
   RMDir "$INSTDIR"
 
+  ${DebugMsg} "removing path $INSTDIR\bin"
   Push "$INSTDIR\bin"
-  Call un.RemoveFromPath
+  Call un.SDCC.RemoveFromPath
 
 ; Clean the registry
-  DeleteRegValue HKLM ${PRODUCT_UNINST_KEY} "NSIS:StartMenuDir"
+  DeleteRegValue HKLM "${PRODUCT_UNINST_KEY}" "NSIS:StartMenuDir"
   DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "Software\${PRODUCT_NAME}"
 ;;;;  SetAutoClose true
@@ -842,16 +915,11 @@ SectionEnd
 !include "WinMessages.nsh"
 !verbose 4
 
-Function AddBinToPath
-    Push "$INSTDIR\bin"
-    Call AddToPath
-FunctionEnd
-
 ; AddToPath - Adds the given dir to the search path.
 ;        Input - head of the stack
 ;        Note - Win9x systems requires reboot
 
-Function AddToPath
+${Function} SDCC.AddToPath
   Exch $0
   Push $1
   Push $2
@@ -861,7 +929,7 @@ Function AddToPath
   ; don't add if the path doesn't exist
   IfFileExists $0 "" AddToPath_done
 
-  Call IsNT
+  Call SDCC.IsNT
   Pop $4
   StrCmp $4 1 +3
     ; Not on NT: read PATH from environment variable
@@ -914,12 +982,13 @@ Function AddToPath
     Pop $2
     Pop $1
     Pop $0
-FunctionEnd
+${FunctionEnd}
 
 ; RemoveFromPath - Remove a given dir from the path
 ;     Input: head of the stack
 
-Function un.RemoveFromPath
+!macro SDCC.RemoveFromPath un
+${Function} ${un}SDCC.RemoveFromPath
   Exch $0
   Push $1
   Push $2
@@ -930,7 +999,7 @@ Function un.RemoveFromPath
 
   IntFmt $6 "%c" 26 ; DOS EOF
 
-  Call un.IsNT
+  Call ${un}SDCC.IsNT
   Pop $1
   StrCmp $1 1 unRemoveFromPath_NT
     ; Not on NT
@@ -973,7 +1042,10 @@ Function un.RemoveFromPath
     StrCpy $5 $1 1 -1 ; copy last char
     StrCmp $5 ";" +2  ; if last char != ;
       StrCpy $1 "$1;" ; append ;
-    ${UnStrStr} $2 $1 "$0;"	; Find `$0;` in $1
+    Push $1
+    Push "$0;"
+    Call ${un}StrStr  ; Find `$0;` in $1
+    Pop $2            ; pos of our dir
     StrCmp $2 "" unRemoveFromPath_done
       ; else, it is in path
       ; $0 - path to add
@@ -1004,7 +1076,10 @@ Function un.RemoveFromPath
     Pop $2
     Pop $1
     Pop $0
-FunctionEnd
+${FunctionEnd}
+!macroend
+!insertmacro SDCC.RemoveFromPath ""
+!insertmacro SDCC.RemoveFromPath "un."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Utility Functions                                                           ;
@@ -1019,24 +1094,23 @@ FunctionEnd
 ;   Pop $R0
 ;  ($R0 at this point is 1 or 0)
 
-!macro IsNT un
-Function ${un}IsNT
-  Push $0
+!macro SDCC.IsNT un
+${Function} ${un}SDCC.IsNT
+  Push $R0
   ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCmp $0 "" 0 IsNT_yes
-  ; we are not NT.
-  Pop $0
-  Push 0
-  Return
-
-  IsNT_yes:
+  ${If} $R0 == ""
+    ; we are not NT.
+    Pop $R0
+    Push 0
+  ${Else}
     ; NT!!!
-    Pop $0
+    Pop $R0
     Push 1
-FunctionEnd
+  ${EndIf}
+${FunctionEnd}
 !macroend
-!insertmacro IsNT ""
-!insertmacro IsNT "un."
+!insertmacro SDCC.IsNT ""
+!insertmacro SDCC.IsNT "un."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  Uninstall/Reinstall page functions                                         ;
@@ -1046,7 +1120,7 @@ FunctionEnd
 
 Var ReinstallPageCheck
 
-Function PageReinstall
+${Function} SDCC.PageReinstall
 
   ReadRegStr $R0 HKLM "Software\${PRODUCT_NAME}" ""
 
@@ -1093,11 +1167,11 @@ Function PageReinstall
 
   ${NSD_CreateRadioButton} 30u 50u -30u 8u $R2
   Pop $R2
-  ${NSD_OnClick} $R2 PageReinstallUpdateSelection
+  ${NSD_OnClick} $R2 SDCC.PageReinstallUpdateSelection
 
   ${NSD_CreateRadioButton} 30u 70u -30u 8u $R3
   Pop $R3
-  ${NSD_OnClick} $R3 PageReinstallUpdateSelection
+  ${NSD_OnClick} $R3 SDCC.PageReinstallUpdateSelection
 
   ${If} $ReinstallPageCheck != 2
     SendMessage $R2 ${BM_SETCHECK} ${BST_CHECKED} 0
@@ -1107,9 +1181,9 @@ Function PageReinstall
 
   nsDialogs::Show
 
-FunctionEnd
+${FunctionEnd}
 
-Function PageReinstallUpdateSelection
+${Function} SDCC.PageReinstallUpdateSelection
 
   Pop $R1
 
@@ -1121,42 +1195,47 @@ Function PageReinstallUpdateSelection
     StrCpy $ReinstallPageCheck 2
   ${EndIf}
 
-FunctionEnd
+${FunctionEnd}
 
-Function PageLeaveReinstall
+${Function} SDCC.PageLeaveReinstall
 
   ${NSD_GetState} $R2 $R1
 
-  StrCmp $R0 "1" 0 +2
-    StrCmp $R1 "1" reinst_uninstall reinst_done
+  ${DebugMsg} "R0 = $R0, R1 = $R1, R2 = $R2"
 
-  StrCmp $R0 "2" 0 +3
-    StrCmp $R1 "1" reinst_done reinst_uninstall
+  ${If} $R0 == "1"
+    ${AndIf} $R1 != "1"
+    Goto reinst_done
+  ${EndIf}
 
-  reinst_uninstall:
-  ReadRegStr $R1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString"
+  ${If} $R0 == "2"
+    ${AndIf} $R1 == 1
+    Goto reinst_done
+  ${EndIf}
+
+  ReadRegStr $R1 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
 
   ;Run uninstaller
   HideWindow
 
-    ClearErrors
-    ExecWait '$R1 _?=$INSTDIR'
+  ClearErrors
+  ExecWait '$R1 _?=$INSTDIR'
 
-    IfErrors no_remove_uninstaller
-    IfFileExists "$INSTDIR\bin\${PRODUCT_NAME}.exe" no_remove_uninstaller
+  ${IfNot} ${Errors}
+    ${AndIfNot} ${FileExists} "$INSTDIR\bin\${PRODUCT_NAME}.exe"
+    ${DebugMsg} "deleting file $R1 and directory $INSTDIR"
+    Delete $R1
+    RMDir $INSTDIR
+  ${EndIf}
 
-      Delete $R1
-      RMDir $INSTDIR
-
-    no_remove_uninstaller:
-
-  StrCmp $R0 "2" 0 +2
+  ${If} $R0 == "2"
     Quit
+  ${EndIf}
 
   BringToFront
 
-  reinst_done:
+reinst_done:
 
-FunctionEnd
+${FunctionEnd}
 
 !endif # VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD

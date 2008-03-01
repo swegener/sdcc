@@ -1,3 +1,9 @@
+2008-03-01 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: reverted MULTIUSER page since it didn't
+	  work correctly, added debugging support if -DSDCC.DEBUG command line
+	  option is defined
+
 2008-02-28 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: cosmetic changes

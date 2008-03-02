@@ -1,3 +1,8 @@
+2008-03-02 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: fixed bug in IsNT, LogicLib-isation of
+	  AddToPath and RemoveFromPath
+
 2008-03-01 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: reverted MULTIUSER page since it didn't

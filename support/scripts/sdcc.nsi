@@ -925,7 +925,6 @@ Section Uninstall
   Call un.SDCC.RemoveFromPath
 
 ; Clean the registry
-  DeleteRegValue HKLM "${PRODUCT_UNINST_KEY}" "NSIS:StartMenuDir"
   DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "Software\${PRODUCT_NAME}"
 ;;;;  SetAutoClose true
@@ -951,61 +950,63 @@ ${Function} SDCC.AddToPath
   Push $4
 
   ; don't add if the path doesn't exist
-  IfFileExists $0 "" AddToPath_done
-
-  Call SDCC.IsNT
-  Pop $4
-  StrCmp $4 1 +3
-    ; Not on NT: read PATH from environment variable
-    ReadEnvStr $1 PATH
-    Goto +2
-    ; On NT: read PATH from registry
-    ReadRegStr $1 HKCU "Environment" "PATH"
-  ${StrStr} $2 "$1;" "$0;"
-  StrCmp $2 "" "" AddToPath_done
-
-  ${StrStr} $2 "$1;" "$0\;"
-  StrCmp $2 "" "" AddToPath_done
-
-  GetFullPathName /SHORT $3 $0
-  ${StrStr} $2 "$1;" "$3;"
-  StrCmp $2 "" "" AddToPath_done
-
-  ${StrStr} $2 "$1;" "$03\;"
-  StrCmp $2 "" "" AddToPath_done
-
-  StrCmp $4 1 AddToPath_NT
-    ; Not on NT
-    StrCpy $1 $WINDIR 2
-    FileOpen $1 "$1\autoexec.bat" a
-    FileSeek $1 -1 END
-    FileReadByte $1 $2
-    IntCmp $2 26 0 +2 +2 ; DOS EOF
-      FileSeek $1 -1 END ; write over EOF
-    FileWrite $1 "$\r$\nSET PATH=%PATH%;$3$\r$\n"
-    FileClose $1
-    SetRebootFlag true
-    Goto AddToPath_done
-
-  AddToPath_NT:
-    ;System PATH variable is at:
-    ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
-    ReadRegStr $1 HKCU "Environment" "PATH"
-    StrCpy $2 $1 1 -1  ; copy last char
-    StrCmp $2 ";" 0 +2 ; if last char == ;
-      StrCpy $1 $1 -1  ; remove last char
-    StrCmp $1 "" AddToPath_NTdoIt
-      StrCpy $0 "$1;$0"
-    AddToPath_NTdoIt:
-      WriteRegExpandStr HKCU "Environment" "PATH" $0
-      SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
-  AddToPath_done:
+  ${If} ${FileExists} $0
+    Call SDCC.IsNT
     Pop $4
-    Pop $3
-    Pop $2
-    Pop $1
-    Pop $0
+    ${If} $4 != 1
+      ; Not on NT: read PATH from environment variable
+      ReadEnvStr $1 PATH
+    ${Else}
+      ; On NT: read PATH from registry
+      ReadRegStr $1 HKCU "Environment" "PATH"
+    ${EndIf}
+
+    ${StrStr} $2 "$1;" "$0;"
+    ${If} $2 == ""
+      ${StrStr} $2 "$1;" "$0\;"
+      ${If} $2 == ""
+        GetFullPathName /SHORT $3 $0
+        ${StrStr} $2 "$1;" "$3;"
+        ${If} $2 == ""
+          ${StrStr} $2 "$1;" "$03\;"
+          ${If} $2 == ""
+            ${If} $4 != 1
+              ; Not on NT
+              StrCpy $1 $WINDIR 2
+              FileOpen $1 "$1\autoexec.bat" a
+              FileSeek $1 -1 END
+              FileReadByte $1 $2
+              ${If} $2 = 26        ; DOS EOF
+                FileSeek $1 -1 END ; write over EOF
+              ${Endif}
+              FileWrite $1 "$\r$\nSET PATH=%PATH%;$3$\r$\n"
+              FileClose $1
+              SetRebootFlag true
+            ${Else}
+              ;System PATH variable is at:
+              ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
+              ReadRegStr $1 HKCU "Environment" "PATH"
+              StrCpy $2 $1 1 -1  ; copy last char
+              ${If} $2 == ";"    ; if last char == ;
+                StrCpy $1 $1 -1  ; remove last char
+              ${Endif}
+              ${If} $1 != ""
+                StrCpy $0 "$1;$0"
+              ${Endif}
+              WriteRegExpandStr HKCU "Environment" "PATH" $0
+              SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+            ${Endif}
+          ${Endif}
+        ${Endif}
+      ${Endif}
+    ${Endif}
+  ${EndIf}
+
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
 ${FunctionEnd}
 
 ; RemoveFromPath - Remove a given dir from the path
@@ -1025,7 +1026,7 @@ ${Function} ${un}SDCC.RemoveFromPath
 
   Call ${un}SDCC.IsNT
   Pop $1
-  StrCmp $1 1 unRemoveFromPath_NT
+  ${If} $1 != 1
     ; Not on NT
     StrCpy $1 $WINDIR 2
     FileOpen $1 "$1\autoexec.bat" r
@@ -1033,45 +1034,50 @@ ${Function} ${un}SDCC.RemoveFromPath
     FileOpen $2 $4 w
     GetFullPathName /SHORT $0 $0
     StrCpy $0 "SET PATH=%PATH%;$0"
-    Goto unRemoveFromPath_dosLoop
 
-    unRemoveFromPath_dosLoop:
-      FileRead $1 $3
+  nextLine:
+    ; copy all lines except the line containing "SET PATH=%PATH%;$0"
+    ; from autoexec.bat to the temporary file
+    ClearErrors
+    FileRead $1 $3
+    ${IfNot} ${Errors}
       StrCpy $5 $3 1 -1 ; read last char
-      StrCmp $5 $6 0 +2 ; if DOS EOF
+      ${If} $5 == $6    ; if DOS EOF
         StrCpy $3 $3 -1 ; remove DOS EOF so we can compare
-      StrCmp $3 "$0$\r$\n" unRemoveFromPath_dosLoopRemoveLine
-      StrCmp $3 "$0$\n" unRemoveFromPath_dosLoopRemoveLine
-      StrCmp $3 "$0" unRemoveFromPath_dosLoopRemoveLine
-      StrCmp $3 "" unRemoveFromPath_dosLoopEnd
-      FileWrite $2 $3
-      Goto unRemoveFromPath_dosLoop
-      unRemoveFromPath_dosLoopRemoveLine:
+      ${EndIf}
+      ${If} $3 != "$0$\r$\n"
+        ${AndIf} $3 != "$0$\n"
+        ${AndIf} $3 != "$0"
+        FileWrite $2 $3
+        Goto nextLine
+      ${Else}
+        ; This is the line I'm looking for:
+        ; don't copy it
         SetRebootFlag true
-        Goto unRemoveFromPath_dosLoop
+        Goto nextLine
+      ${EndIf}
+    ${EndIf}
 
-    unRemoveFromPath_dosLoopEnd:
-      FileClose $2
-      FileClose $1
-      StrCpy $1 $WINDIR 2
-      Delete "$1\autoexec.bat"
-      CopyFiles /SILENT $4 "$1\autoexec.bat"
-      Delete $4
-      Goto unRemoveFromPath_done
-
-  unRemoveFromPath_NT:
+    FileClose $2
+    FileClose $1
+    StrCpy $1 $WINDIR 2
+    Delete "$1\autoexec.bat"
+    CopyFiles /SILENT $4 "$1\autoexec.bat"
+    Delete $4
+  ${Else}
     ;System PATH variable is at:
     ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
     ReadRegStr $1 HKCU "Environment" "PATH"
     StrCpy $5 $1 1 -1 ; copy last char
-    StrCmp $5 ";" +2  ; if last char != ;
+    ${If} $5 != ";"   ; if last char != ;
       StrCpy $1 "$1;" ; append ;
+    ${EndIf}
     Push $1
     Push "$0;"
     Call ${un}StrStr  ; Find `$0;` in $1
     Pop $2            ; pos of our dir
-    StrCmp $2 "" unRemoveFromPath_done
-      ; else, it is in path
+    ${If} $2 != ""
+      ; it is in path:
       ; $0 - path to add
       ; $1 - path var
       StrLen $3 "$0;"
@@ -1081,25 +1087,27 @@ ${Function} ${un}SDCC.RemoveFromPath
       StrCpy $3 $5$6
 
       StrCpy $5 $3 1 -1  ; copy last char
-      StrCmp $5 ";" 0 +2 ; if last char == ;
+      ${If} $5 == ";"    ; if last char == ;
         StrCpy $3 $3 -1  ; remove last char
-
-      StrCmp $3 "" +3
+      ${EndIf}
+      ${If} $3 != ""
         ; New PATH not empty: update the registry
         WriteRegExpandStr HKCU "Environment" "PATH" $3
-        Goto +2
+      ${Else}
         ; New PATH empty: remove from the registry
         DeleteRegValue HKCU "Environment" "PATH"
+      ${EndIf}
       SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+    ${Endif}
+  ${Endif}
 
-  unRemoveFromPath_done:
-    Pop $6
-    Pop $5
-    Pop $4
-    Pop $3
-    Pop $2
-    Pop $1
-    Pop $0
+  Pop $6
+  Pop $5
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
 ${FunctionEnd}
 !macroend
 !insertmacro SDCC.RemoveFromPath ""
@@ -1121,7 +1129,7 @@ ${FunctionEnd}
 !macro SDCC.IsNT un
 ${Function} ${un}SDCC.IsNT
   Push $R0
-  ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
+  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
   ${If} $R0 == ""
     ; we are not NT.
     Pop $R0

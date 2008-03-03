@@ -193,8 +193,8 @@ extern set *userIncDirsSet;
 extern set *libDirsSet;
 extern set *libPathsSet;
 
-/* read the file with all the pic14 definitions and pick out the definition for a processor
- * if specified. if pic_name is NULL reads everything */
+/* read the file with all the pic14 definitions and pick out the definition
+ * for a processor if specified. if pic_name is NULL reads everything */
 static PIC_device *find_device(char *pic_name)
 {
 	FILE *pic_file;
@@ -224,56 +224,66 @@ static PIC_device *find_device(char *pic_name)
 	/* first scan all include directories */
 	pic_file = NULL;
 	//fprintf( stderr, "%s: searching %s\n", __FUNCTION__, DEVICE_FILE_NAME );
-	for (dir = setFirstItem(includeDirsSet);
-		!pic_file && dir;
-		dir = setNextItem(includeDirsSet))
-	{
-	  //fprintf( stderr, "searching1 %s\n", dir );
-	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
-	  pic_file = fopen( filename, "rt" );
-	  if (pic_file) break;
-	} // for
 	for (dir = setFirstItem(userIncDirsSet);
 		!pic_file && dir;
 		dir = setNextItem(userIncDirsSet))
 	{
-	  //fprintf( stderr, "searching2 %s\n", dir );
-	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
+	  //fprintf( stderr, "searching1 %s\n", dir );
+	  SNPRINTF(&filename[0], len, "%s%s", dir,
+	    DIR_SEPARATOR_STRING DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
 	} // for
+
+	for (dir = setFirstItem(includeDirsSet);
+		!pic_file && dir;
+		dir = setNextItem(includeDirsSet))
+	{
+	  //fprintf( stderr, "searching2 %s\n", dir );
+	  SNPRINTF(&filename[0], len, "%s%s", dir,
+	    DIR_SEPARATOR_STRING DEVICE_FILE_NAME);
+	  pic_file = fopen( filename, "rt" );
+	  if (pic_file) break;
+	} // for
+
 	for (dir = setFirstItem(libDirsSet);
 		!pic_file && dir;
 		dir = setNextItem(libDirsSet))
 	{
 	  //fprintf( stderr, "searching3 %s\n", dir );
-	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
+	  SNPRINTF(&filename[0], len, "%s%s", dir,
+	    DIR_SEPARATOR_STRING DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
 	} // for
+
 	for (dir = setFirstItem(libPathsSet);
 		!pic_file && dir;
 		dir = setNextItem(libPathsSet))
 	{
 	  //fprintf( stderr, "searching4 %s\n", dir );
-	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
+	  SNPRINTF(&filename[0], len, "%s%s", dir,
+	    DIR_SEPARATOR_STRING DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
 	} // for
+
 	if (!pic_file) {
-	  pic_file = fopen(DATADIR LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "pic" DIR_SEPARATOR_STRING DEVICE_FILE_NAME, "rt");
-	}
-	if (pic_file == NULL) {
-		/* this second attempt is used when initially building the libraries */
-		pic_file = fopen(".." DIR_SEPARATOR_STRING ".." DIR_SEPARATOR_STRING ".." DIR_SEPARATOR_STRING ".." 
-				DIR_SEPARATOR_STRING "src" DIR_SEPARATOR_STRING "pic" DIR_SEPARATOR_STRING 
-				DEVICE_FILE_NAME, "rt");
-		if (pic_file == NULL) {
-			fprintf(stderr, "can't find %s\n", DATADIR LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "pic" 
-					DIR_SEPARATOR_STRING DEVICE_FILE_NAME);
-			return NULL;
-		}
-	}
+	  SNPRINTF(&filename[0], len, "%s",
+	    DATADIR LIB_DIR_SUFFIX
+	    DIR_SEPARATOR_STRING "pic"
+	    DIR_SEPARATOR_STRING DEVICE_FILE_NAME);
+	  pic_file = fopen( filename, "rt" );
+	} // if
+
+        if (pic_file == NULL) {
+            fprintf(stderr, "can't find %s\n", DEVICE_FILE_NAME);
+            return NULL;
+        } // if
+
+	if (options.verbose) {
+	    printf ("Using devices from %s.\n", filename);
+	} // if
 	
 	/* read line by line */
 	pic_buf[sizeof(pic_buf)-1] = '\0';

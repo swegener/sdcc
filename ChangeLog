@@ -1,3 +1,8 @@
+2008-03-03 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (find_device): search user-specified paths first
+	  for pic14devices.txt, fixes #1900827
+
 2008-03-02 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: fixed bug in IsNT, LogicLib-isation of

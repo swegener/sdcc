@@ -1806,7 +1806,7 @@ static void saveRegisters(iCode *lic)
 
         ic->regsSaved = 1;
 
-        fprintf(stderr, "ERROR: saveRegisters did not do anything to save registers, please report this as a bug.\n");
+        //fprintf(stderr, "ERROR: saveRegisters did not do anything to save registers, please report this as a bug.\n");
 
         dtype = operandType(IC_LEFT(ic));
         if (currFunc && dtype &&

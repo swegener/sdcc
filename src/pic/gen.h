@@ -47,9 +47,8 @@ enum
 {
   AOP_LIT = 1,
   AOP_REG, AOP_DIR,
-  AOP_DPTR, AOP_DPTR2, AOP_R0, AOP_R1,
   AOP_STK, AOP_IMMD, AOP_STR,
-  AOP_CRY, AOP_ACC,
+  AOP_CRY,
   AOP_PCODE
 
 };
@@ -64,15 +63,11 @@ typedef struct asmop
 		  AOP_LIT    -  operand is a literal value
 		  AOP_REG    -  is in registers
 		  AOP_DIR    -  direct just a name
-		  AOP_DPTR   -  dptr contains address of operand
-		  AOP_DPTR2  -  dptr2 contains address of operand (DS80C390 only).
-		  AOP_R0/R1  -  r0/r1 contains address of operand               
 		  AOP_STK    -  should be pushed on stack this
 		  can happen only for the result
 		  AOP_IMMD   -  immediate value for eg. remateriazable 
 		  AOP_CRY    -  carry contains the value of this
 		  AOP_STR    -  array of strings
-		  AOP_ACC    -  result is in the acc:b pair
 	       */
   short coff;	        /* current offset */
   short size;	        /* total size */
@@ -102,16 +97,8 @@ extern unsigned fReturnSizePic;
 #define AOP(op) op->aop
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
-#define IS_AOP_PREG(x) (AOP(x) && (AOP_TYPE(x) == AOP_R1 || \
-                       AOP_TYPE(x) == AOP_R0))
 
-#define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY ||  \
-                        AOP_TYPE(x) == AOP_DPTR || AOP_TYPE(x) == AOP_DPTR2 || \
-                         AOP(x)->paged)) 
-
-#define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
-                      (x->aopu.aop_reg[0] == pic14_regWithIdx(R0_IDX) || \
-                      x->aopu.aop_reg[0] == pic14_regWithIdx(R1_IDX) )))
+#define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY || AOP(x)->paged))
 
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \

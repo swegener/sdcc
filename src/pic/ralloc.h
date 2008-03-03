@@ -31,15 +31,6 @@
 #include "pcoderegs.h"
 
 
-enum
-{
-  R2_IDX = 0, R3_IDX, R4_IDX,
-  R5_IDX, R6_IDX, R7_IDX,
-  R0_IDX, R1_IDX, X8_IDX,
-  X9_IDX, X10_IDX, X11_IDX,
-  X12_IDX, CND_IDX
-};
-
 enum {
   REG_PTR=1,
   REG_GPR,
@@ -48,12 +39,6 @@ enum {
   REG_STK,
   REG_TMP
 };
-//#define REG_PTR 0x01
-//#define REG_GPR 0x02
-//#define REG_CND 0x04
-//#define REG_SFR 0x08
-//#define REG_STK 0x10  /* Use a register as a psuedo stack */
-//#define REG_TMP 0x20  
 
 /* definition for the registers */
 typedef struct regs

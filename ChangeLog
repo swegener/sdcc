@@ -1,5 +1,14 @@
 2008-03-03 Raphael Neider <rneider AT web.de>
 
+	* src/pic/gen.c,
+	* src/pic/gen.h,
+	* src/pic/genarith.c,
+	* src/pic/ralloc.c,
+	* src/pic/ralloc.h: removed AOP_R0, AOP_R1, AOP_DPTR, AOP_DPTR2,
+	  AOP_ACC, and *_IDX and adjusted code, removed unused legacy code
+
+2008-03-03 Raphael Neider <rneider AT web.de>
+
 	* src/pic/device.c (find_device): search user-specified paths first
 	  for pic14devices.txt, fixes #1900827
 

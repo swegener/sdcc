@@ -1420,7 +1420,6 @@ static void
 spillLRWithPtrReg (symbol * forSym)
 {
         symbol *lrsym;
-        regs *r0, *r1;
         int k;
 
         debugLog ("%s\n", __FUNCTION__);
@@ -1428,15 +1427,10 @@ spillLRWithPtrReg (symbol * forSym)
                 bitVectIsZero (_G.regAssigned))
                 return;
 
-        r0 = pic14_regWithIdx (R0_IDX);
-        r1 = pic14_regWithIdx (R1_IDX);
-
         /* for all live ranges */
         for (lrsym = hTabFirstItem (liveRanges, &k); lrsym;
         lrsym = hTabNextItem (liveRanges, &k))
         {
-                int j;
-
                 /* if no registers assigned to it or
                 spilt */
                 /* if it does not overlap with this then
@@ -1446,15 +1440,6 @@ spillLRWithPtrReg (symbol * forSym)
                         (lrsym->liveTo < forSym->liveFrom))
                         continue;
 
-                        /* go thru the registers : if it is either
-                r0 or r1 then spil it */
-                for (j = 0; j < lrsym->nRegs; j++)
-                        if (lrsym->regs[j] == r0 ||
-                                lrsym->regs[j] == r1)
-                        {
-                                spillThis (lrsym);
-                                break;
-                        }
         }
 
 }

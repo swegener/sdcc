@@ -249,7 +249,7 @@ ptrBaseRematSym (symbol *ptrsym)
 
 
 /*--------------------------------------------------------------------*/
-/* ptrPseudoSymSafe - check to see if the convertion of the result of */
+/* ptrPseudoSymSafe - check to see if the conversion of the result of */
 /*   a pointerGet of a rematerializable pointer to a pseudo symbol is */
 /*   safe. Returns true if safe, or false if hazards were detected.   */
 /*--------------------------------------------------------------------*/
@@ -375,10 +375,10 @@ void
 ptrPseudoSymConvert (symbol *sym, iCode *dic, char *name)
 {
   symbol *psym = newSymbol (name, 1);
-  psym->type = sym->type;
-  psym->etype = sym->etype;
   psym->psbase = ptrBaseRematSym (OP_SYMBOL (IC_LEFT (dic)));
-                
+  psym->type = sym->type;
+  psym->etype = psym->psbase->etype;
+
   strcpy (psym->rname, psym->name);
   sym->isspilt = 1;
   sym->usl.spillLoc = psym;

@@ -1,3 +1,11 @@
+2008-03-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/SDCCmain.c: added predefined macros SDCC_REVISION (RFE #1907229),
+          and (depending on corresponding compiler option) SDCC_PARMS_IN_BANK1, 
+          SDCC_FLOAT_REENT, SDCC_INT_LONG_REENT 
+	* device/include/mcs51/compiler.h: removed umlauts, added double
+	  underscore
+
 2008-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCptropt.c (ptrPseudoSymConvert): fixed bug 1536762
@@ -21,7 +29,7 @@
 
 	* src/pic/gen.c: removed unused prototypes, prevent internal errors
 	  on accessing OP_SYM_TYPE(op)
-	* src/pic/gen.h: removed unused protorype of genMinusDec()
+	* src/pic/gen.h: removed unused prototype of genMinusDec()
 	* src/pic/genarith.c (genMinus): cosmetic changes, rewritten to
 	  fix #1876953 (invalid subtraction code), removed unused code
 

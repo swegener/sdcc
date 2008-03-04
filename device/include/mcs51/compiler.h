@@ -21,7 +21,7 @@
   *
   * Header file to overcome 8051 compiler differences for specifying
   * special function registers. The following compilers are supported:
-  * SDCC, Keil, Raisonance, IAR, Hi-Tech, Tasking, Crossware, Wickenhäuser.
+  * SDCC, Keil, Raisonance, IAR, Hi-Tech, Tasking, Crossware, Wickenhaeuser.
   * Unfortunately not for use with Dunfield. The compilers are identified by
   * their unique predefined macros. See also:
   * http://predef.sourceforge.net/precomp.html
@@ -65,7 +65,7 @@
 #if defined SDCC
 # define SBIT(name, addr, bit)  __sbit  __at(addr+bit)                  name
 # define SFR(name, addr)        __sfr   __at(addr)                      name
-# define SFRX(name, addr)       xdata volatile unsigned char __at(addr) name
+# define SFRX(name, addr)       __xdata volatile unsigned char __at(addr) name
 # define SFR16(name, addr)      __sfr16 __at(((addr+1U)<<8) | addr)     name
 # define SFR16E(name, fulladdr) __sfr16 __at(fulladdr)                  name
 # define SFR32(name, addr)      __sfr32 __at(((addr+3UL)<<24) | ((addr+2UL)<<16) | ((addr+1UL)<<8) | addr) name
@@ -147,7 +147,7 @@
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
-/** Wickenhäuser
+/** Wickenhaeuser
   * http://www.wickenhaeuser.de
  */
 #elif defined __UC__

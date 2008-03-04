@@ -186,8 +186,8 @@ optionsTable[] = {
     { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
     { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
-    { 0,    "--int-long-reent",     &options.intlong_rent, "Use reenterant calls on the int and long support functions" },
-    { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the float support functions" },
+    { 0,    "--int-long-reent",     &options.intlong_rent, "Use reentrant calls on the int and long support functions" },
+    { 0,    "--float-reent",        &options.float_rent, "Use reentrant calls on the float support functions" },
     { 0,    "--main-return",        &options.mainreturn, "Issue a return after main()" },
     { 0,    "--xram-movc",          &options.xram_movc, "Use movc instead of movx to read xram (xdata)" },
     { 0,    OPTION_CALLEE_SAVES,    &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers insted of the caller", CLAT_SET },
@@ -2014,11 +2014,30 @@ preProcess (char **envp)
           break;
         }
 
+      /* set macro corresponding to compiler option */
+      if (options.intlong_rent)
+        addSet(&preArgvSet, Safe_strdup("-DSDCC_INT_LONG_REENT"));
+
+      /* set macro corresponding to compiler option */
+      if (options.float_rent)
+        addSet(&preArgvSet, Safe_strdup("-DSDCC_FLOAT_REENT"));
+
+      /* set macro corresponding to compiler option */
+      if (options.parms_in_bank1)
+        addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
+
       /* add SDCC version number */
       {
         char buf[20];
         SNPRINTF(buf, sizeof(buf), "-DSDCC=%d%d%d",
                  SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
+        addSet(&preArgvSet, Safe_strdup(buf));
+      }
+
+      /* add SDCC revision number */
+      {
+        char buf[25];
+        SNPRINTF(buf, sizeof(buf), "-DSDCC_REVISION=%s", getBuildNumber());
         addSet(&preArgvSet, Safe_strdup(buf));
       }
 

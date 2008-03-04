@@ -4,13 +4,6 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
- #include <sdcc-lib.h>
-#else
- #define _AUTOMEM
- #define _STATMEM
-#endif
-
 typedef struct { char b:1; } t;
 t glbl = { 0 };
 t _STATMEM * gp = &glbl;

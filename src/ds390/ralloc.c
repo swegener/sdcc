@@ -2475,8 +2475,6 @@ right:
   return change;
 }
 
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-
 
 /*-----------------------------------------------------------------*/
 /* packRegsDPTRnuse - color live ranges that can go into extra DPTRS */
@@ -3069,6 +3067,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
           IS_SYMOP (IC_RIGHT (ic)) &&
           OP_SYMBOL (IC_RIGHT (ic))->remat &&
           !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode) &&
+          !isOperandGlobal(IC_RESULT(ic)) &&          /* due to bug 1618050 */
           bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat =

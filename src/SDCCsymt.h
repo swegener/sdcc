@@ -217,7 +217,7 @@ typedef enum {
   DECLARATOR=1,
   SPECIFIER
 } SYM_LINK_CLASS;
-#define DECLSPEC2TXT(select) (select==DECLARATOR?"DECLARATOR":select==SPECIFIER?"SPECIFIER":"UNKNOW")
+#define DECLSPEC2TXT(select) (select==DECLARATOR?"DECLARATOR":select==SPECIFIER?"SPECIFIER":"UNKNOWN")
 
 typedef struct sym_link
   {
@@ -505,7 +505,7 @@ extern sym_link *validateLink(sym_link  *l,
                                        x->select.s.noun == V_SBIT ))
 #define IS_BITFIELD(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD))
 #define IS_BITVAR(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
-                                     x->select.s.noun  == V_BIT ||   \
+                                     x->select.s.noun == V_BIT || \
                                      x->select.s.noun == V_SBIT ))
 #define IS_BIT(x) (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
                                   x->select.s.noun == V_SBIT ))

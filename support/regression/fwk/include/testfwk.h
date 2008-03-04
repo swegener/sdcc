@@ -11,6 +11,13 @@ void __printf(const char *szFormat, ...);
 #define LOG(_a)     /* hollow log */
 #endif
 
+#ifdef SDCC
+ #include <sdcc-lib.h>
+#else
+ #define _AUTOMEM
+ #define _STATMEM
+#endif
+
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
 # define data
 # define idata

@@ -6,6 +6,16 @@
 	* src/SDCCutil.h: added getBuildDate()
 	* src/SDCCmain.c (printVersionInfo),
 	* src/SDCCglue.c (initialComments): use getBuildDate() instead of __DATE__
+	* src/*/ralloc.c: removed IS_OP_RUONLY macro
+	* src/ds390/ralloc.c (packRegisters),
+	* src/mcs51/ralloc.c (packRegisters),
+	* src/z80/ralloc.c (packRegisters): applied fix for bug 1618050, thanks
+	  Robert Larice
+	* support/regression/tests/bug1618050.c: new, added
+	* src/SDCCsymt.h: fixed typo in DECLSPEC2TXT
+	* support/regression/fwk/include/testfwk.h,
+	* support/regression/tests/bug1838000.c: moved _AUTOMEM and _STATMEM to
+	  testfwk.h
 
 2008-03-04 Raphael Neider <rneider AT web.de>
 

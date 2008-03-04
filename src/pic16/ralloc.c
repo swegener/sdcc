@@ -3411,8 +3411,6 @@ right:
 #endif
 
 
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-
 #ifndef NO_packRegsForOneuse
 /*-----------------------------------------------------------------*/
 /* packRegsForOneuse : - will reduce some registers for single Use */

@@ -2277,8 +2277,6 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   return changes;
 }
 
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-
 
 #if 0
 /*-----------------------------------------------------------------*/

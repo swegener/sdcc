@@ -1609,8 +1609,6 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   return change;
 }
 
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-
 
 /*-----------------------------------------------------------------*/
 /* packRegsForOneuse : - will reduce some registers for single Use */

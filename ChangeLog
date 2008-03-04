@@ -1,3 +1,11 @@
+2008-03-04 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c: removed unused prototypes, prevent internal errors
+	  on accessing OP_SYM_TYPE(op)
+	* src/pic/gen.h: removed unused protorype of genMinusDec()
+	* src/pic/genarith.c (genMinus): cosmetic changes, rewritten to
+	  fix #1876953 (invalid subtraction code), removed unused code
+
 2008-03-03 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c,

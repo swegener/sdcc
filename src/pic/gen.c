@@ -48,9 +48,6 @@
 #define PIC_IS_DATA_PTR(x)  (IS_DATA_PTR(x) || IS_FARPTR(x))
 #define PIC_IS_FARPTR(x)    (PIC_IS_DATA_PTR(x))
 
-extern void genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
-extern void genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
-void genMult8X8_8 (operand *, operand *,operand *);
 extern void printpBlock(FILE *of, pBlock *pb);
 
 static int labelOffset=0;
@@ -1503,7 +1500,7 @@ int pic14_getDataSize(operand *op)
     // fails. ( in the 8051 port, the size was 4).
 #else
     size = AOP_SIZE(op);
-    if (IS_GENPTR(OP_SYM_TYPE(op)))
+    if (IS_SYMOP(op) && IS_GENPTR(OP_SYM_TYPE(op)))
     {
         sym_link *type = operandType(op);
         if (IS_GENPTR(type))
@@ -8050,18 +8047,18 @@ static void genAddrOf (iCode *ic)
     fprintf (stderr, "left->etype  : "); printTypeChain (OP_SYM_ETYPE(left), stderr); fprintf (stderr, ", codesp:%d, codeptr:%d, constptr:%d\n",IN_CODESPACE(SPEC_OCLS(getSpec (OP_SYM_ETYPE(left)))), IS_CODEPTR(OP_SYM_ETYPE(left)), IS_PTR_CONST(OP_SYM_ETYPE(left)));
 #endif
 
-    if (IS_CODEPTR(OP_SYM_TYPE(result)) && !IN_CODESPACE(SPEC_OCLS(getSpec (OP_SYM_TYPE(left))))) {
+    if (IS_SYMOP(result) && IS_CODEPTR(OP_SYM_TYPE(result)) && !IN_CODESPACE(SPEC_OCLS(getSpec (OP_SYM_TYPE(left))))) {
       fprintf (stderr, "trying to assign __code pointer (%s) an address in __data space (&%s) -- expect trouble\n",
         IS_SYMOP(result) ? OP_SYMBOL(result)->name : "unknown",
         OP_SYMBOL(left)->name);
-    } else if (!IS_CODEPTR (OP_SYM_TYPE(result)) && IN_CODESPACE(SPEC_OCLS(getSpec(OP_SYM_TYPE(left))))) {
+    } else if (IS_SYMOP(result) && !IS_CODEPTR (OP_SYM_TYPE(result)) && IN_CODESPACE(SPEC_OCLS(getSpec(OP_SYM_TYPE(left))))) {
       fprintf (stderr, "trying to assign __data pointer (%s) an address in __code space (&%s) -- expect trouble\n",
         IS_SYMOP(result) ? OP_SYMBOL(result)->name : "unknown",
         OP_SYMBOL(left)->name);
     }
 
     size = AOP_SIZE(IC_RESULT(ic));
-    if (IS_GENPTR(OP_SYM_TYPE(result))) {
+    if (IS_SYMOP(result) && IS_GENPTR(OP_SYM_TYPE(result))) {
         /* strip tag */
         if (size > GPTRSIZE-1) size = GPTRSIZE-1;
     }
@@ -8079,7 +8076,7 @@ static void genAddrOf (iCode *ic)
         offset++;
     }
 
-    if (IS_GENPTR(OP_SYM_TYPE(result)))
+    if (IS_SYMOP(result) && IS_GENPTR(OP_SYM_TYPE(result)))
     {
         /* provide correct tag */
         int isCode = IN_CODESPACE(SPEC_OCLS(getSpec(OP_SYM_TYPE(left))));
@@ -9002,7 +8999,7 @@ aop_isLitLike (asmop *aop)
 {
   assert (aop);
   if (aop->type == AOP_LIT) return 1;
-if (aop->type == AOP_IMMD) return 1;
+  if (aop->type == AOP_IMMD) return 1;
   if ((aop->type == AOP_PCODE) &&
         ((aop->aopu.pcop->type == PO_LITERAL)))
   {
@@ -9018,8 +9015,13 @@ op_isLitLike (operand *op)
 {
   assert (op);
   if (aop_isLitLike (AOP(op))) return 1;
-  if (IS_FUNC(OP_SYM_TYPE(op))) return 1;
-  if (IS_PTR(OP_SYM_TYPE(op)) && AOP_TYPE(op) == AOP_PCODE && AOP(op)->aopu.pcop->type == PO_IMMEDIATE) return 1;
+  if (IS_SYMOP(op) && IS_FUNC(OP_SYM_TYPE(op))) return 1;
+  if (IS_SYMOP(op) && IS_PTR(OP_SYM_TYPE(op))
+        && (AOP_TYPE(op) == AOP_PCODE)
+        && (AOP(op)->aopu.pcop->type == PO_IMMEDIATE)) {
+    return 1;
+  }
+
   return 0;
 }
 

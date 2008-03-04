@@ -154,7 +154,6 @@ char *aopGet (asmop *aop, int offset, bool bit16, bool dname);
 bool genPlusIncr (iCode *ic);
 void pic14_outBitAcc(operand *result);
 void genPlus (iCode *ic);
-bool genMinusDec (iCode *ic);
 void addSign(operand *result, int offset, int sign);
 void genMinus (iCode *ic);
 

@@ -392,6 +392,14 @@ const char *getBuildNumber(void)
 }
 
 /*-----------------------------------------------------------------*/
+/* getBuildDate - return build date                                */
+/*-----------------------------------------------------------------*/
+const char *getBuildDate(void)
+{
+  return (__DATE__);
+}
+
+/*-----------------------------------------------------------------*/
 /* getBuildEnvironment - return environment used to build SDCC     */
 /*-----------------------------------------------------------------*/
 const char *getBuildEnvironment(void)

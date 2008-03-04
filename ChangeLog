@@ -1,3 +1,12 @@
+2008-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCptropt.c (ptrPseudoSymConvert): fixed bug 1536762
+	* support/regression/tests/bug1536762.c: new, added
+	* src/SDCCutil.c,
+	* src/SDCCutil.h: added getBuildDate()
+	* src/SDCCmain.c (printVersionInfo),
+	* src/SDCCglue.c (initialComments): use getBuildDate() instead of __DATE__
+
 2008-03-04 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c: removed unused prototypes, prevent internal errors

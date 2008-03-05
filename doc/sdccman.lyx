@@ -868,7 +868,51 @@ char type parameters to vararg
 
 \end_inset
 
- functions are casted to int unless explicitly casted
+ functions are casted to int unless explicitly casted and 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset
+
+ 
+\series default
+and
+\series bold
+ -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset
+
+
+\series default
+ command line option are not defined 
 \begin_inset Marginal
 status collapsed
 
@@ -898,6 +942,68 @@ n", a, (char)a);
 
 \newline
  will push a as an int and as a char resp.
+\newline
+
+\newline
+
+\family typewriter
+\InsetSpace ~
+\InsetSpace ~
+char a=3;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+printf ("%d %c
+\backslash
+n", a, (char)a);
+\family default
+
+\newline
+ will push a as two ints if
+\series bold
+ -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset
+
+ 
+\series default
+or
+\series bold
+ -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset
+
+
+\series default
+ command line option is defined.
 \end_layout
 
 \begin_layout Itemize
@@ -22585,7 +22691,7 @@ The compiler creates the following #defines
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="2">
+<lyxtabular version="3" rows="15" columns="2">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="3in">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="3in">
@@ -22955,7 +23061,7 @@ when
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -22977,6 +23083,158 @@ SDCC_MODEL_FLAT24
 when 
 \emph on
 -mds390
+\emph default
+ is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+SDCC_REVISION
+\begin_inset LatexCommand \index{SDCC\_REVISION}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+Always defined.
+ SDCC revision number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+SDCC_PARMS_IN_BANK1
+\begin_inset LatexCommand \index{SDCC\_PARMS\_IN\_BANK1}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-parms-in-bank1
+\emph default
+ is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+SDCC_FLOAT_REENT
+\begin_inset LatexCommand \index{SDCC\_MODEL\_FLAT24}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-float-reent
+\emph default
+ is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+SDCC_INT_LONG_REENT
+\begin_inset LatexCommand \index{SDCC\_INT\_LONG\_REENT}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-int-long-reent
 \emph default
  is used
 \end_layout

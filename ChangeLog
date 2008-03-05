@@ -1,3 +1,8 @@
+2008-03-05 Borut Razem <borut.razem AT siol.net>
+
+	* dos/sdccman.lyx: docummented predefined macros SDCC_REVISION,
+	  SDCC_PARMS_IN_BANK1, SDCC_FLOAT_REENT and SDCC_INT_LONG_REENT
+
 2008-03-05 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* support/librarian/sdcclib.c:Added feature request 1908061: 
@@ -6,8 +11,8 @@
 2008-03-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/SDCCmain.c: added predefined macros SDCC_REVISION (RFE #1907229),
-          and (depending on corresponding compiler option) SDCC_PARMS_IN_BANK1, 
-          SDCC_FLOAT_REENT, SDCC_INT_LONG_REENT 
+	  and (depending on corresponding compiler option) SDCC_PARMS_IN_BANK1,
+	  SDCC_FLOAT_REENT, SDCC_INT_LONG_REENT
 	* device/include/mcs51/compiler.h: removed umlauts, added double
 	  underscore
 

@@ -1,3 +1,8 @@
+2008-03-05 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* support/librarian/sdcclib.c:Added feature request 1908061: 
+	  Synchronise sdcclib commands with ar.
+
 2008-03-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/SDCCmain.c: added predefined macros SDCC_REVISION (RFE #1907229),

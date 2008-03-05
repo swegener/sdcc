@@ -96,14 +96,14 @@ int set_options (char * opt)
 	static char Help[] =
 	"Usage: %s [-options] library relfile1 relfile2 relfile3 ...\n\n"
 	"available options:\n"
-	"a - Adds relfile(s) to library.  If relfile exists, replaces it.\n"
-   	"l - Adds relfile list to library.\n"
-	"d - Deletes relfile(s) from library.\n"
-	"e - Extracts relfile(s) from library.\n"
-	"s - Dumps symbols of library.\n"
-	"m - Dumps modules of library.\n"
-	"v - Displays program version.\n"
-	"h - This help.\n";
+	"a,r - Adds relfile(s) to library.  If relfile exists, replaces it.\n"
+   	"l   - Adds relfile list to library.\n"
+	"d   - Deletes relfile(s) from library.\n"
+	"e,x - Extracts relfile(s) from library.\n"
+	"s   - Dumps symbols of library.\n"
+	"m   - Dumps modules of library.\n"
+	"v   - Displays program version.\n"
+	"h   - This help.\n";
 
 	switch (opt[0])
 	{
@@ -120,12 +120,14 @@ int set_options (char * opt)
 			exit(1);
 		break;
 		case 'a':
+		case 'r':
 		    action=OPT_ADD_REL;
 		break;
 		case 'l':
 		    action=OPT_ADD_LIST;
 		break;
 		case 'e':
+		case 'x':
 		    action=OPT_EXT_REL;
 		break;
 		case 'd':

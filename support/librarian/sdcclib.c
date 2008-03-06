@@ -34,50 +34,51 @@ char ListName[PATH_MAX];
 char **RelName;
 int NumRelFiles=0;
 
-#define version "1.1"
+#define version "1.2"
 
-#define OPT_ADD_REL 0
-#define OPT_EXT_REL 1
-#define OPT_DEL_REL 2
-#define OPT_ADD_LIST 3
-#define OPT_DUMP_SYM 4
-#define OPT_DUMP_MOD 5
+#define OPT_NONE     0
+#define OPT_ADD_REL  1
+#define OPT_EXT_REL  2
+#define OPT_DEL_REL  3
+#define OPT_ADD_LIST 4
+#define OPT_DUMP_SYM 5
+#define OPT_DUMP_MOD 6
 
 #define MAXLINE 254
 #define EQ(A,B) !strcmp((A),(B))
 #define NEQ(A,B) strcmp((A),(B))
 
-int action=0;
+int action=OPT_NONE;
 FILE *lib, *newlib, *rel, *adb, *libindex;
 char FLine[MAXLINE+1];
 char ModName[MAXLINE+1];
 
 void GetNameFromPath(char * path, char * name)
 {
-	int i, j;
+    int i, j;
 
-	for(i=0; path[i]!=0; i++);
-	for(; (path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
-	for(j=0, i++; (path[i]!='.')&&(path[i]!=0); i++, j++) name[j]=path[i];
-	name[j]=0;
+    for(i=0; path[i]!=0; i++);
+    for(; (path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
+    for(j=0, i++; (path[i]!='.')&&(path[i]!=0); i++, j++) name[j]=path[i];
+    name[j]=0;
 }
 
 void ChangeExtension(char * path, char * ext)
 {
-	int i;
+    int i;
 
-	for(i=0; path[i]!=0; i++);
-	for(; (path[i]!='.')&&(path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
-	if(path[i]=='.')
-	{
-	    path[i+1]=0;
+    for(i=0; path[i]!=0; i++);
+    for(; (path[i]!='.')&&(path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
+    if(path[i]=='.')
+    {
+        path[i+1]=0;
         strcat(path, ext);
-	}
-	else
-	{
-	    printf("ERROR: Filename '%s' must have an extension\n", path);
-	    exit(1);
-	}
+    }
+    else
+    {
+        printf("ERROR: Filename '%s' must have an extension\n", path);
+        exit(1);
+    }
 }
 
 void CleanLine(char * buff)
@@ -92,141 +93,146 @@ void CleanLine(char * buff)
 
 int set_options (char * opt)
 {
-	int rvalue=0, unknown=0;
-	static char Help[] =
-	"Usage: %s [-options] library relfile1 relfile2 relfile3 ...\n\n"
-	"available options:\n"
-	"a,r - Adds relfile(s) to library.  If relfile exists, replaces it.\n"
-   	"l   - Adds relfile list to library.\n"
-	"d   - Deletes relfile(s) from library.\n"
-	"e,x - Extracts relfile(s) from library.\n"
-	"s   - Dumps symbols of library.\n"
-	"m   - Dumps modules of library.\n"
-	"v   - Displays program version.\n"
-	"h   - This help.\n";
+    int rvalue=0, unknown=0;
+    static char Help[] =
+    "Usage: %s [option|-options] library relfile1 relfile2 relfile3 ...\n\n"
+    "available options:\n"
+    "a,r - Adds relfile(s) to library.  If relfile exists, replaces it.\n"
+    "  l - Adds relfile list to library.\n"
+    "  d - Deletes relfile(s) from library.\n"
+    "e,x - Extracts relfile(s) from library.\n"
+    "  s - Dumps symbols of library.\n"
+    "  m - Dumps modules of library.\n"
+    "  v - Displays program version.\n"
+    "h,? - This help.\n";
 
-	switch (opt[0])
-	{
-		default:
-		    unknown=1;
-		case 'h':
-		case '?':
-		case 'v':
-		    printf("%s: SDCC librarian version %s\n", ProgName, version);
-		    printf("by Jesus Calvino-Fraga\n\n");
-			if (unknown) printf("Unknown option: %c\n", opt[0]);
-		    if (opt[0]=='v') exit(0);
-			printf(Help, ProgName);
-			exit(1);
-		break;
-		case 'a':
-		case 'r':
-		    action=OPT_ADD_REL;
-		break;
-		case 'l':
-		    action=OPT_ADD_LIST;
-		break;
-		case 'e':
-		case 'x':
-		    action=OPT_EXT_REL;
-		break;
-		case 'd':
-		    action=OPT_DEL_REL;
-		break;
-		case 's':
-		    action=OPT_DUMP_SYM;
-		break;
-		case 'm':
-		    action=OPT_DUMP_MOD;
-		break;
-	}
-	return (rvalue);
+    switch (opt[0])
+    {
+        default:
+            unknown=1;
+        case 'h':
+        case '?':
+        case 'v':
+            printf("%s: SDCC librarian version %s\n", ProgName, version);
+            printf("by Jesus Calvino-Fraga\n\n");
+            if (unknown) printf("Unknown option: %c\n", opt[0]);
+            if (opt[0]=='v') exit(0);
+            printf(Help, ProgName);
+            exit(1);
+        break;
+        case 'a':
+        case 'r':
+            action=OPT_ADD_REL;
+        break;
+        case 'l':
+            action=OPT_ADD_LIST;
+        break;
+        case 'e':
+        case 'x':
+            action=OPT_EXT_REL;
+        break;
+        case 'd':
+            action=OPT_DEL_REL;
+        break;
+        case 's':
+            action=OPT_DUMP_SYM;
+        break;
+        case 'm':
+            action=OPT_DUMP_MOD;
+        break;
+    }
+    return (rvalue);
 }
 
 void ProcLineOptions (int argc, char **argv)
 {
-	int cont_par=0;
-	int i, j;
+    int cont_par=0;
+    int i, j;
 
-	/*Get the program name*/
+    /*Get the program name*/
     GetNameFromPath(argv[0], ProgName);
 
-	for (j=1; j<argc; j++)
-	{
-		if(argv[j][0]=='-')
-		{
-			for(i=1; argv[j][i]!=0 ; i++)
-				if (set_options(&argv[j][i])) break;
-		}
-		else
-		{
-			switch(cont_par)
-			{
-				case 0:
-					cont_par++;
-					strcpy(LibName, argv[j]);
-				break;
+    for (j=1; j<argc; j++)
+    {
+        if(argv[j][0]=='-')
+        {
+            for(i=1; argv[j][i]!=0 ; i++)
+                if (set_options(&argv[j][i])) break;
+        }
+        else
+        {
+            switch(cont_par)
+            {
+                case 0:
+                    if ((strlen(argv[j])==1) && (action==OPT_NONE))
+                        set_options(argv[j]);
+                    else
+                    {
+                        cont_par++;
+                        strcpy(LibName, argv[j]);
+                    }
+                break;
 
-				case 1:
-					cont_par++;
+                case 1:
+                    cont_par++;
                     if(action==OPT_ADD_LIST)
                         strcpy(ListName, argv[j]);
                     else
-					{
-						NumRelFiles=1;
-						RelName = (char **) calloc (1, sizeof (char *));
-						if(RelName==NULL)
-						{
-							printf("ERROR: Insuficient memory.\n");
-							exit(2);
-						}
-						RelName[0]=(char *)malloc(PATH_MAX);
-						if(RelName[0]==NULL)
-						{
-							printf("ERROR: Insuficient memory.\n");
-							exit(2);
-						}
-					    strcpy(RelName[0], argv[j]);
-					}
-				break;
+                    {
+                        NumRelFiles=1;
+                        RelName = (char **) calloc (1, sizeof (char *));
+                        if(RelName==NULL)
+                        {
+                            printf("ERROR: Insuficient memory.\n");
+                            exit(2);
+                        }
+                        RelName[0]=(char *)malloc(PATH_MAX);
+                        if(RelName[0]==NULL)
+                        {
+                            printf("ERROR: Insuficient memory.\n");
+                            exit(2);
+                        }
+                        strcpy(RelName[0], argv[j]);
+                    }
+                break;
 
-				default:
-					cont_par++;
-					NumRelFiles++;
-					RelName = (char **) realloc (RelName, NumRelFiles * sizeof (char *));
-					if(RelName==NULL)
-					{
-						printf("ERROR: Insuficient memory.\n");
-						exit(2);
-					}
-					RelName[NumRelFiles-1]=(char *)malloc(PATH_MAX);
-					if(RelName[NumRelFiles-1]==NULL)
-					{
-						printf("ERROR: Insuficient memory.\n");
-						exit(2);
-					}
-				    strcpy(RelName[NumRelFiles-1], argv[j]);
-				break;
-			}
-		}
-	}
+                default:
+                    cont_par++;
+                    NumRelFiles++;
+                    RelName = (char **) realloc (RelName, NumRelFiles * sizeof (char *));
+                    if(RelName==NULL)
+                    {
+                        printf("ERROR: Insuficient memory.\n");
+                        exit(2);
+                    }
+                    RelName[NumRelFiles-1]=(char *)malloc(PATH_MAX);
+                    if(RelName[NumRelFiles-1]==NULL)
+                    {
+                        printf("ERROR: Insuficient memory.\n");
+                        exit(2);
+                    }
+                    strcpy(RelName[NumRelFiles-1], argv[j]);
+                break;
+            }
+        }
+    }
 
-	if ( (cont_par<2) && (action<OPT_DUMP_SYM) )
-	{
-		printf("ERROR: Too few arguments.\n");
-		set_options("h"); /*Show help and exit*/
-	}
-	else if ( (cont_par!=1) && (action>=OPT_DUMP_SYM) )
-	{
-		printf("ERROR: Too %s arguments.\n", cont_par<1?"few":"many");
-		set_options("h"); /*Show help and exit*/
-	}
+    if ( (cont_par<2) && (action<OPT_DUMP_SYM) )
+    {
+        printf("ERROR: Too few arguments.\n");
+        set_options("h"); /*Show help and exit*/
+    }
+    else if ( (cont_par!=1) && (action>=OPT_DUMP_SYM) )
+    {
+        printf("ERROR: Too %s arguments.\n", cont_par<1?"few":"many");
+        set_options("h"); /*Show help and exit*/
+    }
 }
 
 void AddRel(char * RelName)
 {
     int inrel=0;
-	int state=0;
+    int state=0;
     long newlibpos, indexsize;
     char symname[MAXLINE+1];
     char c;
@@ -415,7 +421,7 @@ void AddRel(char * RelName)
 
 void ExtractRel(char * RelName)
 {
-	int state=0;
+    int state=0;
 
     strcpy(AdbName, RelName);
     ChangeExtension(AdbName, "adb");
@@ -491,7 +497,7 @@ void ExtractRel(char * RelName)
 
 void DumpSymbols(void)
 {
-	int state=0;
+    int state=0;
 
     lib=fopen(LibName, "r");
     if(lib==NULL)
@@ -574,7 +580,7 @@ void AddList(void)
     char *as;
     char CmdLine[1024];
     char SrcName[PATH_MAX];
-	char RelName[PATH_MAX];
+    char RelName[PATH_MAX];
 
     list=fopen(ListName, "r");
     if(list==NULL)
@@ -640,36 +646,36 @@ void AddList(void)
 
 int main(int argc, char **argv)
 {
-	int j;
-	ProcLineOptions (argc, argv);
+    int j;
+    ProcLineOptions (argc, argv);
 
-	switch(action)
-	{
-	    default:
-	        action=OPT_ADD_REL;
-		case OPT_ADD_REL:
-		case OPT_DEL_REL:
-			for(j=0; j<NumRelFiles; j++) AddRel(RelName[j]);
-			//Clean up
-			for(j=0; j<NumRelFiles; j++) free(RelName[j]);
-			free(RelName);
-		break;
-		
+    switch(action)
+    {
+        default:
+            action=OPT_ADD_REL;
+        case OPT_ADD_REL:
+        case OPT_DEL_REL:
+            for(j=0; j<NumRelFiles; j++) AddRel(RelName[j]);
+            //Clean up
+            for(j=0; j<NumRelFiles; j++) free(RelName[j]);
+            free(RelName);
+        break;
+        
         case OPT_ADD_LIST:
             AddList();
         break;
 
-		case OPT_EXT_REL:
+        case OPT_EXT_REL:
             for(j=0; j<NumRelFiles; j++) ExtractRel(RelName[j]);
-			//Clean up
-			for(j=0; j<NumRelFiles; j++) free(RelName[j]);
-			free(RelName);
+            //Clean up
+            for(j=0; j<NumRelFiles; j++) free(RelName[j]);
+            free(RelName);
         break;
         
-		case OPT_DUMP_SYM:
-		case OPT_DUMP_MOD:
-		    DumpSymbols();
-		break;
-	}
-	return 0; //Success!!!
+        case OPT_DUMP_SYM:
+        case OPT_DUMP_MOD:
+            DumpSymbols();
+        break;
+    }
+    return 0; //Success!!!
 }

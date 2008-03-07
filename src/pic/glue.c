@@ -1819,8 +1819,20 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
     }
 
     for (i=0; i < size; i++) {
-        char *text = op ? aopGet(AOP(op), i, 0, 0)
+        char *text;
+
+        /*
+         * FIXME: This is hacky and needs some more thought.
+         */
+        if (op && IS_SYMOP(op) && IS_FUNC(OP_SYM_TYPE(op))) {
+            /* This branch is introduced to fix #1427663. */
+            PCOI(AOP(op)->aopu.pcop)->offset+=i;
+            text = get_op(AOP(op)->aopu.pcop, NULL, 0);
+            PCOI(AOP(op)->aopu.pcop)->offset-=i;
+        } else {
+            text = op ? aopGet(AOP(op), i, 0, 0)
             : get_op(newpCodeOpImmd(str, i, 0, inCodeSpace, 0), NULL, 0);
+        } // if
         if (in_code) {
             dbuf_printf (oBuf, "\tretlw %s\n", text);
         } else {

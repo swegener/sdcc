@@ -647,6 +647,7 @@ void CollectInfoFromCDB(void)
 
 						case 'F': /*External ram*/ 
 						case 'A': /*External stack*/
+						case 'P': /*External Pdata*/
 							symbol[numsym].UsageType=0x41;
 						break;
 

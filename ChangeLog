@@ -1,3 +1,6 @@
+2008-03-08 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+	* src/SDCCdebug.c:, as/link/lkaomf51.c: Fixed bug 1909409: Pdata in OMF file
+
 2008-03-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (pushSide, genPcall): fixed bug 1908493

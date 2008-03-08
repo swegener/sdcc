@@ -37,6 +37,7 @@ void outputDebugSymbols(void)
     {
       dumpSymInfo("Code", code);
       dumpSymInfo("Data", data);
+      dumpSymInfo("PData", pdata);
       dumpSymInfo("XData", xdata);
       dumpSymInfo("XIData", xidata);
       dumpSymInfo("XInit", xinit);
@@ -68,6 +69,11 @@ void outputDebugSymbols(void)
 
     if (bit) {
       for (sym = setFirstItem (bit->syms); sym; sym = setNextItem (bit->syms))
+        debugFile->writeSymbol(sym);
+    }
+
+	if (pdata) {
+      for (sym = setFirstItem (pdata->syms); sym; sym = setNextItem (pdata->syms))
         debugFile->writeSymbol(sym);
     }
 

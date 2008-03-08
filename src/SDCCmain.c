@@ -2022,10 +2022,6 @@ preProcess (char **envp)
       if (options.float_rent)
         addSet(&preArgvSet, Safe_strdup("-DSDCC_FLOAT_REENT"));
 
-      /* set macro corresponding to compiler option */
-      if (options.parms_in_bank1)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
-
       /* add SDCC version number */
       {
         char buf[20];

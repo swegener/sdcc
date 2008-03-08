@@ -1,3 +1,9 @@
+2008-03-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (pushSide, genPcall): fixed bug 1908493
+	* src/SDCCmain.c (preProcess): removed -DSDCC_PARMS_IN_BANK1 because it is
+	  already set in ds390/main.c and mcs51/main.c
+
 2008-03-07 Raphael Neider <rneider AT web.de>
 
 	* src/regression/init0.c: new test for initialized arrays of function
@@ -13,7 +19,7 @@
 
 2008-03-05 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* support/librarian/sdcclib.c:Added feature request 1908061: 
+	* support/librarian/sdcclib.c:Added feature request 1908061:
 	  Synchronise sdcclib commands with ar.
 
 2008-03-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

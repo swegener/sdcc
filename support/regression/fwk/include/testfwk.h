@@ -27,6 +27,7 @@ void __printf(const char *szFormat, ...);
 # define near
 # define far
 # define at(x)
+# define reentrant
 #endif
 
 #if defined(SDCC_hc08)

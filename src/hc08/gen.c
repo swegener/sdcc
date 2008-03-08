@@ -1709,7 +1709,7 @@ aopOp (operand * op, iCode * ic, bool result)
 
 //  printf("checking pre-existing\n");
   /* if already has a asmop then continue */
-  if (op->aop )
+  if (op->aop)
     {
       op->aop->op = op;
       op->aop->isaddr = op->isaddr;
@@ -1750,7 +1750,7 @@ aopOp (operand * op, iCode * ic, bool result)
     }
 
   /* this is a temporary : this has
-     only four choices :
+     only five choices :
      a) register
      b) spillocation
      c) rematerialize
@@ -1763,7 +1763,7 @@ aopOp (operand * op, iCode * ic, bool result)
   /* if the type is a conditional */
   if (sym->regType == REG_CND)
     {
-      aop = op->aop = sym->aop = newAsmop (AOP_CRY);
+      sym->aop = op->aop = aop = newAsmop (AOP_CRY);
       aop->size = 0;
       aop->op = op;
       aop->isaddr = op->isaddr;
@@ -1781,8 +1781,7 @@ aopOp (operand * op, iCode * ic, bool result)
       /* rematerialize it NOW */
       if (sym->remat)
         {
-          sym->aop = op->aop = aop =
-            aopForRemat (sym);
+          sym->aop = op->aop = aop = aopForRemat (sym);
           aop->size = getSize (sym->type);
           aop->op = op;
           aop->isaddr = op->isaddr;
@@ -1797,7 +1796,7 @@ aopOp (operand * op, iCode * ic, bool result)
 //      printf("checking accuse\n");
       if (sym->accuse)
         {
-          aop = op->aop = sym->aop = newAsmop (AOP_REG);
+          sym->aop = op->aop = aop = newAsmop (AOP_REG);
           aop->size = getSize (sym->type);
           switch (sym->accuse)
             {
@@ -1821,7 +1820,7 @@ aopOp (operand * op, iCode * ic, bool result)
         {
           unsigned i;
 
-          aop = op->aop = sym->aop = newAsmop (AOP_STR);
+          sym->aop = op->aop = aop = newAsmop (AOP_STR);
           aop->size = getSize (sym->type);
           for (i = 0; i < fReturnSizeHC08; i++)
             aop->aopu.aop_str[i] = fReturn2[i];
@@ -2523,17 +2522,22 @@ unsaveRegisters (iCode * ic)
 
 
 /*-----------------------------------------------------------------*/
-/* pushSide -                */
+/* pushSide -                                                      */
 /*-----------------------------------------------------------------*/
 static void
-pushSide (operand * oper, int size)
+pushSide (operand * oper, int size, iCode * ic)
 {
   int offset = 0;
+
+  aopOp (oper, ic, FALSE);
+
   while (size--)
     {
       loadRegFromAop (hc08_reg_a, AOP (oper), offset++);
       pushReg ( hc08_reg_a, TRUE);
     }
+
+  freeAsmop (oper, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2752,7 +2756,7 @@ genPcall (iCode * ic)
 //  bool restoreBank=FALSE;
 //  bool swapBanks = FALSE;
 
-  D(emitcode(";     genPCall",""));
+  D (emitcode (";", "genPcall"));
 
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
@@ -2763,19 +2767,17 @@ genPcall (iCode * ic)
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic))->next;
 
-  /* now push the calling address */
+  /* push the return address on to the stack */
   emitBranch ("bsr", tlbl);
   emitBranch ("bra", rlbl);
   emitLabel (tlbl);
   _G.stackPushes += 2; /* account for the bsr return address now on stack */
   updateCFA();
 
-  /* Push the function's address */
-  aopOp (IC_LEFT (ic), ic, FALSE);
-  pushSide (IC_LEFT (ic), FPTRSIZE);
-  freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
+  /* now push the function address */
+  pushSide (IC_LEFT (ic), FPTRSIZE, ic);
 
-  /* if send set is not empty the assign */
+  /* if send set is not empty then assign */
   if (_G.sendSet)
     {
         genSend(reverseSet(_G.sendSet));

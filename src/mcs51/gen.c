@@ -1006,8 +1006,7 @@ aopOp (operand * op, iCode * ic, bool result)
               oldAsmOp = sym->usl.spillLoc->aop;
               sym->usl.spillLoc->aop = NULL;
             }
-          sym->aop = op->aop = aop =
-                     aopForSym (ic, sym->usl.spillLoc, result);
+          sym->aop = op->aop = aop = aopForSym (ic, sym->usl.spillLoc, result);
           if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
             {
               /* Don't reuse the new aop, go with the last one */
@@ -2442,7 +2441,7 @@ pushSide (operand * oper, int size, iCode * ic)
         }
       return;
     }
-    
+
   while (size--)
     {
       char *l = aopGet (oper, offset++, FALSE, TRUE);
@@ -3169,7 +3168,7 @@ genPcall (iCode * ic)
           emitcode ("mov", "a,#(%05d$ >> 8)", (rlbl->key + 100));
           emitcode ("push", "acc");
 
-          /* now push the calling address */
+          /* now push the function address */
           pushSide (IC_LEFT (ic), FPTRSIZE, ic);
 
           /* if send set is not empty then assign */

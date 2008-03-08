@@ -2455,12 +2455,32 @@ unsaveRegisters (iCode * ic)
 
 
 /*-----------------------------------------------------------------*/
-/* pushSide -                */
+/* pushSide -                                                      */
 /*-----------------------------------------------------------------*/
 static void
-pushSide (operand * oper, int size)
+pushSide (operand * oper, int size, iCode * ic)
 {
   int offset = 0;
+  int nPushed = _G.r0Pushed + _G.r1Pushed;
+
+  aopOp (oper, ic, FALSE);
+
+  if (nPushed != _G.r0Pushed + _G.r1Pushed)
+    {
+      while (offset < size)
+        {
+          char *l = aopGet (oper, offset, FALSE, TRUE, NULL);
+          emitcode ("mov", "%s,%s", fReturn[offset++], l);
+        }
+      freeAsmop (oper, NULL, ic, TRUE);
+      offset = 0;
+      while (offset < size)
+        {
+          emitcode ("push", "%s", fReturn[offset++]);
+        }
+      return;
+    }
+
   _startLazyDPSEvaluation ();
   while (size--)
     {
@@ -2478,6 +2498,7 @@ pushSide (operand * oper, int size)
         }
     }
   _endLazyDPSEvaluation ();
+  freeAsmop (oper, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3235,14 +3256,10 @@ genPcall (iCode * ic)
       emitcode ("push", "acc");
     }
 
-  /* now push the calling address */
-  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+  /* now push the function address */
+  pushSide (IC_LEFT (ic), FPTRSIZE, ic);
 
-  pushSide (IC_LEFT (ic), FPTRSIZE);
-
-  freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
-
-  /* if send set is not empty the assign */
+  /* if send set is not empty then assign */
   if (_G.sendSet)
     {
         genSend(reverseSet(_G.sendSet));

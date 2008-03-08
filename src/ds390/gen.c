@@ -2463,7 +2463,7 @@ pushSide (operand * oper, int size, iCode * ic)
   int offset = 0;
   int nPushed = _G.r0Pushed + _G.r1Pushed;
 
-  aopOp (oper, ic, FALSE);
+  aopOp (oper, ic, FALSE, FALSE);
 
   if (nPushed != _G.r0Pushed + _G.r1Pushed)
     {

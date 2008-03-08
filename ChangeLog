@@ -1,3 +1,10 @@
+2008-03-08 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCglue.c: fixed bug #1864582: multiple definition of char
+	  cons w. --model-large
+	* support/regression/staticinit.c: added regression test for bug
+	  #1864582
+
 2008-03-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (pushSide, genPcall),

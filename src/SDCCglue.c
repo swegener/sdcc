@@ -44,9 +44,8 @@ set *externs = NULL;            /* Variables that are declared as extern */
 unsigned maxInterrupts = 0;
 int allocInfo = 1;
 symbol *mainf;
-set *pipeSet = NULL;            /* set of pipes */
-set *tmpfileSet = NULL;         /* set of tmp file created by the compiler */
-set *tmpfileNameSet = NULL;     /* All are unlinked at close. */
+int noInit = 0;                 /* no initialization */
+
 
 /*-----------------------------------------------------------------*/
 /* closePipes - closes all pipes created by the compiler           */
@@ -184,10 +183,9 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
         dbuf_tprintf (&map->oBuf, "\t!area\n", map->sname);
     }
 
-  for (sym = setFirstItem (map->syms); sym;
-       sym = setNextItem (map->syms))
+  for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
     {
-      symbol *newSym=NULL;
+      symbol *newSym = NULL;
 
       /* if extern then add it into the extern list */
       if (IS_EXTERN (sym->etype))
@@ -207,9 +205,10 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
       /* for bitvar locals and parameters */
       if (!arFlag && !sym->allocreq && sym->level
-          && !SPEC_ABSA (sym->etype)) {
-        continue;
-      }
+          && !SPEC_ABSA (sym->etype))
+        {
+          continue;
+        }
 
       /* if global variable & not static or extern
          and addPublics allowed then add it to the public set */
@@ -217,7 +216,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
            (sym->_isparm && !IS_REGPARM (sym->etype))) &&
           addPublics &&
           !IS_STATIC (sym->etype) &&
-          (IS_FUNC(sym->type) ? (sym->used || IFFUNC_HASBODY(sym->type)) : 1))
+          (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : 1))
         {
           addSetHead (&publics, sym);
         }
@@ -247,95 +246,110 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
       /* if it has an initial value then do it only if
          it is a global variable */
-      if (sym->ival && sym->level == 0) {
-        if ((SPEC_OCLS(sym->etype)==xidata) && !SPEC_ABSA (sym->etype)) {
-          /* create a new "XINIT (CODE)" symbol, that will be emitted later
-             in the static seg */
-          newSym=copySymbol (sym);
-          SPEC_OCLS(newSym->etype)=xinit;
-          SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
-          SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
-          if (IS_SPEC (newSym->type))
-            SPEC_CONST (newSym->type) = 1;
-          else
-            DCL_PTR_CONST (newSym->type) = 1;
-          SPEC_STAT(newSym->etype)=1;
-          resolveIvalSym(newSym->ival, newSym->type);
-
-          // add it to the "XINIT (CODE)" segment
-          addSet(&xinit->syms, newSym);
-
-          if (!SPEC_ABSA (sym->etype))
+      if (sym->ival && sym->level == 0)
+        {
+          if ((SPEC_OCLS (sym->etype) == xidata) && !SPEC_ABSA (sym->etype))
             {
-              struct dbuf_s tmpBuf;
+              /* create a new "XINIT (CODE)" symbol, that will be emitted later
+                 in the static seg */
+              newSym=copySymbol (sym);
+              SPEC_OCLS(newSym->etype)=xinit;
+              SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
+              SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
+              if (IS_SPEC (newSym->type))
+                SPEC_CONST (newSym->type) = 1;
+              else
+                DCL_PTR_CONST (newSym->type) = 1;
+              SPEC_STAT(newSym->etype)=1;
+              resolveIvalSym(newSym->ival, newSym->type);
 
-              dbuf_init(&tmpBuf, 4096);
-              // before allocation we must parse the sym->ival tree
-              // but without actually generating initialization code
-              noAlloc++;
-              resolveIvalSym (sym->ival, sym->type);
-              printIval (sym, sym->type, sym->ival, &tmpBuf);
-              noAlloc--;
-              dbuf_destroy(&tmpBuf);
-            }
-        } else {
-          if (IS_AGGREGATE (sym->type)) {
-            ival = initAggregates (sym, sym->ival, NULL);
-          } else {
-            if (getNelements(sym->type, sym->ival)>1) {
-              werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar",
-                      sym->name);
-            }
-            ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
-                            decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE));
-          }
-          codeOutBuf = &statsg->oBuf;
+              // add it to the "XINIT (CODE)" segment
+              addSet(&xinit->syms, newSym);
 
-          if (ival) {
-            // set ival's lineno to where the symbol was defined
-            setAstFileLine (ival, filename = sym->fileDef, lineno = sym->lineDef);
-            // check if this is not a constant expression
-            if (!constExprTree(ival)) {
-              werror (E_CONST_EXPECTED, "found expression");
-              // but try to do it anyway
+              if (!SPEC_ABSA (sym->etype))
+                {
+                  struct dbuf_s tmpBuf;
+
+                  dbuf_init(&tmpBuf, 4096);
+                  // before allocation we must parse the sym->ival tree
+                  // but without actually generating initialization code
+                  ++noAlloc;
+                  resolveIvalSym (sym->ival, sym->type);
+                  ++noInit;
+                  printIval (sym, sym->type, sym->ival, &tmpBuf);
+                  --noInit;
+                  --noAlloc;
+                  dbuf_destroy(&tmpBuf);
+                }
             }
-            allocInfo = 0;
-            if (!astErrors(ival))
-              eBBlockFromiCode (iCodeFromAst (ival));
-            allocInfo = 1;
-          }
+          else
+            {
+              if (IS_AGGREGATE (sym->type))
+                {
+                  ival = initAggregates (sym, sym->ival, NULL);
+                }
+              else
+                {
+                  if (getNelements (sym->type, sym->ival)>1)
+                    {
+                      werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", sym->name);
+                    }
+                  ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
+                                  decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE));
+                }
+              codeOutBuf = &statsg->oBuf;
+
+              if (ival)
+                {
+                  // set ival's lineno to where the symbol was defined
+                  setAstFileLine (ival, filename = sym->fileDef, lineno = sym->lineDef);
+                  // check if this is not a constant expression
+                  if (!constExprTree (ival))
+                    {
+                      werror (E_CONST_EXPECTED, "found expression");
+                    // but try to do it anyway
+                    }
+                  allocInfo = 0;
+                  if (!astErrors (ival))
+                    eBBlockFromiCode (iCodeFromAst (ival));
+                  allocInfo = 1;
+                }
+            }
         }
-      }
 
       /* if it has an absolute address then generate
          an equate for this no need to allocate space */
       if (SPEC_ABSA (sym->etype) && !sym->ival)
         {
-          char *equ="=";
+          char *equ = "=";
           if (options.debug) {
             dbuf_printf (&map->oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
           }
-          if (TARGET_IS_XA51) {
-            if (map==sfr) {
-              equ="sfr";
-            } else if (map==bit || map==sfrbit) {
-              equ="bit";
+          if (TARGET_IS_XA51)
+            {
+              if (map == sfr)
+                {
+                  equ = "sfr";
+                }
+              else if (map == bit || map == sfrbit)
+                {
+                  equ="bit";
+                }
             }
-          }
-          dbuf_printf (&map->oBuf, "%s\t%s\t0x%04x\n",
-                   sym->rname, equ,
-                   SPEC_ADDR (sym->etype));
+          dbuf_printf (&map->oBuf, "%s\t%s\t0x%04x\n", sym->rname, equ, SPEC_ADDR (sym->etype));
         }
       else
         {
           int size = getSize (sym->type) + sym->flexArrayLength;
-          if (size==0) {
-            werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
-          }
+          if (size == 0)
+            {
+              werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
+            }
           /* allocate space */
-          if (options.debug) {
-            dbuf_printf (&map->oBuf, "==.\n");
-          }
+          if (options.debug)
+            {
+              dbuf_printf (&map->oBuf, "==.\n");
+            }
           if (SPEC_ABSA (sym->etype))
             {
               dbuf_tprintf (&map->oBuf, "\t!org\n", SPEC_ADDR (sym->etype));
@@ -1035,7 +1049,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s * oB
         }
     }
 
-  if (val->sym && val->sym->isstrlit && !isinSet(statsg->syms, val->sym)) {
+  if (!noInit && val->sym && val->sym->isstrlit && !isinSet(statsg->syms, val->sym)) {
     addSet (&statsg->syms, val->sym);
   }
 

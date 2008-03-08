@@ -6,6 +6,13 @@
 
 #include <testfwk.h>
 
+/*--------------------------------------------------
+   regression test for #1864582:
+   multiple definition of char cons w. --model-large
+   compile-time test only */
+char *c = (char *) "Booting";
+/*------------------------------------------------*/
+
 static {type} smallDense[] = {
     1, 2, 3, 4, 5, 6
 };

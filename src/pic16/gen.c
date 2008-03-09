@@ -1996,6 +1996,23 @@ void pic16_mov2w (asmop *aop, int offset)
     pic16_emitpcode(POC_MOVFW,pic16_popGet(aop,offset));
 }
 
+void pic16_mov2w_volatile (asmop *aop)
+{
+  int i;
+
+  if(!pic16_isLitAop(aop)) {
+    // may need to protect this from the peepholer -- this is not nice but works...
+    pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(";", "VOLATILE READ - BEGIN"));
+    for (i = 0; i < aop->size; i++) {
+      if (i > 0) {
+        pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(";", "VOLATILE READ - MORE"));
+      } // if
+      pic16_emitpcode(POC_MOVFW, pic16_popGet(aop, i));
+    } // for
+    pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(";", "VOLATILE READ - END"));
+  }
+}
+
 void pic16_mov2f(asmop *dst, asmop *src, int offset)
 {
   if(pic16_isLitAop(src)) {
@@ -5725,15 +5742,6 @@ static void genOr (iCode *ic, iCode *ifx)
               pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(right),0));
               pic16_emitpcode(POC_BSF,   pic16_popGet(AOP(result),0));
 
-              pic16_emitcode("bcf","(%s >> 3), (%s & 7)",
-                       AOP(result)->aopu.aop_dir,
-                       AOP(result)->aopu.aop_dir);
-              pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                       AOP(right)->aopu.aop_dir,
-                       AOP(right)->aopu.aop_dir);
-              pic16_emitcode("bsf","(%s >> 3), (%s & 7)",
-                       AOP(result)->aopu.aop_dir,
-                       AOP(result)->aopu.aop_dir);
             } else {
               if( AOP_TYPE(result) == AOP_ACC) {
                 pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
@@ -5748,18 +5756,6 @@ static void genOr (iCode *ic, iCode *ifx)
                 pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(left),0));
                 pic16_emitpcode(POC_BSF,   pic16_popGet(AOP(result),0));
 
-                pic16_emitcode("bcf","(%s >> 3), (%s & 7)",
-                               AOP(result)->aopu.aop_dir,
-                               AOP(result)->aopu.aop_dir);
-                pic16_emitcode("btfss","(%s >> 3), (%s & 7)",
-                               AOP(right)->aopu.aop_dir,
-                               AOP(right)->aopu.aop_dir);
-                pic16_emitcode("btfsc","(%s >> 3), (%s & 7)",
-                               AOP(left)->aopu.aop_dir,
-                               AOP(left)->aopu.aop_dir);
-                pic16_emitcode("bsf","(%s >> 3), (%s & 7)",
-                               AOP(result)->aopu.aop_dir,
-                               AOP(result)->aopu.aop_dir);
               }
             }
           } else {
@@ -5809,6 +5805,9 @@ static void genOr (iCode *ic, iCode *ifx)
      (AOP_TYPE (result) == AOP_CRY) &&
      (AOP_TYPE (left) != AOP_CRY))
     {
+      if (IS_OP_VOLATILE(left)) {
+          pic16_mov2w_volatile(AOP(left));
+      } // if
       if (lit)
         {
           if (rIfx.condition)
@@ -5826,10 +5825,10 @@ static void genOr (iCode *ic, iCode *ifx)
     int know_W = -1;
     for(;size--; offset++,lit>>=8) {
       if(AOP_TYPE(right) == AOP_LIT){
-        if((lit & 0xff) == 0)
+        if(((lit & 0xff) == 0) && !IS_OP_VOLATILE(left)) {
           /*  or'ing with 0 has no effect */
           continue;
-        else {
+        } else {
           int p = pic16_my_powof2(lit & 0xff);
           if(p>=0) {
             /* only one bit is set in the literal, so use a bsf instruction */
@@ -5846,14 +5845,9 @@ static void genOr (iCode *ic, iCode *ifx)
       } else {
         if (AOP_TYPE(left) == AOP_ACC) {
           pic16_emitpcode(POC_IORFW,  pic16_popGet(AOP(right),offset));
-//          pic16_emitcode("iorwf","%s,w",pic16_aopGet(AOP(right),offset,FALSE,FALSE));
         } else {
           pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(right),offset));
           pic16_emitpcode(POC_IORWF,  pic16_popGet(AOP(left),offset));
-
-//          pic16_emitcode("movf","%s,w",pic16_aopGet(AOP(right),offset,FALSE,FALSE));
-//          pic16_emitcode("iorwf","%s,f",pic16_aopGet(AOP(left),offset,FALSE,FALSE));
-
         }
       }
     }
@@ -5892,23 +5886,11 @@ static void genOr (iCode *ic, iCode *ifx)
           case 0x00:
             pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),offset));
             pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),offset));
-
-//            pic16_emitcode("movf","%s,w",
-//                     pic16_aopGet(AOP(left),offset,FALSE,FALSE));
-//            pic16_emitcode("movwf","%s",
-//                     pic16_aopGet(AOP(result),offset,FALSE,FALSE));
             break;
           default:
             pic16_emitpcode(POC_MOVLW,  pic16_popGetLit(t));
             pic16_emitpcode(POC_IORFW,  pic16_popGet(AOP(left),offset));
             pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),offset));
-
-//            pic16_emitcode("movlw","0x%x",t);
-//            pic16_emitcode("iorwf","%s,w",
-//                     pic16_aopGet(AOP(left),offset,FALSE,FALSE));
-//            pic16_emitcode("movwf","%s",
-//                     pic16_aopGet(AOP(result),offset,FALSE,FALSE));
-
           }
           continue;
         }
@@ -5917,17 +5899,11 @@ static void genOr (iCode *ic, iCode *ifx)
         // and better if result is SFR
         if (AOP_TYPE(left) == AOP_ACC) {
           pic16_emitpcode(POC_IORWF,  pic16_popGet(AOP(right),offset));
-//          pic16_emitcode("iorwf","%s,w",pic16_aopGet(AOP(right),offset,FALSE,FALSE));
         } else {
           pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(right),offset));
           pic16_emitpcode(POC_IORFW,  pic16_popGet(AOP(left),offset));
-
-//          pic16_emitcode("movf","%s,w",pic16_aopGet(AOP(right),offset,FALSE,FALSE));
-//          pic16_emitcode("iorwf","%s,w",
-//                   pic16_aopGet(AOP(left),offset,FALSE,FALSE));
         }
         pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),offset));
-//        pic16_emitcode("movwf","%s",pic16_aopGet(AOP(result),offset,FALSE,FALSE));
       }
   }
 
@@ -6002,7 +5978,6 @@ static void genXor (iCode *ic, iCode *ifx)
                   if (size)
                     {
                       pic16_emitpcode(POC_BSF, pic16_popGet(AOP(result), offset));
-                      pic16_emitcode("setb", "%s", AOP(result)->aopu.aop_dir);
                     }
                   else if (ifx)
                     continueIfTrue(ifx);
@@ -6114,6 +6089,7 @@ static void genXor (iCode *ic, iCode *ifx)
             {
               if (rIfx.condition)
                 {
+                  /* rIfx.lbl might be far away... */
                   emitSKPZ;
                   pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
                 }
@@ -6233,31 +6209,17 @@ static void genXor (iCode *ic, iCode *ifx)
                   case 0x00:
                     pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), offset));
                     pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset));
-                    pic16_emitcode("movf", "%s,w",
-                                   pic16_aopGet(AOP(left), offset, FALSE, FALSE));
-                    pic16_emitcode("movwf", "%s",
-                                   pic16_aopGet(AOP(result), offset, FALSE, FALSE));
                     break;
 
                   case 0xff:
                     pic16_emitpcode(POC_COMFW, pic16_popGet(AOP(left), offset));
                     pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset));
-                    pic16_emitcode("comf", "%s,w",
-                                   pic16_aopGet(AOP(left), offset, FALSE, FALSE));
-                    pic16_emitcode("movwf", "%s",
-                                   pic16_aopGet(AOP(result), offset, FALSE, FALSE));
                     break;
 
                   default:
                     pic16_emitpcode(POC_MOVLW, pic16_popGetLit(t));
                     pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(left), offset));
                     pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset));
-                    pic16_emitcode("movlw", "0x%x", t);
-                    pic16_emitcode("xorwf", "%s,w",
-                                   pic16_aopGet(AOP(left), offset, FALSE, FALSE));
-                    pic16_emitcode("movwf", "%s",
-                                   pic16_aopGet(AOP(result), offset, FALSE, FALSE));
-
                   }
                 continue;
               }
@@ -6267,19 +6229,15 @@ static void genXor (iCode *ic, iCode *ifx)
             if (AOP_TYPE(left) == AOP_ACC)
               {
                 pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(right), offset));
-                pic16_emitcode("xorwf", "%s,w", pic16_aopGet(AOP(right), offset, FALSE, FALSE));
               }
             else
               {
                 pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right), offset));
                 pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(left), offset));
-                pic16_emitcode("movf", "%s,w", pic16_aopGet(AOP(right), offset, FALSE, FALSE));
-                pic16_emitcode("xorwf", "%s,w", pic16_aopGet(AOP(left), offset, FALSE, FALSE));
               }
             if ( AOP_TYPE(result) != AOP_ACC)
               {
                 pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset));
-                pic16_emitcode("movwf", "%s", pic16_aopGet(AOP(result), offset, FALSE, FALSE));
               }
           }
       }
@@ -10076,7 +10034,6 @@ static void
 genDummyRead (iCode * ic)
 {
   operand *op;
-  int i;
 
   op = IC_RIGHT(ic);
   if (op && IS_SYMOP(op)) {
@@ -10085,12 +10042,7 @@ genDummyRead (iCode * ic)
       return;
     }
     pic16_aopOp (op, ic, FALSE);
-    for (i=0; i < AOP_SIZE(op); i++) {
-      // may need to protect this from the peepholer -- this is not nice but works...
-      pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir(";", "VOLATILE READ - BEGIN"));
-      pic16_mov2w (AOP(op),i);
-      pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir(";", "VOLATILE READ - END"));
-    } // for i
+    pic16_mov2w_volatile(AOP(op));
     pic16_freeAsmop (op, NULL, ic, TRUE);
   } else if (op) {
     fprintf (stderr, "%s: not implemented for non-symbols (volatile operand might not be read)\n", __FUNCTION__);

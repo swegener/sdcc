@@ -1,3 +1,11 @@
+2008-03-09 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_mov2w_volatile): NEW, read volatile operands,
+	  (genOr): read volatile operand even if the result is known,
+	  closes #1511838
+	  (genOr,genXor): removed unused legacy code,
+	  (genDummyRead): use pic16_mov2w_volatile()
+
 2008-03-08 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCglue.c: fixed bug #1864582: multiple definition of char

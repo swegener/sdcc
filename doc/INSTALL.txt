@@ -10,7 +10,7 @@ To install:
     cd ~
     mkdir tmp
     cd tmp
-    tar xzf path/to/binary/kit/sdcc-2.7.0-i386-unknown-linux2.5.tar.gz
+    tar xzf path/to/binary/kit/sdcc-2.8.0-i386-unknown-linux2.5.tar.gz
 
 * Change to the sdcc directory and copy all files to /usr/local
     cd sdcc
@@ -37,7 +37,7 @@ To install:
 
 * If you would like to keep a copy of your previous version,
   rename the directory where it's installed first
-* Run sdcc-2.7.0-setup.exe
+* Run sdcc-2.8.0-setup.exe
 
 By default this will install sdcc binaries into: C:\Program Files\SDCC\bin\
 header files into:                               C:\Program Files\SDCC\include\
@@ -63,7 +63,7 @@ To install:
     cd ~
     mkdir tmp
     cd tmp
-    tar xzf path/to/binary/kit/sdcc-2.7.0-ppc-apple-macosx.tar.gz
+    tar xzf path/to/binary/kit/sdcc-2.8.0-universal-apple-macosx.tar.gz
 
 * Change to the sdcc directory and copy all files to /Developer/sdcc
     cp -r sdcc /Developer/sdcc

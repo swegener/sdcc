@@ -104,7 +104,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.7.5
+SDCC 2.8.0
 \size footnotesize
 
 \newline
@@ -941,23 +941,51 @@ n", a, (char)a);
 \family default
 
 \newline
- will push a as an int and as a char resp.
-\newline
+ will push a as an int and as a char resp if
+\series bold
+ -
+\begin_inset ERT
+status collapsed
 
-\newline
+\begin_layout Standard
 
-\family typewriter
-\InsetSpace ~
-\InsetSpace ~
-char a=3;
-\newline
-\InsetSpace ~
-\InsetSpace ~
-printf ("%d %c
+
 \backslash
-n", a, (char)a);
-\family default
+/
+\end_layout
 
+\end_inset
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset
+
+ 
+\series default
+and
+\series bold
+ -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset
+
+
+\series default
+ command line options are not defined,
 \newline
  will push a as two ints if
 \series bold
@@ -23110,7 +23138,7 @@ SDCC_REVISION
 
 \begin_layout Standard
 Always defined.
- SDCC revision number
+ SDCC svn revision number
 \end_layout
 
 \end_inset
@@ -36862,7 +36890,11 @@ status collapsed
 
 \end_inset
 
- or -
+ 
+\series default
+or
+\series bold
+ -
 \begin_inset ERT
 status collapsed
 
@@ -36920,7 +36952,11 @@ status collapsed
 
 \end_inset
 
- or -
+ 
+\series default
+or
+\series bold
+ -
 \begin_inset ERT
 status collapsed
 
@@ -40663,7 +40699,7 @@ Acknowledgments
 \end_layout
 
 \begin_layout Standard
-\begin_inset LatexCommand \url{http://sdcc.sourceforge.net#Who}
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/#Who}
 
 \end_inset
 

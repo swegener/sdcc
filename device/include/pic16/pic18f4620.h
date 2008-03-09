@@ -3,16 +3,20 @@
  * 
  * This file is part of the GNU PIC Library.
  * 
+ * September, 2006
+ * Added modifications by
+ *     Gary Plumbridge <gary AT phodex.net>
+ *
+ * August, 2006
+ * Copied from 18f2550 and modified for 18f2620 by
+ *     Anton Strobl <a.strobl AT aws-it.at>
+ *
  * May, 2005
  * The GNU PIC Library is maintained by
  *     Raphael Neider <rneider AT web.de>
  * 
  * originally designed by
- *     Vangelis Rokas <vrokas@otenet.gr>
- * 
- * September, 2006
- *  Added based on existing PICs
- *      Gary Plumbridge <gary@phodex.net>
+ *     Vangelis Rokas <vrokas AT otenet.gr>
  * 
  * $Id$
  * 
@@ -38,10 +42,10 @@ typedef union {
 	};
 	/* aliases */
 	struct {
-		unsigned         	:1;
-		unsigned        	:1;
-		unsigned        	:1;
-		unsigned        	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
 		unsigned C1OUT     	:1;
 		unsigned C2OUT     	:1;
 		unsigned OSC2      	:1;
@@ -54,29 +58,39 @@ typedef union {
 		unsigned AN3       	:1;
 		unsigned T0CKI     	:1;
 		unsigned AN4       	:1;
+		unsigned CLKO      	:1;
+		unsigned CLKI      	:1;
+	};
+	struct {
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned VREF_N    	:1;
+		unsigned VREF_P    	:1;
+		unsigned           	:1;
+		unsigned NOT_SS    	:1;
 		unsigned           	:1;
 		unsigned           	:1;
 	};
-    struct {
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned SS         :1;
-        unsigned            :1;
-        unsigned            :1;
-    };
-    struct {
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned HLVDIN     :1;
-        unsigned            :1;
-        unsigned            :1;
-    };
+	struct {
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned SS        	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+	};
+	struct {
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned HLVDIN    	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+	};
 } __PORTA_t;
 extern volatile __PORTA_t __at (0xF80) PORTAbits;
 
@@ -99,23 +113,27 @@ typedef union {
 	struct {
 		unsigned INT0      	:1;
 		unsigned INT1      	:1;
-		unsigned INT2    	:1;
-		unsigned CCP2     	:1;
-		unsigned KBI0     	:1;
+		unsigned INT2      	:1;
+		unsigned CCP2      	:1;
+		unsigned KBI0      	:1;
 		unsigned KBI1      	:1;
 		unsigned KBI2      	:1;
 		unsigned KBI3      	:1;
 	};
     struct {
-        unsigned AN12       :1;
-        unsigned AN10       :1;
-        unsigned AN8        :1;
-        unsigned AN9        :1;
-        unsigned AN11       :1;
-        unsigned PGM        :1;
-        unsigned PGC        :1;
-        unsigned PGD        :1;
+		unsigned AN12      	:1;
+		unsigned AN10      	:1;
+		unsigned AN8       	:1;
+		unsigned AN9       	:1;
+		unsigned AN11      	:1;
+		unsigned PGM       	:1;
+		unsigned PGC       	:1;
+		unsigned PGD       	:1;
     };
+	struct {
+		unsigned FLT0      	:1;
+		unsigned           	:7;
+	};
 } __PORTB_t;
 extern volatile __PORTB_t __at (0xF81) PORTBbits;
 
@@ -137,26 +155,36 @@ typedef union {
 	/* aliases */
 	struct {
 		unsigned T1OSO     	:1;
-		unsigned T1OSI    	:1;
-		unsigned CCP1     	:1;
-		unsigned SCK      	:1;
+		unsigned T1OSI     	:1;
+		unsigned CCP1      	:1;
+		unsigned SCK       	:1;
 		unsigned SDI       	:1;
 		unsigned SDO       	:1;
-		unsigned TX      	:1;
-		unsigned RX      	:1;
+		unsigned TX        	:1;
+		unsigned RX        	:1;
 	};
 	struct {
 		unsigned T3CKI     	:1;
 		unsigned CCP2      	:1;
-		unsigned SCL      	:1;
-		unsigned SDA      	:1;
+		unsigned P1A       	:1;
+		unsigned SCL       	:1;
+		unsigned SDA       	:1;
+		unsigned           	:1;
 		unsigned CK        	:1;
 		unsigned DTC       	:1;   /* DT might be a reserved word in ASM */
+	};
+	struct {
+		unsigned T1CKI     	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
 		unsigned           	:1;
 		unsigned           	:1;
 	};
 	struct {
-		unsigned T1CKI    	:1;
+		unsigned T13CKI    	:1;
 		unsigned           	:1;
 		unsigned           	:1;
 		unsigned           	:1;
@@ -170,79 +198,79 @@ extern volatile __PORTC_t __at (0xF82) PORTCbits;
 
 extern __sfr __at (0xF83) PORTD;
 typedef union {
-    struct {
-        unsigned RD0        : 1;
-        unsigned RD1        : 1;
-        unsigned RD2        : 1;
-        unsigned RD3        : 1;
-        unsigned RD4        : 1;
-        unsigned RD5        : 1;
-        unsigned RD6        : 1;
-        unsigned RD7        : 1;
-    };
-    struct {
-        unsigned RD         : 8;
-    };
-    /* aliases */
-    struct {
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned ECCPB      :1;
-        unsigned ECCPC      :1;
-        unsigned ECCPD      :1;
-    };
-    struct {
-        unsigned PSP0       :1;
-        unsigned PSP1       :1;
-        unsigned PSP2       :1;
-        unsigned PSP3       :1;
-        unsigned PSP4       :1;
-        unsigned PSP5       :1;
-        unsigned PSP6       :1;
-        unsigned PSP7       :1;
-    };
+	struct {
+		unsigned RD0       	: 1;
+		unsigned RD1       	: 1;
+		unsigned RD2       	: 1;
+		unsigned RD3       	: 1;
+		unsigned RD4       	: 1;
+		unsigned RD5       	: 1;
+		unsigned RD6       	: 1;
+		unsigned RD7       	: 1;
+	};
+	struct {
+		unsigned RD        	: 8;
+	};
+	/* aliases */
+	struct {
+		unsigned PSP0      	:1;
+		unsigned PSP1      	:1;
+		unsigned PSP2      	:1;
+		unsigned PSP3      	:1;
+		unsigned PSP4      	:1;
+		unsigned PSP5      	:1;
+		unsigned PSP6      	:1;
+		unsigned PSP7      	:1;
+	};
+	struct {
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned P1B       	:1;
+		unsigned P1C       	:1;
+		unsigned P1D       	:1;
+	};
 } __PORTD_t;
 extern volatile __PORTD_t __at (0xF83) PORTDbits;
 
 extern __sfr __at (0xF84) PORTE;
 typedef union {
-    struct {
-        unsigned RE0        : 1;
-        unsigned RE1        : 1;
-        unsigned RE2        : 1;
-        unsigned RE3        : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-    };
-    struct {
-        unsigned RE         : 8;
-    };
-    /* aliases */
-    struct {
-        unsigned RD         :1;
-        unsigned WR         :1;
-        unsigned CS         :1;
-        unsigned MCLR       :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-    };
-    struct {
-        unsigned AN5        :1;
-        unsigned AN6        :1;
-        unsigned AN7        :1;
-        unsigned VPP        :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-        unsigned            :1;
-    };
+	struct {
+		unsigned RE0       	: 1;
+		unsigned RE1       	: 1;
+		unsigned RE2       	: 1;
+		unsigned RE3       	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+	};
+	struct {
+		unsigned RE        	: 8;
+	};
+	/* aliases */
+	struct {
+		unsigned AN5       	:1;
+		unsigned AN6       	:1;
+		unsigned AN7       	:1;
+		unsigned VPP       	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+	};
+	struct {
+		unsigned RD        	:1;
+		unsigned WR        	:1;
+		unsigned CS        	:1;
+		unsigned MCLR      	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+	};
 } __PORTE_t;
 extern volatile __PORTE_t __at (0xF84) PORTEbits;
 
@@ -256,7 +284,7 @@ typedef union {
 		unsigned LATA4     	: 1;
 		unsigned LATA5     	: 1;
 		unsigned LATA6     	: 1;
-		unsigned LATA7  	: 1;
+		unsigned LATA7     	: 1;
 	};
 } __LATA_t;
 extern volatile __LATA_t __at (0xF89) LATAbits;
@@ -282,9 +310,9 @@ typedef union {
 		unsigned LATC0     	: 1;
 		unsigned LATC1     	: 1;
 		unsigned LATC2     	: 1;
-		unsigned LATC3      : 1;
-		unsigned LATC4      : 1;
-		unsigned LATC5      : 1;
+		unsigned LATC3     	: 1;
+		unsigned LATC4     	: 1;
+		unsigned LATC5     	: 1;
 		unsigned LATC6     	: 1;
 		unsigned LATC7     	: 1;
 	};
@@ -293,31 +321,31 @@ extern volatile __LATC_t __at (0xF8B) LATCbits;
 
 extern __sfr __at (0xF8C) LATD;
 typedef union {
-    struct {
-        unsigned LATD0      : 1;
-        unsigned LATD1      : 1;
-        unsigned LATD2      : 1;
-        unsigned LATD3      : 1;
-        unsigned LATD4      : 1;
-        unsigned LATD5      : 1;
-        unsigned LATD6      : 1;
-        unsigned LATD7      : 1;
-    };
+	struct {
+		unsigned LATD0     	: 1;
+		unsigned LATD1     	: 1;
+		unsigned LATD2     	: 1;
+		unsigned LATD3     	: 1;
+		unsigned LATD4     	: 1;
+		unsigned LATD5     	: 1;
+		unsigned LATD6     	: 1;
+		unsigned LATD7     	: 1;
+	};
 } __LATD_t;
 extern volatile __LATD_t __at (0xF8C) LATDbits;
 
 extern __sfr __at (0xF8D) LATE;
 typedef union {
-    struct {
-        unsigned LATE0      : 1;
-        unsigned LATE1      : 1;
-        unsigned LATE2      : 1;
-        unsigned LATE3      : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-    };
+	struct {
+		unsigned LATE0     	: 1;
+		unsigned LATE1     	: 1;
+		unsigned LATE2     	: 1;
+		unsigned LATE3     	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+	};
 } __LATE_t;
 extern volatile __LATE_t __at (0xF8D) LATEbits;
 
@@ -357,7 +385,7 @@ typedef union {
 		unsigned TRISC0    	: 1;
 		unsigned TRISC1    	: 1;
 		unsigned TRISC2    	: 1;
-		unsigned TRISC3 	: 1;
+		unsigned TRISC3    	: 1;
 		unsigned TRISC4    	: 1;
 		unsigned TRISC5    	: 1;
 		unsigned TRISC6    	: 1;
@@ -368,41 +396,41 @@ extern volatile __TRISC_t __at (0xF94) TRISCbits;
 
 extern __sfr __at (0xF95) TRISD;
 typedef union {
-    struct {
-        unsigned TRISD0     : 1;
-        unsigned TRISD1     : 1;
-        unsigned TRISD2     : 1;
-        unsigned TRISD3     : 1;
-        unsigned TRISD4     : 1;
-        unsigned TRISD5     : 1;
-        unsigned TRISD6     : 1;
-        unsigned TRISD7     : 1;
-    };
+	struct {
+		unsigned TRISD0    	: 1;
+		unsigned TRISD1    	: 1;
+		unsigned TRISD2    	: 1;
+		unsigned TRISD3    	: 1;
+		unsigned TRISD4    	: 1;
+		unsigned TRISD5    	: 1;
+		unsigned TRISD6    	: 1;
+		unsigned TRISD7    	: 1;
+	};
 } __TRISD_t;
 extern volatile __TRISD_t __at (0xF95) TRISDbits;
 
 extern __sfr __at (0xF96) TRISE;
 typedef union {
-    struct {
-        unsigned TRISE0     : 1;
-        unsigned TRISE1     : 1;
-        unsigned TRISE2     : 1;
-        unsigned TRISE3     : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-        unsigned            : 1;
-    };
+	struct {
+		unsigned TRISE0    	: 1;
+		unsigned TRISE1    	: 1;
+		unsigned TRISE2    	: 1;
+		unsigned TRISE3    	: 1;
+		unsigned PSPMODE   	: 1;
+		unsigned IBOV      	: 1;
+		unsigned OBF       	: 1;
+		unsigned IBF       	: 1;
+	};
 } __TRISE_t;
 extern volatile __TRISE_t __at (0xF96) TRISEbits;
 
 extern __sfr __at (0xF9B) OSCTUNE;
 typedef union {
 	struct {
-		unsigned TUN     	: 5;
+		unsigned TUN       	: 5;
 		unsigned           	: 1;
-		unsigned PLLEN  	: 1;
-        unsigned INTSRC     : 1;
+		unsigned PLLEN     	: 1;
+		unsigned INTSRC    	: 1;
 	};
 } __OSCTUNE_t;
 extern volatile __OSCTUNE_t __at (0xF9B) OSCTUNEbits;
@@ -417,7 +445,7 @@ typedef union {
 		unsigned TXIE      	: 1;
 		unsigned RCIE      	: 1;
 		unsigned ADIE      	: 1;
-		unsigned PSPIE    	: 1;
+		unsigned PSPIE     	: 1;
 	};
 } __PIE1_t;
 extern volatile __PIE1_t __at (0xF9D) PIE1bits;
@@ -518,6 +546,8 @@ extern __sfr __at (0xFA8) EEDATA;
 
 extern __sfr __at (0xFA9) EEADR;
 
+extern __sfr __at (0xFAA) EEADRH;
+
 extern __sfr __at (0xFAB) RCSTA;
 typedef union {
 	struct {
@@ -608,7 +638,7 @@ extern volatile __CVRCON_t __at (0xFB5) CVRCONbits;
 extern __sfr __at (0xFB6) ECCP1AS;
 typedef union {
 	struct {
-		unsigned PSSBD0   	: 1;
+		unsigned PSSBD0    	: 1;
 		unsigned PSSBD1    	: 1;
 		unsigned PSSAC0    	: 1;
 		unsigned PSSAC1    	: 1;
@@ -623,13 +653,7 @@ extern volatile __ECCP1AS_t __at (0xFB6) ECCP1ASbits;
 extern __sfr __at (0xFB7) PWM1CON;
 typedef union {
 	struct {
-		unsigned PDC0     	: 1;
-		unsigned PDC1     	: 1;
-		unsigned PDC2     	: 1;
-		unsigned PDC3     	: 1;
-		unsigned PDC4   	: 1;
-		unsigned PDC5     	: 1;
-		unsigned PDC6   	: 1;
+		unsigned PDC       	: 7;
 		unsigned PRSEN     	: 1;
 	};
 } __PWM1CON_t;
@@ -642,9 +666,9 @@ typedef union {
 		unsigned WUE       	: 1;
 		unsigned           	: 1;
 		unsigned BRG16     	: 1;
-		unsigned SCKP      	: 1;
-		unsigned           	: 1;
-		unsigned RCMT      	: 1;
+		unsigned TXCKP     	: 1;
+		unsigned RXDTP     	: 1;
+		unsigned RCIDL     	: 1;
 		unsigned ABDOVF    	: 1;
 	};
 } __BAUDCON_t;
@@ -678,8 +702,8 @@ typedef union {
 		unsigned CCP1M3    	: 1;
 		unsigned DC1B0     	: 1;
 		unsigned DC1B1     	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
+		unsigned P1M0      	: 1;
+		unsigned P1M1      	: 1;
 	};
 } __CCP1CON_t;
 extern volatile __CCP1CON_t __at (0xFBD) CCP1CONbits;
@@ -722,7 +746,7 @@ extern __sfr __at (0xFC2) ADCON0;
 typedef union {
 	struct {
 		unsigned ADON      	: 1;
-		unsigned GO  		: 1;
+		unsigned GO        	: 1;
 		unsigned CHS0      	: 1;
 		unsigned CHS1      	: 1;
 		unsigned CHS2      	: 1;
@@ -755,10 +779,10 @@ extern volatile __SSPCON2_t __at (0xFC5) SSPCON2bits;
 extern __sfr __at (0xFC6) SSPCON1;
 typedef union {
 	struct {
-		unsigned SSPM0      	: 1;
-		unsigned SSPM1      	: 1;
-		unsigned SSPM2      	: 1;
-		unsigned SSPM3      	: 1;
+		unsigned SSPM0     	: 1;
+		unsigned SSPM1     	: 1;
+		unsigned SSPM2     	: 1;
+		unsigned SSPM3     	: 1;
 		unsigned CKP       	: 1;
 		unsigned SSPEN     	: 1;
 		unsigned SSPOV     	: 1;
@@ -772,10 +796,10 @@ typedef union {
 	struct {
 		unsigned BF        	: 1;
 		unsigned UA        	: 1;
-		unsigned R_W      	: 1;
+		unsigned R_W       	: 1;
 		unsigned S         	: 1;
 		unsigned P         	: 1;
-		unsigned D_A      	: 1;
+		unsigned D_A       	: 1;
 		unsigned CKE       	: 1;
 		unsigned SMP       	: 1;
 	};
@@ -827,11 +851,11 @@ extern __sfr __at (0xFCF) TMR1H;
 extern __sfr __at (0xFD0) RCON;
 typedef union {
 	struct {
-		unsigned BOR      	: 1;
-		unsigned POR      	: 1;
-		unsigned PD       	: 1;
-		unsigned TO       	: 1;
-		unsigned RI       	: 1;
+		unsigned BOR       	: 1;
+		unsigned POR       	: 1;
+		unsigned PD        	: 1;
+		unsigned TO        	: 1;
+		unsigned RI        	: 1;
 		unsigned           	: 1;
 		unsigned SBOREN    	: 1;
 		unsigned IPEN      	: 1;
@@ -873,7 +897,7 @@ extern __sfr __at (0xFD3) OSCCON;
 typedef union {
 	struct {
 		unsigned SCS       	: 2;
-		unsigned FLTS      	: 1;
+		unsigned IOFS      	: 1;
 		unsigned OSTS      	: 1;
 		unsigned IRCF      	: 3;
 		unsigned IDLEN     	: 1;
@@ -1026,7 +1050,7 @@ typedef union {
 		unsigned INTEDG2   	: 1;
 		unsigned INTEDG1   	: 1;
 		unsigned INTEDG0   	: 1;
-		unsigned RBPU     	: 1;
+		unsigned RBPU      	: 1;
 	};
 } __INTCON2_t;
 extern volatile __INTCON2_t __at (0xFF1) INTCON2bits;
@@ -1139,16 +1163,16 @@ extern volatile __TOSU_t __at (0xFFF) TOSUbits;
 
 
 /* Oscillator 1H options */
-#define	_OSC_INTIO7_1H	                            0xF9	/* INTRC-OSC2 as Clock Out, OSC1 as RA7 */
-#define	_OSC_INTIO67_1H      	                    0xF8	/* INTRC-OSC2 as RA6, OSC1 as RA7 */
-#define	_OSC_RCIO6_1H	                            0xF7	/* RC-OSC2 as RA6 */
-#define	_OSC_HSPLL_1H  	                            0xF6	/* HS-PLL Enabled */
-#define	_OSC_ECIO6_1H        	                    0xF5	/* EC-OSC2 as RA6 */
-#define	_OSC_EC_1H              	                0xF4	/* EC-OSC2 as Clock Out */
-#define _OSC_RC_1H                                  0xF3    /* RC */
-#define	_OSC_HS_1H              	                0xF2	/* HS */
-#define _OSC_XT_1H                                  0xF1    /* XT */
-#define	_OSC_LP_1H                                	0xF0	/* LP */
+#define	_OSC_INTIO7_1H                          	0xF9	/* INTRC-OSC2 as Clock Out, OSC1 as RA7 */
+#define	_OSC_INTIO67_1H                         	0xF8	/* INTRC-OSC2 as RA6, OSC1 as RA7 */
+#define	_OSC_RCIO6_1H                           	0xF7	/* RC-OSC2 as RA6 */
+#define	_OSC_HSPLL_1H                           	0xF6	/* HS-PLL Enabled */
+#define	_OSC_ECIO6_1H                           	0xF5	/* EC-OSC2 as RA6 */
+#define	_OSC_EC_1H                              	0xF4	/* EC-OSC2 as Clock Out */
+#define	_OSC_RC_1H                              	0xF3	/* RC */
+#define	_OSC_HS_1H                              	0xF2	/* HS */
+#define	_OSC_XT_1H                              	0xF1	/* XT */
+#define	_OSC_LP_1H                              	0xF0	/* LP */
 
 /* Fail-Safe Clock Monitor Enable 1H options */
 #define	_FCMEN_OFF_1H                           	0xBF	/* Disabled */
@@ -1159,21 +1183,20 @@ extern volatile __TOSU_t __at (0xFFF) TOSUbits;
 #define	_IESO_ON_1H                             	0xFF	/* Enabled */
 
 /* Power Up Timer 2L options */
-#define	_PUT_OFF_2L                             	0xFF	/* Disabled */
-#define	_PUT_ON_2L                              	0xFE	/* Enabled */
+#define	_PWRT_OFF_2L                            	0xFF	/* Disabled */
+#define	_PWRT_ON_2L                             	0xFE	/* Enabled */
 
 /* Brown Out Detect 2L options */
-#define	_BODEN_ON_2L                            	0xFF	/* Enabled in hardware, SBOREN disabled */
-#define	_BODEN_ON_WHILE_ACTIVE_2L               	0xFD	/* Enabled while active,disabled in SLEEP,SBOREN disabled */
-#define	_BODEN_CONTROLLED_WITH_SBOREN_BIT_2L    	0xFB	/* Controlled with SBOREN bit */
-#define	_BODEN_OFF_2L                           	0xF9	/* Disabled in hardware, SBOREN disabled */
+#define	_BOREN_OFF_2L                           	0xF9	/* Disabled */
+#define	_BOREN_ON_2L                            	0xFB	/* SBOREN Enabled */
+#define	_BOREN_NOSLP_2L                         	0xFD	/* Enabled except SLEEP, SBOREN Disabled */
+#define	_BOREN_SBORDIS_2L                       	0xFF	/* Enabled, SBOREN Disabled */
 
 /* Brown Out Voltage 2L options */
-#define	_BODENV_2_0V_2L                         	0xFF	/* 2.1V */
-#define	_BODENV_2_7V_2L                         	0xF7	/* 2.8V */
-#define	_BODENV_4_2V_2L                         	0xEF	/* 4.3V */
-#define	_BODENV_4_5V_2L                         	0xE7	/* 4.6V */
-
+#define	_BORV_46_2L                             	0xE7	/* 4.6V */
+#define	_BORV_43_2L                             	0xEF	/* 4.3V */
+#define	_BORV_28_2L                             	0xF7	/* 2.8V */
+#define	_BORV_21_2L                             	0xFF	/* 2.1V */
 
 /* Watchdog Timer 2H options */
 #define	_WDT_ON_2H                              	0xFF	/* Enabled */
@@ -1224,13 +1247,12 @@ extern volatile __TOSU_t __at (0xFFF) TOSUbits;
 #define	_LVP_OFF_4L                             	0xFB	/* Disabled */
 
 /* Extended CPU Enable 4L options */
-#define	_ENHCPU_ON_4L                           	0xFF	/* Enabled */
-#define	_ENHCPU_OFF_4L                          	0xBF	/* Disabled */
+#define	_XINST_OFF_4L                           	0xBF	/* Disabled */
+#define	_XINST_ON_4L                            	0xFF	/* Enabled */
 
 /* Background Debug 4L options */
-#define	_BACKBUG_OFF_4L                         	0xFF	/* Disabled */
-#define	_BACKBUG_ON_4L                          	0x7F	/* Enabled */
-
+#define	_DEBUG_ON_4L                            	0x7F	/* Enabled */
+#define	_DEBUG_OFF_4L                           	0xFF	/* Disabled */
 
 /* Code Protect 00800-01FFF 5L options */
 #define	_CP_0_OFF_5L                            	0xFF	/* Disabled */
@@ -1311,8 +1333,8 @@ extern volatile __TOSU_t __at (0xFFF) TOSUbits;
 
 
 /* Device ID bytes */
-#define _DEVID1     0x3FFFFE
-#define _DEVID2     0x3FFFFF
+#define	_DEVID1     0x3FFFFE
+#define	_DEVID2     0x3FFFFF
 
 
 /* Location of User ID words */

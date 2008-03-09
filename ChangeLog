@@ -1,9 +1,18 @@
+2008-03-09 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f2620.h,
+	* device/include/pic16/pic18f4620.h,
+	* device/lib/pic16/libdev/pic18f2620.c,
+	* device/lib/pic16/libdev/pic18f4525.c,
+	* device/lib/pic16/libdev/pic18f4620.c: merged 18f2525/2620/4525/4620
+	  family to consistently use pic18f4620.[ch], fixes #1832562
+
 2008-03-09 Borut Razem <borut.razem AT siol.net>
 
 	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
 	  changed sdcc version to 2.8.0
-	*  knownbugs.html: regenerated
-	*  support/scripts/gen_known_bugs.pl: added number of open bugs
+	* knownbugs.html: regenerated
+	* support/scripts/gen_known_bugs.pl: added number of open bugs
 
 2008-03-09 Raphael Neider <rneider AT web.de>
 

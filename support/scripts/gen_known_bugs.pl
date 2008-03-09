@@ -1,6 +1,6 @@
 # gen_known_bugs.pl - generate knownbugs.html
 #
-# Copyright (c) 2007 Borut Razem
+# Copyright (c) 2007 - 2008 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -31,7 +31,6 @@ use HTML::TreeBuilder;
 
 
 my @headerList = ('Request ID', 'Summary', 'Open Date', 'Priority', 'Status', 'Assigned To', 'Submitted By');
-my $version;
 
 
 # check if the line is a correct header
@@ -117,7 +116,7 @@ sub process_page($)
   $tree->parse($html);
 
   # find table with the required header
-  my $hasTable = 0;
+  my $lines = 0;
   foreach my $table ($tree->look_down('_tag', 'table')) {
     my @lines = $table->content_list();
     if (is_header($lines[0])) {
@@ -131,7 +130,7 @@ sub process_page($)
           process_line($line);
           # and print it
           print($line->as_HTML(undef, '  '));
-          $hasTable = 1;
+          ++$lines;
         }
       }
     }
@@ -139,13 +138,15 @@ sub process_page($)
 
   $tree->delete;
   
-  return $hasTable;
+  return $lines;
 }
 
 
 # print HTML header
-sub print_header()
+sub print_header($)
 {
+  my ($version) = @_;
+
   print <<EOF;
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -177,12 +178,13 @@ EOF
 
 
 # print HTML footer
-sub print_footer()
+sub print_footer($)
 {
+  my ($lines) = @_;
+
   print <<EOF;
     </table>
     <p><b>Priority Colors:</b></p>
-    <br />
     <table border="0">
       <tr>
         <td bgcolor="#dadada">1</td>
@@ -197,6 +199,7 @@ sub print_footer()
       </tr>
     </table>
   </body>
+<p><b>Number of open bugs: $lines</b></p>
 </html>
 EOF
 }
@@ -212,21 +215,22 @@ EOF
   }
 
   # get the SDCC version number from command line
-  $version = $ARGV[0];
+  my $version = $ARGV[0];
+
+  my $lines = 0;  # number of lines
 
   # print HTML header
-  print_header();
+  print_header($version);
 
   # get pages from SF bug tracker
   for (my $i = 0; my $html = get($url . $i); $i += 50) {
     # and process them
-    if (!process_page($html)) {
-      last;
-    }
+    last if (!(my $myLines = process_page($html)));
+    $lines += $myLines;
   }
 
   # print HTML footer
-  print_footer();
+  print_footer($lines);
 
   exit(0);
 }

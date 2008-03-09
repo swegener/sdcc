@@ -3,6 +3,7 @@
 	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
 	  changed sdcc version to 2.8.0
 	*  knownbugs.html: regenerated
+	*  support/scripts/gen_known_bugs.pl: added number of open bugs
 
 2008-03-09 Raphael Neider <rneider AT web.de>
 

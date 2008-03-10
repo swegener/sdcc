@@ -1799,8 +1799,8 @@ astHasDeref (ast * tree)
 }
 
 /*-----------------------------------------------------------------*/
-/* isConformingBody - the loop body has to conform to a set of rules */
-/* for the loop to be considered reversible read on for rules      */
+/* isConformingBody - the loop body has to conform to a set of     */
+/* rules for the loop to be considered reversible read on for rules*/
 /*-----------------------------------------------------------------*/
 bool
 isConformingBody (ast * pbody, symbol * sym, ast * body)
@@ -1809,14 +1809,13 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
   /* we are going to do a pre-order traversal of the
      tree && check for the following conditions. (essentially
      a set of very shallow tests )
-     a) the sym passed does not participate in
-     any arithmetic operation
+     a) the sym passed does not participate in any arithmetic operation
      b) There are no function calls
      c) all jumps are within the body
      d) address of loop control variable not taken
-     e) if an assignment has a pointer on the
-     left hand side make sure right does not have
-     loop control variable */
+     e) if an assignment has a pointer on the left hand side make sure
+        right does not have loop control variable
+  */
 
   /* if we reach the end or a leaf then true */
   if (!pbody || IS_AST_LINK (pbody) || IS_AST_VALUE (pbody))
@@ -1871,9 +1870,9 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 
       /* if right is NULL then unary operation  */
 /*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*----------------------------*/
       /*  address of                */
-/*----------------------------*/
+      /*----------------------------*/
       if (!pbody->right)
         {
           if (IS_AST_SYM_VALUE (pbody->left) &&
@@ -1973,7 +1972,8 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       if (astHasVolatile (pbody->left))
         return FALSE;
 
-      if (astHasDeref(pbody->right)) return FALSE;
+      if (astHasDeref(pbody->right))
+        return FALSE;
 
       return isConformingBody (pbody->left, sym, body) &&
         isConformingBody (pbody->right, sym, body);
@@ -1990,27 +1990,31 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       assert ("Parser should not have generated this\n");
 
 /*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*----------------------------*/
       /*      comma operator        */
-/*----------------------------*/
+      /*----------------------------*/
     case ',':
       return isConformingBody (pbody->left, sym, body) &&
         isConformingBody (pbody->right, sym, body);
 
 /*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*----------------------------*/
       /*       function call        */
-/*----------------------------*/
+      /*----------------------------*/
     case CALL:
-        /* if local & not passed as paramater then ok */
-        if (sym->level && !astHasSymbol(pbody->right,sym))
+        /* if local & not passed as parameter &
+           not used to find the function then ok */
+        if (sym->level && !astHasSymbol (pbody->right, sym) &&
+            !astHasSymbol (pbody->left, sym))
+          {
             return TRUE;
+          }
       return FALSE;
 
 /*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*----------------------------*/
       /*     return statement       */
-/*----------------------------*/
+      /*----------------------------*/
     case RETURN:
       return FALSE;
 
@@ -2029,9 +2033,6 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 
   return isConformingBody (pbody->left, sym, body) &&
     isConformingBody (pbody->right, sym, body);
-
-
-
 }
 
 /*-----------------------------------------------------------------*/

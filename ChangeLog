@@ -1,3 +1,8 @@
+2008-03-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (isConformingBody): fixed bug 1505811, thanks Robert Larice
+	* support/regression/tests/bug1505811.c: new, added
+
 2008-03-09 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f2620.h,

@@ -8971,6 +8971,34 @@ Force a called function to always save BC.
 \labelwidthstring 00.00.0000
 
 \series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-std-crt0
+\series default
+
+\begin_inset LatexCommand \index{Z80!Options!-\/-no-std-crt0}
+
+\end_inset
+
+ When linking, skip the standard crt0.o object file.
+ You must provide your own crt0.o for your system when linking.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
 -bo
 \series default
 \InsetSpace ~

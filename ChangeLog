@@ -1,7 +1,11 @@
+2008-03-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: added paragraph about bankswitching for mcs51
+
 2008-03-12 Borut Razem <borut.razem AT siol.net>
 
 	* as/doc/asmlnk.doc, as/doc/asxhtm.html: updated command line options,
-	  fixed documentation request ##1718191
+	  fixed documentation request #1718191
 	* as/hc80/asmain.c, as/mcs51/asmain.c: added option -c to usage
 	* doc/sdccman.lyx: added description of --no-std-crt0 gbz80
 	  command line option

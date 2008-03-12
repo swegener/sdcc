@@ -23435,6 +23435,234 @@ Some MCS51 variants offer features like Double DPTR
  These are currently not used for the MCS51 port.
  If you absolutely need them you can fall back to inline assembly or submit
  a patch to SDCC.
+\end_layout
+
+\begin_layout Subsection
+Bankswitching
+\end_layout
+
+\begin_layout Standard
+Bankswitching
+\begin_inset LatexCommand \index{Bankswitching}
+
+\end_inset
+
+ (a.k.a.
+ code banking
+\begin_inset LatexCommand \index{code banking}
+
+\end_inset
+
+) is a technique to increase the code space above the 64k limit of the 8051.
+\end_layout
+
+\begin_layout Subsubsection
+Hardware
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="4">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell multicolumn="1" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\paragraph_spacing other 0.5
+8000-FFFF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+bank 1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+bank 2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+bank 3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell multicolumn="1" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+0000-7FFF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+common
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+SiLabs C8051F120 example
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\newline
+
+\newline
+Usually the hardware uses some sfr (an output port or an internal sfr) to
+ select a bank and put it in the banked area of the memory map.
+ Because the selected bank usually becomes active immediately you cannot
+ jump call directly from one bank to another and need to use a so-called
+ trampoline in the common area.
+ For SDCC an example trampoline is in crtbank.asm and you may need to change
+ it to your 8051 derivative or schematic.
+ The presented code is written for the C8051F120.
+\newline
+
+\newline
+When calling a banked function
+ SDCC will put the LSB of the functions address in register R0, the MSB
+ in R1 and the bank in R2 and then call this trampoline __sdcc_banked_call.
+ The current selected bank is saved on the stack, the new bank is selected
+ and an indirect jump is made.
+ When the banked function returns it jumps to __sdcc_banked_ret which restores
+ the previous bank and returns to the caller.
+\end_layout
+
+\begin_layout Subsubsection
+Software
+\end_layout
+
+\begin_layout Standard
+When writing banked software using SDCC you need to use some special keywords
+ and options.
+ You also need to take over a bit of work from the linker.
+\newline
+
+\newline
+To create a function
+ that can be called from another bank it requires the keyword banked.
+ The caller must see this in the prototype of the callee and the callee
+ needs it for a proper return.
+ Called functions within the same bank as the caller do not need the banked
+ keyword nor do functions in the common area.
+ Beware: SDCC does not know or check if functions are in the same bank.
+ This is your responsibility!
+\newline
+
+\newline
+Normally all functions you write end up in
+ the segment CSEG.
+ If you want a function explicitly to reside in the common area put it in
+ segment HOME.
+ This applies for instance to interrupt service routines as they should
+ not be banked.
+\end_layout
+
+\begin_layout Standard
+Functions that need to be in a switched bank must be put in a named segment.
+ The name can be mostly anything upto eight characters (e.g.
+ BANK1).
+ To do this you either use --codeseg BANK1 on the command line when compiling
+ or #pragma codeseg BANK1 at the top of the C source file.
+ The segment name always applies to the whole source file and generated
+ object so functions for different banks need to be defined in different
+ source files.
+\newline
+
+\newline
+When linking your objects you need to tell the linker where
+ to put your segments.
+ To do this you use the following command line option to SDCC: -Wl-b BANK1=0x180
+00.
+ This sets the virtual start address of this segment.
+ It sets the banknumber to 0x01 and maps the bank to 0x8000 and up.
+ The linker will not check for overflows, again this is your responsibility.
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace bigskip
 \end_inset
 

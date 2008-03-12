@@ -1227,6 +1227,7 @@ char *usetxt[] = {
         "  l    create list   output file1[LST]",
         "  o    create object output file1[REL]",
         "  s    create symbol output file1[SYM]",
+        "  c    generate sdcdb debug information",
         "  p    disable listing pagination",
         "  f    flag relocatable references by `    in listing file",
         " ff    flag relocatable references by mode in listing file",

@@ -1925,7 +1925,7 @@
         semblers are started with the appropriate option(s) and  file(s)
         to assemble following the assembler name:
 
-        as6809 [-dqxgalosff] file1 [file2 file3 ...  file6]
+        as-z80 [-dqxjgaloscpff] file1 [file2 file3 ...  file6]
 
         The options are:
 
@@ -1936,6 +1936,7 @@
                         The listing radix affects the
                         .lst, .rel, and .sym files.
 
+                j       add line number and debug information to file
                 g       undefined symbols made global
                 a       all user symbols made global
 
@@ -1943,15 +1944,19 @@
                 o       create object output file1.rel
                 s       create symbol output file1.sym
 
-                p       disable listing pagination
-                w       wide listing format for symbol table
+                c       generate sdcdb debug information
 
-                z       enable case sensitivity for symbols
+                p       disable listing pagination
 
                         relocatable reference flagging:
 
                 f       by  `   in the listing file
                 ff      by mode in the listing file
+
+        asx8051 specific command line option:
+                -I<dir>  Add the named directory to the include file
+                        search path.  This option may be used more than once.
+                        Directories are searched in the order given.
 
            The file name for the .lst, .rel, and .sym files is the first
         file name specified in the command line.  All output  files  are
@@ -1964,6 +1969,11 @@
         will use the proper conversion for this file.  Linked files  may
         have different radices.
 
+        ASXXXX assembles supported by and distributed with SDCC are:
+                asx8051         (Intel 8051)
+                as-z80          (Zilog Z80 / Hitachi HD64180)
+                as-gbz80        (GameBoy Z80-like CPU)
+                as-hc08         (Motorola 68HC08)
 
 
         THE ASSEMBLER                                          PAGE 1-28

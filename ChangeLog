@@ -1,3 +1,8 @@
+2008-03-12 Borut Razem <borut.razem AT siol.net>
+
+	* as/doc/asmlnk.doc, as/doc/asxhtm.html: updated command line options
+	* as/hc80/asmain.c, as/mcs51/asmain.c: added option -c to usage
+
 2008-03-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (isConformingBody): fixed bug 1505811, thanks Robert Larice

@@ -23473,7 +23473,6 @@ Hardware
 \begin_inset Text
 
 \begin_layout Standard
-\paragraph_spacing other 0.5
 8000-FFFF
 \end_layout
 
@@ -23483,7 +23482,7 @@ Hardware
 \begin_inset Text
 
 \begin_layout Standard
-bank 1
+bank1
 \end_layout
 
 \end_inset
@@ -23492,7 +23491,7 @@ bank 1
 \begin_inset Text
 
 \begin_layout Standard
-bank 2
+bank2
 \end_layout
 
 \end_inset
@@ -23501,7 +23500,7 @@ bank 2
 \begin_inset Text
 
 \begin_layout Standard
-bank 3
+bank3
 \end_layout
 
 \end_inset

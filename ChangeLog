@@ -1,6 +1,7 @@
 2008-03-13 Borut Razem <borut.razem AT siol.net>
 
-	* doc/sdccman.lyx: corrected to be able to convert to PDF
+	* doc/sdccman.lyx: corrected to be able to convert to PDF,
+	  updated the list pf supported pic14 devices
 
 2008-03-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

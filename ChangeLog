@@ -1,3 +1,7 @@
+2008-03-14 Paul Stoffregen <paul AT pjrc.com>
+
+	* device/lib/printf_fast.c: fixed bug 1255403
+
 2008-03-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: enhanced paragraph about bankswitching for mcs51

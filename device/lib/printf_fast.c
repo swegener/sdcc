@@ -414,6 +414,11 @@ printf_uint_ck8:
 	/* print the digit zero and skip all the hard work! */
 	mov	a, r1
 	jnz	printf_uint_begin
+#ifdef FLOAT
+	/* never use the "just print zero" shortcut if we're printing */
+	/* the integer part of a float  (fixes bug 1255403)  */
+	jb	_continue_float, printf_uint_begin
+#endif
 #ifdef FIELD_WIDTH
 	jnb	_field_width_flag, printf_uint_zero
 	mov	a, _field_width
@@ -425,13 +430,7 @@ printf_uint_zero:
 	//mov	a, #'0'
 	mov	a, #48
 	lcall	printf_putchar
-#ifdef FLOAT
-	jnb	_continue_float, 0001$
-	ret
-0001$:
-#endif
 	ljmp	printf_main_loop
-
 
 printf_uint_begin:
 	push	dpl
@@ -486,7 +485,7 @@ printf_uifw_8:
 	jnz	printf_uifw_sub
 	dec	r1
 printf_uifw_sub:
-	;r1 has the number of digits for the number
+	//r1 has the number of digits for the number
 	mov	a, _field_width
 	mov	c, _negative_flag
 	subb	a, r1
@@ -766,8 +765,12 @@ print_float_default_width:
 	// default fractional field width (between 0 to 7)
 	// attempt to scale the default number of fractional digits
 	// based on the magnitude of the float
-	mov	ar1, r0		// r0 points to first byte of float
-	dec	r1		// r1 points to second byte of float
+	mov	a, @r0
+	anl	a, #0x7F	// ignore sign bit
+	mov	r2, a		// r2 is first byte of float
+	dec	r0
+	mov	ar3, @r0	// r3 is second byte of float
+	inc	r0
 	mov	r6, dpl
 	mov	r7, dph
 	mov	dptr, #_float_range_table
@@ -775,11 +778,11 @@ print_float_default_width:
 print_float_default_loop:
 	clr	a
 	movc	a, @a+dptr
-	add	a, @r1
+	add	a, r3
 	inc	dptr
 	clr	a
 	movc	a, @a+dptr
-	addc	a, @r0
+	addc	a, r2
 	jnc	print_float_default_done
 	inc	dptr
 	djnz	r5, print_float_default_loop

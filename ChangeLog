@@ -1,3 +1,11 @@
+2008-03-14 Borut Razem <borut.razem AT siol.net>
+
+	* as/doc/asmlnk.doc, as/doc/asxhtm.html: updated link-xx and aslink
+	  command line options
+	* as/link/hc08/lkmain.c: converted tabs to spaces so that the usage
+	  is correctly displayed
+	* as/link/z80/lkmain.c: usage line commented out
+
 2008-03-13 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: corrected to be able to convert to PDF,

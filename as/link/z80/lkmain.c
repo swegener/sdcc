@@ -1440,11 +1440,13 @@ char *usetxt[] = {
         "  -f   file[LNK]               File input",
         "  -p   Prompt and echo of file[LNK] to stdout (default)",
         "  -n   No echo of file[LNK] to stdout",
+/*
 #ifdef SDK
         "Usage: [-Options] outfile file [file ...]",
 #else /* SDK */
         "Usage: [-Options] file [file ...]",
 #endif /* SDK */
+*/
         "Libraries:",
         "  -k   Library path specification, one per -k",
         "  -l   Library file specification, one per -l",

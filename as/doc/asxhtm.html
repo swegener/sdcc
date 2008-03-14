@@ -2290,27 +2290,35 @@
              1.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
                  image output file.
 
-             2.  -z      Specifies that symbol names are case sensitive.
-
-             3.  -m      Generate a map file (file.map).  This file con-
+             2.  -m      Generate a map file (file.map).  This file con-
                  tains a list of the symbols (by area) with absolute ad-
                  dresses,  sizes  of  linked  areas,  and  other linking
                  information.
 
-             4.  -w      Specifies  that  a  wide listing format be used
-                 for the map file.
-
-             5.  -xdq    Specifies  the  number  radix  for the map file
+             3.  -xdq    Specifies  the  number  radix  for the map file
                  (Hexidecimal, Decimal, or Octal).
 
-             6.  -u      Generate  an  updated  listing  file (file.rst)
+             4.  -u      Generate  an  updated  listing  file (file.rst)
                  derived from the relocated addresses and data from  the
                  linker
 
-             7.  fileN   Files  to  be linked.  Files may be on the same
+             5.  fileN   Files  to  be linked.  Files may be on the same
                  line as the above options or on a separate line(s)  one
                  file  per line or multiple files separated by spaces or
                  tabs.
+
+             6.  -b  area = expression (one definition per line)
+                 This  specifies  an area base address where the expres-
+                 sion may contain constants and/or defined symbols  from
+                 the linked files.
+
+             7.  -g  symbol = expression (one definition per line)
+                 This  specifies  the value for the symbol where the ex-
+                 pression may contain constants and/or  defined  symbols
+                 from the linked files.
+
+             8.  -k  library directory path
+                 (one  definition  per line) This specifies one possible
 
 
 
@@ -2318,26 +2326,67 @@
         INVOKING ASLINK
 
 
-             8.  -b  area = expression (one definition per line)
-                 This  specifies  an area base address where the expres-
-                 sion may contain constants and/or defined symbols  from
-                 the linked files.
-
-             9.  -g  symbol = expression (one definition per line)
-                 This  specifies  the value for the symbol where the ex-
-                 pression may contain constants and/or  defined  symbols
-                 from the linked files.
-
-            10.  -k  library directory path
-                 (one  definition  per line) This specifies one possible
                  path to an object library.  More than one path  is  al-
                  lowed.
 
-            11.  -l  library file specification
+             9.  -l  library file specification
                  (one  definition  per  line)  This specifies a possible
                  library file.  More than one file is allowed.
 
-            12.  -e      or null line, terminates input to the linker.
+            10.  -e      or null line, terminates input to the linker.
+
+        aslink (msc51) specific options:
+
+        Output:
+          -j   Produce NoICE debug as file[NOI]
+          -z   Produce SDCdb debug as file[cdb]
+          -u   Update listing file(s) with link data as file(s)[.RST]
+        Miscellaneous:
+          -a   [iram-size] Check for internal RAM overflow
+          -v   [xram-size] Check for external RAM overflow
+          -w   [code-size] Check for code overflow
+          -y   Generate memory usage summary file[mem]
+          -Y   Pack internal ram
+          -A   [stack-size] Allocate space for stack
+
+
+        link-z80 (Z80) specific options:
+
+        Map format:
+          -j   no$gmb symbol file generated as file[SYM]
+        Output:
+          -z   Produce SDCdb debug as file[cdb]
+          -Z   Gameboy image as file[GB]
+        List:
+          -u   Update listing file(s) with link data as file(s)[.RST]
+
+
+        link-gbz80 (GBZ80) specific options:
+
+        Relocation:
+          -yo  Number of rom banks (default: 2)
+          -ya  Number of ram banks (default: 0)
+          -yt  MBC type (default: no MBC)
+          -yn  Name of program (default: name of output file)
+          -yp# Patch one byte in the output GB file (# is: addr=byte)
+        Map format:
+          -j   no$gmb symbol file generated as file[SYM]
+        Output:
+          -Z   Gameboy image as file[GB]
+        List:
+          -u   Update listing file(s) with link data as file(s)[.RST]
+
+
+        link-hc08 (HC08) specific options:
+        Output:
+          -t   ELF executable as file[elf]
+          -j    Produce NoICE debug as file[NOI]
+          -z   Produce SDCdb debug as file[cdb]
+          -u    Update listing file(s) with link data as file(s)[.RST]
+        Miscellaneous:
+          -a    [iram-size] Check for internal RAM overflow
+          -v    [xram-size] Check for external RAM overflow
+          -w    [code-size] Check for code overflow
 
 
 

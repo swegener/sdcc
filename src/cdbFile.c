@@ -380,7 +380,7 @@ int cdbWriteBasicSymbol(symbol *sym, int isStructSym, int isFunc)
   fprintf (cdbFilePtr, "),");
 
   /* CHECK FOR REGISTER SYMBOL... */ 
-  if(sym->reqv)
+  if (!sym->allocreq && sym->reqv)
   {
     int a;
     symbol *TempSym = OP_SYMBOL (sym->reqv);

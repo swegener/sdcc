@@ -1,6 +1,7 @@
 2008-03-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: enhanced paragraph about bankswitching for mcs51
+	* src/cdbFile.c (cdbWriteBasicSymbol): fixed bug 1909409 for locals
 
 2008-03-14 Borut Razem <borut.razem AT siol.net>
 

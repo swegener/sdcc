@@ -2212,7 +2212,13 @@
 
             10.  -e      or null line, terminates input to the linker.
 
-        aslink (msc51) specific options:
+        ASLINK linkers supported by and distributed with SDCC are:
+                aslink          (Intel 8051)
+                link-z90        (Zilog Z80 / Hitachi HD64180)
+                link-gbz80      (GameBoy Z80-like CPU)
+                link-hc08       (Motorola 68HC08)
+
+        aslink (Intel 8051) specific options:
 
         Output:
           -j   Produce NoICE debug as file[NOI]
@@ -2227,7 +2233,7 @@
           -A   [stack-size] Allocate space for stack
 
 
-        link-z80 (Z80) specific options:
+        link-z80 (Zilog Z80 / Hitachi HD64180) specific options:
 
         Map format:
           -j   no$gmb symbol file generated as file[SYM]
@@ -2238,7 +2244,7 @@
           -u   Update listing file(s) with link data as file(s)[.RST]
 
 
-        link-gbz80 (GBZ80) specific options:
+        link-gbz80 (GameBoy Z80-like CPU) specific options:
 
         Relocation:
           -yo  Number of rom banks (default: 2)
@@ -2254,7 +2260,7 @@
           -u   Update listing file(s) with link data as file(s)[.RST]
 
 
-        link-hc08 (HC08) specific options:
+        link-hc08 (Motorola 68HC08) specific options:
         Output:
           -t   ELF executable as file[elf]
           -j    Produce NoICE debug as file[NOI]

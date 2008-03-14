@@ -1,3 +1,7 @@
+2008-03-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: enhanced paragraph about bankswitching for mcs51
+
 2008-03-14 Borut Razem <borut.razem AT siol.net>
 
 	* as/doc/asmlnk.doc, as/doc/asxhtm.html: updated link-xx and aslink

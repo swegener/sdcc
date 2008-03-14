@@ -108,7 +108,7 @@ SDCC 2.8.0
 \size footnotesize
 
 \newline
-$Date::             $ 
+$Date::            $ 
 \newline
 $Revision$
 \end_layout
@@ -8028,6 +8028,10 @@ linkOption[,linkOption]
 
 \end_inset
 
+\begin_inset LatexCommand \label{lyx:-Wl option}
+
+\end_inset
+
 ...
  Pass the linkOption to the linker.
  If a bootloader is used an option like 
@@ -8040,6 +8044,8 @@ linkOption[,linkOption]
 \end_inset
 
  would be typical to set the start of the code segment.
+ Either use the double quotes around this option or use no space (e.g.
+ -Wl-bCSEG=0x1000).
  See also #pragma constseg and #pragma codeseg in section 
 \begin_inset LatexCommand \ref{sec:Pragmas}
 
@@ -10825,6 +10831,10 @@ status collapsed
 \series default
 
 \begin_inset LatexCommand \index{-\/-codeseg <Value>}
+
+\end_inset
+
+\begin_inset LatexCommand \label{lyx:-codeseg}
 
 \end_inset
 
@@ -23592,9 +23602,11 @@ SiLabs C8051F120 example
 \newline
 Usually the hardware uses some sfr (an output port or an internal sfr) to
  select a bank and put it in the banked area of the memory map.
- Because the selected bank usually becomes active immediately you cannot
- jump call directly from one bank to another and need to use a so-called
- trampoline in the common area.
+ The selected bank usually becomes active immediately upon assignment to
+ this sfr and when running inside a bank it will switch out this code it
+ is currently running.
+ Therefor you cannot jump or call directly from one bank to another and
+ need to use a so-called trampoline in the common area.
  For SDCC an example trampoline is in crtbank.asm and you may need to change
  it to your 8051 derivative or schematic.
  The presented code is written for the C8051F120.
@@ -23603,11 +23615,18 @@ Usually the hardware uses some sfr (an output port or an internal sfr) to
 \newline
 When calling a banked function
  SDCC will put the LSB of the functions address in register R0, the MSB
- in R1 and the bank in R2 and then call this trampoline __sdcc_banked_call.
+ in R1 and the bank in R2 and then call this trampoline 
+\emph on
+__sdcc_banked_call
+\emph default
+.
  The current selected bank is saved on the stack, the new bank is selected
  and an indirect jump is made.
- When the banked function returns it jumps to __sdcc_banked_ret which restores
- the previous bank and returns to the caller.
+ When the banked function returns it jumps to 
+\emph on
+__sdcc_banked_ret
+\emph default
+ which restores the previous bank and returns to the caller.
 \end_layout
 
 \begin_layout Subsubsection
@@ -23622,10 +23641,22 @@ When writing banked software using SDCC you need to use some special keywords
 
 \newline
 To create a function
- that can be called from another bank it requires the keyword banked.
+ that can be called from another bank it requires the keyword 
+\emph on
+banked
+\emph default
+
+\begin_inset LatexCommand \index{banked}
+
+\end_inset
+
+.
  The caller must see this in the prototype of the callee and the callee
  needs it for a proper return.
- Called functions within the same bank as the caller do not need the banked
+ Called functions within the same bank as the caller do not need the 
+\emph on
+banked
+\emph default
  keyword nor do functions in the common area.
  Beware: SDCC does not know or check if functions are in the same bank.
  This is your responsibility!
@@ -23644,8 +23675,30 @@ Normally all functions you write end up in
 Functions that need to be in a switched bank must be put in a named segment.
  The name can be mostly anything upto eight characters (e.g.
  BANK1).
- To do this you either use --codeseg BANK1 on the command line when compiling
- or #pragma codeseg BANK1 at the top of the C source file.
+ To do this you either use -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-codeseg BANK1 (See 
+\begin_inset LatexCommand \ref{lyx:-codeseg}
+
+\end_inset
+
+) on the command line when compiling or #pragma codeseg BANK1 (See 
+\begin_inset LatexCommand \ref{sec:Pragmas}
+
+\end_inset
+
+) at the top of the C source file.
  The segment name always applies to the whole source file and generated
  object so functions for different banks need to be defined in different
  source files.
@@ -23655,7 +23708,12 @@ Functions that need to be in a switched bank must be put in a named segment.
 When linking your objects you need to tell the linker where
  to put your segments.
  To do this you use the following command line option to SDCC: -Wl-b BANK1=0x180
-00.
+00 (See 
+\begin_inset LatexCommand \ref{lyx:-Wl option}
+
+\end_inset
+
+).
  This sets the virtual start address of this segment.
  It sets the banknumber to 0x01 and maps the bank to 0x8000 and up.
  The linker will not check for overflows, again this is your responsibility.

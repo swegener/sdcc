@@ -301,7 +301,7 @@ ${Function} .onInit
 uninst:
   ; Run the uninstaller
   ClearErrors
-  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+  ExecWait '$R0'
 
   Goto done
 inst:
@@ -733,12 +733,10 @@ LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC library sources"
 ${Section} -Icons SECICONS
 !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE"
-  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.lnk" "$INSTDIR\sdcc.url" 
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Uninstall SDCC.lnk" "$INSTDIR\uninstall.exe" 
 !ifdef FULL_DOC
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk" "$INSTDIR\doc\sdccman.pdf" "" "$INSTDIR\sdcc.ico" "" "" "" ""
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\README.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
-  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.lnk" "$INSTDIR\change_log.url"
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk" "$INSTDIR\doc\ChangeLog.txt" "" "$INSTDIR\sdcc.ico" "" "" "" ""
 !else
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
@@ -749,9 +747,9 @@ ${Section} -Icons SECICONS
 ${SectionEnd}
 
 ${Section} -INI SECINI
-  WriteIniStr "$INSTDIR\sdcc.url" "InternetShortcut" "URL" "http://sdcc.sourceforge.net/"
+  WriteIniStr "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.url" "InternetShortcut" "URL" "http://sdcc.sourceforge.net/"
 !ifdef FULL_DOC
-  WriteIniStr "$INSTDIR\change_log.url" "InternetShortcut" "URL" "http://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc/ChangeLog"
+  WriteIniStr "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.url" "InternetShortcut" "URL" "http://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc/ChangeLog"
 !endif
 ${SectionEnd}
 
@@ -783,13 +781,13 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk"
-  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.lnk"
 !ifdef FULL_DOC
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.url"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\README.lnk"
 !endif
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Uninstall SDCC.lnk"
-  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.url"
 
   RMDir "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE"
 
@@ -913,10 +911,6 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\COPYING.TXT"
   Delete "$INSTDIR\sdcc.ico"
-  Delete "$INSTDIR\sdcc.url"
-!ifdef FULL_DOC
-  Delete "$INSTDIR\change_log.url"
-!endif
   Delete "$INSTDIR\uninstall.exe"
 
   RMDir /r "$INSTDIR\lib\src\pic"
@@ -1302,7 +1296,7 @@ ${Function} SDCC.PageLeaveReinstall
   HideWindow
 
   ClearErrors
-  ExecWait '$R1 _?=$INSTDIR'
+  ExecWait '$R1'
 
   ${If} $R0 == "2"
     Quit

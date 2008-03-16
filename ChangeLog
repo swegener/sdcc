@@ -1,7 +1,8 @@
 2008-03-16 Borut Razem <borut.razem AT siol.net>
 
-	* support/scripts/sdcc.nsi: added section debugging macros, added SDCC icon,
-	  changed startup menu for release distribution, code cleaning
+	* support/scripts/sdcc.nsi: added section debugging macros, added SDCC
+	  icon, changed startup menu for release distribution, code cleaning,
+	  create url files instead links in startup menu
 
 2008-03-16 Maarten Brock <sourceforge.brock AT dse.nl>
 

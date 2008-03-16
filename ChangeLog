@@ -1,3 +1,8 @@
+2008-03-16 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (SetIrp,genNearPointerGet,genNearPointerSet):
+	  fixed code bloat regression using a variant of patch #1915618
+
 2008-03-16 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added section debugging macros, added SDCC

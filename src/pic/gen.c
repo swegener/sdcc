@@ -6899,8 +6899,10 @@ void SetIrp(operand *result) {
         else
             emitCLRIRP;
     } else {
-        if (PCOP(AOP(result))->type == PO_LITERAL) {
-            int addrs = PCOL(AOP(result))->lit;
+        if ((AOP_TYPE(result) == AOP_PCODE)
+            && (AOP(result)->aopu.pcop->type == PO_LITERAL))
+        {
+            int addrs = PCOL(AOP(result)->aopu.pcop)->lit;
             if (addrs & 0x100)
                 emitSETIRP;
             else
@@ -7191,8 +7193,9 @@ static void genNearPointerGet (operand *left,
     aopOp (result,ic,FALSE);
 
     /* Check if can access directly instead of via a pointer */
-    if ((PCOP(AOP(left))->type == PO_LITERAL || PCOP(AOP(left))->type == PO_IMMEDIATE)
-        && AOP_SIZE(result) == 1)
+    if ((AOP_TYPE(left) == AOP_PCODE)
+        && (AOP(left)->aopu.pcop->type == PO_IMMEDIATE)
+        && (AOP_SIZE(result) == 1))
     {
         direct = 1;
     }
@@ -7740,7 +7743,10 @@ static void genNearPointerSet (operand *right,
     DEBUGpic14_AopType(__LINE__,NULL,right,result);
 
     /* Check if can access directly instead of via a pointer */
-    if (PCOP(AOP(result))->type == PO_LITERAL && AOP_SIZE(right) == 1) {
+    if ((AOP_TYPE(result) == AOP_PCODE)
+        && (AOP(result)->aopu.pcop->type == PO_IMMEDIATE)
+        && (AOP_SIZE(right) == 1))
+    {
         direct = 1;
     }
 

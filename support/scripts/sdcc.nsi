@@ -219,7 +219,7 @@ Var SDCC.PathToRemove
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
-!insertmacro MUI_PAGE_LICENSE "${SDCC_ROOT}\COPYING.TXT"
+!insertmacro MUI_PAGE_LICENSE "${SDCC_ROOT}\COPYING.txt"
 
 ; Uninstall/reinstall page
 !ifdef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
@@ -345,7 +345,7 @@ ${FunctionEnd}
 ${Section} -Common SECCOMMON
   SetOutPath "$INSTDIR"
   File ".\sdcc.ico"
-  File "${SDCC_ROOT}\COPYING.TXT"
+  File "${SDCC_ROOT}\COPYING.txt"
 ${SectionEnd}
 
 ${Section} "SDCC application files" SEC01
@@ -742,7 +742,7 @@ ${Section} -Icons SECICONS
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk" "$INSTDIR\doc\ChangeLog_head.txt" "" "$INSTDIR\sdcc.ico" "" "" "" ""
 !endif
-  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk" "$INSTDIR\COPYING.TXT" 
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk" "$INSTDIR\COPYING.txt"
 !insertmacro MUI_STARTMENU_WRITE_END
 ${SectionEnd}
 
@@ -909,7 +909,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdcdb.el"
   Delete "$INSTDIR\bin\sdcdbsrc.el"
 
-  Delete "$INSTDIR\COPYING.TXT"
+  Delete "$INSTDIR\COPYING.txt"
   Delete "$INSTDIR\sdcc.ico"
   Delete "$INSTDIR\uninstall.exe"
 

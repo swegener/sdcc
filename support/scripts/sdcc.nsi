@@ -31,8 +31,8 @@
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
 #   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
 # - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
-#   rename it to COPYING.TXT and convert it to DOS format:
-#   unix2dos COPYING.TXT
+#   rename it to COPYING.txt and convert it to DOS format:
+#   unix2dos COPYING.txt
 # - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DVER_MAJOR=<SDCC_VER_MAJOR> -DVER_MINOR=<SDCC_VER_MINOR> -DVER_REVISION=<SDCC_VER_DEVEL> -DVER_BUILD=<SDCC_REVISION> sdcc.nsi
@@ -51,13 +51,13 @@
 # - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd-rrrr.zip
 #   to a clean directory (the option to create directories should be enabled).
 #   A sub directory sdcc is created (referenced as PKGDIR in continuation).
-# - remove the PKGDIR/doc/README.TXT file
+# - remove the PKGDIR/doc/ directory
 # - unpack sdcc-doc-yyyymmdd-rrrr.zip to the PKGDIR/doc directory
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
 #   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
 # - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
-#   rename it to COPYING.TXT and it to DOS format:
-#   unix2dos COPYING.TXT
+#   rename it to COPYING.txt and convert it to DOS format:
+#   unix2dos COPYING.txt
 # - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DFULL_DOC -DVER_MAJOR=<VER_MAJOR> -DVER_MINOR=<VER_MINOR> -DVER_REVISION=<VER_PATCH> -DVER_BUILD=<REVISION> sdcc.nsi
@@ -129,6 +129,30 @@
   FunctionEnd
 !macroend
 
+!define Section "!insertmacro MACRO_SDCC_Section"
+!macro MACRO_SDCC_Section NAME ID
+  Section "${NAME}" "${ID}"
+  !ifdef SDCC.DEBUG
+    ${SDCC.PushStr} "${NAME}"
+  !endif
+!macroend
+
+!define UnselectedSection "!insertmacro MACRO_SDCC_UnselectedSection"
+!macro MACRO_SDCC_UnselectedSection NAME ID
+  Section /o ${NAME} ${ID}
+  !ifdef SDCC.DEBUG
+    ${SDCC.PushStr} "${NAME}"
+  !endif
+!macroend
+
+!define SectionEnd "!insertmacro MACRO_SDCC_SectionEnd"
+!macro MACRO_SDCC_SectionEnd
+  !ifdef SDCC.DEBUG
+    ${SDCC.PopStr}
+  !endif
+  SectionEnd
+!macroend
+
 
 !define PRODUCT_NAME "SDCC"
 
@@ -145,12 +169,23 @@ SetCompressor /SOLID lzma
 
 !define DEV_ROOT "${SDCC_ROOT}"
 
+!ifdef FULL_DOC
+!system "unix2dos ${SDCC_ROOT}\doc\ChangeLog.txt" = 0
+!else
 !system "unix2dos ${SDCC_ROOT}\doc\ChangeLog_head.txt" = 0
+!endif
 !system "unix2dos ${SDCC_ROOT}\doc\README.TXT" = 0
 
 InstType "Full (Bin, ucSim, SDCDB, Doc, Lib, Src)"
 InstType "Medium (Bin, ucSim, SDCDB, Doc, Lib)"
 InstType "Compact (Bin, ucSim, SDCDB, Doc)"
+
+;--------------------------------
+; Configuration
+
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+!define UNINST_ROOT_KEY HKLM
+!define SDCC_ROOT_KEY HKLM
 
 ;--------------------------------
 ; Header Files
@@ -176,10 +211,9 @@ Var SDCC.PathToRemove
 ;--------------------------------
 ; Configuration
 
-!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-
 ; MUI Settings
 !define MUI_ABORTWARNING
+!define MUI_ICON ".\sdcc.ico"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -194,7 +228,7 @@ Page custom SDCC.PageReinstall SDCC.PageLeaveReinstall
 
 ; StartMenu page
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER ${PRODUCT_NAME}
-!define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM"
+!define MUI_STARTMENUPAGE_REGISTRY_ROOT ${UNINST_ROOT_KEY}
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "NSIS:StartMenuDir"
 !define MUI_STARTMENUPAGE_NODISABLE
@@ -255,7 +289,7 @@ ${Function} .onInit
 !ifndef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
   ; Old unistallation method
   ; Uninstall the old version, if present
-  ReadRegStr $R0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
+  ReadRegStr $R0 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
   StrCmp $R0 "" inst
 
   MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
@@ -280,15 +314,15 @@ done:
 !else
   ; If the registry key exists it is an uninstallation or reinstallation:
   ;  take the old installation directory
-  Push $R2
+  Push $R0
 
-  ReadRegStr $R2 HKLM "${PRODUCT_UNINST_KEY}" "InstallLocation"
+  ReadRegStr $R0 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallLocation"
   ${IfNot} ${Errors}
-    StrCpy $INSTDIR $R2
+    StrCpy $INSTDIR $R0
     StrCpy $SDCC.PathToRemove "$INSTDIR\bin"
   ${EndIf}
 
-  Pop $R2
+  Pop $R0
 !endif
   ${DebugMsg} "Post INSTDIR = $INSTDIR"
 ${FunctionEnd}
@@ -297,24 +331,24 @@ ${Function} un.onInit
 
   ${DebugMsg} "Pre INSTDIR = $INSTDIR"
 
-  Push $R2
-  ReadRegStr $R2 HKLM "${PRODUCT_UNINST_KEY}" "InstallLocation"
+  Push $R0
+  ReadRegStr $R0 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallLocation"
   ${IfNot} ${Errors}
-    StrCpy $INSTDIR $R2
+    StrCpy $INSTDIR $R0
   ${EndIf}
-  Pop $R2
+  Pop $R0
 
   ${DebugMsg} "Post INSTDIR = $INSTDIR"
 
 ${FunctionEnd}
 
-Section -Common
+${Section} -Common SECCOMMON
   SetOutPath "$INSTDIR"
   File ".\sdcc.ico"
   File "${SDCC_ROOT}\COPYING.TXT"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC application files" SEC01
+${Section} "SDCC application files" SEC01
   SectionIn 1 2 3 RO
   SetOutPath "$INSTDIR\bin"
   File "${SDCC_ROOT}\bin\as-gbz80.exe"
@@ -331,25 +365,25 @@ Section "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\sdcclib.exe"
   File "${SDCC_ROOT}\bin\sdcpp.exe"
   File "${SDCC_ROOT}\bin\readline5.dll"
-SectionEnd
+${SectionEnd}
 
-Section "ucSim application files" SEC02
+${Section} "ucSim application files" SEC02
   SectionIn 1 2 3
   SetOutPath "$INSTDIR\bin"
   File "${SDCC_ROOT}\bin\s51.exe"
   File "${SDCC_ROOT}\bin\savr.exe"
   File "${SDCC_ROOT}\bin\shc08.exe"
   File "${SDCC_ROOT}\bin\sz80.exe"
-SectionEnd
+${SectionEnd}
 
-Section "SDCDB files" SEC03
+${Section} "SDCDB files" SEC03
   SectionIn 1 2 3
   File "${SDCC_ROOT}\bin\sdcdb.exe"
   File "${SDCC_ROOT}\bin\sdcdb.el"
   File "${SDCC_ROOT}\bin\sdcdbsrc.el"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC documentation" SEC04
+${Section} "SDCC documentation" SEC04
   SectionIn 1 2 3
   SetOutPath "$INSTDIR\doc"
 !ifdef FULL_DOC
@@ -358,9 +392,9 @@ Section "SDCC documentation" SEC04
   File "${SDCC_ROOT}\doc\ChangeLog_head.txt"
   File "${SDCC_ROOT}\doc\README.TXT"
 !endif
-SectionEnd
+${SectionEnd}
 
-Section "SDCC include files" SEC05
+${Section} "SDCC include files" SEC05
   SectionIn 1 2
   SetOutPath "$INSTDIR\include\asm\default"
   File "${DEV_ROOT}\include\asm\default\features.h"
@@ -390,85 +424,85 @@ Section "SDCC include files" SEC05
   File "${DEV_ROOT}\include\z80\*.h"
   SetOutPath "$INSTDIR\include"
   File "${DEV_ROOT}\include\*.h"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC DS390 library" SEC06
+${Section} "SDCC DS390 library" SEC06
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\ds390"
   File "${DEV_ROOT}\lib\ds390\*.rel"
   File "${DEV_ROOT}\lib\ds390\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC DS400 library" SEC07
+${Section} "SDCC DS400 library" SEC07
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\ds400"
   File "${DEV_ROOT}\lib\ds400\*.rel"
   File "${DEV_ROOT}\lib\ds400\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC GBZ80 library" SEC08
+${Section} "SDCC GBZ80 library" SEC08
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\gbz80"
   File "${DEV_ROOT}\lib\gbz80\*.o"
   File "${DEV_ROOT}\lib\gbz80\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC Z80 library" SEC09
+${Section} "SDCC Z80 library" SEC09
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\z80"
   File "${DEV_ROOT}\lib\z80\*.o"
   File "${DEV_ROOT}\lib\z80\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC small model library" SEC10
+${Section} "SDCC small model library" SEC10
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small"
   File "${DEV_ROOT}\lib\small\*.rel"
   File "${DEV_ROOT}\lib\small\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC medium model library" SEC11
+${Section} "SDCC medium model library" SEC11
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\medium"
   File "${DEV_ROOT}\lib\medium\*.rel"
   File "${DEV_ROOT}\lib\medium\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC large model library" SEC12
+${Section} "SDCC large model library" SEC12
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\large"
   File "${DEV_ROOT}\lib\large\*.rel"
   File "${DEV_ROOT}\lib\large\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC small-stack-auto model library" SEC13
+${Section} "SDCC small-stack-auto model library" SEC13
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small-stack-auto"
   File "${DEV_ROOT}\lib\small-stack-auto\*.rel"
   File "${DEV_ROOT}\lib\small-stack-auto\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC HC08 library" SEC14
+${Section} "SDCC HC08 library" SEC14
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\hc08"
   File "${DEV_ROOT}\lib\hc08\*.rel"
   File "${DEV_ROOT}\lib\hc08\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC PIC16 library" SEC15
+${Section} "SDCC PIC16 library" SEC15
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic16"
   File "${DEV_ROOT}\lib\pic16\*.o"
   File "${DEV_ROOT}\lib\pic16\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC PIC library" SEC16
+${Section} "SDCC PIC library" SEC16
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic"
   File "${DEV_ROOT}\lib\pic\*.lib"
-SectionEnd
+${SectionEnd}
 
-Section "SDCC library sources" SEC17
+${Section} "SDCC library sources" SEC17
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
   File "${DEV_ROOT}\lib\src\ds390\examples\MOVED"
@@ -650,7 +684,7 @@ Section "SDCC library sources" SEC17
 
   SetOutPath "$INSTDIR\lib\src"
   File "${DEV_ROOT}\lib\src\*.c"
-SectionEnd
+${SectionEnd}
 
 ;--------------------------------
 ;Descriptions
@@ -696,49 +730,63 @@ LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC library sources"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 
-Section -Icons
+${Section} -Icons SECICONS
 !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE"
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.lnk" "$INSTDIR\sdcc.url" 
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Uninstall SDCC.lnk" "$INSTDIR\uninstall.exe" 
+!ifdef FULL_DOC
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk" "$INSTDIR\doc\sdccman.pdf" "" "$INSTDIR\sdcc.ico" "" "" "" ""
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\README.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.lnk" "$INSTDIR\change_log.url"
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk" "$INSTDIR\doc\ChangeLog.txt" "" "$INSTDIR\sdcc.ico" "" "" "" ""
+!else
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk" "$INSTDIR\doc\ChangeLog_head.txt" "" "$INSTDIR\sdcc.ico" "" "" "" ""
+!endif
   CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk" "$INSTDIR\COPYING.TXT" 
 !insertmacro MUI_STARTMENU_WRITE_END
-SectionEnd
+${SectionEnd}
 
-Section -INI
+${Section} -INI SECINI
   WriteIniStr "$INSTDIR\sdcc.url" "InternetShortcut" "URL" "http://sdcc.sourceforge.net/"
-SectionEnd
+!ifdef FULL_DOC
+  WriteIniStr "$INSTDIR\change_log.url" "InternetShortcut" "URL" "http://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc/ChangeLog"
+!endif
+${SectionEnd}
 
-Section -PostInstall
-  WriteRegStr HKLM "Software\${PRODUCT_NAME}" "" $INSTDIR
+${Section} -PostInstall SECPOSTINSTALL
+  WriteRegStr ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "" $INSTDIR
 !ifdef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
-  WriteRegDword HKLM "Software\${PRODUCT_NAME}" "VersionMajor" "${VER_MAJOR}"
-  WriteRegDword HKLM "Software\${PRODUCT_NAME}" "VersionMinor" "${VER_MINOR}"
-  WriteRegDword HKLM "Software\${PRODUCT_NAME}" "VersionRevision" "${VER_REVISION}"
-  WriteRegDword HKLM "Software\${PRODUCT_NAME}" "VersionBuild" "${VER_BUILD}"
+  WriteRegDword ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionMajor" "${VER_MAJOR}"
+  WriteRegDword ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionMinor" "${VER_MINOR}"
+  WriteRegDword ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionRevision" "${VER_REVISION}"
+  WriteRegDword ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionBuild" "${VER_BUILD}"
 !endif
 
-  WriteRegExpandStr HKLM "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegExpandStr HKLM "${PRODUCT_UNINST_KEY}" "InstallLocation" "$INSTDIR"
-  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
-  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "Publisher" "sdcc.sourceforge.net"
-  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "http://sdcc.sourceforge.net/"
-  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "HelpLink" "http://sdcc.sourceforge.net/"
-  WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLUpdateInfo" "http://sdcc.sourceforge.net/"
+  WriteRegExpandStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegExpandStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallLocation" "$INSTDIR"
+  WriteRegStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
+  WriteRegStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "sdcc.sourceforge.net"
+  WriteRegStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "http://sdcc.sourceforge.net/"
+  WriteRegStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "HelpLink" "http://sdcc.sourceforge.net/"
+  WriteRegStr ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLUpdateInfo" "http://sdcc.sourceforge.net/"
 
   WriteUninstaller "$INSTDIR\uninstall.exe"
-SectionEnd
+${SectionEnd}
 
 
 ;;;; Uninstaller code ;;;;
 
-Section Uninstall
+${Section} Uninstall SECUNINSTALL
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_STARTMENUPAGE_VARIABLE
 
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.lnk"
+!ifdef FULL_DOC
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\README.lnk"
+!endif
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Uninstall SDCC.lnk"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.lnk"
@@ -866,6 +914,9 @@ Section Uninstall
   Delete "$INSTDIR\COPYING.TXT"
   Delete "$INSTDIR\sdcc.ico"
   Delete "$INSTDIR\sdcc.url"
+!ifdef FULL_DOC
+  Delete "$INSTDIR\change_log.url"
+!endif
   Delete "$INSTDIR\uninstall.exe"
 
   RMDir /r "$INSTDIR\lib\src\pic"
@@ -925,10 +976,10 @@ Section Uninstall
   Call un.SDCC.RemoveFromPath
 
 ; Clean the registry
-  DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
-  DeleteRegKey HKLM "Software\${PRODUCT_NAME}"
+  DeleteRegKey ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+  DeleteRegKey ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}"
 ;;;;  SetAutoClose true
-SectionEnd
+${SectionEnd}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Path Manipulation functions                                                 ;
@@ -1154,19 +1205,19 @@ Var ReinstallPageCheck
 
 ${Function} SDCC.PageReinstall
 
-  ReadRegStr $R0 HKLM "Software\${PRODUCT_NAME}" ""
+  ReadRegStr $R0 ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" ""
 
   ${If} $R0 == ""
-    ReadRegStr $R0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
+    ReadRegStr $R0 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
     ${If} $R0 == ""
       Abort
     ${EndIf}
   ${EndIf}
 
-  ReadRegDWORD $R0 HKLM "Software\${PRODUCT_NAME}" "VersionMajor"
-  ReadRegDWORD $R1 HKLM "Software\${PRODUCT_NAME}" "VersionMinor"
-  ReadRegDWORD $R2 HKLM "Software\${PRODUCT_NAME}" "VersionRevision"
-  ReadRegDWORD $R3 HKLM "Software\${PRODUCT_NAME}" "VersionBuild"
+  ReadRegDWORD $R0 ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionMajor"
+  ReadRegDWORD $R1 ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionMinor"
+  ReadRegDWORD $R2 ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionRevision"
+  ReadRegDWORD $R3 ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionBuild"
   StrCpy $R0 $R0.$R1.$R2.$R3
 
   ${VersionCompare} ${VER_MAJOR}.${VER_MINOR}.${VER_REVISION}.${VER_BUILD} $R0 $R0
@@ -1245,20 +1296,13 @@ ${Function} SDCC.PageLeaveReinstall
     Goto reinst_done
   ${EndIf}
 
-  ReadRegStr $R1 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
+  ReadRegStr $R1 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
 
   ;Run uninstaller
   HideWindow
 
   ClearErrors
   ExecWait '$R1 _?=$INSTDIR'
-
-  ${IfNot} ${Errors}
-    ${AndIfNot} ${FileExists} "$INSTDIR\bin\${PRODUCT_NAME}.exe"
-    ${DebugMsg} "deleting file $R1 and directory $INSTDIR"
-    Delete $R1
-    RMDir $INSTDIR
-  ${EndIf}
 
   ${If} $R0 == "2"
     Quit

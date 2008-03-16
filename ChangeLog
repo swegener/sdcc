@@ -1,3 +1,8 @@
+2008-03-16 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added section debugging macros, added SDCC icon,
+	  changed startup menu for release distribution, code cleaning
+
 2008-03-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCcse.c (algebraicOpts): fixed bug 1579949

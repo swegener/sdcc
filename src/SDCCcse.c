@@ -364,11 +364,11 @@ DEFSETFUNC (findCheaperOp)
               IS_TRUE_SYMOP (IC_RIGHT (cdp->diCode)))
             *opp = IC_RESULT (cdp->diCode);
           else {
-            /* if straight assignement && and both
+            /* if straight assignment and both
                are temps then prefer the one that
                will not need extra space to spil, also
                take into consideration if right side
-               an induction variable
+               is an induction variable
             */
             if (!POINTER_SET (cdp->diCode) &&
                 IS_ITEMP (IC_RESULT (cdp->diCode)) &&
@@ -858,14 +858,14 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           return;
         }
       /* if addition then check if one of them is a zero */
-      /* if yes turn it into assignmnt or cast */
+      /* if yes turn it into assignment or cast */
       if (IS_OP_LITERAL (IC_LEFT (ic)) &&
           operandLitValue (IC_LEFT (ic)) == 0.0)
         {
           int typematch;
           typematch = compareType (operandType (IC_RESULT (ic)),
                                    operandType (IC_RIGHT (ic)));
-          if (typematch<0)
+          if ((typematch<0) || (IS_TRUE_SYMOP (IC_RIGHT (ic))))
             {
               ic->op = CAST;
               IC_LEFT (ic) = operandFromLink (operandType (IC_RESULT (ic)));
@@ -891,7 +891,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           int typematch;
           typematch = compareType (operandType (IC_RESULT (ic)),
                                    operandType (IC_LEFT (ic)));
-          if (typematch<0)
+          if ((typematch<0) || (IS_TRUE_SYMOP (IC_LEFT (ic))))
             {
               ic->op = CAST;
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -915,7 +915,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         }
       break;
     case '-':
-      /* if subtracting the the same thing then zero     */
+      /* if subtracting the same thing then zero     */
       if (IC_LEFT (ic)->key == IC_RIGHT (ic)->key)
         {
           ic->op = '=';
@@ -1093,28 +1093,28 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         }
       break;
     case CAST:
+        {
+          sym_link *otype = operandType(IC_RIGHT(ic));
+          sym_link *ctype = operandType(IC_LEFT(ic));
+          /* if this is a cast of a literal value */
+          if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
+              !(IS_GENPTR(ctype) && (IS_PTR(otype) && !IS_GENPTR(otype))))
             {
-                    sym_link *otype = operandType(IC_RIGHT(ic));
-                    sym_link *ctype = operandType(IC_LEFT(ic));
-                    /* if this is a cast of a literal value */
-                    if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
-                        !(IS_GENPTR(ctype) && (IS_PTR(otype) && !IS_GENPTR(otype)))) {
-                            ic->op = '=';
-                            IC_RIGHT (ic) =
-                                    operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)),
-                                                                      operandLitValue (IC_RIGHT (ic))));
-                            IC_LEFT (ic) = NULL;
-                            SET_ISADDR (IC_RESULT (ic), 0);
-                    }
-                    /* if casting to the same */
-                    if (compareType (operandType (IC_RESULT (ic)),
-                                     operandType (IC_RIGHT (ic))) == 1) {
-                            ic->op = '=';
-                            IC_LEFT (ic) = NULL;
-                            SET_ISADDR (IC_RESULT (ic), 0);
-                    }
+              ic->op = '=';
+              IC_RIGHT (ic) = operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)),
+                                                                operandLitValue (IC_RIGHT (ic))));
+              IC_LEFT (ic) = NULL;
+              SET_ISADDR (IC_RESULT (ic), 0);
             }
-            break;
+          /* if casting to the same */
+          if (compareType (operandType (IC_RESULT (ic)), operandType (IC_RIGHT (ic))) == 1)
+            {
+              ic->op = '=';
+              IC_LEFT (ic) = NULL;
+              SET_ISADDR (IC_RESULT (ic), 0);
+            }
+        }
+      break;
     case '!':
       if (IS_OP_LITERAL (IC_LEFT (ic)))
         {
@@ -1297,11 +1297,11 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               newic->lineno = ic->lineno;
               addiCodeToeBBlock (ebp, newic, ic->next);
             }
-            ic->op = '=';
-            IC_RIGHT (ic) = operandFromLit (0);
-            IC_LEFT (ic) = NULL;
-            SET_RESULT_RIGHT (ic);
-            return;
+          ic->op = '=';
+          IC_RIGHT (ic) = operandFromLit (0);
+          IC_LEFT (ic) = NULL;
+          SET_RESULT_RIGHT (ic);
+          return;
         }
       /* swap literal to right ic */
       if (IS_OP_LITERAL (IC_LEFT (ic)))
@@ -1485,25 +1485,20 @@ ifxOptimize (iCode * ic, set * cseSet,
   /* if the conditional is a literal then */
   if (IS_OP_LITERAL (IC_COND (ic)))
     {
-
       if ((operandLitValue (IC_COND (ic)) != 0.0) && IC_TRUE (ic))
         {
-
           /* change to a goto */
           ic->op = GOTO;
           IC_LABEL (ic) = IC_TRUE (ic);
           (*change)++;
-
         }
       else
         {
-
           if (!operandLitValue (IC_COND (ic)) && IC_FALSE (ic))
             {
               ic->op = GOTO;
               IC_LABEL (ic) = IC_FALSE (ic);
               (*change)++;
-
             }
           else
             {
@@ -1518,9 +1513,10 @@ ifxOptimize (iCode * ic, set * cseSet,
       /* too often, if it does happen then the user pays */
       /* the price */
       computeControlFlow (ebbi);
-      if (!options.lessPedantic) {
-        werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
-      }
+      if (!options.lessPedantic)
+        {
+          werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
+        }
       return;
     }
 
@@ -1531,10 +1527,10 @@ ifxOptimize (iCode * ic, set * cseSet,
   if (elementsInSet (ebb->succList) == 1 &&
       isinSet (ebb->succList, eBBWithEntryLabel (ebbi, label)))
     {
-
-      if (!options.lessPedantic) {
-        werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
-      }
+      if (!options.lessPedantic)
+        {
+          werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
+        }
       if (IS_OP_VOLATILE (IC_COND (ic)))
         {
           IC_RIGHT (ic) = IC_COND (ic);
@@ -1550,8 +1546,7 @@ ifxOptimize (iCode * ic, set * cseSet,
         }
     }
 
-
-  /* if it remains an IFX the update the use Set */
+  /* if it remains an IFX then update the use Set */
   if (ic->op == IFX)
     {
       OP_USES(IC_COND (ic))=bitVectSetBit (OP_USES (IC_COND (ic)), ic->key);
@@ -1888,7 +1883,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
         continue;
 
       /* if this is an assignment from true symbol
-         to a temp then do pointer post inc/dec optimzation */
+         to a temp then do pointer post inc/dec optimization */
       if (ic->op == '=' && !POINTER_SET (ic) &&
           IS_PTR (operandType (IC_RESULT (ic))))
         {

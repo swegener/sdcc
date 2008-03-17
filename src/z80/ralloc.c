@@ -2877,7 +2877,7 @@ packRegsForAccUse2 (iCode * ic)
             D (D_ACCUSE2_VERBOSE, ("  ! Preserves A, so continue scanning\n"));
             scan = next;
           }
-        else if (scan->next == NULL && bitVectnBitsOn (uses) == 1 && next != NULL)
+        /*else if (scan->next == NULL && bitVectnBitsOn (uses) == 1 && next != NULL)
           {
             if (next->prev == NULL)
               {
@@ -2894,7 +2894,7 @@ packRegsForAccUse2 (iCode * ic)
                 D (D_ACCUSE2, ("  + Dropping as last in list and next doesn't start a block\n"));
                 return;
               }
-          }
+          } /*This caused bug #1292721 */
         else if (scan->next == NULL)
           {
             D (D_ACCUSE2, ("  + Dropping as hit the end of the list\n"));

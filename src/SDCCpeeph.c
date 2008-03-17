@@ -1208,8 +1208,8 @@ ftab[] =                                // sorted on the number of times used
 static int
 callFuncByName (char *fname,
                 hTab * vars,
-                lineNode * currPl,
-                lineNode * endPl,
+                lineNode * currPl, /* first source line matched */
+                lineNode * endPl,  /* last source line matched */
                 lineNode * head)
 {
   int   i;

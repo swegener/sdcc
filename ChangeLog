@@ -1,3 +1,14 @@
+2008-03-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/SDCCpeeph.c.c (callFuncByName):
+	  Commented function parameters.
+
+2008-03-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c (packRegsForAccUse2):
+	  disabled a broken accumulator packing optimization (fixed #1292721).
+	* support/regression/tests/bug-1292721: Regression test for #1292721.
+
 2008-03-16 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (SetIrp,genNearPointerGet,genNearPointerSet):

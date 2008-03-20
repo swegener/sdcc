@@ -1,3 +1,8 @@
+2008-03-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (comparePtrType): fixed bug 1921073
+	* support/regression/tests/bug1921073.c: new, added
+
 2008-03-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/SDCCpeeph.c.c (callFuncByName):

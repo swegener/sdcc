@@ -2050,7 +2050,7 @@ comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
   int res;
 
   if (IS_VOID (src->next) && IS_VOID (dest->next))
-    return 1;
+    return bMustCast ? -1 : 1;
   if ((IS_VOID (src->next) && !IS_VOID (dest->next)) ||
       (!IS_VOID (src->next) && IS_VOID (dest->next)) )
     return -1;

@@ -1,3 +1,8 @@
+2008-03-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c (callFuncByName):
+	  Used // instead of /**/ to fix compilation warning about nested comments.
+
 2008-03-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (comparePtrType): fixed bug 1921073

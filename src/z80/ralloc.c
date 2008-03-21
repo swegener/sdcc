@@ -2894,7 +2894,7 @@ packRegsForAccUse2 (iCode * ic)
                 D (D_ACCUSE2, ("  + Dropping as last in list and next doesn't start a block\n"));
                 return;
               }
-          } /*This caused bug #1292721 */
+          } //This caused bug #1292721 */
         else if (scan->next == NULL)
           {
             D (D_ACCUSE2, ("  + Dropping as hit the end of the list\n"));

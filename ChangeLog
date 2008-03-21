@@ -1,3 +1,11 @@
+2008-03-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (opIsGptr, adjustArithmeticResult, genAddrOf, genAssign),
+	* src/mcs51/gen.c (opIsGptr, adjustArithmeticResult, genAddrOf, genAssign):
+	  fixed bug 1839277
+	* src/mcs51/gen.c: throughout only output hex constants
+	* src/SDCCicode.c (getPtrType, geniCodeCast): fixed code size regression
+
 2008-03-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.c (callFuncByName):

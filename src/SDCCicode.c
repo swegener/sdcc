@@ -801,7 +801,6 @@ operandType (operand * op)
   /* depending on type of operand */
   switch (op->type)
     {
-
     case VALUE:
       return op->operand.valOperand->type;
 
@@ -810,6 +809,7 @@ operandType (operand * op)
 
     case TYPE:
       return op->operand.typeOperand;
+
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
               " operand type not known ");
@@ -1947,6 +1947,33 @@ geniCodeRValue (operand * op, bool force)
   return IC_RESULT (ic);
 }
 
+static DECLARATOR_TYPE
+getPtrType(sym_link *type)
+{
+  //for Z80 anything goes
+  if (TARGET_Z80_LIKE)
+    return POINTER;
+
+  //for HC08 only zeropage ptr is different
+  if (TARGET_IS_HC08)
+    {
+      if (IS_DATA_PTR (type))
+        return POINTER;
+      else
+        return FPOINTER;
+    }
+
+  if (IS_DATA_PTR (type) && TARGET_MCS51_LIKE)
+    return IPOINTER;
+  if (IS_PTR (type))
+    return DCL_TYPE (type);
+  else if (IS_FUNC (type))
+    return CPOINTER;
+  else if (IS_ARRAY (type))
+    return PTR_TYPE (SPEC_OCLS (getSpec (type)));
+  return UPOINTER;
+}
+
 /*-----------------------------------------------------------------*/
 /* geniCodeCast - changes the value from one type to another       */
 /*-----------------------------------------------------------------*/
@@ -1979,8 +2006,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   /* if this is a literal then just change the type & return */
   if (IS_LITERAL (opetype) && op->type == VALUE && !IS_PTR (type) && !IS_PTR (optype))
     {
-      return operandFromValue (valCastLiteral (type,
-                                               operandLitValue (op)));
+      return operandFromValue (valCastLiteral (type, operandLitValue (op)));
     }
 
   /* if casting to/from pointers, do some checking */
@@ -2068,7 +2094,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       !IS_FIXED (type) &&
       !IS_FIXED (optype) &&
       ((IS_SPEC (type) && IS_SPEC (optype)) ||
-       (IS_DECL (type) && IS_DECL (optype) && DCL_TYPE (type) == DCL_TYPE (optype))))
+       (IS_DECL (type) && IS_DECL (optype) && getPtrType (type) == getPtrType (optype))))
     {
       ic = newiCode ('=', NULL, op);
       IC_RESULT (ic) = newiTempOperand (type, 0);

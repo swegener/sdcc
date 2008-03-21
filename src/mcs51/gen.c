@@ -1786,15 +1786,13 @@ reAdjustPreg (asmop * aop)
 }
 
 /*-----------------------------------------------------------------*/
-/* opIsGptr: returns non-zero if the passed operand is       */
-/* a generic pointer type.             */
+/* opIsGptr: returns non-zero if the passed operand is             */
+/* a generic pointer type.                                         */
 /*-----------------------------------------------------------------*/
 static int
 opIsGptr (operand * op)
 {
-  sym_link *type = operandType (op);
-
-  if ((AOP_SIZE (op) == GPTRSIZE) && IS_GENPTR (type))
+  if (op && IS_GENPTR (operandType (op)) && (AOP_SIZE (op) == GPTRSIZE))
     {
       return 1;
     }
@@ -1807,8 +1805,8 @@ opIsGptr (operand * op)
 static int
 getDataSize (operand * op)
 {
-  int size;
-  size = AOP_SIZE (op);
+  int size = AOP_SIZE (op);
+
   if (size == GPTRSIZE)
     {
       sym_link *type = operandType (op);
@@ -2173,7 +2171,7 @@ genUminus (iCode * ic)
           if (offset == 0)
             SETC;
           emitcode ("cpl", "a");
-          emitcode ("addc", "a,#0");
+          emitcode ("addc", "a,#0x00");
         }
       else
         {
@@ -2277,7 +2275,7 @@ saveRegisters (iCode * lic)
             }
           emitcode ("mov", "r0,%s", spname);
           MOVA ("r0");
-          emitcode ("add", "a,#%d", count);
+          emitcode ("add", "a,#0x%02x", count);
           emitcode ("mov", "%s,a", spname);
           for (i = 0; i < mcs51_nRegs; i++)
             {
@@ -2523,7 +2521,7 @@ genXpush (iCode * ic)
       // allocate space first
       emitcode ("mov", "%s,%s", r->name, spname);
       MOVA (r->name);
-      emitcode ("add", "a,#%d", size);
+      emitcode ("add", "a,#0x%02x", size);
       emitcode ("mov", "%s,a", spname);
 
       while (size--)
@@ -2666,7 +2664,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       // allocate space first
       emitcode ("mov", "%s,%s", r->name, spname);
       MOVA (r->name);
-      emitcode ("add", "a,#%d", count);
+      emitcode ("add", "a,#0x%02x", count);
       emitcode ("mov", "%s,a", spname);
     }
 
@@ -4446,14 +4444,14 @@ adjustArithmeticResult (iCode * ic)
     }
 
   if (opIsGptr (IC_RESULT (ic)) &&
-      AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
-      AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
+      IC_LEFT (ic) && AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
+      IC_RIGHT (ic) && AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))) &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
     {
-      char buffer[5];
+      char buffer[10];
       SNPRINTF (buffer, sizeof(buffer),
-                "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+                "#0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
       aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
     }
 }
@@ -5172,10 +5170,10 @@ genMultOneByte (operand * left,
         emitcode ("inc", "a"); /* inc doesn't set carry flag */
       else
         {
-          emitcode ("add", "a,#1"); /* this sets carry flag */
+          emitcode ("add", "a,#0x01"); /* this sets carry flag */
           emitcode ("xch", "a,b");
           emitcode ("cpl", "a"); /* msb 2's complement */
-          emitcode ("addc", "a,#0");
+          emitcode ("addc", "a,#0x00");
           emitcode ("xch", "a,b");
         }
       emitLabel (lbl);
@@ -5458,7 +5456,7 @@ genDivOneByte (operand * left,
             }
           else /* compiletimeSign */
             {
-              if (aopPutUsesAcc (result, "#0xFF", offset))
+              if (aopPutUsesAcc (result, "#0xff", offset))
                 {
                   emitcode ("push", "acc");
                   pushedA = TRUE;
@@ -7178,7 +7176,7 @@ genOr (iCode * ic, iCode * ifx)
                 }
               else if (bytelit == 0x0FF)
                 {
-                  aopPut (result, "#0xFF", offset);
+                  aopPut (result, "#0xff", offset);
                 }
               else if (IS_AOP_PREG (left))
                 {
@@ -7319,7 +7317,7 @@ genOr (iCode * ic, iCode * ifx)
                       /* dummy read of volatile operand */
                       if (isOperandVolatile (left, FALSE))
                         MOVA (aopGet (left, offset, FALSE, FALSE));
-                      aopPut (result, "#0xFF", offset);
+                      aopPut (result, "#0xff", offset);
                       continue;
                     }
                 }
@@ -11018,7 +11016,7 @@ genIfx (iCode * ic, iCode * popIc)
 
   /* if there was something to be popped then do it */
   if (popIc)
-    genIpop (popIc);
+      genIpop (popIc);
 
   /* if the condition is a bit variable */
   if (isbit && dup)
@@ -11091,7 +11089,7 @@ genAddrOf (iCode * ic)
     }
 
   /* object not on stack then we need the name */
-  size = AOP_SIZE (IC_RESULT (ic));
+  size = getDataSize (IC_RESULT (ic));
   offset = 0;
 
   while (size--)
@@ -11104,6 +11102,13 @@ genAddrOf (iCode * ic)
       else
         SNPRINTF (s, sizeof(s), "#%s", sym->rname);
       aopPut (IC_RESULT (ic), s, offset++);
+    }
+  if (opIsGptr (IC_RESULT (ic)))
+    {
+      char buffer[10];
+      SNPRINTF (buffer, sizeof(buffer),
+                "#0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+      aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
     }
 
 release:
@@ -11192,7 +11197,7 @@ genAssign (iCode * ic)
 
   /* bit variables done */
   /* general case */
-  size = AOP_SIZE (result);
+  size = getDataSize (result);
   offset = 0;
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
@@ -11233,6 +11238,7 @@ genAssign (iCode * ic)
           offset++;
         }
     }
+  adjustArithmeticResult (ic);
 
 release:
   freeAsmop (result, NULL, ic, TRUE);
@@ -11268,7 +11274,7 @@ genJumpTab (iCode * ic)
       /* multiply by three */
       if (aopGetUsesAcc (IC_JTCOND (ic), 0))
         {
-          emitcode ("mov", "b,#3");
+          emitcode ("mov", "b,#0x03");
           emitcode ("mul", "ab");
         }
       else
@@ -11446,7 +11452,7 @@ genCast (iCode * ic)
                     exit(1);
                 }
 
-                sprintf(gpValStr, "#0x%x", gpVal);
+                sprintf(gpValStr, "#0x%02x", gpVal);
                 aopPut (result, gpValStr, GPTRSIZE - 1);
             }
           goto release;
@@ -11919,18 +11925,18 @@ gen51Code (iCode * lic)
           break;
 
         case IPOP:
-          /* IPOP happens only when trying to restore a
-             spilt live range, if there is an ifx statement
+            /* IPOP happens only when trying to restore a
+               spilt live range, if there is an ifx statement
              following this pop then the if statement might
-             be using some of the registers being popped which
-             would destory the contents of the register so
-             we need to check for this condition and handle it */
+               be using some of the registers being popped which
+               would destory the contents of the register so
+               we need to check for this condition and handle it */
           if (ic->next &&
               ic->next->op == IFX &&
               regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
             genIfx (ic->next, ic);
-          else
-            genIpop (ic);
+            else
+              genIpop (ic);
           break;
 
         case CALL:

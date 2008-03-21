@@ -1947,9 +1947,7 @@ reAdjustPreg (asmop * aop)
 static int
 opIsGptr (operand * op)
 {
-  sym_link *type = operandType (op);
-
-  if ((AOP_SIZE (op) == GPTRSIZE) && IS_GENPTR (type))
+  if (op && IS_GENPTR (operandType (op)) && (AOP_SIZE (op) == GPTRSIZE))
     {
       return 1;
     }
@@ -1962,8 +1960,8 @@ opIsGptr (operand * op)
 static int
 getDataSize (operand * op)
 {
-  int size;
-  size = AOP_SIZE (op);
+  int size = AOP_SIZE (op);
+
   if (size == GPTRSIZE)
     {
       sym_link *type = operandType (op);
@@ -4467,8 +4465,8 @@ adjustArithmeticResult (iCode * ic)
     }
 
   if (opIsGptr (IC_RESULT (ic)) &&
-      AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
-      AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
+      IC_LEFT (ic) && AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
+      IC_RIGHT (ic) && AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))) &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
     {
@@ -11952,13 +11950,14 @@ genAddrOf (iCode * ic)
   }
 
   /* object not on stack then we need the name */
-  size = AOP_SIZE (IC_RESULT (ic));
+  size = getDataSize (IC_RESULT (ic));
   offset = 0;
 
   while (size--)
     {
       char s[SDCC_NAME_MAX];
-      if (offset) {
+      if (offset)
+        {
           switch (offset) {
           case 1:
               tsprintf(s, sizeof(s), "#!his",sym->rname);
@@ -11970,9 +11969,7 @@ genAddrOf (iCode * ic)
               tsprintf(s, sizeof(s), "#!hihihis",sym->rname);
               break;
           default: /* should not need this (just in case) */
-              SNPRINTF (s, sizeof(s), "#(%s >> %d)",
-                       sym->rname,
-                       offset * 8);
+              SNPRINTF (s, sizeof(s), "#(%s >> %d)", sym->rname, offset * 8);
           }
       }
       else
@@ -11981,6 +11978,13 @@ genAddrOf (iCode * ic)
       }
 
       aopPut (IC_RESULT (ic), s, offset++);
+    }
+  if (opIsGptr (IC_RESULT (ic)))
+    {
+      char buffer[10];
+      SNPRINTF (buffer, sizeof(buffer), "#0x%02x",
+                pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+      aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
     }
 
 release:
@@ -12270,7 +12274,7 @@ genAssign (iCode * ic)
 
   /* bit variables done */
   /* general case */
-  size = AOP_SIZE (result);
+  size = getDataSize (result);
   offset = 0;
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
@@ -12312,6 +12316,7 @@ genAssign (iCode * ic)
         }
       _endLazyDPSEvaluation ();
     }
+  adjustArithmeticResult (ic);
 
 release:
   freeAsmop (result, NULL, ic, TRUE);

@@ -5,6 +5,7 @@
 	  fixed bug 1839277
 	* src/mcs51/gen.c: throughout only output hex constants
 	* src/SDCCicode.c (getPtrType, geniCodeCast): fixed code size regression
+	* support/regression/tests/bug1839277.c: new, added
 
 2008-03-21 Philipp Klaus Krause <pkk AT spth.de>
 

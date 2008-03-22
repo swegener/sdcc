@@ -1954,6 +1954,10 @@ getPtrType(sym_link *type)
   if (TARGET_Z80_LIKE)
     return POINTER;
 
+  //preserve original behaviour for PIC16
+  if (TARGET_IS_PIC16)
+    return POINTER;
+
   //for HC08 only zeropage ptr is different
   if (TARGET_IS_HC08)
     {

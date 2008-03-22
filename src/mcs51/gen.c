@@ -4425,34 +4425,58 @@ adjustArithmeticResult (iCode * ic)
 static void
 adjustArithmeticResult (iCode * ic)
 {
-  if (opIsGptr (IC_RESULT (ic)) &&
-      opIsGptr (IC_LEFT (ic)) &&
-      !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
-    {
-      aopPut (IC_RESULT (ic),
-              aopGet (IC_LEFT (ic), GPTRSIZE - 1, FALSE, FALSE),
-              GPTRSIZE - 1);
-    }
-
-  if (opIsGptr (IC_RESULT (ic)) &&
-      opIsGptr (IC_RIGHT (ic)) &&
-      !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
-    {
-      aopPut (IC_RESULT (ic),
-              aopGet (IC_RIGHT (ic), GPTRSIZE - 1, FALSE, FALSE),
-              GPTRSIZE - 1);
-    }
-
-  if (opIsGptr (IC_RESULT (ic)) &&
-      IC_LEFT (ic) && AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
-      IC_RIGHT (ic) && AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
-      !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))) &&
-      !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
+  if (opIsGptr (IC_RESULT (ic)))
     {
       char buffer[10];
-      SNPRINTF (buffer, sizeof(buffer),
-                "#0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
-      aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
+
+      if (opIsGptr (IC_LEFT (ic)))
+        {
+          if (!sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
+            {
+              aopPut (IC_RESULT (ic),
+                      aopGet (IC_LEFT (ic), GPTRSIZE - 1, FALSE, FALSE),
+                      GPTRSIZE - 1);
+            }
+          return;
+        }
+
+      if (opIsGptr (IC_RIGHT (ic)))
+        {
+          if (!sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
+            {
+              aopPut (IC_RESULT (ic),
+                      aopGet (IC_RIGHT (ic), GPTRSIZE - 1, FALSE, FALSE),
+                      GPTRSIZE - 1);
+            }
+          return;
+        }
+
+      if (IC_LEFT (ic) && AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
+          IC_RIGHT (ic) && AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
+          !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))) &&
+          !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "#0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+          aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
+          return;
+        }
+      if (IC_LEFT (ic) && AOP_SIZE (IC_LEFT (ic)) < GPTRSIZE &&
+          !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "#0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+          aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
+          return;
+        }
+      if (IC_RIGHT (ic) && AOP_SIZE (IC_RIGHT (ic)) < GPTRSIZE &&
+          !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "#0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RIGHT (ic)))), NULL, NULL));
+          aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
+          return;
+        }
     }
 }
 #endif

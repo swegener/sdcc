@@ -2,6 +2,7 @@
 
 	* src/pic/gen.h: Q&D solution for the bug, found by Jim Paris
 	  and reverted it, since it was already fixed by Raphael ;-)
+	* doc/knownbugs.html: updated for RC2
 
 2008-03-22 Raphael Neider <rneider AT web.de>
 

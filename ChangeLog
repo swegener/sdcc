@@ -1,6 +1,7 @@
 2008-03-23 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic/gen.h: Q&D solution for the bug, found by Jim Paris
+	  and reverted it, since it was already fixed by Raphael ;-)
 
 2008-03-22 Raphael Neider <rneider AT web.de>
 

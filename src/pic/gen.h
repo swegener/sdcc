@@ -52,8 +52,7 @@ enum
   AOP_IMMD,
   AOP_STR,
   AOP_CRY,
-  AOP_ACC,
-  AOP_PCODE = 13
+  AOP_PCODE
 
 };
 

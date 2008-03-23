@@ -1,3 +1,7 @@
+2008-03-23 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic/gen.h: Q&D solution for the bug, found by Jim Paris
+
 2008-03-22 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCicode.c (getPtrType): avoid unnecessary extra assignments

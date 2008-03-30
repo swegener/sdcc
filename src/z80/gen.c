@@ -2508,7 +2508,6 @@ void
 assignResultValue (operand * oper)
 {
   int size = AOP_SIZE (oper);
-  int i;
   bool topInA = 0;
 
   wassertl (size <= 4, "Got a result that is bigger than four bytes");
@@ -2527,7 +2526,7 @@ assignResultValue (operand * oper)
   else
     {
       if ((AOP_TYPE (oper) == AOP_REG) && (AOP_SIZE (oper) == 4) &&
-          !strcmp (AOP (oper)->aopu.aop_reg[size-2]->name, _fReturn[size-1]))
+          !strcmp (AOP (oper)->aopu.aop_reg[size-1]->name, _fReturn[size-2]))
         {
           size--;
           _emitMove ("a", _fReturn[size-1]);
@@ -2536,9 +2535,9 @@ assignResultValue (operand * oper)
           aopPut (AOP (oper), _fReturn[size], size-1);
           size--;
         }
-      for (i = 0; i < size; i++)
+      while(size--)
         {
-          aopPut (AOP (oper), _fReturn[i], i);
+          aopPut (AOP (oper), _fReturn[size], size);
         }
     }
 }
@@ -3278,7 +3277,7 @@ genFunction (iCode * ic)
     emit2 ("!enterxl", sym->stack);
   else if (sym->stack)
     {
-      if (optimize.codeSize && sym->stack <= 8 || sym->stack <= 4)
+      if ((optimize.codeSize && sym->stack <= 8) || sym->stack <= 4)
         {
           int stack = sym->stack;
           emit2 ("!enter");

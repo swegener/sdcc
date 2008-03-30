@@ -1,3 +1,10 @@
+2008-03-30 Borut Razem <borut.razem AT siol.net>
+
+	* Small Device C Compiler 2.8.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 2.8.1
+	* support/scripts/sdcc.nsi: added finish page; this version
+	  was used for 2.8.0 release
+
 2008-03-23 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic/gen.h: Q&D solution for the bug, found by Jim Paris

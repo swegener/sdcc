@@ -93,7 +93,7 @@
   StrCpy $SDCC.StrStack2 $SDCC.StrStack1
   StrCpy $SDCC.StrStack1 $SDCC.StrStack0
   StrCpy $SDCC.StrStack0 $SDCC.FunctionName
-  StrCpy $SDCC.FunctionName ${NAME}
+  StrCpy $SDCC.FunctionName "${NAME}"
 !macroend
 
 !define SDCC.PopStr "!insertmacro MACRO_SDCC_PopStr"
@@ -255,10 +255,15 @@ ${Function} SDCC.InstFilesLeave
   ${EndIf}
 ${FunctionEnd}
 
-; Finish page
+; Finish page - add to path
+!define MUI_FINISHPAGE_TEXT "Confirm the checkbox if you won to add SDCC binary directory to the PATH environment variable"
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "Add $INSTDIR\bin to the PATH"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION SDCC.AddBinToPath
 !define MUI_FINISHPAGE_SHOWREADME
+!define MUI_FINISHPAGE_BUTTON "Next"
+!insertmacro MUI_PAGE_FINISH
+
+; Finish page - reboot
 !insertmacro MUI_PAGE_FINISH
 
 ${Function} SDCC.AddBinToPath
@@ -271,6 +276,7 @@ ${FunctionEnd}
 ; Uninstaller pages
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
 
 ; Language files
 !insertmacro MUI_LANGUAGE "English"
@@ -779,6 +785,14 @@ ${SectionEnd}
 ${Section} Uninstall SECUNINSTALL
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_STARTMENUPAGE_VARIABLE
 
+  ${DebugMsg} "removing path $INSTDIR\bin"
+  Push "$INSTDIR\bin"
+  Call un.SDCC.RemoveFromPath
+
+; Clean the registry
+  DeleteRegKey ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+  DeleteRegKey ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}"
+
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk"
   Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk"
 !ifdef FULL_DOC
@@ -964,14 +978,6 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\bin"
 
   RMDir "$INSTDIR"
-
-  ${DebugMsg} "removing path $INSTDIR\bin"
-  Push "$INSTDIR\bin"
-  Call un.SDCC.RemoveFromPath
-
-; Clean the registry
-  DeleteRegKey ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-  DeleteRegKey ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}"
 ;;;;  SetAutoClose true
 ${SectionEnd}
 
@@ -1024,8 +1030,10 @@ ${Function} SDCC.AddToPath
               ${If} $2 = 26        ; DOS EOF
                 FileSeek $1 -1 END ; write over EOF
               ${Endif}
+              ${DebugMsg} "adding line $\r$\nSET PATH=%PATH%;$3$\r$\n"
               FileWrite $1 "$\r$\nSET PATH=%PATH%;$3$\r$\n"
               FileClose $1
+              ${DebugMsg} "SetRebootFlag true"
               SetRebootFlag true
             ${Else}
               ;System PATH variable is at:
@@ -1098,6 +1106,8 @@ ${Function} ${un}SDCC.RemoveFromPath
       ${Else}
         ; This is the line I'm looking for:
         ; don't copy it
+        ${DebugMsg} "removing line $0"
+        ${DebugMsg} "SetRebootFlag true"
         SetRebootFlag true
         Goto nextLine
       ${EndIf}
@@ -1296,7 +1306,8 @@ ${Function} SDCC.PageLeaveReinstall
   HideWindow
 
   ClearErrors
-  ExecWait '$R1'
+  ; ExecWait doesn't wait if _?=$INSTDIR is not defined!
+  ExecWait '$R1 _?=$INSTDIR'
 
   ${If} $R0 == "2"
     Quit

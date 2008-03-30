@@ -432,6 +432,8 @@ emit2 (const char *szFormat,...)
 static void
 emitDebug (const char *szFormat,...)
 {
+  if (!options.verboseAsm)
+    return;
   if (!DISABLE_DEBUG)
     {
       va_list ap;
@@ -2506,6 +2508,7 @@ void
 assignResultValue (operand * oper)
 {
   int size = AOP_SIZE (oper);
+  int i;
   bool topInA = 0;
 
   wassertl (size <= 4, "Got a result that is bigger than four bytes");
@@ -2524,7 +2527,7 @@ assignResultValue (operand * oper)
   else
     {
       if ((AOP_TYPE (oper) == AOP_REG) && (AOP_SIZE (oper) == 4) &&
-          !strcmp (AOP (oper)->aopu.aop_reg[size-1]->name, _fReturn[size-2]))
+          !strcmp (AOP (oper)->aopu.aop_reg[size-2]->name, _fReturn[size-1]))
         {
           size--;
           _emitMove ("a", _fReturn[size-1]);
@@ -2533,9 +2536,9 @@ assignResultValue (operand * oper)
           aopPut (AOP (oper), _fReturn[size], size-1);
           size--;
         }
-      while (size--)
+      for (i = 0; i < size; i++)
         {
-          aopPut (AOP (oper), _fReturn[size], size);
+          aopPut (AOP (oper), _fReturn[i], i);
         }
     }
 }
@@ -2956,19 +2959,6 @@ emitCall (iCode * ic, bool ispcall)
   /* Mark the registers as restored. */
   _G.saves.saved = FALSE;
 
-  /* if we need assign a result value */
-  if ((IS_ITEMP (IC_RESULT (ic)) &&
-       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-        OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
-      IS_TRUE_SYMOP (IC_RESULT (ic)))
-    {
-      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-
-      assignResultValue (IC_RESULT (ic));
-
-      freeAsmop (IC_RESULT (ic), NULL, ic);
-    }
-
   /* adjust the stack for parameters if required */
   if (ic->parmBytes)
     {
@@ -3001,6 +2991,19 @@ emitCall (iCode * ic, bool ispcall)
                 }
             }
         }
+    }
+
+  /* if we need assign a result value */
+  if ((IS_ITEMP (IC_RESULT (ic)) &&
+       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
+        OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
+      IS_TRUE_SYMOP (IC_RESULT (ic)))
+    {
+      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+
+      assignResultValue (IC_RESULT (ic));
+
+      freeAsmop (IC_RESULT (ic), NULL, ic);
     }
 
   spillCached ();
@@ -3274,7 +3277,22 @@ genFunction (iCode * ic)
   else if (sym->stack && IS_GB && sym->stack > -INT8MIN)
     emit2 ("!enterxl", sym->stack);
   else if (sym->stack)
-    emit2 ("!enterx", sym->stack);
+    {
+      if (optimize.codeSize && sym->stack <= 8 || sym->stack <= 4)
+        {
+          int stack = sym->stack;
+          emit2 ("!enter");
+          while (stack > 1)
+            {
+              emit2 ("push af");
+              stack -= 2;
+            }
+          if(stack > 0)
+            emit2 ("dec sp");
+        }
+      else
+        emit2 ("!enterx", sym->stack);
+    }
   else
     emit2 ("!enter");
 
@@ -3844,7 +3862,16 @@ genPlus (iCode * ic)
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
       emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
-      spillCached();
+      spillPair (PAIR_HL);
+      commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+      goto release;
+    }
+
+  if (isPair (AOP (IC_LEFT (ic))) && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && getPairId (AOP (IC_LEFT (ic))) != PAIR_HL)
+    {
+      fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+      emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
+      spillPair (PAIR_HL);
       commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
       goto release;
     }
@@ -4165,7 +4192,12 @@ genMinus (iCode * ic)
         {
           /* first add without previous c */
           if (!offset)
-            emit2 ("add a,!immedbyte", (unsigned int) (lit & 0x0FFL));
+            {
+              if (size == 0 && (unsigned int) (lit & 0x0FFL) == 0xFF)
+                emit2 ("dec a");
+              else
+                emit2 ("add a,!immedbyte", (unsigned int) (lit & 0x0FFL));
+            }
           else
             emit2 ("adc a,!immedbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
         }
@@ -4284,7 +4316,7 @@ genMult (iCode * ic)
       i <<= 1;
     }
 
-  spillCached();
+  spillPair(PAIR_HL);
 
   if (IS_Z80 && _G.stack.pushedDE)
     {
@@ -7180,7 +7212,7 @@ genAddrOf (iCode * ic)
     {
       if (sym->onStack)
         {
-          spillCached ();
+          spillPair (PAIR_HL);
           if (sym->stack <= 0)
             {
               setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset);
@@ -7199,7 +7231,7 @@ genAddrOf (iCode * ic)
     }
   else
     {
-      spillCached ();
+      spillPair (PAIR_HL);
       if (sym->onStack)
         {
           /* if it has an offset  then we need to compute it */
@@ -7379,7 +7411,7 @@ genJumpTab (iCode * ic)
   emit2 ("ld e,%s", l);
   emit2 ("ld d,!zero");
   jtab = newiTempLabel (NULL);
-  spillCached ();
+  spillPair (PAIR_HL);
   emit2 ("ld hl,!immed!tlabel", jtab->key + 100);
   emit2 ("add hl,de");
   emit2 ("add hl,de");

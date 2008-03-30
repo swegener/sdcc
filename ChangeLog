@@ -1,6 +1,11 @@
 2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
-	* src/z80/ralloc (serialRegAssign, allocReg, tryAllocatingRegPair):
-	  Implemented #1921450, changed some Debug messages.
+	* src/z80/gen.c (emitDebug, assignResultValue, genPlus, genMinus, genMult, genJumpTab):
+	  Use 16-bit instructions for addition in some additional cases,
+	  implemented RFEs #1914251, #1914245, #1922090, #1921382, #1918323.
+
+2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/ralloc.c (serialRegAssign, allocReg, tryAllocatingRegPair):
+	  Implemented RFE #1921450, changed some debug messages.
 
 2008-03-30 Borut Razem <borut.razem AT siol.net>
 

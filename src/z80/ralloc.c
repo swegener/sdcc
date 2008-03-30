@@ -146,7 +146,7 @@ allocReg (short type)
             {
               currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, i);
             }
-          D (D_ALLOC, ("allocReg: alloced %p\n", &regsZ80[i]));
+          D (D_ALLOC, ("allocReg: alloced %s\n", regsZ80[i].name));
           return &regsZ80[i];
         }
     }
@@ -1039,11 +1039,11 @@ tryAllocatingRegPair (symbol * sym)
               currFunc->regsUsed =
                 bitVectSetBit (currFunc->regsUsed, i + 1);
             }
-          D (D_ALLOC, ("tryAllocRegPair: succeded for sym %p\n", sym));
+          D (D_ALLOC, ("tryAllocatingRegPair: succeded for sym %p\n", sym));
           return TRUE;
         }
     }
-  D (D_ALLOC, ("tryAllocRegPair: failed on sym %p\n", sym));
+  D (D_ALLOC, ("tryAllocatingRegPair: failed on sym %p\n", sym));
   return FALSE;
 }
 
@@ -1234,6 +1234,14 @@ serialRegAssign (eBBlock ** ebbs, int count)
                             break;
                         }
                     }
+                  /* Make sure we didn't allocate a register pair with bytes swapped */
+                  if(sym->nRegs == 2 && sym->regs[0] == sym->regs[1] + 1 && sym->regs[0] != &regsZ80[2])
+                  {
+			freeReg(sym->regs[0]);
+			freeReg(sym->regs[1]);
+			if(!tryAllocatingRegPair(sym))
+				wassertl(0, "Failed to swap register pair bytes back.");
+                  }
                 }
               /* if it shares registers with operands make sure
                  that they are in the same position */

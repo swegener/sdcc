@@ -1,3 +1,7 @@
+2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/ralloc (serialRegAssign, allocReg, tryAllocatingRegPair):
+	  Implemented #1921450, changed some Debug messages.
+
 2008-03-30 Borut Razem <borut.razem AT siol.net>
 
 	* Small Device C Compiler 2.8.0 released

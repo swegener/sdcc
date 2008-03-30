@@ -1,9 +1,16 @@
-2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
-	* src/z80/gen.c (assignResultValue):
-	  Reverted reversal of order of bytewise return value assignments introduced in last commit.
+2008-03-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCloop.c (loopInvariants): applied fix for bug 1717943, thanks
+	  Robert Larice
+	* support/regression/tests/bug1717943.c: new, added
 
 2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
-	* src/z80/gen.c (emitDebug, assignResultValue, genPlus, genMinus, genMult, genJumpTab):
+	* src/z80/gen.c (assignResultValue): Reverted reversal of order of bytewise
+	  return value assignments introduced in last commit.
+
+2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c (emitDebug, assignResultValue, genPlus, genMinus, genMult,
+	  genJumpTab):
 	  Use 16-bit instructions for addition in some additional cases,
 	  implemented RFEs #1914251, #1914245, #1922090, #1921382, #1918323.
 

@@ -1,3 +1,20 @@
+2008-03-31 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2 renamed to support/cpp
+	* support/cpp2/libiberty/filenames.h, support/cpp2/libiberty/hex.c,
+	  support/cpp2/libiberty/splay-tree.c,
+	  support/cpp2/libiberty/splay-tree.h, support/cpp2/libcpp/macro.c,
+	  support/cpp2/libcpp/directives.c,
+	  support/cpp2/libcpp/include/cpplib.h,
+	  support/cpp2/libcpp/include/symtab.h,
+	  support/cpp2/libcpp/include/line-map.h,
+	  support/cpp2/libcpp/line-map.c, support/cpp2/libcpp/files.c,
+	  support/cpp2/libcpp/init.c, support/cpp2/libcpp/traditional.c,
+	  support/cpp2/libcpp/expr.c, support/cpp2/libcpp/internal.h,
+	  support/cpp2/libcpp/lex.c, support/cpp2/libcpp/system.h,
+	  support/cpp2/libcpp/charset.c: SDCPP synchronized with GCC CPP
+	  release version 4.3.0
+
 2008-03-31 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/include/hc08/mc68hc908jkjl.h: committed fix for bug #1929739,

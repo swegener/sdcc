@@ -1,9 +1,9 @@
-/* A splay-tree datatype.  
+/* A splay-tree datatype.
    Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
    Contributed by Mark Mitchell (mark@markmitchell.com).
 
 This file is part of GNU CC.
-   
+
 GNU CC is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
@@ -39,16 +39,16 @@ Boston, MA 02110-1301, USA.  */
 
 static void splay_tree_delete_helper (splay_tree, splay_tree_node);
 static inline void rotate_left (splay_tree_node *,
-				splay_tree_node, splay_tree_node);
+                                splay_tree_node, splay_tree_node);
 static inline void rotate_right (splay_tree_node *,
-				splay_tree_node, splay_tree_node);
+                                splay_tree_node, splay_tree_node);
 static void splay_tree_splay (splay_tree, splay_tree_key);
 static int splay_tree_foreach_helper (splay_tree, splay_tree_node,
                                       splay_tree_foreach_fn, void*);
 
 /* Deallocate NODE (a member of SP), and all its sub-trees.  */
 
-static void 
+static void
 splay_tree_delete_helper (splay_tree sp, splay_tree_node node)
 {
   splay_tree_node pending = 0;
@@ -76,38 +76,38 @@ splay_tree_delete_helper (splay_tree sp, splay_tree_node node)
       active = pending;
       pending = 0;
       while (active)
-	{
-	  splay_tree_node temp;
+        {
+          splay_tree_node temp;
 
-	  /* active points to a node which has its key and value
-	     deallocated, we just need to process left and right.  */
+          /* active points to a node which has its key and value
+             deallocated, we just need to process left and right.  */
 
-	  if (active->left)
-	    {
-	      KDEL (active->left->key);
-	      VDEL (active->left->value);
-	      active->left->key = (splay_tree_key)pending;
-	      pending = (splay_tree_node)(active->left);
-	    }
-	  if (active->right)
-	    {
-	      KDEL (active->right->key);
-	      VDEL (active->right->value);
-	      active->right->key = (splay_tree_key)pending;
-	      pending = (splay_tree_node)(active->right);
-	    }
+          if (active->left)
+            {
+              KDEL (active->left->key);
+              VDEL (active->left->value);
+              active->left->key = (splay_tree_key)pending;
+              pending = (splay_tree_node)(active->left);
+            }
+          if (active->right)
+            {
+              KDEL (active->right->key);
+              VDEL (active->right->value);
+              active->right->key = (splay_tree_key)pending;
+              pending = (splay_tree_node)(active->right);
+            }
 
-	  temp = active;
-	  active = (splay_tree_node)(temp->key);
-	  (*sp->deallocate) ((char*) temp, sp->allocate_data);
-	}
+          temp = active;
+          active = (splay_tree_node)(temp->key);
+          (*sp->deallocate) ((char*) temp, sp->allocate_data);
+        }
     }
 #undef KDEL
 #undef VDEL
 }
 
 /* Rotate the edge joining the left child N with its parent P.  PP is the
-   grandparents pointer to P.  */
+   grandparents' pointer to P.  */
 
 static inline void
 rotate_left (splay_tree_node *pp, splay_tree_node p, splay_tree_node n)
@@ -120,7 +120,7 @@ rotate_left (splay_tree_node *pp, splay_tree_node p, splay_tree_node n)
 }
 
 /* Rotate the edge joining the right child N with its parent P.  PP is the
-   grandparents pointer to P.  */
+   grandparents' pointer to P.  */
 
 static inline void
 rotate_right (splay_tree_node *pp, splay_tree_node p, splay_tree_node n)
@@ -166,33 +166,33 @@ splay_tree_splay (splay_tree sp, splay_tree_key key)
         || (cmp2 < 0 && !c->left)
         || (cmp2 > 0 && !c->right))
       {
-	if (cmp1 < 0)
-	  rotate_left (&sp->root, n, c);
-	else
-	  rotate_right (&sp->root, n, c);
+        if (cmp1 < 0)
+          rotate_left (&sp->root, n, c);
+        else
+          rotate_right (&sp->root, n, c);
         return;
       }
 
     /* Now we have the four cases of double-rotation.  */
     if (cmp1 < 0 && cmp2 < 0)
       {
-	rotate_left (&n->left, c, c->left);
-	rotate_left (&sp->root, n, n->left);
+        rotate_left (&n->left, c, c->left);
+        rotate_left (&sp->root, n, n->left);
       }
     else if (cmp1 > 0 && cmp2 > 0)
       {
-	rotate_right (&n->right, c, c->right);
-	rotate_right (&sp->root, n, n->right);
+        rotate_right (&n->right, c, c->right);
+        rotate_right (&sp->root, n, n->right);
       }
     else if (cmp1 < 0 && cmp2 > 0)
       {
-	rotate_right (&n->left, c, c->right);
-	rotate_left (&sp->root, n, n->left);
+        rotate_right (&n->left, c, c->right);
+        rotate_left (&sp->root, n, n->left);
       }
     else if (cmp1 > 0 && cmp2 < 0)
       {
-	rotate_left (&n->right, c, c->left);
-	rotate_right (&sp->root, n, n->right);
+        rotate_left (&n->right, c, c->left);
+        rotate_right (&sp->root, n, n->right);
       }
   } while (1);
 }
@@ -242,7 +242,7 @@ splay_tree_xmalloc_deallocate (void *object, void *data ATTRIBUTE_UNUSED)
    values.  Use xmalloc to allocate the splay tree structure, and any
    nodes added.  */
 
-splay_tree 
+splay_tree
 splay_tree_new (splay_tree_compare_fn compare_fn,
                 splay_tree_delete_key_fn delete_key_fn,
                 splay_tree_delete_value_fn delete_value_fn)
@@ -257,7 +257,7 @@ splay_tree_new (splay_tree_compare_fn compare_fn,
    DELETE_KEY_FN to deallocate keys, and DELETE_VALUE_FN to deallocate
    values.  */
 
-splay_tree 
+splay_tree
 splay_tree_new_with_allocator (splay_tree_compare_fn compare_fn,
                                splay_tree_delete_key_fn delete_key_fn,
                                splay_tree_delete_value_fn delete_value_fn,
@@ -280,7 +280,7 @@ splay_tree_new_with_allocator (splay_tree_compare_fn compare_fn,
 
 /* Deallocate SP.  */
 
-void 
+void
 splay_tree_delete (splay_tree sp)
 {
   splay_tree_delete_helper (sp, sp->root);
@@ -304,36 +304,36 @@ splay_tree_insert (splay_tree sp, splay_tree_key key, splay_tree_value value)
   if (sp->root && comparison == 0)
     {
       /* If the root of the tree already has the indicated KEY, just
-	 replace the value with VALUE.  */
+         replace the value with VALUE.  */
       if (sp->delete_value)
-	(*sp->delete_value)(sp->root->value);
+        (*sp->delete_value)(sp->root->value);
       sp->root->value = value;
-    } 
-  else 
+    }
+  else
     {
       /* Create a new node, and insert it at the root.  */
       splay_tree_node node;
-      
+
       node = ((splay_tree_node)
               (*sp->allocate) (sizeof (struct splay_tree_node_s),
                                sp->allocate_data));
       node->key = key;
       node->value = value;
-      
+
       if (!sp->root)
-	node->left = node->right = 0;
+        node->left = node->right = 0;
       else if (comparison < 0)
-	{
-	  node->left = sp->root;
-	  node->right = node->left->right;
-	  node->left->right = 0;
-	}
+        {
+          node->left = sp->root;
+          node->right = node->left->right;
+          node->left->right = 0;
+        }
       else
-	{
-	  node->right = sp->root;
-	  node->left = node->right->left;
-	  node->right->left = 0;
-	}
+        {
+          node->right = sp->root;
+          node->left = node->right->left;
+          node->right->left = 0;
+        }
 
       sp->root = node;
     }
@@ -357,30 +357,30 @@ splay_tree_remove (splay_tree sp, splay_tree_key key)
 
       /* Delete the root node itself.  */
       if (sp->delete_value)
-	(*sp->delete_value) (sp->root->value);
+        (*sp->delete_value) (sp->root->value);
       (*sp->deallocate) (sp->root, sp->allocate_data);
 
       /* One of the children is now the root.  Doesn't matter much
-	 which, so long as we preserve the properties of the tree.  */
+         which, so long as we preserve the properties of the tree.  */
       if (left)
-	{
-	  sp->root = left;
+        {
+          sp->root = left;
 
-	  /* If there was a right child as well, hang it off the 
-	     right-most leaf of the left child.  */
-	  if (right)
-	    {
-	      while (left->right)
-		left = left->right;
-	      left->right = right;
-	    }
-	}
+          /* If there was a right child as well, hang it off the
+             right-most leaf of the left child.  */
+          if (right)
+            {
+              while (left->right)
+                left = left->right;
+              left->right = right;
+            }
+        }
       else
-	sp->root = right;
+        sp->root = right;
     }
 }
 
-/* Lookup KEY in SP, returning VALUE if present, and NULL 
+/* Lookup KEY in SP, returning VALUE if present, and NULL
    otherwise.  */
 
 splay_tree_node
@@ -508,7 +508,7 @@ splay_tree_compare_ints (splay_tree_key k1, splay_tree_key k2)
     return -1;
   else if ((int) k1 > (int) k2)
     return 1;
-  else 
+  else
     return 0;
 }
 
@@ -521,6 +521,6 @@ splay_tree_compare_pointers (splay_tree_key k1, splay_tree_key k2)
     return -1;
   else if ((char*) k1 > (char*) k2)
     return 1;
-  else 
+  else
     return 0;
 }

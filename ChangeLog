@@ -1,3 +1,7 @@
+2008-03-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.dsw: adapted for moved cpp2, added dependency for as_z80 on config
+
 2008-03-31 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2 renamed to support/cpp

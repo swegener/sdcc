@@ -1,6 +1,6 @@
 # Makefile for Borlad C++
 
-all: config asx8051 as-z80 sdcc packihx cpp2
+all: config asx8051 as-z80 sdcc packihx cpp
 
 
 config: sdcc_vc.h
@@ -18,8 +18,8 @@ as-z80:
         make -f Makefile.bcc
         cd ..\..
 
-cpp2:
-        cd support\cpp2
+cpp:
+        cd support\cpp
         make -f Makefile.bcc
         cd ..\..
 

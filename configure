@@ -719,7 +719,7 @@ sdccconf_h_dir_separator
 include_dir_suffix
 lib_dir_suffix
 docdir'
-ac_subdirs_all='support/cpp2
+ac_subdirs_all='support/cpp
 support/packihx
 sim/ucsim
 debugger/mcs51
@@ -7598,7 +7598,7 @@ mv ports ports.build
 
 # Generating output files
 # ===========================================================================
-test $OPT_DISABLE_SDCPP   = 0 && subdirs="$subdirs support/cpp2"
+test $OPT_DISABLE_SDCPP   = 0 && subdirs="$subdirs support/cpp"
 
 test $OPT_DISABLE_PACKIHX = 0 && subdirs="$subdirs support/packihx"
 

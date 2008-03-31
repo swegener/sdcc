@@ -56,7 +56,7 @@ endif
 PKGS            += $(SDCC_DOC)
 
 ifeq ($(OPT_DISABLE_SDCPP), 0)
-SDCC_LIBS       += support/cpp2
+SDCC_LIBS       += support/cpp
 endif
 
 TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-aslink sdcc-librarian

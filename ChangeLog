@@ -18,6 +18,8 @@
 	  support/cpp2/libcpp/lex.c, support/cpp2/libcpp/system.h,
 	  support/cpp2/libcpp/charset.c: SDCPP synchronized with GCC CPP
 	  release version 4.3.0
+	* configure.in, configure, Makefile.in, Makefile.bcc:
+	  adapted for moved cpp2
 
 2008-03-31 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

@@ -700,7 +700,7 @@ mv ports ports.build
 
 # Generating output files
 # ===========================================================================
-test $OPT_DISABLE_SDCPP   = 0 && AC_CONFIG_SUBDIRS(support/cpp2)
+test $OPT_DISABLE_SDCPP   = 0 && AC_CONFIG_SUBDIRS(support/cpp)
 test $OPT_DISABLE_PACKIHX = 0 && AC_CONFIG_SUBDIRS(support/packihx)
 test $OPT_DISABLE_UCSIM   = 0 && AC_CONFIG_SUBDIRS(sim/ucsim)
 test $OPT_DISABLE_SDCDB   = 0 && AC_CONFIG_SUBDIRS(debugger/mcs51)

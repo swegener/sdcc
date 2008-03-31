@@ -123,13 +123,12 @@ _VOLDATA _UINT8 __at 0x08 PTE;     /* Port E Data Register */
   #define PTE0 ((struct __hc08_bits *)(&PTE))->bit0
   #define PTE1 ((struct __hc08_bits *)(&PTE))->bit1
 
+_VOLDATA _UINT8 __at 0x0A PDCR;     /* Port D Control Register */
 
-_VOLDATA _UINT8 __at 0x0A PTE;     /* Port D Control Register */
-#define PORTE PTE              /* Alias for PDCR        */
-  #define PTDPU6 ((struct __hc08_bits *)(&PTE))->bit0
-  #define PTDPU7 ((struct __hc08_bits *)(&PTE))->bit1
-  #define SLOWD6 ((struct __hc08_bits *)(&PTE))->bit2
-  #define SLOWD7 ((struct __hc08_bits *)(&PTE))->bit3
+  #define PTDPU6 ((struct __hc08_bits *)(&PDCR))->bit0
+  #define PTDPU7 ((struct __hc08_bits *)(&PDCR))->bit1
+  #define SLOWD6 ((struct __hc08_bits *)(&PDCR))->bit2
+  #define SLOWD7 ((struct __hc08_bits *)(&PDCR))->bit3
 
 _VOLDATA _UINT8 __at 0x0C DDRE;    /* Data Direction Register E */
   #define DDRE0 ((struct __hc08_bits *)(&DDRE))->bit0
@@ -300,14 +299,14 @@ _VOLDATA _UINT8  __at 0x33 T2MODH;   /* TIM2 Counter Modulo Register High */
 _VOLDATA _UINT8  __at 0x34 T2MODL;   /* TIM2 Counter Modulo Register Low */	
 
 	
-_VOLDATA _UINT8 __at 0x35 T2SC1;    /* TIM2 Channel 0 Status and Control Register */
-  #define CH0MAX_2 ((struct __hc08_bits *)(&T2SC1))->bit0
-  #define TOV0_2   ((struct __hc08_bits *)(&T2SC1))->bit1
-  #define ELS0A_2  ((struct __hc08_bits *)(&T2SC1))->bit2
-  #define ELS0B_2  ((struct __hc08_bits *)(&T2SC1))->bit3
-  #define MS0A_2   ((struct __hc08_bits *)(&T2SC1))->bit4
-  #define CH0IE_2  ((struct __hc08_bits *)(&T2SC1))->bit6
-  #define CH0F_2   ((struct __hc08_bits *)(&T2SC1))->bit7
+_VOLDATA _UINT8 __at 0x35 T2SC0;    /* TIM2 Channel 0 Status and Control Register */
+  #define CH0MAX_2 ((struct __hc08_bits *)(&T2SC0))->bit0
+  #define TOV0_2   ((struct __hc08_bits *)(&T2SC0))->bit1
+  #define ELS0A_2  ((struct __hc08_bits *)(&T2SC0))->bit2
+  #define ELS0B_2  ((struct __hc08_bits *)(&T2SC0))->bit3
+  #define MS0A_2   ((struct __hc08_bits *)(&T2SC0))->bit4
+  #define CH0IE_2  ((struct __hc08_bits *)(&T2SC0))->bit6
+  #define CH0F_2   ((struct __hc08_bits *)(&T2SC0))->bit7
 
 _VOLDATA _UINT16 __at 0x36 T2CH0;    /* TIM2 Channel 0 High & Low Registers */
 _VOLDATA _UINT8  __at 0x36 T2CH0H;   /* TIM2 Channel 0 Register High */

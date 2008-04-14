@@ -1,3 +1,8 @@
+2008-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/cc2510fx.h: added _XPAGE
+	* device/include/mcs51/compiler.h: cosmetic changes
+
 2008-03-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdcc.dsw: adapted for moved cpp2, added dependency for as_z80 on config

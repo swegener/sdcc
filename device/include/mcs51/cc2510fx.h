@@ -97,6 +97,7 @@ SFR(P1,       0x90); // Port 1
 SFR(RFIM,     0x91); // RF Interrupt Mask
 SFR(DPS,      0x92); // Data Pointer Select 
 SFR(MPAGE,    0x93); // Memory Page Select 
+SFR(_XPAGE,   0x93); // Memory Page Select under the name SDCC needs it
 SFR(ENDIAN,   0x95); // USB Endianess Control (CC2511Fx) 
 SFR(S0CON,    0x98); // Interrupt Flag 2
    SBIT(ENCIF_0,  0x98, 0); // AES Interrupt Flag 0 

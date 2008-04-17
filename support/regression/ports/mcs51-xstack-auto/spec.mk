@@ -35,7 +35,7 @@ SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
           _strstr.c _strtok.c \
           _uchar2fs.c _uint2fs.c _ulong2fs.c \
-          _heap.c calloc.c malloc.c realloc.c free.c \
+          _heap.c _calloc.c _malloc.c _realloc.c _free.c \
           serial.c ser_ir.c printfl.c \
           printf_large.c sprintf.c vprintf.c puts.c gets.c \
           assert.c time.c bpx.c

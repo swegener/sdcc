@@ -1,3 +1,25 @@
+2008-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/libsdcc.lib,
+	* device/lib/Makefile.in,
+	* support/regression/ports/mcs51-xstack-auto/spec.mk,
+	* device/lib/calloc.c: renamed to _calloc.c
+	* device/lib/free.c: renamed to _free.c
+	* device/lib/malloc.c: renamed to _malloc.c
+	* device/lib/realloc.c: renamed to _realloc.c
+	* src/ds390/gen.c (aopGet, aopPut, genPlusBits, genDataPointerSet,
+	  genNearPointerSet, genPagedPointerSet): synchronized with mcs51/gen.c
+	* src/ds390/gen.c (popForBranch, genIfxJump, genCmp, genCmpEq, ifxForOp,
+	  genAnd, genOr, genXor, genIfx, gen390Code): fixed bug 1509084
+	* src/mcs51/gen.c (popForBranch, genIfxJump, genCmp, genCmpEq,
+	  ifxForOp, genAnd, genOr, genXor, genNearPointerGet,
+	  genPagedPointerGet, genFarPointerGet, genCodePointerGet,
+	  genGenPointerGet, genIfx, gen51Code): fixed bug 1509084
+	* src/ds390/gen.c,
+	* src/mcs51/gen.c: throughout cosmetic changes for syncing both
+	* src/SDCCsymt.h: updated IS_OP_RUONLY, IS_OP_ACCUSE
+	* support/regression/tests/bug1509084.c: new, added
+
 2008-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/cc2510fx.h: added _XPAGE

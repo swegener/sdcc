@@ -40,10 +40,10 @@ rand
 _atoi
 _atol
 _heap
-calloc
-malloc
-realloc
-free
+_calloc
+_malloc
+_realloc
+_free
 serial
 _autobaud
 _startup

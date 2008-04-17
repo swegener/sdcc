@@ -1671,6 +1671,7 @@ aopPut (operand * result, const char *s, int offset)
     case AOP_CRY:
       // destination is carry for return-use-only
       d = (IS_OP_RUONLY (result)) ? "c" : aop->aopu.aop_dir;
+
       // source is no literal and not in carry
       if ((s != zero) && (s != one) && strcmp (s, "c"))
         {
@@ -2639,6 +2640,21 @@ genIpop (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* popForBranch - recover the spilt registers for a branch         */
+/*-----------------------------------------------------------------*/
+static void
+popForBranch (iCode * ic, bool markGenerated)
+{
+  while (ic && ic->op == IPOP)
+    {
+      genIpop (ic);
+      if (markGenerated)
+        ic->generated = 1;    /* mark the icode as generated */
+      ic = ic->next;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* saveRBank - saves an entire register bank on the stack          */
 /*-----------------------------------------------------------------*/
 static void
@@ -2922,8 +2938,7 @@ genCall (iCode * ic)
 
   if (swapBanks)
     {
-        emitcode ("mov", "psw,#0x%02x",
-           ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+      emitcode ("mov", "psw,#0x%02x", ((FUNC_REGBANK(dtype)) << 3) & 0xff);
     }
 
   /* make the call */
@@ -3428,10 +3443,12 @@ genFunction (iCode * ic)
               /* this function has a function call. We cannot
                  determine register usage so we will have to push the
                  entire bank */
-                saveRBank (0, ic, FALSE);
-                if (options.parms_in_bank1) {
-                    for (i=0; i < 8 ; i++ ) {
-                        emitcode ("push","%s",rb1regs[i]);
+              saveRBank (0, ic, FALSE);
+              if (options.parms_in_bank1)
+                {
+                  for (i=0; i < 8 ; i++ )
+                    {
+                      emitcode ("push","%s",rb1regs[i]);
                     }
                 }
             }
@@ -3852,18 +3869,20 @@ genEndFunction (iCode * ic)
             }
           else
             {
-              if (options.parms_in_bank1) {
-                  for (i = 7 ; i >= 0 ; i-- ) {
+              if (options.parms_in_bank1)
+                {
+                  for (i = 7 ; i >= 0 ; i-- )
+                    {
                       emitcode ("pop","%s",rb1regs[i]);
-                  }
-              }
+                    }
+                }
               /* this function has a function call. We cannot
                  determine register usage so we will have to pop the
                  entire bank */
               unsaveRBank (0, ic, FALSE);
             }
         }
-        else
+      else
         {
             /* This ISR uses a non-zero bank.
              *
@@ -4199,6 +4218,7 @@ genPlusIncr (iCode * ic)
       symbol *tlbl;
       int emitTlbl;
       int labelRange;
+      char    *l;
 
       /* If the next instruction is a goto and the goto target
        * is < 10 instructions previous to this, we can generate
@@ -4217,49 +4237,58 @@ genPlusIncr (iCode * ic)
           tlbl = newiTempLabel (NULL);
           emitTlbl = 1;
         }
-      emitcode ("inc", "%s", aopGet (IC_RESULT (ic), LSB, FALSE, FALSE));
+      l = aopGet (IC_RESULT (ic), LSB, FALSE, FALSE);
+      emitcode ("inc", "%s", l);
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
           IS_AOP_PREG (IC_RESULT (ic)))
-        emitcode ("cjne", "%s,#0x00,%05d$",
-                  aopGet (IC_RESULT (ic), LSB, FALSE, FALSE),
-                  tlbl->key + 100);
+        {
+          emitcode ("cjne", "%s,#0x00,%05d$", l, tlbl->key + 100);
+        }
       else
         {
           emitcode ("clr", "a");
-          emitcode ("cjne", "a,%s,%05d$",
-                    aopGet (IC_RESULT (ic), LSB, FALSE, FALSE),
-                    tlbl->key + 100);
+          emitcode ("cjne", "a,%s,%05d$", l, tlbl->key + 100);
         }
 
-      emitcode ("inc", "%s", aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE));
+      l = aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE);
+      emitcode ("inc", "%s", l);
       if (size > 2)
         {
-          if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-              IS_AOP_PREG (IC_RESULT (ic)))
-            emitcode ("cjne", "%s,#0x00,%05d$",
-                      aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE),
-                      tlbl->key + 100);
+          if (!strcmp(l, "acc"))
+            {
+              emitcode("jnz", "!tlabel", tlbl->key + 100);
+            }
+          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
+                   IS_AOP_PREG (IC_RESULT (ic)))
+            {
+              emitcode ("cjne", "%s,#0x00,%05d$", l, tlbl->key + 100);
+            }
           else
-            emitcode ("cjne", "a,%s,%05d$",
-                      aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE),
-                      tlbl->key + 100);
+            {
+              emitcode ("cjne", "a,%s,%05d$", l, tlbl->key + 100);
+            }
 
-          emitcode ("inc", "%s", aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE));
+          l = aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE);
+          emitcode ("inc", "%s", l);
         }
       if (size > 3)
         {
-          if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-              IS_AOP_PREG (IC_RESULT (ic)))
-            emitcode ("cjne", "%s,#0x00,%05d$",
-                      aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE),
-                      tlbl->key + 100);
+          if (!strcmp(l, "acc"))
+            {
+              emitcode("jnz", "!tlabel", tlbl->key + 100);
+            }
+          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
+                   IS_AOP_PREG (IC_RESULT (ic)))
+            {
+              emitcode ("cjne", "%s,#0x00,%05d$", l, tlbl->key + 100);
+            }
           else
             {
-              emitcode ("cjne", "a,%s,%05d$",
-                        aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE),
-                        tlbl->key + 100);
+              emitcode ("cjne", "a,%s,%05d$", l, tlbl->key + 100);
             }
-          emitcode ("inc", "%s", aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE));
+
+          l = aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE);
+          emitcode ("inc", "%s", l);
         }
 
       if (emitTlbl)
@@ -4689,8 +4718,9 @@ genMinusDec (iCode * ic)
       (icount == 1))
     {
       symbol *tlbl;
-      int emitTlbl;
-      int labelRange;
+      int    emitTlbl;
+      int    labelRange;
+      char   *l;
 
       /* If the next instruction is a goto and the goto target
        * is <= 10 instructions previous to this, we can generate
@@ -4710,49 +4740,56 @@ genMinusDec (iCode * ic)
           emitTlbl = 1;
         }
 
-      emitcode ("dec", "%s", aopGet (IC_RESULT (ic), LSB, FALSE, FALSE));
+      l = aopGet (IC_RESULT (ic), LSB, FALSE, FALSE);
+      emitcode ("dec", "%s", l);
+
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
           IS_AOP_PREG (IC_RESULT (ic)))
-        emitcode ("cjne", "%s,#0xff,%05d$"
-                  ,aopGet (IC_RESULT (ic), LSB, FALSE, FALSE)
-                  ,tlbl->key + 100);
+        {
+          emitcode ("cjne", "%s,#0xff,%05d$", l, tlbl->key + 100);
+        }
       else
         {
           emitcode ("mov", "a,#0xff");
-          emitcode ("cjne", "a,%s,%05d$"
-                    ,aopGet (IC_RESULT (ic), LSB, FALSE, FALSE)
-                    ,tlbl->key + 100);
+          emitcode ("cjne", "a,%s,%05d$", l, tlbl->key + 100);
         }
-      emitcode ("dec", "%s", aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE));
+      l = aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE);
+      emitcode ("dec", "%s", l);
       if (size > 2)
         {
-          if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-              IS_AOP_PREG (IC_RESULT (ic)))
-            emitcode ("cjne", "%s,#0xff,%05d$"
-                      ,aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE)
-                      ,tlbl->key + 100);
+          if (!strcmp(l, "acc"))
+            {
+              emitcode("jnz", "!tlabel", tlbl->key + 100);
+            }
+          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
+                   IS_AOP_PREG (IC_RESULT (ic)))
+            {
+              emitcode ("cjne", "%s,#0xff,%05d$", l, tlbl->key + 100);
+            }
           else
             {
-              emitcode ("cjne", "a,%s,%05d$"
-                        ,aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE)
-                        ,tlbl->key + 100);
+              emitcode ("cjne", "a,%s,%05d$", l, tlbl->key + 100);
             }
-          emitcode ("dec", "%s", aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE));
+          l = aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE);
+          emitcode ("dec", "%s", l);
         }
       if (size > 3)
         {
-          if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-              IS_AOP_PREG (IC_RESULT (ic)))
-            emitcode ("cjne", "%s,#0xff,%05d$"
-                      ,aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE)
-                      ,tlbl->key + 100);
+          if (!strcmp(l, "acc"))
+            {
+              emitcode("jnz", "!tlabel", tlbl->key + 100);
+            }
+          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
+                   IS_AOP_PREG (IC_RESULT (ic)))
+            {
+              emitcode ("cjne", "%s,#0xff,%05d$", l, tlbl->key + 100);
+            }
           else
             {
-              emitcode ("cjne", "a,%s,%05d$"
-                        ,aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE)
-                        ,tlbl->key + 100);
+              emitcode ("cjne", "a,%s,%05d$", l, tlbl->key + 100);
             }
-          emitcode ("dec", "%s", aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE));
+          l = aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE);
+          emitcode ("dec", "%s", l);
         }
       if (emitTlbl)
         {
@@ -5176,7 +5213,7 @@ genMultOneByte (operand * left,
           lbl = newiTempLabel (NULL);
           emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
           emitcode ("cpl", "F0"); /* complement sign flag */
-          emitcode ("cpl", "a"); /* 2's complement */
+          emitcode ("cpl", "a");  /* 2's complement */
           emitcode ("inc", "a");
           emitLabel (lbl);
         }
@@ -5752,7 +5789,7 @@ genModOneByte (operand * left,
           /* msb is 0x00 or 0xff depending on the sign */
           if (runtimeSign)
             {
-              emitcode ("mov", "c,F0");
+              emitcode ("mov",  "c,F0");
               emitcode ("subb", "a,acc");
               while (size--)
                 aopPut (result, "a", offset++);
@@ -5819,11 +5856,14 @@ release:
 /* genIfxJump :- will create a jump depending on the ifx           */
 /*-----------------------------------------------------------------*/
 static void
-genIfxJump (iCode * ic, char *jval, operand *left, operand *right, operand *result)
+genIfxJump (iCode * ic, char *jval, operand *left, operand *right, operand *result, iCode *popIc)
 {
   symbol *jlbl;
   symbol *tlbl = newiTempLabel (NULL);
   char *inst;
+
+  /* if there is something to be popped then do it first */
+  popForBranch (popIc, TRUE);
 
   D (emitcode (";", "genIfxJump"));
 
@@ -5911,7 +5951,7 @@ genCmp (operand * left, operand * right,
                       MOVA (aopGet (left, AOP_SIZE (left) - 1, FALSE, FALSE));
                       if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
                         {
-                          genIfxJump (ifx, "acc.7", left, right, result);
+                          genIfxJump (ifx, "acc.7", left, right, result, ic->next);
                           freeAsmop (right, NULL, ic, TRUE);
                           freeAsmop (left, NULL, ic, TRUE);
 
@@ -6003,7 +6043,7 @@ release:
          code a little differently */
       if (ifx)
         {
-          genIfxJump (ifx, "c", NULL, NULL, result);
+          genIfxJump (ifx, "c", NULL, NULL, result, ic->next);
         }
       else
         {
@@ -6186,6 +6226,7 @@ genCmpEq (iCode * ic, iCode * ifx)
 {
   bool swappedLR = FALSE;
   operand *left, *right, *result;
+  iCode * popIc = ic->next;
 
   D (emitcode (";", "genCmpEq"));
 
@@ -6247,6 +6288,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               freeForBranchAsmop (result);
               freeForBranchAsmop (right);
               freeForBranchAsmop (left);
+              popForBranch (popIc, FALSE);
               emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
             }
           else
@@ -6255,6 +6297,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               freeForBranchAsmop (result);
               freeForBranchAsmop (right);
               freeForBranchAsmop (left);
+              popForBranch (popIc, FALSE);
               emitcode ("ljmp", "%05d$", IC_FALSE (ifx)->key + 100);
             }
           emitLabel (tlbl);
@@ -6268,6 +6311,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               freeForBranchAsmop (result);
               freeForBranchAsmop (right);
               freeForBranchAsmop (left);
+              popForBranch (popIc, FALSE);
               emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
               emitLabel (tlbl);
             }
@@ -6279,6 +6323,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               freeForBranchAsmop (result);
               freeForBranchAsmop (right);
               freeForBranchAsmop (left);
+              popForBranch (popIc, FALSE);
               emitcode ("ljmp", "%05d$", IC_FALSE (ifx)->key + 100);
               emitLabel (lbl);
             }
@@ -6326,7 +6371,7 @@ genCmpEq (iCode * ic, iCode * ifx)
         }
       if (ifx)
         {
-          genIfxJump (ifx, "c", left, right, result);
+          genIfxJump (ifx, "c", left, right, result, popIc);
           goto release;
         }
       /* if the result is used in an arithmetic operation
@@ -6344,7 +6389,7 @@ genCmpEq (iCode * ic, iCode * ifx)
       gencjne (left, right, newiTempLabel (NULL), FALSE);
       if (ifx)
         {
-          genIfxJump (ifx, "a", left, right, result);
+          genIfxJump (ifx, "a", left, right, result, popIc);
           goto release;
         }
       /* if the result is used in an arithmetic operation
@@ -6374,18 +6419,21 @@ release:
 static iCode *
 ifxForOp (operand * op, iCode * ic)
 {
+  iCode *ifxIc;
+
   /* if true symbol then needs to be assigned */
   if (IS_TRUE_SYMOP (op))
     return NULL;
 
   /* if this has register type condition and
+     while skipping ipop's (see bug 1509084),
      the next instruction is ifx with the same operand
      and live to of the operand is upto the ifx only then */
-  if (ic->next &&
-      ic->next->op == IFX &&
-      IC_COND (ic->next)->key == op->key &&
-      OP_SYMBOL (op)->liveTo <= ic->next->seq)
-    return ic->next;
+  for (ifxIc = ic->next; ifxIc && ifxIc->op == IPOP; ifxIc = ifxIc->next);
+  if (ifxIc && ifxIc->op == IFX &&
+      IC_COND (ifxIc)->key == op->key &&
+      OP_SYMBOL (op)->liveTo <= ifxIc->seq)
+    return ifxIc;
 
   return NULL;
 }
@@ -6408,22 +6456,25 @@ hasInc (operand *op, iCode *ic, int osize)
   if (IS_AGGREGATE(type->next)) return NULL;
   if (osize != (isize = getSize(type->next))) return NULL;
 
-  while (lic) {
-    /* if operand of the form op = op + <sizeof *op> */
-    if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
-        isOperandEqual(IC_RESULT(lic),op) &&
-        isOperandLiteral(IC_RIGHT(lic)) &&
-        operandLitValue(IC_RIGHT(lic)) == isize) {
-      return lic;
+  while (lic)
+    {
+      /* if operand of the form op = op + <sizeof *op> */
+      if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
+          isOperandEqual(IC_RESULT(lic),op) &&
+          isOperandLiteral(IC_RIGHT(lic)) &&
+          operandLitValue(IC_RIGHT(lic)) == isize)
+        {
+          return lic;
+        }
+      /* if the operand used or deffed */
+      if (bitVectBitValue(OP_USES(op),lic->key) || lic->defKey == op->key)
+        {
+          return NULL;
+        }
+      /* if GOTO or IFX */
+      if (lic->op == IFX || lic->op == GOTO || lic->op == LABEL) break;
+      lic = lic->next;
     }
-    /* if the operand used or deffed */
-    if (bitVectBitValue(OP_USES(op),lic->key) || lic->defKey == op->key) {
-      return NULL;
-    }
-    /* if GOTO or IFX */
-    if (lic->op == IFX || lic->op == GOTO || lic->op == LABEL) break;
-    lic = lic->next;
-  }
   return NULL;
 }
 
@@ -6700,7 +6751,7 @@ genAnd (iCode * ic, iCode * ifx)
         outBitC (result);
       // if(bit & ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-        genIfxJump (ifx, "c", left, right, result);
+        genIfxJump (ifx, "c", left, right, result, ic->next);
       goto release;
     }
 
@@ -6736,7 +6787,7 @@ genAnd (iCode * ic, iCode * ifx)
                 {
                   SNPRINTF (buffer, sizeof(buffer),
                             "acc.%d", posbit & 0x07);
-                  genIfxJump (ifx, buffer, left, right, result);
+                  genIfxJump (ifx, buffer, left, right, result, ic->next);
                 }
               else
                 {// what is this case? just found it in ds390/gen.c
@@ -6902,7 +6953,7 @@ genAnd (iCode * ic, iCode * ifx)
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                    }
+                }
               else
                 {
                   MOVA (aopGet (right, offset, FALSE, FALSE));
@@ -7140,7 +7191,7 @@ genOr (iCode * ic, iCode * ifx)
         outBitC (result);
       // if(bit | ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-        genIfxJump (ifx, "c", left, right, result);
+        genIfxJump (ifx, "c", left, right, result, ic->next);
       goto release;
     }
 
@@ -7174,7 +7225,7 @@ genOr (iCode * ic, iCode * ifx)
             }
           else
             {
-              genIfxJump (ifx, "a", left, right, result);
+              genIfxJump (ifx, "a", left, right, result, ic->next);
               goto release;
             }
         }
@@ -7534,7 +7585,7 @@ genXor (iCode * ic, iCode * ifx)
         outBitC (result);
       // if(bit ^ ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-        genIfxJump (ifx, "c", left, right, result);
+        genIfxJump (ifx, "c", left, right, result, ic->next);
       goto release;
     }
 
@@ -7805,8 +7856,8 @@ static void
 genRRC (iCode * ic)
 {
   operand *left, *result;
-  int size, offset;
-  char *l;
+  int     size, offset;
+  char    *l;
 
   D (emitcode (";", "genRRC"));
 
@@ -8379,16 +8430,16 @@ AccAXLsh (char *x, int shCount)
       break;
     case 3:
     case 4:
-    case 5:                     // AAAAABBB:CCCCCDDD
+    case 5:                             // AAAAABBB:CCCCCDDD
 
-      AccRol (shCount);         // BBBAAAAA:CCCCCDDD
+      AccRol (shCount);                 // BBBAAAAA:CCCCCDDD
 
       emitcode ("anl", "a,#0x%02x",
                 SLMask[shCount]);       // BBB00000:CCCCCDDD
 
       emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBB00000
 
-      AccRol (shCount);         // DDDCCCCC:BBB00000
+      AccRol (shCount);                 // DDDCCCCC:BBB00000
 
       emitcode ("xch", "a,%s", x);      // BBB00000:DDDCCCCC
 
@@ -8404,14 +8455,14 @@ AccAXLsh (char *x, int shCount)
       emitcode ("xrl", "a,%s", x);      // BBBCCCCC:DDD00000
 
       break;
-    case 6:                     // AAAAAABB:CCCCCCDD
+    case 6:                             // AAAAAABB:CCCCCCDD
       emitcode ("anl", "a,#0x%02x",
                 SRMask[shCount]);       // 000000BB:CCCCCCDD
       emitcode ("mov", "c,acc.0");      // c = B
       emitcode ("xch", "a,%s", x);      // CCCCCCDD:000000BB
 #if 0 // REMOVE ME
-      AccAXRrl1 (x);            // BCCCCCCD:D000000B
-      AccAXRrl1 (x);            // BBCCCCCC:DD000000
+      AccAXRrl1 (x);                    // BCCCCCCD:D000000B
+      AccAXRrl1 (x);                    // BBCCCCCC:DD000000
 #else
       emitcode("rrc","a");
       emitcode("xch","a,%s", x);
@@ -8425,7 +8476,7 @@ AccAXLsh (char *x, int shCount)
       emitcode("xch","a,%s", x);
 #endif
       break;
-    case 7:                     // a:x <<= 7
+    case 7:                             // a:x <<= 7
 
       emitcode ("anl", "a,#0x%02x",
                 SRMask[shCount]);       // 0000000B:CCCCCCCD
@@ -8434,7 +8485,7 @@ AccAXLsh (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);      // CCCCCCCD:0000000B
 
-      AccAXRrl1 (x);            // BCCCCCCC:D0000000
+      AccAXRrl1 (x);                    // BCCCCCCC:D0000000
 
       break;
     default:
@@ -8454,26 +8505,26 @@ AccAXRsh (char *x, int shCount)
       break;
     case 1:
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
+      AccAXRrl1 (x);                    // 0->a:x
 
       break;
     case 2:
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
+      AccAXRrl1 (x);                    // 0->a:x
 
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
+      AccAXRrl1 (x);                    // 0->a:x
 
       break;
     case 3:
     case 4:
-    case 5:                     // AAAAABBB:CCCCCDDD = a:x
+    case 5:                             // AAAAABBB:CCCCCDDD = a:x
 
-      AccRol (8 - shCount);     // BBBAAAAA:DDDCCCCC
+      AccRol (8 - shCount);             // BBBAAAAA:DDDCCCCC
 
       emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBBAAAAA
 
-      AccRol (8 - shCount);     // DDDCCCCC:BBBAAAAA
+      AccRol (8 - shCount);             // DDDCCCCC:BBBAAAAA
 
       emitcode ("anl", "a,#0x%02x",
                 SRMask[shCount]);       // 000CCCCC:BBBAAAAA
@@ -8492,13 +8543,13 @@ AccAXRsh (char *x, int shCount)
       emitcode ("xch", "a,%s", x);      // 000AAAAA:BBBCCCCC
 
       break;
-    case 6:                     // AABBBBBB:CCDDDDDD
+    case 6:                             // AABBBBBB:CCDDDDDD
 
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // ABBBBBBC:CDDDDDDA
+      AccAXLrl1 (x);                    // ABBBBBBC:CDDDDDDA
 
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // BBBBBBCC:DDDDDDAA
+      AccAXLrl1 (x);                    // BBBBBBCC:DDDDDDAA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDAA:BBBBBBCC
 
@@ -8506,11 +8557,11 @@ AccAXRsh (char *x, int shCount)
                 SRMask[shCount]);       // 000000AA:BBBBBBCC
 
       break;
-    case 7:                     // ABBBBBBB:CDDDDDDD
+    case 7:                             // ABBBBBBB:CDDDDDDD
 
       emitcode ("mov", "c,acc.7");      // c = A
 
-      AccAXLrl1 (x);            // BBBBBBBC:DDDDDDDA
+      AccAXLrl1 (x);                    // BBBBBBBC:DDDDDDDA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDDA:BBBBBBCC
 
@@ -8536,27 +8587,27 @@ AccAXRshS (char *x, int shCount)
       break;
     case 1:
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
+      AccAXRrl1 (x);                    // s->a:x
 
       break;
     case 2:
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
+      AccAXRrl1 (x);                    // s->a:x
 
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
+      AccAXRrl1 (x);                    // s->a:x
 
       break;
     case 3:
     case 4:
-    case 5:                     // AAAAABBB:CCCCCDDD = a:x
+    case 5:                             // AAAAABBB:CCCCCDDD = a:x
 
       tlbl = newiTempLabel (NULL);
-      AccRol (8 - shCount);     // BBBAAAAA:CCCCCDDD
+      AccRol (8 - shCount);             // BBBAAAAA:CCCCCDDD
 
       emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBBAAAAA
 
-      AccRol (8 - shCount);     // DDDCCCCC:BBBAAAAA
+      AccRol (8 - shCount);             // DDDCCCCC:BBBAAAAA
 
       emitcode ("anl", "a,#0x%02x",
                 SRMask[shCount]);       // 000CCCCC:BBBAAAAA
@@ -8579,16 +8630,16 @@ AccAXRshS (char *x, int shCount)
                 (unsigned char) ~SRMask[shCount]);      // 111AAAAA:BBBCCCCC
 
       emitLabel (tlbl);
-      break;                    // SSSSAAAA:BBBCCCCC
+      break;                            // SSSSAAAA:BBBCCCCC
 
-    case 6:                     // AABBBBBB:CCDDDDDD
+    case 6:                             // AABBBBBB:CCDDDDDD
 
       tlbl = newiTempLabel (NULL);
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // ABBBBBBC:CDDDDDDA
+      AccAXLrl1 (x);                    // ABBBBBBC:CDDDDDDA
 
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // BBBBBBCC:DDDDDDAA
+      AccAXLrl1 (x);                    // BBBBBBCC:DDDDDDAA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDAA:BBBBBBCC
 
@@ -8601,12 +8652,12 @@ AccAXRshS (char *x, int shCount)
 
       emitLabel (tlbl);
       break;
-    case 7:                     // ABBBBBBB:CDDDDDDD
+    case 7:                             // ABBBBBBB:CDDDDDDD
 
       tlbl = newiTempLabel (NULL);
       emitcode ("mov", "c,acc.7");      // c = A
 
-      AccAXLrl1 (x);            // BBBBBBBC:DDDDDDDA
+      AccAXLrl1 (x);                    // BBBBBBBC:DDDDDDDA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDDA:BBBBBBCC
 
@@ -8807,9 +8858,13 @@ genlshTwo (operand * result, operand * left, int shCount)
       if (size > 1)
         {
           if (shCount)
-            shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+            {
+              shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+            }
           else
-            movLeft2Result (left, LSB, result, MSB16, 0);
+            {
+              movLeft2Result (left, LSB, result, MSB16, 0);
+            }
         }
       aopPut (result, zero, LSB);
     }
@@ -9411,7 +9466,6 @@ genRightShiftLiteral (operand * left,
       while (size--)
         movLeft2Result (left, size, result, size, 0);
     }
-
   else if (shCount >= (size * 8))
     {
       if (sign)
@@ -9959,8 +10013,8 @@ genNearPointerGet (operand * left,
           rname = aopGet (left, 0, FALSE, FALSE);
           if (*rname != '@')
             {
-              fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
-                      __FILE__, __LINE__);
+              fprintf(stderr, "probable internal error: unexpected rname '%s' @ %s:%d\n",
+                      rname, __FILE__, __LINE__);
             }
           else
             {
@@ -10015,7 +10069,7 @@ genNearPointerGet (operand * left,
     }
 
   /* now some housekeeping stuff */
-  if (aop)       /* we had to allocate for this iCode */
+  if (aop)      /* we had to allocate for this iCode */
     {
       if (pi) { /* post increment present */
         aopPut (left, rname, 0);
@@ -10043,7 +10097,7 @@ genNearPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, ifxCond, left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result, ic->next);
     }
 
   /* done */
@@ -10116,7 +10170,7 @@ genPagedPointerGet (operand * left,
     }
 
   /* now some housekeeping stuff */
-  if (aop) /* we had to allocate for this iCode */
+  if (aop)      /* we had to allocate for this iCode */
     {
       if (pi)
         aopPut (left, rname, 0);
@@ -10143,7 +10197,7 @@ genPagedPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, ifxCond, left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result, ic->next);
     }
 
   /* done */
@@ -10258,7 +10312,7 @@ genFarPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, ifxCond, left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result, ic->next);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -10312,7 +10366,7 @@ genCodePointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, ifxCond, left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result, ic->next);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -10367,7 +10421,7 @@ genGenPointerGet (operand * left,
 
   if (ifx && !ifx->generated)
     {
-      genIfxJump (ifx, ifxCond, left, NULL, result);
+      genIfxJump (ifx, ifxCond, left, NULL, result, ic->next);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -10707,7 +10761,7 @@ genNearPointerSet (operand * right,
     }
 
   /* now some housekeeping stuff */
-  if (aop) /* we had to allocate for this iCode */
+  if (aop)      /* we had to allocate for this iCode */
     {
       if (pi)
         aopPut (result, rname, 0);
@@ -11038,19 +11092,15 @@ genIfx (iCode * ic, iCode * popIc)
   /* the result is now in the accumulator or a directly addressable bit */
   freeAsmop (cond, NULL, ic, TRUE);
 
-  /* if there was something to be popped then do it */
-  if (popIc)
-      genIpop (popIc);
-
   /* if the condition is a bit variable */
   if (isbit && dup)
-    genIfxJump(ic, dup, NULL, NULL, NULL);
+    genIfxJump(ic, dup, NULL, NULL, NULL, popIc);
   else if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
-    genIfxJump (ic, SPIL_LOC (cond)->rname, NULL, NULL, NULL);
+    genIfxJump (ic, SPIL_LOC (cond)->rname, NULL, NULL, NULL, popIc);
   else if (isbit && !IS_ITEMP (cond))
-    genIfxJump (ic, OP_SYMBOL (cond)->rname, NULL, NULL, NULL);
+    genIfxJump (ic, OP_SYMBOL (cond)->rname, NULL, NULL, NULL, popIc);
   else
-    genIfxJump (ic, "a", NULL, NULL, NULL);
+    genIfxJump (ic, "a", NULL, NULL, NULL, popIc);
 
   ic->generated = 1;
 }
@@ -11120,11 +11170,15 @@ genAddrOf (iCode * ic)
     {
       char s[SDCC_NAME_MAX];
       if (offset)
-        sprintf (s, "#(%s >> %d)",
-                 sym->rname,
-                 offset * 8);
+        {
+          sprintf (s, "#(%s >> %d)",
+                   sym->rname,
+                   offset * 8);
+        }
       else
-        SNPRINTF (s, sizeof(s), "#%s", sym->rname);
+        {
+          SNPRINTF (s, sizeof(s), "#%s", sym->rname);
+        }
       aopPut (IC_RESULT (ic), s, offset++);
     }
   if (opIsGptr (IC_RESULT (ic)))
@@ -11949,18 +12003,25 @@ gen51Code (iCode * lic)
           break;
 
         case IPOP:
+          {
+            iCode *ifxIc, *popIc;
+            bool CommonRegs = FALSE;
+
             /* IPOP happens only when trying to restore a
                spilt live range, if there is an ifx statement
-             following this pop then the if statement might
+               following this pop (or several) then the if statement might
                be using some of the registers being popped which
                would destory the contents of the register so
                we need to check for this condition and handle it */
-          if (ic->next &&
-              ic->next->op == IFX &&
-              regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
-            genIfx (ic->next, ic);
+            for (ifxIc = ic->next; ifxIc && ifxIc->op == IPOP; ifxIc = ifxIc->next);
+            for (popIc = ic; popIc && popIc->op == IPOP; popIc = popIc->next)
+              CommonRegs |= (ifxIc && ifxIc->op == IFX && !ifxIc->generated &&
+                             regsInCommon (IC_LEFT (popIc), IC_COND (ifxIc)));
+            if (CommonRegs)
+              genIfx (ifxIc, ic);
             else
               genIpop (ic);
+          }
           break;
 
         case CALL:

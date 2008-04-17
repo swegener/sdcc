@@ -367,8 +367,8 @@ extern sym_link *validateLink(sym_link  *l,
                                const char       *file,
                                unsigned         line);
 /* Easy Access Macros */
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-#define IS_OP_ACCUSE(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->accuse)
+#define IS_OP_RUONLY(x) (IS_SYMOP(x) && OP_SYMBOL(x) && OP_SYMBOL(x)->ruonly)
+#define IS_OP_ACCUSE(x) (IS_SYMOP(x) && OP_SYMBOL(x) && OP_SYMBOL(x)->accuse)
 
 #define DCL_TYPE(l)  validateLink(l, "DCL_TYPE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.dcl_type
 #define DCL_ELEM(l)  validateLink(l, "DCL_ELEM", #l, DECLARATOR, __FILE__, __LINE__)->select.d.num_elem

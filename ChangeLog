@@ -1,5 +1,6 @@
 2008-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* as/link/mcs51/lkmem.c (summary2): fixed bug 1796077
 	* device/lib/libsdcc.lib,
 	* device/lib/Makefile.in,
 	* support/regression/ports/mcs51-xstack-auto/spec.mk,

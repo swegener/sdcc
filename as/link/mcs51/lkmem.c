@@ -413,7 +413,7 @@ int summary2(struct area * areap)
     } _Mem;
 
     _Mem Stack={0xff,   0, 0,     1, "STACK",           0x0000};
-    _Mem Paged={0xff,   0, 0,   256, "PAGED EXT. RAM",  A_PAG};
+    _Mem Paged={0xffff, 0, 0,   256, "PAGED EXT. RAM",  A_PAG};
     _Mem XRam= {0xffff, 0, 0, 65536, "EXTERNAL RAM",    0x0100};
     _Mem Rom=  {0xffff, 0, 0, 65536, "ROM/EPROM/FLASH", 0x0200};
 

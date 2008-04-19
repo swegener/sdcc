@@ -9,7 +9,6 @@
 #include "SDCCargs.h"
 #include "SDCCpeeph.h"
 #include "dbuf.h"
-#include "mcs51/peep.h"
 
 #define TARGET_ID_MCS51    1
 #define TARGET_ID_GBZ80    2
@@ -136,6 +135,7 @@ typedef struct
         bitVect * (*getRegsRead)(lineNode *line);
         bitVect * (*getRegsWritten)(lineNode *line);
         bool (*deadMove) (const char *reg, lineNode *currPl, lineNode *head);
+        bool (*notUsed) (const char *reg, lineNode *currPl, lineNode *head);
       }
     peep;
 

@@ -8,6 +8,7 @@
 #include "main.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "peep.h"
 #include "dbuf_string.h"
 #include "../SDCCutil.h"
 
@@ -723,7 +724,7 @@ PORT mcs51_port =
     MODEL_SMALL | MODEL_MEDIUM | MODEL_LARGE,
     MODEL_SMALL
   },
-  {
+  {                             /* Assembler */
     _asmCmd,
     NULL,
     "-plosgffc",                /* Options with debug */
@@ -732,19 +733,20 @@ PORT mcs51_port =
     ".asm",
     NULL                        /* no do_assemble function */
   },
-  {
+  {                             /* Linker */
     _linkCmd,
     NULL,
     NULL,
     ".rel",
     1
   },
-  {
+  {                             /* Peephole optimizer */
     _defaultRules,
     getInstructionSize,
     getRegsRead,
     getRegsWritten,
-    mcs51DeadMove
+    mcs51DeadMove,
+    0
   },
   {
     /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

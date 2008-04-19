@@ -403,6 +403,28 @@ FBYNAME (deadMove)
 }
 
 /*-----------------------------------------------------------------*/
+/* notUsed - Check, if value in register is not read again         */
+/*-----------------------------------------------------------------*/
+FBYNAME (notUsed)
+{
+  const char *what;
+
+  if(cmdLine[0] != '\'')
+    what = hTabItemWithKey (vars, 1);
+  else
+  {
+    cmdLine[strlen(cmdLine) - 1] = 0;
+    what = cmdLine + 1;
+  }
+
+  if (port->peep.notUsed)
+    return port->peep.notUsed (what, endPl, head);
+
+  fprintf (stderr, "Function notUsed not initialized in port structure\n");
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
 /* operandsNotSame - check if %1 & %2 are the same                 */
 /*-----------------------------------------------------------------*/
 FBYNAME (operandsNotSame)
@@ -1200,6 +1222,9 @@ ftab[] =                                // sorted on the number of times used
   },
   {
     "useAcallAjmp", useAcallAjmp
+  },
+  {
+    "notUsed", notUsed
   }
 };
 /*-----------------------------------------------------------------*/

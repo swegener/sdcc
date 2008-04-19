@@ -1,3 +1,9 @@
+2008-04-19 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCpeeph.c (added support for notUsed()),
+	* src/mcs51/main.c (added dependency on peep.h, documented mcs51_port struct),
+	* src/port.h (removed dependency on mcs51/peep.h, added declaration for notUsed()):
+	Implemented generic (that is not port-specific) part of RFE #1880202.	
+
 2008-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/mcs51/lkmem.c (summary2): fixed bug 1796077

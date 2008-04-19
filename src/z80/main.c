@@ -714,7 +714,7 @@ PORT z80_port =
     MODEL_MEDIUM | MODEL_SMALL,
     MODEL_SMALL
   },
-  {
+  {                             /* Assembler */
     NULL,
     ASMCMD,
     "-plosgffc",                /* Options with debug */
@@ -722,15 +722,20 @@ PORT z80_port =
     0,
     ".asm"
   },
-  {
+  {                             /* Linker */
     NULL,
     LINKCMD,
     NULL,
     ".o",
     1
   },
-  {
-    _z80_defaultRules
+  {                             /* Peephole optimizer */
+    _z80_defaultRules,
+    0,
+    0,
+    0,
+    0,
+    z80notUsed
   },
   {
         /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

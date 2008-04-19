@@ -1,4 +1,11 @@
 2008-04-19 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/peep.h (declaration of notUsed()),
+	* src/z80/main.c (enabled notUsed() for z80 port, documented z80_port struct),
+	* src/z80/z80.h (added dependency on peep.h),
+	* src/z80/peep.c (definition of notUsed()):
+	Implemented RFE #1880202 for Z80.
+
+2008-04-19 Philipp Klaus Krause <pkk AT spth.de>
 	* src/SDCCpeeph.c (added support for notUsed()),
 	* src/mcs51/main.c (added dependency on peep.h, documented mcs51_port struct),
 	* src/port.h (removed dependency on mcs51/peep.h, added declaration for notUsed()):

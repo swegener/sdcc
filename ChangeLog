@@ -1,19 +1,28 @@
+2008-04-20 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f2455.h: added bitfields for port C
+
 2008-04-20 Philipp Klaus Krause <pkk AT spth.de>
-	* src/z80/peep.c:
-	Use werror for error messages.
+
+	* src/z80/peep.c: Use werror for error messages.
 
 2008-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peep.h (declaration of notUsed()),
-	* src/z80/main.c (enabled notUsed() for z80 port, documented z80_port struct),
+	* src/z80/main.c (enabled notUsed() for z80 port, documented z80_port
+	  struct),
 	* src/z80/z80.h (added dependency on peep.h),
-	* src/z80/peep.c (definition of notUsed()):
-	Implemented RFE #1880202 for Z80.
+	* src/z80/peep.c (definition of notUsed()): Implemented RFE #1880202
+	  for Z80.
 
 2008-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCpeeph.c (added support for notUsed()),
-	* src/mcs51/main.c (added dependency on peep.h, documented mcs51_port struct),
-	* src/port.h (removed dependency on mcs51/peep.h, added declaration for notUsed()):
-	Implemented generic (that is not port-specific) part of RFE #1880202.	
+	* src/mcs51/main.c (added dependency on peep.h, documented mcs51_port
+	  struct),
+	* src/port.h (removed dependency on mcs51/peep.h, added declaration
+	  for notUsed()): Implemented generic (that is not port-specific) part
+	  of RFE #1880202.	
 
 2008-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -45,7 +54,8 @@
 
 2008-03-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* sdcc.dsw: adapted for moved cpp2, added dependency for as_z80 on config
+	* sdcc.dsw: adapted for moved cpp2, added dependency for as_z80 on
+	  config
 
 2008-03-31 Borut Razem <borut.razem AT siol.net>
 
@@ -78,16 +88,19 @@
 	* support/regression/tests/bug1717943.c: new, added
 
 2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
-	* src/z80/gen.c (assignResultValue): Reverted reversal of order of bytewise
-	  return value assignments introduced in last commit.
+
+	* src/z80/gen.c (assignResultValue): Reverted reversal of order of
+	  bytewise return value assignments introduced in last commit.
 
 2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
-	* src/z80/gen.c (emitDebug, assignResultValue, genPlus, genMinus, genMult,
-	  genJumpTab):
+
+	* src/z80/gen.c (emitDebug, assignResultValue, genPlus, genMinus,
+	  genMult, genJumpTab):
 	  Use 16-bit instructions for addition in some additional cases,
 	  implemented RFEs #1914251, #1914245, #1922090, #1921382, #1918323.
 
 2008-03-30 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc.c (serialRegAssign, allocReg, tryAllocatingRegPair):
 	  Implemented RFE #1921450, changed some debug messages.
 
@@ -127,8 +140,8 @@
 
 2008-03-21 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/ralloc.c (callFuncByName):
-	  Used // instead of /**/ to fix compilation warning about nested comments.
+	* src/z80/ralloc.c (callFuncByName): Used // instead of /**/ to fix
+	  compilation warning about nested comments.
 
 2008-03-20 Maarten Brock <sourceforge.brock AT dse.nl>
 

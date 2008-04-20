@@ -509,7 +509,7 @@ typedef union {
 		unsigned RC0       	: 1;
 		unsigned RC1       	: 1;
 		unsigned RC2       	: 1;
-		unsigned           	: 1;
+		unsigned RC3       	: 1;
 		unsigned RC4       	: 1;
 		unsigned RC5       	: 1;
 		unsigned RC6       	: 1;
@@ -632,9 +632,9 @@ typedef union {
 		unsigned LATC0     	: 1;
 		unsigned LATC1     	: 1;
 		unsigned LATC2     	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
+		unsigned LATC3     	: 1;
+		unsigned LATC4     	: 1;
+		unsigned LATC5     	: 1;
 		unsigned LATC6     	: 1;
 		unsigned LATC7     	: 1;
 	};
@@ -707,9 +707,9 @@ typedef union {
 		unsigned TRISC0    	: 1;
 		unsigned TRISC1    	: 1;
 		unsigned TRISC2    	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
+		unsigned TRISC3    	: 1;
+		unsigned TRISC4    	: 1;
+		unsigned TRISC5    	: 1;
 		unsigned TRISC6    	: 1;
 		unsigned TRISC7    	: 1;
 	};

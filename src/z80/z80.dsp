@@ -102,6 +102,10 @@ SOURCE=.\main.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\peep.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\ralloc.c
 # End Source File
 # Begin Source File
@@ -119,6 +123,10 @@ SOURCE=..\common.h
 # Begin Source File
 
 SOURCE=.\gen.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\peep.h
 # End Source File
 # Begin Source File
 

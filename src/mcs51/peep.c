@@ -26,7 +26,7 @@
 #include "ralloc.h"
 
 #define D(x) x
-#define DEADMOVEERROR "SDCC internal error: deadmove in " __FILE__" line %d\n", __LINE__
+#define DEADMOVEERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in deadmove");} while(0)
 
 typedef enum
 {
@@ -177,7 +177,7 @@ findLabel (const lineNode *pl)
   /* sanity check */
   if (p == pl->line)
     {
-      D(fprintf (stderr, DEADMOVEERROR);)
+      DEADMOVEERROR();
       return NULL;
     }
 
@@ -305,7 +305,7 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
   /* sanity check */
   if (rIdx >= mcs51_nRegs)
     {
-      D(fprintf (stderr, DEADMOVEERROR);)
+      DEADMOVEERROR();
       return S4O_ABORT;
     }
 
@@ -374,7 +374,7 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
           /* register passing this label */
           if (!setLabelRefPassedLabel (label))
             {
-              D(fprintf (stderr, DEADMOVEERROR);)
+              DEADMOVEERROR();
               return S4O_ABORT;
             }
           continue;
@@ -529,7 +529,7 @@ doPushScan (lineNode **pl, const char *pReg)
           case S4O_VISITED:
             if (!pushPl)
               {
-                D(fprintf (stderr, DEADMOVEERROR);)
+                DEADMOVEERROR();
                 return FALSE;
               }
             *pl = pushPl;

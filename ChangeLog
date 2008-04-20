@@ -1,3 +1,13 @@
+2008-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/peep.c,
+	* src/mcs51/peep.c: Use werror for error messages.
+	* src/SDCCicode.c (geniCodeConditional),
+	* src/SDCCsymt.c (structElemType): fixed bug 1839321
+	* src/z80/Makefile.bcc,
+	* src/z80/z80.dsp: added src/z80/peep.c/h
+	* support/regression/tests/bug1839321.c: new, added
+
 2008-04-20 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f2455.h: added bitfields for port C
@@ -22,7 +32,7 @@
 	  struct),
 	* src/port.h (removed dependency on mcs51/peep.h, added declaration
 	  for notUsed()): Implemented generic (that is not port-specific) part
-	  of RFE #1880202.	
+	  of RFE #1880202.
 
 2008-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
 

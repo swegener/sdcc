@@ -29,7 +29,7 @@
 #include "SDCCpeeph.h"
 #include "gen.h"
 
-#define NOTUSEDERROR {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");}
+#define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
 
 /*#define D(_s) { printf _s; fflush(stdout); }*/
 #define D(_s)
@@ -89,7 +89,7 @@ isReturned(const char *what)
       // Find size of return value.
       specifier *spec;
       if(sym->type->select.d.dcl_type != FUNCTION)
-        NOTUSEDERROR
+        NOTUSEDERROR();
       spec = &(sym->etype->select.s);
       if(spec->noun == V_VOID)
          size = 0;
@@ -109,7 +109,7 @@ isReturned(const char *what)
     }
   else
     {
-      NOTUSEDERROR
+      NOTUSEDERROR();
       size = 4;
     }
 
@@ -169,7 +169,7 @@ findLabel (const lineNode *pl)
   /* sanity check */
   if (p == pl->line)
     {
-      NOTUSEDERROR
+      NOTUSEDERROR();
       return NULL;
     }
 

@@ -1213,6 +1213,8 @@ structElemType (sym_link * stype, value * id)
             etype = getSpec (type);
             SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
                                  SPEC_SCLS (etype) : SPEC_SCLS (petype));
+            SPEC_OCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
+                                 SPEC_OCLS (etype) : SPEC_OCLS (petype));
             if (IS_SPEC (type))
               SPEC_CONST (type) |= SPEC_CONST (stype);
             else

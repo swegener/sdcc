@@ -29,7 +29,7 @@
 #include "SDCCpeeph.h"
 #include "gen.h"
 
-#define NOTUSEDERROR {fprintf (stderr, "SDCC internal error in notUsed() in %s, line %d\n", __FILE__, __LINE__);}
+#define NOTUSEDERROR {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");}
 
 /*#define D(_s) { printf _s; fflush(stdout); }*/
 #define D(_s)

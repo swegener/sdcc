@@ -1,3 +1,7 @@
+2008-04-20 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/peep.c:
+	Use werror for error messages.
+
 2008-04-19 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/peep.h (declaration of notUsed()),
 	* src/z80/main.c (enabled notUsed() for z80 port, documented z80_port struct),

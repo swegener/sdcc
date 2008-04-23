@@ -647,6 +647,13 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, struct dbuf_s * o
     val = constCharVal (0);
   }
 
+  /* check if the literal value is within bounds */
+  if (checkConstantRange (type, val->etype, '=', FALSE) == CCR_OVL &&
+      !options.lessPedantic)
+    {
+      werror (W_LIT_OVERFLOW);
+    }
+
   if (val->type != type) {
     val = valCastLiteral(type, floatFromVal(val));
   }
@@ -698,7 +705,6 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
   unsigned long ival = 0;
   int size =0;
 
-
   do {
     unsigned long i;
     val = list2val(lilist);
@@ -711,7 +717,15 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
       size = ((SPEC_BLEN (lsym->etype) / 8) +
               (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
     }
+
+    /* check if the literal value is within bounds */
+    if (checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL &&
+        !options.lessPedantic)
+      {
+        werror (W_LIT_OVERFLOW);
+      }
     i = ulFromVal(val);
+    i &= (1 << SPEC_BLEN (lsym->etype)) - 1;
     i <<= SPEC_BSTR (lsym->etype);
     ival |= i;
     if (! ( lsym->next &&
@@ -1244,21 +1258,23 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
         }
 
       /* print extra debug info if required */
-      if (options.debug) {
-
-        if (!sym->level)
-          {                     /* global */
-            if (IS_STATIC (sym->etype))
-              dbuf_printf (oBuf, "F%s$", moduleName);        /* scope is file */
-            else
-              dbuf_printf (oBuf, "G$");      /* scope is global */
-          }
-        else
-          /* symbol is local */
-          dbuf_printf (oBuf, "L%s$",
-                   (sym->localof ? sym->localof->name : "-null-"));
-        dbuf_printf (oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
-      }
+      if (options.debug)
+        {
+          if (!sym->level)
+            {                     /* global */
+              if (IS_STATIC (sym->etype))
+                dbuf_printf (oBuf, "F%s$", moduleName);        /* scope is file */
+              else
+                dbuf_printf (oBuf, "G$");      /* scope is global */
+            }
+          else
+            {
+              /* symbol is local */
+              dbuf_printf (oBuf, "L%s$",
+                           (sym->localof ? sym->localof->name : "-null-"));
+            }
+          dbuf_printf (oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
+        }
 
       /* if it has an absolute address and no initializer */
       if (SPEC_ABSA (sym->etype) && !sym->ival)

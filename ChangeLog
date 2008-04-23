@@ -1,3 +1,8 @@
+2008-04-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (printIvalType, printIvalBitFields): fixed bug 1856409
+	* support/regression/tests/bug1856409.c: new, added
+
 2008-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/peep.c,

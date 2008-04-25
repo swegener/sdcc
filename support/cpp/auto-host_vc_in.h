@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.*/
 
-#ifndef CPP2_VC_H_
-#define CPP2_VC_H_
+#ifndef CPP_VC_H_
+#define CPP_VC_H_
 
 #include <sys/stat.h>
 #include <io.h>
@@ -75,4 +75,4 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.*/
 #pragma warning( disable : 4022 )
 #endif  _MSC_VER
 
-#endif /*CPP2_VC_H_*/
+#endif /*CPP_VC_H_*/

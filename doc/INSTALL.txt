@@ -10,7 +10,7 @@ To install:
     cd ~
     mkdir tmp
     cd tmp
-    tar xzf path/to/binary/kit/sdcc-2.8.0-i386-unknown-linux2.5.tar.gz
+    tar xjf path/to/binary/kit/sdcc-2.8.0-i386-unknown-linux2.5.tar.bz2
 
 * Change to the sdcc directory and copy all files to /usr/local
     cd sdcc
@@ -63,7 +63,7 @@ To install:
     cd ~
     mkdir tmp
     cd tmp
-    tar xzf path/to/binary/kit/sdcc-2.8.0-universal-apple-macosx.tar.gz
+    tar xjf path/to/binary/kit/sdcc-2.8.0-universal-apple-macosx.tar.bz2
 
 * Change to the sdcc directory and copy all files to /Developer/sdcc
     cp -r sdcc /Developer/sdcc

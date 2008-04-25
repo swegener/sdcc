@@ -1,3 +1,15 @@
+2008-04-25 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lklibr.c: moved from as/link/z80/lklibr.c
+	* as/link/hc08/lklibr.c, as/link/mcs51/lklibr.c: deleted
+	* as/link/hc08/Makefile.bcc, as/link/hc08/Makefile.in,
+	* as/link/hc08/link_hc08.dsp, as/link/mcs51/Makefile.bcc,
+	  as/link/mcs51/Makefile.in, as/link/mcs51/aslink.dsp,
+	  as/link/z80/Makefile.in, as/link/z80/linkgbz80.dsp,
+	  as/link/z80/linkz80.dsp: lklibr.c moved
+	* doc/INSTALL.txt: binary archives in bz2 format
+	* support/cpp/auto-host_vc_in.h: CPP2 replaced with CPP
+
 2008-04-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (printIvalType, printIvalBitFields): fixed bug 1856409

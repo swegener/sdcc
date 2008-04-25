@@ -134,7 +134,7 @@ SOURCE=..\lklex.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lklibr.c
+SOURCE=..\lklibr.c
 # ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File

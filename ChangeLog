@@ -1,5 +1,24 @@
 2008-04-29 Raphael Neider <rneider AT web.de>
 
+	* device/include/pic16/{pic18f2480.h, pic18f2580.h, pic18f4423.h,
+	  pic18f4480.h, pic18f4523.h, pic18f4580.h, pic18f6585.h, pic18f8585.h},
+	  device/lib/pic16/libdev/{pic18f2480.c, pic18f2580.c, pic18f4423.c,
+	  pic18f4480.c, pic18f4523.c, pic18f4580.c, pic18f6585.c, pic18f8585.c}:
+	  added missing family members and 18f2480/2580/4480/4580 family
+	* device/include/pic16/{pic18f2423.h, pic18f2523.h}: use 18f4523.h
+	* device/include/pic16/pic18f2525.h: use 18f4620.h
+	* device/include/pic16/pic18f6680.h: use 18f8680.h
+	* device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/pics.all,
+	  src/pic16/devices.inc: add new devices
+	* device/lib/pic16/libdev/{pic18f2423.c, pic18f2523.c}: use 18f4523.c
+	* device/lib/pic16/libdev/pic18f2525.c: use 18f4620.c
+	* device/lib/pic16/libdev/pic18f6680.c: uso 18f8680.c
+	* device/lib/pic16/libio/{adc.ignore, i2c.ignore, usart.ignore}:
+	  prevent attempting to build the libio for some new devices
+
+2008-04-29 Raphael Neider <rneider AT web.de>
+
 	* debugger/mcs51/Makefile.in: fixed paths to sources
 
 2008-04-25 Borut Razem <borut.razem AT siol.net>

@@ -1,6 +1,6 @@
-/* 
- * pic18f2525.h - PIC18F2525 Device Library Header
+/*
+ * pic18f2525.h - Device Library Header
  */
 
-#include "pic18f2620.h"
+#include "pic18f4620.h"
 

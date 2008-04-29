@@ -1,5 +1,26 @@
 2008-04-29 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/devices.inc,
+	  device/include/pic16/pic16devices.txt: replaced compiled-in list
+	  of devices with a variant parsed at runtime
+	* src/pic16/device.c: added support for parsing pic16devices.txt,
+	  clean up
+	* src/pic16/device.h: removed (now) unused fields from PIC_device
+	* src/pic16/main.c: removed #pragma maxram,
+	  (_pic16_initPaths): removed bogus generation of search paths,
+	  setup the port proper only after the search paths (for
+	  pic16devices.txt) are set up,
+	  (_pic16_finaliseOptions): moved processor dependant code here
+	  from _pic16_initPaths(), clean up
+	* src/pic16/ralloc.c (pic16_init_stack),
+	* src/pic16/ralloc.h,
+	* src/pic16/pcode.c: clean up
+	* device/include/Makefile.in,
+	  support/scripts/sdcc.nsi: also install/package pic16devices.txt
+	* support/scripts/inc2h-pic16.pl: updated instructions
+
+2008-04-29 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic16/{pic18f2480.h, pic18f2580.h, pic18f4423.h,
 	  pic18f4480.h, pic18f4523.h, pic18f4580.h, pic18f6585.h, pic18f8585.h},
 	  device/lib/pic16/libdev/{pic18f2480.c, pic18f2580.c, pic18f4423.c,

@@ -55,6 +55,7 @@ install: all installdirs
 	fi
 	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
 		$(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16 ; \
+		$(CP) $(srcdir)/pic16/*.txt $(sdcc_includedir)/pic16 ; \
 	fi
 	if [ "`grep z80 $(top_builddir)/ports.build`" = z80 ]; then \
 		$(CP) $(srcdir)/z80/*.h $(sdcc_includedir)/z80 ; \

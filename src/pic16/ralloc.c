@@ -491,21 +491,6 @@ regFindFreeNext(set *dRegs, regs *creg)
   return NULL;
 }
 
-/*-----------------------------------------------------------------*/
-/* pic16_initStack - allocate registers for a pseudo stack               */
-/*-----------------------------------------------------------------*/
-void pic16_initStack(int base_address, int size)
-{
-
-  int i;
-
-  pic16_Gstack_base_addr = base_address;
-  //fprintf(stderr,"initStack");
-
-  for(i = 0; i<size; i++)
-    addSet(&pic16_dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0, NULL));
-}
-
 /*-----------------------------------------------------------------*
  *-----------------------------------------------------------------*/
 regs *

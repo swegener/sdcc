@@ -2,6 +2,7 @@
 
 use strict;
 
+#
 # Parse MPASM include files to extract SDCC header/device library files
 # This script is (c) 2007 by Raphael Neider <rneider AT web.de>,
 # it is licensed under the terms of the GPL v2.
@@ -19,11 +20,15 @@ use strict;
 # 5. adjust $SDCC/device/lib/pic16/libio/*.ignore if the device
 #    does not support ADC, I2C, or USART
 # 6. edit $SDCC/device/include/pic16/pic18fregs.h
-# 7. edit $SDCC/src/pic16/devices.inc
+# 7. edit $SDCC/device/include/pic16/pic16devices.txt
 #
 # The file format of steps 6 and 7 is self explanatory, in most
 # if not all cases you can copy and paste another device's records
 # and adjust them to the newly added device.
+#
+# Please try to add device families (with a common datasheet) rather
+# than a single device and use the .h and .c files of the largest
+# device for all (using #include "largest.c" and #include "largest.h").
 #
 
 my $SCRIPT = $0;

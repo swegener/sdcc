@@ -163,8 +163,7 @@ struct {
 
 
 enum {
-  P_MAXRAM = 1,
-  P_STACK,
+  P_STACK = 1,
   P_CODE,
   P_UDATA,
   P_LIBRARY
@@ -181,31 +180,6 @@ do_pragma(int id, const char *name, const char *cp)
 
   switch (id)
     {
-    /* #pragma maxram [maxram] */
-    case P_MAXRAM:
-      {
-        int max_ram;
-
-        cp = get_pragma_token(cp, &token);
-        if (TOKEN_INT == token.type)
-          max_ram = token.val.int_val;
-        else
-          {
-            err = 1;
-            break;
-          }
-
-        cp = get_pragma_token(cp, &token);
-        if (TOKEN_EOL != token.type)
-          {
-            err = 1;
-            break;
-          }
-
-        pic16_setMaxRAM(max_ram);
-      }
-      break;
-
     /* #pragma stack [stack-position] [stack-len] */
     case  P_STACK:
       {
@@ -502,7 +476,6 @@ do_pragma(int id, const char *name, const char *cp)
 }
 
 static struct pragma_s pragma_tbl[] = {
-  { "maxram",  P_MAXRAM,  0, do_pragma },
   { "stack",   P_STACK,   0, do_pragma },
   { "code",    P_CODE,    0, do_pragma },
   { "udata",   P_UDATA,   0, do_pragma },
@@ -655,56 +628,25 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
   return FALSE;
 }
 
-extern set *userIncDirsSet;
+extern void pic16_init_pic(const char *name);
 
 static void _pic16_initPaths(void)
 {
-  set *pic16incDirsSet=NULL;
-  set *pic16libDirsSet=NULL;
-  char devlib[512];
+    set *pic16libDirsSet=NULL;
 
-    setMainValue("mcu", pic16->name[2] );
-    addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+    if (!options.nostdlib) {
+        struct dbuf_s pic16libDir;
 
-    setMainValue("mcu1", pic16->name[1] );
-    addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
-
-    if(!options.nostdinc) {
-      struct dbuf_s pic16incDir;
-
-      dbuf_init(&pic16incDir, 128);
-      dbuf_makePath(&pic16incDir, INCLUDE_DIR_SUFFIX, "pic16");
-
-      /* setup pic16 include directory */
-      pic16incDirsSet = appendStrSet(dataDirsSet, NULL, dbuf_c_str(&pic16incDir));
-      dbuf_destroy(&pic16incDir);
-      includeDirsSet = pic16incDirsSet;
-//      mergeSets(&includeDirsSet, pic16incDirsSet);
-    }
-    /* pic16 port should not search to the SDCC standard include directories,
-     * so add here the deleted include dirs that user has issued in command line */
-    mergeSets(&pic16incDirsSet, userIncDirsSet);
-
-    if(!options.nostdlib) {
-      struct dbuf_s pic16libDir;
-
-      dbuf_init(&pic16libDir, 128);
-      dbuf_makePath(&pic16libDir, LIB_DIR_SUFFIX, "pic16");
-      /* setup pic16 library directory */
-      pic16libDirsSet = appendStrSet(dataDirsSet, NULL, dbuf_c_str(&pic16libDir));
-      dbuf_destroy(&pic16libDir);
-      libDirsSet = pic16libDirsSet;
-//      mergeSets(&libDirsSet, pic16libDirsSet);
+        dbuf_init(&pic16libDir, 128);
+        dbuf_makePath(&pic16libDir, LIB_DIR_SUFFIX, "pic16");
+        pic16libDirsSet = appendStrSet(dataDirsSet, NULL, dbuf_c_str(&pic16libDir));
+        dbuf_destroy(&pic16libDir);
+        mergeSets(&pic16libDirsSet, libDirsSet);
+        libDirsSet = pic16libDirsSet;
     }
 
-    if(!pic16_options.nodefaultlibs) {
-      /* now add the library for the device */
-      sprintf(devlib, "%s.lib", pic16->name[2]);
-      addSet(&libFilesSet, Safe_strdup(devlib));
-
-      /* add the internal SDCC library */
-      addSet(&libFilesSet, Safe_strdup( "libsdcc.lib" ));
-    }
+    /* now that we have the paths set up... */
+    pic16_init_pic(port->processor);
 }
 
 extern set *linkOptionsSet;
@@ -786,6 +728,8 @@ static void _pic16_linkEdit(void)
 static void
 _pic16_finaliseOptions (void)
 {
+    char devlib[512];
+
     port->mem.default_local_map = data;
     port->mem.default_globl_map = data;
 
@@ -803,6 +747,20 @@ _pic16_finaliseOptions (void)
     options.intlong_rent = 1;
 #endif
 
+    setMainValue("mcu", pic16->name[2] );
+    addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+
+    setMainValue("mcu1", pic16->name[1] );
+    addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
+
+    if(!pic16_options.nodefaultlibs) {
+      /* now add the library for the device */
+      sprintf(devlib, "%s.lib", pic16->name[2]);
+      addSet(&libFilesSet, Safe_strdup(devlib));
+
+      /* add the internal SDCC library */
+      addSet(&libFilesSet, Safe_strdup( "libsdcc.lib" ));
+    }
 
     if(alt_asm && strlen(alt_asm))
       pic16_asmCmd[0] = alt_asm;
@@ -837,39 +795,6 @@ _pic16_finaliseOptions (void)
       addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
     }
 }
-
-
-#if 0
-  if (options.model == MODEL_LARGE)
-    {
-      port->mem.default_local_map = xdata;
-      port->mem.default_globl_map = xdata;
-    }
-  else
-    {
-      port->mem.default_local_map = data;
-      port->mem.default_globl_map = data;
-    }
-
-  if (options.stack10bit)
-    {
-      if (options.model != MODEL_FLAT24)
-    {
-      fprintf (stderr,
-           "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
-      fprintf (stderr, "\t10 bit stack mode disabled.\n");
-      options.stack10bit = 0;
-    }
-      else
-    {
-      /* Fixup the memory map for the stack; it is now in
-       * far space and requires a FPOINTER to access it.
-       */
-      istack->fmap = 1;
-      istack->ptrType = FPOINTER;
-    }
-    }
-#endif
 
 
 static void

@@ -426,6 +426,7 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\pic\*.inc"
   SetOutPath "$INSTDIR\include\pic16"
   File "${DEV_ROOT}\include\pic16\*.h"
+  File "${DEV_ROOT}\include\pic16\*.txt"
   SetOutPath "$INSTDIR\include\z80"
   File "${DEV_ROOT}\include\z80\*.h"
   SetOutPath "$INSTDIR\include"

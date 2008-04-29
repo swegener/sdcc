@@ -66,15 +66,15 @@ typedef struct {
 #define PROCESSOR_NAMES    4
 /* Processor unique attributes */
 typedef struct PIC16_device {
-  char *name[PROCESSOR_NAMES];/* aliases for the processor name */
-
-  int maxRAMaddress;		/* maximum value for a data address */
+  char *name[PROCESSOR_NAMES];  /* aliases for the processor name */
+  /* RAMsize *must* be the first item to copy for 'using' */
   int RAMsize;			/* size of Data RAM - VR 031120 */
   int acsSplitOfs;		/* access bank split offset */
-  int extMIface;		/* device has external memory interface */
   sfrRangeInfo_t sfrRange;	/* SFR range */
   configWordsInfo_t cwInfo;	/* configuration words info */
   idBytesInfo_t idInfo;		/* ID Locations info */
+  /* next *must* be the first field NOT being copied via 'using' */
+  struct PIC16_device *next;    /* linked list */
 } PIC16_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
@@ -135,7 +135,6 @@ void pic16_assignConfigWordValue(int address, unsigned int value);
 void pic16_assignIdByteValue(int address, char value);
 int pic16_isREGinBank(regs *reg, int bank);
 int pic16_REGallBanks(regs *reg);
-void pic16_setMaxRAM(int size);
 int PIC16_IS_CONFIG_ADDRESS(int address);
 int PIC16_IS_IDLOC_ADDRESS(int address);
 int PIC16_IS_HWREG_ADDRESS(int address);
@@ -145,3 +144,4 @@ int checkAddSym(set **set, symbol *reg);
 int checkSym(set *set, symbol *reg);
 
 #endif  /* __DEVICE_H__ */
+

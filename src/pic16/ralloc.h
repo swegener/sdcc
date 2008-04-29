@@ -31,9 +31,6 @@
 
 #include "pcoderegs.h"
 
-extern unsigned int stackPos;
-extern unsigned int stackLen;
-
 enum
   {
     R2_IDX = 0, R3_IDX, R4_IDX,

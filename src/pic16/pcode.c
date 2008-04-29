@@ -156,7 +156,6 @@ extern void pic16_RemoveUnusedRegisters(void);
 extern void pic16_RegsUnMapLiveRanges(void);
 extern void pic16_BuildFlowTree(pBlock *pb);
 extern void pic16_pCodeRegOptimizeRegUsage(int level);
-extern int pic16_picIsInitialized(void);
 extern void SAFE_snprintf(char **str, size_t *size, const char *format, ...);
 extern int mnem2key(unsigned char const *mnem);
 
@@ -2954,10 +2953,8 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 #endif
 
 extern set *externs;
-extern  void pic16_initStack(int base_address, int size);
 extern regs *pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 extern regs *pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias);
-extern void pic16_init_pic(char *);
 
 void  pic16_pCodeInitRegisters(void)
 {
@@ -2967,9 +2964,6 @@ void  pic16_pCodeInitRegisters(void)
 		return;
 	
 	initialized = 1;
-
-//	pic16_initStack(0xfff, 8);
-	pic16_init_pic(port->processor);
 
 	pic16_pc_status.r = pic16_allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
 	pic16_pc_pcl.r = pic16_allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
@@ -8906,7 +8900,7 @@ int invalidatesBSR(pCode *pc)
 pseudoBankNr getBankFromBanksel (pCode *pc)
 {
   char *sym;
-  int data = (int)NULL;
+  int data = 0;
 
   if (!pc) return INVALID_BANK;
   

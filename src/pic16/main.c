@@ -81,9 +81,6 @@ static char *_pic16_keywords[] =
 
 pic16_sectioninfo_t pic16_sectioninfo;
 
-int xinst=0;
-
-
 extern char *pic16_processor_base_name(void);
 
 void  pic16_pCodeInitRegisters(void);
@@ -524,7 +521,7 @@ OPTION pic16_optionsTable[]= {
     /* code generation options */
     { 0, STACK_MODEL,        NULL, "use stack model 'small' (default) or 'large'"},
 #if XINST
-    { 'y', "--extended",     &xinst, "enable Extended Instruction Set/Literal Offset Addressing mode"},
+    { 'y', "--extended",     &pic16_options.xinst, "enable Extended Instruction Set/Literal Offset Addressing mode"},
 #endif
     { 0, "--pno-banksel",    &pic16_options.no_banksel, "do not generate BANKSEL assembler directives"},
 

@@ -380,7 +380,7 @@ regs* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int a
         if(name)
                 dReg->name = Safe_strdup(name);
         else {
-          if(xinst && pc_type == PO_GPR_TEMP) {
+          if(pic16_options.xinst && pc_type == PO_GPR_TEMP) {
             sprintf(buffer,"0x%02x", dReg->rIdx);
           } else {
             sprintf(buffer,"r0x%02x", dReg->rIdx);
@@ -1332,7 +1332,7 @@ void pic16_writeUsedRegs(FILE *of)
   pic16_dump_isection(of, rel_idataSymSet, 0);
   pic16_dump_isection(of, fix_idataSymSet, 1);
 
-  if(!xinst) {
+  if(!pic16_options.xinst) {
     /* dump internal registers */
     pic16_dump_int_registers(of, pic16_int_regs);
   }

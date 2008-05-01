@@ -21,9 +21,6 @@
 # split <offset>
 #       Addresses below <offset> refer to bank 0, addresses above <offset>
 #       refer to SFRs in bank 15 for references via the access bank.
-# sfrrange <first> <last>
-#       SFRs occupy addresses <first> to <last> (both included) and must
-#       hence not be used as RAM.
 # configrange <first> <last>
 #       Configuration registers occupy addresses <first> to <last> (both
 #       included).
@@ -41,7 +38,6 @@
 name        18f1220
 ramsize     256
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0xff
 configword  0x300002 0x0f 0xff
@@ -64,7 +60,6 @@ using       18f1220
 name        18f2220
 ramsize     512
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0xff
 configword  0x300002 0x0f 0xff
@@ -83,7 +78,6 @@ idlocrange  0x200000 0x200007
 name        18f2221
 ramsize     512
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x37
 configword  0x300002 0x1f 0xff
@@ -110,7 +104,6 @@ using       18f2221
 name        18f2331
 ramsize     768
 split       0x60
-sfrrange    0xf60 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0xff
 configword  0x300002 0x0f 0xff
@@ -130,7 +123,6 @@ idlocrange  0x200000 0x200007
 name        18f242
 ramsize     768
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0x27 0xff
 configword  0x300002 0x0f 0xff
@@ -149,7 +141,6 @@ idlocrange  0x200000 0x200007
 name        18f2420
 ramsize     768
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x07
 configword  0x300002 0x1f 0xff
@@ -168,7 +159,6 @@ idlocrange  0x200000 0x200007
 name        18f2423
 ramsize     768
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x07
 configword  0x300002 0x1f 0xff
@@ -191,7 +181,6 @@ using       18f2331
 name        18f2455
 ramsize     2048
 split       0x60
-sfrrange    0xf60 0xfff
 configrange 0x300000 0x30000d
 configword  0x300000 0x3f 0xc0
 configword  0x300001 0xcf 0x35
@@ -211,7 +200,6 @@ idlocrange  0x200000 0x200007
 name        18f248
 ramsize     768
 split       0x60
-sfrrange    0xf00 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0x27 0xff
 configword  0x300002 0x0f 0xff
@@ -229,7 +217,6 @@ idlocrange  0x200000 0x200007
 name        18f2480
 ramsize     768
 split       0x60
-sfrrange    0xd00 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x37
 configword  0x300002 0x1f 0xff
@@ -248,7 +235,6 @@ idlocrange  0x200000 0x200007
 name        18f24j10
 ramsize     1024
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300000 0x300005
 configword  0x300000 0xe1 0xff
 configword  0x300001 0x04 0xf7
@@ -276,7 +262,6 @@ ramsize     1536
 name        18f2525
 ramsize     4096
 split       0x80
-sfrrange    0xf80 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x37
 configword  0x300002 0x1f 0xff
@@ -309,7 +294,6 @@ ramsize     1536
 name        18f2585
 ramsize     4096
 split       0x60
-sfrrange    0xd00 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x37
 configword  0x300002 0x1f 0xff
@@ -340,7 +324,6 @@ using       18f2585
 name        18f2682
 ramsize     4096
 split       0x60
-sfrrange    0xd00 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0xcf 0x37
 configword  0x300002 0x1f 0xff
@@ -471,7 +454,6 @@ using       18f2682
 name        18f6520
 ramsize     2048
 split       0x60
-sfrrange    0xf60 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0x27 0xff
 configword  0x300002 0x0f 0xff
@@ -491,7 +473,6 @@ idlocrange  0x200000 0x200007
 name        18f6585
 ramsize     3328
 split       0x60
-sfrrange    0xd00 0xfff
 configrange 0x300001 0x30000d
 configword  0x300001 0x2f 0xff
 configword  0x300002 0x0f 0xff

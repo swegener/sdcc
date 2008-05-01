@@ -1508,19 +1508,21 @@ pic16createInterruptVect (struct dbuf_s * vBuf)
 static void
 pic16initialComments (FILE * afile)
 {
-        initialComments (afile);
-        fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
-        if(xinst)
-          fprintf (afile, "; * Extended Instruction Set\n");
+    initialComments (afile);
+    fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
+    if (pic16_options.xinst) {
+        fprintf (afile, "; * Extended Instruction Set\n");
+    } // if
 
-        if(pic16_mplab_comp)
-                fprintf(afile, "; * MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
-        fprintf (afile, iComments2);
+    if (pic16_mplab_comp) {
+        fprintf(afile, "; * MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
+    } // if
+    fprintf (afile, iComments2);
 
-        if(options.debug) {
-                fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]%s\"\n",
-                                SDCC_VERSION_STR, getBuildNumber(), (!xinst?"":" {extended}") );
-        }
+    if (options.debug) {
+        fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]%s\"\n",
+                SDCC_VERSION_STR, getBuildNumber(), (!pic16_options.xinst?"":" {extended}") );
+    } // if
 }
 
 int

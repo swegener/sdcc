@@ -48,7 +48,6 @@ static PIC16_device default_device = {
     { "p18f452", "18f452", "pic18f452", "f452" },
     0x600,
     0x80,
-    { 0xf80, 0xfff },
     { /* configuration words */
       0x300001, 0x30000d,
       { { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ ,
@@ -415,16 +414,14 @@ pic16_list_devices(PIC16_device *head)
     int i = 0;
 
     if (options.verbose) {
-        printf("device        RAM  split        SFRs           config words\n");
+        printf("device        RAM  split       config words\n");
     } // if
     while (head) {
         printf("%-10s  ", head->name[0]);
         if (options.verbose) {
-            printf("%5d   0x%02x    0x%03x..0x%03x    0x%06x..0x%06x\n",
+            printf("%5d   0x%02x    0x%06x..0x%06x\n",
                     head->RAMsize,
                     head->acsSplitOfs,
-                    head->sfrRange.sfrLoAddr,
-                    head->sfrRange.sfrHiAddr,
                     head->cwInfo.confAddrStart,
                     head->cwInfo.confAddrEnd);
         } else {
@@ -631,16 +628,6 @@ pic16_find_device(const char *name)
                     SYNTAX("<offset> (e.g., 0x80) expected.");
                 } else {
                     d->acsSplitOfs = val[0];
-                } // if
-            } else if (0 == strcmp(key, "sfrrange")) {
-                // sfrrange %<first>i %<last>i
-                res = sscanf(&line[1+strlen(key)], " %i %i",
-                        &val[0], &val[1]);
-                if (res < 2) {
-                    SYNTAX("<first> <last> (e.g., 0xf60 0xfff) expected.");
-                } else {
-                    d->sfrRange.sfrLoAddr = val[0];
-                    d->sfrRange.sfrHiAddr = val[1];
                 } // if
             } else if (0 == strcmp(key, "configrange")) {
                 // configrange %<first>i %<last>i

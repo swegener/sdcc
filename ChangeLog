@@ -1,3 +1,16 @@
+2008-05-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/device.h: removed unused field PIC16_device.sfrRange,
+	  moved xinst flag into pic16_options_t
+	* src/pic16/device.c (default_device, pic16_list_devices,
+	  pic16_find_device): removed references to sfrrange
+	* src/pic16/gen.c (genFunction),
+	  src/pic16/glue.c (pic16initialComments),
+	  src/pic16/main.c (pic16_optionsTable),
+	  src/pic16/ralloc.c (newReg, pic16_writeUsedRegs): updated references
+	  to xinst
+	* device/include/pic16/pic16devices.txt: removed sfrrange lines
+
 2008-04-29 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/devices.inc,

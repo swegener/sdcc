@@ -34,12 +34,6 @@
 #define IDLOCATION_BYTES	20
 
 typedef struct {
-	int sfrLoAddr;
-	int sfrHiAddr;
-} sfrRangeInfo_t;
-	
-
-typedef struct {
 	unsigned int mask;
 	int emit;
 	unsigned int value;
@@ -70,12 +64,13 @@ typedef struct PIC16_device {
   /* RAMsize *must* be the first item to copy for 'using' */
   int RAMsize;			/* size of Data RAM - VR 031120 */
   int acsSplitOfs;		/* access bank split offset */
-  sfrRangeInfo_t sfrRange;	/* SFR range */
   configWordsInfo_t cwInfo;	/* configuration words info */
   idBytesInfo_t idInfo;		/* ID Locations info */
   /* next *must* be the first field NOT being copied via 'using' */
   struct PIC16_device *next;    /* linked list */
 } PIC16_device;
+
+extern PIC16_device *pic16;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
@@ -101,9 +96,10 @@ typedef struct {
   unsigned long opt_flags;
   int gstack;
   unsigned int debgen;
+  int xinst;
 } pic16_options_t;
 
-extern int xinst;
+extern pic16_options_t pic16_options;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
 #define STACK_MODEL_LARGE	(pic16_options.stack_model == 1)
@@ -126,9 +122,6 @@ typedef struct {
 } stats_t;
 
 extern stats_t statistics;
-
-extern pic16_options_t pic16_options;
-extern PIC16_device *pic16;
 
 /****************************************/
 void pic16_assignConfigWordValue(int address, unsigned int value);

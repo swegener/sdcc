@@ -3095,7 +3095,7 @@ static void genFunction (iCode *ic)
         if (sym->regsUsed) {
                   pic16_emitpinfo(INF_LOCALREGS, pic16_newpCodeOpLocalRegs(LR_ENTRY_BEGIN));
 
-          if(!xinst) {
+          if(!pic16_options.xinst) {
             /* save the registers used */
             DEBUGpic16_emitcode("; **", "Saving used registers in stack");
             for ( i = 0 ; i < sym->regsUsed->size ; i++) {

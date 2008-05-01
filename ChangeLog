@@ -1,5 +1,21 @@
 2008-05-01 Raphael Neider <rneider AT web.de>
 
+	* device/include/pic16/adc.h,
+	  device/lib/pic16/libio/adc/adcbusy.c,
+	  device/lib/pic16/libio/adc/adcopen.c,
+	  device/lib/pic16/libio/adc/adcsetch.c: support old 18f242 and new
+	  18f2455 style ADC devices, based on patch #1776197
+	* device/lib/pic16/libio/adc/adcclose.c,
+	  device/lib/pic16/libio/adc/adcconv.c,
+	  device/lib/pic16/libio/adc/adcread.c: cosmetic changes
+	* device/include/pic16/{pic18f2331.h,pic18f2431.h},
+	  device/lib/pic16/libdev/{pic18f2331.c,pic18f2431.c}: reuse 18f4331
+	* device/include/pic16/pic18f4431.h,
+	  device/lib/pic16/libdev/pic18f4431.c: remove outdated comments
+	* device/lib/pic16/libio/adc.ignore: forbid unhandled devices
+
+2008-05-01 Raphael Neider <rneider AT web.de>
+
 	* src/pic16/device.h: removed unused field PIC16_device.sfrRange,
 	  moved xinst flag into pic16_options_t
 	* src/pic16/device.c (default_device, pic16_list_devices,

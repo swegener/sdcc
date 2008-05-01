@@ -6,6 +6,7 @@
  *
  * Devices implemented:
  *	PIC18F[24][45][28]
+ *	PIC18F2455-style
  *
  *
  * This program is free software; you can redistribute it and/or
@@ -21,32 +22,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * $Id$
  */
 
-/*
-** $Id$
-*/
-
 #include <pic18fregs.h>
-
 #include <adc.h>
 
 
 void adc_setchannel(unsigned char channel) __naked
 {
 #if 0
+#if defined(__SDCC_ADC_STYLE2455)
+  ADCON0 &= ~(0xf << 2);
+  ADCON0 |= channel << 2;
+#else /* all other devices */
   ADCON0 &= ~(0x7 << 3);
   ADCON0 |= channel << 3;
+#endif
 #else
-  channel;
+  (void)channel;
+
   __asm
+#if defined(__SDCC_ADC_STYLE2455)
+    movlw       0xc3
+#else /* all other devices */
     movlw       0xc7
+#endif
     andwf       _ADCON0, f
     
     movlw       0x01
     movf        _PLUSW1, w
-    
+#if defined(__SDCC_ADC_STYLE2455)
+#else /* all other devices */
     rlcf        _WREG, w
+#endif
     rlcf        _WREG, w
     rlcf        _WREG, w
 
@@ -56,3 +66,4 @@ void adc_setchannel(unsigned char channel) __naked
   __endasm;
 #endif    
 }
+

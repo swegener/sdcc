@@ -6,6 +6,7 @@
  *
  * Devices implemented:
  *	PIC18F[24][45][28]
+ *	PIC18F2455-style
  *
  *
  * This program is free software; you can redistribute it and/or
@@ -21,14 +22,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * $Id$
  */
 
-/*
-** $Id$
-*/
-
 #include <pic18fregs.h>
-
 #include <adc.h>
 
 
@@ -45,23 +43,40 @@ void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, uns
   ADCON1 = 0;
 
   /* setup channel */
+#if defined(__SDCC_ADC_STYLE2455)
+  ADCON0 |= (channel & 0x07) << 2;
+#else /* all other devices */
   ADCON0 |= (channel & 0x07) << 3;
+#endif
 
   /* setup fosc */
+#if defined(__SDCC_ADC_STYLE2455)
+  ADCON2 |= (fosc & 0x03);
+#else /* all other devices */
   ADCON0 |= (fosc & 0x03) << 6;
   ADCON1 |= (fosc & 0x04) << 4;
-  
+#endif
+
   /* setup reference and pins */
+#if defined(__SDCC_ADC_STYLE2455)
+  ADCON1 |= pcfg & 0x3f;
+#else /* all other devices */
   ADCON1 |= pcfg & 0x0f;
-  
+#endif
+
+#if defined(__SDCC_ADC_STYLE2455)
+  ADCON2 |= (config & ADC_FRM_RJUST);
+#else /* all other devices */
   ADCON1 |= (config & ADC_FRM_RJUST);
-  
-  if(config & ADC_INT_ON) {
+#endif
+
+  if (config & ADC_INT_ON) {
     PIR1bits.ADIF = 0;
     PIE1bits.ADIE = 1;
     INTCONbits.PEIE = 1;
   }
-  
+
   /* enable the A/D module */
   ADCON0bits.ADON = 1;
 }
+

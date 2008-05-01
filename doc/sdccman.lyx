@@ -24498,21 +24498,35 @@ The PIC16 port adds support for Microchip
 \end_layout
 
 \begin_layout Standard
-18F: 2220, 2221, 2320, 2321, 2331, 2431, 2455, 24j10, 2525, 2550, 25j10,
- 2620
+18F: 2220, 2221, 2320, 2321, 2331, 2420, 2423, 2431, 2455, 2480, 24j10
 \end_layout
 
 \begin_layout Standard
-18F: 4220, 4221, 4320, 4321, 4331, 4431, 4455, 44j10, 4520, 4525, 4550,
- 45j10, 4620
+18F: 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 2620, 2680, 2682, 2685
 \end_layout
 
 \begin_layout Standard
-18F: 6520, 6620, 6680, 6720
+18F: 4220, 4221, 4320, 4321, 4331, 4420, 4423, 4431, 4455, 4480, 44j10
 \end_layout
 
 \begin_layout Standard
-18F: 8520, 8620, 8680, 8720
+18F: 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 4620, 4680, 4682, 4685
+\end_layout
+
+\begin_layout Standard
+18F: 6520, 6585, 6620, 6680, 6720
+\end_layout
+
+\begin_layout Standard
+18F: 8520, 8585, 8620, 8680, 8720
+\end_layout
+
+\begin_layout Standard
+A list of supported devices is also available via '
+\family typewriter
+sdcc -mpic16 -plist
+\family default
+'.
 \end_layout
 
 \begin_layout Subsection
@@ -26261,6 +26275,15 @@ Note: No 18f prefix here!
 \end_layout
 
 \begin_layout Enumerate
+Set up the I/O library by doing 
+\series bold
+one
+\series default
+ of the following:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
 Adjust 
 \family typewriter
 /path/to/sdcc/device/lib/pic16/libio/*.ignore
@@ -26283,6 +26306,17 @@ usart
 \end_layout
 
 \begin_layout Enumerate
+Adjust 
+\family typewriter
+/path/to/sdcc/device/include/pic16/adc.h
+\newline
+
+\family default
+Add the new devices to the correct ADC style class.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
 Edit 
 \family typewriter
 /path/to/sdcc/device/include/pic16/pic18fregs.h
@@ -26304,16 +26338,16 @@ at the right place (keep it sorted).
 \begin_layout Enumerate
 Edit 
 \family typewriter
-/path/to/sdcc/src/pic16/devices.inc
+/path/to/sdcc/device/include/pic16devices.txt
+\newline
+
 \family default
-.
- Copy and modify an existing entry and insert it at the correct place (keep
- the file sorted).
- The file is hardly documented, look at the entries for the 18f2221...
+Copy and modify an existing entry or create a new one and insert it at the
+ correct place (keep the file sorted).
 \end_layout
 
 \begin_layout Enumerate
-Recompile SDCC, including the pic16 libraries.
+Recompile the pic16 libraries.
 \end_layout
 
 \begin_layout Subsection

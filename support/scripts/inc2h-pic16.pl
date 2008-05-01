@@ -17,8 +17,12 @@ use strict;
 # 2. mv picDEVICE.h $SDCC/device/include/pic16
 # 3. mv picDEVICE.c $SDCC/device/lib/pic16/libdev
 # 4. add DEVICE to $SDCC/device/lib/pic16/pics.all (and .build)
-# 5. adjust $SDCC/device/lib/pic16/libio/*.ignore if the device
-#    does not support ADC, I2C, or USART
+# 5. either
+#    (a) adjust $SDCC/device/lib/pic16/libio/*.ignore
+#        if the device does not support ADC, I2C, or USART
+#        OR
+#    (b) adjust $SDCC/device/include/pic16/adc.h
+#        adding the new device to the correct ADC style class
 # 6. edit $SDCC/device/include/pic16/pic18fregs.h
 # 7. edit $SDCC/device/include/pic16/pic16devices.txt
 #

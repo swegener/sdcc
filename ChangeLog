@@ -1,5 +1,10 @@
 2008-05-01 Raphael Neider <rneider AT web.de>
 
+	* doc/sdccman.lyx, support/scripts/inc2h-pic16.pl: updated list of
+	  supported devices and instructions to add new ones
+
+2008-05-01 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic16/adc.h,
 	  device/lib/pic16/libio/adc/adcbusy.c,
 	  device/lib/pic16/libio/adc/adcopen.c,

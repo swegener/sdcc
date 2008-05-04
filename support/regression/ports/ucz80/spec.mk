@@ -1,18 +1,26 @@
-# Port specification for the xxxx port running with uCsim
+# Regression test specification for the z80 target running with uCsim
 #
 
 # path to uCsim
-# path to uCsim
-SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80
-SZ80B = $(top_builddir)/bin/sz80
+ifdef SDCC_BIN_PATH
+  UCZ80 = $(SDCC_BIN_PATH)/sz80
 
-UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
+  AS_Z80 = $(SDCC_BIN_PATH)/as-z80
+else
+  SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80
+  SZ80B = $(top_builddir)/bin/sz80
+
+  UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
+
+  AS_Z80 = $(top_builddir)/bin/as-z80
+
+  SDCCFLAGS += --nostdinc
+  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/z80
+endif
 
 SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT= -I$(top_srcdir)
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
-LINKFLAGS = --nostdlib
 LINKFLAGS += z80.lib
-LIBDIR = $(top_builddir)/device/lib/build/z80
 
 #OBJEXT = .o
 EXEEXT = .ihx
@@ -21,10 +29,10 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %.ihx: %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
-	$(top_builddir)/bin/as-z80 -plosgff $@ $<
+	$(AS_Z80) -plosgff $@ $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

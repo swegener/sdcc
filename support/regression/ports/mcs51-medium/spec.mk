@@ -1,4 +1,4 @@
-# Port specification for the mcs51-medium port running with uCsim
+# Regression test specification for the mcs51-medium target running with uCsim
 #
 # model medium
 

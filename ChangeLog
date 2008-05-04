@@ -1,3 +1,21 @@
+2008-05-04 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/Makefile.in,
+	  support/regression/fwk/lib/testfwk.c,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/mcs51-large/spec.mk,
+	  support/regression/ports/mcs51-medium/spec.mk,
+	  support/regression/ports/mcs51-small/spec.mk,
+	  support/regression/ports/mcs51-stack-auto/spec.mk,
+	  support/regression/ports/mcs51-xstack-auto/spec.mk,
+	  support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/ucz80/spec.mk:
+	  added possibility to define the sdcc binary directory SDCC_BIN_PATH
+	  used to run regeression tests
+
 2008-05-01 Raphael Neider <rneider AT web.de>
 
 	* doc/sdccman.lyx, support/scripts/inc2h-pic16.pl: updated list of

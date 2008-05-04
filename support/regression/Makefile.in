@@ -151,11 +151,14 @@ PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 
 SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
-INC_DIR = $(top_srcdir)/device/include
 
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
-SDCC = $(top_builddir)/bin/sdcc
+ifdef SDCC_BIN_PATH
+  SDCC = $(SDCC_BIN_PATH)/sdcc
+else
+  SDCC = $(top_builddir)/bin/sdcc
+endif
 # Base flags.
 SDCCFLAGS += --fverbose-asm -DNO_VARARGS
 # Extension of object intermediate files
@@ -172,7 +175,7 @@ endif
 
 make_library: $(MAKE_LIBRARY)
 
-SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests -I$(INC_DIR)
+SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.

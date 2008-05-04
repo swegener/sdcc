@@ -1,4 +1,4 @@
-# Port specification for the mcs51-large port running with uCsim
+# Regression test specification for the mcs51-large target running with uCsim
 #
 # model large
 

@@ -1,4 +1,4 @@
-# Port specification for the pic14 port running with gpsim
+# Regression test specification for the pic14 target running with gpsim
 
 # path to gpsim
 ifdef GPSIM_PATH
@@ -7,10 +7,13 @@ else
   GPSIM := gpsim
 endif
 
-SDCCFLAGS += -mpic14 -pp16f877 -I$(top_srcdir)/device/include/pic --nostdinc --less-pedantic -Wl,-q -DREENTRANT=reentrant -I$(top_srcdir)
-LINKFLAGS = --nostdlib
+ifndef SDCC_BIN_PATH
+  SDCCFLAGS += --nostdinc
+  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/pic
+endif
+
+SDCCFLAGS += -mpic14 -pp16f877 -I$(top_srcdir)/device/include/pic --less-pedantic -Wl,-q -DREENTRANT=reentrant -I$(top_srcdir)
 LINKFLAGS += libsdcc.lib libm.lib
-LIBDIR = $(top_builddir)/device/lib/build/pic
 
 OBJEXT = .o
 EXEEXT = .cod
@@ -19,7 +22,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	-$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
+	-$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.c
 	-$(SDCC) $(SDCCFLAGS) -c $< -o $@

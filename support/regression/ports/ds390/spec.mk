@@ -1,19 +1,24 @@
-# Port specification for the ds390 port running with uCsim
+# Regression test specification for the ds390 target running with uCsim
 
 ifndef DEV_NULL
   DEV_NULL = /dev/null
 endif
 
 # path to uCsim
-S51A = $(top_builddir)/sim/ucsim/s51.src/s51
-S51B = $(top_builddir)/bin/s51
+ifdef SDCC_BIN_PATH
+  S51 = $(SDCC_BIN_PATH)/s51
+else
+  S51A = $(top_builddir)/sim/ucsim/s51.src/s51
+  S51B = $(top_builddir)/bin/s51
 
-S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
+  S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=-mds390 --nostdinc --less-pedantic -DREENTRANT=reentrant -Wl-r -I$(top_srcdir)
-LINKFLAGS = --nostdlib
+  SDCCFLAGS += --nostdinc
+  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/ds390 
+endif
+
+SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=reentrant -Wl-r -I$(top_srcdir)
 LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
-LIBDIR = $(top_builddir)/device/lib/build/ds390
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -22,7 +27,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

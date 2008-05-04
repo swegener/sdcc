@@ -1,13 +1,25 @@
+# Regression test specification for the hc08 target running with uCsim
+#
+
 # path to uCsim
-UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/shc08
-UCHC08B = $(top_builddir)/bin/shc08
+ifdef SDCC_BIN_PATH
+  UCHC08 = $(SDCC_BIN_PATH)/shc08
 
-UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
+  AS_HC08 = $(SDCC_BIN_PATH)/as-hc08
+else
+  UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/shc08
+  UCHC08B = $(top_builddir)/bin/shc08
 
-SDCCFLAGS +=-mhc08 --nostdinc --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant -I$(top_srcdir)
-LINKFLAGS = --nostdlib
+  UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
+
+  AS_HC08 = $(top_builddir)/bin/as-hc08
+
+  SDCCFLAGS += --nostdinc
+  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/hc08
+endif
+
+SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant -I$(top_srcdir)
 LINKFLAGS += hc08.lib
-LIBDIR = $(top_builddir)/device/lib/build/hc08
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -18,10 +30,10 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 #%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm
-	$(top_builddir)/bin/as-hc08 -plosgff $<
+	$(AS_HC08) -plosgff $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

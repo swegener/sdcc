@@ -1,4 +1,4 @@
-# Port specification for the mcs51 port running with uCsim
+# Regression test specification for the mcs51 target running with uCsim
 #
 # model small
 

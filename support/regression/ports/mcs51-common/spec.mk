@@ -1,17 +1,23 @@
-# Common specification for the mcs51 ports running with uCsim
+# Common regression test specification for the mcs51 targets running with uCsim
 
 ifndef DEV_NULL
   DEV_NULL = /dev/null
 endif
 
 # path to uCsim
-S51A = $(top_builddir)/sim/ucsim/s51.src/s51
-S51B = $(top_builddir)/bin/s51
+ifdef SDCC_BIN_PATH
+  S51 = $(SDCC_BIN_PATH)/s51
+else
+  S51A = $(top_builddir)/sim/ucsim/s51.src/s51
+  S51B = $(top_builddir)/bin/s51
 
-S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
+  S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=--nostdinc --less-pedantic -DREENTRANT=reentrant -I$(INC_DIR)/mcs51 -I$(top_srcdir)
-LINKFLAGS = --nostdlib
+  SDCCFLAGS += --nostdinc
+  LINKFLAGS += --nostdlib
+endif
+
+SDCCFLAGS += --less-pedantic -DREENTRANT=reentrant -I$(INC_DIR)/mcs51 -I$(top_srcdir)
 LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 
 OBJEXT = .rel
@@ -22,7 +28,7 @@ FWKLIB = $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

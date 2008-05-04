@@ -1,4 +1,4 @@
-# Port specification for the mcs51-xstack-auto port running with uCsim
+# Regression test specification for the mcs51-xstack-auto target running with uCsim
 #
 # model small xstack-auto
 

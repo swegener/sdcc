@@ -1,4 +1,4 @@
-# Port specification for the mcs51-stack-auto port running with uCsim
+# Regression test specification for the mcs51-stack-auto target running with uCsim
 #
 # model small stack-auto
 

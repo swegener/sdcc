@@ -14,11 +14,11 @@ else
 
   AS_HC08 = $(top_builddir)/bin/as-hc08
 
-  SDCCFLAGS += --nostdinc
-  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/hc08
+  SDCCFLAGS += --nostdinc -I$(top_srcdir)
+  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/hc08
 endif
 
-SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant -I$(top_srcdir)
+SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel

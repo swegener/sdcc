@@ -19,7 +19,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %.ihx: %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L$(LIBDIR) $(EXTRAS) $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	$(top_builddir)/bin/as-z80 -plosgff $@ $<

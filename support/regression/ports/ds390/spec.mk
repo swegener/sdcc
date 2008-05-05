@@ -13,11 +13,11 @@ else
 
   S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-  SDCCFLAGS += --nostdinc
-  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/ds390 
+  SDCCFLAGS += --nostdinc -I$(top_srcdir)
+  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/ds390 
 endif
 
-SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=reentrant -Wl-r -I$(top_srcdir)
+SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=reentrant -Wl-r
 LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 
 OBJEXT = .rel

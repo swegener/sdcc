@@ -8,11 +8,11 @@ else
 endif
 
 ifndef SDCC_BIN_PATH
-  SDCCFLAGS += --nostdinc
-  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/pic
+  SDCCFLAGS += --nostdinc -I$(top_srcdir)/device/include/pic -I$(top_srcdir)
+  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/pic
 endif
 
-SDCCFLAGS += -mpic14 -pp16f877 -I$(top_srcdir)/device/include/pic --less-pedantic -Wl,-q -DREENTRANT=reentrant -I$(top_srcdir)
+SDCCFLAGS += -mpic14 -pp16f877 --less-pedantic -Wl,-q -DREENTRANT=reentrant
 LINKFLAGS += libsdcc.lib libm.lib
 
 OBJEXT = .o

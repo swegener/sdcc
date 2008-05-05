@@ -14,11 +14,11 @@ else
 
   AS_Z80 = $(top_builddir)/bin/as-z80
 
-  SDCCFLAGS += --nostdinc
-  LINKFLAGS += --nostdlib -L $(top_builddir)/device/lib/build/z80
+  SDCCFLAGS += --nostdinc -I$(top_srcdir)
+  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/z80
 endif
 
-SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT= -I$(top_srcdir)
+SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 LINKFLAGS += z80.lib
 

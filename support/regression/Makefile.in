@@ -158,6 +158,7 @@ ifdef SDCC_BIN_PATH
   SDCC = $(SDCC_BIN_PATH)/sdcc
 else
   SDCC = $(top_builddir)/bin/sdcc
+  INC_DIR ?= $(top_srcdir)/device/include
 endif
 # Base flags.
 SDCCFLAGS += --fverbose-asm -DNO_VARARGS
@@ -176,6 +177,9 @@ endif
 make_library: $(MAKE_LIBRARY)
 
 SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests
+#ifdef INC_DIR
+SDCCFLAGS += -I$(INC_DIR)
+#endif
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.

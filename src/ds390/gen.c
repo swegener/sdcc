@@ -2850,7 +2850,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
       if (!ic)
         {
           /* Assume r0 is available for use. */
-          r = REG_WITH_INDEX (R0_IDX);;
+          r = REG_WITH_INDEX (R0_IDX);
         }
       else
         {

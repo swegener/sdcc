@@ -13,11 +13,11 @@ else
 
   S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-  SDCCFLAGS += --nostdinc
-  LINKFLAGS += --nostdlib
+  SDCCFLAGS += --nostdinc -I$(INC_DIR)/mcs51 -I$(top_srcdir)
+  LINKFLAGS += --nostdlib -L$(LIBDIR)
 endif
 
-SDCCFLAGS += --less-pedantic -DREENTRANT=reentrant -I$(INC_DIR)/mcs51 -I$(top_srcdir)
+SDCCFLAGS += --less-pedantic -DREENTRANT=reentrant
 LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 
 OBJEXT = .rel

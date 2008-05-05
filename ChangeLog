@@ -1,3 +1,17 @@
+2008-05-05 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/Makefile.in,
+	  support/regression/fwk/lib/testfwk.c,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/z80/spec.mk:
+	  added INC_DIR and LIBDIR paths
+	* src/ds390/gen.c: removed duplicated selicolon
+
 2008-05-04 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in,

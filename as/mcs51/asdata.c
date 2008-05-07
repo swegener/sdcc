@@ -72,8 +72,10 @@ int     line;                   /*      current assembler source
 int     page;                   /*      current page number
                                  */
 int     lop;                    /*      current line number on page
-                                */
+                                 */
 int     pass;                   /*      assembler pass number
+                                 */
+int     org_cnt;                /*      .org directive counter
                                  */
 int     lflag;                  /*      -l, generate listing flag
                                  */
@@ -129,7 +131,7 @@ char    tb[NTITL];              /*      Title string buffer
                                  */
 char    stb[NSBTL];             /*      Subtitle string buffer
                                  */
-char    optsdcc[NINPUT];                /*      sdcc compile options
+char    optsdcc[NINPUT];        /*      sdcc compile options
                                  */
 int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
                                  *      flat mode (via .flat24 directive).

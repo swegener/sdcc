@@ -213,8 +213,7 @@ int fatalErrors=0;
 char relFile[128];
 
 int
-main(argc, argv)
-char *argv[];
+main(int argc, char *argv[])
 {
         register char *p;
         register int c, i;
@@ -239,8 +238,8 @@ char *argv[];
 
                                 case 'c':
                                 case 'C':
-                                    ++cflag;
-                                    break;
+                                        ++cflag;
+                                        break;
 
                                 case 'g':
                                 case 'G':
@@ -314,9 +313,9 @@ char *argv[];
                                 if (lflag)
                                         lfp = afile(p, "lst", 1);
                                 if (oflag) {
-                                  ofp = afile(p, "rel", 1);
-                                  // save the file name if we have to delete it on error
-                                  strcpy(relFile,afn);
+                                        ofp = afile(p, "rel", 1);
+                                        // save the file name if we have to delete it on error
+                                        strcpy(relFile,afn);
                                 }
                                 if (sflag)
                                         tfp = afile(p, "sym", 1);
@@ -340,6 +339,7 @@ char *argv[];
                 radix = 10;
                 srcline[0] = 0;
                 page = 0;
+                org_cnt = 0;
                 stb[0] = 0;
                 lop  = NLPP;
                 cfile = 0;
@@ -424,8 +424,7 @@ char *argv[];
  */
 
 VOID
-asexit(i)
-int i;
+asexit(int i)
 {
         int j;
 
@@ -538,7 +537,7 @@ int i;
  */
 
 VOID
-asmbl()
+asmbl(void)
 {
         register struct mne *mp;
         register struct sym *sp;
@@ -947,8 +946,9 @@ loop:
         case S_ORG:
                 if (dot.s_area->a_flag & A_ABS) {
                         char buf[NCPS];
+
                         laddr = absexpr();
-                        sprintf(buf, "%s%x", abs_ap->a_id, laddr);
+                        sprintf(buf, "%s%x", abs_ap->a_id, org_cnt++);
                         if ((ap = alookup(buf)) == NULL) {
                                 ap = (struct area *) new (sizeof(struct area));
                                 *ap = *areap;
@@ -1132,10 +1132,7 @@ loop:
  */
 
 FILE *
-afile(fn, ft, wf)
-char *fn;
-char *ft;
-int wf;
+afile(char *fn, char *ft, int wf)
 {
         register char *p2, *p3;
         register int c;
@@ -1203,8 +1200,7 @@ int wf;
  */
 
 VOID
-newdot(nap)
-register struct area *nap;
+newdot(register struct area *nap)
 {
         register struct area *oap;
 
@@ -1266,9 +1262,7 @@ register struct area *nap;
  */
 
 VOID
-phase(ap, a)
-struct area *ap;
-Addr_T a;
+phase(struct area *ap, Addr_T a)
 {
         if (ap != dot.s_area || a != dot.s_addr)
                 err('p');
@@ -1318,7 +1312,7 @@ char *usetxt[] = {
  */
 
 VOID
-usage()
+usage(void)
 {
         register char   **dp;
 

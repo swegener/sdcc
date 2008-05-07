@@ -57,27 +57,28 @@ ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c
 
 ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
-ASX8051 = $(top_builddir)/bin/asx8051$(EXEEXT)
+ASX = $(top_builddir)/bin/asx8051$(EXEEXT)
+DEST = $(DESTDIR)$(bindir)/asx8051$(EXEEXT)
 
 transform       = @program_transform_name@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(ASX8051)
+all: checkconf $(ASX)
 
-$(ASX8051): $(ASOBJECTS)
+$(ASX): $(ASOBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS)
 
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX8051) `echo $(DESTDIR)$(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASX) `echo $(DEST)|sed '$(transform)'`
+	$(STRIP) `echo $(DEST)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/asx8051$(EXEEXT)
+	rm -f $(DEST)
 
 
 # Performing self-test

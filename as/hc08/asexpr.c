@@ -1,4 +1,4 @@
-        /* asexpr.c */
+/* asexpr.c */
 
 /*
  * (C) Copyright 1989-1995
@@ -79,9 +79,7 @@
  */
 
 VOID
-expr(esp, n)
-register struct expr *esp;
-int n;
+expr(register struct expr *esp, int n)
 {
         register int c, p;
         struct area *ap;
@@ -252,7 +250,7 @@ int n;
  */
 
 Addr_T
-absexpr()
+absexpr(void)
 {
         struct expr e;
 
@@ -308,8 +306,7 @@ absexpr()
  */
 
 VOID
-term(esp)
-register struct expr *esp;
+term(register struct expr *esp)
 {
         register int c, n;
         register const char *jp;
@@ -541,8 +538,7 @@ register struct expr *esp;
  */
 
 int
-digit(c, r)
-register int c, r;
+digit(register int c, register int r)
 {
         if (r == 16) {
                 if (ctype[c] & RAD16) {
@@ -596,8 +592,7 @@ register int c, r;
  */
 
 VOID
-abscheck(esp)
-register struct expr *esp;
+abscheck(register struct expr *esp)
 {
         if (esp->e_flag || esp->e_base.e_ap) {
                 esp->e_flag = 0;
@@ -632,8 +627,7 @@ register struct expr *esp;
  */
 
 int
-is_abs (esp)
-register struct expr *esp;
+is_abs (register struct expr *esp)
 {
         if (esp->e_flag || esp->e_base.e_ap) {
                 return(0);
@@ -662,8 +656,7 @@ register struct expr *esp;
  */
 
 int
-oprio(c)
-register int c;
+oprio(register int c)
 {
         if (c == '*' || c == '/' || c == '%')
                 return (10);
@@ -700,8 +693,7 @@ register int c;
  */
 
 VOID
-clrexpr(esp)
-register struct expr *esp;
+clrexpr(register struct expr *esp)
 {
         esp->e_mode = 0;
         esp->e_flag = 0;

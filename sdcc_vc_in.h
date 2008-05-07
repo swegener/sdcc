@@ -11,6 +11,8 @@
 #define __FUNCTION__  __FILE__
 #endif
 
+#define __func__      __FUNCTION__
+
 #define DIR_SEPARATOR_STRING "\\"
 #define DIR_SEPARATOR_CHAR   '\\'
 

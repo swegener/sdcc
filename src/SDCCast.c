@@ -2487,10 +2487,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
   /* just get the type        */
   if (tree->type == EX_VALUE)
     {
-
       if (IS_LITERAL (tree->opval.val->etype))
         {
-
           /* if this is a character array then declare it */
           if (IS_ARRAY (tree->opval.val->type))
             tree->opval.val = stringToSymbol (tree->opval.val);
@@ -6288,19 +6286,13 @@ expandInlineFuncs (ast * tree, ast * block)
           /* during the function call. For example, a function         */
           /* declared as func(int x, int y) but called as func(y,x).   */
           /* { //inlinetree block                                      */
-          /*   type1 temparg1;                                         */
+          /*   type1 temparg1 = argument1;                             */
           /*   ...                                                     */
-          /*   typen tempargn;                                         */
-          /*   temparg1 = argument1;                                   */
-          /*   ...                                                     */
-          /*   tempargn = argumentn;                                   */
+          /*   typen tempargn = argumentn;                             */
           /*   { //inlinetree2 block                                   */
-          /*     type1 param1;                                         */
+          /*     type1 param1 = temparg1;                              */
           /*     ...                                                   */
-          /*     typen paramn;                                         */
-          /*     param1 = temparg1;                                    */
-          /*     ...                                                   */
-          /*     paramn = tempargn;                                    */
+          /*     typen paramn = tempargn;                              */
           /*     inline_function_code;                                 */
           /*     retlab:                                               */
           /*   }                                                       */
@@ -6326,6 +6318,7 @@ expandInlineFuncs (ast * tree, ast * block)
               assigntree = newNode ('=',
                                     newAst_VALUE (symbolVal (temparg)),
                                     passedarg);
+              assigntree->initMode=1; // tell that assignment is initializer
               inlinetree->right = newNode (NULLOP,
                                            assigntree,
                                            inlinetree->right);
@@ -6337,10 +6330,10 @@ expandInlineFuncs (ast * tree, ast * block)
               assigntree = newNode ('=',
                                     newAst_VALUE (symbolVal (parm)),
                                     newAst_VALUE (symbolVal (temparg)));
+              assigntree->initMode=1; // tell that assignment is initializer
               inlinetree2->right = newNode (NULLOP,
                                            assigntree,
                                            inlinetree2->right);
-
 
               args = args->next;
               argIndex++;
@@ -6381,7 +6374,6 @@ expandInlineFuncs (ast * tree, ast * block)
           fixupInline (inlinetree, inlinetree->level);
           inlineState.count++;
         }
-
     }
 
   /* Recursively continue to search for functions to inline. */

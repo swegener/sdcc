@@ -1,3 +1,22 @@
+2008-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/asdata.c,
+	* as/mcs51/asm.h: added org_cnt
+	* as/mcs51/asmain.c (main, asmbl): fixed bug 1957716, changed old K&R to ANSI
+	* as/mcs51/asout.c: changed old K&R to ANSI
+	* as/mcs51/Makefile.in: use common identifiers
+	* as/hc08/asdata.c,
+	* as/hc08/asexpr.c,
+	* as/hc08/asm.h,
+	* as/hc08/asmain.c,
+	* as/hc08/asout.c,
+	* as/hc08/Makefile.bcc,
+	* as/hc08/Makefile.in: synchronized with as/mcs51/*
+	* sdcc_vc_in.h: added define __func__
+	* src/SDCCast.c (expandInlineFuncs): applied patch 1957148 to fix bug 1717305,
+	  Thanks Ruud van Silfhout
+	* support/regression/tests/bug1717305.c: new, added
+
 2008-05-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in,

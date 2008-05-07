@@ -25,121 +25,123 @@
  *      structures, and variables used in the assembler.
  */
 
-int     aserr;          /*      ASxxxx error counter
-                         */
-jmp_buf jump_env;       /*      compiler dependent structure
-                         *      used by setjmp() and longjmp()
-                         */
-int     inpfil;         /*      count of assembler
-                         *      input files specified
-                         */
-int     incfil;         /*      current file handle index
-                         *      for include files
-                         */
-int     cfile;          /*      current file handle index
-                         *      of input assembly files
-                         */
-int     flevel;         /*      IF-ELSE-ENDIF flag will be non
-                         *      zero for false conditional case
-                         */
-int     tlevel;         /*      current conditional level
-                         */
-int     ifcnd[MAXIF+1]; /*      array of IF statement condition
-                         *      values (0 = FALSE) indexed by tlevel
-                         */
-int     iflvl[MAXIF+1]; /*      array of IF-ELSE-ENDIF flevel
-                         *      values indexed by tlevel
-                         */
+int     aserr;                  /*      ASxxxx error counter
+                                 */
+jmp_buf jump_env;               /*      compiler dependent structure
+                                 *      used by setjmp() and longjmp()
+                                 */
+int     inpfil;                 /*      count of assembler
+                                 *      input files specified
+                                 */
+int     incfil;                 /*      current file handle index
+                                 *      for include files
+                                 */
+int     cfile;                  /*      current file handle index
+                                 *      of input assembly files
+                                 */
+int     flevel;                 /*      IF-ELSE-ENDIF flag will be non
+                                 *      zero for false conditional case
+                                 */
+int     tlevel;                 /*      current conditional level
+                                 */
+int     ifcnd[MAXIF+1];         /*      array of IF statement condition
+                                 *      values (0 = FALSE) indexed by tlevel
+                                 */
+int     iflvl[MAXIF+1];         /*      array of IF-ELSE-ENDIF flevel
+                                 *      values indexed by tlevel
+                                 */
 
 char    afn[PATH_MAX];          /*      afile temporary file name
                                  */
-char    srcfn[MAXFIL][PATH_MAX];        /*      array of source file names
+char    srcfn[MAXFIL][PATH_MAX];/*      array of source file names
                                  */
 int     srcline[MAXFIL];        /*      source line number
                                  */
-char    incfn[MAXINC][PATH_MAX];        /*      array of include file names
+char    incfn[MAXINC][PATH_MAX];/*      array of include file names
                                  */
 int     incline[MAXINC];        /*      include line number
                                  */
 
-int     radix;          /*      current number conversion radix:
-                         *      2 (binary), 8 (octal), 10 (decimal),
-                         *      16 (hexadecimal)
-                         */
-int     line;           /*      current assembler source
-                         *      line number
-                         */
-int     page;           /*      current page number
-                         */
-int     lop;            /*      current line number on page
-                         */
-int     pass;           /*      assembler pass number
-                         */
-int     lflag;          /*      -l, generate listing flag
-                         */
-int     cflag;          /*      -lc, generate sdcdb debug info
-                         */
-int     gflag;          /*      -g, make undefined symbols global flag
-                         */
-int     aflag;          /*      -a, make all symbols global flag
-                         */
-int     jflag;          /*      -j, generate debug information flag
-                         */
-int     oflag;          /*      -o, generate relocatable output flag
-                         */
-int     sflag;          /*      -s, generate symbol table flag
-                         */
-int     pflag;          /*      -p, enable listing pagination
-                         */
-int     xflag;          /*      -x, listing radix flag
-                         */
-int     fflag;          /*      -f(f), relocations flagged flag
-                         */
-Addr_T  laddr;          /*      address of current assembler line
-                         *      or value of .if argument
-                         */
-Addr_T  fuzz;           /*      tracks pass to pass changes in the
-                         *      address of symbols caused by
-                         *      variable length instruction formats
-                         */
-int     lmode;          /*      listing mode
-                         */
-char    *ep;            /*      pointer into error list
-                         *      array eb[NERR]
-                         */
-char    eb[NERR];       /*      array of generated error codes
-                         */
-const char *ip;         /*      pointer into the assembler-source
-                         *      text line in ib[]
-                         */
-const char *ib;         /*      assembler-source text line
-                         */
-char    *cp;            /*      pointer to assembler output
-                         *      array cb[]
-                         */
-char    cb[NCODE];      /*      array of assembler output values
-                         */
-int     *cpt;           /*      pointer to assembler relocation type
-                         *      output array cbt[]
-                         */
-int     cbt[NCODE];     /*      array of assembler relocation types
-                         *      describing the data in cb[]
-                         */
-char    tb[NTITL];      /*      Title string buffer
-                         */
-char    stb[NSBTL];     /*      Subtitle string buffer
-                         */
+int     radix;                  /*      current number conversion radix:
+                                 *      2 (binary), 8 (octal), 10 (decimal),
+                                 *      16 (hexadecimal)
+                                 */
+int     line;                   /*      current assembler source
+                                 *      line number
+                                 */
+int     page;                   /*      current page number
+                                 */
+int     lop;                    /*      current line number on page
+                                 */
+int     pass;                   /*      assembler pass number
+                                 */
+int     org_cnt;                /*      .org directive counter
+                                 */
+int     lflag;                  /*      -l, generate listing flag
+                                 */
+int     cflag;                  /*      -lc, generate sdcdb debug info
+                                 */
+int     gflag;                  /*      -g, make undefined symbols global flag
+                                 */
+int     aflag;                  /*      -a, make all symbols global flag
+                                 */
+int     jflag;                  /*      -j, generate debug information flag
+                                 */
+int     oflag;                  /*      -o, generate relocatable output flag
+                                 */
+int     sflag;                  /*      -s, generate symbol table flag
+                                 */
+int     pflag;                  /*      -p, enable listing pagination
+                                 */
+int     xflag;                  /*      -x, listing radix flag
+                                 */
+int     fflag;                  /*      -f(f), relocations flagged flag
+                                 */
+Addr_T  laddr;                  /*      address of current assembler line
+                                 *      or value of .if argument
+                                 */
+Addr_T  fuzz;                   /*      tracks pass to pass changes in the
+                                 *      address of symbols caused by
+                                 *      variable length instruction formats
+                                 */
+int     lmode;                  /*      listing mode
+                                 */
+char    *ep;                    /*      pointer into error list
+                                 *      array eb[NERR]
+                                 */
+char    eb[NERR];               /*      array of generated error codes
+                                 */
+const char *ip;                 /*      pointer into the assembler-source
+                                 *      text line in ib[]
+                                 */
+const char *ib;                 /*      assembler-source text line
+                                 */
+char    *cp;                    /*      pointer to assembler output
+                                 *      array cb[]
+                                 */
+char    cb[NCODE];              /*      array of assembler output values
+                                 */
+int     *cpt;                   /*      pointer to assembler relocation type
+                                 *      output array cbt[]
+                                 */
+int     cbt[NCODE];             /*      array of assembler relocation types
+                                 *      describing the data in cb[]
+                                 */
+char    tb[NTITL];              /*      Title string buffer
+                                 */
+char    stb[NSBTL];             /*      Subtitle string buffer
+                                 */
 char    optsdcc[NINPUT];        /*      sdcc compile options
-                         */
-int     flat24Mode;     /*      non-zero if we are using DS390 24 bit
-                         *      flat mode (via .flat24 directive).
-                         */
+                                 */
+int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
+                                 *      flat mode (via .flat24 directive).
+                                 */
 
 char    symtbl[] = { "Symbol Table" };
 char    aretbl[] = { "Area Table" };
 
-char    module[NCPS];   /*      module name string
-                         */
+char    module[NCPS];           /*      module name string
+                                 */
 
 /*
  *      The mne structure is a linked list of the assembler
@@ -228,19 +230,19 @@ struct  area    area[] = {
     {NULL,      "_CODE",        0,      0,      0,      A_CON|A_REL}
 };
 
-struct  area    *areap; /*      pointer to an area structure
-                         */
+struct  area    *areap;         /*      pointer to an area structure
+                                 */
 
-FILE    *lfp;           /*      list output file handle
-                         */
-FILE    *ofp;           /*      relocation output file handle
-                         */
-FILE    *tfp;           /*      symbol table output file handle
-                         */
-FILE    *sfp[MAXFIL];   /*      array of assembler-source file handles
-                         */
-FILE    *ifp[MAXINC];   /*      array of include-file file handles
-                         */
+FILE    *lfp;                   /*      list output file handle
+                                 */
+FILE    *ofp;                   /*      relocation output file handle
+                                 */
+FILE    *tfp;                   /*      symbol table output file handle
+                                 */
+FILE    *sfp[MAXFIL];           /*      array of assembler-source file handles
+                                 */
+FILE    *ifp[MAXINC];           /*      array of include-file file handles
+                                 */
 
 /*
  *      array of character types, one per

@@ -57,27 +57,28 @@ ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c
 
 ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
-ASHC08 = $(top_builddir)/bin/as-hc08$(EXEEXT)
+ASX = $(top_builddir)/bin/as-hc08$(EXEEXT)
+DEST = $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)
 
 transform       = @program_transform_name@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(ASHC08)
+all: checkconf $(ASX)
 
-$(ASHC08): $(ASOBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS) 
+$(ASX): $(ASOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS)
 
-# Compiling and installing everything and runing test
-# ---------------------------------------------------
+# Compiling and installing everything and running test
+# ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASHC08) `echo $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASX) `echo $(DEST)|sed '$(transform)'`
+	$(STRIP) `echo $(DEST)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)
+	rm -f $(DEST)
 
 
 # Performing self-test

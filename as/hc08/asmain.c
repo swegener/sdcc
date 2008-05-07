@@ -11,6 +11,7 @@
  * 29-Oct-97 JLH pass ";!" comments to output file
  */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
@@ -36,6 +37,67 @@
  *      asmain.c contains the array char *usetxt[] which
  *      references the usage text strings printed by usage().
  */
+
+static const char *search_path[100];
+static int search_path_length;
+
+/**
+ * The search_path_append is used to append another directory to the end
+ * of the include file search path.
+ *
+ * @param dir
+ *     The directory to be added to the path.
+ */
+void
+search_path_append(const char *dir)
+{
+        if (search_path_length < sizeof(search_path)/sizeof(char*))
+        {
+                search_path[search_path_length++] = dir;
+        }
+}
+
+/**
+ * The search_path_fopen function is used to open the named file.  If
+ * the file isn't in the current directory, the search path is then used
+ * to build a series of possible file names, and attempts to open them.
+ * The first found is used.
+ *
+ * @param filename
+ *     The name of the file to be opened.
+ * @param mode
+ *     The mode of the file to be opened.
+ * @returns
+ *     what the fopen function would return on success, or NULL if the
+ *     file is not anywhere in the search path.
+ */
+static FILE *
+search_path_fopen(const char *filename, const char *mode)
+{
+        FILE *fp;
+        int j;
+
+        fp = fopen(filename, mode);
+        if (fp != NULL || filename[0] == '/' || filename[0] == '\\')
+                return fp;
+        for (j = 0; j < search_path_length; ++j)
+        {
+                char path[2000];
+
+                strncpy(path, search_path[j], sizeof(path));
+                if ((path[strlen(path) - 1] != '/') &&
+                    (path[strlen(path) - 1] != DIR_SEPARATOR_CHAR))
+                {
+                        strncat(path, DIR_SEPARATOR_STRING, sizeof(path));
+                }
+                strncat(path, filename, sizeof(path));
+                fp = fopen(path, mode);
+                if (fp != NULL)
+                        return fp;
+        }
+        errno = ENOENT;
+        return NULL;
+}
 
 /*)Function     VOID    main(argc, argv)
  *
@@ -151,8 +213,7 @@ int fatalErrors=0;
 char relFile[128];
 
 int
-main(argc, argv)
-char *argv[];
+main(int argc, char *argv[])
 {
         register char *p;
         register int c, i;
@@ -177,12 +238,19 @@ char *argv[];
 
                                 case 'c':
                                 case 'C':
-                                    ++cflag;
-                                    break;
+                                        ++cflag;
+                                        break;
 
                                 case 'g':
                                 case 'G':
                                         ++gflag;
+                                        break;
+
+                                case 'i':
+                                case 'I':
+                                        search_path_append(p);
+                                        while (*p)
+                                                ++p;
                                         break;
 
                                 case 'j':               /* JLH: debug info */
@@ -245,9 +313,9 @@ char *argv[];
                                 if (lflag)
                                         lfp = afile(p, "lst", 1);
                                 if (oflag) {
-                                  ofp = afile(p, "rel", 1);
-                                  // save the file name if we have to delete it on error
-                                  strcpy(relFile,afn);
+                                        ofp = afile(p, "rel", 1);
+                                        // save the file name if we have to delete it on error
+                                        strcpy(relFile,afn);
                                 }
                                 if (sflag)
                                         tfp = afile(p, "sym", 1);
@@ -271,6 +339,7 @@ char *argv[];
                 radix = 10;
                 srcline[0] = 0;
                 page = 0;
+                org_cnt = 0;
                 stb[0] = 0;
                 lop  = NLPP;
                 cfile = 0;
@@ -355,8 +424,7 @@ char *argv[];
  */
 
 VOID
-asexit(i)
-int i;
+asexit(int i)
 {
         int j;
 
@@ -469,7 +537,7 @@ int i;
  */
 
 VOID
-asmbl()
+asmbl(void)
 {
         register struct mne *mp;
         register struct sym *sp;
@@ -482,6 +550,7 @@ asmbl()
         char fn[PATH_MAX];
         char *p;
         int d, n, uaf, uf;
+        static struct area *abs_ap; /* pointer to current absolute area structure */
 
         laddr = dot.s_addr;
         lmode = SLIST;
@@ -841,7 +910,7 @@ loop:
                 lmode = SLIST;
                 break;
 
-    case S_OPTSDCC:
+        case S_OPTSDCC:
                 p = optsdcc;
                 if ((c = getnb()) != 0) {
                         do {
@@ -852,8 +921,8 @@ loop:
                 *p = 0;
                 unget(c);
                 lmode = SLIST;
-        /*if (pass == 0) printf("optsdcc=%s\n", optsdcc);*/
-        break;
+                /*if (pass == 0) printf("optsdcc=%s\n", optsdcc);*/
+                break;
 
         case S_GLOBL:
                 do {
@@ -901,17 +970,32 @@ loop:
                 }
                 newdot(ap);
                 lmode = SLIST;
+                if (dot.s_area->a_flag & A_ABS)
+                        abs_ap = ap;
                 break;
 
         case S_ORG:
                 if (dot.s_area->a_flag & A_ABS) {
-                        outall();
-                        laddr = dot.s_addr = dot.s_org = absexpr();
+                        char buf[NCPS];
+
+                        laddr = absexpr();
+                        sprintf(buf, "%s%x", abs_ap->a_id, org_cnt++);
+                        if ((ap = alookup(buf)) == NULL) {
+                                ap = (struct area *) new (sizeof(struct area));
+                                *ap = *areap;
+                                ap->a_ap = areap;
+                                strncpy(ap->a_id, buf, NCPS);
+                                ap->a_ref = areap->a_ref + 1;
+                                ap->a_size = 0;
+                                ap->a_fuzz = 0;
+                                areap = ap;
+                        }
+                        newdot(ap);
+                        lmode = ALIST;
+                        dot.s_addr = dot.s_org = laddr;
                 } else {
                         err('o');
                 }
-                outall();
-                lmode = ALIST;
                 break;
 
         case S_RADIX:
@@ -961,7 +1045,7 @@ loop:
                 }
                 *p = 0;
                 if ((++incfil == MAXINC) ||
-                    (ifp[incfil] = fopen(fn, "r")) == NULL) {
+                    (ifp[incfil] = search_path_fopen(fn, "r")) == NULL) {
                         --incfil;
                         err('i');
                 } else {
@@ -1079,10 +1163,7 @@ loop:
  */
 
 FILE *
-afile(fn, ft, wf)
-char *fn;
-char *ft;
-int wf;
+afile(char *fn, char *ft, int wf)
 {
         register char *p2, *p3;
         register int c;
@@ -1150,8 +1231,7 @@ int wf;
  */
 
 VOID
-newdot(nap)
-register struct area *nap;
+newdot(register struct area *nap)
 {
         register struct area *oap;
 
@@ -1166,7 +1246,8 @@ register struct area *nap;
           }
         } else if (oap->a_flag & A_ABS) {
           oap->a_addr = dot.s_org;
-          oap->a_size = dot.s_addr - dot.s_org;
+          oap->a_size += dot.s_addr - dot.s_org;
+          dot.s_addr = dot.s_org = 0;
         } else {
           oap->a_addr = 0;
           oap->a_size = dot.s_addr;
@@ -1174,6 +1255,10 @@ register struct area *nap;
         if (nap->a_flag & A_OVR) {
           // a new overlay starts at 0, no fuzz
           dot.s_addr = 0;
+          fuzz = 0;
+        } else if (nap->a_flag & A_ABS) {
+          // a new absolute starts at org, no fuzz
+          dot.s_addr = dot.s_org;
           fuzz = 0;
         } else {
           dot.s_addr = nap->a_size;
@@ -1208,16 +1293,14 @@ register struct area *nap;
  */
 
 VOID
-phase(ap, a)
-struct area *ap;
-Addr_T a;
+phase(struct area *ap, Addr_T a)
 {
         if (ap != dot.s_area || a != dot.s_addr)
                 err('p');
 }
 
 char *usetxt[] = {
-        "Usage: [-dqxjgalopsf] file1 [file2 file3 ...]",
+        "Usage: [-dqxjgalopsf][ -I<dir> ] file1 [file2 file3 ...]",
         "  d    decimal listing",
         "  q    octal   listing",
         "  x    hex     listing (default)",
@@ -1231,6 +1314,9 @@ char *usetxt[] = {
         "  p    disable listing pagination",
         "  f    flag relocatable references by `    in listing file",
         " ff    flag relocatable references by mode in listing file",
+        "-I<dir>  Add the named directory to the include file",
+        "       search path.  This option may be used more than once.",
+        "       Directories are searched in the order given.",
         "",
         0
 };
@@ -1257,7 +1343,7 @@ char *usetxt[] = {
  */
 
 VOID
-usage()
+usage(void)
 {
         register char   **dp;
 

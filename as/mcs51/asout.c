@@ -231,7 +231,7 @@ char    *relp = { &rel[0] };
  */
 
 VOID
-outab(b)
+outab(int b)
 {
         if (pass == 2) {
                 out_lb(b,0);
@@ -266,7 +266,7 @@ outab(b)
  */
 
 VOID
-outaw(w)
+outaw(int w)
 {
         if (pass == 2) {
                 out_lw(w,0);
@@ -629,9 +629,7 @@ outr24(struct expr *esp, int r)
  */
 
 VOID
-outdp(carea, esp)
-register struct area *carea;
-register struct expr *esp;
+outdp(register struct area *carea, register struct expr *esp)
 {
         register int n, r;
 
@@ -676,7 +674,7 @@ register struct expr *esp;
  */
 
 VOID
-outall()
+outall(void)
 {
         if (oflag && pass==2)
                 outbuf("R");
@@ -704,7 +702,7 @@ outall()
  */
 
 VOID
-outdot()
+outdot(void)
 {
         if (oflag && pass==2) {
                 fprintf(ofp, "T");
@@ -744,7 +742,7 @@ outdot()
  */
 
 VOID
-outchk(nt, nr)
+outchk(int nt, int nr)
 {
         register struct area *ap;
 
@@ -785,8 +783,7 @@ outchk(nt, nr)
  */
 
 VOID
-outbuf(s)
-char *s;
+outbuf(char *s)
 {
         if (txtp > &txt[2]) {
                 fprintf(ofp, "T");
@@ -843,7 +840,7 @@ char *s;
  */
 
 VOID
-outgsd()
+outgsd(void)
 {
         register struct area *ap;
         register struct sym  *sp;
@@ -964,8 +961,7 @@ outgsd()
  */
 
 VOID
-outarea(ap)
-register struct area *ap;
+outarea(register struct area *ap)
 {
         register char *ptr;
         register int c;
@@ -1012,8 +1008,7 @@ register struct area *ap;
  */
 
 VOID
-outsym(sp)
-register struct sym *sp;
+outsym(register struct sym *sp)
 {
         register char *ptr;
 
@@ -1094,8 +1089,7 @@ out(char *p, int n)
  */
 
 VOID
-out_lb(b,t)
-register int b,t;
+out_lb(register int b, register int t)
 {
         if (cp < &cb[NCODE]) {
                 *cp++ = b;
@@ -1127,8 +1121,7 @@ register int b,t;
  */
 
 VOID
-out_lw(n,t)
-register int n,t;
+out_lw(register int n, register int t)
 {
         if (hilo) {
                 out_lb(hibyte(n),t ? t|R_HIGH : 0);
@@ -1198,8 +1191,7 @@ out_l24(int n, int t)
  */
 
 VOID
-out_rw(n)
-register int n;
+out_rw(register int n)
 {
         if (hilo) {
                 *relp++ = hibyte(n);
@@ -1232,8 +1224,7 @@ register int n;
  */
 
 VOID
-out_tw(n)
-register int n;
+out_tw(register int n)
 {
         if (hilo) {
                 *txtp++ = hibyte(n);
@@ -1300,7 +1291,7 @@ out_t24(int n)
  */
 
 int
-lobyte(n)
+lobyte(int n)
 {
         return (n&0377);
 }
@@ -1326,7 +1317,7 @@ lobyte(n)
  */
 
 int
-hibyte(n)
+hibyte(int n)
 {
         return ((n>>8)&0377);
 }

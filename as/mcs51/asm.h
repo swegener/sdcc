@@ -351,7 +351,6 @@ struct  sym
 #define S_FLAT24        27              /* .flat24 */
 #define S_OPTSDCC       28              /* .optsdcc */
 
-
 /*
  *      The tsym structure is a linked list of temporary
  *      symbols defined in the assembler source files following
@@ -432,6 +431,8 @@ extern  int     lop;                    /*      current line number on page
                                          */
 extern  int     pass;                   /*      assembler pass number
                                          */
+extern  int     org_cnt;                /*      .org directive counter
+                                         */
 extern  int     lflag;                  /*      -l, generate listing flag
                                          */
 extern  int     cflag;                  /*      -c, generate sdcdb debug information
@@ -501,7 +502,7 @@ extern  char    tb[NTITL];              /*      Title string buffer
 extern  char    stb[NSBTL];             /*      Subtitle string buffer
                                          */
 extern  char    optsdcc[NINPUT];        /*      sdcc compile options
-                                        */
+                                         */
 extern  int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
                                          *      flat mode (via .flat24 directive).
                                          */
@@ -522,8 +523,8 @@ extern  FILE    *sfp[MAXFIL];           /*      array of assembler-source file h
 extern  FILE    *ifp[MAXINC];           /*      array of include-file file handles
                                          */
 extern  unsigned char   ctype[128];     /*      array of character types, one per
-                                        *       ASCII character
-                                        */
+                                         *      ASCII character
+                                         */
 
 extern  char    ccase[128];             /* an array of characters which
                                          * perform the case translation function

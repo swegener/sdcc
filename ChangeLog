@@ -1,5 +1,15 @@
 2008-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCast.c (fixupInline, createFunction): save currBlockno in
+	  fixupInline instead of createFunction to fix bug 1864577
+	  (inlineFindMaxBlockno): removed, use global blockNo
+	* src/SDCCglobl.h: added blockNo
+	* src/z80/peep.c,
+	* src/z80/peep.h: modified properties
+	* support/regression/tests/bug1864577.c: new, added
+
+2008-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* as/mcs51/asdata.c,
 	* as/mcs51/asm.h: added org_cnt
 	* as/mcs51/asmain.c (main, asmbl): fixed bug 1957716, changed old K&R to ANSI

@@ -325,7 +325,8 @@ extern int RegBankUsed[4];      /* JCF: register banks used  SDCCmain.c */
 extern int BitBankUsed;         /* MB: overlayable bit bank  SDCCmain.c */
 extern struct symbol *currFunc; /* current function    SDCCgens.c */
 extern int cNestLevel;          /* block nest level  SDCCval.c */
-extern int currBlockno;         /* sequentail block number */
+extern int blockNo;             /* maximum sequential block number */
+extern int currBlockno;         /* sequential block number */
 extern struct optimize optimize;
 extern struct options options;
 extern unsigned maxInterrupts;

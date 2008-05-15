@@ -383,7 +383,7 @@ static int check_type(void)
 
   /* check if it is in the table as a typedef */
   if (!ignoreTypedefType && sym && IS_SPEC (sym->etype)
-      && SPEC_TYPEDEF (sym->etype))
+      && SPEC_TYPEDEF (sym->etype) && findSym(TypedefTab, NULL, yytext))
     return (TYPE_NAME);
   else
     return(IDENTIFIER);

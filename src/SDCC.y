@@ -709,7 +709,7 @@ type_specifier2
             symbol *sym;
             sym_link   *p  ;
             sym = findSym(TypedefTab,NULL,$1) ;
-            $$ = p = copyLinkChain(sym->type);
+            $$ = p = copyLinkChain(sym ? sym->type : NULL);
             SPEC_TYPEDEF(getSpec(p)) = 0;
             ignoreTypedefType = 1;
          }

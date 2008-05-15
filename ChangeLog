@@ -1,4 +1,4 @@
-2008-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+2008-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (fixupInline, createFunction): save currBlockno in
 	  fixupInline instead of createFunction to fix bug 1864577

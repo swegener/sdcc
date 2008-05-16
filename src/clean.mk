@@ -1,4 +1,4 @@
-CLEANALLPORTS = avr ds390 ds400 hc08 izt mcs51 pic pic16 z80 xa51
+CLEANALLPORTS = avr ds390 ds400 hc08 mcs51 pic pic16 z80 xa51
 
 # Deleting all files created by building the program
 # --------------------------------------------------

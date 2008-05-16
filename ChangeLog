@@ -1,3 +1,14 @@
+2008-05-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.lex (check_type),
+	* src/SDCC.y (type_specifier2 TYPE_NAME): fixed bug 1925942
+	* as/hc08/clean.mk,
+	* as/mcs51/clean.mk,
+	* as/z80/clean.mk: also clean *.dep
+	* device/lib/pic16/libsdcc/stack/Makefile,
+	* sim/ucsim/libtool: removed as they are rebuild by configure
+	* src/clean.mk: removed izt, so Makefile is not deleted for distclean
+
 2008-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (fixupInline, createFunction): save currBlockno in

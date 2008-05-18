@@ -256,7 +256,7 @@ ${Function} SDCC.InstFilesLeave
 ${FunctionEnd}
 
 ; Finish page - add to path
-!define MUI_FINISHPAGE_TEXT "Confirm the checkbox if you won to add SDCC binary directory to the PATH environment variable"
+!define MUI_FINISHPAGE_TEXT "Confirm the checkbox if you want to add SDCC binary directory to the PATH environment variable"
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "Add $INSTDIR\bin to the PATH"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION SDCC.AddBinToPath
 !define MUI_FINISHPAGE_SHOWREADME
@@ -1306,12 +1306,17 @@ ${Function} SDCC.PageLeaveReinstall
   ;Run uninstaller
   HideWindow
 
-  ClearErrors
-  ; ExecWait doesn't wait if _?=$INSTDIR is not defined!
-  ExecWait '$R1 _?=$INSTDIR'
-
   ${If} $R0 == "2"
+    ; Uninstall only: uninstaller should be removed
+    ClearErrors
+    ; ExecWait doesn't wait if _?=$INSTDIR is not defined!
+    ExecWait '$R1'
     Quit
+  ${Else}
+    ; Uninstal & Reinstall: uninstaller will be rewritten
+    ClearErrors
+    ; ExecWait doesn't wait if _?=$INSTDIR is not defined!
+    ExecWait '$R1 _?=$INSTDIR'
   ${EndIf}
 
   BringToFront

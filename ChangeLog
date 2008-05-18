@@ -1,3 +1,8 @@
+2008-05-19 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: remove uninstall.exe after uninstallation,
+	  fixed typo
+
 2008-05-18 Borut Razem <borut.razem AT siol.net>
 
 	* support/Utils/dbuf_string.[ch]: added dbuf_chomp(),
@@ -49,7 +54,6 @@
 2008-05-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in,
-	  support/regression/fwk/lib/testfwk.c,
 	  support/regression/ports/ds390/spec.mk,
 	  support/regression/ports/hc08/spec.mk,
 	  support/regression/ports/mcs51-common/spec.mk,

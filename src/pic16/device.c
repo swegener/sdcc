@@ -9,12 +9,12 @@
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -22,10 +22,10 @@
 
 
 /*
-	VR - Began writing code to make PIC16 C source files independent from
-	the header file (created by the inc2h.pl)
+        VR - Began writing code to make PIC16 C source files independent from
+        the header file (created by the inc2h.pl)
 
-	- adding maximum RAM memory into PIC_Device structure
+        - adding maximum RAM memory into PIC_Device structure
 
 */
 
@@ -78,16 +78,16 @@ void pic16_dump_equates(FILE *of, set *equs)
 {
   regs *r;
 
-	r = setFirstItem(equs);
-	if(!r)return;
-	
-	fprintf(of, "%s", iComments2);
-	fprintf(of, ";\tEquates to used internal registers\n");
-	fprintf(of, "%s", iComments2);
-	
-	for(; r; r = setNextItem(equs)) {
-		fprintf(of, "%s\tequ\t0x%02x\n", r->name, r->address);
-	}
+        r = setFirstItem(equs);
+        if(!r)return;
+
+        fprintf(of, "%s", iComments2);
+        fprintf(of, ";\tEquates to used internal registers\n");
+        fprintf(of, "%s", iComments2);
+
+        for(; r; r = setNextItem(equs)) {
+                fprintf(of, "%s\tequ\t0x%02x\n", r->name, r->address);
+        }
 }
 
 
@@ -95,18 +95,18 @@ void pic16_dump_access(FILE *of, set *section)
 {
   regs *r;
 
-	r = setFirstItem(section);
-	if(!r)return;
-	
-	fprintf(of, "%s", iComments2);
-	fprintf(of, ";\tAccess bank symbols\n");
-	fprintf(of, "%s", iComments2);
-	
-	fprintf(of, "\tudata_acs\n");
-	for(; r; r = setNextItem(section)) {
-		fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-		statistics.adsize += r->size;
-	}
+        r = setFirstItem(section);
+        if(!r)return;
+
+        fprintf(of, "%s", iComments2);
+        fprintf(of, ";\tAccess bank symbols\n");
+        fprintf(of, "%s", iComments2);
+
+        fprintf(of, "\tudata_acs\n");
+        for(; r; r = setNextItem(section)) {
+                fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+                statistics.adsize += r->size;
+        }
 }
 
 
@@ -115,17 +115,17 @@ int regCompare(const void *a, const void *b)
   const regs *const *i = a;
   const regs *const *j = b;
 
-	/* sort primarily by the address */
-	if( (*i)->address > (*j)->address)return 1;
-	if( (*i)->address < (*j)->address)return -1;
-	
-	/* and secondarily by size */
-	/* register size sorting may have strange results use with care */
-	if( (*i)->size > (*j)->size)return 1;
-	if( (*i)->size < (*j)->size)return -1;
-	
-	/* finally if in same address and same size sort by name */
-	return (strcmp( (*i)->name, (*j)->name));
+        /* sort primarily by the address */
+        if( (*i)->address > (*j)->address)return 1;
+        if( (*i)->address < (*j)->address)return -1;
+
+        /* and secondarily by size */
+        /* register size sorting may have strange results use with care */
+        if( (*i)->size > (*j)->size)return 1;
+        if( (*i)->size < (*j)->size)return -1;
+
+        /* finally if in same address and same size sort by name */
+        return (strcmp( (*i)->name, (*j)->name));
 
   return 0;
 }
@@ -135,17 +135,17 @@ int symCompare(const void *a, const void *b)
   const symbol *const *i = a;
   const symbol *const *j = b;
 
-	/* sort primarily by the address */
-	if( SPEC_ADDR((*i)->etype) > SPEC_ADDR((*j)->etype))return 1;
-	if( SPEC_ADDR((*i)->etype) < SPEC_ADDR((*j)->etype))return -1;
-	
-	/* and secondarily by size */
-	/* register size sorting may have strange results use with care */
-	if( getSize((*i)->etype) > getSize((*j)->etype))return 1;
-	if( getSize((*i)->etype) < getSize((*j)->etype))return -1;
+        /* sort primarily by the address */
+        if( SPEC_ADDR((*i)->etype) > SPEC_ADDR((*j)->etype))return 1;
+        if( SPEC_ADDR((*i)->etype) < SPEC_ADDR((*j)->etype))return -1;
 
-	/* finally if in same address and same size sort by name */
-	return (strcmp( (*i)->rname, (*j)->rname));
+        /* and secondarily by size */
+        /* register size sorting may have strange results use with care */
+        if( getSize((*i)->etype) > getSize((*j)->etype))return 1;
+        if( getSize((*i)->etype) < getSize((*j)->etype))return -1;
+
+        /* finally if in same address and same size sort by name */
+        return (strcmp( (*i)->rname, (*j)->rname));
 
   return 0;
 }
@@ -159,71 +159,71 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
   regs **rlist;
   regs *r1;
 
-	/* put all symbols in an array */
-	if (!elementsInSet(section)) return;
-	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
-	r = rlist[0]; i = 0;
-	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
-		rlist[i] = rprev; i++;
-	}
-	
-	if(!i) {
-		if(rlist)Safe_free(rlist);
-	  return;
-	}
+        /* put all symbols in an array */
+        if (!elementsInSet(section)) return;
+        rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
+        r = rlist[0]; i = 0;
+        for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
+                rlist[i] = rprev; i++;
+        }
 
-	/* sort symbols according to their address */
-	qsort(rlist, i	/*elementsInSet(section)*/, sizeof(regs *), regCompare);
-	
-	if(!fix) {
+        if(!i) {
+                if(rlist)Safe_free(rlist);
+          return;
+        }
 
-#define EMIT_SINGLE_UDATA_SECTION	0
+        /* sort symbols according to their address */
+        qsort(rlist, i  /*elementsInSet(section)*/, sizeof(regs *), regCompare);
+
+        if(!fix) {
+
+#define EMIT_SINGLE_UDATA_SECTION       0
 #if EMIT_SINGLE_UDATA_SECTION
-		fprintf(of, "\n\n\tudata\n");
-		for(r = setFirstItem(section); r; r = setNextItem(section)) {
-			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-			statistics.udsize += r->size;
-		}
+                fprintf(of, "\n\n\tudata\n");
+                for(r = setFirstItem(section); r; r = setNextItem(section)) {
+                        fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+                        statistics.udsize += r->size;
+                }
 #else
-		for(r = setFirstItem(section); r; r = setNextItem(section)) {
-			//fprintf(of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
-			fprintf(of, "\nudata_%s_%u\tudata\n", moduleName, usection_no++);
-			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-			statistics.udsize += r->size;
-		}
+                for(r = setFirstItem(section); r; r = setNextItem(section)) {
+                        //fprintf(of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
+                        fprintf(of, "\nudata_%s_%u\tudata\n", moduleName, usection_no++);
+                        fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+                        statistics.udsize += r->size;
+                }
 #endif
-	} else {
-	  unsigned int j=0;
-	  int deb_addr=0;
+        } else {
+          unsigned int j=0;
+          int deb_addr=0;
 
-		rprev = NULL;
-		init_addr = rlist[j]->address;
-		deb_addr = init_addr;
-		fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
-	
-		for(j=0;j<i;j++) {
-			r = rlist[j];
-			if(j < i-1)r1 = rlist[j+1]; else r1 = NULL;
-			
-			init_addr = r->address;
-			deb_addr = init_addr;
-			
-			if((rprev && (init_addr > (rprev->address + rprev->size)))) {
-				fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
-			}
+                rprev = NULL;
+                init_addr = rlist[j]->address;
+                deb_addr = init_addr;
+                fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
 
-			if(r1 && (init_addr == r1->address)) {
-				fprintf(of, "\n%s\tres\t0\n", r->name);
-			} else {
-				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-				deb_addr += r->size;
-				statistics.udsize += r->size;
-			}
-			
-			rprev = r;
-		}
-	}
-	Safe_free(rlist);
+                for(j=0;j<i;j++) {
+                        r = rlist[j];
+                        if(j < i-1)r1 = rlist[j+1]; else r1 = NULL;
+
+                        init_addr = r->address;
+                        deb_addr = init_addr;
+
+                        if((rprev && (init_addr > (rprev->address + rprev->size)))) {
+                                fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
+                        }
+
+                        if(r1 && (init_addr == r1->address)) {
+                                fprintf(of, "\n%s\tres\t0\n", r->name);
+                        } else {
+                                fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+                                deb_addr += r->size;
+                                statistics.udsize += r->size;
+                        }
+
+                        rprev = r;
+                }
+        }
+        Safe_free(rlist);
 }
 
 void pic16_dump_gsection(FILE *of, set *sections)
@@ -231,19 +231,19 @@ void pic16_dump_gsection(FILE *of, set *sections)
   regs *r;
   sectName *sname;
 
-  	for(sname = setFirstItem(sections); sname; sname = setNextItem(sections)) {
-  		if(!strcmp(sname->name, "access"))continue;
-		fprintf(of, "\n\n%s\tudata\n", sname->name);
+        for(sname = setFirstItem(sections); sname; sname = setNextItem(sections)) {
+                if(!strcmp(sname->name, "access"))continue;
+                fprintf(of, "\n\n%s\tudata\n", sname->name);
 
-  		for(r=setFirstItem(sname->regsSet); r; r=setNextItem(sname->regsSet)) {
+                for(r=setFirstItem(sname->regsSet); r; r=setNextItem(sname->regsSet)) {
 #if 0
-  			fprintf(stderr, "%s:%d emitting variable %s for section %s (%p)\n", __FILE__, __LINE__,
-  				r->name, sname->name, sname);
+                        fprintf(stderr, "%s:%d emitting variable %s for section %s (%p)\n", __FILE__, __LINE__,
+                                r->name, sname->name, sname);
 #endif
-			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-			statistics.udsize += r->size;
-		}
-	}
+                        fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+                        statistics.udsize += r->size;
+                }
+        }
 }
 
 
@@ -258,82 +258,82 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
   unsigned int init_addr, i;
   symbol **slist;
 
-	/* put all symbols in an array */
-	if (!elementsInSet(section)) return;
-	slist = Safe_calloc(elementsInSet(section), sizeof(symbol *));
-	s = slist[0]; i = 0;
-	for(sprev = setFirstItem(section); sprev; sprev = setNextItem(section)) {
-		slist[i] = sprev; i++;
-	}
-	
-	if(!i) {
-		if(slist)Safe_free(slist);
-	  return;
-	}
+        /* put all symbols in an array */
+        if (!elementsInSet(section)) return;
+        slist = Safe_calloc(elementsInSet(section), sizeof(symbol *));
+        s = slist[0]; i = 0;
+        for(sprev = setFirstItem(section); sprev; sprev = setNextItem(section)) {
+                slist[i] = sprev; i++;
+        }
 
-	/* sort symbols according to their address */
-	qsort(slist, i, sizeof(symbol *), symCompare);
-	
-	pic16_initDB();
+        if(!i) {
+                if(slist)Safe_free(slist);
+          return;
+        }
 
-	if(!fix) {
-		fprintf(of, "\n\n\tidata\n");
-		for(s = setFirstItem(section); s; s = setNextItem(section)) {
+        /* sort symbols according to their address */
+        qsort(slist, i, sizeof(symbol *), symCompare);
 
-			if(s->ival) {
-				fprintf(of, "%s", s->rname);
-				pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
-				pic16_flushDB('f', (void *)of);
-			} else {
-				if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
-					&& SPEC_CVAL (s->etype).v_char) {
+        pic16_initDB();
 
-//					fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
-					pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
-				} else {
-				      	assert(0);
-				}
-			}
-				
-		}
-	} else {
-	  unsigned int j=0;
-	  symbol *s1;
-	  
-		sprev = NULL;
-		init_addr = SPEC_ADDR(slist[j]->etype);
-		fprintf(of, "\n\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
-	
-		for(j=0;j<i;j++) {
-			s = slist[j];
-			if(j < i-1)s1 = slist[j+1]; else s1 = NULL;
-			
-			init_addr = SPEC_ADDR(s->etype);
+        if(!fix) {
+                fprintf(of, "\n\n\tidata\n");
+                for(s = setFirstItem(section); s; s = setNextItem(section)) {
 
-			if(sprev && (init_addr > (SPEC_ADDR(sprev->etype) + getSize(sprev->etype)))) {
-				fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
-			}
+                        if(s->ival) {
+                                fprintf(of, "%s", s->rname);
+                                pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
+                                pic16_flushDB('f', (void *)of);
+                        } else {
+                                if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
+                                        && SPEC_CVAL (s->etype).v_char) {
 
-			if(s->ival) {
-				fprintf(of, "%s", s->rname);
-				pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
-				pic16_flushDB('f', (void *)of);
-			} else {
-				if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
-					&& SPEC_CVAL (s->etype).v_char) {
+//                                      fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
+                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
+                                } else {
+                                        assert(0);
+                                }
+                        }
 
-//					fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
-					pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
-				} else {
-				      	assert(0);
-				}
-			}
+                }
+        } else {
+          unsigned int j=0;
+          symbol *s1;
+
+                sprev = NULL;
+                init_addr = SPEC_ADDR(slist[j]->etype);
+                fprintf(of, "\n\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
+
+                for(j=0;j<i;j++) {
+                        s = slist[j];
+                        if(j < i-1)s1 = slist[j+1]; else s1 = NULL;
+
+                        init_addr = SPEC_ADDR(s->etype);
+
+                        if(sprev && (init_addr > (SPEC_ADDR(sprev->etype) + getSize(sprev->etype)))) {
+                                fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
+                        }
+
+                        if(s->ival) {
+                                fprintf(of, "%s", s->rname);
+                                pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
+                                pic16_flushDB('f', (void *)of);
+                        } else {
+                                if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
+                                        && SPEC_CVAL (s->etype).v_char) {
+
+//                                      fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
+                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
+                                } else {
+                                        assert(0);
+                                }
+                        }
 
 
-			sprev = s;
-		}
-	}
-	Safe_free(slist);
+                        sprev = s;
+                }
+        }
+        Safe_free(slist);
 }
 
 
@@ -343,31 +343,31 @@ void pic16_dump_int_registers(FILE *of, set *section)
   int i;
   regs **rlist;
 
-	/* put all symbols in an array */
-	if (!elementsInSet(section)) return;
-	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
-	r = rlist[0]; i = 0;
-	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
-		rlist[i] = rprev; i++;
-	}
+        /* put all symbols in an array */
+        if (!elementsInSet(section)) return;
+        rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
+        r = rlist[0]; i = 0;
+        for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
+                rlist[i] = rprev; i++;
+        }
 
-	/* sort symbols according to their address */
-	qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
-	
-	if(!i) {
-		if(rlist)Safe_free(rlist);
-	  return;
-	}
-	
-	fprintf(of, "\n\n; Internal registers\n");
-	
-	fprintf(of, "%s\tudata_ovr\t0x0000\n", ".registers");
-	for(r = setFirstItem(section); r; r = setNextItem(section)) {
-		fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-		statistics.intsize += r->size;
-	}
+        /* sort symbols according to their address */
+        qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
 
-	Safe_free(rlist);
+        if(!i) {
+                if(rlist)Safe_free(rlist);
+          return;
+        }
+
+        fprintf(of, "\n\n; Internal registers\n");
+
+        fprintf(of, "%s\tudata_ovr\t0x0000\n", ".registers");
+        for(r = setFirstItem(section); r; r = setNextItem(section)) {
+                fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+                statistics.intsize += r->size;
+        }
+
+        Safe_free(rlist);
 }
 
 /**
@@ -437,7 +437,6 @@ pic16_list_devices(PIC16_device *head)
 
 /**
  * Read a single line from the given file.
- * The caller should free() the returned value!
  *
  * @param   file
  *      a pointer to the open file to read
@@ -447,30 +446,30 @@ pic16_list_devices(PIC16_device *head)
 static char *
 get_line (FILE *file)
 {
-    char *line = NULL;
-    size_t len = 129;
-    size_t done = 0;
-    size_t got = 0;
+  static struct dbuf_s dbuf;
+  static int initialized = 0;
 
-    while (!feof(file)) {
-        line = (char *) Safe_realloc(line, len);
-        got += fread(&line[done], 1, 128, file);
-        line[got] = 0;
+  if (!initialized)
+    {
+      dbuf_init (&dbuf, 129);
+      initialized = 1;
+    }
+  else
+    dbuf_set_length (&dbuf, 0);
 
-        /* find EOL */
-        while (done < got) {
-            if (('\r' == line[done]) || ('\n' == line[done])) {
-                line[done] = 0;
-                fseek(file, done + 1 - got, SEEK_CUR);
-                return (line);
-            } // if
-            done++;
-        } // while
 
-        len += 128;
-    } // while
-
-    return (line);
+  if (dbuf_getline (&dbuf, file) != 0)
+    {
+      dbuf_chomp (&dbuf);
+      /* (char *) type cast is an ugly hack since pic16_find_device() modifies the buffer */
+      return (char *)dbuf_get_buf (&dbuf);
+    }
+  else
+    {
+      dbuf_destroy(&dbuf);
+      initialized = 0;
+      return NULL;
+    }
 }
 
 /**
@@ -686,9 +685,8 @@ pic16_find_device(const char *name)
                 } // if
             } else {
                 printf("%s: Invalid keyword in %s ignored: %s\n",
-                        __func__, DEVICE_FILE_NAME, key);
+                  __func__, DEVICE_FILE_NAME, key);
             } // if
-            free(line);
         } // while
 
         if (d) {
@@ -715,7 +713,7 @@ pic16_find_device(const char *name)
 }
 
 /*-----------------------------------------------------------------*
- *  
+ *
  *-----------------------------------------------------------------*/
 void pic16_init_pic(const char *pic_type)
 {
@@ -748,7 +746,7 @@ char *pic16_processor_base_name(void)
   return pic16->name[0];
 }
 
-#define DEBUG_CHECK	0
+#define DEBUG_CHECK     0
 
 /*
  * return 1 if register wasn't found and added, 0 otherwise
@@ -758,25 +756,25 @@ int checkAddReg(set **set, regs *reg)
   regs *tmp;
 
 
-  	if(!reg)return 0;
+        if(!reg)return 0;
 #if DEBUG_CHECK
-	fprintf(stderr, "%s: about to insert REGister: %s ... ", __FUNCTION__, reg->name);
+        fprintf(stderr, "%s: about to insert REGister: %s ... ", __FUNCTION__, reg->name);
 #endif
 
-	for(tmp = setFirstItem(*set); tmp; tmp = setNextItem(*set)) {
-		if(!strcmp(tmp->name, reg->name))break;
-	}
-	
-	if(!tmp) {
-		addSet(set, reg);
+        for(tmp = setFirstItem(*set); tmp; tmp = setNextItem(*set)) {
+                if(!strcmp(tmp->name, reg->name))break;
+        }
+
+        if(!tmp) {
+                addSet(set, reg);
 #if DEBUG_CHECK
-		fprintf(stderr, "added\n");
+                fprintf(stderr, "added\n");
 #endif
-		return 1;
-	}
+                return 1;
+        }
 
 #if DEBUG_CHECK
-	fprintf(stderr, "already added\n");
+        fprintf(stderr, "already added\n");
 #endif
   return 0;
 }
@@ -785,25 +783,25 @@ int checkAddSym(set **set, symbol *sym)
 {
   symbol *tmp;
 
-  	if(!sym)return 0;
+        if(!sym)return 0;
 #if DEBUG_CHECK
-	fprintf(stderr, "%s: about to add SYMbol: %s ... ", __FUNCTION__, sym->name);
+        fprintf(stderr, "%s: about to add SYMbol: %s ... ", __FUNCTION__, sym->name);
 #endif
 
-	for(tmp = setFirstItem( *set ); tmp; tmp = setNextItem(*set)) {
-		if(!strcmp(tmp->name, sym->name))break;
-	}
-	
-	if(!tmp) {
-		addSet(set, sym);
+        for(tmp = setFirstItem( *set ); tmp; tmp = setNextItem(*set)) {
+                if(!strcmp(tmp->name, sym->name))break;
+        }
+
+        if(!tmp) {
+                addSet(set, sym);
 #if DEBUG_CHECK
-		fprintf(stderr, "added\n");
+                fprintf(stderr, "added\n");
 #endif
-		return 1;
-	}
+                return 1;
+        }
 
 #if DEBUG_CHECK
-	fprintf(stderr, "already added\n");
+        fprintf(stderr, "already added\n");
 #endif
 
   return 0;
@@ -813,25 +811,25 @@ int checkSym(set *set, symbol *sym)
 {
   symbol *tmp;
 
-  	if(!sym)return 0;
-  	
+        if(!sym)return 0;
+
 #if DEUG_CHECK
-	fprintf(stderr, "%s: about to search for SYMbol: %s ... ", __FUNCTION__, sym->name);
+        fprintf(stderr, "%s: about to search for SYMbol: %s ... ", __FUNCTION__, sym->name);
 #endif
 
-	for(tmp = setFirstItem( set ); tmp; tmp = setNextItem( set )) {
-		if(!strcmp(tmp->name, sym->name))break;
-	}
-	
-	if(!tmp) {
+        for(tmp = setFirstItem( set ); tmp; tmp = setNextItem( set )) {
+                if(!strcmp(tmp->name, sym->name))break;
+        }
+
+        if(!tmp) {
 #if DEBUG_CHECK
-		fprintf(stderr, "not found\n");
+                fprintf(stderr, "not found\n");
 #endif
-		return 0;
-	}
+                return 0;
+        }
 
 #if DEBUG_CHECK
-	fprintf(stderr, "found\n");
+        fprintf(stderr, "found\n");
 #endif
 
   return 1;
@@ -839,7 +837,7 @@ int checkSym(set *set, symbol *sym)
 
 /*-----------------------------------------------------------------*
  * void pic16_groupRegistersInSection - add each register to its   *
- *	corresponding section                                      *
+ *      corresponding section                                      *
  *-----------------------------------------------------------------*/
 void pic16_groupRegistersInSection(set *regset)
 {
@@ -847,69 +845,69 @@ void pic16_groupRegistersInSection(set *regset)
   sectSym *ssym;
   int docontinue=0;
 
-	for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
+        for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
 
 #if 0
-		fprintf(stderr, "%s:%d group registers in section, reg: %s (used: %d, %p)\n",
-			__FILE__, __LINE__, reg->name, reg->wasUsed, reg);
+                fprintf(stderr, "%s:%d group registers in section, reg: %s (used: %d, %p)\n",
+                        __FILE__, __LINE__, reg->name, reg->wasUsed, reg);
 #endif
-		if((reg->wasUsed
-			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop))))
-		  ) {
-			
-			/* avoid grouping registers that have an initial value,
-			 * they will be added later in idataSymSet */
-			if(reg->regop && (OP_SYMBOL(reg->regop)->ival && !OP_SYMBOL(reg->regop)->level))
-				continue;
+                if((reg->wasUsed
+                        && !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop))))
+                  ) {
+
+                        /* avoid grouping registers that have an initial value,
+                         * they will be added later in idataSymSet */
+                        if(reg->regop && (OP_SYMBOL(reg->regop)->ival && !OP_SYMBOL(reg->regop)->level))
+                                continue;
 
 #if 0
-			fprintf(stderr, "%s:%d register %s alias:%d fix:%d ival=%i level=%i code=%i\n",
-				__FILE__, __LINE__, reg->name, reg->alias, reg->isFixed,
-					(reg->regop?(OP_SYMBOL(reg->regop)->ival?1:0):-1),
-					(reg->regop?(OP_SYMBOL(reg->regop)->level):-1),
-					(reg->regop?(IS_CODE(OP_SYM_ETYPE(reg->regop))):-1) );
+                        fprintf(stderr, "%s:%d register %s alias:%d fix:%d ival=%i level=%i code=%i\n",
+                                __FILE__, __LINE__, reg->name, reg->alias, reg->isFixed,
+                                        (reg->regop?(OP_SYMBOL(reg->regop)->ival?1:0):-1),
+                                        (reg->regop?(OP_SYMBOL(reg->regop)->level):-1),
+                                        (reg->regop?(IS_CODE(OP_SYM_ETYPE(reg->regop))):-1) );
 #endif
-			
-			docontinue=0;
-			for(ssym=setFirstItem(sectSyms);ssym;ssym=setNextItem(sectSyms)) {
-				if(!strcmp(ssym->name, reg->name)) {
-//					fprintf(stderr, "%s:%d section found %s (%p) with var %s\n",
-//							__FILE__, __LINE__, ssym->section->name, ssym->section, ssym->name);
-					if(strcmp(ssym->section->name, "access")) {
-						addSet(&ssym->section->regsSet, reg);
-						docontinue=1;
-						break;
-					} else {
-						docontinue=0;
-						reg->accessBank = 1;
-						break;
-					}
-				}
-			}
 
-			if(docontinue)continue;
+                        docontinue=0;
+                        for(ssym=setFirstItem(sectSyms);ssym;ssym=setNextItem(sectSyms)) {
+                                if(!strcmp(ssym->name, reg->name)) {
+//                                      fprintf(stderr, "%s:%d section found %s (%p) with var %s\n",
+//                                                      __FILE__, __LINE__, ssym->section->name, ssym->section, ssym->name);
+                                        if(strcmp(ssym->section->name, "access")) {
+                                                addSet(&ssym->section->regsSet, reg);
+                                                docontinue=1;
+                                                break;
+                                        } else {
+                                                docontinue=0;
+                                                reg->accessBank = 1;
+                                                break;
+                                        }
+                                }
+                        }
 
-//			fprintf(stderr, "%s:%d reg: %s\n", __FILE__, __LINE__, reg->name);
+                        if(docontinue)continue;
 
-			if(reg->alias == 0x80) {
-				checkAddReg(&pic16_equ_data, reg);
-			} else
-			if(reg->isFixed) {
-				checkAddReg(&pic16_fix_udata, reg);
-			} else
-			if(!reg->isFixed) {
-				if(reg->pc_type == PO_GPR_TEMP)
-					checkAddReg(&pic16_int_regs, reg);
-				else {
-					if(reg->accessBank) {
-						if(reg->alias != 0x40)
-							checkAddReg(&pic16_acs_udata, reg);
-					} else
-						checkAddReg(&pic16_rel_udata, reg);
-				}
-			}
-		}
-	}
+//                      fprintf(stderr, "%s:%d reg: %s\n", __FILE__, __LINE__, reg->name);
+
+                        if(reg->alias == 0x80) {
+                                checkAddReg(&pic16_equ_data, reg);
+                        } else
+                        if(reg->isFixed) {
+                                checkAddReg(&pic16_fix_udata, reg);
+                        } else
+                        if(!reg->isFixed) {
+                                if(reg->pc_type == PO_GPR_TEMP)
+                                        checkAddReg(&pic16_int_regs, reg);
+                                else {
+                                        if(reg->accessBank) {
+                                                if(reg->alias != 0x40)
+                                                        checkAddReg(&pic16_acs_udata, reg);
+                                        } else
+                                                checkAddReg(&pic16_rel_udata, reg);
+                                }
+                        }
+                }
+        }
 }
 
 
@@ -935,17 +933,17 @@ void pic16_assignConfigWordValue(int address, unsigned int value)
 
 #if 0
                         fprintf(stderr, "setting location 0x%X to value 0x%x\tmask: 0x%x\ttest: 0x%x\n",
-                        	/*address*/ pic16->cwInfo.confAddrStart+i, (~value)&0xff,
-                        		pic16->cwInfo.crInfo[i].mask,
-                        		(pic16->cwInfo.crInfo[i].mask) & (~value));
+                                /*address*/ pic16->cwInfo.confAddrStart+i, (~value)&0xff,
+                                        pic16->cwInfo.crInfo[i].mask,
+                                        (pic16->cwInfo.crInfo[i].mask) & (~value));
 #endif
 
 #if 0
-			if((((pic16->cwInfo.crInfo[i].mask) & (~value))&0xff) != ((~value)&0xff)) {
-				fprintf(stderr, "%s:%d a wrong value has been given for configuration register 0x%x\n",
-					__FILE__, __LINE__, address);
-					return;
-			}
+                        if((((pic16->cwInfo.crInfo[i].mask) & (~value))&0xff) != ((~value)&0xff)) {
+                                fprintf(stderr, "%s:%d a wrong value has been given for configuration register 0x%x\n",
+                                        __FILE__, __LINE__, address);
+                                        return;
+                        }
 #endif
 
                         pic16->cwInfo.crInfo[i].value = value;
@@ -959,10 +957,10 @@ void pic16_assignIdByteValue(int address, char value)
 {
   int i;
 
-  	for(i=0;i<pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart+1;i++) {
-  		if(address == pic16->idInfo.idAddrStart+i) {
-  			pic16->idInfo.irInfo[i].value = value;
-  			pic16->idInfo.irInfo[i].emit = 1;
-		}
-	}
+        for(i=0;i<pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart+1;i++) {
+                if(address == pic16->idInfo.idAddrStart+i) {
+                        pic16->idInfo.irInfo[i].value = value;
+                        pic16->idInfo.irInfo[i].emit = 1;
+                }
+        }
 }

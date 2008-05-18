@@ -1,8 +1,8 @@
 /*
   dbuf_string.h - Append formatted string to the dynamic buffer
-  version 1.1.0, December 29th, 2007
+  version 1.2.0, February 10th, 2008
 
-  Copyright (c) 2002-2007 Borut Razem
+  Copyright (c) 2002-2008 Borut Razem
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ int dbuf_append_char(struct dbuf_s *dbuf, char chr);
 int dbuf_vprintf(struct dbuf_s *dbuf, const char *format, va_list args);
 int dbuf_printf (struct dbuf_s *dbuf, const char *format, ...) ATTRIBUTE_PRINTF(2, 3);
 size_t dbuf_getline(struct dbuf_s *dbuf, FILE *infp);
+int dbuf_chomp (struct dbuf_s *dbuf);
 void dbuf_write (struct dbuf_s *dbuf, FILE *dest);
 void dbuf_write_and_destroy (struct dbuf_s *dbuf, FILE *dest);
 

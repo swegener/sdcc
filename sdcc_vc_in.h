@@ -40,7 +40,7 @@
 #define STD_LONG_LIB          "liblong"
 #define STD_FP_LIB            "libfloat"
 #define STD_DS390_LIB         "libds390"
-#define STD_DS400_LIB	      "libds400"
+#define STD_DS400_LIB         "libds400"
 /* #undef STD_XA51_LIB */
 
 /* #undef HAVE_SYS_SOCKET_H */
@@ -63,6 +63,9 @@
 #define TYPE_UDWORD unsigned TYPE_DWORD
 
 /* #undef WORDS_BIGENDIAN */
+
+/* for flex 2.5.35 and greater */
+#define YY_NO_UNISTD_H  1
 
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_GBZ80

@@ -1,8 +1,8 @@
 /*
   dbuf_string.c - Append formatted string to the dynamic buffer
-  version 1.1.0, December 29th, 2007
+  version 1.2.0, February 10th, 2008
 
-  Copyright (c) 2002-2007 Borut Razem
+  Copyright (c) 2002-2008 Borut Razem
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,25 +30,44 @@
 
 /*
  * Append string to the end of the buffer.
+ * The buffer is null terminated.
  */
 
 int
 dbuf_append_str (struct dbuf_s *dbuf, const char *str)
 {
+  size_t len;
   assert (str != NULL);
 
-  return dbuf_append (dbuf, str, strlen(str));
+  len = strlen (str);
+  if (dbuf_append (dbuf, str, len + 1))
+    {
+      --dbuf->len;
+      return 1;
+    }
+  else
+    return 0;
 }
 
 
 /*
  * Append single character to the end of the buffer.
+ * The buffer is null terminated.
  */
 
 int
 dbuf_append_char (struct dbuf_s *dbuf, char chr)
 {
-  return dbuf_append (dbuf, &chr, 1);
+  char buf[2];
+  buf[0] = chr;
+  buf[1] = '\0';
+  if (dbuf_append (dbuf, buf, 2))
+    {
+      --dbuf->len;
+      return 1;
+    }
+  else
+    return 0;
 }
 
 /*
@@ -141,6 +160,7 @@ calc_result_length (const char *format, va_list args)
 
 /*
  * Append the formatted string to the end of the buffer.
+ * The buffer is null terminated.
  */
 
 int
@@ -172,6 +192,7 @@ dbuf_vprintf (struct dbuf_s *dbuf, const char *format, va_list args)
 
 /*
  * Append the formatted string to the end of the buffer.
+ * The buffer is null terminated.
  */
 
 int
@@ -190,6 +211,7 @@ dbuf_printf (struct dbuf_s *dbuf, const char *format, ...)
 
 /*
  * Append line from file to the dynamic buffer
+ * The buffer is null terminated.
  */
 
 size_t
@@ -218,6 +240,38 @@ dbuf_getline (struct dbuf_s *dbuf, FILE *infp)
     ((char *)dbuf->buf)[dbuf->len] = '\0';
 
   return dbuf_get_length (dbuf);
+}
+
+
+/*
+ * Remove trailing newline from the string.
+ * The buffer is null terminated.
+ * It returns the total number of characters removed.
+ */
+
+int
+dbuf_chomp (struct dbuf_s *dbuf)
+{
+  size_t i = dbuf->len;
+  int ret;
+
+  if ('\n' == ((char *)dbuf->buf)[i - 1])
+    {
+      --i;
+      if ('\r' == ((char *)dbuf->buf)[i - 1])
+        {
+          --i;
+        }
+    }
+
+  ret = dbuf->len - i;
+  dbuf->len = i;
+
+  /* terminate the line without increasing the length */
+  if (_dbuf_expand(dbuf, 1) != 0)
+    ((char *)dbuf->buf)[dbuf->len] = '\0';
+
+  return ret;
 }
 
 

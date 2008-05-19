@@ -1,5 +1,10 @@
 2008-05-19 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/gen.c (pic16_emitpLabel,pic16_emitpLabelFORCE):
+	  fixed duplicate labels (#1911325)
+
+2008-05-19 Raphael Neider <rneider AT web.de>
+
 	* src/regression/empty.c: suppress warning
 	* src/regression/pointer1.c: enabled index_by_pointer()
 	* src/regression/inline.c: now works for pic16 as well

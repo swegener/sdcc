@@ -264,11 +264,17 @@ void DEBUGpic16_emitcode (char *inst,char *fmt, ...)
 
 void pic16_emitpLabel(int key)
 {
+  if(key>max_key)
+    max_key = key;
+
   pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(NULL,key+100+pic16_labelOffset));
 }
 
 void pic16_emitpLabelFORCE(int key)
 {
+  if(key>max_key)
+    max_key = key;
+
   pic16_addpCode2pBlock(pb,pic16_newpCodeLabelFORCE(NULL,key+100+pic16_labelOffset));
 }
 

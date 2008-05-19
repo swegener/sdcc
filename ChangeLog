@@ -1,7 +1,7 @@
 2008-05-19 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: remove uninstall.exe after uninstallation,
-	  fixed typo
+	  fixed typo, uninstall include/pic16/pic16devices.txt
 
 2008-05-18 Borut Razem <borut.razem AT siol.net>
 

@@ -890,6 +890,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\pic\*.txt"
   Delete "$INSTDIR\include\pic\*.inc"
   Delete "$INSTDIR\include\pic16\*.h"
+  Delete "$INSTDIR\include\pic16\*.txt"
   Delete "$INSTDIR\include\mcs51\*.h"
   Delete "$INSTDIR\include\hc08\*.h"
   Delete "$INSTDIR\include\*.h"

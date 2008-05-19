@@ -128,9 +128,6 @@ void pic16_assignConfigWordValue(int address, unsigned int value);
 void pic16_assignIdByteValue(int address, char value);
 int pic16_isREGinBank(regs *reg, int bank);
 int pic16_REGallBanks(regs *reg);
-int PIC16_IS_CONFIG_ADDRESS(int address);
-int PIC16_IS_IDLOC_ADDRESS(int address);
-int PIC16_IS_HWREG_ADDRESS(int address);
 
 int checkAddReg(set **set, regs *reg);
 int checkAddSym(set **set, symbol *reg);

@@ -374,7 +374,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 /*-----------------------------------------------------------------*/
 /* pic16_initPointer - pointer initialization code massaging       */
 /*-----------------------------------------------------------------*/
-value *pic16_initPointer (initList * ilist, sym_link *toType)
+static value *
+pic16_initPointer (initList * ilist, sym_link *toType)
 {
   value *val;
   ast *expr;
@@ -516,7 +517,8 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
 /*-----------------------------------------------------------------*/
 /* printPointerType - generates ival for pointer type              */
 /*-----------------------------------------------------------------*/
-void _pic16_printPointerType (const char *name, char ptype, void *p)
+static void
+_pic16_printPointerType (const char *name, char ptype, void *p)
 {
   char buf[256];
 
@@ -529,7 +531,8 @@ void _pic16_printPointerType (const char *name, char ptype, void *p)
 /*-----------------------------------------------------------------*/
 /* printPointerType - generates ival for pointer type              */
 /*-----------------------------------------------------------------*/
-void pic16_printPointerType (const char *name, char ptype, void *p)
+static void
+pic16_printPointerType (const char *name, char ptype, void *p)
 {
   _pic16_printPointerType (name, ptype, p);
   //pic16_flushDB(ptype, p); /* breaks char* const arr[] = {&c, &c, &c}; */
@@ -538,7 +541,8 @@ void pic16_printPointerType (const char *name, char ptype, void *p)
 /*-----------------------------------------------------------------*/
 /* printGPointerType - generates ival for generic pointer type     */
 /*-----------------------------------------------------------------*/
-void pic16_printGPointerType (const char *iname, const unsigned int itype,
+static void
+pic16_printGPointerType (const char *iname, const unsigned int itype,
   char ptype, void *p)
 {
   char buf[256];
@@ -547,15 +551,16 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
 
   switch (itype)
     {
-    case CPOINTER:
-    case FUNCTION:
+    case CPOINTER: /* fall through */
+    case FUNCTION: /* fall through */
+    case GPOINTER:
+      /* GPTRs pointing to __data space should be reported as POINTERs */
       sprintf (buf, "UPPER(%s)", iname);
       pic16_emitDS (buf, ptype, p);
       break;
 
-    case GPOINTER:
-    case POINTER:
-      sprintf (buf, "0x80");
+    case POINTER: /* __data space */
+      sprintf (buf, "0x%02x", GPTR_TAG_DATA);
       pic16_emitDS (buf, ptype, p);
       break;
 
@@ -567,6 +572,10 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
     default:
       debugf ("itype = %d\n", itype );
       assert (0);
+    }
+
+    if (itype == GPOINTER) {
+      fprintf(stderr, "%s: initialized generic pointer with unknown storage class assumes object in code space\n", __func__);
     }
 
   //pic16_flushDB(ptype, p); /* might break char* const arr[] = {...}; */
@@ -772,7 +781,8 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 /*-----------------------------------------------------------------*/
 /* pic16_printIvalBitFields - generate initializer for bitfields   */
 /*-----------------------------------------------------------------*/
-void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
+static void
+pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
 {
   value *val ;
   symbol *lsym = *sym;
@@ -837,7 +847,8 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
 /*-----------------------------------------------------------------*/
 /* printIvalStruct - generates initial value for structures        */
 /*-----------------------------------------------------------------*/
-void pic16_printIvalStruct (symbol * sym, sym_link * type,
+static void
+pic16_printIvalStruct (symbol * sym, sym_link * type,
                  initList * ilist, char ptype, void *p)
 {
   symbol *sflds;
@@ -876,7 +887,8 @@ void pic16_printIvalStruct (symbol * sym, sym_link * type,
 /*-----------------------------------------------------------------*/
 /* printIvalUnion - generates initial value for unions             */
 /*-----------------------------------------------------------------*/
-void pic16_printIvalUnion (symbol * sym, sym_link * type,
+static void
+pic16_printIvalUnion (symbol * sym, sym_link * type,
                  initList * ilist, char ptype, void *p)
 {
   //symbol *sflds;
@@ -925,7 +937,8 @@ pic16_isUnion( symbol *sym, sym_link *type )
 /*--------------------------------------------------------------------------*/
 /* pic16_printIvalCharPtr - generates initial values for character pointers */
 /*--------------------------------------------------------------------------*/
-int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char ptype, void *p)
+static int
+pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char ptype, void *p)
 {
   int size = 0;
 
@@ -956,14 +969,10 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
       else if (size == 3)
         {
           int type;
-          if (IS_PTR (val->type)) {
-            type = DCL_TYPE (val->type);
-          } else {
-            type = PTR_TYPE (SPEC_OCLS (val->etype));
-          }
+          type = PTR_TYPE (SPEC_OCLS (val->etype));
           if (val->sym && val->sym->isstrlit) {
             // this is a literal string
-            type=CPOINTER;
+            type = CPOINTER;
           }
           pic16_printGPointerType(val->name, type, ptype, p);
         }
@@ -1008,7 +1017,8 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
 /*-----------------------------------------------------------------------*/
 /* pic16_printIvalFuncPtr - generate initial value for function pointers */
 /*-----------------------------------------------------------------------*/
-void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void *p)
+static void
+pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void *p)
 {
   value *val;
   int dLvl = 0;
@@ -1029,7 +1039,7 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
   }
 
   if (IS_LITERAL(val->etype)) {
-    if (compareType(type, val->etype) == 0) {
+    if (0 && compareType(type, val->etype) == 0) {
       werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
       printFromToType (val->type, type);
     }
@@ -1046,9 +1056,9 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
 
   /* now generate the name */
   if (!val->sym) {
-      pic16_printGPointerType (val->name, DCL_TYPE(val->type), ptype, p);
+      pic16_printGPointerType (val->name, CPOINTER /*DCL_TYPE(val->type)*/, ptype, p);
   } else {
-      pic16_printGPointerType (val->sym->rname, DCL_TYPE(val->type), ptype, p);
+      pic16_printGPointerType (val->sym->rname, CPOINTER /*DCL_TYPE(val->type)*/, ptype, p);
 
       if(IS_FUNC(val->sym->type) && !val->sym->used && !IS_STATIC(val->sym->etype)) {
 
@@ -1070,7 +1080,8 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
 /*-----------------------------------------------------------------*/
 /* pic16_printIvalPtr - generates initial value for pointers       */
 /*-----------------------------------------------------------------*/
-void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p)
+static void
+pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p)
 {
   value *val;
   int size;
@@ -1142,8 +1153,9 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
     }
   else if (size == 3)
     {
-      pic16_printGPointerType (val->name, (IS_PTR(type)?DCL_TYPE(type):PTR_TYPE(SPEC_OCLS(sym->etype))),
-                          ptype, p);
+      int itype = 0;
+      itype = PTR_TYPE (SPEC_OCLS (val->etype));
+      pic16_printGPointerType (val->name, itype, ptype, p);
     } else
         assert(0);
   return;
@@ -1240,22 +1252,17 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
     }
 }
 
-int PIC16_IS_CONFIG_ADDRESS(int address)
+static int
+PIC16_IS_CONFIG_ADDRESS(int address)
 {
   return ((address >= pic16->cwInfo.confAddrStart && address <= pic16->cwInfo.confAddrEnd));
 }
 
-int PIC16_IS_IDLOC_ADDRESS(int address)
+static int
+PIC16_IS_IDLOC_ADDRESS(int address)
 {
    return ((address >= pic16->idInfo.idAddrStart && address <= pic16->idInfo.idAddrEnd));
 }
-
-/* wrapper function for the above */
-int PIC16_IS_HWREG_ADDRESS(int address)
-{
-  return (PIC16_IS_CONFIG_ADDRESS(address) || PIC16_IS_IDLOC_ADDRESS(address));
-}
-
 
 /*-----------------------------------------------------------------*/
 /* emitStaticSeg - emitcode for the static segment                 */
@@ -1687,7 +1694,8 @@ pic16emitOverlay (struct dbuf_s *aBuf)
     }
 }
 
-void emitStatistics(FILE *asmFile)
+static void
+emitStatistics(FILE *asmFile)
 {
   unsigned long isize, udsize, ramsize;
   statistics.isize = pic16_countInstructions();

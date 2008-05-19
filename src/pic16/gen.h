@@ -27,6 +27,12 @@
 #ifndef SDCCGENPIC16_H
 #define SDCCGENPIC16_H
 
+/* If you change these, you also have to update the library files
+ * device/lib/pic16/libsdcc/gptr{get,put}{1,2,3,4}.c */
+#define GPTR_TAG_DATA   0x80
+#define GPTR_TAG_EEPROM 0x40
+#define GPTR_TAG_CODE   0x00    /* must be 0 becaue of UPPER(sym)==0 */
+
 struct pCodeOp;
 
 enum

@@ -33,6 +33,7 @@
 
 #include "common.h"   // Include everything in the SDCC src directory
 #include "newalloc.h"
+#include "dbuf_string.h"
 
 
 #include "main.h"

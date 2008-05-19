@@ -11695,6 +11695,40 @@ static void assignValnums (pCode *pc) {
       if (val && oldval && (val->in_val != 0) && (val->in_val == oldval->in_val)) {
 	//fprintf (stderr, "MOVFW: W already set up correctly (%x) at %p\n", oldval->in_val, pc);
 	if (!pic16_isAlive (SPO_STATUS, pc)) pic16_safepCodeRemove (pc, "=DF= redundant MOVFW removed");
+      } else {
+          defmap_t *pred, *predpred;
+          /* Optimize MOVLW immd; MOVWF reg1; [...]; MOVFW reg1
+           * into MOVLW immd; MOVWF reg1; [...]; MOVLW immd
+           * This might allow removal of the first two assignments. */
+          pred = defmapFindDef (list, sym1, pc);
+          predpred = pred ? defmapFindDef (list, SPO_WREG, pred->pc) : NULL;
+          if (pred && predpred && (PCI(pred->pc)->op == POC_MOVWF) && (PCI(predpred->pc)->op == POC_MOVLW)
+                && !pic16_isAlive (SPO_STATUS, pc))
+          {
+              newpc = pic16_newpCode (POC_MOVLW, pic16_pCodeOpCopy (PCI(predpred->pc)->pcop));
+
+              if (pic16_debug_verbose || pic16_pcode_verbose) {
+                  pic16_InsertCommentAfter (pc->prev, "=DF= MOVFW: replaced last of MOVLW;MOVWF;MOVFW by MOVLW");
+              } // if
+              pic16_pCodeReplace (pc, newpc);
+              defmapReplaceSymRef (pc, sym1, 0, 1);
+              pic16_fixDefmap (pc, newpc);
+              pc = newpc;
+
+              /* This breaks the defmap chain's references to pCodes... fix it! */
+              if (!val->prev) PCI(pc)->pcflow->defmap = val->next;
+              if (!val->acc.access.isWrite) {
+                  deleteDefmap (val);	// delete reference to reg1 as in value
+                  val = NULL;
+              } else {
+                  val->acc.access.isRead = 0;	// delete reference to reg1 as in value
+              }
+              oldval = PCI(pc)->pcflow->defmap;
+              while (oldval) {
+                  if (oldval->pc == pc) oldval->pc = newpc;
+                  oldval = oldval->next;
+              } // while
+          } // if
       }
       if (val) defmapUpdate (list, SPO_WREG, pc, val->in_val);
     }

@@ -1,3 +1,20 @@
+2008-05-19 Raphael Neider <rneider AT web.de>
+
+	* src/regression/empty.c: suppress warning
+	* src/regression/pointer1.c: enabled index_by_pointer()
+	* src/regression/inline.c: now works for pic16 as well
+
+	* src/pic16/device.c: include dbuf declarations
+	* src/pic16/device.h: removed obsolete prototypes
+
+	* src/pic16/gen.c, src/pic16/gen.h: moved generic pointer tags
+	* src/pic16/glue.c: made purely local functions static,
+	  (pic16_printGPointerType, pic16_printIvalCharPtr,
+	  pic16_printIvalFuncPtr, pic16_printIvalPtr): fixed initialized
+	  generic pointers' tags (#1961866)
+
+	* src/pic16/pcode.c (assignValnums): optimize literal assignments
+
 2008-05-19 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: remove uninstall.exe after uninstallation,

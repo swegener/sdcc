@@ -56,12 +56,6 @@
 #define PIC_IS_TAGGED(x)        (IS_GENPTR(x) || IS_CODEPTR(x))
 #define IS_DIRECT(op)           ((AOP_TYPE(op) == AOP_PCODE) && (AOP(op)->aopu.pcop->type == PO_DIR))
 
-/* If you change these, you also have to update the library files
- * device/lib/pic16/libsdcc/gptr{get,put}{1,2,3,4}.c */
-#define GPTR_TAG_DATA   0x80
-#define GPTR_TAG_EEPROM 0x40
-#define GPTR_TAG_CODE   0x00    /* must be 0 becaue of UPPER(sym)==0 */
-
 /* Wrapper to execute `code' at most once. */
 #define PERFORM_ONCE(id,code)   do { static char id = 0; if (!id) { id = 1; code } } while (0)
 

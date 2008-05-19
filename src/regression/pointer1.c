@@ -11,7 +11,7 @@ unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 unsigned char *acharP = 0;
 
-char buff[10];
+unsigned char buff[10];
 
 void
 done()
@@ -92,10 +92,8 @@ void check_array(char base_value)
 
 void index_by_pointer(unsigned char *index, unsigned char expected_value)
 {
-/*
   if(buff[*index] != expected_value)
     failures++;
-*/
 }
 
 

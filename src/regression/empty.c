@@ -6,6 +6,7 @@ void foo(void) {
 }
 
 void bar(int arg0) {
+    (void)arg0;
 }
 
 void

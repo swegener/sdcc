@@ -1269,9 +1269,18 @@ callFuncByName (char *fname,
       /* and there can be no additional conditions.             */
       if (c == '(')
         {
-          cmdTerm = funcArgs;
-          while ((c = *cmdTerm) && c != ')')
-            cmdTerm++;
+
+          int num_parenthesis = 0;
+          cmdTerm = funcArgs;          
+
+          while ((c = *cmdTerm) && (c != ')' || num_parenthesis))
+            {
+              if (c == '(')
+                num_parenthesis++;
+              else if (c == ')')
+                num_parenthesis--;
+              cmdTerm++;
+            }
           *cmdTerm = '\0';  /* terminate the arguments */
           if (c == ')')
             {

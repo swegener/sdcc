@@ -1,3 +1,8 @@
+2008-05-19  Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c (callFuncByName):
+	  Support nested parenthesis in peephole function arguments (#1967300)
+
 2008-05-19 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_emitpLabel,pic16_emitpLabelFORCE):

@@ -7,7 +7,7 @@
 	* device/lib/_fseq.c,
 	* device/lib/_fsneq.c: handle -0.0
 	* sim/ucsim/s51.src/uc89c51r.cc,
-	* sim/ucsim/s51.src/uc89c51rcl.h: bugfix auxr should be auxr1
+	* sim/ucsim/s51.src/uc89c51rcl.h: fixed bug 1385430
 	* sim/ucsim/sim.src/hwcl.h: */* confuses VC
 	* src/mcs51/gen.c (genSend): fixed bug with --xstack
 	* support/regression/ports/mcs51-xstack-auto/spec.mk: print floats

@@ -39,6 +39,7 @@ public:
   //int t0_overflows;
   uchar dpl0, dph0;
   uchar dpl1, dph1;
+  uchar dps;
 
 public:
   cl_uc89c51r(int Itype, int Itech, class cl_sim *asim);
@@ -49,6 +50,7 @@ public:
   virtual void  pre_inst(void);
   virtual void  post_inst(void);
   virtual int   it_priority(uchar ie_mask);
+  virtual void  print_regs(class cl_console_base *con);
 
   //virtual void  do_extra_hw(int cycles);
   //virtual int   t0_overflow(void);

@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <stdio.h>
+#include <ctype.h>
 
 // local
 #include "uc89c51rcl.h"
@@ -98,7 +99,9 @@ cl_uc89c51r::it_priority(uchar ie_mask)
 void
 cl_uc89c51r::pre_inst(void)
 {
-  if (sfr->get(AUXR1) & bmDPS)
+  //printf("pre dptr0:%02X%02X dptr1:%02X%02X\n", dph0, dpl0, dph1, dpl1);
+  dps = (sfr->get(AUXR1) & bmDPS);
+  if (dps)
     {
       sfr->set(DPL, dpl1);
       sfr->set(DPH, dph1);
@@ -114,7 +117,7 @@ cl_uc89c51r::pre_inst(void)
 void
 cl_uc89c51r::post_inst(void)
 {
-  if (sfr->get(AUXR1) & bmDPS)
+  if (dps)
     {
       dpl1= sfr->get(DPL);
       dph1= sfr->get(DPH);
@@ -124,7 +127,59 @@ cl_uc89c51r::post_inst(void)
       dpl0= sfr->get(DPL);
       dph0= sfr->get(DPH);
     }
+  dps = (sfr->get(AUXR1) & bmDPS);
+  if (dps)
+    {
+      sfr->set(DPL, dpl1);
+      sfr->set(DPH, dph1);
+    }
+  else
+    {
+      sfr->set(DPL, dpl0);
+      sfr->set(DPH, dph0);
+    }
+  //printf("post dptr0:%02X%02X dptr1:%02X%02X\n", dph0, dpl0, dph1, dpl1);
   cl_uc51r::post_inst();
+}
+
+
+void
+cl_uc89c51r::print_regs(class cl_console_base *con)
+{
+  t_addr start;
+  uchar data, acc, dps;
+
+  start= psw->get() & 0x18;
+  //dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
+  iram->dump(start, start+7, 8, con);
+  start= psw->get() & 0x18;
+  data= iram->get(iram->get(start));
+  con->dd_printf("%06x %02x %c",
+              iram->get(start), data, isprint(data)?data:'.');
+
+  acc= sfr->get(ACC);
+  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", acc, acc,
+              isprint(acc)?(acc):'.', sfr->get(B)); 
+  //eram2xram();
+  dps = sfr->get(AUXR1) & bmDPS;
+  data= xram->get(dph0*256+dpl0);
+  con->dd_printf("  %cDPTR0= 0x%02x%02x @DPTR0= 0x%02x %3d %c",
+              dps?' ':'*', dph0, dpl0,
+              data, data, isprint(data)?data:'.');
+  data= xram->get(dph1*256+dpl1);
+  con->dd_printf("  %cDPTR1= 0x%02x%02x @DPTR1= 0x%02x %3d %c\n",
+              dps?'*':' ', dph1, dpl1,
+              data, data, isprint(data)?data:'.');
+
+  data= iram->get(iram->get(start+1));
+  con->dd_printf("%06x %02x %c", iram->get(start+1), data,
+              isprint(data)?data:'.');
+  data= psw->get();
+  con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
+              (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
+              (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
+
+  print_disass(PC, con);
 }
 
 

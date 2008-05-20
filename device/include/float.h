@@ -41,6 +41,7 @@
 /* the following deal with IEEE single-precision numbers */
 #define EXCESS		126
 #define SIGNBIT		((unsigned long)0x80000000)
+#define __INFINITY	((unsigned long)0x7F800000)
 #define HIDDEN		(unsigned long)(1ul << 23)
 #define SIGN(fp)	(((unsigned long)(fp) >> (8*sizeof(fp)-1)) & 1)
 #define EXP(fp)		(((unsigned long)(fp) >> 23) & (unsigned int) 0x00FF)

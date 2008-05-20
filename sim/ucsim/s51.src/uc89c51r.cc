@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (uc89c51r.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -144,15 +144,15 @@ cl_89c51r_dummy_hw::init(void)
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
     }
   //auxr= sfr->register_hw(AUXR, this, 0);
-  register_cell(sfr, AUXR, &auxr, wtd_restore);
+  register_cell(sfr, AUXR1, &auxr1, wtd_restore);
   return(0);
 }
 
 void
 cl_89c51r_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
 {
-  if (cell == auxr)
-    auxr->set_bit0(0x04);
+  if (cell == auxr1)
+    auxr1->set_bit0(0x04);
 }
 
 

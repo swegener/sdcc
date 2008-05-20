@@ -60,7 +60,7 @@ public:
 class cl_89c51r_dummy_hw: public cl_hw
 {
 protected:
-  class cl_memory_cell *auxr;
+  class cl_memory_cell *auxr1;
 public:
   cl_89c51r_dummy_hw(class cl_uc *auc);
   virtual int init(void);

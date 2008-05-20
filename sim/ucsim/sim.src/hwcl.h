@@ -109,7 +109,7 @@ public:
   virtual class cl_hw *make_partner(enum hw_cath cath, int id);
 
   virtual t_mem read(class cl_memory_cell *cell) { return(cell->get()); }
-  virtual void write(class cl_memory_cell */*cell*/, t_mem */*val*/) {}
+  virtual void write(class cl_memory_cell * /*cell*/, t_mem * /*val*/) {}
 
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem,
@@ -126,8 +126,8 @@ public:
 
   virtual int tick(int cycles);
   virtual void reset(void) {}
-  virtual void happen(class cl_hw */*where*/, enum hw_event /*he*/,
-                      void */*params*/) {}
+  virtual void happen(class cl_hw * /*where*/, enum hw_event /*he*/,
+                      void * /*params*/) {}
   virtual void inform_partners(enum hw_event he, void *params);
 
   virtual void print_info(class cl_console_base *con);

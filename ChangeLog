@@ -1,3 +1,18 @@
+2008-05-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/float.h: added __INFINITY
+	* device/lib/_fsadd.c: handle overflows
+	* device/lib/_fsmul.c,
+	* device/lib/_fsdiv.c: use __INFINITY
+	* device/lib/_fseq.c,
+	* device/lib/_fsneq.c: handle -0.0
+	* sim/ucsim/s51.src/uc89c51r.cc,
+	* sim/ucsim/s51.src/uc89c51rcl.h: bugfix auxr should be auxr1
+	* sim/ucsim/sim.src/hwcl.h: */* confuses VC
+	* src/mcs51/gen.c (genSend): fixed bug with --xstack
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: print floats
+	* support/regression/tests/snprintf.c: test bug with --xstack
+
 2008-05-19  Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c (callFuncByName):

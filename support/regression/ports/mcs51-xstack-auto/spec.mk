@@ -8,7 +8,7 @@ LIBSRCDIR   = $(top_srcdir)/device/lib
 LIBBUILDDIR = $(top_builddir)/device/lib
 LIBDIR      = $(PORT_CASES_DIR)/lib
 
-LIBSDCCFLAGS+= --stack-auto --xstack --std-c99
+LIBSDCCFLAGS+= --stack-auto --xstack --std-c99 -DUSE_FLOATS=1
 SDCCFLAGS   += --stack-auto --xstack --std-sdcc99
 
 SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \

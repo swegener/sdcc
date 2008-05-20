@@ -328,7 +328,7 @@ float __fsdiv (float a1, float a2)
 
   /* pack up and go home */
   if (exp >= 0x100)
-    fl1.l = (sign ? SIGNBIT : 0) | 0x7F800000;
+    fl1.l = (sign ? SIGNBIT : 0) | __INFINITY;
   else if (exp < 0)
     fl1.l = 0;
   else

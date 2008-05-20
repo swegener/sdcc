@@ -162,7 +162,7 @@ float __fsadd (float a1, float a2)
   volatile long mant1, mant2;
   volatile union float_long fl1, fl2;
   volatile int exp1, exp2;
-  volatile unsigned long sign = 0;
+  char sign = 0;
 
   fl1.f = a1;
   fl2.f = a2;
@@ -203,7 +203,7 @@ float __fsadd (float a1, float a2)
   if (mant1 < 0)
     {
       mant1 = -mant1;
-      sign = SIGNBIT;
+      sign = 1;
     }
   else if (!mant1)
     return (0);
@@ -218,7 +218,7 @@ float __fsadd (float a1, float a2)
   while (mant1 & 0xff000000) {
     if (mant1&1)
       mant1 += 2;
-    mant1 >>= 1 ;
+    mant1 >>= 1;
     exp1++;
   }
 
@@ -226,8 +226,12 @@ float __fsadd (float a1, float a2)
   mant1 &= ~HIDDEN;
 
   /* pack up and go home */
-  fl1.l = PACK (sign, (unsigned long) exp1, mant1);
-
+  if (exp1 >= 0x100)
+    fl1.l = (sign ? SIGNBIT : 0) | __INFINITY;
+  else if (exp1 < 0)
+    fl1.l = 0;
+  else
+    fl1.l = PACK (sign ? SIGNBIT : 0 , exp1, mant1);
   return (fl1.f);
 }
 

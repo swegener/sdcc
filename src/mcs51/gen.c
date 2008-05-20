@@ -2831,9 +2831,13 @@ static void genSend(set *sendSet)
         }
     }
 
-  if (bit_count)
+  if (options.useXstack || bit_count)
     {
       saveRegisters (setFirstItem (sendSet));
+    }
+
+  if (bit_count)
+    {
       emitcode ("mov", "bits,b");
     }
 

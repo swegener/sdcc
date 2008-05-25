@@ -151,42 +151,6 @@ extern __sfr  __at (EECON1_ADDR)                  EECON1;
 extern __sfr  __at (EECON2_ADDR)                  EECON2;
 extern __sfr  __at (VRCON_ADDR)                   VRCON;
 
-//----- STATUS Bits --------------------------------------------------------
-
-
-//----- INTCON Bits --------------------------------------------------------
-
-
-//----- PIR1 Bits ----------------------------------------------------------
-
-
-//----- T1CON Bits ---------------------------------------------------------
-
-//----- T2CON Bits ---------------------------------------------------------
-
-//----- CCP1CON Bits ---------------------------------------------------------
-
-//----- RCSTA Bits ---------------------------------------------------------
-
-//----- CMCON Bits ---------------------------------------------------------
-
-
-//----- OPTION Bits --------------------------------------------------------
-
-
-//----- PIE1 Bits ----------------------------------------------------------
-
-
-//----- PCON Bits ----------------------------------------------------------
-
-
-//----- TXSTA Bits ----------------------------------------------------------
-
-//----- EECON1 Bits ---------------------------------------------------------
-
-//----- VRCON Bits ---------------------------------------------------------
-
-
 //==========================================================================
 //
 //       RAM Definition
@@ -462,8 +426,8 @@ typedef union {
     unsigned char RA3:1;
     unsigned char RA4:1;
     unsigned char RA5:1;
-    unsigned char :1;
-    unsigned char :1;
+    unsigned char RA6:1;
+    unsigned char RA7:1;
   };
 } __PORTA_bits_t;
 extern volatile __PORTA_bits_t __at(PORTA_ADDR) PORTA_bits;
@@ -475,6 +439,8 @@ extern volatile __PORTA_bits_t __at(PORTA_ADDR) PORTA_bits;
 #define RA3                  PORTA_bits.RA3
 #define RA4                  PORTA_bits.RA4
 #define RA5                  PORTA_bits.RA5
+#define RA6                  PORTA_bits.RA6
+#define RA7                  PORTA_bits.RA7
 #endif /* NO_BIT_DEFINES */
 
 // ----- PORTB bits --------------------
@@ -613,8 +579,8 @@ typedef union {
     unsigned char TRISA3:1;
     unsigned char TRISA4:1;
     unsigned char TRISA5:1;
-    unsigned char :1;
-    unsigned char :1;
+    unsigned char TRISA6:1;
+    unsigned char TRISA7:1;
   };
 } __TRISA_bits_t;
 extern volatile __TRISA_bits_t __at(TRISA_ADDR) TRISA_bits;
@@ -626,6 +592,8 @@ extern volatile __TRISA_bits_t __at(TRISA_ADDR) TRISA_bits;
 #define TRISA3               TRISA_bits.TRISA3
 #define TRISA4               TRISA_bits.TRISA4
 #define TRISA5               TRISA_bits.TRISA5
+#define TRISA6               TRISA_bits.TRISA6
+#define TRISA7               TRISA_bits.TRISA7
 #endif /* NO_BIT_DEFINES */
 
 // ----- TRISB bits --------------------

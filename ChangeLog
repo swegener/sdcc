@@ -1,3 +1,9 @@
+2008-05-25 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic16f627a.h,
+	* device/include/pic/pic16f628a.h,
+	* device/include/pic/pic16f648a.h: added missing ports
+
 2008-05-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/float.h: added __INFINITY

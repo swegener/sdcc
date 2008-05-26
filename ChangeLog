@@ -1,3 +1,11 @@
+2008-05-26 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/startup/crt0.c,
+	* device/lib/pic16/startup/crt0i.c,
+	* device/lib/pic16/startup/crt0iz.c: clean up, make use of access bank
+	  explicit, fixed curr_entry loop for >= 256 initializer records,
+	  removed debug code (write to 0xf7e)
+
 2008-05-25 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic16f627a.h,

@@ -204,9 +204,10 @@ __moduint_rrx_hds::
         ;;  if signs are different
         ;; Remainder has same sign as dividend
         ld      a,b             ; Get high byte of dividend
-        ld      (.srem),a       ; Save as sign of remainder
+        push    af              ; Save as sign of remainder
         xor     d               ; Xor with high byte of divisor
-        ld      (.squot),a      ; Save sign of quotient
+        push    af              ; Save sign of quotient
+
         ;; Take absolute value of divisor
         bit     7,d
         jr      Z,.chkde        ; Jump if divisor is positive
@@ -229,9 +230,9 @@ __moduint_rrx_hds::
         ;; Divide absolute values
 .dodiv:
         call    .divu16
-        ret     C               ; Exit if divide by zero
+        jr      C,.exit         ; Exit if divide by zero
         ;; Negate quotient if it is negative
-        ld      a,(.squot)
+        pop     af              ; recover sign of quotient
         and     #0x80
         jr      Z,.dorem        ; Jump if quotient is positive
         sub     a               ; Substract quotient from 0
@@ -242,7 +243,7 @@ __moduint_rrx_hds::
         ld      b,a
 .dorem:
         ;; Negate remainder if it is negative
-        ld      a,(.srem)
+        pop     af              ; recover sign of remainder
         and     #0x80
         ret     Z               ; Return if remainder is positive
         sub     a               ; Substract remainder from 0
@@ -251,6 +252,10 @@ __moduint_rrx_hds::
         sbc     a               ; Propagate remainder (A=0xFF if borrow)
         sub     d
         ld      d,a
+        ret
+.exit:
+        pop     af
+        pop     af
         ret
 
 .divu8::
@@ -284,7 +289,7 @@ __moduint_rrx_hds::
         ;; HL holds remainder
         ;; Do a 32-bit left shift, shifting carry to L, L to H,
         ;;  H to C, C to B
-        ld      (.dcnt),a
+        push    af              ; save number of bits remaining
         rl      l               ; Carry (next bit of quotient) to bit 0
         rl      h               ; Shift remaining bytes
         rl      c
@@ -303,14 +308,20 @@ __moduint_rrx_hds::
                                 ;  next bit of quotient)
         jr      C,.drop         ; Jump if remainder is >= dividend
         pop     bc              ; Otherwise, restore remainder
+        pop     af              ; recover # bits remaining, carry flag destroyed
+        dec     a
+        or      a               ; restore (clear) the carry flag
+        jr      NZ,.dvloop
         jr      .nodrop
 .drop:
         inc     sp
         inc     sp
-.nodrop:
-        ld      a,(.dcnt)
-        dec     a               ; DEC does not affect carry flag
+        pop     af              ; recover # bits remaining, carry flag destroyed
+        dec     a
+        scf                     ; restore (set) the carry flag
         jr      NZ,.dvloop
+        jr      .nodrop
+.nodrop:
         ;; Shift last carry bit into quotient
         ld      d,b             ; DE = remainder
         ld      e,c
@@ -320,12 +331,3 @@ __moduint_rrx_hds::
         ld      b,h             ; B = high byte of quotient
         or      a               ; Clear carry, valid result
         ret
-
-        .area   _BSS
-
-.srem:
-        .ds 0x01                ; Sign of quotient
-.squot:
-        .ds 0x01                ; Sign of remainder
-.dcnt:
-        .ds 0x01                ; Counter for division

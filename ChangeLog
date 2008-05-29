@@ -1,5 +1,11 @@
 2008-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/gbz80/div.s,
+	* device/lib/z80/div.s: fixed bug 1904314 by applying a modified part of
+	  patch 1597883, Thanks Robert Ramey
+
+2008-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/SDCCast.c (createIvalType, createIvalStruct, createIvalArray,
 	  createIvalCharPtr, createIvalPtr, createIval),
 	* src/SDCCval.h

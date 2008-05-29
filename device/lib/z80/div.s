@@ -208,12 +208,13 @@ __moduint_rrx_hds::
         ;;  if signs are different
         ;; Remainder has same sign as dividend
         ld      a,b             ; Get high byte of dividend
-        ld      (.srem),a       ; Save as sign of remainder
+        push    af              ; Save as sign of remainder
         xor     d               ; Xor with high byte of divisor
-        ld      (.squot),a      ; Save sign of quotient
+        push    af              ; Save sign of quotient
+
         ;; Take absolute value of divisor
         bit     7,d
-        jp      Z,.chkde        ; Jump if divisor is positive
+        jr      Z,.chkde        ; Jump if divisor is positive
         sub     a               ; Substract divisor from 0
         sub     e
         ld      e,a
@@ -223,7 +224,7 @@ __moduint_rrx_hds::
         ;; Take absolute value of dividend
 .chkde:
         bit     7,b
-        jp      Z,.dodiv        ; Jump if dividend is positive
+        jr      Z,.dodiv        ; Jump if dividend is positive
         sub     a               ; Substract dividend from 0
         sub     c
         ld      c,a
@@ -233,11 +234,11 @@ __moduint_rrx_hds::
         ;; Divide absolute values
 .dodiv:
         call    .divu16
-        ret     C               ; Exit if divide by zero
+        jr      C,.exit         ; Exit if divide by zero
         ;; Negate quotient if it is negative
-        ld      a,(.squot)
+        pop     af              ; recover sign of quotient
         and     #0x80
-        jp      Z,.dorem        ; Jump if quotient is positive
+        jr      Z,.dorem        ; Jump if quotient is positive
         sub     a               ; Substract quotient from 0
         sub     c
         ld      c,a
@@ -246,7 +247,7 @@ __moduint_rrx_hds::
         ld      b,a
 .dorem:
         ;; Negate remainder if it is negative
-        ld      a,(.srem)
+        pop     af              ; recover sign of remainder
         and     #0x80
         ret     Z               ; Return if remainder is positive
         sub     a               ; Substract remainder from 0
@@ -255,6 +256,10 @@ __moduint_rrx_hds::
         sbc     a               ; Propagate remainder (A=0xFF if borrow)
         sub     d
         ld      d,a
+        ret
+.exit:
+        pop     af
+        pop     af
         ret
 
 .divu8::
@@ -268,7 +273,7 @@ __moduint_rrx_hds::
         ;; Check for division by zero
         ld      a,e
         or      d
-        jp      NZ,.divide      ; Branch if divisor is non-zero
+        jr      NZ,.divide      ; Branch if divisor is non-zero
         ld      bc,#0x00        ; Divide by zero error
         ld      d,b
         ld      e,c
@@ -280,7 +285,7 @@ __moduint_rrx_hds::
 ;       ld      h,b             ; H = high byte of dividend/quotient
 ;       ld      bc,#0x00        ; BC = remainder
         or      a               ; Clear carry to start
-        ex      af,af
+        ex      af,af'
         ld      a,#16           ; 16 bits in dividend
 .dvloop:
         ;; Shift next bit of quotient into bit 0 of dividend
@@ -308,9 +313,9 @@ __moduint_rrx_hds::
         ccf                     ; Complement borrow so 1 indicates a
                                 ;  successful substraction (this is the
                                 ;  next bit of quotient)
-        jp      C,.drop         ; Jump if remainder is >= dividend
+        jr      C,.drop         ; Jump if remainder is >= dividend
         pop     hl              ; Otherwise, restore remainder
-        jp      .nodrop
+        jr      .nodrop
 .drop:
         inc     sp
         inc     sp
@@ -328,12 +333,3 @@ __moduint_rrx_hds::
 ;       ld      b,h             ; B = high byte of quotient
         or      a               ; Clear carry, valid result
         ret
-
-        .area   _BSS
-
-.srem:
-        .ds 0x01                ; Sign of quotient
-.squot:
-        .ds 0x01                ; Sign of remainder
-.dcnt:
-        .ds 0x01                ; Counter for division

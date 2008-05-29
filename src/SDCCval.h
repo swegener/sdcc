@@ -47,7 +47,6 @@ typedef struct value
     symbol *sym;                  /* Original Symbol                  */
     struct value *next;           /* used in initializer list         */
     unsigned vArgs:1;             /* arg list ended with variable arg */
-
   }
 value;
 
@@ -146,6 +145,6 @@ value *valForArray (struct ast *);
 value *valForStructElem (struct ast *, struct ast *);
 value *valForCastAggr (struct ast *, sym_link *, struct ast *, int);
 value *valForCastArr (struct ast * , sym_link *);
-bool convertIListToConstList(initList *src, literalList **lList);
+bool convertIListToConstList(initList *src, literalList **lList, int size);
 literalList *copyLiteralList(literalList *src);
 #endif

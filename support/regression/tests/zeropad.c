@@ -1,8 +1,9 @@
 /** Zeropad tests.
 
-    storage: idata, pdata, xdata, code,
+    storage: auto, idata, pdata, xdata, code,
 */
 #ifndef STORAGE
+#define STORAGE_{storage}
 #define STORAGE {storage}
 #endif
 
@@ -10,6 +11,10 @@
   /* since g fails on GCC 2.95.4 on alpha... */
   #define FLEXARRAY 0
   #define TEST_G    0
+#elif defined (STORAGE_auto)
+  /* only static flexible arrays are allowed */
+  #define FLEXARRAY 0
+  #define TEST_G    1
 #else
   #define FLEXARRAY 1
   #define TEST_G    1
@@ -20,11 +25,17 @@
 typedef unsigned int size_t;
 #define offsetof(s,m)   (size_t)&(((s *)0)->m)
 
+#if defined (STORAGE_auto)
+  void Zeropad(void)
+  {
+#endif //STORAGE_auto
+
 const char *string1 = "\x00\x01";
 const char string2[] = "\x00\x01";
 
 #ifndef PORT_HOST
 #pragma disable_warning 147 //no warning about excess initializers (W_EXCESS_INITIALIZERS)
+#pragma disable_warning  85 //no warning about unreferenced variables (W_NO_REFERENCE)
 //array will be truncated but warning will be suppressed
 //if truncation is incorrect, other ASSERTs will fail with high probability
 char STORAGE trunc[2] = {'a', 'b', 'c'};
@@ -65,10 +76,14 @@ struct y STORAGE incompletestruct = {
 };
 #endif
 
-void
-testZeropad(void)
+#if !defined (STORAGE_auto)
+void Zeropad(void)
 {
+#endif //STORAGE_auto
+
+  ASSERT(string1[0] == '\x00');
   ASSERT(string1[1] == '\x01');
+  ASSERT(string2[0] == '\x00');
   ASSERT(string2[1] == '\x01');
 
   ASSERT(array[2] == 'c');
@@ -100,4 +115,23 @@ testZeropad(void)
   ASSERT(sizeof(incompletestruct) == offsetof(struct y, b));
   ASSERT(sizeof(incompletestruct) == offsetof(struct x, b));
 #endif
+
+#if defined (STORAGE_auto)
+  array[4] = 1;
+#if TEST_G
+  g[1].b = 1;
+#endif
+  teststruct[0].b[5] = 1;
+  teststruct[4].b[9] = 1;
+#endif //STORAGE_auto
+}
+
+void
+testZeropad(void)
+{
+  Zeropad();
+
+#if defined (STORAGE_auto)
+  Zeropad(); //test reinitialization
+#endif //STORAGE_auto
 }

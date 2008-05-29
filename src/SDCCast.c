@@ -168,7 +168,7 @@ newIfxNode (ast * condAst, symbol * trueLabel, symbol * falseLabel)
 }
 
 /*-----------------------------------------------------------------*/
-/* copyAstValues - copies value portion of ast if needed     */
+/* copyAstValues - copies value portion of ast if needed           */
 /*-----------------------------------------------------------------*/
 void
 copyAstValues (ast * dest, ast * src)
@@ -540,7 +540,6 @@ resolveSymbols (ast * tree)
             werrorfl (tree->filename, tree->lineno, E_LABEL_UNDEF,
                       tree->falseLabel->name);
         }
-
     }
 
   /* if this is a label resolve it from the labelTab */
@@ -548,7 +547,6 @@ resolveSymbols (ast * tree)
       tree->opval.val->sym &&
       tree->opval.val->sym->islbl)
     {
-
       symbol *csym = findSym (LabelTab, tree->opval.val->sym,
                               tree->opval.val->sym->name);
 
@@ -566,7 +564,6 @@ resolveSymbols (ast * tree)
       tree->opval.val->sym &&
       !tree->opval.val->sym->implicit)
     {
-
       symbol *csym = findSymWithLevel (SymbolTab, tree->opval.val->sym);
 
       /* if found in the symbol table & they are not the same */
@@ -582,7 +579,6 @@ resolveSymbols (ast * tree)
       /* is an integer in data space      */
       if (!csym && !tree->opval.val->sym->implicit)
         {
-
           /* if this is a function name then */
           /* mark it as returning an int     */
           if (tree->funcName)
@@ -961,10 +957,13 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
   ast *iExpr;
 
   /* if initList is deep */
-  if (ilist->type == INIT_DEEP)
+  if (ilist && ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
-  iExpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
+  if (ilist)
+    iExpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
+  else
+    iExpr = newAst_VALUE (valueFromLit (0));
   return decorateType (newNode ('=', sym, iExpr), RESULT_TYPE_NONE);
 }
 
@@ -978,28 +977,31 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
   ast *lAst;
   symbol *sflds;
   initList *iloop;
+  sym_link * etype = getSpec (type);
 
   sflds = SPEC_STRUCT (type)->fields;
-  if (ilist->type != INIT_DEEP)
+  if (ilist && ilist->type != INIT_DEEP)
     {
       werror (E_INIT_STRUCT, "");
       return NULL;
     }
 
-  iloop = ilist->init.deep;
+  iloop = ilist ? ilist->init.deep : NULL;
 
   for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL))
     {
       /* if we have come to end */
-      if (!iloop)
-        break;
+      if (!iloop && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
+        {
+          break;
+        }
+
       sflds->implicit = 1;
       lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
       lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
       rast = decorateType (resolveSymbols (createIval (lAst, sflds->type,
                                                        iloop, rast, rootValue)),
                            RESULT_TYPE_NONE);
-
     }
 
   if (iloop)
@@ -1015,7 +1017,6 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
   return rast;
 }
 
-
 /*-----------------------------------------------------------------*/
 /* createIvalArray - generates code for array initialization       */
 /*-----------------------------------------------------------------*/
@@ -1026,6 +1027,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
   initList *iloop;
   int lcnt = 0, size = 0;
   literalList *literalL;
+  sym_link * etype = getSpec (type);
 
   /* take care of the special   case  */
   /* array of characters can be init  */
@@ -1033,23 +1035,29 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
   if (IS_CHAR (type->next))
     if ((rast = createIvalCharPtr (sym,
                                    type,
-                        decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE),
+                                   decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE),
                                    rootValue)))
 
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 
-  /* not the special case             */
-  if (ilist->type != INIT_DEEP)
-  {
+  /* not the special case */
+  if (ilist && ilist->type != INIT_DEEP)
+    {
       werror (E_INIT_STRUCT, "");
       return NULL;
-  }
+    }
 
-  iloop = ilist->init.deep;
+  iloop = ilist ? ilist->init.deep : NULL;
   lcnt = DCL_ELEM (type);
 
-  if (port->arrayInitializerSuppported && convertIListToConstList(ilist, &literalL))
-  {
+  if (!iloop &&
+      (!lcnt || !DCL_ELEM (type) || !AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
+    {
+      return NULL;
+    }
+
+  if (port->arrayInitializerSuppported && convertIListToConstList(ilist, &literalL, lcnt))
+    {
       ast *aSym;
 
       aSym = decorateType (resolveSymbols(sym), RESULT_TYPE_NONE);
@@ -1059,45 +1067,48 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
 
       // Make sure size is set to length of initializer list.
       while (iloop)
-      {
+        {
           size++;
           iloop = iloop->next;
-      }
+        }
 
       if (lcnt && size > lcnt)
-      {
+        {
           // Array size was specified, and we have more initializers than needed.
           werrorfl (sym->opval.val->sym->fileDef, sym->opval.val->sym->lineDef,
-            W_EXCESS_INITIALIZERS, "array", sym->opval.val->sym->name);
-      }
-  }
+                    W_EXCESS_INITIALIZERS, "array", sym->opval.val->sym->name);
+        }
+    }
   else
-  {
+    {
       for (;;)
-      {
+        {
           ast *aSym;
+
+          if (!iloop &&
+              (!lcnt || !DCL_ELEM (type) || !AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
+            {
+              break;
+            }
 
           aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
           aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
           rast = createIval (aSym, type->next, iloop, rast, rootValue);
+          lcnt--;
           iloop = (iloop ? iloop->next : NULL);
-          if (!iloop)
-          {
-              break;
-          }
 
           /* no of elements given and we    */
           /* have generated for all of them */
-          if (!--lcnt)
-          {
+          if (!lcnt && iloop)
+            {
               // is this a better way? at least it won't crash
               char *name = (IS_AST_SYM_VALUE(sym)) ? AST_SYMBOL(sym)->name : "";
               werrorfl (iloop->filename, iloop->lineno, W_EXCESS_INITIALIZERS, "array", name);
 
               break;
-          }
-      }
-  }
+            }
+        }
+    }
 
   /* if we have not been given a size  */
   if (!DCL_ELEM (type))
@@ -1130,6 +1141,29 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast *rootVal)
     return newNode ('=', sym, iexpr);
 
   /* left side is an array so we have to assign each element */
+  if (!iexpr)
+    {
+      /* for each character generate an assignment */
+      /* to the array element */
+      unsigned int i = 0;
+      unsigned int symsize = getSize (type);
+
+      if (!AST_SYMBOL (rootVal)->islocal || SPEC_STAT (getSpec (type)))
+        return NULL;
+
+      for (i=0; i<symsize; i++)
+        {
+          rast = newNode (NULLOP,
+                          rast,
+                          newNode ('=',
+                                   newNode ('[', sym,
+                                            newAst_VALUE (valueFromLit ((float) i))),
+                                   newAst_VALUE (valueFromLit (0))));
+        }
+
+      return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
+    }
+
   if ((IS_LITERAL (iexpr->etype) ||
        SPEC_SCLS (iexpr->etype) == S_CODE)
       && IS_ARRAY (iexpr->ftype))
@@ -1193,7 +1227,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist, ast *rootVal)
   ast *iexpr;
 
   /* if deep then   */
-  if (ilist->type == INIT_DEEP)
+  if (ilist && ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
   iexpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
@@ -1214,7 +1248,7 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast *rootVa
 {
   ast *rast = NULL;
 
-  if (!ilist)
+  if (!ilist && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (getSpec (type))))
     return NULL;
 
   /* if structure then    */
@@ -1242,7 +1276,8 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast *rootVa
 /*-----------------------------------------------------------------*/
 /* initAggregates - initialises aggregate variables with initv     */
 /*-----------------------------------------------------------------*/
-ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
+ast * initAggregates (symbol * sym, initList * ival, ast * wid)
+{
   ast *newAst = newAst_VALUE (symbolVal (sym));
   return createIval (newAst, sym->type, ival, wid, newAst);
 }
@@ -1261,7 +1296,6 @@ gatherAutoInit (symbol * autoChain)
   inInitMode = 1;
   for (sym = autoChain; sym; sym = sym->next)
     {
-
       /* resolve the symbols in the ival */
       if (sym->ival)
         resolveIvalSym (sym->ival, sym->type);
@@ -1322,28 +1356,33 @@ gatherAutoInit (symbol * autoChain)
       /* if there is an initial value */
       if (sym->ival && SPEC_SCLS (sym->etype) != S_CODE)
         {
-          initList *ilist=sym->ival;
+          initList *ilist = sym->ival;
 
-          while (ilist->type == INIT_DEEP) {
-            ilist = ilist->init.deep;
-          }
+          while (ilist->type == INIT_DEEP)
+            {
+              ilist = ilist->init.deep;
+            }
 
           /* update lineno for error msg */
           filename = sym->fileDef;
           lineno = sym->lineDef;
           setAstFileLine (ilist->init.node, sym->fileDef, sym->lineDef);
 
-          if (IS_AGGREGATE (sym->type)) {
-            work = initAggregates (sym, sym->ival, NULL);
-          } else {
-            if (getNelements(sym->type, sym->ival)>1) {
-              werrorfl (sym->fileDef, sym->lineDef,
-                        W_EXCESS_INITIALIZERS, "scalar",
-                        sym->name);
+          if (IS_AGGREGATE (sym->type))
+            {
+              work = initAggregates (sym, sym->ival, NULL);
             }
-            work = newNode ('=', newAst_VALUE (symbolVal (sym)),
-                            list2expr (sym->ival));
-          }
+          else
+            {
+              if (getNelements(sym->type, sym->ival)>1)
+                {
+                  werrorfl (sym->fileDef, sym->lineDef,
+                            W_EXCESS_INITIALIZERS, "scalar",
+                            sym->name);
+                }
+              work = newNode ('=', newAst_VALUE (symbolVal (sym)),
+                              list2expr (sym->ival));
+            }
 
           // just to be sure
           setAstFileLine (work, sym->fileDef, sym->lineDef);
@@ -1459,7 +1498,6 @@ processBlockVars (ast * tree, int *stack, int action)
   processBlockVars (tree->right, stack, action);
   return tree;
 }
-
 
 /*-------------------------------------------------------------*/
 /* constExprTree - returns TRUE if this tree is a constant     */
@@ -5966,8 +6004,6 @@ DEFSETFUNC (resetParmKey)
   return 1;
 }
 
-
-
 /*------------------------------------------------------------------*/
 /* fixupInlineLabel - change a label in an inlined function so that */
 /*                    it is always unique no matter how many times  */
@@ -5982,7 +6018,6 @@ fixupInlineLabel (symbol * sym)
   strcpy (sym->name, name);
 }
 
-
 /*------------------------------------------------------------------*/
 /* copyAstLoc - copy location information (file, line, block, etc.) */
 /*              from one ast node to another                        */
@@ -5995,9 +6030,7 @@ copyAstLoc (ast * dest, ast * src)
   dest->level = src->level;
   dest->block = src->block;
   dest->seqPoint = src->seqPoint;
-
 }
-
 
 /*-----------------------------------------------------------------*/
 /* fixupInline - perform various fixups on an inline function tree */
@@ -6082,10 +6115,10 @@ fixupInline (ast * tree, int level)
       tree->right = gotoTree;
     }
 
-   /* Update any children */
-   if (tree->left)
+  /* Update any children */
+  if (tree->left)
       fixupInline (tree->left, level);
-   if (tree->right)
+  if (tree->right)
       fixupInline (tree->right, level);
 
   if (IS_AST_OP (tree) && (tree->opval.op == LABEL))
@@ -6096,7 +6129,6 @@ fixupInline (ast * tree, int level)
       /* Add this label back into the symbol table */
       addSym (LabelTab, label, label->name, label->level, 0, 0);
     }
-
 
   if (IS_AST_OP (tree) && (tree->opval.op == BLOCK))
     {
@@ -6138,7 +6170,6 @@ inlineAddDecl (symbol * sym, ast * block, int addSymTab)
     }
 }
 
-
 /*-----------------------------------------------------------------*/
 /* inlineTempVar - create a temporary variable for inlining        */
 /*-----------------------------------------------------------------*/
@@ -6162,7 +6193,6 @@ inlineTempVar (sym_link * type, int level)
 
   return sym;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* inlineFindParmRecurse - recursive function for inlineFindParm   */
@@ -6189,7 +6219,6 @@ inlineFindParmRecurse (ast * parms, int *index)
   (*index)--;
   return NULL;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* inlineFindParm - search an ast tree of parameters to find one   */
@@ -6364,7 +6393,6 @@ expandInlineFuncs (ast * tree, ast * block)
     }
 }
 
-
 /*-----------------------------------------------------------------*/
 /* createFunction - This is the key node that calls the iCode for  */
 /*                  generating the code for a function. Note code  */
@@ -6519,7 +6547,8 @@ skipall:
 
   /* we are done freeup memory & cleanup */
   noLineno--;
-  if (port->reset_labelKey) labelKey = 1;
+  if (port->reset_labelKey)
+    labelKey = 1;
   name->key = 0;
   FUNC_HASBODY(name->type) = 1;
   addSet (&operKeyReset, name);

@@ -1,3 +1,9 @@
+2008-06-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/asm/ds390/features.h,
+	* device/include/asm/mcs51/features.h,
+	* device/include/mcs51/regc515c.h: inserted LGPL notice
+
 2008-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/gbz80/div.s,

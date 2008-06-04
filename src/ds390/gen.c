@@ -1669,6 +1669,52 @@ aopGet (operand * oper,
 }
 
 /*-----------------------------------------------------------------*/
+/* aopPutUsesAcc - indicates ahead of time whether aopPut() will   */
+/*                 clobber the accumulator                         */
+/*-----------------------------------------------------------------*/
+static bool
+aopPutUsesAcc (operand * oper, const char *s, int offset)
+{
+  asmop * aop = AOP (oper);
+
+  if (offset > (aop->size - 1))
+    return FALSE;
+
+  switch (aop->type)
+    {
+    case AOP_DUMMY:
+      return TRUE;
+    case AOP_DIR:
+      return FALSE;
+    case AOP_REG:
+      wassert(strcmp(aop->aopu.aop_reg[offset]->name, "a"));
+      return FALSE;
+    case AOP_DPTRn:
+      return FALSE;
+    case AOP_DPTR:
+    case AOP_DPTR2:
+      return TRUE;
+    case AOP_R0:
+    case AOP_R1:
+      return ((aop->paged) || (*s == '@'));
+    case AOP_STK:
+      return (*s == '@');
+    case AOP_CRY:
+      return (!aop->aopu.aop_dir || strcmp(s, aop->aopu.aop_dir));
+    case AOP_STR:
+      return FALSE;
+    case AOP_IMMD:
+      return FALSE;
+    case AOP_ACC:
+      return FALSE;
+    default:
+      /* Error case --- will have been caught already */
+      wassert(0);
+      return FALSE;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* aopPut - puts a string for a aop and indicates if acc is in use */
 /*-----------------------------------------------------------------*/
 static bool
@@ -11937,6 +11983,7 @@ genAddrOf (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   int size, offset;
+  bool pushedA = FALSE;
 
   D (emitcode (";", "genAddrOf"));
 
@@ -11977,7 +12024,14 @@ genAddrOf (iCode * ic)
 
               emitcode ("addc","a,#!constbyte", offset);
 
+              if (aopPutUsesAcc (IC_RESULT (ic), "b", 0))
+                {
+                  emitcode ("push", "acc");
+                  pushedA = TRUE;
+                }
               aopPut (IC_RESULT (ic), "b", 0);
+              if (pushedA)
+                  emitcode ("pop", "acc");
               aopPut (IC_RESULT (ic), "a", 1);
               aopPut (IC_RESULT (ic), buff, 2);
           } else {
@@ -12056,7 +12110,6 @@ genAddrOf (iCode * ic)
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
-
 }
 
 #if 0 // obsolete, and buggy for != xdata

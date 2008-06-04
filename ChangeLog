@@ -1,5 +1,8 @@
 2008-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* .version,
+	* doc/sdccman.lyx: bumped sdcc version to 2.8.2
+	* src/ds390/gen.c (aopPutUsesAcc, genAddrOf): fixed bug 1015185
 	* src/mcs51/gen.c (genNearPointerGet, genNearPointerSet): fixed bug 1938300
 	* support/regression/tests/bug1938300.c: new, added
 

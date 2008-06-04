@@ -10015,7 +10015,13 @@ genNearPointerGet (operand * left,
         {
           // Aha, it is a pointer, just in disguise.
           rname = aopGet (left, 0, FALSE, FALSE);
-          if (*rname != '@')
+          if (strcmp (rname, "a") == 0)
+            {
+              // It's in pdata or on xstack
+              rname = AOP (left)->aopu.aop_ptr->name;
+              emitcode ("mov", "%s,a", rname);
+            }
+          else if (*rname != '@')
             {
               fprintf(stderr, "probable internal error: unexpected rname '%s' @ %s:%d\n",
                       rname, __FILE__, __LINE__);
@@ -10709,7 +10715,13 @@ genNearPointerSet (operand * right,
         {
           // Aha, it is a pointer, just in disguise.
           rname = aopGet (result, 0, FALSE, FALSE);
-          if (*rname != '@')
+          if (strcmp (rname, "a") == 0)
+            {
+              // It's in pdata or on xstack
+              rname = AOP (result)->aopu.aop_ptr->name;
+              emitcode ("mov", "%s,a", rname);
+            }
+          else if (*rname != '@')
             {
               fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
                       __FILE__, __LINE__);
@@ -11195,7 +11207,6 @@ genAddrOf (iCode * ic)
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -11490,7 +11501,6 @@ genCast (iCode * ic)
   /* if the result is of type pointer */
   if (IS_PTR (ctype))
     {
-
       int p_type;
       sym_link *type = operandType (right);
       sym_link *etype = getSpec (type);

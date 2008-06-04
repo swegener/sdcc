@@ -1,3 +1,8 @@
+2008-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genNearPointerGet, genNearPointerSet): fixed bug 1938300
+	* support/regression/tests/bug1938300.c: new, added
+
 2008-06-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/asm/ds390/features.h,

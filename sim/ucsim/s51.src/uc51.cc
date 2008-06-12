@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (uc51.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -314,8 +314,8 @@ cl_51core::bit_tbl(void)
   return(bit_tab51);
 }
 
-char *
-cl_51core::disass(t_addr addr, char *sep)
+const char *
+cl_51core::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20], c[2];
   const char *b;
@@ -440,7 +440,7 @@ cl_51core::print_regs(class cl_console_base *con)
               iram->get(start), data, isprint(data)?data:'.');
 
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
-              isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
+              isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B));
   //eram2xram();
   data= xram->get(sfr->get(DPH)*256+sfr->get(DPL));
   con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
@@ -544,7 +544,7 @@ void
 cl_51core::clear_sfr(void)
 {
   int i;
-  
+
   for (i= 0x80; i <= 0xff; i++)
     sfr->set(i, 0);
   sfr->/*set*/write(P0, 0xff);
@@ -938,7 +938,7 @@ cl_51core::do_inst(int step)
         {
           //fprintf(stderr,"uc: inp avail in PD mode, user stop\n");
           result= resUSER;
-          sim->stop(result); 
+          sim->stop(result);
         }
     }
   return(result);

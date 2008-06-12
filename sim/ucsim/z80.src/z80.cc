@@ -2,9 +2,9 @@
  * Simulator of microcontrollers (z80.cc)
  *
  * some z80 code base from Karl Bongers karl@turbobit.com
- * 
+ *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -309,7 +309,7 @@ cl_z80::get_disasm_info(t_addr addr,
 }
 
 const char *
-cl_z80::disass(t_addr addr, char *sep)
+cl_z80::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
   const char *b;
@@ -320,7 +320,7 @@ cl_z80::disass(t_addr addr, char *sep)
   p= work;
 
   b = get_disasm_info(addr, &len, NULL, &immed_offset);
-  
+
   if (b == NULL) {
     buf= (char*)malloc(30);
     strcpy(buf, "UNKNOWN/INVALID");
@@ -419,7 +419,7 @@ cl_z80::print_regs(class cl_console_base *con)
   con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
                  regs.SP, ram->get(regs.SP), ram->get(regs.SP),
                  isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
-  
+
   print_disass(PC, con);
 }
 
@@ -507,7 +507,7 @@ cl_z80::exec_inst(void)
     case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x77:
     case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
       return(inst_ld(code));
-    case 0x76: 
+    case 0x76:
       return(inst_halt(code));
 
     case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:

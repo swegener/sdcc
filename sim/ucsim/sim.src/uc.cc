@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (uc.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -248,7 +248,7 @@ cl_uc::reset(void)
     }
   sp_max= 0;
   sp_avg= 0;
-  
+
   stack_ops->free_all();
 
   int i;
@@ -460,22 +460,22 @@ cmd->init();*/
       cset= new cl_cmdset();
       cset->init();
     }
-    cset->add(cmd= new cl_info_bp_cmd("breakpoints", 0, 
+    cset->add(cmd= new cl_info_bp_cmd("breakpoints", 0,
 "info breakpoints   Status of user-settable breakpoints",
 "long help of info breakpoints"));
     cmd->add_name("bp");
     cmd->init();
-    cset->add(cmd= new cl_info_reg_cmd("registers", 0, 
+    cset->add(cmd= new cl_info_reg_cmd("registers", 0,
 "info registers     List of integer registers and their contents",
 "long help of info registers"));
     cmd->init();
-    cset->add(cmd= new cl_info_hw_cmd("hardware", 0, 
+    cset->add(cmd= new cl_info_hw_cmd("hardware", 0,
 "info hardware cathegory\n"
 "                   Status of hardware elements of the CPU",
 "long help of info hardware"));
     cmd->add_name("hw");
     cmd->init();
-    cset->add(cmd= new cl_info_stack_cmd("stack", 0, 
+    cset->add(cmd= new cl_info_stack_cmd("stack", 0,
 "info stack         Status of stack of the CPU",
 "long help of info stack"));
     cmd->init();
@@ -632,7 +632,7 @@ class cl_memory *
 cl_uc::mem(enum mem_class type)
 {
   class cl_m *m;
-    
+
   if (mems->count < type)
     m= (class cl_m *)(mems->at(MEM_DUMMY));
   else
@@ -711,7 +711,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
 }
 
 
-/* 
+/*
  * Reading intel hexa file into EROM
  *____________________________________________________________________________
  *
@@ -975,7 +975,7 @@ cl_uc::get_hw(enum hw_cath cath, int hwid, int *idx)
       i++;
       hw= get_hw(cath, &i);
     }
-  if (hw && 
+  if (hw &&
       idx)
     *idx= i;
   return(hw);
@@ -996,7 +996,7 @@ cl_uc::get_hw(char *id_string, int hwid, int *idx)
       i++;
       hw= get_hw(id_string, &i);
     }
-  if (hw && 
+  if (hw &&
       idx)
     *idx= i;
   return(hw);
@@ -1028,7 +1028,7 @@ cl_uc::bit_tbl(void)
   return(&empty);
 }
 
-char *
+const char *
 cl_uc::disass(t_addr addr, const char *sep)
 {
   char *buf;
@@ -1041,7 +1041,7 @@ cl_uc::disass(t_addr addr, const char *sep)
 void
 cl_uc::print_disass(t_addr addr, class cl_console_base *con)
 {
-  char *dis;
+  const char *dis;
   class cl_brk *b;
   int i;
 
@@ -1073,7 +1073,7 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con)
       i++;
     }
   con->dd_printf(" %s\n", dis);
-  free(dis);
+  free((char *)dis);
 }
 
 void
@@ -1464,7 +1464,7 @@ void
 cl_uc::del_counter(char *nam)
 {
   int i;
-  
+
   if (!nam)
     return;
   for (i= 0; i < counters->count; i++)
@@ -1489,7 +1489,7 @@ t_mem
 cl_uc::fetch(void)
 {
   ulong code;
-  
+
   if (!rom)
     return(0);
 
@@ -1618,7 +1618,7 @@ void
 cl_uc::stack_read(class cl_stack_op *op)
 {
   class cl_stack_op *top= (class cl_stack_op *)(stack_ops->top());
-  
+
   if (op->get_op() & stack_write_operation)
     {
       class cl_error_stack_tracker_wrong_handle *e= new
@@ -1677,7 +1677,7 @@ cl_uc::stack_read(class cl_stack_op *op)
                          top?(top->get_pc()):0, top?(top->get_before()):0,
                          op->get_after());
     }
-  
+
   if (top)
     {
       int ta= top->get_after(), oa= op->get_after();
@@ -1694,7 +1694,7 @@ cl_uc::stack_read(class cl_stack_op *op)
           error(e);
         }
     }
-  
+
   delete op;
 }
 
@@ -1707,7 +1707,7 @@ class cl_fetch_brk *
 cl_uc::fbrk_at(t_addr addr)
 {
   int idx;
-  
+
   return((class cl_fetch_brk *)(fbrk->get_bp(addr, &idx)));
 }
 

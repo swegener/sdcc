@@ -335,8 +335,8 @@ disass - Disassemble an opcode.
     addr - address of opcode to disassemble/print.
     sep - optionally points to string(tab) to use as separator.
 |--------------------------------------------------------------------*/
-char *
-cl_xa::disass(t_addr addr, char *sep)
+const char *
+cl_xa::disass(t_addr addr, const char *sep)
 {
   char work[256], parm_str[40];
   char *buf, *p, *b;
@@ -423,15 +423,15 @@ cl_xa::disass(t_addr addr, char *sep)
     break;
     case DIRECT_REG :
       sprintf(parm_str, "%s,%s",
-              get_dir_name(((code & 0x7) << 8) | 
+              get_dir_name(((code & 0x7) << 8) |
                            get_mem(MEM_ROM_ID, addr+immed_offset)),
               reg_strs[((code >> 4) & 0xf)] );
       ++immed_offset;
     break;
     case REG_DIRECT :
       sprintf(parm_str, "%s,%s",
-              reg_strs[((code >> 4) & 0xf)], 
-              get_dir_name(((code & 0x7) << 8) | 
+              reg_strs[((code >> 4) & 0xf)],
+              get_dir_name(((code & 0x7) << 8) |
                            get_mem(MEM_ROM_ID, addr+immed_offset)));
       ++immed_offset;
     break;
@@ -511,14 +511,14 @@ cl_xa::disass(t_addr addr, char *sep)
     break;
     case DIRECT_DATA8 :
       sprintf(parm_str, "%s,#0x%02x",
-              get_dir_name(((code & 0x0070) << 4) | 
+              get_dir_name(((code & 0x0070) << 4) |
                            get_mem(MEM_ROM_ID, addr+immed_offset)),
               get_mem(MEM_ROM_ID, addr+immed_offset+1));
       immed_offset += 3;
     break;
     case DIRECT_DATA16 :
       sprintf(parm_str, "%s,#0x%04x",
-              get_dir_name(((code & 0x0070) << 4) | 
+              get_dir_name(((code & 0x0070) << 4) |
                            get_mem(MEM_ROM_ID, addr+immed_offset)),
               get_mem(MEM_ROM_ID, addr+immed_offset+2) +
               (get_mem(MEM_ROM_ID, addr+immed_offset+1)<<8));
@@ -530,11 +530,11 @@ cl_xa::disass(t_addr addr, char *sep)
       strcpy(parm_str, "");
     break;
     case CY_BIT :
-      sprintf(parm_str, "C,%s", 
+      sprintf(parm_str, "C,%s",
              get_bit_name(((code&0x0003)<<8) + get_mem(MEM_ROM_ID, addr+2)));
     break;
     case BIT_CY :
-      sprintf(parm_str, "%s,C", 
+      sprintf(parm_str, "%s,C",
               get_bit_name(((code&0x0003)<<8) + get_mem(MEM_ROM_ID, addr+2)));
     break;
     case REG_DATA4 :
@@ -563,7 +563,7 @@ cl_xa::disass(t_addr addr, char *sep)
     break;
     case DIRECT :
       sprintf(parm_str, "%s",
-              get_dir_name(((code & 0x007) << 4) + 
+              get_dir_name(((code & 0x007) << 4) +
                            get_mem(MEM_ROM_ID, addr+2)));
     break;
     case REG :
@@ -587,9 +587,9 @@ cl_xa::disass(t_addr addr, char *sep)
       sprintf(parm_str, "#0x%02x", code&0x0f);
       break;
     case ADDR24 :
-      sprintf(parm_str, "0x%06x", 
-             (get_mem(MEM_ROM_ID, addr+3)<<16) + 
-             (get_mem(MEM_ROM_ID, addr+1)<<8) + 
+      sprintf(parm_str, "0x%06x",
+             (get_mem(MEM_ROM_ID, addr+3)<<16) +
+             (get_mem(MEM_ROM_ID, addr+1)<<8) +
              get_mem(MEM_ROM_ID, addr+2));
       break;
     break;
@@ -671,7 +671,7 @@ cl_xa::disass(t_addr addr, char *sep)
     case REG_DIRECT_REL8 :
       sprintf(parm_str, "%s,%s,0x%02x",
               reg_strs[((code >> 4) & 0xf)],
-              get_dir_name(((code & 0x7) << 8) + 
+              get_dir_name(((code & 0x7) << 8) +
                            get_mem(MEM_ROM_ID, addr+immed_offset)),
               ((signed char) get_mem(MEM_ROM_ID, addr+immed_offset+1) * 2) & 0xfffe );
     break;
@@ -711,14 +711,14 @@ cl_xa::disass(t_addr addr, char *sep)
     break;
 
     case REG_REGOFF8 :
-      sprintf(parm_str, "%s,%s+0x%02x", 
+      sprintf(parm_str, "%s,%s+0x%02x",
               w_reg_strs[(code >> 4) & 0x7],
               w_reg_strs[code & 0x7],
               get_mem(MEM_ROM_ID, addr+immed_offset));
       break;
 
     case REG_REGOFF16 :
-      sprintf(parm_str, "%s,%s+0x%02x", 
+      sprintf(parm_str, "%s,%s+0x%02x",
               w_reg_strs[(code >> 4) & 0x7],
               w_reg_strs[code & 0x7],
               get_mem(MEM_ROM_ID, addr+immed_offset+1) +

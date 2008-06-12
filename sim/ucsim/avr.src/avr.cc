@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (avr.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -168,8 +168,8 @@ cl_avr::bit_tbl(void)
   return(0);
 }
 
-char *
-cl_avr::disass(t_addr addr, char *sep)
+const char *
+cl_avr::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
   const char *b;
@@ -178,7 +178,7 @@ cl_avr::disass(t_addr addr, char *sep)
   int i;
 
   p= work;
-  
+
   code= get_mem(MEM_ROM_ID, addr);
   i= 0;
   while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
@@ -646,7 +646,7 @@ cl_avr::push_data(t_mem data)
 {
   t_addr sp;
   t_mem spl, sph;
-  
+
   spl= ram->read(SPL);
   sph= ram->read(SPH);
   sp= 0xffff & (256*sph + spl);
@@ -664,7 +664,7 @@ cl_avr::push_addr(t_addr addr)
 {
   t_addr sp;
   t_mem spl, sph, al, ah;
-  
+
   spl= ram->read(SPL);
   sph= ram->read(SPH);
   sp= 0xffff & (256*sph + spl);
@@ -718,7 +718,7 @@ cl_avr::pop_addr(t_addr *addr)
   sph= (sp>>8) & 0xff;
   ram->write(SPL, spl);
   ram->write(SPH, sph);
-  
+
   return(resGO);
 }
 

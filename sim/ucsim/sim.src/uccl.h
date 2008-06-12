@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (sim.src/uccl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -55,7 +55,7 @@ public:
 
   cl_ticker(int adir, int in_isr, const char *aname);
   virtual ~cl_ticker(void);
-  
+
   virtual int tick(int nr);
   virtual double get_rtime(double xtal);
   virtual void dump(int nr, double xtal, class cl_console_base *con);
@@ -98,7 +98,7 @@ public:
   class cl_sim *sim;
   //class cl_list *mems;
   class cl_hws *hws;
-  
+
   class cl_list *memchips;      // v3
   class cl_address_space_list *address_spaces;
   class cl_address_space *rom;  // Required for almost every uc
@@ -197,7 +197,7 @@ public:
   virtual void check_events(void);
 
   // disassembling and symbol recognition
-  virtual char *disass(t_addr addr, const char *sep);
+  virtual const char *disass(t_addr addr, const char *sep);
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
@@ -221,7 +221,7 @@ public:
   virtual t_addr bit_address(class cl_memory *mem,
                              t_addr mem_address,
                              int bit_number) { return(-1); }
-  
+
   // messages from app to handle and broadcast
   virtual bool handle_event(class cl_event &event);
   //virtual void mem_cell_changed(class cl_address_space *mem, t_addr addr);
@@ -230,7 +230,7 @@ public:
   // Error handling
   virtual void error(class cl_error *error);
   virtual void check_errors(void);
-  
+
   /* Following fields and virtual methods defined in uc51 I don't have
      energy to redesign them:-( */
 public:

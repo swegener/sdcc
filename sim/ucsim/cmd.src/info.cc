@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (cmd.src/info.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // sim.src
 #include "simcl.h"
- 
+
 // local
 #include "infocl.h"
 
@@ -45,18 +45,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
-  char *s;
 
   con->dd_printf("Num Type       Disp Hit   Cnt   Address  What\n");
   for (i= 0; i < uc->fbrk->count; i++)
     {
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
-      s= uc->disass(fb->addr, NULL);
+      const char *s= uc->disass(fb->addr, NULL);
       con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
                      fb->hit, fb->cnt,
                      fb->addr, s);
-      free(s);
+      free((char *)s);
     }
   for (i= 0; i < uc->ebrk->count; i++)
     {

@@ -33,7 +33,7 @@
 void adc_setchannel(unsigned char channel) __naked
 {
 #if 0
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
   ADCON0 &= ~(0xf << 2);
   ADCON0 |= channel << 2;
 #else /* all other devices */
@@ -44,7 +44,7 @@ void adc_setchannel(unsigned char channel) __naked
   (void)channel;
 
   __asm
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
     movlw       0xc3
 #else /* all other devices */
     movlw       0xc7
@@ -53,7 +53,7 @@ void adc_setchannel(unsigned char channel) __naked
     
     movlw       0x01
     movf        _PLUSW1, w
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
 #else /* all other devices */
     rlcf        _WREG, w
 #endif

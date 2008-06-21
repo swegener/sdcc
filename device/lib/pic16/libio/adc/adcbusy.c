@@ -10,7 +10,7 @@ char adc_busy(void) __naked
 #else
   __asm
     movlw       0x00
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
     btfsc       _ADCON0bits, 0
 #else /* all other devices */
     btfsc       _ADCON0bits, 2

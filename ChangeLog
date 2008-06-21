@@ -1,3 +1,35 @@
+2008-06-21 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f66j60.h,
+	* device/include/pic16/pic18f66j65.h,
+	* device/include/pic16/pic18f67j60.h,
+	* device/include/pic16/pic18f86j60.h,
+	* device/include/pic16/pic18f86j65.h,
+	* device/include/pic16/pic18f87j60.h,
+	* device/include/pic16/pic18f96j60.h,
+	* device/include/pic16/pic18f96j65.h,
+	* device/include/pic16/pic18f97j60.h,
+	* device/lib/pic16/libdev/pic18f66j60.c,
+	* device/lib/pic16/libdev/pic18f66j65.c,
+	* device/lib/pic16/libdev/pic18f67j60.c,
+	* device/lib/pic16/libdev/pic18f86j60.c,
+	* device/lib/pic16/libdev/pic18f86j65.c,
+	* device/lib/pic16/libdev/pic18f87j60.c,
+	* device/lib/pic16/libdev/pic18f96j60.c,
+	* device/lib/pic16/libdev/pic18f96j65.c,
+	* device/lib/pic16/libdev/pic18f97j60.c,
+	* device/include/pic16/pic16devices.txt,
+	* device/include/pic16/pic18fregs.h,
+	* device/lib/pic16/pics.all: added new devices
+
+	* device/include/pic16/adc.h,
+	* device/lib/pic16/libio/adc/adcbusy.c,
+	* device/lib/pic16/libio/adc/adcopen.c,
+	* device/lib/pic16/libio/adc/adcsetch.c,
+	* device/lib/pic16/libio/i2c/i2copen.c,
+	* device/lib/pic16/libio/usart/uopen.c: adapted to new devices,
+	  all changes from a patch by Anton Strobl
+
 2008-06-12 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/info.cc, sim/ucsim/cmd.src/bp.cc,

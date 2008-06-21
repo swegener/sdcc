@@ -72,6 +72,13 @@
 
 #define __SDCC_ADC_STYLE2455    1
 
+// 97j60 family
+#elif  defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
+    || defined(pic18f86j60) || defined(pic18f86j65) || defined(pic18f87j60) \
+    || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60) \
+
+#define __SDCC_ADC_STYLE97J60   1
+
 // small ADC device?
 #elif  defined(pic18f242) || defined(pic18f252) || defined(pic18f442) || defined(pic18f452) \
     || defined(pic18f248) || defined(pic18f258) || defined(pic18f448) || defined(pic18f458)
@@ -86,8 +93,7 @@
 
 
 /* channel selection */
-#if defined(__SDCC_ADC_STYLE2455)
-
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
 #define ADC_CHN_0               0x00
 #define ADC_CHN_1               0x01
 #define ADC_CHN_2               0x02
@@ -101,6 +107,11 @@
 #define ADC_CHN_10              0x0a
 #define ADC_CHN_11              0x0b
 #define ADC_CHN_12              0x0c
+#if defined(__SDCC_ADC_STYLE97J60) // 97j60 family has 2 more ADC ports
+#define ADC_CHN_13              0x0d
+#define ADC_CHN_14              0x0e
+#define ADC_CHN_15              0x0f
+#endif
 
 #else   /* all other devices */
 
@@ -116,11 +127,27 @@
 
 
 /* reference and pin configuration */
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
 
+// 97j60 family has 2 more possible ADC configs
+#if defined(__SDCC_ADC_STYLE97J60) // 97j60 family has 2 more ADC ports
+#define ADC_CFG_16A_0R  0x00
+#define ADC_CFG_16A_1R  0x10
+#define ADC_CFG_16A_2R  0x30
+#define ADC_CFG_15A_0R  0x00	// can switch only from 14 analog ports to 16 enabled analog ports
+#define ADC_CFG_15A_1R  0x10
+#define ADC_CFG_15A_2R  0x30
+#define ADC_CFG_14A_0R  0x01
+#define ADC_CFG_14A_1R  0x11
+#define ADC_CFG_14A_2R  0x31
+#define ADC_CFG_13A_0R  0x02
+#define ADC_CFG_13A_1R  0x12
+#define ADC_CFG_13A_2R  0x32
+#else
 #define ADC_CFG_13A_0R  0x01
 #define ADC_CFG_13A_1R  0x11
 #define ADC_CFG_13A_2R  0x31
+#endif
 #define ADC_CFG_12A_0R  0x03
 #define ADC_CFG_12A_1R  0x13
 #define ADC_CFG_12A_2R  0x33

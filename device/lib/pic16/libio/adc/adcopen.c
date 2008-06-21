@@ -43,14 +43,14 @@ void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, uns
   ADCON1 = 0;
 
   /* setup channel */
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
   ADCON0 |= (channel & 0x07) << 2;
 #else /* all other devices */
   ADCON0 |= (channel & 0x07) << 3;
 #endif
 
   /* setup fosc */
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
   ADCON2 |= (fosc & 0x03);
 #else /* all other devices */
   ADCON0 |= (fosc & 0x03) << 6;
@@ -58,13 +58,13 @@ void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, uns
 #endif
 
   /* setup reference and pins */
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
   ADCON1 |= pcfg & 0x3f;
 #else /* all other devices */
   ADCON1 |= pcfg & 0x0f;
 #endif
 
-#if defined(__SDCC_ADC_STYLE2455)
+#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
   ADCON2 |= (config & ADC_FRM_RJUST);
 #else /* all other devices */
   ADCON1 |= (config & ADC_FRM_RJUST);

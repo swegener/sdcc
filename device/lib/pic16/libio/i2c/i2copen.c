@@ -10,10 +10,13 @@ void i2c_open(unsigned char mode, unsigned char slew, unsigned char addr_brd)
   SSPCON2 = 0;
   SSPCON1 |= mode;
   SSPSTAT |= slew;
-  
-  
+
+
 #if defined(pic18f2455) || defined (pic18f2550) \
-    || defined(pic18f4455) || defined (pic18f4550)
+    || defined(pic18f4455) || defined (pic18f4550) \
+    || defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
+    || defined(pic18f86j60) || defined(pic18f86j65) || defined(pic18f87j60) \
+    || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60)
 
   TRISBbits.TRISB1 = 1;
   TRISBbits.TRISB0 = 1;

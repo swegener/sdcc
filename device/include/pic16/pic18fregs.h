@@ -189,8 +189,17 @@
 #elif defined(pic18f6680)
 #  include <pic18f6680.h>
 
+#elif defined(pic18f66j60)
+#  include <pic18f66j60.h>
+
+#elif defined(pic18f66j65)
+#  include <pic18f66j65.h>
+
 #elif defined(pic18f6720)
 #  include <pic18f6720.h>
+
+#elif defined(pic18f67j60)
+#  include <pic18f67j60.h>
 
 #elif defined(pic18f8520)
 #  include <pic18f8520.h>
@@ -204,8 +213,27 @@
 #elif defined(pic18f8680)
 #  include <pic18f8680.h>
 
+#elif defined(pic18f86j60)
+#  include <pic18f86j60.h>
+
+#elif defined(pic18f86j65)
+#  include <pic18f86j65.h>
+
 #elif defined(pic18f8720)
 #  include <pic18f8720.h>
+
+#elif defined(pic18f87j60)
+#  include <pic18f87j60.h>
+
+#elif defined(pic18f96j60)
+#  include <pic18f96j60.h>
+
+#elif defined(pic18f96j65)
+#  include <pic18f96j65.h>
+
+#elif defined(pic18f97j60)
+#  include <pic18f97j60.h>
+
 
 #else
 #  error Unsupported processor

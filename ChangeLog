@@ -1,3 +1,10 @@
+2008-07-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph.def,
+	* src/z80/peeph-z80.def,
+	* src/z80/peeph-gbz80.def: separate Z80 from GBZ80 peepholes in
+	  preparation for Z80 peephole improvements
+
 2008-06-21 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f66j60.h,

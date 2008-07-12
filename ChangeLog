@@ -1,4 +1,9 @@
 2008-07-12 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/mapping.i: Implemented RFE #1919415
+	* src/z80/peeph-z80.def: Implemented RFE #1919415, #1861376,
+          #1880202, #1914434, prepared for RFE #1703943.
+
+2008-07-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph.def,
 	* src/z80/peeph-z80.def,

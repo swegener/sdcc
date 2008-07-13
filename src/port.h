@@ -42,7 +42,7 @@
 typedef struct builtins
   {
     char *name;                         /* name of builtin function */
-    char *rtype;                        /* return type as string : see typefromStr */
+    char *rtype;                        /* return type as string : see typeFromStr */
     int  nParms;                        /* number of parms : max 8 */
     char *parm_types[MAX_BUILTIN_ARGS]; /* each parm type as string : see typeFromStr */
   } builtins;

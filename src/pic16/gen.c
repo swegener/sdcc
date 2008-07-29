@@ -9,6 +9,7 @@
              -  Vangelis Rokas <vrokas AT users.sourceforge.net> (2003-2006)
   Bug Fixes  -  Raphael Neider <rneider AT web.de> (2004,2005)
   Bug Fixes  -  Borut Razem <borut.razem AT siol.net> (2007)
+  Bug Fixes  -  Mauro Giachero <maurogiachero AT users.sourceforge.net> (2008)
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -6376,7 +6377,7 @@ static void genInline (iCode *ic)
 static void genRRC (iCode *ic)
 {
   operand *left , *result ;
-  int size, offset = 0, same;
+  int size, same;
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -6395,20 +6396,16 @@ static void genRRC (iCode *ic)
   DEBUGpic16_emitcode ("; ***","%s  %d size:%d same:%d",__FUNCTION__,__LINE__,size,same);
 
   /* get the lsb and put it into the carry */
-  pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),size-1));
-
-  offset = 0 ;
+  pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),0));
 
   while(size--) {
 
     if(same) {
-      pic16_emitpcode(POC_RRCF, pic16_popGet(AOP(left),offset));
+      pic16_emitpcode(POC_RRCF, pic16_popGet(AOP(left),size));
     } else {
-      pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),offset));
-      pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
+      pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),size));
+      pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),size));
     }
-
-    offset++;
   }
 
   pic16_freeAsmop(left,NULL,ic,TRUE);
@@ -7004,19 +7001,18 @@ static void shiftL2Left2Result (operand *left, int offl,
       }
       break;
     case 6:
-      pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),offl+MSB16));
-      pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),offr+MSB16));
-      pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(result),offl));
+      pic16_emitpcode(POC_RRNCFW, pic16_popGet(AOP(left),offl));
       pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),offr));
-
-      pic16_emitpcode(POC_RRCF,  pic16_popGet(AOP(result),offr+MSB16));
-      pic16_emitpcode(POC_RRCF,  pic16_popGet(AOP(result),offr));
-      pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(result),offr+MSB16));
-      pic16_emitpcode(POC_ANDLW,pic16_popGetLit(0xc0));
-      pic16_emitpcode(POC_XORFW,pic16_popGet(AOP(result),offr));
-      pic16_emitpcode(POC_XORWF,pic16_popGet(AOP(result),offr));
-      pic16_emitpcode(POC_XORFW,pic16_popGet(AOP(result),offr));
-      pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),offr+MSB16));
+      pic16_emitpcode(POC_RRNCF,  pic16_popGet(AOP(result),offr));
+      pic16_emitpcode(POC_RRNCFW, pic16_popGet(AOP(left),offl+MSB16));
+      pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),offr+MSB16));
+      pic16_emitpcode(POC_RRNCF,  pic16_popGet(AOP(result),offr+MSB16));
+      pic16_emitpcode(POC_MOVLW,  pic16_popGetLit(0xc0));
+      pic16_emitpcode(POC_ANDWF,  pic16_popGet(AOP(result),offr+MSB16));
+      pic16_emitpcode(POC_ANDFW,  pic16_popGet(AOP(result),offr));
+      pic16_emitpcode(POC_XORFW,  pic16_popGet(AOP(result),offr));
+      pic16_emitpcode(POC_IORWF,  pic16_popGet(AOP(result),offr+MSB16));
+      pic16_emitpcode(POC_XORWF,  pic16_popGet(AOP(result),offr));
       break;
     case 7:
       pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),offl+MSB16));
@@ -7265,7 +7261,7 @@ static void shiftLLong (operand *left, operand *result, int offr )
                         pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(left),i));
                 }
         } else {
-                pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),LSB+offr));
+                pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),LSB));
         }
 
     if (size > LSB+offr ){

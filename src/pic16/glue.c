@@ -68,7 +68,7 @@ extern void printPublics (FILE * afile);
 
 void  pic16_pCodeInitRegisters(void);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
-extern void pic16_pCodeConstString(char *name, char *value);
+extern void pic16_pCodeConstString(char *name, char *value, unsigned length);
 
 
 /*-----------------------------------------------------------------*/
@@ -1377,7 +1377,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 
 //              fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
 
-                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
+                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char, getSize(sym->type));
               } else {
                 fprintf (stderr, "%s:%u(%s): do not know how to intialize symbol %s\n", __FILE__, __LINE__, __FUNCTION__, sym->rname);
                 assert(0);
@@ -1425,7 +1425,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 
 //              fprintf(stderr, "%s:%d printing code string for %s\n", __FILE__, __LINE__, sym->rname);
 
-                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
+                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char, getSize(sym->type));
               } else {
                 assert(0);
               }

@@ -250,7 +250,7 @@ void pic16_dump_gsection(FILE *of, set *sections)
 
 /* forward declaration */
 void pic16_printIval(symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
-extern void pic16_pCodeConstString(char *name, char *value);
+extern void pic16_pCodeConstString(char *name, char *value, unsigned length);
 
 void pic16_dump_isection(FILE *of, set *section, int fix)
 {
@@ -290,7 +290,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
                                         && SPEC_CVAL (s->etype).v_char) {
 
 //                                      fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
-                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
+                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char, getSize(s->type));
                                 } else {
                                         assert(0);
                                 }
@@ -324,7 +324,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
                                         && SPEC_CVAL (s->etype).v_char) {
 
 //                                      fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
-                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
+                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char, getSize(s->type));
                                 } else {
                                         assert(0);
                                 }

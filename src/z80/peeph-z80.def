@@ -1267,7 +1267,27 @@ replace {
 	; peephole z13 removed unused ret.
 }
 
-// These two need two be here since the peephole optimizer continues to apply rules further down the file even for replace restart rules.
+// These four need two be here since the peephole optimizer continues to apply rules further down the file even for replace restart rules.
+replace restart {
+	jp	NC,%1
+	jp	%2
+%1:
+} by {
+	jp	C,%2
+	; peephole 5' removed jp by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	C,%1
+	jp	%2
+%1:
+} by {
+	jp	NC,%2
+	; peephole 5' removed jp by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
 replace restart {
 	jp	NZ,%1
 	jp	%2

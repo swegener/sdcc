@@ -24787,7 +24787,7 @@ status collapsed
 
 \end_inset
 
--optimize-goto Try to use (conditional) BRA instead of GOTO.
+-no-optimize-goto Do not use (conditional) BRA instead of GOTO.
 \end_layout
 
 \begin_layout Description

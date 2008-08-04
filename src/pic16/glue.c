@@ -1850,7 +1850,7 @@ pic16glue ()
     }
 
     /* turn GOTOs into BRAs -- added by RN 2004-11-16 */
-    if(pic16_options.opt_flags & OF_OPTIMIZE_GOTO) {
+    if(!(pic16_options.opt_flags & OF_NO_OPTIMIZE_GOTO)) {
       pic16_OptimizeJumps();
     }
 

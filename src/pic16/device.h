@@ -76,7 +76,7 @@ extern PIC16_device *pic16;
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
 
 #define OF_LR_SUPPORT		0x00000001
-#define OF_OPTIMIZE_GOTO	0x00000002
+#define OF_NO_OPTIMIZE_GOTO	0x00000002
 #define OF_OPTIMIZE_CMP		0x00000004
 #define OF_OPTIMIZE_DF		0x00000008
 

@@ -38,7 +38,7 @@ CFLAGS += -Wa,-q
 CFLAGS += --fommit-frame-pointer
 CFLAGS += --obanksel=9
 CFLAGS += --denable-peeps
-CFLAGS += --optimize-goto
+#CFLAGS += --no-optimize-goto
 CFLAGS += --optimize-cmp
 CFLAGS += --optimize-df
 

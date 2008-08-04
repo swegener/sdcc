@@ -503,9 +503,9 @@ _process_pragma(const char *s)
 
 #define OFMSG_LRSUPPORT "--flr-support"
 
-#define OPTIMIZE_GOTO   "--optimize-goto"
-#define OPTIMIZE_CMP    "--optimize-cmp"
-#define OPTIMIZE_DF     "--optimize-df"
+#define NO_OPTIMIZE_GOTO    "--no-optimize-goto"
+#define OPTIMIZE_CMP        "--optimize-cmp"
+#define OPTIMIZE_DF         "--optimize-df"
 
 char *alt_asm=NULL;
 char *alt_link=NULL;
@@ -528,7 +528,7 @@ OPTION pic16_optionsTable[]= {
     /* optimization options */
     { 0, OPT_BANKSEL,       &pic16_options.opt_banksel, "set banksel optimization level (default=0 no)", CLAT_INTEGER },
     { 0, "--denable-peeps", &pic16_enable_peeps, "explicit enable of peepholes"},
-    { 0, OPTIMIZE_GOTO,     NULL, "try to use (conditional) BRA instead of GOTO"},
+    { 0, NO_OPTIMIZE_GOTO,  NULL, "do NOT use (conditional) BRA instead of GOTO"},
     { 0, OPTIMIZE_CMP,      NULL, "try to optimize some compares"},
     { 0, OPTIMIZE_DF,       NULL, "thoroughly analyze data flow (memory and time intensive!)"},
 
@@ -606,8 +606,8 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
     }
 #endif
 
-    if (ISOPT(OPTIMIZE_GOTO)) {
-      pic16_options.opt_flags |= OF_OPTIMIZE_GOTO;
+    if (ISOPT(NO_OPTIMIZE_GOTO)) {
+      pic16_options.opt_flags |= OF_NO_OPTIMIZE_GOTO;
       return TRUE;
     }
 

@@ -1,6 +1,18 @@
+2008-08-04 Raphael Neider <rneider AT web.de>
+
+	* doc/sdccman.lyx,
+	* src/pic16/device.h,
+	* src/pic16/glue.c,
+	* src/pic16/main.c: enable --optimize-goto by default
+
+	* device/lib/pic16/Makefile.common.in: suppress removed option
+
+	* src/pic16/gen.c,
+	* src/pic16/genutils.c: avoid too long relative branches (#2031890)
+
 2008-07-30 Borut Razem <borut.razem AT siol.net>
 
-	* src\pic16\device.c, src\pic16\glue.c, src\pic16\pcode.c:
+	* src/pic16/device.c, src/pic16/glue.c, src/pic16/pcode.c:
 	  applied patch 22032433: PIC16: fix constant strings,
 	  thanks Mauro Giachero
 
@@ -18,7 +30,7 @@
 2008-07-12 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/mappings.i: Implemented RFE #1919415
 	* src/z80/peeph-z80.def: Implemented RFE #1919415, #1861376,
-          #1880202, #1914434, prepared for RFE #1703943
+	  #1880202, #1914434, prepared for RFE #1703943
 
 2008-07-12 Philipp Klaus Krause <pkk AT spth.de>
 

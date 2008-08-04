@@ -5471,7 +5471,7 @@ static void genAnd (iCode *ic, iCode *ifx)
                   if (nonnull)
                     {
                       pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet (AOP (left), offset, FALSE, FALSE), posbit - 1, 0, PO_GPR_REGISTER));
-                      pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.condition ? rIfx.lbl->key : tlbl->key));
+                      pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.condition ? rIfx.lbl->key : tlbl->key));
                     }
                   else
                     {
@@ -5496,7 +5496,7 @@ static void genAnd (iCode *ic, iCode *ifx)
                       if (rIfx.condition)
                         {
                           emitSKPZ;
-                          pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
+                          pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
                         }
                       else
                         {
@@ -5528,7 +5528,7 @@ static void genAnd (iCode *ic, iCode *ifx)
           if (ifx)
             {
               if (emitBra)
-                pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.lbl->key));
+                pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key));
               ifx->generated = 1;
             }
           pic16_emitpLabel (tlbl->key);
@@ -5812,7 +5812,7 @@ static void genOr (iCode *ic, iCode *ifx)
       if (lit)
         {
           if (rIfx.condition)
-            pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
+            pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
           ifx->generated = 1;
         }
       else
@@ -6092,7 +6092,7 @@ static void genXor (iCode *ic, iCode *ifx)
                 {
                   /* rIfx.lbl might be far away... */
                   emitSKPZ;
-                  pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
+                  pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key)); /* to false */
                 }
               else
                 {
@@ -6120,7 +6120,7 @@ static void genXor (iCode *ic, iCode *ifx)
         {
           if (ifx)
             {
-              pic16_emitpcode (POC_BRA, pic16_popGetLabel (rIfx.lbl->key));
+              pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key));
               ifx->generated = 1;
             }
           pic16_emitpLabel (tlbl->key);

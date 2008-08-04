@@ -607,7 +607,7 @@ int pic16_genCmp_special(operand *left, operand *right, operand *result,
                 tmplbl = newiTempLabel( NULL );
                 pic16_emitpcode(POC_TSTFSZ, pic16_popGet(AOP(left), 0));
                 pic16_emitpcode(POC_BRA, pic16_popGetLabel(tmplbl->key));
-                pic16_emitpcode(POC_BRA, pic16_popGetLabel(rIfx->lbl->key));
+                pic16_emitpcode(POC_GOTO, pic16_popGetLabel(rIfx->lbl->key));
                 pic16_emitpLabel(tmplbl->key);
 
                 ifx->generated = 1;

@@ -6,6 +6,7 @@
 	  support/cpp/libcpp/lex.c,  doc/sdccman.lyx:
 	  applied modified patsh 2038174: Add support for binary constants v2
 	  thanks Mauro Giachero
+	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.3
 
 2008-08-04 Raphael Neider <rneider AT web.de>
 

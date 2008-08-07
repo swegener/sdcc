@@ -1,3 +1,12 @@
+2008-08-07 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCval.c, src/SDCCmain.c, src/SDCC.lex,
+	  device/lib/pic/Makefile.rules, device/lib/ds390/Makefile.in,
+	  device/lib/ds400/Makefile.in, device/lib/hc08/Makefile.in,
+	  support/cpp/libcpp/lex.c,  doc/sdccman.lyx:
+	  applied modified patsh 2038174: Add support for binary constants v2
+	  thanks Mauro Giachero
+
 2008-08-04 Raphael Neider <rneider AT web.de>
 
 	* doc/sdccman.lyx,
@@ -1081,8 +1090,8 @@
 
 2007-11-12 Borut Razem <borut.razem AT siol.net>
 
-	* as\z80\asmain.c, as\z80\asm.h, as\z80\assym.c, as\z80\asdata.c,
-	  as\z80\asout.c, as\z80\aslist.c:
+	* as/z80/asmain.c, as/z80/asm.h, as/z80/assym.c, as/z80/asdata.c,
+	  as/z80/asout.c, as/z80/aslist.c:
 	  fixed bug #1817005 - as-z80 chokes on long labels
 
 2007-11-11 Maarten Brock <sourceforge.brock AT dse.nl>
@@ -5551,8 +5560,8 @@
 
 2006-04-18 Borut Razem <borut.razem AT siol.net>
 
-	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}\lib\pic\*.o,
-	  ${DEV_ROOT}\lib\src\pic\libdev\*.S, ${DEV_ROOT}\lib\src\pic\libdev\*.inc
+	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}/lib/pic/*.o,
+	  ${DEV_ROOT}/lib/src/pic/libdev/*.S, ${DEV_ROOT}/lib/src/pic/libdev/*.inc
 
 2006-04-17 Borut Razem <borut.razem AT siol.net>
 

@@ -698,9 +698,9 @@ constFixed16x16Val (const char *s)
 value *constVal (const char *s)
 {
   value *val;
-  bool hex = FALSE, octal = FALSE;
   char *p;
   double dval;
+  bool is_integral = 0;
 
   val = newValue ();            /* alloc space for value   */
 
@@ -710,27 +710,22 @@ value *constVal (const char *s)
   SPEC_NOUN (val->type) = V_CHAR;
   SPEC_USIGN (val->type) = 0;
 
+  errno = 0;
   if (s[0] == '0')
     {
-      if (s[1] == 'x' || s[1] == 'X')
-        hex = TRUE;
-      else if (isdigit(s[1]))
-        octal = TRUE;
-    }
-
-  errno = 0;
-  if (hex || octal)
-    {
-      dval = strtoul (s, &p, 0);
-      if (errno)
-        {
-          dval = 4294967295.0;
-          werror (W_INVALID_INT_CONST, s, dval);
-        }
+      if (s[1] == 'b' || s[1] == 'B')
+        dval = strtoul (s + 2, &p, 2);
+      else
+        dval = strtoul (s, &p, 0);
+      is_integral = 1;
     }
   else
+    dval = strtod (s, &p);
+
+  if (errno)
     {
-      dval = strtod(s, &p);
+      dval = 4294967295.0;
+      werror (W_INVALID_INT_CONST, s, dval);
     }
 
   /* Setup the flags first */
@@ -779,7 +774,7 @@ value *constVal (const char *s)
             }
           else if (dval > 0x7fff && !SPEC_USIGN (val->type))
             { /* check if we have to promote to long int */
-              if ((hex || octal) && /* hex or octal constants may be stored in unsigned type */
+              if (is_integral && /* integral (hex, octal and binary)  constants may be stored in unsigned type */
                 dval <= 0xffff)
                 {
                   SPEC_USIGN (val->type) = 1;

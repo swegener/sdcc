@@ -22,6 +22,7 @@
   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+B       [0-1]
 D       [0-9]
 L       [a-zA-Z_$]
 H       [a-fA-F0-9]
@@ -198,6 +199,15 @@ _?"_asm"         {
     }
   count();
   return(check_type());
+}
+0[bB]{B}+{IS}? {
+  if (!options.std_sdcc)
+    {
+      yyerror("binary (0b) constants are not allowed in ISO C");
+    }
+  count();
+  yylval.val = constVal(yytext);
+  return(CONSTANT);
 }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0[0-7]*{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }

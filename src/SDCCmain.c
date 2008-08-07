@@ -283,7 +283,7 @@ static const char *_baseValues[] = {
   NULL
 };
 
-static const char *_preCmd = "{cpp} -nostdinc -Wall -std=c99 {cppextraopts} \"{fullsrcfilename}\" \"{cppoutfilename}\"";
+static const char *_preCmd = "{cpp} -nostdinc -Wall {cppstd}{cppextraopts} \"{fullsrcfilename}\" \"{cppoutfilename}\"";
 
 PORT *port;
 
@@ -2254,6 +2254,20 @@ initValues (void)
       setMainValue ("linkdstfilename", "{stdlinkdstfilename}");
     }
 
+  /*
+   * Make sure the preprocessor is called with the "-std" option
+   * corresponding to the --std used to start sdcc
+   */
+  if (options.std_c99)
+    {
+      if (!options.std_sdcc)
+        setMainValue ("cppstd", "-std=c99 ");
+    }
+  else
+    {
+      if (!options.std_sdcc)
+        setMainValue ("cppstd", "-std=c89 ");
+    }
 }
 
 static void doPrintSearchDirs(void)

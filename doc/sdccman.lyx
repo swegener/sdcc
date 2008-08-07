@@ -1158,6 +1158,14 @@ b = !b; /* toggles b */
 In previous versions, both forms would have toggled the bit.
 \end_layout
 
+\begin_layout Itemize
+in older versions, the preprocessor was always called with -std=c99 regardless
+ of the --std-xxx setting.
+ This is no longer true, and can cause compilation failures on code built
+ with --std-c89 but using c99 preprocessor features, such as one-line (//)
+ comments
+\end_layout
+
 \begin_layout Standard
 
 \emph on
@@ -8028,6 +8036,7 @@ linkOption[,linkOption]
 
 \end_inset
 
+
 \begin_inset LatexCommand \label{lyx:-Wl option}
 
 \end_inset
@@ -10834,6 +10843,7 @@ status collapsed
 
 \end_inset
 
+
 \begin_inset LatexCommand \label{lyx:-codeseg}
 
 \end_inset
@@ -13209,6 +13219,31 @@ The xdata storage class declares a variable that can reside anywhere in
  memory.
  This is the default if no storage class is specified.
  
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Other SDCC language extensions
+\begin_inset LatexCommand \index{Other SDCC language extensions}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Binary constants
+\end_layout
+
+\begin_layout Standard
+SDCC supports the use of binary constants, such as 0b01100010.
+ This feature is only enabled when the compiler is invoked using --std-sdccxx.
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace bigskip
 \end_inset
 

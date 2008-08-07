@@ -622,7 +622,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
 #define get_effective_char(pfile) (*pfile->buffer->cur++)
 #define BACKUP() (--pfile->buffer->cur)
 
-  enum num_type_e { NT_DEC, NT_HEX } num_type = NT_DEC;
+  enum num_type_e { NT_DEC, NT_HEX, NT_BIN } num_type = NT_DEC;
   enum num_part_e { NP_WHOLE, NP_FRACT, NP_EXP, NP_INT_SUFFIX, NP_FLOAT_SUFFIX } num_part = NP_WHOLE;
 
   uchar c = *(pfile->buffer->cur - 1);
@@ -636,7 +636,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
       num_part = NP_FRACT;
       ++len;
       obstack_1grow (stack, '.');
-      c = get_effective_char(pfile);
+      c = get_effective_char (pfile);
     }
   else
     {
@@ -645,7 +645,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
           has_whole = 1;
           ++len;
           obstack_1grow (stack, c);
-          c = get_effective_char(pfile);
+          c = get_effective_char (pfile);
 
           switch (c)
             {
@@ -654,14 +654,25 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
               num_type = NT_HEX;
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
+              break;
+
+            case 'B':
+            case 'b':
+              if (!CPP_OPTION (pfile, std))
+                {
+                  num_type = NT_BIN;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char (pfile);
+                }
               break;
 
             case '.':
               num_part = NP_FRACT;
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
               break;
             }
         }
@@ -679,7 +690,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                   has_whole = 1;
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                 }
 
               if ('.' == c)
@@ -687,7 +698,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                   num_part = NP_FRACT;
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                   continue;
                 }
               else if ('E' == c || 'e' == c)
@@ -697,21 +708,21 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                     num_part = NP_EXP;
                     ++len;
                     obstack_1grow (stack, c);
-                    c = get_effective_char(pfile);
+                    c = get_effective_char (pfile);
                     continue;
                   }
                   else
                     break;
                 }
             }
-          else
+          else if (NT_HEX == num_type)
             {
               while (ISXDIGIT (c))
                 {
                   has_whole = 1;
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                 }
 
               if ('.' == c)
@@ -719,7 +730,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                   num_part = NP_FRACT;
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                   continue;
                 }
               else if ('P' == c || 'p' == c)
@@ -729,7 +740,39 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                       num_part = NP_EXP;
                       ++len;
                       obstack_1grow (stack, c);
-                      c = get_effective_char(pfile);
+                      c = get_effective_char (pfile);
+                      continue;
+                    }
+                  else
+                    break;
+                }
+            }
+          else /* (NT_BIN == num_type) */
+            {
+              while ((c=='0') || (c=='1'))
+                {
+                  has_whole = 1;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char (pfile);
+                }
+
+              if ('.' == c)
+                {
+                  num_part = NP_FRACT;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char (pfile);
+                  continue;
+                }
+              else if ('P' == c || 'p' == c)
+                {
+                  if (has_whole || has_fract)
+                    {
+                      num_part = NP_EXP;
+                      ++len;
+                      obstack_1grow (stack, c);
+                      c = get_effective_char (pfile);
                       continue;
                     }
                   else
@@ -747,7 +790,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                   has_fract = 1;
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                 }
 
               if ('E' == c || 'e' == c)
@@ -757,7 +800,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                       num_part = NP_EXP;
                       ++len;
                       obstack_1grow (stack, c);
-                      c = get_effective_char(pfile);
+                      c = get_effective_char (pfile);
                       continue;
                     }
                 }
@@ -769,7 +812,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                   has_fract = 1;
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                 }
 
               if ('P' == c || 'p' == c)
@@ -779,7 +822,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
                       num_part = NP_EXP;
                       ++len;
                       obstack_1grow (stack, c);
-                      c = get_effective_char(pfile);
+                      c = get_effective_char (pfile);
                       continue;
                     }
                 }
@@ -792,14 +835,14 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
             {
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
             }
 
           while (ISDIGIT (c))
             {
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
             }
 
           num_part = NP_FLOAT_SUFFIX;
@@ -812,20 +855,20 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
 
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
 
               if (c == prevc)
                 {
                   ++len;
                   obstack_1grow (stack, c);
-                  c = get_effective_char(pfile);
+                  c = get_effective_char (pfile);
                 }
             }
           else if ('U' == c || 'u' == c)
             {
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
             }
           break;
 
@@ -834,13 +877,13 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
             {
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
             }
           else if ('L' == c || 'l' == c)
             {
               ++len;
               obstack_1grow (stack, c);
-              c = get_effective_char(pfile);
+              c = get_effective_char (pfile);
             }
           break;
         }
@@ -1303,7 +1346,7 @@ _cpp_lex_direct (cpp_reader *pfile)
       {
         struct normalize_state nst = INITIAL_NORMALIZE_STATE;
         result->type = CPP_NUMBER;
-        if (CPP_OPTION(pfile, pedantic_parse_number))
+        if (CPP_OPTION (pfile, pedantic_parse_number))
           pedantic_lex_number (pfile, &result->val.str);
         else
           lex_number (pfile, &result->val.str, &nst);
@@ -1341,7 +1384,7 @@ _cpp_lex_direct (cpp_reader *pfile)
 
       /* SDCC _asm specific */
       /* handle _asm ... _endasm ;  */
-      if (CPP_OPTION(pfile, preproc_asm) == 0 && result->val.node == pfile->spec_nodes.n__asm)
+      if (CPP_OPTION (pfile, preproc_asm) == 0 && result->val.node == pfile->spec_nodes.n__asm)
         {
           comment_start = buffer->cur;
           result->type = CPP_ASM;
@@ -1484,7 +1527,7 @@ _cpp_lex_direct (cpp_reader *pfile)
         {
           struct normalize_state nst = INITIAL_NORMALIZE_STATE;
           result->type = CPP_NUMBER;
-          if (CPP_OPTION(pfile, pedantic_parse_number))
+          if (CPP_OPTION (pfile, pedantic_parse_number))
             pedantic_lex_number (pfile, &result->val.str);
           else
             lex_number (pfile, &result->val.str, &nst);

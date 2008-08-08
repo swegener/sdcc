@@ -1,5 +1,9 @@
 2008-08-08 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/genarith.c (genAddLit): fix structure access (#1888004)
+
+2008-08-08 Raphael Neider <rneider AT web.de>
+
 	* src/pic/pcoderegs.c,
 	* src/pic/pcode.c,
 	* src/pic16/pcode.c: replace own SAFE_snprintf with common SNPRINTF

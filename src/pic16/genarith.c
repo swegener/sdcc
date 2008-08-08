@@ -424,18 +424,29 @@ static void genAddLit (iCode *ic, int lit)
 {
 
   int size,same;
-  int lo;
+  int lo, offset;
 
   operand *result;
   operand *left;
 
-    FENTRY;
-
+  FENTRY;
 
   left = IC_LEFT(ic);
   result = IC_RESULT(ic);
   same = pic16_sameRegs(AOP(left), AOP(result));
   size = pic16_getDataSize(result);
+
+  if ((AOP_PCODE == AOP_TYPE(left))
+          && (PO_IMMEDIATE == AOP(left)->aopu.pcop->type))
+  {
+      /* see #1888004 for an example case for this */
+      for (offset = 0; offset < size; offset++) {
+          pic16_emitpcode(POC_MOVLW, pic16_newpCodeOpImmd(AOP(left)->aopu.pcop->name,
+                  offset, PCOI(AOP(left)->aopu.pcop)->index + lit, 0));
+          pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset));
+      } // for
+      return;
+  } // if
 
   if(same) {
 

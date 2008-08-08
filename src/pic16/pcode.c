@@ -156,7 +156,6 @@ extern void pic16_RemoveUnusedRegisters(void);
 extern void pic16_RegsUnMapLiveRanges(void);
 extern void pic16_BuildFlowTree(pBlock *pb);
 extern void pic16_pCodeRegOptimizeRegUsage(int level);
-extern void SAFE_snprintf(char **str, size_t *size, const char *format, ...);
 extern int mnem2key(unsigned char const *mnem);
 
 /****************************************************************/
@@ -2882,76 +2881,6 @@ pCodeInstruction pic16_pciBANKSEL = {
 #define MAX_PIC16MNEMONICS 100
 pCodeInstruction *pic16Mnemonics[MAX_PIC16MNEMONICS];
 
-//#define USE_VSNPRINTF
-#if OPT_DISABLE_PIC
-
-#ifdef USE_VSNPRINTF
-  // Alas, vsnprintf is not ANSI standard, and does not exist
-  // on Solaris (and probably other non-Gnu flavored Unixes).
-
-/*-----------------------------------------------------------------*/
-/* SAFE_snprintf - like snprintf except the string pointer is      */
-/*                 after the string has been printed to. This is   */
-/*                 useful for printing to string as though if it   */
-/*                 were a stream.                                  */
-/*-----------------------------------------------------------------*/
-void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
-{
-  va_list val;
-  int len;
-
-  if(!str || !*str)
-    return;
-
-  va_start(val, format);
-
-  vsnprintf(*str, *size, format, val);
-
-  va_end (val);
-
-  len = strlen(*str);
-  if(len > *size) {
-    fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
-    fprintf(stderr,"len = %d is > str size %d\n",len,*size);
-  }
-
-  *str += len;
-  *size -= len;
-
-}
-
-#else
-// This version is *not* safe, despite the name.
-
-void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
-{
-  va_list val;
-  int len;
-  static char buffer[1024]; /* grossly conservative, but still not inherently safe */
-
-  if(!str || !*str)
-    return;
-
-  va_start(val, format);
-
-  vsprintf(buffer, format, val);
-  va_end (val);
-
-  len = strlen(buffer);
-  if(len > *size) {
-    fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
-    fprintf(stderr,"len = %d is > str size %d\n",len, (int) *size);
-  }
-
-  strcpy(*str, buffer);
-  *str += len;
-  *size -= len;
-
-}
-
-#endif    //  USE_VSNPRINTF
-#endif
-
 extern set *externs;
 extern regs *pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 extern regs *pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias);
@@ -4798,108 +4727,114 @@ const char *immdmod[3]={"LOW", "HIGH", "UPPER"};
 
 char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
-  regs *r;
-  static char b[128];
-  char *s;
-  int use_buffer = 1;    // copy the string to the passed buffer pointer
+    regs *r;
+    static char b[128];
+    char *s;
+    int use_buffer = 1;    // copy the string to the passed buffer pointer
 
-        if(!buffer) {
-                buffer = b;
-                size = sizeof(b);
-                use_buffer = 0;     // Don't bother copying the string to the buffer.
-        }
+    if(!buffer) {
+        buffer = b;
+        size = sizeof(b);
+        use_buffer = 0;     // Don't bother copying the string to the buffer.
+    }
 
-        if(pcop) {
+    if(pcop) {
 
-                switch(pcop->type) {
-                        case PO_W:
-                        case PO_WREG:
-                        case PO_PRODL:
-                        case PO_PRODH:
-                        case PO_INDF0:
-                        case PO_FSR0:
-                                if(use_buffer) {
-                                        SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
-                                        return (buffer);
-                                }
-                                return (PCOR(pcop)->r->name);
-                                break;
-                        case PO_GPR_TEMP:
-                                r = pic16_regWithIdx(PCOR(pcop)->r->rIdx);
-                                if(use_buffer) {
-                                        SAFE_snprintf(&buffer,&size,"%s",r->name);
-                                        return (buffer);
-                                }
-                                return (r->name);
-
-                        case PO_IMMEDIATE:
-                                s = buffer;
-                                if(PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-                                        if(PCOI(pcop)->index) {
-                                                SAFE_snprintf(&s,&size, "%s(%s + %d)",
-                                                        immdmod[ PCOI(pcop)->offset ],
-                                                        pcop->name,
-                                                        PCOI(pcop)->index);
-                                        } else {
-                                                SAFE_snprintf(&s,&size,"%s(%s)",
-                                                        immdmod[ PCOI(pcop)->offset ],
-                                                        pcop->name);
-                                        }
-                                } else {
-                                        if(PCOI(pcop)->index) {
-                                                SAFE_snprintf(&s,&size, "%s(%s + %d)",
-                                                        immdmod[ 0 ],
-                                                        pcop->name,
-                                                        PCOI(pcop)->index);
-                                        } else {
-                                                SAFE_snprintf(&s,&size, "%s(%s)",
-                                                        immdmod[ 0 ],
-                                                        pcop->name);
-                                        }
-                                }
-                                return (buffer);
-
-                        case PO_GPR_REGISTER:
-                        case PO_DIR:
-                                s = buffer;
-//                              size = sizeof(buffer);
-                                if( PCOR(pcop)->instance) {
-                                        SAFE_snprintf(&s,&size,"(%s + %d)",
-                                                pcop->name,
-                                                PCOR(pcop)->instance );
-                                } else {
-                                        SAFE_snprintf(&s,&size,"%s",pcop->name);
-                                }
-                                return (buffer);
-                        case PO_GPR_BIT:
-                                s = buffer;
-                                if(PCORB(pcop)->subtype == PO_GPR_TEMP) {
-                                        SAFE_snprintf(&s, &size, "%s", pcop->name);
-                                } else {
-                                        if(PCORB(pcop)->pcor.instance)
-                                                SAFE_snprintf(&s, &size, "(%s + %d)", pcop->name, PCORB(pcop)->pcor.instance);
-                                        else
-                                                SAFE_snprintf(&s, &size, "%s", pcop->name);
-                                }
-
-                                return (buffer);
-                        case PO_TWO_OPS:
-                                return (pic16_get_op( PCOP2(pcop)->pcopL, use_buffer ? buffer : NULL, size ));
-
-                        default:
-                                if(pcop->name) {
-                                        if(use_buffer) {
-                                                SAFE_snprintf(&buffer,&size,"%s",pcop->name);
-                                                return (buffer);
-                                        }
-                                return (pcop->name);
-                                }
-
+        switch(pcop->type) {
+            case PO_W:
+            case PO_WREG:
+            case PO_PRODL:
+            case PO_PRODH:
+            case PO_INDF0:
+            case PO_FSR0:
+                if(use_buffer) {
+                    SNPRINTF(buffer,size,"%s",PCOR(pcop)->r->name);
+                    return (buffer);
                 }
-                return ("unhandled type for op1");
-        }
+                return (PCOR(pcop)->r->name);
+                break;
+            case PO_GPR_TEMP:
+                r = pic16_regWithIdx(PCOR(pcop)->r->rIdx);
+                if(use_buffer) {
+                    SNPRINTF(buffer,size,"%s",r->name);
+                    return (buffer);
+                }
+                return (r->name);
+                break;
 
-  return ("NO operand1");
+            case PO_IMMEDIATE:
+                s = buffer;
+                if(PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+                    if(PCOI(pcop)->index) {
+                        SNPRINTF(s,size, "%s(%s + %d)",
+                                immdmod[ PCOI(pcop)->offset ],
+                                pcop->name,
+                                PCOI(pcop)->index);
+                    } else {
+                        SNPRINTF(s,size,"%s(%s)",
+                                immdmod[ PCOI(pcop)->offset ],
+                                pcop->name);
+                    }
+                } else {
+                    if(PCOI(pcop)->index) {
+                        SNPRINTF(s,size, "%s(%s + %d)",
+                                immdmod[ 0 ],
+                                pcop->name,
+                                PCOI(pcop)->index);
+                    } else {
+                        SNPRINTF(s,size, "%s(%s)",
+                                immdmod[ 0 ],
+                                pcop->name);
+                    }
+                }
+                return (buffer);
+                break;
+
+            case PO_GPR_REGISTER:
+            case PO_DIR:
+                s = buffer;
+                //size = sizeof(buffer);
+                if( PCOR(pcop)->instance) {
+                    SNPRINTF(s,size,"(%s + %d)",
+                            pcop->name,
+                            PCOR(pcop)->instance );
+                } else {
+                    SNPRINTF(s,size,"%s",pcop->name);
+                }
+                return (buffer);
+                break;
+
+            case PO_GPR_BIT:
+                s = buffer;
+                if(PCORB(pcop)->subtype == PO_GPR_TEMP) {
+                    SNPRINTF(s, size, "%s", pcop->name);
+                } else {
+                    if(PCORB(pcop)->pcor.instance)
+                        SNPRINTF(s, size, "(%s + %d)", pcop->name, PCORB(pcop)->pcor.instance);
+                    else
+                        SNPRINTF(s, size, "%s", pcop->name);
+                }
+                return (buffer);
+                break;
+
+            case PO_TWO_OPS:
+                return (pic16_get_op( PCOP2(pcop)->pcopL, use_buffer ? buffer : NULL, size ));
+                break;
+
+            default:
+                if(pcop->name) {
+                    if(use_buffer) {
+                        SNPRINTF(buffer,size,"%s",pcop->name);
+                        return (buffer);
+                    }
+                    return (pcop->name);
+                }
+
+        }
+        return ("unhandled type for op1");
+    }
+
+    return ("NO operand1");
 }
 
 /*-----------------------------------------------------------------*/
@@ -4943,147 +4878,147 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 {
-  char *s = str;
-  regs *r;
+    char *s = str;
+    regs *r;
 
 #if 0
-        if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
-                fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (defaut: %x)\n",
-                        __FILE__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pci_magic, PCI_MAGIC);
-//              exit(EXIT_FAILURE);
-        }
+    if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
+        fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (defaut: %x)\n",
+                __FILE__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pci_magic, PCI_MAGIC);
+        //              exit(EXIT_FAILURE);
+    }
 #endif
 
-  switch(pc->type) {
+    switch(pc->type) {
 
-  case PC_OPCODE:
-    SAFE_snprintf(&s,&size, "\t%s\t", PCI(pc)->mnemonic);
+        case PC_OPCODE:
+            SNPRINTF(s, size, "\t%s\t", PCI(pc)->mnemonic);
+            size -= strlen(s);
+            s += strlen(s);
 
-    if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
+            if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
 
-        //if(PCI(pc)->is2MemOp)
-        if (PCI(pc)->pcop->type == PO_TWO_OPS)
-        {
-                /* split into two phases due to static buffer in pic16_get_op() */
-                SAFE_snprintf(&s,&size, "%s",
-                        pic16_get_op((PCI(pc)->pcop), NULL, 0));
-                SAFE_snprintf(&s, &size, ", %s",
-                        pic16_get_op2((PCI(pc)->pcop), NULL, 0));
-                break;
-        }
+                if (PCI(pc)->pcop->type == PO_TWO_OPS)
+                {
+                    /* split into two phases due to static buffer in pic16_get_op() */
+                    SNPRINTF(s, size, "%s",
+                            pic16_get_op((PCI(pc)->pcop), NULL, 0));
+                    size -= strlen(s);
+                    s += strlen(s);
+                    SNPRINTF(s, size, ", %s",
+                            pic16_get_op2((PCI(pc)->pcop), NULL, 0));
+                    break;
+                }
 
-        if(PCI(pc)->is2LitOp) {
-                SAFE_snprintf(&s,&size, "%s", PCOP(PCI(pc)->pcop)->name);
-                break;
-        }
+                if(PCI(pc)->is2LitOp) {
+                    SNPRINTF(s,size, "%s", PCOP(PCI(pc)->pcop)->name);
+                    break;
+                }
 
-      if(PCI(pc)->isBitInst) {
-        if(PCI(pc)->pcop->type != PO_GPR_BIT) {
-          if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
-            SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)",
-                          PCI(pc)->pcop->name ,
-                          PCI(pc)->pcop->name );
-          else
-            SAFE_snprintf(&s,&size,"%s,%d", pic16_get_op_from_instruction(PCI(pc)),
-//                        (((pCodeOpRegBit *)(PCI(pc)->pcop))->pcor.instance),
-                          (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit ));
+                if(PCI(pc)->isBitInst) {
+                    if(PCI(pc)->pcop->type != PO_GPR_BIT) {
+                        if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
+                            SNPRINTF(s,size,"(%s >> 3), (%s & 7)",
+                                    PCI(pc)->pcop->name ,
+                                    PCI(pc)->pcop->name );
+                        else
+                            SNPRINTF(s,size,"%s,%d", pic16_get_op_from_instruction(PCI(pc)),
+                                    (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit ));
 
-        } else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-          SAFE_snprintf(&s,&size,"%s, %d", pic16_get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
-        } else
-          SAFE_snprintf(&s,&size,"%s,0 ; ?bug", pic16_get_op_from_instruction(PCI(pc)));
-        //PCI(pc)->pcop->t.bit );
-      } else {
+                    } else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+                        SNPRINTF(s,size,"%s, %d", pic16_get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
+                    } else
+                        SNPRINTF(s,size,"%s,0 ; ?bug", pic16_get_op_from_instruction(PCI(pc)));
+                } else {
 
-        if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-          if( PCI(pc)->num_ops == 3)
-            SAFE_snprintf(&s,&size,"(%s >> 3),%c",pic16_get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
-          else
-            SAFE_snprintf(&s,&size,"(1 << (%s & 7))",pic16_get_op_from_instruction(PCI(pc)));
+                    if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+                        if( PCI(pc)->num_ops == 3)
+                            SNPRINTF(s,size,"(%s >> 3),%c",pic16_get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
+                        else
+                            SNPRINTF(s,size,"(1 << (%s & 7))",pic16_get_op_from_instruction(PCI(pc)));
+                    } else {
+                        SNPRINTF(s,size,"%s", pic16_get_op_from_instruction(PCI(pc)));
+                    }
+                }
 
-        }
-        else
-        {
-          SAFE_snprintf(&s,&size,"%s", pic16_get_op_from_instruction(PCI(pc)));
-        }
-      }
-        if( PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
-          if(PCI(pc)->num_ops == 3 && !PCI(pc)->isBitInst)
-            SAFE_snprintf(&s,&size,", %c", ( (PCI(pc)->isModReg) ? 'F':'W'));
+                if( PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
+                    size -= strlen(s);
+                    s += strlen(s);
+                    if(PCI(pc)->num_ops == 3 && !PCI(pc)->isBitInst) {
+                        SNPRINTF(s,size,", %c", ( (PCI(pc)->isModReg) ? 'F':'W'));
+                        size -= strlen(s);
+                        s += strlen(s);
+                    }
 
-          r = pic16_getRegFromInstruction(pc);
-//              fprintf(stderr, "%s:%d reg = %p\tname= %s, accessBank= %d\n",
-//                      __FUNCTION__, __LINE__, r, (r)?r->name:"<null>", (r)?isACCESS_BANK(r):-1);
+                    r = pic16_getRegFromInstruction(pc);
 
-          if(PCI(pc)->isAccess) {
-            static char *bank_spec[2][2] = {
-              { "", ", ACCESS" },  /* gpasm uses access bank by default */
-              { ", B", ", BANKED" }/* MPASM (should) use BANKED by default */
-            };
+                    if(PCI(pc)->isAccess) {
+                        static char *bank_spec[2][2] = {
+                            { "", ", ACCESS" },  /* gpasm uses access bank by default */
+                            { ", B", ", BANKED" }/* MPASM (should) use BANKED by default */
+                        };
 
-            SAFE_snprintf(&s,&size,"%s", bank_spec[(r && !isACCESS_BANK(r)) ? 1 : 0][pic16_mplab_comp ? 1 : 0]);
-          }
-        }
-//
+                        SNPRINTF(s,size,"%s", bank_spec[(r && !isACCESS_BANK(r)) ? 1 : 0][pic16_mplab_comp ? 1 : 0]);
+                    }
+                }
+            }
+            break;
 
+        case PC_COMMENT:
+            /* assuming that comment ends with a \n */
+            SNPRINTF(s,size,";%s", ((pCodeComment *)pc)->comment);
+            break;
+
+        case PC_INFO:
+            SNPRINTF(s,size,"; info ==>");
+            size -= strlen(s);
+            s += strlen(s);
+            switch( PCINF(pc)->type ) {
+                case INF_OPTIMIZATION:
+                    SNPRINTF(s,size, " [optimization] %s\n", OPT_TYPE_STR[ PCOO(PCINF(pc)->oper1)->type ]);
+                    break;
+                case INF_LOCALREGS:
+                    SNPRINTF(s,size, " [localregs] %s\n", LR_TYPE_STR[ PCOLR(PCINF(pc)->oper1)->type ]);
+                    break;
+            }; break;
+
+        case PC_INLINE:
+            /* assuming that inline code ends with a \n */
+            SNPRINTF(s,size,"%s", ((pCodeComment *)pc)->comment);
+            break;
+
+        case PC_LABEL:
+            SNPRINTF(s,size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
+            break;
+        case PC_FUNCTION:
+            SNPRINTF(s,size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
+            break;
+        case PC_WILD:
+            SNPRINTF(s,size,";\tWild opcode: id=%d\n",PCW(pc)->id);
+            break;
+        case PC_FLOW:
+            SNPRINTF(s,size,";\t--FLOW change\n");
+            break;
+        case PC_CSOURCE:
+            SNPRINTF(s,size,"%s\t.line\t%d; %s\t%s\n", ((pic16_mplab_comp || !options.debug)?";":""),
+                    PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
+            break;
+        case PC_ASMDIR:
+            if(PCAD(pc)->directive) {
+                SNPRINTF(s,size,"\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
+            } else
+                if(PCAD(pc)->arg) {
+                    /* special case to handle inline labels without a tab */
+                    SNPRINTF(s,size,"%s\n", PCAD(pc)->arg);
+                }
+            break;
+
+        case PC_BAD:
+            SNPRINTF(s,size,";A bad pCode is being used\n");
+            break;
     }
-    break;
 
-  case PC_COMMENT:
-    /* assuming that comment ends with a \n */
-    SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
-    break;
-
-  case PC_INFO:
-    SAFE_snprintf(&s,&size,"; info ==>");
-    switch( PCINF(pc)->type ) {
-      case INF_OPTIMIZATION:
-          SAFE_snprintf(&s,&size, " [optimization] %s\n", OPT_TYPE_STR[ PCOO(PCINF(pc)->oper1)->type ]);
-          break;
-      case INF_LOCALREGS:
-          SAFE_snprintf(&s,&size, " [localregs] %s\n", LR_TYPE_STR[ PCOLR(PCINF(pc)->oper1)->type ]);
-          break;
-    }; break;
-
-  case PC_INLINE:
-    /* assuming that inline code ends with a \n */
-    SAFE_snprintf(&s,&size,"%s", ((pCodeComment *)pc)->comment);
-    break;
-
-  case PC_LABEL:
-    SAFE_snprintf(&s,&size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
-    break;
-  case PC_FUNCTION:
-    SAFE_snprintf(&s,&size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
-    break;
-  case PC_WILD:
-    SAFE_snprintf(&s,&size,";\tWild opcode: id=%d\n",PCW(pc)->id);
-    break;
-  case PC_FLOW:
-    SAFE_snprintf(&s,&size,";\t--FLOW change\n");
-    break;
-  case PC_CSOURCE:
-//    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
-      SAFE_snprintf(&s,&size,"%s\t.line\t%d; %s\t%s\n", ((pic16_mplab_comp || !options.debug)?";":""),
-        PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
-    break;
-  case PC_ASMDIR:
-        if(PCAD(pc)->directive) {
-                SAFE_snprintf(&s,&size,"\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
-        } else
-        if(PCAD(pc)->arg) {
-                /* special case to handle inline labels without a tab */
-                SAFE_snprintf(&s,&size,"%s\n", PCAD(pc)->arg);
-        }
-        break;
-
-  case PC_BAD:
-    SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
-    break;
-  }
-
-  return str;
-
+    return str;
 }
 
 /*-----------------------------------------------------------------*/

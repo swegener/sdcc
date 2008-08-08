@@ -43,7 +43,6 @@ extern pBranch * pBranchAppend(pBranch *h, pBranch *n);
 void unlinkpCode(pCode *pc);
 extern int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip);
 char *pCode2str(char *str, int size, pCode *pc);
-void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...);
 //static int sameRegs (const regs *reg1, const regs *reg2);
 
 int total_registers_saved=0;
@@ -278,20 +277,21 @@ static void Remove1pcode(pCode *pc, regs *reg, int debug_code)
 	}
 	
 	
-	if(1){
-	/*
-	Debug stuff. Comment out the instruction we're about to delete.
-		*/
+	if(1) {
+                /*
+                 * Debug stuff. Comment out the instruction we're about to delete.
+                 */
 		
 		char buff1[256];
 		size_t size = 256;
 		
-		char *pbuff,**ppbuff;
-		pbuff = buff1;
-		ppbuff = &pbuff;
+		char *pbuff;
+		pbuff = &buff1[0];
 		
-		SAFE_snprintf(ppbuff,&size, ";%d", debug_code);
-		pCode2str(*ppbuff, size, pc);
+		SNPRINTF(pbuff, size, ";%d", debug_code);
+		size -= strlen(pbuff);
+		pbuff += strlen(pbuff);
+		pCode2str(pbuff, size, pc);
 		pCodeInsertBefore(pc, newpCodeCharP(buff1));
 		//fprintf(stderr,"removing instruction:\n%s\n",buff1);
 	}
@@ -1285,7 +1285,7 @@ static int pCodeRemove (pCode *pc, const char *comment)
 		int size = 512;
 		char *pbuff = &buffer[0];
 		
-		SAFE_snprintf (&pbuff, &size, "; %s:%u(%s): %s", __FILE__, __LINE__, __FUNCTION__, comment);
+		SNPRINTF (pbuff, size, "; %s:%u(%s): %s", __FILE__, __LINE__, __FUNCTION__, comment);
 		pCodeInsertAfter(pc->prev, newpCodeCharP (&buffer[0]));
 	} // if
 
@@ -1296,7 +1296,9 @@ static int pCodeRemove (pCode *pc, const char *comment)
 		int size = 512;
 		char *pbuff = &buffer[0];
 		
-		SAFE_snprintf (&pbuff, &size, "; %s:%u(%s): ", __FILE__, __LINE__, __FUNCTION__);
+		SNPRINTF (pbuff, size, "; %s:%u(%s): ", __FILE__, __LINE__, __FUNCTION__);
+		size -= strlen(pbuff);
+		pbuff += strlen(pbuff);
 		pCode2str (pbuff, size, pc);
 		pCodeInsertAfter(pc->prev, newpCodeCharP (&buffer[0]));
 	}
@@ -1453,7 +1455,7 @@ static void replace_PCI (pCodeInstruction *pc, pCodeInstruction *newpc, char *co
     char *pbuff = &buffer[0];
     int size=1024;
     pCode2str (&buffer2[0],1024,&pc->pc);
-    SAFE_snprintf (&pbuff,&size,"%s:%u(%s): removed pCode was %s\t", __FILE__, __LINE__, __FUNCTION__, &buffer2[0]);
+    SNPRINTF (pbuff,size,"%s:%u(%s): removed pCode was %s\t", __FILE__, __LINE__, __FUNCTION__, &buffer2[0]);
     pCodeInsertAfter (&pc->pc, newpCodeCharP (&buffer[0]));
   } // if
 

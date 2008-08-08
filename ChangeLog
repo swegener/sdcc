@@ -1,3 +1,9 @@
+2008-08-08 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcoderegs.c,
+	* src/pic/pcode.c,
+	* src/pic16/pcode.c: replace own SAFE_snprintf with common SNPRINTF
+
 2008-08-07 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCval.c, src/SDCCmain.c, src/SDCC.lex,

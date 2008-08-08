@@ -1261,74 +1261,6 @@ unsigned PCodeID(void) {
 	return pcodeId++;
 }
 
-#ifdef HAVE_VSNPRINTF
-// Alas, vsnprintf is not ANSI standard, and does not exist
-// on Solaris (and probably other non-Gnu flavored Unixes).
-
-/*-----------------------------------------------------------------*/
-/* SAFE_snprintf - like snprintf except the string pointer is      */
-/*                 after the string has been printed to. This is   */
-/*                 useful for printing to string as though if it   */
-/*                 were a stream.                                  */
-/*-----------------------------------------------------------------*/
-void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
-{
-	va_list val;
-	int len;
-	
-	if(!str || !*str)
-		return;
-	
-	va_start(val, format);
-	
-	vsnprintf(*str, *size, format, val);
-	
-	va_end (val);
-	
-	len = strlen(*str);
-	if((size_t)len > *size) {
-		fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
-		fprintf(stderr,"len = %d is > str size %d\n",len,(int)*size);
-	}
-	
-	*str += len;
-	*size -= len;
-	
-}
-
-#else  //  HAVE_VSNPRINTF
-
-// This version is *not* safe, despite the name.
-
-void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
-{
-	va_list val;
-	int len;
-	static char buffer[1024]; /* grossly conservative, but still not inherently safe */
-	
-	if(!str || !*str)
-		return;
-	
-	va_start(val, format);
-	
-	vsprintf(buffer, format, val);
-	va_end (val);
-	
-	len = strlen(buffer);
-	if(len > *size) {
-		fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
-		fprintf(stderr,"len = %d is > str size %d\n",len,*size);
-	}
-	
-	strcpy(*str, buffer);
-	*str += len;
-	*size -= len;
-	
-}
-
-#endif    //  HAVE_VSNPRINTF
-
-
 extern  void initStack(int base_address, int size, int shared);
 extern regs *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 extern regs *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
@@ -2995,10 +2927,9 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 		case PO_INDF:
 		case PO_FSR:
 			if(use_buffer) {
-				SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
+				SNPRINTF(buffer,size,"%s",PCOR(pcop)->r->name);
 				return buffer;
 			}
-			//return PCOR(pcop)->r->name;
 			return pcop->name;
 			break;
 		case PO_GPR_TEMP:
@@ -3008,12 +2939,12 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 				r = pic14_regWithIdx(PCOR(pcop)->r->rIdx);
 			
 			if(use_buffer) {
-				SAFE_snprintf(&buffer,&size,"%s",r->name);
+				SNPRINTF(buffer,size,"%s",r->name);
 				return buffer;
 			}
 			
 			return r->name;
-			
+			break;
 			
 		case PO_IMMEDIATE:
 			s = buffer;
@@ -3022,87 +2953,87 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 				if( PCOI(pcop)->offset >= 0 && PCOI(pcop)->offset<4) {
 					switch(PCOI(pcop)->offset) {
 					case 0:
-						SAFE_snprintf(&s,&size,"low (%s+%d)",pcop->name, PCOI(pcop)->index);
+						SNPRINTF(s,size,"low (%s+%d)",pcop->name, PCOI(pcop)->index);
 						break;
 					case 1:
-						SAFE_snprintf(&s,&size,"high (%s+%d)",pcop->name, PCOI(pcop)->index);
+						SNPRINTF(s,size,"high (%s+%d)",pcop->name, PCOI(pcop)->index);
 						break;
 					case 2:
-						SAFE_snprintf(&s,&size,"0x%02x",PCOI(pcop)->_const ? GPTRTAG_CODE : GPTRTAG_DATA);
+						SNPRINTF(s,size,"0x%02x",PCOI(pcop)->_const ? GPTRTAG_CODE : GPTRTAG_DATA);
 						break;
 					default:
 						fprintf (stderr, "PO_IMMEDIATE/_const/offset=%d\n", PCOI(pcop)->offset);
 						assert ( !"offset too large" );
-						SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
+						SNPRINTF(s,size,"(((%s+%d) >> %d)&0xff)",
 							pcop->name,
 							PCOI(pcop)->index,
 							8 * PCOI(pcop)->offset );
 					}
 				} else
-					SAFE_snprintf(&s,&size,"LOW (%s+%d)",pcop->name,PCOI(pcop)->index);
+					SNPRINTF(s,size,"LOW (%s+%d)",pcop->name,PCOI(pcop)->index);
 			} else {
 				if( !PCOI(pcop)->offset) { // && PCOI(pcc->pcop)->offset<4) 
-					SAFE_snprintf(&s,&size,"(%s + %d)",
+					SNPRINTF(s,size,"(%s + %d)",
 						pcop->name,
 						PCOI(pcop)->index);
 				} else {
 					switch(PCOI(pcop)->offset) {
 					case 0:
-						SAFE_snprintf(&s,&size,"(%s + %d)",pcop->name, PCOI(pcop)->index);
+						SNPRINTF(s,size,"(%s + %d)",pcop->name, PCOI(pcop)->index);
 						break;
 					case 1:
-						SAFE_snprintf(&s,&size,"high (%s + %d)",pcop->name, PCOI(pcop)->index);
+						SNPRINTF(s,size,"high (%s + %d)",pcop->name, PCOI(pcop)->index);
 						break;
 					case 2:
-						SAFE_snprintf(&s,&size,"0x%02x",PCOI(pcop)->_const ? GPTRTAG_CODE : GPTRTAG_DATA);
+						SNPRINTF(s,size,"0x%02x",PCOI(pcop)->_const ? GPTRTAG_CODE : GPTRTAG_DATA);
 						break;
 					default:
 						fprintf (stderr, "PO_IMMEDIATE/mutable/offset=%d\n", PCOI(pcop)->offset);
 						assert ( !"offset too large" );
-						SAFE_snprintf(&s,&size,"((%s + %d) >> %d)&0xff",pcop->name, PCOI(pcop)->index, 8*PCOI(pcop)->offset);
+						SNPRINTF(s,size,"((%s + %d) >> %d)&0xff",pcop->name, PCOI(pcop)->index, 8*PCOI(pcop)->offset);
 						break;
 					}
 				}
 			}
-			
 			return buffer;
+			break;
 			
 		case PO_DIR:
 			s = buffer;
-			//size = sizeof(buffer);
 			if( PCOR(pcop)->instance) {
-				SAFE_snprintf(&s,&size,"(%s + %d)",
+				SNPRINTF(s,size,"(%s + %d)",
 					pcop->name,
 					PCOR(pcop)->instance );
-				//fprintf(stderr,"PO_DIR %s\n",buffer);
 			} else
-				SAFE_snprintf(&s,&size,"%s",pcop->name);
+				SNPRINTF(s,size,"%s",pcop->name);
 			return buffer;
+			break;
 			
 		case PO_LABEL:
 			s = buffer;
 			if  (pcop->name) {
 				if(PCOLAB(pcop)->offset == 1)
-					SAFE_snprintf(&s,&size,"HIGH(%s)",pcop->name);
+					SNPRINTF(s,size,"HIGH(%s)",pcop->name);
 				else
-					SAFE_snprintf(&s,&size,"%s",pcop->name);
+					SNPRINTF(s,size,"%s",pcop->name);
 			}
 			return buffer;
+			break;
 
 		case PO_GPR_BIT:
 			if(PCOR(pcop)->r) {
 				if(use_buffer) {
-					SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
+					SNPRINTF(buffer,size,"%s",PCOR(pcop)->r->name);
 					return buffer;
 				}
 				return PCOR(pcop)->r->name;
 			}
-			
 			/* fall through to the default case */
+
 		default:
 			if(pcop->name) {
 				if(use_buffer) {
-					SAFE_snprintf(&buffer,&size,"%s",pcop->name);
+					SNPRINTF(buffer,size,"%s",pcop->name);
 					return buffer;
 				}
 				return pcop->name;
@@ -3142,86 +3073,86 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 char *pCode2str(char *str, size_t size, pCode *pc)
 {
-  char *s = str;
+    char *s = str;
 
-  switch(pc->type) {
+    switch(pc->type) {
 
-  case PC_OPCODE:
+        case PC_OPCODE:
 
-    SAFE_snprintf(&s,&size, "\t%s\t", PCI(pc)->mnemonic);
+            SNPRINTF(s,size, "\t%s\t", PCI(pc)->mnemonic);
+            size -= strlen(s);
+            s += strlen(s);
 
-    if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
+            if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
+                if(PCI(pc)->isBitInst) {
+                    if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+                        char *name = PCI(pc)->pcop->name;
+                        if (!name)
+                            name = PCOR(PCI(pc)->pcop)->r->name;
+                        if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
+                            SNPRINTF(s,size,"(%s >> 3), (%s & 7)", name, name);
+                        else
+                            SNPRINTF(s,size,"%s,%d", name, (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit)&7);
+                    } else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+                        SNPRINTF(s,size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
+                    } else
+                        SNPRINTF(s,size,"%s,0 ; ?bug", get_op_from_instruction(PCI(pc)));
+                } else {
+                    if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+                        if( PCI(pc)->num_ops == 2)
+                            SNPRINTF(s,size,"(%s >> 3),%c",get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
+                        else
+                            SNPRINTF(s,size,"(1 << (%s & 7))",get_op_from_instruction(PCI(pc)));
+                    } else {
+                        SNPRINTF(s,size,"%s",get_op_from_instruction(PCI(pc)));
+                        size -= strlen(s);
+                        s += strlen(s);
+                        if( PCI(pc)->num_ops == 2)
+                            SNPRINTF(s,size,",%c", ( (PCI(pc)->isModReg) ? 'F':'W'));
+                    }
+                }
+            }
+            break;
 
-      if(PCI(pc)->isBitInst) {
-        if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-          char *name = PCI(pc)->pcop->name;
-          if (!name)
-            name = PCOR(PCI(pc)->pcop)->r->name;
-          if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
-            SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)", name, name);
-          else
-            SAFE_snprintf(&s,&size,"%s,%d", name, 
-            (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit)&7);
-        } else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-          SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
-      } else
-          SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op_from_instruction(PCI(pc)));
-        //PCI(pc)->pcop->t.bit );
-      } else {
-        if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-          if( PCI(pc)->num_ops == 2)
-            SAFE_snprintf(&s,&size,"(%s >> 3),%c",get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
-          else
-            SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op_from_instruction(PCI(pc)));
-        } else {
-          SAFE_snprintf(&s,&size,"%s",get_op_from_instruction(PCI(pc)));
-          if( PCI(pc)->num_ops == 2)
-            SAFE_snprintf(&s,&size,",%c", ( (PCI(pc)->isModReg) ? 'F':'W'));
-        }
-      }
+        case PC_COMMENT:
+            /* assuming that comment ends with a \n */
+            SNPRINTF(s,size,";%s", ((pCodeComment *)pc)->comment);
+            break;
+
+        case PC_INLINE:
+            /* assuming that inline code ends with a \n */
+            SNPRINTF(s,size,"%s", ((pCodeComment *)pc)->comment);
+            break;
+
+        case PC_LABEL:
+            SNPRINTF(s,size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
+            break;
+        case PC_FUNCTION:
+            SNPRINTF(s,size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
+            break;
+        case PC_WILD:
+            SNPRINTF(s,size,";\tWild opcode: id=%d\n",PCW(pc)->id);
+            break;
+        case PC_FLOW:
+            SNPRINTF(s,size,";\t--FLOW change\n");
+            break;
+        case PC_CSOURCE:
+            SNPRINTF(s,size,"%s\t.line\t%d; \"%s\"\t%s\n",(options.debug?"":";"),PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
+            break;
+        case PC_ASMDIR:
+            if(PCAD(pc)->directive) {
+                SNPRINTF(s,size,"\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
+            } else if(PCAD(pc)->arg) {
+                /* special case to handle inline labels without a tab */
+                SNPRINTF(s,size,"%s\n", PCAD(pc)->arg);
+            }
+            break;
+
+        case PC_BAD:
+            SNPRINTF(s,size,";A bad pCode is being used\n");
     }
-    break;
 
-  case PC_COMMENT:
-    /* assuming that comment ends with a \n */
-    SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
-    break;
-
-  case PC_INLINE:
-    /* assuming that inline code ends with a \n */
-    SAFE_snprintf(&s,&size,"%s", ((pCodeComment *)pc)->comment);
-    break;
-
-  case PC_LABEL:
-    SAFE_snprintf(&s,&size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
-    break;
-  case PC_FUNCTION:
-    SAFE_snprintf(&s,&size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
-    break;
-  case PC_WILD:
-    SAFE_snprintf(&s,&size,";\tWild opcode: id=%d\n",PCW(pc)->id);
-    break;
-  case PC_FLOW:
-    SAFE_snprintf(&s,&size,";\t--FLOW change\n");
-    break;
-  case PC_CSOURCE:
-//    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
-    SAFE_snprintf(&s,&size,"%s\t.line\t%d; \"%s\"\t%s\n",(options.debug?"":";"),PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
-    break;
-  case PC_ASMDIR:
-    if(PCAD(pc)->directive) {
-      SAFE_snprintf(&s,&size,"\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
-    } else if(PCAD(pc)->arg) {
-      /* special case to handle inline labels without a tab */
-      SAFE_snprintf(&s,&size,"%s\n", PCAD(pc)->arg);
-    }
-    break;
-
-  case PC_BAD:
-    SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
-  }
-
-  return str;
+    return str;
 }
 
 /*-----------------------------------------------------------------*/

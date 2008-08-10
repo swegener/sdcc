@@ -5342,7 +5342,7 @@ static unsigned register_reassign(pBlock *pb, unsigned idx, unsigned level)
 void ReuseReg(void)
 {
 	pBlock  *pb;
-	if (!the_pFile) return;
+	if (options.noOverlay || !the_pFile) return;
 	InitReuseReg();
 	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 		/* Non static functions can be called from other modules so their registers must reassign */

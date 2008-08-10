@@ -1,3 +1,8 @@
+2008-08-10 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (ReuseReg): do not overlay the registers used for
+	  local variables if --no-overlay is given, workaround for #2023121
+
 2008-08-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/genarith.c (genAddLit): fix structure access (#1888004)
@@ -14,7 +19,7 @@
 	  device/lib/pic/Makefile.rules, device/lib/ds390/Makefile.in,
 	  device/lib/ds400/Makefile.in, device/lib/hc08/Makefile.in,
 	  support/cpp/libcpp/lex.c,  doc/sdccman.lyx:
-	  applied modified patsh 2038174: Add support for binary constants v2
+	  applied modified patch 2038174: Add support for binary constants v2
 	  thanks Mauro Giachero
 	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.3
 

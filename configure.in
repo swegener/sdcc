@@ -23,6 +23,7 @@ VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
 VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
 
 AC_MSG_RESULT(${VERSION})
+AC_SUBST(PACKAGE, [sdcc])
 AC_SUBST(VERSION)
 AC_SUBST(VERSIONHI)
 AC_SUBST(VERSIONLO)
@@ -56,7 +57,7 @@ AC_CHECK_PROGS(LEX, flex lex, :)
 dnl Don't use AC_PROG_YACC
 AC_CHECK_PROGS(YACC, 'bison -y' byacc yacc, :)
 
-AC_DEFUN(SDCC_REQUIRE_PROG,
+AC_DEFUN([SDCC_REQUIRE_PROG],
 [if test "$1" = ":"; then
   AC_MSG_ERROR([Cannot find required program $2.])
  fi
@@ -81,7 +82,7 @@ AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 # supports option specified as the 2nd parameter
 # For example: DD_CPORT(CXX, fPIC)
 
-AC_DEFUN(adl_DD_COPT, [
+AC_DEFUN([adl_DD_COPT], [
 AC_CACHE_CHECK(whether $$1 accepts -$2,sdcc_cv_$1$2,
 cat >_test_.c <<EOF
 #include <stdio.h>

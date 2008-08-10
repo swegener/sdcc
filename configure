@@ -652,6 +652,7 @@ build_alias
 host_alias
 target_alias
 AWK
+PACKAGE
 VERSION
 VERSIONHI
 VERSIONLO
@@ -1823,6 +1824,8 @@ VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
 
 { echo "$as_me:$LINENO: result: ${VERSION}" >&5
 echo "${ECHO_T}${VERSION}" >&6; }
+PACKAGE=sdcc
+
 
 
 
@@ -8358,6 +8361,7 @@ build_alias!$build_alias$ac_delim
 host_alias!$host_alias$ac_delim
 target_alias!$target_alias$ac_delim
 AWK!$AWK$ac_delim
+PACKAGE!$PACKAGE$ac_delim
 VERSION!$VERSION$ac_delim
 VERSIONHI!$VERSIONHI$ac_delim
 VERSIONLO!$VERSIONLO$ac_delim
@@ -8413,7 +8417,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 91; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 92; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

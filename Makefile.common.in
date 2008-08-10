@@ -3,6 +3,7 @@
 #
 
 # Version
+PACKAGE         = @PACKAGE@
 VERSION         = @VERSION@
 VERSIONHI       = @VERSIONHI@
 VERSIONLO       = @VERSIONLO@
@@ -15,7 +16,7 @@ CPP		= @CPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 YACC            = @YACC@
-LEX             = @LEX@ 
+LEX             = @LEX@
 AWK             = @AWK@
 STRIP           = @STRIP@
 prefix          = @prefix@

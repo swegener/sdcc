@@ -302,17 +302,17 @@ objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
 
 model-pic16:
 	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
-	  $(MAKE) MODELFLAGS="-mpic16" PORT=pic16 OEXT=.lib objects-pic16; \
+	  $(MAKE) PORT=pic16 objects-pic16; \
 	fi
 
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
-	-cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
-# yes, we do reuse the *-pic16 rules for pic14
 model-pic14:
 	if [ "`grep pic $(top_builddir)/ports.build | grep -v pic16`" = pic ]; then \
-	  $(MAKE) MODELFLAGS="-mpic14" PORT=pic OEXT=.lib objects-pic16; \
+	  $(MAKE) PORT=pic objects-pic14; \
 	fi
+
+objects-pic14: build-dir port-specific-objects-pic14 clean_intermediate-pic14
 
 build-dir: $(PORTDIR)
 
@@ -327,6 +327,13 @@ port-specific-objects:
 
 port-specific-objects-pic16:
 	-if [ -f $(PORT)/Makefile ]; then \
+	  $(MAKE) -C $(PORT); \
+	  cp -f $(PORT)/*/lib*.a $(PORTDIR); \
+	  cp -f $(PORT)/*/crt0*.o $(PORTDIR); \
+	fi
+
+port-specific-objects-pic14:
+	-if [ -f $(PORT)/Makefile ]; then \
 	  mkdir -p $(PORT)/bin; \
 	  $(MAKE) -C $(PORT); \
 	  cp -f $(PORT)/bin/*.* $(PORTDIR); \
@@ -339,6 +346,9 @@ clean_intermediate:
 	rm -f $(PORTDIR)/*.lst $(PORTDIR)/*.sym
 
 clean_intermediate-pic16:
+	$(MAKE) -C $(PORT) clean-intermediate
+
+clean_intermediate-pic14:
 	$(MAKE) -C $(PORT) clean-intermediate
 
 # Compiling and installing everything and runing test

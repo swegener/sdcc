@@ -1,9 +1,0 @@
-top_builddir = @top_builddir@
-top_srcdir   = @top_srcdir@
-
-VPATH  = @srcdir@
-srcdir = @srcdir@
-
-SUBDIRS = 
-
-include $(top_srcdir)/Makefile.subdir

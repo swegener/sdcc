@@ -1,7 +1,16 @@
 2008-08-10 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic16/**: build pic16 library using autotools for
+	  improved dependency tracking
+
+	* device/lib/Makefile.in,
+	* src/pic16/main.c,
+	* support/scripts/sdcc.nsi: adapt to changes in filenames (s/.lib/.a/)
+
+2008-08-10 Raphael Neider <rneider AT web.de>
+
 	* src/pic/pcode.c (ReuseReg): do not overlay the registers used for
-	  local variables if --no-overlay is given, workaround for #2023121
+	  local variables if --nooverlay is given, workaround for #2023121
 
 2008-08-08 Raphael Neider <rneider AT web.de>
 

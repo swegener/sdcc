@@ -500,7 +500,7 @@ ${Section} "SDCC PIC16 library" SEC15
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic16"
   File "${DEV_ROOT}\lib\pic16\*.o"
-  File "${DEV_ROOT}\lib\pic16\*.lib"
+  File "${DEV_ROOT}\lib\pic16\*.a"
 ${SectionEnd}
 
 ${Section} "SDCC PIC library" SEC16
@@ -849,7 +849,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\pic\*.lib"
 
   Delete "$INSTDIR\lib\pic16\*.o"
-  Delete "$INSTDIR\lib\pic16\*.lib"
+  Delete "$INSTDIR\lib\pic16\*.a"
 
   Delete "$INSTDIR\lib\hc08\*.rel"
   Delete "$INSTDIR\lib\hc08\*.lib"

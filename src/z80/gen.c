@@ -1819,11 +1819,9 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
       if (aop->aopu.aop_pairId==PAIR_IX)
-        SNPRINTF (buffer, sizeof(buffer),
-                  "!*ixx", 0);
+        tsprintf (buffer, sizeof(buffer), "!*ixx", offset);
       else if (aop->aopu.aop_pairId==PAIR_IY)
-        SNPRINTF (buffer, sizeof(buffer),
-                  "!*iyx", 0);
+        tsprintf (buffer, sizeof(buffer), "!*iyx", offset);
       else
         SNPRINTF (buffer, sizeof(buffer),
                   "(%s)", _pairs[aop->aopu.aop_pairId].name);

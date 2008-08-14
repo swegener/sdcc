@@ -1,3 +1,7 @@
+2008-08-14 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c: fixed #2051348
+	* support/regression/tests/bug-2051348.c: regression test for #2051348
+
 2008-08-10 Raphael Neider <rneider AT web.de>
 
 	* configure.in,

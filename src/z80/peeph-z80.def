@@ -139,6 +139,14 @@ replace restart {
 
 replace restart {
 	ex	de,hl
+	push	de
+} by {
+	; peephole 0k' pushed de directly instead of going through hl.
+	push	hl
+} if notUsed('de'), notUsed('hl')
+
+replace restart {
+	ex	de,hl
 	push	bc
 	push	de
 } by {

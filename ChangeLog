@@ -1,3 +1,9 @@
+2008-08-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c,
+	* src/z80/peeph-z80.def: minor peephole improvement
+
+
 2008-08-15 Raphael Neider <rneider AT web.de>
 
 	* src/z80/gen.c (_vemit2): suppress compiler warning

@@ -245,6 +245,7 @@ z80MightRead(const lineNode *pl, const char *what)
     strncmp(pl->line, "rl\t", 3) == 0 ||
     strncmp(pl->line, "rr\t", 3) == 0 ||  
     strncmp(pl->line, "sla\t", 4) == 0 ||
+    strncmp(pl->line, "sra\t", 4) == 0 ||
     strncmp(pl->line, "srl\t", 4) == 0)
     {
        return (strstr(pl->line + 3, what) != 0);

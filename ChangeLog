@@ -1,4 +1,4 @@
-2008-08-14 Philipp Klaus Krause <pkk AT spth.de>
+2008-08-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,
 	* src/z80/peeph-z80.def: minor peephole improvement

@@ -4,7 +4,7 @@
 
 	* src/pic/*.[ch]: make proper use of header files and avoid
 	  ad-hoc extern declarations, mark module-local helpers 'static',
-	  no functional changes
+	  removed dead/replaced code, no functional changes
 	* src/pic16/pcode.c: disentangled from pic14 backend
 
 2008-08-14 Philipp Klaus Krause <pkk AT spth.de>

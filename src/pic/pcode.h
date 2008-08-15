@@ -114,13 +114,6 @@ struct regs;
 #define PIC_PIE_BIT  6   /* Peripheral Interrupt Enable */
 #define PIC_GIE_BIT  7   /* Global Interrupt Enable */
 
-/***********************************************************************
- *  Operand types 
- ***********************************************************************/
-#define POT_RESULT  0
-#define POT_LEFT    1
-#define POT_RIGHT   2
-
 
 /***********************************************************************
  *
@@ -306,15 +299,7 @@ typedef struct pCodeOp
 	char *name;
 
 } pCodeOp;
-#if 0
-typedef struct pCodeOpBit
-{
-	pCodeOp pcop;
-	int bit;
-	unsigned int inBitSpace: 1; /* True if in bit space, else
-	                            just a bit of a register */
-} pCodeOpBit;
-#endif
+
 typedef struct pCodeOpLit
 {
 	pCodeOp pcop;
@@ -358,16 +343,6 @@ typedef struct pCodeOpRegBit
 	unsigned int inBitSpace: 1; /* True if in bit space, else
 	                            just a bit of a register */
 } pCodeOpRegBit;
-
-
-typedef struct pCodeOpRegPtr
-{
-	pCodeOpReg  pcor;       // The Register containing this bit
-
-	//  PIC_OPTYPE subtype;     // The type of this register.
-	//  unsigned int inBitSpace: 1; /* True if in bit space, else
-
-} pCodeOpRegPtr;
 
 typedef struct pCodeOpStr /* Only used here for the name of fn being called or jumped to */
 {
@@ -417,7 +392,6 @@ typedef struct pCode
 	 * in C++. The subsequent structures that "inherit"
 	 * the pCode structure will initialize these function
 	 * pointers to something useful */
-	//  void (*analyze) (struct pCode *_this);
 	void (*destruct)(struct pCode *_this);
 	void (*print)  (FILE *of,struct pCode *_this);
 
@@ -473,12 +447,6 @@ typedef struct pCodeFlow
 
 	pCode *end;   /* Last pCode in this flow. Note that
 	                 the first pCode is pc.next */
-
-	/*  set **uses;   * map the pCode instruction inCond and outCond conditions 
-	 * in this array of set's. The reason we allocate an 
-	 * array of pointers instead of declaring each type of 
-	 * usage is because there are port dependent usage definitions */
-	//int nuses;    /* number of uses sets */
 
 	set *from;    /* flow blocks that can send control to this flow block */
 	set *to;      /* flow blocks to which this one can send control */
@@ -729,11 +697,6 @@ typedef struct pCodePeep {
 	pCodeWildBlock target;     // code we'd like to optimize
 	pCodeWildBlock replace;    // and this is what we'll optimize it with.
 
-	//pBlock *target;
-	//pBlock replace;            // and this is what we'll optimize it with.
-
-
-
 	/* (Note: a wildcard register is a place holder. Any register
 	 * can be replaced by the wildcard when the pcode is being 
 	 * compared to the target. */
@@ -790,7 +753,6 @@ typedef struct peepCommand {
 #define PCAD(x)	  ((pCodeAsmDir *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
-//#define PCOB(x)   ((pCodeOpBit *)(x))
 #define PCOL(x)   ((pCodeOpLit *)(x))
 #define PCOI(x)   ((pCodeOpImmd *)(x))
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
@@ -916,3 +878,4 @@ int getpCodePeepCommand(char *cmd);
 int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip);
 
 #endif // __PCODE_H__
+

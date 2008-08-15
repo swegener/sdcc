@@ -26,17 +26,6 @@
 
 #define IS_PCCOMMENT(x) ( x && (x->type==PC_COMMENT))
 
-/****************************************************************/
-/*
-* rootRules - defined in SDCCpeep.c
-*  This is a pointer to the (parsed) peephole rules that are
-* defined in peep.def.
-*/
-
-//extern peepRule *rootRules;
-
-
-
 
 /****************************************************************/
 /****************************************************************/
@@ -61,32 +50,6 @@ typedef struct pCodePeepSnippets
 /****************************************************************/
 
 static pCodePeepSnippets  *peepSnippets=NULL;
-
-/****************************************************************/
-/*                                                              */
-/* curPeep                                                      */
-/*                                                              */
-/****************************************************************/
-
-//static pCodePeep          *curPeep=NULL;
-
-/****************************************************************/
-/*                                                              */
-/* curBlock                                                     */
-/*                                                              */
-/****************************************************************/
-
-//static pBlock             *curBlock=NULL;
-
-
-/****************************************************************/
-/*                                                              */
-/* max wild cards in a peep rule                                */
-/*                                                              */
-/****************************************************************/
-
-//static int                sMaxWildVar   = 0;
-//static int                sMaxWildMnem  = 0;
 
 
 typedef struct pCodeToken 
@@ -126,9 +89,6 @@ typedef struct parsedPattern {
 
 #define MAX_PARSEDPATARR 50
 static parsedPattern parsedPatArr[MAX_PARSEDPATARR];
-#if 0
-static unsigned int parsedPatIdx=0;
-#endif
 
 typedef enum {
 	PCP_LABEL=1,
@@ -367,10 +327,6 @@ static void * cvt_altpat_mnem0a(void *pp, pCodeWildBlock *pcwb)
 	DFPRINTF((stderr,"altpat_mnem0a wild mnem # %d\n",  p[0].pct[1].tok.n));
 	
 	/* Save the index of the maximum wildcard mnemonic */
-	
-	//if(p[0].pct[1].tok.n > sMaxWildVar)
-	//  sMaxWildMnem = p[0].pct[1].tok.n;
-	
 	if(p[0].pct[1].tok.n > pcwb->nwildpCodes)
 		pcwb->nwildpCodes = p[0].pct[1].tok.n;
 	
@@ -478,9 +434,6 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb)
 		newpCodeOpWild(p[1].pct[1].tok.n, pcwb, pcosubtype)));
 	
 	/* Save the index of the maximum wildcard variable */
-	//if(p[1].pct[1].tok.n > sMaxWildVar)
-	//  sMaxWildVar = p[1].pct[1].tok.n;
-	
 	if(p[1].pct[1].tok.n > pcwb->nvars)
 		pcwb->nvars = p[1].pct[1].tok.n;
 	
@@ -619,9 +572,6 @@ static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb)
 		newpCodeOpWild(p[1].pct[1].tok.n, pcwb, pcosubtype)));
 	
 	/* Save the index of the maximum wildcard variable */
-	//if(p[1].pct[1].tok.n > sMaxWildVar)
-	//  sMaxWildVar = p[1].pct[1].tok.n;
-	
 	if(p[1].pct[1].tok.n > pcwb->nvars)
 		pcwb->nvars = p[1].pct[1].tok.n;
 	
@@ -1126,8 +1076,6 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 				//  pc->print(stderr,pc);
 				//if(pc && pc->destruct) pc->destruct(pc); dumps core?
 				
-				//if(curBlock && pc)
-				//addpCode2pBlock(curBlock, pc);
 				if(pc) {
 					if (pcret) {
 						*pcret = pc;
@@ -1188,29 +1136,6 @@ static void peepRuleBlock2pCodeBlock(lineNode *ln, pCodeWildBlock *pcwb)
 		}
 	}
 }
-
-#if 0
-/*-----------------------------------------------------------------*/
-/*                                                                 */
-/*-----------------------------------------------------------------*/
-static pCode *AssembleLine(char *line)
-{
-	pCode *pc=NULL;
-	
-	if(!line || !*line) {
-		fprintf(stderr,"WARNING returning NULL in AssembleLine\n");
-		return NULL;
-	}
-	
-	tokenizeLineNode(line);
-
-	if(parseTokens(NULL,&pc))
-		fprintf(stderr, "WARNING: unable to assemble line:\n%s\n",line);
-	
-	return pc;
-	
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* peepRuleCondition                                               */
@@ -1326,22 +1251,11 @@ void peepRules2pCode(peepRule *rules)
 		//DFPRINTF((stderr,"finished target, here it is in pcode form:\n"));
 		//printpBlock(stderr, currentRule->target.pb);
 		
-		//DFPRINTF((stderr,"target with labels merged:\n"));
-		//pBlockMergeLabels(curBlock);
 		pBlockMergeLabels(currentRule->target.pb);
 		//printpBlock(stderr, currentRule->replace.pb);
 		
-		//#ifdef PCODE_DEBUG
-		//    printpBlock(stderr, curBlock);
-		//#endif
-		//DFPRINTF((stderr,"\nReplaced by:\n"));
-		
-		
 		/* Convert the replace block */
 		peepRuleBlock2pCodeBlock(pr->replace, &currentRule->replace);
-		
-		//DFPRINTF((stderr,"finished replace block, here it is in pcode form:\n"));
-		//printpBlock(stderr, curBlock);
 		
 		//DFPRINTF((stderr,"replace with labels merged:\n"));
 		
@@ -1375,18 +1289,6 @@ void peepRules2pCode(peepRule *rules)
 	}
 	
 }
-
-#if 0
-static void printpCodeString(FILE *of, pCode *pc, int max)
-{
-	int i=0;
-	
-	while(pc && (i++<max)) {
-		pc->print(of,pc);
-		pc = pc->next;
-	}
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* _DLL * DLL_append                                               */

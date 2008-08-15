@@ -5,7 +5,6 @@
     it easier to set a breakpoint using the debugger.
 */
 #include "common.h"
-#include "dbuf_string.h"
 #include "MySystem.h"
 #include "SDCCmacro.h"
 
@@ -163,61 +162,6 @@ _pic14_finaliseOptions (void)
   
   port->mem.default_local_map = data;
   port->mem.default_globl_map = data;
-#if 0
-  /* Hack-o-matic: if we are using the flat24 model,
-  * adjust pointer sizes.
-  */
-  if (options.model == MODEL_FLAT24)
-  {
-    
-    fprintf (stderr, "*** WARNING: you should use the '-mds390' option "
-      "for DS80C390 support. This code generator is "
-      "badly out of date and probably broken.\n");
-    
-    port->s.fptr_size = 3;
-    port->s.gptr_size = 4;
-    port->stack.isr_overhead++; /* Will save dpx on ISR entry. */
-#if 1
-    port->stack.call_overhead++;  /* This acounts for the extra byte 
-                                     * of return addres on the stack.
-                                     * but is ugly. There must be a 
-                                     * better way.
-                                     */
-#endif
-    fReturn = fReturn390;
-    fReturnSize = 5;
-  }
-  
-  if (options.model == MODEL_LARGE)
-  {
-    port->mem.default_local_map = xdata;
-    port->mem.default_globl_map = xdata;
-  }
-  else
-  {
-    port->mem.default_local_map = data;
-    port->mem.default_globl_map = data;
-  }
-  
-  if (options.stack10bit)
-  {
-    if (options.model != MODEL_FLAT24)
-    {
-      fprintf (stderr,
-        "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
-      fprintf (stderr, "\t10 bit stack mode disabled.\n");
-      options.stack10bit = 0;
-    }
-    else
-    {
-    /* Fixup the memory map for the stack; it is now in
-    * far space and requires a FPOINTER to access it.
-    */
-      istack->fmap = 1;
-      istack->ptrType = FPOINTER;
-    }
-  }
-#endif
 }
 
 static void
@@ -253,42 +197,13 @@ _pic14_genAssemblerPreamble (FILE * of)
 static int
 _pic14_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
-  int i;
-  
-  if (options.model != MODEL_FLAT24)
-  {
-    /* Let the default code handle it. */
-    return FALSE;
-  }
-  
-  dbuf_printf (oBuf, "\t;ajmp\t__sdcc_gsinit_startup\n");
-  
-  /* now for the other interrupts */
-  for (i = 0; i < maxInterrupts; i++)
-  {
-    if (interrupts[i])
-    {
-      dbuf_printf (oBuf, "\t;ljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
-    }
-    else
-    {
-      dbuf_printf (oBuf, "\t;reti\n\t.ds\t7\n");
-    }
-  }
-  
-  return TRUE;
+  /* Let the default code handle it. */
+  return FALSE;
 }
 
 static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
-/*
-sym_link *test = NULL;
-value *val;
-  */
-  
-  //fprintf(stderr,"checking for native mult\n");
-  
   if ( ic->op != '*')
   {
     return FALSE;
@@ -300,35 +215,6 @@ value *val;
   
   /* use library functions for more complex maths */
   return FALSE;
-
-  /*
-  if ( IS_LITERAL (left))
-  {
-  fprintf(stderr,"left is lit\n");
-  test = left;
-  val = OP_VALUE (IC_LEFT (ic));
-  }
-  else if ( IS_LITERAL (right))
-  {
-  fprintf(stderr,"right is lit\n");
-  test = left;
-  val = OP_VALUE (IC_RIGHT (ic));
-  }
-  else
-  {
-  fprintf(stderr,"oops, neither is lit so no\n");
-  return FALSE;
-  }
-  
-    if ( getSize (test) <= 2)
-    {
-    fprintf(stderr,"yep\n");
-    return TRUE;
-    }
-    fprintf(stderr,"nope\n");
-    
-    return FALSE;
-  */
 }
 
 /* Indicate which extended bit operations this port supports */
@@ -546,3 +432,4 @@ PORT pic_port =
   1,            /* globals & local static allowed */
   PORT_MAGIC
 };
+

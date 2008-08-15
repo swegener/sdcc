@@ -1022,22 +1022,6 @@ nfreeRegsType (int type)
         return nFreeRegs (type);
 }
 
-#if 0
-static void writeSetUsedRegs(FILE *of, set *dRegs)
-{
-
-        regs *dReg;
-
-        for (dReg = setFirstItem(dRegs) ; dReg ;
-        dReg = setNextItem(dRegs)) {
-
-                if(dReg->wasUsed)
-                        fprintf (of, "\t%s\n",dReg->name);
-        }
-
-}
-#endif
-
 static void packBits(set *bregs)
 {
         set *regset;
@@ -1135,30 +1119,6 @@ static void bitEQUs(FILE *of, set *bregs)
         }
 
 }
-
-#if 0
-static void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
-{
-        regs *reg;
-
-
-        for (reg = setFirstItem(fregs) ; reg ;
-        reg = setNextItem(fregs)) {
-
-                if(reg->wasUsed) {
-                        if(use_rIdx)
-                                fprintf (of, "%s\tEQU\t0x%03x\n",
-                                reg->name,
-                                reg->rIdx);
-                        else
-                                fprintf (of, "%s\tEQU\t0x%03x\n",
-                                reg->name,
-                                reg->address);
-                }
-        }
-
-}
-#endif
 
 void writeUsedRegs(FILE *of)
 {
@@ -2478,100 +2438,6 @@ createRegMask (eBBlock ** ebbs, int count)
                 }
         }
 }
-#if 0
-/* This was the active version */
-/*-----------------------------------------------------------------*/
-/* rematStr - returns the rematerialized string for a remat var    */
-/*-----------------------------------------------------------------*/
-static symbol *
-rematStr (symbol * sym)
-{
-        char *s = buffer;
-        iCode *ic = sym->rematiCode;
-        symbol *psym = NULL;
-
-        debugLog ("%s\n", __FUNCTION__);
-
-        //printf ("%s\n", s);
-
-        /* if plus or minus print the right hand side */
-
-        if (ic->op == '+' || ic->op == '-') {
-
-                iCode *ric = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-
-                sprintf (s, "(%s %c 0x%04x)",
-                        OP_SYMBOL (IC_LEFT (ric))->rname,
-                        ic->op,
-                        (int) operandLitValue (IC_RIGHT (ic)));
-
-
-                //fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
-
-                psym = newSymbol (OP_SYMBOL (IC_LEFT (ric))->rname, 1);
-                psym->offset = (int) operandLitValue (IC_RIGHT (ic));
-
-                return psym;
-        }
-
-        sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
-        psym = newSymbol (OP_SYMBOL (IC_LEFT (ic))->rname, 1);
-
-        //printf ("ralloc.c:%d %s\n", __LINE__,buffer);
-        return psym;
-}
-#endif
-
-#if 0
-/* deprecated version */
-/*-----------------------------------------------------------------*/
-/* rematStr - returns the rematerialized string for a remat var    */
-/*-----------------------------------------------------------------*/
-static char *
-rematStr (symbol * sym)
-{
-        char *s = buffer;
-        iCode *ic = sym->rematiCode;
-
-        debugLog ("%s\n", __FUNCTION__);
-        while (1)
-        {
-
-                printf ("%s\n", s);
-                /* if plus or minus print the right hand side */
-                /*
-                if (ic->op == '+' || ic->op == '-') {
-                sprintf(s,"0x%04x %c ",(int) operandLitValue(IC_RIGHT(ic)),
-                ic->op );
-                s += strlen(s);
-                ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
-                continue ;
-                }
-                */
-                if (ic->op == '+' || ic->op == '-')
-                {
-                        iCode *ric = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-                        sprintf (s, "(%s %c 0x%04x)",
-                                OP_SYMBOL (IC_LEFT (ric))->rname,
-                                ic->op,
-                                (int) operandLitValue (IC_RIGHT (ic)));
-
-                        //s += strlen(s);
-                        //ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
-                        //continue ;
-                        //fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
-                        return buffer;
-                }
-
-                /* we reached the end */
-                sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
-                break;
-        }
-
-        printf ("%s\n", buffer);
-        return buffer;
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
@@ -2696,67 +2562,6 @@ regTypeNum ()
         }
 
 }
-
-#if 0
-static
-DEFSETFUNC (markRegFree)
-{
-        ((regs *)item)->isFree = 1;
-
-        return 0;
-}
-
-static
-DEFSETFUNC (deallocReg)
-{
-        fprintf(stderr,"deallocting register %s\n",((regs *)item)->name);
-        ((regs *)item)->isFree = 1;
-        ((regs *)item)->wasUsed = 0;
-
-        return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* freeAllRegs - mark all registers as free                        */
-/*-----------------------------------------------------------------*/
-static void
-pic14_freeAllRegs ()
-{
-        //  int i;
-
-        debugLog ("%s\n", __FUNCTION__);
-
-        applyToSet(dynAllocRegs,markRegFree);
-        applyToSet(dynStackRegs,markRegFree);
-
-        /*
-        for (i = 0; i < pic14_nRegs; i++)
-        regspic14[i].isFree = 1;
-        */
-}
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-static void
-pic14_deallocateAllRegs ()
-{
-        //  int i;
-
-        debugLog ("%s\n", __FUNCTION__);
-
-        applyToSet(dynAllocRegs,deallocReg);
-
-        /*
-        for (i = 0; i < pic14_nRegs; i++) {
-                if(regspic14[i].pc_type == PO_GPR_TEMP) {
-                regspic14[i].isFree = 1;
-                regspic14[i].wasUsed = 0;
-                }
-        }
-        */
-}
-#endif
-
 
 /*-----------------------------------------------------------------*/
 /* deallocStackSpil - this will set the stack pointer back         */
@@ -4124,8 +3929,6 @@ pic14_assignRegisters (ebbIndex * ebbi)
         _G.slocNum = 0;
         setToNull ((void *) &_G.stackSpil);
         setToNull ((void *) &_G.spiltSet);
-        /* mark all registers as free */
-        //pic14_freeAllRegs ();
 
         debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
         pic14_debugLogClose ();

@@ -156,7 +156,6 @@ extern void pic16_RemoveUnusedRegisters(void);
 extern void pic16_RegsUnMapLiveRanges(void);
 extern void pic16_BuildFlowTree(pBlock *pb);
 extern void pic16_pCodeRegOptimizeRegUsage(int level);
-extern int mnem2key(unsigned char const *mnem);
 
 /****************************************************************/
 /*                      Forward declarations                    */
@@ -3026,14 +3025,13 @@ void  pic16_pCodeInitRegisters(void)
 
 }
 
-#if OPT_DISABLE_PIC
 /*-----------------------------------------------------------------*/
 /*  mnem2key - convert a pic mnemonic into a hash key              */
 /*   (BTW - this spreads the mnemonics quite well)                 */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 
-int mnem2key(unsigned char const *mnem)
+static int mnem2key(unsigned char const *mnem)
 {
   int key = 0;
 
@@ -3049,7 +3047,6 @@ int mnem2key(unsigned char const *mnem)
   return (key & 0x1f);
 
 }
-#endif
 
 void pic16initMnemonics(void)
 {

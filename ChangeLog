@@ -1,4 +1,14 @@
+2008-08-15 Raphael Neider <rneider AT web.de>
+
+	* src/z80/gen.c (_vemit2): suppress compiler warning
+
+	* src/pic/*.[ch]: make proper use of header files and avoid
+	  ad-hoc extern declarations, mark module-local helpers 'static',
+	  no functional changes
+	* src/pic16/pcode.c: disentangled from pic14 backend
+
 2008-08-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c: fixed #2051348
 	* support/regression/tests/bug-2051348.c: regression test for #2051348
 
@@ -70,9 +80,11 @@
 	  thanks Mauro Giachero
 
 2008-07-13 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/port.h: Fixed typo in comment
 
 2008-07-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/mappings.i: Implemented RFE #1919415
 	* src/z80/peeph-z80.def: Implemented RFE #1919415, #1861376,
 	  #1880202, #1914434, prepared for RFE #1703943

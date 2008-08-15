@@ -19,13 +19,18 @@
    
 -------------------------------------------------------------------------*/
 
-//#include "ralloc.h"
-struct regs;
+#ifndef __PCODE_H__
+#define __PCODE_H__
+
+#include "common.h"
 
 /* When changing these, you must also update the assembler template
  * in device/lib/libsdcc/macros.inc */
 #define GPTRTAG_DATA	0x00
 #define GPTRTAG_CODE	0x80
+
+/* Cyclic dependency with ralloc.h: */
+struct regs;
 
 /*
    Post code generation
@@ -55,20 +60,17 @@ struct regs;
      movwf  t1
      movf   t1,w     ; Can't remove this movf
      skpz
-      return
+     return
 
    example3:
      movwf  t1
      movf   t1,w     ; This  movf can be removed
      xorwf  t2,w     ; since xorwf will over write Z 
      skpz
-      return
+     return
 
 */
 
-
-#ifndef __PCODE_H__
-#define __PCODE_H__
 
 /***********************************************************************
  * debug stuff
@@ -86,7 +88,7 @@ struct regs;
 #ifdef PCODE_DEBUG
 #define DFPRINTF(args) (fprintf args)
 #else
-#define DFPRINTF(args) ;
+#define DFPRINTF(args) ((void)0)
 #endif
 
 
@@ -834,11 +836,12 @@ typedef struct peepCommand {
 
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char *
-pCode *newpCodeInlineP(char *cP);            // Create a new pCode given a char *
 pCode *newpCodeFunction(char *g, char *f,int); // Create a new function
 pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
 pCode *newpCodeCSource(int ln, char *f, const char *l); // Create a new symbol line 
+pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
 pCode *findNextInstruction(pCode *pci);
+pCode *findPrevInstruction(pCode *pci);
 pCode *findNextpCode(pCode *pc, PC_TYPE pct);
 pCode *pCodeInstructionCopy(pCodeInstruction *pci,int invert);
 
@@ -847,13 +850,17 @@ void printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file
 void printpCode(FILE *of, pCode *pc);        // Write a pCode to a file
 void addpCode2pBlock(pBlock *pb, pCode *pc); // Add a pCode to a pBlock
 void addpBlock(pBlock *pb);                  // Add a pBlock to a pFile
+void unlinkpCode(pCode *pc);
 void copypCode(FILE *of, char dbName);       // Write all pBlocks with dbName to *of
 void movepBlock2Head(char dbName);           // move pBlocks around
+void AnalyzeBanking(void);
+void ReuseReg(void);
 void AnalyzepCode(char dbName);
-int OptimizepCode(char dbName);
-void printCallTree(FILE *of);
-void pCodePeepInit(void);
+void InlinepCode(void);
+void pCodeInitRegisters(void);
+void pic14initpCodePeepCommands(void);
 void pBlockConvert2ISR(pBlock *pb);
+void pBlockMergeLabels(pBlock *pb);
 void pCodeInsertAfter(pCode *pc1, pCode *pc2);
 void pCodeInsertBefore(pCode *pc1, pCode *pc2);
 void pCodeDeleteChain(pCode *f,pCode *t);
@@ -864,15 +871,23 @@ pCodeOp *newpCodeOpLabel(char *name, int key);
 pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space,int is_func);
 pCodeOp *newpCodeOpLit(int lit);
 pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
+pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype);
 pCodeOp *newpCodeOpRegFromStr(char *name);
 pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
 pCodeOp *pCodeOpCopy(pCodeOp *pcop);
+pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *popCopyReg(pCodeOpReg *pc);
 
-int isPCinFlow(pCode *pc, pCode *pcflow);
+pBranch *pBranchAppend(pBranch *h, pBranch *n);
+
 struct regs * getRegFromInstruction(pCode *pc);
 
-extern void pcode_test(void);
+char *get_op(pCodeOp *pcop, char *buff, size_t buf_size);
+char *pCode2str(char *str, size_t size, pCode *pc);
+
+int pCodePeepMatchRule(pCode *pc);
+
+void pcode_test(void);
 void resetpCodeStatistics (void);
 void dumppCodeStatistics (FILE *of);
 
@@ -890,5 +905,14 @@ extern pCodeOpReg pc_wsave;     /* wsave, ssave and psave are used to save W, th
 extern pCodeOpReg pc_ssave;     /* registers during an interrupt */
 extern pCodeOpReg pc_psave;     /* registers during an interrupt */
 
+extern pFile *the_pFile;
+extern pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
+
+/*
+ * From pcodepeep.h:
+ */
+int getpCode(char *mnem, unsigned dest);
+int getpCodePeepCommand(char *cmd);
+int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip);
 
 #endif // __PCODE_H__

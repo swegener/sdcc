@@ -22,15 +22,32 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#include "../common.h"
-#include <time.h>
-#include "ralloc.h"
-#include "pcode.h"
-#include "newalloc.h"
+#include "glue.h"
+#include "dbuf_string.h"
+
+#include "device.h"
 #include "gen.h"
 #include "main.h"
-#include "device.h"
-#include "dbuf_string.h"
+
+/*
+ * Imports
+ */
+extern set *publics;
+extern set *externs;
+extern symbol *mainf;
+extern struct dbuf_s *codeOutBuf;
+
+extern DEFSETFUNC(closeTmpFiles);
+extern DEFSETFUNC(rmTmpFiles);
+extern void initialComments(FILE *afile);
+extern operand *operandFromAst(ast *tree, int lvl);
+extern value *initPointer(initList *ilist, sym_link *toType);
+
+
+set *pic14_localFunctions = NULL;
+int pic14_hasInterrupt = 0;             // Indicates whether to emit interrupt handler or not
+
+int pic14_stringInSet(const char *str, set **world, int autoAdd);
 
 
 #ifdef WORDS_BIGENDIAN
@@ -41,75 +58,15 @@
 
 #define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
 #define IS_GLOBAL(sym)  ((sym)->level == 0)
-
-extern symbol *interrupts[256];
-static void showAllMemmaps(FILE *of); // XXX: emits initialized symbols
-extern int noAlloc;
-extern set *publics;
-extern set *externs;
-extern unsigned maxInterrupts;
-extern symbol *mainf;
-extern char *VersionString;
-extern struct dbuf_s *codeOutBuf;
-extern char *iComments1;
-extern char *iComments2;
-//extern void emitStaticSeg (memmap * map);
-set *pic14_localFunctions = NULL;
-
-extern DEFSETFUNC (closeTmpFiles);
-extern DEFSETFUNC (rmTmpFiles);
-
-extern void AnalyzeBanking (void);
-extern void ReuseReg(void);
-extern void InlinepCode(void);
-extern void writeUsedRegs(FILE *);
-
-extern void initialComments (FILE * afile);
-extern void printPublics (FILE * afile);
-
-extern void printChar (FILE * ofile, char *s, int plen);
-void  pCodeInitRegisters(void);
-int getConfigWord(int address);
-int getHasSecondConfigReg(void);
-void pic14_debugLogClose(void); // from ralloc.c
-
-char *udata_section_name=0;             // FIXME Temporary fix to change udata section name -- VR
-int pic14_hasInterrupt = 0;             // Indicates whether to emit interrupt handler or not
+#define IS_DEFINED_HERE(sym)    (!IS_EXTERN(sym->etype))
 
 /* dbufs for initialized data (idata and code sections),
  * extern, and global declarations */
-struct dbuf_s *ivalBuf, *extBuf, *gloBuf, *gloDefBuf;
+static struct dbuf_s *ivalBuf, *extBuf, *gloBuf, *gloDefBuf;
 
 static set *emitted = NULL;
-int pic14_stringInSet(const char *str, set **world, int autoAdd);
 
-/*-----------------------------------------------------------------*/
-/* aopLiteral - string from a literal value                        */
-/*-----------------------------------------------------------------*/
-unsigned int pic14aopLiteral (value *val, int offset)
-{
-        union {
-                float f;
-                unsigned char c[4];
-        } fl;
-
-        /* if it is a float then it gets tricky */
-        /* otherwise it is fairly simple */
-        if (!IS_FLOAT(val->type)) {
-                unsigned long v = ulFromVal (val);
-
-                return ( (v >> (offset * 8)) & 0xff);
-        }
-
-        /* it is type float */
-        fl.f = (float) floatFromVal(val);
-#ifdef WORDS_BIGENDIAN
-        return fl.c[3-offset];
-#else
-        return fl.c[offset];
-#endif
-
-}
+static void showAllMemmaps(FILE *of); // XXX: emits initialized symbols
 
 #if 0
 static int
@@ -210,8 +167,6 @@ emitIfNew(struct dbuf_s *oBuf, set **emitted, const char *fmt,
     return (!wasPresent);
 }
 
-#define IS_DEFINED_HERE(sym)    (!IS_EXTERN(sym->etype))
-extern int IS_CONFIG_ADDRESS( int addr );
 static void
 pic14_constructAbsMap (struct dbuf_s *oBuf, struct dbuf_s *gloBuf)
 {
@@ -716,8 +671,6 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 /*-----------------------------------------------------------------*/
 /* printIvalPtr - generates code for initial value of pointers     */
 /*-----------------------------------------------------------------*/
-extern value *initPointer (initList *, sym_link *toType);
-
 static void
 printIvalPtr (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
 {
@@ -840,7 +793,6 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
 #endif
 
 #if 0
-extern void pCodeConstString(char *name, char *value);
 /*-----------------------------------------------------------------*/
 /* emitStaticSeg - emitcode for the static segment                 */
 /*-----------------------------------------------------------------*/
@@ -967,7 +919,6 @@ pic14emitMaps ()
 /*-----------------------------------------------------------------*/
 /* createInterruptVect - creates the interrupt vector              */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetExternal (char *str, int isReg);
 static void
 pic14createInterruptVect (struct dbuf_s * vBuf)
 {
@@ -1143,34 +1094,6 @@ pic14printPublics (FILE * afile)
 }
 #endif
 
-/*
- * Interface to BANKSEL generation.
- * This function should return != 0 iff str1 and str2 denote operands that
- * are known to be allocated into the same bank. Consequently, there will
- * be no BANKSEL emitted if str2 is accessed while str1 has been used to
- * select the current bank just previously.
- *
- * If in doubt, return 0.
- */
-int
-pic14_operandsAllocatedInSameBank(const char *str1, const char *str2) {
-    // see pic14printLocals
-
-    if (getenv("SDCC_PIC14_SPLIT_LOCALS")) {
-        // no clustering applied, each register resides in its own bank
-    } else {
-        // check whether BOTH names are local registers
-        // XXX: This is some kind of shortcut, should be safe...
-        // In this model, all r0xXXXX are allocated into a single section
-        // per file, so no BANKSEL required if accessing a r0xXXXX after a
-        // (different) r0xXXXX. Works great for multi-byte operands.
-        if (str1 && str2 && str1[0] == 'r' && str2[0] == 'r') return (1);
-    } // if
-
-    // assume operands in different banks
-    return (0);
-}
-
 static void
 pic14printLocals (struct dbuf_s *oBuf)
 {
@@ -1324,7 +1247,7 @@ pic14emitOverlay (struct dbuf_s * aBuf)
 }
 
 
-void
+static void
 pic14_emitInterruptHandler (FILE * asmFile)
 {
         if (pic14_hasInterrupt)
@@ -1597,8 +1520,6 @@ picglue ()
 #endif
 
 
-void ast_print (ast * tree, FILE *outfile, int indent);
-
 #if 0
 /*
  * Emit all memmaps.
@@ -1630,11 +1551,12 @@ showInitList(initList *list, int level)
 }
 #endif
 
+#if 0
 /*
  * DEBUG: Print a value.
  */
-void
-printVal(value *val)
+static void
+printValue(value *val)
 {
     printf ("value %p: name %s, type %p, etype %p, sym %s, vArgs %d, lit 0x%lx/%ld\n",
             val, val->name, val->type, val->etype,
@@ -1645,11 +1567,9 @@ printVal(value *val)
     printTypeChain(val->etype, stdout);
     printf ("\n");
 }
+#endif
 
-//prototype from ../SDCCicode.c
-operand *operandFromAst (ast * tree,int lvl);
-
-char *
+static char *
 parseIvalAst (ast *node, int *inCodeSpace) {
 #define LEN 4096
     char *buffer = NULL;
@@ -1762,7 +1682,6 @@ emitIvalLabel(struct dbuf_s *oBuf, symbol *sym)
     return (in_code);
 }
 
-char *get_op(pCodeOp *pcop,char *buffer, size_t size);
 /*
  * Actually emit the initial values in .asm format.
  */
@@ -1801,7 +1720,7 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
     if (constExprTree(node) && (val = constExprValue(node, 0))) {
         op = operandFromValue(val);
         DEBUGprintf ("%s: constExpr ", __FUNCTION__);
-        //printVal(val);
+        //printValue(val);
     } else if (IS_AST_VALUE(node)) {
         op = operandFromAst(node, 0);
     } else if (IS_AST_OP(node)) {

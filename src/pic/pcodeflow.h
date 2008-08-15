@@ -22,6 +22,8 @@
 #ifndef __PCODEFLOW_H__
 #define __PCODEFLOW_H__
 
+#include "pcode.h"
+
 /*************************************************
  * pCode conditions:
  *
@@ -60,6 +62,7 @@
 
 /*------------------------------------------------------------*/
 
-void BuildFlowAncestry(pBlock *pb);
+void BuildFlowTree(pBlock *pb);
 
 #endif // __PCODEFLOW_H__
+

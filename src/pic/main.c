@@ -5,36 +5,43 @@
     it easier to set a breakpoint using the debugger.
 */
 #include "common.h"
-#include "main.h"
-#include "ralloc.h"
-#include "device.h"
-#include "SDCCutil.h"
-#include "SDCCmacro.h"
-#include "MySystem.h"
-#include "glue.h"
 #include "dbuf_string.h"
-#include <errno.h>
-//#include "gen.h"
+#include "MySystem.h"
+#include "SDCCmacro.h"
+
+#include "device.h"
+#include "gen.h"
+#include "glue.h"
+#include "main.h"
+#include "pcode.h"
+#include "ralloc.h"
+
+/*
+ * Imports
+ */
+extern set *dataDirsSet;
+extern set *includeDirsSet;
+extern set *libDirsSet;
+extern set *libPathsSet;
+extern set *linkOptionsSet;
+
+
+pic14_options_t pic14_options;
+int debug_verbose = 0;
+
 
 #define OPTION_STACK_SIZE         "--stack-size"
-#define OPTION_UDATA_SECTION_NAME "--udata-section-name"
-
 
 static char _defaultRules[] =
 {
 #include "peeph.rul"
 };
 
-pic14_options_t pic14_options;
-extern int debug_verbose; /* from pcode.c */
-extern char *udata_section_name;
-
 static OPTION _pic14_poptions[] =
   {
     { 0, "--debug-xtra",   &debug_verbose, "show more debug info in assembly output" },
     { 0, "--no-pcode-opt", &pic14_options.disable_df, "disable (slightly faulty) optimization on pCode" },
     { 0, OPTION_STACK_SIZE, &options.stack_size, "sets the size if the argument passing stack (default: 16, minimum: 4)", CLAT_INTEGER },
-    { 0, OPTION_UDATA_SECTION_NAME, &udata_section_name, "set udata section name", CLAT_STRING },
     { 0, NULL, NULL, NULL }
   };
 
@@ -66,15 +73,24 @@ static char *_pic14_keywords[] =
   NULL
 };
 
-void  pCodeInitRegisters(void);
-
-void pic14_assignRegisters (ebbIndex *);
-
-/* Also defined in gen.h, but the #include is commented out */
-/* for an unknowned reason. - EEP */
-void pic14_emitDebuggerSymbol (char *);
-
 static int regParmFlg = 0;  /* determine if we can register a parameter */
+
+
+/** $1 is always the basename.
+    $2 is always the output file.
+    $3 varies
+    $l is the list of extra options that should be there somewhere...
+    MUST be terminated with a NULL.
+*/
+static const char *_linkCmd[] =
+{
+  "gplink", "$l", "-w", "-r", "-o \"$2\"", "\"$1\"", "$3", NULL
+};
+
+static const char *_asmCmd[] =
+{
+  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", NULL
+};
 
 static void
 _pic14_init (void)
@@ -110,8 +126,6 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
     return FALSE;
 }
 
-extern set *dataDirsSet;
-extern set *includeDirsSet;
 /* pic14 port uses include/pic and lib/pic instead of
  * include/pic14 and lib/pic14 as indicated by SDCCmain.c's
  * setIncludePaths routine. */
@@ -218,8 +232,6 @@ _pic14_getRegName (struct regs *reg)
     return reg->name;
   return "err";
 }
-
-extern char *processor_base_name(void);
 
 static void
 _pic14_genAssemblerPreamble (FILE * of)
@@ -344,32 +356,6 @@ oclsExpense (struct memmap *oclass)
 
   return 0;
 }
-
-/** $1 is always the basename.
-    $2 is always the output file.
-    $3 varies
-    $l is the list of extra options that should be there somewhere...
-    MUST be terminated with a NULL.
-*/
-static const char *_linkCmd[] =
-{
-  "gplink", "$l", "-w", "-r", "-o \"$2\"", "\"$1\"", "$3", NULL
-};
-
-static const char *_asmCmd[] =
-{
-  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", NULL
-    
-};
-
-extern set *libFilesSet;
-extern set *libDirsSet;
-extern set *libPathsSet;
-extern set *includeDirsSet;
-extern set *userIncDirsSet;
-extern set *dataDirsSetSet;
-extern set *relFilesSet;
-extern set *linkOptionsSet;
 
 static void _pic14_do_link (void)
 {

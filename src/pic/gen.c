@@ -30,56 +30,46 @@
       Made everything static
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "SDCCglobl.h"
-#include "newalloc.h"
+/*
+ * This is the down and dirty file with all kinds of
+ * kludgy & hacky stuff. This is what it is all about
+ * CODE GENERATION for a specific MCU . some of the
+ * routines may be reusable, will have to see.
+ */
 
-#include "common.h"
-#include "SDCCpeeph.h"
-#include "ralloc.h"
-#include "pcode.h"
 #include "gen.h"
 #include "glue.h"
 
+/*
+ * Imports
+ */
+extern struct dbuf_s *codeOutBuf;
+extern set *externs;
+
+
+static pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
+static pCodeOp *popRegFromString(char *str, int size, int offset);
+static int aop_isLitLike(asmop *aop);
+
 /* The PIC port(s) need not differentiate between POINTER and FPOINTER. */
 #define PIC_IS_DATA_PTR(x)  (IS_DATA_PTR(x) || IS_FARPTR(x))
-#define PIC_IS_FARPTR(x)    (PIC_IS_DATA_PTR(x))
 
-extern void printpBlock(FILE *of, pBlock *pb);
-
-static int labelOffset=0;
-extern int debug_verbose;
-extern int pic14_hasInterrupt;
-//static int optimized_for_speed = 0;
-
-/* max_key keeps track of the largest label number used in
-a function. This is then used to adjust the label offset
-for the next function.
-*/
-static int max_key=0;
-static int GpsuedoStkPtr=0;
+/*
+ * max_key keeps track of the largest label number used in
+ * a function. This is then used to adjust the label offset
+ * for the next function.
+ */
+static int max_key = 0;
+static int labelOffset = 0;
+static int GpsuedoStkPtr = 0;
 static int pic14_inISR = 0;
-
-pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
-extern char *get_op( pCodeOp *pcop,char *buff,size_t buf_size);
-const char *AopType(short type);
-
-#define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0x00ff)
-
-/* this is the down and dirty file with all kinds of
-kludgy & hacky stuff. This is what it is all about
-CODE GENERATION for a specific MCU . some of the
-routines may be reusable, will have to see */
 
 static char *zero = "0x00";
 static char *one  = "0x01";
 static char *spname = "sp";
 
-char *fReturnpic14[] = {"temp1","temp2","temp3","temp4" };
 unsigned fReturnSizePic = 4; /* shared with ralloc.c */
+static char *fReturnpic14[] = {"temp1","temp2","temp3","temp4" };
 static char **fReturn = fReturnpic14;
 
 static struct {
@@ -90,9 +80,10 @@ static struct {
     set *sendSet;
 } _G;
 
-/* Resolved ifx structure. This structure stores information
-about an iCode ifx that makes it easier to generate code.
-*/
+/*
+ * Resolved ifx structure. This structure stores information
+ * about an iCode ifx that makes it easier to generate code.
+ */
 typedef struct resolvedIfx {
     symbol *lbl;     /* pointer to a label */
     int condition;   /* true or false ifx */
@@ -100,14 +91,9 @@ typedef struct resolvedIfx {
                       * is generated */
 } resolvedIfx;
 
-extern int pic14_nRegs;
-extern struct dbuf_s *codeOutBuf;
-static void saverbank (int, iCode *,bool);
-
 static lineNode *lineHead = NULL;
 static lineNode *lineCurr = NULL;
-
-static  pBlock *pb;
+static pBlock *pb;
 
 /*-----------------------------------------------------------------*/
 /*  my_powof2(n) - If `n' is an integaer power of 2, then the      */
@@ -151,7 +137,7 @@ void DEBUGpic14_AopType(int line_no, operand *left, operand *right, operand *res
 
 }
 
-void DEBUGpic14_AopTypeSign(int line_no, operand *left, operand *right, operand *result)
+static void DEBUGpic14_AopTypeSign(int line_no, operand *left, operand *right, operand *result)
 {
 
     DEBUGpic14_emitcode ("; ","line = %d, signs: result %s=%c, left %s=%c, right %s=%c",
@@ -264,7 +250,7 @@ void emitpcode_real(PIC_OPCODE poc, pCodeOp *pcop)
     }
 }
 
-void emitpcodeNULLop(PIC_OPCODE poc)
+static void emitpcodeNULLop(PIC_OPCODE poc)
 {
 
     addpCode2pBlock(pb,newpCode(poc,NULL));
@@ -323,7 +309,7 @@ pic14_emitDebuggerSymbol (char * debugSym)
 /*-----------------------------------------------------------------*/
 /* newAsmop - creates a new asmOp                                  */
 /*-----------------------------------------------------------------*/
-asmop *newAsmop (short type)
+static asmop *newAsmop (short type)
 {
     asmop *aop;
 
@@ -502,7 +488,7 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
     return aop;
 }
 
-int aopIdx (asmop *aop, int offset)
+static int aopIdx (asmop *aop, int offset)
 {
     if(!aop)
         return -1;
@@ -803,6 +789,33 @@ void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
 }
 
 /*-----------------------------------------------------------------*/
+/* pic14aopLiteral - string from a literal value                   */
+/*-----------------------------------------------------------------*/
+static unsigned int pic14aopLiteral (value *val, int offset)
+{
+        union {
+                float f;
+                unsigned char c[4];
+        } fl;
+
+        /* if it is a float then it gets tricky */
+        /* otherwise it is fairly simple */
+        if (!IS_FLOAT(val->type)) {
+                unsigned long v = ulFromVal (val);
+
+                return ( (v >> (offset * 8)) & 0xff);
+        }
+
+        /* it is type float */
+        fl.f = (float) floatFromVal(val);
+#ifdef WORDS_BIGENDIAN
+        return fl.c[3-offset];
+#else
+        return fl.c[offset];
+#endif
+}
+
+/*-----------------------------------------------------------------*/
 /* aopGet - for fetching value of the aop                          */
 /*-----------------------------------------------------------------*/
 char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
@@ -907,7 +920,7 @@ char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 /*-----------------------------------------------------------------*/
 /* popGetTempReg - create a new temporary pCodeOp                  */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetTempReg(void)
+static pCodeOp *popGetTempReg(void)
 {
 
     pCodeOp *pcop;
@@ -924,7 +937,7 @@ pCodeOp *popGetTempReg(void)
 /*-----------------------------------------------------------------*/
 /* popReleaseTempReg - create a new temporary pCodeOp                  */
 /*-----------------------------------------------------------------*/
-void popReleaseTempReg(pCodeOp *pcop)
+static void popReleaseTempReg(pCodeOp *pcop)
 {
 
     if(pcop && pcop->type == PO_GPR_TEMP && PCOR(pcop)->r)
@@ -948,7 +961,7 @@ pCodeOp *popGetLabel(unsigned int key)
 /*-------------------------------------------------------------------*/
 /* popGetHighLabel - create a new pCodeOp of type PO_LABEL with offset=1 */
 /*-------------------------------------------------------------------*/
-pCodeOp *popGetHighLabel(unsigned int key)
+static pCodeOp *popGetHighLabel(unsigned int key)
 {
     pCodeOp *pcop;
     pcop = popGetLabel(key);
@@ -968,18 +981,16 @@ pCodeOp *popGetLit(unsigned int lit)
 /*-----------------------------------------------------------------*/
 /* popGetImmd - asm operator to pcode immediate conversion         */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func)
+static pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func)
 {
 
     return newpCodeOpImmd(name, offset,index, 0, is_func);
 }
 
-extern set *externs;
-
 /*-----------------------------------------------------------------*/
 /* popGetWithString - asm operator to pcode operator conversion            */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetWithString(char *str, int isExtern)
+static pCodeOp *popGetWithString(char *str, int isExtern)
 {
     pCodeOp *pcop;
 
@@ -1027,7 +1038,7 @@ pCodeOp *popGetExternal (char *str, int isReg)
 /*-----------------------------------------------------------------*/
 /* popRegFromString -                                              */
 /*-----------------------------------------------------------------*/
-pCodeOp *popRegFromString(char *str, int size, int offset)
+static pCodeOp *popRegFromString(char *str, int size, int offset)
 {
 
     pCodeOp *pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
@@ -1058,7 +1069,7 @@ pCodeOp *popRegFromString(char *str, int size, int offset)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *popRegFromIdx(int rIdx)
+static pCodeOp *popRegFromIdx(int rIdx)
 {
     pCodeOp *pcop;
 
@@ -1285,7 +1296,6 @@ void aopPut (asmop *aop, char *s, int offset)
 
     case AOP_REG:
         if (strcmp(aop->aopu.aop_reg[offset]->name,s) != 0) {
-            //strcmp(aop->aopu.aop_reg[offset]->dname,s)!= 0){
             /*
             if (*s == '@'         ||
             strcmp(s,"r0") == 0 ||
@@ -1541,7 +1551,7 @@ void pic14_outAcc(operand *result)
 /*-----------------------------------------------------------------*/
 /* pic14_outBitC - output a bit C                                  */
 /*-----------------------------------------------------------------*/
-void pic14_outBitC(operand *result)
+static void pic14_outBitC(operand *result)
 {
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -1558,7 +1568,7 @@ void pic14_outBitC(operand *result)
 /*-----------------------------------------------------------------*/
 /* pic14_toBoolean - emit code for orl a,operator(sizeop)          */
 /*-----------------------------------------------------------------*/
-void pic14_toBoolean(operand *oper)
+static void pic14_toBoolean(operand *oper)
 {
     int size = AOP_SIZE(oper);
     int offset = 0;
@@ -1767,6 +1777,56 @@ release:
     /* release the aops */
     freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? 0 : 1));
     freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* saverbank - saves an entire register bank on the stack          */
+/*-----------------------------------------------------------------*/
+static void saverbank (int bank, iCode *ic, bool pushPsw)
+{
+    FENTRY;
+
+    DEBUGpic14_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
+#if 0
+    int i;
+    asmop *aop ;
+    regs *r = NULL;
+
+    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    if (options.useXstack) {
+
+        aop = newAsmop(0);
+        r = getFreePtr(ic,&aop,FALSE);
+        pic14_emitcode("mov","%s,_spx",r->name);
+
+    }
+
+    for (i = 0 ; i < pic14_nRegs ;i++) {
+        if (options.useXstack) {
+            pic14_emitcode("inc","%s",r->name);
+            //pic14_emitcode("mov","a,(%s+%d)",
+            //       regspic14[i].base,8*bank+regspic14[i].offset);
+            pic14_emitcode("movx","@%s,a",r->name);
+        } else
+            pic14_emitcode("push","");// "(%s+%d)",
+        //regspic14[i].base,8*bank+regspic14[i].offset);
+    }
+
+    if (pushPsw) {
+        if (options.useXstack) {
+            pic14_emitcode("mov","a,psw");
+            pic14_emitcode("movx","@%s,a",r->name);
+            pic14_emitcode("inc","%s",r->name);
+            pic14_emitcode("mov","_spx,%s",r->name);
+            freeAsmop (NULL,aop,ic,TRUE);
+
+        } else
+            pic14_emitcode("push","psw");
+
+        pic14_emitcode("mov","psw,#0x%02x",(bank << 3)&0x00ff);
+    }
+    ic->bankSaved = 1;
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -2030,56 +2090,6 @@ static void unsaverbank (int bank,iCode *ic,bool popPsw)
         freeAsmop(NULL,aop,ic,TRUE);
 
     }
-#endif
-}
-
-/*-----------------------------------------------------------------*/
-/* saverbank - saves an entire register bank on the stack          */
-/*-----------------------------------------------------------------*/
-static void saverbank (int bank, iCode *ic, bool pushPsw)
-{
-    FENTRY;
-
-    DEBUGpic14_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
-#if 0
-    int i;
-    asmop *aop ;
-    regs *r = NULL;
-
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if (options.useXstack) {
-
-        aop = newAsmop(0);
-        r = getFreePtr(ic,&aop,FALSE);
-        pic14_emitcode("mov","%s,_spx",r->name);
-
-    }
-
-    for (i = 0 ; i < pic14_nRegs ;i++) {
-        if (options.useXstack) {
-            pic14_emitcode("inc","%s",r->name);
-            //pic14_emitcode("mov","a,(%s+%d)",
-            //       regspic14[i].base,8*bank+regspic14[i].offset);
-            pic14_emitcode("movx","@%s,a",r->name);
-        } else
-            pic14_emitcode("push","");// "(%s+%d)",
-        //regspic14[i].base,8*bank+regspic14[i].offset);
-    }
-
-    if (pushPsw) {
-        if (options.useXstack) {
-            pic14_emitcode("mov","a,psw");
-            pic14_emitcode("movx","@%s,a",r->name);
-            pic14_emitcode("inc","%s",r->name);
-            pic14_emitcode("mov","_spx,%s",r->name);
-            freeAsmop (NULL,aop,ic,TRUE);
-
-        } else
-            pic14_emitcode("push","psw");
-
-        pic14_emitcode("mov","psw,#0x%02x",(bank << 3)&0x00ff);
-    }
-    ic->bankSaved = 1;
 #endif
 }
 
@@ -3333,7 +3343,8 @@ static int genChkZeroes(operand *op, int lit,  int size)
 /*                  aop (if it's NOT a literal) or from lit (if    */
 /*                  aop is a literal)                              */
 /*-----------------------------------------------------------------*/
-void pic14_mov2w_regOrLit (asmop *aop, unsigned long lit, int offset) {
+static void pic14_mov2w_regOrLit (asmop *aop, unsigned long lit, int offset)
+{
   if (aop->type == AOP_LIT) {
     emitpcode (POC_MOVLW, popGetLit((lit >> (offset*8)) & 0x00FF));
   } else {
@@ -6303,12 +6314,6 @@ static void shiftR2Left2Result (operand *left, int offl,
     }
     */
     /* a:x >> shCount (x = lsb(result))*/
-    /*
-    if(sign)
-    AccAXRshS( aopGet(AOP(result),offr,FALSE,FALSE) , shCount);
-    else {
-    AccAXRsh( aopGet(AOP(result),offr,FALSE,FALSE) , shCount);
-    */
     switch(shCount) {
     case 0:
         break;
@@ -6890,7 +6895,8 @@ static void genLeftShift (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* SetIrp - Set IRP bit                                            */
 /*-----------------------------------------------------------------*/
-void SetIrp(operand *result) {
+static void SetIrp(operand *result)
+{
     FENTRY;
     if (AOP_TYPE(result) == AOP_LIT) {
         unsigned lit = (unsigned) double2ul (operandLitValue(result));
@@ -9000,7 +9006,7 @@ void genpic14Code (iCode *lic)
 /* This is not safe, as a AOP_PCODE/PO_IMMEDIATE might be used both as literal
  * (meaning: representing its own address) or not (referencing its contents).
  * This can only be decided based on the operand's type. */
-int
+static int
 aop_isLitLike (asmop *aop)
 {
   assert (aop);

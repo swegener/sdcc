@@ -26,33 +26,21 @@ pcoderegs.c
   The purpose of the code in this file is to optimize the register usage.
 
 */
-#include <stdio.h>
 
-#include "common.h"   // Include everything in the SDCC src directory
-#include "newalloc.h"
-#include "ralloc.h"
-#include "device.h"
-#include "pcode.h"
+#include "main.h"
 #include "pcoderegs.h"
 #include "pcodeflow.h"
-#include "main.h"
+#include "ralloc.h"
 
-extern void dbg_dumpregusage(void);
-extern pCode * findPrevInstruction(pCode *pci);
-extern pBranch * pBranchAppend(pBranch *h, pBranch *n);
-void unlinkpCode(pCode *pc);
-extern int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip);
-char *pCode2str(char *str, int size, pCode *pc);
-//static int sameRegs (const regs *reg1, const regs *reg2);
 
-int total_registers_saved=0;
-int register_optimization=1;
+static int total_registers_saved=0;
+static int register_optimization=1;
 
 /*-----------------------------------------------------------------*
 * void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
 *-----------------------------------------------------------------*/
 /*
-void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
+static void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
 {
 
 	if(!reg || ! pcfl || !isPCFL(pcflow))
@@ -65,10 +53,11 @@ void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
 */
 
 
+#if 0
 /*-----------------------------------------------------------------*
 * 
 *-----------------------------------------------------------------*/
-void dbg_regusage(set *fregs)
+static void dbg_regusage(set *fregs)
 {
 	regs *reg;
 	pCode *pcfl;
@@ -120,11 +109,13 @@ void dbg_regusage(set *fregs)
 		}
 	}
 }
+#endif
 
+#if 0
 /*-----------------------------------------------------------------*
 * 
 *-----------------------------------------------------------------*/
-void dbg_dumpregusage(void)
+static void dbg_dumpregusage(void)
 {
 	
 	fprintf(stderr,"***  Register Usage  ***\n");
@@ -142,12 +133,12 @@ void dbg_dumpregusage(void)
 	dbg_regusage(dynProcessorRegs);
 	
 }
-
+#endif
 
 /*-----------------------------------------------------------------*
 * void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 *-----------------------------------------------------------------*/
-void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
+static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 {
 	
 	pCode *pc=NULL;
@@ -304,7 +295,7 @@ static void Remove1pcode(pCode *pc, regs *reg, int debug_code)
 * void RemoveRegsFromSet(set *regset)
 *
 *-----------------------------------------------------------------*/
-void  RemoveRegsFromSet(set *regset)
+static void RemoveRegsFromSet(set *regset)
 {
 	regs *reg;
 	int used;
@@ -371,9 +362,7 @@ void  RemoveRegsFromSet(set *regset)
 	}
 }
 
-void RegsUnMapLiveRanges(void);
-extern pFile *the_pFile;
-void pic14_ReMapLiveRanges(void)
+static void pic14_ReMapLiveRanges(void)
 {
 	pBlock *pb;
 	if (!the_pFile) return;
@@ -454,7 +443,7 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int 
 /*-----------------------------------------------------------------*
 *
 *-----------------------------------------------------------------*/
-int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
+static int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
 {
 	int i=0;
 	regs *testreg;
@@ -476,7 +465,7 @@ int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
 	return 0;
 }
 
-int regIsSpecial (regs *reg, int mayBeGlobal)
+static int regIsSpecial (regs *reg, int mayBeGlobal)
 {
   if (!reg) return 0;
 
@@ -513,7 +502,7 @@ static int regIsLocal (regs *reg)
 * 
 *
 *-----------------------------------------------------------------*/
-int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free, int optimize_level)
+static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free, int optimize_level)
 {
 	pCode *pct1, *pct2;
 	regs  *reg1, *reg2;
@@ -699,7 +688,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 /*-----------------------------------------------------------------*
 * void pCodeRegOptimeRegUsage(pBlock *pb) 
 *-----------------------------------------------------------------*/
-void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
+static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 {
 	regs *reg;
 	int used;
@@ -832,7 +821,6 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 					
 					if(pc1 && isPCI(pc1) &&  ( (pcfl1 = PCI(pc1)->pcflow) != NULL) ) {
 						
-						//while(rset2 && searching) {
 						if(rset2) {
 							
 							pc2 = rset2->item;
@@ -1128,7 +1116,7 @@ df_removeStates ()
 	} // while
 }
 
-int regIsDead (regs *reg, int cond, pCode *pc)
+static int regIsDead (regs *reg, int cond, pCode *pc)
 {
 	set *seenStates = NULL;
 	set *todo = NULL;
@@ -1200,14 +1188,6 @@ int regIsDead (regs *reg, int cond, pCode *pc)
    (otherwise the SKIP instruction would have to be removed as well,
    which may not be done for SFRs (side-effects on read possible)).
    ------------------------------------------------------------------ */
-
-extern void unBuildFlow (pBlock *pb);
-extern void RegsUnMapLiveRanges ();
-extern void BuildFlow (pBlock *pb);
-extern void LinkFlow (pBlock *pb);
-extern void BuildFlowTree (pBlock *pb);
-extern void pCodeRegMapLiveRanges (pBlock *pb);
-extern pFile *the_pFile;
 
 static int pCodeRemove (pCode *pc, const char *comment)
 {
@@ -1466,7 +1446,7 @@ static void replace_PCI (pCodeInstruction *pc, pCodeInstruction *newpc, char *co
    Find the first (unique) assignment to `reg' (prior to pc).
    ------------------------------------------------------------------ */
 
-pCode *findAssignmentToReg (regs *reg, pCode *pc)
+static pCode *findAssignmentToReg (regs *reg, pCode *pc)
 {
 	pCode *curr;
 	
@@ -1493,7 +1473,7 @@ pCode *findAssignmentToReg (regs *reg, pCode *pc)
    Find a register that holds the same value as `reg' (an alias).
    ------------------------------------------------------------------ */
 
-regs *findRegisterAlias (regs *reg, pCode *pc)
+static regs *findRegisterAlias (regs *reg, pCode *pc)
 {
 	pCode *curr;
 
@@ -1553,7 +1533,7 @@ regs *findRegisterAlias (regs *reg, pCode *pc)
    it with a better variant if possible.
    ------------------------------------------------------------------ */
 
-void analyzeAndReplacePCI (pCodeInstruction *pci)
+static void analyzeAndReplacePCI (pCodeInstruction *pci)
 {
 	regs *op_reg, *alias_reg;
 	
@@ -1592,8 +1572,6 @@ void analyzeAndReplacePCI (pCodeInstruction *pci)
 		break;
 	} // switch
 }
-
-extern pFile *the_pFile;
 
 /* ------------------------------------------------------------------
    Find and remove dead pCodes.
@@ -1636,7 +1614,7 @@ static int removeDeadPCIs (void)
    not used) -- these should be removed in a following sweep phase.
    ------------------------------------------------------------------ */
 
-void optimizeDataflow (void)
+static void optimizeDataflow (void)
 {
 	pBlock *pb;
 	
@@ -1720,7 +1698,7 @@ void pCodeRegOptimizeRegUsage(int level)
 * void RegsUnMapLiveRanges(set *regset)
 *
 *-----------------------------------------------------------------*/
-void  RegsSetUnMapLiveRanges(set *regset)
+static void RegsSetUnMapLiveRanges(set *regset)
 {
 	regs *reg;
 	

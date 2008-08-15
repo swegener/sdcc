@@ -26,7 +26,11 @@
 #ifndef SDCCGENPIC14_H
 #define SDCCGENPIC14_H
 
-extern int debug_verbose;
+#include "common.h"
+
+#include "main.h"
+#include "pcode.h"
+#include "ralloc.h"
 
 #define FENTRY do {                                                                     \
         /*fprintf (stderr, "%s:%u:%s: *{*\n", __FILE__, __LINE__, __FUNCTION__);*/      \
@@ -40,8 +44,6 @@ extern int debug_verbose;
                 emitpComment ("; %s:%u:%s *}*", __FILE__, __LINE__, __FUNCTION__);      \
         }                                                                               \
 } while (0)
-
-struct pCodeOp;
 
 enum
 {
@@ -92,8 +94,6 @@ typedef struct asmop
 }
 asmop;
 
-void genpic14Code (iCode *);
-
 extern unsigned fReturnSizePic;
 
 
@@ -110,17 +110,10 @@ extern unsigned fReturnSizePic;
 #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) pic14_emitcode(";XXX mov","a,%s  %s,%d",x,__FILE__,__LINE__);
 #define CLRC    pic14_emitcode(";XXX clr","c %s,%d",__FILE__,__LINE__);
 
-#define BIT_NUMBER(x) (x & 7)
-#define BIT_REGISTER(x) (x>>3)
-
-
 #define LSB     0
 #define MSB16   1
 #define MSB24   2
 #define MSB32   3
-
-
-#define FUNCTION_LABEL_INC  40
 
 /*-----------------------------------------------------------------*/
 /* Macros for emitting skip instructions                           */
@@ -149,40 +142,33 @@ void emitpLabel(int key);
 void pic14_emitcode (char *inst,char *fmt, ...);
 void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
 void pic14_emitDebuggerSymbol (char *);
-asmop *newAsmop (short type);
 bool pic14_sameRegs (asmop *aop1, asmop *aop2 );
 char *aopGet (asmop *aop, int offset, bool bit16, bool dname);
+void DEBUGpic14_AopType(int line_no, operand *left, operand *right, operand *result);
+void genpic14Code (iCode *lic);
 
 
-bool genPlusIncr (iCode *ic);
-void pic14_outBitAcc(operand *result);
-void genPlus (iCode *ic);
-void addSign(operand *result, int offset, int sign);
-void genMinus (iCode *ic);
-
-
-pCodeOp *popGetLabel(unsigned int key);
-pCodeOp *popCopyReg(pCodeOpReg *pc);
-pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
-pCodeOp *popGetLit(unsigned int lit);
-pCodeOp *popGetWithString(char *str, int isExtern);
-pCodeOp *popRegFromString(char *str, int size, int offset);
 pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 pCodeOp *popGetAddr (asmop *aop, int offset, int index);
-pCodeOp *popGetTempReg(void);
-void popReleaseTempReg(pCodeOp *pcop);
+pCodeOp *popGetExternal (char *str, int isReg);
+pCodeOp *popGetLabel(unsigned int key);
+pCodeOp *popGetLit(unsigned int lit);
 
 
 void aopPut (asmop *aop, char *s, int offset);
 void pic14_outAcc(operand *result);
 void aopOp (operand *op, iCode *ic, bool result);
-void pic14_outBitC(operand *result);
-void pic14_toBoolean(operand *oper);
 void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 void mov2w (asmop *aop, int offset);
-const char *pCodeOpType(  pCodeOp *pcop);
-
-int aop_isLitLike (asmop *aop);
 int op_isLitLike (operand *op);
+
+/*
+ * From genarith.c:
+ */
+const char *AopType(short type);
+const char *pCodeOpType(pCodeOp *pcop);
+void genPlus (iCode *ic);
+void addSign(operand *result, int offset, int sign);
+void genMinus (iCode *ic);
 
 #endif

@@ -29,6 +29,13 @@
 #ifndef  __DEVICE_H__
 #define  __DEVICE_H__
 
+#include "common.h"
+
+/*
+ * Imports
+ */
+extern char *iComments2;
+
 /* memRange - a structure to define a range of valid memory addresses 
  * 
  * The Memory of most PICs (and other micros) is a collection of
@@ -68,27 +75,15 @@ typedef struct PIC_device {
 
 } PIC_device;
 
-/* Given a pointer to a register, this macro returns the bank that it is in */
-#define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
 
-
-/****************************************/
-void assignConfigWordValue(int address, int value);
-int getConfigWord(int address);
-int isREGinBank(regs *reg, int bank);
-int REGallBanks(regs *reg);
-void addMemRange(memRange *r, int type);
-void setMaxRAM(int size);
-void setDefMaxRam(void);
-
+PIC_device *init_pic(char *pic_type);
+int picIsInitialized(void);
+char *processor_base_name(void);
+int IS_CONFIG_ADDRESS(int addr);
 void pic14_assignConfigWordValue(int address, int value);
-int pic14_emitConfigWord (FILE * vFile);
-int pic14_getConfigWord(int address);
+int pic14_emitConfigWord(FILE *vFile);
 
-unsigned pic14_getMaxRam(void);
-int pic14_getHasSecondConfigReg(void);
 int pic14_allRAMShared(void);
-int pic14_hasSharebank(int *low, int *high, int *size);
 int pic14_getSharedStack(int *low, int *high, int *size);
 PIC_device * pic14_getPIC(void);
 

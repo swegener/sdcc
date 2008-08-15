@@ -18,31 +18,11 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "common.h"   // Include everything in the SDCC src directory
-#include "newalloc.h"
-//#define PCODE_DEBUG
 #include "pcode.h"
 #include "pcodeflow.h"
 #include "ralloc.h"
 
-pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
-pCodeOp *popRegFromString(char *str, int size, int offset);
-
-pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype);
-pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
-pCode * findNextInstruction(pCode *pc);
-int getpCode(char *mnem,int dest);
-int getpCodePeepCommand(char *cmd);
-void pBlockMergeLabels(pBlock *pb);
-char *pCode2str(char *str, int size, pCode *pc);
-char *get_op( pCodeOp *pcop,char *buf,int buf_size);
-
-extern pCodeInstruction *pic14Mnemonics[];
-extern pCode * findPrevInstruction(pCode *pci);
-
+//#define PCODE_DEBUG
 
 #define IS_PCCOMMENT(x) ( x && (x->type==PC_COMMENT))
 
@@ -120,8 +100,8 @@ typedef struct pCodeToken
 	
 } pCodeToken;
 
-pCodeToken tokArr[50];
-unsigned   tokIdx=0;
+static pCodeToken tokArr[50];
+static unsigned   tokIdx=0;
 
 
 typedef enum  {
@@ -145,9 +125,10 @@ typedef struct parsedPattern {
 } parsedPattern;
 
 #define MAX_PARSEDPATARR 50
-parsedPattern parsedPatArr[MAX_PARSEDPATARR];
-unsigned int parsedPatIdx=0;
-
+static parsedPattern parsedPatArr[MAX_PARSEDPATARR];
+#if 0
+static unsigned int parsedPatIdx=0;
+#endif
 
 typedef enum {
 	PCP_LABEL=1,
@@ -174,7 +155,7 @@ typedef struct pcPattern {
 	void * (*f) (void *,pCodeWildBlock *);
 } pcPattern;
 
-pcPattern pcpArr[] = {
+static pcPattern pcpArr[] = {
 	{PCP_LABEL,     pcpat_label,      NULL},
 	{PCP_WILDSTR,   pcpat_wildString, NULL},
 	{PCP_STR,       pcpat_string,     NULL},
@@ -222,7 +203,7 @@ static void * cvt_altpat_mnem2(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb);
 
-pcPattern altArr[] = {
+static pcPattern altArr[] = {
 	{ALT_LABEL,        alt_label,  cvt_altpat_label},
 	{ALT_COMMENT,      alt_comment,cvt_altpat_comment},
 	{ALT_MNEM3,        alt_mnem3,  cvt_altpat_mnem3},
@@ -285,14 +266,14 @@ static pCodeOp *cvt_extract_status(char *reg, char *bit)
 	if(len == 1) {
 		// check C,Z
 		if(toupper((unsigned char)*bit) == 'C')
-			return PCOP(popCopyGPR2Bit(&pc_status,PIC_C_BIT));
+			return PCOP(popCopyGPR2Bit(PCOP(&pc_status),PIC_C_BIT));
 		if(toupper((unsigned char)*bit) == 'Z')
-			return PCOP(popCopyGPR2Bit(&pc_status,PIC_Z_BIT));
+			return PCOP(popCopyGPR2Bit(PCOP(&pc_status),PIC_Z_BIT));
 	}
 	
 	// Check DC
 	if(len ==2 && toupper((unsigned char)bit[0]) == 'D' && toupper((unsigned char)bit[1]) == 'C')
-		return PCOP(popCopyGPR2Bit(&pc_status,PIC_DC_BIT));
+		return PCOP(popCopyGPR2Bit(PCOP(&pc_status),PIC_DC_BIT));
 	
 	return NULL;
 	
@@ -820,7 +801,7 @@ static void tokenizeLineNode(char *ln)
 
 
 
-void dump1Token(pCodeTokens tt)
+static void dump1Token(pCodeTokens tt)
 {
 	
 	switch(tt) {
@@ -865,7 +846,7 @@ void dump1Token(pCodeTokens tt)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
+static int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
 {
 	int i=0;
 	
@@ -898,7 +879,7 @@ int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
+static int altComparePattern(char *pct, parsedPattern *pat, int max_tokens)
 {
 	int i=0;
 	
@@ -933,7 +914,7 @@ int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-int advTokIdx(int *v, int amt)
+static int advTokIdx(int *v, int amt)
 {
 	
 	if((unsigned) (*v + amt) > tokIdx)
@@ -962,7 +943,7 @@ int advTokIdx(int *v, int amt)
 /* pcode.                                                          */
 /*-----------------------------------------------------------------*/
 
-int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
+static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 {
 	pCode *pc;
 	int error = 0;
@@ -1184,7 +1165,7 @@ int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 /*-----------------------------------------------------------------*/
 /*                                                                 */
 /*-----------------------------------------------------------------*/
-void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
+static void peepRuleBlock2pCodeBlock(lineNode *ln, pCodeWildBlock *pcwb)
 {
 	
 	if(!ln)
@@ -1208,10 +1189,11 @@ void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
 	}
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /*                                                                 */
 /*-----------------------------------------------------------------*/
-pCode *AssembleLine(char *line)
+static pCode *AssembleLine(char *line)
 {
 	pCode *pc=NULL;
 	
@@ -1228,6 +1210,7 @@ pCode *AssembleLine(char *line)
 	return pc;
 	
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* peepRuleCondition                                               */
@@ -1248,8 +1231,7 @@ static void   peepRuleCondition(char *cond, pCodePeep *pcp)
 	
 }
 
-
-void initpCodeWildBlock(pCodeWildBlock *pcwb)
+static void initpCodeWildBlock(pCodeWildBlock *pcwb)
 {
 	
 	//  pcwb = Safe_calloc(1,sizeof(pCodeWildBlock));
@@ -1267,7 +1249,7 @@ void initpCodeWildBlock(pCodeWildBlock *pcwb)
 	
 }
 
-void postinit_pCodeWildBlock(pCodeWildBlock *pcwb)
+static void postinit_pCodeWildBlock(pCodeWildBlock *pcwb)
 {
 	
 	if(!pcwb)
@@ -1284,7 +1266,7 @@ void postinit_pCodeWildBlock(pCodeWildBlock *pcwb)
 	
 }
 
-void initpCodePeep(pCodePeep *pcp)
+static void initpCodePeep(pCodePeep *pcp)
 {
 	
 	//  pcwb = Safe_calloc(1,sizeof(pCodeWildBlock));
@@ -1311,9 +1293,7 @@ void initpCodePeep(pCodePeep *pcp)
 /* taking raw text to produce machine code, it produces pCode.     */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
-extern void pic14initpCodePeepCommands(void);
-
-void  peepRules2pCode(peepRule *rules)
+void peepRules2pCode(peepRule *rules)
 {
 	peepRule *pr;
 	
@@ -1396,7 +1376,8 @@ void  peepRules2pCode(peepRule *rules)
 	
 }
 
-void printpCodeString(FILE *of, pCode *pc, int max)
+#if 0
+static void printpCodeString(FILE *of, pCode *pc, int max)
 {
 	int i=0;
 	
@@ -1405,6 +1386,7 @@ void printpCodeString(FILE *of, pCode *pc, int max)
 		pc = pc->next;
 	}
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* _DLL * DLL_append                                               */
@@ -1517,7 +1499,7 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip)
 *
 * Compare two pCodeOp's and return 1 if they're the same
 *-----------------------------------------------------------------*/
-int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
+static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 {
 	char b[50], *n2;
 	
@@ -1570,7 +1552,7 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 	return 1;
 }
 
-int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
+static int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 {
 	int labindex;
 	
@@ -1653,7 +1635,7 @@ int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 
-int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
+static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 {
 	int index;   // index into wild card arrays
 	
@@ -1876,7 +1858,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-void pCodePeepClrVars(pCodePeep *pcp)
+static void pCodePeepClrVars(pCodePeep *pcp)
 {
 	
 	int i;

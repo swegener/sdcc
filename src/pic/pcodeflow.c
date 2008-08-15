@@ -27,14 +27,6 @@
 
 */
 
-#include <stdio.h>
-
-#include "common.h"   // Include everything in the SDCC src directory
-#include "newalloc.h"
-#include "ralloc.h"
-#include "device.h"
-#include "pcode.h"
-#include "pcoderegs.h"
 #include "pcodeflow.h"
 
 #if 0
@@ -49,7 +41,7 @@ flow path is constructed.
 
 static set *FlowTree=NULL;
 
-void dbg_dumpFlowTree(set *FlowTree)
+static void dbg_dumpFlowTree(set *FlowTree)
 {
 	set *segment;
 	pCodeFlow *pcflow;
@@ -74,7 +66,7 @@ void dbg_dumpFlowTree(set *FlowTree)
 /*-----------------------------------------------------------------*
 * void BuildFlowSegment(set *segment, pCodeFlow *pcflow)
 *-----------------------------------------------------------------*/
-void BuildFlowSegment(set *segment, pCodeFlow *pcflow)
+static void BuildFlowSegment(set *segment, pCodeFlow *pcflow)
 {
 	
 	int nNextFlow=0;
@@ -156,7 +148,8 @@ void BuildFlowTree(pBlock *pb)
 }
 #endif
 
-void dbg_dumpFlow(pBlock *pb)
+#if 0
+static void dbg_dumpFlow(pBlock *pb)
 {
 	pCode *pcflow;
 	
@@ -183,11 +176,13 @@ void dbg_dumpFlow(pBlock *pb)
 	}
 	
 }
+#endif
+
 /*-----------------------------------------------------------------*
 * void BuildFlowSegment(set *segment, pCodeFlow *pcflow)
 *-----------------------------------------------------------------*/
 
-void BuildFlowSegment(pCodeFlow *pcflow)
+static void BuildFlowSegment(pCodeFlow *pcflow)
 {
 	static int recursion=0;
 	pCodeFlow *pcflow_other;

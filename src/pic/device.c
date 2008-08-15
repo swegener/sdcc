@@ -18,29 +18,21 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-#include "common.h"   // Include everything in the SDCC src directory
-#include "newalloc.h"
-
-
-#include "main.h"
-#include "pcode.h"
-#include "ralloc.h"
 #include "device.h"
 
-extern int Gstack_base_addr;
-extern int Gstack_size;
+/*
+ * Imports
+ */
+extern set *includeDirsSet;
+extern set *userIncDirsSet;
+extern set *libDirsSet;
+extern set *libPathsSet;
 
 #define MAX_PICLIST 200
 static PIC_device *Pics[MAX_PICLIST];
+static PIC_device *pic = NULL;
 static int num_of_supported_PICS = 0;
-
-static PIC_device *pic=NULL;
-
-int maxRAMaddress = 0;
+static int maxRAMaddress = 0;
 
 #define CONFIG_WORD_ADDRESS 0x2007
 #define CONFIG2_WORD_ADDRESS 0x2008
@@ -51,6 +43,8 @@ int maxRAMaddress = 0;
 #define PIC14_STRING_LEN 256
 #define SPLIT_WORDS_MAX 16
 
+/* Keep track of whether we found an assignment to the __config words. */
+static int pic14_hasSetConfigWord = 0;
 static unsigned int config_word = DEFAULT_CONFIG_WORD;
 static unsigned int config2_word = DEFAULT_CONFIG2_WORD;
 static memRange *rangeRAM = NULL;
@@ -188,10 +182,16 @@ static void ram_map(int num_words, char word[SPLIT_WORDS_MAX][PIC14_STRING_LEN])
 	rangeRAM = r;
 }
 
-extern set *includeDirsSet;
-extern set *userIncDirsSet;
-extern set *libDirsSet;
-extern set *libPathsSet;
+static void setMaxRAM(int size)
+{
+	maxRAMaddress = size;
+
+	if (maxRAMaddress < 0) {
+		fprintf(stderr, "invalid maxram 0x%x setting in %s\n",
+			maxRAMaddress, DEVICE_FILE_NAME);
+		return;
+	}
+}
 
 /* read the file with all the pic14 definitions and pick out the definition
  * for a processor if specified. if pic_name is NULL reads everything */
@@ -411,44 +411,6 @@ static PIC_device *find_device(char *pic_name)
 	return NULL;
 }
 
-void setMaxRAM(int size)
-{
-	maxRAMaddress = size;
-	
-	if (maxRAMaddress < 0) {
-		fprintf(stderr, "invalid maxram 0x%x setting in %s\n",
-			maxRAMaddress, DEVICE_FILE_NAME);
-		return;
-	}
-}
-
-/*-----------------------------------------------------------------*
-*-----------------------------------------------------------------*/
-
-int isREGinBank(regs *reg, int bank)
-{
-	
-	if(!reg || !pic)
-		return 0;
-	
-	if((int)((reg->address | reg->alias) & pic->bankMask & bank) == bank)
-		return 1;
-	
-	return 0;
-}
-
-/*-----------------------------------------------------------------*
-*-----------------------------------------------------------------*/
-int REGallBanks(regs *reg)
-{
-	
-	if(!reg || !pic)
-		return 0;
-	
-	return ((reg->address | reg->alias) & pic->bankMask);
-	
-}
-
 /*-----------------------------------------------------------------*
  *  void list_valid_pics(int ncols, int list_alias)
  *
@@ -459,7 +421,7 @@ int REGallBanks(regs *reg)
  * list_alias - if non-zero, print all of the supported aliases
  *              for a device (e.g. F84, 16F84, etc...)
  *-----------------------------------------------------------------*/
-void list_valid_pics(int ncols)
+static void list_valid_pics(int ncols)
 {
 	int col=0,longest;
 	int i,k,l;
@@ -576,9 +538,10 @@ char *processor_base_name(void)
 	return pic->name;
 }
 
+#if 0
 /*-----------------------------------------------------------------*
 *-----------------------------------------------------------------*/
-int validAddress(int address, int reg_size)
+static int validAddress(int address, int reg_size)
 {
 	if (maxRAMaddress < 0) {
 		fprintf(stderr, "missing maxram setting in %s\n", DEVICE_FILE_NAME);
@@ -591,6 +554,7 @@ int validAddress(int address, int reg_size)
 	
 	return 1;
 }
+#endif
 
 #if 0
 /* The following code should be (and is) implemented in the linker. */
@@ -737,11 +701,15 @@ void assignRelocatableRegisters(set *regset, int used)
 }
 #endif
 
-/* Keep track of whether we found an assignment to the __config words. */
-static int pic14_hasSetConfigWord = 0;
+int IS_CONFIG_ADDRESS(int address)
+{
+
+        return ((address == CONFIG_WORD_ADDRESS)
+                || (address == CONFIG2_WORD_ADDRESS));
+}
 
 /*-----------------------------------------------------------------*
- *  void assignConfigWordValue(int address, int value)
+ *  void pic14_assignConfigWordValue(int address, int value)
  *
  * Most midrange PICs have one config word at address 0x2007.
  * Newer PIC14s have a second config word at address 0x2008.
@@ -762,12 +730,55 @@ void pic14_assignConfigWordValue(int address, int value)
 }
 
 /*-----------------------------------------------------------------*
+ * int pic14_getConfigWord(int address)
+ *
+ * Get the current value of a config word.
+ *
+ *-----------------------------------------------------------------*/
+
+static int pic14_getConfigWord(int address)
+{
+	switch (address)
+	{
+	case CONFIG_WORD_ADDRESS:
+		return config_word;
+	
+	case CONFIG2_WORD_ADDRESS:
+		return config2_word;
+	
+	default:
+		return 0;
+	}
+}
+
+#if 0
+/*-----------------------------------------------------------------*
+*  
+*-----------------------------------------------------------------*/
+static unsigned pic14_getMaxRam(void)
+{
+       return pic->defMaxRAMaddrs;
+}
+#endif
+
+/*-----------------------------------------------------------------*
+*  int getHasSecondConfigReg(void) - check if the device has a 
+*  second config register, rather than just one.
+*-----------------------------------------------------------------*/
+static int pic14_getHasSecondConfigReg(void)
+{
+	if(!pic)
+		return 0;
+	else
+		return pic->hasSecondConfigReg;
+}
+
+/*-----------------------------------------------------------------*
  * int pic14_emitConfigWord (FILE * vFile)
- * 
+ *
  * Emit the __config directives iff we found a previous assignment
  * to the config word.
  *-----------------------------------------------------------------*/
-extern char *iComments2;
 int pic14_emitConfigWord (FILE * vFile)
 {
   if (pic14_hasSetConfigWord)
@@ -789,54 +800,11 @@ int pic14_emitConfigWord (FILE * vFile)
 }
 
 /*-----------------------------------------------------------------*
- * int pic14_getConfigWord(int address)
- *
- * Get the current value of a config word.
- *
- *-----------------------------------------------------------------*/
-
-int pic14_getConfigWord(int address)
-{
-	switch (address)
-	{
-	case CONFIG_WORD_ADDRESS:
-		return config_word;
-	
-	case CONFIG2_WORD_ADDRESS:
-		return config2_word;
-	
-	default:
-		return 0;
-	}
-}
-
-/*-----------------------------------------------------------------*
-*  
-*-----------------------------------------------------------------*/
-unsigned pic14_getMaxRam(void)
-{
-	return pic->defMaxRAMaddrs;
-}
-
-
-/*-----------------------------------------------------------------*
-*  int getHasSecondConfigReg(void) - check if the device has a 
-*  second config register, rather than just one.
-*-----------------------------------------------------------------*/
-int pic14_getHasSecondConfigReg(void)
-{
-	if(!pic)
-		return 0;
-	else
-		return pic->hasSecondConfigReg;
-}
-
-/*-----------------------------------------------------------------*
  * True iff the device has memory aliased in every bank.
  * If true, low and high will be set to the low and high address
  * occupied by the (last) sharebank found.
  *-----------------------------------------------------------------*/
-int pic14_hasSharebank(int *low, int *high, int *size)
+static int pic14_hasSharebank(int *low, int *high, int *size)
 {
 	memRange *r;
 
@@ -868,7 +836,7 @@ int pic14_hasSharebank(int *low, int *high, int *size)
 /*
  * True iff the memory region [low, high] is aliased in all banks.
  */
-int pic14_isShared(int low, int high)
+static int pic14_isShared(int low, int high)
 {
 	memRange *r;
 

@@ -23,10 +23,11 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include "SDCCicode.h"
-#include "SDCCBBlock.h"
+
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
+
+#include "common.h"
 
 #include "pcoderegs.h"
 
@@ -67,7 +68,6 @@ typedef struct regs
 }
 regs;
 extern regs regspic14[];
-extern int pic14_nRegs;
 extern int Gstack_base_addr;
 
 /*
@@ -83,16 +83,21 @@ extern set *dynDirectBitRegs;
 extern set *dynInternalRegs;
 
 
+void initStack(int base_address, int size, int shared);
 regs *pic14_regWithIdx (int);
 regs *dirregWithName (char *name );
-void  pic14_freeAllRegs ();
-void  pic14_deallocateAllRegs ();
+void pic14_assignRegisters (ebbIndex *ebbi);
 regs *pic14_findFreeReg(short type);
 regs *pic14_allocWithIdx (int idx);
 regs *typeRegWithIdx (int idx, int type, int fixed);
 regs *regFindWithName (const char *name);
 
+void pic14_debugLogClose(void);
+void writeUsedRegs(FILE *of);
+
 regs *allocDirReg (operand *op );
+regs *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
+regs *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 regs *allocRegByName (char *name, int size );
 regs *allocNewDirReg (sym_link *symlnk,const char *name);
 
@@ -111,5 +116,7 @@ regs *allocNewDirReg (sym_link *symlnk,const char *name);
 #define IDX_WSAVE   0x7ffe
 #define IDX_SSAVE   0x7ffd
 #define IDX_PSAVE   0x7ffc
+
+#define pic14_nRegs 128
 
 #endif

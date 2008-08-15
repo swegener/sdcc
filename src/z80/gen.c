@@ -396,15 +396,15 @@ static void
 _vemit2 (const char *szFormat, va_list ap)
 {
   struct dbuf_s dbuf;
-  const char *buffer;
+  char *buffer;
 
   dbuf_init(&dbuf, INITIAL_INLINEASM);
 
   dbuf_tvprintf (&dbuf, szFormat, ap);
 
-  buffer = dbuf_c_str(&dbuf);
+  buffer = (char *)dbuf_c_str(&dbuf);
 
-  _tidyUp ((char *)buffer);
+  _tidyUp (buffer);
   _G.lines.current = (_G.lines.current ?
               connectLine (_G.lines.current, _newLineNode (buffer)) :
               (_G.lines.head = _newLineNode (buffer)));

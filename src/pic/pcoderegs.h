@@ -23,6 +23,10 @@
 #ifndef __PCODEREGS_H__
 #define __PCODEREGS_H__
 
+#include "common.h"
+
+#include "pcode.h"
+
 /*************************************************
 
   pCodeRegLives 
@@ -38,5 +42,9 @@ typedef struct pCodeRegLives {
 
 } pCodeRegLives;
 
+void pCodeRegMapLiveRanges(struct pBlock *pb);
+void pCodeRegOptimizeRegUsage(int level);
+void RegsUnMapLiveRanges(void);
+void RemoveUnusedRegisters(void);
 
 #endif //  __PCODEREGS_H__

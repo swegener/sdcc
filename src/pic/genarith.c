@@ -29,26 +29,21 @@
       Made everything static
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "SDCCglobl.h"
-#include "newalloc.h"
-
 #if defined(_MSC_VER) && (_MSC_VER < 1300)
 #define __FUNCTION__    __FILE__
 #endif
 
 #include "common.h"
-#include "SDCCpeeph.h"
-#include "ralloc.h"
-#include "pcode.h"
+#include "newalloc.h"
+//#include "SDCCglobl.h"
+//#include "SDCCpeeph.h"
+
 #include "gen.h"
+#include "pcode.h"
+#include "ralloc.h"
 
 
 #define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
-extern void DEBUGpic14_AopType(int line_no, operand *left, operand *right, operand *result);
 
 const char *AopType(short type)
 {
@@ -82,7 +77,8 @@ const char *AopType(short type)
         return "BAD TYPE";
 }
 
-void DebugAop(asmop *aop)
+#if 0
+static void DebugAop(asmop *aop)
 {
         if(!aop)
                 return;
@@ -115,6 +111,7 @@ void DebugAop(asmop *aop)
                 break;
         }
 }
+#endif
 
 const char *pCodeOpType(  pCodeOp *pcop)
 {
@@ -174,7 +171,7 @@ const char *pCodeOpType(  pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 /* genPlusIncr :- does addition with increment if possible         */
 /*-----------------------------------------------------------------*/
-bool genPlusIncr (iCode *ic)
+static bool genPlusIncr (iCode *ic)
 {
         unsigned int icount ;
         unsigned int size = pic14_getDataSize(IC_RESULT(ic));
@@ -264,10 +261,11 @@ bool genPlusIncr (iCode *ic)
         return FALSE ;
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* pic14_outBitAcc - output a bit in acc                                 */
 /*-----------------------------------------------------------------*/
-void pic14_outBitAcc(operand *result)
+static void pic14_outBitAcc(operand *result)
 {
         symbol *tlbl = newiTempLabel(NULL);
         /* if the result is a bit */
@@ -284,6 +282,7 @@ void pic14_outBitAcc(operand *result)
                 pic14_outAcc(result);
         }
 }
+#endif
 
 #if 0
 /* This is the original version of this code.

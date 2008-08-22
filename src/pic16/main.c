@@ -487,35 +487,35 @@ _process_pragma(const char *s)
   return process_pragma_tbl(pragma_tbl, s);
 }
 
-#define REP_UDATA       "--preplace-udata-with="
+#define REP_UDATA         "--preplace-udata-with="
 
-#define STACK_MODEL     "--pstack-model="
-#define OPT_BANKSEL     "--obanksel="
+#define STACK_MODEL       "--pstack-model="
+#define OPT_BANKSEL       "--obanksel="
 
-#define ALT_ASM         "--asm="
-#define ALT_LINK        "--link="
+#define ALT_ASM           "--asm="
+#define ALT_LINK          "--link="
 
-#define IVT_LOC         "--ivt-loc="
-#define NO_DEFLIBS      "--nodefaultlibs"
-#define MPLAB_COMPAT    "--mplab-comp"
+#define IVT_LOC           "--ivt-loc="
+#define NO_DEFLIBS        "--nodefaultlibs"
+#define MPLAB_COMPAT      "--mplab-comp"
 
-#define USE_CRT         "--use-crt="
+#define USE_CRT           "--use-crt="
 
-#define OFMSG_LRSUPPORT "--flr-support"
+#define OFMSG_LRSUPPORT   "--flr-support"
 
-#define NO_OPTIMIZE_GOTO    "--no-optimize-goto"
-#define OPTIMIZE_CMP        "--optimize-cmp"
-#define OPTIMIZE_DF         "--optimize-df"
+#define NO_OPTIMIZE_GOTO  "--no-optimize-goto"
+#define OPTIMIZE_CMP      "--optimize-cmp"
+#define OPTIMIZE_DF       "--optimize-df"
 
-char *alt_asm=NULL;
-char *alt_link=NULL;
+char *alt_asm = NULL;
+char *alt_link = NULL;
 
-int pic16_mplab_comp=0;
+int pic16_mplab_comp = 0;
 extern int pic16_debug_verbose;
 extern int pic16_ralloc_debug;
 extern int pic16_pcode_verbose;
 
-int pic16_enable_peeps=0;
+int pic16_enable_peeps = 0;
 
 OPTION pic16_optionsTable[]= {
     /* code generation options */
@@ -725,32 +725,33 @@ static void _pic16_linkEdit(void)
 static void
 _pic16_finaliseOptions (void)
 {
-    char devlib[512];
+  port->mem.default_local_map = data;
+  port->mem.default_globl_map = data;
 
-    port->mem.default_local_map = data;
-    port->mem.default_globl_map = data;
+  /* peepholes are disabled for the time being */
+  options.nopeep = 1;
 
-    /* peepholes are disabled for the time being */
-    options.nopeep = 1;
+  /* explicit enable peepholes for testing */
+  if (pic16_enable_peeps)
+    options.nopeep = 0;
 
-    /* explicit enable peepholes for testing */
-    if(pic16_enable_peeps)
-      options.nopeep = 0;
-
-    options.all_callee_saves = 1;       // always callee saves
+  options.all_callee_saves = 1;       // always callee saves
 
 #if 0
-    options.float_rent = 1;
-    options.intlong_rent = 1;
+  options.float_rent = 1;
+  options.intlong_rent = 1;
 #endif
 
-    setMainValue("mcu", pic16->name[2] );
-    addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+  setMainValue("mcu", pic16->name[2] );
+  addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
-    setMainValue("mcu1", pic16->name[1] );
-    addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
+  setMainValue("mcu1", pic16->name[1] );
+  addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
 
-    if(!pic16_options.nodefaultlibs) {
+  if (!pic16_options.nodefaultlibs)
+    {
+      char devlib[512];
+
       /* now add the library for the device */
       sprintf(devlib, "libdev%s.a", pic16->name[1]);   /* e.g., libdev18f452.a */
       addSet(&libFilesSet, Safe_strdup(devlib));
@@ -759,35 +760,56 @@ _pic16_finaliseOptions (void)
       addSet(&libFilesSet, Safe_strdup( "libsdcc.a" ));
     }
 
-    if(alt_asm && strlen(alt_asm))
-      pic16_asmCmd[0] = alt_asm;
+  if (alt_asm && alt_asm[0] != '\0')
+    {
+      size_t len = strlen(alt_asm);
+      char *cmd = malloc(len + 3);
 
-    if(alt_link && strlen(alt_link))
-      pic16_linkCmd[0] = alt_link;
+      cmd[0] = '"';
+      memcpy(&cmd[1], alt_asm, len);
+      cmd[len + 1] = '"';
+      cmd[len + 2] = '\0';
+      pic16_linkCmd[0] = cmd;
+    }
 
-    if(!pic16_options.no_crt) {
+  if (alt_link && alt_link[0] != '\0')
+    {
+      size_t len = strlen(alt_asm);
+      char *cmd = malloc(len + 3);
+
+      cmd[0] = '"';
+      memcpy(&cmd[1], alt_link, len);
+      cmd[len + 1] = '"';
+      cmd[len + 2] = '\0';
+      pic16_linkCmd[0] = cmd;
+    }
+
+  if  (!pic16_options.no_crt)
+    {
       pic16_options.omit_ivt = 1;
       pic16_options.leave_reset = 0;
     }
 
-    if(options.model == MODEL_SMALL)
-      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_SMALL"));
-    else
-    if(options.model == MODEL_LARGE)
-      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_LARGE"));
-
+  if  (options.model == MODEL_SMALL)
+    addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_SMALL"));
+  else if(options.model == MODEL_LARGE)
     {
       char buf[128];
 
-        sprintf(buf, "-D%s -D__%s", pic16->name[2], pic16->name[1]);
-        *(strrchr(buf, 'f')) = 'F';
-        addSet(&asmOptionsSet, Safe_strdup( buf ));
+      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_LARGE"));
+
+      sprintf(buf, "-D%s -D__%s", pic16->name[2], pic16->name[1]);
+      *(strrchr(buf, 'f')) = 'F';
+      addSet(&asmOptionsSet, Safe_strdup(buf));
     }
 
-    if(STACK_MODEL_LARGE) {
+  if  (STACK_MODEL_LARGE)
+    {
       addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
       addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
-    } else {
+    }
+  else
+    {
       addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
       addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
     }

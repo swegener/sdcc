@@ -42,9 +42,12 @@ AC_SUBST(ARCH, [${ARCH-18f452}])
 AC_SUBST(CC, [${CC-$abs_top_builddir/../../../bin/sdcc}])
 AC_SUBST(CFLAGS, ["-mpic16 -p$ARCH"])
 AC_PATH_PROG(CCAS, gpasm, :)
+AC_SUBST(CCAS, [\"$CCAS\"])
 AC_SUBST(CCASFLAGS, ["-p$ARCH"])
 AC_PATH_PROG(LD, gplink, :)
+AC_SUBST(LD, [\"$LD\"])
 AC_PATH_PROG(AR, gplib, :)
+AC_SUBST(AR, [\"$AR\"])
 AC_SUBST(ARFLAGS, [-c])
 
 # $RANLIB is called by the autotools but not provided nor required

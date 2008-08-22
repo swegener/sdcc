@@ -2230,6 +2230,8 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
+CCAS=\"$CCAS\"
+
 CCASFLAGS="-p$ARCH"
 
 # Extract the first word of "gplink", so it can be a program name with args.
@@ -2273,6 +2275,8 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
+LD=\"$LD\"
+
 # Extract the first word of "gplib", so it can be a program name with args.
 set dummy gplib; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -2313,6 +2317,8 @@ else
 echo "${ECHO_T}no" >&6; }
 fi
 
+
+AR=\"$AR\"
 
 ARFLAGS=-c
 

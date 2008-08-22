@@ -1,8 +1,12 @@
+2008-08-22 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/configure, device/lib/pic16/configure.ac,
+          src/pic16/main.c: allow spaces in gpasm and gplink paths
+
 2008-08-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,
 	* src/z80/peeph-z80.def: minor peephole improvement
-
 
 2008-08-15 Raphael Neider <rneider AT web.de>
 

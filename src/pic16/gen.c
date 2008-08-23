@@ -2296,7 +2296,7 @@ static void genUminusFloat(operand *op,operand *result)
 /*-----------------------------------------------------------------*/
 static void genUminus (iCode *ic)
 {
-  int size, i;
+  int lsize, rsize, i;
   sym_link *optype, *rtype;
   symbol *label;
   int needLabel=0;
@@ -2331,40 +2331,65 @@ static void genUminus (iCode *ic)
     }
 
     /* otherwise subtract from zero by taking the 2's complement */
-    size = AOP_SIZE(IC_LEFT(ic));
-    assert( size == AOP_SIZE(IC_RESULT(ic)) );
+    lsize = AOP_SIZE(IC_LEFT(ic));
+    rsize = AOP_SIZE(IC_RESULT(ic));
     label = newiTempLabel ( NULL );
 
     if (pic16_sameRegs (AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
-      for (i=size-1; i > 0; i--) {
-        pic16_emitpcode (POC_COMF, pic16_popGet (AOP(IC_LEFT(ic)), i));
+      /* If the result is longer than the operand,
+         store sign extension (0x00 or 0xff) in W */
+      if (rsize > lsize) {
+        pic16_emitpcode (POC_MOVLW, pic16_popGetLit(0x00));
+        pic16_emitpcode (POC_BTFSS, pic16_popCopyGPR2Bit(pic16_popGet(AOP(IC_LEFT(ic)), lsize-1), 7));
+        pic16_emitpcode (POC_MOVLW, pic16_popGetLit(0xFF));
+      }
+      for (i = rsize - 1; i > 0; --i) {
+        if (i > lsize - 1) {
+          pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(IC_RESULT(ic)), i));
+        } else {
+          pic16_emitpcode (POC_COMF, pic16_popGet (AOP(IC_RESULT(ic)), i));
+        } // if
       } // for
-      pic16_emitpcode (POC_NEGF, pic16_popGet (AOP(IC_LEFT(ic)), 0));
-      for (i=1; i < size; i++) {
-        if (i == size - 1) { emitSKPNZ; } else { pic16_emitpcode (POC_BNZ, pic16_popGetLabel (label->key)); needLabel++; }
-        pic16_emitpcode (POC_INCF, pic16_popGet (AOP(IC_LEFT(ic)), i));
+      pic16_emitpcode (POC_NEGF, pic16_popGet (AOP(IC_RESULT(ic)), 0));
+      for (i = 1; i < rsize; ++i) {
+        if (i == rsize - 1) {
+          emitSKPNZ;
+        } else {
+          pic16_emitpcode (POC_BNZ, pic16_popGetLabel (label->key)); needLabel++;
+        }
+        pic16_emitpcode (POC_INCF, pic16_popGet (AOP(IC_RESULT(ic)), i));
       } // for
     } else {
-      for (i=size-1; i >= 0; i--) {
+      for (i = min(rsize, lsize) - 1; i >= 0; i--) {
         pic16_emitpcode (POC_COMFW, pic16_popGet (AOP(IC_LEFT(ic)), i));
         pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(IC_RESULT(ic)), i));
       } // for
-      if (size > 1) {
-        for (i=0; i < size-2; i++) {
-          pic16_emitpcode (POC_INCF, pic16_popGet (AOP(IC_RESULT(ic)),i));
-          pic16_emitpcode (POC_BNZ, pic16_popGetLabel (label->key)); needLabel++;
+      /* Sign extend if the result is longer than the operand */
+      if (rsize > lsize) {
+        pic16_emitpcode (POC_MOVLW, pic16_popGetLit(0x00));
+        pic16_emitpcode (POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(IC_RESULT(ic)), lsize - 1), 7));
+        pic16_emitpcode (POC_MOVLW, pic16_popGetLit(0xFF));
+        for (i = rsize - 1; i > lsize - 1; --i) {
+          pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(IC_RESULT(ic)), i));
         } // for
-        pic16_emitpcode (POC_INFSNZ, pic16_popGet (AOP(IC_RESULT(ic)), size-2));
       } // if
-      pic16_emitpcode (POC_INCF, pic16_popGet(AOP(IC_RESULT(ic)), size-1));
+      if (rsize > 1) {
+        for (i = 0; i < rsize - 2; i++) {
+          pic16_emitpcode (POC_INCF, pic16_popGet (AOP(IC_RESULT(ic)),i));
+          pic16_emitpcode (POC_BNZ, pic16_popGetLabel (label->key));
+          needLabel++;
+        } // for
+        pic16_emitpcode (POC_INFSNZ, pic16_popGet (AOP(IC_RESULT(ic)), rsize - 2));
+      } // if
+      pic16_emitpcode (POC_INCF, pic16_popGet(AOP(IC_RESULT(ic)), rsize - 1));
     }
     if (needLabel)
       pic16_emitpLabel (label->key);
 
 release:
     /* release the aops */
-    pic16_freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? 0 : 1));
-    pic16_freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+    pic16_freeAsmop(IC_LEFT(ic), NULL, ic, (RESULTONSTACK(ic) ? 0 : 1));
+    pic16_freeAsmop(IC_RESULT(ic), NULL, ic, TRUE);
 }
 
 void pic16_loadFromReturn(operand *op, int offset, pCodeOp *src)
@@ -6142,10 +6167,10 @@ static void genXor (iCode *ic, iCode *ifx)
               if  (t == 0x00L)
                 continue;
               else
-	        {
-	          pic16_emitpcode(POC_MOVLW, pic16_popGetLit(t));
-		  pic16_emitpcode(POC_XORWF, pic16_popGet(AOP(left), offset));
-	        }
+                {
+                  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(t));
+                  pic16_emitpcode(POC_XORWF, pic16_popGet(AOP(left), offset));
+                }
             }
           else
             {
@@ -6607,9 +6632,9 @@ static void AccRsh (int shCount, int andmask)
                 case 7 :
                         pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
                         break;
-		default:
-			// Rotating by 8 is a NOP.
-			break;
+                default:
+                        // Rotating by 8 is a NOP.
+                        break;
         }
 
         if (andmask)
@@ -7664,7 +7689,7 @@ static void genRightShiftLiteral (operand *left,
     } // for
   } else if (shCount >= (lsize * 8)) {
     if (sign) {
-      /* 
+      /*
        * Do NOT use
        *    CLRF    result
        *    BTFSC   left, 7

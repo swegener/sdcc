@@ -1,7 +1,13 @@
+2008-08-23 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic16/gen.c: applied patch
+	  2048464: PIC16: fix genUminus - addresses not.c regression test
+	  thanks Mauro Giachero
+
 2008-08-22 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/configure, device/lib/pic16/configure.ac,
-          src/pic16/main.c: allow spaces in gpasm and gplink paths
+	  src/pic16/main.c: allow spaces in gpasm and gplink paths
 
 2008-08-15 Philipp Klaus Krause <pkk AT spth.de>
 

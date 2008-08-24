@@ -695,18 +695,18 @@ static void _pic16_linkEdit(void)
 
     if(!libflags.ignore) {
       if(libflags.want_libc)
-        addSet(&libFilesSet, Safe_strdup("libc18f.a"));
+        addSet(&libFilesSet, Safe_strdup("libc18f.lib"));
 
           if(libflags.want_libm)
-            addSet(&libFilesSet, Safe_strdup("libm18f.a"));
+            addSet(&libFilesSet, Safe_strdup("libm18f.lib"));
 
           if(libflags.want_libio) {
-            sprintf(temp, "libio%s.a", pic16->name[1]);   /* build libio18f452.a name */
+            sprintf(temp, "libio%s.lib", pic16->name[1]);   /* build libio18f452.lib name */
             addSet(&libFilesSet, Safe_strdup(temp));
           }
 
           if(libflags.want_libdebug)
-            addSet(&libFilesSet, Safe_strdup("libdebug.a"));
+            addSet(&libFilesSet, Safe_strdup("libdebug.lib"));
         }
 
     shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
@@ -753,11 +753,11 @@ _pic16_finaliseOptions (void)
       char devlib[512];
 
       /* now add the library for the device */
-      sprintf(devlib, "libdev%s.a", pic16->name[1]);   /* e.g., libdev18f452.a */
+      sprintf(devlib, "libdev%s.lib", pic16->name[1]);   /* e.g., libdev18f452.lib */
       addSet(&libFilesSet, Safe_strdup(devlib));
 
       /* add the internal SDCC library */
-      addSet(&libFilesSet, Safe_strdup( "libsdcc.a" ));
+      addSet(&libFilesSet, Safe_strdup( "libsdcc.lib" ));
     }
 
   if (alt_asm && alt_asm[0] != '\0')

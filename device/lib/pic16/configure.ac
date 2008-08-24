@@ -36,10 +36,10 @@ libdir=$libdir/pic16
 
 # The default architecture can be selected at configure time by setting the
 # environment variable ARCH to the desired device (18fxxx).
-AC_SUBST(ARCH, [${ARCH-18f452}])
+AC_SUBST(ARCH, [${ARCH:-18f452}])
 
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
-AC_SUBST(CC, [${CC-$abs_top_builddir/../../../bin/sdcc}])
+AC_SUBST(CC, [\"$abs_top_builddir/../../../bin/sdcc\"])
 AC_SUBST(CFLAGS, ["-mpic16 -p$ARCH"])
 AC_PATH_PROG(CCAS, gpasm, :)
 AC_SUBST(CCAS, [\"$CCAS\"])

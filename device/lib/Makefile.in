@@ -328,7 +328,7 @@ port-specific-objects:
 port-specific-objects-pic16:
 	-if [ -f $(PORT)/Makefile ]; then \
 	  $(MAKE) -C $(PORT); \
-	  cp -f $(PORT)/*/lib*.a $(PORTDIR); \
+	  for i in $(PORT)/*/lib*.a; do cp -f $$i $(PORTDIR)/$$(basename $$i .a).lib; done; \
 	  cp -f $(PORT)/*/crt0*.o $(PORTDIR); \
 	fi
 
@@ -363,15 +363,17 @@ install: all installdirs
 	for src in $(MODELS) ds390 ds400 gbz80 z80 hc08 pic pic16; do \
 	  find $(sdcc_libdir)/src/$$src -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
-	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'build' -o -name 'bin' -o \
-	    -name 'Makefile*' \) \
-	    -exec rm -rf {}+ \; ; \
+	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'autom4te.cache' -o \
+	    -name 'build' -o -name 'bin' -o -name 'Makefile*' -o -name 'config*' -o \
+	    -name 'depcomp' -o -name 'missing' -o -name 'install-sh' -o \
+	    -name 'bootstrap.sh' \) \
+	    -exec rm -rf {} + ; \
 	done
 	find $(sdcc_libdir)/src/mcs51 -depth \
 	  \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	  -name '*.lst' -o -name '.svn' -o -name 'build' -o -name 'bin' -o \
 	  -name 'Makefile*' \) \
-	  -exec rm -rf {}+ \;
+	  -exec rm -rf {} +
 
 # Deleting all the installed files
 # --------------------------------

@@ -1,3 +1,13 @@
+2008-08-24 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/configure, device/lib/pic16/configure.ac:
+	  always use the sdcc from the current build tree (ignore $CC from
+	  the environment, fixes compile farm builds)
+	* device/lib/Makefile.in: rename .a into .lib for compatibility,
+	  remove more build products from install directory
+	* sdcc/src/pic16/main.c (_pic16_linkEdit,_pic16_finaliseOptions)
+	* sdcc/support/scripts/sdcc.nsi: revert to .lib extension for libs
+
 2008-08-24 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y: applied patch

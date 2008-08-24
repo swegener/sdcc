@@ -1550,6 +1550,8 @@ selection_statement
                            {
                               noLineno++ ;
                               $$ = createIf ($3, $6, $7 );
+                              $$->lineno = $3->lineno;
+                              $$->filename = $3->filename;
                               noLineno--;
                            }
    | SWITCH '(' expr ')'   {
@@ -1630,7 +1632,8 @@ iteration_statement
                            noLineno++ ;
                            $$ = createWhile ( $1, STACK_POP(continueStack),
                                               STACK_POP(breakStack), $3, $6 );
-                           $$->lineno = $1->lineDef ;
+                           $$->lineno = $1->lineDef;
+                           $$->filename = $1->fileDef;
                            noLineno-- ;
                          }
    | do statement   WHILE '(' expr ')' ';'
@@ -1639,7 +1642,8 @@ iteration_statement
                           noLineno++ ;
                           $$ = createDo ( $1 , STACK_POP(continueStack),
                                           STACK_POP(breakStack), $5, $2);
-                          $$->lineno = $1->lineDef ;
+                          $$->lineno = $1->lineDef;
+                          $$->filename = $1->fileDef;
                           noLineno-- ;
                         }
    | for '(' expr_opt   ';' expr_opt ';' expr_opt ')'  statement

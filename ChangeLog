@@ -1,8 +1,10 @@
 2008-08-24 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y: applied patch
+	  2050245: Fix # 1963382
+	  for bug
 	  1963382: Listing File - C file comment is incorrect
-	  thanks to Serge Malo
+	  thanks to RvS
 
 2008-08-23 Borut Razem <borut.razem AT siol.net>
 

@@ -1,3 +1,13 @@
+2008-08-31 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/bug-895992.c,
+	  support/regression/tests/onebyte.c:
+	  enabled pic16 regression testing since the bugs
+	  1511794: pic16: regression test bug-895992.c fails
+	  1444425: onebyte.c regression tes fails on pic16
+	  are fiexed, probably by fixing
+	  2048464: PIC16: fix genUminus - addresses not.c regression test
+
 2008-08-30 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/libcpp/files.c: SDCPP synchronized with GCC CPP

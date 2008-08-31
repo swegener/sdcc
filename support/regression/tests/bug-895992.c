@@ -28,13 +28,8 @@ wait (void)
 #endif
 
 static void
-testLR(void)
+testLR (void)
 {
-/*
- * excluded for pic16 due to bug:
- * [ 1511794 ] pic16: regression test bug-895992.c fails
- */
-#ifndef SDCC_pic16
   unsigned char number;
   unsigned char start = 1;
   unsigned char i;
@@ -42,7 +37,7 @@ testLR(void)
   do
     {
       for (i = 1; i > 0 ; i--)
-        wait();         /* destroys all registers */
+        wait ();        /* destroys all registers */
       if (start)
         {
           number = p0;
@@ -55,6 +50,5 @@ testLR(void)
     }
   while (number != 0);
 
-  ASSERT(loops == p0);
-#endif
+  ASSERT (loops == p0);
 }

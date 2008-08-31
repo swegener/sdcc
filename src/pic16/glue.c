@@ -559,16 +559,14 @@ pic16_printGPointerType (const char *iname, const unsigned int itype,
       pic16_emitDS (buf, ptype, p);
       break;
 
-    case POINTER: /* __data space */
+    case POINTER:  /* fall through */
+    case FPOINTER: /* fall through */
+    case IPOINTER: /* fall through */
+    case PPOINTER: /* __data space */
       sprintf (buf, "0x%02x", GPTR_TAG_DATA);
       pic16_emitDS (buf, ptype, p);
       break;
 
-    /*
-     * FPOINTER and IPOINTER are not used in pic16 port
-      case FPOINTER:
-      case IPOINTER:
-     */
     default:
       debugf ("itype = %d\n", itype );
       assert (0);
@@ -592,6 +590,7 @@ static void
 pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype, void *p)
 {
   value *val;
+  int i;
 
 //  fprintf(stderr, "%s for symbol %s\n",__FUNCTION__, sym->rname);
 
@@ -617,26 +616,9 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
     val = valCastLiteral(type, floatFromVal(val));
   }
 
-  switch (getSize (type)) {
-  case 1:
-    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-    break;
-
-  case 2:
-    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-    pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-    break;
-  case 3:
-    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-    pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-    pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
-  case 4:
-    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-    pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-    pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
-    pic16_emitDB(pic16aopLiteral(val, 3), ptype, p);
-    break;
-  }
+  for (i = 0; i < getSize (type); i++) {
+    pic16_emitDB(pic16aopLiteral(val, i), ptype, p);
+  } // for
 }
 
 /*--------------------------------------------------------------------*/
@@ -663,8 +645,11 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
       /* length of initializer string (might contain \0, so do not use strlen) */
       ilen = DCL_ELEM(val->type);
 
+#if 0
+      /* This causes structflexarray.c to fail. */
       if(!DCL_ELEM (type))
         DCL_ELEM (type) = ilen;
+#endif
 
       /* len is 0 if declartion equals initializer,
        * >0 if declaration greater than initializer
@@ -680,19 +665,25 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
 
       if(len >= 0) {
         /* emit initializer */
-        for(remain=0; remain<ilen; remain++)
+        for(remain=0; remain<ilen; remain++) {
           pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
+        } // for
 
-          /* fill array with 0x00 */
-          while(len--) {
-            pic16_emitDB(0x00, ptype, p);
-          }
+        /* fill array with 0x00 */
+        while(len--) {
+          pic16_emitDB(0x00, ptype, p);
+        } // while
+      } else if (!DCL_ELEM (type)) {
+        // flexible arrays: char str[] = "something"; */
+        for(remain=0; remain<ilen; remain++) {
+          pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
+        } // for
       } else {
         werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
-
-        for(remain=0; remain<DCL_ELEM (type); remain++)
+        for(remain=0; remain<DCL_ELEM (type); remain++) {
           pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
-      }
+        } // for
+      } // if
 
 
 //      if((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0) {
@@ -727,7 +718,7 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
-  if (IS_CHAR (type->next)) {
+  if (IS_CHAR (type->next) && ilist) {
     if (!IS_LITERAL(list2val(ilist)->etype)) {
       werror (W_INIT_WRONG);
       return;
@@ -745,7 +736,7 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       return;
     }
 
-  iloop = ilist->init.deep;
+  iloop = (ilist ? ilist->init.deep : NULL);
   lcnt = DCL_ELEM (type);
 
   for (;;)
@@ -771,9 +762,12 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       }
     }
 
+#if 0
+  /* This causes bug #1843745. */
   /* if we have not been given a size  */
   if (!DCL_ELEM (type))
     DCL_ELEM (type) = size;
+#endif
 
   return;
 }
@@ -788,6 +782,7 @@ pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
   symbol *lsym = *sym;
   initList *lilist = *ilist ;
   unsigned long ival = 0;
+  unsigned long i;
   int size =0;
 
 
@@ -797,7 +792,6 @@ pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
 
 
   do {
-    unsigned long i;
     val = list2val(lilist);
     if (size) {
       if (SPEC_BLEN(lsym->etype) > 8) {
@@ -818,27 +812,11 @@ pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
     lsym = lsym->next;
     lilist = lilist->next;
   } while (1);
-  switch (size) {
-  case 1:
-        pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-        break;
 
-  case 2:
-        pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-        pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
-    break;
+  for (i = 0; i < size; i++) {
+    pic16_emitDB(BYTE_IN_LONG(ival, i), ptype, p);
+  } // for
 
-  case 4: /* EEP: why is this db and not dw? */
-        pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-        pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
-        pic16_emitDB(BYTE_IN_LONG(ival, 2), ptype, p);
-        pic16_emitDB(BYTE_IN_LONG(ival, 3), ptype, p);
-    break;
-  default:
-        /* VR - only 1,2,4 size long can be handled???? Why? */
-        fprintf(stderr, "%s:%d: unhandled case. Contact author.\n", __FILE__, __LINE__);
-        assert(0);
-  }
   *sym = lsym;
   *ilist = lilist;
 }
@@ -870,7 +848,7 @@ pic16_printIvalStruct (symbol * sym, sym_link * type,
     iloop = ilist->init.deep;
   }
 
-  for (; (sflds && iloop); sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
+  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
 //    fprintf(stderr, "%s:%d sflds: %p\tiloop = %p\n", __FILE__, __LINE__, sflds, iloop);
     if (IS_BITFIELD(sflds->type)) {
       pic16_printIvalBitFields(&sflds, &iloop, ptype, p);
@@ -893,38 +871,35 @@ pic16_printIvalUnion (symbol * sym, sym_link * type,
 {
   //symbol *sflds;
   initList *iloop = NULL;
-  int i, size;
-
+  int size;
+  symbol *sflds = NULL;
 
 #if DEBUG_PRINTIVAL
   fprintf(stderr, "%s\n",__FUNCTION__);
 #endif
 
-  iloop = ilist;
-  i = 0;
-  while (iloop)
-  {
-    i++;
-    iloop = iloop->next;
+  assert (type);
+
+  sflds = SPEC_STRUCT (type)->fields;
+
+  if (ilist) {
+    if (ilist->type != INIT_DEEP) {
+      werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
+      return;
+    }
+
+    iloop = ilist->init.deep;
+  }
+
+  size = SPEC_STRUCT(type)->size;
+  sflds = SPEC_STRUCT(type)->fields;
+  pic16_printIval (sym, sflds->type, iloop, ptype, p);
+
+  /* if the first field is not the longest, fill with 0s */
+  while (size > getSize (sflds->type)) {
+      pic16_emitDB(0, ptype, p);
+      size--;
   } // while
-
-  size = -1;
-  if (type) size = SPEC_STRUCT(type)->size;
-
-  if (i == 1 && size >= 0 && size <= sizeof(long))
-  {
-    unsigned long val = ulFromVal (list2val(ilist));
-    while (size--)
-    {
-      pic16_emitDB(val, ptype, p);
-      val >>= 8;
-    } // while
-    return;
-  } // if
-
-  fprintf( stderr, "INCOMPLETE SUPPORT FOR INITIALIZED union---FALLING BACK TO struct\n" );
-  fprintf( stderr, "This is a bug. Please file a bug-report with your source attached.\n" );
-  pic16_printIvalStruct( sym, type, ilist, ptype, p );
 }
 
 static int

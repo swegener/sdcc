@@ -8412,19 +8412,9 @@ static void genPointerGet (iCode *ic)
       case POINTER:
       case FPOINTER:
       case IPOINTER:
+      case PPOINTER:
         genNearPointerGet (left,result,ic);
         break;
-
-#if 0
-      /* MUST move them somewhere; handle [PF]POINTERs like POINTERS or like GPOINTERs?!? */
-      case PPOINTER:
-        genPagedPointerGet(left,result,ic);
-        break;
-
-      case FPOINTER:
-        genFarPointerGet (left,result,ic);
-        break;
-#endif
 
       case CPOINTER:
         genConstPointerGet (left,result,ic);
@@ -8954,19 +8944,9 @@ static void genPointerSet (iCode *ic)
       case POINTER:
       case FPOINTER:
       case IPOINTER:
+      case PPOINTER:
         genNearPointerSet (right,result,ic);
         break;
-
-#if 0
-      /* MUST move them somewhere; handle [PF]POINTERs like POINTERS or like GPOINTERs?!? */
-      case PPOINTER:
-        genPagedPointerSet (right,result,ic);
-        break;
-
-      case FPOINTER:
-        genFarPointerSet (right,result,ic);
-        break;
-#endif
 
       case GPOINTER:
         genGenPointerSet (right,result,ic);
@@ -9247,7 +9227,7 @@ static void genAssign (iCode *ic)
       && !IS_ITEMP(right)) {
 
       DEBUGpic16_emitcode(";   ", "%s:%d symbol in code space, take special care\n", __FUNCTION__, __LINE__);
-      fprintf(stderr, "%s:%d symbol %s = [ %s ] is in code space\n", __FILE__, __LINE__, OP_SYMBOL(result)->name, OP_SYMBOL(right)->name);
+      //fprintf(stderr, "%s:%d symbol %s = [ %s ] is in code space\n", __FILE__, __LINE__, OP_SYMBOL(result)->name, OP_SYMBOL(right)->name);
 
       // set up table pointer
       if(pic16_isLitOp(right)) {
@@ -9795,7 +9775,6 @@ static void genCast (iCode *ic)
 
                 /* pointer to generic pointer */
                 if (IS_GENPTR(ctype)) {
-                  char *l = zero;
 
                         if (IS_PTR(type))
                                 p_type = DCL_TYPE(type);
@@ -9844,19 +9823,15 @@ static void genCast (iCode *ic)
             }
             /* the last byte depending on type */
             switch (p_type) {
-            case IPOINTER:
             case POINTER:
             case FPOINTER:
+            case IPOINTER:
+            case PPOINTER:
                 pic16_movLit2f(pic16_popGet(AOP(result), GPTRSIZE-1), GPTR_TAG_DATA);
                 break;
 
             case CPOINTER:
                 pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), GPTRSIZE-1));
-                break;
-
-            case PPOINTER:
-              pic16_emitcode(";BUG!? ","%d",__LINE__);
-                l = "#0x03";
                 break;
 
             case GPOINTER:

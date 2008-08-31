@@ -1,3 +1,21 @@
+2008-08-31 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genAssign): removed useless compiler output
+	* (genPointerGet,genPointerSet,genCast),
+	  src/pic16/glue.c (pic16_printGPointerType):
+	  also handle PPOINTERs just to avoid spurious asserts
+	* (pic16_printIvalType,pic16_printIvalBitFields):
+	  generalized to arbitrary type/bitfield sizes, allows compilation of
+	  regression test bug-1981238.c
+	* (pic16_printIvalChar): fix regression test structflexarray.c
+	* (pic16_printIvalArray): avoid SIGSEGV on uninitialized strings
+	  in initialized structs and fix #1843745
+	* (pic16_printIvalStruct): always output initializers for all fields,
+	  even those not explicitly given, fixes zeropad.c regression test
+	* (pic16_printIvalUnion): fix union initializers (bug1426356.c,
+	  #2073635, #1567098, and #1485812)
+	* src/pic16/main.c (_pic16_keywords): remove unsupported 'pdata'
+
 2008-08-31 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bug-895992.c,
@@ -5,7 +23,7 @@
 	  enabled pic16 regression testing since the bugs
 	  1511794: pic16: regression test bug-895992.c fails
 	  1444425: onebyte.c regression tes fails on pic16
-	  are fiexed, probably by fixing
+	  are fixed, probably by fixing
 	  2048464: PIC16: fix genUminus - addresses not.c regression test
 	* src/SDCCsymt.c, src/SDCCglue.c,
 	  support/regression/tests/bug-1981238.c:

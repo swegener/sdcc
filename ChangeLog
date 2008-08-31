@@ -7,6 +7,10 @@
 	  1444425: onebyte.c regression tes fails on pic16
 	  are fiexed, probably by fixing
 	  2048464: PIC16: fix genUminus - addresses not.c regression test
+	* src/SDCCsymt.c, src/SDCCglue.c,
+	  support/regression/tests/bug-1981238.c:
+	  applied patch 2076664: fix #1981238 + SIGSEGV in SDCCGlue.c
+	  thanks to RvS
 
 2008-08-30 Borut Razem <borut.razem AT siol.net>
 

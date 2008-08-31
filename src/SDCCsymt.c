@@ -1280,16 +1280,17 @@ compStructSize (int su, structdef * sdef)
       if (!loop->etype->select.s.b_signed)
         SPEC_USIGN(loop->etype) = 1;
 
-      SPEC_BLEN (loop->etype) = loop->bitVar;
-
       if (loop->bitVar == BITVAR_PAD) {
         /* A zero length bitfield forces padding */
-        SPEC_BSTR (loop->etype) = bitOffset;
         SPEC_BLEN (loop->etype) = 0;
-        bitOffset = 8;
+        SPEC_BSTR (loop->etype) = bitOffset;
+        if (bitOffset > 0)
+          bitOffset = 8; /* padding is not needed when at bit 0 */
         loop->offset = sum;
       }
       else {
+        SPEC_BLEN (loop->etype) = loop->bitVar;
+
         if (bitOffset == 8) {
           bitOffset = 0;
           sum++;

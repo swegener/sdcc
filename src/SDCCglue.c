@@ -703,48 +703,60 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
   symbol *lsym = *sym;
   initList *lilist = *ilist ;
   unsigned long ival = 0;
-  int size =0;
+  int size = 0;
 
-  do {
-    unsigned long i;
-    val = list2val(lilist);
-    if (size) {
-      if (SPEC_BLEN(lsym->etype) > 8) {
-        size += ((SPEC_BLEN (lsym->etype) / 8) +
-                 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-      }
-    } else {
-      size = ((SPEC_BLEN (lsym->etype) / 8) +
-              (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-    }
+  do
+    {
+      unsigned long i;
+      val = list2val (lilist);
+      if (size)
+        {
+          if (SPEC_BLEN (lsym->etype) > 8)
+            {
+              size += ((SPEC_BLEN (lsym->etype) / 8) +
+                       (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+            }
+        }
+      else
+        {
+          size = ((SPEC_BLEN (lsym->etype) / 8) +
+                  (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+        }
 
-    /* check if the literal value is within bounds */
-    if (checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL &&
+      /* check if the literal value is within bounds */
+      if (val &&
+        checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL &&
         !options.lessPedantic)
-      {
-        werror (W_LIT_OVERFLOW);
-      }
-    i = ulFromVal(val);
-    i &= (1 << SPEC_BLEN (lsym->etype)) - 1;
-    i <<= SPEC_BSTR (lsym->etype);
-    ival |= i;
-    if (! ( lsym->next &&
-          (IS_BITFIELD(lsym->next->type)) &&
-          (SPEC_BSTR(lsym->next->etype)))) break;
-    lsym = lsym->next;
-    lilist = lilist ? lilist->next : NULL;
-  } while (1);
-  switch (size) {
+        {
+          werror (W_LIT_OVERFLOW);
+        }
+
+      i = ulFromVal (val);
+      i &= (1 << SPEC_BLEN (lsym->etype)) - 1;
+      i <<= SPEC_BSTR (lsym->etype);
+      ival |= i;
+      if (!(lsym->next &&
+        (IS_BITFIELD (lsym->next->type)) &&
+        (SPEC_BSTR (lsym->next->etype))))
+        break;
+      lsym = lsym->next;
+      lilist = lilist ? lilist->next : NULL;
+    }
+  while (1);
+
+  switch (size)
+  {
   case 1:
-    dbuf_tprintf (oBuf, "\t!db !constbyte\n",ival);
+    dbuf_tprintf (oBuf, "\t!db !constbyte\n", ival);
     break;
 
   case 2:
-    dbuf_tprintf (oBuf, "\t!dw !constword\n",ival);
+    dbuf_tprintf (oBuf, "\t!dw !constword\n", ival);
     break;
+
   case 4:
     dbuf_tprintf (oBuf, "\t!dw  !constword,!constword\n",
-             (ival >> 16) & 0xffff, (ival & 0xffff));
+      (ival >> 16) & 0xffff, (ival & 0xffff));
     break;
   }
   *sym = lsym;

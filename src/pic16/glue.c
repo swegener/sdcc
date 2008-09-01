@@ -802,7 +802,7 @@ pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
       size = ((SPEC_BLEN (lsym->etype) / 8) +
               (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
     }
-    i = ulFromVal (val);
+    i = (ulFromVal (val) & ((1ul << SPEC_BLEN (lsym->etype)) - 1ul));
     i <<= SPEC_BSTR (lsym->etype);
     ival |= i;
     if (! ( lsym->next &&
@@ -916,6 +916,7 @@ static int
 pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char ptype, void *p)
 {
   int size = 0;
+  int i;
 
   /* PENDING: this is _very_ mcs51 specific, including a magic
      number...
@@ -961,24 +962,10 @@ pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char ptype, 
   else
     {
       // these are literals assigned to pointers
-      switch (size)
+      for (i = 0; i < size; i++)
         {
-        case 1:
-          pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-          break;
-        case 2:
-          pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-          pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-          break;
-        case 3:
-          pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-          pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-          pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
-          break;
-
-        default:
-          assert (0);
-        }
+          pic16_emitDB(pic16aopLiteral(val, i), ptype, p);
+        } // for
     }
 
   if (val->sym && val->sym->isstrlit) { // && !isinSet(statsg->syms, val->sym)) {
@@ -1060,6 +1047,7 @@ pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char ptype,
 {
   value *val;
   int size;
+  int i;
 
 #if 0
         fprintf(stderr, "%s:%d initialising pointer: %s size: %d\n", __FILE__, __LINE__,
@@ -1091,32 +1079,17 @@ pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char ptype,
     printFromToType (val->type, type);
   }
 
+  size = getSize (type);
+
   /* if val is literal */
   if (IS_LITERAL (val->etype))
     {
-      switch (getSize (type))
+      for (i = 0; i < size; i++)
         {
-        case 1:
-            pic16_emitDB((unsigned int) ulFromVal (val) & 0xff, ptype, p);
-            break;
-        case 2:
-            pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-            pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-            break;
-        case 3:
-            pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
-            pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-            pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
-            break;
-        default:
-                fprintf(stderr, "%s:%d size = %d\n", __FILE__, __LINE__, getSize(type));
-                assert(0);
-        }
+          pic16_emitDB(pic16aopLiteral(val, i), ptype, p);
+        } // for
       return;
     }
-
-
-  size = getSize (type);
 
   if (size == 1)                /* Z80 specific?? */
     {
@@ -1124,16 +1097,18 @@ pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char ptype,
     }
   else if (size == 2)
     {
-        pic16_printPointerType (val->name, ptype, p);
+      pic16_printPointerType (val->name, ptype, p);
     }
   else if (size == 3)
     {
       int itype = 0;
       itype = PTR_TYPE (SPEC_OCLS (val->etype));
       pic16_printGPointerType (val->name, itype, ptype, p);
-    } else
-        assert(0);
-  return;
+    }
+  else
+    {
+      assert(0);
+    }
 }
 
 

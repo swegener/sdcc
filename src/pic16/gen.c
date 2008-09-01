@@ -7928,8 +7928,10 @@ static void pic16_derefPtr (operand *ptr, int p_type, int doWrite, int *fsr0_set
   p_type = DCL_TYPE(operandType(ptr));
 
   switch (p_type) {
-    case FPOINTER:
     case POINTER:
+    case FPOINTER:
+    case IPOINTER:
+    case PPOINTER:
       if (!fsr0_setup || !*fsr0_setup)
       {
         pic16_loadFSR0( ptr, 0 );
@@ -7961,6 +7963,29 @@ static void pic16_derefPtr (operand *ptr, int p_type, int doWrite, int *fsr0_set
         else
           pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
       }
+      break;
+
+    case CPOINTER:
+      /* XXX: Writing to CPOINTERs not (yet) implemented. */
+      assert ( !doWrite && "Cannot write into __code space!" );
+      if( (AOP_TYPE(ptr) == AOP_PCODE)
+              && ((AOP(ptr)->aopu.pcop->type == PO_IMMEDIATE)
+                  || (AOP(ptr)->aopu.pcop->type == PO_DIR)))
+      {
+          pic16_emitpcode(POC_MOVLW, pic16_popGet     (AOP (ptr), 0));
+          pic16_emitpcode(POC_MOVWF, pic16_popCopyReg (&pic16_pc_tblptrl));
+          pic16_emitpcode(POC_MOVLW, pic16_popGet     (AOP (ptr), 1));
+          pic16_emitpcode(POC_MOVWF, pic16_popCopyReg (&pic16_pc_tblptrh));
+          pic16_emitpcode(POC_MOVLW, pic16_popGet     (AOP (ptr), 2));
+          pic16_emitpcode(POC_MOVWF, pic16_popCopyReg (&pic16_pc_tblptru));
+      } else {
+          mov2fp(pic16_popCopyReg(&pic16_pc_tblptrl), AOP(ptr), 0);
+          mov2fp(pic16_popCopyReg(&pic16_pc_tblptrh), AOP(ptr), 1);
+          mov2fp(pic16_popCopyReg(&pic16_pc_tblptru), AOP(ptr), 2);
+      } // if
+
+      pic16_emitpcodeNULLop (POC_TBLRD_POSTINC);
+      pic16_emitpcode (POC_MOVFW, pic16_popCopyReg (&pic16_pc_tablat));
       break;
 
     default:
@@ -8318,6 +8343,12 @@ static void genConstPointerGet (operand *left,
   pic16_aopOp(result,ic,TRUE);
   size = AOP_SIZE(result);
 
+  /* if bit then unpack */
+  if (IS_BITFIELD(getSpec (operandType (left)))) {
+    genUnpackBits(result,left,"BAD",GPOINTER);
+    goto release;
+  } // if
+
   DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);
 
   DEBUGpic16_emitcode ("; "," %d getting const pointer",__LINE__);
@@ -8345,6 +8376,7 @@ static void genConstPointerGet (operand *left,
     offset++;
   }
 
+release:
   pic16_freeAsmop(left,NULL,ic,TRUE);
   pic16_freeAsmop(result,NULL,ic,TRUE);
 }

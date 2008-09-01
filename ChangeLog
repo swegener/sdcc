@@ -1,3 +1,12 @@
+2008-09-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_derefPtr): handle CPOINTERs as well
+	* (genConstPointerGet): fix reading bitfields from __code space
+	* src/pic16/glue.c (pic16_printIvalBitFields): correctly mask
+	  bitfield initializers (fix regression test bug1856409.c)
+	* (pic16_printIvalCharPtr,pic16_printIvalPtr): generalized to support
+	  arbitrary sizes
+
 2008-08-31 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genAssign): removed useless compiler output

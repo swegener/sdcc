@@ -11,8 +11,8 @@ VERSIONP        = @VERSIONP@
 
 # Programs
 SHELL		= /bin/sh
-CC		= @CC@
-CPP		= @CPP@
+CC		= @CCACHE@ @CC@
+CPP		= @CCACHE@ @CPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 YACC            = @YACC@

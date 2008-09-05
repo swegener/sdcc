@@ -675,6 +675,7 @@ AS
 CP
 LEX
 YACC
+CCACHE
 M_OR_MM
 GREP
 EGREP
@@ -1317,6 +1318,11 @@ Optional Features:
   --enable-libgc          Use the Bohem memory allocator. Lower runtime
                           footprint.
 
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --without-ccache        do not use ccache even if available
+
 Some influential environment variables:
   CC          C compiler command
   CFLAGS      C compiler flags
@@ -1822,8 +1828,6 @@ VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
 VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
 VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
 
-{ echo "$as_me:$LINENO: result: ${VERSION}" >&5
-echo "${ECHO_T}${VERSION}" >&6; }
 PACKAGE=sdcc
 
 
@@ -3485,6 +3489,55 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
+
+# Check whether --with-ccache was given.
+if test "${with_ccache+set}" = set; then
+  withval=$with_ccache;
+fi
+
+case x${with_ccache-yes} in
+    xyes) # Extract the first word of "ccache", so it can be a program name with args.
+set dummy ccache; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CCACHE+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CCACHE"; then
+  ac_cv_prog_CCACHE="$CCACHE" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CCACHE="ccache"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CCACHE=$ac_cv_prog_CCACHE
+if test -n "$CCACHE"; then
+  { echo "$as_me:$LINENO: result: $CCACHE" >&5
+echo "${ECHO_T}$CCACHE" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+ ;;
+    xno)  ;;
+    *) CCACHE=$with_ccache
+ ;;
+esac
 
 
 # Checking for functions
@@ -6313,7 +6366,6 @@ if test "${include_dir_suffix}" = ""; then
     include_dir_suffix="sdcc/include"
 fi
 
-
 # lib_dir_suffix:
 # *nix default: "sdcc/lib"
 
@@ -6321,14 +6373,12 @@ if test "${lib_dir_suffix}" = ""; then
     lib_dir_suffix="sdcc/lib"
 fi
 
-
 # docdir:
 # *nix default: "${datadir}/sdcc/doc"
 
 if test "${docdir}" = ""; then
     docdir="\${datadir}"/sdcc/doc
 fi
-
 
 
 
@@ -6870,7 +6920,7 @@ _ACEOF
 # Port selection helper
 # ===========================================================================
 # macro AC_DO_ENABLER()
-#   $1 used to access enable_$1, e.g. enable-doc
+#   $1 used to access enable_$1, e.g. enable_doc
 #   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. DOC
 #   $3 help string
 
@@ -7271,8 +7321,7 @@ _ACEOF
 
 
 
-if test $OPT_ENABLE_DOC = 1; then
-  # Extract the first word of "lyx", so it can be a program name with args.
+# Extract the first word of "lyx", so it can be a program name with args.
 set dummy lyx; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -7310,7 +7359,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-  # Extract the first word of "latex2html", so it can be a program name with args.
+# Extract the first word of "latex2html", so it can be a program name with args.
 set dummy latex2html; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -7348,7 +7397,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-  # Extract the first word of "pdflatex", so it can be a program name with args.
+# Extract the first word of "pdflatex", so it can be a program name with args.
 set dummy pdflatex; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -7386,7 +7435,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-  # Extract the first word of "pdfopt", so it can be a program name with args.
+# Extract the first word of "pdfopt", so it can be a program name with args.
 set dummy pdfopt; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -7424,7 +7473,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-  # Extract the first word of "makeindex", so it can be a program name with args.
+# Extract the first word of "makeindex", so it can be a program name with args.
 set dummy makeindex; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -7463,6 +7512,7 @@ fi
 
 
 
+if test $OPT_ENABLE_DOC = 1; then
   if test "$LYX" = ":"; then
   { { echo "$as_me:$LINENO: error: Cannot find required program lyx." >&5
 echo "$as_me: error: Cannot find required program lyx." >&2;}
@@ -8384,6 +8434,7 @@ AS!$AS$ac_delim
 CP!$CP$ac_delim
 LEX!$LEX$ac_delim
 YACC!$YACC$ac_delim
+CCACHE!$CCACHE$ac_delim
 M_OR_MM!$M_OR_MM$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
@@ -8417,7 +8468,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 92; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 93; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

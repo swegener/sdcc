@@ -1,3 +1,15 @@
+2008-09-05 Raphael Neider <rneider AT web.de>
+
+	* configure.in, Makefile.common.in: add support for ccache,
+	  remove spurious $VERSION output, detect doc-tools even without
+	  --enable-doc to facilitate later manual doc-builds, minor cleanup
+	* configure: regenerated
+
+	* doc/Makefile.in: quieten pdflatex, makeindex, and latex2html,
+	  avoid races in parallel VPATH builds
+	* doc/clean.mk: remove .lyx files in the builddir for VPATH builds
+	* doc/sdccman.lyx: mention --without-ccache configure option
+
 2008-09-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_derefPtr): handle CPOINTERs as well

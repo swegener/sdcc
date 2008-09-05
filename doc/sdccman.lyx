@@ -1690,6 +1690,24 @@ status collapsed
  Lower runtime footprint.
 \end_layout
 
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-without-ccache Do not use ccache even if available
+\end_layout
+
 \begin_layout Standard
 Furthermore the environment variables CC, CFLAGS, ...
  the tools and their arguments can be influenced.

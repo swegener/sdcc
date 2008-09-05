@@ -22,7 +22,6 @@ VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
 VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
 VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
 
-AC_MSG_RESULT(${VERSION})
 AC_SUBST(PACKAGE, [sdcc])
 AC_SUBST(VERSION)
 AC_SUBST(VERSIONHI)
@@ -67,6 +66,15 @@ SDCC_REQUIRE_PROG($YACC, bison)
 SDCC_REQUIRE_PROG($LEX, flex)
 
 AC_LANG_C
+
+AC_ARG_WITH([ccache],
+    AC_HELP_STRING([--without-ccache], [do not use ccache even if available]),
+    [], [])
+case x${with_ccache-yes} in
+    xyes) AC_CHECK_PROG([CCACHE], [ccache], [ccache], []) ;;
+    xno) AC_SUBST([CCACHE], []) ;;
+    *) AC_SUBST([CCACHE], [$with_ccache]) ;;
+esac
 
 
 # Checking for functions
@@ -473,7 +481,7 @@ SDCC_BUILD_BIGENDIAN
 # The macros are expanded for the header.
 # The variables in the header are replaced by AC_*DEFINE*()
 # sdccconf_h_dir_separator contains a backslash.
-AC_ARG_VAR(sdccconf_h_dir_separator, needed in sdccconf.h: either "/" (default) or "\\")
+AC_ARG_VAR([sdccconf_h_dir_separator], [needed in sdccconf.h: either "/" (default) or "\\"])
 if test "x${sdccconf_h_dir_separator}" = "x"; then
     sdccconf_h_dir_separator="/"
 fi
@@ -484,27 +492,24 @@ fi
 # include_dir_suffix:
 # *nix default: "sdcc/include"
 
-AC_ARG_VAR(include_dir_suffix, appended to datadir to define SDCC's include directory)
+AC_ARG_VAR([include_dir_suffix], [appended to datadir to define SDCC's include directory])
 if test "${include_dir_suffix}" = ""; then
     include_dir_suffix="sdcc/include"
 fi
-AC_SUBST(include_dir_suffix)
 
 # lib_dir_suffix:
 # *nix default: "sdcc/lib"
-AC_ARG_VAR(lib_dir_suffix, appended to datadir to define SDCC's library root directory)
+AC_ARG_VAR([lib_dir_suffix], [appended to datadir to define SDCC's library root directory])
 if test "${lib_dir_suffix}" = ""; then
     lib_dir_suffix="sdcc/lib"
 fi
-AC_SUBST(lib_dir_suffix)
 
 # docdir:
 # *nix default: "${datadir}/sdcc/doc"
-AC_ARG_VAR(docdir, documentation installation directory)
+AC_ARG_VAR([docdir], [documentation installation directory])
 if test "${docdir}" = ""; then
     docdir="\${datadir}"/sdcc/doc
 fi
-AC_SUBST(docdir)
 
 AC_SUBST(EXEEXT)
 
@@ -587,7 +592,7 @@ AC_DEFINE_UNQUOTED(SDCC_LIB_NAME, "${sdcc_lib_name}")
 # Port selection helper
 # ===========================================================================
 # macro AC_DO_ENABLER()
-#   $1 used to access enable_$1, e.g. enable-doc
+#   $1 used to access enable_$1, e.g. enable_doc
 #   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. DOC
 #   $3 help string
 AC_DEFUN([AC_DO_ENABLER], [
@@ -671,13 +676,13 @@ AC_DO_DISABLER(sdcpp,      SDCPP,      [Disables building sdcpp])
 AC_DO_DISABLER(sdcdb,      SDCDB,      [Disables building sdcdb])
 
 AC_DO_ENABLER(doc,   DOC,   [Enables building the documentation])
-if test $OPT_ENABLE_DOC = 1; then
-  AC_CHECK_PROG(LYX,        lyx,        lyx, :)
-  AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html, :)
-  AC_CHECK_PROG(PDFLATEX,   pdflatex,   pdflatex, :)
-  AC_CHECK_PROG(PDFOPT,     pdfopt,     pdfopt, :)
-  AC_CHECK_PROG(MAKEINDEX,  makeindex,  makeindex, :)
+AC_CHECK_PROG([LYX],        [lyx],        [lyx],        [:])
+AC_CHECK_PROG([LATEX2HTML], [latex2html], [latex2html], [:])
+AC_CHECK_PROG([PDFLATEX],   [pdflatex],   [pdflatex],   [:])
+AC_CHECK_PROG([PDFOPT],     [pdfopt],     [pdfopt],     [:])
+AC_CHECK_PROG([MAKEINDEX],  [makeindex],  [makeindex],  [:])
 
+if test $OPT_ENABLE_DOC = 1; then
   SDCC_REQUIRE_PROG($LYX,        lyx)
   SDCC_REQUIRE_PROG($LATEX2HTML, latex2html)
   SDCC_REQUIRE_PROG($PDFLATEX,   pdflatex)

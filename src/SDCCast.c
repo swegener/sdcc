@@ -852,7 +852,7 @@ processParms (ast *func,
 
       /* don't perform integer promotion of explicitly typecasted variable arguments
        * if sdcc extensions are enabled */
-      if (options.std_sdcc && 
+      if (options.std_sdcc &&
         (IS_CAST_OP (*actParm) ||
         (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, removedCast)) ||
         (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, literalFromCast))))
@@ -1151,7 +1151,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast *rootVal)
       if (!AST_SYMBOL (rootVal)->islocal || SPEC_STAT (getSpec (type)))
         return NULL;
 
-      for (i=0; i<symsize; i++)
+      for (i = 0; i < symsize; ++i)
         {
           rast = newNode (NULLOP,
                           rast,
@@ -1175,9 +1175,9 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast *rootVal)
       unsigned int symsize = getSize (type);
 
       size = getSize (iexpr->ftype);
-      if (symsize && size>symsize)
+      if (symsize && size > symsize)
         {
-          if (size>(symsize+1))
+          if (size > symsize)
             {
               char *name = (IS_AST_SYM_VALUE(sym)) ? AST_SYMBOL(sym)->name : "";
 
@@ -1187,15 +1187,14 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast *rootVal)
           size = symsize;
         }
 
-      for (i=0;i<size;i++)
+      for (i = 0; i < size; i++)
         {
           rast = newNode (NULLOP,
                           rast,
                           newNode ('=',
                                    newNode ('[', sym,
                                    newAst_VALUE (valueFromLit ((float) i))),
-                                   newAst_VALUE (valueFromLit (*s))));
-          s++;
+                                   newAst_VALUE (valueFromLit (*s++))));
         }
 
       // now WE don't need iexpr's symbol anymore

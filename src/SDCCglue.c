@@ -37,7 +37,7 @@
 
 symbol *interrupts[INTNO_MAX+1];
 
-void printIval (symbol *, sym_link *, initList *, struct dbuf_s *);
+void printIval (symbol *, sym_link *, initList *, struct dbuf_s *, bool check);
 set *publics = NULL;            /* public variables */
 set *externs = NULL;            /* Variables that are declared as extern */
 
@@ -276,7 +276,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   ++noAlloc;
                   resolveIvalSym (sym->ival, sym->type);
                   ++noInit;
-                  printIval (sym, sym->type, sym->ival, &tmpBuf);
+                  printIval (sym, sym->type, sym->ival, &tmpBuf, TRUE);
                   --noInit;
                   --noAlloc;
                   dbuf_destroy(&tmpBuf);
@@ -785,14 +785,14 @@ printIvalStruct (symbol * sym, sym_link * type,
   }
 
   if (SPEC_STRUCT (type)->type == UNION) {
-    printIval (sym, sflds->type, iloop, oBuf);
+    printIval (sym, sflds->type, iloop, oBuf, TRUE);
     iloop = iloop ? iloop->next : NULL;
   } else {
     for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
       if (IS_BITFIELD(sflds->type)) {
         printIvalBitFields(&sflds, &iloop, oBuf);
       } else {
-        printIval (sym, sflds->type, iloop, oBuf);
+        printIval (sym, sflds->type, iloop, oBuf, TRUE);
       }
     }
   }
@@ -806,7 +806,7 @@ printIvalStruct (symbol * sym, sym_link * type,
 /* printIvalChar - generates initital value for character array    */
 /*-----------------------------------------------------------------*/
 int
-printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf, char *s)
+printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf, char *s, bool check)
 {
   value *val;
   unsigned int size = DCL_ELEM (type);
@@ -828,6 +828,9 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * 
                 DCL_ELEM (type) = size;
             }
 
+          if (check && DCL_ELEM (val->type) > size)
+            werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
+
           printChar (oBuf, SPEC_CVAL (val->etype).v_char, size);
 
           return 1;
@@ -845,7 +848,7 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * 
 /*-----------------------------------------------------------------*/
 void
 printIvalArray (symbol * sym, sym_link * type, initList * ilist,
-                struct dbuf_s * oBuf)
+                struct dbuf_s * oBuf, bool check)
 {
   value *val;
   initList *iloop;
@@ -867,7 +870,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       }
       if (printIvalChar (sym, type,
                          (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
-                         oBuf, SPEC_CVAL (sym->etype).v_char))
+                         oBuf, SPEC_CVAL (sym->etype).v_char, check))
         return;
     }
     /* not the special case             */
@@ -881,7 +884,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
         werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "array", sym->name);
         break;
       }
-      printIval (sym, type->next, iloop, oBuf);
+      printIval (sym, type->next, iloop, oBuf, TRUE);
     }
   }
 
@@ -1182,7 +1185,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
 /* printIval - generates code for initial value                    */
 /*-----------------------------------------------------------------*/
 void
-printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf)
+printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf, bool check)
 {
   sym_link *itype;
 
@@ -1196,7 +1199,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf
   /* if this is an array   */
   if (IS_ARRAY (type))
     {
-      printIvalArray (sym, type, ilist, oBuf);
+      printIvalArray (sym, type, ilist, oBuf, check);
       return;
     }
 
@@ -1313,7 +1316,7 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
               dbuf_printf (oBuf, "%s:\n", sym->rname);
               ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
-              printIval (sym, sym->type, sym->ival, oBuf);
+              printIval (sym, sym->type, sym->ival, oBuf, map != xinit);
               --noAlloc;
               /* if sym is a simple string and sym->ival is a string,
                  WE don't need it anymore */

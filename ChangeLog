@@ -1,3 +1,8 @@
+2008-09-07 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCglue.c, src/SDCCast.c:
+	  fixed throw of "excess elements" warning for char arrays
+
 2008-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/z80/aslist.c (lstsym): changed old K&R to ANSI

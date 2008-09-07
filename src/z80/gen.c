@@ -4787,13 +4787,16 @@ genCmpGt (iCode * ic, iCode * ifx)
   letype = getSpec (operandType (left));
   retype = getSpec (operandType (right));
   sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
-  /* assign the amsops */
+  /* assign the asmops */
   aopOp (left, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
+  setupToPreserveCarry (ic);
+
   genCmp (right, left, result, ifx, sign);
 
+  _G.preserveCarry = FALSE;
   freeAsmop (left, NULL, ic);
   freeAsmop (right, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -4817,13 +4820,16 @@ genCmpLt (iCode * ic, iCode * ifx)
   retype = getSpec (operandType (right));
   sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
 
-  /* assign the amsops */
+  /* assign the asmops */
   aopOp (left, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
+  setupToPreserveCarry (ic);
+
   genCmp (left, right, result, ifx, sign);
 
+  _G.preserveCarry = FALSE;
   freeAsmop (left, NULL, ic);
   freeAsmop (right, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -7493,8 +7499,7 @@ genCast (iCode * ic)
   else
     {
       /* we need to extend the sign :{ */
-        const char *l = aopGet (AOP (right), AOP_SIZE (right) - 1,
-                        FALSE);
+      const char *l = aopGet (AOP (right), AOP_SIZE (right) - 1, FALSE);
       _moveA (l);
       emit2 ("rla ");
       emit2 ("sbc a,a");

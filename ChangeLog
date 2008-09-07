@@ -1,9 +1,14 @@
+2008-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/gen.c (genCmpGt, genCmpLt): fixed bug 2094505
+	* support/regression/tests/bug2094505.c: new, added
+
 2008-09-07 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCglue.c, src/SDCCast.c:
 	  fixed throw of "excess elements" warning for char arrays
 
-2008-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
+2008-09-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/z80/aslist.c (lstsym): changed old K&R to ANSI
 	* src/SDCCicode.c (geniCodeCritical): fixed bug for hc08

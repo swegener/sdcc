@@ -7616,7 +7616,7 @@ genCritical (iCode *ic)
       //disable interrupt
       emit2 ("!di");
       //save P/O flag
-      emit2 ("push af");
+      _push (PAIR_AF);
     }
 }
 
@@ -7645,7 +7645,7 @@ genEndCritical (iCode *ic)
   else
     {
       //restore P/O flag
-      emit2 ("pop af");
+      _pop (PAIR_AF);
       //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
       //don't enable interrupts as they were off before
       emit2 ("jp PO,!tlabel", tlbl->key + 100);

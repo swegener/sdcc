@@ -565,7 +565,6 @@ int flag;
  *              int     i               loop counter
  *              int     j               temporary
  *              int     k               temporary
- *              char *  ptr             pointer to an id string
  *              int     nmsym           number of symbols
  *              int     narea           number of areas
  *              sym *   sp              pointer to symbol structure
@@ -596,8 +595,7 @@ int flag;
  */
 
 VOID
-lstsym(fp)
-FILE *fp;
+lstsym(FILE *fp)
 {
         register int c, i, j, k;
         int nmsym, narea;

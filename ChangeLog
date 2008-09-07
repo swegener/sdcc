@@ -1,3 +1,10 @@
+2008-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/z80/aslist.c (lstsym): changed old K&R to ANSI
+	* src/SDCCicode.c (geniCodeCritical): fixed bug for hc08
+	* src/z80/gen.c (genCritical, genEndCritical): fixed bug 2077267
+	* support/regression/tests/bug2077267.c: new, added
+
 2008-09-05 Raphael Neider <rneider AT web.de>
 
 	* configure.in, Makefile.common.in: add support for ccache,

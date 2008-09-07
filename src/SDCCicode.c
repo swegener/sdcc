@@ -3980,7 +3980,7 @@ geniCodeCritical (ast *tree, int lvl)
   operand *op = NULL;
   sym_link *type;
 
-  if (!options.stackAuto)
+  if (!options.stackAuto && !TARGET_IS_HC08)
     {
       type = newLink(SPECIFIER);
       SPEC_VOLATILE(type) = 1;

@@ -1,9 +1,8 @@
 /** Tests covering the shift operators.
-    disabled for pic16
 
     sign: signed, unsigned
     type: char, int, long
-    storage: static, 
+    storage: static,
     attr: volatile
 
     vals: 3
@@ -20,7 +19,7 @@ test1ShiftClasses(void)
     i = 30;
     ASSERT(i>>3 == 3);
     ASSERT(i<<2 == 120);
-    
+
     result = i;
     result >>= 2;
     ASSERT(result == 7);
@@ -46,7 +45,7 @@ test2ShiftRight(void)
     ASSERT(i>>8 == -1);
     result = i;
     result >>= 3;
-    ASSERT(result == -15); 
+    ASSERT(result == -15);
 }
 
 void

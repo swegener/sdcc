@@ -4,16 +4,22 @@
 */
 #include <testfwk.h>
 
+#ifdef SDCC_pic16
+# define ADDRESS(x) (0x02 ## x)
+#else
+# define ADDRESS(x) (0xCA ## x)
+#endif
+
 typedef struct
 {
-	int a,b;
+        int a,b;
 } TestStruct;
 
-{mem} volatile at(0xCABC) TestStruct TestVar = {0,0};
-{mem} at(0xCAB7) char u;
-{mem} at(0xCAB7) char x = 'x';
-{mem} at(0xCAB9) char y = 'y';
-{mem} at(0xCAB0) int  k = 0x1234;
+{mem} volatile at(ADDRESS(BC)) TestStruct TestVar = {0,0};
+{mem} at(ADDRESS(B7)) char u;
+{mem} at(ADDRESS(B7)) char x = 'x';
+{mem} at(ADDRESS(B9)) char y = 'y';
+{mem} at(ADDRESS(B0)) int  k = 0x1234;
 
 char z = 'z';
 
@@ -21,9 +27,9 @@ void
 testAbsolute(void)
 {
 #if defined(SDCC_mcs51) || defined(SDCC_ds390) || defined(SDCC_hc08)
-  static {mem} at(0xCAB6) char s = 's';
-  char {mem} *pC = (char {mem} *)(0xCAB0);
-  int  {mem} *pI = (int  {mem} *)(0xCAB0);
+  static {mem} at(ADDRESS(B6)) char s = 's';
+  char {mem} *pC = (char {mem} *)(ADDRESS(B0));
+  int  {mem} *pI = (int  {mem} *)(ADDRESS(B0));
 
   ASSERT(u == 'x');
   ASSERT(pC[7] == 'x');

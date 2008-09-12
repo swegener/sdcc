@@ -38,6 +38,7 @@ void __printf(const char *szFormat, ...);
 #if defined(SDCC_pic16)
 # define idata data
 # define xdata data
+# define pdata data
 #endif
 
 void __fail(code const char *szMsg, code const char *szCond, code const char *szFile, int line);

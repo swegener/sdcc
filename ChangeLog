@@ -1,6 +1,13 @@
+2008-09-12 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/fwk/testfwk.h:
+	  define pdata as data for pic16 target
+	  thanks Mauro Giachero
+
 2008-09-11 Borut Razem <borut.razem AT siol.net>
 
-	* tests\bug-221100.c, tests\shifts.c, tests\absolute.c:
+	* support/regression/tests/bug-221100.c, support/regression/shifts.c,
+          support/regression/absolute.c:
 	  applied patch #2105615: Some PIC16 testcase fixlets
 	  thanks Mauro Giachero
 

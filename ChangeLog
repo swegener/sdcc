@@ -1,3 +1,9 @@
+2008-09-14 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c, src/pic16/ralloc.c: use
+	  SYM_SPIL_LOC/SPIL_LOC macros, no functional changes
+	* src/pic16/ralloc.c (rematStr): reimplemented, fixes #1818857
+
 2008-09-12 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/fwk/testfwk.h:

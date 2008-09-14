@@ -868,14 +868,14 @@ static bool operandsEqu ( operand *op1, operand *op2)
     if (IS_ITEMP(op1)  &&
         !IS_ITEMP(op2) &&
         sym1->isspilt  &&
-        (sym1->usl.spillLoc == sym2))
+        (SYM_SPIL_LOC(sym1) == sym2))
         return TRUE;
 
     if (IS_ITEMP(op2)  &&
         !IS_ITEMP(op1) &&
         sym2->isspilt  &&
         sym1->level > 0 &&
-        (sym2->usl.spillLoc == sym1))
+        (SYM_SPIL_LOC(sym2) == sym1))
         return TRUE ;
 
     return FALSE ;
@@ -1019,7 +1019,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
             aop->size = getSize(sym->type);
             for ( i = 0 ; i < 1 ; i++ ) {
                 aop->aopu.aop_str[i] = accUse[i];
-//                aop->aopu.pcop = pic16_popRegFromString("WREG", aop->size, sym->usl.spillLoc->offset);
+//                aop->aopu.pcop = pic16_popRegFromString("WREG", aop->size, SYM_SPIL_LOC(sym)->offset);
             }
             fprintf(stderr, "%s:%d allocating AOP_ACC for sym= %s\n", __FILE__, __LINE__, sym->name);
             DEBUGpic16_emitcode(";","%d size=%d",__LINE__,aop->size);
@@ -1031,7 +1031,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
         if (sym->ruonly) {
           /*
           sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
-          aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
+          aop->aopu.pcop = pic16_popGetImmd(SYM_SPIL_LOC(sym)->rname,0,SYM_SPIL_LOC(sym)->offset);
           //pic16_allocDirReg (IC_LEFT(ic));
           aop->size = getSize(sym->type);
           */
@@ -1048,24 +1048,24 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
         }
 #endif
         /* else spill location  */
-        if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
+        if (SYM_SPIL_LOC(sym) && getSize(sym->type) != getSize(SYM_SPIL_LOC(sym)->type)) {
             /* force a new aop if sizes differ */
-            sym->usl.spillLoc->aop = NULL;
+            SYM_SPIL_LOC(sym)->aop = NULL;
         }
 
 #if 0
         DEBUGpic16_emitcode(";","%s %d %s sym->rname = %s, offset %d",
                             __FUNCTION__,__LINE__,
-                            sym->usl.spillLoc->rname,
-                            sym->rname, sym->usl.spillLoc->offset);
+                            SYM_SPIL_LOC(sym)->rname,
+                            sym->rname, SYM_SPIL_LOC(sym)->offset);
 #endif
 
-        //aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
-        if (sym->usl.spillLoc && sym->usl.spillLoc->rname) {
+        //aop->aopu.pcop = pic16_popGetImmd(SYM_SPIL_LOC(sym)->rname,0,SYM_SPIL_LOC(sym)->offset);
+        if (SYM_SPIL_LOC(sym) && SYM_SPIL_LOC(sym)->rname) {
           sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
-          aop->aopu.pcop = pic16_popRegFromString(sym->usl.spillLoc->rname,
+          aop->aopu.pcop = pic16_popRegFromString(SYM_SPIL_LOC(sym)->rname,
                                                   getSize(sym->type),
-                                                  sym->usl.spillLoc->offset, op);
+                                                  SYM_SPIL_LOC(sym)->offset, op);
         } else if (getSize(sym->type) <= 1) {
           //fprintf (stderr, "%s:%d called for a spillLocation -- assigning WREG instead --- CHECK (size:%u)!\n", __FUNCTION__, __LINE__, getSize(sym->type));
           pic16_emitpcomment (";!!! %s:%d called for a spillLocation -- assigning WREG instead --- CHECK", __FUNCTION__, __LINE__);

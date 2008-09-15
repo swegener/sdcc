@@ -104,7 +104,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.8.3
+SDCC 2.8.4
 \size footnotesize
 
 \newline
@@ -1166,10 +1166,14 @@ in older versions, the preprocessor was always called with -std=c99 regardless
  comments
 \end_layout
 
-\begin_layout Standard
-
-\emph on
-<pending: more incompatibilities?>
+\begin_layout Itemize
+in versions older then 2.8.4 the pic16 *printf() and printf_tiny() library
+ functions supported undocumented and not standard compliant 'b' binary
+ format specifier ("%b", "%hb" and "%lb").
+ The 'b' specifier is now disabled by default.
+ It can be enabled by defining BINARY_SPECIFIER macro in files device/lib/pic16/
+libc/stdio/vfprintf.c and device/lib/pic16/libc/stdio/printf_tiny.c and recompilin
+g the library.
 \end_layout
 
 \begin_layout Section

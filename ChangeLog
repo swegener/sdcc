@@ -24,6 +24,10 @@
 	* device/lib/pic16/libc/stdio/vfprintf.c:
 	  applied patch #2044424: PIC16: vfprintf
 	  thanks Mauro Giachero
+	* support/regression/tests/bug1057979.c:
+	  removed old pic16 sprintf specifics
+	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.4
+	* doc/sdccman.lyx: documented 'b' binary format specifier removal
 
 2008-09-15 Raphael Neider <rneider AT web.de>
 

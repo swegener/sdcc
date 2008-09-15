@@ -79,11 +79,12 @@
 #define ISCHAR          (fchar)
 #define HAVESIGN        (nosign)
 
-
-#if 1
-extern void io_long (long);
-extern void io_int (long);
-extern void io_char (char);
+#ifdef BINARY_SPECIFIER
+/* "%lb" = "0" - "11111111111111111111111111111111" */
+# define BUF_SIZE       33
+#else
+/* "%lo" = "0" - "37777777777" or  "-21777777777" - "17777777777" */
+# define BUF_SIZE       13
 #endif
 
 void
@@ -97,8 +98,7 @@ printf_tiny (const char *fmt, ...)
   char *str, *ch;
   __data char *str1;
   long val;
-//  static char buffer[16];
-  char buffer[16];
+  char buffer[BUF_SIZE];
   va_list ap;
 
   va_start (ap, fmt);

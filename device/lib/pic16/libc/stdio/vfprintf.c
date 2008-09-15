@@ -122,6 +122,14 @@
  */
 #define EXTRA_INTEGER
 
+#ifdef BINARY_SPECIFIER
+/* "%lb" = "0" - "11111111111111111111111111111111" */
+# define BUF_SIZE       33
+#else
+/* "%lo" = "0" - "37777777777" or  "-20000000000" - "17777777777" */
+# define BUF_SIZE       13
+#endif
+
 #if _DEBUG
 extern void io_long (unsigned long);
 extern void io_str (char *);
@@ -156,8 +164,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
   int count = 0;
   char *str, *ch;
   long val;
-//  static char buffer[16];
-  char buffer[16];
+  char buffer[BUF_SIZE];
 
 #if _DEBUG
   io_str ("vfprintf: ");

@@ -58,17 +58,17 @@ am_libc18f_a_OBJECTS = iscntrl.$(OBJEXT) isdigit.$(OBJEXT) \
 	delay100tcy.$(OBJEXT) delay10ktcy.$(OBJEXT) \
 	delay10tcy.$(OBJEXT) delay1ktcy.$(OBJEXT) delay1mtcy.$(OBJEXT) \
 	fprintf.$(OBJEXT) printf.$(OBJEXT) printf_small.$(OBJEXT) \
-	printf_tiny.$(OBJEXT) sprintf.$(OBJEXT) streams.$(OBJEXT) \
-	strmgpsim.$(OBJEXT) strmmssp.$(OBJEXT) strmputchar.$(OBJEXT) \
-	strmusart.$(OBJEXT) vfprintf.$(OBJEXT) vprintf.$(OBJEXT) \
-	vsprintf.$(OBJEXT) atof.$(OBJEXT) atoi.$(OBJEXT) \
-	atol.$(OBJEXT) calloc.$(OBJEXT) crc16.$(OBJEXT) free.$(OBJEXT) \
-	g_ftoa.$(OBJEXT) itoa.$(OBJEXT) ltoa.$(OBJEXT) \
+	printf_tiny.$(OBJEXT) putchar.$(OBJEXT) sprintf.$(OBJEXT) \
+	streams.$(OBJEXT) strmgpsim.$(OBJEXT) strmmssp.$(OBJEXT) \
+	strmputchar.$(OBJEXT) strmusart.$(OBJEXT) vfprintf.$(OBJEXT) \
+	vprintf.$(OBJEXT) vsprintf.$(OBJEXT) atof.$(OBJEXT) \
+	atoi.$(OBJEXT) atol.$(OBJEXT) calloc.$(OBJEXT) crc16.$(OBJEXT) \
+	free.$(OBJEXT) g_ftoa.$(OBJEXT) itoa.$(OBJEXT) ltoa.$(OBJEXT) \
 	malloc.$(OBJEXT) memfree.$(OBJEXT) memfreemax.$(OBJEXT) \
-	memmisc.$(OBJEXT) putchar.$(OBJEXT) rand.$(OBJEXT) \
-	realloc.$(OBJEXT) x_ftoa.$(OBJEXT) memccpy.$(OBJEXT) \
-	memchr.$(OBJEXT) memchrpgm.$(OBJEXT) memchrram.$(OBJEXT) \
-	memcmp.$(OBJEXT) memcpy.$(OBJEXT) memcpypgm2ram.$(OBJEXT) \
+	memmisc.$(OBJEXT) rand.$(OBJEXT) realloc.$(OBJEXT) \
+	x_ftoa.$(OBJEXT) memccpy.$(OBJEXT) memchr.$(OBJEXT) \
+	memchrpgm.$(OBJEXT) memchrram.$(OBJEXT) memcmp.$(OBJEXT) \
+	memcpy.$(OBJEXT) memcpypgm2ram.$(OBJEXT) \
 	memcpyram2ram.$(OBJEXT) memmove.$(OBJEXT) memrchr.$(OBJEXT) \
 	memset.$(OBJEXT) strcat.$(OBJEXT) strchr.$(OBJEXT) \
 	strcmp.$(OBJEXT) strcpy.$(OBJEXT) strcspn.$(OBJEXT) \
@@ -184,13 +184,13 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 	delay/delay100ktcy.S delay/delay100tcy.S delay/delay10ktcy.S \
 	delay/delay10tcy.S delay/delay1ktcy.S delay/delay1mtcy.S \
 	stdio/fprintf.c stdio/printf.c stdio/printf_small.c \
-	stdio/printf_tiny.c stdio/sprintf.c stdio/streams.c \
-	stdio/strmgpsim.c stdio/strmmssp.c stdio/strmputchar.c \
-	stdio/strmusart.c stdio/vfprintf.c stdio/vprintf.c \
-	stdio/vsprintf.c stdlib/atof.c stdlib/atoi.c stdlib/atol.c \
-	stdlib/calloc.c stdlib/crc16.c stdlib/free.c stdlib/g_ftoa.S \
-	stdlib/itoa.c stdlib/ltoa.c stdlib/malloc.c stdlib/memfree.c \
-	stdlib/memfreemax.c stdlib/memmisc.c stdlib/putchar.c \
+	stdio/printf_tiny.c stdio/putchar.c stdio/sprintf.c \
+	stdio/streams.c stdio/strmgpsim.c stdio/strmmssp.c \
+	stdio/strmputchar.c stdio/strmusart.c stdio/vfprintf.c \
+	stdio/vprintf.c stdio/vsprintf.c stdlib/atof.c stdlib/atoi.c \
+	stdlib/atol.c stdlib/calloc.c stdlib/crc16.c stdlib/free.c \
+	stdlib/g_ftoa.S stdlib/itoa.c stdlib/ltoa.c stdlib/malloc.c \
+	stdlib/memfree.c stdlib/memfreemax.c stdlib/memmisc.c \
 	stdlib/rand.c stdlib/realloc.c stdlib/x_ftoa.c \
 	string/memccpy.c string/memchr.c string/memchrpgm.c \
 	string/memchrram.c string/memcmp.c string/memcpy.c \
@@ -719,6 +719,20 @@ printf_tiny.obj: stdio/printf_tiny.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o printf_tiny.obj `if test -f 'stdio/printf_tiny.c'; then $(CYGPATH_W) 'stdio/printf_tiny.c'; else $(CYGPATH_W) '$(srcdir)/stdio/printf_tiny.c'; fi`
 
+putchar.o: stdio/putchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT putchar.o -MD -MP -MF $(DEPDIR)/putchar.Tpo -c -o putchar.o `test -f 'stdio/putchar.c' || echo '$(srcdir)/'`stdio/putchar.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/putchar.Tpo $(DEPDIR)/putchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stdio/putchar.c' object='putchar.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o putchar.o `test -f 'stdio/putchar.c' || echo '$(srcdir)/'`stdio/putchar.c
+
+putchar.obj: stdio/putchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT putchar.obj -MD -MP -MF $(DEPDIR)/putchar.Tpo -c -o putchar.obj `if test -f 'stdio/putchar.c'; then $(CYGPATH_W) 'stdio/putchar.c'; else $(CYGPATH_W) '$(srcdir)/stdio/putchar.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/putchar.Tpo $(DEPDIR)/putchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stdio/putchar.c' object='putchar.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o putchar.obj `if test -f 'stdio/putchar.c'; then $(CYGPATH_W) 'stdio/putchar.c'; else $(CYGPATH_W) '$(srcdir)/stdio/putchar.c'; fi`
+
 sprintf.o: stdio/sprintf.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sprintf.o -MD -MP -MF $(DEPDIR)/sprintf.Tpo -c -o sprintf.o `test -f 'stdio/sprintf.c' || echo '$(srcdir)/'`stdio/sprintf.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sprintf.Tpo $(DEPDIR)/sprintf.Po
@@ -1012,20 +1026,6 @@ memmisc.obj: stdlib/memmisc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stdlib/memmisc.c' object='memmisc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memmisc.obj `if test -f 'stdlib/memmisc.c'; then $(CYGPATH_W) 'stdlib/memmisc.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/memmisc.c'; fi`
-
-putchar.o: stdlib/putchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT putchar.o -MD -MP -MF $(DEPDIR)/putchar.Tpo -c -o putchar.o `test -f 'stdlib/putchar.c' || echo '$(srcdir)/'`stdlib/putchar.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/putchar.Tpo $(DEPDIR)/putchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stdlib/putchar.c' object='putchar.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o putchar.o `test -f 'stdlib/putchar.c' || echo '$(srcdir)/'`stdlib/putchar.c
-
-putchar.obj: stdlib/putchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT putchar.obj -MD -MP -MF $(DEPDIR)/putchar.Tpo -c -o putchar.obj `if test -f 'stdlib/putchar.c'; then $(CYGPATH_W) 'stdlib/putchar.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/putchar.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/putchar.Tpo $(DEPDIR)/putchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stdlib/putchar.c' object='putchar.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o putchar.obj `if test -f 'stdlib/putchar.c'; then $(CYGPATH_W) 'stdlib/putchar.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/putchar.c'; fi`
 
 rand.o: stdlib/rand.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rand.o -MD -MP -MF $(DEPDIR)/rand.Tpo -c -o rand.o `test -f 'stdlib/rand.c' || echo '$(srcdir)/'`stdlib/rand.c

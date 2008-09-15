@@ -2,7 +2,7 @@
     streams.c - source file for stream declarations
 
     Written by Vangelis Rokas, 2004 (vrokas@otenet.gr)
-    
+
     This library is free software; you can redistribute it and/or modify it
     under the terms of the GNU Library General Public License as published by the
     Free Software Foundation; either version 2, or (at your option) any
@@ -20,12 +20,14 @@
     In other words, you are welcome to use, share and improve this program.
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable
+   to be covered by the GNU General Public License.
+   This exception does not however invalidate any other reasons why
+   the executable file might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
-
-/*
-** $Id$
-*/
-
 
 #include <stdio.h>
 

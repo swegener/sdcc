@@ -1,3 +1,30 @@
+2008-09-15 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/pic16/stdio.h, device/lib/pic16/libc/stdio/streams.c,
+	  device/lib/pic16/libc/stdio/printf.c,
+	  device/lib/pic16/libc/stdio/strmusart.c,
+	  device/lib/pic16/libc/stdio/printf_tiny.c,
+	  device/lib/pic16/libc/stdio/sprintf.c,
+	  device/lib/pic16/libc/stdio/strmgpsim.c,
+	  device/lib/pic16/libc/stdio/putchar.c,
+	  device/lib/pic16/libc/stdio/fprintf.c,
+	  device/lib/pic16/libc/stdio/strmmssp.c,
+	  device/device/lib/pic16/libc/stdio/vprintf.c,
+	  device/lib/pic16/libc/stdio/printf_small.c,
+	  device/lib/pic16/libc/stdio/vsprintf.c,
+	  device/lib/pic16/libc/stdio/strmputchar.c,
+	  device/lib/pic16/libc/Makefile.am,
+	  device/lib/pic16/libc/Makefile.in:
+	  *printf now returns int, puchar.c moved from stdlib to stdio,
+	  *printf format parameter type changed from char * to const char *,
+	  added GNU link excetion text to library source files,
+	  applyed GNU coding style, removed useless svn ids,
+	  added BINARY_SPECIFIER macro re-enables the use of the removed 'b'
+	  binary specifier: "%b", "%hb" and "%lb"
+	* device/lib/pic16/libc/stdio/vfprintf.c:
+	  applied patch #2044424: PIC16: vfprintf
+	  thanks Mauro Giachero
+
 2008-09-15 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/device.c (pic16_dump_usection): force udata sections
@@ -22,7 +49,7 @@
 2008-09-11 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bug-221100.c, support/regression/shifts.c,
-          support/regression/absolute.c:
+	  support/regression/absolute.c:
 	  applied patch #2105615: Some PIC16 testcase fixlets
 	  thanks Mauro Giachero
 

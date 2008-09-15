@@ -2,7 +2,7 @@
     printf_tiny.c - source file for reduced version of printf
 
     Modified for pic16 port, by Vangelis Rokas, 2004 (vrokas@otenet.gr)
-    
+
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
     This library is free software; you can redistribute it and/or modify it
@@ -22,11 +22,14 @@
     In other words, you are welcome to use, share and improve this program.
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!
--------------------------------------------------------------------------*/
 
-/*
-** $Id$
-*/
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable
+   to be covered by the GNU General Public License.
+   This exception does not however invalidate any other reasons why
+   the executable file might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
 
 /* This function uses function putchar() to dump a character
  * to standard output. putchar() is defined in libc18f.lib
@@ -40,7 +43,7 @@
    format     output type       argument-type
      %u*       unsigned            *
 
-     %b	       binary
+     %b        binary
      %d        decimal             int
      %ld       decimal             long
      %hd       decimal             char
@@ -54,30 +57,37 @@
      %s        character           generic pointer
 */
 
+/*
+ * This macro enables the use of the 'b' binary specifier and
+ * the use of "%b", "%hb" and "%lb"
+ */
+/* #define BINARY_SPECIFIER */
+
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #if 0
-#define	DPUT(c)	putchar( c )
+#define DPUT(c) putchar(c)
 #else
 #define DPUT(c)
 #endif
 
-#define ISLONG		(flong)
-#define ISSTR		(fstr)
-#define ISCHAR		(fchar)
-#define HAVESIGN	(nosign)
+#define ISLONG          (flong)
+#define ISSTR           (fstr)
+#define ISCHAR          (fchar)
+#define HAVESIGN        (nosign)
 
 
 #if 1
-extern void io_long(long);
-extern void io_int(long);
-extern void io_char(char);
+extern void io_long (long);
+extern void io_int (long);
+extern void io_char (char);
 #endif
 
-void printf_tiny(char *fmt, ...) 
+void
+printf_tiny (const char *fmt, ...)
 {
   char radix;
   char flong, fstr;
@@ -89,76 +99,109 @@ void printf_tiny(char *fmt, ...)
   long val;
 //  static char buffer[16];
   char buffer[16];
-  va_list ap ;
+  va_list ap;
 
-    va_start(ap,fmt);
-    ch = fmt;
-    
-    while( *ch ) {			//for (; *fmt ; fmt++ )
-        if (*ch == '%') {
-            ISLONG = 0;
-            ISSTR = 0;
-            ISCHAR = 0;
-            HAVESIGN = 0;
-            radix = 0;
-            upcase = 0;
-            ch++;
+  va_start (ap, fmt);
+  ch = fmt;
 
-            if(*ch == 'u') {
+  while (*ch) //for (; *fmt ; fmt++ )
+    {
+      if (*ch == '%')
+        {
+          ISLONG = 0;
+          ISSTR = 0;
+          ISCHAR = 0;
+          HAVESIGN = 0;
+          radix = 0;
+          upcase = 0;
+          ch++;
+
+          if (*ch == 'u')
+            {
               HAVESIGN = 1;
-              ch++;
+              ++ch;
             }
-            
-            if(*ch == 'l') {
+
+          if (*ch == 'l')
+            {
               ISLONG = 1;
-              ch++;
-            } else
-            if(*ch == 'h') {
+              ++ch;
+            }
+          else if (*ch == 'h')
+            {
               ISCHAR = 1;
-              ch++;
+              ++ch;
             }
-            
-            if(*ch == 's')ISSTR = 1;
-            else if(*ch == 'd')radix = 10;
-            else if(*ch == 'x'){ radix = 16; upcase = 0; }
-            else if(*ch == 'X'){ radix = 16; upcase = 1; }
-            else if(*ch == 'c')radix = 0;
-            else if(*ch == 'o')radix = 8;
-            else if(*ch == 'b')radix = 2;
-            
-            if(ISSTR) {
-                str = va_arg(ap, char *);
-                while(*str) { putchar(*str);str++;}
-            } else {
-              if(ISLONG)val = va_arg(ap, long);
-              else
-              if(ISCHAR) {
-		  val = (unsigned char)va_arg(ap, int); // FIXME: SDCC casts char arguments into ints
-		  if (!HAVESIGN) val = (char)val; // FIXME cont'd: sign-extend if required
-	      } else {
-                  val = va_arg(ap, int);
-              }
 
-              if(radix) {
-                if(HAVESIGN)
-                  ultoa(val, buffer, radix);
-                else
-                  ltoa (val, buffer, radix);
+          if (*ch == 's')
+            ISSTR = 1;
+          else if (*ch == 'd')
+            radix = 10;
+          else if (*ch == 'x')
+            {
+              radix = 16;
+              upcase = 0;
+            }
+          else if (*ch == 'X')
+            {
+              radix = 16;
+              upcase = 1;
+            }
+          else if (*ch == 'c')
+            radix = 0;
+          else if (*ch == 'o')
+            radix = 8;
+#ifdef BINARX_SPECIFIER
+          else if (*ch == 'b')
+            radix = 2;
+#endif
 
-                str1 = buffer;
-                while( (*str1) ) {
-                  radix = *str1;
-                  if(upcase)
-                    radix = toupper( radix );
-                  putchar ( radix );
-                  str1++;
+          if (ISSTR)
+            {
+              str = va_arg (ap, char *);
+              while (*str)
+                {
+                  putchar (*str);
+                  ++str;
                 }
-              }	else
-                putchar((char)val);
             }
-          } else
-            putchar(*ch);
+          else
+            {
+              if (ISLONG)
+                val = va_arg (ap, long);
+              else if (ISCHAR)
+                {
+                  val = (unsigned char) va_arg (ap, int);       // FIXME: SDCC casts char arguments into ints
+                  if (!HAVESIGN)
+                    val = (char) val;   // FIXME cont'd: sign-extend if required
+                }
+              else
+                val = va_arg (ap, int);
 
-        ch++;
+              if (radix)
+                {
+                  if (HAVESIGN)
+                    ultoa (val, buffer, radix);
+                  else
+                    ltoa (val, buffer, radix);
+
+                  str1 = buffer;
+                  while ((*str1))
+                    {
+                      radix = *str1;
+                      if (upcase)
+                        radix = toupper (radix);
+                      putchar (radix);
+                      ++str1;
+                    }
+                }
+              else
+                putchar ((char) val);
+            }
+        }
+      else
+        putchar (*ch);
+
+      ++ch;
     }
 }

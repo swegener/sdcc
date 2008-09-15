@@ -2,7 +2,7 @@
     printf_small.c - source file for reduced version of printf
 
     Modified for pic16 port, by Vangelis Rokas, 2004 (vrokas@otenet.gr)
-    
+
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
     This library is free software; you can redistribute it and/or modify it
@@ -22,11 +22,14 @@
     In other words, you are welcome to use, share and improve this program.
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!
--------------------------------------------------------------------------*/
 
-/*
-** $Id$
-*/
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable
+   to be covered by the GNU General Public License.
+   This exception does not however invalidate any other reasons why
+   the executable file might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
 
 /* This function uses function putchar() to dump a character
  * to standard output. putchar() is defined in libc18f.lib
@@ -56,7 +59,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void printf_small(char *fmt, ...) __reentrant
+void
+printf_small (const char *fmt, ...)
+  __reentrant
 {
   char *ch;
   char radix;
@@ -69,66 +74,93 @@ void printf_small(char *fmt, ...) __reentrant
   __data char *str1;
   long val;
   static char buffer[16];
-  va_list ap ;
+  va_list ap;
 
-    ch = fmt;
-    va_start(ap,fmt);
+  ch = fmt;
+  va_start (ap, fmt);
 
-    while( *ch ) {			//for (; *fmt ; fmt++ )
-        if (*ch == '%') {
-            flong = fstr = fchar = ffloat = 0;
-            radix = 0;
-            ch++;
+  while (*ch) //for (; *fmt ; fmt++ )
+    {
+      if (*ch == '%')
+        {
+          flong = fstr = fchar = ffloat = 0;
+          radix = 0;
+          ++ch;
 
-            if(*ch == 'l') {
+          if (*ch == 'l')
+            {
               flong = 1;
-              ch++;
-            } else
-            if(*ch == 'h') {
+              ++ch;
+            }
+          else if (*ch == 'h')
+            {
               fchar = 1;
-              ch++;
+              ++ch;
             }
-            
-            if(*ch == 's')fstr = 1;
-            else if(*ch == 'f')ffloat = 1;
-            else if(*ch == 'd')radix = 10;
-            else if(*ch == 'x')radix = 16;
-            else if(*ch == 'c')radix = 0;
-            else if(*ch == 'o')radix = 8;
-            
-            if(fstr) {
-                str = va_arg(ap, char *);
-                while (*str) putchar(*str++);
-            } else
-            if(ffloat) {
-                flt = va_arg(ap, float);
-                x_ftoa(flt, buffer, 32, 6);
-                str1 = buffer;
-                while( *str1 )str1++; str1--;
-                while( *str1 == '0' )str1--; str1++;
-                *str1 = 0; str1 = buffer;
-                while( *str1 )putchar(*str1++);
-            } else {
-              if(flong)val = va_arg(ap, long);
+
+          if (*ch == 's')
+            fstr = 1;
+          else if (*ch == 'f')
+            ffloat = 1;
+          else if (*ch == 'd')
+            radix = 10;
+          else if (*ch == 'x')
+            radix = 16;
+          else if (*ch == 'c')
+            radix = 0;
+          else if (*ch == 'o')
+            radix = 8;
+
+          if (fstr)
+            {
+              str = va_arg (ap, char *);
+              while (*str)
+                putchar (*str++);
+            }
+          else if (ffloat)
+            {
+              flt = va_arg (ap, float);
+              x_ftoa (flt, buffer, 32, 6);
+              str1 = buffer;
+              while (*str1)
+                ++str1;
+              --str1;
+              while (*str1 == '0')
+                --str1;
+              ++str1;
+              *str1 = 0;
+              str1 = buffer;
+              while (*str1)
+                putchar (*str1++);
+            }
+          else
+            {
+              if (flong)
+                val = va_arg (ap, long);
+              else if (fchar)
+                val = (char) va_arg (ap, int);  // FIXME: SDCC casts char arguments into ints
               else
-              if(fchar)val = (char)va_arg(ap, int); // FIXME: SDCC casts char arguments into ints
-              else {
-                  val = va_arg(ap, int);
-              }
-            
-              if(radix) {
-                ltoa (val, buffer, radix);
-
-                str1 = buffer;
-                while ( *str1 ) {
-                  putchar ( *str1++ );
+                {
+                  val = va_arg (ap, int);
                 }
-              }	else
-                putchar((char)val);
-            }
-          } else
-            putchar(*ch);
 
-        ch++;
+              if (radix)
+                {
+                  ltoa (val, buffer, radix);
+
+                  str1 = buffer;
+                  while (*str1)
+                    {
+                      putchar (*str1++);
+                    }
+                }
+              else
+                putchar ((char) val);
+            }
+        }
+      else
+        putchar (*ch);
+
+      ++ch;
     }
 }

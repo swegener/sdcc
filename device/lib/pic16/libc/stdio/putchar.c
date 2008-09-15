@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
-/*
-** $Id$
+ *
+ * As a special exception, if you link this library with other files,
+ * some of which are compiled with SDCC, to produce an executable,
+ * this library does not by itself cause the resulting executable
+ * to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
  */
 
 #include <stdio.h>
@@ -29,7 +32,8 @@
  * NOTE that putchar() is declared in stdio.h to
  * have the argument in WCHAR (via the wparam pragma) */
 
-PUTCHAR(c)
+void
+putchar (char c) __wparam __naked
 {
   c;
   __asm

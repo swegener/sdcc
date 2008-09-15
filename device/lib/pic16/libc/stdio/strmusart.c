@@ -2,7 +2,7 @@
     strmusart.c - usart stream putchar
 
     Written for pic16 port, by Vangelis Rokas, 2004 (vrokas@otenet.gr)
-    
+
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
     This library is free software; you can redistribute it and/or modify it
@@ -22,25 +22,29 @@
     In other words, you are welcome to use, share and improve this program.
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!
--------------------------------------------------------------------------*/
 
-/*
-** $Id$
-*/
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable
+   to be covered by the GNU General Public License.
+   This exception does not however invalidate any other reasons why
+   the executable file might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
 
 extern WREG;
 extern TXREG;
 extern TXSTA;
 
 /* note that USART should already been initialized */
-void __stream_usart_putchar(unsigned char c) __wparam __naked
+void
+__stream_usart_putchar (char c) __wparam __naked
 {
   c;
   __asm
 @1:
-    BTFSS	_TXSTA, 1
-    BRA		@1
-    MOVWF	_TXREG
+    BTFSS       _TXSTA, 1
+    BRA         @1
+    MOVWF       _TXREG
     RETURN
   __endasm;
 }

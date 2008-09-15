@@ -195,29 +195,30 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 #endif
         } else {
           unsigned int j=0;
-          int deb_addr=0;
 
                 rprev = NULL;
-                init_addr = rlist[j]->address;
-                deb_addr = init_addr;
-                fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
+                init_addr = (rlist[j]->address & 0x0FFF); // warning(s) emitted below
+                fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, (init_addr & 0x0FFF));
 
                 for(j=0;j<i;j++) {
                         r = rlist[j];
                         if(j < i-1)r1 = rlist[j+1]; else r1 = NULL;
 
-                        init_addr = r->address;
-                        deb_addr = init_addr;
+                        init_addr = (r->address & 0x0FFF);
+                        if (init_addr != r->address) {
+                            fprintf (stderr, "%s: WARNING: Changed address of pinned variable %s from 0x%x to 0x%x\n",
+                                    moduleName, r->name, r->address, init_addr);
+                        } // if
 
-                        if((rprev && (init_addr > (rprev->address + rprev->size)))) {
+                        if((rprev && (init_addr != ((rprev->address & 0x0FFF) + rprev->size)))) {
                                 fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
                         }
 
-                        if(r1 && (init_addr == r1->address)) {
+                        /* XXX: Does not handle partial overlap correctly. */
+                        if(r1 && (init_addr == (r1->address & 0x0FFF))) {
                                 fprintf(of, "\n%s\tres\t0\n", r->name);
                         } else {
                                 fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                                deb_addr += r->size;
                                 statistics.udsize += r->size;
                         }
 

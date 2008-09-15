@@ -2117,12 +2117,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
             )
             {
 
-
-//            for (i = 0; i < max (sym->nRegs, result->nRegs); i++)
-              /* the above does not free the unsued registers in sym,
-               * leaving them marked as used, and increasing register usage
-               * until the end of the function - VR 23/11/05 */
-
               for (i = 0; i < result->nRegs; i++)
                 if (i < sym->nRegs)
                   result->regs[i] = sym->regs[i];
@@ -2130,6 +2124,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                   result->regs[i] = getRegGpr (ic, ebp, result);
 
               _G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
+
             }
 
           /* free the remaining */
@@ -2387,13 +2382,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
                  have been allocated after sym->liveFrom but freed
                  before ic->seq. This is complicated, so spill this
                  symbol instead and let fillGaps handle the allocation. */
-#if 0
               if (sym->liveFrom < ic->seq)
                 {
                     spillThis (sym);
                     continue;
                 }
-#endif
+
               /* if it has a spillocation & is used less than
                  all other live ranges then spill this */
                 if (willCS) {
@@ -4068,7 +4062,7 @@ pic16_packRegisters (eBBlock * ebp)
 #endif
 
     /* mark the pointer usages */
-    if (POINTER_SET (ic))
+    if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)))
       {
         OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
         debugLog ("  marking as a pointer (set) =>");

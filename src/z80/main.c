@@ -587,7 +587,7 @@ _setDefaultOptions (void)
   optimize.loopInduction = 1;
 }
 
-/* Mangaling format:
+/* Mangling format:
     _fun_policy_params
     where:
       policy is the function policy
@@ -598,7 +598,7 @@ _setDefaultOptions (void)
     where:
       r is 'r' for reentrant, 's' for static functions
       s is 'c' for callee saves, 'r' for caller saves
-      p is 'p' for profiling on, 'x' for profiling off
+      f is 'f' for profiling on, 'x' for profiling off
     examples:
       rr - reentrant, caller saves
    params format:
@@ -614,7 +614,7 @@ _mangleSupportFunctionName(char *original)
 
   sprintf(buffer, "%s_rr%s_%s", original,
           options.profile ? "f" : "x",
-          options.noRegParams ? "s" : "bds"
+          options.noRegParams ? "s" : "bds" /* MB: but the library only has hds variants ??? */
           );
 
   return Safe_strdup(buffer);
@@ -649,7 +649,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     }
   else if ( IS_LITERAL (right))
     {
-      test = left;
+      test = right;
       val = OP_VALUE (IC_RIGHT (ic));
     }
   else

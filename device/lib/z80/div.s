@@ -175,12 +175,87 @@ __moduint_rrx_hds::
 
         ret
 
+__divsuchar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      c,(hl)
+        ld      b, #0
+
+        call    signexte
+
+        ld      l,c
+        ld      h,b
+
+        ret
+
+__modsuchar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      c,(hl)
+        ld      b, #0
+
+        call    signexte
+
+        ld      l,e
+        ld      h,d
+
+        ret
+
+__divuschar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        ld      d, #0
+        dec     hl
+        ld      c,(hl)
+
+        ld      a,c             ; Sign extend
+        rlca
+        sbc     a
+        ld      b,a
+
+        call    .div16
+
+        ld      l,c
+        ld      h,b
+
+        ret
+
+__moduschar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        ld      d, #0
+        dec     hl
+        ld      c,(hl)
+
+        ld      a,c             ; Sign extend
+        rlca
+        sbc     a
+        ld      b,a
+
+        call    .div16
+
+        ld      l,e
+        ld      h,d
+
+        ret
+
 .div8::
 .mod8::
         ld      a,c             ; Sign extend
         rlca
         sbc     a
         ld      b,a
+signexte:
         ld      a,e             ; Sign extend
         rlca
         sbc     a

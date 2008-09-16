@@ -26,10 +26,8 @@ testMul (void)
   cL = -128; cR =    1;  r8  =  cL * cR;  r8b  = cR *  cL; ASSERT ( r8  == -128); ASSERT ( r8b  == -128);
   cL =  128; cR =    1; ur8  =  cL * cR; ur8b  = cR *  cL; ASSERT (ur8  ==  128); ASSERT (ur8b  ==  128);
 
-#ifndef SDCC_z80
   ucL = 128; cR =   -5; r16 = ucL * cR; r16b = cR * ucL; ASSERT (r16 == -640); ASSERT (r16b == -640);
   ucL = 128; cR =    5; r16 = ucL * cR; r16b = cR * ucL; ASSERT (r16 ==  640); ASSERT (r16b ==  640);
-#endif
 
   ucL = 127;  cR =  -1;  r8 = ucL * cR;   r8b  = cR * ucL; ASSERT ( r8 == -127); ASSERT ( r8b  == -127);
   ucL = 128;  cR =   1; ur8 = ucL * cR;  ur8b  = cR * ucL; ASSERT (ur8 ==  128); ASSERT (ur8b  ==  128);
@@ -62,10 +60,8 @@ testDiv (void)
 
   ucL =  127;  cR =    3; r8 = ucL /  cR; ASSERT (r8 ==  42);
   ucL =  255;  cR =    3; r8 = ucL /  cR; ASSERT (r8 ==  85);
-#ifndef SDCC_z80
   ucL =  127;  cR =   -3; r8 = ucL /  cR; ASSERT (r8 == -42);
   ucL =  255;  cR =   -3; r8 = ucL /  cR; ASSERT (r8 == -85);
-#endif
 
    cL =  127; ucR =    3; r8 =  cL / ucR; ASSERT (r8 ==  42);
    cL = -127; ucR =    3; r8 =  cL / ucR; ASSERT (r8 == -42);
@@ -78,12 +74,10 @@ testDiv (void)
   ucL = 251;   cR =    1; ur8 = ucL /  cR; ASSERT (ur8 == 251);
   ucL = 251;   cR =    1; r16 = ucL /  cR; ASSERT (r16 == 251);
 
-#ifndef SDCC_z80
   ucL = 253;   cR =   -3; r8  = ucL /  cR; ASSERT (r8  == -84);
   ucL = 253;   cR =   -3; r16 = ucL /  cR; ASSERT (r16 == -84);
 
   ucL =  254;  cR =   -1; r16 = ucL /  cR; ASSERT (r16 == -254);
-#endif
    cL = -128;  cR =   -1; r16 =  cL /  cR; ASSERT (r16 ==  128);
 }
 
@@ -99,9 +93,7 @@ testMod (void)
   volatile         short r16;
 
   ucL =  128;  cR =    5; r16 = ucL %  cR; ASSERT (r16 ==  3);
-#ifndef SDCC_z80
   ucL =  128;  cR =   -5; r16 = ucL %  cR; ASSERT (r16 ==  3);
-#endif
   ucL =  128; ucR =    5; r16 = ucL % ucR; ASSERT (r16 ==  3);
 
   ucL =  128; ucR =  255; ur8 = ucL % ucR; ASSERT (ur8 == 128);

@@ -1,3 +1,15 @@
+2008-09-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/z80/mul.s (__mulsuchar_rrx_s, __muluschar_rrx_s),
+	* device/lib/z80/div.s (__divsuchar_rrx_s, __modsuchar_rrx_s,
+	  __divuschar_rrx_s, __moduschar_rrx_s): added mixed signedness versions
+	* device/lib/z80/stubs.s: added stubs for above functions
+	* src/SDCCopt.c (convilong),
+	* src/SDCCsymt.c (initCSupport): fixed bug 1900961
+	* src/SDCCsymt.h (__muldiv): enlarged for mixed signedness
+	* src/z80/main.c (_hasNativeMulFor): fixed bug, I think
+	* support/regression/tests/onebyte.c: enabled all tests for z80
+
 2008-09-15 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/pic16/stdio.h, device/lib/pic16/libc/stdio/streams.c,

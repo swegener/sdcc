@@ -4,10 +4,10 @@
 ; from Rodnay Zaks, "Programming the Z80".
 
 __muluchar_rrx_s::
-        ld      hl, #2
+        ld      hl, #2+1
         add     hl, sp
         ld      e, (hl)
-        inc     hl
+        dec     hl
         ld      h, (hl)
         ld      l, #0
         ld      d, l
@@ -20,14 +20,36 @@ muluchar_rrx_s_noadd:
         djnz    muluchar_rrx_s_loop
         ret
 
-;; Originally from GBDK by Pascal Felber.
+; operands have different sign
 
-__mulschar_rrx_s::
-        ld      hl,#2
+__mulsuchar_rrx_s::
+        ld      hl,#2+1
         add     hl,sp
 
         ld      e,(hl)
-        inc     hl
+        dec     hl
+        ld      c,(hl)
+        ld      b, #0
+        jr      signexte
+
+__muluschar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      c,(hl)
+        ld      b, #0
+        dec     hl
+        ld      e,(hl)
+        jr      signexte
+
+;; Originally from GBDK by Pascal Felber.
+
+__mulschar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
         ld      l,(hl)
 
         ;; Fall through
@@ -39,13 +61,13 @@ __mulschar_rrx_hds::
         rla
         sbc     a,a
         ld      b,a
-
+signexte:
         ld      a,e
         rla
         sbc     a,a
         ld      d,a
 
-        jp      .mul16
+        jr      .mul16
 
 __mulint_rrx_s::
         ld      hl,#2
@@ -65,7 +87,7 @@ __mulint_rrx_s::
 __muluchar_rrx_hds::
 __mulint_rrx_hds::
 	;; Parameters:
-	;;	HL, DE (left, right irrelivent)
+	;;	HL, DE (left, right irrelevant)
 	ld	b,h
 	ld	c,l
 
@@ -88,7 +110,7 @@ __mulint_rrx_hds::
         ;; Optimise for the case when this side has 8 bits of data or
         ;; less.  This is often the case with support address calls.
         or      a
-        jp      NZ,1$
+        jr      NZ,1$
 
         ld      b,#8
         ld      a,c

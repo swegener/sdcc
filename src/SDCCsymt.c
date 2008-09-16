@@ -184,6 +184,7 @@ deleteSym (bucket ** stab, void *sym, char *sname)
 
   if (!bp)                      /* did not find it */
     return;
+
   /* if this is the first one in the chain */
   if (!bp->prev)
     {
@@ -199,7 +200,6 @@ deleteSym (bucket ** stab, void *sym, char *sname)
 
       bp->prev->next = bp->next;
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -592,7 +592,6 @@ void checkTypeSanity(sym_link *etype, char *name) {
     // short AND long
     werror (E_LONG_AND_SHORT_INVALID, noun, name);
   }
-
 }
 
 /*------------------------------------------------------------------*/
@@ -1088,7 +1087,7 @@ addSymChain (symbol ** symHead)
         {
           /* if not formal parameter and not in file scope
              then show symbol redefined error
-             else check if symbols have conpatible types */
+             else check if symbols have compatible types */
           if (!sym->_isparm && sym->level > 0)
             error = 1;
           else
@@ -3286,8 +3285,8 @@ symbol *__fps16x16_lteq;
 symbol *__fps16x16_gt;
 symbol *__fps16x16_gteq;
 
-/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-symbol *__muldiv[3][3][2];
+/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED/BOTH */
+symbol *__muldiv[3][3][4];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
 sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
@@ -3441,7 +3440,7 @@ initCSupport ()
   };
   const char *ssu[] =
   {
-    "s", "u"
+    "s", "su", "us", "u"
   };
   const char *srlrr[] =
   {
@@ -3511,12 +3510,12 @@ initCSupport ()
             {
               if (tofrom)
                 {
-                  SNPRINTF (buffer, sizeof(buffer), "__fs2%s%s", ssu[su], sbwd[bwd]);
+                  SNPRINTF (buffer, sizeof(buffer), "__fs2%s%s", ssu[su*3], sbwd[bwd]);
                   __conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], floatType, 1, options.float_rent);
                 }
               else
                 {
-                  SNPRINTF (buffer, sizeof(buffer), "__%s%s2fs", ssu[su], sbwd[bwd]);
+                  SNPRINTF (buffer, sizeof(buffer), "__%s%s2fs", ssu[su*3], sbwd[bwd]);
                   __conv[tofrom][bwd][su] = funcOfType (buffer, floatType, __multypes[bwd][su], 1, options.float_rent);
                 }
             }
@@ -3531,7 +3530,7 @@ initCSupport ()
             {
               if (tofrom)
                 {
-                  SNPRINTF (buffer, sizeof(buffer), "__fps16x162%s%s", ssu[su], fp16x16sbwd[bwd]);
+                  SNPRINTF (buffer, sizeof(buffer), "__fps16x162%s%s", ssu[su*3], fp16x16sbwd[bwd]);
                   if(bwd == 3) {
                     __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, floatType, fixed16x16Type, 1, options.float_rent);
                   } else
@@ -3539,7 +3538,7 @@ initCSupport ()
                 }
               else
                 {
-                  SNPRINTF (buffer, sizeof(buffer), "__%s%s2fps16x16", ssu[su], fp16x16sbwd[bwd]);
+                  SNPRINTF (buffer, sizeof(buffer), "__%s%s2fps16x16", ssu[su*3], fp16x16sbwd[bwd]);
                   if(bwd == 3) {
                     __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, floatType, 1, options.float_rent);
                   } else
@@ -3559,7 +3558,7 @@ initCSupport ()
               SNPRINTF (buffer, sizeof(buffer),
                         "_%s%s%s",
                        smuldivmod[muldivmod],
-                       ssu[su],
+                       ssu[su*3],
                        sbwd[bwd]);
               __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
               FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
@@ -3571,7 +3570,34 @@ initCSupport ()
   Therefore they've been merged into mulint() and mullong().
 */
 
-  for (bwd = 0; bwd < 3; bwd++)
+  /* byte */
+  bwd = 0;
+  for (su = 0; su < 4; su++)
+    {
+      for (muldivmod = 0; muldivmod < 3; muldivmod++)
+        {
+          /* muluchar, mulschar, mulsuchar and muluschar are separate functions, because e.g. the z80
+             port is sign/zero-extending to int before calling mulint() */
+          /* div and mod : s8_t x s8_t -> s8_t should be s8_t x s8_t -> s16_t, see below */
+          if (!TARGET_IS_PIC16 || muldivmod != 1 || su != 0)
+            {
+              SNPRINTF (buffer, sizeof(buffer),
+                  "_%s%s%s",
+                  smuldivmod[muldivmod],
+                  ssu[su],
+                  sbwd[bwd]);
+              __muldiv[muldivmod][bwd][su] = funcOfType (
+                  _mangleFunctionName(buffer),
+                  __multypes[bwd][su%2],
+                  __multypes[bwd][su/2],
+                  2,
+                  options.intlong_rent);
+              FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+            }
+        }
+    }
+
+  for (bwd = 1; bwd < 3; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -3583,7 +3609,7 @@ initCSupport ()
                 SNPRINTF (buffer, sizeof(buffer),
                     "_%s%s%s",
                     smuldivmod[muldivmod],
-                    ssu[su],
+                    ssu[su*3],
                     sbwd[bwd]);
                 __muldiv[muldivmod][bwd][su] = funcOfType (
                     _mangleFunctionName(buffer),
@@ -3623,20 +3649,6 @@ initCSupport ()
 
   /* mul only */
   muldivmod = 0;
-  /* byte */
-  bwd = 0;
-  for (su = 0; su < 2; su++)
-    {
-      /* muluchar and mulschar are still separate functions, because e.g. the z80
-         port is sign/zero-extending to int before calling mulint() */
-      SNPRINTF (buffer, sizeof(buffer),
-                "_%s%s%s",
-                smuldivmod[muldivmod],
-                ssu[su],
-                sbwd[bwd]);
-      __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
-      FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
-    }
   /* signed only */
   su = 0;
   /* word and doubleword */
@@ -3662,7 +3674,7 @@ initCSupport ()
               SNPRINTF (buffer, sizeof(buffer),
                         "_%s%s%s",
                        srlrr[rlrr],
-                       ssu[su],
+                       ssu[su*3],
                        sbwd[bwd]);
               __rlrr[rlrr][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[0][0], 2, options.intlong_rent);
               FUNC_NONBANKED (__rlrr[rlrr][bwd][su]->type) = 1;

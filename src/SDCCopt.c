@@ -654,8 +654,9 @@ extern operand *geniCodeRValue (operand *, bool);
 /* convilong - converts int or long mults or divs to fcalls        */
 /*-----------------------------------------------------------------*/
 static void
-convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
+convilong (iCode * ic, eBBlock * ebp)
 {
+  int op = ic->op;
   symbol *func = NULL;
   iCode *ip = ic->next;
   iCode *newic;
@@ -664,16 +665,48 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
   int bwd;
   int su;
   int bytesPushed=0;
+  sym_link *leftType = operandType (IC_LEFT (ic));
+  sym_link *rightType = operandType (IC_RIGHT (ic));
 
   remiCodeFromeBBlock (ebp, ic);
+
+  if (getSize (leftType) == 1 && getSize (rightType) == 1)
+    {
+      int muldivmod;
+
+      if (op == '*')
+        muldivmod = 0;
+      else if (op == '/')
+        muldivmod = 1;
+      else if (op == '%')
+        muldivmod = 2;
+      else
+        muldivmod = -1;
+
+      for (su = 0; su < 4 && muldivmod >= 0; su++)
+        {
+          if ((compareType (leftType, __multypes[0][su%2]) == 1) &&
+              (compareType (rightType, __multypes[0][su/2]) == 1))
+            {
+              func = __muldiv[muldivmod][0][su];
+              goto found;
+            }
+        }
+    }
 
   /* depending on the type */
   for (bwd = 0; bwd < 3; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
-          if (compareType (type, __multypes[bwd][su]) == 1)
+          if (compareType (leftType, __multypes[bwd][su]) == 1)
             {
+              if ((op=='*' || op=='/' || op=='%') &&
+                  compareType (rightType, __multypes[bwd][su]) != 1)
+                {
+                  assert(0);
+                }
+
               if (op == '*')
                 func = __muldiv[0][bwd][su];
               else if (op == '/')
@@ -883,7 +916,7 @@ convertToFcall (eBBlock ** ebbs, int count)
                     }
                   else
                     {
-                      convilong (ic, ebbs[i], leftType, ic->op);
+                      convilong (ic, ebbs[i]);
                     }
                 }
             }
@@ -894,7 +927,7 @@ convertToFcall (eBBlock ** ebbs, int count)
 
               if (IS_INTEGRAL (type) && getSize (type) > port->support.shift && port->support.shift >= 0)
                 {
-                  convilong (ic, ebbs[i], type, ic->op);
+                  convilong (ic, ebbs[i]);
                 }
             }
         }

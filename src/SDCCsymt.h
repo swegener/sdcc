@@ -549,8 +549,8 @@ extern symbol *__fps16x16_lteq;
 extern symbol *__fps16x16_gt;
 extern symbol *__fps16x16_gteq;
 
-/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-extern symbol *__muldiv[3][3][2];
+/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED/BOTH */
+extern symbol *__muldiv[3][3][4];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
 extern sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */

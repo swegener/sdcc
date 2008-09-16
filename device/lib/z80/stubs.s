@@ -7,14 +7,20 @@
         .globl  __divslong
         .globl  __divulong
         .globl	__divschar_rrx_s
-        .globl	__divsint_rrx_s
         .globl	__divuchar_rrx_s
+        .globl	__divsuchar_rrx_s
+        .globl	__divuschar_rrx_s
+        .globl	__divsint_rrx_s
         .globl	__divuint_rrx_s
         .globl	__mulschar_rrx_s
         .globl	__muluchar_rrx_s
+        .globl	__mulsuchar_rrx_s
+        .globl	__muluschar_rrx_s
         .globl	__mulint_rrx_s
-        .globl  __moduchar_rrx_s
         .globl  __modschar_rrx_s
+        .globl  __moduchar_rrx_s
+        .globl  __modsuchar_rrx_s
+        .globl  __moduschar_rrx_s
         .globl  __moduint_rrx_s
         .globl  __modsint_rrx_s
         .globl	__rrulong_rrx_s
@@ -67,6 +73,11 @@ __divschar_rrf_s::
         rst     0x08
         jp	__divschar_rrx_s
 
+__modschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__modschar_rrx_s
+
 __muluchar_rrf_s::
         ld      a,#5
         rst     0x08
@@ -77,15 +88,40 @@ __divuchar_rrf_s::
         rst     0x08
         jp	__divuchar_rrx_s
 
-__modschar_rrf_s::
-        ld      a,#5
-        rst     0x08
-        jp	__modschar_rrx_s
-
 __moduchar_rrf_s::
         ld      a,#5
         rst     0x08
         jp	__moduchar_rrx_s
+
+__mulsuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__mulsuchar_rrx_s
+
+__divsuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__divsuchar_rrx_s
+
+__modsuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__modsuchar_rrx_s
+
+__muluschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__muluschar_rrx_s
+
+__divuschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__divuschar_rrx_s
+
+__moduschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__moduschar_rrx_s
 
 __modsint_rrf_s::
         ld      a,#5

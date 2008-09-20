@@ -1,3 +1,9 @@
+2008-09-20 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic16/glue.c:
+	  definition of absolute address symbols without initial value,
+	  fixed SDCC cresh "do not know how to intialize symbol"
+
 2008-09-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/z80/mul.s (__mulsuchar_rrx_s, __muluschar_rrx_s),

@@ -1221,68 +1221,76 @@ static void
 pic16emitStaticSeg (memmap * map)
 {
   symbol *sym;
-  static int didcode=0;
+  static int didcode = 0;
 
   //fprintf(stderr, "%s\n",__FUNCTION__);
 
-  pic16_initDB();
+  pic16_initDB ();
 
   /* for all variables in this segment do */
-  for (sym = setFirstItem (map->syms); sym;
-       sym = setNextItem (map->syms))
+  for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
     {
 
 #if 0
-        fprintf(stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
-CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
-                map->sname, sym->name, sym->used, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type),
-                IS_CODE(sym->etype), IN_CODESPACE( SPEC_OCLS(sym->etype)), IS_CONSTANT(sym->etype),
-                IS_PTR_CONST(sym->etype), SPEC_CONST(sym->etype));
-        printTypeChain( sym->type, stderr );
-        fprintf(stderr, "\n");
+      fprintf (stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
+CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sname, sym->name, sym->used, SPEC_ABSA (sym->etype), IS_AGGREGATE (sym->type), IS_CODE (sym->etype), IN_CODESPACE (SPEC_OCLS (sym->etype)), IS_CONSTANT (sym->etype), IS_PTR_CONST (sym->etype), SPEC_CONST (sym->etype));
+      printTypeChain (sym->type, stderr);
+      fprintf (stderr, "\n");
 #endif
 
-        if(SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))) {
-                pic16_assignConfigWordValue(SPEC_ADDR(sym->etype),
-                        (int) ulFromVal (list2val(sym->ival)));
+      if (SPEC_ABSA (sym->etype) && PIC16_IS_CONFIG_ADDRESS (SPEC_ADDR (sym->etype)))
+        {
+          pic16_assignConfigWordValue (SPEC_ADDR (sym->etype), (int) ulFromVal (list2val (sym->ival)));
 
-                continue;
-        }
-
-        if(SPEC_ABSA(sym->etype) && PIC16_IS_IDLOC_ADDRESS(SPEC_ADDR(sym->etype))) {
-                pic16_assignIdByteValue(SPEC_ADDR(sym->etype),
-                        (char) ulFromVal (list2val(sym->ival)));
-
-                continue;
-        }
-
-        /* if it is "extern" then do nothing */
-        if (IS_EXTERN (sym->etype)/* && !SPEC_ABSA(sym->etype)*/) {
-                checkAddSym(&externs, sym);
           continue;
         }
 
-        /* if it is not static add it to the public
-           table */
-        if (!IS_STATIC (sym->etype)) {
-                /* do not emit if it is a config word declaration */
-                checkAddSym(&publics, sym);
+      if (SPEC_ABSA (sym->etype) && PIC16_IS_IDLOC_ADDRESS (SPEC_ADDR (sym->etype)))
+        {
+          pic16_assignIdByteValue (SPEC_ADDR (sym->etype), (char) ulFromVal (list2val (sym->ival)));
+
+          continue;
+        }
+
+      /* if it is "extern" then do nothing */
+      if (IS_EXTERN (sym->etype) /* && !SPEC_ABSA(sym->etype) */ )
+        {
+          checkAddSym (&externs, sym);
+          continue;
+        }
+
+      /* if it is not static add it to the public
+         table */
+      if (!IS_STATIC (sym->etype))
+        {
+          /* do not emit if it is a config word declaration */
+          checkAddSym (&publics, sym);
         }
 
       /* print extra debug info if required */
-      if (options.debug || sym->level == 0) {
+      if (options.debug || sym->level == 0)
+        {
           /* NOTE to me - cdbFile may be null in which case,
            * the sym name will be printed to stdout. oh well */
-           debugFile->writeSymbol(sym);
-      }
+          debugFile->writeSymbol (sym);
+        }
 
       /* if it has an absolute address */
-      if (SPEC_ABSA (sym->etype)) {
-//              fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
-//                      __FILE__, __LINE__, sym->name);
+      if (SPEC_ABSA (sym->etype))
+        {
+//        fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
+//                __FILE__, __LINE__, sym->name);
 
-          /* if it has an initial value */
-          if (sym->ival)
+          if (!sym->ival && IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char)
+            {
+              /* symbol has absolute address but no initial value */
+              /* special case for character strings */
+
+//            fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
+
+              pic16_pCodeConstString (sym->rname, SPEC_CVAL (sym->etype).v_char, getSize (sym->type));
+            }
+          else
             {
               pBlock *pb;
               symbol *asym;
@@ -1290,57 +1298,43 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
               pCode *pcf;
 
               /* symbol has absolute address and initial value */
-              noAlloc++;
+              ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
-              asym = newSymbol(sym->rname, 0);
-              abSym = Safe_calloc(1, sizeof(absSym));
-              strcpy(abSym->name, sym->rname);
-              abSym->address = SPEC_ADDR( sym->etype );
-              addSet(&absSymSet, abSym);
+              asym = newSymbol (sym->rname, 0);
+              abSym = Safe_calloc (1, sizeof (absSym));
+              strcpy (abSym->name, sym->rname);
+              abSym->address = SPEC_ADDR (sym->etype);
+              addSet (&absSymSet, abSym);
 
-              pb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute Ival"));
-              pic16_addpBlock(pb);
+              pb = pic16_newpCodeChain (NULL, 'A', pic16_newpCodeCharP ("; Starting pCode block for absolute Ival"));
+              pic16_addpBlock (pb);
 
-              pcf = pic16_newpCodeFunction(moduleName, asym->name);
-              PCF(pcf)->absblock = 1;
+              pcf = pic16_newpCodeFunction (moduleName, asym->name);
+              PCF (pcf)->absblock = 1;
 
-              pic16_addpCode2pBlock(pb,pcf);
-              pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+              pic16_addpCode2pBlock (pb, pcf);
+              pic16_addpCode2pBlock (pb, pic16_newpCodeLabel (sym->rname, -1));
               //fprintf(stderr, "%s:%d [1] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
-              pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
-              pic16_flushDB('p', (void *)pb);
+              /* if it has an initial value */
+              if (sym->ival)
+                {
+                  pic16_printIval (sym, sym->type, sym->ival, 'p', (void *) pb);
+                  pic16_flushDB ('p', (void *) pb);
+                }
 
-              pic16_addpCode2pBlock(pb, pic16_newpCodeFunction(NULL, NULL));
-              noAlloc--;
+              pic16_addpCode2pBlock (pb, pic16_newpCodeFunction (NULL, NULL));
+              --noAlloc;
             }
-          else
-            {
-
-              /* symbol has absolute address but no initial value */
-
-              /* allocate space */
-              dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
-
-              /* special case for character strings */
-              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-                  SPEC_CVAL (sym->etype).v_char) {
-
-//              fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
-
-                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char, getSize(sym->type));
-              } else {
-                fprintf (stderr, "%s:%u(%s): do not know how to intialize symbol %s\n", __FILE__, __LINE__, __FUNCTION__, sym->rname);
-                assert(0);
-              }
-            }
-
-        } else {
-//              fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
-//                      __FILE__, __LINE__, sym->name);
+        }
+      else
+        {
+//        fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
+//               __FILE__, __LINE__, sym->name);
 
 
           /* if it has an initial value */
-          if (sym->ival) {
+          if (sym->ival)
+            {
               pBlock *pb;
 
               /* symbol doesn't have absolute address but has initial value */
@@ -1348,43 +1342,46 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
               ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
 
-              pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
-              pic16_addpBlock(pb);
+              pb = pic16_newpCodeChain (NULL, 'P', pic16_newpCodeCharP ("; Starting pCode block for Ival"));
+              pic16_addpBlock (pb);
 
-              if(!didcode) {
-                /* make sure that 'code' directive is emitted before, once */
-                pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir("code", NULL));
+              if (!didcode)
+                {
+                  /* make sure that 'code' directive is emitted before, once */
+                  pic16_addpCode2pBlock (pb, pic16_newpCodeAsmDir ("code", NULL));
 
-                didcode++;
-              }
+                  ++didcode;
+                }
 
-              pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+              pic16_addpCode2pBlock (pb, pic16_newpCodeLabel (sym->rname, -1));
               //fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
-              pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
-              pic16_flushDB('p', (void *)pb);
+              pic16_printIval (sym, sym->type, sym->ival, 'p', (void *) pb);
+              pic16_flushDB ('p', (void *) pb);
               --noAlloc;
-            } else {
+            }
+          else
+            {
 
               /* symbol doesn't have absolute address and no initial value */
               /* allocate space */
 //            fprintf(stderr, "%s:%d [3] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
               dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
               /* special case for character strings */
-              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-                  SPEC_CVAL (sym->etype).v_char) {
+              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char)
+                {
 
-//              fprintf(stderr, "%s:%d printing code string for %s\n", __FILE__, __LINE__, sym->rname);
+//                fprintf(stderr, "%s:%d printing code string for %s\n", __FILE__, __LINE__, sym->rname);
 
-                pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char, getSize(sym->type));
-              } else {
-                assert(0);
-              }
+                  pic16_pCodeConstString (sym->rname, SPEC_CVAL (sym->etype).v_char, getSize (sym->type));
+                }
+              else
+                {
+                  assert (0);
+                }
             }
         }
     }
-
 }
-
 
 /*-----------------------------------------------------------------*/
 /* pic16_emitConfigRegs - emits the configuration registers              */

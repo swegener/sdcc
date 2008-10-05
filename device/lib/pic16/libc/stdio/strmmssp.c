@@ -36,7 +36,7 @@ extern SSPBUF;
 void
 __stream_mssp_putchar (char c) __wparam __naked
 {
-  c;
+  (void)c;
   __asm
     MOVWF       _SSPBUF
     RETURN

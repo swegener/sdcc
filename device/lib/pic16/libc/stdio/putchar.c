@@ -33,10 +33,7 @@
  * have the argument in WCHAR (via the wparam pragma) */
 
 void
-putchar (char c) __wparam __naked
+putchar (char c) __wparam
 {
-  c;
-  __asm
-    return
-  __endasm;
+  (void)c;
 }

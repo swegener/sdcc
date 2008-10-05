@@ -3804,6 +3804,8 @@ static void pCodeLabelDestruct(pCode *pc)
   if(!pc)
     return;
 
+  pic16_unlinkpCode(pc);
+
 //  if((pc->type == PC_LABEL) && PCL(pc)->label)
 //    Safe_free(PCL(pc)->label);
 
@@ -4661,10 +4663,16 @@ void pic16_unlinkpCode(pCode *pc)
     fprintf(stderr,"Unlinking: ");
     printpCode(stderr, pc);
 #endif
-    if(pc->prev)
+    if(pc->prev) {
       pc->prev->next = pc->next;
-    if(pc->next)
+    } else if (pc->pb && (pc->pb->pcHead == pc)) {
+        pc->pb->pcHead = pc->next;
+    }
+    if(pc->next) {
       pc->next->prev = pc->prev;
+    } else if (pc->pb && (pc->pb->pcTail == pc)) {
+        pc->pb->pcTail = pc->prev;
+    }
 
     /* move C source line down (or up) */
     if (isPCI(pc) && PCI(pc)->cline) {
@@ -5332,30 +5340,9 @@ void pic16_pCodeUnlink(pCode *pc)
   pBranch *pb1,*pb2;
   pCode *pc1;
 
-  if(!pc->prev || !pc->next) {
-    fprintf(stderr,"unlinking bad pCode in %s:%d\n",__FILE__,__LINE__);
-    exit(1);
+  if (!pc) {
+    return;
   }
-
-  /* move C source line down (or up) */
-  if (isPCI(pc) && PCI(pc)->cline) {
-    pc1 = pic16_findNextInstruction (pc->next);
-    if (pc1 && isPCI(pc1) && !PCI(pc1)->cline) {
-      PCI(pc1)->cline = PCI(pc)->cline;
-    } else {
-      pc1 = pic16_findPrevInstruction (pc->prev);
-      if (pc1 && isPCI(pc1) && !PCI(pc1)->cline)
-        PCI(pc1)->cline = PCI(pc)->cline;
-    }
-  }
-
-  /* first remove the pCode from the chain */
-  pc->prev->next = pc->next;
-  pc->next->prev = pc->prev;
-
-  pc->prev = pc->next = NULL;
-
-  /* Now for the hard part... */
 
   /* Remove the branches */
 
@@ -5379,6 +5366,7 @@ void pic16_pCodeUnlink(pCode *pc)
     pb1 = pb1->next;
   }
 
+  pic16_unlinkpCode (pc);
 
 }
 #endif
@@ -11241,6 +11229,10 @@ static void createReachingDefinitions (pBlock *pb) {
   } // for
 
   pc = pic16_findNextInstruction (pb->pcHead);
+  if (!pc) {
+      // empty function, avoid NULL pointer dereference
+      return;
+  } // if
   todo = NULL; blacklist = NULL;
   addSetHead (&todo, PCI(pc)->pcflow);
 

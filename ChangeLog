@@ -1,3 +1,17 @@
+2008-10-06 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/stdio.h,
+	  device/lib/pic16/libc/stdio/putchar.c: putchar should not be
+	  declared __naked for convenience, named all arguments
+	* device/lib/pic16/libc/stdio/strmgpsim.c,
+	  device/lib/pic16/libc/stdio/strmmssp.c,
+	  device/lib/pic16/libc/stdio/strmusart.c: cosmetic changes
+	
+	* src/pic16/pcode.c (createReachingDefinitions): avoid segfault on
+	  empty __naked functions,
+	* (pCodeLabelDestruct, pic16_unlinkpCode, pic16_pCodeUnlink): fix
+	  corner cases (unlink first/last pCode in list), reuse more code
+
 2008-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/main.c (_ds390_genInitStartup): added
@@ -13,7 +27,7 @@
 
 	* src/pic16/glue.c:
 	  definition of absolute address symbols without initial value,
-	  fixed SDCC cresh "do not know how to intialize symbol"
+	  fixed SDCC crash "do not know how to intialize symbol"
 
 2008-09-16 Maarten Brock <sourceforge.brock AT dse.nl>
 

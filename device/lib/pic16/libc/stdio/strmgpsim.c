@@ -37,7 +37,7 @@ extern WREG;
 void
 __stream_gpsim_putchar (char c) __wparam __naked
 {
-  c;
+  (void)c;
   __asm
     MOVFF       _WREG, 0xf7f
     RETURN

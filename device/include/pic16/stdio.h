@@ -92,32 +92,32 @@ typedef char *FILE;
 #define GPSIM_DEREF     0xe
 #define STREAM_GPSIM    ((FILE *)(0x002e0000UL))
 
-extern FILE * stdin;
-extern FILE * stdout;
+extern FILE *stdin;
+extern FILE *stdout;
 
 /* printf_small() supports float print */
-void printf_small (const char *, ...);
+void printf_small (const char *fmt, ...);
 
 /* printf_tiny() does not support float print */
-void printf_tiny (const char *, ...);  // __reentrant;
+void printf_tiny (const char *fmt, ...);  // __reentrant;
 
-extern int printf (const char *,...);
-extern int fprintf (FILE *, const char *,...);
-extern int sprintf (char *, const char *, ...);
+extern int printf (const char *fmt, ...);
+extern int fprintf (FILE *stream, const char *fmt, ...);
+extern int sprintf (char *str, const char *fmt, ...);
 
-extern int vprintf (const char *, va_list);
-extern int vfprintf (FILE * stream, const char *fmt, va_list ap);
-extern int vsprintf (char *, const char *, va_list);
+extern int vprintf (const char *fmt, va_list ap);
+extern int vfprintf (FILE *stream, const char *fmt, va_list ap);
+extern int vsprintf (char *str, const char *fmt, va_list ap);
 
-extern void putchar (char) __wparam __naked;
+extern void putchar (char c) __wparam;
 
-extern void __stream_putchar (FILE *, char);
+extern void __stream_putchar (FILE *stream, char c);
 
 extern void __stream_usart_putchar (char c) __wparam __naked;
 extern void __stream_mssp_putchar (char c) __wparam __naked;
 extern void __stream_gpsim_putchar (char c) __wparam __naked;
 
-extern char *gets (char *);
+extern char *gets (char *str);
 extern char getchar (void);
 
 #endif /* __STDIO_H */

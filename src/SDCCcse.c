@@ -1038,6 +1038,25 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             }
           if (rightValue == -1.0)
             {
+              /* '*' can have two unsigned chars as operands */
+              /* and an unsigned int as result.              */
+              if (IS_INTEGRAL (operandType (IC_LEFT (ic))))
+                {
+                  if ((getSize (operandType (IC_LEFT (ic))) < (unsigned int) INTSIZE) &&
+                      (getSize (operandType (IC_LEFT (ic))) < getSize (operandType (IC_RESULT (ic)))))
+                    {
+                      operand * op;
+                      iCode * newic;
+                      /* Widen to int. */
+                      op = operandFromOperand (IC_RESULT (ic));
+                      op->type = TYPE;
+                      setOperandType (op, INTTYPE);
+                      newic = newiCode (CAST, op, IC_LEFT (ic));
+                      IC_RESULT (newic) = newiTempOperand (INTTYPE, TRUE);
+                      addiCodeToeBBlock (ebp, newic, ic);
+                      IC_LEFT (ic) = IC_RESULT (newic);
+                    }
+                }
               /* convert x * -1 to -x */
               ic->op = UNARYMINUS;
               IC_RIGHT (ic) = NULL;
@@ -1054,19 +1073,58 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           IC_LEFT (ic) = NULL;
           IC_RESULT (ic) = operandFromOperand (IC_RESULT (ic));
           IC_RESULT (ic)->isaddr = 0;
-          break;
+          return;
         }
-      /* if this is a division then check if right */
-      /* is one then change it to an assignment    */
-      if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
-          operandLitValue (IC_RIGHT (ic)) == 1.0)
+      /* if this is a division then check if left is zero */
+      /* and right is not then change it to an assignment */
+      if (IS_OP_LITERAL (IC_LEFT (ic)) && IS_OP_LITERAL (IC_RIGHT (ic)) &&
+          (operandLitValue (IC_LEFT (ic)) == 0.0) && (operandLitValue (IC_RIGHT (ic)) != 0.0))
         {
-
           ic->op = '=';
           IC_RIGHT (ic) = IC_LEFT (ic);
           IC_LEFT (ic) = NULL;
           SET_RESULT_RIGHT (ic);
           return;
+        }
+      /* if this is a division then check if right */
+      /* is one then change it to an assignment    */
+      if (IS_OP_LITERAL (IC_RIGHT (ic)))
+        {
+          double rightValue = operandLitValue (IC_RIGHT (ic));
+          if (rightValue == 1.0)
+            {
+              ic->op = '=';
+              IC_RIGHT (ic) = IC_LEFT (ic);
+              IC_LEFT (ic) = NULL;
+              SET_RESULT_RIGHT (ic);
+              return;
+            }
+          if (rightValue == -1.0)
+            {
+              /* '/' can have two unsigned chars as operands */
+              /* and an unsigned int as result.              */
+              if (IS_INTEGRAL (operandType (IC_LEFT (ic))))
+                {
+                  if ((getSize (operandType (IC_LEFT (ic))) < (unsigned int) INTSIZE) &&
+                      (getSize (operandType (IC_LEFT (ic))) < getSize (operandType (IC_RESULT (ic)))))
+                    {
+                      operand * op;
+                      iCode * newic;
+                      /* Widen to int. */
+                      op = operandFromOperand (IC_RESULT (ic));
+                      op->type = TYPE;
+                      setOperandType (op, INTTYPE);
+                      newic = newiCode (CAST, op, IC_LEFT (ic));
+                      IC_RESULT (newic) = newiTempOperand (INTTYPE, TRUE);
+                      addiCodeToeBBlock (ebp, newic, ic);
+                      IC_LEFT (ic) = IC_RESULT (newic);
+                    }
+                }
+              /* convert x / -1 to -x */
+              ic->op = UNARYMINUS;
+              IC_RIGHT (ic) = NULL;
+              return;
+            }
         }
       break;
       /* if both are the same for an comparison operators */
@@ -2187,7 +2245,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
          mine and type is a pointer then delete
          pointerGets to take care of aliasing */
       if (ASSIGNMENT (ic) &&
-                  IS_SYMOP (IC_RESULT (ic)) &&
+          IS_SYMOP (IC_RESULT (ic)) &&
           OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))) &&
           IS_PTR (operandType (IC_RESULT (ic))))
         {

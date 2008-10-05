@@ -1743,7 +1743,7 @@ replace {
 	cjne	%13,%14,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
+} if labelInRange(%8), labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
 
 replace {
 	cjne	%1,%2,%3
@@ -1767,7 +1767,7 @@ replace {
 	cjne	%13,%14,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
+} if labelInRange(%8), labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
 
 replace {
 	cjne	@%1,%2,%3
@@ -1791,7 +1791,7 @@ replace {
 	cjne	@%1,%14,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
+} if labelInRange(%8), labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
 
 replace {
 	cjne	%1,%2,%3
@@ -1809,7 +1809,7 @@ replace {
 	cjne	%13,%14,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
+} if labelInRange(%8), labelRefCount(%3 4), labelRefCountChange(%3 -4), labelRefCountChange(%8 3)
 
 replace {
 	jnz	%3
@@ -1829,7 +1829,7 @@ replace {
 	cjne	%10,%11,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
+} if labelInRange(%8), labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
 
 replace {
 	cjne	%1,%2,%3
@@ -1849,7 +1849,7 @@ replace {
 	cjne	%10,%11,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
+} if labelInRange(%8), labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
 
 replace {
 	cjne	@%1,%2,%3
@@ -1869,7 +1869,7 @@ replace {
 	cjne	@%1,%11,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
+} if labelInRange(%8), labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
 
 replace {
 	cjne	%1,%2,%3
@@ -1885,7 +1885,7 @@ replace {
 	cjne	%10,%11,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
+} if labelInRange(%8), labelRefCount(%3 3), labelRefCountChange(%3 -3), labelRefCountChange(%8 2)
 
 replace {
 	jnz	%3
@@ -1901,7 +1901,7 @@ replace {
 	cjne	%5,%6,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
+} if labelInRange(%8), labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
 
 replace {
 	cjne	%1,%2,%3
@@ -1917,7 +1917,7 @@ replace {
 	cjne	%5,%6,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
+} if labelInRange(%8), labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
 
 replace {
 	cjne	 @%1,%2,%3
@@ -1933,7 +1933,7 @@ replace {
 	cjne	@%1,%6,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
+} if labelInRange(%8), labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
 
 replace {
 	cjne	%1,%2,%3
@@ -1947,7 +1947,7 @@ replace {
 	cjne	%5,%6,%8
 	sjmp	%7
 %3:
-} if labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
+} if labelInRange(%8), labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
 
 replace {
 	cjne	%1,%2,%3
@@ -1959,7 +1959,7 @@ replace {
 	cjne	%1,%2,%5
 	sjmp	%4
 %3:
-} if labelRefCount(%3 1), labelRefCountChange(%3 -1)
+} if labelInRange(%5), labelRefCount(%3 1), labelRefCountChange(%3 -1)
 
 replace {
 	sjmp	%1

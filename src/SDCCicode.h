@@ -339,6 +339,7 @@ bool isOperandInDirSpace (operand *);
 bool isOperandInCodeSpace (operand *);
 operand *opFromOpWithDU (operand *, bitVect *, bitVect *);
 iCode *copyiCode (iCode *);
+operand *newiTempOperand (sym_link *, char);
 operand *newiTempFromOp (operand *);
 iCode *getBuiltinParms (iCode *,int *, operand **);
 int isiCodeInFunctionCall (iCode *);

@@ -61,6 +61,37 @@ void pic16_peepRules2pCode(peepRule *);
 #endif
 
 /*-----------------------------------------------------------------*/
+/* getPatternVar - finds a pattern variable                        */
+/*-----------------------------------------------------------------*/
+
+static char*
+getPatternVar (hTab *vars, char **cmdLine)
+{
+  int varNumber;
+  char *digitend;
+
+  if (!cmdLine || !*cmdLine || !**cmdLine)
+    return NULL; /* no parameters given */
+
+  while (**cmdLine && ISCHARSPACE(**cmdLine))
+    (*cmdLine)++; /* skip whitespace */
+
+  if (**cmdLine != '%')
+    goto error;
+  (*cmdLine)++;
+  if (!ISCHARDIGIT (**cmdLine))
+    goto error;
+  varNumber = strtol (*cmdLine, &digitend, 10);
+  *cmdLine = digitend;
+  return hTabItemWithKey (vars, varNumber);
+
+error:
+  fprintf (stderr,
+           "*** internal error: peephole restriction malformed: %s\n", *cmdLine);
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* pcDistance - finds a label backward or forward                  */
 /*-----------------------------------------------------------------*/
 
@@ -135,40 +166,52 @@ FBYNAME (useAcallAjmp)
 }
 
 /*-----------------------------------------------------------------*/
-/* labelInRange - will check to see if label %5 is within range    */
+/* labelInRange - will check to see if label is within range       */
 /*-----------------------------------------------------------------*/
 FBYNAME (labelInRange)
 {
-  /* assumes that %5 pattern variable has the label name */
-  char *lbl = hTabItemWithKey (vars, 5);
   int dist = 0;
+  char *lbl = getPatternVar (vars, &cmdLine);
+
+  if (!lbl)
+    {
+      /* If no parameters given, assume that %5 pattern variable
+         has the label name for backward compatibility */
+      lbl = hTabItemWithKey (vars, 5);
+    }
 
   if (!lbl)
     return FALSE;
 
-  /* Don't optimize jumps in a jump table; a more generic test */
-  if (currPl->ic && currPl->ic->op == JUMPTABLE)
-    return FALSE;
+  do
+    {
+      /* Don't optimize jumps in a jump table; a more generic test */
+      if (currPl->ic && currPl->ic->op == JUMPTABLE)
+        return FALSE;
 
-  /* if the previous two instructions are "ljmp"s then don't
-     do it since it can be part of a jump table */
-  if (currPl->prev && currPl->prev->prev &&
-      strstr (currPl->prev->line, "ljmp") &&
-      strstr (currPl->prev->prev->line, "ljmp"))
-    return FALSE;
+      /* if the previous two instructions are "ljmp"s then don't
+         do it since it can be part of a jump table */
+      if (currPl->prev && currPl->prev->prev &&
+          strstr (currPl->prev->line, "ljmp") &&
+          strstr (currPl->prev->prev->line, "ljmp"))
+        return FALSE;
 
-  /* calculate the label distance : the jump for reladdr can be
-     +/- 127 bytes, here I am assuming that an average 8051
-     instruction is 2 bytes long, so if the label is more than
-     63 intructions away, the label is considered out of range
-     for a relative jump. we could get more precise this will
-     suffice for now since it catches > 90% cases */
-  dist = (pcDistance (currPl, lbl, TRUE) +
-          pcDistance (currPl, lbl, FALSE));
+      /* calculate the label distance : the jump for reladdr can be
+         +/- 127 bytes, here I am assuming that an average 8051
+         instruction is 2 bytes long, so if the label is more than
+         63 intructions away, the label is considered out of range
+         for a relative jump. we could get more precise this will
+         suffice for now since it catches > 90% cases */
+      dist = (pcDistance (currPl, lbl, TRUE) +
+              pcDistance (currPl, lbl, FALSE));
 
-/*    changed to 127, now that pcDistance return actual number of bytes */
-  if (!dist || dist > 127)
-    return FALSE;
+      /* changed to 127, now that pcDistance return actual number of bytes */
+      if (!dist || dist > 127)
+        return FALSE;
+
+      lbl = getPatternVar (vars, &cmdLine);
+    }
+  while (lbl);
 
   return TRUE;
 }
@@ -1703,13 +1746,11 @@ bindVar (int key, char **s, hTab ** vtab)
 static bool
 matchLine (char *s, char *d, hTab ** vars)
 {
-
   if (!s || !(*s))
     return FALSE;
 
   while (*s && *d)
     {
-
       /* skip white space in both */
       while (ISCHARSPACE (*s))
         s++;
@@ -2423,7 +2464,7 @@ readFileIntoBuffer (char *fname)
         }
     }
 
-  /* if some charaters left over */
+  /* if some characters left over */
   if (nch)
     {
       lb[nch] = '\0';

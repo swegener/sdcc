@@ -310,6 +310,44 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
   return TRUE;
 }
 
+static void
+_ds390_genInitStartup (FILE *of)
+{
+  fprintf (of, "__sdcc_gsinit_startup:\n");
+  /* if external stack is specified then the
+     higher order byte of the xdatalocation is
+     going into P2 and the lower order going into
+     spx */
+  if (options.useXstack)
+    {
+      fprintf (of, "\tmov\tP2,#0x%02x\n",
+               (((unsigned int) options.xdata_loc) >> 8) & 0xff);
+      fprintf (of, "\tmov\t_spx,#0x%02x\n",
+               (unsigned int) options.xdata_loc & 0xff);
+    }
+
+  // This should probably be a port option, but I'm being lazy.
+  // on the 400, the firmware boot loader gives us a valid stack
+  // (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
+  if (!TARGET_IS_DS400)
+    {
+      /* initialise the stack pointer.  JCF: aslink takes care of the location */
+      fprintf (of, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
+    }
+
+  fprintf (of, "\tlcall\t__sdcc_external_startup\n");
+  fprintf (of, "\tmov\ta,dpl\n");
+  fprintf (of, "\tjz\t__sdcc_init_data\n");
+  fprintf (of, "\tljmp\t__sdcc_program_startup\n");
+  fprintf (of, "__sdcc_init_data:\n");
+
+  // if the port can copy the XINIT segment to XISEG
+  if (port->genXINIT)
+    {
+      port->genXINIT(of);
+    }
+}
+
 /* Generate code to copy XINIT to XISEG */
 static void _ds390_genXINIT (FILE * of) {
   fprintf (of, ";	_ds390_genXINIT() start\n");
@@ -952,7 +990,7 @@ PORT ds390_port =
   NULL,                         /* no genAssemblerEnd */
   _ds390_genIVT,
   _ds390_genXINIT,
-  NULL,                         /* genInitStartup */
+  _ds390_genInitStartup,
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
@@ -1286,7 +1324,7 @@ PORT tininative_port =
   _tininative_genAssemblerEnd,
   _tininative_genIVT,
   NULL,
-  NULL,                         /* genInitStartup */
+  _ds390_genInitStartup,
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
@@ -1539,7 +1577,7 @@ PORT ds400_port =
   NULL,                         /* no genAssemblerEnd */
   _ds400_genIVT,
   _ds390_genXINIT,
-  NULL,                         /* genInitStartup */
+  _ds390_genInitStartup,
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,

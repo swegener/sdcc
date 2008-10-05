@@ -1,3 +1,14 @@
+2008-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/main.c (_ds390_genInitStartup): added
+	* src/SDCCpeeph.c (getPatternVar): new, added,
+	  (labelInRange): fixed bug 2115959
+	* src/mcs51/peeph.def (rules 193.x to 198.x): check for labelInRange
+	* src/SDCCicode.h: added newiTempOperand
+	* src/SDCCcse.c (algebraicOpts): fixed bug for x*-1,
+	  added optimizations for 0/x and x/-1, see also patch 2142900
+	* support/regression/tests/onebyte.c (testMul): added test cases
+
 2008-09-20 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic16/glue.c:

@@ -363,6 +363,7 @@ static int execSimulator(char **args, int nargs)
             exit(1);
         }
     }
+    return simPid;
 }
 
 void openSimulator (char **args, int nargs)

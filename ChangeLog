@@ -1,3 +1,9 @@
+2008-10-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/break.c: bugfix from patch 1989966, thanks Risto Huotari
+	* debugger/mcs51/simi.c: bugfix from patch 1989972, thanks Risto Huotari
+	* device/lib/_strcspn.c: fixed bug 2140931
+
 2008-10-06 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/stdio.h,
@@ -6,7 +12,7 @@
 	* device/lib/pic16/libc/stdio/strmgpsim.c,
 	  device/lib/pic16/libc/stdio/strmmssp.c,
 	  device/lib/pic16/libc/stdio/strmusart.c: cosmetic changes
-	
+
 	* src/pic16/pcode.c (createReachingDefinitions): avoid segfault on
 	  empty __naked functions,
 	* (pCodeLabelDestruct, pic16_unlinkpCode, pic16_pCodeUnlink): fix

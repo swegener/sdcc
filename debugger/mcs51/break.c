@@ -460,16 +460,16 @@ BP_CALLBACK(fexitCB)
 
     if (!func)
     {
-        fprintf(stdout,"Stack underflow\n");
+        fprintf(stdout, "Stack underflow\n");
         return 1;
     }
 
-    Dprintf(D_break, ("break: fexitCB: BP_CALLBACK entry %s %p\n",func->sym->name, p_callStack));
+    Dprintf(D_break, ("break: fexitCB: BP_CALLBACK entry %s %p\n", func->sym->name, p_callStack));
 
     /* check main function */
-    if ( STACK_EMPTY(callStack) && !strcmp(func->sym->name,"main"))
+    if ( !strcmp(func->sym->name, "main"))
     {
-        fprintf(stdout,"Program exited with code %d.\n",simGetValue (0x82,'I',2));
+        fprintf(stdout, "Program exited with code %d.\n", simGetValue (0x82,'I',2));
         return 1;
     }
     return 0;

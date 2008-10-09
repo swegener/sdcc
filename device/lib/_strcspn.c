@@ -36,6 +36,7 @@ int strcspn (
 			break;
 		else
 			count++ ;
+			string++ ;
 	}
 
 	return count ;

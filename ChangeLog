@@ -1,5 +1,14 @@
 2008-10-14 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libio/Makefile.am: enable building libraries for
+	  18f2321, 18f4321, 18f2523, 18f4620, 18f66j60, 18f66j65, 18f67j60,
+	  18f86j60, 18f86j65, 18f87j60, 18f96j60, 18f96j65, and 18f97j60
+	* device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libio/Makefile.in: regenerated
+
+2008-10-14 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic16/pic18f2450.h,
 	  device/include/pic16/pic18f4450.h,
 	  device/lib/pic16/libdev/pic18f2450.c,

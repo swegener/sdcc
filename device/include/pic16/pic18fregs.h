@@ -69,6 +69,9 @@
 #elif defined(pic18f2431)
 #  include <pic18f2431.h>
 
+#elif defined(pic18f2450)
+#  include <pic18f2450.h>
+
 #elif defined(pic18f2455)
 #  include <pic18f2455.h>
 
@@ -134,6 +137,9 @@
 
 #elif defined(pic18f4431)
 #  include <pic18f4431.h>
+
+#elif defined(pic18f4450)
+#  include <pic18f4450.h>
 
 #elif defined(pic18f4455)
 #  include <pic18f4455.h>

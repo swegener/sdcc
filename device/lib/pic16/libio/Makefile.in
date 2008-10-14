@@ -185,6 +185,21 @@ am_libio18f2431_a_OBJECTS = libio18f2431_a-dummy.$(OBJEXT) \
 	libio18f2431_a-uopen.$(OBJEXT) libio18f2431_a-uputc.$(OBJEXT) \
 	libio18f2431_a-uputs.$(OBJEXT) libio18f2431_a-usartd.$(OBJEXT)
 libio18f2431_a_OBJECTS = $(am_libio18f2431_a_OBJECTS)
+libio18f2450_a_AR = $(AR) $(ARFLAGS)
+libio18f2450_a_LIBADD =
+am_libio18f2450_a_OBJECTS = libio18f2450_a-dummy.$(OBJEXT) \
+	libio18f2450_a-adcbusy.$(OBJEXT) \
+	libio18f2450_a-adcclose.$(OBJEXT) \
+	libio18f2450_a-adcconv.$(OBJEXT) \
+	libio18f2450_a-adcopen.$(OBJEXT) \
+	libio18f2450_a-adcread.$(OBJEXT) \
+	libio18f2450_a-adcsetch.$(OBJEXT) \
+	libio18f2450_a-ubaud.$(OBJEXT) libio18f2450_a-ubusy.$(OBJEXT) \
+	libio18f2450_a-uclose.$(OBJEXT) libio18f2450_a-udrdy.$(OBJEXT) \
+	libio18f2450_a-ugetc.$(OBJEXT) libio18f2450_a-ugets.$(OBJEXT) \
+	libio18f2450_a-uopen.$(OBJEXT) libio18f2450_a-uputc.$(OBJEXT) \
+	libio18f2450_a-uputs.$(OBJEXT) libio18f2450_a-usartd.$(OBJEXT)
+libio18f2450_a_OBJECTS = $(am_libio18f2450_a_OBJECTS)
 libio18f2455_a_AR = $(AR) $(ARFLAGS)
 libio18f2455_a_LIBADD =
 am_libio18f2455_a_OBJECTS = libio18f2455_a-dummy.$(OBJEXT) \
@@ -725,6 +740,21 @@ am_libio18f4431_a_OBJECTS = libio18f4431_a-dummy.$(OBJEXT) \
 	libio18f4431_a-uopen.$(OBJEXT) libio18f4431_a-uputc.$(OBJEXT) \
 	libio18f4431_a-uputs.$(OBJEXT) libio18f4431_a-usartd.$(OBJEXT)
 libio18f4431_a_OBJECTS = $(am_libio18f4431_a_OBJECTS)
+libio18f4450_a_AR = $(AR) $(ARFLAGS)
+libio18f4450_a_LIBADD =
+am_libio18f4450_a_OBJECTS = libio18f4450_a-dummy.$(OBJEXT) \
+	libio18f4450_a-adcbusy.$(OBJEXT) \
+	libio18f4450_a-adcclose.$(OBJEXT) \
+	libio18f4450_a-adcconv.$(OBJEXT) \
+	libio18f4450_a-adcopen.$(OBJEXT) \
+	libio18f4450_a-adcread.$(OBJEXT) \
+	libio18f4450_a-adcsetch.$(OBJEXT) \
+	libio18f4450_a-ubaud.$(OBJEXT) libio18f4450_a-ubusy.$(OBJEXT) \
+	libio18f4450_a-uclose.$(OBJEXT) libio18f4450_a-udrdy.$(OBJEXT) \
+	libio18f4450_a-ugetc.$(OBJEXT) libio18f4450_a-ugets.$(OBJEXT) \
+	libio18f4450_a-uopen.$(OBJEXT) libio18f4450_a-uputc.$(OBJEXT) \
+	libio18f4450_a-uputs.$(OBJEXT) libio18f4450_a-usartd.$(OBJEXT)
+libio18f4450_a_OBJECTS = $(am_libio18f4450_a_OBJECTS)
 libio18f4455_a_AR = $(AR) $(ARFLAGS)
 libio18f4455_a_LIBADD =
 am_libio18f4455_a_OBJECTS = libio18f4455_a-dummy.$(OBJEXT) \
@@ -1450,17 +1480,18 @@ SOURCES = $(libio18f1220_a_SOURCES) $(libio18f1320_a_SOURCES) \
 	$(libio18f2220_a_SOURCES) $(libio18f2320_a_SOURCES) \
 	$(libio18f2331_a_SOURCES) $(libio18f242_a_SOURCES) \
 	$(libio18f2420_a_SOURCES) $(libio18f2431_a_SOURCES) \
-	$(libio18f2455_a_SOURCES) $(libio18f248_a_SOURCES) \
-	$(libio18f2480_a_SOURCES) $(libio18f24j10_a_SOURCES) \
-	$(libio18f252_a_SOURCES) $(libio18f2520_a_SOURCES) \
-	$(libio18f2525_a_SOURCES) $(libio18f2550_a_SOURCES) \
-	$(libio18f258_a_SOURCES) $(libio18f2580_a_SOURCES) \
-	$(libio18f2585_a_SOURCES) $(libio18f25j10_a_SOURCES) \
-	$(libio18f2620_a_SOURCES) $(libio18f2680_a_SOURCES) \
-	$(libio18f2682_a_SOURCES) $(libio18f2685_a_SOURCES) \
-	$(libio18f4220_a_SOURCES) $(libio18f4320_a_SOURCES) \
-	$(libio18f4331_a_SOURCES) $(libio18f442_a_SOURCES) \
-	$(libio18f4420_a_SOURCES) $(libio18f4431_a_SOURCES) \
+	$(libio18f2450_a_SOURCES) $(libio18f2455_a_SOURCES) \
+	$(libio18f248_a_SOURCES) $(libio18f2480_a_SOURCES) \
+	$(libio18f24j10_a_SOURCES) $(libio18f252_a_SOURCES) \
+	$(libio18f2520_a_SOURCES) $(libio18f2525_a_SOURCES) \
+	$(libio18f2550_a_SOURCES) $(libio18f258_a_SOURCES) \
+	$(libio18f2580_a_SOURCES) $(libio18f2585_a_SOURCES) \
+	$(libio18f25j10_a_SOURCES) $(libio18f2620_a_SOURCES) \
+	$(libio18f2680_a_SOURCES) $(libio18f2682_a_SOURCES) \
+	$(libio18f2685_a_SOURCES) $(libio18f4220_a_SOURCES) \
+	$(libio18f4320_a_SOURCES) $(libio18f4331_a_SOURCES) \
+	$(libio18f442_a_SOURCES) $(libio18f4420_a_SOURCES) \
+	$(libio18f4431_a_SOURCES) $(libio18f4450_a_SOURCES) \
 	$(libio18f4455_a_SOURCES) $(libio18f448_a_SOURCES) \
 	$(libio18f4480_a_SOURCES) $(libio18f44j10_a_SOURCES) \
 	$(libio18f452_a_SOURCES) $(libio18f4520_a_SOURCES) \
@@ -1478,17 +1509,18 @@ DIST_SOURCES = $(libio18f1220_a_SOURCES) $(libio18f1320_a_SOURCES) \
 	$(libio18f2220_a_SOURCES) $(libio18f2320_a_SOURCES) \
 	$(libio18f2331_a_SOURCES) $(libio18f242_a_SOURCES) \
 	$(libio18f2420_a_SOURCES) $(libio18f2431_a_SOURCES) \
-	$(libio18f2455_a_SOURCES) $(libio18f248_a_SOURCES) \
-	$(libio18f2480_a_SOURCES) $(libio18f24j10_a_SOURCES) \
-	$(libio18f252_a_SOURCES) $(libio18f2520_a_SOURCES) \
-	$(libio18f2525_a_SOURCES) $(libio18f2550_a_SOURCES) \
-	$(libio18f258_a_SOURCES) $(libio18f2580_a_SOURCES) \
-	$(libio18f2585_a_SOURCES) $(libio18f25j10_a_SOURCES) \
-	$(libio18f2620_a_SOURCES) $(libio18f2680_a_SOURCES) \
-	$(libio18f2682_a_SOURCES) $(libio18f2685_a_SOURCES) \
-	$(libio18f4220_a_SOURCES) $(libio18f4320_a_SOURCES) \
-	$(libio18f4331_a_SOURCES) $(libio18f442_a_SOURCES) \
-	$(libio18f4420_a_SOURCES) $(libio18f4431_a_SOURCES) \
+	$(libio18f2450_a_SOURCES) $(libio18f2455_a_SOURCES) \
+	$(libio18f248_a_SOURCES) $(libio18f2480_a_SOURCES) \
+	$(libio18f24j10_a_SOURCES) $(libio18f252_a_SOURCES) \
+	$(libio18f2520_a_SOURCES) $(libio18f2525_a_SOURCES) \
+	$(libio18f2550_a_SOURCES) $(libio18f258_a_SOURCES) \
+	$(libio18f2580_a_SOURCES) $(libio18f2585_a_SOURCES) \
+	$(libio18f25j10_a_SOURCES) $(libio18f2620_a_SOURCES) \
+	$(libio18f2680_a_SOURCES) $(libio18f2682_a_SOURCES) \
+	$(libio18f2685_a_SOURCES) $(libio18f4220_a_SOURCES) \
+	$(libio18f4320_a_SOURCES) $(libio18f4331_a_SOURCES) \
+	$(libio18f442_a_SOURCES) $(libio18f4420_a_SOURCES) \
+	$(libio18f4431_a_SOURCES) $(libio18f4450_a_SOURCES) \
 	$(libio18f4455_a_SOURCES) $(libio18f448_a_SOURCES) \
 	$(libio18f4480_a_SOURCES) $(libio18f44j10_a_SOURCES) \
 	$(libio18f452_a_SOURCES) $(libio18f4520_a_SOURCES) \
@@ -1699,19 +1731,19 @@ top_srcdir = @top_srcdir@
 #libio18f86j65_a_CFLAGS = -p18f86j65 $(AM_CFLAGS)
 lib_LIBRARIES = libio18f1220.a libio18f1320.a libio18f2220.a \
 	libio18f2320.a libio18f2331.a libio18f242.a libio18f2420.a \
-	libio18f2431.a libio18f2455.a libio18f248.a libio18f2480.a \
-	libio18f24j10.a libio18f252.a libio18f2520.a libio18f2525.a \
-	libio18f2550.a libio18f258.a libio18f2580.a libio18f2585.a \
-	libio18f25j10.a libio18f2620.a libio18f2680.a libio18f2682.a \
-	libio18f2685.a libio18f4220.a libio18f4320.a libio18f4331.a \
-	libio18f442.a libio18f4420.a libio18f4431.a libio18f4455.a \
-	libio18f448.a libio18f4480.a libio18f44j10.a libio18f452.a \
-	libio18f4520.a libio18f4525.a libio18f4550.a libio18f458.a \
-	libio18f4580.a libio18f4585.a libio18f45j10.a libio18f4620.a \
-	libio18f4680.a libio18f4682.a libio18f4685.a libio18f6520.a \
-	libio18f6585.a libio18f6620.a libio18f6680.a libio18f6720.a \
-	libio18f8520.a libio18f8585.a libio18f8620.a libio18f8680.a \
-	libio18f8720.a
+	libio18f2431.a libio18f2450.a libio18f2455.a libio18f248.a \
+	libio18f2480.a libio18f24j10.a libio18f252.a libio18f2520.a \
+	libio18f2525.a libio18f2550.a libio18f258.a libio18f2580.a \
+	libio18f2585.a libio18f25j10.a libio18f2620.a libio18f2680.a \
+	libio18f2682.a libio18f2685.a libio18f4220.a libio18f4320.a \
+	libio18f4331.a libio18f442.a libio18f4420.a libio18f4431.a \
+	libio18f4450.a libio18f4455.a libio18f448.a libio18f4480.a \
+	libio18f44j10.a libio18f452.a libio18f4520.a libio18f4525.a \
+	libio18f4550.a libio18f458.a libio18f4580.a libio18f4585.a \
+	libio18f45j10.a libio18f4620.a libio18f4680.a libio18f4682.a \
+	libio18f4685.a libio18f6520.a libio18f6585.a libio18f6620.a \
+	libio18f6680.a libio18f6720.a libio18f8520.a libio18f8585.a \
+	libio18f8620.a libio18f8680.a libio18f8720.a
 libio18f1220_a_SOURCES = dummy.c adc/adcbusy.c adc/adcclose.c \
 	adc/adcconv.c adc/adcopen.c adc/adcread.c adc/adcsetch.c \
 	usart/ubaud.c usart/ubusy.c usart/uclose.c usart/udrdy.c \
@@ -1761,6 +1793,12 @@ libio18f2431_a_SOURCES = dummy.c usart/ubaud.c usart/ubusy.c \
 	usart/uclose.c usart/udrdy.c usart/ugetc.c usart/ugets.c \
 	usart/uopen.c usart/uputc.c usart/uputs.c usart/usartd.c
 libio18f2431_a_CFLAGS = -p18f2431 $(AM_CFLAGS)
+libio18f2450_a_SOURCES = dummy.c adc/adcbusy.c adc/adcclose.c \
+	adc/adcconv.c adc/adcopen.c adc/adcread.c adc/adcsetch.c \
+	usart/ubaud.c usart/ubusy.c usart/uclose.c usart/udrdy.c \
+	usart/ugetc.c usart/ugets.c usart/uopen.c usart/uputc.c \
+	usart/uputs.c usart/usartd.c
+libio18f2450_a_CFLAGS = -p18f2450 $(AM_CFLAGS)
 libio18f2455_a_SOURCES = dummy.c adc/adcbusy.c adc/adcclose.c \
 	adc/adcconv.c adc/adcopen.c adc/adcread.c adc/adcsetch.c \
 	i2c/i2cack.c i2c/i2cclose.c i2c/i2cdrdy.c i2c/i2cidle.c \
@@ -1935,6 +1973,12 @@ libio18f4431_a_SOURCES = dummy.c usart/ubaud.c usart/ubusy.c \
 	usart/uclose.c usart/udrdy.c usart/ugetc.c usart/ugets.c \
 	usart/uopen.c usart/uputc.c usart/uputs.c usart/usartd.c
 libio18f4431_a_CFLAGS = -p18f4431 $(AM_CFLAGS)
+libio18f4450_a_SOURCES = dummy.c adc/adcbusy.c adc/adcclose.c \
+	adc/adcconv.c adc/adcopen.c adc/adcread.c adc/adcsetch.c \
+	usart/ubaud.c usart/ubusy.c usart/uclose.c usart/udrdy.c \
+	usart/ugetc.c usart/ugets.c usart/uopen.c usart/uputc.c \
+	usart/uputs.c usart/usartd.c
+libio18f4450_a_CFLAGS = -p18f4450 $(AM_CFLAGS)
 libio18f4455_a_SOURCES = dummy.c adc/adcbusy.c adc/adcclose.c \
 	adc/adcconv.c adc/adcopen.c adc/adcread.c adc/adcsetch.c \
 	i2c/i2cack.c i2c/i2cclose.c i2c/i2cdrdy.c i2c/i2cidle.c \
@@ -2274,6 +2318,10 @@ libio18f2431.a: $(libio18f2431_a_OBJECTS) $(libio18f2431_a_DEPENDENCIES)
 	-rm -f libio18f2431.a
 	$(libio18f2431_a_AR) libio18f2431.a $(libio18f2431_a_OBJECTS) $(libio18f2431_a_LIBADD)
 	$(RANLIB) libio18f2431.a
+libio18f2450.a: $(libio18f2450_a_OBJECTS) $(libio18f2450_a_DEPENDENCIES) 
+	-rm -f libio18f2450.a
+	$(libio18f2450_a_AR) libio18f2450.a $(libio18f2450_a_OBJECTS) $(libio18f2450_a_LIBADD)
+	$(RANLIB) libio18f2450.a
 libio18f2455.a: $(libio18f2455_a_OBJECTS) $(libio18f2455_a_DEPENDENCIES) 
 	-rm -f libio18f2455.a
 	$(libio18f2455_a_AR) libio18f2455.a $(libio18f2455_a_OBJECTS) $(libio18f2455_a_LIBADD)
@@ -2362,6 +2410,10 @@ libio18f4431.a: $(libio18f4431_a_OBJECTS) $(libio18f4431_a_DEPENDENCIES)
 	-rm -f libio18f4431.a
 	$(libio18f4431_a_AR) libio18f4431.a $(libio18f4431_a_OBJECTS) $(libio18f4431_a_LIBADD)
 	$(RANLIB) libio18f4431.a
+libio18f4450.a: $(libio18f4450_a_OBJECTS) $(libio18f4450_a_DEPENDENCIES) 
+	-rm -f libio18f4450.a
+	$(libio18f4450_a_AR) libio18f4450.a $(libio18f4450_a_OBJECTS) $(libio18f4450_a_LIBADD)
+	$(RANLIB) libio18f4450.a
 libio18f4455.a: $(libio18f4455_a_OBJECTS) $(libio18f4455_a_DEPENDENCIES) 
 	-rm -f libio18f4455.a
 	$(libio18f4455_a_AR) libio18f4455.a $(libio18f4455_a_OBJECTS) $(libio18f4455_a_LIBADD)
@@ -2620,6 +2672,23 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2431_a-uputc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2431_a-uputs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2431_a-usartd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-adcbusy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-adcclose.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-adcconv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-adcopen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-adcread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-adcsetch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-dummy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-ubaud.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-ubusy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-uclose.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-udrdy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-ugetc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-ugets.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-uopen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-uputc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-uputs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2450_a-usartd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2455_a-adcbusy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2455_a-adcclose.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f2455_a-adcconv.Po@am__quote@
@@ -3184,6 +3253,23 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4431_a-uputc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4431_a-uputs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4431_a-usartd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-adcbusy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-adcclose.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-adcconv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-adcopen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-adcread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-adcsetch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-dummy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-ubaud.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-ubusy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-uclose.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-udrdy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-ugetc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-ugets.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-uopen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-uputc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-uputs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4450_a-usartd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4455_a-adcbusy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4455_a-adcclose.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libio18f4455_a-adcconv.Po@am__quote@
@@ -6007,6 +6093,244 @@ libio18f2431_a-usartd.obj: usart/usartd.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/usartd.c' object='libio18f2431_a-usartd.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2431_a_CFLAGS) $(CFLAGS) -c -o libio18f2431_a-usartd.obj `if test -f 'usart/usartd.c'; then $(CYGPATH_W) 'usart/usartd.c'; else $(CYGPATH_W) '$(srcdir)/usart/usartd.c'; fi`
+
+libio18f2450_a-dummy.o: dummy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-dummy.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-dummy.Tpo -c -o libio18f2450_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-dummy.Tpo $(DEPDIR)/libio18f2450_a-dummy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dummy.c' object='libio18f2450_a-dummy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
+
+libio18f2450_a-dummy.obj: dummy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-dummy.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-dummy.Tpo -c -o libio18f2450_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-dummy.Tpo $(DEPDIR)/libio18f2450_a-dummy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dummy.c' object='libio18f2450_a-dummy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+
+libio18f2450_a-adcbusy.o: adc/adcbusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcbusy.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcbusy.Tpo -c -o libio18f2450_a-adcbusy.o `test -f 'adc/adcbusy.c' || echo '$(srcdir)/'`adc/adcbusy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcbusy.Tpo $(DEPDIR)/libio18f2450_a-adcbusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcbusy.c' object='libio18f2450_a-adcbusy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcbusy.o `test -f 'adc/adcbusy.c' || echo '$(srcdir)/'`adc/adcbusy.c
+
+libio18f2450_a-adcbusy.obj: adc/adcbusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcbusy.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcbusy.Tpo -c -o libio18f2450_a-adcbusy.obj `if test -f 'adc/adcbusy.c'; then $(CYGPATH_W) 'adc/adcbusy.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcbusy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcbusy.Tpo $(DEPDIR)/libio18f2450_a-adcbusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcbusy.c' object='libio18f2450_a-adcbusy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcbusy.obj `if test -f 'adc/adcbusy.c'; then $(CYGPATH_W) 'adc/adcbusy.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcbusy.c'; fi`
+
+libio18f2450_a-adcclose.o: adc/adcclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcclose.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcclose.Tpo -c -o libio18f2450_a-adcclose.o `test -f 'adc/adcclose.c' || echo '$(srcdir)/'`adc/adcclose.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcclose.Tpo $(DEPDIR)/libio18f2450_a-adcclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcclose.c' object='libio18f2450_a-adcclose.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcclose.o `test -f 'adc/adcclose.c' || echo '$(srcdir)/'`adc/adcclose.c
+
+libio18f2450_a-adcclose.obj: adc/adcclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcclose.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcclose.Tpo -c -o libio18f2450_a-adcclose.obj `if test -f 'adc/adcclose.c'; then $(CYGPATH_W) 'adc/adcclose.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcclose.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcclose.Tpo $(DEPDIR)/libio18f2450_a-adcclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcclose.c' object='libio18f2450_a-adcclose.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcclose.obj `if test -f 'adc/adcclose.c'; then $(CYGPATH_W) 'adc/adcclose.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcclose.c'; fi`
+
+libio18f2450_a-adcconv.o: adc/adcconv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcconv.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcconv.Tpo -c -o libio18f2450_a-adcconv.o `test -f 'adc/adcconv.c' || echo '$(srcdir)/'`adc/adcconv.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcconv.Tpo $(DEPDIR)/libio18f2450_a-adcconv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcconv.c' object='libio18f2450_a-adcconv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcconv.o `test -f 'adc/adcconv.c' || echo '$(srcdir)/'`adc/adcconv.c
+
+libio18f2450_a-adcconv.obj: adc/adcconv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcconv.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcconv.Tpo -c -o libio18f2450_a-adcconv.obj `if test -f 'adc/adcconv.c'; then $(CYGPATH_W) 'adc/adcconv.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcconv.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcconv.Tpo $(DEPDIR)/libio18f2450_a-adcconv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcconv.c' object='libio18f2450_a-adcconv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcconv.obj `if test -f 'adc/adcconv.c'; then $(CYGPATH_W) 'adc/adcconv.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcconv.c'; fi`
+
+libio18f2450_a-adcopen.o: adc/adcopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcopen.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcopen.Tpo -c -o libio18f2450_a-adcopen.o `test -f 'adc/adcopen.c' || echo '$(srcdir)/'`adc/adcopen.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcopen.Tpo $(DEPDIR)/libio18f2450_a-adcopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcopen.c' object='libio18f2450_a-adcopen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcopen.o `test -f 'adc/adcopen.c' || echo '$(srcdir)/'`adc/adcopen.c
+
+libio18f2450_a-adcopen.obj: adc/adcopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcopen.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcopen.Tpo -c -o libio18f2450_a-adcopen.obj `if test -f 'adc/adcopen.c'; then $(CYGPATH_W) 'adc/adcopen.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcopen.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcopen.Tpo $(DEPDIR)/libio18f2450_a-adcopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcopen.c' object='libio18f2450_a-adcopen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcopen.obj `if test -f 'adc/adcopen.c'; then $(CYGPATH_W) 'adc/adcopen.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcopen.c'; fi`
+
+libio18f2450_a-adcread.o: adc/adcread.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcread.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcread.Tpo -c -o libio18f2450_a-adcread.o `test -f 'adc/adcread.c' || echo '$(srcdir)/'`adc/adcread.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcread.Tpo $(DEPDIR)/libio18f2450_a-adcread.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcread.c' object='libio18f2450_a-adcread.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcread.o `test -f 'adc/adcread.c' || echo '$(srcdir)/'`adc/adcread.c
+
+libio18f2450_a-adcread.obj: adc/adcread.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcread.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcread.Tpo -c -o libio18f2450_a-adcread.obj `if test -f 'adc/adcread.c'; then $(CYGPATH_W) 'adc/adcread.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcread.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcread.Tpo $(DEPDIR)/libio18f2450_a-adcread.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcread.c' object='libio18f2450_a-adcread.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcread.obj `if test -f 'adc/adcread.c'; then $(CYGPATH_W) 'adc/adcread.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcread.c'; fi`
+
+libio18f2450_a-adcsetch.o: adc/adcsetch.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcsetch.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcsetch.Tpo -c -o libio18f2450_a-adcsetch.o `test -f 'adc/adcsetch.c' || echo '$(srcdir)/'`adc/adcsetch.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcsetch.Tpo $(DEPDIR)/libio18f2450_a-adcsetch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcsetch.c' object='libio18f2450_a-adcsetch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcsetch.o `test -f 'adc/adcsetch.c' || echo '$(srcdir)/'`adc/adcsetch.c
+
+libio18f2450_a-adcsetch.obj: adc/adcsetch.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-adcsetch.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-adcsetch.Tpo -c -o libio18f2450_a-adcsetch.obj `if test -f 'adc/adcsetch.c'; then $(CYGPATH_W) 'adc/adcsetch.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcsetch.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-adcsetch.Tpo $(DEPDIR)/libio18f2450_a-adcsetch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcsetch.c' object='libio18f2450_a-adcsetch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-adcsetch.obj `if test -f 'adc/adcsetch.c'; then $(CYGPATH_W) 'adc/adcsetch.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcsetch.c'; fi`
+
+libio18f2450_a-ubaud.o: usart/ubaud.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ubaud.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-ubaud.Tpo -c -o libio18f2450_a-ubaud.o `test -f 'usart/ubaud.c' || echo '$(srcdir)/'`usart/ubaud.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ubaud.Tpo $(DEPDIR)/libio18f2450_a-ubaud.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubaud.c' object='libio18f2450_a-ubaud.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ubaud.o `test -f 'usart/ubaud.c' || echo '$(srcdir)/'`usart/ubaud.c
+
+libio18f2450_a-ubaud.obj: usart/ubaud.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ubaud.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-ubaud.Tpo -c -o libio18f2450_a-ubaud.obj `if test -f 'usart/ubaud.c'; then $(CYGPATH_W) 'usart/ubaud.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubaud.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ubaud.Tpo $(DEPDIR)/libio18f2450_a-ubaud.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubaud.c' object='libio18f2450_a-ubaud.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ubaud.obj `if test -f 'usart/ubaud.c'; then $(CYGPATH_W) 'usart/ubaud.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubaud.c'; fi`
+
+libio18f2450_a-ubusy.o: usart/ubusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ubusy.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-ubusy.Tpo -c -o libio18f2450_a-ubusy.o `test -f 'usart/ubusy.c' || echo '$(srcdir)/'`usart/ubusy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ubusy.Tpo $(DEPDIR)/libio18f2450_a-ubusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubusy.c' object='libio18f2450_a-ubusy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ubusy.o `test -f 'usart/ubusy.c' || echo '$(srcdir)/'`usart/ubusy.c
+
+libio18f2450_a-ubusy.obj: usart/ubusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ubusy.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-ubusy.Tpo -c -o libio18f2450_a-ubusy.obj `if test -f 'usart/ubusy.c'; then $(CYGPATH_W) 'usart/ubusy.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubusy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ubusy.Tpo $(DEPDIR)/libio18f2450_a-ubusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubusy.c' object='libio18f2450_a-ubusy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ubusy.obj `if test -f 'usart/ubusy.c'; then $(CYGPATH_W) 'usart/ubusy.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubusy.c'; fi`
+
+libio18f2450_a-uclose.o: usart/uclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uclose.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-uclose.Tpo -c -o libio18f2450_a-uclose.o `test -f 'usart/uclose.c' || echo '$(srcdir)/'`usart/uclose.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uclose.Tpo $(DEPDIR)/libio18f2450_a-uclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uclose.c' object='libio18f2450_a-uclose.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uclose.o `test -f 'usart/uclose.c' || echo '$(srcdir)/'`usart/uclose.c
+
+libio18f2450_a-uclose.obj: usart/uclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uclose.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-uclose.Tpo -c -o libio18f2450_a-uclose.obj `if test -f 'usart/uclose.c'; then $(CYGPATH_W) 'usart/uclose.c'; else $(CYGPATH_W) '$(srcdir)/usart/uclose.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uclose.Tpo $(DEPDIR)/libio18f2450_a-uclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uclose.c' object='libio18f2450_a-uclose.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uclose.obj `if test -f 'usart/uclose.c'; then $(CYGPATH_W) 'usart/uclose.c'; else $(CYGPATH_W) '$(srcdir)/usart/uclose.c'; fi`
+
+libio18f2450_a-udrdy.o: usart/udrdy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-udrdy.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-udrdy.Tpo -c -o libio18f2450_a-udrdy.o `test -f 'usart/udrdy.c' || echo '$(srcdir)/'`usart/udrdy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-udrdy.Tpo $(DEPDIR)/libio18f2450_a-udrdy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/udrdy.c' object='libio18f2450_a-udrdy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-udrdy.o `test -f 'usart/udrdy.c' || echo '$(srcdir)/'`usart/udrdy.c
+
+libio18f2450_a-udrdy.obj: usart/udrdy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-udrdy.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-udrdy.Tpo -c -o libio18f2450_a-udrdy.obj `if test -f 'usart/udrdy.c'; then $(CYGPATH_W) 'usart/udrdy.c'; else $(CYGPATH_W) '$(srcdir)/usart/udrdy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-udrdy.Tpo $(DEPDIR)/libio18f2450_a-udrdy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/udrdy.c' object='libio18f2450_a-udrdy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-udrdy.obj `if test -f 'usart/udrdy.c'; then $(CYGPATH_W) 'usart/udrdy.c'; else $(CYGPATH_W) '$(srcdir)/usart/udrdy.c'; fi`
+
+libio18f2450_a-ugetc.o: usart/ugetc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ugetc.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-ugetc.Tpo -c -o libio18f2450_a-ugetc.o `test -f 'usart/ugetc.c' || echo '$(srcdir)/'`usart/ugetc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ugetc.Tpo $(DEPDIR)/libio18f2450_a-ugetc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugetc.c' object='libio18f2450_a-ugetc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ugetc.o `test -f 'usart/ugetc.c' || echo '$(srcdir)/'`usart/ugetc.c
+
+libio18f2450_a-ugetc.obj: usart/ugetc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ugetc.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-ugetc.Tpo -c -o libio18f2450_a-ugetc.obj `if test -f 'usart/ugetc.c'; then $(CYGPATH_W) 'usart/ugetc.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugetc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ugetc.Tpo $(DEPDIR)/libio18f2450_a-ugetc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugetc.c' object='libio18f2450_a-ugetc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ugetc.obj `if test -f 'usart/ugetc.c'; then $(CYGPATH_W) 'usart/ugetc.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugetc.c'; fi`
+
+libio18f2450_a-ugets.o: usart/ugets.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ugets.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-ugets.Tpo -c -o libio18f2450_a-ugets.o `test -f 'usart/ugets.c' || echo '$(srcdir)/'`usart/ugets.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ugets.Tpo $(DEPDIR)/libio18f2450_a-ugets.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugets.c' object='libio18f2450_a-ugets.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ugets.o `test -f 'usart/ugets.c' || echo '$(srcdir)/'`usart/ugets.c
+
+libio18f2450_a-ugets.obj: usart/ugets.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-ugets.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-ugets.Tpo -c -o libio18f2450_a-ugets.obj `if test -f 'usart/ugets.c'; then $(CYGPATH_W) 'usart/ugets.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugets.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-ugets.Tpo $(DEPDIR)/libio18f2450_a-ugets.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugets.c' object='libio18f2450_a-ugets.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-ugets.obj `if test -f 'usart/ugets.c'; then $(CYGPATH_W) 'usart/ugets.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugets.c'; fi`
+
+libio18f2450_a-uopen.o: usart/uopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uopen.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-uopen.Tpo -c -o libio18f2450_a-uopen.o `test -f 'usart/uopen.c' || echo '$(srcdir)/'`usart/uopen.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uopen.Tpo $(DEPDIR)/libio18f2450_a-uopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uopen.c' object='libio18f2450_a-uopen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uopen.o `test -f 'usart/uopen.c' || echo '$(srcdir)/'`usart/uopen.c
+
+libio18f2450_a-uopen.obj: usart/uopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uopen.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-uopen.Tpo -c -o libio18f2450_a-uopen.obj `if test -f 'usart/uopen.c'; then $(CYGPATH_W) 'usart/uopen.c'; else $(CYGPATH_W) '$(srcdir)/usart/uopen.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uopen.Tpo $(DEPDIR)/libio18f2450_a-uopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uopen.c' object='libio18f2450_a-uopen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uopen.obj `if test -f 'usart/uopen.c'; then $(CYGPATH_W) 'usart/uopen.c'; else $(CYGPATH_W) '$(srcdir)/usart/uopen.c'; fi`
+
+libio18f2450_a-uputc.o: usart/uputc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uputc.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-uputc.Tpo -c -o libio18f2450_a-uputc.o `test -f 'usart/uputc.c' || echo '$(srcdir)/'`usart/uputc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uputc.Tpo $(DEPDIR)/libio18f2450_a-uputc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputc.c' object='libio18f2450_a-uputc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uputc.o `test -f 'usart/uputc.c' || echo '$(srcdir)/'`usart/uputc.c
+
+libio18f2450_a-uputc.obj: usart/uputc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uputc.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-uputc.Tpo -c -o libio18f2450_a-uputc.obj `if test -f 'usart/uputc.c'; then $(CYGPATH_W) 'usart/uputc.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uputc.Tpo $(DEPDIR)/libio18f2450_a-uputc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputc.c' object='libio18f2450_a-uputc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uputc.obj `if test -f 'usart/uputc.c'; then $(CYGPATH_W) 'usart/uputc.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputc.c'; fi`
+
+libio18f2450_a-uputs.o: usart/uputs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uputs.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-uputs.Tpo -c -o libio18f2450_a-uputs.o `test -f 'usart/uputs.c' || echo '$(srcdir)/'`usart/uputs.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uputs.Tpo $(DEPDIR)/libio18f2450_a-uputs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputs.c' object='libio18f2450_a-uputs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uputs.o `test -f 'usart/uputs.c' || echo '$(srcdir)/'`usart/uputs.c
+
+libio18f2450_a-uputs.obj: usart/uputs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-uputs.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-uputs.Tpo -c -o libio18f2450_a-uputs.obj `if test -f 'usart/uputs.c'; then $(CYGPATH_W) 'usart/uputs.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputs.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-uputs.Tpo $(DEPDIR)/libio18f2450_a-uputs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputs.c' object='libio18f2450_a-uputs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-uputs.obj `if test -f 'usart/uputs.c'; then $(CYGPATH_W) 'usart/uputs.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputs.c'; fi`
+
+libio18f2450_a-usartd.o: usart/usartd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-usartd.o -MD -MP -MF $(DEPDIR)/libio18f2450_a-usartd.Tpo -c -o libio18f2450_a-usartd.o `test -f 'usart/usartd.c' || echo '$(srcdir)/'`usart/usartd.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-usartd.Tpo $(DEPDIR)/libio18f2450_a-usartd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/usartd.c' object='libio18f2450_a-usartd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-usartd.o `test -f 'usart/usartd.c' || echo '$(srcdir)/'`usart/usartd.c
+
+libio18f2450_a-usartd.obj: usart/usartd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -MT libio18f2450_a-usartd.obj -MD -MP -MF $(DEPDIR)/libio18f2450_a-usartd.Tpo -c -o libio18f2450_a-usartd.obj `if test -f 'usart/usartd.c'; then $(CYGPATH_W) 'usart/usartd.c'; else $(CYGPATH_W) '$(srcdir)/usart/usartd.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f2450_a-usartd.Tpo $(DEPDIR)/libio18f2450_a-usartd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/usartd.c' object='libio18f2450_a-usartd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2450_a_CFLAGS) $(CFLAGS) -c -o libio18f2450_a-usartd.obj `if test -f 'usart/usartd.c'; then $(CYGPATH_W) 'usart/usartd.c'; else $(CYGPATH_W) '$(srcdir)/usart/usartd.c'; fi`
 
 libio18f2455_a-dummy.o: dummy.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f2455_a_CFLAGS) $(CFLAGS) -MT libio18f2455_a-dummy.o -MD -MP -MF $(DEPDIR)/libio18f2455_a-dummy.Tpo -c -o libio18f2455_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
@@ -13903,6 +14227,244 @@ libio18f4431_a-usartd.obj: usart/usartd.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/usartd.c' object='libio18f4431_a-usartd.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4431_a_CFLAGS) $(CFLAGS) -c -o libio18f4431_a-usartd.obj `if test -f 'usart/usartd.c'; then $(CYGPATH_W) 'usart/usartd.c'; else $(CYGPATH_W) '$(srcdir)/usart/usartd.c'; fi`
+
+libio18f4450_a-dummy.o: dummy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-dummy.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-dummy.Tpo -c -o libio18f4450_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-dummy.Tpo $(DEPDIR)/libio18f4450_a-dummy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dummy.c' object='libio18f4450_a-dummy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
+
+libio18f4450_a-dummy.obj: dummy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-dummy.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-dummy.Tpo -c -o libio18f4450_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-dummy.Tpo $(DEPDIR)/libio18f4450_a-dummy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dummy.c' object='libio18f4450_a-dummy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
+
+libio18f4450_a-adcbusy.o: adc/adcbusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcbusy.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcbusy.Tpo -c -o libio18f4450_a-adcbusy.o `test -f 'adc/adcbusy.c' || echo '$(srcdir)/'`adc/adcbusy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcbusy.Tpo $(DEPDIR)/libio18f4450_a-adcbusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcbusy.c' object='libio18f4450_a-adcbusy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcbusy.o `test -f 'adc/adcbusy.c' || echo '$(srcdir)/'`adc/adcbusy.c
+
+libio18f4450_a-adcbusy.obj: adc/adcbusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcbusy.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcbusy.Tpo -c -o libio18f4450_a-adcbusy.obj `if test -f 'adc/adcbusy.c'; then $(CYGPATH_W) 'adc/adcbusy.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcbusy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcbusy.Tpo $(DEPDIR)/libio18f4450_a-adcbusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcbusy.c' object='libio18f4450_a-adcbusy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcbusy.obj `if test -f 'adc/adcbusy.c'; then $(CYGPATH_W) 'adc/adcbusy.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcbusy.c'; fi`
+
+libio18f4450_a-adcclose.o: adc/adcclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcclose.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcclose.Tpo -c -o libio18f4450_a-adcclose.o `test -f 'adc/adcclose.c' || echo '$(srcdir)/'`adc/adcclose.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcclose.Tpo $(DEPDIR)/libio18f4450_a-adcclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcclose.c' object='libio18f4450_a-adcclose.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcclose.o `test -f 'adc/adcclose.c' || echo '$(srcdir)/'`adc/adcclose.c
+
+libio18f4450_a-adcclose.obj: adc/adcclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcclose.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcclose.Tpo -c -o libio18f4450_a-adcclose.obj `if test -f 'adc/adcclose.c'; then $(CYGPATH_W) 'adc/adcclose.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcclose.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcclose.Tpo $(DEPDIR)/libio18f4450_a-adcclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcclose.c' object='libio18f4450_a-adcclose.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcclose.obj `if test -f 'adc/adcclose.c'; then $(CYGPATH_W) 'adc/adcclose.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcclose.c'; fi`
+
+libio18f4450_a-adcconv.o: adc/adcconv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcconv.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcconv.Tpo -c -o libio18f4450_a-adcconv.o `test -f 'adc/adcconv.c' || echo '$(srcdir)/'`adc/adcconv.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcconv.Tpo $(DEPDIR)/libio18f4450_a-adcconv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcconv.c' object='libio18f4450_a-adcconv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcconv.o `test -f 'adc/adcconv.c' || echo '$(srcdir)/'`adc/adcconv.c
+
+libio18f4450_a-adcconv.obj: adc/adcconv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcconv.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcconv.Tpo -c -o libio18f4450_a-adcconv.obj `if test -f 'adc/adcconv.c'; then $(CYGPATH_W) 'adc/adcconv.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcconv.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcconv.Tpo $(DEPDIR)/libio18f4450_a-adcconv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcconv.c' object='libio18f4450_a-adcconv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcconv.obj `if test -f 'adc/adcconv.c'; then $(CYGPATH_W) 'adc/adcconv.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcconv.c'; fi`
+
+libio18f4450_a-adcopen.o: adc/adcopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcopen.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcopen.Tpo -c -o libio18f4450_a-adcopen.o `test -f 'adc/adcopen.c' || echo '$(srcdir)/'`adc/adcopen.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcopen.Tpo $(DEPDIR)/libio18f4450_a-adcopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcopen.c' object='libio18f4450_a-adcopen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcopen.o `test -f 'adc/adcopen.c' || echo '$(srcdir)/'`adc/adcopen.c
+
+libio18f4450_a-adcopen.obj: adc/adcopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcopen.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcopen.Tpo -c -o libio18f4450_a-adcopen.obj `if test -f 'adc/adcopen.c'; then $(CYGPATH_W) 'adc/adcopen.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcopen.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcopen.Tpo $(DEPDIR)/libio18f4450_a-adcopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcopen.c' object='libio18f4450_a-adcopen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcopen.obj `if test -f 'adc/adcopen.c'; then $(CYGPATH_W) 'adc/adcopen.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcopen.c'; fi`
+
+libio18f4450_a-adcread.o: adc/adcread.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcread.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcread.Tpo -c -o libio18f4450_a-adcread.o `test -f 'adc/adcread.c' || echo '$(srcdir)/'`adc/adcread.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcread.Tpo $(DEPDIR)/libio18f4450_a-adcread.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcread.c' object='libio18f4450_a-adcread.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcread.o `test -f 'adc/adcread.c' || echo '$(srcdir)/'`adc/adcread.c
+
+libio18f4450_a-adcread.obj: adc/adcread.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcread.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcread.Tpo -c -o libio18f4450_a-adcread.obj `if test -f 'adc/adcread.c'; then $(CYGPATH_W) 'adc/adcread.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcread.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcread.Tpo $(DEPDIR)/libio18f4450_a-adcread.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcread.c' object='libio18f4450_a-adcread.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcread.obj `if test -f 'adc/adcread.c'; then $(CYGPATH_W) 'adc/adcread.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcread.c'; fi`
+
+libio18f4450_a-adcsetch.o: adc/adcsetch.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcsetch.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcsetch.Tpo -c -o libio18f4450_a-adcsetch.o `test -f 'adc/adcsetch.c' || echo '$(srcdir)/'`adc/adcsetch.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcsetch.Tpo $(DEPDIR)/libio18f4450_a-adcsetch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcsetch.c' object='libio18f4450_a-adcsetch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcsetch.o `test -f 'adc/adcsetch.c' || echo '$(srcdir)/'`adc/adcsetch.c
+
+libio18f4450_a-adcsetch.obj: adc/adcsetch.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-adcsetch.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-adcsetch.Tpo -c -o libio18f4450_a-adcsetch.obj `if test -f 'adc/adcsetch.c'; then $(CYGPATH_W) 'adc/adcsetch.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcsetch.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-adcsetch.Tpo $(DEPDIR)/libio18f4450_a-adcsetch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='adc/adcsetch.c' object='libio18f4450_a-adcsetch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-adcsetch.obj `if test -f 'adc/adcsetch.c'; then $(CYGPATH_W) 'adc/adcsetch.c'; else $(CYGPATH_W) '$(srcdir)/adc/adcsetch.c'; fi`
+
+libio18f4450_a-ubaud.o: usart/ubaud.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ubaud.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-ubaud.Tpo -c -o libio18f4450_a-ubaud.o `test -f 'usart/ubaud.c' || echo '$(srcdir)/'`usart/ubaud.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ubaud.Tpo $(DEPDIR)/libio18f4450_a-ubaud.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubaud.c' object='libio18f4450_a-ubaud.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ubaud.o `test -f 'usart/ubaud.c' || echo '$(srcdir)/'`usart/ubaud.c
+
+libio18f4450_a-ubaud.obj: usart/ubaud.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ubaud.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-ubaud.Tpo -c -o libio18f4450_a-ubaud.obj `if test -f 'usart/ubaud.c'; then $(CYGPATH_W) 'usart/ubaud.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubaud.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ubaud.Tpo $(DEPDIR)/libio18f4450_a-ubaud.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubaud.c' object='libio18f4450_a-ubaud.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ubaud.obj `if test -f 'usart/ubaud.c'; then $(CYGPATH_W) 'usart/ubaud.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubaud.c'; fi`
+
+libio18f4450_a-ubusy.o: usart/ubusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ubusy.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-ubusy.Tpo -c -o libio18f4450_a-ubusy.o `test -f 'usart/ubusy.c' || echo '$(srcdir)/'`usart/ubusy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ubusy.Tpo $(DEPDIR)/libio18f4450_a-ubusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubusy.c' object='libio18f4450_a-ubusy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ubusy.o `test -f 'usart/ubusy.c' || echo '$(srcdir)/'`usart/ubusy.c
+
+libio18f4450_a-ubusy.obj: usart/ubusy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ubusy.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-ubusy.Tpo -c -o libio18f4450_a-ubusy.obj `if test -f 'usart/ubusy.c'; then $(CYGPATH_W) 'usart/ubusy.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubusy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ubusy.Tpo $(DEPDIR)/libio18f4450_a-ubusy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ubusy.c' object='libio18f4450_a-ubusy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ubusy.obj `if test -f 'usart/ubusy.c'; then $(CYGPATH_W) 'usart/ubusy.c'; else $(CYGPATH_W) '$(srcdir)/usart/ubusy.c'; fi`
+
+libio18f4450_a-uclose.o: usart/uclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uclose.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-uclose.Tpo -c -o libio18f4450_a-uclose.o `test -f 'usart/uclose.c' || echo '$(srcdir)/'`usart/uclose.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uclose.Tpo $(DEPDIR)/libio18f4450_a-uclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uclose.c' object='libio18f4450_a-uclose.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uclose.o `test -f 'usart/uclose.c' || echo '$(srcdir)/'`usart/uclose.c
+
+libio18f4450_a-uclose.obj: usart/uclose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uclose.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-uclose.Tpo -c -o libio18f4450_a-uclose.obj `if test -f 'usart/uclose.c'; then $(CYGPATH_W) 'usart/uclose.c'; else $(CYGPATH_W) '$(srcdir)/usart/uclose.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uclose.Tpo $(DEPDIR)/libio18f4450_a-uclose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uclose.c' object='libio18f4450_a-uclose.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uclose.obj `if test -f 'usart/uclose.c'; then $(CYGPATH_W) 'usart/uclose.c'; else $(CYGPATH_W) '$(srcdir)/usart/uclose.c'; fi`
+
+libio18f4450_a-udrdy.o: usart/udrdy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-udrdy.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-udrdy.Tpo -c -o libio18f4450_a-udrdy.o `test -f 'usart/udrdy.c' || echo '$(srcdir)/'`usart/udrdy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-udrdy.Tpo $(DEPDIR)/libio18f4450_a-udrdy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/udrdy.c' object='libio18f4450_a-udrdy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-udrdy.o `test -f 'usart/udrdy.c' || echo '$(srcdir)/'`usart/udrdy.c
+
+libio18f4450_a-udrdy.obj: usart/udrdy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-udrdy.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-udrdy.Tpo -c -o libio18f4450_a-udrdy.obj `if test -f 'usart/udrdy.c'; then $(CYGPATH_W) 'usart/udrdy.c'; else $(CYGPATH_W) '$(srcdir)/usart/udrdy.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-udrdy.Tpo $(DEPDIR)/libio18f4450_a-udrdy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/udrdy.c' object='libio18f4450_a-udrdy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-udrdy.obj `if test -f 'usart/udrdy.c'; then $(CYGPATH_W) 'usart/udrdy.c'; else $(CYGPATH_W) '$(srcdir)/usart/udrdy.c'; fi`
+
+libio18f4450_a-ugetc.o: usart/ugetc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ugetc.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-ugetc.Tpo -c -o libio18f4450_a-ugetc.o `test -f 'usart/ugetc.c' || echo '$(srcdir)/'`usart/ugetc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ugetc.Tpo $(DEPDIR)/libio18f4450_a-ugetc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugetc.c' object='libio18f4450_a-ugetc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ugetc.o `test -f 'usart/ugetc.c' || echo '$(srcdir)/'`usart/ugetc.c
+
+libio18f4450_a-ugetc.obj: usart/ugetc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ugetc.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-ugetc.Tpo -c -o libio18f4450_a-ugetc.obj `if test -f 'usart/ugetc.c'; then $(CYGPATH_W) 'usart/ugetc.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugetc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ugetc.Tpo $(DEPDIR)/libio18f4450_a-ugetc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugetc.c' object='libio18f4450_a-ugetc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ugetc.obj `if test -f 'usart/ugetc.c'; then $(CYGPATH_W) 'usart/ugetc.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugetc.c'; fi`
+
+libio18f4450_a-ugets.o: usart/ugets.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ugets.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-ugets.Tpo -c -o libio18f4450_a-ugets.o `test -f 'usart/ugets.c' || echo '$(srcdir)/'`usart/ugets.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ugets.Tpo $(DEPDIR)/libio18f4450_a-ugets.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugets.c' object='libio18f4450_a-ugets.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ugets.o `test -f 'usart/ugets.c' || echo '$(srcdir)/'`usart/ugets.c
+
+libio18f4450_a-ugets.obj: usart/ugets.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-ugets.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-ugets.Tpo -c -o libio18f4450_a-ugets.obj `if test -f 'usart/ugets.c'; then $(CYGPATH_W) 'usart/ugets.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugets.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-ugets.Tpo $(DEPDIR)/libio18f4450_a-ugets.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/ugets.c' object='libio18f4450_a-ugets.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-ugets.obj `if test -f 'usart/ugets.c'; then $(CYGPATH_W) 'usart/ugets.c'; else $(CYGPATH_W) '$(srcdir)/usart/ugets.c'; fi`
+
+libio18f4450_a-uopen.o: usart/uopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uopen.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-uopen.Tpo -c -o libio18f4450_a-uopen.o `test -f 'usart/uopen.c' || echo '$(srcdir)/'`usart/uopen.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uopen.Tpo $(DEPDIR)/libio18f4450_a-uopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uopen.c' object='libio18f4450_a-uopen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uopen.o `test -f 'usart/uopen.c' || echo '$(srcdir)/'`usart/uopen.c
+
+libio18f4450_a-uopen.obj: usart/uopen.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uopen.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-uopen.Tpo -c -o libio18f4450_a-uopen.obj `if test -f 'usart/uopen.c'; then $(CYGPATH_W) 'usart/uopen.c'; else $(CYGPATH_W) '$(srcdir)/usart/uopen.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uopen.Tpo $(DEPDIR)/libio18f4450_a-uopen.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uopen.c' object='libio18f4450_a-uopen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uopen.obj `if test -f 'usart/uopen.c'; then $(CYGPATH_W) 'usart/uopen.c'; else $(CYGPATH_W) '$(srcdir)/usart/uopen.c'; fi`
+
+libio18f4450_a-uputc.o: usart/uputc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uputc.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-uputc.Tpo -c -o libio18f4450_a-uputc.o `test -f 'usart/uputc.c' || echo '$(srcdir)/'`usart/uputc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uputc.Tpo $(DEPDIR)/libio18f4450_a-uputc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputc.c' object='libio18f4450_a-uputc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uputc.o `test -f 'usart/uputc.c' || echo '$(srcdir)/'`usart/uputc.c
+
+libio18f4450_a-uputc.obj: usart/uputc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uputc.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-uputc.Tpo -c -o libio18f4450_a-uputc.obj `if test -f 'usart/uputc.c'; then $(CYGPATH_W) 'usart/uputc.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uputc.Tpo $(DEPDIR)/libio18f4450_a-uputc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputc.c' object='libio18f4450_a-uputc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uputc.obj `if test -f 'usart/uputc.c'; then $(CYGPATH_W) 'usart/uputc.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputc.c'; fi`
+
+libio18f4450_a-uputs.o: usart/uputs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uputs.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-uputs.Tpo -c -o libio18f4450_a-uputs.o `test -f 'usart/uputs.c' || echo '$(srcdir)/'`usart/uputs.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uputs.Tpo $(DEPDIR)/libio18f4450_a-uputs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputs.c' object='libio18f4450_a-uputs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uputs.o `test -f 'usart/uputs.c' || echo '$(srcdir)/'`usart/uputs.c
+
+libio18f4450_a-uputs.obj: usart/uputs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-uputs.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-uputs.Tpo -c -o libio18f4450_a-uputs.obj `if test -f 'usart/uputs.c'; then $(CYGPATH_W) 'usart/uputs.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputs.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-uputs.Tpo $(DEPDIR)/libio18f4450_a-uputs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/uputs.c' object='libio18f4450_a-uputs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-uputs.obj `if test -f 'usart/uputs.c'; then $(CYGPATH_W) 'usart/uputs.c'; else $(CYGPATH_W) '$(srcdir)/usart/uputs.c'; fi`
+
+libio18f4450_a-usartd.o: usart/usartd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-usartd.o -MD -MP -MF $(DEPDIR)/libio18f4450_a-usartd.Tpo -c -o libio18f4450_a-usartd.o `test -f 'usart/usartd.c' || echo '$(srcdir)/'`usart/usartd.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-usartd.Tpo $(DEPDIR)/libio18f4450_a-usartd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/usartd.c' object='libio18f4450_a-usartd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-usartd.o `test -f 'usart/usartd.c' || echo '$(srcdir)/'`usart/usartd.c
+
+libio18f4450_a-usartd.obj: usart/usartd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -MT libio18f4450_a-usartd.obj -MD -MP -MF $(DEPDIR)/libio18f4450_a-usartd.Tpo -c -o libio18f4450_a-usartd.obj `if test -f 'usart/usartd.c'; then $(CYGPATH_W) 'usart/usartd.c'; else $(CYGPATH_W) '$(srcdir)/usart/usartd.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libio18f4450_a-usartd.Tpo $(DEPDIR)/libio18f4450_a-usartd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usart/usartd.c' object='libio18f4450_a-usartd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4450_a_CFLAGS) $(CFLAGS) -c -o libio18f4450_a-usartd.obj `if test -f 'usart/usartd.c'; then $(CYGPATH_W) 'usart/usartd.c'; else $(CYGPATH_W) '$(srcdir)/usart/usartd.c'; fi`
 
 libio18f4455_a-dummy.o: dummy.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libio18f4455_a_CFLAGS) $(CFLAGS) -MT libio18f4455_a-dummy.o -MD -MP -MF $(DEPDIR)/libio18f4455_a-dummy.Tpo -c -o libio18f4455_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c

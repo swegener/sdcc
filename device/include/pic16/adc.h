@@ -60,6 +60,7 @@
     || defined(pic18f2221) || defined(pic18f2321) || defined(pic18f4221) || defined(pic18f4321) \
     || defined(pic18f2420) || defined(pic18f2520) || defined(pic18f4420) || defined(pic18f4520) \
     || defined(pic18f2423) || defined(pic18f2523) || defined(pic18f4423) || defined(pic18f4523) \
+    || defined(pic18f2450) || defined(pic18f4450) \
     || defined(pic18f2455) || defined(pic18f2550) || defined(pic18f4455) || defined(pic18f4550) \
     || defined(pic18f2480) || defined(pic18f2580) || defined(pic18f4480) || defined(pic18f4580) \
     || defined(pic18f24j10) || defined(pic18f25j10) || defined(pic18f44j10) || defined(pic18f45j10) \

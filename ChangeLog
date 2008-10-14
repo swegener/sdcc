@@ -1,3 +1,22 @@
+2008-10-14 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f2450.h,
+	  device/include/pic16/pic18f4450.h,
+	  device/lib/pic16/libdev/pic18f2450.c,
+	  device/lib/pic16/libdev/pic18f4450.c,
+	  device/include/pic16/adc.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/pics.all: added 18f2450 and 18f4450, closes #1844525
+
+	* device/lib/pic16/libsdcc/stack/stack.S: there is no need to pin the
+	  stack to a fixed location, relax it to automatically work with all
+	  but the smallest devices (256 byte RAM devices need #pragma stack)
+
 2008-10-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/break.c: bugfix from patch 1989966, thanks Risto Huotari

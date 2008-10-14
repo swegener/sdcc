@@ -100,6 +100,16 @@ libio18f2431_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f2431_a_SOURCES += usart/usartd.c
 libio18f2431_a_CFLAGS = -p18f2431 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f2450.a
+libio18f2450_a_SOURCES = dummy.c
+libio18f2450_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
+libio18f2450_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
+libio18f2450_a_SOURCES += usart/ubaud.c usart/ubusy.c usart/uclose.c
+libio18f2450_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
+libio18f2450_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
+libio18f2450_a_SOURCES += usart/usartd.c
+libio18f2450_a_CFLAGS = -p18f2450 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f2455.a
 libio18f2455_a_SOURCES = dummy.c
 libio18f2455_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -409,6 +419,16 @@ libio18f4431_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f4431_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f4431_a_SOURCES += usart/usartd.c
 libio18f4431_a_CFLAGS = -p18f4431 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f4450.a
+libio18f4450_a_SOURCES = dummy.c
+libio18f4450_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
+libio18f4450_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
+libio18f4450_a_SOURCES += usart/ubaud.c usart/ubusy.c usart/uclose.c
+libio18f4450_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
+libio18f4450_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
+libio18f4450_a_SOURCES += usart/usartd.c
+libio18f4450_a_CFLAGS = -p18f4450 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f4455.a
 libio18f4455_a_SOURCES = dummy.c

@@ -1,3 +1,9 @@
+2008-10-22 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
+
+	* device/include/mcs51/p89v66x.h: NXP header file
+	* device/include/mcs51/p89c66x.h: fixed an SBIT definition
+	  (svn commit by Frieder Ferlemann <Frieder.Ferlemann AT web.de>)
+
 2008-10-14 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/Makefile.am,

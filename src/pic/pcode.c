@@ -5058,6 +5058,7 @@ static void pBlockStats(FILE *of, pBlock *pb)
 	}
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* printCallTree - writes the call tree to a file                  */
 /*                                                                 */
@@ -5106,6 +5107,7 @@ static void pct2(FILE *of,pBlock *pb,int indent)
 	
 	
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/

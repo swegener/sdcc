@@ -24555,27 +24555,31 @@ The PIC16 port adds support for Microchip
 \end_layout
 
 \begin_layout Standard
-18F: 2220, 2221, 2320, 2321, 2331, 2420, 2423, 2431, 2455, 2480, 24j10
+18F: 2220, 2221, 2320, 2321, 2331, 2410, 2420, 2423, 2431, 2450, 2455, 2480, 24j10
 \end_layout
 
 \begin_layout Standard
-18F: 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 2620, 2680, 2682, 2685
+18F: (2510,) 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 2610, 2620, 2680, 2682, 2685
 \end_layout
 
 \begin_layout Standard
-18F: 4220, 4221, 4320, 4321, 4331, 4420, 4423, 4431, 4455, 4480, 44j10
+18F: 4220, 4221, 4320, 4321, 4331, 4410, 4420, 4423, 4431, 4450, 4455, 4480, 44j10
 \end_layout
 
 \begin_layout Standard
-18F: 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 4620, 4680, 4682, 4685
+18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 4610, 4620, 4680, 4682, 4685
 \end_layout
 
 \begin_layout Standard
-18F: 6520, 6585, 6620, 6680, 6720
+18F: 6520, 6585, 6620, 6680, 66j60, 66j65, 6720, 67j60
 \end_layout
 
 \begin_layout Standard
-18F: 8520, 8585, 8620, 8680, 8720
+18F: 8520, 8585, 8620, 8680, 86j60, 86j65, 8720, 87j60
+\end_layout
+
+\begin_layout Standard
+18F: 96j60, 96j65, 97j60
 \end_layout
 
 \begin_layout Standard
@@ -26379,7 +26383,8 @@ Edit
 /path/to/sdcc/device/include/pic16/pic18fregs.h
 \family default
 .
- The file format is self-explanatory, just add
+\newline
+The file format is self-explanatory, just add
 \newline
 
 \family typewriter

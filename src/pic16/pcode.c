@@ -6424,6 +6424,7 @@ static void insertBankSwitch(unsigned char position, pCode *pc)
 }
 
 
+#if 0
 /*-----------------------------------------------------------------*/
 /*int compareBankFlow - compare the banking requirements between   */
 /*  flow objects. */
@@ -6474,6 +6475,7 @@ static int compareBankFlow(pCodeFlow *pcflow, pCodeFlowLink *pcflowLink, int toO
   return 1;
 
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -7746,7 +7748,9 @@ void pic16_AnalyzeBanking(void)
 /*-----------------------------------------------------------------*/
 /* buildCallTree - Look at the flow and extract all of the calls.  */
 /*-----------------------------------------------------------------*/
+#if 0
 static set *register_usage(pBlock *pb);
+#endif
 
 static void buildCallTree(void    )
 {
@@ -8131,6 +8135,7 @@ static pCode *findFunction(char *fname)
   return NULL;
 }
 
+#if 0
 static void MarkUsedRegisters(set *regset)
 {
 
@@ -8144,6 +8149,7 @@ static void MarkUsedRegisters(set *regset)
     r2->wasUsed = 1;
   }
 }
+#endif
 
 static void pBlockStats(FILE *of, pBlock *pb)
 {
@@ -8214,6 +8220,7 @@ static void sequencepCode(void)
 }
 #endif
 
+#if 0
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static set *register_usage(pBlock *pb)
@@ -8323,6 +8330,7 @@ static set *register_usage(pBlock *pb)
 
   return registers;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* pct2 - writes the call tree to a file                           */

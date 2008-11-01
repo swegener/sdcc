@@ -1471,7 +1471,7 @@ pic16initialComments (FILE * afile)
     if (pic16_mplab_comp) {
         fprintf(afile, "; * MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
     } // if
-    fprintf (afile, iComments2);
+    fprintf (afile, "%s", iComments2);
 
     if (options.debug) {
         fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]%s\"\n",
@@ -1741,7 +1741,7 @@ pic16glue ()
     if(pic16_options.dumpcalltree) {
       FILE *cFile;
 
-        sprintf(buffer, dstFileName);
+        sprintf(buffer, "%s", dstFileName);
         strcat(buffer, ".calltree");
         cFile = fopen(buffer, "w");
         pic16_printCallTree( cFile );
@@ -1759,9 +1759,9 @@ pic16glue ()
     /* now put it all together into the assembler file */
     /* create the assembler file name */
     if((noAssemble || options.c1mode)  && fullDstFileName) {
-      sprintf (buffer, fullDstFileName);
+      sprintf (buffer, "%s", fullDstFileName);
     } else {
-      sprintf (buffer, dstFileName);
+      sprintf (buffer, "%s", dstFileName);
       strcat (buffer, ".asm");
     }
 

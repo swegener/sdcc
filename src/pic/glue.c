@@ -280,7 +280,7 @@ pic14initialComments (FILE * afile)
 {
         initialComments (afile);
         fprintf (afile, "; PIC port for the 14-bit core\n");
-        fprintf (afile, iComments2);
+        fprintf (afile, "%s", iComments2);
 
 }
 
@@ -542,11 +542,11 @@ picglue ()
 
         if ((noAssemble || options.c1mode) && fullDstFileName)
         {
-                sprintf (buffer, fullDstFileName);
+                sprintf (buffer, "%s", fullDstFileName);
         }
         else
         {
-                sprintf (buffer, dstFileName);
+                sprintf (buffer, "%s", dstFileName);
                 strcat (buffer, ".asm");
         }
 

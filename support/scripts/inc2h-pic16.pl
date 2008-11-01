@@ -67,7 +67,7 @@ sub setup
     $proc = uc($proc);
 
     print HEADER <<"HEREDOC"
-/* 
+/*
  * $header - device specific declarations
  *
  * This file is part of the GNU PIC library for SDCC,
@@ -112,7 +112,7 @@ HEREDOC
     print LIBRARY <<HEREDOC
 
 HEREDOC
-;    
+;
     close HEADER;
     close LIBRARY;
 }
@@ -156,7 +156,7 @@ while (<>) {
     chomp;
     s/\s+/ /g;
     next if (/^\s*$/);
-    
+
     if (/IFNDEF _*(18.*[0-9]+)/i) {
 	$processor = lc($1);
 	#LOG "Found processor: $processor.\n";

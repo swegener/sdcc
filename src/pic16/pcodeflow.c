@@ -184,10 +184,10 @@ static void dbg_dumpFlow(pBlock *pb)
 }
 #endif
 
+#if 0
 /*-----------------------------------------------------------------*
  * void BuildFlowSegment(set *segment, pCodeFlow *pcflow)
  *-----------------------------------------------------------------*/
-
 static void BuildFlowSegment(pCodeFlow *pcflow)
 {
   static int recursion=0;
@@ -280,6 +280,7 @@ static void BuildFlowSegment(pCodeFlow *pcflow)
   }
 
 }
+#endif
 
 void pic16_BuildFlowTree(pBlock *pb)
 {

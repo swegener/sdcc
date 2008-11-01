@@ -181,9 +181,9 @@ static asmop *aopForSym(symbol *sym,
   // if the sym has registers
   if (sym->nRegs && sym->regs[0]) {
     aop->type=AOP_REG;
-    sprintf (aop->name[0], sym->regs[0]->name);
+    sprintf (aop->name[0], "%s", sym->regs[0]->name);
     if (size > 2) {
-      sprintf (aop->name[1], sym->regs[1]->name);
+      sprintf (aop->name[1], "%s", sym->regs[1]->name);
     }
     return aop;
   }
@@ -232,14 +232,14 @@ static asmop *aopForSym(symbol *sym,
   // if in bit space
   if (IN_BITSPACE(SPEC_OCLS(sym->etype))) {
     aop->type=AOP_BIT;
-    sprintf (aop->name[0], sym->rname);
+    sprintf (aop->name[0], "%s", sym->rname);
     return aop;
   }
 
   // if in direct space
   if (IN_DIRSPACE(SPEC_OCLS(sym->etype))) {
     aop->type=AOP_DIR;
-    sprintf (aop->name[0], sym->rname);
+    sprintf (aop->name[0], "%s", sym->rname);
     if (size>2) {
       sprintf (aop->name[1], "%s+2", sym->rname);
     }

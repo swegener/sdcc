@@ -1,3 +1,37 @@
+2008-11-01 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/adc.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18f2410.h,
+	  device/include/pic16/pic18f2510.h,
+	  device/include/pic16/pic18f2515.h,
+	  device/include/pic16/pic18f2610.h,
+	  device/include/pic16/pic18f4410.h,
+	  device/include/pic16/pic18f4510.h,
+	  device/include/pic16/pic18f4515.h,
+	  device/include/pic16/pic18f4610.h,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libdev/pic18f2410.c,
+	  device/lib/pic16/libdev/pic18f2510.c,
+	  device/lib/pic16/libdev/pic18f2515.c,
+	  device/lib/pic16/libdev/pic18f2610.c,
+	  device/lib/pic16/libdev/pic18f4410.c,
+	  device/lib/pic16/libdev/pic18f4510.c,
+	  device/lib/pic16/libdev/pic18f4515.c,
+	  device/lib/pic16/libdev/pic18f4610.c,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/pics.all: added support for 18f[24][456]10
+	  and 18f[24]515 devices
+	* doc/sdccman.lyx: updated list of supported PIC16 devices
+
+	* src/pic/glue.c, src/pic/pcode.c, src/pic/pcodeflow.c,
+	  src/pic16/glue.c, src/pic16/pcode.c, src/pic16/pcodeflow.c,
+	  src/xa51/gen.c: avoid compiler warnings
+	* support/scripts/inc2h-pic16.pl: removed trailing whitespace
+
 2008-10-22 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 
 	* device/include/mcs51/p89v66x.h: NXP header file

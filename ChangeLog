@@ -1,3 +1,9 @@
+2008-11-02 Raphael Neider <rneider AT web.de>
+
+	* doc/sdccman.lyx: updated the sections on the library build process
+	  and on how to add support for new devices, and documented known
+	  problems with the extended instruction set including a workaround
+
 2008-11-01 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/adc.h,

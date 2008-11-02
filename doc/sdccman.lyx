@@ -23944,6 +23944,7 @@ The PIC14 port adds support for Microchip
 \end_layout
 
 \begin_layout Standard
+\noindent
 Currently supported devices include:
 \end_layout
 
@@ -23999,6 +24000,7 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
+\noindent
 An up-to-date list of currently supported devices can be obtained via 
 \family typewriter
 sdcc -mpic14 -phelp foo.c
@@ -24555,19 +24557,23 @@ The PIC16 port adds support for Microchip
 \end_layout
 
 \begin_layout Standard
-18F: 2220, 2221, 2320, 2321, 2331, 2410, 2420, 2423, 2431, 2450, 2455, 2480, 24j10
+18F: 2220, 2221, 2320, 2321, 2331, 2410, 2420, 2423, 2431, 2450, 2455, 2480,
+ 24j10
 \end_layout
 
 \begin_layout Standard
-18F: (2510,) 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 2610, 2620, 2680, 2682, 2685
+18F: (2510,) 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 2610, 2620,
+ 2680, 2682, 2685
 \end_layout
 
 \begin_layout Standard
-18F: 4220, 4221, 4320, 4321, 4331, 4410, 4420, 4423, 4431, 4450, 4455, 4480, 44j10
+18F: 4220, 4221, 4320, 4321, 4331, 4410, 4420, 4423, 4431, 4450, 4455, 4480,
+ 44j10
 \end_layout
 
 \begin_layout Standard
-18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 4610, 4620, 4680, 4682, 4685
+18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 4610, 4620,
+ 4680, 4682, 4685
 \end_layout
 
 \begin_layout Standard
@@ -24583,7 +24589,8 @@ The PIC16 port adds support for Microchip
 \end_layout
 
 \begin_layout Standard
-A list of supported devices is also available via '
+\noindent
+An up-to-date list of supported devices is also available via '
 \family typewriter
 sdcc -mpic16 -plist
 \family default
@@ -25370,6 +25377,7 @@ nnn = SMALL or LARGE respectively according to the stack model used
 \end_layout
 
 \begin_layout Standard
+\noindent
 In addition the following macros are defined when calling assembler:
 \end_layout
 
@@ -25978,6 +25986,7 @@ libdebug
 \end_layout
 
 \begin_layout Standard
+\noindent
 This feature allows for linking with specific libraries withoug having to
  explicit name them in the command line.
  Note that the 
@@ -26175,6 +26184,11 @@ The specific microcontroller is selected within the pic18fregs.h automatically,
 
 \begin_layout Subsection
 Libraries
+\begin_inset LatexCommand \label{sub:pic16Libraries}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -26200,6 +26214,7 @@ xxxx
 \end_layout
 
 \begin_layout Standard
+\noindent
 Libraries are created with gplib which is part of the gputils package 
 \begin_inset LatexCommand \url{http://sourceforge.net/projects/gputils}
 
@@ -26214,13 +26229,11 @@ Building the libraries
 
 \begin_layout Standard
 Before using SDCC/pic16 there are some libraries that need to be compiled.
- This process is not done automatically by SDCC since not all users use
- SDCC for pic16 projects.
- So each user should compile the libraries separately.
-\end_layout
-
-\begin_layout Standard
-The steps to compile the pic16 libraries under Linux and Mac OS X are:
+ This process is done automatically if gputils are found at SDCC's compile
+ time.
+ Should you require to rebuild the pic16 libraries manually, these are the
+ steps required to do so under Linux or Mac OS X (cygwin might work as well,
+ but is untested):
 \end_layout
 
 \begin_layout LyX-Code
@@ -26228,11 +26241,7 @@ cd device/lib/pic16
 \end_layout
 
 \begin_layout LyX-Code
-./configure
-\end_layout
-
-\begin_layout LyX-Code
-make
+./configure.gnu
 \end_layout
 
 \begin_layout LyX-Code
@@ -26247,6 +26256,10 @@ make model-pic16
 su -c 'make install'     # install the libraries, you need the root password
 \end_layout
 
+\begin_layout LyX-Code
+cd ../..
+\end_layout
+
 \begin_layout Standard
 If you need to install the headers too, do:
 \end_layout
@@ -26259,26 +26272,6 @@ cd device/include
 su -c 'make install'     # install the headers, you need the root password
 \end_layout
 
-\begin_layout Standard
-There exist a special target to build the I/O libraries.
- This target is not automatically build because it will build the I/O library
- for 
-\emph on
-every
-\emph default
- supported device.
- This way building will take quite a lot of time.
- Users are advised to edit the 
-\series bold
-device/lib/pic16/pics.build
-\series default
- file and then execute:
-\end_layout
-
-\begin_layout LyX-Code
-make lib-io
-\end_layout
-
 \begin_layout Subsection
 Adding New Devices to the Port
 \end_layout
@@ -26286,7 +26279,7 @@ Adding New Devices to the Port
 \begin_layout Standard
 Adding support for a new 16
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Standard
 
@@ -26326,63 +26319,34 @@ Add DEVICE to
 \family typewriter
 /path/to/sdcc/device/lib/pic16/pics.all
 \family default
- (and 
-\family typewriter
-.build
-\family default
-).
+
 \newline
 Note: No 18f prefix here!
 \end_layout
 
 \begin_layout Enumerate
-Set up the I/O library by doing 
-\series bold
-one
-\series default
- of the following:
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-Adjust 
-\family typewriter
-/path/to/sdcc/device/lib/pic16/libio/*.ignore
-\family default
-
-\newline
-Add your DEVICE if it does not compile in 
-\family typewriter
-adc
-\family default
-, 
-\family typewriter
-i2c
-\family default
-, or 
-\family typewriter
-usart
-\family default
-.
-\end_layout
-
-\begin_layout Enumerate
-Adjust 
+Edit 
 \family typewriter
 /path/to/sdcc/device/include/pic16/adc.h
 \newline
 
 \family default
-Add the new devices to the correct ADC style class.
+Add the new devices to the correct ADC style class (depending on the number
+ of ADC channels).
+\newline
+Do not touch 
+\family typewriter
+adc.h
+\family default
+ if the device does not offer any ADC at all.
 \end_layout
 
-\end_deeper
 \begin_layout Enumerate
 Edit 
 \family typewriter
 /path/to/sdcc/device/include/pic16/pic18fregs.h
 \family default
-.
+
 \newline
 The file format is self-explanatory, just add
 \newline
@@ -26390,11 +26354,27 @@ The file format is self-explanatory, just add
 \family typewriter
 #elif defined(picDEVICE)
 \newline
-# include <picDEVICE.h>
+#
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+\family typewriter
+
+\backslash
+ 
+\backslash
+ 
+\end_layout
+
+\end_inset
+
+include <picDEVICE.h>
 \family default
 
 \newline
-at the right place (keep it sorted).
+at the right place (keep the file sorted, please).
 \end_layout
 
 \begin_layout Enumerate
@@ -26405,11 +26385,80 @@ Edit
 
 \family default
 Copy and modify an existing entry or create a new one and insert it at the
- correct place (keep the file sorted).
+ correct place (keep the file sorted, please).
 \end_layout
 
 \begin_layout Enumerate
-Recompile the pic16 libraries.
+Add the device to 
+\family typewriter
+/path/to/sdcc/device/lib/pic16/libdev/Makefile.am
+\family default
+
+\newline
+Copy an existing entry and adjust the device name.
+\end_layout
+
+\begin_layout Enumerate
+Add the device to 
+\family typewriter
+/path/to/sdcc/device/lib/pic16/libio/Makefile.am
+\family default
+
+\newline
+Copy the record from the 18f2220 and adjust the device name.
+\newline
+If the new device
+ does not offer ADC, I
+\begin_inset Formula $^{\text{2}}$
+\end_inset
+
+C, and/or (E)USART functionality as assumed by the library, remove the lines
+ with references to 
+\family typewriter
+adc/*.c
+\family default
+, 
+\family typewriter
+usart/*.c
+\family default
+, or 
+\family typewriter
+usart/*.c
+\family default
+, respectively.
+\end_layout
+
+\begin_layout Enumerate
+Update 
+\family typewriter
+libdev/Makefile.in
+\family default
+ and 
+\family typewriter
+libio/Makefile.in
+\family default
+ using
+\newline
+
+\family typewriter
+./bootstrap.sh
+\family default
+
+\newline
+in 
+\family typewriter
+/path/to/sdcc/device/lib/pic16
+\family default
+.
+\end_layout
+
+\begin_layout Enumerate
+Recompile the pic16 libraries as described in 
+\begin_inset LatexCommand \ref{sub:pic16Libraries}
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -26724,6 +26773,7 @@ Frame pointer FSR2
 \end_layout
 
 \begin_layout Standard
+\noindent
 
 \noun on
 Large 
@@ -27573,6 +27623,7 @@ unimplemented pointer type
 \end_layout
 
 \begin_layout Standard
+\noindent
 Generic pointer are read and written with a set of library functions which
  read/write 1, 2, 3, 4 bytes.
 \end_layout
@@ -27621,6 +27672,7 @@ pointer.
 \end_layout
 
 \begin_layout Standard
+\noindent
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="7">
@@ -27774,10 +27826,12 @@ upper byte high nubble is 0x2n, the rest are zeroes
 \end_layout
 
 \begin_layout Standard
+\noindent
 Currently implemented there are 3 types of streams defined:
 \end_layout
 
 \begin_layout Standard
+\noindent
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="4">
@@ -27952,10 +28006,12 @@ Writes/Reads characters via used defined functions
 \end_layout
 
 \begin_layout Standard
+\noindent
 The stream identifiers are declared as macros in the stdio.h header.
 \end_layout
 
 \begin_layout Standard
+\noindent
 In the libc library there exist the functions that are used to write to
  each of the above streams.
  These are
@@ -28577,6 +28633,7 @@ TMR3 overflow interrupt
 \end_layout
 
 \begin_layout Standard
+\noindent
 The prototypes for these names are defined in the header file 
 \emph on
 signal.h
@@ -28585,6 +28642,7 @@ signal.h
 \end_layout
 
 \begin_layout Standard
+\noindent
 In order to simplify signal handling, a number of macros is provided:
 \end_layout
 
@@ -28794,8 +28852,35 @@ status collapsed
 Known Bugs
 \end_layout
 
+\begin_layout Subsubsection
+Extended Instruction Set
+\end_layout
+
 \begin_layout Standard
-The PIC16 Port currently does not pass SDCC's regression test
+The PIC16 port emits code which is incompatible with the extended instruction
+ set available with many newer devices.
+ Make sure to always explicitly disable it, usually using
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+static __code char __at(__CONFIG4L) conf4l = /* more flags & */ _XINST_OFF_4L;
+\end_layout
+
+\begin_layout Standard
+\noindent
+Some devices (namely 18f2455, 18f2550, 18f4455, and 18f4550) use _ENHCPU_OFF_4L
+ instead of _XINST_OFF_4L.
+\end_layout
+
+\begin_layout Subsubsection
+Regression Tests
+\end_layout
+
+\begin_layout Standard
+The PIC16 port currently passes most but not all of the tests in SDCC's
+ regression test
 \begin_inset LatexCommand \index{Regression test (PIC16)}
 
 \end_inset
@@ -28805,10 +28890,8 @@ The PIC16 Port currently does not pass SDCC's regression test
 
 \end_inset
 
-) and thus the snapshot build regression tests for the PIC16 target are
- currently disabled for all hosts
-\emph on
-.
+), thus no automatic regression tests are currently performed for the PIC16
+ target.
 \end_layout
 
 \begin_layout Chapter

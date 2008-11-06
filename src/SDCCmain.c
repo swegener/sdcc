@@ -2049,7 +2049,7 @@ preProcess (char **envp)
 
       /* standard include path */
       if (!options.nostdinc) {
-        inclList = appendStrSet(includeDirsSet, "-I\"", "\"");
+        inclList = appendStrSet(includeDirsSet, "-isystem \"", "\"");
         mergeSets(&preArgvSet, inclList);
       }
 

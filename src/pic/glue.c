@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-  SDCCglue.c - glues everything we have done together into one file.
+  glue.c - glues everything we have done together into one file.
                 Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it
@@ -37,11 +37,9 @@ extern set *externs;
 extern symbol *mainf;
 extern struct dbuf_s *codeOutBuf;
 
-extern DEFSETFUNC(closeTmpFiles);
-extern DEFSETFUNC(rmTmpFiles);
-extern void initialComments(FILE *afile);
-extern operand *operandFromAst(ast *tree, int lvl);
-extern value *initPointer(initList *ilist, sym_link *toType);
+extern void initialComments (FILE *afile);
+extern operand *operandFromAst (ast *tree, int lvl);
+extern value *initPointer (initList *ilist, sym_link *toType);
 
 
 set *pic14_localFunctions = NULL;
@@ -66,7 +64,7 @@ static struct dbuf_s *ivalBuf, *extBuf, *gloBuf, *gloDefBuf;
 
 static set *emitted = NULL;
 
-static void showAllMemmaps(FILE *of); // XXX: emits initialized symbols
+static void showAllMemmaps (FILE *of); // XXX: emits initialized symbols
 
 static void
 emitPseudoStack(struct dbuf_s *oBuf, struct dbuf_s *oBufExt)

@@ -51,24 +51,21 @@ extern unsigned long pFile_isize;
 
 extern unsigned long pic16_countInstructions();
 set *pic16_localFunctions = NULL;
-set *rel_idataSymSet=NULL;
-set *fix_idataSymSet=NULL;
-
-extern DEFSETFUNC (closeTmpFiles);
-extern DEFSETFUNC (rmTmpFiles);
+set *rel_idataSymSet = NULL;
+set *fix_idataSymSet = NULL;
 
 extern void pic16_AnalyzeBanking (void);
-extern void pic16_OptimizeJumps ();
-extern void pic16_OptimizeBanksel ();
-extern void pic16_InlinepCode(void);
-extern void pic16_writeUsedRegs(FILE *);
+extern void pic16_OptimizeJumps (void);
+extern void pic16_OptimizeBanksel (void);
+extern void pic16_InlinepCode (void);
+extern void pic16_writeUsedRegs (FILE *);
 
 extern void initialComments (FILE * afile);
 extern void printPublics (FILE * afile);
 
-void  pic16_pCodeInitRegisters(void);
-pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
-extern void pic16_pCodeConstString(char *name, char *value, unsigned length);
+void  pic16_pCodeInitRegisters (void);
+pCodeOp *pic16_popCopyReg (pCodeOpReg *pc);
+extern void pic16_pCodeConstString (char *name, char *value, unsigned length);
 
 
 /*-----------------------------------------------------------------*/

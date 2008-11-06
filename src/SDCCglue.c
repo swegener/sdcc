@@ -47,57 +47,6 @@ symbol *mainf;
 int noInit = 0;                 /* no initialization */
 
 
-/*-----------------------------------------------------------------*/
-/* closePipes - closes all pipes created by the compiler           */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (closePipes)
-{
-  FILE *pfile = item;
-  int ret;
-
-  if (pfile) {
-    ret = pclose (pfile);
-    assert(ret != -1);
-  }
-
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* closeTmpFiles - closes all tmp files created by the compiler    */
-/*                 because of BRAIN DEAD MS/DOS & CYGNUS Libraries */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (closeTmpFiles)
-{
-  FILE *tfile = item;
-  int ret;
-
-  if (tfile) {
-    ret = fclose (tfile);
-    assert(ret == 0);
-  }
-
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* rmTmpFiles - unlinks all tmp files created by the compiler      */
-/*                 because of BRAIN DEAD MS/DOS & CYGNUS Libraries */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (rmTmpFiles)
-{
-  char *name = item;
-  int ret;
-
-  if (name) {
-      ret = remove (name);
-      assert(ret == 0);
-      Safe_free (name);
-  }
-
-  return 0;
-}
-
 char *
 aopLiteralLong (value * val, int offset, int size)
 {

@@ -1,3 +1,10 @@
+2008-11-06 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: #fixed bug 2224960: sdcc -MM no working correctly
+	  pass system include paths with -isystem to sdcpp
+	* src/SDCCglue.c, src/pic/glue.c, src/pic16/glue.c: removed unneded
+	  functions (closePipes), (closeTmpFiles) and (rmTmpFiles)
+
 2008-11-02 Raphael Neider <rneider AT web.de>
 
 	* doc/sdccman.lyx: updated the sections on the library build process
@@ -189,6 +196,8 @@
 
 	* src/SDCCglue.c, src/SDCCast.c:
 	  fixed throw of "excess elements" warning for char arrays
+	* support/regression/tests/nullstring.c:
+	  disable warning about excess elements in array of chars initializer
 
 2008-09-07 Maarten Brock <sourceforge.brock AT dse.nl>
 

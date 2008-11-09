@@ -1,3 +1,8 @@
+2008-11-09 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic14devices.txt: fixed memory description for
+	  12f629 and 12f675, closes #2236240
+
 2008-11-06 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c: #fixed bug 2224960: sdcc -MM no working correctly

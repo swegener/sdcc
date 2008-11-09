@@ -1,3 +1,10 @@
+2008-11-09 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
+
+	* device/include/mcs51/p89lpc933_4.h: new NXP header file
+	* device/include/mcs51/p89lpc935_6.h: new NXP header file
+	* device/include/mcs51/p89v66x.h: minor changes
+	  (svn commit by Frieder Ferlemann <Frieder.Ferlemann AT web.de>)
+
 2008-11-09 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic14devices.txt: fixed memory description for

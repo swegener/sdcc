@@ -1,8 +1,8 @@
 /*--------------------------------------------------------------------------
-P89c66x.H
+p89v66x.h
 
-This header allows to use the microcontroler Philips P89c66x
-with the compiler SDCC.
+This header allows to use the microcontroler NXP (formerly Philips) p89v66x
+where x stands for 0,2,4.
 
 Copyright (c) 2008 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 
@@ -20,12 +20,12 @@ Copyright (c) 2008 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA02111-1307 USA
 
- The registered are ordered in the same way as in the NXP data sheet
- P89C660_662_664_3.PDF, see http://www.nxp.com
+ The registered are ordered in the same way as in the NXP data sheet:
+ http://www.standardics.nxp.com/products/80c51/datasheet/p89v660.p89v662.p89v664.pdf
 
 --------------------------------------------------------------------------*/
-#ifndef __P89c66x_H__
-#define __P89c66x_H__
+#ifndef __P89V66X_H__
+#define __P89V66X_H__
 #include <compiler.h>
 
 /*BYTE Registers*/
@@ -164,6 +164,8 @@ SFR(IP1, 0x91); // Interrupt Priority 1
 	#define PS3  0x02
 	#define PS2  0x01
 SFR(IP1H, 0x92); // Interrupt Priority 1 High
+	#define PS3H  0x02
+	#define PS2H  0x01
 SFR(P0, 0x80); // Port 0
 	SBIT(AD7,  0x80, 7);
 	SBIT(P0_7, 0x80, 7);
@@ -385,4 +387,4 @@ SFR(TMOD, 0x89); // Timer Mode
 	#define   M0_0  0x01
 SFR(WDTRST, 0xA6); // Watchdog Timer Reset
 
-#endif
+#endif  //__P89V66X_H__

@@ -1,3 +1,7 @@
+2008-11-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/mcs51/P89LPC922.h: fixed #2255989, thanks kubi57
+
 2008-11-10 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/mkmk.sh: obey pics.all

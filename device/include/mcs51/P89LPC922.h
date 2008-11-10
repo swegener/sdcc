@@ -43,7 +43,7 @@ __sfr __at (0x88) TCON   ;
 __sfr __at (0x89) TMOD   ;
 __sfr __at (0x8A) TL0    ;
 __sfr __at (0x8B) TL1    ;
-__sfr __at (0x8B) TH0    ;
+__sfr __at (0x8C) TH0    ;
 __sfr __at (0x8D) TH1    ;
 __sfr __at (0xA8) IEN0   ;
 __sfr __at (0xB8) IP0    ;

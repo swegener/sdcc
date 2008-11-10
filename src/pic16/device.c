@@ -20,51 +20,44 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-
-/*
-        VR - Began writing code to make PIC16 C source files independent from
-        the header file (created by the inc2h.pl)
-
-        - adding maximum RAM memory into PIC_Device structure
-
-*/
-
 #include <stdio.h>
 
 #include "common.h"   // Include everything in the SDCC src directory
 #include "newalloc.h"
 #include "dbuf_string.h"
 
-
 #include "main.h"
 #include "pcode.h"
 #include "ralloc.h"
 #include "device.h"
+
+void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
+extern void pic16_pCodeConstString (char *name, char *value, unsigned length);
 
 stats_t statistics = { 0, 0, 0, 0 };
 
 #define DEVICE_FILE_NAME    "pic16devices.txt"
 
 static PIC16_device default_device = {
-    { "p18f452", "18f452", "pic18f452", "f452" },
-    0x600,
-    0x80,
-    { /* configuration words */
-      0x300001, 0x30000d,
-      { { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ ,
-        { 0x0f, 0, 0xff } /* 3 */ , {  -1 , 0, 0xff } /* 4 */ ,
-        { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ ,
-        {  -1 , 0, 0xff } /* 7 */ , { 0x0f, 0, 0xff } /* 8 */ ,
-        { 0xc0, 0, 0xff } /* 9 */ , { 0x0f, 0, 0xff } /* a */ ,
-        { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ ,
-        { 0x40, 0, 0xff } /* d */ }
-    },
-    { /* ID locations */
-      0x200000, 0x200007,
-      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
-        { 0, 0 }, { 0, 0 }, { 0, 0 } }
-    },
-    NULL
+  { "p18f452", "18f452", "pic18f452", "f452" },
+  0x600,
+  0x80,
+  { /* configuration words */
+    0x300001, 0x30000d,
+    { { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ ,
+      { 0x0f, 0, 0xff } /* 3 */ , {  -1 , 0, 0xff } /* 4 */ ,
+      { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ ,
+      {  -1 , 0, 0xff } /* 7 */ , { 0x0f, 0, 0xff } /* 8 */ ,
+      { 0xc0, 0, 0xff } /* 9 */ , { 0x0f, 0, 0xff } /* a */ ,
+      { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ ,
+      { 0x40, 0, 0xff } /* d */ }
+  },
+  { /* ID locations */
+    0x200000, 0x200007,
+    { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
+      { 0, 0 }, { 0, 0 }, { 0, 0 } }
+  },
+  NULL
 };
 
 PIC16_device *pic16 = &default_device;
@@ -75,301 +68,371 @@ extern set *userIncDirsSet;
 
 extern char *iComments2;
 
-void pic16_dump_equates(FILE *of, set *equs)
+void
+pic16_dump_equates (FILE *of, set *equs)
 {
   regs *r;
 
-        r = setFirstItem(equs);
-        if(!r)return;
+  r = setFirstItem (equs);
+  if (!r)
+    return;
 
-        fprintf(of, "%s", iComments2);
-        fprintf(of, ";\tEquates to used internal registers\n");
-        fprintf(of, "%s", iComments2);
+  fprintf (of, "%s", iComments2);
+  fprintf (of, ";\tEquates to used internal registers\n");
+  fprintf (of, "%s", iComments2);
 
-        for(; r; r = setNextItem(equs)) {
-                fprintf(of, "%s\tequ\t0x%02x\n", r->name, r->address);
-        }
+  for (; r; r = setNextItem (equs))
+    {
+      fprintf (of, "%s\tequ\t0x%02x\n", r->name, r->address);
+    } // for
 }
 
 
-void pic16_dump_access(FILE *of, set *section)
+void
+pic16_dump_access (FILE *of, set *section)
 {
   regs *r;
 
-        r = setFirstItem(section);
-        if(!r)return;
+  r = setFirstItem (section);
+  if (!r)
+    return;
 
-        fprintf(of, "%s", iComments2);
-        fprintf(of, ";\tAccess bank symbols\n");
-        fprintf(of, "%s", iComments2);
+  fprintf (of, "%s", iComments2);
+  fprintf (of, ";\tAccess bank symbols\n");
+  fprintf (of, "%s", iComments2);
 
-        fprintf(of, "\tudata_acs\n");
-        for(; r; r = setNextItem(section)) {
-                fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                statistics.adsize += r->size;
-        }
+  fprintf (of, "\tudata_acs\n");
+  for (; r; r = setNextItem (section))
+    {
+      fprintf (of, "%s\tres\t%d\n", r->name, r->size);
+      statistics.adsize += r->size;
+    } // for
 }
 
-
-int regCompare(const void *a, const void *b)
+int
+regCompare (const void *a, const void *b)
 {
   const regs *const *i = a;
   const regs *const *j = b;
 
-        /* sort primarily by the address */
-        if( (*i)->address > (*j)->address)return 1;
-        if( (*i)->address < (*j)->address)return -1;
+  /* Sort primarily by the address ... */
+  if ((*i)->address > (*j)->address)
+    return (1);
 
-        /* and secondarily by size */
-        /* register size sorting may have strange results use with care */
-        if( (*i)->size > (*j)->size)return 1;
-        if( (*i)->size < (*j)->size)return -1;
+  if ((*i)->address < (*j)->address)
+    return (-1);
 
-        /* finally if in same address and same size sort by name */
-        return (strcmp( (*i)->name, (*j)->name));
+  /* ... and secondarily by size. */
+  /* Register size sorting may have strange results, use with care! */
+  if ((*i)->size > (*j)->size)
+    return (1);
 
-  return 0;
+  if ((*i)->size < (*j)->size)
+    return (-1);
+
+  /* Finally, if in same address and same size, sort by name. */
+  return (strcmp ((*i)->name, (*j)->name));
 }
 
-int symCompare(const void *a, const void *b)
+int
+symCompare (const void *a, const void *b)
 {
   const symbol *const *i = a;
   const symbol *const *j = b;
 
-        /* sort primarily by the address */
-        if( SPEC_ADDR((*i)->etype) > SPEC_ADDR((*j)->etype))return 1;
-        if( SPEC_ADDR((*i)->etype) < SPEC_ADDR((*j)->etype))return -1;
+  /* Sort primarily by the address ... */
+  if (SPEC_ADDR ((*i)->etype) > SPEC_ADDR ((*j)->etype))
+    return (1);
 
-        /* and secondarily by size */
-        /* register size sorting may have strange results use with care */
-        if( getSize((*i)->etype) > getSize((*j)->etype))return 1;
-        if( getSize((*i)->etype) < getSize((*j)->etype))return -1;
+  if (SPEC_ADDR ((*i)->etype) < SPEC_ADDR ((*j)->etype))
+    return (-1);
 
-        /* finally if in same address and same size sort by name */
-        return (strcmp( (*i)->rname, (*j)->rname));
+  /* ... and secondarily by size. */
+  /* Register size sorting may have strange results, use with care! */
+  if (getSize ((*i)->etype) > getSize ((*j)->etype))
+    return (1);
 
-  return 0;
+  if (getSize ((*i)->etype) < getSize ((*j)->etype))
+    return (-1);
+
+  /* Finally, if in same address and same size, sort by name. */
+  return (strcmp ((*i)->rname, (*j)->rname));
 }
 
-void pic16_dump_usection(FILE *of, set *section, int fix)
+void
+pic16_dump_usection (FILE *of, set *section, int fix)
 {
-  static int abs_usection_no=0;
-  static unsigned int usection_no=0;
+  static int abs_usection_no = 0;
+  static unsigned int usection_no = 0;
   regs *r, *rprev;
   unsigned int init_addr, i;
   regs **rlist;
   regs *r1;
 
-        /* put all symbols in an array */
-        if (!elementsInSet(section)) return;
-        rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
-        r = rlist[0]; i = 0;
-        for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
-                rlist[i] = rprev; i++;
-        }
+  /* put all symbols in an array */
+  if (!elementsInSet (section))
+    return;
 
-        if(!i) {
-                if(rlist)Safe_free(rlist);
-          return;
-        }
+  rlist = Safe_calloc (elementsInSet (section), sizeof (regs *));
+  r = rlist[0];
+  i = 0;
+  for (rprev = setFirstItem (section); rprev; rprev = setNextItem (section))
+    {
+      rlist[i] = rprev;
+      i++;
+    } // for
 
-        /* sort symbols according to their address */
-        qsort(rlist, i  /*elementsInSet(section)*/, sizeof(regs *), regCompare);
+  if (!i)
+    {
+      if (rlist)
+        Safe_free (rlist);
 
-        if(!fix) {
+      return;
+    } // if
 
+  /* sort symbols according to their address */
+  qsort (rlist, i, sizeof (regs *), regCompare);
+
+  if (!fix)
+    {
 #define EMIT_SINGLE_UDATA_SECTION       0
 #if EMIT_SINGLE_UDATA_SECTION
-                fprintf(of, "\n\n\tudata\n");
-                for(r = setFirstItem(section); r; r = setNextItem(section)) {
-                        fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                        statistics.udsize += r->size;
-                }
+      fprintf (of, "\n\n\tudata\n");
+      for (r = setFirstItem (section); r; r = setNextItem (section))
+        {
+          fprintf (of, "%s\tres\t%d\n", r->name, r->size);
+          statistics.udsize += r->size;
+        } // for
 #else
-                for(r = setFirstItem(section); r; r = setNextItem(section)) {
-                        //fprintf(of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
-                        fprintf(of, "\nudata_%s_%u\tudata\n", moduleName, usection_no++);
-                        fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                        statistics.udsize += r->size;
-                }
+      for (r = setFirstItem (section); r; r = setNextItem (section))
+        {
+          //fprintf (of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
+          fprintf (of, "\nudata_%s_%u\tudata\n", moduleName, usection_no++);
+          fprintf (of, "%s\tres\t%d\n", r->name, r->size);
+          statistics.udsize += r->size;
+        } // for
 #endif
-        } else {
-          unsigned int j=0;
+    }
+  else
+    {
+      unsigned int j = 0;
+      unsigned int prev_size = 0;
 
-                rprev = NULL;
-                init_addr = (rlist[j]->address & 0x0FFF); // warning(s) emitted below
-                fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, (init_addr & 0x0FFF));
+      rprev = NULL;
+      init_addr = (rlist[j]->address & 0x0FFF); // warning(s) emitted below
+      fprintf (of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, (init_addr & 0x0FFF));
 
-                for(j=0;j<i;j++) {
-                        r = rlist[j];
-                        if(j < i-1)r1 = rlist[j+1]; else r1 = NULL;
+      for (j = 0; j < i; j++)
+        {
+          r = rlist[j];
+          r1 = NULL;
+          if (j < i - 1)
+            r1 = rlist[j + 1];
 
-                        init_addr = (r->address & 0x0FFF);
-                        if (init_addr != r->address) {
-                            fprintf (stderr, "%s: WARNING: Changed address of pinned variable %s from 0x%x to 0x%x\n",
-                                    moduleName, r->name, r->address, init_addr);
-                        } // if
+          init_addr = (r->address & 0x0FFF);
+          if (init_addr != r->address)
+            {
+              fprintf (stderr, "%s: WARNING: Changed address of pinned variable %s from 0x%x to 0x%x\n",
+                moduleName, r->name, r->address, init_addr);
+            } // if
 
-                        if((rprev && (init_addr != ((rprev->address & 0x0FFF) + rprev->size)))) {
-                                fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
-                        }
+          if ((rprev && (init_addr != ((rprev->address & 0x0FFF) + prev_size))))
+            fprintf (of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
 
-                        /* XXX: Does not handle partial overlap correctly. */
-                        if(r1 && (init_addr == (r1->address & 0x0FFF))) {
-                                fprintf(of, "\n%s\tres\t0\n", r->name);
-                        } else {
-                                fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                                statistics.udsize += r->size;
-                        }
+          /* XXX: Does not handle partial overlap correctly. */
+          if (r1 && (init_addr == (r1->address & 0x0FFF)))
+            {
+              prev_size = 0;
+              fprintf (of, "%-15s\n", r->name);
+            }
+          else
+            {
+              prev_size = r->size;
+              fprintf (of, "%-15s\tres\t%d\n", r->name, prev_size);
+              statistics.udsize += prev_size;
+            }
 
-                        rprev = r;
-                }
-        }
-        Safe_free(rlist);
+          rprev = r;
+        } // for
+    } // if
+
+  Safe_free (rlist);
 }
 
-void pic16_dump_gsection(FILE *of, set *sections)
+void
+pic16_dump_gsection (FILE *of, set *sections)
 {
   regs *r;
   sectName *sname;
 
-        for(sname = setFirstItem(sections); sname; sname = setNextItem(sections)) {
-                if(!strcmp(sname->name, "access"))continue;
-                fprintf(of, "\n\n%s\tudata\n", sname->name);
+  for (sname = setFirstItem (sections); sname; sname = setNextItem (sections))
+    {
+      if (!strcmp (sname->name, "access"))
+        continue;
 
-                for(r=setFirstItem(sname->regsSet); r; r=setNextItem(sname->regsSet)) {
+      fprintf (of, "\n\n%s\tudata\n", sname->name);
+
+      for (r = setFirstItem (sname->regsSet); r; r = setNextItem (sname->regsSet))
+        {
 #if 0
-                        fprintf(stderr, "%s:%d emitting variable %s for section %s (%p)\n", __FILE__, __LINE__,
-                                r->name, sname->name, sname);
+          fprintf (stderr, "%s:%d emitting variable %s for section %s (%p)\n",
+              __FILE__, __LINE__, r->name, sname->name, sname);
 #endif
-                        fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                        statistics.udsize += r->size;
-                }
-        }
+          fprintf (of, "%s\tres\t%d\n", r->name, r->size);
+          statistics.udsize += r->size;
+        } // for
+    } // for
 }
 
-
-/* forward declaration */
-void pic16_printIval(symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
-extern void pic16_pCodeConstString(char *name, char *value, unsigned length);
-
-void pic16_dump_isection(FILE *of, set *section, int fix)
+void
+pic16_dump_isection (FILE *of, set *section, int fix)
 {
-  static int abs_isection_no=0;
+  static int abs_isection_no = 0;
   symbol *s, *sprev;
   unsigned int init_addr, i;
   symbol **slist;
 
-        /* put all symbols in an array */
-        if (!elementsInSet(section)) return;
-        slist = Safe_calloc(elementsInSet(section), sizeof(symbol *));
-        s = slist[0]; i = 0;
-        for(sprev = setFirstItem(section); sprev; sprev = setNextItem(section)) {
-                slist[i] = sprev; i++;
-        }
+  /* put all symbols in an array */
+  if (!elementsInSet (section))
+    return;
 
-        if(!i) {
-                if(slist)Safe_free(slist);
-          return;
-        }
+  slist = Safe_calloc (elementsInSet (section), sizeof (symbol *));
+  s = slist[0];
+  i = 0;
+  for (sprev = setFirstItem (section); sprev; sprev = setNextItem (section))
+    {
+      slist[i] = sprev;
+      i++;
+    } // for
 
-        /* sort symbols according to their address */
-        qsort(slist, i, sizeof(symbol *), symCompare);
+  if (!i)
+    {
+      if (slist)
+        Safe_free (slist);
 
-        pic16_initDB();
+      return;
+    } // if
 
-        if(!fix) {
-                fprintf(of, "\n\n\tidata\n");
-                for(s = setFirstItem(section); s; s = setNextItem(section)) {
+  /* sort symbols according to their address */
+  qsort (slist, i, sizeof (symbol *), symCompare);
 
-                        if(s->ival) {
-                                fprintf(of, "%s", s->rname);
-                                pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
-                                pic16_flushDB('f', (void *)of);
-                        } else {
-                                if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
-                                        && SPEC_CVAL (s->etype).v_char) {
+  pic16_initDB ();
 
-//                                      fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
-                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char, getSize(s->type));
-                                } else {
-                                        assert(0);
-                                }
-                        }
-
+  if (!fix)
+    {
+      fprintf (of, "\n\n\tidata\n");
+      for (s = setFirstItem (section); s; s = setNextItem (section))
+        {
+          if (s->ival)
+            {
+              fprintf (of, "%s", s->rname);
+              pic16_printIval (s, s->type, s->ival, 'f', (void *)of);
+              pic16_flushDB ('f', (void *)of);
+            }
+          else
+            {
+              if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
+                  && SPEC_CVAL (s->etype).v_char)
+                {
+                  //fprintf (stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
+                  pic16_pCodeConstString (s->rname , SPEC_CVAL (s->etype).v_char, getSize (s->type));
                 }
-        } else {
-          unsigned int j=0;
-          symbol *s1;
+              else
+                {
+                  assert (0);
+                } // if
+            } // if
+        } // for
+    }
+  else
+    {
+      unsigned int j = 0;
+      symbol *s1;
 
-                sprev = NULL;
-                init_addr = SPEC_ADDR(slist[j]->etype);
-                fprintf(of, "\n\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
+      sprev = NULL;
+      init_addr = SPEC_ADDR (slist[j]->etype);
+      fprintf (of, "\n\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
 
-                for(j=0;j<i;j++) {
-                        s = slist[j];
-                        if(j < i-1)s1 = slist[j+1]; else s1 = NULL;
+      for (j = 0; j < i; j++)
+        {
+          s = slist[j];
+          s1 = NULL;
+          if (j < i - 1)
+            s1 = slist[j + 1];
 
-                        init_addr = SPEC_ADDR(s->etype);
+          init_addr = SPEC_ADDR (s->etype);
 
-                        if(sprev && (init_addr > (SPEC_ADDR(sprev->etype) + getSize(sprev->etype)))) {
-                                fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
-                        }
+          if (sprev && (init_addr > (SPEC_ADDR (sprev->etype) + getSize (sprev->etype))))
+            fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
 
-                        if(s->ival) {
-                                fprintf(of, "%s", s->rname);
-                                pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
-                                pic16_flushDB('f', (void *)of);
-                        } else {
-                                if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
-                                        && SPEC_CVAL (s->etype).v_char) {
-
-//                                      fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
-                                        pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char, getSize(s->type));
-                                } else {
-                                        assert(0);
-                                }
-                        }
-
-
-                        sprev = s;
+          if (s->ival)
+            {
+              fprintf (of, "%s", s->rname);
+              pic16_printIval (s, s->type, s->ival, 'f', (void *)of);
+              pic16_flushDB ('f', (void *)of);
+            }
+          else
+            {
+              if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
+                  && SPEC_CVAL (s->etype).v_char)
+                {
+                  //fprintf (stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
+                  pic16_pCodeConstString (s->rname , SPEC_CVAL (s->etype).v_char, getSize (s->type));
                 }
-        }
-        Safe_free(slist);
+              else
+                {
+                  assert (0);
+                } // if
+            } // if
+
+          sprev = s;
+        } // for
+    } // if
+
+  Safe_free (slist);
 }
 
-
-void pic16_dump_int_registers(FILE *of, set *section)
+void
+pic16_dump_int_registers (FILE *of, set *section)
 {
   regs *r, *rprev;
   int i;
   regs **rlist;
 
-        /* put all symbols in an array */
-        if (!elementsInSet(section)) return;
-        rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
-        r = rlist[0]; i = 0;
-        for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
-                rlist[i] = rprev; i++;
-        }
+  /* put all symbols in an array */
+  if (!elementsInSet (section))
+    return;
 
-        /* sort symbols according to their address */
-        qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
+  rlist = Safe_calloc (elementsInSet (section), sizeof (regs *));
+  r = rlist[0];
+  i = 0;
+  for (rprev = setFirstItem (section); rprev; rprev = setNextItem (section))
+    {
+      rlist[i] = rprev;
+      i++;
+    } // for
 
-        if(!i) {
-                if(rlist)Safe_free(rlist);
-          return;
-        }
+  if (!i)
+    {
+      if (rlist)
+        Safe_free (rlist);
 
-        fprintf(of, "\n\n; Internal registers\n");
+      return;
+    } // if
 
-        fprintf(of, "%s\tudata_ovr\t0x0000\n", ".registers");
-        for(r = setFirstItem(section); r; r = setNextItem(section)) {
-                fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-                statistics.intsize += r->size;
-        }
+  /* sort symbols according to their address */
+  qsort (rlist, i, sizeof (regs *), regCompare);
 
-        Safe_free(rlist);
+  fprintf (of, "\n\n; Internal registers\n");
+
+  fprintf (of, "%s\tudata_ovr\t0x0000\n", ".registers");
+  for (r = setFirstItem (section); r; r = setNextItem (section))
+    {
+      fprintf (of, "%s\tres\t%d\n", r->name, r->size);
+      statistics.intsize += r->size;
+    } // for
+
+  Safe_free (rlist);
 }
 
 /**

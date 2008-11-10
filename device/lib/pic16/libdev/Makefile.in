@@ -530,31 +530,6 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-
-#lib_LIBRARIES += libdev18f2221.a
-#libdev18f2221_a_SOURCES = pic18f2221.c
-#libdev18f2221_a_CFLAGS = -p18f2221 $(AM_CFLAGS)
-
-#lib_LIBRARIES += libdev18f2423.a
-#libdev18f2423_a_SOURCES = pic18f2423.c
-#libdev18f2423_a_CFLAGS = -p18f2423 $(AM_CFLAGS)
-
-# Not supported by gputils as of 2008-11-01
-#lib_LIBRARIES += libdev18f2510.a
-#libdev18f2510_a_SOURCES = pic18f2510.c
-#libdev18f2510_a_CFLAGS = -p18f2510 $(AM_CFLAGS)
-
-#lib_LIBRARIES += libdev18f4221.a
-#libdev18f4221_a_SOURCES = pic18f4221.c
-#libdev18f4221_a_CFLAGS = -p18f4221 $(AM_CFLAGS)
-
-#lib_LIBRARIES += libdev18f4423.a
-#libdev18f4423_a_SOURCES = pic18f4423.c
-#libdev18f4423_a_CFLAGS = -p18f4423 $(AM_CFLAGS)
-
-#lib_LIBRARIES += libdev18f4523.a
-#libdev18f4523_a_SOURCES = pic18f4523.c
-#libdev18f4523_a_CFLAGS = -p18f4523 $(AM_CFLAGS)
 lib_LIBRARIES = libdev18f1220.a libdev18f1320.a libdev18f2220.a \
 	libdev18f2320.a libdev18f2321.a libdev18f2331.a \
 	libdev18f2410.a libdev18f242.a libdev18f2420.a libdev18f2431.a \

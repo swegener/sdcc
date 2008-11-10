@@ -17,13 +17,11 @@ lib_LIBRARIES =
 
 HERE
 
-ls -1 *.c | sort | while read file; do
-    arch=${file%.c};
-    arch=${arch#pic};
+sed -e 's/\s*#.*$//' ../pics.all | grep -v '^\s*$' | sort | while read arch; do
     cat <<HERE
-lib_LIBRARIES += libdev${arch}.a
-libdev${arch}_a_SOURCES = ${file}
-libdev${arch}_a_CFLAGS = -p${arch} \$(AM_CFLAGS)
+lib_LIBRARIES += libdev18f${arch}.a
+libdev18f${arch}_a_SOURCES = pic18f${arch}.c
+libdev18f${arch}_a_CFLAGS = -p18f${arch} \$(AM_CFLAGS)
 
 HERE
 done

@@ -1,3 +1,23 @@
+2008-11-10 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libdev/mkmk.sh: obey pics.all
+	* device/lib/pic16/libio/mkmk.sh: properly match whole lines in
+	  .ignore files, fixes IO libs for 18f242, 18f252, 18f442, and 18f452
+	  (patch by Nick Materer, #2253980)
+
+	* device/lib/pic16/libio/adc.ignore,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart.ignore,
+	  device/lib/pic16/pics.all: updated to build more device libs
+
+	* device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in: regenerated
+
+	* src/pic16/device.c (pic16_dump_usection): fixed output of multiple
+	  names per memory location, applied SDCC style to more functions
+
 2008-11-09 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 
 	* device/include/mcs51/p89lpc933_4.h: new NXP header file

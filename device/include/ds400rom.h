@@ -1,4 +1,4 @@
-// Interface to DS80C400 ROM functions.
+/* Interface to DS80C400 ROM functions. */
 
 #ifndef DS400ROM_H_
 #define DS400ROM_H_

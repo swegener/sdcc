@@ -24,9 +24,9 @@
 #define true 1
 #define false 0
 
-// Only define bool for ports that really support it to the full extend.
-// For other ports only define BOOL which can be used in most cases,
-// but can result in unexpected behaviour
+/* Only define bool for ports that really support it to the full extend.
+   For other ports only define BOOL which can be used in most cases,
+   but can result in unexpected behaviour */
 
 #if defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80) || defined (SDCC_pic14) || defined (SDCC_pic16)
  #define BOOL char

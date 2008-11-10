@@ -1,25 +1,25 @@
 /*-------------------------------------------------------------------------
   float.h - ANSI functions forward declarations
- 
+
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #ifndef __SDC51_FLOAT_H
@@ -76,23 +76,23 @@ char __fsgt (float, float);
 
 #define FLOAT_ASM_MCS51
 
-// This adds extra code for proper round-off, in
-// an attempt to match the results from gcc.
+/* This adds extra code for proper round-off, in
+   an attempt to match the results from gcc. */
 #define FLOAT_FULL_ACCURACY
 
-// This adds about 66 bytes to the code size and
-// significantly speeds up shift operations more
-// than 8 bits (common when subtracting numbers
-// of significantly different magnitude and scaling
-// to fixed point)
+/* This adds about 66 bytes to the code size and
+   significantly speeds up shift operations more
+   than 8 bits (common when subtracting numbers
+   of significantly different magnitude and scaling
+   to fixed point) */
 #define FLOAT_SHIFT_SPEEDUP
 
 #define sign_a  psw.1
 #define sign_b  psw.5
 #define exp_a dpl
 #define exp_b dph
-#endif	// using mcs51 assembly
+#endif	/* using mcs51 assembly */
 
 
-#endif	// __SDC51_FLOAT_H
+#endif	/* __SDC51_FLOAT_H */
 

@@ -31,9 +31,9 @@
 #define iTWO_PI     0.1591549431
 #define TWO_O_PI    0.6366197724
 
-// EPS=B**(-t/2), where B is the radix of the floating-point representation
-// and there are t base-B digits in the significand.  Therefore, for floats
-// EPS=2**(-12).  Also define EPS2=EPS*EPS.
+/* EPS=B**(-t/2), where B is the radix of the floating-point representation
+   and there are t base-B digits in the significand.  Therefore, for floats
+   EPS=2**(-12).  Also define EPS2=EPS*EPS. */
 #define EPS 244.14062E-6
 #define EPS2 59.6046E-9
 
@@ -44,9 +44,9 @@ union float_long
 };
 
 #if defined(SDCC_MATH_LIB) && defined(SDCC_mcs51) && !defined(SDCC_USE_XSTACK) && !defined(SDCC_STACK_AUTO) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-// Compile the mcs51 assembly version only when all these
-// conditions are met.  Since not all the functions are
-// reentrant, do not compile with --stack-auto is used.
+/* Compile the mcs51 assembly version only when all these
+   conditions are met.  Since not all the functions are
+   reentrant, do not compile with --stack-auto is used. */
 #define MATH_ASM_MCS51
 #endif
 

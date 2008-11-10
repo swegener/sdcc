@@ -1,3 +1,20 @@
+2008-11-10 Steven Borley <steven.borley AT partnerelectronics.com>
+
+	* device/include/ctype.h,
+	* device/include/ds400rom.h,
+	* device/include/ds80c390.h,
+	* device/include/float.h,
+	* device/include/math.h,
+	* device/include/serial.h,
+	* device/include/stdbool.h,
+	* device/include/tinibios.h: replaced non-C89 '//' with '/* */',
+	  patch 2195343
+	* device/include/mcs51/C8051F336.h,
+	* device/include/mcs51/C8051T600.h,
+	* device/include/mcs51/C8051T610.h,
+	* device/include/mcs51/C8051T630.h: new, added, patch 2183334
+	  (svn commit by Maarten Brock <sourceforge.brock AT dse.nl>)
+
 2008-11-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/include/mcs51/P89LPC922.h: fixed #2255989, thanks kubi57

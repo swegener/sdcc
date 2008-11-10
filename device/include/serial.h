@@ -1,12 +1,12 @@
-//----------------------------------------------------------------------------
-//Written by Dmitry S. Obukhov, 1996
-// dso@usa.net
-//----------------------------------------------------------------------------
-//This module implements serial interrupt handler and IO routinwes using
-//two 256 byte cyclic buffers. Bit variables can be used as flags for
-//real-time kernel tasks
-//Last modified 6 Apr 97
-//----------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
+  Written by Dmitry S. Obukhov, 1996
+   dso@usa.net
+  ----------------------------------------------------------------------------
+  This module implements serial interrupt handler and IO routinwes using
+  two 256 byte cyclic buffers. Bit variables can be used as flags for
+  real-time kernel tasks
+  Last modified 6 Apr 97
+  ----------------------------------------------------------------------------*/
 
 void serial_init(void);
 void serial_interrupt_handler(void) __interrupt 4 __using 1;

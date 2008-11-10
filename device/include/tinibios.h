@@ -13,7 +13,7 @@ void Serial0Baud(unsigned long baud);
 void Serial0SendBreak(void);
 void Serial0Flush(void);
 
-void Serial0SwitchToBuffered(void); // ds400 only.
+void Serial0SwitchToBuffered(void); /* ds400 only. */
 
 void Serial1Init (unsigned long baud, unsigned char buffered);
 char Serial1GetChar(void);
@@ -30,11 +30,11 @@ void ClockMicroSecondsDelay(unsigned int us);
 #define SERIAL_0_BAUD 115200L
 #define SERIAL_1_BAUD 9600L
 
-// these need to be binary numbers
+/* these need to be binary numbers */
 #define SERIAL_0_RECEIVE_BUFFER_SIZE 1024
 #define SERIAL_1_RECEIVE_BUFFER_SIZE 64
 
-// I know someone is fooling with the crystals
+/* I know someone is fooling with the crystals */
 #if defined(SDCC_ds400)
 # define OSCILLATOR 14745600L
 #else
@@ -50,15 +50,15 @@ void ClockMicroSecondsDelay(unsigned int us);
 #define CPU_SPEED 2
 void CpuSpeed(unsigned int speed);
 
-// The MOVX stretch cycles, see datasheet
+/* The MOVX stretch cycles, see datasheet */
 #define CPU_MOVX_STRETCH 0x01
 
-// from rtc390.c
+/* from rtc390.c */
 #define HAVE_RTC
 unsigned char RtcRead(struct tm *rtcDate);
 void RtcWrite(struct tm *rtcDate);
 
-// from lcd390.c
+/* from lcd390.c */
 extern void LcdInit(void);
 extern void LcdOn(void);
 extern void LcdOff(void);
@@ -71,7 +71,7 @@ extern void LcdLPutString(unsigned int collumnRow, char *string);
 extern void LcdPrintf(const char *format, ...) __reentrant;
 extern void LcdLPrintf(unsigned int collumnRow, const char *format, ...) __reentrant;
 
-// from i2c390.c
+/* from i2c390.c */
 #define I2C_BUFSIZE 128
 extern char I2CReset(void);
 extern char I2CStart(void);
@@ -81,18 +81,18 @@ extern char I2CSendStop(char addr, char count,
 extern char I2CReceive(char addr, char count);
 extern char I2CSendReceive(char addr, char tx_count,
 			   char rx_count);
-//extern char I2CByteOut(char);
-//extern void I2CDumpError(char);
+/*extern char I2CByteOut(char);*/
+/*extern void I2CDumpError(char);*/
 
 /* global transfer buffers */
 extern char i2cTransmitBuffer[I2C_BUFSIZE];
 extern char i2cReceiveBuffer[I2C_BUFSIZE];
 
-// Macro for normal send transfer ending with a stop condition
+/* Macro for normal send transfer ending with a stop condition */
 #define I2CSend(addr, count)   I2CSendStop(addr, count, 1)
 
 
-// internal functions used by tinibios.c
+/* internal functions used by tinibios.c */
 unsigned char _sdcc_external_startup(void);
 void Serial0IrqHandler (void) __interrupt 4;
 void Serial1IrqHandler (void) __interrupt 7;
@@ -103,13 +103,13 @@ void ClockIrqHandler (void) __interrupt 1 __naked;
 #endif
 
 #if defined(SDCC_ds400)
-// functions for dealing with the ds400 ROM firmware.
+/* functions for dealing with the ds400 ROM firmware. */
 
-// A wrapper which calls rom_init allocating all available RAM in CE0
-// to the heap, sets the serial port to SERIAL_0_BAUD, sets up the
-// millisecond timer, and diddles the clock multiplier.
+/* A wrapper which calls rom_init allocating all available RAM in CE0
+   to the heap, sets the serial port to SERIAL_0_BAUD, sets up the
+   millisecond timer, and diddles the clock multiplier. */
 
-// Values for the romInit "speed" parameter.
+/* Values for the romInit "speed" parameter. */
 #define SPEED_1X	0 /* no clock multiplier, normal speed. */
 #define SPEED_2X	1 /* 2x clock multiplier. */
 #define SPEED_4X	2 /* 4x clock, DOESN'T WORK ON TINIm400! */
@@ -117,7 +117,7 @@ void ClockIrqHandler (void) __interrupt 1 __naked;
 unsigned char romInit(unsigned char noisy,
 		      char speed);
 
-// Install an interrupt handler.
+/* Install an interrupt handler. */
 void installInterrupt(void (*isrPtr)(void), unsigned char offset);
 #endif
 

@@ -1,3 +1,18 @@
+2008-11-11 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f25j10.h,
+	  device/include/pic16/pic18f45j10.h: remove useless boilerplate
+
+	* device/include/pic16/adc.h,
+	  device/lib/pic16/libio/adc/adcbusy.c,
+	  device/lib/pic16/libio/adc/adcclose.c,
+	  device/lib/pic16/libio/adc/adcconv.c,
+	  device/lib/pic16/libio/adc/adcopen.c,
+	  device/lib/pic16/libio/adc/adcread.c,
+	  device/lib/pic16/libio/adc/adcsetch.c: generalized, documented,
+	  and fixed ADC routines to work for more target devices,
+	  incorporates patch #2036130 by Nick Materer
+
 2008-11-10 Steven Borley <steven.borley AT partnerelectronics.com>
 
 	* device/include/ctype.h,

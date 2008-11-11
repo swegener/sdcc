@@ -42,6 +42,12 @@
 #define ADC_FRM_LJUST	0x00
 
 
+/* reference voltage configuration (not for 18f242-style ADC) */
+#define ADC_VCFG_VDD_VSS  0x00
+#define ADC_VCFG_AN3_VSS  0x10
+#define ADC_VCFG_VDD_AN2  0x20
+#define ADC_VCFG_AN3_AN2  0x30
+
 /* oscillator frequency */
 #define ADC_FOSC_2	0x00
 #define ADC_FOSC_4	0x04
@@ -52,11 +58,45 @@
 #define ADC_FOSC_RC	0x07
 
 
-/* distinguish between 18f242-style and 18f2455-style ADC */
+/*
+ * Distinguish between 18f242-style, 18f1220-style, and 18f2220-style ADC:
+ *
+ * ADCON0:
+ * bit  18f242  18f1220 18f2220
+ *  0   ADON    ADON    ADON
+ *  1   -       GO      GO
+ *  2   GO      CHS0    CHS0
+ *  3   CHS0    CHS1    CHS1
+ *  4   CHS1    CHS2    CHS2
+ *  5   CHS2    -       CHS3
+ *  6   ADCS0   VCFG0   -
+ *  7   ADCS1   VCFG1   (ADCAL)
+ *
+ * ADCON1:
+ *  bit 18f242  18f1220 18f2220
+ *   0  PCFG0   PCFG0   PCFG0
+ *   1  PCFG1   PCFG1   PCFG1
+ *   2  PCFG2   PCFG2   PCFG2
+ *   3  PCFG3   PCFG3   PCFG3
+ *   4  -       PCFG4   VCFG0
+ *   5  -       PCFG5   VCFG1
+ *   6  ADCS2   PCFG6   -
+ *   7  ADFM    -       -
+ */
 
-/* ordered by device family */
-#if    defined(pic18f1220) || defined(pic18f1320) \
-    || defined(pic18f2220) || defined(pic18f2320) || defined(pic18f4220) || defined(pic18f4320) \
+/* 18f242-style */
+#if    defined(pic18f242) || defined(pic18f252) || defined(pic18f442) || defined(pic18f452) \
+    || defined(pic18f248) || defined(pic18f258) || defined(pic18f448) || defined(pic18f458)
+
+#define __SDCC_ADC_STYLE242     1
+
+/* 18f1220-style */
+#elif  defined(pic18f1220) || defined(pic18f1320)
+
+#define __SDCC_ADC_STYLE1220    1
+
+/* 18f2220-style, ordered by device family */
+#elif  defined(pic18f2220) || defined(pic18f2320) || defined(pic18f4220) || defined(pic18f4320) \
     || defined(pic18f2221) || defined(pic18f2321) || defined(pic18f4221) || defined(pic18f4321) \
     || defined(pic18f2410) || defined(pic18f2510) || defined(pic18f4410) || defined(pic18f4510) \
     || defined(pic18f2420) || defined(pic18f2520) || defined(pic18f4420) || defined(pic18f4520) \
@@ -70,33 +110,22 @@
     || defined(pic18f2585) || defined(pic18f2680) || defined(pic18f4585) || defined(pic18f4680) \
     || defined(pic18f2682) || defined(pic18f2685) || defined(pic18f4682) || defined(pic18f4685) \
     || defined(pic18f6520) || defined(pic18f6620) || defined(pic18f6720) \
-    || defined(pic18f8520) || defined(pic18f8620) || defined(pic18f8720) \
     || defined(pic18f6585) || defined(pic18f6680) || defined(pic18f8585) || defined(pic18f8680) \
-
-#define __SDCC_ADC_STYLE2455    1
-
-// 97j60 family
-#elif  defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
+    || defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
+    || defined(pic18f8520) || defined(pic18f8620) || defined(pic18f8720) \
     || defined(pic18f86j60) || defined(pic18f86j65) || defined(pic18f87j60) \
     || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60) \
 
-#define __SDCC_ADC_STYLE97J60   1
+#define __SDCC_ADC_STYLE2220    1
 
-// small ADC device?
-#elif  defined(pic18f242) || defined(pic18f252) || defined(pic18f442) || defined(pic18f452) \
-    || defined(pic18f248) || defined(pic18f258) || defined(pic18f448) || defined(pic18f458)
-
-#define __SDCC_ADC_STYLE242     1
-
-#else // unknown device
+#else /* unknown device */
 
 #error Device ADC style is unknown, please update your adc.h manually and/or inform the maintainer!
 
-#endif  // !large ADC device
+#endif
 
 
-/* channel selection */
-#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
+/* channel selection (CHS field in ADCON0) */
 #define ADC_CHN_0               0x00
 #define ADC_CHN_1               0x01
 #define ADC_CHN_2               0x02
@@ -110,47 +139,97 @@
 #define ADC_CHN_10              0x0a
 #define ADC_CHN_11              0x0b
 #define ADC_CHN_12              0x0c
-#if defined(__SDCC_ADC_STYLE97J60) // 97j60 family has 2 more ADC ports
 #define ADC_CHN_13              0x0d
 #define ADC_CHN_14              0x0e
 #define ADC_CHN_15              0x0f
-#endif
-
-#else   /* all other devices */
-
-#define ADC_CHN_1		0x00
-#define ADC_CHN_2		0x01
-#define ADC_CHN_3		0x03
-#define ADC_CHN_4		0x04
-#define ADC_CHN_5		0x05
-#define ADC_CHN_6		0x06
-#define ADC_CHN_7		0x07
-
-#endif  // ADC_STYLE
 
 
-/* reference and pin configuration */
-#if defined(__SDCC_ADC_STYLE2455) || defined(__SDCC_ADC_STYLE97J60)
+/* Port configuration (PCFG (and VCFG) field(s) in ADCON1) */
+#if defined(__SDCC_ADC_STYLE242)
 
-// 97j60 family has 2 more possible ADC configs
-#if defined(__SDCC_ADC_STYLE97J60) // 97j60 family has 2 more ADC ports
+#define ADC_CFG_8A_0R	0x00
+#define ADC_CFG_7A_1R	0x01
+#define ADC_CFG_5A_0R	0x02
+#define ADC_CFG_4A_1R	0x03
+#define ADC_CFG_3A_0R	0x04
+#define ADC_CFG_2A_1R	0x05
+#define ADC_CFG_0A_0R	0x06
+#define ADC_CFG_6A_2R	0x08
+#define ADC_CFG_6A_0R	0x09
+#define ADC_CFG_5A_1R	0x0a
+#define ADC_CFG_4A_2R	0x0b
+#define ADC_CFG_3A_2R	0x0c
+#define ADC_CFG_2A_2R	0x0d
+#define ADC_CFG_1A_0R	0x0e
+#define ADC_CFG_1A_2R	0x0f
+
+#elif defined(__SDCC_ADC_STYLE1220)
+
+/*
+ * These devices use a bitmask in ADCON1 to configure AN0..AN6
+ * as digital ports (bit set) or analog input (bit clear).
+ *
+ * These settings are selected based on their similarity with
+ * the 2220-style settings; 1220-style is more flexible, though.
+ *
+ * Reference voltages are configured via adc_open's config parameter
+ * using ADC_VCFG_*.
+ */
+
+#define ADC_CFG_6A      0x00
+#define ADC_CFG_5A      0x20
+#define ADC_CFG_4A      0x30
+#define ADC_CFG_3A      0x38
+#define ADC_CFG_2A      0x3c
+#define ADC_CFG_1A      0x3e
+#define ADC_CFG_0A      0x3f
+
+#elif defined(__SDCC_ADC_STYLE2220)
+
+/*
+ * The reference voltage configuration should be factored out into
+ * the config argument (ADC_VCFG_*) to adc_open to facilitate a
+ * merger with the 1220-style ADC.
+ */
+
+#define ADC_CFG_16A     0x00
+/* 15 analog ports cannot be configured! */
+#define ADC_CFG_14A     0x01
+#define ADC_CFG_13A     0x02
+#define ADC_CFG_12A     0x03
+#define ADC_CFG_11A     0x04
+#define ADC_CFG_10A     0x05
+#define ADC_CFG_9A      0x06
+#define ADC_CFG_8A      0x07
+#define ADC_CFG_7A      0x08
+#define ADC_CFG_6A      0x09
+#define ADC_CFG_5A      0x0a
+#define ADC_CFG_4A      0x0b
+#define ADC_CFG_3A      0x0c
+#define ADC_CFG_2A      0x0d
+#define ADC_CFG_1A      0x0e
+#define ADC_CFG_0A      0x0f
+
+/*
+ * For compatibility only: Combined port and reference voltage selection.
+ * Consider using ADC_CFG_nA and a separate ADC_VCFG_* instead!
+ */
+
 #define ADC_CFG_16A_0R  0x00
 #define ADC_CFG_16A_1R  0x10
 #define ADC_CFG_16A_2R  0x30
-#define ADC_CFG_15A_0R  0x00	// can switch only from 14 analog ports to 16 enabled analog ports
+
+/* Can only select 14 or 16 analog ports ... */
+#define ADC_CFG_15A_0R  0x00
 #define ADC_CFG_15A_1R  0x10
 #define ADC_CFG_15A_2R  0x30
+
 #define ADC_CFG_14A_0R  0x01
 #define ADC_CFG_14A_1R  0x11
 #define ADC_CFG_14A_2R  0x31
 #define ADC_CFG_13A_0R  0x02
 #define ADC_CFG_13A_1R  0x12
 #define ADC_CFG_13A_2R  0x32
-#else
-#define ADC_CFG_13A_0R  0x01
-#define ADC_CFG_13A_1R  0x11
-#define ADC_CFG_13A_2R  0x31
-#endif
 #define ADC_CFG_12A_0R  0x03
 #define ADC_CFG_12A_1R  0x13
 #define ADC_CFG_12A_2R  0x33
@@ -189,25 +268,13 @@
 #define ADC_CFG_01A_2R  0x3e
 #define ADC_CFG_00A_0R  0x0f
 
-#else   /* all other devices */
+#else   /* unhandled ADC style */
 
-#define ADC_CFG_8A_0R	0x00
-#define ADC_CFG_7A_1R	0x01
-#define ADC_CFG_5A_0R	0x02
-#define ADC_CFG_4A_1R	0x03
-#define ADC_CFG_3A_0R	0x04
-#define ADC_CFG_2A_1R	0x05
-#define ADC_CFG_0A_0R	0x06
-#define ADC_CFG_6A_2R	0x08
-#define ADC_CFG_6A_0R	0x09
-#define ADC_CFG_5A_1R	0x0a
-#define ADC_CFG_4A_2R	0x0b
-#define ADC_CFG_3A_2R	0x0c
-#define ADC_CFG_2A_2R	0x0d
-#define ADC_CFG_1A_0R	0x0e
-#define ADC_CFG_1A_2R	0x0f
+#error No supported ADC style selected.
 
-#endif // ADC_STYLE
+#endif  /* ADC_STYLE */
+
+
 
 /* initialize AD module */
 void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config);
@@ -225,7 +292,7 @@ char adc_busy(void) __naked;
 int adc_read(void) __naked;
 
 /* setup conversion channel */
-void adc_setchannel(unsigned char channel) __naked;
+void adc_setchannel(unsigned char channel);
 
 #endif
 

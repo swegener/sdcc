@@ -792,6 +792,7 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
       if (0 == SPEC_BLEN (lsym->etype))
         {
           /* bit-field structure member with a width of 0 */
+          lsym = lsym->next;
           break;
         }
       else if (!SPEC_BUNNAMED (lsym->etype))

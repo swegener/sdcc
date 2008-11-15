@@ -2,7 +2,9 @@
 
 	* src/pic16/glue.c, src/SDCC.y, src/SDCCast.c, src/SDCCglue.c,
 	  src/SDCCsymt.c, src/SDCCsymt.h:
-	  unnamed bitfields are not initialized (gcc, msvc comatibility)
+	  fixed RFE #2291335 : Unnamed bit-field initialization
+	* support/regression/tests/bitfields.c:
+	  added test case for RFE #2291335
 
 2008-11-11 Raphael Neider <rneider AT web.de>
 

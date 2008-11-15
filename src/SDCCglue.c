@@ -660,6 +660,7 @@ printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
       if (0 == SPEC_BLEN (lsym->etype))
         {
           /* bit-field structure member with a width of 0 */
+          lsym = lsym->next;
           break;
         }
       else if (!SPEC_BUNNAMED (lsym->etype))
@@ -744,9 +745,11 @@ printIvalStruct (symbol * sym, sym_link * type,
           if (IS_BITFIELD (sflds->type))
             printIvalBitFields(&sflds, &iloop, oBuf);
           else
-            printIval (sym, sflds->type, iloop, oBuf, 1);
-            sflds = sflds->next;
-            iloop = iloop ? iloop->next : NULL;
+            {
+              printIval (sym, sflds->type, iloop, oBuf, 1);
+              sflds = sflds->next;
+              iloop = iloop ? iloop->next : NULL;
+            }
         }
     }
 

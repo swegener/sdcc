@@ -774,9 +774,6 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * 
         {
           if (!size)
             {
-              werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-                "size should never be 0");
-
               /* we have not been given a size, but now we know it */
               size = strlen (SPEC_CVAL (val->etype).v_char) + 1;
               /* but first check, if it's a flexible array */

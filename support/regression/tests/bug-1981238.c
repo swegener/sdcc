@@ -16,12 +16,12 @@ code struct {
   char :0;
   int s:1;
   int t:7;
-} noPad = {1, 120, 1, 1, 127};
+} noPad = {1, 120, 1, 127};
 
 code struct {
   char  :0;
   char b;
-} initialNoPad[] = {{1, 2}, {3,4}};
+} initialNoPad[] = {{2}, {4}};
 
 void testBitfield (void)
 {

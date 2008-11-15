@@ -5,6 +5,8 @@
 	  fixed RFE #2291335 : Unnamed bit-field initialization
 	* support/regression/tests/bitfields.c:
 	  added test case for RFE #2291335
+	* support/regression/tests/bug-1981238.c:
+	  don't initialize unnamed bit-fields
 
 2008-11-11 Raphael Neider <rneider AT web.de>
 

@@ -1,3 +1,9 @@
+2008-11-15 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic16/glue.c, src/SDCC.y, src/SDCCast.c, src/SDCCglue.c,
+	  src/SDCCsymt.c, src/SDCCsymt.h:
+	  unnamed bitfields are not initialized (gcc, msvc comatibility)
+
 2008-11-11 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f25j10.h,
@@ -70,7 +76,7 @@
 
 	* src/SDCCmain.c: #fixed bug 2224960: sdcc -MM no working correctly
 	  pass system include paths with -isystem to sdcpp
-	* src/SDCCglue.c, src/pic/glue.c, src/pic16/glue.c: removed unneded
+	* src/SDCCglue.c, src/pic/glue.c, src/pic16/glue.c: removed unneeded
 	  functions (closePipes), (closeTmpFiles) and (rmTmpFiles)
 
 2008-11-02 Raphael Neider <rneider AT web.de>

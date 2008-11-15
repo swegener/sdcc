@@ -971,7 +971,7 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
 /* createIvalStruct - generates initial value for structures       */
 /*-----------------------------------------------------------------*/
 static ast *
-createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
+createIvalStruct (ast *sym, sym_link *type, initList *ilist, ast *rootValue)
 {
   ast *rast = NULL;
   ast *lAst;
@@ -979,7 +979,6 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
   initList *iloop;
   sym_link * etype = getSpec (type);
 
-  sflds = SPEC_STRUCT (type)->fields;
   if (ilist && ilist->type != INIT_DEEP)
     {
       werror (E_INIT_STRUCT, "");
@@ -988,20 +987,20 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
 
   iloop = ilist ? ilist->init.deep : NULL;
 
-  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL))
+  for (sflds = SPEC_STRUCT (type)->fields; sflds; sflds = sflds->next)
     {
       /* if we have come to end */
       if (!iloop && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
-        {
-          break;
-        }
+        break;
 
-      sflds->implicit = 1;
-      lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
-      lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
-      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type,
-                                                       iloop, rast, rootValue)),
-                           RESULT_TYPE_NONE);
+      if (!IS_BITFIELD (sflds->type) || !SPEC_BUNNAMED (sflds->etype))
+        {
+          sflds->implicit = 1;
+          lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
+          lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
+          rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast, rootValue)), RESULT_TYPE_NONE);
+          iloop = iloop ? iloop->next : NULL;
+        }
     }
 
   if (iloop)
@@ -1012,7 +1011,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
                   sym->opval.val->sym->name);
       else
         werrorfl (sym->filename, sym->lineno, E_INIT_COUNT);
-  }
+    }
 
   return rast;
 }

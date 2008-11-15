@@ -646,68 +646,65 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, struct dbuf_s * o
 /*-----------------------------------------------------------------*/
 /* printIvalBitFields - generate initializer for bitfields         */
 /*-----------------------------------------------------------------*/
-void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
+static void
+printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
 {
-  value *val ;
   symbol *lsym = *sym;
-  initList *lilist = *ilist ;
+  initList *lilist = *ilist;
   unsigned long ival = 0;
   int size = 0;
 
-  do
+  while (lsym)
     {
-      unsigned long i;
-      val = list2val (lilist);
-      if (size)
+
+      if (0 == SPEC_BLEN (lsym->etype))
         {
-          if (SPEC_BLEN (lsym->etype) > 8)
+          /* bit-field structure member with a width of 0 */
+          break;
+        }
+      else if (!SPEC_BUNNAMED (lsym->etype))
+        {
+          /* not an unnamed bit-field structure member */
+          value *val = list2val (lilist);
+          int bit_length = SPEC_BLEN (lsym->etype);
+
+          if (size)
             {
-              size += ((SPEC_BLEN (lsym->etype) / 8) +
-                       (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+              if (bit_length > 8)
+                size += (bit_length + 7) / 8;
             }
-        }
-      else
-        {
-          size = ((SPEC_BLEN (lsym->etype) / 8) +
-                  (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-        }
+          else
+            size = (bit_length + 7) / 8;
 
-      /* check if the literal value is within bounds */
-      if (val &&
-        checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL &&
-        !options.lessPedantic)
-        {
-          werror (W_LIT_OVERFLOW);
-        }
+          /* check if the literal value is within bounds */
+          if (val &&
+            checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL &&
+            !options.lessPedantic)
+            {
+              werror (W_LIT_OVERFLOW);
+            }
 
-      i = ulFromVal (val);
-      i &= (1 << SPEC_BLEN (lsym->etype)) - 1;
-      i <<= SPEC_BSTR (lsym->etype);
-      ival |= i;
-      if (!(lsym->next &&
-        (IS_BITFIELD (lsym->next->type)) &&
-        (SPEC_BSTR (lsym->next->etype))))
-        break;
+          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << SPEC_BSTR (lsym->etype);
+          lilist = lilist ? lilist->next : NULL;
+        }
       lsym = lsym->next;
-      lilist = lilist ? lilist->next : NULL;
     }
-  while (1);
 
   switch (size)
-  {
-  case 1:
-    dbuf_tprintf (oBuf, "\t!db !constbyte\n", ival);
-    break;
+    {
+    case 1:
+      dbuf_tprintf (oBuf, "\t!db !constbyte\n", ival);
+      break;
 
-  case 2:
-    dbuf_tprintf (oBuf, "\t!dw !constword\n", ival);
-    break;
+    case 2:
+      dbuf_tprintf (oBuf, "\t!dw !constword\n", ival);
+      break;
 
-  case 4:
-    dbuf_tprintf (oBuf, "\t!dw  !constword,!constword\n",
-      (ival >> 16) & 0xffff, (ival & 0xffff));
-    break;
-  }
+    case 4:
+      dbuf_tprintf (oBuf, "\t!dw  !constword,!constword\n",
+        (ival >> 16) & 0xffff, (ival & 0xffff));
+      break;
+    }
   *sym = lsym;
   *ilist = lilist;
 }
@@ -715,7 +712,7 @@ void printIvalBitFields(symbol **sym, initList **ilist, struct dbuf_s * oBuf)
 /*-----------------------------------------------------------------*/
 /* printIvalStruct - generates initial value for structures        */
 /*-----------------------------------------------------------------*/
-void
+static void
 printIvalStruct (symbol * sym, sym_link * type,
                  initList * ilist, struct dbuf_s * oBuf)
 {
@@ -724,31 +721,37 @@ printIvalStruct (symbol * sym, sym_link * type,
 
   sflds = SPEC_STRUCT (type)->fields;
 
-  if (ilist) {
-    if (ilist->type != INIT_DEEP) {
-      werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
-      return;
+  if (ilist)
+    {
+      if (ilist->type != INIT_DEEP)
+        {
+          werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
+          return;
+        }
+
+      iloop = ilist->init.deep;
     }
 
-    iloop = ilist->init.deep;
-  }
-
-  if (SPEC_STRUCT (type)->type == UNION) {
-    printIval (sym, sflds->type, iloop, oBuf, TRUE);
-    iloop = iloop ? iloop->next : NULL;
-  } else {
-    for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
-      if (IS_BITFIELD(sflds->type)) {
-        printIvalBitFields(&sflds, &iloop, oBuf);
-      } else {
-        printIval (sym, sflds->type, iloop, oBuf, TRUE);
-      }
+  if (SPEC_STRUCT (type)->type == UNION)
+    {
+      printIval (sym, sflds->type, iloop, oBuf, 1);
+      iloop = iloop ? iloop->next : NULL;
     }
-  }
-  if (iloop) {
+  else
+    {
+      while (sflds)
+        {
+          if (IS_BITFIELD (sflds->type))
+            printIvalBitFields(&sflds, &iloop, oBuf);
+          else
+            printIval (sym, sflds->type, iloop, oBuf, 1);
+            sflds = sflds->next;
+            iloop = iloop ? iloop->next : NULL;
+        }
+    }
+
+  if (iloop)
     werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
-  }
-  return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -768,6 +771,9 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * 
         {
           if (!size)
             {
+              werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                "size should never be 0");
+
               /* we have not been given a size, but now we know it */
               size = strlen (SPEC_CVAL (val->etype).v_char) + 1;
               /* but first check, if it's a flexible array */

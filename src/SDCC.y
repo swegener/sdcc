@@ -926,6 +926,7 @@ struct_declarator
                            if (!bitsize)
                              bitsize = BITVAR_PAD;
                            $$->bitVar = bitsize;
+                           $$->bitUnnamed = 1;
                         }
    | declarator ':' constant_expr
                         {

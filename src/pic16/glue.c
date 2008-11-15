@@ -773,14 +773,13 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 /* pic16_printIvalBitFields - generate initializer for bitfields   */
 /*-----------------------------------------------------------------*/
 static void
-pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
+pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
 {
-  value *val ;
   symbol *lsym = *sym;
-  initList *lilist = *ilist ;
+  initList *lilist = *ilist;
   unsigned long ival = 0;
+  int size = 0;
   unsigned long i;
-  int size =0;
 
 
 #if DEBUG_PRINTIVAL
@@ -788,31 +787,35 @@ pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *p)
 #endif
 
 
-  do {
-    val = list2val(lilist);
-    if (size) {
-      if (SPEC_BLEN(lsym->etype) > 8) {
-        size += ((SPEC_BLEN (lsym->etype) / 8) +
-                 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-      }
-    } else {
-      size = ((SPEC_BLEN (lsym->etype) / 8) +
-              (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-    }
-    i = (ulFromVal (val) & ((1ul << SPEC_BLEN (lsym->etype)) - 1ul));
-    i <<= SPEC_BSTR (lsym->etype);
-    ival |= i;
-    if (! ( lsym->next &&
-          (lilist && lilist->next) &&
-          (IS_BITFIELD(lsym->next->type)) &&
-          (SPEC_BSTR(lsym->next->etype)))) break;
-    lsym = lsym->next;
-    lilist = lilist->next;
-  } while (1);
+  while (lsym)
+    {
+      if (0 == SPEC_BLEN (lsym->etype))
+        {
+          /* bit-field structure member with a width of 0 */
+          break;
+        }
+      else if (!SPEC_BUNNAMED (lsym->etype))
+        {
+          /* not an unnamed bit-field structure member */
+          value *val = list2val (lilist);
+          int bit_length = SPEC_BLEN (lsym->etype);
 
-  for (i = 0; i < size; i++) {
-    pic16_emitDB(BYTE_IN_LONG(ival, i), ptype, p);
-  } // for
+          if (size)
+            {
+              if (bit_length > 8)
+                size += (bit_length + 7) / 8;
+            }
+          else
+            size = (bit_length + 7) / 8;
+
+          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << SPEC_BSTR (lsym->etype);
+          lilist = lilist->next;
+        }
+      lsym = lsym->next;
+    }
+
+  for (i = 0; i < size; i++)
+    pic16_emitDB (BYTE_IN_LONG (ival, i), ptype, p);
 
   *sym = lsym;
   *ilist = lilist;
@@ -836,27 +839,33 @@ pic16_printIvalStruct (symbol * sym, sym_link * type,
 
   sflds = SPEC_STRUCT (type)->fields;
 
-  if (ilist) {
-    if (ilist->type != INIT_DEEP) {
-      werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
-      return;
+  if (ilist)
+    {
+      if (ilist->type != INIT_DEEP)
+        {
+          werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
+          return;
+        }
+
+      iloop = ilist->init.deep;
     }
 
-    iloop = ilist->init.deep;
-  }
-
-  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
-//    fprintf(stderr, "%s:%d sflds: %p\tiloop = %p\n", __FILE__, __LINE__, sflds, iloop);
-    if (IS_BITFIELD(sflds->type)) {
-      pic16_printIvalBitFields(&sflds, &iloop, ptype, p);
-    } else {
-      pic16_printIval (sym, sflds->type, iloop, ptype, p);
+  while (sflds)
+    {
+//      fprintf(stderr, "%s:%d sflds: %p\tiloop = %p\n", __FILE__, __LINE__, sflds, iloop);
+      if (IS_BITFIELD (sflds->type))
+        {
+          pic16_printIvalBitFields (&sflds, &iloop, ptype, p);
+        }
+      else
+        {
+          pic16_printIval (sym, sflds->type, iloop, ptype, p);
+          sflds = sflds->next;
+          iloop = iloop ? iloop->next : NULL;
+        }
     }
-  }
-  if (iloop) {
+  if (iloop)
     werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
-  }
-  return;
 }
 
 /*-----------------------------------------------------------------*/

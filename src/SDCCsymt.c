@@ -1272,6 +1272,8 @@ compStructSize (int su, structdef * sdef)
     /* if this is a bit field  */
     if (loop->bitVar) {
 
+      SPEC_BUNNAMED (loop->etype) = loop->bitUnnamed;
+
       /* change it to a unsigned bit */
       SPEC_NOUN (loop->etype) = V_BITFIELD;
       /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */

@@ -104,7 +104,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.8.4
+SDCC 2.8.5
 \size footnotesize
 
 \newline
@@ -1174,6 +1174,93 @@ in versions older then 2.8.4 the pic16 *printf() and printf_tiny() library
  It can be enabled by defining BINARY_SPECIFIER macro in files device/lib/pic16/
 libc/stdio/vfprintf.c and device/lib/pic16/libc/stdio/printf_tiny.c and recompilin
 g the library.
+\end_layout
+
+\begin_layout Itemize
+in versions older then 2.8.5 the unnamed bitfield structure members participated
+ in initialization, which is not conforming with ISO/IEC 9899:1999 standard
+ (see section Section 6.7.8 Initialization, clause 9)
+\newline
+
+\newline
+Old behaviour, before
+ version 2.8.5:
+\family typewriter
+
+\newline
+\InsetSpace ~
+\InsetSpace ~
+struct {
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+int a : 2;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+char\InsetSpace ~
+ : 2;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+int b : 2;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+} s = {1, 2, 3};
+\family default
+
+\newline
+
+\family typewriter
+/* s.a = 1, s.b = 3 */
+\family default
+
+\newline
+
+\newline
+New behaviour:
+\family typewriter
+
+\newline
+\InsetSpace ~
+\InsetSpace ~
+struct {
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+int a : 2;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+char\InsetSpace ~
+ : 2;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+int b : 2;
+\newline
+\InsetSpace ~
+\InsetSpace ~
+} s = {1, 2};
+\family default
+
+\newline
+
+\family typewriter
+/* s.a = 1, s.b = 2 */
 \end_layout
 
 \begin_layout Section
@@ -26360,7 +26447,6 @@ status collapsed
 
 \begin_layout Standard
 
-\family typewriter
 
 \backslash
  

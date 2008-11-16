@@ -1183,7 +1183,7 @@ in versions older then 2.8.5 the unnamed bitfield structure members participated
 \newline
 
 \newline
-Old behaviour, before
+Old behavior, before
  version 2.8.5:
 \family typewriter
 
@@ -1225,7 +1225,7 @@ int b : 2;
 \newline
 
 \newline
-New behaviour:
+New behavior:
 \family typewriter
 
 \newline

@@ -108,9 +108,9 @@ SDCC 2.8.5
 \size footnotesize
 
 \newline
-$Date::            $ 
+$Date: 2008-11-16#$ 
 \newline
-$Revision$
+$Revision: 5272$
 \end_layout
 
 \begin_layout Standard
@@ -1159,11 +1159,70 @@ In previous versions, both forms would have toggled the bit.
 \end_layout
 
 \begin_layout Itemize
-in older versions, the preprocessor was always called with -std=c99 regardless
- of the --std-xxx setting.
+in older versions, the preprocessor was always called with 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset
+
+
+\series default
+ regardless of the 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-xxx
+\series default
+ setting.
  This is no longer true, and can cause compilation failures on code built
- with --std-c89 but using c99 preprocessor features, such as one-line (//)
- comments
+ with 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset
+
+
+\series default
+ but using c99 preprocessor features, such as one-line (//) comments
 \end_layout
 
 \begin_layout Itemize

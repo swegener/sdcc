@@ -1,3 +1,9 @@
+2008-11-19 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx:
+	  fixed 2314467: sdccman.lyx: fix "--" in command line parameters
+	  thanks Mauro Giachero
+
 2008-11-16 Borut Razem <borut.razem AT siol.net>
 
 	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.5

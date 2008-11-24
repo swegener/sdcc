@@ -1,3 +1,11 @@
+2008-11-24 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/main.c (_pic16_finaliseOptions): do not quote the
+	  argument of --asm= or --link= to allow for
+	  --asm="sh script --options", the user can double quote the
+	  argument if needed: --asm="'c:/program files/gpasm' -q",
+	  also fix some potential buffer overflows
+
 2008-11-19 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx:

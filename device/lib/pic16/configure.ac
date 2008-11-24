@@ -39,15 +39,15 @@ libdir=$libdir/pic16
 AC_SUBST(ARCH, [${ARCH:-18f452}])
 
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
-AC_SUBST(CC, [\"$abs_top_builddir/../../../bin/sdcc\"])
+AC_SUBST(CC, [\'$abs_top_builddir/../../../bin/sdcc\'])
 AC_SUBST(CFLAGS, ["-mpic16 -p$ARCH"])
 AC_PATH_PROG(CCAS, gpasm, :)
-AC_SUBST(CCAS, [\"$CCAS\"])
+AC_SUBST(CCAS, [\'$CCAS\'])
 AC_SUBST(CCASFLAGS, ["-p$ARCH"])
 AC_PATH_PROG(LD, gplink, :)
-AC_SUBST(LD, [\"$LD\"])
+AC_SUBST(LD, [\'$LD\'])
 AC_PATH_PROG(AR, gplib, :)
-AC_SUBST(AR, [\"$AR\"])
+AC_SUBST(AR, [\'$AR\'])
 AC_SUBST(ARFLAGS, [-c])
 
 # $RANLIB is called by the autotools but not provided nor required

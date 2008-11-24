@@ -762,46 +762,12 @@ _pic16_finaliseOptions (void)
 
   if (alt_asm && alt_asm[0] != '\0')
     {
-      size_t len = strlen(alt_asm);
-      char *cmd = malloc(len + 3);
-
-      if (0)
-        {
-          // fails for --asm="/bin/sh script.sh --options"
-          cmd[0] = '"';
-          memcpy(&cmd[1], alt_asm, len);
-          cmd[len + 1] = '"';
-          cmd[len + 2] = '\0';
-        }
-      else
-        {
-          // requires --asm="'my prog with spaces'"
-          memcpy(&cmd[0], alt_asm, len);
-          cmd[len] = 0;
-        }
-      pic16_asmCmd[0] = cmd;
+      pic16_asmCmd[0] = alt_asm;
     }
 
   if (alt_link && alt_link[0] != '\0')
     {
-      size_t len = strlen(alt_link);
-      char *cmd = malloc(len + 3);
-
-      if (0)
-        {
-          // fails for --link="/bin/sh script.sh --options"
-          cmd[0] = '"';
-          memcpy(&cmd[1], alt_link, len);
-          cmd[len + 1] = '"';
-          cmd[len + 2] = '\0';
-        }
-      else
-        {
-          // requires --link="'my prog with spaces'"
-          memcpy(&cmd[0], alt_link, len);
-          cmd[len] = 0;
-        }
-      pic16_linkCmd[0] = cmd;
+      pic16_linkCmd[0] = alt_link;
     }
 
   if (!pic16_options.no_crt)
@@ -814,7 +780,7 @@ _pic16_finaliseOptions (void)
     {
       addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_SMALL"));
     }
-  else if(options.model == MODEL_LARGE)
+  else if (options.model == MODEL_LARGE)
     {
       char buf[128];
 

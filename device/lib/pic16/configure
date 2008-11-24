@@ -2185,7 +2185,7 @@ ARCH=${ARCH:-18f452}
 
 
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
-CC=\"$abs_top_builddir/../../../bin/sdcc\"
+CC=\'$abs_top_builddir/../../../bin/sdcc\'
 
 CFLAGS="-mpic16 -p$ARCH"
 
@@ -2230,7 +2230,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-CCAS=\"$CCAS\"
+CCAS=\'$CCAS\'
 
 CCASFLAGS="-p$ARCH"
 
@@ -2275,7 +2275,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-LD=\"$LD\"
+LD=\'$LD\'
 
 # Extract the first word of "gplib", so it can be a program name with args.
 set dummy gplib; ac_word=$2
@@ -2318,7 +2318,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-AR=\"$AR\"
+AR=\'$AR\'
 
 ARFLAGS=-c
 

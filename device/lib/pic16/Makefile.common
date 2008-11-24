@@ -1,6 +1,6 @@
 AM_CFLAGS =
 AM_CFLAGS += --std-c99
-AM_CFLAGS += --asm=$(CCAS)
+AM_CFLAGS += --asm="$(CCAS)"
 AM_CFLAGS += -I.
 AM_CFLAGS += -I$(top_srcdir)/../../include/pic16
 AM_CFLAGS += -Wa,-q

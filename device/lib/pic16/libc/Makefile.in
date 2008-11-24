@@ -207,7 +207,7 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 #AM_CFLAGS += --debug-ralloc
 #AM_CFLAGS += --debug-xtra
 #AM_CFLAGS += --pcode-verbose
-AM_CFLAGS = --std-c99 --asm=$(CCAS) -I. \
+AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
 	-I$(top_srcdir)/../../include/pic16 -Wa,-q \
 	--fommit-frame-pointer --obanksel=9 --denable-peeps \
 	--optimize-cmp --optimize-df --i-code-in-asm

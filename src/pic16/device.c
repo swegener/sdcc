@@ -548,22 +548,25 @@ get_line (FILE *file)
 static char *
 strip_comment (char *line)
 {
-    char *l = line;
-    char c;
+  char *l = line;
+  char c;
 
-    if (!line) {
-        return (line);
+  if (!line)
+    {
+      return (line);
     } // if
 
-    while (0 != (c = *l)) {
-        if ('#' == c) {
-            *l = 0;
-            return (line);
+  while (0 != (c = *l))
+    {
+      if ('#' == c)
+        {
+          *l = 0;
+          return (line);
         } // if
-        l++;
+      l++;
     } // while
 
-    return (line);
+  return (line);
 }
 
 /**
@@ -589,192 +592,266 @@ strip_comment (char *line)
 static PIC16_device *
 pic16_find_device(const char *name)
 {
-    const char *path;
-    char buffer[PATH_MAX];
-    char *line, *key;
-    const char *sep = " \t\n\r";
-    FILE *f = NULL;
-    PIC16_device *d = NULL, *template;
-    PIC16_device *head = NULL, *tail = NULL;
-    set *_sets[] = { userIncDirsSet, includeDirsSet };
-    set **sets = &_sets[0];
-    int lineno = 0;
-    int res, i;
-    int val[3];
+  const char *path;
+  char buffer[PATH_MAX];
+  char *line, *key;
+  const char *sep = " \t\n\r";
+  FILE *f = NULL;
+  PIC16_device *d = NULL, *template;
+  PIC16_device *head = NULL, *tail = NULL;
+  set *_sets[] = { userIncDirsSet, includeDirsSet };
+  set **sets = &_sets[0];
+  int lineno = 0;
+  int res, i;
+  int val[4];
 
-    if (!devices) {
-        //printf("%s: searching %s\n", __func__, DEVICE_FILE_NAME);
+  if (!devices)
+    {
+      //printf("%s: searching %s\n", __func__, DEVICE_FILE_NAME);
 
-        // locate the specification file in the include search paths
-        for (i = 0; (NULL == f) && (i < 2); i++) {
-            for (path = setFirstItem(sets[i]);
-                    (NULL == f) && path;
-                    path = setNextItem(sets[i]))
+      // locate the specification file in the include search paths
+      for (i = 0; (NULL == f) && (i < 2); i++)
+        {
+          for (path = setFirstItem(sets[i]);
+               (NULL == f) && path;
+               path = setNextItem(sets[i]))
             {
-                SNPRINTF(&buffer[0], PATH_MAX, "%s%s%s",
-                        path, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
-                //printf("%s: checking %s\n", __func__, &buffer[0]);
-                f = fopen(&buffer[0], "r");
+              SNPRINTF(&buffer[0], PATH_MAX, "%s%s%s",
+                       path, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
+              //printf("%s: checking %s\n", __func__, &buffer[0]);
+              f = fopen(&buffer[0], "r");
             } // for
-        } // while
+        } // for
     } // if
 
-    if (devices) {
-        // list already set up, nothing to do
-    } else if (NULL == f) {
-        fprintf(stderr, "ERROR: device list %s not found, specify its path via -I<path>\n", DEVICE_FILE_NAME);
-        d = &default_device;
-    } else {
-        // parse the specification file and construct a linked list of
-        // supported devices
-        d = NULL;
-        while (NULL != (line = get_line(f))) {
-            strip_comment(line);
-            //printf("%s: read %s\n", __func__, line);
-            lineno++;
-            key = strtok(line, sep);
-            if (!key) {
-                // empty line---ignore
-            } else if (0 == strcmp(key, "name")) {
-                // name %<name>s
-                if (d) {
-                    if (tail) {
-                        tail->next = d;
-                    } else {
-                        head = d;
+  if (devices)
+    {
+      // list already set up, nothing to do
+    }
+  else if (NULL == f)
+    {
+      fprintf(stderr, "ERROR: device list %s not found, specify its path via -I<path>\n",
+              DEVICE_FILE_NAME);
+      d = &default_device;
+    }
+  else
+    {
+      // parse the specification file and construct a linked list of
+      // supported devices
+      d = NULL;
+      while (NULL != (line = get_line(f)))
+        {
+          strip_comment(line);
+          //printf("%s: read %s\n", __func__, line);
+          lineno++;
+          key = strtok(line, sep);
+          if (!key)
+            {
+              // empty line---ignore
+            }
+          else if (0 == strcmp(key, "name"))
+            {
+              // name %<name>s
+              if (d)
+                {
+                  if (tail)
+                    {
+                      tail->next = d;
+                    }
+                  else
+                    {
+                      head = d;
                     } // if
-                    tail = d;
-                    d = NULL;
+                  tail = d;
+                  d = NULL;
                 } // if
 
-                res = sscanf(&line[1+strlen(key)], " %16s", &buffer[3]);
-                if ((1 < res) || (3 > strlen(&buffer[3]))) {
-                    SYNTAX("<name> (e.g., 18f452) expected.");
-                } else {
-                    d = Safe_calloc(1, sizeof(PIC16_device));
+              res = sscanf(&line[1 + strlen(key)], " %16s", &buffer[3]);
+              if ((1 < res) || (3 > strlen(&buffer[3])))
+                {
+                  SYNTAX("<name> (e.g., 18f452) expected.");
+                }
+              else
+                {
+                  d = Safe_calloc(1, sizeof(PIC16_device));
 
-                    // { "p18f452", "18f452", "pic18f452", "f452" }
-                    buffer[0] = 'p';
-                    buffer[1] = 'i';
-                    buffer[2] = 'c';
-                    d->name[3] = Safe_strdup(&buffer[5]);
-                    d->name[2] = Safe_strdup(&buffer[0]);
-                    d->name[1] = Safe_strdup(&buffer[3]);
-                    buffer[2] = 'p';
-                    d->name[0] = Safe_strdup(&buffer[2]);
+                  // { "p18f452", "18f452", "pic18f452", "f452" }
+                  buffer[0] = 'p';
+                  buffer[1] = 'i';
+                  buffer[2] = 'c';
+                  d->name[3] = Safe_strdup(&buffer[5]);
+                  d->name[2] = Safe_strdup(&buffer[0]);
+                  d->name[1] = Safe_strdup(&buffer[3]);
+                  buffer[2] = 'p';
+                  d->name[0] = Safe_strdup(&buffer[2]);
                 } // if
-            } else if (0 == strcmp(key, "using")) {
-                // using %<name>s
-                res = sscanf(&line[1+strlen(key)], " %16s", &buffer[0]);
-                if ((1 < res) || (3 > strlen(&buffer[3]))) {
-                    SYNTAX("<name> (e.g., 18f452) expected.");
-                } else {
-                    template = find_in_list(&buffer[0], head);
-                    if (!template) {
-                        SYNTAX("<name> (e.g., 18f452) expected.");
-                    } else {
-                        memcpy(&d->RAMsize, &template->RAMsize,
-                                ((char *)&d->next) - ((char *)&d->RAMsize));
-                    } // if
-                } // if
-            } else if (0 == strcmp(key, "ramsize")) {
-                // ramsize %<bytes>i
-                res = sscanf(&line[1+strlen(key)], " %i", &val[0]);
-                if (res < 1) {
-                    SYNTAX("<bytes> (e.g., 256) expected.");
-                } else {
-                    d->RAMsize = val[0];
-                } // if
-            } else if (0 == strcmp(key, "split")) {
-                // split %<offset>i
-                res = sscanf(&line[1+strlen(key)], " %i", &val[0]);
-                if (res < 1) {
-                    SYNTAX("<offset> (e.g., 0x80) expected.");
-                } else {
-                    d->acsSplitOfs = val[0];
-                } // if
-            } else if (0 == strcmp(key, "configrange")) {
-                // configrange %<first>i %<last>i
-                res = sscanf(&line[1+strlen(key)], " %i %i",
-                        &val[0], &val[1]);
-                if (res < 2) {
-                    SYNTAX("<first> <last> (e.g., 0xf60 0xfff) expected.");
-                } else {
-                    d->cwInfo.confAddrStart = val[0];
-                    d->cwInfo.confAddrEnd = val[1];
-                } // if
-            } else if (0 == strcmp(key, "configword")) {
-                // configword %<address>i %<mask>i %<value>i
-                res = sscanf(&line[1+strlen(key)], " %i %i %i",
-                        &val[0], &val[1], &val[2]);
-                if (res < 3) {
-                    SYNTAX("<address> <mask> <value> (e.g., 0x200001 0x0f 0x07) expected.");
-                } else {
-                    val[0] -= d->cwInfo.confAddrStart;
-                    if ((val[0] < 0)
-                            || (val[0] > (d->cwInfo.confAddrEnd - d->cwInfo.confAddrStart))
-                            || (val[0] >= CONFIGURATION_WORDS))
+            }
+          else if (0 == strcmp(key, "using"))
+            {
+              // using %<name>s
+              res = sscanf(&line[1 + strlen(key)], " %16s", &buffer[0]);
+              if ((1 < res) || (3 > strlen(&buffer[3])))
+                {
+                  SYNTAX("<name> (e.g., 18f452) expected.");
+                }
+              else
+                {
+                  template = find_in_list(&buffer[0], head);
+                  if (!template)
                     {
-                        SYNTAX("address out of bounds.");
-                    } else {
-                        d->cwInfo.crInfo[val[0]].mask = val[1];
-                        d->cwInfo.crInfo[val[0]].value = val[2];
-                    } // if
-                } // if
-            } else if (0 == strcmp(key, "idlocrange")) {
-                // idlocrange %<first>i %<last>i
-                res = sscanf(&line[1+strlen(key)], " %i %i",
-                        &val[0], &val[1]);
-                if (res < 2) {
-                    SYNTAX("<first> <last> (e.g., 0xf60 0xfff) expected.");
-                } else {
-                    d->idInfo.idAddrStart = val[0];
-                    d->idInfo.idAddrEnd = val[1];
-                } // if
-            } else if (0 == strcmp(key, "idword")) {
-                // idword %<address>i %<value>i
-                res = sscanf(&line[1+strlen(key)], " %i %i",
-                        &val[0], &val[1]);
-                if (res < 2) {
-                    SYNTAX("<address> <value> (e.g., 0x3fffff 0x00) expected.");
-                } else {
-                    val[0] -= d->idInfo.idAddrStart;
-                    if ((val[0] < 0)
-                            || (val[0] > (d->idInfo.idAddrEnd - d->idInfo.idAddrStart))
-                            || (val[0] >= IDLOCATION_BYTES))
+                      SYNTAX("<name> (e.g., 18f452) expected.");
+                    }
+                  else
                     {
-                        SYNTAX("address out of bounds.");
-                    } else {
-                        d->idInfo.irInfo[val[0]].value = val[1];
+                      memcpy(&d->RAMsize, &template->RAMsize,
+                             ((char *)&d->next) - ((char *)&d->RAMsize));
                     } // if
                 } // if
-            } else {
-                printf("%s: Invalid keyword in %s ignored: %s\n",
-                  __func__, DEVICE_FILE_NAME, key);
+            }
+          else if (0 == strcmp(key, "ramsize"))
+            {
+              // ramsize %<bytes>i
+              res = sscanf(&line[1 + strlen(key)], " %i", &val[0]);
+              if (res < 1)
+                {
+                  SYNTAX("<bytes> (e.g., 256) expected.");
+                }
+              else
+                {
+                  d->RAMsize = val[0];
+                } // if
+            }
+          else if (0 == strcmp(key, "split"))
+            {
+              // split %<offset>i
+              res = sscanf(&line[1 + strlen(key)], " %i", &val[0]);
+              if (res < 1)
+                {
+                  SYNTAX("<offset> (e.g., 0x80) expected.");
+                }
+              else
+                {
+                  d->acsSplitOfs = val[0];
+                } // if
+            }
+          else if (0 == strcmp(key, "configrange"))
+            {
+              // configrange %<first>i %<last>i
+              res = sscanf(&line[1 + strlen(key)], " %i %i",
+                           &val[0], &val[1]);
+              if (res < 2)
+                {
+                  SYNTAX("<first> <last> (e.g., 0xf60 0xfff) expected.");
+                }
+              else
+                {
+                  d->cwInfo.confAddrStart = val[0];
+                  d->cwInfo.confAddrEnd = val[1];
+                } // if
+            }
+          else if (0 == strcmp(key, "configword"))
+            {
+              // configword %<address>i %<mask>i %<value>i [%<and-mask>i]
+              res = sscanf(&line[1 + strlen(key)], " %i %i %i %i",
+                           &val[0], &val[1], &val[2], &val[3]);
+              if (res < 3)
+                {
+                  SYNTAX("<address> <mask> <value> [<and-mask>] (e.g., 0x200001 0x0f 0x07) expected.");
+                }
+              else
+                {
+                  val[0] -= d->cwInfo.confAddrStart;
+                  if ((val[0] < 0)
+                      || (val[0] > (d->cwInfo.confAddrEnd - d->cwInfo.confAddrStart))
+                      || (val[0] >= CONFIGURATION_WORDS))
+                    {
+                      SYNTAX("address out of bounds.");
+                    }
+                  else
+                    {
+                      d->cwInfo.crInfo[val[0]].mask = val[1];
+                      d->cwInfo.crInfo[val[0]].value = val[2];
+                      d->cwInfo.crInfo[val[0]].andmask = 0;
+                      if (res >= 4)
+                        {
+                          // apply extra mask (e.g., to disable XINST)
+                          d->cwInfo.crInfo[val[0]].andmask = val[3];
+                        } // if
+                    } // if
+                } // if
+            }
+          else if (0 == strcmp(key, "idlocrange"))
+            {
+              // idlocrange %<first>i %<last>i
+              res = sscanf(&line[1 + strlen(key)], " %i %i",
+                           &val[0], &val[1]);
+              if (res < 2)
+                {
+                  SYNTAX("<first> <last> (e.g., 0xf60 0xfff) expected.");
+                }
+              else
+                {
+                  d->idInfo.idAddrStart = val[0];
+                  d->idInfo.idAddrEnd = val[1];
+                } // if
+            }
+          else if (0 == strcmp(key, "idword"))
+            {
+              // idword %<address>i %<value>i
+              res = sscanf(&line[1 + strlen(key)], " %i %i",
+                           &val[0], &val[1]);
+              if (res < 2)
+                {
+                  SYNTAX("<address> <value> (e.g., 0x3fffff 0x00) expected.");
+                }
+              else
+                {
+                  val[0] -= d->idInfo.idAddrStart;
+                  if ((val[0] < 0)
+                      || (val[0] > (d->idInfo.idAddrEnd - d->idInfo.idAddrStart))
+                      || (val[0] >= IDLOCATION_BYTES))
+                    {
+                      SYNTAX("address out of bounds.");
+                    }
+                  else
+                    {
+                      d->idInfo.irInfo[val[0]].value = val[1];
+                    } // if
+                } // if
+            }
+          else
+            {
+              printf("%s: Invalid keyword in %s ignored: %s\n",
+                     __func__, DEVICE_FILE_NAME, key);
             } // if
         } // while
 
-        if (d) {
-            if (tail) {
-                tail->next = d;
-            } else {
-                head = d;
+      if (d)
+        {
+          if (tail)
+            {
+              tail->next = d;
+            }
+          else
+            {
+              head = d;
             } // if
-            tail = d;
-            d = NULL;
+          tail = d;
+          d = NULL;
         } // if
 
-        devices = head;
+      devices = head;
 
-        fclose(f);
+      fclose(f);
     } // if
 
-    d = find_in_list(name, devices);
-    if (!d) {
-        d = &default_device;
+  d = find_in_list(name, devices);
+  if (!d)
+    {
+      d = &default_device;
     } // if
 
-    return (d);
+  return (d);
 }
 
 /*-----------------------------------------------------------------*
@@ -987,45 +1064,65 @@ void pic16_groupRegistersInSection(set *regset)
  * This routine will assign a value to that address.
  *
  *-----------------------------------------------------------------*/
-void pic16_assignConfigWordValue(int address, unsigned int value)
+void
+pic16_assignConfigWordValue(int address, unsigned int value)
 {
   int i;
 
-        for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart+1;i++) {
-                if((address == pic16->cwInfo.confAddrStart+i)
-                  && (pic16->cwInfo.crInfo[i].mask != -1)
-                  && (pic16->cwInfo.crInfo[i].mask != 0)) {
+  for (i = 0; i < pic16->cwInfo.confAddrEnd - pic16->cwInfo.confAddrStart + 1; i++)
+    {
+      if ((address == pic16->cwInfo.confAddrStart + i)
+          && (pic16->cwInfo.crInfo[i].mask != -1)
+          && (pic16->cwInfo.crInfo[i].mask != 0))
+        {
 
 #if 0
-                        fprintf(stderr, "setting location 0x%X to value 0x%x\tmask: 0x%x\ttest: 0x%x\n",
-                                /*address*/ pic16->cwInfo.confAddrStart+i, (~value)&0xff,
-                                        pic16->cwInfo.crInfo[i].mask,
-                                        (pic16->cwInfo.crInfo[i].mask) & (~value));
+          fprintf(stderr, "setting location 0x%x to value 0x%x, mask: 0x%x, test: 0x%x\n",
+                  pic16->cwInfo.confAddrStart + i,
+                  (~value) & 0xff,
+                  pic16->cwInfo.crInfo[i].mask,
+                  (pic16->cwInfo.crInfo[i].mask) & (~value));
 #endif
 
 #if 0
-                        if((((pic16->cwInfo.crInfo[i].mask) & (~value))&0xff) != ((~value)&0xff)) {
-                                fprintf(stderr, "%s:%d a wrong value has been given for configuration register 0x%x\n",
-                                        __FILE__, __LINE__, address);
-                                        return;
-                        }
+          if ((((pic16->cwInfo.crInfo[i].mask) & (~value)) & 0xff) != ((~value) & 0xff))
+            {
+              fprintf(stderr, "%s:%d a wrong value has been given for configuration register 0x%x\n",
+                      __FILE__, __LINE__, address);
+              return;
+            } // if
 #endif
 
-                        pic16->cwInfo.crInfo[i].value = value;
-                        pic16->cwInfo.crInfo[i].emit = 1;
-                        return;
-                }
-        }
+          pic16->cwInfo.crInfo[i].value = (value & 0xff);
+          if (pic16->cwInfo.crInfo[i].andmask
+              && ((value & 0xff) != (value & 0xff & pic16->cwInfo.crInfo[i].andmask)))
+            {
+              // apply andmask if effective
+              printf ("INFO: changing configuration word at 0x%x from 0x%x to 0x%x due to %s\n",
+                      address,
+                      (value & 0xff),
+                      (value & 0xff & pic16->cwInfo.crInfo[i].andmask),
+                      DEVICE_FILE_NAME);
+              pic16->cwInfo.crInfo[i].value &= pic16->cwInfo.crInfo[i].andmask;
+            } // if
+          pic16->cwInfo.crInfo[i].emit = 1;
+          return;
+        } // if
+    } // for
 }
 
-void pic16_assignIdByteValue(int address, char value)
+void
+pic16_assignIdByteValue(int address, char value)
 {
   int i;
 
-        for(i=0;i<pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart+1;i++) {
-                if(address == pic16->idInfo.idAddrStart+i) {
-                        pic16->idInfo.irInfo[i].value = value;
-                        pic16->idInfo.irInfo[i].emit = 1;
-                }
-        }
+  for (i = 0; i < pic16->idInfo.idAddrEnd - pic16->idInfo.idAddrStart + 1; i++)
+    {
+      if (address == pic16->idInfo.idAddrStart + i)
+        {
+          pic16->idInfo.irInfo[i].value = value;
+          pic16->idInfo.irInfo[i].emit = 1;
+        } // if
+    } // for
 }
+

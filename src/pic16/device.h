@@ -30,30 +30,31 @@
 #ifndef  __DEVICE_H__
 #define  __DEVICE_H__
 
-#define CONFIGURATION_WORDS	20
-#define IDLOCATION_BYTES	20
+#define CONFIGURATION_WORDS     20
+#define IDLOCATION_BYTES        20
 
 typedef struct {
-	unsigned int mask;
-	int emit;
-	unsigned int value;
+  unsigned int mask;
+  int emit;
+  unsigned int value;
+  unsigned int andmask;
 } configRegInfo_t;
 
 typedef struct {
-	int confAddrStart;	/* starting address */
-	int confAddrEnd;	/* ending address */
-	configRegInfo_t crInfo[ CONFIGURATION_WORDS ];
+  int confAddrStart;      /* starting address */
+  int confAddrEnd;        /* ending address */
+  configRegInfo_t crInfo[ CONFIGURATION_WORDS ];
 } configWordsInfo_t;
 
 typedef struct {
-	unsigned char emit;
-	unsigned char value;
+  unsigned char emit;
+  unsigned char value;
 } idRegInfo_t;
 
 typedef struct {
-	int idAddrStart;	/* starting ID address */
-	int idAddrEnd;		/* ending ID address */
-	idRegInfo_t irInfo[ IDLOCATION_BYTES ];
+  int idAddrStart;        /* starting ID address */
+  int idAddrEnd;          /* ending ID address */
+  idRegInfo_t irInfo[ IDLOCATION_BYTES ];
 } idBytesInfo_t;
 
 
@@ -62,10 +63,10 @@ typedef struct {
 typedef struct PIC16_device {
   char *name[PROCESSOR_NAMES];  /* aliases for the processor name */
   /* RAMsize *must* be the first item to copy for 'using' */
-  int RAMsize;			/* size of Data RAM - VR 031120 */
-  int acsSplitOfs;		/* access bank split offset */
-  configWordsInfo_t cwInfo;	/* configuration words info */
-  idBytesInfo_t idInfo;		/* ID Locations info */
+  int RAMsize;                  /* size of Data RAM - VR 031120 */
+  int acsSplitOfs;              /* access bank split offset */
+  configWordsInfo_t cwInfo;     /* configuration words info */
+  idBytesInfo_t idInfo;         /* ID Locations info */
   /* next *must* be the first field NOT being copied via 'using' */
   struct PIC16_device *next;    /* linked list */
 } PIC16_device;
@@ -75,10 +76,10 @@ extern PIC16_device *pic16;
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
 
-#define OF_LR_SUPPORT		0x00000001
-#define OF_NO_OPTIMIZE_GOTO	0x00000002
-#define OF_OPTIMIZE_CMP		0x00000004
-#define OF_OPTIMIZE_DF		0x00000008
+#define OF_LR_SUPPORT           0x00000001
+#define OF_NO_OPTIMIZE_GOTO     0x00000002
+#define OF_OPTIMIZE_CMP         0x00000004
+#define OF_OPTIMIZE_DF          0x00000008
 
 typedef struct {
   int no_banksel;
@@ -101,8 +102,8 @@ typedef struct {
 
 extern pic16_options_t pic16_options;
 
-#define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
-#define STACK_MODEL_LARGE	(pic16_options.stack_model == 1)
+#define STACK_MODEL_SMALL       (pic16_options.stack_model == 0)
+#define STACK_MODEL_LARGE       (pic16_options.stack_model == 1)
 
 extern set *fix_idataSymSet;
 extern set *rel_idataSymSet;

@@ -1,3 +1,11 @@
+2008-11-25 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic16devices.txt,
+	  sdcc/src/pic16/device.c,
+	  sdcc/src/pic16/device.h: implicitly disable XINST
+	  whenever CONFIG4L is set via an additional optional
+	  argument to the configword directive in pic16devices.txt
+
 2008-11-24 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/configure.ac,

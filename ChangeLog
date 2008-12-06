@@ -1,3 +1,8 @@
+2008-12-07 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/glue.c (pic16_printIvalBitFields): prevent
+	  NULL pointer dereference, closes #2366757
+
 2008-11-25 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic16devices.txt,

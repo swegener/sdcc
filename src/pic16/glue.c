@@ -810,7 +810,7 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
             size = (bit_length + 7) / 8;
 
           ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << SPEC_BSTR (lsym->etype);
-          lilist = lilist->next;
+          lilist = (lilist ? lilist->next : NULL);
         }
       lsym = lsym->next;
     }

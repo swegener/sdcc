@@ -420,3 +420,11 @@ __test2291335(void)
   ASSERT(ls2291335_2.a == 1);
   ASSERT(ls2291335_2.b == 2);
 }
+
+/* test case for bug #2366757: segfault when initializing structure with bitfield */
+
+struct
+{
+  char a : 1;
+  char b : 1;
+} s2366757 = {0};

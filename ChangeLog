@@ -1,3 +1,8 @@
+2008-12-14 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx, cdbfileformat.lyx, test_suite_spec.lyx:
+	  converted to LyX 1.5.7 (\lyxformat 276) format
+
 2008-12-07 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bitfields.c:

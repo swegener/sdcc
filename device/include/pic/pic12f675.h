@@ -662,6 +662,30 @@ extern volatile __T1CON_bits_t __at(T1CON_ADDR) T1CON_bits;
 #define TMR1GE               T1CON_bits.TMR1GE
 #endif /* NO_BIT_DEFINES */
 
+// ----- TRISIO bits -------------------
+typedef union {
+  struct {
+    unsigned char TRISIO0:1;
+    unsigned char TRISIO1:1;
+    unsigned char TRISIO2:1;
+    unsigned char TRISIO3:1;
+    unsigned char TRISIO4:1;
+    unsigned char TRISIO5:1;
+    unsigned char :1;
+    unsigned char :1;
+  };
+} __TRISIO_bits_t;
+extern volatile __TRISIO_bits_t __at(TRISIO_ADDR) TRISIO_bits;
+
+#ifndef NO_BIT_DEFINES
+#define TRISIO0                TRISIO_bits.TRISIO0
+#define TRISIO1                TRISIO_bits.TRISIO1
+#define TRISIO2                TRISIO_bits.TRISIO2
+#define TRISIO3                TRISIO_bits.TRISIO3
+#define TRISIO4                TRISIO_bits.TRISIO4
+#define TRISIO5                TRISIO_bits.TRISIO5
+#endif /* NO_BIT_DEFINES */
+
 // ----- VRCON bits --------------------
 typedef union {
   struct {

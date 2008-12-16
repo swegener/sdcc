@@ -1,3 +1,10 @@
+2008-12-16 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic12f629.h,
+	  device/include/pic/pic12f675.h,
+	  device/lib/pic/libdev/pic12f629.c,
+	  device/lib/pic/libdev/pic12f675.c: consolidated, added TRISIO bits
+
 2008-12-14 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx, cdbfileformat.lyx, test_suite_spec.lyx:

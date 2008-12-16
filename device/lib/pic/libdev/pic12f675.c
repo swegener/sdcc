@@ -55,5 +55,6 @@ volatile __PIE1_bits_t __at(PIE1_ADDR) PIE1_bits;
 volatile __PIR1_bits_t __at(PIR1_ADDR) PIR1_bits;
 volatile __STATUS_bits_t __at(STATUS_ADDR) STATUS_bits;
 volatile __T1CON_bits_t __at(T1CON_ADDR) T1CON_bits;
+volatile __TRISIO_bits_t __at(TRISIO_ADDR) TRISIO_bits;
 volatile __VRCON_bits_t __at(VRCON_ADDR) VRCON_bits;
 

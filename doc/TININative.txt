@@ -115,7 +115,7 @@ As mentioned earlier the Native APIs are implemented using compiler intrinsic fu
 time only the following functions have been mapped (more will be mapped in the future). Some
 Native API calls return multiple values, I haven't found a good way to handle this yet, in most
 cases these return a HANDLE and a pointer to ABSOLUTE memory in DPTR, in such cases SDCC will
-return ONLY the HANDLE and igonre the POINTER value. The HANDLE can then be used with MM_Deref to
+return ONLY the HANDLE and ignore the POINTER value. The HANDLE can then be used with MM_Deref to
 obtain the POINTER value again (I hope my assumption is correct here).
 
 SDCC Prototype					   Native API

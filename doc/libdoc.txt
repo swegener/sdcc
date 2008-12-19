@@ -361,12 +361,12 @@ strncmp - string manipulation - #include <string.h> - all ports
 
 strchr - string manipulation - #include <string.h> - all ports
 	char *strchr (char * string, char ch);
-	Return a pointer to the first occurance of the character ch is string
+	Return a pointer to the first occurrence of the character ch is string
 	or a NULL pointer if not found.
 
 strrchr - string manipulation - #include <string.h> - all ports
 	char *strrchr(char * string, char ch);
-	Return a pointer to the last occurance of the character ch is string
+	Return a pointer to the last occurrence of the character ch is string
 	or a NULL pointer if not found.
 
 strspn - string manipulation - #include <string.h> - all ports

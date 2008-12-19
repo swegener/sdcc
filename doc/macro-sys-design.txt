@@ -8,7 +8,7 @@ GB IAR or rgbds assemblers.
 simple level from one backend, such as the gbz80 and z80.
 3.  Provide a way to dynamically build a command line for any spawned
 processes.
-4.  Provide a way for the backend to convientely access volatile global data
+4.  Provide a way for the backend to conveniently access volatile global data
 such as the source file name or current function name.  This is mainly
 to get around assembler limitations.
 

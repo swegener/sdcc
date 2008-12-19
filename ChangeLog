@@ -1,3 +1,11 @@
+2008-12-19 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx, doc/random-notes.txt, doc/avr/avr_design.txt,
+	  doc/TININative.txt, doc/macro-sys-design.txt, doc/libdoc.txt,
+	  doc/README.txt, doc/test_suite_spec.lyx:
+	  applaid patch 2446381: Dcoumentation spelling correcitons
+	  thanks to Steven Borley
+
 2008-12-16 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic12f629.h,

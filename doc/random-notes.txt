@@ -8,7 +8,7 @@ Lets trace how the register allocator in the mcs51 port works.
 
 Some concepts:
 eBBlock
-	A basic block.  I cant remeber the conditions, but a basic block
+	A basic block.  I can't remember the conditions, but a basic block
 is one that is easy to optimise and analyse.  I guess this means that it has
 a nice set of assignments and a reasonably straight flow.
 iCode
@@ -33,14 +33,14 @@ In pseudo code,
        Remove any unneded iTemps that are just used in assignments.
        Mark anything that can be rematerialised as rematerialisable.
 	   There is no way I spelt that correctly.  Something is rematerialisable
-	   if it can be generated easily and is constant, and hence dosnt need
+	   if it can be generated easily and is constant, and hence dosn't need
 	   to be cached away in an iTemp.  An example is the address of something.
-       Packs iTemps that are only used once into normally unavailble registers.
+       Packs iTemps that are only used once into normally unavailable registers.
     Register packing removes unneeded iTemps.
-2.  Determine what number and type of regsiters are needed for each
+2.  Determine what number and type of registers are needed for each
     live range.
     It does
-       If the iTemp lives for zero time, dont bother assigning
+       If the iTemp lives for zero time, don't bother assigning
        If its not an iTemp, skip for now.
        If its a conditional (determined in the register packing), skip as it will
        be stored in carry.
@@ -103,7 +103,7 @@ iCode.
                   iCode when this icode is allocated.
 
         ->seq  - sequence number of the iCode given in
-	         acesnding order of execution.
+	         ascending order of execution.
 
 operand.
 -------
@@ -180,7 +180,7 @@ It seems that IS_SPEC() is being set, deferencing *s so that it's size
 is sizeof(char) == 1.  It's either a SPECIFIER or a DECLARATOR - seems that
 were the wrong way around.  This is set in SDCCsymt.c, SDCCval.c, and the 
 yacc file. SDCCsymt.c and SDCCval.c havnt really changed in 5 days - must
-be SDCC.y.  Nope, no changes.  diff against 5 days ago shows only intersting
+be SDCC.y.  Nope, no changes.  diff against 5 days ago shows only interesting
 changes are in SDCCicode.  Same with -14 days.
 
 Michael

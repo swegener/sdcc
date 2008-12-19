@@ -66,7 +66,7 @@ with 8 bit stack pointers.
 IV) Register Usage
 ------------------
 
-R0-R7      -  Paramter passing & return value (differs from IAR I don't
+R0-R7      -  Parameter passing & return value (differs from IAR I don't
 	      like IAR's usage of R16-R23, specially since R0-R1 has
 	      to be kept free anyway for divide & multiply operations)
 R8-R25     -  General purpose registers for local variables.
@@ -78,8 +78,8 @@ V) Parameter passing & return values
 ------------------------------------
 Registers R0-R7 (eight) registers will be used for parameter passing.
 Unlike the 8051 port the AVR port will pass the first eight bytes of
-parameters in a registers (8051 passes only yhe first parameter in
-registers), the exception being.. part of a paramter will not be put
+parameters in a registers (8051 passes only the first parameter in
+registers), the exception being.. part of a parameter will not be put
 into registers.
 
 Examples

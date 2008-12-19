@@ -93,7 +93,7 @@ Architecture specific stuff (like memory models, code examples) should maybe
 \end_layout
 
 \begin_layout Standard
-into seperate sections/chapters/appendices (it is hard to document PIC or
+into separate sections/chapters/appendices (it is hard to document PIC or
  Z80 in 
 \end_layout
 
@@ -7073,8 +7073,8 @@ name "-\\/-debug"
  file as well.
  The library files created with sdcclib are plain text files, so they can
  be viewed with a text editor.
- It is not recomended to modify a library file created with sdcclib using
- a text editor, as there are file indexes numbers located accross the file
+ It is not recommended to modify a library file created with sdcclib using
+ a text editor, as there are file indexes numbers located across the file
  used by the linker to quickly locate the required module to link.
  Once a .rel file (as well as a .adb file) is added to a library using sdcclib,
  it can be safely deleted, since all the information required for linking
@@ -14700,7 +14700,7 @@ name "Storage class"
 
 \end_inset
 
- is specified for a local variable, it will NOT be overlayed.
+ is specified for a local variable, it will NOT be overlaid.
 \end_layout
 
 \begin_layout Standard
@@ -14751,7 +14751,7 @@ name "Division"
 
 \end_inset
 
- will NOT be overlayed since these are implemented using external functions,
+ will NOT be overlaid since these are implemented using external functions,
  e.g.:
 \end_layout
 
@@ -14832,7 +14832,7 @@ nooverlay was
  from an interrupt service routine.
  The #pragma\InsetSpace ~
 nooverlay ensures that the parameters and local variables for
- the function are NOT overlayed.
+ the function are NOT overlaid.
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -15977,7 +15977,7 @@ EA = EA_SAVE;
 \end_layout
 
 \begin_layout Standard
-On other architectures which have seperate opcodes for enabling and disabling
+On other architectures which have separate opcodes for enabling and disabling
  interrupts you might want to make use of defines with inline assembly
 \begin_inset LatexCommand index
 name "Assembler routines"
@@ -17439,7 +17439,7 @@ target "http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/lib/mcs51/
 
  crtstart.asm
 \emph default
- and when linking your project explicitely specify 
+ and when linking your project explicitly specify 
 \emph on
 crtstart.rel
 \emph default
@@ -23117,7 +23117,7 @@ name "interrupt vector table"
  manually, or when there is a secondary, manually defined interrupt vector
  table (e.g.
  for the autovector feature of the Cypress EZ-USB FX2).
- More elegantly this can be achieved by obmitting the optional interrupt
+ More elegantly this can be achieved by omitting the optional interrupt
  number after the interrupt keyword, see section 
 \begin_inset LatexCommand ref
 reference "sub:Interrupt-Service-Routines"
@@ -23501,8 +23501,8 @@ name "\\#pragma preproc\\_asm"
 
  (+ | -) - switch _asm _endasm block preprocessing on / off.
  Default is on.
- You use this prama to define multilines of assembly code.
- This will prevent the preprocessor from changing the formating required
+ You use this pragma to define multilines of assembly code.
+ This will prevent the preprocessor from changing the formatting required
  by assembly code.
  Below is an example on how to use this pragma.
 \end_layout
@@ -24704,7 +24704,7 @@ Normally all functions you write end up in
 
 \begin_layout Standard
 Functions that need to be in a switched bank must be put in a named segment.
- The name can be mostly anything upto eight characters (e.g.
+ The name can be mostly anything up to eight characters (e.g.
  BANK1).
  To do this you either use -
 \begin_inset ERT
@@ -25040,7 +25040,7 @@ Make local functions static, as non static functions require code page selection
 \newline
 Due to the way sdcc handles functions, place called functions prior
  to calling functions in the file wherever possible: Otherwise sdcc will
- insert unneccessary pagesel directives around the call, believing that
+ insert unnecessary pagesel directives around the call, believing that
  the called function is externally defined.
 \end_layout
 
@@ -25479,7 +25479,7 @@ device/lib/pic/Makefile.in
 device/lib/pic/Makefile
 \family default
  to reflect your device.
- This might even improve performance for smaller devices as unneccesary
+ This might even improve performance for smaller devices as unnecessary
  BANKSELs might be removed.
 \end_layout
 
@@ -25719,7 +25719,7 @@ status collapsed
 
 \end_inset
 
--pstack-model=[model] Used in conjuction with the command above.
+-pstack-model=[model] Used in conjunction with the command above.
  Defines the stack model to be used, valid stack models are:
 \end_layout
 
@@ -26172,11 +26172,11 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Enviroment Variables
+Environment Variables
 \end_layout
 
 \begin_layout Standard
-There is a number of enviromental variables that can be used when running
+There is a number of environmental variables that can be used when running
  SDCC to enable certain optimizations or force a specific program behaviour.
  these variables are primarily for debugging purposes so they can be enabled/dis
 abled at will.
@@ -27002,7 +27002,7 @@ libdebug
 
 \begin_layout Standard
 \noindent
-This feature allows for linking with specific libraries withoug having to
+This feature allows for linking with specific libraries without having to
  explicit name them in the command line.
  Note that the 
 \noun on
@@ -28272,7 +28272,7 @@ instruction at the
 \emph on
 Interrupt Vector Address
 \emph default
- which points at the genetated ISR.
+ which points at the generated ISR.
  This single GOTO instruction is part of an automatically generated 
 \emph on
 interrupt entry point
@@ -28290,7 +28290,7 @@ not
  Address of the specific interrupt.
  This is not a problem for the LOW priority interrupts, but it is a problem
  for the RESET and the HIGH priority interrupts because code may be written
- at the next interrupt's vector address and cause undeterminate program
+ at the next interrupt's vector address and cause indeterminate program
  behaviour if that interrupt is raised.
 \begin_inset Foot
 status open
@@ -29209,7 +29209,7 @@ For sprintf and vsprintf
 buf
 \emph default
  should normally be a data pointer where the resulting string will be placed.
- No range checking is done so the user should allocate the necessery buffer.
+ No range checking is done so the user should allocate the necessary buffer.
  For fprintf and vfprintf 
 \emph on
 fp
@@ -29268,7 +29268,7 @@ signal name
 \begin_inset Text
 
 \begin_layout Standard
-descritpion
+description
 \end_layout
 
 \end_inset
@@ -30778,9 +30778,9 @@ ddd -debugger "sdcdb -cpu 8032 ddd_example"
 status open
 
 \begin_layout Standard
-Check that the double quotes or an apostroph within the command line survive
+Check that the double quotes or an apostrophe within the command line survive
  the LyX tool chain.
- Previously the apostrophs got slanted in the PDF output so a cut and paste
+ Previously the apostrophes got slanted in the PDF output so a cut and paste
  did not work.
 \end_layout
 
@@ -31935,7 +31935,7 @@ reference "sub:Common-interrupt-pitfall-volatile"
 \end_layout
 
 \begin_layout Itemize
-check that the compilers are not told to supress warnings.
+check that the compilers are not told to suppress warnings.
 \end_layout
 
 \begin_layout Itemize
@@ -35147,12 +35147,12 @@ make your students aware about the pros and cons of open source software
 \end_layout
 
 \begin_layout Enumerate
-give back to the public as you are probably at least partially publically
+give back to the public as you are probably at least partially publicly
  funded
 \end_layout
 
 \begin_layout Enumerate
-give students a chance to publically prove their skills and to possibly
+give students a chance to publicly prove their skills and to possibly
  see a world wide impact
 \end_layout
 
@@ -38341,7 +38341,7 @@ name "sub:ANSI-Compliance"
 \end_layout
 
 \begin_layout Standard
-The latest publically available version of the standard 
+The latest publicly available version of the standard 
 \emph on
 ISO/IEC 9899 - Programming languages - C
 \emph default

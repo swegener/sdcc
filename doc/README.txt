@@ -43,11 +43,11 @@ progress. Please check http://sdcc.sourceforge.net/snap.php for snapshots.
 
 Roadmap:
 COPYING         - GPL v2
-as/             - Assembler, derrived from asxxxx
+as/             - Assembler, derived from asxxxx
 debugger/
 device/         - Device libraries and examples
 doc/            - sdcc and target specific documentation
-link/           - Linker, also derrived from asxxxx
+link/           - Linker, also derived from asxxxx
 sim/            - Simulator (mcs51 only)
 src/            - Source to the C compiler and targets
 support/        - Libraries and apps that may not be provided by your system.
@@ -86,5 +86,5 @@ SDCC includes code from:
 * Pascal Felber
    Some of the Z80 related files are borrowed from the Gameboy
    Development Kit (GBDK).
-* The GCC developement team http://gcc.gnu.org/
+* The GCC development team http://gcc.gnu.org/
    The basis of sdcpp preprocessor

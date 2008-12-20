@@ -282,7 +282,10 @@ dbuf_chomp (struct dbuf_s *dbuf)
 void
 dbuf_write (struct dbuf_s *dbuf, FILE *dest)
 {
-  fwrite (dbuf_get_buf (dbuf), 1, dbuf_get_length (dbuf), dest);
+  size_t res;
+  size_t len = dbuf_get_length (dbuf);
+  res = fwrite (dbuf_get_buf (dbuf), 1, len, dest);
+  assert(res == len);
 }
 
 

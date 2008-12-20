@@ -105,7 +105,7 @@ void parseFunc (char *line)
     func->modName = currModName ;
     while(*rs && *rs != ',') rs++;
     rs++;
-    sscanf(rs,"%d,%d,%d",&i,
+    sscanf(rs,"%d,%d,%hd",&i,
         &(SPEC_INTN(func->sym->etype)),
         &(SPEC_BANK(func->sym->etype)));
     SPEC_INTRTN(func->sym->etype) = i;

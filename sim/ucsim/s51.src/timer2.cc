@@ -151,9 +151,9 @@ cl_timer2::write(class cl_memory_cell *cell, t_mem *val)
           bit_t2oe)
         mode= T2MODE_CLKOUT;
     }
-  if (mode != oldmode ||
-      TR && !oldtr ||
-      !TR && oldtr)
+  if ((mode != oldmode) ||
+      (TR && !oldtr) ||
+      (!TR && oldtr))
     T_edge= t2ex_edge= 0;
 }
 

@@ -469,7 +469,7 @@ BP_CALLBACK(fexitCB)
     /* check main function */
     if ( !strcmp(func->sym->name, "main"))
     {
-        fprintf(stdout, "Program exited with code %d.\n", simGetValue (0x82,'I',2));
+        fprintf(stdout, "Program exited with code %lu.\n", simGetValue (0x82,'I',2));
         return 1;
     }
     return 0;

@@ -116,12 +116,14 @@ format_string(const char *format, ...)
 
   va_start(ap, format);
 #ifdef HAVE_VASPRINTF
+  int res;
   char *msg= NULL;
-  vasprintf(&msg, format, ap);
+  res = vasprintf(&msg, format, ap);
   return(msg);
 #elif defined HAVE_VSNPRINTF
+  int res;
   char *msg= (char*)malloc(80*25);
-  vsnprintf(msg, 80*25, format, ap);
+  res = vsnprintf(msg, 80*25, format, ap);
   return(msg);
 #elif defined HAVE__VSNPRINTF
   char *msg= (char*)malloc(80*25);

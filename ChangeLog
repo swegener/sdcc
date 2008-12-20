@@ -1,9 +1,32 @@
+2008-12-20 Raphael Neider <rneider AT web.de>
+
+	* debugger/mcs51/break.c, debugger/mcs51/cmd.c,
+	  debugger/mcs51/simi.c, debugger/mcs51/symtab.c,
+	  support/cpp/libcpp/macro.c: fix format string errors
+
+	* sim/ucsim/s51.src/timer2.cc: add clarifying parens
+
+	* src/pic/device.c: partial rewrite using strtok,
+	  quieten compiler warnings, adopt SDCC coding style
+
+	* as/link/hc08/lkelf.c, as/link/lkaomf51.c, as/link/lklibr.c,
+	  as/link/z80/lkgb.c, as/z80/asout.c, debugger/mcs51/cmd.c,
+	  sim/ucsim/utils.cc, src/SDCCasm.c, support/Util/dbuf_string.c,
+	  support/cpp/c-ppoutput.c, support/cpp/libcpp/lex.c,
+	  support/librarian/sdcclib.c, support/makebin/makebin.c:
+	  quieten most compiler warnings
+
+	* sim/ucsim/avr.src/arith_inst.cc: quieten compiler warnings,
+	  probably fix operator precedence bug
+
+	* doc/clean.mk: quieten rm if no .lyx is present
+
 2008-12-19 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx, doc/random-notes.txt, doc/avr/avr_design.txt,
 	  doc/TININative.txt, doc/macro-sys-design.txt, doc/libdoc.txt,
 	  doc/README.txt, doc/test_suite_spec.lyx:
-	  applaid patch 2446381: Dcoumentation spelling correcitons
+	  applied patch 2446381: Dcoumentation spelling correcitons
 	  thanks to Steven Borley
 
 2008-12-16 Raphael Neider <rneider AT web.de>

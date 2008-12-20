@@ -212,6 +212,7 @@ tfprintf (FILE *fp, const char *szFormat, ...)
   va_list ap;
   struct dbuf_s dbuf;
   size_t len;
+  size_t res;
 
   dbuf_init (&dbuf, INITIAL_INLINEASM);
 
@@ -220,7 +221,8 @@ tfprintf (FILE *fp, const char *szFormat, ...)
   va_end (ap);
 
   len = dbuf_get_length (&dbuf);
-  fwrite(dbuf_get_buf (&dbuf), 1, len, fp);
+  res = fwrite(dbuf_get_buf (&dbuf), 1, len, fp);
+  assert(res == len);
   dbuf_destroy (&dbuf);
 }
 

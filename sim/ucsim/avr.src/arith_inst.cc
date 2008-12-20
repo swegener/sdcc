@@ -42,7 +42,7 @@ cl_avr::cpi_Rd_K(t_mem code)
   t_addr d;
   t_mem D, K, result, res;
 
-  d= 16+(code&0xf0)>>4;
+  d= 16+((code&0xf0)>>4);
   K= (code&0xf) | ((code&0xf00)>>8);
   D= ram->read(d);
 
@@ -92,7 +92,7 @@ cl_avr::sbci_Rd_K(t_mem code)
   t_addr d;
   t_mem D, K, result, res;
 
-  d= 16+(code&0xf0)>>4;
+  d= 16+((code&0xf0)>>4);
   K= (code&0xf) | ((code&0xf00)>>8);
   D= ram->read(d);
 
@@ -143,7 +143,7 @@ cl_avr::subi_Rd_K(t_mem code)
   t_addr d;
   t_mem D, K, result, res;
 
-  d= 16+(code&0xf0)>>4;
+  d= 16+((code&0xf0)>>4);
   K= (code&0xf) | ((code&0xf00)>>8);
   D= ram->read(d);
 

@@ -611,7 +611,7 @@ outbuf(char *s)
                 fprintf(ofp, "T");
                 out(txt,(int) (txtp-txt));
                 fprintf(ofp, "\n");
-                fprintf(ofp, s);
+                fprintf(ofp, "%s", s);
                 out(rel,(int) (relp-rel));
                 fprintf(ofp, "\n");
         }

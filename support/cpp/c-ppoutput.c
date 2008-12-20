@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
+#include <assert.h>
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
@@ -193,9 +194,11 @@ scan_translation_unit_trad (cpp_reader *pfile)
 {
   while (_cpp_read_logical_line_trad (pfile))
     {
+      size_t res;
       size_t len = pfile->out.cur - pfile->out.base;
       maybe_print_line (pfile->out.first_line);
-      fwrite (pfile->out.base, 1, len, print.outf);
+      res = fwrite (pfile->out.base, 1, len, print.outf);
+      assert(res == len);
       print.printed = 1;
       if (!CPP_OPTION (pfile, discard_comments))
 	account_for_newlines (pfile->out.base, len);

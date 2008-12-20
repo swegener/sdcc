@@ -1782,6 +1782,8 @@ cpp_type2name (enum cpp_ttype type)
 void
 cpp_output_token (const cpp_token *token, FILE *fp)
 {
+  size_t res;
+
   switch (TOKEN_SPELL (token))
     {
     case SPELL_OPERATOR:
@@ -1815,7 +1817,8 @@ cpp_output_token (const cpp_token *token, FILE *fp)
             {
               unsigned char buffer[10];
               i += utf8_to_ucn (buffer, name + i) - 1;
-              fwrite (buffer, 1, 10, fp);
+              res = fwrite (buffer, 1, 10, fp);
+              assert (10 == res);
             }
           else
             fputc (NODE_NAME (token->val.node)[i], fp);
@@ -1823,7 +1826,8 @@ cpp_output_token (const cpp_token *token, FILE *fp)
       break;
 
     case SPELL_LITERAL:
-      fwrite (token->val.str.text, 1, token->val.str.len, fp);
+      res = fwrite (token->val.str.text, 1, token->val.str.len, fp);
+      assert (token->val.str.len == res);
       break;
 
     case SPELL_NONE:

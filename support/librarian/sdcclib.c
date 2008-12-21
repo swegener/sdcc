@@ -49,22 +49,17 @@ int NumRelFiles=0;
 #define NEQ(A,B) strcmp((A),(B))
 
 #if 1
-#include <assert.h>
-#define __assert(COND)  do { assert(COND); } while (0)
-#else
-#define __assert(COND)  do { (void)(COND); } while (0)
-#endif
-
 #define fgets(S, SIZE, STREAM)  do {                    \
   char *__s4567 = S;                                    \
   char *__res4567 = fgets(__s4567, SIZE, STREAM);       \
-  __assert(__s4567 == __res4567);                       \
+  assert(__s4567 == __res4567);                         \
 } while (0)
 
 #define system(CMD)             do {                    \
   int __res4568 = system(CMD);                          \
-  __assert(-1 != __res4568);                            \
+  assert(-1 != __res4568);                              \
 } while (0)
+#endif
 
 int action=OPT_NONE;
 FILE *lib, *newlib, *rel, *adb, *libindex;

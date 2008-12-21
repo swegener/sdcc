@@ -1,3 +1,11 @@
+2008-12-21 Borut Razem <borut.razem AT siol.net>
+
+	* support/librarian/sdcclib.c: fixed build failure on Mac OS X
+	  due to redifinition of symbol __assert
+	  sdcclib.c:53:1:warning: "__assert" redefined
+	  /Xcode2.5/SDKs/MacOSX10.4u.sdk/usr/include/assert.h:80:1:
+	  warning: this is the location of the previous definition
+
 2008-12-20 Raphael Neider <rneider AT web.de>
 
 	* debugger/mcs51/break.c, debugger/mcs51/cmd.c,

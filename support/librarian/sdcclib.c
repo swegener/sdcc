@@ -49,6 +49,8 @@ int NumRelFiles=0;
 #define NEQ(A,B) strcmp((A),(B))
 
 #if 1
+#include <assert.h>
+
 #define fgets(S, SIZE, STREAM)  do {                    \
   char *__s4567 = S;                                    \
   char *__res4567 = fgets(__s4567, SIZE, STREAM);       \

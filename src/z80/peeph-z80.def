@@ -62,7 +62,7 @@ replace restart {
 	ld	a,%3 (%1)
 } by {
 	; peephole 0d loaded %2 into a directly instead of going through %1.
-	ld	a,(#%2 + %3)
+	ld	a,(#%2+%3)
 } if notUsed(%1)
 
 replace restart {
@@ -85,17 +85,15 @@ replace restart {
 } if notVolatile(%1), notUsed(%1)
 
 replace restart {
-	inc	de
-	inc	de
-	ld	l,e
-	ld	h,d
+	inc	bc
+	ld	l,c
+	ld	h,b
 } by {
-	ld	l,e
-	ld	h,d
-	; peephole 0g incremented in hl instead of de.
+	ld	l,c
+	ld	h,b
+	; peephole 0g incremented in hl instead of bc.
 	inc	hl
-	inc	hl
-} if notUsed('de')
+} if notUsed('bc')
 
 replace restart {
 	inc	de
@@ -395,6 +393,17 @@ replace restart {
 } by {
 	; peephole 0zk stored constant #%1 + %2 into hl directly instead of going through bc.
 	ld	hl, #%1 + %2
+} if notUsed('bc')
+
+replace restart {
+	ld	c, %1 (%2)
+	ld	b, %3 (%4)
+	ld	l,c
+	ld	h,b
+} by {
+	; peephole 0zk' stored %1 (%2) %3 (%4) into hl directly instead of going through bc.
+	ld	l, %1 (%2)
+	ld	h, %3 (%4)
 } if notUsed('bc')
 
 replace restart {
@@ -1110,12 +1119,48 @@ replace restart {
 } if operandsNotRelated('h' %3)
 // Don't check for volatile since ix points to the stack.
 
+replace restart {
+	ld	%1, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	ld	l, %1
+} by {
+	ld	l, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	; peephole 76 loaded l from a directly instead of going through %1.
+} if notUsed(%1)
+
+replace restart {
+	ld	%1, a
+	ld	a, #%2
+	adc	a, #%3
+	ld	l, %1
+} by {
+	ld	l, a
+	ld	a, #%2
+	adc	a, #%3
+	; peephole 77 loaded l from a directly instead of going through %1.
+} if notUsed(%1)
+
+replace restart {
+	ld	hl, #%1
+	add	hl, %2
+	ex	de, hl
+	ld	hl, #%3
+	add	hl, de
+} by {
+	ld	hl, #%1+%3
+	add	hl, %2
+	; peephole 78 removed addition and loads exploiting commutativity of addition.
+} if notUsed('de')
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 replace restart {
 	ld	d,h
 	ld	e,l
 } by {
-	; peephole 73 used ex to load hl into de.
+	; peephole 80 used ex to load hl into de.
 	ex	de,hl
 } if notUsed('hl')
 
@@ -1123,7 +1168,7 @@ replace restart {
 	ld	e,l
 	ld	d,h
 } by {
-	; peephole 74 used ex to load hl into de.
+	; peephole 81 used ex to load hl into de.
 	ex	de,hl
 } if notUsed('hl')
 
@@ -1131,7 +1176,7 @@ replace restart {
 	ld	l,e
 	ld	h,d
 } by {
-	; peephole 75 used ex to load de into hl.
+	; peephole 82 used ex to load de into hl.
 	ex	de,hl
 } if notUsed('de')
 

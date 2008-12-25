@@ -1,3 +1,7 @@
+2008-12-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def: minor peephole improvements
+
 2008-12-21 Borut Razem <borut.razem AT siol.net>
 
 	* support/librarian/sdcclib.c: fixed build failure on Mac OS X

@@ -347,7 +347,7 @@ replace restart {
 	; peephole 0zf used hl instead of iy.
 	ld	hl,#%1 + %2
 	ld	(hl), %4
-} if notUsed('iy'), notUsed('hl')
+} if notUsed('iy'), notUsed('hl'), operandsNotRelated(%4 'h'), operandsNotRelated(%4 'l')
 
 replace restart {
 	ld	e,l

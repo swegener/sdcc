@@ -652,6 +652,13 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
       test = right;
       val = OP_VALUE (IC_RIGHT (ic));
     }
+  /* 8x8 unsigned multiplication code is shorter than
+     call overhead for the multiplication routine. */
+  else if ( IS_CHAR (right) && IS_UNSIGNED (right) &&
+    IS_CHAR (left) && IS_UNSIGNED(left) && !IS_GB)
+    {
+      return TRUE;
+    }
   else
     {
       return FALSE;

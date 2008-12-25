@@ -229,8 +229,11 @@ z80MightRead(const lineNode *pl, const char *what)
     strncmp(pl->line, "sub\t", 4) == 0 ||
     strncmp(pl->line, "xor\t", 4) == 0)
     {
-      if( strstr(pl->line + 3, what) == 0 && strcmp("a", what))
-        return FALSE;
+      if( strstr(pl->line + 3, what) != 0)
+        return TRUE;
+      if( strstr(pl->line + 3, "hl") == 0 && strcmp("a", what) == 0)
+        return TRUE;
+      return FALSE;
     }
 
   if(strncmp(pl->line, "pop\t", 4) == 0)
@@ -255,6 +258,9 @@ z80MightRead(const lineNode *pl, const char *what)
     (bool)(strncmp(pl->line, "jr\t", 3)) == 0)
     return FALSE;
 
+  if(strncmp(pl->line, "djnz\t", 5) == 0)
+    return(strchr(what, 'b') != 0);
+
   if(strncmp(pl->line, "rla", 3) == 0 ||
     strncmp(pl->line, "rlca", 4) == 0)
     return(strcmp(what, "a") == 0);
@@ -275,7 +281,8 @@ static bool
 z80CondJump(const lineNode *pl)
 {
   if((strncmp(pl->line, "jp\t", 3) == 0 ||
-    strncmp(pl->line, "jr\t", 3) == 0) && strchr(pl->line, ',') != 0)
+    strncmp(pl->line, "jr\t", 3) == 0) && strchr(pl->line, ',') != 0 ||
+    strncmp(pl->line, "djnz\t", 5) == 0)
     return TRUE;
   return FALSE;
 }

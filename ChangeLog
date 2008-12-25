@@ -1,3 +1,10 @@
+2008-12-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def: fixed a bug in peephole 0zf
+	* src/z80/peep.c: improved checks for unused data
+	* src/z80/gen.c,
+	  src/z80/main.c: Implemented RFE #1899189
+
 2008-12-25 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in:

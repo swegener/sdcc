@@ -4216,6 +4216,72 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* genMultChar - generates code for unsigned 8x8 multiplication    */
+/*-----------------------------------------------------------------*/
+static void
+genMultOneChar (iCode * ic)
+{
+  symbol *tlbl1, *tlbl2;
+  bool savedB = FALSE;
+
+  if(IS_GB)
+    {
+      wassertl (0, "Multiplication is handled through support function calls on gbz80");
+      return;
+    }
+
+  /* Save b into a if b is in use. */
+  if (bitVectBitValue (ic->rMask, B_IDX) &&
+    !(getPairId (AOP (IC_RESULT (ic))) == PAIR_BC))
+    {
+      emit2 ("ld a, b");
+      savedB = TRUE;
+    }
+  if (isPairInUse (PAIR_DE, ic) &&
+    !(getPairId (AOP (IC_RESULT (ic))) == PAIR_DE))
+  {
+    _push (PAIR_DE);
+    _G.stack.pushedDE = TRUE;
+  }
+
+  tlbl1 = newiTempLabel (NULL);
+  tlbl2 = newiTempLabel (NULL);
+
+  emit2 ("ld e,%s", aopGet (AOP (IC_RIGHT (ic)), LSB, FALSE));
+  emit2 ("ld h,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
+  emit2 ("ld l,#0x00");
+  emit2 ("ld d,l");
+  emit2 ("ld b,#0x08");
+  emitLabel (tlbl1->key + 100);
+  emit2 ("add hl,hl");
+  emit2 ("jp NC,!tlabel", tlbl2->key + 100);
+  emit2 ("add hl,de");
+  emitLabel (tlbl2->key + 100);
+  emit2 ("djnz !tlabel", tlbl1->key + 100);
+
+  spillPair(PAIR_HL);
+
+  if (IS_Z80 && _G.stack.pushedDE)
+    {
+      _pop (PAIR_DE);
+      _G.stack.pushedDE = FALSE;
+    }
+  if (savedB)
+    {
+      emit2 ("ld b, a");
+    }
+
+  if (AOP_SIZE (IC_RESULT (ic)) == 1)
+    aopPut (AOP (IC_RESULT (ic)), "l", 0);
+  else
+    commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+
+  freeAsmop (IC_LEFT (ic), NULL, ic);
+  freeAsmop (IC_RIGHT (ic), NULL, ic);
+  freeAsmop (IC_RESULT (ic), NULL, ic);
+}
+
+/*-----------------------------------------------------------------*/
 /* genMult - generates code for multiplication                     */
 /*-----------------------------------------------------------------*/
 static void
@@ -4247,6 +4313,12 @@ genMult (iCode * ic)
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
+    }
+
+  if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
+    {
+      genMultOneChar (ic);
+      return;
     }
 
   wassertl (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT, "Right must be a literal");

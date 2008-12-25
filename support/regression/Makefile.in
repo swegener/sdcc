@@ -177,9 +177,9 @@ endif
 make_library: $(MAKE_LIBRARY)
 
 SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests
-#ifdef INC_DIR
-SDCCFLAGS += -I$(INC_DIR)
-#endif
+ifdef INC_DIR
+  SDCCFLAGS += -I$(INC_DIR)
+endif
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.

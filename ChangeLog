@@ -1,3 +1,9 @@
+2008-12-26 Borut Razem <borut.razem AT siol.net>
+
+	* support/librarian/sdcclib.c:
+	  fixed bug 2466950: "sdcclib broken"
+	  by removing fgets return value check
+
 2008-12-26 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/main.c,
 	  src/z80/gen.c,

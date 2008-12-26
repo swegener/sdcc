@@ -8196,7 +8196,7 @@ genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
   operand *from, *to, *count;
   bool deInUse;
 
-  wassertl (nParams == 3, "Built-in memcpy must have two parameters");
+  wassertl (nParams == 3, "Built-in memcpy must have three parameters");
   to = pparams[2];
   from = pparams[1];
   count = pparams[0];

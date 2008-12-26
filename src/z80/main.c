@@ -113,9 +113,8 @@ extern PORT z80_port;
 
 static builtins _z80_builtins[] = {
   /* Disabled for now.
-    { "__builtin_strcpy", "v", 2, {"cg*", "cg*" } },
-    { "__builtin_memcpy", "cg*", 3, {"cg*", "cg*", "ui" } },
-  */
+    { "__builtin_strcpy", "v", 2, {"cg*", "cg*" } },*/
+    { "__builtin_memcpy", "vg*", 3, {"vg*", "vg*", "ui" } },
     { NULL , NULL,0, {NULL}}
 };
 
@@ -827,7 +826,7 @@ PORT z80_port =
   0,                            /* leave == */
   TRUE,                         /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
-  _z80_builtins,                /* no builtin functions */
+  _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
   1,                            /* globals & local static allowed */

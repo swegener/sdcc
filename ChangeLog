@@ -1,4 +1,9 @@
 2008-12-26 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/main.c,
+	  src/z80/gen.c,
+	  device/include/string.h: Implemented RFE #1914254
+
+2008-12-26 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/z80/Makefile.in,
 	  device/lib/Makefile.in,
 	  device/lib/z80/memmove.s: Implemented RFE #1914256

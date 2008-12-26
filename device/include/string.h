@@ -50,6 +50,9 @@ extern char *strstr (char *, char *)  ;
 extern int   strlen (char *  )  ;
 extern char *strtok (char *, char *)  ;
 extern void *memcpy (void *, void *, size_t )  ;
+#ifdef SDCC_z80
+#define memcpy(dst, src, n) __builtin_memcpy(dst, src, n)
+#endif
 extern int   memcmp (void *, void *, size_t )  ;
 extern void *memset (void *, unsigned char  , size_t )  ;
 extern void *memmove (void *, void *, size_t )  ;

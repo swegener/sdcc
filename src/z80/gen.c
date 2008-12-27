@@ -7999,67 +7999,12 @@ _swap (PAIR_ID one, PAIR_ID two)
     }
 }
 
-/* The problem is that we may have all three pairs used and they may
-   be needed in a different order.
-
-   Note: Have ex de,hl
-
-   Combinations:
-     hl = hl            => unity, fine
-     bc = bc
-     de = de
-
-     hl = hl            hl = hl, swap de <=> bc
-     bc = de
-     de = bc
-
-     hl = bc            Worst case
-     bc = de
-     de = hl
-
-     hl = bc            de = de, swap bc <=> hl
-     bc = hl
-     de = de
-
-     hl = de            Worst case
-     bc = hl
-     de = bc
-
-     hl = de            bc = bc, swap hl <=> de
-     bc = bc
-     de = hl
-
-   Break it down into:
-    * Any pair = pair are done last
-    * Any pair = iTemp are done last
-    * Any swaps can be done any time
-
-   A worst case:
-    push p1
-    p1 = p2
-    p2 = p3
-    pop  p3
-
-   So how do we detect the cases?
-   How about a 3x3 matrix?
-        source
-   dest x x x x
-        x x x x
-        x x x x (Fourth for iTemp/other)
-
-   First determin which mode to use by counting the number of unity and
-   iTemp assigns.
-     Three - any order
-     Two - Assign the pair first, then the rest
-     One - Swap the two, then the rest
-     Zero - Worst case.
-*/
 static void
 setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
 {
   PAIR_ID ids[NUM_PAIRS][NUM_PAIRS];
   PAIR_ID dest[3] = {
-    PAIR_BC, PAIR_HL, PAIR_DE
+    PAIR_DE, PAIR_HL, PAIR_BC
   };
   int i, j, nunity = 0;
   memset (ids, PAIR_INVALID, sizeof (ids));
@@ -8067,10 +8012,6 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
   /* Sanity checks */
   wassert (nparams == 3);
 
-  /* First save everything that needs to be saved. */
-  _saveRegsForCall (ic, 0);
-
-  /* Loading HL first means that DE is always fine. */
   for (i = 0; i < nparams; i++)
     {
       aopOp (pparams[i], ic, FALSE, FALSE);
@@ -8092,7 +8033,7 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
     }
   else if (nunity == 2)
     {
-      /* One is assigned.  Pull it out and assign. */
+      /* Two are OK.  Assign the other one. */
       for (i = 0; i < 3; i++)
         {
           for (j = 0; j < NUM_PAIRS; j++)
@@ -8115,7 +8056,7 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
     }
   else if (nunity == 1)
     {
-      /* Find the pairs to swap. */
+      /* One is OK. Find the other two. */
       for (i = 0; i < 3; i++)
         {
           for (j = 0; j < NUM_PAIRS; j++)
@@ -8124,12 +8065,22 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
                 {
                   if (j == PAIR_INVALID || j == dest[i])
                     {
-                      /* Keep looking. */
+                      /* This one is OK. */
                     }
                   else
                     {
-                      _swap (j, dest[i]);
-                      goto done;
+                      /* Found one. */
+                      if(ids[j][dest[i]] == TRUE)
+                        {
+                          /* Just swap. */
+                           _swap (j, dest[i]);
+                           goto done;
+                        }
+                      else
+                        {
+                          fetchPair (dest[i], AOP (pparams[i]));
+                          continue;
+                        }         
                     }
                 }
             }
@@ -8163,7 +8114,7 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
     }
 }
 
-static void
+/*static void
 genBuiltInStrcpy (iCode *ic, int nParams, operand **pparams)
 {
   operand *from, *to;
@@ -8175,6 +8126,8 @@ genBuiltInStrcpy (iCode *ic, int nParams, operand **pparams)
   from = pparams[1];
 
   deInUse = bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX);
+
+  _saveRegsForCall (ic, 0);
 
   setupForBuiltin3 (ic, nParams, pparams);
 
@@ -8188,20 +8141,19 @@ genBuiltInStrcpy (iCode *ic, int nParams, operand **pparams)
 
   freeAsmop (from, NULL, ic->next);
   freeAsmop (to, NULL, ic);
-}
+}*/
 
 static void
 genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 {
   operand *from, *to, *count;
-  bool deInUse;
 
   wassertl (nParams == 3, "Built-in memcpy must have three parameters");
   to = pparams[2];
   from = pparams[1];
   count = pparams[0];
 
-  deInUse = bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX);
+  _saveRegsForCall (ic, 0);
 
   setupForBuiltin3 (ic, nParams, pparams);
 
@@ -8243,11 +8195,11 @@ static void genBuiltIn (iCode *ic)
     /* which function is it */
     bif = OP_SYMBOL(IC_LEFT(bi_iCode));
 
-    if (strcmp(bif->name,"__builtin_strcpy")==0)
+    /*if (strcmp(bif->name,"__builtin_strcpy")==0)
       {
         genBuiltInStrcpy(bi_iCode, nbi_parms, bi_parms);
       }
-    else if (strcmp(bif->name,"__builtin_memcpy")==0)
+    else*/ if (strcmp(bif->name,"__builtin_memcpy")==0)
       {
         genBuiltInMemcpy(bi_iCode, nbi_parms, bi_parms);
       }

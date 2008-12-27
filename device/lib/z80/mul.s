@@ -3,6 +3,8 @@
 ; This multiplication routine is similar to the one
 ; from Rodnay Zaks, "Programming the Z80".
 
+; Now replaced by a builtin for code generation, but
+; still called from some asm files in this directory.
 __muluchar_rrx_s::
         ld      hl, #2+1
         add     hl, sp

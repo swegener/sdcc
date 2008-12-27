@@ -1,4 +1,13 @@
-2008-12-27 Borut Razem <borut.razem AT siol.net>
+2008-12-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/string.c,
+	  device/lib/z80/printf.c,
+	  device/lib/z80/mul.s:
+	  z80 library cleanup
+	* src/z80/gen.c:
+	  Fixed code generation bug exposed by builtin memcpy().
+
+2008-12-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/_memcpy.c:
 	  fixed conflict with builtin memcpy()

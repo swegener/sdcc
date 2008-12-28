@@ -925,7 +925,7 @@ processParms (ast *func,
       (*actParm)->left = newAst_LINK (defParm->type);
       (*actParm)->right = pTree;
       (*actParm)->decorated = 0; /* force typechecking */
-      decorateType (*actParm, resultType);
+      decorateType (*actParm, IS_GENPTR (defParm->type) ? RESULT_TYPE_GPTR : resultType);
     }
 
   /* make a copy and change the regparm type to the defined parm */
@@ -3873,7 +3873,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       changePointer(LTYPE(tree));
       checkTypeSanity(LETYPE(tree), "(cast)");
 
-
       /* if 'from' and 'to' are the same remove the superfluous cast,
        * this helps other optimizations */
       if (compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
@@ -3903,33 +3902,41 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
 #if 0
       /* if the right is a literal replace the tree */
-      if (IS_LITERAL (RETYPE (tree))) {
-              if (!IS_PTR (LTYPE (tree))) {
-                      tree->type = EX_VALUE;
-                      tree->opval.val =
-                              valCastLiteral (LTYPE (tree),
-                                              floatFromVal (valFromType (RETYPE (tree))));
-                      tree->left = NULL;
-                      tree->right = NULL;
-                      TTYPE (tree) = tree->opval.val->type;
-                      tree->values.literalFromCast = 1;
-              } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) &&
-                         ((int) ulFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
-                      sym_link *rest = LTYPE(tree)->next;
-                      werrorfl (tree->filename, tree->lineno, W_LITERAL_GENERIC);
-                      TTYPE(tree) = newLink(DECLARATOR);
-                      DCL_TYPE(TTYPE(tree)) = FPOINTER;
-                      TTYPE(tree)->next = rest;
-                      tree->left->opval.lnk = TTYPE(tree);
-                      LRVAL (tree) = 1;
-              } else {
-                      TTYPE (tree) = LTYPE (tree);
-                      LRVAL (tree) = 1;
-              }
-      } else {
+      if (IS_LITERAL (RETYPE (tree)))
+        {
+          if (!IS_PTR (LTYPE (tree)))
+            {
+              tree->type = EX_VALUE;
+              tree->opval.val =
+                      valCastLiteral (LTYPE (tree),
+                                      floatFromVal (valFromType (RETYPE (tree))));
+              tree->left = NULL;
+              tree->right = NULL;
+              TTYPE (tree) = tree->opval.val->type;
+              tree->values.literalFromCast = 1;
+            }
+          else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) &&
+                   ((int) ulFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */
+            {
+              sym_link *rest = LTYPE(tree)->next;
+              werrorfl (tree->filename, tree->lineno, W_LITERAL_GENERIC);
+              TTYPE(tree) = newLink(DECLARATOR);
+              DCL_TYPE(TTYPE(tree)) = FPOINTER;
+              TTYPE(tree)->next = rest;
+              tree->left->opval.lnk = TTYPE(tree);
+              LRVAL (tree) = 1;
+            }
+          else
+            {
               TTYPE (tree) = LTYPE (tree);
               LRVAL (tree) = 1;
-      }
+            }
+        }
+      else
+        {
+          TTYPE (tree) = LTYPE (tree);
+          LRVAL (tree) = 1;
+        }
 #else
 #if 0 // this is already checked, now this could be explicit
       /* if pointer to struct then check names */
@@ -3943,49 +3950,47 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 #endif
       if (IS_ADDRESS_OF_OP(tree->right)
           && IS_AST_SYM_VALUE (tree->right->left)
-          && SPEC_ABSA (AST_SYMBOL (tree->right->left)->etype)) {
+          && SPEC_ABSA (AST_SYMBOL (tree->right->left)->etype))
+        {
+          symbol * sym = AST_SYMBOL (tree->right->left);
+          unsigned int gptype = 0;
+          unsigned int addr = SPEC_ADDR (sym->etype);
 
-        symbol * sym = AST_SYMBOL (tree->right->left);
-        unsigned int gptype = 0;
-        unsigned int addr = SPEC_ADDR (sym->etype);
+          if (IS_GENPTR (LTYPE (tree)) && ((GPTRSIZE > FPTRSIZE) || TARGET_IS_PIC16) )
+            {
+              switch (SPEC_SCLS (sym->etype))
+                {
+                case S_CODE:
+                  gptype = GPTYPE_CODE;
+                  break;
+                case S_XDATA:
+                  gptype = GPTYPE_FAR;
+                  break;
+                case S_DATA:
+                case S_IDATA:
+                  gptype = GPTYPE_NEAR;
+                  break;
+                case S_PDATA:
+                  gptype = GPTYPE_XSTACK;
+                  break;
+                default:
+                  gptype = 0;
 
-        if (IS_GENPTR (LTYPE (tree)) && ((GPTRSIZE > FPTRSIZE)
-                                        || TARGET_IS_PIC16) )
-          {
-            switch (SPEC_SCLS (sym->etype))
-              {
-              case S_CODE:
-                gptype = GPTYPE_CODE;
-                break;
-              case S_XDATA:
-                gptype = GPTYPE_FAR;
-                break;
-              case S_DATA:
-              case S_IDATA:
-                gptype = GPTYPE_NEAR;
-                break;
-              case S_PDATA:
-                gptype = GPTYPE_XSTACK;
-                break;
-              default:
-                gptype = 0;
+                  if(TARGET_IS_PIC16 && (SPEC_SCLS(sym->etype) == S_FIXED))
+                      gptype = GPTYPE_NEAR;
+                }
+              addr |= gptype << (8*(GPTRSIZE - 1));
+            }
 
-                if(TARGET_IS_PIC16 && (SPEC_SCLS(sym->etype) == S_FIXED))
-                    gptype = GPTYPE_NEAR;
-              }
-            addr |= gptype << (8*(GPTRSIZE - 1));
-          }
-
-        tree->type = EX_VALUE;
-        tree->opval.val =
-          valCastLiteral (LTYPE (tree), addr);
-        TTYPE (tree) = tree->opval.val->type;
-        TETYPE (tree) = getSpec (TTYPE (tree));
-        tree->left = NULL;
-        tree->right = NULL;
-        tree->values.literalFromCast = 1;
-        return tree;
-      }
+          tree->type = EX_VALUE;
+          tree->opval.val = valCastLiteral (LTYPE (tree), addr);
+          TTYPE (tree) = tree->opval.val->type;
+          TETYPE (tree) = getSpec (TTYPE (tree));
+          tree->left = NULL;
+          tree->right = NULL;
+          tree->values.literalFromCast = 1;
+          return tree;
+        }
 
       /* handle offsetof macro:            */
       /* #define offsetof(TYPE, MEMBER) \  */
@@ -3995,84 +4000,91 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           && tree->right->left->opval.op == PTR_OP
           && IS_AST_OP (tree->right->left->left)
           && tree->right->left->left->opval.op == CAST
-          && IS_AST_LIT_VALUE(tree->right->left->left->right)) {
-
-        symbol *element = getStructElement (
-          SPEC_STRUCT (LETYPE(tree->right->left)),
-          AST_SYMBOL(tree->right->left->right)
-        );
-
-        if (element) {
-          tree->type = EX_VALUE;
-          tree->opval.val = valCastLiteral (
-            LTYPE (tree),
-            element->offset
-            + floatFromVal (valFromType (RTYPE (tree->right->left->left)))
+          && IS_AST_LIT_VALUE(tree->right->left->left->right))
+        {
+          symbol *element = getStructElement (
+            SPEC_STRUCT (LETYPE(tree->right->left)),
+            AST_SYMBOL(tree->right->left->right)
           );
 
-          TTYPE (tree) = tree->opval.val->type;
-          TETYPE (tree) = getSpec (TTYPE (tree));
-          tree->left = NULL;
-          tree->right = NULL;
-          return tree;
-        }
+          if (element)
+            {
+              tree->type = EX_VALUE;
+              tree->opval.val = valCastLiteral (
+                LTYPE (tree),
+                element->offset
+                + floatFromVal (valFromType (RTYPE (tree->right->left->left)))
+              );
+
+            TTYPE (tree) = tree->opval.val->type;
+            TETYPE (tree) = getSpec (TTYPE (tree));
+            tree->left = NULL;
+            tree->right = NULL;
+            return tree;
+          }
       }
 
       /* if the right is a literal replace the tree */
-      if (IS_LITERAL (RETYPE (tree))) {
-        #if 0
-        if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)) ) {
-          /* rewrite      (type *)litaddr
-             as           &temp
-             and define   type at litaddr temp
-             (but only if type's storage class is not generic)
-          */
-          ast *newTree = newNode ('&', NULL, NULL);
-          symbol *sym;
+      if (IS_LITERAL (RETYPE (tree)))
+        {
+          #if 0
+          if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)) )
+            {
+              /* rewrite      (type *)litaddr
+                 as           &temp
+                 and define   type at litaddr temp
+                 (but only if type's storage class is not generic)
+              */
+              ast *newTree = newNode ('&', NULL, NULL);
+              symbol *sym;
 
-          TTYPE (newTree) = LTYPE (tree);
-          TETYPE (newTree) = getSpec(LTYPE (tree));
+              TTYPE (newTree) = LTYPE (tree);
+              TETYPE (newTree) = getSpec(LTYPE (tree));
 
-          /* define a global symbol at the casted address*/
-          sym = newSymbol(genSymName (0), 0);
-          sym->type = LTYPE (tree)->next;
-          if (!sym->type)
-            sym->type = newLink (V_VOID);
-          sym->etype = getSpec(sym->type);
-          SPEC_SCLS (sym->etype) = sclsFromPtr (LTYPE (tree));
-          sym->lineDef = tree->lineno;
-          sym->cdef = 1;
-          sym->isref = 1;
-          SPEC_STAT (sym->etype) = 1;
-          SPEC_ADDR(sym->etype) = floatFromVal (valFromType (RTYPE (tree)));
-          SPEC_ABSA(sym->etype) = 1;
-          addSym (SymbolTab, sym, sym->name, 0, 0, 0);
-          allocGlobal (sym);
+              /* define a global symbol at the casted address*/
+              sym = newSymbol(genSymName (0), 0);
+              sym->type = LTYPE (tree)->next;
+              if (!sym->type)
+                sym->type = newLink (V_VOID);
+              sym->etype = getSpec(sym->type);
+              SPEC_SCLS (sym->etype) = sclsFromPtr (LTYPE (tree));
+              sym->lineDef = tree->lineno;
+              sym->cdef = 1;
+              sym->isref = 1;
+              SPEC_STAT (sym->etype) = 1;
+              SPEC_ADDR(sym->etype) = floatFromVal (valFromType (RTYPE (tree)));
+              SPEC_ABSA(sym->etype) = 1;
+              addSym (SymbolTab, sym, sym->name, 0, 0, 0);
+              allocGlobal (sym);
 
-          newTree->left = newAst_VALUE(symbolVal(sym));
-          newTree->left->filename = tree->filename;
-          newTree->left->lineno = tree->lineno;
-          LTYPE (newTree) = sym->type;
-          LETYPE (newTree) = sym->etype;
-          LLVAL (newTree) = 1;
-          LRVAL (newTree) = 0;
-          TLVAL (newTree) = 1;
-          return newTree;
+              newTree->left = newAst_VALUE(symbolVal(sym));
+              newTree->left->filename = tree->filename;
+              newTree->left->lineno = tree->lineno;
+              LTYPE (newTree) = sym->type;
+              LETYPE (newTree) = sym->etype;
+              LLVAL (newTree) = 1;
+              LRVAL (newTree) = 0;
+              TLVAL (newTree) = 1;
+              return newTree;
+            }
+          #endif
+          if (!IS_PTR (LTYPE (tree)))
+            {
+              tree->type = EX_VALUE;
+              tree->opval.val =
+                valCastLiteral (LTYPE (tree), floatFromVal (valFromType (RTYPE (tree))));
+              TTYPE (tree) = tree->opval.val->type;
+              tree->left = NULL;
+              tree->right = NULL;
+              tree->values.literalFromCast = 1;
+              TETYPE (tree) = getSpec (TTYPE (tree));
+              return tree;
+            }
         }
-        #endif
-        if (!IS_PTR (LTYPE (tree))) {
-          tree->type = EX_VALUE;
-          tree->opval.val =
-          valCastLiteral (LTYPE (tree),
-                          floatFromVal (valFromType (RTYPE (tree))));
-          TTYPE (tree) = tree->opval.val->type;
-          tree->left = NULL;
-          tree->right = NULL;
-          tree->values.literalFromCast = 1;
-          TETYPE (tree) = getSpec (TTYPE (tree));
-          return tree;
+      if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
+        {
+          DCL_TYPE (LTYPE (tree)) = DCL_TYPE (RTYPE (tree));
         }
-      }
       TTYPE (tree) = LTYPE (tree);
       LRVAL (tree) = 1;
 

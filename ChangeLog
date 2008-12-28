@@ -1,3 +1,12 @@
+2008-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/peeph.def (177.e): replaced notVolatile(%3) with
+	  operandsNotRelated(%1 %3), had to change (a)r%1 to (a)%1 for this to work
+	  (177.j): added new rule
+	* src/SDCCsymt.h: added RESULT_TYPE_GPTR
+	* src/SDCCast.c (processParms): use RESULT_TYPE_GPTR for generic ptr parms,
+	  (decorateType CAST): propagate storage class to generic pointer results
+
 2008-12-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/string.c,

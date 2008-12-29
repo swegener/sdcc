@@ -1,3 +1,8 @@
+2008-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/memory.c:
+	  Added simple test for memset(), memcpy() and memmove()
+
 2008-12-29 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/support/scripts/sdcc.nsi: removed $INSTDIR\lib\src\z80\*.c

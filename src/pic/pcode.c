@@ -4013,14 +4013,14 @@ static void insertPCodeInstruction(pCodeInstruction *pci, pCodeInstruction *new_
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static void insertBankSel(pCodeInstruction  *pci, const char *name)
+static int insertBankSel(pCodeInstruction  *pci, const char *name)
 {
 	pCode *new_pc;
 	
 	pCodeOp *pcop;
 
 	// Never BANKSEL STATUS, this breaks all kinds of code (e.g., interrupt handlers).
-	if (!strcmp("STATUS", name) || !strcmp("_STATUS", name)) return;
+	if (!strcmp("STATUS", name) || !strcmp("_STATUS", name)) return 0;
 	
 	pcop = popCopyReg(PCOR(pci->pcop));
 	pcop->type = PO_GPR_REGISTER; // Sometimes the type is set to legacy 8051 - so override it
@@ -4029,6 +4029,7 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 	new_pc = newpCode(POC_BANKSEL, pcop);
 	
 	insertPCodeInstruction(pci, PCI(new_pc));
+	return 1;
 }
 
 /*
@@ -4193,13 +4194,9 @@ static void FixRegisterBanking(pBlock *pb)
 		    // XXX: We can do better with fixed registers.
 		    if (allRAMmshared && reg && (reg->type != REG_SFR) && (!reg->isFixed)) {
 			// no BANKSEL required
-			addpCodeComment(pc->prev, "BANKOPT1b BANKSEL dropped; %s present in all of %s's banks", new_bank, cur_bank);
+			addpCodeComment(pc->prev, "BANKOPT1b BANKSEL dropped; %s present in all (of %s's) banks", new_bank, cur_bank);
 			continue;
 		    }
-
-		    // restrict cur_mask to cover only the banks this register
-		    // is in (as well as the previous registers)
-		    cur_mask &= new_mask;
 
 		    if (sameBank(reg, previous_reg, new_bank, cur_bank, max_mask)) {
 			// no BANKSEL required
@@ -4208,10 +4205,11 @@ static void FixRegisterBanking(pBlock *pb)
 		    }
 		} // if
 
-		cur_mask = new_mask;
-		cur_bank = new_bank;
-		previous_reg = reg;
-		insertBankSel(pci, cur_bank);
+		if (insertBankSel(pci, new_bank)) {
+		    cur_mask = new_mask;
+		    cur_bank = new_bank;
+		    previous_reg = reg;
+		} // if
 	    } // if
 	} // if
     } // for

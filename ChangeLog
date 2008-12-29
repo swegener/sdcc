@@ -1,3 +1,8 @@
+2008-12-29 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (insertBankSel, FixRegisterBanking): emit
+	  incorrectly discarded BANKSELs
+
 2008-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/memory.c:

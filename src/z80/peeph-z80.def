@@ -95,6 +95,20 @@ replace restart {
 	inc	hl
 } if notUsed('bc')
 
+// Catch double and triple incs before later peepholes introduce an ex de,hl in here.
+replace restart {
+	inc	de
+	inc	de
+	ld	l,e
+	ld	h,d
+} by {
+	ld	l,e
+	ld	h,d
+	; peephole 0h' incremented in hl instead of de.
+	inc	hl
+	inc	hl
+} if notUsed('de')
+
 replace restart {
 	inc	de
 	ld	l,e

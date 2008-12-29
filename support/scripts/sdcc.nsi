@@ -528,7 +528,6 @@ ${Section} "SDCC library sources" SEC17
 #  File "${DEV_ROOT}\lib\src\gbz80\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\z80"
-  File "${DEV_ROOT}\lib\src\z80\*.c"
   File "${DEV_ROOT}\lib\src\z80\*.s"
 #  File "${DEV_ROOT}\lib\src\z80\Makefile"
 
@@ -820,7 +819,6 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\hc08\hc08.lib"
   Delete "$INSTDIR\lib\src\hc08\Makefile"
 
-  Delete "$INSTDIR\lib\src\z80\*.c"
   Delete "$INSTDIR\lib\src\z80\*.s"
   Delete "$INSTDIR\lib\src\z80\z80.lib"
   Delete "$INSTDIR\lib\src\z80\README"

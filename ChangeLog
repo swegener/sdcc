@@ -1,3 +1,7 @@
+2008-12-29 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/support/scripts/sdcc.nsi: removed $INSTDIR\lib\src\z80\*.c
+
 2008-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peeph.def (177.e): replaced notVolatile(%3) with

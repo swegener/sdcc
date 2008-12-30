@@ -800,6 +800,36 @@ replace restart {
 }
 
 replace restart {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	ld	a,(hl)
+	inc	a
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	ld	(hl),a
+} by {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	inc	(hl)
+	; peephole 42c incremented in (hl) instead of going through a.
+} if notUsed('a')
+
+replace restart {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	ld	a,(hl)
+	dec	a
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	ld	(hl),a
+} by {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	dec	(hl)
+	; peephole 42d decremented in (hl) instead of going through a.
+} if notUsed('a')
+
+replace restart {
 	ld	%1,a
 	ld	a,%2
 	add	a,%1

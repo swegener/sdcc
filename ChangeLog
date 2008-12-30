@@ -1,3 +1,9 @@
+2008-12-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Minor addition improvement.
+
 2008-12-30 Raphael Neider <rneider AT web.de>
 
 	* as/link/hc08/lkelf.c, as/link/lkaomf51.c, as/link/lklibr.c,

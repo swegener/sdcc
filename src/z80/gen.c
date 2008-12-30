@@ -3994,7 +3994,12 @@ genPlus (iCode * ic)
     {
       _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
       if (offset == 0)
-        emit2 ("add a,%s", aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+      {
+        if(size == 0 && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) == 1)
+	  emit2 ("inc a");
+        else
+          emit2 ("add a,%s", aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+      }
       else
         emit2 ("adc a,%s", aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);

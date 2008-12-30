@@ -21,7 +21,6 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include "sdcdb.h"
 #include "symtab.h"
 #include "simi.h"
@@ -1410,12 +1409,9 @@ int cmdDelUserBp (char *s, context *cctxt)
     if (!*s ) {
         if (userBpPresent) {
             char buffer[10];
-            char *res;
-
             fprintf (stdout,"Delete all breakpoints? (y or n) ");
             fflush(stdout);
-            res = fgets(buffer,sizeof(buffer),stdin);
-            assert(res == &buffer[0]);
+            fgets(buffer,sizeof(buffer),stdin);
             if (toupper(buffer[0]) == 'Y')
                 deleteUSERbp(-1);
         }
@@ -1636,15 +1632,13 @@ int cmdRun (char *s, context *cctxt)
     resetHitCount();
         simGo(0);
     } else {
-        char *res;
 
         fprintf(stdout,
                 "The program being debugged has been started already.\n");
         fprintf(stdout,"Start it from the beginning? (y or n) ");
         fflush(stdout);
 
-        res = fgets(buff,sizeof(buff),stdin);
-        assert(res == &buff[0]);
+        fgets(buff,sizeof(buff),stdin);
         if (toupper(buff[0]) == 'Y') {
             simReset();
         resetHitCount();

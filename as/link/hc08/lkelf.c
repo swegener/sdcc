@@ -18,7 +18,6 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -481,7 +480,6 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
   Elf32_Word size;
   Elf32_Phdr * phdrp;
   Elf32_Shdr * shdrp;
-  size_t res;
 
   if (!ap->a_image)
     {
@@ -539,8 +537,7 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
       shdrp->sh_entsize = 0;
       listAdd (sections, shdrp);
       
-      res = fwrite (&ap->a_image[addr-ap->a_addr], 1, size, ofp);
-      assert(res == size);
+      fwrite (&ap->a_image[addr-ap->a_addr], 1, size, ofp);
     }  
 }
 
@@ -552,7 +549,6 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
 {
   Elf32_Phdr * phdrp;
   Elf32_Shdr * shdrp;
-  size_t res;
   
   if (!ap->a_image)
     {
@@ -594,8 +590,7 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
   shdrp->sh_entsize = 0;
   listAdd (sections, shdrp);
   
-  res = fwrite (ap->a_image, 1, ap->a_size, ofp);
-  assert(res == ap->a_size);
+  fwrite (ap->a_image, 1, ap->a_size, ofp);
 }
 
 /*--------------------------------------------------------------------------*/

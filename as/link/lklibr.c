@@ -22,7 +22,6 @@
 #define EQ(A,B) !strcmp((A),(B))
 #define MAXLINE 254 /*when using fgets*/
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -393,7 +392,6 @@ void LoadRel(char * libfname, FILE * libfp, char * ModName)
 {
     char str[NINPUT+2];
     int state=0;
-    char *res;
 
     while (fgets(str, NINPUT, libfp) != NULL)
     {
@@ -404,8 +402,7 @@ void LoadRel(char * libfname, FILE * libfp, char * ModName)
             case 0:
                 if(EQ(str, "<FILE>"))
                 {
-                    res = fgets(str, NINPUT, libfp);
-                    assert(res == str);
+                    fgets(str, NINPUT, libfp);
                     str[NINPUT+1] = '\0';
                     chop_crlf(str);
                     if(EQ(str, ModName)) state=1;
@@ -441,9 +438,7 @@ int LoadAdb(FILE * libfp)
 
     while (fgets(str, MAXLINE, libfp) != NULL)
     {
-        if (NINPUT < MAXLINE)
-            str[NINPUT+1] = '\0';
-
+        str[NINPUT+1] = '\0';
         chop_crlf(str);
         switch(state)
         {
@@ -472,13 +467,11 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
     char FLine[MAXLINE+1];
     int state=0;
     long IndexOffset=0, FileOffset;
-    char *res;
 
     while(!feof(libfp))
     {
         FLine[0]=0;
-        res = fgets(FLine, MAXLINE, libfp);
-        assert(res == FLine);
+        fgets(FLine, MAXLINE, libfp);
         chop_crlf(FLine);
 
         switch(state)
@@ -488,8 +481,7 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
                 {
                     /*The next line has the size of the index*/
                     FLine[0]=0;
-                    res = fgets(FLine, MAXLINE, libfp);
-                    assert(res == FLine);
+                    fgets(FLine, MAXLINE, libfp);
                     chop_crlf(FLine);
                     IndexOffset=atol(FLine);
                     state=1;
@@ -501,8 +493,7 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
                     /*The next line has the name of the module and the offset
                     of the corresponding embedded file in the library*/
                     FLine[0]=0;
-                    res = fgets(FLine, MAXLINE, libfp);
-                    assert(res == FLine);
+                    fgets(FLine, MAXLINE, libfp);
                     chop_crlf(FLine);
                     sscanf(FLine, "%s %ld", ModName, &FileOffset);
                     state=2;
@@ -747,11 +738,8 @@ int fndsym( char *name )
                     for(j=0; absPath1[j]!=0; j++) absPath1[j]=tolower((unsigned char)absPath1[j]);
                     for(j=0; absPath2[j]!=0; j++) absPath2[j]=tolower((unsigned char)absPath2[j]);
 #else
-                    char *res;
-                    res = realpath(FirstFound->libspc, absPath1);
-                    assert(res == absPath1);
-                    res = realpath(ThisLibr->libspc, absPath2);
-                    assert(res == absPath2);
+                    realpath(FirstFound->libspc, absPath1);
+                    realpath(ThisLibr->libspc, absPath2);
 #endif
                     if( !( EQ(absPath1, absPath2) && EQ(FirstFound->relfil, ThisLibr->relfil) ) )
                     {
@@ -783,13 +771,11 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
     int state=0;
     long IndexOffset=0, FileOffset;
     pmlibrarysymbol ThisSym = NULL;
-    char *res;
 
     while(!feof(libfp))
     {
         FLine[0]=0;
-        res = fgets(FLine, MAXLINE, libfp);
-        assert(res == FLine);
+        fgets(FLine, MAXLINE, libfp);
         chop_crlf(FLine);
 
         switch(state)
@@ -799,8 +785,7 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
                 {
                     /*The next line has the size of the index*/
                     FLine[0]=0;
-                    res = fgets(FLine, MAXLINE, libfp);
-                    assert(res == FLine);
+                    fgets(FLine, MAXLINE, libfp);
                     chop_crlf(FLine);
                     IndexOffset=atol(FLine);
                     state=1;
@@ -812,8 +797,7 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
                     /*The next line has the name of the module and the offset
                     of the corresponding embedded file in the library*/
                     FLine[0]=0;
-                    res = fgets(FLine, MAXLINE, libfp);
-                    assert(res == FLine);
+                    fgets(FLine, MAXLINE, libfp);
                     chop_crlf(FLine);
                     sscanf(FLine, "%s %ld", ModName, &FileOffset);
                     state=2;

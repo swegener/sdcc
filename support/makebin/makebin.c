@@ -1,6 +1,5 @@
 /** @name makebin - turn a .ihx file into a binary image.
  */
-#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -49,7 +48,6 @@ int main(int argc, char **argv)
 {
     int size = 32768, pack = 0, real_size = 0;
     BYTE *rom;
-    size_t res;
     char line[256];
     char *p;
 
@@ -114,13 +112,10 @@ int main(int argc, char **argv)
 	    real_size = addr;
     }
 
-    if (pack) {
-        res = fwrite(rom, 1, real_size, stdout);
-        assert(res == real_size);
-    } else {
-        res = fwrite(rom, 1, size, stdout);
-        assert(res == size);
-    }
+    if (pack)
+        fwrite(rom, 1, real_size, stdout);
+    else
+        fwrite(rom, 1, size, stdout);
     
     return 0;
 }

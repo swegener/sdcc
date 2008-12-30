@@ -48,15 +48,6 @@ int NumRelFiles=0;
 #define EQ(A,B) !strcmp((A),(B))
 #define NEQ(A,B) strcmp((A),(B))
 
-#if 1
-#include <assert.h>
-
-#define system(CMD)             do {                    \
-  int __res4568 = system(CMD);                          \
-  assert(-1 != __res4568);                              \
-} while (0)
-#endif
-
 int action=OPT_NONE;
 FILE *lib, *newlib, *rel, *adb, *libindex;
 char FLine[MAXLINE+1];

@@ -6,7 +6,6 @@
 
 #ifdef GAMEBOY
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -183,11 +182,8 @@ VOID gb(int in)
     cart[0x014E/SEGSIZE][0x014E%SEGSIZE] = (unsigned char)((chk>>8)&0xFF);
     cart[0x014F/SEGSIZE][0x014F%SEGSIZE] = (unsigned char)(chk&0xFF);
 
-    for(i = 0; i < NBSEG; i++) {
-      size_t res;
-      res = fwrite(cart[i], 1, SEGSIZE, ofp);
-      assert(res == SEGSIZE);
-    }
+    for(i = 0; i < NBSEG; i++)
+      fwrite(cart[i], 1, SEGSIZE, ofp);
   }
 }
 

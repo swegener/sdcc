@@ -18,7 +18,6 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -200,10 +199,8 @@ void FreeAll(void)
 
 void OutputByte(unsigned char value)
 {
-	size_t res;
 	GlobalChkSum+=value;
-	res = fwrite( &value, 1, 1, aomf51out );
-	assert(res == 1);
+	fwrite( &value, 1, 1, aomf51out );
 }
 
 void OutputWord(int value)
@@ -570,9 +567,7 @@ void CollectInfoFromCDB(void)
 	CurrentModule=0; /*Set the active module as the first one*/
 	while(!feof(CDBin))
 	{
-		char *res;
-		res = fgets(buff, sizeof(buff)-1, CDBin);
-		assert(res == buff);
+		fgets(buff, sizeof(buff)-1, CDBin);
 
 		if(!feof(CDBin)) switch(buff[0])
 		{

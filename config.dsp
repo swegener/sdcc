@@ -69,7 +69,7 @@ SOURCE=.\as\link\asxxxx_config.h.in
 InputPath=.\as\link\asxxxx_config.h.in
 
 "as/lib/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	gawk -f configure_vc.awk as/link/asxxxx_config.h.in > as/lib/asxxxx_config.h
+	gawk -f configure_vc.awk as/link/asxxxx_config.h.in > as/link/asxxxx_config.h
 
 # End Custom Build
 
@@ -79,7 +79,7 @@ InputPath=.\as\link\asxxxx_config.h.in
 InputPath=.\as\link\asxxxx_config.h.in
 
 "as/lib/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	gawk -f configure_vc.awk as/link/asxxxx_config.h.in > as/lib/asxxxx_config.h
+	gawk -f configure_vc.awk as/link/asxxxx_config.h.in > as/link/asxxxx_config.h
 
 # End Custom Build
 

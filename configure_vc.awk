@@ -30,11 +30,9 @@ BEGIN {
   version_patch = $3;
 
   print "/*"
-  print " * sdcc_vc.h"
   print " * Generated automatically by configure_vc.awk, DO NOT edit!"
-  print " * To make changes to sdcc_vc.h edit sdcc_vc_in.h instead."
-  print " */" 
-  print "" 
+  print " */"
+  print ""
 }
 
 /^#undef SDCC_VERSION_HI$/ {

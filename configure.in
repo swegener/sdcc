@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 AC_INIT(.version)
 AC_CONFIG_SRCDIR([Makefile.in])
-AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
+AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h as/link/asxxxx_config.h])
 
 AC_PROG_AWK
 
@@ -405,7 +405,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <sys/types.h>
 #include <sys/param.h>
 ],
 [#if  ! (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN \
-	&& BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
+        && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
  bogus endian macros
 #endif
 ])],
@@ -428,8 +428,8 @@ AC_RUN_IFELSE(
   u.l = 1;
   return u.c[sizeof (long int) - 1] == 1;
 ]])],
-	      [sdcc_cv_build_bigendian=no],
-	      [sdcc_cv_build_bigendian=yes],
+              [sdcc_cv_build_bigendian=no],
+              [sdcc_cv_build_bigendian=yes],
 [# try to guess the endianness by grepping values into an object file
   sdcc_cv_build_bigendian=unknown
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
@@ -455,8 +455,8 @@ case $sdcc_cv_build_bigendian in
   yes)
     m4_default([$1],
       [AC_DEFINE([BUILD_WORDS_BIGENDIAN], 1,
-	[Define to 1 if your processor stores words with the most significant
-	 byte first (like Motorola and SPARC, unlike Intel and VAX).])]) ;;
+        [Define to 1 if your processor stores words with the most significant
+         byte first (like Motorola and SPARC, unlike Intel and VAX).])]) ;;
   no)
     $2 ;;
   *)
@@ -517,7 +517,7 @@ AC_SUBST(EXEEXT)
 ############
 
 AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}")
-AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR  , '${sdccconf_h_dir_separator}')
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR, '${sdccconf_h_dir_separator}')
 
 # prefix:
 # default: "NONE", ${ac_default_prefix}: "/usr/local"

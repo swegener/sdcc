@@ -24,16 +24,6 @@
 #include <stdlib.h>
 #include "aslink.h"
 
-#ifdef _WIN32
-#  ifdef __MINGW32__ /* GCC MINGW32 depends on configure */
-#    include "sdccconf.h"
-#  else
-#    include "sdcc_vc.h"
-#  endif
-#else /* Assume Un*x style system */
-#  include "sdccconf.h"
-#endif
-
 static int execStartMSB;
 static int execStartLSB;
 static char execStartMSBfound;
@@ -224,17 +214,17 @@ static void
 listAdd (listHeader * lhp, void * item)
 {
   listEntry * lep;
-  
+
   lep = new (sizeof (*lep));
   lep->item = item;
   lep->prev = lhp->last;
   if (lep->prev)
     lep->prev->next = lep;
-  
+
   lhp->last = lep;
   if (!lhp->first)
     lhp->first = lep;
-  
+
   lhp->count++;
 }
 
@@ -242,27 +232,27 @@ static listHeader *
 listNew (void)
 {
   listHeader * lhp;
-  
+
   lhp = new (sizeof (*lhp));
-  
+
   return lhp;
 }
 
 
 #if 0
-static Elf32_Word  
+static Elf32_Word
 strtabFind (strtabList * strtab, char * str)
 {
   strtabString * sp;
   sp = strtab->first;
-  
+
   while (sp)
     {
       if (!strcmp (str, sp->string))
         return sp->index;
       sp = sp->next;
     }
-  
+
   return 0;
 }
 #endif
@@ -272,7 +262,7 @@ strtabFind (strtabList * strtab, char * str)
 /*   string if it does not already exist. Returns the offset of the  */
 /*   string in the table.                                            */
 /*-------------------------------------------------------------------*/
-static Elf32_Word  
+static Elf32_Word
 strtabFindOrAdd (strtabList * strtab, char * str)
 {
   strtabString * sp;
@@ -284,7 +274,7 @@ strtabFindOrAdd (strtabList * strtab, char * str)
         return sp->index;
       sp = sp->next;
     }
-  
+
   sp = new (sizeof(*sp));
   if (strtab->last)
     sp->index = strtab->last->index + 1 + strlen (strtab->last->string);
@@ -292,14 +282,14 @@ strtabFindOrAdd (strtabList * strtab, char * str)
     sp->index = 1;
   sp->string = new (1+strlen (str));
   strcpy (sp->string, str);
-  
+
   sp->prev = strtab->last;
   if (sp->prev)
     sp->prev->next = sp;
   strtab->last = sp;
   if (!strtab->first)
     strtab->first = sp;
-  
+
   return sp->index;
 }
 
@@ -310,9 +300,9 @@ static void
 fputElfStrtab (strtabList *strtab, FILE *fp)
 {
   strtabString * sp;
-  
-  fputc (0, fp);	/* index 0 must be the null character */
-  
+
+  fputc (0, fp);        /* index 0 must be the null character */
+
   sp = strtab->first;
   while (sp)
     {
@@ -413,10 +403,10 @@ static void
 fputElf32_Ehdr (Elf32_Ehdr * ehdr, FILE * fp)
 {
   int i;
-  
+
   for (i=0; i<EI_NIDENT; i++)
     fputc (ehdr->e_ident[i], fp);
-    
+
   fputElf32_Half (ehdr->e_type, fp);
   fputElf32_Half (ehdr->e_machine, fp);
   fputElf32_Word (ehdr->e_version, fp);
@@ -485,7 +475,7 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
     {
       return;
     }
-  
+
   ofs = 0;
   for (;;)
     {
@@ -501,11 +491,11 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
       while (ofs < ap->a_size && ap->a_used[ofs])
         ofs++;
       size = ap->a_addr + ofs - addr;
-      
+
       /* create a segment header for this region if loadable */
       if (!(ap->a_flag & A_NOLOAD))
         {
-          phdrp = new (sizeof (*phdrp));  
+          phdrp = new (sizeof (*phdrp));
           phdrp->p_type = PT_LOAD;
           phdrp->p_offset = ftell (ofp);
           phdrp->p_vaddr = addr;
@@ -518,9 +508,9 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
           phdrp->p_align = 1;
           listAdd (segments, phdrp);
         }
-  
+
       /* create a section header for this region */
-      shdrp = new (sizeof (*shdrp));  
+      shdrp = new (sizeof (*shdrp));
       shdrp->sh_name = strtabFindOrAdd (&shstrtab, ap->a_id);
       shdrp->sh_type = SHT_PROGBITS;
       shdrp->sh_flags = 0;
@@ -536,9 +526,9 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
       shdrp->sh_addralign = 0;
       shdrp->sh_entsize = 0;
       listAdd (sections, shdrp);
-      
+
       fwrite (&ap->a_image[addr-ap->a_addr], 1, size, ofp);
-    }  
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -549,7 +539,7 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
 {
   Elf32_Phdr * phdrp;
   Elf32_Shdr * shdrp;
-  
+
   if (!ap->a_image)
     {
       return;
@@ -558,7 +548,7 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
   /* create a segment header for this area if loadable */
   if (!(ap->a_flag & A_NOLOAD))
     {
-      phdrp = new (sizeof (*phdrp));  
+      phdrp = new (sizeof (*phdrp));
       phdrp->p_type = PT_LOAD;
       phdrp->p_offset = ftell (ofp);
       phdrp->p_vaddr = ap->a_addr;
@@ -571,9 +561,9 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
       phdrp->p_align = 1;
       listAdd (segments, phdrp);
     }
-  
+
   /* create a section header for this area */
-  shdrp = new (sizeof (*shdrp));  
+  shdrp = new (sizeof (*shdrp));
   shdrp->sh_name = strtabFindOrAdd (&shstrtab, ap->a_id);
   shdrp->sh_type = SHT_PROGBITS;
   shdrp->sh_flags = 0;
@@ -589,7 +579,7 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
   shdrp->sh_addralign = 0;
   shdrp->sh_entsize = 0;
   listAdd (sections, shdrp);
-  
+
   fwrite (ap->a_image, 1, ap->a_size, ofp);
 }
 
@@ -608,7 +598,7 @@ elfGenerate (void)
   listEntry * lep;
   int i;
   Elf32_Word shstrtabName;
-  
+
   /* create the null section header for index 0 */
   shdrp = new (sizeof (*shdrp));
   shdrp->sh_name = 0;
@@ -648,11 +638,11 @@ elfGenerate (void)
   ehdr.e_entry = 0;
   if (execStartMSBfound && execStartLSBfound)
     ehdr.e_entry = (execStartMSB << 8) + execStartLSB;
-  
+
   /* Write out the ELF header as a placeholder; we will update */
   /* it with the final values when everything is complete */
   fputElf32_Ehdr (&ehdr, ofp);
-  
+
   /* Iterate over the linker areas to generate */
   /* the ELF sections and segments */
   ap = areap;
@@ -667,7 +657,7 @@ elfGenerate (void)
         }
       ap = ap->a_ap;
     }
-  
+
   /* Create the string table section after the other sections */
   shdrp = new (sizeof (*shdrp));
   shdrp->sh_name = strtabFindOrAdd (&shstrtab, ".shstrtab");
@@ -682,7 +672,7 @@ elfGenerate (void)
   shdrp->sh_entsize = 0;
   listAdd (sections, shdrp);
   fputElfStrtab (&shstrtab, ofp);
-  
+
   /* Find the index of the section string table */
   /* header and save it in the ELF header */
   ehdr.e_shstrndx = 0;
@@ -696,7 +686,7 @@ elfGenerate (void)
       ehdr.e_shstrndx++;
       lep = lep->next;
     }
-  
+
   /* Write out the segment headers */
   ehdr.e_phnum = segments->count;
   ehdr.e_phoff = ftell (ofp);
@@ -723,7 +713,7 @@ elfGenerate (void)
   /* over the placeholder header with the final values */
   fseek (ofp, 0, SEEK_SET);
   fputElf32_Ehdr (&ehdr, ofp);
-  fseek (ofp, 0, SEEK_END);      
+  fseek (ofp, 0, SEEK_END);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -738,7 +728,7 @@ elf (int i)
 
   /* Buffer the data until we have it all */
   if (i)
-    {      
+    {
       if (hilo == 0)
         address = rtval[0] + (rtval[1] << 8); /* little endian order */
       else
@@ -760,7 +750,7 @@ elf (int i)
               ap->a_image[address-ap->a_addr] = rtval[i];
               if (ap->a_used)
                 ap->a_used[address-ap->a_addr] = 1;
-              
+
               /* Make note of the reset vector */
               if (!(ap->a_flag & A_NOLOAD))
                 {
@@ -775,7 +765,7 @@ elf (int i)
                       execStartLSBfound = 1;
                     }
                 }
-	      address++;
+              address++;
             }
         }
     }

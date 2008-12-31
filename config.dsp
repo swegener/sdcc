@@ -61,6 +61,37 @@ MTL=midl.exe
 # Name "config - Win32 Debug"
 # Begin Source File
 
+SOURCE=.\as\link\asxxxx_config.h.in
+
+!IF  "$(CFG)" == "config - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\as\link\asxxxx_config.h.in
+
+"as/lib/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	gawk -f configure_vc.awk as/link/asxxxx_config.h.in > as/lib/asxxxx_config.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "config - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\as\link\asxxxx_config.h.in
+
+"as/lib/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	gawk -f configure_vc.awk as/link/asxxxx_config.h.in > as/lib/asxxxx_config.h
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\configure_vc.awk
+# End Source File
+# Begin Source File
+
 SOURCE=.\sdcc_vc_in.h
 
 !IF  "$(CFG)" == "config - Win32 Release"

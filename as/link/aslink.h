@@ -22,6 +22,9 @@
  * Extensions: P. Felber
  */
 
+#include "getline.h"
+#include "asxxxx_config.h"
+
 #define VERSION "V01.75 + NoICE + SDCC Feb 1999"
 
 /*

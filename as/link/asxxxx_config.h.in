@@ -43,4 +43,4 @@
 # define TYPE_UDWORD unsigned TYPE_DWORD
 #endif
 
-#endif __ASXXXX_CONFIG_H
+#endif  /* __ASXXXX_CONFIG_H */

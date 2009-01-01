@@ -1,7 +1,15 @@
+2009-01-01 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/asxxxx_config.h.in:
+	  fixed warning: extra tokens at end of #endif directive
+	* src/z80/peep.c:
+	  fixed warning: suggest parentheses around && within ||
+
 2008-12-31 Borut Razem <borut.razem AT siol.net>
 
 	* configure, configure.in, config.dsp, config_vc.awk,
-	  as\link\asxxxx_config.h.in, as\link\hc08\lkelf.c, as\link\aslink.h:
+	  as/link/asxxxx_config.h.in, as/link/hc08/lkelf.c, as/link/aslink.h,
+	  as/link/hc08/Makefile.in, as/link/mcs51/Makefile.in:
 	  introduced asxxxx_config.h.in
 
 2008-12-30 Philipp Klaus Krause <pkk AT spth.de>

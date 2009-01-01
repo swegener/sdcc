@@ -280,8 +280,8 @@ z80UncondJump(const lineNode *pl)
 static bool
 z80CondJump(const lineNode *pl)
 {
-  if((strncmp(pl->line, "jp\t", 3) == 0 ||
-    strncmp(pl->line, "jr\t", 3) == 0) && strchr(pl->line, ',') != 0 ||
+  if(((strncmp(pl->line, "jp\t", 3) == 0 ||
+    strncmp(pl->line, "jr\t", 3) == 0) && strchr(pl->line, ',') != 0) ||
     strncmp(pl->line, "djnz\t", 5) == 0)
     return TRUE;
   return FALSE;

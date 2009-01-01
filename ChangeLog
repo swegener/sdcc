@@ -4,6 +4,9 @@
 	  fixed warning: extra tokens at end of #endif directive
 	* src/z80/peep.c:
 	  fixed warning: suggest parentheses around && within ||
+	* device/lib/Makefile.in: allow whitespaces at the end of lines in
+	  ports.build, in order to make it work on cygwin - it seems to be a
+	  bug in cygwin grep: CR is not treated as part of end-of-line
 
 2008-12-31 Borut Razem <borut.razem AT siol.net>
 

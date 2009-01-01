@@ -236,43 +236,43 @@ all: checkconf $(TARGETS)
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
 models:
-	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
+	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 small-mcs51-stack-auto:
-	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
+	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small PORTDIR=$(BUILDDIR)/small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-mcs51-stack-auto:
-	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
+	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$$model PORTDIR=$(BUILDDIR)/$$model-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 model-mcs51-xstack-auto:
-	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
+	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$$model PORTDIR=$(BUILDDIR)/$$model-xstack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 model-ds390:
-	if [ "`grep ds390 $(top_builddir)/ports.build`" = ds390 ]; then \
+	if grep '^ds390\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-ds400:
-	if [ "`grep ds400 $(top_builddir)/ports.build`" = ds400 ]; then \
+	if grep '^ds400\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-xa51:
-	if [ "`grep xa51 $(top_builddir)/ports.build`" = xa51 ]; then \
+	if grep '^xa51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mxa51" PORT=xa51 objects-xa51; \
 	fi
 
@@ -280,12 +280,12 @@ objects-xa51: build-dir $(XA51OBJECTS) port-specific-objects
 	cd $(PORTDIR); ls *$(OEXT) > lib$(PORT).lib
 
 model-z80:
-	if [ "`grep z80 $(top_builddir)/ports.build`" = z80 ]; then \
+	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mz80" PORT=z80 objects-z80 OEXT=.o; \
 	fi
 
 model-gbz80:
-	if [ "`grep z80 $(top_builddir)/ports.build`" = z80 ]; then \
+	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o; \
 	fi
 
@@ -293,7 +293,7 @@ objects-z80: build-dir $(Z80OBJECTS) port-specific-objects clean_intermediate
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
 model-hc08:
-	if [ "`grep hc08 $(top_builddir)/ports.build`" = hc08 ]; then \
+	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
 	fi
 
@@ -301,14 +301,14 @@ objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
 model-pic16:
-	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
+	if grep '^pic16\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic16 objects-pic16; \
 	fi
 
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
 
 model-pic14:
-	if [ "`grep pic $(top_builddir)/ports.build | grep -v pic16`" = pic ]; then \
+	if grep '^pic\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic objects-pic14; \
 	fi
 

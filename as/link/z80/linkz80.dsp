@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I ".." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I ".." /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "SDK" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -67,7 +67,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "SDK" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -89,88 +89,87 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\getline.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lkaomf51.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkarea.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lkdata.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lkeval.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkgb.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkgg.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lkhead.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkihx.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lklex.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# End Source File
+# Begin Source File
+
+SOURCE=..\lklib.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\lklibr.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lklist.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkmain.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lknoice.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# End Source File
+# Begin Source File
+
+SOURCE=..\lkrel.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkrloc.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lks19.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# End Source File
+# Begin Source File
+
+SOURCE=..\lksdcclib.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\lkstore.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
 SOURCE=..\lksym.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
 # End Source File
 # Begin Source File
 
@@ -183,6 +182,22 @@ SOURCE=..\..\asxxsrc\strcmpi.c
 # Begin Source File
 
 SOURCE=..\aslink.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\asxxxx_config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\getline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lklibr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lkrel.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

@@ -33,8 +33,8 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/.. -I$(top_builddir)
-CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -DUNIX -I.. -I$(srcdir)/.. -I$(top_builddir)
+CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
+CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB -DUNIX -I.. -I$(srcdir)/..
 M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@
 
@@ -46,9 +46,9 @@ LKLIB = $(srcdir)/..
 
 ASXXLIBSRC = strcmpi.c
 
-LKLIBSRC = lkaomf51.c lkdata.c lkeval.c \
-           lkhead.c lklex.c lklibr.c lklist.c \
-           lknoice.c lkstore.c lksym.c
+LKLIBSRC = getline.c lkaomf51.c lkdata.c lkeval.c \
+           lkhead.c lklex.c lklib.c lklibr.c lklist.c \
+           lknoice.c lkrel.c lksdcclib.c lkstore.c lksym.c
 
 SRC = lkmain.c lkarea.c lkihx.c \
       lkrloc.c lks19.c lkmem.c

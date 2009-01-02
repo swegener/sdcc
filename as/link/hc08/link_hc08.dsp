@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I ".." /I "..\..\.." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I ".." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /I "..\..\.." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -85,6 +85,10 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Source File
+
+SOURCE=..\getline.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\lkaomf51.c
@@ -119,6 +123,10 @@ SOURCE=..\lklex.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lklib.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lklibr.c
 # End Source File
 # Begin Source File
@@ -139,11 +147,19 @@ SOURCE=..\lknoice.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lkrel.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\lkrloc.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\lks19.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\lksdcclib.c
 # End Source File
 # Begin Source File
 
@@ -167,7 +183,19 @@ SOURCE=..\aslink.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\sdcc_vc.h
+SOURCE=..\asxxxx_config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\getline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lklibr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lkrel.h
 # End Source File
 # End Group
 # End Target

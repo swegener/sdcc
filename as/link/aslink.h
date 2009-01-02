@@ -22,8 +22,6 @@
  * Extensions: P. Felber
  */
 
-#include "asxxxx_config.h"
-
 #define VERSION "V01.75 + NoICE + SDCC Feb 1999"
 
 /*
@@ -487,7 +485,8 @@ struct lbfile {
         char            *libspc;
         char            *relfil;
         char            *filspc;
-        long            offset; /*>=0 if rel file is embedded in a lib file at this offset*/
+        long            offset;
+        unsigned int    type;
 };
 
 /*

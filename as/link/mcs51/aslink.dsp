@@ -88,6 +88,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\getline.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lkaomf51.c
 # End Source File
 # Begin Source File
@@ -116,6 +120,10 @@ SOURCE=..\lklex.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lklib.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lklibr.c
 # End Source File
 # Begin Source File
@@ -136,11 +144,19 @@ SOURCE=..\lknoice.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lkrel.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\lkrloc.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\lks19.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\lksdcclib.c
 # End Source File
 # Begin Source File
 
@@ -161,6 +177,22 @@ SOURCE=..\..\asxxsrc\strcmpi.c
 # Begin Source File
 
 SOURCE=..\aslink.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\asxxxx_config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\getline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lklibr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lkrel.h
 # End Source File
 # End Group
 # End Target

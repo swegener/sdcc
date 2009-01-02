@@ -1,3 +1,17 @@
+2009-01-02 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lklib.c, as/link/lksdcclib.c, as/link/lklibr.h,
+	  as/link/getline.[ch], as/link/lkrel.[ch]: added,
+	  made support for differnet library formats more flexible,
+	  preparation for support of ar format
+	* as/link/lklibr.c, as/link/z80/Makefile.in,
+	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
+	  as/link/hc08/link_hc08.dsp, as/link/hc08/Makefile.in,
+	  as/link/mcs51/aslink.dsp, as/link/mcs51/Makefile.in,
+	  as/link/hc08/lkelf.c, as/link/aslink.h:
+	  made support for differnet library formats more flexible,
+	  preparation for support of ar format
+
 2009-01-01 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/asxxxx_config.h.in:

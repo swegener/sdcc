@@ -487,8 +487,7 @@ struct lbfile {
         char            *libspc;
         char            *relfil;
         char            *filspc;
-        long            offset;
-        unsigned int    type;
+        long            offset; /*>=0 if rel file is embedded in a lib file at this offset*/
 };
 
 /*

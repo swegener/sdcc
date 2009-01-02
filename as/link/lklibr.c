@@ -19,8 +19,6 @@
  * Extensions: P. Felber
  */
 
-#define EQ(A,B) !strcmp((A),(B))
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,6 +48,7 @@
  *
  */
 
+#define EQ(A,B) !strcmp((A),(B))
 #define NELEM(x) (sizeof (x) / sizeof (*x))
 
 #ifdef INDEXLIB
@@ -763,8 +762,8 @@ fndsym (const char *name)
 
       fclose (libfp);
 
-      if (!ret)
-        break;
+      if (ret)
+        return 1;
 
     }                           /* Ends good open of libr file */
   return 0;

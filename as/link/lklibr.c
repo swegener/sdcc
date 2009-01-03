@@ -740,7 +740,7 @@ fndsym (const char *name)
    */
   for (lbnh = lbnhead; lbnh; lbnh = lbnh->next)
     {
-      int ret;
+      int ret = 0;
 
       if ((libfp = fopen (lbnh->libspc, "rb")) == NULL)
         {

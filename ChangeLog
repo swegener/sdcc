@@ -1,3 +1,8 @@
+2009-01-03 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lklibr.c:
+	  fixed warning: 'ret' may be used uninitialized in this function
+
 2009-01-02 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/lklib.c, as/link/lksdcclib.c, as/link/lklibr.h,

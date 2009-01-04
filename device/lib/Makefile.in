@@ -121,7 +121,7 @@ Z80SOURCES =	\
 		_islower.c _isupper.c _isxdigit.c \
 		_startup.c \
 		_strcat.c _strchr.c _strcmp.c _strcpy.c \
-		_strcspn.c _strlen.c _strncat.c _strncmp.c \
+		_strcspn.c _strncat.c _strncmp.c \
 		_strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		_strstr.c _strtok.c \
 		_memcmp.c _memcpy.c _memset.c \

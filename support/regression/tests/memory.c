@@ -39,5 +39,9 @@ void testmemory(void)
   ASSERT(NULL == memchr(destination, 5, 4));
   ASSERT(destination == memchr(destination, 0, 4));
   ASSERT(destination + 3 == memchr(destination, 3, 4));*/
+
+  ASSERT(strlen("test") == 4);
+  ASSERT(strlen("t") == 1);
+  ASSERT(strlen("") == 0);
 }
 

@@ -8005,7 +8005,7 @@ _swap (PAIR_ID one, PAIR_ID two)
 }
 
 static void
-setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
+setupForMemcpy (iCode *ic, int nparams, operand **pparams)
 {
   PAIR_ID ids[NUM_PAIRS][NUM_PAIRS];
   PAIR_ID dest[3] = {
@@ -8119,53 +8119,26 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
     }
 }
 
-/*static void
-genBuiltInStrcpy (iCode *ic, int nParams, operand **pparams)
-{
-  operand *from, *to;
-  symbol *label;
-  bool deInUse;
-
-  wassertl (nParams == 2, "Built-in strcpy must have two parameters");
-  to = pparams[0];
-  from = pparams[1];
-
-  deInUse = bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX);
-
-  _saveRegsForCall (ic, 0);
-
-  setupForBuiltin3 (ic, nParams, pparams);
-
-  label = newiTempLabel(NULL);
-
-  emitLabel (label->key);
-  emit2 ("ld a,(hl)");
-  emit2 ("ldi");
-  emit2 ("or a");
-  emit2 ("!shortjp NZ,!tlabel ; 1", label->key);
-
-  freeAsmop (from, NULL, ic->next);
-  freeAsmop (to, NULL, ic);
-}*/
-
 static void
 genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 {
   operand *from, *to, *count;
 
-  wassertl (nParams == 3, "Built-in memcpy must have three parameters");
+  wassertl (nParams == 3, "Built-in memcpy() must have three parameters");
   to = pparams[2];
   from = pparams[1];
   count = pparams[0];
 
   _saveRegsForCall (ic, 0);
 
-  setupForBuiltin3 (ic, nParams, pparams);
+  setupForMemcpy (ic, nParams, pparams);
 
   emit2 ("ldir");
 
   freeAsmop (count, NULL, ic->next->next);
   freeAsmop (from, NULL, ic);
+
+  spillPair (PAIR_HL);
 
   _restoreRegsAfterCall();
 
@@ -8200,11 +8173,7 @@ static void genBuiltIn (iCode *ic)
     /* which function is it */
     bif = OP_SYMBOL(IC_LEFT(bi_iCode));
 
-    /*if (strcmp(bif->name,"__builtin_strcpy")==0)
-      {
-        genBuiltInStrcpy(bi_iCode, nbi_parms, bi_parms);
-      }
-    else*/ if (strcmp(bif->name,"__builtin_memcpy")==0)
+    if (strcmp(bif->name,"__builtin_memcpy")==0)
       {
         genBuiltInMemcpy(bi_iCode, nbi_parms, bi_parms);
       }

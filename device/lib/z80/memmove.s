@@ -6,8 +6,8 @@
 
 _memmove:
 	push	ix
-	ld	ix,#0
-	add	ix,sp
+	ld	ix, #0
+	add	ix, sp
 	ld	c, 8(ix)
 	ld	b, 9(ix)
 	ld	a, c

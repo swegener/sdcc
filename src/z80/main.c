@@ -112,10 +112,8 @@ extern PORT z80_port;
 #include "mappings.i"
 
 static builtins _z80_builtins[] = {
-  /* Disabled for now.
-    { "__builtin_strcpy", "v", 2, {"cg*", "cg*" } },*/
     { "__builtin_memcpy", "vg*", 3, {"vg*", "vg*", "ui" } },
-    { NULL , NULL,0, {NULL}}
+    { NULL , NULL, 0, {NULL}}
 };
 
 static void

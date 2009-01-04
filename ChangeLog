@@ -5,6 +5,9 @@
 	* doc/README.txt: updated John Hartman's e-mail address
 	* as/link/lkrel.c, as/link/lksdcclib.c:
 	  fixed bug #2484677: Linker hangs
+	* src/z80/peep.c: fixed msvc warning C4047:
+	  'return' : 'int ' differs in levels of indirection from 'char *'
+	* config.dsp: as/lib corrected to as/link
 
 2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
 

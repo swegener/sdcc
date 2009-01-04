@@ -195,9 +195,7 @@ findLabel (const lineNode *pl)
 /* Check if reading arg implies reading what. */
 static bool argCont(const char *arg, const char *what)
 {
-	if(arg[0] == '#')
-		return FALSE;
-	return(strstr(arg, what));;
+  return (arg[0] == '#') ? FALSE : strstr(arg, what) != NULL;
 }
 
 static bool
@@ -262,7 +260,7 @@ z80MightRead(const lineNode *pl, const char *what)
     strncmp(pl->line, "dec\t", 4) == 0 ||
     strncmp(pl->line, "inc\t", 4) == 0 ||
     strncmp(pl->line, "rl\t", 4) == 0 ||
-    strncmp(pl->line, "rr\t", 4) == 0 ||  
+    strncmp(pl->line, "rr\t", 4) == 0 ||
     strncmp(pl->line, "sla\t", 4) == 0 ||
     strncmp(pl->line, "sra\t", 4) == 0 ||
     strncmp(pl->line, "srl\t", 4) == 0)

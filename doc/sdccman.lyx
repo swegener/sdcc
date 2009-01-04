@@ -55,6 +55,7 @@
 \tracking_changes false
 \output_changes false
 \author "" 
+\author "" 
 \end_header
 
 \begin_body
@@ -113,7 +114,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.8.5
+SDCC 2.8.6
 \size footnotesize
 
 \newline
@@ -25040,8 +25041,8 @@ Make local functions static, as non static functions require code page selection
 \newline
 Due to the way sdcc handles functions, place called functions prior
  to calling functions in the file wherever possible: Otherwise sdcc will
- insert unnecessary pagesel directives around the call, believing that
- the called function is externally defined.
+ insert unnecessary pagesel directives around the call, believing that the
+ called function is externally defined.
 \end_layout
 
 \begin_layout Enumerate
@@ -35152,8 +35153,8 @@ give back to the public as you are probably at least partially publicly
 \end_layout
 
 \begin_layout Enumerate
-give students a chance to publicly prove their skills and to possibly
- see a world wide impact
+give students a chance to publicly prove their skills and to possibly see
+ a world wide impact
 \end_layout
 
 \begin_layout Standard

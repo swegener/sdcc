@@ -79,7 +79,7 @@ Authors and interested persons:
 SDCC includes code from:
 * Alan Baldwin      <baldwin AT shop-pdp.kent.edu>
    Initial version of ASXXXX and  ASLINK. 
-* John Hartman      <jhartman AT compuserve.com>
+* John Hartman      <noice AT noicedebugger.com>
    Porting ASXXXX and ASLINK for 8051.
 * Dmitry S. Obukhov <dso AT usa.net>
    malloc and serial I/O routines.

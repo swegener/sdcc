@@ -1,3 +1,9 @@
+2009-01-04 Borut Razem <borut.razem AT siol.net>
+
+	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.6
+	  due changes in sdcc asxxxx linkers - it sholud be done 2 days ago :(
+	* doc/README.txt: updated John Hartman's e-mail address
+
 2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

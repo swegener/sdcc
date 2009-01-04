@@ -1,5 +1,13 @@
 2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Implemented RFE #2485684, and some further improvements of HL caching
+	  including a bugfix.
+	* src/z80/peeph-z80.def:
+	  Fixed a bug exposed by implementing RFE #2485684.
+
+2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peeph-z80.def:
 	  Peephole improvements.
 	* src/z80/gen.c,

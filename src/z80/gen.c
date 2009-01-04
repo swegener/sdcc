@@ -1385,28 +1385,61 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
     {
       if (pairId == PAIR_HL || pairId == PAIR_IY)
         {
-          if (_G.pairs[pairId].last_type == left->type)
+          if (_G.pairs[pairId].last_type == AOP_IMMD && left->type == AOP_IMMD)
             {
               if (_G.pairs[pairId].base && !strcmp (_G.pairs[pairId].base, base))
                 {
                   if (pairId == PAIR_HL && abs (_G.pairs[pairId].offset - offset) < 3)
                     {
                       adjustPair (pair, &_G.pairs[pairId].offset, offset);
-                      return;
+                      goto adjusted;
                     }
                   if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
                     {
-                      return;
+                       goto adjusted;
                     }
                 }
             }
         }
+
+      if (pairId == PAIR_HL && left->type == AOP_LIT && _G.pairs[pairId].last_type == AOP_LIT &&
+        !IS_FLOAT (left->aopu.aop_lit->type) && offset == 0 && _G.pairs[pairId].offset == 0)
+        {
+          unsigned new_low, new_high, old_low, old_high;
+          unsigned long v_new = ulFromVal (left->aopu.aop_lit);
+          unsigned long v_old = strtoul (_G.pairs[pairId].base, NULL, 0);
+          new_low = (v_new >> 0) & 0xff;
+          new_high = (v_new >> 8) & 0xff;
+          old_low = (v_old >> 0) & 0xff;
+          old_high = (v_old >> 8) & 0xff;
+          
+          /* Change lower byte only. */
+          if(new_high == old_high)
+            {
+              emit2("ld l, %s", aopGet (left, 0, FALSE));
+              goto adjusted;
+            }
+          /* Change upper byte only. */
+          else if(new_low == old_low)
+            {
+              emit2("ld h, %s", aopGet (left, 1, FALSE));
+              goto adjusted;
+            }
+        }
+
+
       _G.pairs[pairId].last_type = left->type;
       _G.pairs[pairId].base = traceAlloc(&_G.trace.aops, Safe_strdup (base));
       _G.pairs[pairId].offset = offset;
     }
   /* Both a lit on the right and a true symbol on the left */
   emit2 ("ld %s,!hashedstr", pair, l);
+  return;
+
+adjusted:
+  _G.pairs[pairId].last_type = left->type;
+  _G.pairs[pairId].base = traceAlloc(&_G.trace.aops, Safe_strdup (base));
+  _G.pairs[pairId].offset = offset;
 }
 
 static PAIR_ID
@@ -2676,7 +2709,6 @@ genIpush (iCode * ic)
         {
           fetchHL (AOP (IC_LEFT (ic)));
           emit2 ("push hl");
-          spillPair (PAIR_HL);
           _G.stack.pushed += 2;
           goto release;
         }
@@ -2684,11 +2716,9 @@ genIpush (iCode * ic)
         {
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
           emit2 ("push hl");
-          spillPair (PAIR_HL);
           _G.stack.pushed += 2;
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
           emit2 ("push hl");
-          spillPair (PAIR_HL);
           _G.stack.pushed += 2;
           goto release;
         }

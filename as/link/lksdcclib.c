@@ -56,7 +56,7 @@ is_sdcclib (FILE * libfp)
 }
 
 /* Load a .rel file embedded in a sdcclib file */
-static void
+static int
 LoadRel (char *libfname, FILE * libfp, char *ModName)
 {
   char str[NINPUT];
@@ -69,25 +69,21 @@ LoadRel (char *libfname, FILE * libfp, char *ModName)
 	case 0:
 	  if (EQ (str, "<FILE>"))
 	    {
-	      getline (str, sizeof (str), libfp);
-	      if (EQ (str, ModName))
+	      if (NULL != getline (str, sizeof (str), libfp) && EQ (str, ModName))
 		state = 1;
 	      else
-		{
-		  fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", libfname, ModName);
-		  lkexit (1);
-		}
+                return 0;
 	    }
+          else
+            return 0;
 	  break;
+
 	case 1:
-	  if (EQ (str, "<REL>"))
-	    state = 2;
-	  break;
-	case 2:
-	  load_rel (libfp, -1);
-	  break;
+          return EQ (str, "<REL>") ? load_rel (libfp, -1) : 0;
 	}
     }
+
+  return 0;
 }
 
 #ifdef INDEXLIB
@@ -114,7 +110,8 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
 	      state = 1;
 	    }
 	  break;
-	case 1:
+
+        case 1:
 	  if (EQ (FLine, "<MODULE>"))
 	    {
 	      /* The next line has the name of the module and the offset
@@ -149,7 +146,8 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
 	      return This;	/* Finish, get out of here */
 	    }
 	  break;
-	case 2:
+
+        case 2:
 	  if (EQ (FLine, "</MODULE>"))
 	    {
 	      This->loaded = 0;
@@ -193,7 +191,7 @@ LoadAdb (FILE * libfp)
 {
   char str[MAXLINE];
   int state = 0;
-  int ToReturn = 0;
+  int ret = 0;
 
   while (getline (str, sizeof (str), libfp) != NULL)
     {
@@ -203,15 +201,16 @@ LoadAdb (FILE * libfp)
 	  if (EQ (str, "<ADB>"))
 	    state = 1;
 	  break;
+
 	case 1:
 	  if (EQ (str, "</ADB>"))
-	    return ToReturn;
+	    return ret;
 	  fprintf (dfp, "%s\n", str);
-	  ToReturn = 1;
+	  ret = 1;
 	  break;
 	}
     }
-  return ToReturn;
+  return ret;
 }
 
 /* Check for a symbol in a SDCC library. If found, add the embedded .rel and
@@ -254,7 +253,8 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 	      state = 1;
 	    }
 	  break;
-	case 1:
+
+        case 1:
 	  if (EQ (FLine, "<MODULE>"))
 	    {
 	      /* The next line has the name of the module and the offset
@@ -269,7 +269,8 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 	      return 0;
 	    }
 	  break;
-	case 2:
+
+        case 2:
 	  if (EQ (FLine, "</MODULE>"))
 	    {
 	      /* The symbol is not in this module, try the next one */
@@ -321,8 +322,12 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
 		  /* Jump to where the .rel begins and load it. */
 		  fseek (libfp, lbfh->offset, SEEK_SET);
-		  LoadRel (lbnh->libspc, libfp, ModName);
-
+		  if (!LoadRel (lbnh->libspc, libfp, ModName))
+                    {
+                      fclose (libfp);
+	              fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, ModName);
+	              lkexit (1);
+                    }
 		  /* if cdb information required & .adb file present */
 		  if (dflag && dfp)
 		    {
@@ -349,6 +354,8 @@ static void
 loadfile_sdcclib (struct lbfile *lbfh)
 {
   FILE *fp;
+  int res;
+
 #ifdef __CYGWIN__
   char posix_path[PATH_MAX];
   void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
@@ -361,13 +368,18 @@ loadfile_sdcclib (struct lbfile *lbfh)
   if (fp != NULL)
     {
       fseek (fp, lbfh->offset, SEEK_SET);
-      LoadRel (lbfh->libspc, fp, lbfh->relfil);
+      res = LoadRel (lbfh->libspc, fp, lbfh->relfil);
       fclose (fp);
+
+      if (!res)
+        {
+	  fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, lbfh->relfil);
+	  lkexit (1);
+	}
     }
   else
     {
       fprintf (stderr, "?ASlink-Error-Opening library '%s'\n", lbfh->libspc);
-      fclose (fp);
       lkexit (1);
     }
 }

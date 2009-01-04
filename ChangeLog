@@ -3,6 +3,8 @@
 	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.6
 	  due changes in sdcc asxxxx linkers - it sholud be done 2 days ago :(
 	* doc/README.txt: updated John Hartman's e-mail address
+	* as/link/lkrel.c, as/link/lksdcclib.c:
+	  fixed bug #2484677: Linker hangs
 
 2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -322,7 +324,7 @@
 
 2008-11-06 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCCmain.c: #fixed bug 2224960: sdcc -MM no working correctly
+	* src/SDCCmain.c: fixed bug #2224960: sdcc -MM no working correctly
 	  pass system include paths with -isystem to sdcpp
 	* src/SDCCglue.c, src/pic/glue.c, src/pic16/glue.c: removed unneeded
 	  functions (closePipes), (closeTmpFiles) and (rmTmpFiles)

@@ -15,6 +15,10 @@
  *
  */
 
+/*
+ * Extensions: P. Felber
+ */
+
 #include <string.h>
 #include <assert.h>
 
@@ -54,7 +58,7 @@ is_rel (FILE * libfp)
   return ret;
 }
 
-/* Load a .rel file embedded in a sdcclib file */
+/* Load a standalone or embedded .rel */
 int
 load_rel (FILE * libfp, long size)
 {
@@ -63,10 +67,7 @@ load_rel (FILE * libfp, long size)
       char str[NINPUT];
       long end;
 
-      if (size >= 0)
-	end = ftell (libfp) + size;
-      else
-	end = -1;
+      end = (size >= 0) ? ftell (libfp) + size : -1;
 
       while ((end < 0 || ftell (libfp) < end) && getline (str, sizeof (str), libfp) != NULL)
 	{

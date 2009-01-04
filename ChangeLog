@@ -1,3 +1,10 @@
+2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Implemented RFE #2484693.
+	* src/z80/peeph-z80.def:
+	  Some peephole improvements.
+
 2009-01-03 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/lklibr.c:

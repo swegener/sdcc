@@ -192,14 +192,22 @@ findLabel (const lineNode *pl)
   return NULL;
 }
 
+/* Check if reading arg implies reading what. */
+static bool argCont(const char *arg, const char *what)
+{
+	if(arg[0] == '#')
+		return FALSE;
+	return(strstr(arg, what));;
+}
+
 static bool
 z80MightRead(const lineNode *pl, const char *what)
 {
-  if(strcmp(pl->line, "call\t__initrleblock") == 0)
-    return TRUE;
-
   if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
     what = "iy";
+
+  if(strcmp(pl->line, "call\t__initrleblock") == 0)
+    return TRUE;
 
   if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
     return FALSE;
@@ -224,14 +232,22 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strncmp(pl->line, "adc\t", 4) == 0 ||
     strncmp(pl->line, "add\t", 4) == 0 ||
     strncmp(pl->line, "and\t", 4) == 0 ||
-    strncmp(pl->line, "or\t", 3) == 0 ||
     strncmp(pl->line, "sbc\t", 4) == 0 ||
     strncmp(pl->line, "sub\t", 4) == 0 ||
     strncmp(pl->line, "xor\t", 4) == 0)
     {
-      if( strstr(pl->line + 3, what) != 0)
+      if(argCont(pl->line + 4, what))
         return TRUE;
-      if( strstr(pl->line + 3, "hl") == 0 && strcmp("a", what) == 0)
+      if(strstr(pl->line + 4, "hl") == 0 && strcmp("a", what) == 0)
+        return TRUE;
+      return FALSE;
+    }
+
+  if(strncmp(pl->line, "or\t", 3) == 0)
+    {
+      if(argCont(pl->line + 3, what))
+        return TRUE;
+      if(strcmp("a", what) == 0)
         return TRUE;
       return FALSE;
     }
@@ -245,13 +261,20 @@ z80MightRead(const lineNode *pl, const char *what)
   if(
     strncmp(pl->line, "dec\t", 4) == 0 ||
     strncmp(pl->line, "inc\t", 4) == 0 ||
-    strncmp(pl->line, "rl\t", 3) == 0 ||
-    strncmp(pl->line, "rr\t", 3) == 0 ||  
+    strncmp(pl->line, "rl\t", 4) == 0 ||
+    strncmp(pl->line, "rr\t", 4) == 0 ||  
     strncmp(pl->line, "sla\t", 4) == 0 ||
     strncmp(pl->line, "sra\t", 4) == 0 ||
     strncmp(pl->line, "srl\t", 4) == 0)
     {
-       return (strstr(pl->line + 3, what) != 0);
+       return (argCont(pl->line + 4, what));
+    }
+
+  if(
+    strncmp(pl->line, "rl\t", 3) == 0 ||
+    strncmp(pl->line, "rr\t", 3) == 0)
+    {
+       return (argCont(pl->line + 3, what));
     }
 
   if(strncmp(pl->line, "jp\t", 3) == 0 ||

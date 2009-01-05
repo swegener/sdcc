@@ -28,7 +28,7 @@
 #include "lkrel.h"
 
 #define EQ(A,B) !strcmp((A),(B))
-#define MAXLINE 254		/*when using getline */
+#define MAXLINE 254             /*when using getline */
 
 
 static int
@@ -42,14 +42,14 @@ is_sdcclib (FILE * libfp)
   if (fread (buf, 1, sizeof (buf), libfp) == sizeof (buf) && memcmp (buf, SDCCLIB_MAGIC, SDCCLIB_MAGIC_LEN) == 0)
     {
       switch (getc (libfp))
-	{
-	case '\r':
-	  if (getc (libfp) == '\n')
-	    return 1;
+        {
+        case '\r':
+          if (getc (libfp) == '\n')
+            return 1;
 
-	case '\n':
-	  return 1;
-	}
+        case '\n':
+          return 1;
+        }
     }
   rewind (libfp);
   return 0;
@@ -65,22 +65,22 @@ LoadRel (char *libfname, FILE * libfp, char *ModName)
   while (getline (str, sizeof (str), libfp) != NULL)
     {
       switch (state)
-	{
-	case 0:
-	  if (EQ (str, "<FILE>"))
-	    {
-	      if (NULL != getline (str, sizeof (str), libfp) && EQ (str, ModName))
-		state = 1;
-	      else
+        {
+        case 0:
+          if (EQ (str, "<FILE>"))
+            {
+              if (NULL != getline (str, sizeof (str), libfp) && EQ (str, ModName))
+                state = 1;
+              else
                 return 0;
-	    }
+            }
           else
             return 0;
-	  break;
+          break;
 
-	case 1:
+        case 1:
           return EQ (str, "<REL>") ? load_rel (libfp, -1) : 0;
-	}
+        }
     }
 
   return 0;
@@ -100,84 +100,84 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
   while (getline (FLine, sizeof (FLine), libfp))
     {
       switch (state)
-	{
-	case 0:
-	  if (EQ (FLine, "<INDEX>"))
-	    {
-	      /*The next line has the size of the index */
-	      getline (FLine, sizeof (FLine), libfp);
-	      IndexOffset = atol (FLine);
-	      state = 1;
-	    }
-	  break;
+        {
+        case 0:
+          if (EQ (FLine, "<INDEX>"))
+            {
+              /*The next line has the size of the index */
+              getline (FLine, sizeof (FLine), libfp);
+              IndexOffset = atol (FLine);
+              state = 1;
+            }
+          break;
 
         case 1:
-	  if (EQ (FLine, "<MODULE>"))
-	    {
-	      /* The next line has the name of the module and the offset
-	         of the corresponding embedded file in the library */
-	      getline (FLine, sizeof (FLine), libfp);
-	      sscanf (FLine, "%s %ld", ModName, &FileOffset);
-	      state = 2;
+          if (EQ (FLine, "<MODULE>"))
+            {
+              /* The next line has the name of the module and the offset
+                 of the corresponding embedded file in the library */
+              getline (FLine, sizeof (FLine), libfp);
+              sscanf (FLine, "%s %ld", ModName, &FileOffset);
+              state = 2;
 
-	      /* Create a new libraryfile object for this module */
-	      if (libr == NULL)
-		{
-		  libr = This = (pmlibraryfile) new (sizeof (mlibraryfile));
-		}
-	      else
-		{
-		  This->next = (pmlibraryfile) new (sizeof (mlibraryfile));
-		  This = This->next;
-		}
-	      This->next = NULL;
-	      This->loaded = -1;
-	      This->offset = FileOffset + IndexOffset;
-	      This->libspc = lbnh->libspc;
-	      This->relfil = strdup (ModName);
-	      sprintf (buff, "%s%s%c%s", lbnh->path, ModName, FSEPX, LKOBJEXT);
-	      This->filename = strdup (buff);
-	      This->type = type;
+              /* Create a new libraryfile object for this module */
+              if (libr == NULL)
+                {
+                  libr = This = (pmlibraryfile) new (sizeof (mlibraryfile));
+                }
+              else
+                {
+                  This->next = (pmlibraryfile) new (sizeof (mlibraryfile));
+                  This = This->next;
+                }
+              This->next = NULL;
+              This->loaded = -1;
+              This->offset = FileOffset + IndexOffset;
+              This->libspc = lbnh->libspc;
+              This->relfil = strdup (ModName);
+              sprintf (buff, "%s%s%c%s", lbnh->path, ModName, FSEPX, LKOBJEXT);
+              This->filename = strdup (buff);
+              This->type = type;
 
-	      This->symbols = ThisSym = NULL;	/* Start a new linked list of symbols */
-	    }
-	  else if (EQ (FLine, "</INDEX>"))
-	    {
-	      return This;	/* Finish, get out of here */
-	    }
-	  break;
+              This->symbols = ThisSym = NULL;   /* Start a new linked list of symbols */
+            }
+          else if (EQ (FLine, "</INDEX>"))
+            {
+              return This;      /* Finish, get out of here */
+            }
+          break;
 
         case 2:
-	  if (EQ (FLine, "</MODULE>"))
-	    {
-	      This->loaded = 0;
-	      /* Create the index for the next module */
-	      state = 1;
-	    }
-	  else
-	    {
-	      /* Add the symbols */
-	      if (ThisSym == NULL)	/* First symbol of the current module */
-		{
-		  ThisSym = This->symbols = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
-		}
-	      else
-		{
-		  ThisSym->next = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
-		  ThisSym = ThisSym->next;
-		}
-	      ThisSym->next = NULL;
-	      ThisSym->name = strdup (FLine);
-	    }
-	  break;
+          if (EQ (FLine, "</MODULE>"))
+            {
+              This->loaded = 0;
+              /* Create the index for the next module */
+              state = 1;
+            }
+          else
+            {
+              /* Add the symbols */
+              if (ThisSym == NULL)      /* First symbol of the current module */
+                {
+                  ThisSym = This->symbols = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
+                }
+              else
+                {
+                  ThisSym->next = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
+                  ThisSym = ThisSym->next;
+                }
+              ThisSym->next = NULL;
+              ThisSym->name = strdup (FLine);
+            }
+          break;
 
-	default:
-	  return This;		/* State machine should never reach this point, but just in case... */
-	  break;
-	}
+        default:
+          return This;          /* State machine should never reach this point, but just in case... */
+          break;
+        }
     }
 
-  return This;			/* State machine should never reach this point, but just in case... */
+  return This;                  /* State machine should never reach this point, but just in case... */
 }
 
 #else
@@ -196,19 +196,19 @@ LoadAdb (FILE * libfp)
   while (getline (str, sizeof (str), libfp) != NULL)
     {
       switch (state)
-	{
-	case 0:
-	  if (EQ (str, "<ADB>"))
-	    state = 1;
-	  break;
+        {
+        case 0:
+          if (EQ (str, "<ADB>"))
+            state = 1;
+          break;
 
-	case 1:
-	  if (EQ (str, "</ADB>"))
-	    return ret;
-	  fprintf (dfp, "%s\n", str);
-	  ret = 1;
-	  break;
-	}
+        case 1:
+          if (EQ (str, "</ADB>"))
+            return ret;
+          fprintf (dfp, "%s\n", str);
+          ret = 1;
+          break;
+        }
     }
   return ret;
 }
@@ -232,120 +232,120 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
       char str[PATH_MAX];
 
       if (lbnh->path != NULL)
-	{
-	  strcpy (str, lbnh->path);
+        {
+          strcpy (str, lbnh->path);
 #ifdef  OTHERSYSTEM
-	  if (*str != '\0' && (str[strlen (str) - 1] != '/') && (str[strlen (str) - 1] != LKDIRSEP))
-	    {
-	      strcat (str, LKDIRSEPSTR);
-	    }
+          if (*str != '\0' && (str[strlen (str) - 1] != '/') && (str[strlen (str) - 1] != LKDIRSEP))
+            {
+              strcat (str, LKDIRSEPSTR);
+            }
 #endif
-	}
+        }
 
       switch (state)
-	{
-	case 0:
-	  if (EQ (FLine, "<INDEX>"))
-	    {
-	      /* The next line has the size of the index */
-	      getline (FLine, sizeof (FLine), libfp);
-	      IndexOffset = atol (FLine);
-	      state = 1;
-	    }
-	  break;
+        {
+        case 0:
+          if (EQ (FLine, "<INDEX>"))
+            {
+              /* The next line has the size of the index */
+              getline (FLine, sizeof (FLine), libfp);
+              IndexOffset = atol (FLine);
+              state = 1;
+            }
+          break;
 
         case 1:
-	  if (EQ (FLine, "<MODULE>"))
-	    {
-	      /* The next line has the name of the module and the offset
-	         of the corresponding embedded file in the library */
-	      getline (FLine, sizeof (FLine), libfp);
-	      sscanf (FLine, "%s %ld", ModName, &FileOffset);
-	      state = 2;
-	    }
-	  else if (EQ (FLine, "</INDEX>"))
-	    {
-	      /* Reached the end of the index.  The symbol is not in this library. */
-	      return 0;
-	    }
-	  break;
+          if (EQ (FLine, "<MODULE>"))
+            {
+              /* The next line has the name of the module and the offset
+                 of the corresponding embedded file in the library */
+              getline (FLine, sizeof (FLine), libfp);
+              sscanf (FLine, "%s %ld", ModName, &FileOffset);
+              state = 2;
+            }
+          else if (EQ (FLine, "</INDEX>"))
+            {
+              /* Reached the end of the index.  The symbol is not in this library. */
+              return 0;
+            }
+          break;
 
         case 2:
-	  if (EQ (FLine, "</MODULE>"))
-	    {
-	      /* The symbol is not in this module, try the next one */
-	      state = 1;
-	    }
-	  else
-	    {
-	      /* Check if this is the symbol we are looking for. */
-	      if (strncmp (name, FLine, NCPS) == 0)
-		{
-		  /* The symbol is in this module. */
+          if (EQ (FLine, "</MODULE>"))
+            {
+              /* The symbol is not in this module, try the next one */
+              state = 1;
+            }
+          else
+            {
+              /* Check if this is the symbol we are looking for. */
+              if (strncmp (name, FLine, NCPS) == 0)
+                {
+                  /* The symbol is in this module. */
 
-		  /* As in the original library format, it is assumed that the .rel
-		     files reside in the same directory as the lib files. */
-		  sprintf (&str[strlen (str)], "%s%c%s", ModName, FSEPX, LKOBJEXT);
+                  /* As in the original library format, it is assumed that the .rel
+                     files reside in the same directory as the lib files. */
+                  sprintf (&str[strlen (str)], "%s%c%s", ModName, FSEPX, LKOBJEXT);
 
-		  /* If this module has been loaded already don't load it again. */
-		  lbf = lbfhead;
-		  while (lbf)
-		    {
-		      if (EQ (str, lbf->filspc))
-			return 1;	/* Already loaded */
-		      lbf = lbf->next;
-		    }
+                  /* If this module has been loaded already don't load it again. */
+                  lbf = lbfhead;
+                  while (lbf)
+                    {
+                      if (EQ (str, lbf->filspc))
+                        return 1;       /* Already loaded */
+                      lbf = lbf->next;
+                    }
 
-		  /* Add the embedded file to the list of files to be loaded in
-		     the second pass.  That is performed latter by the function
-		     library() below. */
-		  lbfh = (struct lbfile *) new (sizeof (struct lbfile));
-		  if (lbfhead == NULL)
-		    {
-		      lbfhead = lbfh;
-		    }
-		  else
-		    {
-		      lbf = lbfhead;
-		      while (lbf->next)
-			{
-			  lbf = lbf->next;
-			}
-		      lbf->next = lbfh;
-		    }
+                  /* Add the embedded file to the list of files to be loaded in
+                     the second pass.  That is performed latter by the function
+                     library() below. */
+                  lbfh = (struct lbfile *) new (sizeof (struct lbfile));
+                  if (lbfhead == NULL)
+                    {
+                      lbfhead = lbfh;
+                    }
+                  else
+                    {
+                      lbf = lbfhead;
+                      while (lbf->next)
+                        {
+                          lbf = lbf->next;
+                        }
+                      lbf->next = lbfh;
+                    }
 
-		  lbfh->libspc = lbnh->libspc;
-		  lbfh->filspc = str;
-		  lbfh->relfil = strdup (ModName);
-		  /* Library embedded file, so lbfh->offset must be >=0 */
-		  lbfh->offset = IndexOffset + FileOffset;
+                  lbfh->libspc = lbnh->libspc;
+                  lbfh->filspc = strdup (str);
+                  lbfh->relfil = strdup (ModName);
+                  /* Library embedded file, so lbfh->offset must be >=0 */
+                  lbfh->offset = IndexOffset + FileOffset;
 
-		  /* Jump to where the .rel begins and load it. */
-		  fseek (libfp, lbfh->offset, SEEK_SET);
-		  if (!LoadRel (lbnh->libspc, libfp, ModName))
+                  /* Jump to where the .rel begins and load it. */
+                  fseek (libfp, lbfh->offset, SEEK_SET);
+                  if (!LoadRel (lbnh->libspc, libfp, ModName))
                     {
                       fclose (libfp);
-	              fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, ModName);
-	              lkexit (1);
+                      fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, ModName);
+                      lkexit (1);
                     }
-		  /* if cdb information required & .adb file present */
-		  if (dflag && dfp)
-		    {
-		      if (LoadAdb (libfp))
-			SaveLinkedFilePath (str);
-		    }
-		  return 1;	/* Found the symbol, so success! */
-		}
-	    }
-	  break;
+                  /* if cdb information required & .adb file present */
+                  if (dflag && dfp)
+                    {
+                      if (LoadAdb (libfp))
+                        SaveLinkedFilePath (str);
+                    }
+                  return 1;     /* Found the symbol, so success! */
+                }
+            }
+          break;
 
-	default:
-	  return 0;		/* It should never reach this point, but just in case... */
-	  break;
-	}
+        default:
+          return 0;             /* It should never reach this point, but just in case... */
+          break;
+        }
     }
 
-  return 0;			/* The symbol is not in this library */
+  return 0;                     /* The symbol is not in this library */
 }
 
 #endif
@@ -373,9 +373,9 @@ loadfile_sdcclib (struct lbfile *lbfh)
 
       if (!res)
         {
-	  fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, lbfh->relfil);
-	  lkexit (1);
-	}
+          fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, lbfh->relfil);
+          lkexit (1);
+        }
     }
   else
     {

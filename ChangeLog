@@ -1,3 +1,8 @@
+2009-01-05 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lksdcclib.c:
+	  fixed linker hanging in INDEXLIB is not defined (hc08)
+
 2009-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

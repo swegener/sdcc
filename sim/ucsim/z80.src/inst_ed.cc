@@ -271,18 +271,24 @@ cl_z80::inst_ed(void)
     return(resGO);
 
     case 0xB1: // CPIR
-/* fixme: checkme, compare to other emul. */
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
-      regs.F &= ~(BIT_ALL);  /* clear these */
-      regs.F |= BIT_N | BIT_P;
+      regs.F &= ~(BIT_P | BIT_A | BIT_Z | BIT_S);  /* clear these */
+      regs.F |= BIT_N;
       do {
-        if ((regs.A - get1(regs.HL)) == 0) {
-          regs.F |= (BIT_Z | BIT_P);
-          return(resGO);
-        }
+        if((regs.A - get1(regs.HL)) == 0)
+          regs.F |= BIT_Z;
+        else
+          regs.F &= ~BIT_Z;
+        if((regs.A - get1(regs.HL)) & 0x80)
+          regs.F |= BIT_S;
+        else
+          regs.F &= ~BIT_S;
+/* fixme: set BIT_A correctly. */
         ++regs.HL;
         --regs.BC;
-      } while (regs.BC != 0);
+      } while (regs.BC != 0 && (regs.F & BIT_Z) == 0);
+      if(regs.BC != 0)
+        regs.F |= BIT_P;
 
     return(resGO);
 #if 0

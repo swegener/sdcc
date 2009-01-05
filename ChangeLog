@@ -1,6 +1,11 @@
 2009-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
-	* /device/lib/z80/mod.s,
+	* sim/ucsim/z80.src/inst_ed.cc:
+          Fixed bug #2488074, which made regression tests fail.
+
+2009-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/mod.s,
 	  device/lib/z80/div.s,
 	  device/lib/z80/mulchar.s,
 	  device/lib/z80/mul.s,

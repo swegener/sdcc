@@ -8,7 +8,7 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mz80
 SAS = $(TOPDIR)/bin/as-z80
 
-OBJ = div.o mul.o putchar.o shift.o stubs.o crt0_rle.o heap.o fstubs.o memmove.o strlen.o
+OBJ = div.o divsigned.o mod.o mul.o mulchar.o putchar.o shift.o stubs.o crt0_rle.o heap.o fstubs.o memmove.o strlen.o
 
 LIB = z80.lib
 CC = $(SCC)

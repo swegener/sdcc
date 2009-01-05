@@ -1,3 +1,13 @@
+2009-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* /device/lib/z80/mod.s,
+	  device/lib/z80/div.s,
+	  device/lib/z80/mulchar.s,
+	  device/lib/z80/mul.s,
+	  device/lib/z80/divsigned.s,
+	  device/lib/z80/Makefile.in:
+	  Implemented RFE #1702376.
+
 2009-01-05 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/lksdcclib.c:

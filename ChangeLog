@@ -1,3 +1,8 @@
+2009-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (decorateType RETURN): use RESULT_TYPE_GPTR for generic
+	  pointer return
+
 2009-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/z80.src/inst_ed.cc:

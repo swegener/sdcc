@@ -3251,7 +3251,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "pointer deref");
               goto errorTreeReturn;
             }
-          if (IS_ADDRESS_OF_OP(tree->left))
+          if (IS_ADDRESS_OF_OP (tree->left))
             {
               /* replace *&obj with obj */
               return tree->left->left;
@@ -4687,8 +4687,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           printFromToType(RTYPE(tree), LTYPE(tree));
         }
 
-      TETYPE (tree) = getSpec (TTYPE (tree) =
-                               LTYPE (tree));
+      TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
@@ -4794,7 +4793,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             decorateType (newNode (CAST,
                           newAst_LINK (copyLinkChain (currFunc->type->next)),
                                         tree->right),
-                          RESULT_TYPE_NONE);
+                          IS_GENPTR (currFunc->type->next) ? RESULT_TYPE_GPTR : RESULT_TYPE_NONE);
         }
 
       RRVAL (tree) = 1;

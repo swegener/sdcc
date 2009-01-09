@@ -96,6 +96,10 @@ SOURCE=..\lkaomf51.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lkar.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\lkarea.c
 # End Source File
 # Begin Source File
@@ -185,6 +189,10 @@ SOURCE=..\asxxxx_config.h
 # Begin Source File
 
 SOURCE=..\getline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\lkar.h
 # End Source File
 # Begin Source File
 

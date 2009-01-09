@@ -1,13 +1,24 @@
-/* lklib.c */
+/* lklib.c
+
+   Copyright (C) 1989-1995 Alan R. Baldwin
+   721 Berkeley St., Kent, Ohio 44240
+   Copyright (C) 2008-2009 Borut Razem, borut dot razem at siol dot net
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
 /*
- * (C) Copyright 1989-1995
- * All Rights Reserved
- *
- * Alan R. Baldwin
- * 721 Berkeley St.
- * Kent, Ohio  44240
- *
  * With contributions for the
  * object libraries from
  * Ken Hornstein
@@ -89,7 +100,7 @@ buildlibraryindex_lib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, in
           This->loaded = -1;
           This->libspc = lbnh->libspc;
           This->relfil = strdup (relfil);
-          This->filename = strdup (str);
+          This->filspc = strdup (str);
           This->type = type;
 
           /* Start a new linked list of symbols for this module: */
@@ -113,6 +124,8 @@ static int
 fndsym_lib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 {
   char relfil[NINPUT];
+
+  D ("Searching symbol: %s\n", name);
 
   while (getline (relfil, sizeof (relfil), libfp) != NULL)
     {
@@ -153,6 +166,7 @@ fndsym_lib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
           fclose (fp);
           if (ret)
             {
+              D ("Loaded module %s from file %s.\n", str, str);
               /* if cdb information required & adb file present */
               if (dflag && dfp)
                 {

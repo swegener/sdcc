@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "all"=".\all.dsp" - Package Owner=<4>
+Project: "all"=.\all.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_gbz80"=".\as\z80\as_gbz80.dsp" - Package Owner=<4>
+Project: "as_gbz80"=.\as\z80\as_gbz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -63,7 +63,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_hc08"=".\as\hc08\as_hc08.dsp" - Package Owner=<4>
+Project: "as_hc08"=.\as\hc08\as_hc08.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -75,22 +75,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_z80"=".\as\z80\as_z80.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name config
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "aslink"=".\as\link\mcs51\aslink.dsp" - Package Owner=<4>
+Project: "as_z80"=.\as\z80\as_z80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -105,7 +90,37 @@ Package=<4>
 
 ###############################################################################
 
-Project: "asx8051"=".\as\mcs51\asx8051.dsp" - Package Owner=<4>
+Project: "aslink"=.\as\link\mcs51\aslink.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "asranlib"=.\as\asranlib\asranlib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "asx8051"=.\as\mcs51\asx8051.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -117,7 +132,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "avr"=".\src\avr\avr.dsp" - Package Owner=<4>
+Project: "avr"=.\src\avr\avr.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -138,7 +153,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "avra"=".\src\avr\avra.dsp" - Package Owner=<4>
+Project: "avra"=.\src\avr\avra.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -150,7 +165,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "config"=".\config.dsp" - Package Owner=<4>
+Project: "config"=.\config.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -162,7 +177,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ds390"=".\src\ds390\ds390.dsp" - Package Owner=<4>
+Project: "ds390"=.\src\ds390\ds390.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -183,7 +198,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ds390a"=".\src\ds390\ds390a.dsp" - Package Owner=<4>
+Project: "ds390a"=.\src\ds390\ds390a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -195,7 +210,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "hc08"=".\src\hc08\hc08.dsp" - Package Owner=<4>
+Project: "hc08"=.\src\hc08\hc08.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -210,7 +225,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "hc08a"=".\src\hc08\hc08a.dsp" - Package Owner=<4>
+Project: "hc08a"=.\src\hc08\hc08a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -222,7 +237,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "librarian"=".\support\librarian\librarian.dsp" - Package Owner=<4>
+Project: "librarian"=.\support\librarian\librarian.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -234,7 +249,22 @@ Package=<4>
 
 ###############################################################################
 
-Project: "link_hc08"=".\as\link\hc08\link_hc08.dsp" - Package Owner=<4>
+Project: "link_hc08"=.\as\link\hc08\link_hc08.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "linkgbz80"=.\as\link\z80\linkgbz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -246,7 +276,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "linkgbz80"=".\as\link\z80\linkgbz80.dsp" - Package Owner=<4>
+Project: "linkz80"=.\as\link\z80\linkz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -258,19 +288,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "linkz80"=".\as\link\z80\linkz80.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "mcs51"=".\src\mcs51\mcs51.dsp" - Package Owner=<4>
+Project: "mcs51"=.\src\mcs51\mcs51.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -294,7 +312,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mcs51a"=".\src\mcs51\mcs51a.dsp" - Package Owner=<4>
+Project: "mcs51a"=.\src\mcs51\mcs51a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -306,7 +324,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "packihx"=".\support\packihx\PackIhx.dsp" - Package Owner=<4>
+Project: "packihx"=.\support\packihx\PackIhx.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -318,7 +336,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pic"=".\src\pic\pic.dsp" - Package Owner=<4>
+Project: "pic"=.\src\pic\pic.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -339,7 +357,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pic16"=".\src\pic16\pic16.dsp" - Package Owner=<4>
+Project: "pic16"=.\src\pic16\pic16.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -354,7 +372,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pic16a"=".\src\pic16\pic16a.dsp" - Package Owner=<4>
+Project: "pic16a"=.\src\pic16\pic16a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -366,7 +384,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pica"=".\src\pic\pica.dsp" - Package Owner=<4>
+Project: "pica"=.\src\pic\pica.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -378,7 +396,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sdcpp"=".\support\cpp\sdcpp.dsp" - Package Owner=<4>
+Project: "sdcpp"=.\support\cpp\sdcpp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -393,7 +411,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sdcppa"=".\support\cpp\sdcppa.dsp" - Package Owner=<4>
+Project: "sdcppa"=.\support\cpp\sdcppa.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -405,7 +423,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "src"=".\src\src.dsp" - Package Owner=<4>
+Project: "src"=.\src\src.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -447,7 +465,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "xa51"=".\src\xa51\xa51.dsp" - Package Owner=<4>
+Project: "xa51"=.\src\xa51\xa51.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -468,7 +486,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "xa51a"=".\src\xa51\xa51a.dsp" - Package Owner=<4>
+Project: "xa51a"=.\src\xa51\xa51a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -480,7 +498,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "yacc"=".\src\yacc.dsp" - Package Owner=<4>
+Project: "yacc"=.\src\yacc.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -492,7 +510,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "z80"=".\src\z80\z80.dsp" - Package Owner=<4>
+Project: "z80"=.\src\z80\z80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -513,7 +531,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "z80a"=".\src\z80\z80a.dsp" - Package Owner=<4>
+Project: "z80a"=.\src\z80\z80a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

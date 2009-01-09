@@ -1,3 +1,16 @@
+2009-01-08 Borut Razem <borut.razem AT siol.net>
+
+	* as/asranlib/Makefile.in, as/asranlib/asranlib.dsp,
+	  as/asranlib/asranlib.c: added asranlib
+	* as/link/lkar.c, as/link/lkar.h: added support for ar format libraries
+	* Makefile.in, as/link/hc08/Makefile.in,
+	  as/link/hc08/link_hc08.dsp, as/link/lklib.c, as/link/lklibr.c,
+	  as/link/lklibr.h, as/link/lkrel.c, as/link/lkrel.h,
+	  as/link/lksdcclib.c, as/link/mcs51/Makefile.in,
+	  as/link/mcs51/aslink.dsp, as/link/z80/Makefile.in,
+	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp, configure,
+	  configure.in, sdcc.dsw: modified to support ar format libraries
+
 2009-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (decorateType RETURN): use RESULT_TYPE_GPTR for generic
@@ -6,7 +19,7 @@
 2009-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/z80.src/inst_ed.cc:
-          Fixed bug #2488074, which made regression tests fail.
+	  Fixed bug #2488074, which made regression tests fail.
 
 2009-01-05 Philipp Klaus Krause <pkk AT spth.de>
 

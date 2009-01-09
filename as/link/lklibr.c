@@ -1,13 +1,24 @@
-/* lklibr.c */
+/* lklibr.c
+
+   Copyright (C) 1989-1995 Alan R. Baldwin
+   721 Berkeley St., Kent, Ohio 44240
+   Copyright (C) 2008-2009 Borut Razem, borut dot razem at siol dot net
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
 /*
- * (C) Copyright 1989-1995
- * All Rights Reserved
- *
- * Alan R. Baldwin
- * 721 Berkeley St.
- * Kent, Ohio  44240
- *
  * With contributions for the
  * object libraries from
  * Ken Hornstein
@@ -61,6 +72,7 @@ void freelibraryindex (void);
 
 struct aslib_target *aslib_targets[] = {
   &aslib_target_sdcclib,
+  &aslib_target_ar,
   &aslib_target_lib,
 };
 
@@ -464,19 +476,18 @@ fndsym (char *name)
   pmlibraryfile FirstFound;
   int numfound = 0;
 
+  D ("Searching symbol: %s\n", name);
+
   /* Build the index if this is the first call to fndsym */
   if (libr == NULL)
     buildlibraryindex ();
 
   /* Iterate through all library object files */
-  ThisLibr = libr;
-  FirstFound = libr;            /*So gcc stops whining */
-  while (ThisLibr)
+  FirstFound = libr;            /* So gcc stops whining */
+  for (ThisLibr = libr; ThisLibr != NULL; ThisLibr = ThisLibr->next)
     {
       /* Iterate through all symbols in an object file */
-      ThisSym = ThisLibr->symbols;
-
-      while (ThisSym)
+      for (ThisSym = ThisLibr->symbols; ThisSym != NULL; ThisSym = ThisSym->next)
         {
           if (!strcmp (ThisSym->name, name))
             {
@@ -490,15 +501,13 @@ fndsym (char *name)
                     }
                   else
                     {
-                      lbf = lbfhead;
-                      while (lbf->next)
-                        {
-                          lbf = lbf->next;
-                        }
+                      for (lbf = lbfhead; lbf->next != NULL; lbf = lbf->next)
+                        ;
+
                       lbf->next = lbfh;
                     }
                   lbfh->libspc = ThisLibr->libspc;
-                  lbfh->filspc = ThisLibr->filename;
+                  lbfh->filspc = ThisLibr->filspc;
                   lbfh->relfil = strdup (ThisLibr->relfil);
                   lbfh->offset = ThisLibr->offset;
                   lbfh->type = ThisLibr->type;
@@ -542,9 +551,7 @@ fndsym (char *name)
                     }
                 }
             }
-          ThisSym = ThisSym->next;      /* Next sym in library */
         }
-      ThisLibr = ThisLibr->next;        /* Next library in list */
     }
   return numfound;
 }
@@ -560,6 +567,8 @@ add_sybmol (const char *sym, void *param)
 {
   struct add_sym_s *as = (struct add_sym_s *) param;
   pmlibrarysymbol ps = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
+
+  D ("    Indexing symbol: %s\n", sym);
 
   as->plf->loaded = 0;
   ps->next = NULL;
@@ -609,6 +618,8 @@ buildlibraryindex (void)
       FILE *libfp;
       int i;
 
+      D ("Indexing library: %s\n", lbnh->libspc);
+
       if ((libfp = fopen (lbnh->libspc, "rb")) == NULL)
         {
           fprintf (stderr, "?ASlink-Error-Cannot open library file %s\n", lbnh->libspc);
@@ -633,7 +644,7 @@ buildlibraryindex (void)
   return 0;
 }
 
-/*Release all memory allocated for the in-memory library index*/
+/* Release all memory allocated for the in-memory library index */
 void
 freelibraryindex (void)
 {
@@ -653,7 +664,7 @@ freelibraryindex (void)
           ThisSym = ThisSym->next;
           free (ThisSym2Free);
         }
-      free (ThisLibr->filename);
+      free (ThisLibr->filspc);
       free (ThisLibr->relfil);
       ThisLibr2Free = ThisLibr;
       ThisLibr = ThisLibr->next;
@@ -680,9 +691,13 @@ load_sybmol (const char *sym, void *params)
 {
   struct load_sym_s *ls = (struct load_sym_s *) params;
 
+  D ("    Symbol: %s\n", sym);
+
   if (strcmp (ls->name, sym) == 0)
     {
       struct lbfile *lbfh, *lbf;
+
+      D ("    Symbol %s found in module %s!\n", sym, ls->relfil);
 
       lbfh = (struct lbfile *) new (sizeof (struct lbfile));
       lbfh->libspc = ls->lbnh->libspc;
@@ -692,19 +707,13 @@ load_sybmol (const char *sym, void *params)
       lbfh->type = ls->type;
 
       if (lbfhead == NULL)
-        {
-          lbfhead = lbfh;
-        }
+        lbfhead = lbfh;
       else
         {
-          lbf = lbfhead;
-          while (lbf->next)
-            {
-              lbf = lbf->next;
-            }
+          for (lbf = lbfhead; lbf->next != NULL; lbf = lbf->next)
+              ;
           lbf->next = lbfh;
         }
-
       (*aslib_targets[ls->type]->loadfile) (lbfh);
 
       return 1;
@@ -713,19 +722,47 @@ load_sybmol (const char *sym, void *params)
     return 0;
 }
 
+/*)Function int is_module_loaded(filspc)
+ *
+ * If this module has been already loaded
+ */
+
+int
+is_module_loaded (const char *filspc)
+{
+  struct lbfile *lbf;
+
+  for (lbf = lbfhead; lbf != NULL; lbf = lbf->next)
+    {
+      if (EQ (filspc, lbf->filspc))
+        {
+          D ("  Module %s already loaded!\n", filspc);
+          return 1;       /* Module already loaded */
+        }
+    }
+  return 0;
+}
+
 int
 add_rel_file (const char *name, struct lbname *lbnh, const char *relfil,
               const char *filspc, int offset, FILE * fp, long size, int type)
 {
   struct load_sym_s ls;
-  ls.name = name;
-  ls.lbnh = lbnh;
-  ls.relfil = relfil;
-  ls.filspc = filspc;
-  ls.offset = offset;
-  ls.type = type;
 
-  return enum_symbols (fp, size, &load_sybmol, &ls);
+  /* If this module has been loaded already don't load it again. */
+  if (is_module_loaded (filspc))
+    return 0;
+  else
+    {
+      ls.name = name;
+      ls.lbnh = lbnh;
+      ls.relfil = relfil;
+      ls.filspc = filspc;
+      ls.offset = offset;
+      ls.type = type;
+
+      return enum_symbols (fp, size, &load_sybmol, &ls);
+  }
 }
 
 int
@@ -738,9 +775,14 @@ fndsym (const char *name)
   /*
    * Search through every library in the linked list "lbnhead".
    */
+
+  D ("Searching symbol: %s\n", name);
+
   for (lbnh = lbnhead; lbnh; lbnh = lbnh->next)
     {
       int ret = 0;
+
+      D ("Library: %s\n", lbnh->libspc);
 
       if ((libfp = fopen (lbnh->libspc, "rb")) == NULL)
         {

@@ -1,13 +1,24 @@
-/* lksdcclib.c */
+/* lksdcclib.c - sdcc library format handling
+
+   Copyright (C) 1989-1995 Alan R. Baldwin
+   721 Berkeley St., Kent, Ohio 44240
+   Copyright (C) 2008 Borut Razem, borut dot razem at siol dot net
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
 /*
- * (C) Copyright 1989-1995
- * All Rights Reserved
- *
- * Alan R. Baldwin
- * 721 Berkeley St.
- * Kent, Ohio  44240
- *
  * With contributions for the
  * object libraries from
  * Ken Hornstein
@@ -90,11 +101,9 @@ LoadRel (char *libfname, FILE * libfp, char *ModName)
 static pmlibraryfile
 buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int type)
 {
-  char ModName[NCPS] = "";
   char FLine[MAXLINE];
-  char buff[PATH_MAX];
   int state = 0;
-  long IndexOffset = 0, FileOffset;
+  long IndexOffset = 0;
   pmlibrarysymbol ThisSym = NULL;
 
   while (getline (FLine, sizeof (FLine), libfp))
@@ -114,6 +123,10 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
         case 1:
           if (EQ (FLine, "<MODULE>"))
             {
+              char buff[PATH_MAX];
+              char ModName[NCPS] = "";
+              long FileOffset;
+
               /* The next line has the name of the module and the offset
                  of the corresponding embedded file in the library */
               getline (FLine, sizeof (FLine), libfp);
@@ -136,7 +149,7 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
               This->libspc = lbnh->libspc;
               This->relfil = strdup (ModName);
               sprintf (buff, "%s%s%c%s", lbnh->path, ModName, FSEPX, LKOBJEXT);
-              This->filename = strdup (buff);
+              This->filspc = strdup (buff);
               This->type = type;
 
               This->symbols = ThisSym = NULL;   /* Start a new linked list of symbols */
@@ -221,7 +234,7 @@ LoadAdb (FILE * libfp)
 static int
 findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 {
-  struct lbfile *lbfh, *lbf;
+  struct lbfile *lbfh;
   char ModName[NCPS] = "";
   char FLine[MAXLINE];
   int state = 0;
@@ -229,15 +242,15 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
   while (getline (FLine, sizeof (FLine), libfp))
     {
-      char str[PATH_MAX];
+      char filspc[PATH_MAX];
 
       if (lbnh->path != NULL)
         {
-          strcpy (str, lbnh->path);
+          strcpy (filspc, lbnh->path);
 #ifdef  OTHERSYSTEM
-          if (*str != '\0' && (str[strlen (str) - 1] != '/') && (str[strlen (str) - 1] != LKDIRSEP))
+          if (*filspc != '\0' && (filspc[strlen (filspc) - 1] != '/') && (filspc[strlen (filspc) - 1] != LKDIRSEP))
             {
-              strcat (str, LKDIRSEPSTR);
+              strcat (filspc, LKDIRSEPSTR);
             }
 #endif
         }
@@ -285,16 +298,11 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
                   /* As in the original library format, it is assumed that the .rel
                      files reside in the same directory as the lib files. */
-                  sprintf (&str[strlen (str)], "%s%c%s", ModName, FSEPX, LKOBJEXT);
+                  sprintf (&filspc[strlen (filspc)], "%s%c%s", ModName, FSEPX, LKOBJEXT);
 
                   /* If this module has been loaded already don't load it again. */
-                  lbf = lbfhead;
-                  while (lbf)
-                    {
-                      if (EQ (str, lbf->filspc))
-                        return 1;       /* Already loaded */
-                      lbf = lbf->next;
-                    }
+                  if (is_module_loaded (filspc))
+                    return 1;
 
                   /* Add the embedded file to the list of files to be loaded in
                      the second pass.  That is performed latter by the function
@@ -306,16 +314,16 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
                     }
                   else
                     {
-                      lbf = lbfhead;
-                      while (lbf->next)
-                        {
-                          lbf = lbf->next;
-                        }
+                      struct lbfile *lbf;
+
+                      for (lbf = lbfhead; lbf->next; lbf = lbf->next)
+                        ;
+
                       lbf->next = lbfh;
                     }
 
                   lbfh->libspc = lbnh->libspc;
-                  lbfh->filspc = strdup (str);
+                  lbfh->filspc = strdup (filspc);
                   lbfh->relfil = strdup (ModName);
                   /* Library embedded file, so lbfh->offset must be >=0 */
                   lbfh->offset = IndexOffset + FileOffset;
@@ -332,7 +340,7 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
                   if (dflag && dfp)
                     {
                       if (LoadAdb (libfp))
-                        SaveLinkedFilePath (str);
+                        SaveLinkedFilePath (filspc);
                     }
                   return 1;     /* Found the symbol, so success! */
                 }

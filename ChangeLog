@@ -1,4 +1,10 @@
-2009-01-08 Borut Razem <borut.razem AT siol.net>
+2009-01-10 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added asranlib.exe to the install package
+	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.7
+	  due added support for ar format libraries
+
+2009-01-09 Borut Razem <borut.razem AT siol.net>
 
 	* as/asranlib/Makefile.in, as/asranlib/asranlib.dsp,
 	  as/asranlib/asranlib.c: added asranlib

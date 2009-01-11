@@ -64,7 +64,7 @@ endif
 
 TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-aslink
 
-PKGS            += $(SDCC_LIBS) src device/include $(SDCC_ASLINK) $(SDCC_LIBRARIAN)
+PKGS            += $(SDCC_LIBS) src device/include $(SDCC_ASLINK) $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
 
 PKGS_TINI       = $(SDCC_LIBS) $(SDCC_ASLINK) \
                   src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)

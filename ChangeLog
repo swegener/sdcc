@@ -1,3 +1,7 @@
+2009-01-11 Borut Razem <borut.razem AT siol.net>
+
+	* Makefile.in: added SDCC_ASRANLIB to PKGS
+
 2009-01-10 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added asranlib.exe to the install package

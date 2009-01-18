@@ -1,3 +1,8 @@
+2009-01-18 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/auto-host.h: fixed warning: "__STDC__" redefined,
+	  warning: extra tokens at end of #endif directive
+
 2009-01-11 Borut Razem <borut.razem AT siol.net>
 
 	* Makefile.in: added SDCC_ASRANLIB to PKGS

@@ -102,7 +102,7 @@ sdcc-device-inc:
 	$(MAKE) -C device/include
 
 sdcc-device-lib: sdcc-cc sdcc-aslink
-	$(MAKE) -C device/lib LIB_TYPE=LIB
+	$(MAKE) -C device/lib
 
 sdcc-device-tini:
 	$(MAKE) -C device/include

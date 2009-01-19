@@ -664,6 +664,7 @@ OPT_DISABLE_GBZ80
 OPT_DISABLE_MCS51
 lib_dir_suffix
 include_dir_suffix
+LIB_TYPE
 sdccconf_h_dir_separator
 EGREP
 GREP
@@ -762,6 +763,7 @@ LIBS
 CPPFLAGS
 CPP
 sdccconf_h_dir_separator
+LIB_TYPE
 include_dir_suffix
 lib_dir_suffix
 docdir'
@@ -1429,6 +1431,7 @@ Some influential environment variables:
   CPP         C preprocessor
   sdccconf_h_dir_separator
               needed in sdccconf.h: either "/" (default) or "\\"
+  LIB_TYPE    library type: LIB, SDCCLIB, AR or RANLIB (default)
   include_dir_suffix
               appended to datadir to define SDCC's include directory
   lib_dir_suffix
@@ -6313,6 +6316,14 @@ fi
 
 # Makefiles
 ###########
+
+# LIB_TYPE:
+# *nix default: "RANLIB"
+
+
+if test "${LIB_TYPE}" = ""; then
+    LIB_TYPE="RANLIB"
+fi
 
 # include_dir_suffix:
 # *nix default: "sdcc/include"

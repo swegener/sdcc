@@ -98,7 +98,7 @@
 	} static const cases[]={
 		// arg,	fmt,	result
 		// ... there should be more ...
-		#if defined(SDCC) && !defined(SDCC_ds390) && !(defined(SDCC_mcs51) && defined(SDCC_USE_XSTACK))
+		#if defined(SDCC) && !defined(SDCC_ds390)
 		{1.0,	"%f",	"<NO FLOAT>"},
 		#else
 		{1.0,	"%f",	"1.000000"},

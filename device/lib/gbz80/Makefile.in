@@ -2,11 +2,16 @@
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
+top_builddir = @top_builddir@
+
+LIB_TYPE     = @LIB_TYPE@
 
 TOPDIR = ../../..
 
 SCC = $(TOPDIR)/bin/sdcc -mgbz80
 SAS = $(TOPDIR)/bin/as-gbz80
+
+PORTDIR = ../build/gbz80
 
 OBJ = div.o mul.o putchar.o printf.o shift.o stubs.o crt0_rle.o heap.o fstubs.o
 
@@ -15,11 +20,22 @@ CC = $(SCC)
 AS = $(SAS)
 CFLAGS = -I$(srcdir)/../../include -I. --std-c89
 
-all: $(LIB) crt0.o
+all: $(PORTDIR)/$(LIB) crt0.o
 
-$(LIB): $(OBJ) Makefile _dummy
-	rm -f $(LIB)
-	for i in $(OBJ); do echo $$i >> $(LIB); done
+$(PORTDIR)/$(LIB): $(OBJ) Makefile _dummy
+ifeq ($(LIB_TYPE), SDCCLIB)
+	rm -f $@; \
+	../../../bin/sdcclib -a $@ $(OBJ)
+else ifeq ($(LIB_TYPE), AR)
+	ar -Scq $@ $(OBJ)
+else ifeq ($(LIB_TYPE), RANLIB)
+	ar -Scq $@ $(OBJ)
+	$(top_builddir)/bin/asranlib $@
+else
+	rm -f $@
+	for i in $(basename $(OBJ)); do echo $$i >>$@; done
+	cp $(OBJ) $(PORTDIR)
+endif
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<

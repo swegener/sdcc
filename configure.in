@@ -489,6 +489,14 @@ fi
 # Makefiles
 ###########
 
+# LIB_TYPE:
+# *nix default: "RANLIB"
+
+AC_ARG_VAR([LIB_TYPE], [library type: LIB, SDCCLIB, AR or RANLIB (default)])
+if test "${LIB_TYPE}" = ""; then
+    LIB_TYPE="RANLIB"
+fi
+
 # include_dir_suffix:
 # *nix default: "sdcc/include"
 

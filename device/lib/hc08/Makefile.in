@@ -2,11 +2,16 @@
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
+top_builddir = @top_builddir@
+
+LIB_TYPE     = @LIB_TYPE@
 
 TOPDIR = ../../..
 
 SCC = $(TOPDIR)/bin/sdcc -mhc08
 SAS = $(TOPDIR)/bin/as6808
+
+PORTDIR = ../build/hc08
 
 OBJ = _ret.rel _divuint.rel _divulong.rel _mulint.rel _mullong.rel
 
@@ -17,11 +22,22 @@ ASFLAGS = -plosgff
 
 CFLAGS = -I$(srcdir)/../../include -I. --std-c99
 
-all: $(LIB)
+all: $(PORTDIR)/$(LIB)
 
-$(LIB): $(OBJ) Makefile _dummy
-	rm -f $(LIB)
-	for i in $(OBJ); do echo $$i >> $(LIB); done
+$(PORTDIR)/$(LIB): $(OBJ) Makefile _dummy
+ifeq ($(LIB_TYPE), SDCCLIB)
+	rm -f $@; \
+	../../../bin/sdcclib -a $@ $(OBJ)
+else ifeq ($(LIB_TYPE), AR)
+	ar -Scq $@ $(OBJ)
+else ifeq ($(LIB_TYPE), RANLIB)
+	ar -Scq $@ $(OBJ)
+	$(top_builddir)/bin/asranlib $@
+else
+	rm -f $@
+	for i in $(basename $(OBJ)); do echo $$i >>$@; done
+	cp $(OBJ) $(PORTDIR)
+endif
 
 %.rel: %.c
 	$(CC) $(CFLAGS) -c $<

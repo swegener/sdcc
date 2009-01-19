@@ -1,7 +1,12 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
+top_builddir = @top_builddir@
+
+LIB_TYPE        = @LIB_TYPE@
 
 CC = ../../../bin/sdcc
+
+PORTDIR = ../build/ds390
 
 #VERBOSE = --verbose
 
@@ -12,7 +17,7 @@ SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 CPPFLAGS = -I$(srcdir)/../../include
 CFLAGS = -mds390 $(CPPFLAGS) $(VERBOSE) --std-c99
 
-all: $(OBJECTS) libds390.lib
+all: $(OBJECTS) $(PORTDIR)/libds390.lib
 
 clean:
 	rm -f *.lst *.rel *.sym *.cdb *.asm \#* *~ *.rst *.hex
@@ -21,11 +26,20 @@ clean:
 distclean: clean
 	rm -f Makefile Makefile.dep
 
-libds390.lib: $(OBJECTS)
+$(PORTDIR)/libds390.lib: $(OBJECTS)
+ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	for libfile in $(OBJECTS); do \
-		echo $$libfile >>$@; \
-	done;
+	../../../bin/sdcclib -a $@ $(OBJECTS)
+else ifeq ($(LIB_TYPE), AR)
+	ar -Scq $@ $(OBJECTS)
+else ifeq ($(LIB_TYPE), RANLIB)
+	ar -Scq $@ $(OBJECTS)
+	$(top_builddir)/bin/asranlib $@
+else
+	rm -f $@;
+	for libfile in $(basename $(OBJECTS)); do echo $$libfile >>$@; done
+	cp $(OBJECTS) $(PORTDIR)
+endif
 
 %.rel: %.c
 	$(CC) -c $(CFLAGS) $<

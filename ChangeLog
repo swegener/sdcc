@@ -2,6 +2,8 @@
 
 	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.8
 	  due creation of ar format libraries
+	* support/scripts/sdcc.nsi:
+	  don't add nonexistent object files to the package
 
 2009-01-19 Borut Razem <borut.razem AT siol.net>
 

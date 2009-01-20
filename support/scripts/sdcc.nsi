@@ -1,6 +1,6 @@
 # sdcc.nsi - NSIS installer script for SDCC
 #
-# Copyright (c) 2003-2008 Borut Razem
+# Copyright (c) 2003-2009 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -437,64 +437,55 @@ ${SectionEnd}
 ${Section} "SDCC DS390 library" SEC06
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\ds390"
-  File "${DEV_ROOT}\lib\ds390\*.rel"
-  File "${DEV_ROOT}\lib\ds390\*.lib"
+  File "${DEV_ROOT}\lib\ds390\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC DS400 library" SEC07
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\ds400"
-  File "${DEV_ROOT}\lib\ds400\*.rel"
-  File "${DEV_ROOT}\lib\ds400\*.lib"
+  File "${DEV_ROOT}\lib\ds400\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC GBZ80 library" SEC08
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\gbz80"
-  File "${DEV_ROOT}\lib\gbz80\*.o"
-  File "${DEV_ROOT}\lib\gbz80\*.lib"
+  File "${DEV_ROOT}\lib\gbz80\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC Z80 library" SEC09
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\z80"
-  File "${DEV_ROOT}\lib\z80\*.o"
-  File "${DEV_ROOT}\lib\z80\*.lib"
+  File "${DEV_ROOT}\lib\z80\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC small model library" SEC10
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small"
-  File "${DEV_ROOT}\lib\small\*.rel"
-  File "${DEV_ROOT}\lib\small\*.lib"
+  File "${DEV_ROOT}\lib\small\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC medium model library" SEC11
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\medium"
-  File "${DEV_ROOT}\lib\medium\*.rel"
-  File "${DEV_ROOT}\lib\medium\*.lib"
+  File "${DEV_ROOT}\lib\medium\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC large model library" SEC12
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\large"
-  File "${DEV_ROOT}\lib\large\*.rel"
-  File "${DEV_ROOT}\lib\large\*.lib"
+  File "${DEV_ROOT}\lib\large\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC small-stack-auto model library" SEC13
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small-stack-auto"
-  File "${DEV_ROOT}\lib\small-stack-auto\*.rel"
-  File "${DEV_ROOT}\lib\small-stack-auto\*.lib"
+  File "${DEV_ROOT}\lib\small-stack-auto\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC HC08 library" SEC14
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\hc08"
-  File "${DEV_ROOT}\lib\hc08\*.rel"
-  File "${DEV_ROOT}\lib\hc08\*.lib"
+  File "${DEV_ROOT}\lib\hc08\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC PIC16 library" SEC15
@@ -844,37 +835,28 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\src\*.c"
 
-  Delete "$INSTDIR\lib\pic\*.o"
   Delete "$INSTDIR\lib\pic\*.lib"
 
   Delete "$INSTDIR\lib\pic16\*.o"
   Delete "$INSTDIR\lib\pic16\*.lib"
 
-  Delete "$INSTDIR\lib\hc08\*.rel"
   Delete "$INSTDIR\lib\hc08\*.lib"
 
   Delete "$INSTDIR\lib\z80\*.o"
   Delete "$INSTDIR\lib\z80\*.lib"
 
-  Delete "$INSTDIR\lib\small\*.rel"
   Delete "$INSTDIR\lib\small\*.lib"
 
-  Delete "$INSTDIR\lib\medium\*.rel"
   Delete "$INSTDIR\lib\medium\*.lib"
 
-  Delete "$INSTDIR\lib\large\*.rel"
   Delete "$INSTDIR\lib\large\*.lib"
 
-  Delete "$INSTDIR\lib\small-stack-auto\*.rel"
   Delete "$INSTDIR\lib\small-stack-auto\*.lib"
 
-  Delete "$INSTDIR\lib\gbz80\*.o"
   Delete "$INSTDIR\lib\gbz80\*.lib"
 
-  Delete "$INSTDIR\lib\ds390\*.rel"
   Delete "$INSTDIR\lib\ds390\*.lib"
 
-  Delete "$INSTDIR\lib\ds400\*.rel"
   Delete "$INSTDIR\lib\ds400\*.lib"
 
   Delete "$INSTDIR\include\asm\z80\*.h"

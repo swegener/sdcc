@@ -1,3 +1,8 @@
+2009-01-21 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lkar.h: sgetl and sputl are independent of endianness
+	* as/link/sdxxxx_config.h.in: removed endianness detection
+
 2009-01-20 Borut Razem <borut.razem AT siol.net>
 
 	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.8

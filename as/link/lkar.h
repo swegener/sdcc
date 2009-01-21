@@ -30,13 +30,8 @@ typedef short gid_t;
 typedef _off_t off_t;
 #endif
 
-#ifdef WORDS_BIGENDIAN
-#define sgetl(buf)  (((((((unsigned char)(buf)[3] << 8) + (unsigned char)(buf)[2]) << 8) + (unsigned char)(buf)[1]) << 8) + (unsigned char)(buf)[0])
-#define sputl(value, buf)  ((buf)[3] = ((value) >> 24, (buf)[2] = (value) >> 16, (buf)[1] = (value) >> 8, (buf)[0] = (value))
-#else
 #define sgetl(buf)  (((((((unsigned char)(buf)[0] << 8) + (unsigned char)(buf)[1]) << 8) + (unsigned char)(buf)[2]) << 8) + (unsigned char)(buf)[3])
 #define sputl(value, buf)  ((buf)[0] = (value) >> 24, (buf)[1] = (value) >> 16, (buf)[2] = (value) >> 8, (buf)[3] = (value))
-#endif
 
 #define ARMAG   "!<arch>\n"           /* magic string */
 #define SARMAG  (sizeof (ARMAG) - 1)  /* length of magic string */

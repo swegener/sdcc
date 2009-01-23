@@ -75,7 +75,7 @@ struct ar_hdr                     /* archive member header */
   uid_t ar_uid;                   /* archive member user identification */
   gid_t ar_gid;                   /* archive member group identification */
   mode_t ar_mode;                 /* archive member mode (octal) */
-  off_t ar_size;                  /* archive member size */
+  size_t ar_size;                 /* archive member size */
 };
 
 #endif /* __LKAR_H */

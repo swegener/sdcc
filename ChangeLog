@@ -1,3 +1,10 @@
+2009-01-23 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lkar.h: changed type of ar_size to size_t to make it work on
+	  ppc Mac OS X (off_t is 64 bit and is not converted to 32 bit
+	  unsigned int when calling new(), since asxxxx doesn't use function
+	  prototypes)
+
 2009-01-21 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/lkar.h: sgetl and sputl are independent of endianness

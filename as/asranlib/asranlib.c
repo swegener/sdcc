@@ -93,7 +93,7 @@ struct symbol_s
   };
 
 struct symbol_s *symlist, *lastsym;
-off_t offset, first_member_offset;
+unsigned int offset, first_member_offset;
 
 int
 add_symbol (const char *sym, void *param)

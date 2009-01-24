@@ -290,7 +290,7 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
                       This = This->next;
                     }
                   This->next = NULL;
-                  This->loaded = -1;
+                  This->loaded = 0;
                   This->libspc = lbnh->libspc;
                   This->offset = offset;
                   This->relfil = get_member_name_by_offset (libfp, offset);     /* member name */
@@ -308,7 +308,6 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
                   ThisSym->next = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
                   ThisSym = ThisSym->next;
                 }
-              This->loaded = 0;
               ThisSym->next = NULL;
               ThisSym->name = sym;
             }

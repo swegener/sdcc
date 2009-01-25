@@ -674,8 +674,8 @@ static void _pic16_linkEdit(void)
 
     shash_add(&linkValues, "linker", pic16_linkCmd[0]);
 
-    mergeSets(&tSet, libDirsSet);
     mergeSets(&tSet, libPathsSet);
+    mergeSets(&tSet, libDirsSet);
 
     shash_add(&linkValues, "incdirs", joinStrSet( appendStrSet(tSet, "-I\"", "\"")));
     shash_add(&linkValues, "lflags", joinStrSet(linkOptionsSet));

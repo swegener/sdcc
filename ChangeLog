@@ -1,3 +1,8 @@
+2008-01-25 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/main.c (_pic16_linkEdit): prepend -L paths to linker
+	  search path instead of appending them
+
 2009-01-24 Borut Razem <borut.razem AT siol.net>
 
 	* as/asranlib/asranlib.h: changed type of offset to unsigned int to

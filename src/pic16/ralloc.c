@@ -3800,17 +3800,25 @@ packForPush (iCode * ic, eBBlock * ebp)
 
 
 
-  /* we now we know that it has one & only one def & use
-     and the that the definition is an assignment */
-  IC_LEFT (ic) = IC_RIGHT (dic);
+  /*
+   * The following code causes segfaults, e.g.,
+   *   #2496919 Internal error with pic16 sdcc
+   * and is thus disabled for now.
+   */
+  if (0)
+    {
+      /* we now we know that it has one & only one def & use
+         and the that the definition is an assignment */
+      IC_LEFT (ic) = IC_RIGHT (dic);
 
-  iLine = printILine(dic);
-  debugf("remiCodeFromeBBlock: %s\n", iLine);
-  dbuf_free(iLine);
+      iLine = printILine(dic);
+      debugf("remiCodeFromeBBlock: %s\n", iLine);
+      dbuf_free(iLine);
 
-  remiCodeFromeBBlock (ebp, dic);
-  bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-  hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+      remiCodeFromeBBlock (ebp, dic);
+      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+      hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+    } // if
 }
 
 static void printSymType(char * str, sym_link *sl)

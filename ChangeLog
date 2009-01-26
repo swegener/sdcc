@@ -1,3 +1,7 @@
+2008-01-26 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/ralloc.c (packForPush): disabled to fix #2496919
+
 2008-01-25 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/main.c (_pic16_linkEdit): prepend -L paths to linker

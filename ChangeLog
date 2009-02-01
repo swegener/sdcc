@@ -1,3 +1,9 @@
+2008-02-01 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libdev/pic18f1220.c,
+	* device/lib/pic16/libdev/pic18f4450.c:
+	  define SSPBUF to allow use of printf
+
 2009-02-01 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in, device/lib/gbz80/Makefile.in,

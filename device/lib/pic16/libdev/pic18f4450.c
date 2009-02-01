@@ -213,6 +213,8 @@ __sfr __at (0xFC3) ADRESL;
 
 __sfr __at (0xFC4) ADRESH;
 
+__sfr __at (0xFC9) SSPBUF; /* unimplemented */
+
 __sfr __at (0xFCA) T2CON;
 volatile __T2CONbits_t __at (0xFCA) T2CONbits;
 

@@ -1,3 +1,12 @@
+2009-02-01 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in, device/lib/gbz80/Makefile.in,
+	  device/lib/hc08/Makefile.in, device/lib/incl.mk,
+	  device/lib/z80/Makefile.in:
+	  don't remake libraries
+	* support/regression/tests/snprintf.c:
+	  reenable floating point in small-xstack-auto library
+
 2008-01-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/ralloc.c (packForPush): disabled to fix #2496919

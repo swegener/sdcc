@@ -13,6 +13,31 @@ SAS = $(TOPDIR)/bin/as6808
 
 PORTDIR = ../build/hc08
 
+include $(srcdir)/../incl.mk
+
+HC08_FLOAT = $(COMMON_FLOAT)
+
+HC08_INT = $(COMMON_INT) \
+  _divsint.c \
+  _modsint.c \
+  _moduint.c
+
+HC08_LONG = $(COMMON_LONG)
+
+HC08_SDCC = $(COMMON_SDCC) \
+  _itoa.c \
+  _ltoa.c \
+  _spx.c \
+  _startup.c \
+  _strlen.c \
+  _memmove.c \
+  _heap.c \
+  sprintf.c \
+  vprintf.c
+
+HC08SOURCES = $(addprefix ../,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_SDCC))
+HC08OBJECTS = $(patsubst %.c,%.rel,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_SDCC))
+
 OBJ = _ret.rel _divuint.rel _divulong.rel _mulint.rel _mullong.rel
 
 LIB = hc08.lib
@@ -24,28 +49,29 @@ CFLAGS = -I$(srcdir)/../../include -I. --std-c99
 
 all: $(PORTDIR)/$(LIB)
 
-$(PORTDIR)/$(LIB): $(OBJ) Makefile _dummy
+$(PORTDIR)/$(LIB): $(OBJ) $(HC08OBJECTS) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	../../../bin/sdcclib -a $@ $(OBJ)
+	../../../bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
 else ifeq ($(LIB_TYPE), AR)
-	ar -Scq $@ $(OBJ)
+	ar -Scq $@ $(OBJ) $(HC08OBJECTS)
 else ifeq ($(LIB_TYPE), RANLIB)
-	ar -Scq $@ $(OBJ)
+	ar -Scq $@ $(OBJ) $(HC08OBJECTS)
 	$(top_builddir)/bin/asranlib $@
 else
 	rm -f $@
-	for i in $(basename $(OBJ)); do echo $$i >>$@; done
-	cp $(OBJ) $(PORTDIR)
+	for i in $(basename $(OBJ) $(HC08OBJECTS)); do echo $$i >>$@; done
+	cp $(OBJ) $(HC08OBJECTS) $(PORTDIR)
 endif
+
+%.rel: ../%.c
+	$(CC) $(CFLAGS) -c $<
 
 %.rel: %.c
 	$(CC) $(CFLAGS) -c $<
 
 %.rel: %.asm
 	$(AS) $(ASFLAGS) $@ $<
-
-_dummy:
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib

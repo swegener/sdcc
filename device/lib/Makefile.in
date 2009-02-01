@@ -69,102 +69,6 @@ OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
 OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
 OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
 
-COMMON_FLOAT = \
-  _atof.c \
-  _schar2fs.c \
-  _sint2fs.c \
-  _slong2fs.c \
-  _uchar2fs.c \
-  _uint2fs.c \
-  _ulong2fs.c \
-  _fs2schar.c \
-  _fs2sint.c \
-  _fs2slong.c \
-  _fs2uchar.c \
-  _fs2uint.c \
-  _fs2ulong.c \
-  _fsadd.c \
-  _fsdiv.c \
-  _fsmul.c \
-  _fssub.c \
-  _fseq.c \
-  _fsgt.c \
-  _fslt.c \
-  _fsneq.c \
-  fabsf.c \
-  frexpf.c \
-  ldexpf.c \
-  expf.c \
-  powf.c \
-  sincosf.c \
-  sinf.c \
-  cosf.c \
-  logf.c \
-  log10f.c \
-  sqrtf.c \
-  tancotf.c \
-  tanf.c \
-  cotf.c \
-  asincosf.c \
-  asinf.c \
-  acosf.c \
-  atanf.c \
-  atan2f.c \
-  sincoshf.c \
-  sinhf.c \
-  coshf.c \
-  tanhf.c \
-  floorf.c \
-  ceilf.c \
-  modff.c \
-  errno.c
-
-COMMON_LONG = \
-  _divslong.c \
-  _modslong.c \
-  _modulong.c
-
-COMMON_SDCC = \
-  _atoi.c \
-  _atol.c \
-  abs.c \
-  labs.c \
-  rand.c \
-  _iscntrl.c \
-  _isdigit.c \
-  _isgraph.c \
-  _isprint.c \
-  _ispunct.c \
-  _isspace.c \
-  _islower.c \
-  _isupper.c \
-  _isxdigit.c \
-  _strcat.c \
-  _strchr.c \
-  _strcmp.c \
-  _strcpy.c \
-  _strcspn.c \
-  _strncat.c \
-  _strncmp.c \
-  _strncpy.c \
-  _strpbrk.c \
-  _strrchr.c \
-  _strspn.c \
-  _strstr.c \
-  _strtok.c \
-  _memcmp.c \
-  _memcpy.c \
-  _memset.c \
-  _calloc.c \
-  _malloc.c \
-  _realloc.c \
-  _free.c \
-  printf_large.c \
-  puts.c \
-  gets.c \
-  assert.c \
-  time.c
-
 SOURCES_FLOAT = $(COMMON_FLOAT) \
   _fscmp.c \
   _fsget1arg.c \
@@ -220,24 +124,6 @@ OBJECTS_SDCC = $(SOURCES_SDCC:%.c=$(PORT)/%.rel)
 
 OBJECTS = $(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC)
 
-Z80_FLOAT = $(COMMON_FLOAT)
-
-Z80_INT = $(COMMON_INT)
-
-Z80_LONG = $(COMMON_LONG) \
-  _divulong.c \
-  _mullong.c
-
-Z80_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
-  _ltoa.c \
-  _startup.c \
-  sprintf.c \
-  vprintf.c
-
-Z80SOURCES = $(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_SDCC)
-Z80OBJECTS = $(Z80SOURCES:%.c=$(PORT)/%.o)
-
 XA51_FLOAT = $(COMMON_FLOAT)
 
 XA51_INT = $(COMMON_INT) \
@@ -256,31 +142,18 @@ XA51_SDCC = $(COMMON_SDCC) \
   _strlen.c \
   _heap.c
 
-XA51SOURCES = $(Z80_FLOAT) $(XA51_INT) $(XA51_LONG) $(XA51_SDCC)
+XA51SOURCES = $(XA51_FLOAT) $(XA51_INT) $(XA51_LONG) $(XA51_SDCC)
 XA51OBJECTS = $(XA51SOURCES:%.c=$(PORT)/%.rel)
 
-HC08_FLOAT = $(COMMON_FLOAT)
-
-HC08_INT = $(COMMON_INT) \
-  _divsint.c \
-  _modsint.c \
-  _moduint.c
-
-HC08_LONG = $(COMMON_LONG)
-
-HC08_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
-  _ltoa.c \
-  _spx.c \
-  _startup.c \
-  _strlen.c \
-  _memmove.c \
-  _heap.c \
-  sprintf.c \
-  vprintf.c
-
-HC08SOURCES = $(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_SDCC)
-HC08OBJECTS = $(patsubst %.c,$(PORT)/%.rel,$(HC08SOURCES))
+ifeq ($(LIB_TYPE), SDCCLIB)
+LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+else ifeq ($(LIB_TYPE), AR)
+LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+else ifeq ($(LIB_TYPE), RANLIB)
+LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+else
+LIB_FILES = $($(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC) $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+endif
 
 OEXT            = .rel
 
@@ -322,7 +195,7 @@ endif
 # ------------------------------------------
 all: checkconf $(TARGETS)
 
-objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
+objects: build-dir $(OBJECTS) port-specific-objects $(LIB_FILES) clean_intermediate
 
 models:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
@@ -340,7 +213,7 @@ small-mcs51-stack-auto:
 model-mcs51-stack-auto:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
-            mkdir -p $${model}-stack-auto; cp $${model}/Makefile $${model}-stack-auto; \
+	    mkdir -p $${model}-stack-auto; cp $${model}/Makefile $${model}-stack-auto; \
 	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$${model}-stack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-stack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
@@ -349,7 +222,9 @@ model-mcs51-xstack-auto:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    mkdir -p $${model}-xstack-auto; cp $${model}/Makefile $${model}-xstack-auto; \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$${model}-xstack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-xstack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	    MODELFLAGS="--model-$$model --stack-auto --xstack"; \
+	    if test "$$model" = "large"; then MODELFLAGS="$$MODELFLAGS -DUSE_FLOATS=1"; fi; \
+	    $(MAKE) MODELFLAGS="$$MODELFLAGS" PORT=$${model}-xstack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-xstack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
@@ -369,6 +244,8 @@ model-xa51:
 	fi
 
 objects-xa51: build-dir $(XA51OBJECTS) port-specific-objects
+
+$(PORTDIR)/lib$(PORT).lib: $(XA51OBJECTS)
 ifeq ($(LIB_TYPE), SDCCLIB)
 	../../bin/sdcclib -a $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 else ifeq ($(LIB_TYPE), AR)
@@ -392,38 +269,14 @@ model-gbz80:
 	  $(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o; \
 	fi
 
-objects-z80: build-dir $(Z80OBJECTS) port-specific-objects clean_intermediate
-ifeq ($(LIB_TYPE), SDCCLIB)
-	../../bin/sdcclib -a $(PORTDIR)/$(PORT).lib $(Z80OBJECTS)
-else ifeq ($(LIB_TYPE), AR)
-	ar -Sq $(PORTDIR)/$(PORT).lib $(Z80OBJECTS)
-else ifeq ($(LIB_TYPE), RANLIB)
-	ar -Sq $(PORTDIR)/$(PORT).lib $(Z80OBJECTS)
-	$(top_builddir)/bin/asranlib $(PORTDIR)/$(PORT).lib
-else
-	rm -f $(PORTDIR)/lib$(PORT).lib
-	for i in $(notdir $(basename $(Z80OBJECTS))); do echo $$i >> $(PORTDIR)/lib$(PORT).lib; done
-	cp $(Z80OBJECTS) $(PORTDIR)
-endif
+objects-z80: build-dir port-specific-objects clean_intermediate
 
 model-hc08:
 	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
 	fi
 
-objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
-ifeq ($(LIB_TYPE), SDCCLIB)
-	../../bin/sdcclib -a $(PORTDIR)/$(PORT).lib $(HC08OBJECTS)
-else ifeq ($(LIB_TYPE), AR)
-	ar -Sq $(PORTDIR)/$(PORT).lib $(HC08OBJECTS)
-else ifeq ($(LIB_TYPE), RANLIB)
-	ar -Sq $(PORTDIR)/$(PORT).lib $(HC08OBJECTS)
-	$(top_builddir)/bin/asranlib $(PORTDIR)/$(PORT).lib
-else
-	rm -f $(PORTDIR)/lib$(PORT).lib
-	for i in $(notdir $(basename $(HC08OBJECTS))); do echo $$i >> $(PORTDIR)/lib$(PORT).lib; done
-	cp $(HC08OBJECTS) $(PORTDIR)
-endif
+objects-hc08: build-dir port-specific-objects clean_intermediate
 
 model-pic16:
 	if grep '^pic16\>' $(top_builddir)/ports.build > /dev/null; then \
@@ -472,7 +325,7 @@ port-specific-objects-pic14:
 	  cp -f $(PORT)/bin/*.* $(PORTDIR); \
 	fi
 
-lib-files:
+$(LIB_FILES): $(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC)
 ifeq ($(LIB_TYPE), SDCCLIB)
 	../../bin/sdcclib -a $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
 	../../bin/sdcclib -a $(PORTDIR)/libint.lib $(OBJECTS_INT)

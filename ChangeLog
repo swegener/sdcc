@@ -1,3 +1,9 @@
+2009-02-02 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/gbz80/Makefile.in, device/lib/hc08/Makefile.in,
+	  device/lib/z80/Makefile.in:
+	  chose source files in the PORT directory if they are available
+
 2008-02-01 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/pic18f1220.c,

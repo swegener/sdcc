@@ -57,10 +57,10 @@ else
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
 endif
 
-%.o: ../%.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
-%.o: %.c
+%.o: ../%.c
 	$(CC) $(CFLAGS) -c $<
 
 clean:

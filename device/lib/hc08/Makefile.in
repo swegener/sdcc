@@ -64,14 +64,11 @@ else
 	cp $(OBJ) $(HC08OBJECTS) $(PORTDIR)
 endif
 
-%.rel: ../%.c
-	$(CC) $(CFLAGS) -c $<
-
 %.rel: %.c
 	$(CC) $(CFLAGS) -c $<
 
-%.rel: %.asm
-	$(AS) $(ASFLAGS) $@ $<
+%.rel: ../%.c
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib

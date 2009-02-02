@@ -62,14 +62,14 @@ else
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
 endif
 
-%.o: ../%.c
-	$(CC) $(CFLAGS) -c $<
-
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
 %.o: %.s
 	$(AS) $(ASFLAGS) $@ $<
+
+%.o: ../%.c
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f *.o *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib

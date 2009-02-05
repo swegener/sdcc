@@ -454,6 +454,8 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
         {
           long moduleOffset = ftell (libfp);
 
+          free (obj_name);
+
           /* Opened OK - create a new libraryfile object for it */
           if (This == NULL)
             {
@@ -600,9 +602,10 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
   struct ar_hdr hdr;
   int ret = 0;
   size_t hdr_size;
+  char *obj_name;
 
   /* walk trough all archive members */
-  while ((hdr_size = ar_get_header (&hdr, libfp, NULL)) != 0)
+  while ((hdr_size = ar_get_header (&hdr, libfp, &obj_name)) != 0)
     {
       char filspc[PATH_MAX];
 
@@ -627,7 +630,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
           buf = (char *) new (hdr.ar_size);
 
-          if ((off_t) fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
+          if (fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
             {
               free (buf);
               return 0;
@@ -653,7 +656,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
               if (0 == strcmp (name, sym))
                 {
                   fseek (libfp, offset, SEEK_SET);
-                  if (ar_get_header (&hdr, libfp))
+                  if (ar_get_header (&hdr, libfp, NULL))
                     {
                       sprintf (&filspc[strlen (filspc)], "%s", hdr.ar_name);
 
@@ -715,7 +718,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
           buf = (char *) new (hdr.ar_size);
 
-          if ((off_t) fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
+          if (fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
             {
               free (buf);
               return 0;
@@ -741,7 +744,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
               if (0 == strcmp (name, sym))
                 {
                   fseek (libfp, offset, SEEK_SET);
-                  if (ar_get_header (&hdr, libfp))
+                  if (ar_get_header (&hdr, libfp, NULL))
                     {
                       sprintf (&filspc[strlen (filspc)], "%s", hdr.ar_name);
 
@@ -795,12 +798,14 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
         }
       else if (AR_IS_STRING_TABLE (obj_name))
         {
+          free (obj_name);
+
           if (sym_tab)
             free (sym_tab);
 
           sym_tab = (char *) new (hdr.ar_size);
 
-          if ((off_t) fread (sym_tab, 1, hdr.ar_size, libfp) != hdr.ar_size)
+          if (fread (sym_tab, 1, hdr.ar_size, libfp) != hdr.ar_size)
             {
               free (sym_tab);
               sym_tab = NULL;
@@ -812,6 +817,8 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
       else
         {
           long moduleOffset = ftell (libfp);
+
+          free (obj_name);
 
           D ("  Module: %s\n", hdr.ar_name);
 

@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #ifdef _WIN32
 #include <io.h>
-#define mktemp  _mktemp
+#else
+#include <unistd.h>
 #endif
 
 #define NELEM(x)  (sizeof (x) / sizeof (*x))

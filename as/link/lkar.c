@@ -6,7 +6,7 @@
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -15,8 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /*
  * With contributions for the
@@ -62,17 +61,139 @@ is_ar (FILE * libfp)
   return ret;
 }
 
-static struct ar_hdr *
-ar_get_header (struct ar_hdr *hdr, FILE * libfp)
+static char *sym_tab;
+static int sym_tab_size;
+
+char *
+get_member_name (char *name, size_t *p_size, int allocate, FILE * libfp)
+{
+  *p_size = 0;
+
+  if (0 == memcmp (name, "#1/", 3))
+    {
+      char *p;
+      size_t len = strtoul (&name [3], &p, 10);
+      if (p > &name [3])
+        {
+          /* BSD appends real file name to the file header */
+          if (p_size != NULL)
+            *p_size = len;
+
+          if (allocate)
+            {
+              char *n = (char *) malloc (len);
+              if (fread (n, 1, len, libfp) != len)
+                {
+                  /* not an ar archive or broken ar archive */
+                  return NULL;
+                }
+              else
+                return n;
+            }
+          else
+            {
+              /* just advance the file pointer */
+              fseek (libfp, len, SEEK_CUR);
+              return NULL;
+            }
+        }
+      else
+        {
+          /* not an ar archive or broken ar archive */
+          return NULL;
+        }
+    }
+  else if (allocate)
+    {
+      if (name[0] == '/')
+        {
+          if (NULL != sym_tab)
+            {
+              char *p;
+
+              int name_offset = strtol (++name, &p, 0);
+              if (p != name && name_offset < sym_tab_size)
+                {
+                  int len = p - name + 1;
+                  while (len < AR_NAME_LEN && name[len++] == ' ')
+                    ;
+                  if (len == AR_NAME_LEN)
+                    {
+                      char *n;
+
+                      /* long name: get it from the symbol table */
+                      name = &sym_tab[name_offset];
+                      for (p = name; *p != '/' && *p != '\n'; ++p)
+                        assert (p < &sym_tab[sym_tab_size]);
+
+                      if (p[0] != '/' || p[1] != '\n')
+                        while (*++p != '\n')
+                          assert (p < &sym_tab[sym_tab_size]);
+
+                      n = (char *) malloc (p - name + 1);
+                      memcpy (n, name, p - name);
+                      n[p - name] = '\0';
+                      return n;
+                    }
+                }
+            }
+        }
+      else
+        {
+          char *p = strrchr (name, '/');
+
+          if (NULL != p)
+            {
+              int len = p - name;
+              while (name[++len] == ' ')
+                ;
+              if (len == AR_NAME_LEN)
+                {
+                  char *n = (char *) malloc (p - name + 1);
+                  memcpy (n, name, p - name);
+                  n[p - name] = '\0';
+                  return n;
+                }
+            }
+          else
+            {
+              /* BSD formed member name:
+                 trim trailing spaces */
+              char *n;
+
+              p = name + AR_NAME_LEN;
+              while (*--p == ' ' && p >= name)
+                ;
+              ++p;
+              n = (char *) malloc (p - name + 1);
+              memcpy (n, name, p - name);
+              n[p - name] = '\0';
+              return n;
+            }
+        }
+
+      /* bad formed member name:
+       just return it */
+
+      return strdup (name);
+    }
+  else
+    return NULL;
+}
+
+size_t
+ar_get_header (struct ar_hdr *hdr, FILE * libfp, char **p_obj_name)
 {
   char header[ARHDR_LEN];
   char buf[AR_DATE_LEN + 1];
+  char *obj_name;
+  size_t size;
 
   if (fread (header, 1, sizeof (header), libfp) != sizeof (header)
       || memcmp (header + AR_FMAG_OFFSET, ARFMAG, AR_FMAG_LEN) != 0)
     {
       /* not an ar archive */
-      return NULL;
+      return 0;
     }
 
   memcpy (hdr->ar_name, &header[AR_NAME_OFFSET], AR_NAME_LEN);
@@ -98,122 +219,26 @@ ar_get_header (struct ar_hdr *hdr, FILE * libfp)
   buf[AR_SIZE_LEN] = '\0';
   hdr->ar_size = strtol (buf, NULL, 0);
 
-  return hdr;
-}
+  obj_name = get_member_name (hdr->ar_name, &size, p_obj_name != NULL, libfp);
 
-static char *sym_tab;
-static int sym_tab_size;
+  if (p_obj_name != NULL)
+    *p_obj_name = obj_name;
 
-static void
-loadfile_ar (struct lbfile *lbfh)
-{
-  FILE *fp;
+  /* treat BSD appended real file name as a part of the header */
+  hdr->ar_size -= size;
 
-#ifdef __CYGWIN__
-  char posix_path[PATH_MAX];
-  void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
-  cygwin_conv_to_full_posix_path (lbfh->libspc, posix_path);
-  fp = fopen (posix_path, "rb");
-#else
-  fp = fopen (lbfh->libspc, "rb");
-#endif
-
-  if (fp != NULL)
-    {
-      struct ar_hdr hdr;
-
-      fseek (fp, lbfh->offset, SEEK_SET);
-      if (ar_get_header (&hdr, fp))
-        {
-          D ("Loading module %s from file %s.\n", hdr.ar_name, lbfh->libspc);
-          load_rel (fp, hdr.ar_size);
-          fclose (fp);
-        }
-      else
-        {
-          fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, lbfh->relfil);
-          fclose (fp);
-          lkexit (1);
-        }
-    }
-  else
-    {
-      fprintf (stderr, "?ASlink-Error-Opening library '%s'\n", lbfh->libspc);
-      lkexit (1);
-    }
+  return size + ARHDR_LEN;
 }
 
 #if INDEXLIB
-char *
-get_member_name (char *name)
-{
-  if (name[0] == '/')
-    {
-      if (NULL != sym_tab)
-        {
-          char *p;
-
-          int name_offset = strtol (++name, &p, 0);
-          if (p != name && name_offset < sym_tab_size)
-            {
-              int len = p - name + 1;
-              while (len < AR_NAME_LEN && name[len++] == ' ')
-                ;
-              if (len == AR_NAME_LEN)
-                {
-                  char *n;
-
-                  /* long name: get it from the symbol table */
-                  name = &sym_tab[name_offset];
-                  for (p = name; *p != '/' && *p != '\n'; ++p)
-                    assert (p < &sym_tab[sym_tab_size]);
-
-                  if (p[0] != '/' || p[1] != '\n')
-                    while (*++p != '\n')
-                      assert (p < &sym_tab[sym_tab_size]);
-
-                  n = (char *) malloc (p - name + 1);
-                  memcpy (n, name, p - name);
-                  n[p - name] = '\0';
-                  return n;
-                }
-            }
-        }
-    }
-  else
-    {
-      char *p = strrchr (name, '/');
-
-      if (NULL != p)
-        {
-          int len = p - name;
-          while (name[++len] == ' ')
-            ;
-          if (len == AR_NAME_LEN)
-            {
-              char *n = (char *) malloc (p - name + 1);
-              memcpy (n, name, p - name);
-              n[p - name] = '\0';
-              return n;
-            }
-        }
-    }
-
-  /* bad formed member name:
-     just return it */
-
-  return strdup (name);
-}
-
 static char *
 get_member_name_by_offset (FILE * fp, long offset)
 {
   struct ar_hdr hdr;
+  char *name;
 
   fseek (fp, offset, SEEK_SET);
-
-  /* walk trough all archive members */
-  return (NULL != ar_get_header (&hdr, fp)) ? get_member_name (hdr.ar_name) : NULL;
+  return (ar_get_header (&hdr, fp, &name) != 0) ? name : NULL;
 }
 
 static pmlibraryfile
@@ -221,6 +246,7 @@ find_member_by_offset (const char *libspc, long offset)
 {
   pmlibraryfile p;
 
+  /* walk trough all archive members */
   for (p = libr; p; p = p->next)
     {
       if (0 == strcmp (libspc, p->libspc) && p->offset == offset)
@@ -234,23 +260,30 @@ static pmlibraryfile
 buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int type)
 {
   struct ar_hdr hdr;
+  char *obj_name;
+  size_t hdr_size;
 
   /* walk trough all archive members */
-  while (ar_get_header (&hdr, libfp))
+  while ((hdr_size = ar_get_header (&hdr, libfp, &obj_name)) != 0)
     {
-      if (AR_IS_SYMBOL_TABLE (hdr))
+      if (AR_IS_SYMBOL_TABLE (obj_name))
         {
           char *buf, *po, *ps;
           int i;
           long nsym;
+          long pos;
+
+          free (obj_name);
 
           buf = (char *) new (hdr.ar_size);
 
-          if ((off_t) fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
+          if (fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
             {
               free (buf);
               return This;
             }
+
+          pos = ftell (libfp);
 
           nsym = sgetl (buf);
 
@@ -268,8 +301,7 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
               po += 4;
 
               sym = strdup (ps);
-              while (*ps++ != '\0')
-                ;
+              ps += strlen (ps) + 1;
 
               if ((entry = find_member_by_offset (lbnh->libspc, offset)) != NULL)
                 {
@@ -313,16 +345,104 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
             }
           free (buf);
 
+          fseek (libfp, pos, SEEK_SET);
           break;
         }
-      else if (AR_IS_STRING_TABLE (hdr))
+      else if (AR_IS_BSD_SYMBOL_TABLE (obj_name))
         {
+          char *buf, *po, *ps;
+          int i;
+          long nsym, tablesize;
+          long pos;
+
+          free (obj_name);
+
+          buf = (char *) new (hdr.ar_size);
+
+          if (fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
+            {
+              free (buf);
+              return This;
+            }
+
+          pos = ftell (libfp);
+
+          tablesize = sgetl (buf);
+          nsym = tablesize / 8;
+
+          po = buf + 4;
+
+          ps = po + tablesize + 4;
+
+          for (i = 0; i < nsym; ++i)
+            {
+              pmlibrarysymbol ThisSym;
+              char *sym;
+              long offset;
+              pmlibraryfile entry;
+
+              sym = ps + sgetl (po);
+              po += 4;
+              offset = sgetl (po);
+              po += 4;
+
+              sym = strdup (ps);
+
+              if ((entry = find_member_by_offset (lbnh->libspc, offset)) != NULL)
+                {
+                  for (ThisSym = entry->symbols; ThisSym->next != NULL; ThisSym = ThisSym->next)
+                    ;
+                }
+              else
+                {
+                  /* Opened OK - create a new libraryfile object for it */
+                  if (This == NULL)
+                    {
+                      assert (libr == NULL);
+                      libr = This = (pmlibraryfile) new (sizeof (mlibraryfile));
+                    }
+                  else
+                    {
+                      This->next = (pmlibraryfile) new (sizeof (mlibraryfile));
+                      This = This->next;
+                    }
+                  This->next = NULL;
+                  This->loaded = 0;
+                  This->libspc = lbnh->libspc;
+                  This->offset = offset;
+                  This->relfil = get_member_name_by_offset (libfp, offset);     /* member name */
+                  This->filspc = strdup (This->relfil); /* member file name */
+                  This->type = type;
+
+                  /* start a new linked list of symbols for this module. */
+                  This->symbols = ThisSym = NULL;
+                }
+
+              if (ThisSym == NULL)
+                ThisSym = This->symbols = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
+              else
+                {
+                  ThisSym->next = (pmlibrarysymbol) new (sizeof (mlibrarysymbol));
+                  ThisSym = ThisSym->next;
+                }
+              ThisSym->next = NULL;
+              ThisSym->name = sym;
+            }
+          free (buf);
+
+          fseek (libfp, pos, SEEK_SET);
+          break;
+        }
+      else if (AR_IS_STRING_TABLE (obj_name))
+        {
+          free (obj_name);
+
           if (sym_tab)
             free (sym_tab);
 
           sym_tab = (char *) new (hdr.ar_size);
 
-          if ((off_t) fread (sym_tab, 1, hdr.ar_size, libfp) != hdr.ar_size)
+          if (fread (sym_tab, 1, hdr.ar_size, libfp) != hdr.ar_size)
             {
               free (sym_tab);
               sym_tab_size = 0;
@@ -348,9 +468,9 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
           This->next = NULL;
           This->loaded = -1;
           This->libspc = lbnh->libspc;
-          This->offset = moduleOffset - ARHDR_LEN;
+          This->offset = moduleOffset - hdr_size;
 
-          This->relfil = get_member_name (hdr.ar_name); /* member name */
+          This->relfil = obj_name;              /* member name */
           This->filspc = strdup (This->relfil); /* member file name */
 
           D ("  Indexing module: %s\n", This->relfil);
@@ -390,6 +510,8 @@ load_adb (FILE * libfp, struct lbfile *lbfh)
 {
   struct ar_hdr hdr;
   char *adb_name;
+  char *obj_name;
+  size_t hdr_size;
 
   /* check if it is a .rel file */
   if (0 != stricmp (&lbfh->relfil[strlen (lbfh->relfil) - 4], ".rel"))
@@ -409,10 +531,12 @@ load_adb (FILE * libfp, struct lbfile *lbfh)
 
 
   /* walk trough all archive members */
-  while (ar_get_header (&hdr, libfp))
+  while ((hdr_size = ar_get_header (&hdr, libfp, &obj_name)) != 0)
     {
-      if (AR_IS_STRING_TABLE (hdr))
+      if (AR_IS_STRING_TABLE (obj_name))
         {
+          free (obj_name);
+
           if (sym_tab)
             free (sym_tab);
 
@@ -426,8 +550,10 @@ load_adb (FILE * libfp, struct lbfile *lbfh)
             }
           sym_tab_size = hdr.ar_size;
         }
-      if (AR_IS_SYMBOL_TABLE (hdr) || 0 != stricmp (get_member_name (hdr.ar_name), adb_name))
+      if (AR_IS_SYMBOL_TABLE (obj_name) || 0 != stricmp (obj_name, adb_name))
         {
+          free (obj_name);
+
           /* skip the mamber */
           fseek (libfp, hdr.ar_size + (hdr.ar_size & 1), SEEK_CUR);
         }
@@ -435,6 +561,8 @@ load_adb (FILE * libfp, struct lbfile *lbfh)
         {
           long left = hdr.ar_size;
           char buf[4096];
+
+          free (obj_name);
 
           while (left)
             {
@@ -471,9 +599,10 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 {
   struct ar_hdr hdr;
   int ret = 0;
+  size_t hdr_size;
 
   /* walk trough all archive members */
-  while (ar_get_header (&hdr, libfp))
+  while ((hdr_size = ar_get_header (&hdr, libfp, NULL)) != 0)
     {
       char filspc[PATH_MAX];
 
@@ -488,11 +617,13 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 #endif
         }
 
-      if (AR_IS_SYMBOL_TABLE (hdr))
+      if (AR_IS_SYMBOL_TABLE (obj_name))
         {
           char *buf, *po, *ps;
           int i;
           long nsym;
+
+          free (obj_name);
 
           buf = (char *) new (hdr.ar_size);
 
@@ -574,7 +705,95 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
           break;
         }
-      else if (AR_IS_STRING_TABLE (hdr))
+      else if (AR_IS_BSD_SYMBOL_TABLE (obj_name))
+        {
+          char *buf, *po, *ps;
+          int i;
+          long nsym, tablesize;
+
+          free (obj_name);
+
+          buf = (char *) new (hdr.ar_size);
+
+          if ((off_t) fread (buf, 1, hdr.ar_size, libfp) != hdr.ar_size)
+            {
+              free (buf);
+              return 0;
+            }
+
+          tablesize = sgetl (buf);
+          nsym = tablesize / 8;
+
+          po = buf + 4;
+
+          ps = po + tablesize + 4;
+
+          for (i = 0; i < nsym; ++i)
+            {
+              char *sym;
+              long offset;
+
+              sym = ps + sgetl (po);
+              po += 4;
+              offset = sgetl (po);
+              po += 4;
+
+              if (0 == strcmp (name, sym))
+                {
+                  fseek (libfp, offset, SEEK_SET);
+                  if (ar_get_header (&hdr, libfp))
+                    {
+                      sprintf (&filspc[strlen (filspc)], "%s", hdr.ar_name);
+
+                      /* If this module has been loaded already don't load it again. */
+                      if (!is_module_loaded (filspc))
+                        {
+                          struct lbfile *lbfh, *lbf;
+
+                          lbfh = (struct lbfile *) new (sizeof (struct lbfile));
+                          lbfh->libspc = strdup (lbnh->libspc);
+                          lbfh->relfil = strdup (hdr.ar_name);
+                          lbfh->filspc = strdup (filspc);
+                          lbfh->offset = offset;
+                          lbfh->type = type;
+
+                          if (lbfhead == NULL)
+                            {
+                              lbfhead = lbfh;
+                            }
+                          else
+                            {
+                              for (lbf = lbfhead; lbf->next != NULL; lbf = lbf->next)
+                                ;
+
+                              lbf->next = lbfh;
+                            }
+
+                          D ("Loading module %s from file %s.\n", hdr.ar_name, lbfh->libspc);
+                          load_rel (libfp, hdr.ar_size);
+                          ///* if cdb information required & .adb file present */
+                          //if (dflag && dfp)
+                          //  {
+                          //    if (load_adb(FILE *libfp, struct lbfile *lbfh))
+                          //      SaveLinkedFilePath (filspc);
+                          //  }
+                          ret = 1;
+                          break;
+                        }
+                    }
+                  else
+                    {
+                      fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbnh->libspc, name);
+                      fclose (libfp);
+                      lkexit (1);
+                    }
+                }
+            }
+          free (buf);
+
+          break;
+        }
+      else if (AR_IS_STRING_TABLE (obj_name))
         {
           if (sym_tab)
             free (sym_tab);
@@ -599,7 +818,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
           sprintf (&filspc[strlen (filspc)], "%s", hdr.ar_name);
 
           /* Opened OK - create a new libraryfile object for it */
-          ret = add_rel_file (name, lbnh, hdr.ar_name, filspc, moduleOffset - ARHDR_LEN, libfp, hdr.ar_size, type);
+          ret = add_rel_file (name, lbnh, hdr.ar_name, filspc, moduleOffset - hdr_size, libfp, hdr.ar_size, type);
           ///* if cdb information required & .adb file present */
           //if (dflag && dfp)
           //  {
@@ -629,6 +848,45 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
   return ret;
 }
 #endif
+
+static void
+loadfile_ar (struct lbfile *lbfh)
+{
+  FILE *fp;
+
+#ifdef __CYGWIN__
+  char posix_path[PATH_MAX];
+  void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
+  cygwin_conv_to_full_posix_path (lbfh->libspc, posix_path);
+  fp = fopen (posix_path, "rb");
+#else
+  fp = fopen (lbfh->libspc, "rb");
+#endif
+
+  if (fp != NULL)
+    {
+      struct ar_hdr hdr;
+
+      fseek (fp, lbfh->offset, SEEK_SET);
+      if (ar_get_header (&hdr, fp, NULL) != 0)
+        {
+          D ("Loading module %s from file %s.\n", hdr.ar_name, lbfh->libspc);
+          load_rel (fp, hdr.ar_size);
+          fclose (fp);
+        }
+      else
+        {
+          fprintf (stderr, "?ASlink-Error-Bad offset in library file %s(%s)\n", lbfh->libspc, lbfh->relfil);
+          fclose (fp);
+          lkexit (1);
+        }
+    }
+  else
+    {
+      fprintf (stderr, "?ASlink-Error-Opening library '%s'\n", lbfh->libspc);
+      lkexit (1);
+    }
+}
 
 struct aslib_target aslib_target_ar = {
   &is_ar,

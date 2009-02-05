@@ -4,7 +4,7 @@
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -13,8 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #ifndef __LKAR_H
 #define __LKAR_H
@@ -61,11 +60,16 @@ typedef _off_t off_t;
 
 #define ARHDR_LEN (AR_NAME_LEN + AR_DATE_LEN + AR_UID_LEN + AR_GID_LEN + AR_MODE_LEN + AR_SIZE_LEN + AR_FMAG_LEN)
 
-#define AR_SYMBOL_TABLE_NAME "/               "
-#define AR_STRING_TABLE_NAME "//              "
+#define AR_SYMBOL_TABLE_NAME            "/               "
+#define AR_STRING_TABLE_NAME            "//              "
 
-#define AR_IS_SYMBOL_TABLE(hdr) (0 == strcmp((hdr).ar_name, AR_SYMBOL_TABLE_NAME))
-#define AR_IS_STRING_TABLE(hdr) (0 == strcmp((hdr).ar_name, AR_STRING_TABLE_NAME))
+#define AR_BSD_SYMBOL_TABLE_NAME        "__.SYMDEF       "
+#define AR_BSD_SORTED_SYMBOL_TABLE_NAME "__.SYMDEF SORTED"
+
+#define AR_IS_SYMBOL_TABLE(name) (0 == strcmp((name), AR_SYMBOL_TABLE_NAME))
+#define AR_IS_STRING_TABLE(name) (0 == strcmp((name), AR_STRING_TABLE_NAME))
+
+#define AR_IS_BSD_SYMBOL_TABLE(name) (0 == strcmp((name), AR_BSD_SYMBOL_TABLE_NAME) || 0 == strcmp((name), AR_BSD_SORTED_SYMBOL_TABLE_NAME))
 
 
 struct ar_hdr                     /* archive member header */

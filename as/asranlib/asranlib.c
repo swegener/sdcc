@@ -5,7 +5,7 @@
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -14,8 +14,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +32,10 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 #define NELEM(x)  (sizeof (x) / sizeof (*x))
 
 
+int verbose = 0;
+int list = 0;
+int print_index = 0;
+
 int
 is_ar (FILE * libfp)
 {
@@ -45,17 +48,139 @@ is_ar (FILE * libfp)
   return ret;
 }
 
-static struct ar_hdr *
-ar_get_header (struct ar_hdr *hdr, FILE * libfp)
+static char *sym_tab;
+static int sym_tab_size;
+
+char *
+get_member_name (char *name, size_t *p_size, int allocate, FILE * libfp)
+{
+  *p_size = 0;
+
+  if (0 == memcmp (name, "#1/", 3))
+    {
+      char *p;
+      size_t len = strtoul (&name [3], &p, 10);
+      if (p > &name [3])
+        {
+          /* BSD appends real file name to the file header */
+          if (p_size != NULL)
+            *p_size = len;
+
+          if (allocate)
+            {
+              char *n = (char *) malloc (len);
+              if (fread (n, 1, len, libfp) != len)
+                {
+                  /* not an ar archive or broken ar archive */
+                  return NULL;
+                }
+              else
+                return n;
+            }
+          else
+            {
+              /* just advance the file pointer */
+              fseek (libfp, len, SEEK_CUR);
+              return NULL;
+            }
+        }
+      else
+        {
+          /* not an ar archive or broken ar archive */
+          return NULL;
+        }
+    }
+  else if (allocate)
+    {
+      if (name[0] == '/')
+        {
+          if (NULL != sym_tab)
+            {
+              char *p;
+
+              int name_offset = strtol (++name, &p, 0);
+              if (p != name && name_offset < sym_tab_size)
+                {
+                  int len = p - name + 1;
+                  while (len < AR_NAME_LEN && name[len++] == ' ')
+                    ;
+                  if (len == AR_NAME_LEN)
+                    {
+                      char *n;
+
+                      /* long name: get it from the symbol table */
+                      name = &sym_tab[name_offset];
+                      for (p = name; *p != '/' && *p != '\n'; ++p)
+                        assert (p < &sym_tab[sym_tab_size]);
+
+                      if (p[0] != '/' || p[1] != '\n')
+                        while (*++p != '\n')
+                          assert (p < &sym_tab[sym_tab_size]);
+
+                      n = (char *) malloc (p - name + 1);
+                      memcpy (n, name, p - name);
+                      n[p - name] = '\0';
+                      return n;
+                    }
+                }
+            }
+        }
+      else
+        {
+          char *p = strrchr (name, '/');
+
+          if (NULL != p)
+            {
+              int len = p - name;
+              while (name[++len] == ' ')
+                ;
+              if (len == AR_NAME_LEN)
+                {
+                  char *n = (char *) malloc (p - name + 1);
+                  memcpy (n, name, p - name);
+                  n[p - name] = '\0';
+                  return n;
+                }
+            }
+          else
+            {
+              /* BSD formed member name:
+                 trim trailing spaces */
+              char *n;
+
+              p = name + AR_NAME_LEN;
+              while (*--p == ' ' && p >= name)
+                ;
+              ++p;
+              n = (char *) malloc (p - name + 1);
+              memcpy (n, name, p - name);
+              n[p - name] = '\0';
+              return n;
+            }
+        }
+
+      /* bad formed member name:
+       just return it */
+
+      return strdup (name);
+    }
+  else
+    return NULL;
+}
+
+size_t
+ar_get_header (struct ar_hdr *hdr, FILE * libfp, char **p_obj_name)
 {
   char header[ARHDR_LEN];
   char buf[AR_DATE_LEN + 1];
+  char *obj_name;
+  size_t size;
 
-  if (fread (header, 1, sizeof (header), libfp) != sizeof (header) ||
-      memcmp (header + AR_FMAG_OFFSET, ARFMAG, AR_FMAG_LEN) != 0)
+  if (fread (header, 1, sizeof (header), libfp) != sizeof (header)
+      || memcmp (header + AR_FMAG_OFFSET, ARFMAG, AR_FMAG_LEN) != 0)
     {
       /* not an ar archive */
-      return NULL;
+      return 0;
     }
 
   memcpy (hdr->ar_name, &header[AR_NAME_OFFSET], AR_NAME_LEN);
@@ -81,9 +206,26 @@ ar_get_header (struct ar_hdr *hdr, FILE * libfp)
   buf[AR_SIZE_LEN] = '\0';
   hdr->ar_size = strtol (buf, NULL, 0);
 
-  return hdr;
+  obj_name = get_member_name (hdr->ar_name, &size, p_obj_name != NULL, libfp);
+
+  if (p_obj_name != NULL)
+    *p_obj_name = obj_name;
+
+  /* treat BSD appended real file name as a part of the header */
+  hdr->ar_size -= size;
+
+  return size + ARHDR_LEN;
 }
 
+static char *
+get_member_name_by_offset (FILE * fp, long offset)
+{
+  struct ar_hdr hdr;
+  char *name;
+
+  fseek (fp, offset, SEEK_SET);
+  return (ar_get_header (&hdr, fp, &name) != 0) ? name : NULL;
+}
 
 struct symbol_s
   {
@@ -102,6 +244,9 @@ add_symbol (const char *sym, void *param)
 
   if ((s = (struct symbol_s *) malloc (sizeof (struct symbol_s))) == NULL)
     return 0;
+
+  if (verbose)
+    printf ("%s\n", sym);
 
   s->name = strdup (sym);
   s->offset = offset - first_member_offset;
@@ -212,21 +357,152 @@ enum_symbols (FILE * fp, long size, int (*func) (const char *sym, void *param), 
   return 0;
 }
 
+
+static int
+process_symbol_table (struct ar_hdr *hdr, FILE *fp)
+{
+  if (print_index)
+    {
+      char *buf, *po, *ps;
+      int i;
+      long nsym;
+      long pos;
+
+      printf ("Archive index:\n");
+
+      buf = (char *) malloc (hdr->ar_size);
+
+      if (fread (buf, 1, hdr->ar_size, fp) != hdr->ar_size)
+        {
+          free (buf);
+          return 0;
+        }
+
+      pos = ftell (fp);
+
+      nsym = sgetl (buf);
+
+      po = buf + 4;
+      ps = po + nsym * 4;
+
+      for (i = 0; i < nsym; ++i)
+        {
+          char *obj;
+
+          offset = sgetl (po);
+          po += 4;
+
+          printf ("%s in ", ps);
+          ps += strlen(ps) + 1;
+
+          obj = get_member_name_by_offset (fp, offset);  /* member name */
+          printf ("%s\n", obj);
+          free (obj);
+
+        }
+      free (buf);
+
+      fseek (fp, pos, SEEK_SET);
+
+      putchar ('\n');
+    }
+  else
+    {
+      /* skip the symbol table */
+      fseek (fp, hdr->ar_size + (hdr->ar_size & 1), SEEK_CUR);
+    }
+
+  return 1;
+}
+
+static int
+process_bsd_symbol_table (struct ar_hdr *hdr, FILE *fp)
+{
+  if (print_index)
+    {
+      char *buf, *po, *ps;
+      int i;
+      long tablesize;
+      long nsym;
+      long pos;
+
+      printf ("Archive index:\n");
+
+      buf = (char *) malloc (hdr->ar_size);
+
+      if (fread (buf, 1, hdr->ar_size, fp) != hdr->ar_size)
+        {
+          free (buf);
+          return 0;
+        }
+
+      pos = ftell (fp);
+
+      tablesize = sgetl (buf);
+      nsym = tablesize / 8;
+
+      po = buf + 4;
+
+      ps = po + tablesize + 4;
+
+      for (i = 0; i < nsym; ++i)
+        {
+          char *obj;
+          long sym;
+
+          sym = sgetl (po);
+          po += 4;
+          offset = sgetl (po);
+          po += 4;
+
+          printf ("%s in ", ps + sym);
+
+          obj = get_member_name_by_offset (fp, offset);  /* member name */
+          printf ("%s\n", obj);
+          free (obj);
+        }
+      free (buf);
+
+      fseek (fp, pos, SEEK_SET);
+
+      putchar ('\n');
+    }
+  else
+    {
+      /* skip the symbol table */
+      fseek (fp, hdr->ar_size + (hdr->ar_size & 1), SEEK_CUR);
+    }
+
+  return 1;
+}
+
 int
 get_symbols (FILE * fp, const char *archive)
 {
   struct ar_hdr hdr;
+  char *name;
 
-  if (!is_ar (fp) || !ar_get_header (&hdr, fp))
+  if (!is_ar (fp) || !ar_get_header (&hdr, fp, &name))
     {
       fprintf (stderr, "asranlib: %s: File format not recognized\n", archive);
       exit (1);
     }
 
-  if (AR_IS_SYMBOL_TABLE (hdr))
+  if (AR_IS_SYMBOL_TABLE (name))
     {
-      /* skip the symbol table */
-      fseek (fp, hdr.ar_size + (hdr.ar_size & 1), SEEK_CUR);
+      free (name);
+
+      process_symbol_table (&hdr, fp);
+      if (!ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL))
+        return 1;
+    }
+  else if (AR_IS_BSD_SYMBOL_TABLE (name))
+    {
+      free (name);
+
+      process_bsd_symbol_table (&hdr, fp);
+      if (!ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL))
+        return 1;
     }
 
   first_member_offset = ftell (fp) - ARHDR_LEN;
@@ -236,31 +512,48 @@ get_symbols (FILE * fp, const char *archive)
     {
       if (is_rel (fp))
         {
-          long mdule_offset = ftell (fp);
-
-          offset = mdule_offset - ARHDR_LEN;
-
-          enum_symbols (fp, hdr.ar_size, add_symbol, NULL);
-
-          fseek (fp, mdule_offset + hdr.ar_size, SEEK_SET);
-
-          if (hdr.ar_size & 1)
+          if (verbose || list)
             {
-              int c = getc (fp);
-              assert (c == EOF || c == '\n');
+              printf ("%s%s\n", name, verbose ? ":" : "");
+              free (name);
             }
+
+          if (!list)
+            {
+              long mdule_offset = ftell (fp);
+
+              offset = mdule_offset - ARHDR_LEN;
+
+              enum_symbols (fp, hdr.ar_size, add_symbol, NULL);
+
+              fseek (fp, mdule_offset + hdr.ar_size, SEEK_SET);
+
+              if (hdr.ar_size & 1)
+                {
+                  int c = getc (fp);
+                  assert (c == EOF || c == '\n');
+                }
+            }
+
+          if (verbose)
+            putchar ('\n');
         }
       else
         {
+          if (verbose || list)
+            {
+              fprintf (stderr, "asranlib: %s: File format not recognized\n", name);
+              free (name);
+            }
+
           /* skip if the member is not a .REL format */
           fseek (fp, hdr.ar_size + (hdr.ar_size & 1), SEEK_CUR);
         }
     }
-  while (ar_get_header (&hdr, fp));
+  while (ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL));
 
   return 1;
 }
-
 
 void
 do_ranlib (const char *archive)
@@ -276,16 +569,25 @@ do_ranlib (const char *archive)
 
   if (get_symbols (infp, archive))
     {
-      FILE *outfp = NULL;
+      FILE *outfp;
       struct symbol_s *symp;
       char buf[4];
-      int str_length = 0;
-      int pad = 0;
+      int str_length;
+      int pad;
       int nsym;
       int symtab_size;
       char tmpfile[] = "arXXXXXX";
 
-      if (NULL == mktemp (tmpfile) || NULL == (outfp = fopen (tmpfile, "wb")))
+#ifdef _WIN32
+      if (NULL == _mktemp (tmpfile) || NULL == (outfp = fopen (tmpfile, "wb")))
+        {
+          fclose (infp);
+          fprintf (stderr, "asranlib: %s: ", tmpfile);
+          perror (NULL);
+          exit (1);
+        }
+#else
+      if ((pad = mkstemp (tmpfile)) < 0)
         {
           fclose (infp);
           fprintf (stderr, "asranlib: %s: ", tmpfile);
@@ -293,8 +595,17 @@ do_ranlib (const char *archive)
           exit (1);
         }
 
+      if (NULL == (outfp = fdopen (pad, "wb")))
+        {
+          close (pad);
+          fclose (infp);
+          perror ("asranlib");
+          exit (1);
+        }
+#endif
+
       /* calculate the size of symbol table */
-      for (nsym = 0, symp = symlist; symp; ++nsym, symp = symp->next)
+      for (str_length = 0, nsym = 0, symp = symlist; symp; ++nsym, symp = symp->next)
         {
           str_length += strlen (symp->name) + 1;
         }
@@ -355,6 +666,11 @@ do_ranlib (const char *archive)
     fclose (infp);
 }
 
+void
+do_verbose (void)
+{
+  verbose = 1;
+}
 
 void
 print_version (void)
@@ -363,35 +679,64 @@ print_version (void)
   exit (0);
 }
 
+void
+do_list (void)
+{
+  list = 1;
+}
+
+void
+print_armap (void)
+{
+  print_index = 1;
+}
+
+void usage (void);
+
+struct opt_s
+  {
+    const char *short_opt;
+    const char *long_opt;
+    void (*optfnc) (void);
+    const char *comment;
+  }
+opts[] =
+  {
+    { "-v", "--verbose", &do_verbose, "Be more verbose about the operation" },
+    { "-V", "--version", &print_version, "Print this help message" },
+    { "-h", "--help", &usage, "Print version information" },
+    { "-t", "--list", &do_list, "List the contents of an archive" },
+    { "-s", "--print-armap", &print_armap, "Print the archive index" },
+  };
 
 void
 usage (void)
 {
+  int i;
+
   printf ("Usage: asranlib [options] archive\n"
     " Generate an index to speed access to archives\n"
-    " The options are:\n"
-    "  -h --help                    Print this help message\n"
-    "  -V --version                 Print version information\n"
-    "asranlib: supported targets: asxxxx\n");
+    " The options are:\n");
+
+  for (i = 0; i < NELEM (opts); ++i)
+    {
+      int len = 3;
+      printf ("  %s ", (NULL != opts[i].short_opt) ? opts[i].short_opt : "  ");
+      if (NULL != opts[i].long_opt)
+        {
+          printf ("%s ", opts[i].long_opt);
+          len += strlen (opts[i].long_opt);
+        }
+
+      while (len++ < 32)
+        putchar (' ');
+      printf ("%s\n", opts[i].comment);
+    }
+
+  printf ("asranlib: supported targets: asxxxx\n");
 
   exit (1);
 }
-
-
-struct opt_s
-  {
-    const char *opt;
-    void (*optfnc) (void);
-  }
-opts[] =
-  {
-    { "-v", &print_version, },
-    { "-V", &print_version, },
-    { "--version", &print_version, },
-    { "-h", &usage, },
-    { "--help", &usage, },
-  };
-
 
 void
 process_options (int argc, char *argv[])
@@ -413,25 +758,27 @@ process_options (int argc, char *argv[])
 
           for (i = 0; i < NELEM (opts); ++i)
             {
-              if (0 == strcmp (*argp, opts[i].opt))
+              if (0 == strcmp (*argp, opts[i].short_opt) || 0 == strcmp (*argp, opts[i].long_opt))
                 {
                   if (NULL != opts[i].optfnc)
                     {
                       (*opts[i].optfnc) ();
-                      continue;
+                      break;
                     }
                 }
             }
         }
 
-      do_ranlib (*argp);
-      ++narch;
+      else
+        {
+          do_ranlib (*argp);
+          ++narch;
+        }
     }
 
   if (!narch)
     usage ();
 }
-
 
 int
 main (int argc, char *argv[])

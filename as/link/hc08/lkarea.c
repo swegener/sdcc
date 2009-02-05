@@ -1,13 +1,22 @@
-/* lkarea.c */
+/* lkarea.c
+
+   Copyright (C) 1989-1995 Alan R. Baldwin
+   721 Berkeley St., Kent, Ohio 44240
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /*
- * (C) Copyright 1989-1995
- * All Rights Reserved
- *
- * Alan R. Baldwin
- * 721 Berkeley St.
- * Kent, Ohio  44240
- *
  *  3-Nov-97 JLH:
  *           - change lkparea to use a_type == 0 as "virgin area" flag
  * 02-Apr-98 JLH: add code to link 8051 data spaces
@@ -601,9 +610,9 @@ Addr_T lnksect(struct area *tap)
             taxp = taxp->a_axp;
         }
     } else if (tap->a_flag & A_ABS) {
-    	/*
-    	 * Absolute sections
-    	 */
+        /*
+         * Absolute sections
+         */
         while (taxp) {
             allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap);
             taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */

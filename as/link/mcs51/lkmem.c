@@ -1,22 +1,19 @@
-/*-------------------------------------------------------------------------
-  lkmem.c - Create a memory summary file with extension .mem
+/* lkmem.c - Create a memory summary file with extension .mem
 
-   Written By -  Jesus Calvino-Fraga, jesusc@ieee.org (2002)
+   Copyright (C) 2002 Jesus Calvino-Fraga, jesusc at ieee dot org
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
--------------------------------------------------------------------------*/
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <string.h>
@@ -498,7 +495,7 @@ int summary2(struct area * areap)
         if(j%16==0) fprintf(of, "\n0x%02x:|", j);
         fprintf(of, "%c|", idatamap[j]);
     }
-	fprintf(of, "\n0-3:Reg Banks, T:Bit regs, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack, A:Absolute\n");
+        fprintf(of, "\n0-3:Reg Banks, T:Bit regs, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack, A:Absolute\n");
 
     for(j=0; j<256; j++)
     {

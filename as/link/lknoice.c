@@ -1,4 +1,20 @@
-/* lknoice.c */
+/* lknoice.c - Extensions to CUG 292 linker ASLINK to produce NoICE debug files
+
+   Copyright (C) 1989-1995 Alan R. Baldwin
+   721 Berkeley St., Kent, Ohio 44240
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /*
  * Extensions to CUG 292 linker ASLINK to produce NoICE debug files
@@ -30,85 +46,85 @@ static void PagedAddress( Addr_T value, int page );
  */
 void DefineNoICE( char *name, Addr_T value, int page )
 {
-	char token1[NCPS];			/* parse for file.function.symbol */
-	char token2[NCPS];
-	char token3[NCPS];
-	//	char token4[NCPS];
-	char sep1, sep2;
-	int  j, level;
+        char token1[NCPS];                      /* parse for file.function.symbol */
+        char token2[NCPS];
+        char token3[NCPS];
+        //      char token4[NCPS];
+        char sep1, sep2;
+        int  j, level;
 
-	/* no output if file is not open */
-	if (jfp == NULL) return;
+        /* no output if file is not open */
+        if (jfp == NULL) return;
 
         j = sscanf( name, "%[^.]%c%[^.]%c%s",
-		    token1, &sep1, token2, &sep2, token3 );
+                    token1, &sep1, token2, &sep2, token3 );
         switch (j)
-	{
-		/* file.function.symbol, or file.function..SPECIAL */
-		case 5:
-			DefineFile( token1, 0, 0 );
-			if (token3[0] == '.')
-			{
-				if (strcmp( token3, ".FN" ) == 0)
-				{
-					/* Global function */
+        {
+                /* file.function.symbol, or file.function..SPECIAL */
+                case 5:
+                        DefineFile( token1, 0, 0 );
+                        if (token3[0] == '.')
+                        {
+                                if (strcmp( token3, ".FN" ) == 0)
+                                {
+                                        /* Global function */
                                         DefineFunction( token2, value, page );
-				}
-				else if (strcmp( token3, ".SFN" ) == 0)
-				{
-					/* Static (file-scope) function */
-					DefineStaticFunction( token2, value, page );
-				}
-				else if (strcmp( token3, ".EFN" ) == 0)
-				{
-					/* End of function */
+                                }
+                                else if (strcmp( token3, ".SFN" ) == 0)
+                                {
+                                        /* Static (file-scope) function */
+                                        DefineStaticFunction( token2, value, page );
+                                }
+                                else if (strcmp( token3, ".EFN" ) == 0)
+                                {
+                                        /* End of function */
                                         DefineEndFunction( value, page );
                                 }
-			}
-			else
-			{
-				/* Function-scope var. */
-				DefineFunction( token2, 0, 0 );
+                        }
+                        else
+                        {
+                                /* Function-scope var. */
+                                DefineFunction( token2, 0, 0 );
 
                                 /* Look for optional level integer */
-			        j = sscanf( token3, "%[^.]%c%u", token1, &sep1, &level );
+                                j = sscanf( token3, "%[^.]%c%u", token1, &sep1, &level );
                                 if ((j == 3) && (level != 0))
                                 {
-                                	sprintf( &token1[ strlen(token1) ], "_%u", level );
-                        	}
-                               	DefineScoped( token1, value, page );
+                                        sprintf( &token1[ strlen(token1) ], "_%u", level );
+                                }
+                                DefineScoped( token1, value, page );
                         }
-			break;
+                        break;
 
-		/* file.func. is illegal */
-		case 4:
-			break;
+                /* file.func. is illegal */
+                case 4:
+                        break;
 
-		/* either file.symbol or file.line# */
-		case 3:
-			DefineFile( token1, 0, 0 );
-			if ((token2[0] >= '0') && (token2[0] <= '9'))
-			{
-				/* Line number */
+                /* either file.symbol or file.line# */
+                case 3:
+                        DefineFile( token1, 0, 0 );
+                        if ((token2[0] >= '0') && (token2[0] <= '9'))
+                        {
+                                /* Line number */
                                 DefineLine( token2, value, page );
                         }
-			else
-			{
-				/* File-scope symbol.  (Kill any function) */
-				DefineEndFunction( 0, 0 );
+                        else
+                        {
+                                /* File-scope symbol.  (Kill any function) */
+                                DefineEndFunction( 0, 0 );
                                 DefineScoped( token2, value, page );
                         }
-			break;
+                        break;
 
-		/* symbol. is illegal */
-		case 2:
-			break;
+                /* symbol. is illegal */
+                case 2:
+                        break;
 
-		/* just a symbol */
-		case 1:
+                /* just a symbol */
+                case 1:
                         DefineGlobal( token1, value, page );
                         break;
-	}
+        }
 }
 
 static char currentFile[NCPS];
@@ -120,8 +136,8 @@ static char currentFunction[NCPS];
  */
 void DefineGlobal( char *name, Addr_T value, int page )
 {
-	fprintf( jfp, "DEF %s ", name );
-	PagedAddress( value, page );
+        fprintf( jfp, "DEF %s ", name );
+        PagedAddress( value, page );
 }
 
 /*
@@ -130,8 +146,8 @@ void DefineGlobal( char *name, Addr_T value, int page )
  */
 void DefineScoped( char *name, Addr_T value, int page )
 {
-	fprintf( jfp, "DEFS %s ", name );
-	PagedAddress( value, page );
+        fprintf( jfp, "DEFS %s ", name );
+        PagedAddress( value, page );
 }
 
 /*
@@ -140,19 +156,19 @@ void DefineScoped( char *name, Addr_T value, int page )
  */
 void DefineFile( char *name, Addr_T value, int page )
 {
-	if (as_strcmpi( name, currentFile ) != 0)
-	{
-		strcpy( currentFile, name );
-		if (value != 0)
-		{
-			fprintf( jfp, "FILE %s ", name );
-		        PagedAddress( value, page );
-		}
-		else
-		{
-			fprintf( jfp, "FILE %s\n", name );
-		}
-	}
+        if (as_strcmpi( name, currentFile ) != 0)
+        {
+                strcpy( currentFile, name );
+                if (value != 0)
+                {
+                        fprintf( jfp, "FILE %s ", name );
+                        PagedAddress( value, page );
+                }
+                else
+                {
+                        fprintf( jfp, "FILE %s\n", name );
+                }
+        }
 }
 
 /*
@@ -161,21 +177,21 @@ void DefineFile( char *name, Addr_T value, int page )
  */
 void DefineFunction( char *name, Addr_T value, int page )
 {
-	if (as_strcmpi( name, currentFunction ) != 0)
-	{
-		strcpy( currentFunction, name );
+        if (as_strcmpi( name, currentFunction ) != 0)
+        {
+                strcpy( currentFunction, name );
                 if (value != 0)
                 {
                         fprintf( jfp, "DEF %s ", name );
-		        PagedAddress( value, page );
+                        PagedAddress( value, page );
                         fprintf( jfp, "FUNC %s ", name );
-		        PagedAddress( value, page );
+                        PagedAddress( value, page );
                 }
                 else
                 {
                         fprintf( jfp, "FUNC %s\n", name );
-		}
-	}
+                }
+        }
 }
 
 /*
@@ -184,21 +200,21 @@ void DefineFunction( char *name, Addr_T value, int page )
  */
 void DefineStaticFunction( char *name, Addr_T value, int page )
 {
-	if (as_strcmpi( name, currentFunction ) != 0)
-	{
-		strcpy( currentFunction, name );
-		if (value != 0)
-		{
+        if (as_strcmpi( name, currentFunction ) != 0)
+        {
+                strcpy( currentFunction, name );
+                if (value != 0)
+                {
                         fprintf( jfp, "DEFS %s ", name );
-		        PagedAddress( value, page );
-			fprintf( jfp, "SFUNC %s ", name );
-		        PagedAddress( value, page );
-		}
-		else
-		{
-			fprintf( jfp, "SFUNC %s\n", name );
-		}
-	}
+                        PagedAddress( value, page );
+                        fprintf( jfp, "SFUNC %s ", name );
+                        PagedAddress( value, page );
+                }
+                else
+                {
+                        fprintf( jfp, "SFUNC %s\n", name );
+                }
+        }
 }
 
 /*
@@ -207,20 +223,20 @@ void DefineStaticFunction( char *name, Addr_T value, int page )
  */
 void DefineEndFunction( Addr_T value, int page )
 {
-	if (currentFunction[0] != 0)
-	{
-		if (value != 0)
-		{
-			fprintf( jfp, "ENDF " );
-		        PagedAddress( value, page );
-		}
-		else
-		{
-			fprintf( jfp, "ENDF\n" );
-		}
+        if (currentFunction[0] != 0)
+        {
+                if (value != 0)
+                {
+                        fprintf( jfp, "ENDF " );
+                        PagedAddress( value, page );
+                }
+                else
+                {
+                        fprintf( jfp, "ENDF\n" );
+                }
 
-        	currentFunction[0] = 0;
-	}
+                currentFunction[0] = 0;
+        }
 }
 
 /*
@@ -229,17 +245,17 @@ void DefineEndFunction( Addr_T value, int page )
  */
 void DefineLine( char *lineString, Addr_T value, int page )
 {
-	int indigit, lineNumber = 0;
+        int indigit, lineNumber = 0;
 
-	while( (indigit=digit( *lineString++, 10 )) >= 0)
-	{
-		lineNumber = 10*lineNumber + indigit;
-	}
-	fprintf( jfp, "LINE %u ", lineNumber );
+        while( (indigit=digit( *lineString++, 10 )) >= 0)
+        {
+                lineNumber = 10*lineNumber + indigit;
+        }
+        fprintf( jfp, "LINE %u ", lineNumber );
         PagedAddress( value, page );
 }
 
 void PagedAddress( Addr_T value, int page )
 {
-	fprintf( jfp, "%X:0x%X\n", page, value );
+        fprintf( jfp, "%X:0x%X\n", page, value );
 }

@@ -1,6 +1,22 @@
-/* lkstore.c */
+/* lkstore.c - Allocated string storage module.
 
-/* 
+   Copyright (C) 1989-1995 Alan R. Baldwin
+   721 Berkeley St., Kent, Ohio 44240
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*
  * Allocated string storage module.
  *
  * 31-Oct-1997 by John Hartman
@@ -24,11 +40,11 @@ char *StoreString( char *str )
    #define STR_STORE_HUNK 2000
    static char *pNextFree = NULL;
    static int  bytesLeft = 0;
-   
+
    int  length;
    char *pStoredString;
-   
-   length = strlen( str ) + 1;	/* what we need, including null */
+
+   length = strlen( str ) + 1;  /* what we need, including null */
 
    if (length > bytesLeft)
    {

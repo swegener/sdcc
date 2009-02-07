@@ -362,12 +362,13 @@ enum_symbols (FILE * fp, long size, int (*func) (const char *sym, void *param), 
 static int
 process_symbol_table (struct ar_hdr *hdr, FILE *fp)
 {
+  long pos = ftell (fp);
+
   if (print_index)
     {
       char *buf, *po, *ps;
       int i;
       long nsym;
-      long pos;
 
       printf ("Archive index:\n");
 
@@ -378,8 +379,6 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
           free (buf);
           return 0;
         }
-
-      pos = ftell (fp);
 
       nsym = sgetl (buf);
 
@@ -393,13 +392,16 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
           offset = sgetl (po);
           po += 4;
 
-          printf ("%s in ", ps);
-          ps += strlen(ps) + 1;
-
           obj = get_member_name_by_offset (fp, offset);  /* member name */
-          printf ("%s\n", obj);
+          printf ("%s in %s", ps, obj);
+          if (verbose)
+            printf (" at 0x%04x\n", offset);
+          else
+            putchar ('\n');
           free (obj);
 
+          ps += strlen(ps) + 1;
+        
         }
       free (buf);
 
@@ -407,11 +409,9 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
 
       putchar ('\n');
     }
-  else
-    {
-      /* skip the symbol table */
-      fseek (fp, hdr->ar_size + (hdr->ar_size & 1), SEEK_CUR);
-    }
+
+  /* skip the symbol table */
+  fseek (fp, pos + hdr->ar_size + (hdr->ar_size & 1), SEEK_SET);
 
   return 1;
 }
@@ -419,13 +419,14 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
 static int
 process_bsd_symbol_table (struct ar_hdr *hdr, FILE *fp)
 {
+  long pos = ftell (fp);
+
   if (print_index)
     {
       char *buf, *po, *ps;
       int i;
       long tablesize;
       long nsym;
-      long pos;
 
       printf ("Archive index:\n");
 
@@ -436,8 +437,6 @@ process_bsd_symbol_table (struct ar_hdr *hdr, FILE *fp)
           free (buf);
           return 0;
         }
-
-      pos = ftell (fp);
 
       tablesize = sgetl (buf);
       nsym = tablesize / 8;
@@ -468,11 +467,9 @@ process_bsd_symbol_table (struct ar_hdr *hdr, FILE *fp)
 
       putchar ('\n');
     }
-  else
-    {
-      /* skip the symbol table */
-      fseek (fp, hdr->ar_size + (hdr->ar_size & 1), SEEK_CUR);
-    }
+
+  /* skip the symbol table */
+  fseek (fp, pos + hdr->ar_size + (hdr->ar_size & 1), SEEK_SET);
 
   return 1;
 }
@@ -552,7 +549,7 @@ get_symbols (FILE * fp, const char *archive)
           fseek (fp, hdr.ar_size + (hdr.ar_size & 1), SEEK_CUR);
         }
     }
-  while (ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL));
+  while ((hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)));
 
   return 1;
 }

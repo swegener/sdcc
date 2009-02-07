@@ -231,7 +231,7 @@ get_member_name_by_offset (FILE * fp, long offset)
 struct symbol_s
   {
     const char *name;
-    off_t offset;
+    size_t offset;
     struct symbol_s *next;
   };
 
@@ -481,9 +481,10 @@ int
 get_symbols (FILE * fp, const char *archive)
 {
   struct ar_hdr hdr;
+  size_t hdr_len;
   char *name;
 
-  if (!is_ar (fp) || !ar_get_header (&hdr, fp, &name))
+  if (!is_ar (fp) || !(hdr_len = ar_get_header (&hdr, fp, &name)))
     {
       fprintf (stderr, "asranlib: %s: File format not recognized\n", archive);
       exit (1);
@@ -494,7 +495,7 @@ get_symbols (FILE * fp, const char *archive)
       free (name);
 
       process_symbol_table (&hdr, fp);
-      if (!ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL))
+      if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
         return 1;
     }
   else if (AR_IS_BSD_SYMBOL_TABLE (name))
@@ -502,11 +503,11 @@ get_symbols (FILE * fp, const char *archive)
       free (name);
 
       process_bsd_symbol_table (&hdr, fp);
-      if (!ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL))
+      if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
         return 1;
     }
 
-  first_member_offset = ftell (fp) - ARHDR_LEN;
+  first_member_offset = ftell (fp) - hdr_len;
 
   /* walk trough all archive members */
   do
@@ -523,7 +524,7 @@ get_symbols (FILE * fp, const char *archive)
             {
               long mdule_offset = ftell (fp);
 
-              offset = mdule_offset - ARHDR_LEN;
+              offset = mdule_offset - hdr_len;
 
               enum_symbols (fp, hdr.ar_size, add_symbol, NULL);
 

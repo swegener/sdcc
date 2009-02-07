@@ -1,3 +1,9 @@
+2009-02-07 Borut Razem <borut.razem AT siol.net>
+
+	* asranlib/asranlib.c: fixed BSD header length calculation
+	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.8
+	  due sdcc asxxxx license change to GPLv3
+
 2009-02-05 Borut Razem <borut.razem AT siol.net>
 
 	* asranlib/asranlib.c, link/lkar.h, link/lkar.c:

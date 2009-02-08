@@ -30,9 +30,10 @@
 #   A sub directory sdcc is created (referenced as PKGDIR in continuation).
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
 #   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
-# - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
-#   rename it to COPYING.txt and convert it to DOS format:
+# - copy file COPYING and COPYING3 from the sdcc Subversion snapshot to the PKGDIR directory,
+#   rename it to COPYING.txt and COPYING3.txt and convert it to DOS format:
 #   unix2dos COPYING.txt
+#   unix2dos COPYING3.txt
 # - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DVER_MAJOR=<SDCC_VER_MAJOR> -DVER_MINOR=<SDCC_VER_MINOR> -DVER_REVISION=<SDCC_VER_DEVEL> -DVER_BUILD=<SDCC_REVISION> sdcc.nsi
@@ -55,9 +56,10 @@
 # - unpack sdcc-doc-yyyymmdd-rrrr.zip to the PKGDIR/doc directory
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
 #   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
-# - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
-#   rename it to COPYING.txt and convert it to DOS format:
+# - copy file COPYING and COPYING3 from the sdcc Subversion snapshot to the PKGDIR directory,
+#   rename it to COPYING.txt and COPYING3.txt and convert it to DOS format:
 #   unix2dos COPYING.txt
+#   unix2dos COPYING3.txt
 # - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DFULL_DOC -DVER_MAJOR=<VER_MAJOR> -DVER_MINOR=<VER_MINOR> -DVER_REVISION=<VER_PATCH> -DVER_BUILD=<REVISION> sdcc.nsi
@@ -352,6 +354,7 @@ ${Section} -Common SECCOMMON
   SetOutPath "$INSTDIR"
   File ".\sdcc.ico"
   File "${SDCC_ROOT}\COPYING.txt"
+  File "${SDCC_ROOT}\COPYING3.txt"
 ${SectionEnd}
 
 ${Section} "SDCC application files" SEC01
@@ -908,6 +911,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdcdbsrc.el"
 
   Delete "$INSTDIR\COPYING.txt"
+  Delete "$INSTDIR\COPYING3.txt"
   Delete "$INSTDIR\sdcc.ico"
   Delete "$INSTDIR\uninstall.exe"
 

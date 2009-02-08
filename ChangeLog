@@ -1,7 +1,12 @@
+2009-02-08 Borut Razem <borut.razem AT siol.net>
+
+	* as/COPYING3: added
+	* support/scripts/sdcc.nsi: added COPYING3.txt to the package
+
 2009-02-07 Borut Razem <borut.razem AT siol.net>
 
 	* asranlib/asranlib.c: fixed BSD header length calculation
-	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.8
+	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.9
 	  due sdcc asxxxx license change to GPLv3
 
 2009-02-05 Borut Razem <borut.razem AT siol.net>

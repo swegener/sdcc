@@ -222,9 +222,7 @@ model-mcs51-xstack-auto:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    mkdir -p $${model}-xstack-auto; cp $${model}/Makefile $${model}-xstack-auto; \
-	    MODELFLAGS="--model-$$model --stack-auto --xstack"; \
-	    if test "$$model" = "large"; then MODELFLAGS="$$MODELFLAGS -DUSE_FLOATS=1"; fi; \
-	    $(MAKE) MODELFLAGS="$$MODELFLAGS" PORT=$${model}-xstack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-xstack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack -DUSE_FLOATS=1" PORT=$${model}-xstack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-xstack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 

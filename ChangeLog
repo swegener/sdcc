@@ -2,6 +2,8 @@
 
 	* as/COPYING3: added
 	* support/scripts/sdcc.nsi: added COPYING3.txt to the package
+	* device/lib/Makefile.in: reenable floating point in model-xstack-auto
+	  libraries
 
 2009-02-07 Borut Razem <borut.razem AT siol.net>
 

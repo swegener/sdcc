@@ -503,6 +503,8 @@ get_symbols (FILE * fp, const char *archive)
       if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
         return 1;
     }
+  else if (!verbose && !list)
+    free (name);
 
   first_member_offset = ftell (fp) - hdr_len;
 
@@ -525,13 +527,7 @@ get_symbols (FILE * fp, const char *archive)
 
               enum_symbols (fp, hdr.ar_size, add_symbol, NULL);
 
-              fseek (fp, mdule_offset + hdr.ar_size, SEEK_SET);
-
-              if (hdr.ar_size & 1)
-                {
-                  int c = getc (fp);
-                  assert (c == EOF || c == '\n');
-                }
+              fseek (fp, mdule_offset + hdr.ar_size + (hdr.ar_size & 1), SEEK_SET);
             }
 
           if (verbose)

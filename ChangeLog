@@ -1,3 +1,9 @@
+2009-02-09 Borut Razem <borut.razem AT siol.net>
+
+	* asranlib/asranlib.c, link/lkar.c: don't check the padding bytes since
+	  the openSUSE GNU ar (GNU Binutils; openSUSE 11.0) 2.18.50.20080409-11.1
+	  uses '`' character instead '\n' for padding
+
 2009-02-08 Borut Razem <borut.razem AT siol.net>
 
 	* as/COPYING3: added

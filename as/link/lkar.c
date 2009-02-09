@@ -484,13 +484,7 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
 
           add_rel_index (libfp, hdr.ar_size, This);
 
-          fseek (libfp, moduleOffset + hdr.ar_size, SEEK_SET);
-        }
-
-      if (hdr.ar_size & 1)
-        {
-          int c = getc (libfp);
-          assert (c == EOF || c == '\n');
+          fseek (libfp, moduleOffset + hdr.ar_size + (hdr.ar_size & 1), SEEK_SET);
         }
     }
 
@@ -581,10 +575,7 @@ load_adb (FILE * libfp, struct lbfile *lbfh)
             }
 
           if (hdr.ar_size & 1)
-            {
-              int c = getc (libfp);
-              assert (c == EOF || c == '\n');
-            }
+            getc (libfp);
 
           free (adb_name);
           return 1;
@@ -835,13 +826,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
           if (ret)
             break;
 
-          fseek (libfp, moduleOffset + hdr.ar_size, SEEK_SET);
-        }
-
-      if (hdr.ar_size & 1)
-        {
-          int c = getc (libfp);
-          assert (c == EOF || c == '\n');
+          fseek (libfp, moduleOffset + hdr.ar_size + (hdr.ar_size & 1), SEEK_SET);
         }
     }
 

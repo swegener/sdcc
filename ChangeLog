@@ -6,9 +6,10 @@
 
 2009-02-09 Borut Razem <borut.razem AT siol.net>
 
-	* asranlib/asranlib.c, link/lkar.c: don't check the padding bytes since
+	* as/asranlib/asranlib.c, link/lkar.c: don't check the padding bytes since
 	  the openSUSE GNU ar (GNU Binutils; openSUSE 11.0) 2.18.50.20080409-11.1
 	  uses '`' character instead '\n' for padding
+	* as/asranlib/asranlib.c: made it more robust
 
 2009-02-08 Borut Razem <borut.razem AT siol.net>
 
@@ -19,13 +20,13 @@
 
 2009-02-07 Borut Razem <borut.razem AT siol.net>
 
-	* asranlib/asranlib.c: fixed BSD header length calculation
+	* as/asranlib/asranlib.c: fixed BSD header length calculation
 	* .version, doc/sdccman.lyx: bumped sdcc version to 2.8.9
 	  due sdcc asxxxx license change to GPLv3
 
 2009-02-05 Borut Razem <borut.razem AT siol.net>
 
-	* asranlib/asranlib.c, link/lkar.h, link/lkar.c:
+	* as/asranlib/asranlib.c, link/lkar.h, link/lkar.c:
 	  added support for BSD (Mac OS X) ar format
 	* as/asxxsrc/aslex.c, as/as/asxxsrc/asnoice.c, as/as/asxxsrc/assym.c,
 	  as/as/hc08/asdata.c, as/hc08/asexpr.c, as/hc08/aslist.c,
@@ -58,7 +59,7 @@
 
 2009-02-05 Borut Razem <borut.razem AT siol.net>
 
-	* asranlib/asranlib.c, link/lkar.h, link/lkar.c:
+	* as/asranlib/asranlib.c, link/lkar.h, link/lkar.c:
 	  added support for BSD (Mac OS X) ar format
 
 2009-02-02 Borut Razem <borut.razem AT siol.net>

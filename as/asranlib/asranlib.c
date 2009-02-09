@@ -33,9 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define NELEM(x)  (sizeof (x) / sizeof (*x))
 
 
-int verbose = 0;
-int list = 0;
-int print_index = 0;
+static int verbose = 0;
+static int list = 0;
+static int print_index = 0;
 
 int
 is_ar (FILE * libfp)
@@ -207,7 +207,11 @@ ar_get_header (struct ar_hdr *hdr, FILE * libfp, char **p_obj_name)
   buf[AR_SIZE_LEN] = '\0';
   hdr->ar_size = strtol (buf, NULL, 0);
 
-  obj_name = get_member_name (hdr->ar_name, &size, p_obj_name != NULL, libfp);
+  if (NULL == (obj_name = get_member_name (hdr->ar_name, &size, p_obj_name != NULL, libfp)) && p_obj_name != NULL)
+    {
+      /* Malformed archive */
+      return 0;
+    }
 
   if (p_obj_name != NULL)
     *p_obj_name = obj_name;
@@ -265,7 +269,6 @@ add_symbol (const char *sym, void *param)
 
   return 0;
 }
-
 
 int
 is_rel (FILE * libfp)
@@ -358,7 +361,6 @@ enum_symbols (FILE * fp, long size, int (*func) (const char *sym, void *param), 
   return 0;
 }
 
-
 static int
 process_symbol_table (struct ar_hdr *hdr, FILE *fp)
 {
@@ -392,7 +394,9 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
           offset = sgetl (po);
           po += 4;
 
-          obj = get_member_name_by_offset (fp, offset);  /* member name */
+          if (NULL == (obj = get_member_name_by_offset (fp, offset))) /* member name */
+            return 0;
+
           printf ("%s in %s", ps, obj);
           if (verbose)
             printf (" at 0x%04x\n", offset);
@@ -457,14 +461,13 @@ process_bsd_symbol_table (struct ar_hdr *hdr, FILE *fp)
 
           printf ("%s in ", ps + sym);
 
-          obj = get_member_name_by_offset (fp, offset);  /* member name */
+          if (NULL == (obj = get_member_name_by_offset (fp, offset))) /* member name */
+            return 0;
+
           printf ("%s\n", obj);
           free (obj);
         }
       free (buf);
-
-      fseek (fp, pos, SEEK_SET);
-
       putchar ('\n');
     }
 
@@ -483,25 +486,34 @@ get_symbols (FILE * fp, const char *archive)
 
   if (!is_ar (fp) || !(hdr_len = ar_get_header (&hdr, fp, &name)))
     {
-      fprintf (stderr, "asranlib: %s: File format not recognized\n", archive);
-      exit (1);
+      free (name);
+
+      return 0;
     }
 
   if (AR_IS_SYMBOL_TABLE (name))
     {
       free (name);
 
-      process_symbol_table (&hdr, fp);
-      if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
+      if (!process_symbol_table (&hdr, fp))
+        return 0;
+
+      if (feof (fp))
         return 1;
+      else if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
+        return 0;
     }
   else if (AR_IS_BSD_SYMBOL_TABLE (name))
     {
       free (name);
 
-      process_bsd_symbol_table (&hdr, fp);
-      if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
+      if (!process_bsd_symbol_table (&hdr, fp))
+        return 0;
+
+      if (feof (fp))
         return 1;
+      else if (!(hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)))
+        return 0;
     }
   else if (!verbose && !list)
     free (name);
@@ -547,7 +559,7 @@ get_symbols (FILE * fp, const char *archive)
     }
   while ((hdr_len = ar_get_header (&hdr, fp, (verbose || list) ? &name : NULL)));
 
-  return 1;
+  return feof (fp) ? 1 : 0;
 }
 
 void
@@ -562,7 +574,13 @@ do_ranlib (const char *archive)
       exit (1);
     }
 
-  if (get_symbols (infp, archive))
+  if (!get_symbols (infp, archive))
+    {
+      fprintf (stderr, "asranlib: %s: Malformed archive\n", archive);
+      fclose (infp);
+      exit (1);
+    }
+  else if (!list && !print_index)
     {
       FILE *outfp;
       struct symbol_s *symp;
@@ -690,18 +708,18 @@ void usage (void);
 
 struct opt_s
   {
-    const char *short_opt;
+    char short_opt;
     const char *long_opt;
     void (*optfnc) (void);
     const char *comment;
   }
 opts[] =
   {
-    { "-v", "--verbose", &do_verbose, "Be more verbose about the operation" },
-    { "-V", "--version", &print_version, "Print this help message" },
-    { "-h", "--help", &usage, "Print version information" },
-    { "-t", "--list", &do_list, "List the contents of an archive" },
-    { "-s", "--print-armap", &print_armap, "Print the archive index" },
+    { 'v', "verbose", &do_verbose, "Be more verbose about the operation" },
+    { 'V', "version", &print_version, "Print this help message" },
+    { 'h', "help", &usage, "Print version information" },
+    { 't', "list", &do_list, "List the contents of an archive" },
+    { 's', "print-armap", &print_armap, "Print the archive index" },
   };
 
 void
@@ -715,15 +733,19 @@ usage (void)
 
   for (i = 0; i < NELEM (opts); ++i)
     {
-      int len = 3;
-      printf ("  %s ", (NULL != opts[i].short_opt) ? opts[i].short_opt : "  ");
+      int len = 5;
+      if ('\0' != opts[i].short_opt)
+        printf ("  -%c ", opts[i].short_opt);
+      else
+        printf ("     ");
+
       if (NULL != opts[i].long_opt)
         {
-          printf ("%s ", opts[i].long_opt);
+          printf ("--%s ", opts[i].long_opt);
           len += strlen (opts[i].long_opt);
         }
 
-      while (len++ < 32)
+      while (len++ < 30)
         putchar (' ');
       printf ("%s\n", opts[i].comment);
     }
@@ -733,39 +755,77 @@ usage (void)
   exit (1);
 }
 
-void
-process_options (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   char **argp;
   int noopts = 0;
   int narch = 0;
+
   for (argp = argv + 1; *argp; ++argp)
     {
       if (!noopts && (*argp)[0] == '-')
         {
           int i;
 
-          if ((*argp)[1] == '-' && (*argp)[2] == '\0')
+          if ((*argp)[1] == '-')
             {
-              noopts = 1;
-              continue;
-            }
-
-          for (i = 0; i < NELEM (opts); ++i)
-            {
-              if (0 == strcmp (*argp, opts[i].short_opt) || 0 == strcmp (*argp, opts[i].long_opt))
+              if ((*argp)[2] == '\0')
                 {
-                  if (NULL != opts[i].optfnc)
+                  /* end of options */
+                  noopts = 1;
+                  continue;
+                }
+              else
+                {
+                  /* long option */
+                  for (i = 0; i < NELEM (opts); ++i)
                     {
-                      (*opts[i].optfnc) ();
-                      break;
+                      if (0 == strcmp (&(*argp)[2], opts[i].long_opt))
+                        {
+                          if (NULL != opts[i].optfnc)
+                            {
+                              (*opts[i].optfnc) ();
+                              break;
+                            }
+                        }
+                    }
+                  if (i >= NELEM (opts))
+                    {
+                      fprintf (stderr, "asranlib: unrecognized option `%s'\n", *argp);
+                      usage ();
+                    }
+                }
+            }
+          else
+            {
+              char *optp;
+
+              /* short option */
+              for (optp = &(*argp)[1]; *optp != '\0'; ++optp)
+                {
+                  for (i = 0; i < NELEM (opts); ++i)
+                    {
+                      if (*optp == opts[i].short_opt)
+                        {
+                          if (NULL != opts[i].optfnc)
+                            {
+                              (*opts[i].optfnc) ();
+                              break;
+                            }
+                        }
+                    }
+                  if (i >= NELEM (opts))
+                    {
+                      fprintf (stderr, "asranlib: invalid option -- %c\n", *optp);
+                      usage ();
                     }
                 }
             }
         }
-
       else
         {
+          /* not an option */
           do_ranlib (*argp);
           ++narch;
         }
@@ -773,12 +833,6 @@ process_options (int argc, char *argv[])
 
   if (!narch)
     usage ();
-}
-
-int
-main (int argc, char *argv[])
-{
-  process_options (argc, argv);
 
   return 0;
 }

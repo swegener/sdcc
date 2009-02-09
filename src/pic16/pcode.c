@@ -8967,7 +8967,7 @@ unsigned int attachBsrInfo2pBlock (pBlock *pb, int mod)
 /* bank so that we can make sure the bytes are laid out sequentially in memory)       */
 /* TODO: Symbols with an abslute address must be handled specially!                   */
 /*------------------------------------------------------------------------------------*/
-int assignToSameBank (int bank0, int bank1, int doAbs)
+int assignToSameBank (int bank0, int bank1, int doAbs, int force)
 {
   int eff0, eff1, dummy;
   pseudoBank *pbank0, *pbank1;
@@ -9019,7 +9019,7 @@ int assignToSameBank (int bank0, int bank1, int doAbs)
 #endif
 
   if (pbank1) {
-    if (pbank0->size + pbank1->size > MAX_COMMON_BANK_SIZE) {
+    if (!force && (pbank0->size + pbank1->size > MAX_COMMON_BANK_SIZE)) {
 #if 0
       fprintf (stderr, "bank #%d: %u, bank #%d: %u --> bank #%d': %u > %u (%s,%s)\n",
                pbank0->bank, pbank0->size, pbank1->bank, pbank1->size,
@@ -9162,7 +9162,7 @@ void pic16_OptimizeBanksel ()
     bankNr = reg->address >> 8;
     node = getOrAddGNode (adj, NULL, bankNr);
     bankNr = (pseudoBankNr) getEffectiveBank (getPseudoBankNrFromOperand(reg->name));
-    assignToSameBank (node->hash, bankNr, 1);
+    assignToSameBank (node->hash, bankNr, 1, 1);
 
     assert (bankNr >= 0);
     pbank = (pseudoBank *) hTabFindByKey (coerce, bankNr % coerce->size, (void *) bankNr, &comparePtr);
@@ -9175,6 +9175,7 @@ void pic16_OptimizeBanksel ()
     } else {
       assert (pbank->bank == (reg->address >> 8));
       pbank->bank = reg->address >> 8; //FIXED_BANK;
+      pbank->size++;
     }
     //fprintf (stderr, "ABS: %s (%d bytes) at %x in bank %u\n", reg->name, reg->size, reg->address, bankNr);
   } // for reg
@@ -9193,10 +9194,11 @@ void pic16_OptimizeBanksel ()
       node1next = node1->next;
       base_symbol1 = getSymbolFromOperand (getSymFromBank (getEffectiveBank (node1->hash)), &len1);
       if (len0 == len1 && len0 > 0 && strncmp (base_symbol0, base_symbol1, len0) == 0) {
+        int res;
         // TODO: check for symbols with absolute addresses -- these might be placed across bank boundaries!
         //fprintf (stderr, "merging %s and %s\n", getSymFromBank (getEffectiveBank(node->hash)), getSymFromBank (getEffectiveBank(node1->hash)));
-        if (assignToSameBank (node->hash, node1->hash, 0)) {
-          fprintf (stderr, "%s(%d) == %s(%d)\n", base_symbol0, len0, base_symbol1, len1);
+        if (0 != (res = assignToSameBank (node->hash, node1->hash, 0, 1))) {
+          fprintf (stderr, "%s(%d) == %s(%d), res=%d\n", base_symbol0, len0, base_symbol1, len1, res);
           assert (0 && "Could not assign a symbol to a bank!");
         }
         mergeGraphNodes (node, node1);
@@ -9255,7 +9257,7 @@ void pic16_OptimizeBanksel ()
       node = getGNode (adj, max->src->data, max->src->hash);
       node1 = getGNode (adj, max->node->data, max->node->hash);
 
-      if (0 == assignToSameBank (max->src->hash, max->node->hash, 0)) {
+      if (0 == assignToSameBank (max->src->hash, max->node->hash, 0, 0)) {
         if (max->src->hash < max->node->hash)
           mergeGraphNodes (node, node1);
         else

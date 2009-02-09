@@ -1,3 +1,9 @@
+2008-02-09 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcode.c (assignToSameBank): add force argument to ignore
+	  artificial bank size limits for compound data (structs, arrays),
+	  avoids assert if --obanksel=N, N > 1, is given
+
 2009-02-09 Borut Razem <borut.razem AT siol.net>
 
 	* asranlib/asranlib.c, link/lkar.c: don't check the padding bytes since

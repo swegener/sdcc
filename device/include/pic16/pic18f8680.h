@@ -1779,6 +1779,16 @@ typedef union {
 		unsigned PEIE:1;
 		unsigned GIE:1;
 	};
+	struct {
+		unsigned :1;
+		unsigned INT0IF:1;
+		unsigned TMR0IF:1;
+		unsigned :1;
+		unsigned INT0IE:1;
+		unsigned TMR0IE:1;
+		unsigned GIEL:1;
+		unsigned GIEH:1;
+	};
 } __INTCONbits_t;
 
 extern volatile __INTCONbits_t __at (0xff2) INTCONbits;

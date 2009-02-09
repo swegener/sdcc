@@ -1304,10 +1304,10 @@ typedef union {
 	};
 	struct {
 		unsigned           	: 1;
-		unsigned           	: 1;
+		unsigned INT0F        	: 1;
 		unsigned T0IF      	: 1;
 		unsigned           	: 1;
-		unsigned           	: 1;
+		unsigned INT0E     	: 1;
 		unsigned T0IE      	: 1;
 		unsigned GIEL      	: 1;
 		unsigned GIEH      	: 1;

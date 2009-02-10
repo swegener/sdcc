@@ -2,7 +2,7 @@
 
 	* support/regression/tests/float_single.c: added regression 
 	  test. Some testpoints for probably rarely used functions
-          (acosf, sinhf, tanf, expf) disabled for some targets
+	  (acosf, sinhf, tanf, expf) disabled for some targets
 
 2008-02-10 Raphael Neider <rneider AT web.de>
 
@@ -27,7 +27,7 @@
 
 	* device/lib/pic16/libc/stdio/sprintf.c,
 	  device/lib/pic16/libc/stdio/vsprintf.c: do not mess up the user's
-	  pointer to the string buffer
+	  pointer to the string buffer, enlarge buffer for x_ftoa()
 
 2008-02-10 Borut Razem <borut.razem AT siol.net>
 

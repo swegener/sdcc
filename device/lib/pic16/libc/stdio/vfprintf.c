@@ -139,7 +139,11 @@
  */
 #define EXTRA_INTEGER
 
-#ifdef BINARY_SPECIFIER
+#if defined(USE_FLOATS)
+/* x_ftoa requires up to 8 digits (integral part) + '.' + 24 digits
+ * (fractional part). Adding a sign and a NUL byte yields 35 byte. */
+# define BUF_SIZE       36
+#elif defined(BINARY_SPECIFIER)
 /* "%lb" = "0" - "11111111111111111111111111111111" */
 # define BUF_SIZE       33
 #else

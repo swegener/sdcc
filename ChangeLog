@@ -1,3 +1,7 @@
+2008-02-10 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/printf_tiny.c: replaced non-C89 comments '//' with '/* */'
+
 2008-02-10 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f*.h: add bit aliases in INTCONbits_t

@@ -36,15 +36,15 @@
  */
 
 
-// This removes the negative number code, causing "%d" to be the same
-// as "%u".  If you don't care about printing negative numbers, this
-// will save 21 bytes of code.
-//#define ALWAYS_PRINT_UNSIGNED
+/* This removes the negative number code, causing "%d" to be the same
+   as "%u".  If you don't care about printing negative numbers, this
+   will save 21 bytes of code. */
+/* #define ALWAYS_PRINT_UNSIGNED */
 
-// Directly output characters to the serial port using simple polling,
-// rather than calling putchar().  This saves 14 bytes, plus the size
-// of putchar.
-//#define DIRECT_SERIAL_OUTPUT
+/* Directly output characters to the serial port using simple polling,
+   rather than calling putchar().  This saves 14 bytes, plus the size
+   of putchar. */
+/* #define DIRECT_SERIAL_OUTPUT */
 
 
 
@@ -55,9 +55,12 @@
 
 
 #if !defined(SDCC_mcs51) || defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
-// Does printf_tiny really work on ds390 and ds400?
-// If it does, enable them in the line above
-#if defined(SDCC_USE_XSTACK)
+/* Does printf_tiny really work on ds390 and ds400?
+   If it does, enable them in the line above */
+#if defined(_SDCC_BUILD_LIB)
+/* Disable all warnings if building a library */
+#pragma disable_warning 190
+#elif defined(SDCC_USE_XSTACK)
 #warning "printf_tiny not built, does not support --xstack"
 #elif defined(_SDCC_NO_ASM_LIB_FUNCS)
 #warning "printf_tiny not built, _SDCC_NO_ASM_LIB_FUNCS defined"
@@ -65,7 +68,7 @@
 /* Disable "ISO C forbids an empty source file" wraning message */
 #pragma disable_warning 190
 #endif
-#else // defines are compatible with printf_tiny
+#else /* defines are compatible with printf_tiny */
 
 
 
@@ -76,21 +79,21 @@ void printf_tiny(__code char *fmt, ...) __reentrant
 	__asm
 
 printf_begin:
-	mov	a, _bp		// r0 will point to va_args (stack)
+	mov	a, _bp		/* r0 will point to va_args (stack) */
 	add	a, #253
-	mov	r0, a		// r0 points to MSB of fmt
+	mov	r0, a		/* r0 points to MSB of fmt */
 	mov	dph, @r0
 	dec	r0
-	mov	dpl, @r0	// dptr has address of fmt
+	mov	dpl, @r0	/* dptr has address of fmt */
 	dec	r0
 
 
 printf_main_loop:
 	clr	a
-	movc	a, @a+dptr	// get next byte of fmt string
+	movc	a, @a+dptr	/* get next byte of fmt string */
 	inc	dptr
 	add	a, #256 - 37
-	jz	printf_format	// check for '%'
+	jz	printf_format	/* check for '%' */
 	add	a, #37
 	jz	printf_end_h
 	lcall	printf_putchar
@@ -102,23 +105,23 @@ printf_end_h:
 printf_format:
 	setb	print_zero_flag
 	clr	a
-	movc	a, @a+dptr	// get next byte of data format
+	movc	a, @a+dptr	/* get next byte of data format */
 	inc	dptr
 	push	dph
 	push	dpl
 
 
 printf_format_s:
-	//cjne	a, #'s', printf_format_c
+	/*cjne	a, #'s', printf_format_c*/
 	cjne	a, #115, printf_format_c
 printf_string:
 	/* print a string... just grab each byte with __gptrget */
 	/* the user much pass a 24 bit generic pointer */
-	mov	b, @r0		// b has type of address (generic *)
+	mov	b, @r0		/* b has type of address (generic *) */
 	dec	r0
 	mov	dph, @r0
 	dec	r0
-	mov	dpl, @r0	// dptr has address of user's string
+	mov	dpl, @r0	/* dptr has address of user's string */
 	dec	r0
 printf_str_loop:
 	lcall	__gptrget
@@ -129,17 +132,17 @@ printf_str_loop:
 
 
 printf_format_c:
-	//cjne	a, #'c', printf_format_d
+	/*cjne	a, #'c', printf_format_d*/
 	cjne	a, #99, printf_format_d
 	dec	r0
-	mov	a, @r0		// Acc has the character to print
+	mov	a, @r0		/* Acc has the character to print */
 	dec	r0
 	lcall	printf_putchar
 	sjmp	printf_format_done
 
 
 printf_format_d:
-	//cjne	a, #'d', printf_format_u
+	/*cjne	a, #'d', printf_format_u*/
 	cjne	a, #100, printf_format_x
 #ifndef ALWAYS_PRINT_UNSIGNED
 	mov	a, @r0
@@ -154,7 +157,7 @@ printf_format_d:
 	cpl	a
 	addc	a, #0
 	mov	@r0, a
-	//mov	a, #'-'
+	/*mov	a, #'-'*/
 	mov	a, #45
 	lcall	printf_putchar
 #endif
@@ -162,7 +165,7 @@ printf_format_d:
 
 
 printf_format_x:
-	//cjne	a, #'x', printf_format_u
+	/*cjne	a, #'x', printf_format_u*/
 	cjne	a, #120, printf_format_u
 	mov	dph, @r0
 	dec	r0
@@ -180,7 +183,7 @@ printf_hex:
 	mov	a, dpl
 	lcall	printf_phex_lsn
 	jnb	print_zero_flag, printf_format_done
-	//mov	a, #'0'
+	/*mov	a, #'0'*/
 	mov	a, #48
 	lcall	printf_putchar
 printf_format_done:
@@ -190,7 +193,7 @@ printf_format_done:
 
 
 printf_format_u:
-	//cjne	a, #'u', printf_format_done
+	/*cjne	a, #'u', printf_format_done*/
 	cjne	a, #117, printf_format_done
 printf_uint:
 	mov	a, @r0
@@ -223,8 +226,8 @@ printf_int2bcd:
 	sjmp	printf_hex
 
 
-	// Divide r2/r1 by r5/r4 using successive subtraction
-	// returns quotient in r2/r1 and remainder in acc.
+	/* Divide r2/r1 by r5/r4 using successive subtraction
+	   returns quotient in r2/r1 and remainder in acc. */
 div_by_sub:
 	mov     r3, #0
 div_by_sub_loop:
@@ -289,4 +292,4 @@ printf_end:
 }
 
 
-#endif // defines compatible with printf_tiny
+#endif /* defines compatible with printf_tiny */

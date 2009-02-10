@@ -109,6 +109,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_FLOATS = @USE_FLOATS@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -157,10 +158,6 @@ libdebug_a_SOURCES = gstack/gstack.c
 #AM_CFLAGS += --debug-ralloc
 #AM_CFLAGS += --debug-xtra
 #AM_CFLAGS += --pcode-verbose
-AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 -Wa,-q \
-	--fommit-frame-pointer --obanksel=9 --denable-peeps \
-	--optimize-cmp --optimize-df --i-code-in-asm
 
 #AM_CFLAGS += --nooverlay
 #AM_CFLAGS += --nogcse
@@ -169,6 +166,10 @@ AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
 #AM_CFLAGS += --noinduction
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
+AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
+	-I$(top_srcdir)/../../include/pic16 -Wa,-q \
+	--fommit-frame-pointer --obanksel=9 --denable-peeps \
+	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
 all: all-am
 

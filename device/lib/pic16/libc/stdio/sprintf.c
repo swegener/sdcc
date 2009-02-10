@@ -39,8 +39,8 @@ sprintf (char *ebuf, char *fmt, ...)
   va_list ap;
 
   ap = va_start (ap, fmt);
-  i = vfprintf ((FILE *) &ebuf, fmt, ap);
-  *ebuf = '\0';
+  i = vfprintf ((FILE *) ebuf, fmt, ap);
+  ebuf[i] = '\0';
 
   return i;
 }

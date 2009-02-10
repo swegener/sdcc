@@ -1,4 +1,4 @@
-#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.6 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -21001,7 +21001,7 @@ name "printf()"
 printf_large.c
 \family default
  does not support float (except on ds390).
- To enable this recompile it with the option 
+ To enable this, recompile it with the option 
 \emph on
 -
 \begin_inset ERT
@@ -21049,6 +21049,13 @@ name "-\\/-model-large"
 
 \emph default
  for the mcs51 port, since this uses a lot of memory.
+ To enable float support for the pic16 targets, see 
+\begin_inset LatexCommand ref
+reference "sub:pic16Libraries"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -27254,9 +27261,19 @@ Building the libraries
 Before using SDCC/pic16 there are some libraries that need to be compiled.
  This process is done automatically if gputils are found at SDCC's compile
  time.
- Should you require to rebuild the pic16 libraries manually, these are the
- steps required to do so under Linux or Mac OS X (cygwin might work as well,
- but is untested):
+ Should you require to rebuild the pic16 libraries manually (e.g.
+ in order to enable output of float values
+\begin_inset LatexCommand index
+name "Floating point support"
+
+\end_inset
+
+ via 
+\family typewriter
+printf()
+\family default
+, see below), these are the steps required to do so under Linux or Mac OS
+ X (cygwin might work as well, but is untested):
 \end_layout
 
 \begin_layout LyX-Code
@@ -27293,6 +27310,54 @@ cd device/include
 
 \begin_layout LyX-Code
 su -c 'make install'     # install the headers, you need the root password
+\end_layout
+
+\begin_layout Subsubsection*
+Output of float values via printf()
+\end_layout
+
+\begin_layout Standard
+The library is normally built without support for displaying float values,
+ only <NO FLOAT> will appear instead of the value.
+ To change this, rebuild the library as stated above, but call 
+\family typewriter
+./configure.gnu --enable-floats 
+\family default
+instead of just 
+\family typewriter
+./configure.gnu
+\family default
+.
+ Also make sure that at least 
+\family typewriter
+libc/stdio/vfprintf.c
+\family default
+ is actually recompiled, e.g.
+ by 
+\family typewriter
+touch
+\family default
+ing it after the 
+\family typewriter
+configure
+\family default
+ run or deleting its 
+\family typewriter
+.o
+\family default
+ file.
+\end_layout
+
+\begin_layout Standard
+The more common appraoch of compiling 
+\family typewriter
+vfprintf.c
+\family default
+ manually with 
+\family typewriter
+-DUSE_FLOATS=1
+\family default
+ should also work, but is untested.
 \end_layout
 
 \begin_layout Subsection

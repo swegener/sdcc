@@ -25,6 +25,8 @@ AM_CFLAGS += --i-code-in-asm
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 
+AM_CFLAGS += @USE_FLOATS@
+
 AM_CCASFLAGS =
 AM_CCASFLAGS += -I$(top_srcdir)/../../include/pic16
 AM_CCASFLAGS += -I$(srcdir)

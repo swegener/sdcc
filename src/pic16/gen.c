@@ -1163,7 +1163,7 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
                   }
                 }
 
-                {
+                if (_G.sregsAllocSet) {
                   regs *sr;
 
                     _G.sregsAllocSet = reverseSet( _G.sregsAllocSet );
@@ -9366,8 +9366,8 @@ static void genAssign (iCode *ic)
     pic16_addSign(result, AOP_SIZE(right), !IS_UNSIGNED(operandType(right)));
 
 release:
-  pic16_freeAsmop (right,NULL,ic,FALSE);
   pic16_freeAsmop (result,NULL,ic,TRUE);
+  pic16_freeAsmop (right,NULL,ic,FALSE);
 }
 
 /*-----------------------------------------------------------------*/

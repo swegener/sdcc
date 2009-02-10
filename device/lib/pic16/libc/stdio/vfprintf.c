@@ -111,6 +111,23 @@
  */
 #define FLOAT_PLACEHOLDER
 /*
+ * With this macro defined, printing floats will work.
+ * This also enables PRECISION and disables FLOAT_PLACEHOLDER.
+ */
+#if defined(USE_FLOATS)
+  /* The configure script always defines USE_FLOATS to 0 or 1. */
+# if USE_FLOATS < 1
+#  undef USE_FLOATS
+# endif
+#else
+/* # define USE_FLOATS */
+#endif
+
+#if defined(USE_FLOATS)
+#define PRECISION
+#undef FLOAT_PLACEHOLDER
+#endif
+/*
  * This macro enables the use of the 'b' binary specifier and
  * the use of "%b", "%hb" and "%lb"
  */
@@ -143,7 +160,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
   unsigned char flong;
   unsigned char fstr;
   unsigned char fchar;
-#ifdef FLOAT_PLACEHOLDER
+#if defined(FLOAT_PLACEHOLDER) || defined(USE_FLOATS)
   unsigned char ffloat;
 #endif
   unsigned char nosign;
@@ -165,6 +182,13 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
   char *str, *ch;
   long val;
   char buffer[BUF_SIZE];
+  char *stringbuffer;
+
+  if (0x80 == (unsigned char)(((unsigned long)stream) >> 16)) {
+    /* strmputchar will modify *(char **)stream, thus confusing the user */
+    stringbuffer = (char *) stream;
+    stream = (FILE *) &stringbuffer;
+  }
 
 #if _DEBUG
   io_str ("vfprintf: ");
@@ -182,7 +206,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
           flong = 0;
           fstr = 0;
           fchar = 0;
-#ifdef FLOAT_PLACEHOLDER
+#if defined(FLOAT_PLACEHOLDER) || defined(USE_FLOATS)
           ffloat = 0;
 #endif
           nosign = 0;
@@ -302,13 +326,10 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
           else if (*ch == 'b')
             radix = 2;
 #endif
-#ifdef FLOAT_PLACEHOLDER
+#if defined(FLOAT_PLACEHOLDER) || defined(USE_FLOATS)
           else if (*ch == 'f')
             {
               ffloat = 1;
-# ifdef PRECISION
-              precision = -1;
-# endif
             }
 #endif
 #ifdef EXTRA_INTEGER
@@ -331,13 +352,24 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
           if (fstr)
             {
               str = va_arg (ap, char *);
-#ifdef FLOAT_PLACEHOLDER
+#if defined(USE_FLOATS)
+            }
+          else if (ffloat)
+            {
+              float f = va_arg(ap, float);
+              str = buffer;
+              x_ftoa (f, buffer, BUF_SIZE, precision);
+              precision = -1;
+#elif defined(FLOAT_PLACEHOLDER)
             }
           else if (ffloat)
             {
               str = "<NO FLOAT>";
               va_arg (ap, float);
-#endif
+#ifdef PRECISION
+              precision = -1;
+#endif /* PRECISION */
+#endif /* FLOAT_PLACEHOLDER */
             }
           else
             {
@@ -426,6 +458,10 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
               __stream_putchar (stream, radix);
               ++str;
               ++count;
+              if (fieldwidth)
+                {
+                  fieldwidth--;
+                }
             }
 #ifdef FIELD_WIDTH
           //Right padding (with spaces)

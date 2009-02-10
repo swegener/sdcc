@@ -103,9 +103,9 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	$(PDFLATEX) $* $(QUIET)
 	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
 	$(PDFLATEX) $* $(QUIET)
-	$(PDFOPT) $*.pdf tmp.pdf
+	$(PDFOPT) $*.pdf $*-tmp.pdf
 	rm $*.pdf
-	mv tmp.pdf $*.pdf
+	mv $*-tmp.pdf $*.pdf
 
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2

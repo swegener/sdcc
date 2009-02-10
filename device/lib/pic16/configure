@@ -638,6 +638,7 @@ am__leading_dot
 AMTAR
 am__tar
 am__untar
+USE_FLOATS
 ARCH
 CC
 CFLAGS
@@ -1241,6 +1242,7 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-floats         Enable output of float-values via printf().
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
 
@@ -2176,6 +2178,15 @@ case $ac_top_build_prefix in
 esac
 
 libdir=$libdir/pic16
+
+USE_FLOATS="-DUSE_FLOATS=0"
+
+# Check whether --enable-floats was given.
+if test "${enable_floats+set}" = set; then
+  enableval=$enable_floats; if test "yes" = $enableval; then USE_FLOATS="-DUSE_FLOATS=1"; fi
+
+fi
+
 
 # Checks for programs.
 
@@ -3343,6 +3354,7 @@ am__leading_dot!$am__leading_dot$ac_delim
 AMTAR!$AMTAR$ac_delim
 am__tar!$am__tar$ac_delim
 am__untar!$am__untar$ac_delim
+USE_FLOATS!$USE_FLOATS$ac_delim
 ARCH!$ARCH$ac_delim
 CC!$CC$ac_delim
 CFLAGS!$CFLAGS$ac_delim
@@ -3369,7 +3381,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 83; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 84; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

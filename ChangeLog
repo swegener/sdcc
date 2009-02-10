@@ -1,3 +1,28 @@
+2008-02-10 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_freeAsmop): avoid NULL pointer dereference,
+	  (genAssign): fixed for operands on the stack
+
+	* device/lib/pic16/libc/stdio/vfprintf.c,
+	  device/lib/pic16/configure.ac,
+	  device/lib/pic16/Makefile.common: add configurable support for
+	  printing floats via ./configure --enable-floats
+	* device/lib/pic16/configure,
+	  device/lib/pic16/Makefile.in,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/startup/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in: regenerated
+	* doc/sdccman.lyx: documented float support and how to get it
+	* doc/Makefile.in: fixed race condition on parallel builds
+
+	* device/lib/pic16/libc/stdio/sprintf.c,
+	  device/lib/pic16/libc/stdio/vsprintf.c: do not mess up the user's
+	  pointer to the string buffer
+
 2008-02-10 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/printf_tiny.c: replaced non-C89 comments '//' with '/* */'

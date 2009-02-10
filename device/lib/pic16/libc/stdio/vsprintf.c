@@ -37,8 +37,8 @@ vsprintf (char *ebuf, const char *fmt, va_list ap)
 {
   unsigned int i;
 
-  i = vfprintf((FILE *) &ebuf, fmt, ap);
-  *ebuf = '\0';
+  i = vfprintf((FILE *) ebuf, fmt, ap);
+  ebuf[i] = '\0';
 
   return i;
 }

@@ -1,3 +1,9 @@
+2008-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/float_single.c: added regression 
+	  test. Some testpoints for probably rarely used functions
+          (acosf, sinhf, tanf, expf) disabled for some targets
+
 2008-02-10 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_freeAsmop): avoid NULL pointer dereference,

@@ -1,3 +1,7 @@
+2008-02-11 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: documented ar format libraries
+
 2008-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/float_single.c: added regression 

@@ -1,4 +1,4 @@
-#LyX 1.5.6 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -7082,6 +7082,84 @@ name "-\\/-debug"
  is embedded in the library file itself.
  Library files created using sdcclib are used as described in the preceding
  sections.
+\end_layout
+
+\begin_layout Subsection
+Using sdcclib to Create and Manage Libraries
+\begin_inset LatexCommand index
+name "ar"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Support for ar format libraries was introduced in sdcc 2.9.0.
+ Ar is a standard archive managing utility on unices (Linux, Mac OS X, several
+ unix flavors) so it is not included in the sdcc package.
+\series bold
+
+\newline
+
+\newline
+
+\series default
+For Windows platform you can find ar utility in GNU binutils package included
+ in several projects: Cygwin at 
+\begin_inset LatexCommand url
+target "http://www.cygwin.com/"
+
+\end_inset
+
+, MinGW at 
+\begin_inset LatexCommand url
+target "http://www.mingw.org/"
+
+\end_inset
+
+.
+\series bold
+
+\newline
+
+\newline
+
+\series default
+Both the GNU and BSD ar format variants are suppurated by asxxxx linkers.
+ Ar doesn't understand the asxxxx object file format, so there is a special
+ version of ranlib distributed with sdcc, called asranlib, which produces
+ the ar symbol lookup table.
+\series bold
+
+\newline
+
+\newline
+
+\series default
+To create a library containing asxxxx object files, you should use the following
+ sequence:
+\series bold
+
+\newline
+
+\end_layout
+
+\begin_layout Standard
+
+\family sans
+\series bold
+ar -Sq <library name>.lib <list of .rel files>
+\end_layout
+
+\begin_layout Standard
+
+\family sans
+\series bold
+asranlib <library name>.lib
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace bigskip
 \end_inset
 

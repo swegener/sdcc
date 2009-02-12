@@ -1,5 +1,10 @@
 2008-02-11 Borut Razem <borut.razem AT siol.net>
 
+	* as/doc/aslnk.doc, as/doc/abstra.doc: renamed to *.txt
+	* as/doc/aslnk.txt, as/doc/asxhtml.html: changed licens to GPLv3
+
+2008-02-11 Borut Razem <borut.razem AT siol.net>
+
 	* doc/sdccman.lyx: documented ar format libraries
 
 2008-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

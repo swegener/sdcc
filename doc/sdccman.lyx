@@ -118,7 +118,7 @@ SDCC 2.8.9
 \size footnotesize
 
 \newline
-$Date: 2008-11-16#$ 
+$Date$ 
 \newline
 $Revision: 5272$
 \end_layout
@@ -7085,7 +7085,7 @@ name "-\\/-debug"
 \end_layout
 
 \begin_layout Subsection
-Using sdcclib to Create and Manage Libraries
+Using ar to Create and Manage Libraries
 \begin_inset LatexCommand index
 name "ar"
 

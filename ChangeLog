@@ -1,3 +1,7 @@
+2008-02-13 Borut Razem <borut.razem AT siol.net>
+
+	* as/Makefile.in: *.doc renamed to *.txt
+
 2008-02-11 Borut Razem <borut.razem AT siol.net>
 
 	* as/doc/aslnk.doc, as/doc/abstra.doc: renamed to *.txt

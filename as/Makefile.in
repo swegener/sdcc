@@ -8,7 +8,7 @@ BUILDDIR=../$(top_builddir)/bin
 include $(top_builddir)/Makefile.common
 
 PORTS = z80 gbz80
-DOCS = README abstra.doc appendk.txt asmlnk.doc asxhtm.html format.txt
+DOCS = README abstra.txt appendk.txt asmlnk.txt asxhtm.html format.txt
 
 all:
 	$(MAKE) -C z80 _as-z80 _as-gbz80 E=$(E) BUILDDIR=$(BUILDDIR)

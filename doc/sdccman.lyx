@@ -7767,16 +7767,16 @@ name "sdcpp (preprocessor)"
 \end_inset
 
 .
- SDCC uses an adapted version of the preprocessor 
-\emph on
-cpp
-\emph default
- of the GNU Compiler Collection
+ SDCC uses an adapted version of the GNU Compiler Collection
 \begin_inset LatexCommand index
 name "gcc (GNU Compiler Collection)"
 
 \end_inset
 
+ preprocessor 
+\emph on
+cpp
+\emph default
  (
 \emph on
 gcc
@@ -7787,11 +7787,11 @@ target "http://gcc.gnu.org/"
 
 \end_inset
 
-), if you need more dedicated options please refer to the GCC\InsetSpace ~
-4.1.1\InsetSpace ~
+).
+ If you need more dedicated options please refer to the GCC\InsetSpace ~
 CPP\InsetSpace ~
-Manual
- at 
+Manual at
+ 
 \begin_inset LatexCommand htmlurl
 target "http://www.gnu.org/software/gcc/onlinedocs/"
 

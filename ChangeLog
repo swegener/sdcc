@@ -1,3 +1,7 @@
+2008-02-14 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: corrected cpp info
+
 2008-02-13 Borut Razem <borut.razem AT siol.net>
 
 	* as/Makefile.in: *.doc renamed to *.txt

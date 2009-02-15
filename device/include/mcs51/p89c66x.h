@@ -121,10 +121,10 @@ SFR(IPH, 0xB7); // Interrupt Priority High
 	#define PPCH  0x40
 	#define PS1H  0x20
 	#define PS0H  0x10
-	#define PT1H  0x80
-	#define PX1H  0x40
-	#define PT0H  0x20
-	#define PX0H  0x10
+	#define PT1H  0x08
+	#define PX1H  0x04
+	#define PT0H  0x02
+	#define PX0H  0x01
 SFR(P0, 0x80); // Port 0
 	SBIT(AD7,  0x80, 7);
 	SBIT(P0_7, 0x80, 7);
@@ -213,9 +213,9 @@ SFR(PSW, 0xD0); // Program Status Word
 SFR(RCAP2H, 0xCB); // Timer 2 Capture High
 SFR(RCAP2L, 0xCA); // Timer 2 Capture Low
 SFR(SADDR,  0xA9); // I2C Slave Address
-SFR(SADEN,  0xB9); // I2C Slave Address Mask 
+SFR(SADEN,  0xB9); // I2C Slave Address Mask
 SFR(S0BUF,  0x99); // Serial Data Buffer
-SFR(S0CON,  0x98); // Serial Control 
+SFR(S0CON,  0x98); // Serial Control
 	SBIT(SM0_FE, 0x98, 7);
 	SBIT(SM1,    0x98, 6);
 	SBIT(SM2,    0x98, 5);
@@ -271,7 +271,7 @@ SFR(TH2,    0xCD); // Timer High 2
 SFR(TL0,    0x8A); // Timer Low 0
 SFR(TL1,    0x8B); // Timer Low 1
 SFR(TL2,    0xCC); // Timer Low 2
-SFR(TMOD ,  0x89); // Timer Mode
+SFR(TMOD,   0x89); // Timer Mode
 	#define GATE_1 0x80
 	#define C_T_1  0x40
 	#define M1_1   0x20

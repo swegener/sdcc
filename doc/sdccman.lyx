@@ -120,7 +120,7 @@ SDCC 2.8.9
 \newline
 $Date::            $ 
 \newline
-$Revision: 5272$
+$Revision$
 \end_layout
 
 \begin_layout Standard
@@ -21078,8 +21078,26 @@ name "printf()"
 \family typewriter
 printf_large.c
 \family default
- does not support float (except on ds390).
- To enable this, recompile it with the option 
+ does not support float
+\begin_inset LatexCommand index
+name "Floating point support"
+
+\end_inset
+
+ (except on ds390), only <NO FLOAT>
+\begin_inset LatexCommand index
+name "<NO FLOAT>"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "printf floating point support"
+
+\end_inset
+
+ will be printed instead of the value.
+ To enable floating point output, recompile it with the option 
 \emph on
 -
 \begin_inset ERT
@@ -21107,7 +21125,7 @@ name "USE\\_FLOATS"
 \emph on
 -
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Standard
 
@@ -21236,7 +21254,7 @@ mcs51
 \begin_layout Standard
 printf
 \begin_inset LatexCommand index
-name "printf"
+name "printf()"
 
 \end_inset
 
@@ -27396,7 +27414,19 @@ Output of float values via printf()
 
 \begin_layout Standard
 The library is normally built without support for displaying float values,
- only <NO FLOAT> will appear instead of the value.
+ only <NO FLOAT>
+\begin_inset LatexCommand index
+name "<NO FLOAT>"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "printf floating point support"
+
+\end_inset
+
+ will appear instead of the value.
  To change this, rebuild the library as stated above, but call 
 \family typewriter
 ./configure.gnu --enable-floats 

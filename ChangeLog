@@ -1,3 +1,12 @@
+2008-02-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/mcs51/p89v66x.h: added ENBOOT thanks
+	  Gudjon Gudjonsson <gudjon AT gudjon.org>
+	* device/include/mcs51/p89c66x.h: fixed some defines
+	* device/include/mcs51/p89v66x.h: fixed some sbit addresses
+	* doc/sdccman.lyx: added <NO FLOAT> to index, try to reanimate
+	  svn keywords
+
 2008-02-14 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: corrected cpp info

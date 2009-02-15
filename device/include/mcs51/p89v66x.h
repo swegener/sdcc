@@ -42,6 +42,7 @@ SFR(AUXR, 0x8E); // Auxiliary
 	#define  EXTRAM   0x02
 	#define  AO       0x01
 SFR(AUXR1, 0xA2); // Auxiliary 1
+	#define  ENBOOT   0x20
 	#define  GF2      0x08
 	// Bit 2 must be zero
 	#define  DPS      0x01
@@ -112,13 +113,13 @@ SFR(CCAPM4, 0xC6); // Module 4 Mode
 	#define PWM      0x02
 	#define ECCF     0x01
 SFR(CCON,   0xC0); // PCA Counter Control
-	SBIT(CF,   0xD8, 7);
-	SBIT(CR,   0xD8, 6);
-	SBIT(CCF4, 0xD8, 4);
-	SBIT(CCF3, 0xD8, 3);
-	SBIT(CCF2, 0xD8, 2);
-	SBIT(CCF1, 0xD8, 1);
-	SBIT(CCF0, 0xD8, 0);
+	SBIT(CF,   0xC0, 7);
+	SBIT(CR,   0xC0, 6);
+	SBIT(CCF4, 0xC0, 4);
+	SBIT(CCF3, 0xC0, 3);
+	SBIT(CCF2, 0xC0, 2);
+	SBIT(CCF1, 0xC0, 1);
+	SBIT(CCF0, 0xC0, 0);
 SFR(CH,   0xF9); // PCA Counter High
 SFR(CL,   0xE9); // PCA Counter Low
 SFR(CMOD, 0xC1); // PCA Counter Mode

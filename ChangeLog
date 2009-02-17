@@ -1,3 +1,8 @@
+2009-02-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/mcs51/lkihx.c (hexRecord): bugfix do not insert extended address
+	  when addresses are unsorted
+
 2008-02-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/include/mcs51/p89v66x.h: added ENBOOT thanks
@@ -26,7 +31,7 @@
 
 2008-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	* support/regression/tests/float_single.c: added regression 
+	* support/regression/tests/float_single.c: added regression
 	  test. Some testpoints for probably rarely used functions
 	  (acosf, sinhf, tanf, expf) disabled for some targets
 

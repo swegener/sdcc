@@ -143,7 +143,8 @@ hexRecord(unsigned addr, int rtvalIndex)
     if (chksum == 0)
         return;         // nothing to output
 
-    if ( (lastHexAddr > addr) && (rflag) ) {
+    /* Is this record in the same bank as previous? */
+    if ( ((lastHexAddr>>16) != (addr>>16)) && (rflag) ) {
         overrun = hexPageOverrun + 1;
         ihxExtendedLinearAddress(lastExtendedAddress + overrun);
         hexPageOverrun = overrun;

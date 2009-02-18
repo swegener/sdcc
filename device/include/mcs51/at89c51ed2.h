@@ -65,23 +65,23 @@ __sfr __at (0x8F) CKCON0;   //Clock control Register 0
 __sfr __at (0xAF) CKCON1;   //Clock control Register 1
     #define XPIX2 0x01      //SPI Clock speed '1'=12 ck/cy, '0'=6 ck/cy
 
-__sfr __at (0xFA) CCAP0H;	//Module 0 Capture HIGH. 
-__sfr __at (0xFB) CCAP1H;	//Module 1 Capture HIGH. 
-__sfr __at (0xFC) CCAP2H;	//Module 2 Capture HIGH. 
-__sfr __at (0xFD) CCAP3H;	//Module 3 Capture HIGH. 
-__sfr __at (0xFE) CCAP4H;	//Module 4 Capture HIGH. 
-__sfr __at (0xEA) CCAP0L;	//Module 0 Capture LOW. 
-__sfr __at (0xEB) CCAP1L;	//Module 1 Capture LOW. 
-__sfr __at (0xEC) CCAP2L;	//Module 2 Capture LOW. 
-__sfr __at (0xED) CCAP3L;	//Module 3 Capture LOW. 
-__sfr __at (0xEE) CCAP4L;	//Module 4 Capture LOW. 
+__sfr __at (0xFA) CCAP0H;	//Module 0 Capture HIGH.
+__sfr __at (0xFB) CCAP1H;	//Module 1 Capture HIGH.
+__sfr __at (0xFC) CCAP2H;	//Module 2 Capture HIGH.
+__sfr __at (0xFD) CCAP3H;	//Module 3 Capture HIGH.
+__sfr __at (0xFE) CCAP4H;	//Module 4 Capture HIGH.
+__sfr __at (0xEA) CCAP0L;	//Module 0 Capture LOW.
+__sfr __at (0xEB) CCAP1L;	//Module 1 Capture LOW.
+__sfr __at (0xEC) CCAP2L;	//Module 2 Capture LOW.
+__sfr __at (0xED) CCAP3L;	//Module 3 Capture LOW.
+__sfr __at (0xEE) CCAP4L;	//Module 4 Capture LOW.
 
-__sfr __at (0xDA) CCAPM0;	//Module 0 Mode.  
-__sfr __at (0xDB) CCAPM1;	//Module 1 Mode.  
-__sfr __at (0xDC) CCAPM2;	//Module 2 Mode.  
-__sfr __at (0xDD) CCAPM3;	//Module 3 Mode.  
+__sfr __at (0xDA) CCAPM0;	//Module 0 Mode.
+__sfr __at (0xDB) CCAPM1;	//Module 1 Mode.
+__sfr __at (0xDC) CCAPM2;	//Module 2 Mode.
+__sfr __at (0xDD) CCAPM3;	//Module 3 Mode.
 __sfr __at (0xDE) CCAPM4;	//Module 4 Mode.
-//The preceding five registers have the following bits:  
+//The preceding five registers have the following bits:
 	#define ECOM 0x40		//Enable Comparator.
 	#define CAPP 0x20		//1=enables positive edge capture.
 	#define CAPN 0x10		//1=enables negative edge capture.
@@ -99,10 +99,10 @@ __sfr __at (0xD8) CCON;	//PCA Counter Control
 	__sbit __at (0xD9) CCF1;//PCA Module 1 Interrupt Flag.
 	__sbit __at (0xD8) CCF0;//PCA Module 0 Interrupt Flag.
 
-__sfr __at (0xF9) CH;		//PCA Counter HIGH. 
-__sfr __at (0xE9) CL;		//PCA Counter LOW. 
+__sfr __at (0xF9) CH;		//PCA Counter HIGH.
+__sfr __at (0xE9) CL;		//PCA Counter LOW.
 
-__sfr __at (0xD9) CMOD;		//PCA Counter Mode.  
+__sfr __at (0xD9) CMOD;		//PCA Counter Mode.
 	#define CIDL 0x80		//CIDL=0 program the PCA counter to work during idle mode.
 	#define WDTE 0x40		//Watchdog Timer Enable.
 	#define CPS1 0x04		//PCA Count Pulse Select bit 1.
@@ -131,7 +131,7 @@ __sfr __at (0xB8) IPL0;	    //Interrupt Priority 0 LOW
 	__sbit __at (0xB9) PT0L;//Timer 0 Interrupt Priority Low Bit.
 	__sbit __at (0xB8) PX0L;//External Interrupt 0 Priority Low Bit.
 
-__sfr __at (0xB7) IPH0;		//Interrupt Priority 0 HIGH  
+__sfr __at (0xB7) IPH0;		//Interrupt Priority 0 HIGH
 	#define PPCH 0x40		//PCA Interrupt Priority High Bit.
 	#define PT2H 0x20		//Timer 2 Interrupt Priority High Bit.
 	#define PHS  0x10		//Serial Port Interrupt Priority High Bit.
@@ -144,7 +144,7 @@ __sfr __at (0xB2) IPL1;		//Interrupt Priority 1 LOW.
     #define SPIL 0x04       //SPI Priority Low Bit
     #define KBDL 0x01       //Keyboard Priority Low Bit
 
-__sfr __at (0xB3) IPH1;		//Interrupt Priority 1 HIGH.  
+__sfr __at (0xB3) IPH1;		//Interrupt Priority 1 HIGH.
     #define SPIH 0x04       //SPI Priority High Bit
     #define KBDH 0x01       //Keyboard Priority High Bit
 
@@ -187,8 +187,8 @@ __sfr __at (0xA7) WDTPRG;   //WatchDog Timer Program
 	//1  1  0  (2^20 - 1) machine cycles, 1.05  s @ FOSCA=12 MHz
 	//1  1  1  (2^21 - 1) machine cycles, 2.09  s @ FOSCA=12 MHz
 
-__sfr __at (0xA9) SADDR;	//Serial Port Address Register. 
-__sfr __at (0xB9) SADEN;	//Serial Port Address Enable. 
+__sfr __at (0xA9) SADDR;	//Serial Port Address Register.
+__sfr __at (0xB9) SADEN;	//Serial Port Address Enable.
 
 __sfr __at (0xC3) SPCON;	//SPI Control Register
 	#define SPR2  0x80		//SPI Clork Rate select bit 2.
@@ -208,7 +208,7 @@ __sfr __at (0xC3) SPCON;	//SPI Control Register
 		//  1    0    1   64
 		//  1    1    0   128
 		//  1    1    1   Invalid: Don't Use
-	
+
 __sfr __at (0xC4) SPSTA;	//Serial Peripheral Status register
 	#define SPIF  0x80		//Serial Peripheral Data Transfer Flag
 	#define WCOL  0x40		//Write collision Flag.
@@ -224,7 +224,7 @@ __sfr __at (0xC9) T2MOD;	//Timer 2 mode control
 __sfr __at (0x9B) BDRCON;	//Baud Rate Control
 	#define BRR   0x10		//Baud Rate Run Control bit. '1'=enable
 	#define TBCK  0x08		//Transmission Baud rate Generator Selection bit for UART
-	#define RBCK  0x03		//Reception Baud Rate Generator Selection bit for UART
+	#define RBCK  0x04		//Reception Baud Rate Generator Selection bit for UART
 	#define SPD   0x02		//Baud Rate Speed Control bit for UART
 	#define SRC   0x01		//Baud Rate Source select bit in Mode 0 for UART
 

@@ -1,3 +1,7 @@
+2009-02-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89c51ed2.h: fixed bug #2071949 bitmask RBCK wrong
+
 2009-02-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/mcs51/lkihx.c (hexRecord): bugfix do not insert extended address

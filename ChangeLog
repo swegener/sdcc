@@ -1,6 +1,7 @@
 2008-02-22 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in: fixed parenthesis error
+	* doc/sdccman.lyx: fixed webdocs bug #2071421: error in the manual
 
 2009-02-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

@@ -4245,7 +4245,7 @@ Unpack the file using a command like:
  
 \family sans
 \series bold
-"tar -xvzf sdcc-src-yyyymmdd-rrrr.tar.bz2
+"tar -xvjf sdcc-src-yyyymmdd-rrrr.tar.bz2
 \begin_inset Quotes srd
 \end_inset
 
@@ -4984,13 +4984,28 @@ cd ~\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
 # cd $HOME
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-tar -xzf sdcc.src.tar.gz\InsetSpace ~
+tar -xjf sdcc-src-yyyymmdd-rrrr.tar.bz2\InsetSpace ~
 # extract source to directory sdcc
 \end_layout
 
@@ -4998,6 +5013,21 @@ tar -xzf sdcc.src.tar.gz\InsetSpace ~
 
 \family typewriter
 mkdir sdcc.build\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
@@ -5019,6 +5049,21 @@ cd sdcc.build
 
 \family typewriter
 ../sdcc/configure\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~

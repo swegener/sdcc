@@ -7898,7 +7898,7 @@ name "-\\/-lib-path <path>"
 
 
 \begin_inset LatexCommand index
-name "-L -\\/-lib-path"
+name "-L <path>"
 
 \end_inset
 
@@ -10183,6 +10183,41 @@ name "Options other"
 \labelwidthstring 00.00.0000
 
 \series bold
+-v\InsetSpace ~
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-version
+\begin_inset LatexCommand index
+name "-\\/-version"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "-v"
+
+\end_inset
+
+
+\series default
+ displays the sdcc version.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
 -c\InsetSpace ~
 -
 \begin_inset ERT
@@ -10205,7 +10240,7 @@ name "-\\/-compile-only"
 
 
 \begin_inset LatexCommand index
-name "-c -\\/-compile-only"
+name "-c"
 
 \end_inset
 

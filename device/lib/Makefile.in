@@ -152,7 +152,7 @@ LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib
 else ifeq ($(LIB_TYPE), RANLIB)
 LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
 else
-LIB_FILES = $($(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC) $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+LIB_FILES = $(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC) $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
 endif
 
 OEXT            = .rel

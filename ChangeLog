@@ -1,3 +1,7 @@
+2008-02-22 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in: fixed parenthesis error
+
 2009-02-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/at89c51ed2.h: fixed bug #2071949 bitmask RBCK wrong

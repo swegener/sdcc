@@ -549,10 +549,16 @@ struct mne *mp;
 	case S_DJNZ:
 	case S_JR:
 		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
+			if ((v1 &= 0xFF) <= 0x18 && v1 != PO && v1 != PE && v1 != P && v1 != M) {
+				op += (v1+1)<<3;
+			} else {
+				aerr();
+			}
+			comma();
+		}
 #else /* GAMEBOY */
 	case S_JR:
 		if ((v1 = admode(CND)) != 0) {
-#endif /* GAMEBOY */
 			if ((v1 &= 0xFF) <= 0x18) {
 				op += (v1+1)<<3;
 			} else {
@@ -560,6 +566,7 @@ struct mne *mp;
 			}
 			comma();
 		}
+#endif /* GAMEBOY */
 		expr(&e2, 0);
 		outab(op);
 		if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {

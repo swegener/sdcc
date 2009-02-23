@@ -2,6 +2,7 @@
 
 	* as/z80/asexpr.c: fixed bug #1829678: Z-80 CP A,<xxx> assembly
 	  it is already fixed for mcs51 and hc08 targets
+	* as/z80/z80mch.c: fixed bug #1704376: missing as-z80 errors
 
 2009-02-22 Borut Razem <borut.razem AT siol.net>
 

@@ -158,15 +158,16 @@ __sfr __at (0xC0) P4;       //8-bit port 4
     __sbit __at (0xC6) P4_6 ;
     __sbit __at (0xC7) P4_7 ;
 
-__sfr __at (0xD8) P5;       //8-bit port 5
-    __sbit __at (0xD8) P5_0 ;
-    __sbit __at (0xD9) P5_1 ;
-    __sbit __at (0xDA) P5_2 ;
-    __sbit __at (0xDB) P5_3 ;
-    __sbit __at (0xDC) P5_4 ;
-    __sbit __at (0xDD) P5_5 ;
-    __sbit __at (0xDE) P5_6 ;
-    __sbit __at (0xDF) P5_7 ;
+// S. Qu  12/30/2008 4:23PM
+__sfr __at (0xE8) P5;       //8-bit port 5
+    __sbit __at (0xE8) P5_0 ;
+    __sbit __at (0xE9) P5_1 ;
+    __sbit __at (0xEA) P5_2 ;
+    __sbit __at (0xEB) P5_3 ;
+    __sbit __at (0xEC) P5_4 ;
+    __sbit __at (0xED) P5_5 ;
+    __sbit __at (0xEE) P5_6 ;
+    __sbit __at (0xEF) P5_7 ;
 
 __sfr __at (0xA6) WDTRST;   //WatchDog Timer Reset
 __sfr __at (0xA7) WDTPRG;   //WatchDog Timer Program

@@ -1,4 +1,9 @@
-2008-02-22 Borut Razem <borut.razem AT siol.net>
+2009-02-23 Borut Razem <borut.razem AT siol.net>
+
+	* as/z80/asexpr.c: fixed bug #1829678: Z-80 CP A,<xxx> assembly
+	  it is already fixed for mcs51 and hc08 targets
+
+2009-02-22 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in: fixed parenthesis error
 	* doc/sdccman.lyx: fixed webdocs bug #2071421: error in the manual,
@@ -13,7 +18,7 @@
 	* as/link/mcs51/lkihx.c (hexRecord): bugfix do not insert extended address
 	  when addresses are unsorted
 
-2008-02-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2009-02-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/include/mcs51/p89v66x.h: added ENBOOT thanks
 	  Gudjon Gudjonsson <gudjon AT gudjon.org>
@@ -22,30 +27,30 @@
 	* doc/sdccman.lyx: added <NO FLOAT> to index, try to reanimate
 	  svn keywords
 
-2008-02-14 Borut Razem <borut.razem AT siol.net>
+2009-02-14 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: corrected cpp info
 
-2008-02-13 Borut Razem <borut.razem AT siol.net>
+2009-02-13 Borut Razem <borut.razem AT siol.net>
 
 	* as/Makefile.in: *.doc renamed to *.txt
 
-2008-02-11 Borut Razem <borut.razem AT siol.net>
+2009-02-11 Borut Razem <borut.razem AT siol.net>
 
 	* as/doc/aslnk.doc, as/doc/abstra.doc: renamed to *.txt
 	* as/doc/aslnk.txt, as/doc/asxhtml.html: changed licens to GPLv3
 
-2008-02-11 Borut Razem <borut.razem AT siol.net>
+2009-02-11 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: documented ar format libraries
 
-2008-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2009-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/float_single.c: added regression
 	  test. Some testpoints for probably rarely used functions
 	  (acosf, sinhf, tanf, expf) disabled for some targets
 
-2008-02-10 Raphael Neider <rneider AT web.de>
+2009-02-10 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_freeAsmop): avoid NULL pointer dereference,
 	  (genAssign): fixed for operands on the stack
@@ -70,15 +75,15 @@
 	  device/lib/pic16/libc/stdio/vsprintf.c: do not mess up the user's
 	  pointer to the string buffer, enlarge buffer for x_ftoa()
 
-2008-02-10 Borut Razem <borut.razem AT siol.net>
+2009-02-10 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/printf_tiny.c: replaced non-C89 comments '//' with '/* */'
 
-2008-02-10 Raphael Neider <rneider AT web.de>
+2009-02-10 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f*.h: add bit aliases in INTCONbits_t
 
-2008-02-09 Raphael Neider <rneider AT web.de>
+2009-02-09 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.c (assignToSameBank): add force argument to ignore
 	  artificial bank size limits for compound data (structs, arrays),
@@ -148,7 +153,7 @@
 	  device/lib/z80/Makefile.in:
 	  chose source files in the PORT directory if they are available
 
-2008-02-01 Raphael Neider <rneider AT web.de>
+2009-02-01 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/pic18f1220.c,
 	* device/lib/pic16/libdev/pic18f4450.c:
@@ -163,11 +168,11 @@
 	* support/regression/tests/snprintf.c:
 	  reenable floating point in small-xstack-auto library
 
-2008-01-26 Raphael Neider <rneider AT web.de>
+2009-01-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/ralloc.c (packForPush): disabled to fix #2496919
 
-2008-01-25 Raphael Neider <rneider AT web.de>
+2009-01-25 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/main.c (_pic16_linkEdit): prepend -L paths to linker
 	  search path instead of appending them

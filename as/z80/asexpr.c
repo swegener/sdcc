@@ -461,6 +461,7 @@ register struct expr *esp;
                 getid(id, c);
                 sp = lookup(id);
                 if (sp->s_type == S_NEW) {
+                        esp->e_addr = 0;
                         if (sp->s_flag&S_GBL) {
                                 esp->e_flag = 1;
                                 esp->e_base.e_sp = sp;

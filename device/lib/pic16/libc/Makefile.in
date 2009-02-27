@@ -217,9 +217,9 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 -Wa,-q \
-	--fommit-frame-pointer --obanksel=9 --denable-peeps \
-	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
+	-I$(top_srcdir)/../../include/pic16 --fommit-frame-pointer \
+	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
+	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
 all: all-am
 

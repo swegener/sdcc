@@ -23,6 +23,15 @@
 	* doc/sdccman.lyx: updated list of supported devices, fixed typo
 	* device/lib/pic16/Makefile.common: do not suppress assembler warnings
 
+	* device/lib/pic16/Makefile.in,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/startup/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in: regenerated
+
 2009-02-27 Borut Razem <borut.razem AT siol.net>
 
 	* as/z80/asexpr.c, as/z80/z80mch.c: re-fixed bugs

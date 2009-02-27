@@ -122,6 +122,24 @@ configword  0x30000d 0x40 0xff
 idlocrange  0x200000 0x200007
 
 
+name        18f23k20
+ramsize     512
+split       0x60
+configrange 0x300001 0x30000d
+configword  0x300001 0xcf 0x37
+configword  0x300002 0x1f 0xff
+configword  0x300003 0x1f 0xff
+configword  0x300005 0x8f 0xfb
+configword  0x300006 0xc5 0xbf 0xbf
+configword  0x300008 0x0f 0xff
+configword  0x300009 0xc0 0xff
+configword  0x30000a 0x0f 0xff
+configword  0x30000b 0xe0 0xff
+configword  0x30000c 0x0f 0xff
+configword  0x30000d 0x40 0xff
+idlocrange  0x200000 0x200007
+
+
 name        18f2410
 ramsize     768
 split       0x80
@@ -283,6 +301,11 @@ configword  0x300005 0x01 0xff
 idlocrange  0x200000 0x200007
 
 
+name        18f24k20
+using       18f23k20
+ramsize     768
+
+
 name        18f2510
 using       18f2410
 ramsize     1536
@@ -362,6 +385,11 @@ name        18f25j10
 using       18f24j10
 
 
+name        18f25k20
+using       18f23k20
+ramsize     1536
+
+
 name        18f2610
 using       18f2410
 ramsize     4096
@@ -397,6 +425,11 @@ name        18f2685
 using       18f2682
 
 
+name        18f26k20
+using       18f23k20
+ramsize     3936
+
+
 name        18f4220
 using       18f2220
 
@@ -415,6 +448,10 @@ using       18f2221
 
 name        18f4331
 using       18f2331
+
+
+name        18f43k20
+using       18f23k20
 
 
 name        18f4410
@@ -455,6 +492,11 @@ using       18f2480
 
 name        18f44j10
 using       18f24j10
+
+
+name        18f44k20
+using       18f23k20
+ramsize     768
 
 
 name        18f4510
@@ -507,6 +549,11 @@ name        18f45j10
 using       18f24j10
 
 
+name        18f45k20
+using       18f23k20
+ramsize     1536
+
+
 name        18f4610
 using       18f2410
 ramsize     4096
@@ -526,6 +573,11 @@ using       18f2682
 
 name        18f4685
 using       18f2682
+
+
+name        18f46k20
+using       18f23k20
+ramsize     3936
 
 
 name        18f6520
@@ -566,6 +618,18 @@ configword  0x30000d 0x40 0xff
 idlocrange  0x200000 0x200007
 
 
+name        18f65j50
+ramsize     3904
+split       0x60
+configrange 0x7ff8 0x7ffd
+configword  0x7ff8 0xef 0xff 0xbf
+configword  0x7ff9 0x07 0xff
+configword  0x7ffa 0xc7 0xff
+configword  0x7ffb 0x0f 0xff
+configword  0x7ffc 0xf8 0xff
+configword  0x7ffd 0x0f 0xff
+
+
 name        18f6620
 using       18f6520
 ramsize     3840
@@ -574,10 +638,45 @@ ramsize     3840
 name        18f6680
 using       18f6585
 
+name        18f66j50
+ramsize     3904
+split       0x60
+configrange 0xfff8 0xfffd
+configword  0xfff8 0xef 0xff 0xbf
+configword  0xfff9 0x07 0xff
+configword  0xfffa 0xc7 0xff
+configword  0xfffb 0x0f 0xff
+configword  0xfffc 0xf8 0xff
+configword  0xfffd 0x0f 0xff
+
+
+name        18f66j55
+ramsize     3904
+split       0x60
+configrange 0x17ff8 0x17ffd
+configword  0x17ff8 0xef 0xff 0xbf
+configword  0x17ff9 0x07 0xff
+configword  0x17ffa 0xc7 0xff
+configword  0x17ffb 0x0f 0xff
+configword  0x17ffc 0xf8 0xff
+configword  0x17ffd 0x0f 0xff
+
 
 name        18f6720
 using       18f6520
 ramsize     3840
+
+
+name        18f67j50
+ramsize     3904
+split       0x60
+configrange 0x1fff8 0x1fffd
+configword  0x1fff8 0xef 0xff 0xbf
+configword  0x1fff9 0x07 0xff
+configword  0x1fffa 0xc7 0xff
+configword  0x1fffb 0x0f 0xff
+configword  0x1fffc 0xf8 0xff
+configword  0x1fffd 0x0f 0xff
 
 
 name        18f8520
@@ -638,12 +737,28 @@ configword  0x1fffc 0xf8 0xff
 configword  0x1fffd 0x07 0xff
 
 
+name        18f85j50
+using       18f65j50
+
+
+name        18f86j50
+using       18f66j50
+
+
+name        18f86j55
+using       18f66j55
+
+
 name        18f86j60
 using       18f66j60
 
 
 name        18f86j65
 using       18f66j65
+
+
+name        18f87j50
+using       18f67j50
 
 
 name        18f87j60

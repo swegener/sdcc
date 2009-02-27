@@ -25,6 +25,9 @@
 
 char adc_busy(void) __naked
 {
+#if defined(__SDCC_ADC_STYLE65J50)
+  WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
+#endif
 #if 0
   return (ADCON0bits.GO);
 #else
@@ -32,7 +35,9 @@ char adc_busy(void) __naked
     movlw       0x00
 #if defined(__SDCC_ADC_STYLE242)
     btfsc       _ADCON0bits, 2
-#elif defined(__SDCC_ADC_STYLE1220) || defined(__SDCC_ADC_STYLE2220)
+#elif defined(__SDCC_ADC_STYLE1220) \
+   || defined(__SDCC_ADC_STYLE2220) \
+   || defined(__SDCC_ADC_STYLE65J50)
     btfsc       _ADCON0bits, 1
 #else /* unsupported ADC style */
 #error Unsupported ADC style.

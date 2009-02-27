@@ -1,4 +1,4 @@
-#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.6 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -22480,7 +22480,7 @@ name "heap (malloc)"
 \begin_layout Verse
 
 \family typewriter
-sdcc -c _heap.c -D HEAD_SIZE=2048
+sdcc -c _heap.c -D HEAP_SIZE=2048
 \end_layout
 
 \begin_layout Standard
@@ -25745,31 +25745,45 @@ name "PIC"
 \end_layout
 
 \begin_layout Standard
-18F: 2220, 2221, 2320, 2321, 2331, 2410, 2420, 2423, 2431, 2450, 2455, 2480,
- 24j10
+18F: 2220, 2221, 2320, 2321, 2331, 23k20
 \end_layout
 
 \begin_layout Standard
-18F: (2510,) 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 2610, 2620,
- 2680, 2682, 2685
+18F: 2410, 2420, 2423, 2431, 2450, 2455, 2480, 24j10, 24k20
 \end_layout
 
 \begin_layout Standard
-18F: 4220, 4221, 4320, 4321, 4331, 4410, 4420, 4423, 4431, 4450, 4455, 4480,
- 44j10
+18F: 2510, 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 25k20
 \end_layout
 
 \begin_layout Standard
-18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 4610, 4620,
- 4680, 4682, 4685
+18F: 2610, 2620, 2680, 2682, 2685
 \end_layout
 
 \begin_layout Standard
-18F: 6520, 6585, 6620, 6680, 66j60, 66j65, 6720, 67j60
+18F: 4220, 4221, 4320, 4321, 4331, 43k20
 \end_layout
 
 \begin_layout Standard
-18F: 8520, 8585, 8620, 8680, 86j60, 86j65, 8720, 87j60
+18F: 4410, 4420, 4423, 4431, 4450, 4455, 4480, 44j10, 44k20
+\end_layout
+
+\begin_layout Standard
+18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 45k20
+\end_layout
+
+\begin_layout Standard
+18F: 4610, 4620, 4680, 4682, 4685, 46k20
+\end_layout
+
+\begin_layout Standard
+18F: 6520, 6585, 65j50, 6620, 6680, 66j50, 66j55, 66j60, 66j65, 6720, 67j50,
+ 67j60
+\end_layout
+
+\begin_layout Standard
+18F: 8520, 8585, 85j50, 8620, 8680, 86j50, 86j55, 86j60, 86j65, 8720, 87j50,
+ 87j60
 \end_layout
 
 \begin_layout Standard

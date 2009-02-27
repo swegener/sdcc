@@ -23,16 +23,24 @@
 #include <adc.h>
 
 
-/* parameters are:
+/*
+ * parameters are:
  *   channel: one of ADC_CHN_*
- *   fosc:    one of ADC_FOSC_*
- *   pcfg:    one of ADC_CFG_* (a bitmask with set bits denoting digital ports for 242-style)
+ *   fosc:    one of ADC_FOSC_* | ADC_ACQT_* | ADC_CAL
+ *   pcfg:    one of ADC_CFG_* (a bitmask with set bits denoting digital ports for 1220/65j50-style)
  *   config:  ADC_FRM_* | ADC_INT_* | ADC_VCFG_*
  */
 
+#if defined(__SDCC_ADC_STYLE65J50)
+void adc_open(unsigned char channel, unsigned char fosc, unsigned int pcfg, unsigned char config)
+#else
 void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config)
+#endif
 {
   /* disable ADC */
+#if defined(__SDCC_ADC_STYLE65J50)
+  WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
+#endif
   ADCON0 = 0;
 
 #if defined(__SDCC_ADC_STYLE242)
@@ -51,6 +59,13 @@ void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, uns
    * but we retain compatibility for now ... */
   ADCON1 = (pcfg & 0x3f) | (config & ADC_VCFG_AN3_AN2);
   ADCON2 = (ADCON2 & 0x38) | (fosc & 0x07) | (config & ADC_FRM_RJUST);
+#elif defined(__SDCC_ADC_STYLE65J50)
+  WDTCONbits.ADSHR = 1; /* access ANCON0/1 */
+  ANCON0 = pcfg;
+  ANCON1 = (pcfg >> 8);
+  WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
+  ADCON0 = ((channel & 0x0f) << 2) | ((config & ADC_VCFG_AN3_AN2) << 2);
+  ADCON1 = (config & ADC_FRM_RJUST) | (fosc & 0x7f);
 #else /* unsupported ADC style */
 #error Unsupported ADC style.
 #endif

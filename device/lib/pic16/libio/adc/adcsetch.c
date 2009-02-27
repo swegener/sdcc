@@ -31,6 +31,9 @@ void adc_setchannel(unsigned char channel)
   ADCON0 = (ADCON0 & ~(0x07 << 2)) | ((channel & 0x07) << 2);
 #elif defined(__SDCC_ADC_STYLE2220)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
+#elif defined(__SDCC_ADC_STYLE65J50)
+  WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
+  ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
 #else /* unsupported ADC style */
 #error Unsupported ADC style.
 #endif

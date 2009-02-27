@@ -57,31 +57,49 @@
 #define ADC_FOSC_64	0x06
 #define ADC_FOSC_RC	0x07
 
+/*
+ * acquisition time (65j50-style only)
+ * -- to be ORed with ADC_FOSC
+ */
+#define ADC_ACQT_0      (0x00 << 3)
+#define ADC_ACQT_2      (0x01 << 3)
+#define ADC_ACQT_4      (0x02 << 3)
+#define ADC_ACQT_6      (0x03 << 3)
+#define ADC_ACQT_8      (0x04 << 3)
+#define ADC_ACQT_12     (0x05 << 3)
+#define ADC_ACQT_16     (0x06 << 3)
+#define ADC_ACQT_20     (0x07 << 3)
 
 /*
- * Distinguish between 18f242-style, 18f1220-style, and 18f2220-style ADC:
+ * calibration enable (65j50-style only)
+ * -- to be ORed with ADC_FOSC
+ */
+#define ADC_CAL         0x40
+
+/*
+ * Distinguishing between ADC-styles:
  *
  * ADCON0:
- * bit  18f242  18f1220 18f2220
- *  0   ADON    ADON    ADON
- *  1   -       GO      GO
- *  2   GO      CHS0    CHS0
- *  3   CHS0    CHS1    CHS1
- *  4   CHS1    CHS2    CHS2
- *  5   CHS2    -       CHS3
- *  6   ADCS0   VCFG0   -
- *  7   ADCS1   VCFG1   (ADCAL)
+ * bit  18f242  18f1220 18f2220 18f65j50
+ *  0   ADON    ADON    ADON    ADON
+ *  1   -       GO      GO      GO
+ *  2   GO      CHS0    CHS0    CHS0
+ *  3   CHS0    CHS1    CHS1    CHS1
+ *  4   CHS1    CHS2    CHS2    CHS2
+ *  5   CHS2    -       CHS3    CHS3
+ *  6   ADCS0   VCFG0   -       VCFG0
+ *  7   ADCS1   VCFG1   (ADCAL) VCFG1
  *
  * ADCON1:
- *  bit 18f242  18f1220 18f2220
- *   0  PCFG0   PCFG0   PCFG0
- *   1  PCFG1   PCFG1   PCFG1
- *   2  PCFG2   PCFG2   PCFG2
- *   3  PCFG3   PCFG3   PCFG3
- *   4  -       PCFG4   VCFG0
- *   5  -       PCFG5   VCFG1
- *   6  ADCS2   PCFG6   -
- *   7  ADFM    -       -
+ *  bit 18f242  18f1220 18f2220 18f65j50
+ *   0  PCFG0   PCFG0   PCFG0   ADCS0
+ *   1  PCFG1   PCFG1   PCFG1   ADCS1
+ *   2  PCFG2   PCFG2   PCFG2   ADCS2
+ *   3  PCFG3   PCFG3   PCFG3   ACQT0
+ *   4  -       PCFG4   VCFG0   ACQT1
+ *   5  -       PCFG5   VCFG1   ACQT2
+ *   6  ADCS2   PCFG6   -       ADCAL
+ *   7  ADFM    -       -       ADFM
  */
 
 /* 18f242-style */
@@ -98,6 +116,7 @@
 /* 18f2220-style, ordered by device family */
 #elif  defined(pic18f2220) || defined(pic18f2320) || defined(pic18f4220) || defined(pic18f4320) \
     || defined(pic18f2221) || defined(pic18f2321) || defined(pic18f4221) || defined(pic18f4321) \
+    || defined(pic18f23k20) || defined(pic18f24k20) || defined(pic18f25k20) || defined(pic18f26k20) \
     || defined(pic18f2410) || defined(pic18f2510) || defined(pic18f4410) || defined(pic18f4510) \
     || defined(pic18f2420) || defined(pic18f2520) || defined(pic18f4420) || defined(pic18f4520) \
     || defined(pic18f2423) || defined(pic18f2523) || defined(pic18f4423) || defined(pic18f4523) \
@@ -109,6 +128,7 @@
     || defined(pic18f2525) || defined(pic18f2620) || defined(pic18f4525) || defined(pic18f4620) \
     || defined(pic18f2585) || defined(pic18f2680) || defined(pic18f4585) || defined(pic18f4680) \
     || defined(pic18f2682) || defined(pic18f2685) || defined(pic18f4682) || defined(pic18f4685) \
+    || defined(pic18f43k20) || defined(pic18f44k20) || defined(pic18f45k20) || defined(pic18f46k20) \
     || defined(pic18f6520) || defined(pic18f6620) || defined(pic18f6720) \
     || defined(pic18f6585) || defined(pic18f6680) || defined(pic18f8585) || defined(pic18f8680) \
     || defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
@@ -117,6 +137,11 @@
     || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60) \
 
 #define __SDCC_ADC_STYLE2220    1
+
+#elif defined(pic18f65j50) || defined(pic18f66j50) || defined(pic18f66j55) || defined(pic18f67j50) \
+   || defined(pic18f85j50) || defined(pic18f86j50) || defined(pic18f86j55) || defined(pic18f87j50) \
+
+#define __SDCC_ADC_STYLE65J50
 
 #else /* unknown device */
 
@@ -268,6 +293,38 @@
 #define ADC_CFG_01A_2R  0x3e
 #define ADC_CFG_00A_0R  0x0f
 
+#elif defined(__SDCC_ADC_STYLE65J50)
+
+/*
+ * These devices use a bitmask in ANCON0/1 to configure
+ * AN7..0/AN15..8 as digital ports (bit set) or analog
+ * inputs (bit clear).
+ *
+ * These settings are selected based on their similarity with
+ * the 2220-style settings; 65j50-style is more flexible, though.
+ *
+ * Reference voltages are configured via adc_open's config parameter
+ * using ADC_VCFG_*.
+ */
+
+#define ADC_CFG_16A     0x0000
+#define ADC_CFG_15A     0x8000
+#define ADC_CFG_14A     0xC000
+#define ADC_CFG_13A     0xE000
+#define ADC_CFG_12A     0xF000
+#define ADC_CFG_11A     0xF800
+#define ADC_CFG_10A     0xFC00
+#define ADC_CFG_9A      0xFE00
+#define ADC_CFG_8A      0xFF00
+#define ADC_CFG_7A      0xFF80
+#define ADC_CFG_6A      0xFFC0
+#define ADC_CFG_5A      0xFFE0
+#define ADC_CFG_4A      0xFFF0
+#define ADC_CFG_3A      0xFFF8
+#define ADC_CFG_2A      0xFFFC
+#define ADC_CFG_1A      0xFFFE
+#define ADC_CFG_0A      0xFFFF
+
 #else   /* unhandled ADC style */
 
 #error No supported ADC style selected.
@@ -277,7 +334,11 @@
 
 
 /* initialize AD module */
+#if defined(__SDCC_ADC_STYLE65J50)
+void adc_open(unsigned char channel, unsigned char fosc, unsigned int pcfg, unsigned char config);
+#else
 void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config);
+#endif
 
 /* shutdown AD module */
 void adc_close(void);

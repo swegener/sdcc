@@ -25,6 +25,9 @@
 
 void adc_conv(void)
 {
+#if defined(__SDCC_ADC_STYLE65J50)
+  WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
+#endif
   ADCON0bits.GO = 1;
 }
 

@@ -1,3 +1,28 @@
+2009-02-27 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f[24][3456]k20.h,
+	  device/include/pic16/pic18f[68][567]j50.h,
+	  device/include/pic16/pic18f[68]6j55.h,
+	  device/lib/pic16/libdev/pic18f[24][3456]k20.c,
+	  device/lib/pic16/libdev/pic18f[68][567]j50.c,
+	  device/lib/pic16/libdev/pic18f[68]6j55.c,
+	  device/include/pic16/pic18fregs.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/lib/pic16/pics.all,
+	  device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libio/Makefile.am: added/re-enabled many device
+	  families (87j50 family contributed by Robert Wuest)
+
+	* device/include/pic16/adc.h,
+	  device/lib/pic16/libio/adc/adcbusy.c,
+	  device/lib/pic16/libio/adc/adcclose.c,
+	  device/lib/pic16/libio/adc/adcconv.c,
+	  device/lib/pic16/libio/adc/adcopen.c,
+	  device/lib/pic16/libio/adc/adcsetch.c: added 65j50-style ADC
+
+	* doc/sdccman.lyx: updated list of supported devices, fixed typo
+	* device/lib/pic16/Makefile.common: do not suppress assembler warnings
+
 2009-02-27 Borut Razem <borut.razem AT siol.net>
 
 	* as/z80/asexpr.c, as/z80/z80mch.c: re-fixed bugs

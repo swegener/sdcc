@@ -15,6 +15,10 @@ lib_LIBRARIES += libdev18f2220.a
 libdev18f2220_a_SOURCES = pic18f2220.c
 libdev18f2220_a_CFLAGS = -p18f2220 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f2221.a
+libdev18f2221_a_SOURCES = pic18f2221.c
+libdev18f2221_a_CFLAGS = -p18f2221 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f2320.a
 libdev18f2320_a_SOURCES = pic18f2320.c
 libdev18f2320_a_CFLAGS = -p18f2320 $(AM_CFLAGS)
@@ -27,6 +31,10 @@ lib_LIBRARIES += libdev18f2331.a
 libdev18f2331_a_SOURCES = pic18f2331.c
 libdev18f2331_a_CFLAGS = -p18f2331 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f23k20.a
+libdev18f23k20_a_SOURCES = pic18f23k20.c
+libdev18f23k20_a_CFLAGS = -p18f23k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f2410.a
 libdev18f2410_a_SOURCES = pic18f2410.c
 libdev18f2410_a_CFLAGS = -p18f2410 $(AM_CFLAGS)
@@ -38,6 +46,10 @@ libdev18f242_a_CFLAGS = -p18f242 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f2420.a
 libdev18f2420_a_SOURCES = pic18f2420.c
 libdev18f2420_a_CFLAGS = -p18f2420 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f2423.a
+libdev18f2423_a_SOURCES = pic18f2423.c
+libdev18f2423_a_CFLAGS = -p18f2423 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f2431.a
 libdev18f2431_a_SOURCES = pic18f2431.c
@@ -62,6 +74,14 @@ libdev18f2480_a_CFLAGS = -p18f2480 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f24j10.a
 libdev18f24j10_a_SOURCES = pic18f24j10.c
 libdev18f24j10_a_CFLAGS = -p18f24j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f24k20.a
+libdev18f24k20_a_SOURCES = pic18f24k20.c
+libdev18f24k20_a_CFLAGS = -p18f24k20 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f2510.a
+libdev18f2510_a_SOURCES = pic18f2510.c
+libdev18f2510_a_CFLAGS = -p18f2510 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f2515.a
 libdev18f2515_a_SOURCES = pic18f2515.c
@@ -103,6 +123,10 @@ lib_LIBRARIES += libdev18f25j10.a
 libdev18f25j10_a_SOURCES = pic18f25j10.c
 libdev18f25j10_a_CFLAGS = -p18f25j10 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f25k20.a
+libdev18f25k20_a_SOURCES = pic18f25k20.c
+libdev18f25k20_a_CFLAGS = -p18f25k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f2610.a
 libdev18f2610_a_SOURCES = pic18f2610.c
 libdev18f2610_a_CFLAGS = -p18f2610 $(AM_CFLAGS)
@@ -123,9 +147,17 @@ lib_LIBRARIES += libdev18f2685.a
 libdev18f2685_a_SOURCES = pic18f2685.c
 libdev18f2685_a_CFLAGS = -p18f2685 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f26k20.a
+libdev18f26k20_a_SOURCES = pic18f26k20.c
+libdev18f26k20_a_CFLAGS = -p18f26k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f4220.a
 libdev18f4220_a_SOURCES = pic18f4220.c
 libdev18f4220_a_CFLAGS = -p18f4220 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f4221.a
+libdev18f4221_a_SOURCES = pic18f4221.c
+libdev18f4221_a_CFLAGS = -p18f4221 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f4320.a
 libdev18f4320_a_SOURCES = pic18f4320.c
@@ -139,6 +171,10 @@ lib_LIBRARIES += libdev18f4331.a
 libdev18f4331_a_SOURCES = pic18f4331.c
 libdev18f4331_a_CFLAGS = -p18f4331 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f43k20.a
+libdev18f43k20_a_SOURCES = pic18f43k20.c
+libdev18f43k20_a_CFLAGS = -p18f43k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f4410.a
 libdev18f4410_a_SOURCES = pic18f4410.c
 libdev18f4410_a_CFLAGS = -p18f4410 $(AM_CFLAGS)
@@ -150,6 +186,10 @@ libdev18f442_a_CFLAGS = -p18f442 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f4420.a
 libdev18f4420_a_SOURCES = pic18f4420.c
 libdev18f4420_a_CFLAGS = -p18f4420 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f4423.a
+libdev18f4423_a_SOURCES = pic18f4423.c
+libdev18f4423_a_CFLAGS = -p18f4423 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f4431.a
 libdev18f4431_a_SOURCES = pic18f4431.c
@@ -175,6 +215,10 @@ lib_LIBRARIES += libdev18f44j10.a
 libdev18f44j10_a_SOURCES = pic18f44j10.c
 libdev18f44j10_a_CFLAGS = -p18f44j10 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f44k20.a
+libdev18f44k20_a_SOURCES = pic18f44k20.c
+libdev18f44k20_a_CFLAGS = -p18f44k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f4510.a
 libdev18f4510_a_SOURCES = pic18f4510.c
 libdev18f4510_a_CFLAGS = -p18f4510 $(AM_CFLAGS)
@@ -190,6 +234,10 @@ libdev18f452_a_CFLAGS = -p18f452 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f4520.a
 libdev18f4520_a_SOURCES = pic18f4520.c
 libdev18f4520_a_CFLAGS = -p18f4520 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f4523.a
+libdev18f4523_a_SOURCES = pic18f4523.c
+libdev18f4523_a_CFLAGS = -p18f4523 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f4525.a
 libdev18f4525_a_SOURCES = pic18f4525.c
@@ -215,6 +263,10 @@ lib_LIBRARIES += libdev18f45j10.a
 libdev18f45j10_a_SOURCES = pic18f45j10.c
 libdev18f45j10_a_CFLAGS = -p18f45j10 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f45k20.a
+libdev18f45k20_a_SOURCES = pic18f45k20.c
+libdev18f45k20_a_CFLAGS = -p18f45k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f4610.a
 libdev18f4610_a_SOURCES = pic18f4610.c
 libdev18f4610_a_CFLAGS = -p18f4610 $(AM_CFLAGS)
@@ -235,6 +287,10 @@ lib_LIBRARIES += libdev18f4685.a
 libdev18f4685_a_SOURCES = pic18f4685.c
 libdev18f4685_a_CFLAGS = -p18f4685 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f46k20.a
+libdev18f46k20_a_SOURCES = pic18f46k20.c
+libdev18f46k20_a_CFLAGS = -p18f46k20 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f6520.a
 libdev18f6520_a_SOURCES = pic18f6520.c
 libdev18f6520_a_CFLAGS = -p18f6520 $(AM_CFLAGS)
@@ -243,6 +299,10 @@ lib_LIBRARIES += libdev18f6585.a
 libdev18f6585_a_SOURCES = pic18f6585.c
 libdev18f6585_a_CFLAGS = -p18f6585 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f65j50.a
+libdev18f65j50_a_SOURCES = pic18f65j50.c
+libdev18f65j50_a_CFLAGS = -p18f65j50 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f6620.a
 libdev18f6620_a_SOURCES = pic18f6620.c
 libdev18f6620_a_CFLAGS = -p18f6620 $(AM_CFLAGS)
@@ -250,6 +310,14 @@ libdev18f6620_a_CFLAGS = -p18f6620 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f6680.a
 libdev18f6680_a_SOURCES = pic18f6680.c
 libdev18f6680_a_CFLAGS = -p18f6680 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f66j50.a
+libdev18f66j50_a_SOURCES = pic18f66j50.c
+libdev18f66j50_a_CFLAGS = -p18f66j50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f66j55.a
+libdev18f66j55_a_SOURCES = pic18f66j55.c
+libdev18f66j55_a_CFLAGS = -p18f66j55 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f66j60.a
 libdev18f66j60_a_SOURCES = pic18f66j60.c
@@ -263,6 +331,10 @@ lib_LIBRARIES += libdev18f6720.a
 libdev18f6720_a_SOURCES = pic18f6720.c
 libdev18f6720_a_CFLAGS = -p18f6720 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f67j50.a
+libdev18f67j50_a_SOURCES = pic18f67j50.c
+libdev18f67j50_a_CFLAGS = -p18f67j50 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f67j60.a
 libdev18f67j60_a_SOURCES = pic18f67j60.c
 libdev18f67j60_a_CFLAGS = -p18f67j60 $(AM_CFLAGS)
@@ -275,6 +347,10 @@ lib_LIBRARIES += libdev18f8585.a
 libdev18f8585_a_SOURCES = pic18f8585.c
 libdev18f8585_a_CFLAGS = -p18f8585 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f85j50.a
+libdev18f85j50_a_SOURCES = pic18f85j50.c
+libdev18f85j50_a_CFLAGS = -p18f85j50 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f8620.a
 libdev18f8620_a_SOURCES = pic18f8620.c
 libdev18f8620_a_CFLAGS = -p18f8620 $(AM_CFLAGS)
@@ -282,6 +358,14 @@ libdev18f8620_a_CFLAGS = -p18f8620 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f8680.a
 libdev18f8680_a_SOURCES = pic18f8680.c
 libdev18f8680_a_CFLAGS = -p18f8680 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f86j50.a
+libdev18f86j50_a_SOURCES = pic18f86j50.c
+libdev18f86j50_a_CFLAGS = -p18f86j50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f86j55.a
+libdev18f86j55_a_SOURCES = pic18f86j55.c
+libdev18f86j55_a_CFLAGS = -p18f86j55 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f86j60.a
 libdev18f86j60_a_SOURCES = pic18f86j60.c
@@ -294,6 +378,10 @@ libdev18f86j65_a_CFLAGS = -p18f86j65 $(AM_CFLAGS)
 lib_LIBRARIES += libdev18f8720.a
 libdev18f8720_a_SOURCES = pic18f8720.c
 libdev18f8720_a_CFLAGS = -p18f8720 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f87j50.a
+libdev18f87j50_a_SOURCES = pic18f87j50.c
+libdev18f87j50_a_CFLAGS = -p18f87j50 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f87j60.a
 libdev18f87j60_a_SOURCES = pic18f87j60.c

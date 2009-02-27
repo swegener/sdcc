@@ -1,3 +1,8 @@
+2009-02-27 Borut Razem <borut.razem AT siol.net>
+
+	* as/z80/asexpr.c, as/z80/z80mch.c: re-fixed bugs
+	  #1829678 and #1704376 in the way proposed by Alan Baldwin
+
 2009-02-23 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed2.h: Fixed address of SFR P5. Thanks

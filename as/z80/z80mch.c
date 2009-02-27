@@ -133,6 +133,7 @@ struct mne *mp;
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
 			comma();
+			clrexpr(&e2);
 			t2 = addr(&e2);
 		}
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -147,6 +148,7 @@ struct mne *mp;
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
 			comma();
+			clrexpr(&e2);
 			t2 = addr(&e2);
 		}
 		if (genop(0, op, &e2, 1) || t1)
@@ -549,7 +551,7 @@ struct mne *mp;
 	case S_DJNZ:
 	case S_JR:
 		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
-			if ((v1 &= 0xFF) <= 0x18 && v1 != PO && v1 != PE && v1 != P && v1 != M) {
+			if ((v1 &= 0xFF) <= 0x03) {
 				op += (v1+1)<<3;
 			} else {
 				aerr();

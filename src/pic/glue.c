@@ -262,7 +262,8 @@ pic14createInterruptVect (struct dbuf_s * vBuf)
         dbuf_printf (vBuf, "%s", iComments2);
         dbuf_printf (vBuf, "; reset vector \n");
         dbuf_printf (vBuf, "%s", iComments2);
-        dbuf_printf (vBuf, "STARTUP\t%s\n", CODE_NAME); // Lkr file should place section STARTUP at address 0x0
+        // Lkr file should place section STARTUP at address 0x0, but does not ...
+        dbuf_printf (vBuf, "STARTUP\t%s 0x0000\n", CODE_NAME);
         dbuf_printf (vBuf, "\tnop\n"); /* first location for used by incircuit debugger */
         dbuf_printf (vBuf, "\tpagesel __sdcc_gsinit_startup\n");
         dbuf_printf (vBuf, "\tgoto\t__sdcc_gsinit_startup\n");

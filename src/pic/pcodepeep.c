@@ -1878,7 +1878,7 @@ int pCodePeepMatchRule(pCode *pc)
 			inefficient code with the optimized version */
 #ifdef PCODE_DEBUG
 			DFPRINTF((stderr, "Found a pcode peep match:\nRule:\n"));
-			printpCodeString(stderr,peepBlock->target.pb->pcHead,10);
+			//printpCodeString(stderr,peepBlock->target.pb->pcHead,10);
 			DFPRINTF((stderr,"first thing matched\n"));
 			pc->print(stderr,pc);
 			if(pcin) {

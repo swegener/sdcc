@@ -301,8 +301,11 @@ void
 main (void)
 {
   char_compare();
+  __asm clrwdt __endasm;
   int_compare1();
+  __asm clrwdt __endasm;
   int_compare2();
+  __asm clrwdt __endasm;
 
   done ();
 }

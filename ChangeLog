@@ -1,5 +1,17 @@
 2009-02-28 Raphael Neider <rneider AT web.de>
 
+	* src/regression/compare10.c,
+	  src/regression/compare7.c,
+	  src/regression/compare8.c,
+	  src/regression/compare9.c: reset watchdog timer in time
+	* src/pic/glue.c (pic14createInterruptVect): pin RESET vector
+	  handler to 0x0000 as the linker no longer knows STARTUP sections
+	* src/pic/pcode.c (register_reassign, ReuseReg): applied modified
+	  patch #2512926 to (mostly) fix #1762626, cosmetic changes
+	* src/pic/pcodepeep.c: remove reference to nonexisting function
+
+2009-02-28 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic16/signal.h: avoid multiline inline
 	  assembler statements in macros, addresses #2644965
 

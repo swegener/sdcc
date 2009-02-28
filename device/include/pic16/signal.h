@@ -47,12 +47,10 @@
 #define SIG_USB		SIG_USBIF
 
 /* define name to be the interrupt handler for interrupt #vecno */
-#define DEF_ABSVECTOR(vecno, name)                  \
-void __ivt_ ## name(void) __interrupt vecno __naked \
-{                                        \
-  __asm                                \n\
-    goto        _ ## name              \n\
-  __endasm;                              \
+#define DEF_ABSVECTOR(vecno, name)                      \
+void __ivt_ ## name(void) __interrupt(vecno) __naked    \
+{                                                       \
+  __asm goto _ ## name __endasm;                        \
 }
 
 /* Define name to be the handler for high priority interrupts,
@@ -75,8 +73,7 @@ void __ivt_ ## name(void) __interrupt vecno __naked \
 #define DEF_INTHIGH(name)                \
 DEF_ABSVECTOR(1, name)                   \
 void name(void) __naked __interrupt      \
-{                                        \
-  __asm
+{
   
 /* Define name to be the handler for high priority interrupts,
  * use like this:
@@ -98,13 +95,11 @@ void name(void) __naked __interrupt      \
 #define DEF_INTLOW(name)                 \
 DEF_ABSVECTOR(2, name)                   \
 void name(void) __naked __interrupt      \
-{                                        \
-  __asm
+{
 
 /* finish an interrupt handler definition */
-#define END_DEF                          \
-    retfie                             \n\
-  __endasm;                              \
+#define END_DEF                                 \
+  __asm retfie __endasm;                        \
 }
 
 /* Declare handler to be the handler function for the given signal.
@@ -115,9 +110,9 @@ void name(void) __naked __interrupt      \
  *            Use DEF_HANDLER2(SIG_xxx, SIGxxxIE, handler) instead!
  * To be used together with DEF_INTHIGH and DEF_INTLOW.
  */
-#define DEF_HANDLER(sig, handler)        \
-    btfsc       sig                    \n\
-    goto        _ ## handler
+#define DEF_HANDLER(sig, handler)               \
+    __asm btfsc sig __endasm;                   \
+    __asm goto  _ ## handler __endasm;
 
 /* Declare handler to be the handler function for the given signal.
  * sig should be one of SIG_xxx from above,
@@ -126,11 +121,11 @@ void name(void) __naked __interrupt      \
  * or SIGHANDLERNAKED(handler).
  * To be used together with DEF_INTHIGH and DEF_INTLOW.
  */
-#define DEF_HANDLER2(sig1,sig2,handler)          \
-    btfss       sig1                           \n\
-    bra         $+8                            \n\
-    btfsc       sig2                           \n\
-    goto        _ ## handler
+#define DEF_HANDLER2(sig1,sig2,handler)         \
+    __asm btfss sig1 __endasm;                  \
+    __asm bra   $+8 __endasm;                   \
+    __asm btfsc sig2 __endasm;                  \
+    __asm goto  _ ## handler __endasm;
 
 /* Declare or define an interrupt handler function. */
 #define SIGHANDLER(handler)             void handler (void) __interrupt

@@ -1,3 +1,8 @@
+2009-02-28 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/signal.h: avoid multiline inline
+	  assembler statements in macros, addresses #2644965
+
 2009-02-27 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f[24][3456]k20.h,

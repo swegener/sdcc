@@ -4,6 +4,7 @@
 	  src/regression/compare7.c,
 	  src/regression/compare8.c,
 	  src/regression/compare9.c: reset watchdog timer in time
+	* src/regression/configword.c: apply patch from #2488150
 	* src/pic/glue.c (pic14createInterruptVect): pin RESET vector
 	  handler to 0x0000 as the linker no longer knows STARTUP sections
 	* src/pic/pcode.c (register_reassign, ReuseReg): applied modified

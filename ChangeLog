@@ -1,3 +1,10 @@
+2009-03-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (spillThis, spilSomething): fixed bug 2435941
+	  (serialRegAssign): do not spil bit registers
+	  throughout cosmetic changes
+	* support/regression/tests/bug2435941.c: new, added
+
 2009-02-28 Raphael Neider <rneider AT web.de>
 
 	* src/regression/compare10.c,

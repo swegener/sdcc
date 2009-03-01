@@ -80,9 +80,9 @@ isReturned(const char *what)
   do
   {
     l = l->next;
-  } while(l->ic->op != FUNCTION);
+  } while(l->isComment || l->ic->op != FUNCTION);
 
-  sym = OP_SYMBOL(IC_LEFT(_G.head->next->next->ic));
+  sym = OP_SYMBOL(IC_LEFT(l->ic));
 
   if(sym && IS_DECL(sym->type))
     {

@@ -1,3 +1,7 @@
+2009-03-01 Borut Razem <borut.razem AT siol.net>
+
+	* src/z80/peep.c: fixed bug #2648964: --i-code-in-asm crashes sdcc
+
 2009-03-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (spillThis, spilSomething): fixed bug 2435941

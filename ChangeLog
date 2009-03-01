@@ -1,3 +1,7 @@
+2009-03-01 Raphael Neider <rneider AT web.de>
+
+	* device/lib/Makefile.in: fixed parallel builds (i.e., make -jN, N>1)
+
 2009-03-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/peep.c: fixed bug #2648964: --i-code-in-asm crashes sdcc

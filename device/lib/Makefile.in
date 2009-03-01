@@ -193,9 +193,16 @@ endif
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(TARGETS)
+all:
+	$(MAKE) checkconf
+	$(MAKE) $(TARGETS)
 
-objects: build-dir $(OBJECTS) port-specific-objects $(LIB_FILES) clean_intermediate
+objects:
+	$(MAKE) build-dir
+	$(MAKE) $(OBJECTS)
+	$(MAKE) port-specific-objects
+	$(MAKE) $(LIB_FILES)
+	$(MAKE) clean_intermediate
 
 models:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
@@ -241,7 +248,10 @@ model-xa51:
 	  $(MAKE) MODELFLAGS="-mxa51" PORT=xa51 objects-xa51; \
 	fi
 
-objects-xa51: build-dir $(XA51OBJECTS) port-specific-objects
+objects-xa51:
+	$(MAKE) build-dir
+	$(MAKE) $(XA51OBJECTS)
+	$(MAKE) port-specific-objects
 
 $(PORTDIR)/lib$(PORT).lib: $(XA51OBJECTS)
 ifeq ($(LIB_TYPE), SDCCLIB)
@@ -267,30 +277,44 @@ model-gbz80:
 	  $(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o; \
 	fi
 
-objects-z80: build-dir port-specific-objects clean_intermediate
+objects-z80:
+	$(MAKE) build-dir
+	$(MAKE) port-specific-objects
+	$(MAKE) clean_intermediate
 
 model-hc08:
 	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
 	fi
 
-objects-hc08: build-dir port-specific-objects clean_intermediate
+objects-hc08:
+	$(MAKE) build-dir
+	$(MAKE) port-specific-objects
+	$(MAKE) clean_intermediate
 
 model-pic16:
 	if grep '^pic16\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic16 objects-pic16; \
 	fi
 
-objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
+objects-pic16:
+	$(MAKE) build-dir
+	$(MAKE) port-specific-objects-pic16
+	$(MAKE) clean_intermediate-pic16
 
 model-pic14:
 	if grep '^pic\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic objects-pic14; \
 	fi
 
-objects-pic14: build-dir port-specific-objects-pic14 clean_intermediate-pic14
+objects-pic14:
+	$(MAKE) build-dir
+	$(MAKE) port-specific-objects-pic14
+	$(MAKE) clean_intermediate-pic14
 
-build-dir: $(PORTDIR) $(PORT)
+build-dir:
+	$(MAKE) $(PORTDIR)
+	$(MAKE) $(PORT)
 
 $(PORTDIR):
 	mkdir -p $(PORTDIR)

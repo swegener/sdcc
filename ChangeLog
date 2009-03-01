@@ -5,6 +5,8 @@
 2009-03-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/peep.c: fixed bug #2648964: --i-code-in-asm crashes sdcc
+	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
+	  changed sdcc version to 2.9.0
 
 2009-03-01 Maarten Brock <sourceforge.brock AT dse.nl>
 

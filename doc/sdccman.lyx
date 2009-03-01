@@ -1,4 +1,4 @@
-#LyX 1.5.6 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -114,7 +114,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.8.9
+SDCC 2.9.0
 \size footnotesize
 
 \newline

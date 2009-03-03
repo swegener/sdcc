@@ -137,14 +137,14 @@ typedef union
 /*--------------------------------------------------------------------------*/
 
 #ifdef SDCC_STACK_AUTO
-  #define OUTPUT_2DIGITS( B )	{ output_2digits( B, lower_case, output_char, p ); charsOutputted += 2; }
+  #define OUTPUT_2DIGITS( B )   { output_2digits( B, lower_case, output_char, p ); charsOutputted += 2; }
   static void output_2digits( unsigned char b, BOOL lower_case, pfn_outputchar output_char, void* p )
   {
     output_digit( b>>4,   lower_case, output_char, p );
     output_digit( b&0x0F, lower_case, output_char, p );
   }
 #else
-  #define OUTPUT_2DIGITS( B )	output_2digits( B )
+  #define OUTPUT_2DIGITS( B )   output_2digits( B )
   static void output_2digits( unsigned char b )
   {
     output_digit( b>>4   );
@@ -211,7 +211,7 @@ static void calculate_digit( unsigned char radix )
 #define DEFAULT_FLOAT_PRECISION 6
 
 #ifdef SDCC_STACK_AUTO
-#define OUTPUT_FLOAT(F, W, D, L, Z, S, P)	output_float(F, W, D, L, Z, S, P, output_char, p)
+#define OUTPUT_FLOAT(F, W, D, L, Z, S, P)       output_float(F, W, D, L, Z, S, P, output_char, p)
 static unsigned char
 output_float (float f, unsigned char reqWidth,
               signed char reqDecimals,
@@ -225,7 +225,7 @@ output_float (float f, unsigned char reqWidth,
   char fpBuffer[128];
  #endif
 #else
-#define OUTPUT_FLOAT(F, W, D, L, Z, S, P)	output_float(F, W, D, L, Z, S, P)
+#define OUTPUT_FLOAT(F, W, D, L, Z, S, P)       output_float(F, W, D, L, Z, S, P)
 static void
 output_float (float f, unsigned char reqWidth,
               signed char reqDecimals,
@@ -511,7 +511,7 @@ get_conversion_spec:
         goto get_conversion_spec;
 
       case 'C':
-	if( char_argument )
+        if( char_argument )
           c = va_arg(ap,char);
         else
           c = va_arg(ap,int);
@@ -566,11 +566,11 @@ get_conversion_spec:
 #if defined (SDCC_ds390)
         {
           unsigned char memtype = value.byte[3];
-          if (memtype > 0x80)
+          if (memtype >= 0x80)
             c = 'C';
-          else if (memtype > 0x60)
+          else if (memtype >= 0x60)
             c = 'P';
-          else if (memtype > 0x40)
+          else if (memtype >= 0x40)
             c = 'I';
           else
             c = 'X';
@@ -585,11 +585,11 @@ get_conversion_spec:
 #elif defined (SDCC_mcs51)
         {
           unsigned char memtype = value.byte[2];
-          if (memtype > 0x80)
+          if (memtype >= 0x80)
             c = 'C';
-          else if (memtype > 0x60)
+          else if (memtype >= 0x60)
             c = 'P';
-          else if (memtype > 0x40)
+          else if (memtype >= 0x40)
             c = 'I';
           else
             c = 'X';

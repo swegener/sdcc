@@ -1,3 +1,7 @@
+2009-03-03 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/printf_large.c: fixed bug #2656821: bug in printf
+
 2009-03-03 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic/libdev/Makefile.in: build device-specific

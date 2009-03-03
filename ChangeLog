@@ -1,3 +1,8 @@
+2009-03-03 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/libdev/Makefile.in: build device-specific
+	  libraries for the correct processor, fixes #2654585
+
 2009-03-01 Raphael Neider <rneider AT web.de>
 
 	* device/lib/Makefile.in: fixed parallel builds (i.e., make -jN, N>1)

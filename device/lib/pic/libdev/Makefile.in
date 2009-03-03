@@ -30,7 +30,7 @@ pic%.o : pic%.c
 ifndef SILENT
 	@echo "[  CC   ] ==> $(patsubst $(top_builddir)/%,%,$@)"
 endif
-	@-$(CC) $(CPPFLAGS) $(CFLAGS) -mpic14 -p$* -o "$@" -c "$<"
+	@-$(CC) -mpic14 -p$* $(CPPFLAGS) $(CFLAGS) -o "$@" -c "$<"
 
 $(INSTALL_DIR)/%.lib : %.o
 	@-$(LIB) -c "$@" "$<";

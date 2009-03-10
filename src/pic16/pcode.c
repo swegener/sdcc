@@ -6273,7 +6273,7 @@ static void LinkFlow(pBlock *pb)
       }
 
       if( (pct = findLabelinpBlock(pb,pcol)) != NULL)
-        LinkFlow_pCode(PCI(pc),PCI(pct));
+        LinkFlow_pCode(PCI(pc),PCI(pic16_findNextInstruction(pct)));
       else
         fprintf(stderr, "ERROR: %s, couldn't find label. key=%d,lab=%s\n",
                 __FUNCTION__,pcol->key,((PCOP(pcol)->name)?PCOP(pcol)->name:"-"));

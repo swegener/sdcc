@@ -1,3 +1,8 @@
+2009-03-10 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcode.c (LinkFlow): fix invalid cast from pCodeLabel
+	  to pCodeInstruction to avoid a segmentation fault
+
 2009-03-03 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/printf_large.c: fixed bug #2656821: bug in printf

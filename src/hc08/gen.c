@@ -5038,7 +5038,6 @@ genAnd (iCode * ic, iCode * ifx)
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl = NULL;
-      wassertl (ifx, "AOP_CRY result without ifx");
 
       offset = 0;
       while (size--)
@@ -5075,7 +5074,8 @@ genAnd (iCode * ic, iCode * ifx)
         }
         if (tlbl)
           emitLabel (tlbl);
-        genIfxJump (ifx, "a");
+        if(ifx)
+          genIfxJump (ifx, "a");
         goto release;
     }
 
@@ -5202,7 +5202,6 @@ genOr (iCode * ic, iCode * ifx)
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl = NULL;
-      wassertl (ifx, "AOP_CRY result without ifx");
 
       offset = 0;
       while (size--)
@@ -5235,7 +5234,8 @@ genOr (iCode * ic, iCode * ifx)
         }
         if (tlbl)
           emitLabel (tlbl);
-        genIfxJump (ifx, "a");
+        if(ifx)
+          genIfxJump (ifx, "a");
     }
 
   if (AOP_TYPE (right) == AOP_LIT)

@@ -1412,7 +1412,7 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
           new_high = (v_new >> 8) & 0xff;
           old_low = (v_old >> 0) & 0xff;
           old_high = (v_old >> 8) & 0xff;
-          
+
           /* Change lower byte only. */
           if(new_high == old_high)
             {
@@ -4013,7 +4013,7 @@ genPlus (iCode * ic)
               emit2 ("ld a, b");
               emit2 ("pop bc");
             }
-          
+
         }
       emit2 ("adc a,%s", aopGet (AOP (IC_RIGHT (ic)), 1, FALSE));
       aopPut (AOP (IC_RESULT (ic)), "a", 1);
@@ -4026,7 +4026,7 @@ genPlus (iCode * ic)
       if (offset == 0)
       {
         if(size == 0 && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) == 1)
-	  emit2 ("inc a");
+          emit2 ("inc a");
         else
           emit2 ("add a,%s", aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
       }
@@ -5386,6 +5386,7 @@ genAnd (iCode * ic, iCode * ifx)
                   /* For the flags */
                   emit2 ("or a,a");
                 }
+          if (size || ifx)  /* emit jmp only, if it is actually used */
               emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
             }
               offset++;
@@ -5569,9 +5570,19 @@ genOr (iCode * ic, iCode * ifx)
           bytelit = (lit >> (offset * 8)) & 0x0FFL;
 
           _moveA (aopGet (AOP (left), offset, FALSE));
-          /* OR with any literal is the same as OR with itself. */
-          emit2 ("or a,a");
-          emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+
+          if (bytelit != 0)
+            { /* FIXME, allways true, shortcut possible */
+              emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
+            }
+          else
+            {
+              /* For the flags */
+              emit2 ("or a,a");
+            }
+
+          if (ifx)  /* emit jmp only, if it is actually used */
+            emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
 
           offset++;
         }
@@ -8115,7 +8126,7 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
                         {
                           fetchPair (dest[i], AOP (pparams[i]));
                           continue;
-                        }         
+                        }
                     }
                 }
             }

@@ -7210,7 +7210,7 @@ genOr (iCode * ic, iCode * ifx)
           // result = 1
           if (size)
             emitcode ("setb", "%s", AOP (result)->aopu.aop_dir);
-          else
+          else if(ifx)
             continueIfTrue (ifx);
           goto release;
         }
@@ -7228,7 +7228,7 @@ genOr (iCode * ic, iCode * ifx)
               emitLabel (tlbl);
             }
           else
-            {
+            { /* FIXME, thats pretty fishy, check for ifx!=0, testcase .. */
               genIfxJump (ifx, "a", left, right, result, ic->next);
               goto release;
             }

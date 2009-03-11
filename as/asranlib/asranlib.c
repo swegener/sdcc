@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <string.h>
 #include <assert.h>
 #include <time.h>
+#include <sys/stat.h>
 #include "dbuf_string.h"
 #include "lkar.h"
 
@@ -593,7 +594,6 @@ do_ranlib (const char *archive)
       struct stat stat_buf;
       int can_stat;
 
-      /* TODO: create tmpfile in temporery directory (TMP, TMPDIR, /usr/tmp, /tmp) */
 #ifdef _WIN32
       if (NULL == _mktemp (tmpfile) || NULL == (outfp = fopen (tmpfile, "wb")))
         {
@@ -667,7 +667,7 @@ do_ranlib (const char *archive)
 
       if (0 != fstat(fileno(infp), &stat_buf))
         {
-          fprintf (stderr, "asranlib: can't stat %s: ", infp);
+          fprintf (stderr, "asranlib: can't stat %s: ", archive);
           perror (NULL);
           fclose (infp);
           can_stat = 0;

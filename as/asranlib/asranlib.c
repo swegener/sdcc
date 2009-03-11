@@ -590,7 +590,10 @@ do_ranlib (const char *archive)
       int nsym;
       int symtab_size;
       char tmpfile[] = "arXXXXXX";
+      struct stat stat_buf;
+      int can_stat;
 
+      /* TODO: create tmpfile in temporery directory (TMP, TMPDIR, /usr/tmp, /tmp) */
 #ifdef _WIN32
       if (NULL == _mktemp (tmpfile) || NULL == (outfp = fopen (tmpfile, "wb")))
         {
@@ -646,7 +649,6 @@ do_ranlib (const char *archive)
           fwrite (buf, 1, sizeof (buf), outfp);
         }
 
-
       for (symp = symlist; symp; symp = symp->next)
         {
           fputs (symp->name, outfp);
@@ -662,6 +664,17 @@ do_ranlib (const char *archive)
         putc (pad, outfp);
 
       fclose (outfp);
+
+      if (0 != fstat(fileno(infp), &stat_buf))
+        {
+          fprintf (stderr, "asranlib: can't stat %s: ", infp);
+          perror (NULL);
+          fclose (infp);
+          can_stat = 0;
+        }
+      else
+        can_stat = 1;
+
       fclose (infp);
 
       if (0 != remove (archive))
@@ -672,6 +685,11 @@ do_ranlib (const char *archive)
       else if (0 != rename (tmpfile, archive))
         {
           fprintf (stderr, "asranlib: can't rename %s to %s: ", tmpfile, archive);
+          perror (NULL);
+        }
+      else if (!can_stat || 0 != chmod (archive, stat_buf.st_mode))
+        {
+          fprintf (stderr, "asranlib: can't chmod %s: ", archive);
           perror (NULL);
         }
     }

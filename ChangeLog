@@ -1,3 +1,7 @@
+2009-03-11 Borut Razem <borut.razem AT siol.net>
+
+	* as/asranlib/asranlib.c: retain the original file mode
+
 2009-03-10 Borut Razem <borut.razem AT siol.net>
 
 	* src/mcs51/gen.c, src/z80/gen.c, src/hc08/gen.c, src/ds390/gen.c,

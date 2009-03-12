@@ -1,3 +1,7 @@
+2009-03-12 Borut Razem <borut.razem AT siol.net>
+
+	* src/z80/peep.c: #2652979: --debug crashes sdcc
+
 2009-03-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/SDCCglue.c,

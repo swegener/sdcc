@@ -80,7 +80,7 @@ isReturned(const char *what)
   do
   {
     l = l->next;
-  } while(l->isComment || l->ic->op != FUNCTION);
+  } while(l->isComment || l->ic == NULL || l->ic->op != FUNCTION);
 
   sym = OP_SYMBOL(IC_LEFT(l->ic));
 

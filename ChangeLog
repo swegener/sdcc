@@ -1,3 +1,11 @@
+2009-03-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/SDCCglue.c,
+	  support/regression/tests/bug2655200.c:
+	  applied modified patch from Robert Larice <larice AT vidisys.de>
+	  fixing original report of bug #2655200: pointer to pdata memory
+	  not correctly initialized
+
 2009-03-11 Borut Razem <borut.razem AT siol.net>
 
 	* as/asranlib/asranlib.c: retain the original file mode

@@ -1,3 +1,7 @@
+2009-03-13 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: "freeware" replaced with "free open source"
+
 2009-03-12 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/peep.c: #2652979: --debug crashes sdcc

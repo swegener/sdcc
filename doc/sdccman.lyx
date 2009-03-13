@@ -118,7 +118,7 @@ SDCC 2.9.0
 \size footnotesize
 
 \newline
-$Date::            $ 
+$Date::             $ 
 \newline
 $Revision$
 \end_layout
@@ -203,7 +203,7 @@ name "aslink"
 
 \end_inset
 
-, an open source retargetable assembler & linker.
+, an free open source retargetable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
 rollers and underlying hardware effectively.
  
@@ -735,11 +735,7 @@ Open Source
 \begin_layout Standard
 All packages used in this compiler system are 
 \emph on
-open source
-\emph default
- and 
-\emph on
-freeware
+free open source
 \emph default
 ; source code for all the sub-packages (pre-processor, assemblers, linkers
  etc.) is distributed with the package.
@@ -30299,7 +30295,7 @@ reference "cha:Debugging-with-SDCDB"
 \end_layout
 
 \begin_layout Itemize
-or (8051 specific) use a freeware/commercial simulator which interfaces
+or (8051 specific) use a free open source/commercial simulator which interfaces
  to the AOMF
 \begin_inset LatexCommand index
 name "AOMF, AOMF51"

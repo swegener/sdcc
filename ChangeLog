@@ -1,3 +1,7 @@
+2009-03-15 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/repack_release.sh: added
+
 2009-03-13 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: "freeware" replaced with "free open source"

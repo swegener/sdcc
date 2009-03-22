@@ -1,3 +1,8 @@
+2009-03-22 Borut Razem <borut.razem AT siol.net>
+
+	* Small Device C Compiler 2.9.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 2.9.1
+
 2009-03-15 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/repack_release.sh: added

@@ -1,3 +1,13 @@
+2009-03-23 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCval.c, src/SDCCmain.c, device/include/limits.h,
+	  device/include/pic/limits.h, device/include/pic16/limits.h,
+	  device/lib/_fs2schar.c, device/lib/pic/libsdcc/fs2schar.c,
+	  device/lib/pic16/libsdcc/float/fs2schar.c, doc/sdccman.lyx,
+	  support/regression/tests/funsigned-char.c:
+	  applied patch 2704189: character constant sign fix
+	  thanks to Robert Larice
+
 2009-03-22 Borut Razem <borut.razem AT siol.net>
 
 	* Small Device C Compiler 2.9.0 released

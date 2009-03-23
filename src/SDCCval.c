@@ -840,10 +840,18 @@ value *constCharVal (unsigned char v)
 
   val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
   SPEC_SCLS (val->type) = S_LITERAL;
-  /* let's start with a signed char */
+
   SPEC_NOUN (val->type) = V_CHAR;
-  SPEC_USIGN (val->type) = 1;
-  SPEC_CVAL (val->type).v_uint = v;
+
+  if (options.unsigned_char)
+    {
+      SPEC_USIGN (val->type) = 1;
+      SPEC_CVAL (val->type).v_uint = (unsigned char) v;
+    }
+  else
+    {
+      SPEC_CVAL (val->type).v_int = (signed char) v;
+    }
 
   return val;
 }

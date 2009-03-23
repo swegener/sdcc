@@ -24297,6 +24297,49 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Standard
+SDCC_CHAR_UNSIGNED
+\begin_inset LatexCommand index
+name "SDCC\\_CHAR\\_UNSIGNED"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-funsigned-char
+\emph default
+ option is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
 SDCC_STACK_TENBIT
 \begin_inset LatexCommand index
 name "SDCC\\_STACK\\_TENBIT"

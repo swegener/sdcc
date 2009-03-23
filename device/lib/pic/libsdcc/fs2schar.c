@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------
-   fs2schar.c :- 
+   fs2schar.c :-
 
    Adopted for float and pic16 port by
-	- Vangelis Rokas, vrokas@otenet.gr (2004)
+        - Vangelis Rokas, vrokas@otenet.gr (2004)
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU Library General Public License as published by the
@@ -36,9 +36,9 @@
 signed char __fs2schar (float f) _FS_REENTRANT
 {
   signed long sl=__fs2slong(f);
-  if (sl>=CHAR_MAX)
-    return CHAR_MAX;
-  if (sl<=CHAR_MIN) 
-    return -CHAR_MIN;
+  if (sl>=SCHAR_MAX)
+    return SCHAR_MAX;
+  if (sl<=SCHAR_MIN)
+    return -SCHAR_MIN;
   return sl;
 }

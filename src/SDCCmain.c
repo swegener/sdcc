@@ -1988,6 +1988,9 @@ preProcess (char **envp)
       if (options.noOverlay)
         addSet(&preArgvSet, Safe_strdup("-DSDCC_NOOVERLAY"));
 
+      if (options.unsigned_char)
+        addSet(&preArgvSet, Safe_strdup("-DSDCC_CHAR_UNSIGNED"));
+
       /* set the macro for large model  */
       switch (options.model)
         {

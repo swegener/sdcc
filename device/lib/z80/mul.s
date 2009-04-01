@@ -33,15 +33,14 @@ __mulint_rrx_hds::
 	;;
 	;; Register used: AF,BC,DE,HL
 __mul16::
-        ld      hl,#0
+        ld      l,#0
         ld      a,b
-        ; ld c,c
         ld      b,#16
 
         ;; Optimise for the case when this side has 8 bits of data or
         ;; less.  This is often the case with support address calls.
         or      a
-        jr      NZ,1$
+        jr      NZ,2$
 
         ld      b,#8
         ld      a,c
@@ -49,11 +48,12 @@ __mul16::
         ;; Taken from z88dk, which originally borrowed from the
         ;; Spectrum rom.
         add     hl,hl
+2$:
         rl      c
         rla                     ;DLE 27/11/98
-        jr      NC,2$
+        jr      NC,3$
         add     hl,de
-2$:
+3$:
         djnz    1$
         ret
 

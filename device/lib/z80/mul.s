@@ -18,30 +18,29 @@ __mulint_rrx_s::
 __muluchar_rrx_hds::
 __mulint_rrx_hds::
 	;; Parameters:
-	;;	HL, DE (left, right irrelevant)
+	;;	hl, de (left, right irrelevant)
 	ld	b,h
 	ld	c,l
 
 	;; 16-bit multiplication
 	;;
 	;; Entry conditions
-	;;   BC = multiplicand
-	;;   DE = multiplier
+	;; bc = multiplicand
+	;; de = multiplier
 	;;
 	;; Exit conditions
-	;;   DE = less significant word of product
+	;; hl = less significant word of product
 	;;
 	;; Register used: AF,BC,DE,HL
 __mul16::
-        ld      l,#0
-        ld      a,b
-        ld      b,#16
+	xor	a,a
+	ld	l,a
+	or	a,b
+	ld	b,#16
 
         ;; Optimise for the case when this side has 8 bits of data or
         ;; less.  This is often the case with support address calls.
-        or      a
         jr      NZ,2$
-
         ld      b,#8
         ld      a,c
 1$:

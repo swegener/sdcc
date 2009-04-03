@@ -1,3 +1,10 @@
+2009-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/mul.s,
+	  device/lib/z80/memmove.s,
+	  device/lib/z80/strlen.s:
+	  Minor improvements, code cleanup and license clarification.
+
 2009-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/mul.s: 

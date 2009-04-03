@@ -1543,10 +1543,10 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
           }
         else
           {
-            /* Swapping register contents within register pair */
-            if(!strcmp(aopGet (aop, offset, FALSE), _pairs[pairId].h))
+            /* Operand resides (partially) in the pair */
+            if(!strcmp(aopGet (aop, offset + 1, FALSE), _pairs[pairId].l))
               {
-                emit2 ("ld a,%s",aopGet (aop, offset + 1, FALSE));
+                emit2 ("ld a,%s", aopGet (aop, offset + 1, FALSE));
                 emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
                 emit2 ("ld %s,a", _pairs[pairId].h);
               }
@@ -5016,7 +5016,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
             }
           else
             {
-              emit2 ("sub %s", aopGet (AOP (right), offset, FALSE));
+              emit2 ("sub a,%s", aopGet (AOP (right), offset, FALSE));
               emit2 ("jp NZ,!tlabel", lbl->key + 100);
             }
           offset++;
@@ -5040,7 +5040,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           emit2 ("; direct compare");
           _emitMove (_pairs[pair].l, aopGet (AOP (left), offset, FALSE));
           _moveA (aopGet (AOP (right), offset, FALSE));
-          emit2 ("sub %s", _pairs[pair].l);
+          emit2 ("sub a,%s", _pairs[pair].l);
           emit2 ("!shortjp NZ,!tlabel", lbl->key + 100);
           offset++;
         }
@@ -6752,10 +6752,9 @@ genUnpackBits (operand * result, int pair)
         {
           /* signed bitfield */
           symbol *tlbl = newiTempLabel (NULL);
-
-          emit2 ("bit %d,a", blen - 1);
+          emit2 ("bit %d,a", blen - 1 - 8);
           emit2 ("jp Z,!tlabel", tlbl->key + 100);
-          emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
+          emit2 ("or a,!immedbyte", (unsigned char) (0xff << (blen - 8)));
           emitLabel (tlbl->key + 100);
         }
       emit2 ("ld h,a");

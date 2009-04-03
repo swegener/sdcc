@@ -1,5 +1,14 @@
 2009-04-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fixed bugs #2728224, #2728218.
+	  src/z80/peeph-z80.def:
+	  Workaround for bug #2728445.
+	  support/regression/tests/memory.c:
+	  Added test for memcmp().
+
+2009-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/z80/mul.s,
 	  device/lib/z80/memmove.s,
 	  device/lib/z80/strlen.s:

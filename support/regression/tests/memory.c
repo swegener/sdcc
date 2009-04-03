@@ -22,6 +22,10 @@ void testmemory(void)
   ASSERT(destination[2] == source[2]);
   ASSERT(destination[3] == 23);
 
+  /* Test memcmp() */
+  memcpy(destination, source, 4);
+  ASSERT(memcmp(destination, source, 4) == 0);
+
   /* Test memmove() */
   memcpy(destination, source, 4);
   memmove(destination, destination + 1, 3);

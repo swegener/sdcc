@@ -1,5 +1,10 @@
 2009-04-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/peeph-z80.def:
+	  Reenabled peephole 0t.
+
+2009-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fixed bugs #2728224, #2728218.
 	  src/z80/peeph-z80.def:

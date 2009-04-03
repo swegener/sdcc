@@ -53,7 +53,7 @@ enum
     DISABLE_PACK_ACC = 0,
     DISABLE_PACK_ASSIGN = 0,
     DISABLE_PACK_ONE_USE = 0,
-    DISABLE_PACK_HL = 1,
+    DISABLE_PACK_HL = 0,
     DISABLE_PACK_IY = 0
   };
 
@@ -2478,14 +2478,18 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
       if (ic->op == LEFT_OP && isOperandLiteral (IC_RIGHT (ic)))
         continue;
 
+      if (ic->op == '+' &&
+	  (isOperandEqual (op, IC_LEFT (ic)) || isOperandEqual (op, IC_RIGHT (ic))))
+        continue;
+
       if ((ic->op == '=' && !POINTER_SET(ic)) ||
           ic->op == UNARYMINUS ||
-          ic->op == '+' ||
           ic->op == '-' ||
           ic->op == '>' ||
           ic->op == '<' ||
           ic->op == EQ_OP ||
-          0)
+          (ic->op == '+' && getSize (operandType (IC_RESULT (ic))) == 1))
+          /* 16 bit addition uses add hl, rr */
         continue;
 
       if (ic->op == '*' && isOperandEqual (op, IC_LEFT (ic)))

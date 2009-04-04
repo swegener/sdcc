@@ -62,8 +62,16 @@ replace restart {
 	ld	a,%3 (%1)
 } by {
 	; peephole 0d loaded %2 into a directly instead of going through %1.
-	ld	a,(#%2+%3)
+	ld	a,(#%2 + %3)
 } if notUsed(%1)
+
+replace restart {
+	ld	hl,#%1 + %2
+	ld	a, (hl)
+} by {
+	; peephole 0d' loaded %2 into a directly instead of going through %1.
+	ld	a, (#%1 + %2)
+} if notUsed('hl')
 
 replace restart {
 	srl	%1
@@ -403,12 +411,23 @@ replace restart {
 
 replace restart {
 	ld	iy,#%1
-	ld	%2,%3 (%4)
+	ld	%2,%3 (iy)
 } by {
 	; peephole 0ze used hl instead of iy.
 	ld	hl,#%1 + %3
 	ld	%2,(hl)
 } if notUsed('iy'), notUsed('hl')
+
+replace restart {
+	ld	iy,#%1
+	ld	%2 (iy),%3
+	ld	l,%2 (iy)
+} by {
+	; peephole 0ze' used hl instead of iy.
+	ld	hl,#%1 + %2
+	ld	(hl),%3
+	ld	l,(hl)
+} if notUsed('iy'), notUsed('h')
 
 replace restart {
 	ld	iy,#%1

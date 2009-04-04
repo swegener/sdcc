@@ -1,3 +1,11 @@
+2009-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Improved caching of pointers in hl and iy.
+	  device/lib/z80/div.s:
+	  Applied patch #2727917 from Marco Bodrato.
+
 2009-04-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.c:

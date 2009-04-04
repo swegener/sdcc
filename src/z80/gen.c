@@ -1385,7 +1385,8 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
     {
       if (pairId == PAIR_HL || pairId == PAIR_IY)
         {
-          if (_G.pairs[pairId].last_type == AOP_IMMD && left->type == AOP_IMMD)
+          if ((_G.pairs[pairId].last_type == AOP_IMMD && left->type == AOP_IMMD) ||
+            (_G.pairs[pairId].last_type == AOP_IY && left->type == AOP_IY))
             {
               if (_G.pairs[pairId].base && !strcmp (_G.pairs[pairId].base, base))
                 {
@@ -1680,6 +1681,14 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
       wassert (0);
     }
   _G.pairs[pairId].last_type = aop->type;
+}
+
+/* Can be used for local labels where Code generation takes care of spilling */
+static void
+emitLabelNoSpill (int key)
+{
+  emit2 ("!tlabeldef", key);
+  _G.lines.current->isLabel = 1;
 }
 
 static void
@@ -3629,7 +3638,7 @@ genPlusIncr (iCode * ic)
               emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
             }
         }
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
       return TRUE;
     }
 
@@ -3681,7 +3690,7 @@ outBitAcc (operand * result)
     {
       emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
       emit2 ("ld a,!one");
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
       outAcc (result);
     }
 }
@@ -4287,11 +4296,11 @@ genMultOneChar (iCode * ic)
   emit2 ("ld l,#0x00");
   emit2 ("ld d,l");
   emit2 ("ld b,#0x08");
-  emitLabel (tlbl1->key + 100);
+  emitLabelNoSpill (tlbl1->key + 100);
   emit2 ("add hl,hl");
   emit2 ("jp NC,!tlabel", tlbl2->key + 100);
   emit2 ("add hl,de");
-  emitLabel (tlbl2->key + 100);
+  emitLabelNoSpill (tlbl2->key + 100);
   emit2 ("djnz !tlabel", tlbl1->key + 100);
 
   spillPair(PAIR_HL);
@@ -5064,7 +5073,7 @@ gencjne (operand * left, operand * right, symbol * lbl)
   emit2 ("!shortjp !tlabel", tlbl->key + 100);
   emitLabel (lbl->key + 100);
   emit2 ("xor a,a");
-  emitLabel (tlbl->key + 100);
+  emitLabelNoSpill (tlbl->key + 100);
   _pop (pop);
 }
 
@@ -5110,7 +5119,7 @@ genCmpEq (iCode * ic, iCode * ifx)
             {
               _pop (pop);
               emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
-              emitLabel (tlbl->key + 100);
+              emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);
             }
           else
@@ -5119,10 +5128,10 @@ genCmpEq (iCode * ic, iCode * ifx)
               symbol *lbl = newiTempLabel (NULL);
               _pop (pop);
               emit2 ("!shortjp !tlabel", lbl->key + 100);
-              emitLabel (tlbl->key + 100);
+              emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);
               emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
-              emitLabel (lbl->key + 100);
+              emitLabelNoSpill (lbl->key + 100);
             }
         }
       /* mark the icode as generated */
@@ -5217,7 +5226,7 @@ genAndOp (iCode * ic)
       _toBoolean (left);
       emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
       _toBoolean (right);
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
       outBitAcc (result);
     }
 
@@ -5254,7 +5263,7 @@ genOrOp (iCode * ic)
       _toBoolean (left);
       emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
       _toBoolean (right);
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
       outBitAcc (result);
     }
 
@@ -5296,14 +5305,14 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
     {
       symbol *nlbl = newiTempLabel (NULL);
       emit2 ("jp !tlabel", nlbl->key + 100);
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
       emit2 ("jp !tlabel", IC_TRUE (ic)->key + 100);
-      emitLabel (nlbl->key + 100);
+      emitLabelNoSpill (nlbl->key + 100);
     }
   else
     {
       emit2 ("jp !tlabel", IC_FALSE (ic)->key + 100);
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
     }
   ic->generated = 1;
 }
@@ -5987,7 +5996,7 @@ shiftR2Left2Result (operand * left, int offl,
     {
       emit2 ("ld a,!immedbyte", shCount);
 
-      emitLabel (tlbl->key + 100);
+      emitLabelNoSpill (tlbl->key + 100);
 
       emitRsh2 (AOP (result), size, is_signed);
 
@@ -6061,7 +6070,7 @@ shiftL2Left2Result (operand * left, int offl,
           {
             emit2 ("ld a,!immedbyte+1", shCount);
             emit2 ("!shortjp !tlabel", tlbl1->key + 100);
-            emitLabel (tlbl->key + 100);
+            emitLabelNoSpill (tlbl->key + 100);
           }
 
         while (size--)
@@ -6081,7 +6090,7 @@ shiftL2Left2Result (operand * left, int offl,
           }
         if (shCount > 1)
           {
-            emitLabel (tlbl1->key + 100);
+            emitLabelNoSpill (tlbl1->key + 100);
             emit2 ("dec a");
             emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
           }
@@ -6400,7 +6409,7 @@ genLeftShift (iCode * ic)
      _pop (PAIR_AF);
 
   emit2 ("!shortjp !tlabel", tlbl1->key + 100);
-  emitLabel (tlbl->key + 100);
+  emitLabelNoSpill (tlbl->key + 100);
   l = aopGet (AOP (result), offset, FALSE);
 
   while (size--)
@@ -6417,7 +6426,7 @@ genLeftShift (iCode * ic)
         }
       offset++;
     }
-  emitLabel (tlbl1->key + 100);
+  emitLabelNoSpill (tlbl1->key + 100);
   emit2 ("dec a");
   emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
 
@@ -6675,7 +6684,7 @@ genRightShift (iCode * ic)
      _pop (PAIR_AF);
 
   emit2 ("!shortjp !tlabel", tlbl1->key + 100);
-  emitLabel (tlbl->key + 100);
+  emitLabelNoSpill (tlbl->key + 100);
   while (size--)
     {
       l = aopGet (AOP (result), offset--, FALSE);
@@ -6689,7 +6698,7 @@ genRightShift (iCode * ic)
           emit2 ("rr %s", l);
         }
     }
-  emitLabel (tlbl1->key + 100);
+  emitLabelNoSpill (tlbl1->key + 100);
   emit2 ("dec a");
   emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
 
@@ -6732,7 +6741,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("bit %d,a", blen - 1);
           emit2 ("jp Z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
-          emitLabel (tlbl->key + 100);
+          emitLabelNoSpill (tlbl->key + 100);
         }
       aopPut (AOP (result), "a", offset++);
       goto finish;
@@ -6755,7 +6764,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("bit %d,a", blen - 1 - 8);
           emit2 ("jp Z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << (blen - 8)));
-          emitLabel (tlbl->key + 100);
+          emitLabelNoSpill (tlbl->key + 100);
         }
       emit2 ("ld h,a");
       spillPair (PAIR_HL);
@@ -6788,7 +6797,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("bit %d,a", rlen - 1);
           emit2 ("jp Z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << rlen));
-          emitLabel (tlbl->key + 100);
+          emitLabelNoSpill (tlbl->key + 100);
         }
       aopPut (AOP (result), "a", offset++);
     }

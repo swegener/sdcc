@@ -198,63 +198,47 @@ __divu16::
         ld      a,e
         or      d
         jr      NZ,.divide      ; Branch if divisor is non-zero
-        ld      bc,#0x00        ; Divide by zero error
-        ld      d,b
-        ld      e,c
+        ld      b,d             ; Divide by zero error: D=E=0
+        ld      c,e
         scf                     ; Set carry, invalid result
         ret
 .divide:
         ld      hl,#0
-;       ld      l,c             ; L = low byte of dividend/quotient
-;       ld      h,b             ; H = high byte of dividend/quotient
-;       ld      bc,#0x00        ; BC = remainder
-        or      a               ; Clear carry to start
-        ex      af,af'
-        ld      a,#16           ; 16 bits in dividend
+        ld      a,b
+        ld      b,#16           ; 16 bits in dividend
 .dvloop:
+        ;; Cleaned up on April 2009 by Marco Bodrato(http://bodrato.it/ )
         ;; Shift next bit of quotient into bit 0 of dividend
         ;; Shift next MSB of dividend into LSB of remainder
-        ;; BC holds both dividend and quotient. While we shift a bit from
+        ;; AC holds both dividend and quotient. While we shift a bit from
         ;;  MSB of dividend, we shift next bit of quotient in from carry
         ;; HL holds remainder
-        ;; Do a 32-bit left shift, shifting carry to L, L to H,
-        ;;  H to C, C to B
-        ex      af,af'
+        ;; Do a 32-bit left shift, shifting carry to C, C to A,
+        ;;  A to HL
         rl      c               ; Carry (next bit of quotient) to bit 0
-        rl      b               ; Clears carry since BC was 0
-        adc     hl,hl
+        rla
+        adc     hl,hl           ; HL < 32768 before, no carry, ever.
 
         ;; If remainder is >= divisor, next bit of quotient is 1. This
         ;;  bit goes to carry
-        push    hl              ; Save current remainder
         sbc     hl,de
-;       ld      a,c             ; Substract divisor from remainder
-;       sbc     e
-;       ld      c,a
-;       ld      a,b
-;       sbc     d
-;       ld      b,a
+        jr      NC,.nodrop      ; Jump if remainder is >= dividend
+        add     hl,de           ; Otherwise, restore remainder
+	;; The add above sets the carry, because sbc hl,de did set it.
+.nodrop:
         ccf                     ; Complement borrow so 1 indicates a
                                 ;  successful substraction (this is the
                                 ;  next bit of quotient)
-        jr      C,.drop         ; Jump if remainder is >= dividend
-        pop     hl              ; Otherwise, restore remainder
-        jr      .nodrop
-.drop:
-        inc     sp
-        inc     sp
-.nodrop:
-        ex      af,af'
-        dec     a               ; DEC does not affect carry flag
-        jp      NZ,.dvloop
-        ex      af,af'
+        djnz    .dvloop
         ;; Shift last carry bit into quotient
-        ld      d,h             ; DE = remainder
-        ld      e,l
-        rl      c               ; Carry to L
-;       ld      c,l             ; C = low byte of quotient
-        rl      b
-;       ld      b,h             ; B = high byte of quotient
-        or      a               ; Clear carry, valid result
+        ex      de,hl           ; DE = remainder, HL = divisor...
+        ;; HL does not contain remainder, it contains the divisor!
+        ; ld      d,h             ; DE = remainder
+        ; ld      e,l
+        rl      c               ; Carry to C
+        rla
+        ld      b,a             ; BC = quotient
+        ;; Carry now contains the same value it contained before
+        ;; entering .dvloop[*]: "0" = valid result.
         ret
 

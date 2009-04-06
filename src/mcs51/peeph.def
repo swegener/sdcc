@@ -4663,13 +4663,13 @@ replace {
 } if notVolatile(%1)
 
 //accessing struct/array on stack
-replace {
-	add	a,#%1
-	add	a,#%2
-} by {
-	;	Peephole 270	removed redundant add
-	add	a,#%1+%2
-}
+//replace {
+//	add	a,#%1
+//	add	a,#%2
+//} by {
+//	;	Peephole 270	removed redundant add (carry might differ, bug 2736282)
+//	add	a,#%1+%2
+//}
 
 replace {
 	jz	%1

@@ -1,3 +1,7 @@
+2009-04-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: disabled rule 270, fixing bug #2736282
+
 2009-04-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

@@ -10,11 +10,9 @@ __moduchar_rrx_s::
 
         ;; Fall through
 __moduchar_rrx_hds::
-        ld      c,l
         call    __divu8
 
-        ld      l,e
-        ld      h,d
+        ex      de,hl
 
         ret
 
@@ -33,13 +31,9 @@ __moduint_rrx_s::
         ;; Fall through
 
 __moduint_rrx_hds::
-        ld      b,h
-        ld      c,l
-
         call    __divu16
 
-        ld      l,e
-        ld      h,d
+        ex      de,hl
 
         ret
 
@@ -50,17 +44,16 @@ __moduschar_rrx_s::
         ld      e,(hl)
         ld      d, #0
         dec     hl
-        ld      c,(hl)
+        ld      l,(hl)
 
-        ld      a,c             ; Sign extend
+        ld      a,l             ; Sign extend
         rlca
         sbc     a
-        ld      b,a
+        ld      h,a
 
         call    __div16
 
-        ld      l,e
-        ld      h,d
+        ex      de,hl
 
         ret
 

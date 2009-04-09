@@ -1,3 +1,14 @@
+2009-04-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/mod.s,
+	  device/lib/z80/Makefile.in,
+	  device/lib/z80/div.s,
+	  device/lib/z80/modsigned.s,
+	  device/lib/z80/divsigned.s:
+	  Applied patch #2741451 from Marco Bodrato
+	  and moved functions for signed modulo into
+	  separate file.
+
 2009-04-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: disabled rule 270, fixing bug #2736282

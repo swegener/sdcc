@@ -10,7 +10,7 @@
 	  device/lib/pic16/libsdcc/float/fsdiv.c,
 	  device/lib/pic16/libsdcc/float/fsmul.c: fixed pic14 libraries, merge
 	  changes from the pic16 port, minor code cleanup
-	* src/pic/gen.c: implemented genUminusFloat()
+	* src/pic/gen.c: implemented genUminusFloat(), fixed warning and style
 
 2009-04-09 Philipp Klaus Krause <pkk AT spth.de>
 

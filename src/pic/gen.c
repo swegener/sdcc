@@ -1617,25 +1617,26 @@ release:
 /*-----------------------------------------------------------------*/
 /* genUminusFloat - unary minus for floating points                */
 /*-----------------------------------------------------------------*/
-static void genUminusFloat(operand *op,operand *result)
+static void
+genUminusFloat(operand *op, operand *result)
 {
-    int size ,offset =0 ;
-    char *l;
+  int size;
 
-    FENTRY;
+  FENTRY;
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    /* for this we just need to flip the
-    first it then copy the rest in place */
-    size = AOP_SIZE(op) - 1;
+  DEBUGpic14_emitcode("; ***", "%s  %d", __FUNCTION__, __LINE__);
+  /* for this we just need to flip the
+     first it then copy the rest in place */
+  size = AOP_SIZE(op) - 1;
 
-    mov2w_op(op, size);
-    emitpcode(POC_XORLW, popGetLit(0x80));
-    movwf(AOP(result), size);
+  mov2w_op(op, size);
+  emitpcode(POC_XORLW, popGetLit(0x80));
+  movwf(AOP(result), size);
 
-    while(size--) {
-        mov2w_op(op, size);
-        movwf(AOP(result), size);
+  while (size--)
+    {
+      mov2w_op(op, size);
+      movwf(AOP(result), size);
     } // while
 }
 

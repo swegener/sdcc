@@ -32,8 +32,8 @@ union float_long
 float __fsmul (float a1, float a2) _FS_REENTRANT
 {
   volatile union float_long fl1, fl2;
-  volatile unsigned long result;
-  volatile int exp;
+  unsigned long result;
+  int exp;
   char sign;
   
   fl1.f = a1;

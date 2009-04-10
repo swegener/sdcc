@@ -31,7 +31,7 @@ union float_long
 float __ulong2fs (unsigned long a ) _FS_REENTRANT
 {
   int exp = 24 + EXCESS;
-  FS_STATIC volatile union float_long fl;
+  volatile union float_long fl;
 
   if (!a)
     {

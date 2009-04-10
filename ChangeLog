@@ -1,3 +1,17 @@
+2009-04-10 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/libsdcc/fs2ulong.c, device/lib/pic/libsdcc/fsadd.c,
+	  device/lib/pic/libsdcc/fsdiv.c, device/lib/pic/libsdcc/fseq.c,
+	  device/lib/pic/libsdcc/fsgt.c, device/lib/pic/libsdcc/fslt.c,
+	  device/lib/pic/libsdcc/fsmul.c, device/lib/pic/libsdcc/fsneq.c,
+	  device/lib/pic/libsdcc/fssub.c, device/lib/pic/libsdcc/ulong2fs.c,
+	  device/lib/pic16/libsdcc/float/fs2ulong.c,
+	  device/lib/pic16/libsdcc/float/fsadd.c,
+	  device/lib/pic16/libsdcc/float/fsdiv.c,
+	  device/lib/pic16/libsdcc/float/fsmul.c: fixed pic14 libraries, merge
+	  changes from the pic16 port, minor code cleanup
+	* src/pic/gen.c: implemented genUminusFloat()
+
 2009-04-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/mod.s,

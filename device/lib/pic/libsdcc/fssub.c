@@ -31,7 +31,7 @@ union float_long
 /* subtract two floats */
 float __fssub (float a1, float a2) _FS_REENTRANT
 {
-  FS_STATIC volatile union float_long fl1, fl2;
+  volatile union float_long fl1, fl2;
 
   fl1.f = a1;
   fl2.f = a2;

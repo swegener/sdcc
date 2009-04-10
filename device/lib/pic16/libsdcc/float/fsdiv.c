@@ -32,10 +32,10 @@ union float_long
 float __fsdiv (float a1, float a2) _FS_REENTRANT
 {
   volatile union float_long fl1, fl2;
-  volatile long result;
-  volatile unsigned long mask;
-  volatile long mant1, mant2;
-  volatile int exp;
+  long result;
+  unsigned long mask;
+  long mant1, mant2;
+  int exp;
   char sign;
 
   fl1.f = a1;

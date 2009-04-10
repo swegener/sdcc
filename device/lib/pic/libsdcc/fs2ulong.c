@@ -31,9 +31,9 @@ union float_long
 /* convert float to unsigned long */
 unsigned long __fs2ulong (float a1) _FS_REENTRANT
 {
-  FS_STATIC volatile union float_long fl1;
+  volatile union float_long fl1;
   int exp;
-  long l;
+  unsigned long l;
   
   fl1.f = a1;
   

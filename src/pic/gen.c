@@ -1628,19 +1628,15 @@ static void genUminusFloat(operand *op,operand *result)
     /* for this we just need to flip the
     first it then copy the rest in place */
     size = AOP_SIZE(op) - 1;
-    l = aopGet(AOP(op),3,FALSE,FALSE);
 
-    MOVA(l);
-
-    pic14_emitcode("cpl","acc.7");
-    aopPut(AOP(result),"a",3);
+    mov2w_op(op, size);
+    emitpcode(POC_XORLW, popGetLit(0x80));
+    movwf(AOP(result), size);
 
     while(size--) {
-        aopPut(AOP(result),
-            aopGet(AOP(op),offset,FALSE,FALSE),
-            offset);
-        offset++;
-    }
+        mov2w_op(op, size);
+        movwf(AOP(result), size);
+    } // while
 }
 
 /*-----------------------------------------------------------------*/

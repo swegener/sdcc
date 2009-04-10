@@ -31,11 +31,11 @@ union float_long
 /* divide two floats */
 float __fsdiv (float a1, float a2) _FS_REENTRANT
 {
-  FS_STATIC volatile union float_long fl1, fl2;
+  volatile union float_long fl1, fl2;
   long result;
   unsigned long mask;
   long mant1, mant2;
-  int exp ;
+  int exp;
   char sign;
 
   fl1.f = a1;

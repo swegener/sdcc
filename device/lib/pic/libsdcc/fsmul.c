@@ -31,7 +31,7 @@ union float_long
 /* multiply two floats */
 float __fsmul (float a1, float a2) _FS_REENTRANT
 {
-  FS_STATIC volatile union float_long fl1, fl2;
+  volatile union float_long fl1, fl2;
   unsigned long result;
   int exp;
   char sign;
@@ -55,7 +55,7 @@ float __fsmul (float a1, float a2) _FS_REENTRANT
   result += ((fl1.l & (unsigned long) 0xFF) * (fl2.l >> 8)) >> 8;
   result += ((fl2.l & (unsigned long) 0xFF) * (fl1.l >> 8)) >> 8;
 
-  if (0 != (result & SIGNBIT))
+  if (result & SIGNBIT)
     {
       /* round */
       result += 0x80;

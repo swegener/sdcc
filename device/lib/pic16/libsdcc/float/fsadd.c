@@ -29,10 +29,10 @@ union float_long
 /* add two floats */
 float __fsadd (float a1, float a2) _FS_REENTRANT
 {
-  volatile long mant1, mant2;
   volatile union float_long fl1, fl2;
-  volatile int exp1, exp2;
-  volatile unsigned long sign = 0;
+  long mant1, mant2;
+  int exp1, exp2;
+  unsigned long sign = 0;
 
   fl1.f = a1;
   fl2.f = a2;

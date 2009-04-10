@@ -29,8 +29,8 @@ union float_long
 /* add two floats */
 float __fsadd (float a1, float a2) _FS_REENTRANT
 {
-  FS_STATIC volatile union float_long fl1, fl2;
-  unsigned long mant1, mant2;
+  volatile union float_long fl1, fl2;
+  long mant1, mant2;
   int exp1, exp2;
   unsigned long sign = 0;
 
@@ -70,7 +70,7 @@ float __fsadd (float a1, float a2) _FS_REENTRANT
     }
   mant1 += mant2;
 
-  if ((long)mant1 < 0)
+  if (mant1 < 0)
     {
       mant1 = -mant1;
       sign = SIGNBIT;
@@ -85,7 +85,7 @@ float __fsadd (float a1, float a2) _FS_REENTRANT
   }
 
   /* round off */
-  while (0 != (mant1 & 0xff000000)) {
+  while (mant1 & 0xff000000) {
     if (mant1&1)
       mant1 += 2;
     mant1 >>= 1 ;

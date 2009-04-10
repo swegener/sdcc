@@ -28,14 +28,12 @@ union float_long
   long l;
 };
 
-#define volatile
-
 /* convert float to unsigned long */
 unsigned long __fs2ulong (float a1) _FS_REENTRANT
 {
   volatile union float_long fl1;
-  volatile int exp;
-  volatile long l;
+  int exp;
+  unsigned long l;
   
   fl1.f = a1;
   

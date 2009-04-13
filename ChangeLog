@@ -1,3 +1,9 @@
+2009-04-13 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in: remove abspath for PORTDIR, introduced in
+	  svn revision #5341, since it makes asranlib to fail on cygming and
+	  mingw builds: win32 native asranlib doesn't understand cygwin paths.
+
 2009-04-10 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic/libsdcc/fs2ulong.c, device/lib/pic/libsdcc/fsadd.c,

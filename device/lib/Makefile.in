@@ -8,7 +8,6 @@ VERSIONLO       = @VERSIONLO@
 VERSIONP        = @VERSIONP@
 
 SHELL           = /bin/sh
-CPP             = @CPP@
 INSTALL         = @INSTALL@
 CP              = @CP@
 
@@ -55,7 +54,7 @@ BUILDDIR        = build
 # Default
 PORT            = z80
 ifndef PORTDIR
-PORTDIR         = $(abspath $(BUILDDIR)/$(PORT))
+PORTDIR         = $(BUILDDIR)/$(PORT)
 endif
 
 OPT_DISABLE_AVR   = @OPT_DISABLE_AVR@
@@ -214,14 +213,14 @@ models:
 small-mcs51-stack-auto:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  mkdir -p small-stack-auto; cp small/Makefile small-stack-auto; \
-	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small-stack-auto PORTDIR=$(abspath $(BUILDDIR)/small-stack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small-stack-auto PORTDIR=$(BUILDDIR)/small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-mcs51-stack-auto:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    mkdir -p $${model}-stack-auto; cp $${model}/Makefile $${model}-stack-auto; \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$${model}-stack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-stack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$${model}-stack-auto PORTDIR=$(BUILDDIR)/$${model}-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
@@ -229,7 +228,7 @@ model-mcs51-xstack-auto:
 	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    mkdir -p $${model}-xstack-auto; cp $${model}/Makefile $${model}-xstack-auto; \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack -DUSE_FLOATS=1" PORT=$${model}-xstack-auto PORTDIR=$(abspath $(BUILDDIR)/$${model}-xstack-auto) PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack -DUSE_FLOATS=1" PORT=$${model}-xstack-auto PORTDIR=$(BUILDDIR)/$${model}-xstack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 

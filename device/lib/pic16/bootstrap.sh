@@ -3,5 +3,4 @@
 aclocal
 autoheader
 autoconf
-automake -a --foreign
-
+automake -a -c -f --foreign

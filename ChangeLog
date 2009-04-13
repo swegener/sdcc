@@ -1,3 +1,9 @@
+2009-04-13 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/bootstrap.sh: avoid symlinks
+	* device/lib/pic16/configure.ac,
+	  device/lib/pic16/configure.gnu: removed obsolete configure-wrapper
+
 2009-04-13 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in: remove abspath for PORTDIR, introduced in

@@ -1,13 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-#
-# The (generated) configure script should be called with
-#     --build=<your-build-system> --target=pic16
-# to force cross-compilation mode; rather use the wrapper
-# ./configure.gnu instead of ./configure directly.
-#
-
 AC_PREREQ(2.61)
 AC_INIT([pic16lib], [0.3], [tecodev AT users sourceforge net])
 AM_INIT_AUTOMAKE

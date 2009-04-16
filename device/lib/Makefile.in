@@ -322,15 +322,9 @@ $(PORT):
 	mkdir -p $(PORT)
 
 port-specific-objects:
-ifneq ($(LIB_TYPE), LIB)
 	-if [ -f $(PORT)/Makefile ]; then \
 	  $(MAKE) -C $(PORT) PORT=$(PORT); \
 	fi
-else
-	-if [ -f $(PORT)/Makefile ]; then \
-	  $(MAKE) -C $(PORT) PORT=$(PORT); \
-	 fi
-endif
 
 port-specific-objects-pic16:
 	-if [ -f $(PORT)/Makefile ]; then \

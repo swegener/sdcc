@@ -1,3 +1,10 @@
+2009-04-13 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in, device/lib/ds390/Makefile.in,
+	  device/lib/ds400/Makefile.in, device/lib/gbz80/Makefile.in,
+	  device/lib/hc08/Makefile.in, device/lib/mcs51/Makefile.in,
+	  device/lib/z80/Makefile.in: override PORTDIR in sub-makefiles
+
 2009-04-13 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/bootstrap.sh: avoid symlinks

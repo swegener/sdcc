@@ -11,7 +11,8 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mz80
 SAS = $(TOPDIR)/bin/as-z80
 
-PORTDIR = ../build/z80
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/z80
 
 include $(srcdir)/../incl.mk
 

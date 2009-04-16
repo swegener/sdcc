@@ -8,7 +8,8 @@ LIB_TYPE     = @LIB_TYPE@
 SAS = $(top_builddir)/bin/asx8051
 SCC = $(top_builddir)/bin/sdcc
 
-PORTDIR = ../build/$(PORT)
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/$(PORT)
 
 OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel crtxstack.rel \
       crtpagesfr.rel crtbank.rel crtcall.rel

@@ -11,7 +11,8 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mhc08
 SAS = $(TOPDIR)/bin/as6808
 
-PORTDIR = ../build/hc08
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/hc08
 
 include $(srcdir)/../incl.mk
 

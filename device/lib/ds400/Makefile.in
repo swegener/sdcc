@@ -6,7 +6,8 @@ LIB_TYPE     = @LIB_TYPE@
 
 CC = ../../../bin/sdcc
 
-PORTDIR = ../build/ds400
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/ds400
 
 #VERBOSE = --verbose
 

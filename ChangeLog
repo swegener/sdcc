@@ -1,3 +1,13 @@
+2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/strtok.c,
+	  support/regression/tests/strstr.c,
+	  support/regression/tests/strspn.c,
+	  support/regression/tests/strncmp.c,
+	  support/regression/tests/strcpy.c,
+	  support/regression/tests/strcmp.c:
+	  Added some regression tests by Ruud van Silfhout from patch #2321830.
+
 2009-04-13 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in, device/lib/ds390/Makefile.in,

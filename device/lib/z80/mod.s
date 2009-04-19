@@ -17,19 +17,14 @@ __moduchar_rrx_hds::
         ret
 
 __moduint_rrx_s::
-        ld      hl,#2+3
-        add     hl,sp
+        pop     af
+        pop     hl
+        pop     de
+        push    de
+        push    hl
+        push    af
 
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
-        ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
         ;; Fall through
-
 __moduint_rrx_hds::
         call    __divu16
 
@@ -39,10 +34,10 @@ __moduint_rrx_hds::
 
 __moduschar_rrx_s::
         ld      hl,#2+1
+        ld      d, h
         add     hl,sp
 
         ld      e,(hl)
-        ld      d, #0
         dec     hl
         ld      l,(hl)
 

@@ -7,12 +7,12 @@
 ; still called from some asm files in this directory.
 __muluchar_rrx_s::
         ld      hl, #2+1
+        ld      d, h
         add     hl, sp
         ld      e, (hl)
         dec     hl
         ld      h, (hl)
-        ld      l, #0
-        ld      d, l
+        ld      l, d
         ld      b, #8
 muluchar_rrx_s_loop:
         add     hl, hl
@@ -26,22 +26,22 @@ muluchar_rrx_s_noadd:
 
 __mulsuchar_rrx_s::
         ld      hl,#2+1
+        ld      b, h
         add     hl,sp
 
         ld      e,(hl)
         dec     hl
         ld      c,(hl)
-        ld      b, #0
         jr      signexte
 
 __muluschar_rrx_s::
-        ld      hl,#2+1
+        ld      hl,#2
+        ld      b, h
         add     hl,sp
 
-        ld      c,(hl)
-        ld      b, #0
-        dec     hl
         ld      e,(hl)
+        inc     hl
+        ld      c,(hl)
         jr      signexte
 
 ;; Originally from GBDK by Pascal Felber.

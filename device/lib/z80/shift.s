@@ -3,83 +3,73 @@ __rrulong_rrx_s::
         ld      hl,#2+4
         add     hl,sp
 
-        ld      c,(hl)
-        dec     hl
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
         ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
-
-        ld      a,c
-1$:
         or      a,a
+	pop     bc
+	pop     hl
+	pop     de
+	push    de
+	push    hl
+	push    bc
         ret     Z
-
-        rr      d
-        rr      e
-        rr      h
+        ld      b,a
+        ld      a,e
+1$:
+        srl     d
+        rra
+        rr	h
         rr      l
 
-        dec     a
-        jp      1$
+        djnz    1$
+        ld      e,a
+        ret
 
 __rrslong_rrx_s::
         ld      hl,#2+4
         add     hl,sp
 
-        ld      c,(hl)
-        dec     hl
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
         ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
-
-        ld      a,c
-1$:
         or      a,a
+	pop     bc
+	pop     hl
+	pop     de
+	push    de
+	push    hl
+	push    bc
         ret     Z
-
+        ld      b,a
+        ld      a,e
+2$:
         sra     d
-        rr      e
-        rr      h
+        rra
+        rr	h
         rr      l
 
-        dec     a
-        jp      1$
+        djnz    2$
+        ld      e,a
+        ret
 
 __rlslong_rrx_s::
 __rlulong_rrx_s::
         ld      hl,#2+4
         add     hl,sp
 
-        ld      c,(hl)
-        dec     hl
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
         ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
-
-        ld      a,c
-1$:
         or      a,a
+	pop     bc
+	pop     hl
+	pop     de
+	push    de
+	push    hl
+	push    bc
         ret     Z
+        ld      b,a
+        ld      a,e
+3$:
+        add     hl,hl
+        rla
+        rl	d
 
-        rl      l
-        rl      h
-        rl      e
-        rl      d
-
-        dec     a
-        jp      1$
+        djnz    3$
+        ld      e,a
+        ret

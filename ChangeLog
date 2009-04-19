@@ -1,4 +1,14 @@
 2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
+	* device/lib/z80/shift.s,
+	  device/lib/z80/memmove.s,
+	  device/lib/z80/mul.s,
+	  device/lib/z80/mulchar.s,
+	  device/lib/z80/div.s,
+	  device/lib/z80/mod.s:
+	  Applied patch #2762516 from Marco Bodrato containing minor
+	  improvementsof many Z80 asm routines.
+
+2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/strtok.c,
 	  support/regression/tests/strstr.c,

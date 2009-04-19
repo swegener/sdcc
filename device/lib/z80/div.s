@@ -39,10 +39,10 @@ __modsuchar_rrx_s::
 
 __divuschar_rrx_s::
         ld      hl,#2+1
+        ld      d, h
         add     hl,sp
 
         ld      e,(hl)
-        ld      d, #0
         dec     hl
         ld      l,(hl)
 
@@ -228,4 +228,3 @@ __divu16::
         ld      e,c             ; DE = quotient, HL = remainder
         ex      de,hl           ; HL = quotient, DE = remainder
         ret
-

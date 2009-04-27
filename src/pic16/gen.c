@@ -8199,7 +8199,7 @@ static void genNearPointerGet (operand *left,
 
 #if 1
     if(IS_BITFIELD( retype )
-      && (SPEC_BLEN(operandType(result))==1)
+      && (SPEC_BLEN(retype)==1)
     ) {
       iCode *nextic;
       pCodeOp *jop;
@@ -8224,8 +8224,8 @@ static void genNearPointerGet (operand *left,
             /* everything is ok then */
             /* find a way to optimize the genIfx iCode */
 
-            bytestrt = SPEC_BSTR(operandType(result))/8;
-            bitstrt = SPEC_BSTR(operandType(result))%8;
+            bytestrt = SPEC_BSTR(retype)/8;
+            bitstrt = SPEC_BSTR(retype)%8;
 
             jop = pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bitstrt);
 

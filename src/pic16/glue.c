@@ -1399,9 +1399,9 @@ void pic16_emitConfigRegs(FILE *of)
 
         for(i=0;i<=(pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart);i++)
                 if(pic16->cwInfo.crInfo[i].emit)        //mask != -1)
-                        fprintf (of, "\t__config 0x%x, 0x%hhx\n",
+                        fprintf (of, "\t__config 0x%x, 0x%02x\n",
                                 pic16->cwInfo.confAddrStart+i,
-                                pic16->cwInfo.crInfo[i].value);
+                                (unsigned char) pic16->cwInfo.crInfo[i].value);
 }
 
 void pic16_emitIDRegs(FILE *of)
@@ -1410,9 +1410,9 @@ void pic16_emitIDRegs(FILE *of)
 
         for(i=0;i<=(pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart);i++)
                 if(pic16->idInfo.irInfo[i].emit)
-                        fprintf (of, "\t__idlocs 0x%06x, 0x%hhx\n",
+                        fprintf (of, "\t__idlocs 0x%06x, 0x%02x\n",
                                 pic16->idInfo.idAddrStart+i,
-                                pic16->idInfo.irInfo[i].value);
+                                (unsigned char) pic16->idInfo.irInfo[i].value);
 }
 
 

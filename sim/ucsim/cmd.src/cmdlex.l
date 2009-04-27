@@ -1,4 +1,5 @@
 %{
+#include <stdio.h>
 #include "cmdlexcl.h"
 #include "cmdpars.h"
 

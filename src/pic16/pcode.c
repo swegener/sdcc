@@ -3977,7 +3977,7 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
 
   pcop->name = NULL;
   //if(lit>=0)
-    sprintf(s,"0x%02hhx", (unsigned char)lit);
+    sprintf(s,"0x%02x", (unsigned char) lit);
   //else
   //  sprintf(s, "%i", lit);
 

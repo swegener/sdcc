@@ -1,3 +1,20 @@
+2009-04-27 Borut Razem <borut.razem AT siol.net>
+
+	* fixed GCC 4.4.0 mingw compilation:
+	* sim/ucsim/cmd.src/cmdlex.l: added #include <stdio.h>
+	* support/cpp/sdcpp-opts.c: fixed warning:
+	  unknown conversion type character 'm' in format,
+	  use strerror(errno) instead of %m glibc extension format specifier
+	* src/SDCCsymt.c: fixed warning:
+	  suggest parentheses around operand of '!' or change '&' to '&&' or
+	  '!' to '~'
+	* src/pic16/pcode.c, src/pic16/glue.c: fixed warning:
+	  unknown conversion type character 'h' in format,
+	  replaced hh printf format specifier with parameter casting to
+	  unsigned char
+
+support\cpp\sdcpp-opts.c
+
 2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/z80/shift.s,
 	  device/lib/z80/memmove.s,

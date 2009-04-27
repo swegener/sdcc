@@ -564,7 +564,7 @@ sdcpp_common_post_options (const char **pfilename)
 
   if (out_stream == NULL)
     {
-      fatal_error ("opening output file %s: %m", out_fname);
+      fatal_error ("opening output file %s: %s", out_fname, strerror(errno));
       return false;
     }
 
@@ -641,7 +641,7 @@ sdcpp_common_finish (void)
 	{
 	  deps_stream = fopen (deps_file, deps_append ? "a": "w");
 	  if (!deps_stream)
-	    fatal_error ("opening dependency file %s: %m", deps_file);
+	    fatal_error ("opening dependency file %s: %s", deps_file, strerror(errno));
 	}
     }
 
@@ -651,10 +651,10 @@ sdcpp_common_finish (void)
 
   if (deps_stream && deps_stream != out_stream
       && (ferror (deps_stream) || fclose (deps_stream)))
-    fatal_error ("closing dependency file %s: %m", deps_file);
+    fatal_error ("closing dependency file %s: %s", deps_file, strerror(errno));
 
   if (out_stream && (ferror (out_stream) || fclose (out_stream)))
-    fatal_error ("when writing output to %s: %m", out_fname);
+    fatal_error ("when writing output to %s: %s", out_fname, strerror(errno));
 }
 
 /* Either of two environment variables can specify output of

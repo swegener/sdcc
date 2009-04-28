@@ -1,3 +1,8 @@
+2009-04-28 Borut Razem <borut.razem AT siol.net>
+
+	* fixed GCC 4.4.0 mingw compilation:
+	  sim/ucsim/cmd.src/cmdlex.cc: regenerated - added #include <stdio.h>
+
 2009-04-27 Raphael Neider <rneider AT web.de>
 
         * src/pic16/gen.c (genNearPointerGet): fix double indirect
@@ -19,6 +24,7 @@
 	  unsigned char
 
 2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/z80/shift.s,
 	  device/lib/z80/memmove.s,
 	  device/lib/z80/mul.s,

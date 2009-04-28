@@ -2324,7 +2324,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
   srcScls = SPEC_SCLS (src);
 
   /* Compensate for const to const code change in checkSClass() */
-  if ((!level & port->mem.code_ro) && SPEC_CONST (dest))
+  if (((!level) & port->mem.code_ro) && SPEC_CONST (dest))
     {
       if (srcScls == S_CODE && destScls == S_FIXED)
         destScls = S_CODE;

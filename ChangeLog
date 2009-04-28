@@ -2,6 +2,10 @@
 
 	* fixed GCC 4.4.0 mingw compilation:
 	  sim/ucsim/cmd.src/cmdlex.cc: regenerated - added #include <stdio.h>
+	* src/SDCCsymt.c: fixed warning:
+	  suggest parentheses around operand of '!' or change '&' to '&&' or
+	  '!' to '~'
+	* support/scripts/sdcc_mingw32: sync with sdcc-build
 
 2009-04-27 Raphael Neider <rneider AT web.de>
 

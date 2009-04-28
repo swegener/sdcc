@@ -1,13 +1,13 @@
 /* Default error handlers for CPP Library.
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1998, 1999, 2000,
-   2001, 2002, 2004 Free Software Foundation, Inc.
+   2001, 2002, 2004, 2008, 2009 Free Software Foundation, Inc.
    Written by Per Bothner, 1994.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -16,8 +16,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+along with this program; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.
 
  In other words, you are welcome to use, share and improve this program.
  You are forbidden to forbid anyone else to use, share and improve
@@ -42,25 +42,25 @@ print_location (cpp_reader *pfile, source_location line, unsigned int col)
   else
     {
       const struct line_map *map;
-      unsigned int lin;
+      linenum_type lin;
 
       map = linemap_lookup (pfile->line_table, line);
       linemap_print_containing_files (pfile->line_table, map);
 
       lin = SOURCE_LINE (map, line);
       if (col == 0)
-	{
-	  col = SOURCE_COLUMN (map, line);
-	  if (col == 0)
-	    col = 1;
-	}
+        {
+          col = SOURCE_COLUMN (map, line);
+          if (col == 0)
+            col = 1;
+        }
 
       if (lin == 0)
-	fprintf (stderr, "%s:", map->to_file);
+        fprintf (stderr, "%s:", map->to_file);
       else if (CPP_OPTION (pfile, show_column) == 0)
-	fprintf (stderr, "%s:%u:", map->to_file, lin);
+        fprintf (stderr, "%s:%u:", map->to_file, lin);
       else
-	fprintf (stderr, "%s:%u:%u:", map->to_file, lin, col);
+        fprintf (stderr, "%s:%u:%u:", map->to_file, lin, col);
 
       fputc (' ', stderr);
     }
@@ -76,9 +76,9 @@ print_location (cpp_reader *pfile, source_location line, unsigned int col)
    big enough max_column_hint.)
 
    Returns 0 if the error has been suppressed.  */
-int
+static int
 _cpp_begin_message (cpp_reader *pfile, int code,
-		    source_location src_loc, unsigned int column)
+                    source_location src_loc, unsigned int column)
 {
   int level = CPP_DL_EXTRACT (code);
 
@@ -87,26 +87,26 @@ _cpp_begin_message (cpp_reader *pfile, int code,
     case CPP_DL_WARNING:
     case CPP_DL_PEDWARN:
       if (cpp_in_system_header (pfile)
-	  && ! CPP_OPTION (pfile, warn_system_headers))
-	return 0;
+          && ! CPP_OPTION (pfile, warn_system_headers))
+        return 0;
       /* Fall through.  */
 
     case CPP_DL_WARNING_SYSHDR:
       if (CPP_OPTION (pfile, warnings_are_errors)
-	  || (level == CPP_DL_PEDWARN && CPP_OPTION (pfile, pedantic_errors)))
-	{
-	  if (CPP_OPTION (pfile, inhibit_errors))
-	    return 0;
-	  level = CPP_DL_ERROR;
-	  pfile->errors++;
-	}
+          || (level == CPP_DL_PEDWARN && CPP_OPTION (pfile, pedantic_errors)))
+        {
+          if (CPP_OPTION (pfile, inhibit_errors))
+            return 0;
+          level = CPP_DL_ERROR;
+          pfile->errors++;
+        }
       else if (CPP_OPTION (pfile, inhibit_warnings))
-	return 0;
+        return 0;
       break;
 
     case CPP_DL_ERROR:
       if (CPP_OPTION (pfile, inhibit_errors))
-	return 0;
+        return 0;
       /* ICEs cannot be inhibited.  */
     case CPP_DL_ICE:
       pfile->errors++;
@@ -137,7 +137,7 @@ cpp_error (cpp_reader * pfile, int level, const char *msgid, ...)
 {
   source_location src_loc;
   va_list ap;
-  
+
   va_start (ap, msgid);
 
   if (CPP_OPTION (pfile, client_diagnostic))
@@ -145,19 +145,28 @@ cpp_error (cpp_reader * pfile, int level, const char *msgid, ...)
   else
     {
       if (CPP_OPTION (pfile, traditional))
-	{
-	  if (pfile->state.in_directive)
-	    src_loc = pfile->directive_line;
-	  else
-	    src_loc = pfile->line_table->highest_line;
-	}
+        {
+          if (pfile->state.in_directive)
+            src_loc = pfile->directive_line;
+          else
+            src_loc = pfile->line_table->highest_line;
+        }
+      /* We don't want to refer to a token before the beginning of the
+         current run -- that is invalid.  */
+      else if (pfile->cur_token == pfile->cur_run->base)
+        {
+          if (pfile->cur_run->prev != NULL)
+            src_loc = pfile->cur_run->prev->limit->src_loc;
+          else
+            src_loc = 0;
+        }
       else
-	{
-	  src_loc = pfile->cur_token[-1].src_loc;
-	}
+        {
+          src_loc = pfile->cur_token[-1].src_loc;
+        }
 
       if (_cpp_begin_message (pfile, level, src_loc, 0))
-	v_message (msgid, ap);
+        v_message (msgid, ap);
     }
 
   va_end (ap);
@@ -166,11 +175,11 @@ cpp_error (cpp_reader * pfile, int level, const char *msgid, ...)
 /* Print an error at a specific location.  */
 void
 cpp_error_with_line (cpp_reader *pfile, int level,
-		     source_location src_loc, unsigned int column,
-		     const char *msgid, ...)
+                     source_location src_loc, unsigned int column,
+                     const char *msgid, ...)
 {
   va_list ap;
-  
+
   va_start (ap, msgid);
 
   if (_cpp_begin_message (pfile, level, src_loc, column))

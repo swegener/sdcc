@@ -63,7 +63,7 @@ const struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
 
 const char *main_input_filename;
 
-struct line_maps line_table;
+struct line_maps *line_table;
 
 /* Temporarily suppress certain warnings.
    This is set while reading code from a system header file.  */
@@ -267,6 +267,8 @@ general_init (const char *argv0)
   hex_init ();
 
   gcc_init_libintl ();
+
+  line_table = XNEW (struct line_maps);
 }
 
 /* Process the options that have been parsed.  */

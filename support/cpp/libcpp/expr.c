@@ -1,11 +1,11 @@
 /* Parse C expressions for cpplib.
    Copyright (C) 1987, 1992, 1994, 1995, 1997, 1998, 1999, 2000, 2001,
-   2002, 2004 Free Software Foundation.
+   2002, 2004, 2008, 2009 Free Software Foundation.
    Contributed by Per Bothner, 1994.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -14,9 +14,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 51 Franklin Street, Fifth Floor,
-Boston, MA 02110-1301, USA.  */
+along with this program; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
 
 #include "config.h"
 #include "system.h"
@@ -32,6 +31,7 @@ struct op
 {
   const cpp_token *token;       /* The token forming op (for diagnostics).  */
   cpp_num value;                /* The value logically "right" of op.  */
+  source_location loc;          /* The location of this value.         */
   enum cpp_ttype op;
 };
 
@@ -637,6 +637,20 @@ parse_defined (cpp_reader *pfile)
                    "this use of \"defined\" may not be portable");
 
       _cpp_mark_macro_used (node);
+      if (!(node->flags & NODE_USED))
+        {
+          node->flags |= NODE_USED;
+          if (node->type == NT_MACRO)
+            {
+              if (pfile->cb.used_define)
+                pfile->cb.used_define (pfile, pfile->directive_line, node);
+            }
+          else
+            {
+              if (pfile->cb.used_undef)
+                pfile->cb.used_undef (pfile, pfile->directive_line, node);
+            }
+        }
 
       /* A possible controlling macro of the form #if !defined ().
          _cpp_parse_expr checks there was no other junk on the line.  */
@@ -691,6 +705,8 @@ eval_token (cpp_reader *pfile, const cpp_token *token)
 
     case CPP_WCHAR:
     case CPP_CHAR:
+    case CPP_CHAR16:
+    case CPP_CHAR32:
       {
         cppchar_t cc = cpp_interpret_charconst (pfile, token,
                                                 &temp, &unsignedp);
@@ -729,10 +745,25 @@ eval_token (cpp_reader *pfile, const cpp_token *token)
         }
       break;
 
-    default: /* CPP_HASH */
+    case CPP_HASH:
+      if (!pfile->state.skipping)
+        {
+          /* A pedantic warning takes precedence over a deprecated
+             warning here.  */
+          if (CPP_PEDANTIC (pfile))
+            cpp_error (pfile, CPP_DL_PEDWARN,
+                       "assertions are a GCC extension");
+          else if (CPP_OPTION (pfile, warn_deprecated))
+            cpp_error (pfile, CPP_DL_WARNING,
+                       "assertions are a deprecated extension");
+        }
       _cpp_test_assertion (pfile, &temp);
       result.high = 0;
       result.low = temp;
+      break;
+
+    default:
+      abort ();
     }
 
   result.unsignedp = !!unsignedp;
@@ -793,9 +824,11 @@ static const struct cpp_operator
   /* COMPL */           {16, NO_L_OPERAND},
   /* AND_AND */         {6, LEFT_ASSOC},
   /* OR_OR */           {5, LEFT_ASSOC},
-  /* QUERY */           {3, 0},
+  /* Note that QUERY, COLON, and COMMA must have the same precedence.
+     However, there are some special cases for these in reduce().  */
+  /* QUERY */           {4, 0},
   /* COLON */           {4, LEFT_ASSOC | CHECK_PROMOTION},
-  /* COMMA */           {2, LEFT_ASSOC},
+  /* COMMA */           {4, LEFT_ASSOC},
   /* OPEN_PAREN */      {1, NO_L_OPERAND},
   /* CLOSE_PAREN */     {0, 0},
   /* EOF */             {0, 0},
@@ -819,7 +852,7 @@ static const struct cpp_operator
    stored in the 'value' field of the stack element of the operator
    that precedes it.  */
 bool
-_cpp_parse_expr (cpp_reader *pfile)
+_cpp_parse_expr (cpp_reader *pfile, bool is_if)
 {
   struct op *top = pfile->op_stack;
   unsigned int lex_count;
@@ -842,6 +875,7 @@ _cpp_parse_expr (cpp_reader *pfile)
       lex_count++;
       op.token = cpp_get_token (pfile);
       op.op = op.token->type;
+      op.loc = op.token->src_loc;
 
       switch (op.op)
         {
@@ -849,6 +883,8 @@ _cpp_parse_expr (cpp_reader *pfile)
         case CPP_NUMBER:
         case CPP_CHAR:
         case CPP_WCHAR:
+        case CPP_CHAR16:
+        case CPP_CHAR32:
         case CPP_NAME:
         case CPP_HASH:
           if (!want_value)
@@ -892,7 +928,7 @@ _cpp_parse_expr (cpp_reader *pfile)
             SYNTAX_ERROR ("missing expression between '(' and ')'");
 
           if (op.op == CPP_EOF && top->op == CPP_EOF)
-            SYNTAX_ERROR ("#if with no expression");
+            SYNTAX_ERROR2 ("%s with no expression", is_if ? "#if" : "#elif");
 
           if (top->op != CPP_EOF && top->op != CPP_OPEN_PAREN)
             SYNTAX_ERROR2 ("operator '%s' has no right operand",
@@ -943,6 +979,7 @@ _cpp_parse_expr (cpp_reader *pfile)
 
       top->op = op.op;
       top->token = op.token;
+      top->loc = op.token->src_loc;
     }
 
   /* The controlling macro expression is only valid if we called lex 3
@@ -953,7 +990,8 @@ _cpp_parse_expr (cpp_reader *pfile)
 
   if (top != pfile->op_stack)
     {
-      cpp_error (pfile, CPP_DL_ICE, "unbalanced stack in #if");
+      cpp_error (pfile, CPP_DL_ICE, "unbalanced stack in %s",
+                 is_if ? "#if" : "#elif");
     syntax_error:
       return false;  /* Return false on syntax error.  */
     }
@@ -995,6 +1033,7 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
         case CPP_NOT:
         case CPP_COMPL:
           top[-1].value = num_unary_op (pfile, top->value, top->op);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_PLUS:
@@ -1004,6 +1043,7 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
         case CPP_COMMA:
           top[-1].value = num_binary_op (pfile, top[-1].value,
                                          top->value, top->op);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_GREATER:
@@ -1012,12 +1052,14 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
         case CPP_LESS_EQ:
           top[-1].value
             = num_inequality_op (pfile, top[-1].value, top->value, top->op);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_EQ_EQ:
         case CPP_NOT_EQ:
           top[-1].value
             = num_equality_op (pfile, top[-1].value, top->value, top->op);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_AND:
@@ -1025,16 +1067,19 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
         case CPP_XOR:
           top[-1].value
             = num_bitwise_op (pfile, top[-1].value, top->value, top->op);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_MULT:
           top[-1].value = num_mul (pfile, top[-1].value, top->value);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_DIV:
         case CPP_MOD:
           top[-1].value = num_div_op (pfile, top[-1].value,
                                       top->value, top->op);
+          top[-1].loc = top->loc;
           break;
 
         case CPP_OR_OR:
@@ -1046,6 +1091,7 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
           top->value.high = 0;
           top->value.unsignedp = false;
           top->value.overflow = false;
+          top->loc = top[1].loc;
           continue;
 
         case CPP_AND_AND:
@@ -1057,16 +1103,20 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
           top->value.high = 0;
           top->value.unsignedp = false;
           top->value.overflow = false;
+          top->loc = top[1].loc;
           continue;
 
         case CPP_OPEN_PAREN:
           if (op != CPP_CLOSE_PAREN)
             {
-              cpp_error (pfile, CPP_DL_ERROR, "missing ')' in expression");
+              cpp_error_with_line (pfile, CPP_DL_ERROR,
+                                   top->token->src_loc,
+                                   0, "missing ')' in expression");
               return 0;
             }
           top--;
           top->value = top[1].value;
+          top->loc = top[1].loc;
           return top;
 
         case CPP_COLON:
@@ -1075,14 +1125,21 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
             {
               pfile->state.skip_eval--;
               top->value = top[1].value;
+              top->loc = top[1].loc;
             }
           else
-            top->value = top[2].value;
+            {
+              top->value = top[2].value;
+              top->loc = top[2].loc;
+            }
           top->value.unsignedp = (top[1].value.unsignedp
                                   || top[2].value.unsignedp);
           continue;
 
         case CPP_QUERY:
+          /* COMMA and COLON should not reduce a QUERY operator.  */
+          if (op == CPP_COMMA || op == CPP_COLON)
+            return top;
           cpp_error (pfile, CPP_DL_ERROR, "'?' without following ':'");
           return 0;
 
@@ -1129,12 +1186,12 @@ check_promotion (cpp_reader *pfile, const struct op *op)
   if (op->value.unsignedp)
     {
       if (!num_positive (op[-1].value, CPP_OPTION (pfile, precision)))
-        cpp_error (pfile, CPP_DL_WARNING,
-                   "the left operand of \"%s\" changes sign when promoted",
-                   cpp_token_as_text (pfile, op->token));
+        cpp_error_with_line (pfile, CPP_DL_WARNING, op[-1].loc, 0,
+                             "the left operand of \"%s\" changes sign when promoted",
+                             cpp_token_as_text (pfile, op->token));
     }
   else if (!num_positive (op->value, CPP_OPTION (pfile, precision)))
-    cpp_error (pfile, CPP_DL_WARNING,
+    cpp_error_with_line (pfile, CPP_DL_WARNING, op->loc, 0,
                "the right operand of \"%s\" changes sign when promoted",
                cpp_token_as_text (pfile, op->token));
 }

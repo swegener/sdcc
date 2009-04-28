@@ -1,13 +1,13 @@
 /* Declarations for insn-output.c.  These functions are defined in recog.c,
    final.c, and varasm.c.
-   Copyright (C) 1987, 1991, 1994, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1987, 1991, 1994, 1997, 1998, 1999, 2000, 2001, 2002,
+   2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
 GCC is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
+Software Foundation; either version 3, or (at your option) any later
 version.
 
 GCC is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -16,9 +16,8 @@ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License
-along with GCC; see the file COPYING.  If not, write to the Free
-Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301, USA.  */
+along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
 
 #ifndef GCC_OUTPUT_H
 #define GCC_OUTPUT_H
@@ -98,6 +97,9 @@ extern int label_to_alignment (rtx);
 /* Output a LABEL_REF, or a bare CODE_LABEL, as an assembler symbol.  */
 extern void output_asm_label (rtx);
 
+/* Marks SYMBOL_REFs in x as referenced through use of assemble_external.  */
+extern void mark_symbol_refs_as_used (rtx);
+
 /* Print a memory reference operand for address X
    using machine-dependent assembler syntax.  */
 extern void output_address (rtx);
@@ -145,9 +147,6 @@ extern void leaf_renumber_regs_insn (rtx);
 /* Locate the proper template for the given insn-code.  */
 extern const char *get_insn_template (int, rtx);
 
-/* Functions in flow.c */
-extern int regno_clobbered_at_setjmp (int);
-
 /* Functions in varasm.c.  */
 
 /* Declare DECL to be a weak symbol.  */
@@ -157,6 +156,9 @@ extern void merge_weak (tree, tree);
 
 /* Emit any pending weak declarations.  */
 extern void weak_finish (void);
+
+/* Emit any pending emutls declarations and initializations.  */
+extern void emutls_finish (void);
 
 /* Decode an `asm' spec for a declaration as a register name.
    Return the register number, or -1 if nothing specified,
@@ -200,9 +202,9 @@ extern void assemble_variable (tree, int, int, int);
    DONT_OUTPUT_DATA is from assemble_variable.  */
 extern void align_variable (tree decl, bool dont_output_data);
 
-/* Output something to declare an external symbol to the assembler.
-   (Most assemblers don't need this, so we normally output nothing.)
-   Do nothing if DECL is not external.  */
+/* Queue for outputting something to declare an external symbol to the
+   assembler.  (Most assemblers don't need this, so we normally output
+   nothing.)  Do nothing if DECL is not external.  */
 extern void assemble_external (tree);
 
 /* Assemble code to leave SIZE bytes of zeros.  */
@@ -265,6 +267,9 @@ extern bool assemble_integer (rtx, unsigned, unsigned, int);
 extern void assemble_real (REAL_VALUE_TYPE, enum machine_mode, unsigned);
 #endif
 
+/* Write the address of the entity given by SYMBOL to SEC.  */
+extern void assemble_addr_to_section (rtx, section *);
+
 /* Return the size of the constant pool.  */
 extern int get_pool_size (void);
 
@@ -281,7 +286,7 @@ extern void output_object_blocks (void);
    and has been exposed to let other functions like categorize_ctor_elements
    evaluate the property while walking a constructor for other purposes.  */
 
-extern bool constructor_static_from_elts_p (tree);
+extern bool constructor_static_from_elts_p (const_tree);
 
 /* Return nonzero if VALUE is a valid constant-valued expression
    for use in initializing a static variable; one that can be an
@@ -340,7 +345,7 @@ extern int current_function_is_leaf;
 
 /* Nonzero if function being compiled doesn't modify the stack pointer
    (ignoring the prologue and epilogue).  This is only valid after
-   life_analysis has run.  */
+   pass_stack_ptr_mod has run.  */
 
 extern int current_function_sp_is_unchanging;
 
@@ -376,7 +381,7 @@ extern bool first_function_block_is_cold;
 
 /* Decide whether DECL needs to be in a writable section.
    RELOC is the same as for SELECT_SECTION.  */
-extern bool decl_readonly_section (tree, int);
+extern bool decl_readonly_section (const_tree, int);
 
 /* This can be used to compute RELOC for the function above, when
    given a constant expression.  */
@@ -392,32 +397,32 @@ extern void default_function_pro_epilogue (FILE *, HOST_WIDE_INT);
 extern void no_asm_to_stream (FILE *);
 
 /* Flags controlling properties of a section.  */
-#define SECTION_ENTSIZE	 0x000ff	/* entity size in section */
-#define SECTION_CODE	 0x00100	/* contains code */
-#define SECTION_WRITE	 0x00200	/* data is writable */
-#define SECTION_DEBUG	 0x00400	/* contains debug data */
-#define SECTION_LINKONCE 0x00800	/* is linkonce */
-#define SECTION_SMALL	 0x01000	/* contains "small data" */
-#define SECTION_BSS	 0x02000	/* contains zeros only */
-#define SECTION_FORGET	 0x04000	/* forget that we've entered the section */
-#define SECTION_MERGE	 0x08000	/* contains mergeable data */
-#define SECTION_STRINGS  0x10000	/* contains zero terminated strings without
-					   embedded zeros */
-#define SECTION_OVERRIDE 0x20000	/* allow override of default flags */
-#define SECTION_TLS	 0x40000	/* contains thread-local storage */
-#define SECTION_NOTYPE	 0x80000	/* don't output @progbits */
-#define SECTION_DECLARED 0x100000	/* section has been used */
-#define SECTION_STYLE_MASK 0x600000	/* bits used for SECTION_STYLE */
-#define SECTION_COMMON   0x800000	/* contains common data */
-#define SECTION_MACH_DEP 0x1000000	/* subsequent bits reserved for target */
+#define SECTION_ENTSIZE  0x000ff        /* entity size in section */
+#define SECTION_CODE     0x00100        /* contains code */
+#define SECTION_WRITE    0x00200        /* data is writable */
+#define SECTION_DEBUG    0x00400        /* contains debug data */
+#define SECTION_LINKONCE 0x00800        /* is linkonce */
+#define SECTION_SMALL    0x01000        /* contains "small data" */
+#define SECTION_BSS      0x02000        /* contains zeros only */
+#define SECTION_FORGET   0x04000        /* forget that we've entered the section */
+#define SECTION_MERGE    0x08000        /* contains mergeable data */
+#define SECTION_STRINGS  0x10000        /* contains zero terminated strings without
+                                           embedded zeros */
+#define SECTION_OVERRIDE 0x20000        /* allow override of default flags */
+#define SECTION_TLS      0x40000        /* contains thread-local storage */
+#define SECTION_NOTYPE   0x80000        /* don't output @progbits */
+#define SECTION_DECLARED 0x100000       /* section has been used */
+#define SECTION_STYLE_MASK 0x600000     /* bits used for SECTION_STYLE */
+#define SECTION_COMMON   0x800000       /* contains common data */
+#define SECTION_MACH_DEP 0x1000000      /* subsequent bits reserved for target */
 
 /* This SECTION_STYLE is used for unnamed sections that we can switch
    to using a special assembler directive.  */
-#define SECTION_UNNAMED	 0x000000
+#define SECTION_UNNAMED  0x000000
 
 /* This SECTION_STYLE is used for named sections that we can switch
    to using a general section directive.  */
-#define SECTION_NAMED	 0x200000
+#define SECTION_NAMED    0x200000
 
 /* This SECTION_STYLE is used for sections that we cannot switch to at
    all.  The choice of section is implied by the directive that we use
@@ -441,13 +446,13 @@ enum section_category
 
   /* To optimize loading of shared programs, define following subsections
      of data section:
-	_REL	Contains data that has relocations, so they get grouped
-		together and dynamic linker will visit fewer pages in memory.
-	_RO	Contains data that is otherwise read-only.  This is useful
-		with prelinking as most relocations won't be dynamically
-		linked and thus stay read only.
-	_LOCAL	Marks data containing relocations only to local objects.
-		These relocations will get fully resolved by prelinking.  */
+        _REL    Contains data that has relocations, so they get grouped
+                together and dynamic linker will visit fewer pages in memory.
+        _RO     Contains data that is otherwise read-only.  This is useful
+                with prelinking as most relocations won't be dynamically
+                linked and thus stay read only.
+        _LOCAL  Marks data containing relocations only to local objects.
+                These relocations will get fully resolved by prelinking.  */
   SECCAT_DATA_REL,
   SECCAT_DATA_REL_LOCAL,
   SECCAT_DATA_REL_RO,
@@ -458,7 +463,10 @@ enum section_category
 
   SECCAT_BSS,
   SECCAT_SBSS,
-  SECCAT_TBSS
+  SECCAT_TBSS,
+
+  SECCAT_EMUTLS_VAR,
+  SECCAT_EMUTLS_TMPL
 };
 
 /* Information that is provided by all instances of the section type.  */
@@ -506,8 +514,8 @@ struct unnamed_section GTY(()) {
    alignment.  A false return value implies that we are relying
    on the rounded size to align the decl.  */
 typedef bool (*noswitch_section_callback) (tree decl, const char *name,
-					   unsigned HOST_WIDE_INT size,
-					   unsigned HOST_WIDE_INT rounded);
+                                           unsigned HOST_WIDE_INT size,
+                                           unsigned HOST_WIDE_INT rounded);
 
 /* Information about a SECTION_NOSWITCH section.  */
 struct noswitch_section GTY(()) {
@@ -551,18 +559,22 @@ extern GTY(()) section *in_section;
 extern GTY(()) bool in_cold_section_p;
 
 extern section *get_unnamed_section (unsigned int, void (*) (const void *),
-				     const void *);
+                                     const void *);
 extern section *get_section (const char *, unsigned int, tree);
 extern section *get_named_section (tree, const char *, int);
 extern void place_block_symbol (rtx);
 extern rtx get_section_anchor (struct object_block *, HOST_WIDE_INT,
-			       enum tls_model);
+                               enum tls_model);
 extern section *mergeable_constant_section (enum machine_mode,
-					    unsigned HOST_WIDE_INT,
-					    unsigned int);
+                                            unsigned HOST_WIDE_INT,
+                                            unsigned int);
 extern section *function_section (tree);
 extern section *unlikely_text_section (void);
 extern section *current_function_section (void);
+
+/* Return the numbered .ctors.N (if CONSTRUCTOR_P) or .dtors.N (if
+   not) section for PRIORITY.  */
+extern section *get_cdtor_priority_section (int, bool);
 
 extern bool unlikely_text_section_p (section *);
 extern void switch_to_section (section *);
@@ -573,7 +585,7 @@ extern unsigned int default_section_type_flags (tree, const char *, int);
 extern bool have_global_bss_p (void);
 extern void default_no_named_section (const char *, unsigned int, tree);
 extern void default_elf_asm_named_section (const char *, unsigned int, tree);
-extern enum section_category categorize_decl_for_section (tree, int);
+extern enum section_category categorize_decl_for_section (const_tree, int);
 extern void default_coff_asm_named_section (const char *, unsigned int, tree);
 extern void default_pe_asm_named_section (const char *, unsigned int, tree);
 
@@ -590,16 +602,17 @@ extern void default_unique_section (tree, int);
 extern section *default_function_rodata_section (tree);
 extern section *default_no_function_rodata_section (tree);
 extern section *default_select_rtx_section (enum machine_mode, rtx,
-					    unsigned HOST_WIDE_INT);
+                                            unsigned HOST_WIDE_INT);
 extern section *default_elf_select_rtx_section (enum machine_mode, rtx,
-						unsigned HOST_WIDE_INT);
+                                                unsigned HOST_WIDE_INT);
 extern void default_encode_section_info (tree, rtx, int);
 extern const char *default_strip_name_encoding (const char *);
 extern void default_asm_output_anchor (rtx);
-extern bool default_use_anchors_for_symbol_p (rtx);
-extern bool default_binds_local_p (tree);
-extern bool default_binds_local_p_1 (tree, int);
+extern bool default_use_anchors_for_symbol_p (const_rtx);
+extern bool default_binds_local_p (const_tree);
+extern bool default_binds_local_p_1 (const_tree, int);
 extern void default_globalize_label (FILE *, const char *);
+extern void default_globalize_decl_name (FILE *, tree);
 extern void default_emit_unwind_label (FILE *, tree, int, int);
 extern void default_emit_except_table_label (FILE *);
 extern void default_internal_label (FILE *, const char *, unsigned long);
@@ -607,7 +620,11 @@ extern void default_file_start (void);
 extern void file_end_indicate_exec_stack (void);
 extern bool default_valid_pointer_mode (enum machine_mode);
 
-extern int default_address_cost (rtx);
+extern void default_elf_asm_output_external (FILE *file, tree,
+                                             const char *);
+extern int maybe_assemble_visibility (tree);
+
+extern int default_address_cost (rtx, bool);
 
 /* dbxout helper functions */
 #if defined DBX_DEBUGGING_INFO || defined XCOFF_DEBUGGING_INFO
@@ -625,7 +642,7 @@ extern void dbxout_stab_value_label (const char *);
 extern void dbxout_stab_value_label_diff (const char *, const char *);
 extern void dbxout_stab_value_internal_label (const char *, int *);
 extern void dbxout_stab_value_internal_label_diff (const char *, int *,
-						   const char *);
+                                                   const char *);
 
 #endif
 

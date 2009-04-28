@@ -35,10 +35,6 @@ Boston, MA 02110-1301, USA.  */
 #ifndef SAFE_CTYPE_H
 #define SAFE_CTYPE_H
 
-#ifdef isalpha
- #error "safe-ctype.h and ctype.h may not be used simultaneously"
-#endif
-
 /* Determine host character set.  */
 #define HOST_CHARSET_UNKNOWN 0
 #define HOST_CHARSET_ASCII   1
@@ -60,29 +56,29 @@ Boston, MA 02110-1301, USA.  */
 
 enum {
   /* In C99 */
-  _sch_isblank  = 0x0001,	/* space \t */
-  _sch_iscntrl  = 0x0002,	/* nonprinting characters */
-  _sch_isdigit  = 0x0004,	/* 0-9 */
-  _sch_islower  = 0x0008,	/* a-z */
-  _sch_isprint  = 0x0010,	/* any printing character including ' ' */
-  _sch_ispunct  = 0x0020,	/* all punctuation */
-  _sch_isspace  = 0x0040,	/* space \t \n \r \f \v */
-  _sch_isupper  = 0x0080,	/* A-Z */
-  _sch_isxdigit = 0x0100,	/* 0-9A-Fa-f */
+  _sch_isblank  = 0x0001,       /* space \t */
+  _sch_iscntrl  = 0x0002,       /* nonprinting characters */
+  _sch_isdigit  = 0x0004,       /* 0-9 */
+  _sch_islower  = 0x0008,       /* a-z */
+  _sch_isprint  = 0x0010,       /* any printing character including ' ' */
+  _sch_ispunct  = 0x0020,       /* all punctuation */
+  _sch_isspace  = 0x0040,       /* space \t \n \r \f \v */
+  _sch_isupper  = 0x0080,       /* A-Z */
+  _sch_isxdigit = 0x0100,       /* 0-9A-Fa-f */
 
   /* Extra categories useful to cpplib.  */
-  _sch_isidst	= 0x0200,	/* A-Za-z_ */
-  _sch_isvsp    = 0x0400,	/* \n \r */
-  _sch_isnvsp   = 0x0800,	/* space \t \f \v \0 */
+  _sch_isidst   = 0x0200,       /* A-Za-z_ */
+  _sch_isvsp    = 0x0400,       /* \n \r */
+  _sch_isnvsp   = 0x0800,       /* space \t \f \v \0 */
 
   /* Combinations of the above.  */
-  _sch_isalpha  = _sch_isupper|_sch_islower,	/* A-Za-z */
-  _sch_isalnum  = _sch_isalpha|_sch_isdigit,	/* A-Za-z0-9 */
-  _sch_isidnum  = _sch_isidst|_sch_isdigit,	/* A-Za-z0-9_ */
-  _sch_isgraph  = _sch_isalnum|_sch_ispunct,	/* isprint and not space */
-  _sch_iscppsp  = _sch_isvsp|_sch_isnvsp,	/* isspace + \0 */
+  _sch_isalpha  = _sch_isupper|_sch_islower,    /* A-Za-z */
+  _sch_isalnum  = _sch_isalpha|_sch_isdigit,    /* A-Za-z0-9 */
+  _sch_isidnum  = _sch_isidst|_sch_isdigit,     /* A-Za-z0-9_ */
+  _sch_isgraph  = _sch_isalnum|_sch_ispunct,    /* isprint and not space */
+  _sch_iscppsp  = _sch_isvsp|_sch_isnvsp,       /* isspace + \0 */
   _sch_isbasic  = _sch_isprint|_sch_iscppsp     /* basic charset of ISO C
-						   (plus ` and @)  */
+                                                   (plus ` and @)  */
 };
 
 /* Character classification.  */
@@ -103,17 +99,52 @@ extern const unsigned short _sch_istable[256];
 #define ISUPPER(c)  _sch_test(c, _sch_isupper)
 #define ISXDIGIT(c) _sch_test(c, _sch_isxdigit)
 
-#define ISIDNUM(c)	_sch_test(c, _sch_isidnum)
-#define ISIDST(c)	_sch_test(c, _sch_isidst)
-#define IS_ISOBASIC(c)	_sch_test(c, _sch_isbasic)
-#define IS_VSPACE(c)	_sch_test(c, _sch_isvsp)
-#define IS_NVSPACE(c)	_sch_test(c, _sch_isnvsp)
-#define IS_SPACE_OR_NUL(c)	_sch_test(c, _sch_iscppsp)
+#define ISIDNUM(c)      _sch_test(c, _sch_isidnum)
+#define ISIDST(c)       _sch_test(c, _sch_isidst)
+#define IS_ISOBASIC(c)  _sch_test(c, _sch_isbasic)
+#define IS_VSPACE(c)    _sch_test(c, _sch_isvsp)
+#define IS_NVSPACE(c)   _sch_test(c, _sch_isnvsp)
+#define IS_SPACE_OR_NUL(c)      _sch_test(c, _sch_iscppsp)
 
 /* Character transformation.  */
 extern const unsigned char  _sch_toupper[256];
 extern const unsigned char  _sch_tolower[256];
 #define TOUPPER(c) _sch_toupper[(c) & 0xff]
 #define TOLOWER(c) _sch_tolower[(c) & 0xff]
+
+/* Prevent the users of safe-ctype.h from accidently using the routines
+   from ctype.h.  Initially, the approach was to produce an error when
+   detecting that ctype.h has been included.  But this was causing
+   trouble as ctype.h might get indirectly included as a result of
+   including another system header (for instance gnulib's stdint.h).
+   So we include ctype.h here and then immediately redefine its macros.  */
+
+#include <ctype.h>
+#undef isalpha
+#define isalpha(c) do_not_use_isalpha_with_safe_ctype
+#undef isalnum
+#define isalnum(c) do_not_use_isalnum_with_safe_ctype
+#undef iscntrl
+#define iscntrl(c) do_not_use_iscntrl_with_safe_ctype
+#undef isdigit
+#define isdigit(c) do_not_use_isdigit_with_safe_ctype
+#undef isgraph
+#define isgraph(c) do_not_use_isgraph_with_safe_ctype
+#undef islower
+#define islower(c) do_not_use_islower_with_safe_ctype
+#undef isprint
+#define isprint(c) do_not_use_isprint_with_safe_ctype
+#undef ispunct
+#define ispunct(c) do_not_use_ispunct_with_safe_ctype
+#undef isspace
+#define isspace(c) do_not_use_isspace_with_safe_ctype
+#undef isupper
+#define isupper(c) do_not_use_isupper_with_safe_ctype
+#undef isxdigit
+#define isxdigit(c) do_not_use_isxdigit_with_safe_ctype
+#undef toupper
+#define toupper(c) do_not_use_toupper_with_safe_ctype
+#undef tolower
+#define tolower(c) do_not_use_tolower_with_safe_ctype
 
 #endif /* SAFE_CTYPE_H */

@@ -171,7 +171,7 @@ defer_opt (enum opt_code code, const char *arg)
 unsigned int
 sdcpp_common_init_options (unsigned int argc, const char **argv ATTRIBUTE_UNUSED)
 {
-  parse_in = cpp_create_reader (CLK_GNUC89, NULL, &line_table);
+  parse_in = cpp_create_reader (CLK_GNUC89, NULL, line_table);
 
   cpp_opts = cpp_get_options (parse_in);
   cpp_opts->dollars_in_ident = DOLLARS_IN_IDENTIFIERS;
@@ -231,23 +231,23 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_I:
       if (strcmp (arg, "-"))
-	add_path (xstrdup (arg), BRACKET, 0, true);
+        add_path (xstrdup (arg), BRACKET, 0, true);
       else
-	{
-	  if (quote_chain_split)
-	    error ("-I- specified twice");
-	  quote_chain_split = true;
-	  split_quote_chain ();
-	  inform ("obsolete option -I- used, please use -iquote instead");
-	}
+        {
+          if (quote_chain_split)
+            error ("-I- specified twice");
+          quote_chain_split = true;
+          split_quote_chain ();
+          inform ("obsolete option -I- used, please use -iquote instead");
+        }
       break;
 
     case OPT_M:
     case OPT_MM:
       /* When doing dependencies with -M or -MM, suppress normal
-	 preprocessed output, but still do -dM etc. as software
-	 depends on this.  Preprocessed output does occur if -MD, -MMD
-	 or environment var dependency generation is used.  */
+         preprocessed output, but still do -dM etc. as software
+         depends on this.  Preprocessed output does occur if -MD, -MMD
+         or environment var dependency generation is used.  */
       cpp_opts->deps.style = (code == OPT_M ? DEPS_SYSTEM: DEPS_USER);
       flag_no_output = 1;
       cpp_opts->inhibit_warnings = 1;
@@ -296,7 +296,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       cpp_opts->warn_trigraphs = value;
       cpp_opts->warn_comments = value;
       cpp_opts->warn_num_sign_change = value;
-      cpp_opts->warn_multichar = value;	/* Was C++ only.  */
+      cpp_opts->warn_multichar = value; /* Was C++ only.  */
       break;
 
     case OPT_Wcomment:
@@ -391,7 +391,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
     case OPT_ftabstop_:
       /* It is documented that we silently ignore silly values.  */
       if (value >= 1 && value <= 100)
-	cpp_opts->tabstop = value;
+        cpp_opts->tabstop = value;
       break;
 
     case OPT_fexec_charset_:
@@ -458,9 +458,9 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_o:
       if (!out_fname)
-	out_fname = arg;
+        out_fname = arg;
       else
-	error ("output filename specified twice");
+        error ("output filename specified twice");
       break;
 
       /* SDCPP specfic */
@@ -469,8 +469,8 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       break;
 
       /* We need to handle the -pedantic switches here, rather than in
-	 sdcpp_common_post_options, so that a subsequent -Wno-endif-labels
-	 is not overridden.  */
+         sdcpp_common_post_options, so that a subsequent -Wno-endif-labels
+         is not overridden.  */
     case OPT_pedantic_errors:
       cpp_opts->pedantic_errors = 1;
       /* Fall through.  */
@@ -552,7 +552,7 @@ sdcpp_common_post_options (const char **pfilename)
   sanitize_cpp_opts ();
 
   register_include_chains (parse_in, sysroot, iprefix, imultilib,
-			   std_inc, 0, verbose);
+                           std_inc, 0, verbose);
 
   /* Open the output now.  We must do so even if flag_no_output is
      on, because there may be other output than from the actual
@@ -570,7 +570,7 @@ sdcpp_common_post_options (const char **pfilename)
 
   if (num_in_fnames > 1)
     error ("too many filenames given.  Type %s --help for usage",
-	   progname);
+           progname);
 
   init_pp_output (out_stream);
 
@@ -634,15 +634,15 @@ sdcpp_common_finish (void)
   if (cpp_opts->deps.style != DEPS_NONE)
     {
       /* If -M or -MM was seen without -MF, default output to the
-	 output stream.  */
+         output stream.  */
       if (!deps_file)
-	deps_stream = out_stream;
+        deps_stream = out_stream;
       else
-	{
-	  deps_stream = fopen (deps_file, deps_append ? "a": "w");
-	  if (!deps_stream)
-	    fatal_error ("opening dependency file %s: %s", deps_file, strerror(errno));
-	}
+        {
+          deps_stream = fopen (deps_file, deps_append ? "a": "w");
+          if (!deps_stream)
+            fatal_error ("opening dependency file %s: %s", deps_file, strerror(errno));
+        }
     }
 
   /* For performance, avoid tearing down cpplib's internal structures
@@ -676,10 +676,10 @@ check_deps_environment_vars (void)
     {
       GET_ENVIRONMENT (spec, "SUNPRO_DEPENDENCIES");
       if (spec)
-	{
-	  cpp_opts->deps.style = DEPS_SYSTEM;
-	  cpp_opts->deps.ignore_main_file = true;
-	}
+        {
+          cpp_opts->deps.style = DEPS_SYSTEM;
+          cpp_opts->deps.ignore_main_file = true;
+        }
     }
 
   if (spec)
@@ -687,15 +687,15 @@ check_deps_environment_vars (void)
       /* Find the space before the DEPS_TARGET, if there is one.  */
       char *s = strchr (spec, ' ');
       if (s)
-	{
-	  /* Let the caller perform MAKE quoting.  */
-	  defer_opt (OPT_MT, s + 1);
-	  *s = '\0';
-	}
+        {
+          /* Let the caller perform MAKE quoting.  */
+          defer_opt (OPT_MT, s + 1);
+          *s = '\0';
+        }
 
       /* Command line -MF overrides environment variables and default.  */
       if (!deps_file)
-	deps_file = spec;
+        deps_file = spec;
 
       deps_append = 1;
       deps_seen = true;
@@ -722,7 +722,7 @@ handle_deferred_opts (void)
       struct deferred_opt *opt = &deferred_opts[i];
 
       if (opt->code == OPT_MT || opt->code == OPT_MQ)
-	deps_add_target (deps, opt->arg, opt->code == OPT_MQ);
+        deps_add_target (deps, opt->arg, opt->code == OPT_MQ);
     }
 }
 
@@ -747,7 +747,7 @@ sanitize_cpp_opts (void)
   if (flag_no_output)
     {
       if (flag_dump_macros != 'M')
-	flag_dump_macros = 0;
+        flag_dump_macros = 0;
       flag_dump_includes = 0;
       flag_no_line_commands = 1;
     }
@@ -795,53 +795,53 @@ finish_options (void)
       size_t i;
 
       cb_file_change (parse_in,
-		      linemap_add (&line_table, LC_RENAME, 0,
-				   _("<built-in>"), 0));
+                      linemap_add (line_table, LC_RENAME, 0,
+                                   _("<built-in>"), 0));
 
       cpp_init_builtins (parse_in, 0 /*flag_hosted*/);
 
       /* We're about to send user input to cpplib, so make it warn for
-	 things that we previously (when we sent it internal definitions)
-	 told it to not warn.
+         things that we previously (when we sent it internal definitions)
+         told it to not warn.
 
-	 C99 permits implementation-defined characters in identifiers.
-	 The documented meaning of -std= is to turn off extensions that
-	 conflict with the specified standard, and since a strictly
-	 conforming program cannot contain a '$', we do not condition
-	 their acceptance on the -std= setting.  */
+         C99 permits implementation-defined characters in identifiers.
+         The documented meaning of -std= is to turn off extensions that
+         conflict with the specified standard, and since a strictly
+         conforming program cannot contain a '$', we do not condition
+         their acceptance on the -std= setting.  */
       cpp_opts->warn_dollars = (cpp_opts->pedantic && !cpp_opts->c99);
 
       cpp_change_file (parse_in, LC_RENAME, _("<command line>"));
       for (i = 0; i < deferred_count; i++)
-	{
-	  struct deferred_opt *opt = &deferred_opts[i];
+        {
+          struct deferred_opt *opt = &deferred_opts[i];
 
-	  if (opt->code == OPT_D)
-	    cpp_define (parse_in, opt->arg);
-	  else if (opt->code == OPT_U)
-	    cpp_undef (parse_in, opt->arg);
-	  else if (opt->code == OPT_A)
-	    {
-	      if (opt->arg[0] == '-')
-		cpp_unassert (parse_in, opt->arg + 1);
-	      else
-		cpp_assert (parse_in, opt->arg);
-	    }
-	}
+          if (opt->code == OPT_D)
+            cpp_define (parse_in, opt->arg);
+          else if (opt->code == OPT_U)
+            cpp_undef (parse_in, opt->arg);
+          else if (opt->code == OPT_A)
+            {
+              if (opt->arg[0] == '-')
+                cpp_unassert (parse_in, opt->arg + 1);
+              else
+                cpp_assert (parse_in, opt->arg);
+            }
+        }
 
       /* Handle -imacros after -D and -U.  */
       for (i = 0; i < deferred_count; i++)
-	{
-	  struct deferred_opt *opt = &deferred_opts[i];
+        {
+          struct deferred_opt *opt = &deferred_opts[i];
 
-	  if (opt->code == OPT_imacros
-	      && cpp_push_include (parse_in, opt->arg))
-	    {
-	      /* Disable push_command_line_include callback for now.  */
-	      include_cursor = deferred_count + 1;
-	      cpp_scan_nooutput (parse_in);
-	    }
-	}
+          if (opt->code == OPT_imacros
+              && cpp_push_include (parse_in, opt->arg))
+            {
+              /* Disable push_command_line_include callback for now.  */
+              include_cursor = deferred_count + 1;
+              cpp_scan_nooutput (parse_in);
+            }
+        }
     }
 
   include_cursor = 0;
@@ -857,8 +857,8 @@ push_command_line_include (void)
       struct deferred_opt *opt = &deferred_opts[include_cursor++];
 
       if (!cpp_opts->preprocessed && opt->code == OPT_include
-	  && cpp_push_include (parse_in, opt->arg))
-	return;
+          && cpp_push_include (parse_in, opt->arg))
+        return;
     }
 
   if (include_cursor == deferred_count)
@@ -868,18 +868,18 @@ push_command_line_include (void)
       cpp_opts->warn_unused_macros = warn_unused_macros;
       /* Restore the line map from <command line>.  */
       if (!cpp_opts->preprocessed)
-	cpp_change_file (parse_in, LC_RENAME, this_input_filename);
+        cpp_change_file (parse_in, LC_RENAME, this_input_filename);
 
       /* Set this here so the client can change the option if it wishes,
-	 and after stacking the main file so we don't trace the main file.  */
-      line_table.trace_includes = cpp_opts->print_include_names;
+         and after stacking the main file so we don't trace the main file.  */
+      line_table->trace_includes = cpp_opts->print_include_names;
     }
 }
 
 /* File change callback.  Has to handle -include files.  */
 static void
 cb_file_change (cpp_reader * ARG_UNUSED (pfile),
-		const struct line_map *new_map)
+                const struct line_map *new_map)
 {
   pp_file_change (new_map);
 
@@ -919,14 +919,14 @@ handle_OPT_d (const char *arg)
   while ((c = *arg++) != '\0')
     switch (c)
       {
-      case 'M':			/* Dump macros only.  */
-      case 'N':			/* Dump names.  */
-      case 'D':			/* Dump definitions.  */
-	flag_dump_macros = c;
-	break;
+      case 'M':                 /* Dump macros only.  */
+      case 'N':                 /* Dump names.  */
+      case 'D':                 /* Dump definitions.  */
+        flag_dump_macros = c;
+        break;
 
       case 'I':
-	flag_dump_includes = 1;
-	break;
+        flag_dump_includes = 1;
+        break;
       }
 }

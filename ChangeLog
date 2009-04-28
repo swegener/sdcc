@@ -1,3 +1,28 @@
+2009-04-27 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/output.h, support/cpp/opts-common.c,
+	  support/cpp/c-ppoutput.c, support/cpp/cppdefault.c,
+	  support/cpp/system.h, support/cpp/cppdefault.h,
+	  support/cpp/prefix.c, support/cpp/except.h, support/cpp/hwint.h,
+	  support/cpp/prefix.h, support/cpp/libiberty/safe-ctype.h,
+	  support/cpp/libiberty/filenames.h, support/cpp/libiberty/xstrdup.c,
+	  support/cpp/libiberty/md5.c, support/cpp/libiberty/obstack.h,
+	  support/cpp/sdcpp.c, support/cpp/intl.h, support/cpp/sdcpp.h
+	  support/cpp/libcpp/symtab.c, support/cpp/libcpp/directives.c,
+	  support/cpp/libcpp/macro.c, support/cpp/libcpp/include/cpplib.h,
+	  support/cpp/libcpp/include/symtab.h,
+	  support/cpp/libcpp/include/line-map.h,
+	  support/cpp/libcpp/include/cpp-id-data.h,
+	  support/cpp/libcpp/include/mkdeps.h, support/cpp/libcpp/files.c,
+	  support/cpp/libcpp/line-map.c, support/cpp/libcpp/init.c,
+	  support/cpp/libcpp/identifiers.c, support/cpp/libcpp/ucnid.h,
+	  support/cpp/libcpp/traditional.c, support/cpp/libcpp/errors.c,
+	  support/cpp/libcpp/expr.c, support/cpp/libcpp/internal.h,
+	  support/cpp/libcpp/mkdeps.c, support/cpp/libcpp/lex.c,
+	  support/cpp/libcpp/system.h, support/cpp/libcpp/charset.c,
+	  support/cpp/opts.h, support/cpp/sdcpp-opts.c:
+	  SDCPP synchronized with GCC CPP release version 4.4.0
+
 2009-04-28 Borut Razem <borut.razem AT siol.net>
 
 	* fixed GCC 4.4.0 mingw compilation:

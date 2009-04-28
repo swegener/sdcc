@@ -199,7 +199,7 @@ extern struct cpp_reader* parse_in;
 /*
  * From input.h
  */
-extern struct line_maps line_table;
+extern struct line_maps *line_table;
 
 typedef source_location location_t; /* deprecated typedef */
 
@@ -226,6 +226,5 @@ union tree_node
  * From diagnostic.h
  */
 extern int errorcount;
-
 
 #endif  /* __SDCPP_H */

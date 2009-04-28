@@ -1,12 +1,12 @@
 /* Utility to update paths from internal to external forms.
-   Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-   Free Software Foundation, Inc.
+   Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2007  Free Software Foundation, Inc.
 
 This file is part of GCC.
 
 GCC is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
+the Free Software Foundation; either version 3 of the License, or (at
 your option) any later version.
 
 GCC is distributed in the hope that it will be useful,
@@ -15,9 +15,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with GCC; see the file COPYING.  If not, write to the Free
-Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-Boston, MA 02110-1301, USA.  */
+License along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
 
 /* This file contains routines to update a path, both to canonicalize
    the directory format and to handle any prefix translation.
@@ -139,21 +138,21 @@ lookup_key (char *key)
   if (reg_key == (HKEY) INVALID_HANDLE_VALUE)
     {
       res = RegOpenKeyExA (HKEY_LOCAL_MACHINE, "SOFTWARE", 0,
-			   KEY_READ, &reg_key);
+                           KEY_READ, &reg_key);
 
       if (res == ERROR_SUCCESS)
-	res = RegOpenKeyExA (reg_key, "Free Software Foundation", 0,
-			     KEY_READ, &reg_key);
+        res = RegOpenKeyExA (reg_key, "Free Software Foundation", 0,
+                             KEY_READ, &reg_key);
 
       if (res == ERROR_SUCCESS)
-	res = RegOpenKeyExA (reg_key, WIN32_REGISTRY_KEY, 0,
-			     KEY_READ, &reg_key);
+        res = RegOpenKeyExA (reg_key, WIN32_REGISTRY_KEY, 0,
+                             KEY_READ, &reg_key);
 
       if (res != ERROR_SUCCESS)
-	{
-	  reg_key = (HKEY) INVALID_HANDLE_VALUE;
-	  return 0;
-	}
+        {
+          reg_key = (HKEY) INVALID_HANDLE_VALUE;
+          return 0;
+        }
     }
 
   size = 32;
@@ -192,33 +191,33 @@ translate_name (char *name)
     {
       code = name[0];
       if (code != '@' && code != '$')
-	break;
+        break;
 
       for (keylen = 0;
-	   (name[keylen + 1] != 0 && !IS_DIR_SEPARATOR (name[keylen + 1]));
-	   keylen++)
-	;
+           (name[keylen + 1] != 0 && !IS_DIR_SEPARATOR (name[keylen + 1]));
+           keylen++)
+        ;
 
       key = (char *) alloca (keylen + 1);
       strncpy (key, &name[1], keylen);
       key[keylen] = 0;
 
       if (code == '@')
-	{
-	  prefix = get_key_value (key);
-	  if (prefix == 0)
-	    prefix = std_prefix;
-	}
+        {
+          prefix = get_key_value (key);
+          if (prefix == 0)
+            prefix = std_prefix;
+        }
       else
-	prefix = getenv (key);
+        prefix = getenv (key);
 
       if (prefix == 0)
-	prefix = PREFIX;
+        prefix = PREFIX;
 
       /* We used to strip trailing DIR_SEPARATORs here, but that can
-	 sometimes yield a result with no separator when one was coded
-	 and intended by the user, causing two path components to run
-	 together.  */
+         sometimes yield a result with no separator when one was coded
+         and intended by the user, causing two path components to run
+         together.  */
 
       old_name = name;
       name = concat (prefix, &name[keylen + 1], NULL);
@@ -235,7 +234,7 @@ tr (char *string, int c1, int c2)
   do
     {
       if (*string == c1)
-	*string = c2;
+        *string = c2;
     }
   while (*string++);
 }
@@ -258,14 +257,14 @@ update_path (const char *path, const char *key)
       bool free_key = false;
 
       if (key[0] != '$')
-	{
-	  key = concat ("@", key, NULL);
-	  free_key = true;
-	}
+        {
+          key = concat ("@", key, NULL);
+          free_key = true;
+        }
 
       result = concat (key, &path[len], NULL);
       if (free_key)
-	free ((char *) key);
+        free (CONST_CAST (char *, key));
       result = translate_name (result);
     }
   else
@@ -282,50 +281,50 @@ update_path (const char *path, const char *key)
 
       p = strchr (p, '.');
       if (p == NULL)
-	break;
+        break;
       /* Look for `/../'  */
       if (p[1] == '.'
-	  && IS_DIR_SEPARATOR (p[2])
-	  && (p != result && IS_DIR_SEPARATOR (p[-1])))
-	{
-	  *p = 0;
-	  if (!ALWAYS_STRIP_DOTDOT && access (result, X_OK) == 0)
-	    {
-	      *p = '.';
-	      break;
-	    }
-	  else
-	    {
-	      /* We can't access the dir, so we won't be able to
-		 access dir/.. either.  Strip out `dir/../'.  If `dir'
-		 turns out to be `.', strip one more path component.  */
-	      dest = p;
-	      do
-		{
-		  --dest;
-		  while (dest != result && IS_DIR_SEPARATOR (*dest))
-		    --dest;
-		  while (dest != result && !IS_DIR_SEPARATOR (dest[-1]))
-		    --dest;
-		}
-	      while (dest != result && *dest == '.');
-	      /* If we have something like `./..' or `/..', don't
-		 strip anything more.  */
-	      if (*dest == '.' || IS_DIR_SEPARATOR (*dest))
-		{
-		  *p = '.';
-		  break;
-		}
-	      src = p + 3;
-	      while (IS_DIR_SEPARATOR (*src))
-		++src;
-	      p = dest;
-	      while ((*dest++ = *src++) != 0)
-		;
-	    }
-	}
+          && IS_DIR_SEPARATOR (p[2])
+          && (p != result && IS_DIR_SEPARATOR (p[-1])))
+        {
+          *p = 0;
+          if (!ALWAYS_STRIP_DOTDOT && access (result, X_OK) == 0)
+            {
+              *p = '.';
+              break;
+            }
+          else
+            {
+              /* We can't access the dir, so we won't be able to
+                 access dir/.. either.  Strip out `dir/../'.  If `dir'
+                 turns out to be `.', strip one more path component.  */
+              dest = p;
+              do
+                {
+                  --dest;
+                  while (dest != result && IS_DIR_SEPARATOR (*dest))
+                    --dest;
+                  while (dest != result && !IS_DIR_SEPARATOR (dest[-1]))
+                    --dest;
+                }
+              while (dest != result && *dest == '.');
+              /* If we have something like `./..' or `/..', don't
+                 strip anything more.  */
+              if (*dest == '.' || IS_DIR_SEPARATOR (*dest))
+                {
+                  *p = '.';
+                  break;
+                }
+              src = p + 3;
+              while (IS_DIR_SEPARATOR (*src))
+                ++src;
+              p = dest;
+              while ((*dest++ = *src++) != 0)
+                ;
+            }
+        }
       else
-	++p;
+        ++p;
     }
 
 #ifdef UPDATE_PATH_HOST_CANONICALIZE

@@ -1,14 +1,14 @@
 /* Part of CPP library.  (Macro and #define handling.)
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1996, 1998,
    1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Free Software Foundation, Inc.
+   2006, 2007, 2008, 2009 Free Software Foundation, Inc.
    Written by Per Bothner, 1994.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -17,8 +17,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+along with this program; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.
 
  In other words, you are welcome to use, share and improve this program.
  You are forbidden to forbid anyone else to use, share and improve
@@ -118,7 +118,7 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
 {
   const struct line_map *map;
   const uchar *result = NULL;
-  unsigned int number = 1;
+  linenum_type number = 1;
 
   switch (node->value.builtin)
     {
@@ -158,7 +158,7 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
                   {
                     cpp_errno (pfile, CPP_DL_WARNING,
                         "could not determine file timestamp");
-                    pbuffer->timestamp = U"\"??? ??? ?? ??:??:?? ????\"";
+                    pbuffer->timestamp = UC"\"??? ??? ?? ??:??:?? ????\"";
                   }
               }
           }
@@ -200,11 +200,10 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
       /* If __LINE__ is embedded in a macro, it must expand to the
          line of the macro's invocation, not its definition.
          Otherwise things like assert() will not work properly.  */
-      if (CPP_OPTION (pfile, traditional))
-        number = pfile->line_table->highest_line;
-      else
-        number = pfile->cur_token[-1].src_loc;
-      number = SOURCE_LINE (map, number);
+      number = SOURCE_LINE (map,
+                            CPP_OPTION (pfile, traditional)
+                            ? pfile->line_table->highest_line
+                            : pfile->cur_token[-1].src_loc);
       break;
 
       /* __STDC__ has the value 1 under normal circumstances.
@@ -256,8 +255,8 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
               cpp_errno (pfile, CPP_DL_WARNING,
                          "could not determine date and time");
 
-              pfile->date = U"\"??? ?? ????\"";
-              pfile->time = U"\"??:??:??\"";
+              pfile->date = UC"\"??? ?? ????\"";
+              pfile->time = UC"\"??:??:??\"";
             }
         }
 
@@ -375,8 +374,10 @@ stringify_arg (cpp_reader *pfile, macro_arg *arg)
           continue;
         }
 
-      escape_it = (token->type == CPP_STRING || token->type == CPP_WSTRING
-                   || token->type == CPP_CHAR || token->type == CPP_WCHAR);
+      escape_it = (token->type == CPP_STRING || token->type == CPP_CHAR
+                   || token->type == CPP_WSTRING || token->type == CPP_STRING
+                   || token->type == CPP_STRING32 || token->type == CPP_CHAR32
+                   || token->type == CPP_STRING16 || token->type == CPP_CHAR16);
 
       /* Room for each char being written in octal, initial space and
          final quote and NUL.  */
@@ -815,6 +816,13 @@ enter_macro_context (cpp_reader *pfile, cpp_hashnode *node,
 
   pfile->state.angled_headers = false;
 
+  if ((node->flags & NODE_BUILTIN) && !(node->flags & NODE_USED))
+    {
+      node->flags |= NODE_USED;
+      if (pfile->cb.used_define)
+        pfile->cb.used_define (pfile, pfile->directive_line, node);
+    }
+
   /* Handle standard macros.  */
   if (! (node->flags & NODE_BUILTIN))
     {
@@ -853,6 +861,13 @@ enter_macro_context (cpp_reader *pfile, cpp_hashnode *node,
 
       /* Disable the macro within its expansion.  */
       node->flags |= NODE_DISABLED;
+
+      if (!(node->flags & NODE_USED))
+        {
+          node->flags |= NODE_USED;
+          if (pfile->cb.used_define)
+            pfile->cb.used_define (pfile, pfile->directive_line, node);
+        }
 
       macro->used = 1;
 
@@ -992,6 +1007,17 @@ replace_args (cpp_reader *pfile, cpp_hashnode *node, cpp_macro *macro, macro_arg
              token should be flagged PASTE_LEFT.  */
           if (src->flags & PASTE_LEFT)
             paste_flag = dest - 1;
+        }
+      else if (CPP_PEDANTIC (pfile) && ! macro->syshdr
+               && ! CPP_OPTION (pfile, c99)
+               && ! cpp_in_system_header (pfile))
+        {
+          cpp_error (pfile, CPP_DL_PEDWARN,
+                     "invoking macro %s argument %d: "
+                     "empty macro arguments are undefined"
+                     " in ISO C90 and ISO C++98",
+                     NODE_NAME (node),
+                     src->val.arg_no);
         }
 
       /* Avoid paste on RHS (even case count == 0).  */
@@ -1224,14 +1250,45 @@ cpp_get_token (cpp_reader *pfile)
 
       if (!(node->flags & NODE_DISABLED))
         {
-          int ret;
+          int ret = 0;
           /* If not in a macro context, and we're going to start an
              expansion, record the location.  */
           if (can_set && !context->macro)
             pfile->invocation_location = result->src_loc;
           if (pfile->state.prevent_expansion)
             break;
-          ret = enter_macro_context (pfile, node, result);
+
+          /* Conditional macros require that a predicate be evaluated
+             first.  */
+          if ((node->flags & NODE_CONDITIONAL) != 0)
+            {
+              if (pfile->cb.macro_to_expand)
+                {
+                  bool whitespace_after;
+                  const cpp_token *peek_tok = cpp_peek_token (pfile, 0);
+
+                  whitespace_after = (peek_tok->type == CPP_PADDING
+                                      || (peek_tok->flags & PREV_WHITE));
+                  node = pfile->cb.macro_to_expand (pfile, result);
+                  if (node)
+                    ret = enter_macro_context (pfile, node, result);
+                  else if (whitespace_after)
+                    {
+                      /* If macro_to_expand hook returned NULL and it
+                         ate some tokens, see if we don't need to add
+                         a padding token in between this and the
+                         next token.  */
+                      peek_tok = cpp_peek_token (pfile, 0);
+                      if (peek_tok->type != CPP_PADDING
+                          && (peek_tok->flags & PREV_WHITE) == 0)
+                        _cpp_push_token_context (pfile, NULL,
+                                                 padding_token (pfile,
+                                                                peek_tok), 1);
+                    }
+                }
+            }
+          else
+            ret = enter_macro_context (pfile, node, result);
           if (ret)
             {
               if (pfile->state.in_directive || ret == 2)
@@ -1311,26 +1368,31 @@ cpp_scan_nooutput (cpp_reader *pfile)
   pfile->state.prevent_expansion--;
 }
 
+/* Step back one or more tokens obtained from the lexer.  */
+void
+_cpp_backup_tokens_direct (cpp_reader *pfile, unsigned int count)
+{
+  pfile->lookaheads += count;
+  while (count--)
+    {
+      pfile->cur_token--;
+      if (pfile->cur_token == pfile->cur_run->base
+          /* Possible with -fpreprocessed and no leading #line.  */
+          && pfile->cur_run->prev != NULL)
+        {
+          pfile->cur_run = pfile->cur_run->prev;
+          pfile->cur_token = pfile->cur_run->limit;
+        }
+    }
+}
+
 /* Step back one (or more) tokens.  Can only step back more than 1 if
    they are from the lexer, and not from macro expansion.  */
 void
 _cpp_backup_tokens (cpp_reader *pfile, unsigned int count)
 {
   if (pfile->context->prev == NULL)
-    {
-      pfile->lookaheads += count;
-      while (count--)
-        {
-          pfile->cur_token--;
-          if (pfile->cur_token == pfile->cur_run->base
-              /* Possible with -fpreprocessed and no leading #line.  */
-              && pfile->cur_run->prev != NULL)
-            {
-              pfile->cur_run = pfile->cur_run->prev;
-              pfile->cur_token = pfile->cur_run->limit;
-            }
-        }
-    }
+    _cpp_backup_tokens_direct (pfile, count);
   else
     {
       if (count != 1)
@@ -1355,6 +1417,15 @@ warn_of_redefinition (cpp_reader *pfile, const cpp_hashnode *node,
   /* Some redefinitions need to be warned about regardless.  */
   if (node->flags & NODE_WARN)
     return true;
+
+  /* Suppress warnings for builtins that lack the NODE_WARN flag.  */
+  if (node->flags & NODE_BUILTIN)
+    return false;
+
+  /* Redefinitions of conditional (context-sensitive) macros, on
+     the other hand, must be allowed silently.  */
+  if (node->flags & NODE_CONDITIONAL)
+    return false;
 
   /* Redefinition of a macro is allowed if and only if the old and new
      definitions are the same.  (6.10.3 paragraph 2).  */
@@ -1393,7 +1464,7 @@ _cpp_free_definition (cpp_hashnode *h)
   /* Macros and assertions no longer have anything to free.  */
   h->type = NT_VOID;
   /* Clear builtin flag in case of redefinition.  */
-  h->flags &= ~(NODE_BUILTIN | NODE_DISABLED);
+  h->flags &= ~(NODE_BUILTIN | NODE_DISABLED | NODE_USED);
 }
 
 /* Save parameter NODE to the parameter list of macro MACRO.  Returns
@@ -1788,6 +1859,10 @@ _cpp_create_definition (cpp_reader *pfile, cpp_hashnode *node)
       && ustrcmp (NODE_NAME (node), (const uchar *) "__STDC_LIMIT_MACROS")
       && ustrcmp (NODE_NAME (node), (const uchar *) "__STDC_CONSTANT_MACROS"))
     node->flags |= NODE_WARN;
+
+  /* If user defines one of the conditional macros, remove the
+     conditional flag */
+  node->flags &= ~NODE_CONDITIONAL;
 
   return ok;
 }

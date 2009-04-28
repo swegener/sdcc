@@ -1,10 +1,10 @@
 /* Structures that hang off cpp_identifier, for PCH.
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   1999, 2000, 2001, 2002, 2003, 2004, 2009 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -13,8 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+along with this program; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
 
 #include "cpplib.h"
 
@@ -22,7 +22,7 @@ Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 typedef unsigned char uchar;
 #endif
 
-#define U (const unsigned char *)  /* Intended use: U"string" */
+#define UC (const unsigned char *)  /* Intended use: UC"string" */
 
 /* Chained list of answers to an assertion.  */
 struct answer GTY(())
@@ -38,9 +38,9 @@ struct cpp_macro GTY(())
 {
   /* Parameters, if any.  */
   cpp_hashnode ** GTY ((nested_ptr (union tree_node,
-		"%h ? CPP_HASHNODE (GCC_IDENT_TO_HT_IDENT (%h)) : NULL",
-			"%h ? HT_IDENT_TO_GCC_IDENT (HT_NODE (%h)) : NULL"),
-			length ("%h.paramc")))
+                "%h ? CPP_HASHNODE (GCC_IDENT_TO_HT_IDENT (%h)) : NULL",
+                        "%h ? HT_IDENT_TO_GCC_IDENT (HT_NODE (%h)) : NULL"),
+                        length ("%h.paramc")))
     params;
 
   /* Replacement tokens (ISO) or replacement text (traditional).  See

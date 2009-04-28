@@ -1,10 +1,10 @@
 /* Map logical line numbers to (source file, line number) pairs.
-   Copyright (C) 2001, 2003, 2004, 2007
+   Copyright (C) 2001, 2003, 2004, 2007, 2008, 2009
    Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+Free Software Foundation; either version 3, or (at your option) any
 later version.
 
 This program is distributed in the hope that it will be useful,
@@ -13,8 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+along with this program; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.
 
  In other words, you are welcome to use, share and improve this program.
  You are forbidden to forbid anyone else to use, share and improve
@@ -81,12 +81,11 @@ linemap_free (struct line_maps *set)
 
    FROM_LINE should be monotonic increasing across calls to this
    function.  A call to this function can relocate the previous set of
-   A call to this function can relocate the previous set of
    maps, so any stored line_map pointers should not be used.  */
 
 const struct line_map *
 linemap_add (struct line_maps *set, enum lc_reason reason,
-             unsigned int sysp, const char *to_file, unsigned int to_line)
+             unsigned int sysp, const char *to_file, linenum_type to_line)
 {
   struct line_map *map;
   source_location start_location = set->highest_location + 1;
@@ -183,13 +182,13 @@ linemap_add (struct line_maps *set, enum lc_reason reason,
 }
 
 source_location
-linemap_line_start (struct line_maps *set, unsigned int to_line,
+linemap_line_start (struct line_maps *set, linenum_type to_line,
                     unsigned int max_column_hint)
 {
   struct line_map *map = &set->maps[set->used - 1];
   source_location highest = set->highest_location;
   source_location r;
-  unsigned int last_line = SOURCE_LINE (map, set->highest_line);
+  linenum_type last_line = SOURCE_LINE (map, set->highest_line);
   int line_delta = to_line - last_line;
   bool add_map = false;
   if (line_delta < 0
@@ -225,8 +224,8 @@ linemap_line_start (struct line_maps *set, unsigned int to_line,
       if (line_delta < 0
           || last_line != map->to_line
           || SOURCE_COLUMN (map, highest) >= (1U << column_bits))
-        map = (struct line_map*) linemap_add (set, LC_RENAME, map->sysp,
-                                      map->to_file, to_line);
+        map = (struct line_map *) linemap_add (set, LC_RENAME, map->sysp,
+                                               map->to_file, to_line);
       map->column_bits = column_bits;
       r = map->start_location + ((to_line - map->to_line) << column_bits);
     }

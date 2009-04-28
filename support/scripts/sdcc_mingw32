@@ -2,10 +2,10 @@
 # Script to crosscompile with mingw32
 TOOLSPREFIX=/usr/local/cross-tools/bin/i586-mingw32msvc-
 
-export CC=${TOOLSPREFIX}/gcc
-export CXX=${TOOLSPREFIX}/g++
-export RANLIB=${TOOLSPREFIX}/ranlib
-export STRIP=${TOOLSPREFIX}/strip
+export CC=${TOOLSPREFIX}gcc
+export CXX=${TOOLSPREFIX}g++
+export RANLIB=${TOOLSPREFIX}ranlib
+export STRIP=${TOOLSPREFIX}strip
 
 export SDCCCONFIGUREFLAGS=" \
 --prefix=/sdcc \
@@ -17,4 +17,4 @@ sdccconf_h_dir_separator=\\\\ \
 --disable-device-lib \
 --host=i586-mingw32msvc --build=unknown-unknown-linux-gnu"
 
-./configure ${SDCCCONFIGUREFLAGS} & make 2>&1 | tee make.log
+../sdcc/configure ${SDCCCONFIGUREFLAGS} & make 2>&1 | tee make.log

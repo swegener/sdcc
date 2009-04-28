@@ -17,4 +17,4 @@ sdccconf_h_dir_separator=\\\\ \
 --disable-device-lib \
 --host=i586-mingw32msvc --build=unknown-unknown-linux-gnu"
 
-../sdcc/configure ${SDCCCONFIGUREFLAGS} & make 2>&1 | tee make.log
+( ../sdcc/configure ${SDCCCONFIGUREFLAGS} && make ) 2>&1 | tee make.log

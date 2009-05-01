@@ -1,3 +1,9 @@
+2009-05-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (processParms): fixed bug 2783061 by applying patch from
+	  Keith Packard, thanks
+	* support/regression/tests/bug2783061.c: new, added
+
 2009-04-27 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/output.h, support/cpp/opts-common.c,
@@ -157,7 +163,7 @@
 
 2009-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
-	* device/lib/z80/mul.s: 
+	* device/lib/z80/mul.s:
 	  Minor improvement in Z80 16x16 bit multiplication.
 
 2009-03-23 Borut Razem <borut.razem AT siol.net>

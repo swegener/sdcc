@@ -1,5 +1,5 @@
 /*
-  getline.h - read a line from file into a buffer
+  lk_readnl.h - read a line from file into a buffer
   version 1.0.0, Aprile 25th, 2008
 
   Copyright (c) 2008 Borut Razem
@@ -25,8 +25,8 @@
 */
 
 
-#ifndef __GETLINE_H
-#define __GETLINE_H
+#ifndef __LK_READNL_H
+#define __LK_READNL_H
 
 #include <stdio.h>
 
@@ -35,10 +35,10 @@ extern "C"
 {
 #endif
 
-  char *getline (char *s, int size, FILE * stream);
+  char *lk_readnl (char *s, int size, FILE * stream);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif                          /* __GETLINE_H */
+#endif                          /* __LK_READNL_H */

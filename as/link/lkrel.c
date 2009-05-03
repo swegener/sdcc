@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <string.h>
 #include <assert.h>
 
-#include "getline.h"
+#include "lk_readnl.h"
 #include "aslink.h"
 #include "lkrel.h"
 
@@ -79,7 +79,7 @@ load_rel (FILE * libfp, long size)
 
       end = (size >= 0) ? ftell (libfp) + size : -1;
 
-      while ((end < 0 || ftell (libfp) < end) && getline (str, sizeof (str), libfp) != NULL)
+      while ((end < 0 || ftell (libfp) < end) && lk_readnl (str, sizeof (str), libfp) != NULL)
         {
           if (0 == strcmp (str, "</REL>"))
             return 1;
@@ -110,7 +110,7 @@ enum_symbols (FILE * fp, long size, int (*func) (const char *symvoid, void *para
    * our object file and don't go into the next one.
    */
 
-  while ((end < 0 || ftell (fp) < end) && getline (buf, sizeof (buf), fp) != NULL)
+  while ((end < 0 || ftell (fp) < end) && lk_readnl (buf, sizeof (buf), fp) != NULL)
     {
       char symname[NINPUT];
       char c;

@@ -1,10 +1,19 @@
+2009-05-03 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/hc08/Makefile.in, as/link/mcs51/Makefile.in,
+	  as/link/z80/Makefile.in, as/link/lk_readnl.c, as/link/lk_readnl.h,
+	  as/link/lklib.c, as/link/lkrel.c, as/link/lksdcclib.c:
+	  getline renamed to lk_readln to prevent conflicts with Fedora 11
+	  glibc-2.9.90-19 getline;
+	  see https://bugzilla.redhat.com/show_bug.cgi?id=488217
+
 2009-05-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (processParms): fixed bug 2783061 by applying patch from
 	  Keith Packard, thanks
 	* support/regression/tests/bug2783061.c: new, added
 
-2009-04-27 Borut Razem <borut.razem AT siol.net>
+2009-04-28 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/output.h, support/cpp/opts-common.c,
 	  support/cpp/c-ppoutput.c, support/cpp/cppdefault.c,
@@ -27,7 +36,8 @@
 	  support/cpp/libcpp/mkdeps.c, support/cpp/libcpp/lex.c,
 	  support/cpp/libcpp/system.h, support/cpp/libcpp/charset.c,
 	  support/cpp/opts.h, support/cpp/sdcpp-opts.c:
-	  SDCPP synchronized with GCC CPP release version 4.4.0
+	  SDCPP synchronized with GCC CPP release version 4.4.0.
+	  SDCPP license changed to GPL version 3 or later.
 
 2009-04-28 Borut Razem <borut.razem AT siol.net>
 

@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <string.h>
 
-#include "getline.h"
+#include "lk_readnl.h"
 #include "aslink.h"
 #include "lklibr.h"
 #include "lkrel.h"
@@ -51,7 +51,7 @@ buildlibraryindex_lib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, in
 {
   char relfil[NINPUT];
 
-  while (getline (relfil, sizeof (relfil), libfp) != NULL)
+  while (lk_readnl (relfil, sizeof (relfil), libfp) != NULL)
     {
       FILE *fp;
       char str[PATH_MAX];
@@ -126,7 +126,7 @@ fndsym_lib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
 
   D ("Searching symbol: %s\n", name);
 
-  while (getline (relfil, sizeof (relfil), libfp) != NULL)
+  while (lk_readnl (relfil, sizeof (relfil), libfp) != NULL)
     {
       char str[PATH_MAX];
       FILE *fp;
@@ -206,7 +206,7 @@ fndsym_lib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
  *
  *   functions called:
  *      int     fclose()    c_library
- *      char    *getline()  getline.c
+ *      char    *lk_readnl()  lk_readnl.c
  *      FILE *  fopen()     c_library
  *      VOID    link_main() lkmain.c
  *      int     strlen()    c_library

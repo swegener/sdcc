@@ -13,7 +13,7 @@ ASXXLIBSRC = strcmpi.c
 
 LKLIB = $(srcdir)/..
 
-LKLIBSRC = getline.c lkaomf51.c lkar.c lkdata.c lkeval.c \
+LKLIBSRC = lk_readnl.c lkaomf51.c lkar.c lkdata.c lkeval.c \
            lkhead.c lklex.c lklib.c lklibr.c lklist.c \
            lknoice.c lkrel.c lksdcclib.c lkstore.c lksym.c
 

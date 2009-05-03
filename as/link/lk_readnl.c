@@ -1,5 +1,5 @@
 /*
-  getline.c - read a line from file into a buffer
+  lk_readnl.c - read a line from file into a buffer
   version 1.0.0, April 25th, 2008
 
   Copyright (c) 2008 Borut Razem
@@ -24,25 +24,25 @@
   borut.razem@siol.net
 */
 
-#include "getline.h"
+#include "lk_readnl.h"
 
 /*******************************************************************************
 
-                                getline
+                                lk_readnl
 
-getline() reads in at most one less than size characters from stream and stores
+lk_readnl() reads in at most one less than size characters from stream and stores
 them into the buffer pointed to by s. Reading stops after an EOF or a newline.
 The newline character is not stored into the buffer. A '\0' is stored after the
 last character in the buffer. All the characters between size and the newline or
 EOF are skipped.
 
-getline() return s on success, and NULL on error or when end of file occurs
+lk_readnl() return s on success, and NULL on error or when end of file occurs
 while no characters have been read.
 
 *******************************************************************************/
 
 char *
-getline (char *s, int size, FILE * stream)
+lk_readnl (char *s, int size, FILE * stream)
 {
   static char eof_f = 0;
   int c = '\0';

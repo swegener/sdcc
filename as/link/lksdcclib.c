@@ -32,13 +32,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdlib.h>
 #include <string.h>
 
-#include "getline.h"
+#include "lk_readnl.h"
 #include "aslink.h"
 #include "lklibr.h"
 #include "lkrel.h"
 
 #define EQ(A,B) !strcmp((A),(B))
-#define MAXLINE 254             /*when using getline */
+#define MAXLINE 254             /* when using lk_readnl */
 
 
 static int
@@ -72,14 +72,14 @@ LoadRel (char *libfname, FILE * libfp, char *ModName)
   char str[NINPUT];
   int state = 0;
 
-  while (getline (str, sizeof (str), libfp) != NULL)
+  while (lk_readnl (str, sizeof (str), libfp) != NULL)
     {
       switch (state)
         {
         case 0:
           if (EQ (str, "<FILE>"))
             {
-              if (NULL != getline (str, sizeof (str), libfp) && EQ (str, ModName))
+              if (NULL != lk_readnl (str, sizeof (str), libfp) && EQ (str, ModName))
                 state = 1;
               else
                 return 0;
@@ -105,7 +105,7 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
   long IndexOffset = 0;
   pmlibrarysymbol ThisSym = NULL;
 
-  while (getline (FLine, sizeof (FLine), libfp))
+  while (lk_readnl (FLine, sizeof (FLine), libfp))
     {
       switch (state)
         {
@@ -113,7 +113,7 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
           if (EQ (FLine, "<INDEX>"))
             {
               /*The next line has the size of the index */
-              getline (FLine, sizeof (FLine), libfp);
+              lk_readnl (FLine, sizeof (FLine), libfp);
               IndexOffset = atol (FLine);
               state = 1;
             }
@@ -128,7 +128,7 @@ buildlibraryindex_sdcclib (struct lbname *lbnh, FILE * libfp, pmlibraryfile This
 
               /* The next line has the name of the module and the offset
                  of the corresponding embedded file in the library */
-              getline (FLine, sizeof (FLine), libfp);
+              lk_readnl (FLine, sizeof (FLine), libfp);
               sscanf (FLine, "%s %ld", ModName, &FileOffset);
               state = 2;
 
@@ -205,7 +205,7 @@ LoadAdb (FILE * libfp)
   int state = 0;
   int ret = 0;
 
-  while (getline (str, sizeof (str), libfp) != NULL)
+  while (lk_readnl (str, sizeof (str), libfp) != NULL)
     {
       switch (state)
         {
@@ -239,7 +239,7 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
   int state = 0;
   long IndexOffset = 0, FileOffset;
 
-  while (getline (FLine, sizeof (FLine), libfp))
+  while (lk_readnl (FLine, sizeof (FLine), libfp))
     {
       char filspc[PATH_MAX];
 
@@ -260,7 +260,7 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
           if (EQ (FLine, "<INDEX>"))
             {
               /* The next line has the size of the index */
-              getline (FLine, sizeof (FLine), libfp);
+              lk_readnl (FLine, sizeof (FLine), libfp);
               IndexOffset = atol (FLine);
               state = 1;
             }
@@ -271,7 +271,7 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
             {
               /* The next line has the name of the module and the offset
                  of the corresponding embedded file in the library */
-              getline (FLine, sizeof (FLine), libfp);
+              lk_readnl (FLine, sizeof (FLine), libfp);
               sscanf (FLine, "%s %ld", ModName, &FileOffset);
               state = 2;
             }

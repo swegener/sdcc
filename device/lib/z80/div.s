@@ -19,7 +19,7 @@ __divsuchar_rrx_s::
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        xor     a
+        ld      h,#0
 
         jr      signexte
 
@@ -30,7 +30,7 @@ __modsuchar_rrx_s::
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        xor     a
+        ld      h,#0
 
         call    signexte
 
@@ -67,8 +67,8 @@ __div8::
         ld      a,l             ; Sign extend
         rlca
         sbc     a
-signexte:
         ld      h,a
+signexte:
         ld      a,e             ; Sign extend
         rlca
         sbc     a
@@ -87,7 +87,7 @@ signexte:
         ;;   If divisor is non-zero, carry=0
         ;;   If divisor is 0, carry=1 and both quotient and remainder are 0
         ;;
-        ;; Register used: AF,BC,DE,HL
+        ;; Register used: AF,B,DE,HL
 __divsint_rrx_hds::
 __div16::
         ;; Determine sign of quotient by xor-ing high bytes of dividend
@@ -190,23 +190,57 @@ __divu16::
         ld      a,e
         or      d
         jr      Z,.dividebyzero ; Branch if divisor is non-zero
-        ld      a,h
-        ld      c,l
-        ld      hl,#0
-        ;; Carry was cleared by OR, this "0" bit will pass trough AC.[*]
-        ld      b,#16           ; 16 bits in dividend
+        ;; Two algorithms: one assumes divisor <2^7, the second
+        ;; assumes divisor >=2^7; choose the applicable one.
+        and     #0x80
+        jr      NZ,.morethan7bits
+        or      d
+        jr      NZ,.morethan7bits
+        ;; Both algorithms "rotate" 24 bits (H,L,A) but roles change.
+
+        ;; unsigned 16/7-bit division
+        ;; Rewrote on April 2009 by Marco Bodrato ( http://bodrato.it/ )
+.atmost7bits:
+        ld      b,#16           ; bits in dividend and possible quotient
+        ;; Carry cleared by AND/OR, this "0" bit will pass trough HL.[*]
+        adc     hl,hl
+.dvloop7:
+        ;; HL holds both dividend and quotient. While we shift a bit from
+        ;;  MSB of dividend, we shift next bit of quotient in from carry.
+        ;; A holds remainder.
+        rla
+
+        ;; If remainder is >= divisor, next bit of quotient is 1.  We try
+        ;;  to compute the difference.
+        sub     a,e
+        jr      NC,.nodrop7     ; Jump if remainder is >= dividend
+        add     a,e             ; Otherwise, restore remainder
+        ;; The add above sets the carry, because sbc a,e did set it.
+.nodrop7:
+        ccf                     ; Complement borrow so 1 indicates a
+                                ;  successful substraction (this is the
+                                ;  next bit of quotient)
+        adc     hl,hl
+        djnz    .dvloop7
+        ;; Carry now contains the same value it contained before
+        ;; entering .dvloop7[*]: "0" = valid result.
+        ld      e,a             ; DE = remainder, HL = quotient
+        ret
+
+.morethan7bits:
+        ld      b,#9            ; at most 9 bits in quotient.
+        ld      a,l             ; precompute the first 7 shifts, by
+        ld      l,h             ;  doing 8
+        ld      h,#0
+        rr      l               ;  undoing 1
 .dvloop:
         ;; Cleaned up on April 2009 by Marco Bodrato(http://bodrato.it/ )
         ;; Shift next bit of quotient into bit 0 of dividend
         ;; Shift next MSB of dividend into LSB of remainder
-        ;; AC holds both dividend and quotient. While we shift a bit from
+        ;; A holds both dividend and quotient. While we shift a bit from
         ;;  MSB of dividend, we shift next bit of quotient in from carry
         ;; HL holds remainder
-        ;; Do a 32-bit left shift, shifting carry to C, C to A,
-        ;;  A to HL
-        rl      c               ; Carry (next bit of quotient) to bit 0
-        rla
-        adc     hl,hl           ; HL < 32768 before, no carry, ever.
+        adc     hl,hl           ; HL < 2^(7+9), no carry, ever.
 
         ;; If remainder is >= divisor, next bit of quotient is 1. We try
         ;;  to compute the difference.
@@ -218,13 +252,13 @@ __divu16::
         ccf                     ; Complement borrow so 1 indicates a
                                 ;  successful substraction (this is the
                                 ;  next bit of quotient)
-        djnz    .dvloop
-        ;; Shift last carry bit into quotient
-        rl      c               ; Carry to C
         rla
-        ;; Carry now contains the same value it contained before
-        ;; entering .dvloop[*]: "0" = valid result.
-        ld      d,a
-        ld      e,c             ; DE = quotient, HL = remainder
+        djnz    .dvloop
+        ;; Take care of the ninth quotient bit! after the loop B=0.
+        rl      b               ; BA = quotient
+        ;; Carry now contains "0" = valid result.
+        ld      d,b
+        ld      e,a             ; DE = quotient, HL = remainder
         ex      de,hl           ; HL = quotient, DE = remainder
         ret
+

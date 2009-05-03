@@ -1,3 +1,8 @@
+2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/div.s:
+	  Applied patch #2764475 from Marco Bodrato to speed up Z80 division.
+
 2009-05-03 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/hc08/Makefile.in, as/link/mcs51/Makefile.in,

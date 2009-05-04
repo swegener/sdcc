@@ -1,3 +1,9 @@
+2009-05-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/link/hc08/link_hc08.dsp, as/link/mcs51/aslink.dsp, 
+	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp: replaced getline.c
+	  with lk_readnl.c.
+
 2009-05-04 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/sdcpp.c, support/cpp/version.c: fixed crash due to

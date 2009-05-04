@@ -269,6 +269,8 @@ general_init (const char *argv0)
   gcc_init_libintl ();
 
   line_table = XNEW (struct line_maps);
+  linemap_init (line_table);
+  line_table->reallocator = xrealloc;
 }
 
 /* Process the options that have been parsed.  */

@@ -1,3 +1,9 @@
+2009-05-04 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/sdcpp.c, support/cpp/version.c: fixed crash due to
+	  missing initialization of line_table,
+	  corrected sdcpp version to 4.4.0
+
 2009-04-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/div.s:

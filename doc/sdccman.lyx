@@ -1,4 +1,4 @@
-#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.5 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -1055,6 +1055,63 @@ name "-\\/-std-c99"
 
 \series default
  command line option is defined.
+\end_layout
+
+\begin_layout Itemize
+pointer type parameters to vararg
+\begin_inset LatexCommand index
+name "vararg, va\\_arg"
+
+\end_inset
+
+ functions are casted to generic pointers on harvard architectures (e.g.
+ mcs51, ds390) unless explicitly casted and 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset LatexCommand index
+name "-\\/-std-c89"
+
+\end_inset
+
+
+\series default
+ and 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset LatexCommand index
+name "-\\/-std-c99"
+
+\end_inset
+
+
+\series default
+ command line option are not defined.
 \end_layout
 
 \begin_layout Itemize

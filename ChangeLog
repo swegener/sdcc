@@ -1,3 +1,9 @@
+2009-05-07 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* support/librarian/sdcclib.c: fixed bugs in GetNameFromPath() and
+	  ChangeExtension().  Thanks to Jon Nall for pointed the bug out and
+	  patch #2788108.
+
 2009-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented pointer casting for vararg function params

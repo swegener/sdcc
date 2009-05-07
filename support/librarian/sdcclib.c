@@ -58,7 +58,10 @@ void GetNameFromPath(char * path, char * name)
     int i, j;
 
     for(i=0; path[i]!=0; i++);
-    for(; (path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
+    for(; i>=0; i--)
+    {
+    	if((path[i]=='\\') || (path[i]=='/')) break;
+    }
     for(j=0, i++; (path[i]!='.')&&(path[i]!=0); i++, j++) name[j]=path[i];
     name[j]=0;
 }
@@ -68,15 +71,26 @@ void ChangeExtension(char * path, char * ext)
     int i;
 
     for(i=0; path[i]!=0; i++);
-    for(; (path[i]!='.')&&(path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
-    if(path[i]=='.')
+    for(; i>=0; i--)
     {
-        path[i+1]=0;
-        strcat(path, ext);
+    	if( (path[i]=='.') || (path[i]=='\\') || (path[i]=='/') ) break;
+    }
+    if(i>=0)
+    {
+	    if(path[i]=='.')
+	    {
+	        path[i+1]=0;
+	        strcat(path, ext);
+	    }
+	    else
+	    {
+	        printf("ERROR: Filename '%s' must have an extension\n", path);
+	        exit(1);
+	    }
     }
     else
     {
-        printf("ERROR: Filename '%s' must have an extension\n", path);
+        printf("ERROR: Empty filename\n");
         exit(1);
     }
 }

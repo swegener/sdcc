@@ -1,4 +1,4 @@
-#LyX 1.5.5 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -931,20 +931,7 @@ name "-\\/-std-c99"
 
 
 \series default
- command line option are not defined 
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Standard
-
-\series bold
-\InsetSpace ~
-!
-\end_layout
-
-\end_inset
-
-, e.g.: 
+ command line option are not defined, e.g.: 
 \newline
 
 \family typewriter
@@ -1222,19 +1209,6 @@ name "\\~\\/ Operator"
 \end_inset
 
 b; /* equivalent to b=1 instead of toggling b */
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Standard
-
-\series bold
-\InsetSpace ~
-!
-\end_layout
-
-\end_inset
-
-
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -2025,8 +1999,8 @@ the binaries can be built by cross compiling on SDCC Distributed Compile
 
 \begin_layout Standard
 See the examples, how to pass the Win32 settings to 'configure'.
- The other Win32 builds using Borland, VC or whatever don't use 'configure',
- but a header file sdcc_vc_in.h is the same as sdccconf.h built by 'configure'
+ The other Win32 builds using VC or whatever don't use 'configure', but
+ a header file sdcc_vc_in.h is the same as sdccconf.h built by 'configure'
  for Win32.
 \newline
 
@@ -4875,55 +4849,6 @@ That is it.
 bin_vc to sdcc
 \backslash
 bin, and you can compile using SDCC.
-\end_layout
-
-\begin_layout Subsection
-Building SDCC Using Borland
-\end_layout
-
-\begin_layout Enumerate
-From the sdcc directory, run the command "make -f Makefile.bcc".
- This should regenerate all the .exe files in the bin directory except for
- SDCDB and ucSim.
-\end_layout
-
-\begin_layout Enumerate
-If you modify any source files and need to rebuild, be aware that the dependenci
-es may not be correctly calculated.
- The safest option is to delete all .obj files and run the build again.
- From a Cygwin BASH prompt, this can easily be done with the command (be
- sure you are in the sdcc directory):
-\newline
-
-\newline
-
-\family sans
-\series bold
-find .
- 
-\backslash
-( -name '*.obj' -o -name '*.lib' -o -name '*.rul' 
-\backslash
-) -print -exec rm {} 
-\backslash
-;
-\family default
-\series default
-
-\newline
-
-\newline
-or on Windows NT/2000/XP from the command prompt with the command:
-\newline
-
-\family sans
-\series bold
-
-\newline
-del /s *.obj *.lib *.rul
-\family default
-\series default
- from the sdcc directory.
 \end_layout
 
 \begin_layout Subsection
@@ -23995,7 +23920,7 @@ name "Defines created by the compiler"
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="15" columns="2">
+<lyxtabular version="3" rows="16" columns="2">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="3in">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="3in">
@@ -24529,7 +24454,7 @@ status collapsed
 \begin_layout Standard
 SDCC_FLOAT_REENT
 \begin_inset LatexCommand index
-name "SDCC\\_MODEL\\_FLAT24"
+name "SDCC\\_FLOAT\\_REENT"
 
 \end_inset
 

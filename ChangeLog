@@ -1,3 +1,7 @@
+2009-05-09 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: implemented FRE #2786753: Remove Borland C support
+
 2009-05-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/uPSD32xx.h: added, thanks G.H.J. Morsink

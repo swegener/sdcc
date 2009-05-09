@@ -2099,6 +2099,12 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
         }
     }
 
+    /* Fixes #2646174, but there might be a better way */
+    if(ic->op == SEND)
+        {
+          return NULL;
+        }
+
   OP_SYMBOL (op)->ruonly = 1;
   return sic;
 }

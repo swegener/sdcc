@@ -8110,6 +8110,10 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
     }
   else if (nunity == 1)
     {
+      int k = 0;
+      PAIR_ID dest_pairs[2];
+      PAIR_ID src_pairs[2];
+      int i_pairs[2];
       /* One is OK. Find the other two. */
       for (i = 0; i < 3; i++)
         {
@@ -8132,13 +8136,26 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
                         }
                       else
                         {
-                          fetchPair (dest[i], AOP (pparams[i]));
+                          dest_pairs[k] = dest[i];
+                          src_pairs[k] = j;
+                          i_pairs[k] = i;
+                          k++;
                           continue;
                         }
                     }
                 }
             }
         }
+        if(dest_pairs[0] != src_pairs[1])
+          {
+            fetchPair (dest_pairs[0], AOP (pparams[i_pairs[0]]));
+            fetchPair (dest_pairs[1], AOP (pparams[i_pairs[1]]));
+          }
+        else
+          {
+            fetchPair (dest_pairs[1], AOP (pparams[i_pairs[1]]));
+            fetchPair (dest_pairs[0], AOP (pparams[i_pairs[0]]));
+          }
     }
   else
     {

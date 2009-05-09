@@ -1,3 +1,8 @@
+2009-05-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fixed bug #1924707.
+
 2009-05-09 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: implemented FRE #2786753: Remove Borland C support

@@ -1031,32 +1031,32 @@ replace restart {
 	; peephole 48 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-//replace restart {
-//	or	a,%1
-//	jp	NZ,%2
-//	ld	a,%3
-//	or	a,a
-//} by {
-//	or	a,%1
-//	jp	NZ,%2
-//	or	a,%3
-//	; peephole 49 shortened or using a (which has just been tested to be #0x00).
-//} if operandsNotSame3(%3 '(bc)' '(de)')
+replace restart {
+	or	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	or	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole 49 shortened or using a (which has just been tested to be #0x00).
+} if operandsNotRelated(%3 '(bc)' '(de)')
 
-//replace restart {
-//	and	a,%1
-//	jp	NZ,%2
-//	ld	a,%3
-//	or	a,a
-//} by {
-//	and	a,%1
-//	jp	NZ,%2
-//	or	a,%3
-//	; peephole 50 shortened or using a (which has just been tested to be #0x00).
-//} if operandsNotSame3(%3 '(bc)' '(de)')
+replace restart {
+	and	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	and	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole 50 shortened or using a (which has just been tested to be #0x00).
+} if operandsNotRelated(%3 '(bc)' '(de)')
 
 // Commented out sine it triggers for %3 od the form (#...)
-//replace restart {
+// replace restart {
 //	sub	a,%1
 //	jp	NZ,%2
 //	ld	a,%3
@@ -1080,7 +1080,7 @@ replace restart {
 	or	a,%2
 	; peephole 52 shortened or using a (which has just been tested to be #0x00).
 }
-//if operandsNotSame3(%2 '(bc)' '(de)')
+if operandsNotRelated(%2 '(bc)' '(de)')
 
 replace restart {
 	or	a,%1

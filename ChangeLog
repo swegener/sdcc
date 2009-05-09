@@ -1,3 +1,7 @@
+2009-05-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/uPSD32xx.h: added, thanks G.H.J. Morsink
+
 2009-05-07 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* support/librarian/sdcclib.c: fixed bugs in GetNameFromPath() and

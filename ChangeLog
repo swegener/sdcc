@@ -1,6 +1,8 @@
 2009-05-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/uPSD32xx.h: added, thanks G.H.J. Morsink
+	* device/include/mcs51/C8051F920.h: added, from patch 2486338,
+	  thanks Steven Borley
 
 2009-05-07 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 

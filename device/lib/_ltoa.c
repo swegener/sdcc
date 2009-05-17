@@ -26,7 +26,7 @@
 # define MEMSPACE_BUFFER __idata	/* eventually __pdata or __xdata */
 # pragma nogcse
 #else
-# define MEMSPACE_BUFFER 
+# define MEMSPACE_BUFFER
 #endif
 
 void _ultoa(unsigned long value, char* string, unsigned char radix)
@@ -36,7 +36,7 @@ void _ultoa(unsigned long value, char* string, unsigned char radix)
 
   do {
     unsigned char c = '0' + (value % radix);
-    if (c > '9') 
+    if (c > (unsigned char)'9')
        c += 'A' - '9' - 1;
     buffer[--index] = c;
     value /= radix;

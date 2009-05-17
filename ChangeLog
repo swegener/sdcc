@@ -1,8 +1,34 @@
+2009-05-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_iscntrl.c,
+	* device/lib/_isdigit.c,
+	* device/lib/_isgraph.c,
+	* device/lib/_islower.c,
+	* device/lib/_isprint.c,
+	* device/lib/_ispunct.c,
+	* device/lib/_isspace.c,
+	* device/lib/_isupper.c,
+	* device/lib/_isxdigit.c,
+	* device/lib/_ltoa.c,
+	* device/lib/pic16/libc/ctype/iscntrl.c,
+	* device/lib/pic16/libc/ctype/isdigit.c,
+	* device/lib/pic16/libc/ctype/isgraph.c,
+	* device/lib/pic16/libc/ctype/islower.c,
+	* device/lib/pic16/libc/ctype/isprint.c,
+	* device/lib/pic16/libc/ctype/ispunct.c,
+	* device/lib/pic16/libc/ctype/isspace.c,
+	* device/lib/pic16/libc/ctype/isupper.c,
+	* device/lib/pic16/libc/ctype/isxdigit.c,
+	* device/lib/pic16/libc/stdlib/ltoa.c: fixed warnings after patch 2704189
+	* src/SDCCglue.c (printIvalBitFields): fixed bug 2791782, a bug with
+	  bitfields in next integer and an endianness bug for hc08
+	* support/regression/tests/bitfields.c: added testcase for these bugs
+
 2009-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.c,
 	  src/z80/gen.c,
-          support/regression/test/bug-2646174.c:
+	  support/regression/test/bug-2646174.c:
 	  Fixed bug #2646174.
 
 2009-05-09 Philipp Klaus Krause <pkk AT spth.de>
@@ -12,7 +38,7 @@
 
 2009-05-09 Borut Razem <borut.razem AT siol.net>
 
-	* doc/sdccman.lyx: implemented FRE #2786753: Remove Borland C support
+	* doc/sdccman.lyx: implemented RFE #2786753: Remove Borland C support
 
 2009-05-09 Maarten Brock <sourceforge.brock AT dse.nl>
 

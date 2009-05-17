@@ -31,7 +31,7 @@ void ultoa(unsigned long value, __data char* str, unsigned char radix)
 
     do {
       ch = '0' + (value % radix);
-      if ( ch > '9') ch += 'a' - '9' - 1;
+      if ( ch > (unsigned char)'9') ch += 'a' - '9' - 1;
 
 #if _DEBUG
       io_str( "ultoa: " );

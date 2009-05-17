@@ -657,11 +657,12 @@ printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
   initList *lilist = *ilist;
   unsigned long ival = 0;
   int size = 0;
+  int bit_start = 0;
 
-  while (lsym)
+  while (lsym && IS_BITFIELD (lsym->type))
     {
-
-      if (0 == SPEC_BLEN (lsym->etype))
+      int bit_length = SPEC_BLEN (lsym->etype);
+      if (0 == bit_length)
         {
           /* bit-field structure member with a width of 0 */
           lsym = lsym->next;
@@ -671,7 +672,6 @@ printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
         {
           /* not an unnamed bit-field structure member */
           value *val = list2val (lilist);
-          int bit_length = SPEC_BLEN (lsym->etype);
 
           if (size)
             {
@@ -689,10 +689,16 @@ printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
               werror (W_LIT_OVERFLOW);
             }
 
-          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << SPEC_BSTR (lsym->etype);
+          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << bit_start;//SPEC_BSTR (lsym->etype);
           lilist = lilist ? lilist->next : NULL;
         }
+	  bit_start += bit_length;
       lsym = lsym->next;
+      if (lsym && IS_BITFIELD (lsym->type) && (0 == SPEC_BSTR (lsym->etype)))
+        {
+          /* a new integer */
+          break;
+        }
     }
 
   switch (size)
@@ -702,12 +708,12 @@ printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
       break;
 
     case 2:
-      dbuf_tprintf (oBuf, "\t!dw !constword\n", ival);
+      dbuf_tprintf (oBuf, "\t!db !constbyte, !constbyte\n", (ival & 0xff), (ival >> 8) & 0xff);
       break;
 
     case 4:
-      dbuf_tprintf (oBuf, "\t!dw  !constword,!constword\n",
-        (ival >> 16) & 0xffff, (ival & 0xffff));
+      dbuf_tprintf (oBuf, "\t!db !constbyte, !constbyte, !constbyte, !constbyte\n",
+        (ival & 0xff), (ival >> 8) & 0xff, (ival >> 16) & 0xff, (ival >> 24) & 0xff);
       break;
     }
   *sym = lsym;
@@ -1116,7 +1122,6 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
       return;
     }
 
-
   size = getSize (type);
 
   if (size == 1)                /* Z80 specific?? */
@@ -1469,7 +1474,6 @@ emitOverlay (struct dbuf_s * aBuf)
   for (ovrset = setFirstItem (ovrSetSets); ovrset;
        ovrset = setNextItem (ovrSetSets))
     {
-
       symbol *sym;
 
       if (elementsInSet (ovrset))
@@ -1527,29 +1531,26 @@ emitOverlay (struct dbuf_s * aBuf)
              an equate for this no need to allocate space */
           if (SPEC_ABSA (sym->etype))
             {
-
               if (options.debug)
                 dbuf_printf (aBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 
-              dbuf_printf (aBuf, "%s\t=\t0x%04x\n",
-                       sym->rname,
-                       SPEC_ADDR (sym->etype));
+              dbuf_printf (aBuf, "%s\t=\t0x%04x\n", sym->rname, SPEC_ADDR (sym->etype));
             }
           else
             {
               int size = getSize(sym->type);
 
-              if (size==0) {
+              if (size==0)
+                {
                   werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE);
-              }
+                }
               if (options.debug)
-                  dbuf_printf (aBuf, "==.\n");
+                dbuf_printf (aBuf, "==.\n");
 
               /* allocate space */
               dbuf_tprintf (aBuf, "!labeldef\n", sym->rname);
               dbuf_tprintf (aBuf, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
-          }
-
+            }
         }
     }
 }

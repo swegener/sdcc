@@ -428,3 +428,28 @@ struct
   char a : 1;
   char b : 1;
 } s2366757 = {0};
+
+/* test case for const struct with bitfields */
+const struct
+{
+  unsigned int a : 4;
+  unsigned int b : 3;
+  unsigned int c : 12;
+  unsigned int d : 3;
+  unsigned int e : 2;
+  unsigned int   : 4;
+  unsigned int f : 2;
+  unsigned int g;
+} cs = { 1, 2, 345, 6, 2, 1, 54321};
+
+void
+testCS(void)
+{
+  ASSERT(cs.a == 1);
+  ASSERT(cs.b == 2);
+  ASSERT(cs.c == 345);
+  ASSERT(cs.d == 6);
+  ASSERT(cs.e == 2);
+  ASSERT(cs.f == 1);
+  ASSERT(cs.g == 54321U);
+}

@@ -779,6 +779,7 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
   initList *lilist = *ilist;
   unsigned long ival = 0;
   int size = 0;
+  int bit_start = 0;
   unsigned long i;
 
 
@@ -787,9 +788,10 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
 #endif
 
 
-  while (lsym)
+  while (lsym && IS_BITFIELD (lsym->type))
     {
-      if (0 == SPEC_BLEN (lsym->etype))
+      int bit_length = SPEC_BLEN (lsym->etype);
+      if (0 == bit_length)
         {
           /* bit-field structure member with a width of 0 */
           lsym = lsym->next;
@@ -799,7 +801,6 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
         {
           /* not an unnamed bit-field structure member */
           value *val = list2val (lilist);
-          int bit_length = SPEC_BLEN (lsym->etype);
 
           if (size)
             {
@@ -809,10 +810,16 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
           else
             size = (bit_length + 7) / 8;
 
-          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << SPEC_BSTR (lsym->etype);
+          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << bit_start;
           lilist = (lilist ? lilist->next : NULL);
         }
+      bit_start += bit_length;
       lsym = lsym->next;
+      if (lsym && IS_BITFIELD (lsym->type) && (0 == SPEC_BSTR (lsym->etype))) 
+        {
+          /* a new integer */
+          break;
+        }
     }
 
   for (i = 0; i < size; i++)

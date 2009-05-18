@@ -689,10 +689,10 @@ printIvalBitFields (symbol **sym, initList **ilist, struct dbuf_s * oBuf)
               werror (W_LIT_OVERFLOW);
             }
 
-          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << bit_start;//SPEC_BSTR (lsym->etype);
+          ival |= (ulFromVal (val) & ((1ul << bit_length) - 1ul)) << bit_start;
           lilist = lilist ? lilist->next : NULL;
         }
-	  bit_start += bit_length;
+      bit_start += bit_length;
       lsym = lsym->next;
       if (lsym && IS_BITFIELD (lsym->type) && (0 == SPEC_BSTR (lsym->etype)))
         {

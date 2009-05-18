@@ -1,3 +1,8 @@
+2009-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (printIvalBitFields): cleaned up
+	* src/pic16/glue.c (pic16_printIvalBitFields): same fix for bug 2791782
+
 2009-05-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_iscntrl.c,

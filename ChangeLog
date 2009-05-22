@@ -1,3 +1,8 @@
+2009-05-22 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genGenericShift): do not overwrite the shift count
+	  for `val = 1 << val', fixes bug #2795131
+
 2009-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (printIvalBitFields): cleaned up

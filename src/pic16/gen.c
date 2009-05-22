@@ -7790,6 +7790,18 @@ static void genGenericShift (iCode *ic, int isShiftLeft)
     label_negative = newiTempLabel ( NULL );
   } // if
 
+  /*
+   * The code below overwrites the shift count for `val = (1 << val)'
+   * when it assigns LEFT to RESULT (== RIGHT == shift count).
+   * XXX: This problem should have been/is also addressed in ralloc.c,
+   *      but the code there seems not to catch this case ...
+   */
+  if (pic16_sameRegs (AOP(right), AOP(result))) {
+    // We abuse FSR0L as a temporary, pic16_popGetTempReg() is too costly.
+    pic16_mov2w (AOP(right), 0);
+    pic16_emitpcode (POC_MOVWF, pic16_popCopyReg (&pic16_pc_fsr0l));
+  } // if
+
   // copy source to result -- this will effectively truncate the left operand to the size of result!
   // (e.g. char c = 0x100 << -3 will become c = 0x00 >> 3 == 0x00 instad of 0x20)
   // This is fine, as it only occurs for left shifting with negative count which is not standardized!
@@ -7815,7 +7827,13 @@ static void genGenericShift (iCode *ic, int isShiftLeft)
     }
   } // if (size mismatch)
 
-  pic16_mov2w (AOP(right), 0);
+  /* load/restore shift count */
+  if (pic16_sameRegs (AOP(right), AOP(result))) {
+    pic16_emitpcode (POC_MOVFW, pic16_popCopyReg (&pic16_pc_fsr0l));
+  } else {
+    pic16_mov2w (AOP(right), 0);
+  } // if
+
   pic16_emitpcode (POC_BZ, pic16_popGetLabel (label_complete->key));
   if (signedCount) pic16_emitpcode (POC_BN, pic16_popGetLabel (label_negative->key));
 

@@ -1,3 +1,8 @@
+2009-05-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #2795942.
+
 2009-05-22 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genGenericShift): do not overwrite the shift count

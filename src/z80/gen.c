@@ -7464,12 +7464,6 @@ genAssign (iCode * ic)
           offset++;
         }
     }
-  else if (size == 2 && AOP_TYPE (right) == AOP_IY)
-    {
-      emit2 ("ld hl,(%s)", AOP (right)->aopu.aop_dir);
-      aopPut (AOP (result), "l", LSB);
-      aopPut (AOP (result), "h", MSB16);
-    }
   else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && IS_GB)
     {
       /* Special case.  Load into a and d, then load out. */

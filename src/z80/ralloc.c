@@ -2490,7 +2490,11 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
 
       if ((ic->op == '=' && !POINTER_SET(ic)) ||
           ic->op == UNARYMINUS ||
+          ic->op == RETURN ||
+          ic->op == RIGHT_OP ||
           ic->op == '-' ||
+          ic->op == BITWISEAND ||
+          ic->op == '|' ||
           ic->op == '>' ||
           ic->op == '<' ||
           ic->op == EQ_OP ||
@@ -2515,6 +2519,7 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
         }
 
       /* By default give up */
+      D (D_PACK_HLUSE3, ("packRegsForHLUse3 giving up at icode %u\n", (unsigned)(ic->op)));
       return NULL;
     }
 

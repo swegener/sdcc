@@ -1,5 +1,10 @@
 2009-05-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc.c:
+	  Improved use of hl as inter-i-code temporary.
+
+2009-05-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fixed bug #2795942.
 

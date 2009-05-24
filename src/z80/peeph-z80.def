@@ -1031,17 +1031,18 @@ replace restart {
 	; peephole 48 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-replace restart {
-	or	a,%1
-	jp	NZ,%2
-	ld	a,%3
-	or	a,a
-} by {
-	or	a,%1
-	jp	NZ,%2
-	or	a,%3
-	; peephole 49 shortened or using a (which has just been tested to be #0x00).
-} if operandsNotRelated(%3 '(bc)' '(de)')
+// Commented out since it triggers for %3 of the form (#...)
+//replace restart {
+//	or	a,%1
+//	jp	NZ,%2
+//	ld	a,%3
+//	or	a,a
+//} by {
+//	or	a,%1
+//	jp	NZ,%2
+//	or	a,%3
+//	; peephole 49 shortened or using a (which has just been tested to be #0x00).
+//} if operandsNotRelated(%3 '(bc)' '(de)')
 
 replace restart {
 	and	a,%1
@@ -1055,7 +1056,7 @@ replace restart {
 	; peephole 50 shortened or using a (which has just been tested to be #0x00).
 } if operandsNotRelated(%3 '(bc)' '(de)')
 
-// Commented out sine it triggers for %3 od the form (#...)
+// Commented out since it triggers for %3 of the form (#...)
 // replace restart {
 //	sub	a,%1
 //	jp	NZ,%2

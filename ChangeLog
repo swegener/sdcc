@@ -1,5 +1,12 @@
 2009-05-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc.c,
+	  src/z80/peeph-z80.def,
+	  src/SDCCasm.c:
+	  Propagate rematerializability over addition of constants.
+
+2009-05-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc.c:
 	  Improved use of hl as inter-i-code temporary.
 

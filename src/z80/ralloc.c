@@ -1605,6 +1605,7 @@ static void
 regTypeNum (void)
 {
   symbol *sym;
+  iCode *ic;
   int k;
 
   /* for each live range do */
@@ -2986,7 +2987,6 @@ packRegisters (eBBlock * ebp)
           bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
           !OP_SYMBOL (IC_LEFT (ic))->onStack)
         {
-
           OP_SYMBOL (IC_RESULT (ic))->remat = 1;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
           OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
@@ -3007,6 +3007,21 @@ packRegisters (eBBlock * ebp)
             OP_SYMBOL (IC_RIGHT (ic))->remat;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode =
             OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+        }
+
+      /* if this is a +/- operation with a rematerizable
+         then mark this as rematerializable as well */
+      if ((ic->op == '+' || ic->op == '-') &&
+          (IS_SYMOP (IC_LEFT (ic)) &&
+           IS_ITEMP (IC_RESULT (ic)) &&
+           IS_OP_LITERAL (IC_RIGHT (ic))) &&
+           OP_SYMBOL (IC_LEFT (ic))->remat &&
+          (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
+           bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
+        {
+          OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+          OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+          OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
         }
 
       /* if the condition of an if instruction is defined in the

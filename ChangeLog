@@ -1,3 +1,15 @@
+2009-05-25 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/80c51xa.h, device/include/ds400rom.h,
+	  device/include/ds80c390.h, device/include/ser.h,
+	  device/include/ser_ir.h, device/include/serial.h,
+	  device/include/serial390.h, device/include/tinibios.h:
+	  moved to device/include/mcs51/
+	  device/include/z180.h:
+	  moved to device/include/z80/
+	  implemented RFE #1930974: Some device specific header files are not
+	  in their folders
+
 2009-05-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.c,

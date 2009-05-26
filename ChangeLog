@@ -1,3 +1,8 @@
+2009-05-25 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c:
+	  Fixed an ancient, but difficult to reproduce and detect bug, that
+	  led to stack corruption under certain conditions.
+
 2009-05-25 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/80c51xa.h, device/include/ds400rom.h,

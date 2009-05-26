@@ -5117,7 +5117,8 @@ genCmpEq (iCode * ic, iCode * ifx)
           pop = gencjneshort (left, right, tlbl);
           if (IC_TRUE (ifx))
             {
-              _pop (pop);
+              if(pop != PAIR_INVALID)
+                emit2 ("pop %s", _pairs[pop].name);
               emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
               emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);
@@ -5126,7 +5127,8 @@ genCmpEq (iCode * ic, iCode * ifx)
             {
               /* PENDING: do this better */
               symbol *lbl = newiTempLabel (NULL);
-              _pop (pop);
+              if(pop != PAIR_INVALID)
+                emit2 ("pop %s", _pairs[pop].name);
               emit2 ("!shortjp !tlabel", lbl->key + 100);
               emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);

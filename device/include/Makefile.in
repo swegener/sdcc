@@ -47,6 +47,15 @@ install: all installdirs
 	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
 		$(CP) $(srcdir)/mcs51/*.h $(sdcc_includedir)/mcs51 ; \
 	fi
+	if [ "`grep ds390 $(top_builddir)/ports.build`" = ds390 ]; then \
+		$(CP) $(srcdir)/ds390/*.h $(sdcc_includedir)/ds390 ; \
+	fi
+	if [ "`grep ds400 $(top_builddir)/ports.build`" = ds400 ]; then \
+		$(CP) $(srcdir)/ds400/*.h $(sdcc_includedir)/ds400 ; \
+	fi
+	if [ "`grep xa51 $(top_builddir)/ports.build`" = xa51 ]; then \
+		$(CP) $(srcdir)/xa51/*.h $(sdcc_includedir)/xa51 ; \
+	fi
 	if [ "`grep '^pic$$' $(top_builddir)/ports.build`" = pic ]; then \
 		$(CP) $(srcdir)/pic/*.h   $(sdcc_includedir)/pic ; \
 		$(CP) $(srcdir)/pic/*.inc $(sdcc_includedir)/pic ; \
@@ -89,6 +98,9 @@ installcheck:
 installdirs:
 	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
 	[ -d $(sdcc_includedir)/mcs51 ] || mkdir -p $(sdcc_includedir)/mcs51
+	[ -d $(sdcc_includedir)/ds390 ] || mkdir -p $(sdcc_includedir)/ds390
+	[ -d $(sdcc_includedir)/ds400 ] || mkdir -p $(sdcc_includedir)/ds400
+	[ -d $(sdcc_includedir)/xa51 ] || mkdir -p $(sdcc_includedir)/xa51
 	[ -d $(sdcc_includedir)/pic ] || mkdir -p $(sdcc_includedir)/pic
 	[ -d $(sdcc_includedir)/pic16 ] || mkdir -p $(sdcc_includedir)/pic16
 	[ -d $(sdcc_includedir)/z80 ] || mkdir -p $(sdcc_includedir)/z80

@@ -1,3 +1,13 @@
+2009-05-30 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/mcs51/80c51xa.h: moved to device/include/xa51
+	  device/include/mcs51/ds400rom.h: moved to device/include/ds400
+	  device/include/mcs51/serial390.h: moved to device/include/ds390
+	  device/include/mcs51/ds80c390.h, device/include/mcs51/tinibios.h:
+	  moved back to device/include, since they are used also by ds400
+	  device/include/Makefile.in: new include directories ds390, ds400
+	  and xa51
+
 2009-05-25 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c:
 	  Fixed an ancient, but difficult to reproduce and detect bug, that

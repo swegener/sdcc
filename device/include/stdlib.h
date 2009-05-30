@@ -39,10 +39,10 @@ extern int atoi (char *);
 extern long atol (char *);
 
 extern void _uitoa(unsigned int, char*, unsigned char);
-extern void _itoa(unsigned int, char*, unsigned char);
+extern void _itoa(int, char*, unsigned char);
 
 extern void _ultoa(unsigned long, char*, unsigned char);
-extern void _ltoa(unsigned long, char*, unsigned char);
+extern void _ltoa(long, char*, unsigned char);
 
 #define RAND_MAX 32767
 

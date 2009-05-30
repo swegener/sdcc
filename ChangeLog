@@ -7,6 +7,8 @@
 	  moved back to device/include, since they are used also by ds400
 	  device/include/Makefile.in: new include directories ds390, ds400
 	  and xa51
+	* device/include/stdlib.h: coorected types for _itoa and _ltoa
+	* device/lib/ds400/Makefile.in: added include serch path include/ds400
 
 2009-05-25 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c:

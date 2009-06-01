@@ -1,7 +1,7 @@
 /* Test unary minus
 
-    lefttype: char, short, long
-    resulttype: char, short, long
+    lefttype: signed char, short, long
+    resulttype: signed char, short, long
     storage: static,
     attr: volatile,
  */

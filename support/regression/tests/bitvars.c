@@ -38,7 +38,7 @@ testBits(void)
   ASSERT (complement (~_0, 1));
   ASSERT (complement (~_1, 1));
 
-#if defined TYPE_char
+#if defined TYPE_char && !defined SDCC_CHAR_UNSIGNED
   ASSERT (complement (~_ff, 0));
 #else
   ASSERT (complement (~_ff, 1));
@@ -46,7 +46,7 @@ testBits(void)
 
 #if defined TYPE_bool
   ASSERT (complement (~_ffff, 1));
-#elif defined TYPE_char
+#elif defined TYPE_char && !defined SDCC_CHAR_UNSIGNED
   ASSERT (complement (~_ffff, 0));
 #else
   if (sizeof({type}) < sizeof(int))

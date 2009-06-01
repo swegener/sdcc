@@ -32,7 +32,7 @@ test1ShiftClasses(void)
 void
 test2ShiftRight(void)
 {
-    {attr} {storage} {type} i, result;
+    {attr} {storage} signed {type} i, result;
 
     i = -120;
     ASSERT(i>>1 == -60);

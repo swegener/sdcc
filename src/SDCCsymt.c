@@ -595,6 +595,25 @@ void checkTypeSanity(sym_link *etype, char *name) {
 }
 
 /*------------------------------------------------------------------*/
+/* finalizeSpec                                             */
+/*    currently just a V_CHAR is forced to be unsigned              */
+/*      when it's neither signed nor unsigned                       */
+/*      and the --funsigned-char command line switch is active      */
+/*------------------------------------------------------------------*/
+sym_link *
+finalizeSpec(sym_link * lnk)
+{
+  if (options.unsigned_char) {
+    sym_link *p = lnk;
+      while (p && !IS_SPEC(p))
+        p = p->next;
+      if(SPEC_NOUN(p) == V_CHAR && !SPEC_USIGN(p) && !p->select.s.b_signed)
+        SPEC_USIGN(p) = 1;
+  }
+  return lnk;
+}
+
+/*------------------------------------------------------------------*/
 /* mergeSpec - merges two specifiers and returns the new one        */
 /*------------------------------------------------------------------*/
 sym_link *
@@ -1349,7 +1368,7 @@ compStructSize (int su, structdef * sdef)
       checkDecl (loop, 1);
       sum += getSize (loop->type);
 
-      /* search for "flexibel array members" */
+      /* search for "flexible array members" */
       /* and do some syntax checks */
       if (   su == STRUCT
           && checkStructFlexArray (loop, loop->type))
@@ -1368,12 +1387,12 @@ compStructSize (int su, structdef * sdef)
     loop = loop->next;
 
     /* if union then size = sizeof largest field */
-    if (su == UNION) {
-      /* For UNION, round up after each field */
-      sum += ((bitOffset+7)/8);
-      usum = max (usum, sum);
-    }
-
+    if (su == UNION)
+      {
+        /* For UNION, round up after each field */
+        sum += ((bitOffset+7)/8);
+        usum = max (usum, sum);
+      }
   }
 
   /* For STRUCT, round up after all fields processed */
@@ -3298,6 +3317,7 @@ symbol *__fp16x16conv[2][4][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 symbol *__rlrr[2][3][2];
 
+sym_link *charType;
 sym_link *floatType;
 sym_link *fixed16x16Type;
 
@@ -3456,9 +3476,6 @@ initCSupport ()
     return;
   }
 
-  floatType = newFloatLink ();
-  fixed16x16Type = newFixed16x16Link ();
-
   for (bwd = 0; bwd < 3; bwd++)
     {
       sym_link *l = NULL;
@@ -3481,28 +3498,31 @@ initCSupport ()
       SPEC_USIGN (__multypes[bwd][1]) = 1;
     }
 
+  floatType = newFloatLink ();
+  fixed16x16Type = newFixed16x16Link ();
+  charType = (options.unsigned_char) ? UCHARTYPE : SCHARTYPE;
+
   __fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
   __fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);
   __fsmul = funcOfType ("__fsmul", floatType, floatType, 2, options.float_rent);
   __fsdiv = funcOfType ("__fsdiv", floatType, floatType, 2, options.float_rent);
-  __fseq = funcOfType ("__fseq", CHARTYPE, floatType, 2, options.float_rent);
-  __fsneq = funcOfType ("__fsneq", CHARTYPE, floatType, 2, options.float_rent);
-  __fslt = funcOfType ("__fslt", CHARTYPE, floatType, 2, options.float_rent);
-  __fslteq = funcOfType ("__fslteq", CHARTYPE, floatType, 2, options.float_rent);
-  __fsgt = funcOfType ("__fsgt", CHARTYPE, floatType, 2, options.float_rent);
-  __fsgteq = funcOfType ("__fsgteq", CHARTYPE, floatType, 2, options.float_rent);
+  __fseq = funcOfType ("__fseq", charType, floatType, 2, options.float_rent);
+  __fsneq = funcOfType ("__fsneq", charType, floatType, 2, options.float_rent);
+  __fslt = funcOfType ("__fslt", charType, floatType, 2, options.float_rent);
+  __fslteq = funcOfType ("__fslteq", charType, floatType, 2, options.float_rent);
+  __fsgt = funcOfType ("__fsgt", charType, floatType, 2, options.float_rent);
+  __fsgteq = funcOfType ("__fsgteq", charType, floatType, 2, options.float_rent);
 
   __fps16x16_add = funcOfType ("__fps16x16_add", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
   __fps16x16_sub = funcOfType ("__fps16x16_sub", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
   __fps16x16_mul = funcOfType ("__fps16x16_mul", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
   __fps16x16_div = funcOfType ("__fps16x16_div", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_eq = funcOfType ("__fps16x16_eq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_neq = funcOfType ("__fps16x16_neq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_lt = funcOfType ("__fps16x16_lt", CHARTYPE, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_lteq = funcOfType ("__fps16x16_lteq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_gt = funcOfType ("__fps16x16_gt", CHARTYPE, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_gteq = funcOfType ("__fps16x16_gteq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
-
+  __fps16x16_eq = funcOfType ("__fps16x16_eq", charType, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_neq = funcOfType ("__fps16x16_neq", charType, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_lt = funcOfType ("__fps16x16_lt", charType, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_lteq = funcOfType ("__fps16x16_lteq", charType, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_gt = funcOfType ("__fps16x16_gt", charType, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_gteq = funcOfType ("__fps16x16_gteq", charType, fixed16x16Type, 2, options.float_rent);
 
   for (tofrom = 0; tofrom < 2; tofrom++)
     {

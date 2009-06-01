@@ -1,3 +1,21 @@
+2009-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y,
+	* src/SDCCsymt.c (finalizeSpec),
+	* src/SDCCsymt.h: applied patch for bug 2798646, thanks Robert Larice
+	* src/SDCCsymt.c (initCSupport): also handle --funsigned-char for floating
+	  point support routines
+	* src/z80/ralloc.c (regTypeNum): fixed warning
+	* device/lib/_atof.c,
+	* support/regression/tests/args.c,
+	* support/regression/tests/arithcse.c,
+	* support/regression/tests/bitvars.c,
+	* support/regression/tests/compare.c,
+	* support/regression/tests/onebyte.c,
+	* support/regression/tests/shifts.c,
+	* support/regression/tests/uminus.c,
+	* support/regression/tests/vaargs.c: fixed for --funsigned-char
+
 2009-05-30 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/80c51xa.h: moved to device/include/xa51

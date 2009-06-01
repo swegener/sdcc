@@ -108,9 +108,9 @@ bool uselessDecl = TRUE;
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list
 %type <sym> declarator2_function_attributes while do for critical
-%type <lnk> pointer type_specifier_list type_specifier type_name
+%type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier
-%type <lnk> declaration_specifiers sfr_reg_bit sfr_attributes type_specifier2
+%type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes type_specifier2
 %type <lnk> function_attribute function_attributes enum_specifier
 %type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
@@ -183,8 +183,6 @@ function_definition
    | declaration_specifiers function_declarator function_body
                                 {
                                     pointerTypes($2->type,copyLinkChain($1));
-                                    if (options.unsigned_char && SPEC_NOUN($1) == V_CHAR && !($1)->select.s.b_signed)
-                                      SPEC_USIGN($1) = 1;
                                     addDecl($2,0,$1);
                                     $$ = createFunction($2,$3);
                                 }
@@ -479,8 +477,6 @@ declaration
 
          for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
              sym_link *lnk = copyLinkChain($1);
-             if (options.unsigned_char && SPEC_NOUN(lnk) == V_CHAR && !lnk->select.s.b_signed)
-               SPEC_USIGN(lnk) = 1;
              /* do the pointer stuff */
              pointerTypes(sym->type,lnk);
              addDecl (sym,0,lnk) ;
@@ -491,9 +487,11 @@ declaration
       }
    ;
 
-declaration_specifiers
+declaration_specifiers : declaration_specifiers_ { $$ = finalizeSpec($1); } ;
+
+declaration_specifiers_
    : storage_class_specifier                                            { $$ = $1; }
-   | storage_class_specifier declaration_specifiers {
+   | storage_class_specifier declaration_specifiers_ {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
@@ -507,7 +505,7 @@ declaration_specifiers
        $$ = mergeSpec($1,$2, "storage_class_specifier declaration_specifiers");
    }
    | type_specifier                                 { $$ = $1; }
-   | type_specifier declaration_specifiers          {
+   | type_specifier declaration_specifiers_         {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
@@ -521,7 +519,7 @@ declaration_specifiers
        $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
    }
    | function_specifier                             { $$ = $1; }
-   | function_specifier declaration_specifiers          {
+   | function_specifier declaration_specifiers_     {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
@@ -883,8 +881,6 @@ struct_declaration
            symbol *sym ;
            for ( sym = $2 ; sym != NULL ; sym = sym->next ) {
                sym_link *btype = copyLinkChain($1);
-               if (options.unsigned_char && SPEC_NOUN(btype) == V_CHAR && !(btype)->select.s.b_signed)
-                 SPEC_USIGN(btype) = 1;
 
                /* make the symbol one level up */
                sym->level-- ;
@@ -1248,10 +1244,12 @@ unqualified_pointer
       }
    ;
 
-type_specifier_list
+type_specifier_list : type_specifier_list_ { $$ = finalizeSpec($1); } ;
+
+type_specifier_list_
    : type_specifier
-   //| type_specifier_list type_specifier         {  $$ = mergeSpec ($1,$2, "type_specifier_list"); }
-   | type_specifier_list type_specifier {
+   //| type_specifier_list_ type_specifier         {  $$ = mergeSpec ($1,$2, "type_specifier_list"); }
+   | type_specifier_list_ type_specifier {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
@@ -1294,8 +1292,6 @@ parameter_declaration
                {
                   symbol *loop ;
                   pointerTypes($2->type,$1);
-                  if (options.unsigned_char && SPEC_NOUN($1) == V_CHAR && !($1)->select.s.b_signed)
-                    SPEC_USIGN($1) = 1;
                   addDecl ($2,0,$1);
                   for (loop=$2;loop;loop->_isparm=1,loop=loop->next);
                   addSymChain (&$2);
@@ -1304,8 +1300,6 @@ parameter_declaration
                }
    | type_name {
                   $$ = newValue() ;
-                  if (options.unsigned_char && SPEC_NOUN($1) == V_CHAR && !($1)->select.s.b_signed)
-                    SPEC_USIGN($1) = 1;
                   $$->type = $1;
                   $$->etype = getSpec($$->type);
                   ignoreTypedefType = 0;

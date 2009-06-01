@@ -35,10 +35,10 @@ test_arithCse(void)
 
   /* multiplication with -1 */
   res = -1 * i;
-  ASSERT (res == -i);
+  ASSERT (res == ({type})-i);
 
   res = i * -1;
-  ASSERT (res == -i);
+  ASSERT (res == ({type})-i);
 
   /* division by 1 */
   res = i / 1;
@@ -46,5 +46,5 @@ test_arithCse(void)
 
   /* division by -1 */
   res = i / -1;
-  ASSERT (res == -i);
+  ASSERT (res == ({type})-i);
 }

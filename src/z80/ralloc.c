@@ -1605,14 +1605,12 @@ static void
 regTypeNum (void)
 {
   symbol *sym;
-  iCode *ic;
   int k;
 
   /* for each live range do */
   for (sym = hTabFirstItem (liveRanges, &k); sym;
        sym = hTabNextItem (liveRanges, &k))
     {
-
       /* if used zero times then no registers needed */
       if ((sym->liveTo - sym->liveFrom) == 0)
         continue;
@@ -1622,7 +1620,6 @@ regTypeNum (void)
       /* if the live range is a temporary */
       if (sym->isitmp)
         {
-
           /* if the type is marked as a conditional */
           if (sym->regType == REG_CND)
             continue;
@@ -1655,7 +1652,6 @@ regTypeNum (void)
           /* determine the type of register required */
           /* Always general purpose */
           sym->regType = REG_GPR;
-
         }
       else
         {
@@ -1666,7 +1662,6 @@ regTypeNum (void)
           sym->nRegs = 0;
         }
     }
-
 }
 
 /** Mark all registers as free.

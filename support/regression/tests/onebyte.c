@@ -8,11 +8,11 @@
 void
 testMul (void)
 {
-  {attrL}            char  cL;
+  {attrL}    signed  char  cL;
   {attrL}  unsigned  char ucL;
-  {attrR}            char  cR;
+  {attrR}    signed  char  cR;
   {attrR}  unsigned  char ucR;
-  volatile           char   r8 , r8b;
+  volatile   signed  char   r8 , r8b;
   volatile unsigned  char  ur8, ur8b;
   volatile           short r16, r16b;
 
@@ -41,11 +41,11 @@ testMul (void)
 void
 testDiv (void)
 {
-  {attrL}           char  cL;
+  {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
-  {attrR}           char  cR;
+  {attrR}    signed char  cR;
   {attrR}  unsigned char ucR;
-  volatile          char  r8;
+  volatile   signed char  r8;
   volatile unsigned char ur8;
   volatile         short r16;
 
@@ -87,11 +87,11 @@ testDiv (void)
 void
 testMod (void)
 {
-  {attrL}           char  cL;
+  {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
-  {attrR}           char  cR;
+  {attrR}    signed char  cR;
   {attrR}  unsigned char ucR;
-  volatile          char  r8;
+  volatile   signed char  r8;
   volatile unsigned char ur8;
   volatile         short r16;
 
@@ -120,9 +120,9 @@ testMod (void)
 void
 testOr (void)
 {
-  {attrL}           char  cL;
+  {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
-  {attrR}           char  cR;
+  {attrR}    signed char  cR;
   {attrR}  unsigned char ucR;
   volatile         short r16, r16b;
 
@@ -134,9 +134,9 @@ testOr (void)
 void
 testXor (void)
 {
-  {attrL}           char  cL;
+  {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
-  {attrR}           char  cR;
+  {attrR}    signed char  cR;
   {attrR}  unsigned char ucR;
   volatile         short r16, r16b;
 
@@ -154,9 +154,9 @@ testXor (void)
 void
 testAnd (void)
 {
-  {attrL}           char  cL;
+  {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
-  {attrR}           char  cR;
+  {attrR}    signed char  cR;
   {attrR}  unsigned char ucR;
   volatile         short r16, r16b;
 
@@ -168,17 +168,17 @@ testAnd (void)
 void
 testComplement (void)
 {
-  {attrR}           char  c;
+  {attrR}    signed char  c;
   {attrR}  unsigned char uc;
   volatile         short r16;
 
    c = 0x00;  r16 = ~ c; ASSERT (r16    == (short) 0xffff); ASSERT (~ c < 0);
   uc = 0x00;  r16 = ~uc; ASSERT (r16    == (short) 0xffff); ASSERT (~uc < 0);
-  ASSERT (~ (char)          0x00 == (short) 0xffff); ASSERT (~ (char)          0x00 < 0);
+  ASSERT (~ (signed char)   0x00 == (short) 0xffff); ASSERT (~ (signed char)   0x00 < 0);
   ASSERT (~ (unsigned char) 0x00 == (short) 0xffff); ASSERT (~ (unsigned char) 0x00 < 0);
    c = 0x80;  r16 = ~ c; ASSERT (r16 == (short) 0x007f); ASSERT (~ c > 0);
   uc = 0x80;  r16 = ~uc; ASSERT (r16 == (short) 0xff7f); ASSERT (~uc < 0);
-  ASSERT (~ (char)          0x80 == (short) 0x007f); ASSERT (~ (char)          0x80 > 0);
+  ASSERT (~ (signed char)   0x80 == (short) 0x007f); ASSERT (~ (signed char)   0x80 > 0);
   ASSERT (~ (unsigned char) 0x80 == (short) 0xff7f); ASSERT (~ (unsigned char) 0x80 < 0);
 
   ASSERT (~ 1   < 0);

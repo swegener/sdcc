@@ -34,13 +34,12 @@ returnThirdArg({type1} arg1, {type2} arg2, {type3} arg3)
 static void
 testArgs(void)
 {
-    ASSERT(returnFirstArg(123, 45, 67) == 123);
-    ASSERT(returnFirstArg(-123, 45, 67) == -123);
+    ASSERT(returnFirstArg(123, 45, 67) == ({type1})123);
+    ASSERT(returnFirstArg(-123, 45, 67) == ({type1})-123);
 
-    ASSERT(returnSecondArg(1, -23, 64) == -23);
-    ASSERT(returnSecondArg(1, 8, 64) == 8);
+    ASSERT(returnSecondArg(1, -23, 64) == ({type2})-23);
+    ASSERT(returnSecondArg(1, 8, 64) == ({type2})8);
 
-    ASSERT(returnThirdArg(-33, -34, -35) == -35);
-    ASSERT(returnThirdArg(-33, -34, 35) == 35);
-
+    ASSERT(returnThirdArg(-33, -34, -35) == ({type3})-35);
+    ASSERT(returnThirdArg(-33, -34, 35) == ({type3})35);
 }

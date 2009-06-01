@@ -23,7 +23,7 @@
 float atof(char * s)
 {
 	float value, fraction;
-	char iexp;
+	signed char iexp;
 	BOOL sign;
 
 	//Skip leading blanks
@@ -62,7 +62,7 @@ float atof(char * s)
 	if (toupper(*s)=='E')
 	{
 		s++;
-		iexp=(char)atoi(s);
+		iexp=(signed char)atoi(s);
 		{
 			while(iexp!=0)
 			{

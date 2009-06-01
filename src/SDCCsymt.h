@@ -94,7 +94,7 @@ typedef struct structdef
     struct symbol *fields;              /* pointer to fields     */
     unsigned size;                      /* sizeof the table in bytes  */
     int type;                           /* STRUCT or UNION */
-    bool b_flexArrayMember;             /* has got an flexible array member,
+    bool b_flexArrayMember;             /* has got a flexible array member,
                                            only needed for syntax checks */
   }
 structdef;
@@ -563,7 +563,7 @@ extern symbol *__fp16x16conv[2][4][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 extern symbol *__rlrr[2][3][2];
 
-#define CHARTYPE        __multypes[0][0]
+#define SCHARTYPE       __multypes[0][0]
 #define UCHARTYPE       __multypes[0][1]
 #define INTTYPE         __multypes[1][0]
 #define UINTTYPE        __multypes[1][1]
@@ -593,6 +593,7 @@ sym_link *newLink (SYM_LINK_CLASS);
 sym_link *newFloatLink ();
 structdef *newStruct (char *);
 void addDecl (symbol *, int, sym_link *);
+sym_link *finalizeSpec(sym_link *);
 sym_link *mergeSpec (sym_link *, sym_link *, char *name);
 symbol *reverseSyms (symbol *);
 sym_link *reverseLink (sym_link *);

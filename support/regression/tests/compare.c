@@ -9,7 +9,7 @@
 static void
 testCmpAroundZero(void)
 {
-    {attr} {storage} {type} i;
+    {attr} {storage} signed {type} i;
 
     i = 5;
 
@@ -33,7 +33,7 @@ testCmpAroundZero(void)
 static void
 testCompareConstants(void)
 {
-    {attr} {storage} {type} i;
+    {attr} {storage} signed {type} i;
 
     i = 12;
     ASSERT(i < 23);
@@ -61,7 +61,7 @@ testCompareConstants(void)
 static void
 testCompareVariables(void)
 {
-    {attr} {storage} {type} left, right;
+    {attr} {storage} signed {type} left, right;
 
     left = 12;
     right = 47;

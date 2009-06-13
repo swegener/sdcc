@@ -81,7 +81,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
   const char *noTokens;
   const char *sz = format;
 
-  dbuf_init(&tmpDBuf, INITIAL_INLINEASM);
+  dbuf_init (&tmpDBuf, INITIAL_INLINEASM);
 
   /* First pass: expand all of the macros */
   while (*sz)
@@ -106,8 +106,9 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
             }
           else
             {
-              fprintf (stderr, "Cant find token \"%s\"\n", dbuf_c_str(&token));
-              wassert (0);
+              /* Token not recognized as a valid macro: macro is not expanded */
+              dbuf_append_char (&tmpDBuf, '!');
+              dbuf_append (&tmpDBuf, dbuf_get_buf(&token), dbuf_get_length(&token));
             }
           dbuf_destroy (&token);
         }

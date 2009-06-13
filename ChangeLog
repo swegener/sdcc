@@ -1,6 +1,7 @@
 2009-06-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCasm.c: fixed bug #2805536: Assembly code comment cause Internal Error
+	* support/regression/tests/macro.c: new, added
 
 2009-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
 

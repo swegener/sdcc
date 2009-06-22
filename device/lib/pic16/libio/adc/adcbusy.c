@@ -31,20 +31,27 @@ char adc_busy(void) __naked
 #if 0
   return (ADCON0bits.GO);
 #else
+#if defined(__SDCC_ADC_STYLE242)
   __asm
     movlw       0x00
-#if defined(__SDCC_ADC_STYLE242)
     btfsc       _ADCON0bits, 2
-#elif defined(__SDCC_ADC_STYLE1220) \
-   || defined(__SDCC_ADC_STYLE2220) \
-   || defined(__SDCC_ADC_STYLE65J50)
-    btfsc       _ADCON0bits, 1
-#else /* unsupported ADC style */
-#error Unsupported ADC style.
-#endif
     addlw       0x01
     return
   __endasm;
+#elif defined(__SDCC_ADC_STYLE1220) \
+   || defined(__SDCC_ADC_STYLE13K50) \
+   || defined(__SDCC_ADC_STYLE2220) \
+   || defined(__SDCC_ADC_STYLE24J50) \
+   || defined(__SDCC_ADC_STYLE65J50)
+  __asm
+    movlw       0x00
+    btfsc       _ADCON0bits, 1
+    addlw       0x01
+    return
+  __endasm;
+#else /* unsupported ADC style */
+#error Unsupported ADC style.
+#endif
 #endif
 }
 

@@ -5,8 +5,8 @@
  * written by Vangelis Rokas, 2004 <vrokas AT otenet.gr>
  *
  * Devices implemented:
- *	PIC18F[24][45][28]
- *	PIC18F2455-style
+ *      PIC18F[24][45][28]
+ *      PIC18F2455-style
  *
  *
  * This program is free software; you can redistribute it and/or
@@ -32,74 +32,146 @@
 /* link I/O libarary */
 #pragma library io
 
-/* interrupt on/off flag */
-#define ADC_INT_OFF	0x00
-#define ADC_INT_ON	0x01
+/*
+ * adc_open's `channel' argument:
+ *
+ * one of ADC_CHN_*
+ */
 
+/* channel selection (CHS field in ADCON0) */
+#define ADC_CHN_0               0x00
+#define ADC_CHN_1               0x01
+#define ADC_CHN_2               0x02
+#define ADC_CHN_3               0x03
+#define ADC_CHN_4               0x04
+#define ADC_CHN_5               0x05
+#define ADC_CHN_6               0x06
+#define ADC_CHN_7               0x07
+#define ADC_CHN_8               0x08
+#define ADC_CHN_9               0x09
+#define ADC_CHN_10              0x0a
+#define ADC_CHN_11              0x0b
+#define ADC_CHN_12              0x0c
+#define ADC_CHN_13              0x0d
+#define ADC_CHN_14              0x0e
+#define ADC_CHN_DAC             0x0e  /* 13k50-style */
+#define ADC_CHN_15              0x0f
+#define ADC_CHN_FVR             0x0f  /* 13k50-style */
+
+
+/*
+ * adc_open's `fosc' argument:
+ *
+ * ADC_FOSC_* | ADC_ACQT_* | ADC_CAL
+ *
+ *    7     6     5     4     3     2     1     0
+ * +-----+-----+-----+-----+-----+-----+-----+-----+
+ * | --- | CAL |       ACQT      |    FOSC/ADCS    |
+ * +-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+/* oscillator frequency (ADCS field) */
+#define ADC_FOSC_2              0x00
+#define ADC_FOSC_4              0x04
+#define ADC_FOSC_8              0x01
+#define ADC_FOSC_16             0x05
+#define ADC_FOSC_32             0x02
+#define ADC_FOSC_64             0x06
+#define ADC_FOSC_RC             0x07
+
+/* acquisition time (13k50/24j50/65j50-styles only) */
+#define ADC_ACQT_0              (0x00 << 3)
+#define ADC_ACQT_2              (0x01 << 3)
+#define ADC_ACQT_4              (0x02 << 3)
+#define ADC_ACQT_6              (0x03 << 3)
+#define ADC_ACQT_8              (0x04 << 3)
+#define ADC_ACQT_12             (0x05 << 3)
+#define ADC_ACQT_16             (0x06 << 3)
+#define ADC_ACQT_20             (0x07 << 3)
+
+/* calibration enable (24j50/65j50-style only) */
+#define ADC_CAL                 0x40
+
+
+/*
+ * adc_open's `pcfg' argment:
+ *
+ * ADC_CFG_* (see below, style-specific)
+ */
+
+
+/*
+ * adc_open's `config' argument:
+ *
+ * ADC_FRM_* | ADC_INT_* | ADC_VCFG_* | ADC_NVCFG_* | ADC_PVCFG_*
+ *
+ *    7     6     5     4     3     2     1     0
+ * +-----+-----+-----+-----+-----+-----+-----+-----+
+ * | FRM | INT |   VCFG    |   PVCFG   |   NVCFG   |
+ * +-----+-----+-----+-----+-----+-----+-----+-----+
+ */
 
 /* output format */
-#define ADC_FRM_RJUST	0x80
-#define ADC_FRM_LJUST	0x00
+#define ADC_FRM_LJUST           0x00
+#define ADC_FRM_RJUST           0x80
 
+/* interrupt on/off flag */
+#define ADC_INT_OFF             0x00
+#define ADC_INT_ON              0x40
 
 /* reference voltage configuration (not for 18f242-style ADC) */
-#define ADC_VCFG_VDD_VSS  0x00
-#define ADC_VCFG_AN3_VSS  0x10
-#define ADC_VCFG_VDD_AN2  0x20
-#define ADC_VCFG_AN3_AN2  0x30
+#define ADC_VCFG_VDD_VSS        0x00
+#define ADC_VCFG_AN3_VSS        0x10
+#define ADC_VCFG_VDD_AN2        0x20
+#define ADC_VCFG_AN3_AN2        0x30
 
-/* oscillator frequency */
-#define ADC_FOSC_2	0x00
-#define ADC_FOSC_4	0x04
-#define ADC_FOSC_8	0x01
-#define ADC_FOSC_16	0x05
-#define ADC_FOSC_32	0x02
-#define ADC_FOSC_64	0x06
-#define ADC_FOSC_RC	0x07
+/* reference voltage configuration (13k50-style) */
+#define ADC_NVCFG_VSS           0x00
+#define ADC_NVCFG_AN5           0x01
 
-/*
- * acquisition time (65j50-style only)
- * -- to be ORed with ADC_FOSC
- */
-#define ADC_ACQT_0      (0x00 << 3)
-#define ADC_ACQT_2      (0x01 << 3)
-#define ADC_ACQT_4      (0x02 << 3)
-#define ADC_ACQT_6      (0x03 << 3)
-#define ADC_ACQT_8      (0x04 << 3)
-#define ADC_ACQT_12     (0x05 << 3)
-#define ADC_ACQT_16     (0x06 << 3)
-#define ADC_ACQT_20     (0x07 << 3)
+#define ADC_PVCFG_VDD           (0x00 << 2)
+#define ADC_PVCFG_AN4           (0x01 << 2)
+#define ADC_PVCFG_FVR           (0x02 << 2)
 
-/*
- * calibration enable (65j50-style only)
- * -- to be ORed with ADC_FOSC
- */
-#define ADC_CAL         0x40
 
 /*
  * Distinguishing between ADC-styles:
+ * - 18f24j50-style devices have separate ANCON0/ANCON1
+ *   registers for A/D port pin configuration, whereas
+ *   18f65j50-style devices multiplex ANCONx and ADCONx
  *
  * ADCON0:
- * bit  18f242  18f1220 18f2220 18f65j50
- *  0   ADON    ADON    ADON    ADON
- *  1   -       GO      GO      GO
- *  2   GO      CHS0    CHS0    CHS0
- *  3   CHS0    CHS1    CHS1    CHS1
- *  4   CHS1    CHS2    CHS2    CHS2
- *  5   CHS2    -       CHS3    CHS3
- *  6   ADCS0   VCFG0   -       VCFG0
- *  7   ADCS1   VCFG1   (ADCAL) VCFG1
+ * bit  18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50
+ *  0   ADON    ADON    ADON      ADON    ADON      ADON
+ *  1   -       GO      GO        GO      GO        GO
+ *  2   GO      CHS0    CHS0      CHS0    CHS0      CHS0
+ *  3   CHS0    CHS1    CHS1      CHS1    CHS1      CHS1
+ *  4   CHS1    CHS2    CHS2      CHS2    CHS2      CHS2
+ *  5   CHS2    -       CHS3      CHS3    CHS3      CHS3
+ *  6   ADCS0   VCFG0   -         -       VCFG0     VCFG0
+ *  7   ADCS1   VCFG1   -         (ADCAL) VCFG1     VCFG1
  *
  * ADCON1:
- *  bit 18f242  18f1220 18f2220 18f65j50
- *   0  PCFG0   PCFG0   PCFG0   ADCS0
- *   1  PCFG1   PCFG1   PCFG1   ADCS1
- *   2  PCFG2   PCFG2   PCFG2   ADCS2
- *   3  PCFG3   PCFG3   PCFG3   ACQT0
- *   4  -       PCFG4   VCFG0   ACQT1
- *   5  -       PCFG5   VCFG1   ACQT2
- *   6  ADCS2   PCFG6   -       ADCAL
- *   7  ADFM    -       -       ADFM
+ *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50
+ *   0  PCFG0   PCFG0   NVCFG0    PCFG0   ADCS0     ADCS0
+ *   1  PCFG1   PCFG1   NVCFG1    PCFG1   ADCS1     ADCS1
+ *   2  PCFG2   PCFG2   PVCFG0    PCFG2   ADCS2     ADCS2
+ *   3  PCFG3   PCFG3   PVCFG1    PCFG3   ACQT0     ACQT0
+ *   4  -       PCFG4   -         VCFG0   ACQT1     ACQT1
+ *   5  -       PCFG5   -         VCFG1   ACQT2     ACQT2
+ *   6  ADCS2   PCFG6   -         -       ADCAL     ADCAL
+ *   7  ADFM    -       -         -       ADFM      ADFM
+ *
+ * ADCON2:
+ *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50
+ *   0                  ADCS0
+ *   1                  ADCS1
+ *   2                  ADCS2
+ *   3                  ACQT0
+ *   4                  ACQT1
+ *   5                  ACQT2
+ *   6                  -
+ *   7                  ADFM
  */
 
 /* 18f242-style */
@@ -112,6 +184,11 @@
 #elif  defined(pic18f1220) || defined(pic18f1320)
 
 #define __SDCC_ADC_STYLE1220    1
+
+/* 18f13k50-style */
+#elif  defined(pic18f13k50) || defined(pic18f14k50)
+
+#define __SDCC_ADC_STYLE13K50   1
 
 /* 18f2220-style, ordered by device family */
 #elif  defined(pic18f2220) || defined(pic18f2320) || defined(pic18f4220) || defined(pic18f4320) \
@@ -130,18 +207,27 @@
     || defined(pic18f2682) || defined(pic18f2685) || defined(pic18f4682) || defined(pic18f4685) \
     || defined(pic18f43k20) || defined(pic18f44k20) || defined(pic18f45k20) || defined(pic18f46k20) \
     || defined(pic18f6520) || defined(pic18f6620) || defined(pic18f6720) \
+    || defined(pic18f6527) || defined(pic18f6622) || defined(pic18f6627) || defined(pic18f6722) \
     || defined(pic18f6585) || defined(pic18f6680) || defined(pic18f8585) || defined(pic18f8680) \
     || defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
     || defined(pic18f8520) || defined(pic18f8620) || defined(pic18f8720) \
+    || defined(pic18f8527) || defined(pic18f8622) || defined(pic18f8627) || defined(pic18f8722) \
     || defined(pic18f86j60) || defined(pic18f86j65) || defined(pic18f87j60) \
     || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60) \
 
 #define __SDCC_ADC_STYLE2220    1
 
+/* 18f24j50-style */
+#elif  defined(pic18f24j50) || defined(pic18f25j50) || defined(pic18f26j50) \
+    || defined(pic18f44j50) || defined(pic18f45j50) || defined(pic18f46j50)
+
+#define __SDCC_ADC_STYLE24J50   1
+
+/* 18f65j50-style */
 #elif defined(pic18f65j50) || defined(pic18f66j50) || defined(pic18f66j55) || defined(pic18f67j50) \
    || defined(pic18f85j50) || defined(pic18f86j50) || defined(pic18f86j55) || defined(pic18f87j50) \
 
-#define __SDCC_ADC_STYLE65J50
+#define __SDCC_ADC_STYLE65J50   1
 
 #else /* unknown device */
 
@@ -150,43 +236,24 @@
 #endif
 
 
-/* channel selection (CHS field in ADCON0) */
-#define ADC_CHN_0               0x00
-#define ADC_CHN_1               0x01
-#define ADC_CHN_2               0x02
-#define ADC_CHN_3               0x03
-#define ADC_CHN_4               0x04
-#define ADC_CHN_5               0x05
-#define ADC_CHN_6               0x06
-#define ADC_CHN_7               0x07
-#define ADC_CHN_8               0x08
-#define ADC_CHN_9               0x09
-#define ADC_CHN_10              0x0a
-#define ADC_CHN_11              0x0b
-#define ADC_CHN_12              0x0c
-#define ADC_CHN_13              0x0d
-#define ADC_CHN_14              0x0e
-#define ADC_CHN_15              0x0f
-
-
 /* Port configuration (PCFG (and VCFG) field(s) in ADCON1) */
 #if defined(__SDCC_ADC_STYLE242)
 
-#define ADC_CFG_8A_0R	0x00
-#define ADC_CFG_7A_1R	0x01
-#define ADC_CFG_5A_0R	0x02
-#define ADC_CFG_4A_1R	0x03
-#define ADC_CFG_3A_0R	0x04
-#define ADC_CFG_2A_1R	0x05
-#define ADC_CFG_0A_0R	0x06
-#define ADC_CFG_6A_2R	0x08
-#define ADC_CFG_6A_0R	0x09
-#define ADC_CFG_5A_1R	0x0a
-#define ADC_CFG_4A_2R	0x0b
-#define ADC_CFG_3A_2R	0x0c
-#define ADC_CFG_2A_2R	0x0d
-#define ADC_CFG_1A_0R	0x0e
-#define ADC_CFG_1A_2R	0x0f
+#define ADC_CFG_8A_0R   0x00
+#define ADC_CFG_7A_1R   0x01
+#define ADC_CFG_5A_0R   0x02
+#define ADC_CFG_4A_1R   0x03
+#define ADC_CFG_3A_0R   0x04
+#define ADC_CFG_2A_1R   0x05
+#define ADC_CFG_0A_0R   0x06
+#define ADC_CFG_6A_2R   0x08
+#define ADC_CFG_6A_0R   0x09
+#define ADC_CFG_5A_1R   0x0a
+#define ADC_CFG_4A_2R   0x0b
+#define ADC_CFG_3A_2R   0x0c
+#define ADC_CFG_2A_2R   0x0d
+#define ADC_CFG_1A_0R   0x0e
+#define ADC_CFG_1A_2R   0x0f
 
 #elif defined(__SDCC_ADC_STYLE1220)
 
@@ -208,6 +275,38 @@
 #define ADC_CFG_2A      0x3c
 #define ADC_CFG_1A      0x3e
 #define ADC_CFG_0A      0x3f
+
+#elif defined(__SDCC_ADC_STYLE13K50)
+
+/*
+ * These devices use a bitmask in ANSEL/H to configure
+ * AN7..0/AN15..8 as digital ports (bit clear) or analog
+ * inputs (bit set).
+ *
+ * These settings are selected based on their similarity with
+ * the 2220-style settings; 13k50-style is more flexible, though.
+ *
+ * Reference voltages are configured via adc_open's config parameter
+ * using ADC_PVCFG_* and ADC_NVCFG_*.
+ */
+
+#define ADC_CFG_16A     0xFFFF
+#define ADC_CFG_15A     0x7FFF
+#define ADC_CFG_14A     0x3FFF
+#define ADC_CFG_13A     0x1FFF
+#define ADC_CFG_12A     0x0FFF
+#define ADC_CFG_11A     0x07FF
+#define ADC_CFG_10A     0x03FF
+#define ADC_CFG_9A      0x01FF
+#define ADC_CFG_8A      0x00FF
+#define ADC_CFG_7A      0x007F
+#define ADC_CFG_6A      0x003F
+#define ADC_CFG_5A      0x001F
+#define ADC_CFG_4A      0x000F
+#define ADC_CFG_3A      0x0007
+#define ADC_CFG_2A      0x0003
+#define ADC_CFG_1A      0x0001
+#define ADC_CFG_0A      0x0000
 
 #elif defined(__SDCC_ADC_STYLE2220)
 
@@ -293,7 +392,7 @@
 #define ADC_CFG_01A_2R  0x3e
 #define ADC_CFG_00A_0R  0x0f
 
-#elif defined(__SDCC_ADC_STYLE65J50)
+#elif defined(__SDCC_ADC_STYLE24J50) || defined(__SDCC_ADC_STYLE65J50)
 
 /*
  * These devices use a bitmask in ANCON0/1 to configure
@@ -301,7 +400,7 @@
  * inputs (bit clear).
  *
  * These settings are selected based on their similarity with
- * the 2220-style settings; 65j50-style is more flexible, though.
+ * the 2220-style settings; 24j50/65j50-style is more flexible, though.
  *
  * Reference voltages are configured via adc_open's config parameter
  * using ADC_VCFG_*.
@@ -334,9 +433,11 @@
 
 
 /* initialize AD module */
-#if defined(__SDCC_ADC_STYLE65J50)
+#if    defined(__SDCC_ADC_STYLE13K50) \
+    || defined(__SDCC_ADC_STYLE24J50) \
+    || defined(__SDCC_ADC_STYLE65J50)
 void adc_open(unsigned char channel, unsigned char fosc, unsigned int pcfg, unsigned char config);
-#else
+#else /* other styles */
 void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config);
 #endif
 

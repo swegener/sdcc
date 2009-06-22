@@ -25762,7 +25762,7 @@ name "PIC"
 \end_layout
 
 \begin_layout Standard
-18F: 1220, 1320
+18F: 1220, 1320, 13k50, 14k50
 \end_layout
 
 \begin_layout Standard
@@ -25770,15 +25770,15 @@ name "PIC"
 \end_layout
 
 \begin_layout Standard
-18F: 2410, 2420, 2423, 2431, 2450, 2455, 2480, 24j10, 24k20
+18F: 2410, 2420, 2423, 2431, 2450, 2455, 2480, 24j10, 24j50, 24k20
 \end_layout
 
 \begin_layout Standard
-18F: 2510, 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 25k20
+18F: 2510, 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 25j50, 25k20
 \end_layout
 
 \begin_layout Standard
-18F: 2610, 2620, 2680, 2682, 2685
+18F: 2610, 2620, 2680, 2682, 2685, 26j50, 26k20
 \end_layout
 
 \begin_layout Standard
@@ -25786,25 +25786,39 @@ name "PIC"
 \end_layout
 
 \begin_layout Standard
-18F: 4410, 4420, 4423, 4431, 4450, 4455, 4480, 44j10, 44k20
+18F: 4410, 4420, 4423, 4431, 4450, 4455, 4480, 44j10, 44j50, 44k20
 \end_layout
 
 \begin_layout Standard
-18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 45k20
+18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 45j50, 45k20
 \end_layout
 
 \begin_layout Standard
-18F: 4610, 4620, 4680, 4682, 4685, 46k20
+18F: 4610, 4620, 4680, 4682, 4685, 46j50, 46k20
 \end_layout
 
 \begin_layout Standard
-18F: 6520, 6585, 65j50, 6620, 6680, 66j50, 66j55, 66j60, 66j65, 6720, 67j50,
- 67j60
+18F: 6520, 6527, 6585, 65j50
 \end_layout
 
 \begin_layout Standard
-18F: 8520, 8585, 85j50, 8620, 8680, 86j50, 86j55, 86j60, 86j65, 8720, 87j50,
- 87j60
+18F: 6620, 6622, 6627, 6680, 66j50, 66j55, 66j60, 66j65
+\end_layout
+
+\begin_layout Standard
+18F: 6720, 6722, 67j50, 67j60
+\end_layout
+
+\begin_layout Standard
+18F: 8520, 8527, 8585, 85j50
+\end_layout
+
+\begin_layout Standard
+18F: 8620, 8622, 8627, 8680, 86j50, 86j55, 86j60, 86j65
+\end_layout
+
+\begin_layout Standard
+18F: 8720, 8722, 87j50, 87j60
 \end_layout
 
 \begin_layout Standard

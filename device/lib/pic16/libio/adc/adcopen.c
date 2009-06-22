@@ -28,12 +28,14 @@
  *   channel: one of ADC_CHN_*
  *   fosc:    one of ADC_FOSC_* | ADC_ACQT_* | ADC_CAL
  *   pcfg:    one of ADC_CFG_* (a bitmask with set bits denoting digital ports for 1220/65j50-style)
- *   config:  ADC_FRM_* | ADC_INT_* | ADC_VCFG_*
+ *   config:  ADC_FRM_* | ADC_INT_* | ADC_VCFG_* | ADC_NVCFG_* | ADC_PVCFG_*
  */
 
-#if defined(__SDCC_ADC_STYLE65J50)
+#if    defined(__SDCC_ADC_STYLE13K50) \
+    || defined(__SDCC_ADC_STYLE24J50) \
+    || defined(__SDCC_ADC_STYLE65J50)
 void adc_open(unsigned char channel, unsigned char fosc, unsigned int pcfg, unsigned char config)
-#else
+#else /* other styles */
 void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config)
 #endif
 {
@@ -53,12 +55,23 @@ void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, uns
   ADCON0 = ((channel & 0x07) | (config & ADC_VCFG_AN3_AN2)) << 2;
   ADCON1 = (pcfg & 0x7f);
   ADCON2 = (ADCON2 & 0x38) | (fosc & 0x07) | (config & ADC_FRM_RJUST);
+#elif defined(__SDCC_ADC_STYLE13K50)
+  ANSEL = pcfg;
+  ANSELH = (pcfg >> 8);
+  ADCON0 = ((channel & 0x0f) << 2);
+  ADCON1 = (config & 0x0f);
+  ADCON2 = (config & ADC_FRM_RJUST) | (fosc & 0x3f);
 #elif defined(__SDCC_ADC_STYLE2220)
   ADCON0 = (channel & 0x0f) << 2;
   /* XXX: Should be (pcfg & 0x0f) as VCFG comes from config,
    * but we retain compatibility for now ... */
   ADCON1 = (pcfg & 0x3f) | (config & ADC_VCFG_AN3_AN2);
   ADCON2 = (ADCON2 & 0x38) | (fosc & 0x07) | (config & ADC_FRM_RJUST);
+#elif defined(__SDCC_ADC_STYLE24J50)
+  ANCON0 = pcfg;
+  ANCON1 = (pcfg >> 8);
+  ADCON0 = ((channel & 0x0f) << 2) | ((config & ADC_VCFG_AN3_AN2) << 2);
+  ADCON1 = (config & ADC_FRM_RJUST) | (fosc & 0x7f);
 #elif defined(__SDCC_ADC_STYLE65J50)
   WDTCONbits.ADSHR = 1; /* access ANCON0/1 */
   ANCON0 = pcfg;

@@ -45,6 +45,12 @@
 #elif defined(pic18f1320)
 #  include <pic18f1320.h>
 
+#elif defined(pic18f13k50)
+#  include <pic18f13k50.h>
+
+#elif defined(pic18f14k50)
+#  include <pic18f14k50.h>
+
 #elif defined(pic18f2220)
 #  include <pic18f2220.h>
 
@@ -87,6 +93,9 @@
 #elif defined(pic18f24j10)
 #  include <pic18f24j10.h>
 
+#elif defined(pic18f24j50)
+#  include <pic18f24j50.h>
+
 #elif defined(pic18f24k20)
 #  include <pic18f24k20.h>
 
@@ -117,6 +126,9 @@
 #elif defined(pic18f25j10)
 #  include <pic18f25j10.h>
 
+#elif defined(pic18f25j50)
+#  include <pic18f25j50.h>
+
 #elif defined(pic18f25k20)
 #  include <pic18f25k20.h>
 
@@ -134,6 +146,9 @@
 
 #elif defined(pic18f2685)
 #  include <pic18f2685.h>
+
+#elif defined(pic18f26j50)
+#  include <pic18f26j50.h>
 
 #elif defined(pic18f26k20)
 #  include <pic18f26k20.h>
@@ -180,6 +195,9 @@
 #elif defined(pic18f44j10)
 #  include <pic18f44j10.h>
 
+#elif defined(pic18f44j50)
+#  include <pic18f44j50.h>
+
 #elif defined(pic18f44k20)
 #  include <pic18f44k20.h>
 
@@ -210,6 +228,9 @@
 #elif defined(pic18f45j10)
 #  include <pic18f45j10.h>
 
+#elif defined(pic18f45j50)
+#  include <pic18f45j50.h>
+
 #elif defined(pic18f45k20)
 #  include <pic18f45k20.h>
 
@@ -228,11 +249,17 @@
 #elif defined(pic18f4685)
 #  include <pic18f4685.h>
 
+#elif defined(pic18f46j50)
+#  include <pic18f46j50.h>
+
 #elif defined(pic18f46k20)
 #  include <pic18f46k20.h>
 
 #elif defined(pic18f6520)
 #  include <pic18f6520.h>
+
+#elif defined(pic18f6527)
+#  include <pic18f6527.h>
 
 #elif defined(pic18f6585)
 #  include <pic18f6585.h>
@@ -242,6 +269,12 @@
 
 #elif defined(pic18f6620)
 #  include <pic18f6620.h>
+
+#elif defined(pic18f6622)
+#  include <pic18f6622.h>
+
+#elif defined(pic18f6627)
+#  include <pic18f6627.h>
 
 #elif defined(pic18f6680)
 #  include <pic18f6680.h>
@@ -261,6 +294,9 @@
 #elif defined(pic18f6720)
 #  include <pic18f6720.h>
 
+#elif defined(pic18f6722)
+#  include <pic18f6722.h>
+
 #elif defined(pic18f67j50)
 #  include <pic18f67j50.h>
 
@@ -270,6 +306,9 @@
 #elif defined(pic18f8520)
 #  include <pic18f8520.h>
 
+#elif defined(pic18f8527)
+#  include <pic18f8527.h>
+
 #elif defined(pic18f8585)
 #  include <pic18f8585.h>
 
@@ -278,6 +317,12 @@
 
 #elif defined(pic18f8620)
 #  include <pic18f8620.h>
+
+#elif defined(pic18f8622)
+#  include <pic18f8622.h>
+
+#elif defined(pic18f8627)
+#  include <pic18f8627.h>
 
 #elif defined(pic18f8680)
 #  include <pic18f8680.h>
@@ -296,6 +341,9 @@
 
 #elif defined(pic18f8720)
 #  include <pic18f8720.h>
+
+#elif defined(pic18f8722)
+#  include <pic18f8722.h>
 
 #elif defined(pic18f87j50)
 #  include <pic18f87j50.h>

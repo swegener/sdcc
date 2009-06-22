@@ -21,6 +21,12 @@ void i2c_open(unsigned char mode, unsigned char slew, unsigned char addr_brd)
   TRISBbits.TRISB1 = 1;
   TRISBbits.TRISB0 = 1;
 
+#elif  defined(pic18f24j50) || defined(pic18f25j50) || defined(pic18f26j50) \
+    || defined(pic18f44j50) || defined(pic18f45j50) || defined(pic18f46j50)
+
+  TRISBbits.TRISB4 = 1;
+  TRISBbits.TRISB5 = 1;
+
 #else	/* all other devices */
 
   TRISCbits.TRISC3 = 1;

@@ -3841,96 +3841,106 @@ dumpEbbsToDebug (eBBlock ** ebbs, int count)
                 printiCChain (ebbs[i]->sch, debugF);
         }
 }
+
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
 void
-pic14_assignRegisters (ebbIndex * ebbi)
+pic14_assignRegisters (ebbIndex *ebbi)
 {
-        eBBlock ** ebbs = ebbi->bbOrder;
-        int count = ebbi->count;
-        iCode *ic;
-        int i;
+  int i;
+  iCode *ic;
+  eBBlock **ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
 
-        debugLog ("<><><><><><><><><><><><><><><><><>\nstarting\t%s:%s\n", __FILE__, __FUNCTION__);
-        debugLog ("ebbs before optimizing:\n");
-        dumpEbbsToDebug (ebbs, count);
+  debugLog ("<><><><><><><><><><><><><><><><><>\nstarting\t%s:%s\n",
+            __FILE__, __FUNCTION__);
+  debugLog ("ebbs before optimizing:\n");
+  dumpEbbsToDebug (ebbs, count);
 
-        setToNull ((void *) &_G.funcrUsed);
-        pic14_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
+  setToNull ((void *) &_G.funcrUsed);
+  pic14_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
 
+  /* mark all r0xZZZZ registers as 'used' to guarantee that
+   * disjoint sets of registers are allocated to functions */
+  if (1)
+    {
+      regs *r;
 
-        /* change assignments this will remove some
-        live ranges reducing some register pressure */
-        for (i = 0; i < count; i++)
-                packRegisters (ebbs[i]);
-
+      for (r = setFirstItem (dynAllocRegs);
+           r;
+           r = setNextItem (dynAllocRegs))
         {
-                regs *reg;
-                int hkey;
-                int i=0;
-
-                debugLog("dir registers allocated so far:\n");
-                reg = hTabFirstItem(dynDirectRegNames, &hkey);
-
-                while(reg) {
-                        debugLog("  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
-                        reg = hTabNextItem(dynDirectRegNames, &hkey);
-                }
-
+          r->isFree = 0;
         }
+    }
 
-        if (options.dump_pack)
-                dumpEbbsToFileExt (DUMP_PACK, ebbi);
+  /* change assignments this will remove some
+     live ranges reducing some register pressure */
+  for (i = 0; i < count; i++)
+    packRegisters (ebbs[i]);
 
-        /* first determine for each live range the number of
-        registers & the type of registers required for each */
-        regTypeNum ();
+  if (1)
+    {
+      regs *reg;
+      int hkey;
+      int i = 0;
 
-        /* and serially allocate registers */
-        serialRegAssign (ebbs, count);
+      debugLog ("dir registers allocated so far:\n");
+      reg = hTabFirstItem (dynDirectRegNames, &hkey);
 
-        /* if stack was extended then tell the user */
-        if (_G.stackExtend)
+      while (reg)
         {
-                /*      werror(W_TOOMANY_SPILS,"stack", */
-                /*             _G.stackExtend,currFunc->name,""); */
-                _G.stackExtend = 0;
+          debugLog ("  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",
+                    i++, reg->name, hkey, reg->rIdx, reg->size);
+          reg = hTabNextItem (dynDirectRegNames, &hkey);
         }
+    }
 
-        if (_G.dataExtend)
-        {
-                /*      werror(W_TOOMANY_SPILS,"data space", */
-                /*             _G.dataExtend,currFunc->name,""); */
-                _G.dataExtend = 0;
-        }
+  if (options.dump_pack)
+    dumpEbbsToFileExt (DUMP_PACK, ebbi);
 
-        /* after that create the register mask
-        for each of the instruction */
-        createRegMask (ebbs, count);
+  /* first determine for each live range the number of
+     registers & the type of registers required for each */
+  regTypeNum ();
 
-        /* redo that offsets for stacked automatic variables */
-        redoStackOffsets ();
+  /* and serially allocate registers */
+  serialRegAssign (ebbs, count);
 
-        if (options.dump_rassgn)
-                dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
+  /* if stack was extended then tell the user */
+  if (_G.stackExtend)
+    {
+      _G.stackExtend = 0;
+    }
 
-        /* now get back the chain */
-        ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));
+  if (_G.dataExtend)
+    {
+      _G.dataExtend = 0;
+    }
 
-        debugLog ("ebbs after optimizing:\n");
-        dumpEbbsToDebug (ebbs, count);
+  /* after that create the register mask for each of the instruction */
+  createRegMask (ebbs, count);
 
+  /* redo that offsets for stacked automatic variables */
+  redoStackOffsets ();
 
-        genpic14Code (ic);
+  if (options.dump_rassgn)
+    dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
 
-        /* free up any _G.stackSpil locations allocated */
-        applyToSet (_G.stackSpil, deallocStackSpil);
-        _G.slocNum = 0;
-        setToNull ((void *) &_G.stackSpil);
-        setToNull ((void *) &_G.spiltSet);
+  /* now get back the chain */
+  ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));
 
-        debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
-        pic14_debugLogClose ();
-        return;
+  debugLog ("ebbs after optimizing:\n");
+  dumpEbbsToDebug (ebbs, count);
+
+  genpic14Code (ic);
+
+  /* free up any _G.stackSpil locations allocated */
+  applyToSet (_G.stackSpil, deallocStackSpil);
+  _G.slocNum = 0;
+  setToNull ((void *) &_G.stackSpil);
+  setToNull ((void *) &_G.spiltSet);
+
+  debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
+  pic14_debugLogClose ();
 }

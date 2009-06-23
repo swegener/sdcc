@@ -1,35 +1,40 @@
+2009-06-24 Raphael Neider <rneider AT web.de>
+
+	* src/pic/ralloc.c (pic14_assignRegisters): avoid incorrect register
+	  reuse among functions (fixes #2810015), cosmetic changes
+
 2009-06-22 Raphael Neider <rneider AT web.de>
 
-        * device/include/pic16/adc.h,
-          device/include/pic16/pic16devices.txt,
-          device/include/pic16/pic18f1[34]k50.h,
-          device/include/pic16/pic18f[24][456]j50.h,
-          device/include/pic16/pic18f[68][56]27.h,
-          device/include/pic16/pic18f[68][67]22.h,
-          device/include/pic16/pic18fregs.h,
-          device/lib/pic16/libdev/Makefile.am,
-          device/lib/pic16/libdev/pic18f1[34]k50.c,
-          device/lib/pic16/libdev/pic18f[24][456]j50.c,
-          device/lib/pic16/libdev/pic18f[68][56]27.c,
-          device/lib/pic16/libdev/pic18f[68][67]22.c,
-          device/lib/pic16/libio/Makefile.am,
-          device/lib/pic16/libio/adc/adcbusy.c,
-          device/lib/pic16/libio/adc/adcopen.c,
-          device/lib/pic16/libio/adc/adcsetch.c,
-          device/lib/pic16/libio/i2c/i2copen.c,
-          device/lib/pic16/pics.all,
-          doc/sdccman.lyx: added families 18f1[34]k50 (#2783178),
-            18f[24][456]j50 (#2794505), and 18f[68][56]27/18f[68][67]22
-        * device/lib/pic16/aclocal.m4,
-          device/lib/pic16/configure,
-          device/lib/pic16/Makefile.in,
-          device/lib/pic16/debug/Makefile.in,
-          device/lib/pic16/libc/Makefile.in,
-          device/lib/pic16/libdev/Makefile.in,
-          device/lib/pic16/libio/Makefile.in,
-          device/lib/pic16/libm/Makefile.in,
-          device/lib/pic16/libsdcc/Makefile.in,
-          device/lib/pic16/startup/Makefile.in: regenerated
+	* device/include/pic16/adc.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18f1[34]k50.h,
+	  device/include/pic16/pic18f[24][456]j50.h,
+	  device/include/pic16/pic18f[68][56]27.h,
+	  device/include/pic16/pic18f[68][67]22.h,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libdev/pic18f1[34]k50.c,
+	  device/lib/pic16/libdev/pic18f[24][456]j50.c,
+	  device/lib/pic16/libdev/pic18f[68][56]27.c,
+	  device/lib/pic16/libdev/pic18f[68][67]22.c,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/adc/adcbusy.c,
+	  device/lib/pic16/libio/adc/adcopen.c,
+	  device/lib/pic16/libio/adc/adcsetch.c,
+	  device/lib/pic16/libio/i2c/i2copen.c,
+	  device/lib/pic16/pics.all,
+	  doc/sdccman.lyx: added families 18f1[34]k50 (#2783178),
+	    18f[24][456]j50 (#2794505), and 18f[68][56]27/18f[68][67]22
+	* device/lib/pic16/aclocal.m4,
+	  device/lib/pic16/configure,
+	  device/lib/pic16/Makefile.in,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in,
+	  device/lib/pic16/libdev/Makefile.in,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/startup/Makefile.in: regenerated
 
 2009-06-13 Borut Razem <borut.razem AT siol.net>
 

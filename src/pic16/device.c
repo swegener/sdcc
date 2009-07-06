@@ -454,7 +454,7 @@ find_in_list(const char *name, PIC16_device *head)
 
     while (head) {
         for (i = 0; i < 4; i++) {
-            if (0 == strcmp(head->name[i], name)) {
+            if (0 == STRCASECMP(head->name[i], name)) {
                 return (head);
             } // if
         } // for

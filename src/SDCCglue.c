@@ -615,33 +615,64 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, struct dbuf_s * o
   case 1:
     if (!val)
       dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
-    else
-      dbuf_tprintf (oBuf, "\t!dbs\n",
-                aopLiteral (val, 0));
+    else {
+      if (IS_UNSIGNED (val->type)) {
+        dbuf_tprintf (oBuf, "\t!dbs\t; %u",
+                aopLiteral (val, 0), (unsigned int)floatFromVal (val) );
+      }
+      else {
+        dbuf_tprintf (oBuf, "\t!dbs\t; % d",
+                aopLiteral (val, 0), (int)floatFromVal (val) );
+      }
+      if( isalpha ((char)floatFromVal (val)) )
+        dbuf_tprintf (oBuf, "\t%c\n", (char)floatFromVal (val) );
+      else
+        dbuf_tprintf (oBuf, "\n");
+    }
     break;
 
   case 2:
     if (port->use_dw_for_init)
       dbuf_tprintf (oBuf, "\t!dws\n", aopLiteralLong (val, 0, 2));
-    else if (port->little_endian)
-      dbuf_printf (oBuf, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
+    else if (port->little_endian) {
+        if (IS_UNSIGNED (val->type))
+          dbuf_printf (oBuf, "\t.byte %s,%s\t; %u\n",
+                             aopLiteral (val, 0), aopLiteral (val, 1),
+                             (unsigned int)floatFromVal(val) );
+        else
+          dbuf_printf (oBuf, "\t.byte %s,%s\t; % d\n",
+                             aopLiteral (val, 0), aopLiteral (val, 1),
+                             (int)floatFromVal(val) );
+      }
     else
       dbuf_printf (oBuf, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
     break;
+
   case 4:
     if (!val) {
       dbuf_tprintf (oBuf, "\t!dw !constword\n", 0);
       dbuf_tprintf (oBuf, "\t!dw !constword\n", 0);
     }
-    else if (port->little_endian) {
-      dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",
-               aopLiteral (val, 0), aopLiteral (val, 1),
-               aopLiteral (val, 2), aopLiteral (val, 3));
-    }
     else {
-      dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",
-               aopLiteral (val, 3), aopLiteral (val, 2),
-               aopLiteral (val, 1), aopLiteral (val, 0));
+      if (port->little_endian) {
+        dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s",
+                 aopLiteral (val, 0), aopLiteral (val, 1),
+                 aopLiteral (val, 2), aopLiteral (val, 3));
+      }
+      else {
+        dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s",
+                 aopLiteral (val, 3), aopLiteral (val, 2),
+                 aopLiteral (val, 1), aopLiteral (val, 0));
+      }
+      if (IS_FLOAT (val->type)) {
+        dbuf_printf (oBuf, "\t; % e\n", floatFromVal (val) );
+      }
+      else {
+        if (IS_UNSIGNED (val->type))
+          dbuf_printf (oBuf, "\t; %u\n", (unsigned int)floatFromVal (val));
+        else
+          dbuf_printf (oBuf, "\t; % d\n", (int)floatFromVal (val));
+      }
     }
     break;
   }

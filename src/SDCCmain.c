@@ -31,6 +31,7 @@
 #include <signal.h>
 #include "common.h"
 #include <ctype.h>
+#include <libgen.h>
 #include "newalloc.h"
 #include "dbuf_string.h"
 #include "SDCCerr.h"
@@ -372,24 +373,44 @@ _validatePorts (void)
     }
 }
 
-/* search through the command line options for the port */
+/* search through the command line for the port */
 static void
 _findPort (int argc, char **argv)
 {
+  char* programNameTmp = Safe_strdup (*argv);
+  const char* programName = basename (programNameTmp);
+  int found = 0;
+  int i;
+
   _validatePorts ();
 
-  while (argc--)
+  /* try to assign port by command line option */
+  while (argc-- && !found)
     {
       if (!strncmp (*argv, "-m", 2))
         {
           _setPort (*argv + 2);
-          return;
+          found = 1;
         }
       argv++;
     }
 
-  /* Use the first in the list */
-  port = _ports[0];
+  /* try to assign port by the name of the executable */
+  for (i = 0; i < NUM_PORTS && !found; i++)
+    {
+      if (strstr (programName, _ports[i]->target))
+        {
+          _setPort (_ports[i]->target);
+          found = 1;
+        }
+    }
+
+  if (!found)
+    {
+      /* Use the first in the list as default */
+      port = _ports[0];
+    }
+  Safe_free (programNameTmp);
 }
 
 /* search through the command line options for the processor */

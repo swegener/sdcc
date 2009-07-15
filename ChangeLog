@@ -1,3 +1,11 @@
+2009-07-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/SDCCmain.c: make SDCC a multicall binary, RFE #1204438,
+	  allows choosing the port by renaming the sdcc binary
+	  (to f.e. z80-sdcc) or by calling SDCC from a suitable link
+	  (parameter -m takes precedence)
+	* src/SDCCglue.c: be more verbose about constants in code space
+
 2009-07-07 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/device.c (find_in_list): ignore case during device

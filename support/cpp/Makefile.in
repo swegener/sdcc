@@ -126,8 +126,9 @@ clean:
 	rm -f s-options optionlist options.h s-options-h options.c
 
 distclean: clean
-	-rm -f auto-host.h auto-build.h cstamp-h Makefile
-	config.status config.run config.cache config.bak config.log *~
+	-rm -f auto-host.h auto-build.h cstamp-h Makefile \
+	  config.status config.run config.cache config.bak config.log *~ \
+	  configargs.h
 
 # This tells GNU Make version 3 not to put all variables in the environment.
 .NOEXPORT:

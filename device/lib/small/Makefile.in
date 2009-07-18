@@ -4,7 +4,7 @@ all:
 	touch dummy.rel
 
 clean:
-	rm -f *.rel
+	rm -f *.rel *.sym *.lst *.asm *~ *.lib
 
 distclean: clean
 	rm -f Makefile

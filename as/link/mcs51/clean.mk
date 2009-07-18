@@ -6,6 +6,8 @@ clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
 	rm -f $(top_builddir)/bin/aslink$(EXEEXT) aslink$(EXEEXT)
+	rm -f $(LKOBJECTS) $(OBJDIR)/.stamp
+	-rmdir $(OBJDIR)
 
 
 # Deleting all files created by configuring or building the program

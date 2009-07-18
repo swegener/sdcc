@@ -6,6 +6,8 @@ clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
 	rm -f $(top_builddir)/bin/link-hc08$(EXEEXT) link-hc08$(EXEEXT)
+	rm -f $(LKOBJECTS) $(OBJDIR)/.stamp
+	-rmdir $(OBJDIR)
 
 
 # Deleting all files created by configuring or building the program

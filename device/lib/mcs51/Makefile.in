@@ -43,7 +43,7 @@ endif
 	$(CC) $(CFLAGS) -c $<
 
 %.rel: %.asm
-	@# TODO: asx8051 should place it's output in the current dir
+	@# TODO: asx8051 should place it\'s output in the current dir
 	test $(srcdir) = . || cp $< .
 	-$(AS) $(ASFLAGS) $(notdir $<)
 	test $(srcdir) = . || rm $(notdir $<)

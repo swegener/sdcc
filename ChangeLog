@@ -7,6 +7,15 @@
 	* src/SDCCast.c, support/regression/tests/bug2740884.c:
 	  applied patch #2740884 - Incorrect assignment in array of structs,
 	  thanks to Robert Larice
+	* as/hc08/clean.mk, as/link/clean.mk, as/link/hc08/clean.mk,
+	  as/link/mcs51/clean.mk, as/link/z80/clean.mk, as/mcs51/clean.mk,
+	  as/z80/clean.mk, device/lib/clean.mk, device/lib/large/Makefile.in,
+	  device/lib/Makefile.in, device/lib/mcs51/Makefile.in,
+	  device/lib/medium/Makefile.in, device/lib/pic/Makefile.in,
+	  device/lib/small/Makefile.in, support/cpp/Makefile.in:
+	  allpied patch #2801385 - make clean and distclean,
+	  thanks to Robert Larice
+	* .version, doc/sdccman.lyx: changed sdcc version to 2.9.2
 
 2009-07-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

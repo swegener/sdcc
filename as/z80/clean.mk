@@ -4,6 +4,7 @@ include $(top_builddir)/Makefile.common
 
 clean: mostlyclean
 	rm -f *.dep
+	rm -rf obj-z80 obj-gbz80
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

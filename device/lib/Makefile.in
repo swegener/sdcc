@@ -422,13 +422,11 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(sdcc_libdir) ] || mkdir -p $(sdcc_libdir)
 	for model in $(MODELS); do \
-	  [ -d $(sdcc_libdir)/$$model ] || \
 	  mkdir -p $(sdcc_libdir)/$$model; \
 	done
 	for libdir in small-stack-auto ds390 ds400 hc08 pic16 pic; do \
-	  [ -d $(sdcc_libdir)/$$libdir ] || mkdir -p $(sdcc_libdir)/$$libdir; \
+	  mkdir -p $(sdcc_libdir)/$$libdir; \
 	done
 	mkdir -p $(sdcc_libdir)/src
 

@@ -7,7 +7,8 @@ clean:
 	rm -f .[a-z]*~
 	rm -f $(top_builddir)/bin/link-z80$(EXEEXT) link-z80$(EXEEXT)
 	rm -f $(top_builddir)/bin/link-gbz80$(EXEEXT) link-gbz80$(EXEEXT)
-	rm -rf obj
+	rm -f $(LKOBJECTS) $(OBJDIR)/.stamp
+	rm -rf obj-z80 obj-gbz80
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

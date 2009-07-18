@@ -7,4 +7,4 @@ clean:
 
 distclean: clean
 	$(MAKE) -C z80 distclean
-	rm -f Makefile
+	rm -f Makefile asxxxx_config.h

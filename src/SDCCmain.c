@@ -26,12 +26,12 @@
 #include <io.h>
 #else
 #include <unistd.h>
+#include <libgen.h>
 #endif
 
 #include <signal.h>
 #include "common.h"
 #include <ctype.h>
-#include <libgen.h>
 #include "newalloc.h"
 #include "dbuf_string.h"
 #include "SDCCerr.h"
@@ -373,12 +373,29 @@ _validatePorts (void)
     }
 }
 
+
+static char
+*program_name (const char *path)
+{
+#ifdef _WIN32
+  char fname[_MAX_FNAME];
+
+  _splitpath (path, NULL, NULL, fname, NULL);
+  return Safe_strdup (fname);
+#else
+  char *tmpPath = Safe_strdup (path);
+  char *res = Safe_strdup (basename (tmpPath)));
+
+  free (tmpPath);
+  return res;
+#endif
+}
+
 /* search through the command line for the port */
 static void
 _findPort (int argc, char **argv)
 {
-  char* programNameTmp = Safe_strdup (*argv);
-  const char* programName = basename (programNameTmp);
+  char *programName = program_name (*argv);
   int found = 0;
   int i;
 
@@ -410,7 +427,8 @@ _findPort (int argc, char **argv)
       /* Use the first in the list as default */
       port = _ports[0];
     }
-  Safe_free (programNameTmp);
+
+  Safe_free (programName);
 }
 
 /* search through the command line options for the processor */

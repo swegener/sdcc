@@ -4,6 +4,9 @@
 	  fixed for WIN32
 	* as/link/lkar.c: fixed bug 2817508 - double free or memory corruption
 	  in aslink
+	* src/SDCCast.c, support/regression/tests/bug2740884.c:
+	  applied patch #2740884 - Incorrect assignment in array of structs,
+	  thanks to Robert Larice
 
 2009-07-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

@@ -396,7 +396,7 @@ ast * createRMW (ast *target, unsigned op, ast *operand)
       werrorfl (target->filename, target->lineno, E_LVALUE_REQUIRED, "=");
     } else {
       /* we would have to handle '.', but it is not generated any more */
-      wassertl(target->opval.op != '.', "obsolete opcode in tree");
+      wassertl (target->opval.op != '.', "obsolete opcode in tree");
 
       /* no other kinds of ASTs are lvalues and can contain side effects */
     }
@@ -1537,8 +1537,7 @@ bool constExprTree (ast *cexpr) {
       }
       return FALSE;
     case EX_LINK:
-      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-              "unexpected link in expression tree\n");
+      wassertl (0, "unexpected link in expression tree");
       return FALSE;
     case EX_OP:
       if (cexpr->opval.op==ARRAYINIT) {
@@ -1745,13 +1744,14 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
   else
     {
       /* check for += */
-      if (loopExpr->opval.op == ADD_ASSIGN)
+      if (loopExpr->opval.op == ADD_ASSIGN) /* seems to never happen, createRMW() absorbed */
         {
+          wassertl (0, "obsolete opcode in tree");
 
           if (IS_AST_SYM_VALUE (loopExpr->left) &&
               isSymbolEqual (*sym, AST_SYMBOL (loopExpr->left)) &&
               IS_AST_LIT_VALUE (loopExpr->right) &&
-              AST_ULONG_VALUE (loopExpr->right) != 1)
+              AST_ULONG_VALUE (loopExpr->right) == 1)
             return TRUE;
         }
     }
@@ -1871,7 +1871,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     {
 /*------------------------------------------------------------------*/
     case '[':
-      // if the loopvar is used as an index
+      /* if the loopvar is used as an index */
       /* array op is commutative -- must check both left & right */
       if (astHasSymbol(pbody->right, sym) || astHasSymbol(pbody->left, sym)) {
         return FALSE;
@@ -1881,25 +1881,25 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 
 /*------------------------------------------------------------------*/
     case PTR_OP:
+      /* '->' right: is a symbol
+              left: check if the loopvar is used as an index */
+      if (astHasSymbol(pbody->left, sym))
+        return FALSE;
+      return isConformingBody (pbody->left, sym, body);
+
     case '.':
-      return TRUE;
+      wassertl (0, "obsolete opcode in tree");
+      break;
 
 /*------------------------------------------------------------------*/
     case INC_OP:
     case DEC_OP:
 
-      /* sure we are not sym is not modified */
-      if (pbody->left &&
-          IS_AST_SYM_VALUE (pbody->left) &&
-          isSymbolEqual (AST_SYMBOL (pbody->left), sym))
+      if (astHasSymbol(pbody->right, sym) || astHasSymbol(pbody->left, sym))
         return FALSE;
 
-      if (pbody->right &&
-          IS_AST_SYM_VALUE (pbody->right) &&
-          isSymbolEqual (AST_SYMBOL (pbody->right), sym))
-        return FALSE;
-
-      return TRUE;
+      return isConformingBody (pbody->right, sym, body)
+        && isConformingBody (pbody->left,  sym, body);
 
 /*------------------------------------------------------------------*/
 
@@ -1995,7 +1995,8 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       if (astHasPointer (pbody->left) &&
           astHasSymbol (pbody->right, sym))
         return FALSE;
-      if (astHasVolatile (pbody->left))
+
+        if (astHasVolatile (pbody->left))
         return FALSE;
 
       if (IS_AST_SYM_VALUE (pbody->left)) {
@@ -2008,9 +2009,6 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
           return FALSE;
         }
       }
-
-      if (astHasVolatile (pbody->left))
-        return FALSE;
 
       if (astHasDeref(pbody->right))
         return FALSE;
@@ -2063,11 +2061,14 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
         return TRUE;
       else
         return FALSE;
+
     case SWITCH:
       if (astHasSymbol (pbody->left, sym))
         return FALSE;
+      break;
 
     default:
+      wassertl (0, "unanticipated opcode in tree");
       break;
     }
 
@@ -2447,13 +2448,13 @@ gatherImplicitVariables (ast * tree, ast * block)
         SPEC_VOLATILE (assignee->etype) = 0;
         SPEC_ABSA (assignee->etype) = 0;
 
-        wassertl(block != NULL, "implicit variable not contained in block");
-        wassert(assignee->next == NULL);
+        wassertl (block != NULL, "implicit variable not contained in block");
+        wassert (assignee->next == NULL);
         if (block != NULL) {
           symbol **decl = &(block->values.sym);
 
           while (*decl) {
-            wassert(*decl != assignee);  /* should not already be in list */
+            wassert (*decl != assignee);  /* should not already be in list */
             decl = &( (*decl)->next );
           }
 
@@ -2565,7 +2566,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
         }
       else
-        wassert(0); /* unreached: all values are literals or symbols */
+        wassert (0); /* unreached: all values are literals or symbols */
 
       return tree;
     }

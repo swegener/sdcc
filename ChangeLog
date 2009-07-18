@@ -2,6 +2,8 @@
 
 	* src/SDCCasm.c: RFE #1204438 - make SDCC a multicall binary, 
 	  fixed for WIN32
+	* as/link/lkar.c: fixed bug 2817508 - double free or memory corruption
+	  in aslink
 
 2009-07-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

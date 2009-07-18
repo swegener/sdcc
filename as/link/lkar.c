@@ -454,8 +454,6 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
         {
           long moduleOffset = ftell (libfp);
 
-          free (obj_name);
-
           /* Opened OK - create a new libraryfile object for it */
           if (This == NULL)
             {
@@ -484,7 +482,7 @@ buildlibraryindex_ar (struct lbname *lbnh, FILE * libfp, pmlibraryfile This, int
 
           add_rel_index (libfp, hdr.ar_size, This);
 
-          fseek (libfp, moduleOffset + hdr.ar_size + (hdr.ar_size & 1), SEEK_SET);
+          fseek (libfp, moduleOffset + hdr.ar_size + (hdr.ar_size & 1), SEEK_SET);;
         }
     }
 

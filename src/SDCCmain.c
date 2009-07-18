@@ -384,7 +384,7 @@ static char
   return Safe_strdup (fname);
 #else
   char *tmpPath = Safe_strdup (path);
-  char *res = Safe_strdup (basename (tmpPath)));
+  char *res = Safe_strdup (basename (tmpPath));
 
   free (tmpPath);
   return res;

@@ -5,7 +5,8 @@
 	* as/link/lkar.c: fixed bug 2817508 - double free or memory corruption
 	  in aslink
 	* src/SDCCast.c, support/regression/tests/bug2740884.c:
-	  applied patch #2740884 - Incorrect assignment in array of structs,
+	  applied patch #2802510 - fix for bug #274088,
+	  fixed bug #2740884 - Incorrect assignment in array of structs,
 	  thanks to Robert Larice
 	* as/hc08/clean.mk, as/link/clean.mk, as/link/hc08/clean.mk,
 	  as/link/mcs51/clean.mk, as/link/z80/clean.mk, as/mcs51/clean.mk,
@@ -13,7 +14,9 @@
 	  device/lib/Makefile.in, device/lib/mcs51/Makefile.in,
 	  device/lib/medium/Makefile.in, device/lib/pic/Makefile.in,
 	  device/lib/small/Makefile.in, support/cpp/Makefile.in:
-	  allpied patch #2801385 - make clean and distclean,
+	  applied patch #2801385 - make clean and distclean,
+	  fixed bug #2799101 - make clean does not remove .obj in /as,
+	  fixed bug #2783160 - "make distclean" fails to clean properly,
 	  thanks to Robert Larice
 	* .version, doc/sdccman.lyx: changed sdcc version to 2.9.2
 

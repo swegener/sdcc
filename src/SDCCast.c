@@ -2068,7 +2068,6 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       break;
 
     default:
-      wassertl (0, "unanticipated opcode in tree");
       break;
     }
 

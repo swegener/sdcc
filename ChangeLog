@@ -1,3 +1,8 @@
+2009-07-19 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCast.c: removed check for "unanticipated opcode in tree",
+	  introduced with patch #2802510
+
 2009-07-18 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCasm.c: RFE #1204438 - make SDCC a multicall binary, 

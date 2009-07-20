@@ -1625,7 +1625,7 @@ operandFromSymbol (symbol * sym)
       !sym->reqv &&                     /* does not already have a reg equivalence */
       !IS_VOLATILE (sym->etype) &&      /* not declared as volatile */
       !sym->islbl &&                    /* not a label */
-      ok                            /* farspace check */
+      ok                                /* farspace check */
     )
     {
 
@@ -1770,7 +1770,6 @@ setOperandType (operand * op, sym_link * type)
   /* depending on the type of operand */
   switch (op->type)
     {
-
     case VALUE:
       op->operand.valOperand->etype =
         getSpec (op->operand.valOperand->type =
@@ -1791,7 +1790,6 @@ setOperandType (operand * op, sym_link * type)
       op->operand.typeOperand = copyLinkChain (type);
       return;
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2439,7 +2437,6 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
   ADDTOCHAIN (ic);
 
   return IC_RESULT (ic);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2575,6 +2572,8 @@ geniCodeStruct (operand * left, operand * right, bool islval)
                                       right->operand.symOperand);
 
   wassert(IS_SYMOP(right));
+
+  wassert(IS_STRUCT (type) || (IS_PTR (type) && IS_STRUCT (type->next)));
 
   /* add the offset */
   ic = newiCode ('+', left, operandFromLit (element->offset));
@@ -2884,7 +2883,6 @@ setOClass (sym_link * ptr, sym_link * spec)
 
     default:
       break;
-
     }
 }
 
@@ -4131,15 +4129,13 @@ ast2iCode (ast * tree,int lvl)
       tree->opval.op != INLINEASM &&
       tree->opval.op != CRITICAL)
     {
-
         if (IS_ASSIGN_OP (tree->opval.op) ||
-           IS_DEREF_OP (tree) ||
-           (tree->opval.op == '&' && !tree->right) ||
-           tree->opval.op == PTR_OP)
+            IS_DEREF_OP (tree) ||
+            IS_ADDRESS_OF_OP (tree) )
           {
             addLvaluereq(lvl);
             if ((IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
-               (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
+                (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
               clearLvaluereq();
 
             left = operandFromAst (tree->left,lvl);

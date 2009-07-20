@@ -36,18 +36,18 @@ findPointerGetSet (iCode * sic, operand * op)
   for (; ic; ic = ic->next)
     {
       if ((POINTER_SET (ic) && isOperandEqual (op, IC_RESULT (ic))) ||
-	  (POINTER_GET (ic) && isOperandEqual (op, IC_LEFT (ic))))
-	return ic;
+          (POINTER_GET (ic) && isOperandEqual (op, IC_LEFT (ic))))
+        return ic;
 
       /* if we find any other usage or definition of op null */
       if (IC_RESULT (ic) && isOperandEqual (IC_RESULT (ic), op))
-	return NULL;
+        return NULL;
 
       if (IC_RIGHT (ic) && isOperandEqual (IC_RIGHT (ic), op))
-	return NULL;
+        return NULL;
 
       if (IC_LEFT (ic) && isOperandEqual (IC_LEFT (ic), op))
-	return NULL;
+        return NULL;
 
     }
 
@@ -56,123 +56,123 @@ findPointerGetSet (iCode * sic, operand * op)
 
 static int pattern1 (iCode *sic)
 {
-	/* this is what we do. look for sequences like
+        /* this is what we do. look for sequences like
 
-	iTempX := _SOME_POINTER_;
-	iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object) 	sic->next
-	_SOME_POINTER_ := iTempY;						sic->next->next
-	either       
-     	iTempZ := @[iTempX];							sic->next->next->next
-	or
-     	*(iTempX) := ..something..						sic->next->next->next
-	if we find this then transform this to
-	iTempX := _SOME_POINTER_;
-	either       
-     	iTempZ := @[iTempX];
-	or 
-     	*(iTempX) := ..something..
-	iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
-	_SOME_POINTER_ := iTempY; */
-	
-	/* sounds simple enough so lets start , here I use -ve
-	   tests all the way to return if any test fails */
-	iCode *pgs, *sh, *st;
+        iTempX := _SOME_POINTER_;
+        iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)      sic->next
+        _SOME_POINTER_ := iTempY;                                               sic->next->next
+        either       
+        iTempZ := @[iTempX];                                                    sic->next->next->next
+        or
+        *(iTempX) := ..something..                                              sic->next->next->next
+        if we find this then transform this to
+        iTempX := _SOME_POINTER_;
+        either       
+        iTempZ := @[iTempX];
+        or 
+        *(iTempX) := ..something..
+        iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
+        _SOME_POINTER_ := iTempY; */
+        
+        /* sounds simple enough so lets start , here I use -ve
+           tests all the way to return if any test fails */
+        iCode *pgs, *sh, *st;
 
-	if (!(sic->next && sic->next->next && sic->next->next->next))
-		return 0;
-	if (sic->next->op != '+' && sic->next->op != '-')
-		return 0;
-	if (!(sic->next->next->op == '=' &&
-	      !POINTER_SET (sic->next->next)))
-		return 0;
-	if (!isOperandEqual (IC_LEFT (sic->next), IC_RIGHT (sic)) ||
-	    !IS_OP_LITERAL (IC_RIGHT (sic->next)))
-		return 0;
-	if (operandLitValue (IC_RIGHT (sic->next)) !=
-	    getSize (operandType (IC_RIGHT (sic))->next))
-		return 0;
-	if (!isOperandEqual (IC_RESULT (sic->next->next),
-			     IC_RIGHT (sic)))
-		return 0;
-	if (!isOperandEqual (IC_RESULT (sic->next), IC_RIGHT (sic->next->next)))
-		return 0;
-	if (!(pgs = findPointerGetSet (sic->next->next, IC_RESULT (sic))))
-		return 0;
+        if (!(sic->next && sic->next->next && sic->next->next->next))
+                return 0;
+        if (sic->next->op != '+' && sic->next->op != '-')
+                return 0;
+        if (!(sic->next->next->op == '=' &&
+              !POINTER_SET (sic->next->next)))
+                return 0;
+        if (!isOperandEqual (IC_LEFT (sic->next), IC_RIGHT (sic)) ||
+            !IS_OP_LITERAL (IC_RIGHT (sic->next)))
+                return 0;
+        if (operandLitValue (IC_RIGHT (sic->next)) !=
+            getSize (operandType (IC_RIGHT (sic))->next))
+                return 0;
+        if (!isOperandEqual (IC_RESULT (sic->next->next),
+                             IC_RIGHT (sic)))
+                return 0;
+        if (!isOperandEqual (IC_RESULT (sic->next), IC_RIGHT (sic->next->next)))
+                return 0;
+        if (!(pgs = findPointerGetSet (sic->next->next, IC_RESULT (sic))))
+                return 0;
 
-	/* found the patter .. now do the transformation */
-	sh = sic->next;
-	st = sic->next->next;
+        /* found the patter .. now do the transformation */
+        sh = sic->next;
+        st = sic->next->next;
 
-	/* take the two out of the chain */
-	sic->next = st->next;
-	st->next->prev = sic;
+        /* take the two out of the chain */
+        sic->next = st->next;
+        st->next->prev = sic;
 
-	/* and put them after the pointer get/set icode */
-	if ((st->next = pgs->next))
-		st->next->prev = st;
-	pgs->next = sh;
-	sh->prev = pgs;
-	return 1;
+        /* and put them after the pointer get/set icode */
+        if ((st->next = pgs->next))
+                st->next->prev = st;
+        pgs->next = sh;
+        sh->prev = pgs;
+        return 1;
 }
 
 static int pattern2 (iCode *sic)
 {
-	/* this is what we do. look for sequences like
+        /* this is what we do. look for sequences like
 
-	iTempX := _SOME_POINTER_;
-	iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object) 	sic->next
-	iTempK := iTempY;							sic->next->next
-	_SOME_POINTER_ := iTempK;						sic->next->next->next
-	either       
-     	iTempZ := @[iTempX];							sic->next->next->next->next
-	or
-     	*(iTempX) := ..something..						sic->next->next->next->next
-	if we find this then transform this to
-	iTempX := _SOME_POINTER_;
-	either       
-     	iTempZ := @[iTempX];
-	or 
-     	*(iTempX) := ..something..
-	iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
-	iTempK := iTempY;	
-	_SOME_POINTER_ := iTempK; */
-	
-	/* sounds simple enough so lets start , here I use -ve
-	   tests all the way to return if any test fails */
-	iCode *pgs, *sh, *st;
+        iTempX := _SOME_POINTER_;
+        iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)      sic->next
+        iTempK := iTempY;                                                       sic->next->next
+        _SOME_POINTER_ := iTempK;                                               sic->next->next->next
+        either       
+        iTempZ := @[iTempX];                                                    sic->next->next->next->next
+        or
+        *(iTempX) := ..something..                                              sic->next->next->next->next
+        if we find this then transform this to
+        iTempX := _SOME_POINTER_;
+        either       
+        iTempZ := @[iTempX];
+        or 
+        *(iTempX) := ..something..
+        iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
+        iTempK := iTempY;       
+        _SOME_POINTER_ := iTempK; */
+        
+        /* sounds simple enough so lets start , here I use -ve
+           tests all the way to return if any test fails */
+        iCode *pgs, *sh, *st;
 
-	if (!(sic->next && sic->next->next && sic->next->next->next && 
-	      sic->next->next->next->next))
-		return 0;
+        if (!(sic->next && sic->next->next && sic->next->next->next && 
+              sic->next->next->next->next))
+                return 0;
 
-	/* yes I can OR them together and make one large if... but I have
-	   simple mind and like to keep things simple & readable */
-	if (!(sic->next->op == '+' || sic->next->op == '-')) return 0;
-	if (!isOperandEqual(IC_RIGHT(sic),IC_LEFT(sic->next))) return 0;
-	if (!IS_OP_LITERAL (IC_RIGHT (sic->next))) return 0;
-	if (operandLitValue (IC_RIGHT (sic->next)) !=
-	    getSize (operandType (IC_RIGHT (sic))->next)) return 0;
-	if (!IS_ASSIGN_ICODE(sic->next->next)) return 0;
-	if (!isOperandEqual(IC_RIGHT(sic->next->next),IC_RESULT(sic->next))) return 0;
-	if (!IS_ASSIGN_ICODE(sic->next->next->next)) return 0;
-	if (!isOperandEqual(IC_RIGHT(sic->next->next->next),IC_RESULT(sic->next->next))) return 0;
-	if (!isOperandEqual(IC_RESULT(sic->next->next->next),IC_LEFT(sic->next))) return 0;
-	if (!(pgs = findPointerGetSet (sic->next->next->next, IC_RESULT (sic)))) return 0;
-	
-	/* found the patter .. now do the transformation */
-	sh = sic->next;
-	st = sic->next->next->next;
+        /* yes I can OR them together and make one large if... but I have
+           simple mind and like to keep things simple & readable */
+        if (!(sic->next->op == '+' || sic->next->op == '-')) return 0;
+        if (!isOperandEqual(IC_RIGHT(sic),IC_LEFT(sic->next))) return 0;
+        if (!IS_OP_LITERAL (IC_RIGHT (sic->next))) return 0;
+        if (operandLitValue (IC_RIGHT (sic->next)) !=
+            getSize (operandType (IC_RIGHT (sic))->next)) return 0;
+        if (!IS_ASSIGN_ICODE(sic->next->next)) return 0;
+        if (!isOperandEqual(IC_RIGHT(sic->next->next),IC_RESULT(sic->next))) return 0;
+        if (!IS_ASSIGN_ICODE(sic->next->next->next)) return 0;
+        if (!isOperandEqual(IC_RIGHT(sic->next->next->next),IC_RESULT(sic->next->next))) return 0;
+        if (!isOperandEqual(IC_RESULT(sic->next->next->next),IC_LEFT(sic->next))) return 0;
+        if (!(pgs = findPointerGetSet (sic->next->next->next, IC_RESULT (sic)))) return 0;
+        
+        /* found the patter .. now do the transformation */
+        sh = sic->next;
+        st = sic->next->next->next;
 
-	/* take the three out of the chain */
-	sic->next = st->next;
-	st->next->prev = sic;
+        /* take the three out of the chain */
+        sic->next = st->next;
+        st->next->prev = sic;
 
-	/* and put them after the pointer get/set icode */
-	if ((st->next = pgs->next))
-		st->next->prev = st;
-	pgs->next = sh;
-	sh->prev = pgs;
-	return 1;
+        /* and put them after the pointer get/set icode */
+        if ((st->next = pgs->next))
+                st->next->prev = st;
+        pgs->next = sh;
+        sh->prev = pgs;
+        return 1;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -182,8 +182,8 @@ static int pattern2 (iCode *sic)
 void 
 ptrPostIncDecOpt (iCode * sic)
 {
-	if (pattern1(sic)) return ;
-	pattern2(sic);
+        if (pattern1(sic)) return ;
+        pattern2(sic);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -191,23 +191,23 @@ ptrPostIncDecOpt (iCode * sic)
 /*-----------------------------------------------------------------------*/
 static int addPattern1(iCode *ic)
 {
-	iCode *dic;
-	operand *tmp;
-	/* transform :
-	   iTempAA = iTempBB + iTempCC
-	   iTempDD = iTempAA + CONST
-	   to
-	   iTempAA = iTempBB + CONST
-	   iTempDD = iTempAA + iTempCC
-	*/
-	if (!isOperandLiteral(IC_RIGHT(ic))) return 0;
-	if ((dic=findBackwardDef(IC_LEFT(ic),ic->prev)) == NULL) return 0;
-	if (bitVectnBitsOn(OP_SYMBOL(IC_RESULT(dic))->uses) > 1) return 0;
-	if (dic->op != '+') return 0;
-	tmp = IC_RIGHT(ic);
-	IC_RIGHT(ic) = IC_RIGHT(dic);
-	IC_RIGHT(dic) = tmp;
-	return 1;
+        iCode *dic;
+        operand *tmp;
+        /* transform :
+           iTempAA = iTempBB + iTempCC
+           iTempDD = iTempAA + CONST
+           to
+           iTempAA = iTempBB + CONST
+           iTempDD = iTempAA + iTempCC
+        */
+        if (!isOperandLiteral(IC_RIGHT(ic))) return 0;
+        if ((dic=findBackwardDef(IC_LEFT(ic),ic->prev)) == NULL) return 0;
+        if (bitVectnBitsOn(OP_SYMBOL(IC_RESULT(dic))->uses) > 1) return 0;
+        if (dic->op != '+') return 0;
+        tmp = IC_RIGHT(ic);
+        IC_RIGHT(ic) = IC_RIGHT(dic);
+        IC_RIGHT(dic) = tmp;
+        return 1;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -215,8 +215,8 @@ static int addPattern1(iCode *ic)
 /*-----------------------------------------------------------------------*/
 int ptrAddition (iCode *sic)
 {
-	if (addPattern1(sic)) return 1;
-	return 0;
+        if (addPattern1(sic)) return 1;
+        return 0;
 }
 
 /*--------------------------------------------------------------------*/
@@ -234,7 +234,7 @@ ptrBaseRematSym (symbol *ptrsym)
   while (ric)
     {
       if (ric->op == '+' || ric->op == '-')
-	ric = OP_SYMBOL (IC_LEFT (ric))->rematiCode;
+        ric = OP_SYMBOL (IC_LEFT (ric))->rematiCode;
       else if (IS_CAST_ICODE (ric))
         ric = OP_SYMBOL (IC_RIGHT (ric))->rematiCode;
       else
@@ -310,50 +310,50 @@ ptrPseudoSymSafe (symbol *sym, iCode *dic)
     {
       if (!(SKIP_IC3 (ic) || ic->op == IFX))
         {
-	  /* Check for hazard #1 */
-	  if ((ic->op == CALL || ic->op == PCALL) /* && isGlobal */ )
-	    {
-	      if (ic->seq <= sym->liveTo)
-		return 0;
-	    }
-	  /* Check for hazard #2 */
-	  else if (POINTER_SET (ic))
-	    {
-	      symbol * ptrsym2 = OP_SYMBOL (IC_RESULT (ic));
-	  
-	      if (ptrsym2->remat)
-		{
-		  /* Must not be the same base symbol */
-		  if (basesym == ptrBaseRematSym (ptrsym2))
-		    return 0;
-		}
-	      else
-		{
-		  int ptrsym2DclType = aggrToPtrDclType (ptrsym2->type, FALSE);
+          /* Check for hazard #1 */
+          if ((ic->op == CALL || ic->op == PCALL) /* && isGlobal */ )
+            {
+              if (ic->seq <= sym->liveTo)
+                return 0;
+            }
+          /* Check for hazard #2 */
+          else if (POINTER_SET (ic))
+            {
+              symbol * ptrsym2 = OP_SYMBOL (IC_RESULT (ic));
+          
+              if (ptrsym2->remat)
+                {
+                  /* Must not be the same base symbol */
+                  if (basesym == ptrBaseRematSym (ptrsym2))
+                    return 0;
+                }
+              else
+                {
+                  int ptrsym2DclType = aggrToPtrDclType (ptrsym2->type, FALSE);
 
-		  /* Pointer must have no memory space in common */
-		  if (ptrsym2DclType == ptrsymDclType
-		      || ptrsym2DclType == GPOINTER
-		      || ptrsymDclType == GPOINTER)
-		    return 0;
-		}
-	    }
-	  else if (IC_RESULT (ic))
-	    {
-	      symbol * rsym = OP_SYMBOL (IC_RESULT (ic));
-	  
-	      /* Make sure there is no conflict with another pseudo symbol */
-	      if (rsym->psbase == basesym)
-		return 0;
-	      if (rsym->isspilt && rsym->usl.spillLoc)
-		rsym = rsym->usl.spillLoc;
-	      if (rsym->psbase == basesym)
-		return 0;
-	    }
-	}
-	
+                  /* Pointer must have no memory space in common */
+                  if (ptrsym2DclType == ptrsymDclType
+                      || ptrsym2DclType == GPOINTER
+                      || ptrsymDclType == GPOINTER)
+                    return 0;
+                }
+            }
+          else if (IC_RESULT (ic))
+            {
+              symbol * rsym = OP_SYMBOL (IC_RESULT (ic));
+          
+              /* Make sure there is no conflict with another pseudo symbol */
+              if (rsym->psbase == basesym)
+                return 0;
+              if (rsym->isspilt && rsym->usl.spillLoc)
+                rsym = rsym->usl.spillLoc;
+              if (rsym->psbase == basesym)
+                return 0;
+            }
+        }
+        
       if (ic->seq == sym->liveTo)
-	 break;
+         break;
       ic = ic->next;
     }
 

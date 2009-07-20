@@ -17,21 +17,6 @@
 
 #define TOLERANCE (1e-5)
 
-#ifdef SDCC_mcs51
-#   define STORAGE __code
-#else
-#   define STORAGE
-#endif
-
-#ifdef SDCC
-#   ifndef REENTRANT
-#       define REENTRANT reentrant
-#   endif
-#else
-#   define REENTRANT
-#endif
-
-
 /* now exceptions for targets/functions which would not pass */
 #if defined(SDCC_ds390)
 #   define ACOSF_DISABLED (1)
@@ -62,7 +47,7 @@ static float dummy(float a)
     return a;
 }
 
-typedef float (*float_test_func)(float) REENTRANT;
+typedef float (*float_test_func)(float) reentrant;
 
 /* the table with functions, their argument, expected result, tolerance.
    For most 8-bitters each testpoint uses 14 bytes so we could have a few:) */
@@ -71,7 +56,7 @@ struct
     float_test_func f;
     float arg, result, tolerance;
 }
-static const STORAGE testpoint[] =
+static const testpoint[] =
 {
 
     #if SINF

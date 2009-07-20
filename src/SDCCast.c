@@ -380,7 +380,7 @@ ast * createRMW (ast *target, unsigned op, ast *operand)
 
   if (IS_AST_OP(target)) {
     /* if this is a dereference, put the referenced item in the temporary */
-    if (IS_DEREF_OP(target) || target->opval.op == PTR_OP) {
+    if (IS_DEREF_OP(target)) {
       /* create a new temporary containing the item being dereferenced */
       if (hasSEFcalls(target->left))
         tempvar1 = replaceAstWithTemporary(&(target->left));
@@ -4720,7 +4720,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
     case CALL:
 
-      /* undo any explicit pointer derefernce; PCALL will handle it instead */
+      /* undo any explicit pointer dereference; PCALL will handle it instead */
       if (IS_FUNC (LTYPE (tree)) && tree->left->type == EX_OP)
         {
           if (tree->left->opval.op == '*' && !tree->left->right)

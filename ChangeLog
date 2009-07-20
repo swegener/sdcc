@@ -1,3 +1,16 @@
+2009-07-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/asranlib/asranlib.dsp: removed all windows library dependencies
+	* as/mcs51/asx8051.dsp: no debugging for Release build
+	* src/SDCCast.h,
+	* src/SDCCast.c (createRMW): IS_DEREF now also checks for PTR_OP
+	* src/SDCCicode.c (geniCodeStruct): added assert for really being a struct,
+	  (ast2iCode): IS_DEREF now also checks for PTR_OP, fixes bug 2821333     
+	* src/SDCCptropt.c: changed all TAB's to spaces
+	* support/regression/tests/float_single.c, 
+	* device/lib/asincosf.c: removed unnecessary macros, const on global always
+	  means 'put it in code memory', and 'reentrant' is predefined in testfwk.h
+
 2009-07-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: various changes
@@ -15,7 +28,7 @@
 	* as/link/lkar.c: fixed bug 2817508 - double free or memory corruption
 	  in aslink
 	* src/SDCCast.c, support/regression/tests/bug2740884.c:
-	  applied patch #2802510 - fix for bug #274088,
+	  applied patch #2802510 - fix for bug #2740884,
 	  fixed bug #2740884 - Incorrect assignment in array of structs,
 	  thanks to Robert Larice
 	* as/hc08/clean.mk, as/link/clean.mk, as/link/hc08/clean.mk,

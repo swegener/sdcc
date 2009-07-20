@@ -1289,7 +1289,7 @@ name "-\\/-std-c89"
 \end_layout
 
 \begin_layout Itemize
-in versions older then 2.8.4 the pic16 *printf() and printf_tiny() library
+in versions older than 2.8.4 the pic16 *printf() and printf_tiny() library
  functions supported undocumented and not standard compliant 'b' binary
  format specifier ("%b", "%hb" and "%lb").
  The 'b' specifier is now disabled by default.
@@ -5826,6 +5826,12 @@ This is the actual compiler, it in turn uses the c-preprocessor and invokes
 
 \begin_layout Subsection
 sdcpp - The C-Preprocessor
+\begin_inset LatexCommand index
+name "Preprocessor"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5865,10 +5871,27 @@ xxx
 \end_layout
 
 \begin_layout Standard
-This is retargettable assembler & linkage editor, it was developed by Alan
- Baldwin.
+This is a set of retargettable assemblers and linkage editors, which was
+ developed by Alan Baldwin.
  John Hartman created the version for 8051, and I (Sandeep) have made some
  enhancements and bug fixes for it to work properly with SDCC.
+ 
+\end_layout
+
+\begin_layout Standard
+SDCC uses an about 1999 branch which unfortunately is not compatible with
+ the more advanced (f.e.
+ macros, more targets) ASxxxx Cross Assemblers nowadays available from Alan
+ Baldwin 
+\begin_inset LatexCommand url
+target "http://shop-pdp.kent.edu/"
+
+\end_inset
+
+.
+ In 2009 Alan made his ASxxxx Cross Assemblers available under the GPL licence
+ (GPLv3 or later), so a reunion could be possible.
+ Thanks Alan!
 \end_layout
 
 \begin_layout Subsection
@@ -5878,7 +5901,7 @@ s51 - The Simulator
 \begin_layout Standard
 S51
 \begin_inset LatexCommand index
-name "s51"
+name "s51 (simulator)"
 
 \end_inset
 
@@ -5916,7 +5939,7 @@ reference "cha:Debugging-with-SDCDB"
 .
  The current version of the debugger uses Daniel's Simulator S51
 \begin_inset LatexCommand index
-name "s51"
+name "s51 (simulator)"
 
 \end_inset
 
@@ -7367,7 +7390,7 @@ name "AVR"
 \end_inset
 
  processor (Not maintained, not complete).
- AVR users should probably have a look at winavr 
+ AVR users should have a look at winavr 
 \begin_inset LatexCommand url
 target "http://sourceforge.net/projects/winavr"
 
@@ -7379,7 +7402,7 @@ target "http://www.avrfreaks.net/index.php?name=PNphpBB2&file=index"
 
 \end_inset
 
-, which is based on AVR-port of the gcc compiler.
+, which is based on the gcc compiler.
 \end_layout
 
 \begin_layout Standard
@@ -7491,6 +7514,13 @@ name "XA51"
 \end_layout
 
 \begin_layout Standard
+SDCC inspects the program name it was called with so the processor family
+ can also be selected by renaming the sdcc binary (to f.e.
+ z80-sdcc) or by calling SDCC from a suitable link.
+ Option -m has higher priority than setting from program name.
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -7506,7 +7536,7 @@ name "Options preprocessor"
 
 
 \begin_inset LatexCommand index
-name "Preprocessor options"
+name "Preprocessor!Options"
 
 \end_inset
 
@@ -7517,6 +7547,46 @@ name "sdcpp (preprocessor)"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+SDCC uses an adapted version of the GNU Compiler Collection
+\begin_inset LatexCommand index
+name "gcc (GNU Compiler Collection)"
+
+\end_inset
+
+ preprocessor 
+\emph on
+cpp
+\emph default
+
+\begin_inset LatexCommand index
+name "cpp|see{sdcpp}"
+
+\end_inset
+
+ (
+\emph on
+gcc
+\emph default
+ 
+\begin_inset LatexCommand url
+target "http://gcc.gnu.org/"
+
+\end_inset
+
+).
+ If you need more dedicated options than those listed below please refer
+ to the GCC\InsetSpace ~
+CPP\InsetSpace ~
+Manual at 
+\begin_inset LatexCommand htmlurl
+target "http://www.gnu.org/software/gcc/onlinedocs/"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout List
@@ -7790,37 +7860,7 @@ name "sdcpp (preprocessor)"
 \end_inset
 
 .
- SDCC uses an adapted version of the GNU Compiler Collection
-\begin_inset LatexCommand index
-name "gcc (GNU Compiler Collection)"
-
-\end_inset
-
- preprocessor 
-\emph on
-cpp
-\emph default
- (
-\emph on
-gcc
-\emph default
  
-\begin_inset LatexCommand url
-target "http://gcc.gnu.org/"
-
-\end_inset
-
-).
- If you need more dedicated options please refer to the GCC\InsetSpace ~
-CPP\InsetSpace ~
-Manual at
- 
-\begin_inset LatexCommand htmlurl
-target "http://www.gnu.org/software/gcc/onlinedocs/"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -10272,7 +10312,13 @@ name "-E"
 
 
 \series default
- Run only the C preprocessor.
+ Run only the C preprocessor
+\begin_inset LatexCommand index
+name "Preprocessor"
+
+\end_inset
+
+.
  Preprocess all the C source files specified and output the results to standard
  output.
 \end_layout
@@ -12278,7 +12324,7 @@ SDCC recognizes the following environment variables:
 \series bold
 SDCC_LEAVE_SIGNALS
 \begin_inset LatexCommand index
-name "SDCC\\_LEAVE\\_SIGNALS"
+name "SDCC!Environment variables!SDCC\\_LEAVE\\_SIGNALS"
 
 \end_inset
 
@@ -12303,7 +12349,7 @@ TMP,\InsetSpace ~
 TEMP,\InsetSpace ~
 TMPDIR
 \begin_inset LatexCommand index
-name "TMP, TEMP, TMPDIR"
+name "SDCC!Environment variables!TMP, TEMP, TMPDIR"
 
 \end_inset
 
@@ -12322,7 +12368,7 @@ name "TMP, TEMP, TMPDIR"
 \series bold
 SDCC_HOME
 \begin_inset LatexCommand index
-name "SDCC\\_HOME"
+name "SDCC!Environment variables!SDCC\\_HOME"
 
 \end_inset
 
@@ -12352,7 +12398,7 @@ reference "sub:Install-paths"
 \series bold
 SDCC_INCLUDE
 \begin_inset LatexCommand index
-name "SDCC\\_INCLUDE"
+name "SDCC!Environment variables!SDCC\\_INCLUDE"
 
 \end_inset
 
@@ -12382,7 +12428,7 @@ Search Paths
 \series bold
 SDCC_LIB
 \begin_inset LatexCommand index
-name "SDCC\\_LIB"
+name "SDCC!Environment variables!SDCC\\_LIB"
 
 \end_inset
 
@@ -12408,8 +12454,35 @@ Search Paths
 
 \begin_layout Standard
 There are some more environment variables recognized by SDCC, but these
- are solely used for debugging purposes.
- They can change or disappear very quickly, and will never be documented.
+ are mainly used for debugging purposes.
+ They can change or disappear very quickly, and will never be documented
+\begin_inset Foot
+status open
+
+\begin_layout Standard
+if you are curious search in SDCC's sources for 
+\family typewriter
+
+\begin_inset Quotes sld
+\end_inset
+
+getenv
+\begin_inset Quotes srd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "SDCC!Environment variables!undocumented"
+
+\end_inset
+
+.
+ 
 \begin_inset VSpace bigskip
 \end_inset
 
@@ -13169,7 +13242,17 @@ status collapsed
 \family default
  
 \series bold
-Nevertheless it is possible to write header files
+Nevertheless with the file 
+\family typewriter
+compiler.h
+\begin_inset LatexCommand index
+name "compiler.h (include file)"
+
+\end_inset
+
+
+\family default
+ it is possible to write header files
 \begin_inset LatexCommand index
 name "Header files"
 
@@ -13316,7 +13399,7 @@ name "Libraries"
  routines.
  Explicitly specifying the pointer
 \begin_inset LatexCommand index
-name "pointer"
+name "Pointer"
 
 \end_inset
 
@@ -21051,6 +21134,12 @@ name "putchar()"
 \end_inset
 
 
+\begin_inset LatexCommand index
+name "printf()!putchar()"
+
+\end_inset
+
+
 \family default
  routines.
  SDCC does not know whether the system connects to a serial line with or
@@ -21150,7 +21239,7 @@ name "<NO FLOAT>"
 
 
 \begin_inset LatexCommand index
-name "printf floating point support"
+name "printf()!floating point support"
 
 \end_inset
 
@@ -21217,7 +21306,7 @@ If you're short on code memory you might want to use
 \family typewriter
 printf_small()
 \begin_inset LatexCommand index
-name "printf\\_small()"
+name "printf()!printf\\_small()"
 
 \end_inset
 
@@ -21236,7 +21325,7 @@ printf().
 \family typewriter
 printf_tiny()
 \begin_inset LatexCommand index
-name "printf\\_tiny() (mcs51)"
+name "printf()!printf\\_tiny() (mcs51)"
 
 \end_inset
 
@@ -21246,7 +21335,7 @@ name "printf\\_tiny() (mcs51)"
 \family typewriter
 printf_fast()
 \begin_inset LatexCommand index
-name "printf\\_fast() (mcs51)"
+name "printf()!printf\\_fast() (mcs51)"
 
 \end_inset
 
@@ -21256,7 +21345,7 @@ name "printf\\_fast() (mcs51)"
 \family typewriter
 printf_fast_f()
 \begin_inset LatexCommand index
-name "printf\\_fast\\_f() (mcs51)"
+name "printf()!printf\\_fast\\_f() (mcs51)"
 
 \end_inset
 
@@ -23548,7 +23637,13 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-The preprocessor SDCPP
+The preprocessor
+\begin_inset LatexCommand index
+name "Preprocessor"
+
+\end_inset
+
+ SDCPP
 \begin_inset LatexCommand index
 name "sdcpp (preprocessor)"
 
@@ -23955,7 +24050,13 @@ Description
 \begin_layout Standard
 SDCC
 \begin_inset LatexCommand index
-name "SDCC"
+name "SDCC!Defines!SDCC (version macro)"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "version macro"
 
 \end_inset
 
@@ -23983,19 +24084,19 @@ Always defined.
 \begin_layout Standard
 SDCC_mcs51
 \begin_inset LatexCommand index
-name "SDCC\\_mcs51"
+name "SDCC!Defines!SDCC\\_mcs51"
 
 \end_inset
 
  or SDCC_ds390
 \begin_inset LatexCommand index
-name "SDCC\\_ds390"
+name "SDCC!Defines!SDCC\\_ds390"
 
 \end_inset
 
  or SDCC_z80
 \begin_inset LatexCommand index
-name "SDCC\\_z80"
+name "SDCC!Defines!SDCC\\_z80"
 
 \end_inset
 
@@ -24066,7 +24167,7 @@ depending on the model used (e.g.
 \begin_layout Standard
 SDCC_STACK_AUTO
 \begin_inset LatexCommand index
-name "SDCC\\_STACK\\_AUTO"
+name "SDCC!Defines!SDCC\\_STACK\\_AUTO"
 
 \end_inset
 
@@ -24109,7 +24210,7 @@ status collapsed
 \begin_layout Standard
 SDCC_MODEL_SMALL
 \begin_inset LatexCommand index
-name "SDCC\\_MODEL\\_SMALL"
+name "SDCC!Defines!SDCC\\_MODEL\\_SMALL"
 
 \end_inset
 
@@ -24152,7 +24253,7 @@ status collapsed
 \begin_layout Standard
 SDCC_MODEL_MEDIUM
 \begin_inset LatexCommand index
-name "SDCC\\_MODEL\\_MEDIUM"
+name "SDCC!Defines!SDCC\\_MODEL\\_MEDIUM"
 
 \end_inset
 
@@ -24195,7 +24296,7 @@ status collapsed
 \begin_layout Standard
 SDCC_MODEL_LARGE
 \begin_inset LatexCommand index
-name "SDCC\\_MODEL\\_LARGE"
+name "SDCC!Defines!SDCC\\_MODEL\\_LARGE"
 
 \end_inset
 
@@ -24238,7 +24339,7 @@ status collapsed
 \begin_layout Standard
 SDCC_USE_XSTACK
 \begin_inset LatexCommand index
-name "SDCC\\_USE\\_XSTACK"
+name "SDCC!Defines!SDCC\\_USE\\_XSTACK"
 
 \end_inset
 
@@ -24281,7 +24382,7 @@ status collapsed
 \begin_layout Standard
 SDCC_CHAR_UNSIGNED
 \begin_inset LatexCommand index
-name "SDCC\\_CHAR\\_UNSIGNED"
+name "SDCC!Defines!SDCC\\_CHAR\\_UNSIGNED"
 
 \end_inset
 
@@ -24324,7 +24425,7 @@ status collapsed
 \begin_layout Standard
 SDCC_STACK_TENBIT
 \begin_inset LatexCommand index
-name "SDCC\\_STACK\\_TENBIT"
+name "SDCC!Defines!SDCC\\_STACK\\_TENBIT (ds390)"
 
 \end_inset
 
@@ -24354,7 +24455,7 @@ when
 \begin_layout Standard
 SDCC_MODEL_FLAT24
 \begin_inset LatexCommand index
-name "SDCC\\_MODEL\\_FLAT24"
+name "SDCC!Defines!SDCC\\_MODEL\\_FLAT24 (ds390)"
 
 \end_inset
 
@@ -24384,7 +24485,7 @@ when
 \begin_layout Standard
 SDCC_REVISION
 \begin_inset LatexCommand index
-name "SDCC\\_REVISION"
+name "SDCC!Defines!SDCC\\_REVISION (svn revision number)"
 
 \end_inset
 
@@ -24411,7 +24512,7 @@ Always defined.
 \begin_layout Standard
 SDCC_PARMS_IN_BANK1
 \begin_inset LatexCommand index
-name "SDCC\\_PARMS\\_IN\\_BANK1"
+name "SDCC!Defines!SDCC\\_PARMS\\_IN\\_BANK1"
 
 \end_inset
 
@@ -24454,7 +24555,7 @@ status collapsed
 \begin_layout Standard
 SDCC_FLOAT_REENT
 \begin_inset LatexCommand index
-name "SDCC\\_FLOAT\\_REENT"
+name "SDCC!Defines!SDCC\\_FLOAT\\_REENT"
 
 \end_inset
 
@@ -24497,7 +24598,7 @@ status collapsed
 \begin_layout Standard
 SDCC_INT_LONG_REENT
 \begin_inset LatexCommand index
-name "SDCC\\_INT\\_LONG\\_REENT"
+name "SDCC!Defines!SDCC\\_INT\\_LONG\\_REENT"
 
 \end_inset
 
@@ -25601,8 +25702,20 @@ The PIC14 port recognizes the following environment variables:
 \end_layout
 
 \begin_layout Description
-SDCC_PIC14_SPLIT_LOCALS If set and not empty, sdcc will allocate each temporary
- register (the ones called r0xNNNN) in a section of its own.
+SDCC_PIC14_SPLIT_LOCALS
+\begin_inset LatexCommand index
+name "PIC14!Environment variables!SDCC\\_PIC14\\_SPLIT\\_LOCALS"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "SDCC!Environment variables!SDCC\\_PIC14\\_SPLIT\\_LOCALS"
+
+\end_inset
+
+ If set and not empty, sdcc will allocate each temporary register (the ones
+ called r0xNNNN) in a section of its own.
  By default (if this variable is unset), sdcc tries to cluster registers
  in sections in order to reduce the BANKSEL overhead when accessing them.
 \end_layout
@@ -26420,9 +26533,20 @@ Currently there is only two such variables available:
 \end_layout
 
 \begin_layout Description
-OPTIMIZE_BITFIELD_POINTER_GET When this variable exists, reading of structure
- bitfields is optimized by directly loading FSR0 with the address of the
- bitfield structure.
+OPTIMIZE_BITFIELD_POINTER_GET
+\begin_inset LatexCommand index
+name "PIC16!Environment variables!OPTIMIZE\\_BITFIELD\\_POINTER\\_GET"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "SDCC!Environment variables!OPTIMIZE\\_BITFIELD\\_POINTER\\_GET (PIC16)"
+
+\end_inset
+
+ When this variable exists, reading of structure bitfields is optimized
+ by directly loading FSR0 with the address of the bitfield structure.
  Normally SDCC will cast the bitfield structure to a bitfield pointer and
  then load FSR0.
  This step saves data ram and code space for functions that make heavy use
@@ -26433,7 +26557,19 @@ OPTIMIZE_BITFIELD_POINTER_GET When this variable exists, reading of structure
 \end_layout
 
 \begin_layout Description
-NO_REG_OPT Do not perform pCode registers optimization.
+NO_REG_OPT
+\begin_inset LatexCommand index
+name "PIC16!Environment variables!NO\\_REG\\_OPT"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "SDCC!Environment variables!NO\\_REG\\_OPT"
+
+\end_inset
+
+ Do not perform pCode registers optimization.
  This should be used for debugging purposes.
  If bugs in the pcode optimizer are found, users can benefit from temporarily
  disabling the optimizer until the bug is fixed.
@@ -26441,6 +26577,12 @@ NO_REG_OPT Do not perform pCode registers optimization.
 
 \begin_layout Subsection
 Preprocessor Macros
+\begin_inset LatexCommand index
+name "Preprocessor!PIC16 Macros"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -26486,6 +26628,12 @@ Description
 
 \begin_layout Standard
 SDCC_pic16
+\begin_inset LatexCommand index
+name "SDCC!Defines!SDCC\\_pic16"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -26519,6 +26667,12 @@ status collapsed
 \end_inset
 
 _pic16
+\begin_inset LatexCommand index
+name "PIC16!Defines!\\_\\_pic16"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -26539,6 +26693,12 @@ Port identification (same as above)
 
 \begin_layout Standard
 pic18fxxxx
+\begin_inset LatexCommand index
+name "PIC16!Defines!pic18fxxxx"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -26578,6 +26738,12 @@ status collapsed
 \end_inset
 
 _18Fxxxx
+\begin_inset LatexCommand index
+name "PIC16!Defines!\\_\\_pic18fxxxx"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -26598,6 +26764,12 @@ MCU Identification (same as above)
 
 \begin_layout Standard
 STACK_MODEL_nnn
+\begin_inset LatexCommand index
+name "PIC16!Defines!STACK\\_MODEL\\_nnn"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -27489,7 +27661,7 @@ Before using SDCC/pic16 there are some libraries that need to be compiled.
  Should you require to rebuild the pic16 libraries manually (e.g.
  in order to enable output of float values
 \begin_inset LatexCommand index
-name "Floating point support"
+name "printf()!PIC16 Floating point support"
 
 \end_inset
 
@@ -27551,7 +27723,7 @@ name "<NO FLOAT>"
 
 
 \begin_inset LatexCommand index
-name "printf floating point support"
+name "printf()!PIC16 floating point support"
 
 \end_inset
 
@@ -29470,7 +29642,13 @@ Printing functions
 \end_layout
 
 \begin_layout Standard
-PIC16 contains an implementation of the printf-family of functions.
+PIC16 contains an implementation of the printf-family
+\begin_inset LatexCommand index
+name "printf()!PIC16"
+
+\end_inset
+
+ of functions.
  There exist the following functions:
 \end_layout
 
@@ -32151,7 +32329,13 @@ name "sec:Porting-code-to-other-compilers"
 \end_layout
 
 \begin_layout Itemize
-check whether endianness of the compilers differs and adapt where needed.
+check whether endianness
+\begin_inset LatexCommand index
+name "Endianness"
+
+\end_inset
+
+ of the compilers differs and adapt where needed.
 \end_layout
 
 \begin_layout Itemize
@@ -32192,8 +32376,13 @@ target "http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/include/mc
 \end_layout
 
 \begin_layout Itemize
-check whether the startup code contains the correct initialization (watchdog,
- peripherals).
+check whether the startup code contains the correct initialization (watchdog
+\begin_inset LatexCommand index
+name "watchdog"
+
+\end_inset
+
+, peripherals).
 \end_layout
 
 \begin_layout Itemize
@@ -32223,6 +32412,12 @@ not
 check whether the keyword 
 \emph on
 volatile
+\begin_inset LatexCommand index
+name "volatile"
+
+\end_inset
+
+
 \emph default
  is used where needed.
  The compilers might differ in their optimization characteristics (as different
@@ -32316,7 +32511,13 @@ check whether timing loops result in proper timing (or preferably consider
 \end_layout
 
 \begin_layout Itemize
-check for differences in printf parameters (some compilers push (va_arg
+check for differences in printf parameters
+\begin_inset LatexCommand index
+name "printf()!parameters"
+
+\end_inset
+
+ (some compilers push (va_arg
 \begin_inset LatexCommand index
 name "vararg, va\\_arg"
 
@@ -32338,6 +32539,13 @@ reference "sec:Compatibility-with-previous"
 \end_inset
 
 ).
+ Provide a putchar()
+\begin_inset LatexCommand index
+name "printf()!putchar()"
+
+\end_inset
+
+ function if needed.
 \end_layout
 
 \begin_layout Itemize
@@ -32826,8 +33034,6 @@ sdcc/bin
 \end_inset
 
 
-\newline
-
 \end_layout
 
 \begin_layout Section
@@ -33242,6 +33448,10 @@ target "http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/src/pi
 SDCC internal documentation (debugging file format)
 \end_layout
 
+\begin_layout Standard
+
+\end_layout
+
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -33293,8 +33503,370 @@ target "http://sdcc.sourceforge.net/doc/cdbfileformat.pdf"
 \end_inset
 
 
-\newline
+\end_layout
 
+\begin_layout Section
+Communication online at SourceForge
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="30col%">
+<column alignment="left" valignment="top" leftline="true" width="30col%">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="40col%">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\series bold
+Subject / Title
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\series bold
+Note
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\series bold
+Link
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+wiki
+\begin_inset LatexCommand index
+name "wiki"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "Communication!wiki"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "http://sdcc.wiki.sourceforge.net/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+sdcc-user mailing list
+\begin_inset LatexCommand index
+name "mailing list"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "Communication!Mailing lists"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+around 650 subscribers mid 2009
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "https://lists.sourceforge.net/mailman/listinfo/sdcc-user"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+sdcc-devel mailing list
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "https://lists.sourceforge.net/mailman/listinfo/sdcc-devel"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+help forum
+\begin_inset LatexCommand index
+name "Communication!Forums"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+similar scope as sdcc-user mailing list
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "http://sourceforge.net/forum/forum.php?forum_id=1865"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+open discussion forum
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "http://sourceforge.net/forum/forum.php?forum_id=1864"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+trackers (bug tracker, feature requests, patches, support requests, webdocs)
+\begin_inset LatexCommand index
+name "Communication!Trackers"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "http://sourceforge.net/tracker/?group_id=599"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+rss feed
+\begin_inset LatexCommand index
+name "RSS feed"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "Communication!RSS feed"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+stay tuned with most (not all) sdcc activities
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+\begin_inset LatexCommand url
+target "http://sourceforge.net/export/rss2_keepsake.php?group_id=599"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+With a sourceforge account you can 
+\begin_inset Quotes sld
+\end_inset
+
+monitor
+\begin_inset Quotes srd
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "Communication!Monitor"
+
+\end_inset
+
+ forums and trackers, so that you automatically receive mail on changes.
+ You can digg out earlier communication by using the search function 
+\begin_inset LatexCommand url
+target "http://sourceforge.net/search/?group_id=599"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -33318,9 +33890,9 @@ name "Related tools"
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="40col%">
+<column alignment="left" valignment="top" leftline="true" width="20col%">
+<column alignment="block" valignment="top" leftline="true" width="30col%">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="50col%">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -33973,8 +34545,6 @@ target "http://www.cmake.org/Wiki/CmakeSdcc"
 \end_inset
 
 
-\newline
-
 \end_layout
 
 \begin_layout Section
@@ -33986,9 +34556,9 @@ Related documentation / recommended reading
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="20col%">
+<column alignment="left" valignment="top" leftline="true" width="30col%">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="50col%">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -34290,7 +34860,7 @@ name "Application notes"
 <features>
 <column alignment="block" valignment="top" leftline="true" width="17col%">
 <column alignment="block" valignment="top" leftline="true" width="27col%">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="57col%">
+<column alignment="block" valignment="top" leftline="true" rightline="true" width="56col%">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -34711,7 +35281,7 @@ name "Patch submission"
 
 \end_inset
 
- system, download
+ system, wiki, rss-feed, download
 \begin_inset LatexCommand index
 name "download"
 
@@ -34736,6 +35306,12 @@ name "Bug reporting"
 
 \begin_inset LatexCommand index
 name "Reporting bugs"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "Communication!Bug report"
 
 \end_inset
 
@@ -34876,6 +35452,12 @@ name "Requesting features"
 \end_inset
 
 
+\begin_inset LatexCommand index
+name "Communication!Feature request"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -34892,6 +35474,12 @@ target "http://sourceforge.net/tracker/?group_id=599&atid=350599"
 
 \begin_layout Section
 Submitting patches
+\begin_inset LatexCommand index
+name "Communication!Patch submission"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -34983,6 +35571,12 @@ target "http://sourceforge.net/forum/?group_id=599"
 , lists
 \begin_inset LatexCommand index
 name "Mailing list(s)"
+
+\end_inset
+
+
+\begin_inset LatexCommand index
+name "Communication!Mailing lists"
 
 \end_inset
 
@@ -35090,20 +35684,24 @@ name "Release policy"
 
 \begin_layout Standard
 Historically there often were long delays between official releases and
- the sourceforge download area tends to get not updated at all.
- Excuses in the past might have referred to problems with live range analysis,
- but as this was fixed a while ago, the current problem is that another
- excuse has to be found.
- Kidding aside, we have to get better there! On the other hand there are
- daily snapshots available at 
+ the sourceforge download area tended to get not updated at all.
+ Starting with version 2.4.0 SDCC in 2004 switched to a time-based release
+ schedule with one official release usually during the first half of the
+ year.
+\end_layout
+
+\begin_layout Standard
+The medium digit in the version number denotes the year of the release and
+ the last digit of an official release is zero.
+ Additionally there are daily snapshots available at 
 \begin_inset LatexCommand htmlurl
 name "snap"
 target "http://sdcc.sourceforge.net/snap.php"
 
 \end_inset
 
-, and you can always build the very last version (hopefully with many bugs
- fixed, and features added) from the source code available at 
+, and you can always build the very last version from the source code available
+ at 
 \begin_inset LatexCommand htmlurl
 name "Source"
 target "http://sdcc.sourceforge.net/snap.php#Source"
@@ -35133,64 +35731,6 @@ target "http://sdcc.wiki.sourceforge.net/"
 \end_layout
 
 \begin_layout Section
-Examples
-\begin_inset LatexCommand index
-name "Examples"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-You'll find some small examples in the directory 
-\emph on
-sdcc/device/examples/.
-
-\emph default
- More examples and libraries are available at 
-\emph on
-The SDCC Open Knowledge Resource 
-\begin_inset LatexCommand url
-target "http://sdccokr.dl9sec.de/"
-
-\end_inset
-
-
-\emph default
- web site or at 
-\begin_inset LatexCommand url
-target "http://www.pjrc.com/tech/8051/"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Standard
-I did insert a reference to Paul's web site here although it seems rather
- dedicated to a specific 8032 board (I think it's okay because it f.e.
- shows LCD/Harddisc interface and has a free 8051 monitor.
- Independent 8032 board vendors face hard competition of heavily subsidized
- development boards anyway).
-\end_layout
-
-\begin_layout Standard
-Maybe we should include some links to real world applications.
- Preferably pointer to pointers (one for each architecture) so this stays
- manageable here?
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
 Quality control
 \begin_inset LatexCommand label
 name "sec:Quality-control"
@@ -35207,7 +35747,11 @@ name "Quality control"
 \end_layout
 
 \begin_layout Standard
-The compiler is passed through snaphot build compile and build checks.
+The compiler is passed through 
+\shape italic
+daily
+\shape default
+ snapshot build compile and build checks.
  The so called 
 \shape italic
 regression tests
@@ -35307,6 +35851,64 @@ name "Regression test (PIC14)"
 sdcc/src/regression
 \shape default
 .
+\end_layout
+
+\begin_layout Section
+Examples
+\begin_inset LatexCommand index
+name "Examples"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You'll find some small examples in the directory 
+\emph on
+sdcc/device/examples/.
+
+\emph default
+ More examples and libraries are available at 
+\emph on
+The SDCC Open Knowledge Resource 
+\begin_inset LatexCommand url
+target "http://sdccokr.dl9sec.de/"
+
+\end_inset
+
+
+\emph default
+ web site or at 
+\begin_inset LatexCommand url
+target "http://www.pjrc.com/tech/8051/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+I did insert a reference to Paul's web site here although it seems rather
+ dedicated to a specific 8032 board (I think it's okay because it f.e.
+ shows LCD/Harddisc interface and has a free 8051 monitor.
+ Independent 8032 board vendors face hard competition of heavily subsidized
+ development boards anyway).
+\end_layout
+
+\begin_layout Standard
+Maybe we should include some links to real world applications.
+ Preferably pointer to pointers (one for each architecture) so this stays
+ manageable here?
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

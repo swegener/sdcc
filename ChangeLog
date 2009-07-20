@@ -1,3 +1,8 @@
+2009-07-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: various changes
+	* src/SDCCmain.c: fix typo in help text
+
 2009-07-19 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCast.c: removed check for "unanticipated opcode in tree",
@@ -5,7 +10,7 @@
 
 2009-07-18 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCCasm.c: RFE #1204438 - make SDCC a multicall binary, 
+	* src/SDCCmain.c: RFE #1204438 - make SDCC a multicall binary, 
 	  fixed for WIN32
 	* as/link/lkar.c: fixed bug 2817508 - double free or memory corruption
 	  in aslink

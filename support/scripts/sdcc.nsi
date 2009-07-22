@@ -755,6 +755,11 @@ ${Section} -INI SECINI
 ${SectionEnd}
 
 ${Section} -PostInstall SECPOSTINSTALL
+; Add SDCC bin directory to path if silent mode
+  ${If} ${Silent}
+    Call SDCC.AddBinToPath
+  ${EndIf}
+
   WriteRegStr ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "" $INSTDIR
 !ifdef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
   WriteRegDword ${SDCC_ROOT_KEY} "Software\${PRODUCT_NAME}" "VersionMajor" "${VER_MAJOR}"

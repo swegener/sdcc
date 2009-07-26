@@ -1,3 +1,18 @@
+2009-07-26 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/z80/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/gbz80/spec.mk,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/host/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/xa51/spec.mk:
+	  preparations for running WIN32 regression test on Linux / wine
+
 2009-07-22 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: add SDCC bin directory to path if silent mode

@@ -2,9 +2,9 @@
 
 # path to gpsim
 ifdef GPSIM_PATH
-  GPSIM := $(GPSIM_PATH)/gpsim
+  GPSIM := $(GPSIM_PATH)/gpsim$(EXEEXT)
 else
-  GPSIM := gpsim
+  GPSIM := gpsim$(EXEEXT)
 endif
 
 ifndef SDCC_BIN_PATH
@@ -16,12 +16,12 @@ SDCCFLAGS += -mpic14 -pp16f877 --less-pedantic -Wl,-q -DREENTRANT=reentrant
 LINKFLAGS += libsdcc.lib libm.lib
 
 OBJEXT = .o
-EXEEXT = .cod
+BINEXT = .cod
 
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx
-%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
+%$(BINEXT): %$(OBJEXT) $(EXTRAS)
 	-$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.c
@@ -36,14 +36,14 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # run simulator with 25 seconds timeout
-%.out: %$(EXEEXT) $(CASES_DIR)/timeout
+%.out: %$(BINEXT) $(CASES_DIR)/timeout$(EXEEXT)
 	mkdir -p $(dir $@)
 	-$(CASES_DIR)/timeout 25 "$(GPSIM)" -i -s $< -c $(PORTS_DIR)/pic14/gpsim.cmd > $@ || \
-	  echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
+	  echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-$(CASES_DIR)/timeout: fwk/lib/timeout.c
+$(CASES_DIR)/timeout$(EXEEXT): fwk/lib/timeout.c
 	$(CC) $(CFLAGS) $< -o $@
 
 _clean:

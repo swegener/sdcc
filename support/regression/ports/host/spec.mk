@@ -6,7 +6,7 @@ SDCCFLAGS+= -w
 # enable all warnings:
 #SDCCFLAGS+= -Wall
 
-EXEEXT = .bin
+BINEXT = .bin
 OBJEXT = .o
 INC_DIR = .
 
@@ -16,12 +16,12 @@ INC_DIR = .
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
-%.out: %$(EXEEXT)
+%.out: %$(BINEXT)
 	mkdir -p $(dir $@)
 	-$< > $@
 	-grep -n FAIL $@ /dev/null || true
 
-%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
+%$(BINEXT): %$(OBJEXT) $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS) -lm
 
 %$(OBJEXT): %.c

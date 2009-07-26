@@ -43,6 +43,7 @@
 CC = @CC@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@ -DNO_VARARGS
+EXEEXT = @EXEEXT@
 
 # support VPATH:
 VPATH        = @srcdir@
@@ -155,9 +156,9 @@ SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
 ifdef SDCC_BIN_PATH
-  SDCC = $(SDCC_BIN_PATH)/sdcc
+  SDCC = $(SDCC_BIN_PATH)/sdcc$(EXEEXT)
 else
-  SDCC = $(top_builddir)/bin/sdcc
+  SDCC = $(top_builddir)/bin/sdcc$(EXEEXT)
   INC_DIR ?= $(top_srcdir)/device/include
 endif
 # Base flags.
@@ -165,7 +166,7 @@ SDCCFLAGS += --fverbose-asm -DNO_VARARGS
 # Extension of object intermediate files
 OBJEXT = .o
 # Extension of files that can be run in the emulator
-EXEEXT = .bin
+BINEXT = .bin
 # Currently unused.  Extension to append to intermediate directories.
 DIREXT =
 

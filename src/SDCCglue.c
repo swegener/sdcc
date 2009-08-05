@@ -108,6 +108,27 @@ aopLiteral (value * val, int offset)
 }
 
 /*-----------------------------------------------------------------*/
+/* emitDebugSym - emit label for debug symbol                      */
+/*-----------------------------------------------------------------*/
+static void
+emitDebugSym (struct dbuf_s * oBuf, symbol * sym)
+{
+  if (!sym->level) /* global */
+    {
+      if (IS_STATIC (sym->etype))
+        dbuf_printf (oBuf, "F%s$", moduleName); /* scope is file */
+      else
+        dbuf_printf (oBuf, "G$");     /* scope is global */
+    }
+  else
+    {
+      /* symbol is local */
+      dbuf_printf (oBuf, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
+    }
+  dbuf_printf (oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
+}
+
+/*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
 /*-----------------------------------------------------------------*/
 static void
@@ -130,6 +151,9 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
         dbuf_tprintf (&map->oBuf, "\t!areahome\n", map->sname);
       else
         dbuf_tprintf (&map->oBuf, "\t!area\n", map->sname);
+
+	  if (map->regsp)
+        dbuf_tprintf (&map->oBuf, "\t!org\n", 0);
     }
 
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
@@ -175,31 +199,13 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       if (IS_FUNC (sym->type) && !(sym->isitmp))
         continue;
 
-      /* print extra debug info if required */
-      if (options.debug)
-        {
-          if (!sym->level) /* global */
-            {
-              if (IS_STATIC (sym->etype))
-                dbuf_printf (&map->oBuf, "F%s$", moduleName); /* scope is file */
-              else
-                dbuf_printf (&map->oBuf, "G$");     /* scope is global */
-            }
-          else
-            {
-              /* symbol is local */
-              dbuf_printf (&map->oBuf, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
-            }
-          dbuf_printf (&map->oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
-        }
-
       /* if it has an initial value then do it only if
          it is a global variable */
       if (sym->ival && sym->level == 0)
         {
           if ((SPEC_OCLS (sym->etype) == xidata) && !SPEC_ABSA (sym->etype))
             {
-              /* create a new "XINIT (CODE)" symbol, that will be emitted later
+              /* create a new "XINIT (CODE)" symbol, that will be emited later
                  in the static seg */
               newSym=copySymbol (sym);
               SPEC_OCLS(newSym->etype)=xinit;
@@ -271,9 +277,13 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       if (SPEC_ABSA (sym->etype) && !sym->ival)
         {
           char *equ = "=";
-          if (options.debug) {
-            dbuf_printf (&map->oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-          }
+
+          /* print extra debug info if required */
+          if (options.debug)
+            {
+              emitDebugSym (&map->oBuf, sym);
+              dbuf_printf (&map->oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+            }
           if (TARGET_IS_XA51)
             {
               if (map == sfr)
@@ -282,7 +292,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                 }
               else if (map == bit || map == sfrbit)
                 {
-                  equ="bit";
+                  equ = "bit";
                 }
             }
           dbuf_printf (&map->oBuf, "%s\t%s\t0x%04x\n", sym->rname, equ, SPEC_ADDR (sym->etype));
@@ -295,13 +305,15 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
             }
           /* allocate space */
-          if (options.debug)
-            {
-              dbuf_printf (&map->oBuf, "==.\n");
-            }
           if (SPEC_ABSA (sym->etype))
             {
               dbuf_tprintf (&map->oBuf, "\t!org\n", SPEC_ADDR (sym->etype));
+            }
+          /* print extra debug info if required */
+          if (options.debug)
+            {
+              emitDebugSym (&map->oBuf, sym);
+              dbuf_printf (&map->oBuf, "==.\n");
             }
           if (IS_STATIC (sym->etype) || sym->level)
             dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
@@ -963,9 +975,9 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
   return;
 }
 
-/*-----------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 /* printIvalCharPtr - generates initial values for character pointers */
-/*-----------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 int
 printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s * oBuf)
 {
@@ -981,8 +993,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s * oB
     {
       if (size == 1)            /* This appears to be Z80 specific?? */
         {
-          dbuf_tprintf (oBuf,
-                    "\t!dbs\n", val->name);
+          dbuf_tprintf (oBuf, "\t!dbs\n", val->name);
         }
       else if (size == FPTRSIZE)
         {
@@ -1256,7 +1267,6 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms))
     {
-
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype))
         continue;
@@ -1267,46 +1277,31 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
           addSetHead (&publics, sym);
         }
 
-      /* print extra debug info if required */
-      if (options.debug)
-        {
-          if (!sym->level)
-            {                     /* global */
-              if (IS_STATIC (sym->etype))
-                dbuf_printf (oBuf, "F%s$", moduleName);        /* scope is file */
-              else
-                dbuf_printf (oBuf, "G$");      /* scope is global */
-            }
-          else
-            {
-              /* symbol is local */
-              dbuf_printf (oBuf, "L%s$",
-                           (sym->localof ? sym->localof->name : "-null-"));
-            }
-          dbuf_printf (oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
-        }
-
       /* if it has an absolute address and no initializer */
       if (SPEC_ABSA (sym->etype) && !sym->ival)
         {
           if (options.debug)
-            dbuf_printf (oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-
+            {
+              emitDebugSym (oBuf, sym);
+              dbuf_printf (oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+            }
           dbuf_printf (oBuf, "%s\t=\t0x%04x\n",
                    sym->rname,
                    SPEC_ADDR (sym->etype));
         }
       else
         {
-          if (options.debug)
-            dbuf_printf (oBuf, " == .\n");
-
           /* if it has an initial value */
           if (sym->ival)
             {
               if (SPEC_ABSA (sym->etype))
                 {
                   dbuf_tprintf (oBuf, "\t!org\n", SPEC_ADDR (sym->etype));
+                }
+              if (options.debug)
+                {
+                  emitDebugSym (oBuf, sym);
+                  dbuf_printf (oBuf, " == .\n");
                 }
               dbuf_printf (oBuf, "%s:\n", sym->rname);
               ++noAlloc;
@@ -1328,6 +1323,11 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
               if (size==0) {
                   werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE,sym->name);
               }
+              if (options.debug)
+                {
+                  emitDebugSym (oBuf, sym);
+                  dbuf_printf (oBuf, " == .\n");
+                }
               dbuf_printf (oBuf, "%s:\n", sym->rname);
               /* special case for character strings */
               if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&

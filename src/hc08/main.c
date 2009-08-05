@@ -255,7 +255,6 @@ _hc08_genExtraAreas (FILE * asmFile, bool mainExists)
     dbuf_write_and_destroy (&xdata->oBuf, asmFile);
 }
 
-
 /* Generate interrupt vector table. */
 static int
 _hc08_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
@@ -312,7 +311,6 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
     return 1;
 }
 
-
 /* Indicate which extended bit operations this port supports */
 static bool
 hasExtBitOp (int op, int size)
@@ -344,7 +342,6 @@ oclsExpense (struct memmap *oclass)
   return 0; /* anything we missed */
 }
 
-
 /*----------------------------------------------------------------------*/
 /* hc08_dwarfRegNum - return the DWARF register number for a register.  */
 /*   These are defined for the HC08 in "Motorola 8- and 16-bit Embedded */
@@ -363,8 +360,6 @@ hc08_dwarfRegNum (regs * reg)
     }
   return -1;
 }
-
-
 
 /** $1 is always the basename.
     $2 is always the output file.
@@ -403,7 +398,7 @@ PORT hc08_port =
     "-plosgff",			/* Options without debug */
     0,
     ".asm",
-    NULL			/* no do_assemble function */
+    NULL				/* no do_assemble function */
   },
   {
     _linkCmd,
@@ -431,7 +426,7 @@ PORT hc08_port =
     NULL, /* "PSEG" */
     "XSEG",
     "BSEG",
-    "RSEG",
+    "RSEG (ABS)",
     "GSINIT (CODE)",
     "OSEG    (OVR)",
     "GSFINAL (CODE)",
@@ -466,7 +461,7 @@ PORT hc08_port =
       hc08_dwarfRegNum,
       NULL,
       NULL,
-      4,				/* addressSize */
+      4,			/* addressSize */
       14,			/* regNumRet */
       15,			/* regNumSP */
       -1,			/* regNumBP */

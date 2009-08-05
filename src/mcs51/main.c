@@ -312,8 +312,6 @@ oclsExpense (struct memmap *oclass)
   return 0;
 }
 
-
-
 static int
 instructionSize(char *inst, char *op1, char *op2)
 {
@@ -763,7 +761,7 @@ PORT mcs51_port =
     "PSEG    (PAG,XDATA)",      // pdata_name
     "XSEG    (XDATA)",          // xdata_name
     "BSEG    (BIT)",            // bit_name
-    "RSEG    (DATA)",           // reg_name
+    "RSEG    (ABS,DATA)",       // reg_name
     "GSINIT  (CODE)",           // static_name
     "OSEG    (OVR,DATA)",       // overlay_name
     "GSFINAL (CODE)",           // post_static_name

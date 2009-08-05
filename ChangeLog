@@ -1,3 +1,16 @@
+2009-08-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/lksym.c (newsym): only allow redefinition in ABS area
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/z80/main.c: made RSEG absolute
+	* src/SDCCglue.c (emitDebugSym): new, factored out
+	  (emitRegularMap): add org 0x0000 to SFR/SBIT,
+	  (emitRegularMap, emitStaticSeg) fixed bug for absolute debug symbols	
+	* src/SDCCmem.h,
+	* src/SDCCsymt.h: cosmetic changes
+	* src/SDCCsymt.c (dbuf_printTypeChain): implemented RFE 2824498
+
 2009-07-26 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in,

@@ -13,19 +13,19 @@ struct eBBlock;
 
 typedef struct memmap
   {
-    unsigned char pageno;       /* page no for this variable  */
-    const char *sname;          /*   character prefix for map */
+    unsigned char pageno;       /* page no for this variable   */
+    const char *sname;          /* character prefix for map    */
     char dbName;                /* debugger address space name */
     int ptrType;                /* pointer Type for this space */
-    int slbl;                   /* label counter for space    */
-    unsigned sloc;              /* starting location          */
-    unsigned fmap:1;            /* 1 = 16bit addressing reqd  */
-    unsigned paged:1;           /* this is a paged mem space  */
-    unsigned direct:1;          /* 1 = indirect access only   */
-    unsigned bitsp:1;           /* 1 = bit addressable space  */
-    unsigned codesp:1;          /* 1 = code space             */
-    unsigned regsp:1;           /* 1 = sfr space              */
-    struct dbuf_s oBuf;         /* object buffer associated   */
+    int slbl;                   /* label counter for space     */
+    unsigned sloc;              /* starting location           */
+    unsigned fmap:1;            /* 1 = 16bit addressing reqd   */
+    unsigned paged:1;           /* this is a paged mem space   */
+    unsigned direct:1;          /* 1 = indirect access only    */
+    unsigned bitsp:1;           /* 1 = bit addressable space   */
+    unsigned codesp:1;          /* 1 = code space              */
+    unsigned regsp:1;           /* 1 = sfr space               */
+    struct dbuf_s oBuf;         /* object buffer associated    */
     struct set *syms;           /* symbols defined in this segment */
   }
 memmap;

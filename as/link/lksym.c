@@ -157,7 +157,8 @@ newsym(void)
         } else
         if (c == 'D') {
                 i = eval();
-                if (tsp->s_type & S_DEF && tsp->s_addr != i) {
+				if (tsp->s_type & S_DEF &&
+					!(tsp->s_addr == i && ((tsp->s_axp->a_bap->a_flag & A_ABS) == A_ABS))) {
                         fprintf(stderr, "Multiple definition of %s\n", id);
                         lkerr++;
                 }

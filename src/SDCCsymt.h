@@ -78,22 +78,22 @@ enum {
 /* hash table bucket */
 typedef struct bucket
   {
-    void *sym;                          /* pointer to the object   */
-    char name[SDCC_NAME_MAX + 1];       /* name of this symbol          */
-    int level;                          /* nest level for this symbol   */
-    int block;                          /* belongs to which block */
-    struct bucket *prev;                /* ptr 2 previous bucket   */
-    struct bucket *next;                /* ptr 2 next bucket       */
+    void *sym;                          /* pointer to the object      */
+    char name[SDCC_NAME_MAX + 1];       /* name of this symbol        */
+    int level;                          /* nest level for this symbol */
+    int block;                          /* belongs to which block     */
+    struct bucket *prev;                /* ptr 2 previous bucket      */
+    struct bucket *next;                /* ptr 2 next bucket          */
   }
 bucket;
 
 typedef struct structdef
   {
     char tag[SDCC_NAME_MAX + 1];        /* tag part of structure      */
-    unsigned char level;                /* Nesting level         */
-    struct symbol *fields;              /* pointer to fields     */
+    unsigned char level;                /* Nesting level              */
+    struct symbol *fields;              /* pointer to fields          */
     unsigned size;                      /* sizeof the table in bytes  */
-    int type;                           /* STRUCT or UNION */
+    int type;                           /* STRUCT or UNION            */
     bool b_flexArrayMember;             /* has got a flexible array member,
                                            only needed for syntax checks */
   }
@@ -233,28 +233,28 @@ typedef struct sym_link
 
     /* function attributes */
     struct {
-      struct value *args;               /* the defined arguments      */
-      unsigned hasVargs:1;              /* functions has varargs      */
-      unsigned calleeSaves:1;           /* functions uses callee save */
-      unsigned hasbody:1;               /* function body defined      */
-      unsigned hasFcall:1;              /* does it call other functions */
-      unsigned reent:1;                 /* function is reentrant      */
-      unsigned naked:1;                 /* naked function             */
+      struct value *args;               /* the defined arguments                */
+      unsigned hasVargs:1;              /* functions has varargs                */
+      unsigned calleeSaves:1;           /* functions uses callee save           */
+      unsigned hasbody:1;               /* function body defined                */
+      unsigned hasFcall:1;              /* does it call other functions         */
+      unsigned reent:1;                 /* function is reentrant                */
+      unsigned naked:1;                 /* naked function                       */
 
       unsigned shadowregs:1;            /* function uses shadow registers (pic16 port) */
       unsigned wparam:1;                /* first byte of arguments is passed via WREG (pic16 port) */
       unsigned nonbanked:1;             /* function has the nonbanked attribute */
-      unsigned banked:1;                /* function has the banked attribute */
-      unsigned critical:1;              /* critical function          */
-      unsigned intrtn:1;                /* this is an interrupt routine */
-      unsigned rbank:1;                 /* seperate register bank     */
-      unsigned inlinereq:1;             /* inlining requested         */
-      unsigned intno;                   /* 1=Interrupt svc routine    */
-      short    regbank;                 /* register bank 2b used      */
-      unsigned builtin;                 /* is a builtin function      */
+      unsigned banked:1;                /* function has the banked attribute    */
+      unsigned critical:1;              /* critical function                    */
+      unsigned intrtn:1;                /* this is an interrupt routine         */
+      unsigned rbank:1;                 /* seperate register bank               */
+      unsigned inlinereq:1;             /* inlining requested                   */
+      unsigned intno;                   /* 1=Interrupt svc routine              */
+      short    regbank;                 /* register bank 2b used                */
+      unsigned builtin;                 /* is a builtin function                */
       unsigned javaNative;              /* is a JavaNative Function (TININative ONLY) */
       unsigned overlay;                 /* force parameters & locals into overlay segment */
-      unsigned hasStackParms;           /* function has parameters on stack */
+      unsigned hasStackParms;           /* function has parameters on stack     */
     } funcAttrs;
 
     struct sym_link *next;              /* next element on the chain  */
@@ -282,7 +282,7 @@ typedef struct symbol
     unsigned isitmp:1;                  /* is an intermediate temp */
     unsigned islbl:1;                   /* is a temporary label */
     unsigned isref:1;                   /* has been referenced  */
-    unsigned isind:1;                   /* is a induction variable */
+    unsigned isind:1;                   /* is an induction variable */
     unsigned isinvariant:1;             /* is a loop invariant  */
     unsigned cdef:1;                    /* compiler defined symbol */
     unsigned addrtaken:1;               /* address of the symbol was taken */

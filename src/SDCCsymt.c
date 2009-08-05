@@ -2924,7 +2924,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
   /* Print the chain as it is written in the source: */
   /* start with the last entry.                      */
   /* However, the storage class at the end of the    */
-  /* chain reall applies to the first in the chain!  */
+  /* chain really applies to the first in the chain! */
 
   for (type = start; type && type->next; type = type->next)
     ;
@@ -2934,25 +2934,6 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
     scls=0;
   while (type)
     {
-      if (type==start) {
-        switch (scls)
-          {
-          case S_DATA: dbuf_append_str (dbuf, "data-"); break;
-          case S_XDATA: dbuf_append_str (dbuf, "xdata-"); break;
-          case S_SFR: dbuf_append_str (dbuf, "sfr-"); break;
-          case S_SBIT: dbuf_append_str (dbuf, "sbit-"); break;
-          case S_CODE: dbuf_append_str (dbuf, "code-"); break;
-          case S_IDATA: dbuf_append_str (dbuf, "idata-"); break;
-          case S_PDATA: dbuf_append_str (dbuf, "pdata-"); break;
-          case S_LITERAL: dbuf_append_str (dbuf, "literal-"); break;
-          case S_STACK: dbuf_append_str (dbuf, "stack-"); break;
-          case S_XSTACK: dbuf_append_str (dbuf, "xstack-"); break;
-          case S_BIT: dbuf_append_str (dbuf, "bit-"); break;
-          case S_EEPROM: dbuf_append_str (dbuf, "eeprom-"); break;
-          default: break;
-          }
-      }
-
       if (IS_DECL (type))
         {
           if (!IS_FUNC(type)) {
@@ -2983,35 +2964,38 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, ") ");
               break;
             case GPOINTER:
-              dbuf_append_str (dbuf, "generic* ");
+              dbuf_append_str (dbuf, "generic*");
               break;
             case CPOINTER:
-              dbuf_append_str (dbuf, "code* ");
+              dbuf_append_str (dbuf, "code*");
               break;
             case FPOINTER:
-              dbuf_append_str (dbuf, "xdata* ");
+              dbuf_append_str (dbuf, "xdata*");
               break;
             case EEPPOINTER:
-              dbuf_append_str (dbuf, "eeprom* ");
+              dbuf_append_str (dbuf, "eeprom*");
               break;
             case POINTER:
-              dbuf_append_str (dbuf, "near* ");
+              dbuf_append_str (dbuf, "near*");
               break;
             case IPOINTER:
-              dbuf_append_str (dbuf, "idata* ");
+              dbuf_append_str (dbuf, "idata*");
               break;
             case PPOINTER:
-              dbuf_append_str (dbuf, "pdata* ");
+              dbuf_append_str (dbuf, "pdata*");
               break;
             case UPOINTER:
-              dbuf_append_str (dbuf, "unknown* ");
+              dbuf_append_str (dbuf, "unknown*");
               break;
             case ARRAY:
               if (DCL_ELEM(type)) {
-                dbuf_printf (dbuf, "[%d] ", DCL_ELEM(type));
+                dbuf_printf (dbuf, "[%d]", DCL_ELEM(type));
               } else {
-                dbuf_append_str (dbuf, "[] ");
+                dbuf_append_str (dbuf, "[]");
               }
+              break;
+            default:
+              dbuf_append_str (dbuf, "unknown?");
               break;
             }
         }
@@ -3072,6 +3056,28 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               break;
             }
         }
+      if (type==start) {
+        switch (scls)
+          {
+          case S_FIXED:		dbuf_append_str (dbuf, " fixed"); break;
+          case S_AUTO:		dbuf_append_str (dbuf, " auto"); break;
+          case S_REGISTER:	dbuf_append_str (dbuf, " register"); break;
+          case S_DATA:		dbuf_append_str (dbuf, " data"); break;
+          case S_XDATA:		dbuf_append_str (dbuf, " xdata"); break;
+          case S_SFR:		dbuf_append_str (dbuf, " sfr"); break;
+          case S_SBIT:		dbuf_append_str (dbuf, " sbit"); break;
+          case S_CODE:		dbuf_append_str (dbuf, " code"); break;
+          case S_IDATA:		dbuf_append_str (dbuf, " idata"); break;
+          case S_PDATA:		dbuf_append_str (dbuf, " pdata"); break;
+          case S_LITERAL:	dbuf_append_str (dbuf, " literal"); break;
+          case S_STACK:		dbuf_append_str (dbuf, " stack"); break;
+          case S_XSTACK:	dbuf_append_str (dbuf, " xstack"); break;
+          case S_BIT:		dbuf_append_str (dbuf, " bit"); break;
+          case S_EEPROM:	dbuf_append_str (dbuf, " eeprom"); break;
+          default: break;
+          }
+      }
+
       /* search entry in list before "type" */
       for (search = start; search && search->next != type;)
         search = search->next;

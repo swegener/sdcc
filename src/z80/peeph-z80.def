@@ -392,13 +392,12 @@ replace restart {
 	push	hl
 } if notUsed('bc')
 
-// Doesn'T work due to bug #1947081
-//replace restart {
-//	pop	%1
-//	push	%1
-//} by {
-//	; peephole 0zc eleminated dead pop/push pair.
-//} if notUsed(%1)
+replace restart {
+	pop	%1
+	push	%1
+} by {
+	; peephole 0zc eleminated dead pop/push pair.
+} if notUsed(%1)
 
 replace restart {
 	ld	iy,#%1

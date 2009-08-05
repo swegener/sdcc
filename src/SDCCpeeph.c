@@ -2139,7 +2139,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
       lhead = comment;
     }
 
-  if (lhead)
+  if (lhead && cl)
     {
       /* determine which iCodes the replacment lines relate to */
       reassociate_ic(*shead,stail,lhead,cl);

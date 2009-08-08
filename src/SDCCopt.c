@@ -977,12 +977,10 @@ replaceRegEqv (ebbIndex * ebbi)
 
   for (i = 0; i < count; i++)
     {
-
       iCode *ic;
 
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-
           if (SKIP_IC2 (ic))
             continue;
 
@@ -999,12 +997,10 @@ replaceRegEqv (ebbIndex * ebbi)
                   OP_SYMBOL (IC_COND (ic))->allocreq = 1;
                 }
 
-              if (IS_TRUE_SYMOP (IC_COND (ic)) &&
-                  OP_REQV (IC_COND (ic)))
+              if (IS_TRUE_SYMOP (IC_COND (ic)) && OP_REQV (IC_COND (ic)))
                 IC_COND (ic) = opFromOpWithDU (OP_REQV (IC_COND (ic)),
-                                             OP_SYMBOL (IC_COND (ic))->defs,
-                                            OP_SYMBOL (IC_COND (ic))->uses);
-
+                                               OP_DEFS (IC_COND (ic)),
+                                               OP_USES (IC_COND (ic)));
               continue;
             }
 
@@ -1022,11 +1018,10 @@ replaceRegEqv (ebbIndex * ebbi)
                   OP_SYMBOL (IC_JTCOND (ic))->allocreq = 1;
                 }
 
-              if (IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
-                  OP_REQV (IC_JTCOND (ic)))
+              if (IS_TRUE_SYMOP (IC_JTCOND (ic)) && OP_REQV (IC_JTCOND (ic)))
                 IC_JTCOND (ic) = opFromOpWithDU (OP_REQV (IC_JTCOND (ic)),
-                                           OP_SYMBOL (IC_JTCOND (ic))->defs,
-                                          OP_SYMBOL (IC_JTCOND (ic))->uses);
+                                                 OP_DEFS (IC_JTCOND (ic)),
+                                                 OP_USES (IC_JTCOND (ic)));
               continue;
             }
 
@@ -1044,14 +1039,14 @@ replaceRegEqv (ebbIndex * ebbi)
               if (POINTER_SET (ic))
                 {
                   IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-                                           OP_SYMBOL (IC_RESULT (ic))->defs,
-                                          OP_SYMBOL (IC_RESULT (ic))->uses);
+                                                   OP_DEFS (IC_RESULT (ic)),
+                                                   OP_USES (IC_RESULT (ic)));
                   IC_RESULT (ic)->isaddr = 1;
                 }
               else
                 IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-                                           OP_SYMBOL (IC_RESULT (ic))->defs,
-                                          OP_SYMBOL (IC_RESULT (ic))->uses);
+                                                 OP_DEFS (IC_RESULT (ic)),
+                                                 OP_USES (IC_RESULT (ic)));
             }
 
           if (IC_RIGHT (ic) &&
@@ -1070,8 +1065,8 @@ replaceRegEqv (ebbIndex * ebbi)
               OP_REQV (IC_RIGHT (ic)))
             {
               IC_RIGHT (ic) = opFromOpWithDU (OP_REQV (IC_RIGHT (ic)),
-                                            OP_SYMBOL (IC_RIGHT (ic))->defs,
-                                           OP_SYMBOL (IC_RIGHT (ic))->uses);
+                                              OP_DEFS (IC_RIGHT (ic)),
+                                              OP_USES (IC_RIGHT (ic)));
               IC_RIGHT (ic)->isaddr = 0;
             }
 
@@ -1091,8 +1086,8 @@ replaceRegEqv (ebbIndex * ebbi)
               OP_REQV (IC_LEFT (ic)))
             {
               IC_LEFT (ic) = opFromOpWithDU (OP_REQV (IC_LEFT (ic)),
-                                             OP_SYMBOL (IC_LEFT (ic))->defs,
-                                             OP_SYMBOL (IC_LEFT (ic))->uses);
+                                             OP_DEFS (IC_LEFT (ic)),
+                                             OP_USES (IC_LEFT (ic)));
               IC_LEFT (ic)->isaddr = 0;
             }
         }
@@ -1170,9 +1165,8 @@ killDeadCode (ebbIndex * ebbi)
   /*     or then skip                                            */
   /*     else            KILL                                    */
   /* this whole process is carried on iteratively till no change */
-  while (1)
+  do
     {
-
       change = 0;
       /* for all blocks do */
       for (i = 0; i < count; i++)
@@ -1346,12 +1340,9 @@ killDeadCode (ebbIndex * ebbi)
 
           if (!ebbs[i]->sch && !ebbs[i]->noPath)
             disconBBlock (ebbs[i], ebbi);
-
         }                       /* end of for all blocks */
-
-      if (!change)
-        break;
-    }                           /* end of while(1) */
+    }                           /* end of do */
+  while (change);
 
   return gchange;
 }
@@ -1427,7 +1418,6 @@ optimizeCastCast (eBBlock ** ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-
           if (ic->op == CAST && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
               type1 = operandType (IC_RIGHT (ic));
@@ -1589,7 +1579,6 @@ eBBlockFromiCode (iCode * ic)
 
       if (options.dump_loop)
         dumpEbbsToFileExt (DUMP_LOOPD, ebbi);
-
     }
 
   /* sort it back by block number */

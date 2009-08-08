@@ -193,7 +193,7 @@ optionsTable[] = {
     { 0,    "--xram-movc",          &options.xram_movc, "Use movc instead of movx to read xram (xdata)" },
     { 0,    OPTION_CALLEE_SAVES,    &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers instead of the caller", CLAT_SET },
     { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
-    { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
+    { 0,    "--fomit-frame-pointer", &options.omitFramePtr, "Leave out the frame pointer." },
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
     { 0,    "--stack-probe",        &options.stack_probe,"insert call to function __stack_probe at each function prologue"},
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
@@ -271,7 +271,8 @@ unsupportedOptTable[] = {
     { 'i',  NULL,       "use --idata-loc instead" },
     { 'r',  NULL,       "use --xdata-loc instead" },
     { 's',  NULL,       "use --code-loc instead" },
-    { 'Y',  NULL,       "use -I instead" }
+    { 'Y',  NULL,       "use -I instead" },
+    { 0,    "--fommit-frame-pointer", "use --fomit-frame-pointer instead" },
 };
 
 /** List of all default constant macros.
@@ -1419,16 +1420,6 @@ parseCmdLine (int argc, char **argv)
     {
       options.intlong_rent++;
       options.float_rent++;
-    }
-
-  /* mcs51 has an assembly coded float library that's always reentrant */
-  if (TARGET_IS_MCS51)
-    {
-      options.float_rent++;
-
-      /* set up external stack location if not explicitly specified */
-      if (!options.xstack_loc)
-        options.xstack_loc = options.xdata_loc;
     }
 
   /* if debug option is set then open the cdbFile */

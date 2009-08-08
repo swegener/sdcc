@@ -2475,6 +2475,34 @@ gatherImplicitVariables (ast * tree, ast * block)
   gatherImplicitVariables(tree->right, block);
 }
 
+/*-----------------------------------------------------------------*/
+/* CodePtrPointsToConst - if code memory is read-only, then        */
+/*   pointers to code memory implicitly point to constants.        */
+/*   Make this explicit.                                           */
+/*-----------------------------------------------------------------*/
+void
+CodePtrPointsToConst (sym_link *t)
+{
+  if (port->mem.code_ro)
+    {
+      while (t && t->next)
+        {
+          if (IS_CODEPTR(t))
+            {
+              sym_link *t2 = t;
+              /* find the first non-array link */
+              while (IS_ARRAY(t2->next))
+                t2 = t2->next;
+              if (IS_SPEC(t2->next))
+                SPEC_CONST (t2->next) = 1;
+              else
+                DCL_PTR_CONST (t2->next) = 1;
+            }
+          t = t->next;
+        }
+    }
+}
+
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
@@ -2672,14 +2700,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         /*----------------------------*/
     case '[':
 
-      /* first check if this is a array or a pointer */
+      /* first check if this is an array or a pointer */
       if ((!IS_ARRAY (LTYPE (tree))) && (!IS_PTR (LTYPE (tree))))
         {
           werrorfl (tree->filename, tree->lineno, E_NEED_ARRAY_PTR, "[]");
           goto errorTreeReturn;
         }
 
-      /* check if the type of the idx */
+      /* check the type of the idx */
       if (!IS_INTEGRAL (RTYPE (tree)))
         {
           werrorfl (tree->filename, tree->lineno, E_IDX_NOT_INT);
@@ -2705,7 +2733,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
-      SPEC_CONST (TETYPE (tree)) |= DCL_PTR_CONST (LTYPE (tree));
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3889,20 +3916,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       /* If code memory is read only, then pointers to code memory */
       /* implicitly point to constants -- make this explicit       */
-      {
-        sym_link *t = LTYPE(tree);
-        while (t && t->next)
-          {
-            if (IS_CODEPTR(t) && port->mem.code_ro)
-              {
-                if (IS_SPEC(t->next))
-                  SPEC_CONST (t->next) = 1;
-                else
-                  DCL_PTR_CONST (t->next) = 1;
-              }
-            t = t->next;
-          }
-      }
+      CodePtrPointsToConst (LTYPE (tree));
 
 #if 0
       /* if the right is a literal replace the tree */

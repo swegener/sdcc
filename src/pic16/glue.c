@@ -424,7 +424,7 @@ pic16_initPointer (initList * ilist, sym_link *toType)
       val->type = newLink (DECLARATOR);
       if(SPEC_SCLS (expr->left->etype) == S_CODE) {
         DCL_TYPE (val->type) = CPOINTER;
-        DCL_PTR_CONST (val->type) = port->mem.code_ro;
+        CodePtrPointsToConst (val->type);
       }
       else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
         DCL_TYPE (val->type) = FPOINTER;
@@ -484,7 +484,7 @@ pic16_initPointer (initList * ilist, sym_link *toType)
     val->type = newLink (DECLARATOR);
     if (SPEC_SCLS (expr->right->etype) == S_CODE) {
       DCL_TYPE (val->type) = CPOINTER;
-      DCL_PTR_CONST (val->type) = port->mem.code_ro;
+      CodePtrPointsToConst (val->type);
     }
     else if (SPEC_SCLS (expr->right->etype) == S_XDATA)
       DCL_TYPE (val->type) = FPOINTER;

@@ -461,68 +461,62 @@ extern sym_link *validateLink(sym_link  *l,
 #define SPEC_INLINE(x) validateLink(x, "SPEC_INLINE", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_inline
 
 /* type check macros */
-#define IS_DECL(x)   ( x && x->class == DECLARATOR      )
-#define IS_SPEC(x)   ( x && x->class == SPECIFIER  )
-#define IS_ARRAY(x)  (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
-#define IS_DATA_PTR(x) (IS_DECL(x) && DCL_TYPE(x) == POINTER)
-#define IS_PTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
-                                     DCL_TYPE(x) == FPOINTER   ||    \
-                                     DCL_TYPE(x) == GPOINTER   ||    \
-                                     DCL_TYPE(x) == IPOINTER   ||    \
-                                     DCL_TYPE(x) == PPOINTER   ||    \
-                                     DCL_TYPE(x) == EEPPOINTER ||    \
-                                     DCL_TYPE(x) == CPOINTER   ||    \
-                                     DCL_TYPE(x) == UPOINTER  ))
-#define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))
+#define IS_DECL(x)       ( x && x->class == DECLARATOR )
+#define IS_SPEC(x)       ( x && x->class == SPECIFIER  )
+#define IS_ARRAY(x)      (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
+#define IS_DATA_PTR(x)   (IS_DECL(x) && DCL_TYPE(x) == POINTER)
+#define IS_PTR(x)        (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
+                                         DCL_TYPE(x) == FPOINTER   ||    \
+                                         DCL_TYPE(x) == GPOINTER   ||    \
+                                         DCL_TYPE(x) == IPOINTER   ||    \
+                                         DCL_TYPE(x) == PPOINTER   ||    \
+                                         DCL_TYPE(x) == EEPPOINTER ||    \
+                                         DCL_TYPE(x) == CPOINTER   ||    \
+                                         DCL_TYPE(x) == UPOINTER  ))
+#define IS_PTR_CONST(x)  (IS_PTR(x) && DCL_PTR_CONST(x))
 #define IS_PTR_RESTRICT(x) (IS_PTR(x) && DCL_PTR_RESTRICT(x))
-#define IS_FARPTR(x) (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
-#define IS_CODEPTR(x) (IS_DECL(x) && DCL_TYPE(x) == CPOINTER)
-#define IS_GENPTR(x) (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
-#define IS_FUNCPTR(x) (IS_DECL(x) && (DCL_TYPE(x) == CPOINTER || DCL_TYPE(x) == GPOINTER) && IS_FUNC(x->next))
-#define IS_FUNC(x)   (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
-#define IS_LONG(x)   (IS_SPEC(x) && x->select.s.b_long)
-#define IS_UNSIGNED(x) (IS_SPEC(x) && x->select.s.b_unsigned)
-#define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s.b_typedef)
-#define IS_CONSTANT(x)  (!x ? 0 : \
-                           IS_SPEC(x) ? \
-                           x->select.s.b_const : \
-                           x->select.d.ptr_const)
-#define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
-#define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s.b_absadr )
-#define IS_REGISTER(x)  (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
-#define IS_RENT(x)   (IS_SPEC(x) && x->select.s._reent )
-#define IS_STATIC(x) (IS_SPEC(x) && SPEC_STAT(x))
-#define IS_INLINE(x) (IS_SPEC(x) && SPEC_INLINE(x))
-#define IS_INT(x)    (IS_SPEC(x) && x->select.s.noun == V_INT)
-#define IS_VOID(x)   (IS_SPEC(x) && x->select.s.noun == V_VOID)
-#define IS_CHAR(x)   (IS_SPEC(x) && x->select.s.noun == V_CHAR)
-#define IS_EXTERN(x)    (IS_SPEC(x) && x->select.s.b_extern)
-#define IS_VOLATILE(x)  (!x ? 0 : \
-                           IS_SPEC(x) ? \
-                           x->select.s.b_volatile : \
-                           x->select.d.ptr_volatile)
-#define IS_INTEGRAL(x) (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
-                                       x->select.s.noun == V_CHAR || \
-                                       x->select.s.noun == V_BITFIELD || \
-                                       x->select.s.noun == V_BIT ||  \
-                                       x->select.s.noun == V_SBIT ))
-#define IS_BITFIELD(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD))
-#define IS_BITVAR(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
-                                     x->select.s.noun == V_BIT || \
-                                     x->select.s.noun == V_SBIT ))
-#define IS_BIT(x) (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
-                                  x->select.s.noun == V_SBIT ))
-#define IS_FLOAT(x)  (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
-#define IS_FIXED16X16(x)  (IS_SPEC(x) && x->select.s.noun == V_FIXED16X16)
-#define IS_FIXED(x) (IS_FIXED16X16(x))
+#define IS_FARPTR(x)     (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
+#define IS_CODEPTR(x)    (IS_DECL(x) && DCL_TYPE(x) == CPOINTER)
+#define IS_GENPTR(x)     (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
+#define IS_FUNCPTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == CPOINTER || DCL_TYPE(x) == GPOINTER) && IS_FUNC(x->next))
+#define IS_FUNC(x)       (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
+#define IS_LONG(x)       (IS_SPEC(x) && x->select.s.b_long)
+#define IS_UNSIGNED(x)   (IS_SPEC(x) && x->select.s.b_unsigned)
+#define IS_TYPEDEF(x)    (IS_SPEC(x) && x->select.s.b_typedef)
+#define IS_CONSTANT(x)   (isConstant (x))
+#define IS_STRUCT(x)     (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
+#define IS_ABSOLUTE(x)   (IS_SPEC(x) && x->select.s.b_absadr )
+#define IS_REGISTER(x)   (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
+#define IS_RENT(x)       (IS_SPEC(x) && x->select.s._reent )
+#define IS_STATIC(x)     (IS_SPEC(x) && SPEC_STAT(x))
+#define IS_INLINE(x)     (IS_SPEC(x) && SPEC_INLINE(x))
+#define IS_INT(x)        (IS_SPEC(x) && x->select.s.noun == V_INT)
+#define IS_VOID(x)       (IS_SPEC(x) && x->select.s.noun == V_VOID)
+#define IS_CHAR(x)       (IS_SPEC(x) && x->select.s.noun == V_CHAR)
+#define IS_EXTERN(x)     (IS_SPEC(x) && x->select.s.b_extern)
+#define IS_VOLATILE(x)   (isVolatile (x))
+#define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
+                                         x->select.s.noun == V_CHAR || \
+                                         x->select.s.noun == V_BITFIELD || \
+                                         x->select.s.noun == V_BIT ||  \
+                                         x->select.s.noun == V_SBIT ))
+#define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD))
+#define IS_BITVAR(x)     (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
+                                         x->select.s.noun == V_BIT || \
+                                         x->select.s.noun == V_SBIT ))
+#define IS_BIT(x)        (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
+                                         x->select.s.noun == V_SBIT ))
+#define IS_FLOAT(x)      (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
+#define IS_FIXED16X16(x) (IS_SPEC(x) && x->select.s.noun == V_FIXED16X16)
+#define IS_FIXED(x)      (IS_FIXED16X16(x))
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x) || IS_FIXED(x))
-#define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
-#define IS_LITERAL(x)   (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
-#define IS_CODE(x)      (IS_SPEC(x)  && SPEC_SCLS(x) == S_CODE)
-#define IS_REGPARM(x)   (IS_SPEC(x) && SPEC_REGPARM(x))
+#define IS_AGGREGATE(x)  (IS_ARRAY(x) || IS_STRUCT(x))
+#define IS_LITERAL(x)    (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
+#define IS_CODE(x)       (IS_SPEC(x)  && SPEC_SCLS(x) == S_CODE)
+#define IS_REGPARM(x)    (IS_SPEC(x) && SPEC_REGPARM(x))
 
 /* symbol check macros */
-#define IS_AUTO(x) (x->level && !IS_STATIC(x->etype) && !IS_EXTERN(x->etype))
+#define IS_AUTO(x)       (x->level && !IS_STATIC(x->etype) && !IS_EXTERN(x->etype))
 
 /* forward declaration for the global vars */
 extern bucket *SymbolTab[];
@@ -651,6 +645,8 @@ sym_link *typeFromStr (char *) ;
 STORAGE_CLASS sclsFromPtr(sym_link *ptr);
 sym_link *newEnumType (symbol *);
 void  promoteAnonStructs (int, structdef *);
+int isConstant (sym_link * type);
+int isVolatile (sym_link * type);
 
 
 extern char *nounName(sym_link *); /* noun strings */

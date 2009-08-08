@@ -159,7 +159,7 @@ programs is:
 			callee-saves
 	--no-peep	peephole optimizer is better to be switched off,
 			because it behaves strangely in some cases
-	--fommit-frame-pointer	this omits frame pointer in functions that
+	--fomit-frame-pointer	this omits frame pointer in functions that
 			don't use registers (maybe changed later, not
 			important)
 

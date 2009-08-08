@@ -5,7 +5,7 @@ AM_CFLAGS += -I.
 AM_CFLAGS += -I$(top_srcdir)/../../include/pic16
 ##AM_CFLAGS += -Wa,-q
 
-AM_CFLAGS += --fommit-frame-pointer
+AM_CFLAGS += --fomit-frame-pointer
 AM_CFLAGS += --obanksel=9
 AM_CFLAGS += --denable-peeps
 #AM_CFLAGS += --no-optimize-goto

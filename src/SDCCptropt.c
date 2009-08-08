@@ -74,7 +74,7 @@ static int pattern1 (iCode *sic)
         iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
         _SOME_POINTER_ := iTempY; */
         
-        /* sounds simple enough so lets start , here I use -ve
+        /* sounds simple enough so let's start , here I use negative
            tests all the way to return if any test fails */
         iCode *pgs, *sh, *st;
 
@@ -99,7 +99,7 @@ static int pattern1 (iCode *sic)
         if (!(pgs = findPointerGetSet (sic->next->next, IC_RESULT (sic))))
                 return 0;
 
-        /* found the patter .. now do the transformation */
+        /* found the pattern .. now do the transformation */
         sh = sic->next;
         st = sic->next->next;
 
@@ -137,7 +137,7 @@ static int pattern2 (iCode *sic)
         iTempK := iTempY;       
         _SOME_POINTER_ := iTempK; */
         
-        /* sounds simple enough so lets start , here I use -ve
+        /* sounds simple enough so let's start , here I use negative
            tests all the way to return if any test fails */
         iCode *pgs, *sh, *st;
 
@@ -159,7 +159,7 @@ static int pattern2 (iCode *sic)
         if (!isOperandEqual(IC_RESULT(sic->next->next->next),IC_LEFT(sic->next))) return 0;
         if (!(pgs = findPointerGetSet (sic->next->next->next, IC_RESULT (sic)))) return 0;
         
-        /* found the patter .. now do the transformation */
+        /* found the pattern .. now do the transformation */
         sh = sic->next;
         st = sic->next->next->next;
 

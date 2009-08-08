@@ -178,7 +178,7 @@ libm18f_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c \
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 --fommit-frame-pointer \
+	-I$(top_srcdir)/../../include/pic16 --fomit-frame-pointer \
 	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
 	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
@@ -244,7 +244,7 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-libm18f.a: $(libm18f_a_OBJECTS) $(libm18f_a_DEPENDENCIES) 
+libm18f.a: $(libm18f_a_OBJECTS) $(libm18f_a_DEPENDENCIES)
 	-rm -f libm18f.a
 	$(libm18f_a_AR) libm18f.a $(libm18f_a_OBJECTS) $(libm18f_a_LIBADD)
 	$(RANLIB) libm18f.a

@@ -3076,7 +3076,7 @@ static void genFunction (iCode *ic)
 //    debugf(stderr, "function name: %s ARGS=%p\n", sym->name, FUNC_ARGS(sym->type));
     if(strcmp(sym->name, "main")) {
       if(0
-        || !options.ommitFramePtr
+        || !options.omitFramePtr
 //        || sym->regsUsed
         || IFFUNC_ARGS(sym->type)
         || FUNC_HASSTACKPARM(sym->etype)
@@ -3235,7 +3235,7 @@ static void genEndFunction (iCode *ic)
 
     if(strcmp(sym->name, "main")) {
       if(0
-        || !options.ommitFramePtr
+        || !options.omitFramePtr
 //        || sym->regsUsed
         || IFFUNC_ARGS(sym->type)
         || FUNC_HASSTACKPARM(sym->etype)

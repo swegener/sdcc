@@ -26007,7 +26007,7 @@ status collapsed
 
 \end_inset
 
--fommit-frame-pointer
+-fomit-frame-pointer
 \begin_inset LatexCommand index
 name "PIC16!Options!-\\/-fommit-frame-pointer"
 
@@ -30354,7 +30354,7 @@ status collapsed
 
 \end_inset
 
--fommit-frame-pointer might reduce stack usage by not creating unnecessery
+-fomit-frame-pointer might reduce stack usage by not creating unnecessery
  stack frames.
  Other ways to reduce stack usage may exist.
 \end_layout

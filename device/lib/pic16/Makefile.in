@@ -169,7 +169,7 @@ SUBDIRS = debug libc libdev libio libm libsdcc startup
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 --fommit-frame-pointer \
+	-I$(top_srcdir)/../../include/pic16 --fomit-frame-pointer \
 	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
 	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
@@ -220,7 +220,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.h.in:  $(am__configure_deps) 
+$(srcdir)/config.h.in:  $(am__configure_deps)
 	cd $(top_srcdir) && $(AUTOHEADER)
 	rm -f stamp-h1
 	touch $@

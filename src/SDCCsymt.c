@@ -1227,16 +1227,21 @@ structElemType (sym_link * stype, value * id)
       {
         if (strcmp (fields->rname, id->name) == 0)
           {
+            sym_link *t;
             type = copyLinkChain (fields->type);
             etype = getSpec (type);
             SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
                                  SPEC_SCLS (etype) : SPEC_SCLS (petype));
             SPEC_OCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
                                  SPEC_OCLS (etype) : SPEC_OCLS (petype));
-            if (IS_SPEC (type))
-              SPEC_CONST (type) |= SPEC_CONST (stype);
+            /* find the first non-array link */
+            t = type;
+            while (IS_ARRAY (t))
+              t = t->next;
+            if (IS_SPEC (t))
+              SPEC_CONST (t) |= SPEC_CONST (stype);
             else
-              DCL_PTR_CONST (type) |= SPEC_CONST (stype);
+              DCL_PTR_CONST (t) |= SPEC_CONST (stype);
             return type;
           }
         fields = fields->next;
@@ -1541,46 +1546,32 @@ checkSClass (symbol * sym, int isProto)
 
   /* If code memory is read only, then pointers to code memory */
   /* implicitly point to constants -- make this explicit       */
-  t = sym->type;
-  while (t && t->next) {
-    if (IS_CODEPTR(t) && port->mem.code_ro) {
-      if (IS_SPEC(t->next)) {
-        SPEC_CONST (t->next) = 1;
-      } else {
-        DCL_PTR_CONST (t->next) = 1;
-      }
-    }
-    t = t->next;
-  }
+  CodePtrPointsToConst (sym->type);
 
   /* global variables declared const put into code */
   /* if no other storage class specified */
   if (sym->level == 0 &&
       SPEC_SCLS(sym->etype) == S_FIXED &&
-      !IS_FUNC(sym->type)) {
-    /* find the first non-array link */
-    t = sym->type;
-    while (IS_ARRAY(t))
-      t = t->next;
-    if (IS_CONSTANT (t)) {
-      SPEC_SCLS (sym->etype) = S_CODE;
+      !IS_FUNC(sym->type))
+    {
+      if (IS_CONSTANT (sym->type))
+        SPEC_SCLS (sym->etype) = S_CODE;
     }
-  }
 
   /* global variable in code space is a constant */
   if (sym->level == 0 &&
       SPEC_SCLS (sym->etype) == S_CODE &&
-      port->mem.code_ro) {
-    /* find the first non-array link */
-    t = sym->type;
-    while (IS_ARRAY(t))
-      t = t->next;
-    if (IS_SPEC(t)) {
-      SPEC_CONST (t) = 1;
-    } else {
-      DCL_PTR_CONST (t) = 1;
+      port->mem.code_ro)
+    {
+      /* find the first non-array link */
+      t = sym->type;
+      while (IS_ARRAY(t))
+        t = t->next;
+      if (IS_SPEC(t))
+        SPEC_CONST (t) = 1;
+      else
+        DCL_PTR_CONST (t) = 1;
     }
-  }
 
   /* if bit variable then no storage class can be */
   /* specified since bit is already a storage */
@@ -1588,7 +1579,7 @@ checkSClass (symbol * sym, int isProto)
       (SPEC_SCLS (sym->etype) != S_FIXED &&
        SPEC_SCLS (sym->etype) != S_SBIT &&
        SPEC_SCLS (sym->etype) != S_BIT)
-    )
+     )
     {
       werror (E_BITVAR_STORAGE, sym->name);
       SPEC_SCLS (sym->etype) = S_FIXED;
@@ -3807,4 +3798,40 @@ newEnumType (symbol *enumlist)
     }
 
   return type;
+}
+
+/*-------------------------------------------------------------------*/
+/* isConstant - check if the type is constant                        */
+/*-------------------------------------------------------------------*/
+int
+isConstant (sym_link * type)
+{
+  if (!type)
+    return 0;
+
+  while (IS_ARRAY (type))
+    type = type->next;
+
+  if (IS_SPEC (type))
+    return SPEC_CONST (type);
+  else
+    return DCL_PTR_CONST (type);
+}
+
+/*-------------------------------------------------------------------*/
+/* isVolatile - check if the type is volatile                        */
+/*-------------------------------------------------------------------*/
+int
+isVolatile (sym_link * type)
+{
+  if (!type)
+    return 0;
+
+  while (IS_ARRAY (type))
+    type = type->next;
+
+  if (IS_SPEC (type))
+    return SPEC_VOLATILE (type);
+  else
+    return DCL_PTR_VOLATILE (type);
 }

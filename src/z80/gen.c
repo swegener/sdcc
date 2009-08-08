@@ -1877,7 +1877,7 @@ aopGet (asmop * aop, int offset, bool bit16)
   exit (0);
 }
 
-bool
+static bool
 isRegString (const char *s)
 {
   if (!strcmp (s, "b") ||
@@ -1891,8 +1891,8 @@ isRegString (const char *s)
   return FALSE;
 }
 
-bool
-isConstant (const char *s)
+static bool
+isConstantString (const char *s)
 {
   /* This is a bit of a hack... */
   return (*s == '#' || *s == '$');
@@ -1903,7 +1903,7 @@ canAssignToPtr (const char *s)
 {
   if (isRegString (s))
     return TRUE;
-  if (isConstant (s))
+  if (isConstantString (s))
     return TRUE;
   return FALSE;
 }
@@ -3301,7 +3301,7 @@ genFunction (iCode * ic)
     }
   sym = OP_SYMBOL (IC_LEFT (ic));
 
-  _G.omitFramePtr = options.ommitFramePtr;
+  _G.omitFramePtr = options.omitFramePtr;
   if (IS_Z80 && !stackParm && !sym->stack)
     {
       /* When the conflicts between AOP_EXSTK && AOP_HLREG are fixed, */
@@ -5397,8 +5397,8 @@ genAnd (iCode * ic, iCode * ifx)
                   /* For the flags */
                   emit2 ("or a,a");
                 }
-          if (size || ifx)  /* emit jmp only, if it is actually used */
-              emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+              if (size || ifx)  /* emit jmp only, if it is actually used */
+                emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
             }
               offset++;
         }
@@ -5583,7 +5583,7 @@ genOr (iCode * ic, iCode * ifx)
           _moveA (aopGet (AOP (left), offset, FALSE));
 
           if (bytelit != 0)
-            { /* FIXME, allways true, shortcut possible */
+            { /* FIXME, always true, shortcut possible */
               emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
             }
           else

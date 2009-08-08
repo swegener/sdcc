@@ -205,17 +205,22 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
         {
           if ((SPEC_OCLS (sym->etype) == xidata) && !SPEC_ABSA (sym->etype))
             {
+              sym_link *t;
               /* create a new "XINIT (CODE)" symbol, that will be emited later
                  in the static seg */
-              newSym=copySymbol (sym);
-              SPEC_OCLS(newSym->etype)=xinit;
+              newSym = copySymbol (sym);
+              SPEC_OCLS (newSym->etype) = xinit;
               SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
               SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
-              if (IS_SPEC (newSym->type))
-                SPEC_CONST (newSym->type) = 1;
+              /* find the first non-array link */
+              t = newSym->type;
+              while (IS_ARRAY (t))
+                t = t->next;
+              if (IS_SPEC (t))
+                SPEC_CONST (t) = 1;
               else
-                DCL_PTR_CONST (newSym->type) = 1;
-              SPEC_STAT(newSym->etype)=1;
+                DCL_PTR_CONST (t) = 1;
+              SPEC_STAT(newSym->etype) = 1;
               resolveIvalSym(newSym->ival, newSym->type);
 
               // add it to the "XINIT (CODE)" segment
@@ -380,7 +385,7 @@ initPointer (initList * ilist, sym_link *toType)
       val->type = newLink (DECLARATOR);
       if (SPEC_SCLS (expr->left->etype) == S_CODE) {
         DCL_TYPE (val->type) = CPOINTER;
-        DCL_PTR_CONST (val->type) = port->mem.code_ro;
+        CodePtrPointsToConst (val->type);
       }
       else if (SPEC_SCLS (expr->left->etype) == S_PDATA)
         DCL_TYPE (val->type) = PPOINTER;
@@ -441,7 +446,7 @@ initPointer (initList * ilist, sym_link *toType)
     val->type = newLink (DECLARATOR);
     if (SPEC_SCLS (expr->right->etype) == S_CODE) {
       DCL_TYPE (val->type) = CPOINTER;
-      DCL_PTR_CONST (val->type) = port->mem.code_ro;
+      CodePtrPointsToConst (val->type);
     }
     else if (SPEC_SCLS (expr->right->etype) == S_PDATA)
       DCL_TYPE (val->type) = PPOINTER;

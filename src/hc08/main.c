@@ -143,9 +143,8 @@ _hc08_setDefaultOptions (void)
   options.stack_loc = 0x7fff;
   options.out_fmt = 1;		/* use motorola S19 output */
 
-  options.ommitFramePtr = 1;	/* no frame pointer (we use SP */
-                                /* offsets instead)            */
-  
+  options.omitFramePtr = 1; /* no frame pointer (we use SP */
+                            /* offsets instead)            */
 }
 
 static const char *
@@ -499,7 +498,7 @@ PORT hc08_port =
   hasExtBitOp,			/* hasExtBitOp */
   oclsExpense,			/* oclsExpense */
   TRUE,				/* use_dw_for_init */
-  FALSE,			/* little endian */
+  FALSE,			/* little_endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */

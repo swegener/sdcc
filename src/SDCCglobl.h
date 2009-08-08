@@ -253,7 +253,7 @@ struct options
     int shortis8bits;           /* treat short like int or char */
     int lessPedantic;           /* disable some warnings */
     int profile;                /* Turn on extra profiling information */
-    int ommitFramePtr;          /* Turn off the frame pointer. */
+    int omitFramePtr;           /* Turn off the frame pointer. */
     int useAccelerator;         /* use ds390 Arithmetic Accelerator */
     int noiv;                   /* do not generate irq vector table entries */
     int all_callee_saves;       /* callee saves for all functions */

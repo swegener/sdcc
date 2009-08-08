@@ -1,3 +1,40 @@
+2009-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/pic16/libc/Makefile.in,
+	* device/lib/pic16/libdev/Makefile.in,
+	* device/lib/pic16/libio/Makefile.in,
+	* device/lib/pic16/libm/Makefile.in,
+	* device/lib/pic16/libsdcc/Makefile.in,
+	* device/lib/pic16/startup/Makefile.in,
+	* device/lib/pic16/Makefile.common,
+	* device/lib/pic16/Makefile.in,
+	* src/hc08/main.c (_hc08_setDefaultOptions),
+	* src/pic16/gen.c (genFunction, genEndFunction),
+	* src/pic16/NOTES,
+	* src/SDCCglobl.h,
+	* src/SDCCmain.c,
+	* src/z80/gen.c (genFunction),
+	* doc/sdccman.lyx: changed ommitFramePtr to omitFramePtr
+	* src/mcs51/main.c (_mcs51_finaliseOptions),
+	* src/SDCCmain.c (parseCmdLine): moved mcs51 specific code for float_rent
+	* src/SDCCast.h,
+	* src/SDCCast.c (decorateType): removed incorrect fix for bug 1372851 which
+	   caused bug 1458678
+	  (CodePtrPointsToConst),
+	* src/SDCCicode.c (isOperandVolatile),
+	* src/SDCCsymt.h (IS_CONSTANT, IS_VOLATILE),
+	* src/SDCCsymt.c (structElemType, checkSClass, isConstant, isVolatile)
+	* src/SDCCglue.c (emitRegularMap, initPointer),
+	* src/pic16/glue.c (pic16_initPointer): skip arrays when setting/checking
+	   const/volatile, fixes bugs 1372851 and 1458678
+	* src/SDCCbitv.c (bitVectnBitsOn): made mask const
+	* src/SDCCicode.c (opFromOpWithDU),
+	* src/SDCCopt.c (replaceRegEqv): use OPDEFS and OP_USES
+	* src/SDCCptropt.c: cosmetic changes
+	* src/z80/gen.c (isRegString, isConstantString): renamed isConstant and
+	  made them static
+	* support/regression/tests/bug1458678.c: new, added
+
 2009-08-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpepph.c:
@@ -8,12 +45,13 @@
 2009-08-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/lksym.c (newsym): only allow redefinition in ABS area
+	  fixes bug 1057171
 	* src/hc08/main.c,
 	* src/mcs51/main.c,
 	* src/z80/main.c: made RSEG absolute
 	* src/SDCCglue.c (emitDebugSym): new, factored out
 	  (emitRegularMap): add org 0x0000 to SFR/SBIT,
-	  (emitRegularMap, emitStaticSeg) fixed bug for absolute debug symbols	
+	  (emitRegularMap, emitStaticSeg) fixed bug for absolute debug symbols
 	* src/SDCCmem.h,
 	* src/SDCCsymt.h: cosmetic changes
 	* src/SDCCsymt.c (dbuf_printTypeChain): implemented RFE 2824498
@@ -44,9 +82,9 @@
 	* src/SDCCast.h,
 	* src/SDCCast.c (createRMW): IS_DEREF now also checks for PTR_OP
 	* src/SDCCicode.c (geniCodeStruct): added assert for really being a struct,
-	  (ast2iCode): IS_DEREF now also checks for PTR_OP, fixes bug 2821333     
+	  (ast2iCode): IS_DEREF now also checks for PTR_OP, fixes bug 2821333
 	* src/SDCCptropt.c: changed all TAB's to spaces
-	* support/regression/tests/float_single.c, 
+	* support/regression/tests/float_single.c,
 	* device/lib/asincosf.c: removed unnecessary macros, const on global always
 	  means 'put it in code memory', and 'reentrant' is predefined in testfwk.h
 
@@ -62,7 +100,7 @@
 
 2009-07-18 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCCmain.c: RFE #1204438 - make SDCC a multicall binary, 
+	* src/SDCCmain.c: RFE #1204438 - make SDCC a multicall binary,
 	  fixed for WIN32
 	* as/link/lkar.c: fixed bug 2817508 - double free or memory corruption
 	  in aslink

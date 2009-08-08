@@ -106,8 +106,7 @@ bitVectSetBit (bitVect * bvp, int pos)
 
   byteSize = pos / 8;
   offset = pos % 8;
-  bvp->vect[byteSize] |= (((unsigned char) 1) <<
-			  (7 - offset));
+  bvp->vect[byteSize] |= (((unsigned char) 1) << (7 - offset));
   return bvp;
 }
 
@@ -129,8 +128,7 @@ bitVectUnSetBit (bitVect * bvp, int pos)
 
   offset = pos % 8;
 
-  bvp->vect[byteSize] &= ~(((unsigned char) 1) <<
-			   (7 - offset));
+  bvp->vect[byteSize] &= ~(((unsigned char) 1) << (7 - offset));
 }
 
 /*-----------------------------------------------------------------*/
@@ -201,7 +199,6 @@ bitVectUnion (bitVect * bvp1, bitVect * bvp2)
 
   for (; i < nbits; i++)
     newBvp->vect[i] = bvp1->vect[i] | bvp2->vect[i];
-
 
   return newBvp;
 }
@@ -397,7 +394,7 @@ bitVectnBitsOn (bitVect * bvp)
   unsigned int *p1;
 
   /* The bit vector is highest to lowest.  Interesting. */
-  unsigned int mask[] = {
+  const unsigned int mask[] = {
     0, 128, 128+64, 128+64+32, 128+64+32+16,
     128+64+32+16+8, 128+64+32+16+8+4, 128+64+32+16+8+4+2
   };

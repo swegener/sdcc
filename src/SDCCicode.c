@@ -885,20 +885,10 @@ isOperandGlobal (operand * op)
 int
 isOperandVolatile (operand * op, bool chkTemp)
 {
-  sym_link *optype;
-  sym_link *opetype;
-
   if (IS_ITEMP (op) && !chkTemp)
     return 0;
 
-  opetype = getSpec (optype = operandType (op));
-
-  if (IS_PTR (optype) && DCL_PTR_VOLATILE (optype))
-    return 1;
-
-  if (IS_VOLATILE (opetype))
-    return 1;
-  return 0;
+  return IS_VOLATILE (operandType (op));
 }
 
 /*-----------------------------------------------------------------*/
@@ -1571,8 +1561,8 @@ opFromOpWithDU (operand * op, bitVect * defs, bitVect * uses)
 
   if (nop->type == SYMBOL)
     {
-      OP_SYMBOL (nop)->defs = bitVectCopy (defs);
-      OP_SYMBOL (nop)->uses = bitVectCopy (uses);
+      OP_DEFS (nop) = bitVectCopy (defs);
+      OP_USES (nop) = bitVectCopy (uses);
     }
 
   return nop;

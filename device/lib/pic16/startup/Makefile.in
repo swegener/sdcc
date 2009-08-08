@@ -187,7 +187,7 @@ crt_DATA = crt0.o crt0i.o crt0iz.o
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 --fommit-frame-pointer \
+	-I$(top_srcdir)/../../include/pic16 --fomit-frame-pointer \
 	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
 	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
@@ -227,15 +227,15 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libcrt0.a: $(libcrt0_a_OBJECTS) $(libcrt0_a_DEPENDENCIES) 
+libcrt0.a: $(libcrt0_a_OBJECTS) $(libcrt0_a_DEPENDENCIES)
 	-rm -f libcrt0.a
 	$(libcrt0_a_AR) libcrt0.a $(libcrt0_a_OBJECTS) $(libcrt0_a_LIBADD)
 	$(RANLIB) libcrt0.a
-libcrt0i.a: $(libcrt0i_a_OBJECTS) $(libcrt0i_a_DEPENDENCIES) 
+libcrt0i.a: $(libcrt0i_a_OBJECTS) $(libcrt0i_a_DEPENDENCIES)
 	-rm -f libcrt0i.a
 	$(libcrt0i_a_AR) libcrt0i.a $(libcrt0i_a_OBJECTS) $(libcrt0i_a_LIBADD)
 	$(RANLIB) libcrt0i.a
-libcrt0iz.a: $(libcrt0iz_a_OBJECTS) $(libcrt0iz_a_DEPENDENCIES) 
+libcrt0iz.a: $(libcrt0iz_a_OBJECTS) $(libcrt0iz_a_DEPENDENCIES)
 	-rm -f libcrt0iz.a
 	$(libcrt0iz_a_AR) libcrt0iz.a $(libcrt0iz_a_OBJECTS) $(libcrt0iz_a_LIBADD)
 	$(RANLIB) libcrt0iz.a

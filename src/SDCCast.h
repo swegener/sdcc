@@ -205,6 +205,7 @@ ast *createDefault (ast *, ast *, ast *);
 ast *forLoopOptForm (ast *);
 ast *argAst (ast *);
 ast *resolveSymbols (ast *);
+void CodePtrPointsToConst (sym_link *t);
 ast *decorateType (ast *, RESULT_TYPE);
 ast *createWhile (symbol *, symbol *, symbol *, ast *, ast *);
 ast *createIf (ast *, ast *, ast *);

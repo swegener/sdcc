@@ -1001,7 +1001,7 @@ libdev18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 --fommit-frame-pointer \
+	-I$(top_srcdir)/../../include/pic16 --fomit-frame-pointer \
 	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
 	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
@@ -1067,463 +1067,463 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-libdev18f1220.a: $(libdev18f1220_a_OBJECTS) $(libdev18f1220_a_DEPENDENCIES) 
+libdev18f1220.a: $(libdev18f1220_a_OBJECTS) $(libdev18f1220_a_DEPENDENCIES)
 	-rm -f libdev18f1220.a
 	$(libdev18f1220_a_AR) libdev18f1220.a $(libdev18f1220_a_OBJECTS) $(libdev18f1220_a_LIBADD)
 	$(RANLIB) libdev18f1220.a
-libdev18f1320.a: $(libdev18f1320_a_OBJECTS) $(libdev18f1320_a_DEPENDENCIES) 
+libdev18f1320.a: $(libdev18f1320_a_OBJECTS) $(libdev18f1320_a_DEPENDENCIES)
 	-rm -f libdev18f1320.a
 	$(libdev18f1320_a_AR) libdev18f1320.a $(libdev18f1320_a_OBJECTS) $(libdev18f1320_a_LIBADD)
 	$(RANLIB) libdev18f1320.a
-libdev18f13k50.a: $(libdev18f13k50_a_OBJECTS) $(libdev18f13k50_a_DEPENDENCIES) 
+libdev18f13k50.a: $(libdev18f13k50_a_OBJECTS) $(libdev18f13k50_a_DEPENDENCIES)
 	-rm -f libdev18f13k50.a
 	$(libdev18f13k50_a_AR) libdev18f13k50.a $(libdev18f13k50_a_OBJECTS) $(libdev18f13k50_a_LIBADD)
 	$(RANLIB) libdev18f13k50.a
-libdev18f14k50.a: $(libdev18f14k50_a_OBJECTS) $(libdev18f14k50_a_DEPENDENCIES) 
+libdev18f14k50.a: $(libdev18f14k50_a_OBJECTS) $(libdev18f14k50_a_DEPENDENCIES)
 	-rm -f libdev18f14k50.a
 	$(libdev18f14k50_a_AR) libdev18f14k50.a $(libdev18f14k50_a_OBJECTS) $(libdev18f14k50_a_LIBADD)
 	$(RANLIB) libdev18f14k50.a
-libdev18f2220.a: $(libdev18f2220_a_OBJECTS) $(libdev18f2220_a_DEPENDENCIES) 
+libdev18f2220.a: $(libdev18f2220_a_OBJECTS) $(libdev18f2220_a_DEPENDENCIES)
 	-rm -f libdev18f2220.a
 	$(libdev18f2220_a_AR) libdev18f2220.a $(libdev18f2220_a_OBJECTS) $(libdev18f2220_a_LIBADD)
 	$(RANLIB) libdev18f2220.a
-libdev18f2221.a: $(libdev18f2221_a_OBJECTS) $(libdev18f2221_a_DEPENDENCIES) 
+libdev18f2221.a: $(libdev18f2221_a_OBJECTS) $(libdev18f2221_a_DEPENDENCIES)
 	-rm -f libdev18f2221.a
 	$(libdev18f2221_a_AR) libdev18f2221.a $(libdev18f2221_a_OBJECTS) $(libdev18f2221_a_LIBADD)
 	$(RANLIB) libdev18f2221.a
-libdev18f2320.a: $(libdev18f2320_a_OBJECTS) $(libdev18f2320_a_DEPENDENCIES) 
+libdev18f2320.a: $(libdev18f2320_a_OBJECTS) $(libdev18f2320_a_DEPENDENCIES)
 	-rm -f libdev18f2320.a
 	$(libdev18f2320_a_AR) libdev18f2320.a $(libdev18f2320_a_OBJECTS) $(libdev18f2320_a_LIBADD)
 	$(RANLIB) libdev18f2320.a
-libdev18f2321.a: $(libdev18f2321_a_OBJECTS) $(libdev18f2321_a_DEPENDENCIES) 
+libdev18f2321.a: $(libdev18f2321_a_OBJECTS) $(libdev18f2321_a_DEPENDENCIES)
 	-rm -f libdev18f2321.a
 	$(libdev18f2321_a_AR) libdev18f2321.a $(libdev18f2321_a_OBJECTS) $(libdev18f2321_a_LIBADD)
 	$(RANLIB) libdev18f2321.a
-libdev18f2331.a: $(libdev18f2331_a_OBJECTS) $(libdev18f2331_a_DEPENDENCIES) 
+libdev18f2331.a: $(libdev18f2331_a_OBJECTS) $(libdev18f2331_a_DEPENDENCIES)
 	-rm -f libdev18f2331.a
 	$(libdev18f2331_a_AR) libdev18f2331.a $(libdev18f2331_a_OBJECTS) $(libdev18f2331_a_LIBADD)
 	$(RANLIB) libdev18f2331.a
-libdev18f23k20.a: $(libdev18f23k20_a_OBJECTS) $(libdev18f23k20_a_DEPENDENCIES) 
+libdev18f23k20.a: $(libdev18f23k20_a_OBJECTS) $(libdev18f23k20_a_DEPENDENCIES)
 	-rm -f libdev18f23k20.a
 	$(libdev18f23k20_a_AR) libdev18f23k20.a $(libdev18f23k20_a_OBJECTS) $(libdev18f23k20_a_LIBADD)
 	$(RANLIB) libdev18f23k20.a
-libdev18f2410.a: $(libdev18f2410_a_OBJECTS) $(libdev18f2410_a_DEPENDENCIES) 
+libdev18f2410.a: $(libdev18f2410_a_OBJECTS) $(libdev18f2410_a_DEPENDENCIES)
 	-rm -f libdev18f2410.a
 	$(libdev18f2410_a_AR) libdev18f2410.a $(libdev18f2410_a_OBJECTS) $(libdev18f2410_a_LIBADD)
 	$(RANLIB) libdev18f2410.a
-libdev18f242.a: $(libdev18f242_a_OBJECTS) $(libdev18f242_a_DEPENDENCIES) 
+libdev18f242.a: $(libdev18f242_a_OBJECTS) $(libdev18f242_a_DEPENDENCIES)
 	-rm -f libdev18f242.a
 	$(libdev18f242_a_AR) libdev18f242.a $(libdev18f242_a_OBJECTS) $(libdev18f242_a_LIBADD)
 	$(RANLIB) libdev18f242.a
-libdev18f2420.a: $(libdev18f2420_a_OBJECTS) $(libdev18f2420_a_DEPENDENCIES) 
+libdev18f2420.a: $(libdev18f2420_a_OBJECTS) $(libdev18f2420_a_DEPENDENCIES)
 	-rm -f libdev18f2420.a
 	$(libdev18f2420_a_AR) libdev18f2420.a $(libdev18f2420_a_OBJECTS) $(libdev18f2420_a_LIBADD)
 	$(RANLIB) libdev18f2420.a
-libdev18f2423.a: $(libdev18f2423_a_OBJECTS) $(libdev18f2423_a_DEPENDENCIES) 
+libdev18f2423.a: $(libdev18f2423_a_OBJECTS) $(libdev18f2423_a_DEPENDENCIES)
 	-rm -f libdev18f2423.a
 	$(libdev18f2423_a_AR) libdev18f2423.a $(libdev18f2423_a_OBJECTS) $(libdev18f2423_a_LIBADD)
 	$(RANLIB) libdev18f2423.a
-libdev18f2431.a: $(libdev18f2431_a_OBJECTS) $(libdev18f2431_a_DEPENDENCIES) 
+libdev18f2431.a: $(libdev18f2431_a_OBJECTS) $(libdev18f2431_a_DEPENDENCIES)
 	-rm -f libdev18f2431.a
 	$(libdev18f2431_a_AR) libdev18f2431.a $(libdev18f2431_a_OBJECTS) $(libdev18f2431_a_LIBADD)
 	$(RANLIB) libdev18f2431.a
-libdev18f2450.a: $(libdev18f2450_a_OBJECTS) $(libdev18f2450_a_DEPENDENCIES) 
+libdev18f2450.a: $(libdev18f2450_a_OBJECTS) $(libdev18f2450_a_DEPENDENCIES)
 	-rm -f libdev18f2450.a
 	$(libdev18f2450_a_AR) libdev18f2450.a $(libdev18f2450_a_OBJECTS) $(libdev18f2450_a_LIBADD)
 	$(RANLIB) libdev18f2450.a
-libdev18f2455.a: $(libdev18f2455_a_OBJECTS) $(libdev18f2455_a_DEPENDENCIES) 
+libdev18f2455.a: $(libdev18f2455_a_OBJECTS) $(libdev18f2455_a_DEPENDENCIES)
 	-rm -f libdev18f2455.a
 	$(libdev18f2455_a_AR) libdev18f2455.a $(libdev18f2455_a_OBJECTS) $(libdev18f2455_a_LIBADD)
 	$(RANLIB) libdev18f2455.a
-libdev18f248.a: $(libdev18f248_a_OBJECTS) $(libdev18f248_a_DEPENDENCIES) 
+libdev18f248.a: $(libdev18f248_a_OBJECTS) $(libdev18f248_a_DEPENDENCIES)
 	-rm -f libdev18f248.a
 	$(libdev18f248_a_AR) libdev18f248.a $(libdev18f248_a_OBJECTS) $(libdev18f248_a_LIBADD)
 	$(RANLIB) libdev18f248.a
-libdev18f2480.a: $(libdev18f2480_a_OBJECTS) $(libdev18f2480_a_DEPENDENCIES) 
+libdev18f2480.a: $(libdev18f2480_a_OBJECTS) $(libdev18f2480_a_DEPENDENCIES)
 	-rm -f libdev18f2480.a
 	$(libdev18f2480_a_AR) libdev18f2480.a $(libdev18f2480_a_OBJECTS) $(libdev18f2480_a_LIBADD)
 	$(RANLIB) libdev18f2480.a
-libdev18f24j10.a: $(libdev18f24j10_a_OBJECTS) $(libdev18f24j10_a_DEPENDENCIES) 
+libdev18f24j10.a: $(libdev18f24j10_a_OBJECTS) $(libdev18f24j10_a_DEPENDENCIES)
 	-rm -f libdev18f24j10.a
 	$(libdev18f24j10_a_AR) libdev18f24j10.a $(libdev18f24j10_a_OBJECTS) $(libdev18f24j10_a_LIBADD)
 	$(RANLIB) libdev18f24j10.a
-libdev18f24j50.a: $(libdev18f24j50_a_OBJECTS) $(libdev18f24j50_a_DEPENDENCIES) 
+libdev18f24j50.a: $(libdev18f24j50_a_OBJECTS) $(libdev18f24j50_a_DEPENDENCIES)
 	-rm -f libdev18f24j50.a
 	$(libdev18f24j50_a_AR) libdev18f24j50.a $(libdev18f24j50_a_OBJECTS) $(libdev18f24j50_a_LIBADD)
 	$(RANLIB) libdev18f24j50.a
-libdev18f24k20.a: $(libdev18f24k20_a_OBJECTS) $(libdev18f24k20_a_DEPENDENCIES) 
+libdev18f24k20.a: $(libdev18f24k20_a_OBJECTS) $(libdev18f24k20_a_DEPENDENCIES)
 	-rm -f libdev18f24k20.a
 	$(libdev18f24k20_a_AR) libdev18f24k20.a $(libdev18f24k20_a_OBJECTS) $(libdev18f24k20_a_LIBADD)
 	$(RANLIB) libdev18f24k20.a
-libdev18f2510.a: $(libdev18f2510_a_OBJECTS) $(libdev18f2510_a_DEPENDENCIES) 
+libdev18f2510.a: $(libdev18f2510_a_OBJECTS) $(libdev18f2510_a_DEPENDENCIES)
 	-rm -f libdev18f2510.a
 	$(libdev18f2510_a_AR) libdev18f2510.a $(libdev18f2510_a_OBJECTS) $(libdev18f2510_a_LIBADD)
 	$(RANLIB) libdev18f2510.a
-libdev18f2515.a: $(libdev18f2515_a_OBJECTS) $(libdev18f2515_a_DEPENDENCIES) 
+libdev18f2515.a: $(libdev18f2515_a_OBJECTS) $(libdev18f2515_a_DEPENDENCIES)
 	-rm -f libdev18f2515.a
 	$(libdev18f2515_a_AR) libdev18f2515.a $(libdev18f2515_a_OBJECTS) $(libdev18f2515_a_LIBADD)
 	$(RANLIB) libdev18f2515.a
-libdev18f252.a: $(libdev18f252_a_OBJECTS) $(libdev18f252_a_DEPENDENCIES) 
+libdev18f252.a: $(libdev18f252_a_OBJECTS) $(libdev18f252_a_DEPENDENCIES)
 	-rm -f libdev18f252.a
 	$(libdev18f252_a_AR) libdev18f252.a $(libdev18f252_a_OBJECTS) $(libdev18f252_a_LIBADD)
 	$(RANLIB) libdev18f252.a
-libdev18f2520.a: $(libdev18f2520_a_OBJECTS) $(libdev18f2520_a_DEPENDENCIES) 
+libdev18f2520.a: $(libdev18f2520_a_OBJECTS) $(libdev18f2520_a_DEPENDENCIES)
 	-rm -f libdev18f2520.a
 	$(libdev18f2520_a_AR) libdev18f2520.a $(libdev18f2520_a_OBJECTS) $(libdev18f2520_a_LIBADD)
 	$(RANLIB) libdev18f2520.a
-libdev18f2523.a: $(libdev18f2523_a_OBJECTS) $(libdev18f2523_a_DEPENDENCIES) 
+libdev18f2523.a: $(libdev18f2523_a_OBJECTS) $(libdev18f2523_a_DEPENDENCIES)
 	-rm -f libdev18f2523.a
 	$(libdev18f2523_a_AR) libdev18f2523.a $(libdev18f2523_a_OBJECTS) $(libdev18f2523_a_LIBADD)
 	$(RANLIB) libdev18f2523.a
-libdev18f2525.a: $(libdev18f2525_a_OBJECTS) $(libdev18f2525_a_DEPENDENCIES) 
+libdev18f2525.a: $(libdev18f2525_a_OBJECTS) $(libdev18f2525_a_DEPENDENCIES)
 	-rm -f libdev18f2525.a
 	$(libdev18f2525_a_AR) libdev18f2525.a $(libdev18f2525_a_OBJECTS) $(libdev18f2525_a_LIBADD)
 	$(RANLIB) libdev18f2525.a
-libdev18f2550.a: $(libdev18f2550_a_OBJECTS) $(libdev18f2550_a_DEPENDENCIES) 
+libdev18f2550.a: $(libdev18f2550_a_OBJECTS) $(libdev18f2550_a_DEPENDENCIES)
 	-rm -f libdev18f2550.a
 	$(libdev18f2550_a_AR) libdev18f2550.a $(libdev18f2550_a_OBJECTS) $(libdev18f2550_a_LIBADD)
 	$(RANLIB) libdev18f2550.a
-libdev18f258.a: $(libdev18f258_a_OBJECTS) $(libdev18f258_a_DEPENDENCIES) 
+libdev18f258.a: $(libdev18f258_a_OBJECTS) $(libdev18f258_a_DEPENDENCIES)
 	-rm -f libdev18f258.a
 	$(libdev18f258_a_AR) libdev18f258.a $(libdev18f258_a_OBJECTS) $(libdev18f258_a_LIBADD)
 	$(RANLIB) libdev18f258.a
-libdev18f2580.a: $(libdev18f2580_a_OBJECTS) $(libdev18f2580_a_DEPENDENCIES) 
+libdev18f2580.a: $(libdev18f2580_a_OBJECTS) $(libdev18f2580_a_DEPENDENCIES)
 	-rm -f libdev18f2580.a
 	$(libdev18f2580_a_AR) libdev18f2580.a $(libdev18f2580_a_OBJECTS) $(libdev18f2580_a_LIBADD)
 	$(RANLIB) libdev18f2580.a
-libdev18f2585.a: $(libdev18f2585_a_OBJECTS) $(libdev18f2585_a_DEPENDENCIES) 
+libdev18f2585.a: $(libdev18f2585_a_OBJECTS) $(libdev18f2585_a_DEPENDENCIES)
 	-rm -f libdev18f2585.a
 	$(libdev18f2585_a_AR) libdev18f2585.a $(libdev18f2585_a_OBJECTS) $(libdev18f2585_a_LIBADD)
 	$(RANLIB) libdev18f2585.a
-libdev18f25j10.a: $(libdev18f25j10_a_OBJECTS) $(libdev18f25j10_a_DEPENDENCIES) 
+libdev18f25j10.a: $(libdev18f25j10_a_OBJECTS) $(libdev18f25j10_a_DEPENDENCIES)
 	-rm -f libdev18f25j10.a
 	$(libdev18f25j10_a_AR) libdev18f25j10.a $(libdev18f25j10_a_OBJECTS) $(libdev18f25j10_a_LIBADD)
 	$(RANLIB) libdev18f25j10.a
-libdev18f25j50.a: $(libdev18f25j50_a_OBJECTS) $(libdev18f25j50_a_DEPENDENCIES) 
+libdev18f25j50.a: $(libdev18f25j50_a_OBJECTS) $(libdev18f25j50_a_DEPENDENCIES)
 	-rm -f libdev18f25j50.a
 	$(libdev18f25j50_a_AR) libdev18f25j50.a $(libdev18f25j50_a_OBJECTS) $(libdev18f25j50_a_LIBADD)
 	$(RANLIB) libdev18f25j50.a
-libdev18f25k20.a: $(libdev18f25k20_a_OBJECTS) $(libdev18f25k20_a_DEPENDENCIES) 
+libdev18f25k20.a: $(libdev18f25k20_a_OBJECTS) $(libdev18f25k20_a_DEPENDENCIES)
 	-rm -f libdev18f25k20.a
 	$(libdev18f25k20_a_AR) libdev18f25k20.a $(libdev18f25k20_a_OBJECTS) $(libdev18f25k20_a_LIBADD)
 	$(RANLIB) libdev18f25k20.a
-libdev18f2610.a: $(libdev18f2610_a_OBJECTS) $(libdev18f2610_a_DEPENDENCIES) 
+libdev18f2610.a: $(libdev18f2610_a_OBJECTS) $(libdev18f2610_a_DEPENDENCIES)
 	-rm -f libdev18f2610.a
 	$(libdev18f2610_a_AR) libdev18f2610.a $(libdev18f2610_a_OBJECTS) $(libdev18f2610_a_LIBADD)
 	$(RANLIB) libdev18f2610.a
-libdev18f2620.a: $(libdev18f2620_a_OBJECTS) $(libdev18f2620_a_DEPENDENCIES) 
+libdev18f2620.a: $(libdev18f2620_a_OBJECTS) $(libdev18f2620_a_DEPENDENCIES)
 	-rm -f libdev18f2620.a
 	$(libdev18f2620_a_AR) libdev18f2620.a $(libdev18f2620_a_OBJECTS) $(libdev18f2620_a_LIBADD)
 	$(RANLIB) libdev18f2620.a
-libdev18f2680.a: $(libdev18f2680_a_OBJECTS) $(libdev18f2680_a_DEPENDENCIES) 
+libdev18f2680.a: $(libdev18f2680_a_OBJECTS) $(libdev18f2680_a_DEPENDENCIES)
 	-rm -f libdev18f2680.a
 	$(libdev18f2680_a_AR) libdev18f2680.a $(libdev18f2680_a_OBJECTS) $(libdev18f2680_a_LIBADD)
 	$(RANLIB) libdev18f2680.a
-libdev18f2682.a: $(libdev18f2682_a_OBJECTS) $(libdev18f2682_a_DEPENDENCIES) 
+libdev18f2682.a: $(libdev18f2682_a_OBJECTS) $(libdev18f2682_a_DEPENDENCIES)
 	-rm -f libdev18f2682.a
 	$(libdev18f2682_a_AR) libdev18f2682.a $(libdev18f2682_a_OBJECTS) $(libdev18f2682_a_LIBADD)
 	$(RANLIB) libdev18f2682.a
-libdev18f2685.a: $(libdev18f2685_a_OBJECTS) $(libdev18f2685_a_DEPENDENCIES) 
+libdev18f2685.a: $(libdev18f2685_a_OBJECTS) $(libdev18f2685_a_DEPENDENCIES)
 	-rm -f libdev18f2685.a
 	$(libdev18f2685_a_AR) libdev18f2685.a $(libdev18f2685_a_OBJECTS) $(libdev18f2685_a_LIBADD)
 	$(RANLIB) libdev18f2685.a
-libdev18f26j50.a: $(libdev18f26j50_a_OBJECTS) $(libdev18f26j50_a_DEPENDENCIES) 
+libdev18f26j50.a: $(libdev18f26j50_a_OBJECTS) $(libdev18f26j50_a_DEPENDENCIES)
 	-rm -f libdev18f26j50.a
 	$(libdev18f26j50_a_AR) libdev18f26j50.a $(libdev18f26j50_a_OBJECTS) $(libdev18f26j50_a_LIBADD)
 	$(RANLIB) libdev18f26j50.a
-libdev18f26k20.a: $(libdev18f26k20_a_OBJECTS) $(libdev18f26k20_a_DEPENDENCIES) 
+libdev18f26k20.a: $(libdev18f26k20_a_OBJECTS) $(libdev18f26k20_a_DEPENDENCIES)
 	-rm -f libdev18f26k20.a
 	$(libdev18f26k20_a_AR) libdev18f26k20.a $(libdev18f26k20_a_OBJECTS) $(libdev18f26k20_a_LIBADD)
 	$(RANLIB) libdev18f26k20.a
-libdev18f4220.a: $(libdev18f4220_a_OBJECTS) $(libdev18f4220_a_DEPENDENCIES) 
+libdev18f4220.a: $(libdev18f4220_a_OBJECTS) $(libdev18f4220_a_DEPENDENCIES)
 	-rm -f libdev18f4220.a
 	$(libdev18f4220_a_AR) libdev18f4220.a $(libdev18f4220_a_OBJECTS) $(libdev18f4220_a_LIBADD)
 	$(RANLIB) libdev18f4220.a
-libdev18f4221.a: $(libdev18f4221_a_OBJECTS) $(libdev18f4221_a_DEPENDENCIES) 
+libdev18f4221.a: $(libdev18f4221_a_OBJECTS) $(libdev18f4221_a_DEPENDENCIES)
 	-rm -f libdev18f4221.a
 	$(libdev18f4221_a_AR) libdev18f4221.a $(libdev18f4221_a_OBJECTS) $(libdev18f4221_a_LIBADD)
 	$(RANLIB) libdev18f4221.a
-libdev18f4320.a: $(libdev18f4320_a_OBJECTS) $(libdev18f4320_a_DEPENDENCIES) 
+libdev18f4320.a: $(libdev18f4320_a_OBJECTS) $(libdev18f4320_a_DEPENDENCIES)
 	-rm -f libdev18f4320.a
 	$(libdev18f4320_a_AR) libdev18f4320.a $(libdev18f4320_a_OBJECTS) $(libdev18f4320_a_LIBADD)
 	$(RANLIB) libdev18f4320.a
-libdev18f4321.a: $(libdev18f4321_a_OBJECTS) $(libdev18f4321_a_DEPENDENCIES) 
+libdev18f4321.a: $(libdev18f4321_a_OBJECTS) $(libdev18f4321_a_DEPENDENCIES)
 	-rm -f libdev18f4321.a
 	$(libdev18f4321_a_AR) libdev18f4321.a $(libdev18f4321_a_OBJECTS) $(libdev18f4321_a_LIBADD)
 	$(RANLIB) libdev18f4321.a
-libdev18f4331.a: $(libdev18f4331_a_OBJECTS) $(libdev18f4331_a_DEPENDENCIES) 
+libdev18f4331.a: $(libdev18f4331_a_OBJECTS) $(libdev18f4331_a_DEPENDENCIES)
 	-rm -f libdev18f4331.a
 	$(libdev18f4331_a_AR) libdev18f4331.a $(libdev18f4331_a_OBJECTS) $(libdev18f4331_a_LIBADD)
 	$(RANLIB) libdev18f4331.a
-libdev18f43k20.a: $(libdev18f43k20_a_OBJECTS) $(libdev18f43k20_a_DEPENDENCIES) 
+libdev18f43k20.a: $(libdev18f43k20_a_OBJECTS) $(libdev18f43k20_a_DEPENDENCIES)
 	-rm -f libdev18f43k20.a
 	$(libdev18f43k20_a_AR) libdev18f43k20.a $(libdev18f43k20_a_OBJECTS) $(libdev18f43k20_a_LIBADD)
 	$(RANLIB) libdev18f43k20.a
-libdev18f4410.a: $(libdev18f4410_a_OBJECTS) $(libdev18f4410_a_DEPENDENCIES) 
+libdev18f4410.a: $(libdev18f4410_a_OBJECTS) $(libdev18f4410_a_DEPENDENCIES)
 	-rm -f libdev18f4410.a
 	$(libdev18f4410_a_AR) libdev18f4410.a $(libdev18f4410_a_OBJECTS) $(libdev18f4410_a_LIBADD)
 	$(RANLIB) libdev18f4410.a
-libdev18f442.a: $(libdev18f442_a_OBJECTS) $(libdev18f442_a_DEPENDENCIES) 
+libdev18f442.a: $(libdev18f442_a_OBJECTS) $(libdev18f442_a_DEPENDENCIES)
 	-rm -f libdev18f442.a
 	$(libdev18f442_a_AR) libdev18f442.a $(libdev18f442_a_OBJECTS) $(libdev18f442_a_LIBADD)
 	$(RANLIB) libdev18f442.a
-libdev18f4420.a: $(libdev18f4420_a_OBJECTS) $(libdev18f4420_a_DEPENDENCIES) 
+libdev18f4420.a: $(libdev18f4420_a_OBJECTS) $(libdev18f4420_a_DEPENDENCIES)
 	-rm -f libdev18f4420.a
 	$(libdev18f4420_a_AR) libdev18f4420.a $(libdev18f4420_a_OBJECTS) $(libdev18f4420_a_LIBADD)
 	$(RANLIB) libdev18f4420.a
-libdev18f4423.a: $(libdev18f4423_a_OBJECTS) $(libdev18f4423_a_DEPENDENCIES) 
+libdev18f4423.a: $(libdev18f4423_a_OBJECTS) $(libdev18f4423_a_DEPENDENCIES)
 	-rm -f libdev18f4423.a
 	$(libdev18f4423_a_AR) libdev18f4423.a $(libdev18f4423_a_OBJECTS) $(libdev18f4423_a_LIBADD)
 	$(RANLIB) libdev18f4423.a
-libdev18f4431.a: $(libdev18f4431_a_OBJECTS) $(libdev18f4431_a_DEPENDENCIES) 
+libdev18f4431.a: $(libdev18f4431_a_OBJECTS) $(libdev18f4431_a_DEPENDENCIES)
 	-rm -f libdev18f4431.a
 	$(libdev18f4431_a_AR) libdev18f4431.a $(libdev18f4431_a_OBJECTS) $(libdev18f4431_a_LIBADD)
 	$(RANLIB) libdev18f4431.a
-libdev18f4450.a: $(libdev18f4450_a_OBJECTS) $(libdev18f4450_a_DEPENDENCIES) 
+libdev18f4450.a: $(libdev18f4450_a_OBJECTS) $(libdev18f4450_a_DEPENDENCIES)
 	-rm -f libdev18f4450.a
 	$(libdev18f4450_a_AR) libdev18f4450.a $(libdev18f4450_a_OBJECTS) $(libdev18f4450_a_LIBADD)
 	$(RANLIB) libdev18f4450.a
-libdev18f4455.a: $(libdev18f4455_a_OBJECTS) $(libdev18f4455_a_DEPENDENCIES) 
+libdev18f4455.a: $(libdev18f4455_a_OBJECTS) $(libdev18f4455_a_DEPENDENCIES)
 	-rm -f libdev18f4455.a
 	$(libdev18f4455_a_AR) libdev18f4455.a $(libdev18f4455_a_OBJECTS) $(libdev18f4455_a_LIBADD)
 	$(RANLIB) libdev18f4455.a
-libdev18f448.a: $(libdev18f448_a_OBJECTS) $(libdev18f448_a_DEPENDENCIES) 
+libdev18f448.a: $(libdev18f448_a_OBJECTS) $(libdev18f448_a_DEPENDENCIES)
 	-rm -f libdev18f448.a
 	$(libdev18f448_a_AR) libdev18f448.a $(libdev18f448_a_OBJECTS) $(libdev18f448_a_LIBADD)
 	$(RANLIB) libdev18f448.a
-libdev18f4480.a: $(libdev18f4480_a_OBJECTS) $(libdev18f4480_a_DEPENDENCIES) 
+libdev18f4480.a: $(libdev18f4480_a_OBJECTS) $(libdev18f4480_a_DEPENDENCIES)
 	-rm -f libdev18f4480.a
 	$(libdev18f4480_a_AR) libdev18f4480.a $(libdev18f4480_a_OBJECTS) $(libdev18f4480_a_LIBADD)
 	$(RANLIB) libdev18f4480.a
-libdev18f44j10.a: $(libdev18f44j10_a_OBJECTS) $(libdev18f44j10_a_DEPENDENCIES) 
+libdev18f44j10.a: $(libdev18f44j10_a_OBJECTS) $(libdev18f44j10_a_DEPENDENCIES)
 	-rm -f libdev18f44j10.a
 	$(libdev18f44j10_a_AR) libdev18f44j10.a $(libdev18f44j10_a_OBJECTS) $(libdev18f44j10_a_LIBADD)
 	$(RANLIB) libdev18f44j10.a
-libdev18f44j50.a: $(libdev18f44j50_a_OBJECTS) $(libdev18f44j50_a_DEPENDENCIES) 
+libdev18f44j50.a: $(libdev18f44j50_a_OBJECTS) $(libdev18f44j50_a_DEPENDENCIES)
 	-rm -f libdev18f44j50.a
 	$(libdev18f44j50_a_AR) libdev18f44j50.a $(libdev18f44j50_a_OBJECTS) $(libdev18f44j50_a_LIBADD)
 	$(RANLIB) libdev18f44j50.a
-libdev18f44k20.a: $(libdev18f44k20_a_OBJECTS) $(libdev18f44k20_a_DEPENDENCIES) 
+libdev18f44k20.a: $(libdev18f44k20_a_OBJECTS) $(libdev18f44k20_a_DEPENDENCIES)
 	-rm -f libdev18f44k20.a
 	$(libdev18f44k20_a_AR) libdev18f44k20.a $(libdev18f44k20_a_OBJECTS) $(libdev18f44k20_a_LIBADD)
 	$(RANLIB) libdev18f44k20.a
-libdev18f4510.a: $(libdev18f4510_a_OBJECTS) $(libdev18f4510_a_DEPENDENCIES) 
+libdev18f4510.a: $(libdev18f4510_a_OBJECTS) $(libdev18f4510_a_DEPENDENCIES)
 	-rm -f libdev18f4510.a
 	$(libdev18f4510_a_AR) libdev18f4510.a $(libdev18f4510_a_OBJECTS) $(libdev18f4510_a_LIBADD)
 	$(RANLIB) libdev18f4510.a
-libdev18f4515.a: $(libdev18f4515_a_OBJECTS) $(libdev18f4515_a_DEPENDENCIES) 
+libdev18f4515.a: $(libdev18f4515_a_OBJECTS) $(libdev18f4515_a_DEPENDENCIES)
 	-rm -f libdev18f4515.a
 	$(libdev18f4515_a_AR) libdev18f4515.a $(libdev18f4515_a_OBJECTS) $(libdev18f4515_a_LIBADD)
 	$(RANLIB) libdev18f4515.a
-libdev18f452.a: $(libdev18f452_a_OBJECTS) $(libdev18f452_a_DEPENDENCIES) 
+libdev18f452.a: $(libdev18f452_a_OBJECTS) $(libdev18f452_a_DEPENDENCIES)
 	-rm -f libdev18f452.a
 	$(libdev18f452_a_AR) libdev18f452.a $(libdev18f452_a_OBJECTS) $(libdev18f452_a_LIBADD)
 	$(RANLIB) libdev18f452.a
-libdev18f4520.a: $(libdev18f4520_a_OBJECTS) $(libdev18f4520_a_DEPENDENCIES) 
+libdev18f4520.a: $(libdev18f4520_a_OBJECTS) $(libdev18f4520_a_DEPENDENCIES)
 	-rm -f libdev18f4520.a
 	$(libdev18f4520_a_AR) libdev18f4520.a $(libdev18f4520_a_OBJECTS) $(libdev18f4520_a_LIBADD)
 	$(RANLIB) libdev18f4520.a
-libdev18f4523.a: $(libdev18f4523_a_OBJECTS) $(libdev18f4523_a_DEPENDENCIES) 
+libdev18f4523.a: $(libdev18f4523_a_OBJECTS) $(libdev18f4523_a_DEPENDENCIES)
 	-rm -f libdev18f4523.a
 	$(libdev18f4523_a_AR) libdev18f4523.a $(libdev18f4523_a_OBJECTS) $(libdev18f4523_a_LIBADD)
 	$(RANLIB) libdev18f4523.a
-libdev18f4525.a: $(libdev18f4525_a_OBJECTS) $(libdev18f4525_a_DEPENDENCIES) 
+libdev18f4525.a: $(libdev18f4525_a_OBJECTS) $(libdev18f4525_a_DEPENDENCIES)
 	-rm -f libdev18f4525.a
 	$(libdev18f4525_a_AR) libdev18f4525.a $(libdev18f4525_a_OBJECTS) $(libdev18f4525_a_LIBADD)
 	$(RANLIB) libdev18f4525.a
-libdev18f4550.a: $(libdev18f4550_a_OBJECTS) $(libdev18f4550_a_DEPENDENCIES) 
+libdev18f4550.a: $(libdev18f4550_a_OBJECTS) $(libdev18f4550_a_DEPENDENCIES)
 	-rm -f libdev18f4550.a
 	$(libdev18f4550_a_AR) libdev18f4550.a $(libdev18f4550_a_OBJECTS) $(libdev18f4550_a_LIBADD)
 	$(RANLIB) libdev18f4550.a
-libdev18f458.a: $(libdev18f458_a_OBJECTS) $(libdev18f458_a_DEPENDENCIES) 
+libdev18f458.a: $(libdev18f458_a_OBJECTS) $(libdev18f458_a_DEPENDENCIES)
 	-rm -f libdev18f458.a
 	$(libdev18f458_a_AR) libdev18f458.a $(libdev18f458_a_OBJECTS) $(libdev18f458_a_LIBADD)
 	$(RANLIB) libdev18f458.a
-libdev18f4580.a: $(libdev18f4580_a_OBJECTS) $(libdev18f4580_a_DEPENDENCIES) 
+libdev18f4580.a: $(libdev18f4580_a_OBJECTS) $(libdev18f4580_a_DEPENDENCIES)
 	-rm -f libdev18f4580.a
 	$(libdev18f4580_a_AR) libdev18f4580.a $(libdev18f4580_a_OBJECTS) $(libdev18f4580_a_LIBADD)
 	$(RANLIB) libdev18f4580.a
-libdev18f4585.a: $(libdev18f4585_a_OBJECTS) $(libdev18f4585_a_DEPENDENCIES) 
+libdev18f4585.a: $(libdev18f4585_a_OBJECTS) $(libdev18f4585_a_DEPENDENCIES)
 	-rm -f libdev18f4585.a
 	$(libdev18f4585_a_AR) libdev18f4585.a $(libdev18f4585_a_OBJECTS) $(libdev18f4585_a_LIBADD)
 	$(RANLIB) libdev18f4585.a
-libdev18f45j10.a: $(libdev18f45j10_a_OBJECTS) $(libdev18f45j10_a_DEPENDENCIES) 
+libdev18f45j10.a: $(libdev18f45j10_a_OBJECTS) $(libdev18f45j10_a_DEPENDENCIES)
 	-rm -f libdev18f45j10.a
 	$(libdev18f45j10_a_AR) libdev18f45j10.a $(libdev18f45j10_a_OBJECTS) $(libdev18f45j10_a_LIBADD)
 	$(RANLIB) libdev18f45j10.a
-libdev18f45j50.a: $(libdev18f45j50_a_OBJECTS) $(libdev18f45j50_a_DEPENDENCIES) 
+libdev18f45j50.a: $(libdev18f45j50_a_OBJECTS) $(libdev18f45j50_a_DEPENDENCIES)
 	-rm -f libdev18f45j50.a
 	$(libdev18f45j50_a_AR) libdev18f45j50.a $(libdev18f45j50_a_OBJECTS) $(libdev18f45j50_a_LIBADD)
 	$(RANLIB) libdev18f45j50.a
-libdev18f45k20.a: $(libdev18f45k20_a_OBJECTS) $(libdev18f45k20_a_DEPENDENCIES) 
+libdev18f45k20.a: $(libdev18f45k20_a_OBJECTS) $(libdev18f45k20_a_DEPENDENCIES)
 	-rm -f libdev18f45k20.a
 	$(libdev18f45k20_a_AR) libdev18f45k20.a $(libdev18f45k20_a_OBJECTS) $(libdev18f45k20_a_LIBADD)
 	$(RANLIB) libdev18f45k20.a
-libdev18f4610.a: $(libdev18f4610_a_OBJECTS) $(libdev18f4610_a_DEPENDENCIES) 
+libdev18f4610.a: $(libdev18f4610_a_OBJECTS) $(libdev18f4610_a_DEPENDENCIES)
 	-rm -f libdev18f4610.a
 	$(libdev18f4610_a_AR) libdev18f4610.a $(libdev18f4610_a_OBJECTS) $(libdev18f4610_a_LIBADD)
 	$(RANLIB) libdev18f4610.a
-libdev18f4620.a: $(libdev18f4620_a_OBJECTS) $(libdev18f4620_a_DEPENDENCIES) 
+libdev18f4620.a: $(libdev18f4620_a_OBJECTS) $(libdev18f4620_a_DEPENDENCIES)
 	-rm -f libdev18f4620.a
 	$(libdev18f4620_a_AR) libdev18f4620.a $(libdev18f4620_a_OBJECTS) $(libdev18f4620_a_LIBADD)
 	$(RANLIB) libdev18f4620.a
-libdev18f4680.a: $(libdev18f4680_a_OBJECTS) $(libdev18f4680_a_DEPENDENCIES) 
+libdev18f4680.a: $(libdev18f4680_a_OBJECTS) $(libdev18f4680_a_DEPENDENCIES)
 	-rm -f libdev18f4680.a
 	$(libdev18f4680_a_AR) libdev18f4680.a $(libdev18f4680_a_OBJECTS) $(libdev18f4680_a_LIBADD)
 	$(RANLIB) libdev18f4680.a
-libdev18f4682.a: $(libdev18f4682_a_OBJECTS) $(libdev18f4682_a_DEPENDENCIES) 
+libdev18f4682.a: $(libdev18f4682_a_OBJECTS) $(libdev18f4682_a_DEPENDENCIES)
 	-rm -f libdev18f4682.a
 	$(libdev18f4682_a_AR) libdev18f4682.a $(libdev18f4682_a_OBJECTS) $(libdev18f4682_a_LIBADD)
 	$(RANLIB) libdev18f4682.a
-libdev18f4685.a: $(libdev18f4685_a_OBJECTS) $(libdev18f4685_a_DEPENDENCIES) 
+libdev18f4685.a: $(libdev18f4685_a_OBJECTS) $(libdev18f4685_a_DEPENDENCIES)
 	-rm -f libdev18f4685.a
 	$(libdev18f4685_a_AR) libdev18f4685.a $(libdev18f4685_a_OBJECTS) $(libdev18f4685_a_LIBADD)
 	$(RANLIB) libdev18f4685.a
-libdev18f46j50.a: $(libdev18f46j50_a_OBJECTS) $(libdev18f46j50_a_DEPENDENCIES) 
+libdev18f46j50.a: $(libdev18f46j50_a_OBJECTS) $(libdev18f46j50_a_DEPENDENCIES)
 	-rm -f libdev18f46j50.a
 	$(libdev18f46j50_a_AR) libdev18f46j50.a $(libdev18f46j50_a_OBJECTS) $(libdev18f46j50_a_LIBADD)
 	$(RANLIB) libdev18f46j50.a
-libdev18f46k20.a: $(libdev18f46k20_a_OBJECTS) $(libdev18f46k20_a_DEPENDENCIES) 
+libdev18f46k20.a: $(libdev18f46k20_a_OBJECTS) $(libdev18f46k20_a_DEPENDENCIES)
 	-rm -f libdev18f46k20.a
 	$(libdev18f46k20_a_AR) libdev18f46k20.a $(libdev18f46k20_a_OBJECTS) $(libdev18f46k20_a_LIBADD)
 	$(RANLIB) libdev18f46k20.a
-libdev18f6520.a: $(libdev18f6520_a_OBJECTS) $(libdev18f6520_a_DEPENDENCIES) 
+libdev18f6520.a: $(libdev18f6520_a_OBJECTS) $(libdev18f6520_a_DEPENDENCIES)
 	-rm -f libdev18f6520.a
 	$(libdev18f6520_a_AR) libdev18f6520.a $(libdev18f6520_a_OBJECTS) $(libdev18f6520_a_LIBADD)
 	$(RANLIB) libdev18f6520.a
-libdev18f6527.a: $(libdev18f6527_a_OBJECTS) $(libdev18f6527_a_DEPENDENCIES) 
+libdev18f6527.a: $(libdev18f6527_a_OBJECTS) $(libdev18f6527_a_DEPENDENCIES)
 	-rm -f libdev18f6527.a
 	$(libdev18f6527_a_AR) libdev18f6527.a $(libdev18f6527_a_OBJECTS) $(libdev18f6527_a_LIBADD)
 	$(RANLIB) libdev18f6527.a
-libdev18f6585.a: $(libdev18f6585_a_OBJECTS) $(libdev18f6585_a_DEPENDENCIES) 
+libdev18f6585.a: $(libdev18f6585_a_OBJECTS) $(libdev18f6585_a_DEPENDENCIES)
 	-rm -f libdev18f6585.a
 	$(libdev18f6585_a_AR) libdev18f6585.a $(libdev18f6585_a_OBJECTS) $(libdev18f6585_a_LIBADD)
 	$(RANLIB) libdev18f6585.a
-libdev18f65j50.a: $(libdev18f65j50_a_OBJECTS) $(libdev18f65j50_a_DEPENDENCIES) 
+libdev18f65j50.a: $(libdev18f65j50_a_OBJECTS) $(libdev18f65j50_a_DEPENDENCIES)
 	-rm -f libdev18f65j50.a
 	$(libdev18f65j50_a_AR) libdev18f65j50.a $(libdev18f65j50_a_OBJECTS) $(libdev18f65j50_a_LIBADD)
 	$(RANLIB) libdev18f65j50.a
-libdev18f6620.a: $(libdev18f6620_a_OBJECTS) $(libdev18f6620_a_DEPENDENCIES) 
+libdev18f6620.a: $(libdev18f6620_a_OBJECTS) $(libdev18f6620_a_DEPENDENCIES)
 	-rm -f libdev18f6620.a
 	$(libdev18f6620_a_AR) libdev18f6620.a $(libdev18f6620_a_OBJECTS) $(libdev18f6620_a_LIBADD)
 	$(RANLIB) libdev18f6620.a
-libdev18f6622.a: $(libdev18f6622_a_OBJECTS) $(libdev18f6622_a_DEPENDENCIES) 
+libdev18f6622.a: $(libdev18f6622_a_OBJECTS) $(libdev18f6622_a_DEPENDENCIES)
 	-rm -f libdev18f6622.a
 	$(libdev18f6622_a_AR) libdev18f6622.a $(libdev18f6622_a_OBJECTS) $(libdev18f6622_a_LIBADD)
 	$(RANLIB) libdev18f6622.a
-libdev18f6627.a: $(libdev18f6627_a_OBJECTS) $(libdev18f6627_a_DEPENDENCIES) 
+libdev18f6627.a: $(libdev18f6627_a_OBJECTS) $(libdev18f6627_a_DEPENDENCIES)
 	-rm -f libdev18f6627.a
 	$(libdev18f6627_a_AR) libdev18f6627.a $(libdev18f6627_a_OBJECTS) $(libdev18f6627_a_LIBADD)
 	$(RANLIB) libdev18f6627.a
-libdev18f6680.a: $(libdev18f6680_a_OBJECTS) $(libdev18f6680_a_DEPENDENCIES) 
+libdev18f6680.a: $(libdev18f6680_a_OBJECTS) $(libdev18f6680_a_DEPENDENCIES)
 	-rm -f libdev18f6680.a
 	$(libdev18f6680_a_AR) libdev18f6680.a $(libdev18f6680_a_OBJECTS) $(libdev18f6680_a_LIBADD)
 	$(RANLIB) libdev18f6680.a
-libdev18f66j50.a: $(libdev18f66j50_a_OBJECTS) $(libdev18f66j50_a_DEPENDENCIES) 
+libdev18f66j50.a: $(libdev18f66j50_a_OBJECTS) $(libdev18f66j50_a_DEPENDENCIES)
 	-rm -f libdev18f66j50.a
 	$(libdev18f66j50_a_AR) libdev18f66j50.a $(libdev18f66j50_a_OBJECTS) $(libdev18f66j50_a_LIBADD)
 	$(RANLIB) libdev18f66j50.a
-libdev18f66j55.a: $(libdev18f66j55_a_OBJECTS) $(libdev18f66j55_a_DEPENDENCIES) 
+libdev18f66j55.a: $(libdev18f66j55_a_OBJECTS) $(libdev18f66j55_a_DEPENDENCIES)
 	-rm -f libdev18f66j55.a
 	$(libdev18f66j55_a_AR) libdev18f66j55.a $(libdev18f66j55_a_OBJECTS) $(libdev18f66j55_a_LIBADD)
 	$(RANLIB) libdev18f66j55.a
-libdev18f66j60.a: $(libdev18f66j60_a_OBJECTS) $(libdev18f66j60_a_DEPENDENCIES) 
+libdev18f66j60.a: $(libdev18f66j60_a_OBJECTS) $(libdev18f66j60_a_DEPENDENCIES)
 	-rm -f libdev18f66j60.a
 	$(libdev18f66j60_a_AR) libdev18f66j60.a $(libdev18f66j60_a_OBJECTS) $(libdev18f66j60_a_LIBADD)
 	$(RANLIB) libdev18f66j60.a
-libdev18f66j65.a: $(libdev18f66j65_a_OBJECTS) $(libdev18f66j65_a_DEPENDENCIES) 
+libdev18f66j65.a: $(libdev18f66j65_a_OBJECTS) $(libdev18f66j65_a_DEPENDENCIES)
 	-rm -f libdev18f66j65.a
 	$(libdev18f66j65_a_AR) libdev18f66j65.a $(libdev18f66j65_a_OBJECTS) $(libdev18f66j65_a_LIBADD)
 	$(RANLIB) libdev18f66j65.a
-libdev18f6720.a: $(libdev18f6720_a_OBJECTS) $(libdev18f6720_a_DEPENDENCIES) 
+libdev18f6720.a: $(libdev18f6720_a_OBJECTS) $(libdev18f6720_a_DEPENDENCIES)
 	-rm -f libdev18f6720.a
 	$(libdev18f6720_a_AR) libdev18f6720.a $(libdev18f6720_a_OBJECTS) $(libdev18f6720_a_LIBADD)
 	$(RANLIB) libdev18f6720.a
-libdev18f6722.a: $(libdev18f6722_a_OBJECTS) $(libdev18f6722_a_DEPENDENCIES) 
+libdev18f6722.a: $(libdev18f6722_a_OBJECTS) $(libdev18f6722_a_DEPENDENCIES)
 	-rm -f libdev18f6722.a
 	$(libdev18f6722_a_AR) libdev18f6722.a $(libdev18f6722_a_OBJECTS) $(libdev18f6722_a_LIBADD)
 	$(RANLIB) libdev18f6722.a
-libdev18f67j50.a: $(libdev18f67j50_a_OBJECTS) $(libdev18f67j50_a_DEPENDENCIES) 
+libdev18f67j50.a: $(libdev18f67j50_a_OBJECTS) $(libdev18f67j50_a_DEPENDENCIES)
 	-rm -f libdev18f67j50.a
 	$(libdev18f67j50_a_AR) libdev18f67j50.a $(libdev18f67j50_a_OBJECTS) $(libdev18f67j50_a_LIBADD)
 	$(RANLIB) libdev18f67j50.a
-libdev18f67j60.a: $(libdev18f67j60_a_OBJECTS) $(libdev18f67j60_a_DEPENDENCIES) 
+libdev18f67j60.a: $(libdev18f67j60_a_OBJECTS) $(libdev18f67j60_a_DEPENDENCIES)
 	-rm -f libdev18f67j60.a
 	$(libdev18f67j60_a_AR) libdev18f67j60.a $(libdev18f67j60_a_OBJECTS) $(libdev18f67j60_a_LIBADD)
 	$(RANLIB) libdev18f67j60.a
-libdev18f8520.a: $(libdev18f8520_a_OBJECTS) $(libdev18f8520_a_DEPENDENCIES) 
+libdev18f8520.a: $(libdev18f8520_a_OBJECTS) $(libdev18f8520_a_DEPENDENCIES)
 	-rm -f libdev18f8520.a
 	$(libdev18f8520_a_AR) libdev18f8520.a $(libdev18f8520_a_OBJECTS) $(libdev18f8520_a_LIBADD)
 	$(RANLIB) libdev18f8520.a
-libdev18f8527.a: $(libdev18f8527_a_OBJECTS) $(libdev18f8527_a_DEPENDENCIES) 
+libdev18f8527.a: $(libdev18f8527_a_OBJECTS) $(libdev18f8527_a_DEPENDENCIES)
 	-rm -f libdev18f8527.a
 	$(libdev18f8527_a_AR) libdev18f8527.a $(libdev18f8527_a_OBJECTS) $(libdev18f8527_a_LIBADD)
 	$(RANLIB) libdev18f8527.a
-libdev18f8585.a: $(libdev18f8585_a_OBJECTS) $(libdev18f8585_a_DEPENDENCIES) 
+libdev18f8585.a: $(libdev18f8585_a_OBJECTS) $(libdev18f8585_a_DEPENDENCIES)
 	-rm -f libdev18f8585.a
 	$(libdev18f8585_a_AR) libdev18f8585.a $(libdev18f8585_a_OBJECTS) $(libdev18f8585_a_LIBADD)
 	$(RANLIB) libdev18f8585.a
-libdev18f85j50.a: $(libdev18f85j50_a_OBJECTS) $(libdev18f85j50_a_DEPENDENCIES) 
+libdev18f85j50.a: $(libdev18f85j50_a_OBJECTS) $(libdev18f85j50_a_DEPENDENCIES)
 	-rm -f libdev18f85j50.a
 	$(libdev18f85j50_a_AR) libdev18f85j50.a $(libdev18f85j50_a_OBJECTS) $(libdev18f85j50_a_LIBADD)
 	$(RANLIB) libdev18f85j50.a
-libdev18f8620.a: $(libdev18f8620_a_OBJECTS) $(libdev18f8620_a_DEPENDENCIES) 
+libdev18f8620.a: $(libdev18f8620_a_OBJECTS) $(libdev18f8620_a_DEPENDENCIES)
 	-rm -f libdev18f8620.a
 	$(libdev18f8620_a_AR) libdev18f8620.a $(libdev18f8620_a_OBJECTS) $(libdev18f8620_a_LIBADD)
 	$(RANLIB) libdev18f8620.a
-libdev18f8622.a: $(libdev18f8622_a_OBJECTS) $(libdev18f8622_a_DEPENDENCIES) 
+libdev18f8622.a: $(libdev18f8622_a_OBJECTS) $(libdev18f8622_a_DEPENDENCIES)
 	-rm -f libdev18f8622.a
 	$(libdev18f8622_a_AR) libdev18f8622.a $(libdev18f8622_a_OBJECTS) $(libdev18f8622_a_LIBADD)
 	$(RANLIB) libdev18f8622.a
-libdev18f8627.a: $(libdev18f8627_a_OBJECTS) $(libdev18f8627_a_DEPENDENCIES) 
+libdev18f8627.a: $(libdev18f8627_a_OBJECTS) $(libdev18f8627_a_DEPENDENCIES)
 	-rm -f libdev18f8627.a
 	$(libdev18f8627_a_AR) libdev18f8627.a $(libdev18f8627_a_OBJECTS) $(libdev18f8627_a_LIBADD)
 	$(RANLIB) libdev18f8627.a
-libdev18f8680.a: $(libdev18f8680_a_OBJECTS) $(libdev18f8680_a_DEPENDENCIES) 
+libdev18f8680.a: $(libdev18f8680_a_OBJECTS) $(libdev18f8680_a_DEPENDENCIES)
 	-rm -f libdev18f8680.a
 	$(libdev18f8680_a_AR) libdev18f8680.a $(libdev18f8680_a_OBJECTS) $(libdev18f8680_a_LIBADD)
 	$(RANLIB) libdev18f8680.a
-libdev18f86j50.a: $(libdev18f86j50_a_OBJECTS) $(libdev18f86j50_a_DEPENDENCIES) 
+libdev18f86j50.a: $(libdev18f86j50_a_OBJECTS) $(libdev18f86j50_a_DEPENDENCIES)
 	-rm -f libdev18f86j50.a
 	$(libdev18f86j50_a_AR) libdev18f86j50.a $(libdev18f86j50_a_OBJECTS) $(libdev18f86j50_a_LIBADD)
 	$(RANLIB) libdev18f86j50.a
-libdev18f86j55.a: $(libdev18f86j55_a_OBJECTS) $(libdev18f86j55_a_DEPENDENCIES) 
+libdev18f86j55.a: $(libdev18f86j55_a_OBJECTS) $(libdev18f86j55_a_DEPENDENCIES)
 	-rm -f libdev18f86j55.a
 	$(libdev18f86j55_a_AR) libdev18f86j55.a $(libdev18f86j55_a_OBJECTS) $(libdev18f86j55_a_LIBADD)
 	$(RANLIB) libdev18f86j55.a
-libdev18f86j60.a: $(libdev18f86j60_a_OBJECTS) $(libdev18f86j60_a_DEPENDENCIES) 
+libdev18f86j60.a: $(libdev18f86j60_a_OBJECTS) $(libdev18f86j60_a_DEPENDENCIES)
 	-rm -f libdev18f86j60.a
 	$(libdev18f86j60_a_AR) libdev18f86j60.a $(libdev18f86j60_a_OBJECTS) $(libdev18f86j60_a_LIBADD)
 	$(RANLIB) libdev18f86j60.a
-libdev18f86j65.a: $(libdev18f86j65_a_OBJECTS) $(libdev18f86j65_a_DEPENDENCIES) 
+libdev18f86j65.a: $(libdev18f86j65_a_OBJECTS) $(libdev18f86j65_a_DEPENDENCIES)
 	-rm -f libdev18f86j65.a
 	$(libdev18f86j65_a_AR) libdev18f86j65.a $(libdev18f86j65_a_OBJECTS) $(libdev18f86j65_a_LIBADD)
 	$(RANLIB) libdev18f86j65.a
-libdev18f8720.a: $(libdev18f8720_a_OBJECTS) $(libdev18f8720_a_DEPENDENCIES) 
+libdev18f8720.a: $(libdev18f8720_a_OBJECTS) $(libdev18f8720_a_DEPENDENCIES)
 	-rm -f libdev18f8720.a
 	$(libdev18f8720_a_AR) libdev18f8720.a $(libdev18f8720_a_OBJECTS) $(libdev18f8720_a_LIBADD)
 	$(RANLIB) libdev18f8720.a
-libdev18f8722.a: $(libdev18f8722_a_OBJECTS) $(libdev18f8722_a_DEPENDENCIES) 
+libdev18f8722.a: $(libdev18f8722_a_OBJECTS) $(libdev18f8722_a_DEPENDENCIES)
 	-rm -f libdev18f8722.a
 	$(libdev18f8722_a_AR) libdev18f8722.a $(libdev18f8722_a_OBJECTS) $(libdev18f8722_a_LIBADD)
 	$(RANLIB) libdev18f8722.a
-libdev18f87j50.a: $(libdev18f87j50_a_OBJECTS) $(libdev18f87j50_a_DEPENDENCIES) 
+libdev18f87j50.a: $(libdev18f87j50_a_OBJECTS) $(libdev18f87j50_a_DEPENDENCIES)
 	-rm -f libdev18f87j50.a
 	$(libdev18f87j50_a_AR) libdev18f87j50.a $(libdev18f87j50_a_OBJECTS) $(libdev18f87j50_a_LIBADD)
 	$(RANLIB) libdev18f87j50.a
-libdev18f87j60.a: $(libdev18f87j60_a_OBJECTS) $(libdev18f87j60_a_DEPENDENCIES) 
+libdev18f87j60.a: $(libdev18f87j60_a_OBJECTS) $(libdev18f87j60_a_DEPENDENCIES)
 	-rm -f libdev18f87j60.a
 	$(libdev18f87j60_a_AR) libdev18f87j60.a $(libdev18f87j60_a_OBJECTS) $(libdev18f87j60_a_LIBADD)
 	$(RANLIB) libdev18f87j60.a
-libdev18f96j60.a: $(libdev18f96j60_a_OBJECTS) $(libdev18f96j60_a_DEPENDENCIES) 
+libdev18f96j60.a: $(libdev18f96j60_a_OBJECTS) $(libdev18f96j60_a_DEPENDENCIES)
 	-rm -f libdev18f96j60.a
 	$(libdev18f96j60_a_AR) libdev18f96j60.a $(libdev18f96j60_a_OBJECTS) $(libdev18f96j60_a_LIBADD)
 	$(RANLIB) libdev18f96j60.a
-libdev18f96j65.a: $(libdev18f96j65_a_OBJECTS) $(libdev18f96j65_a_DEPENDENCIES) 
+libdev18f96j65.a: $(libdev18f96j65_a_OBJECTS) $(libdev18f96j65_a_DEPENDENCIES)
 	-rm -f libdev18f96j65.a
 	$(libdev18f96j65_a_AR) libdev18f96j65.a $(libdev18f96j65_a_OBJECTS) $(libdev18f96j65_a_LIBADD)
 	$(RANLIB) libdev18f96j65.a
-libdev18f97j60.a: $(libdev18f97j60_a_OBJECTS) $(libdev18f97j60_a_DEPENDENCIES) 
+libdev18f97j60.a: $(libdev18f97j60_a_OBJECTS) $(libdev18f97j60_a_DEPENDENCIES)
 	-rm -f libdev18f97j60.a
 	$(libdev18f97j60_a_AR) libdev18f97j60.a $(libdev18f97j60_a_OBJECTS) $(libdev18f97j60_a_LIBADD)
 	$(RANLIB) libdev18f97j60.a

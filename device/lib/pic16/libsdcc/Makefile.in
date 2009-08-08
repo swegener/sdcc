@@ -218,7 +218,7 @@ libsdcc_a_SOURCES = char/divschar.c char/divuchar.c char/modschar.c \
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 --fommit-frame-pointer \
+	-I$(top_srcdir)/../../include/pic16 --fomit-frame-pointer \
 	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
 	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
@@ -284,7 +284,7 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-libsdcc.a: $(libsdcc_a_OBJECTS) $(libsdcc_a_DEPENDENCIES) 
+libsdcc.a: $(libsdcc_a_OBJECTS) $(libsdcc_a_DEPENDENCIES)
 	-rm -f libsdcc.a
 	$(libsdcc_a_AR) libsdcc.a $(libsdcc_a_OBJECTS) $(libsdcc_a_LIBADD)
 	$(RANLIB) libsdcc.a

@@ -16,10 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-/*
- * Extensions: P. Felber, M. Hope
- */
-
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
@@ -69,9 +65,7 @@ register int c;
 {
 	register char *p;
 
-#ifndef SDK
 	aserr++;
-#endif /* SDK */
 	p = eb;
 	while (p < ep)
 		if (*p++ == c)
@@ -111,6 +105,8 @@ register int c;
  *		none
  */
 
+extern int fatalErrors;
+
 VOID
 diag()
 {
@@ -118,7 +114,7 @@ diag()
 
 	if (eb != ep) {
 		p = eb;
-#ifndef SDK
+#if 0
 		fprintf(stderr, "?ASxxxx-Error-<");
 		while (p < ep) {
 			fprintf(stderr, "%c", *p++);
@@ -132,10 +128,10 @@ diag()
 			fprintf(stderr, " of %s\n", srcfn[cfile]);
 		}
 		p = eb;
-#endif /* SDK */
+#endif
 		while (p < ep) {
 			if ((errstr = geterr(*p++)) != NULL) {
-#ifdef SDK
+#if 1
 				/* Modified to conform to gcc error standard, M. Hope, 7 Feb 98. */
 				if (incfil >= 0) {
 					fprintf(stderr, "%s:", incfn[incfil]);
@@ -148,14 +144,54 @@ diag()
 				fprintf(stderr, " %s\n", errstr);
 #else
 				fprintf(stderr, "              %s\n", errstr);
-#endif /* SDK */
+#endif
 			}
 		}
-#ifdef SDK
 		aserr++;
-#endif /* SDK */
 	}
 }
+
+/*)Function	VOID	warnBanner()
+ *
+ *	The function warnBanner() prints a generic warning message
+ *	header (including the current source file/line) and positions
+ *	the output for a more specific warning message.
+ *
+ *	It is assumed that the call to warnBanner will be followed with
+ *	a fprintf to stderr (or equivalent) with the specific warning
+ *	text.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		int	cfile		current source file index
+ *		int	incfile		current include file index
+ *		char	incfn[]		array of include file names
+ *		int	incline[]	array of include line numbers
+ *		char	srcfn[]		array of source file names
+ *		int	srcline[]	array of source line numbers
+ *		FILE *	stderr		c_library
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		none
+ */
+VOID
+warnBanner(void)
+{
+	fprintf(stderr, "?ASxxxx-Warning in line ");
+	if (incfil >= 0) {
+		fprintf(stderr, "%d", incline[incfil]);
+		fprintf(stderr, " of %s\n", incfn[incfil]);
+	} else {
+		fprintf(stderr, "%d", srcline[cfile]);
+		fprintf(stderr, " of %s\n", srcfn[cfile]);
+	}
+	fprintf(stderr, "               ");
+}	
 
 /*)Functions:	VOID	aerr()
  *		VOID	qerr()

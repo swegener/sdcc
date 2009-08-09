@@ -1,8 +1,8 @@
 /*
   dbuf_string.h - Append formatted string to the dynamic buffer
-  version 1.2.0, February 10th, 2008
+  version 1.2.1, August 9th, 2000
 
-  Copyright (c) 2002-2008 Borut Razem
+  Copyright (c) 2002-2009 Borut Razem
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #define __DBUF_STRING_H
 
 #include <stdarg.h>
+#include <stdio.h>
 #include "dbuf.h"
 
 /* Attribute `nonnull' was valid as of gcc 3.3.  */

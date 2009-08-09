@@ -45,10 +45,10 @@ UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
 ASXXLIB = $(srcdir)/../asxxsrc
-ASXXLIBSRC = strcmpi.c assym.c aslex.c asnoice.c
+ASXXLIBSRC = strcmpi.c assubr.c assym.c aslex.c asnoice.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
-SRC = asmain.c assubr.c \
+SRC = asmain.c \
       asexpr.c asdata.c aslist.c asout.c \
       m08ext.c m08pst.c m08mch.c m08adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)

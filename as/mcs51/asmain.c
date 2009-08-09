@@ -218,7 +218,6 @@ search_path_fopen(const char *filename, const char *mode)
  *              REL, LST, and/or SYM files may be generated.
  */
 
-int fatalErrors=0;
 char relFile[128];
 
 int
@@ -401,9 +400,7 @@ main(int argc, char *argv[])
         if (lflag) {
                 lstsym(lfp);
         }
-        //printf ("aserr: %d\n", aserr);
-        //printf ("fatalErrors: %d\n", fatalErrors);
-        asexit(fatalErrors);
+	asexit(aserr);
         return 0; // hush the compiler
 }
 

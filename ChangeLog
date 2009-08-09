@@ -1,3 +1,20 @@
+2009-08-09 Borut Razem <borut.razem AT siol.net>
+
+	* aas/asxxsrc/assubr.c: moved and mergerd from as/mcs51/assubr.c
+	  as/hc08/assubr.c, as/mcs51/assubr.c, as/z80/assubr.c: deleted
+	  as/hc08/asmain.c, as/mcs51/asmain.c: removed variable fatalError
+	* as/hc08/Makefile.as_hc08, as/mcs51/Makefile.asx8051,
+	  as/hc08/Makefile.bcc, as/link/hc08/Makefile.bcc,
+	  as/link/mcs51/Makefile.bcc, as/mcs51/Makefile.bcc,
+	  as/z80/Makefile.bcc, device/examples/ds390/tinitalk/Makefile.bcc,
+	  Makefile.bcc, src/avr/Makefile.bcc, src/ds390/Makefile.bcc,
+	  src/hc08/Makefile.bcc, src/izt/Makefile.bcc, src/Makefile.bcc,
+	  src/mcs51/Makefile.bcc, src/pic16/Makefile.bcc, src/pic/Makefile.bcc,
+	  src/xa51/Makefile.bcc, src/z80/Makefile.bcc,
+	  support/cpp/Makefile.bcc, support/librarian/Makefile.bcc,
+	  support/packihx/Makefile.bcc: removed unmaintained makefiles
+	* support/Util/dbuf_string.h: include stdio.h
+
 2009-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/pic16/libc/Makefile.in,

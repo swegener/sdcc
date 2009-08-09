@@ -121,8 +121,7 @@ SOURCE=.\asout.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\assubr.c
-# ADD CPP /D "GAMEBOY"
+SOURCE=..\asxxsrc\assubr.c
 # End Source File
 # Begin Source File
 

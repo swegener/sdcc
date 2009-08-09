@@ -115,7 +115,7 @@ SOURCE=.\asout.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\assubr.c
+SOURCE=..\asxxsrc\assubr.c
 # End Source File
 # Begin Source File
 

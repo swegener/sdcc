@@ -1,8 +1,10 @@
 2009-08-09 Borut Razem <borut.razem AT siol.net>
 
-	* aas/asxxsrc/assubr.c: moved and mergerd from as/mcs51/assubr.c
+	* as/asxxsrc/assubr.c: moved and mergerd from as/mcs51/assubr.c
 	  as/hc08/assubr.c, as/mcs51/assubr.c, as/z80/assubr.c: deleted
 	  as/hc08/asmain.c, as/mcs51/asmain.c: removed variable fatalError
+	* as/z80/as_gbz80.dsp, as/hc08/as_hc08.dsp,
+	  as/z80/as_z80.dsp, as/mcs51/asx8051.dsp: assubr.c moved to as/asxxsrc
 	* as/hc08/Makefile.as_hc08, as/mcs51/Makefile.asx8051,
 	  as/hc08/Makefile.bcc, as/link/hc08/Makefile.bcc,
 	  as/link/mcs51/Makefile.bcc, as/mcs51/Makefile.bcc,
@@ -12,7 +14,8 @@
 	  src/mcs51/Makefile.bcc, src/pic16/Makefile.bcc, src/pic/Makefile.bcc,
 	  src/xa51/Makefile.bcc, src/z80/Makefile.bcc,
 	  support/cpp/Makefile.bcc, support/librarian/Makefile.bcc,
-	  support/packihx/Makefile.bcc: removed unmaintained makefiles
+	  support/packihx/Makefile.bcc: removed unmaintained makefiles,
+	  implemented RFE #2786753: Remove Borland C support
 	* support/Util/dbuf_string.h: include stdio.h
 
 2009-08-08 Maarten Brock <sourceforge.brock AT dse.nl>

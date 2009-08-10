@@ -12,7 +12,7 @@
 	  Makefile.bcc, src/avr/Makefile.bcc, src/ds390/Makefile.bcc,
 	  src/hc08/Makefile.bcc, src/izt/Makefile.bcc, src/Makefile.bcc,
 	  src/mcs51/Makefile.bcc, src/pic16/Makefile.bcc, src/pic/Makefile.bcc,
-	  src/xa51/Makefile.bcc, src/z80/Makefile.bcc,
+	  src/xa51/Makefile.bcc, src/z80/Makefile.bcc, Bcc.inc
 	  support/cpp/Makefile.bcc, support/librarian/Makefile.bcc,
 	  support/packihx/Makefile.bcc: removed unmaintained makefiles,
 	  implemented RFE #2786753: Remove Borland C support

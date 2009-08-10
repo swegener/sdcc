@@ -48,7 +48,7 @@ ASXXLIB = $(srcdir)/../asxxsrc
 ASXXLIBSRC = strcmpi.c assubr.c assym.c aslex.c asnoice.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
-SRC = asmain.c assubr.c \
+SRC = asmain.c \
       asexpr.c asdata.c aslist.c asout.c \
       i51ext.c i51pst.c i51mch.c i51adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)

@@ -1,3 +1,9 @@
+2009-08-10 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/assubr.c, as/hc08/asm.h, as/hc08/asmain.c,
+	  as/mcs51/asm.h, as/mcs51/asmain.c, as/z80/asm.h:
+	  increnemt aserr only on fatal errors
+
 2009-08-09 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/assubr.c: moved and mergerd from as/mcs51/assubr.c

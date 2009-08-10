@@ -344,6 +344,8 @@ struct  tsym
 
 extern  int     aserr;          /*      ASxxxx error counter
                                  */
+extern  int     asfatal;        /*      ASxxxx fatal error counter
+                                 */
 extern  jmp_buf jump_env;       /*      compiler dependent structure
                                  *      used by setjmp() and longjmp()
                                  */

@@ -65,7 +65,6 @@ register int c;
 {
 	register char *p;
 
-	aserr++;
 	p = eb;
 	while (p < ep)
 		if (*p++ == c)
@@ -104,8 +103,6 @@ register int c;
  *	side effects:
  *		none
  */
-
-extern int fatalErrors;
 
 VOID
 diag()
@@ -147,7 +144,7 @@ diag()
 #endif
 			}
 		}
-		aserr++;
+		++aserr;
 	}
 }
 

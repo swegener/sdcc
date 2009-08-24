@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <setjmp.h>
 #include <string.h>
 #include <ctype.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /* Return basic file name without path or extension.
    If spacesToUnderscores != 0 then spaces are converted to underscores */

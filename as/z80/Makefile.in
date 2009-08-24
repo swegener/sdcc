@@ -12,7 +12,7 @@ UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
 ASXXLIB = $(srcdir)/../asxxsrc
-ASXXLIBSRC = strcmpi.c assubr.c assym.c aslex.c asnoice.c
+ASXXLIBSRC = asdata.c aslex.c asnoice.c assubr.c assym.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
 SRC = asmain.c \
@@ -26,7 +26,7 @@ ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 BINS = $(BUILDDIR)/as$(EXT)$(EXEEXT)
 
-CFLAGS += $(CPPFLAGS) $(OPTS) -I. -I$(srcdir)/../../support/Util -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
+CFLAGS += $(CPPFLAGS) $(OPTS) -I. -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS += -funsigned-char
 
 LDFLAGS = @LDFLAGS@ -lm $(EXTRALIBS)

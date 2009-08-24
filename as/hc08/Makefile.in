@@ -34,7 +34,7 @@ EXEEXT          = @EXEEXT@
 VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir)
-CFLAGS          = @CFLAGS@ -Wall -I. -I$(srcdir) -I$(srcdir)/../../support/Util
+CFLAGS          = @CFLAGS@ -Wall -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
 M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@
 
@@ -45,7 +45,7 @@ UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
 ASXXLIB = $(srcdir)/../asxxsrc
-ASXXLIBSRC = strcmpi.c assubr.c assym.c aslex.c asnoice.c
+ASXXLIBSRC = asdata.c aslex.c asnoice.c assubr.c assym.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
 SRC = asmain.c \

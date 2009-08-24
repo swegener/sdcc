@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <setjmp.h>
 #include <string.h>
 #include <stdlib.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module       assym.c
  *

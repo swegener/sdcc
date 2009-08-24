@@ -1,3 +1,23 @@
+2009-08-24 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/asdata.c, as/asxxsrc/asxxxx.h, as/asxxsrc/aslex.c,
+	  as/asxxsrc/asnoice.c, as/asxxsrc/assubr.c, as/asxxsrc/assym.c,
+	  as/hc08/asexpr.c, as/hc08/aslist.c, as/hc08/asmain.c,
+	  as/hc08/asout.c, as/hc08/m08adr.c, as/hc08/m08ext.c,
+	  as/hc08/m08mch.c, as/hc08/m08pst.c, as/mcs51/asexpr.c,
+	  as/mcs51/aslist.c, as/mcs51/asmain.c, as/mcs51/asout.c,
+	  as/mcs51/i51adr.c, as/mcs51/i51ext.c, as/mcs51/i51mch.c,
+	  as/mcs51/i51pst.c, as/z80/asexpr.c, as/z80/aslist.c,
+	  as/z80/asmain.c, as/z80/asout.c, as/z80/z80adr.c,
+	  as/z80/z80ext.c, as/z80/z80mch.c, as/z80/z80pst.c:
+	  as/mcs51/asdata.c moved to as/asxxsrc/asdata.c,
+	  as/mcs51/asm.h moved to as/asxxsrc/asxxxx.h
+	  as/hc08/as_hc08.dsp, as/mcs51/asx8051.dsp, as/z80/as_gbz80.dsp,
+	  as/z80/as_z80.dsp,
+	  as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in,
+	* as/hc08/asdata.c, as/mcs51/asdata.c, as/z80/asdata.c,
+	  as/hc08/asm.h, as/mcs51/asm.h, as/z80/asm.h: removed
+
 2009-08-10 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/assubr.c, as/hc08/asm.h, as/hc08/asmain.c,
@@ -3966,18 +3986,18 @@
 	* as/link/mcs51/aslink.dsp,
 	* as/link/mcs51/Makefile.bcc,
 	* as/link/mcs51/Makefile.in: moved lkamof51.c and lkdata.c
-	* as/link/hc08/lkaomf51.c,      as/link/mcs51/lkaomf51.c,
+	* as/link/hc08/lkaomf51.c, as/link/mcs51/lkaomf51.c,
 	* as/link/lkaomf51.c: merged and moved
-	* as/link/hc08/lkdata.c,        as/link/mcs51/lkdata.c,
+	* as/link/hc08/lkdata.c, as/link/mcs51/lkdata.c,
 	* as/link/z80/lkdata.c,
 	* as/link/lkdata.c: merged and moved
 	* as/link/hc08/lkmain.c,
 	* as/link/mcs51/lkmain.c: cosmetic changes
-	* as/link/z80/lkeval.c,         as/link/lkeval.c: merged
+	* as/link/z80/lkeval.c, as/link/lkeval.c: merged
 	* as/link/lklex.c: use LKOBJEXT
-	* as/link/z80/lklist.c,         as/link/lklist.c: merged,
+	* as/link/z80/lklist.c, as/link/lklist.c: merged,
 	  ANSI-fied functions, removed bubble-sorts
-	* as/link/z80/lksym.c           as/link/lksym.c: merged,
+	* as/link/z80/lksym.c, as/link/lksym.c: merged,
 	  ANSI-fied functions
 	* as/link/z80/linkgbz80.dsp,
 	* as/link/z80/linkz80.dsp,

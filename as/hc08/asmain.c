@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <setjmp.h>
 #include <string.h>
 
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module       asmain.c
  *
@@ -966,7 +966,7 @@ loop:
                 } else {
                         ap = (struct area *) new (sizeof(struct area));
                         ap->a_ap = areap;
-                        strncpy(ap->a_id, id, NCPS);
+			ap->a_id = strsto(id);
                         ap->a_ref = areap->a_ref + 1;
                         ap->a_addr = 0;
                         ap->a_size = 0;
@@ -990,7 +990,7 @@ loop:
                                 ap = (struct area *) new (sizeof(struct area));
                                 *ap = *areap;
                                 ap->a_ap = areap;
-                                strncpy(ap->a_id, buf, NCPS);
+				ap->a_id = strsto(id);
                                 ap->a_ref = areap->a_ref + 1;
                                 ap->a_size = 0;
                                 ap->a_fuzz = 0;

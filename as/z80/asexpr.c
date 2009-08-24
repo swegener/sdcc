@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <setjmp.h>
 #include <string.h>
 
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module       asexpr.c
  *

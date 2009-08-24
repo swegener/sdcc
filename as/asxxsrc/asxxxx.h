@@ -1,4 +1,4 @@
-/* asm.h
+/* asxxxx.h
 
    Copyright (C) 1989-1995 Alan R. Baldwin
    721 Berkeley St., Kent, Ohio 44240
@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /*
+ * 10-Nov-07 borutr:
+ *           - change a_id from [NCPS] to pointer
  * 28-Oct-97 JLH:
- *           - add proto for StoreString
+ *           - add proto for strsto
  *           - change s_id from [NCPS] to pointer
  *           - change m_id from [NCPS] to pointer
  *           - change NCPS to 80
@@ -36,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *           - add DS80C390 flat mode support.
  */
 
-#define VERSION "V01.70 + NoICE + SDCC mods + Flat24 Feb-1999"
+#define VERSION "V01.75 + NoICE + SDCC mods + Flat24 Feb-1999"
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #include <unistd.h>
@@ -47,9 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 #define CASE_SENSITIVE  1
 
-/*)Module       asm.h
+/*)Module       asxxxx.h
  *
- *      The module asm.h contains the definitions for constants,
+ *      The module asxxxx.h contains the definitions for constants,
  *      structures, global variables, and ASxxxx functions
  *      contained in the ASxxxx.c files.  The two functions
  *      and three global variables from the machine dependent
@@ -118,19 +120,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define LFTERM  '('                     /* Left expression delimeter */
 #define RTTERM  ')'                     /* Right expression delimeter */
 
-#define NCPS    80                      /* Chars. per symbol (JLH: change from 8) */
+#define NCPS	80		        /* Characters per symbol */
 #define HUGE    1000                    /* A huge number */
 #define NERR    3                       /* Errors per line */
-#define NINPUT  1024                    /* Input buffer size (icodes need space) */
+#define NINPUT  1024                    /* Input buffer size */
 #define NCODE   128                     /* Listing code buffer size */
-#define NTITL   64                      /* Title buffer size */
-#define NSBTL   64                      /* SubTitle buffer size */
+#define NTITL   80                      /* Title buffer size */
+#define NSBTL   80                      /* SubTitle buffer size */
 #define NHASH   64                      /* Buckets in hash table */
 #define HMASK   077                     /* Hash mask */
 #define NLPP    60                      /* Lines per page */
 #define MAXFIL  6                       /* Maximum command line input files */
 #define MAXINC  6                       /* Maximum nesting of include files */
 #define MAXIF   10                      /* Maximum nesting of if/else/endif */
+#define FILSPC  256                     /* Chars. in filespec */
 
 #define NLIST   0                       /* No listing */
 #define SLIST   1                       /* Source only */
@@ -166,12 +169,14 @@ typedef unsigned int Addr_T;
 struct  area
 {
         struct  area *a_ap;             /* Area link */
-        char    a_id[NCPS];             /* Area Name */
+        char *  a_id;                   /* Area Name */
         int     a_ref;                  /* Ref. number */
-        Addr_T  a_addr;                 /* Area address */
         Addr_T  a_size;                 /* Area size */
         Addr_T  a_fuzz;                 /* Area fuzz */
         int     a_flag;                 /* Area flags */
+/* sdas specific */
+        Addr_T  a_addr;                 /* Area address */
+/* ebd sdas specific */
 };
 
 /*
@@ -193,11 +198,16 @@ struct  area
 #define A_NOPAG 0000                    /* Non-Paged */
 #define A_PAG   0020                    /* Paged */
 
+/* sdas specific */
 /* Additional flags for 8051 address spaces */
 #define A_DATA  0000                    /* data space (default)*/
 #define A_CODE  0040                    /* code space */
 #define A_XDATA 0100                    /* external data space */
 #define A_BIT   0200                    /* bit addressable space */
+
+#define A_NOLOAD  0400                  /* nonloadable */
+#define A_LOAD  0000                    /* loadable (default) */
+/* end sdas specific */
 
 /*
  *      The "R_" relocation constants define values used in
@@ -291,7 +301,7 @@ struct  area
 struct  mne
 {
         struct  mne *m_mp;              /* Hash link */
-        char    *m_id;                  /* Mnemonic JLH: change from [NCPS] */
+        char    *m_id;                  /* Mnemonic (JLH) */
         char    m_type;                 /* Mnemonic subtype */
         char    m_flag;                 /* Mnemonic flags */
         Addr_T  m_valu;                 /* Value */
@@ -314,20 +324,21 @@ struct  sym
 {
         struct  sym  *s_sp;             /* Hash link */
         struct  tsym *s_tsym;           /* Temporary symbol link */
-        char    *s_id;                  /* Symbol: JLH change from [NCPS] */
+        char    *s_id;                  /* Symbol (JLH) */
         char    s_type;                 /* Symbol subtype */
         char    s_flag;                 /* Symbol flags */
         struct  area *s_area;           /* Area line, 0 if absolute */
         int     s_ref;                  /* Ref. number */
         Addr_T  s_addr;                 /* Address */
+/* sdas specific */
         Addr_T  s_org;                  /* Start Address if absolute */
+/* end sdas specific */
 };
 
 #define S_GBL           01              /* Global */
 #define S_ASG           02              /* Assigned */
 #define S_MDF           04              /* Mult. def */
-#define S_END           010             /* End mark for pst. */
-#define S_BIT           020             /* address of bit in byte memory */
+#define	S_END		010	        /* End mark for ___pst files */
 
 #define S_NEW           0               /* New name */
 #define S_USER          1               /* User name */
@@ -357,8 +368,13 @@ struct  sym
 #define S_ORG           24              /* .org */
 #define S_MODUL         25              /* .module */
 #define S_ASCIS         26              /* .ascis */
+/* sdas specific */
 #define S_FLAT24        27              /* .flat24 */
-#define S_OPTSDCC       28              /* .optsdcc */
+#define S_FLOAT         28              /* .df */
+#define S_ULEB128       29              /* .uleb128 */
+#define S_SLEB128       30              /* .sleb128 */
+#define S_OPTSDCC       31              /* .optsdcc */
+/* end sdas specific */
 
 /*
  *      The tsym structure is a linked list of temporary
@@ -415,16 +431,16 @@ extern  int     iflvl[MAXIF+1];         /*      array of IF-ELSE-ENDIF flevel
                                          *      values indexed by tlevel
                                          */
 extern  char
-        afn[PATH_MAX];                  /*      afile() temporary filespec
+        afn[FILSPC];                    /*      afile() temporary filespec
                                          */
 extern  char
-        srcfn[MAXFIL][PATH_MAX];        /*      array of source file names
+        srcfn[MAXFIL][FILSPC];          /*      array of source file names
                                          */
 extern  int
         srcline[MAXFIL];                /*      current source file line
                                          */
 extern  char
-        incfn[MAXINC][PATH_MAX];        /*      array of include file names
+        incfn[MAXINC][FILSPC];          /*      array of include file names
                                          */
 extern  int
         incline[MAXINC];                /*      current include file line
@@ -645,10 +661,12 @@ extern  VOID            allglob();
 extern  VOID            aerr();
 extern  VOID            diag();
 extern  VOID            err();
-extern  VOID            warnBanner(void);
 extern  char *          geterr();
 extern  VOID            qerr();
 extern  VOID            rerr();
+/* sdas specific */
+extern  VOID            warnBanner(void);
+/* end sdas specific */
 
 /* asexpr.c */
 extern  VOID            abscheck();
@@ -670,7 +688,6 @@ extern  VOID            slew();
 /* asout.c */
 extern  int             hibyte();
 extern  int             lobyte();
-extern  int             byte3(int);
 extern  VOID            out();
 extern  VOID            outab();
 extern  VOID            outarea();
@@ -682,20 +699,24 @@ extern  VOID            outchk();
 extern  VOID            outgsd();
 extern  VOID            outrb();
 extern  VOID            outrw(struct expr *, int);
-extern  VOID            outr24(struct expr *, int);
+extern  VOID            outr11();       /* JLH */
 extern  VOID            outsym();
 extern  VOID            out_lb();
 extern  VOID            out_lw();
-extern  VOID            out_l24(int, int);
 extern  VOID            out_rw();
 extern  VOID            out_tw();
+/* sdas specific */
+extern  int             byte3(int);
+extern  VOID            outr24(struct expr *, int);
+extern  VOID            out_l24(int, int);
 extern  VOID            out_t24(int);
-extern  VOID            outr11();       /* JLH */
 extern  VOID            outr19(struct expr *, int, int);
+extern  VOID            outdp(struct area *, struct expr *);
 
 /* asnoice.c */
 extern void DefineNoICE_Line();
 extern void DefineCDB_Line();
+/* end sdas specific */
 
 /* Machine dependent variables */
 
@@ -709,6 +730,8 @@ extern  struct  mne     mne[];
 extern  VOID            minit();
 extern  VOID            machine(struct mne *);
 
+/* sdas specific */
 /* strcmpi.c */
 extern  int as_strcmpi(const char *s1, const char *s2);
 extern  int as_strncmpi(const char *s1, const char *s2, size_t n);
+/* end sdas specific */

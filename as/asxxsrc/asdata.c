@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module       asdata.c
  *
@@ -60,13 +60,13 @@ int     iflvl[MAXIF+1];         /*      array of IF-ELSE-ENDIF flevel
                                  *      values indexed by tlevel
                                  */
 
-char    afn[PATH_MAX];          /*      afile temporary file name
+char    afn[FILSPC];            /*      afile temporary file name
                                  */
-char    srcfn[MAXFIL][PATH_MAX];/*      array of source file names
+char    srcfn[MAXFIL][FILSPC];  /*      array of source file names
                                  */
 int     srcline[MAXFIL];        /*      source line number
                                  */
-char    incfn[MAXINC][PATH_MAX];/*      array of include file names
+char    incfn[MAXINC][FILSPC];  /*      array of include file names
                                  */
 int     incline[MAXINC];        /*      include line number
                                  */
@@ -140,11 +140,13 @@ char    tb[NTITL];              /*      Title string buffer
                                  */
 char    stb[NSBTL];             /*      Subtitle string buffer
                                  */
+/* sdas specific */
 char    optsdcc[NINPUT];        /*      sdcc compile options
                                  */
 int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
                                  *      flat mode (via .flat24 directive).
                                  */
+/* end sdas specific */
 
 char    symtbl[] = { "Symbol Table" };
 char    aretbl[] = { "Area Table" };
@@ -168,7 +170,7 @@ char    module[NCPS];           /*      module name string
  *      struct  mne
  *      {
  *              struct  mne *m_mp;      Hash link
- *              char    m_id[NCPS];     Mnemonic
+ *              char *  m_id;          Mnemonic (JLH)
  *              char    m_type;         Mnemonic subtype
  *              char    m_flag;         Mnemonic flags
  *              Addr_T  m_valu;         Value
@@ -199,10 +201,14 @@ struct  mne     *mnehash[NHASH];
  *              struct  area *s_area;   Area line, 0 if absolute
  *              int     s_ref;          Ref. number
  *              Addr_T  s_addr;         Address
+ * sdas specific
+ *              Addr_T  s_org;          Start Address if absolute
+ * end sdas specific
  *      };
  */
 struct  sym     sym[] = {
-    {NULL,      NULL,   ".",    S_USER, S_END,  NULL,   0,      0}
+    {NULL,      NULL,   ".",            S_USER, 0,                      NULL,   0,      0,      0},
+    {NULL,      NULL,   ".__.ABS.",     S_USER, S_ASG|S_GBL|S_END,      NULL,   0,      0,      0}
 };
 
 struct  sym     *symp;          /*      pointer to a symbol structure
@@ -228,7 +234,7 @@ struct  sym *symhash[NHASH];    /*      array of pointers to NHASH
  *      struct  area
  *      {
  *              struct  area *a_ap;     Area link
- *              char    a_id[NCPS];     Area Name
+ *              char *  a_id;           Area Name
  *              int     a_ref;          Reference number
  *              Addr_T  a_size;         Area size
  *              Addr_T  a_fuzz;         Area fuzz
@@ -269,7 +275,7 @@ unsigned char   ctype[128] = {
 /*@*/   ETC,    LTR16,  LTR16,  LTR16,  LTR16,  LTR16,  LTR16,  LETTER,
 /*H*/   LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER,
 /*P*/   LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER,
-/*X*/   LETTER, LETTER, LETTER, ETC,    ETC,    ETC,    BINOP,  LETTER,
+/*X*/   LETTER, LETTER, LETTER, BINOP,  ETC,    ETC,    BINOP,  LETTER,
 /*`*/   ETC,    LTR16,  LTR16,  LTR16,  LTR16,  LTR16,  LTR16,  LETTER,
 /*h*/   LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER,
 /*p*/   LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER,

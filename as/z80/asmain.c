@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <math.h>
 #undef HUGE
 #endif
-#include "asm.h"
+#include "asxxxx.h"
 #include "z80.h"
 
 /*)Module       asmain.c

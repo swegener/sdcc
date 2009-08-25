@@ -726,13 +726,7 @@ atable:
 			fprintf(fp, " %3u ", j);
 		}
 		ptr = &ap->a_id[0];
-		while (ptr < &ap->a_id[NCPS]) {
-			if ((c = *ptr++) != 0) {
-				putc(c, fp);
-			} else {
-				putc(' ', fp);
-			}
-		}
+                fprintf(fp, "%-40.40s", ptr );
 		j = ap->a_size;
 		k = ap->a_flag;
 		if (xflag==0) {

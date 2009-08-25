@@ -990,7 +990,7 @@ loop:
                                 ap = (struct area *) new (sizeof(struct area));
                                 *ap = *areap;
                                 ap->a_ap = areap;
-				ap->a_id = strsto(id);
+				ap->a_id = strsto(buf);
                                 ap->a_ref = areap->a_ref + 1;
                                 ap->a_size = 0;
                                 ap->a_fuzz = 0;

@@ -2,6 +2,9 @@
 
 	* as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in:
 	  removed duplicated asdata.c
+	* as/hc08/aslist.c, as/hc08/asmain.c, as/hc08/asout.c,
+	  as/mcs51/aslist.c, as/mcs51/asmain.c, as/mcs51/asout.c:
+	  fixed copy&paste problem in S_ORG
 
 2009-08-24 Borut Razem <borut.razem AT siol.net>
 
@@ -14,12 +17,12 @@
 	  as/mcs51/i51adr.c, as/mcs51/i51ext.c, as/mcs51/i51mch.c,
 	  as/mcs51/i51pst.c, as/z80/asexpr.c, as/z80/aslist.c,
 	  as/z80/asmain.c, as/z80/asout.c, as/z80/z80adr.c,
-	  as/z80/z80ext.c, as/z80/z80mch.c, as/z80/z80pst.c:
-	  as/mcs51/asdata.c moved to as/asxxsrc/asdata.c,
-	  as/mcs51/asm.h moved to as/asxxsrc/asxxxx.h
+	  as/z80/z80ext.c, as/z80/z80mch.c, as/z80/z80pst.c,
 	  as/hc08/as_hc08.dsp, as/mcs51/asx8051.dsp, as/z80/as_gbz80.dsp,
 	  as/z80/as_z80.dsp,
-	  as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in,
+	  as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in:
+	  as/mcs51/asdata.c moved to as/asxxsrc/asdata.c,
+	  as/mcs51/asm.h moved to as/asxxsrc/asxxxx.h
 	* as/hc08/asdata.c, as/mcs51/asdata.c, as/z80/asdata.c,
 	  as/hc08/asm.h, as/mcs51/asm.h, as/z80/asm.h: removed
 

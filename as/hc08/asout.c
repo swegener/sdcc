@@ -1004,10 +1004,7 @@ outarea(register struct area *ap)
 
 	fprintf(ofp, "A ");
 	ptr = &ap->a_id[0];
-	while (ptr < &ap->a_id[NCPS]) {
-		if ((c = *ptr++) != 0)
-			putc(c, ofp);
-	}
+        fprintf(ofp, "%s", ptr);
 	if (xflag == 0) {
 		fprintf(ofp, " size %X flags %X addr %X\n", ap->a_size, ap->a_flag, ap->a_addr);
 	} else

@@ -6,7 +6,9 @@
 	  as/mcs51/aslist.c, as/mcs51/asmain.c, as/mcs51/asout.c:
 	  fixed copy&paste problem in S_ORG
 	* as/asxxsrc/asmain.c, as/hc08/Makefile.in, as/mcs51/Makefile.in,
-	  as/z80/Makefile.in: as/mcs51/asmain.c moved to s/asxxsrc/asmain.c
+	  as/z80/Makefile.in,
+	* as/mcs51/asx8051.dsp, as/z80/as_z80.dsp, as/hc08/as_hc08.dsp,
+	  as/z80/as_gbz80.dsp: as/mcs51/asmain.c moved to s/asxxsrc/asmain.c
 	* as/hc08/asmain.c, as/z80/asmain.c: removed
 	* as/asxxsrc/asmain.c, as/asxxsrc/asdata.c, as/asxxsrc/asxxxx.h:
 	  added wflag and zflag

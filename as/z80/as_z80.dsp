@@ -104,7 +104,7 @@ SOURCE=.\aslist.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\asmain.c
+SOURCE=..\asxxsrc\asmain.c
 # End Source File
 # Begin Source File
 

@@ -1000,7 +1000,6 @@ VOID
 outarea(register struct area *ap)
 {
 	register char *ptr;
-	register int c;
 
 	fprintf(ofp, "A ");
 	ptr = &ap->a_id[0];

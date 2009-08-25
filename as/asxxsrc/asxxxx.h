@@ -476,6 +476,10 @@ extern  int     sflag;                  /*      -s, generate symbol table flag
                                          */
 extern  int     pflag;                  /*      -p, enable listing pagination
                                          */
+extern	int	wflag;                  /*	-w, enable wide format listing
+                                         */
+extern	int	zflag;                  /*	-z, enable symbol case sensitivity
+                                         */
 extern  int     xflag;                  /*      -x, listing radix flag
                                          */
 extern  int     fflag;                  /*      -f(f), relocations flagged flag
@@ -628,7 +632,7 @@ extern  char *          strncpy();
 extern  FILE *          afile();
 extern  VOID            asexit();
 extern  VOID            asmbl();
-extern  int             main();
+extern  VOID            main();
 extern  VOID            newdot();
 extern  VOID            phase();
 extern  VOID            usage();

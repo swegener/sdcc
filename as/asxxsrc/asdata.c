@@ -102,6 +102,10 @@ int     sflag;                  /*      -s, generate symbol table flag
                                  */
 int     pflag;                  /*      -p, enable listing pagination
                                  */
+int	wflag;                  /*      -w, enable wide listing format
+                                 */
+int	zflag;                  /*      -z, enable symbol case sensitivity
+                                 */
 int     xflag;                  /*      -x, listing radix flag
                                  */
 int     fflag;                  /*      -f(f), relocations flagged flag

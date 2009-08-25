@@ -26,8 +26,8 @@ ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 BINS = $(BUILDDIR)/as$(EXT)$(EXEEXT)
 
-CPPFLAGS += $(CPPFLAGS) $(OPTS) -I. -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
-CFLAGS += $(CFLAGS) $(OPTS) -Wall -I. -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
+CPPFLAGS += -I$(srcdir)/../asxxsrc
+CFLAGS += $(CPPFLAGS) $(OPTS) -I. -I$(srcdir)/../../support/Util -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS += -funsigned-char
 
 LDFLAGS = @LDFLAGS@ -lm $(EXTRALIBS)

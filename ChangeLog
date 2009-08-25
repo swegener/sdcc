@@ -5,6 +5,9 @@
 	* as/hc08/aslist.c, as/hc08/asmain.c, as/hc08/asout.c,
 	  as/mcs51/aslist.c, as/mcs51/asmain.c, as/mcs51/asout.c:
 	  fixed copy&paste problem in S_ORG
+	* as/asxxsrc/asmain.c, as/hc08/Makefile.in, as/mcs51/Makefile.in,
+	   as/z80/Makefile.in: as/mcs51/asmain.c moved to s/asxxsrc/asmain.c
+	* as/hc08/asmain.c, as/z80/asmain.c: removed
 
 2009-08-24 Borut Razem <borut.razem AT siol.net>
 

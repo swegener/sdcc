@@ -1,3 +1,8 @@
+2009-08-25 Borut Razem <borut.razem AT siol.net>
+
+	* as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in:
+	  removed duplicated asdata.c
+
 2009-08-24 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/asdata.c, as/asxxsrc/asxxxx.h, as/asxxsrc/aslex.c,

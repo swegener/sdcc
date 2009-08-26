@@ -121,7 +121,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define RTTERM  ')'                     /* Right expression delimeter */
 
 #define NCPS	80		        /* Characters per symbol */
-#define HUGE    1000                    /* A huge number */
+#define ASXXXX_HUGE 1000                /* A huge number */
 #define NERR    3                       /* Errors per line */
 #define NINPUT  1024                    /* Input buffer size */
 #define NCODE   128                     /* Listing code buffer size */

@@ -100,7 +100,7 @@ SOURCE=..\asxxsrc\aslex.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\aslist.c
+SOURCE=..\asxxsrc\aslist.c
 # End Source File
 # Begin Source File
 

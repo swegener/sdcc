@@ -235,10 +235,13 @@ char *argv[];
 	int c, i;
 	struct area *ap;
 
+/* sdas specific */
         /* sdas initialization */
         sdas_init(argv[0]);
+/* end sdas specific */
 
-	/*fprintf(stdout, "\n");*/
+        if (!is_sdas())
+                fprintf(stdout, "\n");
 	inpfil = -1;
 	pflag = 1;
 	for (i=1; i<argc; ++i) {
@@ -352,6 +355,15 @@ char *argv[];
 	}
 	if (inpfil < 0)
 		usage();
+/* sdas specific */
+        if (is_sdas()) {
+                /* TODO: this should be passed in commad line at asm invocation */
+                /* force wide listing format for symbol table */
+                wflag = 1;
+                /* force enable case sensitivity for symbols */
+                zflag = 1;
+        }
+/* end sdas specific */
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;
@@ -1407,6 +1419,8 @@ char *usetxt[] = {
 	0
 };
 
+/* sdas specific */
+/* TODO: do we really need different object file extension for z80 and gbz80? */
 char *usetxt_z80[] = {
 	"Usage: [-dqxjgaloscpwzf] [-I<dir>] file1 [file2 file3 ...]",
 	"  d    decimal listing",
@@ -1430,6 +1444,7 @@ char *usetxt_z80[] = {
 	"",
 	0
 };
+/* sdas specific */
 
 /*)Function	VOID	usage()
  *

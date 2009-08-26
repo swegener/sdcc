@@ -101,8 +101,7 @@ SOURCE=..\asxxsrc\aslex.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\aslist.c
-# ADD CPP /D "GAMEBOY"
+SOURCE=..\asxxsrc\aslist.c
 # End Source File
 # Begin Source File
 

@@ -1,25 +1,31 @@
-/* aslist.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* aslist.c */
 
 /*
- * 28-Oct-97 JLH: 
- *	     - lstsym: show s_id as string rather than array [NCPS]
- */
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *
+ *	John L. Hartman	(JLH)
+ *	jhartman at compuserve dot com
+*/
 
 #include <stdio.h>
 #include <setjmp.h>
@@ -83,9 +89,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 VOID
 list()
 {
-	register char *wp;
-	register int *wpt;
-	register int nb;
+	char *wp;
+	int *wpt;
+	int nb;
 
 	if (lfp == NULL || lmode == NLIST)
 		return;
@@ -126,7 +132,7 @@ list()
 		return;
 	}
 	if (lmode == ALIST) {
-		outchk(HUGE,HUGE);
+		outchk(ASXXXX_HUGE,ASXXXX_HUGE);
 	}
 
 	/*
@@ -286,10 +292,10 @@ list()
 
 VOID
 list1(wp, wpt, nb, f)
-register char *wp;
-register int *wpt, nb, f;
+char *wp;
+int *wpt, nb, f;
 {
-	register int i;
+	int i;
 
 	/*
 	 * HEX output Option.
@@ -400,9 +406,9 @@ register int *wpt, nb, f;
 
 VOID
 list2(t)
-register int t;
+int t;
 {
-	register int c;
+	int c;
 
 	c = ' ';
 
@@ -486,6 +492,7 @@ int flag;
 	}
 }
 
+/* sdas specific */
 /* Used for qsort call in lstsym */
 static int _cmpSym(const void *p1, const void *p2)
 {
@@ -493,6 +500,7 @@ static int _cmpSym(const void *p1, const void *p2)
     struct sym **s2 = (struct sym **)(p2);
     return strcmp((*s1)->s_id,(*s2)->s_id);
 }
+/* end sdas specific */
 
 /*)Function	VOID	lstsym(fp)
  *
@@ -523,6 +531,7 @@ static int _cmpSym(const void *p1, const void *p2)
  *					linked symbol lists
  *		char	symtbl[]	string "Symbol Table"
  *		FILE *	tfp		symbol table output file handle
+ *		int	wflag		-w, wide listing flag
  *		int	xflag		-x, listing radix flag
  *
  *	functions called:
@@ -540,8 +549,8 @@ VOID
 lstsym(fp)
 FILE *fp;
 {
-	register int i, j, k;
-	register char *ptr;
+	int c, i, j, k;
+	char *ptr;
 	int nmsym, narea;
 	struct sym *sp;
 	struct sym **p;
@@ -590,6 +599,7 @@ FILE *fp;
 		}
 	}
 
+/* sdas specific */
 #if 0
 	/* BUBBLE SORT?? WTF??? */
 	/*
@@ -612,6 +622,7 @@ FILE *fp;
 
 	qsort(p, nmsym, sizeof(struct sym *), _cmpSym);
 #endif	
+/* end sdas specific */
 
 	/*
 	 * Symbol Table Output
@@ -633,8 +644,11 @@ FILE *fp;
 			fprintf(fp, "    ");
 		}
 		ptr = &sp->s_id[0];
-		fprintf(fp, "%-60s", ptr );	/* JLH */
-
+		if (wflag) {
+			fprintf(fp, "%-60.60s", ptr );	/* JLH */
+		} else {
+			fprintf(fp, "%-8.8s", ptr);
+		}
 		if (sp->s_flag & S_ASG) {
 			putc('=', fp);
 		} else {
@@ -675,21 +689,21 @@ FILE *fp;
 			putc('X', fp);
 			++j;
 		}
-#if NCPS-8
-		putc('\n', fp);
-		slew(fp, 0);
-		++i;
-#else
-		if (++i % 3 == 0) {
-			putc('\n', fp);
-			slew(fp, pflag);
-		} else
-		if (i < nmsym) {
-			while (j++ < 4)
-				putc(' ', fp);
-			fprintf(fp, "| ");
+		if (wflag) {
+			putc('\n', fp);		/* JLH */
+			slew(fp, 0);
+			++i;
+		} else {
+			if (++i % 3 == 0) {
+				putc('\n', fp);
+				slew(fp, pflag);
+			} else
+			if (i < nmsym) {
+				while (j++ < 4)
+					putc(' ', fp);
+				fprintf(fp, "| ");
+			}
 		}
-#endif
 	}
 	putc('\n', fp);
 
@@ -726,7 +740,12 @@ atable:
 			fprintf(fp, " %3u ", j);
 		}
 		ptr = &ap->a_id[0];
-                fprintf(fp, "%-40.40s", ptr );
+		if (wflag) {
+			fprintf(fp, "%-40.40s", ptr );
+		} else {
+			fprintf(fp, "%-8.8s", ptr);
+		}
+
 		j = ap->a_size;
 		k = ap->a_flag;
 		if (xflag==0) {

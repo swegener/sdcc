@@ -9,6 +9,12 @@
 	  as/z80/as_z80.dsp: updated project files
 	* device/lib/z80/Makefile.in, device/lib/gbz80/Makefile.in:
 	  unified call convention, sync with device/lib/z80/Makefile.in
+	* as/asxxsrc/aslist.c: as/mcs51/aslist.c moved to as/asxxsrc/aslist.c
+	* as/asxxsrc/asxxxx.h, as/z80/asout.c, as/mcs51/asout.c,
+	  as/hc08/asout.c:
+	  HUGE changed to ASXXXX_HUGE due to redefinition in math.h
+	* as/asxxsrc/asmain.c: forced wflag and zflag
+	* as/z80/aslist.c, as/mcs51/aslist.c, as/hc08/aslist.c: removed
 
 2009-08-25 Borut Razem <borut.razem AT siol.net>
 

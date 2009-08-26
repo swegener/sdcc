@@ -465,7 +465,7 @@ outdp(struct area *carea, struct expr *esp)
         register int n, r;
 
         if (oflag && pass==2) {
-                outchk(HUGE,HUGE);
+                outchk(ASXXXX_HUGE,ASXXXX_HUGE);
                 out_tw(carea->a_ref);
                 out_tw(esp->e_addr);
                 if (esp->e_flag || esp->e_base.e_ap!=NULL) {

@@ -147,6 +147,10 @@ SOURCE=.\m08pst.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\asxxsrc\sdas.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\asxxsrc\strcmpi.c
 # End Source File
 # End Group
@@ -168,6 +172,14 @@ SOURCE=..\..\support\Util\dbuf_string.h
 # Begin Source File
 
 SOURCE=.\m6808.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\asxxsrc\sdas.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\sdcc_vc.h
 # End Source File
 # End Group
 # End Target

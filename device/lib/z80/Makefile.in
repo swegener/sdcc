@@ -67,7 +67,10 @@ endif
 	$(CC) $(CFLAGS) -c $<
 
 %.o: %.s
-	$(AS) $(ASFLAGS) $@ $<
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
 
 %.o: ../%.c
 	$(CC) $(CFLAGS) -c $<

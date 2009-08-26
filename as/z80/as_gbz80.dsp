@@ -135,6 +135,10 @@ SOURCE=..\..\support\Util\dbuf_string.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\asxxsrc\sdas.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\asxxsrc\strcmpi.c
 # End Source File
 # Begin Source File
@@ -163,10 +167,6 @@ SOURCE=.\z80pst.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\alloc.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\asxxsrc\asxxxx.h
 # End Source File
 # Begin Source File
@@ -179,7 +179,11 @@ SOURCE=..\..\support\Util\dbuf_string.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\string.h
+SOURCE=..\asxxsrc\sdas.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\sdcc_vc.h
 # End Source File
 # Begin Source File
 

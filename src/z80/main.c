@@ -702,8 +702,15 @@ oclsExpense (struct memmap *oclass)
     " {z80extraobj}"
 */
 
-#define ASMCMD \
-    "as-{port} -plosgff \"{objdstfilename}\" \"{dstfilename}{asmext}\""
+/* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
+static const char *_z80asmCmd[] =
+{
+  "as-z80", "$l", "$3", "\"$1.asm\"", NULL
+};
+static const char *_gbz80asmCmd[] =
+{
+  "as-gbz80", "$l", "$3", "\"$1.asm\"", NULL
+};
 
 /* Globals */
 PORT z80_port =
@@ -719,8 +726,8 @@ PORT z80_port =
     MODEL_SMALL
   },
   {                             /* Assembler */
+    _z80asmCmd,
     NULL,
-    ASMCMD,
     "-plosgffc",                /* Options with debug */
     "-plosgff",                 /* Options without debug */
     0,
@@ -844,9 +851,9 @@ PORT gbz80_port =
     MODEL_MEDIUM | MODEL_SMALL,
     MODEL_SMALL
   },
-  {
+  {                             /* Assembler */
+    _gbz80asmCmd,
     NULL,
-    ASMCMD,
     "-plosgffc",                /* Options with debug */
     "-plosgff",                 /* Options without debug */
     0,

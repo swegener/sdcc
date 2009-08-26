@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <setjmp.h>
 #include <string.h>
 #include <math.h>
+#include "sdas.h"
 #include "asxxxx.h"
 
 /*)Module       asmain.c
@@ -226,9 +227,6 @@ search_path_fopen(const char *filename, const char *mode)
 
 char relFile[128];
 
-static int is_sdas = 1; /* TODO: should be changed to 0 when adcc asxxxx renamed to sdas */
-static int is_z80 = 0;
-
 VOID
 main(argc, argv)
 char *argv[];
@@ -237,12 +235,8 @@ char *argv[];
 	int c, i;
 	struct area *ap;
 
-        /* check if sdas */
-        if (strncmp(argv[0], "sdas", 4) == 0)
-                is_sdas = 1;
-
-        if (strstr(argv[0], "z80") != NULL)
-                is_z80 = 1;
+        /* sdas initialization */
+        sdas_init(argv[0]);
 
 	/*fprintf(stdout, "\n");*/
 	inpfil = -1;
@@ -348,7 +342,7 @@ char *argv[];
 				if (lflag)
 					lfp = afile(p, "lst", 1);
 				if (oflag)
-					ofp = afile(p, is_sdas ? (is_z80 ? "" : "rel") : "REL", 1);
+					ofp = afile(p, (is_sdas() && is_sdas_target_z80_like()) ? "o" : "rel", 1);
                                         // save the file name if we have to delete it on error
                                         strcpy(relFile,afn);
 				if (sflag)
@@ -1463,8 +1457,8 @@ usage()
 {
 	register char   **dp;
 
-	fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas ? "sdas" : "ASxxxx", VERSION, cpu);
-	for (dp = is_z80 ? usetxt_z80 : usetxt; *dp; dp++)
+	fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
+	for (dp = (is_sdas() && is_sdas_target_z80_like()) ? usetxt_z80 : usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	asexit(1);
 }

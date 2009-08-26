@@ -1,4 +1,4 @@
-# libc/z80 Makefile
+# libc/gbz80 Makefile
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
@@ -39,27 +39,38 @@ OBJ = div.o mul.o putchar.o printf.o shift.o stubs.o crt0_rle.o heap.o fstubs.o
 LIB = gbz80.lib
 CC = $(SCC)
 AS = $(SAS)
+ASFLAGS = -plosgff
+
 CFLAGS = -I$(srcdir)/../../include -I. --std-c99
 
-all: $(PORTDIR)/$(LIB) crt0.o
+all: $(PORTDIR)/$(LIB) $(PORTDIR)/crt0.o
+
+$(PORTDIR)/crt0.o: crt0.o
+	cp crt0.o $(PORTDIR)/crt0.o
 
 $(PORTDIR)/$(LIB): $(OBJ) $(Z8OBJECTS) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
 	../../../bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else ifeq ($(LIB_TYPE), AR)
-	ar -Scq $@ $(OBJ)
+	ar -Scq $@ $(OBJ) $(Z8OBJECTS)
 else ifeq ($(LIB_TYPE), RANLIB)
 	ar -Scq $@ $(OBJ) $(Z8OBJECTS)
 	$(top_builddir)/bin/asranlib $@
 else
-	rm -f $@
+	rm -f $@; \
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
 endif
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
+
+%.o: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
 
 %.o: ../%.c
 	$(CC) $(CFLAGS) -c $<

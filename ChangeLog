@@ -1,3 +1,15 @@
+2009-08-26 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/sdas.c, as/asxxsrc/sdas.h: added
+	* as/asxxsrc/asmain.c: calls sdas
+	* src/z80/main.c: unified as-z80 and as-gbz80 call convention with
+	  other assemblers
+	* as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in, 
+	  as/hc08/as_hc08.dsp, as/mcs51/asx8051.dsp, as/z80/as_gbz80.dsp,
+	  as/z80/as_z80.dsp: updated project files
+	* device/lib/z80/Makefile.in, device/lib/gbz80/Makefile.in:
+	  unified call convention, sync with device/lib/z80/Makefile.in
+
 2009-08-25 Borut Razem <borut.razem AT siol.net>
 
 	* as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in:
@@ -12,6 +24,8 @@
 	* as/hc08/asmain.c, as/z80/asmain.c: removed
 	* as/asxxsrc/asmain.c, as/asxxsrc/asdata.c, as/asxxsrc/asxxxx.h:
 	  added wflag and zflag
+	* as/hc08/aslist.c, as/hc08/asout.c, as/mcs51/aslist.c,
+	  as/mcs51/asout.c: fixed compiler wrning about unused variables
 
 2009-08-24 Borut Razem <borut.razem AT siol.net>
 

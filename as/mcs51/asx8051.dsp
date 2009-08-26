@@ -148,6 +148,10 @@ SOURCE=.\i51pst.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\asxxsrc\sdas.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\asxxsrc\strcmpi.c
 # End Source File
 # End Group
@@ -169,6 +173,10 @@ SOURCE=..\..\support\Util\dbuf_string.h
 # Begin Source File
 
 SOURCE=.\i8051.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\asxxsrc\sdas.h
 # End Source File
 # Begin Source File
 

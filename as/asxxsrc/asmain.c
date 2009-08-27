@@ -235,10 +235,10 @@ char *argv[];
 	int c, i;
 	struct area *ap;
 
-/* sdas specific */
+        /* sdas specific */
         /* sdas initialization */
         sdas_init(argv[0]);
-/* end sdas specific */
+        /* end sdas specific */
 
         if (!is_sdas())
                 fprintf(stdout, "\n");
@@ -355,7 +355,7 @@ char *argv[];
 	}
 	if (inpfil < 0)
 		usage();
-/* sdas specific */
+        /* sdas specific */
         if (is_sdas()) {
                 /* TODO: this should be passed in commad line at asm invocation */
                 /* force wide listing format for symbol table */
@@ -363,7 +363,7 @@ char *argv[];
                 /* force enable case sensitivity for symbols */
                 zflag = 1;
         }
-/* end sdas specific */
+        /* end sdas specific */
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;
@@ -427,7 +427,7 @@ char *argv[];
 			err('i');
 	}
 	if (oflag)
-		outchk(HUGE, HUGE);  /* Flush */
+		outchk(ASXXXX_HUGE, ASXXXX_HUGE);  /* Flush */
 	if (sflag) {
 		lstsym(tfp);
 	} else
@@ -854,7 +854,7 @@ loop:
 		unget(c);
 		break;
 
-/* sdas z80 specific */
+        /* sdas z80 specific */
         case S_FLOAT:
                 do {
                         getid( readbuffer, ' ' ); /* Hack :) */
@@ -895,9 +895,9 @@ loop:
                 } while ((c = getnb()) == ',');
                 unget(c);
                 break;
-/* end sdas z80 specific */
+        /* end sdas z80 specific */
 
-/* sdas hc08 specific */
+        /* sdas hc08 specific */
         case S_ULEB128:
         case S_SLEB128:
                 do {
@@ -928,7 +928,7 @@ loop:
                 } while ((c = getnb()) == ',');
                 unget(c);
                 break;
-/* end sdas hc08 specific */
+        /* end sdas hc08 specific */
 
         case S_ASCII:
 	case S_ASCIZ:
@@ -957,7 +957,7 @@ loop:
 	case S_BLK:
 		clrexpr(&e1);
 		expr(&e1, 0);
-		outchk(HUGE,HUGE);
+		outchk(ASXXXX_HUGE,ASXXXX_HUGE);
 		dot.s_addr += e1.e_addr*mp->m_valu;
 		lmode = BLIST;
 		break;
@@ -1258,8 +1258,8 @@ char *fn;
 char *ft;
 int wf;
 {
-        register char *p2, *p3;
-        register int c;
+        char *p2, *p3;
+        int c;
         FILE *fp;
 
         p2 = afn;
@@ -1325,9 +1325,9 @@ int wf;
 
 VOID
 newdot(nap)
-register struct area *nap;
+struct area *nap;
 {
-        register struct area *oap;
+        struct area *oap;
 
         oap = dot.s_area;
         /* fprintf (stderr, "%s dot.s_area->a_size: %d dot.s_addr: %d\n",
@@ -1470,10 +1470,12 @@ char *usetxt_z80[] = {
 VOID
 usage()
 {
-	register char   **dp;
+	char **dp;
 
+        /* sdas specific */
 	fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
 	for (dp = (is_sdas() && is_sdas_target_z80_like()) ? usetxt_z80 : usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
+        /* end sdas specific */
 	asexit(1);
 }

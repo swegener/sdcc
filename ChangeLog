@@ -1,3 +1,12 @@
+2009-08-27 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/asmain.c:
+	  HUGE changed to ASXXXX_HUGE due to redefinition in math.h
+	* support/regression/ports/gbz80/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/z80/spec.mk:
+	  unified as-z80 and as-gbz80 call convention with other assemblers
+
 2009-08-26 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/sdas.c, as/asxxsrc/sdas.h: added

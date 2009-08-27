@@ -32,7 +32,10 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
-	$(AS_Z80) -plosgff $@ $<
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< $(PORT_CASES_DIR)
+	$(AS_Z80) -plosgff $(PORT_CASES_DIR)/$(notdir $<)
+	test $(srcdir) = . || rm $(PORT_CASES_DIR)/$(notdir $<)
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

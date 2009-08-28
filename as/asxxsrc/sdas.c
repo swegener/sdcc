@@ -64,7 +64,7 @@ sdas_init (char *path)
   } tgt[] = {
     { "gbz80", TARGET_IS_GBZ80, },  /* must be before z80! */
     { "z80",   TARGET_IS_Z80, },
-    { "mcs51", TARGET_IS_MCS51, },
+    { "x8051", TARGET_IS_MCS51, },
     { "hc08",  TARGET_IS_HC08, },
   };
   int i;
@@ -106,4 +106,12 @@ is_sdas_target_z80_like(void)
 {
   check_init();
   return target == TARGET_IS_Z80 || target == TARGET_IS_GBZ80;
+}
+
+
+int
+is_sdas_target_mcs51_like(void)
+{
+  check_init();
+  return target == TARGET_IS_MCS51;
 }

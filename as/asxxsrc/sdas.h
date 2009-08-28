@@ -30,5 +30,6 @@ void sdas_init (char *path);
 int is_sdas(void);
 enum sdas_target_e get_sdas_target(void);
 int is_sdas_target_z80_like(void);
+int is_sdas_target_mcs51_like(void);
 
 #endif  /* __SDCA_H */

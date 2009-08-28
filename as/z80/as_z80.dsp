@@ -112,7 +112,7 @@ SOURCE=..\asxxsrc\asnoice.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\asout.c
+SOURCE=..\asxxsrc\asout.c
 # End Source File
 # Begin Source File
 

@@ -549,7 +549,7 @@ VOID
 lstsym(fp)
 FILE *fp;
 {
-	int c, i, j, k;
+	int i, j, k;
 	char *ptr;
 	int nmsym, narea;
 	struct sym *sp;

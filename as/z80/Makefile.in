@@ -12,11 +12,10 @@ UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
 ASXXLIB = $(srcdir)/../asxxsrc
-ASXXLIBSRC = asdata.c aslex.c aslist.c asmain.c asnoice.c asout.c assubr.c assym.c sdas.c strcmpi.c
+ASXXLIBSRC = asdata.c asexpr.c aslex.c aslist.c asmain.c asnoice.c asout.c assubr.c assym.c sdas.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
-SRC = asexpr.c \
-      z80ext.c z80pst.c z80mch.c z80adr.c
+SRC = z80ext.c z80pst.c z80mch.c z80adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
 ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#include "sdas.h"
 #include "asxxxx.h"
 
 /*)Module       asexpr.c
@@ -225,20 +226,23 @@ expr(register struct expr *esp, int n)
                             esp->e_addr >>= re.e_addr;
                             break;
                         case '[':
-                            /* MB added [ for bit access in bdata */
-                            abscheck(&re);
-                            if (getnb() != ']')
-                                qerr();
+                                if (is_sdas() && is_sdas_target_mcs51_like()) {
+                                        /* MB added [ for bit access in bdata */
+                                        abscheck(&re);
+                                        if (getnb() != ']')
+                                                qerr();
 
-                            /* if the left is a relative address then */
-                            if (esp->e_base.e_ap) {
-                                esp->e_addr |= (re.e_addr | 0x80) << 8;
-                                break;
-                            }
-                            else if ((esp->e_addr & 0x87) == 0x80) {
-                                esp->e_addr |= re.e_addr;
-                                break;
-                            }
+                                        /* if the left is a relative address then */
+                                        if (esp->e_base.e_ap) {
+                                                esp->e_addr |= (re.e_addr | 0x80) << 8;
+                                                break;
+                                        }
+                                        else if ((esp->e_addr & 0x87) == 0x80) {
+                                                esp->e_addr |= re.e_addr;
+                                                break;
+                                        }
+                                }
+                                /* fall through */
 
                        default:
                            qerr();
@@ -335,8 +339,9 @@ term(register struct expr *esp)
         char id[NCPS];
         struct sym  *sp;
         struct tsym *tp;
-        int r=0, v;
+        int r, v;
 
+        r = radix;
         c = getnb();
         /*
          * Discard the unary '+' at this point and
@@ -357,7 +362,7 @@ term(register struct expr *esp)
         if (c == '-') {
                 expr(esp, 100);
                 abscheck(esp);
-                esp->e_addr = 0-esp->e_addr;
+                esp->e_addr = 0 - esp->e_addr;
                 return;
         }
         if (c == '~') {
@@ -409,7 +414,7 @@ term(register struct expr *esp)
         if (ctype[c] & DIGIT) {
                 esp->e_mode = S_USER;
                 jp = ip;
-                while (ctype[(int)*jp] & RAD10) {
+                while (ctype[*jp & 0x007F] & RAD10) {
                         jp++;
                 }
                 if (*jp == '$') {
@@ -430,7 +435,6 @@ term(register struct expr *esp)
                         err('u');
                         return;
                 }
-                r = radix;
                 if (c == '0') {
                         c = get();
                         switch (c) {
@@ -522,7 +526,7 @@ term(register struct expr *esp)
                                 esp->e_base.e_sp = sp;
                                 return;
                         }
-                        /* err('u'); */
+                        err('u');
                 } else {
                         esp->e_mode = sp->s_type;
                         esp->e_addr = sp->s_addr;
@@ -685,8 +689,6 @@ is_abs (register struct expr *esp)
 int
 oprio(register int c)
 {
-        if (c == '[')
-                return (12);
         if (c == '*' || c == '/' || c == '%')
                 return (10);
         if (c == '+' || c == '-')
@@ -699,6 +701,8 @@ oprio(register int c)
                 return (3);
         if (c == '|')
                 return (1);
+        if (is_sdas() && is_sdas_target_mcs51_like() && c == '[')
+                return (12);
         return (0);
 }
 

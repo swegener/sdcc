@@ -1,3 +1,20 @@
+2009-08-28 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/asout.c: as/mcs51/asout.c moved to as/asxxsrc/asout.c
+	* as/mcs51/asout.c, as/hc08/asout.c, as/z80/asout.c: removed
+	* as/asxxsrc/sdas.c, as/asxxsrc/sdas.h:
+	  added function is_sdas_target_mcs51_like()
+	* as/z80/as_gbz80.dsp, as/hc08/as_hc08.dsp, as/z80/as_z80.dsp,
+	  as/mcs51/asx8051.dsp, as/hc08/Makefile.in, as/mcs51/Makefile.in,
+	  as/z80/Makefile.in: updated project files
+	* as/asxxsrc/asexpr.c: as/mcs51/asexpr.c moved to as/asxxsrc/asexpr.c
+	* as/mcs51/asexpr.c, as/hc08/asexpr.c, as/z80/asexpr.c: removed
+	* as/z80/as_gbz80.dsp, as/hc08/as_hc08.dsp, as/z80/as_z80.dsp,
+	  as/mcs51/asx8051.dsp, as/hc08/Makefile.in, as/mcs51/Makefile.in,
+	  as/z80/Makefile.in: updated project files
+	* support/regression/ports/z80/spec.mk:
+	  unified as-z80 and as-gbz80 call convention with other assemblers
+
 2009-08-27 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/asmain.c:
@@ -6,13 +23,6 @@
 	  support/regression/ports/ucz80/spec.mk,
 	  support/regression/ports/z80/spec.mk:
 	  unified as-z80 and as-gbz80 call convention with other assemblers
-	* as/asxxsrc/asout.c: as/mcs51/asout.c moved to as/asxxsrc/asout.c
-	* as/mcs51/asout.c, as/hc08/asout.c, as/z80/asout.c: removed
-	* as/asxxsrc/sdas.c, as/asxxsrc/sdas.h:
-	  added function is_sdas_target_mcs51_like()
-	* as/z80/as_gbz80.dsp, as/hc08/as_hc08.dsp, as/z80/as_z80.dsp,
-	  as/mcs51/asx8051.dsp, as/hc08/Makefile.in, as/mcs51/Makefile.in,
-	  as/z80/Makefile.in: updated project files
 
 2009-08-26 Borut Razem <borut.razem AT siol.net>
 

@@ -92,8 +92,7 @@ SOURCE=..\asxxsrc\asdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\asexpr.c
-# ADD CPP /D "GAMEBOY"
+SOURCE=..\asxxsrc\asexpr.c
 # End Source File
 # Begin Source File
 

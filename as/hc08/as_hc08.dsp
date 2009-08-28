@@ -91,7 +91,7 @@ SOURCE=..\asxxsrc\asdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\asexpr.c
+SOURCE=..\asxxsrc\asexpr.c
 # End Source File
 # Begin Source File
 

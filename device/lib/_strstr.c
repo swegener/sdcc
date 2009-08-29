@@ -24,13 +24,13 @@
 #include "string.h" 
 
 char * strstr (
-	char * str1,
-	char * str2
+	const char * str1,
+	const char * str2
 	) 
 {
-	char * cp = str1;
-	char * s1;
-	char * s2;
+	const char * cp = str1;
+	const char * s1;
+	const char * s2;
 
 	if ( !*str2 )
 	    return str1;
@@ -44,7 +44,7 @@ char * strstr (
 			s1++, s2++;
 
 		if (!*s2)
-			return(cp);
+			return( (char*)cp );
 
 		cp++;
 	}

@@ -6,7 +6,7 @@
 static void 
 teststrstr(void)
 {
-  char *a = "aabbcd";
+  const char *a = "aabbcd";
   ASSERT( strstr(a, "\0\1") == a);
   ASSERT( strstr(a, "") == a);
   ASSERT( strstr(a, "ab") == &a[1]);

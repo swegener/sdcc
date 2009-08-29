@@ -34,20 +34,6 @@
 
 #include <sdcc-lib.h>
 
-#ifdef SDCC_STACK_AUTO
-
-extern char  iscntrl   (unsigned char ) _REENTRANT ;
-extern char  isdigit   (unsigned char ) _REENTRANT ;
-extern char  isgraph   (unsigned char ) _REENTRANT ;
-extern char  islower   (unsigned char ) _REENTRANT ;
-extern char  isupper   (unsigned char ) _REENTRANT ;
-extern char  isprint   (unsigned char ) _REENTRANT ;
-extern char  ispunct   (unsigned char ) _REENTRANT ;
-extern char  isspace   (unsigned char ) _REENTRANT ;
-extern char  isxdigit  (unsigned char ) _REENTRANT ;
-
-#else
-
 extern char  iscntrl   (unsigned char )  ;
 extern char  isdigit   (unsigned char )  ;
 extern char  isgraph   (unsigned char )  ;
@@ -57,8 +43,6 @@ extern char  isprint   (unsigned char )  ;
 extern char  ispunct   (unsigned char )  ;
 extern char  isspace   (unsigned char )  ;
 extern char  isxdigit  (unsigned char )  ;
-
-#endif
 
 #define isalnum(c)   (isalpha(c) || isdigit(c))
 #define isalpha(c)   (isupper(c) || islower(c))
@@ -70,8 +54,8 @@ extern char  isxdigit  (unsigned char )  ;
 
 /* The _tolower & _toupper functions below can applied to any
    alpha characters regardless of the case (upper or lower) */
-#define _tolower(c)  ((c) | ('a' - 'A'))
-#define _toupper(c)  ((c) & ~('a' - 'A'))
+#define _tolower(c)  (char)(((c) |  (char)('a' - 'A')))
+#define _toupper(c)  (char)(((c) & ~(char)('a' - 'A')))
 
 #define tolower(c)  ((isupper(c)) ? _tolower(c) : (c))
 #define toupper(c)  ((islower(c)) ? _toupper(c) : (c))

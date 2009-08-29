@@ -24,8 +24,8 @@
 #include "string.h"
 
 int strncmp (
-	char * first,
-	char * last,
+	const char * first,
+	const char * last,
 	size_t count
 	) 
 {

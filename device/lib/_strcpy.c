@@ -28,11 +28,11 @@
 
 char * strcpy (
 	char * d, 
-	char * s) 
+	const char * s) 
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
     register char * to = d;
-    register char * from = s;
+    register const char * from = s;
 
     while (*to++ = *from++) ;
 

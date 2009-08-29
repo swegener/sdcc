@@ -224,7 +224,7 @@ testFloat(void)
 
         result = testpoint[i].f(testpoint[i].arg);
 
-        rel_error = testpoint[i].result ? result/testpoint[i].result - 1.0 : 0.0;
+        rel_error = testpoint[i].result ? result/testpoint[i].result - 1.0 : result;
 
         DEBUG(printf ("Test No: %d f(%f) = %f should: %f rel_error: %f %s\n",
                       i, testpoint[i].arg, result, testpoint[i].result, rel_error,

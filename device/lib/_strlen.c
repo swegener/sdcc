@@ -26,7 +26,7 @@
 #if (!defined (SDCC_mcs51))
 
   /* Generic routine first */
-  int strlen ( char * str )
+  int strlen ( const char * str )
   {
     register int i = 0 ;
 
@@ -39,7 +39,7 @@
 #else
 
   /* Assembler version for mcs51 */
-  int strlen ( char * str ) __naked
+  int strlen ( const char * str ) __naked
   {
     str;     /* hush the compiler */
 

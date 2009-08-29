@@ -24,11 +24,11 @@
 #include "string.h"
 
 char * strrchr (
-	char * string,
+	const char * string,
 	char ch
 	) 
 {
-	char * start = string;
+	const char * start = string;
 
 	while (*string++)                       /* find end of string */
 		;

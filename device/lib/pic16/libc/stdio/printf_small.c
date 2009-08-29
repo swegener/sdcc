@@ -63,7 +63,7 @@ void
 printf_small (const char *fmt, ...)
   __reentrant
 {
-  char *ch;
+  const char *ch;
   char radix;
   char flong;
   char fstr;

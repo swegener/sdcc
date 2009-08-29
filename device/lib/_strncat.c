@@ -25,7 +25,7 @@
 
 char * strncat (
 	char * front,
-	char * back,
+	const char * back,
 	size_t count
 	) 
 {

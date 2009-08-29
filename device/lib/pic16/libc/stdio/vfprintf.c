@@ -173,7 +173,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
   unsigned char fieldwidth;
   unsigned char lalign;
   char padchar;
-  char *str1;
+  const char *str1;
 #endif
 #ifdef PRECISION
   unsigned char precision;
@@ -183,7 +183,8 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
   char positivechar;
 #endif
   int count = 0;
-  char *str, *ch;
+  const char *ch;
+  char *str;
   long val;
   char buffer[BUF_SIZE];
   char *stringbuffer;
@@ -368,7 +369,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
             }
           else if (ffloat)
             {
-              str = "<NO FLOAT>";
+              str = (char*)"<NO FLOAT>";
               va_arg (ap, float);
 #ifdef PRECISION
               precision = -1;

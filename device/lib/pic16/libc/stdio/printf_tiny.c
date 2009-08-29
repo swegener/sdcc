@@ -95,7 +95,7 @@ printf_tiny (const char *fmt, ...)
   char fchar, nosign;
   char upcase;
 
-  char *str, *ch;
+  const char *str, *ch;
   __data char *str1;
   long val;
   char buffer[BUF_SIZE];
@@ -158,7 +158,7 @@ printf_tiny (const char *fmt, ...)
 
           if (ISSTR)
             {
-              str = va_arg (ap, char *);
+              str = va_arg (ap, const char *);
               while (*str)
                 {
                   putchar (*str);

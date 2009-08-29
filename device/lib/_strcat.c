@@ -25,7 +25,7 @@
 
 char * strcat (
         char * dst,
-        char * src
+        const char * src
         )
 {
         char * cp = dst;

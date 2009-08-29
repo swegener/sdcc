@@ -23,5 +23,4 @@ teststrtok(void)
   ASSERT( token == NULL);
   token = strtok(NULL, "a");
   ASSERT( token == NULL);
-
 }

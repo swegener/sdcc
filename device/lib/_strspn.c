@@ -24,8 +24,8 @@
 #include "string.h" 
 
 int strspn (
-	char * string,
-	char * control
+	const char * string,
+	const char * control
 	) 
 {
 	register int count = 0;

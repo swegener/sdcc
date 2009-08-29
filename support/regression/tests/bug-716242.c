@@ -4,7 +4,7 @@
  */
 #include <testfwk.h>
 
-void *p;
+const void *p;
 int ret;
 
 int mul2 (int i)

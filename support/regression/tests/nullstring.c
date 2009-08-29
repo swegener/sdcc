@@ -32,8 +32,8 @@ testStringArray (void)
 void
 testStringConst(void)
 {
-  char * constStr1 = "";
-  char * constStr2 = "a\0b\0c";
+  const char * constStr1 = "";
+  const char * constStr2 = "a\0b\0c";
 
   ASSERT (constStr1[0] == 0);
   ASSERT (constStr2[5] == 0);

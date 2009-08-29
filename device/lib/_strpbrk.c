@@ -24,8 +24,8 @@
 #include <string.h>
 
 char * strpbrk ( 
-	char * string ,
-	char * control
+	const char * string ,
+	const char * control
 		       ) 
 {
 	register char ch ;

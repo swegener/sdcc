@@ -1,3 +1,35 @@
+2009-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/ctype.h: removed _REENTRANT as they are already with
+	  --stack-auto, optimized _tolower and _toupper with char casts
+	* device/include/string.h,
+	* device/lib/_strcat.c,
+	* device/lib/_strchr.c,
+	* device/lib/_strcmp.c,
+	* device/lib/_strcpy.c,
+	* device/lib/_strcspn.c,
+	* device/lib/_strlen.c,
+	* device/lib/_strncat.c,
+	* device/lib/_strncmp.c,
+	* device/lib/_strncpy.c,
+	* device/lib/_strpbrk.c,
+	* device/lib/_strrchr.c,
+	* device/lib/_strspn.c,
+	* device/lib/_strstr.c,
+	* device/lib/_strtok.c,
+	* device/lib/pic16/libc/stdio/printf_small.c,
+	* device/lib/pic16/libc/stdio/printf_tiny.c,
+	* device/lib/pic16/libc/stdio/vfprintf.c,
+	* device/lib/printf_large.c,
+	* device/lib/time.c: added required const keywords to pointers
+	* device/lib/pic16/debug/Makefile.in: changed ommitFramePtr to omitFramePtr
+	* support/regression/tests/bug-716242.c,
+	* support/regression/tests/nullstring.c,
+	* support/regression/tests/strstr.c,
+	* support/regression/tests/strtok.c: added const and set svn-properties
+	* support/regression/tests/bug1908493.c: added cast
+	* support/regression/tests/float_single.c: fixed check for result=0.0
+
 2009-08-28 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/asout.c: as/mcs51/asout.c moved to as/asxxsrc/asout.c
@@ -30,7 +62,7 @@
 	* as/asxxsrc/asmain.c: calls sdas
 	* src/z80/main.c: unified as-z80 and as-gbz80 call convention with
 	  other assemblers
-	* as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in, 
+	* as/hc08/Makefile.in, as/mcs51/Makefile.in, as/z80/Makefile.in,
 	  as/hc08/as_hc08.dsp, as/mcs51/asx8051.dsp, as/z80/as_gbz80.dsp,
 	  as/z80/as_z80.dsp: updated project files
 	* device/lib/z80/Makefile.in, device/lib/gbz80/Makefile.in:

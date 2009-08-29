@@ -27,16 +27,16 @@
 #if !_SDCC_PORT_PROVIDES_STRCMP
 
 int strcmp (
-	char * asrc,
-	char * adst
+	const char * asrc,
+	const char * adst
 	)
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
 #pragma noinduction
 
 	char ret = 0 ;
-        char * src = asrc;
-        char * dst = adst;
+        const char * src = asrc;
+        const char * dst = adst;
 
 	while( ! (*src - *dst) && *dst)
 		++src, ++dst;
@@ -53,4 +53,3 @@ int strcmp (
 }
 
 #endif
-

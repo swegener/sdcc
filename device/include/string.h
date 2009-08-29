@@ -35,24 +35,24 @@
   typedef unsigned int size_t;
 #endif
 
-extern char *strcpy (char *, char *)  ;
-extern char *strncpy(char *, char *, size_t )  ;
-extern char *strcat (char *, char *)  ;
-extern char *strncat(char *, char *, size_t )  ;
-extern int   strcmp (char *, char *)  ;
-extern int   strncmp(char *, char *, size_t )  ;
-extern char *strchr (char *, char  )  ;
-extern char *strrchr(char *, char  )  ;
-extern int   strspn (char *, char *)  ;
-extern int   strcspn(char *, char *)  ;
-extern char *strpbrk(char *, char *)  ;
-extern char *strstr (char *, char *)  ;
-extern int   strlen (char *  )  ;
-extern char *strtok (char *, char *)  ;
-extern void *memcpy (void *, void *, size_t )  ;
-extern int   memcmp (void *, void *, size_t )  ;
+extern char *strcpy (char *, const char *)  ;
+extern char *strncpy(char *, const char *, size_t )  ;
+extern char *strcat (char *, const char *)  ;
+extern char *strncat(char *, const char *, size_t )  ;
+extern int   strcmp (const char *, const char *)  ;
+extern int   strncmp(const char *, const char *, size_t )  ;
+extern char *strchr (const char *, char  )  ;
+extern char *strrchr(const char *, char  )  ;
+extern int   strspn (const char *, const char *)  ;
+extern int   strcspn(const char *, const char *)  ;
+extern char *strpbrk(const char *, const char *)  ;
+extern char *strstr (const char *, const char *)  ;
+extern int   strlen (const char *  )  ;
+extern char *strtok (char *, const char *)  ;
+extern void *memcpy (void *, const void *, size_t )  ;
+extern int   memcmp (const void *, const void *, size_t )  ;
 extern void *memset (void *, unsigned char  , size_t )  ;
-extern void *memmove (void *, void *, size_t )  ;
+extern void *memmove (void *, const void *, size_t )  ;
 
 #ifdef SDCC_ds390
 extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;

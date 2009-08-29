@@ -24,7 +24,7 @@
 #include "string.h"
 
 char * strchr (
-	char * string,
+	const char * string,
 	char ch
 	)
 {

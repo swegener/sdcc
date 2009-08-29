@@ -52,8 +52,8 @@
 
 /****************************************************************************/
 
-//typedef char * ptr_t;
-#define ptr_t char *
+//typedef const char * ptr_t;
+#define ptr_t const char *
 
 #ifdef toupper
 #undef toupper
@@ -80,7 +80,7 @@ typedef union
   long           l;
   unsigned long  ul;
   float          f;
-  char           *ptr;
+  const char     *ptr;
 } value_t;
 
 #ifndef SDCC_STACK_AUTO

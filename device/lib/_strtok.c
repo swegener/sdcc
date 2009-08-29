@@ -30,7 +30,7 @@
 
 char * strtok (
 	char * str,
-	char * control ) 
+	const char * control ) 
 {
 	static  char * s;
 	register char * s1;
@@ -64,4 +64,3 @@ char * strtok (
 	else
 		return NULL;
 }  
-

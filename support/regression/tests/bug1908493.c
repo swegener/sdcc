@@ -117,7 +117,7 @@ void QHsm_dispatch(QHsm *me) Q_REENTRANT
 void
 testBug (void)
 {
-    AO_derived.super.state = state_2;
+    AO_derived.super.state = (QHsmState)state_2;
     AO_derived.super.evt.sig = 2;
 
     QHsm_dispatch((QHsm *)&AO_derived);

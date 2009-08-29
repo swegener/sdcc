@@ -1413,7 +1413,8 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
         return aop->aopu.aop_reg[offset]->name;
 
     case AOP_CRY:
-      emitcode ("mov", "c,%s", aop->aopu.aop_dir);
+      if (!IS_OP_RUONLY (oper))
+        emitcode ("mov", "c,%s", aop->aopu.aop_dir);
       emitcode ("clr", "a");
       emitcode ("rlc", "a");
       return (dname ? "acc" : "a");
@@ -10052,7 +10053,7 @@ genNearPointerGet (operand * left,
     ifxCond = genUnpackBits (result, rname, POINTER, ifx);
   else
     {
-      /* we have can just get the values */
+      /* we can just get the values */
       int size = AOP_SIZE (result);
       int offset = 0;
 
@@ -10060,7 +10061,6 @@ genNearPointerGet (operand * left,
         {
           if (ifx || IS_AOP_PREG (result) || AOP_TYPE (result) == AOP_STK)
             {
-
               emitcode ("mov", "a,@%s", rname);
               if (!ifx)
                 aopPut (result, "a", offset);
@@ -10483,7 +10483,6 @@ genPointerGet (iCode * ic, iCode *pi, iCode *ifx)
      the pointer values */
   switch (p_type)
     {
-
     case POINTER:
     case IPOINTER:
       genNearPointerGet (left, result, ic, pi, ifx);

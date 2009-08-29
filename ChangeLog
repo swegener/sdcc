@@ -1,5 +1,11 @@
 2009-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/mcs51/gen.c (aopGet): applied patch 2837100 to fix bug 2805333
+	* support/regression/tests/bug2805333.c: new, added,
+	  thanks Ruud van Silfhout
+
+2009-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/include/ctype.h: removed _REENTRANT as they are already with
 	  --stack-auto, optimized _tolower and _toupper with char casts
 	* device/include/string.h,

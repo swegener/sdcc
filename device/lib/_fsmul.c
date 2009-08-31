@@ -253,16 +253,17 @@ float __fsmul (float a1, float a2) {
   result += ((fl1.l & (unsigned long) 0xFF) * (fl2.l >> 8)) >> 8;
   result += ((fl2.l & (unsigned long) 0xFF) * (fl1.l >> 8)) >> 8;
 
+  /* round, phase 1 */
+  result += 0x40;
+
   if (result & SIGNBIT)
     {
-      /* round */
-      result += 0x80;
+      /* round, phase 2 */
+      result += 0x40;
       result >>= 8;
     }
   else
     {
-      /* round */
-      result += 0x40;
       result >>= 7;
       exp--;
     }

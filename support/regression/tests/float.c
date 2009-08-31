@@ -124,8 +124,17 @@ testFloatMath(void)
   DEBUG(printf ("%d tests, %d errors\n", tests, errors));
 }
 
+void
+testFloatMulRound(void)
+{
+    right = 2.0 / 10.61;
+    result = 10.61 * right;
+    compare(result, 2.0);
+}
+
 #ifndef REENTRANT
 void main(void) {
   testFloatMath();
+  testFloatMulRound();
 }
 #endif

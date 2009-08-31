@@ -632,7 +632,7 @@ extern  char *          strncpy();
 extern  FILE *          afile();
 extern  VOID            asexit();
 extern  VOID            asmbl();
-extern  VOID            main();
+extern  int             main();
 extern  VOID            newdot();
 extern  VOID            phase();
 extern  VOID            usage();

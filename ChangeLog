@@ -1,3 +1,10 @@
+2009-08-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/asxxsrc/asmain.c,
+	* as/asxxsrc/asxxxx.h: fixed warning, main should return int
+	* as/hc08/Makefile.in,
+	* as/mcs51/Makefile.in: added -lm to LDFLAGS
+
 2009-08-31 Raphael Neider <rneider AT web.de>
 
 	* device/lib/_fsmul.c, device/lib/pic/libsdcc/fsmul.c,

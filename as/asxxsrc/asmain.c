@@ -111,7 +111,7 @@ search_path_fopen(const char *filename, const char *mode)
 }
 /* end sdas specific */
 
-/*)Function	VOID	main(argc, argv)
+/*)Function	int	main(argc, argv)
  *
  *		int	argc		argument count
  *		char *	argv		array of pointers to argument strings
@@ -227,9 +227,8 @@ search_path_fopen(const char *filename, const char *mode)
 
 char relFile[128];
 
-VOID
-main(argc, argv)
-char *argv[];
+int
+main(int argc, char *argv[])
 {
 	char *p;
 	int c, i;
@@ -435,6 +434,7 @@ char *argv[];
 		lstsym(lfp);
 	}
 	asexit(aserr);
+	return aserr;
 }
 
 /*)Function	VOID	asexit(i)

@@ -36,7 +36,7 @@ VPATH           = @srcdir@
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
 CFLAGS          = @CFLAGS@ -Wall -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
 M_OR_MM         = @M_OR_MM@
-LDFLAGS         = @LDFLAGS@
+LDFLAGS         = @LDFLAGS@ -lm
 
 OBJDIR = obj
 

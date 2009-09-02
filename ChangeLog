@@ -1,3 +1,10 @@
+2009-09-02 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/gbz80/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/z80/spec.mk: fixed *z80 regression test if
+	  built ran directly from sdcc source directory
+
 2009-08-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/asxxsrc/asmain.c,

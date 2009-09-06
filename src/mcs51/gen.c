@@ -966,7 +966,6 @@ aopOp (operand * op, iCode * ic, bool result)
      b) has a spill location */
   if (sym->isspilt || sym->nRegs == 0)
     {
-
       /* rematerialize it NOW */
       if (sym->remat)
         {
@@ -1403,7 +1402,6 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
                     "%s",
                     aop->aopu.aop_dir);
         }
-
       return Safe_strdup(buffer);
 
     case AOP_REG:
@@ -1434,7 +1432,6 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
         return "acc";
 
       return aop->aopu.aop_str[offset];
-
     }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -4549,8 +4546,7 @@ genPlus (iCode * ic)
       swappedLR = TRUE;
     }
 
-  /* if both left & right are in bit
-     space */
+  /* if both left & right are in bit space */
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY &&
       AOP_TYPE (IC_RIGHT (ic)) == AOP_CRY)
     {
@@ -6735,6 +6731,11 @@ genAnd (iCode * ic, iCode * ifx)
                 {
                   emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
                 }
+              else if (IS_OP_ACCUSE (right))
+                {
+                  emitcode ("rrc", "a");
+                  emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
               else
                 {
                   emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
@@ -7164,6 +7165,11 @@ genOr (iCode * ic, iCode * ifx)
                 {
                   emitcode ("orl", "c,%s", AOP (right)->aopu.aop_dir);
                 }
+              else if (IS_OP_ACCUSE (right))
+                {
+                  emitcode ("rrc", "a");
+                  emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
               else
                 {
                   emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
@@ -7219,8 +7225,8 @@ genOr (iCode * ic, iCode * ifx)
         {
           // lit = 0, result = boolean(left)
           if (size)
-            emitcode ("setb", "c");
-          toBoolean (right);
+            SETC;
+          toBoolean (left);
           if (size)
             {
               symbol *tlbl = newiTempLabel (NULL);
@@ -11044,17 +11050,17 @@ genPointerSet (iCode * ic, iCode *pi)
 
   /* special case when cast remat */
   if (p_type == GPOINTER && OP_SYMBOL(result)->remat &&
-      IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode)) {
-          result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
-          type = operandType (result);
-          p_type = DCL_TYPE (type);
-  }
+      IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode))
+    {
+      result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
+      type = operandType (result);
+      p_type = DCL_TYPE (type);
+    }
 
   /* now that we have the pointer type we assign
      the pointer values */
   switch (p_type)
     {
-
     case POINTER:
     case IPOINTER:
       genNearPointerSet (right, result, ic, pi);
@@ -11940,7 +11946,6 @@ gen51Code (iCode * lic)
     spname = "_spx";
   else
     spname = "sp";
-
 
   for (ic = lic; ic; ic = ic->next)
     {

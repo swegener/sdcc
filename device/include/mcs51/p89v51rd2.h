@@ -151,11 +151,11 @@ __sfr __at (0x86) SPDR;		//SPI Data
 __sfr __at (0x86) SPDAT;	//SPI Data (This name appears also in the datasheet). 
 
 __sfr __at (0xC0) WDTC;		//Watchdog Timer Control (Reset value 0x00). 
-	#define WDOUT 0x10 		//Watchdog output enable.
-	#define WDRE  0x08		//Watchdog timer reset enable.
-	#define WDTS  0x04		//Watchdog timer reset flag.
-	#define WDT   0x02		//Watchdog timer refresh.
-	#define SWDT  0x01		//Start watchdog timer.
+	__sbit __at (0xC4) WDOUT;//Watchdog output enable.
+	__sbit __at (0xC3) WDRE; //Watchdog timer reset enable.
+	__sbit __at (0xC2) WDTS; //Watchdog timer reset flag.
+	__sbit __at (0xC1) WDT;  //Watchdog timer refresh.
+	__sbit __at (0xC0) SWDT; //Start watchdog timer.
 
 __sfr __at (0x85) WDTD;		//Watchdog Timer Data/Reload. 
 

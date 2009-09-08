@@ -1,3 +1,8 @@
+2009-09-08 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/p89v51rd2.h: Watchdog Timer Control sfr is
+	  bit addressable. 
+
 2009-08-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genAnd, genOr): applied patch for bug 2719592,

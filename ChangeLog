@@ -1,3 +1,8 @@
+2009-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89Sx051.h: new, added, applied patch 2858106,
+	  thanks Ben Boeckel
+
 2009-09-08 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/p89v51rd2.h: Watchdog Timer Control sfr is

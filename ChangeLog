@@ -1,4 +1,13 @@
 2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
+	* device/include/string.h,
+	  device/lib/_strspn.c,
+	  device/lib/incl.mk,
+	  device/lib/_memchr.c,
+	  device/lib/_strcspn.c,
+	  device/lib/_memcmp.c:
+	  Minor string library improvements, including #772292.
+
+2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
 	* sdcc/src/SDCCmain.c:
 	  Fixed #2819835 applying #2853488.
 

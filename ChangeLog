@@ -1,4 +1,8 @@
 2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
+	* sdcc/src/SDCCmain.c:
+	  Fixed #2819835 applying #2853488.
+
+2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
 	* sdcc/debugger/mcs51/sdcdb.c,
 	  sdcc/src/SDCCerr.c,
 	  sdcc/src/z80/gen.c,

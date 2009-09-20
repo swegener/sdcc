@@ -1853,29 +1853,43 @@ linkEdit (char **envp)
   if (fullDstFileName)
     {
       char *p, *q;
-      /* the linked file gets the name of the first modul */
-      if (fullSrcFileName)
+
+      if (TARGET_Z80_LIKE)
         {
+          /* link-z80 named the output using dstFileName 
+          (specified in linker script) with extension .ihx or .s19 */
           strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
           p = strlen (scratchFileName) + scratchFileName;
+          strncatz (scratchFileName, options.out_fmt ? ".s19" : ".ihx", sizeof(scratchFileName));
         }
-      else
+      else 
         {
-          s = peekSet(relFilesSet);
-
-          assert(s);
-
-          strncpyz (scratchFileName, s, sizeof(scratchFileName));
-          /* strip ".rel" extension */
-          p = strrchr (scratchFileName, '.');
-          if (p)
+          /* For the non-z80 linkers,                         */
+          /* the linked file gets the name of the first modul */
+          if (fullSrcFileName)
             {
-              *p = 0;
+              strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
+              p = strlen (scratchFileName) + scratchFileName;
             }
-        }
-      strncatz (scratchFileName,
-        options.out_fmt ? ".S19" : ".ihx",
-        sizeof(scratchFileName));
+          else
+            {
+              s = peekSet(relFilesSet);
+
+              assert(s);
+
+              strncpyz (scratchFileName, s, sizeof(scratchFileName));
+              /* strip ".rel" extension */
+              p = strrchr (scratchFileName, '.');
+             if (p)
+               {
+                 *p = 0;
+               }
+            }
+          strncatz (scratchFileName,
+            options.out_fmt ? ".S19" : ".ihx",
+            sizeof(scratchFileName));
+          }
+
       if (FILENAME_CMP (fullDstFileName, scratchFileName))
         remove (fullDstFileName);
       rename (scratchFileName, fullDstFileName);

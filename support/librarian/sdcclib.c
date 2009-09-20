@@ -197,13 +197,13 @@ void ProcLineOptions (int argc, char **argv)
                         RelName = (char **) calloc (1, sizeof (char *));
                         if(RelName==NULL)
                         {
-                            printf("ERROR: Insuficient memory.\n");
+                            printf("ERROR: Insufficient memory.\n");
                             exit(2);
                         }
                         RelName[0]=(char *)malloc(PATH_MAX);
                         if(RelName[0]==NULL)
                         {
-                            printf("ERROR: Insuficient memory.\n");
+                            printf("ERROR: Insufficient memory.\n");
                             exit(2);
                         }
                         strcpy(RelName[0], argv[j]);
@@ -216,13 +216,13 @@ void ProcLineOptions (int argc, char **argv)
                     RelName = (char **) realloc (RelName, NumRelFiles * sizeof (char *));
                     if(RelName==NULL)
                     {
-                        printf("ERROR: Insuficient memory.\n");
+                        printf("ERROR: Insufficient memory.\n");
                         exit(2);
                     }
                     RelName[NumRelFiles-1]=(char *)malloc(PATH_MAX);
                     if(RelName[NumRelFiles-1]==NULL)
                     {
-                        printf("ERROR: Insuficient memory.\n");
+                        printf("ERROR: Insufficient memory.\n");
                         exit(2);
                     }
                     strcpy(RelName[NumRelFiles-1], argv[j]);

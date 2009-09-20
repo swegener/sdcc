@@ -8116,7 +8116,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
   }
 
   fprintf(stderr, "SDCC pic16 port error: the port currently does not support *reading*\n");
-  fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
+  fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailing out...\n");
   exit(EXIT_FAILURE);
 
   return ;
@@ -8643,7 +8643,7 @@ static void genPackBits (sym_link    *etype , operand *result,
 
 #if 0
   fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
-  fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
+  fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailing out...\n");
   exit(EXIT_FAILURE);
 #endif
 

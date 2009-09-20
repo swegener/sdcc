@@ -2409,7 +2409,7 @@ _gbz80_emitAddSubLongLong (iCode *ic, asmop *left, asmop *right, bool isAdd)
   const char *first = isAdd ? "add" : "sub";
   const char *later = isAdd ? "adc" : "sbc";
 
-  wassertl (IS_GB, "Code is only relevent to the gbz80");
+  wassertl (IS_GB, "Code is only relevant to the gbz80");
   wassertl (AOP( IC_RESULT (ic))->size == 4, "Only works for four bytes");
 
   fetchPair (PAIR_DE, left);

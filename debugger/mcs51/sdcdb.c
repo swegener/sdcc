@@ -145,7 +145,7 @@ struct cmdtab
       "display [/<fmt>] [<variable>]\t print value of given variable each time the program stops\n"
     },
     { "undisplay"  ,  cmdUnDisplay   , completionCmdUnDisplay,
-      "undisplay [<variable>]\t dont display this variable or all\n"
+      "undisplay [<variable>]\t don't display this variable or all\n"
     },
     { "down"     ,  cmdDown      , NULL,
       "down\t\tSelect and print stack frame called by this one.\nAn argument says how many frames down to go.\n"
@@ -235,7 +235,7 @@ struct cmdtab
     { "h"        ,  cmdHelp       , NULL, NULL },
 
     { "quit"     ,  cmdQuit       , NULL,
-      "{q}uit\t\t\t \"Watch me now. Iam going Down. My name is Bobby Brown\"\n"
+      "{q}uit\t\t\t \"Watch me now. I'm going Down. My name is Bobby Brown\"\n"
     },
     { "q"        ,  cmdQuit       , NULL, NULL }
 };
@@ -1685,7 +1685,7 @@ static void parseCmdLine (int argc, char **argv)
             }
 
             if (-1 != access(argv[i], 0)) {
-                /* file exists: strip the cdb or ihx externsion */
+                /* file exists: strip the cdb or ihx extension */
                 char *p = strrchr(argv[i], '.');
 
                 if (NULL != p &&

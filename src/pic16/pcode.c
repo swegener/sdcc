@@ -8051,7 +8051,7 @@ void pic16_OptimizeLocalRegs(void)
 
 #if 1
                         if(curFunc && inWparamList(curFunc+1)) {
-                          fprintf(stderr, "sdcc: %s: warning: disabling lr-support for functionn %s\n",
+                          fprintf(stderr, "sdcc: %s: warning: disabling lr-support for function %s\n",
                                         filename, curFunc);
                         } else {
                           if(regCount>2) {

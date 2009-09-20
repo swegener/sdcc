@@ -39,3 +39,4 @@ int memcmp (
 
 	return( *((unsigned char *)buf1) - *((unsigned char *)buf2) );
 }
+

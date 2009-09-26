@@ -350,6 +350,7 @@ FBYNAME (labelIsUncondJump)
             }
         }
     }
+
   if (!pl)
     return FALSE; /* did not find the label */
   pl = pl->next;
@@ -370,6 +371,7 @@ FBYNAME (labelIsUncondJump)
   len = strlen(jpInst);
   if (strncmp(p, jpInst, len) != 0)
     return FALSE; /* next line is no jump */
+
   p += len;
   while (*p && ISCHARSPACE(*p))
     p++;
@@ -382,6 +384,7 @@ FBYNAME (labelIsUncondJump)
   len = q-p;
   if (len == 0)
     return FALSE; /* no destination? */
+
   if (TARGET_Z80_LIKE)
     {
       while (q>p && *q!=',')
@@ -389,8 +392,7 @@ FBYNAME (labelIsUncondJump)
       if (*q==',')
         return FALSE; /* conditional jump */
     }
-  if (strcmp(p, q) == 0)
-    return FALSE; /* labels are equal */
+
   /* now put the destination in %6 */
   bindVar (6, &p, &vars);
   return TRUE;

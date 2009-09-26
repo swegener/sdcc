@@ -1,4 +1,9 @@
 2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCpeeph.c,
+	  src/z80/peeph-z80.def:
+	  Fixed #2867572.
+
+2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
 	* device/include/string.h,
 	  device/lib/_strspn.c,
 	  device/lib/incl.mk,

@@ -1,4 +1,8 @@
 2009-09-26 Philipp Klaus Krause <pkk AT spth.de>
+	  src/z80/peeph-z80.def:
+	  Minor peephole improvement.
+
+2009-09-26 Philipp Klaus Krause <pkk AT spth.de>
 	* src/SDCCpeeph.c,
 	  src/z80/peeph-z80.def:
 	  Fixed #2867572.

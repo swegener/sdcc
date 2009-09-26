@@ -495,6 +495,17 @@ replace restart {
 } if notUsed('bc')
 
 replace restart {
+	ld	c, %1
+	ld	b, %2
+	ld	l,c
+	ld	h,b
+} by {
+	; peephole 0zk'' stored %2%1 into hl directly instead of going through bc.
+	ld	l, %1
+	ld	h, %2
+} if notUsed('bc'), operandsNotRelated(%2 'l')
+
+replace restart {
 	jp	NC,%1
 	jp	%2
 %1:

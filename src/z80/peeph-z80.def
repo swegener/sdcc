@@ -66,11 +66,27 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	ld	hl,#%1 + %2
-	ld	a, (hl)
+	ld	hl,#%1
+	ld	a,(hl)
 } by {
-	; peephole 0d' loaded %2 into a directly instead of going through %1.
-	ld	a, (#%1 + %2)
+	ld	a,(#%1)
+	; peephole 0d' loaded a from (#%1) directly instead of using through hl.
+} if notUsed('hl')
+
+replace restart {
+	ld	hl,#%1 + %2
+	ld	a,(hl)
+} by {
+	; peephole 0d'' loaded %2 into a directly instead of using hl.
+	ld	a,(#%1 + %2)
+} if notUsed('hl')
+
+replace restart {
+	ld	hl,#%1
+	ld	(hl),a
+} by {
+	ld	(#%1),a
+	; peephole 0d''' loaded (#%1) from a directly instead of using through hl.
 } if notUsed('hl')
 
 replace restart {
@@ -352,6 +368,19 @@ replace restart {
 replace restart {
 	push	af
 	inc	sp
+	ld	a,#%1
+	push	af
+	inc	sp
+} by {
+	; peephole 0x' pushed de instead of pushing a twice.
+	ld	d,a
+	ld	e,#%1
+	push	de
+} if notUsed('de')
+
+replace restart {
+	push	af
+	inc	sp
 	ld	a,c
 	push	af
 	inc	sp
@@ -360,6 +389,19 @@ replace restart {
 	ld	b,a
 	push	bc
 } if notUsed('b'), notUsed('a')
+
+replace restart {
+	push	af
+	inc	sp
+	ld	a,#%1
+	push	af
+	inc	sp
+} by {
+	; peephole 0y' pushed bc instead of pushing a twice.
+	ld	b,a
+	ld	c,#%1
+	push	bc
+} if notUsed('bc')
 
 replace restart {
 	ld	a,#%1

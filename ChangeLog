@@ -1,3 +1,9 @@
+2009-09-27 Philipp Klaus Krause <pkk AT spth.de>
+	  src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  src/z80/peeph-z80.def
+	  Improved usage of accumulator as inter-i-code temporary.
+
 2009-09-26 Philipp Klaus Krause <pkk AT spth.de>
 	  src/z80/peeph-z80.def:
 	  Minor peephole improvement.

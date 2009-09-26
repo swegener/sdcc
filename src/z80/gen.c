@@ -2516,6 +2516,7 @@ genUminus (iCode * ic)
     }
 
   offset = 0;
+
   _clearCarry();
   while (size--)
     {
@@ -5370,6 +5371,14 @@ genAnd (iCode * ic, iCode * ifx)
       goto release;
     }
 
+  /* Make sure A is on the left to not overwrite it. */
+  if (AOP_TYPE (right) == AOP_ACC)
+    {
+      operand *tmp = right;
+      right = left;
+      left = tmp;
+    }
+
   // if(val & 0xZZ)       - size = 0, ifx != FALSE  -
   // bit = val & 0xZZ     - size = 1, ifx = FALSE -
   if ((AOP_TYPE (right) == AOP_LIT) &&
@@ -5562,6 +5571,14 @@ genOr (iCode * ic, iCode * ifx)
       goto release;
     }
 
+  /* Make sure A is on the left to not overwrite it. */
+  if (AOP_TYPE (right) == AOP_ACC)
+    {
+      operand *tmp = right;
+      right = left;
+      left = tmp;
+    }
+
   // if(val | 0xZZ)       - size = 0, ifx != FALSE  -
   // bit = val | 0xZZ     - size = 1, ifx = FALSE -
   if ((AOP_TYPE (right) == AOP_LIT) &&
@@ -5730,6 +5747,14 @@ genXor (iCode * ic, iCode * ifx)
       goto release;
     }
 
+  /* Make sure A is on the left to not overwrite it. */
+  if (AOP_TYPE (right) == AOP_ACC)
+    {
+      operand *tmp = right;
+      right = left;
+      left = tmp;
+    }
+ 
   // if(val & 0xZZ)       - size = 0, ifx != FALSE  -
   // bit = val & 0xZZ     - size = 1, ifx = FALSE -
   if ((AOP_TYPE (right) == AOP_LIT) &&

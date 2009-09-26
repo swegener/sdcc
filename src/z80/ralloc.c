@@ -2721,6 +2721,44 @@ opPreservesA (iCode * uic)
   return FALSE;
 }
 
+/* Return TRUE if this operation can use A (it doesn't have to keep A unchanged) */
+static bool
+opCanUseA (iCode * uic)
+{
+  if (uic->op == IFX)
+    {
+      /* If we've gotten this far then the thing to compare must be
+         small enough and must be in A.
+      */
+      return TRUE;
+    }
+  if (uic->op == JUMPTABLE)
+    {
+      D (D_ACCUSE2, ("  + Dropping as operation is a Jumptable\n"));
+      return FALSE;
+    }
+  /* A pointer assign preserves A if A is the left value. */
+  if (uic->op == '=' && POINTER_SET (uic))
+    {
+      return TRUE;
+    }
+
+  /* Somehow fails for unary minus. */
+  if (IC_LEFT (uic) == NULL ||
+      IC_RIGHT (uic) == NULL)
+    {
+      D (D_ACCUSE2, ("  + Dropping as operation has only one operand\n"));
+      return FALSE;
+    }
+
+  if (uic->op == BITWISEAND || uic->op == '|' || uic->op == '^')
+    {
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 /** Returns true if this operand preserves the value of A.
  */
 static bool
@@ -2887,6 +2925,12 @@ packRegsForAccUse2 (iCode * ic)
             D (D_ACCUSE2_VERBOSE, ("  ! Is next in line\n"));
 
             bitVectUnSetBit (uses, setBit);
+
+            if (bitVectIsZero (uses) && opCanUseA (next))
+              {
+                D (D_ACCUSE2, ("  Arrived at last op safely.\n"));
+                break;
+              }
             /* Still contigous. */
             if (!opPreservesA (next))
               {

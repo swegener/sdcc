@@ -2498,6 +2498,11 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
           /* 16 bit addition uses add hl, rr */
         continue;
 
+      /* Strangely this leads to a code size increase for some functions. */
+      /*if (ic->op == '+' && getSize (operandType (IC_RESULT (ic)))  <= 2 &&
+          isOperandEqual (op, IC_RESULT (ic)))
+        continue;*/
+
       if (ic->op == '*' && isOperandEqual (op, IC_LEFT (ic)))
         continue;
 
@@ -2580,7 +2585,7 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
 
   if (getSize (operandType (op)) != 2)
     {
-      D (D_ACCUSE2, ("  + Dropping as operation has size is too big\n"));
+      D (D_PACK_IY, ("  + Dropping as operation has size is too big\n"));
       return FALSE;
     }
 
@@ -2737,8 +2742,14 @@ opCanUseA (iCode * uic)
       D (D_ACCUSE2, ("  + Dropping as operation is a Jumptable\n"));
       return FALSE;
     }
-  /* A pointer assign preserves A if A is the left value. */
-  if (uic->op == '=' && POINTER_SET (uic))
+
+  if (uic->op == '=')
+    {
+      return TRUE;
+    }
+
+  if((uic->op == RIGHT_OP || uic->op == LEFT_OP)
+     && IS_OP_LITERAL (IC_RIGHT (uic)))
     {
       return TRUE;
     }

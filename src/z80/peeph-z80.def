@@ -412,6 +412,15 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
+	ld	%1,a
+	ld	%2,%1
+} by {
+	; peephole 0z' loaded %2 from a directly instead of going through %1.
+	ld	%1,a
+	ld	%2,a
+} if notVolatile(%1), operandsNotRelated(%1 'a')
+
+replace restart {
 	ld	a,%1 (ix)
 	push	af
 	inc	sp

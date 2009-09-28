@@ -1,4 +1,9 @@
 2009-09-28 Philipp Klaus Krause <pkk AT spth.de>
+	  src/z80/ralloc.c,
+	  src/z80/peeph-z80.def:
+	  Improved usage of accumulator as inter-i-code temporary.
+
+2009-09-28 Philipp Klaus Krause <pkk AT spth.de>
 	  src/SDCCOpt.c:
 	  Burn the corpses to fight necromancy.
 

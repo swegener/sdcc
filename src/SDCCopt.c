@@ -1520,6 +1520,11 @@ eBBlockFromiCode (iCode * ic)
 
   optimizeCastCast (ebbi->bbOrder, ebbi->count);
 
+  /* Burn the corpses, so the dead may rest in peace,
+     safe from cse necromancy */
+  computeDataFlow (ebbi);
+  killDeadCode (ebbi);
+
   /* do common subexpression elimination for each block */
   change = cseAllBlocks (ebbi, FALSE);
 

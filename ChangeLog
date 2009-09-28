@@ -1,3 +1,7 @@
+2009-09-28 Philipp Klaus Krause <pkk AT spth.de>
+	  src/SDCCOpt.c:
+	  Burn the corpses to fight necromancy.
+
 2009-09-27 Philipp Klaus Krause <pkk AT spth.de>
 	  src/z80/gen.c,
 	  src/z80/ralloc.c,

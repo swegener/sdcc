@@ -1,3 +1,7 @@
+2009-09-29 Philipp Klaus Krause <pkk AT spth.de>
+	  src/z80/gen.c,
+	  Minor 16-bit addition improvement.
+
 2009-09-28 Philipp Klaus Krause <pkk AT spth.de>
 	  src/z80/ralloc.c,
 	  src/z80/peeph-z80.def:

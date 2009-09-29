@@ -3900,7 +3900,7 @@ genPlus (iCode * ic)
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
       emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
       spillPair (PAIR_HL);
-      commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
       goto release;
     }
 
@@ -3909,9 +3909,25 @@ genPlus (iCode * ic)
       fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
       emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
       spillPair (PAIR_HL);
-      commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
       goto release;
     }
+
+  if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_LEFT (ic))) == PAIR_HL)
+   {
+      emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
+      spillPair (PAIR_HL);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
+      goto release;
+   }
+
+  if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_RIGHT (ic))) == PAIR_HL)
+   {
+      emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
+      spillPair (PAIR_HL);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
+      goto release;
+   }
 
   /* Special case:
      ld hl,sp+n trashes C so we can't afford to do it during an

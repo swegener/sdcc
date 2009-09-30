@@ -1660,11 +1660,6 @@ constFold (iCode * ic, set * cseSet)
       ic->op != '-')
     return 0;
 
-  /* this check is a heuristic to prevent live ranges
-     from becoming too long */
-  if (IS_PTR (operandType (IC_RESULT (ic))))
-      return 0;
-
   /* check if operation with a literal */
   if (!IS_OP_LITERAL (IC_RIGHT (ic)))
     return 0;

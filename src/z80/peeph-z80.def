@@ -65,29 +65,29 @@ replace restart {
 	ld	a,(#%2 + %3)
 } if notUsed(%1)
 
-replace restart {
-	ld	hl,#%1
-	ld	a,(hl)
-} by {
-	ld	a,(#%1)
-	; peephole 0d' loaded a from (#%1) directly instead of using through hl.
-} if notUsed('hl')
+#replace restart {
+#	ld	hl,#%1
+#	ld	a,(hl)
+#} by {
+#	ld	a,(#%1)
+#	; peephole 0d' loaded a from (#%1) directly instead of using through hl.
+#} if notUsed('hl')
 
-replace restart {
-	ld	hl,#%1 + %2
-	ld	a,(hl)
-} by {
-	; peephole 0d'' loaded %2 into a directly instead of using hl.
-	ld	a,(#%1 + %2)
-} if notUsed('hl')
+#replace restart {
+#	ld	hl,#%1 + %2
+#	ld	a,(hl)
+#} by {
+#	; peephole 0d'' loaded %2 into a directly instead of using hl.
+#	ld	a,(#%1 + %2)
+#} if notUsed('hl')
 
-replace restart {
-	ld	hl,#%1
-	ld	(hl),a
-} by {
-	ld	(#%1),a
-	; peephole 0d''' loaded (#%1) from a directly instead of using through hl.
-} if notUsed('hl')
+#replace restart {
+#	ld	hl,#%1
+#	ld	(hl),a
+#} by {
+#	ld	(#%1),a
+#	; peephole 0d''' loaded (#%1) from a directly instead of using through hl.
+#} if notUsed('hl')
 
 replace restart {
 	srl	%1
@@ -411,14 +411,14 @@ replace restart {
 	ld	d,#%1
 } if notUsed('a')
 
-replace restart {
-	ld	%1,a
-	ld	%2,%1
-} by {
-	; peephole 0z' loaded %2 from a directly instead of going through %1.
-	ld	%1,a
-	ld	%2,a
-} if notVolatile(%1), operandsNotRelated(%1 'a')
+#replace restart {
+#	ld	%1,a
+#	ld	%2,%1
+#} by {
+#	; peephole 0z' loaded %2 from a directly instead of going through %1.
+#	ld	%1,a
+#	ld	%2,a
+#} if notVolatile(%1), operandsNotRelated(%1 'a')
 
 replace restart {
 	ld	a,%1 (ix)
@@ -545,16 +545,16 @@ replace restart {
 	ld	h, %3 (%4)
 } if notUsed('bc')
 
-replace restart {
-	ld	c, %1
-	ld	b, %2
-	ld	l,c
-	ld	h,b
-} by {
-	; peephole 0zk'' stored %2%1 into hl directly instead of going through bc.
-	ld	l, %1
-	ld	h, %2
-} if notUsed('bc'), operandsNotRelated(%2 'l')
+#replace restart {
+#	ld	c, %1
+#	ld	b, %2
+#	ld	l,c
+#	ld	h,b
+#} by {
+#	; peephole 0zk'' stored %2%1 into hl directly instead of going through bc.
+#	ld	l, %1
+#	ld	h, %2
+#} if notUsed('bc'), operandsNotRelated(%2 'l')
 
 replace restart {
 	jp	NC,%1

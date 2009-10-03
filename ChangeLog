@@ -1,5 +1,9 @@
 2009-10-03 Philipp Klaus Krause <pkk AT spth.de>
 	  src/z80/z80-peeph.def:
+	  Reenabled unproblematic peephole changes.
+
+2009-10-03 Philipp Klaus Krause <pkk AT spth.de>
+	  src/z80/z80-peeph.def:
 	  Reverted recent peephole changes.
 
 2009-09-30 Philipp Klaus Krause <pkk AT spth.de>

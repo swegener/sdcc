@@ -33,7 +33,7 @@
 #include "string.h"
 
 size_t strcspn ( 
-	const char * string ,
+	const char * string,
 	const char * control 
 	    ) 
 {

@@ -27,7 +27,7 @@ __pdata char thing_apdata[2];
 #endif
 
 
-char * __code test_array[] = {
+const char * __code test_array[] = {
  &thing
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
  , &thing_code
@@ -37,14 +37,14 @@ char * __code test_array[] = {
 };
 
 
-char *gime_thing() { return &thing; }
+const char *gime_thing() { return &thing; }
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
-char *gime_thing_code() { return &thing_code; }
-char *gime_thing_data() { return &thing_data; }
-char *gime_thing_idata() { return &thing_idata; }
-char *gime_thing_xdata() { return &thing_xdata; }
-char *gime_thing_pdata() { return &thing_pdata; }
-char *gime_thing_apdata() { return thing_apdata; }
+const char *gime_thing_code() { return &thing_code; }
+const char *gime_thing_data() { return &thing_data; }
+const char *gime_thing_idata() { return &thing_idata; }
+const char *gime_thing_xdata() { return &thing_xdata; }
+const char *gime_thing_pdata() { return &thing_pdata; }
+const char *gime_thing_apdata() { return thing_apdata; }
 #endif
 
 

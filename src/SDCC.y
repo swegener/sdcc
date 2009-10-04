@@ -277,7 +277,6 @@ postfix_expr
                         $4 = newSymbol($4->name,NestLevel);
                         $4->implicit = 1;
                         $$ = newNode(PTR_OP,newNode('&',$1,NULL),newAst_VALUE(symbolVal($4)));
-/*                      $$ = newNode('.',$1,newAst(EX_VALUE,symbolVal($4))) ;                   */
                       }
    | postfix_expr PTR_OP { ignoreTypedefType = 1; } identifier
                       {
@@ -427,9 +426,6 @@ assignment_expr
                                      $$ = createRMW($1, '^', $3);
                                      break;
                              case OR_ASSIGN:
-/*                                   $$ = newNode('=',$1,newNode('|',removeIncDecOps(copyAst($1)),$3)); */
-/*                                   $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('|',removePreIncDecOps(copyAst($1)),$3)); */
                                      $$ = createRMW($1, '|', $3);
                                      break;
                              default :
@@ -495,11 +491,7 @@ declaration_specifiers_
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
-       sym_link *lnk = $2 ;
-       while (lnk && !IS_SPEC(lnk->next))
-         lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, "storage_class_specifier declaration_specifiers - skipped");
-       $$ = $2 ;
+       $$ = mergeDeclSpec($2, $1, "storage_class_specifier declaration_specifiers - skipped");
      }
      else
        $$ = mergeSpec($1,$2, "storage_class_specifier declaration_specifiers");
@@ -509,11 +501,7 @@ declaration_specifiers_
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
-       sym_link *lnk = $2 ;
-       while (lnk && !IS_SPEC(lnk->next))
-         lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, "type_specifier declaration_specifiers - skipped");
-       $$ = $2 ;
+       $$ = mergeDeclSpec($2, $1, "type_specifier declaration_specifiers - skipped");
      }
      else
        $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
@@ -523,11 +511,7 @@ declaration_specifiers_
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
-       sym_link *lnk = $2 ;
-       while (lnk && !IS_SPEC(lnk->next))
-         lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, "function_specifier declaration_specifiers - skipped");
-       $$ = $2 ;
+       $$ = mergeDeclSpec($2, $1, "function_specifier declaration_specifiers - skipped");
      }
      else
        $$ = mergeSpec($1,$2, "function_specifier declaration_specifiers");
@@ -1253,11 +1237,7 @@ type_specifier_list_
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
-       sym_link *lnk = $2 ;
-       while (lnk && !IS_SPEC(lnk->next))
-         lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, "type_specifier_list type_specifier skipped");
-       $$ = $2 ;
+       $$ = mergeDeclSpec($2, $1, "type_specifier_list type_specifier skipped");
      }
      else
        $$ = mergeSpec($1,$2, "type_specifier_list type_specifier");
@@ -1509,7 +1489,7 @@ declaration_list
          $$ = $1 ;
        }
        else {
-                                /* get to the end of the previous decl */
+         /* get to the end of the previous decl */
          if ( $1 ) {
            $$ = sym = $1 ;
            while (sym->next)

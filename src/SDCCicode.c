@@ -195,7 +195,6 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
         if (SPIL_LOC (op) && IS_ITEMP (op))
           dbuf_printf (dbuf, "}{ sir@ %s", SPIL_LOC (op)->rname);
         dbuf_append_char (dbuf, '}');
-
       }
 
       /* if assigned to registers */
@@ -1108,14 +1107,14 @@ operandLitValue (operand * op)
 }
 
 /*-----------------------------------------------------------------*/
-/* getBuiltInParms - returns parameters to a builtin functions     */
+/* getBuiltInParms - returns parameters to a builtin function      */
 /*-----------------------------------------------------------------*/
 iCode *getBuiltinParms (iCode *ic, int *pcount, operand **parms)
 {
     sym_link *ftype;
 
     *pcount = 0;
-    /* builtin functions uses only SEND for parameters */
+    /* builtin function uses only SEND for parameters */
     while (ic->op != CALL) {
         assert(ic->op == SEND && ic->builtinSEND);
         ic->generated = 1;    /* mark the icode as generated */
@@ -1661,7 +1660,6 @@ operandFromSymbol (symbol * sym)
   if (IS_ARRAY (sym->type))
     {
       IC_RESULT (ic) = geniCodeArray2Ptr (IC_RESULT (ic));
-      IC_RESULT (ic)->isaddr = 0;
     }
   else
     IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (sym->type));
@@ -1722,7 +1720,7 @@ operandFromLit (double i)
 /* operandFromAst - creates an operand from an ast                 */
 /*-----------------------------------------------------------------*/
 operand *
-operandFromAst (ast * tree,int lvl)
+operandFromAst (ast * tree, int lvl)
 {
 
   if (!tree)
@@ -1967,6 +1965,27 @@ getPtrType(sym_link *type)
 }
 
 /*-----------------------------------------------------------------*/
+/* checkPtrQualifiers - check for lost pointer qualifers           */
+/*-----------------------------------------------------------------*/
+static void
+checkPtrQualifiers (sym_link *ltype, sym_link *rtype)
+{
+  if (IS_PTR(ltype) && IS_PTR(rtype) && !IS_FUNCPTR (ltype))
+    {
+      if (!IS_CONSTANT(ltype->next) && IS_CONSTANT(rtype->next))
+        werror(W_TARGET_LOST_QUALIFIER, "const");
+#if 0
+      // disabled because SDCC will make all union fields volatile
+      // but your ptr to it need not be
+      if (!IS_VOLATILE(ltype->next) && IS_VOLATILE(rtype->next))
+        werror(W_TARGET_LOST_QUALIFIER, "volatile");
+#endif
+      if (!IS_RESTRICT(ltype->next) && IS_RESTRICT(rtype->next))
+        werror(W_TARGET_LOST_QUALIFIER, "restrict");
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* geniCodeCast - changes the value from one type to another       */
 /*-----------------------------------------------------------------*/
 static operand *
@@ -1988,7 +2007,6 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   if (IS_ITEMP (op) && IS_ARRAY (OP_SYMBOL (op)->type))
     {
       geniCodeArray2Ptr (op);
-      op->isaddr = 0;
     }
 
   /* if the operand is already the desired type then do nothing */
@@ -2096,9 +2114,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
     }
   else
     {
-      ic = newiCode (CAST, operandFromLink (type),
-                     geniCodeRValue (op, FALSE));
-
+      ic = newiCode (CAST, operandFromLink (type), geniCodeRValue (op, FALSE));
       IC_RESULT (ic) = newiTempOperand (type, 0);
     }
 
@@ -2475,6 +2491,9 @@ geniCodeArray2Ptr (operand * op)
 
   /* set the pointer depending on the storage class */
   DCL_TYPE (optype) = PTR_TYPE (SPEC_OCLS (opetype));
+  /* now remove the storage class from this itemp */
+  SPEC_SCLS (opetype) = S_FIXED;
+  SPEC_OCLS (opetype) = NULL;
 
   op->isaddr = 0;
   return op;
@@ -3206,20 +3225,13 @@ geniCodeConditional (ast * tree,int lvl)
 }
 
 /*-----------------------------------------------------------------*/
-/* geniCodeAssign - generate code for assignment                   */
+/* checkTypes - check types for assignment                         */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
+static operand *
+checkTypes (operand * left, operand * right)
 {
-  iCode *ic;
   sym_link *ltype = operandType (left);
   sym_link *rtype = operandType (right);
-
-  if (!left->isaddr && (!IS_ITEMP (left) || strictLval))
-    {
-      werror (E_LVALUE_REQUIRED, "assignment");
-      return left;
-    }
 
   /* left is integral type and right is literal then
      check if the literal value is within bounds */
@@ -3240,12 +3252,41 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
       compareType (ltype, rtype) <= 0)
     {
       if (left->aggr2ptr)
-        right = geniCodeCast (ltype, right, TRUE);
-      else if (compareType (ltype->next, rtype) < 0)
-        right = geniCodeCast (ltype->next, right, TRUE);
+        {
+          right = geniCodeCast (ltype, right, TRUE);
+          checkPtrQualifiers (ltype, rtype);
+        }
+      else
+        {
+          if (compareType (ltype->next, rtype) < 0)
+            right = geniCodeCast (ltype->next, right, TRUE);
+          checkPtrQualifiers (ltype->next, rtype);
+        }
     }
-  else if (compareType (ltype, rtype) < 0)
-    right = geniCodeCast (ltype, right, TRUE);
+  else
+    {
+      if (compareType (ltype, rtype) < 0)
+        right = geniCodeCast (ltype, right, TRUE);
+      checkPtrQualifiers (ltype, rtype);
+    }
+  return right;
+}
+
+/*-----------------------------------------------------------------*/
+/* geniCodeAssign - generate code for assignment                   */
+/*-----------------------------------------------------------------*/
+operand *
+geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
+{
+  iCode *ic;
+
+  if (!left->isaddr && (!IS_ITEMP (left) || strictLval))
+    {
+      werror (E_LVALUE_REQUIRED, "assignment");
+      return left;
+    }
+
+  right = checkTypes (left, right);
 
   /* If left is a true symbol & ! volatile
      create an assignment to temporary for
@@ -3259,6 +3300,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
     {
       symbol *sym = NULL;
       operand *newRight;
+      sym_link *ltype = operandType (left);
 
       if (IS_TRUE_SYMOP (right))
         sym = OP_SYMBOL (right);
@@ -3342,7 +3384,7 @@ geniCodeSEParms (ast * parms,int lvl)
 /* geniCodeParms - generates parameters                            */
 /*-----------------------------------------------------------------*/
 value *
-geniCodeParms (ast * parms, value *argVals, int *stack,
+geniCodeParms (ast * parms, value *argVals, int *iArg, int *stack,
                sym_link * ftype, int lvl)
 {
   iCode *ic;
@@ -3351,16 +3393,11 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
   if (!parms)
     return argVals;
 
-  if (argVals==NULL) {
-    // first argument
-    argVals = FUNC_ARGS (ftype);
-  }
-
   /* if this is a param node then do the left & right */
   if (parms->type == EX_OP && parms->opval.op == PARAM)
     {
-      argVals=geniCodeParms (parms->left, argVals, stack, ftype, lvl);
-      argVals=geniCodeParms (parms->right, argVals, stack, ftype, lvl);
+      argVals = geniCodeParms (parms->left, argVals, iArg, stack, ftype, lvl);
+      argVals = geniCodeParms (parms->right, argVals, iArg, stack, ftype, lvl);
       return argVals;
     }
 
@@ -3380,13 +3417,14 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
           IS_ADDRESS_OF_OP (parms->right))
         parms->right->left->lvalue = 1;
 
-      pval = geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
+      pval = geniCodeRValue (ast2iCode (parms, lvl+1), FALSE);
     }
 
   /* if register parm then make it a send */
   if ((IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(ftype)) ||
       IFFUNC_ISBUILTIN(ftype))
     {
+      pval = checkTypes (operandFromValue (argVals), pval);
       ic = newiCode (SEND, pval, NULL);
       ic->argreg = SPEC_ARGREG(parms->etype);
       ic->builtinSEND = FUNC_ISBUILTIN(ftype);
@@ -3397,16 +3435,20 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
       /* now decide whether to push or assign */
       if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
         {
-
           /* assign */
-          operand *top = operandFromSymbol (argVals->sym);
+          operand *top = operandFromValue (argVals);
           /* clear useDef and other bitVectors */
-          OP_USES(top)=OP_DEFS(top)=OP_SYMBOL(top)->clashes = NULL;
+          OP_USES (top) = OP_DEFS (top) = OP_SYMBOL (top)->clashes = NULL;
           geniCodeAssign (top, pval, 1, 0);
         }
       else
         {
-          sym_link *p = operandType (pval);
+          sym_link *p;
+          if (argVals && (*iArg >= 0))
+            {
+              pval = checkTypes (operandFromValue (argVals), pval);
+            }
+          p = operandType (pval);
           /* push */
           ic = newiCode (IPUSH, pval, NULL);
           ic->parmPush = 1;
@@ -3416,7 +3458,9 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
         }
     }
 
-  argVals=argVals->next;
+  if (*iArg >= 0)
+    argVals = argVals->next;
+  (*iArg)++;
   return argVals;
 }
 
@@ -3431,6 +3475,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   sym_link *type, *etype;
   sym_link *ftype;
   int stack = 0;
+  int iArg = 0;
 
   if (!IS_FUNC(OP_SYMBOL(left)->type) &&
       !IS_FUNCPTR(OP_SYMBOL(left)->type)) {
@@ -3441,14 +3486,45 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   /* take care of parameters with side-effecting
      function calls in them, this is required to take care
      of overlaying function parameters */
-  geniCodeSEParms (parms,lvl);
+  geniCodeSEParms (parms, lvl);
 
   ftype = operandType (left);
   if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
 
   /* first the parameters */
-  geniCodeParms (parms, NULL, &stack, ftype, lvl);
+  if ((options.stackAuto || IFFUNC_ISREENT (ftype)) && !IFFUNC_ISBUILTIN (ftype))
+    {
+      value *argVals;
+      int nArgs = 0;
+      ast * parm;
+      int nParms = 0;
+
+      //count expected arguments except varargs
+      for (argVals = FUNC_ARGS (ftype); argVals; argVals = argVals->next)
+        nArgs++;
+      //count actual parameters including varargs
+      for (parm = parms;
+           parm && parm->type == EX_OP && parm->opval.op == PARAM;
+           parm = parm->right)
+        {
+          if (parm->left)
+            nParms++;
+        }
+      if (parm)
+        nParms++;
+      argVals = FUNC_ARGS (ftype);
+      iArg = nArgs - nParms;
+
+      // reverse the argVals to match the parms
+      argVals = reverseVal (argVals);
+      geniCodeParms (parms, argVals, &iArg, &stack, ftype, lvl);
+      argVals = reverseVal (argVals);
+    }
+  else
+    {
+      geniCodeParms (parms, FUNC_ARGS (ftype), &iArg, &stack, ftype, lvl);
+    }
 
   /* now call : if symbol then pcall */
   if (IS_OP_POINTER (left) || IS_ITEMP(left)) {
@@ -4339,7 +4415,7 @@ ast2iCode (ast * tree,int lvl)
         return geniCodeLogic (leftOp, rightOp, tree->opval.op, tree);
       }
     case '?':
-      return geniCodeConditional (tree,lvl);
+      return geniCodeConditional (tree, lvl);
 
     case SIZEOF:
       return operandFromLit (getSize (tree->right->ftype));

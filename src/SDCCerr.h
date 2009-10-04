@@ -211,6 +211,8 @@ SDCCERR - SDCC Standard error handler
 #define E_BAD_INLINE                  193 /* Only functions may be qualified with 'inline' */
 #define E_BAD_INT_ARGUMENT            194 /* Bad integer option argument */
 #define E_NEGATIVE_ARRAY_SIZE         195 /* Size of array '%s' is negative */
+#define W_TARGET_LOST_QUALIFIER       196 /* Pointer target lost qualifier */
+
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 
 /** Describes the maximum error level that will be logged.  Any level

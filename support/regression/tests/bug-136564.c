@@ -53,8 +53,8 @@ foo (void)
 }
 
 int _strncmp (
-  char * first,
-  char * last,
+  const char * first,
+  const char * last,
   unsigned count
   )
 {

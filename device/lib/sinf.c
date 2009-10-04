@@ -19,8 +19,9 @@
 /* Version 1.0 - Initial release */
 
 #include <math.h>
+#include <stdbool.h>
 
-float sincosf(const float x, const int iscos);
+float sincosf(const float x, const BOOL iscos);
 
 float sinf(const float x) _FLOAT_FUNC_REENTRANT
 {

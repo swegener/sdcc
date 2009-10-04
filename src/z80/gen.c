@@ -8260,7 +8260,7 @@ genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 }
 
 /*-----------------------------------------------------------------*/
-/* genBuiltIn - calls the appropriate function to  generating code */
+/* genBuiltIn - calls the appropriate function to generate code    */
 /* for a built in function                                         */
 /*-----------------------------------------------------------------*/
 static void genBuiltIn (iCode *ic)
@@ -8271,7 +8271,7 @@ static void genBuiltIn (iCode *ic)
     symbol *bif;
 
     /* get all the arguments for a built in function */
-    bi_iCode = getBuiltinParms(ic,&nbi_parms,bi_parms);
+    bi_iCode = getBuiltinParms(ic, &nbi_parms, bi_parms);
 
     /* which function is it */
     bif = OP_SYMBOL(IC_LEFT(bi_iCode));

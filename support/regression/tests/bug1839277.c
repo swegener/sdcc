@@ -4,8 +4,8 @@
 
 #include <testfwk.h>
 
-code struct Value {
-  code char* Name[2];
+const code struct Value {
+  const code char* Name[2];
 } Values[2]= {{{"abc", "def"}}, {{"ghi", "jkl"}}};
 
 char i=1;
@@ -13,7 +13,7 @@ char i=1;
 void
 testBug1839277(void)
 {
-	volatile char code* * p;
+	const char code* const * volatile p;
 	unsigned long v = 0;
 //first subexpression 'Values[0].Name' is evaluted as follows:
 //mov     r2,#_Values
@@ -34,7 +34,7 @@ testBug1839277(void)
 #endif
 
 //everything is all right with explicit typecast - but why do I need it?
-	p = i ? (char code**)Values[0].Name : (char code**)Values[1].Name;
+	p = i ? (const char code* const *)Values[0].Name : (const char code* const *)Values[1].Name;
 #if defined(SDCC_mcs51)
 	v = (unsigned long)p;
 	ASSERT((unsigned char)(v>>16)==0x80);
@@ -42,7 +42,7 @@ testBug1839277(void)
 
 //this is the best/optimal version - again with explicit typecast
 //Question: Why is it necessary to have explicit typecast to make things right?
-	p = i ? (char code* code*)Values[0].Name : (char code* code*)Values[1].Name;
+	p = i ? (const char code* const code*)Values[0].Name : (const char code* const code*)Values[1].Name;
 #if defined(SDCC_mcs51)
 	v = (unsigned long)p;
 	ASSERT((unsigned char)(v>>16)==0x80);
@@ -52,7 +52,7 @@ testBug1839277(void)
 void
 testBug1839299(void)
 {
-	volatile char code* * p;
+	const char code* const * volatile p;
 	unsigned long v = 0;
 //'Values[0].Name' subexpression is evaluated as follows first:
 //mov     r2,#_Values

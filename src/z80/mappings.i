@@ -132,7 +132,7 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "tlabel", ".l%05d" },
     { "fileprelude", 
       "; Generated using the rgbds tokens.\n"
-      "\t; We have to define these here as sdcc dosn't make them global by default\n"
+      "\t; We have to define these here as sdcc doesn't make them global by default\n"
       "\tGLOBAL __mulschar\n"
       "\tGLOBAL __muluchar\n"
       "\tGLOBAL __mulint\n"

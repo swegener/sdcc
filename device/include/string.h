@@ -74,7 +74,7 @@ extern char *strtok (char * /* restrict*/ str, const char * /*restrict*/ delim);
 /* Miscanelleous functions: */
 extern void *memset (void *s, unsigned char c, size_t n); /* c should be int according to standard. */
 /* extern char *strerror(int errnum); */
-extern int strlen (const char *s); /* Return value should be size_t according to standard. */
+extern size_t strlen (const char *s);
 
 #ifdef SDCC_ds390
 extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;

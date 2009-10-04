@@ -23,10 +23,12 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <string.h>
+
 #if (!defined (SDCC_mcs51))
 
   /* Generic routine first */
-  int strlen ( const char * str )
+  size_t strlen ( const char * str )
   {
     register int i = 0 ;
 
@@ -39,7 +41,7 @@
 #else
 
   /* Assembler version for mcs51 */
-  int strlen ( const char * str ) __naked
+  size_t strlen ( const char * str ) __naked
   {
     str;     /* hush the compiler */
 

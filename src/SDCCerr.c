@@ -444,6 +444,8 @@ struct
    "Bad integer argument for option %s" },
 { E_NEGATIVE_ARRAY_SIZE, ERROR_LEVEL_ERROR,
    "Size of array '%s' is negative" },
+{ W_TARGET_LOST_QUALIFIER, ERROR_LEVEL_WARNING,
+   "pointer target lost %s qualifier" },
 };
 
 /*

@@ -484,6 +484,7 @@ extern sym_link *validateLink(sym_link  *l,
 #define IS_UNSIGNED(x)   (IS_SPEC(x) && x->select.s.b_unsigned)
 #define IS_TYPEDEF(x)    (IS_SPEC(x) && x->select.s.b_typedef)
 #define IS_CONSTANT(x)   (isConstant (x))
+#define IS_RESTRICT(x)   (isRestrict (x))
 #define IS_STRUCT(x)     (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
 #define IS_ABSOLUTE(x)   (IS_SPEC(x) && x->select.s.b_absadr )
 #define IS_REGISTER(x)   (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
@@ -589,6 +590,7 @@ structdef *newStruct (char *);
 void addDecl (symbol *, int, sym_link *);
 sym_link *finalizeSpec(sym_link *);
 sym_link *mergeSpec (sym_link *, sym_link *, char *name);
+sym_link *mergeDeclSpec (sym_link *, sym_link *, char *name);
 symbol *reverseSyms (symbol *);
 sym_link *reverseLink (sym_link *);
 symbol *copySymbol (symbol *);
@@ -647,6 +649,7 @@ sym_link *newEnumType (symbol *);
 void  promoteAnonStructs (int, structdef *);
 int isConstant (sym_link * type);
 int isVolatile (sym_link * type);
+int isRestrict (sym_link * type);
 
 
 extern char *nounName(sym_link *); /* noun strings */

@@ -8,9 +8,9 @@ int putch( int Ch )
   return( Ch );
 }
 
-int puts( char *Str )
+int puts( const char *Str )
 {
-  char *Ptr;
+  const char *Ptr;
 
   for( Ptr = Str; *Ptr != '\0'; Ptr++ ) {
     putch( *Ptr );

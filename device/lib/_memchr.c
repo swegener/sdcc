@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _memcpy.c - part of string library functions
+   _memchr.c - part of string library functions
 
    Written By -  Philipp Klaus Krause . pkk@spth.de (2009)
 
@@ -38,4 +38,3 @@ void *memchr(const void *s, int c, size_t n)
 			return((void *)p);
 	return(0);
 }
-

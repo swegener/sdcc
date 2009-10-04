@@ -366,15 +366,22 @@ sclsFromPtr(sym_link *ptr)
 void
 pointerTypes (sym_link * ptr, sym_link * type)
 {
+  sym_link * p;
+  sym_link * etype;
+
   if (IS_SPEC (ptr))
     return;
 
-  /* find the first pointer type */
-  while (ptr && !IS_PTR (ptr))
-    ptr = ptr->next;
+  /* find the last unknown pointer type */
+  p = ptr;
+  while (p) {
+    if (IS_PTR (p) && DCL_TYPE(p)==UPOINTER)
+      ptr = p;
+    p = p->next;
+  }
 
   /* could not find it */
-  if (!ptr || IS_SPEC (ptr))
+  if (!ptr || IS_SPEC (ptr) || !IS_PTR (ptr))
     return;
 
   if (IS_PTR(ptr) && DCL_TYPE(ptr)!=UPOINTER) {
@@ -383,10 +390,11 @@ pointerTypes (sym_link * ptr, sym_link * type)
   }
 
   /* change the pointer type depending on the
-     storage class of the type */
-  if (IS_SPEC (type))
+     storage class of the etype */
+  etype = getSpec (type);
+  if (IS_SPEC (etype))
     {
-      switch (SPEC_SCLS (type))
+      switch (SPEC_SCLS (etype))
         {
         case S_XDATA:
           DCL_TYPE (ptr) = FPOINTER;
@@ -410,8 +418,8 @@ pointerTypes (sym_link * ptr, sym_link * type)
           DCL_TYPE (ptr) = port->unqualified_pointer;
           break;
         }
-      /* the storage class of type ends here */
-      SPEC_SCLS (type) = 0;
+      /* the storage class of etype ends here */
+      SPEC_SCLS (etype) = 0;
     }
 
   /* now change all the remaining unknown pointers
@@ -522,7 +530,8 @@ addDecl (symbol * sym, int type, sym_link * p)
   checkTypeSanity: prevent the user from doing e.g.:
   unsigned float uf;
   ------------------------------------------------------------------*/
-void checkTypeSanity(sym_link *etype, char *name) {
+void checkTypeSanity(sym_link *etype, char *name)
+{
   char *noun;
 
   if (!etype) {
@@ -573,7 +582,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
      "const a;" or "data b;" or "signed s" or "long l"
      assume an int */
   if (!SPEC_NOUN(etype)) {
-    SPEC_NOUN(etype)=V_INT;
+    SPEC_NOUN(etype) = V_INT;
   }
 
   /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
@@ -595,7 +604,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
 }
 
 /*------------------------------------------------------------------*/
-/* finalizeSpec                                             */
+/* finalizeSpec                                                     */
 /*    currently just a V_CHAR is forced to be unsigned              */
 /*      when it's neither signed nor unsigned                       */
 /*      and the --funsigned-char command line switch is active      */
@@ -705,6 +714,26 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   FUNC_REGBANK(dest) |= FUNC_REGBANK(src);
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
 
+  return dest;
+}
+
+/*------------------------------------------------------------------*/
+/* mergeDeclSpec - merges a specifier and a declarator              */
+/*------------------------------------------------------------------*/
+sym_link *
+mergeDeclSpec (sym_link * dest, sym_link * src, char *name)
+{
+  sym_link *lnk = dest;
+
+  DCL_PTR_CONST(dest) |= SPEC_CONST(src);
+  DCL_PTR_VOLATILE(dest) |= SPEC_VOLATILE(src);
+  DCL_PTR_RESTRICT(dest) |= SPEC_RESTRICT(src);
+
+  SPEC_CONST(src) = SPEC_VOLATILE(src) = SPEC_RESTRICT(src) = 0;
+
+  while (lnk && !IS_SPEC(lnk->next))
+    lnk = lnk->next;
+  lnk->next = mergeSpec(src, lnk->next, name);
   return dest;
 }
 
@@ -1554,7 +1583,11 @@ checkSClass (symbol * sym, int isProto)
       SPEC_SCLS(sym->etype) == S_FIXED &&
       !IS_FUNC(sym->type))
     {
-      if (IS_CONSTANT (sym->type))
+      /* find the first non-array link */
+      t = sym->type;
+      while (IS_ARRAY(t))
+        t = t->next;
+      if (IS_CONSTANT (t))
         SPEC_SCLS (sym->etype) = S_CODE;
     }
 
@@ -2224,62 +2257,63 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
     {
       if (IS_DECL (src))
         {
-          if (DCL_TYPE (src) == DCL_TYPE (dest)) {
-            if ((DCL_TYPE (src) == ARRAY) && (DCL_ELEM (src) != DCL_ELEM (dest)))
-              return 0;
-            if (DCL_PTR_CONST (src) != DCL_PTR_CONST (dest))
-              return 0;
-            if (DCL_PTR_VOLATILE (src) != DCL_PTR_VOLATILE (dest))
-              return 0;
-            if (IS_FUNC(src))
-              {
-                value *exargs, *acargs, *checkValue;
+          if (DCL_TYPE (src) == DCL_TYPE (dest))
+            {
+              if ((DCL_TYPE (src) == ARRAY) && (DCL_ELEM (src) != DCL_ELEM (dest)))
+                return 0;
+              if (DCL_PTR_CONST (src) != DCL_PTR_CONST (dest))
+                return 0;
+              if (DCL_PTR_VOLATILE (src) != DCL_PTR_VOLATILE (dest))
+                return 0;
+              if (IS_FUNC(src))
+                {
+                  value *exargs, *acargs, *checkValue;
 
-                /* verify function return type */
-                if (!compareTypeExact (dest->next, src->next, -1))
-                  return 0;
-                if (FUNC_ISISR (dest) != FUNC_ISISR (src))
-                  return 0;
-                if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))
-                  return 0;
-                if (IFFUNC_ISNAKED (dest) != IFFUNC_ISNAKED (src))
-                  return 0;
-                #if 0
-                if (IFFUNC_ISREENT (dest) != IFFUNC_ISREENT (src) && argCnt>1)
-                  return 0;
-                #endif
-
-                /* compare expected args with actual args */
-                exargs = FUNC_ARGS(dest);
-                acargs = FUNC_ARGS(src);
-
-                /* for all the expected args do */
-                for (; exargs && acargs; exargs = exargs->next, acargs = acargs->next)
-                  {
-                    //checkTypeSanity(acargs->etype, acargs->name);
-
-                    if (IS_AGGREGATE (acargs->type))
-                      {
-                        checkValue = copyValue (acargs);
-                        aggregateToPointer (checkValue);
-                      }
-                    else
-                      checkValue = acargs;
-
-                    #if 0
-                    if (!compareTypeExact (exargs->type, checkValue->type, -1))
-                      return 0;
-                    #endif
-                  }
-
-                  /* if one them ended we have a problem */
-                  if ((exargs && !acargs && !IS_VOID (exargs->type)) ||
-                      (!exargs && acargs && !IS_VOID (acargs->type)))
+                  /* verify function return type */
+                  if (!compareTypeExact (dest->next, src->next, -1))
                     return 0;
-                  return 1;
-              }
-            return compareTypeExact (dest->next, src->next, level);
-          }
+                  if (FUNC_ISISR (dest) != FUNC_ISISR (src))
+                    return 0;
+                  if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))
+                    return 0;
+                  if (IFFUNC_ISNAKED (dest) != IFFUNC_ISNAKED (src))
+                    return 0;
+                  #if 0
+                  if (IFFUNC_ISREENT (dest) != IFFUNC_ISREENT (src) && argCnt>1)
+                    return 0;
+                  #endif
+
+                  /* compare expected args with actual args */
+                  exargs = FUNC_ARGS(dest);
+                  acargs = FUNC_ARGS(src);
+
+                  /* for all the expected args do */
+                  for (; exargs && acargs; exargs = exargs->next, acargs = acargs->next)
+                    {
+                      //checkTypeSanity(acargs->etype, acargs->name);
+
+                      if (IS_AGGREGATE (acargs->type))
+                        {
+                          checkValue = copyValue (acargs);
+                          aggregateToPointer (checkValue);
+                        }
+                      else
+                        checkValue = acargs;
+
+                      #if 0
+                      if (!compareTypeExact (exargs->type, checkValue->type, -1))
+                        return 0;
+                      #endif
+                    }
+
+                    /* if one them ended we have a problem */
+                    if ((exargs && !acargs && !IS_VOID (exargs->type)) ||
+                        (!exargs && acargs && !IS_VOID (acargs->type)))
+                      return 0;
+                    return 1;
+                }
+              return compareTypeExact (dest->next, src->next, level);
+            }
           return 0;
         }
       return 0;
@@ -2588,7 +2622,9 @@ checkFunction (symbol * sym, symbol *csym)
 
   if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {
-      werror (E_PREV_DEF_CONFLICT, csym->name, "_naked");
+// disabled since __naked has no influence on the calling convention
+//      werror (E_PREV_DEF_CONFLICT, csym->name, "__naked");
+      FUNC_ISNAKED (sym->type) = 1;
     }
 
   /* Really, reentrant should match regardless of argCnt, but     */
@@ -2611,7 +2647,6 @@ checkFunction (symbol * sym, symbol *csym)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "shadowregs");
     }
-
 
   /* compare expected args with actual args */
   exargs = FUNC_ARGS(csym->type);
@@ -2927,17 +2962,6 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
     {
       if (IS_DECL (type))
         {
-          if (!IS_FUNC(type)) {
-            if (DCL_PTR_VOLATILE (type)) {
-              dbuf_append_str (dbuf, "volatile-");
-            }
-            if (DCL_PTR_CONST (type)) {
-              dbuf_append_str (dbuf, "const-");
-            }
-            if (DCL_PTR_RESTRICT (type)) {
-              dbuf_append_str (dbuf, "restrict-");
-            }
-          }
           switch (DCL_TYPE (type))
             {
             case FUNCTION:
@@ -2979,15 +3003,33 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, "unknown*");
               break;
             case ARRAY:
-              if (DCL_ELEM(type)) {
-                dbuf_printf (dbuf, "[%d]", DCL_ELEM(type));
-              } else {
-                dbuf_append_str (dbuf, "[]");
-              }
+              if (DCL_ELEM(type))
+                {
+                  dbuf_printf (dbuf, "[%d]", DCL_ELEM(type));
+                }
+              else
+                {
+                  dbuf_append_str (dbuf, "[]");
+                }
               break;
             default:
               dbuf_append_str (dbuf, "unknown?");
               break;
+            }
+          if (!IS_FUNC(type))
+            {
+              if (DCL_PTR_VOLATILE (type))
+                {
+                  dbuf_append_str (dbuf, " volatile");
+                }
+              if (DCL_PTR_CONST (type))
+                {
+                  dbuf_append_str (dbuf, " const");
+                }
+              if (DCL_PTR_RESTRICT (type))
+                {
+                  dbuf_append_str (dbuf, " restrict");
+                }
             }
         }
       else
@@ -3047,27 +3089,28 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               break;
             }
         }
-      if (type==start) {
-        switch (scls)
-          {
-          case S_FIXED:		dbuf_append_str (dbuf, " fixed"); break;
-          case S_AUTO:		dbuf_append_str (dbuf, " auto"); break;
-          case S_REGISTER:	dbuf_append_str (dbuf, " register"); break;
-          case S_DATA:		dbuf_append_str (dbuf, " data"); break;
-          case S_XDATA:		dbuf_append_str (dbuf, " xdata"); break;
-          case S_SFR:		dbuf_append_str (dbuf, " sfr"); break;
-          case S_SBIT:		dbuf_append_str (dbuf, " sbit"); break;
-          case S_CODE:		dbuf_append_str (dbuf, " code"); break;
-          case S_IDATA:		dbuf_append_str (dbuf, " idata"); break;
-          case S_PDATA:		dbuf_append_str (dbuf, " pdata"); break;
-          case S_LITERAL:	dbuf_append_str (dbuf, " literal"); break;
-          case S_STACK:		dbuf_append_str (dbuf, " stack"); break;
-          case S_XSTACK:	dbuf_append_str (dbuf, " xstack"); break;
-          case S_BIT:		dbuf_append_str (dbuf, " bit"); break;
-          case S_EEPROM:	dbuf_append_str (dbuf, " eeprom"); break;
-          default: break;
-          }
-      }
+      if (type==start)
+        {
+          switch (scls)
+            {
+            case S_FIXED:       dbuf_append_str (dbuf, " fixed"); break;
+            case S_AUTO:        dbuf_append_str (dbuf, " auto"); break;
+            case S_REGISTER:    dbuf_append_str (dbuf, " register"); break;
+            case S_DATA:        dbuf_append_str (dbuf, " data"); break;
+            case S_XDATA:       dbuf_append_str (dbuf, " xdata"); break;
+            case S_SFR:         dbuf_append_str (dbuf, " sfr"); break;
+            case S_SBIT:        dbuf_append_str (dbuf, " sbit"); break;
+            case S_CODE:        dbuf_append_str (dbuf, " code"); break;
+            case S_IDATA:       dbuf_append_str (dbuf, " idata"); break;
+            case S_PDATA:       dbuf_append_str (dbuf, " pdata"); break;
+            case S_LITERAL:     dbuf_append_str (dbuf, " literal"); break;
+            case S_STACK:       dbuf_append_str (dbuf, " stack"); break;
+            case S_XSTACK:      dbuf_append_str (dbuf, " xstack"); break;
+            case S_BIT:         dbuf_append_str (dbuf, " bit"); break;
+            case S_EEPROM:      dbuf_append_str (dbuf, " eeprom"); break;
+            default: break;
+            }
+        }
 
       /* search entry in list before "type" */
       for (search = start; search && search->next != type;)
@@ -3834,4 +3877,22 @@ isVolatile (sym_link * type)
     return SPEC_VOLATILE (type);
   else
     return DCL_PTR_VOLATILE (type);
+}
+
+/*-------------------------------------------------------------------*/
+/* isRestrict - check if the type is restricted                      */
+/*-------------------------------------------------------------------*/
+int
+isRestrict (sym_link * type)
+{
+  if (!type)
+    return 0;
+
+  while (IS_ARRAY (type))
+    type = type->next;
+
+  if (IS_SPEC (type))
+    return SPEC_RESTRICT (type);
+  else
+    return DCL_PTR_RESTRICT (type);
 }

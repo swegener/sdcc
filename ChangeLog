@@ -1,3 +1,31 @@
+2009-10-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/string.h,
+	* device/lib/_strlen.c: return size_t
+	* device/lib/_memchr.c,
+	* device/lib/_strcspn.c: cosmetic changes
+	* device/lib/sincosf.c,
+	* device/lib/cosf.c,
+	* device/lib/sinf.c: use BOOL instead of larger int
+	* src/z80/gen.c,
+	* src/z80/mappings.i: cosmetic changes
+	* src/SDCCsymt.c (pointerTypes, mergeDeclSpec, checkSClass): fixed bug 2817646
+	  (checkFunction): disabled __naked
+	  (dbuf_printTypeChain): more like RFE 2824498, print C-ish
+	  (isRestrict): added
+	* src/SDCCsymt.h: added IS_RESTRICT, mergeDeclSpec, isRestrict
+	* src/SDCC.y: use mergeDeclSpec to fix bug 2817646
+	* src/SDCCicode.c (checkPtrQualifiers, checkTypes, geniCodeAssign,
+	  geniCodeParms, geniCodeCall): fixed bug 1302048
+	* src/SDCCerr.c,
+	* src/SDCCerr.h: added warning W_TARGET_LOST_QUALIFIER
+	* support/regression/tests/bug-136564.c,
+	* support/regression/tests/bug-223113.c,
+	* support/regression/tests/bug1839277.c,
+	* support/regression/tests/bug2655200.c: added necessary const keywords
+	* support/regression/tests/strtok.c: removed incorrect const keyword
+	* support/regression/tests/bug2817646.c: new, added
+
 2009-10-03 Philipp Klaus Krause <pkk AT spth.de>
 	  src/z80/z80-peeph.def:
 	  Reenabled unproblematic peephole changes.
@@ -69,7 +97,7 @@
 2009-09-08 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/p89v51rd2.h: Watchdog Timer Control sfr is
-	  bit addressable. 
+	  bit addressable.
 
 2009-08-31 Maarten Brock <sourceforge.brock AT dse.nl>
 

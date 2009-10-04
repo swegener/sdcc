@@ -25,6 +25,8 @@
 	* support/regression/tests/bug2655200.c: added necessary const keywords
 	* support/regression/tests/strtok.c: removed incorrect const keyword
 	* support/regression/tests/bug2817646.c: new, added
+	* .version,
+	* doc/sdccman.lyx: bumped version to 2.9.3
 
 2009-10-03 Philipp Klaus Krause <pkk AT spth.de>
 	  src/z80/z80-peeph.def:

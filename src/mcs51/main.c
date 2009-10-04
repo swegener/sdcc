@@ -740,8 +740,8 @@ PORT mcs51_port =
   {                             /* Assembler */
     _asmCmd,
     NULL,
-    "-plosgffc",                /* Options with debug */
-    "-plosgff",                 /* Options without debug */
+    "-plosgffwzc",              /* Options with debug */
+    "-plosgffwz",               /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */
@@ -766,7 +766,7 @@ PORT mcs51_port =
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },		/* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
   {
     "XSTK    (PAG,XDATA)",      // xstack_name
     "STACK   (DATA)",           // istack_name

@@ -48,11 +48,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              sym *   lookup()
  *              mne *   mlookup()
  *              VOID *  new()
+ *		char *	strsto()
  *              int     symeq()
  *              VOID    syminit()
  *              VOID    symglob()
  *
- *      assym.c contains no local/static variables.
+ *	assym.c contains the static variables:
+ *		char *	pnext
+ *		int	bytes
+ *	used by the string store function.
  */
 
 /*)Function     VOID    syminit()
@@ -86,7 +90,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *      side effects:
  *              (1)     The symbol hash tables are initialized,
- *                      the only defined symbol is '.'.
+ *			the predefined symbols are '.' and '.__.ABS.'.
  *              (2)     The mnemonic/directive hash tables are
  *                      initialized with the assembler directives
  *                      and mnemonics found in the machine dependent
@@ -160,10 +164,12 @@ alookup(char *id)
 
         ap = areap;
         while (ap) {
-                if (symeq(id, ap->a_id)) {
-                        return (ap);
-                }
-                ap = ap->a_ap;
+		/*
+		 * JLH: case insensitive lookup always
+		 */
+		if(symeq(id, ap->a_id, 0))
+			return (ap);
+		ap = ap->a_ap;
         }
         return(NULL);
 }
@@ -200,7 +206,10 @@ mlookup(char *id)
         h = hash(id);
         mp = mnehash[h];
         while (mp) {
-                if (as_strcmpi(id, mp->m_id) == 0)      /* JLH: case insensitive */
+		/*
+		 * JLH: case insensitive lookup always
+		 */
+		if(symeq(id, mp->m_id, 0))
                         return (mp);
                 mp = mp->m_mp;
         }
@@ -224,10 +233,12 @@ mlookup(char *id)
  *      global varaibles:
  *              sym * symhash[]         array of pointers to NHASH
  *                                      linked symbol lists
- *
+  *		int	zflag		enable symbol case sensitivity
+*
  *      functions called:
  *              int     hash()          assym.c
  *              VOID *  new()           assym.c
+ *		char *	strsto()	assym.c
  *              int     symeq()         assym.c
  *
  *      side effects:
@@ -244,7 +255,7 @@ lookup(char *id)
         h = hash(id);
         sp = symhash[h];
         while (sp) {
-                if (symeq(id, sp->s_id))
+		if(symeq(id, sp->s_id, zflag))
                         return (sp);
                 sp = sp->s_sp;
         }
@@ -335,37 +346,58 @@ allglob(void)
         }
 }
 
-/*)Function     int     symeq(p1, p2)
+/*)Function	int	symeq(p1, p2, cflag)
  *
- *              char *  p1              name string
- *              char *  p2              name string
+ *		int	cflag		case sensitive flag
+ *		char *	p1		name string
+ *		char *	p2		name string
  *
- *      The function symeq() compares the two name strings for a match.
- *      The return value is 1 for a match and 0 for no match.
+ *	The function symeq() compares the two name strings for a match.
+ *	The return value is 1 for a match and 0 for no match.
  *
- *      local variables:
- *              int     h               loop counter
+ *		cflag == 0	case insensitve compare
+ *		cflag != 0	case sensitive compare
  *
- *      global variables:
- *              char    ccase[]         an array of characters which
- *                                      perform the case translation function
+ *	local variables:
+ *		int	n		loop counter
  *
- *      functions called:
- *              none
+ *	global variables:
+ *		char	ccase[]		an array of characters which
+ *					perform the case translation function
  *
- *      side effects:
- *              none
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
  *
  */
 
 int
-symeq(char *p1, char *p2)
+symeq(p1, p2, cflag)
+register char *p1, *p2;
+int cflag;
 {
-#if     CASE_SENSITIVE
-                return (strcmp( p1, p2 ) == 0);
-#else
-                return (as_strcmpi( p1, p2 ) == 0);
-#endif
+	register n;
+
+	n = strlen(p1) + 1;
+	if(cflag) {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
+				return (0);
+		} while (--n);
+	} else {
+		/*
+		 * Case Insensitive Compare
+		 */
+		do {
+			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])				return (0);
+		} while (--n);
+	}
+	return (1);
 }
 
 /*)Function     int     hash(p)
@@ -397,10 +429,12 @@ hash(char *p)
 
         h = 0;
         while (*p) {
-                /* JLH: case insensitive hash:  Doesn't much affect
-                 * hashing, and allows same function for mnemonics and symbols
-                 */
-                h += ccase[(int)*p++];
+		/*
+		 * JLH: case insensitive hash:
+		 * Doesn't much affect hashing, and allows
+		 * same function for mnemonics and symbols.
+		 */
+                h += ccase[*p++ & 0x007F];
         }
         return (h&HMASK);
 }

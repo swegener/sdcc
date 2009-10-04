@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *           - add DS80C390 flat mode support.
  */
 
-#define VERSION "V01.75 + NoICE + SDCC mods + Flat24 Feb-1999"
+#define VERSION "V02.00 + NoICE + SDCC mods + Flat24 Feb-1999"
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #include <unistd.h>
@@ -405,8 +405,6 @@ struct  tsym
 
 extern  int     aserr;                  /*      ASxxxx error counter
                                          */
-extern  int     asfatal;                /*      ASxxxx fatal error counter
-                                         */
 extern  jmp_buf jump_env;               /*      compiler dependent structure
                                          *      used by setjmp() and longjmp()
                                          */
@@ -458,17 +456,11 @@ extern  int     lop;                    /*      current line number on page
                                          */
 extern  int     pass;                   /*      assembler pass number
                                          */
-extern  int     org_cnt;                /*      .org directive counter
-                                         */
 extern  int     lflag;                  /*      -l, generate listing flag
-                                         */
-extern  int     cflag;                  /*      -c, generate sdcdb debug information
                                          */
 extern  int     gflag;                  /*      -g, make undefined symbols global flag
                                          */
 extern  int     aflag;                  /*      -a, make all symbols global flag
-                                         */
-extern  int     jflag;                  /*      -j, generate debug information flag
                                          */
 extern  int     oflag;                  /*      -o, generate relocatable output flag
                                          */
@@ -532,11 +524,6 @@ extern  char    tb[NTITL];              /*      Title string buffer
                                          */
 extern  char    stb[NSBTL];             /*      Subtitle string buffer
                                          */
-extern  char    optsdcc[NINPUT];        /*      sdcc compile options
-                                         */
-extern  int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
-                                         *      flat mode (via .flat24 directive).
-                                         */
 extern  char    symtbl[];               /*      string "Symbol Table"
                                          */
 extern  char    aretbl[];               /*      string "Area Table"
@@ -556,10 +543,25 @@ extern  FILE    *ifp[MAXINC];           /*      array of include-file file handl
 extern  unsigned char   ctype[128];     /*      array of character types, one per
                                          *      ASCII character
                                          */
-
 extern  char    ccase[128];             /* an array of characters which
                                          * perform the case translation function
                                          */
+/*sdas specific */
+extern  int     asfatal;                /*      ASxxxx fatal error counter
+                                         */
+extern  int     org_cnt;                /*      .org directive counter
+                                         */
+extern  int     cflag;                  /*      -c, generate sdcdb debug information
+                                         */
+extern  int     jflag;                  /*      -j, generate debug information flag
+                                         */
+extern  char    optsdcc[NINPUT];        /*      sdcc compile options
+                                         */
+extern  int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
+                                         *      flat mode (via .flat24 directive).
+                                         */
+/*end sdas specific */
+
 /*
  * Definitions for Character Types
  */

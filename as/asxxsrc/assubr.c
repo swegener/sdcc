@@ -111,43 +111,44 @@ diag()
 
 	if (eb != ep) {
 		p = eb;
-#if 0
-		fprintf(stderr, "?ASxxxx-Error-<");
-		while (p < ep) {
-			fprintf(stderr, "%c", *p++);
-		}
-		fprintf(stderr, "> in line ");
-		if (incfil >= 0) {
-			fprintf(stderr, "%d", incline[incfil]);
-			fprintf(stderr, " of %s\n", incfn[incfil]);
-		} else {
-			fprintf(stderr, "%d", srcline[cfile]);
-			fprintf(stderr, " of %s\n", srcfn[cfile]);
-		}
-		p = eb;
-#endif
+                if (!is_sdas()) {
+                        fprintf(stderr, "?ASxxxx-Error-<");
+                        while (p < ep) {
+                                fprintf(stderr, "%c", *p++);
+                        }
+                        fprintf(stderr, "> in line ");
+                        if (incfil >= 0) {
+                                fprintf(stderr, "%d", incline[incfil]);
+                                fprintf(stderr, " of %s\n", incfn[incfil]);
+                        } else {
+                                fprintf(stderr, "%d", srcline[cfile]);
+                                fprintf(stderr, " of %s\n", srcfn[cfile]);
+                        }
+                        p = eb;
+                }
 		while (p < ep) {
 			if ((errstr = geterr(*p++)) != NULL) {
-#if 1
-				/* Modified to conform to gcc error standard, M. Hope, 7 Feb 98. */
-				if (incfil >= 0) {
-					fprintf(stderr, "%s:", incfn[incfil]);
-					fprintf(stderr, "%d: Error:", incline[incfil]);
+                                if (is_sdas()) {
+                                        /* Modified to conform to gcc error standard, M. Hope, 7 Feb 98. */
+                                        if (incfil >= 0) {
+                                                fprintf(stderr, "%s:", incfn[incfil]);
+                                                fprintf(stderr, "%d: Error:", incline[incfil]);
+                                        }
+                                        else {
+                                                fprintf(stderr, "%s:", srcfn[cfile]);
+                                                fprintf(stderr, "%d: Error:", srcline[cfile]);
+                                        }
+                                        fprintf(stderr, " %s\n", errstr);
+                                } else {
+					fprintf(stderr, "              %s\n", errstr);
 				}
-				else {
-					fprintf(stderr, "%s:", srcfn[cfile]);
-					fprintf(stderr, "%d: Error:", srcline[cfile]);
-				}
-				fprintf(stderr, " %s\n", errstr);
-#else
-				fprintf(stderr, "              %s\n", errstr);
-#endif
 			}
 		}
 		++aserr;
 	}
 }
 
+/* sdas specific */
 /*)Function	VOID	warnBanner()
  *
  *	The function warnBanner() prints a generic warning message
@@ -189,6 +190,7 @@ warnBanner(void)
 	}
 	fprintf(stderr, "               ");
 }	
+/* end sdas specific */
 
 /*)Functions:	VOID	aerr()
  *		VOID	qerr()

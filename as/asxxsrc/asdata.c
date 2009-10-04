@@ -84,17 +84,11 @@ int     lop;                    /*      current line number on page
                                  */
 int     pass;                   /*      assembler pass number
                                  */
-int     org_cnt;                /*      .org directive counter
-                                 */
 int     lflag;                  /*      -l, generate listing flag
-                                 */
-int     cflag;                  /*      -lc, generate sdcdb debug info
                                  */
 int     gflag;                  /*      -g, make undefined symbols global flag
                                  */
 int     aflag;                  /*      -a, make all symbols global flag
-                                 */
-int     jflag;                  /*      -j, generate debug information flag
                                  */
 int     oflag;                  /*      -o, generate relocatable output flag
                                  */
@@ -144,19 +138,25 @@ char    tb[NTITL];              /*      Title string buffer
                                  */
 char    stb[NSBTL];             /*      Subtitle string buffer
                                  */
-/* sdas specific */
-char    optsdcc[NINPUT];        /*      sdcc compile options
-                                 */
-int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
-                                 *      flat mode (via .flat24 directive).
-                                 */
-/* end sdas specific */
 
 char    symtbl[] = { "Symbol Table" };
 char    aretbl[] = { "Area Table" };
 
 char    module[NCPS];           /*      module name string
                                  */
+/* sdas specific */
+int     org_cnt;                /*      .org directive counter
+                                 */
+int     cflag;                  /*      -c, generate sdcdb debug info
+                                 */
+int     jflag;                  /*      -j, generate debug information flag
+                                 */
+char    optsdcc[NINPUT];        /*      sdcc compile options
+                                 */
+int     flat24Mode;             /*      non-zero if we are using DS390 24 bit
+                                 *      flat mode (via .flat24 directive).
+                                 */
+/* end sdas specific */
 
 /*
  *      The mne structure is a linked list of the assembler

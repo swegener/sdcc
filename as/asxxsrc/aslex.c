@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /*)Function     VOID    getid(id,c)
  *
  *              char *  id              a pointer to a string of
- *                                      maximum length NCPS
+ *                                      maximum length NCPS-1
  *              int     c               mode flag
  *                                      >=0     this is first character to
  *                                              copy to the string buffer
@@ -63,15 +63,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      The function getid() scans the current assembler-source text line
  *      from the current position copying the next LETTER | DIGIT string
  *      into the external string buffer (id).  The string ends when a non
- *      LETTER or DIGIT character is found. The maximum number of
- *      characters copied is NCPS.  If the input string is larger than
- *      NCPS characters then the string is truncated, if the input string
- *      is shorter than NCPS characters then the string is NULL filled.
- *      If the mode argument (c) is >=0 then (c) is the first character
- *      copied to the string buffer, if (c) is <0 then intervening white
- *      space (SPACES and TABS) are skipped and the first character found
- *      must be a LETTER else a 'q' error terminates the parse of this
- *      assembler-source text line.
+ *	LETTER or DIGIT character is found. The maximum number of characters
+ *	copied is NCPS-1.  If the input string is larger than NCPS-1
+ *	characters then the string is truncated.  The string is always
+ *	NULL terminated.  If the mode argument (c) is >=0 then (c) is
+ *	the first character copied to the string buffer, if (c) is <0
+ *	then intervening white space (SPACES and TABS) are skipped and
+ *	the first character found must be a LETTER else a 'q' error
+ *	terminates the parse of this assembler-source text line.
  *
  *      local variables:
  *              char *  p               pointer to external string buffer
@@ -108,31 +107,29 @@ char *id;
         }
         p = id;
         do {
-                if (p < &id[NCPS])
+                if (p < &id[NCPS-1])
                         *p++ = c;
         } while (ctype[c=get()] & (LETTER|DIGIT));
         unget(c);
-        while (p < &id[NCPS])
-                *p++ = 0;
+        *p++ = 0;
 }
 
 /*)Function     VOID    getst(id,c)
  *
  *              char *  id              a pointer to a string of
- *                                      maximum length NCPS
+ *                                      maximum length NCPS-1
  *              int     c               mode flag
  *                                      >=0     this is first character to
  *                                              copy to the string buffer
  *                                      <0      skip white space, first
  *                                              character must be a LETTER
  *
- *      The function getnbid() scans the current assembler-source text line
+ *      The function getst() scans the current assembler-source text line
  *      from the current position copying the next character string into
  *      the external string buffer (id).  The string ends when a SPACE or
- *      ILL character is found. The maximum number of
- *      characters copied is NCPS.  If the input string is larger than
- *      NCPS characters then the string is truncated, if the input string
- *      is shorter than NCPS characters then the string is NULL filled.
+ *	ILL character is found. The maximum number of characters copied is
+ *	NCPS-1.  If the input string is larger than NCPS-1 characters then
+ *	the string is truncated.  The string is always NULL terminated.
  *      If the mode argument (c) is >=0 then (c) is the first character
  *      copied to the string buffer, if (c) is <0 then intervening white
  *      space (SPACES and TABS) are skipped and the first character found
@@ -174,12 +171,11 @@ char *id;
         }
         p = id;
         do {
-                if (p < &id[NCPS])
+                if (p < &id[NCPS-1])
                         *p++ = c;
-        } while (ctype[c=get()] & (0xFF - (SPACE|ILL)));
+        } while (ctype[c=get()] & ~(SPACE|ILL) & 0xFF);
         unget(c);
-        while (p < &id[NCPS])
-                *p++ = 0;
+        *p++ = 0;
 }
 
 /*)Function     char    getnb()
@@ -242,7 +238,7 @@ get()
 
         if ((c = *ip) != 0)
                 ++ip;
-        return (c);
+        return (c & 0x007F);
 }
 
 /*)Function     VOID    unget(c)
@@ -275,6 +271,7 @@ get()
 
 VOID
 unget(c)
+int c;
 {
         if (c)
                 if (ip != ib)
@@ -313,6 +310,7 @@ unget(c)
 
 int
 getmap(d)
+int d;
 {
         register int c, n, v;
 

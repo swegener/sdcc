@@ -53,7 +53,7 @@ static char *_hc08_keywords[] =
 
 void hc08_assignRegisters (ebbIndex *);
 
-static int regParmFlg = 0;	/* determine if we can register a parameter */
+static int regParmFlg = 0;      /* determine if we can register a parameter */
 
 static void
 _hc08_init (void)
@@ -71,7 +71,7 @@ static int
 _hc08_regparm (sym_link * l, bool reentrant)
 {
   int size = getSize(l);
-    
+
   /* If they fit completely, the first two bytes of parameters can go */
   /* into A and X, otherwise, they go on the stack. Examples:         */
   /*   foo(char p1)                    A <- p1                        */
@@ -85,7 +85,7 @@ _hc08_regparm (sym_link * l, bool reentrant)
   if (regParmFlg>=2)
     return 0;
 
-  if ((regParmFlg+size)>2) 
+  if ((regParmFlg+size)>2)
     {
       regParmFlg = 2;
       return 0;
@@ -104,11 +104,11 @@ _hc08_parseOptions (int *pargc, char **argv, int *i)
       debugFile = &dwarf2DebugFile;
       return TRUE;
     }
-    
+
   return FALSE;
 }
 
-static OPTION _hc08_options[] = 
+static OPTION _hc08_options[] =
   {
     {  0,   "--out-fmt-elf", NULL, "Output executable in ELF format" },
     {  0, NULL }
@@ -139,9 +139,9 @@ _hc08_setDefaultOptions (void)
 {
   options.code_loc = 0x8000;
   options.data_loc = 0x80;
-  options.xdata_loc = 0;	/* 0 means immediately following data */
+  options.xdata_loc = 0;        /* 0 means immediately following data */
   options.stack_loc = 0x7fff;
-  options.out_fmt = 1;		/* use motorola S19 output */
+  options.out_fmt = 1;          /* use motorola S19 output */
 
   options.omitFramePtr = 1; /* no frame pointer (we use SP */
                             /* offsets instead)            */
@@ -180,25 +180,25 @@ _hc08_genAssemblerPreamble (FILE * of)
     {
       // generate interrupt vector table
       fprintf (of, "\t.area\tCODEIVT (ABS)\n");
-      
+
       for (i=maxInterrupts;i>0;i--)
         {
           if (interrupts[i])
-	    {
-	      if (needOrg)
-		{
-		  fprintf (of, "\t.org\t0x%04x\n", (0xfffe - (i * 2)));
-		  needOrg = 0;
-		}
-	      fprintf (of, "\t.dw\t%s\n", interrupts[i]->rname);
-	    }
+            {
+              if (needOrg)
+                {
+                  fprintf (of, "\t.org\t0x%04x\n", (0xfffe - (i * 2)));
+                  needOrg = 0;
+                }
+              fprintf (of, "\t.dw\t%s\n", interrupts[i]->rname);
+            }
           else
-	    needOrg = 1;
+            needOrg = 1;
         }
       if (needOrg)
-	fprintf (of, "\t.org\t0xfffe\n");
+        fprintf (of, "\t.org\t0xfffe\n");
       fprintf (of, "\t.dw\t%s", "__sdcc_gs_init_startup\n\n");
-        
+
       fprintf (of, "\t.area GSINIT0\n");
       fprintf (of, "__sdcc_gs_init_startup:\n");
       if (options.stack_loc)
@@ -232,7 +232,7 @@ _hc08_genAssemblerPreamble (FILE * of)
       fprintf (of, "__sdcc_program_startup:\n");
       fprintf (of, "\tjsr\t_main\n");
       fprintf (of, "\tbra\t.\n");
-      
+
     }
 }
 
@@ -259,11 +259,11 @@ static int
 _hc08_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
   int i;
-  
+
   dbuf_printf (oBuf, "\t.area\tCODEIVT (ABS)\n");
   dbuf_printf (oBuf, "\t.org\t0x%04x\n",
     (0xfffe - (maxInterrupts * 2)));
-  
+
   for (i=maxInterrupts;i>0;i--)
     {
       if (interrupts[i])
@@ -272,14 +272,14 @@ _hc08_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
         dbuf_printf (oBuf, "\t.dw\t0xffff\n");
     }
   dbuf_printf (oBuf, "\t.dw\t%s", "__sdcc_gs_init_startup\n");
-        
+
   return TRUE;
 }
 
 /* Generate code to copy XINIT to XISEG */
 static void _hc08_genXINIT (FILE * of) {
-  fprintf (of, ";	_hc08_genXINIT() start\n");
-  fprintf (of, ";	_hc08_genXINIT() end\n");
+  fprintf (of, ";       _hc08_genXINIT() start\n");
+  fprintf (of, ";       _hc08_genXINIT() end\n");
 }
 
 
@@ -290,22 +290,22 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
     sym_link *result_type = operandType(result);
 
     return 0; /* disable CSE */
-    
+
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
-    
+
     if (ic->op == ADDRESS_OF)
       return 0;
-    
-    /* if bitwise | add & subtract then no since hc08 is pretty good at it 
+
+    /* if bitwise | add & subtract then no since hc08 is pretty good at it
        so we will cse only if they are local (i.e. both ic & pdic belong to
        the same basic block */
     if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
-	/* then if they are the same Basic block then ok */
-	if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
-	else return 0;
+        /* then if they are the same Basic block then ok */
+        if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
+        else return 0;
     }
-	
+
     /* for others it is cheaper to do the cse */
     return 1;
 }
@@ -330,14 +330,14 @@ oclsExpense (struct memmap *oclass)
 {
   /* The hc08's addressing modes allow access to all storage classes */
   /* inexpensively (<=0) */
-  
-  if (IN_DIRSPACE (oclass))	/* direct addressing mode is fastest */
+
+  if (IN_DIRSPACE (oclass))     /* direct addressing mode is fastest */
     return -2;
-  if (IN_FARSPACE (oclass))	/* extended addressing mode is almost at fast */
+  if (IN_FARSPACE (oclass))     /* extended addressing mode is almost at fast */
     return -1;
   if (oclass == istack) /* stack is the slowest, but still faster than */
-    return 0;		/* trying to copy to a temp location elsewhere */
-  
+    return 0;           /* trying to copy to a temp location elsewhere */
+
   return 0; /* anything we missed */
 }
 
@@ -382,22 +382,22 @@ PORT hc08_port =
 {
   TARGET_ID_HC08,
   "hc08",
-  "HC08",			/* Target name */
-  NULL,				/* Processor name */
+  "HC08",                       /* Target name */
+  NULL,                         /* Processor name */
   {
     glue,
-    FALSE,			/* Emit glue around main */
+    FALSE,                      /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,
     MODEL_LARGE
   },
   {
     _asmCmd,
     NULL,
-    "-plosgffc",		/* Options with debug */
-    "-plosgff",			/* Options without debug */
+    "-plosgffwzc",              /* Options with debug */
+    "-plosgffwz",               /* Options without debug */
     0,
     ".asm",
-    NULL				/* no do_assemble function */
+    NULL                        /* no do_assemble function */
   },
   {
     _linkCmd,
@@ -410,12 +410,12 @@ PORT hc08_port =
     _defaultRules
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 2, 2, 2, 1, 4, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },		/* far, near, xstack, code */
-  
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+
   {
     "XSEG",
     "STACK",
@@ -443,12 +443,12 @@ PORT hc08_port =
   { _hc08_genExtraAreas,
     NULL },
   {
-    -1,		/* direction (-1 = stack grows down) */
-    0,		/* bank_overhead (switch between register banks) */
-    4,		/* isr_overhead */
-    2,		/* call_overhead */
-    0,		/* reent_overhead */
-    0		/* banked_overhead (switch between code banks) */
+    -1,         /* direction (-1 = stack grows down) */
+    0,          /* bank_overhead (switch between register banks) */
+    4,          /* isr_overhead */
+    2,          /* call_overhead */
+    0,          /* reent_overhead */
+    0           /* banked_overhead (switch between code banks) */
   },
     /* hc08 has an 8 bit mul */
   {
@@ -460,11 +460,11 @@ PORT hc08_port =
       hc08_dwarfRegNum,
       NULL,
       NULL,
-      4,			/* addressSize */
-      14,			/* regNumRet */
-      15,			/* regNumSP */
-      -1,			/* regNumBP */
-      1,			/* offsetSP */
+      4,                        /* addressSize */
+      14,                       /* regNumRet */
+      15,                       /* regNumSP */
+      -1,                       /* regNumBP */
+      1,                        /* offsetSP */
     },
   },
   {
@@ -486,30 +486,30 @@ PORT hc08_port =
   _hc08_getRegName,
   _hc08_keywords,
   _hc08_genAssemblerPreamble,
-  _hc08_genAssemblerEnd,	/* no genAssemblerEnd */
+  _hc08_genAssemblerEnd,        /* no genAssemblerEnd */
   _hc08_genIVT,
   _hc08_genXINIT,
-  NULL, 			/* genInitStartup */
+  NULL,                         /* genInitStartup */
   _hc08_reset_regparm,
   _hc08_regparm,
-  NULL,				/* process_pragma */
-  NULL,				/* getMangledFunctionName */
-  NULL,				/* hasNativeMulFor */
-  hasExtBitOp,			/* hasExtBitOp */
-  oclsExpense,			/* oclsExpense */
-  TRUE,				/* use_dw_for_init */
-  FALSE,			/* little_endian */
-  0,				/* leave lt */
-  0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
-  0,				/* leave == */
+  NULL,                         /* process_pragma */
+  NULL,                         /* getMangledFunctionName */
+  NULL,                         /* hasNativeMulFor */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
+  TRUE,                         /* use_dw_for_init */
+  FALSE,                        /* little_endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
-  NULL, 			/* no builtin functions */
-  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
-  1,				/* reset labelKey to 1 */
-  1,				/* globals & local static allowed */
+  NULL,                         /* no builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
   PORT_MAGIC
 };

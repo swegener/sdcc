@@ -350,31 +350,31 @@ _ds390_genInitStartup (FILE *of)
 
 /* Generate code to copy XINIT to XISEG */
 static void _ds390_genXINIT (FILE * of) {
-  fprintf (of, ";	_ds390_genXINIT() start\n");
-  fprintf (of, "	mov	a,#l_XINIT\n");
-  fprintf (of, "	orl	a,#l_XINIT>>8\n");
-  fprintf (of, "	jz	00003$\n");
-  fprintf (of, "	mov	a,#s_XINIT\n");
-  fprintf (of, "	add	a,#l_XINIT\n");
-  fprintf (of, "	mov	r1,a\n");
-  fprintf (of, "	mov	a,#s_XINIT>>8\n");
-  fprintf (of, "	addc	a,#l_XINIT>>8\n");
-  fprintf (of, "	mov	r2,a\n");
-  fprintf (of, "	mov	dptr,#s_XINIT\n");
-  fprintf (of, "	mov	dps,#0x21\n");
-  fprintf (of, "	mov	dptr,#s_XISEG\n");
-  fprintf (of, "00001$:	clr	a\n");
-  fprintf (of, "	movc	a,@a+dptr\n");
-  fprintf (of, "	movx	@dptr,a\n");
-  fprintf (of, "	inc	dptr\n");
-  fprintf (of, "	inc	dptr\n");
-  fprintf (of, "00002$:	mov	a,dpl\n");
-  fprintf (of, "	cjne	a,ar1,00001$\n");
-  fprintf (of, "	mov	a,dph\n");
-  fprintf (of, "	cjne	a,ar2,00001$\n");
-  fprintf (of, "	mov	dps,#0\n");
+  fprintf (of, ";       _ds390_genXINIT() start\n");
+  fprintf (of, "        mov     a,#l_XINIT\n");
+  fprintf (of, "        orl     a,#l_XINIT>>8\n");
+  fprintf (of, "        jz      00003$\n");
+  fprintf (of, "        mov     a,#s_XINIT\n");
+  fprintf (of, "        add     a,#l_XINIT\n");
+  fprintf (of, "        mov     r1,a\n");
+  fprintf (of, "        mov     a,#s_XINIT>>8\n");
+  fprintf (of, "        addc    a,#l_XINIT>>8\n");
+  fprintf (of, "        mov     r2,a\n");
+  fprintf (of, "        mov     dptr,#s_XINIT\n");
+  fprintf (of, "        mov     dps,#0x21\n");
+  fprintf (of, "        mov     dptr,#s_XISEG\n");
+  fprintf (of, "00001$: clr     a\n");
+  fprintf (of, "        movc    a,@a+dptr\n");
+  fprintf (of, "        movx    @dptr,a\n");
+  fprintf (of, "        inc     dptr\n");
+  fprintf (of, "        inc     dptr\n");
+  fprintf (of, "00002$: mov     a,dpl\n");
+  fprintf (of, "        cjne    a,ar1,00001$\n");
+  fprintf (of, "        mov     a,dph\n");
+  fprintf (of, "        cjne    a,ar2,00001$\n");
+  fprintf (of, "        mov     dps,#0\n");
   fprintf (of, "00003$:\n");
-  fprintf (of, ";	_ds390_genXINIT() end\n");
+  fprintf (of, ";       _ds390_genXINIT() end\n");
 }
 
 /* Do CSE estimation */
@@ -906,8 +906,8 @@ PORT ds390_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffc",                /* Options with debug */
-    "-plosgff",                 /* Options without debug */
+    "-plosgffwzc",              /* Options with debug */
+    "-plosgffwz",               /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */
@@ -929,7 +929,7 @@ PORT ds390_port =
         /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
-  
+
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
@@ -1493,8 +1493,8 @@ PORT ds400_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffc",                /* Options with debug */
-    "-plosgff",                 /* Options without debug */
+    "-plosgffwzc",              /* Options with debug */
+    "-plosgffwz",               /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */

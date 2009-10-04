@@ -1,3 +1,11 @@
+2009-10-04 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/asdata.c, as/asxxsrc/aslex.c, as/asxxsrc/assubr.c,
+	  as/asxxsrc/assym.c, as/asxxsrc/asxxxx.h:
+	  partially synced with asxxxx v2.0
+	* src/ds390/main.c, src/hc08/main.c, src/mcs51/main.c, src/z80/main.c:
+	  added -z and -w option to assembler invocation
+
 2009-10-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/string.h,

@@ -65,7 +65,7 @@ static OPTION _z80_options[] =
     { 0, NULL }
   };
 
-static OPTION _gbz80_options[] = 
+static OPTION _gbz80_options[] =
   {
     { 0, OPTION_BO,              NULL, "<num> use code bank <num>" },
     { 0, OPTION_BA,              NULL, "<num> use data bank <num>" },
@@ -89,7 +89,7 @@ ASM_TYPE;
 static struct
   {
     ASM_TYPE asmType;
-    /* determine if we can register a parameter */    
+    /* determine if we can register a parameter */
     int regParams;
   }
 _G;
@@ -142,7 +142,7 @@ _reg_parm (sym_link * l, bool reentrant)
     {
       return FALSE;
     }
-  else 
+  else
     {
       if (_G.regParams == 2)
         {
@@ -566,7 +566,7 @@ _setDefaultOptions (void)
   /* Default code and data locations. */
   options.code_loc = 0x200;
 
-  if (IS_GB) 
+  if (IS_GB)
     {
       options.data_loc = 0xC000;
     }
@@ -685,7 +685,7 @@ oclsExpense (struct memmap *oclass)
 {
   if (IN_FARSPACE(oclass))
     return 1;
-    
+
   return 0;
 }
 
@@ -728,8 +728,8 @@ PORT z80_port =
   {                             /* Assembler */
     _z80asmCmd,
     NULL,
-    "-plosgffc",                /* Options with debug */
-    "-plosgff",                 /* Options without debug */
+    "-plosgffwzc",              /* Options with debug */
+    "-plosgffwz",               /* Options without debug */
     0,
     ".asm"
   },
@@ -854,8 +854,8 @@ PORT gbz80_port =
   {                             /* Assembler */
     _gbz80asmCmd,
     NULL,
-    "-plosgffc",                /* Options with debug */
-    "-plosgff",                 /* Options without debug */
+    "-plosgffwzc",              /* Options with debug */
+    "-plosgffwz",               /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */

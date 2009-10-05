@@ -354,15 +354,6 @@ main(int argc, char *argv[])
 	}
 	if (inpfil < 0)
 		usage();
-        /* sdas specific */
-        if (is_sdas()) {
-                /* TODO: this should be passed in commad line at asm invocation */
-                /* force wide listing format for symbol table */
-                wflag = 1;
-                /* force enable case sensitivity for symbols */
-                zflag = 1;
-        }
-        /* end sdas specific */
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;

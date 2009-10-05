@@ -1,3 +1,9 @@
+2009-10-05 Borut Razem <borut.razem AT siol.net>
+
+	* as/asxxsrc/asmain.c:
+	  removed forced wide listing format for symbol table and
+	  removed forced enable case sensitivity for symbols in case of sdas
+
 2009-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/asxxsrc/assubr.c: include sdas.h

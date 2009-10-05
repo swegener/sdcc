@@ -378,7 +378,7 @@ symeq(p1, p2, cflag)
 register char *p1, *p2;
 int cflag;
 {
-	register n;
+	register size_t n;
 
 	n = strlen(p1) + 1;
 	if(cflag) {

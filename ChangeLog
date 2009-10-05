@@ -1,3 +1,10 @@
+2009-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/asxxsrc/assubr.c: include sdas.h
+	* as/asxxsrc/assym.c(symeq): type of n is size_t
+	* src/SDCCglue.c(initPointer): fixed bug 2655200 by using oclass->ptrType
+	* support/regression/tests/bug2655200.c: enabled --model-medium
+
 2009-10-04 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/asdata.c, as/asxxsrc/aslex.c, as/asxxsrc/assubr.c,

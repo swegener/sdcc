@@ -41,7 +41,7 @@ float sincosf(const float x, const BOOL iscos)
 {
     float y, f, r, g, XN;
     int N;
-	BOOL sign;
+    BOOL sign;
 
     if(iscos)
     {

@@ -51,9 +51,7 @@ const char *gime_thing_apdata() { return thing_apdata; }
 void
 testBug(void)
 {
-#if !defined (SDCC_MODEL_MEDIUM)        /* test-mcs51-medium fails */
  ASSERT(test_array[0] == gime_thing());
-#endif
 
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
  ASSERT(test_array[1] == gime_thing_code());

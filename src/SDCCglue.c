@@ -331,58 +331,17 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 }
 
 /*-----------------------------------------------------------------*/
-/* initPointer - pointer initialization code massaging             */
+/* initValPointer - pointer initialization code massaging          */
 /*-----------------------------------------------------------------*/
 value *
-initPointer (initList * ilist, sym_link *toType)
+initValPointer (ast *expr)
 {
   value *val;
-  ast *expr;
-
-  if (!ilist)
-    {
-      return valCastLiteral(toType, 0.0);
-    }
-
-  expr = list2expr (ilist);
-
-  if (!expr)
-    goto wrong;
-
-  /* try it the old way first */
-  if ((val = constExprValue (expr, FALSE)))
-    return val;
-
-  /* ( ptr + constant ) */
-  if (IS_AST_OP (expr) &&
-      (expr->opval.op == '+' || expr->opval.op == '-') &&
-      IS_AST_SYM_VALUE (expr->left) &&
-      (IS_ARRAY(expr->left->ftype) || IS_PTR(expr->left->ftype)) &&
-      compareType(toType, expr->left->ftype) &&
-      IS_AST_LIT_VALUE (expr->right))
-    {
-      return valForCastAggr (expr->left, expr->left->ftype,
-                             expr->right,
-                             expr->opval.op);
-    }
-
-  /* (char *)&a */
-  if (IS_AST_OP(expr) && expr->opval.op==CAST &&
-      IS_AST_OP(expr->right) && expr->right->opval.op=='&')
-    {
-      if (compareType(toType, expr->left->ftype)!=1)
-        {
-          werror (W_INIT_WRONG);
-          printFromToType(expr->left->ftype, toType);
-        }
-      // skip the cast ???
-      expr=expr->right;
-    }
 
   /* no then we have to do these kludgy checks */
   /* pointers can be initialized with address of
      a variable or address of an array element */
-  if (IS_AST_OP (expr) && expr->opval.op == '&')
+  if (IS_ADDRESS_OF_OP (expr))
     {
       /* address of symbol */
       if (IS_AST_SYM_VALUE (expr->left))
@@ -419,7 +378,7 @@ initPointer (initList * ilist, sym_link *toType)
         }
 
       /* if address of indexed array */
-      if (IS_AST_OP (expr->left) && expr->left->opval.op == '[')
+      if (IS_ARRAY_OP (expr->left))
         return valForArray (expr->left);
 
       /* if address of structure element then
@@ -442,25 +401,24 @@ initPointer (initList * ilist, sym_link *toType)
   /* case 3. (((char *) &a) +/- constant) */
   if (IS_AST_OP (expr) &&
       (expr->opval.op == '+' || expr->opval.op == '-') &&
-      IS_AST_OP (expr->left) && expr->left->opval.op == CAST &&
-      IS_AST_OP (expr->left->right) &&
-      expr->left->right->opval.op == '&' &&
+      IS_CAST_OP (expr->left) &&
+      IS_ADDRESS_OF_OP (expr->left->right) &&
       IS_AST_LIT_VALUE (expr->right))
     {
       return valForCastAggr (expr->left->right->left,
                              expr->left->left->opval.lnk,
                              expr->right, expr->opval.op);
     }
-  /* case 4. (char *)(array type) */
-  if (IS_CAST_OP(expr) && IS_AST_SYM_VALUE (expr->right) &&
-      IS_ARRAY(expr->right->ftype))
+  /* case 4. (array type) */
+  if (IS_AST_SYM_VALUE (expr) &&
+      IS_ARRAY(expr->ftype))
     {
-      STORAGE_CLASS sclass = SPEC_SCLS (expr->right->etype);
-      memmap *oclass = SPEC_OCLS (expr->right->etype);
+      STORAGE_CLASS sclass = SPEC_SCLS (expr->etype);
+      memmap *oclass = SPEC_OCLS (expr->etype);
 
-      val = copyValue (AST_VALUE (expr->right));
+      val = copyValue (AST_VALUE (expr));
       val->type = newLink (DECLARATOR);
-      if (SPEC_SCLS (expr->right->etype) == S_CODE)
+      if (SPEC_SCLS (expr->etype) == S_CODE)
         {
           DCL_TYPE (val->type) = CPOINTER;
           CodePtrPointsToConst (val->type);
@@ -481,11 +439,75 @@ initPointer (initList * ilist, sym_link *toType)
         DCL_TYPE (val->type) = EEPPOINTER;
       else
         DCL_TYPE (val->type) = POINTER;
-      val->type->next = expr->right->ftype->next;
+      val->type->next = expr->ftype->next;
       val->etype = getSpec (val->type);
       return val;
     }
- wrong:
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* initPointer - pointer initialization code massaging             */
+/*-----------------------------------------------------------------*/
+value *
+initPointer (initList * ilist, sym_link *toType)
+{
+  value *val;
+  ast *expr;
+
+  if (!ilist)
+    {
+      return valCastLiteral(toType, 0.0);
+    }
+
+  expr = list2expr (ilist);
+
+  if (!expr)
+    goto wrong;
+
+  /* try it the old way first */
+  if ((val = constExprValue (expr, FALSE)))
+    return val;
+
+  /* ( ptr + constant ) */
+  if (IS_AST_OP (expr) &&
+      (expr->opval.op == '+' || expr->opval.op == '-') &&
+      IS_AST_SYM_VALUE (expr->left) &&
+      (IS_ARRAY(expr->left->ftype) || IS_PTR(expr->left->ftype)) &&
+      compareType(toType, expr->left->ftype) &&
+      IS_AST_LIT_VALUE (expr->right))
+    {
+      return valForCastAggr (expr->left, expr->left->ftype,
+                             expr->right,
+                             expr->opval.op);
+    }
+
+  /* (char *)(expr1) */
+  if (IS_CAST_OP (expr))
+    {
+      if (compareType(toType, expr->left->ftype)!=1)
+        {
+          werror (W_INIT_WRONG);
+          printFromToType(expr->left->ftype, toType);
+        }
+      val = initValPointer (expr->right);
+      if (val)
+        {
+          DECLARATOR_TYPE dcl_type = DCL_TYPE (val->type);
+          val->type = expr->left->ftype;
+          val->etype = getSpec (val->type);
+          if (IS_GENPTR (val->type))
+            DCL_TYPE (val->type) = dcl_type;
+        }
+    }
+  else
+    {
+      val = initValPointer (expr);
+    }
+  if (val)
+      return val;
+
+wrong:
   if (expr)
     werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
   else

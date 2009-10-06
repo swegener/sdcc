@@ -1,3 +1,7 @@
+2009-10-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c(initValPointer, initPointer): fixed bug 2166213
+
 2009-10-05 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/asmain.c:

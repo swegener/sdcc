@@ -1,3 +1,11 @@
+2009-10-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCerr.c,
+	* src/SDCCerr.h: changed W_STRUCT_AS_ARG to error E_STRUCT_AS_ARG
+	* src/SDCCsymt.c(aggregateToPointer), 
+	* src/SDCCast.c(processParms): throw error for struct parameters,
+	  fixes bug 2874687
+
 2009-10-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c(initValPointer, initPointer): fixed bug 2166213

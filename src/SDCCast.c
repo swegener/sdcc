@@ -879,7 +879,13 @@ processParms (ast *func,
           resultType = RESULT_TYPE_GPTR;
         }
 
-      if (IS_AGGREGATE (ftype))
+      if (IS_STRUCT (ftype))
+        {
+          werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, (*actParm)->opval.val->name);
+          return 1;
+        }
+
+      if (IS_ARRAY (ftype))
         {
           newType = newAst_LINK (copyLinkChain (ftype));
           DCL_TYPE (newType->opval.lnk) = port->unqualified_pointer;
@@ -910,9 +916,17 @@ processParms (ast *func,
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, (*actParm)->ftype) == 0)
     {
-      werror (E_INCOMPAT_TYPES);
-      printFromToType ((*actParm)->ftype, defParm->type);
-      return 1;
+      if (IS_STRUCT ((*actParm)->ftype))
+        {
+          werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, (*actParm)->opval.val->name);
+          return 1;
+        }
+	  else
+        {
+          werror (E_INCOMPAT_TYPES);
+          printFromToType ((*actParm)->ftype, defParm->type);
+          return 1;
+        }
     }
 
   /* if the parameter is castable then add the cast */
@@ -1464,7 +1478,6 @@ stringToSymbol (value * val)
     }
   sym->ival = NULL;
   return symbolVal (sym);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -1648,7 +1661,6 @@ static bool
 isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
                  symbol ** sym, ast ** init, ast ** end)
 {
-
   /* the loop is considered countable if the following
      conditions are true :-
 
@@ -1681,7 +1693,6 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
   /* now check condExpr */
   if (IS_AST_OP (condExpr))
     {
-
       switch (condExpr->opval.op)
         {
         case '<':
@@ -1711,7 +1722,6 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
         default:
           return FALSE;
         }
-
     }
   else
     return FALSE;
@@ -1723,14 +1733,12 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
   /* check if <sym> ++ */
   if (loopExpr->opval.op == INC_OP)
     {
-
       if (loopExpr->left)
         {
           /* pre */
           if (IS_AST_SYM_VALUE (loopExpr->left) &&
               isSymbolEqual (*sym, AST_SYMBOL (loopExpr->left)))
             return TRUE;
-
         }
       else
         {
@@ -1739,7 +1747,6 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
               isSymbolEqual (*sym, AST_SYMBOL (loopExpr->right)))
             return TRUE;
         }
-
     }
   else
     {
@@ -1845,7 +1852,6 @@ astHasDeref (ast * tree)
 bool
 isConformingBody (ast * pbody, symbol * sym, ast * body)
 {
-
   /* we are going to do a pre-order traversal of the
      tree && check for the following conditions. (essentially
      a set of very shallow tests )
@@ -2119,7 +2125,6 @@ replLoopSym (ast * body, symbol * sym)
 
   if (IS_AST_SYM_VALUE (body))
     {
-
       if (isSymbolEqual (AST_SYMBOL (body), sym))
         {
 
@@ -2127,16 +2132,12 @@ replLoopSym (ast * body, symbol * sym)
           body->opval.op = '-';
           body->left = newAst_VALUE (symbolVal (sym));
           body->right = newAst_VALUE (constCharVal (1));
-
         }
-
       return;
-
     }
 
   replLoopSym (body->left, sym);
   replLoopSym (body->right, sym);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2183,7 +2184,6 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 
   rloop->lineno=init->lineno;
   return decorateType (rloop, RESULT_TYPE_NONE);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -6711,7 +6711,6 @@ void ast_print (ast * tree, FILE *outfile, int indent)
     fprintf(outfile,")\n");
     return ;
   }
-
 
   /* depending on type of operator do */
 

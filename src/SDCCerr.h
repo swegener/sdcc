@@ -112,7 +112,7 @@ SDCCERR - SDCC Standard error handler
 #define W_COMP_RANGE                   94 /* comparison is always %s due to limited range of data type */
 #define W_FUNC_NO_RETURN               95 /* no return statement found */
 #define W_PRE_PROC_WARNING             96 /* preprocessor generated warning */
-#define W_STRUCT_AS_ARG                97 /* structure passed as argument */
+#define E_STRUCT_AS_ARG                97 /* structure passed as argument */
 #define E_PREV_DEF_CONFLICT            98 /* previous definition conflicts with current */
 #define E_CODE_NO_INIT                 99 /* vars in code space must have initializer */
 #define E_OPS_INTEGRAL                100 /* operans must be integral for certian assignments */

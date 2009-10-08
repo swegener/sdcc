@@ -2442,15 +2442,10 @@ aggregateToPointer (value * val)
   if (IS_AGGREGATE (val->type))
     {
       /* if this is a structure */
-      /* then we need to add a new link */
       if (IS_STRUCT (val->type))
         {
-          /* first lets add DECLARATOR type */
-          sym_link *p = val->type;
-
-          werror (W_STRUCT_AS_ARG, val->name);
-          val->type = newLink (DECLARATOR);
-          val->type->next = p;
+          werror (E_STRUCT_AS_ARG, val->name);
+		  return NULL;
         }
 
       /* change to a pointer depending on the */
@@ -2799,8 +2794,10 @@ processFuncArgs (symbol * func)
         {
           SPEC_REGPARM (val->etype) = 1;
           SPEC_ARGREG(val->etype) = argreg;
-        } else if (IFFUNC_ISREENT(funcType)) {
-            FUNC_HASSTACKPARM(funcType) = 1;
+        }
+      else if (IFFUNC_ISREENT(funcType))
+        {
+          FUNC_HASSTACKPARM(funcType) = 1;
         }
 
       if (IS_AGGREGATE (val->type))
@@ -2813,24 +2810,27 @@ processFuncArgs (symbol * func)
     }
 
   /* if this is an internal generated function call */
-  if (func->cdef) {
-    /* ignore --stack-auto for this one, we don't know how it is compiled */
-    /* simply trust on --int-long-reent or --float-reent */
-    if (IFFUNC_ISREENT(funcType)) {
-      return;
+  if (func->cdef)
+    {
+      /* ignore --stack-auto for this one, we don't know how it is compiled */
+      /* simply trust on --int-long-reent or --float-reent */
+      if (IFFUNC_ISREENT(funcType))
+        {
+          return;
+        }
     }
-  } else {
-    /* if this function is reentrant or */
-    /* automatics r 2b stacked then nothing */
-    if (IFFUNC_ISREENT (funcType) || options.stackAuto)
-      return;
-  }
+  else
+    {
+      /* if this function is reentrant or */
+      /* automatics r 2b stacked then nothing */
+      if (IFFUNC_ISREENT (funcType) || options.stackAuto)
+        return;
+    }
 
   val = FUNC_ARGS(funcType);
   pNum = 1;
   while (val)
     {
-
       /* if a symbolname is not given  */
       /* synthesize a variable name */
       if (!val->sym)
@@ -2846,19 +2846,10 @@ processFuncArgs (symbol * func)
           val->sym->etype = getSpec (val->sym->type);
           val->sym->_isparm = 1;
           strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
-          #if 0
-          /* ?? static functions shouldn't imply static parameters - EEP */
-          if (IS_SPEC(func->etype)) {
-            SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
-              SPEC_STAT (func->etype);
-          }
-          #endif
           addSymChain (&val->sym);
-
         }
       else                      /* symbol name given create synth name */
         {
-
           SNPRINTF (val->name, sizeof(val->name), "_%s_PARM_%d", func->name, pNum++);
           strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
           val->sym->_isparm = 1;
@@ -2867,21 +2858,14 @@ processFuncArgs (symbol * func)
           else
             SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
               port->mem.default_local_map;
-
-          #if 0
-          /* ?? static functions shouldn't imply static parameters - EEP */
-          if (IS_SPEC(func->etype)) {
-            SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
-              SPEC_STAT (func->etype);
-          }
-          #endif
         }
       if (SPEC_OCLS (val->sym->etype) == pdata)
         val->sym->iaccess = 1;
-      if (!isinSet(operKeyReset, val->sym)) {
-        addSet (&operKeyReset, val->sym);
-        applyToSet (operKeyReset, resetParmKey);
-      }
+      if (!isinSet(operKeyReset, val->sym))
+        {
+          addSet (&operKeyReset, val->sym);
+          applyToSet (operKeyReset, resetParmKey);
+        }
       val = val->next;
     }
 }

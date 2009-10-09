@@ -1,3 +1,8 @@
+2009-10-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y,
+	* src/SDCCsymt.c(mergeDeclSpec): fixed bug 1376285
+
 2009-10-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCerr.c,

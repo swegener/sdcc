@@ -723,18 +723,46 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
 sym_link *
 mergeDeclSpec (sym_link * dest, sym_link * src, char *name)
 {
-  sym_link *lnk = dest;
+  sym_link *decl, *spec, *lnk;
 
-  DCL_PTR_CONST(dest) |= SPEC_CONST(src);
-  DCL_PTR_VOLATILE(dest) |= SPEC_VOLATILE(src);
-  DCL_PTR_RESTRICT(dest) |= SPEC_RESTRICT(src);
+  if (IS_SPEC (src))
+    {
+      if (IS_SPEC (dest))
+        {
+          return mergeSpec (dest, src, name);
+        }
+      else
+        {
+          decl = dest;
+          spec = src;
+        }
+    }
+  else
+    {
+      if (IS_SPEC (dest))
+        {
+          decl = src;
+          spec = dest;
+        }
+      else
+        {
+          werror (E_SYNTAX_ERROR, yytext);
+          // the show must go on
+          return newIntLink();
+        }
+    }
 
-  SPEC_CONST(src) = SPEC_VOLATILE(src) = SPEC_RESTRICT(src) = 0;
+  DCL_PTR_CONST(decl) |= SPEC_CONST(spec);
+  DCL_PTR_VOLATILE(decl) |= SPEC_VOLATILE(spec);
+  DCL_PTR_RESTRICT(decl) |= SPEC_RESTRICT(spec);
 
+  SPEC_CONST(spec) = SPEC_VOLATILE(spec) = SPEC_RESTRICT(spec) = 0;
+
+  lnk = decl;
   while (lnk && !IS_SPEC(lnk->next))
     lnk = lnk->next;
-  lnk->next = mergeSpec(src, lnk->next, name);
-  return dest;
+  lnk->next = mergeSpec(spec, lnk->next, name);
+  return decl;
 }
 
 /*-------------------------------------------------------------------*/

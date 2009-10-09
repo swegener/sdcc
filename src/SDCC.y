@@ -490,31 +490,19 @@ declaration_specifiers_
    | storage_class_specifier declaration_specifiers_ {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
-     if ( !IS_SPEC($2)) {
-       $$ = mergeDeclSpec($2, $1, "storage_class_specifier declaration_specifiers - skipped");
-     }
-     else
-       $$ = mergeSpec($1,$2, "storage_class_specifier declaration_specifiers");
+     $$ = mergeDeclSpec($1, $2, "storage_class_specifier declaration_specifiers - skipped");
    }
    | type_specifier                                 { $$ = $1; }
    | type_specifier declaration_specifiers_         {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
-     if ( !IS_SPEC($2)) {
-       $$ = mergeDeclSpec($2, $1, "type_specifier declaration_specifiers - skipped");
-     }
-     else
-       $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
+     $$ = mergeDeclSpec($1, $2, "type_specifier declaration_specifiers - skipped");
    }
    | function_specifier                             { $$ = $1; }
    | function_specifier declaration_specifiers_     {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
-     if ( !IS_SPEC($2)) {
-       $$ = mergeDeclSpec($2, $1, "function_specifier declaration_specifiers - skipped");
-     }
-     else
-       $$ = mergeSpec($1,$2, "function_specifier declaration_specifiers");
+     $$ = mergeDeclSpec($1, $2, "function_specifier declaration_specifiers - skipped");
    }
    ;
 
@@ -1236,11 +1224,7 @@ type_specifier_list_
    | type_specifier_list_ type_specifier {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
-     if ( !IS_SPEC($2)) {
-       $$ = mergeDeclSpec($2, $1, "type_specifier_list type_specifier skipped");
-     }
-     else
-       $$ = mergeSpec($1,$2, "type_specifier_list type_specifier");
+     $$ = mergeDeclSpec($1, $2, "type_specifier_list type_specifier skipped");
    }
    ;
 

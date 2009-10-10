@@ -28,7 +28,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2, type;
+	int op, t1, t2, type;
 	struct expr e1, e2, e3;
 	Addr_T espv;
 	struct area *espa;
@@ -429,7 +429,7 @@ struct expr *exp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

@@ -1,3 +1,10 @@
+2009-10-10 Borut Razem <borut.razem AT siol.net>
+
+	* as/hc08/m08adr.c, as/hc08/m08mch.c, as/hc08/m6808.h,
+	  as/mcs51/i51adr.c, as/mcs51/i51mch.c, as/mcs51/i51pst.c,
+	  as/mcs51/i8051.h, as/z80/z80.h, as/z80/z80adr.c, as/z80/z80mch.c:
+	  targets synced with asxxxx v2.0 and later
+
 2009-10-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.y,

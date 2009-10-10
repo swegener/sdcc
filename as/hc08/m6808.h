@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /*)BUILD
 	$(PROGRAM) =	AS6808
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		M6808.H
 	}
 	$(FILES) = {

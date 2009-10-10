@@ -24,12 +24,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /*)BUILD
 	$(PROGRAM) =	AS8051
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		I8051.H
 	}
 	$(FILES) = {
 		I51EXT.C
 		I51MCH.C
+		I51ADR.C
 		I51PST.C
 		ASMAIN.C
 		ASLEX.C
@@ -40,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 /*
@@ -113,14 +114,41 @@ struct adsym
 /* pre-defined symbol structure: name and value */
 struct PreDef
 {
-   char id[NCPS];
+   char *id;		/* ARB */
    int  value;
 };
 extern struct PreDef preDef[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* i51adr.c */
+extern	struct	adsym	reg51[];
+extern	int		addr(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+extern	int		reg(void);
+
+	/* i51mch.c */
+extern	int		comma(void);
+extern	VOID		machine(struct mne *mp);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+
+#else
+	/* i51adr.c */
+extern	struct	adsym	reg51[];
+extern	int		addr();
+extern	int		admode();
+extern	int		any();
+extern	int		srch();
+extern	int		reg();
+
 	/* i51mch.c */
 extern	int		comma();
+extern	VOID		machine();
+extern	int		mchpcr();
 extern	VOID		minit();
-extern	int		reg();
+#endif

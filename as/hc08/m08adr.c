@@ -23,11 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-        register int c;
-        register struct area *espa;
-        register Addr_T espv;
+        int c;
+        struct area *espa;
+        Addr_T espv;
         const char *tcp;
 
         if ((c = getnb()) == '#') {
@@ -140,11 +140,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-        register char *ptr;
-        register int i;
-        register const char *ips;
+        char *ptr;
+        int i;
+        const char *ips;
 
         ips = ip;
         unget(getnb());
@@ -165,9 +165,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-        register const char *ptr;
+        const char *ptr;
         ptr = ip;
 
         while (*ptr && *str) {

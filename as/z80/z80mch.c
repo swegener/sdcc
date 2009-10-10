@@ -37,13 +37,13 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2;
+	int op, t1, t2;
 	struct expr e1, e2;
 	int rf, v1, v2;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	rf = mp->m_type;
 #ifndef GAMEBOY
 	if (!hd64 && rf>X_HD64)
@@ -65,7 +65,7 @@ struct mne *mp;
 	case S_RET:
 		if (more()) {
 			if ((v1 = admode(CND)) != 0) {
-				outab(op | v1<<3);
+				outab(op | (v1<<3));
 			} else {
 				qerr();
 			}
@@ -84,14 +84,14 @@ struct mne *mp;
 				outab(op+0x20);
 				break;
 			}
-			outab(op | v1<<4);
+			outab(op | (v1<<4));
 			break;
 		}
 		aerr();
 		break;
 
 	case S_RST:
-		v1 = absexpr();
+		v1 = (int) absexpr();
 		if (v1 & ~0x38) {
 			aerr();
 			v1 = 0;
@@ -107,13 +107,13 @@ struct mne *mp;
 			e1.e_addr = 0;
 		}
 		outab(op);
-		outab(imtab[e1.e_addr]);
+		outab(imtab[(int) e1.e_addr]);
 		break;
 
 	case S_BIT:
 		expr(&e1, 0);
 		t1 = 0;
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		if (v1 > 7) {
 			++t1;
 			v1 &= 0x07;
@@ -182,8 +182,8 @@ struct mne *mp;
 				op = 0x4A;
 			if (rf == S_SBC)
 				op = 0x42;
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			if ((v1 == HL) && (v2 <= SP)) {
 				if (rf != S_ADD)
 					outab(0xED);
@@ -210,8 +210,8 @@ struct mne *mp;
 			}
 		}
 #else /* GAMEBOY */
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			if ((v1 == HL) && (v2 <= SP) && (rf == S_ADD)) {
 				outab(0x09 | (v2<<4));
 				break;
@@ -238,16 +238,16 @@ struct mne *mp;
 			if (genop(0, v1, &e2, 0) == 0)
 				break;
 			if (t2 == S_IMMED) {
-				outab(e1.e_addr<<3 | 0x06);
+				outab((e1.e_addr<<3) | 0x06);
 				outrb(&e2,0);
 				break;
 			}
 		}
-		v1 = e1.e_addr;
-		v2 = e2.e_addr;
+		v1 = (int) e1.e_addr;
+		v2 = (int) e2.e_addr;
 		if ((t1 == S_R16) && (t2 == S_IMMED)) {
 			v1 = gixiy(v1);
-			outab(0x01|v1<<4);
+			outab(0x01|(v1<<4));
 			outrw(&e2, 0);
 			break;
 		}
@@ -257,7 +257,7 @@ struct mne *mp;
 				outab(0x2A);
 			} else {
 				outab(0xED);
-				outab(0x4B | v1<<4);
+				outab(0x4B | (v1<<4));
 			}
 			outrw(&e2, 0);
 			break;
@@ -267,7 +267,7 @@ struct mne *mp;
 				outab(0x22);
 			} else {
 				outab(0xED);
-				outab(0x43 | v2<<4);
+				outab(0x43 | (v2<<4));
 			}
 			outrw(&e1, 0);
 			break;
@@ -316,13 +316,13 @@ struct mne *mp;
 		}
 		if ((t1 == S_R8) && (v1 == A)) {
 			if ((t2 == S_IDBC) || (t2 == S_IDDE)) {
-				outab(0x0A | (t2-S_INDR)<<4);
+				outab(0x0A | ((t2-S_INDR)<<4));
 				break;
 			}
 		}
 		if ((t2 == S_R8) && (v2 == A)) {
 			if ((t1 == S_IDBC) || (t1 == S_IDDE)) {
-				outab(0x02 | (t1-S_INDR)<<4);
+				outab(0x02 | ((t1-S_INDR)<<4));
 				break;
 			}
 		}
@@ -465,8 +465,8 @@ struct mne *mp;
 		comma();
 		t2 = addr(&e2);
 		if (t2 == S_R16) {
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			if ((t1 == S_IDSP) && (v1 == 0)) {
 				if (gixiy(v2) == HL) {
 					outab(op);
@@ -498,8 +498,8 @@ struct mne *mp;
 			comma();
 			t1 = addr(&e1);
 		}
-		v1 = e1.e_addr;
-		v2 = e2.e_addr;
+		v1 = (int) e1.e_addr;
+		v2 = (int) e2.e_addr;
 		if (t1 == S_R8) {
 			if ((v1 == A) && (t2 == S_INDM)) {
 				outab(op);
@@ -519,7 +519,7 @@ struct mne *mp;
 	case S_DEC:
 	case S_INC:
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		if (t1 == S_R8) {
 			outab(op|(v1<<3));
 			break;
@@ -550,7 +550,7 @@ struct mne *mp;
 #ifndef GAMEBOY
 	case S_DJNZ:
 	case S_JR:
-		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
+		if (rf == S_JR && (v1 = admode(CND)) != 0) {
 			if ((v1 &= 0xFF) <= 0x03) {
 				op += (v1+1)<<3;
 			} else {
@@ -571,8 +571,8 @@ struct mne *mp;
 #endif /* GAMEBOY */
 		expr(&e2, 0);
 		outab(op);
-		if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
-			v2 = e2.e_addr - dot.s_addr - 1;
+		if (mchpcr(&e2)) {
+			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if (pass == 2 && ((v2 < -128) || (v2 > 127)))
 				aerr();
 			outab(v2);
@@ -640,7 +640,7 @@ struct mne *mp;
 		}
 		if ((t1 == S_R8) && (t2 == S_INDM)) {
 			outab(0xED);
-			outab(op | e1.e_addr<<3);
+			outab(op | (e1.e_addr<<3));
 			outrb(&e2, 0);
 			break;
 		}
@@ -649,9 +649,9 @@ struct mne *mp;
 
 	case X_MLT:
 		t1 = addr(&e1);
-		if ((t1 == S_R16) && ((v1 = e1.e_addr) <= SP)) {
+		if ((t1 == S_R16) && ((v1 = (int) e1.e_addr) <= SP)) {
 			outab(0xED);
-			outab(op | v1<<4);
+			outab(op | (v1<<4));
 			break;
 		}
 		aerr();
@@ -661,7 +661,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		if (t1 == S_R8) {
 			outab(0xED);
-			outab(op | e1.e_addr<<3);
+			outab(op | (e1.e_addr<<3));
 			break;
 		}
 		if (t1 == S_IDHL) {
@@ -702,11 +702,11 @@ struct mne *mp;
  */
 int
 genop(pop, op, esp, f)
-register int pop, op;
-register struct expr *esp;
+int pop, op;
+struct expr *esp;
 int f;
 {
-	register int t1;
+	int t1;
 	if ((t1 = esp->e_mode) == S_R8) {
 		if (pop)
 			outab(pop);
@@ -775,6 +775,31 @@ comma()
 	if (getnb() != ',')
 		qerr();
 	return(1);
+}
+
+/*
+ * Branch/Jump PCR Mode Check
+ */
+int
+mchpcr(esp)
+struct expr *esp;
+{
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
 }
 
 /*

@@ -42,9 +42,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-        register int c, mode = 0, indx;
+        int c, mode, indx;
 
         if ((c = getnb()) == '#') {
                 expr(esp, 0);
@@ -65,8 +65,9 @@ register struct expr *esp;
                         mode = S_R16X;
                         aerr();
                 } else {
+			mode = S_INDM;
                         expr(esp, 0);
-                        esp->e_mode = S_INDM;
+                        esp->e_mode = mode;
                 }
                 if (indx) {
                         esp->e_mode = (mode + indx)&0xFF;
@@ -88,8 +89,9 @@ register struct expr *esp;
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
                 } else {
+			mode = S_USER;
                         expr(esp, 0);
-                        esp->e_mode = S_USER;
+                        esp->e_mode = mode;
                 }
                 if (indx) {
                         esp->e_addr = indx&0xFF;
@@ -123,17 +125,17 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-        register char *ptr;
-        register int i;
-        register const char *ips;
+        char *ptr;
+        int i;
+        const char *ips;
 
         ips = ip;
         unget(getnb());
 
         i = 0;
-        while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
                 if (srch(ptr)) {
                         return(sp[i].a_val);
                 }
@@ -148,34 +150,21 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-        register const char *ptr;
+        const char *ptr;
         ptr = ip;
 
-#if     CASE_SENSITIVE
         while (*ptr && *str) {
-                if (*ptr != *str)
+		if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
                         break;
                 ptr++;
                 str++;
         }
-        if (*ptr == *str) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
                 ip = ptr;
                 return(1);
         }
-#else
-        while (*ptr && *str) {
-                if (ccase[(unsigned char)(*ptr)] != ccase[(unsigned char)(*str)])
-                        break;
-                ptr++;
-                str++;
-        }
-        if (ccase[(unsigned char)(*ptr)] == ccase[(unsigned char)(*str)]) {
-                ip = ptr;
-                return(1);
-        }
-#endif
 
         if (!*str)
                 if (any(*ptr," \t\n,);")) {
@@ -210,22 +199,13 @@ struct  adsym   R8[] = {
     { "h",      H|0400 },
     { "l",      L|0400 },
     { "a",      A|0400 },
-    { "B",      B|0400 },
-    { "C",      C|0400 },
-    { "D",      D|0400 },
-    { "E",      E|0400 },
-    { "H",      H|0400 },
-    { "L",      L|0400 },
-    { "A",      A|0400 },
-    { "",       000 }
+    { "",       0000 }
 };
 
 struct  adsym   R8X[] = {
     { "i",      I|0400 },
     { "r",      R|0400 },
-    { "I",      I|0400 },
-    { "R",      R|0400 },
-    { "",       000 }
+    { "",       0000 }
 };
 
 struct  adsym   R16[] = {
@@ -233,36 +213,24 @@ struct  adsym   R16[] = {
     { "de",     DE|0400 },
     { "hl",     HL|0400 },
     { "sp",     SP|0400 },
-    { "BC",     BC|0400 },
-    { "DE",     DE|0400 },
-    { "HL",     HL|0400 },
-    { "SP",     SP|0400 },
 #ifndef GAMEBOY
     { "ix",     IX|0400 },
     { "iy",     IY|0400 },
-    { "IX",     IX|0400 },
-    { "IY",     IY|0400 },
 #else /* GAMEBOY */
     { "hl-",    HLD|0400 },
     { "hl+",    HLI|0400 },
     { "hld",    HLD|0400 },
     { "hli",    HLI|0400 },
-    { "HL-",    HLD|0400 },
-    { "HL+",    HLI|0400 },
-    { "HLD",    HLD|0400 },
-    { "HLI",    HLI|0400 },
 #endif /* GAMEBOY */
-    { "",       000 }
+    { "",       0000 }
 };
 
 struct  adsym   R16X[] = {
-    { "af",     AF|0400 },
-    { "AF",     AF|0400 },
 #ifndef GAMEBOY
-    { "af'",    AF|0400 },
-    { "AF'",    AF|0400 },
+    { "af'",    AF|0400 },	/* af' must be first !!! */
 #endif /* GAMEBOY */
-    { "",       000 }
+    { "af",     AF|0400 },
+    { "",       0000 }
 };
 
 /*
@@ -274,19 +242,11 @@ struct  adsym   CND[] = {
     { "Z",      Z |0400 },
     { "NC",     NC|0400 },
     { "C",      CS|0400 },
-    { "nz",     NZ|0400 },
-    { "z",      Z |0400 },
-    { "nc",     NC|0400 },
-    { "c",      CS|0400 },
 #ifndef GAMEBOY
     { "PO",     PO|0400 },
     { "PE",     PE|0400 },
     { "P",      P |0400 },
     { "M",      M |0400 },
-    { "po",     PO|0400 },
-    { "pe",     PE|0400 },
-    { "p",      P |0400 },
-    { "m",      M |0400 },
 #endif /* GAMEBOY */
-    { "",       000 }
+    { "",       0000 }
 };

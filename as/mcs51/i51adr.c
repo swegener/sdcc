@@ -26,45 +26,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "asxxxx.h"
 #include "i8051.h"
 
-extern int admode (struct adsym *);
 
 struct adsym reg51[] = {        /* R0 thru R7 registers */
-{       "R0",   R0},
-{       "R1",   R1},
-{       "R2",   R2},
-{       "R3",   R3},
-{       "R4",   R4},
-{       "R5",   R5},
-{       "R6",   R6},
-{       "R7",   R7},
-{       "A",    A},
-{       "DPTR", DPTR},
-{       "PC",   PC},
-{       "C",    C},
-{       "AB",   AB},
-{       "r0",   R0},
-{       "r1",   R1},
-{       "r2",   R2},
-{       "r3",   R3},
-{       "r4",   R4},
-{       "r5",   R5},
-{       "r6",   R6},
-{       "r7",   R7},
-{       "a",    A},
-{       "dptr", DPTR},
-{       "pc",   PC},
-{       "c",    C},
-{       "ab",   AB},
-{       "",     0x00}
+    {	"R0",	R0	},
+    {	"R1",	R1	},
+    {	"R2",	R2	},
+    {	"R3",	R3	},
+    {	"R4",	R4	},
+    {	"R5",	R5	},
+    {	"R6",	R6	},
+    {	"R7",	R7	},
+    {	"A",	A	},
+    {	"DPTR", DPTR	},
+    {	"PC",	PC	},
+    {	"C",	C	},
+    {	"AB",	AB	},
+    {	"",	0x00	}
 };
 
 /*  Classify argument as to address mode */
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-        register int c;
-        register unsigned rd;
+        int c;
+        unsigned rd;
 
         if ((c = getnb()) == '#') {
                 /*  Immediate mode */
@@ -107,9 +93,16 @@ register struct expr *esp;
                 esp->e_base.e_ap = NULL;
         }
         else if (c == '*') {
-                /* Force direct page */
-                expr(esp, 0);
-                esp->e_mode = S_DIR;
+		if ((c = getnb()) == '/') {
+			/* Force inverted bit */
+			expr(esp, 0);
+			esp->e_mode = S_NOT_BIT;
+		} else {
+			unget(c);
+			/* Force direct page */
+			expr(esp, 0);
+			esp->e_mode = S_DIR;
+		}
                 if (esp->e_addr & ~0xFF)
                         err('d');
         }
@@ -117,8 +110,6 @@ register struct expr *esp;
                 /* Force inverted bit  */
                 expr(esp, 0);
                 esp->e_mode = S_NOT_BIT;
-                if (esp->e_addr & ~0xFF)
-                        err('d');
         }
         else {
                 unget(c);
@@ -160,59 +151,6 @@ register struct expr *esp;
         return (esp->e_mode);
 }
 
-
-/*
- *      any --- does str contain c?
- */
-int
-any(c,str)
-char    c, *str;
-{
-        while (*str)
-                if(*str++ == c)
-                        return(1);
-        return(0);
-}
-
-int
-srch(str)
-register char *str;
-{
-        register const char *ptr;
-        ptr = ip;
-
-#if     CASE_SENSITIVE
-        while (*ptr && *str) {
-                if(*ptr != *str)
-                        break;
-                ptr++;
-                str++;
-        }
-        if (*ptr == *str) {
-                ip = ptr;
-                return(1);
-        }
-#else
-        while (*ptr && *str) {
-                if(ccase[*ptr] != ccase[*str])
-                        break;
-                ptr++;
-                str++;
-        }
-        if (ccase[*ptr] == ccase[*str]) {
-                ip = ptr;
-                return(1);
-        }
-#endif
-
-        if (!*str)
-                if (any(*ptr," \t\n,];")) {
-                        ip = ptr;
-                        return(1);
-                }
-        return(0);
-}
-
 /*
  * Enter admode() to search a specific addressing mode table
  * for a match. Return the addressing value on a match or
@@ -226,7 +164,7 @@ register struct adsym *sp;
         register int i;
         unget(getnb());
         i = 0;
-        while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
                 if (srch(ptr)) {
                         return(sp[i].a_val);
                 }
@@ -238,6 +176,45 @@ register struct adsym *sp;
 /*
  *      srch --- does string match ?
  */
+int
+srch(str)
+char *str;
+{
+        const char *ptr;
+        ptr = ip;
+
+        while (*ptr && *str) {
+		if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
+                        break;
+                ptr++;
+                str++;
+        }
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
+                ip = ptr;
+                return(1);
+        }
+
+        if (!*str)
+                if (any(*ptr," \t\n,];")) {
+                        ip = ptr;
+                        return(1);
+                }
+        return(0);
+}
+
+/*
+ *      any --- does str contain c?
+ */
+int
+any(c,str)
+int c;
+char *str;
+{
+        while (*str)
+                if(*str++ == c)
+                        return(1);
+        return(0);
+}
 
 /*
  * Read a register name.  Return register value, -1 if no register found
@@ -245,7 +222,7 @@ register struct adsym *sp;
 int
 reg()
 {
-        register struct mne *mp;
+        struct mne *mp;
         char id[NCPS];
 
         getid(id, -1);
@@ -259,7 +236,7 @@ reg()
         case S_DPTR:
         case S_PC:
         case S_REG:
-                return (mp->m_valu);
+                return ((int) mp->m_valu);
 
         default:
                 return (-1);

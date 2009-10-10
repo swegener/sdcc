@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /*)BUILD
 	$(PROGRAM) =	ASZ80
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		Z80.H
 	}
 	$(FILES) = {
@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 /*
@@ -184,6 +184,25 @@ extern	struct	adsym	CND[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* z80adr.c */
+extern	int		addr(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(char c, char *str);
+extern	int		srch(char *str);
+
+
+	/* z80mch.c */
+extern	int		comma(void);
+extern	int		genop(int pop, int op, struct expr *esp, int f);
+extern	int		gixiy(int v);
+extern	VOID		machine(struct mne *mp);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+
+#else
+
 	/* z80adr.c */
 extern	int		addr();
 extern	int		admode();
@@ -194,5 +213,8 @@ extern	int		srch();
 extern	int		comma();
 extern	int		genop();
 extern	int		gixiy();
+extern	VOID		machine();
+extern	int		mchpcr();
 extern	VOID		minit();
-extern	VOID		machine(struct mne *mp) ;
+
+#endif

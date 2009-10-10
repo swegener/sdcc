@@ -22,23 +22,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
 #include "asxxxx.h"
 #include "i8051.h"
 
-extern int addr(struct expr *);
 /*
  * Process machine ops.
  */
 VOID
-machine(struct mne *mp)
+machine(mp)
+struct mne *mp;
 {
         register unsigned op;
         register int t, t1, v1;
-        struct expr e, e1, e2;
+        struct expr e, e1;
 
         clrexpr(&e);
         clrexpr(&e1);
-        clrexpr(&e2);
 
         op = mp->m_valu;
         switch (mp->m_type) {
@@ -56,12 +56,10 @@ machine(struct mne *mp)
                  * hack-o-matic fashion by the linker.
                 */
                 expr(&e, 0);
-                if (flat24Mode)
-                {
+                if (flat24Mode) {
                         outr19(&e, op, R_J19);
                 }
-                else
-                {
+                else {
                         outr11(&e, op, R_J11);
                 }
                 break;
@@ -73,13 +71,11 @@ machine(struct mne *mp)
                  */
                 expr(&e, 0);
                 outab(op);
-                if (flat24Mode)
-                {
+                if (flat24Mode) {
                         outr24(&e, 0);
                 }
-                else
-                {
-                        outrw(&e, 0);
+                else {
+			outrw(&e, R_NORM);
                 }
                 break;
 
@@ -138,7 +134,7 @@ machine(struct mne *mp)
                 switch (t1) {
                 case S_IMMED:
                         outab(op + 4);
-                        outrb(&e1, 0);
+			outrb(&e1, R_NORM);
                         break;
 
                 case S_DIR:
@@ -180,9 +176,10 @@ machine(struct mne *mp)
 
                         case S_IMMED:
                                 outab(op + 3);
-                                outrb(&e, 0);
-                                outrb(&e1, 0);
+				outrb(&e, R_PAG0);
+				outrb(&e1, R_NORM);
                                 break;
+
                         default:
                                 aerr();
                         }
@@ -192,7 +189,7 @@ machine(struct mne *mp)
                         switch (t1) {
                         case S_IMMED:
                                 outab(op + 4);
-                                outrb(&e1, 0);
+				outrb(&e1, R_NORM);
                                 break;
 
                         case S_DIR:
@@ -228,7 +225,7 @@ machine(struct mne *mp)
 
                         case S_NOT_BIT:
                                 outab(op + 0x60);
-                                outrb(&e1, 0);
+				outrb(&e1, R_PAG0);
                                 break;
 
                         default:
@@ -280,7 +277,7 @@ machine(struct mne *mp)
                         switch (t1) {
                         case S_IMMED:
                                 outab(0x74);
-                                outrb(&e1, 0);
+				outrb(&e1, R_NORM);
                                 break;
 
                         case S_DIR:
@@ -310,7 +307,7 @@ machine(struct mne *mp)
 
                         case S_IMMED:
                                 outab(0x78 + e.e_addr);
-                                outrb(&e1, 0);
+				outrb(&e1, R_NORM);
                                 break;
 
                         case S_DIR:
@@ -335,7 +332,7 @@ machine(struct mne *mp)
                         case S_IMMED:
                                 outab(0x75);
                                 outrb(&e, R_PAG0);
-                                outrb(&e1, 0);
+				outrb(&e1, R_NORM);
                                 break;
 
                         case S_DIR:
@@ -369,7 +366,7 @@ machine(struct mne *mp)
                         switch (t1) {
                         case S_IMMED:
                                 outab(0x76 + e.e_addr);
-                                outrb(&e1, 0);
+				outrb(&e1, R_NORM);
                                 break;
 
                         case S_DIR:
@@ -403,13 +400,11 @@ machine(struct mne *mp)
                          * #immed is a 24 bit constant. For 8051,
                          * it is a 16 bit constant.
                          */
-                        if (flat24Mode)
-                        {
+                        if (flat24Mode) {
                                 outr24(&e1, 0);
                         }
-                        else
-                        {
-                                outrw(&e1, 0);
+                        else {
+				outrw(&e1, R_NORM);
                         }
                         break;
 
@@ -423,13 +418,15 @@ machine(struct mne *mp)
                 t = addr(&e);
                 if ((t != S_DIR) && (t != S_EXT))
                         aerr();
+                /* sdcc svn rev #4994: fixed bug 1865114 */
                 comma();
                 expr(&e1, 0);
                 outab(op);
                 outrb(&e, R_PAG0);
-                if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        v1 = e1.e_addr - dot.s_addr - 1;
-                        if (pass==2 && ((v1 < -128) || (v1 > 127)))
+		if (mchpcr(&e1)) {
+ 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+                        /* sdcc svn rev #602: Fix some path problems */
+                      	if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
                 } else {
@@ -441,10 +438,12 @@ machine(struct mne *mp)
 
         case S_BR:
                 /* Relative branch */
+                /* sdcc svn rev #4994: fixed bug 1865114 */
                 expr(&e1, 0);
                 outab(op);
-                if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        v1 = e1.e_addr - dot.s_addr - 1;
+		if (mchpcr(&e1)) {
+                        v1 = (int) (e1.e_addr - dot.s_addr - 1);
+                        /* sdcc svn rev #602: Fix some path problems */
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
@@ -460,13 +459,11 @@ machine(struct mne *mp)
                 t = addr(&e);
                 comma();
                 t1 = addr(&e1);
-                comma();
-                expr(&e2, 0);
                 switch (t) {
                 case S_A:
                         if (t1 == S_IMMED) {
                                 outab(op + 4);
-                                outrb(&e1, 0);
+				outrb(&e1, R_NORM);
                         }
                         else if ((t1 == S_DIR) || (t1 == S_EXT)) {
                                 outab(op + 5);
@@ -480,14 +477,14 @@ machine(struct mne *mp)
                         outab(op + 6 + e.e_addr);
                         if (t1 != S_IMMED)
                                 aerr();
-                        outrb(&e1, 0);
+			outrb(&e1, R_NORM);
                         break;
 
                 case S_REG:
                         outab(op + 8 + e.e_addr);
                         if (t1 != S_IMMED)
                                 aerr();
-                        outrb(&e1, 0);
+			outrb(&e1, R_NORM);
                         break;
 
                 default:
@@ -495,21 +492,26 @@ machine(struct mne *mp)
                 }
 
                 /* branch destination */
-                if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
-                        v1 = e2.e_addr - dot.s_addr - 1;
+                comma();
+		clrexpr(&e1);
+		expr(&e1, 0);
+		if (mchpcr(&e1)) {
+                        v1 = (int) (e1.e_addr - dot.s_addr - 1);
+                        /* sdcc svn rev #602: Fix some path problems */
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
                 } else {
-                        outrb(&e2, R_PCR);
+                        outrb(&e1, R_PCR);
                 }
-                if (e2.e_mode != S_USER)
+                if (e1.e_mode != S_USER)
                         rerr();
                 break;
 
         case S_DJNZ:
                 /* Dir,dest;  Reg,dest */
                 t = addr(&e);
+                /* sdcc svn rev #4994: fixed bug 1865114 */
                 comma();
                 expr(&e1, 0);
                 switch (t) {
@@ -528,9 +530,11 @@ machine(struct mne *mp)
                         aerr();
                 }
 
-                /* branch destination */
-                if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                        v1 = e1.e_addr - dot.s_addr - 1;
+		/* branch destination */
+                /* sdcc svn rev #4994: fixed bug 1865114 */
+		if (mchpcr(&e1)) {
+                        v1 = (int) (e1.e_addr - dot.s_addr - 1);
+                        /* sdcc svn rev #602: Fix some path problems */
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
@@ -576,9 +580,11 @@ machine(struct mne *mp)
                         case S_AT_DP:
                                 outab(0xE0);
                                 break;
+                                
                         case S_AT_R:
                                 outab(0xE2 + e1.e_addr);
                                 break;
+
                         default:
                                 aerr();
                         }
@@ -689,6 +695,31 @@ machine(struct mne *mp)
 }
 
 /*
+ * Branch/Jump PCR Mode Check
+ */
+int
+mchpcr(esp)
+struct expr *esp;
+{
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
+}
+
+/*
  * Is the next character a comma ?
  */
 int
@@ -702,23 +733,46 @@ comma()
  /*
   * Machine specific initialization
   */
- VOID
- minit()
- {
-         static int beenHere=0;      /* set non-zero if we have done that... */
-         struct sym    *sp;
-         struct PreDef *pd;
 
-         /*  First time only, add the pre-defined symbols to the symbol table*/
-         if (beenHere == 0) {
-                 pd = preDef;
-                 while (*pd->id) {
-                         sp = lookup(pd->id);
-                         if (sp->s_type == S_NEW) {
-                                 sp->s_addr = pd->value;
-                                 sp->s_type = S_DIR;
-                         }
-                         pd++;
+static int beenHere=0;      /* set non-zero if we have done that... */
+
+VOID
+minit()
+{
+        struct sym      *sp;
+        struct PreDef   *pd;
+	int i;
+	char pid[8];
+	char *p;
+
+	/*
+	 * First time only:
+	 *	add the pre-defined symbols to the table
+	 *	as local symbols.
+	 */
+        if (beenHere == 0) {
+                pd = preDef;
+                while (pd->id) {
+			strcpy(pid, pd->id);
+			for (i=0; i<2; i++) {
+				/*
+				 * i == 0,  Create Upper Case Symbols
+				 * i == 1,  Create Lower Case Symbols
+				 */
+				if (i == 1) {
+					p = pid;
+					while (*p) {
+						*p = ccase[*p & 0x007F];
+						p++;
+					}
+				}
+                                sp = lookup(pid);
+                                if (sp->s_type == S_NEW) {
+                                        sp->s_addr = pd->value;
+                                        sp->s_type = S_USER;
+                                }
+                        }
+                        pd++;
                 }
                 beenHere = 1;
         }

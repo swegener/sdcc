@@ -36,7 +36,7 @@ Package=<4>
     Project_Dep_Name linkgbz80
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name as_gbz80
+    Project_Dep_Name asgb
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name librarian
@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_gbz80"=.\as\z80\as_gbz80.dsp - Package Owner=<4>
+Project: "as_gbz80"=.\as\asgb\asgb.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

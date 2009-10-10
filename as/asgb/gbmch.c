@@ -23,10 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <setjmp.h>
 #include "asxxxx.h"
-#include "z80.h"
+#include "gb.h"
 
 char	imtab[3] = { 0x46, 0x56, 0x5E };
-int	hd64;
 
 /*
  * Process a machine op.
@@ -43,16 +42,9 @@ struct mne *mp;
 	clrexpr(&e2);
 	op = (int) mp->m_valu;
 	rf = mp->m_type;
-	if (!hd64 && rf>X_HD64)
-		rf = 0;
 	switch (rf) {
 
 	case S_INH1:
-		outab(op);
-		break;
-
-	case S_INH2:
-		outab(0xED);
 		outab(op);
 		break;
 
@@ -74,10 +66,6 @@ struct mne *mp;
 			break;
 		} else
 		if ((v1 = admode(R16)) != 0 && (v1 &= 0xFF) != SP) {
-			if (v1 != gixiy(v1)) {
-				outab(op+0x20);
-				break;
-			}
 			outab(op | (v1<<4));
 			break;
 		}
@@ -169,38 +157,20 @@ struct mne *mp;
 			break;
 		}
 		if ((t1 == S_R16) && (t2 == S_R16)) {
-			if (rf == S_ADD)
-				op = 0x09;
-			if (rf == S_ADC)
-				op = 0x4A;
-			if (rf == S_SBC)
-				op = 0x42;
-			v1 = (int) e1.e_addr;
-			v2 = (int) e2.e_addr;
-			if ((v1 == HL) && (v2 <= SP)) {
-				if (rf != S_ADD)
-					outab(0xED);
-				outab(op | (v2<<4));
+			v1 = e1.e_addr;
+			v2 = e2.e_addr;
+			if ((v1 == HL) && (v2 <= SP) && (rf == S_ADD)) {
+				outab(0x09 | (v2<<4));
 				break;
 			}
-			if (rf != S_ADD) {
-				aerr();
-				break;
-			}
-			if ((v1 == IX) && (v2 != HL) && (v2 != IY)) {
-				if (v2 == IX)
-					v2 = HL;
-				outab(0xDD);
-				outab(op | (v2<<4));
-				break;
-			}
-			if ((v1 == IY) && (v2 != HL) && (v2 != IX)) {
-				if (v2 == IY)
-					v2 = HL;
-				outab(0xFD);
-				outab(op | (v2<<4));
-				break;
-			}
+		}
+		/*
+		 * 0xE8 : ADD SP,#n
+		 */
+		if ((rf == S_ADD) && (t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_IMMED)) {
+			outab(0xE8);
+			outrb(&e2,0);
+			break;
 		}
 		aerr();
 		break;
@@ -222,66 +192,25 @@ struct mne *mp;
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
 		if ((t1 == S_R16) && (t2 == S_IMMED)) {
-			v1 = gixiy(v1);
 			outab(0x01|(v1<<4));
 			outrw(&e2, 0);
 			break;
 		}
-		if ((t1 == S_R16) && (t2 == S_INDM)) {
-			if (gixiy(v1) == HL) {
-				outab(0x2A);
-			} else {
-				outab(0xED);
-				outab(0x4B | (v1<<4));
-			}
-			outrw(&e2, 0);
-			break;
-		}
-		if ((t1 == S_INDM) && (t2 == S_R16)) {
-			if (gixiy(v2) == HL) {
-				outab(0x22);
-			} else {
-				outab(0xED);
-				outab(0x43 | (v2<<4));
-			}
-			outrw(&e1, 0);
-			break;
-		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
-			outab(0x3A);
-			outrw(&e2, 0);
-			break;
-		}
-		if ((t1 == S_INDM) && (t2 == S_R8) && (v2 == A)) {
-			outab(0x32);
-			outrw(&e1, 0);
-			break;
-		}
-		if ((t2 == S_R8) && (gixiy(t1) == S_IDHL)) {
+		if ((t2 == S_R8) && (t1 == S_IDHL)) {
 			outab(0x70|v2);
 			if (t1 != S_IDHL)
 				outrb(&e1, 0);
 			break;
 		}
-		if ((t2 == S_IMMED) && (gixiy(t1) == S_IDHL)) {
+		if ((t2 == S_IMMED) && (t1 == S_IDHL)) {
 			outab(0x36);
 			if (t1 != S_IDHL)
 				outrb(&e1, 0);
 			outrb(&e2, 0);
 			break;
 		}
-		if ((t1 == S_R8X) && (t2 == S_R8) && (v2 == A)) {
-			outab(0xED);
-			outab(v1);
-			break;
-		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_R8X)) {
-			outab(0xED);
-			outab(v2|0x10);
-			break;
-		}
 		if ((t1 == S_R16) && (v1 == SP)) {
-			if ((t2 == S_R16) && (gixiy(v2) == HL)) {
+			if ((t2 == S_R16) && (v2 == HL)) {
 				outab(0xF9);
 				break;
 			}
@@ -298,63 +227,129 @@ struct mne *mp;
 				break;
 			}
 		}
-		aerr();
-		break;
-
-
-
-
-	case S_EX:
-		t1 = addr(&e1);
-		comma();
-		t2 = addr(&e2);
-		if (t2 == S_R16) {
-			v1 = (int) e1.e_addr;
-			v2 = (int) e2.e_addr;
-			if ((t1 == S_IDSP) && (v1 == 0)) {
-				if (gixiy(v2) == HL) {
-					outab(op);
-					break;
-				}
-			}
-			if (t1 == S_R16) {
-				if ((v1 == DE) && (v2 == HL)) {
-					outab(0xEB);
-					break;
-				}
-			}
-		}
-		if ((t1 == S_R16X) && (t2 == S_R16X)) {
+		/*
+		 * 0x08 : LD (nn),SP
+		 */
+		if ((t1 == S_INDM) && (t2 == S_R16) && (v2 == SP)) {
 			outab(0x08);
+			outrw(&e1, 0);
+			break;
+		}
+		/*
+		 * 0xEA : LD (nn),A
+		 * 0xFA : LD A,(nn)
+		 */
+		if ((t1 == S_INDM) && (t2 == S_R8) && (v2 == A)) {
+			outab(0xEA);
+			outrw(&e1, 0);
+			break;
+		}
+		if ((t2 == S_INDM) && (t1 == S_R8) && (v1 == A)) {
+			outab(0xFA);
+			outrw(&e2, 0);
+			break;
+		}
+		/*
+		 * 0x32 : LD (HL-),A
+		 * 0x3A : LD A,(HL-)
+		 */
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDHLD)) {
+			outab(0x3A);
+			break;
+		}
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDHLD)) {
+			outab(0x32);
+			break;
+		}
+		/*
+		 * 0x22 : LD (HL+),A
+		 * 0x2A : LD A,(HL+)
+		 */
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDHLI)) {
+			outab(0x2A);
+			break;
+		}
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDHLI)) {
+			outab(0x22);
 			break;
 		}
 		aerr();
 		break;
 
-	case S_IN:
-	case S_OUT:
-		if (rf == S_IN) {
-			t1 = addr(&e1);
-			comma();
-			t2 = addr(&e2);
-		} else {
-			t2 = addr(&e2);
-			comma();
-			t1 = addr(&e1);
+	case S_STOP:	/* 0x10 */
+		/*
+		 * 0x10 : STOP
+		 */
+		outab(op);
+		outab(0x00);
+		break;
+
+
+	case S_LDH:	/* 0xE0 */
+		/*
+		 * 0xE0 : LDH (n),A = LD ($FF00+n),A
+		 * 0xE2 : LDH (C),A = LD ($FF00+C),A
+		 * 0xF0 : LDH A,(n) = LD A,($FF00+n)
+		 * 0xF2 : LDH A,(C) = LD A,($FF00+C)
+		 */
+		t1 = addr(&e1);
+		comma();
+		t2 = addr(&e2);
+		if ((t1 == S_INDM) && (t2 == S_R8) && (e2.e_addr == A)) {
+			outab(0xE0);
+			outrb(&e1, 0);
+			break;
 		}
-		v1 = (int) e1.e_addr;
-		v2 = (int) e2.e_addr;
-		if (t1 == S_R8) {
-			if ((v1 == A) && (t2 == S_INDM)) {
-				outab(op);
-				outab(v2);
-				break;
-			}
-			if (t2 == S_IDC) {
-				outab(0xED);
-				outab(((rf == S_IN) ? 0x40 : 0x41) + (v1<<3));
-				break;
-			}
+		if ((t1 == S_IDC) && (t2 == S_R8) && (e2.e_addr == A)) {
+			outab(0xE2);
+			break;
+		}
+		if ((t2 == S_INDM) && (t1 == S_R8) && (e1.e_addr == A)) {
+			outab(0xF0);
+			outrb(&e2, 0);
+			break;
+		}
+		if ((t2 == S_IDC) && (t1 == S_R8) && (e1.e_addr == A)) {
+			outab(0xF2);
+			break;
+		}
+		aerr();
+		break;
+
+
+	case S_LDA:	/* 0xE8 */
+		/*
+		 * 0xE8 : LDA SP,#n(SP)
+		 * 0xF8 : LDA HL,#n(SP)
+		 */
+		t1 = addr(&e1);
+		comma();
+		t2 = addr(&e2);
+		if ((t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_INDR+SP)) {
+			outab(0xE8);
+			outrb(&e2,0);
+			break;
+		}
+		if ((t1 == S_R16) && (e1.e_addr == HL) && (t2 == S_INDR+SP)) {
+			outab(0xF8);
+			outrb(&e2,0);
+			break;
+		}
+		aerr();
+		break;
+
+
+	case S_LDHL:	/* 0xF8 */
+		/*
+		 * 0xF8 : LDHL SP,#n
+		 */
+		t1 = addr(&e1);
+		comma();
+		t2 = addr(&e2);
+		if ((t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_IMMED)) {
+			outab(0xF8);
+			outrb(&e2,0);
+			break;
 		}
 		aerr();
 		break;
@@ -371,13 +366,7 @@ struct mne *mp;
 			outab(op|0x30);
 			break;
 		}
-		if (t1 != gixiy(t1)) {
-			outab(op|0x30);
-			outrb(&e1,0);
-			break;
-		}
 		if (t1 == S_R16) {
-			v1 = gixiy(v1);
 			if (rf == S_INC) {
 				outab(0x03|(v1<<4));
 				break;
@@ -390,10 +379,9 @@ struct mne *mp;
 		aerr();
 		break;
 
-	case S_DJNZ:
 	case S_JR:
-		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
-			if ((v1 &= 0xFF) <= 0x03) {
+		if ((v1 = admode(CND)) != 0) {
+			if ((v1 &= 0xFF) <= 0x18) {
 				op += (v1+1)<<3;
 			} else {
 				aerr();
@@ -441,79 +429,8 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		if ((e1.e_addr == 0) && (gixiy(t1) == S_IDHL)) {
+		if ((e1.e_addr == 0) && (t1 == S_IDHL)) {
 			outab(0xE9);
-			break;
-		}
-		aerr();
-		break;
-
-	case X_HD64:
-		++hd64;
-		break;
-
-	case X_INH2:
-		outab(0xED);
-		outab(op);
-		break;
-
-	case X_IN:
-	case X_OUT:
-		if (rf == X_IN) {
-			t1 = addr(&e1);
-			comma();
-			t2 = addr(&e2);
-		} else {
-			t2 = addr(&e2);
-			comma();
-			t1 = addr(&e1);
-		}
-		if ((t1 == S_R8) && (t2 == S_INDM)) {
-			outab(0xED);
-			outab(op | (e1.e_addr<<3));
-			outrb(&e2, 0);
-			break;
-		}
-		aerr();
-		break;
-
-	case X_MLT:
-		t1 = addr(&e1);
-		if ((t1 == S_R16) && ((v1 = (int) e1.e_addr) <= SP)) {
-			outab(0xED);
-			outab(op | (v1<<4));
-			break;
-		}
-		aerr();
-		break;
-
-	case X_TST:
-		t1 = addr(&e1);
-		if (t1 == S_R8) {
-			outab(0xED);
-			outab(op | (e1.e_addr<<3));
-			break;
-		}
-		if (t1 == S_IDHL) {
-			outab(0xED);
-			outab(0x34);
-			break;
-		}
-		if (t1 == S_IMMED) {
-			outab(0xED);
-			outab(0x64);
-			outrb(&e1, 0);
-			break;
-		}
-		aerr();
-		break;
-
-	case X_TSTIO:
-		t1 = addr(&e1);
-		if (t1 == S_IMMED) {
-			outab(0xED);
-			outab(op);
-			outrb(&e1, 0);
 			break;
 		}
 		aerr();
@@ -548,7 +465,7 @@ int f;
 		outab(op|0x06);
 		return(0);
 	}
-	if (gixiy(t1) == S_IDHL) {
+	if (t1 == S_IDHL) {
 		if (pop) {
 			outab(pop);
 			outrb(esp,0);
@@ -567,29 +484,6 @@ int f;
 		return(0);
 	}
 	return(t1);
-}
-
-/*
- * IX and IY prebyte check
- */
-int
-gixiy(v)
-int v;
-{
-	if (v == IX) {
-		v = HL;
-		outab(0xDD);
-	} else if (v == IY) {
-		v = HL;
-		outab(0xFD);
-	} else if (v == S_IDIX) {
-		v = S_IDHL;
-		outab(0xDD);
-	} else if (v == S_IDIY) {
-		v = S_IDHL;
-		outab(0xFD);
-	}
-	return(v);
 }
 
 /*
@@ -635,5 +529,4 @@ struct expr *esp;
 VOID
 minit()
 {
-	hd64 = 0;
 }

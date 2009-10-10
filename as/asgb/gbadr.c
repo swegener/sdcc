@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <setjmp.h>
 #include "asxxxx.h"
-#include "z80.h"
+#include "gb.h"
 
 /*
  * Read an address specifier. Pack the
@@ -99,8 +99,7 @@ struct expr *esp;
                         esp->e_base.e_ap = NULL;
                 }
                 if ((c = getnb()) == LFIND) {
-                        if ((indx=admode(R16))!=0
-                                && ((indx&0xFF)==IX || (indx&0xFF)==IY)) {
+                        if ((indx=admode(R16))!=0) {
                                 esp->e_mode = S_INDR + (indx&0xFF);
                         } else {
                                 aerr();
@@ -152,12 +151,12 @@ char *str;
         ptr = ip;
 
         while (*ptr && *str) {
-                if (ccase[*ptr  & 0x007F] != ccase[*str & 0x007F])
+		if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
                         break;
                 ptr++;
                 str++;
         }
-        if (ccase[*ptr  & 0x007F] == ccase[*str  & 0x007F]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
                 ip = ptr;
                 return(1);
         }
@@ -175,7 +174,8 @@ char *str;
  */
 int
 any(c,str)
-char    c, *str;
+int c;
+char *str;
 {
         while (*str)
                 if(*str++ == c)
@@ -209,13 +209,14 @@ struct  adsym   R16[] = {
     { "de",     DE|0400 },
     { "hl",     HL|0400 },
     { "sp",     SP|0400 },
-    { "ix",     IX|0400 },
-    { "iy",     IY|0400 },
+    { "hl-",    HLD|0400 },
+    { "hl+",    HLI|0400 },
+    { "hld",    HLD|0400 },
+    { "hli",    HLI|0400 },
     { "",       0000 }
 };
 
 struct  adsym   R16X[] = {
-    { "af'",    AF|0400 },	/* af' must be first !!! */
     { "af",     AF|0400 },
     { "",       0000 }
 };
@@ -229,9 +230,5 @@ struct  adsym   CND[] = {
     { "Z",      Z |0400 },
     { "NC",     NC|0400 },
     { "C",      CS|0400 },
-    { "PO",     PO|0400 },
-    { "PE",     PE|0400 },
-    { "P",      P |0400 },
-    { "M",      M |0400 },
     { "",       0000 }
 };

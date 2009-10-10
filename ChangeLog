@@ -4,6 +4,14 @@
 	  as/mcs51/i51adr.c, as/mcs51/i51mch.c, as/mcs51/i51pst.c,
 	  as/mcs51/i8051.h, as/z80/z80.h, as/z80/z80adr.c, as/z80/z80mch.c:
 	  targets synced with asxxxx v2.0 and later
+	* as/asgb/asgb.dsp, as/asgb/clean.mk, as/asgb/conf.mk, as/asgb/gb.h,
+	  as/asgb/gbadr.c, as/asgb/gbext.c, as/asgb/gbmch.c, as/asgb/gbpst.c,
+	  as/asgb/Makefile.in,
+	  as/Makefile.in, as/z80/as_gbz80.dsp,
+	  as/mcs51/i51ext.c, as/z80/Makefile.in, as/z80/z80.h, as/z80/z80adr.c,
+	  as/z80/z80ext.c, as/z80/z80mch.c, as/z80/z80pst.c,
+	  configure, configure.in, Makefile.in, sdcc.dsw:
+	  split asz80 and asgb
 
 2009-10-09 Maarten Brock <sourceforge.brock AT dse.nl>
 

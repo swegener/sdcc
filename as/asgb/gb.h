@@ -21,16 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 /*)BUILD
-	$(PROGRAM) =	ASZ80
+	$(PROGRAM) =	ASGB
 	$(INCLUDE) = {
 		ASXXXX.H
-		Z80.H
+		GB.H
 	}
 	$(FILES) = {
-		Z80EXT.C
-		Z80MCH.C
-		Z80ADR.C
-		Z80PST.C
+		GBEXT.C
+		GBMCH.C
+		GBADR.C
+		GBPST.C
 		ASMAIN.C
 		ASLEX.C
 		ASSYM.C
@@ -68,8 +68,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define HL	2
 #define SP	3
 #define AF	4
-#define IX	5
-#define IY	6
+#define HLD	5
+#define HLI	6
 
 /*
  * Conditional definitions
@@ -78,10 +78,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	Z	1
 #define	NC	2
 #define	CS	3
-#define	PO	4
-#define	PE	5
-#define	P	6
-#define	M	7
 
 /*
  * Symbol types
@@ -104,8 +100,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	S_IDDE	51
 #define	S_IDHL	52
 #define	S_IDSP	53
-#define	S_IDIX	55
-#define	S_IDIY	56
+#define	S_IDHLD	55
+#define	S_IDHLI	56
 #define	S_INDM	57
 
 /*
@@ -122,29 +118,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	S_ADD	68
 #define	S_ADC	69
 #define	S_AND	70
-#define	S_EX	71
 #define	S_PUSH	72
-#define	S_IN	73
-#define	S_OUT	74
 #define	S_RL	75
 #define	S_RST	76
 #define	S_IM	77
 #define	S_INH1	78
-#define	S_INH2	79
-#define	S_DJNZ	80
 #define	S_SUB	81
 #define	S_SBC	82
-
-/*
- * HD64180 Instructions
- */
-#define	X_HD64	90
-#define	X_INH2	91
-#define	X_IN	92
-#define	X_OUT	93
-#define	X_MLT	94
-#define	X_TST	95
-#define	X_TSTIO	96
+#define	S_STOP	83
+#define	S_LDH	84
+#define	S_LDA	85
+#define	S_LDHL	86
 
 struct adsym
 {
@@ -162,36 +146,30 @@ extern	struct	adsym	CND[];
 
 #ifdef	OTHERSYSTEM
 	
-	/* z80adr.c */
+	/* gbadr.c */
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(char c, char *str);
+extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
-
-	/* z80mch.c */
+	/* gbmch.c */
 extern	int		comma(void);
 extern	int		genop(int pop, int op, struct expr *esp, int f);
-extern	int		gixiy(int v);
 extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
 extern	VOID		minit(void);
 
 #else
-
-	/* z80adr.c */
+	/* gbadr.c */
 extern	int		addr();
 extern	int		admode();
 extern	int		any();
 extern	int		srch();
 
-	/* z80mch.c */
+	/* gbmch.c */
 extern	int		comma();
 extern	int		genop();
-extern	int		gixiy();
-extern	VOID		machine();
+extern	VOID		machine() ;
 extern	int		mchpcr();
 extern	VOID		minit();
-
 #endif
-

@@ -48,15 +48,15 @@ ASXXLIB = $(srcdir)/../asxxsrc
 ASXXLIBSRC = asdata.c asexpr.c aslex.c aslist.c asmain.c asnoice.c asout.c assubr.c assym.c sdas.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
-SRC = z80ext.c z80pst.c z80mch.c z80adr.c
+SRC = gbext.c gbpst.c gbmch.c gbadr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
 ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
 
 ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
-ASX = $(top_builddir)/bin/as-z80$(EXEEXT)
-DEST = $(DESTDIR)$(bindir)/as-z80$(EXEEXT)
+ASX = $(top_builddir)/bin/as-gbz80$(EXEEXT)
+DEST = $(DESTDIR)$(bindir)/as-gbz80$(EXEEXT)
 
 transform       = @program_transform_name@
 

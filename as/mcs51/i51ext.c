@@ -27,4 +27,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 char	*cpu	= "Intel 8051";
 int	hilo	= 1;
-char	*dsft	= "ASM";
+char	*dsft	= "asm";

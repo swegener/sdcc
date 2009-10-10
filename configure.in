@@ -762,8 +762,8 @@ test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 
 if test $OPT_DISABLE_Z80 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile
-                   as/Makefile
                    as/z80/Makefile
+                   as/asgb/Makefile
                    as/link/Makefile
                    as/link/z80/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile

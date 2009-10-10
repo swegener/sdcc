@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <setjmp.h>
 #include "asxxxx.h"
-#include "z80.h"
+#include "gb.h"
 
-char	*cpu	= "Zilog Z80 / Hitachi HD64180";
+char	*cpu	= "GameBoy Z80-like CPU";
 int	hilo	= 0;
 char	*dsft	= "asm";

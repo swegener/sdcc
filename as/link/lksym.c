@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              int     symeq()
  *              VOID    syminit()
  *              VOID    symmod()
- *              Addr_T  symval()
+ *              a_uint  symval()
  *
  *      lksym.c contains no local/static variables.
  */
@@ -109,7 +109,7 @@ syminit(void)
  *              int     lkerr           error flag
  *
  *      functions called:
- *              Addr_T  eval()          lkeval.c
+ *              a_uint  eval()          lkeval.c
  *              VOID    exit()          c_library
  *              int     fprintf()       c_library
  *              char    getSid()        lklex.c
@@ -247,7 +247,7 @@ lkpsym(char *id, int f)
         return (sp);
 }
 
-/*)Function     Addr_T  symval(tsp)
+/*)Function     a_uint  symval(tsp)
  *
  *              sym *   tsp             pointer to a symbol structure
  *
@@ -256,7 +256,7 @@ lkpsym(char *id, int f)
  *      value to the areax base address.
  *
  *      local variables:
- *              Addr_T  val             relocated address value
+ *              a_uint  val             relocated address value
  *
  *      global variables:
  *              none
@@ -268,10 +268,10 @@ lkpsym(char *id, int f)
  *              none
  */
 
-Addr_T
+a_uint
 symval(register struct sym *tsp)
 {
-        register Addr_T val;
+        register a_uint val;
 
         val = tsp->s_addr;
         if (tsp->s_axp) {

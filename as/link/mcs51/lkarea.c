@@ -83,7 +83,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      int     lkerr       error flag
  *
  *  functions called:
- *      Addr_T  eval()      lkeval.c
+ *      a_uint  eval()      lkeval.c
  *      VOID    exit()      c_library
  *      int     fprintf()   c_library
  *      VOID    getid()     lklex.c
@@ -301,7 +301,7 @@ lkparea(char *id)
  *  define the starting address and length of each area.
  *
  *  local variables:
- *      Addr_T  rloc        ;current relocation address
+ *      a_uint  rloc        ;current relocation address
  *      char    temp[]      ;temporary string
  *      struct symbol   *sp ;symbol structure
  *
@@ -331,7 +331,7 @@ VOID lnksect(register struct area *tap);
 VOID
 lnkarea()
 {
-    Addr_T rloc[4];
+    a_uint rloc[4];
     int  locIndex;
     char temp[NCPS];
     struct sym *sp;
@@ -431,8 +431,8 @@ lnkarea()
  *  function.
  *
  *  local variables:
- *      Addr_T  size        size of area
- *      Addr_T  addr        address of area
+ *      a_uint  size        size of area
+ *      a_uint  addr        address of area
  *      areax * taxp        pointer to an areax structure
  *
  *  global variables:
@@ -449,7 +449,7 @@ lnkarea()
 VOID
 lnksect(register struct area *tap)
 {
-    register Addr_T size, addr;
+    register a_uint size, addr;
     register struct areax *taxp;
 
     size = 0;
@@ -498,19 +498,19 @@ lnksect(register struct area *tap)
     }
 }
 
-Addr_T lnksect2 (struct area *tap, int locIndex);
+a_uint lnksect2 (struct area *tap, int locIndex);
 char idatamap[256];
 unsigned long codemap[524288];
 unsigned long xdatamap[131072];
 struct area *dseg_ap = NULL;
-Addr_T dram_start = 0;
-Addr_T iram_start = 0;
+a_uint dram_start = 0;
+a_uint iram_start = 0;
 
 /*Modified version of the functions for packing variables in internal data memory*/
 VOID lnkarea2 (void)
 {
-    Addr_T rloc[4]={0, 0, 0, 0};
-    Addr_T gs_size = 0;
+    a_uint rloc[4]={0, 0, 0, 0};
+    a_uint gs_size = 0;
     int  locIndex;
     char temp[NCPS];
     struct sym *sp;
@@ -665,14 +665,14 @@ VOID lnkarea2 (void)
 }
 
 static
-Addr_T find_empty_space(Addr_T start, Addr_T size, unsigned long *map)
+a_uint find_empty_space(a_uint start, a_uint size, unsigned long *map)
 {
     int i, j, k;
     unsigned long mask, b;
 
     while (1)
     {
-        Addr_T a = start;
+        a_uint a = start;
         i = start >> 5;
         j = (start + size) >> 5;
         mask = -(1 << (start & 0x1F));
@@ -715,11 +715,11 @@ Addr_T find_empty_space(Addr_T start, Addr_T size, unsigned long *map)
 }
 
 static
-Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
+a_uint allocate_space(a_uint start, a_uint size, char* id, unsigned long *map)
 {
     int i, j;
     unsigned long mask;
-    Addr_T a = start;
+    a_uint a = start;
     i = start >> 5;
     j = (start + size) >> 5;
     mask = -(1 << (start & 0x1F));
@@ -743,9 +743,9 @@ Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
     return start;
 }
 
-Addr_T lnksect2 (struct area *tap, int locIndex)
+a_uint lnksect2 (struct area *tap, int locIndex)
 {
-    register Addr_T size, addr;
+    register a_uint size, addr;
     register struct areax *taxp;
     int j, k, ramlimit, ramstart;
     char fchar=' ', dchar='a';

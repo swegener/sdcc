@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *      asexpr.c contains the following functions:
  *              VOID    abscheck()
- *              Addr_T  absexpr()
+ *              a_uint  absexpr()
  *              VOID    clrexpr()
  *              int     digit()
  *              VOID    expr()
@@ -253,7 +253,7 @@ expr(register struct expr *esp, int n)
         unget(c);
 }
 
-/*)Function     Addr_T  absexpr()
+/*)Function     a_uint  absexpr()
  *
  *      The function absexpr() evaluates an expression, verifies it
  *      is absolute (i.e. not position dependent or relocatable), and
@@ -275,7 +275,7 @@ expr(register struct expr *esp, int n)
  *              a 'r' error is reported.
  */
 
-Addr_T
+a_uint
 absexpr(void)
 {
         struct expr e;

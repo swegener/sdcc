@@ -156,7 +156,7 @@ search_path_fopen(const char *filename, const char *mode)
  *		int	fflag		-f(f), relocations flagged flag
  *		int	flevel		IF-ELSE-ENDIF flag will be non
  *					zero for false conditional case
- *		Addr_T	fuzz		tracks pass to pass changes in the
+ *		a_uint	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *		int	gflag		-g, make undefined symbols global flag
@@ -509,7 +509,7 @@ int i;
  *					ASCII character
  *		int	flevel		IF-ELSE-ENDIF flag will be non
  *					zero for false conditional case
- *		Addr_T	fuzz		tracks pass to pass changes in the
+ *		a_uint	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *		int	ifcnd[]		array of IF statement condition
@@ -521,7 +521,7 @@ int i;
  *		int	incline[]	current include file line
  *		int	incfil		current file handle index
  *					for include files
- *		Addr_T	laddr		address of current assembler line
+ *		a_uint	laddr		address of current assembler line
  *					or value of .if argument
  *		int	lmode		listing mode
  *		int	lop		current line number on page
@@ -536,7 +536,7 @@ int i;
  *		int	tlevel		current conditional level
  *
  *	functions called:
- *		Addr_T	absexpr()	asexpr.c
+ *		a_uint	absexpr()	asexpr.c
  *		area *	alookup()	assym.c
  *		VOID	clrexpr()	asexpr.c
  *		int	digit()		asexpr.c
@@ -892,7 +892,7 @@ loop:
         case S_ULEB128:
         case S_SLEB128:
                 do {
-                        Addr_T val = absexpr();
+                        a_uint val = absexpr();
                         int bit = sizeof(val)*8 - 1;
                         int impliedBit;
 
@@ -1146,9 +1146,9 @@ loop:
                     if (!as_strcmpi(id, "on"))
                     {
                         /* Quick sanity check: size of
-                         * Addr_T must be at least 24 bits.
+                         * a_uint must be at least 24 bits.
                          */
-                        if (sizeof(Addr_T) < 3)
+                        if (sizeof(a_uint) < 3)
                         {
                             warnBanner();
                             fprintf(stderr,
@@ -1303,7 +1303,7 @@ int wf;
  *
  *	global variables:
  *		sym	dot		defined as sym[0]
- *		Addr_T	fuzz		tracks pass to pass changes in the
+ *		a_uint	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *
@@ -1356,7 +1356,7 @@ struct area *nap;
 /*)Function	VOID	phase(ap, a)
  *
  *		area *	ap		pointer to area
- *		Addr_T	a		address in area
+ *		a_uint	a		address in area
  *
  *	Function phase() compares the area ap and address a
  *	with the current area dot.s_area and address dot.s_addr
@@ -1380,7 +1380,7 @@ struct area *nap;
 VOID
 phase(ap, a)
 struct area *ap;
-Addr_T a;
+a_uint a;
 {
 	if (ap != dot.s_area || a != dot.s_addr)
 		err('p');

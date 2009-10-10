@@ -30,7 +30,7 @@ struct mne *mp;
 {
 	int op, t1, t2, type;
 	struct expr e1, e2, e3;
-	Addr_T espv;
+	a_uint espv;
 	struct area *espa;
 	char id[NCPS];
 	int c, v1;
@@ -183,7 +183,7 @@ struct mne *mp;
 		espv = e1.e_addr;
 		if (t1 != S_IMMED || espv & ~0x07)
 			aerr();
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
 			aerr();
@@ -196,11 +196,11 @@ struct mne *mp;
 		espv = e1.e_addr;
 		if (t1 != S_IMMED || espv & ~0x07)
 			aerr();
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
 			aerr();
-		comma();
+		comma(1);
 		expr(&e3, 0);
 		outab(op + 2*(espv&0x07));
 		outrb(&e2, R_PAG0);
@@ -252,7 +252,7 @@ struct mne *mp;
 
 	case S_CBEQ:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		if (t1 == S_IMMED) {
 			outab(op);
@@ -297,7 +297,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		if (t1 != S_IMMED)
 			aerr();
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		outab(op);
 		outrb(&e1, 0);
@@ -315,7 +315,7 @@ struct mne *mp;
 
 	case S_DBNZ:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op);
@@ -376,7 +376,7 @@ struct mne *mp;
 			outrb(&e1, R_PAG0);
 			break;
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t1 == S_IMMED) {
 			if (t2 == S_DIR || t2 == S_EXT) {
@@ -447,18 +447,6 @@ struct expr *esp;
 		esp->e_base.e_sp = &sym[1];
 	}
 	return(0);
-}
-
-/*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
 }
 
 /*

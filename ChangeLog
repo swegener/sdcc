@@ -12,6 +12,20 @@
 	  as/z80/z80ext.c, as/z80/z80mch.c, as/z80/z80pst.c,
 	  configure, configure.in, Makefile.in, sdcc.dsw:
 	  split asz80 and asgb
+	* as/asgb/gb.h, as/asgb/gbmch.c, as/asxxsrc/asdata.c,
+	  as/asxxsrc/asexpr.c, as/asxxsrc/aslex.c, as/asxxsrc/asmain.c,
+	  as/asxxsrc/asxxxx.h, as/hc08/m08adr.c, as/hc08/m08mch.c,
+	  as/hc08/m6808.h, as/link/aslink.h, as/link/hc08/lkarea.c,
+	  as/link/hc08/lkelf.c, as/link/hc08/lkihx.c, as/link/hc08/lkmain.c,
+	  as/link/hc08/lkrloc.c, as/link/hc08/lks19.c, as/link/lkdata.c,
+	  as/link/lkeval.c, as/link/lkhead.c. as/link/lklist.c,
+	  as/link/lknoice.c, as/link/lksym.c, as/link/mcs51/lkarea.c,
+	  as/link/mcs51/lkihx.c, as/link/mcs51/lkmain.c,
+	  as/link/mcs51/lkrloc.c, as/link/mcs51/lks19.c, as/link/z80/lkarea.c,
+	  as/link/z80/lkihx.c, as/link/z80/lkmain.c, as/link/z80/lkrloc.c,
+	  as/link/z80/lks19.c, as/mcs51/i51mch.c, as/mcs51/i8051.h,
+	  as/z80/z80.h, as/z80/z80mch.c: type Addr_T renamed to a_uint,
+	  function comma() moved to aslex.c
 
 2009-10-09 Maarten Brock <sourceforge.brock AT dse.nl>
 

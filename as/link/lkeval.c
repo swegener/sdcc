@@ -33,15 +33,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *      lkeval.c contains the following functions:
  *              int     digit()
- *              Addr_T  eval()
- *              Addr_T  expr()
+ *              a_uint  eval()
+ *              a_uint  expr()
  *              int     oprio()
- *              Addr_T  term()
+ *              a_uint  term()
  *
  *      lkeval.c contains no local/static variables
  */
 
-/*)Function     Addr_T  eval()
+/*)Function     a_uint  eval()
  *
  *      The function eval() evaluates a character string to a
  *      numerical value.
@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      local variables:
  *              int     c               character from input string
  *              int     v               value of character in current radix
- *              Addr_T  n               evaluation value
+ *              a_uint  n               evaluation value
  *
  *      global variables:
  *              int     radix           current number conversion radix
@@ -65,11 +65,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              numerical value.
  */
 
-Addr_T
+a_uint
 eval()
 {
         register int c, v;
-        register Addr_T n;
+        register a_uint n;
 
         c = getnb();
         n = 0;
@@ -81,7 +81,7 @@ eval()
         return(n);
 }
 
-/*)Function     Addr_T  expr(n)
+/*)Function     a_uint  expr(n)
  *
  *              int     n               a firewall priority; all top
  *                                      level calls (from the user)
@@ -93,8 +93,8 @@ eval()
  *      local variables:
  *              int     c               current input text character
  *              int     p               current operator priority
- *              Addr_T  v               value returned by term()
- *              Addr_T  ve              value returned by a
+ *              a_uint  v               value returned by term()
+ *              a_uint  ve              value returned by a
  *                                      recursive call to expr()
  *
  *      global variables:
@@ -117,11 +117,11 @@ eval()
  *              text string.
  */
 
-Addr_T
+a_uint
 expr (n)
 {
         register int c, p;
-        register Addr_T v, ve;
+        register a_uint v, ve;
 
         v = term();
         while (ctype[c = getnb()] & BINOP) {
@@ -179,7 +179,7 @@ expr (n)
         return(v);
 }
 
-/*)Function     Addr_T  term()
+/*)Function     a_uint  term()
  *
  *      The function term() evaluates a single constant
  *      or symbol value prefaced by any unary operator
@@ -191,7 +191,7 @@ expr (n)
  *              int     n               value of digit in current radix
  *              int     r               current evaluation radix
  *              sym *   sp              pointer to a sym structure
- *              Addr_T  v               evaluation value
+ *              a_uint  v               evaluation value
  *
  *      global variables:
  *              char    ctype[]         array of character types, one per
@@ -207,18 +207,18 @@ expr (n)
  *              int     getmap()        lklex.c
  *              int     getnb()         lklex.c
  *              sym *   lkpsym()        lksym.c
- *              Addr_T  symval()        lksym.c
+ *              a_uint  symval()        lksym.c
  *              VOID    unget()         lklex.c
  *
  *      side effects:
  *              An arithmetic term is evaluated by scanning input text.
  */
 
-Addr_T
+a_uint
 term()
 {
         register int c, r, n;
-        register Addr_T v;
+        register a_uint v;
         struct sym *sp;
         char id[NCPS];
 

@@ -253,7 +253,7 @@ extern patch* patches;
 /*
  *      General assembler address type
  */
-typedef unsigned int Addr_T;
+typedef unsigned int a_uint;
 
 /*
  *      The structures of head, area, areax, and sym are created
@@ -299,9 +299,9 @@ struct  area
 {
         struct  area    *a_ap;  /* Area link */
         struct  areax   *a_axp; /* Area extension link */
-        Addr_T  a_addr;         /* Beginning address of area */
-        Addr_T  a_size;         /* Total size of the area */
-        Addr_T  a_unaloc;       /* Total number of unallocated bytes, for error reporting */
+        a_uint  a_addr;         /* Beginning address of area */
+        a_uint  a_size;         /* Total size of the area */
+        a_uint  a_unaloc;       /* Total number of unallocated bytes, for error reporting */
         char    a_type;         /* Area subtype */
         int     a_flag;         /* Flag byte */
         char    a_id[NCPS];     /* Name */
@@ -329,8 +329,8 @@ struct  areax
         struct  areax   *a_axp; /* Area extension link */
         struct  area    *a_bap; /* Base area link */
         struct  head    *a_bhp; /* Base header link */
-        Addr_T  a_addr;         /* Beginning address of section */
-        Addr_T  a_size;         /* Size of the area in section */
+        a_uint  a_addr;         /* Beginning address of section */
+        a_uint  a_size;         /* Size of the area in section */
 };
 
 /*
@@ -351,7 +351,7 @@ struct  sym
         struct  areax   *s_axp; /* Symbol area link */
         char    s_type;         /* Symbol subtype */
         char    s_flag;         /* Flag byte */
-        Addr_T  s_addr;         /* Address */
+        a_uint  s_addr;         /* Address */
         char    *s_id;          /* Name: JLH change from [NCPS] */
 };
 
@@ -400,7 +400,7 @@ struct  sdp
 {
         struct  area  *s_area;  /* Paged Area link */
         struct  areax *s_areax; /* Paged Area Extension Link */
-        Addr_T  s_addr;         /* Page address offset */
+        a_uint  s_addr;         /* Page address offset */
 };
 
 /*
@@ -417,9 +417,9 @@ struct  rerr
 {
         int     aindex;         /* Linking area */
         int     mode;           /* Relocation mode */
-        Addr_T  rtbase;         /* Base address in section */
+        a_uint  rtbase;         /* Base address in section */
         int     rindex;         /* Area/Symbol reloaction index */
-        Addr_T  rval;           /* Area/Symbol offset value */
+        a_uint  rval;           /* Area/Symbol offset value */
 };
 
 /*
@@ -669,7 +669,7 @@ extern  int     pass;           /*      linker pass number
 extern  int     rtcnt;          /*      count of elements in the
                                  *      rtval[] and rtflg[] arrays
                                  */
-extern  Addr_T  rtval[];        /*      data associated with relocation
+extern  a_uint  rtval[];        /*      data associated with relocation
                                  */
 extern  int     rtflg[];        /*      indicates if rtval[] value is
                                  *      to be sent to the output file.
@@ -692,7 +692,7 @@ extern  struct lbname *lbnhead; /*      pointer to the first
 extern  struct lbfile *lbfhead; /*      pointer to the first
                                  *      library file structure
                                  */
-extern  Addr_T iram_size;       /*      internal ram size
+extern  a_uint iram_size;       /*      internal ram size
                                  */
 extern  long xram_size;         /*      external ram size
                                  */
@@ -769,14 +769,14 @@ extern  VOID            symdef();
 extern  int             symeq();
 extern  VOID            syminit();
 extern  VOID            symmod();
-extern  Addr_T          symval();
+extern  a_uint          symval();
 
 /* lkeval.c */
 extern  int             digit();
-extern  Addr_T          eval();
-extern  Addr_T          expr();
+extern  a_uint          eval();
+extern  a_uint          expr();
 extern  int             oprio();
-extern  Addr_T          term();
+extern  a_uint          term();
 
 /* lklist.c */
 extern  int             dgt();
@@ -788,19 +788,19 @@ extern  VOID            newpag();
 extern  VOID            slew();
 
 /* lkrloc.c */
-extern  Addr_T          adb_b(register Addr_T v, register int i);
-extern  Addr_T          adb_bit(register Addr_T v, register int i);
-extern  Addr_T          adb_hi(Addr_T  v, int i);
-extern  Addr_T          adb_lo(Addr_T  v, int i);
-extern  Addr_T          adb_24_bit(register Addr_T v, register int i);
-extern  Addr_T          adb_24_hi(Addr_T v, int i);
-extern  Addr_T          adb_24_mid(Addr_T v, int i);
-extern  Addr_T          adb_24_lo(Addr_T v, int i);
-extern  Addr_T          adw_w(register Addr_T v, register int i);
-extern  Addr_T          adw_24(Addr_T v, int i);
-extern  Addr_T          adw_hi(Addr_T  v, int i);
-extern  Addr_T          adw_lo(Addr_T  v, int i);
-extern  Addr_T          evword(VOID);
+extern  a_uint          adb_b(register a_uint v, register int i);
+extern  a_uint          adb_bit(register a_uint v, register int i);
+extern  a_uint          adb_hi(a_uint  v, int i);
+extern  a_uint          adb_lo(a_uint  v, int i);
+extern  a_uint          adb_24_bit(register a_uint v, register int i);
+extern  a_uint          adb_24_hi(a_uint v, int i);
+extern  a_uint          adb_24_mid(a_uint v, int i);
+extern  a_uint          adb_24_lo(a_uint v, int i);
+extern  a_uint          adw_w(register a_uint v, register int i);
+extern  a_uint          adw_24(a_uint v, int i);
+extern  a_uint          adw_hi(a_uint  v, int i);
+extern  a_uint          adw_lo(a_uint  v, int i);
+extern  a_uint          evword(VOID);
 extern  VOID            rele(VOID);
 extern  VOID            reloc(char c);
 extern  VOID            relt(VOID);
@@ -811,7 +811,7 @@ extern  char *          errmsg[];
 extern  VOID            errdmp(FILE *fptr, char *str);
 extern  VOID            relerp(char *str);
 extern  VOID            erpdmp(FILE *fptr, char *str);
-extern  VOID            prntval(FILE *fptr, Addr_T v);
+extern  VOID            prntval(FILE *fptr, a_uint v);
 extern  int             lastExtendedAddress;
 
 /* lklibr.c */
@@ -828,14 +828,14 @@ extern  VOID            s19();
 
 /* lkihx.c */
 extern  VOID            ihx();
-extern  VOID            ihxExtendedLinearAddress(Addr_T);
+extern  VOID            ihxExtendedLinearAddress(a_uint);
 extern  VOID            ihxNewArea();
 
 /* lkstore.c */
 extern  char *          StoreString( char *str );
 
 /* lknoice.c */
-extern  void            DefineNoICE( char *name, Addr_T value, int page );
+extern  void            DefineNoICE( char *name, a_uint value, int page );
 
 /* EEP: lkelf.c */
 extern  VOID            elf();

@@ -153,7 +153,6 @@ extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* gbmch.c */
-extern	int		comma(void);
 extern	int		genop(int pop, int op, struct expr *esp, int f);
 extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
@@ -167,7 +166,6 @@ extern	int		any();
 extern	int		srch();
 
 	/* gbmch.c */
-extern	int		comma();
 extern	int		genop();
 extern	VOID		machine() ;
 extern	int		mchpcr();

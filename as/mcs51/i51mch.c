@@ -128,7 +128,7 @@ struct mne *mp;
                 t = addr(&e);
                 if (t != S_A)
                         aerr();
-                comma();
+                comma(1);
                 t1 = addr(&e1);
 
                 switch (t1) {
@@ -162,7 +162,7 @@ struct mne *mp;
                  * C,direct;  C,/direct
                  */
                 t = addr(&e);
-                comma();
+                comma(1);
                 t1 = addr(&e1);
 
                 switch (t) {
@@ -243,7 +243,7 @@ struct mne *mp;
                 t = addr(&e);
                 if (t != S_A)
                         aerr();
-                comma();
+                comma(1);
                 t1 = addr(&e1);
 
                 switch (t1) {
@@ -269,7 +269,7 @@ struct mne *mp;
         /* MOV instruction, all modes */
         case S_MOV:
                 t = addr(&e);
-                comma();
+                comma(1);
                 t1 = addr(&e1);
 
                 switch (t) {
@@ -419,7 +419,7 @@ struct mne *mp;
                 if ((t != S_DIR) && (t != S_EXT))
                         aerr();
                 /* sdcc svn rev #4994: fixed bug 1865114 */
-                comma();
+                comma(1);
                 expr(&e1, 0);
                 outab(op);
                 outrb(&e, R_PAG0);
@@ -457,7 +457,7 @@ struct mne *mp;
         case S_CJNE:
                 /* A,#;  A,dir;  @R0,#;  @R1,#;  Rn,# */
                 t = addr(&e);
-                comma();
+                comma(1);
                 t1 = addr(&e1);
                 switch (t) {
                 case S_A:
@@ -492,7 +492,7 @@ struct mne *mp;
                 }
 
                 /* branch destination */
-                comma();
+                comma(1);
 		clrexpr(&e1);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
@@ -512,7 +512,7 @@ struct mne *mp;
                 /* Dir,dest;  Reg,dest */
                 t = addr(&e);
                 /* sdcc svn rev #4994: fixed bug 1865114 */
-                comma();
+                comma(1);
                 expr(&e1, 0);
                 switch (t) {
 
@@ -558,7 +558,7 @@ struct mne *mp;
                 t = addr(&e);
                 if (t != S_A)
                         aerr();
-                comma();
+                comma(1);
                 t1 = addr(&e1);
                 if (t1 == S_AT_ADP)
                         outab(0x93);
@@ -571,7 +571,7 @@ struct mne *mp;
         case S_MOVX:
                 /* A,@DPTR  A,@R0  A,@R1  @DPTR,A  @R0,A  @R1,A */
                 t = addr(&e);
-                comma();
+                comma(1);
                 t1 = addr(&e1);
 
                 switch (t) {
@@ -678,7 +678,7 @@ struct mne *mp;
                 t = addr(&e);
                 if (t != S_A)
                         aerr();
-                comma();
+                comma(1);
                 t1 = addr(&e1);
                 switch (t1) {
                 case S_AT_R:
@@ -717,17 +717,6 @@ struct expr *esp;
 		esp->e_base.e_sp = &sym[1];
 	}
 	return(0);
-}
-
-/*
- * Is the next character a comma ?
- */
-int
-comma()
-{
-        if (getnb() != ',')
-                qerr();
-        return(1);
 }
 
  /*

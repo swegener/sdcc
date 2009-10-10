@@ -1021,7 +1021,7 @@ bassav()
  *      int     lkerr       error flag
  *
  *   functions called:
- *      Addr_T  expr()      lkeval.c
+ *      a_uint  expr()      lkeval.c
  *      int     fprintf()   c_library
  *      VOID    getid()     lklex.c
  *      char    getnb()     lklex.c
@@ -1130,7 +1130,7 @@ gblsav()
  *      int     lkerr       error flag
  *
  *   functions called:
- *      Addr_T  expr()      lkeval.c
+ *      a_uint  expr()      lkeval.c
  *      int     fprintf()   c_library
  *      VOID    getid()     lklex.c
  *      char    getnb()     lklex.c
@@ -1279,7 +1279,7 @@ afile(char *fn, char *ft, int wf)
  *   functions called:
  *      char    getnb()     lklex.c
  *      VOID    unget()     lklex.c
- *      Addr_T  expr()      lkeval.c
+ *      a_uint  expr()      lkeval.c
  *
  *  side effects:
  *      The iram_size may be modified.

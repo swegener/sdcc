@@ -104,7 +104,6 @@ extern	VOID		machine(struct mne *mp);
 extern	int		chkindx(struct expr *exp);
 extern	int		mchpcr(struct expr *esp);
 extern	VOID		minit(void);
-extern	int		comma(void);
 
 #else
 
@@ -120,7 +119,6 @@ extern	VOID		machine();
 extern	int		chkindx();
 extern	int		mchpcr();
 extern	VOID		minit();
-extern	int		comma();
 
 #endif
 

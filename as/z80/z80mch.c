@@ -113,7 +113,7 @@ struct mne *mp;
 			v1 &= 0x07;
 		}
 		op |= (v1<<3);
-		comma();
+		comma(1);
 		addr(&e2);
 		abscheck(&e1);
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -126,7 +126,7 @@ struct mne *mp;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
-			comma();
+			comma(1);
 			clrexpr(&e2);
 			t2 = addr(&e2);
 		}
@@ -141,7 +141,7 @@ struct mne *mp;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
-			comma();
+			comma(1);
 			clrexpr(&e2);
 			t2 = addr(&e2);
 		}
@@ -155,7 +155,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		t2 = 0;
 		if (more()) {
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		}
 		if (t2 == 0) {
@@ -207,7 +207,7 @@ struct mne *mp;
 
 	case S_LD:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t1 == S_R8) {
 			v1 = op | e1.e_addr<<3;
@@ -306,7 +306,7 @@ struct mne *mp;
 
 	case S_EX:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 == S_R16) {
 			v1 = (int) e1.e_addr;
@@ -335,11 +335,11 @@ struct mne *mp;
 	case S_OUT:
 		if (rf == S_IN) {
 			t1 = addr(&e1);
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		} else {
 			t2 = addr(&e2);
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 		}
 		v1 = (int) e1.e_addr;
@@ -398,7 +398,7 @@ struct mne *mp;
 			} else {
 				aerr();
 			}
-			comma();
+			comma(1);
 		}
 		expr(&e2, 0);
 		outab(op);
@@ -417,7 +417,7 @@ struct mne *mp;
 	case S_CALL:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 		} else {
 			op = 0xCD;
 		}
@@ -429,7 +429,7 @@ struct mne *mp;
 	case S_JP:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 			expr(&e1, 0);
 			outab(op);
 			outrw(&e1, 0);
@@ -461,11 +461,11 @@ struct mne *mp;
 	case X_OUT:
 		if (rf == X_IN) {
 			t1 = addr(&e1);
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		} else {
 			t2 = addr(&e2);
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 		}
 		if ((t1 == S_R8) && (t2 == S_INDM)) {
@@ -590,18 +590,6 @@ int v;
 		outab(0xFD);
 	}
 	return(v);
-}
-
-/*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
 }
 
 /*

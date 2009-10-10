@@ -55,7 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *                                      head structure
  *
  *      functions called:
- *              Addr_T  expr()          lkeval.c
+ *              a_uint  expr()          lkeval.c
  *              VOID *  new()           lksym.c
  *              VOID    lkparea()       lkarea.c
  *

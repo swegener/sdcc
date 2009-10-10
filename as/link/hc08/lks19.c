@@ -84,14 +84,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      in the standard Motorola S19 format.
  *
  *      local variables:
- *              Addr_T  chksum          byte checksum
+ *              a_uint  chksum          byte checksum
  *
  *      global variables:
  *              int     hilo            byte order
  *              FILE *  ofp             output file handle
  *              int     rtcnt           count of data words
  *              int     rtflg[]         output the data flag
- *              Addr_T  rtval[]         relocated data
+ *              a_uint  rtval[]         relocated data
  *
  *      functions called:
  *              int     fprintf()       c_library
@@ -103,7 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 VOID
 s19(i)
 {
-        register Addr_T chksum;
+        register a_uint chksum;
 
         if (i) {
                 if (ap->a_flag & A_NOLOAD)

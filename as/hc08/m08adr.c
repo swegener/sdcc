@@ -27,7 +27,7 @@ struct expr *esp;
 {
         int c;
         struct area *espa;
-        Addr_T espv;
+        a_uint espv;
         const char *tcp;
 
         if ((c = getnb()) == '#') {
@@ -57,7 +57,7 @@ struct expr *esp;
                 if (esp->e_addr & ~0xFF)
                         err('d');
                 if (more()) {
-                        comma();
+                        comma(1);
                         tcp = ip;
                         switch(admode(axs)) {
                         case S_X:
@@ -85,7 +85,7 @@ struct expr *esp;
                         espa = esp->e_base.e_ap;
                         espv = esp->e_addr;
                         if (more()) {
-                                comma();
+                                comma(1);
                                 c = admode(axs);
                                 if (esp->e_flag == 0 &&
                                     espa == NULL &&

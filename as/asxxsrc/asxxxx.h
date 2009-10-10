@@ -44,11 +44,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <unistd.h>
 #endif
 
-/*
- * Case Sensitivity Flag
- */
-#define CASE_SENSITIVE  1
-
 /*)Module       asxxxx.h
  *
  *      The module asxxxx.h contains the definitions for constants,
@@ -146,11 +141,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define dca     area[0]                 /* Dca, default code area */
 
 
-/* NB: for Flat24 extentions to work, Addr_T must be at least 24
+/* NB: for Flat24 extentions to work, a_uint must be at least 24
  * bits. This is checked at runtime when the .flat24 directive
  * is processed.
  */
-typedef unsigned int Addr_T;
+typedef unsigned int a_uint;
 
 /*
  *      The area structure contains the parameter values for a
@@ -171,11 +166,11 @@ struct  area
         struct  area *a_ap;             /* Area link */
         char *  a_id;                   /* Area Name */
         int     a_ref;                  /* Ref. number */
-        Addr_T  a_size;                 /* Area size */
-        Addr_T  a_fuzz;                 /* Area fuzz */
+        a_uint  a_size;                 /* Area size */
+        a_uint  a_fuzz;                 /* Area fuzz */
         int     a_flag;                 /* Area flags */
 /* sdas specific */
-        Addr_T  a_addr;                 /* Area address */
+        a_uint  a_addr;                 /* Area address */
 /* ebd sdas specific */
 };
 
@@ -304,7 +299,7 @@ struct  mne
         char    *m_id;                  /* Mnemonic (JLH) */
         char    m_type;                 /* Mnemonic subtype */
         char    m_flag;                 /* Mnemonic flags */
-        Addr_T  m_valu;                 /* Value */
+        a_uint  m_valu;                 /* Value */
 };
 
 /*
@@ -329,9 +324,9 @@ struct  sym
         char    s_flag;                 /* Symbol flags */
         struct  area *s_area;           /* Area line, 0 if absolute */
         int     s_ref;                  /* Ref. number */
-        Addr_T  s_addr;                 /* Address */
+        a_uint  s_addr;                 /* Address */
 /* sdas specific */
-        Addr_T  s_org;                  /* Start Address if absolute */
+        a_uint  s_org;                  /* Start Address if absolute */
 /* end sdas specific */
 };
 
@@ -396,7 +391,7 @@ struct  tsym
         int t_flg;                      /* flags */
 
         struct  area *t_area;           /* Area */
-        Addr_T  t_addr;                 /* Address */
+        a_uint  t_addr;                 /* Address */
 };
 
 /*
@@ -476,10 +471,10 @@ extern  int     xflag;                  /*      -x, listing radix flag
                                          */
 extern  int     fflag;                  /*      -f(f), relocations flagged flag
                                          */
-extern  Addr_T  laddr;                  /*      address of current assembler line
+extern  a_uint  laddr;                  /*      address of current assembler line
                                          *      or value of .if argument
                                          */
-extern  Addr_T  fuzz;                   /*      tracks pass to pass changes in the
+extern  a_uint  fuzz;                   /*      tracks pass to pass changes in the
                                          *      address of symbols caused by
                                          *      variable length instruction formats
                                          */
@@ -601,7 +596,7 @@ struct  expr
 {
         char    e_mode;                 /* Address mode */
         char    e_flag;                 /* Symbol flag */
-        Addr_T  e_addr;                 /* Address */
+        a_uint  e_addr;                 /* Address */
         union   {
                 struct area *e_ap;
                 struct sym  *e_sp;
@@ -630,6 +625,82 @@ extern  char *          strncpy();
 
 /* Machine independent functions */
 
+#ifdef	OTHERSYSTEM
+/* aslex.c */
+extern	int		comma(int flag);
+
+/* assym.c */
+extern  char *          strsto(char *str);
+
+/* assubr.c */
+/* sdas specific */
+extern  VOID            warnBanner(void);
+/* end sdas specific */
+
+/* asout.c */
+extern  VOID            outrw(struct expr *, int);
+/* sdas specific */
+extern  int             byte3(int);
+extern  VOID            outr24(struct expr *, int);
+extern  VOID            out_l24(int, int);
+extern  VOID            out_t24(int);
+extern  VOID            outr19(struct expr *, int, int);
+extern  VOID            outdp(struct area *, struct expr *);
+
+/* asnoice.c */
+extern void DefineNoICE_Line(void);
+extern void DefineCDB_Line(void);
+/* end sdas specific */
+
+/* Machine dependent functions */
+
+extern  VOID            minit(void);
+extern  VOID            machine(struct mne *);
+
+/* sdas specific */
+/* strcmpi.c */
+extern  int as_strcmpi(const char *s1, const char *s2);
+extern  int as_strncmpi(const char *s1, const char *s2, size_t n);
+/* end sdas specific */
+#else
+/* aslex.c */
+extern	int		comma();
+
+/* assym.c */
+extern  char *          strsto();
+
+/* assubr.c */
+/* sdas specific */
+extern  VOID            warnBanner();
+/* end sdas specific */
+
+/* asout.c */
+extern  VOID            outrw();
+/* sdas specific */
+extern  int             byte3();
+extern  VOID            outr24();
+extern  VOID            out_l24();
+extern  VOID            out_t24();
+extern  VOID            outr19(t);
+extern  VOID            outdp();
+
+/* asnoice.c */
+extern void DefineNoICE_Line();
+extern void DefineCDB_Line();
+/* end sdas specific */
+
+/* Machine dependent functions */
+
+extern  VOID            minit();
+extern  VOID            machine();
+
+/* sdas specific */
+/* strcmpi.c */
+extern  int as_strcmpi();
+extern  int as_strncmpi();
+/* end sdas specific */
+#endif
+
 /* asmain.c */
 extern  FILE *          afile();
 extern  VOID            asexit();
@@ -657,7 +728,6 @@ extern  struct  mne *   mlookup();
 extern  int             hash();
 extern  struct  sym *   lookup();
 extern  VOID *          new();
-extern  char *          strsto(char *str);
 extern  int             symeq();
 extern  VOID            syminit();
 extern  VOID            symglob();
@@ -670,13 +740,10 @@ extern  VOID            err();
 extern  char *          geterr();
 extern  VOID            qerr();
 extern  VOID            rerr();
-/* sdas specific */
-extern  VOID            warnBanner(void);
-/* end sdas specific */
 
 /* asexpr.c */
 extern  VOID            abscheck();
-extern  Addr_T          absexpr();
+extern  a_uint          absexpr();
 extern  VOID            clrexpr();
 extern  int             digit();
 extern  int             is_abs();
@@ -704,25 +771,12 @@ extern  VOID            outbuf();
 extern  VOID            outchk();
 extern  VOID            outgsd();
 extern  VOID            outrb();
-extern  VOID            outrw(struct expr *, int);
 extern  VOID            outr11();       /* JLH */
 extern  VOID            outsym();
 extern  VOID            out_lb();
 extern  VOID            out_lw();
 extern  VOID            out_rw();
 extern  VOID            out_tw();
-/* sdas specific */
-extern  int             byte3(int);
-extern  VOID            outr24(struct expr *, int);
-extern  VOID            out_l24(int, int);
-extern  VOID            out_t24(int);
-extern  VOID            outr19(struct expr *, int, int);
-extern  VOID            outdp(struct area *, struct expr *);
-
-/* asnoice.c */
-extern void DefineNoICE_Line();
-extern void DefineCDB_Line();
-/* end sdas specific */
 
 /* Machine dependent variables */
 
@@ -730,14 +784,3 @@ extern  char *          cpu;
 extern  char *          dsft;
 extern  int             hilo;
 extern  struct  mne     mne[];
-
-/* Machine dependent functions */
-
-extern  VOID            minit();
-extern  VOID            machine(struct mne *);
-
-/* sdas specific */
-/* strcmpi.c */
-extern  int as_strcmpi(const char *s1, const char *s2);
-extern  int as_strncmpi(const char *s1, const char *s2, size_t n);
-/* end sdas specific */

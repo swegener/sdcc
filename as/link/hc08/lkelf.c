@@ -723,7 +723,7 @@ elfGenerate (void)
 void
 elf (int i)
 {
-  Addr_T address;
+  a_uint address;
 
   /* Buffer the data until we have it all */
   if (i)

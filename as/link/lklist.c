@@ -163,8 +163,8 @@ static int _cmpSymByAddr(const void *p1, const void *p2)
  *              int     i               loop counter
  *              char *  ptr             pointer to an id string
  *              int     nmsym           number of symbols in area
- *              Addr_T  ai              temporary
- *              Addr_T  aj              temporary
+ *              a_uint  ai              temporary
+ *              a_uint  aj              temporary
  *              sym *   sp              pointer to a symbol structure
  *              sym **  p               pointer to an array of
  *                                      pointers to symbol structures
@@ -193,7 +193,7 @@ lstarea(struct area *xp)
         register int i;
         register char *ptr;
         int nmsym;
-        Addr_T     ai, aj;
+        a_uint     ai, aj;
         struct sym *sp;
         struct sym **p;
         int memPage;
@@ -381,8 +381,8 @@ lstarea(struct area *xp)
  *              int     i               loop counter
  *              char *  ptr             pointer to an id string
  *              int     nmsym           number of symbols in area
- *              Addr_T  ai              temporary
- *              Addr_T  aj              temporary
+ *              a_uint  ai              temporary
+ *              a_uint  aj              temporary
  *              sym *   sp              pointer to a symbol structure
  *              sym **  p               pointer to an array of
  *                                      pointers to symbol structures
@@ -411,7 +411,7 @@ lstarea(struct area *xp)
         register int c, i;
         register char *ptr;
         int nmsym;
-        Addr_T ai, aj;
+        a_uint ai, aj;
         struct sym *sp;
         struct sym **p;
         int page;
@@ -566,7 +566,7 @@ VOID lstareatosym(struct area *xp)
         register struct areax *oxp;
         register int i;
         int nmsym;
-        Addr_T a0;
+        a_uint a0;
         struct sym *sp;
         struct sym **p;
 
@@ -658,7 +658,7 @@ VOID lstareatosym(struct area *xp)
  *      output file.
  *
  *      local variables:
- *              Addr_T  pc              current program counter address
+ *              a_uint  pc              current program counter address
  *
  *      global variables:
  *              int     hilo            byte order
@@ -669,7 +669,7 @@ VOID lstareatosym(struct area *xp)
  *                                      output RST file
  *              int     rtcnt           count of data words
  *              int     rtflg[]         output the data flag
- *              Addr_T  rtval[]         relocated data
+ *              a_uint  rtval[]         relocated data
  *              FILE    *tfp            The file handle to the current
  *                                      LST file being scanned
  *
@@ -688,7 +688,7 @@ VOID lstareatosym(struct area *xp)
 VOID
 lkulist(int i)
 {
-        Addr_T pc;
+        a_uint pc;
 
         /*
          * Exit if listing file is not open
@@ -788,7 +788,7 @@ lkulist(int i)
  */
 
 VOID
-lkalist(Addr_T pc)
+lkalist(a_uint pc)
 {
         char str[8];
         int i;
@@ -914,7 +914,7 @@ loop:   if (tfp == NULL)
  */
 
 VOID
-lkglist(Addr_T pc, int v)
+lkglist(a_uint pc, int v)
 {
         char str[8];
         int i;

@@ -107,7 +107,7 @@ unsigned int lastHexAddr = 0;
  *  the extended address record if necessary).
  *
  *  local variables:
- *      Addr_T  chksum      byte checksum
+ *      a_uint  chksum      byte checksum
  *      int     i           index for loops
  *      int     overrun     temporary storage for hexPageOverrun
  *      int     bytes       counter for bytes written
@@ -116,7 +116,7 @@ unsigned int lastHexAddr = 0;
  *      FILE *  ofp         output file handle
  *      int     rtcnt       count of data words
  *      int     rtflg[]     output the data flag
- *      Addr_T  rtval[]     relocated data
+ *      a_uint  rtval[]     relocated data
  *
  *  functions called:
  *      int     fprintf()           c_library
@@ -131,7 +131,7 @@ unsigned int lastHexAddr = 0;
 VOID
 hexRecord(unsigned addr, int rtvalIndex)
 {
-    Addr_T chksum;
+    a_uint chksum;
     int i, overrun, bytes;
 
     for (i = rtvalIndex, chksum = 0; i < rtcnt; i++) {
@@ -187,12 +187,12 @@ hexRecord(unsigned addr, int rtvalIndex)
  *  or writes the End of Data record to the file defined by ofp.
  *
  *  local variables:
- *      Addr_T  n           auxiliary variable
+ *      a_uint  n           auxiliary variable
  *
  *  global variables:
  *      int     hilo        byte order
  *      FILE *  ofp         output file handle
- *      Addr_T  rtval[]     relocated data
+ *      a_uint  rtval[]     relocated data
  *
  *  functions called:
  *      VOID hexRecord()    lkihx.c
@@ -205,7 +205,7 @@ hexRecord(unsigned addr, int rtvalIndex)
 VOID
 ihx(i)
 {
-    Addr_T n;
+    a_uint n;
     if (i) {
         if (hilo == 0) {
             n = rtval[0];
@@ -233,13 +233,13 @@ ihxNewArea()
 
 /*)Function ihxExtendedLinearAddress(i)
  *
- *      Addr_T  i           16 bit extended linear address.
+ *      a_uint  i           16 bit extended linear address.
  *
  *  The function ihxExtendedLinearAddress() writes an extended
  *  linear address record (type 04) to the output file.
  *
  *  local variables:
- *      Addr_T  chksum      byte checksum
+ *      a_uint  chksum      byte checksum
  *
  *  global variables:
  *      FILE *  ofp         output file handle
@@ -252,9 +252,9 @@ ihxNewArea()
  *      hexPageOverrun and lastHexAddr is cleared
  */
 VOID
-ihxExtendedLinearAddress(Addr_T a)
+ihxExtendedLinearAddress(a_uint a)
 {
-    Addr_T  chksum;
+    a_uint  chksum;
 
     /* The checksum is the complement of the bytes in the
      * record: the 2 is record length, 4 is the extended linear

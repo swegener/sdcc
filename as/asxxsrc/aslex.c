@@ -364,6 +364,49 @@ int d;
         return (c);
 }
 
+/*)Function	int	comma(flag)
+ *
+ *		int	flag		when flag is non zero a 'q' error is
+ *					generated if a COMMA is not found.
+ *
+ *	The function comma() skips SPACEs and TABs and returns
+ *	a '1' if the next character is a COMMA else a '0' is
+ *	returned.  If a COMMA is not found and flag is non zero
+ *	then a 'q' error is reported.
+ *
+ *	local variables:
+ *		int	c		last character read from
+ *					assembler-source text line
+ *
+ *	global variables:
+ *		none
+ *
+ *	called functions:
+ *		int	getnb()		aslex.c
+ *		VOID	qerr()		assubr.c
+ *		VOID	unget()		aslex.c
+ *
+ *	side effects:
+ *		assembler-source text line pointer updated
+ */
+
+int
+comma(flag)
+int flag;
+{
+	int c;
+
+	if ((c = getnb()) != ',') {
+		if (flag) {
+			qerr();
+		} else {
+			unget(c);
+		}
+		return(0);
+	}
+	return(1);
+}
+
 /*)Function     int     as_getline()
  *
  *      The function as_getline() reads a line of assembler-source text

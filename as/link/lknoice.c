@@ -29,14 +29,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <string.h>
 #include "aslink.h"
 
-static void DefineGlobal( char *name, Addr_T value, int page );
-static void DefineScoped( char *name, Addr_T value, int page );
-static void DefineFile( char *name, Addr_T value, int page );
-static void DefineFunction( char *name, Addr_T value, int page );
-static void DefineStaticFunction( char *name, Addr_T value, int page );
-static void DefineEndFunction( Addr_T value, int page );
-static void DefineLine( char *lineString, Addr_T value, int page );
-static void PagedAddress( Addr_T value, int page );
+static void DefineGlobal( char *name, a_uint value, int page );
+static void DefineScoped( char *name, a_uint value, int page );
+static void DefineFile( char *name, a_uint value, int page );
+static void DefineFunction( char *name, a_uint value, int page );
+static void DefineStaticFunction( char *name, a_uint value, int page );
+static void DefineEndFunction( a_uint value, int page );
+static void DefineLine( char *lineString, a_uint value, int page );
+static void PagedAddress( a_uint value, int page );
 
 /*
  * Called from lstarea in lklist.c for each symbol.
@@ -44,7 +44,7 @@ static void PagedAddress( Addr_T value, int page );
  * Generates appropriate NoICE commands into output file, if any is open
  *
  */
-void DefineNoICE( char *name, Addr_T value, int page )
+void DefineNoICE( char *name, a_uint value, int page )
 {
         char token1[NCPS];                      /* parse for file.function.symbol */
         char token2[NCPS];
@@ -134,7 +134,7 @@ static char currentFunction[NCPS];
  * static function:
  * Define "name" as a global symbol
  */
-void DefineGlobal( char *name, Addr_T value, int page )
+void DefineGlobal( char *name, a_uint value, int page )
 {
         fprintf( jfp, "DEF %s ", name );
         PagedAddress( value, page );
@@ -144,7 +144,7 @@ void DefineGlobal( char *name, Addr_T value, int page )
  * static function:
  * Define "name" as a static (scoped) symbol
  */
-void DefineScoped( char *name, Addr_T value, int page )
+void DefineScoped( char *name, a_uint value, int page )
 {
         fprintf( jfp, "DEFS %s ", name );
         PagedAddress( value, page );
@@ -154,7 +154,7 @@ void DefineScoped( char *name, Addr_T value, int page )
  * static function:
  * Define "name" as the current file
  */
-void DefineFile( char *name, Addr_T value, int page )
+void DefineFile( char *name, a_uint value, int page )
 {
         if (as_strcmpi( name, currentFile ) != 0)
         {
@@ -175,7 +175,7 @@ void DefineFile( char *name, Addr_T value, int page )
  * static function:
  * Define "name" as the current function
  */
-void DefineFunction( char *name, Addr_T value, int page )
+void DefineFunction( char *name, a_uint value, int page )
 {
         if (as_strcmpi( name, currentFunction ) != 0)
         {
@@ -198,7 +198,7 @@ void DefineFunction( char *name, Addr_T value, int page )
  * static function:
  * Define "name" as the current static (scoped) function
  */
-void DefineStaticFunction( char *name, Addr_T value, int page )
+void DefineStaticFunction( char *name, a_uint value, int page )
 {
         if (as_strcmpi( name, currentFunction ) != 0)
         {
@@ -221,7 +221,7 @@ void DefineStaticFunction( char *name, Addr_T value, int page )
  * static function:
  * Define the end of the current function
  */
-void DefineEndFunction( Addr_T value, int page )
+void DefineEndFunction( a_uint value, int page )
 {
         if (currentFunction[0] != 0)
         {
@@ -243,7 +243,7 @@ void DefineEndFunction( Addr_T value, int page )
  * static function:
  * Define "lineNumber" as a line in the current file
  */
-void DefineLine( char *lineString, Addr_T value, int page )
+void DefineLine( char *lineString, a_uint value, int page )
 {
         int indigit, lineNumber = 0;
 
@@ -255,7 +255,7 @@ void DefineLine( char *lineString, Addr_T value, int page )
         PagedAddress( value, page );
 }
 
-void PagedAddress( Addr_T value, int page )
+void PagedAddress( a_uint value, int page )
 {
         fprintf( jfp, "%X:0x%X\n", page, value );
 }

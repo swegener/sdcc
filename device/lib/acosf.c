@@ -1,6 +1,6 @@
 /*  acosf.c: Computes arc cosine of a 32-bit float
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -19,13 +19,14 @@
 /* Version 1.0 - Initial release */
 
 #include <math.h>
+#include <stdbool.h>
 
-float asincosf(const float x, const int isacos);
+float asincosf(const float x, const BOOL isacos);
 
 float acosf(const float x) _FLOAT_FUNC_REENTRANT
 {
-         if(x== 1.0) return 0.0;
-    else if(x==-1.0) return PI;
-    else if(x== 0.0) return HALF_PI;
-    return asincosf(x,1);
+         if (x == 1.0) return 0.0;
+    else if (x ==-1.0) return PI;
+    else if (x == 0.0) return HALF_PI;
+    else               return asincosf(x, true);
 }

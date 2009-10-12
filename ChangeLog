@@ -1,3 +1,23 @@
+2009-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_fsadd.c: optimized (for mcs51-xstack) and enhanced precision
+	  to fix some float_single regression tests
+	* device/lib/_fssub.c: optimized
+	* device/lib/asinf.c,
+	* device/lib/acosf.c,
+	* device/lib/asincosf.c: optimized
+	* device/lib/mcs51/crtxpop.asm,
+	* device/lib/mcs51/crtxpopbits.asm,
+	* device/lib/mcs51/crtxpush.asm,
+	* device/lib/mcs51/crtxpushr0.asm: new (slow) helper functions for xstack
+	* device/lib/mcs51/Makefile.in: added crtxpush... and crtxpop...
+	* src/mcs51/gen.c(aopForSym): optimized stack access
+	  (xstackRegisters): new, calculates bitmask
+	  (saveRegisters, unsaveRegisters): use (slow) crtxpush/pop to save memory
+	  (genFunction): optimized stack access
+	* src/mcs51/peep.c(removeDeadMove): removed unused parm
+	* support/regression/tests/float_single.c: enabled now passing tests
+
 2009-10-12 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/aslink.h, as/link/hc08/lkarea.c, as/link/hc08/lkmain.c,
@@ -47,7 +67,7 @@
 
 	* src/SDCCerr.c,
 	* src/SDCCerr.h: changed W_STRUCT_AS_ARG to error E_STRUCT_AS_ARG
-	* src/SDCCsymt.c(aggregateToPointer), 
+	* src/SDCCsymt.c(aggregateToPointer),
 	* src/SDCCast.c(processParms): throw error for struct parameters,
 	  fixes bug 2874687
 

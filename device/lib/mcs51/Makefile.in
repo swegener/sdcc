@@ -11,8 +11,9 @@ SCC = $(top_builddir)/bin/sdcc
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/$(PORT)
 
-OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel crtxstack.rel \
-      crtpagesfr.rel crtbank.rel crtcall.rel
+OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel \
+      crtpagesfr.rel crtbank.rel crtcall.rel \
+      crtxstack.rel crtxpush.rel crtxpushr0.rel crtxpop.rel crtxpopbits.rel
 
 LIB = mcs51.lib
 

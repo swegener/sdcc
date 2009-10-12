@@ -629,8 +629,8 @@ aopForSym (iCode * ic, symbol * sym, bool result)
                          ((signed char) (sym->stack - _G.nRegsSaved)) :
                          ((signed char) sym->stack)) & 0xff;
 
-              if ((abs(offset) <= 3) ||
-                  (accuse && (abs(offset) <= 7)))
+              if ((abs(offset) < 3) ||
+                  (accuse && (abs(offset) < 4)))
                 {
                   emitcode ("mov", "%s,%s",
                             aop->aopu.aop_ptr->name, SYM_BP (sym));
@@ -648,12 +648,18 @@ aopForSym (iCode * ic, symbol * sym, bool result)
               else
                 {
                   if (accuse)
-                    emitcode ("push", "acc");
-                  emitcode ("mov", "a,%s", SYM_BP (sym));
-                  emitcode ("add", "a,#0x%02x", offset & 0xff);
-                  emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
-                  if (accuse)
-                    emitcode ("pop", "acc");
+                    {
+                      emitcode ("xch", "a,%s", aop->aopu.aop_ptr->name);
+                      emitcode ("mov", "a,%s", SYM_BP (sym));
+                      emitcode ("add", "a,#0x%02x", offset & 0xff);
+                      emitcode ("xch", "a,%s", aop->aopu.aop_ptr->name);
+                    }
+                  else
+                    {
+                      emitcode ("mov", "a,%s", SYM_BP (sym));
+                      emitcode ("add", "a,#0x%02x", offset & 0xff);
+                      emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
+                    }
                 }
             }
           else
@@ -2199,6 +2205,52 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* xstackRegisters - create bitmask for registers on xstack        */
+/*-----------------------------------------------------------------*/
+static int
+xstackRegisters (bitVect *rsave, bool push, int count, char szRegs[32])
+{
+  int i;
+  int mask = 0;
+
+  szRegs[0] = '\0';
+
+  for (i = mcs51_nRegs; i >= 0; i--)
+    {
+      if (bitVectBitValue (rsave, i))
+        {
+          regs * reg = REG_WITH_INDEX (i);
+          if (reg->type == REG_BIT)
+            {
+              mask |= (push) ? 0x01 : 0x100;
+              strncat(szRegs, reg->base, 31);
+            }
+          else
+            {
+              if (i == R0_IDX)
+                {
+                  mask |= (push) ? 0x100 : 0x01;
+                }
+              else if (i == R1_IDX)
+                {
+                  mask |= 0x02;
+                }
+              else
+                {
+                  //set bit(9-n) for Rn when pushing
+                  //set bit(n) for Rn when popping
+                  mask |= (push) ? (0x80 >> i) : (0x04 << i);
+                }
+              strncat(szRegs, reg->name, 31);
+            }
+        }
+    }
+  if (push)
+    mask ^= 0x02; //invert bit1 when pushing
+  return mask ^ 0x01; //invert bit0
+}
+
+/*-----------------------------------------------------------------*/
 /* saveRegisters - will look for a call and save the registers     */
 /*-----------------------------------------------------------------*/
 static void
@@ -2268,42 +2320,57 @@ saveRegisters (iCode * lic)
         }
       else if (count != 0)
         {
-          if (bitVectBitValue (rsave, R0_IDX))
+          if ((FUNC_REGBANK (currFunc->type) == 0) && optimize.codeSize)
             {
-              emitcode ("push", "%s", REG_WITH_INDEX (R0_IDX)->dname);
+              char szRegs[32];
+              int mask = xstackRegisters(rsave, TRUE, count, szRegs);
+              emitcode ("mov", "a,#0x%02X", count);
+              emitcode ("mov", "b,#0x%02X", mask & 0xFF);
+              if (mask & 0x100)
+                emitcode ("lcall", "__sdcc_xpush_regs_r0\t;(%s)", szRegs);
+              else
+                emitcode ("lcall", "__sdcc_xpush_regs\t;(%s)", szRegs);
+              lineCurr->isInline = 1;
             }
-          emitcode ("mov", "r0,%s", spname);
-          MOVA ("r0");
-          emitcode ("add", "a,#0x%02x", count);
-          emitcode ("mov", "%s,a", spname);
-          for (i = 0; i < mcs51_nRegs; i++)
+          else
             {
-              if (bitVectBitValue (rsave, i))
+              if (bitVectBitValue (rsave, R0_IDX))
                 {
-                  regs * reg = REG_WITH_INDEX (i);
-                  if (i == R0_IDX)
+                  emitcode ("push", "%s", REG_WITH_INDEX (R0_IDX)->dname);
+                }
+              emitcode ("mov", "r0,%s", spname);
+              MOVA ("r0");
+              emitcode ("add", "a,#0x%02x", count);
+              emitcode ("mov", "%s,a", spname);
+              for (i = 0; i < mcs51_nRegs; i++)
+                {
+                  if (bitVectBitValue (rsave, i))
                     {
-                      emitcode ("pop", "acc");
-                      emitcode ("push", "acc");
-                    }
-                  else if (reg->type == REG_BIT)
-                    {
-                      emitcode ("mov", "a,%s", reg->base);
-                    }
-                  else
-                    {
-                      emitcode ("mov", "a,%s", reg->name);
-                    }
-                  emitcode ("movx", "@r0,a");
-                  if (--count)
-                    {
-                      emitcode ("inc", "r0");
+                      regs * reg = REG_WITH_INDEX (i);
+                      if (i == R0_IDX)
+                        {
+                          emitcode ("pop", "acc");
+                          emitcode ("push", "acc");
+                        }
+                      else if (reg->type == REG_BIT)
+                        {
+                          emitcode ("mov", "a,%s", reg->base);
+                        }
+                      else
+                        {
+                          emitcode ("mov", "a,%s", reg->name);
+                        }
+                      emitcode ("movx", "@r0,a");
+                      if (--count)
+                        {
+                          emitcode ("inc", "r0");
+                        }
                     }
                 }
-            }
-          if (bitVectBitValue (rsave, R0_IDX))
-            {
-              emitcode ("pop", "%s", REG_WITH_INDEX (R0_IDX)->dname);
+              if (bitVectBitValue (rsave, R0_IDX))
+                {
+                  emitcode ("pop", "%s", REG_WITH_INDEX (R0_IDX)->dname);
+                }
             }
         }
     }
@@ -2368,32 +2435,46 @@ unsaveRegisters (iCode * ic)
         }
       else if (count != 0)
         {
-          emitcode ("mov", "r0,%s", spname);
-          for (i = mcs51_nRegs; i >= 0; i--)
+          if ((FUNC_REGBANK (currFunc->type) == 0) && optimize.codeSize)
             {
-              if (bitVectBitValue (rsave, i))
+              char szRegs[32];
+              int mask = xstackRegisters(rsave, FALSE, count, szRegs);
+              emitcode ("mov", "b,#0x%02X", mask & 0xFF);
+              if (mask & 0x100)
+                emitcode ("lcall", "__sdcc_xpop_regs_bits\t;(%s)", szRegs);
+              else
+                emitcode ("lcall", "__sdcc_xpop_regs\t;(%s)", szRegs);
+              lineCurr->isInline = 1;
+            }
+          else
+            {
+              emitcode ("mov", "r0,%s", spname);
+              for (i = mcs51_nRegs; i >= 0; i--)
                 {
-                  regs * reg = REG_WITH_INDEX (i);
-                  emitcode ("dec", "r0");
-                  emitcode ("movx", "a,@r0");
-                  if (i == R0_IDX)
+                  if (bitVectBitValue (rsave, i))
                     {
-                      emitcode ("push", "acc");
-                    }
-                  else if (reg->type == REG_BIT)
-                    {
-                      emitcode ("mov", "%s,a", reg->base);
-                    }
-                  else
-                    {
-                      emitcode ("mov", "%s,a", reg->name);
+                      regs * reg = REG_WITH_INDEX (i);
+                      emitcode ("dec", "r0");
+                      emitcode ("movx", "a,@r0");
+                      if (i == R0_IDX)
+                        {
+                          emitcode ("push", "acc");
+                        }
+                      else if (reg->type == REG_BIT)
+                        {
+                          emitcode ("mov", "%s,a", reg->base);
+                        }
+                      else
+                        {
+                          emitcode ("mov", "%s,a", reg->name);
+                        }
                     }
                 }
-            }
-          emitcode ("mov", "%s,r0", spname);
-          if (bitVectBitValue (rsave, R0_IDX))
-            {
-              emitcode ("pop", "ar0");
+              emitcode ("mov", "%s,r0", spname);
+              if (bitVectBitValue (rsave, R0_IDX))
+                {
+                  emitcode ("pop", "ar0");
+                }
             }
         }
     }
@@ -2551,7 +2632,6 @@ genIpush (iCode * ic)
      and spill push is always done on the local stack */
   if (!ic->parmPush)
     {
-
       /* and the item is spilt then do nothing */
       if (OP_SYMBOL (IC_LEFT (ic))->isspilt)
         return;
@@ -3351,6 +3431,7 @@ genFunction (iCode * ic)
   int      calleesaves_saved_register = -1;
   int      stackAdjust = sym->stack;
   int      accIsFree = sym->recvSize < 4;
+  char     * freereg = NULL;
   iCode    *ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
   bool     fReentrant = (IFFUNC_ISREENT (sym->type) || options.stackAuto);
 
@@ -3676,6 +3757,24 @@ genFunction (iCode * ic)
         }
     }
 
+  /* If the accumulator is not free, we will need another register */
+  /* to clobber. No need to worry about a possible conflict with */
+  /* the above early RECEIVE optimizations since they would have */
+  /* freed the accumulator if they were generated. */
+  if (IFFUNC_CALLEESAVES(sym->type))
+    {
+      /* if it's a callee-saves function we need a saved register */
+      if (calleesaves_saved_register >= 0)
+        {
+          freereg = REG_WITH_INDEX (calleesaves_saved_register)->dname;
+        }
+    }
+  else
+    {
+      /* not callee-saves, we can clobber r0 */
+      freereg = "r0";
+    }
+
   /* adjust the stack for the function */
   if (stackAdjust)
     {
@@ -3689,37 +3788,21 @@ genFunction (iCode * ic)
           emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
           emitcode ("mov", "sp,a");
         }
-      else if (i > 5)
+      else if (i > 4)
         {
-          /* The accumulator is not free, so we will need another register */
-          /* to clobber. No need to worry about a possible conflict with */
-          /* the above early RECEIVE optimizations since they would have */
-          /* freed the accumulator if they were generated. */
-
-          if (IFFUNC_CALLEESAVES(sym->type))
+          if (freereg)
             {
-              /* if it's a callee-saves function we need a saved register */
-              if (calleesaves_saved_register >= 0)
-                {
-                  emitcode ("mov", "%s,a", REG_WITH_INDEX (calleesaves_saved_register)->dname);
-                  emitcode ("mov", "a,sp");
-                  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
-                  emitcode ("mov", "sp,a");
-                  emitcode ("mov", "a,%s", REG_WITH_INDEX (calleesaves_saved_register)->dname);
-                }
-              else
-                /* do it the hard way */
-                while (i--)
-                  emitcode ("inc", "sp");
-            }
-          else
-            {
-              /* not callee-saves, we can clobber r0 */
-              emitcode ("mov", "r0,a");
+              emitcode ("xch", "a,%s", freereg);
               emitcode ("mov", "a,sp");
               emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
               emitcode ("mov", "sp,a");
-              emitcode ("mov", "a,r0");
+              emitcode ("xch", "a,%s", freereg);
+            }
+          else
+            {
+              /* do it the hard way */
+              while (i--)
+                emitcode ("inc", "sp");
             }
         }
       else
@@ -3737,13 +3820,19 @@ genFunction (iCode * ic)
           emitcode ("add", "a,#0x%02x", i & 0xff);
           emitcode ("mov", "_spx,a");
         }
-      else if (i > 5)
+      else if (i > 4)
         {
-          emitcode ("push", "acc");
+          if (freereg)
+            emitcode ("xch", "a,%s", freereg);
+          else
+            emitcode ("push", "acc");
           emitcode ("mov", "a,_spx");
           emitcode ("add", "a,#0x%02x", i & 0xff);
           emitcode ("mov", "_spx,a");
-          emitcode ("pop", "acc");
+          if (freereg)
+            emitcode ("xch", "a,%s", freereg);
+          else
+            emitcode ("pop", "acc");
         }
       else
         {
@@ -6729,6 +6818,7 @@ genAnd (iCode * ic, iCode * ifx)
               // c = bit & bit;
               if (IS_OP_ACCUSE (left))
                 {
+                  assert(0);
                   emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
                 }
               else if (IS_OP_ACCUSE (right))
@@ -7163,6 +7253,7 @@ genOr (iCode * ic, iCode * ifx)
               // c = bit | bit;
               if (IS_OP_ACCUSE (left))
                 {
+                  assert(0);
                   emitcode ("orl", "c,%s", AOP (right)->aopu.aop_dir);
                 }
               else if (IS_OP_ACCUSE (right))
@@ -7236,6 +7327,7 @@ genOr (iCode * ic, iCode * ifx)
             }
           else
             { /* FIXME, thats pretty fishy, check for ifx!=0, testcase .. */
+              assert (ifx);
               genIfxJump (ifx, "a", left, right, result, ic->next);
               goto release;
             }
@@ -7575,6 +7667,7 @@ genXor (iCode * ic, iCode * ifx)
                   operand *tmp = right;
                   right = left;
                   left = tmp;
+                  assert(0);
                 }
               else
                 {

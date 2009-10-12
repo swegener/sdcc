@@ -1,6 +1,6 @@
 /*  asincosf.c: Computes asin or acos of a 32-bit float as outlined in [1]
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 
 #include <math.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define P1  0.933935835E+0
 #define P2 -0.504400557E+0
@@ -30,52 +31,57 @@
 #define Q1 -0.554846723E+1
 #define Q2  0.100000000E+1
 
-#define P(g) (P2*g+P1)
-#define Q(g) ((Q2*g+Q1)*g+Q0)
+#define P(g) (P2 * g + P1)
+#define Q(g) ((Q2 * g + Q1) * g + Q0)
 
-float asincosf(const float x, const int isacos)
+float asincosf(const float x, const BOOL isacos)
 {
     float y, g, r;
-    int i;
+    unsigned char i;
+    BOOL quartPI = isacos;
 
-    static const float a[2]={ 0.0, QUART_PI };
-    static const float b[2]={ HALF_PI, QUART_PI };
+    static const float a[2] = { 0.0, QUART_PI };
+    static const float b[2] = { HALF_PI, QUART_PI };
 
-    y=fabsf(x);
-    i=isacos;
-    if (y < EPS) r=y;
+    y = fabsf(x);
+    if (y < EPS)
+    {
+        r = y;
+    }
     else
     {
         if (y > 0.5)
         {
-            i=1-i;
+            quartPI = !isacos;
             if (y > 1.0)
             {
-                errno=EDOM;
+                errno = EDOM;
                 return 0.0;
             }
-            g=(0.5-y)+0.5;
-            g=ldexpf(g,-1);
-            y=sqrtf(g);
-            y=-(y+y);
+            g = (0.5 - y) + 0.5;
+            g = ldexpf(g, -1);
+            y = sqrtf(g);
+            y = -(y + y);
         }
         else
         {
-            g=y*y;
+            g = y * y;
         }
-        r=y+y*((P(g)*g)/Q(g));
+        r = y + y * ((P(g) * g) / Q(g));
     }
+    i = quartPI;
     if (isacos)
     {
         if (x < 0.0)
-            r=(b[i]+r)+b[i];
+            r = (b[i] + r) + b[i];
         else
-            r=(a[i]-r)+a[i];
+            r = (a[i] - r) + a[i];
     }
     else
     {
-        r=(a[i]+r)+a[i];
-        if (x<0.0) r=-r;
+        r = (a[i] + r) + a[i];
+        if (x < 0.0)
+            r = -r;
     }
     return r;
 }

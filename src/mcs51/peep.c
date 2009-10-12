@@ -568,7 +568,7 @@ doTermScan (lineNode **pl, const char *pReg)
           case S4O_TERM:
           case S4O_VISITED:
           case S4O_WR_OP:
-            /* all these are terminating condtions */
+            /* all these are terminating conditions */
             return TRUE;
           case S4O_PUSHPOP:
             /* don't care, go on */
@@ -672,7 +672,7 @@ removeDeadPopPush (const char *pReg, lineNode *currPl, lineNode *head)
 /* removeDeadMove - remove superflous 'mov r%1,%2'                 */
 /*-----------------------------------------------------------------*/
 static bool
-removeDeadMove (const char *pReg, lineNode *currPl, lineNode *head)
+removeDeadMove (const char *pReg, lineNode *currPl)
 {
   lineNode *pl;
 
@@ -719,7 +719,7 @@ mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
     return removeDeadPopPush (pReg, currPl, head);
   else if (   strncmp (currPl->line, "mov", 3) == 0
            && (currPl->line[3] == ' ' || currPl->line[3] == '\t'))
-    return removeDeadMove (pReg, currPl, head);
+    return removeDeadMove (pReg, currPl);
   else
     {
       fprintf (stderr, "Error: "

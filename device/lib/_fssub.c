@@ -59,29 +59,11 @@ ___fssub:
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
-union float_long
-  {
-    float f;
-    long l;
-  };
-
 /* subtract two floats */
 float __fssub (float a1, float a2)
 {
-  volatile union float_long fl1, fl2;
-
-  fl1.f = a1;
-  fl2.f = a2;
-
-  /* check for zero args */
-  if (!fl2.l)
-    return (fl1.f);
-  if (!fl1.l)
-    return (-fl2.f);
-
-  /* twiddle sign bit and add */
-  fl2.l ^= SIGNBIT;
-  return fl1.f + fl2.f; 
+  float neg = -a1;
+  return -(neg + a2);
 }
 
 #endif

@@ -18,21 +18,10 @@
 #define TOLERANCE (1e-5)
 
 /* now exceptions for targets/functions which would not pass */
-#if defined(SDCC_ds390)
-#   define ACOSF_DISABLED (1)
-#endif
-
 #if defined(SDCC_hc08)
-#   define ACOSF_DISABLED (1)
 #   define EXPF_DISABLED  (1)
 #   define SINHF_DISABLED (1)
 #   define TANF_DISABLED  (1)
-#endif
-
-#if defined(SDCC_mcs51) && defined(SDCC_USE_XSTACK)
-#   define SINF_DISABLED  (1)
-#   define ACOSF_DISABLED (1)
-#   define COSF_DISABLED  (1)
 #endif
 
 #if defined(SDCC_z80)

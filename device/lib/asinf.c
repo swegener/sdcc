@@ -1,6 +1,6 @@
 /*  asinf.c: Computes asin(x)
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,14 @@
 /* Version 1.0 - Initial release */
 
 #include <math.h>
+#include <stdbool.h>
 
-float asincosf(const float x, const int isacos);
+float asincosf(const float x, const BOOL isacos);
 
 float asinf(const float x) _FLOAT_FUNC_REENTRANT
-{   
-         if(x== 1.0) return  HALF_PI;
-    else if(x==-1.0) return -HALF_PI;
-    else if(x== 0.0) return 0.0;
-    else return asincosf(x,0);
+{
+         if (x == 1.0) return  HALF_PI;
+    else if (x ==-1.0) return -HALF_PI;
+    else if (x == 0.0) return 0.0;
+    else               return asincosf(x, false);
 }
-

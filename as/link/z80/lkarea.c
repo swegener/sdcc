@@ -202,7 +202,7 @@ lkparea(char *id)
         ap = areap;
         axp = (struct areax *) new (sizeof(struct areax));
         while (ap) {
-                if (symeq(id, ap->a_id)) {
+                if (symeq(id, ap->a_id, 0)) {
                         taxp = ap->a_axp;
                         while (taxp->a_axp)
                                 taxp = taxp->a_axp;
@@ -402,7 +402,7 @@ lnkarea()
                  *      l_<areaname>    the length of the area
                  */
 
-                if (! symeq(ap->a_id, _abs_))
+                if (! symeq(ap->a_id, _abs_, 0))
                 {
                         strncpy(temp+2,ap->a_id,NCPS-2);
                         *(temp+1) = '_';

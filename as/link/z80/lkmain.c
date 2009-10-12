@@ -929,6 +929,10 @@ parse()
         register int c;
         char fid[NINPUT];
 
+        /* sdas specific */
+        zflag = 1;
+        /* end sdas specific */
+
         while ((c = getnb()) != 0) {
                 if (c == ';')
                         return(0);
@@ -1179,7 +1183,7 @@ setbas()
                 if (getnb() == '=') {
                         v = expr(0);
                         for (ap = areap; ap != NULL; ap = ap->a_ap) {
-                                if (symeq(id, ap->a_id))
+                                if (symeq(id, ap->a_id, 0))
                                         break;
                         }
                         if (ap == NULL) {

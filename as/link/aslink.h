@@ -516,7 +516,7 @@ extern  char    *rp;            /*      pointer into the LST file
 extern  char    rb[NINPUT];     /*      LST file text line being
                                  *      address relocated
                                  */
-extern  unsigned char   ctype[];        /*      array of character types, one per
+extern  char   ctype[];        /*      array of character types, one per
                                  *      ASCII character
                                  */
 
@@ -543,13 +543,9 @@ extern char curr_module[NINPUT];
 #define DGT10   DIGIT|RAD16|RAD10
 #define LTR16   LETTER|RAD16
 
-#if     CASE_SENSITIVE
-#else
 extern  char    ccase[];        /*      an array of characters which
                                  *      perform the case translation function
                                  */
-#endif
-
 extern  struct  lfile   *filep; /*      The pointers (lfile *) filep,
                                  *      (lfile *) cfp, and (FILE *) sfp
                                  *      are used in conjunction with
@@ -654,6 +650,8 @@ extern  int     uflag;          /*      Listing relocation flag
                                  */
 extern int      rflag;          /*      Extended linear address record flag.
                                 */
+extern	int	zflag;		/*	Enable symbol case sensitivity
+				 */
 extern  int     radix;          /*      current number conversion radix:
                                  *      2 (binary), 8 (octal), 10 (decimal),
                                  *      16 (hexadecimal)

@@ -82,6 +82,8 @@ int     uflag;          /*      Listing relocation flag
                          */
 int     rflag;          /*      Extended linear address record flag.
                          */
+int	zflag;		/*	Enable symbol case sensitivity
+			 */
 int     radix;          /*      current number conversion radix:
                          *      2 (binary), 8 (octal), 10 (decimal),
                          *      16 (hexadecimal)
@@ -460,7 +462,7 @@ struct  lbfile  *lbfhead;       /*      pointer to the first
  *      array of character types, one per
  *      ASCII character
  */
-unsigned char   ctype[128] = {
+char   ctype[128] = {
 /*NUL*/ ILL,    ILL,    ILL,    ILL,    ILL,    ILL,    ILL,    ILL,
 /*BS*/  ILL,    SPACE,  ILL,    ILL,    SPACE,  ILL,    ILL,    ILL,
 /*DLE*/ ILL,    ILL,    ILL,    ILL,    ILL,    ILL,    ILL,    ILL,
@@ -483,8 +485,6 @@ unsigned char   ctype[128] = {
  *      an array of characters which
  *      perform the case translation function
  */
-#if     CASE_SENSITIVE
-#else
 char    ccase[128] = {
 /*NUL*/ '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
 /*BS*/  '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
@@ -503,4 +503,3 @@ char    ccase[128] = {
 /*p*/   '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
 /*x*/   '\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177'
 };
-#endif

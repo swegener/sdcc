@@ -1,3 +1,10 @@
+2009-10-12 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/aslink.h, as/link/hc08/lkarea.c, as/link/hc08/lkmain.c,
+	  as/link/lkdata.c, as/link/lksym.c, as/link/mcs51/lkarea.c,
+	  as/link/mcs51/lkmain.c, as/link/z80/lkarea.c, as/link/z80/lkmain.c:
+	  itroduced zflag for case senditivity; zflag is forced to 1
+
 2009-10-10 Borut Razem <borut.razem AT siol.net>
 
 	* as/asgb/Makefile.in, as/z80/Makefile.in: added -lm to LDFLAGS

@@ -231,10 +231,10 @@ lkpsym(char *id, int f)
         register struct sym *sp;
         register int h;
 
-        h = hash(id);
+        h = hash(id, zflag);
         sp = symhash[h];
         while (sp != NULL) {
-                if (symeq(id, sp->s_id))
+                if (symeq(id, sp->s_id, zflag))
                         return (sp);
                 sp = sp->s_sp;
         }
@@ -376,48 +376,19 @@ symmod(FILE *fp, struct sym *tsp)
         }
 }
 
-/*)Function     int     symeq(p1, p2)
+/*)Function     int     symeq(p1, p2, cflag)
  *
+ *		int	cflag		case sensitive flag
  *              char *  p1              name string
  *              char *  p2              name string
  *
  *      The function symeq() compares the two name strings for a match.
  *      The return value is 1 for a match and 0 for no match.
  *
- *      local variables:
- *              int     h               loop counter
- *
- *      global variables:
- *              char    ccase[]         an array of characters which
- *                                      perform the case translation function
- *
- *      functions called:
- *              none
- *
- *      side effects:
- *              none
- *
- */
-
-int
-symeq(register char *p1, register char *p2)
-{
-#if     CASE_SENSITIVE
-                return (strncmp( p1, p2, NCPS ) == 0);
-#else
-                return (as_strncmpi( p1, p2, NCPS ) == 0);
-#endif
-}
-
-/*)Function     int     hash(p)
- *
- *              char *  p               pointer to string to hash
- *
- *      The function hash() computes a hash code using the sum
- *      of all characters mod table size algorithm.
+ *		cflag == 0	case insensitve compare
+ *		cflag != 0	case sensitive compare
  *
  *      local variables:
- *              int     h               accumulated character sum
  *              int     n               loop counter
  *
  *      global variables:
@@ -433,22 +404,80 @@ symeq(register char *p1, register char *p2)
  */
 
 int
-hash(register char *p)
+symeq(p1, p2, cflag)
+register char *p1, *p2;
+int cflag;
 {
-        register int h, n;
+	register int n;
 
-        h = 0;
-        n = NCPS;
-        while (*p && n--) {
+	n = strlen(p1) + 1;
+	if(cflag) {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
+				return (0);
+		} while (--n);
+	} else {
+		/*
+		 * Case Insensitive Compare
+		 */
+		do {
+			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
+				return (0);
+		} while (--n);
+	}
+	return (1);
+}
 
-#if     CASE_SENSITIVE
-                h += *p++;
-#else
-                h += ccase[(unsigned char)(*p++)];
-#endif
+/*)Function	int	hash(p, cflag)
+ *
+ *		char *	p		pointer to string to hash
+ *		int	cflag		case sensitive flag
+ *
+ *	The function hash() computes a hash code using the sum
+ *	of all characters mod table size algorithm.
+ *
+ *		cflag == 0	case insensitve hash
+ *		cflag != 0	case sensitive hash
+ *
+ *	local variables:
+ *		int	h		accumulated character sum
+ *
+ *	global variables:
+ *		char	ccase[]		an array of characters which
+ *					perform the case translation function
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
 
-        }
-        return (h&HMASK);
+int
+hash(p, cflag)
+register char *p;
+register int cflag;
+{
+	register int h;
+
+	h = 0;
+	while (*p) {
+		if(cflag) {
+			/*
+			 * Case Sensitive Hash
+			 */
+			h += *p++;
+		} else {
+			/*
+			 * Case Insensitive Hash
+			 */
+			h += ccase[*p++ & 0x007F];
+		}
+	}
+	return (h&HMASK);
 }
 
 /*)Function     VOID *  new(n)

@@ -17,6 +17,7 @@
 	    as-hc08 -> sdas6808
 	    asx8051 -> sdas8051
 	    as-z80 -> sdasz80
+	* .version, doc/sdccman.lyx: bumped version to 2.9.4
 
 2009-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

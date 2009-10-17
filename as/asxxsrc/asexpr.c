@@ -226,7 +226,7 @@ expr(register struct expr *esp, int n)
                             esp->e_addr >>= re.e_addr;
                             break;
                         case '[':
-                                if (is_sdas() && is_sdas_target_mcs51_like()) {
+                                if (is_sdas() && is_sdas_target_8051_like()) {
                                         /* MB added [ for bit access in bdata */
                                         abscheck(&re);
                                         if (getnb() != ']')
@@ -701,7 +701,7 @@ oprio(register int c)
                 return (3);
         if (c == '|')
                 return (1);
-        if (is_sdas() && is_sdas_target_mcs51_like() && c == '[')
+        if (is_sdas() && is_sdas_target_8051_like() && c == '[')
                 return (12);
         return (0);
 }

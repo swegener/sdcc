@@ -19,7 +19,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	@# TODO: sdas should place it\'s output in the current dir
 	cp $< $(PORT_CASES_DIR)
-	$(top_builddir)/bin/as-gbz80 -plosgff $(PORT_CASES_DIR)/$(notdir $<)
+	$(top_builddir)/bin/sdasgb -plosgff $(PORT_CASES_DIR)/$(notdir $<)
 	rm $(PORT_CASES_DIR)/$(notdir $<)
 
 %$(OBJEXT): %.c

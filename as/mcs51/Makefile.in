@@ -55,8 +55,8 @@ ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c
 
 ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
-ASX = $(top_builddir)/bin/asx8051$(EXEEXT)
-DEST = $(DESTDIR)$(bindir)/asx8051$(EXEEXT)
+ASX = $(top_builddir)/bin/sdas8051$(EXEEXT)
+DEST = $(DESTDIR)$(bindir)/sdas8051$(EXEEXT)
 
 transform       = @program_transform_name@
 

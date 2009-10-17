@@ -343,10 +343,11 @@ main(int argc, char *argv[])
 			if (inpfil == 0) {
 				if (lflag)
 					lfp = afile(p, "lst", 1);
-				if (oflag)
+                                if (oflag) {
 					ofp = afile(p, (is_sdas() && is_sdas_target_z80_like()) ? "o" : "rel", 1);
                                         // save the file name if we have to delete it on error
                                         strcpy(relFile,afn);
+                                }
 				if (sflag)
 					tfp = afile(p, "sym", 1);
 			}

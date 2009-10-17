@@ -49,8 +49,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\asx8051.exe" /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\asx8051.exe" /pdbtype:sept
+# ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\sdas8051.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\sdas8051.exe" /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "asx8051 - Win32 Release"
 
@@ -74,8 +74,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\asx8051.exe" /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\asx8051.exe" /pdbtype:sept
+# ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\sdas8051.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\sdas8051.exe" /pdbtype:sept
 
 !ENDIF 
 

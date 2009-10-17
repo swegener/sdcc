@@ -5,7 +5,7 @@ top_srcdir   = @top_srcdir@
 top_builddir = @top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
-SAS = $(top_builddir)/bin/asx8051
+SAS = $(top_builddir)/bin/sdas8051
 SCC = $(top_builddir)/bin/sdcc
 
 # override PORTDIR defined by super (parent) makefile

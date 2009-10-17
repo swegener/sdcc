@@ -5,14 +5,14 @@
 ifdef SDCC_BIN_PATH
   UCZ80 = $(SDCC_BIN_PATH)/sz80$(EXEEXT)
 
-  AS_Z80 = $(SDCC_BIN_PATH)/as-z80$(EXEEXT)
+  AS_Z80 = $(SDCC_BIN_PATH)/sdasz80$(EXEEXT)
 else
   SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80$(EXEEXT)
   SZ80B = $(top_builddir)/bin/sz80$(EXEEXT)
 
   UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 
-  AS_Z80 = $(top_builddir)/bin/as-z80$(EXEEXT)
+  AS_Z80 = $(top_builddir)/bin/sdasz80$(EXEEXT)
 
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
   LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/z80

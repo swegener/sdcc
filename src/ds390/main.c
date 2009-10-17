@@ -887,7 +887,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "asx8051", "$l", "$3", "\"$1.asm\"", NULL
+  "sdas8051", "$l", "$3", "\"$1.asm\"", NULL
 };
 
 /* Globals */

@@ -5,14 +5,14 @@
 ifdef SDCC_BIN_PATH
   UCHC08 = $(SDCC_BIN_PATH)/shc08$(EXEEXT)
 
-  AS_HC08 = $(SDCC_BIN_PATH)/as-hc08$(EXEEXT)
+  AS_HC08 = $(SDCC_BIN_PATH)/sdas6808$(EXEEXT)
 else
   UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/shc08$(EXEEXT)
   UCHC08B = $(top_builddir)/bin/shc08$(EXEEXT)
 
   UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
 
-  AS_HC08 = $(top_builddir)/bin/as-hc08$(EXEEXT)
+  AS_HC08 = $(top_builddir)/bin/sdas6808$(EXEEXT)
 
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
   LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/hc08

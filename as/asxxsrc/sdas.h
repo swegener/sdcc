@@ -20,16 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 enum sdas_target_e {
   TARGET_IS_UNKNOWN,
-  TARGET_IS_GBZ80,
+  TARGET_IS_GB,
   TARGET_IS_Z80,
-  TARGET_IS_MCS51,
-  TARGET_IS_HC08,
+  TARGET_IS_8051,
+  TARGET_IS_6808,
 };
 
 void sdas_init (char *path);
 int is_sdas(void);
 enum sdas_target_e get_sdas_target(void);
 int is_sdas_target_z80_like(void);
-int is_sdas_target_mcs51_like(void);
+int is_sdas_target_8051_like(void);
 
 #endif  /* __SDCA_H */

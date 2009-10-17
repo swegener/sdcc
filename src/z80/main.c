@@ -705,11 +705,11 @@ oclsExpense (struct memmap *oclass)
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_z80asmCmd[] =
 {
-  "as-z80", "$l", "$3", "\"$1.asm\"", NULL
+  "sdasz80", "$l", "$3", "\"$1.asm\"", NULL
 };
 static const char *_gbz80asmCmd[] =
 {
-  "as-gbz80", "$l", "$3", "\"$1.asm\"", NULL
+  "sdasgb", "$l", "$3", "\"$1.asm\"", NULL
 };
 
 /* Globals */

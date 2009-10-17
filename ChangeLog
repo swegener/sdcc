@@ -1,3 +1,23 @@
+2009-10-17 Borut Razem <borut.razem AT siol.net>
+
+	* as/asgb/asgb.dsp, as/asgb/Makefile.in, as/asxxsrc/asexpr.c,
+	  as/asxxsrc/asmain.c, as/asxxsrc/asout.c, as/asxxsrc/sdas.c,
+	  as/asxxsrc/sdas.h, as/hc08/as_hc08.dsp, as/hc08/Makefile.in,
+	  as/mcs51/asx8051.dsp, as/mcs51/Makefile.in, as/z80/as_z80.dsp,
+	  as/z80/Makefile.in, device/lib/gbz80/Makefile.in,
+	  device/lib/hc08/Makefile.in, device/lib/mcs51/Makefile.in,
+	  device/lib/z80/Makefile.in, src/ds390/main.c, src/hc08/main.c,
+	  src/mcs51/main.c, src/z80/main.c,
+	  support/regression/ports/gbz80/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/z80/spec.mk:
+	  assemblers remnamed to sdasxxxx:
+	    as-gbz80 -> sdasgb,
+	    as-hc08 -> sdas6808
+	    asx8051 -> sdas8051
+	    as-z80 -> sdasz80
+
 2009-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_fsadd.c: optimized (for mcs51-xstack) and enhanced precision

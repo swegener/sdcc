@@ -9,7 +9,7 @@ LIB_TYPE     = @LIB_TYPE@
 TOPDIR = ../../..
 
 SCC = $(TOPDIR)/bin/sdcc -mgbz80
-SAS = $(TOPDIR)/bin/as-gbz80
+SAS = $(TOPDIR)/bin/sdasgb
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/gbz80

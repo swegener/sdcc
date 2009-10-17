@@ -384,7 +384,7 @@ outrb(struct expr *esp, int r)
                                 *txtp++ = lobyte(esp->e_addr);
                         }
                 } else {
-                        if (!is_sdas() || !is_sdas_target_mcs51_like()) {
+                        if (!is_sdas() || !is_sdas_target_8051_like()) {
                                 r |= R_BYTE | R_BYT2 | esp->e_rlcf;
                                 if (r & R_MSB) {
                                         out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
@@ -484,7 +484,7 @@ outrw(struct expr *esp, int r)
         register int n;
 
         if (pass == 2) {
-                if (is_sdas() && is_sdas_target_mcs51_like() && esp->e_addr > 0xffff) {
+                if (is_sdas() && is_sdas_target_8051_like() && esp->e_addr > 0xffff) {
                     /* sdas specific */
                     warnBanner();
                     fprintf(stderr,
@@ -511,7 +511,7 @@ outrw(struct expr *esp, int r)
                                 out_lw(esp->e_addr,r|R_RELOC);
                         }
                         if (oflag) {
-                                if (!is_sdas() || !is_sdas_target_mcs51_like()) {
+                                if (!is_sdas() || !is_sdas_target_8051_like()) {
                                         outchk(2, 4);
                                         out_tw(esp->e_addr);
                                         if (esp->e_flag) {
@@ -1427,7 +1427,7 @@ outr11(register struct expr *esp, int op, int r)
         register int n;
 
         if (pass == 2) {
-                if (!is_sdas() || !is_sdas_target_mcs51_like()) {
+                if (!is_sdas() || !is_sdas_target_8051_like()) {
                         if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
                                 /*
                                  * Absolute Destination

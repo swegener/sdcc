@@ -62,10 +62,10 @@ sdas_init (char *path)
     char *str;
     enum sdas_target_e target;
   } tgt[] = {
-    { "gbz80", TARGET_IS_GBZ80, },  /* must be before z80! */
+    { "gb", TARGET_IS_GB, },  /* must be before z80! */
     { "z80",   TARGET_IS_Z80, },
-    { "x8051", TARGET_IS_MCS51, },
-    { "hc08",  TARGET_IS_HC08, },
+    { "8051", TARGET_IS_8051, },
+    { "6808",  TARGET_IS_6808, },
   };
   int i;
 
@@ -87,9 +87,7 @@ int
 is_sdas(void)
 {
   check_init();
-  /* TODO: should be uncommented when adcc asxxxx renamed to sdas
-  return sdas; */
-  return 1;
+  return sdas;
 }
 
 
@@ -105,13 +103,13 @@ int
 is_sdas_target_z80_like(void)
 {
   check_init();
-  return target == TARGET_IS_Z80 || target == TARGET_IS_GBZ80;
+  return target == TARGET_IS_Z80 || target == TARGET_IS_GB;
 }
 
 
 int
-is_sdas_target_mcs51_like(void)
+is_sdas_target_8051_like(void)
 {
   check_init();
-  return target == TARGET_IS_MCS51;
+  return target == TARGET_IS_8051;
 }

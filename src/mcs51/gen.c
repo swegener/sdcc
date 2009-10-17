@@ -11454,6 +11454,7 @@ genJumpTab (iCode * ic)
     {
       /* this algorithm needs 9 cycles and 7 + 3*n bytes
          if the switch argument is in a register.
+	     (5 + 2*n bytes when options.acall_ajmp is set)
          (8 cycles and 6+2*n bytes if peepholes can change ljmp to sjmp) */
       /* Peephole may not convert ljmp to sjmp or ret
          labelIsReturnOnly & labelInRange must check
@@ -11465,13 +11466,17 @@ genJumpTab (iCode * ic)
       /* multiply by three */
       if (aopGetUsesAcc (IC_JTCOND (ic), 0))
         {
-          emitcode ("mov", "b,#0x03");
+		  if(options.acall_ajmp==0)
+			emitcode ("mov", "b,#0x03");
+		  else
+			emitcode ("mov", "b,#0x02");
           emitcode ("mul", "ab");
         }
       else
         {
           emitcode ("add", "a,acc");
-          emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
+		  if(options.acall_ajmp==0)
+			emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
         }
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
 

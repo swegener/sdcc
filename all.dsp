@@ -69,16 +69,16 @@ SOURCE=.\ChangeLog
 # End Group
 # Begin Source File
 
-SOURCE=".\bin_vc\as-gbz80.exe"
+SOURCE=".\bin_vc\sdasgb.exe"
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\as-gbz80.exe"
+InputPath=".\bin_vc\sdasgb.exe"
 
-"bin\as-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\as-gbz80.exe bin /y > nul
+"bin\sdasgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdasgb.exe bin /y > nul
 
 # End Custom Build
 
@@ -86,10 +86,10 @@ InputPath=".\bin_vc\as-gbz80.exe"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\as-gbz80.exe"
+InputPath=".\bin_vc\sdasgb.exe"
 
-"bin\as-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\as-gbz80.exe bin /y > nul
+"bin\sdasgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdasgb.exe bin /y > nul
 
 # End Custom Build
 
@@ -98,15 +98,15 @@ InputPath=".\bin_vc\as-gbz80.exe"
 # End Source File
 # Begin Source File
 
-SOURCE=".\bin_vc\as-hc08.exe"
+SOURCE=".\bin_vc\sdas6808.exe"
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # Begin Custom Build
-InputPath=".\bin_vc\as-hc08.exe"
+InputPath=".\bin_vc\sdas6808.exe"
 
-"bin\as-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\as-hc08.exe bin /y > nul
+"bin\sdas6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdas6808.exe bin /y > nul
 
 # End Custom Build
 
@@ -114,10 +114,10 @@ InputPath=".\bin_vc\as-hc08.exe"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\as-hc08.exe"
+InputPath=".\bin_vc\sdas6808.exe"
 
-"bin\as-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\as-hc08.exe bin /y > nul
+"bin\sdas6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdas6808.exe bin /y > nul
 
 # End Custom Build
 
@@ -126,16 +126,16 @@ InputPath=".\bin_vc\as-hc08.exe"
 # End Source File
 # Begin Source File
 
-SOURCE=".\bin_vc\as-z80.exe"
+SOURCE=".\bin_vc\sdasz80.exe"
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\as-z80.exe"
+InputPath=".\bin_vc\sdasz80.exe"
 
-"bin\as-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\as-z80.exe bin /y > nul
+"bin\sdasz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdasz80.exe bin /y > nul
 
 # End Custom Build
 
@@ -143,10 +143,10 @@ InputPath=".\bin_vc\as-z80.exe"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\as-z80.exe"
+InputPath=".\bin_vc\sdasz80.exe"
 
-"bin\as-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\as-z80.exe bin /y > nul
+"bin\sdasz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdasz80.exe bin /y > nul
 
 # End Custom Build
 
@@ -184,16 +184,16 @@ InputPath=.\bin_vc\aslink.exe
 # End Source File
 # Begin Source File
 
-SOURCE=.\bin_vc\asx8051.exe
+SOURCE=.\bin_vc\sdas8051.exe
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=.\bin_vc\asx8051.exe
+InputPath=.\bin_vc\sdas8051.exe
 
-"bin\asx8051.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\asx8051.exe  bin /y > nul
+"bin\sdas8051.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdas8051.exe  bin /y > nul
 
 # End Custom Build
 
@@ -201,10 +201,10 @@ InputPath=.\bin_vc\asx8051.exe
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=.\bin_vc\asx8051.exe
+InputPath=.\bin_vc\sdas8051.exe
 
-"bin\asx8051.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\asx8051.exe  bin /y > nul
+"bin\sdas8051.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdas8051.exe  bin /y > nul
 
 # End Custom Build
 

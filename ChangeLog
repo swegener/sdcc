@@ -1,3 +1,7 @@
+2009-10-18 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: assemblers renamed to sdasxxxx
+
 2009-10-17 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* src/mcs51/gen.c: Fixed bug 2880909
@@ -17,7 +21,7 @@
 	  support/regression/ports/hc08/spec.mk,
 	  support/regression/ports/ucz80/spec.mk,
 	  support/regression/ports/z80/spec.mk:
-	  assemblers remnamed to sdasxxxx:
+	  assemblers renamed to sdasxxxx:
 	    as-gbz80 -> sdasgb,
 	    as-hc08 -> sdas6808
 	    asx8051 -> sdas8051

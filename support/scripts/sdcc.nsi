@@ -360,10 +360,10 @@ ${SectionEnd}
 ${Section} "SDCC application files" SEC01
   SectionIn 1 2 3 RO
   SetOutPath "$INSTDIR\bin"
-  File "${SDCC_ROOT}\bin\as-gbz80.exe"
-  File "${SDCC_ROOT}\bin\as-hc08.exe"
-  File "${SDCC_ROOT}\bin\as-z80.exe"
-  File "${SDCC_ROOT}\bin\asx8051.exe"
+  File "${SDCC_ROOT}\bin\sdasgb.exe"
+  File "${SDCC_ROOT}\bin\sdas6808.exe"
+  File "${SDCC_ROOT}\bin\sdasz80.exe"
+  File "${SDCC_ROOT}\bin\sdas8051.exe"
   File "${SDCC_ROOT}\bin\aslink.exe"
   File "${SDCC_ROOT}\bin\asranlib.exe"
   File "${SDCC_ROOT}\bin\link-gbz80.exe"

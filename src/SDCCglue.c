@@ -977,19 +977,25 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
   else
     val = valCastLiteral(type, 0.0);
 
-  if (!val) {
-    // an error has been thrown already
-    val = constCharVal (0);
-  }
-
-  if (IS_LITERAL(val->etype)) {
-    if (compareType(type, val->etype) == 0) {
-      werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
-      printFromToType (val->type, type);
+  if (!val)
+    {
+      // an error has been thrown already
+      val = constCharVal (0);
     }
-    printIvalCharPtr (NULL, type, val, oBuf);
-    return;
-  }
+
+  if (IS_LITERAL(val->etype))
+    {
+      if (compareType(type, val->type) == 0)
+        {
+          if (ilist)
+            werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
+          else
+            werror (E_INCOMPAT_TYPES);
+          printFromToType (val->type, type);
+        }
+      printIvalCharPtr (NULL, type, val, oBuf);
+      return;
+    }
 
   /* check the types   */
   if ((dLvl = compareType (val->type, type->next)) <= 0)

@@ -1,3 +1,9 @@
+2009-10-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(createIvalPtr),
+	* src/SDCCglue.c(printIvalFuncPtr): fixed bug 2881971
+	* support/regression/tests/zeropad.c: added test
+
 2009-10-18 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: assemblers renamed to sdasxxxx

@@ -1246,7 +1246,10 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist, ast *rootVal)
   if (ilist && ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
-  iexpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
+  if (ilist)
+    iexpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
+  else
+    iexpr = newAst_VALUE (valueFromLit (0));
 
   /* if character pointer */
   if (IS_CHAR (type->next))
@@ -6601,7 +6604,6 @@ skipall:
 
 void ast_print (ast * tree, FILE *outfile, int indent)
 {
-
   if (!tree) return ;
 
   /* can print only decorated trees */
@@ -6614,7 +6616,6 @@ void ast_print (ast * tree, FILE *outfile, int indent)
     fprintf(outfile,"ERROR_NODE(%p)\n",tree);
   }
 
-
   /* print the line          */
   /* if not block & function */
   if (tree->type == EX_OP &&
@@ -6625,11 +6626,11 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 
   if (tree->opval.op == FUNCTION) {
     int arg=0;
-    value *args=FUNC_ARGS(tree->left->opval.val->type);
-    fprintf(outfile,"FUNCTION (%s=%p) type (",
+    value *args = FUNC_ARGS (tree->left->opval.val->type);
+    fprintf(outfile, "FUNCTION (%s=%p) type (",
       tree->left->opval.val->name, tree);
-    printTypeChain (tree->left->opval.val->type->next,outfile);
-    fprintf(outfile,") args (");
+    printTypeChain (tree->left->opval.val->type->next, outfile);
+    fprintf(outfile, ") args (");
     do {
       if (arg) {
         fprintf (outfile, ", ");
@@ -6638,9 +6639,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
       arg++;
       args= args ? args->next : NULL;
     } while (args);
-    fprintf(outfile,")\n");
-    ast_print(tree->left,outfile,indent);
-    ast_print(tree->right,outfile,indent);
+    fprintf(outfile, ")\n");
+    ast_print(tree->left, outfile, indent);
+    ast_print(tree->right, outfile, indent);
     return ;
   }
   if (tree->opval.op == BLOCK) {

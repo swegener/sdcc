@@ -76,6 +76,16 @@ struct y STORAGE incompletestruct = {
 };
 #endif
 
+struct z {
+  short a;
+  void (*fp)(void);
+};
+
+//see bug 2881971
+struct z STORAGE funcptrstruct = {
+  10
+};
+
 #if !defined (STORAGE_auto)
 void Zeropad(void)
 {

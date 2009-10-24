@@ -1,3 +1,7 @@
+2009-10-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/mcs51/lkarea.c(lnkarea2): fixed bug 2839083
+
 2009-10-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c(decorateType): also set OCLS for PTR_OP, fixed bug 2823963

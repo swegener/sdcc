@@ -623,7 +623,7 @@ VOID lnkarea2 (void)
 
         if (!strcmp(ap->a_id, "BSEG_BYTES"))
         {
-            bseg_ap->a_addr = (ap->a_axp->a_addr - 0x20) * 8; /*Bytes to bits*/
+            bseg_ap->a_addr += (ap->a_axp->a_addr - 0x20) * 8; /*Bytes to bits*/
         }
         /*
          * Create symbols called:

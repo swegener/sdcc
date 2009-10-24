@@ -2751,7 +2751,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
       TTYPE (tree) = structElemType (LTYPE (tree),
                                      (tree->right->type == EX_VALUE ?
-                               tree->right->opval.val : NULL));
+                                         tree->right->opval.val : NULL));
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
@@ -2775,40 +2775,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       TTYPE (tree) = structElemType (LTYPE (tree)->next,
                                      (tree->right->type == EX_VALUE ?
-                               tree->right->opval.val : NULL));
+                                         tree->right->opval.val : NULL));
       TETYPE (tree) = getSpec (TTYPE (tree));
 
       /* adjust the storage class */
-      switch (DCL_TYPE(tree->left->ftype)) {
-      case POINTER:
-        SPEC_SCLS(TETYPE(tree)) = S_DATA;
-        break;
-      case FPOINTER:
-        SPEC_SCLS(TETYPE(tree)) = S_XDATA;
-        break;
-      case CPOINTER:
-        SPEC_SCLS(TETYPE(tree)) = S_CODE;
-        break;
-      case GPOINTER:
-        SPEC_SCLS (TETYPE (tree)) = 0;
-        break;
-      case PPOINTER:
-        SPEC_SCLS(TETYPE(tree)) = S_XSTACK;
-        break;
-      case IPOINTER:
-        SPEC_SCLS(TETYPE(tree)) = S_IDATA;
-        break;
-      case EEPPOINTER:
-        SPEC_SCLS(TETYPE(tree)) = S_EEPROM;
-        break;
-      case UPOINTER:
-        SPEC_SCLS (TETYPE (tree)) = 0;
-        break;
-      case ARRAY:
-      case FUNCTION:
-        break;
-      }
-
+      if (DCL_TYPE (LTYPE (tree)) != ARRAY)
+        {
+          setOClass (LTYPE (tree), TETYPE(tree));
+          SPEC_SCLS(TETYPE(tree)) = sclsFromPtr (LTYPE (tree));
+        }
       /* This breaks with extern declarations, bitfields, and perhaps other */
       /* cases (gcse). Let's leave this optimization disabled for now and   */
       /* ponder if there's a safe way to do this. -- EEP                    */
@@ -2876,7 +2851,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if right is NULL then unary operation  */
       if (tree->right)          /* not an unary operation */
         {
-
           if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
             {
               werrorfl (tree->filename, tree->lineno, E_BITWISE_OP);
@@ -3011,18 +2985,18 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
       if (!LETYPE (tree))
         DCL_TYPE (p) = POINTER;
-      else if (SPEC_SCLS (tree->left->etype) == S_CODE)
+      else if (SPEC_SCLS (LETYPE (tree)) == S_CODE)
         DCL_TYPE (p) = CPOINTER;
-      else if (SPEC_SCLS (tree->left->etype) == S_XDATA)
+      else if (SPEC_SCLS (LETYPE (tree)) == S_XDATA)
         DCL_TYPE (p) = FPOINTER;
-      else if (SPEC_SCLS (tree->left->etype) == S_XSTACK)
+      else if (SPEC_SCLS (LETYPE (tree)) == S_XSTACK)
         DCL_TYPE (p) = PPOINTER;
-      else if (SPEC_SCLS (tree->left->etype) == S_IDATA)
+      else if (SPEC_SCLS (LETYPE (tree)) == S_IDATA)
         DCL_TYPE (p) = IPOINTER;
-      else if (SPEC_SCLS (tree->left->etype) == S_EEPROM)
+      else if (SPEC_SCLS (LETYPE (tree)) == S_EEPROM)
         DCL_TYPE (p) = EEPPOINTER;
-      else if (SPEC_OCLS(tree->left->etype))
-          DCL_TYPE (p) = PTR_TYPE(SPEC_OCLS(tree->left->etype));
+      else if (SPEC_OCLS (LETYPE (tree)))
+          DCL_TYPE (p) = PTR_TYPE (SPEC_OCLS (LETYPE (tree)));
       else
           DCL_TYPE (p) = POINTER;
 
@@ -5994,7 +5968,6 @@ addSymToBlock (symbol * sym, ast * tree)
   if (IS_AST_OP (tree) &&
       tree->opval.op == BLOCK)
     {
-
       symbol *lsym = copySymbol (sym);
 
       lsym->next = AST_VALUES (tree, sym);

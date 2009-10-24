@@ -81,13 +81,13 @@ typedef struct ast
         /* if for then for values */
         struct
           {
-            struct ast *initExpr;       /* init portion */
-            struct ast *condExpr;       /* conditional portion */
-            struct ast *loopExpr;       /* iteration portion   */
+            struct ast *initExpr;       /* init portion          */
+            struct ast *condExpr;       /* conditional portion   */
+            struct ast *loopExpr;       /* iteration portion     */
             symbol *trueLabel;          /* entry point into body */
-            symbol *falseLabel;         /* exit point */
-            symbol *continueLabel;      /* conditional check   */
-            symbol *condLabel;          /* conditional label   */
+            symbol *falseLabel;         /* exit point            */
+            symbol *continueLabel;      /* conditional check     */
+            symbol *condLabel;          /* conditional label     */
           }
         forVals;
         struct
@@ -107,9 +107,9 @@ typedef struct ast
     sym_link *ftype;            /* start of type chain for this subtree */
     sym_link *etype;            /* end of type chain for this subtree   */
 
-    struct ast *left;           /* pointer to left tree        */
-    struct ast *right;          /* pointer to right tree       */
-    symbol *trueLabel;          /* if statement trueLabel */
+    struct ast *left;           /* pointer to left tree    */
+    struct ast *right;          /* pointer to right tree   */
+    symbol *trueLabel;          /* if statement trueLabel  */
     symbol *falseLabel;         /* if statement falseLabel */
   }
 ast;
@@ -154,7 +154,7 @@ ast;
 
 #define IS_AST_PARAM(x)         (IS_AST_OP(x) && (x)->opval.op == PARAM)
 
-#define  CAN_EVAL(x)    (      (x) == '['     || (x) == '.'      || (x) == PTR_OP || \
+#define CAN_EVAL(x)     (      (x) == '['     || (x) == '.'      || (x) == PTR_OP || \
               (x) ==  '&'   || (x) == '|'     || (x) == '^'      || (x) == '*'    || \
               (x) ==  '-'   || (x) == '+'     || (x) == '~'      ||                  \
               (x) ==  '!'   || (x) == LEFT_OP || (x) == RIGHT_OP ||                  \
@@ -162,20 +162,20 @@ ast;
               (x) == LE_OP  || (x) == GE_OP   || (x) == EQ_OP    || (x) == NE_OP  || \
               (x) == AND_OP || (x) == OR_OP   || (x) == '='  )
 
-#define  LEFT_FIRST(x) ( x  ==  AND_OP  ||      x       ==      OR_OP   )
+#define LEFT_FIRST(x) ( x == AND_OP || x == OR_OP )
 
 #define SIDE_EFFECTS_CHECK(op,rVal)  if (!sideEffects)  {               \
                                          werror(W_NO_SIDE_EFFECTS,op);  \
                                          return rVal    ;               \
                                      }
-#define IS_MODIFYING_OP(x) ( (x) == INC_OP || (x) == DEC_OP || (x) == '=' ||  \
-                        (x) == AND_ASSIGN || x== OR_ASSIGN || (x) == XOR_ASSIGN )
+#define IS_MODIFYING_OP(x) ( (x) == INC_OP     || (x) == DEC_OP    || (x) == '='        || \
+                             (x) == AND_ASSIGN || (x) == OR_ASSIGN || (x) == XOR_ASSIGN )
 
-#define IS_ASSIGN_OP(x) ( (x) == '=' || (x) == ADD_ASSIGN || (x) == SUB_ASSIGN ||\
-                          (x) == MUL_ASSIGN || (x) == DIV_ASSIGN || (x) == XOR_ASSIGN ||\
-                          (x) == AND_ASSIGN || (x) == OR_ASSIGN || (x) == INC_OP || (x) == DEC_OP)
-#define IS_DEREF_OP(x) ( ( (x)->opval.op == '*' && (x)->right == NULL) ||\
-                         (x)->opval.op == '.' ||\
+#define IS_ASSIGN_OP(x) ( (x) == '='        || (x) == ADD_ASSIGN || (x) == SUB_ASSIGN || \
+                          (x) == MUL_ASSIGN || (x) == DIV_ASSIGN || (x) == XOR_ASSIGN || \
+                          (x) == AND_ASSIGN || (x) == OR_ASSIGN  || (x) == INC_OP     || (x) == DEC_OP)
+#define IS_DEREF_OP(x) ( ( (x)->opval.op == '*' && (x)->right == NULL) || \
+                         (x)->opval.op == '.' || \
 						 (x)->opval.op == PTR_OP )
 
 /* forward declarations for global variables */

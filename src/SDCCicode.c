@@ -52,7 +52,6 @@ static operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *,int);
 int isLvaluereq(int lvl);
-void  setOClass (sym_link * ptr, sym_link * spec);
 static operand *geniCodeCast (sym_link *, operand *, bool);
 
 #define PRINTFUNC(x) void x (struct dbuf_s *dbuf, iCode *ic, char *s)
@@ -4140,7 +4139,7 @@ int isLvaluereq(int lvl)
 /* ast2iCode - creates an icodeList from an ast                    */
 /*-----------------------------------------------------------------*/
 operand *
-ast2iCode (ast * tree,int lvl)
+ast2iCode (ast * tree, int lvl)
 {
   operand *left = NULL;
   operand *right = NULL;
@@ -4171,13 +4170,13 @@ ast2iCode (ast * tree,int lvl)
      tree->opval.op == BLOCK))
     {
       if (tree->left && tree->left->type == EX_VALUE)
-        geniCodeDummyRead (ast2iCode (tree->left,lvl+1));
+        geniCodeDummyRead (ast2iCode (tree->left, lvl+1));
       else
-        ast2iCode (tree->left,lvl+1);
+        ast2iCode (tree->left, lvl+1);
       if (tree->right && tree->right->type == EX_VALUE)
-        geniCodeDummyRead (ast2iCode (tree->right,lvl+1));
+        geniCodeDummyRead (ast2iCode (tree->right, lvl+1));
       else
-        ast2iCode (tree->right,lvl+1);
+        ast2iCode (tree->right, lvl+1);
       return NULL;
     }
 
@@ -4204,25 +4203,25 @@ ast2iCode (ast * tree,int lvl)
                 (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
               clearLvaluereq();
 
-            left = operandFromAst (tree->left,lvl);
+            left = operandFromAst (tree->left, lvl);
             delLvaluereq();
             if (IS_DEREF_OP (tree) && IS_DEREF_OP (tree->left))
               left = geniCodeRValue (left, TRUE);
           }
         else
           {
-            left = operandFromAst (tree->left,lvl);
+            left = operandFromAst (tree->left, lvl);
           }
         if (tree->opval.op == INC_OP ||
             tree->opval.op == DEC_OP)
           {
             addLvaluereq(lvl);
-            right = operandFromAst (tree->right,lvl);
+            right = operandFromAst (tree->right, lvl);
             delLvaluereq();
           }
         else
           {
-            right = operandFromAst (tree->right,lvl);
+            right = operandFromAst (tree->right, lvl);
           }
       }
 
@@ -4230,7 +4229,6 @@ ast2iCode (ast * tree,int lvl)
   /* this will be a biggy                 */
   switch (tree->opval.op)
     {
-
     case '[':                   /* array operation */
       {
         //sym_link *ltype = operandType (left);

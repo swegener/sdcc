@@ -329,6 +329,7 @@ operand *operandFromSymbol (symbol *);
 operand *operandFromLink (sym_link *);
 sym_link *aggrToPtr (sym_link *, bool);
 int aggrToPtrDclType (sym_link *, bool);
+void  setOClass (sym_link * ptr, sym_link * spec);
 int piCode (void *, FILE *);
 int dbuf_printOperand (operand *, struct dbuf_s *);
 int printOperand (operand *, FILE *);

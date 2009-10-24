@@ -1,3 +1,11 @@
+2009-10-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(decorateType): also set OCLS for PTR_OP, fixed bug 2823963
+	* src/SDCCast.h: cosmetic changes
+	* src/SDCCicode.c,
+	* src/SDCCicode.h: moved setOClass prototype
+	* support/regression/tests/bug2823963.c: new, added
+
 2009-10-22 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/p89lpc9321.h, device/include/mcs51/p89lpc9331.h,

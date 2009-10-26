@@ -1,5 +1,5 @@
-#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
-\lyxformat 276
+#LyX 1.6.4 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
 \begin_document
 \begin_header
 \textclass article
@@ -12,6 +12,7 @@
   colorlinks=true,
   linkcolor=blue] {hyperref}
 \end_preamble
+\use_default_options false
 \language english
 \inputencoding auto
 \font_roman times
@@ -22,9 +23,11 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
+
 \graphics default
 \paperfontsize default
 \spacing single
+\use_hyperref false
 \papersize default
 \use_geometry false
 \use_amsmath 1
@@ -43,6 +46,7 @@
 \tracking_changes false
 \output_changes false
 \author "" 
+\author "" 
 \end_header
 
 \begin_body
@@ -52,7 +56,7 @@ Proposed Test Suite Design
 \begin_inset ERT
 status open
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -584,7 +588,9 @@ I don't know how to do pre-formatted text in LaTeX.
 The following code generates a simple increment test for all combinations
  of the storage classes and all combinations of the data sizes.
  This is a bad example as the optimiser will often remove most of this code.
-\newline
+\begin_inset Newline newline
+\end_inset
+
 
 \end_layout
 
@@ -593,22 +599,53 @@ The following code generates a simple increment test for all combinations
 \family typewriter
 /** Test for increment.
  
-\newline
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 type: char, int, long
-\newline
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 Z80 port does not fully support longs (4 byte)
-\newline
-\InsetSpace ~
-\InsetSpace ~
-type[z80]:
- char, int
-\newline
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+type[z80]: char, int
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 class: 
 \begin_inset Quotes eld
 \end_inset
@@ -618,28 +655,61 @@ class:
 \end_inset
 
 , register, static */
-\newline
+\begin_inset Newline newline
+\end_inset
+
  
-\newline
+\begin_inset Newline newline
+\end_inset
+
 static void
-\newline
+\begin_inset Newline newline
+\end_inset
+
 testInc{class}{types}(void)
-\newline
+\begin_inset Newline newline
+\end_inset
+
 { 
-\newline
-\InsetSpace ~
-\InsetSpace ~
-{class} {type}
- i = 0; 
-\newline
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+{class} {type} i = 0; 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 i = i + 1;
-\newline
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 ASSERT((i == 1));
-\newline
+\begin_inset Newline newline
+\end_inset
+
 }
 \end_layout
 

@@ -1,5 +1,5 @@
-#LyX 1.5.7 created this file. For more info see http://www.lyx.org/
-\lyxformat 276
+#LyX 1.6.4 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
 \begin_document
 \begin_header
 \textclass article
@@ -12,6 +12,7 @@
   colorlinks=true,
   linkcolor=blue] {hyperref}
 \end_preamble
+\use_default_options false
 \language english
 \inputencoding auto
 \font_roman times
@@ -22,9 +23,11 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
+
 \graphics default
 \paperfontsize default
 \spacing single
+\use_hyperref false
 \papersize default
 \use_geometry false
 \use_amsmath 1
@@ -43,6 +46,7 @@
 \tracking_changes false
 \output_changes false
 \author "" 
+\author "" 
 \end_header
 
 \begin_body
@@ -52,7 +56,7 @@ CDB File Format
 \begin_inset ERT
 status open
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -74,7 +78,8 @@ SDCC Development Team
 \end_layout
 
 \begin_layout Standard
-\begin_inset LatexCommand tableofcontents
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
 
 \end_inset
 
@@ -106,7 +111,7 @@ CDB files are created when the "-
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -121,7 +126,7 @@ status collapsed
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -150,7 +155,7 @@ n as possible.
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -169,7 +174,7 @@ status collapsed
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -191,7 +196,7 @@ n.
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -249,14 +254,14 @@ Basic Record Format
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \series bold
 Type
@@ -264,10 +269,10 @@ Type
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \series bold
 Description
@@ -275,10 +280,10 @@ Description
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \series bold
 Form
@@ -287,11 +292,11 @@ Form
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 M
 \end_layout
 
@@ -300,7 +305,7 @@ M
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Module Record
 \end_layout
 
@@ -309,18 +314,18 @@ Module Record
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Compiler
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F
 \end_layout
 
@@ -329,7 +334,7 @@ F
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Function Record
 \end_layout
 
@@ -338,18 +343,18 @@ Function Record
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Compiler
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 S
 \end_layout
 
@@ -358,7 +363,7 @@ S
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol Record
 \end_layout
 
@@ -367,18 +372,18 @@ Symbol Record
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Compiler
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 T
 \end_layout
 
@@ -387,7 +392,7 @@ T
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Structure (Complex Type) Record
 \end_layout
 
@@ -396,36 +401,36 @@ Structure (Complex Type) Record
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Compiler
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Linker Record
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Assembler / Linker
 \end_layout
 
@@ -457,13 +462,13 @@ Module Record
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 M
 \end_layout
 
@@ -472,27 +477,27 @@ M
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Module record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Filename
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The filename of the module that this CDB file represents.
 \end_layout
 
@@ -533,7 +538,9 @@ Examples
 
 \family typewriter
 M:Timer0
-\newline
+\begin_inset Newline newline
+\end_inset
+
 M:_bp
 \end_layout
 
@@ -545,222 +552,222 @@ Symbol Records
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
-<column alignment="block" valignment="top" rightline="true" width="3.9in">
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 S
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 G
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope is global
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F <Filename>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope is file
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L <Function>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope is local
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Name>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol name
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Level>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope level (see below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Block>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope block (see below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <TypeChain>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Type chain record (see type record below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Address Space>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Address space code (see table below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <On Stack>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Is this symbol on the stack? Indicates if the next parameter is valid.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Stack>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The stack Offsetorelative to the 
 \begin_inset Quotes eld
 \end_inset
@@ -774,7 +781,7 @@ bp
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -789,20 +796,20 @@ status collapsed
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Reg>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 If the address space is 'R', this field indicates the register that the
  symbol is allocated.
  The register name is in its native form: R1, AX, etc.
@@ -822,7 +829,9 @@ If the address space is 'R', this field indicates the register that the
 <S><:>
 \series bold
 
-\newline
+\begin_inset Newline newline
+\end_inset
+
 { G | F<Filename> | L { <function> | 
 \begin_inset Quotes eld
 \end_inset
@@ -832,22 +841,37 @@ If the address space is 'R', this field indicates the register that the
 \end_inset
 
  }}
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Name>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Level>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Block>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <(><TypeRecord><)>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <,><AddressSpace>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <,><OnStack>
-\newline
-<
-,><Stack>
-\newline
+\begin_inset Newline newline
+\end_inset
+
+<,><Stack>
+\begin_inset Newline newline
+\end_inset
+
 <,><[><Reg><,>{<Reg><,>}<]>
 \end_layout
 
@@ -938,13 +962,13 @@ int c; /* block #1 , level #1 */
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 A
 \end_layout
 
@@ -953,18 +977,18 @@ A
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 External stack
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 B
 \end_layout
 
@@ -973,18 +997,18 @@ B
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Internal stack
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 C
 \end_layout
 
@@ -993,18 +1017,18 @@ C
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Code
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 D
 \end_layout
 
@@ -1013,18 +1037,18 @@ D
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Code / static segment
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 E
 \end_layout
 
@@ -1033,18 +1057,18 @@ E
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Internal ram (lower 128) bytes
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F
 \end_layout
 
@@ -1053,18 +1077,18 @@ F
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 External ram
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 G
 \end_layout
 
@@ -1073,18 +1097,18 @@ G
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Internal ram
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 H
 \end_layout
 
@@ -1093,18 +1117,18 @@ H
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Bit addressable
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 I
 \end_layout
 
@@ -1113,18 +1137,18 @@ I
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SFR space
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 J
 \end_layout
 
@@ -1133,18 +1157,18 @@ J
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SBIT space
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 R
 \end_layout
 
@@ -1153,27 +1177,27 @@ R
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Register space
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Z
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Used for function records, or any undefined space code
 \end_layout
 
@@ -1201,13 +1225,13 @@ Type Chain Record
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Size>
 \end_layout
 
@@ -1216,18 +1240,18 @@ Type Chain Record
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The size of the item in decimal.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <DCLType>
 \end_layout
 
@@ -1236,27 +1260,27 @@ The size of the item in decimal.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The type encoded using the table below.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Sign>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The sign of the item.
  Encoded as 'U' or 'S'.
 \end_layout
@@ -1287,13 +1311,13 @@ The C programming language allows arbitrarily complex type constructions.
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DA <n>
 \end_layout
 
@@ -1302,18 +1326,18 @@ DA <n>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Array of n elements
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DF
 \end_layout
 
@@ -1322,18 +1346,18 @@ DF
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Function
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DG
 \end_layout
 
@@ -1342,18 +1366,18 @@ DG
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Generic pointer
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DC
 \end_layout
 
@@ -1362,18 +1386,18 @@ DC
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Code pointer
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DX
 \end_layout
 
@@ -1382,18 +1406,18 @@ DX
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 External ram pointer
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DD
 \end_layout
 
@@ -1402,18 +1426,18 @@ DD
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Internal ram pointer
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DP
 \end_layout
 
@@ -1422,18 +1446,18 @@ DP
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Paged pointer
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 DI
 \end_layout
 
@@ -1442,18 +1466,18 @@ DI
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Upper 128 byte pointer
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SL
 \end_layout
 
@@ -1462,18 +1486,18 @@ SL
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 long
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SI
 \end_layout
 
@@ -1482,18 +1506,18 @@ SI
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 int
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SC
 \end_layout
 
@@ -1502,18 +1526,18 @@ SC
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 char
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SS
 \end_layout
 
@@ -1522,18 +1546,18 @@ SS
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 short
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SV
 \end_layout
 
@@ -1542,18 +1566,18 @@ SV
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 void
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SF
 \end_layout
 
@@ -1562,18 +1586,18 @@ SF
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 float
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 ST <name>
 \end_layout
 
@@ -1582,18 +1606,18 @@ ST <name>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Structure of name <name>
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SX
 \end_layout
 
@@ -1602,27 +1626,27 @@ SX
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 sbit
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 SB <n>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Bit field of <n> bits
 \end_layout
 
@@ -1647,15 +1671,21 @@ Examples
 \family typewriter
 \size small
 S:LcheckSerialPort$pstBuffer$1$1({3}DG,STTTinyBuffer:S),R,0,0,[r2,r3,r4]
-\newline
-S:Ltimer
-0LoadExtended$count$1$1({2}SI:S),B,1,-4
-\newline
+\begin_inset Newline newline
+\end_inset
+
+S:Ltimer0LoadExtended$count$1$1({2}SI:S),B,1,-4
+\begin_inset Newline newline
+\end_inset
+
 S:G$T2CON_7$0$0({1}SX:S),J,0,0
-\newline
-S:LAdcIniti
-alize$a$1$1({2}SI:S),B,1,1
-\newline
+\begin_inset Newline newline
+\end_inset
+
+S:LAdcInitialize$a$1$1({2}SI:S),B,1,1
+\begin_inset Newline newline
+\end_inset
+
 S:G$ScanCount$0$0({2}SI:S),F,0,0
 \end_layout
 
@@ -1667,7 +1697,9 @@ Function Records
 <F><:>
 \series bold
 
-\newline
+\begin_inset Newline newline
+\end_inset
+
 { G | F<Filename> | L { <function> | 
 \begin_inset Quotes eld
 \end_inset
@@ -1677,26 +1709,45 @@ Function Records
 \end_inset
 
  }}
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Name>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Level>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Block>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <(><TypeRecord><)>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <,><AddressSpace>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <,><OnStack>
-\newline
-<
-,><Stack>
-\newline
+\begin_inset Newline newline
+\end_inset
+
+<,><Stack>
+\begin_inset Newline newline
+\end_inset
+
 <,><Interrupt>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <,><Interrupt Num>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <,><Register Bank>
 \end_layout
 
@@ -1704,13 +1755,13 @@ Function Records
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="3.9in">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F
 \end_layout
 
@@ -1719,18 +1770,18 @@ F
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 G
 \end_layout
 
@@ -1739,18 +1790,18 @@ G
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope is global
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F <Filename>
 \end_layout
 
@@ -1759,18 +1810,18 @@ F <Filename>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope is file
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L <Function>
 \end_layout
 
@@ -1779,18 +1830,18 @@ L <Function>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope is local
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Name>
 \end_layout
 
@@ -1799,18 +1850,18 @@ Scope is local
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol name
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Level>
 \end_layout
 
@@ -1819,18 +1870,18 @@ Symbol name
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope level (see below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Block>
 \end_layout
 
@@ -1839,18 +1890,18 @@ Scope level (see below)
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Scope block (see below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <TypeChain>
 \end_layout
 
@@ -1859,18 +1910,18 @@ Scope block (see below)
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Type chain record (see type record below)
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Address Space>
 \end_layout
 
@@ -1879,18 +1930,18 @@ Type chain record (see type record below)
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Address space code <see table below>
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <On Stack>
 \end_layout
 
@@ -1899,18 +1950,18 @@ Address space code <see table below>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Indicates if this is a stack variable
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Stack>
 \end_layout
 
@@ -1919,7 +1970,7 @@ Indicates if this is a stack variable
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 If stack variable, the stack offset relative to the 
 \begin_inset Quotes eld
 \end_inset
@@ -1933,7 +1984,7 @@ bp
 \begin_inset ERT
 status collapsed
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 
 \backslash
@@ -1948,11 +1999,11 @@ status collapsed
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Is Interrupt>
 \end_layout
 
@@ -1961,18 +2012,18 @@ status collapsed
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Indicates if this is an interrupt handler.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Interrupt Num>
 \end_layout
 
@@ -1981,27 +2032,27 @@ Indicates if this is an interrupt handler.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 If interrupt handler, this indicates the interrupt number.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Register Bank>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 If interrupt handler, this ist he register bank number.
 \end_layout
 
@@ -2037,7 +2088,9 @@ Example
 
 \family typewriter
 F:G$main$0$0({2}DF,SV:S),C,0,0,0,0,0
-\newline
+\begin_inset Newline newline
+\end_inset
+
 F:G$SioISR$0$0({2}DF,SV:S),Z,0,0,1,4,0
 \end_layout
 
@@ -2049,11 +2102,17 @@ Type Records
 <T><:>
 \series bold
 
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <F><Filename><$>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <Name>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <[><TypeMember> {<TypeMember>} <]>
 \end_layout
 
@@ -2061,13 +2120,13 @@ Type Records
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 T
 \end_layout
 
@@ -2076,18 +2135,18 @@ T
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Type record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Filename>
 \end_layout
 
@@ -2096,18 +2155,18 @@ Type record type indicator
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The filename where this type is declared
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Name>
 \end_layout
 
@@ -2116,27 +2175,27 @@ The filename where this type is declared
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The name of this type
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <TypeMember>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 (see below)
 \end_layout
 
@@ -2162,13 +2221,13 @@ Type Member
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="3.9in">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Offset>
 \end_layout
 
@@ -2177,27 +2236,27 @@ Type Member
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 The offset of this type member in decimal.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <SymbolRecord>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 A complete symbol record describing this Member.
  (See 
 \begin_inset Quotes eld
@@ -2241,22 +2300,33 @@ Examples
 
 \family typewriter
 T:Fcmdas$TTinyBuffer[
-\newline
+\begin_inset Newline newline
+\end_inset
+
 ({0}S:S$pNext$0$0({3}DG,STTTinyBuffer:S),Z,0,0)
-\newline
-({3}S:S$leng
-th$0$0({1}SC:U),Z,0,0)
-\newline
+\begin_inset Newline newline
+\end_inset
+
+({3}S:S$length$0$0({1}SC:U),Z,0,0)
+\begin_inset Newline newline
+\end_inset
+
 ({4}S:S$maxLength$0$0({1}SC:U),Z,0,0)
-\newline
-({5}S:S$rindex$0$0({1
-}SC:U),Z,0,0)
-\newline
+\begin_inset Newline newline
+\end_inset
+
+({5}S:S$rindex$0$0({1}SC:U),Z,0,0)
+\begin_inset Newline newline
+\end_inset
+
 ({6}S:S$windex$0$0({1}SC:U),Z,0,0)
-\newline
-({7}S:S$buffer$0$0({64}DA64,SC:U)
-,Z,0,0)
-\newline
+\begin_inset Newline newline
+\end_inset
+
+({7}S:S$buffer$0$0({64}DA64,SC:U),Z,0,0)
+\begin_inset Newline newline
+\end_inset
+
 ]
 \end_layout
 
@@ -2268,15 +2338,25 @@ Link Address of Symbol
 <L><:> 
 \series bold
 
-\newline
+\begin_inset Newline newline
+\end_inset
+
 { <G> | F<filename> | L<function> } 
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><name>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><level>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><block>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <:><address>
 \end_layout
 
@@ -2284,13 +2364,13 @@ Link Address of Symbol
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="3.9in">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L
 \end_layout
 
@@ -2299,18 +2379,18 @@ L
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 G
 \end_layout
 
@@ -2319,18 +2399,18 @@ G
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol has file scope.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F <Filename>
 \end_layout
 
@@ -2339,18 +2419,18 @@ F <Filename>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol has file scope.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L <Function>
 \end_layout
 
@@ -2359,18 +2439,18 @@ L <Function>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol has function scope
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Name>
 \end_layout
 
@@ -2379,18 +2459,18 @@ Symbol has function scope
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol name
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Level>
 \end_layout
 
@@ -2399,18 +2479,18 @@ Symbol name
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol level
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Block>
 \end_layout
 
@@ -2419,27 +2499,27 @@ Symbol level
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol block
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Address>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol address in hex, relative to the address space code, in the matching
  symbol record.
 \end_layout
@@ -2474,9 +2554,13 @@ Example
 
 \family typewriter
 L:G$P0$0$0:80
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:G$ScanCount$0$0:0
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:Fcmdas$_str_0$0$0:195
 \end_layout
 
@@ -2488,15 +2572,25 @@ Linker Symbol End Address Record
 <L><:><X>
 \series bold
 
-\newline
+\begin_inset Newline newline
+\end_inset
+
 { <G> | F<filename> | L<functionName> }
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><name>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><level>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><block>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <:><Address>
 \end_layout
 
@@ -2504,13 +2598,13 @@ Linker Symbol End Address Record
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="3.9in">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L
 \end_layout
 
@@ -2519,18 +2613,18 @@ L
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 X
 \end_layout
 
@@ -2539,18 +2633,18 @@ X
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link end address sub type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 G
 \end_layout
 
@@ -2559,18 +2653,18 @@ G
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol has file scope.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 F <Filename>
 \end_layout
 
@@ -2579,18 +2673,18 @@ F <Filename>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol has file scope.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L <Function>
 \end_layout
 
@@ -2599,18 +2693,18 @@ L <Function>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol has function scope.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Name>
 \end_layout
 
@@ -2619,18 +2713,18 @@ Symbol has function scope.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol name
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Level>
 \end_layout
 
@@ -2639,18 +2733,18 @@ Symbol name
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol level
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Block>
 \end_layout
 
@@ -2659,27 +2753,27 @@ Symbol level
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol block
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Address>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Symbol end address in hex, relative to the address space code contained
  in the matching symbol record.
 \end_layout
@@ -2717,7 +2811,9 @@ Example
 
 \family typewriter
 L:XG$sysClearError$0$0:194
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:XG$SioISR$0$0:A09
 \end_layout
 
@@ -2729,11 +2825,17 @@ Linker ASM Line Record
 <L> 
 \series bold
 <:> <A>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Filename>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Line>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <:><EndAddress>
 \end_layout
 
@@ -2741,13 +2843,13 @@ Linker ASM Line Record
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="3.9in">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L
 \end_layout
 
@@ -2756,18 +2858,18 @@ L
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 A
 \end_layout
 
@@ -2776,18 +2878,18 @@ A
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link assembly file line record sub type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Filename>
 \end_layout
 
@@ -2796,18 +2898,18 @@ Link assembly file line record sub type indicator
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Filename of the assembly file.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Line>
 \end_layout
 
@@ -2816,27 +2918,27 @@ Filename of the assembly file.
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Line number in the above filename.{}These numbers start at 1 (not 0).
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <EndAdress>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 End address
 \end_layout
 
@@ -2871,7 +2973,9 @@ Example
 
 \family typewriter
 L:A$TinyBuffer$2320:A13
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$max1270$391:CA4
 \end_layout
 
@@ -2883,15 +2987,25 @@ Linker C-Line Record
 <L> 
 \series bold
 <:> <C>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Filename>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Line>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Level>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <$><Block>
-\newline
+\begin_inset Newline newline
+\end_inset
+
 <:><EndAddress>
 \end_layout
 
@@ -2899,13 +3013,13 @@ Linker C-Line Record
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="3.9in">
-<row topline="true">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="block" valignment="top" width="3.9in">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L
 \end_layout
 
@@ -2914,18 +3028,18 @@ L
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link record type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 C
 \end_layout
 
@@ -2934,18 +3048,18 @@ C
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Link assembly file line record sub type indicator
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Filename>
 \end_layout
 
@@ -2954,18 +3068,18 @@ Link assembly file line record sub type indicator
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Filename of the assembly file.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Line>
 \end_layout
 
@@ -2974,7 +3088,7 @@ Filename of the assembly file.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Line number in the above filename.
  These numbers start at 1 (not 0).
 \end_layout
@@ -2982,11 +3096,11 @@ Line number in the above filename.
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Level>
 \end_layout
 
@@ -2995,18 +3109,18 @@ Line number in the above filename.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Current level at this line and address.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <Block>
 \end_layout
 
@@ -3015,27 +3129,27 @@ Current level at this line and address.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Current block at this line and address.
 \end_layout
 
 \end_inset
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 <EndAddress>
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 End address
 \end_layout
 
@@ -3076,28 +3190,28 @@ ng C-Line Records.
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 01
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -3105,28 +3219,28 @@ ng C-Line Records.
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 02
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
 struct complex
@@ -3136,28 +3250,28 @@ struct complex
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 03
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
 {
@@ -3167,32 +3281,37 @@ struct complex
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 04
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 int count;
 \end_layout
 
@@ -3200,32 +3319,37 @@ int count;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 05
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 int Max;
 \end_layout
 
@@ -3233,28 +3357,28 @@ int Max;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 06
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
 };
@@ -3264,28 +3388,28 @@ int Max;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 07
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -3293,28 +3417,28 @@ int Max;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 08
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$8$0$0:38
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
 void main(void)
@@ -3324,28 +3448,28 @@ void main(void)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 09
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
 {
@@ -3355,32 +3479,37 @@ void main(void)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 10
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 int iterA;
 \end_layout
 
@@ -3388,32 +3517,37 @@ int iterA;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 11
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 int iterB;
 \end_layout
 
@@ -3421,32 +3555,37 @@ int iterB;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 12
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 struct complex myStruct;
 \end_layout
 
@@ -3454,28 +3593,28 @@ struct complex myStruct;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 13
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -3483,32 +3622,37 @@ struct complex myStruct;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 14
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$14$1$1:C1
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 for(iterA = 0; iterA < 10; iterA++)
 \end_layout
 
@@ -3516,32 +3660,37 @@ for(iterA = 0; iterA < 10; iterA++)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 15
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 {
 \end_layout
 
@@ -3549,34 +3698,45 @@ for(iterA = 0; iterA < 10; iterA++)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 16
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$16$2$2:B9
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 for(iterB = 0; iterB < 10; iterB++)
 \end_layout
 
@@ -3584,34 +3744,45 @@ for(iterB = 0; iterB < 10; iterB++)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 17
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 {
 \end_layout
 
@@ -3619,36 +3790,53 @@ for(iterB = 0; iterB < 10; iterB++)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 18
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 int iterA = 6 + iterB;
 \end_layout
 
@@ -3656,36 +3844,53 @@ int iterA = 6 + iterB;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 19
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 iterA++;
 \end_layout
 
@@ -3693,28 +3898,28 @@ iterA++;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 20
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -3722,36 +3927,53 @@ iterA++;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 21
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$21$1$1:69
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 myStruct.count++;
 \end_layout
 
@@ -3759,28 +3981,28 @@ myStruct.count++;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 22
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -3788,36 +4010,53 @@ myStruct.count++;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 23
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$23$3$3:83
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 if(myStruct.count > myStruct.Max)
 \end_layout
 
@@ -3825,38 +4064,61 @@ if(myStruct.count > myStruct.Max)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 24
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$24$3$3:A3
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 myStruct.Max = mystruct.count;
 \end_layout
 
@@ -3864,34 +4126,45 @@ myStruct.Max = mystruct.count;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 25
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 }
 \end_layout
 
@@ -3899,32 +4172,37 @@ myStruct.Max = mystruct.count;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 26
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
-\InsetSpace ~
-\InsetSpace ~
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 }
 \end_layout
 
@@ -3932,28 +4210,28 @@ myStruct.Max = mystruct.count;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 27
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 L:C$vars.c$27$1$1:CE
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \family typewriter
 }
@@ -3979,7 +4257,9 @@ Example
 
 \family typewriter
 L:C$max1270.c$35$1$1:CA9
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:C$Timer0.c$20$1$1:D9D
 \end_layout
 
@@ -4115,263 +4395,474 @@ CDB File Example
 
 \family typewriter
 M:vars
-\newline
+\begin_inset Newline newline
+\end_inset
+
 F:G$main$0$0({2}DF,SV:S),C,0,0,0,0,0
-\newline
-T:Fvars$complex[({0}S:S$count$0$0({2}S
-I:S),Z,0,0)({2}S:S$Max$0$0({2}SI:S),Z,0,0)]
-\newline
-S:Lmain$iterA$1$1({2}SI:S),R,0,0,[r0,
-r1]
-\newline
+\begin_inset Newline newline
+\end_inset
+
+T:Fvars$complex[({0}S:S$count$0$0({2}SI:S),Z,0,0)({2}S:S$Max$0$0({2}SI:S),Z,0,0)
+]
+\begin_inset Newline newline
+\end_inset
+
+S:Lmain$iterA$1$1({2}SI:S),R,0,0,[r0,r1]
+\begin_inset Newline newline
+\end_inset
+
 S:Lmain$iterB$1$1({2}SI:S),R,0,0,[r4,r5]
-\newline
-S:Lmain$myStruct$1$1({4}STcomplex:S),
-E,0,0
-\newline
+\begin_inset Newline newline
+\end_inset
+
+S:Lmain$myStruct$1$1({4}STcomplex:S),E,0,0
+\begin_inset Newline newline
+\end_inset
+
 S:Lmain$iterA$3$3({2}SI:S),R,0,0,[r6,r7]
-\newline
+\begin_inset Newline newline
+\end_inset
+
 S:G$IM$0$0({1}SC:U),I,0,0
-\newline
-S:G$main$0
-$0({2}DF,SV:S),C,0,0
-\newline
+\begin_inset Newline newline
+\end_inset
+
+S:G$main$0$0({2}DF,SV:S),C,0,0
+\begin_inset Newline newline
+\end_inset
+
 L:G$IM$0$0:90
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:Lmain$myStruct$1$1:8
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$64:0
-\newline
-L:A$vars$65:
-3
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$65:3
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$67:B
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$69:13
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$71:1B
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$73:23
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$75:2B
-\newline
-L:A$vars$1
-29:33
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$129:33
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$131:36
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$158:38
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$10$0$0:38
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:G$main$0$0:38
-\newline
-L:A$vars$15
-9:3A
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$159:3A
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$163:3C
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$164:3D
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$165:3E
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$166:40
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$167:41
-\newline
-L
-:A$vars$168:43
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$168:43
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$170:45
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$171:47
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$176:4A
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$177:4C
-\newline
-L:A$va
-rs$181:4E
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$181:4E
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$182:4F
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$183:50
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$184:52
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$185:53
-\newline
-L:A$vars$18
-6:55
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$186:55
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$191:57
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$196:59
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$20$3$3:59
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$197:5B
-\newline
-L:A$vars$198
-:5D
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$198:5D
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$200:5E
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$201:5F
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$202:61
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$207:62
-\newline
-L:C$vars.c$21$3$3:
-62
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:C$vars.c$21$3$3:62
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$208:63
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$209:66
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$216:67
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$23$3$3:67
-\newline
-L:A$vars$217:6
-9
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$217:69
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$220:6B
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$221:6C
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$222:6F
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$227:70
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$228:72
-\newline
-L:A$
-vars$232:74
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$232:74
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$25$3$3:74
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$238:76
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$27$3$3:76
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$239:77
-\newline
-L
-:A$vars$240:79
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$240:79
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$241:7A
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$242:7C
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$243:7E
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$244:80
-\newline
-L:A$va
-rs$245:83
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$245:83
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$248:85
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$256:87
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$28$3$3:87
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$257:8A
-\newline
-L:A$var
-s$263:8D
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$263:8D
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$18$2$2:8D
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$264:8E
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$265:91
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$268:92
-\newline
-L:A$vars
-$274:94
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$274:94
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$16$1$1:94
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$275:95
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$276:98
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$278:99
-\newline
-L:A$vars$
-282:9C
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$282:9C
+\begin_inset Newline newline
+\end_inset
+
 L:C$vars.c$31$1$1:9C
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:XG$main$0$0:9C
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$84:A1
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$85:A4
-\newline
-L:A$vars$86
-:A7
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$86:A7
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$87:A9
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$88:AB
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$91:AE
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$92:B0
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$93:B2
-\newline
-L:A$var
-s$94:B4
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$94:B4
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$95:B6
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$96:B8
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$97:B9
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$98:BB
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$99:BD
-\newline
-L:A
-$vars$100:BE
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$100:BE
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$101:C1
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$102:C3
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$103:C6
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$104:C7
-\newline
-L:A$vars
-$105:C8
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$105:C8
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$106:C9
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$107:CA
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$108:CB
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$109:CE
-\newline
-L:A$vars$110:
-D0
-\newline
+\begin_inset Newline newline
+\end_inset
+
+L:A$vars$110:D0
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$111:D2
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$112:D5
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$113:D7
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$114:DA
-\newline
+\begin_inset Newline newline
+\end_inset
+
 L:A$vars$118:DD
 \end_layout
 

@@ -1,3 +1,8 @@
+2009-10-26 Borut Razem <borut.razem AT siol.net>
+
+	* doc/cdbfileformat.lyx, doc/sdccman.lyx, doc/test_suite_spec.lyx:
+	  converted to LyX 1.6.4 (\lyxformat 345) format
+
 2009-10-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/mcs51/lkarea.c(lnkarea2): fixed bug 2839083

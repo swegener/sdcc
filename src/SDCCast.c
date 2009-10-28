@@ -145,7 +145,7 @@ newIfxNode (ast * condAst, symbol * trueLabel, symbol * falseLabel)
   ast *ifxNode;
 
   /* if this is a literal then we already know the result */
-  if (condAst->etype && IS_LITERAL (condAst->etype))
+  if (condAst->etype && IS_LITERAL (condAst->etype) && IS_AST_VALUE (condAst))
     {
       /* then depending on the expression value */
       if (floatFromVal (condAst->opval.val))
@@ -4670,8 +4670,16 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* they should either match or be castable */
       if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
         {
-          werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "assignment", " ");
-          printFromToType(RTYPE(tree),LTYPE(tree));
+          if (IS_CODEPTR(LTYPE (tree)) && IS_FUNC (LTYPE (tree)->next)) /* function pointer */
+            {
+              werrorfl (tree->filename, tree->lineno, E_INCOMPAT_TYPES);
+              printFromToType (RTYPE (tree), LTYPE (tree)->next);
+            }
+          else
+            {
+              werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "assignment", " ");
+              printFromToType (RTYPE (tree), LTYPE (tree));
+            }
         }
 
       /* if the left side of the tree is of type void
@@ -4679,7 +4687,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_VOID (LTYPE (tree)))
         {
           werrorfl (tree->filename, tree->lineno, E_CAST_ZERO);
-          printFromToType(RTYPE(tree), LTYPE(tree));
+          printFromToType (RTYPE (tree), LTYPE (tree));
         }
 
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));

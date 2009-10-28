@@ -970,7 +970,6 @@ void
 printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
 {
   value *val;
-  int dLvl = 0;
 
   if (ilist)
     val = list2val (ilist);
@@ -994,13 +993,6 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
           printFromToType (val->type, type);
         }
       printIvalCharPtr (NULL, type, val, oBuf);
-      return;
-    }
-
-  /* check the types   */
-  if ((dLvl = compareType (val->type, type->next)) <= 0)
-    {
-      dbuf_tprintf (oBuf, "\t!dw !constword\n", 0);
       return;
     }
 
@@ -1265,30 +1257,46 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf
   if (ilist)
     {
       // not an aggregate, ilist must be a node
-      if (ilist->type!=INIT_NODE) {
+      if (ilist->type!=INIT_NODE)
+        {
           // or a 1-element list
-        if (ilist->init.deep->next) {
-          werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar",
-                  sym->name);
-        } else {
-          ilist=ilist->init.deep;
+          if (ilist->init.deep->next)
+            {
+              werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar",
+                        sym->name);
+            }
+          else
+            {
+              ilist = ilist->init.deep;
+            }
         }
-      }
 
       // and the type must match
-      itype=ilist->init.node->ftype;
+      itype = ilist->init.node->ftype;
 
-      if (compareType(type, itype)==0) {
-        // special case for literal strings
-        if (IS_ARRAY (itype) && IS_CHAR (getSpec(itype)) &&
-            // which are really code pointers
-            IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
-          // no sweat
-        } else {
-          werrorfl (ilist->filename, ilist->lineno, E_TYPE_MISMATCH, "assignment", " ");
-          printFromToType(itype, type);
+      if (compareType(type, itype)==0)
+        {
+          // special case for literal strings
+          if (IS_ARRAY (itype) && IS_CHAR (getSpec(itype)) &&
+              // which are really code pointers
+              IS_CODEPTR(type))
+            {
+              // no sweat
+            }
+          else if (IS_CODEPTR(type) && IS_FUNC (type->next)) /* function pointer */
+            {
+              if (ilist)
+                werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
+              else
+                werror (E_INCOMPAT_TYPES);
+              printFromToType (itype, type->next);
+            }
+          else
+            {
+              werrorfl (ilist->filename, ilist->lineno, E_TYPE_MISMATCH, "assignment", " ");
+              printFromToType(itype, type);
+            }
         }
-      }
     }
 
   /* if this is a pointer */

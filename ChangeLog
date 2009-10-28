@@ -1,3 +1,14 @@
+2009-10-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(newIfxNode): fixed bug 2887512
+	  (decorateType, '='): use different error for function pointers
+	* src/SDCCglue.c(printIvalFuncPtr): fixed bug 1928022 and 2806238, don't
+	  throw away function pointer value just like that
+	  (printIval): use different error for function pointers
+	* src/SDCCsymt.c(compareFuncType, compareType): new function to compare
+	  function pointer types
+	  (isConstant): treat literals as constant too to warn before bug 2887512
+
 2009-10-26 Borut Razem <borut.razem AT siol.net>
 
 	* doc/cdbfileformat.lyx, doc/sdccman.lyx, doc/test_suite_spec.lyx:

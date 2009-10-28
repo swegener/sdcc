@@ -1277,33 +1277,33 @@ structElemType (sym_link * stype, value * id)
   sym_link *type, *etype;
   sym_link *petype = getSpec (stype);
 
-  if (fields && id) {
-
-    /* look for the id */
-    while (fields)
-      {
-        if (strcmp (fields->rname, id->name) == 0)
-          {
-            sym_link *t;
-            type = copyLinkChain (fields->type);
-            etype = getSpec (type);
-            SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
-                                 SPEC_SCLS (etype) : SPEC_SCLS (petype));
-            SPEC_OCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
-                                 SPEC_OCLS (etype) : SPEC_OCLS (petype));
-            /* find the first non-array link */
-            t = type;
-            while (IS_ARRAY (t))
-              t = t->next;
-            if (IS_SPEC (t))
-              SPEC_CONST (t) |= SPEC_CONST (stype);
-            else
-              DCL_PTR_CONST (t) |= SPEC_CONST (stype);
-            return type;
-          }
-        fields = fields->next;
-      }
-  }
+  if (fields && id)
+    {
+      /* look for the id */
+      while (fields)
+        {
+          if (strcmp (fields->rname, id->name) == 0)
+            {
+              sym_link *t;
+              type = copyLinkChain (fields->type);
+              etype = getSpec (type);
+              SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
+                                   SPEC_SCLS (etype) : SPEC_SCLS (petype));
+              SPEC_OCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
+                                   SPEC_OCLS (etype) : SPEC_OCLS (petype));
+              /* find the first non-array link */
+              t = type;
+              while (IS_ARRAY (t))
+                t = t->next;
+              if (IS_SPEC (t))
+                SPEC_CONST (t) |= SPEC_CONST (stype);
+              else
+                DCL_PTR_CONST (t) |= SPEC_CONST (stype);
+              return type;
+            }
+          fields = fields->next;
+        }
+    }
 
   werror (E_NOT_MEMBER, id->name);
 
@@ -1340,122 +1340,134 @@ compStructSize (int su, structdef * sdef)
 
   /* for the identifiers  */
   loop = sdef->fields;
-  while (loop) {
-
-    /* create the internal name for this variable */
-    SNPRINTF (loop->rname, sizeof(loop->rname), "_%s", loop->name);
-    if (su == UNION) {
-        sum = 0;
-        bitOffset = 0;
-    }
-    SPEC_VOLATILE (loop->etype) |= (su == UNION ? 1 : 0);
-
-    /* if this is a bit field  */
-    if (loop->bitVar) {
-
-      SPEC_BUNNAMED (loop->etype) = loop->bitUnnamed;
-
-      /* change it to a unsigned bit */
-      SPEC_NOUN (loop->etype) = V_BITFIELD;
-      /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
-      /* a "plain" int bitfield is unsigned */
-      if (!loop->etype->select.s.b_signed)
-        SPEC_USIGN(loop->etype) = 1;
-
-      if (loop->bitVar == BITVAR_PAD) {
-        /* A zero length bitfield forces padding */
-        SPEC_BLEN (loop->etype) = 0;
-        SPEC_BSTR (loop->etype) = bitOffset;
-        if (bitOffset > 0)
-          bitOffset = 8; /* padding is not needed when at bit 0 */
-        loop->offset = sum;
-      }
-      else {
-        SPEC_BLEN (loop->etype) = loop->bitVar;
-
-        if (bitOffset == 8) {
-          bitOffset = 0;
-          sum++;
-        }
-        /* check if this fit into the remaining   */
-        /* bits of this byte else align it to the */
-        /* next byte boundary                     */
-        if (loop->bitVar <= (8 - bitOffset)) {
-          /* fits into current byte */
-          loop->offset = sum;
-          SPEC_BSTR (loop->etype) = bitOffset;
-          bitOffset += loop->bitVar;
-        }
-        else if (!bitOffset) {
-          /* does not fit, but is already byte aligned */
-          loop->offset = sum;
-          SPEC_BSTR (loop->etype) = bitOffset;
-          bitOffset += loop->bitVar;
-        }
-        else {
-          if( TARGET_IS_PIC16 && getenv("PIC16_PACKED_BITFIELDS") ) {
-            /* if PIC16 && enviroment variable is set, then
-             * tightly pack bitfields, this means that when a
-             * bitfield goes beyond byte alignment, do not
-             * automatically start allocatint from next byte,
-             * but also use the available bits first */
-            fprintf(stderr, ": packing bitfields in structures\n");
-            SPEC_BSTR (loop->etype) = bitOffset;
-            bitOffset += loop->bitVar;
-            loop->offset = (su == UNION ? sum = 0 : sum);
-          } else {
-            /* does not fit; need to realign first */
-            sum++;
-            loop->offset = (su == UNION ? sum = 0 : sum);
-            bitOffset = 0;
-            SPEC_BSTR (loop->etype) = bitOffset;
-            bitOffset += loop->bitVar;
-          }
-        }
-        while (bitOffset>8) {
-          bitOffset -= 8;
-          sum++;
-        }
-      }
-    }
-    else {
-      /* This is a non-bit field. Make sure we are */
-      /* byte aligned first */
-      if (bitOffset) {
-        sum++;
-        loop->offset = (su == UNION ? sum = 0 : sum);
-        bitOffset = 0;
-      }
-      loop->offset = sum;
-      checkDecl (loop, 1);
-      sum += getSize (loop->type);
-
-      /* search for "flexible array members" */
-      /* and do some syntax checks */
-      if (   su == STRUCT
-          && checkStructFlexArray (loop, loop->type))
+  while (loop)
+    {
+      /* create the internal name for this variable */
+      SNPRINTF (loop->rname, sizeof(loop->rname), "_%s", loop->name);
+      if (su == UNION)
         {
-          /* found a "flexible array member" */
-          sdef->b_flexArrayMember = TRUE;
-          /* is another struct-member following? */
-          if (loop->next)
-            werror (E_FLEXARRAY_NOTATEND);
-          /* is it the first struct-member? */
-          else if (loop == sdef->fields)
-            werror (E_FLEXARRAY_INEMPTYSTRCT);
+          sum = 0;
+          bitOffset = 0;
+        }
+      SPEC_VOLATILE (loop->etype) |= (su == UNION ? 1 : 0);
+
+      /* if this is a bit field  */
+      if (loop->bitVar)
+        {
+          SPEC_BUNNAMED (loop->etype) = loop->bitUnnamed;
+
+          /* change it to a unsigned bit */
+          SPEC_NOUN (loop->etype) = V_BITFIELD;
+          /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
+          /* a "plain" int bitfield is unsigned */
+          if (!loop->etype->select.s.b_signed)
+            SPEC_USIGN(loop->etype) = 1;
+
+          if (loop->bitVar == BITVAR_PAD)
+            {
+              /* A zero length bitfield forces padding */
+              SPEC_BLEN (loop->etype) = 0;
+              SPEC_BSTR (loop->etype) = bitOffset;
+              if (bitOffset > 0)
+                bitOffset = 8; /* padding is not needed when at bit 0 */
+              loop->offset = sum;
+            }
+          else
+            {
+              SPEC_BLEN (loop->etype) = loop->bitVar;
+
+              if (bitOffset == 8)
+                {
+                  bitOffset = 0;
+                  sum++;
+                }
+              /* check if this fit into the remaining   */
+              /* bits of this byte else align it to the */
+              /* next byte boundary                     */
+              if (loop->bitVar <= (8 - bitOffset))
+                {
+                  /* fits into current byte */
+                  loop->offset = sum;
+                  SPEC_BSTR (loop->etype) = bitOffset;
+                  bitOffset += loop->bitVar;
+                }
+              else if (!bitOffset)
+                {
+                  /* does not fit, but is already byte aligned */
+                  loop->offset = sum;
+                  SPEC_BSTR (loop->etype) = bitOffset;
+                  bitOffset += loop->bitVar;
+                }
+              else
+                {
+                  if( TARGET_IS_PIC16 && getenv("PIC16_PACKED_BITFIELDS") )
+                    {
+                      /* if PIC16 && enviroment variable is set, then
+                       * tightly pack bitfields, this means that when a
+                       * bitfield goes beyond byte alignment, do not
+                       * automatically start allocatint from next byte,
+                       * but also use the available bits first */
+                      fprintf(stderr, ": packing bitfields in structures\n");
+                      SPEC_BSTR (loop->etype) = bitOffset;
+                      bitOffset += loop->bitVar;
+                      loop->offset = (su == UNION ? sum = 0 : sum);
+                    }
+                  else
+                    {
+                      /* does not fit; need to realign first */
+                      sum++;
+                      loop->offset = (su == UNION ? sum = 0 : sum);
+                      bitOffset = 0;
+                      SPEC_BSTR (loop->etype) = bitOffset;
+                      bitOffset += loop->bitVar;
+                    }
+                }
+              while (bitOffset>8)
+                {
+                  bitOffset -= 8;
+                  sum++;
+                }
+            }
+        }
+      else
+        {
+          /* This is a non-bit field. Make sure we are */
+          /* byte aligned first */
+          if (bitOffset)
+            {
+              sum++;
+              loop->offset = (su == UNION ? sum = 0 : sum);
+              bitOffset = 0;
+            }
+          loop->offset = sum;
+          checkDecl (loop, 1);
+          sum += getSize (loop->type);
+
+          /* search for "flexible array members" */
+          /* and do some syntax checks */
+          if (su == STRUCT && checkStructFlexArray (loop, loop->type))
+            {
+              /* found a "flexible array member" */
+              sdef->b_flexArrayMember = TRUE;
+              /* is another struct-member following? */
+              if (loop->next)
+                werror (E_FLEXARRAY_NOTATEND);
+              /* is it the first struct-member? */
+              else if (loop == sdef->fields)
+                werror (E_FLEXARRAY_INEMPTYSTRCT);
+            }
+        }
+
+      loop = loop->next;
+
+      /* if union then size = sizeof largest field */
+      if (su == UNION)
+        {
+          /* For UNION, round up after each field */
+          sum += ((bitOffset+7)/8);
+          usum = max (usum, sum);
         }
     }
-
-    loop = loop->next;
-
-    /* if union then size = sizeof largest field */
-    if (su == UNION)
-      {
-        /* For UNION, round up after each field */
-        sum += ((bitOffset+7)/8);
-        usum = max (usum, sum);
-      }
-  }
 
   /* For STRUCT, round up after all fields processed */
   if (su != UNION)
@@ -1765,7 +1777,6 @@ changePointer (sym_link * p)
 int
 checkDecl (symbol * sym, int isProto)
 {
-
   checkSClass (sym, isProto);        /* check the storage class     */
   changePointer (sym->type);         /* change pointers if required */
 
@@ -2119,6 +2130,84 @@ computeType (sym_link * type1, sym_link * type2,
   return rType;
 }
 
+/*------------------------------------------------------------------*/
+/* compareFuncType - compare function prototypes                    */
+/*------------------------------------------------------------------*/
+int
+compareFuncType (sym_link * dest, sym_link * src)
+{
+  value *exargs, *acargs;
+  value *checkValue;
+  int argCnt = 0;
+
+  /* if not type then some kind of error */
+  if (!dest || !src)
+    return 0;
+
+  /* check the return value type   */
+  if (compareType (dest->next, src->next) <= 0)
+    return 0;
+
+  /* Really, reentrant should match regardless of argCnt, but     */
+  /* this breaks some existing code (the fp lib functions). If    */
+  /* the first argument is always passed the same way, this       */
+  /* lax checking is ok (but may not be true for in future ports) */
+  if (IFFUNC_ISREENT (dest) != IFFUNC_ISREENT (src)
+      && argCnt>1)
+    {
+      //printf("argCnt = %d\n",argCnt);
+      return 0;
+    }
+
+  if (IFFUNC_ISWPARAM (dest) != IFFUNC_ISWPARAM (src))
+    {
+      return 0;
+    }
+
+  if (IFFUNC_ISSHADOWREGS (dest) != IFFUNC_ISSHADOWREGS (src))
+    {
+      return 0;
+    }
+
+  /* compare expected args with actual args */
+  exargs = FUNC_ARGS(dest);
+  acargs = FUNC_ARGS(src);
+
+  /* for all the expected args do */
+  for (argCnt = 1;
+       exargs && acargs;
+       exargs = exargs->next, acargs = acargs->next, argCnt++)
+    {
+      /* If the actual argument is an array, any prototype
+       * will have modified it to a pointer. Duplicate that
+       * change here.
+       */
+      if (IS_AGGREGATE (acargs->type))
+        {
+          checkValue = copyValue (acargs);
+          aggregateToPointer (checkValue);
+        }
+      else
+        {
+          checkValue = acargs;
+        }
+
+      if (compareType (exargs->type, checkValue->type) <= 0)
+        {
+          return 0;
+        }
+    }
+
+  /* if one them ended we have a problem */
+  if ((exargs && !acargs && !IS_VOID (exargs->type)) ||
+      (!exargs && acargs && !IS_VOID (acargs->type)))
+    {
+      return 0;
+    }
+
+  return 1;
+}
+
 int
 comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
 {
@@ -2173,7 +2262,7 @@ compareType (sym_link * dest, sym_link * src)
             {
               if (IS_FUNC(src))
                 {
-                  //checkFunction(src,dest);
+                  return compareFuncType(dest, src);
                 }
               return comparePtrType(dest, src, FALSE);
             }
@@ -2524,6 +2613,7 @@ aggregateToPointer (value * val)
     }
   return val;
 }
+
 /*------------------------------------------------------------------*/
 /* checkFunction - does all kinds of check on a function            */
 /*------------------------------------------------------------------*/
@@ -2552,7 +2642,7 @@ checkFunction (symbol * sym, symbol *csym)
     }
 
   /* make sure the type is complete and sane */
-  checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
+  checkTypeSanity(sym->etype, sym->name);
 
   /* if not type then some kind of error */
   if (!sym->type)
@@ -2571,42 +2661,47 @@ checkFunction (symbol * sym, symbol *csym)
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-  FUNC_CALLEESAVES(sym->type) = inCalleeSaveList (sym->name);
+  FUNC_CALLEESAVES (sym->type) = inCalleeSaveList (sym->name);
 
   /* if interrupt service routine  */
   /* then it cannot have arguments */
-  if (IFFUNC_ARGS(sym->type) && FUNC_ISISR (sym->type))
+  if (IFFUNC_ARGS (sym->type) && FUNC_ISISR (sym->type))
     {
-      if (!IS_VOID(FUNC_ARGS(sym->type)->type)) {
-        werror (E_INT_ARGS, sym->name);
-        FUNC_ARGS(sym->type)=NULL;
-      }
+      if (!IS_VOID (FUNC_ARGS (sym->type)->type))
+        {
+          werror (E_INT_ARGS, sym->name);
+          FUNC_ARGS (sym->type)=NULL;
+        }
     }
 
-  if (IFFUNC_ISSHADOWREGS(sym->type) && !FUNC_ISISR (sym->type))
+  if (IFFUNC_ISSHADOWREGS (sym->type) && !FUNC_ISISR (sym->type))
     {
       werror (E_SHADOWREGS_NO_ISR, sym->name);
     }
 
-  for (argCnt=1, acargs = FUNC_ARGS(sym->type);
+  for (argCnt=1, acargs = FUNC_ARGS (sym->type);
        acargs;
-       acargs=acargs->next, argCnt++) {
-    if (!acargs->sym) {
-      // this can happen for reentrant functions
-      werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
-      // the show must go on: synthesize a name and symbol
-      SNPRINTF (acargs->name, sizeof(acargs->name), "_%s_PARM_%d", sym->name, argCnt);
-      acargs->sym = newSymbol (acargs->name, 1);
-      SPEC_OCLS (acargs->etype) = istack;
-      acargs->sym->type = copyLinkChain (acargs->type);
-      acargs->sym->etype = getSpec (acargs->sym->type);
-      acargs->sym->_isparm = 1;
-      strncpyz (acargs->sym->rname, acargs->name, sizeof(acargs->sym->rname));
-    } else if (strcmp(acargs->sym->name, acargs->sym->rname)==0) {
-      // synthesized name
-      werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
+       acargs=acargs->next, argCnt++)
+    {
+      if (!acargs->sym)
+        {
+          // this can happen for reentrant functions
+          werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
+          // the show must go on: synthesize a name and symbol
+          SNPRINTF (acargs->name, sizeof(acargs->name), "_%s_PARM_%d", sym->name, argCnt);
+          acargs->sym = newSymbol (acargs->name, 1);
+          SPEC_OCLS (acargs->etype) = istack;
+          acargs->sym->type = copyLinkChain (acargs->type);
+          acargs->sym->etype = getSpec (acargs->sym->type);
+          acargs->sym->_isparm = 1;
+          strncpyz (acargs->sym->rname, acargs->name, sizeof(acargs->sym->rname));
+        }
+      else if (strcmp(acargs->sym->name, acargs->sym->rname)==0)
+        {
+          // synthesized name
+          werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
+        }
     }
-  }
   argCnt--;
 
   /*JCF: Mark the register bank as used*/
@@ -2616,7 +2711,7 @@ checkFunction (symbol * sym, symbol *csym)
     return 1;                   /* not defined nothing more to check  */
 
   /* check if body already present */
-  if (csym && IFFUNC_HASBODY(csym->type))
+  if (csym && IFFUNC_HASBODY (csym->type))
     {
       werror (E_FUNC_BODY, sym->name);
       return 0;
@@ -2672,8 +2767,8 @@ checkFunction (symbol * sym, symbol *csym)
     }
 
   /* compare expected args with actual args */
-  exargs = FUNC_ARGS(csym->type);
-  acargs = FUNC_ARGS(sym->type);
+  exargs = FUNC_ARGS (csym->type);
+  acargs = FUNC_ARGS (sym->type);
 
   /* for all the expected args do */
   for (argCnt = 1;
@@ -2718,8 +2813,7 @@ checkFunction (symbol * sym, symbol *csym)
   deleteSym (SymbolTab, csym, csym->name);
   deleteFromSeg(csym);
   addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
-  if (IS_EXTERN (csym->etype) && !
-      IS_EXTERN (sym->etype))
+  if (IS_EXTERN (csym->etype) && !IS_EXTERN (sym->etype))
     {
       addSet (&publics, sym);
     }
@@ -3868,7 +3962,7 @@ isConstant (sym_link * type)
     type = type->next;
 
   if (IS_SPEC (type))
-    return SPEC_CONST (type);
+    return SPEC_CONST (type) || IS_LITERAL (type);
   else
     return DCL_PTR_CONST (type);
 }

@@ -2,8 +2,8 @@
 
 	* src/SDCCast.c(newIfxNode): fixed bug 2887512
 	  (decorateType, '='): use different error for function pointers
-	* src/SDCCglue.c(printIvalFuncPtr): fixed bug 1928022 and 2806238, don't
-	  throw away function pointer value just like that
+	* src/SDCCglue.c(printIvalFuncPtr): fixed bug 2806238, don't throw away
+	  function pointer value just like that
 	  (printIval): use different error for function pointers
 	* src/SDCCsymt.c(compareFuncType, compareType): new function to compare
 	  function pointer types

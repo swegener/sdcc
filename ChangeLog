@@ -1,3 +1,11 @@
+2009-10-30 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/P89LPC922.h, device/include/mcs51/P89LPC932.h,
+	  device/include/mcs51/p89lpc938.h: fixed bug 2889428, double definition
+	  for CMP1 and CMP2.
+	* device/include/mcs51/p89lpc925.h: for consistency with the other lpc
+	  files, renamed CMP1b and CMP2b to CMP_1 and CMP_2.
+
 2009-10-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c(newIfxNode): fixed bug 2887512

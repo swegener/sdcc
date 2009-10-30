@@ -252,13 +252,13 @@ SFR(P0, 0x80); // Port 0
    SBIT(P0_0, 0x80, 0);
    //P0 alternate pin functions
    SBIT(T1,     0x80, 7);
-   SBIT(CMP1b,  0x80, 6); //Should be CMP1 but there is SFR with that name
+   SBIT(CMP_1,  0x80, 6); //Should be CMP1 but there is SFR with that name
    SBIT(CMPREF, 0x80, 5);
    SBIT(CIN1A,  0x80, 4);
    SBIT(CIN1B,  0x80, 3);
    SBIT(CIN2A,  0x80, 2);
    SBIT(CIN2B,  0x80, 1);
-   SBIT(CMP2b,  0x80, 0); //Should be CMP2 but there is SFR with that name
+   SBIT(CMP_2,  0x80, 0); //Should be CMP2 but there is SFR with that name
    //More P0 alternate pin functions
    SBIT(KB7, 0x80, 7);
    SBIT(KB6, 0x80, 6);

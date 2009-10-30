@@ -184,7 +184,7 @@ __sbit __at (0x84) P0_4;
 __sbit __at (0x85) P0_5;
 __sbit __at (0x86) P0_6;
 __sbit __at (0x87) P0_7;
-/*#define CMP2   P0_0*/ /* Removed:  Name conflicts with SFR 0xAD */
+#define CMP_2  P0_0 /* Renamed:  Name conflicts with SFR 0xAD */
 #define KB0    P0_0
 #define CIN2B  P0_1
 #define KB1    P0_1
@@ -196,7 +196,7 @@ __sbit __at (0x87) P0_7;
 #define KB4    P0_4
 #define CMPREF P0_5
 #define KB5    P0_5
-/*#define CMP1   P0_6*/ /* Removed:  Name conflicts with SFR 0xAC */
+#define CMP_1  P0_6 /* Renamed:  Name conflicts with SFR 0xAC */
 #define KB6    P0_6
 #define T1     P0_7
 #define KB7    P0_7

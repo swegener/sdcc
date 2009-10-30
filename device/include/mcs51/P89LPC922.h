@@ -241,15 +241,15 @@ __sbit __at (0x87) P0_7    ;
 
 #define	KB7   P0_7   // alternatively "T1"
 #define T1    P0_7
-#define KB6   P0_6   // alternatively "CMP1"
-#define CMP1  P0_6
+#define KB6   P0_6   // alternatively "CMP_1"
+#define CMP_1 P0_6
 #define KB5   P0_5
 #define KB4   P0_4
 #define KB3   P0_3
 #define KB2   P0_2
 #define KB1   P0_1
-#define KB0   P0_0   // alternatively "CMP2"
-#define CMP2  P0_0
+#define KB0   P0_0   // alternatively "CMP_2"
+#define CMP_2 P0_0
 
 /*  P1  */
 __sbit __at (0x90) P1_0    ;

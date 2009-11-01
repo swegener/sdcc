@@ -1141,20 +1141,21 @@ addSymChain (symbol ** symHead)
   symbol *csym = NULL;
   symbol **symPtrPtr;
   int error = 0;
+  int elemsFromIval = 0;
 
   for (; sym != NULL; sym = sym->next)
     {
       changePointer(sym->type);
       checkTypeSanity(sym->etype, sym->name);
 
-      if (!sym->level && !(IS_SPEC(sym->etype) && IS_TYPEDEF(sym->etype)))
-        checkDecl (sym, 0);
+      if (!sym->level && !(IS_SPEC (sym->etype) && IS_TYPEDEF (sym->etype)))
+        elemsFromIval = checkDecl (sym, 0);
       else
         {
           /* if this is an array without any dimension
              then update the dimension from the initial value */
           if (IS_ARRAY (sym->type) && !DCL_ELEM (sym->type))
-            DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
+            elemsFromIval = DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
         }
 
       /* if already exists in the symbol table on the same level */
@@ -1171,11 +1172,12 @@ addSymChain (symbol ** symHead)
               /* If the previous definition was for an array with incomplete
                  type, and the new definition has completed the type, update
                  the original type to match */
-              if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==ARRAY
-                  && IS_DECL(sym->type) && DCL_TYPE(sym->type)==ARRAY)
+              if (IS_ARRAY (csym->type) && IS_ARRAY (sym->type))
                 {
-                  if (!DCL_ELEM(csym->type) && DCL_ELEM(sym->type))
-                    DCL_ELEM(csym->type) = DCL_ELEM(sym->type);
+                  if (!DCL_ELEM (csym->type) && DCL_ELEM (sym->type))
+                    DCL_ELEM (csym->type) = DCL_ELEM (sym->type);
+                  if ((DCL_ELEM (csym->type) > DCL_ELEM (sym->type)) && elemsFromIval)
+                    DCL_ELEM (sym->type) = DCL_ELEM (csym->type);
                 }
 
               #if 0
@@ -1782,7 +1784,7 @@ checkDecl (symbol * sym, int isProto)
   /* if this is an array without any dimension
      then update the dimension from the initial value */
   if (IS_ARRAY (sym->type) && !DCL_ELEM (sym->type))
-    DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
+    return DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
 
   return 0;
 }

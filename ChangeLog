@@ -1,5 +1,10 @@
 2009-11-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCsymt.c(addSymChain, checkDecl): fixed bug 1470790
+	* support/regression/tests/zeropad.c: added test
+
+2009-11-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/SDCCast.c(decorateType,CAST): fold literal pointers
 	* src/SDCCdflow.c(usedInRemaining),
 	* src/SDCCicode.c(geniCodeCall): fix for non-symbol values

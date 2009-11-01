@@ -28,6 +28,10 @@ typedef unsigned int size_t;
 #if defined (STORAGE_auto)
   void Zeropad(void)
   {
+#else
+  extern char STORAGE bug1470790[3];
+         char STORAGE bug1470790[] = {1, };
+
 #endif //STORAGE_auto
 
 const char *string1 = "\x00\x01";
@@ -89,6 +93,8 @@ struct z STORAGE funcptrstruct = {
 #if !defined (STORAGE_auto)
 void Zeropad(void)
 {
+  ASSERT(bug1470790[0] == 1);
+  ASSERT(bug1470790[1] == 0);
 #endif //STORAGE_auto
 
   ASSERT(string1[0] == '\x00');

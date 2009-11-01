@@ -1,5 +1,5 @@
 /*
-	bug 1928022
+	bug 1928022 & 1503239
 */
 
 // the following "C"
@@ -18,6 +18,7 @@
 #include <testfwk.h>
 
 struct st_a {
+	char b;
 	char a[2];
 	struct { char c; } s;
 };
@@ -37,7 +38,21 @@ char cmp(void *a, void *b)
 void
 testBug(void)
 {
-	ASSERT( cmp(Ptr_a1, (char xdata *) 0x1234) );
-	ASSERT( cmp(Ptr_a2, (char xdata *) 0x1235) );
-	ASSERT( cmp(Ptr_c1, (char xdata *) 0x1236) );
+	ASSERT( cmp(Ptr_a1, (char xdata *) 0x1235) );
+	ASSERT( cmp(Ptr_a2, (char xdata *) 0x1236) );
+	ASSERT( cmp(Ptr_c1, (char xdata *) 0x1237) );
 }
+
+// bug 1503239
+struct st_a foo;
+
+const char * code bob = &foo.b; // validateLink failed
+
+char * Ptr1 = &(foo.a[0]); // this works
+char * Ptr2 = foo.a; // caused internal compiler error
+
+char * code Ptr3 = &(foo.a[0]);
+char * code Ptr4 = foo.a; // compile error 129: pointer types incompatible
+
+char * const Ptr5 = &(foo.a[0]);
+char * const Ptr6 = foo.a; // compile error 129: pointer types incompatible

@@ -443,6 +443,21 @@ initValPointer (ast *expr)
       val->etype = getSpec (val->type);
       return val;
     }
+
+  /* if structure element then
+     case 5. a.b ; */
+  if (IS_AST_OP (expr) && expr->opval.op == '.')
+    {
+      return valForStructElem (expr->left, expr->right);
+    }
+
+  /* case 6. a->b ;
+     some_struct->element */
+  if (IS_AST_OP (expr) && expr->opval.op == PTR_OP)
+    {
+      return valForStructElem (expr->left->left, expr->right);
+    }
+
   return NULL;
 }
 
@@ -1166,10 +1181,11 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
       return;
 
   /* check the type      */
-  if (compareType (type, val->type) == 0) {
-    werrorfl (ilist->filename, ilist->lineno, W_INIT_WRONG);
-    printFromToType (val->type, type);
-  }
+  if (compareType (type, val->type) == 0)
+    {
+      werrorfl (ilist->filename, ilist->lineno, W_INIT_WRONG);
+      printFromToType (val->type, type);
+    }
 
   /* if val is literal */
   if (IS_LITERAL (val->etype))
@@ -1190,15 +1206,9 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
         case 3: // how about '390??
           dbuf_printf (oBuf, "; generic printIvalPtr\n");
           if (port->little_endian)
-            {
-              dbuf_printf (oBuf, "\t.byte %s,%s",
-                       aopLiteral (val, 0), aopLiteral (val, 1));
-            }
+            dbuf_printf (oBuf, "\t.byte %s,%s", aopLiteral (val, 0), aopLiteral (val, 1));
           else
-            {
-              dbuf_printf (oBuf, "\t.byte %s,%s",
-                       aopLiteral (val, 1), aopLiteral (val, 0));
-            }
+            dbuf_printf (oBuf, "\t.byte %s,%s", aopLiteral (val, 1), aopLiteral (val, 0));
           if (IS_GENPTR (val->type))
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
           else if (IS_PTR (val->type))
@@ -1217,11 +1227,10 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
     }
   else if (size == FPTRSIZE)
     {
-      if (port->use_dw_for_init) {
+      if (port->use_dw_for_init)
         dbuf_tprintf (oBuf, "\t!dws\n", val->name);
-      } else {
+      else
         printPointerType (oBuf, val->name);
-      }
     }
   else if (size == GPTRSIZE)
     {
@@ -1346,9 +1355,7 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
               emitDebugSym (oBuf, sym);
               dbuf_printf (oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
             }
-          dbuf_printf (oBuf, "%s\t=\t0x%04x\n",
-                   sym->rname,
-                   SPEC_ADDR (sym->etype));
+          dbuf_printf (oBuf, "%s\t=\t0x%04x\n", sym->rname, SPEC_ADDR (sym->etype));
         }
       else
         {
@@ -1373,17 +1380,20 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
                  WE don't need it anymore */
               if (IS_ARRAY(sym->type) && IS_CHAR(sym->type->next) &&
                   IS_AST_SYM_VALUE(list2expr(sym->ival)) &&
-                  list2val(sym->ival)->sym->isstrlit) {
-                freeStringSymbol(list2val(sym->ival)->sym);
-              }
+                  list2val(sym->ival)->sym->isstrlit)
+                {
+                  freeStringSymbol(list2val(sym->ival)->sym);
+                }
             }
-          else {
+          else
+            {
               /* allocate space */
               int size = getSize (sym->type);
 
-              if (size==0) {
+              if (size==0)
+                {
                   werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE,sym->name);
-              }
+                }
               if (options.debug)
                 {
                   emitDebugSym (oBuf, sym);
@@ -1393,11 +1403,13 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
               /* special case for character strings */
               if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
                   SPEC_CVAL (sym->etype).v_char)
-                  printChar (oBuf,
-                             SPEC_CVAL (sym->etype).v_char,
-                             size);
+                {
+                  printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
+                }
               else
+                {
                   dbuf_tprintf (oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
+                }
             }
         }
     }

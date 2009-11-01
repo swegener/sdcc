@@ -1611,8 +1611,7 @@ constExprValue (ast * cexpr, int check)
         }
 
       /* if we are casting a literal value then */
-      if (IS_AST_OP (cexpr) &&
-          cexpr->opval.op == CAST &&
+      if (IS_CAST_OP (cexpr) &&
           IS_LITERAL (cexpr->right->ftype))
         {
           return valCastLiteral (cexpr->ftype,
@@ -4075,6 +4074,34 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               TETYPE (tree) = getSpec (TTYPE (tree));
               return tree;
             }
+          else
+            {
+              unsigned long gpVal = 0;
+
+              if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
+                {
+                  if (resultType != RESULT_TYPE_GPTR)
+                    {
+                      DCL_TYPE (LTYPE (tree)) = DCL_TYPE (RTYPE (tree));
+                    }
+                  else
+                    {
+                      gpVal = pointerTypeToGPByte (DCL_TYPE (RTYPE (tree)), NULL, NULL);
+                      gpVal <<= getSize (RTYPE (tree)) * 8;
+                      gpVal &= (1 << (getSize (LTYPE (tree)) * 8)) - 1;
+                    }
+                }
+              LRVAL (tree) = 1;
+              tree->type = EX_VALUE;
+              tree->opval.val =
+                valCastLiteral (LTYPE (tree), gpVal | ulFromVal (valFromType (RTYPE (tree))));
+              TTYPE (tree) = tree->opval.val->type;
+              tree->left = NULL;
+              tree->right = NULL;
+              tree->values.literalFromCast = 1;
+              TETYPE (tree) = getSpec (TTYPE (tree));
+              return tree;
+            }
         }
       if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
         {
@@ -5565,7 +5592,7 @@ optimizeGetByte (ast * tree, RESULT_TYPE resultType)
         {
           i = AST_ULONG_VALUE (tree->right);
           count = tree->right;
-            expr = tree->left;
+          expr = tree->left;
         }
     }
   if (!expr || (i == 0) || (i % 8) || (i >= getSize (TTYPE (expr)) * 8))
@@ -5604,7 +5631,7 @@ optimizeGetWord (ast * tree, RESULT_TYPE resultType)
         {
           i = AST_ULONG_VALUE (tree->right);
           count = tree->right;
-            expr = tree->left;
+          expr = tree->left;
         }
     }
   if (!expr || (i == 0) || (i % 8) || (i >= (getSize (TTYPE (expr))-1) * 8))

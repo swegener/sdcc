@@ -1756,7 +1756,6 @@ checkSClass (symbol * sym, int isProto)
 void
 changePointer (sym_link * p)
 {
-
   /* go thru the chain of declarations   */
   /* if we find a pointer to a function  */
   /* change it to a ptr to code area     */
@@ -3962,7 +3961,7 @@ isConstant (sym_link * type)
     type = type->next;
 
   if (IS_SPEC (type))
-    return SPEC_CONST (type) || IS_LITERAL (type);
+    return SPEC_CONST (type);
   else
     return DCL_PTR_CONST (type);
 }

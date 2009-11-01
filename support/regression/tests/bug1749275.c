@@ -8,7 +8,7 @@ xdata char baz;
 
 // no need to call this, it generates compiler error:
 //   Internal error: validateOpType failed in
-//   OP_SYM_TYPE(IC_LEFT(pl->ic)) @ peep\.c:226:
+//   OP_SYM_TYPE(IC_LEFT(pl->ic)) @ peep.c:226:
 //   expected symbol, got value
 void foo(void)
 {

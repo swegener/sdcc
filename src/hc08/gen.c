@@ -2685,12 +2685,14 @@ static void
 genCall (iCode * ic)
 {
   sym_link *dtype;
+  sym_link *etype;
 //  bool restoreBank = FALSE;
 //  bool swapBanks = FALSE;
 
-  D(emitcode(";     genCall",""));
+  D (emitcode (";", "genCall"));
 
   dtype = operandType (IC_LEFT (ic));
+  etype = getSpec(dtype);
   /* if send set is not empty then assign */
   if (_G.sendSet)
     {
@@ -2699,7 +2701,6 @@ genCall (iCode * ic)
         } else {
             genSend(_G.sendSet);
         }
-
       _G.sendSet = NULL;
     }
 
@@ -2707,12 +2708,17 @@ genCall (iCode * ic)
   if (!ic->regsSaved)
       saveRegisters (ic);
 
-
   /* make the call */
-  emitcode ("jsr", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-                          OP_SYMBOL (IC_LEFT (ic))->rname :
-                          OP_SYMBOL (IC_LEFT (ic))->name));
-
+  if (IS_LITERAL (etype))
+    {
+      emitcode ("jsr", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+    }
+  else
+    {
+      emitcode ("jsr", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                              OP_SYMBOL (IC_LEFT (ic))->rname :
+                              OP_SYMBOL (IC_LEFT (ic))->name));
+    }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
@@ -2721,7 +2727,6 @@ genCall (iCode * ic)
         OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
-
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
@@ -2731,8 +2736,7 @@ genCall (iCode * ic)
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }
 
-  /* adjust the stack for parameters if
-     required */
+  /* adjust the stack for parameters if required */
   if (ic->parmBytes)
     {
       pullNull (ic->parmBytes);
@@ -2741,11 +2745,10 @@ genCall (iCode * ic)
   /* if we had saved some registers then unsave them */
   if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
     unsaveRegisters (ic);
-
 }
 
 /*-----------------------------------------------------------------*/
-/* -10l - generates a call by pointer statement                */
+/* genPcall - generates a call by pointer statement                */
 /*-----------------------------------------------------------------*/
 static void
 genPcall (iCode * ic)
@@ -2758,6 +2761,7 @@ genPcall (iCode * ic)
 
   D (emitcode (";", "genPcall"));
 
+  dtype = operandType (IC_LEFT (ic))->next;
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);
@@ -2765,7 +2769,6 @@ genPcall (iCode * ic)
   /* if we are calling a not _naked function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
-  dtype = operandType (IC_LEFT (ic))->next;
 
   /* push the return address on to the stack */
   emitBranch ("bsr", tlbl);
@@ -2784,14 +2787,12 @@ genPcall (iCode * ic)
         _G.sendSet = NULL;
     }
 
-
   /* make the call */
   emitcode ("rts", "");
 
   emitLabel (rlbl);
   _G.stackPushes -= 4; /* account for rts here & in called function */
   updateCFA();
-
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
@@ -2809,16 +2810,14 @@ genPcall (iCode * ic)
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }
 
-  /* adjust the stack for parameters if
-     required */
+  /* adjust the stack for parameters if required */
   if (ic->parmBytes)
     {
       pullNull (ic->parmBytes);
     }
 
-  /* if we hade saved some registers then
-     unsave them */
-  if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
+  /* if we had saved some registers then unsave them */
+  if (ic->regsSaved && !IFFUNC_CALLEESAVES (dtype))
     unsaveRegisters (ic);
 }
 

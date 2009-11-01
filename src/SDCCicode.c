@@ -3476,18 +3476,18 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   int stack = 0;
   int iArg = 0;
 
-  if (!IS_FUNC(OP_SYMBOL(left)->type) &&
-      !IS_FUNCPTR(OP_SYMBOL(left)->type)) {
-    werror (E_FUNCTION_EXPECTED);
-    return operandFromValue(valueFromLit(0));
-  }
+  ftype = operandType (left);
+  if (!IS_FUNC(ftype) && !IS_FUNCPTR(ftype))
+    {
+      werror (E_FUNCTION_EXPECTED);
+      return operandFromValue(valueFromLit(0));
+    }
 
   /* take care of parameters with side-effecting
      function calls in them, this is required to take care
      of overlaying function parameters */
   geniCodeSEParms (parms, lvl);
 
-  ftype = operandType (left);
   if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
 
@@ -4537,18 +4537,18 @@ ast2iCode (ast * tree, int lvl)
       return geniCodeRValue (right, FALSE);
 
     case CALL:
-      return geniCodeCall (ast2iCode (tree->left,lvl+1),
-                           tree->right,lvl);
+      return geniCodeCall (ast2iCode (tree->left, lvl+1),
+                           tree->right, lvl);
     case LABEL:
-      geniCodeLabel (ast2iCode (tree->left,lvl+1)->operand.symOperand);
-      return ast2iCode (tree->right,lvl+1);
+      geniCodeLabel (ast2iCode (tree->left, lvl+1)->operand.symOperand);
+      return ast2iCode (tree->right, lvl+1);
 
     case GOTO:
-      geniCodeGoto (ast2iCode (tree->left,lvl+1)->operand.symOperand);
-      return ast2iCode (tree->right,lvl+1);
+      geniCodeGoto (ast2iCode (tree->left, lvl+1)->operand.symOperand);
+      return ast2iCode (tree->right, lvl+1);
 
     case FUNCTION:
-      geniCodeFunctionBody (tree,lvl);
+      geniCodeFunctionBody (tree, lvl);
       return NULL;
 
     case RETURN:
@@ -4556,11 +4556,11 @@ ast2iCode (ast * tree, int lvl)
       return NULL;
 
     case IFX:
-      geniCodeIfx (tree,lvl);
+      geniCodeIfx (tree, lvl);
       return NULL;
 
     case SWITCH:
-      geniCodeSwitch (tree,lvl);
+      geniCodeSwitch (tree, lvl);
       return NULL;
 
     case INLINEASM:
@@ -4568,7 +4568,7 @@ ast2iCode (ast * tree, int lvl)
       return NULL;
 
     case ARRAYINIT:
-        geniCodeArrayInit(tree, ast2iCode (tree->left,lvl+1));
+        geniCodeArrayInit(tree, ast2iCode (tree->left, lvl+1));
         return NULL;
 
     case CRITICAL:

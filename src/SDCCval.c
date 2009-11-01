@@ -662,6 +662,7 @@ constFloatVal (const char *s)
   val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = V_FLOAT;
   SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CONST (val->type) = 1;
   SPEC_CVAL (val->type).v_float = sval;
 
   return val;
@@ -687,6 +688,7 @@ constFixed16x16Val (const char *s)
   val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = V_FLOAT;
   SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CONST (val->type) = 1;
   SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble ( sval );
 
   return val;
@@ -706,6 +708,7 @@ value *constVal (const char *s)
 
   val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
   SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CONST (val->type) = 1;
   /* let's start with a signed char */
   SPEC_NOUN (val->type) = V_CHAR;
   SPEC_USIGN (val->type) = 0;
@@ -840,6 +843,7 @@ value *constCharVal (unsigned char v)
 
   val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
   SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CONST (val->type) = 1;
 
   SPEC_NOUN (val->type) = V_CHAR;
 
@@ -872,6 +876,7 @@ strVal (const char *s)
   val->type->next = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_SCLS (val->etype) = S_LITERAL;
+  SPEC_CONST (val->etype) = 1;
 
   SPEC_CVAL (val->etype).v_char = Safe_alloc (strlen (s) + 1);
   DCL_ELEM (val->type) = copyStr (SPEC_CVAL (val->etype).v_char, s);
@@ -908,7 +913,7 @@ reverseValWithType (value * val)
 }
 
 /*------------------------------------------------------------------*/
-/* reverseVal - reverses the values for a value  chain        */
+/* reverseVal - reverses the values for a value chain               */
 /*------------------------------------------------------------------*/
 value *
 reverseVal (value * val)
@@ -1929,8 +1934,8 @@ value *
 valForArray (ast * arrExpr)
 {
   value *val, *lval = NULL;
-  char buffer[128];
   int size = getSize (arrExpr->left->ftype->next);
+
   /* if the right or left is an array
      resolve it first */
   if (IS_AST_OP (arrExpr->left))
@@ -1938,15 +1943,16 @@ valForArray (ast * arrExpr)
       if (arrExpr->left->opval.op == '[')
         lval = valForArray (arrExpr->left);
       else if (arrExpr->left->opval.op == '.')
-        lval = valForStructElem (arrExpr->left->left,
-                                 arrExpr->left->right);
-      else if (arrExpr->left->opval.op == PTR_OP &&
-               IS_ADDRESS_OF_OP (arrExpr->left->left))
-        lval = valForStructElem (arrExpr->left->left->left,
-                                 arrExpr->left->right);
+        lval = valForStructElem (arrExpr->left->left, arrExpr->left->right);
+      else if (arrExpr->left->opval.op == PTR_OP)
+        {
+          if (IS_ADDRESS_OF_OP (arrExpr->left->left))
+            lval = valForStructElem (arrExpr->left->left->left, arrExpr->left->right);
+          else if (IS_AST_VALUE (arrExpr->left->left) && IS_PTR (arrExpr->left->left->ftype))
+            lval = valForStructElem (arrExpr->left->left, arrExpr->left->right);
+        }
       else
         return NULL;
-
     }
   else if (!IS_AST_SYM_VALUE (arrExpr->left))
     return NULL;
@@ -1955,31 +1961,39 @@ valForArray (ast * arrExpr)
     return NULL;
 
   val = newValue ();
-  if (!lval)
-    {
-        SNPRINTF (buffer, sizeof(buffer), "%s", AST_SYMBOL (arrExpr->left)->rname);
-    }
-  else
-    {
-        SNPRINTF (buffer, sizeof(buffer), "%s", lval->name);
-    }
-
-  SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
-           AST_ULONG_VALUE (arrExpr->right) * size);
-
   val->type = newLink (DECLARATOR);
-  if (SPEC_SCLS (arrExpr->left->etype) == S_CODE)
-    DCL_TYPE (val->type) = CPOINTER;
-  else if (SPEC_SCLS (arrExpr->left->etype) == S_XDATA)
-    DCL_TYPE (val->type) = FPOINTER;
-  else if (SPEC_SCLS (arrExpr->left->etype) == S_XSTACK)
-    DCL_TYPE (val->type) = PPOINTER;
-  else if (SPEC_SCLS (arrExpr->left->etype) == S_IDATA)
-    DCL_TYPE (val->type) = IPOINTER;
-  else if (SPEC_SCLS (arrExpr->left->etype) == S_EEPROM)
-    DCL_TYPE (val->type) = EEPPOINTER;
+  if (IS_AST_LIT_VALUE (arrExpr->left) && IS_PTR (arrExpr->left->ftype))
+    {
+      SNPRINTF (val->name, sizeof(val->name), "0x%X",
+                AST_ULONG_VALUE (arrExpr->left) + AST_ULONG_VALUE (arrExpr->right) * size);
+      memcpy (val->type, arrExpr->left->ftype, sizeof(sym_link));
+    }
+  else if (lval)
+    {
+      SNPRINTF (val->name, sizeof(val->name), "(%s + %d)",
+                lval->name,
+                AST_ULONG_VALUE (arrExpr->right) * size);
+      memcpy (val->type, lval->type, sizeof(sym_link));
+    }
   else
-    DCL_TYPE (val->type) = POINTER;
+    {
+      SNPRINTF (val->name, sizeof(val->name), "(%s + %d)",
+                AST_SYMBOL (arrExpr->left)->rname,
+                AST_ULONG_VALUE (arrExpr->right) * size);
+      if (SPEC_SCLS (arrExpr->left->etype) == S_CODE)
+        DCL_TYPE (val->type) = CPOINTER;
+      else if (SPEC_SCLS (arrExpr->left->etype) == S_XDATA)
+        DCL_TYPE (val->type) = FPOINTER;
+      else if (SPEC_SCLS (arrExpr->left->etype) == S_XSTACK)
+        DCL_TYPE (val->type) = PPOINTER;
+      else if (SPEC_SCLS (arrExpr->left->etype) == S_IDATA)
+        DCL_TYPE (val->type) = IPOINTER;
+      else if (SPEC_SCLS (arrExpr->left->etype) == S_EEPROM)
+        DCL_TYPE (val->type) = EEPPOINTER;
+      else
+        DCL_TYPE (val->type) = POINTER;
+    }
+
   val->type->next = arrExpr->left->ftype->next;
   val->etype = getSpec (val->type);
   return val;
@@ -1992,20 +2006,22 @@ value *
 valForStructElem (ast * structT, ast * elemT)
 {
   value *val, *lval = NULL;
-  char buffer[128];
   symbol *sym;
 
-  /* left could be furthur derefed */
+  /* left could be further derefed */
   if (IS_AST_OP (structT))
     {
       if (structT->opval.op == '[')
         lval = valForArray (structT);
       else if (structT->opval.op == '.')
         lval = valForStructElem (structT->left, structT->right);
-      else if (structT->opval.op == PTR_OP &&
-               IS_ADDRESS_OF_OP (structT->left))
-        lval = valForStructElem (structT->left->left,
-                                 structT->right);
+      else if (structT->opval.op == PTR_OP)
+        {
+          if (IS_ADDRESS_OF_OP (structT->left))
+            lval = valForStructElem (structT->left->left, structT->right);
+          else if (IS_AST_VALUE (structT->left) && IS_PTR (structT->left->ftype))
+            lval = valForStructElem (structT->left, structT->right);
+        }
       else
         return NULL;
     }
@@ -2023,31 +2039,37 @@ valForStructElem (ast * structT, ast * elemT)
     }
 
   val = newValue ();
-  if (!lval)
-    {
-        SNPRINTF(buffer, sizeof(buffer), "%s", AST_SYMBOL (structT)->rname);
-    }
-  else
-    {
-        SNPRINTF (buffer, sizeof(buffer), "%s", lval->name);
-    }
-
-  SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
-           (int) sym->offset);
-
   val->type = newLink (DECLARATOR);
-  if (SPEC_SCLS (structT->etype) == S_CODE)
-    DCL_TYPE (val->type) = CPOINTER;
-  else if (SPEC_SCLS (structT->etype) == S_XDATA)
-    DCL_TYPE (val->type) = FPOINTER;
-  else if (SPEC_SCLS (structT->etype) == S_XSTACK)
-    DCL_TYPE (val->type) = PPOINTER;
-  else if (SPEC_SCLS (structT->etype) == S_IDATA)
-    DCL_TYPE (val->type) = IPOINTER;
-  else if (SPEC_SCLS (structT->etype) == S_EEPROM)
-    DCL_TYPE (val->type) = EEPPOINTER;
+  if (IS_AST_LIT_VALUE (structT) && IS_PTR (structT->ftype))
+    {
+      SNPRINTF (val->name, sizeof(val->name), "0x%X",
+                AST_ULONG_VALUE (structT) + (int) sym->offset);
+      memcpy (val->type, structT->ftype, sizeof(sym_link));
+    }
+  else if (lval)
+    {
+      SNPRINTF (val->name, sizeof(val->name), "(%s + %d)",
+                lval->name, (int) sym->offset);
+      memcpy (val->type, lval->type, sizeof(sym_link));
+    }
   else
-    DCL_TYPE (val->type) = POINTER;
+    {
+      SNPRINTF (val->name, sizeof(val->name), "(%s + %d)",
+                AST_SYMBOL (structT)->rname, (int) sym->offset);
+      if (SPEC_SCLS (structT->etype) == S_CODE)
+        DCL_TYPE (val->type) = CPOINTER;
+      else if (SPEC_SCLS (structT->etype) == S_XDATA)
+        DCL_TYPE (val->type) = FPOINTER;
+      else if (SPEC_SCLS (structT->etype) == S_XSTACK)
+        DCL_TYPE (val->type) = PPOINTER;
+      else if (SPEC_SCLS (structT->etype) == S_IDATA)
+        DCL_TYPE (val->type) = IPOINTER;
+      else if (SPEC_SCLS (structT->etype) == S_EEPROM)
+        DCL_TYPE (val->type) = EEPPOINTER;
+      else
+        DCL_TYPE (val->type) = POINTER;
+    }
+
   val->type->next = sym->type;
   val->etype = getSpec (val->type);
   return val;

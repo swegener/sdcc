@@ -1,3 +1,19 @@
+2009-11-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(decorateType,CAST): fold literal pointers
+	* src/SDCCdflow.c(usedInRemaining),
+	* src/SDCCicode.c(geniCodeCall): fix for non-symbol values
+	* src/SDCCsymt.c(isConstant): reverted, make literals const instead
+	* src/SDCCval.c(constFloatVal, constFixed16x16Val, constVal, constCharVal,
+	  strVal): make literals const
+	  (valForArray),
+	  (valForStructElem): fixed bug 1928022 with folded literal pointers
+	* src/ds390/gen.c(genCall),
+	* src/hc08/gen.c(genCall),
+	* src/mcs51/gen.c(genCall),
+	* src/z80/gen.c(emitCall): handle literal function pointers
+	* support/regression/tests/bug1928022.c: new, added
+
 2009-10-30 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/P89LPC922.h, device/include/mcs51/P89LPC932.h,

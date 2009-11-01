@@ -1297,8 +1297,7 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
 
   /* offset is greater than
      size then zero */
-  if (offset > (aop->size - 1) &&
-      aop->type != AOP_LIT)
+  if (offset > (aop->size - 1) && aop->type != AOP_LIT)
     return zero;
 
   /* depending on type */
@@ -2818,7 +2817,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
       if (!ic)
         {
           /* Assume r0 is available for use. */
-          r = REG_WITH_INDEX (R0_IDX);;
+          r = REG_WITH_INDEX (R0_IDX);
         }
       else
         {
@@ -3032,21 +3031,36 @@ genCall (iCode * ic)
         }
       else
         {
-          char *l = (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-                     OP_SYMBOL (IC_LEFT (ic))->rname :
-                     OP_SYMBOL (IC_LEFT (ic))->name);
-
-          emitcode ("mov", "r0,#%s", l);
-          emitcode ("mov", "r1,#(%s >> 8)", l);
-          emitcode ("mov", "r2,#(%s >> 16)", l);
+          if (IS_LITERAL (etype))
+            {
+              emitcode ("mov", "r0,#%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 0, 1));
+              emitcode ("mov", "r1,#%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 1, 1));
+              emitcode ("mov", "r2,#%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 2, 1));
+            }
+          else
+            {
+              char *name = (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                            OP_SYMBOL (IC_LEFT (ic))->rname :
+                            OP_SYMBOL (IC_LEFT (ic))->name);
+              emitcode ("mov", "r0,#%s", name);
+              emitcode ("mov", "r1,#(%s >> 8)", name);
+              emitcode ("mov", "r2,#(%s >> 16)", name);
+            }
           emitcode ("lcall", "__sdcc_banked_call");
         }
     }
   else
     {
-      emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-                                OP_SYMBOL (IC_LEFT (ic))->rname :
-                                OP_SYMBOL (IC_LEFT (ic))->name));
+      if (IS_LITERAL (etype))
+        {
+          emitcode ("lcall", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+        }
+      else
+        {
+          emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                                    OP_SYMBOL (IC_LEFT (ic))->rname :
+                                    OP_SYMBOL (IC_LEFT (ic))->name));
+        }
     }
 
   if (swapBanks)
@@ -3062,7 +3076,6 @@ genCall (iCode * ic)
         OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
-
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
@@ -3084,7 +3097,7 @@ genCall (iCode * ic)
               emitcode ("push", "acc");
               accPushed = TRUE;
             }
-          if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))) &&
+          if (IS_BIT (etype) &&
               IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
               !assignResultGenerated)
             {
@@ -3196,17 +3209,15 @@ genPcall (iCode * ic)
             }
           else
             {
-              char *l = aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 0, 2);
-
-              emitcode ("mov", "r0,#%s", l);
-              emitcode ("mov", "r1,#(%s >> 8)", l);
-              emitcode ("mov", "r2,#(%s >> 16)", l);
+              emitcode ("mov", "r0,#%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 0, 1));
+              emitcode ("mov", "r1,#%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 1, 1));
+              emitcode ("mov", "r2,#%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 2, 1));
               emitcode ("lcall", "__sdcc_banked_call");
             }
         }
       else
         {
-          emitcode ("lcall", "%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 0, 2));
+          emitcode ("lcall", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
         }
     }
   else
@@ -11583,7 +11594,6 @@ genCast (iCode * ic)
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
-
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))
         goto release;
@@ -11617,9 +11627,9 @@ genCast (iCode * ic)
             }
           else
             {
-              if (SPEC_SCLS(etype)==S_REGISTER) {
+              if (SPEC_SCLS (etype) == S_REGISTER) {
                 // let's assume it is a generic pointer
-                p_type=GPOINTER;
+                p_type = GPOINTER;
               } else {
                 /* we have to go by the storage class */
                 p_type = PTR_TYPE (SPEC_OCLS (etype));

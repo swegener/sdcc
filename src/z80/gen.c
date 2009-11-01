@@ -2877,6 +2877,7 @@ emitCall (iCode * ic, bool ispcall)
 {
   bool bInRet, cInRet, dInRet, eInRet;
   sym_link *dtype = operandType (IC_LEFT (ic));
+  sym_link *etype = getSpec(dtype);
 
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
@@ -2976,19 +2977,28 @@ emitCall (iCode * ic, bool ispcall)
     }
   else
     {
-      char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-      OP_SYMBOL (IC_LEFT (ic))->rname :
-      OP_SYMBOL (IC_LEFT (ic))->name;
+      /* make the call */
       if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
         {
+          char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                       OP_SYMBOL (IC_LEFT (ic))->rname :
+                       OP_SYMBOL (IC_LEFT (ic))->name;
           emit2 ("call banked_call");
           emit2 ("!dws", name);
           emit2 ("!dw !bankimmeds", name);
         }
       else
         {
-          /* make the call */
-          emit2 ("call %s", name);
+          if (IS_LITERAL (etype))
+            {
+              emit2 ("call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+            }
+          else
+            {
+              emit2 ("call %s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                                 OP_SYMBOL (IC_LEFT (ic))->rname :
+                                 OP_SYMBOL (IC_LEFT (ic))->name));
+            }
         }
     }
   spillCached ();

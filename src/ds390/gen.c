@@ -1172,7 +1172,6 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
      b) has a spill location */
   if (sym->isspilt || sym->nRegs == 0)
     {
-
       /* rematerialize it NOW */
       if (sym->remat)
         {
@@ -1628,7 +1627,6 @@ aopGet (operand * oper,
                     "%s",
                     aop->aopu.aop_dir);
         }
-
       return Safe_strdup(buffer);
 
     case AOP_REG:
@@ -1658,7 +1656,6 @@ aopGet (operand * oper,
         return "acc";
 
       return aop->aopu.aop_str[offset];
-
     }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -1797,7 +1794,7 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_DPTRn:
-        emitcode ("mov","%s,%s",dptrn[aop->aopu.dptr][offset],s);
+        emitcode ("mov", "%s,%s", dptrn[aop->aopu.dptr][offset], s);
         break;
 
     case AOP_DPTR:
@@ -2686,7 +2683,6 @@ genIpush (iCode * ic)
      and spill push is always done on the local stack */
   if (!ic->parmPush)
     {
-
       /* and the item is spilt then do nothing */
       if (OP_SYMBOL (IC_LEFT (ic))->isspilt || OP_SYMBOL(IC_LEFT(ic))->dptr)
         return;
@@ -3167,9 +3163,19 @@ genCall (iCode * ic)
     }
 
   /* make the call */
-  emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-                            OP_SYMBOL (IC_LEFT (ic))->rname :
-                            OP_SYMBOL (IC_LEFT (ic))->name));
+  if (IS_LITERAL (etype))
+    {
+      if (options.model == MODEL_FLAT24)
+        emitcode ("lcall", "0x%06X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+      else
+        emitcode ("lcall", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+    }
+  else
+    {
+      emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                                OP_SYMBOL (IC_LEFT (ic))->rname :
+                                OP_SYMBOL (IC_LEFT (ic))->name));
+    }
 
   if (swapBanks)
     {
@@ -3366,7 +3372,6 @@ genPcall (iCode * ic)
   /* make the call */
   emitcode ("ret", "");
   emitLabel (rlbl);
-
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&

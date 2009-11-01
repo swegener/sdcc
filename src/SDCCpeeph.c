@@ -470,9 +470,9 @@ FBYNAME (notUsed)
 }
 
 /*-----------------------------------------------------------------*/
-/* operandsNotSame - check if %1 & %2 are the same                 */
+/* operandsNotSame2 - check if %1 & %2 are the same                 */
 /*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame)
+FBYNAME (operandsNotSame2)
 {
   char *op1 = hTabItemWithKey (vars, 1);
   char *op2 = hTabItemWithKey (vars, 2);
@@ -1163,6 +1163,42 @@ FBYNAME (operandsNotRelated)
   return TRUE;
 }
 
+/*-----------------------------------------------------------------*/
+/* notSame - Check, that arguments are pairwise not the same       */
+/*-----------------------------------------------------------------*/
+FBYNAME (notSame)
+{
+  set *operands;
+  const char *op1, *op2;
+
+  operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+    {
+      fprintf (stderr,
+               "*** internal error: notSame peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  while ((op1 = setFirstItem (operands)))
+    {
+      deleteSetItem (&operands, (void*)op1);
+
+      for (op2 = setFirstItem (operands); op2; op2 = setNextItem (operands))
+        {
+          if (strcmp (op1, op2) == 0)
+            {
+              deleteSet (&operands);
+              return FALSE;
+            }
+        }
+    }
+
+  deleteSet (&operands);
+  return TRUE;
+}
+
 /*-------------------------------------------------------------------*/
 /* operandsLiteral - returns true of the condition's operands are    */
 /* literals.                                                         */
@@ -1224,7 +1260,7 @@ ftab[] =                                // sorted on the number of times used
     "24bitMode", flat24bitMode                      //9
   },
   {
-    "operandsNotSame", operandsNotSame              //8
+    "operandsNotSame2", operandsNotSame2            //8
   },
   {
     "operandsNotSame3", operandsNotSame3
@@ -1270,6 +1306,9 @@ ftab[] =                                // sorted on the number of times used
   },
   {
     "notUsed", notUsed
+  },
+  {
+    "notSame", notSame
   }
 };
 /*-----------------------------------------------------------------*/

@@ -2117,7 +2117,7 @@ replace	 {
 	mov	%1,a
 	;	Peephole 214.a	removed redundant mov
 	add	a,%2
-} if operandsNotSame
+} if operandsNotSame2
 
 replace {
 	mov	%1,a
@@ -2127,7 +2127,7 @@ replace {
 	;	Peephole 214.b	removed redundant mov
 	add	a,%2
 	mov	%1,a
-} if operandsNotSame
+} if operandsNotSame2
 
 replace {
 	mov	r%1,%2

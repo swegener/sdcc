@@ -601,14 +601,14 @@ replace restart {
 } by {
 	jp	%6
 	; peephole 7 jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
-	; peephole 8 redirected %6 directly instead of via %5.
-} if labelIsUncondJump(), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+	; peephole 8 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	xor	a,a

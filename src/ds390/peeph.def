@@ -1722,7 +1722,7 @@ replace  {
 	; Peephole 214 reduced some extra movs
 	mov  %1,a
 	add  a,%2
-} if operandsNotSame
+} if operandsNotSame2
 
 replace {
 	mov  %1,a
@@ -1732,7 +1732,7 @@ replace {
 	; Peephole 215 removed some movs
 	add  a,%2
 	mov  %1,a
-} if operandsNotSame
+} if operandsNotSame2
 
 replace {
 	mov   r%1,%2

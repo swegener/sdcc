@@ -1521,61 +1521,77 @@ processBlockVars (ast * tree, int *stack, int action)
 /* constExprTree - returns TRUE if this tree is a constant     */
 /*                 expression                                  */
 /*-------------------------------------------------------------*/
-bool constExprTree (ast *cexpr) {
-
-  if (!cexpr) {
-    return TRUE;
-  }
+bool constExprTree (ast *cexpr)
+{
+  if (!cexpr)
+    {
+      return TRUE;
+    }
 
   cexpr = decorateType (resolveSymbols (cexpr), RESULT_TYPE_NONE);
 
   switch (cexpr->type)
     {
     case EX_VALUE:
-      if (IS_AST_LIT_VALUE(cexpr)) {
-        // this is a literal
-        return TRUE;
-      }
-      if (IS_AST_SYM_VALUE(cexpr) && IS_FUNC(AST_SYMBOL(cexpr)->type)) {
-        // a function's address will never change
-        return TRUE;
-      }
-      if (IS_AST_SYM_VALUE(cexpr) && IS_ARRAY(AST_SYMBOL(cexpr)->type)) {
-        // an array's address will never change
-        return TRUE;
-      }
-      if (IS_AST_SYM_VALUE(cexpr) &&
-          IN_CODESPACE(SPEC_OCLS(AST_SYMBOL(cexpr)->etype))) {
-        // a symbol in code space will never change
-        // This is only for the 'char *s="hallo"' case and will have to leave
-        //printf(" code space symbol");
-        return TRUE;
-      }
+      if (IS_AST_LIT_VALUE (cexpr))
+        {
+          // this is a literal
+          return TRUE;
+        }
+      if (IS_AST_SYM_VALUE (cexpr) && IS_FUNC (AST_SYMBOL (cexpr)->type))
+        {
+          // a function's address will never change
+          return TRUE;
+        }
+      if (IS_AST_SYM_VALUE (cexpr) && IS_ARRAY (AST_SYMBOL (cexpr)->type))
+        {
+          // an array's address will never change
+          return TRUE;
+        }
+      if (IS_AST_SYM_VALUE (cexpr) && !AST_SYMBOL (cexpr)->etype)
+        {
+          // the offset of a struct field will never change
+          return TRUE;
+        }
+      if (IS_AST_SYM_VALUE (cexpr) &&
+          IN_CODESPACE (SPEC_OCLS (AST_SYMBOL (cexpr)->etype)))
+        {
+          // a symbol in code space will never change
+          // This is only for the 'char *s="hallo"' case and will have to leave
+          //printf(" code space symbol");
+          return TRUE;
+        }
       return FALSE;
     case EX_LINK:
       wassertl (0, "unexpected link in expression tree");
       return FALSE;
     case EX_OP:
-      if (cexpr->opval.op==ARRAYINIT) {
-        // this is a list of literals
-        return TRUE;
-      }
-      if (cexpr->opval.op=='=') {
-        return constExprTree(cexpr->right);
-      }
-      if (cexpr->opval.op==CAST) {
-        // cast ignored, maybe we should throw a warning here?
-        return constExprTree(cexpr->right);
-      }
-      if (cexpr->opval.op=='&') {
-        return TRUE;
-      }
-      if (cexpr->opval.op==CALL || cexpr->opval.op==PCALL) {
-        return FALSE;
-      }
-      if (constExprTree(cexpr->left) && constExprTree(cexpr->right)) {
-        return TRUE;
-      }
+      if (cexpr->opval.op==ARRAYINIT)
+        {
+          // this is a list of literals
+          return TRUE;
+        }
+      if (cexpr->opval.op=='=')
+        {
+          return constExprTree(cexpr->right);
+        }
+      if (cexpr->opval.op==CAST)
+        {
+          // cast ignored, maybe we should throw a warning here?
+          return constExprTree(cexpr->right);
+        }
+      if (cexpr->opval.op=='&')
+        {
+          return TRUE;
+        }
+      if (cexpr->opval.op==CALL || cexpr->opval.op==PCALL)
+        {
+          return FALSE;
+        }
+      if (constExprTree(cexpr->left) && constExprTree(cexpr->right))
+        {
+          return TRUE;
+        }
       return FALSE;
     case EX_OPERAND:
       return IS_CONSTANT(operandType(cexpr->opval.oprnd));

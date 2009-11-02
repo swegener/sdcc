@@ -1,9 +1,14 @@
+2009-11-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(constExprTree): struct fields have a constant offset
+
 2009-11-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c(initValPointer): fixed bug 1503239
 	* support/regression/tests/bug1928022.c: added test cases
 
 2009-11-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCpeeph.c,
 	* src/mcs51/peeph.def,
 	* src/avr/peeph.def,

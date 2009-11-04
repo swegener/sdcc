@@ -1,3 +1,12 @@
+2009-11-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmem.c(defaultOClass, allocDefault): refactored
+	* src/SDCCmem.h: added defaultOClass
+	* src/SDCCsymt.c(processFuncArgs): use defaultOClass to support storage
+	  class in parameters, fixes bug 2761883
+	* support/regression/tests/bug2761883.c: new, added
+	* doc/sdccman.lyx: removed warning about ignored storage class in params
+
 2009-11-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c(constExprTree): struct fields have a constant offset

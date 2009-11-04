@@ -393,10 +393,10 @@ void deleteFromSeg(symbol *sym)
 }
 
 /*-----------------------------------------------------------------*/
-/* allocDefault - assigns the output segment based on SCLASS       */
+/* defaultOClass - set the output segment based on SCLASS          */
 /*-----------------------------------------------------------------*/
 bool
-allocDefault (symbol * sym)
+defaultOClass (symbol * sym)
 {
   switch (SPEC_SCLS (sym->etype))
     {
@@ -471,12 +471,25 @@ allocDefault (symbol * sym)
     default:
       return FALSE;
     }
-  allocIntoSeg (sym);
   return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
-/* allocGlobal - assigns the output segment to a global var       */
+/* allocDefault - assigns the output segment based on SCLASS       */
+/*-----------------------------------------------------------------*/
+bool
+allocDefault (struct symbol * sym)
+{
+  if (defaultOClass (sym))
+    {
+      allocIntoSeg (sym);
+      return TRUE;
+  }
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* allocGlobal - assigns the output segment to a global var        */
 /*-----------------------------------------------------------------*/
 void
 allocGlobal (symbol * sym)
@@ -541,8 +554,8 @@ allocGlobal (symbol * sym)
   if (SPEC_SCLS (sym->etype) == S_REGISTER)
     SPEC_SCLS (sym->etype) = S_FIXED;
 
-  /* if it is fixed, then allocate depending on the  */
-  /* current memory model, same for automatics        */
+  /* if it is fixed, then allocate depending on the */
+  /* current memory model, same for automatics      */
   if (SPEC_SCLS (sym->etype) == S_FIXED ||
       (TARGET_IS_PIC16 && (SPEC_SCLS (sym->etype) == S_REGISTER) && (sym->level==0)) ||
       SPEC_SCLS (sym->etype) == S_AUTO) {

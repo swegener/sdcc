@@ -94,6 +94,7 @@ extern struct set *ovrSetSets;
 /* forward decls for functions    */
 memmap *allocMap (char, char, char, char, char, char, unsigned, const char *, char, int);
 void initMem ();
+bool defaultOClass (struct symbol *);
 void allocGlobal (struct symbol *);
 void allocLocal (struct symbol *);
 void allocParms (struct value *);

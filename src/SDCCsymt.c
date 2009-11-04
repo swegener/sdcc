@@ -2868,7 +2868,7 @@ processFuncArgs (symbol * func)
 {
   value *val;
   int pNum = 1;
-  sym_link *funcType=func->type;
+  sym_link *funcType = func->type;
 
   if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "SDCCsymt.c:processFuncArgs(%s)\n", func->name);
@@ -2879,20 +2879,20 @@ processFuncArgs (symbol * func)
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
-  if (IFFUNC_HASVARARGS(funcType) || (options.stackAuto && !func->cdef))
-    FUNC_ISREENT(funcType)=1;
+  if (IFFUNC_HASVARARGS (funcType) || (options.stackAuto && !func->cdef))
+    FUNC_ISREENT (funcType)=1;
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-  FUNC_CALLEESAVES(funcType) = inCalleeSaveList (func->name);
+  FUNC_CALLEESAVES (funcType) = inCalleeSaveList (func->name);
 
   /* loop thru all the arguments   */
-  val = FUNC_ARGS(funcType);
+  val = FUNC_ARGS (funcType);
 
   /* if it is void then remove parameters */
   if (val && IS_VOID (val->type))
     {
-      FUNC_ARGS(funcType) = NULL;
+      FUNC_ARGS (funcType) = NULL;
       return;
     }
 
@@ -2912,15 +2912,15 @@ processFuncArgs (symbol * func)
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */
-      if (!IFFUNC_HASVARARGS(funcType) &&
-          (argreg = (*port->reg_parm) (val->type, FUNC_ISREENT(funcType))))
+      if (!IFFUNC_HASVARARGS (funcType) &&
+          (argreg = (*port->reg_parm) (val->type, FUNC_ISREENT (funcType))))
         {
           SPEC_REGPARM (val->etype) = 1;
-          SPEC_ARGREG(val->etype) = argreg;
+          SPEC_ARGREG (val->etype) = argreg;
         }
-      else if (IFFUNC_ISREENT(funcType))
+      else if (IFFUNC_ISREENT (funcType))
         {
-          FUNC_HASSTACKPARM(funcType) = 1;
+          FUNC_HASSTACKPARM (funcType) = 1;
         }
 
       if (IS_AGGREGATE (val->type))
@@ -2937,7 +2937,7 @@ processFuncArgs (symbol * func)
     {
       /* ignore --stack-auto for this one, we don't know how it is compiled */
       /* simply trust on --int-long-reent or --float-reent */
-      if (IFFUNC_ISREENT(funcType))
+      if (IFFUNC_ISREENT (funcType))
         {
           return;
         }
@@ -2950,7 +2950,7 @@ processFuncArgs (symbol * func)
         return;
     }
 
-  val = FUNC_ARGS(funcType);
+  val = FUNC_ARGS (funcType);
   pNum = 1;
   while (val)
     {
@@ -2961,13 +2961,12 @@ processFuncArgs (symbol * func)
           SNPRINTF (val->name, sizeof(val->name),
                     "_%s_PARM_%d", func->name, pNum++);
           val->sym = newSymbol (val->name, 1);
-          if (SPEC_SCLS(val->etype) == S_BIT)
-            SPEC_OCLS (val->etype) = bit;
-          else
-            SPEC_OCLS (val->etype) = port->mem.default_local_map;
           val->sym->type = copyLinkChain (val->type);
           val->sym->etype = getSpec (val->sym->type);
           val->sym->_isparm = 1;
+          if (!defaultOClass (val->sym))
+            SPEC_OCLS (val->sym->etype) = port->mem.default_local_map;
+          SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype);
           strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
           addSymChain (&val->sym);
         }
@@ -2976,11 +2975,9 @@ processFuncArgs (symbol * func)
           SNPRINTF (val->name, sizeof(val->name), "_%s_PARM_%d", func->name, pNum++);
           strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
           val->sym->_isparm = 1;
-          if (SPEC_SCLS(val->etype) == S_BIT)
-            SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) = bit;
-          else
-            SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
-              port->mem.default_local_map;
+          if (!defaultOClass (val->sym))
+            SPEC_OCLS (val->sym->etype) = port->mem.default_local_map;
+          SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype);
         }
       if (SPEC_OCLS (val->sym->etype) == pdata)
         val->sym->iaccess = 1;

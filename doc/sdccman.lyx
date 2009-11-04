@@ -21962,7 +21962,7 @@ Absolute addressing
 \begin_layout Verse
 
 \family typewriter
-unsigned char foo() 
+unsigned char foo(__xdata int parm) 
 \begin_inset Newline newline
 \end_inset
 
@@ -22065,7 +22065,21 @@ at
 \end_layout
 
 \begin_layout Standard
-In the above example the variable 
+In the above example the parameter
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+function parameter
+\end_layout
+
+\end_inset
+
+ 
+\emph on
+parm
+\emph default
+ and the variable 
 \emph on
 i
 \emph default
@@ -22100,31 +22114,6 @@ status collapsed
 reentrant
 \emph default
  this should only be done for static variables.
-\end_layout
-
-\begin_layout Standard
-Parameters
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-function parameter
-\end_layout
-
-\end_inset
-
- however are not allowed any storage class
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-Storage class
-\end_layout
-
-\end_inset
-
-, (storage classes for parameters will be ignored), their allocation is
- governed by the memory model in use, and the reentrancy options.
 \end_layout
 
 \begin_layout Standard

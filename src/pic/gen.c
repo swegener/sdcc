@@ -5227,7 +5227,8 @@ emitPtrByteSet (operand *dst, int p_type, bool alreadyAddressed)
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
-static void genUnpackBits (operand *result, operand *left, int ptype, iCode *ifx)
+static void
+genUnpackBits (operand *result, operand *left, int ptype, iCode *ifx)
 {
   int rsize;            /* result size */
   sym_link *etype;      /* bitfield type information */
@@ -5235,105 +5236,114 @@ static void genUnpackBits (operand *result, operand *left, int ptype, iCode *ifx
   int bstr;             /* bitfield starting bit within byte */
 
   FENTRY;
-  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  etype = getSpec(operandType(result));
+  DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
+  etype = getSpec (operandType (result));
   rsize = getSize (operandType (result));
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
   /* single bit field case */
-  if (blen == 1) {
-    if (ifx) { /* that is for an if statement */
-      pCodeOp *pcop;
-      resolvedIfx rIfx;
-      resolveIfx(&rIfx,ifx);
-      if (ptype == -1) /* direct */
-    pcop = newpCodeOpBit(aopGet (AOP(left),0,FALSE,FALSE),bstr,0);
+  if (blen == 1)
+    {
+      if (ifx)
+        {
+          /* that is for an if statement */
+          pCodeOp *pcop;
+          resolvedIfx rIfx;
+
+          resolveIfx (&rIfx, ifx);
+          if (ptype == -1) /* direct */
+            pcop = newpCodeOpBit (aopGet (AOP (left), 0, FALSE, FALSE), bstr, 0);
+          else
+            {
+              setup_fsr (left);
+              pcop = newpCodeOpBit (pc_indf.pcop.name, bstr, 0);
+            }
+          emitpcode ((rIfx.condition) ? POC_BTFSC : POC_BTFSS, pcop);
+          emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
+          ifx->generated = 1;
+        }
       else
-    pcop = newpCodeOpBit(pc_indf.pcop.name,bstr,0);
-      emitpcode((rIfx.condition) ? POC_BTFSC : POC_BTFSS,pcop);
-      emitpcode(POC_GOTO,popGetLabel(rIfx.lbl->key));
-      ifx->generated=1;
-    } else {
-      int i;
-      assert (!pic14_sameRegs (AOP(result), AOP(left)));
-      for (i=0; i < AOP_SIZE(result); i++)
-    emitpcode (POC_CLRF, popGet (AOP(result), i));
+        {
+          int i;
 
-      switch (ptype)
-      {
-      case -1:
-        emitpcode(POC_BTFSC,newpCodeOpBit(aopGet (AOP(left),0,FALSE,FALSE),bstr,0));
-    /* adjust result below */
-        break;
+          assert (!pic14_sameRegs (AOP (result), AOP (left)));
+          for (i = 0; i < AOP_SIZE (result); i++)
+            emitpcode (POC_CLRF, popGet (AOP (result), i));
 
-      case POINTER:
-      case FPOINTER:
-      case GPOINTER:
-      case CPOINTER:
-        emitPtrByteGet (left, ptype, FALSE);
-    emitpcode(POC_ANDLW, popGetLit (1UL << bstr));
-    emitSKPZ;
-    /* adjust result below */
-        break;
+          switch (ptype)
+            {
+              case -1:
+                  emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (left), 0, FALSE, FALSE), bstr, 0));
+                  /* adjust result below */
+                  break;
 
-      default:
-        assert( !"unhandled pointer type" );
-      } // switch
+              case POINTER:
+              case FPOINTER:
+              case GPOINTER:
+              case CPOINTER:
+                  emitPtrByteGet (left, ptype, FALSE);
+                  emitpcode (POC_ANDLW, popGetLit (1UL << bstr));
+                  emitSKPZ;
+                  /* adjust result below */
+                  break;
 
-      /* move sign-/zero extended bit to result */
-      if (SPEC_USIGN(OP_SYM_ETYPE(left))) {
-    emitpcode (POC_INCF, popGet (AOP(result), 0));
-      } else {
-    emitpcode (POC_DECF, popGet (AOP(result), 0));
+              default:
+                  assert (!"unhandled pointer type" );
+            } // switch
+
+          /* move sign-/zero extended bit to result */
+          if (SPEC_USIGN (OP_SYM_ETYPE (left)))
+            emitpcode (POC_INCF, popGet (AOP (result), 0));
+          else
+            emitpcode (POC_DECF, popGet (AOP (result), 0));
+          addSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
       }
-      addSign (result, 1, !SPEC_USIGN(OP_SYM_ETYPE(left)));
-    }
-    return;
+      return;
   }
   else if (blen <= 8 && ((blen + bstr) <= 8))
-  {
-    /* blen > 1 */
-    int i;
-
-    for (i=0; i < AOP_SIZE(result); i++)
-      emitpcode (POC_CLRF, popGet (AOP(result), i));
-
-    switch (ptype)
     {
-    case -1:
-      mov2w(AOP(left), 0);
-      break;
+      /* blen > 1 */
+      int i;
 
-    case POINTER:
-    case FPOINTER:
-    case GPOINTER:
-    case CPOINTER:
-      emitPtrByteGet (left, ptype, FALSE);
-      break;
+      for (i = 0; i < AOP_SIZE (result); i++)
+        emitpcode (POC_CLRF, popGet (AOP (result), i));
 
-    default:
-      assert( !"unhandled pointer type" );
-    } // switch
+      switch (ptype)
+        {
+          case -1:
+              mov2w (AOP (left), 0);
+              break;
 
-    if (blen < 8)
-      emitpcode(POC_ANDLW, popGetLit ((((1UL << blen)-1) << bstr) & 0x00ff));
-    movwf(AOP(result), 0);
-    AccRsh (popGet(AOP(result), 0), bstr, 1); /* zero extend the bitfield */
+          case POINTER:
+          case FPOINTER:
+          case GPOINTER:
+          case CPOINTER:
+              emitPtrByteGet (left, ptype, FALSE);
+              break;
 
-    if (!SPEC_USIGN(OP_SYM_ETYPE(left)) && (bstr + blen != 8))
-    {
-      /* signed bitfield */
-      assert (bstr + blen > 0);
-      emitpcode(POC_MOVLW, popGetLit (0x00ff << (bstr + blen)));
-      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE), bstr + blen - 1, 0));
-      emitpcode(POC_IORWF, popGet(AOP(result),0));
+          default:
+              assert (!"unhandled pointer type" );
+        } // switch
+
+      if (blen < 8)
+        emitpcode (POC_ANDLW, popGetLit ((((1UL << blen)-1) << bstr) & 0x00ff));
+      movwf (AOP (result), 0);
+      AccRsh (popGet (AOP (result), 0), bstr, 1); /* zero extend the bitfield */
+
+      if (!SPEC_USIGN (OP_SYM_ETYPE (left)) && (bstr + blen != 8))
+        {
+          /* signed bitfield */
+          assert (bstr + blen > 0);
+          emitpcode (POC_MOVLW, popGetLit (0x00ff << (bstr + blen)));
+          emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (result), 0, FALSE, FALSE), bstr + blen - 1, 0));
+          emitpcode (POC_IORWF, popGet (AOP (result), 0));
+        }
+      addSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+      return;
     }
-    addSign (result, 1, !SPEC_USIGN(OP_SYM_ETYPE(left)));
-    return;
-  }
 
-  assert( !"bitfields larger than 8 bits or crossing byte boundaries are not yet supported" );
+  assert (!"bitfields larger than 8 bits or crossing byte boundaries are not yet supported" );
 }
 
 #if 1

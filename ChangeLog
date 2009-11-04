@@ -1,3 +1,8 @@
+2009-11-05 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (genUnpackBits): setup FSR before using it, fixes
+          "[Sdcc-user] The damned loop from hell"; plus cosmetic changes
+
 2009-11-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmem.c(defaultOClass, allocDefault): refactored

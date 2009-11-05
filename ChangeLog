@@ -1,7 +1,12 @@
+2009-11-06 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (pic14_getDataSize): use true size of generic
+	  pointers to fix assignment of the result of pointer arithmetics
+
 2009-11-05 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (genUnpackBits): setup FSR before using it, fixes
-          "[Sdcc-user] The damned loop from hell"; plus cosmetic changes
+	  "[Sdcc-user] The damned loop from hell"; plus cosmetic changes
 
 2009-11-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

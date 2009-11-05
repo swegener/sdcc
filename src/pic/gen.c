@@ -1423,31 +1423,8 @@ int pic14_getDataSize(operand *op)
 {
     int size;
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-#if 0
-    size = getSize(OP_SYM_ETYPE(op));
-    return size;
-    //return AOP_SIZE(op);
-
-    // tsd- in the pic port, the genptr size is 1, so this code here
-    // fails. ( in the 8051 port, the size was 4).
-#else
     size = AOP_SIZE(op);
-    if (IS_SYMOP(op) && IS_GENPTR(OP_SYM_TYPE(op)))
-    {
-        sym_link *type = operandType(op);
-        if (IS_GENPTR(type))
-        {
-            /* generic pointer; arithmetic operations
-            * should ignore the high byte (pointer type).
-            */
-            size--;
-            DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-        }
-    }
     return size;
-#endif
 }
 
 /*-----------------------------------------------------------------*/

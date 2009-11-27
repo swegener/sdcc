@@ -1,3 +1,9 @@
+2009-11-27 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/config.guess, sim/ucsim/ltmain.sh, sim/ucsim/config.sub:
+	  upgraded to libtool 2.2.5,
+	  fixed dug #2897829: ancient-libtool sim/ucsim/ltmain.sh 1.4.2
+
 2009-11-06 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (pic14_getDataSize): use true size of generic

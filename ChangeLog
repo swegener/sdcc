@@ -1,4 +1,8 @@
-2009-11-27 Borut Razem <borut.razem AT siol.net>
+2009-11-28 Borut Razem <borut.razem AT siol.net>
+
+	* 
+
+	2009-11-27 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/config.guess, sim/ucsim/ltmain.sh, sim/ucsim/config.sub:
 	  upgraded to libtool 2.2.5,

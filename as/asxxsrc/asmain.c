@@ -29,23 +29,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "sdas.h"
 #include "asxxxx.h"
 
-/*)Module       asmain.c
+/*)Module	asmain.c
  *
- *      The module asmain.c includes the command argument parser,
- *      the three pass sequencer, and the machine independent
- *      assembler parsing code.
+ *	The module asmain.c includes the command argument parser,
+ *	the three pass sequencer, and the machine independent
+ *	assembler parsing code.
  *
- *      asmain.c contains the following functions:
- *              VOID    main(argc, argv)
- *              VOID    asexit()
- *              VOID    asmbl()
- *              FILE *  afile(fn, ft, wf)
- *              VOID    newdot(nap)
- *              VOID    phase(ap, a)
- *              VOID    usage()
+ *	asmain.c contains the following functions:
+ *		int		main(argc, argv)
+ *		VOID	asexit(n)
+ *		VOID	asmbl()
+ *		FILE *	afile(fn, ft, wf)
+ *		VOID	newdot(nap)
+ *		VOID	phase(ap, a)
+ *		VOID	usage()
  *
- *      asmain.c contains the array char *usetxt[] which
- *      references the usage text strings printed by usage().
+ * 	asmain.c contains the array char *usetxt[] which
+ *	references the usage text strings printed by usage().
  */
 
 /* sdas specific */
@@ -57,15 +57,15 @@ static int search_path_length;
  * of the include file search path.
  *
  * @param dir
- *     The directory to be added to the path.
+ *		The directory to be added to the path.
  */
 void
 search_path_append(const char *dir)
 {
-        if (search_path_length < sizeof(search_path)/sizeof(char*))
-        {
-                search_path[search_path_length++] = dir;
-        }
+	if (search_path_length < sizeof(search_path)/sizeof(char*))
+	{
+		search_path[search_path_length++] = dir;
+	}
 }
 
 /**
@@ -75,39 +75,39 @@ search_path_append(const char *dir)
  * The first found is used.
  *
  * @param filename
- *     The name of the file to be opened.
+ *		The name of the file to be opened.
  * @param mode
- *     The mode of the file to be opened.
+ *		The mode of the file to be opened.
  * @returns
- *     what the fopen function would return on success, or NULL if the
- *     file is not anywhere in the search path.
+ *		what the fopen function would return on success, or NULL if the
+ *		file is not anywhere in the search path.
  */
 static FILE *
 search_path_fopen(const char *filename, const char *mode)
 {
-        FILE *fp;
-        int j;
+	FILE *fp;
+	int j;
 
-        fp = fopen(filename, mode);
-        if (fp != NULL || filename[0] == '/' || filename[0] == '\\')
-                return fp;
-        for (j = 0; j < search_path_length; ++j)
-        {
-                char path[2000];
+	fp = fopen(filename, mode);
+	if (fp != NULL || filename[0] == '/' || filename[0] == '\\')
+		return fp;
+	for (j = 0; j < search_path_length; ++j)
+	{
+		char path[2000];
 
-                strncpy(path, search_path[j], sizeof(path));
-                if ((path[strlen(path) - 1] != '/') &&
-                    (path[strlen(path) - 1] != DIR_SEPARATOR_CHAR))
-                {
-                        strncat(path, DIR_SEPARATOR_STRING, sizeof(path));
-                }
-                strncat(path, filename, sizeof(path));
-                fp = fopen(path, mode);
-                if (fp != NULL)
-                        return fp;
-        }
-        errno = ENOENT;
-        return NULL;
+		strncpy(path, search_path[j], sizeof(path));
+		if ((path[strlen(path) - 1] != '/') &&
+			(path[strlen(path) - 1] != DIR_SEPARATOR_CHAR))
+		{
+			strncat(path, DIR_SEPARATOR_STRING, sizeof(path));
+		}
+		strncat(path, filename, sizeof(path));
+		fp = fopen(path, mode);
+		if (fp != NULL)
+			return fp;
+	}
+	errno = ENOENT;
+	return NULL;
 }
 /* end sdas specific */
 
@@ -178,7 +178,9 @@ search_path_fopen(const char *filename, const char *mode)
  *					line number
  *		int	lop		current line number on page
  *		int	oflag		-o, generate relocatable output flag
- *              int     jflag           -j, generate debug info flag
+ * sdas specific
+ *		int jflag		-j, generate debug info flag
+ * end sdas specific
  *		int	page		current page number
  *		int	pflag		enable listing pagination
  *		int	pass		assembler pass number
@@ -225,29 +227,33 @@ search_path_fopen(const char *filename, const char *mode)
  *		REL, LST, and/or SYM files may be generated.
  */
 
+/* sdas specific */
 char relFile[128];
+/* end sdas specific */
 
 int
-main(int argc, char *argv[])
+main(argc, argv)
+int argc;
+char *argv[];
 {
 	char *p;
 	int c, i;
 	struct area *ap;
 
-        /* sdas specific */
-        /* sdas initialization */
-        sdas_init(argv[0]);
-        /* end sdas specific */
+	/* sdas specific */
+	/* sdas initialization */
+	sdas_init(argv[0]);
+	/* end sdas specific */
 
-        if (!is_sdas())
-                fprintf(stdout, "\n");
+	if (!is_sdas())
+		fprintf(stdout, "\n");
 	inpfil = -1;
 	pflag = 1;
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
 			if (inpfil >= 0)
-				usage();
+				usage(ER_FATAL);
 			++p;
 			while ((c = *p++) != 0)
 				switch(c) {
@@ -257,28 +263,28 @@ main(int argc, char *argv[])
 					++aflag;
 					break;
 
-                                case 'c':
-                                case 'C':
-                                        ++cflag;
-                                        break;
+				case 'c':
+				case 'C':
+					++cflag;
+					break;
 
 				case 'g':
 				case 'G':
 					++gflag;
 					break;
 
-                                case 'i':
-                                case 'I':
-                                        search_path_append(p);
-                                        while (*p)
-                                                ++p;
-                                        break;
+				case 'i':
+				case 'I':
+					search_path_append(p);
+					while (*p)
+						++p;
+					break;
 
-                                case 'j':               /* JLH: debug info */
-                                case 'J':
-                                        ++jflag;
-                                        ++oflag;        /* force object */
-                                        break;
+				case 'j':			/* JLH: debug info */
+				case 'J':
+					++jflag;
+					++oflag;		/* force object */
+					break;
 
 				case 'l':
 				case 'L':
@@ -331,30 +337,32 @@ main(int argc, char *argv[])
 					break;
 
 				default:
-					usage();
+					usage(ER_FATAL);
 				}
 		} else {
 			if (++inpfil == MAXFIL) {
 				fprintf(stderr, "too many input files\n");
-				asexit(1);
+				asexit(ER_FATAL);
 			}
 			sfp[inpfil] = afile(p, "", 0);
 			strcpy(srcfn[inpfil],afn);
 			if (inpfil == 0) {
 				if (lflag)
 					lfp = afile(p, "lst", 1);
-                                if (oflag) {
+				if (oflag) {
 					ofp = afile(p, (is_sdas() && is_sdas_target_z80_like()) ? "o" : "rel", 1);
-                                        // save the file name if we have to delete it on error
-                                        strcpy(relFile,afn);
-                                }
+					/* sdas specific */
+					// save the file name if we have to delete it on error
+					strcpy(relFile,afn);
+					/* end sdas specific */
+				}
 				if (sflag)
 					tfp = afile(p, "sym", 1);
 			}
 		}
 	}
 	if (inpfil < 0)
-		usage();
+		usage(ER_WARNING);
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;
@@ -371,7 +379,9 @@ main(int argc, char *argv[])
 		radix = 10;
 		srcline[0] = 0;
 		page = 0;
-                org_cnt = 0;
+		/* sdas specific */
+		org_cnt = 0;
+		/* end sdas specific */
 		stb[0] = 0;
 		lop  = NLPP;
 		cfile = 0;
@@ -397,14 +407,16 @@ main(int argc, char *argv[])
 			ep = eb;
 			ip = ib;
 
-                        /* JLH: if line begins with ";!", then
-                         * pass this comment on to the output file
-                         */
-                        if (oflag && (pass == 1) &&
-                            (ip[0] == ';') && (ip[1] == '!'))
-                        {
-                                fprintf(ofp, "%s\n", ip );
-                        }
+			/* sdas specific */
+			/* JLH: if line begins with ";!", then
+			 * pass this comment on to the output file
+			 */
+			if (oflag && (pass == 1) &&
+			    (ip[0] == ';') && (ip[1] == '!'))
+			{
+				fprintf(ofp, "%s\n", ip );
+			}
+			/* end sdas specific */
 
 			if (setjmp(jump_env) == 0)
 				asmbl();
@@ -425,8 +437,8 @@ main(int argc, char *argv[])
 	if (lflag) {
 		lstsym(lfp);
 	}
-	asexit(aserr);
-	return aserr;
+	asexit(aserr ? ER_ERROR : ER_NONE);
+	return(0);
 }
 
 /*)Function	VOID	asexit(i)
@@ -471,11 +483,13 @@ int i;
 	for (j=0; j<MAXINC && ifp[j] != NULL; j++) {
 		fclose(ifp[j]);
 	}
-        if (i) {
-          /* remove output file */
-          printf ("removing %s\n", relFile);
-          remove(relFile);
-        }
+	/* sdas specific */
+	if (i) {
+		/* remove output file */
+		printf ("removing %s\n", relFile);
+		remove(relFile);
+	}
+	/* end sdas specific */
 	exit(i);
 }
 
@@ -545,10 +559,10 @@ int i;
  *		VOID	err()		assubr.c
  *		VOID	expr()		asexpr.c
  *		FILE *	fopen()		c-library
- *		char	get()		aslex.c
+ *		int	get()		aslex.c
  *		VOID	getid()		aslex.c
  *		int	getmap()	aslex.c
- *		char	getnb()		aslex.c
+ *		int	getnb()		aslex.c
  *		VOID	getst()		aslex.c
  *		sym *	lookup()	assym.c
  *		VOID	machin()	___mch.c
@@ -580,16 +594,17 @@ asmbl()
 	struct expr e1;
 	char id[NCPS];
 	char opt[NCPS];
-	char fn[FILSPC];
+	char fn[FILSPC+FILSPC];
 	char *p;
 	int d, n, uaf, uf;
-        static struct area *abs_ap; /* pointer to current absolute area structure */
+	/* sdas specific */
+	static struct area *abs_ap; /* pointer to current absolute area structure */
+	double f1, f2;
+	unsigned int mantissa, exponent;
+	const char readbuffer[80];
+	/* end sdas specific */
 
-        double f1, f2;
-        unsigned int mantissa, exponent;
-        const char readbuffer[80];
-
-        laddr = dot.s_addr;
+	laddr = dot.s_addr;
 	lmode = SLIST;
 loop:
 	if ((c=endline()) == 0) { return; }
@@ -671,7 +686,7 @@ loop:
 		} else {
 			qerr();
 		}
-        }
+	}
 	getid(id, c);
 	c = getnb();
 	/*
@@ -846,83 +861,78 @@ loop:
 		unget(c);
 		break;
 
-        /* sdas z80 specific */
-        case S_FLOAT:
-                do {
-                        getid( readbuffer, ' ' ); /* Hack :) */
-                        if ((c=getnb())=='.')
-                          {
-                                  getid(&readbuffer[strlen(readbuffer)],'.');
-                          }
-                        else
-                            unget(c);
+	/* sdas z80 specific */
+	case S_FLOAT:
+		do {
+			getid(readbuffer, ' ');	/* Hack :) */
+			if ((c = getnb()) == '.') {
+				getid(&readbuffer[strlen(readbuffer)], '.');
+			}
+			else
+				unget(c);
 
-                        f1 = strtod( readbuffer, (char **)NULL );
-                        /* Convert f1 to a gb-lib type fp
-                         * 24 bit mantissa followed by 7 bit exp and 1 bit sign
-                        */
+			f1 = strtod(readbuffer, (char **)NULL);
+			/* Convert f1 to a gb-lib type fp
+			 * 24 bit mantissa followed by 7 bit exp and 1 bit sign
+			 */
 
-                        if (f1!=0)
-                          {
+			if (f1 != 0) {
+				f2 = floor(log(fabs(f1)) / log(2)) + 1;
+				mantissa = (unsigned int) ((0x1000000 * fabs(f1)) / exp(f2 * log(2)));
+				mantissa &= 0xffffff;
+				exponent = (unsigned int) (f2 + 0x40) ;
+				if (f1 < 0)
+					exponent |=0x80;
+			}
+			else {
+				mantissa = 0;
+				exponent = 0;
+			}
 
-                                  f2 = floor(log(fabs(f1))/log(2))+1;
-                                  mantissa = (unsigned int) ((0x1000000*fabs(f1))/exp(f2*log(2))) ;
-                                  mantissa &=0xffffff;
-                                  exponent = (unsigned int) (f2 + 0x40) ;
-                                  if (f1<0)
-                                      exponent |=0x80;
-                          }
+			outab(mantissa & 0xff);
+			outab((mantissa >> 8) & 0xff);
+			outab((mantissa >> 16) & 0xff);
+			outab(exponent & 0xff);
 
-                        else
-                          {
-                                  mantissa=0;
-                                  exponent=0;
-                          }
+		} while ((c = getnb()) == ',');
+		unget(c);
+		break;
+	/* end sdas z80 specific */
 
-                        outab(mantissa&0xff);
-                        outab((mantissa>>8)&0xff);
-                        outab((mantissa>>16)&0xff);
-                        outab(exponent&0xff);
+	/* sdas hc08 specific */
+	case S_ULEB128:
+	case S_SLEB128:
+		do {
+			a_uint val = absexpr();
+			int bit = sizeof(val)*8 - 1;
+			int impliedBit;
 
-                } while ((c = getnb()) == ',');
-                unget(c);
-                break;
-        /* end sdas z80 specific */
+			if (mp->m_type == S_ULEB128) {
+				impliedBit = 0;
+			} else {
+				impliedBit = (val & (1 << bit)) ? 1 : 0;
+			}
+			while ((bit>0) && (((val & (1 << bit)) ? 1 : 0) == impliedBit)) {
+				bit--;
+			}
+			if (mp->m_type == S_SLEB128) {
+				bit++;
+			}
+			while (bit>=0) {
+				if (bit<7) {
+					outab(val & 0x7f);
+				} else {
+					outab(0x80 | (val & 0x7f));
+				}
+				bit -= 7;
+				val >>= 7;
+			}
+		} while ((c = getnb()) == ',');
+		unget(c);
+		break;
+	/* end sdas hc08 specific */
 
-        /* sdas hc08 specific */
-        case S_ULEB128:
-        case S_SLEB128:
-                do {
-                        a_uint val = absexpr();
-                        int bit = sizeof(val)*8 - 1;
-                        int impliedBit;
-
-                        if (mp->m_type == S_ULEB128) {
-                                impliedBit = 0;
-                        } else {
-                                impliedBit = (val & (1 << bit)) ? 1 : 0;
-                        }
-                        while ((bit>0) && (((val & (1 << bit)) ? 1 : 0) == impliedBit)) {
-                                bit--;
-                        }
-                        if (mp->m_type == S_SLEB128) {
-                                bit++;
-                        }
-                        while (bit>=0) {
-                                if (bit<7) {
-                                        outab(val & 0x7f);
-                                } else {
-                                        outab(0x80 | (val & 0x7f));
-                                }
-                                bit -= 7;
-                                val >>= 7;
-                        }
-                } while ((c = getnb()) == ',');
-                unget(c);
-                break;
-        /* end sdas hc08 specific */
-
-        case S_ASCII:
+	case S_ASCII:
 	case S_ASCIZ:
 		if ((d = getnb()) == '\0')
 			qerr();
@@ -981,7 +991,7 @@ loop:
 		break;
 
 	case S_MODUL:
-                getst(id, getnb()); // a module can start with a digit
+		getst(id, getnb()); // a module can start with a digit
 		if (pass == 0) {
 			if (module[0]) {
 				err('m');
@@ -992,19 +1002,21 @@ loop:
 		lmode = SLIST;
 		break;
 
-        case S_OPTSDCC:
-                p = optsdcc;
-                if ((c = getnb()) != 0) {
-                        do {
-                                if (p < &optsdcc[NINPUT-1])
-                                        *p++ = c;
-                        } while ((c = get()) != 0);
-                }
-                *p = 0;
-                unget(c);
-                lmode = SLIST;
+	/* sdas hc08 specific */
+	case S_OPTSDCC:
+		p = optsdcc;
+		if ((c = getnb()) != 0) {
+			do {
+				if (p < &optsdcc[NINPUT-1])
+					*p++ = c;
+			} while ((c = get()) != 0);
+		}
+		*p = 0;
+		unget(c);
+		lmode = SLIST;
 		/*if (pass == 0) printf("optsdcc=%s\n", optsdcc);*/
 		break;
+	/* end sdas hc08 specific */
 
 	case S_GLOBL:
 		do {
@@ -1044,7 +1056,9 @@ loop:
 			ap->a_ap = areap;
 			ap->a_id = strsto(id);
 			ap->a_ref = areap->a_ref + 1;
-                        ap->a_addr = 0;
+			/* sdas specific */
+			ap->a_addr = 0;
+			/* end sdas specific */
 			ap->a_size = 0;
 			ap->a_fuzz = 0;
 			ap->a_flag = uaf ? uf : (A_CON|A_REL);
@@ -1052,34 +1066,33 @@ loop:
 		}
 		newdot(ap);
 		lmode = SLIST;
-                if (dot.s_area->a_flag & A_ABS)
-                        abs_ap = ap;
+		if (dot.s_area->a_flag & A_ABS)
+			abs_ap = ap;
 		break;
 
-        case S_ORG:
-                if (dot.s_area->a_flag & A_ABS) {
-                        char buf[NCPS];
+	case S_ORG:
+		if (dot.s_area->a_flag & A_ABS) {
+			char buf[NCPS];
 
-                        laddr = absexpr();
-                        sprintf(buf, "%s%x", abs_ap->a_id, org_cnt++);
-                        if ((ap = alookup(buf)) == NULL) {
-                                ap = (struct area *) new (sizeof(struct area));
-                                *ap = *areap;
-                                ap->a_ap = areap;
+			laddr = absexpr();
+			sprintf(buf, "%s%x", abs_ap->a_id, org_cnt++);
+			if ((ap = alookup(buf)) == NULL) {
+				ap = (struct area *) new (sizeof(struct area));
+				*ap = *areap;
+				ap->a_ap = areap;
 				ap->a_id = strsto(buf);
-                                ap->a_ref = areap->a_ref + 1;
-                                ap->a_size = 0;
-                                ap->a_fuzz = 0;
-                                areap = ap;
-                        }
-                        newdot(ap);
-                        lmode = ALIST;
-                        dot.s_addr = dot.s_org = laddr;
-                } else {
-                        err('o');
-                }
-                break;
-
+				ap->a_ref = areap->a_ref + 1;
+				ap->a_size = 0;
+				ap->a_fuzz = 0;
+				areap = ap;
+			}
+			newdot(ap);
+			lmode = ALIST;
+			dot.s_addr = dot.s_org = laddr;
+		} else {
+			err('o');
+		}
+		break;
 
 	case S_RADIX:
 		if (more()) {
@@ -1128,7 +1141,7 @@ loop:
 		}
 		*p = 0;
 		if (++incfil == MAXINC ||
-                   (ifp[incfil] = search_path_fopen(fn, "r")) == NULL) {
+		   (ifp[incfil] = search_path_fopen(fn, "r")) == NULL) {
 			--incfil;
 			err('i');
 		} else {
@@ -1139,48 +1152,43 @@ loop:
 		lmode = SLIST;
 		break;
 
-        case S_FLAT24:
-                if (more())
-                {
-                    getst(id, -1);
+	/* sdas hc08 specific */
+	case S_FLAT24:
+		if (more()) {
+			getst(id, -1);
 
-                    if (!as_strcmpi(id, "on"))
-                    {
-                        /* Quick sanity check: size of
-                         * a_uint must be at least 24 bits.
-                         */
-                        if (sizeof(a_uint) < 3)
-                        {
-                            warnBanner();
-                            fprintf(stderr,
-                                    "Cannot enable Flat24 mode: "
-                                    "host system must have 24 bit "
-                                    "or greater integers.\n");
-                        }
-                        else
-                        {
-                            flat24Mode = 1;
-                        }
-                    }
-                    else if (!as_strcmpi(id, "off"))
-                    {
-                        flat24Mode = 0;
-                    }
-                    else
-                    {
-                        qerr();
-                    }
-                }
-                else
-                {
-                    qerr();
-                }
-                lmode = SLIST;
-                #if 0
-                printf("as8051: ds390 flat mode %sabled.\n",
-                        flat24Mode ? "en" : "dis");
-                #endif
-                break;
+			if (!as_strcmpi(id, "on")) {
+				/* Quick sanity check: size of
+				* a_uint must be at least 24 bits.
+				*/
+				if (sizeof(a_uint) < 3) {
+					warnBanner();
+					fprintf(stderr,
+						"Cannot enable Flat24 mode: "
+						"host system must have 24 bit "
+						"or greater integers.\n");
+				}
+				else {
+					flat24Mode = 1;
+				}
+			}
+			else if (!as_strcmpi(id, "off")) {
+				flat24Mode = 0;
+			}
+			else {
+				qerr();
+			}
+		}
+		else {
+			qerr();
+		}
+		lmode = SLIST;
+		#if 0
+		printf("as8051: ds390 flat mode %sabled.\n",
+			flat24Mode ? "en" : "dis");
+		#endif
+		break;
+	/* end sdas hc08 specific */
 
 	/*
 	 * If not an assembler directive then go to
@@ -1189,17 +1197,16 @@ loop:
 	 */
 	default:
 		machine(mp);
-                /* if cdb information then generate the line info */
-                if (cflag && (pass == 1))
-                    DefineCDB_Line();
+		/* sdas hc08 specific */
+		/* if cdb information then generate the line info */
+		if (cflag && (pass == 1))
+			DefineCDB_Line();
 
-                /* JLH: if -j, generate a line number symbol */
-                if (jflag && (pass == 1))
-                {
-                   DefineNoICE_Line();
-                }
-
-        }
+		/* JLH: if -j, generate a line number symbol */
+		if (jflag && (pass == 1))
+			DefineNoICE_Line();
+		/* end sdas hc08 specific */
+	}
 	goto loop;
 }
 
@@ -1250,41 +1257,41 @@ char *fn;
 char *ft;
 int wf;
 {
-        char *p2, *p3;
-        int c;
-        FILE *fp;
+	char *p2, *p3;
+	int c;
+	FILE *fp;
 
-        p2 = afn;
-        p3 = ft;
+	p2 = afn;
+	p3 = ft;
 
-        strcpy (afn, fn);
-        p2 = strrchr (afn, FSEPX);              // search last '.'
-        if (!p2)
-                p2 = afn + strlen (afn);
-        if (p2 > &afn[PATH_MAX-4])              // truncate filename, if it's too long
-                p2 = &afn[PATH_MAX-4];
-        *p2++ = FSEPX;
+	strcpy (afn, fn);
+	p2 = strrchr (afn, FSEPX);		// search last '.'
+	if (!p2)
+		p2 = afn + strlen (afn);
+	if (p2 > &afn[PATH_MAX-4])		// truncate filename, if it's too long
+		p2 = &afn[PATH_MAX-4];
+	*p2++ = FSEPX;
 
-        // choose a file-extension
-        if (*p3 == 0) {                                 // extension supplied?
-                p3 = strrchr (fn, FSEPX);       // no: extension in fn?
-                if (p3)
-                        ++p3;
-                else
-                        p3 = dsft;                                      // no: default extension
-        }
+	// choose a file-extension
+	if (*p3 == 0) {				// extension supplied?
+		p3 = strrchr (fn, FSEPX);	// no: extension in fn?
+		if (p3)
+			++p3;
+		else
+			p3 = dsft;		// no: default extension
+	}
 
-        while ((c = *p3++) != 0) {              // strncpy
-                if (p2 < &afn[PATH_MAX-1])
-                        *p2++ = c;
-        }
-        *p2++ = 0;
+	while ((c = *p3++) != 0) {		// strncpy
+		if (p2 < &afn[PATH_MAX-1])
+			*p2++ = c;
+	}
+	*p2++ = 0;
 
-        if ((fp = fopen(afn, wf?"w":"r")) == NULL) {
-                fprintf(stderr, "%s: cannot %s.\n", afn, wf?"create":"open");
-                asexit(1);
-        }
-        return (fp);
+	if ((fp = fopen(afn, wf?"w":"r")) == NULL) {
+		fprintf(stderr, "%s: cannot %s.\n", afn, wf?"create":"open");
+		asexit(1);
+	}
+	return (fp);
 }
 
 /*)Function	VOID	newdot(nap)
@@ -1319,39 +1326,43 @@ VOID
 newdot(nap)
 struct area *nap;
 {
-        struct area *oap;
+	struct area *oap;
 
-        oap = dot.s_area;
-        /* fprintf (stderr, "%s dot.s_area->a_size: %d dot.s_addr: %d\n",
-             oap->a_id, dot.s_area->a_size, dot.s_addr); */
-        oap->a_fuzz = fuzz;
-        if (oap->a_flag & A_OVR) {
-          // the size of an overlay is the biggest size encountered
-          if (oap->a_size < dot.s_addr) {
-            oap->a_size = dot.s_addr;
-          }
-        } else if (oap->a_flag & A_ABS) {
-          oap->a_addr = dot.s_org;
-          oap->a_size += dot.s_addr - dot.s_org;
-          dot.s_addr = dot.s_org = 0;
-        } else {
-          oap->a_addr = 0;
-          oap->a_size = dot.s_addr;
-        }
-        if (nap->a_flag & A_OVR) {
-          // a new overlay starts at 0, no fuzz
-          dot.s_addr = 0;
-          fuzz = 0;
-        } else if (nap->a_flag & A_ABS) {
-          // a new absolute starts at org, no fuzz
-          dot.s_addr = dot.s_org;
-          fuzz = 0;
-        } else {
-          dot.s_addr = nap->a_size;
-          fuzz = nap->a_fuzz;
-        }
-        dot.s_area = nap;
-        outall();
+	oap = dot.s_area;
+	/* fprintf (stderr, "%s dot.s_area->a_size: %d dot.s_addr: %d\n",
+		oap->a_id, dot.s_area->a_size, dot.s_addr); */
+	oap->a_fuzz = fuzz;
+	if (oap->a_flag & A_OVR) {
+		// the size of an overlay is the biggest size encountered
+		if (oap->a_size < dot.s_addr) {
+			oap->a_size = dot.s_addr;
+		}
+	}
+	else if (oap->a_flag & A_ABS) {
+		oap->a_addr = dot.s_org;
+		oap->a_size += dot.s_addr - dot.s_org;
+		dot.s_addr = dot.s_org = 0;
+	}
+	else {
+		oap->a_addr = 0;
+		oap->a_size = dot.s_addr;
+	}
+	if (nap->a_flag & A_OVR) {
+		// a new overlay starts at 0, no fuzz
+		dot.s_addr = 0;
+		fuzz = 0;
+	}
+	else if (nap->a_flag & A_ABS) {
+		// a new absolute starts at org, no fuzz
+		dot.s_addr = dot.s_org;
+		fuzz = 0;
+	}
+	else {
+		dot.s_addr = nap->a_size;
+		fuzz = nap->a_fuzz;
+	}
+	dot.s_area = nap;
+	outall();
 }
 
 /*)Function	VOID	phase(ap, a)
@@ -1392,21 +1403,21 @@ char *usetxt[] = {
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
-        "  j    add line number and debug information to file", /* JLH */
+	"  j    add line number and debug information to file", /* JLH */
 	"  g    undefined symbols made global",
 	"  a    all user symbols made global",
 	"  l    create list   output file1[lst]",
 	"  o    create object output file1[rel]",
 	"  s    create symbol output file1[sym]",
-        "  c    generate sdcdb debug information",
+	"  c    generate sdcdb debug information",
 	"  p    disable listing pagination",
 	"  w    wide listing format for symbol table",
 	"  z    enable case sensitivity for symbols",
 	"  f    flag relocatable references by  `   in listing file",
 	" ff    flag relocatable references by mode in listing file",
-        "-I<dir>  Add the named directory to the include file",
-        "       search path.  This option may be used more than once.",
-        "       Directories are searched in the order given.",
+	"-I<dir>  Add the named directory to the include file",
+	"       search path.  This option may be used more than once.",
+	"       Directories are searched in the order given.",
 	"",
 	0
 };
@@ -1418,21 +1429,21 @@ char *usetxt_z80[] = {
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
-        "  j    add line number and debug information to file", /* JLH */
+	"  j    add line number and debug information to file", /* JLH */
 	"  g    undefined symbols made global",
 	"  a    all user symbols made global",
 	"  l    create list   output file1[lst]",
 	"  o    create object output file1[o]",
 	"  s    create symbol output file1[sym]",
-        "  c    generate sdcdb debug information",
+	"  c    generate sdcdb debug information",
 	"  p    disable listing pagination",
 	"  w    wide listing format for symbol table",
 	"  z    enable case sensitivity for symbols",
 	"  f    flag relocatable references by  `   in listing file",
 	" ff    flag relocatable references by mode in listing file",
-        "-I<dir>  Add the named directory to the include file",
-        "       search path.  This option may be used more than once.",
-        "       Directories are searched in the order given.",
+	"-I<dir>  Add the named directory to the include file",
+	"       search path.  This option may be used more than once.",
+	"       Directories are searched in the order given.",
 	"",
 	0
 };
@@ -1460,14 +1471,14 @@ char *usetxt_z80[] = {
  */
 
 VOID
-usage()
+usage(n)
 {
 	char **dp;
 
-        /* sdas specific */
+	/* sdas specific */
 	fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
 	for (dp = (is_sdas() && is_sdas_target_z80_like()) ? usetxt_z80 : usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-        /* end sdas specific */
-	asexit(1);
+	/* end sdas specific */
+	asexit(n);
 }

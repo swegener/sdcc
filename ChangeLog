@@ -10,7 +10,8 @@
 	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
 	  as/link/z80/lkarea.c, as/link/z80/lkgb.c, as/link/z80/lkmain.c,
 	  as/link/z80/lkmem.c, as/link/z80/Makefile.in, src/ds390/main.c,
-	  src/hc08/main.c, src/mcs51/main.c, src/z80/main.c:
+	  src/hc08/main.c, src/mcs51/main.c, src/z80/main.c,
+	  as/link/sdlink.[ch]:
 	  lkmain.c unification; linkers renamed to sdlinkXXXX
 
 2009-11-27 Borut Razem <borut.razem AT siol.net>

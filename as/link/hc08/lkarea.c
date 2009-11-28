@@ -649,3 +649,7 @@ a_uint lnksect(struct area *tap)
 
     return addr;
 }
+
+VOID lnkarea2 (void)
+{
+}

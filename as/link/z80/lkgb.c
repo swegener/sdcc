@@ -42,13 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 unsigned char *cart[NBSEG];
 
-int nb_rom_banks;
-int nb_ram_banks;
 int current_rom_bank;
-int mbc_type;
-char cart_name[16] = "";
-
-patch* patches = NULL;
 
 VOID gb(int in)
 {

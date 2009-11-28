@@ -1,8 +1,19 @@
 2009-11-28 Borut Razem <borut.razem AT siol.net>
 
-	* 
+	* as/asxxsrc/asdata.c, as/asxxsrc/asmain.c, as/asxxsrc/asxxxx.h:
+	  mark sdas specifics
+	* as/asxxsrc/sdas.c, as/asxxsrc/sdas.h, as/link/aslink.h,
+	  as/link/hc08/lkarea.c, as/link/hc08/lkmain.c, as/link/hc08/lkmem.c,
+	  as/link/hc08/Makefile.aslink, as/link/hc08/Makefile.in,
+	  as/link/lkmain.c, as/link/Makefile.in, as/link/mcs51/lkmain.c,
+	  as/link/mcs51/Makefile.aslink, as/link/mcs51/Makefile.in,
+	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
+	  as/link/z80/lkarea.c, as/link/z80/lkgb.c, as/link/z80/lkmain.c,
+	  as/link/z80/lkmem.c, as/link/z80/Makefile.in, src/ds390/main.c,
+	  src/hc08/main.c, src/mcs51/main.c, src/z80/main.c:
+	  lkmain.c unification; linkers renamed to sdlinkXXXX
 
-	2009-11-27 Borut Razem <borut.razem AT siol.net>
+2009-11-27 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/config.guess, sim/ucsim/ltmain.sh, sim/ucsim/config.sub:
 	  upgraded to libtool 2.2.5,

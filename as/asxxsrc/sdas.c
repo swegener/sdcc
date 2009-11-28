@@ -62,22 +62,23 @@ sdas_init (char *path)
     char *str;
     enum sdas_target_e target;
   } tgt[] = {
-    { "gb", TARGET_IS_GB, },  /* must be before z80! */
-    { "z80",   TARGET_IS_Z80, },
+    { "gb", TARGET_IS_GB, },
+    { "z80", TARGET_IS_Z80, },
     { "8051", TARGET_IS_8051, },
-    { "6808",  TARGET_IS_6808, },
+    { "6808", TARGET_IS_6808, },
   };
   int i;
 
   char *progname = program_name (path);
-  sdas = (strncmp(progname, "sdas", 4) == 0);
-
-  for (i = 0; i < NELEM (tgt); ++i)
+  if ((sdas = (strncmp(progname, "sdas", 4) == 0)) != 0)
     {
-      if (strstr(progname, tgt[i].str))
+      for (i = 0; i < NELEM (tgt); ++i)
         {
-          target = tgt[i].target;
-          break;
+          if (strstr(progname, tgt[i].str))
+            {
+              target = tgt[i].target;
+              break;
+	    }
         }
     }
 }

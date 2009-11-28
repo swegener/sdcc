@@ -4,18 +4,18 @@ top_builddir = @top_builddir@
 
 include $(top_builddir)/Makefile.common
 
-PORTS = z80 gbz80
+PORTS = z80 gb
 
 all: 
-	$(MAKE) -C z80 _link-z80 _link-gbz80 E=$(E) BUILDDIR=../../../bin/
+	$(MAKE) -C z80 _sdlinkz80 _sdlinkgb E=$(E) BUILDDIR=../../../bin/
 
 install: all
-	$(INSTALL) $(top_builddir)/bin/link-z80$(EXEEXT) `echo $(DESTDIR)$(bindir)/link-z80$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/link-z80$(EXEEXT)|sed '$(transform)'`
-	$(INSTALL) $(top_builddir)/bin/link-gbz80$(EXEEXT) `echo $(DESTDIR)$(bindir)/link-gbz80$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/link-gbz80$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(top_builddir)/bin/sdlinkz80$(EXEEXT) `echo $(DESTDIR)$(bindir)/sdlinkz80$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdlinkz80$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(top_builddir)/bin/sdlinkgb$(EXEEXT) `echo $(DESTDIR)$(bindir)/sdlinkgb$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdlinkgb$(EXEEXT)|sed '$(transform)'`
 
 uninstall:
-	cd $(DESTDIR)$(bindir); rm -f link-z80$(EXEEXT) link-gbz80$(EXEEXT)
+	cd $(DESTDIR)$(bindir); rm -f sdlinkz80$(EXEEXT) sdlinkgb$(EXEEXT)
 
 include $(srcdir)/clean.mk

@@ -604,3 +604,7 @@ VOID lnksect(register struct area *tap)
         }
 //        return addr;
 }
+
+VOID lnkarea2 (void)
+{
+}

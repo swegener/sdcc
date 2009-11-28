@@ -230,7 +230,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define F_REL   3               /* File.rel */
 #define F_CMD   4               /* Command line */
 
-#ifdef GAMEBOY
+/* sdlink gb specific */
 /*
  * Multiple banks support
  */
@@ -248,7 +248,7 @@ typedef struct _patch {
   struct _patch *next;
 } patch;
 extern patch* patches;
-#endif /* GAMEBOY */
+/* end sdlink gb specific */
 
 /*
  *      General assembler address type

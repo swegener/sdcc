@@ -355,3 +355,8 @@ int summary(struct area * areap)
         fclose(of);
         return toreturn;
 }
+
+int summary2(struct area * areap)
+{
+	return 0;
+}

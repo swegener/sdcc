@@ -48,9 +48,9 @@ ASXXLIBSRC = strcmpi.c
 
 LKLIBSRC = lk_readnl.c lkaomf51.c lkar.c lkdata.c lkeval.c \
            lkhead.c lklex.c lklib.c lklibr.c lklist.c \
-           lknoice.c lkrel.c lksdcclib.c lkstore.c lksym.c
+           lkmain.c lknoice.c lkrel.c lksdcclib.c lkstore.c lksym.c sdlink.c
 
-SRC = lkmain.c lkarea.c lkihx.c \
+SRC = lkarea.c lkihx.c \
       lkrloc.c lks19.c lkelf.c lkmem.c
 
 LKSOURCES = $(SRC) $(LKLIBSRC:%.c=$(LKLIB)/%.c) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
@@ -60,7 +60,7 @@ LKOBJS = $(LKLIBSRC:%.c=$(OBJDIR)/%.o)
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 LKOBJECTS = $(OBJS) $(LKOBJS) $(ASXXLIBOBJS)
 
-ASLINK = $(top_builddir)/bin/link-hc08$(EXEEXT)
+ASLINK = $(top_builddir)/bin/sdlink6808$(EXEEXT)
 
 transform       = @program_transform_name@
 

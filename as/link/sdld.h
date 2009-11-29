@@ -1,4 +1,4 @@
-/* sdlink.h
+/* sdld.h
 
    Copyright (C) 2009 Borut Razem
 
@@ -15,10 +15,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#ifndef __SDLINK_H
-#define __SDLINK_H
+#ifndef __SDLD_H
+#define __SDLD_H
 
-enum sdlink_target_e {
+enum sdld_target_e {
   TARGET_IS_UNKNOWN,
   TARGET_IS_GB,
   TARGET_IS_Z80,
@@ -26,10 +26,10 @@ enum sdlink_target_e {
   TARGET_IS_6808,
 };
 
-void sdlink_init (char *path);
-int is_sdlink(void);
-enum sdlink_target_e get_sdlink_target(void);
-int is_sdlink_target_z80_like(void);
-int is_sdlink_target_8051_like(void);
+void sdld_init (char *path);
+int is_sdld(void);
+enum sdld_target_e get_sdld_target(void);
+int is_sdld_target_z80_like(void);
+int is_sdld_target_8051_like(void);
 
-#endif  /* __SDLINK_H */
+#endif  /* __SDLD_H */

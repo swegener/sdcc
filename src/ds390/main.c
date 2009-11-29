@@ -331,7 +331,7 @@ _ds390_genInitStartup (FILE *of)
   // (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
   if (!TARGET_IS_DS400)
     {
-      /* initialise the stack pointer.  JCF: sdlink takes care of the location */
+      /* initialise the stack pointer.  JCF: sdld takes care of the location */
       fprintf (of, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
     }
 
@@ -881,7 +881,7 @@ getRegsWritten (lineNode *line)
 */
 static const char *_linkCmd[] =
 {
-  "sdlink", "-nf", "\"$1\"", NULL
+  "sdld", "-nf", "\"$1\"", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */

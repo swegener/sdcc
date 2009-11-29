@@ -1,3 +1,13 @@
+2009-11-29 Borut Razem <borut.razem AT siol.net>
+
+	* src/mcs51/main.c, src/z80/main.c, src/hc08/main.c, src/ds390/main.c,
+	  as/asxxsrc/sdas.c, as/link/Makefile.in, as/link/lkmain.c,
+	  as/link/z80/Makefile.in, as/link/mcs51/Makefile.in,
+	  as/link/hc08/Makefile.in, as/link/aslink.h, as/link/sdlink.[ch],
+	  as/link/sdld.[ch], sdcc/as/asxxsrc/sdas.c, as/link/lkdata.c,
+	  as/link/lkmain.c:
+	  fixed bug in target detection, sdlink renamed to sdld
+
 2009-11-28 Borut Razem <borut.razem AT siol.net>
 
 	* as/asxxsrc/asdata.c, as/asxxsrc/asmain.c, as/asxxsrc/asxxxx.h:

@@ -1,4 +1,4 @@
-/* sdlink.c
+/* sdld.c
 
    Copyright (C) 2009 Borut Razem
 
@@ -22,13 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <string.h>
 
-#include "sdlink.h"
+#include "sdld.h"
 
 #define NELEM(x)  (sizeof (x) / sizeof (x)[0])
 
 
-static int sdlink = -1;
-static enum sdlink_target_e target = TARGET_IS_UNKNOWN;
+static int sdld = -1;
+static enum sdld_target_e target = TARGET_IS_UNKNOWN;
 
 
 static char
@@ -48,19 +48,19 @@ static char
 static void
 check_init(void)
 {
-  if (sdlink == -1) {
-    fprintf(stderr, "sdlink_init not called!\n");
+  if (sdld == -1) {
+    fprintf(stderr, "sdld_init not called!\n");
     exit (1);
   }
 }
 
 
 void
-sdlink_init (char *path)
+sdld_init (char *path)
 {
   struct tgt_s {
     char *str;
-    enum sdlink_target_e target;
+    enum sdld_target_e target;
   } tgt[] = {
     { "gb", TARGET_IS_GB, },
     { "z80", TARGET_IS_Z80, },
@@ -70,10 +70,10 @@ sdlink_init (char *path)
   int i;
 
   char *progname = program_name (path);
-  if ((sdlink = (strncmp(progname, "sdlink", 6) == 0)) != 0)
+  if ((sdld = (strncmp(progname, "sdld", 4) == 0)) != 0)
     {
-      /* exception: sdlink is 8051 linker */
-      if (progname[6] == '\0')
+      /* exception: sdld is 8051 linker */
+      if (progname[4] == '\0')
 	target = TARGET_IS_8051;
       else
         {
@@ -91,23 +91,23 @@ sdlink_init (char *path)
 
 
 int
-is_sdlink(void)
+is_sdld(void)
 {
   check_init();
-  return sdlink;
+  return sdld;
 }
 
 
-enum sdlink_target_e
-get_sdlink_target(void)
+enum sdld_target_e
+get_sdld_target(void)
 {
   check_init();
-  return sdlink;
+  return target;
 }
 
 
 int
-is_sdlink_target_z80_like(void)
+is_sdld_target_z80_like(void)
 {
   check_init();
   return target == TARGET_IS_Z80 || target == TARGET_IS_GB;
@@ -115,7 +115,7 @@ is_sdlink_target_z80_like(void)
 
 
 int
-is_sdlink_target_8051_like(void)
+is_sdld_target_8051_like(void)
 {
   check_init();
   return target == TARGET_IS_8051;

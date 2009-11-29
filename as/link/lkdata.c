@@ -39,6 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 char    *_abs_  = { ".  .ABS." };
 
+char	afspec[FILSPC];	/*	The filespec created by afile()
+			 */
 int     lkerr;          /*      Linker error flag
                          */
 char    *ip;            /*      Pointer into the REL file text line in ib[]

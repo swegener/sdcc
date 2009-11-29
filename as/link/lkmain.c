@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "sdlink.h"
+#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lkmain.c
@@ -56,7 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  */
 
-/* sdlink 8051 & 6808 specific */
+/* sdld 8051 & 6808 specific */
 /*JCF:	Creates some of the default areas so they are allocated in the right order.*/
 void Areas51 (void)
 {
@@ -113,21 +113,21 @@ void Areas51 (void)
 		else if (!strcmp(ap->a_id, "REG_BANK_2")) { ap->a_addr = 0x10; ap->a_type = 1; }
 		else if (!strcmp(ap->a_id, "REG_BANK_3")) { ap->a_addr = 0x18; ap->a_type = 1; }
 		else if (!strcmp(ap->a_id, "BSEG_BYTES")) { ap->a_addr = 0x20; ap->a_type = 1; }
-		else if (get_sdlink_target() == TARGET_IS_8051 && !strcmp(ap->a_id, "SSEG")) {
+		else if (get_sdld_target() == TARGET_IS_8051 && !strcmp(ap->a_id, "SSEG")) {
 			if (stacksize) ap->a_axp->a_size = stacksize;
 		}
 	}
 
-	if (get_sdlink_target() == TARGET_IS_8051) {
+	if (get_sdld_target() == TARGET_IS_8051) {
 		sp = lkpsym("l_IRAM", 1);
 		sp->s_addr = ((iram_size>0) && (iram_size<=0x100)) ? iram_size : 0x0100;
 		sp->s_axp = NULL;
 		sp->s_type |= S_DEF;
 	}
 }
-/* end sdlink 8051 & 6808 specific */
+/* end sdld 8051 & 6808 specific */
 
-/* sdlink gb specific */
+/* sdld gb specific */
 char *default_basep[] = {
   "_CODE=0x0200",
   "_DATA=0xC0A0",
@@ -200,7 +200,7 @@ void gb_init_banks()
 		sprintf(bsp->b_strp, "_DATA_%d=0xA000", i);
 	}
 }
-/* end sdlink gb specific */
+/* end sdld gb specific */
 
 /*)Function	VOID	main(argc,argv)
  *
@@ -296,12 +296,12 @@ char *argv[];
 
 	/* sdas specific */
 	/* sdas initialization */
-	sdlink_init(argv[0]);
+	sdld_init(argv[0]);
 	/* end sdas specific */
 
-	if (get_sdlink_target() == TARGET_IS_GB)
+	if (get_sdld_target() == TARGET_IS_GB)
 		gb_init();
-	if (!is_sdlink())
+	if (!is_sdld())
 		fprintf(stdout, "\n");
 
 	startp = (struct lfile *) new (sizeof (struct lfile));
@@ -369,11 +369,11 @@ char *argv[];
 	if (linkp == NULL)
 		usage();
 
-	if (get_sdlink_target() == TARGET_IS_GB)
+	if (get_sdld_target() == TARGET_IS_GB)
 		gb_init_banks();
 	syminit();
 
-	/* sdlink specific */
+	/* sdld specific */
 	if (dflag){
 		//dfp = afile("temp", "cdb", 1);
 		SaveLinkedFilePath(linkp->f_idp); //Must be the first one...
@@ -381,7 +381,7 @@ char *argv[];
 		if (dfp == NULL)
 			lkexit(1);
 	}
-	/* end sdlink specific */
+	/* end sdld specific */
 
 	for (pass=0; pass<2; ++pass) {
 		cfp = NULL;
@@ -390,20 +390,20 @@ char *argv[];
 		hp = NULL;
 		radix = 10;
 
-		/* sdlink specific */
-		if (get_sdlink_target() == TARGET_IS_8051 || get_sdlink_target() == TARGET_IS_6808)
+		/* sdld specific */
+		if (get_sdld_target() == TARGET_IS_8051 || get_sdld_target() == TARGET_IS_6808)
 			Areas51(); /*JCF: Create the default 8051 areas in the right order*/
-		/* end sdlink specific */
+		/* end sdld specific */
 
 		while (lk_getline()) {
 			ip = ib;
 
-			/* sdlink specific */
+			/* sdld specific */
 			/* pass any "magic comments" to NoICE output */
 			if ((ip[0] == ';') && (ip[1] == '!') && jfp) {
 				fprintf( jfp, "%s\n", &ip[2] );
 			}
-			/* end sdlink specific */
+			/* end sdld specific */
 
 			link_main();
 		}
@@ -422,9 +422,9 @@ char *argv[];
 			if (!packflag)
 				lnkarea();
 			else {
-				/* sdlink 8051 specific */
+				/* sdld 8051 specific */
 				lnkarea2();
-				/* end sdlink 8051 specific */
+				/* end sdld 8051 specific */
 			}
 			/*
 			 * Process global definitions.
@@ -435,7 +435,7 @@ char *argv[];
 			 */
 			symdef(stderr);
 
-			/* sdlink specific */
+			/* sdld specific */
 			/* Open NoICE output file if requested */
 			if (jflag) {
 				jfp = afile(linkp->f_idp, "NOI", 1);
@@ -443,7 +443,7 @@ char *argv[];
 					lkexit(1);
 				}
 			}
-			/* end sdlink specific */
+			/* end sdld specific */
 
 			/*
 			 * Output Link Map if requested,
@@ -453,21 +453,21 @@ char *argv[];
 			if (mflag || jflag)
 				map();
 
-			/* sdlink specific */
+			/* sdld specific */
 			if (sflag) {	/*JCF: memory usage summary output*/
 				if (!packflag) {
 					if (summary(areap)) lkexit(1);
 				}
 				else {
-					/* sdlink 8051 specific */
+					/* sdld 8051 specific */
 					if (summary2(areap)) lkexit(1);
-					/* end sdlink 8051 specific */
+					/* end sdld 8051 specific */
 				}
 			}
 
 			if ((iram_size) && (!packflag))
 				iramcheck();
-			/* end sdlink specific */
+			/* end sdld specific */
 
 			/*
 			 * Open output file
@@ -477,38 +477,38 @@ char *argv[];
 				if (ofp == NULL) {
 					lkexit(1);
 				}
-				/* sdlink specific */
+				/* sdld specific */
 				/* include NoICE command to load hex file */
 				if (jfp) fprintf( jfp, "LOAD %s.IHX\n", linkp->f_idp );
-				/* end sdlink specific */
+				/* end sdld specific */
 			} else
 			if (oflag == 2) {
 				ofp = afile(linkp->f_idp, "S19", 1);
 				if (ofp == NULL) {
 					lkexit(1);
 				}
-				/* sdlink specific */
+				/* sdld specific */
 				/* include NoICE command to load hex file */
 				if (jfp) fprintf( jfp, "LOAD %s.S19\n", linkp->f_idp );
-				/* end sdlink specific */
+				/* end sdld specific */
 			} else
 			if (oflag == 3) {
-				/* sdlink 6808 specific */
-				if (get_sdlink_target() == TARGET_IS_6808) {
-					ofp = afile(linkp->f_idp, "elf", 4);
+				/* sdld 6808 specific */
+				if (get_sdld_target() == TARGET_IS_6808) {
+					ofp = afile(linkp->f_idp, "elf", 2);
 					if (ofp == NULL) {
 						lkexit(1);
 					}
 				}
-				/* end sdlink 6808 specific */
-				/* sdlink gb specific */
-				else if (get_sdlink_target() == TARGET_IS_GB) {
-					ofp = afile(linkp->f_idp, "", 4);
+				/* end sdld 6808 specific */
+				/* sdld gb specific */
+				else if (get_sdld_target() == TARGET_IS_GB) {
+					ofp = afile(linkp->f_idp, "", 2);
 					if (ofp == NULL) {
 						lkexit(1);
 					}
 				}
-				/* end sdlink gb specific */
+				/* end sdld gb specific */
 			}
 		} else {
 			/*
@@ -518,7 +518,7 @@ char *argv[];
 			reloc('E');
 		}
 	}
-	if (get_sdlink_target() == TARGET_IS_8051 || get_sdlink_target() == TARGET_IS_6808) {
+	if (get_sdld_target() == TARGET_IS_8051 || get_sdld_target() == TARGET_IS_6808) {
 		//JCF:
 		CreateAOMF51();
 	}
@@ -558,10 +558,10 @@ VOID
 lkexit(i)
 int i;
 {
-	/* sdlink 8051 specific */
+	/* sdld 8051 specific */
 	if (jfp != NULL) fclose(jfp);
 	if (dfp != NULL) fclose(dfp);
-	/* end sdlink 8051 specific */
+	/* end sdld 8051 specific */
 	if (mfp != NULL) fclose(mfp);
 	if (ofp != NULL) fclose(ofp);
 	if (rfp != NULL) fclose(rfp);
@@ -609,9 +609,9 @@ link_main()
 	if ((c=endline()) == 0) { return; }
 	switch (c) {
 
-	/* sdlink specific */
+	/* sdld specific */
 	case 'O': /*For some important sdcc options*/
-		if (is_sdlink() && pass == 0) {
+		if (is_sdld() && pass == 0) {
 			if (strlen(sdccopt) == 0) {
 				strcpy(sdccopt, &ip[1]);
 				strcpy(sdccopt_module, curr_module);
@@ -628,7 +628,7 @@ link_main()
 			}
 		}
 		break;
-	/* end sdlink specific */
+	/* end sdld specific */
 
 	case 'X':
 		radix = 16;
@@ -659,9 +659,9 @@ link_main()
 
 	case 'M':
 		if (pass == 0) {
-			/* sdlink specific */
+			/* sdld specific */
 			strcpy(curr_module, &ip[1]);
-			/* sdlink specific */
+			/* sdld specific */
 			module();
 		}
 		break;
@@ -897,15 +897,15 @@ parse()
 	register int c;
 	char fid[NINPUT];
 
-		/* sdlink specific */
+		/* sdld specific */
 		zflag = 1;
-		/* end sdlink specific */
+		/* end sdld specific */
   
 	while ((c = getnb()) != 0) {
-		/* sdlink specific */
+		/* sdld specific */
 		if ( c == ';')
 			return(0);
-		/* end sdlink specific */
+		/* end sdld specific */
 		if ( c == '-') {
 			while (ctype[c=get()] & LETTER) {
 				switch(c) {
@@ -922,7 +922,7 @@ parse()
 
 				case 't':
 				case 'T':
-					if (get_sdlink_target() == TARGET_IS_6808)
+					if (get_sdld_target() == TARGET_IS_6808)
 						oflag = 3;
 					else
 						goto err;
@@ -934,7 +934,7 @@ parse()
 					break;
 
 				case 'y': /*JCF: memory usage summary output*/
-					if (get_sdlink_target() == TARGET_IS_GB) {
+					if (get_sdld_target() == TARGET_IS_GB) {
 						c = get();
 						if(c == 'O' || c == 'o')
 							nb_rom_banks = expr(0);
@@ -972,23 +972,26 @@ parse()
 							lkexit(1);
 						}
 					}
-					else if (is_sdlink())
+					else if (is_sdld())
 						++sflag;
 					else
 						goto err;
 					break;
 
 				case 'Y':
-					if (get_sdlink_target() == TARGET_IS_8051) {
+					if (get_sdld_target() == TARGET_IS_8051) {
 						unget(getnb());
 						packflag=1;
+					}
+					else if (get_sdld_target() == TARGET_IS_6808) {
+						++sflag;
 					}
 					else
 						goto err;
 					break;
 
 				case 'A':
-					if (get_sdlink_target() == TARGET_IS_8051) {
+					if (get_sdld_target() == TARGET_IS_8051) {
 						unget(getnb());
 						if (ip && *ip)
 						{
@@ -1001,7 +1004,7 @@ parse()
 					else
 						goto err;
 				case 'a':
-					if (is_sdlink() && !(get_sdlink_target() == TARGET_IS_Z80 || get_sdlink_target() == TARGET_IS_GB)) {
+					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
 						iramsav();
 						return(0);
 					}
@@ -1010,7 +1013,7 @@ parse()
 
 				case 'v':
 				case 'V':
-					if (is_sdlink() && !(get_sdlink_target() == TARGET_IS_Z80 || get_sdlink_target() == TARGET_IS_GB)) {
+					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
 						xramsav();
 						return(0);
 					}
@@ -1019,7 +1022,7 @@ parse()
 
 				case 'w':
 				case 'W':
-					if (is_sdlink() && !(get_sdlink_target() == TARGET_IS_Z80 || get_sdlink_target() == TARGET_IS_GB)) {
+					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
 						codesav();
 						return(0);
 					}
@@ -1027,13 +1030,13 @@ parse()
 						goto err;
 
 				case 'Z':
-					if (get_sdlink_target() == TARGET_IS_Z80 || get_sdlink_target() == TARGET_IS_GB) {
+					if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
 						oflag = 3;
 						break;
 					}
 					/* fall through */
 				case 'z':
-					if (is_sdlink()) {
+					if (is_sdld()) {
 						dflag = 1;
 						return(0);
 					}
@@ -1042,10 +1045,10 @@ parse()
 
 				case 'j':
 				case 'J':
-					if (get_sdlink_target() == TARGET_IS_Z80 || get_sdlink_target() == TARGET_IS_GB) {
+					if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
 						++symflag;
 					}
-					if (is_sdlink())
+					if (is_sdld())
 						jflag = 1;
 					else
 						goto err;
@@ -1053,7 +1056,7 @@ parse()
 
 				case 'r':
 				case 'R':
-					if (is_sdlink() && !(get_sdlink_target() == TARGET_IS_Z80 || get_sdlink_target() == TARGET_IS_GB))
+					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB))
 						rflag = 1;
 					else
 						goto err;
@@ -1119,10 +1122,10 @@ parse()
 					lkexit(1);
 				}
 			}
-			/* sdlink specific */
+			/* sdld specific */
 			if ( c == ';')
 				return(0);
-			/* end sdlink specific */
+			/* end sdld specific */
 		} else
 		if (ctype[c] & ILL) {
 			fprintf(stderr, "Invalid input");
@@ -1246,9 +1249,9 @@ setbas()
 				lkerr++;
 			} else {
 				ap->a_addr = v;
-				/* sdlink specific */
+				/* sdld specific */
 				ap->a_type = 1; /* JLH: value set */
-				/* end sdlink specific */
+				/* end sdld specific */
 			}
 		} else {
 			fprintf(stderr, "ASlink-Warning-No '=' in base expression");
@@ -1373,7 +1376,9 @@ setgbl()
  *
  *		char *	fn		file specification string
  *		char *	ft		file type string
- *		int	wf		read(0)/write(1) flag
+ *		int	wf		0 ==>> read
+ *					1 ==>> write
+ *					2 ==>> binary write
  *
  *	The function afile() opens a file for reading or writing.
  *		(1)	If the file type specification string ft
@@ -1390,13 +1395,18 @@ setgbl()
  *	the assembler on an open error.
  *
  *	local variables:
- *		char	fb[]		constructed file specification string
+ *		int	c		character value
  *		FILE *	fp		filehandle for opened file
+ *		char *	p1		pointer to filespec string fn
+ *		char *	p2		pointer to filespec string fb
+ *		char *	p3		pointer to filetype string ft
  *
  *	global variables:
+ *		char	afspec[]	constructed file specification string
  *		int	lkerr		error flag
  *
  *	functions called:
+ *		int	fndidx()	lkmain.c
  *		FILE *	fopen()		c_library
  *		int	fprintf()	c_library
  *
@@ -1410,55 +1420,150 @@ char *fn;
 char *ft;
 int wf;
 {
+	char *p1, *p2;
+	int c;
+	char * frmt;
 	FILE *fp;
-	char fb[PATH_MAX];
-	char *omode;
-	int i;
 
-	switch (wf) {
-		case 0: omode = "r"; break;
-		case 1: omode = "w"; break;
-		case 2: omode = "a"; break;
-		case 3: omode = "rb"; break;
-		case 4: omode = "wb"; break;
-		case 5: omode = "ab"; break;
-		default: omode = "r"; break;
+	if (strlen(fn) > (FILSPC-7)) {
+		fprintf(stderr, "?ASlink-Error-<filspc to long> : \"%s\"\n", fn);
+		lkerr++;
+		return(NULL);
 	}
 
-	/*Look backward the name path and get rid of the extension, if any*/
-	i=strlen(fn);
-	for(; (fn[i]!=FSEPX)&&(fn[i]!=LKDIRSEP)&&(fn[i]!='/')&&(i>0); i--);
-	if( (fn[i]==FSEPX) && strcmp(ft, "lnk") )
-	{
-		strncpy(fb, fn, i);
-		fb[i]=0;
-	}
-	else
-	{
-		strcpy(fb, fn);
-	}
+	/*
+	 * Skip The Path
+	 */
+	strcpy(afspec, fn);
+	c = fndidx(afspec);
 
-	/*Add the extension*/
-	if (fb[i] != FSEPX)
-	{
-		fb[i] = FSEPX;
-		fb[i+1] = 0;
-		strcat(fb, strlen(ft)?ft:LKOBJEXT);
-	}
+	/*
+	 * Skip to File Extension separator
+	 */
+	p1 = strrchr(&afspec[c], FSEPX);
 
-	fp = fopen(fb, omode);
-	if (fp==NULL)
-	{
-		if (strcmp(ft,"adb"))/*Do not complain for optional adb files*/
-		{
-			fprintf(stderr, "%s: cannot %s.\n", fb, (wf%3)==1?"create":"open");
-			lkerr++;
+	/*
+	 * Copy File Extension
+	 */
+	 p2 = ft;
+	 if (*p2 == 0) {
+		if (p1 == NULL) {
+			p2 = "rel";
+		} else {
+			p2 = strrchr(&fn[c], FSEPX) + 1;
 		}
+	}
+	if (p1 == NULL) {
+		p1 = &afspec[strlen(afspec)];
+	}
+	*p1++ = FSEPX;
+	while ((c = *p2++) != 0) {
+		if (p1 < &afspec[FILSPC-1])
+			*p1++ = c;
+	}
+	*p1++ = 0;
+
+	/*
+	 * Select Read/Write/Binary Write
+	 */
+	switch(wf) {
+	default:
+	case 0:	frmt = "r";	break;
+	case 1:	frmt = "w";	break;
+#ifdef	DECUS
+	case 2:	frmt = "wn";	break;
+#else
+	case 2:	frmt = "wb";	break;
+#endif
+	}
+	if ((fp = fopen(afspec, frmt)) == NULL) {
+		fprintf(stderr, "?ASlink-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afspec);
+		lkerr++;
 	}
 	return (fp);
 }
 
-/* sdlink specific */
+/*)Function	int	fndidx(str)
+ *
+ *		char *	str		file specification string
+ *
+ *	The function fndidx() scans the file specification string
+ *	to find the index to the file name.  If the file
+ *	specification contains a 'path' then the index will
+ *	be non zero.
+ *
+ *	fndidx() returns the index value.
+ *
+ *	local variables:
+ *		char *	p1		temporary pointer
+ *		char *	p2		temporary pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		char *	strrchr()	c_library
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+fndidx(str)
+char *str;
+{
+	char *p1, *p2;
+
+	/*
+	 * Skip Path Delimiters
+	 */
+	p1 = str;
+	if ((p2 = strrchr(p1,  ':')) != NULL) { p1 = p2 + 1; }
+	if ((p2 = strrchr(p1,  '/')) != NULL) { p1 = p2 + 1; }
+	if ((p2 = strrchr(p1, '\\')) != NULL) { p1 = p2 + 1; }
+
+	return((int) (p1 - str));
+}
+
+/*)Function	int	fndext(str)
+ *
+ *		char *	str		file specification string
+ *
+ *	The function fndext() scans the file specification string
+ *	to find the file.ext separater.
+ *
+ *	fndext() returns the index to FSEPX or the end of the string.
+ *
+ *	local variables:
+ *		char *	p1		temporary pointer
+ *		char *	p2		temporary pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		char *	strrchr()	c_library
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+fndext(str)
+char * str;
+{
+	char *p1, *p2;
+
+	/*
+	 * Find the file separator
+	 */
+	p1 = str + strlen(str);
+	if ((p2 = strrchr(str,  FSEPX)) != NULL) { p1 = p2; }
+
+	return((int) (p1 - str));
+}
+
+/* sdld specific */
 /*)Function	VOID	iramsav()
  *
  *	The function iramsav() stores the size of the chip's internal RAM.
@@ -1563,7 +1668,7 @@ iramcheck()
 	}
   }
 }
-/* end sdlink specific */
+/* end sdld specific */
 
 char *usetxt[] = {
 	"Startup:",
@@ -1750,12 +1855,12 @@ VOID
 usage()
 {
 	register char	**dp;
-	/* sdlink specific */
-	fprintf(stderr, "\n%s Linker %s\n\n", is_sdlink() ? "sdlink" : "ASxxxx", VERSION);
-	enum sdlink_target_e target = get_sdlink_target();
+	/* sdld specific */
+	fprintf(stderr, "\n%s Linker %s\n\n", is_sdld() ? "sdld" : "ASxxxx", VERSION);
+	enum sdld_target_e target = get_sdld_target();
 	for (dp = (target == TARGET_IS_8051) ? usetxt_8051 : ((target == TARGET_IS_6808) ? usetxt_6808 : ((target == TARGET_IS_Z80) ? usetxt_z80 : ((target == TARGET_IS_GB) ? usetxt_gb : usetxt))); *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-	/* end sdlink specific */
+	/* end sdld specific */
 	lkexit(1);
 }
 

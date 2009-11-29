@@ -15,7 +15,7 @@ LKLIB = $(srcdir)/..
 
 LKLIBSRC = lk_readnl.c lkaomf51.c lkar.c lkdata.c lkeval.c \
            lkhead.c lklex.c lklib.c lklibr.c lklist.c \
-           lkmain.c lknoice.c lkrel.c lksdcclib.c lkstore.c lksym.c sdlink.c
+           lkmain.c lknoice.c lkrel.c lksdcclib.c lkstore.c lksym.c sdld.c
 
 SRC = lkarea.c lkihx.c \
       lkrloc.c lks19.c lkgb.c lkgg.c lkmem.c
@@ -27,7 +27,7 @@ LKOBJS = $(LKLIBSRC:%.c=$(OBJDIR)/%.o)
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 LKOBJECTS = $(OBJS) $(LKOBJS) $(ASXXLIBOBJS)
 
-BINS = $(BUILDDIR)sdlink$(EXT)$(EXEEXT)
+BINS = $(BUILDDIR)sdld$(EXT)$(EXEEXT)
 
 CPPFLAGS += -I.. -I$(srcdir)/..
 CFLAGS += $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DSDK
@@ -60,10 +60,10 @@ $(OBJDIR)/%.o: $(LKLIB)/%.c $(OBJDIR)/.stamp
 $(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-_sdlinkz80:
+_sdldz80:
 	$(MAKE) EXT=z80$(E) PORT=z80
 
-_sdlinkgb:
+_sdldgb:
 	$(MAKE) EXT=gb$(E) OPTS=-DGAMEBOY PORT=z80
 
 include $(srcdir)/clean.mk

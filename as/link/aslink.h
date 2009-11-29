@@ -131,6 +131,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define HMASK   077             /* Hash mask */
 #define NLPP    60              /* Lines per page */
 #define NTXT    16              /* T values */
+#define	FILSPC	PATH_MAX	/* File spec length */
 
 /*
  *      The "R_" relocation constants define values used in
@@ -230,7 +231,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define F_REL   3               /* File.rel */
 #define F_CMD   4               /* Command line */
 
-/* sdlink gb specific */
+/* sdld gb specific */
 /*
  * Multiple banks support
  */
@@ -248,7 +249,7 @@ typedef struct _patch {
   struct _patch *next;
 } patch;
 extern patch* patches;
-/* end sdlink gb specific */
+/* end sdld gb specific */
 
 /*
  *      General assembler address type
@@ -543,6 +544,8 @@ extern char curr_module[NINPUT];
 #define DGT10   DIGIT|RAD16|RAD10
 #define LTR16   LETTER|RAD16
 
+extern	char	afspec[];	/*	The filespec created by afile()
+				 */
 extern  char    ccase[];        /*      an array of characters which
                                  *      perform the case translation function
                                  */
@@ -718,6 +721,8 @@ extern  char *          strncpy();
 /* lkmain.c */
 extern  FILE *          afile();
 extern  VOID            bassav();
+extern	int		fndidx(char *str);
+extern	int		fndext(char *str);
 extern  VOID            gblsav();
 extern  VOID            iramsav();
 extern  VOID            xramsav();

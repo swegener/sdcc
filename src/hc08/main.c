@@ -368,7 +368,7 @@ hc08_dwarfRegNum (regs * reg)
 */
 static const char *_linkCmd[] =
 {
-  "sdlink6808", "-nf", "\"$1\"", NULL
+  "sdld6808", "-nf", "\"$1\"", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */

@@ -96,7 +96,7 @@ enum sdas_target_e
 get_sdas_target(void)
 {
   check_init();
-  return sdas;
+  return target;
 }
 
 

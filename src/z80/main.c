@@ -690,10 +690,10 @@ oclsExpense (struct memmap *oclass)
 }
 
 
-#define LINKCMD "sdlink{port} -nf {dstfilename}"
+#define LINKCMD "sdld{port} -nf {dstfilename}"
 /*
 #define LINKCMD \
-    "sdlink{port} -n -c -- {z80bases} -m -j" \
+    "sdld{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
     " {z80extralibfiles} {z80extralibpaths}" \
     " {z80outputtypeflag} \"{linkdstfilename}\"" \

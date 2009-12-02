@@ -155,11 +155,12 @@ patch* patches = NULL;
 void
 gb_init()
 {
+	int i;
+
 	nb_rom_banks = 2;
 	nb_ram_banks = 0;
 	mbc_type = 0;
 	symflag = 0;
-	int i;
 
 	for(i = 0; default_basep[i] != NULL; i++) {
 		if(basep == NULL) {
@@ -1861,8 +1862,9 @@ usage()
 {
 	register char	**dp;
 	/* sdld specific */
-	fprintf(stderr, "\n%s Linker %s\n\n", is_sdld() ? "sdld" : "ASxxxx", VERSION);
 	enum sdld_target_e target = get_sdld_target();
+
+	fprintf(stderr, "\n%s Linker %s\n\n", is_sdld() ? "sdld" : "ASxxxx", VERSION);
 	for (dp = (target == TARGET_IS_8051) ? usetxt_8051 : ((target == TARGET_IS_6808) ? usetxt_6808 : ((target == TARGET_IS_Z80) ? usetxt_z80 : ((target == TARGET_IS_GB) ? usetxt_gb : usetxt))); *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	/* end sdld specific */

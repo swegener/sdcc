@@ -139,7 +139,7 @@ SOURCE=..\lklist.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkmain.c
+SOURCE=..\lkmain.c
 # End Source File
 # Begin Source File
 
@@ -175,6 +175,10 @@ SOURCE=..\lksym.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\sdld.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\asxxsrc\strcmpi.c
 # End Source File
 # End Group
@@ -195,6 +199,10 @@ SOURCE=..\getline.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\lk_readnl.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\lkar.h
 # End Source File
 # Begin Source File
@@ -204,6 +212,10 @@ SOURCE=..\lklibr.h
 # Begin Source File
 
 SOURCE=..\lkrel.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\sdld.h
 # End Source File
 # End Group
 # End Target

@@ -1,3 +1,9 @@
+2009-12-02 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/hc08/link_hc08.dsp, as/link/mcs51/aslink.dsp,
+	  as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
+	  as/link/lkmain.c: re-enabled msvc build
+
 2009-12-01 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/aslink.h, as/link/lkmain.c, as/link/z80/Makefile.in,

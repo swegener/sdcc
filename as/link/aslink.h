@@ -229,7 +229,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define F_STD   1               /* stdin */
 #define F_LNK   2               /* File.lnk */
 #define F_REL   3               /* File.rel */
-#define F_CMD   4               /* Command line */
 
 /* sdld gb specific */
 /*

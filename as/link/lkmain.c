@@ -620,8 +620,8 @@ link_main()
 				if(strcmp(sdccopt, &ip[1])!=0) {
 					fprintf(stderr,
 					"?ASlink-Warning-Conflicting sdcc options:\n"
-					"	\"%s\" in module \"%s\" and\n"
-					"	\"%s\" in module \"%s\".\n",
+					"   \"%s\" in module \"%s\" and\n"
+					"   \"%s\" in module \"%s\".\n",
 					sdccopt, sdccopt_module, &ip[1], curr_module);
 					lkerr++;
 				}
@@ -900,7 +900,7 @@ parse()
 		/* sdld specific */
 		zflag = 1;
 		/* end sdld specific */
-  
+
 	while ((c = getnb()) != 0) {
 		/* sdld specific */
 		if ( c == ';')
@@ -1766,6 +1766,7 @@ char *usetxt_6808[] = {
 	"  -a   [iram-size] Check for internal RAM overflow",
 	"  -v   [xram-size] Check for external RAM overflow",
 	"  -w   [code-size] Check for code overflow",
+	"  -y   Generate memory usage summary file[mem]",
 	"End:",
 	"  -e   or null line terminates input",
 	0
@@ -1786,7 +1787,9 @@ char *usetxt_z80[] = {
 	"Map format:",
 	"  -m   Map output generated as file[MAP]",
 	"  -j   no$gmb symbol file generated as file[SYM]",
-	"  -x   Hexadecimal (default),  -d  Decimal,  -q  Octal",
+	"  -x   Hexidecimal (default)",
+	"  -d   Decimal",
+	"  -q   Octal",
 	"Output:",
 	"  -i   Intel Hex as file[IHX]",
 	"  -s   Motorola S19 as file[S19]",
@@ -1819,7 +1822,9 @@ char *usetxt_gb[] = {
 	"Map format:",
 	"  -m   Map output generated as file[MAP]",
 	"  -j   no$gmb symbol file generated as file[SYM]",
-	"  -x   Hexadecimal (default),  -d  Decimal,  -q  Octal",
+	"  -x   Hexidecimal (default)",
+	"  -d   Decimal",
+	"  -q   Octal",
 	"Output:",
 	"  -i   Intel Hex as file[IHX]",
 	"  -s   Motorola S19 as file[S19]",

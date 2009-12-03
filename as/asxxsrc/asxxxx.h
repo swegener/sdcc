@@ -107,7 +107,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #ifdef _WIN32		/* WIN32 native */
 
 #  define NATIVE_WIN32		1
-#  ifdef __MINGW32	/* GCC MINGW32 depends on configure */
+#  ifdef __MINGW32__	/* GCC MINGW32 depends on configure */
 #    include "../../sdccconf.h"
 #  else
 #    include "../../sdcc_vc.h"

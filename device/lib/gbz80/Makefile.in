@@ -53,16 +53,18 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
 	../../../bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else
-ifeq ($(LIB_TYPE), AR)
+  ifeq ($(LIB_TYPE), AR)
 	ar -Scq $@ $(OBJ) $(Z8OBJECTS)
-else
-ifeq ($(LIB_TYPE), RANLIB)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
 	ar -Scq $@ $(OBJ) $(Z8OBJECTS)
 	$(top_builddir)/bin/asranlib $@
-else
+    else
 	rm -f $@; \
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
+    endif
+  endif
 endif
 
 %.o: %.c

@@ -147,13 +147,15 @@ XA51OBJECTS = $(XA51SOURCES:%.c=$(PORT)/%.rel)
 ifeq ($(LIB_TYPE), SDCCLIB)
 LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
 else
-ifeq ($(LIB_TYPE), AR)
+  ifeq ($(LIB_TYPE), AR)
 LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
-else
-ifeq ($(LIB_TYPE), RANLIB)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
 LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
-else
+    else
 LIB_FILES = $(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC) $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+    endif
+  endif
 endif
 
 OEXT            = .rel
@@ -258,16 +260,18 @@ $(PORTDIR)/lib$(PORT).lib: $(XA51OBJECTS)
 ifeq ($(LIB_TYPE), SDCCLIB)
 	../../bin/sdcclib -a $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 else
-ifeq ($(LIB_TYPE), AR)
+  ifeq ($(LIB_TYPE), AR)
 	ar -Sq $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
-else
-ifeq ($(LIB_TYPE), RANLIB)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
 	ar -Sq $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 	$(top_builddir)/bin/asranlib $(PORTDIR)/lib$(PORT).lib
-else
+    else
 	rm -f $(PORTDIR)/lib$(PORT).lib
 	for i in $(notdir $(basename $(XA51OBJECTS))); do echo $$i >> $(PORTDIR)/lib$(PORT).lib; done
 	cp $(XA51OBJECTS) $(PORTDIR)
+    endif
+  endif
 endif
 
 model-z80:
@@ -351,18 +355,18 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	../../bin/sdcclib -a $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 	../../bin/sdcclib -a $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 else
-ifeq ($(LIB_TYPE), AR)
+  ifeq ($(LIB_TYPE), AR)
 	ar -Scq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
 	ar -Scq $(PORTDIR)/libint.lib $(OBJECTS_INT)
 	ar -Scq $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 	ar -Scq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
-else
-ifeq ($(LIB_TYPE), RANLIB)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
 	ar -Scq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT); $(top_builddir)/bin/asranlib $(PORTDIR)/libfloat.lib
 	ar -Scq $(PORTDIR)/libint.lib $(OBJECTS_INT); $(top_builddir)/bin/asranlib $(PORTDIR)/libint.lib
 	ar -Scq $(PORTDIR)/liblong.lib $(OBJECTS_LONG); $(top_builddir)/bin/asranlib $(PORTDIR)/liblong.lib
 	ar -Scq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC); $(top_builddir)/bin/asranlib $(PORTDIR)/libsdcc.lib
-else
+    else
 	rm -f $(PORTDIR)/libfloat.lib
 	for i in $(notdir $(basename $(OBJECTS_FLOAT))); do echo $$i >> $(PORTDIR)/libfloat.lib; done
 	cp $(OBJECTS_FLOAT) $(PORTDIR)
@@ -375,6 +379,8 @@ else
 	rm -f $(PORTDIR)/libsdcc.lib
 	for i in $(notdir $(basename $(OBJECTS_SDCC))); do echo $$i >> $(PORTDIR)/libsdcc.lib; done
 	cp $(OBJECTS_SDCC) $(PORTDIR)
+    endif
+  endif
 endif
 
 clean_intermediate:

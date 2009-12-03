@@ -29,9 +29,11 @@ $(PORTDIR)/$(LIB): $(OBJ) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
 	../../../bin/sdcclib -a $@ $(OBJ)
-else ifeq ($(LIB_TYPE), AR)
+else
+ifeq ($(LIB_TYPE), AR)
 	ar -Scq $@ $(OBJ)
-else ifeq ($(LIB_TYPE), RANLIB)
+else
+ifeq ($(LIB_TYPE), RANLIB)
 	ar -Scq $@ $(OBJ)
 	$(top_builddir)/bin/asranlib $@
 else

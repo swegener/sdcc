@@ -1,3 +1,11 @@
+2009-12-03 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/device/lib/z80/Makefile.in, sdcc/device/lib/gbz80/Makefile.in,
+	  sdcc/device/lib/ds390/Makefile.in, sdcc/device/lib/Makefile.in,
+	  sdcc/device/lib/ds400/Makefile.in, sdcc/device/lib/mcs51/Makefile.in,
+	  sdcc/device/lib/hc08/Makefile.in:
+	  fixef bug #2907642: version of make > 3.80 required to build SDCC
+
 2009-12-02 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/hc08/link_hc08.dsp, as/link/mcs51/aslink.dsp,

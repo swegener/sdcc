@@ -31,9 +31,11 @@ $(PORTDIR)/libds400.lib: $(OBJECTS)
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
 	../../../bin/sdcclib -a $@ $(OBJECTS)
-else ifeq ($(LIB_TYPE), AR)
+else
+ifeq ($(LIB_TYPE), AR)
 	ar -Scq $@ $(OBJECTS)
-else ifeq ($(LIB_TYPE), RANLIB)
+else
+ifeq ($(LIB_TYPE), RANLIB)
 	ar -Scq $@ $(OBJECTS)
 	$(top_builddir)/bin/asranlib $@
 else

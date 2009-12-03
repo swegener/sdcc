@@ -54,9 +54,11 @@ $(PORTDIR)/$(LIB): $(OBJ) $(HC08OBJECTS) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
 	../../../bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
-else ifeq ($(LIB_TYPE), AR)
+else
+ifeq ($(LIB_TYPE), AR)
 	ar -Scq $@ $(OBJ) $(HC08OBJECTS)
-else ifeq ($(LIB_TYPE), RANLIB)
+else
+ifeq ($(LIB_TYPE), RANLIB)
 	ar -Scq $@ $(OBJ) $(HC08OBJECTS)
 	$(top_builddir)/bin/asranlib $@
 else

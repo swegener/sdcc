@@ -76,13 +76,13 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/sdld6808$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdld6808$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sdld6808$(EXEEXT)
 
 
 # Performing self-test

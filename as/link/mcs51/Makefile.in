@@ -74,13 +74,13 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/sdld$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdld$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/aslink$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sdld$(EXEEXT)
 
 
 # Performing self-test

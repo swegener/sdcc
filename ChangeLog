@@ -1,6 +1,8 @@
 2009-12-04 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: renamed liker executables
+	* as/link/mcs51/Makefile.in, as/link/hc08/Makefile.in:
+	  fixed installation linker executable name
 
 2009-12-03 Borut Razem <borut.razem AT siol.net>
 

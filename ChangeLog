@@ -1,3 +1,8 @@
+2009-12-10 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* all.dsp, as/link/hc08/link_hc08.dsp, as/link/mcs51/aslink.dsp:
+	 renamed linker executables.
+
 2009-12-04 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: renamed liker executables

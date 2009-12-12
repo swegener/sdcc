@@ -18,10 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
+#include "sdld.h"
 #include "aslink.h"
 
 int summary(struct area * areap)
 {
+  if (get_sdld_target() == TARGET_IS_8051 || get_sdld_target() == TARGET_IS_6808) {
+    /* only for 8051 and 6808 targets */
+
     #define EQ(A,B) !as_strcmpi((A),(B))
     #define MIN_STACK 16
     #define REPORT_ERROR(A, H) \
@@ -59,7 +64,7 @@ int summary(struct area * areap)
     } _Mem;
 
     unsigned int dram[0x100];
-    _Mem Ram[]={
+    _Mem Ram8051[] = {
         {0,     8,  8,   "REG_BANK_0", 0x0001},
         {0x8,   8,  8,   "REG_BANK_1", 0x0002},
         {0x10,  8,  8,   "REG_BANK_2", 0x0004},
@@ -70,42 +75,82 @@ int summary(struct area * areap)
         {0,     0,  128, "TOTAL:",     0x0000}
     };
 
-    _Mem IRam= {0xff,   0,   128, "INDIRECT RAM",       0x0080};
-    _Mem Stack={0xff,   0,     1, "STACK",              0x0000};
-    _Mem XRam= {0xffff, 0, 65536, "EXTERNAL RAM",       0x0100};
-    _Mem Rom=  {0xffff, 0, 65536, "ROM/EPROM/FLASH",    0x0200};
+    _Mem IRam8051 =  {0xff,   0,   128, "INDIRECT RAM",       0x0080};
+    _Mem Stack8051 = {0xff,   0,     1, "STACK",              0x0000};
+    _Mem XRam8051 =  {0xffff, 0, 65536, "EXTERNAL RAM",       0x0100};
+    _Mem Rom8051 =   {0xffff, 0, 65536, "ROM/EPROM/FLASH",    0x0200};
 
-    if(stacksize==0) stacksize=MIN_STACK;
+    _Mem Ram6808[] = {
+        {0,     0,      0,       "REG_BANK_0", 0x0001},
+        {0x0,   0,      0,       "REG_BANK_1", 0x0002},
+        {0x0,   0,      0,       "REG_BANK_2", 0x0004},
+        {0x0,   0,      0,       "REG_BANK_3", 0x0008},
+        {0x0,   0,      0,       "BSEG_BYTES", 0x0010},
+        {0,     0,      256,    "UNUSED",     0x0000},
+        {0xff,  0,      256,    "DATA",       0x0020},
+        {0,             0,      256, "TOTAL:",     0x0000}
+    };
 
-    if(rflag) /*For the DS390*/
-    {
-        XRam.Max=0x1000000; /*24 bits*/
-        XRam.Start=0xffffff;
-        Rom.Max=0x1000000;
-        Rom.Start=0xffffff;
+    _Mem IRam6808 =  {0xff,   0,     0, "INDIRECT RAM",           0x0080};
+    _Mem Stack6808 = {0xff,   0,     1, "STACK",                          0x0000};
+    _Mem XRam6808 =  {0xffff, 0, 65536, "EXTERNAL RAM",           0x0100};
+    _Mem Rom6808 =   {0xffff, 0, 65536, "ROM/EPROM/FLASH",        0x0200};
+
+    _Mem *Ram = NULL;
+
+    _Mem IRam =  {0, 0, 0, "", 0};
+    _Mem Stack = {0, 0, 0, "", 0};
+    _Mem XRam =  {0, 0, 0, "", 0};
+    _Mem Rom =   {0, 0, 0, "", 0};
+
+    if (get_sdld_target() == TARGET_IS_8051) {
+        Ram = Ram8051;
+	memcpy(&IRam, &IRam8051, sizeof (_Mem));
+	memcpy(&Stack, &Stack8051, sizeof (_Mem));
+	memcpy(&XRam, &XRam8051, sizeof (_Mem));
+	memcpy(&Rom, &Rom8051, sizeof (_Mem));
+    }
+    else {
+        Ram = Ram6808;
+	memcpy(&IRam, &IRam6808, sizeof (_Mem));
+	memcpy(&Stack, &Stack6808, sizeof (_Mem));
+	memcpy(&XRam, &XRam6808, sizeof (_Mem));
+	memcpy(&Rom, &Rom6808, sizeof (_Mem));
     }
 
-    if((iram_size<=0)||(iram_size>0x100)) /*Default: 8052 like memory*/
-    {
-        Ram[5].Max=0x80;
-        Ram[6].Max=0x80;
-        Ram[7].Max=0x80;
-        IRam.Max=0x80;
-        iram_size=0x100;
-    }
-    else if(iram_size<0x80)
-    {
-        Ram[5].Max=iram_size;
-        Ram[6].Max=iram_size;
-        Ram[7].Max=iram_size;
-        IRam.Max=0;
-    }
-    else
-    {
-        Ram[5].Max=0x80;
-        Ram[6].Max=0x80;
-        Ram[7].Max=0x80;
-        IRam.Max=iram_size-0x80;
+    if (stacksize == 0) stacksize = MIN_STACK;
+
+    if (get_sdld_target() == TARGET_IS_8051) {
+        if(rflag) /*For the DS390*/
+        {
+            XRam.Max=0x1000000; /*24 bits*/
+            XRam.Start=0xffffff;
+            Rom.Max=0x1000000;
+            Rom.Start=0xffffff;
+        }
+
+        if((iram_size<=0)||(iram_size>0x100)) /*Default: 8052 like memory*/
+        {
+            Ram[5].Max=0x80;
+            Ram[6].Max=0x80;
+            Ram[7].Max=0x80;
+            IRam.Max=0x80;
+            iram_size=0x100;
+        }
+        else if(iram_size<0x80)
+        {
+            Ram[5].Max=iram_size;
+            Ram[6].Max=iram_size;
+            Ram[7].Max=iram_size;
+            IRam.Max=0;
+        }
+        else
+        {
+            Ram[5].Max=0x80;
+            Ram[6].Max=0x80;
+            Ram[7].Max=0x80;
+            IRam.Max=iram_size-0x80;
+        }
     }
 
     for(j=0; j<(int)iram_size; j++) dram[j]=0;
@@ -193,8 +238,10 @@ int summary(struct area * areap)
         for(k=Ram[j].Start; (k<(Ram[j].Start+Ram[j].Size))&&(k<0x100); k++)
             dram[k]|=Ram[j].flag; /*Mark as used*/
 
-    for(k=IRam.Start; (k<(IRam.Start+IRam.Size))&&(k<0x100); k++)
-        dram[k]|=IRam.flag; /*Mark as used*/
+    if (get_sdld_target() == TARGET_IS_8051) {
+        for(k=IRam.Start; (k<(IRam.Start+IRam.Size))&&(k<0x100); k++)
+            dram[k]|=IRam.flag; /*Mark as used*/
+    }
 
     /*Compute the amount of unused memory in direct data Ram.  This is the
     gap between the last register bank or bit segment and the data segment.*/
@@ -230,79 +277,83 @@ int summary(struct area * areap)
         }
     }
 
-    for(k=Ram[6].Start; (k<(Ram[6].Start+Ram[6].Size))&&(k<0x100); k++)
-    {
-        if(dram[k]!=Ram[6].flag)
+    if (get_sdld_target() == TARGET_IS_8051) {
+        for(k=Ram[6].Start; (k<(Ram[6].Start+Ram[6].Size))&&(k<0x100); k++)
         {
-            sprintf(buff, "Internal memory overlap starting at 0x%02x.\n", k);
-            REPORT_ERROR(buff, 1);
-            break;
+            if(dram[k]!=Ram[6].flag)
+            {
+                sprintf(buff, "Internal memory overlap starting at 0x%02x.\n", k);
+                REPORT_ERROR(buff, 1);
+                break;
+            }
         }
-    }
 
-    if(Ram[4].Size>Ram[4].Max)
-    {
-        k=Ram[4].Size-Ram[4].Max;
-        sprintf(buff, "Insufficient bit addressable memory.  "
-                    "%d byte%s short.\n", k, (k==1)?"":"s");
-        REPORT_ERROR(buff, 1);
-    }
+        if(Ram[4].Size>Ram[4].Max)
+        {
+            k=Ram[4].Size-Ram[4].Max;
+            sprintf(buff, "Insufficient bit addressable memory.  "
+                        "%d byte%s short.\n", k, (k==1)?"":"s");
+            REPORT_ERROR(buff, 1);
+        }
 
-    if(Ram[5].Size!=0)
-    {
-        sprintf(buff, "%ld bytes in data memory wasted.  "
-                    "SDCC link could use: --data-loc 0x%02lx\n",
-                    Ram[5].Size, Ram[6].Start-Ram[5].Size);
-        REPORT_WARNING(buff, 1);
-    }
+        if(Ram[5].Size!=0)
+        {
+            sprintf(buff, "%ld bytes in data memory wasted.  "
+                        "SDCC link could use: --data-loc 0x%02lx\n",
+                        Ram[5].Size, Ram[6].Start-Ram[5].Size);
+            REPORT_WARNING(buff, 1);
+        }
 
-    if((Ram[6].Start+Ram[6].Size)>Ram[6].Max)
-    {
-        k=(Ram[6].Start+Ram[6].Size)-Ram[6].Max;
-        sprintf(buff, "Insufficient space in data memory.   "
-                    "%d byte%s short.\n", k, (k==1)?"":"s");
-        REPORT_ERROR(buff, 1);
+        if((Ram[6].Start+Ram[6].Size)>Ram[6].Max)
+        {
+            k=(Ram[6].Start+Ram[6].Size)-Ram[6].Max;
+            sprintf(buff, "Insufficient space in data memory.   "
+                        "%d byte%s short.\n", k, (k==1)?"":"s");
+            REPORT_ERROR(buff, 1);
+        }
     }
 
     /*Report the position of the beginning of the stack*/
     fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
         rflag ? "16 bit mode initial s" : "S", Stack.Start, Stack.Start-1);
 
-    /*Check that the stack pointer is landing in a safe place:*/
-    if( (dram[Stack.Start] & 0x8000) == 0x8000 )
-    {
-        fprintf(of, ".\n");
-        sprintf(buff, "Stack set to unavailable memory.\n");
-        REPORT_ERROR(buff, 1);
-    }
-    else if(dram[Stack.Start])
-    {
-        fprintf(of, ".\n");
-        sprintf(buff, "Stack overlaps area ");
-        REPORT_ERROR(buff, 1);
-        for(j=0; j<7; j++)
+    if (get_sdld_target() == TARGET_IS_8051) {
+        /*Check that the stack pointer is landing in a safe place:*/
+        if( (dram[Stack.Start] & 0x8000) == 0x8000 )
         {
-                        if(dram[Stack.Start]&Ram[j].flag)
+            fprintf(of, ".\n");
+            sprintf(buff, "Stack set to unavailable memory.\n");
+            REPORT_ERROR(buff, 1);
+        }
+        else if(dram[Stack.Start])
+        {
+            fprintf(of, ".\n");
+            sprintf(buff, "Stack overlaps area ");
+            REPORT_ERROR(buff, 1);
+            for(j=0; j<7; j++)
             {
-                sprintf(buff, "'%s'\n", Ram[j].Name);
-                break;
+                if(dram[Stack.Start]&Ram[j].flag)
+                {
+                    sprintf(buff, "'%s'\n", Ram[j].Name);
+                    break;
+                }
             }
+            if(dram[Stack.Start]&IRam.flag)
+            {
+                sprintf(buff, "'%s'\n", IRam.Name);
+            }
+            REPORT_ERROR(buff, 0);
         }
-        if(dram[Stack.Start]&IRam.flag)
+        else
         {
-            sprintf(buff, "'%s'\n", IRam.Name);
-        }
-        REPORT_ERROR(buff, 0);
-    }
-    else
-    {
-        for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
-        fprintf(of, " with %d bytes available\n", k);
-        if ((int)k<stacksize)
-        {
-            sprintf(buff, "Only %d byte%s available for stack.\n",
-                k, (k==1)?"":"s");
-            REPORT_WARNING(buff, 1);
+            for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
+            fprintf(of, " with %d bytes available\n", k);
+            if ((int)k<stacksize)
+            {
+                sprintf(buff, "Only %d byte%s available for stack.\n",
+                    k, (k==1)?"":"s");
+                REPORT_WARNING(buff, 1);
+            }
         }
     }
 
@@ -356,10 +407,12 @@ int summary(struct area * areap)
     fprintf(of, format, Rom.Name, start, end, size, max);
 
     /*Report any excess:*/
-    if((IRam.Start+IRam.Size)>(IRam.Max+0x80))
-    {
-        sprintf(buff, "Insufficient INDIRECT RAM memory.\n");
-        REPORT_ERROR(buff, 1);
+    if (get_sdld_target() == TARGET_IS_8051) {
+        if((IRam.Start+IRam.Size)>(IRam.Max+0x80))
+        {
+            sprintf(buff, "Insufficient INDIRECT RAM memory.\n");
+            REPORT_ERROR(buff, 1);
+        }
     }
     if( ((XRam.Start+XRam.Size)>XRam.Max) ||
         (((int)XRam.Size>xram_size)&&(xram_size>=0)) )
@@ -376,13 +429,18 @@ int summary(struct area * areap)
 
     fclose(of);
     return toreturn;
+  }
+  else {
+    assert (0);
+    return 0;
+  }
 }
-
-extern char idatamap[]; //0:not used, 1:used
-
 
 int summary2(struct area * areap)
 {
+  if (get_sdld_target() == TARGET_IS_8051) {
+    /* only for 8051 target */
+
     #define EQ(A,B) !as_strcmpi((A),(B))
 
     char buff[128];
@@ -606,4 +664,9 @@ int summary2(struct area * areap)
 
     fclose(of);
     return toreturn;
+  }
+  else {
+    assert (0);
+    return 0;
+  }
 }

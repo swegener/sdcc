@@ -6,6 +6,17 @@
 	* as/link/lkmain.c: fixed command line option handling
 	* src/port.h, src/SDCCmain.c, src/z80/main.c:
 	  fixed crt object file handling with asld, ...
+	* sdcc/as/link/lkdata.c, sdcc/as/link/mcs51/lkarea.c,
+	  sdcc/as/link/aslink.h, sdcc/as/link/hc08/Makefile.in,
+	  sdcc/as/link/mcs51/Makefile.in, sdcc/as/link/z80/Makefile.in,
+	  sdcc/as/link/z80/linkz80.dsp, sdcc/as/link/z80/linkgbz80.dsp,
+	  sdcc/as/link/mcs51/aslink.dsp, sdcc/as/link/hc08/link_hc08.dsp:
+	  modified
+	  sdcc/as/link/z80/lks19.c, sdcc/as/link/z80/lkmem.c,
+	  sdcc/as/link/mcs51/lks19.c, sdcc/as/link/mcs51/lkmem.c,
+	  sdcc/as/link/hc08/lks19.c, sdcc/as/link/hc08/lkmem.c,
+	  sdcc/as/link/hc08/lkelf.c: moved to sdcc/as/link
+	  unification of lkelf.c, lks19.c and lkmem.c
 
 2009-12-10 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 

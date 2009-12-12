@@ -140,7 +140,7 @@ SOURCE=..\lkmain.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkmem.c
+SOURCE=..\lkmem.c
 # End Source File
 # Begin Source File
 
@@ -156,7 +156,7 @@ SOURCE=.\lkrloc.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lks19.c
+SOURCE=..\lks19.c
 # End Source File
 # Begin Source File
 

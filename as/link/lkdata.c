@@ -459,6 +459,9 @@ struct  lbname  *lbnhead;       /*      pointer to the first
 struct  lbfile  *lbfhead;       /*      pointer to the first
                                  *      library file structure
                                  */
+/* sdld 8015 specific */
+char idatamap[256];
+/* end sdld 8015 specific */
 
 /*
  *      array of character types, one per

@@ -106,8 +106,10 @@ s19(i)
         register a_uint chksum;
 
         if (i) {
+                /* sdld 6808 specific */
                 if (ap->a_flag & A_NOLOAD)
                         return;
+                /* end sdld 6808 specific */
                 if (hilo == 0) {
                         chksum = rtval[0];
                         rtval[0] = rtval[1];

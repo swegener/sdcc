@@ -499,7 +499,6 @@ lnksect(register struct area *tap)
 }
 
 a_uint lnksect2 (struct area *tap, int locIndex);
-char idatamap[256];
 unsigned long codemap[524288];
 unsigned long xdatamap[131072];
 struct area *dseg_ap = NULL;

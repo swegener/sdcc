@@ -698,6 +698,11 @@ extern  long xram_size;         /*      external ram size
                                  */
 extern  long code_size;         /*      code size
                                  */
+/* sdld 8015 specific */
+extern  char idatamap[];        /* 0:not used, 1:used
+                                 */
+/* end sdld 8051 specific */
+
 
 
 /* C Library function definitions */

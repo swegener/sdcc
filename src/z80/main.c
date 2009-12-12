@@ -690,7 +690,7 @@ oclsExpense (struct memmap *oclass)
 }
 
 
-#define LINKCMD "sdld{port} -nf {dstfilename}"
+//#define LINKCMD "sdld{port} -nf {dstfilename}"
 /*
 #define LINKCMD \
     "sdld{port} -n -c -- {z80bases} -m -j" \
@@ -702,12 +702,21 @@ oclsExpense (struct memmap *oclass)
     " {z80extraobj}"
 */
 
+static const char *_z80LinkCmd[] =
+{
+  "sdldz80", "-nf", "\"$1\"", NULL
+};
+static const char *_gbLinkCmd[] =
+{
+  "sdldgb", "-nf", "\"$1\"", NULL
+};
+
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
-static const char *_z80asmCmd[] =
+static const char *_z80AsmCmd[] =
 {
   "sdasz80", "$l", "$3", "\"$1.asm\"", NULL
 };
-static const char *_gbz80asmCmd[] =
+static const char *_gbAsmCmd[] =
 {
   "sdasgb", "$l", "$3", "\"$1.asm\"", NULL
 };
@@ -726,7 +735,7 @@ PORT z80_port =
     MODEL_SMALL
   },
   {                             /* Assembler */
-    _z80asmCmd,
+    _z80AsmCmd,
     NULL,
     "-plosgffwzc",              /* Options with debug */
     "-plosgffwz",               /* Options without debug */
@@ -734,8 +743,8 @@ PORT z80_port =
     ".asm"
   },
   {                             /* Linker */
-    NULL,
-    LINKCMD,
+    _z80LinkCmd,	//NULL,
+    NULL,		//LINKCMD,
     NULL,
     ".o",
     1
@@ -852,7 +861,7 @@ PORT gbz80_port =
     MODEL_SMALL
   },
   {                             /* Assembler */
-    _gbz80asmCmd,
+    _gbAsmCmd,
     NULL,
     "-plosgffwzc",              /* Options with debug */
     "-plosgffwz",               /* Options without debug */
@@ -861,8 +870,8 @@ PORT gbz80_port =
     NULL                        /* no do_assemble function */
   },
   {
-    NULL,
-    LINKCMD,
+    _gbLinkCmd,		//NULL,
+    NULL,		//LINKCMD,
     NULL,
     ".o",
     1

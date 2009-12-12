@@ -1,3 +1,12 @@
+2009-12-12 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/z80/lkmain.c: removed
+	* as/link/z80/linkgbz80.dsp, as/link/z80/linkz80.dsp,
+	  as/link/z80/Makefile.in: use as/link/lkmain.c
+	* as/link/lkmain.c: fixed command line option handling
+	* src/port.h, src/SDCCmain.c, src/z80/main.c:
+	  fixed crt object file handling with asld, ...
+
 2009-12-10 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* all.dsp, as/link/hc08/link_hc08.dsp, as/link/mcs51/aslink.dsp:

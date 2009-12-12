@@ -145,7 +145,7 @@ SOURCE=..\lklist.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkmain.c
+SOURCE=..\lkmain.c
 # End Source File
 # Begin Source File
 

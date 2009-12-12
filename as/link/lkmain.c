@@ -935,46 +935,48 @@ parse()
 					break;
 
 				case 'y': /*JCF: memory usage summary output*/
-					if (get_sdld_target() == TARGET_IS_GB) {
-						c = get();
-						if(c == 'O' || c == 'o')
-							nb_rom_banks = expr(0);
-						else if(c == 'A' || c == 'a')
-							nb_ram_banks = expr(0);
-						else if(c == 'T' || c == 't')
-							mbc_type = expr(0);
-						else if(c == 'N' || c == 'n') {
-							int i = 0;
-							if(getnb() != '=' || getnb() != '"') {
-								fprintf(stderr, "Syntax error in -yn=\"name\" flag\n");
-								lkexit(1);
-							}
-							while((c = get()) != '"' && i < 16) {
-								cart_name[i++] = c;
-							}
-							if(i < 16)
-								cart_name[i] = 0;
-							else
-								while(get() != '"')
-									;
-						} else if(c == 'P' || c == 'p') {
-							patch *p = patches;
+					if (is_sdld()) {
+						if (get_sdld_target() == TARGET_IS_GB) {
+							c = get();
+							if(c == 'O' || c == 'o')
+								nb_rom_banks = expr(0);
+							else if(c == 'A' || c == 'a')
+								nb_ram_banks = expr(0);
+							else if(c == 'T' || c == 't')
+								mbc_type = expr(0);
+							else if(c == 'N' || c == 'n') {
+								int i = 0;
+								if(getnb() != '=' || getnb() != '"') {
+									fprintf(stderr, "Syntax error in -yn=\"name\" flag\n");
+									lkexit(1);
+								}
+								while((c = get()) != '"' && i < 16) {
+									cart_name[i++] = c;
+								}
+								if(i < 16)
+									cart_name[i] = 0;
+								else
+									while(get() != '"')
+										;
+							} else if(c == 'P' || c == 'p') {
+								patch *p = patches;
 
-							patches = (patch *)malloc(sizeof(patch));
-							patches->next = p;
-							patches->addr = expr(0);
-							if(getnb() != '=') {
-								fprintf(stderr, "Syntax error in -YHaddr=val flag\n");
+								patches = (patch *)malloc(sizeof(patch));
+								patches->next = p;
+								patches->addr = expr(0);
+								if(getnb() != '=') {
+									fprintf(stderr, "Syntax error in -YHaddr=val flag\n");
+									lkexit(1);
+								}
+								patches->value = expr(0);
+							} else {
+								fprintf(stderr, "Invalid option\n");
 								lkexit(1);
 							}
-							patches->value = expr(0);
-						} else {
-							fprintf(stderr, "Invalid option\n");
-							lkexit(1);
 						}
+						else
+							++sflag;
 					}
-					else if (is_sdld())
-						++sflag;
 					else
 						goto err;
 					break;
@@ -1004,6 +1006,8 @@ parse()
 					}
 					else
 						goto err;
+					break;
+
 				case 'a':
 					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
 						iramsav();
@@ -1011,6 +1015,7 @@ parse()
 					}
 					else
 						goto err;
+					break;
 
 				case 'v':
 				case 'V':
@@ -1020,6 +1025,7 @@ parse()
 					}
 					else
 						goto err;
+					break;
 
 				case 'w':
 				case 'W':
@@ -1029,6 +1035,7 @@ parse()
 					}
 					else
 						goto err;
+					break;
 
 				case 'Z':
 					if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
@@ -1043,14 +1050,17 @@ parse()
 					}
 					else
 						goto err;
+					break;
 
 				case 'j':
 				case 'J':
-					if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
-						++symflag;
+					if (is_sdld()) {
+						if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
+							++symflag;
+						}
+						else
+							jflag = 1;
 					}
-					if (is_sdld())
-						jflag = 1;
 					else
 						goto err;
 					break;

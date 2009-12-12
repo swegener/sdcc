@@ -149,6 +149,10 @@ SOURCE=..\lkmain.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\lkmem.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lknoice.c
 # End Source File
 # Begin Source File

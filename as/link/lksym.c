@@ -243,7 +243,7 @@ lkpsym(char *id, int f)
         sp = (struct sym *) new (sizeof(struct sym));
         sp->s_sp = symhash[h];
         symhash[h] = sp;
-        sp->s_id = StoreString( id );   /* JLH */
+        sp->s_id = strsto(id);   /* JLH */
         return (sp);
 }
 
@@ -480,38 +480,276 @@ register int cflag;
 	return (h&HMASK);
 }
 
-/*)Function     VOID *  new(n)
+#if	decus
+
+/*)Function	char *	strsto(str)
  *
- *              unsigned int    n       allocation size in bytes
+ *		char *	str		pointer to string to save
  *
- *      The function new() allocates n bytes of space and returns
- *      a pointer to this memory.  If no space is available the
- *      linker is terminated.
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
  *
- *      local variables:
- *              char *  p               a general pointer
- *              char *  q               a general pointer
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
  *
- *      global variables:
- *              none
+ *	local variables:
+ *		int	l		string length + 1
+ *		char *	p		string location
  *
- *      functions called:
- *              int     fprintf()       c_library
- *              VOID *  malloc()        c_library
+ *	global variables:
+ *		none
  *
- *      side effects:
- *              Memory is allocated, if allocation fails
- *              the linker is terminated.
+ *	functions called:
+ *		char *	new()		assym.c
+ *		char *	strncpy()	c_library
+ *
+ *	side effects:
+ *		Space allocated for string, string copied
+ *		to space.  Out of Space terminates linker.
  */
 
-VOID *
-new(unsigned int n)
+char *
+strsto(str)
+char *str;
 {
-        register char *p;
+	int  l;
+	char *p;
 
-        if ((p = (char *) calloc(n, 1)) == NULL) {
-                fprintf(stderr, "Out of space!\n");
-                lkexit(1);
-        }
-        return (p);
+	/*
+	 * What we need, including a null.
+	 */
+	l = strlen(str) + 1;
+	p = (char *) new (l);
+
+	/*
+	 * Copy the name and terminating null.
+	 */
+	strncpy(p, str, l);
+	return(p);
 }
+
+/*
+ * This code is optimized for the PDP-11 (decus)
+ * which has a limited program space of 56K Bytes !
+ * Short strings and small structures are allocated
+ * from a memory hunk in new() to reduce the overhead
+ * from allocations directly by malloc().  Longer
+ * allocations are made directly by malloc.
+ * PDP-11 addressing requires that variables
+ * are allocated on a word boundary, (strings donot
+ * have this restriction,) all allocations will have
+ * at most 1 extra byte to maintain the word boundary
+ * requirement.
+ */
+
+/*)Function	char *	new(n)
+ *
+ *		unsigned int	n	allocation size in bytes
+ *
+ *	The function new() allocates n bytes of space and returns
+ *	a pointer to this memory.  If no space is available the
+ *	linker is terminated.
+ *
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	bytes		bytes remaining in buffer area
+ *		int	i		loop counter
+ *		char *	p		pointer to head of copied string
+ *		char *	pnext		next location in buffer area
+ *		char *	q		a general pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		VOID *	malloc()	c_library
+ *
+ *	side effects:
+ *		Memory is allocated, if allocation fails
+ *		the linker is terminated.
+ */
+
+/*
+ * To avoid wasting memory headers on small allocations, we
+ * allocate a big chunk and parcel it out as required.
+ * These static variables remember our hunk.
+ */
+
+#define	STR_SPC	1024
+#define	STR_MIN	16
+static	char *	pnext = NULL;
+static	int	bytes = 0;
+
+char *
+new(n)
+unsigned int n;
+{
+	char *p,*q;
+	unsigned int i;
+
+	/*
+	 * Always an even byte count
+	 */
+	n = (n+1) & 0xFFFE;
+
+	if (n > STR_MIN) {
+		/*
+		 * For allocations larger than
+		 * most structures and short strings
+		 * allocate the space directly.
+		 */
+		p = (char *) malloc(n);
+	} else {
+		/*
+		 * For smaller structures and
+		 * strings allocate from the hunk.
+		 */
+		if (n > bytes) {
+			/*
+			 * No space.  Allocate a new hunk.
+			 * We lose the pointer to any old hunk.
+			 * We don't care, as the pieces are never deleted.
+			*/
+			pnext = (char *) malloc (STR_SPC);
+			bytes = STR_SPC;
+		}
+		p = pnext;
+		pnext += n;
+		bytes -= n;
+	}
+	if (p == NULL) {
+		fprintf(stderr, "Out of space!\n");
+		lkexit(ER_FATAL);
+	}
+	for (i=0,q=p; i<n; i++) {
+		*q++ = 0;
+	}
+	return (p);
+}
+
+#else
+
+/*)Function	char *	strsto(str)
+ *
+ *		char *	str		pointer to string to save
+ *
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	l		string length + 1
+ *		int	bytes		bytes remaining in buffer area
+ *		char *	p		pointer to head of copied string
+ *		char *	pnext		next location in buffer area
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		char *	new()		assym.c
+ *		char *	strncpy()	c_library
+ *
+ *	side effects:
+ *		Space allocated for string, string copied
+ *		to space.  Out of Space terminates assembler.
+ */
+
+/*
+ * To avoid wasting memory headers on small allocations, we
+ * allocate a big chunk and parcel it out as required.
+ * These static variables remember our hunk
+ */
+
+#define	STR_SPC	1024
+static	char *	pnext = NULL;
+static	int	bytes = 0;
+
+char *
+strsto(str)
+char *str;
+{
+	int  l;
+	char *p;
+
+	/*
+	 * What we need, including a null.
+	 */
+	l = strlen(str) + 1;
+
+	if (l > bytes) {
+		/*
+		 * No space.  Allocate a new hunk.
+		 * We lose the pointer to any old hunk.
+		 * We don't care, as the strings are never deleted.
+		*/
+		pnext = (char *) new (STR_SPC);
+		bytes = STR_SPC;
+	}
+
+	/*
+	 * Copy the name and terminating null.
+	 */
+	p = pnext;
+	strncpy(p, str, l);
+
+	pnext += l;
+	bytes -= l;
+
+	return(p);
+}
+
+/*)Function	char *	new(n)
+ *
+ *		unsigned int	n	allocation size in bytes
+ *
+ *	The function new() allocates n bytes of space and returns
+ *	a pointer to this memory.  If no space is available the
+ *	linker is terminated.
+ *
+ *	local variables:
+ *		char *	p		a general pointer
+ *		char *	q		a general pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		VOID *	malloc()	c_library
+ *
+ *	side effects:
+ *		Memory is allocated, if allocation fails
+ *		the linker is terminated.
+ */
+
+char *
+new(n)
+unsigned int n;
+{
+	char *p,*q;
+	unsigned int i;
+
+	if ((p = (char *) malloc(n)) == NULL) {
+		fprintf(stderr, "Out of space!\n");
+		lkexit(ER_FATAL);
+	}
+	for (i=0,q=p; i<n; i++) {
+		*q++ = 0;
+	}
+	return (p);
+}
+
+#endif
+

@@ -113,11 +113,11 @@ SOURCE=..\lkeval.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkgb.c
+SOURCE=..\lkgb.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkgg.c
+SOURCE=..\lkgg.c
 # End Source File
 # Begin Source File
 
@@ -170,10 +170,6 @@ SOURCE=..\lks19.c
 # Begin Source File
 
 SOURCE=..\lksdcclib.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\lkstore.c
 # End Source File
 # Begin Source File
 

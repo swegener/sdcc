@@ -1,3 +1,14 @@
+2009-12-13 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/aslink.h. as/link/lksym.c, as/link/lkstore.c:
+	  StrStore() replaced with strsto(), removed as/link/lkstore.c
+	* as/link/lkgb.c, as/link/lkgg.c, as/link/z80/lkgb.c,
+	  as/link/z80/lkgg.c, as/link/z80/Makefile.in,
+	  as/link/z80/linkz80.dsp, as/link/z80/linkgbz80.dsp,
+	  as/link/mcs51/Makefile.in, as/link/mcs51/aslink.dsp,
+	  as/link/hc08/Makefile.in, as/link/hc08/link_hc08.dsp:
+	  as/link/z80/lkgb.c and as/link/z80/lkgg.c moved to as/link
+
 2009-12-12 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/z80/lkmain.c: removed

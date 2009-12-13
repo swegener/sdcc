@@ -120,6 +120,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #endif /* SDK */
 
 /*
+ * Error definitions
+ */
+#define	ER_NONE		0	/* No error */
+#define	ER_WARNING	1	/* Warning */
+#define	ER_ERROR	2	/* Assembly error */
+#define	ER_FATAL	3	/* Fatal error */
+
+/*
  * This file defines the format of the
  * relocatable binary file.
  */
@@ -770,8 +778,9 @@ extern  VOID            newhead();
 /* lksym.c */
 extern  int             hash();
 extern  struct  sym *   lkpsym();
-extern  VOID *          new();
-extern  struct  sym *   newsym();
+extern  char *          new(unsigned int n);
+extern  struct  sym *   newsym(VOID);
+extern	char *		strsto(char *str);
 extern  VOID            symdef();
 extern  int             symeq();
 extern  VOID            syminit();
@@ -837,9 +846,6 @@ extern  VOID            s19();
 extern  VOID            ihx();
 extern  VOID            ihxExtendedLinearAddress(a_uint);
 extern  VOID            ihxNewArea();
-
-/* lkstore.c */
-extern  char *          StoreString( char *str );
 
 /* lknoice.c */
 extern  void            DefineNoICE( char *name, a_uint value, int page );

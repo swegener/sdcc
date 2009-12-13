@@ -12,6 +12,7 @@
 	* as/link/lkmem.c: fixed code asld6808 crash
 	* all.dsp, as/link/z80/linkz80.dsp, as/link/z80/linkgbz80.dsp:
 	  fixed for new sdld names
+	* src/SDCCmain.c: fixed cygwin compilation
 
 2009-12-12 Borut Razem <borut.razem AT siol.net>
 

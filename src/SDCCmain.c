@@ -1762,8 +1762,9 @@ linkEdit (char **envp)
                        windows paths, so convert them to the CYGWIN format */
                     char posix_path[PATH_MAX];
                     void cygwin_conv_to_full_posix_path (char * win_path, char * posix_path);
-                    cygwin_conv_to_full_posix_path (crt0path, posix_path);
-                    strcpy (crt0path, posix_path);
+                    cygwin_conv_to_full_posix_path ((char *)dbuf_c_str(&crt0path), posix_path);
+		    dbuf_set_length (&crt0path, 0);
+                    dbuf_append_str (&crt0path, posix_path);
                   }
                   #endif
                   /* append crt0.o to the files list */
@@ -1881,7 +1882,7 @@ linkEdit (char **envp)
         {
           remove (fullDstFileName);
           rename (scratchFileName, fullDstFileName);
-       }
+        }
  
       strncpyz (buffer, fullDstFileName, sizeof(buffer));
       if (NULL == (q = strrchr (buffer, '.')))
@@ -1895,7 +1896,7 @@ linkEdit (char **envp)
         {
           remove (buffer);
           rename (scratchFileName, buffer);
-       }
+        }
  
       *p = 0;
       strncatz (scratchFileName, ".mem", sizeof(scratchFileName));
@@ -1905,7 +1906,7 @@ linkEdit (char **envp)
         {
           remove (buffer);
           rename (scratchFileName, buffer);
-       }
+        }
  
       if (options.debug)
         {
@@ -1926,7 +1927,7 @@ linkEdit (char **envp)
             {
               remove (buffer);
               rename (scratchFileName, buffer);
-           }
+            }
         }
     }
   if (system_ret)

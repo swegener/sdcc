@@ -214,7 +214,7 @@ listAdd (listHeader * lhp, void * item)
 {
   listEntry * lep;
 
-  lep = new (sizeof (*lep));
+  lep = (listEntry *)new (sizeof (*lep));
   lep->item = item;
   lep->prev = lhp->last;
   if (lep->prev)
@@ -232,7 +232,7 @@ listNew (void)
 {
   listHeader * lhp;
 
-  lhp = new (sizeof (*lhp));
+  lhp = (listHeader *)new (sizeof (*lhp));
 
   return lhp;
 }
@@ -274,7 +274,7 @@ strtabFindOrAdd (strtabList * strtab, char * str)
       sp = sp->next;
     }
 
-  sp = new (sizeof(*sp));
+  sp = (strtabString *)new (sizeof(*sp));
   if (strtab->last)
     sp->index = strtab->last->index + 1 + strlen (strtab->last->string);
   else
@@ -494,7 +494,7 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
       /* create a segment header for this region if loadable */
       if (!(ap->a_flag & A_NOLOAD))
         {
-          phdrp = new (sizeof (*phdrp));
+          phdrp = (Elf32_Phdr *)new (sizeof (*phdrp));
           phdrp->p_type = PT_LOAD;
           phdrp->p_offset = ftell (ofp);
           phdrp->p_vaddr = addr;
@@ -509,7 +509,7 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
         }
 
       /* create a section header for this region */
-      shdrp = new (sizeof (*shdrp));
+      shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
       shdrp->sh_name = strtabFindOrAdd (&shstrtab, ap->a_id);
       shdrp->sh_type = SHT_PROGBITS;
       shdrp->sh_flags = 0;
@@ -547,7 +547,7 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
   /* create a segment header for this area if loadable */
   if (!(ap->a_flag & A_NOLOAD))
     {
-      phdrp = new (sizeof (*phdrp));
+      phdrp = (Elf32_Phdr *)new (sizeof (*phdrp));
       phdrp->p_type = PT_LOAD;
       phdrp->p_offset = ftell (ofp);
       phdrp->p_vaddr = ap->a_addr;
@@ -562,7 +562,7 @@ elfGenerateRel (struct area *ap, listHeader * segments, listHeader * sections)
     }
 
   /* create a section header for this area */
-  shdrp = new (sizeof (*shdrp));
+  shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
   shdrp->sh_name = strtabFindOrAdd (&shstrtab, ap->a_id);
   shdrp->sh_type = SHT_PROGBITS;
   shdrp->sh_flags = 0;
@@ -599,7 +599,7 @@ elfGenerate (void)
   Elf32_Word shstrtabName;
 
   /* create the null section header for index 0 */
-  shdrp = new (sizeof (*shdrp));
+  shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
   shdrp->sh_name = 0;
   shdrp->sh_type = SHT_NULL;
   shdrp->sh_flags = 0;
@@ -658,7 +658,7 @@ elfGenerate (void)
     }
 
   /* Create the string table section after the other sections */
-  shdrp = new (sizeof (*shdrp));
+  shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
   shdrp->sh_name = strtabFindOrAdd (&shstrtab, ".shstrtab");
   shdrp->sh_type = SHT_STRTAB;
   shdrp->sh_flags = 0;

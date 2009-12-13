@@ -184,20 +184,10 @@ int summary(struct area * areap)
         }
         else if (EQ(xp->a_id, "BSEG_BYTES"))
         {
-            Ram[4].Size+=xp->a_size;
-        }
-        else if (EQ(xp->a_id, "BIT_BANK"))
-        {
-            Ram[4].Size+=xp->a_size;
-        }
-
-        else if(xp->a_flag & A_CODE)
-        {
-            if(xp->a_size>0)
-            {
-                Rom.Size+=xp->a_size;
-                if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
-            }
+            if (get_sdld_target() == TARGET_IS_8051)
+            	Ram[4].Size+=xp->a_size;
+            else
+                Ram[4].Size=xp->a_size;
         }
 
         else if (EQ(xp->a_id, "SSEG"))
@@ -206,23 +196,62 @@ int summary(struct area * areap)
             if(xp->a_addr<Stack.Start) Stack.Start=xp->a_addr;
         }
 
-        else if(xp->a_flag & A_XDATA)
-        {
-            if(xp->a_size>0)
-            {
-                XRam.Size+=xp->a_size;
-                if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
-            }
-        }
-
         else if (EQ(xp->a_id, "ISEG"))
         {
             IRam.Size+=xp->a_size;
             if(xp->a_addr<IRam.Start) IRam.Start=xp->a_addr;
         }
 
+        else if (get_sdld_target() == TARGET_IS_8051)
+        {
+            if(xp->a_flag & A_XDATA)
+            {
+                if(xp->a_size>0)
+                {
+                    XRam.Size+=xp->a_size;
+                    if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+                }
+            }
+
+            else if (EQ(xp->a_id, "BIT_BANK"))
+            {
+                Ram[4].Size+=xp->a_size;
+            }
+
+            else if(xp->a_flag & A_CODE)
+            {
+                if(xp->a_size>0)
+                {
+                    Rom.Size+=xp->a_size;
+                    if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+                }
+            }
+        }
+
+        else if(get_sdld_target() == TARGET_IS_6808)
+        {
+            if ( EQ(xp->a_id, "DSEG") || EQ(xp->a_id, "OSEG") )
+            {
+                Ram[6].Size+=xp->a_size;
+                if(xp->a_addr<Ram[6].Start) Ram[6].Start=xp->a_addr;
+            }
+
+            else if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
+                         EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
+            {
+                Rom.Size+=xp->a_size;
+                if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+            }
+
+            else if (EQ(xp->a_id, "XSEG") || EQ(xp->a_id, "XISEG"))
+            {
+                    XRam.Size+=xp->a_size;
+                    if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+            }
+        }
+
         /*If is not a register bank, bit, stack, or idata, then it should be data*/
-        else if((xp->a_flag & (A_CODE|A_BIT|A_XDATA))==0)
+        else if((get_sdld_target() == TARGET_IS_8051 && xp->a_flag & (A_CODE|A_BIT|A_XDATA))==0)
         {
             if(xp->a_size)
             {
@@ -670,3 +699,4 @@ int summary2(struct area * areap)
     return 0;
   }
 }
+

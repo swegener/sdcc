@@ -98,16 +98,16 @@ InputPath=.\bin_vc\sdld.exe
 # End Source File
 # Begin Source File
 
-SOURCE=".\bin_vc\link-gbz80.exe"
+SOURCE=".\bin_vc\sdldgb.exe"
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\link-gbz80.exe"
+InputPath=".\bin_vc\sdldgb.exe"
 
-"bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\link-gbz80.exe  bin /y > nul
+"bin\sdldgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldgb.exe  bin /y > nul
 
 # End Custom Build
 
@@ -115,10 +115,10 @@ InputPath=".\bin_vc\link-gbz80.exe"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\link-gbz80.exe"
+InputPath=".\bin_vc\sdldgb.exe"
 
-"bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\link-gbz80.exe  bin /y > nul
+"bin\sdldgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldgb.exe  bin /y > nul
 
 # End Custom Build
 
@@ -155,16 +155,16 @@ InputPath=".\bin_vc\sdld6808.exe"
 # End Source File
 # Begin Source File
 
-SOURCE=".\bin_vc\link-z80.exe"
+SOURCE=".\bin_vc\sdldz80.exe"
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\link-z80.exe"
+InputPath=".\bin_vc\sdldz80.exe"
 
-"bin\link-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\link-z80.exe  bin /y > nul
+"bin\sdldz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldz80.exe  bin /y > nul
 
 # End Custom Build
 
@@ -172,10 +172,10 @@ InputPath=".\bin_vc\link-z80.exe"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=".\bin_vc\link-z80.exe"
+InputPath=".\bin_vc\sdldz80.exe"
 
-"bin\link-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\link-z80.exe  bin /y > nul
+"bin\sdldz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldz80.exe  bin /y > nul
 
 # End Custom Build
 

@@ -10,6 +10,8 @@
 	  as/link/z80/lkgb.c and as/link/z80/lkgg.c moved to as/link
 	* as/link/lkelf.c: added casts to new()
 	* as/link/lkmem.c: fixed code asld6808 crash
+	* all.dsp, as/link/z80/linkz80.dsp, as/link/z80/linkgbz80.dsp:
+	  fixed for new sdld names
 
 2009-12-12 Borut Razem <borut.razem AT siol.net>
 

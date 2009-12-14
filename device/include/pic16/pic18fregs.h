@@ -1,4 +1,3 @@
-
 /*
  * pic18fregs.h - 18F Family Device Library Header
  *
@@ -7,9 +6,6 @@
  * January, 2004
  * The GNU PIC Library is maintained by,
  * 	Vangelis Rokas <vrokas@otenet.gr>
- *
- * $Id$
- *
  */
 
 #ifndef __PIC18FREGS_H__
@@ -366,12 +362,21 @@
 
 #endif
 
+#ifndef _CONCAT
+#define _CONCAT(a,b)    _CONCAT2(a,b)
+#endif  // !_CONCAT
+
+#ifndef _CONCAT2
+#define _CONCAT2(a,b)   a##b
+#endif  // !_CONCAT2
+
+#define _CONFIG(ADDR, VAL)  \
+    static const __code unsigned char __at(ADDR) _CONCAT(_conf,__LINE__) = (VAL)
 
 #define Nop()           do { __asm nop __endasm; } while(0)
 #define ClrWdt()        do { __asm clrwdt __endasm; } while(0)
 #define Sleep()         do { __asm sleep __endasm; } while(0)
 #define Reset()         do { __asm reset __endasm; } while(0)
-
 
 #endif /* __PIC18FREGS_H__ */
 

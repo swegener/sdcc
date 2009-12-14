@@ -1,3 +1,19 @@
+2009-12-14 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic16devices.txt: mask _XINST for 18f97j60
+	  family
+	* device/include/pic16/pic18f66j60.h,
+	  device/include/pic16/pic18f66j65.h,
+	  device/include/pic16/pic18f67j60.h,
+	  device/include/pic16/pic18f86j60.h,
+	  device/include/pic16/pic18f86j65.h,
+	  device/include/pic16/pic18f87j60.h,
+	  device/include/pic16/pic18f96j60.h,
+	  device/include/pic16/pic18f96j65.h,
+	  device/include/pic16/pic18f97j60.h: add symbolic addresses to
+	  configuration bits
+	* device/include/pic16/pic18fregs.h: add _CONFIG() macro
+
 2009-12-14 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c: fixed crashing if -o option is not defined,

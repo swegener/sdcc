@@ -4,16 +4,16 @@
 
 #include "pic18f86j60.h"
 
-#undef  _CONFIG1L
-#undef  _CONFIG1H
-#undef  _CONFIG2L
-#undef  _CONFIG2H
-#undef  _CONFIG3L
-#undef  _CONFIG3H
+#undef  __CONFIG1L
+#undef  __CONFIG1H
+#undef  __CONFIG2L
+#undef  __CONFIG2H
+#undef  __CONFIG3L
+#undef  __CONFIG3H
 
-#define _CONFIG1L               0x17FF8
-#define _CONFIG1H               0x17FF9
-#define _CONFIG2L               0x17FFA
-#define _CONFIG2H               0x17FFB
-#define _CONFIG3L               0x17FFC
-#define _CONFIG3H               0x17FFD
+#define __CONFIG1L              0x17FF8
+#define __CONFIG1H              0x17FF9
+#define __CONFIG2L              0x17FFA
+#define __CONFIG2H              0x17FFB
+#define __CONFIG3L              0x17FFC
+#define __CONFIG3H              0x17FFD

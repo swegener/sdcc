@@ -362,16 +362,16 @@
 
 #endif
 
-#ifndef _CONCAT
-#define _CONCAT(a,b)    _CONCAT2(a,b)
-#endif  // !_CONCAT
+#ifndef __CONCAT
+#define __CONCAT(a,b)   __CONCAT2(a,b)
+#endif  // !__CONCAT
 
-#ifndef _CONCAT2
-#define _CONCAT2(a,b)   a##b
-#endif  // !_CONCAT2
+#ifndef __CONCAT2
+#define __CONCAT2(a,b)   a##b
+#endif  // !__CONCAT2
 
-#define _CONFIG(ADDR, VAL)  \
-    static const __code unsigned char __at(ADDR) _CONCAT(_conf,__LINE__) = (VAL)
+#define __CONFIG(ADDR,VAL)  \
+    static const __code unsigned char __at(ADDR) __CONCAT(_conf,__LINE__) = (VAL)
 
 #define Nop()           do { __asm nop __endasm; } while(0)
 #define ClrWdt()        do { __asm clrwdt __endasm; } while(0)

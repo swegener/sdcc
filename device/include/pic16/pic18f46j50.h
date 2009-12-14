@@ -11,6 +11,15 @@
 #ifndef __PIC18F46J50_H__
 #define __PIC18F46J50_H__ 1
 
+#define __CONFIG1L      0xFFF8
+#define __CONFIG1H      0xFFF9
+#define __CONFIG2L      0xFFFA
+#define __CONFIG2H      0xFFFB
+#define __CONFIG3L      0xFFFC
+#define __CONFIG3H      0xFFFD
+#define __CONFIG4L      0xFFFE
+#define __CONFIG4H      0xFFFF
+
 #define	_DEVID1             	0x3FFFFE
 #define	_DEVID2             	0x3FFFFF
 

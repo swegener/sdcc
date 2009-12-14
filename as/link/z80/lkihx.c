@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "aslink.h"
 
 /*)Module       lkihx.c
@@ -138,3 +139,42 @@ ihx(i)
                 fprintf(ofp, ":00000001FF\n");
         }
 }
+
+/*)Function     ihxNewArea(i)
+ * The function ihxNewArea() is called when processing of new area is started.
+ * It resets the value of lastHexAddr.
+ */
+VOID
+ihxNewArea()
+{
+  /* dummy function for z80 like targets */
+  assert(0);
+}
+
+/*)Function     ihxExtendedLinearAddress(i)
+ *
+ *              a_uint  i               16 bit extended linear address.
+ *
+ *      The function ihxExtendedLinearAddress() writes an extended
+ *      linear address record (type 04) to the output file.
+ *
+ *      local variables:
+ *              a_uint  chksum          byte checksum
+ *
+ *      global variables:
+ *              FILE *  ofp             output file handle
+ *
+ *      functions called:
+ *              int     fprintf()       c_library
+ *
+ *      side effects:
+ *              The data is output to the file defined by ofp.
+ *              hexPageOverrun and lastHexAddr is cleared
+ */
+VOID
+ihxExtendedLinearAddress(a_uint a)
+{
+  /* dummy function for z80 like targets */
+  assert(0);
+}
+

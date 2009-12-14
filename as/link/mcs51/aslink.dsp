@@ -152,7 +152,7 @@ SOURCE=..\lkrel.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkrloc.c
+SOURCE=..\lkrloc.c
 # End Source File
 # Begin Source File
 

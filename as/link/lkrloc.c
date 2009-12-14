@@ -25,6 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "sdld.h"
 #include "aslink.h"
 
 /*)Module   lkrloc.c
@@ -55,6 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  */
 
+/* sdld specific */
 /* Global which holds the upper 16 bits of the last 32 bit area adress
  * output. Useful only for iHex mode.
  */
@@ -64,6 +68,7 @@ int    lastExtendedAddress=-1;
  * Useful only for iHex mode.
  */
 static int lastAreaIndex = -1;
+/* end sdld specific */
 
 /*)Function VOID    reloc(c)
  *
@@ -244,6 +249,9 @@ VOID relt(VOID)
  *      a_uint  adb_lo()    lkrloc.c
  *      a_uint  adb_hi()    lkrloc.c
  *      a_uint  adw_w()     lkrloc.c
+ * sdld specific
+ *      VOID    elf()       lkelf.c
+ * end sdld specific
  *      a_uint  evword()    lkrloc.c
  *      int eval()          lkeval.c
  *      int fprintf()       c_library
@@ -293,6 +301,8 @@ VOID relr(VOID)
         lkerr++;
         return;
     }
+    if (get_sdld_target() == TARGET_IS_6808)
+        ap = a[aindex]->a_bap;
 
     /*
      * Base values
@@ -309,6 +319,14 @@ VOID relr(VOID)
     printf("area %d base address: 0x%x size: 0x%x rtbase: 0x%x\n", aindex,
         a[aindex]->a_addr, a[aindex]->a_size, rtbase);
     #endif
+    if (get_sdld_target() == TARGET_IS_GB)
+    {
+        char *s = strrchr(a[aindex]->a_bap->a_id, '_');
+        if(s != NULL && isdigit((unsigned char)s[1]))
+                current_rom_bank = atoi(s+1);
+        else
+                current_rom_bank = 0;
+    }
     /*
      * Do remaining relocations
      */
@@ -335,10 +353,14 @@ VOID relr(VOID)
                 return;
             }
             reli = symval(s[rindex]);
-        } else if ((IS_R_J11(mode) || IS_R_J19(mode)) && (rindex == 0xFFFF)) {
+        }
+/* sdld specific */
+        else if ((IS_R_J11(mode) || IS_R_J19(mode)) && (rindex == 0xFFFF)) {
             /* absolute acall/ajmp address */
             reli = 0;
-        } else {
+        }
+/* end sdld specific */
+        else {
             if (rindex >= hp->h_narea) {
                 fprintf(stderr, "R area error\n");
                 lkerr++;
@@ -376,10 +398,12 @@ VOID relr(VOID)
                 /* This is a three byte address, of which
                  * we will select one byte.
                  */
+/* sdld specific */
                 if (mode & R_BIT)
                 {
                     relv = adb_24_bit(reli, rtp);
                 }
+/* sdld specific */
                 else if (mode & R_HIB)
                 {
                     /* printf("24 bit address selecting hi byte.\n"); */
@@ -505,12 +529,15 @@ VOID relr(VOID)
         /*
          * Page Relocation Error Checking
          */
-        /* if (mode & R_PAG0 && (relv & ~0xFF || paga || pags))
-            error = 3;*/
+        if ((get_sdld_target() == TARGET_IS_GB || get_sdld_target() == TARGET_IS_Z80) &&
+            mode & R_PAG0 && (relv & ~0xFF || paga || pags))
+            error = 3;
         if (mode & R_PAG  && (relv & ~0xFF))
             error = 4;
+/* sdld specific */
         if ((mode & R_BIT) && (relv & ~0x87FF))
             error = 5;
+/* end sdld specific */
 
         /*
          * Error Processing
@@ -529,7 +556,10 @@ VOID relr(VOID)
     }
 
     /* JLH: output only if data (beyond two byte address) */
-    if ((oflag == 1) && (rtcnt > 2)) {
+    if ((get_sdld_target() == TARGET_IS_GB || get_sdld_target() == TARGET_IS_Z80) && oflag == 1) {
+        ihx(1);
+    }
+    else if ((oflag == 1) && (rtcnt > 2)) {
         int extendedAddress = (a[aindex]->a_addr >> 16) & 0xffff;
 
         /* Boy, is this a hack: for ABS sections, the
@@ -557,7 +587,7 @@ VOID relr(VOID)
             ihxNewArea();
         }
 
-        if (extendedAddress != lastExtendedAddress)
+        if (get_sdld_target() == TARGET_IS_8051 && extendedAddress != lastExtendedAddress)
         {
 
             if (lastExtendedAddress!=-1) {
@@ -585,6 +615,18 @@ VOID relr(VOID)
     if ((oflag == 2) && (rtcnt > 2)) {
         s19(1);
     }
+/* sdld specific */
+    else if ((oflag == 3) && (rtcnt > 2)) {
+        if (get_sdld_target() == TARGET_IS_6808)
+            elf(1);
+        else if (get_sdld_target() == TARGET_IS_GB)
+            gb(1);
+/*
+        else if (--GAMEGEAR--)
+             gg(1);
+*/
+    }
+/* end sdld specific */
 }
 
 char *errmsg[] = {
@@ -592,7 +634,9 @@ char *errmsg[] = {
     "Byte PCR relocation error",
     "Page0 relocation error",
     "Page Mode relocation error",
+/* sdld specific */
     "Bit-addressable relocation error"
+/* end sdld specific */
 };
 
 
@@ -740,6 +784,9 @@ VOID relp(VOID)
  *      int uflag       relocation listing flag
  *
  *  called functions:
+ * sdld specific
+ *      VOID    elf()       lkelf.c
+ * end sdld specific
  *      VOID    ihx()       lkihx.c
  *      VOID    lkulist()   lklist.c
  *      VOID    s19()       lks19.c
@@ -760,6 +807,12 @@ VOID rele(VOID)
     if (oflag == 2) {
         s19(0);
     }
+/* sdld specific */
+    else if (oflag == 3) {
+        if (get_sdld_target() == TARGET_IS_6808)
+            elf(0);
+    }
+/* end sdld specific */
 }
 
 /*)Function a_uint      evword()

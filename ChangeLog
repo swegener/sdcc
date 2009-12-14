@@ -1,3 +1,8 @@
+2009-12-14 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: fixed crashing if -o option is not defined,
+	  bug #2913769: sdcc crashes on cygwin
+
 2009-12-13 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/aslink.h. as/link/lksym.c, as/link/lkstore.c:

@@ -1861,9 +1861,9 @@ linkEdit (char **envp)
 
   system_ret = my_system (buffer);
 
-  if (IS_SDASLD)
+  if (fullDstFileName && IS_SDASLD)
     {
-      /* make some order in the mess remined behind sdld:
+      /* make some order in the mess left by sdld:
          move generated files to the output directory */
       char *p, *q;
 

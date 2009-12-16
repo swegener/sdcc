@@ -109,6 +109,10 @@ SOURCE=..\lkdata.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lkelf.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lkeval.c
 # End Source File
 # Begin Source File

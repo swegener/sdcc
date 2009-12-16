@@ -115,6 +115,10 @@ SOURCE=..\lkeval.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\lkgb.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\lkhead.c
 # End Source File
 # Begin Source File

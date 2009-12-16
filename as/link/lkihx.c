@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <string.h>
+#include "sdld.h"
 #include "aslink.h"
 
 /*)Module   lkihx.c
@@ -144,7 +145,8 @@ hexRecord(unsigned addr, int rtvalIndex)
         return;         // nothing to output
 
     /* Is this record in the same bank as previous? */
-    if ( ((lastHexAddr>>16) != (addr>>16)) && (rflag) ) {
+    if ((get_sdld_target() == TARGET_IS_8051 && ((lastHexAddr>>16) != (addr>>16)) && (rflag)) ||
+        (get_sdld_target() == TARGET_IS_6808 && lastHexAddr > addr)) {
         overrun = hexPageOverrun + 1;
         ihxExtendedLinearAddress(lastExtendedAddress + overrun);
         hexPageOverrun = overrun;
@@ -159,18 +161,20 @@ hexRecord(unsigned addr, int rtvalIndex)
         if (rtflg[i]) {
             fprintf(ofp, "%02X", rtval[i]);
             chksum += rtval[i];
-            if (addr + ++bytes > 0xffff) {
-                if (rflag) {
-                    fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
-                    overrun = hexPageOverrun + 1;
-                    ihxExtendedLinearAddress(lastExtendedAddress + overrun);
-                    hexPageOverrun = overrun;
-                    hexRecord(0, i + 1);
-                    return;
-                } else {
-                    fprintf(stderr,
-                        "warning: extended linear address encountered; "
-                        "you probably want the -r flag.\n");
+            if (get_sdld_target() == TARGET_IS_8051) {
+                if (addr + ++bytes > 0xffff) {
+                    if (rflag) {
+                        fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
+                        overrun = hexPageOverrun + 1;
+                        ihxExtendedLinearAddress(lastExtendedAddress + overrun);
+                        hexPageOverrun = overrun;
+                        hexRecord(0, i + 1);
+                        return;
+                    } else {
+                        fprintf(stderr,
+                            "warning: extended linear address encountered; "
+                            "you probably want the -r flag.\n");
+                    }
                 }
             }
         }
@@ -207,6 +211,9 @@ ihx(i)
 {
     a_uint n;
     if (i) {
+        if (get_sdld_target() == TARGET_IS_6808 && ap->a_flag & A_NOLOAD)
+            return;
+
         if (hilo == 0) {
             n = rtval[0];
             rtval[0] = rtval[1];
@@ -214,7 +221,7 @@ ihx(i)
         }
         hexRecord((rtval[0]<<8) + rtval[1], 2);
     } else {
-        if (rflag) /* linear start address, hardcoded as reset vector (0x0000) */
+        if (get_sdld_target() == TARGET_IS_8051 && rflag) /* linear start address, hardcoded as reset vector (0x0000) */
             fprintf(ofp, ":0400000500000000F7\n");
         fprintf(ofp, ":00000001FF\n");
     }

@@ -7439,27 +7439,35 @@ sdcpp - The C preprocessor.
 \end_layout
 
 \begin_layout Itemize
-asx8051 - The assembler for 8051 type processors.
+sdas8051 - The assembler for 8051 type processors.
 \end_layout
 
 \begin_layout Itemize
-as-z80
+sdasz80
 \series bold
 ,
 \series default
- as-gbz80 - The Z80 and GameBoy Z80 assemblers.
+ sdasgb - The Z80 and GameBoy Z80 assemblers.
 \end_layout
 
 \begin_layout Itemize
-aslink -The linker for 8051 type processors.
+sdas6808 - The 6808 assembler.
 \end_layout
 
 \begin_layout Itemize
-link-z80
+sdld -The linker for 8051 type processors.
+\end_layout
+
+\begin_layout Itemize
+sdldz80
 \series bold
 ,
 \series default
- link-gbz80 - The Z80 and GameBoy Z80 linkers.
+ sdldgb - The Z80 and GameBoy Z80 linkers.
+\end_layout
+
+\begin_layout Itemize
+sdld6808 - The 6808 linker.
 \end_layout
 
 \begin_layout Itemize
@@ -7587,11 +7595,11 @@ http://gcc.gnu.org/
 \end_layout
 
 \begin_layout Subsection
-as
+sdas
 \emph on
 xxxx
 \emph default
-, aslink, link-
+, asld, asld
 \emph on
 xxx
 \emph default
@@ -52054,7 +52062,7 @@ Tools
 \begin_layout Standard
 \align left
 \begin_inset Tabular
-<lyxtabular version="3" rows="12" columns="3">
+<lyxtabular version="3" rows="14" columns="3">
 <features>
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -52216,7 +52224,7 @@ sdcc/support/scripts
 \begin_inset Text
 
 \begin_layout Plain Layout
-as-gbz80
+sdasgb
 \end_layout
 
 \end_inset
@@ -52254,7 +52262,7 @@ sdcc/bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-as-z80
+sdasz80
 \end_layout
 
 \end_inset
@@ -52292,7 +52300,45 @@ sdcc/bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-asx8051
+sdas8051
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Assembler
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+sdcc/bin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdas6808
 \end_layout
 
 \end_inset
@@ -52368,7 +52414,7 @@ sdcc/bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-aslink
+sdld
 \end_layout
 
 \end_inset
@@ -52406,7 +52452,7 @@ sdcc/bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-link-z80
+sdldz80
 \end_layout
 
 \end_inset
@@ -52444,7 +52490,45 @@ sdcc/bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-link-gbz80
+sdldgb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Linker
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+sdcc/bin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdld6808
 \end_layout
 
 \end_inset
@@ -55857,8 +55941,7 @@ Historically there often were long delays between official releases and
 \end_layout
 
 \begin_layout Standard
-The medium digit in the version number denotes the year of the release and
- the last digit of an official release is zero.
+The last digit of an official release is zero.
  Additionally there are daily snapshots available at snap 
 \begin_inset Flex URL
 status collapsed
@@ -55871,7 +55954,7 @@ http://sdcc.sourceforge.net/snap.php
 \end_inset
 
 , and you can always build the very last version from the source code available
- at Source 
+ at Sourceforge 
 \begin_inset Flex URL
 status collapsed
 

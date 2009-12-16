@@ -14,11 +14,11 @@ ASXXLIBSRC = strcmpi.c
 LKLIB = $(srcdir)/..
 
 LKLIBSRC = lk_readnl.c lkaomf51.c lkar.c lkdata.c lkelf.c lkeval.c lkgb.c lkgg.c \
-           lkhead.c lklex.c lklib.c lklibr.c lklist.c lkmain.c \
+           lkhead.c lkihx.c lklex.c lklib.c lklibr.c lklist.c lkmain.c \
            lkmem.c lknoice.c lkrel.c lkrloc.c lks19.c lksdcclib.c \
            lksym.c sdld.c
 
-SRC = lkarea.c lkihx.c
+SRC = lkarea.c
 
 LKSOURCES = $(SRC) $(LKLIBSRC:%.c=$(LKLIB)/%.c) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
 

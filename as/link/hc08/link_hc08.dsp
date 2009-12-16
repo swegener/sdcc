@@ -119,7 +119,7 @@ SOURCE=..\lkhead.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkihx.c
+SOURCE=..\lkihx.c
 # End Source File
 # Begin Source File
 

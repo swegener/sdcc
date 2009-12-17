@@ -23,17 +23,22 @@
 -------------------------------------------------------------------------*/
 #include <string.h>
 
-char * strpbrk ( 
+char * strpbrk (
 	const char * string ,
 	const char * control
-		       ) 
+		)
 {
-	register char ch ;
+	char *ret = NULL;
+	register char ch;
 
-	while ( ch = *string ) {
-		if (strchr (control, ch ))
-			return string ;
+	while (ch = *control) {
+		char * p = strchr(string, ch);
+		if (p != NULL && (ret == NULL || p < ret)) {
+			ret = p;
+		}
+		control++;
 	}
 
-	return (NULL);
+	return (ret);
 }
+

@@ -1,3 +1,11 @@
+2009-12-17 Indy Sams < drift_solutions AT users.sourceforge.net >
+
+	* device/lib/_strpbrk.c: fixed bug #2908537 (svn commit by Frieder)
+
+2009-12-17 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/strpbrk.c: added regression test
+
 2009-12-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/w7100.h: added.

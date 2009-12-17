@@ -1,3 +1,7 @@
+2009-12-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/w7100.h: added.
+
 2009-12-16 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/lkihx.c,

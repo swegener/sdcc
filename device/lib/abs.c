@@ -20,8 +20,34 @@
 
 #include <stdlib.h>
 
+#if defined (SDCC_mcs51)
+
+static void dummy(void) __naked
+{
+	__asm
+	.globl	_abs
+_abs:
+	mov	a, dph
+	jnb	acc.7, 00001$
+	clr	c
+	clr	a
+	subb	a,dpl
+	mov	dpl,a
+	clr	a
+	subb	a,dph
+	mov	dph,a
+00001$:
+	ret
+	__endasm;
+}
+
+#else
+
 int abs(int j)
 {
-	return (j >= 0) ? j : -j;
+	return (j < 0) ? -j : j;
 }
+
+#endif
+
 //END OF MODULE

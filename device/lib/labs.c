@@ -20,8 +20,39 @@
 
 #include <stdlib.h>
 
+#if defined (SDCC_mcs51)
+
+static void dummy(void) __naked
+{
+	__asm
+	.globl	_labs
+_labs:
+	jnb	acc.7, 00001$
+	mov	r2,a
+	clr	c
+	clr	a
+	subb	a,dpl
+	mov	dpl,a
+	clr	a
+	subb	a,dph
+	mov	dph,a
+	clr	a
+	subb	a,b
+	mov	b,a
+	clr	a
+	subb	a,r2
+00001$:
+	ret
+	__endasm;
+}
+
+#else
+
 long int labs(long int j)
 {
-	return (j >= 0) ? j : -j;
+	return (j < 0) ? -j : j;
 }
+
+#endif
+
 //END OF MODULE

@@ -11,6 +11,7 @@
 	  unification of lkarea.c, one polymorphic sdld
 	* as/asxxsrc/sdas.h, as/asxxsrc/sdas.c:
 	  renamed TRAGET_IS_XXXX to TARGET_ID_XXXX
+	* .version, doc/sdccman.lyx: bumped version to 2.9.5
 
 2009-12-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

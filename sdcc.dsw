@@ -30,12 +30,6 @@ Package=<4>
     Project_Dep_Name src
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name linkz80
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name linkgbz80
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name asgb
     End Project Dependency
     Begin Project Dependency
@@ -45,20 +39,8 @@ Package=<4>
     Project_Dep_Name as_hc08
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name link_hc08
+    Project_Dep_Name sdld_all
     End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "as_gbz80"=.\as\asgb\asgb.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
 }}}
 
 ###############################################################################
@@ -90,7 +72,19 @@ Package=<4>
 
 ###############################################################################
 
-Project: "aslink"=.\as\link\mcs51\aslink.dsp - Package Owner=<4>
+Project: "asgb"=.\as\asgb\asgb.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "aslink"=.\as\link\aslink.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -249,45 +243,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "link_hc08"=.\as\link\hc08\link_hc08.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name config
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "linkgbz80"=.\as\link\z80\linkgbz80.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "linkz80"=.\as\link\z80\linkz80.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "mcs51"=.\src\mcs51\mcs51.dsp - Package Owner=<4>
 
 Package=<5>
@@ -419,6 +374,21 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "sdld_all"=.\AS\LINK\sdld_all.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name aslink
+    End Project Dependency
 }}}
 
 ###############################################################################

@@ -1,14 +1,15 @@
 2009-12-19 Borut Razem <borut.razem AT siol.net>
 
 	* configure, Makefile.in, configure.in, as/link/Makefile.in,
-	  sdcc/as/link/lkmain.c, sdcc/as/link/lkgb.c, sdcc/as/link/lkihx.c,
-	  sdcc/as/link/sdld.c, sdcc/as/link/sdld.h, sdcc/as/link/lkmem.c,
-	  sdcc/as/link/clean.mk, sdcc/as/link/lkrloc.c: modified
-	  sdcc/as/link/lkarea.c, sdcc/as/link/readme.390, conf.mk, aslink.dsp:
+	  all.dsp, as/link/aslink.dsp, as/link/sdld_all.dsp,
+	  as/link/lkmain.c, as/link/lkgb.c, as/link/lkihx.c,
+	  as/link/sdld.c, as/link/sdld.h, as/link/lkmem.c,
+	  as/link/clean.mk, as/link/lkrloc.c: modified
+	  as/link/lkarea.c, as/link/readme.390, conf.mk, aslink.dsp:
 	  moved from as/link/mcs51,
-	  sdcc/as/link/z80, sdcc/as/link/mcs51, sdcc/as/link/hc08: removed,
-	  unification of lkarea.c, one plymorphic sdld
-	* sdcc/as/asxxsrc/sdas.h, sdcc/as/asxxsrc/sdas.c:
+	  as/link/z80, as/link/mcs51, as/link/hc08: removed,
+	  unification of lkarea.c, one polymorphic sdld
+	* as/asxxsrc/sdas.h, as/asxxsrc/sdas.c:
 	  renamed TRAGET_IS_XXXX to TARGET_ID_XXXX
 
 2009-12-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
@@ -97,16 +98,16 @@
 	* as/link/lkmain.c: fixed command line option handling
 	* src/port.h, src/SDCCmain.c, src/z80/main.c:
 	  fixed crt object file handling with asld, ...
-	* sdcc/as/link/lkdata.c, sdcc/as/link/mcs51/lkarea.c,
-	  sdcc/as/link/aslink.h, sdcc/as/link/hc08/Makefile.in,
-	  sdcc/as/link/mcs51/Makefile.in, sdcc/as/link/z80/Makefile.in,
-	  sdcc/as/link/z80/linkz80.dsp, sdcc/as/link/z80/linkgbz80.dsp,
-	  sdcc/as/link/mcs51/aslink.dsp, sdcc/as/link/hc08/link_hc08.dsp:
+	* as/link/lkdata.c, as/link/mcs51/lkarea.c,
+	  as/link/aslink.h, as/link/hc08/Makefile.in,
+	  as/link/mcs51/Makefile.in, as/link/z80/Makefile.in,
+	  as/link/z80/linkz80.dsp, as/link/z80/linkgbz80.dsp,
+	  as/link/mcs51/aslink.dsp, as/link/hc08/link_hc08.dsp:
 	  modified
-	  sdcc/as/link/z80/lks19.c, sdcc/as/link/z80/lkmem.c,
-	  sdcc/as/link/mcs51/lks19.c, sdcc/as/link/mcs51/lkmem.c,
-	  sdcc/as/link/hc08/lks19.c, sdcc/as/link/hc08/lkmem.c,
-	  sdcc/as/link/hc08/lkelf.c: moved to sdcc/as/link
+	  as/link/z80/lks19.c, as/link/z80/lkmem.c,
+	  as/link/mcs51/lks19.c, as/link/mcs51/lkmem.c,
+	  as/link/hc08/lks19.c, as/link/hc08/lkmem.c,
+	  as/link/hc08/lkelf.c: moved to as/link
 	  unification of lkelf.c, lks19.c and lkmem.c
 
 2009-12-10 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
@@ -122,10 +123,10 @@
 
 2009-12-03 Borut Razem <borut.razem AT siol.net>
 
-	* sdcc/device/lib/z80/Makefile.in, sdcc/device/lib/gbz80/Makefile.in,
-	  sdcc/device/lib/ds390/Makefile.in, sdcc/device/lib/Makefile.in,
-	  sdcc/device/lib/ds400/Makefile.in, sdcc/device/lib/mcs51/Makefile.in,
-	  sdcc/device/lib/hc08/Makefile.in:
+	* device/lib/z80/Makefile.in, device/lib/gbz80/Makefile.in,
+	  device/lib/ds390/Makefile.in, device/lib/Makefile.in,
+	  device/lib/ds400/Makefile.in, device/lib/mcs51/Makefile.in,
+	  device/lib/hc08/Makefile.in:
 	  fixed bug #2907642: version of make > 3.80 required to build SDCC
 	* as/asxxsrc/asxxxx.h: fixed typo
 
@@ -147,7 +148,7 @@
 	  as/asxxsrc/sdas.c, as/link/Makefile.in, as/link/lkmain.c,
 	  as/link/z80/Makefile.in, as/link/mcs51/Makefile.in,
 	  as/link/hc08/Makefile.in, as/link/aslink.h, as/link/sdlink.[ch],
-	  as/link/sdld.[ch], sdcc/as/asxxsrc/sdas.c, as/link/lkdata.c,
+	  as/link/sdld.[ch], as/asxxsrc/sdas.c, as/link/lkdata.c,
 	  as/link/lkmain.c:
 	  fixed bug in target detection, sdlink renamed to sdld
 
@@ -487,17 +488,17 @@
 	  Minor string library improvements, including #772292.
 
 2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
-	* sdcc/src/SDCCmain.c:
+	* src/SDCCmain.c:
 	  Fixed #2819835 applying #2853488.
 
 2009-09-20 Philipp Klaus Krause <pkk AT spth.de>
-	* sdcc/debugger/mcs51/sdcdb.c,
-	  sdcc/src/SDCCerr.c,
-	  sdcc/src/z80/gen.c,
-	  sdcc/src/z80/mappings.i,
-	  sdcc/src/pic16/gen.c,
-	  sdcc/src/pic16/pcode.c,
-	  sdcc/support/librarian/sdcclib.c:
+	* debugger/mcs51/sdcdb.c,
+	  src/SDCCerr.c,
+	  src/z80/gen.c,
+	  src/z80/mappings.i,
+	  src/pic16/gen.c,
+	  src/pic16/pcode.c,
+	  support/librarian/sdcclib.c:
 	  Applied spelling patch #2862563.
 
 2009-09-15 Maarten Brock <sourceforge.brock AT dse.nl>

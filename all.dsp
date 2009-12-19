@@ -69,121 +69,6 @@ SOURCE=.\ChangeLog
 # End Group
 # Begin Source File
 
-SOURCE=.\bin_vc\sdld.exe
-
-!IF  "$(CFG)" == "all - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=.\bin_vc\sdld.exe
-
-"bin\sdld.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdld.exe bin /y > nul
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "all - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=.\bin_vc\sdld.exe
-
-"bin\sdld.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdld.exe bin /y > nul
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=".\bin_vc\sdldgb.exe"
-
-!IF  "$(CFG)" == "all - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=".\bin_vc\sdldgb.exe"
-
-"bin\sdldgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdldgb.exe  bin /y > nul
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "all - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=".\bin_vc\sdldgb.exe"
-
-"bin\sdldgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdldgb.exe  bin /y > nul
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=".\bin_vc\sdld6808.exe"
-
-!IF  "$(CFG)" == "all - Win32 Release"
-
-# Begin Custom Build
-InputPath=".\bin_vc\sdld6808.exe"
-
-"bin\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdld6808.exe  bin /y > nul
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "all - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=".\bin_vc\sdld6808.exe"
-
-"bin\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdld6808.exe  bin /y > nul
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=".\bin_vc\sdldz80.exe"
-
-!IF  "$(CFG)" == "all - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=".\bin_vc\sdldz80.exe"
-
-"bin\sdldz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdldz80.exe  bin /y > nul
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "all - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=".\bin_vc\sdldz80.exe"
-
-"bin\sdldz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy bin_vc\sdldz80.exe  bin /y > nul
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\bin_vc\packihx.exe
 
 !IF  "$(CFG)" == "all - Win32 Release"
@@ -407,6 +292,124 @@ InputPath=.\bin_vc\sdcpp.exe
 
 "bin\sdcpp.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\sdcpp.exe  bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\bin_vc\sdld.exe
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\bin_vc\sdld.exe
+
+"bin\sdld.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdld.exe bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\bin_vc\sdld.exe
+
+"bin\sdld.exe bin\sdldz80.exe bin\sdldgb.exe bin\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdld.exe bin /y > nul 
+	copy bin_vc\sdldz80.exe bin /y > nul 
+	copy bin_vc\sdldgb.exe bin /y > nul 
+	copy bin_vc\sdld6808.exe bin /y > nul 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=".\bin_vc\sdld6808.exe"
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# Begin Custom Build
+InputPath=".\bin_vc\sdld6808.exe"
+
+"bin\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdld6808.exe  bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=".\bin_vc\sdld6808.exe"
+
+"bin\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdld6808.exe  bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=".\bin_vc\sdldgb.exe"
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=".\bin_vc\sdldgb.exe"
+
+"bin\sdldgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldgb.exe  bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=".\bin_vc\sdldgb.exe"
+
+"bin\sdldgb.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldgb.exe  bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=".\bin_vc\sdldz80.exe"
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=".\bin_vc\sdldz80.exe"
+
+"bin\sdldz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldz80.exe  bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=".\bin_vc\sdldz80.exe"
+
+"bin\sdldz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdldz80.exe  bin /y > nul
 
 # End Custom Build
 

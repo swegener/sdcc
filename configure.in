@@ -734,15 +734,13 @@ fi
 
 if test $OPT_DISABLE_HC08 = 0; then
   AC_CONFIG_FILES([src/hc08/Makefile
-                   as/hc08/Makefile
-                   as/link/hc08/Makefile])
+                   as/hc08/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/hc08/Makefile])
 fi
 
 if test $OPT_DISABLE_MCS51 = 0; then
   AC_CONFIG_FILES([src/mcs51/Makefile
-                   as/mcs51/Makefile
-                   as/link/mcs51/Makefile])
+                   as/mcs51/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/mcs51/Makefile
                                                        device/lib/small/Makefile
                                                        device/lib/medium/Makefile
@@ -763,9 +761,7 @@ test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 if test $OPT_DISABLE_Z80 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile
                    as/z80/Makefile
-                   as/asgb/Makefile
-                   as/link/Makefile
-                   as/link/z80/Makefile])
+                   as/asgb/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile
                                                        device/lib/gbz80/Makefile])
 fi
@@ -775,6 +771,7 @@ test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])
 AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
 device/include/Makefile
+as/link/Makefile
 as/asranlib/Makefile
 support/librarian/Makefile
 support/makebin/Makefile

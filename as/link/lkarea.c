@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
 #include <string.h>
+#include "sdld.h"
 #include "aslink.h"
 
 /*)Module   lkarea.c
@@ -141,16 +142,19 @@ newarea()
         ap->a_flag = eval();
     } else {
         i = eval();
-/*      if (i && (ap->a_flag != i)) { */
-/*          fprintf(stderr, "Conflicting flags in area %8s\n", id); */
-/*          lkerr++; */
-/*      } */
+        if ((!is_sdld() || TARGET_IS_Z80 || TARGET_IS_GB) &&
+            i && (ap->a_flag != i)) {
+            fprintf(stderr, "Conflicting flags in area %8s\n", id);
+            lkerr++;
+        }
     }
-    /*
-     * Evaluate area address
-     */
-    skip(-1);
-    axp->a_addr = eval();
+    if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
+        /*
+         * Evaluate area address
+         */
+        skip(-1);
+        axp->a_addr = eval();
+    }
     /*
      * Place pointer in header area list
      */
@@ -212,7 +216,8 @@ lkparea(char *id)
 
     ap = areap;
     axp = (struct areax *) new (sizeof(struct areax));
-    axp->a_addr = -1; /* default: no address yet */
+    if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB))
+        axp->a_addr = -1; /* default: no address yet */
     while (ap) {
         if (symeq(id, ap->a_id, 0)) {
             taxp = ap->a_axp;
@@ -238,7 +243,8 @@ lkparea(char *id)
     axp->a_bap = ap;
     axp->a_bhp = hp;
     strncpy(ap->a_id, id, NCPS);
-    ap->a_addr = 0;
+    if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB))
+        ap->a_addr = 0;
 }
 
 /*)Function VOID    lnkarea()
@@ -324,50 +330,124 @@ lkparea(char *id)
  *      structures.
  */
 
+/* sdld6808 specific */
+unsigned long codemap6808[2048];
+/* end sdld6808 specific */
+/* sdld specific */
 VOID lnksect(register struct area *tap);
+/* end sdld specific */
 /*
  * Resolve all area addresses.
  */
 VOID
 lnkarea()
 {
-    a_uint rloc[4];
+    /* sdld specific */
+    a_uint rloc[4] = { 0, 0, 0, 0 };
     int  locIndex;
-    char temp[NCPS];
-    struct sym *sp;
+    /* end sdld specific */
+    /* sdld8051 & sdld6808 specific */
     /*JCF: used to save the REG_BANK_[0-3] and SBIT_BYTES area pointers*/
     struct area *ta[5];
     int j;
+    /* end sdld8051 & sdld6808 specific */
+    /* sdld6800 specific */
+    a_uint gs_size = 0;
+    struct area *abs_ap = NULL;
+    struct area *gs0_ap = NULL;
+    /* end sdld6800 specific */
+    char temp[NCPS];
+    struct sym *sp;
 
-    rloc[0] = rloc[1] = rloc[2] = rloc[3] = 0;
-    ap = areap;
-    while (ap) {
+    if (TARGET_IS_6808) {
+        memset(codemap6808, 0, sizeof(codemap6808));
+
+        /* first sort all absolute areas to the front */
+        ap = areap;
+        /* no need to check first area, it's in front anyway */
+        while (ap && ap->a_ap) {
+            if (ap->a_ap->a_flag & A_ABS)
+            {/* next area is absolute, move it to front,
+                reversed sequence is no problem for absolutes */
+                abs_ap = ap->a_ap;
+                ap->a_ap = abs_ap->a_ap;
+                abs_ap->a_ap = areap;
+                areap = abs_ap;
+            }
+            else {
+                ap = ap->a_ap;
+            }
+        }
+
+        /* next accumulate all GSINITx/GSFINAL area sizes
+           into GSINIT so they stay together */
+        ap = areap;
+        while (ap) {
+            if (!strncmp(ap->a_id, "GS", 2))
+            {/* GSxxxxx area */
+                if (ap->a_size == 0)
+                {
+                    axp = ap->a_axp;
+                    while (axp)
+                    {
+                        ap->a_size += axp->a_size;
+                        axp = axp->a_axp;
+                    }
+                }
+                gs_size += ap->a_size;
+                if (!strcmp(ap->a_id, "GSINIT0"))
+                {/* GSINIT0 area */
+                    gs0_ap = ap;
+                }
+            }
+            ap = ap->a_ap;
+        }
+        if (gs0_ap)
+            gs0_ap->a_size = gs_size;
+    }
+
+   ap = areap;
+   while (ap) {
         if (ap->a_flag&A_ABS) {
             /*
              * Absolute sections
              */
             lnksect(ap);
         } else {
+            /* sdld specific */
             /* Determine memory space */
             locIndex = 0;
-            if (ap->a_flag & A_CODE) {
-                locIndex = 1;
-            }
-            if (ap->a_flag & A_XDATA) {
-                locIndex = 2;
-            }
-            if (ap->a_flag & A_BIT) {
-                locIndex = 3;
+            if ((TARGET_IS_8051)) {
+                if (ap->a_flag & A_CODE) {
+                    locIndex = 1;
+                }
+                if (ap->a_flag & A_XDATA) {
+                    locIndex = 2;
+                }
+                if (ap->a_flag & A_BIT) {
+                    locIndex = 3;
+                }
             }
             /*
              * Relocatable sections
              */
-            if (ap->a_type == 0) {  /* JLH */
-                ap->a_addr = rloc[ locIndex ];
+            if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_GB) {
+                if (ap->a_addr == 0)
+                    ap->a_addr = rloc[locIndex];
+            }
+            else if (ap->a_type == 0) {  /* JLH */
+                if (TARGET_IS_6808 && ap->a_flag & A_NOLOAD) {
+                    locIndex = 2;
+                    ap->a_addr = 0;
+                }
+                else {
+                    ap->a_addr = rloc[locIndex];
+                }
                 ap->a_type = 1;
             }
             lnksect(ap);
             rloc[ locIndex ] = ap->a_addr + ap->a_size;
+            /* end sdld specific */
         }
 
         /*
@@ -383,7 +463,8 @@ lnkarea()
             *temp = 's';
             sp = lkpsym(temp, 1);
             sp->s_addr = ap->a_addr ;
-            /* sp->s_axp = ap->a_axp;  JLH: was NULL; */
+            if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_GB)
+                sp->s_axp = NULL;
             sp->s_type |= S_DEF;
 
             *temp = 'l';
@@ -391,34 +472,119 @@ lnkarea()
             sp->s_addr = ap->a_size;
             sp->s_axp = NULL;
             sp->s_type |= S_DEF;
-
         }
 
-        /*JCF: Since area BSEG is defined just before BSEG_BYTES, use the bit size of BSEG
-        to compute the byte size of BSEG_BYTES: */
-        if (!strcmp(ap->a_id, "BSEG")) {
-            ap->a_ap->a_axp->a_size += ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
-        }
-        else if (!strcmp(ap->a_id, "REG_BANK_0")) ta[0]=ap;
-        else if (!strcmp(ap->a_id, "REG_BANK_1")) ta[1]=ap;
-        else if (!strcmp(ap->a_id, "REG_BANK_2")) ta[2]=ap;
-        else if (!strcmp(ap->a_id, "REG_BANK_3")) ta[3]=ap;
-        else if (!strcmp(ap->a_id, "BSEG_BYTES"))
-        {
-            ta[4]=ap;
-            for(j=4; j>1; j--)
+        if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
+            /*JCF: Since area BSEG is defined just before BSEG_BYTES, use the bit size of BSEG
+            to compute the byte size of BSEG_BYTES: */
+            if (!strcmp(ap->a_id, "BSEG")) {
+                if (TARGET_IS_8051)
+                    ap->a_ap->a_axp->a_size += ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
+                else
+                    ap->a_ap->a_axp->a_size=(ap->a_addr/8)+((ap->a_size+7)/8); /*Bits to bytes*/
+            }
+            else if (!strcmp(ap->a_id, "REG_BANK_0")) ta[0]=ap;
+            else if (!strcmp(ap->a_id, "REG_BANK_1")) ta[1]=ap;
+            else if (!strcmp(ap->a_id, "REG_BANK_2")) ta[2]=ap;
+            else if (!strcmp(ap->a_id, "REG_BANK_3")) ta[3]=ap;
+            else if (!strcmp(ap->a_id, "BSEG_BYTES"))
             {
-                /*If upper register banks are not used roll back the relocation counter*/
-                if ( (ta[j]->a_size==0) && (ta[j-1]->a_size==0) )
+                ta[4]=ap;
+                for(j=4; j>1; j--)
                 {
-                    rloc[0]-=8;
+                    /*If upper register banks are not used roll back the relocation counter*/
+                    if ( (ta[j]->a_size==0) && (ta[j-1]->a_size==0) )
+                    {
+                        rloc[0]-=8;
+                    }
+                    else break;
                 }
-                else break;
             }
         }
         ap = ap->a_ap;
     }
 }
+
+/* sdld6808 specific */
+static
+a_uint find_empty_space(a_uint start, a_uint size, unsigned long *map)
+{
+    int i, j, k;
+    unsigned long mask, b;
+
+    while (1)
+    {
+        a_uint a = start;
+        i = start >> 5;
+        j = (start + size) >> 5;
+        mask = -(1 << (start & 0x1F));
+
+        while (i < j)
+        {
+            if (map[i] & mask)
+            {
+                k = 32;
+                for (b=0x80000000; b!=0; b>>=1, k--)
+                {
+                    if (map[i] & b)
+                      break;
+                }
+                start = a + k;
+                break;
+            }
+            i++;
+            mask = 0xFFFFFFFF;
+            a += 32;
+        }
+        if (start > a)
+          continue;
+
+        mask &= (1 << ((start + size) & 0x1F)) - 1;
+        if (map[i] & mask)
+        {
+            k = 32;
+            for (b=0x80000000; b!=0; b>>=1, k--)
+            {
+                if (map[i] & b)
+                  break;
+            }
+            start = (a & ~0x1F) + k;
+        }
+        if (start <= a)
+          break;
+    }
+    return start;
+}
+
+static
+a_uint allocate_space(a_uint start, a_uint size, char* id, unsigned long *map)
+{
+    int i, j;
+    unsigned long mask;
+    a_uint a = start;
+    i = start >> 5;
+    j = (start + size) >> 5;
+    mask = -(1 << (start & 0x1F));
+
+    while (i < j)
+    {
+        if (map[i] & mask)
+        {
+            fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+        }
+        map[i++] |= mask;
+        mask = 0xFFFFFFFF;
+        a += 32;
+    }
+    mask &= (1 << ((start + size) & 0x1F)) - 1;
+    if (map[i] & mask)
+    {
+        fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+    }
+    map[i] |= mask;
+    return start;
+}
+/* end sdld6808 specific */
 
 /*)Function VOID    lnksect()
  *
@@ -454,13 +620,12 @@ lnksect(register struct area *tap)
 
     size = 0;
     addr = tap->a_addr;
-#if 0
-    if ((tap->a_flag&A_PAG) && (addr & 0xFF)) {
+    if (!TARGET_IS_8051 &&
+        (tap->a_flag&A_PAG) && (addr & 0xFF)) {
         fprintf(stderr,
         "\n?ASlink-Warning-Paged Area %8s Boundary Error\n", tap->a_id);
         lkerr++;
     }
-#endif
     taxp = tap->a_axp;
     if (tap->a_flag&A_OVR) {
         /*
@@ -472,11 +637,29 @@ lnksect(register struct area *tap)
                 size = taxp->a_size;
             taxp = taxp->a_axp;
         }
+    } else if (TARGET_IS_6808 && tap->a_flag & A_ABS) {
+        /*
+         * Absolute sections
+         */
+        while (taxp) {
+            allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap6808);
+            taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
+            size += taxp->a_size;
+            taxp = taxp->a_axp;
+        }
     } else {
         /*
          * Concatenated sections
          */
+        if (TARGET_IS_6808 && tap->a_size) {
+            addr = find_empty_space(addr, tap->a_size, codemap6808);
+        }
         while (taxp) {
+            /* find next unused address now */
+            if (TARGET_IS_6808 && taxp->a_size) {
+                addr = find_empty_space(addr, taxp->a_size, codemap6808);
+                allocate_space(addr, taxp->a_size, tap->a_id, codemap6808);
+            }
             taxp->a_addr = addr;
             addr += taxp->a_size;
             size += taxp->a_size;
@@ -489,7 +672,8 @@ lnksect(register struct area *tap)
         "\n?ASlink-Warning-Paged Area %8s Length Error\n", tap->a_id);
         lkerr++;
     }
-    if ((tap->a_flag&A_PAG) && (tap->a_size) &&
+    if (TARGET_IS_8051 &&
+        (tap->a_flag&A_PAG) && (tap->a_size) &&
         ((tap->a_addr & 0xFFFFFF00) != ((addr-1) & 0xFFFFFF00)))
     {
         fprintf(stderr,
@@ -498,8 +682,9 @@ lnksect(register struct area *tap)
     }
 }
 
+/* sdld specific */
 a_uint lnksect2 (struct area *tap, int locIndex);
-unsigned long codemap[524288];
+unsigned long codemap8051[524288];
 unsigned long xdatamap[131072];
 struct area *dseg_ap = NULL;
 a_uint dram_start = 0;
@@ -520,7 +705,7 @@ VOID lnkarea2 (void)
     struct sym *sp_dseg_s=NULL, *sp_dseg_l=NULL;
 
     for(j=0; j<256; j++) idatamap[j]=' ';
-    memset(codemap, 0, sizeof(codemap));
+    memset(codemap8051, 0, sizeof(codemap8051));
     memset(xdatamap, 0, sizeof(xdatamap));
 
     /* first sort all absolute areas to the front */
@@ -661,85 +846,6 @@ VOID lnkarea2 (void)
     }
     if(sp_dseg_s!=NULL) sp_dseg_s->s_addr=0;
     if(sp_dseg_l!=NULL) sp_dseg_l->s_addr=dseg_ap->a_size;
-}
-
-static
-a_uint find_empty_space(a_uint start, a_uint size, unsigned long *map)
-{
-    int i, j, k;
-    unsigned long mask, b;
-
-    while (1)
-    {
-        a_uint a = start;
-        i = start >> 5;
-        j = (start + size) >> 5;
-        mask = -(1 << (start & 0x1F));
-
-        while (i < j)
-        {
-            if (map[i] & mask)
-            {
-                k = 32;
-                for (b=0x80000000; b!=0; b>>=1, k--)
-                {
-                    if (map[i] & b)
-                      break;
-                }
-                start = a + k;
-                break;
-            }
-            i++;
-            mask = 0xFFFFFFFF;
-            a += 32;
-        }
-        if (start > a)
-          continue;
-
-        mask &= (1 << ((start + size) & 0x1F)) - 1;
-        if (map[i] & mask)
-        {
-            k = 32;
-            for (b=0x80000000; b!=0; b>>=1, k--)
-            {
-                if (map[i] & b)
-                    break;
-            }
-            start = (a & ~0x1F) + k;
-        }
-        if (start <= a)
-          break;
-    }
-    return start;
-}
-
-static
-a_uint allocate_space(a_uint start, a_uint size, char* id, unsigned long *map)
-{
-    int i, j;
-    unsigned long mask;
-    a_uint a = start;
-    i = start >> 5;
-    j = (start + size) >> 5;
-    mask = -(1 << (start & 0x1F));
-
-    while (i < j)
-    {
-        if (map[i] & mask)
-        {
-            fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
-        }
-        map[i++] |= mask;
-        mask = 0xFFFFFFFF;
-        a += 32;
-    }
-    mask &= (1 << ((start + size) & 0x1F)) - 1;
-    if (map[i] & mask)
-    {
-        fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
-    }
-    map[i] |= mask;
-    return start;
 }
 
 a_uint lnksect2 (struct area *tap, int locIndex)
@@ -971,7 +1077,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
             }
             else if (locIndex == 1)
             {
-                allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap);
+                allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap8051);
             }
             else if (locIndex == 2)
             {
@@ -986,7 +1092,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
     {
         if ((locIndex == 1) && tap->a_size)
         {
-            addr = find_empty_space(addr, tap->a_size, codemap);
+            addr = find_empty_space(addr, tap->a_size, codemap8051);
         }
         if ((locIndex == 2) && tap->a_size)
         {
@@ -1072,8 +1178,8 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                 //find next unused address now
                 if ((locIndex == 1) && taxp->a_size)
                 {
-                    addr = find_empty_space(addr, taxp->a_size, codemap);
-                    allocate_space(addr, taxp->a_size, tap->a_id, codemap);
+                    addr = find_empty_space(addr, taxp->a_size, codemap8051);
+                    allocate_space(addr, taxp->a_size, tap->a_id, codemap8051);
                 }
                 if ((locIndex == 2) && taxp->a_size)
                 {
@@ -1105,3 +1211,5 @@ a_uint lnksect2 (struct area *tap, int locIndex)
     }
     return addr;
 }
+/* end sdld specific */
+

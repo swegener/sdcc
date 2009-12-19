@@ -301,7 +301,7 @@ VOID relr(VOID)
         lkerr++;
         return;
     }
-    if (get_sdld_target() == TARGET_IS_6808)
+    if (TARGET_IS_6808)
         ap = a[aindex]->a_bap;
 
     /*
@@ -319,7 +319,7 @@ VOID relr(VOID)
     printf("area %d base address: 0x%x size: 0x%x rtbase: 0x%x\n", aindex,
         a[aindex]->a_addr, a[aindex]->a_size, rtbase);
     #endif
-    if (get_sdld_target() == TARGET_IS_GB)
+    if (TARGET_IS_GB)
     {
         char *s = strrchr(a[aindex]->a_bap->a_id, '_');
         if(s != NULL && isdigit((unsigned char)s[1]))
@@ -529,7 +529,7 @@ VOID relr(VOID)
         /*
          * Page Relocation Error Checking
          */
-        if ((get_sdld_target() == TARGET_IS_GB || get_sdld_target() == TARGET_IS_Z80) &&
+        if ((TARGET_IS_GB || TARGET_IS_Z80) &&
             mode & R_PAG0 && (relv & ~0xFF || paga || pags))
             error = 3;
         if (mode & R_PAG  && (relv & ~0xFF))
@@ -556,7 +556,7 @@ VOID relr(VOID)
     }
 
     /* JLH: output only if data (beyond two byte address) */
-    if ((get_sdld_target() == TARGET_IS_GB || get_sdld_target() == TARGET_IS_Z80) && oflag == 1) {
+    if ((TARGET_IS_GB || TARGET_IS_Z80) && oflag == 1) {
         ihx(1);
     }
     else if ((oflag == 1) && (rtcnt > 2)) {
@@ -587,7 +587,7 @@ VOID relr(VOID)
             ihxNewArea();
         }
 
-        if (get_sdld_target() == TARGET_IS_8051 && extendedAddress != lastExtendedAddress)
+        if (TARGET_IS_8051 && extendedAddress != lastExtendedAddress)
         {
 
             if (lastExtendedAddress!=-1) {
@@ -617,9 +617,9 @@ VOID relr(VOID)
     }
 /* sdld specific */
     else if ((oflag == 3) && (rtcnt > 2)) {
-        if (get_sdld_target() == TARGET_IS_6808)
+        if (TARGET_IS_6808)
             elf(1);
-        else if (get_sdld_target() == TARGET_IS_GB)
+        else if (TARGET_IS_GB)
             gb(1);
 /*
         else if (--GAMEGEAR--)
@@ -809,7 +809,7 @@ VOID rele(VOID)
     }
 /* sdld specific */
     else if (oflag == 3) {
-        if (get_sdld_target() == TARGET_IS_6808)
+        if (TARGET_IS_6808)
             elf(0);
     }
 /* end sdld specific */

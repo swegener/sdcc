@@ -113,12 +113,12 @@ void Areas51 (void)
 		else if (!strcmp(ap->a_id, "REG_BANK_2")) { ap->a_addr = 0x10; ap->a_type = 1; }
 		else if (!strcmp(ap->a_id, "REG_BANK_3")) { ap->a_addr = 0x18; ap->a_type = 1; }
 		else if (!strcmp(ap->a_id, "BSEG_BYTES")) { ap->a_addr = 0x20; ap->a_type = 1; }
-		else if (get_sdld_target() == TARGET_IS_8051 && !strcmp(ap->a_id, "SSEG")) {
+		else if (TARGET_IS_8051 && !strcmp(ap->a_id, "SSEG")) {
 			if (stacksize) ap->a_axp->a_size = stacksize;
 		}
 	}
 
-	if (get_sdld_target() == TARGET_IS_8051) {
+	if (TARGET_IS_8051) {
 		sp = lkpsym("l_IRAM", 1);
 		sp->s_addr = ((iram_size>0) && (iram_size<=0x100)) ? iram_size : 0x0100;
 		sp->s_axp = NULL;
@@ -300,7 +300,7 @@ char *argv[];
 	sdld_init(argv[0]);
 	/* end sdas specific */
 
-	if (get_sdld_target() == TARGET_IS_GB)
+	if (TARGET_IS_GB)
 		gb_init();
 	if (!is_sdld())
 		fprintf(stdout, "\n");
@@ -370,7 +370,7 @@ char *argv[];
 	if (linkp == NULL)
 		usage();
 
-	if (get_sdld_target() == TARGET_IS_GB)
+	if (TARGET_IS_GB)
 		gb_init_banks();
 	syminit();
 
@@ -392,7 +392,7 @@ char *argv[];
 		radix = 10;
 
 		/* sdld specific */
-		if (get_sdld_target() == TARGET_IS_8051 || get_sdld_target() == TARGET_IS_6808)
+		if (TARGET_IS_8051 || TARGET_IS_6808)
 			Areas51(); /*JCF: Create the default 8051 areas in the right order*/
 		/* end sdld specific */
 
@@ -495,7 +495,7 @@ char *argv[];
 			} else
 			if (oflag == 3) {
 				/* sdld 6808 specific */
-				if (get_sdld_target() == TARGET_IS_6808) {
+				if (TARGET_IS_6808) {
 					ofp = afile(linkp->f_idp, "elf", 2);
 					if (ofp == NULL) {
 						lkexit(1);
@@ -503,7 +503,7 @@ char *argv[];
 				}
 				/* end sdld 6808 specific */
 				/* sdld gb specific */
-				else if (get_sdld_target() == TARGET_IS_GB) {
+				else if (TARGET_IS_GB) {
 					ofp = afile(linkp->f_idp, "", 2);
 					if (ofp == NULL) {
 						lkexit(1);
@@ -519,7 +519,7 @@ char *argv[];
 			reloc('E');
 		}
 	}
-	if (get_sdld_target() == TARGET_IS_8051 || get_sdld_target() == TARGET_IS_6808) {
+	if (TARGET_IS_8051 || TARGET_IS_6808) {
 		//JCF:
 		CreateAOMF51();
 	}
@@ -923,7 +923,7 @@ parse()
 
 				case 't':
 				case 'T':
-					if (get_sdld_target() == TARGET_IS_6808)
+					if (TARGET_IS_6808)
 						oflag = 3;
 					else
 						goto err;
@@ -936,7 +936,7 @@ parse()
 
 				case 'y': /*JCF: memory usage summary output*/
 					if (is_sdld()) {
-						if (get_sdld_target() == TARGET_IS_GB) {
+						if (TARGET_IS_GB) {
 							c = get();
 							if(c == 'O' || c == 'o')
 								nb_rom_banks = expr(0);
@@ -982,11 +982,11 @@ parse()
 					break;
 
 				case 'Y':
-					if (get_sdld_target() == TARGET_IS_8051) {
+					if (TARGET_IS_8051) {
 						unget(getnb());
 						packflag=1;
 					}
-					else if (get_sdld_target() == TARGET_IS_6808) {
+					else if (TARGET_IS_6808) {
 						++sflag;
 					}
 					else
@@ -994,7 +994,7 @@ parse()
 					break;
 
 				case 'A':
-					if (get_sdld_target() == TARGET_IS_8051) {
+					if (TARGET_IS_8051) {
 						unget(getnb());
 						if (ip && *ip)
 						{
@@ -1009,7 +1009,7 @@ parse()
 					break;
 
 				case 'a':
-					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
+					if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
 						iramsav();
 						return(0);
 					}
@@ -1019,7 +1019,7 @@ parse()
 
 				case 'v':
 				case 'V':
-					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
+					if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
 						xramsav();
 						return(0);
 					}
@@ -1029,7 +1029,7 @@ parse()
 
 				case 'w':
 				case 'W':
-					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB)) {
+					if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
 						codesav();
 						return(0);
 					}
@@ -1038,7 +1038,7 @@ parse()
 					break;
 
 				case 'Z':
-					if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
+					if (TARGET_IS_Z80 || TARGET_IS_GB) {
 						oflag = 3;
 						break;
 					}
@@ -1055,7 +1055,7 @@ parse()
 				case 'j':
 				case 'J':
 					if (is_sdld()) {
-						if (get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB) {
+						if (TARGET_IS_Z80 || TARGET_IS_GB) {
 							++symflag;
 						}
 						else
@@ -1067,7 +1067,7 @@ parse()
 
 				case 'r':
 				case 'R':
-					if (is_sdld() && !(get_sdld_target() == TARGET_IS_Z80 || get_sdld_target() == TARGET_IS_GB))
+					if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB))
 						rflag = 1;
 					else
 						goto err;

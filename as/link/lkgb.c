@@ -46,7 +46,7 @@ int current_rom_bank;
 
 VOID gb(int in)
 {
-  if (get_sdld_target() == TARGET_IS_GB) {
+  if (TARGET_IS_GB) {
     static int first = 1;
     unsigned long pos, chk;
     int i;

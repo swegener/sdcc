@@ -24,16 +24,19 @@ SDCC_ASRANLIB   = as/asranlib
 TARGETS         = sdcc-librarian sdcc-asranlib
 
 ifeq ($(OPT_DISABLE_HC08), 0)
-SDCC_ASLINK     += as/hc08 as/link/hc08
+SDCC_AS         += as/hc08 as/link/hc08
+SDCC_LD         += sdcc-ld6808
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)
-SDCC_ASLINK     += as/mcs51 as/link/mcs51
+SDCC_AS         += as/mcs51
+SDCC_LD         += sdcc-ld8051
 SDCC_MISC       += debugger/mcs51
 endif
 
 ifeq ($(OPT_DISABLE_Z80), 0)
-SDCC_ASLINK     += as/z80 as/asgb as/link
+SDCC_AS         += as/z80 as/asgb
+SDCC_LD         += sdcc-ldz80 sdcc-ldgb
 endif
 
 ifeq ($(OPT_DISABLE_UCSIM), 0)
@@ -62,7 +65,7 @@ ifeq ($(OPT_DISABLE_SDCPP), 0)
 SDCC_LIBS       += support/cpp
 endif
 
-TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-aslink
+TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld
 
 PKGS            += $(SDCC_LIBS) src device/include $(SDCC_ASLINK) $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
 
@@ -83,8 +86,11 @@ sdcc-libs:
 sdcc-cc: sdcc-libs
 	$(MAKE) -C src
 
-sdcc-aslink:
-	for as in $(SDCC_ASLINK); do $(MAKE) -C $$as ; done
+sdcc-as:
+	for as in $(SDCC_AS); do $(MAKE) -C $$as ; done
+
+sdcc-ld:
+	$(MAKE) -C as/link $(SDCC-LD)
 
 sdcc-misc:
 	for misc in $(SDCC_MISC); do $(MAKE) -C $$misc ; done
@@ -101,7 +107,7 @@ sdcc-asranlib:
 sdcc-device-inc:
 	$(MAKE) -C device/include
 
-sdcc-device-lib: sdcc-cc sdcc-aslink
+sdcc-device-lib: sdcc-cc sdcc-as sdcc-ld
 	$(MAKE) -C device/lib
 
 sdcc-device-tini:
@@ -114,13 +120,13 @@ sdcc-doc:
 
 sdcc: $(TARGETS)
 
-sdcc-tini: sdcc-librarian sdcc-asranlib sdcc-cc sdcc-aslink sdcc-device-tini sdcc-packihx
+sdcc-tini: sdcc-librarian sdcc-asranlib sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules
-sdcc-bin: sdcc-cc sdcc-aslink sdcc-misc
+sdcc-bin: sdcc-cc sdcc-as sdcc-ld sdcc-misc
 
-sdcc-base: sdcc-cc sdcc-aslink
+sdcc-base: sdcc-cc sdcc-as sdcc-ld
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

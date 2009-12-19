@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 int summary(struct area * areap)
 {
-  if (get_sdld_target() == TARGET_IS_8051 || get_sdld_target() == TARGET_IS_6808) {
+  if (TARGET_IS_8051 || TARGET_IS_6808) {
     /* only for 8051 and 6808 targets */
 
     #define EQ(A,B) !as_strcmpi((A),(B))
@@ -103,7 +103,7 @@ int summary(struct area * areap)
     _Mem XRam =  {0, 0, 0, "", 0};
     _Mem Rom =   {0, 0, 0, "", 0};
 
-    if (get_sdld_target() == TARGET_IS_8051) {
+    if (TARGET_IS_8051) {
         Ram = Ram8051;
 	memcpy(&IRam, &IRam8051, sizeof (_Mem));
 	memcpy(&Stack, &Stack8051, sizeof (_Mem));
@@ -120,7 +120,7 @@ int summary(struct area * areap)
 
     if (stacksize == 0) stacksize = MIN_STACK;
 
-    if (get_sdld_target() == TARGET_IS_8051) {
+    if (TARGET_IS_8051) {
         if(rflag) /*For the DS390*/
         {
             XRam.Max=0x1000000; /*24 bits*/
@@ -184,7 +184,7 @@ int summary(struct area * areap)
         }
         else if (EQ(xp->a_id, "BSEG_BYTES"))
         {
-            if (get_sdld_target() == TARGET_IS_8051)
+            if (TARGET_IS_8051)
             	Ram[4].Size+=xp->a_size;
             else
                 Ram[4].Size=xp->a_size;
@@ -202,7 +202,7 @@ int summary(struct area * areap)
             if(xp->a_addr<IRam.Start) IRam.Start=xp->a_addr;
         }
 
-        else if (get_sdld_target() == TARGET_IS_8051)
+        else if (TARGET_IS_8051)
         {
             if(xp->a_flag & A_XDATA)
             {
@@ -228,7 +228,7 @@ int summary(struct area * areap)
             }
         }
 
-        else if(get_sdld_target() == TARGET_IS_6808)
+        else if(TARGET_IS_6808)
         {
             if ( EQ(xp->a_id, "DSEG") || EQ(xp->a_id, "OSEG") )
             {
@@ -251,7 +251,7 @@ int summary(struct area * areap)
         }
 
         /*If is not a register bank, bit, stack, or idata, then it should be data*/
-        else if((get_sdld_target() == TARGET_IS_8051 && xp->a_flag & (A_CODE|A_BIT|A_XDATA))==0)
+        else if((TARGET_IS_8051 && xp->a_flag & (A_CODE|A_BIT|A_XDATA))==0)
         {
             if(xp->a_size)
             {
@@ -267,7 +267,7 @@ int summary(struct area * areap)
         for(k=Ram[j].Start; (k<(Ram[j].Start+Ram[j].Size))&&(k<0x100); k++)
             dram[k]|=Ram[j].flag; /*Mark as used*/
 
-    if (get_sdld_target() == TARGET_IS_8051) {
+    if (TARGET_IS_8051) {
         for(k=IRam.Start; (k<(IRam.Start+IRam.Size))&&(k<0x100); k++)
             dram[k]|=IRam.flag; /*Mark as used*/
     }
@@ -306,7 +306,7 @@ int summary(struct area * areap)
         }
     }
 
-    if (get_sdld_target() == TARGET_IS_8051) {
+    if (TARGET_IS_8051) {
         for(k=Ram[6].Start; (k<(Ram[6].Start+Ram[6].Size))&&(k<0x100); k++)
         {
             if(dram[k]!=Ram[6].flag)
@@ -346,7 +346,7 @@ int summary(struct area * areap)
     fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
         rflag ? "16 bit mode initial s" : "S", Stack.Start, Stack.Start-1);
 
-    if (get_sdld_target() == TARGET_IS_8051) {
+    if (TARGET_IS_8051) {
         /*Check that the stack pointer is landing in a safe place:*/
         if( (dram[Stack.Start] & 0x8000) == 0x8000 )
         {
@@ -436,7 +436,7 @@ int summary(struct area * areap)
     fprintf(of, format, Rom.Name, start, end, size, max);
 
     /*Report any excess:*/
-    if (get_sdld_target() == TARGET_IS_8051) {
+    if (TARGET_IS_8051) {
         if((IRam.Start+IRam.Size)>(IRam.Max+0x80))
         {
             sprintf(buff, "Insufficient INDIRECT RAM memory.\n");
@@ -467,7 +467,7 @@ int summary(struct area * areap)
 
 int summary2(struct area * areap)
 {
-  if (get_sdld_target() == TARGET_IS_8051) {
+  if (TARGET_IS_8051) {
     /* only for 8051 target */
 
     #define EQ(A,B) !as_strcmpi((A),(B))

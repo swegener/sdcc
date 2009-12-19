@@ -49,8 +49,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\..\bin_vc\aslink.exe" /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\..\bin_vc\sdld.exe" /pdbtype:sept
+# ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\aslink.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\sdld.exe" /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "aslink - Win32 Release"
 
@@ -88,99 +88,99 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\lk_readnl.c
+SOURCE=lk_readnl.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkaomf51.c
+SOURCE=lkaomf51.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkar.c
+SOURCE=lkar.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkarea.c
+SOURCE=lkarea.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkdata.c
+SOURCE=lkdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkelf.c
+SOURCE=lkelf.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkeval.c
+SOURCE=lkeval.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkgb.c
+SOURCE=lkgb.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkhead.c
+SOURCE=lkhead.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkihx.c
+SOURCE=lkihx.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lklex.c
+SOURCE=lklex.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lklib.c
+SOURCE=lklib.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lklibr.c
+SOURCE=lklibr.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lklist.c
+SOURCE=lklist.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkmain.c
+SOURCE=lkmain.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkmem.c
+SOURCE=lkmem.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lknoice.c
+SOURCE=lknoice.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkrel.c
+SOURCE=lkrel.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkrloc.c
+SOURCE=lkrloc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lks19.c
+SOURCE=lks19.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lksdcclib.c
+SOURCE=lksdcclib.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\lksym.c
+SOURCE=lksym.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\sdld.c
+SOURCE=sdld.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\asxxsrc\strcmpi.c
+SOURCE=..\asxxsrc\strcmpi.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -188,35 +188,35 @@ SOURCE=..\..\asxxsrc\strcmpi.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\aslink.h
+SOURCE=aslink.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\asxxxx_config.h
+SOURCE=asxxxx_config.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\getline.h
+SOURCE=getline.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\lk_readnl.h
+SOURCE=lk_readnl.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkar.h
+SOURCE=lkar.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\lklibr.h
+SOURCE=lklibr.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\lkrel.h
+SOURCE=lkrel.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\sdld.h
+SOURCE=sdld.h
 # End Source File
 # End Group
 # End Target

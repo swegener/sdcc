@@ -1,3 +1,14 @@
+2009-12-19 Borut Razem <borut.razem AT siol.net>
+
+	* configure, Makefile.in, configure.in, as/link/Makefile.in,
+	  sdcc/as/link/lkmain.c, sdcc/as/link/lkgb.c, sdcc/as/link/lkihx.c,
+	  sdcc/as/link/sdld.c, sdcc/as/link/sdld.h, sdcc/as/link/lkmem.c,
+	  sdcc/as/link/clean.mk, sdcc/as/link/lkrloc.c: modified
+	  sdcc/as/link/lkarea.c, sdcc/as/link/readme.390, conf.mk, aslink.dsp:
+	  moved from as/link/mcs51,
+	  sdcc/as/link/z80, sdcc/as/link/mcs51, sdcc/as/link/hc08: removed,
+	  unification of lkarea.c, one plymorphic sdld
+
 2009-12-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/abs.c, device/lib/labs.c: assembler version 

@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define __SDAS_H
 
 enum sdas_target_e {
-  TARGET_IS_UNKNOWN,
-  TARGET_IS_GB,
-  TARGET_IS_Z80,
-  TARGET_IS_8051,
-  TARGET_IS_6808,
+  TARGET_ID_UNKNOWN,
+  TARGET_ID_GB,
+  TARGET_ID_Z80,
+  TARGET_ID_8051,
+  TARGET_ID_6808,
 };
 
 void sdas_init (char *path);

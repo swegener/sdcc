@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 
 static int sdas = -1;
-static enum sdas_target_e target = TARGET_IS_UNKNOWN;
+static enum sdas_target_e target = TARGET_ID_UNKNOWN;
 
 
 static char
@@ -62,10 +62,10 @@ sdas_init (char *path)
     char *str;
     enum sdas_target_e target;
   } tgt[] = {
-    { "gb", TARGET_IS_GB, },
-    { "z80", TARGET_IS_Z80, },
-    { "8051", TARGET_IS_8051, },
-    { "6808", TARGET_IS_6808, },
+    { "gb", TARGET_ID_GB, },
+    { "z80", TARGET_ID_Z80, },
+    { "8051", TARGET_ID_8051, },
+    { "6808", TARGET_ID_6808, },
   };
   int i;
 
@@ -104,7 +104,7 @@ int
 is_sdas_target_z80_like(void)
 {
   check_init();
-  return target == TARGET_IS_Z80 || target == TARGET_IS_GB;
+  return target == TARGET_ID_Z80 || target == TARGET_ID_GB;
 }
 
 
@@ -112,5 +112,5 @@ int
 is_sdas_target_8051_like(void)
 {
   check_init();
-  return target == TARGET_IS_8051;
+  return target == TARGET_ID_8051;
 }

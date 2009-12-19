@@ -8,6 +8,8 @@
 	  moved from as/link/mcs51,
 	  sdcc/as/link/z80, sdcc/as/link/mcs51, sdcc/as/link/hc08: removed,
 	  unification of lkarea.c, one plymorphic sdld
+	* sdcc/as/asxxsrc/sdas.h, sdcc/as/asxxsrc/sdas.c:
+	  renamed TRAGET_IS_XXXX to TARGET_ID_XXXX
 
 2009-12-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

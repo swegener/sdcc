@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <string.h>
 
+#include "sdld.h"
 #include "lk_readnl.h"
 #include "aslink.h"
 #include "lklibr.h"

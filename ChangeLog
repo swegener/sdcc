@@ -1,3 +1,9 @@
+2009-12-20 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/lkmain.c, as/link/lksdcclib.c,
+	  as/link/lklib.c, as/link/lklex.c, as/link/aslink.h:
+	  fixed "o" file extension for z80 and gb targets
+
 2009-12-19 Borut Razem <borut.razem AT siol.net>
 
 	* configure, Makefile.in, configure.in, as/link/Makefile.in,

@@ -1459,7 +1459,7 @@ int wf;
 	 p2 = ft;
 	 if (*p2 == 0) {
 		if (p1 == NULL) {
-			p2 = "rel";
+			p2 = LKOBJEXT;
 		} else {
 			p2 = strrchr(&fn[c], FSEPX) + 1;
 		}

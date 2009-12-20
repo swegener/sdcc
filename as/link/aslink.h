@@ -32,11 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #define VERSION "V01.75 + NoICE + SDCC Feb 1999"
 
-/*
- * Case Sensitivity Flag
- */
-#define CASE_SENSITIVE  1
-
 /*)Module       asmlnk.h
  *
  *      The module asmlnk.h contains the definitions for constants,
@@ -113,11 +108,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  #endif
 #endif
 
-#ifdef SDK
-    #define LKOBJEXT "o"
-#else /* SDK */
-    #define LKOBJEXT "rel"
-#endif /* SDK */
+#define LKOBJEXT	((TARGET_IS_Z80 || TARGET_IS_GB) ? "o" : "rel")
 
 /*
  * Error definitions

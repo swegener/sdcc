@@ -1,8 +1,9 @@
 2009-12-21 Borut Razem <borut.razem AT siol.net>
 
-	*  Makefile.in: fixed hc08
+	* Makefile.in: fixed hc08
+	* Makefile.in, as/link/Makefile.in: fixed installation
 
-	2009-12-20 Borut Razem <borut.razem AT siol.net>
+2009-12-20 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/lkmain.c, as/link/lksdcclib.c,
 	  as/link/lklib.c, as/link/lklex.c, as/link/aslink.h:

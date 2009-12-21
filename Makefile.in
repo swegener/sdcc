@@ -24,7 +24,7 @@ SDCC_ASRANLIB   = as/asranlib
 TARGETS         = sdcc-librarian sdcc-asranlib
 
 ifeq ($(OPT_DISABLE_HC08), 0)
-SDCC_AS         += as/hc08 as/link/hc08
+SDCC_AS         += as/hc08
 SDCC_LD         += sdcc-ld6808
 endif
 

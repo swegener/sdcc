@@ -68,10 +68,10 @@ SOURCE=..\..\bin_vc\sdld.exe
 # Begin Custom Build
 InputPath=..\..\bin_vc\sdld.exe
 
-"..\..\sdldz80.exe  ..\..\sdldgb.exe ..\..\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) ..\..\sdldz80.exe 
-	copy $(InputPath) ..\..\sdldgb.exe 
-	copy $(InputPath) ..\..\sdld6808.exe 
+"..\..\bin_vc\sdldz80.exe  ..\..\bin_vc\dldgb.exe ..\..\bin_vc\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) ..\..\bin_vc\sdldz80.exe 
+	copy $(InputPath) ..\..\bin_vc\sdldgb.exe 
+	copy $(InputPath) ..\..\bin_vc\sdld6808.exe 
 	
 # End Custom Build
 
@@ -80,10 +80,10 @@ InputPath=..\..\bin_vc\sdld.exe
 # Begin Custom Build
 InputPath=..\..\bin_vc\sdld.exe
 
-"..\..\sdldz80.exe ..\..\sdldgb.exe ..\..\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) ..\..\sdldz80.exe 
-	copy $(InputPath) ..\..\sdldgb.exe 
-	copy $(InputPath) ..\..\sdld6808.exe 
+"..\..\bin_vc\sdldz80.exe  ..\..\bin_vc\dldgb.exe ..\..\bin_vc\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) ..\..\bin_vc\sdldz80.exe 
+	copy $(InputPath) ..\..\bin_vc\sdldgb.exe 
+	copy $(InputPath) ..\..\bin_vc\sdld6808.exe 
 	
 # End Custom Build
 

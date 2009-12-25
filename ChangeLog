@@ -1,3 +1,8 @@
+2009-12-25 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/link/aslink.dsp, as/link/sdld_all.dsp: fixed destination path of
+	sdld.exe, sdldz80.exe, sdldgb.exe, and sdld6808.exe
+	
 2009-12-21 Borut Razem <borut.razem AT siol.net>
 
 	* Makefile.in: fixed hc08

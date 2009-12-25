@@ -75,7 +75,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\..\bin_vc\aslink.exe" /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\..\bin_vc\sdld.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\sdld.exe" /pdbtype:sept
 
 !ENDIF 
 

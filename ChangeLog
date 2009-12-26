@@ -1,3 +1,7 @@
+2009-12-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: fixed bug 2912013
+
 2009-12-25 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* as/link/aslink.dsp, as/link/sdld_all.dsp: fixed destination path of

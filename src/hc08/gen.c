@@ -1446,6 +1446,16 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       return aop;
     }
 
+  /* if it is on the stack */
+  if (sym->onStack)
+    {
+      sym->aop = aop = newAsmop (AOP_SOF);
+      aop->aopu.aop_dir = sym->rname;
+      aop->size = getSize (sym->type);
+      aop->aopu.aop_stk = sym->stack;
+      return aop;
+    }
+
   /* if it is in direct space */
   if (IN_DIRSPACE (space))
     {
@@ -1461,15 +1471,6 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_EXT);
       aop->aopu.aop_dir = sym->rname;
       aop->size = getSize (sym->type);
-      return aop;
-    }
-
-  if (IN_STACK (sym->etype))
-    {
-      sym->aop = aop = newAsmop (AOP_SOF);
-      aop->aopu.aop_dir = sym->rname;
-      aop->size = getSize (sym->type);
-      aop->aopu.aop_stk = sym->stack;
       return aop;
     }
 

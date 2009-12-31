@@ -5,6 +5,9 @@
 	  sdcc/as/link/lklibr.c, sdcc/as/link/lkaomf51.c, sdcc/as/link/lkhead.c,
 	  sdcc/as/link/lklex.c, sdcc/as/link/lkrloc.c, sdcc/as/link/aslink.h:
 	  sync with aslink 2.0
+	* sdcc/as/link/lks19.c: include "sdld.c"
+	* sdcc/as/link/aslink.dsp: cleaning
+	* sdcc/as/link/aslink.h: changed the type Character Type Definitions to char
 
 2009-12-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -549,7 +549,7 @@ struct lbfile {
  *	External Definitions for all Global Variables
  */
 
-extern	char	*_abs_;		/*	= { ".	.ABS." };
+extern	char	*_abs_;		/*	= { ".  .ABS." };
 				 */
 extern	int	lkerr;		/*	ASLink error flag
 				 */
@@ -564,7 +564,7 @@ extern	char	*rp;		/*	pointer into the LST file
 extern	char	rb[NINPUT];	/*	LST file text line being
 				 *	address relocated
 				 */
-extern	char   ctype[];		/*	array of character types, one per
+extern	char	ctype[];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 
@@ -577,21 +577,21 @@ extern char curr_module[NINPUT];
 /*
  *	Character Type Definitions
  */
-#define SPACE	0000
-#define ETC	0000
-#define LETTER	0001
-#define DIGIT	0002
-#define BINOP	0004
-#define RAD2	0010
-#define RAD8	0020
-#define RAD10	0040
-#define RAD16	0100
-#define ILL	0200
+#define	SPACE	'\000'
+#define ETC	'\000'
+#define	LETTER	'\001'
+#define	DIGIT	'\002'
+#define	BINOP	'\004'
+#define	RAD2	'\010'
+#define	RAD8	'\020'
+#define	RAD10	'\040'
+#define	RAD16	'\100'
+#define	ILL	'\200'
 
-#define DGT2	DIGIT|RAD16|RAD10|RAD8|RAD2
-#define DGT8	DIGIT|RAD16|RAD10|RAD8
-#define DGT10	DIGIT|RAD16|RAD10
-#define LTR16	LETTER|RAD16
+#define	DGT2	DIGIT|RAD16|RAD10|RAD8|RAD2
+#define	DGT8	DIGIT|RAD16|RAD10|RAD8
+#define	DGT10	DIGIT|RAD16|RAD10
+#define	LTR16	LETTER|RAD16
 
 extern	char	afspec[];	/*	The filespec created by afile()
 				 */

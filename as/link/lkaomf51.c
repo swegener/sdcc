@@ -564,7 +564,19 @@ void CollectInfoFromCDB(void)
         CurrentModule=0; /*Set the active module as the first one*/
         while(!feof(CDBin))
         {
-                fgets(buff, sizeof(buff)-1, CDBin);
+                if(NULL==fgets(buff, sizeof(buff)-1, CDBin))
+                {
+			if(ferror(CDBin))
+                        {
+                                perror("Can't read file");
+                                lkexit(1);
+                        }
+                        else if(!feof(CDBin))
+                        {
+                                fprintf(stderr, "Unknown error while reading file '%s'\n", SourceName);
+                                lkexit(1);
+                        }
+                }
 
                 if(!feof(CDBin)) switch(buff[0])
                 {

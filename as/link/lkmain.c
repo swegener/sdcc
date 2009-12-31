@@ -1,6 +1,6 @@
 /* lkmain.c
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
+   Copyright (C) 1989-1998 Alan R. Baldwin
    721 Berkeley St., Kent, Ohio 44240
 
 This program is free software; you can redistribute it and/or modify it
@@ -38,12 +38,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *	    link map file and/or relocated listing files.
  *
  *	lkmain.c contains the following functions:
- *		FILE *	afile(fn,ft,wf)
+ *		FILE *	afile()
  *		VOID	bassav()
  *		VOID	gblsav()
  *		VOID	link_main()
  *		VOID	lkexit()
- *		VOID	main(argc,argv)
+ *		VOID	main()
  *		VOID	map()
  *		int	parse()
  *		VOID	setbas()
@@ -787,22 +787,17 @@ map()
 	 * List Linked Files
 	 */
 	newpag(mfp);
-	fprintf(mfp, "\nFiles Linked      [ module(s) ]\n\n");
+	fprintf(mfp,
+"\nFiles Linked                              [ module(s) ]\n\n");
 	hdp = headp;
 	filep = linkp;
 	while (filep) {
-		fprintf(mfp, "%-16s", filep->f_idp);
+		fprintf(mfp, "%-40.40s  [ ", filep->f_idp);
 		i = 0;
 		while ((hdp != NULL) && (hdp->h_lfile == filep)) {
-			if (i % 5) {
-			    fprintf(mfp, ", %8.8s", hdp->m_id);
-			} else {
-			    if (i) {
-				fprintf(mfp, ",\n%20s%8.8s", "", hdp->m_id);
-			    } else {
-				fprintf(mfp, "  [ %8.8s", hdp->m_id);
-			    }
-			}
+			if (i)
+				fprintf(mfp, ",\n%44s", "");
+			fprintf(mfp, "%-.32s", hdp->m_id);
 			hdp = hdp->h_hp;
 			i++;
 		}
@@ -811,14 +806,15 @@ map()
 		fprintf(mfp, "\n");
 		filep = filep->f_flp;
 	}
+	fprintf(mfp, "\n");
 	/*
 	 * List Linked Libraries
 	 */
 	if (lbfhead != NULL) {
 		fprintf(mfp,
-	"\nLibraries Linked                    [   object  file   ]\n\n");
+"\nLibraries Linked                          [ object file ]\n\n");
 		for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
-			fprintf(mfp, "%-32s    [ %16.16s ]\n",
+			fprintf(mfp, "%-40.40s  [ %-.32s ]\n",
 				lbfh->libspc, lbfh->relfil);
 		}
 		fprintf(mfp, "\n");
@@ -874,6 +870,8 @@ map()
  *		FILE *	stderr		c_library
  *		int	uflag		Relocated listing flag
  *		int	xflag		Map file radix type flag
+ *		int	wflag		Wide listing format
+ *		int	zflag		Enable symbol case sensitivity
  *
  *	Functions called:
  *		VOID	addlib()	lklibr.c
@@ -884,7 +882,7 @@ map()
  *		VOID	getfid()	lklex.c
  *		char	getnb()		lklex.c
  *		VOID	lkexit()	lkmain.c
- *		char *	strcpy()	c_library
+ *		char *	strsto()	lksym.c
  *		int	strlen()	c_library
  *
  *	side effects:
@@ -898,9 +896,10 @@ parse()
 	register int c;
 	char fid[NINPUT];
 
-		/* sdld specific */
-		zflag = 1;
-		/* end sdld specific */
+	/* sdld specific */
+	wflag = 1;
+	zflag = 1;
+	/* end sdld specific */
 
 	while ((c = getnb()) != 0) {
 		/* sdld specific */
@@ -1034,7 +1033,7 @@ parse()
 						return(0);
 					}
 					else
-						goto err;
+						++wflag;
 					break;
 
 				case 'Z':
@@ -1049,7 +1048,7 @@ parse()
 						return(0);
 					}
 					else
-						goto err;
+						++zflag;
 					break;
 
 				case 'j':
@@ -1129,8 +1128,9 @@ parse()
 
 				default:
 				err:
-					fprintf(stderr, "Invalid option\n");
-					lkexit(1);
+					fprintf(stderr,
+					    "Unkown option -%c ignored\n", c);
+					break;
 				}
 			}
 			/* sdld specific */
@@ -1152,8 +1152,7 @@ parse()
 				lfp = lfp->f_flp;
 			}
 			getfid(fid, c);
-			lfp->f_idp = (char *) new (strlen(fid)+1);
-			strcpy(lfp->f_idp, fid);
+			lfp->f_idp = strsto(fid);
 			lfp->f_type = F_REL;
 		}
 	}
@@ -1364,11 +1363,14 @@ setgbl()
 			v = expr(0);
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
-				fprintf(stderr, "No definition of symbol %s\n", id);
+				fprintf(stderr,
+				"No definition of symbol %s\n", id);
 				lkerr++;
 			} else {
-				if (sp->s_flag & S_DEF) {
-					fprintf(stderr, "Redefinition of symbol %s\n", id);
+
+				if (sp->s_type & S_DEF) {
+					fprintf(stderr,
+					"Redefinition of symbol %s\n", id);
 					lkerr++;
 					sp->s_axp = NULL;
 				}
@@ -1725,6 +1727,7 @@ char *usetxt_8051[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as file[MAP]",
+	"  -w	Wide listing format for map file",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
@@ -1742,6 +1745,8 @@ char *usetxt_8051[] = {
 	"  -y   Generate memory usage summary file[mem]",
 	"  -Y   Pack internal ram",
 	"  -A   [stack-size] Allocate space for stack",
+	"Case Sensitivity:",
+	"  -z	Enable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	0
@@ -1851,7 +1856,7 @@ char *usetxt_gb[] = {
 /*)Function	VOID	usage()
  *
  *	The function usage() outputs to the stderr device the
- *	assembler name and version and a list of valid assembler options.
+ *	linker name and version and a list of valid linker options.
  *
  *	local variables:
  *		char ** dp		pointer to an array of

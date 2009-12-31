@@ -1,3 +1,11 @@
+2009-12-31 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/as/link/lkarea.c, sdcc/as/link/lkdata.c, sdcc/as/link/lklist.c,
+	  sdcc/as/link/lks19.c, sdcc/as/link/lkmain.c, sdcc/as/link/lkeval.c,
+	  sdcc/as/link/lklibr.c, sdcc/as/link/lkaomf51.c, sdcc/as/link/lkhead.c,
+	  sdcc/as/link/lklex.c, sdcc/as/link/lkrloc.c, sdcc/as/link/aslink.h:
+	  sync with aslink 2.0
+
 2009-12-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: fixed bug 2912013

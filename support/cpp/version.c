@@ -8,7 +8,7 @@
    in parentheses.  You may also wish to include a number indicating
    the revision of your modified compiler.  */
 
-#define BASEVER "4.4.0"
+#define BASEVER "4.4.2"
 #define DATESTAMP
 #define DEVPHASE
 #define VERSUFFIX " + SDCC"

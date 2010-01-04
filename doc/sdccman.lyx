@@ -21286,7 +21286,7 @@ MCLK = 1;
 \begin_inset space ~
 \end_inset
 
-/* _asm nop _endasm; */
+/* __asm nop __endasm; */
 \begin_inset space ~
 \end_inset
 
@@ -24367,7 +24367,7 @@ HC08!interrupt
 \begin_layout Verse
 
 \family typewriter
-#define CLI _asm
+#define CLI __asm
 \begin_inset Index
 status collapsed
 
@@ -24405,7 +24405,7 @@ cli
 \begin_inset space ~
 \end_inset
 
-_endasm
+__endasm
 \begin_inset Index
 status collapsed
 
@@ -24433,7 +24433,7 @@ endasm
 \begin_layout Verse
 
 \family typewriter
-#define SEI _asm
+#define SEI __asm
 \begin_inset space ~
 \end_inset
 
@@ -24449,7 +24449,7 @@ sei
 \begin_inset space ~
 \end_inset
 
-_endasm; 
+__endasm; 
 \end_layout
 
 \begin_layout Verse
@@ -28547,7 +28547,7 @@ to_buffer_asm()
 
 
 \series bold
-_asm
+__asm
 \series default
 
 \begin_inset Quotes srd
@@ -28559,7 +28559,7 @@ _asm
 
 
 \series bold
-_endasm;
+__endasm;
 \series default
 
 \begin_inset Quotes srd
@@ -28570,8 +28570,8 @@ _endasm;
 status open
 
 \begin_layout Plain Layout
-Note, that the single underscore form (_asm and _endasm) are not C99-compatible,
- and for C-99 compatibility, the double-underscore form (__asm and __endasm)
+Note, that the single underscore form (_asm and _endasm) are not C99 compatible,
+ and for C99 compatibility, the double-underscore form (__asm and __endasm)
  has to be used.
  The latter is also used in the library functions.
 \end_layout
@@ -28629,7 +28629,7 @@ void to_buffer_asm( unsigned char c )
 \begin_inset space ~
 \end_inset
 
-_asm
+__asm
 \begin_inset Index
 status collapsed
 
@@ -29126,7 +29126,7 @@ ret
 \begin_inset space ~
 \end_inset
 
-_endasm
+__endasm
 \begin_inset Index
 status collapsed
 
@@ -29349,7 +29349,7 @@ c; // to avoid warning: unreferenced function argument
 \begin_inset space ~
 \end_inset
 
-_asm
+__asm
 \begin_inset Index
 status collapsed
 
@@ -30169,7 +30169,7 @@ http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/as/doc/asxhtm.
 \begin_layout Standard
 The compiler does not do any validation of the code within the 
 \family typewriter
-_asm
+__asm
 \begin_inset Index
 status collapsed
 
@@ -30227,7 +30227,7 @@ asm
 \end_inset
 
  ...
- _endasm
+ __endasm
 \size footnotesize
 
 \begin_inset Index
@@ -30619,7 +30619,7 @@ void nakedInterrupt(void) __interrupt (2) __naked
 \begin_inset space ~
 \end_inset
 
-_asm
+__asm
 \begin_inset Index
 status collapsed
 
@@ -30788,7 +30788,7 @@ reti
 \begin_inset space ~
 \end_inset
 
-_endasm
+__endasm
 \begin_inset Index
 status collapsed
 
@@ -31587,7 +31587,7 @@ The numeric part of local labels does not need to have 5 digits (although
 \begin_layout Verse
 
 \family typewriter
-_asm
+__asm
 \begin_inset Index
 status collapsed
 
@@ -31728,7 +31728,7 @@ b,00001$
 \begin_inset Newline newline
 \end_inset
 
-_endasm
+__endasm
 \begin_inset Index
 status collapsed
 
@@ -31846,7 +31846,7 @@ foo() {
 \begin_inset space ~
 \end_inset
 
-_asm 
+__asm 
 \begin_inset Newline newline
 \end_inset
 
@@ -31922,7 +31922,7 @@ ljmp 0003$
 \begin_inset space ~
 \end_inset
 
-_endasm; 
+__endasm; 
 \begin_inset Newline newline
 \end_inset
 
@@ -31989,7 +31989,7 @@ clabel
 \begin_inset space ~
 \end_inset
 
-_asm
+__asm
 \begin_inset Newline newline
 \end_inset
 
@@ -32029,7 +32029,7 @@ _asm
 \begin_inset space ~
 \end_inset
 
-_endasm
+__endasm
 \begin_inset Index
 status collapsed
 
@@ -38820,11 +38820,8 @@ asm
 
 \end_inset
 
- (+ | -) - switch _asm _endasm block preprocessing on / off.
+ (+ | -) - switch the __asm __endasm block preprocessing on / off.
  Default is on.
- You use this pragma to define multilines of assembly code.
- This will prevent the preprocessor from changing the formatting required
- by assembly code.
  Below is an example on how to use this pragma.
 \end_layout
 
@@ -38870,7 +38867,23 @@ asm
 \begin_inset Newline newline
 \end_inset
 
-#define MYDELAY _asm
+/* this is a c code nop */
+\begin_inset Newline newline
+\end_inset
+
+#define NOP ;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+void foo (void)
+\begin_inset Newline newline
+\end_inset
+
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -38886,7 +38899,7 @@ asm
 \begin_inset space ~
 \end_inset
 
-nop ;my assembly comment...
+...
 \begin_inset Newline newline
 \end_inset
 
@@ -38902,7 +38915,7 @@ nop ;my assembly comment...
 \begin_inset space ~
 \end_inset
 
-nop
+while (--i)
 \begin_inset Newline newline
 \end_inset
 
@@ -38918,23 +38931,196 @@ nop
 \begin_inset space ~
 \end_inset
 
-nop
-\begin_inset Newline newline
-\end_inset
 
-_endasm
-\begin_inset Newline newline
-\end_inset
-
-#pragma preproc_asm +
-\begin_inset Newline newline
+\begin_inset space ~
 \end_inset
 
 
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+NOP
 \begin_inset Newline newline
 \end_inset
 
-void foo (void) 
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+__asm
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+; this is an assembler nop instruction
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+; it is not preprocessed to ';' since the asm preprocessing is disabled
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+NOP
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+__endasm;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+The pragma preproc_asm should not be used to define multilines of assembly
+ code (even if it supports it), since this behavior is only a side effect
+ of sdcpp __asm __endasm implementation in combination with pragma preproc_asm
+ and is not in conformance with the C standard.
+ This behavior might be changed in the future sdcpp versions.
+ To define multilines of assembly code you have to include each assembly
+ line into it's own __asm __endasm block.
+ Below is an example for multiline assembly defines.
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+#define Nop __asm 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+nop 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+__endasm
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#define ThreeNops Nop; 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+Nop; 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+Nop
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+void foo (void)
 \begin_inset Newline newline
 \end_inset
 
@@ -38954,7 +39140,7 @@ void foo (void)
 \begin_inset space ~
 \end_inset
 
- ...
+...
  
 \begin_inset Newline newline
 \end_inset
@@ -38971,7 +39157,7 @@ void foo (void)
 \begin_inset space ~
 \end_inset
 
- MYDELAY;
+ThreeNops;
 \begin_inset Newline newline
 \end_inset
 
@@ -38987,7 +39173,7 @@ void foo (void)
 \begin_inset space ~
 \end_inset
 
- ...
+...
  
 \begin_inset Newline newline
 \end_inset
@@ -39171,7 +39357,7 @@ lcall __romcall
 \begin_inset Newline newline
 \end_inset
 
-_asm
+__asm
 \begin_inset Newline newline
 \end_inset
 
@@ -39179,7 +39365,7 @@ ROMCALL(72)
 \begin_inset Newline newline
 \end_inset
 
-_endasm;
+__endasm;
 \begin_inset Newline newline
 \end_inset
 
@@ -47239,7 +47425,7 @@ SIGHANDLERNAKED(_bcol_handler)
 \end_layout
 
 \begin_layout LyX-Code
-  _asm
+  __asm
 \end_layout
 
 \begin_layout LyX-Code
@@ -47251,7 +47437,7 @@ SIGHANDLERNAKED(_bcol_handler)
 \end_layout
 
 \begin_layout LyX-Code
- _endasm;
+ __endasm;
 \end_layout
 
 \begin_layout LyX-Code
@@ -65314,7 +65500,7 @@ _
 \end_inset
 
 , f.e.
- '__data' instead of 'data'.
+ '__data' instead of 'data' and '__asm' instead of '_asm'.
 \end_layout
 
 \begin_layout Itemize

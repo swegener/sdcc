@@ -325,15 +325,14 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
    seeing _endasm.  Returns non-zero if _asm terminated by EOF, zero
    otherwise.  */
 static int
-skip_asm_block (cpp_reader *pfile)
+_sdcpp_skip_asm_block (cpp_reader *pfile)
 {
 #define _ENDASM_STR "endasm"
 #define _ENDASM_LEN ((sizeof _ENDASM_STR) - 1)
 
   cpp_buffer *buffer = pfile->buffer;
-  cppchar_t c = EOF;
-  int prev_space = 0;
-  int ret = 1;
+  uchar c = EOF;
+  int prev_space = false;
 
   while (buffer->cur != buffer->rlimit)
     {
@@ -342,11 +341,13 @@ skip_asm_block (cpp_reader *pfile)
 
       if (prev_space && c == '_')
         {
+          /* check if it is _endasm or __endasm */
+          if (*buffer->cur == '_')
+            ++buffer->cur;
           if (buffer->cur + _ENDASM_LEN <= buffer->rlimit &&
-            strncmp((char *)buffer->cur, _ENDASM_STR, _ENDASM_LEN) == 0)
+            strncmp((const char *)buffer->cur, _ENDASM_STR, _ENDASM_LEN) == 0)
             {
               buffer->cur += _ENDASM_LEN;
-              ret = 0;
               break;
             }
         }
@@ -365,7 +366,7 @@ skip_asm_block (cpp_reader *pfile)
     }
 
   _cpp_process_line_notes (pfile, true);
-  return ret;
+  return false;
 }
 
 /* Skip a C-style block comment.  We find the end of the comment by
@@ -1047,17 +1048,21 @@ copy_text_chars (unsigned char *dest, const unsigned char *src, unsigned int len
 /* SDCC _asm specific */
 /* The stored comment includes the comment start and any terminator.  */
 static void
-save_asm (cpp_reader *pfile, cpp_token *token, const unsigned char *from)
+_sdcpp_save_asm (cpp_reader *pfile, cpp_token *token, const unsigned char *from, int is_asm)
 {
-#define _ASM_STR  "_asm"
+#define _ASM_STR  "__asm"
 #define _ASM_LEN  ((sizeof _ASM_STR) - 1)
+#define _ASM_STR1  "_asm"
+#define _ASM_LEN1  ((sizeof _ASM_STR1) - 1)
 
   unsigned char *buffer;
   unsigned int text_len, len;
+  unsigned int asm_len = is_asm ? _ASM_LEN : _ASM_LEN1;
+  const char *asm_str = is_asm ? _ASM_STR : _ASM_STR1;
 
   len = pfile->buffer->cur - from;
-  /* + _ASM_LEN for the initial '_asm'.  */
-  text_len = copy_text_chars (NULL, from, len) + _ASM_LEN;
+  /* + asm_len for the initial '_asm'.  */
+  text_len = copy_text_chars (NULL, from, len) + asm_len;
   buffer = _cpp_unaligned_alloc (pfile, text_len);
 
 
@@ -1065,8 +1070,8 @@ save_asm (cpp_reader *pfile, cpp_token *token, const unsigned char *from)
   token->val.str.len = text_len;
   token->val.str.text = buffer;
 
-  memcpy (buffer, _ASM_STR, _ASM_LEN);
-  copy_text_chars (buffer + _ASM_LEN, from, len);
+  memcpy (buffer, asm_str, asm_len);
+  copy_text_chars (buffer + asm_len, from, len);
 }
 
 /* Return the comment table. The client may not make any assumption
@@ -1517,13 +1522,13 @@ _cpp_lex_direct (cpp_reader *pfile)
 
       /* SDCC _asm specific */
       /* handle _asm ... _endasm ;  */
-      if (CPP_OPTION (pfile, preproc_asm) == 0 && result->val.node == pfile->spec_nodes.n__asm)
+      if (CPP_OPTION (pfile, preproc_asm) == 0 && (result->val.node == pfile->spec_nodes.n__asm || result->val.node == pfile->spec_nodes.n__asm1))
         {
           comment_start = buffer->cur;
           result->type = CPP_ASM;
-          skip_asm_block (pfile);
+          _sdcpp_skip_asm_block (pfile);
           /* Save the _asm block as a token in its own right.  */
-          save_asm (pfile, result, comment_start);
+          _sdcpp_save_asm (pfile, result, comment_start, result->val.node == pfile->spec_nodes.n__asm);
         }
       /* Convert named operators to their proper types.  */
       else if (result->val.node->flags & NODE_OPERATOR)

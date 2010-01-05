@@ -1489,7 +1489,7 @@ int wf;
 	case 2:	frmt = "wb";	break;
 #endif
 	}
-	if ((fp = fopen(afspec, frmt)) == NULL) {
+	if ((fp = fopen(afspec, frmt)) == NULL && strcmp(ft,"adb") != 0) { /* Do not complaint for optional adb files */
 		fprintf(stderr, "?ASlink-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afspec);
 		lkerr++;
 	}

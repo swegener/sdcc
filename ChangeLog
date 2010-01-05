@@ -4,7 +4,9 @@
 	  support/cpp/libcpp/lex.c, support/cpp/sdcpp.c:
 	  fixed bug #2919991: #Pragma preproc_asm cannot be used by -- std-c99.
 	* support/cpp/libcpp/macro.c, support/cpp/version.c:
-	  SDCPP synchronized with GCC CPP release version 4.4.2.
+	  SDCPP synchronized with GCC CPP release version 4.4.2
+	* sdcc/as/link/lklist.c: fixed NULL pointer dereference
+	* sdcc/as/link/lkmain.c: do not complaint when opening optional adb files
 
 2009-12-31 Borut Razem <borut.razem AT siol.net>
 

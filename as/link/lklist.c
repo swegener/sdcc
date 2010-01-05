@@ -403,6 +403,7 @@ struct area *xp;
 		}
 
 		/* sdld specific */
+		ptr = &sp->s_id[0];
 		/* if cdb flag set the output cdb Information
 		   and the symbol has a '$' sign in it then */
 		if (dflag && strchr(ptr,'$'))

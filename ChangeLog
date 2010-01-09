@@ -10,6 +10,7 @@
 	  sdcc/support/regression/Makefile.in,
 	  sdcc/support/regression/ports/ucz80/spec.mk:
 	  object file extension for z80 and gb targets changed from .o to .rel
+	* .version, doc/sdccman.lyx: bumped version to 2.9.6
 
 2010-01-04 Borut Razem <borut.razem AT siol.net>
 

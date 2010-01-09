@@ -117,7 +117,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.9.5
+SDCC 2.9.6
 \size footnotesize
 
 \begin_inset Newline newline
@@ -7837,16 +7837,6 @@ status collapsed
 
 \end_inset
 
- or sourcefile.o
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-<file>.o
-\end_layout
-
-\end_inset
-
  - Object file
 \begin_inset Index
 status collapsed
@@ -12563,8 +12553,8 @@ status collapsed
 
 \end_inset
 
- When linking, skip the standard crt0.o object file.
- You must provide your own crt0.o for your system when linking.
+ When linking, skip the standard crt0.rel object file.
+ You must provide your own crt0.rel for your system when linking.
 \end_layout
 
 \begin_layout List
@@ -12878,8 +12868,8 @@ status collapsed
 
 \end_inset
 
- When linking, skip the standard crt0.o object file.
- You must provide your own crt0.o for your system when linking.
+ When linking, skip the standard crt0.rel object file.
+ You must provide your own crt0.rel for your system when linking.
 \end_layout
 
 \begin_layout List
@@ -27868,8 +27858,8 @@ Z80
 
 \end_inset
 
- the startup code is inserted by linking with crt0.o which is generated from
- sdcc/device/lib/z80/crt0.s.
+ the startup code is inserted by linking with crt0.rel which is generated
+ from sdcc/device/lib/z80/crt0.s.
  If you need a different startup code you can use the compiler option 
 \emph on
 -
@@ -27916,7 +27906,7 @@ status collapsed
 
 \end_inset
 
- and provide your own crt0.o.
+ and provide your own crt0.rel.
  
 \begin_inset VSpace bigskip
 \end_inset

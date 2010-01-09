@@ -1750,7 +1750,7 @@ linkEdit (char **envp)
 
           for (s = setFirstItem (tempSet); s != NULL; s = setNextItem (tempSet))
             {
-              dbuf_printf (&crt0path, "%s%scrt0.o", s, DIR_SEPARATOR_STRING);
+              dbuf_printf (&crt0path, "%s%scrt0%s", s, DIR_SEPARATOR_STRING, port->linker.rel_ext);
 
               crt0fp = fopen (dbuf_c_str(&crt0path), "r");
               if (crt0fp != NULL)  /* Found it! */

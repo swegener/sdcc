@@ -61,7 +61,7 @@ static OPTION _z80_options[] =
     { 0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
     { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
     { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
-    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
+    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
     { 0, NULL }
   };
 
@@ -72,7 +72,7 @@ static OPTION _gbz80_options[] =
     { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
     { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
     { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
-    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
+    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
     { 0, NULL }
   };
 
@@ -332,7 +332,7 @@ _process_pragma(const char *s)
 
 static const char *_gbz80_rgbasmCmd[] =
 {
-  "rgbasm", "-o\"$1.o\"", "\"$1.asm\"", NULL
+  "rgbasm", "-o\"$1.rel\"", "\"$1.asm\"", NULL
 };
 
 static const char *_gbz80_rgblinkCmd[] =
@@ -355,7 +355,7 @@ _gbz80_rgblink (void)
 
   fprintf (lnkfile, "[Objects]\n");
 
-  fprintf (lnkfile, "%s.o\n", dstFileName);
+  fprintf (lnkfile, "%s.rel\n", dstFileName);
 
   fputStrSet(lnkfile, relFilesSet);
 
@@ -746,7 +746,7 @@ PORT z80_port =
     _z80LinkCmd,	//NULL,
     NULL,		//LINKCMD,
     NULL,
-    ".o",
+    ".rel",
     1
   },
   {                             /* Peephole optimizer */
@@ -873,7 +873,7 @@ PORT gbz80_port =
     _gbLinkCmd,		//NULL,
     NULL,		//LINKCMD,
     NULL,
-    ".o",
+    ".rel",
     1
   },
   {

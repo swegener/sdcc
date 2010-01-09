@@ -108,7 +108,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  #endif
 #endif
 
-#define LKOBJEXT	((TARGET_IS_Z80 || TARGET_IS_GB) ? "o" : "rel")
+#define LKOBJEXT	"rel"
 
 /*
  * Error definitions

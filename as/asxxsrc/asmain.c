@@ -350,7 +350,7 @@ char *argv[];
 				if (lflag)
 					lfp = afile(p, "lst", 1);
 				if (oflag) {
-					ofp = afile(p, (is_sdas() && is_sdas_target_z80_like()) ? "o" : "rel", 1);
+					ofp = afile(p, "rel", 1);
 					/* sdas specific */
 					// save the file name if we have to delete it on error
 					strcpy(relFile,afn);
@@ -1422,33 +1422,6 @@ char *usetxt[] = {
 	0
 };
 
-/* sdas specific */
-/* TODO: do we really need different object file extension for z80 and gbz80? */
-char *usetxt_z80[] = {
-	"Usage: [-dqxjgaloscpwzf] [-I<dir>] file1 [file2 file3 ...]",
-	"  d    decimal listing",
-	"  q    octal   listing",
-	"  x    hex     listing (default)",
-	"  j    add line number and debug information to file", /* JLH */
-	"  g    undefined symbols made global",
-	"  a    all user symbols made global",
-	"  l    create list   output file1[lst]",
-	"  o    create object output file1[o]",
-	"  s    create symbol output file1[sym]",
-	"  c    generate sdcdb debug information",
-	"  p    disable listing pagination",
-	"  w    wide listing format for symbol table",
-	"  z    enable case sensitivity for symbols",
-	"  f    flag relocatable references by  `   in listing file",
-	" ff    flag relocatable references by mode in listing file",
-	"-I<dir>  Add the named directory to the include file",
-	"       search path.  This option may be used more than once.",
-	"       Directories are searched in the order given.",
-	"",
-	0
-};
-/* sdas specific */
-
 /*)Function	VOID	usage()
  *
  *	The function usage() outputs to the stderr device the
@@ -1477,8 +1450,8 @@ usage(n)
 
 	/* sdas specific */
 	fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
-	for (dp = (is_sdas() && is_sdas_target_z80_like()) ? usetxt_z80 : usetxt; *dp; dp++)
-		fprintf(stderr, "%s\n", *dp);
 	/* end sdas specific */
+	for (dp = usetxt; *dp; dp++)
+		fprintf(stderr, "%s\n", *dp);
 	asexit(n);
 }

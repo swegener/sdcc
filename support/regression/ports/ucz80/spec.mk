@@ -22,7 +22,7 @@ SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 LINKFLAGS += z80.lib
 
-#OBJEXT = .o
+OBJEXT = .rel
 BINEXT = .ihx
 
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)

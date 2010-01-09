@@ -164,7 +164,7 @@ endif
 # Base flags.
 SDCCFLAGS += --fverbose-asm -DNO_VARARGS
 # Extension of object intermediate files
-OBJEXT = .o
+OBJEXT = .rel
 # Extension of files that can be run in the emulator
 BINEXT = .bin
 # Currently unused.  Extension to append to intermediate directories.

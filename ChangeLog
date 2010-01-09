@@ -4,6 +4,12 @@
 	  sdcc/as/conf.mk: added
 	  sdcc/as/*/Makefile.in: use common sdcc/as/conf.mk
 	  sdcc/as/*/clean.in: unified
+	* sdcc/src/SDCCmain.c, sdcc/src/z80/main.c,
+	  sdcc/device/lib/z80/Makefile.in, sdcc/device/lib/gbz80/Makefile.in,
+	  sdcc/as/asxxsrc/asmain.c, sdcc/as/link/aslink.h,
+	  sdcc/support/regression/Makefile.in,
+	  sdcc/support/regression/ports/ucz80/spec.mk:
+	  object file extension for z80 and gb targets changed from .o to .rel
 
 2010-01-04 Borut Razem <borut.razem AT siol.net>
 

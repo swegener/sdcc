@@ -1,3 +1,10 @@
+2010-01-09 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/as/*/conf.mk: removed
+	  sdcc/as/conf.mk: added
+	  sdcc/as/*/Makefile.in: use common sdcc/as/conf.mk
+	  sdcc/as/*/clean.in: unified
+
 2010-01-04 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx, support/cpp/libcpp/internal.h,

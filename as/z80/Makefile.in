@@ -128,7 +128,7 @@ $(OBJDIR)/%.o: $(UTILLIB)/%.c $(OBJDIR)/.stamp
 # ----------------------
 checkconf:
 	@if [ -f $(top_builddir)/devel ]; then\
-          $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+          $(MAKE) -f ../conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
         fi
 
 # End of Makefile

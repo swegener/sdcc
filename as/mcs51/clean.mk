@@ -17,7 +17,7 @@ distclean: clean
 mostlyclean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(top_builddir)/bin/asx8051$(EXEEXT) asx8051$(EXEEXT)
+	rm -f $(top_builddir)/bin/sdas8051$(EXEEXT)
 
 # Deleting everything that can reconstructed by this Makefile. It deletes
 # everything deleted by distclean plus files created by bison, etc.

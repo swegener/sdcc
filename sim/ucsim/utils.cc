@@ -106,25 +106,23 @@ get_string_id(struct id_element *ids, const char *str, int def)
 }
 
 
-extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
-extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
-
 char *
 format_string(const char *format, ...)
 {
   va_list ap;
+  char *msg;
 
   va_start(ap, format);
 #ifdef HAVE_VASPRINTF
-  char *msg= NULL;
-  vasprintf(&msg, format, ap);
+  if (0 > vasprintf(&msg, format, ap))
+    msg = NULL;
   return(msg);
 #elif defined HAVE_VSNPRINTF
-  char *msg= (char*)malloc(80*25);
+  msg = (char*)malloc(80*25);
   vsnprintf(msg, 80*25, format, ap);
   return(msg);
 #elif defined HAVE__VSNPRINTF
-  char *msg= (char*)malloc(80*25);
+  msg = (char*)malloc(80*25);
   _vsnprintf(msg, 80*25, format, ap);
   return(msg);
 #else

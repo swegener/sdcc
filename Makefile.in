@@ -19,23 +19,23 @@ SDCC_EXTRA      = support/regression support/valdiag
 
 SDCC_PACKIHX    = support/packihx
 SDCC_LIBRARIAN  = support/librarian
-SDCC_ASRANLIB   = as/asranlib
+SDCC_ASRANLIB   = sdas/asranlib
 
 TARGETS         = sdcc-librarian sdcc-asranlib
 
 ifeq ($(OPT_DISABLE_HC08), 0)
-SDCC_AS         += as/hc08
+SDCC_AS         += sdas/as6808
 SDCC_LD         += sdcc-ld6808
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)
-SDCC_AS         += as/mcs51
+SDCC_AS         += sdas/as8051
 SDCC_LD         += sdcc-ld8051
 SDCC_MISC       += debugger/mcs51
 endif
 
 ifeq ($(OPT_DISABLE_Z80), 0)
-SDCC_AS         += as/z80 as/asgb
+SDCC_AS         += sdas/asz80 sdas/asgb
 SDCC_LD         += sdcc-ldz80 sdcc-ldgb
 endif
 
@@ -67,9 +67,9 @@ endif
 
 TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld
 
-PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) as/link $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
+PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) sdas/aslink $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
 
-PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) as/link \
+PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/aslink \
                   src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
 PORTS           = $(shell cat ports.build)
 ALLPORTS        = $(shell cat ports.all)
@@ -90,7 +90,7 @@ sdcc-as:
 	for as in $(SDCC_AS); do $(MAKE) -C $$as ; done
 
 sdcc-ld:
-	$(MAKE) -C as/link $(SDCC-LD)
+	$(MAKE) -C sdas/aslink $(SDCC-LD)
 
 sdcc-misc:
 	for misc in $(SDCC_MISC); do $(MAKE) -C $$misc ; done

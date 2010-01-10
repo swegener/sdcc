@@ -45,7 +45,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_hc08"=.\as\hc08\as_hc08.dsp - Package Owner=<4>
+Project: "as_hc08"=.\sdas\as6808\as_hc08.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -57,34 +57,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_z80"=.\as\z80\as_z80.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name config
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "asgb"=.\as\asgb\asgb.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "aslink"=.\as\link\aslink.dsp - Package Owner=<4>
+Project: "as_z80"=.\sdas\asz80\as_z80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -99,7 +72,19 @@ Package=<4>
 
 ###############################################################################
 
-Project: "asranlib"=.\as\asranlib\asranlib.dsp - Package Owner=<4>
+Project: "asgb"=.\sdas\asgb\asgb.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "aslink"=.\sdas\aslink\aslink.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -114,7 +99,22 @@ Package=<4>
 
 ###############################################################################
 
-Project: "asx8051"=.\as\mcs51\asx8051.dsp - Package Owner=<4>
+Project: "asranlib"=.\sdas\asranlib\asranlib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "asx8051"=.\sdas\as8051\asx8051.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -378,7 +378,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sdld_all"=.\AS\LINK\sdld_all.dsp - Package Owner=<4>
+Project: "sdld_all"=.\sdas\aslink\sdld_all.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -1411,8 +1411,7 @@ int cmdDelUserBp (char *s, context *cctxt)
             char buffer[10];
             fprintf (stdout,"Delete all breakpoints? (y or n) ");
             fflush(stdout);
-            fgets(buffer,sizeof(buffer),stdin);
-            if (toupper(buffer[0]) == 'Y')
+            if (fgets(buffer,sizeof(buffer),stdin) && toupper(buffer[0]) == 'Y')
                 deleteUSERbp(-1);
         }
         return 0;
@@ -1624,12 +1623,12 @@ int cmdRun (char *s, context *cctxt)
     char buff[10];
     if (STACK_EMPTY(callStack)) {
         fprintf(stdout,"Starting program\n");
-    if ( ! simactive )
-    {
-        fprintf(stdout,"No executable file specified.\nUse the \"file\" command.\n");
-        return 0;
-    }
-    resetHitCount();
+        if ( ! simactive )
+        {
+            fprintf(stdout,"No executable file specified.\nUse the \"file\" command.\n");
+            return 0;
+        }
+        resetHitCount();
         simGo(0);
     } else {
 
@@ -1638,10 +1637,9 @@ int cmdRun (char *s, context *cctxt)
         fprintf(stdout,"Start it from the beginning? (y or n) ");
         fflush(stdout);
 
-        fgets(buff,sizeof(buff),stdin);
-        if (toupper(buff[0]) == 'Y') {
+        if (fgets(buff,sizeof(buff),stdin) && toupper(buff[0]) == 'Y') {
             simReset();
-        resetHitCount();
+            resetHitCount();
             simGo(0);
         }
     }

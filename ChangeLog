@@ -1,3 +1,13 @@
+2010-01-10 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, Makefile.in, sdas/*/Makefile.in,
+	  sdcc/sdcc.dsw, sdas/asranlib/asranlib.dsp:
+	  as renamed to sdas, as/link renamed to sdas/aslink,
+	  as/z80 renamed to sdac/asz80, as/mcs51 renamed to sdas/as8051,
+	  as/hc80 renamed to sdcc/sdas/as6808
+	* debugger/mcs51/cmd.c, sim/ucsim/utils.cc, sdcc/sdas/aslink/lklibr.c,
+	  support/cpp/libcpp/macro.c: fixed compiler warnings
+
 2010-01-09 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/as/*/conf.mk: removed

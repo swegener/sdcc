@@ -1,7 +1,7 @@
 2010-01-10 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, Makefile.in, sdas/*/Makefile.in,
-	  sdcc/sdcc.dsw, sdas/asranlib/asranlib.dsp:
+	  sdcc/sdcc.dsw, sdas/asranlib/asranlib.dsp, config.dsp:
 	  as renamed to sdas, as/link renamed to sdas/aslink,
 	  as/z80 renamed to sdac/asz80, as/mcs51 renamed to sdas/as8051,
 	  as/hc80 renamed to sdcc/sdas/as6808
@@ -10,15 +10,15 @@
 
 2010-01-09 Borut Razem <borut.razem AT siol.net>
 
-	* sdcc/as/*/conf.mk: removed
-	  sdcc/as/conf.mk: added
-	  sdcc/as/*/Makefile.in: use common sdcc/as/conf.mk
-	  sdcc/as/*/clean.in: unified
-	* sdcc/src/SDCCmain.c, sdcc/src/z80/main.c,
-	  sdcc/device/lib/z80/Makefile.in, sdcc/device/lib/gbz80/Makefile.in,
-	  sdcc/as/asxxsrc/asmain.c, sdcc/as/link/aslink.h,
-	  sdcc/support/regression/Makefile.in,
-	  sdcc/support/regression/ports/ucz80/spec.mk:
+	* as/*/conf.mk: removed
+	  as/conf.mk: added
+	  as/*/Makefile.in: use common as/conf.mk
+	  as/*/clean.in: unified
+	* src/SDCCmain.c, src/z80/main.c,
+	  device/lib/z80/Makefile.in, device/lib/gbz80/Makefile.in,
+	  as/asxxsrc/asmain.c, as/link/aslink.h,
+	  support/regression/Makefile.in,
+	  support/regression/ports/ucz80/spec.mk:
 	  object file extension for z80 and gb targets changed from .o to .rel
 	* .version, doc/sdccman.lyx: bumped version to 2.9.6
 
@@ -29,19 +29,19 @@
 	  fixed bug #2919991: #Pragma preproc_asm cannot be used by -- std-c99.
 	* support/cpp/libcpp/macro.c, support/cpp/version.c:
 	  SDCPP synchronized with GCC CPP release version 4.4.2
-	* sdcc/as/link/lklist.c: fixed NULL pointer dereference
-	* sdcc/as/link/lkmain.c: do not complaint when opening optional adb files
+	* as/link/lklist.c: fixed NULL pointer dereference
+	* as/link/lkmain.c: do not complaint when opening optional adb files
 
 2009-12-31 Borut Razem <borut.razem AT siol.net>
 
-	* sdcc/as/link/lkarea.c, sdcc/as/link/lkdata.c, sdcc/as/link/lklist.c,
-	  sdcc/as/link/lks19.c, sdcc/as/link/lkmain.c, sdcc/as/link/lkeval.c,
-	  sdcc/as/link/lklibr.c, sdcc/as/link/lkaomf51.c, sdcc/as/link/lkhead.c,
-	  sdcc/as/link/lklex.c, sdcc/as/link/lkrloc.c, sdcc/as/link/aslink.h:
+	* as/link/lkarea.c, as/link/lkdata.c, as/link/lklist.c,
+	  as/link/lks19.c, as/link/lkmain.c, as/link/lkeval.c,
+	  as/link/lklibr.c, as/link/lkaomf51.c, as/link/lkhead.c,
+	  as/link/lklex.c, as/link/lkrloc.c, as/link/aslink.h:
 	  sync with aslink 2.0
-	* sdcc/as/link/lks19.c: include "sdld.c"
-	* sdcc/as/link/aslink.dsp: cleaning
-	* sdcc/as/link/aslink.h: changed the type Character Type Definitions to char
+	* as/link/lks19.c: include "sdld.c"
+	* as/link/aslink.dsp: cleaning
+	* as/link/aslink.h: changed the type Character Type Definitions to char
 
 2009-12-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

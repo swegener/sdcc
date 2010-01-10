@@ -525,7 +525,7 @@ fndsym (char *name)
 		{
 		  char absPath1[PATH_MAX];
 		  char absPath2[PATH_MAX];
-#if defined(__BORLANDC__) || defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(_WIN32)
 		  int j;
 
 		  _fullpath (absPath1, FirstFound->libspc, PATH_MAX);
@@ -535,8 +535,10 @@ fndsym (char *name)
 		  for (j = 0; absPath2[j] != 0; j++)
 		    absPath2[j] = tolower ((unsigned char) absPath2[j]);
 #else
-		  realpath (FirstFound->libspc, absPath1);
-		  realpath (ThisLibr->libspc, absPath2);
+		  if (NULL == realpath (FirstFound->libspc, absPath1))
+		    *absPath1 = '\0';
+		  if (NULL == realpath (ThisLibr->libspc, absPath2))
+		    *absPath2 = '\0';
 #endif
 		  if (!(EQ (absPath1, absPath2) && EQ (FirstFound->relfil, ThisLibr->relfil)))
 		    {

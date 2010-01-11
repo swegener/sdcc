@@ -61,25 +61,25 @@ MTL=midl.exe
 # Name "config - Win32 Debug"
 # Begin Source File
 
-SOURCE=.\sdas\aslink\asxxxx_config.h.in
+SOURCE=.\sdas\linksrc\asxxxx_config.h.in
 
 !IF  "$(CFG)" == "config - Win32 Release"
 
 # Begin Custom Build
-InputPath=.\sdas\aslink\asxxxx_config.h.in
+InputPath=.\sdas\linksrc\asxxxx_config.h.in
 
-"sdas/aslink/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	gawk -f configure_vc.awk sdas/aslink/asxxxx_config.h.in > sdas/aslink/asxxxx_config.h
+"sdas/linksrc/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	gawk -f configure_vc.awk sdas/linksrc/asxxxx_config.h.in > sdas/linksrc/asxxxx_config.h
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "config - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\sdas\aslink\asxxxx_config.h.in
+InputPath=.\sdas\linksrc\asxxxx_config.h.in
 
-"sdas/aslink/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	gawk -f configure_vc.awk sdas/aslink/asxxxx_config.h.in > sdas/aslink/asxxxx_config.h
+"sdas/linksrc/asxxxx_config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	gawk -f configure_vc.awk sdas/linksrc/asxxxx_config.h.in > sdas/linksrc/asxxxx_config.h
 
 # End Custom Build
 

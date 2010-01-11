@@ -84,7 +84,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "aslink"=.\sdas\aslink\aslink.dsp - Package Owner=<4>
+Project: "aslink"=.\sdas\linksrc\aslink.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -378,7 +378,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sdld_all"=.\sdas\aslink\sdld_all.dsp - Package Owner=<4>
+Project: "sdld_all"=.\sdas\linksrc\sdld_all.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

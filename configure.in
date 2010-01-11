@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 AC_INIT(.version)
 AC_CONFIG_SRCDIR([Makefile.in])
-AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h sdas/aslink/asxxxx_config.h])
+AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h sdas/linksrc/asxxxx_config.h])
 
 AC_PROG_AWK
 
@@ -771,7 +771,7 @@ test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])
 AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
 device/include/Makefile
-sdas/aslink/Makefile
+sdas/linksrc/Makefile
 sdas/asranlib/Makefile
 support/librarian/Makefile
 support/makebin/Makefile

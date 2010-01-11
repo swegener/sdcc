@@ -2251,7 +2251,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers sdccconf.h:sdccconf_in.h sdas/aslink/asxxxx_config.h"
+ac_config_headers="$ac_config_headers sdccconf.h:sdccconf_in.h sdas/linksrc/asxxxx_config.h"
 
 
 for ac_prog in gawk mawk nawk awk
@@ -5974,7 +5974,7 @@ fi
 test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/Makefile"
 
 
-ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/aslink/Makefile sdas/asranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
+ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/linksrc/Makefile sdas/asranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6657,7 +6657,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "sdccconf.h") CONFIG_HEADERS="$CONFIG_HEADERS sdccconf.h:sdccconf_in.h" ;;
-    "sdas/aslink/asxxxx_config.h") CONFIG_HEADERS="$CONFIG_HEADERS sdas/aslink/asxxxx_config.h" ;;
+    "sdas/linksrc/asxxxx_config.h") CONFIG_HEADERS="$CONFIG_HEADERS sdas/linksrc/asxxxx_config.h" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "src/avr/Makefile") CONFIG_FILES="$CONFIG_FILES src/avr/Makefile" ;;
     "src/ds390/Makefile") CONFIG_FILES="$CONFIG_FILES src/ds390/Makefile" ;;
@@ -6685,7 +6685,7 @@ do
     "main.mk") CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "device/include/Makefile") CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
-    "sdas/aslink/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/aslink/Makefile" ;;
+    "sdas/linksrc/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/linksrc/Makefile" ;;
     "sdas/asranlib/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asranlib/Makefile" ;;
     "support/librarian/Makefile") CONFIG_FILES="$CONFIG_FILES support/librarian/Makefile" ;;
     "support/makebin/Makefile") CONFIG_FILES="$CONFIG_FILES support/makebin/Makefile" ;;

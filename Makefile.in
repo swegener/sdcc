@@ -67,9 +67,9 @@ endif
 
 TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld
 
-PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) sdas/aslink $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
+PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
 
-PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/aslink \
+PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/linksrc \
                   src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
 PORTS           = $(shell cat ports.build)
 ALLPORTS        = $(shell cat ports.all)
@@ -90,7 +90,7 @@ sdcc-as:
 	for as in $(SDCC_AS); do $(MAKE) -C $$as ; done
 
 sdcc-ld:
-	$(MAKE) -C sdas/aslink $(SDCC-LD)
+	$(MAKE) -C sdas/linksrc $(SDCC-LD)
 
 sdcc-misc:
 	for misc in $(SDCC_MISC); do $(MAKE) -C $$misc ; done

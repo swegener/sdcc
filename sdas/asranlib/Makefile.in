@@ -4,7 +4,7 @@ top_builddir = @top_builddir@
 
 include $(top_builddir)/Makefile.common
 
-CFLAGS          += -Wall -I$(srcdir)/../aslink
+CFLAGS          += -Wall -I$(srcdir)/../linksrc
 
 OBJECTS         = asranlib.o
 

@@ -1,6 +1,7 @@
 2010-01-11 Borut Razem <borut.razem AT siol.net>
 
-	* configure.in, configure, Makefile.in, sdcc.dsw:
+	* configure.in, configure, Makefile.in, sdcc.dsw,
+	  sdas/asranlib/asranlib.dsp, sdas/asranlib/Makefile.in:
 	  sdas/aslink renamed to sdas/linksrc
 
 2009-01-10 Raphael Neider <rneider AT web.de>

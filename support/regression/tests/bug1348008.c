@@ -6,15 +6,20 @@
 
 #ifndef PORT_HOST
 
-void foo(void) { }
+void
+foo (void)
+{
+}
 
-void IRQ_ISR(void) interrupt
+void
+IRQ_ISR (void) __interrupt
 {
   foo();
 }
 
 #endif
 
-void testBug(void)
+void
+testBug (void)
 {
 }

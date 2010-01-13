@@ -18,7 +18,7 @@ else
   LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/hc08
 endif
 
-SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant
+SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel

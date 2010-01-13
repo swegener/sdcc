@@ -1,6 +1,6 @@
 /*
     bug 1856409
-    storage: static code,
+    storage: static __code,
 */
 
 #include <stdint.h>
@@ -11,24 +11,24 @@
 #endif
 
 typedef struct {
-	unsigned int e:2;
-	unsigned int f:3;
-	unsigned int g:3;
+  unsigned int e:2;
+  unsigned int f:3;
+  unsigned int g:3;
 } Ta;
 
 void
-testBug(void)
+testBug (void)
 {
-	{storage} Ta aa = {1, 29, 0};
-	{storage} uint16_t xx = 100000;
-	char t;
+  {storage} Ta aa = {1, 29, 0};
+  {storage} uint16_t xx = 100000;
+  char t;
 
-	t = aa.e;
-	ASSERT(t ==  (1 & 3));
-	t = aa.f;
-	ASSERT(t == (29 & 7));
-	t = aa.g;
-	ASSERT(t ==  (0 & 7));
+  t = aa.e;
+  ASSERT (t == (1 & 3));
+  t = aa.f;
+  ASSERT (t == (29 & 7));
+  t = aa.g;
+  ASSERT (t ==  (0 & 7));
 
-	ASSERT(xx == (uint16_t)(100000 & 65535));
+  ASSERT (xx == (uint16_t)(100000 & 65535));
 }

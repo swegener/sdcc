@@ -38,12 +38,12 @@
 
 /* #include "ezusbfx2.h" */
 
-#define NEAR  near
-#define IDATA idata
-#define XDATA xdata
-#define CODE  code
-#define SFR_T sfr
-#define BIT_T bit
+#define NEAR  __near
+#define IDATA __idata
+#define XDATA __xdata
+#define CODE  __code
+#define SFR_T __sfr
+#define BIT_T __bit
 
 #define QF_ISR_NEST
 /* #define Q_ROM_VAR               CODE */

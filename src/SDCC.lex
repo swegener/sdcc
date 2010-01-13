@@ -42,7 +42,7 @@ IS      (u|U|l|L)*
                                 check_type())
 
 #define TKEYWORDSDCC(token) return (options.std_sdcc && isTargetKeyword(yytext)\
-                                    ? token : check_type())
+                                    ? werror(W_DEPRECATED_KEYWORD, yytext, yytext), token : check_type())
 
 #define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
 

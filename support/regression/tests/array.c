@@ -1,6 +1,6 @@
 /** array test
     type: char, int
-    storage: xdata, code,
+    storage: __xdata, __code,
 */
 #include <testfwk.h>
 

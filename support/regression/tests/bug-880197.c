@@ -10,12 +10,12 @@
 //   Contact Author with source code
 
 void
-writeflash(code unsigned char *cp, unsigned char val)
+writeflash (__code unsigned char *cp, unsigned char val)
 {
-	*(xdata unsigned char *)cp = val;
+  *(__xdata unsigned char *)cp = val;
 }
 
 void
-testBug(void)
+testBug (void)
 {
 }

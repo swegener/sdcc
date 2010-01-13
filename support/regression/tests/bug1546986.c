@@ -7,20 +7,20 @@
 
 #ifdef __bool_true_false_are_defined
 
-static unsigned char pdata tst1 = 0x01;
-static unsigned char pdata tst2 = 0x00;
+static unsigned char __pdata tst1 = 0x01;
+static unsigned char __pdata tst2 = 0x00;
 
 static bool test;
 
 #endif //__bool_true_false_are_defined
 
 void
-testBug(void)
+testBug (void)
 {
 #ifdef __bool_true_false_are_defined
   test = (tst1 | tst2);
-  ASSERT( test );
+  ASSERT (test);
   test = (tst2 | tst1);
-  ASSERT( test );
+  ASSERT (test);
 #endif //__bool_true_false_are_defined
 }

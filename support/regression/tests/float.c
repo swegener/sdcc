@@ -22,10 +22,10 @@
 #endif
 
 #ifdef SDCC_mcs51
-#  define STORAGE xdata
-#  define XDATA xdata
+#  define STORAGE __xdata
+#  define XDATA __xdata
 #elif SDCC_pic16
-#  define STORAGE code
+#  define STORAGE __code
 #  define XDATA
 #else
 #  define STORAGE
@@ -57,84 +57,93 @@ struct {
                                                           0x1000000,  0 /* ignore */},
 };
 
-XDATA int tests=0, errors=0;
+XDATA int tests = 0, errors = 0;
 
-char compare (float is, float should) {
-  float diff = should ? is/should : 0;
+char
+compare (float is, float should)
+{
+  float diff = should ? is / should : 0;
   tests++;
-  DEBUG(printf (" %1.3f (%f %f) ", is, should, diff));
+  DEBUG (printf (" %1.3f (%f %f) ", is, should, diff));
 
-  if (should==0) {
-    DEBUG(printf ("IGNORED!\n"));
-    return 0;
-  }
+  if (should == 0)
+    {
+      DEBUG (printf ("IGNORED!\n"));
+      return 0;
+    }
 
   // skip the fp roundoff errors
-  if (diff>0.999999 && diff<1.00001) {
-    DEBUG(printf ("OK!\n"));
-    ASSERT(1);
-    return 0;
-  } else {
-    errors++;
-    DEBUG(printf ("FAIL!\n"));
-    ASSERT(0);
-    return 1;
-  }
+  if (diff > 0.999999 && diff < 1.00001)
+    {
+      DEBUG (printf ("OK!\n"));
+      ASSERT (1);
+      return 0;
+    }
+  else
+    {
+      errors++;
+      DEBUG (printf ("FAIL!\n"));
+      ASSERT (0);
+      return 1;
+    }
 }
 
 void
-testFloatMath(void)
+testFloatMath (void)
 {
   int i;
-  int t = sizeof(cases)/sizeof(cases[0]);
+  int t = sizeof (cases) / sizeof (cases[0]);
   float result;
 
-  for (i=0; i<t; i++) {
-    #ifdef ADD
-      // add
-      result=cases[i].left+cases[i].right;
-      DEBUG(printf ("%1.3f + %1.3f =", cases[i].left, cases[i].right));
-      compare(result, cases[i].add);
-    #endif
-    #ifdef SUB
-      // sub
-      result=cases[i].left-cases[i].right;
-      DEBUG(printf ("%1.3f - %1.3f =", cases[i].left, cases[i].right));
-      compare(result, cases[i].sub);
-    #endif
-    #ifdef MUL
-      // mul
-      result=cases[i].left*cases[i].right;
-      DEBUG(printf ("%1.3f * %1.3f =", cases[i].left, cases[i].right));
-      compare(result, cases[i].mul);
-    #endif
-    #ifdef DIV
-      // div
-      result=cases[i].left/cases[i].right;
-      DEBUG(printf ("%1.3f / %1.3f =", cases[i].left, cases[i].right));
-      compare(result, cases[i].div);
-    #endif
-    #ifdef REVDIV
-      // revdiv
-      result=cases[i].right/cases[i].left;
-      DEBUG(printf ("%1.3f / %1.3f =", cases[i].right, cases[i].left));
-      compare(result, cases[i].revdiv);
-    #endif
-  }
-  DEBUG(printf ("%d tests, %d errors\n", tests, errors));
+  for (i = 0; i < t; i++)
+    {
+      #ifdef ADD
+        // add
+        result = cases[i].left + cases[i].right;
+        DEBUG (printf ("%1.3f + %1.3f =", cases[i].left, cases[i].right));
+        compare (result, cases[i].add);
+      #endif
+      #ifdef SUB
+        // sub
+        result = cases[i].left - cases[i].right;
+        DEBUG (printf ("%1.3f - %1.3f =", cases[i].left, cases[i].right));
+        compare (result, cases[i].sub);
+      #endif
+      #ifdef MUL
+        // mul
+        result = cases[i].left * cases[i].right;
+        DEBUG (printf ("%1.3f * %1.3f =", cases[i].left, cases[i].right));
+        compare (result, cases[i].mul);
+      #endif
+      #ifdef DIV
+        // div
+        result = cases[i].left / cases[i].right;
+        DEBUG (printf ("%1.3f / %1.3f =", cases[i].left, cases[i].right));
+        compare (result, cases[i].div);
+      #endif
+      #ifdef REVDIV
+        // revdiv
+        result = cases[i].right / cases[i].left;
+        DEBUG (printf ("%1.3f / %1.3f =", cases[i].right, cases[i].left));
+        compare(result, cases[i].revdiv);
+      #endif
+    }
+  DEBUG (printf ("%d tests, %d errors\n", tests, errors));
 }
 
 void
-testFloatMulRound(void)
+testFloatMulRound (void)
 {
     right = 2.0 / 10.61;
     result = 10.61 * right;
-    compare(result, 2.0);
+    compare (result, 2.0);
 }
 
 #ifndef REENTRANT
-void main(void) {
-  testFloatMath();
-  testFloatMulRound();
+void
+main (void)
+{
+  testFloatMath ();
+  testFloatMulRound ();
 }
 #endif

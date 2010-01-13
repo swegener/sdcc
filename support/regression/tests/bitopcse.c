@@ -19,7 +19,7 @@
 #if defined(TYPE_bool)
 #  define _data
 #else
-#  define _data idata
+#  define _data __idata
 #endif
 
 #if defined(TYPE_bool) && defined(__bool_true_false_are_defined)

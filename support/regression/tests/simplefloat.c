@@ -14,24 +14,24 @@
 #endif
 
 void
-testCmp(void)
+testCmp (void)
 {
   volatile float left, right;
 
   left = 5;
   right = 13;
-  ASSERT(left + right == 18);
-  ASSERT(left + right <= 18);
-  ASSERT(left + right >= 18);
-  ASSERT(left + right > 17.9);
-  ASSERT(left + right < 18.1);
+  ASSERT (left + right == 18);
+  ASSERT (left + right <= 18);
+  ASSERT (left + right >= 18);
+  ASSERT (left + right > 17.9);
+  ASSERT (left + right < 18.1);
 }
 
 void
-testDiv(void)
+testDiv (void)
 {
 #if defined (__mcs51) && !defined (SDCC_STACK_AUTO)
-  idata at 0xd0
+  __idata __at 0xd0
 #endif
   volatile float left;
   volatile float right;
@@ -39,15 +39,15 @@ testDiv(void)
   left = 17;
   right = 343;
 
-  ASSERT(FCOMP(left/right, (17.0/343.0)));
-  ASSERT(FCOMP(right/left, (343.0/17.0)));
+  ASSERT (FCOMP (left / right, (17.0 / 343.0)));
+  ASSERT (FCOMP (right / left, (343.0 / 17.0)));
 
   right = 17;
-  ASSERT(FCOMP(left/right, 1.0));
+  ASSERT (FCOMP (left / right, 1.0));
 }
 
 void
-testDivNearOne(void)
+testDivNearOne (void)
 {
   volatile float left, right, result;
 
@@ -61,7 +61,7 @@ testDivNearOne(void)
     }
   else
     {
-      FAIL();
+      FAIL ();
     }
   if (result < 1.00001)
     {
@@ -69,7 +69,7 @@ testDivNearOne(void)
     }
   else
     {
-      FAIL();
+      FAIL ();
     }
   if (result > 0.999999 && result < 1.00001)
     {
@@ -77,6 +77,6 @@ testDivNearOne(void)
     }
   else
     {
-      FAIL();
+      FAIL ();
     }
 }

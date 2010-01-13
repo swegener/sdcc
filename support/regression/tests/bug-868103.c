@@ -1,7 +1,7 @@
 /** Bug 868103 tests.
 
-    storage1: near, far, code,
-    storage2: near, far,
+    storage1: __near, __far, __code,
+    storage2: __near, __far,
 */
 
 #ifndef STORAGE1
@@ -22,8 +22,8 @@ STORAGE1 char c = 'x';
 STORAGE2 foo f;
 
 void
-testBug868103(void)
+testBug868103 (void)
 {
   f.bar[1] = &c;
-  ASSERT(f.bar[1] == &c);
+  ASSERT (f.bar[1] == &c);
 }

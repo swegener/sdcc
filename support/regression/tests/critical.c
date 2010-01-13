@@ -19,14 +19,15 @@ typedef union
 volatile big global_var = { 0 };
 int y;
 
-unsigned int get_global (void) critical
+unsigned int
+get_global (void) __critical
 {
   return global_var.a;
 }
 #endif
 
 void
-testCritical(void)
+testCritical (void)
 {
 #if defined(SDCC_mcs51)
   big x;
@@ -37,33 +38,34 @@ testCritical(void)
   EA = 1;
   TF2 = 1;
 
-  critical x.a = global_var.a;
-  ASSERT(x.b == x.c);
+  __critical x.a = global_var.a;
+  ASSERT (x.b == x.c);
 
-  x.a = get_global();
-  ASSERT(x.b == x.c);
+  x.a = get_global ();
+  ASSERT (x.b == x.c);
 
-  for (i=10; i!=0; i--)
-  {
-    critical x.a = global_var.a;
-    ASSERT(x.b == x.c);
+  for (i = 10; i != 0; i--)
+    {
+      __critical x.a = global_var.a;
+      ASSERT (x.b == x.c);
 
-    x.a = get_global();
-    ASSERT(x.b == x.c);
+      x.a = get_global();
+      ASSERT (x.b == x.c);
   }
   //check the interrupt has run at all
-  ASSERT(x.a != 0);
+  ASSERT (x.a != 0);
 
-  critical y = 0;
+  __critical y = 0;
   //check the interrupts are still enabled
-  ASSERT(EA);
+  ASSERT (EA);
 #else
-  ASSERT(1);
+  ASSERT (1);
 #endif
 }
 
 #if defined(SDCC_mcs51)
-void T2_isr (void) interrupt 5 using 2
+void
+T2_isr (void) __interrupt 5 __using 2
 {
   //do not clear flag ET2 so it keeps interrupting !
   global_var.b++;

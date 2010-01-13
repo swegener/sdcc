@@ -11,29 +11,28 @@
 #endif  /* SDCC */
 
 void 
-func( unsigned char a )
+func (unsigned char a)
 {
-  UNUSED(a);
+  UNUSED (a);
 }
 
 void
-testBadPromotion(void)
+testBadPromotion (void)
 {
-
 #ifdef SDCC
-  unsigned char c=*((unsigned xdata char*)(ADDRESS));
+  unsigned char c = *((unsigned __xdata char*)(ADDRESS));
 #else
   unsigned char loc_c;
-  unsigned char c=*(unsigned char*)&loc_c;
+  unsigned char c = *(unsigned char*)&loc_c;
 #endif 
-  
-  func(c); 
-  
-  c+='0'; /* is evaluated as an 8-bit expr */ 
-  
-  func(c); 
 
-  c+='A'-'0'; /* is a 16-bit expr ??? */ 
-  
-  func(c); 
+  func (c);
+
+  c += '0';     /* is evaluated as an 8-bit expr */ 
+
+  func (c); 
+
+  c += 'A'-'0'; /* is a 16-bit expr ??? */ 
+
+  func (c);
 }

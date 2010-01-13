@@ -19,36 +19,36 @@ void __printf(const char *szFormat, ...);
 #endif
 
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-# define data
-# define idata
-# define pdata
-# define xdata
-# define code
-# define near
-# define far
-# define at(x)
-# define reentrant
+# define __data
+# define __idata
+# define __pdata
+# define __xdata
+# define __code
+# define __near
+# define __far
+# define __at(x)
+# define __reentrant
 #endif
 
 #if defined(SDCC_hc08)
-# define idata data
-# define pdata data
+# define __idata __data
+# define __pdata __data
 #endif
 
 #if defined(SDCC_pic16)
-# define idata data
-# define xdata data
-# define pdata data
+# define __idata __data
+# define __xdata __data
+# define __pdata __data
 #endif
 
-void __fail(code const char *szMsg, code const char *szCond, code const char *szFile, int line);
-void __prints(const char *s);
-void __printn(int n);
-code const char *__getSuiteName(void);
-void __runSuite(void);
+void __fail (__code const char *szMsg, __code const char *szCond, __code const char *szFile, int line);
+void __prints (const char *s);
+void __printn (int n);
+__code const char *__getSuiteName (void);
+void __runSuite (void);
 
-#define ASSERT(_a)  (++__numTests, (_a) ? (void)0 : __fail("Assertion failed", #_a, __FILE__, __LINE__))
-#define ASSERT_FAILED(_a)  (++__numTests, (_a) ? 0 : (__fail("Assertion failed", #_a, __FILE__, __LINE__), 1))
+#define ASSERT(_a)  (++__numTests, (_a) ? (void)0 : __fail ("Assertion failed", #_a, __FILE__, __LINE__))
+#define ASSERT_FAILED(_a)  (++__numTests, (_a) ? 0 : (__fail ("Assertion failed", #_a, __FILE__, __LINE__), 1))
 #define FAIL()      FAILM("Failure")
 #define FAILM(_a)   __fail(_a, #_a, __FILE__, __LINE__)
 

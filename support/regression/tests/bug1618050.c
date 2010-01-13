@@ -6,21 +6,26 @@
 
 #include <testfwk.h>
 
-_STATMEM char * data px;
+_STATMEM char * __data px;
 _STATMEM char x[2] = {0,42};
 
-void fiddle_px(_STATMEM char * unused) {
+void
+fiddle_px (_STATMEM char * unused)
+{
   (volatile char) unused[0]; // shut up
   px++;
 }
 
-char buggy(void) {
+char
+buggy (void)
+{
   px = x;
-  fiddle_px(x);
+  fiddle_px (x);
   return *px;
 }
 
 void
-testBug(void) {
-  ASSERT(buggy() == 42);
+testBug (void)
+{
+  ASSERT (buggy () == 42);
 }

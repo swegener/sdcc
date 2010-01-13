@@ -8,25 +8,25 @@
 #ifdef __bool_true_false_are_defined
 
 union USUINT {
-    unsigned int value;
-    struct {
-        unsigned char A;   // LS byte
-        unsigned char B;   // HS byte
-    };
-};                         // could name variables here
+  unsigned int value;
+  struct {
+    unsigned char A;   // LS byte
+    unsigned char B;   // HS byte
+  };
+};                     // could name variables here
 
 typedef struct {
-    unsigned char CRC_seed;                    // 1
-    union USUINT cal_burst_duration;           // 3
-    union USUINT cal_calibration;              // 5
-    union USUINT cal_number_of_bursts;         // 7
-    union USUINT cal_holdoff_delay;            // 9
-    unsigned char CRC;                         // 10
+  unsigned char CRC_seed;                    // 1
+  union USUINT cal_burst_duration;           // 3
+  union USUINT cal_calibration;              // 5
+  union USUINT cal_number_of_bursts;         // 7
+  union USUINT cal_holdoff_delay;            // 9
+  unsigned char CRC;                         // 10
 } AUTOCAL_CFG;
 
-code at (0x8000) AUTOCAL_CFG AutoCal_CFG = {0};
+__code __at (0x8000) AUTOCAL_CFG AutoCal_CFG = {0};
 
-static code unsigned char crc_table[256] =
+static __code unsigned char crc_table[256] =
 {   0x00,0x2F,0x5E,0x71,0xBC,0x93,0xE2,0xCD,
     0x57,0x78,0x09,0x26,0xEB,0xC4,0xB5,0x9A,
     0xAE,0x81,0xF0,0xDF,0x12,0x3D,0x4C,0x63,
@@ -61,23 +61,25 @@ static code unsigned char crc_table[256] =
     0x8F,0xA0,0xD1,0xFE,0x33,0x1C,0x6D,0x42
 };
 
-data unsigned char crc;
+__data unsigned char crc;
 
-static xdata unsigned char rx_buffer[8];
+static __xdata unsigned char rx_buffer[8];
 static unsigned char rx_index;
 
-bool VerifyCRC(void)
+bool
+VerifyCRC (void)
 {
-    unsigned char i;
+  unsigned char i;
 
-    crc = 0 ;
+  crc = 0 ;
 
-    for (i=0; i<(rx_index-1); i++)
-       	crc = crc_table[rx_buffer[i] ^ crc] ;
-    return (crc == rx_buffer[rx_index-1]) ;
+  for (i = 0; i < (rx_index - 1); i++)
+    crc = crc_table[rx_buffer[i] ^ crc];
+  return (crc == rx_buffer[rx_index-1]) ;
 }
 
-bool NotZero(unsigned int t)
+bool
+NotZero (unsigned int t)
 {
     return (t != 0);
 }
@@ -85,11 +87,11 @@ bool NotZero(unsigned int t)
 #endif //__bool_true_false_are_defined
 
 void
-testBug(void)
+testBug (void)
 {
 #ifdef __bool_true_false_are_defined
     rx_index = 1;
-    ASSERT (VerifyCRC());
-    ASSERT (NotZero(300));
+    ASSERT (VerifyCRC ());
+    ASSERT (NotZero (300));
 #endif //__bool_true_false_are_defined
 }

@@ -7,20 +7,23 @@
 const void *p;
 int ret;
 
-int mul2 (int i)
+int
+mul2 (int i)
 {
   return 2 * i;
 }
 
-void g (int (*h) (int))
+void
+g (int (*h) (int))
 {
   ret = h (2);
 }
 
-void f1()
+void
+f1 ()
 {
 #if defined(SDCC_ds390)
-  p = (void code *) mul2;
+  p = (void __code *) mul2;
 #else
   p = (void *) mul2;
 #endif
@@ -31,7 +34,8 @@ void f1()
 
 void g (int (*h) (int));
 
-void f2()
+void
+f2 ()
 {
   int (*fp) (int) = p;
 
@@ -42,7 +46,8 @@ void f2()
 
 void g (int (*h) (int));
 
-void f3()
+void
+f3 ()
 {
   int (*fp) (int) = (int (*) (int)) p;
 
@@ -51,32 +56,35 @@ void f3()
 
 /****************************/
 
-void f4()
+void
+f4 ()
 {
-  ((void (code *) (void)) p) ();
+  ((void (__code *) (void)) p) ();
 }
 
 /****************************/
 
-void f5()
+void
+f5 ()
 {
   int (*fp) (int) = mul2;
 
-  fp(1);
+  fp (1);
 }
 
 /****************************/
 
-void f6()
+void
+f6 ()
 {
-  ((void (code *) (void)) 0) ();
+  ((void (__code *) (void)) 0) ();
 }
 
 /****************************/
 
 static void
-testFuncPtr(void)
+testFuncPtr (void)
 {
-  f1();
-  ASSERT(ret == 4);
+  f1 ();
+  ASSERT (ret == 4);
 }

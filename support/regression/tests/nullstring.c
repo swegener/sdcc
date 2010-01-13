@@ -1,6 +1,6 @@
 /** Null character in string tests.
 
-     storage: data, xdata, code,
+     storage: __data, __xdata, __code,
 */
 #include <testfwk.h>
 
@@ -30,7 +30,7 @@ testStringArray (void)
 }
 
 void
-testStringConst(void)
+testStringConst (void)
 {
   const char * constStr1 = "";
   const char * constStr2 = "a\0b\0c";

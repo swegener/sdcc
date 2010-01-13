@@ -11,8 +11,8 @@
 
 #ifdef SDCC_mcs51
 /* until changed, isr's must have a prototype in the module containing main */
-void T2_isr (void) interrupt 5;
-#define MEMSPACE_BUF idata
+void T2_isr (void) __interrupt 5;
+#define MEMSPACE_BUF __idata
 #else
 #define MEMSPACE_BUF
 #endif
@@ -33,21 +33,23 @@ static int __numFailures = 0;
 static int
 __div(int num, int denom)
 {
-    int q = 0;
-    while (num >= denom) {
-        q++;
-        num -= denom;
+  int q = 0;
+  while (num >= denom)
+    {
+      q++;
+      num -= denom;
     }
-    return q;
+  return q;
 }
 
 static int
-__mod(int num, int denom)
+__mod (int num, int denom)
 {
-    while (num >= denom) {
-        num -= denom;
+  while (num >= denom)
+    {
+      num -= denom;
     }
-    return num;
+  return num;
 }
 #else
 #define __div(num, denom) ((num) / (denom))
@@ -55,90 +57,104 @@ __mod(int num, int denom)
 #endif
 
 void
-__prints(const char *s)
+__prints (const char *s)
 {
   char c;
 
-  while ('\0' != (c = *s)) {
-    _putchar(c);
-    ++s;
-  }
+  while ('\0' != (c = *s))
+    {
+      _putchar(c);
+      ++s;
+    }
 }
 
 void
-__printn(int n)
+__printn (int n)
 {
-  if (0 == n) {
-    _putchar('0');
-  }
-  else {
-    static char MEMSPACE_BUF buf[6];
-    char MEMSPACE_BUF *p = &buf[sizeof(buf) - 1];
-    char neg = 0;
-
-    buf[sizeof(buf) - 1] = '\0';
-
-    if (0 > n) {
-      n = -n;
-      neg = 1;
+  if (0 == n)
+    {
+      _putchar('0');
     }
+  else
+    {
+      static char MEMSPACE_BUF buf[6];
+      char MEMSPACE_BUF *p = &buf[sizeof (buf) - 1];
+      char neg = 0;
+
+      buf[sizeof(buf) - 1] = '\0';
+
+      if (0 > n)
+        {
+          n = -n;
+          neg = 1;
+        }
   
-    while (0 != n) {
-      *--p = '0' + __mod(n, 10);
-      n = __div(n, 10);
+      while (0 != n)
+        {
+          *--p = '0' + __mod (n, 10);
+          n = __div (n, 10);
+        }
+
+      if (neg)
+        _putchar('-');
+
+      __prints(p);
     }
-
-    if (neg)
-      _putchar('-');
-
-    __prints(p);
-  }
 }
 
 #ifndef NO_VARARGS
 void
-__printf(const char *szFormat, ...)
+__printf (const char *szFormat, ...)
 {
   va_list ap;
-  va_start(ap, szFormat);
+  va_start (ap, szFormat);
 
-  while (*szFormat) {
-    if (*szFormat == '%') {
-      switch (*++szFormat) {
-      case 's': {
-        char *sz = va_arg(ap, char *);
-        __prints(sz);
-        break;
+  while (*szFormat)
+    {
+      if (*szFormat == '%')
+        {
+          switch (*++szFormat)
+            {
+            case 's':
+              {
+                char *sz = va_arg (ap, char *);
+                __prints(sz);
+                break;
+              }
+
+            case 'u':
+              {
+                int i = va_arg (ap, int);
+               __printn (i);
+               break;
+             }
+
+           case '%':
+             _putchar ('%');
+             break;
+
+           default:
+             break;
+          }
       }
-      case 'u': {
-        int i = va_arg(ap, int);
-        __printn(i);
-        break;
+    else
+      {
+        _putchar (*szFormat);
       }
-      case '%':
-        _putchar('%');
-        break;
-      default:
-        break;
-      }
-    }
-    else {
-      _putchar(*szFormat);
-    }
     szFormat++;
   }
-  va_end(ap);
+  va_end (ap);
 }
 
 void
-__fail(code const char *szMsg, code const char *szCond, code const char *szFile, int line)
+__fail (code const char *szMsg, code const char *szCond, code const char *szFile, int line)
 {
   __printf("--- FAIL: \"%s\" on %s at %s:%u\n", szMsg, szCond, szFile, line);
   __numFailures++;
 }
 
 int
-main(void)
+main (void)
 {
   _initEmu();
 
@@ -157,7 +173,7 @@ main(void)
 }
 #else
 void
-__fail(code const char *szMsg, code const char *szCond, code const char *szFile, int line)
+__fail (__code const char *szMsg, __code const char *szCond, __code const char *szFile, int line)
 {
   __prints("--- FAIL: \"");
   __prints(szMsg);
@@ -173,7 +189,7 @@ __fail(code const char *szMsg, code const char *szCond, code const char *szFile,
 }
 
 int
-main(void)
+main (void)
 {
   _initEmu();
 

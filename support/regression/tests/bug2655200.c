@@ -12,10 +12,6 @@
 #include <testfwk.h>
 #include <stdint.h>
 
-#if !defined (SDCC_mcs51) && !defined (SDCC_ds390)
-# define __code
-#endif
-
 char thing;
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
 __code char thing_code = 0;

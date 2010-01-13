@@ -20,7 +20,7 @@ testfuntablefooter = """}
 
 # Code to generate the suite function
 testfunsuite = """
-code const char *
+__code const char *
 __getSuiteName(void)
 {
   return "{testcase}";

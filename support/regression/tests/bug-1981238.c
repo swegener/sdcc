@@ -3,14 +3,14 @@
 */
 #include <testfwk.h>
 
-code struct {
+__code struct {
   char x:1;
   char  :0;
   char d:2;
   char b:6;
 } pad = {1, 2, 1};
 
-code struct {
+__code struct {
   int p:1;
   int q:7;
   char :0;
@@ -18,12 +18,13 @@ code struct {
   int t:7;
 } noPad = {1, 120, 1, 127};
 
-code struct {
+__code struct {
   char  :0;
   char b;
 } initialNoPad[] = {{2}, {4}};
 
-void testBitfield (void)
+void
+testBitfield (void)
 {
   ASSERT (sizeof (pad) == 2);
   ASSERT (sizeof (noPad) == 2);

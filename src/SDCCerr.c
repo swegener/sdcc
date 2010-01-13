@@ -41,9 +41,9 @@ extern int fatalError;
  */
 struct
 {
-    int                 errIndex;
-    ERROR_LOG_LEVEL     errType;
-    const char          *errText;
+  int                 errIndex;
+  ERROR_LOG_LEVEL     errType;
+  const char          *errText;
 } ErrTab [] =
 {
 { E_DUPLICATE, ERROR_LEVEL_ERROR,
@@ -446,6 +446,8 @@ struct
    "Size of array '%s' is negative" },
 { W_TARGET_LOST_QUALIFIER, ERROR_LEVEL_WARNING,
    "pointer target lost %s qualifier" },
+{ W_DEPRECATED_KEYWORD, ERROR_LEVEL_WARNING,
+   "keyword '%s' is deprecated, use '__%s' instead" },
 };
 
 /*
@@ -455,16 +457,17 @@ SetErrorOut - Set the error output file
 -------------------------------------------------------------------------------
 */
 
-FILE *SetErrorOut(FILE *NewErrorOut)
+FILE *
+SetErrorOut (FILE *NewErrorOut)
 {
-    _SDCCERRG.out = NewErrorOut ;
+  _SDCCERRG.out = NewErrorOut ;
 
-    return NewErrorOut ;
+  return NewErrorOut ;
 }
 
 void setErrorLogLevel (ERROR_LOG_LEVEL level)
 {
-    _SDCCERRG.logLevel = level;
+  _SDCCERRG.logLevel = level;
 }
 
 /*
@@ -474,57 +477,72 @@ vwerror - Output a standard error message with variable number of arguments
 -------------------------------------------------------------------------------
 */
 
-void vwerror (int errNum, va_list marker)
+void
+vwerror (int errNum, va_list marker)
 {
-    if (_SDCCERRG.out == NULL) {
-        _SDCCERRG.out = DEFAULT_ERROR_OUT;
+  if (_SDCCERRG.out == NULL)
+    {
+      _SDCCERRG.out = DEFAULT_ERROR_OUT;
     }
 
-    if (ErrTab[errNum].errIndex != errNum) {
-        fprintf(_SDCCERRG.out, 
-                "Internal error: error table entry for %d inconsistent.", errNum);
+  if (ErrTab[errNum].errIndex != errNum)
+    {
+      fprintf (_SDCCERRG.out, 
+              "Internal error: error table entry for %d inconsistent.", errNum);
     }
 
-    if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!_SDCCERRG.disabled[errNum])) {
-        if ( ErrTab[errNum].errType == ERROR_LEVEL_ERROR || _SDCCERRG.werror )
-            fatalError++ ;
+  if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!_SDCCERRG.disabled[errNum]))
+    {
+      if (ErrTab[errNum].errType == ERROR_LEVEL_ERROR || _SDCCERRG.werror)
+        fatalError++ ;
   
-        if ( filename && lineno ) {
-            if(_SDCCERRG.style)
-                fprintf(_SDCCERRG.out, "%s(%d) : ",filename,lineno);
-            else
-                fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
-        } else if (lineno) {
-            fprintf(_SDCCERRG.out, "at %d: ", lineno);
-        } else {
-            fprintf(_SDCCERRG.out, "-:0: ");
+      if (filename && lineno)
+        {
+          if (_SDCCERRG.style)
+            fprintf (_SDCCERRG.out, "%s(%d) : ",filename,lineno);
+          else
+            fprintf (_SDCCERRG.out, "%s:%d: ",filename,lineno);
+        }
+      else if (lineno)
+        {
+          fprintf (_SDCCERRG.out, "at %d: ", lineno);
+        }
+      else
+        {
+          fprintf (_SDCCERRG.out, "-:0: ");
         }
 
-        switch(ErrTab[errNum].errType)
+      switch (ErrTab[errNum].errType)
         {
-            case ERROR_LEVEL_ERROR:
-                fprintf(_SDCCERRG.out, "error %d: ", errNum);
-                break;
-            case ERROR_LEVEL_WARNING:
-            case ERROR_LEVEL_PEDANTIC:
-                if (_SDCCERRG.werror)
-                    fprintf(_SDCCERRG.out, "error %d: ", errNum);
-                else
-                    fprintf(_SDCCERRG.out, "warning %d: ", errNum);
-                break;
-            case ERROR_LEVEL_INFO:
-                fprintf(_SDCCERRG.out, "info %d: ", errNum);
-                break;
-            default:
-                break;                  
+        case ERROR_LEVEL_ERROR:
+          fprintf (_SDCCERRG.out, "error %d: ", errNum);
+          break;
+
+        case ERROR_LEVEL_WARNING:
+        case ERROR_LEVEL_PEDANTIC:
+          if (_SDCCERRG.werror)
+            fprintf (_SDCCERRG.out, "error %d: ", errNum);
+          else
+            fprintf (_SDCCERRG.out, "warning %d: ", errNum);
+          break;
+
+        case ERROR_LEVEL_INFO:
+          fprintf (_SDCCERRG.out, "info %d: ", errNum);
+          break;
+
+        default:
+          break;                  
         }
     
-        vfprintf(_SDCCERRG.out, ErrTab[errNum].errText,marker);
-        fprintf(_SDCCERRG.out, "\n");
-    } else {
-        /* Below the logging level, drop. */
+        vfprintf (_SDCCERRG.out, ErrTab[errNum].errText,marker);
+        fprintf (_SDCCERRG.out, "\n");
+    }
+  else
+    {
+      /* Below the logging level, drop. */
     }
 }
+
 /*
 -------------------------------------------------------------------------------
 werror - Output a standard error message with variable number of arguments
@@ -532,12 +550,13 @@ werror - Output a standard error message with variable number of arguments
 -------------------------------------------------------------------------------
 */
 
-void werror (int errNum, ...)
+void
+werror (int errNum, ...)
 {
-    va_list marker;
-    va_start(marker,errNum);
-    vwerror(errNum, marker);
-    va_end(marker);
+  va_list marker;
+  va_start (marker, errNum);
+  vwerror (errNum, marker);
+  va_end (marker);
 }
 
 /*
@@ -548,21 +567,22 @@ werrorfl - Output a standard error message with variable number of arguments.
 -------------------------------------------------------------------------------
 */
 
-void werrorfl (char *newFilename, int newLineno, int errNum, ...)
+void
+werrorfl (char *newFilename, int newLineno, int errNum, ...)
 {
-    char *oldFilename = filename;
-    int oldLineno = lineno;
-    va_list marker;
+  char *oldFilename = filename;
+  int oldLineno = lineno;
+  va_list marker;
 
-    filename = newFilename;
-    lineno = newLineno;
+  filename = newFilename;
+  lineno = newLineno;
 
-    va_start(marker,errNum);
-    vwerror(errNum, marker);
-    va_end(marker);
+  va_start (marker,errNum);
+  vwerror (errNum, marker);
+  va_end (marker);
 
-    filename = oldFilename;
-    lineno = oldLineno;
+  filename = oldFilename;
+  lineno = oldLineno;
 }
 
 
@@ -572,14 +592,15 @@ fatal - Output a standard error message with variable number of arguments and
         call exit()
 -------------------------------------------------------------------------------
 */
-void fatal (int exitCode, int errNum, ...)
+void
+fatal (int exitCode, int errNum, ...)
 {
-    va_list marker;
-    va_start(marker,errNum);
-    vwerror(errNum, marker);
-    va_end(marker);
+  va_list marker;
+  va_start (marker, errNum);
+  vwerror (errNum, marker);
+  va_end (marker);
 
-    exit(exitCode);
+  exit (exitCode);
 }
 
 /*
@@ -588,9 +609,10 @@ style - Change the output error style to MSVC
 -------------------------------------------------------------------------------
 */
 
-void MSVC_style (int style)
+void
+MSVC_style (int style)
 {
-    _SDCCERRG.style = style;
+  _SDCCERRG.style = style;
 }
 
 /*
@@ -599,10 +621,11 @@ disabled - Disable output of specified warning
 -------------------------------------------------------------------------------
 */
 
-void setWarningDisabled (int errNum)
+void
+setWarningDisabled (int errNum)
 {
-    if ((errNum < MAX_ERROR_WARNING) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
-        _SDCCERRG.disabled[errNum] = 1;
+  if ((errNum < MAX_ERROR_WARNING) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
+    _SDCCERRG.disabled[errNum] = 1;
 }
 
 /*
@@ -611,7 +634,8 @@ Set the flag to treat warnings as errors
 -------------------------------------------------------------------------------
 */
 
-void setWError (int flag)
+void
+setWError (int flag)
 {
-    _SDCCERRG.werror = flag;
+  _SDCCERRG.werror = flag;
 }

@@ -6,23 +6,23 @@
 #include <8052.h>
 #include <stdbool.h>
 
-bool manipulate_bits(bool x) using 2
+bool
+manipulate_bits (bool x) __using 2
 {
-	return x;
+  return x;
 }
 
-bool complement(bool x)
+bool
+complement (bool x)
 {
-	return !x;
+  return !x;
 }
-
 #endif
 
 void
-testSaveBits(void)
+testSaveBits (void)
 {
 #if defined(SDCC_mcs51)
-
   //enable the interrupt and set it
   ET2 = 1;
   EA = 1;
@@ -30,27 +30,27 @@ testSaveBits(void)
 
   //this will pass b0 cleared, test whether it will arrive cleared
   if (complement(false))
-  {
-    EA = 0;
-    ASSERT(1);
-  }
+    {
+      EA = 0;
+      ASSERT (1);
+    }
   else
-  {
-    EA = 0;
-    ASSERT(0);
-  }
-
+    {
+      EA = 0;
+      ASSERT (0);
+    }
 #else
-  ASSERT(1);
+  ASSERT (1);
 #endif
 }
 
 #if defined(SDCC_mcs51)
-void T2_isr (void) interrupt 5 using 2
+void
+T2_isr (void) __interrupt 5 __using 2
 {
   //do not clear flag ET2 so it keeps interrupting !
 
   //this will set b0
-  manipulate_bits(true);
+  manipulate_bits (true);
 }
 #endif

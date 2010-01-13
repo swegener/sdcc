@@ -1,10 +1,20 @@
 /*
-===============================================================================
-SDCCERR - SDCC Standard error handler
-
-
-===============================================================================
-*/
+ * SDCCerr - Standard error handler
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
 
 #if !defined(__SDCCERR_H)
 
@@ -212,6 +222,7 @@ SDCCERR - SDCC Standard error handler
 #define E_BAD_INT_ARGUMENT            194 /* Bad integer option argument */
 #define E_NEGATIVE_ARRAY_SIZE         195 /* Size of array '%s' is negative */
 #define W_TARGET_LOST_QUALIFIER       196 /* Pointer target lost qualifier */
+#define W_DEPRECATED_KEYWORD          197 /* keyword %s is deprecated, use __%s instead */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 
@@ -221,27 +232,27 @@ SDCCERR - SDCC Standard error handler
  *
  */
 enum _ERROR_LOG_LEVEL {
-    /** Everything.  Currently the same as PEDANTIC. */
-    ERROR_LEVEL_ALL,
-    /** All warnings, including those considered 'reasonable to use,
-        on occasion, in clean programs' (man 3 gcc). */
-    ERROR_LEVEL_PEDANTIC,
-    /** 'informational' warnings */
-    ERROR_LEVEL_INFO,
-    /** Most warnings. */
-    ERROR_LEVEL_WARNING,
-    /** Errors only. */
-    ERROR_LEVEL_ERROR
+  /** Everything.  Currently the same as PEDANTIC. */
+  ERROR_LEVEL_ALL,
+  /** All warnings, including those considered 'reasonable to use,
+      on occasion, in clean programs' (man 3 gcc). */
+  ERROR_LEVEL_PEDANTIC,
+  /** 'informational' warnings */
+  ERROR_LEVEL_INFO,
+  /** Most warnings. */
+  ERROR_LEVEL_WARNING,
+  /** Errors only. */
+  ERROR_LEVEL_ERROR
 };
 
 typedef enum _ERROR_LOG_LEVEL ERROR_LOG_LEVEL;
 
 struct SDCCERRG {
-    ERROR_LOG_LEVEL logLevel;
-    FILE *out;
-    int style;                        /* 1=MSVC */
-    int werror;                       /* treat the warnings as errors */
-    char disabled[MAX_ERROR_WARNING]; /* 1=warning disabled*/
+  ERROR_LOG_LEVEL logLevel;
+  FILE *out;
+  int style;                        /* 1=MSVC */
+  int werror;                       /* treat the warnings as errors */
+  char disabled[MAX_ERROR_WARNING]; /* 1=warning disabled*/
 };
 
 extern struct SDCCERRG _SDCCERRG;
@@ -258,7 +269,7 @@ SetErrorOut - Set the error output file
 -------------------------------------------------------------------------------
 */
 
-FILE * SetErrorOut(FILE *NewErrorOut) ;
+FILE * SetErrorOut (FILE *NewErrorOut);
 
 /*
 -------------------------------------------------------------------------------
@@ -267,7 +278,7 @@ vwerror - Output a standard eror message with variable number of arguements
 -------------------------------------------------------------------------------
 */
 
-void vwerror (int errNum, va_list marker) ;
+void vwerror (int errNum, va_list marker);
 
 /*
 -------------------------------------------------------------------------------
@@ -276,7 +287,7 @@ werror - Output a standard eror message with variable number of arguements
 -------------------------------------------------------------------------------
 */
 
-void werror (int errNum, ... ) ;
+void werror (int errNum, ... );
 
 /*
 -------------------------------------------------------------------------------
@@ -286,7 +297,7 @@ werrorfl - Output a standard eror message with variable number of arguements.
 -------------------------------------------------------------------------------
 */
 
-void werrorfl (char *newFilename, int newLineno, int errNum, ...) ;
+void werrorfl (char *newFilename, int newLineno, int errNum, ...);
 
 /*
 -------------------------------------------------------------------------------
@@ -295,7 +306,7 @@ fatal - Output a standard eror message with variable number of arguements and
 -------------------------------------------------------------------------------
 */
 
-void fatal (int exitCode, int errNum, ... ) ;
+void fatal (int exitCode, int errNum, ... );
 
 /*
 -------------------------------------------------------------------------------
@@ -303,7 +314,7 @@ style - Change the output error style to MSVC
 -------------------------------------------------------------------------------
 */
 
-void MSVC_style (int style) ;
+void MSVC_style (int style);
 
 /*
 -------------------------------------------------------------------------------
@@ -311,7 +322,7 @@ disabled - Disable output of specified warning
 -------------------------------------------------------------------------------
 */
 
-void setWarningDisabled (int errNum) ;
+void setWarningDisabled (int errNum);
 
 /*
 -------------------------------------------------------------------------------

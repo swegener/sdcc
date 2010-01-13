@@ -17,7 +17,7 @@ else
   LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/ds390 
 endif
 
-SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=reentrant -Wl-r
+SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=__reentrant -Wl-r
 LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 
 OBJEXT = .rel

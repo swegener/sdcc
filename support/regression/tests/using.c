@@ -9,22 +9,24 @@
 
   #ifndef _no_proto
     #if defined (_both)
-      void my_isr (void) interrupt (1) using (1);
+      void my_isr (void) __interrupt (1) __using (1);
     #else
-      void my_isr (void) interrupt (1);
+      void my_isr (void) __interrupt (1);
     #endif
   #endif
 
-  data char array[8];
+  __data char array[8];
 
-  void my_isr (void) interrupt (1) using (1)
+  void
+  my_isr (void) __interrupt (1) __using (1)
   {
     array[array[0]] = 1; //generate some register pressure
   }
 
 #endif
 
-void testUsing (void)
+void
+testUsing (void)
 {
 #if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL)
   ASSERT ((unsigned char)(&array[0]) >= 0x10);

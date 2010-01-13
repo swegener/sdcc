@@ -4,12 +4,12 @@
 
 #include <testfwk.h>
 
-xdata float z;
-xdata float x = 1.0;
+__xdata float z;
+__xdata float x = 1.0;
 
 void
-testBug(void)
+testBug (void)
 {
-    z = x * x;
-    ASSERT( z == 1.0 );
+  z = x * x;
+  ASSERT (z == 1.0);
 }

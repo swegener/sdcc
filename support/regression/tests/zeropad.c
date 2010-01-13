@@ -1,6 +1,6 @@
 /** Zeropad tests.
 
-    storage: auto, idata, pdata, xdata, code,
+    storage: auto, __idata, __pdata, __xdata, __code,
 */
 #ifndef STORAGE
 #define STORAGE_{storage}
@@ -91,45 +91,46 @@ struct z STORAGE funcptrstruct = {
 };
 
 #if !defined (STORAGE_auto)
-void Zeropad(void)
+void
+Zeropad (void)
 {
-  ASSERT(bug1470790[0] == 1);
-  ASSERT(bug1470790[1] == 0);
+  ASSERT (bug1470790[0] == 1);
+  ASSERT (bug1470790[1] == 0);
 #endif //STORAGE_auto
 
-  ASSERT(string1[0] == '\x00');
-  ASSERT(string1[1] == '\x01');
-  ASSERT(string2[0] == '\x00');
-  ASSERT(string2[1] == '\x01');
+  ASSERT (string1[0] == '\x00');
+  ASSERT (string1[1] == '\x01');
+  ASSERT (string2[0] == '\x00');
+  ASSERT (string2[1] == '\x01');
 
-  ASSERT(array[2] == 'c');
-  ASSERT(array[4] == 0);
+  ASSERT (array[2] == 'c');
+  ASSERT (array[4] == 0);
 
 #if TEST_G
-  ASSERT(g[1].a == 'y');
-  ASSERT(g[1].b == 0);
-  ASSERT(g[2].a == 'z');
-  ASSERT(g[2].b == 3);
+  ASSERT (g[1].a == 'y');
+  ASSERT (g[1].b == 0);
+  ASSERT (g[2].a == 'z');
+  ASSERT (g[2].b == 3);
 #endif
 
-  ASSERT(teststruct[0].b[1] ==  2);
-  ASSERT(teststruct[0].b[5] ==  0);
-  ASSERT(teststruct[1].b[0] == 11);
-  ASSERT(teststruct[4].b[9] ==  0);
+  ASSERT (teststruct[0].b[1] ==  2);
+  ASSERT (teststruct[0].b[5] ==  0);
+  ASSERT (teststruct[1].b[0] == 11);
+  ASSERT (teststruct[4].b[9] ==  0);
 
-  ASSERT(sizeof(teststruct[2].a) ==  2);
-  ASSERT(sizeof(teststruct[1].b) == 10);
-  ASSERT(sizeof(teststruct[1])   == 12);
-  ASSERT(sizeof(teststruct)      == 60);
+  ASSERT (sizeof(teststruct[2].a) ==  2);
+  ASSERT (sizeof(teststruct[1].b) == 10);
+  ASSERT (sizeof(teststruct[1])   == 12);
+  ASSERT (sizeof(teststruct)      == 60);
 
 #if FLEXARRAY
-  ASSERT(incompletestruct.a    == 10);
-  ASSERT(incompletestruct.b[0] ==  1);
-  ASSERT(incompletestruct.b[4] ==  5);
+  ASSERT (incompletestruct.a    == 10);
+  ASSERT (incompletestruct.b[0] ==  1);
+  ASSERT (incompletestruct.b[4] ==  5);
 
-  ASSERT(sizeof(incompletestruct) == sizeof(struct y));
-  ASSERT(sizeof(incompletestruct) == offsetof(struct y, b));
-  ASSERT(sizeof(incompletestruct) == offsetof(struct x, b));
+  ASSERT (sizeof (incompletestruct) == sizeof (struct y));
+  ASSERT (sizeof (incompletestruct) == offsetof (struct y, b));
+  ASSERT (sizeof (incompletestruct) == offsetof (struct x, b));
 #endif
 
 #if defined (STORAGE_auto)
@@ -143,11 +144,11 @@ void Zeropad(void)
 }
 
 void
-testZeropad(void)
+testZeropad (void)
 {
-  Zeropad();
+  Zeropad ();
 
 #if defined (STORAGE_auto)
-  Zeropad(); //test reinitialization
+  Zeropad (); //test reinitialization
 #endif //STORAGE_auto
 }

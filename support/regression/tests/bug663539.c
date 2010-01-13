@@ -5,11 +5,11 @@
 #include <testfwk.h>
 
 #if defined (SDCC_ds390) || defined (SDCC_mcs51)
-  volatile xdata at 0x7654 char x;
+  volatile __xdata __at 0x7654 char x;
 #endif
 
 void
-test_volatile(void)
+test_volatile (void)
 {
   ASSERT (1);
 

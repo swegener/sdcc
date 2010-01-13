@@ -31,12 +31,13 @@
 #endif
 
 
-static float dummy(float a)
+static float
+dummy (float a)
 {
-    return a;
+  return a;
 }
 
-typedef float (*float_test_func)(float) reentrant;
+typedef float (*float_test_func)(float) __reentrant;
 
 /* the table with functions, their argument, expected result, tolerance.
    For most 8-bitters each testpoint uses 14 bytes so we could have a few:) */
@@ -204,21 +205,21 @@ static const testpoint[] =
 
 
 void
-testFloat(void)
+testFloat (void)
 {
-    unsigned char i;
-    float result, rel_error;
+  unsigned char i;
+  float result, rel_error;
 
-    for( i = 0; i < sizeof testpoint / sizeof testpoint[0]; i++ ) {
+  for ( i = 0; i < sizeof testpoint / sizeof testpoint[0]; i++ )
+    {
+      result = testpoint[i].f (testpoint[i].arg);
 
-        result = testpoint[i].f(testpoint[i].arg);
+      rel_error = testpoint[i].result ? result/testpoint[i].result - 1.0 : result;
 
-        rel_error = testpoint[i].result ? result/testpoint[i].result - 1.0 : result;
+      DEBUG (printf ("Test No: %d f(%f) = %f should: %f rel_error: %f %s\n",
+                     i, testpoint[i].arg, result, testpoint[i].result, rel_error,
+                     (fabsf (rel_error) < testpoint[i].tolerance) ? "Ok" : "Fail");)
 
-        DEBUG(printf ("Test No: %d f(%f) = %f should: %f rel_error: %f %s\n",
-                      i, testpoint[i].arg, result, testpoint[i].result, rel_error,
-                      (fabsf(rel_error) < testpoint[i].tolerance) ? "Ok" : "Fail");)
-
-        ASSERT(fabsf(rel_error) < testpoint[i].tolerance);
+      ASSERT (fabsf (rel_error) < testpoint[i].tolerance);
     }
 }

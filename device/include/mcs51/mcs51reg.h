@@ -1520,12 +1520,12 @@
 
 #ifdef ACC
 #undef ACC
-sfr at 0xE0 ACC         ;
+__sfr __at 0xE0 ACC         ;
 #endif
 
 #ifdef ACON__PAGEE__PAGES1__PAGES0__x__x__x__x__x
 #undef ACON__PAGEE__PAGES1__PAGES0__x__x__x__x__x
-sfr at 0x9D ACON        ; // DS89C420 specific
+__sfr __at 0x9D ACON        ; // DS89C420 specific
 // Not directly accessible bits
 #define PAGES0      0x20
 #define PAGES1      0x40
@@ -1534,7 +1534,7 @@ sfr at 0x9D ACON        ; // DS89C420 specific
 
 #ifdef ACON__x__x__x__x__x__SA__AM1__AM0
 #undef ACON__x__x__x__x__x__SA__AM1__AM0
-sfr at 0x9D ACON        ; // DS89C390 specific
+__sfr __at 0x9D ACON        ; // DS89C390 specific
 // Not directly accessible bits
 #define AM0         0x01
 #define AM1         0x02
@@ -1543,35 +1543,35 @@ sfr at 0x9D ACON        ; // DS89C390 specific
 
 #ifdef ADCH_AT_0XC6
 #undef ADCH_AT_0XC6
-sfr at 0xC6 ADCH        ; // A/D converter high
+__sfr __at 0xC6 ADCH        ; // A/D converter high
 #endif
 
 #ifdef ADCON
 #undef ADCON
-sfr at 0xD8 ADCON       ; // A/D-converter control register SAB80515 specific
+__sfr __at 0xD8 ADCON       ; // A/D-converter control register SAB80515 specific
 // Bit registers
-sbit at 0xD8 MX0        ;
-sbit at 0xD9 MX1        ;
-sbit at 0xDA MX2        ;
-sbit at 0xDB ADM        ;
-sbit at 0xDC BSY        ;
-sbit at 0xDE CLK        ;
-sbit at 0xDF BD         ;
+__sbit __at 0xD8 MX0        ;
+__sbit __at 0xD9 MX1        ;
+__sbit __at 0xDA MX2        ;
+__sbit __at 0xDB ADM        ;
+__sbit __at 0xDC BSY        ;
+__sbit __at 0xDE CLK        ;
+__sbit __at 0xDF BD         ;
 #endif
 
 // ADCON0 ... Infineon / Siemens also called this register ADCON in the User Manual
 #ifdef ADCON0
 #undef ADCON0
-sfr at 0xD8 ADCON0      ; // A/D-converter control register 0 SAB80515A &
+__sfr __at 0xD8 ADCON0      ; // A/D-converter control register 0 SAB80515A &
 // Bit registers          // SAB80517 specific
-sbit at 0xD8 MX0        ;
-sbit at 0xD9 MX1        ;
-sbit at 0xDA MX2        ;
-sbit at 0xDB ADM        ;
-sbit at 0xDC BSY        ;
-sbit at 0xDD ADEX       ;
-sbit at 0xDE CLK        ;
-sbit at 0xDF BD         ;
+__sbit __at 0xD8 MX0        ;
+__sbit __at 0xD9 MX1        ;
+__sbit __at 0xDA MX2        ;
+__sbit __at 0xDB ADM        ;
+__sbit __at 0xDC BSY        ;
+__sbit __at 0xDD ADEX       ;
+__sbit __at 0xDE CLK        ;
+__sbit __at 0xDF BD         ;
 // Not directly accessible ADCON0
 #define ADCON0_MX0  0x01
 #define ADCON0_MX1  0x02
@@ -1585,7 +1585,7 @@ sbit at 0xDF BD         ;
 
 #ifdef ADCON1
 #undef ADCON1
-sfr at 0xDC ADCON1      ; // A/D-converter control register 1 SAB80515A & SAB80517 specific
+__sfr __at 0xDC ADCON1      ; // A/D-converter control register 1 SAB80515A & SAB80517 specific
 // Not directly accessible ADCON1
 #define ADCON1_MX0  0x01
 #define ADCON1_MX1  0x02
@@ -1595,7 +1595,7 @@ sfr at 0xDC ADCON1      ; // A/D-converter control register 1 SAB80515A & SAB805
 
 #ifdef ADCON__ADC_1__ADC_0__ADEX__ADCI__ADCS__AADR2__AADR1__AADR0
 #undef ADCON__ADC_1__ADC_0__ADEX__ADCI__ADCS__AADR2__AADR1__AADR0
-sfr at 0xC5 ADCON       ; // A/D control, P80C552 specific
+__sfr __at 0xC5 ADCON       ; // A/D control, P80C552 specific
 // Not directly accessible Bits.
 #define AADR0       0x01
 #define AADR1       0x02
@@ -1609,33 +1609,33 @@ sfr at 0xC5 ADCON       ; // A/D control, P80C552 specific
 
 #ifdef ADDAT
 #undef ADDAT
-sfr at 0xD9 ADDAT       ; // A/D-converter data register SAB80515 specific
+__sfr __at 0xD9 ADDAT       ; // A/D-converter data register SAB80515 specific
 #endif
 
 #ifdef ADDATH
 #undef ADDATH
-sfr at 0xD9 ADDATH      ; // A/D data high byte SAB80515A specific
+__sfr __at 0xD9 ADDATH      ; // A/D data high byte SAB80515A specific
 #endif
 
 #ifdef ADDATL
 #undef ADDATL
-sfr at 0xDA ADDATL      ; // A/D data low byte SAB80515A specific
+__sfr __at 0xDA ADDATL      ; // A/D data low byte SAB80515A specific
 #endif
 
 #ifdef ARCON
 #undef ARCON
-sfr at 0xEF ARCON       ; // arithmetic control register SAB80517
+__sfr __at 0xEF ARCON       ; // arithmetic control register SAB80517
 #endif
 
 #ifdef AP
 #undef AP
-sfr at 0x9C AP          ; // DS80C390
+__sfr __at 0x9C AP          ; // DS80C390
 #endif
 
 #ifdef AUXR__x__x__x__x__x__x__EXTRAM__A0
 #undef AUXR__x__x__x__x__x__x__EXTRAM__A0
 // P89C668 specific, Auxilary
-sfr at 0x8E AUXR        ;
+__sfr __at 0x8E AUXR        ;
 // not bit addressable:
 #define EXTRAM      0x02
 #define A0          0x01
@@ -1643,7 +1643,7 @@ sfr at 0x8E AUXR        ;
 
 #ifdef AUXR__x__x__M0__x__XRS1__XRS0__EXTRAM__A0
 #undef AUXR__x__x__M0__x__XRS1__XRS0__EXTRAM__A0
-sfr at 0x8E AUXR        ;
+__sfr __at 0x8E AUXR        ;
 #define AO          0x01
 #define EXTRAM      0x02
 #define XRS0        0x04
@@ -1652,21 +1652,21 @@ sfr at 0x8E AUXR        ;
 #endif
 #ifdef B
 #undef B
-sfr at 0xF0 B           ;
+__sfr __at 0xF0 B           ;
 // Bit registers
-sbit at 0xF0 BREG_F0    ;
-sbit at 0xF1 BREG_F1    ;
-sbit at 0xF2 BREG_F2    ;
-sbit at 0xF3 BREG_F3    ;
-sbit at 0xF4 BREG_F4    ;
-sbit at 0xF5 BREG_F5    ;
-sbit at 0xF6 BREG_F6    ;
-sbit at 0xF7 BREG_F7    ;
+__sbit __at 0xF0 BREG_F0    ;
+__sbit __at 0xF1 BREG_F1    ;
+__sbit __at 0xF2 BREG_F2    ;
+__sbit __at 0xF3 BREG_F3    ;
+__sbit __at 0xF4 BREG_F4    ;
+__sbit __at 0xF5 BREG_F5    ;
+__sbit __at 0xF6 BREG_F6    ;
+__sbit __at 0xF7 BREG_F7    ;
 #endif
 
 #ifdef AUXR1__x__x__x__x__GF3__x__x__DPS
 #undef AUXR1__x__x__x__x__GF3__x__x__DPS
-sfr at 0xA2 AUXR1       ;
+__sfr __at 0xA2 AUXR1       ;
 #define DPS         0x01
 #define GF3         0x08
 #endif
@@ -1674,7 +1674,7 @@ sfr at 0xA2 AUXR1       ;
 #ifdef AUXR1__x__x__ENBOOT__x__GF2__0__x__DPS
 #undef AUXR1__x__x__ENBOOT__x__GF2__0__x__DPS
 // P89C668 specific, Auxilary 1
-sfr at 0xA2 AUXR1       ;
+__sfr __at 0xA2 AUXR1       ;
 #define ENBOOT      0x20
 #define GF2         0x08
 #define ALWAYS_ZERO 0x04
@@ -1683,7 +1683,7 @@ sfr at 0xA2 AUXR1       ;
 
 #ifdef BP2
 #undef BP2
-sfr at 0xC3 BP2         ;
+__sfr __at 0xC3 BP2         ;
 // Not directly accessible bits
 #define MS0         0x01
 #define MS1         0x02
@@ -1695,7 +1695,7 @@ sfr at 0xC3 BP2         ;
 
 #ifdef C0C
 #undef C0C
-sfr at 0xA3 C0C         ; // DS80C390 specific
+__sfr __at 0xA3 C0C         ; // DS80C390 specific
 // Not directly accessible bits
 #define SWINT       0x01
 #define ERCS        0x02
@@ -1709,7 +1709,7 @@ sfr at 0xA3 C0C         ; // DS80C390 specific
 
 #ifdef C0IR
 #undef C0IR
-sfr at 0xA5 C0IR        ; // DS80C390 specific
+__sfr __at 0xA5 C0IR        ; // DS80C390 specific
 // Not directly accessible bits
 #define INTIN0      0x01
 #define INTIN1      0x02
@@ -1723,7 +1723,7 @@ sfr at 0xA5 C0IR        ; // DS80C390 specific
 
 #ifdef C0M1C
 #undef C0M1C
-sfr at 0xAB C0M1C       ; // DS80C390 specific
+__sfr __at 0xAB C0M1C       ; // DS80C390 specific
 // Not directly accessible bits
 #define DTUP        0x01
 #define ROW_TIH     0x02
@@ -1737,92 +1737,92 @@ sfr at 0xAB C0M1C       ; // DS80C390 specific
 
 #ifdef C0M2C
 #undef C0M2C
-sfr at 0xAC C0M2C       ; // DS80C390 specific
+__sfr __at 0xAC C0M2C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M3C
 #undef C0M3C
-sfr at 0xAD C0M3C       ; // DS80C390 specific
+__sfr __at 0xAD C0M3C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M4C
 #undef C0M4C
-sfr at 0xAE C0M4C       ; // DS80C390 specific
+__sfr __at 0xAE C0M4C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M5C
 #undef C0M5C
-sfr at 0xAF C0M5C       ; // DS80C390 specific
+__sfr __at 0xAF C0M5C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M6C
 #undef C0M6C
-sfr at 0xB3 C0M6C       ; // DS80C390 specific
+__sfr __at 0xB3 C0M6C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M7C
 #undef C0M7C
-sfr at 0xB4 C0M7C       ; // DS80C390 specific
+__sfr __at 0xB4 C0M7C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M8C
 #undef C0M8C
-sfr at 0xB5 C0M8C       ; // DS80C390 specific
+__sfr __at 0xB5 C0M8C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M9C
 #undef C0M9C
-sfr at 0xB6 C0M9C       ; // DS80C390 specific
+__sfr __at 0xB6 C0M9C       ; // DS80C390 specific
 #endif
 
 #ifdef C0M10C
 #undef C0M10C
-sfr at 0xB7 C0M10C      ; // DS80C390 specific
+__sfr __at 0xB7 C0M10C      ; // DS80C390 specific
 #endif
 
 #ifdef C0M11C
 #undef C0M11C
-sfr at 0xBB C0M11C      ; // DS80C390 specific
+__sfr __at 0xBB C0M11C      ; // DS80C390 specific
 #endif
 
 #ifdef C0M12C
 #undef C0M12C
-sfr at 0xBC C0M12C      ; // DS80C390 specific
+__sfr __at 0xBC C0M12C      ; // DS80C390 specific
 #endif
 
 #ifdef C0M13C
 #undef C0M13C
-sfr at 0xBD C0M13C      ; // DS80C390 specific
+__sfr __at 0xBD C0M13C      ; // DS80C390 specific
 #endif
 
 #ifdef C0M14C
 #undef C0M14C
-sfr at 0xBE C0M14C      ; // DS80C390 specific
+__sfr __at 0xBE C0M14C      ; // DS80C390 specific
 #endif
 
 #ifdef C0M15C
 #undef C0M15C
-sfr at 0xBF C0M15C      ; // DS80C390 specific
+__sfr __at 0xBF C0M15C      ; // DS80C390 specific
 #endif
 
 #ifdef C0RE
 #undef C0RE
-sfr at 0xA7 C0RE        ; // DS80C390 specific
+__sfr __at 0xA7 C0RE        ; // DS80C390 specific
 #endif
 
 #ifdef C0RMS0
 #undef C0RMS0
-sfr at 0x96 C0RMS0      ; // DS80C390 specific
+__sfr __at 0x96 C0RMS0      ; // DS80C390 specific
 #endif
 
 #ifdef C0RMS1
 #undef C0RMS1
-sfr at 0x97 C0RMS1      ; // DS80C390 specific
+__sfr __at 0x97 C0RMS1      ; // DS80C390 specific
 #endif
 
 #ifdef C0S
 #undef C0S
-sfr at 0xA4 C0S         ; // DS80C390 specific
+__sfr __at 0xA4 C0S         ; // DS80C390 specific
 // Not directly accessible bits
 #define ER0         0x01
 #define ER1         0x02
@@ -1836,22 +1836,22 @@ sfr at 0xA4 C0S         ; // DS80C390 specific
 
 #ifdef C0TE
 #undef C0TE
-sfr at 0xA6 C0TE        ; // DS80C390 specific
+__sfr __at 0xA6 C0TE        ; // DS80C390 specific
 #endif
 
 #ifdef C0TMA0
 #undef C0TMA0
-sfr at 0x9E C0TMA0      ; // DS80C390 specific
+__sfr __at 0x9E C0TMA0      ; // DS80C390 specific
 #endif
 
 #ifdef C0TMA1
 #undef C0TMA1
-sfr at 0x9F C0TMA1      ; // DS80C390 specific
+__sfr __at 0x9F C0TMA1      ; // DS80C390 specific
 #endif
 
 #ifdef C1C
 #undef C1C
-sfr at 0xE3 C1C         ; // DS80C390 specific
+__sfr __at 0xE3 C1C         ; // DS80C390 specific
 // Not directly accessible bits
 #define SWINT       0x01
 #define ERCS        0x02
@@ -1865,7 +1865,7 @@ sfr at 0xE3 C1C         ; // DS80C390 specific
 
 #ifdef C1IR
 #undef C1IR
-sfr at 0xE5 C1IR        ; // DS80C390 specific
+__sfr __at 0xE5 C1IR        ; // DS80C390 specific
 // Not directly accessible bits
 #define INTIN0      0x01
 #define INTIN1      0x02
@@ -1879,87 +1879,87 @@ sfr at 0xE5 C1IR        ; // DS80C390 specific
 
 #ifdef C1IRE
 #undef C1IRE
-sfr at 0xE7 C1RE        ; // DS80C390 specific
+__sfr __at 0xE7 C1RE        ; // DS80C390 specific
 #endif
 
 #ifdef C1M1C
 #undef C1M1C
-sfr at 0xEB C1M1C       ; // DS80C390 specific
+__sfr __at 0xEB C1M1C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M2C
 #undef C1M2C
-sfr at 0xEC C1M2C       ; // DS80C390 specific
+__sfr __at 0xEC C1M2C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M3C
 #undef C1M3C
-sfr at 0xED C1M3C       ; // DS80C390 specific
+__sfr __at 0xED C1M3C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M4C
 #undef C1M4C
-sfr at 0xEE C1M4C       ; // DS80C390 specific
+__sfr __at 0xEE C1M4C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M5C
 #undef C1M5C
-sfr at 0xEF C1M5C       ; // DS80C390 specific
+__sfr __at 0xEF C1M5C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M6C
 #undef C1M6C
-sfr at 0xF3 C1M6C       ; // DS80C390 specific
+__sfr __at 0xF3 C1M6C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M7C
 #undef C1M7C
-sfr at 0xF4 C1M7C       ; // DS80C390 specific
+__sfr __at 0xF4 C1M7C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M8C
 #undef C1M8C
-sfr at 0xF5 C1M8C       ; // DS80C390 specific
+__sfr __at 0xF5 C1M8C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M9C
 #undef C1M9C
-sfr at 0xF6 C1M9C       ; // DS80C390 specific
+__sfr __at 0xF6 C1M9C       ; // DS80C390 specific
 #endif
 
 #ifdef C1M10C
 #undef C1M10C
-sfr at 0xF7 C1M10C      ; // DS80C390 specific
+__sfr __at 0xF7 C1M10C      ; // DS80C390 specific
 #endif
 
 #ifdef C1M11C
 #undef C1M11C
-sfr at 0xFB C1M11C      ; // DS80C390 specific
+__sfr __at 0xFB C1M11C      ; // DS80C390 specific
 #endif
 
 #ifdef C1M12C
 #undef C1M12C
-sfr at 0xFC C1M12C      ; // DS80C390 specific
+__sfr __at 0xFC C1M12C      ; // DS80C390 specific
 #endif
 
 #ifdef C1M13C
 #undef C1M13C
-sfr at 0xFD C1M13C      ; // DS80C390 specific
+__sfr __at 0xFD C1M13C      ; // DS80C390 specific
 #endif
 
 #ifdef C1M14C
 #undef C1M14C
-sfr at 0xFE C1M14C      ; // DS80C390 specific
+__sfr __at 0xFE C1M14C      ; // DS80C390 specific
 #endif
 
 #ifdef C1M15C
 #undef C1M15C
-sfr at 0xFF C1M15C      ; // DS80C390 specific
+__sfr __at 0xFF C1M15C      ; // DS80C390 specific
 #endif
 
 #ifdef C1S
 #undef C1S
-sfr at 0xE4 C1S         ; // DS80C390 specific
+__sfr __at 0xE4 C1S         ; // DS80C390 specific
 // Not directly accessible bits
 #define ER0         0x01
 #define ER1         0x02
@@ -1973,113 +1973,113 @@ sfr at 0xE4 C1S         ; // DS80C390 specific
 
 #ifdef C1ITE
 #undef C1ITE
-sfr at 0xE6 C1TE        ; // DS80C390 specific
+__sfr __at 0xE6 C1TE        ; // DS80C390 specific
 #endif
 
 #ifdef C1RSM0
 #undef C1RSM0
-sfr at 0xD6 C1RSM0      ; // DS80C390 specific
+__sfr __at 0xD6 C1RSM0      ; // DS80C390 specific
 #endif
 
 #ifdef C1RSM1
 #undef C1RSM1
-sfr at 0xD7 C1RSM1      ; // DS80C390 specific
+__sfr __at 0xD7 C1RSM1      ; // DS80C390 specific
 #endif
 
 #ifdef C1TMA0
 #undef C1TMA0
-sfr at 0xDE C1TMA0      ; // DS80C390 specific
+__sfr __at 0xDE C1TMA0      ; // DS80C390 specific
 #endif
 
 #ifdef C1TMA1
 #undef C1TMA1
-sfr at 0xDF C1TMA1      ; // DS80C390 specific
+__sfr __at 0xDF C1TMA1      ; // DS80C390 specific
 #endif
 
 #ifdef CC1
 #undef CC1
-sfr at 0xC2 CC1;
+__sfr __at 0xC2 CC1;
 #endif
 
 #ifdef CC2
 #undef CC2
-sfr at 0xC4 CC2;
+__sfr __at 0xC4 CC2;
 #endif
 
 #ifdef CC3
 #undef CC3
-sfr at 0xC6 CC3;
+__sfr __at 0xC6 CC3;
 #endif
 
 #ifdef CC4
 #undef CC4
-sfr at 0xCE CC4;
+__sfr __at 0xCE CC4;
 #endif
 
 #ifdef CC4EN
 #undef CC4EN
-sfr at 0xC9 CC4EN       ; // compare/capture 4 enable register SAB80517 specific
+__sfr __at 0xC9 CC4EN       ; // compare/capture 4 enable register SAB80517 specific
 #endif
 
 #ifdef CCAP0H_AT_0XFA
 #undef CCAP0H_AT_0XFA
-sfr at 0xFA CCAP0H      ;
+__sfr __at 0xFA CCAP0H      ;
 #endif
 
 #ifdef CCAP1H_AT_0XFB
 #undef CCAP1H_AT_0XFB
-sfr at 0xFB CCAP1H      ;
+__sfr __at 0xFB CCAP1H      ;
 #endif
 
 #ifdef CCAP2H_AT_0XFC
 #undef CCAP2H_AT_0XFC
-sfr at 0xFC CCAP2H      ;
+__sfr __at 0xFC CCAP2H      ;
 #endif
 
 #ifdef CCAP3H_AT_0XFD
 #undef CCAP3H_AT_0XFD
-sfr at 0xFD CCAP3H      ;
+__sfr __at 0xFD CCAP3H      ;
 #endif
 
 #ifdef CCAP4H_AT_0XFE
 #undef CCAP4H_AT_0XFE
-sfr at 0xFE CCAP4H      ;
+__sfr __at 0xFE CCAP4H      ;
 #endif
 
 #ifdef CCAP0L_AT_0XEA
 #undef CCAP0L_AT_0XEA
-sfr at 0xEA CCAP0L      ;
+__sfr __at 0xEA CCAP0L      ;
 #endif
 
 #ifdef CCAP1L_AT_0XEB
 #undef CCAP1L_AT_0XEB
-sfr at 0xEB CCAP1L      ;
+__sfr __at 0xEB CCAP1L      ;
 #endif
 
 #ifdef CCAP2L_AT_0XEC
 #undef CCAP2L_AT_0XEC
-sfr at 0xEC CCAP2L      ;
+__sfr __at 0xEC CCAP2L      ;
 #endif
 
 #ifdef CCAP3L_AT_0XED
 #undef CCAP3L_AT_0XED
-sfr at 0xED CCAP3L      ;
+__sfr __at 0xED CCAP3L      ;
 #endif
 
 #ifdef CCAP4L_AT_0XEE
 #undef CCAP4L_AT_0XEE
-sfr at 0xEE CCAP4L      ;
+__sfr __at 0xEE CCAP4L      ;
 #endif
 
 #ifdef CCAPM0_AT_0XC2
 #undef CCAPM0_AT_0XC2
 // P89C668 specific, Capture module:
-sfr at 0xC2 CCAPM0      ;
+__sfr __at 0xC2 CCAPM0      ;
 #endif
 
 #ifdef CCAPM0_AT_0XDA
 #undef CCAPM0_AT_0XDA
-sfr at 0xDA CCAPM0      ;
+__sfr __at 0xDA CCAPM0      ;
 #define ECCF        0x01
 #define PWM         0x02
 #define TOG         0x04
@@ -2091,131 +2091,131 @@ sfr at 0xDA CCAPM0      ;
 
 #ifdef CCAPM1_AT_0XC3
 #undef CCAPM1_AT_0XC3
-sfr at 0xC3 CCAPM1      ;
+__sfr __at 0xC3 CCAPM1      ;
 #endif
 
 #ifdef CCAPM1_AT_0XDB
 #undef CCAPM1_AT_0XDB
-sfr at 0xDB CCAPM1      ;
+__sfr __at 0xDB CCAPM1      ;
 #endif
 
 #ifdef CCAPM2_AT_0XC4
 #undef CCAPM2_AT_0XC4
-sfr at 0xC4 CCAPM2      ;
+__sfr __at 0xC4 CCAPM2      ;
 #endif
 
 #ifdef CCAPM2_AT_0XDC
 #undef CCAPM2_AT_0XDC
-sfr at 0x0DC CCAPM2     ;
+__sfr __at 0x0DC CCAPM2     ;
 #endif
 
 #ifdef CCAPM3_AT_0XC5
 #undef CCAPM3_AT_0XC5
-sfr at 0xC5 CCAPM3      ;
+__sfr __at 0xC5 CCAPM3      ;
 #endif
 
 #ifdef CCAPM3_AT_0XDD
 #undef CCAPM3_AT_0XDD
-sfr at 0x0DD CCAPM3     ;
+__sfr __at 0x0DD CCAPM3     ;
 #endif
 
 #ifdef CCAPM4_AT_0XDE
 #undef CCAPM4_AT_0XDE
-sfr at 0x0DE CCAPM4     ;
+__sfr __at 0x0DE CCAPM4     ;
 #endif
 
 #ifdef CCAPM4_AT_0XC6
 #undef CCAPM4_AT_0XC6
-sfr at 0xC6 CCAPM4      ;
+__sfr __at 0xC6 CCAPM4      ;
 #endif
 
 #ifdef CCEN
 #undef CCEN
-sfr at 0xC1 CCEN        ; // compare/capture enable register SAB80515 specific
+__sfr __at 0xC1 CCEN        ; // compare/capture enable register SAB80515 specific
 #endif
 
 #ifdef CCH1
 #undef CCH1
-sfr at 0xC3 CCH1        ; // compare/capture register 1, high byte SAB80515 specific
+__sfr __at 0xC3 CCH1        ; // compare/capture register 1, high byte SAB80515 specific
 #endif
 
 #ifdef CCH2
 #undef CCH2
-sfr at 0xC5 CCH2        ; // compare/capture register 2, high byte SAB80515 specific
+__sfr __at 0xC5 CCH2        ; // compare/capture register 2, high byte SAB80515 specific
 #endif
 
 #ifdef CCH3
 #undef CCH3
-sfr at 0xC7 CCH3        ; // compare/capture register 3, high byte SAB80515 specific
+__sfr __at 0xC7 CCH3        ; // compare/capture register 3, high byte SAB80515 specific
 #endif
 
 #ifdef CCH4
 #undef CCH4
-sfr at 0xCF CCH4        ; // compare/capture register 4, high byte SAB80515 specific
+__sfr __at 0xCF CCH4        ; // compare/capture register 4, high byte SAB80515 specific
 #endif
 
 #ifdef CCL1
 #undef CCL1
-sfr at 0xC2 CCL1        ; // compare/capture register 1, low byte SAB80515 specific
+__sfr __at 0xC2 CCL1        ; // compare/capture register 1, low byte SAB80515 specific
 #endif
 
 #ifdef CCL2
 #undef CCL2
-sfr at 0xC4 CCL2        ; // compare/capture register 2, low byte SAB80515 specific
+__sfr __at 0xC4 CCL2        ; // compare/capture register 2, low byte SAB80515 specific
 #endif
 
 #ifdef CCL3
 #undef CCL3
-sfr at 0xC6 CCL3        ; // compare/capture register 3, low byte SAB80515 specific
+__sfr __at 0xC6 CCL3        ; // compare/capture register 3, low byte SAB80515 specific
 #endif
 
 #ifdef CCL4
 #undef CCL4
-sfr at 0xCE CCL4        ; // compare/capture register 4, low byte SAB80515 specific
+__sfr __at 0xCE CCL4        ; // compare/capture register 4, low byte SAB80515 specific
 #endif
 
 #ifdef CCON__0xD8__CF__CR__x__CCF4__CCF3__CCF2__CCF1__CCF0
 #undef CCON__0xD8__CF__CR__x__CCF4__CCF3__CCF2__CCF1__CCF0
-sfr at 0xD8 CCON        ; // T89C51RD2 specific register
+__sfr __at 0xD8 CCON        ; // T89C51RD2 specific register
 // Bit registers
-sbit at 0xD8 CCF0       ;
-sbit at 0xD9 CCF1       ;
-sbit at 0xDA CCF2       ;
-sbit at 0xDB CCF3       ;
-sbit at 0xDC CCF4       ;
-sbit at 0xDE CR         ;
-sbit at 0xDF CF         ;
+__sbit __at 0xD8 CCF0       ;
+__sbit __at 0xD9 CCF1       ;
+__sbit __at 0xDA CCF2       ;
+__sbit __at 0xDB CCF3       ;
+__sbit __at 0xDC CCF4       ;
+__sbit __at 0xDE CR         ;
+__sbit __at 0xDF CF         ;
 #endif
 
 #ifdef CCON__CF__CR__x__CCF4__CCF3__CCF2__CCF1__CCF0
 #undef CCON__CF__CR__x__CCF4__CCF3__CCF2__CCF1__CCF0
 // P89C668 specific, PCA Counter control:
-sfr at 0xC0 CCON        ;
+__sfr __at 0xC0 CCON        ;
 // Bit registers
-sbit at 0xC0 CCF0       ;
-sbit at 0xC1 CCF1       ;
-sbit at 0xC2 CCF2       ;
-sbit at 0xC3 CCF3       ;
-sbit at 0xC4 CCF4       ;
-//sbit at 0xC5 -
-sbit at 0xC6 CR         ;
-sbit at 0xC7 CF         ;
+__sbit __at 0xC0 CCF0       ;
+__sbit __at 0xC1 CCF1       ;
+__sbit __at 0xC2 CCF2       ;
+__sbit __at 0xC3 CCF3       ;
+__sbit __at 0xC4 CCF4       ;
+//__sbit __at 0xC5 -
+__sbit __at 0xC6 CR         ;
+__sbit __at 0xC7 CF         ;
 #endif
 
 #ifdef CCR
 #undef CCR
-sfr at 0xCA CCR;
+__sfr __at 0xCA CCR;
 #endif
 
 #ifdef CH_AT_0XF9
 #undef CH_AT_0XF9
-sfr at 0xF9 CH          ;
+__sfr __at 0xF9 CH          ;
 #endif
 
 #ifdef CMOD__CIDL__WDTE__x__x__x__CPS1__CPS0__ECF
 #undef CMOD__CIDL__WDTE__x__x__x__CPS1__CPS0__ECF
 // P89C668 specific, PCA Counter mode:
-sfr at 0xC1 CMOD        ;
+__sfr __at 0xC1 CMOD        ;
 // not bit addressable:
 #define CIDL        0x80
 #define WDTE        0x40
@@ -2226,7 +2226,7 @@ sfr at 0xC1 CMOD        ;
 
 #ifdef CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
 #undef CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
-sfr at 0x8E CKCON       ; // DS80C320 & DS80C390 specific
+__sfr __at 0x8E CKCON       ; // DS80C320 & DS80C390 specific
 // Not directly accessible Bits.
 #define MD0         0x01
 #define MD1         0x02
@@ -2240,7 +2240,7 @@ sfr at 0x8E CKCON       ; // DS80C320 & DS80C390 specific
 
 #ifdef CKCON__X2__T0X2__T1X2__T2X2__SiX2__PcaX2__WdX2__x
 #undef CKCON__X2__T0X2__T1X2__T2X2__SiX2__PcaX2__WdX2__x
-sfr at 0x8F CKCON       ;
+__sfr __at 0x8F CKCON       ;
 #define X2          0x01
 #define T0X2        0x02
 #define T1X2        0x04
@@ -2252,7 +2252,7 @@ sfr at 0x8F CKCON       ;
 
 #ifdef CKMOD
 #undef CKMOD
-sfr at 0x96 CKMOD       ; // DS89C420 specific
+__sfr __at 0x96 CKMOD       ; // DS89C420 specific
 // Not directly accessible Bits.
 #define T0MH        0x08
 #define T1MH        0x10
@@ -2261,132 +2261,132 @@ sfr at 0x96 CKMOD       ; // DS89C420 specific
 
 #ifdef CL_AT_0XE9
 #undef CL_AT_0XE9
-sfr at 0xE9 CL          ;
+__sfr __at 0xE9 CL          ;
 #endif
 
 #ifdef CLRMSK
 #undef CLRMSK
-sfr at 0xA6 CLRMSK;
+__sfr __at 0xA6 CLRMSK;
 #endif
 
 #ifdef CMEN
 #undef CMEN
-sfr at 0xF6 CMEN        ; // compare enable register SAB80517 specific
+__sfr __at 0xF6 CMEN        ; // compare enable register SAB80517 specific
 #endif
 
 #ifdef CMH0
 #undef CMH0
-sfr at 0xD3 CMH0        ; // compare register 0 high byte SAB80517 specific
+__sfr __at 0xD3 CMH0        ; // compare register 0 high byte SAB80517 specific
 #endif
 
 #ifdef CMH1
 #undef CMH1
-sfr at 0xD5 CMH1        ; // compare register 1 high byte SAB80517 specific
+__sfr __at 0xD5 CMH1        ; // compare register 1 high byte SAB80517 specific
 #endif
 
 #ifdef CMH2
 #undef CMH2
-sfr at 0xD7 CMH2        ; // compare register 2 high byte SAB80517 specific
+__sfr __at 0xD7 CMH2        ; // compare register 2 high byte SAB80517 specific
 #endif
 
 #ifdef CMH3
 #undef CMH3
-sfr at 0xE3 CMH3        ; // compare register 3 high byte SAB80517 specific
+__sfr __at 0xE3 CMH3        ; // compare register 3 high byte SAB80517 specific
 #endif
 
 #ifdef CMH4
 #undef CMH4
-sfr at 0xE5 CMH4        ; // compare register 4 high byte SAB80517 specific
+__sfr __at 0xE5 CMH4        ; // compare register 4 high byte SAB80517 specific
 #endif
 
 #ifdef CMH5
 #undef CMH5
-sfr at 0xE7 CMH5        ; // compare register 5 high byte SAB80517 specific
+__sfr __at 0xE7 CMH5        ; // compare register 5 high byte SAB80517 specific
 #endif
 
 #ifdef CMH6
 #undef CMH6
-sfr at 0xF3 CMH6        ; // compare register 6 high byte SAB80517 specific
+__sfr __at 0xF3 CMH6        ; // compare register 6 high byte SAB80517 specific
 #endif
 
 #ifdef CMH7
 #undef CMH7
-sfr at 0xF5 CMH7        ; // compare register 7 high byte SAB80517 specific
+__sfr __at 0xF5 CMH7        ; // compare register 7 high byte SAB80517 specific
 #endif
 
 #ifdef CMH0_AT_0XC9
 #undef CMH0_AT_0XC9
-sfr at 0xC9 CMH0        ; // Compare high 0, P80C552 specific
+__sfr __at 0xC9 CMH0        ; // Compare high 0, P80C552 specific
 #endif
 
 #ifdef CMH1_AT_0XCA
 #undef CMH1_AT_0XCA
-sfr at 0xCA CMH1        ; // Compare high 1, P80C552 specific
+__sfr __at 0xCA CMH1        ; // Compare high 1, P80C552 specific
 #endif
 
 #ifdef CMH2_AT_0XCB
 #undef CMH2_AT_0XCB
-sfr at 0xCB CMH2        ; // Compare high 2, P80C552 specific
+__sfr __at 0xCB CMH2        ; // Compare high 2, P80C552 specific
 #endif
 
 #ifdef CML0
 #undef CML0
-sfr at 0xD2 CML0        ; // compare register 0 low byte SAB80517 specific
+__sfr __at 0xD2 CML0        ; // compare register 0 low byte SAB80517 specific
 #endif
 
 #ifdef CML1
 #undef CML1
-sfr at 0xD4 CML1        ; // compare register 1 low byte SAB80517 specific
+__sfr __at 0xD4 CML1        ; // compare register 1 low byte SAB80517 specific
 #endif
 
 #ifdef CML2
 #undef CML2
-sfr at 0xD6 CML2        ; // compare register 2 low byte SAB80517 specific
+__sfr __at 0xD6 CML2        ; // compare register 2 low byte SAB80517 specific
 #endif
 
 #ifdef CML3
 #undef CML3
-sfr at 0xE2 CML3        ; // compare register 3 low byte SAB80517 specific
+__sfr __at 0xE2 CML3        ; // compare register 3 low byte SAB80517 specific
 #endif
 
 #ifdef CML4
 #undef CML4
-sfr at 0xE4 CML4        ; // compare register 4 low byte SAB80517 specific
+__sfr __at 0xE4 CML4        ; // compare register 4 low byte SAB80517 specific
 #endif
 
 #ifdef CML5
 #undef CML5
-sfr at 0xE6 CML5        ; // compare register 5 low byte SAB80517 specific
+__sfr __at 0xE6 CML5        ; // compare register 5 low byte SAB80517 specific
 #endif
 
 #ifdef CML6
 #undef CML6
-sfr at 0xF2 CML6        ; // compare register 6 low byte SAB80517 specific
+__sfr __at 0xF2 CML6        ; // compare register 6 low byte SAB80517 specific
 #endif
 
 #ifdef CML7
 #undef CML7
-sfr at 0xF4 CML7        ; // compare register 7 low byte SAB80517 specific
+__sfr __at 0xF4 CML7        ; // compare register 7 low byte SAB80517 specific
 #endif
 
 #ifdef CML0_AT_0XA9
 #undef CML0_AT_0XA9
-sfr at 0xA9 CML0        ; // Compare low 0, P80C552 specific
+__sfr __at 0xA9 CML0        ; // Compare low 0, P80C552 specific
 #endif
 
 #ifdef CML1_AT_0XAA
 #undef CML1_AT_0XAA
-sfr at 0xAA CML1        ; // Compare low 1, P80C552 specific
+__sfr __at 0xAA CML1        ; // Compare low 1, P80C552 specific
 #endif
 
 #ifdef CML2_AT_0XAB
 #undef CML2_AT_0XAB
-sfr at 0xAB CML2        ; // Compare low 2, P80C552 specific
+__sfr __at 0xAB CML2        ; // Compare low 2, P80C552 specific
 #endif
 
 #ifdef CMOD__0xD9__CIDL__WDTE__x__x__x__CPS1__CPS0__ECF
 #undef CMOD__0xD9__CIDL__WDTE__x__x__x__CPS1__CPS0__ECF
-sfr at 0xD9 CMOD        ;
+__sfr __at 0xD9 CMOD        ;
 #define ECF         0x01
 #define CPS0        0x02
 #define CPS1        0x04
@@ -2396,32 +2396,32 @@ sfr at 0xD9 CMOD        ;
 
 #ifdef CMSEL
 #undef CMSEL
-sfr at 0xF7 CMSEL       ; // compare input select SAB80517
+__sfr __at 0xF7 CMSEL       ; // compare input select SAB80517
 #endif
 
 #ifdef COMCLRH
 #undef COMCLRH
-sfr at 0xA4 COMCLRH;
+__sfr __at 0xA4 COMCLRH;
 #endif
 
 #ifdef COMCLRL
 #undef COMCLRL
-sfr at 0xA3 COMCLRL;
+__sfr __at 0xA3 COMCLRL;
 #endif
 
 #ifdef COMSETH
 #undef COMSETH
-sfr at 0xA2 COMSETH;
+__sfr __at 0xA2 COMSETH;
 #endif
 
 #ifdef COMSETL
 #undef COMSETL
-sfr at 0xA1 COMSETL;
+__sfr __at 0xA1 COMSETL;
 #endif
 
 #ifdef COR
 #undef COR
-sfr at 0xCE COR         ; // Dallas DS80C390 specific
+__sfr __at 0xCE COR         ; // Dallas DS80C390 specific
 #define CLKOE       0x01
 #define COD0        0x02
 #define COD1        0x04
@@ -2434,7 +2434,7 @@ sfr at 0xCE COR         ; // Dallas DS80C390 specific
 
 #ifdef CRC
 #undef CRC
-sfr at 0xC1 CRC         ; // Dallas DS5001 specific
+__sfr __at 0xC1 CRC         ; // Dallas DS5001 specific
 #define CRC_        0x01
 #define MDM         0x02
 #define RNGE0       0x10
@@ -2445,37 +2445,37 @@ sfr at 0xC1 CRC         ; // Dallas DS5001 specific
 
 #ifdef CRCH
 #undef CRCH
-sfr at 0xCB CRCH        ; // compare/reload/capture register, high byte SAB80515 specific
+__sfr __at 0xCB CRCH        ; // compare/reload/capture register, high byte SAB80515 specific
 #endif
 
 #ifdef CRCHIGH
 #undef CRCHIGH
-sfr at 0xC3 CRCHIGH     ; // DS5001 specific
+__sfr __at 0xC3 CRCHIGH     ; // DS5001 specific
 #endif
 
 #ifdef CRCL
 #undef CRCL
-sfr at 0xCA CRCL        ; // compare/reload/capture register, low byte SAB80515 specific
+__sfr __at 0xCA CRCL        ; // compare/reload/capture register, low byte SAB80515 specific
 #endif
 
 #ifdef CRCLOW
 #undef CRCLOW
-sfr at 0xC2 CRCLOW      ; // DS5001 specific
+__sfr __at 0xC2 CRCLOW      ; // DS5001 specific
 #endif
 
 #ifdef CT1COM
 #undef CT1COM
-sfr at 0xBC CT1COM;
+__sfr __at 0xBC CT1COM;
 #endif
 
 #ifdef CTCOM_AT_0XE1
 #undef CTCOM_AT_0XE1
-sfr at 0xE1 CTCON       ; // com.timer control register SAB80517
+__sfr __at 0xE1 CTCON       ; // com.timer control register SAB80517
 #endif
 
 #ifdef CTCON__CTN3__CTP3__CTN2__CTP2__CTN1__CTP1__CTN0__CTP0
 #undef CTCON__CTN3__CTP3__CTN2__CTP2__CTN1__CTP1__CTN0__CTP0
-sfr at 0xEB CTCON       ; // Capture control, P80C552 specific
+__sfr __at 0xEB CTCON       ; // Capture control, P80C552 specific
 // Not directly accessible Bits.
 #define CTP0        0x01
 #define CTN0        0x02
@@ -2489,98 +2489,98 @@ sfr at 0xEB CTCON       ; // Capture control, P80C552 specific
 
 #ifdef CTH0_AT_0XCC
 #undef CTH0_AT_0XCC
-sfr at 0xCC CTH0        ; // Capture high 0, P80C552 specific
+__sfr __at 0xCC CTH0        ; // Capture high 0, P80C552 specific
 #endif
 
 #ifdef CTH1_AT_0XCD
 #undef CTH1_AT_0XCD
-sfr at 0xCD CTH1        ; // Capture high 1, P80C552 specific
+__sfr __at 0xCD CTH1        ; // Capture high 1, P80C552 specific
 #endif
 
 #ifdef CTH2_AT_0XCE
 #undef CTH2_AT_0XCE
-sfr at 0xCE CTH2        ; // Capture high 2, P80C552 specific
+__sfr __at 0xCE CTH2        ; // Capture high 2, P80C552 specific
 #endif
 
 #ifdef CTH3_AT_0XCF
 #undef CTH3_AT_0XCF
-sfr at 0xCF CTH3        ; // Capture high 3, P80C552 specific
+__sfr __at 0xCF CTH3        ; // Capture high 3, P80C552 specific
 #endif
 
 #ifdef CTL0_AT_0XAC
 #undef CTL0_AT_0XAC
-sfr at 0xAC CTL0        ; // Capture low 0, P80C552 specific
+__sfr __at 0xAC CTL0        ; // Capture low 0, P80C552 specific
 #endif
 
 #ifdef CTL1_AT_0XAD
 #undef CTL1_AT_0XAD
-sfr at 0xAD CTL1        ; // Capture low 1, P80C552 specific
+__sfr __at 0xAD CTL1        ; // Capture low 1, P80C552 specific
 #endif
 
 #ifdef CTL2_AT_0XAE
 #undef CTL2_AT_0XAE
-sfr at 0xAE CTL2        ; // Capture low 2, P80C552 specific
+__sfr __at 0xAE CTL2        ; // Capture low 2, P80C552 specific
 #endif
 
 #ifdef CTL3_AT_0XAF
 #undef CTL3_AT_0XAF
-sfr at 0xAF CTL3        ; // Capture low 3, P80C552 specific
+__sfr __at 0xAF CTL3        ; // Capture low 3, P80C552 specific
 #endif
 
 #ifdef CTRELH
 #undef CTRELH
-sfr at 0xDF CTRELH      ; // com.timer rel register high byte SAB80517
+__sfr __at 0xDF CTRELH      ; // com.timer rel register high byte SAB80517
 #endif
 
 #ifdef CTRELL
 #undef CTRELL
-sfr at 0xDE CTRELL      ; // com.timer rel register low byte SAB80517
+__sfr __at 0xDE CTRELL      ; // com.timer rel register low byte SAB80517
 #endif
 
 #ifdef DAPR__SAB80515
 #undef DAPR__SAB80515
-sfr at 0xDA DAPR        ; // D/A-converter program register SAB80515 specific
+__sfr __at 0xDA DAPR        ; // D/A-converter program register SAB80515 specific
 #endif
 
 #ifdef DAPR__SAB80517
 #undef DAPR__SAB80517
-sfr at 0xDA DAPR        ; // D/A-converter program register SAB80517 specific
+__sfr __at 0xDA DAPR        ; // D/A-converter program register SAB80517 specific
 #endif
 
 #ifdef DPH
 #undef DPH
-sfr at 0x83 DPH         ;
-sfr at 0x83 DP0H        ;  // Alternate name for AT89S53
+__sfr __at 0x83 DPH         ;
+__sfr __at 0x83 DP0H        ;  // Alternate name for AT89S53
 #endif
 
 #ifdef DPH1
 #undef DPH1
-sfr at 0x85 DPH1        ; // DS80C320 specific
-sfr at 0x85 DP1H        ; // Alternate name for AT89S53
+__sfr __at 0x85 DPH1        ; // DS80C320 specific
+__sfr __at 0x85 DP1H        ; // Alternate name for AT89S53
 #endif
 
 #ifdef DPL
 #undef DPL
-sfr at 0x82 DPL         ;  // Alternate name for AT89S53
-sfr at 0x82 DP0L        ;
+__sfr __at 0x82 DPL         ;  // Alternate name for AT89S53
+__sfr __at 0x82 DP0L        ;
 #endif
 
 #ifdef DPL1
 #undef DPL1
-sfr at 0x84 DPL1        ; // DS80C320 specific
-sfr at 0x84 DP1L        ; // Alternate name for AT89S53
+__sfr __at 0x84 DPL1        ; // DS80C320 specific
+__sfr __at 0x84 DP1L        ; // Alternate name for AT89S53
 #endif
 
 #ifdef DPS__x__x__x__x__x__x__x__SEL
 #undef DPS__x__x__x__x__x__x__x__SEL
-sfr at 0x86 DPS         ;
+__sfr __at 0x86 DPS         ;
 // Not directly accessible DPS Bit. DS80C320 & DPS8XC520 specific
 #define SEL         0x01
 #endif
 
 #ifdef DPS__ID1__ID0__TSL__x__x__x__x__SEL
 #undef DPS__ID1__ID0__TSL__x__x__x__x__SEL
-sfr at 0x86 DPS         ;
+__sfr __at 0x86 DPS         ;
 // Not directly accessible DPS Bit. DS89C390 specific
 #define SEL         0x01
 #define TSL         0x20
@@ -2590,7 +2590,7 @@ sfr at 0x86 DPS         ;
 
 #ifdef DPS__ID1__ID0__TSL__AID__x__x__x__SEL
 #undef DPS__ID1__ID0__TSL__AID__x__x__x__SEL
-sfr at 0x86 DPS         ;
+__sfr __at 0x86 DPS         ;
 // Not directly accessible DPS Bit. DS89C420 specific
 #define SEL         0x01
 #define AID         0x10
@@ -2601,22 +2601,22 @@ sfr at 0x86 DPS         ;
 
 #ifdef DPSEL
 #undef DPSEL
-sfr at 0x92 DPSEL       ; // data pointer select register SAB80517
+__sfr __at 0x92 DPSEL       ; // data pointer select register SAB80517
 #endif
 
 #ifdef DPX
 #undef DPX
-sfr at 0x93 DPX1        ; // DS80C390 specific
+__sfr __at 0x93 DPX1        ; // DS80C390 specific
 #endif
 
 #ifdef DPX1
 #undef DPX1
-sfr at 0x95 DPX1        ; // DS80C390 specific
+__sfr __at 0x95 DPX1        ; // DS80C390 specific
 #endif
 
 #ifdef EECON
 #undef EECON
-sfr at 0xD2 EECON       ;
+__sfr __at 0xD2 EECON       ;
 #define EEBUSY      0x01
 #define EEE         0x02
 #define EEPL0       0x10
@@ -2628,78 +2628,78 @@ sfr at 0xD2 EECON       ;
 
 #ifdef EETIM
 #undef EETIM
-sfr at 0xD3 EETIM       ;
+__sfr __at 0xD3 EETIM       ;
 #endif
 
 #ifdef EICC1
 #undef EICC1
-sfr at 0xBF EICC1;
+__sfr __at 0xBF EICC1;
 #endif
 
 #ifdef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
 #undef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
-sfr at 0xE8 EIE         ;
+__sfr __at 0xE8 EIE         ;
 // Bit registers DS80C320 specific
-sbit at 0xE8 EX2        ;
-sbit at 0xE9 EX3        ;
-sbit at 0xEA EX4        ;
-sbit at 0xEB EX5        ;
-sbit at 0xEC EWDI       ;
+__sbit __at 0xE8 EX2        ;
+__sbit __at 0xE9 EX3        ;
+__sbit __at 0xEA EX4        ;
+__sbit __at 0xEB EX5        ;
+__sbit __at 0xEC EWDI       ;
 #endif
 
 #ifdef EIE__CANBIE__C0IE__C1IE__EWDI__EX5__EX4__EX3__EX2
 #undef EIE__CANBIE__C0IE__C1IE__EWDI__EX5__EX4__EX3__EX2
-sfr at 0xE8 EIE         ;
+__sfr __at 0xE8 EIE         ;
 // Bit registers DS80C390 specific
-sbit at 0xE8 EX2        ;
-sbit at 0xE9 EX3        ;
-sbit at 0xEA EX4        ;
-sbit at 0xEB EX5        ;
-sbit at 0xEC EWDI       ;
-sbit at 0xED C1IE       ;
-sbit at 0xEE C0IE       ;
-sbit at 0xEF CANBIE     ;
+__sbit __at 0xE8 EX2        ;
+__sbit __at 0xE9 EX3        ;
+__sbit __at 0xEA EX4        ;
+__sbit __at 0xEB EX5        ;
+__sbit __at 0xEC EWDI       ;
+__sbit __at 0xED C1IE       ;
+__sbit __at 0xEE C0IE       ;
+__sbit __at 0xEF CANBIE     ;
 #endif
 
 #ifdef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
 #undef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
-sfr at 0xF8 EIP         ;
+__sfr __at 0xF8 EIP         ;
 // Bit registers DS80C320 specific
-sbit at 0xF8 PX2        ;
-sbit at 0xF9 PX3        ;
-sbit at 0xFA PX4        ;
-sbit at 0xFB PX5        ;
-sbit at 0xFC PWDI       ;
+__sbit __at 0xF8 PX2        ;
+__sbit __at 0xF9 PX3        ;
+__sbit __at 0xFA PX4        ;
+__sbit __at 0xFB PX5        ;
+__sbit __at 0xFC PWDI       ;
 #endif
 
 #ifdef EIP__CANBIP__C0IP__C1IP__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
 #undef EIP__CANBIP__C0IP__C1IP__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
-sfr at 0xF8 EIP         ;
+__sfr __at 0xF8 EIP         ;
 // Bit registers DS80C320 specific
-sbit at 0xF8 PX2        ;
-sbit at 0xF9 PX3        ;
-sbit at 0xFA PX4        ;
-sbit at 0xFB PX5        ;
-sbit at 0xFC PWDI       ;
-sbit at 0xFD C1IP       ;
-sbit at 0xFE C0IP       ;
-sbit at 0xFF CANBIP     ;
+__sbit __at 0xF8 PX2        ;
+__sbit __at 0xF9 PX3        ;
+__sbit __at 0xFA PX4        ;
+__sbit __at 0xFB PX5        ;
+__sbit __at 0xFC PWDI       ;
+__sbit __at 0xFD C1IP       ;
+__sbit __at 0xFE C0IP       ;
+__sbit __at 0xFF CANBIP     ;
 #endif
 
 #ifdef EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
 #undef EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
-sfr at 0xF8 EIP0        ;
+__sfr __at 0xF8 EIP0        ;
 // Bit registers DS89C420 specific
-sbit at 0xF8 LPX2       ;
-sbit at 0xF9 LPX3       ;
-sbit at 0xFA LPX4       ;
-sbit at 0xFB LPX5       ;
-sbit at 0xFC LPWDI      ;
+__sbit __at 0xF8 LPX2       ;
+__sbit __at 0xF9 LPX3       ;
+__sbit __at 0xFA LPX4       ;
+__sbit __at 0xFB LPX5       ;
+__sbit __at 0xFC LPWDI      ;
 #endif
 
 #ifdef EIP1__x__x__x__MPWDI__MPX5__MPX4__MPX3__MPX2
 #undef EIP1__x__x__x__MPWDI__MPX5__MPX4__MPX3__MPX2
-sfr at 0xF1 EIP1        ;
+__sfr __at 0xF1 EIP1        ;
 // Not directly accessible Bits DS89C420 specific
 #define MPX2        0x01
 #define MPX3        0x02
@@ -2710,7 +2710,7 @@ sfr at 0xF1 EIP1        ;
 
 #ifdef ESP
 #undef ESP
-sfr at 0x9B ESP         ;
+__sfr __at 0x9B ESP         ;
 // Not directly accessible Bits DS80C390 specific
 #define ESP_0       0x01
 #define ESP_1       0x02
@@ -2718,7 +2718,7 @@ sfr at 0x9B ESP         ;
 
 #ifdef EXIF__IE5__IE4__IE3__IE2__x__RGMD__RGSL__BGS
 #undef EXIF__IE5__IE4__IE3__IE2__x__RGMD__RGSL__BGS
-sfr at 0x91 EXIF        ;
+__sfr __at 0x91 EXIF        ;
 // Not directly accessible EXIF Bits DS80C320 specific
 #define BGS         0x01
 #define RGSL        0x02
@@ -2731,7 +2731,7 @@ sfr at 0x91 EXIF        ;
 
 #ifdef EXIF__IE5__IE4__IE3__IE2__XT_RG__RGMD__RGSL__BGS
 #undef EXIF__IE5__IE4__IE3__IE2__XT_RG__RGMD__RGSL__BGS
-sfr at 0x91 EXIF        ;
+__sfr __at 0x91 EXIF        ;
 // Not directly accessible EXIF Bits DS87C520 specific
 #define BGS         0x01
 #define RGSL        0x02
@@ -2745,7 +2745,7 @@ sfr at 0x91 EXIF        ;
 
 #ifdef EXIF__IE5__IE4__IE3__IE2__CKRY__RGMD__RGSL__BGS
 #undef EXIF__IE5__IE4__IE3__IE2__CKRY__RGMD__RGSL__BGS
-sfr at 0x91 EXIF        ;
+__sfr __at 0x91 EXIF        ;
 // Not directly accessible EXIF Bits DS80C390 & DS89C420 specific
 #define BGS         0x01
 #define RGSL        0x02
@@ -2759,7 +2759,7 @@ sfr at 0x91 EXIF        ;
 
 #ifdef FCNTL__FBUSY__FERR__x__x__FC3__FC2__FC1__FC0
 #undef FCNTL__FBUSY__FERR__x__x__FC3__FC2__FC1__FC0
-sfr at 0xD5 FCNTL       ;
+__sfr __at 0xD5 FCNTL       ;
 // Not directly accessible DS89C420 specific
 #define FC0         0x01
 #define FC1         0x02
@@ -2771,7 +2771,7 @@ sfr at 0xD5 FCNTL       ;
 
 #ifdef FCON
 #undef FCON
-sfr at 0xD1 FCON        ;
+__sfr __at 0xD1 FCON        ;
 #define FBUSY       0x01
 #define FMOD0       0x02
 #define FMOD1       0x04
@@ -2785,254 +2785,254 @@ sfr at 0xD1 FCON        ;
 
 #ifdef FDATA
 #undef FDATA
-sfr at 0xD6 FDATA       ;
+__sfr __at 0xD6 FDATA       ;
 #endif
 
 #ifdef FMODE
 #undef FMODE
-sfr at 0xB3 FMODE;
+__sfr __at 0xB3 FMODE;
 #endif
 
 #ifdef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
-sfr at 0xA8 IE          ;
+__sfr __at 0xA8 IE          ;
 // Bit registers
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES         ;
-sbit at 0xAF EA         ;
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES         ;
+__sbit __at 0xAF EA         ;
 #endif
 
 #ifdef IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
-sfr at 0xA8 IE          ;
+__sfr __at 0xA8 IE          ;
 // Bit registers
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES         ;
-sbit at 0xAD ET2        ; // Enable timer2 interrupt
-sbit at 0xAF EA         ;
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES         ;
+__sbit __at 0xAD ET2        ; // Enable timer2 interrupt
+__sbit __at 0xAF EA         ;
 #endif // IE
 
 #ifdef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
 #undef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
-sfr at 0xA8 IE          ; // same as IEN0 - Interrupt enable 0, P80C552 specific
-sfr at 0xA8 IEN0        ; // alternate name
+__sfr __at 0xA8 IE          ; // same as IEN0 - Interrupt enable 0, P80C552 specific
+__sfr __at 0xA8 IEN0        ; // alternate name
 // Bit registers
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES0        ;
-sbit at 0xAD ES1        ;
-sbit at 0xAE EAD        ;
-sbit at 0xAF EEA        ;
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES0        ;
+__sbit __at 0xAD ES1        ;
+__sbit __at 0xAE EAD        ;
+__sbit __at 0xAF EEA        ;
 #endif
 
 #ifdef IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
-sfr at 0xA8 IE          ;
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES         ;
-sbit at 0xAD ET2        ;
-sbit at 0xAE EC         ;
-sbit at 0xAF EA         ;
+__sfr __at 0xA8 IE          ;
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES         ;
+__sbit __at 0xAD ET2        ;
+__sbit __at 0xAE EC         ;
+__sbit __at 0xAF EA         ;
 #endif
 
 #ifdef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0
-sfr at 0xA8 IE          ;
+__sfr __at 0xA8 IE          ;
 // Bit registers
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES         ;
-sbit at 0xAC ES0        ; // Alternate name
-sbit at 0xAD ET2        ; // Enable timer2 interrupt
-sbit at 0xAE ES1        ;
-sbit at 0xAF EA         ;
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES         ;
+__sbit __at 0xAC ES0        ; // Alternate name
+__sbit __at 0xAD ET2        ; // Enable timer2 interrupt
+__sbit __at 0xAE ES1        ;
+__sbit __at 0xAF EA         ;
 #endif // IE
 
 #ifdef IE__EA_WDT_ET2_ES_ET1_EX1_ET0_EX0
 #undef IE__EA_WDT_ET2_ES_ET1_EX1_ET0_EX0
-sfr at 0xA8 IE          ;
-sfr at 0xA8 IEN0        ; // Alternate name
+__sfr __at 0xA8 IE          ;
+__sfr __at 0xA8 IEN0        ; // Alternate name
 // Bit registers for the SAB80515 and compatible IE
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES         ;
-sbit at 0xAC ES0        ;
-sbit at 0xAD ET2        ; // Enable timer 2 overflow SAB80515 specific
-sbit at 0xAE WDT        ; // watchdog timer reset - SAB80515 specific
-sbit at 0xAF EA         ;
-sbit at 0xAF EAL        ; // EA as called by Infineon / Siemens
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES         ;
+__sbit __at 0xAC ES0        ;
+__sbit __at 0xAD ET2        ; // Enable timer 2 overflow SAB80515 specific
+__sbit __at 0xAE WDT        ; // watchdog timer reset - SAB80515 specific
+__sbit __at 0xAF EA         ;
+__sbit __at 0xAF EAL        ; // EA as called by Infineon / Siemens
 #endif
 
 #ifdef IEN0__EA__EC__ES1__ES0__ET1__EX1__ET0__EX0
 #undef IEN0__EA__EC__ES1__ES0__ET1__EX1__ET0__EX0
 // P89C668 specific
-sfr at 0xA8 IEN0        ;
+__sfr __at 0xA8 IEN0        ;
 // Bit registers
-sbit at 0xA8 EX0        ;
-sbit at 0xA9 ET0        ;
-sbit at 0xAA EX1        ;
-sbit at 0xAB ET1        ;
-sbit at 0xAC ES0        ;
-sbit at 0xAD ES1        ;
-sbit at 0xAE EC         ;
-sbit at 0xAF EA         ;
+__sbit __at 0xA8 EX0        ;
+__sbit __at 0xA9 ET0        ;
+__sbit __at 0xAA EX1        ;
+__sbit __at 0xAB ET1        ;
+__sbit __at 0xAC ES0        ;
+__sbit __at 0xAD ES1        ;
+__sbit __at 0xAE EC         ;
+__sbit __at 0xAF EA         ;
 #endif
 
 #ifdef IEN1__x__x__x__x__x__x__x__ET2
 #undef IEN1__x__x__x__x__x__x__x__ET2
 // P89C668 specific bit registers
-sfr at 0xE8 IEN1        ;
+__sfr __at 0xE8 IEN1        ;
 // Bit registers
-sbit at 0xE8 ET2        ;
+__sbit __at 0xE8 ET2        ;
 #endif
 
 #ifdef IEN1__ET2__ECM2__ECM1__ECM0__ECT3__ECT2__ECT1__ECT0
 #undef IEN1__ET2__ECM2__ECM1__ECM0__ECT3__ECT2__ECT1__ECT0
-sfr at 0xE8 IEN1        ; // Interrupt enable 1, P80C552 specific
+__sfr __at 0xE8 IEN1        ; // Interrupt enable 1, P80C552 specific
 // Bit registers
-sbit at 0xE8 ECT0       ;
-sbit at 0xE9 ECT1       ;
-sbit at 0xEA ECT2       ;
-sbit at 0xEB ECT3       ;
-sbit at 0xEC ECM0       ;
-sbit at 0xED ECM1       ;
-sbit at 0xEE ECM2       ;
-sbit at 0xEF ET2        ;
+__sbit __at 0xE8 ECT0       ;
+__sbit __at 0xE9 ECT1       ;
+__sbit __at 0xEA ECT2       ;
+__sbit __at 0xEB ECT3       ;
+__sbit __at 0xEC ECM0       ;
+__sbit __at 0xED ECM1       ;
+__sbit __at 0xEE ECM2       ;
+__sbit __at 0xEF ET2        ;
 #endif
 
 #ifdef IEN1__EXEN2__SWDT__EX6__EX5__EX4__EX3__EX2__EADC
 #undef IEN1__EXEN2__SWDT__EX6__EX5__EX4__EX3__EX2__EADC
-sfr at 0xB8 IEN1        ; // interrupt enable register - SAB80515 specific
+__sfr __at 0xB8 IEN1        ; // interrupt enable register - SAB80515 specific
 // Bit registers
-sbit at 0xB8 EADC       ; // A/D converter interrupt enable
-sbit at 0xB9 EX2        ;
-sbit at 0xBA EX3        ;
-sbit at 0xBB EX4        ;
-sbit at 0xBC EX5        ;
-sbit at 0xBD EX6        ;
-sbit at 0xBE SWDT       ; // watchdog timer start/reset
-sbit at 0xBF EXEN2      ; // timer2 external reload interrupt enable
+__sbit __at 0xB8 EADC       ; // A/D converter interrupt enable
+__sbit __at 0xB9 EX2        ;
+__sbit __at 0xBA EX3        ;
+__sbit __at 0xBB EX4        ;
+__sbit __at 0xBC EX5        ;
+__sbit __at 0xBD EX6        ;
+__sbit __at 0xBE SWDT       ; // watchdog timer start/reset
+__sbit __at 0xBF EXEN2      ; // timer2 external reload interrupt enable
 #endif
 
 #ifdef IEN2__SAB80517
 #undef IEN2__SAB80517
-sfr at 0x9A IEN2        ; // interrupt enable register 2 SAB80517
+__sfr __at 0x9A IEN2        ; // interrupt enable register 2 SAB80517
 #endif
 
 #ifdef IEN3
 #undef IEN3
-sfr at 0xBE IEN3;
+__sfr __at 0xBE IEN3;
 #endif
 
 #ifdef IP__x__x__x__PS__PT1__PX1__PT0__PX0
 #undef IP__x__x__x__PS__PT1__PX1__PT0__PX0
-sfr at 0xB8 IP          ;
+__sfr __at 0xB8 IP          ;
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS         ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS         ;
 #endif
 
 #ifdef IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 #undef IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
-sfr at 0xB8 IP          ;
+__sfr __at 0xB8 IP          ;
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS         ;
-sbit at 0xBC PS0        ;  // alternate name
-sbit at 0xBD PT2        ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS         ;
+__sbit __at 0xBC PS0        ;  // alternate name
+__sbit __at 0xBD PT2        ;
 #endif
 
 #ifdef IP__x__PAD__PS1__PS0__PT1__PX1__PT0__PX0
 #undef IP__x__PAD__PS1__PS0__PT1__PX1__PT0__PX0
-sfr at 0xB8 IP          ; // Interrupt priority 0, P80C552 specific
-sfr at 0xB8 IP0         ; // alternate name
+__sfr __at 0xB8 IP          ; // Interrupt priority 0, P80C552 specific
+__sfr __at 0xB8 IP0         ; // alternate name
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS0        ;
-sbit at 0xBD PS1        ;
-sbit at 0xBE PAD        ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS0        ;
+__sbit __at 0xBD PS1        ;
+__sbit __at 0xBE PAD        ;
 #endif
 
 #ifdef IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
 #undef IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
-sfr at 0xB8 IP          ;
+__sfr __at 0xB8 IP          ;
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS         ;
-sbit at 0xBD PT2        ;
-sbit at 0xBE PPC        ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS         ;
+__sbit __at 0xBD PT2        ;
+__sbit __at 0xBE PPC        ;
 #endif
 
 #ifdef IP__x__PS1__PT2__PS__PT1_PX1__PT0__PX0
 #undef IP__x__PS1__PT2__PS__PT1_PX1__PT0__PX0
-sfr at 0xB8 IP          ;
+__sfr __at 0xB8 IP          ;
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS         ;
-sbit at 0xBD PT2        ;
-sbit at 0xBE PS1        ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS         ;
+__sbit __at 0xBD PT2        ;
+__sbit __at 0xBE PS1        ;
 #endif
 
 #ifdef IP__PT2__PPC__PS1__PS0__PT1__PX1__PT0__PX0
 #undef IP__PT2__PPC__PS1__PS0__PT1__PX1__PT0__PX0
 // P89C668 specific:
-sfr at 0xB8 IP          ;
+__sfr __at 0xB8 IP          ;
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS0        ;
-sbit at 0xBD PS1        ;
-sbit at 0xBE PPC        ;
-sbit at 0xBF PT2        ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS0        ;
+__sbit __at 0xBD PS1        ;
+__sbit __at 0xBE PPC        ;
+__sbit __at 0xBF PT2        ;
 #endif
 
 #ifdef IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
 #undef IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
-sfr at 0xB8 IP          ;
+__sfr __at 0xB8 IP          ;
 // Bit registers
-sbit at 0xB8 PX0        ;
-sbit at 0xB9 PT0        ;
-sbit at 0xBA PX1        ;
-sbit at 0xBB PT1        ;
-sbit at 0xBC PS         ;
-sbit at 0xBF RWT        ;
+__sbit __at 0xB8 PX0        ;
+__sbit __at 0xB9 PT0        ;
+__sbit __at 0xBA PX1        ;
+__sbit __at 0xBB PT1        ;
+__sbit __at 0xBC PS         ;
+__sbit __at 0xBF RWT        ;
 #endif
 
 #ifdef IP0__x__WDTS__IP0_5__IP0_4__IP0_3__IP0_2__IP0_1__IP0_0
 #undef IP0__x__WDTS__IP0_5__IP0_4__IP0_3__IP0_2__IP0_1__IP0_0
-sfr at 0xA9 IP0         ; // interrupt priority register SAB80515 specific
+__sfr __at 0xA9 IP0         ; // interrupt priority register SAB80515 specific
 // Not directly accessible IP0 bits
 #define IP0_0       0x01
 #define IP0_1       0x02
@@ -3045,20 +3045,20 @@ sfr at 0xA9 IP0         ; // interrupt priority register SAB80515 specific
 
 #ifdef IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
 #undef IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
-sfr at 0xB8 IP0         ; // interrupt priority register DS89C420 specific
+__sfr __at 0xB8 IP0         ; // interrupt priority register DS89C420 specific
 // Bit registers
-sbit at 0xB8 LPX0       ;
-sbit at 0xB9 LPT0       ;
-sbit at 0xBA LPX1       ;
-sbit at 0xBB LPT1       ;
-sbit at 0xBC LPS0       ;
-sbit at 0xBD LPT2       ;
-sbit at 0xBE LPS1       ;
+__sbit __at 0xB8 LPX0       ;
+__sbit __at 0xB9 LPT0       ;
+__sbit __at 0xBA LPX1       ;
+__sbit __at 0xBB LPT1       ;
+__sbit __at 0xBC LPS0       ;
+__sbit __at 0xBD LPT2       ;
+__sbit __at 0xBE LPS1       ;
 #endif
 
 #ifdef IP1__x__x__IP1_5__IP1_4__IP1_3__IP1_2__IP1_1__IP1_0
 #undef IP1__x__x__IP1_5__IP1_4__IP1_3__IP1_2__IP1_1__IP1_0
-sfr at 0xB9 IP1         ; // interrupt priority register SAB80515 specific
+__sfr __at 0xB9 IP1         ; // interrupt priority register SAB80515 specific
 // Not directly accessible IP1 bits
 #define IP1_0       0x01
 #define IP1_1       0x02
@@ -3070,7 +3070,7 @@ sfr at 0xB9 IP1         ; // interrupt priority register SAB80515 specific
 
 #ifdef IP1__x__MPS1__MPT2__MPS0__MPT1__MPX1__MPT0__MPX0
 #undef IP1__x__MPS1__MPT2__MPS0__MPT1__MPX1__MPT0__MPX0
-sfr at 0xB1 IP1         ; // interrupt priority register DS89C420 specific
+__sfr __at 0xB1 IP1         ; // interrupt priority register DS89C420 specific
 // Not directly accessible IP1 bits
 #define MPX0        0x01
 #define MPT0        0x02
@@ -3083,21 +3083,21 @@ sfr at 0xB1 IP1         ; // interrupt priority register DS89C420 specific
 
 #ifdef IP1__PT2__PCM2__PCM1__PCM0__PCT3__PCT2__PCT1__PCT0
 #undef IP1__PT2__PCM2__PCM1__PCM0__PCT3__PCT2__PCT1__PCT0
-sfr at 0xF8 IP1         ; // Interrupt priority 1, P80C552 specific
+__sfr __at 0xF8 IP1         ; // Interrupt priority 1, P80C552 specific
 // Bit registers
-sbit at 0xF8 PCT0       ;
-sbit at 0xF9 PCT1       ;
-sbit at 0xFA PCT2       ;
-sbit at 0xFB PCT3       ;
-sbit at 0xFC PCM0       ;
-sbit at 0xFD PCM1       ;
-sbit at 0xFE PCM2       ;
-sbit at 0xFF PT2        ;
+__sbit __at 0xF8 PCT0       ;
+__sbit __at 0xF9 PCT1       ;
+__sbit __at 0xFA PCT2       ;
+__sbit __at 0xFB PCT3       ;
+__sbit __at 0xFC PCM0       ;
+__sbit __at 0xFD PCM1       ;
+__sbit __at 0xFE PCM2       ;
+__sbit __at 0xFF PT2        ;
 #endif
 
 #ifdef IPH__x__PPCH__PT2H__PSH__PT1H__PX1H__PT0H__PX0H
 #undef IPH__x__PPCH__PT2H__PSH__PT1H__PX1H__PT0H__PX0H
-sfr at 0xB7 IPH         ;
+__sfr __at 0xB7 IPH         ;
 #define PX0H        0x01
 #define PT0H        0x02
 #define PX1H        0x04
@@ -3110,7 +3110,7 @@ sfr at 0xB7 IPH         ;
 #ifdef IPH__PT2H__PPCH__PS1H__PS0H__PT1H__PX1H__PT0H__PX0H
 #undef IPH__PT2H__PPCH__PS1H__PS0H__PT1H__PX1H__PT0H__PX0H
 // P89C668 specific:
-sfr at 0xB7 IPH         ;
+__sfr __at 0xB7 IPH         ;
 // not bit addressable:
 #define PX0H        0x01
 #define PT0H        0x02
@@ -3124,60 +3124,60 @@ sfr at 0xB7 IPH         ;
 
 #ifdef IRCON
 #undef IRCON
-sfr at 0xC0 IRCON       ; // interrupt control register - SAB80515 specific
+__sfr __at 0xC0 IRCON       ; // interrupt control register - SAB80515 specific
 // Bit registers
-sbit at 0xC0 IADC       ; // A/D converter irq flag
-sbit at 0xC1 IEX2       ; // external interrupt edge detect flag
-sbit at 0xC2 IEX3       ;
-sbit at 0xC3 IEX4       ;
-sbit at 0xC4 IEX5       ;
-sbit at 0xC5 IEX6       ;
-sbit at 0xC6 TF2        ; // timer 2 owerflow flag
-sbit at 0xC7 EXF2       ; // timer2 reload flag
+__sbit __at 0xC0 IADC       ; // A/D converter irq flag
+__sbit __at 0xC1 IEX2       ; // external interrupt edge detect flag
+__sbit __at 0xC2 IEX3       ;
+__sbit __at 0xC3 IEX4       ;
+__sbit __at 0xC4 IEX5       ;
+__sbit __at 0xC5 IEX6       ;
+__sbit __at 0xC6 TF2        ; // timer 2 owerflow flag
+__sbit __at 0xC7 EXF2       ; // timer2 reload flag
 #endif
 
 #ifdef IRCON0
 #undef IRCON0
-sfr at 0xC0 IRCON0      ; // interrupt control register - SAB80515 specific
+__sfr __at 0xC0 IRCON0      ; // interrupt control register - SAB80515 specific
 // Bit registers
-sbit at 0xC0 IADC       ; // A/D converter irq flag
-sbit at 0xC1 IEX2       ; // external interrupt edge detect flag
-sbit at 0xC2 IEX3       ;
-sbit at 0xC3 IEX4       ;
-sbit at 0xC4 IEX5       ;
-sbit at 0xC5 IEX6       ;
-sbit at 0xC6 TF2        ; // timer 2 owerflow flag
-sbit at 0xC7 EXF2       ; // timer2 reload flag
+__sbit __at 0xC0 IADC       ; // A/D converter irq flag
+__sbit __at 0xC1 IEX2       ; // external interrupt edge detect flag
+__sbit __at 0xC2 IEX3       ;
+__sbit __at 0xC3 IEX4       ;
+__sbit __at 0xC4 IEX5       ;
+__sbit __at 0xC5 IEX6       ;
+__sbit __at 0xC6 TF2        ; // timer 2 owerflow flag
+__sbit __at 0xC7 EXF2       ; // timer2 reload flag
 #endif
 
 #ifdef IRCON1
 #undef IRCON1
-sfr at 0xD1 IRCON1      ; // interrupt control register - SAB80515 specific
+__sfr __at 0xD1 IRCON1      ; // interrupt control register - SAB80515 specific
 #endif
 
 #ifdef IRCON2
 #undef IRCON2
-sfr at 0xBF IRCON2;
+__sfr __at 0xBF IRCON2;
 #endif
 
 #ifdef MA
 #undef MA
-sfr at 0xD3 MA          ; // DS80C390
+__sfr __at 0xD3 MA          ; // DS80C390
 #endif
 
 #ifdef MB
 #undef MB
-sfr at 0xD4 MB          ; // DS80C390
+__sfr __at 0xD4 MB          ; // DS80C390
 #endif
 
 #ifdef MC
 #undef MC
-sfr at 0xD5 MC          ; // DS80C390
+__sfr __at 0xD5 MC          ; // DS80C390
 #endif
 
 #ifdef MCNT0
 #undef MCNT0
-sfr at 0xD1 MCNT0       ; // DS80C390
+__sfr __at 0xD1 MCNT0       ; // DS80C390
 #define MAS0        0x01
 #define MAS1        0x02
 #define MAS2        0x04
@@ -3190,7 +3190,7 @@ sfr at 0xD1 MCNT0       ; // DS80C390
 
 #ifdef MCNT1
 #undef MCNT1
-sfr at 0xD2 MCNT1       ; // DS80C390
+__sfr __at 0xD2 MCNT1       ; // DS80C390
 #define CLM         0x10
 #define MOF         0x40
 #define MST         0x80
@@ -3198,7 +3198,7 @@ sfr at 0xD2 MCNT1       ; // DS80C390
 
 #ifdef MCON__IDM1__IDM0__CMA__x__PDCE3__PDCE2__PDCE1__PDCE0
 #undef MCON__IDM1__IDM0__CMA__x__PDCE3__PDCE2__PDCE1__PDCE0
-sfr at 0xC6 MCON        ; // DS80C390
+__sfr __at 0xC6 MCON        ; // DS80C390
 #define PDCE0       0x01
 #define PDCE1       0x02
 #define PDCE2       0x04
@@ -3210,7 +3210,7 @@ sfr at 0xC6 MCON        ; // DS80C390
 
 #ifdef MCON__PA3__PA2__PA1__PA0__RA32_8__ECE2__PAA__SL
 #undef MCON__PA3__PA2__PA1__PA0__RA32_8__ECE2__PAA__SL
-sfr at 0xC6 MCON        ; // DS5000
+__sfr __at 0xC6 MCON        ; // DS5000
 #define SL          0x01
 #define PAA         0x02
 #define ECE2        0x04
@@ -3223,7 +3223,7 @@ sfr at 0xC6 MCON        ; // DS5000
 
 #ifdef MCON__PA3__PA2__PA1__PA0__RG1__PES__PM__SL
 #undef MCON__PA3__PA2__PA1__PA0__RG1__PES__PM__SL
-sfr at 0xC6 MCON        ; // DS5001
+__sfr __at 0xC6 MCON        ; // DS5001
 #define SL          0x01
 #define PM          0x02
 #define PES         0x04
@@ -3236,260 +3236,260 @@ sfr at 0xC6 MCON        ; // DS5001
 
 #ifdef MD0
 #undef MD0
-sfr at 0xE9 MD0         ; // MUL / DIV register 0 SAB80517
+__sfr __at 0xE9 MD0         ; // MUL / DIV register 0 SAB80517
 #endif
 
 #ifdef MD1
 #undef MD1
-sfr at 0xEA MD1         ; // MUL / DIV register 1 SAB80517
+__sfr __at 0xEA MD1         ; // MUL / DIV register 1 SAB80517
 #endif
 
 #ifdef MD2
 #undef MD2
-sfr at 0xEB MD2         ; // MUL / DIV register 2 SAB80517
+__sfr __at 0xEB MD2         ; // MUL / DIV register 2 SAB80517
 #endif
 
 #ifdef MD3
 #undef MD3
-sfr at 0xEC MD3         ; // MUL / DIV register 3 SAB80517
+__sfr __at 0xEC MD3         ; // MUL / DIV register 3 SAB80517
 #endif
 
 #ifdef MD4
 #undef MD4
-sfr at 0xED MD4         ; // MUL / DIV register 4 SAB80517
+__sfr __at 0xED MD4         ; // MUL / DIV register 4 SAB80517
 #endif
 
 #ifdef MD5
 #undef MD5
-sfr at 0xEE MD5         ; // MUL / DIV register 5 SAB80517
+__sfr __at 0xEE MD5         ; // MUL / DIV register 5 SAB80517
 #endif
 
 #ifdef MXAX
 #undef MXAX
-sfr at 0xEA MXAX        ; // Dallas DS80C390
+__sfr __at 0xEA MXAX        ; // Dallas DS80C390
 #endif
 
 #ifdef P0
 #undef P0
-sfr at 0x80 P0          ;
+__sfr __at 0x80 P0          ;
 //  Bit Registers
-sbit at 0x80 P0_0       ;
-sbit at 0x81 P0_1       ;
-sbit at 0x82 P0_2       ;
-sbit at 0x83 P0_3       ;
-sbit at 0x84 P0_4       ;
-sbit at 0x85 P0_5       ;
-sbit at 0x86 P0_6       ;
-sbit at 0x87 P0_7       ;
+__sbit __at 0x80 P0_0       ;
+__sbit __at 0x81 P0_1       ;
+__sbit __at 0x82 P0_2       ;
+__sbit __at 0x83 P0_3       ;
+__sbit __at 0x84 P0_4       ;
+__sbit __at 0x85 P0_5       ;
+__sbit __at 0x86 P0_6       ;
+__sbit __at 0x87 P0_7       ;
 #endif
 
 #ifdef P0_EXT__AD7__AD6__AD5__AD4__AD3__AD2__AD1__AD0
 #undef P0_EXT__AD7__AD6__AD5__AD4__AD3__AD2__AD1__AD0
 // P89C668 alternate names for bits in P0
-sbit at 0x80 AD0        ;
-sbit at 0x81 AD1        ;
-sbit at 0x82 AD2        ;
-sbit at 0x83 AD3        ;
-sbit at 0x84 AD4        ;
-sbit at 0x85 AD5        ;
-sbit at 0x86 AD6        ;
-sbit at 0x87 AD7        ;
+__sbit __at 0x80 AD0        ;
+__sbit __at 0x81 AD1        ;
+__sbit __at 0x82 AD2        ;
+__sbit __at 0x83 AD3        ;
+__sbit __at 0x84 AD4        ;
+__sbit __at 0x85 AD5        ;
+__sbit __at 0x86 AD6        ;
+__sbit __at 0x87 AD7        ;
 #endif
 
 #ifdef P1
 #undef P1
-sfr at 0x90 P1          ;
+__sfr __at 0x90 P1          ;
 // Bit registers
-sbit at 0x90 P1_0       ;
-sbit at 0x91 P1_1       ;
-sbit at 0x92 P1_2       ;
-sbit at 0x93 P1_3       ;
-sbit at 0x94 P1_4       ;
-sbit at 0x95 P1_5       ;
-sbit at 0x96 P1_6       ;
-sbit at 0x97 P1_7       ;
+__sbit __at 0x90 P1_0       ;
+__sbit __at 0x91 P1_1       ;
+__sbit __at 0x92 P1_2       ;
+__sbit __at 0x93 P1_3       ;
+__sbit __at 0x94 P1_4       ;
+__sbit __at 0x95 P1_5       ;
+__sbit __at 0x96 P1_6       ;
+__sbit __at 0x97 P1_7       ;
 #endif
 
 #ifdef P1_EXT__INT5__INT4__INT3__INT2__TXD1__RXD1__T2EX__T2
 #undef P1_EXT__INT5__INT4__INT3__INT2__TXD1__RXD1__T2EX__T2
 // P1 alternate functions
-sbit at 0x90 T2         ;
-sbit at 0x91 T2EX       ;
-sbit at 0x92 RXD1       ;
-sbit at 0x93 TXD1       ;
-sbit at 0x94 INT2       ;
-sbit at 0x95 INT3       ;
-sbit at 0x96 INT4       ;
-sbit at 0x97 INT5       ;
+__sbit __at 0x90 T2         ;
+__sbit __at 0x91 T2EX       ;
+__sbit __at 0x92 RXD1       ;
+__sbit __at 0x93 TXD1       ;
+__sbit __at 0x94 INT2       ;
+__sbit __at 0x95 INT3       ;
+__sbit __at 0x96 INT4       ;
+__sbit __at 0x97 INT5       ;
 #endif
 
 #ifdef P1_EXT__SDA__SCL__CEX2__CEX1__CEX0__ECI__T2EX__T2
 #undef P1_EXT__SDA__SCL__CEX2__CEX1__CEX0__ECI__T2EX__T2
-// P89C669 alternate names for bits at P1
+// P89C669 alternate names for bits __at P1
 // P1_EXT__SDA__SCL__CEX2__CEX1__CEX0__ECI__T2EX__T2
-sbit at 0x90 T2         ;
-sbit at 0x91 T2EX       ;
-sbit at 0x92 ECI        ;
-sbit at 0x93 CEX0       ;
-sbit at 0x94 CEX1       ;
-sbit at 0x95 CEX2       ;
-sbit at 0x96 SCL        ;
-sbit at 0x97 SDA        ;
+__sbit __at 0x90 T2         ;
+__sbit __at 0x91 T2EX       ;
+__sbit __at 0x92 ECI        ;
+__sbit __at 0x93 CEX0       ;
+__sbit __at 0x94 CEX1       ;
+__sbit __at 0x95 CEX2       ;
+__sbit __at 0x96 SCL        ;
+__sbit __at 0x97 SDA        ;
 #endif
 
 #ifdef P1_EXT__T2__CLKOUT__T2EX__INT2__INT6_CC3__INT5_CC2__INT4_CC1__INT3_CC0
-sbit at 0x90 INT3_CC0   ; // P1 alternate functions - SAB80515 specific
-sbit at 0x91 INT4_CC1   ;
-sbit at 0x92 INT5_CC2   ;
-sbit at 0x93 INT6_CC3   ;
-sbit at 0x94 INT2       ;
-sbit at 0x95 T2EX       ;
-sbit at 0x96 CLKOUT     ;
-sbit at 0x97 T2         ;
+__sbit __at 0x90 INT3_CC0   ; // P1 alternate functions - SAB80515 specific
+__sbit __at 0x91 INT4_CC1   ;
+__sbit __at 0x92 INT5_CC2   ;
+__sbit __at 0x93 INT6_CC3   ;
+__sbit __at 0x94 INT2       ;
+__sbit __at 0x95 T2EX       ;
+__sbit __at 0x96 CLKOUT     ;
+__sbit __at 0x97 T2         ;
 #endif
 
 #ifdef P1_EXT__CT0I__CT1I__CT2I__CT3I__T2__RT2__SCL__SDA
 #undef P1_EXT__CT0I__CT1I__CT2I__CT3I__T2__RT2__SCL__SDA
 // Bit registers
-sbit at 0x90 CT0I       ; // Port 1 alternate functions, P80C552 specific
-sbit at 0x91 CT1I       ;
-sbit at 0x92 CT2I       ;
-sbit at 0x93 CT3I       ;
-sbit at 0x94 T2         ;
-sbit at 0x95 RT2        ;
-sbit at 0x96 SCL        ;
-sbit at 0x97 SDA        ;
+__sbit __at 0x90 CT0I       ; // Port 1 alternate functions, P80C552 specific
+__sbit __at 0x91 CT1I       ;
+__sbit __at 0x92 CT2I       ;
+__sbit __at 0x93 CT3I       ;
+__sbit __at 0x94 T2         ;
+__sbit __at 0x95 RT2        ;
+__sbit __at 0x96 SCL        ;
+__sbit __at 0x97 SDA        ;
 #endif
 
 #ifdef P1_EXT__x__x__x__x__x__x__T2EX__T2
 #undef P1_EXT__x__x__x__x__x__x__T2EX__T2
 // P1 alternate functions
-sbit at 0x90 T2         ;
-sbit at 0x91 T2EX       ;
+__sbit __at 0x90 T2         ;
+__sbit __at 0x91 T2EX       ;
 #endif
 
 #ifdef P2
 #undef P2
-sfr at 0xA0 P2          ;
+__sfr __at 0xA0 P2          ;
 // Bit registers
-sbit at 0xA0 P2_0       ;
-sbit at 0xA1 P2_1       ;
-sbit at 0xA2 P2_2       ;
-sbit at 0xA3 P2_3       ;
-sbit at 0xA4 P2_4       ;
-sbit at 0xA5 P2_5       ;
-sbit at 0xA6 P2_6       ;
-sbit at 0xA7 P2_7       ;
+__sbit __at 0xA0 P2_0       ;
+__sbit __at 0xA1 P2_1       ;
+__sbit __at 0xA2 P2_2       ;
+__sbit __at 0xA3 P2_3       ;
+__sbit __at 0xA4 P2_4       ;
+__sbit __at 0xA5 P2_5       ;
+__sbit __at 0xA6 P2_6       ;
+__sbit __at 0xA7 P2_7       ;
 #endif
 
 #ifdef P2_EXT__AD15__AD14__AD13__AD12__AD11__AD10__AD9__AD8
 #undef P2_EXT__AD15__AD14__AD13__AD12__AD11__AD10__AD9__AD8
-// P89C668 specific bit registers at P2:
-sbit at 0xA0 AD8        ;
-sbit at 0xA1 AD9        ;
-sbit at 0xA2 AD10       ;
-sbit at 0xA3 AD11       ;
-sbit at 0xA4 AD12       ;
-sbit at 0xA5 AD13       ;
-sbit at 0xA6 AD14       ;
-sbit at 0xA7 AD15       ;
+// P89C668 specific bit registers __at P2:
+__sbit __at 0xA0 AD8        ;
+__sbit __at 0xA1 AD9        ;
+__sbit __at 0xA2 AD10       ;
+__sbit __at 0xA3 AD11       ;
+__sbit __at 0xA4 AD12       ;
+__sbit __at 0xA5 AD13       ;
+__sbit __at 0xA6 AD14       ;
+__sbit __at 0xA7 AD15       ;
 #endif
 
 #ifdef P3
 #undef P3
-sfr at 0xB0 P3          ;
+__sfr __at 0xB0 P3          ;
 // Bit registers
-sbit at 0xB0 P3_0       ;
-sbit at 0xB1 P3_1       ;
-sbit at 0xB2 P3_2       ;
-sbit at 0xB3 P3_3       ;
-sbit at 0xB4 P3_4       ;
-sbit at 0xB5 P3_5       ;
+__sbit __at 0xB0 P3_0       ;
+__sbit __at 0xB1 P3_1       ;
+__sbit __at 0xB2 P3_2       ;
+__sbit __at 0xB3 P3_3       ;
+__sbit __at 0xB4 P3_4       ;
+__sbit __at 0xB5 P3_5       ;
 #ifndef MCS51REG_EXTERNAL_RAM
-sbit at 0xB6 P3_6       ;
-sbit at 0xB7 P3_7       ;
+__sbit __at 0xB6 P3_6       ;
+__sbit __at 0xB7 P3_7       ;
 #endif
 // alternate names
-sbit at 0xB0 RXD        ;
-sbit at 0xB0 RXD0       ;
-sbit at 0xB1 TXD        ;
-sbit at 0xB1 TXD0       ;
-sbit at 0xB2 INT0       ;
-sbit at 0xB3 INT1       ;
-sbit at 0xB4 T0         ;
-sbit at 0xB5 T1         ;
+__sbit __at 0xB0 RXD        ;
+__sbit __at 0xB0 RXD0       ;
+__sbit __at 0xB1 TXD        ;
+__sbit __at 0xB1 TXD0       ;
+__sbit __at 0xB2 INT0       ;
+__sbit __at 0xB3 INT1       ;
+__sbit __at 0xB4 T0         ;
+__sbit __at 0xB5 T1         ;
 #ifndef MCS51REG_EXTERNAL_RAM
-sbit at 0xB6 WR         ;
-sbit at 0xB7 RD         ;
+__sbit __at 0xB6 WR         ;
+__sbit __at 0xB7 RD         ;
 #endif
 #endif
 
 #ifdef P3_EXT__x__x__CEX4__CEX3__x__x__x__x
 #undef P3_EXT__x__x__CEX4__CEX3__x__x__x__x
-// P89C668 specific bit registers at P3 (alternate names)
-sbit at 0xB5 CEX4       ;
-sbit at 0xB4 CEX3       ;
+// P89C668 specific bit registers __at P3 (alternate names)
+__sbit __at 0xB5 CEX4       ;
+__sbit __at 0xB4 CEX3       ;
 #endif
 
 #ifdef P4_AT_0X80
 #undef P4_AT_0X80
-sfr at 0x80 P4          ; // Port 4 - DS80C390
+__sfr __at 0x80 P4          ; // Port 4 - DS80C390
 // Bit registers
-sbit at 0x80 P4_0       ;
-sbit at 0x81 P4_1       ;
-sbit at 0x82 P4_2       ;
-sbit at 0x83 P4_3       ;
-sbit at 0x84 P4_4       ;
-sbit at 0x85 P4_5       ;
-sbit at 0x86 P4_6       ;
-sbit at 0x87 P4_7       ;
+__sbit __at 0x80 P4_0       ;
+__sbit __at 0x81 P4_1       ;
+__sbit __at 0x82 P4_2       ;
+__sbit __at 0x83 P4_3       ;
+__sbit __at 0x84 P4_4       ;
+__sbit __at 0x85 P4_5       ;
+__sbit __at 0x86 P4_6       ;
+__sbit __at 0x87 P4_7       ;
 #endif
 
 #ifdef P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
 #undef P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
-sfr at 0xC0 P4          ; // Port 4, P80C552 specific
+__sfr __at 0xC0 P4          ; // Port 4, P80C552 specific
 // Bit registers
-sbit at 0xC0 CMSR0      ;
-sbit at 0xC1 CMSR1      ;
-sbit at 0xC2 CMSR2      ;
-sbit at 0xC3 CMSR3      ;
-sbit at 0xC4 CMSR4      ;
-sbit at 0xC5 CMSR5      ;
-sbit at 0xC6 CMT0       ;
-sbit at 0xC7 CMT1       ;
+__sbit __at 0xC0 CMSR0      ;
+__sbit __at 0xC1 CMSR1      ;
+__sbit __at 0xC2 CMSR2      ;
+__sbit __at 0xC3 CMSR3      ;
+__sbit __at 0xC4 CMSR4      ;
+__sbit __at 0xC5 CMSR5      ;
+__sbit __at 0xC6 CMT0       ;
+__sbit __at 0xC7 CMT1       ;
 #endif
 
 #ifdef P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
 #undef P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
-sfr at 0xC0 P4          ; // Port 4, T89C51 specific
+__sfr __at 0xC0 P4          ; // Port 4, T89C51 specific
 // Bit registers
-sbit at 0xC0 P4_0       ;
-sbit at 0xC1 P4_1       ;
-sbit at 0xC2 P4_2       ;
-sbit at 0xC3 P4_3       ;
-sbit at 0xC4 P4_4       ;
-sbit at 0xC5 P4_5       ;
-sbit at 0xC6 P4_6       ;
-sbit at 0xC7 P4_7       ;
+__sbit __at 0xC0 P4_0       ;
+__sbit __at 0xC1 P4_1       ;
+__sbit __at 0xC2 P4_2       ;
+__sbit __at 0xC3 P4_3       ;
+__sbit __at 0xC4 P4_4       ;
+__sbit __at 0xC5 P4_5       ;
+__sbit __at 0xC6 P4_6       ;
+__sbit __at 0xC7 P4_7       ;
 #endif
 
 #ifdef P4_AT_0XE8
 #undef P4_AT_0XE8
-sfr at 0xE8 P4          ; // Port 4 - SAB80515 & compatible microcontrollers
+__sfr __at 0xE8 P4          ; // Port 4 - SAB80515 & compatible microcontrollers
 // Bit registers
-sbit at 0xE8 P4_0       ;
-sbit at 0xE9 P4_1       ;
-sbit at 0xEA P4_2       ;
-sbit at 0xEB P4_3       ;
-sbit at 0xEC P4_4       ;
-sbit at 0xED P4_5       ;
-sbit at 0xEE P4_6       ;
-sbit at 0xEF P4_7       ;
+__sbit __at 0xE8 P4_0       ;
+__sbit __at 0xE9 P4_1       ;
+__sbit __at 0xEA P4_2       ;
+__sbit __at 0xEB P4_3       ;
+__sbit __at 0xEC P4_4       ;
+__sbit __at 0xED P4_5       ;
+__sbit __at 0xEE P4_6       ;
+__sbit __at 0xEF P4_7       ;
 #endif
 
 #ifdef P4CNT
 #undef P4CNT
-sfr at 0x92 P4CNT       ; // DS80C390
+__sfr __at 0x92 P4CNT       ; // DS80C390
 // Not directly accessible bits
 #define P4CNT_0     0x01
 #define P4CNT_1     0x02
@@ -3502,26 +3502,26 @@ sfr at 0x92 P4CNT       ; // DS80C390
 
 #ifdef P5_AT_0XA1
 #undef P5_AT_0XA1
-sfr at 0xA1 P5          ; // Port 5 - DS80C390
+__sfr __at 0xA1 P5          ; // Port 5 - DS80C390
 #endif
 
 #ifdef P5_AT_0XE8
 #undef P5_AT_0XE8
-sfr at 0xE8 P5          ; // Port 5 - T89C51RD2
+__sfr __at 0xE8 P5          ; // Port 5 - T89C51RD2
 // Bit registers
-sbit at 0xE8 P5_0       ;
-sbit at 0xE9 P5_1       ;
-sbit at 0xEA P5_2       ;
-sbit at 0xEB P5_3       ;
-sbit at 0xEC P5_4       ;
-sbit at 0xED P5_5       ;
-sbit at 0xEE P5_6       ;
-sbit at 0xEF P5_7       ;
+__sbit __at 0xE8 P5_0       ;
+__sbit __at 0xE9 P5_1       ;
+__sbit __at 0xEA P5_2       ;
+__sbit __at 0xEB P5_3       ;
+__sbit __at 0xEC P5_4       ;
+__sbit __at 0xED P5_5       ;
+__sbit __at 0xEE P5_6       ;
+__sbit __at 0xEF P5_7       ;
 #endif
 
 #ifdef P5CNT
 #undef P5CNT
-sfr at 0xA2 P5CNT       ; // DS80C390
+__sfr __at 0xA2 P5CNT       ; // DS80C390
 // Not directly accessible bits
 #define P5CNT_0     0x01
 #define P5CNT_1     0x02
@@ -3535,7 +3535,7 @@ sfr at 0xA2 P5CNT       ; // DS80C390
 
 #ifdef P5_AT_0XC4
 #undef P5_AT_0XC4
-sfr at 0xC4 P5          ; // Port 5, P80C552 specific
+__sfr __at 0xC4 P5          ; // Port 5, P80C552 specific
 // Not directly accessible Bits.
 #define ADC0        0x01
 #define ADC1        0x02
@@ -3549,53 +3549,53 @@ sfr at 0xC4 P5          ; // Port 5, P80C552 specific
 
 #ifdef P5_AT_0XF8
 #undef P5_AT_0XF8
-sfr at 0xF8 P5          ; // Port 5 - SAB80515 & compatible microcontrollers
+__sfr __at 0xF8 P5          ; // Port 5 - SAB80515 & compatible microcontrollers
 // Bit registers
-sbit at 0xF8 P5_0       ;
-sbit at 0xF9 P5_1       ;
-sbit at 0xFA P5_2       ;
-sbit at 0xFB P5_3       ;
-sbit at 0xFC P5_4       ;
-sbit at 0xFD P5_5       ;
-sbit at 0xFE P5_6       ;
-sbit at 0xFF P5_7       ;
+__sbit __at 0xF8 P5_0       ;
+__sbit __at 0xF9 P5_1       ;
+__sbit __at 0xFA P5_2       ;
+__sbit __at 0xFB P5_3       ;
+__sbit __at 0xFC P5_4       ;
+__sbit __at 0xFD P5_5       ;
+__sbit __at 0xFE P5_6       ;
+__sbit __at 0xFF P5_7       ;
 #endif
 
 #ifdef P6_AT_0XDB
 #undef P6_AT_0XDB
-sfr at 0xDB P6          ; // Port 6 - SAB80515 & compatible microcontrollers
+__sfr __at 0xDB P6          ; // Port 6 - SAB80515 & compatible microcontrollers
 #endif
 
 #ifdef P6_AT_0XFA
 #undef P6_AT_0XFA
-sfr at 0xFA P6          ; // Port 6 - SAB80517 specific
+__sfr __at 0xFA P6          ; // Port 6 - SAB80517 specific
 #endif
 
 #ifdef P7_AT_0XDB
 #undef P7_AT_0XDB
-sfr at 0xDB P7          ; // Port 7 - SAB80517 specific
+__sfr __at 0xDB P7          ; // Port 7 - SAB80517 specific
 #endif
 
 #ifdef P8_AT_0XDD
 #undef P8_AT_0XDD
-sfr at 0xDD P8          ; // Port 6 - SAB80517 specific
+__sfr __at 0xDD P8          ; // Port 6 - SAB80517 specific
 #endif
 
 #ifdef P9_AT_0XF9
 #undef P9_AT_0XF9
-sfr at 0xF9 P9;
+__sfr __at 0xF9 P9;
 #endif
 
 #ifdef PCON__SMOD__x__x__x__x__x__x__x
 #undef PCON__SMOD__x__x__x__x__x__x__x
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 // Not directly accessible PCON bits
 #define SMOD        0x80
 #endif
 
 #ifdef PCON__SMOD__x__x__x__GF1__GF0__PD__IDL
 #undef PCON__SMOD__x__x__x__GF1__GF0__PD__IDL
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 // Not directly accessible PCON bits
 #define IDL         0x01
 #define PD          0x02
@@ -3606,7 +3606,7 @@ sfr at 0x87 PCON        ;
 
 #ifdef PCON__SMOD__x__x__WLE__GF1__GF0__PD__IDL
 #undef PCON__SMOD__x__x__WLE__GF1__GF0__PD__IDL
-sfr at 0x87 PCON        ; // PCON, P80C552 specific
+__sfr __at 0x87 PCON        ; // PCON, P80C552 specific
 // Not directly accessible Bits.
 #define IDL         0x01
 #define IDLE        0x01 /* same as IDL */
@@ -3619,7 +3619,7 @@ sfr at 0x87 PCON        ; // PCON, P80C552 specific
 
 #ifdef PCON__SMOD__PDS__IDLS__x__x__x__PD__IDL
 #undef PCON__SMOD__PDS__IDLS__x__x__x__PD__IDL
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 // Not directly accessible PCON bits
 #define IDL         0x01
 #define IDLE        0x01 /* same as IDL */
@@ -3640,7 +3640,7 @@ sfr at 0x87 PCON        ;
 
 #ifdef PCON__SMOD__POR__PFW__WTR__EPFW__EWT__STOP__IDL
 #undef PCON__SMOD__POR__PFW__WTR__EPFW__EWT__STOP__IDL
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 // Not directly accessible PCON bits
 #define IDL         0x01
 #define IDLE        0x01 /* same as IDL */
@@ -3655,7 +3655,7 @@ sfr at 0x87 PCON        ;
 
 #ifdef PCON__SMOD__SMOD0__x__x__GF1__GF0__STOP__IDLE
 #undef PCON__SMOD__SMOD0__x__x__GF1__GF0__STOP__IDLE
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 // Not directly accessible PCON bits
 #define IDL         0x01
 #define IDLE        0x01  /* same as IDL */
@@ -3668,7 +3668,7 @@ sfr at 0x87 PCON        ;
 
 #ifdef PCON__SMOD__SMOD0__OFDF__OFDE__GF1__GF0__STOP__IDLE
 #undef PCON__SMOD__SMOD0__OFDF__OFDE__GF1__GF0__STOP__IDLE
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 // Not directly accessible PCON bits
 #define IDL         0x01
 #define IDLE        0x01 /* same as IDL */
@@ -3684,7 +3684,7 @@ sfr at 0x87 PCON        ;
 
 #ifdef PCON__SMOD1__SMOD0__x__POF__GF1__GF0__PD__IDL
 #undef PCON__SMOD1__SMOD0__x__POF__GF1__GF0__PD__IDL
-sfr at 0x87 PCON        ;
+__sfr __at 0x87 PCON        ;
 #define IDL         0x01
 #define PD          0x02
 #define GF0         0x04
@@ -3696,7 +3696,7 @@ sfr at 0x87 PCON        ;
 
 #ifdef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
 #undef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
-sfr at 0xC4 PMR         ; // DS87C520, DS83C520
+__sfr __at 0xC4 PMR         ; // DS87C520, DS83C520
 // Not directly accessible bits
 #define DME0        0x01
 #define DME1        0x02
@@ -3709,7 +3709,7 @@ sfr at 0xC4 PMR         ; // DS87C520, DS83C520
 
 #ifdef PMR__CD1__CD0__SWB__CTM__4X_2X__ALEOFF__x__x
 #undef PMR__CD1__CD0__SWB__CTM__4X_2X__ALEOFF__x__x
-sfr at 0xC4 PMR         ; // DS80C390
+__sfr __at 0xC4 PMR         ; // DS80C390
 // Not directly accessible bits
 #define ALEOFF      0x04
 #define XTOFF       0x08
@@ -3721,7 +3721,7 @@ sfr at 0xC4 PMR         ; // DS80C390
 
 #ifdef PMR__CD1__CD0__SWB__CTM__4X_2X__ALEON__DME1__DME0
 #undef PMR__CD1__CD0__SWB__CTM__4X_2X__ALEON__DME1__DME0
-sfr at 0xC4 PMR         ; // DS89C420
+__sfr __at 0xC4 PMR         ; // DS89C420
 // Not directly accessible bits
 #define DME0        0x01
 #define DME1        0x02
@@ -3735,56 +3735,56 @@ sfr at 0xC4 PMR         ; // DS89C420
 
 #ifdef PRSC
 #undef PRSC
-sfr at 0xB4 PRSC;
+__sfr __at 0xB4 PRSC;
 #endif
 
 #ifdef PSW
 #undef PSW
-sfr at 0xD0 PSW         ;
+__sfr __at 0xD0 PSW         ;
 // Bit registers
-sbit at 0xD0 P          ;
-sbit at 0xD1 F1         ;
-sbit at 0xD2 OV         ;
-sbit at 0xD3 RS0        ;
-sbit at 0xD4 RS1        ;
-sbit at 0xD5 F0         ;
-sbit at 0xD6 AC         ;
-sbit at 0xD7 CY         ;
+__sbit __at 0xD0 P          ;
+__sbit __at 0xD1 F1         ;
+__sbit __at 0xD2 OV         ;
+__sbit __at 0xD3 RS0        ;
+__sbit __at 0xD4 RS1        ;
+__sbit __at 0xD5 F0         ;
+__sbit __at 0xD6 AC         ;
+__sbit __at 0xD7 CY         ;
 #endif
 
 #ifdef PWM0_AT_0XFC
 #undef PWM0_AT_0XFC
-sfr at 0xFC PWM0        ; // PWM register 0, P80C552 specific
+__sfr __at 0xFC PWM0        ; // PWM register 0, P80C552 specific
 #endif
 
 #ifdef PWM1_AT_0XFD
 #undef PWM1_AT_0XFD
-sfr at 0xFD PWM1        ; // PWM register 1, P80C552 specific
+__sfr __at 0xFD PWM1        ; // PWM register 1, P80C552 specific
 #endif
 
 #ifdef PWMP_AT_0XFE
 #undef PWMP_AT_0XFE
-sfr at 0xFE PWMP        ; // PWM prescaler, P80C552 specific
+__sfr __at 0xFE PWMP        ; // PWM prescaler, P80C552 specific
 #endif
 
 #ifdef RCAP2H
 #undef RCAP2H
-sfr at 0xCB RCAP2H      ;
+__sfr __at 0xCB RCAP2H      ;
 #endif
 
 #ifdef RCAP2L
 #undef RCAP2L
-sfr at 0xCA RCAP2L      ;
+__sfr __at 0xCA RCAP2L      ;
 #endif
 
 #ifdef RNR
 #undef RNR
-sfr at 0xCF RNR         ;
+__sfr __at 0xCF RNR         ;
 #endif
 
 #ifdef ROMSIZE__x__x__x__x__x__RMS2__RMS1__RMS0
 #undef ROMSIZE__x__x__x__x__x__RMS2__RMS1__RMS0
-sfr at 0xC2 ROMSIZE     ; // DS87C520, DS83C520
+__sfr __at 0xC2 ROMSIZE     ; // DS87C520, DS83C520
 // Not directly accessible bits
 #define RSM0        0x01
 #define RSM1        0x02
@@ -3793,7 +3793,7 @@ sfr at 0xC2 ROMSIZE     ; // DS87C520, DS83C520
 
 #ifdef ROMSIZE__x__x__x__x__PRAME__RMS2__RMS1__RMS0
 #undef ROMSIZE__x__x__x__x__PRAME__RMS2__RMS1__RMS0
-sfr at 0xC2 ROMSIZE     ; // DS89C420
+__sfr __at 0xC2 ROMSIZE     ; // DS89C420
 // Not directly accessible bits
 #define RSM0        0x01
 #define RSM1        0x02
@@ -3803,7 +3803,7 @@ sfr at 0xC2 ROMSIZE     ; // DS89C420
 
 #ifdef ROMSIZE__HBPF__BPF__TE__MOVCX__PRAME__RMS2__RMS1__RMS0
 #undef ROMSIZE__HBPF__BPF__TE__MOVCX__PRAME__RMS2__RMS1__RMS0
-sfr at 0xC2 ROMSIZE     ; // DS87C520, DS83C520
+__sfr __at 0xC2 ROMSIZE     ; // DS87C520, DS83C520
 // Not directly accessible bits
 #define RSM0        0x01
 #define RSM1        0x02
@@ -3817,19 +3817,19 @@ sfr at 0xC2 ROMSIZE     ; // DS87C520, DS83C520
 
 #ifdef RPCTL
 #undef RPCTL
-sfr at 0xD8 RPCTL       ;  // Dallas DS5001 specific
-sbit at 0xD8 RG0        ;
-sbit at 0xD9 RPCON      ;
-sbit at 0xDA DMA        ;
-sbit at 0xDB IBI        ;
-sbit at 0xDC AE         ;
-sbit at 0xDD EXBS       ;
-sbit at 0xDF RNR_FLAG   ;
+__sfr __at 0xD8 RPCTL       ;  // Dallas DS5001 specific
+__sbit __at 0xD8 RG0        ;
+__sbit __at 0xD9 RPCON      ;
+__sbit __at 0xDA DMA        ;
+__sbit __at 0xDB IBI        ;
+__sbit __at 0xDC AE         ;
+__sbit __at 0xDD EXBS       ;
+__sbit __at 0xDF RNR_FLAG   ;
 #endif
 
 #ifdef RTE__TP47__TP46__RP45__RP44__RP43__RP42__RP41__RP40
 #undef RTE__TP47__TP46__RP45__RP44__RP43__RP42__RP41__RP40
-sfr at 0xEF RTE         ; // Reset/toggle enable, P80C552 specific
+__sfr __at 0xEF RTE         ; // Reset/toggle enable, P80C552 specific
 // Not directly accessible Bits.
 #define RP40        0x01
 #define RP41        0x02
@@ -3843,105 +3843,105 @@ sfr at 0xEF RTE         ; // Reset/toggle enable, P80C552 specific
 
 #ifdef S0BUF
 #undef S0BUF
-sfr at 0x99 S0BUF       ; // serial channel 0 buffer register SAB80517 specific
+__sfr __at 0x99 S0BUF       ; // serial channel 0 buffer register SAB80517 specific
 #endif
 
 #ifdef S0CON__SM0__SM1__SM2__REN__TB8__RB8__TI__RI
 #undef S0CON__SM0__SM1__SM2__REN__TB8__RB8__TI__RI
-sfr at 0x98 S0CON       ; // serial channel 0 control register P80C552 specific
+__sfr __at 0x98 S0CON       ; // serial channel 0 control register P80C552 specific
 // Bit registers
 // Already defined in SCON
-//sbit at 0x98 RI0  ;
-//sbit at 0x99 TI0  ;
-//sbit at 0x9A RB8  ;
-//sbit at 0x9B TB8  ;
-//sbit at 0x9C REN  ;
-//sbit at 0x9D SM2  ;
-//sbit at 0x9E SM1  ;
-//sbit at 0x9F SM0  ;
+//__sbit __at 0x98 RI0  ;
+//__sbit __at 0x99 TI0  ;
+//__sbit __at 0x9A RB8  ;
+//__sbit __at 0x9B TB8  ;
+//__sbit __at 0x9C REN  ;
+//__sbit __at 0x9D SM2  ;
+//__sbit __at 0x9E SM1  ;
+//__sbit __at 0x9F SM0  ;
 #endif
 
 #ifdef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
 #undef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
 // serial channel 0 buffer register SAB80517 specific(same as stock SCON)
-sfr at 0x98 S0CON       ;
-sbit at 0x98 RI0        ;
-sbit at 0x99 TI0        ;
-sbit at 0x9A RB80       ;
-sbit at 0x9B TB80       ;
-sbit at 0x9C REN0       ;
-sbit at 0x9D SM20       ;
-sbit at 0x9E SM1        ;
-sbit at 0x9F SM0        ;
+__sfr __at 0x98 S0CON       ;
+__sbit __at 0x98 RI0        ;
+__sbit __at 0x99 TI0        ;
+__sbit __at 0x9A RB80       ;
+__sbit __at 0x9B TB80       ;
+__sbit __at 0x9C REN0       ;
+__sbit __at 0x9D SM20       ;
+__sbit __at 0x9E SM1        ;
+__sbit __at 0x9F SM0        ;
 #endif
 
 #ifdef S0RELL
 #undef S0RELL
-sfr at 0xAA S0RELL      ; // serial channel 0 reload register low byte SAB80517 specific
+__sfr __at 0xAA S0RELL      ; // serial channel 0 reload register low byte SAB80517 specific
 #endif
 
 #ifdef S0RELH
 #undef S0RELH
-sfr at 0xBA S0RELH      ; // serial channel 0 reload register high byte SAB80517 specific
+__sfr __at 0xBA S0RELH      ; // serial channel 0 reload register high byte SAB80517 specific
 #endif
 
 #ifdef S1ADR__x__x__x__x__x__x__x__GC
 #undef S1ADR__x__x__x__x__x__x__x__GC
-sfr at 0xDB S1ADR       ; // Serial 1 address, P80C552 specific
+__sfr __at 0xDB S1ADR       ; // Serial 1 address, P80C552 specific
 // Not directly accessible Bits.
 #define GC      0x01
 #endif
 
 #ifdef S1BUF
 #undef S1BUF
-sfr at 0x9C S1BUF       ; // serial channel 1 buffer register SAB80517 specific
+__sfr __at 0x9C S1BUF       ; // serial channel 1 buffer register SAB80517 specific
 #endif
 
 #ifdef S1CON_AT_0X9B
 #undef S1CON_AT_0X9B
-sfr at 0x9B S1CON       ; // serial channel 1 control register SAB80517 specific
+__sfr __at 0x9B S1CON       ; // serial channel 1 control register SAB80517 specific
 #endif
 
 #ifdef S1CON__CR2__ENS1__STA__ST0__SI__AA__CR1__CR0
 #undef S1CON__CR2__ENS1__STA__ST0__SI__AA__CR1__CR0
-sfr at 0xD8 S1CON       ; // Serial 1 control, P80C552 specific
-sfr at 0xD8 SICON       ; // sometimes called SICON
+__sfr __at 0xD8 S1CON       ; // Serial 1 control, P80C552 specific
+__sfr __at 0xD8 SICON       ; // sometimes called SICON
 // Bit register
-sbit at 0xD8 CR0        ;
-sbit at 0xD9 CR1        ;
-sbit at 0xDA AA         ;
-sbit at 0xDB SI         ;
-sbit at 0xDC ST0        ;
-sbit at 0xDD STA        ;
-sbit at 0xDE ENS1       ;
-sbit at 0xDF CR2        ;
+__sbit __at 0xD8 CR0        ;
+__sbit __at 0xD9 CR1        ;
+__sbit __at 0xDA AA         ;
+__sbit __at 0xDB SI         ;
+__sbit __at 0xDC ST0        ;
+__sbit __at 0xDD STA        ;
+__sbit __at 0xDE ENS1       ;
+__sbit __at 0xDF CR2        ;
 #endif
 
 #ifdef S1DAT_AT_0XDA
 #undef S1DAT_AT_0XDA
-sfr at 0xDA S1DAT       ; // Serial 1 data, P80C552 specific
-sfr at 0xDA SIDAT       ; // sometimes called SIDAT
+__sfr __at 0xDA S1DAT       ; // Serial 1 data, P80C552 specific
+__sfr __at 0xDA SIDAT       ; // sometimes called SIDAT
 #endif
 
 #ifdef S1IST_AT_0XDC
 #undef S1IST_AT_0XDC
 // P89C668 specific
-sfr at 0xDC S1IST       ;
+__sfr __at 0xDC S1IST       ;
 #endif
 
 #ifdef S1RELL
 #undef S1RELL
-sfr at 0x9D S1RELL      ; // serial channel 1 reload register low byte SAB80517 specific
+__sfr __at 0x9D S1RELL      ; // serial channel 1 reload register low byte SAB80517 specific
 #endif
 
 #ifdef S1RELH
 #undef S1RELH
-sfr at 0xBB S1RELH      ; // serial channel 1 reload register high byte SAB80517 specific
+__sfr __at 0xBB S1RELH      ; // serial channel 1 reload register high byte SAB80517 specific
 #endif
 
 #ifdef S1STA__SC4__SC3__SC2__SC1__SC0__x__x__x
 #undef S1STA__SC4__SC3__SC2__SC1__SC0__x__x__x
-sfr at 0xD9 S1STA       ; // Serial 1 status, P80C552 specific
+__sfr __at 0xD9 S1STA       ; // Serial 1 status, P80C552 specific
 // Not directly accessible Bits.
 #define SC0         0x08
 #define SC1         0x10
@@ -3952,110 +3952,110 @@ sfr at 0xD9 S1STA       ; // Serial 1 status, P80C552 specific
 
 #ifdef SADR_AT_0XA9
 #undef SADR_AT_0XA9
-sfr at 0xA9 SADDR       ;
+__sfr __at 0xA9 SADDR       ;
 #endif
 
 #ifdef SADDR0
 #undef SADDR0
 // DS80C320 specific
-sfr at 0xA9 SADDR0      ;
+__sfr __at 0xA9 SADDR0      ;
 #endif
 
 #ifdef SADDR1
 #undef SADDR1
 // DS80C320 specific
-sfr at 0xAA SADDR1      ;
+__sfr __at 0xAA SADDR1      ;
 #endif
 
 #ifdef SADEN_AT_0XB9
 #undef SADEN_AT_0XB9
-sfr at 0xB9 SADEN       ;
+__sfr __at 0xB9 SADEN       ;
 #endif
 
 #ifdef SADEN0
 #undef SADEN0
 // DS80C320 & DS80C390 specific
-sfr at 0xB9 SADEN0      ;
+__sfr __at 0xB9 SADEN0      ;
 #endif
 
 #ifdef SADEN1
 #undef SADEN1
 // DS80C320 & DS80C390 specific
-sfr at 0xBA SADEN1      ;
+__sfr __at 0xBA SADEN1      ;
 #endif
 
 #ifdef SBUF
 #undef SBUF
-sfr at 0x99 SBUF        ;
-sfr at 0x99 SBUF0       ;
+__sfr __at 0x99 SBUF        ;
+__sfr __at 0x99 SBUF0       ;
 #endif
 
 #ifdef SBUF1
 #undef SBUF1
 // DS80C320 & DS80C390 specific
-sfr at 0xC1 SBUF1       ;
+__sfr __at 0xC1 SBUF1       ;
 #endif
 
 #ifdef SCON
 #undef SCON
-sfr at 0x98 SCON        ;
+__sfr __at 0x98 SCON        ;
 // Bit registers
-sbit at 0x98 RI         ;
-sbit at 0x99 TI         ;
-sbit at 0x9A RB8        ;
-sbit at 0x9B TB8        ;
-sbit at 0x9C REN        ;
-sbit at 0x9D SM2        ;
-sbit at 0x9E SM1        ;
-sbit at 0x9F SM0        ;
+__sbit __at 0x98 RI         ;
+__sbit __at 0x99 TI         ;
+__sbit __at 0x9A RB8        ;
+__sbit __at 0x9B TB8        ;
+__sbit __at 0x9C REN        ;
+__sbit __at 0x9D SM2        ;
+__sbit __at 0x9E SM1        ;
+__sbit __at 0x9F SM0        ;
 #endif
 
 #ifdef SCON0
 #undef SCON0
-sfr at 0x98 SCON0       ;
+__sfr __at 0x98 SCON0       ;
 // Bit registers
-sbit at 0x98 RI_0       ;
-sbit at 0x99 TI_0       ;
-sbit at 0x9A RB8_0      ;
-sbit at 0x9B TB8_0      ;
-sbit at 0x9C REN_0      ;
-sbit at 0x9D SM2_0      ;
-sbit at 0x9E SM1_0      ;
-sbit at 0x9F SM0_0      ;
-sbit at 0x9F FE_0       ;
-sbit at 0x9F SM0_FE_0   ;
+__sbit __at 0x98 RI_0       ;
+__sbit __at 0x99 TI_0       ;
+__sbit __at 0x9A RB8_0      ;
+__sbit __at 0x9B TB8_0      ;
+__sbit __at 0x9C REN_0      ;
+__sbit __at 0x9D SM2_0      ;
+__sbit __at 0x9E SM1_0      ;
+__sbit __at 0x9F SM0_0      ;
+__sbit __at 0x9F FE_0       ;
+__sbit __at 0x9F SM0_FE_0   ;
 #endif
 
 #ifdef SCON1
 #undef SCON1
 // DS80C320 - 80C390 specific
-sfr at 0xC0 SCON1       ;
+__sfr __at 0xC0 SCON1       ;
 // Bit registers
-sbit at 0xC0 RI_1       ;
-sbit at 0xC1 TI_1       ;
-sbit at 0xC2 RB8_1      ;
-sbit at 0xC3 TB8_1      ;
-sbit at 0xC4 REN_1      ;
-sbit at 0xC5 SM2_1      ;
-sbit at 0xC6 SM1_1      ;
-sbit at 0xC7 SM0_1      ;
-sbit at 0xC7 FE_1       ;
-sbit at 0xC7 SM0_FE_1   ;
+__sbit __at 0xC0 RI_1       ;
+__sbit __at 0xC1 TI_1       ;
+__sbit __at 0xC2 RB8_1      ;
+__sbit __at 0xC3 TB8_1      ;
+__sbit __at 0xC4 REN_1      ;
+__sbit __at 0xC5 SM2_1      ;
+__sbit __at 0xC6 SM1_1      ;
+__sbit __at 0xC7 SM0_1      ;
+__sbit __at 0xC7 FE_1       ;
+__sbit __at 0xC7 SM0_FE_1   ;
 #endif
 
 #ifdef SETMSK
 #undef SETMSK
-sfr at 0xA5 SETMSK;
+__sfr __at 0xA5 SETMSK;
 #endif
 
 #ifdef SP
 #undef SP
-sfr at 0x81 SP          ;
+__sfr __at 0x81 SP          ;
 #endif
 
 #ifdef SPCR
 #undef SPCR
-sfr at 0xD5 SPCR        ; // AT89S53 specific
+__sfr __at 0xD5 SPCR        ; // AT89S53 specific
 // Not directly accesible bits
 #define SPR0        0x01
 #define SPR1        0x02
@@ -4069,7 +4069,7 @@ sfr at 0xD5 SPCR        ; // AT89S53 specific
 
 #ifdef SPDR
 #undef SPDR
-sfr at 0x86 SPDR        ; // AT89S53 specific
+__sfr __at 0x86 SPDR        ; // AT89S53 specific
 // Not directly accesible bits
 #define SPD_0       0x01
 #define SPD_1       0x02
@@ -4083,7 +4083,7 @@ sfr at 0x86 SPDR        ; // AT89S53 specific
 
 #ifdef SPSR
 #undef SPSR
-sfr at 0xAA SPSR        ; // AT89S53 specific
+__sfr __at 0xAA SPSR        ; // AT89S53 specific
 // Not directly accesible bits
 #define SPIF        0x40
 #define WCOL        0x80
@@ -4091,18 +4091,18 @@ sfr at 0xAA SPSR        ; // AT89S53 specific
 
 #ifdef SRELH
 #undef SRELH
-sfr at 0xBA SRELH       ; // Baudrate generator reload high
+__sfr __at 0xBA SRELH       ; // Baudrate generator reload high
 #endif
 
 #ifdef SRELL
 #undef SRELL
-sfr at 0xAA SRELL       ; // Baudrate generator reload low
+__sfr __at 0xAA SRELL       ; // Baudrate generator reload low
 #endif
 
 #ifdef STATUS__PIP__HIP__LIP__x__x__x__x__x
 #undef STATUS__PIP__HIP__LIP__x__x__x__x__x
 // DS80C320 specific
-sfr at 0xC5 STATUS      ;
+__sfr __at 0xC5 STATUS      ;
 // Not directly accessible Bits. DS80C320 specific
 #define LIP         0x20
 #define HIP         0x40
@@ -4111,7 +4111,7 @@ sfr at 0xC5 STATUS      ;
 
 #ifdef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
 #undef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
-sfr at 0xC5 STATUS      ; // DS80C390 specific
+__sfr __at 0xC5 STATUS      ; // DS80C390 specific
 // Not directly accessible Bits.
 #define SPRA0       0x01
 #define SPTA0       0x02
@@ -4124,7 +4124,7 @@ sfr at 0xC5 STATUS      ; // DS80C390 specific
 
 #ifdef STATUS__PIS2__PIS1__PIS0__x__SPTA1__SPRA1__SPTA0__SPRA0
 #undef STATUS__PIS2__PIS1__PIS0__x__SPTA1__SPRA1__SPTA0__SPRA0
-sfr at 0xC5 STATUS      ; // DS89C420 specific
+__sfr __at 0xC5 STATUS      ; // DS89C420 specific
 // Not directly accessible Bits.
 #define SPRA0       0x01
 #define SPTA0       0x02
@@ -4137,7 +4137,7 @@ sfr at 0xC5 STATUS      ; // DS89C420 specific
 
 #ifdef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
 #undef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
-sfr at 0xC5 STATUS      ; // DS80C390 specific
+__sfr __at 0xC5 STATUS      ; // DS80C390 specific
 // Not directly accessible Bits.
 #define SPRA0       0x01
 #define SPTA0       0x02
@@ -4150,7 +4150,7 @@ sfr at 0xC5 STATUS      ; // DS80C390 specific
 
 #ifdef STATUS__PIP__HIP__LIP__XTUP__SPTA2__SPTA1__SPTA0__SPRA0
 #undef STATUS__PIP__HIP__LIP__XTUP__SPTA2__SPTA1__SPTA0__SPRA0
-sfr at 0xC5 STATUS      ; // DS87C520 & DS83520specific
+__sfr __at 0xC5 STATUS      ; // DS87C520 & DS83520specific
 // Not directly accessible Bits.
 #define SPRA0       0x01
 #define SPTA0       0x02
@@ -4164,7 +4164,7 @@ sfr at 0xC5 STATUS      ; // DS87C520 & DS83520specific
 
 #ifdef STATUS__ST7__ST6__ST5__ST4__IA0__F0__IBF__OBF
 #undef STATUS__ST7__ST6__ST5__ST4__IA0__F0__IBF__OBF
-sfr at 0xDA STATUS      ; // DS5001specific
+__sfr __at 0xDA STATUS      ; // DS5001specific
 // Not directly accessible Bits.
 #define OBF         0x01
 #define IBF         0x02
@@ -4178,7 +4178,7 @@ sfr at 0xDA STATUS      ; // DS5001specific
 
 #ifdef STE__TG47__TG46__SP45__SP44__SP43__SP42__SP41__SP40
 #undef STE__TG47__TG46__SP45__SP44__SP43__SP42__SP41__SP40
-sfr at 0xEE STE         ; // Set enable, P80C552 specific
+__sfr __at 0xEE STE         ; // Set enable, P80C552 specific
 // Not directly accessible Bits.
 #define SP40        0x01
 #define SP41        0x02
@@ -4192,7 +4192,7 @@ sfr at 0xEE STE         ; // Set enable, P80C552 specific
 
 #ifdef SYSCON
 #undef SYSCON
-sfr at 0xB1 SYSCON      ; // XRAM Controller Access Control
+__sfr __at 0xB1 SYSCON      ; // XRAM Controller Access Control
 // SYSCON bits
 #define SYSCON_XMAP0 0x01
 #define SYSCON_XMAP1 0x02
@@ -4202,66 +4202,66 @@ sfr at 0xB1 SYSCON      ; // XRAM Controller Access Control
 
 #ifdef SYSCON1
 #undef SYSCON1
-sfr at 0xB2 SYSCON1;
+__sfr __at 0xB2 SYSCON1;
 #endif
 
 #ifdef T2
 #undef T2
-sfr at 0xCC T2;
+__sfr __at 0xCC T2;
 #endif
 
 #ifdef T2CON__TF2__EXF2__RCLK__TCLK__EXEN2__TR2__C_T2__CP_RL2
 #undef T2CON__TF2__EXF2__RCLK__TCLK__EXEN2__TR2__C_T2__CP_RL2
-sfr at 0xC8 T2CON       ;
+__sfr __at 0xC8 T2CON       ;
 // Definitions for the 8052 compatible microcontrollers.
 // Bit registers
-sbit at 0xC8 CP_RL2     ;
-sbit at 0xC9 C_T2       ;
-sbit at 0xCA TR2        ;
-sbit at 0xCB EXEN2      ;
-sbit at 0xCC TCLK       ;
-sbit at 0xCD RCLK       ;
-sbit at 0xCE EXF2       ;
-sbit at 0xCF TF2        ;
+__sbit __at 0xC8 CP_RL2     ;
+__sbit __at 0xC9 C_T2       ;
+__sbit __at 0xCA TR2        ;
+__sbit __at 0xCB EXEN2      ;
+__sbit __at 0xCC TCLK       ;
+__sbit __at 0xCD RCLK       ;
+__sbit __at 0xCE EXF2       ;
+__sbit __at 0xCF TF2        ;
 // alternate names
-sbit at 0xC8 T2CON_0    ;
-sbit at 0xC9 T2CON_1    ;
-sbit at 0xCA T2CON_2    ;
-sbit at 0xCB T2CON_3    ;
-sbit at 0xCC T2CON_4    ;
-sbit at 0xCD T2CON_5    ;
-sbit at 0xCE T2CON_6    ;
-sbit at 0xCF T2CON_7    ;
+__sbit __at 0xC8 T2CON_0    ;
+__sbit __at 0xC9 T2CON_1    ;
+__sbit __at 0xCA T2CON_2    ;
+__sbit __at 0xCB T2CON_3    ;
+__sbit __at 0xCC T2CON_4    ;
+__sbit __at 0xCD T2CON_5    ;
+__sbit __at 0xCE T2CON_6    ;
+__sbit __at 0xCF T2CON_7    ;
 #endif
 
 #ifdef T2CON__T2PS__I3FR__I2FR__T2R1__T2R0__T2CM__T2I1__T2I0
 #undef T2CON__T2PS__I3FR__I2FR__T2R1__T2R0__T2CM__T2I1__T2I0
-sfr at 0xC8 T2CON       ;
+__sfr __at 0xC8 T2CON       ;
 // Definitions for the Infineon / Siemens SAB80515, SAB80515A, SAB80517
 // Bit registers
-sbit at 0xC8 T2I0       ;
-sbit at 0xC9 T2I1       ;
-sbit at 0xCA T2CM       ;
-sbit at 0xCB T2R0       ;
-sbit at 0xCC T2R1       ;
-sbit at 0xCD I2FR       ;
-sbit at 0xCE I3FR       ;
-sbit at 0xCF T2PS       ;
+__sbit __at 0xC8 T2I0       ;
+__sbit __at 0xC9 T2I1       ;
+__sbit __at 0xCA T2CM       ;
+__sbit __at 0xCB T2R0       ;
+__sbit __at 0xCC T2R1       ;
+__sbit __at 0xCD I2FR       ;
+__sbit __at 0xCE I3FR       ;
+__sbit __at 0xCF T2PS       ;
 // alternate names
-sbit at 0xC8 T2CON_0    ;
-sbit at 0xC9 T2CON_1    ;
-sbit at 0xCA T2CON_2    ;
-sbit at 0xCB T2CON_3    ;
-sbit at 0xCC T2CON_4    ;
-sbit at 0xCD T2CON_5    ;
-sbit at 0xCE T2CON_6    ;
-sbit at 0xCF T2CON_7    ;
+__sbit __at 0xC8 T2CON_0    ;
+__sbit __at 0xC9 T2CON_1    ;
+__sbit __at 0xCA T2CON_2    ;
+__sbit __at 0xCB T2CON_3    ;
+__sbit __at 0xCC T2CON_4    ;
+__sbit __at 0xCD T2CON_5    ;
+__sbit __at 0xCE T2CON_6    ;
+__sbit __at 0xCF T2CON_7    ;
 #endif
 
 #ifdef T2MOD__x__x__x__D13T1__D13T2__x__T2OE__DCEN
 #undef T2MOD__x__x__x__D13T1__D13T2__x__T2OE__DCEN
 // Definitions for the timer/counter 2 of the Atmel & Dallas microcontrollers
-sfr at 0xC9 T2MOD       ;
+__sfr __at 0xC9 T2MOD       ;
 // Not not directly accessible T2MOD bits
 #define DCEN        0x01
 #define T2OE        0x02
@@ -4272,7 +4272,7 @@ sfr at 0xC9 T2MOD       ;
 #ifdef T2MOD__x__x__x__x__x__x__T2OE__DCEN
 #undef T2MOD__x__x__x__x__x__x__T2OE__DCEN
 // Definitions for the timer/counter 2 of the Atmel 89x52 microcontroller
-sfr at 0xC9 T2MOD       ;
+__sfr __at 0xC9 T2MOD       ;
 // Not not directly accessible T2MOD bits
 #define DCEN        0x01
 #define T2OE        0x02
@@ -4283,62 +4283,62 @@ sfr at 0xC9 T2MOD       ;
 
 #ifdef T3_AT_0XFF
 #undef T3_AT_0XFF
-sfr at 0xFF T3          ; // Timer 3, P80C552 specific
+__sfr __at 0xFF T3          ; // Timer 3, P80C552 specific
 #endif
 
 #ifdef TA
 #undef TA
 // DS500x, DS80C320 & DS80C390 specific
-sfr at 0xC7 TA          ;
+__sfr __at 0xC7 TA          ;
 #endif
 
 #ifdef TCON
 #undef TCON
-sfr at 0x88 TCON        ;
+__sfr __at 0x88 TCON        ;
 //  Bit registers
-sbit at 0x88 IT0        ;
-sbit at 0x89 IE0        ;
-sbit at 0x8A IT1        ;
-sbit at 0x8B IE1        ;
-sbit at 0x8C TR0        ;
-sbit at 0x8D TF0        ;
-sbit at 0x8E TR1        ;
-sbit at 0x8F TF1        ;
+__sbit __at 0x88 IT0        ;
+__sbit __at 0x89 IE0        ;
+__sbit __at 0x8A IT1        ;
+__sbit __at 0x8B IE1        ;
+__sbit __at 0x8C TR0        ;
+__sbit __at 0x8D TF0        ;
+__sbit __at 0x8E TR1        ;
+__sbit __at 0x8F TF1        ;
 #endif
 
 #ifdef TH0
 #undef TH0
-sfr at 0x8C TH0         ;
+__sfr __at 0x8C TH0         ;
 #endif
 
 #ifdef TH1
 #undef TH1
-sfr at 0x8D TH1         ;
+__sfr __at 0x8D TH1         ;
 #endif
 
 #ifdef TH2
 #undef TH2
-sfr at 0xCD TH2         ;
+__sfr __at 0xCD TH2         ;
 #endif
 
 #ifdef TL0
 #undef TL0
-sfr at 0x8A TL0         ;
+__sfr __at 0x8A TL0         ;
 #endif
 
 #ifdef TL1
 #undef TL1
-sfr at 0x8B TL1         ;
+__sfr __at 0x8B TL1         ;
 #endif
 
 #ifdef TL2
 #undef TL2
-sfr at 0xCC TL2         ;
+__sfr __at 0xCC TL2         ;
 #endif
 
 #ifdef TMOD
 #undef TMOD
-sfr at 0x89 TMOD        ;
+__sfr __at 0x89 TMOD        ;
 // Not directly accessible TMOD bits
 #define T0_M0       0x01
 #define T0_M1       0x02
@@ -4355,7 +4355,7 @@ sfr at 0x89 TMOD        ;
 
 #ifdef TM2CON__T2IS1__T2IS0__T2ER__T2B0__T2P1__T2P0__T2MS1__T2MS0
 #undef TM2CON__T2IS1__T2IS0__T2ER__T2B0__T2P1__T2P0__T2MS1__T2MS0
-sfr at 0xEA TM2CON      ; // Timer 2 control, P80C552 specific
+__sfr __at 0xEA TM2CON      ; // Timer 2 control, P80C552 specific
 // Not directly accessible Bits.
 #define T2MS0       0x01
 #define T2MS1       0x02
@@ -4369,31 +4369,31 @@ sfr at 0xEA TM2CON      ; // Timer 2 control, P80C552 specific
 
 #ifdef TM2IR__T20V__CMI2__CMI1__CMI0__CTI3__CTI2__CTI1__CTI0
 #undef TM2IR__T20V__CMI2__CMI1__CMI0__CTI3__CTI2__CTI1__CTI0
-sfr at 0xC8 TM2IR       ; // Timer 2 int flag reg, P80C552 specific
+__sfr __at 0xC8 TM2IR       ; // Timer 2 int flag reg, P80C552 specific
 // Bit register
-sbit at 0xC8 CTI0       ;
-sbit at 0xC9 CTI1       ;
-sbit at 0xCA CTI2       ;
-sbit at 0xCB CTI3       ;
-sbit at 0xCC CMI0       ;
-sbit at 0xCD CMI1       ;
-sbit at 0xCE CMI2       ;
-sbit at 0xCF T20V       ;
+__sbit __at 0xC8 CTI0       ;
+__sbit __at 0xC9 CTI1       ;
+__sbit __at 0xCA CTI2       ;
+__sbit __at 0xCB CTI3       ;
+__sbit __at 0xCC CMI0       ;
+__sbit __at 0xCD CMI1       ;
+__sbit __at 0xCE CMI2       ;
+__sbit __at 0xCF T20V       ;
 #endif
 
 #ifdef TMH2_AT_0XED
 #undef TMH2_AT_0XED
-sfr at 0xED TMH2        ; // Timer high 2, P80C552 specific
+__sfr __at 0xED TMH2        ; // Timer high 2, P80C552 specific
 #endif
 
 #ifdef TML2_AT_0XEC
 #undef TML2_AT_0XEC
-sfr at 0xEC TML2        ; // Timer low 2, P80C552 specific
+__sfr __at 0xEC TML2        ; // Timer low 2, P80C552 specific
 #endif
 
 #ifdef WCON
 #undef WCON
-sfr at 0x96 WCON        ;   // AT89S53 specific
+__sfr __at 0x96 WCON        ;   // AT89S53 specific
 // Not directly accesible bits
 #define WDTEN       0x01
 #define WDTRST      0x02
@@ -4406,21 +4406,21 @@ sfr at 0x96 WCON        ;   // AT89S53 specific
 #ifdef WDCON
 #undef WDCON
 // DS80C320 - 390, DS89C420, etc. specific
-sfr at 0xD8 WDCON       ;
+__sfr __at 0xD8 WDCON       ;
 //  Bit registers
-sbit at 0xD8 RWT        ;
-sbit at 0xD9 EWT        ;
-sbit at 0xDA WTRF       ;
-sbit at 0xDB WDIF       ;
-sbit at 0xDC PFI        ;
-sbit at 0xDD EPFI       ;
-sbit at 0xDE POR        ;
-sbit at 0xDF SMOD_1     ;
+__sbit __at 0xD8 RWT        ;
+__sbit __at 0xD9 EWT        ;
+__sbit __at 0xDA WTRF       ;
+__sbit __at 0xDB WDIF       ;
+__sbit __at 0xDC PFI        ;
+__sbit __at 0xDD EPFI       ;
+__sbit __at 0xDE POR        ;
+__sbit __at 0xDF SMOD_1     ;
 #endif
 
 #ifdef WDTPRG_AT_0XA7
 #undef WDTPRG_AT_0XA7
-sfr at 0xA7 WDTPRG      ;
+__sfr __at 0xA7 WDTPRG      ;
 #define WDTRPRG_S0  0x01
 #define WDTRPRG_S1  0x02
 #define WDTRPRG_S2  0x04
@@ -4428,17 +4428,17 @@ sfr at 0xA7 WDTPRG      ;
 
 #ifdef WDTREL
 #undef WDTREL
-sfr at 0x86 WDTREL      ; // Watchdof Timer reload register
+__sfr __at 0x86 WDTREL      ; // Watchdof Timer reload register
 #endif
 
 #ifdef WDTRST_AT_0XA6
 #undef WDTRST_AT_0XA6
-sfr at 0xA6 WDTRST      ;
+__sfr __at 0xA6 WDTRST      ;
 #endif
 
 #ifdef XPAGE
 #undef XPAGE
-sfr at 0x91 XPAGE       ; // Page Address Register for Extended On-Chip Ram - Infineon / Siemens SAB80515A specific
+__sfr __at 0x91 XPAGE       ; // Page Address Register for Extended On-Chip Ram - Infineon / Siemens SAB80515A specific
 #endif
 
 /////////////////////////

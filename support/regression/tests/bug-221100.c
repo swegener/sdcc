@@ -9,7 +9,7 @@
 
 #ifdef SDCC_pic16
 /* not enough pic16 data space, so put the array into the code memory */
-code static unsigned int
+__code static unsigned int
 testArray[ARRAY_SIZE] = {
     0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
    10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
@@ -26,7 +26,7 @@ testArray[ARRAY_SIZE] = {
   120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
 };
 #else
-xdata static unsigned int
+__xdata static unsigned int
 testArray[ARRAY_SIZE];
 #endif
 
@@ -35,13 +35,13 @@ static unsigned int test_int;
 static unsigned char test_index;
 
 static void
-fetch(void)
+fetch (void)
 {
   test_int = testArray [test_index];
 }
 
 static void
-testUnsignedCharIndex(void)
+testUnsignedCharIndex (void)
 {
 #ifndef SDCC_pic16
   int i;
@@ -51,10 +51,10 @@ testUnsignedCharIndex(void)
 #endif
 
   test_index = 5;
-  fetch();
-  ASSERT(test_int == 5);
+  fetch ();
+  ASSERT (test_int == 5);
 
   test_index = 129;
-  fetch();
-  ASSERT(test_int == 129);
+  fetch ();
+  ASSERT (test_int == 129);
 }

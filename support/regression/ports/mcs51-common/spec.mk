@@ -17,7 +17,7 @@ else
   LINKFLAGS += --nostdlib -L$(LIBDIR)
 endif
 
-SDCCFLAGS += --less-pedantic -DREENTRANT=reentrant
+SDCCFLAGS += --less-pedantic -DREENTRANT=__reentrant
 LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 
 OBJEXT = .rel

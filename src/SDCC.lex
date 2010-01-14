@@ -42,7 +42,7 @@ IS      (u|U|l|L)*
                                 check_type())
 
 #define TKEYWORDSDCC(token) return (options.std_sdcc && isTargetKeyword(yytext)\
-                                    ? werror(W_DEPRECATED_KEYWORD, yytext, yytext), token : check_type())
+                                    ? deprecated_keyword (yytext), token : check_type())
 
 #define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
 
@@ -58,40 +58,54 @@ int lexLineno = 1;
 static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
 /* forward declarations */
-int yyerror(char *s);
-static const char *stringLiteral(void);
-static void count(void);
-static void count_char(int);
-static int process_pragma(const char *);
-static int check_type(void);
-static int isTargetKeyword(const char *s);
-static int checkCurrFile(const char *s);
+int yyerror (char *s);
+static const char *stringLiteral (void);
+static void count (void);
+static void count_char (int);
+static int process_pragma (const char *);
+static int check_type (void);
+static int isTargetKeyword (const char *s);
+static int checkCurrFile (const char *s);
+static void deprecated_keyword (char *yytext);
 %}
 
 %x asm
 %%
 _?"_asm"         {
   count();
-  if (!options.std_sdcc && yytext[1] != '_')
-    return check_type();
+  if (yytext[1] != '_') /* deprecated single underscore */
+    {      
+      if (!options.std_sdcc)
+        return check_type ();
+      else
+        deprecated_keyword (yytext);
+    }
   if (asmbuff.buf == NULL)
-    dbuf_init(&asmbuff, INITIAL_INLINEASM);
+    dbuf_init (&asmbuff, INITIAL_INLINEASM);
   else
-    dbuf_set_length(&asmbuff, 0);
+    dbuf_set_length (&asmbuff, 0);
 
-  BEGIN(asm);
+  BEGIN (asm);
 }
 <asm>_?"_endasm" {
   count();
-  if (!options.std_sdcc && yytext[1] != '_')
+  if (yytext[1] != '_') /* deprecated single underscore */
     {
-      dbuf_append_str(&asmbuff, yytext);
+      if (!options.std_sdcc)
+        dbuf_append_str (&asmbuff, yytext);
+      else
+        {
+          deprecated_keyword (yytext);
+          yylval.yyinline = dbuf_c_str (&asmbuff);
+          BEGIN (INITIAL);
+          return INLINEASM;
+        }
     }
   else
     {
-      yylval.yyinline = dbuf_c_str(&asmbuff);
-      BEGIN(INITIAL);
-      return (INLINEASM);
+      yylval.yyinline = dbuf_c_str (&asmbuff);
+      BEGIN (INITIAL);
+      return INLINEASM;
     }
 }
 <asm>\n        {
@@ -290,6 +304,20 @@ _?"_asm"         {
 #define yytext_ptr yytext
 #endif
 
+static void
+deprecated_keyword (char *yytext)
+{
+  struct dbuf_s dbuf;
+
+  dbuf_init (&dbuf, 32);
+
+  dbuf_append_char (&dbuf, '_');
+  if ('_' != yytext[0])
+    dbuf_append_char (&dbuf, '_');
+  dbuf_append_str (&dbuf, yytext);
+  werror (W_DEPRECATED_KEYWORD, yytext, dbuf_c_str(&dbuf));
+  dbuf_destroy (&dbuf);
+}
 
 static int checkCurrFile (const char *s)
 {

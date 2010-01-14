@@ -222,7 +222,7 @@
 #define E_BAD_INT_ARGUMENT            194 /* Bad integer option argument */
 #define E_NEGATIVE_ARRAY_SIZE         195 /* Size of array '%s' is negative */
 #define W_TARGET_LOST_QUALIFIER       196 /* Pointer target lost qualifier */
-#define W_DEPRECATED_KEYWORD          197 /* keyword %s is deprecated, use __%s instead */
+#define W_DEPRECATED_KEYWORD          197 /* keyword '%s' is deprecated, use '%s' instead */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

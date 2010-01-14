@@ -447,7 +447,7 @@ struct
 { W_TARGET_LOST_QUALIFIER, ERROR_LEVEL_WARNING,
    "pointer target lost %s qualifier" },
 { W_DEPRECATED_KEYWORD, ERROR_LEVEL_WARNING,
-   "keyword '%s' is deprecated, use '__%s' instead" },
+   "keyword '%s' is deprecated, use '%s' instead" },
 };
 
 /*

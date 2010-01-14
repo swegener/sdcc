@@ -1,6 +1,6 @@
 2010-01-14 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.lex,
+	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.lex, doc/sdccman.lyx,
 	  device/include/mcs51/mcs51reg.h,
 	  support/regression/tests/bug2817646.c,
 	  support/regression/tests/driverstruct.c,
@@ -63,6 +63,9 @@
 	  support/regression/ports/mcs51-common/support.c,
 	  support/regression/generate-cases.py:
 	  implemented RFE #2931693: deprecate warnings for sdcc specific keyword
+	* configure.in, configure:
+	  implemented RFE #2932327: remove unsupported and broken targets xa51 and avr
+	* .version, doc/sdccman.lyx: bumped version to 2.9.7
 
 2010-01-11 Borut Razem <borut.razem AT siol.net>
 

@@ -605,13 +605,13 @@ OPT_DISABLE_SDCPP
 OPT_DISABLE_PACKIHX
 OPT_DISABLE_DEVICE_LIB
 OPT_DISABLE_UCSIM
-OPT_DISABLE_HC08
 OPT_DISABLE_XA51
+OPT_DISABLE_AVR
+OPT_DISABLE_HC08
 OPT_DISABLE_PIC16
 OPT_DISABLE_PIC
 OPT_DISABLE_DS400
 OPT_DISABLE_DS390
-OPT_DISABLE_AVR
 OPT_DISABLE_Z80
 OPT_DISABLE_GBZ80
 OPT_DISABLE_MCS51
@@ -692,13 +692,13 @@ with_ccache
 enable_mcs51_port
 enable_gbz80_port
 enable_z80_port
-enable_avr_port
 enable_ds390_port
 enable_ds400_port
 enable_pic_port
 enable_pic16_port
-enable_xa51_port
 enable_hc08_port
+enable_avr_port
+enable_xa51_port
 enable_ucsim
 enable_device_lib
 enable_packihx
@@ -1342,13 +1342,13 @@ Optional Features:
   --disable-mcs51-port    Excludes the Intel mcs51 port
   --disable-gbz80-port    Excludes the Gameboy gbz80 port
   --disable-z80-port      Excludes the z80 port
-  --disable-avr-port      Excludes the AVR port
   --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic-port      Excludes the PIC port
   --disable-pic16-port    Excludes the PIC16 port
-  --disable-xa51-port     Excludes the XA51 port
   --disable-hc08-port     Excludes the HC08 port
+  --enable-avr-port       Includes the AVR port (disabled by default)
+  --enable-xa51-port      Includes the XA51 port (disabled by default)
   --disable-ucsim         Disables configuring and building of ucsim
   --disable-device-lib    Disables building device libraries
   --disable-packihx       Disables building packihx
@@ -5229,9 +5229,18 @@ _ACEOF
 #   $4 help string
 
 
+# macro AC_DO_PORT_ENABLER($1, $2, $3, $4)
+#   $1 used to access enable_$2_port, e.g. gbz80
+#   $2 port name in ports.all and ports.build, e.g. z80
+#   $3 OPT_DISABLE_$3, normally uppercase of $2, e.g. GBZ80
+#   $4 help string
+
+
 # Now handle the port selection
 # ===========================================================================
 rm -f ports.all ports.build
+
+# Supported targets
 
   # Check whether --enable-mcs51-port was given.
 if test "${enable_mcs51_port+set}" = set; then :
@@ -5305,31 +5314,6 @@ _ACEOF
   echo z80 >>ports.all
   if test $OPT_DISABLE_Z80 = 0; then
     echo z80 >>ports.build
-  fi
-
-
-  # Check whether --enable-avr-port was given.
-if test "${enable_avr_port+set}" = set; then :
-  enableval=$enable_avr_port;
-fi
-
-
-  if test "$enable_avr_port" = "no"; then
-    OPT_DISABLE_AVR=1
-  else
-    enable_avr_port="yes"
-    OPT_DISABLE_AVR=0
-  fi
-
-  cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_AVR $OPT_DISABLE_AVR
-_ACEOF
-
-
-
-  echo avr >>ports.all
-  if test $OPT_DISABLE_AVR = 0; then
-    echo avr >>ports.build
   fi
 
 
@@ -5437,31 +5421,6 @@ _ACEOF
   fi
 
 
-  # Check whether --enable-xa51-port was given.
-if test "${enable_xa51_port+set}" = set; then :
-  enableval=$enable_xa51_port;
-fi
-
-
-  if test "$enable_xa51_port" = "no"; then
-    OPT_DISABLE_XA51=1
-  else
-    enable_xa51_port="yes"
-    OPT_DISABLE_XA51=0
-  fi
-
-  cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_XA51 $OPT_DISABLE_XA51
-_ACEOF
-
-
-
-  echo xa51 >>ports.all
-  if test $OPT_DISABLE_XA51 = 0; then
-    echo xa51 >>ports.build
-  fi
-
-
   # Check whether --enable-hc08-port was given.
 if test "${enable_hc08_port+set}" = set; then :
   enableval=$enable_hc08_port;
@@ -5484,6 +5443,58 @@ _ACEOF
   echo hc08 >>ports.all
   if test $OPT_DISABLE_HC08 = 0; then
     echo hc08 >>ports.build
+  fi
+
+
+# Unsupported targets
+
+  # Check whether --enable-avr-port was given.
+if test "${enable_avr_port+set}" = set; then :
+  enableval=$enable_avr_port;
+fi
+
+
+  if test "$enable_avr_port" = "yes"; then
+    OPT_DISABLE_AVR=0
+  else
+    enable_avr_port="no"
+    OPT_DISABLE_AVR=1
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_AVR $OPT_DISABLE_AVR
+_ACEOF
+
+
+
+  echo avr >>ports.all
+  if test $OPT_DISABLE_AVR = 0; then
+    echo avr >>ports.build
+  fi
+
+
+  # Check whether --enable-xa51-port was given.
+if test "${enable_xa51_port+set}" = set; then :
+  enableval=$enable_xa51_port;
+fi
+
+
+  if test "$enable_xa51_port" = "yes"; then
+    OPT_DISABLE_XA51=0
+  else
+    enable_xa51_port="no"
+    OPT_DISABLE_XA51=1
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_XA51 $OPT_DISABLE_XA51
+_ACEOF
+
+
+
+  echo xa51 >>ports.all
+  if test $OPT_DISABLE_XA51 = 0; then
+    echo xa51 >>ports.build
   fi
 
 

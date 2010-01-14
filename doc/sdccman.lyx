@@ -117,7 +117,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.9.6
+SDCC 2.9.7
 \size footnotesize
 
 \begin_inset Newline newline
@@ -1912,6 +1912,23 @@ int b : 2;
 
 \family typewriter
 /* s.a = 1, s.b = 2 */
+\end_layout
+
+\begin_layout Itemize
+Special sdcc keywords which are not preceded by a double underscore are
+ deprecated in version 3.0 and higher.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:ANSI-Compliance"
+
+\end_inset
+
+ ANSI-Compliance.
+\end_layout
+
+\begin_layout Itemize
+Targets for xa51 and avr are disabled by default in version 3.0 and higher.
 \end_layout
 
 \begin_layout Section
@@ -20658,106 +20675,6 @@ at
  <address>
 \emph default
  keyword, in addition to a storage class, e.g.:
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-xdata
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-xdata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
- at
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-at
-\end_layout
-
-\end_inset
-
- 0x7ffe unsigned int chksum;
-\end_layout
-
-\begin_layout Standard
-or, better conforming to ISO/IEC 9899 C:
 \end_layout
 
 \begin_layout Verse
@@ -65453,6 +65370,10 @@ status collapsed
 t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
  'sram', 'using', 'wparam', 'xdata', '_overlay', '_asm', '_endasm', and
  '_naked'.
+ The compiler displays a warning "keyword <keyword> is deprecated, use '__<keywo
+rd>' instead" in such cases.
+ The warning can be disabled by using "#pragma disable_warning 197" in the
+ source file or "--disable-warning 197" command line option.
  Compliant equivalents of these keywords are always available in a form
  that begin with two underscores
 \begin_inset Index
@@ -65495,7 +65416,7 @@ _
 
 \begin_layout Itemize
 Integer promotion of variable arguments is not performed if the argument
- is explicitly taypecasted unless the 
+ is explicitly typecasted unless the 
 \series bold
 -
 \begin_inset ERT
@@ -68129,7 +68050,7 @@ This section shows some details of iCode.
 \begin_inset space ~
 \end_inset
 
-xdata int * p;
+__xdata int * p;
 \begin_inset Newline newline
 \end_inset
 
@@ -68174,7 +68095,7 @@ for the purpose of explaining iCode */
 \begin_inset space ~
 \end_inset
 
-short function (data int *x)
+short function (__data int *x)
 \begin_inset Newline newline
 \end_inset
 

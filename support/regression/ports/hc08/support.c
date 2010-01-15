@@ -3,9 +3,9 @@ void
 _putchar(unsigned char c)
 {
   c;
-  _asm
+  __asm
     .db 0x9e, 0xed
-  _endasm;
+  __endasm;
 }
 
 void
@@ -16,7 +16,7 @@ _initEmu(void)
 void
 _exitEmu(void)
 {
-  _asm
+  __asm
     .db 0x9e, 0xec
-  _endasm;
+  __endasm;
 }

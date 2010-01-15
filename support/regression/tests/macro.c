@@ -8,9 +8,9 @@ static void
 bug_2805536(void)
 {
 #ifndef PORT_HOST
-_asm
+__asm
 ; != <-- this should not causes a compiler internal error
-_endasm;
+__endasm;
 #endif
 }
 

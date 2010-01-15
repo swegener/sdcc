@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   support.c - startup for PIC16 regression tests with gpsim
   
-  Copyright (c) 2006 Borut Razem
+  Copyright (c) 2006-2010 Borut Razem
     
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -101,7 +101,7 @@ _exitEmu(void)
     ;
 
   /* set the breakpoint */
-  _asm
+  __asm
    .direct "a", "\"\""
-  _endasm;
+  __endasm;
 }

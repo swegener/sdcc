@@ -30,10 +30,10 @@ void
 _putchar (char c)
 {
   c;
-  _asm
+  __asm
     mov.b r0l,[r7+2]
     trap #0x0e
-  _endasm;
+  __endasm;
 }
 
 void
@@ -44,8 +44,7 @@ _initEmu (void)
 void
 _exitEmu (void)
 {
-  _asm
+  __asm
     trap #0x0f
-  _endasm;
+  __endasm;
 }
-

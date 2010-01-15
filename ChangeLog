@@ -1,3 +1,12 @@
+2010-01-15 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/hc08/support.c,
+	  support/regression/ports/pic14/support.c,
+	  support/regression/ports/pic16/support.c,
+	  support/regression/ports/xa51/support.c,
+	  support/regression/tests/macro.c:
+	  _asm and _endasm changed to __asm and __endasm
+
 2010-01-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/gbz80/string.c:

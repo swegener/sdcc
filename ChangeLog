@@ -1,3 +1,8 @@
+2010-01-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* src/SDCCmain.c: added ReadcfgFile() - get options from
+	  a sdcc.cfg file.
+
 2010-01-15 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/hc08/support.c,

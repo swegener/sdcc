@@ -1438,7 +1438,75 @@ parseCmdLine (int argc, char **argv)
 }
 
 /*-----------------------------------------------------------------*/
-/* finalizeOptions - finalize (post-process( options               */
+/* ReadcfgFile - get options from a sdcc.cfg file                  */
+/*-----------------------------------------------------------------*/
+static int
+ReadcfgFile (char * PathName)
+{
+	FILE * cfgFile;
+	#define MAXCFGLINE 0x100
+	char cfgline[MAXCFGLINE];
+	char str1[MAXCFGLINE];
+	char str2[MAXCFGLINE];
+	char str3[MAXCFGLINE];
+	char str4[MAXCFGLINE];
+	char cfgpath[PATH_MAX];
+	char * argv[5];
+	int j, n;
+ 
+	if (PathName != NULL)
+		strcpy(cfgpath, PathName);
+	else
+		strcpy(cfgpath, ".");
+
+	strcat(cfgpath, DIR_SEPARATOR_STRING);
+	strcat(cfgpath, "sdcc.cfg");
+
+	cfgFile = fopen (cfgpath, "r");
+	if(cfgFile==NULL) return 0; /* Nothing to do here */
+
+	argv[0]="hi!"; /* Ignored by parseCmdLine() */
+	argv[1]=str1;
+	argv[2]=str2;
+	argv[3]=str3;
+	argv[4]=str4;
+
+	while(!feof(cfgFile))
+	{
+		if(fgets(cfgline, MAXCFGLINE, cfgFile)!=NULL)
+		{
+			for(j=0; cfgline[j]!=0; j++)
+			{
+				if ((cfgline[j]=='\n') || (cfgline[j]=='\r'))
+				{
+					cfgline[j]=0;
+					break;
+				}
+			}
+
+			if(cfgline[0]!=';') /* If not a comment */
+			{
+				n=sscanf(cfgline, "%s %s %s %s", str1, str2, str3, str4);
+				if(n>0)
+				{
+					if(strcmp(str1, "echo")==0)
+					{
+						if(strlen(cfgline)>4) printf("%s\n", &cfgline[5]);
+					}
+					else
+					{
+						parseCmdLine(n+1, argv);
+					}
+				}
+			}
+		}
+	}
+	fclose(cfgFile);
+	return 1;
+}
+
+/*-----------------------------------------------------------------*/
+/* finalizeOptions - finalize (post-process) options               */
 /*-----------------------------------------------------------------*/
 static void
 finalizeOptions (void)
@@ -2440,6 +2508,9 @@ main (int argc, char **argv, char **envp)
 
   setBinPaths (argv[0]);
   setDataPaths (argv[0]);
+  
+  if(ReadcfgFile (".")==0)  /* check local directory first */
+    ReadcfgFile (setFirstItem(binPathSet)); /* check sdcc's bin directory */
 
   if (port->initPaths)
     port->initPaths();

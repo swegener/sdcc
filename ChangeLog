@@ -1,3 +1,7 @@
+2010-01-16 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: sfr at to __sfr __at
+
 2010-01-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* src/SDCCmain.c: added ReadcfgFile() - get options from

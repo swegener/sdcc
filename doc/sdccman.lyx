@@ -20032,7 +20032,7 @@ Z180!I/O memory
 \begin_layout Verse
 
 \family typewriter
-sfr at 0x78 IoPort;
+__sfr __at 0x78 IoPort;
 \begin_inset space ~
 \end_inset
 
@@ -20165,7 +20165,7 @@ banked
 \begin_layout Verse
 
 \family typewriter
-sfr banked at
+__sfr __banked __at
 \begin_inset Index
 status collapsed
 

@@ -39,6 +39,7 @@ init:
         .area   _GSFINAL
 
 	.area	_DATA
+	.area	_BSEG
         .area   _BSS
         .area   _HEAP
 

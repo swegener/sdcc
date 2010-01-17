@@ -28,7 +28,7 @@
    For other ports only define BOOL which can be used in most cases,
    but can result in unexpected behaviour */
 
-#if defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80) || defined (SDCC_pic14) || defined (SDCC_pic16)
+#if defined (SDCC_hc08) || defined (SDCC_pic14) || defined (SDCC_pic16)
  #define BOOL char
 #else
  #define _Bool __bit

@@ -2323,7 +2323,6 @@ _toBoolean (operand * oper)
     }
 }
 
-
 /*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
 /*-----------------------------------------------------------------*/
@@ -5995,6 +5994,15 @@ genGetHbit (iCode * ic)
   freeAsmop (result, NULL, ic);
 }
 
+/*-----------------------------------------------------------------*/
+/* genGetAbit - generates code get a single bit                    */
+/*-----------------------------------------------------------------*/
+static void
+genGetAbit (iCode * ic)
+{
+  wassert (0);
+}
+
 static void
 emitRsh2 (asmop *aop, int size, int is_signed)
 {
@@ -6607,7 +6615,7 @@ genrshTwo (operand * result, operand * left,
 }
 
 /*-----------------------------------------------------------------*/
-/* genRightShiftLiteral - left shifting by known count              */
+/* genRightShiftLiteral - right shifting by known count              */
 /*-----------------------------------------------------------------*/
 static void
 genRightShiftLiteral (operand * left,
@@ -7354,8 +7362,19 @@ genIfx (iCode * ic, iCode * popIc)
   aopOp (cond, ic, FALSE, TRUE);
 
   /* get the value into acc */
-  if (AOP_TYPE (cond) != AOP_CRY)
+  if(AOP_TYPE (cond) != AOP_CRY &&
+    !IS_BIT (operandType(cond)))
     _toBoolean (cond);
+  /* Special case: Condition is bool */
+  else if(IS_BIT (operandType(cond)))
+    {
+      emit2 ("bit 0,%s", aopGet (AOP (cond), 0, FALSE));
+      emit2 ("jp %s,!tlabel", IC_TRUE (ic) ? "NZ" : "Z",
+        (IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key + 100);
+      freeAsmop (cond, NULL, ic);
+      ic->generated = 1;
+      return;
+    }
   else
     isbit = 1;
   /* the result is now in the accumulator */
@@ -7625,6 +7644,42 @@ genCast (iCode * ic)
   if (AOP_TYPE (result) == AOP_CRY)
     {
       wassertl (0, "Tried to cast to a bit");
+    }
+
+  /* casting to bool */
+  if (IS_BIT(operandType(result)))
+    {
+      emitDebug("; Casting to bool");
+      symbol *tlbl1, *tlbl2;
+      size = AOP_SIZE(right);
+
+      /* Can do without branching for small arguments */
+      if(size == 1)
+        {
+          emit2("xor a,a");
+          emit2("cp a,%s", aopGet (AOP (right), 0, FALSE));
+          emit2("rla");
+          aopPut(AOP (result), "a", 0);
+          goto release;
+        }
+
+      tlbl1 = newiTempLabel(0);
+      tlbl2 = newiTempLabel(0);
+      while(--size)
+        {
+          const char *l = aopGet (AOP (right), size, FALSE);
+          _moveA (l);
+          emit2("or a,a");
+          emit2("jp NZ,!tlabel", tlbl1->key + 100);
+        }
+      emit2("cp a,%s", aopGet (AOP (right), 0, FALSE));
+      emit2("rla");
+      emit2("jp !tlabel", tlbl2->key + 100);
+      emitLabel(tlbl1->key + 100);
+      emit2("ld a,#0x01");
+      emitLabel(tlbl2->key + 100);
+      aopPut(AOP (result), "a", 0);
+      goto release;
     }
 
   /* if they are the same size : or less */
@@ -8525,8 +8580,13 @@ genZ80Code (iCode * lic)
           break;
 
         case GETHBIT:
-          emitDebug ("; genGetHBIT");
+          emitDebug ("; genGetHbit");
           genGetHbit (ic);
+          break;
+
+        case GETABIT:
+          emitDebug ("; genGetAbit");
+          genGetAbit (ic);
           break;
 
         case LEFT_OP:

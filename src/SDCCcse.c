@@ -1707,6 +1707,36 @@ constFold (iCode * ic, set * cseSet)
   return 1;
 }
 
+/* Remove casts to bool from results of logical operations. */
+int
+boolCast (iCode * ic, set * cseSet)
+{
+  iCode *dic = NULL;
+
+  /* Only casts to booleans are optimized away. */
+  if (ic->op != CAST || !IS_BIT ( operandType (IC_RESULT (ic))))
+    return 0;
+
+  /* Find a definition for the right hand side. */
+  if (!(applyToSet (cseSet, diCodeForSym, IC_RIGHT (ic), &dic)))
+    return 0;
+
+  /* Check that this is a logic op. */
+  if (dic->op != '!' &&
+    dic->op != '<' &&
+    dic->op != '>' &&
+    dic->op != EQ_OP &&
+    dic->op != AND_OP &&
+    dic->op != OR_OP &&
+    dic->op != GETHBIT)
+    return 0;
+
+  /* Replace cast by assignment. */
+  ic->op = '=';
+
+  return 0;
+}
+
 /*-----------------------------------------------------------------*/
 /* deleteGetPointers - called when a pointer is passed as parm     */
 /* will delete from cseSet all get pointers computed from this     */
@@ -2039,6 +2069,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           /* do some algebraic optimizations if possible */
           algebraicOpts (ic, ebb);
           while (constFold (ic, cseSet));
+          while (boolCast (ic, cseSet));
         }
 
       /* small kludge */

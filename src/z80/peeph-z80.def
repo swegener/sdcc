@@ -489,6 +489,14 @@ replace restart {
 } if notUsed('iy'), notUsed('hl'), operandsNotRelated(%4 'h'), operandsNotRelated(%4 'l')
 
 replace restart {
+	ld	%1,(hl)
+	or	a,%1
+} by {
+	or	a,(hl)
+	; peephole 0zf' used (hl) directly instead of going through %1.
+} if notUsed(%1), operandsNotRelated(%1 'a')
+
+replace restart {
 	ld	e,l
 	ld	d,h
 	ld	%1,(de)
@@ -523,6 +531,14 @@ replace restart {
 } by {
 	; peephole 0zj tested bit of %1 (%2) directly instead of going through a.
 	bit	%3,%1 (%2)
+} if notUsed('a')
+
+replace restart {
+	ld	a,b
+	bit	%1,a
+} by {
+	; peephole 0zj' tested bit %1 of b directly instead of going through a.
+	bit	%1,b
 } if notUsed('a')
 
 replace restart {
@@ -597,6 +613,78 @@ replace restart {
 } if labelRefCountChange(%1 -1)
 
 replace restart {
+	ld	%1,#0x00
+	jp	%2
+%3:
+	ld	%1,#0x01
+%2:
+	bit	0,%1
+	jp	Z,%4
+} by {
+	ld	%1,#0x00
+	jp	%4
+	; peephole 6a redirected jump from %2 to %4
+%3:
+	ld	%1,#0x01
+%2:
+	bit	0,%1
+	jp	Z,%4
+} if labelRefCountChange(%2 -1), labelRefCountChange(%4 +1)
+
+replace restart {
+	jr	Z,%1
+	ld	%4,#0x01
+	jr	%2
+%1:
+	ld	%4,#0x00
+%2:
+	xor	a,a
+	or	a,%4
+	jr	Z,%3
+} by {
+	ld	%4,#0x00
+	jr	Z,%3
+	; peephole 6a' redirected jump from %2 to %3
+	ld	%4,#0x01
+	jr	%2
+%1:
+	ld	%4,#0x00
+%2:
+	xor	a,a
+	or	a,%4
+	jr	Z,%3
+} if labelRefCountChange(%1 -1), labelRefCountChange(%3 +1)
+
+replace restart {
+	jr	%1
+	ld	%2, #%3
+%1:
+} by {
+	; peephole 6b removed unecessary jump.
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	ld	%1,#0x01
+	xor	a,a
+	or	a,%1
+	jr	Z,%2
+} by {
+	ld	%1,#0x01
+	ld	a,%1
+	; peephole 6b' removed never taken conditional jump.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	ld	%1, #0x01
+	bit	0,%1
+	jr	Z,%2
+} by {
+	ld	%1, #0x01
+	; peephole 6c eliminated conditional jump to %2
+} if labelRefCountChange(%2 -1)
+
+replace restart {
 	jp	%5
 } by {
 	jp	%6
@@ -662,15 +750,16 @@ replace restart {
 // This gives many false negatives and without the test no problems are encountered in the regression tests
 // Maybe we can try this after 2.7.0 release
 
-replace restart {
-	ld	%1,a
-	ld	a,%2
-	or	a,%1
-} by {
-	ld	%1,a
-	or	a,%2
-	; peephole 17a removed load by reordering or arguments.
-} if notVolatile(%1)
+//replace restart {
+//	ld	%1,a
+//	ld	a,%2
+//	or	a,%1
+//} by {
+//	ld	%1,a
+//	or	a,%2
+//	; peephole 17a removed load by reordering or arguments.
+//} if notVolatile(%1)
+// Removed since it triggers for %2 of the form (#...
 
 replace restart {
 	ld	%1,a
@@ -791,6 +880,17 @@ replace restart {
 	; peephole 32 moved and pushed arguments e and #%2 through de instead of pushing them individually.
 	call	%3
 }
+
+replace restart {
+	push	de
+	inc	sp
+	ld	a,e
+	push	af
+	inc	sp
+} by {
+	push	de
+	; peephole 32' pushed de
+} if notUsed('a')
 
 replace restart {
 	ld	a,%1
@@ -1145,6 +1245,28 @@ replace restart {
 if operandsNotRelated(%2 '(bc)' '(de)')
 
 replace restart {
+	dec	%1 (%2)
+	xor	a,a
+	or	a, %1 (%2)
+	jp	NZ,%3
+} by {
+	dec	%1 (%2)
+	; Peephole 52a removed nonzeroness test.
+	jp	NZ,%3
+}if notUsed('a')
+
+replace restart {
+	dec	%1 (%2)
+	xor	a,a
+	or	a, %1 (%2)
+	jp	Z,%3
+} by {
+	dec	%1 (%2)
+	; Peephole 52a' removed zeroness test.
+	jp	Z,%3
+}if notUsed('a')
+
+replace restart {
 	or	a,%1
 	jp	NZ,%2
 	push	%3
@@ -1432,6 +1554,16 @@ replace restart {
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 replace restart {
+	ld	a,%1 (%2)
+	or	a,#0x01
+	ld	%1 (%2),a
+} by {
+	set	0,%1 (%2)
+	; peephole z0 used set instead of or.
+} if notUsed('a')
+// TODO: Do this at a higher level using SETABIT icode instead of peephole optimizer
+
+replace restart {
 	ld	%1,#%2
 	ld	a,%3 (%1)
 	ld	%4,a
@@ -1520,6 +1652,80 @@ replace restart {
 	ex	(sp),hl
 	; peephole z10 moved hl directly to the stack instead of going through de.
 	call	%1
+}
+
+replace restart {
+	ld	%1,a
+	bit	%2,%1
+} by {
+	bit	%2,a
+	; peephole z10a tested bit %2 of a directly instead of going through %1.
+} if notUsed(%1)
+
+replace restart {
+	rla
+	bit	0,a
+	jp	Z,%1
+} by {
+	jp	NC,%1
+	; peephole z10b jumped by carry.
+} if notUsed('a')
+
+replace restart {
+	rla
+	bit	0,a
+	jp	NZ,%1
+} by {
+	jp	C,%1
+	; peephole z10b' jumped by carry.
+} if notUsed('a')
+
+replace restart {
+	and	a,#0x01
+	sub	a,#0x01
+	jp	NC,%1
+} by {
+	bit	0,a
+	jp	NZ,%1
+	; peephole z10c jumped by bit test.
+}
+
+replace restart {
+	and	a,#0x01
+	sub	a,#0x01
+	jp	C,%1
+} by {
+	bit	0,a
+	jp	Z,%1
+	; peephole z10c' jumped by bit test.
+}
+
+replace restart {
+	rlca
+	bit	0,a
+} by {
+	bit	7,a
+	; peephole z10d tested bit 7 intead of rotating and testing 0.
+} if notUsed('a')
+
+replace restart {
+	sbc	a,%1
+	bit	7,a
+	jp	Z,%2
+} by {
+	sbc	a,%1
+	jp	P,%2
+	; peephole z10e used sign flag instead of testing bit 7.
+}
+
+replace restart {
+	sbc	a,%1
+	bit	7,a
+	jp	NZ,%2
+} by {
+	sbc	a,%1
+	jp	M,%2
+	; peephole z10e' used sign flag instead of testing bit 7.
 }
 
 replace restart {

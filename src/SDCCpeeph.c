@@ -326,10 +326,6 @@ FBYNAME (labelIsUncondJump)
   int len;
   char * jpInst = NULL;
 
-  /* Don't optimize jumps in a jump table; a more generic test */
-  if (currPl->ic && currPl->ic->op == JUMPTABLE)
-    return FALSE;
-
   label = hTabItemWithKey (vars, 5);
   if (!label)
     return FALSE;

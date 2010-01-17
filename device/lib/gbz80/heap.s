@@ -1,3 +1,5 @@
+; Just stubs - not copyrightable
+
         ;; Stubs that hook the heap in
         .globl  __sdcc_heap_init
 

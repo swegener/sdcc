@@ -259,20 +259,27 @@ z80MightRead(const lineNode *pl, const char *what)
   if(
     strncmp(pl->line, "dec\t", 4) == 0 ||
     strncmp(pl->line, "inc\t", 4) == 0 ||
-    strncmp(pl->line, "rl\t", 4) == 0 ||
-    strncmp(pl->line, "rr\t", 4) == 0 ||
     strncmp(pl->line, "sla\t", 4) == 0 ||
     strncmp(pl->line, "sra\t", 4) == 0 ||
     strncmp(pl->line, "srl\t", 4) == 0)
     {
-       return (argCont(pl->line + 4, what));
+      return(argCont(pl->line + 4, what));
     }
 
   if(
     strncmp(pl->line, "rl\t", 3) == 0 ||
     strncmp(pl->line, "rr\t", 3) == 0)
     {
-       return (argCont(pl->line + 3, what));
+      return(argCont(pl->line + 3, what));
+    }
+
+  // Bit set, reset and test group
+  if(
+    strncmp(pl->line, "bit\t", 4) == 0 ||
+    strncmp(pl->line, "set\t", 4) == 0 ||
+    strncmp(pl->line, "res\t", 4) == 0)
+    {
+      return(argCont(pl->line + 4, what));
     }
 
   if(strncmp(pl->line, "jp\t", 3) == 0 ||

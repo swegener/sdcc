@@ -2097,6 +2097,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   /* made explicit. Need to fix this someday.                 */
   /* -- EEP, 2004/01/21                                       */
   if (getSize (type) == getSize (optype) &&
+      !IS_BIT (type) &&
       !IS_BITFIELD (type) &&
       !IS_FLOAT (type) &&
       !IS_FLOAT (optype) &&

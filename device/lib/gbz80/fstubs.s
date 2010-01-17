@@ -1,3 +1,5 @@
+; Just stubs - not copyrightable
+
         ;; Stubs to match between function names
         .area	_CODE
         .globl  ___slong2fs

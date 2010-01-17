@@ -1,3 +1,27 @@
+2010-01-17 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCcse.c,
+	  src/SDCCicode.c,
+	  src/SDCCglue.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def,
+	  device/include/stdbool.h,
+	  device/lib/z80/crt0.s:
+	  Support for bool on the Z80 (RFE #1751355).
+	* device/lib/z80/asm_strings.s,
+	  device/lib/z80/mulchar.s,
+	  device/lib/z80/stubs.s,
+	  device/lib/z80/fstubs.s,
+	  device/lib/z80/heap.s,
+	  device/lib/gbz80/stubs.s,
+	  device/lib/gbz80/fstubs.s,
+	  device/lib/gbz80/asm_strings.s,
+	  device/lib/gbz80/heap.s:
+	  Z80 library cleanup.
+	* src/SDCCpeeph.c:
+	  Enable jump-to-jump optimizations for jump table entries.
+
 2010-01-16 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: sfr at to __sfr __at

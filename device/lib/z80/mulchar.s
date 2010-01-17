@@ -1,3 +1,5 @@
+; Written by Philipp Klaus Krause
+
         .area   _CODE
 
 ; This multiplication routine is similar to the one

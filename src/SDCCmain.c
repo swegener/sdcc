@@ -1562,11 +1562,11 @@ linkEdit (char **envp)
       if (TARGET_Z80_LIKE)
         {
 //          fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n", out_fmt, dstFileName);
-          fprintf (lnkfile, "-mjx%c\n", out_fmt);
+          fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, dstFileName);
         }
       else /*For all the other ports.  Including pics???*/
         {
-          fprintf (lnkfile, "-myux%c\n", out_fmt);
+          fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, dstFileName);
           if(!options.no_pack_iram)
               fprintf (lnkfile, "-Y\n");
         }
@@ -1858,19 +1858,19 @@ linkEdit (char **envp)
     printf ("sdcc: Calling linker...\n");
 
   /* build linker output filename */
-  if (fullDstFileName && !IS_SDASLD)
+  if (fullDstFileName /*&& !IS_SDASLD*/)
     strncpyz (scratchFileName, fullDstFileName, sizeof(scratchFileName));
   else
     {
-      if (fullSrcFileName && !IS_SDASLD)
+      if (fullSrcFileName /*&& !IS_SDASLD*/)
         {
           /* the linked file gets the name of the C source file name */
           strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
         }
       else
         {
-          /* the linked file gets the name of the first module
-             this is always true for sdld */
+          /* the linked file gets the name of the first module */
+          /* ----   this is always true for sdld */
           char *p;
 
           s = peekSet (relFilesSet);
@@ -1929,21 +1929,31 @@ linkEdit (char **envp)
 
   system_ret = my_system (buffer);
 
-  if (fullDstFileName && IS_SDASLD)
+#if 0
+  if (fullDstFileName /*&& IS_SDASLD*/)
     {
       /* make some order in the mess left by sdld:
          move generated files to the output directory */
       char *p, *q;
 
-      s = peekSet(relFilesSet);
+      /* the linked file gets the name of the first modul */
+      if (fullSrcFileName)
+        {
+          strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
+          p = strlen (scratchFileName) + scratchFileName;
+        }
+      else
+        {
+          s = peekSet(relFilesSet);
 
-      assert(s);
+          assert(s);
 
-      strncpyz (scratchFileName, s, sizeof(scratchFileName));
-      /* strip the extension */
-      if (NULL == (p = strrchr (scratchFileName, '.')))
-        p = strlen (scratchFileName) + scratchFileName;;
-      *p = 0;
+          strncpyz (scratchFileName, s, sizeof(scratchFileName));
+          /* strip the extension */
+          if (NULL == (p = strrchr (scratchFileName, '.')))
+            p = strlen (scratchFileName) + scratchFileName;;
+          *p = 0;
+        }
       strncatz (scratchFileName, options.out_fmt ? ".s19" : ".ihx", sizeof(scratchFileName));
 
       if (FILENAME_CMP (fullDstFileName, scratchFileName))
@@ -1998,6 +2008,8 @@ linkEdit (char **envp)
             }
         }
     }
+#endif
+
   if (system_ret)
     {
       exit (EXIT_FAILURE);

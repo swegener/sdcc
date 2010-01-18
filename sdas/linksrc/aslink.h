@@ -266,10 +266,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /*
  * File types
  */
-#define F_INV	0		/* invalid */
-#define F_STD	1		/* stdin */
-#define F_LNK	2		/* File.lnk */
-#define F_REL	3		/* File.rel */
+#define	F_OUT	0		/* File.ixx / File.sxx */
+#define	F_STD	1		/* stdin */
+#define	F_LNK	2		/* File.lnk */
+#define	F_REL	3		/* File.rel */
 
 /* sdld gb specific */
 /*
@@ -757,6 +757,8 @@ extern	a_uint iram_size;	/*	internal ram size
 extern	long xram_size;		/*	external ram size
 				 */
 extern	long code_size;		/*	code size
+				 */
+extern	char *sdld_output;	/*	output file name, --output argument
 				 */
 /* sdld 8015 specific */
 extern	char idatamap[];	/* 0:not used, 1:used

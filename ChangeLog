@@ -1,3 +1,7 @@
+2010-01-18 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCast.c:
+	  Taking the address of _Bool works on the z80 and gbz80 ports.
+
 2010-01-17 Philipp Klaus Krause <pkk AT spth.de>
 	* src/SDCCcse.c,
 	  src/SDCCicode.c,

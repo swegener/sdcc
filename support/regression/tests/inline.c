@@ -58,8 +58,8 @@ f3 (int x)
 static inline int
 g_for (int b)
 {
-  int a = 10;
-  for (a += b * 2; b > 0; b--)
+  int a = 10 + b * 2;
+  for (; b > 0; b--)
     {
       if (a > 1000)
         return a;
@@ -72,7 +72,7 @@ f_for (int c)
 {
   int i;
   for (i = c; i > 0; i--)
-    c += i;
+    c += i * g_for (i);
   return c;
 }
 
@@ -102,15 +102,15 @@ typedef uint8_t error_t;
 
 enum __nesc_unnamed4247
   {
-    SUCCESS = 0, 
-    FAIL = 1, 
-    ESIZE = 2, 
-    ECANCEL = 3, 
-    EOFF = 4, 
-    EBUSY = 5, 
-    EINVAL = 6, 
-    ERETRY = 7, 
-    ERESERVE = 8, 
+    SUCCESS = 0,
+    FAIL = 1,
+    ESIZE = 2,
+    ECANCEL = 3,
+    EOFF = 4,
+    EBUSY = 5,
+    EINVAL = 6,
+    ERETRY = 7,
+    ERESERVE = 8,
     EALREADY = 9
   };
 

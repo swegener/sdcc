@@ -3838,14 +3838,16 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   if (tree->values.switchVals.swDefault)
     {
       SNPRINTF (buffer, sizeof(buffer),
-                "_default_%d",
-                tree->values.switchVals.swNum);
+                "_default_%d%s",
+                tree->values.switchVals.swNum,
+                tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
     }
   else
     {
       SNPRINTF (buffer, sizeof(buffer),
-                "_swBrk_%d",
-                tree->values.switchVals.swNum);
+                "_swBrk_%d%s",
+                tree->values.switchVals.swNum,
+                tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
     }
   falseLabel = newiTempLabel (buffer);
 
@@ -3858,9 +3860,10 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
         {
           /* Explicit case: make a new label for it. */
           SNPRINTF (buffer, sizeof(buffer),
-                    "_case_%d_%d",
+                    "_case_%d_%d%s",
                     tree->values.switchVals.swNum,
-                    i);
+                    i,
+		    tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
           addSet (&labels, newiTempLabel (buffer));
           vch = vch->next;
           if (vch)
@@ -3932,8 +3935,9 @@ geniCodeSwitch (ast * tree,int lvl)
           caseVal = (int) ulFromVal (caseVals);
           if (caseVal == switchVal)
             {
-              SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d",
-                        tree->values.switchVals.swNum, caseVal);
+              SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d%s",
+                        tree->values.switchVals.swNum, caseVal,
+			tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
               trueLabel = newiTempLabel (buffer);
               geniCodeGoto (trueLabel);
               goto jumpTable;
@@ -3971,9 +3975,10 @@ geniCodeSwitch (ast * tree,int lvl)
                                         operandFromValue (caseVals),
                                         EQ_OP, NULL);
 
-      SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d",
+      SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d%s",
                tree->values.switchVals.swNum,
-               (int) ulFromVal (caseVals));
+               (int) ulFromVal (caseVals),
+	       tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
       trueLabel = newiTempLabel (buffer);
 
       ic = newiCodeCondition (compare, trueLabel, NULL);
@@ -3986,11 +3991,13 @@ defaultOrBreak:
   /* if default is present then goto break else break */
   if (tree->values.switchVals.swDefault)
     {
-        SNPRINTF (buffer, sizeof(buffer), "_default_%d", tree->values.switchVals.swNum);
+        SNPRINTF (buffer, sizeof(buffer), "_default_%d%s", tree->values.switchVals.swNum,
+                  tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
     }
   else
     {
-        SNPRINTF (buffer, sizeof(buffer), "_swBrk_%d", tree->values.switchVals.swNum);
+        SNPRINTF (buffer, sizeof(buffer), "_swBrk_%d%s", tree->values.switchVals.swNum,
+                  tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
     }
 
   falseLabel = newiTempLabel (buffer);

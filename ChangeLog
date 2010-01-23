@@ -1,3 +1,11 @@
+2010-01-23 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCicode.c, src/SDCCast.c, src/SDCCast.h:
+	  fixed bug #1767885: Parameters lost from scope of intermediate inline function
+	  applied patches from Pavel Pisa; tahks Pavel
+	* support/regression/tests/inline.c:
+	  merged inline regression tests bug1717305.c, bug1864577.c and bug 1767885
+
 2010-01-18 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, sdas/linksrc/lkmain.c, sdas/linksrc/aslink.h:

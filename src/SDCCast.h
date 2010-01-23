@@ -76,6 +76,7 @@ typedef struct ast
             value *swVals;      /* switch comparison values */
             int swDefault;      /* default if present       */
             int swNum;          /* switch number            */
+            char *swSuffix;
           }
         switchVals;
         /* if for then for values */

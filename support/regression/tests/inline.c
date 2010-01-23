@@ -55,7 +55,30 @@ f3 (int x)
   return y;
 }
 
+static inline int
+g_for (int b)
+{
+  int a = 10;
+  for (a += b * 2; b > 0; b--)
+    {
+      if (a > 1000)
+        return a;
+    }
+  return a;
+}
+
+static inline int
+f_for (int c)
+{
+  int i;
+  for (i = c; i > 0; i--)
+    c += i;
+  return c;
+}
+
 int gi = 6;
+int g_a;
+int g_y;
 
 void
 bug_1767885 (void)
@@ -65,6 +88,9 @@ bug_1767885 (void)
 
   gi = f3 (gi);
   ASSERT (gi == 18);
+
+  g_y = f_for (g_a);
+  g_y = g_for (g_y);
 }
 
 /*--------------

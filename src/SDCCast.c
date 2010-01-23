@@ -6216,6 +6216,26 @@ fixupInline (ast * tree, int level)
       tree->values.switchVals.swSuffix = strdup (name);
     }
 
+  /* Update FOR expression */
+  if (tree->type == EX_OP && tree->opval.op == FOR)
+    {
+      if (AST_FOR (tree, initExpr))
+          fixupInline (AST_FOR (tree, initExpr), level);
+      if (AST_FOR (tree, condExpr))
+          fixupInline (AST_FOR (tree, condExpr), level);
+      if (AST_FOR (tree, loopExpr))
+          fixupInline (AST_FOR (tree, loopExpr), level);
+
+      if (AST_FOR (tree, trueLabel))
+          fixupInlineLabel (AST_FOR (tree, trueLabel));
+      if (AST_FOR (tree, continueLabel))
+          fixupInlineLabel (AST_FOR (tree, continueLabel));
+      if (AST_FOR (tree, falseLabel))
+          fixupInlineLabel (AST_FOR (tree, falseLabel));
+      if (AST_FOR (tree, condLabel))
+          fixupInlineLabel (AST_FOR (tree, condLabel));
+    }
+
   if (IS_AST_OP (tree) && (tree->opval.op == LABEL))
     {
       symbol * label = tree->left->opval.val->sym;

@@ -2971,7 +2971,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       p = newLink (DECLARATOR);
       /* if bit field then error */
-      if (IS_BITFIELD (tree->left->etype) || IS_BITVAR (tree->left->etype) && !TARGET_Z80_LIKE)
+      if (IS_BITFIELD (tree->left->etype) || (IS_BITVAR (tree->left->etype) && !TARGET_Z80_LIKE))
         {
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of bit variable");
           goto errorTreeReturn;
@@ -6734,7 +6734,7 @@ skipall:
 }
 
 
-#define INDENT(x,f) { int i ; fprintf (f, "%s:%d:", tree->filename, tree->lineno); fprintf(f, "%*s", (x)&0xff, ""); }
+#define INDENT(x,f) do { fprintf (f, "%s:%d:", tree->filename, tree->lineno); fprintf (f, "%*s", (x) & 0xff, ""); } while (0)
 /*-----------------------------------------------------------------*/
 /* ast_print : prints the ast (for debugging purposes)             */
 /*-----------------------------------------------------------------*/

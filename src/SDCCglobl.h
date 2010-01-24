@@ -94,6 +94,7 @@ typedef int bool;
 #endif
 
 /* size's in bytes  */
+#define BOOLSIZE    port->s.char_size
 #define CHARSIZE    port->s.char_size
 #define SHORTSIZE   port->s.short_size
 #define INTSIZE     port->s.int_size

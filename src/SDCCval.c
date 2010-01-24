@@ -398,7 +398,7 @@ checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeLeftRight
   /* special: assignment */
   if (op == '=')
     {
-      if (IS_BIT (var))
+      if (IS_BOOL(var) || IS_BIT (var))
         return CCR_OK;
 
       if (getenv ("SDCC_VERY_PEDANTIC"))
@@ -457,7 +457,14 @@ checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeLeftRight
       TYPE_TARGET_ULONG minValP, maxValP, minValM, maxValM;
       TYPE_TARGET_ULONG opBitsMask = 0xffffffffu >> (32 - bitsForType (reType));
 
-      if (SPEC_USIGN (lit) && SPEC_USIGN (var))
+      if (IS_BOOL (var))
+        {
+          minValP = 0;
+          maxValP = 1;
+          minValM = 0;
+          maxValM = 1;
+        }
+      else if (SPEC_USIGN (lit) && SPEC_USIGN (var))
         {
           /* both operands are unsigned, this is easy */
           minValP = 0;
@@ -567,7 +574,12 @@ checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeLeftRight
       /* signed operation */
       TYPE_TARGET_LONG minVal, maxVal;
 
-      if (SPEC_USIGN (var))
+      if (IS_BOOL (var))
+        {
+          minVal = 0;
+          maxVal = 1;
+        }
+      else if (SPEC_USIGN (var))
         {
           /* unsigned var, but signed operation. This happens
              when var is promoted to signed int.
@@ -1089,7 +1101,7 @@ floatFromVal (value * val)
         return (signed char) SPEC_CVAL (val->etype).v_int;
     }
 
-  if (IS_BITVAR(val->etype))
+  if (IS_BOOL(val->etype) || IS_BITVAR(val->etype))
     return SPEC_CVAL (val->etype).v_uint;
 
   if (SPEC_NOUN (val->etype) == V_VOID)
@@ -1150,7 +1162,7 @@ ulFromVal (value * val)
         return (signed char) SPEC_CVAL (val->etype).v_int;
     }
 
-  if (IS_BITVAR(val->etype))
+  if (IS_BOOL(val->etype) || IS_BITVAR(val->etype))
     return SPEC_CVAL (val->etype).v_uint;
 
   if (SPEC_NOUN (val->etype) == V_VOID)
@@ -1845,6 +1857,7 @@ valCastLiteral (sym_link * dtype, double fval)
       SPEC_CVAL (val->etype).v_fixed16x16 = fixed16x16FromDouble (fval);
       break;
 
+    case V_BOOL:
     case V_BIT:
     case V_SBIT:
       SPEC_CVAL (val->etype).v_uint = fval ? 1 : 0;

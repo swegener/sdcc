@@ -1856,7 +1856,7 @@ glue (void)
     }
 
   /* copy the bit segment */
-  if (mcs51_like || TARGET_Z80_LIKE)
+  if (mcs51_like)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; bit data\n");

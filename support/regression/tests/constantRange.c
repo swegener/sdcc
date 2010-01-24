@@ -3,6 +3,11 @@
 */
 
 #include <testfwk.h>
+
+#ifdef SDCC
+#pragma std_sdcc99
+#endif
+
 #include <stdbool.h>
 #ifdef __sun__
 #include <inttypes.h>
@@ -124,7 +129,7 @@ testFoo1(void)
 {
 #ifdef __bool_true_false_are_defined
 
-#if defined(PORT_HOST)
+#if !defined(__SDCC_WEIRD_BOOL)
    volatile bool sb, ub;
 #else
    volatile   signed bool sb;

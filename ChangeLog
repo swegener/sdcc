@@ -1,3 +1,40 @@
+2010-01-24 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCcse.c,
+	  src/SDCCval.c,
+	  src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCC.y,
+	  src/SDCCdwarf2.c,
+	  src/SDCCglue.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def,
+	  src/SDCCglobl.h,
+	  src/SDCC.lex,
+	  src/SDCCast.c,
+	  device/include/stdbool.h,
+	  support/regression/tests/bug1546986.c,
+	  support/regression/tests/constantRange.c,
+	  support/regression/tests/bug2805333.c,
+	  support/regression/tests/bug1337835.c,
+	  support/regression/tests/bitopcse.c,
+	  support/regression/tests/bug1723128.c,
+	  support/regression/tests/bug-908454.c,
+	  support/regression/tests/bug1734654.c,
+	  support/regression/tests/bug1745717.c,
+	  support/regression/tests/bug2719592.c,
+	  support/regression/tests/bug1738367.c,
+	  support/regression/tests/funptrs.c,
+	  support/regression/tests/bug1509084.c,
+	  support/regression/tests/bug1788177.c,
+	  support/regression/tests/bitvars.c:
+	  Finally implemented true _Bool support.
+	* src/SDCCpeeph.c,
+	  doc/random-notes.txt:
+	  Generic cleanup.
+
 2010-01-24 Borut Razem <borut.razem AT siol.net>
 
 	* sdas/as8051/i51adr.c, sdas/as8051/i51pst.c, sdas/asz80/z80pst.c,

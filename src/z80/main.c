@@ -99,7 +99,6 @@ static char *_keywords[] =
   "sfr",
   "nonbanked",
   "banked",
-  "bit",
   "at",       //.p.t.20030714 adding support for 'sfr at ADDR' construct
   "_naked",   //.p.t.20030714 adding support for '_naked' functions
   "critical",

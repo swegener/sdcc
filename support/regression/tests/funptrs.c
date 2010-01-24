@@ -3,6 +3,11 @@
     type: BOOL, char, int, long
  */
 #include <testfwk.h>
+
+#ifdef SDCC
+#pragma std_sdcc99
+#endif
+
 #include <stdbool.h>
 
 #ifndef BOOL

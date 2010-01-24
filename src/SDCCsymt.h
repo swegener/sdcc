@@ -39,6 +39,7 @@
 enum {
     TYPEOF_INT=1,
     TYPEOF_SHORT,
+    TYPEOF_BOOL,
     TYPEOF_CHAR,
     TYPEOF_LONG,
     TYPEOF_FLOAT,
@@ -105,6 +106,7 @@ typedef enum
     V_INT = 1,
     V_FLOAT,
     V_FIXED16X16,
+    V_BOOL,
     V_CHAR,
     V_VOID,
     V_STRUCT,
@@ -493,10 +495,12 @@ extern sym_link *validateLink(sym_link  *l,
 #define IS_INLINE(x)     (IS_SPEC(x) && SPEC_INLINE(x))
 #define IS_INT(x)        (IS_SPEC(x) && x->select.s.noun == V_INT)
 #define IS_VOID(x)       (IS_SPEC(x) && x->select.s.noun == V_VOID)
+#define IS_BOOL(x)       (IS_SPEC(x) && x->select.s.noun == V_BOOL)
 #define IS_CHAR(x)       (IS_SPEC(x) && x->select.s.noun == V_CHAR)
 #define IS_EXTERN(x)     (IS_SPEC(x) && x->select.s.b_extern)
 #define IS_VOLATILE(x)   (isVolatile (x))
 #define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
+                                         x->select.s.noun == V_BOOL || \
                                          x->select.s.noun == V_CHAR || \
                                          x->select.s.noun == V_BITFIELD || \
                                          x->select.s.noun == V_BIT ||  \

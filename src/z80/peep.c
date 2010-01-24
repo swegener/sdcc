@@ -93,7 +93,7 @@ isReturned(const char *what)
       spec = &(sym->etype->select.s);
       if(spec->noun == V_VOID)
          size = 0;
-      else if(spec->noun == V_CHAR)
+      else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
          size = 1;
       else if(spec->noun == V_INT && !(spec->b_long))
          size = 2;
@@ -213,11 +213,13 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strncmp(pl->line, "ret", 3) == 0 && !isReturned(what))
     return FALSE;
 
+  if(strcmp(pl->line, "ex\t(sp),hl") == 0 && strchr(what, 'h') == 0 && strchr(what, 'l') == 0)
+    return FALSE;
   if(strcmp(pl->line, "ex\tde,hl") == 0 && strchr(what, 'h') == 0 && strchr(what, 'l') == 0 && strchr(what, 'd') == 0&& strchr(what, 'e') == 0)
     return FALSE;
   if(strncmp(pl->line, "ld\t", 3) == 0)
     {
-      if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#')
+      if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#' && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[2] == '#'))
         return TRUE;
       if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) && (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')))
         return TRUE;
@@ -258,19 +260,30 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(
     strncmp(pl->line, "dec\t", 4) == 0 ||
-    strncmp(pl->line, "inc\t", 4) == 0 ||
-    strncmp(pl->line, "sla\t", 4) == 0 ||
-    strncmp(pl->line, "sra\t", 4) == 0 ||
-    strncmp(pl->line, "srl\t", 4) == 0)
+    strncmp(pl->line, "inc\t", 4) == 0)
     {
       return(argCont(pl->line + 4, what));
     }
 
+  // Rotate and shift group (todo: rld rrd, maybe sll)
+  if(strncmp(pl->line, "rlca", 4) == 0 ||
+     strncmp(pl->line, "rla", 3) == 0 ||
+     strncmp(pl->line, "rrca", 4) == 0 ||
+     strncmp(pl->line, "rra", 3) == 0)
+    return(strcmp(what, "a") == 0);
   if(
     strncmp(pl->line, "rl\t", 3) == 0 ||
     strncmp(pl->line, "rr\t", 3) == 0)
     {
       return(argCont(pl->line + 3, what));
+    }
+  if(
+    strncmp(pl->line, "rlc\t", 4) == 0 ||
+    strncmp(pl->line, "sla\t", 4) == 0 ||
+    strncmp(pl->line, "sra\t", 4) == 0 ||
+    strncmp(pl->line, "srl\t", 4) == 0)
+    {
+      return(argCont(pl->line + 4, what));
     }
 
   // Bit set, reset and test group
@@ -282,16 +295,15 @@ z80MightRead(const lineNode *pl, const char *what)
       return(argCont(pl->line + 4, what));
     }
 
+ if(strncmp(pl->line, "ccf", 3) == 0)
+    return FALSE;
+
   if(strncmp(pl->line, "jp\t", 3) == 0 ||
     (bool)(strncmp(pl->line, "jr\t", 3)) == 0)
     return FALSE;
 
   if(strncmp(pl->line, "djnz\t", 5) == 0)
     return(strchr(what, 'b') != 0);
-
-  if(strncmp(pl->line, "rla", 3) == 0 ||
-    strncmp(pl->line, "rlca", 4) == 0)
-    return(strcmp(what, "a") == 0);
 
   return TRUE;
 }

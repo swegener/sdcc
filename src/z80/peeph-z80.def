@@ -3,7 +3,7 @@
 // Some of these peepholes could be potentially moved to peeph.def, but a
 // GBZ80 expert should have a look at them before.
 //
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2008
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2010
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -87,6 +87,14 @@ replace restart {
 } by {
 	ld	(#%1),a
 	; peephole 0d''' loaded (#%1) from a directly instead of using through hl.
+} if notUsed('hl')
+
+replace restart {
+	ld	hl,#%1 + %2
+	ld	(hl),a
+} by {
+	ld	(#%1 + %2),a
+	; peephole 0d'''' loaded (#%1) from a directly instead of using through hl.
 } if notUsed('hl')
 
 replace restart {
@@ -692,10 +700,24 @@ replace restart {
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
+	jr	%5
+} by {
+	jp	%6
+	; peephole 7' jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
 	; peephole 8 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jr	%1,%5
+} by {
+	jp	%1,%6
+	; peephole 8' jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
@@ -1347,6 +1369,15 @@ replace restart {
 	; peephole 63 moved addition of constant 0x%3%2 to bc to constant.
 }
 
+//replace restart {
+//	pop	af
+//	ld	sp,%1
+//} by {
+//	; peephole 64 removed redundant pop af.
+//	ld	sp,%1
+//} if notUSed(#a')
+// Doesn't work due to bug preventing replacement of macro-generated asm.
+
 replace restart {
 	call	%1
 	ret
@@ -1534,10 +1565,253 @@ replace restart {
 	ex	de,hl
 } if notUsed('de')
 
+replace restart {
+	ld	%1,#0x00
+	jp	%3
+%2:
+	ld	%1,#0x01
+%3:
+	xor	a,a
+	cp	a,%1
+	rla
+} by {
+	ld	%1,#0x00
+	jp	%3
+%2:
+	ld	%1,#0x01
+%3:
+	ld	a,%1
+	; peephole 83 replaced cast from bool to bool by assignment.
+}
+
+replace restart {
+	and	a,#0x01
+	sub	a,#0x01
+	ld	a,#0x00
+	rla
+} by {
+	and	a,#0x01
+	xor	a,#0x01
+	; peephole 84 used xor for negation.
+}
+
+replace restart {
+	and	a,#0x01
+	xor	a,#0x01
+	jp	NZ,%1
+} by {
+	and	a,#0x01
+	; peephole 85a removed xor by inverting jump condition.
+	jp	Z,%1
+} if notUsed('a')
+
+replace restart {
+	and	a,#0x01
+	xor	a,#0x01
+	jr	NZ,%1
+} by {
+	and	a,#0x01
+	; peephole 85a' removed xor by inverting jump condition.
+	jr	Z,%1
+} if notUsed('a')
+
+replace restart {
+	and	a,#0x01
+	xor	a,#0x01
+	jp	Z,%1
+} by {
+	and	a,#0x01
+	; peephole 85b removed xor by inverting jump condition.
+	jp	NZ,%1
+} if notUsed('a')
+
+replace restart {
+	and	a,#0x01
+	xor	a,#0x01
+	jr	Z,%1
+} by {
+	and	a,#0x01
+	; peephole 85b' removed xor by inverting jump condition.
+	jr	NZ,%1
+} if notUsed('a')
+
+replace restart {
+	rlca
+	and	a,#0x01
+	jp	NZ,%1
+} by {
+	rlca
+	; peephole 86a jumped by carry instead of bit 0.
+	jp	C,%1
+} if notUsed('a')
+
+replace restart {
+	rlca
+	and	a,#0x01
+	jr	NZ,%1
+} by {
+	rlca
+	; peephole 86a' jumped by carry instead of bit 0.
+	jr	C,%1
+} if notUsed('a')
+
+replace restart {
+	rlca
+	and	a,#0x01
+	jp	Z,%1
+} by {
+	rlca
+	; peephole 86b jumped by carry instead of bit 0.
+	jp	NC,%1
+} if notUsed('a')
+
+replace restart {
+	rlca
+	and	a,#0x01
+	jr	Z,%1
+} by {
+	rlca
+	; peephole 86b' jumped by carry instead of bit 0.
+	jr	NC,%1
+} if notUsed('a')
+
+replace restart {
+	or	a,a
+	sub	a,#%1
+} by {
+	; peephole 87 removed redundant or.
+	sub	a,#%1
+}
+
+replace restart {
+	ld	a,#0x00
+	rla
+	sub	a,#0x01
+	ld	a,#0x00
+	rla
+} by {
+	ld	a,#0x00
+	ccf
+	; peephole 88 moved negation from bit 0 to carry flag.
+	rla
+}
+
+replace restart {
+	ld	a,#0x00
+	ccf
+	rla
+	or	a,a
+	jp	NZ,%1
+} by {
+	; peephole 89a jumped by carry instead of going through bit 0 of a.
+	jp	NC,%1
+} if notUsed('a')
+
+replace restart {
+	ld	a,#0x00
+	ccf
+	rla
+	or	a,a
+	jr	NZ,%1
+} by {
+	; peephole 89a' jumped by carry instead of going through bit 0 of a.
+	jr	NC,%1
+} if notUsed('a')
+
+replace restart {
+	ld	a,#0x00
+	ccf
+	rla
+	or	a,a
+	jp	Z,%1
+} by {
+	; peephole 89b jumped by carry instead of going through bit 0 of a.
+	jp	C,%1
+} if notUsed('a')
+
+replace restart {
+	ld	a,#0x00
+	ccf
+	rla
+	or	a,a
+	jr	Z,%1
+} by {
+	; peephole 89b' jumped by carry instead of going through bit 0 of a.
+	jr	C,%1
+} if notUsed('a')
+
+replace restart {
+	sbc	a,%1
+	rlca
+	jr	C,%2
+} by {
+	sbc	a,%1
+	; peephole 90a jumped by sign instead of going through carry.
+	jp	M,%2
+}
+
+replace restart {
+	sbc	a,%1
+	rlca
+	jr	NC,%2
+} by {
+	sbc	a,%1
+	; peephole 90b jumped by sign instead of going through carry.
+	jp	P,%2
+}
+
+replace restart {
+	jp	NZ,%2
+%1:
+	ld	b,#0x00
+	jp	%3
+%2:
+	ld	b,#0x01
+%3:
+	xor	a,a
+	or	a,b
+	jp	Z,%4
+} by {
+	jp	NZ,%2
+%1:
+	ld	b,#0x00
+	ld	a,b
+	jp	%4
+	; peephole 91 redirected jump from %3 to %4.
+%2:
+	ld	b,#0x01
+%3:
+	xor	a,a
+	or	a,b
+	jp	Z,%4
+} if labelRefCountChange(%3 -1), labelRefCountChange(%4 +1)
+
+replace restart {
+	pop	af
+	ld	hl,#%1
+	push	hl
+} by {
+	ld	hl,#%1
+	; peephole 92 used ex to move #%1 onto the stack.
+	ex	(sp),hl
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	pop	af
+	inc	sp
+	ld	hl,#%1
+	push	hl
+} by {
+	inc	sp
+	ld	hl,#%1
+	; peephole 93 used ex to move #%1 onto the stack.
+	ex	(sp),hl
+} if notUsed('a'), notUsed('hl')
+
 // peeph-z80.def - Z80 peephole rules
 //
 //
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2007
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2010
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -1796,6 +2070,26 @@ replace restart {
 } by {
 	jp	NZ,%2
 	; peephole 6' removed jp by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jr	NZ,%1
+	jr	%2
+%1:
+} by {
+	jp	Z,%2
+	; peephole 5'' removed jp by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jr	Z,%1
+	jr	%2
+%1:
+} by {
+	jp	NZ,%2
+	; peephole 6'' removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 

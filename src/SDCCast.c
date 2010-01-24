@@ -4430,6 +4430,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 case V_FIXED16X16:
                     typeofv = TYPEOF_FIXED16X16;
                     break;
+                case V_BOOL:
+                    typeofv = TYPEOF_BOOL;
+                    break;
                 case V_CHAR:
                     typeofv = TYPEOF_CHAR;
                     break;

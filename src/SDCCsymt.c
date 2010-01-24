@@ -49,6 +49,7 @@ char *nounName(sym_link *sl) {
     }
     case V_FLOAT: return "float";
     case V_FIXED16X16: return "fixed16x16";
+    case V_BOOL: return "_Bool";
     case V_CHAR: return "char";
     case V_VOID: return "void";
     case V_STRUCT: return "struct";
@@ -554,7 +555,8 @@ void checkTypeSanity(sym_link *etype, char *name)
     fprintf (stderr, "checking sanity for %s %p\n", name, etype);
   }
 
-  if ((SPEC_NOUN(etype)==V_CHAR ||
+  if ((SPEC_NOUN(etype)==V_BOOL ||
+       SPEC_NOUN(etype)==V_CHAR ||
        SPEC_NOUN(etype)==V_FLOAT ||
        SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE ||
@@ -563,7 +565,8 @@ void checkTypeSanity(sym_link *etype, char *name)
     // long or short for char float double or void
     werror (E_LONG_OR_SHORT_INVALID, noun, name);
   }
-  if ((SPEC_NOUN(etype)==V_FLOAT ||
+  if ((SPEC_NOUN(etype)==V_BOOL ||
+       SPEC_NOUN(etype)==V_FLOAT ||
        SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE ||
        SPEC_NOUN(etype)==V_VOID) &&
@@ -897,6 +900,7 @@ getSize (sym_link * p)
           return FLOATSIZE;
         case V_FIXED16X16:
           return (4);
+        case V_BOOL:
         case V_CHAR:
           return CHARSIZE;
         case V_VOID:
@@ -1001,6 +1005,8 @@ bitsForType (sym_link * p)
           return FLOATSIZE * 8;
         case V_FIXED16X16:
           return (32);
+        case V_BOOL:
+          return BOOLSIZE * 8;
         case V_CHAR:
           return CHARSIZE * 8;
         case V_VOID:
@@ -1864,8 +1870,8 @@ static sym_link *
 computeTypeOr (sym_link * etype1, sym_link * etype2, sym_link * reType)
 {
   /* sanity check */
-  assert (   (IS_CHAR (etype1) || IS_BIT (etype1))
-          && (IS_CHAR (etype2) || IS_BIT (etype2)));
+  assert (   (IS_CHAR (etype1) || IS_BOOL(etype1) || IS_BIT (etype1))
+          && (IS_CHAR (etype2) || IS_BOOL(etype2) || IS_BIT (etype2)));
 
   if (SPEC_USIGN (etype1) == SPEC_USIGN (etype2))
     {
@@ -2007,7 +2013,7 @@ computeType (sym_link * type1, sym_link * type2,
           }
         break;
       case RESULT_TYPE_CHAR:
-        if (IS_BITVAR (reType))
+        if (IS_BOOL (reType) || IS_BITVAR (reType))
           {
             SPEC_NOUN (reType) = V_CHAR;
             SPEC_SCLS (reType) = 0;
@@ -2018,7 +2024,7 @@ computeType (sym_link * type1, sym_link * type2,
       case RESULT_TYPE_INT:
       case RESULT_TYPE_NONE:
       case RESULT_TYPE_OTHER:
-        if (IS_BIT (reType))
+        if (IS_BOOL (reType) || IS_BIT (reType))
           {
             SPEC_NOUN (reType) = V_CHAR;
             SPEC_SCLS (reType) = 0;
@@ -2330,7 +2336,8 @@ compareType (sym_link * dest, sym_link * src)
              instead of the next two lines, but the regression tests fail with
              them; I guess it's a problem with replaceCheaperOp  */
           getSize (dest) == getSize (src) &&
-          (IS_BIT (dest) == IS_BIT (src)))
+          (IS_BIT (dest) == IS_BIT (src)) &&
+          !(IS_BOOL (dest) && !IS_BOOL (src)))
         return 1;
       else if (IS_ARITHMETIC (dest) && IS_ARITHMETIC (src))
         return -1;
@@ -3152,6 +3159,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, "int");
               break;
 
+            case V_BOOL:
+              dbuf_append_str (dbuf, "_Bool");
+              break;
+
             case V_CHAR:
               dbuf_append_str (dbuf, "char");
               break;
@@ -3354,6 +3365,10 @@ printTypeChainRaw (sym_link * start, FILE * of)
               fprintf (of, "int");
               break;
 
+            case V_BOOL:
+              fprintf (of, "_Bool");
+              break;
+
             case V_CHAR:
               fprintf (of, "char");
               break;
@@ -3480,7 +3495,8 @@ _mangleFunctionName(char *in)
 
 /*-----------------------------------------------------------------*/
 /* typeFromStr - create a typechain from an encoded string         */
-/* basic types -        'c' - char                                 */
+/* basic types -        'b' - bool                                 */
+/*                      'c' - char                                 */
 /*                      's' - short                                */
 /*                      'i' - int                                  */
 /*                      'l' - long                                 */
@@ -3511,6 +3527,10 @@ sym_link *typeFromStr (char *s)
             s++;
             continue ;
             break ;
+        case 'b':
+            r->class = SPECIFIER;
+            SPEC_NOUN(r) = V_BOOL;
+            break;
         case 'c':
             r->class = SPECIFIER;
             SPEC_NOUN(r) = V_CHAR;

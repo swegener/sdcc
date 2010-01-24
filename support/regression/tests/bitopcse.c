@@ -3,6 +3,11 @@
     type: bool, char, short, long
  */
 #include <testfwk.h>
+
+#ifdef SDCC
+#pragma std_sdcc99
+#endif
+
 #include <stdbool.h>
 
 /* This is not only a regression test, the focus of this test
@@ -10,7 +15,7 @@
 
 #define TYPE_{type}
 
-#if defined(TYPE_bool) && !defined(SDCC)
+#if defined(TYPE_bool) && !defined(__SDCC__WEIRD_BOOL)
 #  define UNSIGNED
 #else
 #  define UNSIGNED unsigned

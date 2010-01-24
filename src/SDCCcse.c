@@ -1714,10 +1714,10 @@ boolCast (iCode * ic, set * cseSet)
   iCode *dic = NULL;
 
   /* Only casts to booleans are optimized away. */
-  if (ic->op != CAST || !IS_BIT ( operandType (IC_RESULT (ic))))
+  if (ic->op != CAST || !IS_BOOL ( operandType (IC_RESULT (ic))))
     return 0;
 
-  /* Find a definition for the right hand side. */
+  /* Find the definition for the right hand side. */
   if (!(applyToSet (cseSet, diCodeForSym, IC_RIGHT (ic), &dic)))
     return 0;
 
@@ -1728,7 +1728,8 @@ boolCast (iCode * ic, set * cseSet)
     dic->op != EQ_OP &&
     dic->op != AND_OP &&
     dic->op != OR_OP &&
-    dic->op != GETHBIT)
+    dic->op != GETHBIT &&
+    dic->op != GETABIT)
     return 0;
 
   /* Replace cast by assignment. */

@@ -2329,29 +2329,39 @@ _toBoolean (operand * oper)
 static void
 genNot (iCode * ic)
 {
+  operand *left = IC_LEFT(ic);
+  operand *result = IC_RESULT(ic);
 
   /* assign asmOps to operand & result */
-  aopOp (IC_LEFT (ic), ic, FALSE, TRUE);
-  aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+  aopOp (left, ic, FALSE, TRUE);
+  aopOp (result, ic, TRUE, FALSE);
 
   /* if in bit space then a special case */
-  if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
+  if (AOP_TYPE (left) == AOP_CRY)
     {
       wassertl (0, "Tried to negate a bit");
     }
+  else if(IS_BOOL(operandType(left)))
+    {
+      emit2("ld a,%s", aopGet(AOP(left), 0, FALSE));
+      emit2("xor a,#0x01");
+      emit2("ld %s,a", aopGet(AOP(result), 0, FALSE));
+      goto release;
+    }
 
-  _toBoolean (IC_LEFT (ic));
+  _toBoolean (left);
 
   /* Not of A:
      If A == 0, !A = 1
      else A = 0
      So if A = 0, A-1 = 0xFF and C is set, rotate C into reg. */
   emit2 ("sub a,!one");
-  outBitC (IC_RESULT (ic));
+  outBitC (result);
 
+release:
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL, ic);
-  freeAsmop (IC_RESULT (ic), NULL, ic);
+  freeAsmop (left, NULL, ic);
+  freeAsmop (result, NULL, ic);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7363,10 +7373,10 @@ genIfx (iCode * ic, iCode * popIc)
 
   /* get the value into acc */
   if(AOP_TYPE (cond) != AOP_CRY &&
-    !IS_BIT (operandType(cond)))
+    !IS_BOOL (operandType(cond)))
     _toBoolean (cond);
   /* Special case: Condition is bool */
-  else if(IS_BIT (operandType(cond)))
+  else if(IS_BOOL (operandType(cond)))
     {
       emit2 ("bit 0,%s", aopGet (AOP (cond), 0, FALSE));
       emit2 ("jp %s,!tlabel", IC_TRUE (ic) ? "NZ" : "Z",
@@ -7647,7 +7657,7 @@ genCast (iCode * ic)
     }
 
   /* casting to bool */
-  if (IS_BIT(operandType(result)))
+  if (IS_BOOL(operandType(result)))
     {
       emitDebug("; Casting to bool");
       symbol *tlbl1, *tlbl2;
@@ -7675,9 +7685,9 @@ genCast (iCode * ic)
       emit2("cp a,%s", aopGet (AOP (right), 0, FALSE));
       emit2("rla");
       emit2("jp !tlabel", tlbl2->key + 100);
-      emitLabel(tlbl1->key + 100);
+      emitLabelNoSpill(tlbl1->key + 100);
       emit2("ld a,#0x01");
-      emitLabel(tlbl2->key + 100);
+      emitLabelNoSpill(tlbl2->key + 100);
       aopPut(AOP (result), "a", 0);
       goto release;
     }

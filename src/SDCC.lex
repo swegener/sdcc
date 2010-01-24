@@ -120,6 +120,7 @@ _?"_asm"         {
 "auto"         { count(); return(AUTO); }
 "bit"          { count(); TKEYWORDSDCC(BIT); }
 "__bit"        { count(); TKEYWORD(BIT); }
+"_Bool"        { count(); TKEYWORD99(BOOL); }
 "break"        { count(); return(BREAK); }
 "case"         { count(); return(CASE); }
 "char"         { count(); return(CHAR); }

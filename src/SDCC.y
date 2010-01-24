@@ -90,7 +90,7 @@ bool uselessDecl = TRUE;
 %token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
 %token NONBANKED BANKED SHADOWREGS WPARAM
-%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE FIXED16X16 CONST VOLATILE VOID BIT
+%token BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE FIXED16X16 CONST VOLATILE VOID BIT
 %token STRUCT UNION ENUM RANGE FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED JAVANATIVE OVERLAY
@@ -573,7 +573,12 @@ type_specifier
    ;
 
 type_specifier2
-   : CHAR      {
+   : BOOL      {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_BOOL   ;
+                  ignoreTypedefType = 1;
+               }
+   | CHAR      {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_CHAR  ;
                   ignoreTypedefType = 1;
@@ -993,7 +998,7 @@ opt_assign_expr
                               value *val ;
 
                               val = constExprValue($2,TRUE);
-                              if (!IS_INT(val->type) && !IS_CHAR(val->type))
+                              if (!IS_INT(val->type) && !IS_CHAR(val->type) && !IS_BOOL(val->type))
                                 {
                                   werror(E_ENUM_NON_INTEGER);
                                   SNPRINTF(lbuff, sizeof(lbuff),

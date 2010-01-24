@@ -1,6 +1,11 @@
 /* promoting bit to char */
 
 #include <testfwk.h>
+
+#ifdef SDCC
+#pragma std_sdcc99
+#endif
+
 #include <stdbool.h>
 
 #if !defined(__bool_true_false_are_defined)

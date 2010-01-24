@@ -2,8 +2,13 @@
     bug 1788177
 */
 
-#include <stdbool.h>
 #include <testfwk.h>
+
+#ifdef SDCC
+#pragma std_sdcc99
+#endif
+
+#include <stdbool.h>
 
 #ifdef __bool_true_false_are_defined
 

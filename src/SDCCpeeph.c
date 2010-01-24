@@ -325,6 +325,7 @@ FBYNAME (labelIsUncondJump)
   const lineNode *pl;
   int len;
   char * jpInst = NULL;
+  char * jpInst2 = NULL;
 
   label = hTabItemWithKey (vars, 5);
   if (!label)
@@ -363,9 +364,12 @@ FBYNAME (labelIsUncondJump)
   if (TARGET_IS_HC08)
     jpInst = "jmp";
   if (TARGET_Z80_LIKE)
-    jpInst = "jp";
+    {
+      jpInst = "jp";
+      jpInst2 = "jr";
+    }
   len = strlen(jpInst);
-  if (strncmp(p, jpInst, len) != 0)
+  if (strncmp(p, jpInst, len)  && (!jpInst2 || strncmp(p, jpInst2, len)))
     return FALSE; /* next line is no jump */
 
   p += len;

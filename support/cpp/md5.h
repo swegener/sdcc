@@ -27,6 +27,8 @@
 # include <limits.h>
 #endif
 
+#include "ansidecl.h"
+
 /* The following contortions are an attempt to use the C preprocessor
    to determine an unsigned integral type that is 32 bits wide.  An
    alternative approach is to use autoconf's AC_CHECK_SIZEOF macro, but
@@ -68,6 +70,10 @@ typedef uintptr_t md5_uintptr;
 /* We have to make a guess about the integer type equivalent in size
    to pointers which should always be correct.  */
 typedef unsigned long int md5_uintptr;
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /* Structure to save state of computation between the single steps.  */
@@ -135,5 +141,9 @@ extern int md5_stream (FILE *stream, void *resblock);
    output yields to the wanted ASCII representation of the message
    digest.  */
 extern void *md5_buffer (const char *buffer, size_t len, void *resblock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

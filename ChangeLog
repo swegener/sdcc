@@ -1,3 +1,15 @@
+2010-01-24 Borut Razem <borut.razem AT siol.net>
+
+	* src/z80/gen.c:
+	  fixed declaration in the middle of the block
+	* support/cpp/ansidecl.h, support/cpp/libcpp/directives.c,
+	  support/cpp/libcpp/errors.c, support/cpp/libcpp/init.c,
+	  support/cpp/libcpp/internal.h, support/cpp/libcpp/lex.c,
+	  support/cpp/libiberty.h, support/cpp/libiberty/hex.c,
+	  support/cpp/libiberty/md5.c, support/cpp/libiberty/splay-tree.c,
+	  support/cpp/md5.h:
+	  SDCPP synchronized with GCC CPP release version 4.4.3
+
 2010-01-24 Philipp Klaus Krause <pkk AT spth.de>
 	* src/SDCCcse.c,
 	  src/SDCCval.c,

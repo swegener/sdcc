@@ -59,9 +59,9 @@ __extension__ const uchar _cpp_trigraph_map[UCHAR_MAX + 1] = {
 #endif
 
 TRIGRAPH_MAP
-  s('=', '#')   s(')', ']')     s('!', '|')
-  s('(', '[')   s('\'', '^')    s('>', '}')
-  s('/', '\\')  s('<', '{')     s('-', '~')
+  s('=', '#')	s(')', ']')	s('!', '|')
+  s('(', '[')	s('\'', '^')	s('>', '}')
+  s('/', '\\')	s('<', '{')	s('-', '~')
 END
 
 #undef s
@@ -108,15 +108,15 @@ cpp_set_lang (cpp_reader *pfile, enum c_lang lang)
 
   CPP_OPTION (pfile, lang) = lang;
 
-  CPP_OPTION (pfile, c99)                        = l->c99;
-  CPP_OPTION (pfile, cplusplus)                  = l->cplusplus;
-  CPP_OPTION (pfile, extended_numbers)           = l->extended_numbers;
-  CPP_OPTION (pfile, extended_identifiers)       = l->extended_identifiers;
-  CPP_OPTION (pfile, std)                        = l->std;
-  CPP_OPTION (pfile, trigraphs)                  = l->std;
-  CPP_OPTION (pfile, cplusplus_comments)         = l->cplusplus_comments;
-  CPP_OPTION (pfile, digraphs)                   = l->digraphs;
-  CPP_OPTION (pfile, uliterals)                  = l->uliterals;
+  CPP_OPTION (pfile, c99)			 = l->c99;
+  CPP_OPTION (pfile, cplusplus)			 = l->cplusplus;
+  CPP_OPTION (pfile, extended_numbers)		 = l->extended_numbers;
+  CPP_OPTION (pfile, extended_identifiers)	 = l->extended_identifiers;
+  CPP_OPTION (pfile, std)			 = l->std;
+  CPP_OPTION (pfile, trigraphs)			 = l->std;
+  CPP_OPTION (pfile, cplusplus_comments)	 = l->cplusplus_comments;
+  CPP_OPTION (pfile, digraphs)			 = l->digraphs;
+  CPP_OPTION (pfile, uliterals)			 = l->uliterals;
 }
 
 /* Initialize library global state.  */
@@ -130,8 +130,8 @@ init_library (void)
       initialized = 1;
 
       /* Set up the trigraph map.  This doesn't need to do anything if
-         we were compiled with a compiler that supports C99 designated
-         initializers.  */
+	 we were compiled with a compiler that supports C99 designated
+	 initializers.  */
       init_trigraph_map ();
 
 #ifdef ENABLE_NLS
@@ -143,7 +143,7 @@ init_library (void)
 /* Initialize a cpp_reader structure.  */
 cpp_reader *
 cpp_create_reader (enum c_lang lang, hash_table *table,
-                   struct line_maps *line_table)
+		   struct line_maps *line_table)
 {
   cpp_reader *pfile;
 
@@ -218,13 +218,16 @@ cpp_create_reader (enum c_lang lang, hash_table *table,
   pfile->a_buff = _cpp_get_buff (pfile, 0);
   pfile->u_buff = _cpp_get_buff (pfile, 0);
 
+  /* Initialize table for push_macro/pop_macro.  */
+  pfile->pushed_macros = 0;
+
   /* The expression parser stack.  */
   _cpp_expand_op_stack (pfile);
 
   /* Initialize the buffer obstack.  */
   _obstack_begin (&pfile->buffer_ob, 0, 0,
-                  (void *(*) (long)) xmalloc,
-                  (void (*) (void *)) free);
+		  (void *(*) (long)) xmalloc,
+		  (void (*) (void *)) free);
 
   _cpp_init_files (pfile);
 
@@ -247,6 +250,7 @@ void
 cpp_destroy (cpp_reader *pfile)
 {
   cpp_context *context, *contextn;
+  struct def_pragma_macro *pmacro;
   tokenrun *run, *runn;
   int i;
 
@@ -282,7 +286,7 @@ cpp_destroy (cpp_reader *pfile)
       runn = run->next;
       free (run->base);
       if (run != &pfile->base_run)
-        free (run);
+	free (run);
     }
 
   for (context = pfile->base_context.next; context; context = contextn)
@@ -294,9 +298,20 @@ cpp_destroy (cpp_reader *pfile)
   if (pfile->comments.entries)
     {
       for (i = 0; i < pfile->comments.count; i++)
-        free (pfile->comments.entries[i].comment);
+	free (pfile->comments.entries[i].comment);
 
       free (pfile->comments.entries);
+    }
+  if (pfile->pushed_macros)
+    {
+      do
+	{
+	  pmacro = pfile->pushed_macros;
+	  pfile->pushed_macros = pmacro->next;
+	  free (pmacro->name);
+	  free (pmacro);
+	}
+      while (pfile->pushed_macros);
     }
 
   free (pfile);
@@ -327,18 +342,18 @@ struct builtin_macro
 #define B(n, t, f)    { DSC(n), t, f }
 static const struct builtin_macro builtin_array[] =
 {
-  B("__TIMESTAMP__",     BT_TIMESTAMP,     false),
-  B("__TIME__",          BT_TIME,          false),
-  B("__DATE__",          BT_DATE,          false),
-  B("__FILE__",          BT_FILE,          false),
-  B("__BASE_FILE__",     BT_BASE_FILE,     false),
-  B("__LINE__",          BT_SPECLINE,      true),
+  B("__TIMESTAMP__",	 BT_TIMESTAMP,     false),
+  B("__TIME__",		 BT_TIME,          false),
+  B("__DATE__",		 BT_DATE,          false),
+  B("__FILE__",		 BT_FILE,          false),
+  B("__BASE_FILE__",	 BT_BASE_FILE,     false),
+  B("__LINE__",		 BT_SPECLINE,      true),
   B("__INCLUDE_LEVEL__", BT_INCLUDE_LEVEL, true),
-  B("__COUNTER__",       BT_COUNTER,       true),
+  B("__COUNTER__",	 BT_COUNTER,       true),
   /* Keep builtins not used for -traditional-cpp at the end, and
      update init_builtins() if any more are added.  */
-  B("_Pragma",           BT_PRAGMA,        true),
-  B("__STDC__",          BT_STDC,          true),
+  B("_Pragma",		 BT_PRAGMA,        true),
+  B("__STDC__",		 BT_STDC,          true),
 };
 #undef B
 
@@ -352,17 +367,17 @@ struct builtin_operator
 #define B(n, t)    { DSC(n), t }
 static const struct builtin_operator operator_array[] =
 {
-  B("and",      CPP_AND_AND),
-  B("and_eq",   CPP_AND_EQ),
-  B("bitand",   CPP_AND),
-  B("bitor",    CPP_OR),
-  B("compl",    CPP_COMPL),
-  B("not",      CPP_NOT),
-  B("not_eq",   CPP_NOT_EQ),
-  B("or",       CPP_OR_OR),
-  B("or_eq",    CPP_OR_EQ),
-  B("xor",      CPP_XOR),
-  B("xor_eq",   CPP_XOR_EQ)
+  B("and",	CPP_AND_AND),
+  B("and_eq",	CPP_AND_EQ),
+  B("bitand",	CPP_AND),
+  B("bitor",	CPP_OR),
+  B("compl",	CPP_COMPL),
+  B("not",	CPP_NOT),
+  B("not_eq",	CPP_NOT_EQ),
+  B("or",	CPP_OR_OR),
+  B("or_eq",	CPP_OR_EQ),
+  B("xor",	CPP_XOR),
+  B("xor_eq",	CPP_XOR_EQ)
 };
 #undef B
 
@@ -392,7 +407,7 @@ cpp_init_special_builtins (cpp_reader *pfile)
   if (CPP_OPTION (pfile, traditional))
     n -= 2;
   else if (! CPP_OPTION (pfile, stdc_0_in_system_headers)
-           || CPP_OPTION (pfile, std))
+	   || CPP_OPTION (pfile, std))
     n--;
 
   for (b = builtin_array; b < builtin_array + n; b++)
@@ -402,7 +417,7 @@ cpp_init_special_builtins (cpp_reader *pfile)
       hp->flags |= NODE_BUILTIN;
       if (b->always_warn_if_redefined
           || CPP_OPTION (pfile, warn_builtin_macro_redefined))
-        hp->flags |= NODE_WARN;
+	hp->flags |= NODE_WARN;
       hp->value.builtin = (enum builtin_type) b->value;
     }
 }
@@ -417,7 +432,7 @@ cpp_init_builtins (cpp_reader *pfile, int hosted)
 
   if (!CPP_OPTION (pfile, traditional)
       && (! CPP_OPTION (pfile, stdc_0_in_system_headers)
-          || CPP_OPTION (pfile, std)))
+	  || CPP_OPTION (pfile, std)))
     _cpp_define_builtin (pfile, "__STDC__ 1");
 
   if (CPP_OPTION (pfile, cplusplus))
@@ -455,37 +470,37 @@ static void sanity_checks (cpp_reader *pfile)
 
   if (CPP_OPTION (pfile, precision) > max_precision)
     cpp_error (pfile, CPP_DL_ICE,
-               "preprocessor arithmetic has maximum precision of %lu bits;"
-               " target requires %lu bits",
-               (unsigned long) max_precision,
-               (unsigned long) CPP_OPTION (pfile, precision));
+	       "preprocessor arithmetic has maximum precision of %lu bits;"
+	       " target requires %lu bits",
+	       (unsigned long) max_precision,
+	       (unsigned long) CPP_OPTION (pfile, precision));
 
   if (CPP_OPTION (pfile, precision) < CPP_OPTION (pfile, int_precision))
     cpp_error (pfile, CPP_DL_ICE,
-               "CPP arithmetic must be at least as precise as a target int");
+	       "CPP arithmetic must be at least as precise as a target int");
 
   if (CPP_OPTION (pfile, char_precision) < 8)
     cpp_error (pfile, CPP_DL_ICE, "target char is less than 8 bits wide");
 
   if (CPP_OPTION (pfile, wchar_precision) < CPP_OPTION (pfile, char_precision))
     cpp_error (pfile, CPP_DL_ICE,
-               "target wchar_t is narrower than target char");
+	       "target wchar_t is narrower than target char");
 
   if (CPP_OPTION (pfile, int_precision) < CPP_OPTION (pfile, char_precision))
     cpp_error (pfile, CPP_DL_ICE,
-               "target int is narrower than target char");
+	       "target int is narrower than target char");
 
   /* This is assumed in eval_token() and could be fixed if necessary.  */
   if (sizeof (cppchar_t) > sizeof (cpp_num_part))
     cpp_error (pfile, CPP_DL_ICE,
-               "CPP half-integer narrower than CPP character");
+	       "CPP half-integer narrower than CPP character");
 
   if (CPP_OPTION (pfile, wchar_precision) > BITS_PER_CPPCHAR_T)
     cpp_error (pfile, CPP_DL_ICE,
-               "CPP on this host cannot handle wide character constants over"
-               " %lu bits, but the target requires %lu bits",
-               (unsigned long) BITS_PER_CPPCHAR_T,
-               (unsigned long) CPP_OPTION (pfile, wchar_precision));
+	       "CPP on this host cannot handle wide character constants over"
+	       " %lu bits, but the target requires %lu bits",
+	       (unsigned long) BITS_PER_CPPCHAR_T,
+	       (unsigned long) CPP_OPTION (pfile, wchar_precision));
 }
 #else
 # define sanity_checks(PFILE)
@@ -514,7 +529,7 @@ cpp_read_main_file (cpp_reader *pfile, const char *fname)
   if (CPP_OPTION (pfile, deps.style) != DEPS_NONE)
     {
       if (!pfile->deps)
-        pfile->deps = deps_init ();
+	pfile->deps = deps_init ();
 
       /* Set the default target (if there is none already).  */
       deps_add_default_target (pfile, fname);
@@ -558,11 +573,11 @@ read_original_filename (cpp_reader *pfile)
 
       /* If it's a #line directive, handle it.  */
       if (token1->type == CPP_NUMBER)
-        {
-          _cpp_handle_directive (pfile, token->flags & PREV_WHITE);
-          read_original_directory (pfile);
-          return;
-        }
+	{
+	  _cpp_handle_directive (pfile, token->flags & PREV_WHITE);
+	  read_original_directory (pfile);
+	  return;
+	}
     }
 
   /* Backup as if nothing happened.  */
@@ -598,8 +613,8 @@ read_original_directory (cpp_reader *pfile)
 
   if (token->type != CPP_STRING
       || ! (token->val.str.len >= 5
-            && token->val.str.text[token->val.str.len-2] == '/'
-            && token->val.str.text[token->val.str.len-3] == '/'))
+	    && token->val.str.text[token->val.str.len-2] == '/'
+	    && token->val.str.text[token->val.str.len-3] == '/'))
     {
       _cpp_backup_tokens (pfile, 3);
       return;
@@ -610,11 +625,11 @@ read_original_directory (cpp_reader *pfile)
       char *debugdir = (char *) alloca (token->val.str.len - 3);
 
       memcpy (debugdir, (const char *) token->val.str.text + 1,
-              token->val.str.len - 4);
+	      token->val.str.len - 4);
       debugdir[token->val.str.len - 4] = '\0';
 
       pfile->cb.dir_change (pfile, debugdir);
-    }
+    }      
 }
 
 /* This is called at the end of preprocessing.  It pops the last
@@ -645,7 +660,7 @@ cpp_finish (cpp_reader *pfile, FILE *deps_stream)
       deps_write (pfile->deps, deps_stream, 72);
 
       if (CPP_OPTION (pfile, deps.phony_targets))
-        deps_phony_targets (pfile->deps, deps_stream);
+	deps_phony_targets (pfile->deps, deps_stream);
     }
 
   /* Report on headers that could use multiple include guards.  */
@@ -667,7 +682,7 @@ post_options (cpp_reader *pfile)
   if (CPP_OPTION (pfile, preprocessed))
     {
       if (!CPP_OPTION (pfile, directives_only))
-        pfile->state.prevent_expansion = 1;
+	pfile->state.prevent_expansion = 1;
       CPP_OPTION (pfile, traditional) = 0;
     }
 

@@ -125,7 +125,7 @@ struct adsym *sp;
 {
         char *ptr;
         int i;
-        const char *ips;
+        char *ips;
 
         ips = ip;
         unget(getnb());
@@ -148,7 +148,7 @@ int
 srch(str)
 char *str;
 {
-        const char *ptr;
+        char *ptr;
         ptr = ip;
 
         while (*ptr && *str) {

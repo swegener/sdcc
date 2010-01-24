@@ -947,7 +947,7 @@ outgsd(void)
         /*
          * Sdcc compile options
          */
-        if (is_sdas() && strlen(optsdcc)) fprintf(ofp, "O %s\n", optsdcc);
+        if (is_sdas() && NULL != optsdcc) fprintf(ofp, "O %s\n", optsdcc);
         /* end sdas specific */
 
         /*

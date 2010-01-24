@@ -599,9 +599,6 @@ asmbl()
 	int d, n, uaf, uf;
 	/* sdas specific */
 	static struct area *abs_ap; /* pointer to current absolute area structure */
-	double f1, f2;
-	unsigned int mantissa, exponent;
-	const char readbuffer[80];
 	/* end sdas specific */
 
 	laddr = dot.s_addr;
@@ -864,6 +861,10 @@ loop:
 	/* sdas z80 specific */
 	case S_FLOAT:
 		do {
+			double f1, f2;
+			unsigned int mantissa, exponent;
+			const char readbuffer[80];
+
 			getid(readbuffer, ' ');	/* Hack :) */
 			if ((c = getnb()) == '.') {
 				getid(&readbuffer[strlen(readbuffer)], '.');
@@ -1002,21 +1003,12 @@ loop:
 		lmode = SLIST;
 		break;
 
-	/* sdas hc08 specific */
+	/* sdas specific */
 	case S_OPTSDCC:
-		p = optsdcc;
-		if ((c = getnb()) != 0) {
-			do {
-				if (p < &optsdcc[NINPUT-1])
-					*p++ = c;
-			} while ((c = get()) != 0);
-		}
-		*p = 0;
-		unget(c);
+		optsdcc = strsto(ip);
 		lmode = SLIST;
-		/*if (pass == 0) printf("optsdcc=%s\n", optsdcc);*/
-		break;
-	/* end sdas hc08 specific */
+		return;	/* line consumed */
+	/* end sdas specific */
 
 	case S_GLOBL:
 		do {

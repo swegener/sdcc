@@ -63,7 +63,9 @@ struct	mne	mne[] = {
     { NULL,	".org",		S_ORG,		0,	0 },
     { NULL,	".module",	S_MODUL,	0,	0 },
     { NULL,	".ascis",	S_ASCIS,	0,	0 },
+/* sdas specific */
     { NULL,	".optsdcc",	S_OPTSDCC,	0,	0 },
+/* end sdas specific */
 
 	/* Gameboy, a modified Z80 */
 

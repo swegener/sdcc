@@ -623,19 +623,19 @@ link_main()
 	switch (c) {
 
 	/* sdld specific */
-	case 'O': /*For some important sdcc options*/
+	case 'O': /* For some important sdcc options */
 		if (is_sdld() && pass == 0) {
-			if (strlen(sdccopt) == 0) {
-				strcpy(sdccopt, &ip[1]);
-				strcpy(sdccopt_module, curr_module);
+			if (NULL == optsdcc) {
+				optsdcc = strsto(&ip[1]);
+				optsdcc_module = hp->m_id;
 			}
 			else {
-				if(strcmp(sdccopt, &ip[1])!=0) {
+				if (strcmp(optsdcc, &ip[1]) != 0) {
 					fprintf(stderr,
-					"?ASlink-Warning-Conflicting sdcc options:\n"
-					"   \"%s\" in module \"%s\" and\n"
-					"   \"%s\" in module \"%s\".\n",
-					sdccopt, sdccopt_module, &ip[1], curr_module);
+						"?ASlink-Warning-Conflicting sdcc options:\n"
+						"   \"%s\" in module \"%s\" and\n"
+						"   \"%s\" in module \"%s\".\n",
+						optsdcc, optsdcc_module, &ip[1], hp->m_id);
 					lkerr++;
 				}
 			}
@@ -672,9 +672,6 @@ link_main()
 
 	case 'M':
 		if (pass == 0) {
-			/* sdld specific */
-			strcpy(curr_module, &ip[1]);
-			/* sdld specific */
 			module();
 		}
 		break;

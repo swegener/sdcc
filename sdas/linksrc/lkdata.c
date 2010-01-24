@@ -104,10 +104,8 @@ int	gcntr;		/*	LST file relocation active
 			 *	counter
 			 */
 /* sdld specific */
-char	sdccopt[NINPUT] = "";
-char	sdccopt_module[NINPUT] = "";
-char	curr_module[NINPUT] = "";
-
+char	*optsdcc;
+char	*optsdcc_module;
 int	dflag;		/*	Debug information output flag
 			 */
 int	sflag;		/*	JCF: Memory usage output flag

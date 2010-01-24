@@ -516,10 +516,10 @@ extern	char	*ep;		/*	pointer into error list
 				 */
 extern	char	eb[NERR];	/*	array of generated error codes
 				 */
-extern	const char *ip;	/*	pointer into the assembler-source
+extern	char	*ip;		/*	pointer into the assembler-source
 				 *	text line in ib[]
 				 */
-extern	const char *ib;	/*	assembler-source text line
+extern	char	*ib;		/*	assembler-source text line
 				 */
 extern	char	*cp;		/*	pointer to assembler output
 				 *	array cb[]
@@ -567,7 +567,7 @@ extern	int	cflag;		/*	-c, generate sdcdb debug information
 				 */
 extern	int	jflag;		/*	-j, generate debug information flag
 				 */
-extern	char	optsdcc[NINPUT];	/*	sdcc compile options
+extern	char	*optsdcc;	/*	sdcc compile options
 				 */
 extern	int	flat24Mode;	/*	non-zero if we are using DS390 24 bit
 				 *	flat mode (via .flat24 directive).

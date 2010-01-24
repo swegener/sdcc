@@ -568,12 +568,6 @@ extern	char	ctype[];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 
-/* sdld specific */
-extern char sdccopt[NINPUT];
-extern char sdccopt_module[NINPUT];
-extern char curr_module[NINPUT];
-/* end sdld specific */
-
 /*
  *	Character Type Definitions
  */
@@ -760,6 +754,8 @@ extern	long code_size;		/*	code size
 				 */
 extern	char *sdld_output;	/*	output file name, --output argument
 				 */
+extern char *optsdcc;
+extern char *optsdcc_module;
 /* sdld 8015 specific */
 extern	char idatamap[];	/* 0:not used, 1:used
 				 */

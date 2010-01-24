@@ -28,7 +28,7 @@ struct expr *esp;
         int c;
         struct area *espa;
         a_uint espv;
-        const char *tcp;
+        char *tcp;
 
         if ((c = getnb()) == '#') {
                 expr(esp, 0);
@@ -144,7 +144,7 @@ struct adsym *sp;
 {
         char *ptr;
         int i;
-        const char *ips;
+        char *ips;
 
         ips = ip;
         unget(getnb());
@@ -167,7 +167,7 @@ int
 srch(str)
 char *str;
 {
-        const char *ptr;
+        char *ptr;
         ptr = ip;
 
         while (*ptr && *str) {

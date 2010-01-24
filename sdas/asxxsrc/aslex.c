@@ -424,7 +424,7 @@ int flag;
  *              int     i               string length
  *
  *      global variables:
- *              const char ib[]         string buffer containing
+ *              char    ib[]            string buffer containing
  *                                      assembler-source text line
  *              char    ifp[]           array of file handles for
  *                                      include files
@@ -503,7 +503,7 @@ loop:
           ++srcline[cfile];
         }
     }
-  ib = dbuf_c_str (&dbuf);
+  ib = (char *)dbuf_c_str (&dbuf);
 
   /* remove the trailing NL */
   if (len > 0 && '\n' == ib[len - 1])
@@ -512,7 +512,7 @@ loop:
       if (len > 0 && '\r' == ib[len - 1])
         --len;
       dbuf_set_length (&dbuf, len);
-      ib = dbuf_c_str (&dbuf);
+      ib = (char *)dbuf_c_str (&dbuf);
     }
 
   return 1;

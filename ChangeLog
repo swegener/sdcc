@@ -1,3 +1,12 @@
+2010-01-24 Borut Razem <borut.razem AT siol.net>
+
+	* sdas/as8051/i51adr.c, sdas/as8051/i51pst.c, sdas/asz80/z80pst.c,
+	  sdas/asz80/z80adr.c, sdas/linksrc/lkdata.c, sdas/linksrc/lkmain.c,
+	  sdas/linksrc/aslink.h, sdas/as6808/m08adr.c, sdas/as6808/m08pst.c,
+	  sdas/asxxsrc/asmain.c, sdas/asxxsrc/asxxxx.h, sdas/asxxsrc/aslex.c,
+	  sdas/asxxsrc/asdata.c, sdas/asgb/gbadr.c, sdas/asgb/gbpst.c:
+	  optimized .optsdcc handling
+
 2010-01-23 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCicode.c, src/SDCCast.c, src/SDCCast.h:

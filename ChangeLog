@@ -1,3 +1,9 @@
+2010-01-24 Philipp Klaus Krause <pkk AT spth.de>
+	* support/regression/tests/bool.c,
+	  support/regression/tests/bitopcse.c,
+	  device/include/stdbool.h:
+	  Added test for bool.
+
 2010-01-24 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/gen.c:

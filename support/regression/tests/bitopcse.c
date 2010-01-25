@@ -15,7 +15,7 @@
 
 #define TYPE_{type}
 
-#if defined(TYPE_bool) && !defined(__SDCC__WEIRD_BOOL)
+#if defined(TYPE_bool) && !defined(__SDCC_WEIRD_BOOL)
 #  define UNSIGNED
 #else
 #  define UNSIGNED unsigned

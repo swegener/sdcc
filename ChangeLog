@@ -1,5 +1,9 @@
 2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
-	* src/SDCCsymt.h:
+	* src/z80/gen.c:
+	  Minor comment.
+
+2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c:
 	  Minor comment.
 
 2010-01-29 Philipp Klaus Krause <pkk AT spth.de>

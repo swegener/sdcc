@@ -2053,6 +2053,8 @@ assemble (char **envp)
       buildCmdLine2 (buffer, sizeof(buffer), port->assembler.mcmd);
     }
 
+  dbuf_destroy (&asmName);
+
   if (my_system (buffer))
     {
       /* either system() or the assembler itself has reported an error
@@ -2061,22 +2063,6 @@ assemble (char **envp)
       dbuf_destroy (&asmName);
       exit (EXIT_FAILURE);
   }
-
-  if (IS_SDASLD && options.cc_only && fullDstFileName)
-    {
-      /* make some order in the mess remined behind sdas:
-         move generated files to the output directory */
-      dbuf_set_length (&asmName, 0);
-      dbuf_printf (&asmName, "%s%s", dstFileName, port->linker.rel_ext);
-
-      if (FILENAME_CMP (dbuf_c_str (&asmName), fullDstFileName))
-        {
-          remove (fullDstFileName);
-          rename (dbuf_c_str(&asmName), fullDstFileName);
-        }
-    }
-
-    dbuf_destroy (&asmName);
 }
 
 /*-----------------------------------------------------------------*/

@@ -236,7 +236,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	char *p;
+	char *p, *q;
 	int c, i;
 	struct area *ap;
 
@@ -344,25 +344,31 @@ char *argv[];
 				fprintf(stderr, "too many input files\n");
 				asexit(ER_FATAL);
 			}
+			if (inpfil == 0) {
+				q = p;
+				if (++i < argc) {
+					p = argv[i];
+					if (*p == '-')
+						usage(ER_FATAL);
+				}
+			}
 			sfp[inpfil] = afile(p, "", 0);
 			strcpy(srcfn[inpfil],afn);
-			if (inpfil == 0) {
-				if (lflag)
-					lfp = afile(p, "lst", 1);
-				if (oflag) {
-					ofp = afile(p, "rel", 1);
-					/* sdas specific */
-					// save the file name if we have to delete it on error
-					strcpy(relFile,afn);
-					/* end sdas specific */
-				}
-				if (sflag)
-					tfp = afile(p, "sym", 1);
-			}
 		}
 	}
 	if (inpfil < 0)
 		usage(ER_WARNING);
+	if (lflag)
+		lfp = afile(q, "lst", 1);
+	if (oflag) {
+		ofp = afile(q, "rel", 1);
+		/* sdas specific */
+		// save the file name if we have to delete it on error
+		strcpy(relFile,afn);
+		/* end sdas specific */
+	}
+	if (sflag)
+		tfp = afile(q, "sym", 1);
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;
@@ -1391,23 +1397,24 @@ a_uint a;
 }
 
 char *usetxt[] = {
-	"Usage: [-dqxjgaloscpwzf] [-I<dir>] file1 [file2 file3 ...]",
-	"  d    decimal listing",
-	"  q    octal   listing",
-	"  x    hex     listing (default)",
-	"  j    add line number and debug information to file", /* JLH */
-	"  g    undefined symbols made global",
-	"  a    all user symbols made global",
-	"  l    create list   output file1[lst]",
-	"  o    create object output file1[rel]",
-	"  s    create symbol output file1[sym]",
-	"  c    generate sdcdb debug information",
-	"  p    disable listing pagination",
-	"  w    wide listing format for symbol table",
-	"  z    enable case sensitivity for symbols",
-	"  f    flag relocatable references by  `   in listing file",
-	" ff    flag relocatable references by mode in listing file",
-	"-I<dir>  Add the named directory to the include file",
+	"Usage: [-Options] file",
+	"Usage: [-Options] outfile file1 [file2 file3 ...]",
+	"  -d   Decimal listing",
+	"  -q   Octal   listing",
+	"  -x   Hex     listing (default)",
+	"  -j   Add line number and debug information to file", /* JLH */
+	"  -g   Undefined symbols made global",
+	"  -a   All user symbols made global",
+	"  -l   Create list   output file1[lst]",
+	"  -o   Create object output file1[rel]",
+	"  -s   Create symbol output file1[sym]",
+	"  -c   Generate sdcdb debug information",
+	"  -p   Disable listing pagination",
+	"  -w   Wide listing format for symbol table",
+	"  -z   Enable case sensitivity for symbols",
+	"  -f   Flag relocatable references by  `   in listing file",
+	"  -ff  Flag relocatable references by mode in listing file",
+	"  -I   Add the named directory to the include file",
 	"       search path.  This option may be used more than once.",
 	"       Directories are searched in the order given.",
 	"",

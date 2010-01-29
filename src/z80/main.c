@@ -714,11 +714,11 @@ static const char *_gbLinkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_z80AsmCmd[] =
 {
-  "sdasz80", "$l", "$3", "\"$1.asm\"", NULL
+  "sdasz80", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 static const char *_gbAsmCmd[] =
 {
-  "sdasgb", "$l", "$3", "\"$1.asm\"", NULL
+  "sdasgb", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
 /* Globals */

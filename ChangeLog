@@ -1,6 +1,10 @@
 2010-01-29 Borut Razem <borut.razem AT siol.net>
 
-	* 
+	* sdcc/src/xa51/main.c, sdcc/src/mcs51/main.c, sdcc/src/SDCCmain.c,
+	  sdcc/src/z80/main.c, sdcc/src/ds390/main.c, sdcc/src/hc08/main.c,
+	  sdcc/sdas/asxxsrc/asmain.c:
+	  fixed bug #2925290: SDCC assemblers do not process "-o" option correctly
+	  The sdas command line syntax is now compatible with asxxxx v5.0
 
 2010-01-24 Philipp Klaus Krause <pkk AT spth.de>
 	* support/regression/tests/bool.c,
@@ -78,6 +82,7 @@
 
 	* src/SDCCmain.c, sdas/linksrc/lkmain.c, sdas/linksrc/aslink.h:
 	  fixed bug #2933892 - Weird default ouput location for linker - regression
+	  The sdld command line syntax is now compatible with asxxxx v5.0
 
 2010-01-18 Philipp Klaus Krause <pkk AT spth.de>
 

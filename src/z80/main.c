@@ -785,7 +785,7 @@ PORT z80_port =
     NULL, /* iabs_name */
     NULL,
     NULL,
-    1
+    1 /* CODE  is read-only */
   },
   { NULL, NULL },
   {

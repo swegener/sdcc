@@ -901,6 +901,7 @@ getSize (sym_link * p)
         case V_FIXED16X16:
           return (4);
         case V_BOOL:
+          return BOOLSIZE;
         case V_CHAR:
           return CHARSIZE;
         case V_VOID:

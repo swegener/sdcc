@@ -1,3 +1,7 @@
+2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCsymt.h:
+	  Minor fix.
+
 2010-01-29 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/src/xa51/main.c, sdcc/src/mcs51/main.c, sdcc/src/SDCCmain.c,

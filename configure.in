@@ -773,7 +773,8 @@ if test $OPT_DISABLE_MCS51 = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/mcs51/Makefile
                                                        device/lib/small/Makefile
                                                        device/lib/medium/Makefile
-                                                       device/lib/large/Makefile])
+                                                       device/lib/large/Makefile
+                                                       device/lib/huge/Makefile])
 fi
 
 if test $OPT_DISABLE_PIC = 0; then

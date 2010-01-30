@@ -1,5 +1,10 @@
 2010-01-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* configure,
+	* configure.in: added device/lib/huge/Makefile
+
+2010-01-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/include/asm/mcs51/features.h: added _RETURN
 	* device/include/setjmp.h: adapted for model-huge
 	* device/lib/_setjmp.c: adapted for xstack and model-huge

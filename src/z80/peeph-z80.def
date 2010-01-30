@@ -1808,6 +1808,18 @@ replace restart {
 	ex	(sp),hl
 } if notUsed('a'), notUsed('hl')
 
+replace restart {
+	pop	af
+	ld	a,#%1
+	push	af
+	inc	sp
+} by {
+	ld	h,#%1
+	ex	(sp),hl
+	; peephole 94 used ex to move #%1 onto the stack.
+	inc	sp
+} if notUsed('a'), notUsed('hl')
+
 // peeph-z80.def - Z80 peephole rules
 //
 //

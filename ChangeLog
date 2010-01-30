@@ -1,3 +1,8 @@
+2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Minor peephole.
+
 2010-01-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* configure,
@@ -66,14 +71,17 @@
 	* support/regression/tests/snprintf.c: adapted for model-huge
 
 2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Minor comment.
 
 2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Minor comment.
 
 2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCsymt.h:
 	  Minor fix.
 

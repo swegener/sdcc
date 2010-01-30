@@ -54,7 +54,7 @@ float expf(float x)
 	mov	dptr, #0
 	mov	b, #0x80
 	mov	a, #0x3F
-	ret
+	ljmp	expf_exit
 expf_not_zero:
 	// TODO: check exponent for very small values, and return zero
 	mov	_n, #0
@@ -91,7 +91,8 @@ expf_range_reduction:
 	mov	_n, a
 	add	a, #128
 	jnc	expf_range_ok
-	ljmp	fs_return_inf	// exponent overflow
+	lcall	fs_return_inf	// exponent overflow
+	ljmp	expf_exit
 expf_range_ok:
 	mov     r0,#0x00
 	mov     r1,#0x80
@@ -234,6 +235,7 @@ exp_cordic_skip:
 	dec	sp
 expf_done:
 	clr	acc.7		// Result is always positive!
+expf_exit:
 	__endasm;
 #pragma less_pedantic
 }

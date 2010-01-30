@@ -2,7 +2,7 @@
 #
 # model small xstack-auto
 
-LIBSDCCFLAGS+= --stack-auto --xstack --std-c99 -DUSE_FLOATS=1
+LIBSDCCFLAGS+= --stack-auto --xstack --std-c99
 SDCCFLAGS   += --stack-auto --xstack --std-sdcc99
 
 include $(PORTS_DIR)/mcs51-common/spec.mk

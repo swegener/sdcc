@@ -230,9 +230,6 @@ function_attributes
                         if (FUNC_NONBANKED($$)) {
                             werror(W_BANKED_WITH_NONBANKED);
                         }
-                        if (SPEC_STAT($$)) {
-                            werror(W_BANKED_WITH_STATIC);
-                        }
                      }
    |  Interrupt_storage
                      {

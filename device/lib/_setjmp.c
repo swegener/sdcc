@@ -24,7 +24,7 @@
 #include <8051.h>
 #include <setjmp.h>
 
-#if defined(SDCC_USE_XSTACK)
+#if defined(SDCC_STACK_AUTO) && defined(SDCC_USE_XSTACK)
 
 static void dummy (void) __naked
 {
@@ -321,26 +321,42 @@ _longjmp:
 #else
 
 //extern unsigned char __data bp;
+extern unsigned char __data spx;
+extern unsigned char __data bpx;
 
 int setjmp (jmp_buf buf)
 {
     /* registers would have been saved on the
        stack anyway so we need to save SP
        and the return address */
-//    *buf++ = bp;
+#ifdef SDCC_USE_XSTACK
+    *buf++ = spx;
+    *buf++ = bpx;
+#endif
     *buf++ = SP;
-    *buf++ = *((unsigned char __data *) SP  );
-    *buf   = *((unsigned char __data *)SP - 1);
+//    *buf++ = bp;
+    *buf++ = *((unsigned char __data *) SP - 0);
+    *buf++ = *((unsigned char __data *) SP - 1);
+#ifdef SDCC_MODEL_HUGE
+    *buf++ = *((unsigned char __data *) SP - 2);
+#endif
     return 0;
 }
 
 int longjmp (jmp_buf buf, int rv)
 {
     unsigned char lsp;
-//    bp = *buf++;
+#ifdef SDCC_USE_XSTACK
+    spx = *buf++;
+    bpx = *buf++;
+#endif
     lsp = *buf++;
-    *((unsigned char __data *) lsp) = *buf++;
-    *((unsigned char __data *) lsp - 1) = *buf;
+//    bp = *buf++;
+    *((unsigned char __data *) lsp - 0) = *buf++;
+    *((unsigned char __data *) lsp - 1) = *buf++;
+#ifdef SDCC_MODEL_HUGE
+    *((unsigned char __data *) lsp - 2) = *buf++;
+#endif
     SP = lsp;
     return rv;
 }

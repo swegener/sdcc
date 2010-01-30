@@ -422,11 +422,11 @@ extern sym_link *validateLink(sym_link  *l,
 #define FUNC_ISOVERLAY(x) (x->funcAttrs.overlay)
 #define IFFUNC_ISOVERLAY(x) (IS_FUNC(x) && FUNC_ISOVERLAY(x))
 
-#define IFFUNC_ISBANKEDCALL(x) (!IFFUNC_NONBANKED(x) && \
-  (options.model == MODEL_HUGE || \
-   ((options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \
-   (TARGET_IS_Z80 || TARGET_IS_GBZ80)) || \
-  IFFUNC_BANKED(x)))
+#define BANKED_FUNCTIONS        ( options.model == MODEL_HUGE || \
+                                  ( (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \
+                                    TARGET_Z80_LIKE ) )
+#define IFFUNC_ISBANKEDCALL(x)  ( IS_FUNC(x) && \
+                                  ( FUNC_BANKED(x) || ( BANKED_FUNCTIONS && !FUNC_NONBANKED(x) ) ) )
 
 #define SPEC_NOUN(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.noun
 #define SPEC_LONG(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_long

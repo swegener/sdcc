@@ -2958,7 +2958,7 @@ emitCall (iCode * ic, bool ispcall)
 
   if (ispcall)
     {
-      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+      if (IFFUNC_ISBANKEDCALL (dtype))
         {
           werror (W_INDIR_BANKED);
         }
@@ -2987,7 +2987,7 @@ emitCall (iCode * ic, bool ispcall)
   else
     {
       /* make the call */
-      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+      if (IFFUNC_ISBANKEDCALL (dtype))
         {
           char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
                        OP_SYMBOL (IC_LEFT (ic))->rname :

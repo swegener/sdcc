@@ -645,7 +645,8 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
   DCL_TYPE (sym->type) = FUNCTION;
   sym->type->next = copyLinkChain (type);
   sym->etype = getSpec (sym->type);
-  FUNC_ISREENT(sym->type) = rent ? 1 : 0;
+  FUNC_ISREENT (sym->type) = rent ? 1 : 0;
+  FUNC_NONBANKED (sym->type) = 1;
 
   /* if arguments required */
   if (nArgs)
@@ -669,7 +670,6 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
   sym->cdef = 1;
   allocVariables (sym);
   return sym;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -678,7 +678,6 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
 symbol *
 funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
 {
-
     symbol *sym;
     int i ;
     /* create the symbol */
@@ -709,7 +708,6 @@ funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
     sym->cdef = 1;
     allocVariables (sym);
     return sym;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -777,7 +775,7 @@ processParms (ast *func,
       checkTypeSanity(defParm->etype, defParm->name);
     }
 
-  if (IS_CODEPTR (func->ftype))
+  if (IS_FUNCPTR (func->ftype))
     functype = func->ftype->next;
   else
     functype = func->ftype;
@@ -6626,6 +6624,9 @@ createFunction (symbol * name, ast * body)
       else
         stackPtr  -= port->stack.direction * port->stack.reent_overhead;
     }
+
+  if (IFFUNC_ISBANKEDCALL (name->type))
+    stackPtr -= port->stack.direction * port->stack.banked_overhead;
 
   fetype = getSpec (name->type);        /* get the specifier for the function */
   /* if this is a reentrant function then */

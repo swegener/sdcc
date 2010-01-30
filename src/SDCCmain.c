@@ -99,6 +99,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_HELP             "--help"
 #define OPTION_OUT_FMT_IHX      "--out-fmt-ihx"
 #define OPTION_OUT_FMT_S19      "--out-fmt-s19"
+#define OPTION_HUGE_MODEL       "--model-huge"
 #define OPTION_LARGE_MODEL      "--model-large"
 #define OPTION_MEDIUM_MODEL     "--model-medium"
 #define OPTION_SMALL_MODEL      "--model-small"
@@ -182,9 +183,10 @@ optionsTable[] = {
     { 0,    NULL,                   NULL, "Code generation options"},
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
     { 'p',  NULL,                   NULL, "Select port specific processor e.g. -mpic14 -p16f84" },
-    { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
-    { 0,    OPTION_MEDIUM_MODEL,    NULL, "external paged data space is used" },
     { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
+    { 0,    OPTION_MEDIUM_MODEL,    NULL, "external paged data space is used" },
+    { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
+    { 0,    OPTION_HUGE_MODEL,      NULL, "functions are banked, data in external space" },
     { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
     { 0,    "--int-long-reent",     &options.intlong_rent, "Use reentrant calls on the int and long support functions" },
@@ -980,9 +982,9 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_LARGE_MODEL) == 0)
+          if (strcmp (argv[i], OPTION_SMALL_MODEL) == 0)
             {
-              _setModel (MODEL_LARGE, argv[i]);
+              _setModel (MODEL_SMALL, argv[i]);
               continue;
             }
 
@@ -992,9 +994,15 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_SMALL_MODEL) == 0)
+          if (strcmp (argv[i], OPTION_LARGE_MODEL) == 0)
             {
-              _setModel (MODEL_SMALL, argv[i]);
+              _setModel (MODEL_LARGE, argv[i]);
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_HUGE_MODEL) == 0)
+            {
+              _setModel (MODEL_HUGE, argv[i]);
               continue;
             }
 
@@ -2127,6 +2135,9 @@ preProcess (char **envp)
           break;
         case MODEL_MEDIUM:
           addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_MEDIUM"));
+          break;
+        case MODEL_HUGE:
+          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_HUGE"));
           break;
         case MODEL_FLAT24:
           addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_FLAT24"));

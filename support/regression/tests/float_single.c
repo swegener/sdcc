@@ -9,6 +9,13 @@
 #if 0
 #   include <stdio.h>
 #   define DEBUG(x) x      /* only for "make test-host" */
+#   ifdef SDCC
+        void _putchar(char c);
+        void putchar(char c)
+        {
+            _putchar(c);
+        }
+#   endif
 #else
 #   define DEBUG(x)
 #endif

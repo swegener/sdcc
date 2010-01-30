@@ -319,8 +319,8 @@ struct
 { W_UNSUPPORTED_MODEL, ERROR_LEVEL_WARNING,
    "Model '%s' not supported for %s, ignored." },
 { W_BANKED_WITH_NONBANKED, ERROR_LEVEL_WARNING,
-   "Both banked and nonbanked attributes used.  nonbanked wins." },
-{ W_BANKED_WITH_STATIC, ERROR_LEVEL_WARNING,
+   "Both banked and nonbanked attributes used. nonbanked wins." },
+{ W_BANKED_WITH_STATIC, ERROR_LEVEL_WARNING, // no longer used
    "Both banked and static used.  static wins." },
 { W_INT_TO_GEN_PTR_CAST, ERROR_LEVEL_WARNING,
    "converting integer type to generic pointer: assuming XDATA" },

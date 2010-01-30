@@ -1,6 +1,6 @@
 /*  tancotf.c: Computes tan or cot of a 32-bit float as outlined in [1]
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 
 #include <math.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define P0  0.100000000E+1
 #define P1 -0.958017723E-1
@@ -39,7 +40,7 @@
 //A reasonable choice for YMAX is the integer part of B**(t/2)*PI/2:
 #define YMAX 6433.0
 
-float tancotf(const float x, const int iscotan)
+float tancotf(const float x, const BOOL iscotan)
 {
     float f, g, xn, xnum, xden;
     int n;
@@ -82,4 +83,3 @@ float tancotf(const float x, const int iscotan)
                else return (xnum/xden);
     }
 }
-

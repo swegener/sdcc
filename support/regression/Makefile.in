@@ -93,7 +93,7 @@ test-gbz80:
 	$(MAKE) test-port PORT=gbz80
 
 # Helper rule for testing the mcs51 port only
-test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-stack-auto test-mcs51-xstack-auto
+test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-stack-auto test-mcs51-xstack-auto
 
 test-mcs51-small:
 	$(MAKE) test-port PORT=mcs51-small
@@ -103,6 +103,9 @@ test-mcs51-medium:
 
 test-mcs51-large:
 	$(MAKE) test-port PORT=mcs51-large
+
+test-mcs51-huge:
+	$(MAKE) make_library test-port PORT=mcs51-huge
 
 test-mcs51-stack-auto:
 	$(MAKE) test-port PORT=mcs51-stack-auto

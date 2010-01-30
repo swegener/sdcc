@@ -42,6 +42,7 @@ static char *_mcs51_keywords[] =
   "idata",
   "interrupt",
   "near",
+  "nonbanked",
   "pdata",
   "reentrant",
   "sfr",
@@ -155,6 +156,7 @@ _mcs51_finaliseOptions (void)
       port->s.gptr_size = 3;
       break;
     case MODEL_LARGE:
+    case MODEL_HUGE:
       port->mem.default_local_map = xdata;
       port->mem.default_globl_map = xdata;
       port->s.gptr_size = 3;
@@ -168,8 +170,9 @@ _mcs51_finaliseOptions (void)
   if (options.parms_in_bank1)
     addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
 
-  /* mcs51 has an assembly coded float library that's always reentrant */
-  options.float_rent = 1;
+  /* mcs51 has an assembly coded float library that's almost always reentrant */
+  if (!options.useXstack)
+    options.float_rent = 1;
 
   /* set up external stack location if not explicitly specified */
   if (!options.xstack_loc)
@@ -733,8 +736,8 @@ PORT mcs51_port =
   NULL,                         /* Processor name */
   {
     glue,
-    TRUE,                       /* Emit glue around main */
-    MODEL_SMALL | MODEL_MEDIUM | MODEL_LARGE,
+    TRUE,                       /* glue_up_main: Emit glue around main */
+    MODEL_SMALL | MODEL_MEDIUM | MODEL_LARGE | MODEL_HUGE,
     MODEL_SMALL
   },
   {                             /* Assembler */
@@ -766,7 +769,7 @@ PORT mcs51_port =
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
     "XSTK    (PAG,XDATA)",      // xstack_name
     "STACK   (DATA)",           // istack_name
@@ -798,7 +801,7 @@ PORT mcs51_port =
     4,          /* isr_overhead */
     1,          /* call_overhead (2 for return address - 1 for pre-incrementing push */
     1,          /* reent_overhead */
-    0           /* banked_overhead (switch between code banks) */
+    1           /* banked_overhead (switch between code banks) */
   },
   {
     /* mcs51 has an 8 bit mul */
@@ -832,12 +835,12 @@ PORT mcs51_port =
   _mcs51_genInitStartup,
   _mcs51_reset_regparm,
   _mcs51_regparm,
-  NULL,
-  NULL,
-  NULL,
+  NULL,                         /* process_pragma */
+  NULL,                         /* getMangledFunctionName */
+  NULL,                         /* hasNativeMulFor */
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
-  FALSE,
+  FALSE,                        /* use_dw_for_init */
   TRUE,                         /* little_endian */
   0,                            /* leave lt */
   0,                            /* leave gt */

@@ -1,3 +1,65 @@
+2010-01-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/asm/mcs51/features.h: added _RETURN
+	* device/include/setjmp.h: adapted for model-huge
+	* device/lib/_setjmp.c: adapted for xstack and model-huge
+	* device/lib/_decdptr.c(_decdptr): __naked
+	* device/lib/_logexpf.c (_fs_cordic_rshift_r765_unsigned): __naked
+	* device/lib/_mullong.c: use _AUTOMEM from sdcc-lib.h
+	* device/lib/_startup.c (_sdcc_external_startup): __nonbanked
+	* device/lib/_strlen.c,
+	* device/lib/abs.c,
+	* device/lib/labs.c: use _RETURN
+	* device/lib/cotf.c,
+	* device/lib/tanf.c,
+	* device/lib/tancotf.c (tancotf): changed iscotan to BOOL
+	* device/lib/expf.c,
+	* device/lib/logf.c: adapted for model-huge
+	* device/lib/printf_large.c: set USE_FLOATS for ds390, xstack, model-huge
+	* device/lib/huge: added directory
+	* device/lib/huge/Makefile.in: new, added
+	* src/mcs51/gen.c (aopPut, Push): factored out Push,
+	  (getFreePtr): save R0 in B for PCALL,
+	  (opIsGptr): also true for banked function pointers,
+	  (saveRegisters, unsaveRegisters): always save for banked functions,
+	    don't kill R0,
+	  (genCall, genPcall, genEndFunction): even static functions are banked in
+	    model-huge, address could be taken,
+	  (genPcall): don't kill R0-R2 before genSend
+	* src/mcs51/main.c (_mcs51_keywords): added nonbanked,
+	  (_mcs51_finaliseOptions): added MODEL_HUGE,
+	    xstack float lib is not reentrant,
+	  (mcs51_port): added MODEL_HUGE, fixed banked_overhead bug
+	* src/mcs51/peep.c (termScanAtFunc): always abort for banked call and R0-R2
+	* src/SDCC.y: remoed warning W_BANKED_WITH_STATIC
+	* src/SDCCast.c (funcOfType): all C support routines are nonbanked,
+	  (processParms): fixed banked function pointer is no codepointer,
+	  (createFunction): fixed banked_overhead bug
+	* src/SDCCerr.c: W_BANKED_WITH_STATIC no longer used
+	* src/SDCCglue.c (_printPointerType): added size parameter,
+	  (printIvalFuncPtr): adapted for banked function pointer,
+	  (glue): added MODEL_HUGE
+	* src/SDCCmain.c (optionsTable, parseCmdLine, preProcess): added
+	    MODEL_HUGE, --model-huge and OPTION_HUGE_MODEL
+	* src/SDCCmem.c (allocParms): moved banked_overhead to createFunction
+	* src/SDCCsymt.c (getSize): adapted for model-huge,
+	  (checkFunction): merge banked/nonbanked from prototype into definition,
+	  (initCSupport):  all C support routines are made nonbanked in funcOfType
+	* src/SDCCsymt.h: added BANKED_FUNCTIONS, adapted IFFUNC_ISBANKEDCALL
+	* src/z80/gen.c (emitCall):  even static functions are banked in
+	    model-large and model-medium, address could be taken
+	* support/regression/Makefile.in: added target test-mcs51-huge
+	* support/regression/ports/mcs51-common/support.c: added PSBANK,
+	  (_sdcc_external_startup): must be nonbanked
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: moved USE_FLOATS to
+	    printf_large.c
+	* support/regression/ports/mcs51-huge: added directory
+	* support/regression/ports/mcs51-huge/spec.mk: new, added
+	* support/regression/tests/bug1678803.c,
+	* support/regression/tests/bug1712928.c: adapted for model-huge
+	* support/regression/tests/float_single.c: added putchar for debugging
+	* support/regression/tests/snprintf.c: adapted for model-huge
+
 2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c:
 	  Minor comment.
@@ -282,7 +344,7 @@
 
 	* as/link/aslink.dsp, as/link/sdld_all.dsp: fixed destination path of
 	sdld.exe, sdldz80.exe, sdldgb.exe, and sdld6808.exe
-	
+
 2009-12-21 Borut Razem <borut.razem AT siol.net>
 
 	* Makefile.in: fixed hc08
@@ -311,7 +373,7 @@
 
 2009-12-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	* device/lib/abs.c, device/lib/labs.c: assembler version 
+	* device/lib/abs.c, device/lib/labs.c: assembler version
 	  for mcs51, other targets slightly shorter too
 	* support/regression/tests/abs.c: added regression test
 
@@ -368,7 +430,7 @@
 	  as/link/mcs51/Makefile.in, as/link/mcs51/aslink.dsp,
 	  as/link/hc08/Makefile.in, as/link/hc08/link_hc08.dsp,
 	  as/link/z80/lkrloc.c, as/link/hc08/lkrloc.c
-	  as/link/mcs51/lkrloc.c: 
+	  as/link/mcs51/lkrloc.c:
 	  unification of lkrloc.c
 
 2009-12-13 Borut Razem <borut.razem AT siol.net>

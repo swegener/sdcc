@@ -1,8 +1,11 @@
 // #define MICROCONTROLLER_8051
 #include <mcs51reg.h>
 
+/* assume P1 for bankswitching address lines */
+__sfr __at(0x90) PSBANK;
+
 unsigned char
-_sdcc_external_startup (void)
+_sdcc_external_startup (void) __nonbanked
 {
   /* serial port mode 0 is default */
   /* enable transmission of first byte */

@@ -25,18 +25,29 @@
 /* External startup code can be written in C
    here .. Special usage if this routine
    returns a non-zero value then global &
-   static variable initialisation will be skipped */
+   static variable initialisation will be skipped.
+   Beware not to use initialized variables as they
+   are not initialized yet nor to use pdata/xdata
+   variables if external data memory needs to be
+   enabled first. */
 
-#if !defined(SDCC_ds390) && !defined(SDCC_ds400)
+#if defined(SDCC_ds390) || defined(SDCC_ds400)
 
-unsigned char _sdcc_external_startup ()
+/* Disable "ISO C forbids an empty source file" warning message */
+#pragma disable_warning 190
+
+#elif defined(SDCC_mcs51) || defined(SDCC_z80)
+
+unsigned char _sdcc_external_startup (void) __nonbanked
 {
     return 0;
 }
 
 #else
 
-/* Disable "ISO C forbids an empty source file" wraning message */
-#pragma disable_warning 190
+unsigned char _sdcc_external_startup ()
+{
+    return 0;
+}
 
 #endif

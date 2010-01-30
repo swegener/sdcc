@@ -939,7 +939,7 @@ getSize (sym_link * p)
     case FPOINTER:
     case CPOINTER:
     case FUNCTION:
-      return (IFFUNC_BANKED (p) ? GPTRSIZE : FPTRSIZE);
+      return (IFFUNC_ISBANKEDCALL (p) ? GPTRSIZE : FPTRSIZE);
     case GPOINTER:
       return (GPTRSIZE);
 
@@ -1736,14 +1736,11 @@ checkSClass (symbol * sym, int isProto)
 
   /* if parameter or local variable then change */
   /* the storage class to reflect where the var will go */
-  if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED
-   && !IS_STATIC(sym->etype)
-      )
+  if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED && !IS_STATIC (sym->etype))
     {
       if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))
         {
-          SPEC_SCLS (sym->etype) = (options.useXstack ?
-                                    S_XSTACK : S_STACK);
+          SPEC_SCLS (sym->etype) = (options.useXstack ? S_XSTACK : S_STACK);
         }
       else
         {
@@ -1753,8 +1750,7 @@ checkSClass (symbol * sym, int isProto)
            */
           bool useXdata = (TARGET_IS_DS390 || TARGET_IS_DS400) ?
                 1 : options.useXstack;
-          SPEC_SCLS (sym->etype) = (useXdata ?
-                                    S_XDATA : S_FIXED);
+          SPEC_SCLS (sym->etype) = (useXdata ? S_XDATA : S_FIXED);
         }
     }
 }
@@ -1774,8 +1770,8 @@ changePointer (sym_link * p)
       if (!IS_SPEC (p) && DCL_TYPE (p) == UPOINTER)
         DCL_TYPE (p) = port->unqualified_pointer;
       if (IS_PTR (p) && IS_FUNC (p->next))
-        if (!IFFUNC_BANKED(p->next))
-        DCL_TYPE (p) = CPOINTER;
+        if (!IFFUNC_ISBANKEDCALL (p->next))
+          DCL_TYPE (p) = CPOINTER;
     }
 }
 
@@ -2256,9 +2252,9 @@ compareType (sym_link * dest, sym_link * src)
     {
       if (IS_DECL (src))
         {
-          /* banked function pointer */
           if (IS_GENPTR (dest) && IS_GENPTR (src))
             {
+              /* banked function pointer */
               if (IS_FUNC (src->next) && IS_VOID(dest->next))
                 return -1;
               if (IS_FUNC (dest->next) && IS_VOID(src->next))
@@ -2294,7 +2290,9 @@ compareType (sym_link * dest, sym_link * src)
               return res;
             }
           if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
-            return compareType (dest->next, src);
+            {
+              return compareType (dest->next, src);
+            }
           return 0;
         }
       else if (IS_PTR (dest) && IS_INTEGRAL (src))
@@ -2754,6 +2752,27 @@ checkFunction (symbol * sym, symbol *csym)
       FUNC_ISNAKED (sym->type) = 1;
     }
 
+  if (FUNC_BANKED (csym->type) || FUNC_BANKED (sym->type))
+    {
+      if (FUNC_NONBANKED (csym->type) || FUNC_NONBANKED (sym->type))
+        {
+          werror (W_BANKED_WITH_NONBANKED);
+          FUNC_BANKED (sym->type) = 0;
+          FUNC_NONBANKED (sym->type) = 1;
+        }
+      else
+        {
+          FUNC_BANKED (sym->type) = 1;
+        }
+    }
+  else
+    {
+      if (FUNC_NONBANKED (csym->type) || FUNC_NONBANKED (sym->type))
+        {
+          FUNC_NONBANKED (sym->type) = 1;
+        }
+    }
+
   /* Really, reentrant should match regardless of argCnt, but     */
   /* this breaks some existing code (the fp lib functions). If    */
   /* the first argument is always passed the same way, this       */
@@ -2812,12 +2831,12 @@ checkFunction (symbol * sym, symbol *csym)
         }
     }
 
-  /* if one them ended we have a problem */
+  /* if one of them ended we have a problem */
   if ((exargs && !acargs && !IS_VOID (exargs->type)) ||
       (!exargs && acargs && !IS_VOID (acargs->type)))
     werror (E_ARG_COUNT);
 
-  /* replace with this defition */
+  /* replace with this definition */
   sym->cdef = csym->cdef;
   deleteSym (SymbolTab, csym, csym->name);
   deleteFromSeg(csym);
@@ -3779,7 +3798,6 @@ initCSupport ()
                   __multypes[bwd][su/2],
                   2,
                   options.intlong_rent);
-              FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
             }
         }
     }
@@ -3792,47 +3810,46 @@ initCSupport ()
             {
               /* div and mod : s8_t x s8_t -> s8_t should be s8_t x s8_t -> s16_t, see below */
               if (!TARGET_IS_PIC16 || muldivmod != 1 || bwd != 0 || su != 0)
-              {
-                SNPRINTF (buffer, sizeof(buffer),
-                    "_%s%s%s",
-                    smuldivmod[muldivmod],
-                    ssu[su*3],
-                    sbwd[bwd]);
-                __muldiv[muldivmod][bwd][su] = funcOfType (
-                    _mangleFunctionName(buffer),
-                    __multypes[bwd][su],
-                    __multypes[bwd][su],
-                    2,
-                    options.intlong_rent);
-                FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
-              }
+                {
+                  SNPRINTF (buffer, sizeof(buffer),
+                      "_%s%s%s",
+                      smuldivmod[muldivmod],
+                      ssu[su*3],
+                      sbwd[bwd]);
+                  __muldiv[muldivmod][bwd][su] = funcOfType (
+                      _mangleFunctionName(buffer),
+                      __multypes[bwd][su],
+                      __multypes[bwd][su],
+                      2,
+                      options.intlong_rent);
+                }
             }
         }
     }
 
   if (TARGET_IS_PIC16)
-  {
-    /* PIC16 port wants __divschar/__modschar to return an int, so that both
-     * 100 / -4 = -25 and -128 / -1 = 128 can be handled correctly
-     * (first one would have to be sign extended, second one must not be).
-     * Similarly, modschar should be handled, but the iCode introduces cast
-     * here and forces '% : s8 x s8 -> s8' ... */
-    su = 0; bwd = 0;
-    for (muldivmod = 1; muldivmod < 2; muldivmod++) {
-      SNPRINTF (buffer, sizeof(buffer),
-          "_%s%s%s",
-          smuldivmod[muldivmod],
-          ssu[su],
-          sbwd[bwd]);
-      __muldiv[muldivmod][bwd][su] = funcOfType (
-          _mangleFunctionName(buffer),
-          __multypes[1][su],
-          __multypes[bwd][su],
-          2,
-          options.intlong_rent);
-      FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+    {
+      /* PIC16 port wants __divschar/__modschar to return an int, so that both
+       * 100 / -4 = -25 and -128 / -1 = 128 can be handled correctly
+       * (first one would have to be sign extended, second one must not be).
+       * Similarly, modschar should be handled, but the iCode introduces cast
+       * here and forces '% : s8 x s8 -> s8' ... */
+      su = 0; bwd = 0;
+      for (muldivmod = 1; muldivmod < 2; muldivmod++)
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+              "_%s%s%s",
+              smuldivmod[muldivmod],
+              ssu[su],
+              sbwd[bwd]);
+          __muldiv[muldivmod][bwd][su] = funcOfType (
+              _mangleFunctionName(buffer),
+              __multypes[1][su],
+              __multypes[bwd][su],
+              2,
+              options.intlong_rent);
+        }
     }
-  }
 
   /* mul only */
   muldivmod = 0;
@@ -3846,8 +3863,12 @@ initCSupport ()
                 "_%s%s",
                 smuldivmod[muldivmod],
                 sbwd[bwd]);
-      __muldiv[muldivmod][bwd][0] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
-      FUNC_NONBANKED (__muldiv[muldivmod][bwd][0]->type) = 1;
+      __muldiv[muldivmod][bwd][0] = funcOfType (
+          _mangleFunctionName(buffer),
+          __multypes[bwd][su],
+          __multypes[bwd][su],
+          2,
+          options.intlong_rent);
       /* signed = unsigned */
       __muldiv[muldivmod][bwd][1] = __muldiv[muldivmod][bwd][0];
     }
@@ -3863,8 +3884,12 @@ initCSupport ()
                        srlrr[rlrr],
                        ssu[su*3],
                        sbwd[bwd]);
-              __rlrr[rlrr][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[0][0], 2, options.intlong_rent);
-              FUNC_NONBANKED (__rlrr[rlrr][bwd][su]->type) = 1;
+              __rlrr[rlrr][bwd][su] = funcOfType (
+                  _mangleFunctionName(buffer),
+                  __multypes[bwd][su],
+                  __multypes[0][0],
+                  2,
+                  options.intlong_rent);
             }
         }
     }
@@ -3875,16 +3900,18 @@ initCSupport ()
 /*-----------------------------------------------------------------*/
 void initBuiltIns()
 {
-    int i;
-    symbol *sym;
+  int i;
+  symbol *sym;
 
-    if (!port->builtintable) return ;
+  if (!port->builtintable)
+    return;
 
-    for (i = 0 ; port->builtintable[i].name ; i++) {
-        sym = funcOfTypeVarg(port->builtintable[i].name,port->builtintable[i].rtype,
-                             port->builtintable[i].nParms,port->builtintable[i].parm_types);
-        FUNC_ISBUILTIN(sym->type) = 1;
-        FUNC_ISREENT(sym->type) = 0;    /* can never be reentrant */
+  for (i = 0 ; port->builtintable[i].name ; i++)
+    {
+      sym = funcOfTypeVarg(port->builtintable[i].name,port->builtintable[i].rtype,
+                           port->builtintable[i].nParms,port->builtintable[i].parm_types);
+      FUNC_ISBUILTIN(sym->type) = 1;
+      FUNC_ISREENT(sym->type) = 0;    /* can never be reentrant */
     }
 }
 
@@ -3897,15 +3924,15 @@ sym_link *validateLink(sym_link         *l,
 {
   if (l && l->class==select)
     {
-        return l;
+      return l;
     }
-    fprintf(stderr,
-            "Internal error: validateLink failed in %s(%s) @ %s:%u:"
-            " expected %s, got %s\n",
-            macro, args, file, line,
-            DECLSPEC2TXT(select), l ? DECLSPEC2TXT(l->class) : "null-link");
-    exit(EXIT_FAILURE);
-    return l; // never reached, makes compiler happy.
+  fprintf(stderr,
+          "Internal error: validateLink failed in %s(%s) @ %s:%u:"
+          " expected %s, got %s\n",
+          macro, args, file, line,
+          DECLSPEC2TXT(select), l ? DECLSPEC2TXT(l->class) : "null-link");
+  exit(EXIT_FAILURE);
+  return l; // never reached, makes compiler happy.
 }
 
 /*--------------------------------------------------------------------*/

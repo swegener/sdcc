@@ -18,8 +18,12 @@ func GetFunc(void) __naked
 
     ; some assembler code
     mov dptr,#_foo
+#ifdef SDCC_MODEL_HUGE
+    mov B,#_foo>>16
+    ljmp __sdcc_banked_ret
+#else
     ret
-
+#endif
   __endasm;
 }
 #endif

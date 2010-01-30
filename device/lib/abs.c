@@ -22,6 +22,10 @@
 
 #if defined (SDCC_mcs51)
 
+#if defined(SDCC)
+ #include <sdcc-lib.h>
+#endif
+
 static void dummy(void) __naked
 {
 	__asm
@@ -37,7 +41,7 @@ _abs:
 	subb	a,dph
 	mov	dph,a
 00001$:
-	ret
+	_RETURN
 	__endasm;
 }
 

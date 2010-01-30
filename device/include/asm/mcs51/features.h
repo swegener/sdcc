@@ -65,4 +65,14 @@
   #define _STATMEM __xdata
 #endif
 
+
+/* define _RETURN for correct returning from inline asm functions
+*/
+#if defined(SDCC_MODEL_HUGE)
+ #define _RETURN ljmp __sdcc_banked_ret
+#else
+ #define _RETURN ret
+#endif
+
+
 #endif

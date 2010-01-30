@@ -236,13 +236,13 @@ termScanAtFunc (const lineNode *pl, int rIdx)
   ftype = OP_SYM_TYPE(IC_LEFT(pl->ic));
   if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
+  if (IFFUNC_ISBANKEDCALL(ftype) &&
+      ((rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX)))
+    return S4O_ABORT;
   if (FUNC_CALLEESAVES(ftype))
     return S4O_CONTINUE;
   if (FUNC_ISNAKED(ftype))
     return S4O_CONTINUE;
-  if (FUNC_BANKED(ftype) &&
-      ((rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX)))
-    return S4O_ABORT;
   return S4O_TERM;
 }
 

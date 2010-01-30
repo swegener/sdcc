@@ -9,7 +9,11 @@ unsigned char NakedFunc(void) __naked
 {
 	__asm
 	mov	dpl,#0x01
+#if defined (SDCC_MODEL_HUGE)
+	ljmp	__sdcc_banked_ret
+#else
 	ret
+#endif
 	__endasm;
 }
 #endif

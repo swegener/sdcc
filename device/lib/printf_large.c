@@ -24,7 +24,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#if defined (SDCC_ds390)
+#if defined (SDCC_ds390) || defined (SDCC_USE_XSTACK) || defined (SDCC_MODEL_HUGE)
 #define USE_FLOATS 1
 #endif
 

@@ -331,6 +331,40 @@ popReg (int index, bool bits_popped)
 }
 
 /*-----------------------------------------------------------------*/
+/* Push - saves a byte                                             */
+/*-----------------------------------------------------------------*/
+static void
+Push (const char *s)
+{
+    if (strcmp (s, "a") == 0)
+      {
+        emitcode ("push", "acc");
+      }
+    else if ((*s=='@') || (*s=='#'))
+      {
+        MOVA(s);
+        emitcode ("push", "acc");
+      }
+    else if (strcmp (s, "r0") == 0 ||
+             strcmp (s, "r1") == 0 ||
+             strcmp (s, "r2") == 0 ||
+             strcmp (s, "r3") == 0 ||
+             strcmp (s, "r4") == 0 ||
+             strcmp (s, "r5") == 0 ||
+             strcmp (s, "r6") == 0 ||
+             strcmp (s, "r7") == 0)
+      {
+        char buffer[10];
+        SNPRINTF (buffer, sizeof(buffer), "a%s", s);
+        emitcode ("push", buffer);
+      }
+    else
+      {
+        emitcode ("push", s);
+      }
+}
+
+/*-----------------------------------------------------------------*/
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed */
 /*-----------------------------------------------------------------*/
 static regs *
@@ -376,7 +410,7 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
   if (!r0iu)
     {
       /* push it if not already pushed */
-      if (ic->op == IPUSH)
+      if ((ic->op == IPUSH) || (ic->op == PCALL))
         {
           MOVB (REG_WITH_INDEX (R0_IDX)->dname);
           R0INB++;
@@ -399,7 +433,7 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
   if (!r1iu)
     {
       /* push it if not already pushed */
-      if (ic->op == IPUSH)
+      if ((ic->op == IPUSH) || (ic->op == PCALL))
         {
           MOVB (REG_WITH_INDEX (R1_IDX)->dname);
           R1INB++;
@@ -1642,33 +1676,7 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_STK:
-      if (strcmp (s, "a") == 0)
-        {
-          emitcode ("push", "acc");
-        }
-      else if (*s=='@')
-        {
-          MOVA(s);
-          emitcode ("push", "acc");
-        }
-      else if (strcmp (s, "r0") == 0 ||
-               strcmp (s, "r1") == 0 ||
-               strcmp (s, "r2") == 0 ||
-               strcmp (s, "r3") == 0 ||
-               strcmp (s, "r4") == 0 ||
-               strcmp (s, "r5") == 0 ||
-               strcmp (s, "r6") == 0 ||
-               strcmp (s, "r7") == 0)
-        {
-          char buffer[10];
-          SNPRINTF (buffer, sizeof(buffer), "a%s", s);
-          emitcode ("push", buffer);
-        }
-      else
-        {
-          emitcode ("push", s);
-        }
-
+      Push (s);
       break;
 
     case AOP_CRY:
@@ -1796,7 +1804,8 @@ reAdjustPreg (asmop * aop)
 static int
 opIsGptr (operand * op)
 {
-  if (op && IS_GENPTR (operandType (op)) && (AOP_SIZE (op) == GPTRSIZE))
+  if (op && (AOP_SIZE (op) == GPTRSIZE) &&
+      (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))))
     {
       return 1;
     }
@@ -2274,10 +2283,14 @@ saveRegisters (iCode * lic)
      do nothing */
   if (ic->regsSaved)
     return;
-  if (IS_SYMOP(IC_LEFT(ic)) &&
-      (IFFUNC_CALLEESAVES (OP_SYMBOL (IC_LEFT (ic))->type) ||
-       IFFUNC_ISNAKED (OP_SYM_TYPE (IC_LEFT (ic)))))
-    return;
+  if (IS_SYMOP(IC_LEFT(ic)))
+    {
+      sym_link *type = OP_SYM_TYPE (IC_LEFT (ic));
+      if (IFFUNC_CALLEESAVES (type))
+        return;
+      if (IFFUNC_ISNAKED (type) && !IFFUNC_ISBANKEDCALL (type))
+        return;
+    }
 
   /* save the registers in use at this time but skip the
      ones for the result */
@@ -2303,6 +2316,7 @@ saveRegisters (iCode * lic)
       if (count == 1)
         {
           regs * reg = REG_WITH_INDEX (bitVectFirstBit (rsave));
+          emitcode ("push", "%s", REG_WITH_INDEX (R0_IDX)->dname);
           if (reg->type == REG_BIT)
             {
               emitcode ("mov", "a,%s", reg->base);
@@ -2314,8 +2328,7 @@ saveRegisters (iCode * lic)
           emitcode ("mov", "r0,%s", spname);
           emitcode ("inc", "%s", spname);// allocate before use
           emitcode ("movx", "@r0,a");
-          if (bitVectBitValue (rsave, R0_IDX))
-            emitcode ("mov", "r0,a");
+          emitcode ("pop", "%s", REG_WITH_INDEX (R0_IDX)->dname);
         }
       else if (count != 0)
         {
@@ -2333,10 +2346,7 @@ saveRegisters (iCode * lic)
             }
           else
             {
-              if (bitVectBitValue (rsave, R0_IDX))
-                {
-                  emitcode ("push", "%s", REG_WITH_INDEX (R0_IDX)->dname);
-                }
+              emitcode ("push", "%s", REG_WITH_INDEX (R0_IDX)->dname);
               emitcode ("mov", "r0,%s", spname);
               MOVA ("r0");
               emitcode ("add", "a,#0x%02x", count);
@@ -2366,10 +2376,7 @@ saveRegisters (iCode * lic)
                         }
                     }
                 }
-              if (bitVectBitValue (rsave, R0_IDX))
-                {
-                  emitcode ("pop", "%s", REG_WITH_INDEX (R0_IDX)->dname);
-                }
+              emitcode ("pop", "%s", REG_WITH_INDEX (R0_IDX)->dname);
             }
         }
     }
@@ -2447,6 +2454,11 @@ unsaveRegisters (iCode * ic)
             }
           else
             {
+              bool resultInR0 = bitVectBitValue (mcs51_rUmaskForOp (IC_RESULT(ic)), R0_IDX);
+              if (resultInR0)
+                {
+                  emitcode ("push", REG_WITH_INDEX (R0_IDX)->dname);
+                }
               emitcode ("mov", "r0,%s", spname);
               for (i = mcs51_nRegs; i >= 0; i--)
                 {
@@ -2470,9 +2482,9 @@ unsaveRegisters (iCode * ic)
                     }
                 }
               emitcode ("mov", "%s,r0", spname);
-              if (bitVectBitValue (rsave, R0_IDX))
+              if (bitVectBitValue (rsave, R0_IDX) || resultInR0)
                 {
-                  emitcode ("pop", "ar0");
+                  emitcode ("pop", REG_WITH_INDEX (R0_IDX)->dname);
                 }
             }
         }
@@ -2995,10 +3007,13 @@ genCall (iCode * ic)
   /* if send set is not empty then assign */
   if (_G.sendSet)
     {
-        if (IFFUNC_ISREENT(dtype)) { /* need to reverse the send set */
-            genSend(reverseSet(_G.sendSet));
-        } else {
-            genSend(_G.sendSet);
+      if (IFFUNC_ISREENT (dtype))
+        { /* need to reverse the send set */
+          genSend (reverseSet (_G.sendSet));
+        }
+      else
+        {
+          genSend (_G.sendSet);
         }
       _G.sendSet = NULL;
     }
@@ -3023,9 +3038,9 @@ genCall (iCode * ic)
     }
 
   /* make the call */
-  if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+  if (IFFUNC_ISBANKEDCALL (dtype))
     {
-      if (IFFUNC_CALLEESAVES(dtype))
+      if (IFFUNC_CALLEESAVES (dtype))
         {
           werror (E_BANKED_WITH_CALLEESAVES);
         }
@@ -3197,11 +3212,10 @@ genPcall (iCode * ic)
 
       if (swapBanks)
         {
-          emitcode ("mov", "psw,#0x%02x",
-           ((FUNC_REGBANK (dtype)) << 3) & 0xff);
+          emitcode ("mov", "psw,#0x%02x", ((FUNC_REGBANK (dtype)) << 3) & 0xff);
         }
 
-      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT (getSpec(dtype)))
+      if (IFFUNC_ISBANKEDCALL (dtype))
         {
           if (IFFUNC_CALLEESAVES (dtype))
             {
@@ -3222,7 +3236,7 @@ genPcall (iCode * ic)
     }
   else
     {
-      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT (getSpec(dtype)))
+      if (IFFUNC_ISBANKEDCALL (dtype))
         {
           if (IFFUNC_CALLEESAVES (dtype))
             {
@@ -3232,20 +3246,9 @@ genPcall (iCode * ic)
             {
               aopOp (IC_LEFT (ic), ic, FALSE);
 
-              if (!swapBanks)
-                {
-                  /* what if aopGet needs r0 or r1 ??? */
-                  emitcode ("mov", "ar0,%s", aopGet(IC_LEFT (ic), 0, FALSE, FALSE));
-                  emitcode ("mov", "ar1,%s", aopGet(IC_LEFT (ic), 1, FALSE, FALSE));
-                  emitcode ("mov", "ar2,%s", aopGet(IC_LEFT (ic), 2, FALSE, FALSE));
-                }
-              else
-                {
-                  int reg = ((FUNC_REGBANK(dtype)) << 3) & 0xff;
-                  emitcode ("mov", "0x%02x,%s", reg++, aopGet(IC_LEFT (ic), 0, FALSE, FALSE));
-                  emitcode ("mov", "0x%02x,%s", reg++, aopGet(IC_LEFT (ic), 1, FALSE, FALSE));
-                  emitcode ("mov", "0x%02x,%s", reg,   aopGet(IC_LEFT (ic), 2, FALSE, FALSE));
-                }
+              Push (aopGet(IC_LEFT (ic), 0, FALSE, TRUE));
+              Push (aopGet(IC_LEFT (ic), 1, FALSE, TRUE));
+              Push (aopGet(IC_LEFT (ic), 2, FALSE, TRUE));
 
               freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
@@ -3258,10 +3261,18 @@ genPcall (iCode * ic)
 
               if (swapBanks)
                 {
-                  emitcode ("mov", "psw,#0x%02x",
-                   ((FUNC_REGBANK (dtype)) << 3) & 0xff);
+                  int reg = ((FUNC_REGBANK(dtype)) << 3) & 0xff;
+                  emitcode ("mov", "psw,#0x%02x", reg);
+                  emitcode ("pop", "0x%02x,%s", reg+2);
+                  emitcode ("pop", "0x%02x,%s", reg+1);
+                  emitcode ("pop", "0x%02x,%s", reg+0);
                 }
-
+              else
+                {
+                  emitcode ("pop", "ar2");
+                  emitcode ("pop", "ar1");
+                  emitcode ("pop", "ar0");
+                }
               /* make the call */
               emitcode ("lcall", "__sdcc_banked_call");
             }
@@ -4064,7 +4075,7 @@ genEndFunction (iCode * ic)
           debugFile->writeEndFunction (currFunc, ic, 1);
         }
 
-      if (IFFUNC_ISBANKEDCALL (sym->type) && !SPEC_STAT(getSpec(sym->type)))
+      if (IFFUNC_ISBANKEDCALL (sym->type))
         {
           emitcode ("ljmp", "__sdcc_banked_ret");
         }

@@ -22,6 +22,10 @@
 
 #if defined (SDCC_mcs51)
 
+#if defined(SDCC)
+ #include <sdcc-lib.h>
+#endif
+
 static void dummy(void) __naked
 {
 	__asm
@@ -42,7 +46,7 @@ _labs:
 	clr	a
 	subb	a,r2
 00001$:
-	ret
+	_RETURN
 	__endasm;
 }
 

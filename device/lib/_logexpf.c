@@ -8,9 +8,18 @@
 // separate file to allow the linker to include it when either
 // function is needed, but only 1 copy when both are used.
 
-void _fs_cordic_rshift_r765_unsigned(void)
+void _fs_cordic_rshift_r765_unsigned(void) __naked
 {
 	__asm
+	ar2 = 0x02
+	ar3 = 0x03
+	ar4 = 0x04
+	ar5 = 0x05
+	ar6 = 0x06
+	ar7 = 0x07
+	ar0 = 0x00
+	ar1 = 0x01
+
 	add	a, #248
 	jnc	00003$
 	mov	b, r5
@@ -52,6 +61,7 @@ void _fs_cordic_rshift_r765_unsigned(void)
 	djnz	r0, 00010$
 	pop	ar0
 00030$:
+	ret
 	__endasm;
 }
 
@@ -89,4 +99,3 @@ __code unsigned char _fs_natural_log_table[] = {
 };
 
 #endif
-

@@ -48,13 +48,15 @@ float logf(float x)
 logf_neg_check:
 	jnb	sign_a, logf_zero_check
 	// TODO: set errno to EDOM (negative numbers not allowed)
-	ljmp	fs_return_nan
+	lcall	fs_return_nan
+	ljmp	logf_exit
 
 logf_zero_check:
 	cjne	r4, #0, logf_ok
 	// TODO: set errno to ERANGE (zero not allowed)
 	setb	sign_a
-	ljmp	fs_return_inf
+	lcall	fs_return_inf
+	ljmp	logf_exit
 
 logf_ok:
 	push	exp_a
@@ -136,8 +138,9 @@ logf_cordic_skip:
 	// anything and we can just return the with we have already
 
 	// TODO: which of these gives best accuracy???
-	ljmp	fs_zerocheck_return
-	//ljmp	fs_round_and_return
+	lcall	fs_zerocheck_return
+	//lcall	fs_round_and_return
+	sjmp	logf_exit
 logf_exponent:
 	jc	logf_exp_neg
 	// the input exponent was greater than 126
@@ -182,7 +185,8 @@ logf_exp_scale:
 	mov	exp_a, #134
 	lcall	fs_normalize_a
 	// now just add log(fractional) +/- log(2) * abs(exp - 126)
-	ljmp	fsadd_direct_entry
+	lcall	fsadd_direct_entry
+logf_exit:
 	__endasm;
 #pragma less_pedantic
 }

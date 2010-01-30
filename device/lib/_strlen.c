@@ -40,6 +40,10 @@
 
 #else
 
+#if defined(SDCC)
+ #include <sdcc-lib.h>
+#endif
+
   /* Assembler version for mcs51 */
   size_t strlen ( const char * str ) __naked
   {
@@ -74,7 +78,7 @@
       subb    a,r3
       mov     dph,a
       ;
-      ret
+      _RETURN
     __endasm;
   }
 

@@ -41,7 +41,11 @@
 
 #define BPX_SIZE	SPX_SIZE
 
+#ifdef SDCC_MODEL_HUGE
+#define RET_SIZE	3
+#else
 #define RET_SIZE	2
+#endif
 
 typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
 

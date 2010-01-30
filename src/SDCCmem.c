@@ -494,7 +494,6 @@ allocDefault (struct symbol * sym)
 void
 allocGlobal (symbol * sym)
 {
-
   /* symbol name is internal name  */
   if (!sym->level)              /* local statics can come here */
     SNPRINTF (sym->rname, sizeof(sym->rname),
@@ -631,7 +630,6 @@ allocParms (value * val)
                   /* PENDING: isr, bank overhead, ... */
                   SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
                     stackPtr +
-                    ((IFFUNC_ISBANKEDCALL (currFunc->type) && !SPEC_STAT(getSpec(currFunc->etype)))? port->stack.banked_overhead : 0) +
                     (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0) +
                     0;
                   stackPtr += getSize (lval->type);

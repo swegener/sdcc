@@ -20,8 +20,9 @@
 
 #include <math.h>
 #include <errno.h>
+#include <stdbool.h>
 
-float tancotf(const float x, const int iscot);
+float tancotf(const float x, const BOOL iscotan);
 
 float cotf(const float x) _FLOAT_FUNC_REENTRANT
 {
@@ -38,4 +39,3 @@ float cotf(const float x) _FLOAT_FUNC_REENTRANT
     }
     return tancotf(x, 1);
 }
-

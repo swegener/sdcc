@@ -643,15 +643,11 @@ union bil {
 } ;
 #endif
 
-#if defined(SDCC_USE_XSTACK) || defined(SDCC_MODEL_MEDIUM)
-#  define bcast(x) ((union bil __pdata *)&(x))
-#elif (defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390) || defined (SDCC_ds400)) && !defined(SDCC_STACK_AUTO)
-#  define bcast(x) ((union bil __xdata *)&(x))
-#elif defined(__z80) || defined(__gbz80)
-#  define bcast(x) ((union bil *)&(x))
-#else
-#  define bcast(x) ((union bil __near  *)&(x))
+#if defined(SDCC)
+ #include <sdcc-lib.h>
 #endif
+
+#define bcast(x) ((union bil _AUTOMEM *)&(x))
 
 /*
                      3   2   1   0

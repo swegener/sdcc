@@ -267,7 +267,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   if (!constExprTree (ival))
                     {
                       werror (E_CONST_EXPECTED, "found expression");
-                    // but try to do it anyway
+                      // but try to do it anyway
                     }
                   allocInfo = 0;
                   if (!astErrors (ival))
@@ -615,12 +615,12 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
 
 
 /*-----------------------------------------------------------------*/
-/* printPointerType - generates ival for pointer type              */
+/* _printPointerType - generates ival for pointer type             */
 /*-----------------------------------------------------------------*/
-void
-_printPointerType (struct dbuf_s * oBuf, const char *name)
+static void
+_printPointerType (struct dbuf_s * oBuf, const char *name, int size)
 {
-  if (options.model == MODEL_FLAT24)
+  if (size == 3)
     {
       if (port->little_endian)
         dbuf_printf (oBuf, "\t.byte %s,(%s >> 8),(%s >> 16)", name, name, name);
@@ -639,21 +639,21 @@ _printPointerType (struct dbuf_s * oBuf, const char *name)
 /*-----------------------------------------------------------------*/
 /* printPointerType - generates ival for pointer type              */
 /*-----------------------------------------------------------------*/
-void
+static void
 printPointerType (struct dbuf_s * oBuf, const char *name)
 {
-  _printPointerType (oBuf, name);
+  _printPointerType (oBuf, name, (options.model == MODEL_FLAT24) ? 3 : 2);
   dbuf_printf (oBuf, "\n");
 }
 
 /*-----------------------------------------------------------------*/
 /* printGPointerType - generates ival for generic pointer type     */
 /*-----------------------------------------------------------------*/
-void
+static void
 printGPointerType (struct dbuf_s * oBuf, const char *iname, const char *oname,
                    int type)
 {
-  _printPointerType (oBuf, iname);
+  _printPointerType (oBuf, iname, (options.model == MODEL_FLAT24) ? 3 : 2);
   dbuf_printf (oBuf, ",#0x%02x\n", pointerTypeToGPByte (type, iname, oname));
 }
 
@@ -985,6 +985,8 @@ void
 printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
 {
   value *val;
+  char *name;
+  int size;
 
   if (ilist)
     val = list2val (ilist);
@@ -1013,23 +1015,31 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s * oBuf)
 
   /* now generate the name */
   if (!val->sym)
+      name = val->name;
+  else
+    name = val->sym->rname;
+
+  size = getSize (type);
+
+  if (size == FPTRSIZE)
     {
       if (port->use_dw_for_init)
         {
-          dbuf_tprintf (oBuf, "\t!dws\n", val->name);
+          dbuf_tprintf (oBuf, "\t!dws\n", name);
         }
       else
         {
-          printPointerType (oBuf, val->name);
+          printPointerType (oBuf, name);
         }
     }
-  else if (port->use_dw_for_init)
+  else if (size == GPTRSIZE)
     {
-      dbuf_tprintf (oBuf, "\t!dws\n", val->sym->rname);
+      _printPointerType (oBuf, name, size);
+      dbuf_printf (oBuf, "\n");
     }
   else
     {
-      printPointerType (oBuf, val->sym->rname);
+      assert(0);
     }
 
   return;
@@ -1731,6 +1741,7 @@ glue (void)
         case MODEL_LARGE:   fprintf (asmFile, " --model-large");   break;
         case MODEL_FLAT24:  fprintf (asmFile, " --model-flat24");  break;
         case MODEL_PAGE0:   fprintf (asmFile, " --model-page0");   break;
+        case MODEL_HUGE:    fprintf (asmFile, " --model-huge");    break;
         default: break;
         }
       /*if(options.stackAuto)      fprintf (asmFile, " --stack-auto");*/

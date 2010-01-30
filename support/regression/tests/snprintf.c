@@ -102,7 +102,7 @@ struct
 } static const cases[] = {
   // arg, fmt,    result
   // ... there should be more ...
-#if defined(SDCC) && !defined(SDCC_ds390) && !(defined(SDCC_mcs51) && defined(SDCC_USE_XSTACK))
+#if defined(SDCC) && !defined(SDCC_ds390) && !(defined(SDCC_mcs51) && (defined(SDCC_USE_XSTACK) || defined(SDCC_MODEL_HUGE)))
   {1.0, "%f", "<NO FLOAT>"},
 #else
   {1.0, "%f", "1.000000"},
@@ -123,7 +123,13 @@ test_snprintf (void)
   for (i = 0; i < sizeof cases / sizeof cases[0]; i++)
     {
       sprintf (buf, cases[i].fmt, cases[i].arg);
-      DEBUG (printf ("Test%d should be: \"%s\" is: \"%s\"\n", i, cases[i].result, buf));
+      DEBUG (__prints ("Test"));
+      DEBUG (__printn (i));
+      DEBUG (__prints (" should be: '"));
+      DEBUG (__prints (cases[i].result));
+      DEBUG (__prints ("' is: '"));
+      DEBUG (__prints (buf));
+      DEBUG (__prints ("'\n"));
       ASSERT (!strcmp (buf, cases[i].result));
     }
 

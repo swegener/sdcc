@@ -1,5 +1,9 @@
 2010-02-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCmain.c(assemble): don't destroy asmName twice
+
+2010-02-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/ds390/ralloc.c (packRegsDPTRuse): fixed bug 2938110
 	* support/regression/tests/bug2938110.c: new, added
 

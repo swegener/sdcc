@@ -2068,9 +2068,8 @@ assemble (char **envp)
       /* either system() or the assembler itself has reported an error
          perror ("Cannot exec assembler");
       */
-      dbuf_destroy (&asmName);
       exit (EXIT_FAILURE);
-  }
+    }
 }
 
 /*-----------------------------------------------------------------*/

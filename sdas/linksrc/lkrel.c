@@ -2,7 +2,7 @@
 
    Copyright (C) 1989-1995 Alan R. Baldwin
    721 Berkeley St., Kent, Ohio 44240
-   Copyright (C) 2008-2009 Borut Razem, borut dot razem at siol dot net
+   Copyright (C) 2008-2010 Borut Razem, borut dot razem at siol dot net
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -43,11 +43,26 @@ is_rel (FILE * libfp)
   long pos = ftell (libfp);
   int ret = 0;
 
-  /* [XDQ][HL] */
+  /* [XDQ][HL][234] */
   if (((c = getc (libfp)) == 'X' || c == 'D' || c == 'Q') && ((c = getc (libfp)) == 'H' || c == 'L'))
     {
       switch (getc (libfp))
         {
+	case '2':
+	case '3':
+	case '4':
+          switch (getc (libfp))
+            {
+            case '\r':
+              if (getc (libfp) == '\n')
+                ret = 1;
+              break;
+
+            case '\n':
+              ret = 1;
+            }
+          break;
+
         case '\r':
           if (getc (libfp) == '\n')
             ret = 1;

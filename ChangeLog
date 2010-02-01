@@ -1,4 +1,9 @@
-2010-01-29 Philipp Klaus Krause <pkk AT spth.de>
+2010-02-01 Borut Razem <borut.razem AT siol.net>
+
+	* sdas/linksrc/lkar.c, sdas/linksrc/lksdcclib.c:
+	  detection of asxxxx v3.0 and higher rel files
+
+2010-01-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:
 	  Minor peephole.

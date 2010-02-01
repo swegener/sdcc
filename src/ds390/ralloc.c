@@ -2606,121 +2606,142 @@ static int packRegsDPTRnuse( operand *op , unsigned dptr)
 static iCode *
 packRegsDPTRuse (operand * op)
 {
-    /* go thru entire liveRange of this variable & check for
-       other possible usage of DPTR , if we don't find it the
-       assign this to DPTR (ruonly)
-    */
-    int i, key;
-    symbol *sym;
-    iCode *ic, *dic;
-    sym_link *type, *etype;
+  /* go thru entire liveRange of this variable & check for
+     other possible usage of DPTR, if we don't find it then
+     assign this to DPTR (ruonly)
+  */
+  int i, key;
+  symbol *sym;
+  iCode *ic, *dic;
+  sym_link *type, *etype;
 
-    if (!IS_SYMOP(op) || !IS_ITEMP(op)) return NULL;
-    if (OP_SYMBOL(op)->remat || OP_SYMBOL(op)->ruonly) return NULL;
+  if (!IS_SYMOP (op) || !IS_ITEMP (op))
+    return NULL;
+  if (OP_SYMBOL (op)->remat || OP_SYMBOL (op)->ruonly)
+    return NULL;
 
-    /* first check if any overlapping liverange has already been
-       assigned to DPTR */
-    if (OP_SYMBOL(op)->clashes) {
-        for (i = 0 ; i < OP_SYMBOL(op)->clashes->size ; i++ ) {
-            if (bitVectBitValue(OP_SYMBOL(op)->clashes,i)) {
-                sym = hTabItemWithKey(liveRanges,i);
-                if (sym->ruonly) return NULL ;
+  /* first check if any overlapping liverange has already been
+     assigned to DPTR */
+  if (OP_SYMBOL (op)->clashes)
+    {
+      for (i = 0 ; i < OP_SYMBOL (op)->clashes->size ; i++ )
+        {
+          if (bitVectBitValue (OP_SYMBOL (op)->clashes, i))
+            {
+              sym = hTabItemWithKey (liveRanges, i);
+              if (sym->ruonly)
+                return NULL;
             }
         }
     }
 
-    /* no then go thru this guys live range */
-    dic = ic = hTabFirstItemWK(iCodeSeqhTab,OP_SYMBOL(op)->liveFrom);
-    for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
-         ic = hTabNextItem(iCodeSeqhTab,&key)) {
+  /* no then go thru this guys live range */
+  dic = ic = hTabFirstItemWK (iCodeSeqhTab, OP_SYMBOL (op)->liveFrom);
+  for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
+       ic = hTabNextItem(iCodeSeqhTab,&key))
+    {
+      if (SKIP_IC3(ic))
+        continue;
 
-        if (SKIP_IC3(ic)) continue;
+      /* if PCALL cannot be sure give up */
+      if (ic->op == PCALL)
+        return NULL;
 
-        /* if PCALL cannot be sure give up */
-        if (ic->op == PCALL) return NULL;
+      /* if SEND & not the first parameter then give up */
+      if (ic->op == SEND && ic->argreg != 1 &&
+          ((isOperandInFarSpace (IC_LEFT (ic)) && !isOperandInReg (IC_LEFT (ic))) ||
+           isOperandEqual (op, IC_LEFT (ic))))
+        return NULL;
 
-        /* if SEND & not the first parameter then giveup */
-        if (ic->op == SEND && ic->argreg != 1 &&
-            ((isOperandInFarSpace(IC_LEFT(ic))  && !isOperandInReg(IC_LEFT(ic))) ||
-             isOperandEqual(op,IC_LEFT(ic)))) return NULL;
-
-        /* if CALL then make sure it is VOID || return value not used
-           or the return value is assigned to this one */
-        if (ic->op == CALL) {
-            if (OP_SYMBOL(IC_RESULT(ic))->liveTo ==
-                OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
-            etype = getSpec(type = operandType(IC_RESULT(ic)));
-            if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic)))
-                continue ;
-            return NULL ;
+      /* if CALL then make sure it is VOID || return value not used
+         or the return value is assigned to this one */
+      if (ic->op == CALL)
+        {
+          if (OP_SYMBOL (IC_RESULT (ic))->liveTo == OP_SYMBOL (IC_RESULT (ic))->liveFrom)
+            continue;
+          etype = getSpec (type = operandType (IC_RESULT (ic)));
+          if (getSize (type) == 0 || isOperandEqual (op, IC_RESULT (ic)))
+            continue;
+          return NULL;
         }
 
-        /* special case of add with a [remat] */
-        if (ic->op == '+' &&
-            OP_SYMBOL(IC_LEFT(ic))->remat &&
-            (isOperandInFarSpace(IC_RIGHT(ic)) &&
-             !isOperandInReg(IC_RIGHT(ic)))) return NULL ;
-
-        /* special cases  */
-        /* pointerGet */
-        if (POINTER_GET(ic) && !isOperandEqual(IC_LEFT(ic),op) &&
-            getSize(operandType(IC_LEFT(ic))) > 1 ) return NULL ;
-
-        /* pointerSet */
-        if (POINTER_SET(ic) && !isOperandEqual(IC_RESULT(ic),op) &&
-            getSize(operandType(IC_RESULT(ic))) > 1 ) return NULL;
-
-        /* conditionals can destroy 'b' - make sure B wont
-           be used in this one*/
-        if ((IS_CONDITIONAL(ic) || ic->op == '*' || ic->op == '/'  ||
-             ic->op == LEFT_OP || ic->op == RIGHT_OP ) &&
-            getSize(operandType(op)) > 3) return NULL;
-
-        /* if this is a cast to a bigger type */
-        if (ic->op==CAST) {
-          if (!IS_PTR(OP_SYM_TYPE(IC_RESULT(ic))) &&
-              getSize(OP_SYM_TYPE(IC_RESULT(ic))) >
-              getSize(OP_SYM_TYPE(IC_RIGHT(ic)))) {
-            return 0;
-          }
+      /* special case of add with a [remat] */
+      if (ic->op == '+' &&
+          IS_SYMOP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->remat &&
+          isOperandInFarSpace (IC_RIGHT (ic)) && !isOperandInReg (IC_RIGHT (ic)))
+        {
+          return NULL;
         }
 
-        /* general case */
-        if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) &&
-            !isOperandEqual(IC_RESULT(ic),op) &&
-            ( ( ( isOperandInFarSpace(IC_RESULT(ic)) || OP_SYMBOL(IC_RESULT(ic))->onStack) &&
-                !isOperandInReg(IC_RESULT(ic))) ||
-             OP_SYMBOL(IC_RESULT(ic))->ruonly)) return NULL;
+      /* special cases  */
+      /* pointerGet */
+      if (POINTER_GET (ic) && !isOperandEqual (IC_LEFT (ic), op) &&
+          getSize (operandType (IC_LEFT (ic))) > 1 )
+        return NULL ;
 
-        if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) &&
-            !isOperandEqual(IC_RIGHT(ic),op) &&
-            (OP_SYMBOL(IC_RIGHT(ic))->liveTo >= ic->seq ||
-             IS_TRUE_SYMOP(IC_RIGHT(ic))               ||
-             OP_SYMBOL(IC_RIGHT(ic))->ruonly) &&
-            ( ( isOperandInFarSpace(IC_RIGHT(ic)) || OP_SYMBOL(IC_RIGHT(ic))->onStack) &&
-                !isOperandInReg(IC_RIGHT(ic))) ) return NULL;
+      /* pointerSet */
+      if (POINTER_SET (ic) && !isOperandEqual (IC_RESULT (ic), op) &&
+          getSize (operandType (IC_RESULT (ic))) > 1 )
+        return NULL;
 
-        if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) &&
-            !isOperandEqual(IC_LEFT(ic),op) &&
-            (OP_SYMBOL(IC_LEFT(ic))->liveTo >= ic->seq ||
-             IS_TRUE_SYMOP(IC_LEFT(ic))               ||
-             OP_SYMBOL(IC_LEFT(ic))->ruonly) &&
-            ( ( isOperandInFarSpace(IC_LEFT(ic)) || OP_SYMBOL(IC_LEFT(ic))->onStack) &&
-                !isOperandInReg(IC_LEFT(ic))) ) return NULL;
+      /* conditionals can destroy 'b' - make sure B wont
+         be used in this one*/
+      if ((IS_CONDITIONAL (ic) || ic->op == '*' || ic->op == '/'  ||
+           ic->op == LEFT_OP || ic->op == RIGHT_OP ) &&
+          getSize (operandType (op)) > 3)
+        return NULL;
 
-        if (IC_LEFT(ic) && IC_RIGHT(ic) &&
-            IS_ITEMP(IC_LEFT(ic)) && IS_ITEMP(IC_RIGHT(ic)) &&
-            (isOperandInFarSpace(IC_LEFT(ic)) && !isOperandInReg(IC_LEFT(ic))) &&
-            (isOperandInFarSpace(IC_RIGHT(ic)) && !isOperandInReg(IC_RIGHT(ic))))
-            return NULL;
+      /* if this is a cast to a bigger type */
+      if (ic->op == CAST)
+        {
+          if (!IS_PTR (OP_SYM_TYPE (IC_RESULT (ic))) &&
+              getSize (OP_SYM_TYPE (IC_RESULT (ic))) >
+              getSize (OP_SYM_TYPE (IC_RIGHT (ic))))
+            {
+              return 0;
+            }
+        }
+
+      /* general case */
+      if (IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) &&
+          !isOperandEqual (IC_RESULT (ic), op) &&
+          ( ( ( isOperandInFarSpace (IC_RESULT (ic)) || OP_SYMBOL (IC_RESULT (ic))->onStack) &&
+              !isOperandInReg (IC_RESULT (ic))) ||
+           OP_SYMBOL (IC_RESULT (ic))->ruonly))
+        return NULL;
+
+      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
+          !isOperandEqual (IC_RIGHT (ic), op) &&
+          (OP_SYMBOL (IC_RIGHT (ic))->liveTo >= ic->seq ||
+           IS_TRUE_SYMOP (IC_RIGHT (ic))                ||
+           OP_SYMBOL (IC_RIGHT (ic))->ruonly) &&
+          ( ( isOperandInFarSpace (IC_RIGHT (ic)) || OP_SYMBOL (IC_RIGHT (ic))->onStack) &&
+              !isOperandInReg (IC_RIGHT (ic))) )
+        return NULL;
+
+      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
+          !isOperandEqual (IC_LEFT (ic), op) &&
+          (OP_SYMBOL (IC_LEFT (ic))->liveTo >= ic->seq ||
+           IS_TRUE_SYMOP (IC_LEFT (ic))                ||
+           OP_SYMBOL (IC_LEFT (ic))->ruonly) &&
+          ( ( isOperandInFarSpace (IC_LEFT (ic)) || OP_SYMBOL (IC_LEFT (ic))->onStack) &&
+              !isOperandInReg (IC_LEFT (ic))) )
+        return NULL;
+
+      if (IC_LEFT (ic) && IC_RIGHT (ic) &&
+          IS_ITEMP (IC_LEFT (ic)) && IS_ITEMP (IC_RIGHT (ic)) &&
+          (isOperandInFarSpace (IC_LEFT (ic)) && !isOperandInReg (IC_LEFT (ic))) &&
+          (isOperandInFarSpace (IC_RIGHT (ic)) && !isOperandInReg (IC_RIGHT (ic))))
+        return NULL;
     }
-    OP_SYMBOL(op)->ruonly = 1;
-    if (OP_SYMBOL(op)->usl.spillLoc) {
-        if (OP_SYMBOL(op)->spillA)
-            OP_SYMBOL(op)->usl.spillLoc->allocreq--;
-        OP_SYMBOL(op)->usl.spillLoc = NULL;
+  OP_SYMBOL (op)->ruonly = 1;
+  if (OP_SYMBOL (op)->usl.spillLoc)
+    {
+      if (OP_SYMBOL (op)->spillA)
+        OP_SYMBOL (op)->usl.spillLoc->allocreq--;
+      OP_SYMBOL (op)->usl.spillLoc = NULL;
     }
-    return dic;
+  return dic;
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,8 @@
+2010-02-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/ralloc.c (packRegsDPTRuse): fixed bug 2938110
+	* support/regression/tests/bug2938110.c: new, added
+
 2010-02-01 Borut Razem <borut.razem AT siol.net>
 
 	* sdas/linksrc/lkar.c, sdas/linksrc/lksdcclib.c:

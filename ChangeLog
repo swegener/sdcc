@@ -1,3 +1,7 @@
+2010-02-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c(addSymChain): fixed --xstack float support in model-huge
+
 2010-02-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c(assemble): don't destroy asmName twice

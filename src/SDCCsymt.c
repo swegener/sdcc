@@ -1233,6 +1233,27 @@ addSymChain (symbol ** symHead)
               continue;
             }
 
+          if (FUNC_BANKED (csym->type) || FUNC_BANKED (sym->type))
+            {
+              if (FUNC_NONBANKED (csym->type) || FUNC_NONBANKED (sym->type))
+                {
+                  werror (W_BANKED_WITH_NONBANKED);
+                  FUNC_BANKED (sym->type) = 0;
+                  FUNC_NONBANKED (sym->type) = 1;
+                }
+              else
+                {
+                  FUNC_BANKED (sym->type) = 1;
+                }
+            }
+          else
+            {
+              if (FUNC_NONBANKED (csym->type) || FUNC_NONBANKED (sym->type))
+                {
+                  FUNC_NONBANKED (sym->type) = 1;
+                }
+            }
+
           if (csym->ival && !sym->ival)
             sym->ival = csym->ival;
 
@@ -2635,7 +2656,7 @@ checkFunction (symbol * sym, symbol *csym)
     fprintf (stderr, "checkFunction: %s ", sym->name);
   }
 
-  if (!IS_DECL(sym->type) || DCL_TYPE(sym->type)!=FUNCTION)
+  if (!IS_FUNC (sym->type))
     {
       werror(E_SYNTAX_ERROR, sym->name);
       return 0;

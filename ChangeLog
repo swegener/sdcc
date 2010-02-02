@@ -1,3 +1,9 @@
+2010-02-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-gbz80.def,
+	  src/z80/mappings.i:
+	  Fixed gbz80 port to work with new assembler.
+
 2010-02-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c(addSymChain): fixed --xstack float support in model-huge

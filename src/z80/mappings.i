@@ -8,8 +8,9 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "*hl", "(hl)" },
     { "di", "di" },
     { "ei", "ei" },
-    { "ldahli", "ld a,(hl+)" },
-    { "ldahlsp", "lda hl,%d(sp)" },
+    /*{ "ldahli", "ldi\ta,(hl)" }, use when assembler update is complete*/
+    {"ldahli", "ld\ta,(hl)\ninc\thl"},
+    { "ldahlsp", "ldhl\tsp,#%d" },
     { "ldaspsp", "lda sp,%d(sp)" },
     { "*pair", "(%s)" },
     { "shortjp", "jr" },

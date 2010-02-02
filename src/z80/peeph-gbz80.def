@@ -734,77 +734,56 @@ replace restart {
 }
 
 // Old gbz80 rules from here onward
+// Commented out until des assembler update is complete.
+//replace {
+//	ld	(hl),a
+//	dec	hl
+//} by {
+//	ldd	(hl),a
+//}
+//replace {
+//	ld	(hl),a
+//	inc	hl
+//} by {
+//	ldi	(hl),a
+//}
+//replace {
+//	ld	a,(hl)
+//	inc	hl
+//} by {
+//	ldi	a,(hl)
+//}
+//
+//}
+//replace {
+//	ldi	(hl),a
+//	ld	(hl),d
+//	dec	hl
+//	ld	e,(hl)
+//	inc	hl
+//	ld	d,(hl)
+//	ld	a,(de)
+//} by {
+//	ldi	(hl),a
+//	ld	(hl),d
+//	ld	e,a
+//	ld	a,(de)
+//}
+//replace {
+//	ld	(hl),a
+//	ld	%1,(hl)
+//} by {
+//	ld	(hl),a
+//	ld	%1,a
+//}
+//replace {
+//	ld	(hl),a
+//	inc	de
+//	ld	a,(de)
+//	inc	hl
+//} by {
+//	ldi	(hl),a
+//	inc	de
+//	ld	a,(de)
+//}
 
-replace {
-	ld	(hl),a
-	dec	hl
-} by {
-	ld	(hl-),a
-}
-replace {
-	ld	(hl),a
-	inc	hl
-} by {
-	ld	(hl+),a
-}
-replace {
-	ld	a,(hl)
-	inc	hl
-} by {
-	ld	a,(hl+)
-}
-replace {
-	ld	a,[hl]
-	inc	hl
-} by {
-	ld	a,[hl+]
-}
-replace {
-	ld	a,[hl]
-	inc	hl
-} by {
-	ld	a,[hl+]
-}
-replace {
-	ld	[hl],a
-	inc	hl
-} by {
-	ld	[hl+],a
-}
-replace {
-	ld	[hl],a
-	dec	hl
-} by {
-	ld	[hl-],a
-}
-replace {
-	ld	(hl+),a
-	ld	(hl),d
-	dec	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	a,(de)
-} by {
-	ld	(hl+),a
-	ld	(hl),d
-	ld	e,a
-	ld	a,(de)
-}
-replace {
-	ld	(hl),a
-	ld	%1,(hl)
-} by {
-	ld	(hl),a
-	ld	%1,a
-}
-replace {
-	ld	(hl),a
-	inc	de
-	ld	a,(de)
-	inc	hl
-} by {
-	ld	(hl+),a
-	inc	de
-	ld	a,(de)
-}

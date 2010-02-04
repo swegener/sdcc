@@ -721,6 +721,8 @@ static const char *_gbAsmCmd[] =
   "sdasgb", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
+static const char * const crt[] = { "crt0.rel", NULL, };
+
 /* Globals */
 PORT z80_port =
 {
@@ -747,7 +749,8 @@ PORT z80_port =
     NULL,		//LINKCMD,
     NULL,
     ".rel",
-    1
+    1,
+    crt,                        /* crt */
   },
   {                             /* Peephole optimizer */
     _z80_defaultRules,
@@ -869,12 +872,13 @@ PORT gbz80_port =
     ".asm",
     NULL                        /* no do_assemble function */
   },
-  {
+  {                             /* Linker */
     _gbLinkCmd,		//NULL,
     NULL,		//LINKCMD,
     NULL,
     ".rel",
-    1
+    1,
+    crt,                        /* crt */
   },
   {
     _gbz80_defaultRules

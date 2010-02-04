@@ -673,10 +673,9 @@ processFile (char *s)
       return;
     }
 
-  /* if the extension is type .rel or .r or .REL or .R
+  /* if the extension is type rel_ext
      additional object file will be passed to the linker */
-  if (STRCASECMP (extp, ".r") == 0 || STRCASECMP (extp, ".rel") == 0 ||
-      strcmp (extp, port->linker.rel_ext) == 0)
+  if (STRCASECMP (extp, port->linker.rel_ext) == 0)
     {
       dbuf_destroy (&ext);
       dbuf_destroy (&path);
@@ -1532,12 +1531,13 @@ linkEdit (char **envp)
 {
   FILE *lnkfile;
   char *segName, *c;
-  int system_ret;
   const char *s;
-  char linkerScriptFileName[PATH_MAX];
+  struct dbuf_s linkerScriptFileName;
+  struct dbuf_s binFileName;
 
-  linkerScriptFileName[0] = 0;
   c = NULL;
+  dbuf_init (&linkerScriptFileName, PATH_MAX);
+  dbuf_init (&binFileName, PATH_MAX);
 
   if (port->linker.needLinkerScript)
     {
@@ -1559,11 +1559,10 @@ linkEdit (char **envp)
         }
 
       /* first we need to create the <filename>.lnk file */
-      SNPRINTF (linkerScriptFileName, sizeof(linkerScriptFileName),
-        "%s.lnk", dstFileName);
-      if (!(lnkfile = fopen (linkerScriptFileName, "w")))
+      dbuf_printf(&linkerScriptFileName, "%s.lnk", dstFileName);
+      if (!(lnkfile = fopen (dbuf_c_str (&linkerScriptFileName), "w")))
         {
-          werror (E_FILE_OPEN_ERR, linkerScriptFileName);
+          werror (E_FILE_OPEN_ERR, dbuf_c_str (&linkerScriptFileName));
           exit (EXIT_FAILURE);
         }
 
@@ -1800,59 +1799,70 @@ linkEdit (char **envp)
         }
 
       /* put in the object file, generated from the C cource */
-      if (fullSrcFileName) {
-        struct dbuf_s path;
-
-        dbuf_init (&path, 128);
-        dbuf_printf (&path, "%s%s", dstFileName, port->linker.rel_ext);
-        addSetHead (&relFilesSet, dbuf_detach (&path));
-      }
-
-      /* For the z80 and gbz80 ports, try to find where crt0.o is...
-         It is very important for this file to be first on the linking proccess
-         so the areas are set in the correct order, expecially _GSINIT
-         TODO: the list of crt objects should be defined in the target's PORT structure */
-      if ((TARGET_Z80_LIKE) && !options.no_std_crt0) /* For the z80, gbz80 */
+      if (fullSrcFileName)
         {
-          struct dbuf_s crt0path;
-          FILE * crt0fp;
-          set *tempSet = NULL;
+          struct dbuf_s path;
 
-          dbuf_init (&crt0path, PATH_MAX);
+          dbuf_init (&path, 128);
+          dbuf_printf (&path, "%s%s", dstFileName, port->linker.rel_ext);
+          addSetHead (&relFilesSet, dbuf_detach (&path));
+        }
 
-          tempSet = appendStrSet (libDirsSet, NULL, DIR_SEPARATOR_STRING);
-          tempSet = appendStrSet (tempSet, NULL, c);
-          mergeSets (&tempSet, libPathsSet);
+      if (!options.no_std_crt0)
+        {
+          const char * const *p;
+          set *crtSet = NULL;
 
-          for (s = setFirstItem (tempSet); s != NULL; s = setNextItem (tempSet))
+          if (NULL != port->linker.crt)
             {
-              dbuf_printf (&crt0path, "%s%scrt0%s", s, DIR_SEPARATOR_STRING, port->linker.rel_ext);
+              struct dbuf_s crtpath;
 
-              crt0fp = fopen (dbuf_c_str(&crt0path), "r");
-              if (crt0fp != NULL)  /* Found it! */
+              dbuf_init (&crtpath, PATH_MAX);
+
+              for (p = port->linker.crt; NULL != *p; ++p)
                 {
-                  fclose (crt0fp);
-                  #ifdef __CYGWIN__
-                  {
-                    /* The CYGWIN version of the z80-gbz80 linker is getting confused with
-                       windows paths, so convert them to the CYGWIN format */
-                    char posix_path[PATH_MAX];
-                    void cygwin_conv_to_full_posix_path (char * win_path, char * posix_path);
-                    cygwin_conv_to_full_posix_path ((char *)dbuf_c_str(&crt0path), posix_path);
-		    dbuf_set_length (&crt0path, 0);
-                    dbuf_append_str (&crt0path, posix_path);
-                  }
-                  #endif
-                  /* append crt0.o to the files list */
-                  addSetHead (&relFilesSet, dbuf_detach (&crt0path));
-                  break;
+                  /* Try to find where C runtiome files are ...
+                     It is very important for this file to be first on the linking proccess
+                     so the areas are set in the correct order, expecially _GSINIT */
+                  /*
+                  tempSet = appendStrSet (libDirsSet, NULL, DIR_SEPARATOR_STRING);  // root directory
+                  tempSet = appendStrSet (tempSet, NULL, c);                        // ./<target> directory
+                  mergeSets (&tempSet, libPathsSet);
+                  */
+
+                  for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
+                    {
+                      dbuf_set_length (&crtpath, 0);
+                      dbuf_printf (&crtpath, "%s%s%s", s, DIR_SEPARATOR_STRING, *p);
+
+                      if (!access (dbuf_c_str (&crtpath), 0))  /* Found it! */
+                        {
+                          #ifdef __CYGWIN__
+                          /* TODO: is this still needed? */
+                          /* The CYGWIN version of the z80-gbz80 linker is getting confused with
+                          windows paths, so convert them to the CYGWIN format */
+                          char posix_path[PATH_MAX];
+                          void cygwin_conv_to_full_posix_path (char * win_path, char * posix_path);
+
+                          cygwin_conv_to_full_posix_path ((char *)dbuf_c_str (&crtpath), posix_path);
+                          dbuf_set_length (&crtpath, 0);
+                          dbuf_append_str (&crtpath, posix_path);
+                          #endif
+
+                          /* append C runtime file to the crt list */
+                          addSet (&crtSet, Safe_strdup (dbuf_c_str (&crtpath)));
+                          break;
+                        }
+                    }
+                  if (s == NULL)
+                    fprintf (stderr, "Warning: couldn't find %s\n", dbuf_c_str (&crtpath));
                 }
-              dbuf_set_length (&crt0path, 0);
+              dbuf_destroy (&crtpath);
             }
-          if (s == NULL) {
-            dbuf_destroy (&crt0path);
-            fprintf (stderr, "Warning: couldn't find crt0.o\n");
-          }
+
+          /* Merge crtSet and relFilesSet */
+          mergeSets (&crtSet, relFilesSet);
+          relFilesSet = crtSet;
         }
 
       /* put in all object files */
@@ -1862,166 +1872,89 @@ linkEdit (char **envp)
       fclose (lnkfile);
     } /* if(port->linker.needLinkerScript) */
 
-  if (options.verbose)
-    printf ("sdcc: Calling linker...\n");
-
   /* build linker output filename */
-  if (fullDstFileName /*&& !IS_SDASLD*/)
-    strncpyz (scratchFileName, fullDstFileName, sizeof(scratchFileName));
+  if (fullDstFileName)
+    dbuf_append_str (&binFileName, fullDstFileName);
   else
     {
-      if (fullSrcFileName /*&& !IS_SDASLD*/)
+      if (fullSrcFileName)
         {
           /* the linked file gets the name of the C source file name */
-          strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
+          dbuf_append_str (&binFileName, dstFileName);
         }
       else
         {
           /* the linked file gets the name of the first module */
-          /* ----   this is always true for sdld */
-          char *p;
+          const char *p;
 
           s = peekSet (relFilesSet);
 
           assert(s);
 
-          strncpyz (scratchFileName, s, sizeof(scratchFileName));
-          /* strip the extension */
-          if (NULL == (p = strrchr (scratchFileName, '.')))
-            p = strlen (scratchFileName) + scratchFileName;;
-          *p = 0;
+          if (NULL == (p = strrchr (s, '.')))
+            {
+              /* strip the extension */
+              dbuf_append (&binFileName, s, p - s);
+            }
+          else
+            dbuf_append_str (&binFileName, s);
         }
-      strncatz (scratchFileName, options.out_fmt ? ".s19" : ".ihx", sizeof(scratchFileName));
+      dbuf_append_str (&binFileName, options.out_fmt ? ".s19" : ".ihx");
     }
+
+  if (options.verbose)
+    printf ("sdcc: Calling linker...\n");
 
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
       char buffer3[PATH_MAX];
-      set *tempSet=NULL, *libSet=NULL;
+      set *tempSet = NULL, *libSet = NULL;
 
-      strcpy(buffer3, linkerScriptFileName);
-      if(/*TARGET_IS_PIC16 ||*/ TARGET_IS_PIC) {
+      strcpy (buffer3, dbuf_c_str (&linkerScriptFileName));
+      if (/*TARGET_IS_PIC16 ||*/ TARGET_IS_PIC)
+        {
+          /* use $l to set the linker include directories */
+          tempSet = appendStrSet (libDirsSet, "-I\"", "\"");
+          mergeSets (&linkOptionsSet, tempSet);
 
-         /* use $l to set the linker include directories */
-         tempSet = appendStrSet(libDirsSet, "-I\"", "\"");
-         mergeSets(&linkOptionsSet, tempSet);
+          tempSet = appendStrSet (libPathsSet, "-I\"", "\"");
+          mergeSets (&linkOptionsSet, tempSet);
 
-         tempSet = appendStrSet(libPathsSet, "-I\"", "\"");
-         mergeSets(&linkOptionsSet, tempSet);
+          /* use $3 for libraries from command line --> libSet */
+          mergeSets (&libSet, libFilesSet);
 
-         /* use $3 for libraries from command line --> libSet */
-         mergeSets(&libSet, libFilesSet);
+          tempSet = appendStrSet (relFilesSet, "", "");
+          mergeSets (&libSet, tempSet);
+//        libSet = reverseSet(libSet);
 
-         tempSet = appendStrSet(relFilesSet, "", "");
-         mergeSets(&libSet, tempSet);
-//         libSet = reverseSet(libSet);
+          if(fullSrcFileName)
+            {
+//            strcpy(buffer3, strrchr(fullSrcFileName, DIR_SEPARATOR_CHAR)+1);
+              /* if it didn't work, revert to old behaviour */
+              if (!strlen (buffer3))
+                strcpy (buffer3, dstFileName);
+              strcat (buffer3, port->linker.rel_ext);
 
-        if(fullSrcFileName) {
-//              strcpy(buffer3, strrchr(fullSrcFileName, DIR_SEPARATOR_CHAR)+1);
-                /* if it didn't work, revert to old behaviour */
-                if(!strlen(buffer3))strcpy(buffer3, dstFileName);
-                strcat(buffer3, port->linker.rel_ext);
+            }
+          else
+            strcpy (buffer3, "");
+        }
 
-        } else strcpy(buffer3, "");
-      }
+      buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL), linkOptionsSet);
 
-      buildCmdLine (buffer2, port->linker.cmd, buffer3, scratchFileName, (libSet?joinStrSet(libSet):NULL), linkOptionsSet);
-
-      buildCmdLine2 (buffer, sizeof(buffer), buffer2);
+      buildCmdLine2 (buffer, sizeof (buffer), buffer2);
     }
   else
     {
-      buildCmdLine2 (buffer, sizeof(buffer), port->linker.mcmd);
+      buildCmdLine2 (buffer, sizeof (buffer), port->linker.mcmd);
     }
 
-  system_ret = my_system (buffer);
+  dbuf_destroy (&linkerScriptFileName);
+  dbuf_destroy (&binFileName);
 
-#if 0
-  if (fullDstFileName /*&& IS_SDASLD*/)
-    {
-      /* make some order in the mess left by sdld:
-         move generated files to the output directory */
-      char *p, *q;
-
-      /* the linked file gets the name of the first modul */
-      if (fullSrcFileName)
-        {
-          strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
-          p = strlen (scratchFileName) + scratchFileName;
-        }
-      else
-        {
-          s = peekSet(relFilesSet);
-
-          assert(s);
-
-          strncpyz (scratchFileName, s, sizeof(scratchFileName));
-          /* strip the extension */
-          if (NULL == (p = strrchr (scratchFileName, '.')))
-            p = strlen (scratchFileName) + scratchFileName;;
-          *p = 0;
-        }
-      strncatz (scratchFileName, options.out_fmt ? ".s19" : ".ihx", sizeof(scratchFileName));
-
-      if (FILENAME_CMP (fullDstFileName, scratchFileName))
-        {
-          remove (fullDstFileName);
-          rename (scratchFileName, fullDstFileName);
-        }
- 
-      strncpyz (buffer, fullDstFileName, sizeof(buffer));
-      if (NULL == (q = strrchr (buffer, '.')))
-        q = strlen (buffer) + buffer;
-
-      *p = 0;
-      strncatz (scratchFileName, ".map", sizeof(scratchFileName));
-      *q = 0;
-      strncatz(buffer, ".map", sizeof(buffer));
-      if (FILENAME_CMP (scratchFileName, buffer))
-        {
-          remove (buffer);
-          rename (scratchFileName, buffer);
-        }
- 
-      *p = 0;
-      strncatz (scratchFileName, ".mem", sizeof(scratchFileName));
-      *q = 0;
-      strncatz(buffer, ".mem", sizeof(buffer));
-      if (FILENAME_CMP (scratchFileName, buffer))
-        {
-          remove (buffer);
-          rename (scratchFileName, buffer);
-        }
- 
-      if (options.debug)
-        {
-          *p = 0;
-          strncatz (scratchFileName, ".cdb", sizeof(scratchFileName));
-          *q = 0;
-          strncatz(buffer, ".cdb", sizeof(buffer));
-          if (FILENAME_CMP (scratchFileName, buffer))
-            {
-              remove (buffer);
-              rename (scratchFileName, buffer);
-           }
-
-          /* and the OMF file without extension: */
-          *p = 0;
-          *q = 0;
-          if (FILENAME_CMP (scratchFileName, buffer))
-            {
-              remove (buffer);
-              rename (scratchFileName, buffer);
-            }
-        }
-    }
-#endif
-
-  if (system_ret)
-    {
-      exit (EXIT_FAILURE);
-    }
+  if (my_system (buffer))
+    exit (EXIT_FAILURE);
 }
 
 /*-----------------------------------------------------------------*/

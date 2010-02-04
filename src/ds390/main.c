@@ -912,12 +912,13 @@ PORT ds390_port =
     ".asm",
     NULL                        /* no do_assemble function */
   },
-  {
+  {                             /* Linker */
     _linkCmd,
     NULL,
     NULL,
     ".rel",
-    1
+    1,
+    NULL,                       /* crt */
   },
   {
     _defaultRules,
@@ -1247,12 +1248,13 @@ PORT tininative_port =
     ".a51",
     _tininative_do_assemble
   },
-  {
+  {                             /* Linker */
     NULL,
     NULL,
     NULL,
     ".tlib",
-    1
+    1,
+    NULL,                       /* crt */
   },
   {
     _defaultRules,
@@ -1499,12 +1501,13 @@ PORT ds400_port =
     ".asm",
     NULL                        /* no do_assemble function */
   },
-  {
+  {                             /* Linker */
     _linkCmd,
     NULL,
     NULL,
     ".rel",
-    1
+    1,
+    NULL,                       /* crt */
   },
   {
     _defaultRules,

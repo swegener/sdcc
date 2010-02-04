@@ -754,7 +754,8 @@ PORT mcs51_port =
     NULL,
     NULL,
     ".rel",
-    1
+    1,
+    NULL,                       /* crt */
   },
   {                             /* Peephole optimizer */
     _defaultRules,

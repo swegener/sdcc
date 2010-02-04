@@ -399,12 +399,13 @@ PORT hc08_port =
     ".asm",
     NULL                        /* no do_assemble function */
   },
-  {
+  {                             /* Linker */
     _linkCmd,
     NULL,
     NULL,
     ".rel",
-    1
+    1,
+    NULL,                       /* crt */
   },
   {
     _defaultRules

@@ -19,8 +19,8 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
       "lda sp,-%d(sp)" },
     { "enterxl",
                 "ld hl,#-%d\n"
-                "\tadd\thl,sp\n"
-                "\tld\tsp,hl"
+                "add\thl,sp\n"
+                "ld\tsp,hl"
     },
     { "leave", ""
     },
@@ -28,30 +28,30 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     },
     { "leavexl",
                 "ld hl,#%d\n"
-                "\tadd\thl,sp\n"
-                "\tld\tsp,hl"
+                "add\thl,sp\n"
+                "ld\tsp,hl"
     },
     { "pusha", 
       "push af\n"
-      "\tpush bc\n"
-      "\tpush de\n"
-      "\tpush hl"
+      "push bc\n"
+      "push de\n"
+      "push hl"
     },
     { "popa", 
       "pop hl\n"
-      "\tpop de\n"
-      "\tpop bc\n"
-      "\tpop af"
+      "pop de\n"
+      "pop bc\n"
+      "pop af"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
     { "fileprelude", "" },
     { "profileenter",
                 "ld a,#3\n"
-                "\trst\t0x08"
+                "rst\t0x08"
     },
     { "profileexit",
                 "ld a,#4\n"
-                "\trst\t0x08"
+                "rst\t0x08"
     },
     { NULL, NULL }
 };
@@ -69,57 +69,57 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
     { "ei", "ei" },
     { "ldahli", 
 		"ld a,(hl)\n"
-		"\tinc\thl" },
+		"inc\thl" },
     { "ldahlsp", 
 		"ld hl,#%d\n"
-		"\tadd\thl,sp" },
+		"add\thl,sp" },
     { "ldaspsp", 
 		"ld hl,#%d\n"
-		"\tadd\thl,sp\n"
-		"\tld\tsp,hl" },
+		"add\thl,sp\n"
+		"ld\tsp,hl" },
     { "*pair", "(%s)" },
     { "shortjp", "jp" },
     { "enter", 
 		"push\tix\n"
-		"\tld\tix,#0\n"
-		"\tadd\tix,sp" },
+		"ld\tix,#0\n"
+		"add\tix,sp" },
     { "enterx", 
 		"push\tix\n"
-		"\tld\tix,#0\n"
-		"\tadd\tix,sp\n"
-		"\tld\thl,#-%d\n"
-		"\tadd\thl,sp\n"
-		"\tld\tsp,hl" 
+		"ld\tix,#0\n"
+		"add\tix,sp\n"
+		"ld\thl,#-%d\n"
+		"add\thl,sp\n"
+		"ld\tsp,hl" 
         },
     { "leave", 
 		"pop\tix"
     },
     { "leavex", 
 		"ld sp,ix\n"
-		"\tpop\tix"
+		"pop\tix"
     },
     { "pusha", 
       		"push af\n"
-      		"\tpush\tbc\n"
-      		"\tpush\tde\n"
-      		"\tpush\thl\n"
-		"\tpush\tiy"
+      		"push\tbc\n"
+      		"push\tde\n"
+      		"push\thl\n"
+		"push\tiy"
     },
     { "popa",
 		"pop iy\n"
-		"\tpop\thl\n"
-		"\tpop\tde\n"
-		"\tpop\tbc\n"
-		"\tpop\taf"
+		"pop\thl\n"
+		"pop\tde\n"
+		"pop\tbc\n"
+		"pop\taf"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
     { "profileenter",
                 "ld a,#3\n"
-                "\trst\t0x08"
+                "rst\t0x08"
     },
     { "profileexit",
                 "ld a,#4\n"
-                "\trst\t0x08"
+                "rst\t0x08"
     },
     { NULL, NULL }
 };
@@ -277,15 +277,15 @@ static const ASM_MAPPING _isas_mapping[] = {
 static const ASM_MAPPING _isas_gb_mapping[] = {
     { "pusha", 
       "push af\n"
-      "\tpush bc\n"
-      "\tpush de\n"
-      "\tpush hl"
+      "push bc\n"
+      "push de\n"
+      "push hl"
     },
     { "popa", 
       "pop hl\n"
-      "\tpop de\n"
-      "\tpop bc\n"
-      "\tpop af"
+      "pop de\n"
+      "pop bc\n"
+      "pop af"
     },
     { "di", "di" },
     { "ei", "ei" },
@@ -369,57 +369,57 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
     { "ei", "ei" },
     { "ldahli", 
 		"ld a,(hl)\n"
-		"\tinc\thl" },
+		"inc\thl" },
     { "ldahlsp", 
 		"ld hl,%d\n"
-		"\tadd\thl,sp" },
+		"add\thl,sp" },
     { "ldaspsp", 
 		"ld hl,%d\n"
-		"\tadd\thl,sp\n"
-		"\tld\tsp,hl" },
+		"add\thl,sp\n"
+		"ld\tsp,hl" },
     { "*pair", "(%s)" },
     { "shortjp", "jp" },
     { "enter", 
 		"push\tix\n"
-		"\tld\tix,0\n"
-		"\tadd\tix,sp" },
+		"ld\tix,0\n"
+		"add\tix,sp" },
     { "enterx", 
 		"push\tix\n"
-		"\tld\tix,0\n"
-		"\tadd\tix,sp\n"
-		"\tld\thl,-%d\n"
-		"\tadd\thl,sp\n"
-		"\tld\tsp,hl" 
+		"ld\tix,0\n"
+		"add\tix,sp\n"
+		"ld\thl,-%d\n"
+		"add\thl,sp\n"
+		"ld\tsp,hl" 
         },
     { "leave", 
 		"pop\tix"
     },
     { "leavex", 
 		"ld sp,ix\n"
-		"\tpop\tix"
+		"pop\tix"
     },
     { "pusha", 
       		"push af\n"
-      		"\tpush\tbc\n"
-      		"\tpush\tde\n"
-      		"\tpush\thl\n"
-		"\tpush\tiy"
+      		"push\tbc\n"
+      		"push\tde\n"
+      		"push\thl\n"
+		"push\tiy"
     },
     { "popa", 
 		"pop\tiy\n"
-		"\tpop\thl\n"
-		"\tpop\tde\n"
-		"\tpop\tbc\n"
-		"\tpop\taf"
+		"pop\thl\n"
+		"pop\tde\n"
+		"pop\tbc\n"
+		"pop\taf"
     },
     { "adjustsp", "lda sp,(sp%+d)" },
     { "profileenter",
                 "ld a,3\n"
-                "\trst\t$08"
+                "rst\t$08"
     },
     { "profileexit",
                 "ld a,4\n"
-                "\trst\t$08"
+                "rst\t$08"
     },
     { NULL, NULL }
 };

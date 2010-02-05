@@ -393,18 +393,8 @@ _newLineNode (const char *line)
 }
 
 static void
-_vemit2 (const char *szFormat, va_list ap)
+_add_line (const char *buffer)
 {
-  struct dbuf_s dbuf;
-  char *buffer;
-
-  dbuf_init(&dbuf, INITIAL_INLINEASM);
-
-  dbuf_tvprintf (&dbuf, szFormat, ap);
-
-  buffer = (char *)dbuf_c_str(&dbuf);
-
-  _tidyUp (buffer);
   _G.lines.current = (_G.lines.current ?
               connectLine (_G.lines.current, _newLineNode (buffer)) :
               (_G.lines.head = _newLineNode (buffer)));
@@ -413,6 +403,31 @@ _vemit2 (const char *szFormat, va_list ap)
   _G.lines.current->isDebug = _G.lines.isDebug;
   _G.lines.current->ic = _G.current_iCode;
   _G.lines.current->isComment = (*buffer == ';');
+}
+
+static void
+_vemit2 (const char *szFormat, va_list ap)
+{
+  struct dbuf_s dbuf;
+  char *buffer, *nextbuffer;
+
+  dbuf_init(&dbuf, INITIAL_INLINEASM);
+
+  dbuf_tvprintf (&dbuf, szFormat, ap);
+
+  buffer = (char *)dbuf_c_str(&dbuf);
+
+  _tidyUp (buffer);
+
+  /* Decompose multiline macros */
+  while(nextbuffer = strchr(buffer, '\n'))
+    {
+      *nextbuffer = 0;
+      _add_line(buffer);
+      buffer = nextbuffer + 1;
+    }
+
+  _add_line(buffer);
 
   dbuf_destroy(&dbuf);
 }

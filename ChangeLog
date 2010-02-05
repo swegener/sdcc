@@ -1,3 +1,10 @@
+2010-02-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/mappings.i,
+	  src/z80/peeph-z80.def:
+	  Decompose multiline macros, fixing #1570701, #1921731.
+
 2010-02-04 Borut Razem <borut.razem AT siol.net>
 
 	* src/mcs51/main.c, src/z80/main.c, src/ds390/main.c, src/hc08/main.c,

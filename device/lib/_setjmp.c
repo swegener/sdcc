@@ -22,6 +22,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 #include <8051.h>
+#include <sdcc-lib.h>
 #include <setjmp.h>
 
 #if defined(SDCC_STACK_AUTO) && defined(SDCC_USE_XSTACK)
@@ -95,10 +96,25 @@ _setjmp:
 ;     genPointerSet
 ;     genGenPointerSet
 	lcall	__gptrput
-;../../device/lib/_setjmp.c:189:return 0;
+#ifdef SDCC_MODEL_HUGE
+	inc	dptr
+;../../device/lib/_setjmp.c:189:*buf   = *((unsigned char __data *)SP - 2);
+;     genCast
+;     genMinus
+;     genMinusDec
+;	peephole 177.g	optimized mov sequence
+	dec	r0
+;     genPointerGet
+;     genNearPointerGet
+	mov	a,@r0
+;     genPointerSet
+;     genGenPointerSet
+	lcall	__gptrput
+#endif
+;../../device/lib/_setjmp.c:190:return 0;
 ;     genRet
 	mov	dptr,#0x0000
-	ret
+	_RETURN
 
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'longjmp'
@@ -166,15 +182,28 @@ _longjmp:
 ;     genPointerSet
 ;     genNearPointerSet
 	mov	@r0,a
-;../../device/lib/_setjmp.c:199:SP = lsp;
+#ifdef SDCC_MODEL_HUGE
+	inc	dptr
+;../../device/lib/_setjmp.c:199:*((unsigned char __data *) lsp - 1) = *buf;
+;     genMinus
+;     genMinusDec
+	dec	r0
+;     genPointerGet
+;     genGenPointerGet
+	lcall	__gptrget
+;     genPointerSet
+;     genNearPointerSet
+	mov	@r0,a
+#endif
+;../../device/lib/_setjmp.c:200:SP = lsp;
 ;     genAssign
 	mov	sp,r5
-;../../device/lib/_setjmp.c:200:return rv;
+;../../device/lib/_setjmp.c:201:return rv;
 ;     genAssign
 	mov	dph,r2
 	mov	dpl,r3
 ;     genRet
-	ret
+	_RETURN
 
 	__endasm;
 }
@@ -238,10 +267,24 @@ _setjmp:
 ;     genPointerSet
 ;     genGenPointerSet
 	lcall	__gptrput
-;../../device/lib/_setjmp.c:129:return 0;
+#ifdef SDCC_MODEL_HUGE
+	inc	dptr
+;../../device/lib/_setjmp.c:129:*buf++ = *((unsigned char __data *)SP - 2);
+;     genCast
+;     genMinus
+;     genMinusDec
+	dec	r0
+;     genPointerGet
+;     genNearPointerGet
+	mov	a,@r0
+;     genPointerSet
+;     genGenPointerSet
+	lcall	__gptrput
+#endif
+;../../device/lib/_setjmp.c:130:return 0;
 ;     genRet
 	mov	dptr,#0x0000
-	ret
+	_RETURN
 
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'longjmp'
@@ -268,6 +311,9 @@ _longjmp:
 	mov	r0,sp
 	dec	r0
 	dec	r0
+#ifdef SDCC_MODEL_HUGE
+	dec	r0
+#endif
 	mov	ar2,@r0
 	dec	r0
 	mov	ar3,@r0
@@ -306,14 +352,28 @@ _longjmp:
 ;     genPointerSet
 ;     genNearPointerSet
 	mov	@r0,a
-;../../device/lib/_setjmp.c:34:SP = lsp;
+#ifdef SDCC_MODEL_HUGE
+	inc	dptr
+;../../device/lib/_setjmp.c:34:*((unsigned char __data *) lsp - 2) = *buf;
+;     genCast
+;     genMinus
+;     genMinusDec
+	dec	r0
+;     genPointerGet
+;     genGenPointerGet
+	lcall	__gptrget
+;     genPointerSet
+;     genNearPointerSet
+	mov	@r0,a
+#endif
+;../../device/lib/_setjmp.c:35:SP = lsp;
 ;     genAssign
 	mov	sp,r5
-;../../device/lib/_setjmp.c:35:return rv;
+;../../device/lib/_setjmp.c:36:return rv;
 ;     genRet
 	mov	dph,r2
 	mov	dpl,r3
-	ret
+	_RETURN
 
 	__endasm;
 }

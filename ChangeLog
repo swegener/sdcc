@@ -1,3 +1,8 @@
+2010-02-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_setjmp.c: fixed --stack-auto for model-huge
+	* support/regression/Makefile.in: keep the hex-file
+
 2010-02-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

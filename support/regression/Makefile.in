@@ -187,7 +187,7 @@ endif
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.
-.PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT)
+.PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT)
 
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)

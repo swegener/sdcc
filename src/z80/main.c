@@ -38,7 +38,7 @@
 #define OPTION_PORTMODE        "--portmode="
 #define OPTION_ASM             "--asm="
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
-
+#define OPTION_OUT_FMT_GB      "--out-fmt-gb"
 
 static char _z80_defaultRules[] =
 {
@@ -73,6 +73,7 @@ static OPTION _gbz80_options[] =
     { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
     { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
     { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+    { 0, OPTION_OUT_FMT_GB,      NULL, "Output executable in GB format" },
     { 0, NULL }
   };
 
@@ -569,10 +570,12 @@ _setDefaultOptions (void)
   if (IS_GB)
     {
       options.data_loc = 0xC000;
+      options.out_fmt = 'Z';	/* Default output format is gb */
     }
   else
     {
       options.data_loc = 0x8000;
+      options.out_fmt = 'i';	/* Default output format is ihx */
     }
 
   optimize.global_cse = 1;

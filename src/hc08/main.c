@@ -100,7 +100,7 @@ _hc08_parseOptions (int *pargc, char **argv, int *i)
 {
   if (!strcmp (argv[*i], "--out-fmt-elf"))
     {
-      options.out_fmt = 2;
+      options.out_fmt = 't';
       debugFile = &dwarf2DebugFile;
       return TRUE;
     }
@@ -141,10 +141,10 @@ _hc08_setDefaultOptions (void)
   options.data_loc = 0x80;
   options.xdata_loc = 0;        /* 0 means immediately following data */
   options.stack_loc = 0x7fff;
-  options.out_fmt = 1;          /* use motorola S19 output */
+  options.out_fmt = 's';        /* use motorola S19 output */
 
-  options.omitFramePtr = 1; /* no frame pointer (we use SP */
-                            /* offsets instead)            */
+  options.omitFramePtr = 1;     /* no frame pointer (we use SP */
+                                /* offsets instead)            */
 }
 
 static const char *
@@ -239,7 +239,7 @@ _hc08_genAssemblerPreamble (FILE * of)
 static void
 _hc08_genAssemblerEnd (FILE * of)
 {
-  if (options.out_fmt == 2 && options.debug)
+  if (options.out_fmt == 't' && options.debug)
     {
       dwarf2FinalizeFile (of);
     }

@@ -505,24 +505,21 @@ char *argv[];
 				if (jfp) fprintf( jfp, "LOAD %s.s19\n", linkp->f_idp );
 				/* end sdld specific */
 			} else
+			/* sdld specific */
 			if (oflag == 3) {
-				/* sdld 6808 specific */
-				if (TARGET_IS_6808) {
-					ofp = afile(linkp->f_idp, "elf", 2);
-					if (ofp == NULL) {
-						lkexit(1);
-					}
+				ofp = afile(linkp->f_idp, "elf", 2);
+				if (ofp == NULL) {
+					lkexit(1);
 				}
-				/* end sdld 6808 specific */
-				/* sdld gb specific */
-				else if (TARGET_IS_GB) {
-					ofp = afile(linkp->f_idp, "", 2);
-					if (ofp == NULL) {
-						lkexit(1);
-					}
-				}
-				/* end sdld gb specific */
 			}
+			else
+			if (oflag == 4) {
+				ofp = afile(linkp->f_idp, "", 2);
+				if (ofp == NULL) {
+					lkexit(1);
+				}
+			}
+			/* end sdld specific */
 		} else {
 			/*
 			 * Link in library files
@@ -1047,7 +1044,7 @@ parse()
 
 				case 'Z':
 					if (TARGET_IS_Z80 || TARGET_IS_GB) {
-						oflag = 3;
+						oflag = 4;
 						break;
 					}
 					/* fall through */
@@ -1264,9 +1261,11 @@ setbas()
 					break;
 			}
 			if (ap == NULL) {
-				fprintf(stderr,
-				"ASlink-Warning-No definition of area %s\n", id);
-				lkerr++;
+				if (!TARGET_IS_GB) {
+					fprintf(stderr,
+					"ASlink-Warning-No definition of area %s\n", id);
+					lkerr++;
+				}
 			} else {
 				ap->a_addr = v;
 				/* sdld specific */
@@ -1373,9 +1372,11 @@ setgbl()
 			v = expr(0);
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
-				fprintf(stderr,
-				"No definition of symbol %s\n", id);
-				lkerr++;
+				if (!TARGET_IS_GB) {
+					fprintf(stderr,
+					"No definition of symbol %s\n", id);
+					lkerr++;
+				}
 			} else {
 
 				if (sp->s_type & S_DEF) {

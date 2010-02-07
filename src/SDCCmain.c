@@ -584,8 +584,8 @@ setDefaultOptions (void)
   options.std_c99 = 0;            /* default to C89 until more C99 support */
   options.code_seg = CODE_NAME ? Safe_strdup(CODE_NAME) : NULL; /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup(CONST_NAME) : NULL; /* default to CONST for generated code */
-
-  options.stack10bit=0;
+  options.stack10bit = 0;
+  options.out_fmt = 0;
 
   /* now for the optimizations */
   /* turn on the everything */
@@ -971,13 +971,13 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_OUT_FMT_IHX) == 0)
             {
-              options.out_fmt = 0;
+              options.out_fmt = 'i';
               continue;
             }
 
           if (strcmp (argv[i], OPTION_OUT_FMT_S19) == 0)
             {
-              options.out_fmt = 1;
+              options.out_fmt = 's';
               continue;
             }
 
@@ -1541,22 +1541,7 @@ linkEdit (char **envp)
 
   if (port->linker.needLinkerScript)
     {
-      char out_fmt;
-
-      switch (options.out_fmt)
-        {
-        case 0:
-          out_fmt = 'i';        /* Intel hex */
-          break;
-        case 1:
-          out_fmt = 's';        /* Motorola S19 */
-          break;
-        case 2:
-          out_fmt = 't';        /* Elf */
-          break;
-        default:
-          out_fmt = 'i';
-        }
+      char out_fmt = (options.out_fmt == 0) ? 'i' : options.out_fmt;
 
       /* first we need to create the <filename>.lnk file */
       dbuf_printf(&linkerScriptFileName, "%s.lnk", dstFileName);
@@ -1569,11 +1554,11 @@ linkEdit (char **envp)
       if (TARGET_Z80_LIKE)
         {
 //          fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n", out_fmt, dstFileName);
-          fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, dstFileName);
+          fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, fullDstFileName ? fullDstFileName : dstFileName);
         }
       else /*For all the other ports.  Including pics???*/
         {
-          fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, dstFileName);
+          fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, fullDstFileName ? fullDstFileName : dstFileName);
           if(!options.no_pack_iram)
               fprintf (lnkfile, "-Y\n");
         }

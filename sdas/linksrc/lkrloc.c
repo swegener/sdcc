@@ -254,6 +254,7 @@ relt()
  *		a_uint	adw_w()		lkrloc.c
  * sdld specific
  *		VOID	elf()		lkelf.c
+ *		VOID	gb()		lkgb.c
  * end sdld specific
  *		a_uint	evword()	lkrloc.c
  *		int	eval()		lkeval.c
@@ -620,16 +621,18 @@ relr()
 		s19(1);
 	}
 /* sdld specific */
-	else if ((oflag == 3) && (rtcnt > 2)) {
-		if (TARGET_IS_6808)
-			elf(1);
-		else if (TARGET_IS_GB)
-			gb(1);
+	else
+	if ((oflag == 3) && (rtcnt > 2)) {
+		elf(1);
+	}
+	else
+	if ((oflag == 4) && (rtcnt > 2)) {
+		gb(1);
+	}
 /*
 		else if (--GAMEGEAR--)
 			 gg(1);
 */
-	}
 /* end sdld specific */
 }
 
@@ -791,6 +794,7 @@ relp()
  *	called functions:
  * sdld specific
  *		VOID	elf()		lkelf.c
+ *		VOID	gb()		lkgb.c
  * end sdld specific
  *		VOID	ihx()		lkihx.c
  *		VOID	lkulist()	lklist.c
@@ -814,9 +818,13 @@ rele()
 		s19(0);
 	}
 /* sdld specific */
-	else if (oflag == 3) {
-		if (TARGET_IS_6808)
-			elf(0);
+	else
+	if (oflag == 3) {
+		elf(0);
+	}
+	else
+	if (oflag == 4) {
+		gb(0);
 	}
 /* end sdld specific */
 }

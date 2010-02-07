@@ -3,6 +3,11 @@
 	* src/SDCCmain.c, src/SDCCglobl.h, src/z80/main.c, src/hc08/main.c,
 	  sdas/linksrc/lkmain.c, sdas/linksrc/lkar.c, sdas/linksrc/lkrloc.c:
 	  fixed output file format handling
+	* src/SDCCmain.c, src/port.h, src/xa51/main.c, src/mcs51/main.c,
+	  src/z80/main.c, src/ds390/main.c, src/hc08/main.c:
+	  list of standard library files moved to port structure,
+	  defined for each target
+	* sdas/linksrc/lkmain.c: re-added the gb version of map()
 
 2010-02-06 Maarten Brock <sourceforge.brock AT dse.nl>
 

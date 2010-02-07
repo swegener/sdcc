@@ -377,6 +377,8 @@ static const char *_asmCmd[] =
   "sdas6808", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
+static const char * const _libs[] = { "hc08", NULL, };
+
 /* Globals */
 PORT hc08_port =
 {
@@ -406,6 +408,7 @@ PORT hc08_port =
     ".rel",
     1,
     NULL,                       /* crt */
+    _libs,                      /* libs */
   },
   {
     _defaultRules

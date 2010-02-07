@@ -767,6 +767,99 @@ link_main()
 VOID
 map()
 {
+  /* sdld specific */
+  /* if gb output file format, generate gb map file */
+  if (oflag == 4) {
+        register int i;
+        register struct head *hdp;
+        register struct lbfile *lbfh;
+
+        /*
+         * Open Map File
+         */
+        mfp = afile(linkp->f_idp, "map", 1);
+        if (mfp == NULL) {
+                lkexit(1);
+        }
+
+        /*
+         * Output Map Area Lists
+         */
+        page = 0;
+        lop  = NLPP;
+        ap = areap;
+        while (ap) {
+                lstarea(ap);
+                ap = ap->a_ap;
+        }
+        /*
+         * List Linked Files
+         */
+        newpag(mfp);
+        fprintf(mfp, "\nFiles Linked      [ module(s) ]\n\n");
+        hdp = headp;
+        filep = linkp->f_flp;
+        while (filep) {
+                fprintf(mfp, "%-16s", filep->f_idp);
+                i = 0;
+                while ((hdp != NULL) && (hdp->h_lfile == filep)) {
+                        if (i % 5) {
+                            fprintf(mfp, ", %8.8s", hdp->m_id);
+                        } else {
+                            if (i) {
+                                fprintf(mfp, ",\n%20s%8.8s", "", hdp->m_id);
+                            } else {
+                                fprintf(mfp, "  [ %8.8s", hdp->m_id);
+                            }
+                        }
+                        hdp = hdp->h_hp;
+                        i++;
+                }
+                if (i)
+                        fprintf(mfp, " ]");
+                fprintf(mfp, "\n");
+                filep = filep->f_flp;
+        }
+        /*
+         * List Linked Libraries
+         */
+        if (lbfhead != NULL) {
+                fprintf(mfp,
+        "\nLibraries Linked                    [   object  file   ]\n\n");
+                for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
+                        fprintf(mfp, "%-32s    [ %16.16s ]\n",
+                                lbfh->libspc, lbfh->relfil);
+                }
+                fprintf(mfp, "\n");
+        }
+        /*
+         * List Base Address Definitions
+         */
+        if (basep) {
+                newpag(mfp);
+                fprintf(mfp, "\nUser Base Address Definitions\n\n");
+                bsp = basep;
+                while (bsp) {
+                        fprintf(mfp, "%s\n", bsp->b_strp);
+                        bsp = bsp->b_base;
+                }
+        }
+        /*
+         * List Global Definitions
+         */
+        if (globlp) {
+                newpag(mfp);
+                fprintf(mfp, "\nUser Global Definitions\n\n");
+                gsp = globlp;
+                while (gsp) {
+                        fprintf(mfp, "%s\n", gsp->g_strp);
+                        gsp = gsp->g_globl;
+                }
+        }
+        fprintf(mfp, "\n\f");
+        symdef(mfp);
+  } else {
+  /* end sdld specific */
 	register int i;
 	register struct head *hdp;
 	register struct lbfile *lbfh;
@@ -851,6 +944,9 @@ map()
 	}
 	fprintf(mfp, "\n\f");
 	symdef(mfp);
+  /* sdld specific */
+  }
+  /* end sdld specific */
 }
 
 /*)Function	int	parse()

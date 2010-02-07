@@ -890,6 +890,8 @@ static const char *_asmCmd[] =
   "sdas8051", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
+static const char * const _libs_ds390[] = { STD_DS390_LIB, NULL, };
+
 /* Globals */
 PORT ds390_port =
 {
@@ -919,6 +921,7 @@ PORT ds390_port =
     ".rel",
     1,
     NULL,                       /* crt */
+    _libs_ds390,                /* libs */
   },
   {
     _defaultRules,
@@ -1255,6 +1258,7 @@ PORT tininative_port =
     ".tlib",
     1,
     NULL,                       /* crt */
+    _libs_ds390,                /* libs */
   },
   {
     _defaultRules,
@@ -1479,6 +1483,7 @@ static void _ds400_linkRomDataArea(FILE *fp)
     fprintf(fp, "-b ROMSEG = 0x0068\n");
 }
 
+static const char * const _libs_ds400[] = { STD_DS400_LIB, NULL, };
 
 PORT ds400_port =
 {
@@ -1508,6 +1513,7 @@ PORT ds400_port =
     ".rel",
     1,
     NULL,                       /* crt */
+    _libs_ds400,                /* libs */
   },
   {
     _defaultRules,

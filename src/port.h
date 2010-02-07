@@ -129,6 +129,7 @@ typedef struct
         /** 1 if port needs the .lnk file, 0 otherwise */
         const int needLinkerScript;
 	const char * const *crt;
+	const char * const *libs;
       }
     linker;
 

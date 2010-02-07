@@ -1523,6 +1523,26 @@ finalizeOptions (void)
     options.noPeepComments = 1;
 }
 
+static const char *
+getOutFmtExt (void)
+{
+  switch (options.out_fmt)
+    {
+      default:
+      case 'i':
+        return ".ixh";
+
+      case 's':
+        return ".s19";
+
+      case 't':
+        return ".elf";
+
+      case 'Z':
+        return ".gb";
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
 /*-----------------------------------------------------------------*/
@@ -1543,6 +1563,16 @@ linkEdit (char **envp)
     {
       char out_fmt = (options.out_fmt == 0) ? 'i' : options.out_fmt;
 
+      if (NULL != fullDstFileName)
+        {
+          dbuf_append_str (&binFileName, dstFileName);
+        }
+      else
+        {
+          dbuf_append_str (&binFileName, fullDstFileName);
+          dbuf_append_str (&binFileName, getOutFmtExt());
+        }
+
       /* first we need to create the <filename>.lnk file */
       dbuf_printf(&linkerScriptFileName, "%s.lnk", dstFileName);
       if (!(lnkfile = fopen (dbuf_c_str (&linkerScriptFileName), "w")))
@@ -1553,12 +1583,11 @@ linkEdit (char **envp)
 
       if (TARGET_Z80_LIKE)
         {
-//          fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n", out_fmt, dstFileName);
-          fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, fullDstFileName ? fullDstFileName : dstFileName);
+          fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
         }
       else /*For all the other ports.  Including pics???*/
         {
-          fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, fullDstFileName ? fullDstFileName : dstFileName);
+          fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt,  dbuf_c_str (&binFileName));
           if(!options.no_pack_iram)
               fprintf (lnkfile, "-Y\n");
         }
@@ -1725,61 +1754,17 @@ linkEdit (char **envp)
       for (s = setFirstItem(libFilesSet); s != NULL; s = setNextItem(libFilesSet))
         fprintf (lnkfile, "-l %s\n", s);
 
-      /* standard library files
-         TODO: the list of libraries should be defined in the target's PORT structure */
+      /* standard library files */
       if (!options.nostdlib)
         {
-#if !OPT_DISABLE_DS390
-          if (options.model == MODEL_FLAT24)
+          if (NULL != port->linker.libs)
             {
-              if (TARGET_IS_DS390)
-                {
-                  fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
-                }
-              else if (TARGET_IS_DS400)
-                {
-                  fprintf (lnkfile, "-l %s\n", STD_DS400_LIB);
-                }
-              else
-                {
-                  fprintf(stderr,
-                    "Add support for your FLAT24 target in %s @ line %d\n",
-                    __FILE__, __LINE__);
-                  exit (EXIT_FAILURE);
-                }
-              }
-#endif
+              const char * const *p;
 
-#if !OPT_DISABLE_XA51
-#ifdef STD_XA51_LIB
-          if (options.model == MODEL_PAGE0)
-            {
-              fprintf (lnkfile, "-l %s\n", STD_XA51_LIB);
-            }
-#endif
-#endif
-          if (TARGET_IS_MCS51)
-            {
-              fprintf (lnkfile, "-l mcs51\n");
-            }
-          if (!(TARGET_Z80_LIKE || TARGET_IS_HC08)) /* Not for the z80, gbz80 */
-            { /* Why the z80 port is not using the standard libraries? */
-              fprintf (lnkfile, "-l %s\n", STD_LIB);
-              fprintf (lnkfile, "-l %s\n", STD_INT_LIB);
-              fprintf (lnkfile, "-l %s\n", STD_LONG_LIB);
-              fprintf (lnkfile, "-l %s\n", STD_FP_LIB);
-            }
-          else if (TARGET_IS_HC08)
-            {
-              fprintf (lnkfile, "-l hc08\n");
-            }
-          else if (TARGET_IS_Z80)
-            {
-              fprintf (lnkfile, "-l z80\n");
-            }
-          else if (TARGET_IS_GBZ80)
-            {
-              fprintf (lnkfile, "-l gbz80\n");
+              for (p = port->linker.libs; NULL != *p; ++p)
+                {
+                  fprintf (lnkfile, "-l %s\n", *p);
+                }
             }
         }
 
@@ -1856,36 +1841,6 @@ linkEdit (char **envp)
       fprintf (lnkfile, "\n-e\n");
       fclose (lnkfile);
     } /* if(port->linker.needLinkerScript) */
-
-  /* build linker output filename */
-  if (fullDstFileName)
-    dbuf_append_str (&binFileName, fullDstFileName);
-  else
-    {
-      if (fullSrcFileName)
-        {
-          /* the linked file gets the name of the C source file name */
-          dbuf_append_str (&binFileName, dstFileName);
-        }
-      else
-        {
-          /* the linked file gets the name of the first module */
-          const char *p;
-
-          s = peekSet (relFilesSet);
-
-          assert(s);
-
-          if (NULL == (p = strrchr (s, '.')))
-            {
-              /* strip the extension */
-              dbuf_append (&binFileName, s, p - s);
-            }
-          else
-            dbuf_append_str (&binFileName, s);
-        }
-      dbuf_append_str (&binFileName, options.out_fmt ? ".s19" : ".ihx");
-    }
 
   if (options.verbose)
     printf ("sdcc: Calling linker...\n");

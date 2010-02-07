@@ -724,7 +724,9 @@ static const char *_gbAsmCmd[] =
   "sdasgb", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
-static const char * const crt[] = { "crt0.rel", NULL, };
+static const char * const _crt[] = { "crt0.rel", NULL, };
+static const char * const _libs_z80[] = { "z80", NULL, };
+static const char * const _libs_gb[] = { "gbz80", NULL, };
 
 /* Globals */
 PORT z80_port =
@@ -753,7 +755,8 @@ PORT z80_port =
     NULL,
     ".rel",
     1,
-    crt,                        /* crt */
+    _crt,                       /* crt */
+    _libs_z80,                  /* libs */
   },
   {                             /* Peephole optimizer */
     _z80_defaultRules,
@@ -881,7 +884,8 @@ PORT gbz80_port =
     NULL,
     ".rel",
     1,
-    crt,                        /* crt */
+    _crt,                       /* crt */
+    _libs_gb,                   /* libs */
   },
   {
     _gbz80_defaultRules

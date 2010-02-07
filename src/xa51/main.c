@@ -233,6 +233,8 @@ static const char *_asmCmd[] =
   "xa_rasm", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
+static const char * const _libs[] = { STD_LIB, STD_INT_LIB, STD_LONG_LIB, STD_FP_LIB, NULL, };
+
 /* Globals */
 PORT xa51_port =
 {
@@ -262,6 +264,7 @@ PORT xa51_port =
     ".rel",
     1,
     NULL,                       /* crt */
+    _libs,                      /* libs */
   },
   {
     _defaultRules

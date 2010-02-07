@@ -1,3 +1,7 @@
+2010-02-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added rules 272.x helping literal left shifts
+
 2010-02-07 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/SDCCglobl.h, src/z80/main.c, src/hc08/main.c,

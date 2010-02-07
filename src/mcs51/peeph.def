@@ -4688,6 +4688,34 @@ replace {
 } if operandsNotRelated('a' 'dptr' %2), labelRefCount(%1 1), labelRefCountChange(%3 -1)
 
 
+// left-shifting 8 bit to 16 bit result
+// http://sourceforge.net/projects/sdcc/forums/forum/1864/topic/3536144
+replace {
+	clr	a
+	swap	a
+} by {
+	clr	a
+	;	Peephole 272.a	removed swap operation on zero
+}
+
+replace {
+	clr	a
+	anl	a,%1
+} by {
+	clr	a
+	;	Peephole 272.b	removed anl operation on zero
+} if notVolatile(%1)
+
+replace {
+	clr	a
+	mov	c,acc.0
+} by {
+	clr	a
+	;	Peephole 272.c	clearing carry directly
+	clr	c
+}
+
+
 replace restart {
 	pop	ar%1
 } by {

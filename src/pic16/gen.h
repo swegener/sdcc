@@ -147,7 +147,7 @@ void pic16_emitpcode_real(PIC_OPCODE poc, pCodeOp *pcop);
 void pic16_emitpLabel(int key);
 void pic16_emitcode (char *inst,char *fmt, ...);
 void DEBUGpic16_emitcode (char *inst,char *fmt, ...);
-void pic16_emitDebuggerSymbol (char *);
+void pic16_emitDebuggerSymbol (const char *);
 bool pic16_sameRegs (asmop *aop1, asmop *aop2 );
 char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname);
 void DEBUGpic16_pic16_AopType(int line_no, operand *left, operand *right, operand *result);

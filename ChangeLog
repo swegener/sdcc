@@ -1,3 +1,17 @@
+2010-02-08 Borut Razem <borut.razem AT siol.net>
+
+	* src/avr/gen.c, src/avr/gen.h, src/cdbFile.c, src/ds390/gen.c,
+	  src/ds390/gen.h, src/hc08/gen.c, src/hc08/gen.h, src/mcs51/gen.c,
+	  src/mcs51/gen.h, src/mcs51/main.c, src/pic16/gen.c, src/pic16/gen.h,
+	  src/pic16/main.c, src/pic/gen.c, src/pic/gen.h, src/port.h,
+	  src/SDCCBBlock.c, src/SDCCdebug.c, src/SDCCdebug.h, src/SDCCdwarf2.c,
+	  src/SDCCdwarf2.h, src/SDCCglobl.h, src/SDCCglue.c, src/SDCCmain.c,
+	  src/xa51/gen.c, src/xa51/gen.h, src/xa51/main.c, src/z80/gen.c,
+	  src/z80/gen.h, src/z80/main.c:
+	  get rid of scratchFileName, const string pointers
+	* src/SDCCmain.c, src/xa51/main.c, src/mcs51/main.c, sdcc_vc_in.h:
+	  fixed bug #2947712: SDCC completely broken in multiple ways
+
 2010-02-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added rules 272.x helping literal left shifts

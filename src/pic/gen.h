@@ -141,7 +141,7 @@ void emitpComment (const char *fmt, ...);
 void emitpLabel(int key);
 void pic14_emitcode (char *inst,char *fmt, ...);
 void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
-void pic14_emitDebuggerSymbol (char *);
+void pic14_emitDebuggerSymbol (const char *);
 bool pic14_sameRegs (asmop *aop1, asmop *aop2 );
 char *aopGet (asmop *aop, int offset, bool bit16, bool dname);
 void DEBUGpic14_AopType(int line_no, operand *left, operand *right, operand *result);

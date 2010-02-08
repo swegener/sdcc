@@ -268,7 +268,7 @@ emitLabel (symbol *tlbl)
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-ds390_emitDebuggerSymbol (char * debugSym)
+ds390_emitDebuggerSymbol (const char * debugSym)
 {
   _G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);

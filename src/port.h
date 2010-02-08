@@ -242,7 +242,7 @@ typedef struct
 
     struct
       {
-        void (*emitDebuggerSymbol) (char *);
+        void (*emitDebuggerSymbol) (const char *);
         struct
           {
             int (*regNum) (struct regs *);

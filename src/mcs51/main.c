@@ -727,7 +727,7 @@ static const char *_asmCmd[] =
   "sdas8051", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
-static const char * const _libs[] = { STD_XA51_LIB, NULL, };
+static const char * const _libs[] = { STD_LIB, STD_INT_LIB, STD_LONG_LIB, STD_FP_LIB, NULL, };
 
 /* Globals */
 PORT mcs51_port =

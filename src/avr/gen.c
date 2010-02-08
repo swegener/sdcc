@@ -266,7 +266,7 @@ emitcode (char *inst, char *fmt, ...)
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-avr_emitDebuggerSymbol (char * debugSym)
+avr_emitDebuggerSymbol (const char * debugSym)
 {
   _G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);

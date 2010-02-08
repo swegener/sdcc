@@ -466,7 +466,7 @@ emitDebug (const char *szFormat,...)
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-z80_emitDebuggerSymbol (char * debugSym)
+z80_emitDebuggerSymbol (const char * debugSym)
 {
   _G.lines.isDebug = 1;
   emit2 ("%s !equ .", debugSym);

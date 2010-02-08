@@ -309,7 +309,7 @@ typedef struct dwloc
   struct
   {
     symbol * sym;
-    char * label;
+    const char * label;
     int offset;
   } operand;
   struct dwloc * next;

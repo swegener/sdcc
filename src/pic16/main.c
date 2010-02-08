@@ -97,7 +97,7 @@ extern set *libFilesSet;
 
 /* Also defined in gen.h, but the #include is commented out */
 /* for an unknowned reason. - EEP */
-void pic16_emitDebuggerSymbol (char *);
+void pic16_emitDebuggerSymbol (const char *);
 
 extern void pic16_emitConfigRegs(FILE *of);
 extern void pic16_emitIDRegs(FILE *of);

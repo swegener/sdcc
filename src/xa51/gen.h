@@ -64,6 +64,6 @@ typedef struct asmop {
 #define AOP_SIZE(x) x->aop->size
 #define AOP_NAME(x) x->aop->name
 
-void xa51_emitDebuggerSymbol (char *);
+void xa51_emitDebuggerSymbol (const char *);
 
 #endif

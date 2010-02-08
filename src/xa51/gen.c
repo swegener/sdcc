@@ -123,7 +123,7 @@ static void emitcode (char *inst, char *fmt,...) {
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-xa51_emitDebuggerSymbol (char * debugSym)
+xa51_emitDebuggerSymbol (const char * debugSym)
 {
   _G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);

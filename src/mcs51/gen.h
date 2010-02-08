@@ -79,7 +79,7 @@ typedef struct asmop
 asmop;
 
 void gen51Code (iCode *);
-void mcs51_emitDebuggerSymbol (char *);
+void mcs51_emitDebuggerSymbol (const char *);
 
 //extern char *fReturn8051[];
 extern unsigned fReturnSizeMCS51;

@@ -345,14 +345,20 @@ static void
 _gbz80_rgblink (void)
 {
   FILE *lnkfile;
+  struct dbuf_s lnkFileName;
+
+  dbuf_init (&lnkFileName, PATH_MAX);
 
   /* first we need to create the <filename>.lnk file */
-  sprintf (scratchFileName, "%s.lnk", dstFileName);
-  if (!(lnkfile = fopen (scratchFileName, "w")))
+  dbuf_append_str (&lnkFileName, dstFileName);
+  dbuf_append_str (&lnkFileName, ".lnk");
+  if (!(lnkfile = fopen (dbuf_c_str (&lnkFileName), "w")))
     {
-      werror (E_FILE_OPEN_ERR, scratchFileName);
+      werror (E_FILE_OPEN_ERR, dbuf_c_str (&lnkFileName));
+      dbuf_destroy (&lnkFileName);
       exit (1);
     }
+  dbuf_destroy (&lnkFileName);
 
   fprintf (lnkfile, "[Objects]\n");
 

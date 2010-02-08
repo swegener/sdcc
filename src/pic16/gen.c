@@ -355,7 +355,7 @@ void pic16_emitcode (char *inst,char *fmt, ...)
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-pic16_emitDebuggerSymbol (char * debugSym)
+pic16_emitDebuggerSymbol (const char * debugSym)
 {
   _G.debugLine = 1;
   pic16_emitcode (";", "%s ==.", debugSym);

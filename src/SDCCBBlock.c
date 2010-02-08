@@ -24,6 +24,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "dbuf_string.h"
 
 int eBBNum = 0;
 set *graphEdges = NULL;         /* list of edges in this flow graph */
@@ -107,15 +108,20 @@ FILE *createDumpFile (int id) {
 
   if (!dumpFilesPtr->filePtr) {
     // not used before, create it
-    strncpyz (scratchFileName, dstFileName, PATH_MAX);
+    struct dbuf_s dumpFileName;
+
+    dbuf_init (&dumpFileName, PATH_MAX);
+    dbuf_append_str (&dumpFileName, dstFileName);
 #if 0
-    strncatz (scratchFileName, dumpIndexStr, PATH_MAX);
+    dbuf_append_str (&dumpFileName, dumpIndexStr);
 #endif
-    strncatz (scratchFileName, dumpFilesPtr->ext, PATH_MAX);
-    if (!(dumpFilesPtr->filePtr = fopen (scratchFileName, "w"))) {
-      werror (E_FILE_OPEN_ERR, scratchFileName);
+    dbuf_append_str (&dumpFileName, dumpFilesPtr->ext);
+    if (!(dumpFilesPtr->filePtr = fopen (dbuf_c_str (&dumpFileName), "w"))) {
+      werror (E_FILE_OPEN_ERR, dbuf_c_str (&dumpFileName));
+      dbuf_destroy (&dumpFileName);
       exit (1);
     }
+    dbuf_destroy (&dumpFileName);
   }
 
 #if 0

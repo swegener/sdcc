@@ -91,7 +91,6 @@ int ds390_jammed = 0;
 
 /* Globally accessible scratch buffer for file names.
    TODO: replace them with local buffers */
-char scratchFileName[PATH_MAX];
 char buffer[PATH_MAX * 2];
 
 #define LENGTH(_a)      (sizeof(_a)/sizeof(*(_a)))
@@ -1432,12 +1431,18 @@ parseCmdLine (int argc, char **argv)
   /* if debug option is set then open the cdbFile */
   if (options.debug && fullSrcFileName)
     {
-      SNPRINTF (scratchFileName, sizeof(scratchFileName),
-                "%s.adb", dstFileName); /*JCF: Nov 30, 2002*/
-      if(debugFile->openFile(scratchFileName))
+      struct dbuf_s adbFile;
+
+      dbuf_init (&adbFile, PATH_MAX);
+      dbuf_append_str (&adbFile, dstFileName);
+      dbuf_append_str (&adbFile, ".adb");
+
+      if (debugFile->openFile(dbuf_c_str (&adbFile)))
         debugFile->writeModule(moduleName);
       else
-        werror (E_FILE_OPEN_ERR, scratchFileName);
+        werror (E_FILE_OPEN_ERR, dbuf_c_str (&adbFile));
+
+      dbuf_destroy (&adbFile);
     }
   MSVC_style(options.vc_err_style);
 
@@ -1563,7 +1568,7 @@ linkEdit (char **envp)
     {
       char out_fmt = (options.out_fmt == 0) ? 'i' : options.out_fmt;
 
-      if (NULL != fullDstFileName)
+      if (NULL == fullDstFileName)
         {
           dbuf_append_str (&binFileName, dstFileName);
         }

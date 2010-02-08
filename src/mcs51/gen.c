@@ -212,7 +212,7 @@ emitLabel (symbol *tlbl)
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-mcs51_emitDebuggerSymbol (char * debugSym)
+mcs51_emitDebuggerSymbol (const char * debugSym)
 {
   _G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);

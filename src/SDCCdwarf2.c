@@ -35,19 +35,19 @@
 
 extern set *includeDirsSet;
 
-int dwOpenFile(char *file);
-int dwCloseFile(void);
-int dwWriteFunction(symbol *pSym, iCode *ic);
-int dwWriteEndFunction(symbol *pSym, iCode *ic, int offset);
-int dwWriteLabel(symbol *pSym, iCode *ic);
-int dwWriteScope(iCode *ic);
-int dwWriteSymbol(symbol *pSym);
-int dwWriteType(structdef *sdef, int block, int inStruct, char *tag);
-int dwWriteModule(char *name);
-int dwWriteCLine(iCode *ic);
-int dwWriteALine(char *module, int Line);
-int dwWriteFrameAddress(char *variable, struct regs *reg, int offset);
-int dwWriteBasicSymbol(symbol *sym, int isStructSym, int isFunc);
+int dwOpenFile (const char *file);
+int dwCloseFile (void);
+int dwWriteFunction (symbol *pSym, iCode *ic);
+int dwWriteEndFunction (symbol *pSym, iCode *ic, int offset);
+int dwWriteLabel (symbol *pSym, iCode *ic);
+int dwWriteScope (iCode *ic);
+int dwWriteSymbol (symbol *pSym);
+int dwWriteType (structdef *sdef, int block, int inStruct, const char *tag);
+int dwWriteModule (const char *name);
+int dwWriteCLine (iCode *ic);
+int dwWriteALine (const char *module, int Line);
+int dwWriteFrameAddress (const char *variable, struct regs *reg, int offset);
+int dwWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc);
      
 
 DEBUGFILE dwarf2DebugFile = 
@@ -118,9 +118,9 @@ dwWriteByte (char * label, int offset, char * comment)
   if (label)
     {
       if (offset)
-	fprintf (dwarf2FilePtr, "%s+%d", label, offset);
+        fprintf (dwarf2FilePtr, "%s+%d", label, offset);
       else
-	fprintf (dwarf2FilePtr, "%s", label);
+        fprintf (dwarf2FilePtr, "%s", label);
     }
   else
     fprintf (dwarf2FilePtr, "%d", offset);
@@ -139,15 +139,15 @@ dwWriteByte (char * label, int offset, char * comment)
 /* The label and comment parameters are optional                        */
 /*----------------------------------------------------------------------*/
 static void
-dwWriteHalf (char * label, int offset, char * comment)
+dwWriteHalf (const char * label, int offset, char * comment)
 {
   tfprintf (dwarf2FilePtr, "\t!dw\t");
   if (label)
     {
       if (offset)
-	fprintf (dwarf2FilePtr, "%s+%d", label, offset);
+        fprintf (dwarf2FilePtr, "%s+%d", label, offset);
       else
-	fprintf (dwarf2FilePtr, "%s", label);
+        fprintf (dwarf2FilePtr, "%s", label);
     }
   else
     fprintf (dwarf2FilePtr, "%d", offset);
@@ -166,7 +166,7 @@ dwWriteHalf (char * label, int offset, char * comment)
 /* The label and comment parameters are optional                        */
 /*----------------------------------------------------------------------*/
 static void
-dwWriteWord (char * label, int offset, char * comment)
+dwWriteWord (const char * label, int offset, char * comment)
 {
   /* FIXME: need to implement !dd pseudo-op in the assember. In the */
   /* meantime, we use dw with zero padding and hope the values fit  */
@@ -176,9 +176,9 @@ dwWriteWord (char * label, int offset, char * comment)
   if (label)
     {
       if (offset)
-	fprintf (dwarf2FilePtr, "%s+%d", label, offset);
+        fprintf (dwarf2FilePtr, "%s+%d", label, offset);
       else
-	fprintf (dwarf2FilePtr, "%s", label);
+        fprintf (dwarf2FilePtr, "%s", label);
     }
   else
     fprintf (dwarf2FilePtr, "%d", offset);
@@ -187,26 +187,26 @@ dwWriteWord (char * label, int offset, char * comment)
   if (port->little_endian)
     {
       if (label)
-	{
-	  if (offset)
-	    fprintf (dwarf2FilePtr, "(%s+%d),0", label, offset);
-	  else
-	    fprintf (dwarf2FilePtr, "(%s),0", label);
-	}
+        {
+          if (offset)
+            fprintf (dwarf2FilePtr, "(%s+%d),0", label, offset);
+          else
+            fprintf (dwarf2FilePtr, "(%s),0", label);
+        }
       else
-	fprintf (dwarf2FilePtr, "%d,%d", offset, offset >> 16);
+        fprintf (dwarf2FilePtr, "%d,%d", offset, offset >> 16);
     }
   else
     {
       if (label)
-	{
-	  if (offset)
-	    fprintf (dwarf2FilePtr, "0,(%s+%d)", label, offset);
-	  else
-	    fprintf (dwarf2FilePtr, "0,(%s)", label);
-	}
+        {
+          if (offset)
+            fprintf (dwarf2FilePtr, "0,(%s+%d)", label, offset);
+          else
+            fprintf (dwarf2FilePtr, "0,(%s)", label);
+        }
       else
-	fprintf (dwarf2FilePtr, "%d,%d", offset >> 16, offset);
+        fprintf (dwarf2FilePtr, "%d,%d", offset >> 16, offset);
     }
 #endif
   
@@ -232,9 +232,9 @@ dwWriteULEB128 (char * label, int offset, char * comment)
   if (label)
     {
       if (offset)
-	fprintf (dwarf2FilePtr, "%s+%d", label, offset);
+        fprintf (dwarf2FilePtr, "%s+%d", label, offset);
       else
-	fprintf (dwarf2FilePtr, "%s", label);
+        fprintf (dwarf2FilePtr, "%s", label);
     }
   else
     fprintf (dwarf2FilePtr, "%d", offset);
@@ -260,9 +260,9 @@ dwWriteSLEB128 (char * label, int offset, char * comment)
   if (label)
     {
       if (offset)
-	fprintf (dwarf2FilePtr, "%s+%d", label, offset);
+        fprintf (dwarf2FilePtr, "%s+%d", label, offset);
       else
-	fprintf (dwarf2FilePtr, "%s", label);
+        fprintf (dwarf2FilePtr, "%s", label);
     }
   else
     fprintf (dwarf2FilePtr, "%d", offset);
@@ -347,7 +347,7 @@ dwWriteString (char * string, char * comment)
 /* parameters are optional                                              */
 /*----------------------------------------------------------------------*/
 static void
-dwWriteAddress (char * label, int offset, char * comment)
+dwWriteAddress (const char * label, int offset, char * comment)
 {
   switch (port->debugger.dwarf.addressSize)
     {
@@ -359,7 +359,7 @@ dwWriteAddress (char * label, int offset, char * comment)
       break;
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	      "unsupported port->debugger.dwarf.addressSize");
+              "unsupported port->debugger.dwarf.addressSize");
     }
 }
 
@@ -431,7 +431,7 @@ dwWriteAddressDelta (char * label1, char * label2)
       break;
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	      "unsupported port->debugger.dwarf.addressSize");
+              "unsupported port->debugger.dwarf.addressSize");
     }
 }
 
@@ -459,7 +459,7 @@ dwWriteULEB128Delta (char * label1, char * label2, int offset)
 /* dwNewLoc - allocates a new location expression node                  */
 /*----------------------------------------------------------------------*/
 dwloc *
-dwNewLoc (int opcode, char * label, int offset)
+dwNewLoc (int opcode, const char * label, int offset)
 {
   dwloc * lp;
   
@@ -486,77 +486,77 @@ dwSizeofLoc (dwloc * lp)
       size++;
       switch (lp->opcode)
         {
-	case DW_OP_addr:
-	  size += port->debugger.dwarf.addressSize;
-	  break;
-	  
-	case DW_OP_deref_size:
-	case DW_OP_xderef_size:
-	case DW_OP_pick:
-	case DW_OP_const1u:
-	case DW_OP_const1s:
-	  size += 1;
-	  break;
-	
-	case DW_OP_skip:
-	case DW_OP_bra:
-	case DW_OP_const2u:
-	case DW_OP_const2s:
-	  size += 2;
-	  break;
-	
-	case DW_OP_const4u:
-	case DW_OP_const4s:
-	  size += 4;
-	  break;
-	
-	case DW_OP_const8u:
-	case DW_OP_const8s:
-	  size += 8;
-	  break;
+        case DW_OP_addr:
+          size += port->debugger.dwarf.addressSize;
+          break;
+          
+        case DW_OP_deref_size:
+        case DW_OP_xderef_size:
+        case DW_OP_pick:
+        case DW_OP_const1u:
+        case DW_OP_const1s:
+          size += 1;
+          break;
+        
+        case DW_OP_skip:
+        case DW_OP_bra:
+        case DW_OP_const2u:
+        case DW_OP_const2s:
+          size += 2;
+          break;
+        
+        case DW_OP_const4u:
+        case DW_OP_const4s:
+          size += 4;
+          break;
+        
+        case DW_OP_const8u:
+        case DW_OP_const8s:
+          size += 8;
+          break;
 
-	case DW_OP_piece:
-	case DW_OP_regx:
-	case DW_OP_plus_uconst:
-	  size += dwSizeofULEB128 (lp->operand.offset);
-	  break;
-	
-	case DW_OP_breg0:
-	case DW_OP_breg1:
-	case DW_OP_breg2:
-	case DW_OP_breg3:
-	case DW_OP_breg4:
-	case DW_OP_breg5:
-	case DW_OP_breg6:
-	case DW_OP_breg7:
-	case DW_OP_breg8:
-	case DW_OP_breg9:
-	case DW_OP_breg10:
-	case DW_OP_breg11:
-	case DW_OP_breg12:
-	case DW_OP_breg13:
-	case DW_OP_breg14:
-	case DW_OP_breg15:
-	case DW_OP_breg16:
-	case DW_OP_breg17:
-	case DW_OP_breg18:
-	case DW_OP_breg19:
-	case DW_OP_breg20:
-	case DW_OP_breg21:
-	case DW_OP_breg22:
-	case DW_OP_breg23:
-	case DW_OP_breg24:
-	case DW_OP_breg25:
-	case DW_OP_breg26:
-	case DW_OP_breg27:
-	case DW_OP_breg28:
-	case DW_OP_breg29:
-	case DW_OP_breg30:
-	case DW_OP_breg31:
-	case DW_OP_fbreg:
-	  size += dwSizeofSLEB128 (lp->operand.offset);
-	  break;
-	}
+        case DW_OP_piece:
+        case DW_OP_regx:
+        case DW_OP_plus_uconst:
+          size += dwSizeofULEB128 (lp->operand.offset);
+          break;
+        
+        case DW_OP_breg0:
+        case DW_OP_breg1:
+        case DW_OP_breg2:
+        case DW_OP_breg3:
+        case DW_OP_breg4:
+        case DW_OP_breg5:
+        case DW_OP_breg6:
+        case DW_OP_breg7:
+        case DW_OP_breg8:
+        case DW_OP_breg9:
+        case DW_OP_breg10:
+        case DW_OP_breg11:
+        case DW_OP_breg12:
+        case DW_OP_breg13:
+        case DW_OP_breg14:
+        case DW_OP_breg15:
+        case DW_OP_breg16:
+        case DW_OP_breg17:
+        case DW_OP_breg18:
+        case DW_OP_breg19:
+        case DW_OP_breg20:
+        case DW_OP_breg21:
+        case DW_OP_breg22:
+        case DW_OP_breg23:
+        case DW_OP_breg24:
+        case DW_OP_breg25:
+        case DW_OP_breg26:
+        case DW_OP_breg27:
+        case DW_OP_breg28:
+        case DW_OP_breg29:
+        case DW_OP_breg30:
+        case DW_OP_breg31:
+        case DW_OP_fbreg:
+          size += dwSizeofSLEB128 (lp->operand.offset);
+          break;
+        }
       
       lp = lp->next;
     }
@@ -575,73 +575,73 @@ dwWriteLoc (dwloc *lp)
       dwWriteByte (NULL, lp->opcode, NULL);
       switch (lp->opcode)
         {
-	case DW_OP_addr:
-	  dwWriteAddress (lp->operand.label, lp->operand.offset, NULL);
-	  break;
-	  
-	case DW_OP_deref_size:
-	case DW_OP_xderef_size:
-	case DW_OP_pick:
-	case DW_OP_const1u:
-	case DW_OP_const1s:
-	  dwWriteByte (NULL, lp->operand.offset, NULL);
-	  break;
-	
-	case DW_OP_skip:
-	case DW_OP_bra:
-	case DW_OP_const2u:
-	case DW_OP_const2s:
-	  dwWriteHalf (NULL, lp->operand.offset, NULL);
-	  break;
-	
-	case DW_OP_const4u:
-	case DW_OP_const4s:
-	  dwWriteWord (NULL, lp->operand.offset, NULL);
-	  break;
-	
-	case DW_OP_piece:
-	case DW_OP_regx:
-	case DW_OP_plus_uconst:
-	  dwWriteULEB128 (NULL, lp->operand.offset, NULL);
-	  break;
-	
-	case DW_OP_breg0:
-	case DW_OP_breg1:
-	case DW_OP_breg2:
-	case DW_OP_breg3:
-	case DW_OP_breg4:
-	case DW_OP_breg5:
-	case DW_OP_breg6:
-	case DW_OP_breg7:
-	case DW_OP_breg8:
-	case DW_OP_breg9:
-	case DW_OP_breg10:
-	case DW_OP_breg11:
-	case DW_OP_breg12:
-	case DW_OP_breg13:
-	case DW_OP_breg14:
-	case DW_OP_breg15:
-	case DW_OP_breg16:
-	case DW_OP_breg17:
-	case DW_OP_breg18:
-	case DW_OP_breg19:
-	case DW_OP_breg20:
-	case DW_OP_breg21:
-	case DW_OP_breg22:
-	case DW_OP_breg23:
-	case DW_OP_breg24:
-	case DW_OP_breg25:
-	case DW_OP_breg26:
-	case DW_OP_breg27:
-	case DW_OP_breg28:
-	case DW_OP_breg29:
-	case DW_OP_breg30:
-	case DW_OP_breg31:
-	case DW_OP_fbreg:
-	  dwWriteSLEB128 (NULL, lp->operand.offset, NULL);
-	  break;
-	}
-	
+        case DW_OP_addr:
+          dwWriteAddress (lp->operand.label, lp->operand.offset, NULL);
+          break;
+          
+        case DW_OP_deref_size:
+        case DW_OP_xderef_size:
+        case DW_OP_pick:
+        case DW_OP_const1u:
+        case DW_OP_const1s:
+          dwWriteByte (NULL, lp->operand.offset, NULL);
+          break;
+        
+        case DW_OP_skip:
+        case DW_OP_bra:
+        case DW_OP_const2u:
+        case DW_OP_const2s:
+          dwWriteHalf (NULL, lp->operand.offset, NULL);
+          break;
+        
+        case DW_OP_const4u:
+        case DW_OP_const4s:
+          dwWriteWord (NULL, lp->operand.offset, NULL);
+          break;
+        
+        case DW_OP_piece:
+        case DW_OP_regx:
+        case DW_OP_plus_uconst:
+          dwWriteULEB128 (NULL, lp->operand.offset, NULL);
+          break;
+        
+        case DW_OP_breg0:
+        case DW_OP_breg1:
+        case DW_OP_breg2:
+        case DW_OP_breg3:
+        case DW_OP_breg4:
+        case DW_OP_breg5:
+        case DW_OP_breg6:
+        case DW_OP_breg7:
+        case DW_OP_breg8:
+        case DW_OP_breg9:
+        case DW_OP_breg10:
+        case DW_OP_breg11:
+        case DW_OP_breg12:
+        case DW_OP_breg13:
+        case DW_OP_breg14:
+        case DW_OP_breg15:
+        case DW_OP_breg16:
+        case DW_OP_breg17:
+        case DW_OP_breg18:
+        case DW_OP_breg19:
+        case DW_OP_breg20:
+        case DW_OP_breg21:
+        case DW_OP_breg22:
+        case DW_OP_breg23:
+        case DW_OP_breg24:
+        case DW_OP_breg25:
+        case DW_OP_breg26:
+        case DW_OP_breg27:
+        case DW_OP_breg28:
+        case DW_OP_breg29:
+        case DW_OP_breg30:
+        case DW_OP_breg31:
+        case DW_OP_fbreg:
+          dwWriteSLEB128 (NULL, lp->operand.offset, NULL);
+          break;
+        }
+        
       lp = lp->next;
     }
 }
@@ -720,13 +720,13 @@ dwWriteLocLists (void)
       //fprintf (dwarf2FilePtr, "; baseOffset = 0x%x\n", llp->baseOffset);
       lrp = llp->region;
       while (lrp)
-	{
-	  dwWriteAddress (lrp->startLabel, 0, NULL);
-	  dwWriteAddress (lrp->endLabel, 0, NULL);
-	  dwWriteHalf (NULL, dwSizeofLoc (lrp->loc), NULL);
-	  dwWriteLoc (lrp->loc);
-	  lrp = lrp ->next;
-	}
+        {
+          dwWriteAddress (lrp->startLabel, 0, NULL);
+          dwWriteAddress (lrp->endLabel, 0, NULL);
+          dwWriteHalf (NULL, dwSizeofLoc (lrp->loc), NULL);
+          dwWriteLoc (lrp->loc);
+          lrp = lrp ->next;
+        }
 
       dwWriteAddress (NULL, 0, NULL);
       dwWriteAddress (NULL, 0, NULL);
@@ -762,7 +762,6 @@ dwFreeAttr (dwattr * ap)
 {
   Safe_free (ap);
 }
-
 
 
 /*-------------------------------------------------------------------------*/
@@ -950,81 +949,81 @@ dwWriteAttr (dwattr * ap)
   switch (ap->form)
     {
       case DW_FORM_addr:
-	dwWriteAddress (ap->val.symaddr.label, ap->val.symaddr.offset, NULL);
-	break;
+        dwWriteAddress (ap->val.symaddr.label, ap->val.symaddr.offset, NULL);
+        break;
       
       case DW_FORM_block:
         dwWriteULEB128 (NULL, dwSizeofLoc (ap->val.loc), NULL);
-	dwWriteLoc (ap->val.loc);
-	break;
+        dwWriteLoc (ap->val.loc);
+        break;
       
       case DW_FORM_block1:
         dwWriteByte (NULL, dwSizeofLoc (ap->val.loc), NULL);
-	dwWriteLoc (ap->val.loc);
-	break;
+        dwWriteLoc (ap->val.loc);
+        break;
       
       case DW_FORM_block2:
         dwWriteHalf (NULL, dwSizeofLoc (ap->val.loc), NULL);
-	dwWriteLoc (ap->val.loc);
-	break;
+        dwWriteLoc (ap->val.loc);
+        break;
       
       case DW_FORM_block4:
         dwWriteWord (NULL, dwSizeofLoc (ap->val.loc), NULL);
-	dwWriteLoc (ap->val.loc);
-	break;
+        dwWriteLoc (ap->val.loc);
+        break;
       
       case DW_FORM_data1:
       case DW_FORM_flag:
         dwWriteByte (NULL, ap->val.data, NULL);
-	break;
+        break;
       
       case DW_FORM_data2:
         dwWriteHalf (NULL, ap->val.data, NULL);
-	break;
+        break;
       
       case DW_FORM_data4:
         switch (ap->attr)
-	  {
-	  case DW_AT_stmt_list:
-	    dwWriteWord (ap->val.symaddr.label, ap->val.symaddr.offset, NULL);
-	    break;
-	  case DW_AT_location:
-	  case DW_AT_frame_base:
-	    dwWriteWord ("Ldebug_loc_start", ap->val.loclist->baseOffset, NULL);
-	    break;
-	  default:
-	    dwWriteWord (NULL, ap->val.data, NULL);
-	  }
-	break;
+          {
+          case DW_AT_stmt_list:
+            dwWriteWord (ap->val.symaddr.label, ap->val.symaddr.offset, NULL);
+            break;
+          case DW_AT_location:
+          case DW_AT_frame_base:
+            dwWriteWord ("Ldebug_loc_start", ap->val.loclist->baseOffset, NULL);
+            break;
+          default:
+            dwWriteWord (NULL, ap->val.data, NULL);
+          }
+        break;
       
       case DW_FORM_udata:
         dwWriteULEB128 (NULL, ap->val.data, NULL);
-	break;
+        break;
       
       case DW_FORM_sdata:
         dwWriteSLEB128 (NULL, ap->val.data, NULL);
-	break;
+        break;
 
       case DW_FORM_string:
         dwWriteString (ap->val.string, NULL);
-	break;
+        break;
       
       case DW_FORM_ref1:
-	dwWriteByte (NULL, ap->val.ref->baseOffset, NULL);
-	break;
+        dwWriteByte (NULL, ap->val.ref->baseOffset, NULL);
+        break;
       
       case DW_FORM_ref2:
-	dwWriteHalf (NULL, ap->val.ref->baseOffset, NULL);
-	break;
+        dwWriteHalf (NULL, ap->val.ref->baseOffset, NULL);
+        break;
       
       case DW_FORM_ref4:
-	dwWriteWord (NULL, ap->val.ref->baseOffset, NULL);
-	break;
-	
+        dwWriteWord (NULL, ap->val.ref->baseOffset, NULL);
+        break;
+        
       default:
         werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		"unsupported DWARF form");
-	exit (1);
+                "unsupported DWARF form");
+        exit (1);
     }
 }
 
@@ -1085,11 +1084,11 @@ dwSizeofAttr (dwattr * ap)
       
       case DW_FORM_ref4:
         return 4;
-	
+        
       default:
         werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		"unsupported DWARF form");
-	exit (1);
+                "unsupported DWARF form");
+        exit (1);
     }
     
 }
@@ -1294,7 +1293,7 @@ static int
 dwAssignAbbrev (dwtag *tp, void *info)
 {
   dwtag * oldtp;
-  int * anp = info;	/* pointer to current abbreviation number */
+  int * anp = info;     /* pointer to current abbreviation number */
   int key;
   
   if (!tp)
@@ -1334,14 +1333,14 @@ dwWriteAbbrevs (void)
       dwWriteULEB128 (NULL, tp->abbrev, NULL);
       dwWriteULEB128 (NULL, tp->tag, NULL);
       dwWriteByte (NULL, tp->firstChild ? DW_CHILDREN_yes : DW_CHILDREN_no,
-		   NULL);
+                   NULL);
       ap = tp->attribs;
       while (ap)
         {
-	  dwWriteULEB128 (NULL, ap->attr, NULL);
-	  dwWriteULEB128 (NULL, ap->form, NULL);
-	  ap = ap->next;
-	}
+          dwWriteULEB128 (NULL, ap->attr, NULL);
+          dwWriteULEB128 (NULL, ap->form, NULL);
+          ap = ap->next;
+        }
       dwWriteULEB128 (NULL, 0, NULL);
       dwWriteULEB128 (NULL, 0, NULL);
       
@@ -1484,9 +1483,9 @@ dwDeleteTagAttr (dwtag *tp, void *info)
     {
       if (ap->next && ap->next->attr == attr)
         {
-	  ap->next = ap->next->next;
-	  return 1;
-	}
+          ap->next = ap->next->next;
+          return 1;
+        }
       ap = ap->next;
     }
   
@@ -1523,21 +1522,21 @@ dwWritePubnames (void)
     {
       tp = dwRootTag->firstChild;
       while (tp)
-	{
-	  if (tp->tag == DW_TAG_variable || tp->tag == DW_TAG_subprogram)
-	    {
-	      /* If it has a name and is externally visible, it's a pubname */
-	      ap1 = dwFindAttr (tp, DW_AT_external);
-	      ap2 = dwFindAttr (tp, DW_AT_name);
-	      if (ap1 && ap1->val.data && ap2)
-		{
-		  dwWriteWord (NULL, tp->baseOffset, NULL);
-		  dwWriteString (ap2->val.string, NULL);
-		}
-	    }
-	
-	  tp = tp->siblings;
-	}
+        {
+          if (tp->tag == DW_TAG_variable || tp->tag == DW_TAG_subprogram)
+            {
+              /* If it has a name and is externally visible, it's a pubname */
+              ap1 = dwFindAttr (tp, DW_AT_external);
+              ap2 = dwFindAttr (tp, DW_AT_name);
+              if (ap1 && ap1->val.data && ap2)
+                {
+                  dwWriteWord (NULL, tp->baseOffset, NULL);
+                  dwWriteString (ap2->val.string, NULL);
+                }
+            }
+        
+          tp = tp->siblings;
+        }
     }  
   dwWriteWord (NULL, 0, NULL);
   tfprintf (dwarf2FilePtr, "!slabeldef\n", "Ldebug_pubnames_end");
@@ -1575,9 +1574,9 @@ dwFindFileIndex (char * filename)
       if (!strncmp (includeDir, filename, strlen (includeDir))
           && strlen (filename) > strlen (includeDir))
         {
-	  if (IS_DIR_SEPARATOR(filename[strlen (includeDir)]))
-	    break;
-	}
+          if (IS_DIR_SEPARATOR(filename[strlen (includeDir)]))
+            break;
+        }
     }
   if (!includeDir)
     dirIndex = 0;
@@ -1649,17 +1648,17 @@ dwWriteLineNumber (dwline * lp)
   else if (lp->end_sequence)
     {
       if (deltaAddrValid)
-	{
-	  dwWriteByte (NULL, DW_LNS_advance_pc, NULL);
-	  dwWriteULEB128 (NULL, deltaAddr, NULL);
-	}
+        {
+          dwWriteByte (NULL, DW_LNS_advance_pc, NULL);
+          dwWriteULEB128 (NULL, deltaAddr, NULL);
+        }
       else
         {
-	  dwWriteByte (NULL, DW_LNS_fixed_advance_pc, NULL);
-	  dwWriteHalfDelta (lp->label, curLabel, lp->offset-curOffset);
-	  curLabel = lp->label;
-	  curOffset = lp->offset;
-	}
+          dwWriteByte (NULL, DW_LNS_fixed_advance_pc, NULL);
+          dwWriteHalfDelta (lp->label, curLabel, lp->offset-curOffset);
+          curLabel = lp->label;
+          curOffset = lp->offset;
+        }
       
       dwWriteByte (NULL, 0, NULL);
       dwWriteULEB128 (NULL, 1, NULL);
@@ -1674,51 +1673,51 @@ dwWriteLineNumber (dwline * lp)
       #if 0
       if (deltaLine >= dwLineBase && deltaLine < (dwLineBase+dwLineRange))
         {
-	  int opcode;
-	  
-	  /* try to build a "special" opcode */
-	  opcode = dwLineOpcodeBase + (deltaLine - dwLineBase);
-	  if (deltaAddrValid)
-	    opcode += deltaAddr*dwLineRange;
-	  
-	  if (opcode >= dwLineOpcodeBase && opcode <= 255)
-	    {
-	      /* ok, we can use a "special" opcode */
-	      
-	      /* If the deltaAddr value was symbolic, it can't be part */
-	      /* of the "special" opcode, so encode it seperately      */
-	      if (!deltaAddrValid)
-	        {
-		  dwWriteByte (NULL, DW_LNS_advance_pc, NULL);
-		  dwWriteULEB128Delta (lp->label, curLabel, lp->offset-curOffset);
-		  curLabel = lp->label;
-		  curOffset = lp->offset;
-		}
+          int opcode;
+          
+          /* try to build a "special" opcode */
+          opcode = dwLineOpcodeBase + (deltaLine - dwLineBase);
+          if (deltaAddrValid)
+            opcode += deltaAddr*dwLineRange;
+          
+          if (opcode >= dwLineOpcodeBase && opcode <= 255)
+            {
+              /* ok, we can use a "special" opcode */
+              
+              /* If the deltaAddr value was symbolic, it can't be part */
+              /* of the "special" opcode, so encode it seperately      */
+              if (!deltaAddrValid)
+                {
+                  dwWriteByte (NULL, DW_LNS_advance_pc, NULL);
+                  dwWriteULEB128Delta (lp->label, curLabel, lp->offset-curOffset);
+                  curLabel = lp->label;
+                  curOffset = lp->offset;
+                }
 
-	      /* Write the "special" opcode */	      
-	      dwWriteByte (NULL, opcode, NULL);
-	      curLine = lp->line;
-	      usedSpecial = 1;
-	    }
-	}
+              /* Write the "special" opcode */        
+              dwWriteByte (NULL, opcode, NULL);
+              curLine = lp->line;
+              usedSpecial = 1;
+            }
+        }
       #endif
       
       /* If we couldn't use the "special" opcode, we will have to */
       /* encode this the long way.                                */
       if (!usedSpecial)
         {
-	  dwWriteByte (NULL, DW_LNS_fixed_advance_pc, NULL);
-	  dwWriteHalfDelta (lp->label, curLabel, lp->offset-curOffset);
-	  curLabel = lp->label;
-	  curOffset = lp->offset;
-	
-	  dwWriteByte (NULL, DW_LNS_advance_line, NULL);
-	  dwWriteSLEB128 (NULL, deltaLine, NULL);
-	  curLine = lp->line;
-	  
-	  dwWriteByte (NULL, DW_LNS_copy, NULL);
-	}
-	
+          dwWriteByte (NULL, DW_LNS_fixed_advance_pc, NULL);
+          dwWriteHalfDelta (lp->label, curLabel, lp->offset-curOffset);
+          curLabel = lp->label;
+          curOffset = lp->offset;
+        
+          dwWriteByte (NULL, DW_LNS_advance_line, NULL);
+          dwWriteSLEB128 (NULL, deltaLine, NULL);
+          curLine = lp->line;
+          
+          dwWriteByte (NULL, DW_LNS_copy, NULL);
+        }
+        
     }
     
 }
@@ -1753,15 +1752,15 @@ dwWriteLineNumbers (void)
   
   dwWriteByte (NULL, 9+1, NULL);  /* there are 9 standard opcodes */
   
-  dwWriteByte (NULL, 0, NULL);	/* number of DW_LNS_copy arguments */
-  dwWriteByte (NULL, 1, NULL);	/* number of DW_LNS_advance_pc arguments */
-  dwWriteByte (NULL, 1, NULL);	/* number of DW_LNS_advance_line arguments */
-  dwWriteByte (NULL, 1, NULL);	/* number of DW_LNS_set_file arguments */
-  dwWriteByte (NULL, 1, NULL);	/* number of DW_LNS_set_column arguments */
-  dwWriteByte (NULL, 0, NULL);	/* number of DW_LNS_negate_stmt arguments */
-  dwWriteByte (NULL, 0, NULL);	/* number of DW_LNS_set_basic_block arguments */
-  dwWriteByte (NULL, 0, NULL);	/* number of DW_LNS_const_add_pc arguments */
-  dwWriteByte (NULL, 1, NULL);	/* number of DW_LNS_fixed_advance_pc arguments */
+  dwWriteByte (NULL, 0, NULL);  /* number of DW_LNS_copy arguments */
+  dwWriteByte (NULL, 1, NULL);  /* number of DW_LNS_advance_pc arguments */
+  dwWriteByte (NULL, 1, NULL);  /* number of DW_LNS_advance_line arguments */
+  dwWriteByte (NULL, 1, NULL);  /* number of DW_LNS_set_file arguments */
+  dwWriteByte (NULL, 1, NULL);  /* number of DW_LNS_set_column arguments */
+  dwWriteByte (NULL, 0, NULL);  /* number of DW_LNS_negate_stmt arguments */
+  dwWriteByte (NULL, 0, NULL);  /* number of DW_LNS_set_basic_block arguments */
+  dwWriteByte (NULL, 0, NULL);  /* number of DW_LNS_const_add_pc arguments */
+  dwWriteByte (NULL, 1, NULL);  /* number of DW_LNS_fixed_advance_pc arguments */
 
   /* Write the list of source directories searched */
   for (includeDir = setFirstItem (includeDirsSet);
@@ -1814,50 +1813,50 @@ dwWriteCFAinstructions (dwcfins *ip)
       dwWriteByte (NULL, op->opcode, NULL);
       switch (op->opcode >> 6)
         {
-	case 0:
-	  switch (op->opcode)
-	    {
-	    case DW_CFA_set_loc:
-	      dwWriteAddress (NULL, op->label, op->operand1);
-	      break;
-	    
-	    case DW_CFA_advance_loc1:
-	      dwWriteByte (NULL, op->operand1, NULL);
-	      break;
-	    
-	    case DW_CFA_advance_loc2:
-	      dwWriteHalf (NULL, op->operand1, NULL);
-	      break;
-	    
-	    case DW_CFA_advance_loc4:
-	      dwWriteWord (NULL, op->operand1, NULL);
-	      break;
-	    
-	    case DW_CFA_def_cfa:
-	    case DW_CFA_register:
-	    case DW_CFA_offset_extended:
-	      dwWriteULEB128 (NULL, op->operand1, NULL);
-	      dwWriteULEB128 (NULL, op->operand2, NULL);
-	      break;
-	    
-	    case DW_CFA_undefined:
-	    case DW_CFA_same_value:
-	    case DW_CFA_def_cfa_register:
-	    case DW_CFA_def_cfa_offset:
-	    case DW_CFA_restore_extended:
-	      dwWriteULEB128 (NULL, op->operand1, NULL);
-	      break;
-	    }
-	  break;
-	
-	case DW_CFA_restore >> 6:
-	case DW_CFA_advance_loc >> 6:
-	  break;
-	
-	case DW_CFA_offset >> 6:
-	  dwWriteULEB128 (NULL, op->operand1, NULL);
-	  break;
-	}
+        case 0:
+          switch (op->opcode)
+            {
+            case DW_CFA_set_loc:
+              dwWriteAddress (NULL, op->label, op->operand1);
+              break;
+            
+            case DW_CFA_advance_loc1:
+              dwWriteByte (NULL, op->operand1, NULL);
+              break;
+            
+            case DW_CFA_advance_loc2:
+              dwWriteHalf (NULL, op->operand1, NULL);
+              break;
+            
+            case DW_CFA_advance_loc4:
+              dwWriteWord (NULL, op->operand1, NULL);
+              break;
+            
+            case DW_CFA_def_cfa:
+            case DW_CFA_register:
+            case DW_CFA_offset_extended:
+              dwWriteULEB128 (NULL, op->operand1, NULL);
+              dwWriteULEB128 (NULL, op->operand2, NULL);
+              break;
+            
+            case DW_CFA_undefined:
+            case DW_CFA_same_value:
+            case DW_CFA_def_cfa_register:
+            case DW_CFA_def_cfa_offset:
+            case DW_CFA_restore_extended:
+              dwWriteULEB128 (NULL, op->operand1, NULL);
+              break;
+            }
+          break;
+        
+        case DW_CFA_restore >> 6:
+        case DW_CFA_advance_loc >> 6:
+          break;
+        
+        case DW_CFA_offset >> 6:
+          dwWriteULEB128 (NULL, op->operand1, NULL);
+          break;
+        }
       op = op->next;
     }
 }
@@ -1873,50 +1872,50 @@ dwSizeofCFAinstructions (dwcfins *ip)
       size++;
       switch (op->opcode >> 6)
         {
-	case 0:
-	  switch (op->opcode)
-	    {
-	    case DW_CFA_set_loc:
-	      size += port->debugger.dwarf.addressSize;
-	      break;
-	    
-	    case DW_CFA_advance_loc1:
-	      size += 1;
-	      break;
-	    
-	    case DW_CFA_advance_loc2:
-	      size += 2;
-	      break;
-	    
-	    case DW_CFA_advance_loc4:
-	      size += 4;
-	      break;
-	    
-	    case DW_CFA_def_cfa:
-	    case DW_CFA_register:
-	    case DW_CFA_offset_extended:
-	      size += dwSizeofULEB128 (op->operand1);
-	      size += dwSizeofULEB128 (op->operand2);
-	      break;
-	    
-	    case DW_CFA_undefined:
-	    case DW_CFA_same_value:
-	    case DW_CFA_def_cfa_register:
-	    case DW_CFA_def_cfa_offset:
-	    case DW_CFA_restore_extended:
-	      size += dwSizeofULEB128 (op->operand1);
-	      break;
-	    }
-	  break;
-	
-	case DW_CFA_restore >> 6:
-	case DW_CFA_advance_loc >> 6:
-	  break;
-	
-	case DW_CFA_offset >> 6:
-	  size += dwSizeofULEB128 (op->operand1);
-	  break;
-	}
+        case 0:
+          switch (op->opcode)
+            {
+            case DW_CFA_set_loc:
+              size += port->debugger.dwarf.addressSize;
+              break;
+            
+            case DW_CFA_advance_loc1:
+              size += 1;
+              break;
+            
+            case DW_CFA_advance_loc2:
+              size += 2;
+              break;
+            
+            case DW_CFA_advance_loc4:
+              size += 4;
+              break;
+            
+            case DW_CFA_def_cfa:
+            case DW_CFA_register:
+            case DW_CFA_offset_extended:
+              size += dwSizeofULEB128 (op->operand1);
+              size += dwSizeofULEB128 (op->operand2);
+              break;
+            
+            case DW_CFA_undefined:
+            case DW_CFA_same_value:
+            case DW_CFA_def_cfa_register:
+            case DW_CFA_def_cfa_offset:
+            case DW_CFA_restore_extended:
+              size += dwSizeofULEB128 (op->operand1);
+              break;
+            }
+          break;
+        
+        case DW_CFA_restore >> 6:
+        case DW_CFA_advance_loc >> 6:
+          break;
+        
+        case DW_CFA_offset >> 6:
+          size += dwSizeofULEB128 (op->operand1);
+          break;
+        }
       op = op->next;
     }
   return size;
@@ -1972,21 +1971,21 @@ dwGenCFIins (void)
   if (port->debugger.dwarf.cfiUndef)
     for (i=0; i < port->debugger.dwarf.cfiUndef->size; i++)
       {
-	if (bitVectBitValue (port->debugger.dwarf.cfiUndef, i))
-	  {
-	    op = dwNewCFop (DW_CFA_undefined);
-	    dwAddCFinsOp (ip, op);
-	  }
+        if (bitVectBitValue (port->debugger.dwarf.cfiUndef, i))
+          {
+            op = dwNewCFop (DW_CFA_undefined);
+            dwAddCFinsOp (ip, op);
+          }
     }
   
   if (port->debugger.dwarf.cfiSame)
     for (i=0; i < port->debugger.dwarf.cfiSame->size; i++)
       {
-	if (bitVectBitValue (port->debugger.dwarf.cfiSame, i))
-	  {
-	    op = dwNewCFop (DW_CFA_undefined);
-	    dwAddCFinsOp (ip, op);
-	  }
+        if (bitVectBitValue (port->debugger.dwarf.cfiSame, i))
+          {
+            op = dwNewCFop (DW_CFA_undefined);
+            dwAddCFinsOp (ip, op);
+          }
       }
 
   return ip;
@@ -1997,7 +1996,7 @@ static void
 dwWriteFDE (dwfde * fp)
 {
   dwWriteWord (NULL, dwSizeofCFAinstructions(fp->ins) + 4
-		+ port->debugger.dwarf.addressSize * 2, NULL);
+                + port->debugger.dwarf.addressSize * 2, NULL);
   
   dwWriteWord ("Ldebug_CIE_start-4", 0, NULL);
   
@@ -2019,13 +2018,13 @@ dwWriteFrames (void)
   tfprintf (dwarf2FilePtr, "!slabeldef\n", "Ldebug_CIE_start");
   
   tfprintf (dwarf2FilePtr, "\t!dw\t0xffff\n");
-  tfprintf (dwarf2FilePtr, "\t!dw\t0xffff\n");	/* CIE_id */
+  tfprintf (dwarf2FilePtr, "\t!dw\t0xffff\n");  /* CIE_id */
 
-  tfprintf (dwarf2FilePtr, "\t!db\t%d\n",1);	/* CIE version number */
+  tfprintf (dwarf2FilePtr, "\t!db\t%d\n",1);    /* CIE version number */
 
-  tfprintf (dwarf2FilePtr, "\t!db\t%d\n",0);	/* augmentation (none) */
+  tfprintf (dwarf2FilePtr, "\t!db\t%d\n",0);    /* augmentation (none) */
 
-  dwWriteULEB128 (NULL, 1, NULL);	/* code alignment factor */
+  dwWriteULEB128 (NULL, 1, NULL);       /* code alignment factor */
   
   dwWriteSLEB128 (NULL, (port->stack.direction > 0) ? -1 : 1, NULL); /* data alignment factor */
   
@@ -2066,16 +2065,16 @@ dwHashType (sym_link * type)
     {
       hash = (hash << 5) ^ ((hash >> 8) & 0xff);
       if (IS_DECL (type))
-	{
+        {
           hash ^= DCL_TYPE (type);
-	}
+        }
       else
         {
           hash ^= SPEC_NOUN (type)
-	       | (SPEC_CONST (type) << 4)
-	       | (SPEC_VOLATILE (type) << 5)
-	       | (SPEC_LONG (type) << 6);
-	}
+               | (SPEC_CONST (type) << 4)
+               | (SPEC_VOLATILE (type) << 5)
+               | (SPEC_LONG (type) << 6);
+        }
       
       type = type->next;
     }  
@@ -2103,45 +2102,45 @@ dwMatchTypes (const void * type1v, const void * type2v)
     {
       if (IS_SPEC(type1))
         {
-	  if (IS_SPEC (type2))
-	    {
-	      if (SPEC_NOUN (type1) != SPEC_NOUN (type2))
-	        return 0;
-	      if (SPEC_NOUN (type1) == V_STRUCT
-	          && SPEC_STRUCT (type1) != SPEC_STRUCT (type2))
-		return 0;
-	      if (SPEC_CONST (type1) != SPEC_CONST (type2))
-	        return 0;
-	      if (SPEC_VOLATILE (type1) != SPEC_VOLATILE (type2))
-	        return 0;
-	      if (SPEC_SHORT (type1) != SPEC_SHORT (type2))
-	        return 0;
-	      if (SPEC_LONG (type1) != SPEC_LONG (type2))
-	        return 0;
-	      if (SPEC_USIGN (type1) != SPEC_USIGN (type2))
-	        return 0;
-	    }
-	  else
-	    return 0;
-	}
+          if (IS_SPEC (type2))
+            {
+              if (SPEC_NOUN (type1) != SPEC_NOUN (type2))
+                return 0;
+              if (SPEC_NOUN (type1) == V_STRUCT
+                  && SPEC_STRUCT (type1) != SPEC_STRUCT (type2))
+                return 0;
+              if (SPEC_CONST (type1) != SPEC_CONST (type2))
+                return 0;
+              if (SPEC_VOLATILE (type1) != SPEC_VOLATILE (type2))
+                return 0;
+              if (SPEC_SHORT (type1) != SPEC_SHORT (type2))
+                return 0;
+              if (SPEC_LONG (type1) != SPEC_LONG (type2))
+                return 0;
+              if (SPEC_USIGN (type1) != SPEC_USIGN (type2))
+                return 0;
+            }
+          else
+            return 0;
+        }
       else
         {
-	  if (IS_DECL (type2))
-	    {
-	      if (DCL_TYPE (type1) != DCL_TYPE (type2))
-	        return 0;
-	      if (DCL_PTR_CONST (type1) != DCL_PTR_CONST (type2))
-	        return 0;
-	      if (DCL_PTR_VOLATILE (type1) != DCL_PTR_VOLATILE (type2))
-	        return 0;
-	      if (DCL_TYPE (type1) == ARRAY
-	          && DCL_ELEM (type1) != DCL_ELEM (type2))
-	        return 0;
-	      /* FIXME: need to match function pointer parameters */
-	    }
-	  else
-	    return 0;
-	}
+          if (IS_DECL (type2))
+            {
+              if (DCL_TYPE (type1) != DCL_TYPE (type2))
+                return 0;
+              if (DCL_PTR_CONST (type1) != DCL_PTR_CONST (type2))
+                return 0;
+              if (DCL_PTR_VOLATILE (type1) != DCL_PTR_VOLATILE (type2))
+                return 0;
+              if (DCL_TYPE (type1) == ARRAY
+                  && DCL_ELEM (type1) != DCL_ELEM (type2))
+                return 0;
+              /* FIXME: need to match function pointer parameters */
+            }
+          else
+            return 0;
+        }
       
       type1 = type1->next;
       type2 = type2->next;
@@ -2176,270 +2175,270 @@ dwTagFromType (sym_link * type, dwtag * parent)
     {
       if (IS_DECL (type))
         {
-	  switch (DCL_TYPE (type))
-	    {
-	    case POINTER:
-	    case FPOINTER:
-	    case CPOINTER:
-	    case GPOINTER:
-	    case PPOINTER:
-	    case IPOINTER:
-	    case EEPPOINTER:
-	    case UPOINTER:
-	      tp = dwNewTag (DW_TAG_pointer_type);
-	      if (type->next && !IS_VOID (type->next))
-		{
-		  subtp = dwTagFromType (type->next, parent);
-		  dwAddTagAttr (tp, dwNewAttrTagRef (DW_AT_type, subtp));
-		}
-	      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						getSize (type)));
-	      dwAddTagChild (parent, tp);
-	      if (DCL_PTR_VOLATILE (type))
-	        {
-		  modtp = dwNewTag (DW_TAG_volatile_type);
-		  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
-		  dwAddTagChild (parent, modtp);
-		  tp = modtp;
-		}
-	      if (DCL_PTR_CONST (type))
-	        {
-		  modtp = dwNewTag (DW_TAG_const_type);
-		  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
-		  dwAddTagChild (parent, modtp);
-		  tp = modtp;
-		}
-	      break;
-	      
-	    case ARRAY:
-	      tp = dwNewTag (DW_TAG_array_type);
-	      subtp = dwTagFromType (type->next, parent);
-	      dwAddTagAttr (tp, dwNewAttrTagRef (DW_AT_type, subtp));
-	      if (!subtp->parent)
-	        dwAddTagChild (tp, subtp);
-	      if (DCL_ELEM (type))
-		{
-	          dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						    getSize (type)));
-		  subtp = dwNewTag (DW_TAG_subrange_type);
-		  dwAddTagAttr (subtp, dwNewAttrConst (DW_AT_upper_bound,
-						       DCL_ELEM (type)-1));
-		  dwAddTagChild (tp, subtp);
-		}
+          switch (DCL_TYPE (type))
+            {
+            case POINTER:
+            case FPOINTER:
+            case CPOINTER:
+            case GPOINTER:
+            case PPOINTER:
+            case IPOINTER:
+            case EEPPOINTER:
+            case UPOINTER:
+              tp = dwNewTag (DW_TAG_pointer_type);
+              if (type->next && !IS_VOID (type->next))
+                {
+                  subtp = dwTagFromType (type->next, parent);
+                  dwAddTagAttr (tp, dwNewAttrTagRef (DW_AT_type, subtp));
+                }
+              dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                getSize (type)));
+              dwAddTagChild (parent, tp);
+              if (DCL_PTR_VOLATILE (type))
+                {
+                  modtp = dwNewTag (DW_TAG_volatile_type);
+                  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
+                  dwAddTagChild (parent, modtp);
+                  tp = modtp;
+                }
+              if (DCL_PTR_CONST (type))
+                {
+                  modtp = dwNewTag (DW_TAG_const_type);
+                  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
+                  dwAddTagChild (parent, modtp);
+                  tp = modtp;
+                }
+              break;
+              
+            case ARRAY:
+              tp = dwNewTag (DW_TAG_array_type);
+              subtp = dwTagFromType (type->next, parent);
+              dwAddTagAttr (tp, dwNewAttrTagRef (DW_AT_type, subtp));
+              if (!subtp->parent)
+                dwAddTagChild (tp, subtp);
+              if (DCL_ELEM (type))
+                {
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                    getSize (type)));
+                  subtp = dwNewTag (DW_TAG_subrange_type);
+                  dwAddTagAttr (subtp, dwNewAttrConst (DW_AT_upper_bound,
+                                                       DCL_ELEM (type)-1));
+                  dwAddTagChild (tp, subtp);
+                }
 
-	      break;
-	    
-	    case FUNCTION:
-	      tp = dwNewTag (DW_TAG_subroutine_type);
-	      if (type->next && !IS_VOID (type->next))
-		{
-		  subtp = dwTagFromType (type->next, parent);
-		  dwAddTagAttr (tp, dwNewAttrTagRef (DW_AT_type, subtp));
-		}
-	      /* FIXME: need to handle function parameters */
-	      break;
-	      
-	    default:
-	      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		      "unknown DCL_TYPE");
-	      exit (1);
-	    }
-	}
+              break;
+            
+            case FUNCTION:
+              tp = dwNewTag (DW_TAG_subroutine_type);
+              if (type->next && !IS_VOID (type->next))
+                {
+                  subtp = dwTagFromType (type->next, parent);
+                  dwAddTagAttr (tp, dwNewAttrTagRef (DW_AT_type, subtp));
+                }
+              /* FIXME: need to handle function parameters */
+              break;
+              
+            default:
+              werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                      "unknown DCL_TYPE");
+              exit (1);
+            }
+        }
       else
         {
-	  if (IS_STRUCT (type))
-	    {
-	      struct structdef * sdp = SPEC_STRUCT (type);
-	      symbol * field;
-	      
-	      tp = dwNewTag (sdp->type == STRUCT ? DW_TAG_structure_type
-						 : DW_TAG_union_type);
-	      if (*(sdp->tag))
-	        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, sdp->tag));
-	      
-	      /* FIXME: should only specify the size if we know this */
-	      /* is a complete type */
-	      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						getSize (type)));
-	      
-	      /* Must add this before processing the struct fields */
-	      /* in case there is a recursive definition.          */
-	      hTabAddItemLong (&dwTypeTagTable, key, type, tp);
-	      tableUpdated = 1;
+          if (IS_STRUCT (type))
+            {
+              struct structdef * sdp = SPEC_STRUCT (type);
+              symbol * field;
+              
+              tp = dwNewTag (sdp->type == STRUCT ? DW_TAG_structure_type
+                                                 : DW_TAG_union_type);
+              if (*(sdp->tag))
+                dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, sdp->tag));
+              
+              /* FIXME: should only specify the size if we know this */
+              /* is a complete type */
+              dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                getSize (type)));
+              
+              /* Must add this before processing the struct fields */
+              /* in case there is a recursive definition.          */
+              hTabAddItemLong (&dwTypeTagTable, key, type, tp);
+              tableUpdated = 1;
 
-	      field = sdp->fields;
-	      while (field)
-		{
-		  dwtag * memtp;
-		  dwloc * lp;
+              field = sdp->fields;
+              while (field)
+                {
+                  dwtag * memtp;
+                  dwloc * lp;
 
-		  if (IS_BITFIELD (field->type) && !SPEC_BLEN(field->type))
-		    {
-		      field = field->next;
-		      continue;
-		    }
+                  if (IS_BITFIELD (field->type) && !SPEC_BLEN(field->type))
+                    {
+                      field = field->next;
+                      continue;
+                    }
 
-		  memtp = dwNewTag (DW_TAG_member);
-		  if (*(field->name))
-		    dwAddTagAttr (memtp, dwNewAttrString (DW_AT_name,
-							  field->name));
-		  if (IS_BITFIELD (field->type))
-		    {
-		      int blen = SPEC_BLEN (field->type);
-		      int bstr = SPEC_BSTR (field->type);
-		      sym_link * type;
-		      
-		      dwAddTagAttr (memtp,
-				    dwNewAttrConst (DW_AT_byte_size,
-						    (blen+7)/8));
-		      dwAddTagAttr (memtp,
-				    dwNewAttrConst (DW_AT_bit_size, blen));
-		      dwAddTagAttr (memtp,
-				    dwNewAttrConst (DW_AT_bit_offset,
-						    ((blen+7) & ~7)
-						    - (blen+bstr)));
-		      if (blen < 8)
-		        type = typeFromStr ("uc");
-		      else
-		        type = typeFromStr ("ui");
-		      subtp = dwTagFromType (type, tp);
-		      dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
-		    }
-		  else
-		    {
-		      subtp = dwTagFromType (field->type, tp);
-		      dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
-		      if (!subtp->parent)
-			dwAddTagChild (parent, subtp);
-		    }
+                  memtp = dwNewTag (DW_TAG_member);
+                  if (*(field->name))
+                    dwAddTagAttr (memtp, dwNewAttrString (DW_AT_name,
+                                                          field->name));
+                  if (IS_BITFIELD (field->type))
+                    {
+                      int blen = SPEC_BLEN (field->type);
+                      int bstr = SPEC_BSTR (field->type);
+                      sym_link * type;
+                      
+                      dwAddTagAttr (memtp,
+                                    dwNewAttrConst (DW_AT_byte_size,
+                                                    (blen+7)/8));
+                      dwAddTagAttr (memtp,
+                                    dwNewAttrConst (DW_AT_bit_size, blen));
+                      dwAddTagAttr (memtp,
+                                    dwNewAttrConst (DW_AT_bit_offset,
+                                                    ((blen+7) & ~7)
+                                                    - (blen+bstr)));
+                      if (blen < 8)
+                        type = typeFromStr ("uc");
+                      else
+                        type = typeFromStr ("ui");
+                      subtp = dwTagFromType (type, tp);
+                      dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
+                    }
+                  else
+                    {
+                      subtp = dwTagFromType (field->type, tp);
+                      dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
+                      if (!subtp->parent)
+                        dwAddTagChild (parent, subtp);
+                    }
 
-		  lp = dwNewLoc (DW_OP_plus_uconst, NULL, field->offset);
-		  dwAddTagAttr (memtp,
-		                dwNewAttrLoc (DW_AT_data_member_location, lp));
+                  lp = dwNewLoc (DW_OP_plus_uconst, NULL, field->offset);
+                  dwAddTagAttr (memtp,
+                                dwNewAttrLoc (DW_AT_data_member_location, lp));
 
-		  dwAddTagChild (tp, memtp);
-		  
-		  field = field->next;
-		}
-	    }
-	  else if (SPEC_VOLATILE (type) || SPEC_CONST (type))
-	    {
-	      sym_link temptype = *type;
-	      
-	      SPEC_VOLATILE (&temptype) = 0;
-	      SPEC_CONST (&temptype) = 0;
-	      tp = dwTagFromType (&temptype, parent);
-	      if (SPEC_VOLATILE (type))
-	        {
-		  modtp = dwNewTag (DW_TAG_volatile_type);
-		  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
-		  dwAddTagChild (parent, modtp);
-		  tp = modtp;
-		}
-	      if (SPEC_CONST (type))
-	        {
-		  modtp = dwNewTag (DW_TAG_const_type);
-		  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
-		  dwAddTagChild (parent, modtp);
-		  tp = modtp;
-		}
-	    }
-	  else
-	    {
-	      switch (SPEC_NOUN (type))
-	        {
-		case V_INT:
-		  tp = dwNewTag (DW_TAG_base_type);
-		  if (SPEC_USIGN (type))
-		    {
-		      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-							DW_ATE_unsigned));
-		      if (SPEC_LONG (type))
-			dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
-							   "unsigned long"));
-		      else
-			dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
-							   "unsigned int"));
-		    }
-		  else
-		    {
-		      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-							DW_ATE_signed));
-		      if (SPEC_LONG (type))
-			dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "long"));
-		      else
-			dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "int"));
-		    }
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						    getSize (type)));
-		  dwAddTagChild (dwRootTag, tp);
-		  break;
-		  
-		case V_FLOAT:
-		  tp = dwNewTag (DW_TAG_base_type);
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-						    DW_ATE_float));
-		  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "float"));
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						    getSize (type)));
-		  dwAddTagChild (dwRootTag, tp);
-		  break;
+                  dwAddTagChild (tp, memtp);
+                  
+                  field = field->next;
+                }
+            }
+          else if (SPEC_VOLATILE (type) || SPEC_CONST (type))
+            {
+              sym_link temptype = *type;
+              
+              SPEC_VOLATILE (&temptype) = 0;
+              SPEC_CONST (&temptype) = 0;
+              tp = dwTagFromType (&temptype, parent);
+              if (SPEC_VOLATILE (type))
+                {
+                  modtp = dwNewTag (DW_TAG_volatile_type);
+                  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
+                  dwAddTagChild (parent, modtp);
+                  tp = modtp;
+                }
+              if (SPEC_CONST (type))
+                {
+                  modtp = dwNewTag (DW_TAG_const_type);
+                  dwAddTagAttr (modtp, dwNewAttrTagRef (DW_AT_type, tp));
+                  dwAddTagChild (parent, modtp);
+                  tp = modtp;
+                }
+            }
+          else
+            {
+              switch (SPEC_NOUN (type))
+                {
+                case V_INT:
+                  tp = dwNewTag (DW_TAG_base_type);
+                  if (SPEC_USIGN (type))
+                    {
+                      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                        DW_ATE_unsigned));
+                      if (SPEC_LONG (type))
+                        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
+                                                           "unsigned long"));
+                      else
+                        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
+                                                           "unsigned int"));
+                    }
+                  else
+                    {
+                      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                        DW_ATE_signed));
+                      if (SPEC_LONG (type))
+                        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "long"));
+                      else
+                        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "int"));
+                    }
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                    getSize (type)));
+                  dwAddTagChild (dwRootTag, tp);
+                  break;
+                  
+                case V_FLOAT:
+                  tp = dwNewTag (DW_TAG_base_type);
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                    DW_ATE_float));
+                  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "float"));
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                    getSize (type)));
+                  dwAddTagChild (dwRootTag, tp);
+                  break;
 
-		case V_FIXED16X16:
-		  tp = dwNewTag (DW_TAG_base_type);
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-						    DW_ATE_float));
-		  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "fixed16x16"));
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						    getSize (type)));
-		  dwAddTagChild (dwRootTag, tp);
-		  break;
-		
+                case V_FIXED16X16:
+                  tp = dwNewTag (DW_TAG_base_type);
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                    DW_ATE_float));
+                  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "fixed16x16"));
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                    getSize (type)));
+                  dwAddTagChild (dwRootTag, tp);
+                  break;
+                
                 case V_BOOL:
-		  tp = dwNewTag (DW_TAG_base_type);
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-						    DW_ATE_float));
-		  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "_Bool"));
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						    getSize (type)));
-		  dwAddTagChild (dwRootTag, tp);
-		  break;
+                  tp = dwNewTag (DW_TAG_base_type);
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                    DW_ATE_float));
+                  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "_Bool"));
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                    getSize (type)));
+                  dwAddTagChild (dwRootTag, tp);
+                  break;
 
-		case V_CHAR:
-		  tp = dwNewTag (DW_TAG_base_type);
-		  if (SPEC_USIGN (type))
-		    {
-		      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-							DW_ATE_unsigned_char));
-		      dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
-							 "unsigned char"));
-		    }
-		  else
-		    {
-		      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
-							DW_ATE_signed));
-		      dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "char"));
-		    }
-		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
-						    getSize (type)));
-		  dwAddTagChild (dwRootTag, tp);
-		  break;
-		
-		case V_VOID:
-		case V_BIT:
-		case V_BITFIELD:
-		case V_SBIT:
-		case V_DOUBLE:
-		default:
-		  
-		  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		      "unhandled base type");
-		  printTypeChain (type, NULL);
-		  exit (1);
+                case V_CHAR:
+                  tp = dwNewTag (DW_TAG_base_type);
+                  if (SPEC_USIGN (type))
+                    {
+                      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                        DW_ATE_unsigned_char));
+                      dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
+                                                         "unsigned char"));
+                    }
+                  else
+                    {
+                      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+                                                        DW_ATE_signed));
+                      dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "char"));
+                    }
+                  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+                                                    getSize (type)));
+                  dwAddTagChild (dwRootTag, tp);
+                  break;
+                
+                case V_VOID:
+                case V_BIT:
+                case V_BITFIELD:
+                case V_SBIT:
+                case V_DOUBLE:
+                default:
+                  
+                  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                      "unhandled base type");
+                  printTypeChain (type, NULL);
+                  exit (1);
   
-		}
-	    }
-	}
+                }
+            }
+        }
     }
   
   if (!tableUpdated)
@@ -2455,7 +2454,8 @@ dwTagFromType (sym_link * type, dwtag * parent)
 /* dwOpenFile - open the debugging file (just initialize, since all      */
 /*              DWARF data goes into the assembly output file)           */
 /*-----------------------------------------------------------------------*/
-int dwOpenFile(char *file)
+int
+dwOpenFile(const char *file)
 {
   dwTypeTagTable = newHashTable (128);
   
@@ -2466,7 +2466,8 @@ int dwOpenFile(char *file)
 /* dwCloseFile - close the debugging file (do nothing, since all DWARF   */
 /*               data goes into the assembly output file)                */
 /*-----------------------------------------------------------------------*/
-int dwCloseFile(void)
+int
+dwCloseFile (void)
 {
   return 1;
 }
@@ -2493,10 +2494,10 @@ dwGenerateScopes (dwtag *tp, ast * tree)
       if (tree->right)
         {
           dwAddTagAttr (subtp, dwNewAttrConst (DW_AT_user_block, tree->right->block));
-	  dwAddTagAttr (subtp, dwNewAttrConst (DW_AT_user_level, tree->right->level));
+          dwAddTagAttr (subtp, dwNewAttrConst (DW_AT_user_level, tree->right->level));
       
           dwAddTagChild (tp, subtp);
-	}
+        }
       dwGenerateScopes (subtp, tree->right);
     }
   else
@@ -2523,21 +2524,21 @@ dwFindScope (dwtag * tp, int block)
     {
       if (tp->tag == DW_TAG_lexical_block)
         {
-	  ap = tp->attribs;
-	  while (ap)
-	    {
-	      if (ap->attr == DW_AT_user_block)
-		{
-		  if (ap->val.data == block)
-		    return tp;
-		}
-	      ap = ap->next;
-	    }
-	    
-	  rettp = dwFindScope (tp->firstChild, block);
-	  if (rettp)
-	    return rettp;
-	}
+          ap = tp->attribs;
+          while (ap)
+            {
+              if (ap->attr == DW_AT_user_block)
+                {
+                  if (ap->val.data == block)
+                    return tp;
+                }
+              ap = ap->next;
+            }
+            
+          rettp = dwFindScope (tp->firstChild, block);
+          if (rettp)
+            return rettp;
+        }
       tp = tp->siblings;
     }
   
@@ -2568,23 +2569,23 @@ dwWriteSymbolInternal (symbol *sym)
       assert(sym->localof);
       if (!sym->localof)
         return 0;
-	
+        
       /* Find the tag for the function this symbol is defined in */
       functp = dwRootTag->firstChild;
       while (functp)
         {
-	  if (functp->tag == DW_TAG_subprogram)
-	    {
-	      funcap = dwFindAttr (functp, DW_AT_name);
-	      if (funcap && !strcmp (funcap->val.string, sym->localof->name))
-	        break;
-	    }
-	  functp = functp->siblings;
-	}
+          if (functp->tag == DW_TAG_subprogram)
+            {
+              funcap = dwFindAttr (functp, DW_AT_name);
+              if (funcap && !strcmp (funcap->val.string, sym->localof->name))
+                break;
+            }
+          functp = functp->siblings;
+        }
       assert (functp);
       if (!functp)
         return 0;
-	
+        
       /* Find the correct scope within this function */
       scopetp = dwFindScope (functp->firstChild, sym->block);
       if (!scopetp)
@@ -2605,7 +2606,7 @@ dwWriteSymbolInternal (symbol *sym)
     {
       symloc = OP_SYMBOL (symloc->reqv);
       if (symloc->isspilt && !symloc->remat)
-	symloc = symloc->usl.spillLoc;
+        symloc = symloc->usl.spillLoc;
       else
         inregs = 1;
     }
@@ -2621,34 +2622,34 @@ dwWriteSymbolInternal (symbol *sym)
       /* register allocation */
       for (i = (port->little_endian ? 0 : symloc->nRegs-1);
            (port->little_endian ? (i < symloc->nRegs) : (i >= 0));
-	   (port->little_endian ? i++ : i--))
-	{
-	  regNum = port->debugger.dwarf.regNum (symloc->regs[i]);
-	  if (regNum >= 0 && regNum <= 31)
-	    reglp = dwNewLoc (DW_OP_reg0 + regNum, NULL, 0);
-	  else if (regNum >= 0)
-	    reglp = dwNewLoc (DW_OP_regx, NULL, regNum);
-	  else
-	    {
-	      /* We are forced to give up if the ABI for this port */
-	      /* does not define a number for this register        */
-	      lp = NULL;
-	      break;
-	    }
-	  
-	  if (lastlp)
-	    lastlp->next = reglp;
-	  else
-	    lp = reglp;
-	  lastlp = reglp;
-	  
-	  if (symloc->nRegs != 1)
-	    {
-	      reglp = dwNewLoc (DW_OP_piece, NULL, 1);
-	      lastlp->next = reglp;
-	      lastlp = reglp;
-	    }
-	}
+           (port->little_endian ? i++ : i--))
+        {
+          regNum = port->debugger.dwarf.regNum (symloc->regs[i]);
+          if (regNum >= 0 && regNum <= 31)
+            reglp = dwNewLoc (DW_OP_reg0 + regNum, NULL, 0);
+          else if (regNum >= 0)
+            reglp = dwNewLoc (DW_OP_regx, NULL, regNum);
+          else
+            {
+              /* We are forced to give up if the ABI for this port */
+              /* does not define a number for this register        */
+              lp = NULL;
+              break;
+            }
+          
+          if (lastlp)
+            lastlp->next = reglp;
+          else
+            lp = reglp;
+          lastlp = reglp;
+          
+          if (symloc->nRegs != 1)
+            {
+              reglp = dwNewLoc (DW_OP_piece, NULL, 1);
+              lastlp->next = reglp;
+              lastlp = reglp;
+            }
+        }
     }
   else if (symloc->onStack)
     {
@@ -2689,7 +2690,8 @@ dwWriteSymbolInternal (symbol *sym)
 /*-----------------------------------------------------------------------*/
 /* dwWriteFunction - generate a tag for a function.                      */
 /*-----------------------------------------------------------------------*/
-int dwWriteFunction(symbol *sym, iCode *ic)
+int
+dwWriteFunction (symbol *sym, iCode *ic)
 {
   dwtag * tp;
   value * args;
@@ -2702,10 +2704,10 @@ int dwWriteFunction(symbol *sym, iCode *ic)
   
   if (FUNC_ISISR (sym->type))
     dwAddTagAttr (dwFuncTag, dwNewAttrConst (DW_AT_calling_convention,
-					      DW_CC_nocall));
+                                              DW_CC_nocall));
   
   dwAddTagAttr (dwFuncTag, dwNewAttrFlag (DW_AT_external, 
-					   !IS_STATIC (sym->etype)));
+                                           !IS_STATIC (sym->etype)));
 
   if (sym->type->next && !IS_VOID (sym->type->next))
     {
@@ -2747,7 +2749,8 @@ int dwWriteFunction(symbol *sym, iCode *ic)
 /*                      that are only known after code generation is     */
 /*                      complete                                         */
 /*-----------------------------------------------------------------------*/
-int dwWriteEndFunction(symbol *sym, iCode *ic, int offset)
+int
+dwWriteEndFunction (symbol *sym, iCode *ic, int offset)
 {
   char debugSym[SDCC_NAME_MAX + 1];
   
@@ -2765,13 +2768,13 @@ int dwWriteEndFunction(symbol *sym, iCode *ic, int offset)
   emitDebuggerSymbol (debugSym);
       
   dwAddTagAttr (dwFuncTag, dwNewAttrAddrLabel (DW_AT_high_pc,
-					       Safe_strdup(debugSym),
-					       offset));
+                                               Safe_strdup(debugSym),
+                                               offset));
   
   if (dwFrameLocList)
     {
       dwAddTagAttr (dwFuncTag, dwNewAttrLocRef (DW_AT_frame_base,
-						dwFrameLocList));
+                                                dwFrameLocList));
       
       dwFrameLocList->next = dwRootLocList;
       dwRootLocList = dwFrameLocList;
@@ -2785,7 +2788,8 @@ int dwWriteEndFunction(symbol *sym, iCode *ic, int offset)
 /*-----------------------------------------------------------------------*/
 /* dwWriteLabel - generate a tag for a source level label                */
 /*-----------------------------------------------------------------------*/
-int dwWriteLabel(symbol *sym, iCode *ic)
+int
+dwWriteLabel (symbol *sym, iCode *ic)
 {
   char debugSym[SDCC_NAME_MAX + 1];
   dwtag * tp;
@@ -2800,7 +2804,7 @@ int dwWriteLabel(symbol *sym, iCode *ic)
   tp = dwNewTag (DW_TAG_label);
   dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, sym->name));
   dwAddTagAttr (tp, dwNewAttrAddrLabel (DW_AT_low_pc,
-					Safe_strdup (debugSym), 0));
+                                        Safe_strdup (debugSym), 0));
 
   dwAddTagChild (dwFuncTag, tp);
   
@@ -2812,7 +2816,8 @@ int dwWriteLabel(symbol *sym, iCode *ic)
 /* dwWriteScope - add the starting and ending address attributes to a    */
 /*                a lexical block tag (created during dwWriteFunction)   */
 /*-----------------------------------------------------------------------*/
-int dwWriteScope(iCode *ic)
+int
+dwWriteScope (iCode *ic)
 {
   char * debugSym = NULL;
   dwtag * scopetp;
@@ -2825,7 +2830,7 @@ int dwWriteScope(iCode *ic)
       debugSym = dwNewDebugSymbol ();
       emitDebuggerSymbol (debugSym);
       dwSetTagAttr (dwScopeTag, dwNewAttrAddrLabel (DW_AT_high_pc, debugSym, 0));
-						    
+                                                    
       dwScopeTag = scopetp;
       dwScopeLevel = ic->level;
     }
@@ -2839,7 +2844,7 @@ int dwWriteScope(iCode *ic)
         debugSym = dwNewDebugSymbol ();
       emitDebuggerSymbol (debugSym);
       dwAddTagAttr (scopetp, dwNewAttrAddrLabel (DW_AT_low_pc, debugSym, 0));
-						 
+                                                 
       dwScopeTag = scopetp;
       dwScopeLevel = ic->level;
     }
@@ -2852,7 +2857,8 @@ int dwWriteScope(iCode *ic)
 /*                 called for all variables and parameters, but we       */
 /*                 process the non-global variables elsewhere.           */
 /*-----------------------------------------------------------------------*/
-int dwWriteSymbol(symbol *sym)
+int
+dwWriteSymbol (symbol *sym)
 {
   if (IS_FUNC (sym->type))
     return 1;
@@ -2873,7 +2879,8 @@ int dwWriteSymbol(symbol *sym)
 /*-----------------------------------------------------------------------*/
 /* dwWriteType                                                           */
 /*-----------------------------------------------------------------------*/
-int dwWriteType(structdef *sdef, int block, int inStruct, char *tag)
+int
+dwWriteType (structdef *sdef, int block, int inStruct, const char *tag)
 {
   /* FIXME: needs implementation */
   return 1;
@@ -2883,7 +2890,8 @@ int dwWriteType(structdef *sdef, int block, int inStruct, char *tag)
 /*-----------------------------------------------------------------------*/
 /* dwWriteModule - generates the root tag for this compilation unit      */
 /*-----------------------------------------------------------------------*/
-int dwWriteModule(char *name)
+int
+dwWriteModule (const char *name)
 {
   dwtag * tp;
   char verid[125];
@@ -2900,7 +2908,7 @@ int dwWriteModule(char *name)
   dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, fullSrcFileName));
 
   dwAddTagAttr (tp, dwNewAttrLabelRef (DW_AT_stmt_list,
-				       "Ldebug_line_start", -4));
+                                       "Ldebug_line_start", -4));
 
   dwRootTag = tp;
   
@@ -2912,7 +2920,8 @@ int dwWriteModule(char *name)
 /* dwWriteCLine - generates a line number/position to address record for */
 /*                C source                                               */
 /*-----------------------------------------------------------------------*/
-int dwWriteCLine(iCode *ic)
+int
+dwWriteCLine (iCode *ic)
 {
   dwline * lp;
   char * debugSym;
@@ -2946,7 +2955,7 @@ int dwWriteCLine(iCode *ic)
 /*                       no current frame pointer address defined.       */
 /*-----------------------------------------------------------------------*/
 int
-dwWriteFrameAddress(char *variable, struct regs *reg, int offset)
+dwWriteFrameAddress(const char *variable, struct regs *reg, int offset)
 {
   char * debugSym = NULL;
   dwlocregion * lrp;
@@ -2977,7 +2986,7 @@ dwWriteFrameAddress(char *variable, struct regs *reg, int offset)
   lrp = Safe_alloc (sizeof (dwlocregion));
   lrp->startLabel = debugSym;
 
-  if (variable)		/* frame pointer based from a global variable */
+  if (variable)         /* frame pointer based from a global variable */
     {
       dwloc * lp;
 
@@ -2985,31 +2994,31 @@ dwWriteFrameAddress(char *variable, struct regs *reg, int offset)
       lrp->loc->next = lp = dwNewLoc (DW_OP_deref_size, NULL, PTRSIZE);
       if (offset)
         {
-	  lp->next = dwNewLoc (DW_OP_consts, NULL, offset);
-	  lp->next->next = dwNewLoc (DW_OP_plus, NULL, 0);
-	}
+          lp->next = dwNewLoc (DW_OP_consts, NULL, offset);
+          lp->next->next = dwNewLoc (DW_OP_plus, NULL, 0);
+        }
     }
-  else if (reg)		/* frame pointer based from a register */
+  else if (reg)         /* frame pointer based from a register */
     {
       regNum = port->debugger.dwarf.regNum (reg);
       assert (regNum>=0);
       
       if (regNum>=0 && regNum<=31)
-	{
-	  if (offset)
-	    lrp->loc = dwNewLoc (DW_OP_breg0 + regNum, NULL, offset);
-	  else
-	    lrp->loc = dwNewLoc (DW_OP_reg0 + regNum, NULL, 0);
-	}
+        {
+          if (offset)
+            lrp->loc = dwNewLoc (DW_OP_breg0 + regNum, NULL, offset);
+          else
+            lrp->loc = dwNewLoc (DW_OP_reg0 + regNum, NULL, 0);
+        }
       else
         {
           lrp->loc = lp = dwNewLoc (DW_OP_regx, NULL, regNum);
-	  if (offset)
-	    {
-	      lp->next = dwNewLoc (DW_OP_consts, NULL, offset);
-	      lp->next->next = dwNewLoc (DW_OP_plus, NULL, 0);
-	    }
-	}
+          if (offset)
+            {
+              lp->next = dwNewLoc (DW_OP_consts, NULL, offset);
+              lp->next->next = dwNewLoc (DW_OP_plus, NULL, 0);
+            }
+        }
     }
   dwFrameLastLoc = lrp;
   
@@ -3026,12 +3035,11 @@ dwWriteFrameAddress(char *variable, struct regs *reg, int offset)
 /* dwWriteALine - generates a line number/position to address record for */
 /*                assembly source                                        */
 /*-----------------------------------------------------------------------*/
-int dwWriteALine(char *module, int Line)
+int
+dwWriteALine(const char *module, int Line)
 {
   return 1;
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -3039,7 +3047,7 @@ int dwWriteALine(char *module, int Line)
 /*                      debug file                                       */
 /*-----------------------------------------------------------------------*/
 int
-dwarf2FinalizeFile(FILE *of)
+dwarf2FinalizeFile (FILE *of)
 {
   int tagAddress = 11;
   int abbrevNum = 0;

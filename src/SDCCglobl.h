@@ -372,11 +372,6 @@ struct _dumpFiles {
 
 extern struct _dumpFiles dumpFiles[];
 
-/* Buffer which can be used to hold a file name; assume it will
- * be trashed by any function call within SDCC.
- */
-extern char scratchFileName[PATH_MAX];
-
 /* Define well known filenos if the system does not define them.  */
 #ifndef STDIN_FILENO
 # define STDIN_FILENO   0

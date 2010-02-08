@@ -200,7 +200,7 @@ emitLabel (symbol *tlbl)
 /*   with a debugger symbol                                        */
 /*-----------------------------------------------------------------*/
 void
-hc08_emitDebuggerSymbol (char * debugSym)
+hc08_emitDebuggerSymbol (const char * debugSym)
 {
   _G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);

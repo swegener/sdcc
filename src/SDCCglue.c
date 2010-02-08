@@ -1677,6 +1677,7 @@ glue (void)
 {
   struct dbuf_s vBuf;
   struct dbuf_s ovrBuf;
+  struct dbuf_s asmFileName;
   FILE *asmFile;
   int mcs51_like;
 
@@ -1708,21 +1709,24 @@ glue (void)
   /* create the assembler file name */
 
   /* -o option overrides default name? */
+  dbuf_init (&asmFileName, PATH_MAX);
   if ((noAssemble || options.c1mode) && fullDstFileName)
     {
-      strncpyz (scratchFileName, fullDstFileName, PATH_MAX);
+      dbuf_append_str (&asmFileName, fullDstFileName);
     }
   else
     {
-      strncpyz (scratchFileName, dstFileName, PATH_MAX);
-      strncatz (scratchFileName, port->assembler.file_ext, PATH_MAX);
+      dbuf_append_str (&asmFileName, dstFileName);
+      dbuf_append_str (&asmFileName, port->assembler.file_ext);
     }
 
-  if (!(asmFile = fopen (scratchFileName, "w")))
+  if (!(asmFile = fopen (dbuf_c_str (&asmFileName), "w")))
     {
-      werror (E_FILE_OPEN_ERR, scratchFileName);
+      werror (E_FILE_OPEN_ERR, dbuf_c_str (&asmFileName));
+      dbuf_destroy (&asmFileName);
       exit (EXIT_FAILURE);
     }
+  dbuf_destroy (&asmFileName);
 
   /* initial comments */
   initialComments (asmFile);

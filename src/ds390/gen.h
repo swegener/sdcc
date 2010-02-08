@@ -81,6 +81,6 @@ typedef struct asmop
 asmop;
 
 void gen390Code (iCode *);
-void ds390_emitDebuggerSymbol (char *);
+void ds390_emitDebuggerSymbol (const char *);
 
 #endif

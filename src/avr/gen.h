@@ -74,7 +74,7 @@ typedef struct asmop
 asmop;
 
 void genAVRCode (iCode *);
-void avr_emitDebuggerSymbol (char *);
+void avr_emitDebuggerSymbol (const char *);
 
 extern char *fReturn8051[];
 extern char *fReturn390[];

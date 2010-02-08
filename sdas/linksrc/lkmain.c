@@ -770,7 +770,6 @@ map()
   /* sdld specific */
   /* if gb output file format, generate gb map file */
   if (oflag == 4) {
-        register int i;
         register struct head *hdp;
         register struct lbfile *lbfh;
 
@@ -783,7 +782,7 @@ map()
         }
 
         /*
-         * Output Map Area Lists
+         *Output Map Area Lists
          */
         page = 0;
         lop  = NLPP;
@@ -795,52 +794,39 @@ map()
         /*
          * List Linked Files
          */
-        newpag(mfp);
-        fprintf(mfp, "\nFiles Linked      [ module(s) ]\n\n");
         hdp = headp;
         filep = linkp->f_flp;
+        if (filep) {
+                fprintf( mfp, "MODULES\n");
+        }
         while (filep) {
-                fprintf(mfp, "%-16s", filep->f_idp);
-                i = 0;
+                fprintf(mfp, "\tFILE %s\n", filep->f_idp);
                 while ((hdp != NULL) && (hdp->h_lfile == filep)) {
-                        if (i % 5) {
-                            fprintf(mfp, ", %8.8s", hdp->m_id);
-                        } else {
-                            if (i) {
-                                fprintf(mfp, ",\n%20s%8.8s", "", hdp->m_id);
-                            } else {
-                                fprintf(mfp, "  [ %8.8s", hdp->m_id);
-                            }
-                        }
+                        if (strlen(hdp->m_id)>0)
+                                fprintf(mfp, "\t\tNAME %s\n", hdp->m_id);
                         hdp = hdp->h_hp;
-                        i++;
                 }
-                if (i)
-                        fprintf(mfp, " ]");
-                fprintf(mfp, "\n");
                 filep = filep->f_flp;
         }
         /*
          * List Linked Libraries
          */
         if (lbfhead != NULL) {
-                fprintf(mfp,
-        "\nLibraries Linked                    [   object  file   ]\n\n");
+                fprintf(mfp, "LIBRARIES\n");
                 for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
-                        fprintf(mfp, "%-32s    [ %16.16s ]\n",
+                        fprintf(mfp,    "\tLIBRARY %s\n"
+                                        "\t\tMODULE %s\n",
                                 lbfh->libspc, lbfh->relfil);
                 }
-                fprintf(mfp, "\n");
         }
         /*
          * List Base Address Definitions
          */
         if (basep) {
-                newpag(mfp);
-                fprintf(mfp, "\nUser Base Address Definitions\n\n");
+                fprintf(mfp, "USERBASEDEF\n");
                 bsp = basep;
                 while (bsp) {
-                        fprintf(mfp, "%s\n", bsp->b_strp);
+                        fprintf(mfp, "\t%s\n", bsp->b_strp);
                         bsp = bsp->b_base;
                 }
         }
@@ -848,16 +834,18 @@ map()
          * List Global Definitions
          */
         if (globlp) {
-                newpag(mfp);
-                fprintf(mfp, "\nUser Global Definitions\n\n");
+                fprintf(mfp, "USERGLOBALDEF\n");
                 gsp = globlp;
                 while (gsp) {
-                        fprintf(mfp, "%s\n", gsp->g_strp);
+                        fprintf(mfp, "\t%s\n", gsp->g_strp);
                         gsp = gsp->g_globl;
                 }
         }
-        fprintf(mfp, "\n\f");
         symdef(mfp);
+        if (mfp!=NULL) {
+                fclose(mfp);
+                mfp = NULL;
+        }
   } else {
   /* end sdld specific */
 	register int i;

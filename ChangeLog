@@ -11,6 +11,9 @@
 	  get rid of scratchFileName, const string pointers
 	* src/SDCCmain.c, src/xa51/main.c, src/mcs51/main.c, sdcc_vc_in.h:
 	  fixed bug #2947712: SDCC completely broken in multiple ways
+	* sdas/linksrc/lklist.c, sdas/linksrc/lkmain.c:
+	  reintroduced gameboy map file format, required by rrgb simulator,
+	  reenabled gameboy regression tests
 
 2010-02-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

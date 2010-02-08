@@ -291,6 +291,133 @@ VOID
 lstarea(xp)
 struct area *xp;
 {
+  /* sdld specific */
+  /* if gb output file format, generate gb map file */
+  if (oflag == 4) {
+	register struct areax *oxp;
+	register int i, j;
+	int nmsym;
+	a_uint a0, ai = 0, aj = 0;
+	struct sym *sp;
+	struct sym **p;
+
+	/*
+	 * Find number of symbols in area
+	 */
+	nmsym = 0;
+	oxp = xp->a_axp;
+	while (oxp) {
+		for (i=0; i<NHASH; i++) {
+			sp = symhash[i];
+			while (sp != NULL) {
+				if (oxp == sp->s_axp)
+					++nmsym;
+				sp = sp->s_sp;
+			}
+		}
+		oxp = oxp->a_axp;
+	}
+
+	/*
+	 * Symbol Table Output
+	 */
+	if (!((xp->a_size==0)&&(xp->a_addr==0)&&(nmsym==0))) {
+		fprintf(mfp, "AREA %s\n", xp->a_id );
+		switch (xflag) {
+			case 1:
+				fprintf(mfp, "\tRADIX OCTAL\n" );
+				break;
+			case 2:
+				fprintf(mfp, "\tRADIX DEC\n" );
+				break;
+			default:
+				fprintf(mfp, "\tRADIX HEX\n" );
+				break;
+		}
+		fprintf( mfp,	"\tBASE %04X\n"
+				"\tSIZE %04X\n"
+				"\tATTRIB "
+			, xp->a_addr, xp->a_size );
+		if (xp->a_flag & A_ABS) {
+			fprintf(mfp, "ABS");
+		} else {
+			fprintf(mfp, "REL");
+		}
+		if (xp->a_flag & A_OVR) {
+			fprintf(mfp, " OVR");
+		} else {
+			fprintf(mfp, " CON");
+		}
+		if (xp->a_flag & A_PAG) {
+			fprintf(mfp, " PAG");
+		}
+		if (xp->a_flag & A_PAG) {
+			ai = (ai & 0xFF);
+			aj = (aj > 256);
+			if (ai || aj) { fprintf(mfp, "  "); }
+			if (ai)      { fprintf(mfp, " Boundary"); }
+			if (ai & aj)  { fprintf(mfp, " /"); }
+			if (aj)      { fprintf(mfp, " Length"); }
+			if (ai || aj) { fprintf(mfp, " Error"); }
+		}
+
+		fprintf( mfp,"\n");
+		if (nmsym>0) {
+			/*
+			 * Allocate space for an array of pointers to symbols
+			 * and load array.
+			 */
+			if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
+			    == NULL) {
+				fprintf(mfp, "\nInsufficient space to build Map Segment.\n");
+				return;
+			}
+			nmsym = 0;
+			oxp = xp->a_axp;
+			while (oxp) {
+				for (i=0; i<NHASH; i++) {
+					sp = symhash[i];
+					while (sp != NULL) {
+						if (oxp == sp->s_axp) {
+							p[nmsym++] = sp;
+						}
+						sp = sp->s_sp;
+					}
+				}
+				oxp = oxp->a_axp;
+			}
+
+			/*
+			 * Bubble Sort of Addresses in Symbol Table Array
+			 */
+			j = 1;
+			while (j) {
+				j = 0;
+				sp = p[0];
+				a0 = sp->s_addr + sp->s_axp->a_addr;
+				for (i=1; i<nmsym; ++i) {
+					sp = p[i];
+					ai = sp->s_addr + sp->s_axp->a_addr;
+					if (a0 > ai) {
+						j = 1;
+						p[i] = p[i-1];
+						p[i-1] = sp;
+					}
+					a0 = ai;
+				}
+			}
+
+			fprintf( mfp, "\tGLOBALS\n");
+			i = 0;
+			while (i < nmsym) {
+				fprintf(mfp, "\t\t%s\t%04X\n", p[i]->s_id, p[i]->s_addr + p[i]->s_axp->a_addr );
+				i++;
+			}
+			free(p);
+		}
+	}
+  } else {
+  /* end sdld specific */
 	register struct areax *oxp;
 	register int i;
 	register char *ptr;
@@ -417,6 +544,9 @@ struct area *xp;
 		putc('\n', mfp);
 	}
 	free(p);
+  /* sdld specific */
+  }
+  /* end sdld specific */
 }
 
 /* sdld specific */

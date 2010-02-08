@@ -1568,13 +1568,13 @@ linkEdit (char **envp)
     {
       char out_fmt = (options.out_fmt == 0) ? 'i' : options.out_fmt;
 
-      if (NULL == fullDstFileName)
+      if (NULL != fullDstFileName)
         {
-          dbuf_append_str (&binFileName, dstFileName);
+          dbuf_append_str (&binFileName, fullDstFileName);
         }
       else
         {
-          dbuf_append_str (&binFileName, fullDstFileName);
+          dbuf_append_str (&binFileName, dstFileName);
           dbuf_append_str (&binFileName, getOutFmtExt());
         }
 

@@ -297,8 +297,20 @@ replace {
 	mov	a,%1
 } by {
 	mov	%1,a
-	;	Peephole 105	removed redundant mov
+	;	Peephole 105.a	removed redundant mov
 } if notVolatile %1
+
+replace {
+	mov	dptr,#%1
+	movx	@dptr,a
+	mov	dptr,#%1
+	movx	a,@dptr
+} by {
+	mov	dptr,#%1
+	movx	@dptr,a
+	;	Peephole 105.b  removed redundant movx
+} if notVolatile %1
+
 
 replace {
 	mov	%1,a
@@ -408,6 +420,81 @@ replace {
 	setb	%4
 %3:
 } if labelRefCount %3 2
+
+// parameter passing for model-large and model-huge
+replace {
+	mov	r%2,dph
+	mov	a,dpl
+	mov	dptr,#%1
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%2
+	movx	@dptr,a
+	mov	dptr,#%1
+	movx	a,@dptr
+	mov	r%2,a
+	inc	dptr
+	movx	a,@dptr
+} by {
+	mov	r%2,dph
+	mov	a,dpl
+	mov	dptr,#%1
+	movx	@dptr,a
+	inc	dptr
+	;	Peephole 114.a	optimized 16-bit parameter passing
+	xch	a,r%2
+	movx	@dptr,a
+} if notVolatile(%1)
+
+replace {
+	mov	r%2,dpl
+	mov	r%3,dph
+	mov	r%4,b
+	mov	r%5,a
+	mov	dptr,#%1
+	mov	a,r%2
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%3
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%4
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%5
+	movx	@dptr,a
+	mov	dptr,#%1
+	movx	a,@dptr
+	mov	r%2,a
+	inc	dptr
+	movx	a,@dptr
+	mov	r%3,a
+	inc	dptr
+	movx	a,@dptr
+	mov	r%4,a
+	inc	dptr
+	movx	a,@dptr
+	mov	r%5,a
+} by {
+	mov	r%2,dpl
+	mov	r%3,dph
+	mov	r%4,b
+	mov	r%5,a
+	mov	dptr,#%1
+	mov	a,r%2
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%3
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%4
+	movx	@dptr,a
+	inc	dptr
+	mov	a,r%5
+	movx	@dptr,a
+;	Peephole 114.b	optimized 32-bit parameter passing
+} if notVolatile(%1)
+
 
 replace {
 	clr	a

@@ -67,9 +67,17 @@ sdld_init (char *path)
     { "8051", TARGET_ID_8051, },
     { "6808", TARGET_ID_6808, },
   };
-  int i;
+  int i = NELEM (tgt);
 
   char *progname = program_name (path);
+#if _WIN32
+  /* convert it to lower case:
+     on DOS and Windows 9x the file name in argv[0] is uppercase */
+  char *p;
+
+  for (p = progname; '\0' != *p; ++p)
+    *p = tolower (*p);
+#endif
   if ((sdld = (strncmp(progname, "sdld", 4) == 0)) != 0)
     {
       /* exception: sdld is 8051 linker */
@@ -86,6 +94,14 @@ sdld_init (char *path)
 		}
             }
         }
+    }
+  /* diagnostic message */
+  if (getenv ("SDLD_DIAG"))
+    {
+      printf ("sdld path: %s\n", path);
+      printf ("is sdld: %d\n", sdld);
+      if (sdld)
+        printf ("sdld target: %s\n", (i >= NELEM (tgt)) ? "8051" : tgt[i].str);
     }
 }
 

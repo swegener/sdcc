@@ -1,3 +1,11 @@
+2010-02-09 Borut Razem <borut.razem AT siol.net>
+
+	* sdas/asxxsrc/sdas.c, sdas/linksrc/sdld.c:
+	  convert parogram name to lower case since on Win 9x program names
+	  in argv[0] are always upper case;
+	  added diagnostic if SDAS_DIAG and/or SDLD_DIAG environment
+	  variables are set
+
 2010-02-08 Borut Razem <borut.razem AT siol.net>
 
 	* src/avr/gen.c, src/avr/gen.h, src/cdbFile.c, src/ds390/gen.c,

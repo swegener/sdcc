@@ -67,9 +67,17 @@ sdas_init (char *path)
     { "8051", TARGET_ID_8051, },
     { "6808", TARGET_ID_6808, },
   };
-  int i;
+  int i = NELEM (tgt);
 
   char *progname = program_name (path);
+#if _WIN32
+  /* convert it to lower case:
+     on DOS and Windows 9x the file name in argv[0] is uppercase */
+  char *p;
+
+  for (p = progname; '\0' != *p; ++p)
+    *p = tolower (*p);
+#endif
   if ((sdas = (strncmp(progname, "sdas", 4) == 0)) != 0)
     {
       for (i = 0; i < NELEM (tgt); ++i)
@@ -80,6 +88,14 @@ sdas_init (char *path)
               break;
 	    }
         }
+    }
+  /* diagnostic message */
+  if (getenv ("SDAS_DIAG"))
+    {
+      printf ("sdas path: %s\n", path);
+      printf ("is sdas: %d\n", sdas);
+      if (sdas)
+        printf ("sdas target: %s\n", (i >= NELEM (tgt)) ? "unknown" : tgt[i].str);
     }
 }
 

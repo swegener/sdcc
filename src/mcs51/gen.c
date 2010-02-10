@@ -11410,35 +11410,116 @@ genAssign (iCode * ic)
 
   /* bit variables done */
   /* general case */
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      if (!IS_FLOAT (operandType (right)))
+        {
+          lit = ulFromVal (AOP (right)->aopu.aop_lit);
+        }
+      else
+        {
+          union { float f; unsigned char c[4]; } fl;
+
+          fl.f = (float) floatFromVal (AOP (right)->aopu.aop_lit);
+#ifdef WORDS_BIGENDIAN
+          lit = (fl.c[3] << 0) | (fl.c[2] << 8) | (fl.c[1] << 16) | (fl.c[0] << 24);
+#else
+          lit = (fl.c[0] << 0) | (fl.c[1] << 8) | (fl.c[2] << 16) | (fl.c[3] << 24);
+#endif
+        }
+    }
+
   size = getDataSize (result);
   offset = 0;
-  if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   if ((size > 1) &&
-      (AOP_TYPE (result) != AOP_REG) &&
-      (AOP_TYPE (right) == AOP_LIT) &&
-      !IS_FLOAT (operandType (right)) &&
-      (lit < 256L))
+      (AOP_TYPE (result) != AOP_REG) && /* for registers too? (regression test passes) */
+      (AOP_TYPE (right) == AOP_LIT)  &&
+      !aopPutUsesAcc (result, aopGet (right, 0, FALSE, FALSE), 0))
     {
-      while ((size) && (lit))
+      int accumulator_value = -1;       /* -1 denotes: not yet set */
+
+      while (size)
         {
-          aopPut (result,
-                  aopGet (right, offset, FALSE, FALSE),
-                  offset);
+          /* check whether preloading the accumulator pays off:
+
+                mov     direct,#something       3 byte, 2 cycle
+                mov     direct,a                2 byte, 1 cycle
+
+                mov     @r0,#something          2 byte, 1 cycle
+                mov     @r0,a                   1 byte, 1 cycle
+
+                mov     rx,#something           2 byte, 1 cycle
+                mov     rx,a                    1 byte, 1 cycle
+
+                clr     a                       1 byte, 1 cycle
+                mov     a,#something            2 byte, 1 cycle
+
+               (setting bytes in pdata and xdata need the accumulator anyway)
+           */
+
+          /* clr a needs an extra byte. If two bytes are zero it starts to pay off
+             to preload the accumulator */
+          int clr_num_bytes_saved = -1 +        /* size of clr a */
+                                    (int)((((lit >>  0) & 0xff) == 0) && (size >= 1)) +
+                                    (int)((((lit >>  8) & 0xff) == 0) && (size >= 2)) +
+                                    (int)((((lit >> 16) & 0xff) == 0) && (size >= 3)) +
+                                    (int)((((lit >> 24) & 0xff) == 0) && (size >= 4));
+
+          /* mov a,#something needs two extra bytes. If three bytes are identical it starts to pay off */
+          int mov_num_bytes_saved = -2 +        /* size of mov a,#something */
+                                    (int)((lit & 0xff) == ((lit >>  0) & 0xff) && (size >= 1)) + /* true */
+                                    (int)((lit & 0xff) == ((lit >>  8) & 0xff) && (size >= 2)) +
+                                    (int)((lit & 0xff) == ((lit >> 16) & 0xff) && (size >= 3)) +
+                                    (int)((lit & 0xff) == ((lit >> 24) & 0xff) && (size >= 4));
+
+          int num_bytes_to_save_before_using_acc_takes_effect = 1;
+
+          if (optimize.codeSpeed && (AOP_TYPE (result) != AOP_DIR))
+            {
+              /* require an extra byte being safed */
+              num_bytes_to_save_before_using_acc_takes_effect++;
+            }
+
+          /* eventually preload accumulator */
+          if ((clr_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) &&
+              (clr_num_bytes_saved >= mov_num_bytes_saved) &&
+              (lit & 0xff) == 0 )
+            {
+              if (0 != accumulator_value)
+                {
+                  accumulator_value = 0;
+                  emitcode ("clr", "a");
+                }
+            }
+          else if ((mov_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) &&
+                   (mov_num_bytes_saved > clr_num_bytes_saved))         /* preferrably have 0 in acc */
+            {
+              if ((lit & 0xff) != accumulator_value)
+                {
+                  accumulator_value = lit & 0xff;
+                  emitcode ("mov", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                }
+            }
+
+          /* write byte */
+          if ((lit & 0xff) == accumulator_value)
+            {
+              /* value in accumulator can be used */
+              aopPut (result, "a", offset);
+            }
+          else
+            {
+              /* otherwise use the normal path that should always work */
+              aopPut (result,
+                      aopGet (right, offset, FALSE, FALSE),
+                      offset);
+            }
+
+          /* advance */
           lit >>= 8;
           offset++;
           size--;
-        }
-      /* And now fill the rest with zeros. */
-      if (size)
-        {
-          emitcode ("clr", "a");
-        }
-      while (size--)
-        {
-          aopPut (result, "a", offset);
-          offset++;
         }
     }
   else

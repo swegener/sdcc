@@ -1,3 +1,8 @@
+2010-02-10 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/gen.c: (genAssign literal) loading via accumulator if it
+	  pays off. Could eventually also be enabled for assigning to registers
+
 2010-02-09 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added rules 105.b and 114.x improving parameter

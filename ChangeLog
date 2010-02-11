@@ -1,3 +1,7 @@
+2010-02-11 Borut Razem <borut.razem AT siol.net>
+
+	* sdas/linksrc/lkmain.c: removed unneeded gb linker initialization
+
 2010-02-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/clean.mk: also clean huge library

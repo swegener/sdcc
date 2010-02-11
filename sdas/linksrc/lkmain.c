@@ -128,79 +128,12 @@ void Areas51 (void)
 /* end sdld 8051 & 6808 specific */
 
 /* sdld gb specific */
-char *default_basep[] = {
-  "_CODE=0x0200",
-  "_DATA=0xC0A0",
-  NULL
-};
-
-char *default_globlp[] = {
-  /* DMA transfer must start at multiples of 0x100 */
-  ".OAM=0xC000",
-  ".STACK=0xE000",
-  ".refresh_OAM=0xFF80",
-
-  ".init=0x0000",
-
-  NULL
-};
-
-int nb_rom_banks;
-int nb_ram_banks;
-int mbc_type;
+int nb_rom_banks = 2;
+int nb_ram_banks = 0;
+int mbc_type = 0;
 char cart_name[16] = "";
 
 patch* patches = NULL;
-
-void
-gb_init()
-{
-	int i;
-
-	nb_rom_banks = 2;
-	nb_ram_banks = 0;
-	mbc_type = 0;
-	symflag = 0;
-
-	for(i = 0; default_basep[i] != NULL; i++) {
-		if(basep == NULL) {
-			basep = (struct base *)new(sizeof(struct base));
-			bsp = basep;
-		} else {
-			bsp->b_base = (struct base *)new(sizeof(struct base));
-			bsp = bsp->b_base;
-		}
-		bsp->b_strp = default_basep[i];
-	}
-	for(i = 0; default_globlp[i] != NULL; i++) {
-		if(globlp == NULL) {
-			globlp = (struct globl *)new(sizeof(struct globl));
-			gsp = globlp;
-		} else {
-			gsp->g_globl = (struct globl *)new(sizeof(struct globl));
-			gsp = gsp->g_globl;
-		}
-		gsp->g_strp = default_globlp[i];
-	}
-}
-
-void gb_init_banks()
-{
-	int i;
-
-	for(i = 1; i < nb_rom_banks; i++) {
-		bsp->b_base = (struct base *)new(sizeof(struct base));
-		bsp = bsp->b_base;
-		bsp->b_strp = (char *)malloc(18);
-		sprintf(bsp->b_strp, "_CODE_%d=0x4000", i);
-	}
-	for(i = 0; i < nb_ram_banks; i++) {
-		bsp->b_base = (struct base *)new(sizeof(struct base));
-		bsp = bsp->b_base;
-		bsp->b_strp = (char *)malloc(18);
-		sprintf(bsp->b_strp, "_DATA_%d=0xA000", i);
-	}
-}
 /* end sdld gb specific */
 
 /*)Function	VOID	main(argc,argv)
@@ -300,8 +233,6 @@ char *argv[];
 	sdld_init(argv[0]);
 	/* end sdas specific */
 
-	if (TARGET_IS_GB)
-		gb_init();
 	if (!is_sdld())
 		fprintf(stdout, "\n");
 
@@ -382,8 +313,6 @@ char *argv[];
 		lfp->f_type = F_REL;
 	}
 
-	if (TARGET_IS_GB)
-		gb_init_banks();
 	syminit();
 
 	/* sdld specific */
@@ -1345,11 +1274,9 @@ setbas()
 					break;
 			}
 			if (ap == NULL) {
-				if (!TARGET_IS_GB) {
-					fprintf(stderr,
-					"ASlink-Warning-No definition of area %s\n", id);
-					lkerr++;
-				}
+				fprintf(stderr,
+				"ASlink-Warning-No definition of area %s\n", id);
+				lkerr++;
 			} else {
 				ap->a_addr = v;
 				/* sdld specific */
@@ -1456,11 +1383,9 @@ setgbl()
 			v = expr(0);
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
-				if (!TARGET_IS_GB) {
-					fprintf(stderr,
-					"No definition of symbol %s\n", id);
-					lkerr++;
-				}
+				fprintf(stderr,
+				"No definition of symbol %s\n", id);
+				lkerr++;
 			} else {
 
 				if (sp->s_type & S_DEF) {

@@ -21,3 +21,4 @@
 #define _SDCC_MALLOC_TYPE_MLH		1
 
 #endif
+

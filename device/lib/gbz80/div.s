@@ -1,6 +1,69 @@
         ;; Originally from GBDK by Pascal Felber.
         .area   _CODE
 
+__divsuchar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+        ld      h,#0
+
+        jp      signexte
+
+__modsuchar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+        ld      h,#0
+
+        call    signexte
+
+        ld	h,d
+	ld	l,e
+        ret
+
+__divuschar_rrx_s::
+        ld      hl,#2+1
+        ld      d, h
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+
+        ld      a,l             ; Sign extend
+        rlca
+        sbc     a
+        ld      h,a
+
+        jp      .div16
+
+__moduschar_rrx_s::
+        ld      hl,#2+1
+        ld      d, h
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+
+        ld      a,l             ; Sign extend
+        rlca
+        sbc     a
+        ld      h,a
+
+        call    .div16
+
+        ld	h,d
+	ld	l,e
+
+        ret
+
 __divschar_rrx_s::
         ld      hl,#2+1
         add     hl,sp
@@ -177,6 +240,7 @@ __moduint_rrx_hds::
         rlca
         sbc     a
         ld      b,a
+signexte:
         ld      a,e             ; Sign extend
         rlca
         sbc     a

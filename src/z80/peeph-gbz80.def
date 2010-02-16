@@ -72,14 +72,14 @@ replace restart {
 } by {
 	jp	%6
 	; peephole 7 redirected jump-to-jump at %5 by jump to %6
-} if labelIsUncondJump(), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
 	; peephole 8 redirected jump-to-jump at %5 by jump to %6
-} if labelIsUncondJump(), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	ld	%2,%3

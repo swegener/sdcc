@@ -29,7 +29,9 @@ Z80_SDCC = $(COMMON_SDCC) \
   _ltoa.c \
   _startup.c \
   sprintf.c \
-  vprintf.c
+  vprintf.c \
+  _strlen.c \
+  _memmove.c
 
 Z80SOURCES = $(addprefix ../,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_SDCC))
 Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_SDCC))

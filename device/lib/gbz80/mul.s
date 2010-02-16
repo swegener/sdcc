@@ -2,6 +2,28 @@
 
         .area   _CODE
 
+; operands have different sign
+
+__mulsuchar_rrx_s::
+        ld      hl,#2+1
+        ld      b, h
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      c,(hl)
+        jr      signexte
+
+__muluschar_rrx_s::
+        ld      hl,#2
+        ld      b, h
+        add     hl,sp
+
+        ld      e,(hl)
+        inc     hl
+        ld      c,(hl)
+        jr      signexte
+
 __mulschar_rrx_s::
         ld      hl,#2
         add     hl,sp
@@ -19,7 +41,7 @@ __mulschar_rrx_hds::
         rla
         sbc     a,a
         ld      b,a
-
+signexte:
         ld      a,e
         rla
         sbc     a,a

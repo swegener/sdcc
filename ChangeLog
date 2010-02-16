@@ -1,3 +1,12 @@
+2010-02-16 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/peeph-gbz80.def,
+	  device/include/asm/z80/features.h,
+	  device/lib/gbz80/Makefile.in,
+	  device/lib/gbz80/div.s,
+	  device/lib/gbz80/mul.s,
+	  support/regression/ports/gbz80/spec.mk:
+	  Made gbz80 regression tests compile again.
+
 2010-02-11 Borut Razem <borut.razem AT siol.net>
 
 	* sdas/linksrc/lkmain.c: removed unneeded gb linker initialization

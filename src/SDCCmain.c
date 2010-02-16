@@ -1535,7 +1535,7 @@ getOutFmtExt (void)
     {
       default:
       case 'i':
-        return ".ixh";
+        return ".ihx";
 
       case 's':
         return ".s19";

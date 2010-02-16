@@ -611,7 +611,7 @@ processFile (char *s)
   struct dbuf_s path;
 
   dbuf_init (&ext, 128);
-  dbuf_init (&path, 128);
+  dbuf_init (&path, PATH_MAX);
 
   /* get the file extension.
      If no '.' then we don't know what the file type is
@@ -1205,7 +1205,7 @@ parseCmdLine (int argc, char **argv)
                   {
                     struct dbuf_s path;
 
-                    dbuf_init (&path, 128);
+                    dbuf_init (&path, PATH_MAX);
                     fullDstFileName = Safe_strdup (outName);
 
                     /* get rid of the "."-extension */
@@ -1214,7 +1214,7 @@ parseCmdLine (int argc, char **argv)
                     dbuf_c_str (&path);
                     dstFileName = dbuf_detach (&path);
 
-                    dbuf_init (&path, 128);
+                    dbuf_init (&path, PATH_MAX);
                     /* strip module name to get path */
                     if (dbuf_splitPath (dstFileName, &path, NULL))
                       {
@@ -1398,7 +1398,7 @@ parseCmdLine (int argc, char **argv)
           dbuf_c_str (&file);
           s = dbuf_detach (&file);
 
-          dbuf_init (&file, 128);
+          dbuf_init (&file, PATH_MAX);
 
           dbuf_splitPath (s, NULL, &file);
 
@@ -1406,7 +1406,7 @@ parseCmdLine (int argc, char **argv)
             {
               struct dbuf_s path;
 
-              dbuf_init(&path, 128);
+              dbuf_init (&path, PATH_MAX);
               dbuf_makePath (&path, dstPath, dbuf_c_str (&file));
               dbuf_destroy (&file);
               dbuf_c_str (&path);
@@ -1556,6 +1556,7 @@ linkEdit (char **envp)
 {
   FILE *lnkfile;
   char *segName, *c;
+  int system_ret;
   const char *s;
   struct dbuf_s linkerScriptFileName;
   struct dbuf_s binFileName;
@@ -1575,7 +1576,7 @@ linkEdit (char **envp)
       else
         {
           dbuf_append_str (&binFileName, dstFileName);
-          dbuf_append_str (&binFileName, getOutFmtExt());
+          dbuf_append_str (&binFileName, getOutFmtExt ());
         }
 
       /* first we need to create the <filename>.lnk file */
@@ -1778,7 +1779,7 @@ linkEdit (char **envp)
         {
           struct dbuf_s path;
 
-          dbuf_init (&path, 128);
+          dbuf_init (&path, PATH_MAX);
           dbuf_printf (&path, "%s%s", dstFileName, port->linker.rel_ext);
           addSetHead (&relFilesSet, dbuf_detach (&path));
         }
@@ -1796,15 +1797,9 @@ linkEdit (char **envp)
 
               for (p = port->linker.crt; NULL != *p; ++p)
                 {
-                  /* Try to find where C runtiome files are ...
+                  /* Try to find where C runtime files are ...
                      It is very important for this file to be first on the linking proccess
                      so the areas are set in the correct order, expecially _GSINIT */
-                  /*
-                  tempSet = appendStrSet (libDirsSet, NULL, DIR_SEPARATOR_STRING);  // root directory
-                  tempSet = appendStrSet (tempSet, NULL, c);                        // ./<target> directory
-                  mergeSets (&tempSet, libPathsSet);
-                  */
-
                   for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
                     {
                       dbuf_set_length (&crtpath, 0);
@@ -1896,9 +1891,29 @@ linkEdit (char **envp)
     }
 
   dbuf_destroy (&linkerScriptFileName);
+
+  /* if the binary file name is defined,
+     rename the linker output file name to binary file name */
+  if (fullDstFileName)
+    {
+      struct dbuf_s lkrFileName;
+
+      dbuf_init (&lkrFileName, PATH_MAX);
+      dbuf_append_str (&lkrFileName, dstFileName);
+      dbuf_append_str (&lkrFileName, getOutFmtExt ());
+
+      if (FILENAME_CMP (dbuf_c_str (&binFileName), dbuf_c_str (&lkrFileName))
+        remove (dbuf_c_str (&binFileName));
+      rename (dbuf_c_str (&lkrFileName), dbuf_c_str (&binFileName));
+
+      dbuf_destroy (&lkrFileName);
+    }
+
   dbuf_destroy (&binFileName);
 
-  if (my_system (buffer))
+  system_ret = my_system (buffer);
+
+  if (system_ret)
     exit (EXIT_FAILURE);
 }
 
@@ -1910,7 +1925,7 @@ assemble (char **envp)
 {
   /* build assembler output filename */
   struct dbuf_s asmName;
-  dbuf_init (&asmName, 128);
+  dbuf_init (&asmName, PATH_MAX);
 
   /* -o option overrides default name? */
   if (options.cc_only && fullDstFileName)

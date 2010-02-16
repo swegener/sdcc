@@ -1,6 +1,9 @@
 2010-02-16 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: remove crt0.rel for z80 and gb
+	* src/SDCCmain.c:
+	  fixed the fist part of bug #2951083: -o not working as expected:
+	  rename the linker output file name to -o binary file name
 
 2010-02-16 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/peeph-gbz80.def,

@@ -130,19 +130,23 @@ void SaveLinkedFilePath(char * filepath)
 
         if((dflag) && (!rflag))
         {
+		char *p;
+
                 infn=realloc(infn, sizeof(_infn)*(numin+1));
 
                 strcpy(infn[numin].PathName, filepath);
                 j=strlen(infn[numin].PathName);
 
                 /*If there is an extension remove it*/
-                if(j>=4)
-                {
-                        if(EQ(&infn[numin].PathName[j-4], ".rel"))
-                        {
-                                infn[numin].PathName[j-4]=0;
-                        }
-                }
+		for (p = &infn[numin].PathName[strlen(infn[numin].PathName) - 1]; p >= infn[numin].PathName; --p)
+		{
+			if (*p == '/' || *p == '\\')
+				break;
+
+			if (*p == '.')
+				*p = '\0';
+				break;
+		}
 
                 /*Get the module name=filename, no drive, no dir, no ext*/
                 GetName(infn[numin].PathName, infn[numin].ModuleName);

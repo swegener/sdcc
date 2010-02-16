@@ -4,6 +4,9 @@
 	* src/SDCCmain.c:
 	  fixed the fist part of bug #2951083: -o not working as expected:
 	  rename the linker output file name to -o binary file name
+	* sdas/linksrc/lkaomf51.c:
+	  fixed the second part of bug #2951083: -o not working as expected:
+	  remove the file extension in any case
 
 2010-02-16 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/peeph-gbz80.def,

@@ -1902,7 +1902,7 @@ linkEdit (char **envp)
       dbuf_append_str (&lkrFileName, dstFileName);
       dbuf_append_str (&lkrFileName, getOutFmtExt ());
 
-      if (FILENAME_CMP (dbuf_c_str (&binFileName), dbuf_c_str (&lkrFileName))
+      if (FILENAME_CMP (dbuf_c_str (&binFileName), dbuf_c_str (&lkrFileName)))
         remove (dbuf_c_str (&binFileName));
       rename (dbuf_c_str (&lkrFileName), dbuf_c_str (&binFileName));
 

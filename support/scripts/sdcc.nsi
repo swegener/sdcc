@@ -1,6 +1,6 @@
 # sdcc.nsi - NSIS installer script for SDCC
 #
-# Copyright (c) 2003-2009 Borut Razem
+# Copyright (c) 2003-2010 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -850,7 +850,7 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\hc08\*.lib"
 
-  Delete "$INSTDIR\lib\z80\*.o"
+  Delete "$INSTDIR\lib\z80\*.rel"
   Delete "$INSTDIR\lib\z80\*.lib"
 
   Delete "$INSTDIR\lib\small\*.lib"
@@ -861,6 +861,7 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\small-stack-auto\*.lib"
 
+  Delete "$INSTDIR\lib\gbz80\*.rel"
   Delete "$INSTDIR\lib\gbz80\*.lib"
 
   Delete "$INSTDIR\lib\ds390\*.lib"

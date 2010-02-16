@@ -1,3 +1,7 @@
+2010-02-16 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: remove crt0.rel for z80 and gb
+
 2010-02-16 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/peeph-gbz80.def,
 	  device/include/asm/z80/features.h,

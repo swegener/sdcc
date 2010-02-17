@@ -369,7 +369,7 @@ _validatePorts (void)
           /* Uncomment this line to debug which port is causing the problem
            * (the target name is close to the beginning of the port struct
            * and probably can be accessed just fine). */
-          fprintf(stderr,"%s :",_ports[i]->target);
+          fprintf (stderr, "%s :",_ports[i]->target);
           wassertl (0, "Port definition structure is incomplete");
         }
     }
@@ -472,7 +472,7 @@ printVersionInfo (FILE *stream)
 }
 
 static void
-printOptions(const OPTION *optionsTable, FILE *stream)
+printOptions (const OPTION *optionsTable, FILE *stream)
 {
   int i;
   for (i = 0;
@@ -539,7 +539,7 @@ setParseWithComma (set **dest, const char *src)
 
   /* skip the trailing white spaces */
   end = &src[strlen(src) - 1];
-  while (end >= src && isspace((unsigned char)*end))
+  while (end >= src && isspace  ((unsigned char)*end))
     --end;
   ++end;
 
@@ -581,8 +581,8 @@ setDefaultOptions (void)
   options.shortis8bits = 0;
   options.std_sdcc = 1;           /* enable SDCC language extensions */
   options.std_c99 = 0;            /* default to C89 until more C99 support */
-  options.code_seg = CODE_NAME ? Safe_strdup(CODE_NAME) : NULL; /* default to CSEG for generated code */
-  options.const_seg = CONST_NAME ? Safe_strdup(CONST_NAME) : NULL; /* default to CONST for generated code */
+  options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL; /* default to CSEG for generated code */
+  options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL; /* default to CONST for generated code */
   options.stack10bit = 0;
   options.out_fmt = 0;
 
@@ -712,11 +712,11 @@ _setModel (int model, const char *sz)
     then for input of '--optxyz' or '--opt xyz' returns xyz.
 */
 char *
-getStringArg(const char *szStart, char **argv, int *pi, int argc)
+getStringArg (const char *szStart, char **argv, int *pi, int argc)
 {
-  if (argv[*pi][strlen(szStart)])
+  if (argv[*pi][strlen (szStart)])
     {
-      return &argv[*pi][strlen(szStart)];
+      return &argv[*pi][strlen (szStart)];
     }
   else
     {
@@ -738,13 +738,13 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
     getStringArg.
 */
 int
-getIntArg(const char *szStart, char **argv, int *pi, int argc)
+getIntArg (const char *szStart, char **argv, int *pi, int argc)
 {
   char *p;
   int val;
-  char *str = getStringArg(szStart, argv, pi, argc);
+  char *str = getStringArg (szStart, argv, pi, argc);
 
-  val = strtol(str, &p, 0);
+  val = strtol (str, &p, 0);
   if (p == str || *p != '\0')
     {
       werror (E_BAD_INT_ARGUMENT, szStart);
@@ -755,16 +755,16 @@ getIntArg(const char *szStart, char **argv, int *pi, int argc)
 }
 
 static void
-verifyShortOption(const char *opt)
+verifyShortOption (const char *opt)
 {
-  if (strlen(opt) != 2)
+  if (strlen (opt) != 2)
     {
       werror (W_EXCESS_SHORT_OPTIONS, opt);
     }
 }
 
 static bool
-tryHandleUnsupportedOpt(char **argv, int *pi)
+tryHandleUnsupportedOpt (char **argv, int *pi)
 {
   if (argv[*pi][0] == '-')
     {
@@ -781,14 +781,14 @@ tryHandleUnsupportedOpt(char **argv, int *pi)
         {
           shortOpt = argv[*pi][1];
         }
-      for (i = 0; i < LENGTH(unsupportedOptTable); i++)
+      for (i = 0; i < LENGTH (unsupportedOptTable); i++)
         {
           if (unsupportedOptTable[i].shortOpt == shortOpt ||
-              (longOpt && unsupportedOptTable[i].longOpt && !strcmp(unsupportedOptTable[i].longOpt, longOpt)))
+              (longOpt && unsupportedOptTable[i].longOpt && !strcmp (unsupportedOptTable[i].longOpt, longOpt)))
             {
               /* Found an unsupported opt. */
               char buffer[100];
-              SNPRINTF(buffer, sizeof(buffer),
+              SNPRINTF (buffer, sizeof(buffer),
                 "%s%c%c",
                 longOpt ? longOpt : "",
                 shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
@@ -807,7 +807,7 @@ tryHandleUnsupportedOpt(char **argv, int *pi)
 }
 
 static bool
-scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt, char **argv, int *pi, int argc)
+scanOptionsTable (const OPTION *optionsTable, char shortOpt, const char *longOpt, char **argv, int *pi, int argc)
 {
   int i;
 
@@ -820,7 +820,7 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
         {
           if (optionsTable[i].pparameter != NULL)
             {
-              verifyShortOption(argv[*pi]);
+              verifyShortOption (argv[*pi]);
 
               (*(int *)optionsTable[i].pparameter)++;
 
@@ -851,7 +851,7 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
 
                     case CLAT_STRING:
                       if (*(char **)optionsTable[i].pparameter)
-                        Safe_free(*(char **)optionsTable[i].pparameter);
+                        Safe_free (*(char **)optionsTable[i].pparameter);
                       *(char **)optionsTable[i].pparameter = Safe_strdup (getStringArg (optionsTable[i].longOpt, argv, pi, argc));
                       break;
 
@@ -864,7 +864,7 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
                       break;
 
                     case CLAT_ADD_SET:
-                      addSet((set **)optionsTable[i].pparameter, Safe_strdup (getStringArg (optionsTable[i].longOpt, argv, pi, argc)));
+                      addSet ((set **)optionsTable[i].pparameter, Safe_strdup (getStringArg (optionsTable[i].longOpt, argv, pi, argc)));
                       break;
                     }
                   return TRUE;
@@ -882,7 +882,7 @@ scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt,
 }
 
 static bool
-tryHandleSimpleOpt(char **argv, int *pi, int argc)
+tryHandleSimpleOpt (char **argv, int *pi, int argc)
 {
   if (argv[*pi][0] == '-')
     {
@@ -899,12 +899,12 @@ tryHandleSimpleOpt(char **argv, int *pi, int argc)
           shortOpt = argv[*pi][1];
         }
 
-      if (scanOptionsTable(optionsTable, shortOpt, longOpt, argv, pi, argc))
+      if (scanOptionsTable (optionsTable, shortOpt, longOpt, argv, pi, argc))
         {
           return TRUE;
         }
       else if (port && port->poptions &&
-               scanOptionsTable(port->poptions, shortOpt, longOpt, argv, pi, argc))
+               scanOptionsTable (port->poptions, shortOpt, longOpt, argv, pi, argc))
         {
           return TRUE;
         }
@@ -940,12 +940,12 @@ parseCmdLine (int argc, char **argv)
           continue;
         }
 
-      if (tryHandleUnsupportedOpt(argv, &i) == TRUE)
+      if (tryHandleUnsupportedOpt (argv, &i) == TRUE)
         {
           continue;
         }
 
-      if (tryHandleSimpleOpt(argv, &i, argc) == TRUE)
+      if (tryHandleSimpleOpt (argv, &i, argc) == TRUE)
         {
           continue;
         }
@@ -1025,7 +1025,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
             {
-              options.xram_size = getIntArg(OPTION_XRAM_SIZE, argv, &i, argc);
+              options.xram_size = getIntArg (OPTION_XRAM_SIZE, argv, &i, argc);
               options.xram_size_set = TRUE;
               continue;
             }
@@ -1071,16 +1071,16 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_LESS_PEDANTIC) == 0)
             {
               options.lessPedantic = 1;
-              setErrorLogLevel(ERROR_LEVEL_WARNING);
+              setErrorLogLevel (ERROR_LEVEL_WARNING);
               continue;
             }
 
           if (strcmp (argv[i], OPTION_DISABLE_WARNING) == 0)
             {
-              int w = getIntArg(OPTION_DISABLE_WARNING, argv, &i, argc);
+              int w = getIntArg (OPTION_DISABLE_WARNING, argv, &i, argc);
               if (w < MAX_ERROR_WARNING)
                 {
-                  setWarningDisabled(w);
+                  setWarningDisabled (w);
                 }
               continue;
             }
@@ -1088,7 +1088,7 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_WERROR) == 0)
             {
               setWError(1);
-              addSet(&preArgvSet, Safe_strdup("-Werror"));
+              addSet (&preArgvSet, Safe_strdup ("-Werror"));
               continue;
             }
 
@@ -1132,7 +1132,7 @@ parseCmdLine (int argc, char **argv)
 
               dbuf_init (&segname, 16);
               dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CODE_SEG, argv, &i, argc));
-              if (options.code_seg) Safe_free(options.code_seg);
+              if (options.code_seg) Safe_free (options.code_seg);
               options.code_seg = dbuf_detach (&segname);
               continue;
             }
@@ -1143,7 +1143,7 @@ parseCmdLine (int argc, char **argv)
 
               dbuf_init (&segname, 16);
               dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CONST_SEG, argv, &i, argc));
-              if (options.const_seg) Safe_free(options.const_seg);
+              if (options.const_seg) Safe_free (options.const_seg);
               options.const_seg = dbuf_detach (&segname);
               continue;
             }
@@ -1158,7 +1158,7 @@ parseCmdLine (int argc, char **argv)
           switch (argv[i][1])
             {
             case 'h':
-              verifyShortOption(argv[i]);
+              verifyShortOption (argv[i]);
 
               printUsage ();
               exit (EXIT_SUCCESS);
@@ -1174,30 +1174,30 @@ parseCmdLine (int argc, char **argv)
               break;
 
             case 'c':
-              verifyShortOption(argv[i]);
+              verifyShortOption (argv[i]);
 
               options.cc_only = 1;
               break;
 
             case 'L':
-                addSet(&libPathsSet, Safe_strdup(getStringArg("-L", argv, &i, argc)));
+                addSet (&libPathsSet, Safe_strdup (getStringArg("-L", argv, &i, argc)));
                 break;
 
             case 'l':
-                addSet(&libFilesSet, Safe_strdup(getStringArg("-l", argv, &i, argc)));
+                addSet (&libFilesSet, Safe_strdup (getStringArg("-l", argv, &i, argc)));
                 break;
 
             case 'o':
               {
-                char *outName = getStringArg("-o", argv, &i, argc);
-                size_t len = strlen(outName);
+                char *outName = getStringArg ("-o", argv, &i, argc);
+                size_t len = strlen (outName);
 
                 /* point to last character */
-                if (IS_DIR_SEPARATOR(outName[len - 1]))
+                if (IS_DIR_SEPARATOR (outName[len - 1]))
                   {
                     /* only output path specified */
                     dstPath = Safe_malloc(len);
-                    memcpy(dstPath, outName, len - 1);
+                    memcpy (dstPath, outName, len - 1);
                     dstPath[len - 1] = '\0';
                     fullDstFileName = NULL;
                   }
@@ -1231,17 +1231,17 @@ parseCmdLine (int argc, char **argv)
               /* pre-processer options */
               if (argv[i][2] == 'p')
                 {
-                  setParseWithComma(&preArgvSet, getStringArg("-Wp", argv, &i, argc));
+                  setParseWithComma (&preArgvSet, getStringArg ("-Wp", argv, &i, argc));
                 }
               /* linker options */
               else if (argv[i][2] == 'l')
                 {
-                  setParseWithComma(&linkOptionsSet, getStringArg("-Wl", argv, &i, argc));
+                  setParseWithComma (&linkOptionsSet, getStringArg ("-Wl", argv, &i, argc));
                 }
               /* assembler options */
               else if (argv[i][2] == 'a')
                 {
-                  setParseWithComma(&asmOptionsSet, getStringArg("-Wa", argv, &i, argc));
+                  setParseWithComma (&asmOptionsSet, getStringArg ("-Wa", argv, &i, argc));
                 }
               else
                 {
@@ -1250,7 +1250,7 @@ parseCmdLine (int argc, char **argv)
               break;
 
             case 'v':
-              verifyShortOption(argv[i]);
+              verifyShortOption (argv[i]);
 
               printVersionInfo (stdout);
               exit (EXIT_SUCCESS);
@@ -1261,9 +1261,9 @@ parseCmdLine (int argc, char **argv)
               {
                 preProcOnly = 1;
                 if (argv[i][2] == 'M')
-                  addSet(&preArgvSet, Safe_strdup("-MM"));
+                  addSet (&preArgvSet, Safe_strdup ("-MM"));
                 else
-                  addSet(&preArgvSet, Safe_strdup("-M"));
+                  addSet (&preArgvSet, Safe_strdup ("-M"));
                 break;
               }
 
@@ -1282,7 +1282,7 @@ parseCmdLine (int argc, char **argv)
                     if (i >= argc)
                       {
                         /* No argument. */
-                        werror(E_ARGUMENT_MISSING, argv[i-1]);
+                        werror (E_ARGUMENT_MISSING, argv[i-1]);
                         break;
                       }
                     else
@@ -1296,12 +1296,12 @@ parseCmdLine (int argc, char **argv)
                 if (sOpt == 'Y')
                   sOpt = 'I';
 
-                SNPRINTF (buffer, sizeof(buffer),
+                SNPRINTF (buffer, sizeof (buffer),
                   ((sOpt == 'I') ? "-%c\"%s\"": "-%c%s"), sOpt, rest);
-                addSet(&preArgvSet, Safe_strdup(buffer));
+                addSet (&preArgvSet, Safe_strdup (buffer));
                 if(sOpt == 'I') {
-                  addSet(&includeDirsSet, Safe_strdup(rest));
-                  addSet(&userIncDirsSet, Safe_strdup(rest));
+                  addSet (&includeDirsSet, Safe_strdup (rest));
+                  addSet (&userIncDirsSet, Safe_strdup (rest));
                 }
               }
               break;
@@ -1334,16 +1334,16 @@ parseCmdLine (int argc, char **argv)
           werror (W_NO_FILE_ARG_IN_C1, fullSrcFileName);
         }
       fullSrcFileName = NULL;
-      for (s = setFirstItem(relFilesSet); s != NULL; s = setNextItem(relFilesSet))
+      for (s = setFirstItem (relFilesSet); s != NULL; s = setNextItem (relFilesSet))
         {
           werror (W_NO_FILE_ARG_IN_C1, s);
         }
-      for (s = setFirstItem(libFilesSet); s != NULL; s = setNextItem(libFilesSet))
+      for (s = setFirstItem (libFilesSet); s != NULL; s = setNextItem (libFilesSet))
         {
           werror (W_NO_FILE_ARG_IN_C1, s);
         }
-      deleteSet(&relFilesSet);
-      deleteSet(&libFilesSet);
+      deleteSet (&relFilesSet);
+      deleteSet (&libFilesSet);
 
       if (options.cc_only || noAssemble || preProcOnly)
         {
@@ -1359,7 +1359,7 @@ parseCmdLine (int argc, char **argv)
         {
           char *p;
 
-          moduleName = Safe_strdup(dstFileName);
+          moduleName = Safe_strdup (dstFileName);
           for (p = moduleName; *p; ++p)
             if (!isalnum ((unsigned char)*p))
               *p = '_';
@@ -1377,16 +1377,16 @@ parseCmdLine (int argc, char **argv)
 
           if (*dstPath != '\0')
             {
-              dbuf_init(&path, 128);
+              dbuf_init (&path, 128);
               dbuf_makePath (&path, dstPath, moduleNameBase);
               dbuf_c_str (&path);
               dstFileName = dbuf_detach (&path);
             }
           else
-            dstFileName = Safe_strdup(moduleNameBase);
+            dstFileName = Safe_strdup (moduleNameBase);
         }
       /* use the modulename from the first object file */
-      else if ((s = peekSet(relFilesSet)) != NULL)
+      else if ((s = peekSet (relFilesSet)) != NULL)
         {
           struct dbuf_s file;
 
@@ -1438,13 +1438,13 @@ parseCmdLine (int argc, char **argv)
       dbuf_append_str (&adbFile, ".adb");
 
       if (debugFile->openFile(dbuf_c_str (&adbFile)))
-        debugFile->writeModule(moduleName);
+        debugFile->writeModule (moduleName);
       else
         werror (E_FILE_OPEN_ERR, dbuf_c_str (&adbFile));
 
       dbuf_destroy (&adbFile);
     }
-  MSVC_style(options.vc_err_style);
+  MSVC_style (options.vc_err_style);
 
   return 0;
 }
@@ -1594,7 +1594,7 @@ linkEdit (char **envp)
       else /*For all the other ports.  Including pics???*/
         {
           fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt,  dbuf_c_str (&binFileName));
-          if(!options.no_pack_iram)
+          if (!options.no_pack_iram)
               fprintf (lnkfile, "-Y\n");
         }
 
@@ -1623,10 +1623,10 @@ linkEdit (char **envp)
 #define WRITE_SEG_LOC(N, L) \
   if (N) \
   { \
-    segName = Safe_strdup(N); \
-    c = strtok(segName, " \t"); \
+    segName = Safe_strdup (N); \
+    c = strtok (segName, " \t"); \
     fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
-    if (segName) { Safe_free(segName); } \
+    if (segName) { Safe_free (segName); } \
   }
 
       if (!(TARGET_Z80_LIKE)) /*Not for the z80, gbz80*/
@@ -1666,8 +1666,8 @@ linkEdit (char **envp)
           WRITE_SEG_LOC (BIT_NAME, 0);
 
           /* stack start */
-          if ( (options.stack_loc) && (options.stack_loc<0x100) &&
-               !TARGET_IS_HC08)
+          if ((options.stack_loc) && (options.stack_loc<0x100) &&
+            !TARGET_IS_HC08)
             {
               WRITE_SEG_LOC ("SSEG", options.stack_loc);
             }
@@ -1681,14 +1681,14 @@ linkEdit (char **envp)
       /* If the port has any special linker area declarations, get 'em */
       if (port->extraAreas.genExtraAreaLinkOptions)
         {
-          port->extraAreas.genExtraAreaLinkOptions(lnkfile);
+          port->extraAreas.genExtraAreaLinkOptions (lnkfile);
         }
 
       /* add the extra linker options */
-      fputStrSet(lnkfile, linkOptionsSet);
+      fputStrSet (lnkfile, linkOptionsSet);
 
       /* command line defined library paths if specified */
-      for (s = setFirstItem(libPathsSet); s != NULL; s = setNextItem(libPathsSet))
+      for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
         fprintf (lnkfile, "-k %s\n", s);
 
       /* standard library path */
@@ -1704,18 +1704,21 @@ linkEdit (char **envp)
                   else
                     c = "small";
                   break;
+ 
                 case MODEL_MEDIUM:
                   if (options.stackAuto)
                     c = "medium-stack-auto";
                   else
                     c = "medium";
                   break;
+
                 case MODEL_LARGE:
                   if (options.stackAuto)
                     c = "large-stack-auto";
                   else
                     c = "large";
                   break;
+
                 case MODEL_FLAT24:
                   /* c = "flat24"; */
                   if (TARGET_IS_DS390)
@@ -1734,9 +1737,11 @@ linkEdit (char **envp)
                       exit (EXIT_FAILURE);
                     }
                   break;
+
                 case MODEL_PAGE0:
                   c = "xa51";
                   break;
+
                 default:
                   werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
                   c = "unknown";
@@ -1892,6 +1897,8 @@ linkEdit (char **envp)
 
   dbuf_destroy (&linkerScriptFileName);
 
+  system_ret = my_system (buffer);
+
   /* if the binary file name is defined,
      rename the linker output file name to binary file name */
   if (fullDstFileName)
@@ -1910,8 +1917,6 @@ linkEdit (char **envp)
     }
 
   dbuf_destroy (&binFileName);
-
-  system_ret = my_system (buffer);
 
   if (system_ret)
     exit (EXIT_FAILURE);
@@ -1984,59 +1989,66 @@ preProcess (char **envp)
         {
 #define OBJ_EXT_STR     "-obj-ext="
 #define OBJ_EXT_LEN     ((sizeof OBJ_EXT_STR) - 1)
-          char *buf = Safe_alloc(strlen(port->linker.rel_ext) + (OBJ_EXT_LEN + 1));
-          strcpy(buf, OBJ_EXT_STR);
-          strcpy(&buf[OBJ_EXT_LEN], port->linker.rel_ext);
-          addSet(&preArgvSet, buf);
+          char *buf = Safe_alloc (strlen (port->linker.rel_ext) + (OBJ_EXT_LEN + 1));
+          strcpy (buf, OBJ_EXT_STR);
+          strcpy (&buf[OBJ_EXT_LEN], port->linker.rel_ext);
+          addSet (&preArgvSet, buf);
         }
 
       /* if using dollar signs in identifiers */
       if (options.dollars_in_ident)
-        addSet(&preArgvSet, Safe_strdup("-fdollars-in-identifiers"));
+        addSet (&preArgvSet, Safe_strdup ("-fdollars-in-identifiers"));
 
       /* if using external stack define the macro */
       if (options.useXstack)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_USE_XSTACK"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_USE_XSTACK"));
 
       /* set the macro for stack autos  */
       if (options.stackAuto)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_STACK_AUTO"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_STACK_AUTO"));
 
       /* set the macro for stack autos  */
       if (options.stack10bit)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_STACK_TENBIT"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_STACK_TENBIT"));
 
       /* set the macro for no overlay  */
       if (options.noOverlay)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_NOOVERLAY"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_NOOVERLAY"));
 
       if (options.unsigned_char)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_CHAR_UNSIGNED"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_CHAR_UNSIGNED"));
 
       /* set the macro for large model  */
       switch (options.model)
         {
         case MODEL_LARGE:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_LARGE"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_LARGE"));
           break;
+
         case MODEL_SMALL:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_SMALL"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_SMALL"));
           break;
+
         case MODEL_COMPACT:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_COMPACT"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_COMPACT"));
           break;
+
         case MODEL_MEDIUM:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_MEDIUM"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_MEDIUM"));
           break;
+
         case MODEL_HUGE:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_HUGE"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_HUGE"));
           break;
+
         case MODEL_FLAT24:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_FLAT24"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_FLAT24"));
           break;
+
         case MODEL_PAGE0:
-          addSet(&preArgvSet, Safe_strdup("-DSDCC_MODEL_PAGE0"));
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_PAGE0"));
           break;
+
         default:
           werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
           break;
@@ -2044,47 +2056,49 @@ preProcess (char **envp)
 
       /* set macro corresponding to compiler option */
       if (options.intlong_rent)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_INT_LONG_REENT"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_INT_LONG_REENT"));
 
       /* set macro corresponding to compiler option */
       if (options.float_rent)
-        addSet(&preArgvSet, Safe_strdup("-DSDCC_FLOAT_REENT"));
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_FLOAT_REENT"));
 
       /* add SDCC version number */
       {
         char buf[20];
-        SNPRINTF(buf, sizeof(buf), "-DSDCC=%d%d%d",
+        SNPRINTF (buf, sizeof(buf), "-DSDCC=%d%d%d",
                  SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
-        addSet(&preArgvSet, Safe_strdup(buf));
+        addSet (&preArgvSet, Safe_strdup (buf));
       }
 
       /* add SDCC revision number */
       {
         char buf[25];
-        SNPRINTF(buf, sizeof(buf), "-DSDCC_REVISION=%s", getBuildNumber());
-        addSet(&preArgvSet, Safe_strdup(buf));
+        SNPRINTF (buf, sizeof(buf), "-DSDCC_REVISION=%s", getBuildNumber());
+        addSet (&preArgvSet, Safe_strdup (buf));
       }
 
       /* add port (processor information to processor */
-      addSet(&preArgvSet, Safe_strdup("-DSDCC_{port}"));
-      addSet(&preArgvSet, Safe_strdup("-D__{port}"));
+      addSet (&preArgvSet, Safe_strdup ("-DSDCC_{port}"));
+      addSet (&preArgvSet, Safe_strdup ("-D__{port}"));
 
-      if (port && port->processor && TARGET_IS_PIC) {
-        char proc[512];
-        SNPRINTF(&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
-        addSet(&preArgvSet, Safe_strdup(proc));
-      }
+      if (port && port->processor && TARGET_IS_PIC)
+        {
+          char proc[512];
+          SNPRINTF (&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
+          addSet (&preArgvSet, Safe_strdup (proc));
+        }
 
       /* standard include path */
-      if (!options.nostdinc) {
-        inclList = appendStrSet(includeDirsSet, "-isystem \"", "\"");
-        mergeSets(&preArgvSet, inclList);
-      }
+      if (!options.nostdinc)
+        {
+          inclList = appendStrSet (includeDirsSet, "-isystem \"", "\"");
+          mergeSets (&preArgvSet, inclList);
+        }
 
-      setMainValue("cppextraopts", (s = joinStrSet(preArgvSet)));
-      Safe_free((void *)s);
+      setMainValue ("cppextraopts", (s = joinStrSet (preArgvSet)));
+      Safe_free ((void *)s);
       if (inclList != NULL)
-        deleteSet(&inclList);
+        deleteSet (&inclList);
 
       if (preProcOnly && fullDstFileName)
         {
@@ -2326,15 +2340,19 @@ sig_handler (int signal)
     case SIGABRT:
       sig_string = "SIGABRT";
       break;
+
     case SIGTERM:
       sig_string = "SIGTERM";
       break;
+
     case SIGINT:
       sig_string = "SIGINT";
       break;
+
     case SIGSEGV:
       sig_string = "SIGSEGV";
       break;
+
     default:
       sig_string = "Unknown?";
       break;
@@ -2396,7 +2414,7 @@ main (int argc, char **argv, char **envp)
 #ifdef JAMIN_DS390
   if (ds390_jammed) {
     options.model = MODEL_SMALL;
-    options.stack10bit=0;
+    options.stack10bit = 0;
   }
 #endif
 
@@ -2411,20 +2429,20 @@ main (int argc, char **argv, char **envp)
   setDataPaths (argv[0]);
   
   if(readCfgFile (".")==0)  /* check local directory first */
-    readCfgFile (setFirstItem(binPathSet)); /* check sdcc's bin directory */
+    readCfgFile (setFirstItem (binPathSet)); /* check sdcc's bin directory */
 
   if (port->initPaths)
     port->initPaths();
 
   if (options.printSearchDirs)
-    doPrintSearchDirs();
+    doPrintSearchDirs ();
 
   /* if no input then printUsage & exit */
-  if (!options.c1mode && !fullSrcFileName && peekSet(relFilesSet) == NULL)
+  if (!options.c1mode && !fullSrcFileName && peekSet (relFilesSet) == NULL)
     {
       if (options.printSearchDirs)
         exit (EXIT_SUCCESS);
-      printUsage();
+      printUsage ();
       exit (EXIT_FAILURE);
     }
 
@@ -2456,7 +2474,7 @@ main (int argc, char **argv, char **envp)
       yyparse ();
 
       if (!options.c1mode)
-        if (pclose(yyin))
+        if (pclose (yyin))
           fatalError = 1;
 
       if (fatalError)

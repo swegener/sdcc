@@ -1805,7 +1805,7 @@ linkEdit (char **envp)
                   /* Try to find where C runtime files are ...
                      It is very important for this file to be first on the linking proccess
                      so the areas are set in the correct order, expecially _GSINIT */
-                  for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
+                  for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
                     {
                       dbuf_set_length (&crtpath, 0);
                       dbuf_printf (&crtpath, "%s%s%s", s, DIR_SEPARATOR_STRING, *p);

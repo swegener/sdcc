@@ -1,4 +1,9 @@
-2010-02-16 Borut Razem <borut.razem AT siol.net>
+2010-02-18 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: search C runtime initialization object files
+	  crt0.rel in system library directories
+
+	2010-02-16 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: remove crt0.rel for z80 and gb
 	* src/SDCCmain.c:

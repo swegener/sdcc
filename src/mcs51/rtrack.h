@@ -23,3 +23,6 @@ void rtrackUpdate (const char *line);
 char * rtrackGetLit(const char *x);
 
 int rtrackMoveALit (const char *x);
+
+void rtrackLoadDptrWithSym (const char *x);
+void rtrackLoadR0R1WithSym (const char *reg, const char *x);

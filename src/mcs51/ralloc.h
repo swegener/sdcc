@@ -56,9 +56,14 @@ typedef struct regs
     char *base;             /* base address */
     short offset;           /* offset from the base */
     unsigned isFree:1;      /* is currently unassigned  */
-    unsigned valueKnown:1;  /* from rtrack.c */
-    unsigned char value;    /* from rtrack.c only valid when valueKnown is set */
 
+    struct
+      {
+        unsigned valueKnown:1;
+        unsigned char value;    /* only valid when valueKnown is set */
+        char *symbol;           /* holds symbol if value is known by symbol */
+      }
+    rtrack;
   }
 regs;
 extern regs regs8051[];

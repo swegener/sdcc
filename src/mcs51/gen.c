@@ -741,7 +741,9 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   /* only remaining is far space */
   /* in which case DPTR gets the address */
   sym->aop = aop = newAsmop (AOP_DPTR);
-  emitcode ("mov", "dptr,#%s", sym->rname);
+
+  rtrackLoadDptrWithSym (sym->rname);
+
   aop->size = getSize (sym->type);
 
   /* if it is in code space */
@@ -1462,7 +1464,10 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
       return aop->aopu.aop_str[offset];
 
     case AOP_LIT:
-      return aopLiteral (aop->aopu.aop_lit, offset);
+      if (bit16)
+        return aopLiteralLong (aop->aopu.aop_lit, offset, 2);
+      else
+        return aopLiteral (aop->aopu.aop_lit, offset);
 
     case AOP_STR:
       aop->coff = offset;
@@ -2336,8 +2341,8 @@ saveRegisters (iCode * lic)
             {
               char szRegs[32];
               int mask = xstackRegisters(rsave, TRUE, count, szRegs);
-              emitcode ("mov", "a,#0x%02X", count);
-              emitcode ("mov", "b,#0x%02X", mask & 0xFF);
+              emitcode ("mov", "a,#0x%02x", count);
+              emitcode ("mov", "b,#0x%02x", mask & 0xFF);
               if (mask & 0x100)
                 emitcode ("lcall", "__sdcc_xpush_regs_r0\t;(%s)", szRegs);
               else
@@ -2445,7 +2450,7 @@ unsaveRegisters (iCode * ic)
             {
               char szRegs[32];
               int mask = xstackRegisters(rsave, FALSE, count, szRegs);
-              emitcode ("mov", "b,#0x%02X", mask & 0xFF);
+              emitcode ("mov", "b,#0x%02x", mask & 0xFF);
               if (mask & 0x100)
                 emitcode ("lcall", "__sdcc_xpop_regs_bits\t;(%s)", szRegs);
               else
@@ -10387,6 +10392,12 @@ loadDptrFromOperand (operand *op, bool loadBToo)
               emitcode ("pop", "dpl");
             }
         }
+      else if (AOP_TYPE (op) == AOP_LIT)
+      {
+          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE));
+          if (loadBToo)
+            emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
+      }
       else
         {                       /* we need to get it byte by byte */
           emitcode ("mov", "dpl,%s", aopGet (op, 0, FALSE, FALSE));

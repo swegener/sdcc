@@ -21,15 +21,16 @@
 /*-------------------------------------------------------------------------
   Status:
     - passes regression test suite, still bugs are likely
-    - only active if environment variable SDCC_RTRACK is set
+    - only active if environment variable SDCC_REGTRACK is set
 
   Missed opportunities:
-    - does not track symbols as in "mov a,#_my_int" or "mov a,#(_my_int+1)"
-    - only used with moves to acc so chances to use: "inc dptr",
-      "inc r2", "add a,r2" or "mov r2,a" would not be detected)
+    - does not track offsets to symbols as in "mov dptr,#(_my_int + 2)"
+    - only used for moves to acc or dptr so chances to use:
+      "inc r2", "mov r2,a" would not be taken
     - a label causes loss of tracking (no handling of information of blocks
       known to follow/preceed the current block)
     - not used in aopGet or genRet
+    - SFRX (__xdata volatile unsigned char __at(addr)) not handled as value
     - does not track which registers are known to be unchanged within
       a function (would not have to be saved when calling the function)
 -------------------------------------------------------------------------*/
@@ -42,26 +43,11 @@
 #include "common.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "rtrack.h"
 
-#define DEBUG(x)
-//#define DEBUG(x) x
 
-#define D(x) do if (options.verboseAsm) {x;} while(0)
-
-#define REGS8051_SET(idx,val) do{ \
-                                  regs8051[idx].value = (val) & 0xff; \
-                                  regs8051[idx].valueKnown = 1; \
-                                  DEBUG(printf("%s:0x%02x\n",regs8051[idx].name, \
-                                                       regs8051[idx].value);) \
-                              } while(0)
-
-#define REGS8051_UNSET(idx)   do{ \
-                                  regs8051[idx].valueKnown = 0; \
-                                  DEBUG(printf("%s:*\n",regs8051[idx].name);) \
-                              } while(0)
-
-/* r0..r7 are not in numerical order in struct regs: r2..r7,r0,r1 */
-#define Rx_NUM_TO_IDX(num) (R2_IDX+((num-2)&0x07))
+#define D(x)  do if (options.verboseAsm) {x;} while(0)
+#define DD(x) do if (options.verboseAsm && enableextraverbose) {x;} while(0)
 
 
 /* move this (or rtrackGetLit() and rtrackMoveALit()
@@ -70,69 +56,230 @@ void emitcode (const char *inst, const char *fmt,...);
 
 
 static int enable = -1;
+static int enableextraverbose = -1;
 
-/*
-static void dumpAll()
+
+static unsigned int rx_num_to_idx (const unsigned int num)
 {
-  unsigned int i;
-  unsigned int nl=0;
+  const unsigned int regidx[8] =
+    { R2_IDX, R3_IDX, R4_IDX, R5_IDX, R6_IDX, R7_IDX, R0_IDX, R1_IDX };
 
-  for (i=0; i<END_IDX; i++)
+  assert( 7 >= num );
+
+  return regidx [num & 0x7];
+}
+
+
+static void rtrack_data_unset (const unsigned int idx)
+{
+  assert (idx >= R2_IDX);
+  assert (idx < END_IDX);
+
+  if (regs8051[idx].rtrack.symbol || regs8051[idx].rtrack.valueKnown)
     {
-       if (regs8051[i].valueKnown)
-         {
-           if (!nl)
-             {
-               DEBUG(printf("know:");)
-             }
-           DEBUG(printf(" %s:0x%02x",regs8051[i].name,regs8051[i].value);)
-           nl = 1;
-         }
+      DD(emitcode (";", "\t%s=?", regs8051[idx].name););
     }
-  if (nl)
+
+  if (regs8051[idx].rtrack.symbol)
     {
-      DEBUG(printf("\n");)
+      Safe_free (regs8051[idx].rtrack.symbol);
+    }
+
+  memset (&regs8051[idx].rtrack, 0, sizeof regs8051[idx].rtrack);
+}
+
+
+static void rtrack_data_set_val (const unsigned int idx, const unsigned char value)
+{
+  assert (idx >= R2_IDX);
+  assert (idx < END_IDX);
+
+  if (value < 0)
+    {
+      rtrack_data_unset (idx);
+      return;
+    }
+
+  regs8051[idx].rtrack.value = value;
+  regs8051[idx].rtrack.valueKnown = 1;
+
+  /* in case it was set by symbol, unset symbol */
+  if (regs8051[idx].rtrack.symbol)
+    {
+      Safe_free (regs8051[idx].rtrack.symbol);
+      regs8051[idx].rtrack.symbol = NULL;
+    }
+
+  DD(emitcode (";", "\t%s=#0x%02x",
+                    regs8051[idx].name,
+                    regs8051[idx].rtrack.value););
+}
+
+
+static void rtrack_data_set_symbol (const unsigned int idx, const char * const symbol)
+{
+  assert (idx >= R2_IDX);
+  assert (idx < END_IDX);
+
+  /* in case it was set by value, unset value */
+  regs8051[idx].rtrack.value = 0;
+  regs8051[idx].rtrack.valueKnown = 0;
+
+  /* eventually free a previous symbol */
+  if (regs8051[idx].rtrack.symbol)
+    {
+      Safe_free (regs8051[idx].rtrack.symbol);
+    }
+  regs8051[idx].rtrack.symbol = Safe_strdup(symbol);
+
+  DD(emitcode (";", "\t%s=#%s",
+                    regs8051[idx].name,
+                    regs8051[idx].rtrack.symbol););
+}
+
+
+static int rtrack_data_is_same (const unsigned int idxdst, const unsigned int idxsrc)
+{
+  return ((regs8051[idxdst].rtrack.valueKnown && regs8051[idxsrc].rtrack.valueKnown) &&
+          (regs8051[idxdst].rtrack.value      == regs8051[idxsrc].rtrack.value)) ||
+         ((regs8051[idxdst].rtrack.symbol && regs8051[idxsrc].rtrack.symbol) &&
+         !strcmp (regs8051[idxdst].rtrack.symbol, regs8051[idxsrc].rtrack.symbol));
+}
+
+
+static void rtrack_data_copy_dst_src (const unsigned int idxdst, const unsigned int idxsrc)
+{
+  assert (idxdst >= R2_IDX);
+  assert (idxdst < END_IDX);
+  assert (idxsrc >= R2_IDX);
+  assert (idxsrc < END_IDX);
+
+  DD
+  (
+    if ((NULL != regs8051[idxsrc].rtrack.symbol) || regs8051[idxsrc].rtrack.valueKnown)
+      {
+        emitcode (";", "\t%s=%s", regs8051[idxdst].name, regs8051[idxsrc].name);
+      }
+    else if (regs8051[idxdst].rtrack.symbol || regs8051[idxdst].rtrack.valueKnown)
+      {
+        emitcode (";", "\t%s=*",regs8051[idxdst].name);
+      }
+
+    if (rtrack_data_is_same (idxdst, idxsrc))
+      {
+        emitcode (";", "genFromRTrack redundant?");
+      }
+  );
+
+  /* mov a, acc */
+  if (idxsrc == idxdst)
+    return;
+
+  regs8051[idxdst].rtrack.valueKnown = regs8051[idxsrc].rtrack.valueKnown;
+  regs8051[idxdst].rtrack.value      = regs8051[idxsrc].rtrack.value;
+
+  if (regs8051[idxdst].rtrack.symbol)
+    {
+      Safe_free (regs8051[idxdst].rtrack.symbol);
+      regs8051[idxdst].rtrack.symbol = NULL;
+    }
+
+  memcpy (&regs8051[idxdst].rtrack, &regs8051[idxdst].rtrack, sizeof regs8051[idxdst].rtrack);
+
+  if (regs8051[idxsrc].rtrack.symbol)
+    {
+      regs8051[idxdst].rtrack.symbol = Safe_strdup(regs8051[idxsrc].rtrack.symbol);
     }
 }
-*/
+
+
+static void dumpAll()
+{
+  DD
+  (
+    unsigned int i;
+    unsigned int column = 0;
+    char s[512];
+
+    s[0] = 0;
+    for (i = 0; i < END_IDX; i++)
+      {
+        if (regs8051[i].rtrack.valueKnown)
+          {
+            column += sprintf(s + column, "%s%s:#0x%02x",
+                              column?" ":"", regs8051[i].name, regs8051[i].rtrack.value);
+          }
+        if (NULL != regs8051[i].rtrack.symbol)
+          {
+            column += sprintf(s + column, "%s%s:#%s",
+                              column?" ":"", regs8051[i].name, regs8051[i].rtrack.symbol);
+          }
+        if (column>160)
+          {
+            strcpy (&s[157], "...");
+            break;
+          }
+      }
+    emitcode (";", "\t%s", s);
+  );
+}
 
 
 static void invalidateAllRx()
 {
-  //DEBUG(dumpAll();)
-  DEBUG(printf("R0..7:*\n");)
-  regs8051[R2_IDX].valueKnown = 0;
-  regs8051[R3_IDX].valueKnown = 0;
-  regs8051[R4_IDX].valueKnown = 0;
-  regs8051[R5_IDX].valueKnown = 0;
-  regs8051[R6_IDX].valueKnown = 0;
-  regs8051[R7_IDX].valueKnown = 0;
-  regs8051[R0_IDX].valueKnown = 0;
-  regs8051[R1_IDX].valueKnown = 0;
+  unsigned int i;
+  for (i = 0; i <= 7; i++)
+    {
+      rtrack_data_unset (rx_num_to_idx (i));
+    }
 }
+
 
 static void invalidateAll()
 {
-  DEBUG(printf("All:* ");)
   invalidateAllRx();
-  regs8051[DPL_IDX].valueKnown = 0;
-  regs8051[DPH_IDX].valueKnown = 0;
-  regs8051[B_IDX].valueKnown = 0;
-  regs8051[A_IDX].valueKnown = 0;
+
+  rtrack_data_unset (DPL_IDX);
+  rtrack_data_unset (DPH_IDX);
+  rtrack_data_unset (B_IDX);
+  rtrack_data_unset (A_IDX);
 }
 
-static regs * getReg(const char *str)
+
+static int regidxfromregname (const char* const s)
 {
-  char *s;
-  int regNum;
+  unsigned int i;
 
-  regNum = strtol (str, &s, 16);
-  if (s == str+1)
+  for (i = 0; i < END_IDX; i++)
     {
-      return &regs8051[Rx_NUM_TO_IDX(regNum)];
+       if (regs8051[i].name)
+         if (!strncmp (s, regs8051[i].name, strlen(regs8051[i].name)))
+            return i;
+
+       if (regs8051[i].dname)
+         if (!strncmp (s, regs8051[i].dname, strlen(regs8051[i].dname)))
+            return i;
     }
-  return NULL;
+
+  return -1;
 }
+
+
+static int valuefromliteral (const char* const s)
+{
+  char* tmp = NULL;
+  int value;
+
+  if (strncmp (s, "0x", 2))
+    return -1;
+
+  value = strtol (s + 2, &tmp, 16);
+  if (s != tmp)
+    return value;
+
+  return -1;
+}
+
 
 /* tracking values within registers by looking
    at the line passed to the assembler.
@@ -140,347 +287,626 @@ static regs * getReg(const char *str)
 void rtrackUpdate (const char *line)
 {
   if (enable == -1)
-    enable = (NULL != getenv("SDCC_RTRACK"));
+    enable = (NULL != getenv("SDCC_REGTRACK"));
+
+  if (enableextraverbose == -1)
+    enableextraverbose = (NULL != getenv("SDCC_REGTRACK_VERBOSE"));
 
   if (!enable ||
       *line == ';' ||                 /* comment */
       (NULL != strstr( line, "==."))) /* dirty check for _G.debugLine */
     return;                           /* nothing to do */
 
-  DEBUG(printf("%s\n",line);)
+  DD ( dumpAll ());
 
-  if (!strncmp (line,"mov",3))
+  if (!strncmp (line, "mov", 3))
     {
-      /* check literal mov to accumulator */
-      if(!strncmp (line,"mov\ta,#0x",9))
+      if (!strncmp (line, "movc\ta", 6) ||
+          !strncmp (line, "movx\ta", 6))
         {
-          char *s;
-          int value;
-
-          value = strtol (line+7, &s, 16);
-          if (s != line+7)
-              REGS8051_SET (A_IDX, value); /* valid hex found */
-          else
-              REGS8051_UNSET (A_IDX); /* probably a symbol (not handled) */
-
+          rtrack_data_unset (A_IDX);
           return;
         }
 
-      if (!strncmp (line,"mov\ta,r",7))
+      /* mov to register (r0..r7, dpl, dph, a, b)*/
+      if (!strncmp (line, "mov\t", 4))
         {
-          /* handle mov from Rx if Rx is known */
-          regs *r = getReg(line+7);
-          if (r && r->valueKnown)
+          int regIdx = regidxfromregname (line + 4);
+
+          if (0 <= regIdx)
             {
-              REGS8051_SET (A_IDX, r->value);
-              return;
-            }
-          REGS8051_UNSET (A_IDX);
-          return;
-        }
+              char *argument = strstr (line, ",") + 1;
+              char *s;
+              int value;
 
-      if (!strncmp (line,"mov\ta",5))
-        {
-          REGS8051_UNSET (A_IDX);
-          return;
-        }
+              value = strtol (argument + 1, &s, 16);
 
-      if (!strncmp (line,"movc\ta",6) ||
-          !strncmp (line,"movx\ta",6))
-        {
-          REGS8051_UNSET (A_IDX);
-          return;
-        }
+              /* check literal mov to register */
+              if ((s != argument + 1) && !strncmp (argument, "#0x", 3))
+                {
+                  D
+                  (
+                    if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value))
+                      emitcode (";", "genFromRTrack suggests to remove\t%s", line);
+                    if (regs8051[A_IDX].rtrack.valueKnown && (value == regs8051[A_IDX].rtrack.value) &&
+                        (regIdx != A_IDX))
+                      emitcode (";", "genFromRTrack suggests\tmov\t%s,a", regs8051[regIdx].name);
+                    else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value + 1) &&
+                             ((regIdx != A_IDX) || (0xff != regs8051[regIdx].rtrack.value)))
+                      emitcode (";", "genFromRTrack suggests\tinc\t%s", regs8051[regIdx].name);
+                    else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value - 1) &&
+                             ((regIdx != A_IDX) || (0x01 != regs8051[regIdx].rtrack.value)))
+                      emitcode (";", "genFromRTrack suggests\tdec\t%s", regs8051[regIdx].name);
+                  );
 
-      /* move direct to symbol, do not care */
-      if (!strncmp (line,"mov\t_",5) ||
-          !strncmp (line,"mov\t(_",6))
-        return;
-
-      /* check literal mov to register */
-      if (!strncmp (line,"mov\tr",5))
-        {
-          char *s;
-          int value;
-          int regNum;
-
-          regNum = strtol (line+5, &s, 16);
-          if (s == line+6)
-            {
-              value = strtol (line+8, &s, 16);
-              if ((s != line+8) && !strncmp (line+6,",#0x",4))
-                REGS8051_SET (Rx_NUM_TO_IDX(regNum), value);
+                  rtrack_data_set_val (regIdx, value);
+                }
+              /* check literal mov of symbol to register */
+              else if (!strncmp (argument, "#", 1))
+                {
+                  rtrack_data_set_symbol (regIdx, argument + 1);
+                }
+              /* check mov from register to register */
+              else if (0 <= regidxfromregname (argument))
+                {
+                  rtrack_data_copy_dst_src (regIdx, regidxfromregname (argument));
+                }
               else
-                REGS8051_UNSET (Rx_NUM_TO_IDX(regNum));
+                {
+                  /* mov acc.7,c and the likes */
+                  rtrack_data_unset (regIdx);
+                }
               return;
             }
         }
 
       /* mov to psw can change register bank */
-      if (!strncmp (line,"mov\tpsw,",8))
+      if (!strncmp (line, "mov\tpsw,", 8))
         {
-          invalidateAllRx();
+          invalidateAllRx ();
           return;
         }
 
-      /* no tracking of these, so we do not care */
-      if (!strncmp (line,"mov\tdptr,#",10) ||
-          !strncmp (line,"mov\tdpl,",8) ||
-          !strncmp (line,"mov\tdph,",8) ||
-          !strncmp (line,"mov\tsp,",7) ||
-          !strncmp (line,"mov\tb,",6))
-        return;
-
-      /* mov to xdata memory does not change registers */
-      if (!strncmp (line,"movx\t@",6))
-        return;
-
-      if (!strncmp (line,"mov\t@",5))
+      /* tracking dptr */
+      /* literal number 16 bit */
+      if (!strncmp (line, "mov\tdptr,#0x", 12))
         {
-          invalidateAllRx();
+          char* s;
+          int value = strtol (line + 10, &s, 16);
+          if( s != line + 10 )
+            {
+              if (options.verboseAsm)
+                {
+                  bool foundshortcut = 0;
+
+                  if ( regs8051[DPH_IDX].rtrack.valueKnown &&
+                       regs8051[DPL_IDX].rtrack.valueKnown &&
+                      (regs8051[DPH_IDX].rtrack.value == (value >> 8)) &&
+                      (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
+                    {
+                      emitcode (";", "genFromRTrack suggests to remove\t%s", line);
+                      foundshortcut = 1;
+                    }
+
+                  if (!foundshortcut &&
+                       regs8051[DPH_IDX].rtrack.valueKnown &&
+                       regs8051[DPL_IDX].rtrack.valueKnown)
+                    {
+                      /* some instructions are shorter than  mov dptr,#0xabcd */
+                      const struct
+                        {
+                           int offset;
+                           char* opcode;
+                        } reachable[6] =
+                        {
+                          {   1, "inc\tdptr"},
+                          { 256, "inc\tdph"},
+                          {-256, "dec\tdph"},
+                          {-255, "inc\tdpl"},    /* if overflow */
+                          {  -1, "dec\tdpl"},    /* if no overflow */
+                          { 255, "dec\tdpl"}     /* if overflow */
+                        };
+
+                       unsigned int dptr = (regs8051[DPH_IDX].rtrack.value << 8 ) |
+                                            regs8051[DPL_IDX].rtrack.value;
+                       unsigned int i;
+
+                       for (i = 0; i < 6; i++)
+                         {
+                           if (dptr + reachable[i].offset == value)
+                             {
+                                /* check if an overflow would occur */
+                                if ((i == 3) && ((dptr & 0xff) != 0xff)) continue;
+                                if ((i == 4) && ((dptr & 0xff) == 0x00)) continue;
+                                if ((i == 5) && ((dptr & 0xff) != 0x00)) continue;
+
+                                emitcode (";", "genFromRTrack suggests\t%s", reachable[i].opcode);
+                                foundshortcut = 1;
+
+                                break;
+                             }
+                         };
+                    }
+
+                  if (!foundshortcut &&
+                       regs8051[DPH_IDX].rtrack.valueKnown &&
+                      (regs8051[DPH_IDX].rtrack.value == (value >> 8)))
+                    {
+                      char s[32];
+                      sprintf (s, "#0x%02x", value & 0xff);
+
+                      if (s != rtrackGetLit(s))
+                        {
+                          emitcode (";", "genFromRTrack suggests\tmov\tdpl,%s", rtrackGetLit (s));
+                          foundshortcut = 1;
+                        }
+                    }
+                  if (!foundshortcut &&
+                       regs8051[DPL_IDX].rtrack.valueKnown &&
+                      (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
+                    {
+                      char s[32];
+                      sprintf (s, "#0x%02x", value >> 8);
+
+                      if (s != rtrackGetLit (s))
+                        {
+                          emitcode (";", "genFromRTrack suggests\tmov\tdph,%s", rtrackGetLit (s));
+                          foundshortcut = 1;
+                        }
+                    }
+                }
+
+              rtrack_data_set_val (DPH_IDX, value >> 8);
+              rtrack_data_set_val (DPL_IDX, value & 0xff);
+              return;
+            }
+          }
+        /* literal symbol 16 bit */
+        else if (!strncmp (line, "mov\tdptr,#", 10))
+          {
+              char* s = Safe_alloc (strlen (line) + strlen ("( >> 8)"));
+
+              strcat (s, "(");
+              strcat (s, &line[10]);
+              strcat (s, " >> 8)");
+
+              rtrack_data_set_symbol (DPH_IDX, s);
+              rtrack_data_set_symbol (DPL_IDX, &line[10]);
+
+              Safe_free (s);
+              return;
+          }
+        else if (!strncmp (line, "mov\tdptr", 8))
+          {
+            /* unidentified */
+            rtrack_data_unset (DPH_IDX);
+            rtrack_data_unset (DPL_IDX);
+            return;
+          }
+
+      /* move direct to symbol */
+      if (!strncmp (line, "mov\t_", 5) ||
+          !strncmp (line, "mov\t(", 5))
+        {
+          char* argument = strstr (line, ",") + 1;
+
+          if (argument && !strncmp (argument, "#0x", 3))
+            {
+              char s[8];
+
+              strncpy ((void *)&s, argument, strlen ("#0xab"));
+
+              /* could we get it from a, r0..r7? */
+              if (s != rtrackGetLit (s))
+                {
+                  int lengthuptoargument = argument - line;
+                  D(emitcode (";", "genFromRTrack suggests\t%.*s%s",
+                                   lengthuptoargument,
+                                   line,
+                                   rtrackGetLit (s)));
+                }
+          }
+          return;
+        }
+
+      /* no tracking of SP, so we do not care */
+      if (!strncmp (line, "mov\tsp,", 7))
+        return;
+
+      /* mov to xdata or pdata memory does not change registers */
+      if (!strncmp (line, "movx\t@", 6))
+        return;
+
+      /* mov to idata memory might change registers r0..r7
+         but unless there is a stack problem compiler
+         compiler generated code does not do idata
+         writes to 0x00..0x1f? */
+      if (!strncmp (line, "mov\t@", 5))
+        {
+          /* a little too paranoid? */
+          invalidateAllRx ();
           return;
         }
     }
 
   /* no tracking of SP */
-  if (!strncmp (line,"push",4))
+  if (!strncmp (line, "push", 4))
     return;
 
-  if (!strncmp (line,"pop\ta",5))
+  if (!strncmp (line, "pop\t", 4))
     {
-      if (!strncmp (line+4,"acc",3)){ REGS8051_UNSET (A_IDX); return; }
-      if (!strncmp (line+4,"ar2",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (2)); return; }
-      if (!strncmp (line+4,"ar3",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (3)); return; }
-      if (!strncmp (line+4,"ar4",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (4)); return; }
-      if (!strncmp (line+4,"ar5",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (5)); return; }
-      if (!strncmp (line+4,"ar6",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (6)); return; }
-      if (!strncmp (line+4,"ar7",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (7)); return; }
-      if (!strncmp (line+4,"ar0",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (0)); return; }
-      if (!strncmp (line+4,"ar1",3)){ REGS8051_UNSET (Rx_NUM_TO_IDX (1)); return; }
+      int regIdx = regidxfromregname (line + 4);
+      if (0 <= regIdx)
+        {
+          rtrack_data_unset (regIdx);
+        }
+      return;
     }
 
-  if (!strncmp (line,"inc",3))
+  if (!strncmp (line, "inc", 3))
     {
-      /* no tracking of dptr, ignore */
-      if (!strcmp (line,"inc\tdptr") ||
-          !strcmp (line,"inc\tdph") ||
-          !strcmp (line,"inc\tdpl"))
-        return;
-
-      if (!strcmp (line,"inc\ta"))
+      if (!strcmp (line, "inc\tdptr"))
         {
-          if (regs8051[A_IDX].valueKnown)
-            REGS8051_SET (A_IDX, regs8051[A_IDX].value+1);
-          return;
-        }
-
-      if(!strncmp (line,"inc\tr",5))
-        {
-          regs *r = getReg(line+5);
-          if (r && r->valueKnown)
+          if (regs8051[DPH_IDX].rtrack.valueKnown &&
+              regs8051[DPL_IDX].rtrack.valueKnown)
             {
-              REGS8051_SET (r->rIdx, r->value+1);
+              int val = (regs8051[DPH_IDX].rtrack.value << 8) | regs8051[DPL_IDX].rtrack.value;
+              val += 1;
+              rtrack_data_set_val (DPL_IDX, val & 0xff);
+              rtrack_data_set_val (DPH_IDX, val >> 8);
+            }
+          else
+            {
+              /* not yet handling offset to a symbol. Invalidating. So no inc dptr for:
+                 __xdata char array[4]; array[0] = 0; array[1] = 0; array[2] = 0;
+                 (If an offset to the respective linker segment would be
+                 available then additionally
+                 __xdata int a = 123; __xdata int b = 456; __xdata c= 'a';
+                 could be 4 bytes shorter) */
+              rtrack_data_unset (DPL_IDX);
+              rtrack_data_unset (DPH_IDX);
             }
           return;
         }
+      if (!strncmp (line, "inc\t", 4))
+        {
+          int regIdx = regidxfromregname (line + 4);
+          if (0 <= regIdx)
+            {
+              if (regs8051[regIdx].rtrack.valueKnown)
+                rtrack_data_set_val (regIdx, regs8051[regIdx].rtrack.value + 1);
+              else
+                /* explicitely unsetting (could be known by symbol).
+                   not yet handling offset to a symbol. (idata/pdata) */
+                rtrack_data_unset (regIdx);
+
+              return;
+            }
+        }
+      return;
     }
 
   /* some bit in acc is cleared
      MB: I'm too lazy to find out which right now */
-  if (!strncmp (line,"jbc\tacc",7))
+  if (!strncmp (line, "jbc\tacc", 7))
     {
-      REGS8051_UNSET (A_IDX);
+      rtrack_data_unset (A_IDX);
       return;
     }
 
   /* unfortunately the label typically following these
      will cause loss of tracking */
-  if (!strncmp (line,"jc\t",3) ||
-      !strncmp (line,"jnc\t",4) ||
-      !strncmp (line,"jb\t",3) ||
-      !strncmp (line,"jnb\t",4) ||
-      !strncmp (line,"jbc\t",4))
+  if (!strncmp (line, "jc\t", 3) ||
+      !strncmp (line, "jnc\t", 4) ||
+      !strncmp (line, "jb\t", 3) ||
+      !strncmp (line, "jnb\t", 4) ||
+      !strncmp (line, "jbc\t", 4))
     return;
 
   /* if branch not taken in "cjne r2,#0x08,somewhere" 
      r2 is known to be 8 */
-  if (!strncmp (line,"cjne",4))
+  if (!strncmp (line, "cjne\t", 5))
     {
-      if(!strncmp (line,"cjne\ta,#0x",10))
+      int regIdx = regidxfromregname (line + 5);
+      if (0 <= regIdx)
         {
+          char *argument = strstr (line, ",") + 1;
           char *s;
           int value;
 
-          value = strtol (line+8, &s, 16);
-          if (s != line+8)
-              REGS8051_SET (A_IDX, value); /* valid hex found */
-        }
-      if(!strncmp (line,"cjne\tr",6))
-        {
-          char *s;
-          int value;
-          regs *r = getReg(line+6);
-          value = strtol (line+8, &s, 16);
-          if (r && s != line+8)
-              REGS8051_SET (r->rIdx, value); /* valid hex found */
+          value = strtol (argument + 1, &s, 16);
+
+          /* check literal compare to register */
+          if ((s != argument + 1) && !strncmp (argument, "#0x", 3))
+            {
+               rtrack_data_set_val (regIdx, value);
+               return;
+            }
+          rtrack_data_unset (regIdx);
         }
       return;
     }
 
   /* acc eventually known to be zero */
-  if (!strncmp (line,"jz\t",3))
+  if (!strncmp (line, "jz\t", 3))
     return;
 
   /* acc eventually known to be zero */
-  if (!strncmp (line,"jnz\t",4))
+  if (!strncmp (line, "jnz\t", 4))
     {
-      REGS8051_SET (A_IDX, 0x00); // branch not taken
+      rtrack_data_set_val (A_IDX, 0x00); // branch not taken
       return;
     }
 
-  if (!strncmp (line,"djnz\tr",6))
+  if (!strncmp (line, "djnz\t", 5))
     {
-      char *s;
-      int regNum;
-
-      regNum = strtol (line+6, &s, 16);
-      if (s == line+7)
+      int regIdx = regidxfromregname (line + 5);
+      if (0 <= regIdx)
         {
-          //REGS8051_UNSET (Rx_NUM_TO_IDX(regNum));
-          REGS8051_SET (Rx_NUM_TO_IDX(regNum), 0x00); // branch not taken
+          rtrack_data_set_val (regIdx, 0x00); // branch not taken
           return;
         }
     }
 
   /* only carry bit, so we do not care */
-  if (!strncmp (line,"setb\tc",6) ||
-      !strncmp (line,"clr\tc",5) ||
-      !strncmp (line,"cpl\tc",5))
+  if (!strncmp (line, "setb\tc", 6) ||
+      !strncmp (line, "clr\tc", 5) ||
+      !strncmp (line, "cpl\tc", 5))
     return;
 
-  if (!strncmp (line,"add\ta,",6) ||
-      !strncmp (line,"addc\ta,",7)||
-      !strncmp (line,"subb\ta,",7)||
-      !strncmp (line,"xrl\ta,",6) ||
-      !strncmp (line,"orl\ta,",6) ||
-      !strncmp (line,"anl\ta,",6) ||
-      !strncmp (line,"da\ta",4)   ||
-      !strncmp (line,"rlc\ta,",6) ||
-      !strncmp (line,"rrc\ta,",6) ||
-      !strncmp (line,"setb\ta",6) ||
-      !strncmp (line,"clrb\ta,",7)||
-      !strncmp (line,"cpl\tacc",7))
+  /* operations on acc which depend on PSW */
+  if (!strncmp (line, "addc\ta,", 7)||
+      !strncmp (line, "subb\ta,", 7)||
+      !strncmp (line, "da\ta", 4)   ||
+      !strncmp (line, "rlc\ta", 5) ||
+      !strncmp (line, "rrc\ta", 5))
     {
-      /* could also handle f.e. "add a,Rx" if a, Rx are known or "xrl a,#0x08" */
-      REGS8051_UNSET (A_IDX);
+      rtrack_data_unset (A_IDX);
       return;
     }
 
-
-  if (!strncmp (line,"dec",3))
+  /* bitwise operations on acc */
+  if (!strncmp (line, "setb\ta", 6) ||
+      !strncmp (line, "clrb\ta", 6))
     {
-      /* no tracking of dptr, so we would not care */
-      if (!strcmp (line,"dec\tdph") ||
-          !strcmp (line,"dec\tdpl"))
-        return;
+      rtrack_data_unset (A_IDX);
+      return;
+    }
 
-      if (!strcmp (line,"dec\ta"))
+  /* other operations on acc that can be tracked */
+  if (!strncmp (line, "add\ta,", 6) ||
+      !strncmp (line, "anl\ta,", 6) ||
+      !strncmp (line, "orl\ta,", 6) ||
+      !strncmp (line, "xrl\ta,", 6) ||
+      !strcmp (line, "cpl\ta"))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown)
         {
-          if (regs8051[A_IDX].valueKnown)
-            REGS8051_SET (A_IDX, regs8051[A_IDX].value-1);
-          return;
-        }
-
-      if(!strncmp (line,"dec\tr",5))
-        {
-          regs *r = getReg(line+5);
-          if (r && r->valueKnown)
+          if (!strncmp (line, "add\ta,", 6))
             {
-              REGS8051_SET (r->rIdx, r->value-1);
+              int regIdx = regidxfromregname (line + 6);
+
+              if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value + regs8051[regIdx].rtrack.value);
+                  return;
+                }
+              else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value + valuefromliteral (line + 7));
+                  return;
+                }
             }
+
+          if (!strncmp (line, "anl\ta,", 6))
+            {
+              int regIdx = regidxfromregname (line + 6);
+
+              if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value & regs8051[regIdx].rtrack.value);
+                  return;
+                }
+              else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value & valuefromliteral (line + 7));
+                  return;
+                }
+            }
+
+          if (!strncmp (line, "orl\ta,", 6))
+            {
+              int regIdx = regidxfromregname (line + 6);
+
+              if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value | regs8051[regIdx].rtrack.value);
+                  return;
+                }
+              else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value | valuefromliteral (line + 7));
+                  return;
+                }
+            }
+
+          if (!strncmp (line, "xrl\ta,", 6))
+            {
+              int regIdx = regidxfromregname (line + 6);
+
+              if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value ^ regs8051[regIdx].rtrack.value);
+                  return;
+                }
+              else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
+                {
+                  rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value ^ valuefromliteral (line + 7));
+                  return;
+                }
+            }
+
+          if (!strcmp (line, "cpl\ta"))
+            {
+              rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value ^ 0xff);
+              return;
+            }
+
+          rtrack_data_unset (A_IDX);
+          return;
+        }
+      else
+        {
+          rtrack_data_unset (A_IDX);
           return;
         }
     }
 
+  if (!strncmp (line, "dec\t", 4))
+    {
+      int regIdx = regidxfromregname (line + 4);
+      if (0 <= regIdx)
+        {
+          if (regs8051[regIdx].rtrack.valueKnown)
+            rtrack_data_set_val (regIdx, regs8051[regIdx].rtrack.value - 1);
 
-  if (!strcmp (line,"clr\ta"))
-    {
-      REGS8051_SET (A_IDX, 0);
-      return;
-    }
+          /* not handling offset to a symbol. invalidating if needed */
+          if (NULL != regs8051[regIdx].rtrack.symbol)
+            rtrack_data_unset (regIdx);
 
-  if (!strcmp (line,"cpl\ta"))
-    {
-      if (regs8051[A_IDX].valueKnown)
-        REGS8051_SET (A_IDX, ~regs8051[A_IDX].value);
-      return;
-    }
-  if (!strcmp (line,"rl\ta"))
-    {
-      if (regs8051[A_IDX].valueKnown)
-        REGS8051_SET (A_IDX, (regs8051[A_IDX].value<<1) | 
-                             (regs8051[A_IDX].value>>7) );
-      return;
-    }
-  if (!strcmp (line,"rr\ta"))
-    {
-      if (regs8051[A_IDX].valueKnown)
-        REGS8051_SET (A_IDX, (regs8051[A_IDX].value>>1) |
-                             (regs8051[A_IDX].value<<7));
-      return;
-    }
-  if (!strcmp (line,"swap\ta"))
-    {
-      if (regs8051[A_IDX].valueKnown)
-        REGS8051_SET (A_IDX, (regs8051[A_IDX].value>>4) |
-                             (regs8051[A_IDX].value<<4));
+          return;
+        }
       return;
     }
 
-  if (!strncmp (line,"mul",3) ||
-      !strncmp (line,"div",3)
-      )
+  if (!strcmp (line, "clr\ta"))
     {
-      REGS8051_UNSET (A_IDX);
-      REGS8051_UNSET (B_IDX);
+      if (regs8051[A_IDX].rtrack.valueKnown && (0 == regs8051[A_IDX].rtrack.value))
+        {
+          D(emitcode (";", "genFromRTrack suggests to remove\t%s", line));
+        }
+      rtrack_data_set_val (A_IDX, 0);
+      return;
+    }
+
+  if (!strcmp (line, "cpl\ta"))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown)
+        rtrack_data_set_val (A_IDX, ~regs8051[A_IDX].rtrack.value);
+      else
+        /* in case a holds a symbol */
+        rtrack_data_unset (A_IDX);
+      return;
+    }
+  if (!strcmp (line, "rl\ta"))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown)
+        rtrack_data_set_val (A_IDX, (regs8051[A_IDX].rtrack.value<<1) |
+                                    (regs8051[A_IDX].rtrack.value>>7) );
+      else
+        rtrack_data_unset (A_IDX);
+      return;
+    }
+  if (!strcmp (line, "rr\ta"))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown)
+        rtrack_data_set_val (A_IDX, (regs8051[A_IDX].rtrack.value>>1) |
+                                    (regs8051[A_IDX].rtrack.value<<7));
+      else
+        rtrack_data_unset (A_IDX);
+      return;
+    }
+  if (!strcmp (line, "swap\ta"))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown)
+        rtrack_data_set_val (A_IDX, (regs8051[A_IDX].rtrack.value>>4) |
+                                    (regs8051[A_IDX].rtrack.value<<4));
+      else
+        rtrack_data_unset (A_IDX);
+      return;
+    }
+
+  if (!strncmp (line, "mul\t", 4))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown && regs8051[B_IDX].rtrack.valueKnown)
+        {
+           unsigned int value = (unsigned int)regs8051[A_IDX].rtrack.value *
+                                (unsigned int)regs8051[B_IDX].rtrack.value;
+
+           rtrack_data_set_val (A_IDX, value & 0xff);
+           rtrack_data_set_val (B_IDX, value >> 8);
+        }
+      else
+        {
+          rtrack_data_unset (A_IDX);
+          rtrack_data_unset (B_IDX);
+        }
+      return;
+    }
+
+  if (!strncmp (line, "div\t", 4))
+    {
+      if (regs8051[A_IDX].rtrack.valueKnown && regs8051[B_IDX].rtrack.valueKnown)
+        {
+           rtrack_data_set_val (A_IDX, regs8051[A_IDX].rtrack.value / regs8051[B_IDX].rtrack.value);
+           rtrack_data_set_val (B_IDX, regs8051[A_IDX].rtrack.value % regs8051[B_IDX].rtrack.value);
+        }
+      else
+        {
+          rtrack_data_unset (A_IDX);
+          rtrack_data_unset (B_IDX);
+        }
       return;
     }
 
   /* assuming these library functions have no side-effects */
-  if (!strcmp (line,"lcall"))
+  if (!strncmp (line, "lcall", 5))
     {
-      if (!strcmp (line,"lcall\t__gptrput"))
+      if (!strcmp (line, "lcall\t__gptrput"))
         {
           /* invalidate R0..R7 because they might have been changed */
           /* MB: too paranoid ? */
           //invalidateAllRx();
           return;
         }
-      if (!strcmp (line,"lcall\t__gptrget"))
+      if (!strcmp (line, "lcall\t__gptrget"))
         {
-          REGS8051_UNSET (A_IDX);
+          rtrack_data_unset (A_IDX);
           return;
         }
-      if (!strcmp (line,"lcall\t__decdptr"))
+      if (!strcmp (line, "lcall\t__decdptr"))
         {
+          if (regs8051[DPH_IDX].rtrack.valueKnown &&
+              regs8051[DPL_IDX].rtrack.valueKnown)
+            {
+              int val = (regs8051[DPH_IDX].rtrack.value << 8) | regs8051[DPL_IDX].rtrack.value;
+              val -= 1;
+              rtrack_data_set_val (DPL_IDX, val & 0xff);
+              rtrack_data_set_val (DPH_IDX, val >> 8);
+            }
+          else
+            {
+              rtrack_data_unset (DPL_IDX);
+              rtrack_data_unset (DPH_IDX);
+            }
           return;
         }
+       /* if callee_saves */
      }
 
-  if (!strncmp (line,"xch\ta,r",7))
+  if (!strncmp (line, "xch\ta,", 6))
     {
-      /* handle xch acc with Rn */
-      regs *r = getReg(line+7);
-      if (r)
+      /* handle xch from register (r0..r7, dpl, dph, b) */
+      int regIdx = regidxfromregname (line + 6);
+      if (0 <= regIdx)
         {
-          unsigned swap;
-          swap = r->valueKnown;
-          r->valueKnown = regs8051[A_IDX].valueKnown;
-          regs8051[A_IDX].valueKnown = swap;
+          void* swap = Safe_malloc (sizeof regs8051[A_IDX].rtrack);
 
-          swap = r->value;
-          r->value = regs8051[A_IDX].value;
-          regs8051[A_IDX].value = swap;
+          memcpy (swap,                     &regs8051[A_IDX].rtrack,  sizeof regs8051[A_IDX].rtrack);
+          memcpy (&regs8051[A_IDX ].rtrack, &regs8051[regIdx].rtrack, sizeof regs8051[A_IDX].rtrack);
+          memcpy (&regs8051[regIdx].rtrack, swap,                     sizeof regs8051[A_IDX].rtrack);
+
+          Safe_free (swap);
           return;
         }
     }
@@ -513,20 +939,20 @@ char * rtrackGetLit(const char *x)
         {
           /* try to get from acc */
           regs *r = &regs8051[A_IDX];
-          if (r->valueKnown &&
-              r->value == val)
+          if (r->rtrack.valueKnown &&
+              r->rtrack.value == val)
             {
-              D(emitcode (";", "genFromRTrack 0x%02x=%s", val, r->name));
+              D(emitcode (";", "genFromRTrack 0x%02x==%s", val, r->name));
               return r->name;
             }
           /* try to get from register R0..R7 */
-          for (i=0; i<8; i++)
+          for (i = 0; i < 8; i++)
             {
-              regs *r = &regs8051[Rx_NUM_TO_IDX(i)];
-              if (r->valueKnown &&
-                  r->value == val)
+              regs *r = &regs8051[rx_num_to_idx(i)];
+              if (r->rtrack.valueKnown &&
+                  r->rtrack.value == val)
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=%s", val, r->name));
+                  D(emitcode (";", "genFromRTrack 0x%02x==%s", val, r->name));
                   return r->name;
                 }
             }
@@ -563,62 +989,62 @@ int rtrackMoveALit (const char *x)
         {
           /* prefer mov a,#0x00 */
           if (val == 0 &&
-              ((a->valueKnown && a->value != 0) ||
-               !a->valueKnown))
+              ((a->rtrack.valueKnown && a->rtrack.value != 0) ||
+               !a->rtrack.valueKnown))
             {
               /* peepholes convert to clr a */
-              /* MB: why not here ? */
+              /* (regression test suite is slightly larger if "clr a" is used here) */
               emitcode ("mov", "a,#0x00");
               return 1;
             }
 
-          if (a->valueKnown)
+          if (a->rtrack.valueKnown)
             {
               /* already there? */
-              if (val == a->value)
+              if (val == a->rtrack.value)
                 {
-                  D(emitcode (";", "genFromRTrack acc=0x%02x", a->value));
+                  D(emitcode (";", "genFromRTrack acc==0x%02x", a->rtrack.value));
                   return 1;
                 }
 
               /* can be calculated with an instruction
                  that does not change flags from acc itself? */
-              if (val == ((a->value+1) & 0xff) )
+              if (val == ((a->rtrack.value+1) & 0xff) )
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=0x%02x+1", val, a->value));
+                  D(emitcode (";", "genFromRTrack 0x%02x==0x%02x+1", val, a->rtrack.value));
                   emitcode ("inc", "a");
                   return 1;
                 }
-              if (val == ((a->value-1) & 0xff) )
+              if (val == ((a->rtrack.value-1) & 0xff) )
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=0x%02x-1", val, a->value));
+                  D(emitcode (";", "genFromRTrack 0x%02x==0x%02x-1", val, a->rtrack.value));
                   emitcode ("dec", "a");
                   return 1;
                 }
-              if (val == ((~a->value) & 0xff) )
+              if (val == ((~a->rtrack.value) & 0xff) )
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=~0x%02x", val, a->value));
+                  D(emitcode (";", "genFromRTrack 0x%02x==~0x%02x", val, a->rtrack.value));
                   emitcode ("cpl", "a");
                   return 1;
                 }
-              if (val == (((a->value>>1) |
-                           (a->value<<7)) & 0xff))
+              if (val == (((a->rtrack.value>>1) |
+                           (a->rtrack.value<<7)) & 0xff))
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=rr(0x%02x)", val, a->value));
+                  D(emitcode (";", "genFromRTrack 0x%02x==rr(0x%02x)", val, a->rtrack.value));
                   emitcode ("rr", "a");
                   return 1;
                 }
-              if (val == (((a->value<<1) |
-                           (a->value>>7)) & 0xff ))
+              if (val == (((a->rtrack.value<<1) |
+                           (a->rtrack.value>>7)) & 0xff ))
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=rl(0x%02x)", val, a->value));
+                  D(emitcode (";", "genFromRTrack 0x%02x==rl(0x%02x)", val, a->rtrack.value));
                   emitcode ("rl", "a");
                   return 1;
                 }
-              if (val == ( ((a->value & 0x0f)<<4) |
-                           ((a->value & 0xf0)>>4) ))
+              if (val == ( ((a->rtrack.value & 0x0f)<<4) |
+                           ((a->rtrack.value & 0xf0)>>4) ))
                 {
-                  D(emitcode (";", "genFromRTrack 0x%02x=swap(0x%02x)", val, a->value));
+                  D(emitcode (";", "genFromRTrack 0x%02x==swap(0x%02x)", val, a->rtrack.value));
                   emitcode ("swap", "a");
                   return 1;
                 }
@@ -638,39 +1064,39 @@ int rtrackMoveALit (const char *x)
               }
 
             /* not yet giving up - try to calculate from register R0..R7 */
-            for (i=0; i<8; i++)
+            for (i = 0; i < 8; i++)
               {
-                regs *r = &regs8051[Rx_NUM_TO_IDX(i)];
+                regs *r = &regs8051[rx_num_to_idx(i)];
 
-                if (a->valueKnown && r->valueKnown)
+                if (a->rtrack.valueKnown && r->rtrack.valueKnown)
                   {
                     /* calculate with a single byte instruction from R0..R7? */
-                    if (val == (a->value | r->value))
+                    if (val == (a->rtrack.value | r->rtrack.value))
                       {
-                        D(emitcode (";", "genFromRTrack 0x%02x=0x%02x|0x%02x",
-                                    val, a->value, r->value));
+                        D(emitcode (";", "genFromRTrack 0x%02x==0x%02x|0x%02x",
+                                    val, a->rtrack.value, r->rtrack.value));
                         emitcode ("orl", "a,%s",r->name);
                         return 1;
                       }
-                    if (val == (a->value & r->value))
+                    if (val == (a->rtrack.value & r->rtrack.value))
                       {
-                        D(emitcode (";", "genFromRTrack 0x%02x=0x%02x&0x%02x",
-                                    val, a->value, r->value));
+                        D(emitcode (";", "genFromRTrack 0x%02x==0x%02x&0x%02x",
+                                    val, a->rtrack.value, r->rtrack.value));
                         emitcode ("anl", "a,%s", r->name);
                         return 1;
                       }
-                    if (val == (a->value ^ r->value))
+                    if (val == (a->rtrack.value ^ r->rtrack.value))
                       {
-                        D(emitcode (";", "genFromRTrack 0x%02x=0x%02x^0x%02x",
-                                    val, a->value, r->value));
+                        D(emitcode (";", "genFromRTrack 0x%02x==0x%02x^0x%02x",
+                                    val, a->rtrack.value, r->rtrack.value));
                         emitcode ("xrl", "a,%s", r->name);
                         return 1;
                       }
                     /* changes flags (does that matter?)
-                    if (val == (a->value + r->value))
+                    if (val == (a->rtrack.value + r->rtrack.value))
                       {
                         D(emitcode (";", "genFromRTrack 0x%02x=0x%02x+%0x02x",
-                                    val, a->value, r->value));
+                                    val, a->rtrack.value, r->rtrack.value));
                         emitcode ("add", "a,%s",r->name);
                         return 1;
                       }
@@ -684,3 +1110,62 @@ int rtrackMoveALit (const char *x)
   return 0;
 }
 
+
+/* Loads dptr with symbol (if needed)
+ */
+void rtrackLoadDptrWithSym (const char *x)
+{
+  if (enable != 1)
+    {
+      emitcode ("mov", "dptr,#%s", x);
+      return;
+    }
+
+  if (regs8051[DPL_IDX].rtrack.symbol &&
+      regs8051[DPH_IDX].rtrack.symbol)
+    {
+      /* rtrack.symbol for dph should look like "(something >> 8)" */
+      if ((!strcmp  (x, regs8051[DPL_IDX].rtrack.symbol) &&
+           !strncmp (x, regs8051[DPH_IDX].rtrack.symbol + 1, strlen (x) ) &&
+           !strncmp (" >> 8)", regs8051[DPH_IDX].rtrack.symbol + 1 + strlen (x), 6)))
+        {
+          /* dptr already holds the symbol */
+          D(emitcode (";", "genFromRTrack dptr==#%s",x));
+          return;
+        }
+    }
+
+  emitcode ("mov", "dptr,#%s", x);
+}
+
+
+#if 0
+/* Loads index registers R0, R1 with symbol (if needed)
+ *
+ * R0, R1 index registers are already handled in gen.c (see AOP_INPREG)
+ */
+void rtrackLoadR0R1WithSym (const char *reg, const char *x)
+{
+  int regNum, regIdx;
+
+  if (enable != 1)
+    {
+      emitcode ("mov", "%s,#%s", reg, x );
+      return;
+    }
+
+  regNum = reg[1] - '0';
+  if (regNum == 0 || regNum == 1)
+    {
+      regIdx = rx_num_to_idx(regNum);
+      if ((NULL != regs8051[regIdx].rtrack.symbol) && !strcmp (x, regs8051[regIdx].rtrack.symbol))
+        {
+          /* register already holds the symbol */
+          D(emitcode (";", "genFromRTrack %s=#%s",reg,x));
+          return;
+        }
+    }
+
+  emitcode ("mov", "%s,#%s", reg, x );
+}
+#endif

@@ -89,11 +89,11 @@ usage (void)
            "  -s romsize     size of the binary file (default: 32768)\n"
            "  -Z             genarate GameBoy format binary file\n"
            "GameBoy format options (applicable only with -Z option):\n"
-           "  -yo            number of rom banks (default: 2)\n"
-           "  -ya            number of ram banks (default: 0)\n"
-           "  -yt            MBC type (default: no MBC)\n"
-           "  -yn            cartrige name (default: none)\n"
-           "Arguments>\n"
+           "  -yo n          number of rom banks (default: 2)\n"
+           "  -ya n          number of ram banks (default: 0)\n"
+           "  -yt n          MBC type (default: no MBC)\n"
+           "  -yn name       cartrige name (default: none)\n"
+           "Arguments:\n"
            "  <in_file>      optional IHX input file, '-' means stdin. (default: stdin)\n"
            "  <out_file>     optional output file, '-' means stdout. (default: stdout)\n");
 }

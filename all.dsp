@@ -69,6 +69,33 @@ SOURCE=.\ChangeLog
 # End Group
 # Begin Source File
 
+SOURCE=.\bin_vc\makebin.exe
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\bin_vc\makebin.exe
+
+"bin\makebin.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\makebin.exe  bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\bin_vc\makebin.exe
+
+"bin\makebin.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\makebin.exe  bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\bin_vc\packihx.exe
 
 !IF  "$(CFG)" == "all - Win32 Release"

@@ -243,6 +243,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "makebin"=.\SUPPORT\makebin\makebin.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "mcs51"=.\src\mcs51\mcs51.dsp - Package Owner=<4>
 
 Package=<5>

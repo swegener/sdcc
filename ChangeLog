@@ -1,3 +1,9 @@
+2010-02-20 Borut Razem <borut.razem AT siol.net>
+
+	* support/makebin/makebin.c: addad support for GameBoj binary file format
+	* all.dsp, sdcc.dsw, support/makebin/makebin.dsp:
+	  addad makebin to the MSVC project
+
 2010-02-19 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/rtrack.h,

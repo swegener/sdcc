@@ -116,7 +116,7 @@ __mulint_rrx_hds::
         add     hl,hl
         rl      c
         rla                     ;DLE 27/11/98
-        jr      NZ,2$
+        jp      NC,2$
         add     hl,de
 2$:
         dec     b
@@ -127,3 +127,4 @@ __mulint_rrx_hds::
         ld      d,h
 
         ret
+

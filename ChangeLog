@@ -1,4 +1,9 @@
 2010-02-20 Philipp Klaus Krause <pkk AT spth.de>
+	* device/lib/gbz80/mul.s,
+	  device/lib/gbz80/Makefile.in:
+	  Fixed multiplication in gbz80 port.
+
+2010-02-20 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/gbz80/div.s:
 	  Fixed mixed-sign division and modulo in gbz80 port.
 

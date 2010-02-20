@@ -1833,8 +1833,7 @@ linkEdit (char **envp)
                       for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
                         {
                           dbuf_set_length (&crtpath, 0);
-                          dbuf_printf (&crtpath, "%s%s%s%s%s", s, DIR_SEPARATOR_STRING, *p, DIR_SEPARATOR_STRING,
-                                       get_lib_suffix ());
+                          dbuf_printf (&crtpath, "%s%s%s", s, DIR_SEPARATOR_STRING, *p);
 
                           if (!access (dbuf_c_str (&crtpath), 0))       /* Found it! */
                             {

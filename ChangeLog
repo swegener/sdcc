@@ -4,7 +4,9 @@
 
 2010-02-20 Borut Razem <borut.razem AT siol.net>
 
-	* support/makebin/makebin.c: addad support for GameBoj binary file format
+	* support/makebin/makebin.c: addad support for GameBoj binary file format,
+	  added optional input and output file names arguments,
+	  making it (hopefully) more robust, ...
 	* all.dsp, sdcc.dsw, support/makebin/makebin.dsp:
 	  addad makebin to the MSVC project
 

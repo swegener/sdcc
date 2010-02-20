@@ -14,6 +14,7 @@
 	  making it (hopefully) more robust, ...
 	* all.dsp, sdcc.dsw, support/makebin/makebin.dsp:
 	  addad makebin to the MSVC project
+	* src/SDCCmain.c: fixed bug #2955614 - Regression - Warning: Couldn't find
 
 2010-02-19 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

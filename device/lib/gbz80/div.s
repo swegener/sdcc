@@ -7,10 +7,15 @@ __divsuchar_rrx_s::
 
         ld      e,(hl)
         dec     hl
-        ld      l,(hl)
-        ld      h,#0
+        ld      c,(hl)
+        ld      b,#0
 
-        jp      signexte
+        call      signexte
+
+	ld	e,c
+	ld	d,b
+
+	ret
 
 __modsuchar_rrx_s::
         ld      hl,#2+1
@@ -18,14 +23,10 @@ __modsuchar_rrx_s::
 
         ld      e,(hl)
         dec     hl
-        ld      l,(hl)
-        ld      h,#0
+        ld      c,(hl)
+        ld      b,#0
 
-        call    signexte
-
-        ld	h,d
-	ld	l,e
-        ret
+        jp    signexte
 
 __divuschar_rrx_s::
         ld      hl,#2+1
@@ -34,14 +35,19 @@ __divuschar_rrx_s::
 
         ld      e,(hl)
         dec     hl
-        ld      l,(hl)
+        ld      c,(hl)
 
-        ld      a,l             ; Sign extend
+        ld      a,c             ; Sign extend
         rlca
         sbc     a
-        ld      h,a
+        ld      b,a
 
-        jp      .div16
+        call      .div16
+
+	ld	e,c
+	ld	d,b
+
+	ret
 
 __moduschar_rrx_s::
         ld      hl,#2+1
@@ -50,17 +56,14 @@ __moduschar_rrx_s::
 
         ld      e,(hl)
         dec     hl
-        ld      l,(hl)
+        ld      c,(hl)
 
-        ld      a,l             ; Sign extend
+        ld      a,c             ; Sign extend
         rlca
         sbc     a
-        ld      h,a
+        ld      b,a
 
         call    .div16
-
-        ld	h,d
-	ld	l,e
 
         ret
 
@@ -395,3 +398,4 @@ signexte:
         ld      b,h             ; B = high byte of quotient
         or      a               ; Clear carry, valid result
         ret
+

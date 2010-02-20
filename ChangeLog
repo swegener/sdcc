@@ -1,3 +1,7 @@
+2010-02-20 Philipp Klaus Krause <pkk AT spth.de>
+	* device/lib/gbz80/div.s:
+	  Fixed mixed-sign division and modulo in gbz80 port.
+
 2010-02-20 Borut Razem <borut.razem AT siol.net>
 
 	* support/makebin/makebin.c: addad support for GameBoj binary file format
@@ -6,7 +10,7 @@
 
 2010-02-19 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	* src/mcs51/rtrack.h,
+	* src/mcs51/rt rack.h,
 	  src/mcs51/rtrack.c,
 	  src/mcs51/ralloc.h,
 	  src/mcs51/gen.c: Implemented tracking of symbols and dptr.

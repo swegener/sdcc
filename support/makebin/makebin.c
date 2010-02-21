@@ -92,7 +92,7 @@ usage (void)
            "  -yo n          number of rom banks (default: 2)\n"
            "  -ya n          number of ram banks (default: 0)\n"
            "  -yt n          MBC type (default: no MBC)\n"
-           "  -yn name       cartrige name (default: none)\n"
+           "  -yn name       cartridge name (default: none)\n"
            "Arguments:\n"
            "  <in_file>      optional IHX input file, '-' means stdin. (default: stdin)\n"
            "  <out_file>     optional output file, '-' means stdout. (default: stdout)\n");
@@ -102,7 +102,7 @@ usage (void)
 
 struct gb_opt_s
 {
-  char cart_name[CART_NAME_LEN];  /* cartrige name buffer */
+  char cart_name[CART_NAME_LEN];  /* cartridge name buffer */
   BYTE mbc_type;                  /* MBC type (default: no MBC) */
   short nb_rom_banks;             /* Number of rom banks (default: 2) */
   BYTE nb_ram_banks;              /* Number of ram banks (default: 0) */
@@ -119,7 +119,7 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
    * remaining bytes are filled with 00's.
    */
 
-  /* capitalize cartrige name */
+  /* capitalize cartridge name */
   for (i = 0; i < CART_NAME_LEN; ++i)
     {
       rom[0x134 + i] = toupper (o->cart_name[i]);
@@ -327,7 +327,7 @@ main (int argc, char **argv)
       switch (argv[0][1])
         {
         case 's':
-          if (!++argv)
+          if (!*++argv)
             {
               usage ();
               return 1;
@@ -358,7 +358,7 @@ main (int argc, char **argv)
           switch (argv[0][2])
             {
             case 'o':
-              if (!++argv)
+              if (!*++argv)
                 {
                   usage ();
                   return 1;
@@ -376,7 +376,7 @@ main (int argc, char **argv)
               break;
 
             case 't':
-              if (!++argv)
+              if (!*++argv)
                 {
                   usage ();
                   return 1;
@@ -385,7 +385,7 @@ main (int argc, char **argv)
               break;
 
             case 'n':
-              if (!++argv)
+              if (!*++argv)
                 {
                   usage ();
                   return 1;
@@ -410,8 +410,14 @@ main (int argc, char **argv)
   if (*argv)
     {
       if ('-' != argv[0][0] || '\0' != argv[0][1])
-        fin = fopen (*argv, "r");
-
+        {
+          if (NULL == (fin = fopen (*argv, "r")))
+            {
+              fprintf (stderr, "error: can't open %s: ", *argv);
+              perror(NULL);
+              return 1;
+            }
+        }
       ++argv;
     }
 
@@ -447,7 +453,14 @@ main (int argc, char **argv)
       if (*argv)
         {
           if ('-' != argv[0][0] || '\0' != argv[0][1])
-            fout = fopen (*argv, "wb");
+            {
+              if (NULL == (fout = fopen (*argv, "wb")))
+                {
+                  fprintf (stderr, "error: can't create %s: ", *argv);
+                  perror(NULL);
+                  return 1;
+                }
+            }
         }
 
       fwrite (rom, 1, (pack ? real_size : size), fout);

@@ -1,3 +1,13 @@
+2010-02-21 Borut Razem <borut.razem AT siol.net>
+
+	* support/makebin/makebin.c:
+	  check if fopen() succeeded
+	* support/regression/ports/gbz80/spec.mk:
+	  sdlsgb now creates .ihx file and makebin converts it to .gb;
+	  removed -m (Load map file) rrgb command line option, since sdlsgb
+	  doesn't generate a rrgb compatible map file. A converter from asxxxx
+	  to rrgb map file format should be written...
+
 2010-02-21 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/rt rack.c: fixed two warnings reported in #2955971

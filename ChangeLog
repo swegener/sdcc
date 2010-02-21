@@ -7,6 +7,9 @@
 	  removed -m (Load map file) rrgb command line option, since sdlsgb
 	  doesn't generate a rrgb compatible map file. A converter from asxxxx
 	  to rrgb map file format should be written...
+	* src/SDCCmain.c: search C runtime initialization object files
+	  crt0.rel in system library directories, then in user defined
+	  library directories - third try
 
 2010-02-21 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

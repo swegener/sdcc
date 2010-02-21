@@ -1805,7 +1805,7 @@ linkEdit (char **envp)
                   for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
                     {
                       dbuf_set_length (&crtpath, 0);
-                      dbuf_printf (&crtpath, "%s%s%s%s%s", s, DIR_SEPARATOR_STRING, *p, DIR_SEPARATOR_STRING, get_lib_suffix ());
+                      dbuf_printf (&crtpath, "%s%s%s%s%s", s, DIR_SEPARATOR_STRING, get_lib_suffix (), DIR_SEPARATOR_STRING, *p);
 
                       if (!access (dbuf_c_str (&crtpath), 0))   /* Found it! */
                         {
@@ -2357,6 +2357,8 @@ doPrintSearchDirs (void)
   printf ("libdir:\n");
   for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
     fprintf (stdout, "%s%s%s\n", s, DIR_SEPARATOR_STRING, get_lib_suffix ());
+
+  printf ("libpath:\n");
   fputStrSet (stdout, libPathsSet);
 }
 

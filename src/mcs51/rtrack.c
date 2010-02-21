@@ -94,12 +94,6 @@ static void rtrack_data_set_val (const unsigned int idx, const unsigned char val
   assert (idx >= R2_IDX);
   assert (idx < END_IDX);
 
-  if (value < 0)
-    {
-      rtrack_data_unset (idx);
-      return;
-    }
-
   regs8051[idx].rtrack.value = value;
   regs8051[idx].rtrack.valueKnown = 1;
 
@@ -184,7 +178,7 @@ static void rtrack_data_copy_dst_src (const unsigned int idxdst, const unsigned 
       regs8051[idxdst].rtrack.symbol = NULL;
     }
 
-  memcpy (&regs8051[idxdst].rtrack, &regs8051[idxdst].rtrack, sizeof regs8051[idxdst].rtrack);
+  memcpy (&regs8051[idxdst].rtrack, &regs8051[idxsrc].rtrack, sizeof regs8051[idxdst].rtrack);
 
   if (regs8051[idxsrc].rtrack.symbol)
     {

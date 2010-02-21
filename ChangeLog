@@ -1,3 +1,8 @@
+2010-02-21 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/rt rack.c: fixed two warnings reported in #2955971
+	  by Hubert Sack. (2nd warning found a bug)
+
 2010-02-20 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/gbz80/mul.s,
 	  device/lib/gbz80/Makefile.in:

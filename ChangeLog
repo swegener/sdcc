@@ -5,11 +5,12 @@
 	* support/regression/ports/gbz80/spec.mk:
 	  sdlsgb now creates .ihx file and makebin converts it to .gb;
 	  removed -m (Load map file) rrgb command line option, since sdlsgb
-	  doesn't generate a rrgb compatible map file. A converter from asxxxx
-	  to rrgb map file format should be written...
+	  doesn't generate a rrgb compatible map file
 	* src/SDCCmain.c: search C runtime initialization object files
 	  crt0.rel in system library directories, then in user defined
 	  library directories - third try
+	* support/scripts/as2gbmap.py: converter from asxxxx to rrgb map
+	  file format
 
 2010-02-21 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

@@ -1,3 +1,14 @@
+2010-02-23 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/z80/main.c, sdas/linksrc/lkdata.c,
+	  sdas/linksrc/lklist.c, sdas/linksrc/lkmain.c, sdas/linksrc/lkrloc.c,
+	  sdas/linksrc/aslink.h:
+	  removed geneneration of no$gmb symbol file and rrgb map file
+	* sdas/linksrc/Makefile.in: removed compilation of lkgb.c
+	* sdcc/support/scripts/as2gbmap.py:
+	  added option -j to convert from asxxxx to no$gmb symbol file format
+	* sdas/linksrc/lkgb.c, sdas/linksrc/lkgg.c: deleted from svn
+
 2010-02-21 Borut Razem <borut.razem AT siol.net>
 
 	* support/makebin/makebin.c:

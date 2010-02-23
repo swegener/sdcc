@@ -46,7 +46,7 @@ LKLIB = $(srcdir)/..
 
 ASXXLIBSRC = strcmpi.c
 
-SRC = lk_readnl.c lkaomf51.c lkar.c lkarea.c lkdata.c lkelf.c lkeval.c lkgb.c \
+SRC = lk_readnl.c lkaomf51.c lkar.c lkarea.c lkdata.c lkelf.c lkeval.c \
         lkhead.c lkihx.c lklex.c lklib.c lklibr.c lklist.c lkmain.c \
         lkmem.c lknoice.c lkrel.c lkrloc.c lks19.c lksdcclib.c \
         lksym.c sdld.c

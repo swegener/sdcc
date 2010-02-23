@@ -324,14 +324,6 @@ relr()
 	printf("area %d base address: 0x%x size: 0x%x rtbase: 0x%x\n", aindex,
 		a[aindex]->a_addr, a[aindex]->a_size, rtbase);
 	#endif
-	if (TARGET_IS_GB)
-	{
-		char *s = strrchr(a[aindex]->a_bap->a_id, '_');
-		if(s != NULL && isdigit((unsigned char)s[1]))
-				current_rom_bank = atoi(s+1);
-		else
-				current_rom_bank = 0;
-	}
 	/*
 	 * Do remaining relocations
 	 */
@@ -625,14 +617,6 @@ relr()
 	if ((oflag == 3) && (rtcnt > 2)) {
 		elf(1);
 	}
-	else
-	if ((oflag == 4) && (rtcnt > 2)) {
-		gb(1);
-	}
-/*
-		else if (--GAMEGEAR--)
-			 gg(1);
-*/
 /* end sdld specific */
 }
 
@@ -821,10 +805,6 @@ rele()
 	else
 	if (oflag == 3) {
 		elf(0);
-	}
-	else
-	if (oflag == 4) {
-		gb(0);
 	}
 /* end sdld specific */
 }

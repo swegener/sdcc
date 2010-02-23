@@ -127,15 +127,6 @@ void Areas51 (void)
 }
 /* end sdld 8051 & 6808 specific */
 
-/* sdld gb specific */
-int nb_rom_banks = 2;
-int nb_ram_banks = 0;
-int mbc_type = 0;
-char cart_name[16] = "";
-
-patch* patches = NULL;
-/* end sdld gb specific */
-
 /*)Function	VOID	main(argc,argv)
  *
  *		int	argc		number of command line arguments + 1
@@ -441,13 +432,6 @@ char *argv[];
 					lkexit(1);
 				}
 			}
-			else
-			if (oflag == 4) {
-				ofp = afile(linkp->f_idp, "", 2);
-				if (ofp == NULL) {
-					lkexit(1);
-				}
-			}
 			/* end sdld specific */
 		} else {
 			/*
@@ -696,87 +680,6 @@ link_main()
 VOID
 map()
 {
-  /* sdld specific */
-  /* if gb output file format, generate gb map file */
-  if (oflag == 4) {
-        register struct head *hdp;
-        register struct lbfile *lbfh;
-
-        /*
-         * Open Map File
-         */
-        mfp = afile(linkp->f_idp, "map", 1);
-        if (mfp == NULL) {
-                lkexit(1);
-        }
-
-        /*
-         *Output Map Area Lists
-         */
-        page = 0;
-        lop  = NLPP;
-        ap = areap;
-        while (ap) {
-                lstarea(ap);
-                ap = ap->a_ap;
-        }
-        /*
-         * List Linked Files
-         */
-        hdp = headp;
-        filep = linkp->f_flp;
-        if (filep) {
-                fprintf( mfp, "MODULES\n");
-        }
-        while (filep) {
-                fprintf(mfp, "\tFILE %s\n", filep->f_idp);
-                while ((hdp != NULL) && (hdp->h_lfile == filep)) {
-                        if (strlen(hdp->m_id)>0)
-                                fprintf(mfp, "\t\tNAME %s\n", hdp->m_id);
-                        hdp = hdp->h_hp;
-                }
-                filep = filep->f_flp;
-        }
-        /*
-         * List Linked Libraries
-         */
-        if (lbfhead != NULL) {
-                fprintf(mfp, "LIBRARIES\n");
-                for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
-                        fprintf(mfp,    "\tLIBRARY %s\n"
-                                        "\t\tMODULE %s\n",
-                                lbfh->libspc, lbfh->relfil);
-                }
-        }
-        /*
-         * List Base Address Definitions
-         */
-        if (basep) {
-                fprintf(mfp, "USERBASEDEF\n");
-                bsp = basep;
-                while (bsp) {
-                        fprintf(mfp, "\t%s\n", bsp->b_strp);
-                        bsp = bsp->b_base;
-                }
-        }
-        /*
-         * List Global Definitions
-         */
-        if (globlp) {
-                fprintf(mfp, "USERGLOBALDEF\n");
-                gsp = globlp;
-                while (gsp) {
-                        fprintf(mfp, "\t%s\n", gsp->g_strp);
-                        gsp = gsp->g_globl;
-                }
-        }
-        symdef(mfp);
-        if (mfp!=NULL) {
-                fclose(mfp);
-                mfp = NULL;
-        }
-  } else {
-  /* end sdld specific */
 	register int i;
 	register struct head *hdp;
 	register struct lbfile *lbfh;
@@ -861,9 +764,6 @@ map()
 	}
 	fprintf(mfp, "\n\f");
 	symdef(mfp);
-  /* sdld specific */
-  }
-  /* end sdld specific */
 }
 
 /*)Function	int	parse()
@@ -915,10 +815,10 @@ parse()
 	register int c;
 	char fid[NINPUT];
 
-	/* sdld specific */
-	wflag = 1;
-	zflag = 1;
-	/* end sdld specific */
+	if (is_sdld()) {
+		wflag = 1;
+		zflag = 1;
+	}
 
 	while ((c = getnb()) != 0) {
 		/* sdld specific */
@@ -954,46 +854,7 @@ parse()
 
 				case 'y': /*JCF: memory usage summary output*/
 					if (is_sdld()) {
-						if (TARGET_IS_GB) {
-							c = get();
-							if(c == 'O' || c == 'o')
-								nb_rom_banks = expr(0);
-							else if(c == 'A' || c == 'a')
-								nb_ram_banks = expr(0);
-							else if(c == 'T' || c == 't')
-								mbc_type = expr(0);
-							else if(c == 'N' || c == 'n') {
-								int i = 0;
-								if(getnb() != '=' || getnb() != '"') {
-									fprintf(stderr, "Syntax error in -yn=\"name\" flag\n");
-									lkexit(1);
-								}
-								while((c = get()) != '"' && i < 16) {
-									cart_name[i++] = c;
-								}
-								if(i < 16)
-									cart_name[i] = 0;
-								else
-									while(get() != '"')
-										;
-							} else if(c == 'P' || c == 'p') {
-								patch *p = patches;
-
-								patches = (patch *)malloc(sizeof(patch));
-								patches->next = p;
-								patches->addr = expr(0);
-								if(getnb() != '=') {
-									fprintf(stderr, "Syntax error in -YHaddr=val flag\n");
-									lkexit(1);
-								}
-								patches->value = expr(0);
-							} else {
-								fprintf(stderr, "Invalid option\n");
-								lkexit(1);
-							}
-						}
-						else
-							++sflag;
+						++sflag;
 					}
 					else
 						goto err;
@@ -1016,9 +877,9 @@ parse()
 						unget(getnb());
 						if (ip && *ip)
 						{
-							stacksize=expr(0);
-							if(stacksize>256) stacksize=256;
-							else if(stacksize<0) stacksize=0;
+							stacksize = expr(0);
+							if (stacksize > 256) stacksize = 256;
+							else if (stacksize < 0) stacksize = 0;
 						}
 						return(0);
 					}
@@ -1056,11 +917,6 @@ parse()
 					break;
 
 				case 'Z':
-					if (TARGET_IS_Z80 || TARGET_IS_GB) {
-						oflag = 4;
-						break;
-					}
-					/* fall through */
 				case 'z':
 					if (is_sdld()) {
 						dflag = 1;
@@ -1073,11 +929,7 @@ parse()
 				case 'j':
 				case 'J':
 					if (is_sdld()) {
-						if (TARGET_IS_Z80 || TARGET_IS_GB) {
-							++symflag;
-						}
-						else
-							jflag = 1;
+						jflag = 1;
 					}
 					else
 						goto err;
@@ -1728,6 +1580,8 @@ char *usetxt[] = {
 	"  -s   Motorola S19 as file[s19]",
 	"List:",
 	"  -u	Update listing file(s) with link data as file(s)[.rst]",
+	"Case Sensitivity:",
+	"  -z	Enable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
@@ -1759,7 +1613,7 @@ char *usetxt_8051[] = {
 	"  -s   Motorola S19 as file[s19]",
 	"  -j   Produce NoICE debug as file[noi]",
 	"  -z   Produce SDCdb debug as file[cdb]",
-/*	"List:", */
+	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Miscellaneous:\n"
 	"  -a   [iram-size] Check for internal RAM overflow",
@@ -1768,8 +1622,6 @@ char *usetxt_8051[] = {
 	"  -y   Generate memory usage summary file[mem]",
 	"  -Y   Pack internal ram",
 	"  -A   [stack-size] Allocate space for stack",
-	"Case Sensitivity:",
-	"  -z	Enable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
@@ -1801,7 +1653,7 @@ char *usetxt_6808[] = {
 	"  -t   ELF executable as file[elf]",
 	"  -j   Produce NoICE debug as file[noi]",
 	"  -z   Produce SDCdb debug as file[cdb]",
-/*	"List:", */
+	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Miscellaneous:\n"
 	"  -a   [iram-size] Check for internal RAM overflow",
@@ -1814,7 +1666,7 @@ char *usetxt_6808[] = {
 	0
 };
 
-char *usetxt_z80[] = {
+char *usetxt_z80_gb[] = {
 	"Usage: [-Options] [-Option with arg] file",
 	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
 	"Startup:",
@@ -1830,7 +1682,6 @@ char *usetxt_z80[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as file[map]",
-	"  -j   no$gmb symbol file generated as file[sym]",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
@@ -1838,43 +1689,6 @@ char *usetxt_z80[] = {
 	"  -i   Intel Hex as file[ihx]",
 	"  -s   Motorola S19 as file[s19]",
 	"  -z   Produce SDCdb debug as file[cdb]",
-	"List:",
-	"  -u   Update listing file(s) with link data as file(s)[.rst]",
-	"End:",
-	"  -e   or null line terminates input",
-	"",
-	0
-};
-
-char *usetxt_gb[] = {
-	"Usage: [-Options] [-Option with arg] file",
-	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
-	"Startup:",
-	"  -c                           Command line input",
-	"  -f   file[lnk]               File input",
-	"  -p   Prompt and echo of file[lnk] to stdout (default)",
-	"  -n   No echo of file[lnk] to stdout",
-	"Libraries:",
-	"  -k   Library path specification, one per -k",
-	"  -l   Library file specification, one per -l",
-	"Relocation:",
-	"  -b   area base address = expression",
-	"  -g   global symbol = expression",
-	"  -yo  Number of rom banks (default: 2)",
-	"  -ya  Number of ram banks (default: 0)",
-	"  -yt  MBC type (default: no MBC)",
-	"  -yn  Name of program (default: name of output file)",
-	"  -yp# Patch one byte in the output GB file (# is: addr=byte)",
-	"Map format:",
-	"  -m   Map output generated as file[map]",
-	"  -j   no$gmb symbol file generated as file[sym]",
-	"  -x   Hexidecimal (default)",
-	"  -d   Decimal",
-	"  -q   Octal",
-	"Output:",
-	"  -i   Intel Hex as file[ihx]",
-	"  -s   Motorola S19 as file[s19]",
-	"  -Z   Gameboy image as file[gb]",
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"End:",
@@ -1907,10 +1721,8 @@ usage()
 {
 	register char	**dp;
 	/* sdld specific */
-	enum sdld_target_e target = get_sdld_target();
-
 	fprintf(stderr, "\n%s Linker %s\n\n", is_sdld() ? "sdld" : "ASxxxx", VERSION);
-	for (dp = (target == TARGET_IS_8051) ? usetxt_8051 : ((target == TARGET_IS_6808) ? usetxt_6808 : ((target == TARGET_IS_Z80) ? usetxt_z80 : ((target == TARGET_IS_GB) ? usetxt_gb : usetxt))); *dp; dp++)
+	for (dp = TARGET_IS_8051 ? usetxt_8051 : (TARGET_IS_6808 ? usetxt_6808 : ((TARGET_IS_Z80 || TARGET_IS_GB) ? usetxt_z80_gb : usetxt)); *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	/* end sdld specific */
 	lkexit(1);

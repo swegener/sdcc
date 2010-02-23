@@ -118,8 +118,6 @@ int	aflag;		/*	Overlapping area warning flag
 			 */
 int	jflag;		/*	NoICE output flag
 			 */
-int	symflag;	/*	no$gmb .sym output flag
-			 */
 int	rflag;		/*	Extended linear address record flag.
 			 */
 a_uint	iram_size;	/*	internal ram size

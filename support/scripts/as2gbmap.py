@@ -25,14 +25,18 @@
 #  Borut Razem
 #  borut.razem@siol.net
 
-from optparse import OptionParser
 import sys
+import os
 import re
+from optparse import OptionParser
+import operator
 
 def main():
     '''asxxxx to gb map file converter'''
-    usage = "usage: %prog [options] [<input_asxxxx_map_file> [<output_gb_map_file>]]"
+    usage = "usage: %prog [options] [<input_asxxxx_map_file> [<output_gb_file>]]"
     parser = OptionParser(usage = usage, version = "1.0")
+    parser.set_defaults(no_gmb = False)
+    parser.add_option("-j", "--no$gmb", action = "store_true", dest = "no_gmb", help = "generate no$gmb symbol file (default: rrgb)")
     (options, args) = parser.parse_args()
 
     if len(args) > 0 and args[0] != "-":
@@ -113,35 +117,51 @@ def main():
     if area:
         areas.append(area)
 
-    # generate gb map file
-    for e in areas:
-        print >> fout, 'AREA %s' % e['area']
-        print >> fout, '\tRADIX %s' % e['radix']
-        print >> fout, '\tBASE %04X' % e['base']
-        print >> fout, '\tSIZE %04X' % e['size']
-        print >> fout, '\tATTRIB %s' % e['attrib']
-        if e['globals']:
-            print >> fout, '\tGLOBALS'
-            for g in e['globals']:
-                print >> fout, '\t\t%s\t%04X' % (g['global'], g['value'])
 
-    if modules:
-        print >> fout, 'MODULES'
-        for m in modules:
-            print >> fout, '\tFILE %s' % m['file']
-            if m['name']:
-                print >> fout, '\t\tNAME %s' % m['name']
-
-    if libraries:
-        print >> fout, 'LIBRARIES'
-        for m in libraries:
-            print >> fout, '\tLIBRARY %s' % m['library']
-            print >> fout, '\t\tMODULE %s' % m['module']
-
-    if ubads:
-        print >> fout, 'USERBASEDEF'
-        for m in ubads:
-            print >> fout, '\t%s = 0x%04X' % (m['symbol'], int(m['value'], 16))
+    if options.no_gmb:
+        # generate no$gmp map file
+        print >> fout, '; no$gmb format .sym file'
+        print >> fout, '; Generated automagically by %s' % os.path.basename(sys.argv[0])
+        for e in areas:
+            print >> fout, '; Area: %s' % e['area']
+            if e['globals']:
+                e['globals'].sort(key=operator.itemgetter('value'))
+                for g in e['globals']:
+                   if g['global'][0:3] != 'l__':
+                        if g['value'] > 0x7FFF:
+                            print >> fout, '00:%04X %s' % (g['value'], g['global'])
+                        else:
+                            print >> fout, '%02X:%04X %s' % (g['value'] // 16384, g['value'], g['global'])
+    else:
+        # generate rrgb map file
+        for e in areas:
+            print >> fout, 'AREA %s' % e['area']
+            print >> fout, '\tRADIX %s' % e['radix']
+            print >> fout, '\tBASE %04X' % e['base']
+            print >> fout, '\tSIZE %04X' % e['size']
+            print >> fout, '\tATTRIB %s' % e['attrib']
+            if e['globals']:
+                print >> fout, '\tGLOBALS'
+                for g in e['globals']:
+                    print >> fout, '\t\t%s\t%04X' % (g['global'], g['value'])
+    
+        if modules:
+            print >> fout, 'MODULES'
+            for m in modules:
+                print >> fout, '\tFILE %s' % m['file']
+                if m['name']:
+                    print >> fout, '\t\tNAME %s' % m['name']
+    
+        if libraries:
+            print >> fout, 'LIBRARIES'
+            for m in libraries:
+                print >> fout, '\tLIBRARY %s' % m['library']
+                print >> fout, '\t\tMODULE %s' % m['module']
+    
+        if ubads:
+            print >> fout, 'USERBASEDEF'
+            for m in ubads:
+                print >> fout, '\t%s = 0x%04X' % (m['symbol'], int(m['value'], 16))
 
 if __name__ == '__main__':
     main()

@@ -271,26 +271,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	F_LNK	2		/* File.lnk */
 #define	F_REL	3		/* File.rel */
 
-/* sdld gb specific */
-/*
- * Multiple banks support
- */
-extern int nb_rom_banks;
-extern int nb_ram_banks;
-extern int current_rom_bank;
-extern int mbc_type;
-extern char cart_name[];
-/*
- * ROM patching support
- */
-typedef struct _patch {
-  unsigned int addr;
-  unsigned char value;
-  struct _patch *next;
-} patch;
-extern patch* patches;
-/* end sdld gb specific */
-
 /*
  *	General assembler address type
  */
@@ -741,8 +721,6 @@ extern	int	packflag;	/*	Pack data memory flag
 extern	int	stacksize;	/*	Pack data memory flag
 				 */
 extern	int	jflag;		/*	NoICE output flag
-				 */
-extern	int	symflag;	/*	no$gmb .sym output flag
 				 */
 extern int	rflag;		/*	Extended linear address record flag.
 				*/

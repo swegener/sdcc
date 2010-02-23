@@ -1534,9 +1534,6 @@ getOutFmtExt (void)
 
     case 't':
       return ".elf";
-
-    case 'Z':
-      return ".gb";
     }
 }
 

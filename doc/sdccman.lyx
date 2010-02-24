@@ -123,7 +123,7 @@ SDCC 2.9.7
 \begin_inset Newline newline
 \end_inset
 
-$Date::             $ 
+$Date: 2010-01-16 #$ 
 \begin_inset Newline newline
 \end_inset
 
@@ -1915,7 +1915,20 @@ int b : 2;
 \end_layout
 
 \begin_layout Itemize
-Special sdcc keywords which are not preceded by a double underscore are
+libraries, included in sdcc packages, are in ar format in sdcc version 2.9.0
+ and higher.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Using-ar-to"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+special sdcc keywords which are not preceded by a double underscore are
  deprecated in version 3.0 and higher.
  See section 
 \begin_inset CommandInset ref
@@ -1928,7 +1941,21 @@ reference "sub:ANSI-Compliance"
 \end_layout
 
 \begin_layout Itemize
-Targets for xa51 and avr are disabled by default in version 3.0 and higher.
+targets for xa51 and avr are disabled by default in version 3.0 and higher.
+\end_layout
+
+\begin_layout Itemize
+in sdcc version 3.0 and higher sdldgb and sdldz80 don't support generation
+ of GameBoy binary image format.
+ The makebin utility can be used to convert Intel Hex format to GameBoy
+ binary image format.
+\end_layout
+
+\begin_layout Itemize
+in sdcc version 3.0 and higher sdldgb and sdldz80 don't support generation
+ of rrgb (GameBoy simulator) map file and no$gmb symbol file formats.
+ The as2gbmap utility can be used to convert sdld map format to rrgb and
+ no$gmb file formats.
 \end_layout
 
 \begin_layout Section
@@ -2304,7 +2331,7 @@ status collapsed
 
 \end_inset
 
--disable-gbz80-port Excludes the Gameboy gbz80 port
+-disable-gbz80-port Excludes the GameBoy gbz80 port
 \end_layout
 
 \begin_layout List
@@ -7499,6 +7526,11 @@ sdcdb - The source debugger.
 packihx - A tool to pack (compress) Intel hex files.
 \end_layout
 
+\begin_layout Itemize
+makebin - A tool to convert Intel Hex file to a binary and GameBoy binary
+ image file format.
+\end_layout
+
 \begin_layout Standard
 In <installdir>/share/sdcc/include
 \end_layout
@@ -7632,8 +7664,8 @@ This is a set of retargettable assemblers and linkage editors, which was
 \end_layout
 
 \begin_layout Standard
-SDCC uses an about 1999 branch which unfortunately is not compatible with
- the more advanced (f.e.
+SDCC uses an about 1998 branch of asxxxx version 2.0 which unfortunately
+ is not compatible with the more advanced (f.e.
  macros, more targets) ASxxxx Cross Assemblers nowadays available from Alan
  Baldwin 
 \begin_inset Flex URL
@@ -7647,8 +7679,8 @@ http://shop-pdp.kent.edu/
 \end_inset
 
 .
- In 2009 Alan made his ASxxxx Cross Assemblers available under the GPL licence
- (GPLv3 or later), so a reunion could be possible.
+ In 2009 Alan made his ASxxxx Cross Assemblers versin 5.0 available under
+ the GPL licence (GPLv3 or later), so a reunion could be possible.
  Thanks Alan!
 \end_layout
 
@@ -9319,6 +9351,13 @@ status collapsed
 \begin_layout Plain Layout
 ar
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Using-ar-to"
 
 \end_inset
 
@@ -41297,7 +41336,7 @@ Z80
 
 \end_inset
 
- and the Nintendo Gameboy's Z80-like gbz80
+ and the Nintendo GameBoy's Z80-like gbz80
 \begin_inset Index
 status collapsed
 
@@ -52155,7 +52194,7 @@ Tools
 \begin_layout Standard
 \align left
 \begin_inset Tabular
-<lyxtabular version="3" rows="14" columns="3">
+<lyxtabular version="3" rows="16" columns="3">
 <features>
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -52655,7 +52694,7 @@ sdcc/bin
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -52664,7 +52703,7 @@ packihx
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -52683,7 +52722,7 @@ packihx (tool)
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -52697,6 +52736,73 @@ packihx (tool)
 \noun off
 \color none
 sdcc/bin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+makebin
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Intl Hex to binary and GameBoy binay format converter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+sdcc/bin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+as2gbmap.py
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdas map to rrgb map and no$gmb sym file format converter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdcc/support/scripts
 \end_layout
 
 \end_inset

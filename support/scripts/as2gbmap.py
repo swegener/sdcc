@@ -40,12 +40,20 @@ def main():
     (options, args) = parser.parse_args()
 
     if len(args) > 0 and args[0] != "-":
-        fin = open(args[0], "r")
+        try:
+            fin = open(args[0], "r")
+        except IOError as (errno, strerror):
+            print >> sys.stderr, "%s: can't open %s: %s" % (os.path.basename(sys.argv[0]), args[0], strerror)
+            return 1
     else:
         fin = sys.stdin
 
     if len(args) > 1 and args[1] != "-":
-        fout = open(args[1], "w")
+        try:
+            fout = open(args[1], "w")
+        except IOError as (errno, strerror):
+            print >> sys.stderr, "%s: can't create %s: %s" % (os.path.basename(sys.argv[1]), args[1], strerror)
+            return 1
     else:
         fout = sys.stdout;
 
@@ -125,7 +133,7 @@ def main():
         for e in areas:
             print >> fout, '; Area: %s' % e['area']
             if e['globals']:
-                e['globals'].sort(key=operator.itemgetter('value'))
+                e['globals'].sort(key = operator.itemgetter('value'))
                 for g in e['globals']:
                    if g['global'][0:3] != 'l__':
                         if g['value'] > 0x7FFF:
@@ -141,6 +149,7 @@ def main():
             print >> fout, '\tSIZE %04X' % e['size']
             print >> fout, '\tATTRIB %s' % e['attrib']
             if e['globals']:
+                e['globals'].sort(key = operator.itemgetter('value'))
                 print >> fout, '\tGLOBALS'
                 for g in e['globals']:
                     print >> fout, '\t\t%s\t%04X' % (g['global'], g['value'])
@@ -162,6 +171,7 @@ def main():
             print >> fout, 'USERBASEDEF'
             for m in ubads:
                 print >> fout, '\t%s = 0x%04X' % (m['symbol'], int(m['value'], 16))
+        return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

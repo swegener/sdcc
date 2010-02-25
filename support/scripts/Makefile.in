@@ -7,7 +7,7 @@ TARGET = $(top_builddir)/bin/as2gbmap
 all:
 	cp $(srcdir)/as2gbmap.py $(TARGET) && chmod +x $(TARGET)
 
-install: all instaldirs
+install: all installdirs
 	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/as2gbmap|sed '$(transform)'`
 
 installdirs:

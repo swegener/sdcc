@@ -2,6 +2,8 @@ VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
 
+include $(top_builddir)/Makefile.common
+
 TARGET = $(top_builddir)/bin/as2gbmap
 
 all:
@@ -15,4 +17,3 @@ installdirs:
 
 uninstall:
 	rm -rf `echo $(DESTDIR)$(bindir)/as2gbmap|sed '$(transform)'`
-

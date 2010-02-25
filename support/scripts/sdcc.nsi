@@ -374,6 +374,7 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\sdcc.exe"
   File "${SDCC_ROOT}\bin\sdcclib.exe"
   File "${SDCC_ROOT}\bin\sdcpp.exe"
+  File "${SDCC_ROOT}\bin\as2gbmap.cmd"
   File "${SDCC_ROOT}\bin\readline5.dll"
 ${SectionEnd}
 
@@ -904,6 +905,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdcc.exe"
   Delete "$INSTDIR\bin\sdcclib.exe"
   Delete "$INSTDIR\bin\sdcpp.exe"
+  Delete "$INSTDIR\bin\as2gbmap.cmd"
   Delete "$INSTDIR\bin\readline5.dll"
 
 

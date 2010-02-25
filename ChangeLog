@@ -1,3 +1,9 @@
+2010-02-25 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, Makefile.in, support/scripts/Makefile.in:
+	  "compile" as2gbmap.py: copy it to bin/as2gbmap and make it executable
+	* support/scripts/sdcc.nsi: include bin/as2gbmap.cmd to the package
+
 2010-02-24 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/support/scripts/as2gbmap.py:

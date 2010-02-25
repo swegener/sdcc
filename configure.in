@@ -807,6 +807,7 @@ support/librarian/Makefile
 support/makebin/Makefile
 support/regression/Makefile
 support/valdiag/Makefile
+support/scripts/Makefile
 Makefile
 Makefile.common:Makefile.common.in
 ])

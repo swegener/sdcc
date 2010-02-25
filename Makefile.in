@@ -12,6 +12,7 @@ top_srcdir      = @top_srcdir@
 include Makefile.common
 
 SDCC_LIBS       = support/makebin
+SDCC_SCRIPTS    = support/scripts
 SDCC_DOC        = doc
 
 # Parts that are not normally compiled but need to be cleaned
@@ -65,9 +66,9 @@ ifeq ($(OPT_DISABLE_SDCPP), 0)
 SDCC_LIBS       += support/cpp
 endif
 
-TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld
+TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
 
-PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB)
+PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB) $(SDCC_SCRIPTS)
 
 PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/linksrc \
                   src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
@@ -94,6 +95,9 @@ sdcc-ld:
 
 sdcc-misc:
 	for misc in $(SDCC_MISC); do $(MAKE) -C $$misc ; done
+
+sdcc-scripts:
+	$(MAKE) -C $(SDCC_SCRIPTS)
 
 sdcc-packihx:
 	$(MAKE) -C $(SDCC_PACKIHX)

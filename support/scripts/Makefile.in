@@ -1,0 +1,18 @@
+VPATH  = @srcdir@
+srcdir = @srcdir@
+top_builddir = @top_builddir@
+
+TARGET = $(top_builddir)/bin/as2gbmap
+
+all:
+	cp $(srcdir)/as2gbmap.py $(TARGET) && chmod +x $(TARGET)
+
+install: all instaldirs
+	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/as2gbmap|sed '$(transform)'`
+
+installdirs:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+
+uninstall:
+	rm -rf `echo $(DESTDIR)$(bindir)/as2gbmap|sed '$(transform)'`
+

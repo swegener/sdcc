@@ -1,3 +1,8 @@
+2010-02-26 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/support/scripts/as2gbmap.py:
+	  use pre-python 2.6 exceptin handling syntax
+
 2010-02-25 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, Makefile.in, support/scripts/Makefile.in:

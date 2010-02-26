@@ -42,7 +42,7 @@ def main():
     if len(args) > 0 and args[0] != "-":
         try:
             fin = open(args[0], "r")
-        except IOError as (errno, strerror):
+        except IOError, (errno, strerror):
             print >> sys.stderr, "%s: can't open %s: %s" % (os.path.basename(sys.argv[0]), args[0], strerror)
             return 1
     else:
@@ -51,7 +51,7 @@ def main():
     if len(args) > 1 and args[1] != "-":
         try:
             fout = open(args[1], "w")
-        except IOError as (errno, strerror):
+        except IOError, (errno, strerror):
             print >> sys.stderr, "%s: can't create %s: %s" % (os.path.basename(sys.argv[1]), args[1], strerror)
             return 1
     else:

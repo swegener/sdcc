@@ -1,3 +1,7 @@
+2010-03-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c(get_lib_suffix): added huge model
+
 2010-02-26 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/support/scripts/as2gbmap.py:

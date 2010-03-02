@@ -1567,6 +1567,13 @@ get_lib_suffix (void)
             c = "large";
           break;
 
+        case MODEL_HUGE:
+          if (options.stackAuto)
+            c = "huge-stack-auto";
+          else
+            c = "huge";
+          break;
+
         case MODEL_FLAT24:
           /* c = "flat24"; */
           if (TARGET_IS_DS390)

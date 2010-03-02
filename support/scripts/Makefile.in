@@ -17,3 +17,5 @@ installdirs:
 
 uninstall:
 	rm -rf `echo $(DESTDIR)$(bindir)/as2gbmap|sed '$(transform)'`
+
+include $(srcdir)/clean.mk

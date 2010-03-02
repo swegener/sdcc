@@ -243,13 +243,14 @@ oclsExpense (struct memmap *oclass)
   return 0;
 }
 
-static void _pic14_do_link (void)
+static void
+_pic14_do_link (void)
 {
-  hTab *linkValues=NULL;
+  hTab *linkValues = NULL;
   char lfrm[256];
   char *lcmd;
-  char temp[128];
-  set *tSet=NULL;
+  char temp[PATH_MAX];
+  set *tSet = NULL;
   int ret;
   char * procName;
   
@@ -268,40 +269,41 @@ static void _pic14_do_link (void)
   mergeSets(&tSet, libDirsSet);
   shash_add(&linkValues, "incdirs", joinStrSet(appendStrSet(tSet, "-I\"", "\"")));
 
-  SNPRINTF (&temp[0], 128, "%cpic\"", DIR_SEPARATOR_CHAR);
-  joinStrSet(appendStrSet(libDirsSet, "-I\"", &temp[0]));
-  shash_add(&linkValues, "sysincdirs", joinStrSet(appendStrSet(libDirsSet, "-I\"", &temp[0])));
+  joinStrSet (appendStrSet (libDirsSet, "-I\"", "\""));
+  shash_add (&linkValues, "sysincdirs", joinStrSet (appendStrSet(libDirsSet, "-I\"", "\"")));
   
-  shash_add(&linkValues, "lflags", joinStrSet(linkOptionsSet));
+  shash_add (&linkValues, "lflags", joinStrSet (linkOptionsSet));
 
-  shash_add(&linkValues, "outfile", fullDstFileName ? fullDstFileName : dstFileName);
+  shash_add (&linkValues, "outfile", fullDstFileName ? fullDstFileName : dstFileName);
 
-  if(fullSrcFileName) {
-    sprintf(temp, "%s.o", fullDstFileName ? fullDstFileName : dstFileName );
-    shash_add(&linkValues, "user_ofile", temp);
-  }
+  if (fullSrcFileName)
+    {
+      SNPRINTF (temp, sizeof (temp), "%s.o", fullDstFileName ? fullDstFileName : dstFileName );
+      shash_add (&linkValues, "user_ofile", temp);
+    }
 
-  shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
+  shash_add (&linkValues, "ofiles", joinStrSet (relFilesSet));
 
   /* LIBRARIES */
   procName = processor_base_name();
-  if (!procName) {
-     procName = "16f877";
-  }
+  if (!procName)
+    {
+      procName = "16f877";
+    }
 
-  addSet(&libFilesSet, "libsdcc.lib");
-  SNPRINTF(&temp[0], 128, "pic%s.lib", procName);
-  addSet(&libFilesSet, temp);
-  shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
+  addSet (&libFilesSet, Safe_strdup ("libsdcc.lib"));
+  SNPRINTF(temp, sizeof (temp), "pic%s.lib", procName);
+  addSet (&libFilesSet, Safe_strdup (temp));
+  shash_add (&linkValues, "libs", joinStrSet (libFilesSet));
 
   lcmd = msprintf(linkValues, lfrm);
 
-  ret = my_system( lcmd );
+  ret = my_system (lcmd);
 
-  Safe_free( lcmd );
+  Safe_free (lcmd);
 
-  if(ret)
-    exit(1);
+  if (ret)
+    exit (1);
 }
 
 /* Globals */

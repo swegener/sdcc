@@ -1655,14 +1655,14 @@ linkEdit (char **envp)
         {
           fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
         }
-      else                      /*For all the other ports.  Including pics??? */
+      else                      /* For all the other portswhich need linker script */
         {
           fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
           if (!options.no_pack_iram)
             fprintf (lnkfile, "-Y\n");
         }
 
-      if (!(TARGET_Z80_LIKE))   /*Not for the z80, gbz80 */
+      if (!TARGET_Z80_LIKE)   /* Not for the z80, gbz80 */
         {
           /* if iram size specified */
           if (options.iram_size)
@@ -1694,7 +1694,7 @@ linkEdit (char **envp)
     if (segName) { Safe_free (segName); } \
   }
 
-      if (!(TARGET_Z80_LIKE))   /*Not for the z80, gbz80 */
+      if (!TARGET_Z80_LIKE)   /* Not for the z80, gbz80 */
         {
 
           /* code segment start */
@@ -1759,7 +1759,7 @@ linkEdit (char **envp)
       if (!options.nostdlib)
         {
           for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
-            fprintf (lnkfile, "-k %s%s%s\n", s, DIR_SEPARATOR_STRING, get_lib_suffix ());
+            fprintf (lnkfile, "-k %s\n", s);
         }
 
       /* command line defined library files if specified */
@@ -1809,7 +1809,7 @@ linkEdit (char **envp)
                   for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
                     {
                       dbuf_set_length (&crtpath, 0);
-                      dbuf_printf (&crtpath, "%s%s%s%s%s", s, DIR_SEPARATOR_STRING, get_lib_suffix (), DIR_SEPARATOR_STRING, *p);
+                      dbuf_printf (&crtpath, "%s%c%s", s, DIR_SEPARATOR_CHAR, *p);
 
                       if (!access (dbuf_c_str (&crtpath), 0))   /* Found it! */
                         {
@@ -1837,7 +1837,7 @@ linkEdit (char **envp)
                       for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
                         {
                           dbuf_set_length (&crtpath, 0);
-                          dbuf_printf (&crtpath, "%s%s%s", s, DIR_SEPARATOR_STRING, *p);
+                          dbuf_printf (&crtpath, "%s%c%s", s, DIR_SEPARATOR_CHAR, *p);
 
                           if (!access (dbuf_c_str (&crtpath), 0))       /* Found it! */
                             {
@@ -1899,7 +1899,7 @@ linkEdit (char **envp)
           /* use $3 for libraries from command line --> libSet */
           mergeSets (&libSet, libFilesSet);
 
-          tempSet = appendStrSet (relFilesSet, "", "");
+          tempSet = setFromSetNonRev (relFilesSet);
           mergeSets (&libSet, tempSet);
 //        libSet = reverseSet(libSet);
 
@@ -1907,13 +1907,13 @@ linkEdit (char **envp)
             {
 //            strcpy(buffer3, strrchr(fullSrcFileName, DIR_SEPARATOR_CHAR)+1);
               /* if it didn't work, revert to old behaviour */
-              if (!strlen (buffer3))
+              if (buffer3[0] == '\0')
                 strcpy (buffer3, dstFileName);
               strcat (buffer3, port->linker.rel_ext);
 
             }
           else
-            strcpy (buffer3, "");
+            buffer3[0] = '\0';
         }
 
       buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
@@ -2227,7 +2227,7 @@ setIncludePath (void)
 
       dbuf_init (&dbuf, PATH_MAX);
       addSetHead (&includeDirsSet, p);
-      dbuf_printf (&dbuf, "%s%s%s", p, DIR_SEPARATOR_STRING, port->target);
+      dbuf_printf (&dbuf, "%s%c%s", p, DIR_SEPARATOR_CHAR, port->target);
       addSetHead (&includeDirsSet, dbuf_detach (&dbuf));
     }
 }
@@ -2237,6 +2237,7 @@ static void
 setLibPath (void)
 {
   char *p;
+  struct dbuf_s dbuf;
 
   /*
    * Search logic:
@@ -2250,10 +2251,13 @@ setLibPath (void)
   if (options.nostdlib)
     return;
 
-  libDirsSet = appendStrSet (dataDirsSet, NULL, LIB_DIR_SUFFIX);
-
   if ((p = getenv (SDCC_LIB_NAME)) != NULL)
-    addSetHead (&libDirsSet, p);
+    addSetHead (&libDirsSet, Safe_strdup (p));
+
+  dbuf_init (&dbuf, PATH_MAX);
+  dbuf_printf (&dbuf, "%c%s", DIR_SEPARATOR_CHAR, get_lib_suffix ());
+
+  libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 }
 
 /* Set data path */
@@ -2360,7 +2364,7 @@ doPrintSearchDirs (void)
 
   printf ("libdir:\n");
   for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
-    fprintf (stdout, "%s%s%s\n", s, DIR_SEPARATOR_STRING, get_lib_suffix ());
+    fprintf (stdout, "%s\n", s);
 
   printf ("libpath:\n");
   fputStrSet (stdout, libPathsSet);

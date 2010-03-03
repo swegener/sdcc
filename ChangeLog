@@ -1,3 +1,10 @@
+2010-03-02 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/pic/main.c, src/pic16/main.c:
+	  lib suffix is a part of lib dir set
+	* support/scripts/Makefile.in, support/scripts/clean.mk:
+	  added clean Makefile target for scripts
+
 2010-03-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c(get_lib_suffix): added huge model
@@ -96,6 +103,7 @@
 	  remove the file extension in any case
 
 2010-02-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peeph-gbz80.def,
 	  device/include/asm/z80/features.h,
 	  device/lib/gbz80/Makefile.in,

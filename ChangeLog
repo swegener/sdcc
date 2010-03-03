@@ -1,3 +1,10 @@
+2010-03-03 Borut Razem <borut.razem AT siol.net>
+
+	* all.dsp: added makebin to project
+	* src/SDCCmain.c: fixed lib suffix,
+	  get_lib_suffix() renamed to get_model(),
+	  added pic* handling to get_model()
+
 2010-03-02 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/pic/main.c, src/pic16/main.c:

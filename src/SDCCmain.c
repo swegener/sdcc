@@ -1537,81 +1537,77 @@ getOutFmtExt (void)
     }
 }
 
+/* TODO: this should be moved to the traget:
+   port->get_model () */
 const char *
-get_lib_suffix (void)
+get_model (void)
 {
-  const char *c;
-
-  if (!(TARGET_Z80_LIKE || TARGET_IS_HC08))     /*Not for the z80, gbz80 */
+  switch (port->id)
     {
+    case TARGET_ID_HC08:
+      return "hc08";
+
+    case TARGET_ID_Z80:
+      return "z80";
+
+    case TARGET_ID_GBZ80:
+      return "gbz80";
+
+    case TARGET_ID_PIC:
+      return "pic";
+
+    case TARGET_ID_PIC16:
+      return "pic16";
+
+    default:     /* TARGET_MCS51_LIKE */
       switch (options.model)
         {
         case MODEL_SMALL:
           if (options.stackAuto)
-            c = "small-stack-auto";
+            return "small-stack-auto";
           else
-            c = "small";
-          break;
+            return "small";
 
         case MODEL_MEDIUM:
           if (options.stackAuto)
-            c = "medium-stack-auto";
+            return "medium-stack-auto";
           else
-            c = "medium";
-          break;
+            return "medium";
 
         case MODEL_LARGE:
           if (options.stackAuto)
-            c = "large-stack-auto";
+            return "large-stack-auto";
           else
-            c = "large";
-          break;
+            return "large";
 
         case MODEL_HUGE:
           if (options.stackAuto)
-            c = "huge-stack-auto";
+            return "huge-stack-auto";
           else
-            c = "huge";
-          break;
+            return "huge";
 
         case MODEL_FLAT24:
           /* c = "flat24"; */
           if (TARGET_IS_DS390)
-            {
-              c = "ds390";
-            }
+            return "ds390";
           else if (TARGET_IS_DS400)
-            {
-              c = "ds400";
-            }
+            return "ds400";
           else
             {
               fprintf (stderr, "Add support for your FLAT24 target in %s @ line %d\n", __FILE__, __LINE__);
               exit (EXIT_FAILURE);
+              /* not reached */
+              return "";
             }
-          break;
 
         case MODEL_PAGE0:
-          c = "xa51";
-          break;
+          return "xa51";
 
         default:
           werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
-          c = "unknown";
-          break;
+          return "unknown";
         }
     }
-  else                          /*for the z80, gbz80 and hc08 */
-    {
-      if (TARGET_IS_HC08)
-        c = "hc08";
-      else if (TARGET_IS_Z80)
-        c = "z80";
-      else
-        c = "gbz80";
-    }
-
-  return c;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2255,7 +2251,7 @@ setLibPath (void)
     addSetHead (&libDirsSet, Safe_strdup (p));
 
   dbuf_init (&dbuf, PATH_MAX);
-  dbuf_printf (&dbuf, "%c%s", DIR_SEPARATOR_CHAR, get_lib_suffix ());
+  dbuf_printf (&dbuf, "%s%c%s", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, get_model ());
 
   libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 }

@@ -179,7 +179,8 @@ PORT avr_port = {
          glue,
 	 TRUE,			/* Emit glue around main */
 	 MODEL_LARGE | MODEL_SMALL,
-	 MODEL_SMALL
+	 MODEL_SMALL,
+         NULL,                       /* model == target */
 	},
 	{
 	 _asmCmd,

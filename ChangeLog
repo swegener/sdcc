@@ -1,3 +1,11 @@
+2010-03-04 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/port.h, src/avr/main.c, src/ds390/main.c,
+	  src/hc08/main.c, src/mcs51/main.c, src/pic16/main.c, src/pic/main.c,
+	  src/xa51/main.c, src/z80/main.c: get_model() moved to the traget
+	* src/mcs51/rtrack.c: removed MSVC warnings:
+	  integral size mismatch in argument; conversion supplied
+
 2010-03-03 Borut Razem <borut.razem AT siol.net>
 
 	* all.dsp: added makebin to project

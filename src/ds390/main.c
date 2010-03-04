@@ -872,6 +872,31 @@ getRegsWritten (lineNode *line)
   return line->aln->regsWritten;
 }
 
+static const char *
+get_model (void)
+{
+  switch (options.model)
+    {
+    case MODEL_SMALL:
+      if (options.stackAuto)
+        return "small-stack-auto";
+      else
+        return "small";
+
+    case MODEL_LARGE:
+      if (options.stackAuto)
+        return "large-stack-auto";
+      else
+        return "large";
+
+    case MODEL_FLAT24:
+        return port->target_name;
+
+    default:
+      werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
+      return "unknown";
+    }
+}
 
 /** $1 is always the basename.
     $2 is always the output file.
@@ -903,7 +928,8 @@ PORT ds390_port =
     glue,
     TRUE,                       /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
-    MODEL_SMALL
+    MODEL_SMALL,
+    get_model,
   },
   {
     _asmCmd,
@@ -1235,12 +1261,13 @@ PORT tininative_port =
   TARGET_ID_DS390,
   "TININative",
   "DS80C390",                   /* Target name */
-        NULL,                   /* processor */
+  NULL,                         /* processor */
   {
     glue,
     FALSE,                      /* Emit glue around main */
     MODEL_FLAT24,
-    MODEL_FLAT24
+    MODEL_FLAT24,
+    get_model,
   },
   {
     _a390Cmd,
@@ -1495,7 +1522,8 @@ PORT ds400_port =
     glue,
     TRUE,                       /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
-    MODEL_SMALL
+    MODEL_SMALL,
+    get_model,
   },
   {
     _asmCmd,

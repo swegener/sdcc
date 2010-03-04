@@ -1537,79 +1537,6 @@ getOutFmtExt (void)
     }
 }
 
-/* TODO: this should be moved to the traget:
-   port->get_model () */
-const char *
-get_model (void)
-{
-  switch (port->id)
-    {
-    case TARGET_ID_HC08:
-      return "hc08";
-
-    case TARGET_ID_Z80:
-      return "z80";
-
-    case TARGET_ID_GBZ80:
-      return "gbz80";
-
-    case TARGET_ID_PIC:
-      return "pic";
-
-    case TARGET_ID_PIC16:
-      return "pic16";
-
-    default:     /* TARGET_MCS51_LIKE */
-      switch (options.model)
-        {
-        case MODEL_SMALL:
-          if (options.stackAuto)
-            return "small-stack-auto";
-          else
-            return "small";
-
-        case MODEL_MEDIUM:
-          if (options.stackAuto)
-            return "medium-stack-auto";
-          else
-            return "medium";
-
-        case MODEL_LARGE:
-          if (options.stackAuto)
-            return "large-stack-auto";
-          else
-            return "large";
-
-        case MODEL_HUGE:
-          if (options.stackAuto)
-            return "huge-stack-auto";
-          else
-            return "huge";
-
-        case MODEL_FLAT24:
-          /* c = "flat24"; */
-          if (TARGET_IS_DS390)
-            return "ds390";
-          else if (TARGET_IS_DS400)
-            return "ds400";
-          else
-            {
-              fprintf (stderr, "Add support for your FLAT24 target in %s @ line %d\n", __FILE__, __LINE__);
-              exit (EXIT_FAILURE);
-              /* not reached */
-              return "";
-            }
-
-        case MODEL_PAGE0:
-          return "xa51";
-
-        default:
-          werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
-          return "unknown";
-        }
-    }
-}
-
 /*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
 /*-----------------------------------------------------------------*/
@@ -2075,6 +2002,9 @@ preProcess (char **envp)
           addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_PAGE0"));
           break;
 
+        case NO_MODEL:
+          break;
+
         default:
           werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
           break;
@@ -2251,7 +2181,7 @@ setLibPath (void)
     addSetHead (&libDirsSet, Safe_strdup (p));
 
   dbuf_init (&dbuf, PATH_MAX);
-  dbuf_printf (&dbuf, "%s%c%s", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, get_model ());
+  dbuf_printf (&dbuf, "%s%c%s", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);
 
   libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 }

@@ -1108,8 +1108,6 @@ const char *pic16_linkCmd[] =
   "gplink", "$l", "-w", "-r", "-o \"$2\"", "\"$1\"","$3", NULL
 };
 
-
-
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies (nothing currently)
@@ -1132,8 +1130,9 @@ PORT pic16_port =
   {
     pic16glue,
     TRUE,           /* Emit glue around main */
-    MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
-    MODEL_SMALL
+    NO_MODEL,
+    NO_MODEL,
+    NULL,           /* model == target */
   },
   {
     pic16_asmCmd,   /* assembler command and arguments */

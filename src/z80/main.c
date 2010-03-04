@@ -733,8 +733,9 @@ PORT z80_port =
   {
     glue,
     FALSE,
-    MODEL_MEDIUM | MODEL_SMALL,
-    MODEL_SMALL
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
   },
   {                             /* Assembler */
     _z80AsmCmd,
@@ -861,8 +862,9 @@ PORT gbz80_port =
   {
     glue,
     FALSE,
-    MODEL_MEDIUM | MODEL_SMALL,
-    MODEL_SMALL
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
   },
   {                             /* Assembler */
     _gbAsmCmd,

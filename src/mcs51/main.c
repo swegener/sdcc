@@ -709,6 +709,40 @@ getRegsWritten (lineNode *line)
   return line->aln->regsWritten;
 }
 
+static const char *
+get_model (void)
+{
+  switch (options.model)
+    {
+    case MODEL_SMALL:
+      if (options.stackAuto)
+        return "small-stack-auto";
+      else
+        return "small";
+
+    case MODEL_MEDIUM:
+      if (options.stackAuto)
+        return "medium-stack-auto";
+      else
+        return "medium";
+
+    case MODEL_LARGE:
+      if (options.stackAuto)
+        return "large-stack-auto";
+      else
+        return "large";
+
+    case MODEL_HUGE:
+      if (options.stackAuto)
+        return "huge-stack-auto";
+      else
+        return "huge";
+
+    default:
+      werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
+      return "unknown";
+    }
+}
 
 /** $1 is always the basename.
     $2 is always the output file.
@@ -740,7 +774,8 @@ PORT mcs51_port =
     glue,
     TRUE,                       /* glue_up_main: Emit glue around main */
     MODEL_SMALL | MODEL_MEDIUM | MODEL_LARGE | MODEL_HUGE,
-    MODEL_SMALL
+    MODEL_SMALL,
+    get_model,
   },
   {                             /* Assembler */
     _asmCmd,

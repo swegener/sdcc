@@ -215,7 +215,6 @@ oclsExpense (struct memmap *oclass)
   return 0;
 }
 
-
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -246,7 +245,8 @@ PORT xa51_port =
     glue,
     FALSE,                      /* Emit glue around main */
     MODEL_PAGE0,
-    MODEL_PAGE0
+    MODEL_PAGE0,
+    NULL,                       /* model == target */
   },
   {
     _asmCmd,

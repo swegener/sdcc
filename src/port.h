@@ -82,7 +82,7 @@ typedef struct
     struct
       {
         /** Pointer to glue function */
-        void (*do_glue)(void);
+        void (*do_glue) (void);
         /** TRUE if all types of glue functions should be inserted into
             the file that also defines main.
             We dont want this in cases like the z80 where the startup
@@ -92,6 +92,9 @@ typedef struct
         /* OR of MODEL_* */
         int supported_models;
         int default_model;
+        /** return the model string, used as library destination;
+            port->taget is used as model string if get_model is NULL */
+        const char *(*get_model) (void);
       }
     general;
 

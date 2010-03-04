@@ -5,6 +5,7 @@
 	  src/xa51/main.c, src/z80/main.c: get_model() moved to the traget
 	* src/mcs51/rtrack.c: removed MSVC warnings:
 	  integral size mismatch in argument; conversion supplied
+	* src/SDCCglobl.h: introduced NO_MODEL
 
 2010-03-03 Borut Razem <borut.razem AT siol.net>
 

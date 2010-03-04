@@ -198,13 +198,14 @@ struct optimize
 */
 enum
   {
+    NO_MODEL = 0,     /* no model applicable */
     MODEL_SMALL = 1,
     MODEL_COMPACT = 2,
     MODEL_MEDIUM = 4,
     MODEL_LARGE = 8,
     MODEL_FLAT24 = 16,
     MODEL_PAGE0 = 32, /* for the xa51 port */
-    MODEL_HUGE = 64 /* for banked support */
+    MODEL_HUGE = 64   /* for banked support */
   };
 
 /* overlay segment name and the functions

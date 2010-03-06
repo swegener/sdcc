@@ -389,8 +389,8 @@ PORT hc08_port =
   {
     glue,
     FALSE,                      /* Emit glue around main */
-    NO_MODEL,
-    NO_MODEL,
+    MODEL_SMALL | MODEL_LARGE,
+    MODEL_LARGE,
     NULL,                       /* model == target */
   },
   {

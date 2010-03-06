@@ -1,3 +1,8 @@
+2010-03-06 Borut Razem <borut.razem AT siol.net>
+
+	* src/hc08/main.c: fixed hc08 target:
+	  reintroduced MODAL_SMALL and MODEL_LARGE
+
 2010-03-04 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/port.h, src/avr/main.c, src/ds390/main.c,

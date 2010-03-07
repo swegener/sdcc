@@ -1,3 +1,8 @@
+2010-03-07 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c,
+	  support/regression/tests/float_single.c:
+	  gbz80 port regression test fixes.
+
 2010-03-06 Borut Razem <borut.razem AT siol.net>
 
 	* src/hc08/main.c: fixed hc08 target:

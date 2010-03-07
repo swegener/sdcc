@@ -5354,18 +5354,22 @@ static void
 jmpTrueOrFalse (iCode * ic, symbol * tlbl)
 {
   // ugly but optimized by peephole
+  // Using emitLabel instead of emitLabelNoSpill (esp. on gbz80)
+  // We could jump there from locations with different values in hl.
+  // This should be changed to a more efficient solution that spills
+  // only what and when necessary.
   if (IC_TRUE (ic))
     {
       symbol *nlbl = newiTempLabel (NULL);
       emit2 ("jp !tlabel", nlbl->key + 100);
-      emitLabelNoSpill (tlbl->key + 100);
+      emitLabel (tlbl->key + 100);
       emit2 ("jp !tlabel", IC_TRUE (ic)->key + 100);
-      emitLabelNoSpill (nlbl->key + 100);
+      emitLabel (nlbl->key + 100);
     }
   else
     {
       emit2 ("jp !tlabel", IC_FALSE (ic)->key + 100);
-      emitLabelNoSpill (tlbl->key + 100);
+      emitLabel (tlbl->key + 100);
     }
   ic->generated = 1;
 }

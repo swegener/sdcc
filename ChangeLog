@@ -1,3 +1,8 @@
+2010-03-09 Philipp Klaus Krause <pkk AT spth.de>
+	* device/lib/gbz80/Makefile.in,
+	  device/lib/gbz80/printf.c:
+	  Made gbz80 port use the generic printf routine family.
+
 2010-03-07 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c,
 	  support/regression/tests/float_single.c:

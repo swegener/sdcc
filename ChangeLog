@@ -1,3 +1,12 @@
+2009-03-11 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic16f616.h,
+	  device/include/pic/pic16hv616.h,
+	  device/lib/pic/libdev/devices.txt,
+	  device/lib/pic/libdev/pic16f616.c,
+	  device/lib/pic/libdev/pic16hv616.c:
+	  add support for 16f616 and 16hv616 devices
+
 2010-03-09 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/gbz80/Makefile.in,
 	  device/lib/gbz80/printf.c:

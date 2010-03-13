@@ -3,8 +3,9 @@
 	* support/scripts/sdcc.nsi: removed lib/src/z80/*.c from the package
 	* src/z80/gen.c: fixed warning: suggest parentheses around assignment
 	  used as truth value
-	* sdas/asxxsrc/sdas.c: fixed warning: implicit declaration of function
-	  'tolower'
+	* sdas/asxxsrc/sdas.c, sdas/linksrc/sdld.c:
+	  fixed warning: implicit declaration of function 'tolower'
+	* sdas/asxxsrc/asmain.c: fixed warning: variable not initialized
 
 2009-03-11 Raphael Neider <rneider AT web.de>
 

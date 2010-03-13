@@ -420,7 +420,7 @@ _vemit2 (const char *szFormat, va_list ap)
   _tidyUp (buffer);
 
   /* Decompose multiline macros */
-  while(nextbuffer = strchr(buffer, '\n'))
+  while((nextbuffer = strchr(buffer, '\n')))
     {
       *nextbuffer = 0;
       _add_line(buffer);

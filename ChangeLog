@@ -6,6 +6,15 @@
 	* sdas/asxxsrc/sdas.c, sdas/linksrc/sdld.c:
 	  fixed warning: implicit declaration of function 'tolower'
 	* sdas/asxxsrc/asmain.c: fixed warning: variable not initialized
+	* device/include/limits.h, device/include/stdint.h,
+	  device/include/float.h, device/include/typeof.h,
+	  device/include/stddef.h, device/include/sdcc-lib.h,
+	  device/include/stdlib.h, device/include/stdio.h,
+	  device/include/math.h, device/include/asm/default/features.h,
+	  device/include/assert.h, device/include/setjmp.h,
+	  device/include/stdbool.h, device/include/ctype.h,
+	  device/include/stdarg.h, device/include/errno.h:
+	  sdcc library license changed to GPL+LE
 
 2009-03-11 Raphael Neider <rneider AT web.de>
 

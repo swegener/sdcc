@@ -519,7 +519,6 @@ ${Section} "SDCC library sources" SEC17
 #  File "${DEV_ROOT}\lib\src\ds400\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\gbz80"
-  File "${DEV_ROOT}\lib\src\gbz80\*.c"
   File "${DEV_ROOT}\lib\src\gbz80\*.s"
 #  File "${DEV_ROOT}\lib\src\gbz80\Makefile"
 
@@ -825,7 +824,6 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\z80\README"
   Delete "$INSTDIR\lib\src\z80\Makefile"
 
-  Delete "$INSTDIR\lib\src\gbz80\*.c"
   Delete "$INSTDIR\lib\src\gbz80\*.s"
   Delete "$INSTDIR\lib\src\gbz80\gbz80.lib"
   Delete "$INSTDIR\lib\src\gbz80\README"

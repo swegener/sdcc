@@ -1,3 +1,7 @@
+2010-03-15 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/*.c: sdcc library license changed to GPL+LE
+
 2010-03-13 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: removed lib/src/z80/*.c from the package

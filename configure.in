@@ -86,23 +86,38 @@ AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 # Macro definitions
 # ===========================================================================
 
-# adl_DD_COPT macro checks if the compiler specified as the 1st parameter
-# supports option specified as the 2nd parameter
-# For example: DD_CPORT(CXX, fPIC)
+# Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN([adl_DD_COPT], [
-AC_CACHE_CHECK(whether $$1 accepts -$2,sdcc_cv_$1$2,
-cat >_test_.c <<EOF
-#include <stdio.h>
-void main(void) {}
-EOF
-$$1 -v -$2 -c _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  sdcc_cv_$1$2="yes"
-else
-  sdcc_cv_$1$2="no"
-fi
-rm -f _test_.* a.out)
+AC_DEFUN(bor_IS_SUNPRO,
+[AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
+  [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
+  [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
+       choke me
+#endif
+]])],
+    [bor_compiler_sunpro=yes],
+    [bor_compiler_sunpro=no])
+bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
+])])
+
+# bor_IS_VALID_OPTION macro checks if the current compiler, selected by 
+# AC_LANG, supports option specified as the 1st parameter. The test fails if
+# the compiler returns an error or in case something is writeen to stderr.
+# For example: bor_VALID_OPT(fPIC)
+
+AC_DEFUN(bor_IS_VALID_OPTION,
+[ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
+bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
+AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
+  [bor_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=yes
+   
+   []_AC_LANG_PREFIX[]FLAGS="-$1"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+     [bor_cv_[]_AC_LANG_ABBREV[]_$1=yes],
+     [bor_cv_[]_AC_LANG_ABBREV[]_$1=no])
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=$bor_save_[]_AC_LANG_ABBREV[]_werror_flag])
+   []_AC_LANG_PREFIX[]FLAGS=$bor_save_[]_AC_LANG_PREFIX[]FLAGS
 ])
 
 # This macro expands DIR and assigns it to RET.
@@ -316,29 +331,37 @@ $2=`echo "[$]$2" | sed 's,\\\\\\\\,\\\\,g'`
 
 # Checking characteristics of compilers and other programs
 # ===========================================================================
-AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,sdcc_cv_MM,
-echo "#include <stdio.h>" >_test_.c
-echo "" >>_test_.c
-$CPP -v -MM _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  sdcc_cv_MM="-MM"
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+  AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,sdcc_cv_MM,
+  echo "#include <stdio.h>" >_test_.c
+  echo "" >>_test_.c
+  $CPP -v -MM _test_.c 1>&5 2>&5
+  if test "$?" = "0"; then
+    sdcc_cv_MM="-MM"
+  else
+    sdcc_cv_MM="-M"
+  fi
+  rm -f _test_.*)
+  M_OR_MM=$sdcc_cv_MM
+
+  # This is the first time when CFLAGS are set/modified!!
+  bor_IS_VALID_OPTION(ggdb)
+  if test "$bor_cv_c_ggdb" = "yes"; then
+    CFLAGS="-ggdb ${CFLAGS}"
+  fi
+
+  bor_IS_VALID_OPTION(pipe)
+  if test "$bor_cv_c_pipe" = "yes"; then
+    CFLAGS="-pipe $CFLAGS"
+  fi
 else
-  sdcc_cv_MM="-M"
+  bor_IS_SUNPRO
+  if test "$bor_cv_c_compiler_sunpro" = "yes"; then
+    M_OR_MM="-xM1"
+  fi
 fi
-rm -f _test_.*)
-M_OR_MM=$sdcc_cv_MM
+
 AC_SUBST(M_OR_MM)
-
-# This is the first time when CFLAGS are set/modified!!
-adl_DD_COPT(CC, ggdb)
-if test "$sdcc_cv_CCggdb" = "yes"; then
-  CFLAGS="-ggdb ${CFLAGS}"
-fi
-
-adl_DD_COPT(CC, pipe)
-if test "$sdcc_cv_CCpipe" = "yes"; then
-  CFLAGS="-pipe $CFLAGS"
-fi
 
 
 # Checks for typedefs, structures, and compiler characteristics.

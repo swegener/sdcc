@@ -420,6 +420,22 @@ const char *getBuildEnvironment(void)
 # else
   return "Mac OS X ppc";
 #endif
+#elif defined(__linux__)
+  return "Linux";
+#elif defined(__NetBSD__)
+  return "NetBSD";
+#elif defined(__FreeBSD__)
+  return "FreeBSD";
+#elif defined(__OpenBSD__)
+  return "OpenBSD";
+#elif defined(__sun)
+# if defined(__i386)
+  return "Solaris i386";
+# elif defined(__amd64)
+  return "Solaris amd64";
+# else
+  return "Solaris SPARC";
+# endif
 #else
   return "UNIX";
 #endif

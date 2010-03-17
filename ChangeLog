@@ -1,3 +1,10 @@
+2010-03-17 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, debugger/mcs51/configure.in,
+	  debugger/mcs51/configure, sim/ucsim/configure.in,
+	  sim/ucsim/configure, sim/ucsim/aclocal.m4, src/SDCCutil.c:
+	  preparations for *BSD and Solaris ports
+
 2010-03-15 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/*.c: sdcc library license changed to GPL+LE

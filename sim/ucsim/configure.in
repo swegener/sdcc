@@ -372,48 +372,39 @@ ucsim_ACCEPT_LENGTH_T
 # Macro definitions
 ###################
 
-# DD_COPT macro checks if the compiler specified as the 1st parameter
-# supports option specified as the 2nd parameter
-# For example: DD_COPT(CXX, fPIC)
+# Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN(DD_COPT, [
-AC_CACHE_CHECK(whether $$1 accepts -$2,ucsim_cv_$1$2,
-cat >_test_.c <<EOF
-int main(void) {return(0);}
-EOF
-$$1 -v -$2 -c _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  ucsim_cv_$1$2="yes"
-else
-  ucsim_cv_$1$2="no"
-fi
-rm -f _test_.* a.out)
+AC_DEFUN(bor_IS_SUNPRO,
+[AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
+  [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
+  [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
+       choke me
+#endif
+]])],
+    [bor_compiler_sunpro=yes],
+    [bor_compiler_sunpro=no])
+bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
+])])
+
+# bor_IS_VALID_OPTION macro checks if the current compiler, selected by 
+# AC_LANG, supports option specified as the 1st parameter. The test fails if
+# the compiler returns an error or in case something is writeen to stderr.
+# For example: bor_VALID_OPT(fPIC)
+
+AC_DEFUN(bor_IS_VALID_OPTION,
+[ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
+bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
+AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
+  [bor_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=yes
+   
+   []_AC_LANG_PREFIX[]FLAGS="-$1"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+     [bor_cv_[]_AC_LANG_ABBREV[]_$1=yes],
+     [bor_cv_[]_AC_LANG_ABBREV[]_$1=no])
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=$bor_save_[]_AC_LANG_ABBREV[]_werror_flag])
+   []_AC_LANG_PREFIX[]FLAGS=$bor_save_[]_AC_LANG_PREFIX[]FLAGS
 ])
-
-# DD_COPT_NO_IGNORE macro checks if the compiler specified as the
-# 1st parameter supports and doesn't ignore option specified as the
-# 2nd parameter
-# For example: DD_COPT_NO_IGNORE(CXX, fPIC)
-
-AC_DEFUN(DD_COPT_NO_IGNORE, [
-AC_CACHE_CHECK(whether $$1 accepts and doesn't ignore -$2,ucsim_cv_$1$2,
-cat >_test_.c <<EOF
-int main(void) {return(0);}
-EOF
-ucsim_cv_$1$2=$($$1 -v -$2 -c _test_.c 2>&1 1>&5)
-if test "$?" = "0"; then
-  expr "$ucsim_cv_$1$2" : '.*'-$2'.*ignored' 1>&5 2>&5
-  if test "$?" = "0"; then
-    ucsim_cv_$1$2="no"
-  else
-    ucsim_cv_$1$2="yes"
-  fi
-else
-  ucsim_cv_$1$2="no"
-fi
-rm -f _test_.* a.out)
-])
-
 
 # Checking characteristics of compilers and other programs
 # --------------------------------------------------------
@@ -501,55 +492,57 @@ esac
 
 SDCC_BUILD_BIGENDIAN
 
-AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,ucsim_cv_MM,
-echo "#include <stdio.h>" >_test_.c
-echo "" >>_test_.c
-$CXXCPP -v -MM _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  ucsim_cv_MM="-MM"
-else
-  ucsim_cv_MM="-M"
-fi
-rm -f _test_.*)
-M_OR_MM=$ucsim_cv_MM
-AC_SUBST(M_OR_MM)
-
-# This is the first time when CFLAGS are set/modified!!
-
-DD_COPT(CXX, ggdb)
-DD_COPT(CXX, gstabs)
-if test "$ucsim_cv_CXXgstabs" = "yes"; then
-   gopt="-gstabs+ -g3"
-elif test "$ucsim_cv_CXXggdb" = "yes"; then
-     gopt="-ggdb -g3"
-else
-     gopt="-g"
-fi
-if test "$CXXFLAGS"x = x ;then
-        CXXFLAGS="$gopt"
-else
-        CXXFLAGS="$CXXFLAGS $gopt"
-fi
-
-DD_COPT(CXX, pipe)
-if test "$ucsim_cv_CXXpipe" = "yes"; then
-  CXXFLAGS="$CXXFLAGS -pipe"
-fi
-
 PICOPT=""
 SHAREDLIB="no"
-DD_COPT_NO_IGNORE(CXX, fPIC)
-if test "$ucsim_cv_CXXfPIC" = "yes"; then
-    PICOPT="-fPIC"
+
+if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
+  AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,ucsim_cv_MM,
+  echo "#include <stdio.h>" >_test_.c
+  echo "" >>_test_.c
+  $CXXCPP -v -MM _test_.c 1>&5 2>&5
+  if test "$?" = "0"; then
+    ucsim_cv_MM="-MM"
+  else
+    ucsim_cv_MM="-M"
+  fi
+  rm -f _test_.*)
+  M_OR_MM=$ucsim_cv_MM
+
+  # This is the first time when CFLAGS are set/modified!!
+
+  bor_IS_VALID_OPTION(ggdb)
+  bor_IS_VALID_OPTION(gstabs)
+  if test "$ucsim_cv_cxx_gstabs" = "yes"; then
+    gopt="-gstabs+ -g3"
+  elif test "$ucsim_cv_cxx_ggdb" = "yes"; then
+    gopt="-ggdb -g3"
+  else
+    gopt="-g"
+  fi
+  if test "$CXXFLAGS"x = x ;then
+    CXXFLAGS="$gopt"
+  else
+    CXXFLAGS="$CXXFLAGS $gopt"
+  fi
+
+  bor_IS_VALID_OPTION(pipe)
+  if test "$ucsim_cv_cxx_pipe" = "yes"; then
+    CXXFLAGS="$CXXFLAGS -pipe"
+  fi
 else
-    DD_COPT_NO_IGNORE(CXX, fpic)
-    if test "$ucsim_cv_CXXfpic" = "yes"; then
-        PICOPT="-fpic"
-    fi
+  bor_IS_SUNPRO
+  if test "$bor_cv_cxx_compiler_sunpro" = "yes"; then
+    M_OR_MM="-xM1"
+  fi
 fi
+
+# pic_flag is defined by AC_PROG_LIBTOOL
+PICOPT=$pic_flag
+
 if test "$PICOPT"x != "x"; then
     SHAREDLIB="yes"
 fi
+AC_SUBST(M_OR_MM)
 AC_SUBST(SHAREDLIB)
 AC_SUBST(PICOPT)
 

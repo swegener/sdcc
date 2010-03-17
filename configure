@@ -3809,9 +3809,14 @@ done
 # Macro definitions
 # ===========================================================================
 
-# adl_DD_COPT macro checks if the compiler specified as the 1st parameter
-# supports option specified as the 2nd parameter
-# For example: DD_CPORT(CXX, fPIC)
+# Check whether the compiler for the current language is SunPRO.
+
+
+
+# bor_IS_VALID_OPTION macro checks if the current compiler, selected by
+# AC_LANG, supports option specified as the 1st parameter. The test fails if
+# the compiler returns an error or in case something is writeen to stderr.
+# For example: bor_VALID_OPT(fPIC)
 
 
 
@@ -3879,76 +3884,139 @@ done
 
 # Checking characteristics of compilers and other programs
 # ===========================================================================
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether preprocessor accepts -MM or -M" >&5
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether preprocessor accepts -MM or -M" >&5
 $as_echo_n "checking whether preprocessor accepts -MM or -M... " >&6; }
 if test "${sdcc_cv_MM+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   echo "#include <stdio.h>" >_test_.c
-echo "" >>_test_.c
-$CPP -v -MM _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  sdcc_cv_MM="-MM"
-else
-  sdcc_cv_MM="-M"
-fi
-rm -f _test_.*
+  echo "" >>_test_.c
+  $CPP -v -MM _test_.c 1>&5 2>&5
+  if test "$?" = "0"; then
+    sdcc_cv_MM="-MM"
+  else
+    sdcc_cv_MM="-M"
+  fi
+  rm -f _test_.*
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_MM" >&5
 $as_echo "$sdcc_cv_MM" >&6; }
-M_OR_MM=$sdcc_cv_MM
+  M_OR_MM=$sdcc_cv_MM
 
-
-# This is the first time when CFLAGS are set/modified!!
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -ggdb" >&5
-$as_echo_n "checking whether $CC accepts -ggdb... " >&6; }
-if test "${sdcc_cv_CCggdb+set}" = set; then :
+  # This is the first time when CFLAGS are set/modified!!
+  ac_test_CFLAGS=${CFLAGS+set}
+bor_save_CFLAGS=$CFLAGS
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $C accepts -ggdb" >&5
+$as_echo_n "checking whether $C accepts -ggdb... " >&6; }
+if test "${bor_cv_c_ggdb+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
-  cat >_test_.c <<EOF
-#include <stdio.h>
-void main(void) {}
-EOF
-$CC -v -ggdb -c _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  sdcc_cv_CCggdb="yes"
+  bor_save_c_werror_flag=$ac_c_werror_flag
+   ac_c_werror_flag=yes
+
+   CFLAGS="-ggdb"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  bor_cv_c_ggdb=yes
 else
-  sdcc_cv_CCggdb="no"
+  bor_cv_c_ggdb=no
 fi
-rm -f _test_.* a.out
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   ac_c_werror_flag=$bor_save_c_werror_flag
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_CCggdb" >&5
-$as_echo "$sdcc_cv_CCggdb" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_ggdb" >&5
+$as_echo "$bor_cv_c_ggdb" >&6; }
+   CFLAGS=$bor_save_CFLAGS
 
-if test "$sdcc_cv_CCggdb" = "yes"; then
-  CFLAGS="-ggdb ${CFLAGS}"
-fi
+  if test "$bor_cv_c_ggdb" = "yes"; then
+    CFLAGS="-ggdb ${CFLAGS}"
+  fi
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -pipe" >&5
-$as_echo_n "checking whether $CC accepts -pipe... " >&6; }
-if test "${sdcc_cv_CCpipe+set}" = set; then :
+  ac_test_CFLAGS=${CFLAGS+set}
+bor_save_CFLAGS=$CFLAGS
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $C accepts -pipe" >&5
+$as_echo_n "checking whether $C accepts -pipe... " >&6; }
+if test "${bor_cv_c_pipe+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
-  cat >_test_.c <<EOF
-#include <stdio.h>
-void main(void) {}
-EOF
-$CC -v -pipe -c _test_.c 1>&5 2>&5
-if test "$?" = "0"; then
-  sdcc_cv_CCpipe="yes"
-else
-  sdcc_cv_CCpipe="no"
-fi
-rm -f _test_.* a.out
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_CCpipe" >&5
-$as_echo "$sdcc_cv_CCpipe" >&6; }
+  bor_save_c_werror_flag=$ac_c_werror_flag
+   ac_c_werror_flag=yes
 
-if test "$sdcc_cv_CCpipe" = "yes"; then
-  CFLAGS="-pipe $CFLAGS"
+   CFLAGS="-pipe"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  bor_cv_c_pipe=yes
+else
+  bor_cv_c_pipe=no
 fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   ac_c_werror_flag=$bor_save_c_werror_flag
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_pipe" >&5
+$as_echo "$bor_cv_c_pipe" >&6; }
+   CFLAGS=$bor_save_CFLAGS
+
+  if test "$bor_cv_c_pipe" = "yes"; then
+    CFLAGS="-pipe $CFLAGS"
+  fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
+$as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
+if test "${bor_cv_c_compiler_sunpro+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+#if !defined __SUNPRO_C && !defined __SUNPRO_CC
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  bor_compiler_sunpro=yes
+else
+  bor_compiler_sunpro=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+bor_cv_c_compiler_sunpro=$bor_compiler_sunpro
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_compiler_sunpro" >&5
+$as_echo "$bor_cv_c_compiler_sunpro" >&6; }
+  if test "$bor_cv_c_compiler_sunpro" = "yes"; then
+    M_OR_MM="-xM1"
+  fi
+fi
+
+
 
 
 # Checks for typedefs, structures, and compiler characteristics.

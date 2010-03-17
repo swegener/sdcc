@@ -23,8 +23,8 @@ DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
 		  -I$(top_srcdir)/gui.src
-CFLAGS          = @CFLAGS@ -Wall
-CXXFLAGS        = @CXXFLAGS@ -Wall
+CFLAGS          = @CFLAGS@ @WALL_FLAG@
+CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
 LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 

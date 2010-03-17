@@ -621,6 +621,7 @@ LIB_TYPE
 sdccconf_h_dir_separator
 EGREP
 GREP
+WALL_FLAG
 M_OR_MM
 CCACHE
 YACC
@@ -3980,6 +3981,8 @@ $as_echo "$bor_cv_c_pipe" >&6; }
   if test "$bor_cv_c_pipe" = "yes"; then
     CFLAGS="-pipe $CFLAGS"
   fi
+
+  WALL_FLAG="-Wall"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
 $as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
@@ -4013,8 +4016,11 @@ fi
 $as_echo "$bor_cv_c_compiler_sunpro" >&6; }
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
     M_OR_MM="-xM1"
+    WALL_FLAG=
+    CFLAGS="-xO2 $CFLAGS"
   fi
 fi
+
 
 
 

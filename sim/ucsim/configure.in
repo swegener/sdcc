@@ -529,10 +529,14 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
   if test "$ucsim_cv_cxx_pipe" = "yes"; then
     CXXFLAGS="$CXXFLAGS -pipe"
   fi
+
+  WALL_FLAG="-Wall"
 else
   bor_IS_SUNPRO
   if test "$bor_cv_cxx_compiler_sunpro" = "yes"; then
     M_OR_MM="-xM1"
+    WALL_FLAG=
+    CFLAGS="-xO2 $CFLAGS"
   fi
 fi
 
@@ -543,6 +547,7 @@ if test "$PICOPT"x != "x"; then
     SHAREDLIB="yes"
 fi
 AC_SUBST(M_OR_MM)
+AC_SUBST(WALL_FLAG)
 AC_SUBST(SHAREDLIB)
 AC_SUBST(PICOPT)
 

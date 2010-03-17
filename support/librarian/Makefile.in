@@ -4,8 +4,6 @@ top_builddir = @top_builddir@
 
 include $(top_builddir)/Makefile.common
 
-CFLAGS          += -Wall
-
 OBJECTS 	= sdcclib.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))

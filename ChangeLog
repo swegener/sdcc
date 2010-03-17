@@ -4,6 +4,17 @@
 	  debugger/mcs51/configure, sim/ucsim/configure.in,
 	  sim/ucsim/configure, sim/ucsim/aclocal.m4, src/SDCCutil.c:
 	  preparations for *BSD and Solaris ports
+	* configure, debugger/mcs51/configure, debugger/mcs51/configure.in,
+	  configure.in, sim/ucsim/configure, sim/ucsim/cmd.src/Makefile.in,
+	  sim/ucsim/xa.src/Makefile.in, sim/ucsim/z80.src/Makefile.in,
+	  sim/ucsim/gui.src/Makefile.in,
+	  sim/ucsim/gui.src/serio.src/Makefile.in,
+	  sim/ucsim/gui.src/obsolete/portmon.src/Makefile.in,
+	  sim/ucsim/sim.src/Makefile.in, sim/ucsim/configure.in,
+	  sim/ucsim/hc08.src/Makefile.in, sim/ucsim/s51.src/Makefile.in,
+	  sim/ucsim/avr.src/Makefile.in, sdas/as8051/Makefile.in,
+	  sdas/asz80/Makefile.in, sdas/linksrc/Makefile.in:
+	  portable -Wall
 
 2010-03-15 Borut Razem <borut.razem AT siol.net>
 

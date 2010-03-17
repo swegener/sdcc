@@ -5,8 +5,6 @@ top_builddir    = @top_builddir@
 
 include $(PRJDIR)/$(top_builddir)/Makefile.common
 
-CFLAGS          += -Wall
-
 OBJECTS 	= packihx.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))

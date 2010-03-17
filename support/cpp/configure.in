@@ -504,6 +504,14 @@ AC_SUBST(target_subdir)
 objdir=`pwd`
 AC_SUBST(objdir)
 
+# -Wall c flag if GNU C
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+  WALL_FLAG="-Wall"
+else
+  WALL_FLAG=
+fi
+AC_SUBST(WALL_FLAG)
+
 # Substitute configuration variables
 AC_SUBST(all_stagestuff)
 AC_SUBST(build_exeext)

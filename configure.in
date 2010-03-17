@@ -354,14 +354,19 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
   if test "$bor_cv_c_pipe" = "yes"; then
     CFLAGS="-pipe $CFLAGS"
   fi
+
+  WALL_FLAG="-Wall"
 else
   bor_IS_SUNPRO
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
     M_OR_MM="-xM1"
+    WALL_FLAG=
+    CFLAGS="-xO2 $CFLAGS"
   fi
 fi
 
 AC_SUBST(M_OR_MM)
+AC_SUBST(WALL_FLAG)
 
 
 # Checks for typedefs, structures, and compiler characteristics.

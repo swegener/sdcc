@@ -62,7 +62,7 @@ transform       = @program_transform_name@
 
 DEFS           += $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS       += @CPPFLAGS@ $(INCLUDEFLAGS) -I. -I$(top_builddir) -I$(srcdir)/$(SLIB) -I$(srcdir)
-CFLAGS         += -Wall @CFLAGS@
+CFLAGS         += @CFLAGS@ @WALL_FLAG@
 LDFLAGS        += @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 

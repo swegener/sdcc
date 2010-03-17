@@ -277,10 +277,13 @@ traditional.o: $(LIBCPP_DIR)/traditional.c $(CONFIG_H) $(LIBCPP_DEPS)
 ##########################
 # Libiberty
 
-MY_LIBIBERTY_BITS = concat.o fopen_unlocked.o getpwd.o hashtab.o hex.o \
+MY_LIBIBERTY_BITS = alloca.o concat.o fopen_unlocked.o getpwd.o hashtab.o hex.o \
 		    lbasename.o md5.o obstack.o safe-ctype.o splay-tree.o \
 		    vasprintf.o xexit.o xmalloc.o xmemdup.o xstrdup.o \
 		    xstrerror.o
+
+alloca.o: $(LIBIBERTY_DIR)/alloca.c $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 
 concat.o: $(LIBIBERTY_DIR)/concat.c $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)

@@ -13,8 +13,8 @@
 	  sim/ucsim/sim.src/Makefile.in, sim/ucsim/configure.in,
 	  sim/ucsim/hc08.src/Makefile.in, sim/ucsim/s51.src/Makefile.in,
 	  sim/ucsim/avr.src/Makefile.in, sdas/as8051/Makefile.in,
-	  sdas/asz80/Makefile.in, sdas/linksrc/Makefile.in:
-	  portable -Wall
+	  sdas/asz80/Makefile.in, sdas/linksrc/Makefile.in,
+	  sim/ucsim/main_in.mk: portable -Wall
 
 2010-03-15 Borut Razem <borut.razem AT siol.net>
 

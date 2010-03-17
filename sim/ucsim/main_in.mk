@@ -24,8 +24,8 @@ DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir) -I$(srcdir) \
                   -I$(top_srcdir)/$(SIMDIR) \
 		  -I$(top_srcdir)/$(CMDDIR) -I$(top_srcdir)/$(GUIDIR)
-CFLAGS          = @CFLAGS@ -I$(top_builddir) -Wall
-CXXFLAGS        = @CXXFLAGS@ -I$(top_builddir) -Wall
+CFLAGS          = @CFLAGS@ -I$(top_builddir) @WALL_FLAG@
+CXXFLAGS        = @CXXFLAGS@ -I$(top_builddir) @WALL_FLAG@
 M_OR_MM         = @M_OR_MM@
 
 EXEEXT		= @EXEEXT@

@@ -1,3 +1,8 @@
+2010-03-18 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/ddconfig_in.h:
+	  fixed endianness detection, so that it works on Solaris
+
 2010-03-17 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, debugger/mcs51/configure.in,

@@ -105,10 +105,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * find out the endianess of host machine
  * in order to be able to make Mac OS X unified binaries
  */
-#if __BIG_ENDIAN__ || _BIG_ENDIAN
+#if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN
 /* 1) trust the compiler */
 # define WORDS_BIGENDIAN 1
-#elif __LITTLE_ENDIAN__
+#elif defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN
 /* do nothing */
 #elif (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
 /* 2) trust the header files */

@@ -4,7 +4,9 @@ srcdir = @srcdir@
 top_srcdir   = @top_srcdir@
 top_builddir = @top_builddir@
 
-LIB_TYPE     = @LIB_TYPE@
+AR_S            = @AR@ @AR_S_FLAG@
+
+LIB_TYPE        = @LIB_TYPE@
 SAS = $(top_builddir)/bin/sdas8051
 SCC = $(top_builddir)/bin/sdcc
 
@@ -31,10 +33,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	../../../bin/sdcclib -a $@ $(OBJ)
 else
   ifeq ($(LIB_TYPE), AR)
-	ar -Scq $@ $(OBJ)
+	$(AR_S) -cq $@ $(OBJ)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	ar -Scq $@ $(OBJ)
+	$(AR_S) -cq $@ $(OBJ)
 	$(top_builddir)/bin/asranlib $@
     else
 	rm -f $@

@@ -1,3 +1,12 @@
+2010-03-19 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, device/lib/z80/Makefile.in,
+	  device/lib/gbz80/Makefile.in, device/lib/ds390/Makefile.in,
+	  device/lib/Makefile.in, device/lib/ds400/Makefile.in,
+	  device/lib/mcs51/Makefile.in, device/lib/hc08/Makefile.in:
+	  autoconf test if ar accepts -S (GNU ar does, BSD ar does not)
+	* src/pic/ralloc.c: Solaris SunPro C compiler doesn't like (void)0
+
 2010-03-18 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/ddconfig_in.h:

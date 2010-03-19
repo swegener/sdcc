@@ -48,6 +48,7 @@ AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_CHECK_PROG(AS, as, as, :)
 AC_CHECK_PROG(CP, cp, cp, :)
+AC_CHECK_PROG(AR, ar, ar, :)
 
 dnl Don't use AC_PROG_LEX
 dnl LEXLIB is not useful in gcc.
@@ -86,6 +87,30 @@ AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 # Macro definitions
 # ===========================================================================
 
+# _bor_EXECUTE_IFELSE_BODY(COMMAND)
+# -----------------------
+# Shell function body for _AC_EXECUTE_IFELSE.
+m4_define([_bor_EXECUTE_IFELSE_BODY],
+[  AS_LINENO_PUSH([$[]1])
+  AS_IF([_AC_DO_STDERR([$1 $2]) > conftest.out && {
+	 test ! -s conftest.err
+       }],
+      [ac_retval=0],
+      [ac_retval=1])
+  AS_LINENO_POP
+])# _bor_EXECUTE_IFELSE_BODY
+
+# bor_EXECUTE_IFELSE(COMMAND[ACTION-IF-TRUE], [ACTION-IF-FALSE])
+# ----------------------------------------------------------------
+# Try to execute COMMAND.
+AC_DEFUN([bor_EXECUTE_IFELSE],
+[_$0_BODY($1)
+  AS_IF([test "$ac_retval" = 0],
+    [$2],
+    [$3])
+rm conftest.err conftest.out
+])# bor_EXECUTE_IFELSE
+
 # Check whether the compiler for the current language is SunPRO.
 
 AC_DEFUN(bor_IS_SUNPRO,
@@ -108,7 +133,7 @@ bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
 AC_DEFUN(bor_IS_VALID_OPTION,
 [ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
 bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
-AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
+AC_CACHE_CHECK(whether _AC_LANG accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
   [bor_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
    ac_[]_AC_LANG_ABBREV[]_werror_flag=yes
    
@@ -367,6 +392,17 @@ fi
 
 AC_SUBST(M_OR_MM)
 AC_SUBST(WALL_FLAG)
+
+# does AR accept the -S flag
+echo '!<arch>' > conftest.ar
+AC_MSG_CHECKING([whether $AR accepts -S])
+bor_EXECUTE_IFELSE([$AR -S -t conftest.ar],
+  [AC_MSG_RESULT([yes])
+    AR_S_FLAG="-S"],
+  [AC_MSG_RESULT([no])
+    AR_S_FLAG=""])
+rm conftest.ar
+AC_SUBST(AR_S_FLAG)
 
 
 # Checks for typedefs, structures, and compiler characteristics.

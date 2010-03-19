@@ -37,7 +37,7 @@ set *dynDirectBitRegs=NULL;
 set *dynInternalRegs=NULL;
 
 
-#define FENTRY2                 1 ? (void)0 : printf
+#define FENTRY2                 1 ? 0 : printf
 
 /* this should go in SDCCicode.h, but it doesn't. */
 #define IS_REF(op)       (IS_SYMOP(op) && op->operand.symOperand->isref == 1)

@@ -10,6 +10,7 @@ VERSIONP        = @VERSIONP@
 SHELL           = /bin/sh
 INSTALL         = @INSTALL@
 CP              = @CP@
+AR_S            = @AR@ @AR_S_FLAG@
 
 LIB_TYPE        = @LIB_TYPE@
 
@@ -261,10 +262,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	../../bin/sdcclib -a $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	ar -Sq $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
+	$(AR_S) -q $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	ar -Sq $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
+	$(AR_S) -q $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 	$(top_builddir)/bin/asranlib $(PORTDIR)/lib$(PORT).lib
     else
 	rm -f $(PORTDIR)/lib$(PORT).lib
@@ -356,16 +357,16 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	../../bin/sdcclib -a $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 else
   ifeq ($(LIB_TYPE), AR)
-	ar -Scq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
-	ar -Scq $(PORTDIR)/libint.lib $(OBJECTS_INT)
-	ar -Scq $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
-	ar -Scq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
+	$(AR_S) -cq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
+	$(AR_S) -cq $(PORTDIR)/libint.lib $(OBJECTS_INT)
+	$(AR_S) -cq $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
+	$(AR_S) -cq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	ar -Scq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT); $(top_builddir)/bin/asranlib $(PORTDIR)/libfloat.lib
-	ar -Scq $(PORTDIR)/libint.lib $(OBJECTS_INT); $(top_builddir)/bin/asranlib $(PORTDIR)/libint.lib
-	ar -Scq $(PORTDIR)/liblong.lib $(OBJECTS_LONG); $(top_builddir)/bin/asranlib $(PORTDIR)/liblong.lib
-	ar -Scq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC); $(top_builddir)/bin/asranlib $(PORTDIR)/libsdcc.lib
+	$(AR_S) -cq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT); $(top_builddir)/bin/asranlib $(PORTDIR)/libfloat.lib
+	$(AR_S) -cq $(PORTDIR)/libint.lib $(OBJECTS_INT); $(top_builddir)/bin/asranlib $(PORTDIR)/libint.lib
+	$(AR_S) -cq $(PORTDIR)/liblong.lib $(OBJECTS_LONG); $(top_builddir)/bin/asranlib $(PORTDIR)/liblong.lib
+	$(AR_S) -cq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC); $(top_builddir)/bin/asranlib $(PORTDIR)/libsdcc.lib
     else
 	rm -f $(PORTDIR)/libfloat.lib
 	for i in $(notdir $(basename $(OBJECTS_FLOAT))); do echo $$i >> $(PORTDIR)/libfloat.lib; done

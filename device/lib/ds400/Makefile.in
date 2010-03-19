@@ -2,6 +2,8 @@ VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
 
+AR_S            = @AR@ @AR_S_FLAG@
+
 LIB_TYPE     = @LIB_TYPE@
 
 CC = ../../../bin/sdcc
@@ -33,10 +35,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	../../../bin/sdcclib -a $@ $(OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	ar -Scq $@ $(OBJECTS)
+	$(AR_S) -cq $@ $(OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	ar -Scq $@ $(OBJECTS)
+	$(AR_S) -cq $@ $(OBJECTS)
 	$(top_builddir)/bin/asranlib $@
     else
 	rm -f $@;

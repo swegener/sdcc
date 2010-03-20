@@ -338,7 +338,7 @@ port-specific-objects:
 port-specific-objects-pic16:
 	-if [ -f $(PORT)/Makefile ]; then \
 	  $(MAKE) -C $(PORT); \
-	  for i in $(PORT)/*/lib*.a; do cp -f $$i $(PORTDIR)/$$(basename $$i .a).lib; done; \
+	  for i in $(PORT)/*/lib*.a; do cp -f $$i $(PORTDIR)/`basename $$i .a`.lib; done; \
 	  cp -f $(PORT)/*/crt0*.o $(PORTDIR); \
 	fi
 

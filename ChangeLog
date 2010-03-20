@@ -9,6 +9,9 @@
 	  regression test fixed for SunPro C compiler
 	* support/regression/ports/host/spec.mk:
 	  adapted for SunPro C compiler & renamed to spec.mk.in
+	* device/lib/Makefile.in:
+	  Solaris make (GNU Make 3.81) doesn't like $$() syntax;
+	  converted to ``
 
 2010-03-19 Borut Razem <borut.razem AT siol.net>
 

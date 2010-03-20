@@ -3,8 +3,9 @@
 */
 #include <testfwk.h>
 
-#if defined __SUNPRO_C || defined __GNUC__
+#if defined(__SUNPRO_C) || defined(__GNUC__)
 #pragma pack(1)
+#endif
 
 __code struct {
   char x:1;
@@ -33,3 +34,4 @@ testBitfield (void)
   ASSERT (sizeof (noPad) == 2);
   ASSERT (sizeof (initialNoPad[0]) == 1);
 }
+

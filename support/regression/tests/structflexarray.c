@@ -2,6 +2,10 @@
  */
 #include <testfwk.h>
 
+#if defined(__SUNPRO_C) || defined(__GNUC__)
+#pragma pack(1)
+#endif
+
 #if !defined(__SUNPRO_C) && (!defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ >= 3))
 /* flexible array members not supported by gcc < 3 compiler
    and seems not to be supported on SunPro C compiler */

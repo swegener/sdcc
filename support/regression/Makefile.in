@@ -175,7 +175,12 @@ DIREXT =
 
 # Only include if we're in a per-port call.
 ifdef PORT
-include $(PORTS_DIR)/$(PORT)/spec.mk
+  # iclude ./$(PORT)/spec.mk if exists, else include $(PORTS_DIR)/$(PORT)/spec.mk
+  ifeq ($(shell if test -f ./ports/$(PORT)/spec.mk; then echo OK; fi),OK)
+    include ./ports/$(PORT)/spec.mk
+  else
+    include $(PORTS_DIR)/$(PORT)/spec.mk
+  endif
 endif
 
 make_library: $(MAKE_LIBRARY)

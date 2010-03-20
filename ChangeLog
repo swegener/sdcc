@@ -1,3 +1,15 @@
+2010-03-20 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, support/regression/tests/bitfields.c,
+	  support/regression/tests/bug-1981238.c,
+	  support/regression/tests/preproc.c,
+	  support/regression/tests/strtok.c,
+	  support/regression/tests/structflexarray.c,
+	  support/regression/tests/malloc.c:
+	  regression test fixed for SunPro C compiler
+	* support/regression/ports/host/spec.mk:
+	  adapted for SunPro C compiler & renamed to spec.mk.in
+
 2010-03-19 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, device/lib/z80/Makefile.in,

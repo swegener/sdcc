@@ -377,21 +377,24 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
 
   bor_IS_VALID_OPTION(pipe)
   if test "$bor_cv_c_pipe" = "yes"; then
-    CFLAGS="-pipe $CFLAGS"
+    CFLAGS="-pipe ${CFLAGS}"
   fi
 
   WALL_FLAG="-Wall"
+  C99_FLAG=
 else
   bor_IS_SUNPRO
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
     M_OR_MM="-xM1"
     WALL_FLAG=
-    CFLAGS="-xO2 $CFLAGS"
+    C99_FLAG="-xc99"
+    CFLAGS="-xO2 ${CFLAGS}"
   fi
 fi
 
 AC_SUBST(M_OR_MM)
 AC_SUBST(WALL_FLAG)
+AC_SUBST(C99_FLAG)
 
 # does AR accept the -S flag
 echo '!<arch>' > conftest.ar
@@ -872,6 +875,7 @@ support/makebin/Makefile
 support/regression/Makefile
 support/valdiag/Makefile
 support/scripts/Makefile
+support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in
 Makefile
 Makefile.common:Makefile.common.in
 ])

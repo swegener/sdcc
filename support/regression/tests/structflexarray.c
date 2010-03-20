@@ -2,8 +2,9 @@
  */
 #include <testfwk.h>
 
-#if !defined __GNUC__ || __GNUC__ >= 3
-/* flexible array members not supported by gcc < 3 */
+#if !defined(__SUNPRO_C) && (!defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ >= 3))
+/* flexible array members not supported by gcc < 3 compiler
+   and seems not to be supported on SunPro C compiler */
 struct str1
 {
   char c;
@@ -17,12 +18,13 @@ struct str1 s12 = { 4, {5, 6, 7} }; /* different size */
 static void
 testFlexibleArray1(void)
 {
-#if !defined __GNUC__ || __GNUC__ >= 3
-  /* flexible array members not supported by gcc < 3 */
+#if !defined(__SUNPRO_C) && (!defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ >= 3))
+  /* flexible array members not supported by gcc < 3 compiler
+     and seems not to be supported on SunPro C compiler */
   /* test sizeof */
   ASSERT(sizeof(s11) == 1);
   /* test allocation size */
-#if ! defined(PORT_HOST)
+#if !defined(PORT_HOST)
    ASSERT((char *) &s12 - (char *) &s11 == 1 + 4);
 #endif
 #endif
@@ -31,8 +33,9 @@ testFlexibleArray1(void)
 
 /* test initialisation with string */
 
-#if !defined __GNUC__ || __GNUC__ >= 3
-/* flexible array members not supported by gcc < 3 */
+#if !defined(__SUNPRO_C) && (!defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ >= 3))
+/* flexible array members not supported by gcc < 3 compiler
+   and seems not to be supported on SunPro C compiler */
 struct str2
 {
   short s;
@@ -46,12 +49,13 @@ struct str2 s22 = { 2, "sdcc is great" }; /* different size */
 static void
 testFlexibleArray2(void)
 {
-#if !defined __GNUC__ || __GNUC__ >= 3
-  /* flexible array members not supported by gcc < 3 */
+#if !defined(__SUNPRO_C) && (!defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ >= 3))
+  /* flexible array members not supported by gcc < 3 compiler
+     and seems not to be supported on SunPro C compiler */
   /* test sizeof */
   ASSERT(sizeof(s21) == 2);
   /* test allocation size */
-#if ! defined(PORT_HOST)
+#if !defined(PORT_HOST)
    ASSERT((char *) &s22 - (char *) &s21 == 2 + 5);
 #endif
 #endif

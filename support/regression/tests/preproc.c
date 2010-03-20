@@ -5,6 +5,11 @@
 #include <testfwk.h>
 
 /*
+ * the following tests are applicable only for SDCC,
+ * since they are using SDCC specific pragmas
+ */
+#ifdef SDCC
+/*
  * test for bug 135170
  */
 const char *
@@ -28,8 +33,6 @@ return "A"
 /*
  * test for bug 982435
  */
-#if !defined (__GNUC__) && !defined (_MSC_VER)
-/* since this fails on GCC cpp and MSVC cl -E... */
 #pragma pedantic_parse_number +
 
 #define LO_B(x) ((x) & 0xff)
@@ -49,6 +52,7 @@ return (a + b);
 }
 #endif
 
-void testBug(void)
+void
+testBug(void)
 {
 }

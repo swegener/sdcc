@@ -17,7 +17,7 @@ testMalloc (void)
   char *p;
   unsigned char i;
 
-#if !defined(__GNUC__) && !defined(SDCC_gbz80) && !defined(SDCC_z80)
+#if !defined(PORT_HOST) && !defined(SDCC_gbz80) && !defined(SDCC_z80)
 #if defined(SDCC_pic16)
   _initHeap (heap, sizeof heap);
 #endif

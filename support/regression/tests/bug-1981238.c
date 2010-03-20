@@ -3,6 +3,9 @@
 */
 #include <testfwk.h>
 
+#if defined __SUNPRO_C || defined __GNUC__
+#pragma pack(1)
+
 __code struct {
   char x:1;
   char  :0;

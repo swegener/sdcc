@@ -622,6 +622,7 @@ sdccconf_h_dir_separator
 EGREP
 GREP
 AR_S_FLAG
+C99_FLAG
 WALL_FLAG
 M_OR_MM
 CCACHE
@@ -4029,10 +4030,11 @@ $as_echo "$bor_cv_c_pipe" >&6; }
    CFLAGS=$bor_save_CFLAGS
 
   if test "$bor_cv_c_pipe" = "yes"; then
-    CFLAGS="-pipe $CFLAGS"
+    CFLAGS="-pipe ${CFLAGS}"
   fi
 
   WALL_FLAG="-Wall"
+  C99_FLAG=
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
 $as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
@@ -4067,9 +4069,11 @@ $as_echo "$bor_cv_c_compiler_sunpro" >&6; }
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
     M_OR_MM="-xM1"
     WALL_FLAG=
-    CFLAGS="-xO2 $CFLAGS"
+    C99_FLAG="-xc99"
+    CFLAGS="-xO2 ${CFLAGS}"
   fi
 fi
+
 
 
 
@@ -6152,7 +6156,7 @@ fi
 test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/Makefile"
 
 
-ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/linksrc/Makefile sdas/asranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile Makefile Makefile.common:Makefile.common.in"
+ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/linksrc/Makefile sdas/asranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6871,6 +6875,7 @@ do
     "support/regression/Makefile") CONFIG_FILES="$CONFIG_FILES support/regression/Makefile" ;;
     "support/valdiag/Makefile") CONFIG_FILES="$CONFIG_FILES support/valdiag/Makefile" ;;
     "support/scripts/Makefile") CONFIG_FILES="$CONFIG_FILES support/scripts/Makefile" ;;
+    "support/regression/ports/host/spec.mk") CONFIG_FILES="$CONFIG_FILES support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "Makefile.common") CONFIG_FILES="$CONFIG_FILES Makefile.common:Makefile.common.in" ;;
 

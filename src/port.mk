@@ -39,7 +39,7 @@ $(LIB): $(OBJ)
 dep: Makefile.dep
 
 Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(SPECIAL)
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
 
 # don't include Makefile.dep for the listed targets:
 ifeq "$(findstring $(MAKECMDGOALS),clean distclean)" ""

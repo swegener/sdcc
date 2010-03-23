@@ -13,6 +13,7 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 STRIP		= @STRIP@
+MAKEDEP		= @MAKEDEP@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -26,7 +27,6 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 CFLAGS          = @CFLAGS@ @WALL_FLAG@
 CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
 LDFLAGS         = @LDFLAGS@
-M_OR_MM         = @M_OR_MM@
 
 LIBS		= @LIBS@ -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim
 
@@ -94,7 +94,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
 
 -include Makefile.dep
 include $(srcdir)/clean.mk

@@ -593,7 +593,7 @@ LIBOBJS
 lib_dir_suffix
 sdccconf_h_dir_separator
 WALL_FLAG
-M_OR_MM
+MAKEDEP
 CP
 AS
 STRIP
@@ -4502,7 +4502,6 @@ else
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_MM" >&5
 $as_echo "$sdcc_cv_MM" >&6; }
-  M_OR_MM=$sdcc_cv_MM
 
   # This is the first time when CFLAGS are set/modified!!
   ac_test_CFLAGS=${CFLAGS+set}
@@ -4582,6 +4581,8 @@ $as_echo "$bor_cv_c_pipe" >&6; }
   fi
 
   WALL_FLAG="-Wall"
+  C99_FLAG="--std=c99"
+  MAKEDEP="$CC $sdcc_cv_MM"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
 $as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
@@ -4614,9 +4615,10 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_compiler_sunpro" >&5
 $as_echo "$bor_cv_c_compiler_sunpro" >&6; }
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
-    M_OR_MM="-xM1"
-    WALL_FLAG=
     CFLAGS="-xO2 $CFLAGS"
+    WALL_FLAG=
+    C99_FLAG="-xc99"
+    MAKEDEP="$CC -xM1"
   fi
 fi
 

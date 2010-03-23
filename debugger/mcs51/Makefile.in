@@ -7,7 +7,7 @@ CC		= @CC@
 CPP		= @CPP@
 INSTALL		= @INSTALL@
 STRIP           = @STRIP@
-
+MAKEDEP         = @MAKEDEP@
 
 top_builddir	= ../../
 top_srcdir	= @srcdir@/../..
@@ -24,7 +24,6 @@ bindir          = @bindir@
 STD_INC		= @sdcc_include_dir@
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(top_builddir) -I$(top_srcdir) -I$(SLIB) -DHAVE_CONFIG_H
 CFLAGS		= @CFLAGS@
-M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 
 EXEEXT          = @EXEEXT@
@@ -85,7 +84,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SDCCSOURCES) $(srcdir)/*.h $(top_builddir)/*.h $(top_srcdir)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall installcheck installdirs checkconf \
                                    clean distclean mostlyclean realclean)" ""

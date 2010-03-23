@@ -12,6 +12,7 @@ CPP		= @CPP@
 CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
+MAKEDEP         = @MAKEDEP@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -21,7 +22,6 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ @WALL_FLAG@
 CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
-M_OR_MM         = @M_OR_MM@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -83,7 +83,7 @@ installdirs:
 dep: main.dep
 
 Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
 
 -include Makefile.dep
 include $(srcdir)/clean.mk

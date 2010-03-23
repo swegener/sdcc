@@ -11,7 +11,8 @@ CXX		= @CXX@
 CPP		= @CPP@
 CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
-INSTALL		= @INSTALL@
+INSTALL	        = @INSTALL@
+MAKEDEP         = @MAKEDEP@
 
 LEX		= @LEX@
 YACC		= @YACC@
@@ -25,8 +26,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/sim.src -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ @WALL_FLAG@
 CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
-M_OR_MM         = @M_OR_MM@
-WINSOCK_AVAIL	= @WINSOCK_AVAIL@
+WINSOCK_AVAIL   = @WINSOCK_AVAIL@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -94,7 +94,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(addprefix $(srcdir)/, $(OBJECTS:.o=.cc)) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(addprefix $(srcdir)/, $(OBJECTS:.o=.cc)) >Makefile.dep
 
 -include Makefile.dep
 include $(srcdir)/clean.mk

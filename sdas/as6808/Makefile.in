@@ -12,6 +12,7 @@ CC              = @CC@
 CPP             = @CPP@
 INSTALL         = @INSTALL@
 STRIP           = @STRIP@
+MAKEDEP         = @MAKEDEP
 
 top_builddir    = @top_builddir@
 top_srcdir      = @top_srcdir@
@@ -35,7 +36,6 @@ VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
 CFLAGS          = @CFLAGS@ @WALL_FLAG@ -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
-M_OR_MM         = @M_OR_MM@
 LDFLAGS         = @LDFLAGS@ -lm
 
 OBJDIR = obj
@@ -100,7 +100,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(ASSOURCES) $(srcdir)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
                                    clean distclean mostlyclean realclean)" ""

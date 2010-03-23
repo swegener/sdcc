@@ -743,7 +743,7 @@ dlso_ok
 PICOPT
 SHAREDLIB
 WALL_FLAG
-M_OR_MM
+MAKEDEP
 CURSES_LIBS
 curses_ok
 panel_ok
@@ -15654,7 +15654,6 @@ else
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ucsim_cv_MM" >&5
 $as_echo "$ucsim_cv_MM" >&6; }
-  M_OR_MM=$ucsim_cv_MM
 
   # This is the first time when CFLAGS are set/modified!!
 
@@ -15777,6 +15776,7 @@ $as_echo "$bor_cv_cxx_pipe" >&6; }
     CXXFLAGS="$CXXFLAGS -pipe"
   fi
 
+  MAKEDEP="$CXX $ucsim_cv_MM"
   WALL_FLAG="-Wall"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C++ compiler" >&5
@@ -15810,9 +15810,9 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_cxx_compiler_sunpro" >&5
 $as_echo "$bor_cv_cxx_compiler_sunpro" >&6; }
   if test "$bor_cv_cxx_compiler_sunpro" = "yes"; then
-    M_OR_MM="-xM1"
-    WALL_FLAG=
     CFLAGS="-xO2 $CFLAGS"
+    MAKEDEP="$CXX -xM1"
+    WALL_FLAG=
   fi
 fi
 

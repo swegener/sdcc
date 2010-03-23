@@ -109,12 +109,8 @@ installdirs:
 
 # Creating dependencies
 # ---------------------
-dep: #Makefile.dep
+dep:
 
-#Makefile.dep:
-#	$(CPP) $(CPPFLAGS) $(M_OR_MM) *.c >main.dep
-
-#-include Makefile.dep
 include $(srcdir)/clean.mk
 
 # My rules

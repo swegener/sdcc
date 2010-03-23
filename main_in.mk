@@ -36,7 +36,6 @@ srcdir          = @srcdir@
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
 CFLAGS          = @CFLAGS@
-M_OR_MM         = @M_OR_MM@
 
 
 # Compiling entire program or any subproject
@@ -71,12 +70,8 @@ installdirs:
 
 # Creating dependencies
 # ---------------------
-dep: #main.dep
+dep:
 
-#main.dep: *.c *.h
-#	$(CPP) $(CPPFLAGS) $(M_OR_MM) *.c >main.dep
-
-#-include main.dep
 include $(srcdir)/clean.mk
 
 # My rules

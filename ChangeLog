@@ -1,4 +1,16 @@
 2010-03-20 Borut Razem <borut.razem AT siol.net>
+	* main_in.mk, configure, debugger/mcs51/configure,
+	  debugger/mcs51/Makefile.in, debugger/mcs51/configure.in,
+	  configure.in, src/Makefile.in, src/port.mk, sim/ucsim/configure,
+	  sim/ucsim/cmd.src/Makefile.in, , sim/ucsim/xa.src/Makefile.in,
+	  sim/ucsim/z80.src/Makefile.in, sim/ucsim/gui.src/Makefile.in,
+	  sim/ucsim/gui.src/serio.src/Makefile.in,
+	  sim/ucsim/gui.src/obsolete/portmon.src/Makefile.in,
+	  sim/ucsim/sim.src/Makefile.in, sim/ucsim/main_in.mk,
+	  sim/ucsim/configure.in, sim/ucsim/hc08.src/Makefile.in:
+	  introduced MAKEDEP
+
+2010-03-20 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, support/regression/tests/bitfields.c,
 	  support/regression/tests/bug-1981238.c,

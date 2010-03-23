@@ -1,4 +1,11 @@
+2010-03-23 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/*.h, device/include/asm/z80/features.h,
+	  device/include/asm/default/features.h, device/include/z80/*.h,
+	  device/lib/z80/*.s: sdcc library license changed to GPL+LE
+
 2010-03-20 Borut Razem <borut.razem AT siol.net>
+
 	* main_in.mk, configure, debugger/mcs51/configure,
 	  debugger/mcs51/Makefile.in, debugger/mcs51/configure.in,
 	  configure.in, src/Makefile.in, src/port.mk, sim/ucsim/configure,

@@ -2,7 +2,9 @@
 
 	* device/include/*.h, device/include/asm/z80/features.h,
 	  device/include/asm/default/features.h, device/include/z80/*.h,
-	  device/lib/z80/*.s: sdcc library license changed to GPL+LE
+	  device/lib/z80/*.s, device/include/asm/ds390/features.h,
+	  device/lib/ds390/memcpyx.c, device/lib/ds390/putchar.c:
+	  sdcc library license changed to GPL+LE
 
 2010-03-20 Borut Razem <borut.razem AT siol.net>
 

@@ -135,6 +135,7 @@ if test -d /stuff/include; then
 fi
 
 AC_HEADER_STDC
+AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h)
 AC_CHECK_HEADERS(getopt.h unistd.h termios.h)
 
 AC_CHECK_HEADER(curses.h,

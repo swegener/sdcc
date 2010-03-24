@@ -44,6 +44,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #undef HAVE_DLFCN_H
 #undef HAVE_CURSES_H
 #undef HAVE_TERMIOS_H
+#undef HAVE_ENDIAN_H
+#undef HAVE_SYS_ENDIAN_H
+#undef HAVE_MACHINE_ENDIAN_H
 
 #undef SOCKET_AVAIL
 #undef SOCKLEN_T
@@ -105,23 +108,34 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * find out the endianess of host machine
  * in order to be able to make Mac OS X unified binaries
  */
-#if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN
+#if defined __sun || defined __APPLE__
+# if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN)
 /* 1) trust the compiler */
-# define WORDS_BIGENDIAN 1
-#elif defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN
-/* do nothing */
-#elif (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
-/* 2) trust the header files */
-# if BYTE_ORDER == BIG_ENDIAN 
 #   define WORDS_BIGENDIAN 1
+# elif defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN
+/* do nothing */
 # endif
-#else 
+#else
+# ifdef HAVE_ENDIAN_H
+#   include <endian.h>
+# elif defined HAVE_SYS_ENDIAN_H
+#   include <sys/endian.h>
+# elif defined HAVE_MACHINE_ENDIAN_H
+#   include <machine/endian.h>
+# endif
+# if (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
+/* 2) trust the header files */
+#   if BYTE_ORDER == BIG_ENDIAN
+#     define WORDS_BIGENDIAN 1
+#   endif
+# else
 /* 3) trust the configure; this actually doesn't work for unified Mac OS X binaries :-( */
-# undef BUILD_WORDS_BIGENDIAN
-# if (defined BUILD_WORDS_BIGENDIAN && BUILD_WORDS_BIGENDIAN)
-#   define WORDS_BIGENDIAN  1
-# endif
+#   undef BUILD_WORDS_BIGENDIAN
+#   if (defined BUILD_WORDS_BIGENDIAN && BUILD_WORDS_BIGENDIAN)
+#     define WORDS_BIGENDIAN  1
+#   endif
 /* 4) assume that host is a little endian machine */
+# endif
 #endif
 
 #undef VERSIONSTR

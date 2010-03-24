@@ -68,6 +68,8 @@ SDCC_REQUIRE_PROG($LEX, flex)
 
 AC_LANG_C
 
+AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h)
+
 AC_ARG_WITH([ccache],
     AC_HELP_STRING([--without-ccache], [do not use ccache even if available]),
     [], [])

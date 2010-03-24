@@ -1,3 +1,10 @@
+2010-03-25 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/configure, sdcc/configure.in, sdcc/sdccconf_in.h,
+	  sdcc/sim/ucsim/configure, sdcc/sim/ucsim/configure.in,
+	  sdcc/sim/ucsim/ddconfig_in.h:
+	  fixed endianness detection, enabled NetBSD build
+
 2010-03-23 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/*.h, device/include/asm/z80/features.h,

@@ -8,8 +8,12 @@
 
 #define SWAP_4(x) ((unsigned char)((x)<<4)|(unsigned char)((x)>>4))
     
-typedef union {unsigned  int i; unsigned char c[2];} WORD;
-typedef union {unsigned long l; unsigned char c[4];} LONG;
+/* on 32 and 64 bit machines */
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+
+typedef union {uint16 i; unsigned char c[2];} WORD;
+typedef union {uint32 l; unsigned char c[4];} LONG;
 
 static void testSwap_4(void)
 {

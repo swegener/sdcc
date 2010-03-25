@@ -6,6 +6,11 @@
 	  fixed endianness detection, enabled NetBSD build
 	* sim/ucsim/cmd.src/cmdpars.cc:
 	  fixed alloca detection on Solaris x86. This is actually bison++ bug.
+	* support/regression/tests/bitfields.c,
+	  support/regression/tests/literalop.c,
+	  support/regression/tests/bitwise.c,
+	  support/regression/tests/swap.c:
+	  fixed host regression tests on NetBSD sparc64
 
 2010-03-23 Borut Razem <borut.razem AT siol.net>
 

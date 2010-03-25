@@ -4,6 +4,8 @@
 	  sdcc/sim/ucsim/configure, sdcc/sim/ucsim/configure.in,
 	  sdcc/sim/ucsim/ddconfig_in.h:
 	  fixed endianness detection, enabled NetBSD build
+	* sim/ucsim/cmd.src/cmdpars.cc:
+	  fixed alloca detection on Solaris x86. This is actually bison++ bug.
 
 2010-03-23 Borut Razem <borut.razem AT siol.net>
 

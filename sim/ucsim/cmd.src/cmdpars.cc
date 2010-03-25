@@ -49,7 +49,7 @@ Maintained by Magnus Ekdahl <magnus@debian.org>
  #if defined( __GNUC__)
   #define alloca __builtin_alloca
 
- #elif (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc)  || defined (__sgi)
+ #elif (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sun) || defined (__sgi)
   #include <alloca.h>
 
  #elif defined (__MSDOS_AND_ALIKE)

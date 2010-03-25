@@ -8,9 +8,14 @@
 
 #define SWAP_4(x) ((unsigned char)((x)<<4)|(unsigned char)((x)>>4))
     
+#ifdef SDCC
+typedef unsigned int uint16;
+typedef unsigned long uint32;
+#else
 /* on 32 and 64 bit machines */
 typedef unsigned short uint16;
 typedef unsigned int uint32;
+#endif
 
 typedef union {uint16 i; unsigned char c[2];} WORD;
 typedef union {uint32 l; unsigned char c[4];} LONG;

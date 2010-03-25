@@ -63,7 +63,7 @@
  * in order to be able to make Mac OS X unified binaries
  */
 #if defined __sun || defined __APPLE__
-# if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN)
+# if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN
 /* 1) trust the compiler */
 #   define WORDS_BIGENDIAN 1
 # elif defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN

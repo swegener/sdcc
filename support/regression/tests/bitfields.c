@@ -343,8 +343,8 @@ testBitfields(void)
 {
   c_bf.c0_3 = 2;
   c_bf.c3_5 = 3;
-#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__SUNPRO_C) || defined(__sparc64__))
-  /* bitfields on powerpc architecture are allocated from left to right */
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__sparc) || defined(__sparc64__))
+  /* bitfields on powerpc and sparc architectures are allocated from left to right */
   ASSERT(*(char *)(&c_bf) == ((2<<(8-3)) + 3) );
 #else
   ASSERT(*(char *)(&c_bf) == (2 + (3<<3)) );

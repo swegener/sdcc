@@ -13,7 +13,8 @@
 	  device/lib/mcs51/crtbank.asm, device/lib/mcs51/crtcall.asm,
 	  device/lib/mcs51/crtxinit.asm, device/lib/mcs51/crtstart.asm,
 	  device/lib/mcs51/crtxstack.asm, device/lib/mcs51/crtxclear.asm,
-	  device/lib/mcs51/crtclear.asm, device/lib/mcs51/crtxpop.asm:
+	  device/lib/mcs51/crtclear.asm, device/lib/mcs51/crtxpop.asm,
+	* device/include/asm/mcs51/features.h, device/include/mcs51/*.h:
 	  sdcc library license changed to GPL+LE
 
 2010-03-25 Borut Razem <borut.razem AT siol.net>

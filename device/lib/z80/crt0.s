@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  crt0.s
+;  crt0.s - Generic crt0.s for a Z80
 ;
 ;  Copyright (C) 2000, Michael Hope
 ;
@@ -26,7 +26,6 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	;; Generic crt0.s for a Z80
         .module crt0
        	.globl	_main
 

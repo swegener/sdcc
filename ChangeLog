@@ -7,7 +7,13 @@
 	  device/lib/gbz80/crt0_rle.s, device/lib/gbz80/heap.s,
 	  device/lib/gbz80/mul.s, device/lib/gbz80/shift.s,
 	  device/lib/ds400/memcpyx.c, device/lib/hc08/_mulint.c,
-	  device/lib/hc08/_ret.c, device/lib/hc08/_mullong.c:
+	  device/lib/hc08/_ret.c, device/lib/hc08/_mullong.c,
+	  device/lib/mcs51/crtpagesfr.asm, device/lib/mcs51/crtxpush.asm,
+	  device/lib/mcs51/crtxpopbits.asm, device/lib/mcs51/crtxpushr0.asm,
+	  device/lib/mcs51/crtbank.asm, device/lib/mcs51/crtcall.asm,
+	  device/lib/mcs51/crtxinit.asm, device/lib/mcs51/crtstart.asm,
+	  device/lib/mcs51/crtxstack.asm, device/lib/mcs51/crtxclear.asm,
+	  device/lib/mcs51/crtclear.asm, device/lib/mcs51/crtxpop.asm:
 	  sdcc library license changed to GPL+LE
 
 2010-03-25 Borut Razem <borut.razem AT siol.net>

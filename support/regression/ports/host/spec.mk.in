@@ -1,6 +1,7 @@
 # Port specification for compiling on the host machines version of gcc
 SDCC = @CC@
-SDCCFLAGS = @C99_FLAG@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
+SDCCFLAGS = @CFLAGS@ @C99_FLAG@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
+SDLDFLAGS = @LDFLAGS@
 # disable all warnings:
 SDCCFLAGS+= -w
 # enable all warnings:
@@ -22,7 +23,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 	-grep -n FAIL $@ /dev/null || true
 
 %$(BINEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS) -lm
+	$(SDCC) $(SDCCFLAGS) $(SDLDFLAGS) -o $@ $< $(EXTRAS) -lm
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

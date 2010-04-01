@@ -1,3 +1,8 @@
+2010-04-01 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/host/spec.mk.in:
+	  fixed execution of host regression tests on Mac OS X 
+
 2010-03-28 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/ds400/ds400rom.h, device/include/asm/gbz80/features.h,

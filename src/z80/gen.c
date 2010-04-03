@@ -8710,7 +8710,6 @@ genZ80Code (iCode * lic)
         }
     }
 
-
   /* now we are ready to call the
      peep hole optimizer */
   if (!options.nopeep)
@@ -8729,6 +8728,12 @@ genZ80Code (iCode * lic)
         _G.flushStatics = 0;
       }
     codeOutBuf = buf;
+  }
+
+  {
+    int pairId;
+    for(pairId = 0; pairId < NUM_PAIRS; pairId++)
+      _G.pairs[pairId].base = 0;
   }
 
   freeTrace(&_G.lines.trace);

@@ -1,30 +1,37 @@
-/*--------------------------------------------------------------------------
-p89lpc933_4.h
+/*-------------------------------------------------------------------------
+   p89lpc933_4.h - This header allows to use the microcontrolers NXP
+   (formerly Philips) p89lpc933, 934.
 
-This header allows to use the microcontrolers NXP (formerly Philips)
-p89lpc933, 934.
+   Copyright (C) 2008, Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 
-Copyright (c) 2008 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
+   later version.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU
- Lesser General Public License for more details.
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA02111-1307 USA
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
 
+/*-------------------------------------------------------------------------
  The registered are ordered in the same way as in the NXP data sheet:
  http://www.standardics.nxp.com/products/lpc900/datasheet/p89lpc933.p89lpc934.p89lpc935.p89lpc936.pdf
+-------------------------------------------------------------------------*/
 
-
---------------------------------------------------------------------------*/
 #ifndef __P89LPC933_4_H__
 #define __P89LPC933_4_H__
 #include <compiler.h>

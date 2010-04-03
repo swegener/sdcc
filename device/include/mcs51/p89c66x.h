@@ -1,29 +1,36 @@
-/*--------------------------------------------------------------------------
-P89c66x.H
+/*-------------------------------------------------------------------------
+   p89c66x.h - This header allows to use the microcontroler Philips P89c66x
+   with the compiler SDCC.
 
-This header allows to use the microcontroler Philips P89c66x
-with the compiler SDCC.
+   Copyright (C), 2007 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
 
-Copyright (c) 2007 Gudjon I. Gudjonsson <gudjon AT gudjon.org>
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
+   later version.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU
- Lesser General Public License for more details.
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA02111-1307 USA
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
 
+/*-------------------------------------------------------------------------
  The registered are ordered in the same way as in the NXP data sheet
  P89C660_662_664_3.PDF, see http://www.nxp.com
-
---------------------------------------------------------------------------*/
+-------------------------------------------------------------------------*/
 
 #ifndef __P89c66x_H__
 #define __P89c66x_H__

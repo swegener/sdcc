@@ -2,6 +2,8 @@
 
 	* device/include/hc08/mc68hc908jb8.h:
 	  sdcc library license changed to GPL+LE
+	* sdas/linksrc/Makefile.in: Solaris make (GNU Make 3.81) doesn't like
+	  $$() syntax; converted to ``
 
 2010-04-03 Borut Razem <borut.razem AT siol.net>
 

@@ -84,8 +84,8 @@ $(ASLINK): $(LKOBJECTS)
 install: all installdirs
 	for ld in $(ASLINK) $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT); \
 	do \
-	  $(INSTALL) $$ld $$(echo $(DESTDIR)$(bindir)/$$(basename $$ld) | sed '$(transform)'); \
-	  $(STRIP) $$(echo $(DESTDIR)$(bindir)/$$(basename $$ld) | sed '$(transform)'); \
+	  $(INSTALL) $$ld `echo $(DESTDIR)$(bindir)/\`basename $$ld\` | sed '$(transform)'`; \
+	  $(STRIP) `echo $(DESTDIR)$(bindir)/\`basename $$ld\` | sed '$(transform)'`; \
 	done
 
 # Deleting all the installed files
@@ -93,7 +93,7 @@ install: all installdirs
 uninstall:
 	for ld in $(ASLINK) $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT); \
 	do \
-	  rm -f $(DESTDIR)$(bindir)/$$(basename $$ld); \
+	  rm -f $(DESTDIR)$(bindir)/`basename $$ld`; \
 	done
 
 

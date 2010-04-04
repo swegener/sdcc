@@ -1,3 +1,8 @@
+2010-04-04 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/hc08/mc68hc908jb8.h:
+	  sdcc library license changed to GPL+LE
+
 2010-04-03 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/p89lpc933_4.h, device/include/mcs51/p89lpc935_6.h,

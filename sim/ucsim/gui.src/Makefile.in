@@ -69,9 +69,11 @@ all: gui.src
 
 gui.src: checkconf gui_api
 ifeq ($(curses_ok),yes)
-	@for pkg in dummy $(CURSES_PKGS); do\
-	  if test -f $$pkg/Makefile; then $(MAKE) -C $$pkg $$pkg; else : ; fi ;\
+ifneq ($(CURSES_PKGS),)
+	@for pkg in $(CURSES_PKGS); do\
+	  $(MAKE) -C $$pkg $$pkg;\
 	done
+endif
 endif
 #	@for pkg in $(PKGS); do\
 #	  $(MAKE) -C $$pkg $$pkg ;\
@@ -84,9 +86,11 @@ gui_api: ucsim_lib tool_lib
 # ---------------------------------------------------
 install: install_gui_api
 ifeq ($(curses_ok),yes)
+ifneq ($(CURSES_PKGS),)
 	@for pkg in $(CURSES_PKGS); do\
 	  $(MAKE) -C $$pkg install ; cd ..;\
 	done
+endif
 endif
 
 install_gui_api:
@@ -96,9 +100,11 @@ install_gui_api:
 # --------------------------------
 uninstall: uninstall_gui_api
 ifeq ($(curses_ok),yes)
+ifneq ($(CURSES_PKGS),)
 	@for pkg in $(CURSES_PKGS); do\
 	  $(MAKE) -C $$pkg uninstall ; cd ..;\
 	done
+endif
 endif
 
 uninstall_gui_api:
@@ -107,16 +113,20 @@ uninstall_gui_api:
 # Performing self-test
 # --------------------
 check: check_local
+ifneq ($(CURSES_PKGS),)
 	@for pkg in $(CURSES_PKGS); do\
-	  $(MAKE) -C $$pkg check ; cd ..;\
+	  $(MAKE) -C $$pkg check;\
 	done
+endif
 
 check_local:
 
 test: test_local
+ifneq ($(CURSES_PKGS),)
 	@for pkg in $(CURSES_PKGS); do\
-	  $(MAKE) -C $$pkg test ; cd ..;\
+	  $(MAKE) -C $$pkg test;\
 	done
+endif
 
 test_local:
 
@@ -124,9 +134,11 @@ test_local:
 # Performing installation test
 # ----------------------------
 installcheck: installcheck_gui_api
+ifneq ($(CURSES_PKGS),)
 	@for pkg in $(CURSES_PKGS); do\
-	  $(MAKE) -C $$pkg installcheck ; cd ..;\
+	  $(MAKE) -C $$pkg installcheck;\
 	done
+endif
 
 installcheck_gui_api:
 
@@ -134,10 +146,11 @@ installcheck_gui_api:
 # Creating installation directories
 # ---------------------------------
 installdirs:
+ifneq ($(CURSES_PKGS),)
 	@for pkg in $(CURSES_PKGS); do\
-	  $(MAKE) -C $$pkg installdirs ; cd ..;\
+	  $(MAKE) -C $$pkg installdirs;\
 	done
-
+endif
 
 # Creating dependencies
 # ---------------------

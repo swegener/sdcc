@@ -1400,6 +1400,16 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
     {
       if (pairId == PAIR_HL || pairId == PAIR_IY)
         {
+          if (pairId == PAIR_HL && base[0] == '0') // Ugly workaround
+            {
+               unsigned int tmpoffset;
+               const char *tmpbase;
+               if(sscanf(base, "%xd", &tmpoffset) && (tmpbase = strchr(base , '+')))
+                 {
+                   offset = tmpoffset;
+                   base = tmpbase++;
+                 }
+            }
           if ((_G.pairs[pairId].last_type == AOP_IMMD && left->type == AOP_IMMD) ||
             (_G.pairs[pairId].last_type == AOP_IY && left->type == AOP_IY))
             {

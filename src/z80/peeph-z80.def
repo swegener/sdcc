@@ -450,6 +450,19 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	inc	%1
+	dec	%1
+	push	%2
+	ld	%3, %4
+	inc	%1
+} by {
+	; peephole 0zc' eliminated dead inc/dec pair.
+	push	%2
+	ld	%3, %4
+	inc	%1
+} if operandsNotRelated(%2 'af')
+
+replace restart {
 	ld	iy,#%1
 	or	a,%2 (iy)
 } by {
@@ -904,6 +917,17 @@ replace restart {
 	push	de
 	; peephole 32' pushed de
 } if notUsed('a')
+
+replace restart {
+	ld	iy,%1
+	add	iy,sp
+	ld	sp,iy
+} by {
+	ld	hl,%1
+	add	hl,sp
+	ld	sp,hl
+	; peephole 32'' fixed stack using hl instead of iy.
+} if notUsed('hl'), notUsed('iy')
 
 replace restart {
 	ld	a,%1
@@ -1376,24 +1400,24 @@ replace restart {
 	ld	sp,%1
 } if notUsed('a')
 
-replace restart {
-	call	%1
-	ret
-} by {
-	jp	%1
-	; peephole 65 replaced call at end of function by jump.
-}
+//replace restart {
+//	call	%1
+//	ret
+//} by {
+//	jp	%1
+//	; peephole 65 replaced call at end of function by jump (tail call optimization).
+//}
 
 // Callee saves ix.
-replace restart {
-	call	%1
-	pop	ix
-	ret
-} by {
-	pop	ix
-	jp	%1
-	; peephole 66 replaced call at end of function by jump moving call beyond pop ix.
-}
+//replace restart {
+//	call	%1
+//	pop	ix
+//	ret
+//} by {
+//	pop	ix
+//	jp	%1
+//	; peephole 66 replaced call at end of function by jump moving call beyond pop ix (tail call optimization).
+//}
 
 replace restart {
 	ld	%1,a
@@ -2042,7 +2066,17 @@ replace {
 	; peephole z13 removed unused ret.
 }
 
-// These four need two be here since the peephole optimizer continues to apply rules further down the file even for replace restart rules.
+replace {
+	jp	%5
+	ld	sp,ix
+	pop	ix
+	ret
+} by {
+	jp	%5
+	; peephole z13a removed unused ret.
+}
+
+// These four need to be here since the peephole optimizer continues to apply rules further down the file even for replace restart rules.
 replace restart {
 	jp	NC,%1
 	jp	%2

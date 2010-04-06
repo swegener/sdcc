@@ -38,3 +38,96 @@ __divsint_rrx_s::
 
         jp      __div16
 
+__divschar_rrx_s::
+        ld      hl,#2+1
+        add     hl,sp
+
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+
+        ;; Fall through
+__divschar_rrx_hds::
+__div8::
+        ld      a,l             ; Sign extend
+        rlca
+        sbc     a
+        ld      h,a
+__div_signexte::
+        ld      a,e             ; Sign extend
+        rlca
+        sbc     a
+        ld      d,a
+        ; Fall through to __div16
+
+        ;; signed 16-bit division
+        ;;
+        ;; Entry conditions
+        ;;   HL = dividend
+        ;;   DE = divisor
+        ;;
+        ;; Exit conditions
+        ;;   HL = quotient
+        ;;   DE = remainder
+        ;;   If divisor is non-zero, carry=0
+        ;;   If divisor is 0, carry=1 and both quotient and remainder are 0
+        ;;
+        ;; Register used: AF,B,DE,HL
+__divsint_rrx_hds::
+__div16::
+        ;; Determine sign of quotient by xor-ing high bytes of dividend
+        ;;  and divisor. Quotient is positive if signs are the same, negative
+        ;;  if signs are different
+        ;; Remainder has same sign as dividend
+        ld      a,h             ; Get high byte of dividend
+        xor     d               ; Xor with high byte of divisor
+        rla                     ; Sign of quotient goes into the carry
+        ld      a,h             ; Get high byte of dividend
+        push    af              ; Save sign of both quotient and reminder
+
+        ;; Take absolute value of dividend
+        rla
+        jr      NC,.chkde       ; Jump if dividend is positive
+        sub     a               ; Substract dividend from 0
+        sub     l
+        ld      l,a
+        sbc     a               ; Propagate borrow (A=0xFF if borrow)
+        sub     h
+        ld      h,a
+        ;; Take absolute value of divisor
+.chkde:
+        bit     7,d
+        jr      Z,.dodiv        ; Jump if divisor is positive
+        sub     a               ; Substract divisor from 0
+        sub     e
+        ld      e,a
+        sbc     a               ; Propagate borrow (A=0xFF if borrow)
+        sub     d
+        ld      d,a
+        ;; Divide absolute values
+.dodiv:
+        call    __divu16
+;        jr      C,.exit         ; Exit if divide by zero
+        ;; Negate quotient if it is negative
+        pop     af              ; recover sign of quotient
+        jr      NC,.dorem       ; Jump if quotient is positive
+        ld      b,a
+        sub     a               ; Substract quotient from 0
+        sub     l
+        ld      l,a
+        sbc     a               ; Propagate borrow (A=0xFF if borrow)
+        sub     h
+        ld      h,a
+        ld      a,b
+.dorem:
+        ;; Negate remainder if it is negative
+        rla
+        ret     NC              ; Return if remainder is positive
+        sub     a               ; Substract remainder from 0
+        sub     e
+        ld      e,a
+        sbc     a               ; Propagate remainder (A=0xFF if borrow)
+        sub     d
+        ld      d,a
+        ret
+

@@ -905,7 +905,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                   else
                     result->regs[i] = getRegGpr (ic, ebp, result);
 
-                  /* if the allocation falied which means
+                  /* if the allocation failed which means
                      this was spilt then break */
                   if (!result->regs[i])
                     {
@@ -2095,11 +2095,13 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
         }
     }
 
-    /* Fixes #2646174, but there might be a better way */
-    if(ic->op == SEND)
-        {
-          return NULL;
-        }
+  /* Fixes #2646174, but there might be a better way */
+  if(ic->op == SEND)
+    return NULL;
+
+  /* Fixes #2982135, but there might be a better way */
+  if(ic->op == RETURN)
+    return NULL;
 
   OP_SYMBOL (op)->ruonly = 1;
   return sic;

@@ -1,3 +1,8 @@
+2010-04-07 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/ralloc.c,
+	  support/regression/tests/bug-2982135.c:
+	  Fixed bug #2982135.
+
 2010-04-06 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c,
 	  src/z80/peeph-z80.def

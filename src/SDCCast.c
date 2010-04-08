@@ -854,8 +854,8 @@ processParms (ast *func,
        * if sdcc extensions are enabled */
       if (options.std_sdcc &&
         (IS_CAST_OP (*actParm) ||
-        (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, removedCast)) ||
-        (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, literalFromCast))))
+        (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, cast.removedCast)) ||
+        (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, cast.literalFromCast))))
         {
           /* Parameter was explicitly typecast; don't touch it. */
           return 0;
@@ -3038,7 +3038,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->left = NULL;
           tree->right = NULL;
           tree->type = EX_VALUE;
-          tree->values.literalFromCast = 1;
+          tree->values.cast.literalFromCast = 1;
         }
       #endif
 
@@ -3902,7 +3902,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           /* mark that the explicit cast has been removed,
            * for proper processing (no integer promotion) of explicitly typecasted variable arguments */
-          tree->right->values.removedCast = 1;
+          tree->right->values.cast.removedCast = 1;
           return tree->right;
         }
 
@@ -3923,7 +3923,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               tree->left = NULL;
               tree->right = NULL;
               TTYPE (tree) = tree->opval.val->type;
-              tree->values.literalFromCast = 1;
+              tree->values.cast.literalFromCast = 1;
             }
           else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) &&
                    ((int) ulFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */
@@ -3998,7 +3998,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           TETYPE (tree) = getSpec (TTYPE (tree));
           tree->left = NULL;
           tree->right = NULL;
-          tree->values.literalFromCast = 1;
+          tree->values.cast.literalFromCast = 1;
           return tree;
         }
 
@@ -4086,7 +4086,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               TTYPE (tree) = tree->opval.val->type;
               tree->left = NULL;
               tree->right = NULL;
-              tree->values.literalFromCast = 1;
+              tree->values.cast.literalFromCast = 1;
               TETYPE (tree) = getSpec (TTYPE (tree));
               return tree;
             }
@@ -4114,7 +4114,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               TTYPE (tree) = tree->opval.val->type;
               tree->left = NULL;
               tree->right = NULL;
-              tree->values.literalFromCast = 1;
+              tree->values.cast.literalFromCast = 1;
               TETYPE (tree) = getSpec (TTYPE (tree));
               return tree;
             }

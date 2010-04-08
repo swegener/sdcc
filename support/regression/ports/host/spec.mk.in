@@ -1,6 +1,6 @@
 # Port specification for compiling on the host machines version of gcc
 SDCC = @CC@
-SDCCFLAGS = @CFLAGS@ @C99_FLAG@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
+SDCCFLAGS = @CFLAGS@ @C99_FLAG@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir))
 SDLDFLAGS = @LDFLAGS@
 # disable all warnings:
 SDCCFLAGS+= -w

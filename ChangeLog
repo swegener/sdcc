@@ -7,6 +7,14 @@
 	* support/regressuin/test/bitvars.c:
 	  fixed failing test on on Solaris i386 SunPro C compiler;
 	  it behaves differently if -xO2 option is set or not
+	* src/SDCCast.c, src/SDCCast.h:
+	  fixed SunPro C warning: anonymous struct declaration
+	* device/include/mcs51/C8051F336.h, device/include/mcs51/C8051T610.h,
+	  device/include/mcs51/p89lpc938.h, device/include/mcs51/C8051F920.h,
+	  device/include/mcs51/C8051T600.h, device/include/mcs51/C8051T630.h,
+	  sdcc/device/include/hc08/mc68hc908qy.h, device/include/hc08/mc68hc908gp32.h:
+	  sdcc library license changed to GPL+LE
+	* support/regression/ports/host/spec.mk.in: removed unneeded include
 
 2010-04-07 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/ralloc.c,

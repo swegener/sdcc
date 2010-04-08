@@ -15,6 +15,10 @@
 	  sdcc/device/include/hc08/mc68hc908qy.h, device/include/hc08/mc68hc908gp32.h:
 	  sdcc library license changed to GPL+LE
 	* support/regression/ports/host/spec.mk.in: removed unneeded include
+	* sim/ucsim/cmd.src/Makefile.in:
+	  sh test doesn't understand -e option
+	* sim/ucsim/cmd.src/FlexLexer.h:
+	  fixed warning about missing newline at last line
 
 2010-04-07 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/ralloc.c,

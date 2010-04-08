@@ -4,6 +4,10 @@
 
 #include <testfwk.h>
 
+#ifndef PORT_HOST
+#pragma disable_warning 85  //in function f2 unreferenced function argument : 'n'
+#endif
+
 char* fp;
 
 char* f1(int n){

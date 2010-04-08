@@ -1,3 +1,9 @@
+2010-04-08 Borut Razem <borut.razem AT siol.net>
+
+	* support/regressuin/test/bitvars.c:
+	  fixed failing test on on Solaris i386 SunPro C compiler;
+	  it behaves differently if -xO2 option is set or not
+
 2010-04-07 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/ralloc.c,
 	  support/regression/tests/bug-2982135.c:

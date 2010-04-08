@@ -1,3 +1,7 @@
+2010-04-08 Philipp Klaus Krause <pkk AT spth.de>
+	* support/regression/tests/bug-2982135.c:
+	  Fixed a stupid mistake.
+
 2010-04-08 Borut Razem <borut.razem AT siol.net>
 
 	* support/regressuin/test/bitvars.c:

@@ -21,9 +21,8 @@ char* f2(int n){
 void test2982135(void)
 {
 	fp = (char *)42;
-	f1(23);
-	ASSERT(fp == (char *)42);
-	f2(23);
-	ASSERT(fp == (char *)42);
+	ASSERT(f1(23) == (char *)42);
+	fp = (char *)42;
+	ASSERT(f2(23) == (char *)42);
 }
 

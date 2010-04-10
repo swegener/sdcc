@@ -1,8 +1,10 @@
 2010-04-10 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/host/spec.mk.in:
-	  reverted change made 2010-04-08, since it the include is needed by
+	  reverted change made 2010-04-08, since the include is needed by
 	  the libmullong.c regression test
+	* device/lib/pic/libm/*.c:
+	  sdcc library license changed to GPL+LE
 
 2010-04-09 Borut Razem <borut.razem AT siol.net>
 

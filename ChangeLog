@@ -4,6 +4,8 @@
 	  define CXXFLAGS
 	* device/lib/pic/libm/expf.c:
 	  corrected typo
+	* device/include/mcs51/uPSD32xx.h:
+	  sdcc library license changed to GPL+LE
 
 2010-04-10 Borut Razem <borut.razem AT siol.net>
 

@@ -29,7 +29,7 @@
 /* [1] William James Cody and W.  M.  Waite.  _Software manual for the
    elementary functions_, Englewood Cliffs, N.J.:Prentice-Hall, 1980. */
 
-include <math.h>
+#include <math.h>
 #include <errno.h>
 
 #define P0      0.2499999995E+0

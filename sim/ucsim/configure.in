@@ -535,7 +535,7 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
 else
   bor_IS_SUNPRO
   if test "$bor_cv_cxx_compiler_sunpro" = "yes"; then
-    CFLAGS="-xO2 $CFLAGS"
+    CXXFLAGS="-xO2 $CXXFLAGS"
     MAKEDEP="$CXX -xM1"
     WALL_FLAG=
   fi

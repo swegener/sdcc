@@ -14,10 +14,6 @@
 ** uunet!motown!pipeline!phw
 */
 
-/*
-** $Id$
-*/
-
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
 #include <float.h>

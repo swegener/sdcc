@@ -1,3 +1,8 @@
+2010-04-12 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic/libsdcc/*.[cS], device/lib/pic/*.[cS]:
+	  sdcc library license changed to GPL+LE
+
 2010-04-11 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/configure.in:

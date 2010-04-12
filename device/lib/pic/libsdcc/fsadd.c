@@ -14,10 +14,6 @@
 ** uunet!motown!pipeline!phw
 */
 
-/*
-** $Id$
-*/
-
 #include <float.h>
 
 union float_long

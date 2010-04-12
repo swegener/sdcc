@@ -37,7 +37,7 @@
 
 #ifndef PSD_CSIOP
 #define PSD_CSIOP 0x00                /* for reference for PSD registers as default (page 99 datasheet) */
-                                       /* This must be set in PSDSoft "Define PSD pin/node Functions"
+                                      /* This must be set in PSDSoft "Define PSD pin/node Functions"
                                          Step3 'Next', tab "Chip Select Equations"  */
 #endif
 

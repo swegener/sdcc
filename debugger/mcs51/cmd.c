@@ -37,7 +37,7 @@ static int listlines = LISTLINES;
    no better context is available */
 static module *list_mod = NULL;
 
-EXTERN_STACK_DCL(callStack,function *,1024);
+EXTERN_STACK_DCL(callStack,function *,1024)
 
 #if defined(__APPLE__) && defined(__MACH__)
 static char *copying=
@@ -327,8 +327,8 @@ static char *warranty=
 "POSSIBILITY OF SUCH DAMAGES.\n";
 #endif
 
-static void printTypeInfo(link *);
-static void printValAggregates (symbol *,link *,char,unsigned int,int);
+static void printTypeInfo(st_link *);
+static void printValAggregates (symbol *,st_link *,char,unsigned int,int);
 static  int printOrSetSymValue (symbol *sym, context *cctxt,
                                 int flg, int dnum, int fmt,
                                 char *rs, char *val, char cmp);
@@ -452,16 +452,18 @@ static void clearBPatModLine (module *mod, int line)
 
     for ( ; line < (srcMode == SRC_CMODE ? mod->ncLines : mod->nasmLines ) ;
           line++ ) {
-        if (srcMode == SRC_CMODE)
+        if (srcMode == SRC_CMODE) {
             if (mod->cLines[line]->addr) {
                 clearUSERbp (mod->cLines[line]->addr);
                 break;
             }
-        else
+        }
+        else {
             if (mod->asmLines[line]->addr) {
                 clearUSERbp (mod->asmLines[line]->addr);
                 break;
             }
+        }
     }
 
     return;
@@ -1140,7 +1142,6 @@ int cmdSetUserBp (char *s, context *cctxt)
 int cmdJump (char *s, context *cctxt)
 {
     char *bp;
-    function *func = NULL;
     if (STACK_EMPTY(callStack))
     {
         fprintf(stdout,"The program is not running.\n");
@@ -2321,7 +2322,7 @@ int cmdListSrc (char *s, context *cctxt)
     return 0;
 }
 
-static unsigned long getValBasic(symbol *sym, link *type, char *val)
+static unsigned long getValBasic(symbol *sym, st_link *type, char *val)
 {
     char *s;
     union
@@ -2345,7 +2346,7 @@ static unsigned long getValBasic(symbol *sym, link *type, char *val)
     {
             if (IS_INTEGRAL(type))
         {
-            link *etype;
+            st_link *etype;
             if ( type->next )
                 etype = type->next;
             else
@@ -2458,7 +2459,7 @@ static void printFmtInteger(char *deffmt,int fmt, long val,
 /*-----------------------------------------------------------------*/
 /* printValBasic - print value of basic types                      */
 /*-----------------------------------------------------------------*/
-static void printValBasic(symbol *sym, link *type,
+static void printValBasic(symbol *sym, st_link *type,
                           char mem, unsigned addr,int size, int fmt)
 {
     union {
@@ -2482,7 +2483,7 @@ static void printValBasic(symbol *sym, link *type,
         else
         if (IS_INTEGRAL(type))
         {
-            link *etype;
+            st_link *etype;
             if ( type->next )
                 etype = type->next;
             else
@@ -2532,10 +2533,10 @@ static void printValFunc (symbol *sym, int fmt)
 /*-----------------------------------------------------------------*/
 /* printArrayValue - will print the values of array elements       */
 /*-----------------------------------------------------------------*/
-static void printArrayValue (symbol *sym,  link *type,
+static void printArrayValue (symbol *sym,  st_link *type,
                              char space, unsigned int addr, int fmt)
 {
-        link *elem_type = type->next;
+        st_link *elem_type = type->next;
         int i;
 
         fprintf(stdout,"{");
@@ -2556,7 +2557,7 @@ static void printArrayValue (symbol *sym,  link *type,
 /*-----------------------------------------------------------------*/
 /* printStructValue - prints structures elements                   */
 /*-----------------------------------------------------------------*/
-static void printStructValue (symbol *sym, link *type,
+static void printStructValue (symbol *sym, st_link *type,
                               char space, unsigned int addr, int fmt)
 {
         symbol *fields = SPEC_STRUCT(type)->fields;
@@ -2579,7 +2580,7 @@ static void printStructValue (symbol *sym, link *type,
 /*-----------------------------------------------------------------*/
 /* printValAggregates - print value of aggregates                  */
 /*-----------------------------------------------------------------*/
-static void printValAggregates (symbol *sym, link *type,
+static void printValAggregates (symbol *sym, st_link *type,
                                 char space,unsigned int addr, int fmt)
 {
 
@@ -2604,7 +2605,7 @@ static int printOrSetSymValue (symbol *sym, context *cctxt,
     static char fmtChar[] = " todx ";
     static int stack = 1;
         symbol *fields;
-    link *type;
+    st_link *type;
     unsigned int  addr;
     int size, n;
     char *s, *s2;
@@ -2806,7 +2807,7 @@ static void printStructInfo (structdef *sdef)
 /*-----------------------------------------------------------------*/
 /* printTypeInfo - print out the type information                  */
 /*-----------------------------------------------------------------*/
-static void printTypeInfo(link *p)
+static void printTypeInfo(st_link *p)
 {
     if (!p)
         return ;
@@ -3219,7 +3220,6 @@ static void printFrame()
 {
     int i;
     function *func     = NULL;
-    function *lastfunc = NULL;
 
     if ( currentFrame < 0 )
     {
@@ -3281,9 +3281,6 @@ int cmdDown(char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdFrame (char *s, context *cctxt)
 {
-    function *func = NULL;
-    int framenr = 0;
-
     s = trim_left(s);
     if ( *s )
         currentFrame = strtol(s,0,10);

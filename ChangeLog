@@ -4,6 +4,12 @@
 	  fixed bug #2986676: ucz80 fails to run z80 regtests on Solaris
 	  SPARC platform
 	* sdccconf_in.h: corrected endianness detection on solaris
+	* debugger/mcs51/symtab.c, debugger/mcs51/configure,
+	  debugger/mcs51/Makefile.in, debugger/mcs51/simi.c,
+	  debugger/mcs51/cmd.c, debugger/mcs51/symtab.h,
+	  debugger/mcs51/configure.in, debugger/mcs51/sdcdb.c,
+	  debugger/mcs51/config.h.in, debugger/mcs51/break.c:
+	  code cleaning: removed warnings, added -Wall c compiler flag, ...
 
 2010-04-12 Borut Razem <borut.razem AT siol.net>
 

@@ -31,7 +31,7 @@ DEFSETFUNC(symWithRName);
 /*------------------------------------------------------------------*/
 /* getSize - returns size of a type chain in bits                   */
 /*------------------------------------------------------------------*/
-unsigned int   getSize ( link *p )
+unsigned int   getSize ( st_link *p )
 {
     /* if nothing return 0 */
     if ( ! p )
@@ -127,8 +127,8 @@ static char  *parseTypeInfo (symbol *sym, char *s)
     /* bp now points to '}' ... go past it */
     s = ++bp;
     while (*s != ')') { /* till we reach the end */
-        link *type;
-        type = Safe_calloc(1,sizeof(link));
+        st_link *type;
+        type = Safe_calloc(1,sizeof(st_link));
         if (*s == ',') s++;
 
         /* is a declarator */

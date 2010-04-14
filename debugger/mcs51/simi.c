@@ -54,7 +54,6 @@ int sock = -1; /* socket descriptor to comm with simulator */
 pid_t simPid = -1;
 #endif
 static char simibuff[MAX_SIM_BUFF];    /* sim buffer       */
-static char regBuff[MAX_SIM_BUFF];
 static char *sbp = simibuff;           /* simulator buffer pointer */
 extern char **environ;
 char simactive = 0;
@@ -135,7 +134,6 @@ static void invalidateCache( int cachenum )
 /*-----------------------------------------------------------------*/
 void waitForSim(int timeout_ms, char *expect)
 {
-  int i=0;
   int ch;
 
 Dprintf(D_simi, ("simi: waitForSim start(%d)\n", timeout_ms));
@@ -563,7 +561,7 @@ int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
 unsigned long simGetValue (unsigned int addr,char mem, int size)
 {
     unsigned int b[4] = {0,0,0,0}; /* can be a max of four bytes long */
-    char cachenr, i;
+    char cachenr;
     char buffer[40];
     char *resp;
 
@@ -609,6 +607,8 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
     }
     else
     {
+        int i;
+
         for (i = 0 ; i < size ; i++ )
         {
             /* skip white space */
@@ -665,8 +665,6 @@ void simLoadFile (char *s)
 unsigned int simGoTillBp ( unsigned int gaddr)
 {
     char *sr;
-    unsigned addr ;
-    char *sfmt;
     int wait_ms = 1000;
 
     invalidateCache(XMEM_CACHE);

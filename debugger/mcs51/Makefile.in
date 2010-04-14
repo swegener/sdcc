@@ -23,7 +23,7 @@ bindir          = @bindir@
 
 STD_INC		= @sdcc_include_dir@
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(top_builddir) -I$(top_srcdir) -I$(SLIB) -DHAVE_CONFIG_H
-CFLAGS		= @CFLAGS@
+CFLAGS		= @CFLAGS@ @WALL_FLAG@
 LDFLAGS		= @LDFLAGS@
 
 EXEEXT          = @EXEEXT@

@@ -34,6 +34,12 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif  /* HAVE_LIBREADLINE */
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
 
 #ifdef SDCDB_DEBUG
 int   sdcdbDebug = 0;
@@ -1430,9 +1436,9 @@ char *completionMain(const char *text, int state)
 static void commandLoop(FILE *cmdfile)
 {
     char *line, save_ch, *s;
+#ifdef HAVE_LIBREADLINE
     char *line_read;
 
-#ifdef HAVE_LIBREADLINE
     FILE *old_rl_instream, *old_rl_outstream;
     actualcmdfile = cmdfile;
 
@@ -1596,14 +1602,20 @@ static void parseCmdLine (int argc, char **argv)
                 continue;
             }
 
-            if (strcmp(argv[i],"-cd") == 0) {
-                i++;
-                chdir(argv[i]);
-                 continue;
+            if (strncmp(argv[i],"-cd=",4) == 0) {
+                if (0 > chdir(&argv[i][4])) {
+                    fprintf(stderr, "can't change directory to %s\n", &argv[i][4]);
+                    exit(1);
+                }
+                continue;
             }
 
-            if (strncmp(argv[i],"-cd=",4) == 0) {
-                chdir(argv[i][4]);
+            if (strcmp(argv[i],"-cd") == 0) {
+                i++;
+                if (0 > chdir(argv[i])) {
+                    fprintf(stderr, "can't change directory to %s\n", argv[i]);
+                    exit(1);
+                }
                 continue;
             }
 

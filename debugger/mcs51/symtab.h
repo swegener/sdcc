@@ -106,13 +106,13 @@ typedef struct declarator {
     short    num_elem;     /* # of elems if type==array  */
     short    ptr_const :1;   /* pointer is constant        */
     short    ptr_volatile:1; /* pointer is volatile        */
-    struct link *tspec;     /* pointer type specifier      */
+    struct st_link *tspec;     /* pointer type specifier      */
 } declarator ;
 
 #define DECLARATOR   0
 #define SPECIFIER    1
 
-typedef struct link {
+typedef struct st_link {
     unsigned class : 1      ;  /* DECLARATOR or SPECIFIER    */
     unsigned tdef  : 1      ;  /* current link created by    */
     /* typedef if this flag is set*/
@@ -121,8 +121,8 @@ typedef struct link {
         declarator     d     ;  /* if CLASS == DECLARATOR     */
     } select ;
 
-    struct link    *next    ;  /* next element on the chain  */
-} link ;
+    struct st_link    *next    ;  /* next element on the chain  */
+} st_link ;
 
 typedef struct symbol {
     char     *name               ;
@@ -136,8 +136,8 @@ typedef struct symbol {
     unsigned addr               ;  /* address if the symbol */
     unsigned eaddr              ;  /* end address for functions */
     char     addr_type          ;  /* which address space   */
-    link     *type              ;  /* start of type chain        */
-    link     *etype             ;  /* end of type chain          */
+    st_link  *type              ;  /* start of type chain        */
+    st_link  *etype             ;  /* end of type chain          */
     char     scopetype         ;  /* 'G' global, 'F' - file, 'L' local */
     char     *sname             ;  /* if 'F' or 'L' then scope name */
     char     *rname             ;  /* real name i.e. mangled beyond recognition */
@@ -242,6 +242,6 @@ symbol *symLookup (char *,context *);
 DEFSETFUNC(moduleWithName);
 DEFSETFUNC(moduleWithCName);
 DEFSETFUNC(moduleWithAsmName);
-unsigned int getSize (link *);
+unsigned int getSize (st_link *);
 
 #endif

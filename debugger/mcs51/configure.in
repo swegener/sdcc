@@ -24,12 +24,12 @@ AC_LANG_C
 
 # Checking for header files.
 # ===========================================================================
+AC_CHECK_HEADERS(unistd.h sys/wait.h)
 socket_type=unknown
 AC_CHECK_HEADERS(sys/socket.h, socket_type=sys_socket_h)
 if test $socket_type = unknown; then
   AC_CHECK_HEADERS(winsock2.h, socket_type=winsock2_h)
 fi
-
 
 # Checking for functions/libs
 # ===========================================================================

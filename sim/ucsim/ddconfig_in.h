@@ -106,16 +106,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /*
  * find out the endianess of host machine
- * in order to be able to make Mac OS X unified binaries
  */
-#if defined __sun || defined __APPLE__
-# if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN
-/* 1) trust the compiler */
-#   define WORDS_BIGENDIAN 1
-# elif defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN
+#if defined __APPLE__ && (defined __BIG_ENDIAN__ || defined _BIG_ENDIAN)
+/* 1) trust the compiler
+ * in order to be able to make Mac OS X unified binaries */
+# define WORDS_BIGENDIAN 1
+#elif defined __APPLE__ && (defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN)
 /* do nothing */
+#elif defined __sun && defined HAVE_SYS_ISA_DEFS_H
+/* Solaris defines endianness in <sys/isa_defs.h> */
+# include <sys/isa_defs.h>
+# ifdef _BIG_ENDIAN
+#   define WORDS_BIGENDIAN 1
 # endif
-#else
+#elif
 # ifdef HAVE_ENDIAN_H
 #   include <endian.h>
 # elif defined HAVE_SYS_ENDIAN_H

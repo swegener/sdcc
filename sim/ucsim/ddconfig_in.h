@@ -119,7 +119,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # ifdef _BIG_ENDIAN
 #   define WORDS_BIGENDIAN 1
 # endif
-#elif
+#else
 # ifdef HAVE_ENDIAN_H
 #   include <endian.h>
 # elif defined HAVE_SYS_ENDIAN_H

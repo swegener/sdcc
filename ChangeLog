@@ -3,6 +3,7 @@
 	* sim/ucsim/configure, sim/ucsim/configure.in, sim/ucsim/ddconfig_in.h:
 	  fixed bug #2986676: ucz80 fails to run z80 regtests on Solaris
 	  SPARC platform
+	* sdccconf_in.h: corrected endianness detection on solaris
 
 2010-04-12 Borut Razem <borut.razem AT siol.net>
 

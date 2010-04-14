@@ -57,6 +57,7 @@
 #undef HAVE_ENDIAN_H
 #undef HAVE_SYS_ENDIAN_H
 #undef HAVE_MACHINE_ENDIAN_H
+#undef HAVE_SYS_ISA_DEFS_H
 
 /*
  * find out the endianess of host machine

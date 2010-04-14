@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #undef HAVE_ENDIAN_H
 #undef HAVE_SYS_ENDIAN_H
 #undef HAVE_MACHINE_ENDIAN_H
+#undef HAVE_SYS_ISA_DEFS_H
 
 #undef SOCKET_AVAIL
 #undef SOCKLEN_T

@@ -1,7 +1,7 @@
 /* CPP Library.
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009
-   Free Software Foundation, Inc.
+   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008,
+   2009, 2010 Free Software Foundation, Inc.
    Contributed by Per Bothner, 1994-95.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
@@ -30,7 +30,7 @@ along with this program; see the file COPYING3.  If not see
 #endif
 
 static void init_library (void);
-static void mark_named_operators (cpp_reader *);
+static void mark_named_operators (cpp_reader *, int);
 static void read_original_filename (cpp_reader *);
 static void read_original_directory (cpp_reader *);
 static void post_options (cpp_reader *);
@@ -162,7 +162,7 @@ cpp_create_reader (enum c_lang lang, hash_table *table,
   CPP_OPTION (pfile, warn_trigraphs) = 2;
   CPP_OPTION (pfile, warn_endif_labels) = 1;
   CPP_OPTION (pfile, warn_deprecated) = 1;
-  CPP_OPTION (pfile, warn_long_long) = !CPP_OPTION (pfile, c99);
+  CPP_OPTION (pfile, warn_long_long) = 0;
   CPP_OPTION (pfile, dollars_in_ident) = 1;
   CPP_OPTION (pfile, warn_dollars) = 1;
   CPP_OPTION (pfile, warn_variadic_macros) = 1;
@@ -383,7 +383,7 @@ static const struct builtin_operator operator_array[] =
 
 /* Mark the C++ named operators in the hash table.  */
 static void
-mark_named_operators (cpp_reader *pfile)
+mark_named_operators (cpp_reader *pfile, int flags)
 {
   const struct builtin_operator *b;
 
@@ -392,10 +392,28 @@ mark_named_operators (cpp_reader *pfile)
        b++)
     {
       cpp_hashnode *hp = cpp_lookup (pfile, b->name, b->len);
-      hp->flags |= NODE_OPERATOR;
+      hp->flags |= flags;
       hp->is_directive = 0;
       hp->directive_index = b->value;
     }
+}
+
+/* Helper function of cpp_type2name. Return the string associated with
+   named operator TYPE.  */
+const char *
+cpp_named_operator2name (enum cpp_ttype type)
+{
+  const struct builtin_operator *b;
+
+  for (b = operator_array;
+       b < (operator_array + ARRAY_SIZE (operator_array));
+       b++)
+    {
+      if (type == b->value)
+	return (const char *) b->name;
+    }
+
+  return NULL;
 }
 
 void
@@ -418,7 +436,7 @@ cpp_init_special_builtins (cpp_reader *pfile)
       if (b->always_warn_if_redefined
           || CPP_OPTION (pfile, warn_builtin_macro_redefined))
 	hp->flags |= NODE_WARN;
-      hp->value.builtin = (enum builtin_type) b->value;
+      hp->value.builtin = (enum cpp_builtin_type) b->value;
     }
 }
 
@@ -511,13 +529,20 @@ static void sanity_checks (cpp_reader *pfile)
 void
 cpp_post_options (cpp_reader *pfile)
 {
+  int flags;
+
   sanity_checks (pfile);
 
   post_options (pfile);
 
   /* Mark named operators before handling command line macros.  */
+  flags = 0;
   if (CPP_OPTION (pfile, cplusplus) && CPP_OPTION (pfile, operator_names))
-    mark_named_operators (pfile);
+    flags |= NODE_OPERATOR;
+  if (CPP_OPTION (pfile, warn_cxx_operator_names))
+    flags |= NODE_DIAGNOSTIC | NODE_WARN_OPERATOR;
+  if (flags != 0)
+    mark_named_operators (pfile, flags);
 }
 
 /* Setup for processing input from the file named FNAME, or stdin if
@@ -572,9 +597,9 @@ read_original_filename (cpp_reader *pfile)
       pfile->state.in_directive = 0;
 
       /* If it's a #line directive, handle it.  */
-      if (token1->type == CPP_NUMBER)
+      if (token1->type == CPP_NUMBER
+	  && _cpp_handle_directive (pfile, token->flags & PREV_WHITE))
 	{
-	  _cpp_handle_directive (pfile, token->flags & PREV_WHITE);
 	  read_original_directory (pfile);
 	  return;
 	}
@@ -633,12 +658,11 @@ read_original_directory (cpp_reader *pfile)
 }
 
 /* This is called at the end of preprocessing.  It pops the last
-   buffer and writes dependency output, and returns the number of
-   errors.
+   buffer and writes dependency output.
 
    Maybe it should also reset state, such that you could call
    cpp_start_read with a new filename to restart processing.  */
-int
+void
 cpp_finish (cpp_reader *pfile, FILE *deps_stream)
 {
   /* Warn about unused macros before popping the final buffer.  */
@@ -653,9 +677,8 @@ cpp_finish (cpp_reader *pfile, FILE *deps_stream)
   while (pfile->buffer)
     _cpp_pop_buffer (pfile);
 
-  /* Don't write the deps file if there are errors.  */
   if (CPP_OPTION (pfile, deps.style) != DEPS_NONE
-      && deps_stream && pfile->errors == 0)
+      && deps_stream)
     {
       deps_write (pfile->deps, deps_stream, 72);
 
@@ -666,8 +689,6 @@ cpp_finish (cpp_reader *pfile, FILE *deps_stream)
   /* Report on headers that could use multiple include guards.  */
   if (CPP_OPTION (pfile, print_include_names))
     _cpp_report_missing_guards (pfile);
-
-  return pfile->errors;
 }
 
 static void

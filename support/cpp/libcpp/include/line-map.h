@@ -1,5 +1,5 @@
 /* Map logical line numbers to (source file, line number) pairs.
-   Copyright (C) 2001, 2003, 2004, 2007, 2009
+   Copyright (C) 2001, 2003, 2004, 2007, 2008, 2009
    Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify it
@@ -31,8 +31,9 @@ along with this program; see the file COPYING3.  If not see
    when including a new file, e.g. a #include directive in C.
    LC_LEAVE is when reaching a file's end.  LC_RENAME is when a file
    name or line number changes for neither of the above reasons
-   (e.g. a #line directive in C).  */
-enum lc_reason {LC_ENTER = 0, LC_LEAVE, LC_RENAME};
+   (e.g. a #line directive in C); LC_RENAME_VERBATIM is like LC_RENAME
+   but a filename of "" is not specially interpreted as standard input.  */
+enum lc_reason {LC_ENTER = 0, LC_LEAVE, LC_RENAME, LC_RENAME_VERBATIM};
 
 /* The type of line numbers.  */
 typedef unsigned int linenum_type;
@@ -57,8 +58,7 @@ typedef void *(*line_map_realloc) (void *, size_t);
    creation of this line map, SYSP is one for a system header, two for
    a C system header file that therefore needs to be extern "C"
    protected in C++, and zero otherwise.  */
-struct line_map GTY(())
-{
+struct GTY(()) line_map {
   const char *to_file;
   linenum_type to_line;
   source_location start_location;
@@ -71,8 +71,7 @@ struct line_map GTY(())
 };
 
 /* A set of chronological line_map structures.  */
-struct line_maps GTY(())
-{
+struct GTY(()) line_maps {
   struct line_map * GTY ((length ("%h.used"))) maps;
   unsigned int allocated;
   unsigned int used;
@@ -144,11 +143,10 @@ extern const struct line_map *linemap_add
 extern const struct line_map *linemap_lookup
   (struct line_maps *, source_location);
 
-/* Print the file names and line numbers of the #include commands
-   which led to the map MAP, if any, to stderr.  Nothing is output if
-   the most recently listed stack is the same as the current one.  */
-extern void linemap_print_containing_files (struct line_maps *,
-                                            const struct line_map *);
+/* source_location values from 0 to RESERVED_LOCATION_COUNT-1 will
+   be reserved for libcpp user as special values, no token from libcpp
+   will contain any of those locations.  */
+#define RESERVED_LOCATION_COUNT	2
 
 /* Converts a map and a source_location to source line.  */
 #define SOURCE_LINE(MAP, LOC) \
@@ -161,9 +159,11 @@ extern void linemap_print_containing_files (struct line_maps *,
    of the #include, or other directive, that caused a map change.  */
 #define LAST_SOURCE_LINE(MAP) \
   SOURCE_LINE (MAP, LAST_SOURCE_LINE_LOCATION (MAP))
+#define LAST_SOURCE_COLUMN(MAP) \
+  SOURCE_COLUMN (MAP, LAST_SOURCE_LINE_LOCATION (MAP))
 #define LAST_SOURCE_LINE_LOCATION(MAP) \
   ((((MAP)[1].start_location - 1 - (MAP)->start_location) \
-    & ~((1 << (MAP)->column_bits) - 1))                   \
+    & ~((1 << (MAP)->column_bits) - 1))			  \
    + (MAP)->start_location)
 
 /* Returns the map a given map was included from.  */
@@ -185,10 +185,11 @@ extern void linemap_print_containing_files (struct line_maps *,
     r = r + to_column; \
     if (r >= set->highest_location) \
       set->highest_location = r; \
-    (LOC) = r;                   \
+    (LOC) = r;			 \
   }} while (0)
-
+    
 
 extern source_location
 linemap_position_for_column (struct line_maps *set, unsigned int to_column);
+
 #endif /* !LIBCPP_LINE_MAP_H  */

@@ -25,8 +25,7 @@ typedef unsigned char uchar;
 #define UC (const unsigned char *)  /* Intended use: UC"string" */
 
 /* Chained list of answers to an assertion.  */
-struct answer GTY(())
-{
+struct GTY(()) answer {
   struct answer *next;
   unsigned int count;
   cpp_token GTY ((length ("%h.count"))) first[1];
@@ -34,13 +33,12 @@ struct answer GTY(())
 
 /* Each macro definition is recorded in a cpp_macro structure.
    Variadic macros cannot occur with traditional cpp.  */
-struct cpp_macro GTY(())
-{
+struct GTY(()) cpp_macro {
   /* Parameters, if any.  */
   cpp_hashnode ** GTY ((nested_ptr (union tree_node,
-                "%h ? CPP_HASHNODE (GCC_IDENT_TO_HT_IDENT (%h)) : NULL",
-                        "%h ? HT_IDENT_TO_GCC_IDENT (HT_NODE (%h)) : NULL"),
-                        length ("%h.paramc")))
+		"%h ? CPP_HASHNODE (GCC_IDENT_TO_HT_IDENT (%h)) : NULL",
+			"%h ? HT_IDENT_TO_GCC_IDENT (HT_NODE (%h)) : NULL"),
+			length ("%h.paramc")))
     params;
 
   /* Replacement tokens (ISO) or replacement text (traditional).  See
@@ -75,4 +73,9 @@ struct cpp_macro GTY(())
 
   /* Indicate which field of 'exp' is in use.  */
   unsigned int traditional : 1;
+
+  /* Indicate whether the tokens include extra CPP_PASTE tokens at the
+     end to track invalid redefinitions with consecutive CPP_PASTE
+     tokens.  */
+  unsigned int extra_tokens : 1;
 };

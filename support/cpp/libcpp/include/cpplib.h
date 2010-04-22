@@ -28,10 +28,6 @@ along with this program; see the file COPYING3.  If not see
 #include "symtab.h"
 #include "line-map.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct cpp_reader cpp_reader;
 typedef struct cpp_buffer cpp_buffer;
 typedef struct cpp_options cpp_options;
@@ -56,89 +52,90 @@ struct _cpp_file;
    See the cpp_operator table optab in expr.c if you change the order or
    add or remove anything in the first group.  */
 
-#define TTYPE_TABLE                                                     \
-  OP(EQ,                "=")                                            \
-  OP(NOT,               "!")                                            \
-  OP(GREATER,           ">")    /* compare */                           \
-  OP(LESS,              "<")                                            \
-  OP(PLUS,              "+")    /* math */                              \
-  OP(MINUS,             "-")                                            \
-  OP(MULT,              "*")                                            \
-  OP(DIV,               "/")                                            \
-  OP(MOD,               "%")                                            \
-  OP(AND,               "&")    /* bit ops */                           \
-  OP(OR,                "|")                                            \
-  OP(XOR,               "^")                                            \
-  OP(RSHIFT,            ">>")                                           \
-  OP(LSHIFT,            "<<")                                           \
-                                                                        \
-  OP(COMPL,             "~")                                            \
-  OP(AND_AND,           "&&")   /* logical */                           \
-  OP(OR_OR,             "||")                                           \
-  OP(QUERY,             "?")                                            \
-  OP(COLON,             ":")                                            \
-  OP(COMMA,             ",")    /* grouping */                          \
-  OP(OPEN_PAREN,        "(")                                            \
-  OP(CLOSE_PAREN,       ")")                                            \
-  TK(EOF,               NONE)                                           \
-  OP(EQ_EQ,             "==")   /* compare */                           \
-  OP(NOT_EQ,            "!=")                                           \
-  OP(GREATER_EQ,        ">=")                                           \
-  OP(LESS_EQ,           "<=")                                           \
-                                                                        \
-  /* These two are unary + / - in preprocessor expressions.  */         \
-  OP(PLUS_EQ,           "+=")   /* math */                              \
-  OP(MINUS_EQ,          "-=")                                           \
-                                                                        \
-  OP(MULT_EQ,           "*=")                                           \
-  OP(DIV_EQ,            "/=")                                           \
-  OP(MOD_EQ,            "%=")                                           \
-  OP(AND_EQ,            "&=")   /* bit ops */                           \
-  OP(OR_EQ,             "|=")                                           \
-  OP(XOR_EQ,            "^=")                                           \
-  OP(RSHIFT_EQ,         ">>=")                                          \
-  OP(LSHIFT_EQ,         "<<=")                                          \
-  /* Digraphs together, beginning with CPP_FIRST_DIGRAPH.  */           \
-  OP(HASH,              "#")    /* digraphs */                          \
-  OP(PASTE,             "##")                                           \
-  OP(OPEN_SQUARE,       "[")                                            \
-  OP(CLOSE_SQUARE,      "]")                                            \
-  OP(OPEN_BRACE,        "{")                                            \
-  OP(CLOSE_BRACE,       "}")                                            \
-  /* The remainder of the punctuation.  Order is not significant.  */   \
-  OP(SEMICOLON,         ";")    /* structure */                         \
-  OP(ELLIPSIS,          "...")                                          \
-  OP(PLUS_PLUS,         "++")   /* increment */                         \
-  OP(MINUS_MINUS,       "--")                                           \
-  OP(DEREF,             "->")   /* accessors */                         \
-  OP(DOT,               ".")                                            \
-  OP(SCOPE,             "::")                                           \
-  OP(DEREF_STAR,        "->*")                                          \
-  OP(DOT_STAR,          ".*")                                           \
-  OP(ATSIGN,            "@")  /* used in Objective-C */                 \
-                                                                        \
-  TK(NAME,              IDENT)   /* word */                             \
-  TK(AT_NAME,           IDENT)   /* @word - Objective-C */              \
-  TK(NUMBER,            LITERAL) /* 34_be+ta  */                        \
-                                                                        \
-  TK(CHAR,              LITERAL) /* 'char' */                           \
-  TK(WCHAR,             LITERAL) /* L'char' */                          \
-  TK(CHAR16,            LITERAL) /* u'char' */                          \
-  TK(CHAR32,            LITERAL) /* U'char' */                          \
-  TK(OTHER,             LITERAL) /* stray punctuation */                \
-                                                                        \
-  TK(STRING,            LITERAL) /* "string" */                         \
-  TK(WSTRING,           LITERAL) /* L"string" */                        \
-  TK(STRING16,          LITERAL) /* u"string" */                        \
-  TK(STRING32,          LITERAL) /* U"string" */                        \
-  TK(OBJC_STRING,       LITERAL) /* @"string" - Objective-C */          \
-  TK(HEADER_NAME,       LITERAL) /* <stdio.h> in #include */            \
-                                                                        \
-  TK(COMMENT,           LITERAL) /* Only if output comments.  */        \
-                                 /* SPELL_LITERAL happens to DTRT.  */  \
-  TK(MACRO_ARG,         NONE)    /* Macro argument.  */                 \
-  TK(PRAGMA,            NONE)    /* Only for deferred pragmas.  */      \
-  TK(PRAGMA_EOL,        NONE)    /* End-of-line for deferred pragmas.  */ \
+#define TTYPE_TABLE							\
+  OP(EQ,		"=")						\
+  OP(NOT,		"!")						\
+  OP(GREATER,		">")	/* compare */				\
+  OP(LESS,		"<")						\
+  OP(PLUS,		"+")	/* math */				\
+  OP(MINUS,		"-")						\
+  OP(MULT,		"*")						\
+  OP(DIV,		"/")						\
+  OP(MOD,		"%")						\
+  OP(AND,		"&")	/* bit ops */				\
+  OP(OR,		"|")						\
+  OP(XOR,		"^")						\
+  OP(RSHIFT,		">>")						\
+  OP(LSHIFT,		"<<")						\
+									\
+  OP(COMPL,		"~")						\
+  OP(AND_AND,		"&&")	/* logical */				\
+  OP(OR_OR,		"||")						\
+  OP(QUERY,		"?")						\
+  OP(COLON,		":")						\
+  OP(COMMA,		",")	/* grouping */				\
+  OP(OPEN_PAREN,	"(")						\
+  OP(CLOSE_PAREN,	")")						\
+  TK(EOF,		NONE)						\
+  OP(EQ_EQ,		"==")	/* compare */				\
+  OP(NOT_EQ,		"!=")						\
+  OP(GREATER_EQ,	">=")						\
+  OP(LESS_EQ,		"<=")						\
+									\
+  /* These two are unary + / - in preprocessor expressions.  */		\
+  OP(PLUS_EQ,		"+=")	/* math */				\
+  OP(MINUS_EQ,		"-=")						\
+									\
+  OP(MULT_EQ,		"*=")						\
+  OP(DIV_EQ,		"/=")						\
+  OP(MOD_EQ,		"%=")						\
+  OP(AND_EQ,		"&=")	/* bit ops */				\
+  OP(OR_EQ,		"|=")						\
+  OP(XOR_EQ,		"^=")						\
+  OP(RSHIFT_EQ,		">>=")						\
+  OP(LSHIFT_EQ,		"<<=")						\
+  /* Digraphs together, beginning with CPP_FIRST_DIGRAPH.  */		\
+  OP(HASH,		"#")	/* digraphs */				\
+  OP(PASTE,		"##")						\
+  OP(OPEN_SQUARE,	"[")						\
+  OP(CLOSE_SQUARE,	"]")						\
+  OP(OPEN_BRACE,	"{")						\
+  OP(CLOSE_BRACE,	"}")						\
+  /* The remainder of the punctuation.	Order is not significant.  */	\
+  OP(SEMICOLON,		";")	/* structure */				\
+  OP(ELLIPSIS,		"...")						\
+  OP(PLUS_PLUS,		"++")	/* increment */				\
+  OP(MINUS_MINUS,	"--")						\
+  OP(DEREF,		"->")	/* accessors */				\
+  OP(DOT,		".")						\
+  OP(SCOPE,		"::")						\
+  OP(DEREF_STAR,	"->*")						\
+  OP(DOT_STAR,		".*")						\
+  OP(ATSIGN,		"@")  /* used in Objective-C */			\
+									\
+  TK(NAME,		IDENT)	 /* word */				\
+  TK(AT_NAME,		IDENT)	 /* @word - Objective-C */		\
+  TK(NUMBER,		LITERAL) /* 34_be+ta  */			\
+									\
+  TK(CHAR,		LITERAL) /* 'char' */				\
+  TK(WCHAR,		LITERAL) /* L'char' */				\
+  TK(CHAR16,		LITERAL) /* u'char' */				\
+  TK(CHAR32,		LITERAL) /* U'char' */				\
+  TK(OTHER,		LITERAL) /* stray punctuation */		\
+									\
+  TK(STRING,		LITERAL) /* "string" */				\
+  TK(WSTRING,		LITERAL) /* L"string" */			\
+  TK(STRING16,		LITERAL) /* u"string" */			\
+  TK(STRING32,		LITERAL) /* U"string" */			\
+  TK(UTF8STRING,	LITERAL) /* u8"string" */			\
+  TK(OBJC_STRING,	LITERAL) /* @"string" - Objective-C */		\
+  TK(HEADER_NAME,	LITERAL) /* <stdio.h> in #include */		\
+									\
+  TK(COMMENT,		LITERAL) /* Only if output comments.  */	\
+				 /* SPELL_LITERAL happens to DTRT.  */	\
+  TK(MACRO_ARG,		NONE)	 /* Macro argument.  */			\
+  TK(PRAGMA,		NONE)	 /* Only for deferred pragmas.  */	\
+  TK(PRAGMA_EOL,	NONE)	 /* End-of-line for deferred pragmas.  */ \
   TK(PADDING,           NONE)    /* Whitespace for -E.  */              \
 \
   /* SDCC _asm specific */                                              \
@@ -162,25 +159,28 @@ enum cpp_ttype
 
 /* C language kind, used when calling cpp_create_reader.  */
 enum c_lang {CLK_GNUC89 = 0, CLK_GNUC99, CLK_STDC89, CLK_STDC94, CLK_STDC99,
-             CLK_GNUCXX, CLK_CXX98, CLK_GNUCXX0X, CLK_CXX0X, CLK_ASM};
+	     CLK_GNUCXX, CLK_CXX98, CLK_GNUCXX0X, CLK_CXX0X, CLK_ASM};
 
 /* Payload of a NUMBER, STRING, CHAR or COMMENT token.  */
-struct cpp_string GTY(())
-{
+struct GTY(()) cpp_string {
   unsigned int len;
   const unsigned char *text;
 };
 
 /* Flags for the cpp_token structure.  */
-#define PREV_WHITE      (1 << 0) /* If whitespace before this token.  */
-#define DIGRAPH         (1 << 1) /* If it was a digraph.  */
-#define STRINGIFY_ARG   (1 << 2) /* If macro argument to be stringified.  */
-#define PASTE_LEFT      (1 << 3) /* If on LHS of a ## operator.  */
-#define NAMED_OP        (1 << 4) /* C++ named operators.  */
-#define NO_EXPAND       (1 << 5) /* Do not macro-expand this token.  */
-#define BOL             (1 << 6) /* Token at beginning of line.  */
-#define PURE_ZERO       (1 << 7) /* Single 0 digit, used by the C++ frontend,
-                                    set in c-lex.c.  */
+#define PREV_WHITE	(1 << 0) /* If whitespace before this token.  */
+#define DIGRAPH		(1 << 1) /* If it was a digraph.  */
+#define STRINGIFY_ARG	(1 << 2) /* If macro argument to be stringified.  */
+#define PASTE_LEFT	(1 << 3) /* If on LHS of a ## operator.  */
+#define NAMED_OP	(1 << 4) /* C++ named operators.  */
+#define NO_EXPAND	(1 << 5) /* Do not macro-expand this token.  */
+#define BOL		(1 << 6) /* Token at beginning of line.  */
+#define PURE_ZERO	(1 << 7) /* Single 0 digit, used by the C++ frontend,
+				    set in c-lex.c.  */
+#define SP_DIGRAPH	(1 << 8) /* # or ## token was a digraph.  */
+#define SP_PREV_WHITE	(1 << 9) /* If whitespace before a ##
+				    operator, or before this token
+				    after a # operator.  */
 
 /* Specify which field, if any, of the cpp_token union is used.  */
 
@@ -189,28 +189,39 @@ enum cpp_token_fld_kind {
   CPP_TOKEN_FLD_SOURCE,
   CPP_TOKEN_FLD_STR,
   CPP_TOKEN_FLD_ARG_NO,
+  CPP_TOKEN_FLD_TOKEN_NO,
   CPP_TOKEN_FLD_PRAGMA,
   CPP_TOKEN_FLD_NONE
 };
 
+/* A macro argument in the cpp_token union.  */
+struct GTY(()) cpp_macro_arg {
+  /* Argument number.  */
+  unsigned int arg_no;
+};
+
+/* An identifier in the cpp_token union.  */
+struct GTY(()) cpp_identifier {
+  /* The canonical (UTF-8) spelling of the identifier.  */
+  cpp_hashnode *
+    GTY ((nested_ptr (union tree_node,
+		"%h ? CPP_HASHNODE (GCC_IDENT_TO_HT_IDENT (%h)) : NULL",
+			"%h ? HT_IDENT_TO_GCC_IDENT (HT_NODE (%h)) : NULL")))
+       node;
+};
+
 /* A preprocessing token.  This has been carefully packed and should
    occupy 16 bytes on 32-bit hosts and 24 bytes on 64-bit hosts.  */
-struct cpp_token GTY(())
-{
-  source_location src_loc;      /* Location of first char of token.  */
+struct GTY(()) cpp_token {
+  source_location src_loc;	/* Location of first char of token.  */
   ENUM_BITFIELD(cpp_ttype) type : CHAR_BIT;  /* token type */
-  unsigned char flags;          /* flags - see above */
+  unsigned short flags;		/* flags - see above */
 
   union cpp_token_u
   {
     /* An identifier.  */
-    cpp_hashnode *
-      GTY ((nested_ptr (union tree_node,
-                "%h ? CPP_HASHNODE (GCC_IDENT_TO_HT_IDENT (%h)) : NULL",
-                        "%h ? HT_IDENT_TO_GCC_IDENT (HT_NODE (%h)) : NULL"),
-            tag ("CPP_TOKEN_FLD_NODE")))
-         node;
-
+    struct cpp_identifier GTY ((tag ("CPP_TOKEN_FLD_NODE"))) node;
+	 
     /* Inherit padding from this token.  */
     cpp_token * GTY ((tag ("CPP_TOKEN_FLD_SOURCE"))) source;
 
@@ -218,7 +229,11 @@ struct cpp_token GTY(())
     struct cpp_string GTY ((tag ("CPP_TOKEN_FLD_STR"))) str;
 
     /* Argument no. for a CPP_MACRO_ARG.  */
-    unsigned int GTY ((tag ("CPP_TOKEN_FLD_ARG_NO"))) arg_no;
+    struct cpp_macro_arg GTY ((tag ("CPP_TOKEN_FLD_ARG_NO"))) macro_arg;
+
+    /* Original token no. for a CPP_PASTE (from a sequence of
+       consecutive paste tokens in a macro expansion).  */
+    unsigned int GTY ((tag ("CPP_TOKEN_FLD_TOKEN_NO"))) token_no;
 
     /* Caller-supplied identifier for a CPP_PRAGMA.  */
     unsigned int GTY ((tag ("CPP_TOKEN_FLD_PRAGMA"))) pragma;
@@ -305,21 +320,8 @@ struct cpp_options
   /* Nonzero means print names of header files (-H).  */
   unsigned char print_include_names;
 
-  /* Nonzero means cpp_pedwarn causes a hard error.  */
-  unsigned char pedantic_errors;
-
-  /* Nonzero means don't print warning messages.  */
-  unsigned char inhibit_warnings;
-
   /* Nonzero means complain about deprecated features.  */
   unsigned char warn_deprecated;
-
-  /* Nonzero means don't suppress warnings from system headers.  */
-  unsigned char warn_system_headers;
-
-  /* Nonzero means don't print error messages.  Has no option to
-     select it, but can be set by a user of cpplib (e.g. fix-header).  */
-  unsigned char inhibit_errors;
 
   /* Nonzero means warn if slash-star appears in a comment.  */
   unsigned char warn_comments;
@@ -355,9 +357,6 @@ struct cpp_options
   /* Nonzero means warn about builtin macros that are redefined or
      explicitly undefined.  */
   unsigned char warn_builtin_macro_redefined;
-
-  /* Nonzero means turn warnings into errors.  */
-  unsigned char warnings_are_errors;
 
   /* Nonzero means we should look for header.gcc files that remap file
      names.  */
@@ -397,6 +396,9 @@ struct cpp_options
 
   /* Nonzero means handle C++ alternate operator names.  */
   unsigned char operator_names;
+
+  /* Nonzero means warn about use of C++ alternate operator names.  */
+  unsigned char warn_cxx_operator_names;
 
   /* True for traditional preprocessing.  */
   unsigned char traditional;
@@ -452,6 +454,10 @@ struct cpp_options
 
     /* If true, no dependency is generated on the main file.  */
     bool ignore_main_file;
+
+    /* If true, intend to use the preprocessor output (e.g., for compilation)
+       in addition to the dependency info.  */
+    bool need_preprocessor_output;
   } deps;
 
   /* Target-specific features set by the front end or client.  */
@@ -469,9 +475,6 @@ struct cpp_options
 
   /* Nonzero means __STDC__ should have the value 0 in system headers.  */
   unsigned char stdc_0_in_system_headers;
-
-  /* True means error callback should be used for diagnostics.  */
-  bool client_diagnostic;
 
   /* True disables tokenization outside of preprocessing directives. */
   bool directives_only;
@@ -499,7 +502,7 @@ struct cpp_callbacks
 
   void (*dir_change) (cpp_reader *, const char *);
   void (*include) (cpp_reader *, unsigned int, const unsigned char *,
-                   const char *, int, const cpp_token **);
+		   const char *, int, const cpp_token **);
   void (*define) (cpp_reader *, unsigned int, cpp_hashnode *);
   void (*undef) (cpp_reader *, unsigned int, cpp_hashnode *);
   void (*ident) (cpp_reader *, unsigned int, const cpp_string *);
@@ -512,10 +515,11 @@ struct cpp_callbacks
      be expanded.  */
   cpp_hashnode * (*macro_to_expand) (cpp_reader *, const cpp_token *);
 
-  /* Called to emit a diagnostic if client_diagnostic option is true.
-     This callback receives the translated message.  */
-  void (*error) (cpp_reader *, int, const char *, va_list *)
-       ATTRIBUTE_FPTR_PRINTF(3,0);
+  /* Called to emit a diagnostic.  This callback receives the
+     translated message.  */
+  bool (*error) (cpp_reader *, int, source_location, unsigned int,
+		 const char *, va_list *)
+       ATTRIBUTE_FPTR_PRINTF(5,0);
 
   /* Callbacks for when a macro is expanded, or tested (whether
      defined or not at the time) in #ifdef, #ifndef or "defined".  */
@@ -524,7 +528,16 @@ struct cpp_callbacks
   /* Called before #define and #undef or other macro definition
      changes are processed.  */
   void (*before_define) (cpp_reader *);
+  /* Called whenever a macro is expanded or tested.
+     Second argument is the location of the start of the current expansion.  */
+  void (*used) (cpp_reader *, source_location, cpp_hashnode *);
 };
+
+#ifdef VMS
+#define INO_T_CPP ino_t ino[3]
+#else
+#define INO_T_CPP ino_t ino
+#endif
 
 /* Chain of directories to look for include files in.  */
 struct cpp_dir
@@ -543,7 +556,7 @@ struct cpp_dir
   /* Is this a user-supplied directory? */
   bool user_supplied_p;
 
-  /* The canonicalized NAME as determined by lrealpath.  This field
+  /* The canonicalized NAME as determined by lrealpath.  This field 
      is only used by hosts that lack reliable inode numbers.  */
   char *canonical_name;
 
@@ -559,12 +572,9 @@ struct cpp_dir
 
   /* The C front end uses these to recognize duplicated
      directories in the search path.  */
-  ino_t ino;
+  INO_T_CPP;
   dev_t dev;
 };
-
-/* Name under which this program was invoked.  */
-extern const char *progname;
 
 /* The structure of a node in the hash table.  The hash table has
    entries for all identifiers: either macros defined by #define
@@ -575,47 +585,49 @@ extern const char *progname;
    identifier that behaves like an operator such as "xor".
    NODE_DIAGNOSTIC is for speed in lex_token: it indicates a
    diagnostic may be required for this node.  Currently this only
-   applies to __VA_ARGS__ and poisoned identifiers.  */
+   applies to __VA_ARGS__, poisoned identifiers, and -Wc++-compat
+   warnings about NODE_OPERATOR.  */
 
 /* Hash node flags.  */
-#define NODE_OPERATOR   (1 << 0)        /* C++ named operator.  */
-#define NODE_POISONED   (1 << 1)        /* Poisoned identifier.  */
-#define NODE_BUILTIN    (1 << 2)        /* Builtin macro.  */
-#define NODE_DIAGNOSTIC (1 << 3)        /* Possible diagnostic when lexed.  */
-#define NODE_WARN       (1 << 4)        /* Warn if redefined or undefined.  */
-#define NODE_DISABLED   (1 << 5)        /* A disabled macro.  */
-#define NODE_MACRO_ARG  (1 << 6)        /* Used during #define processing.  */
-#define NODE_USED       (1 << 7)        /* Dumped with -dU.  */
-#define NODE_CONDITIONAL (1 << 8)       /* Conditional macro */
+#define NODE_OPERATOR	(1 << 0)	/* C++ named operator.  */
+#define NODE_POISONED	(1 << 1)	/* Poisoned identifier.  */
+#define NODE_BUILTIN	(1 << 2)	/* Builtin macro.  */
+#define NODE_DIAGNOSTIC (1 << 3)	/* Possible diagnostic when lexed.  */
+#define NODE_WARN	(1 << 4)	/* Warn if redefined or undefined.  */
+#define NODE_DISABLED	(1 << 5)	/* A disabled macro.  */
+#define NODE_MACRO_ARG	(1 << 6)	/* Used during #define processing.  */
+#define NODE_USED	(1 << 7)	/* Dumped with -dU.  */
+#define NODE_CONDITIONAL (1 << 8)	/* Conditional macro */
+#define NODE_WARN_OPERATOR (1 << 9)	/* Warn about C++ named operator.  */
 
 /* Different flavors of hash node.  */
 enum node_type
 {
-  NT_VOID = 0,     /* No definition yet.  */
-  NT_MACRO,        /* A macro of some form.  */
-  NT_ASSERTION     /* Predicate for #assert.  */
+  NT_VOID = 0,	   /* No definition yet.  */
+  NT_MACRO,	   /* A macro of some form.  */
+  NT_ASSERTION	   /* Predicate for #assert.  */
 };
 
 /* Different flavors of builtin macro.  _Pragma is an operator, but we
    handle it with the builtin code for efficiency reasons.  */
-enum builtin_type
+enum cpp_builtin_type
 {
-  BT_SPECLINE = 0,              /* `__LINE__' */
-  BT_DATE,                      /* `__DATE__' */
-  BT_FILE,                      /* `__FILE__' */
-  BT_BASE_FILE,                 /* `__BASE_FILE__' */
-  BT_INCLUDE_LEVEL,             /* `__INCLUDE_LEVEL__' */
-  BT_TIME,                      /* `__TIME__' */
-  BT_STDC,                      /* `__STDC__' */
-  BT_PRAGMA,                    /* `_Pragma' operator */
-  BT_TIMESTAMP,                 /* `__TIMESTAMP__' */
-  BT_COUNTER                    /* `__COUNTER__' */
+  BT_SPECLINE = 0,		/* `__LINE__' */
+  BT_DATE,			/* `__DATE__' */
+  BT_FILE,			/* `__FILE__' */
+  BT_BASE_FILE,			/* `__BASE_FILE__' */
+  BT_INCLUDE_LEVEL,		/* `__INCLUDE_LEVEL__' */
+  BT_TIME,			/* `__TIME__' */
+  BT_STDC,			/* `__STDC__' */
+  BT_PRAGMA,			/* `_Pragma' operator */
+  BT_TIMESTAMP,			/* `__TIMESTAMP__' */
+  BT_COUNTER			/* `__COUNTER__' */
 };
 
-#define CPP_HASHNODE(HNODE)     ((cpp_hashnode *) (HNODE))
-#define HT_NODE(NODE)           ((ht_identifier *) (NODE))
-#define NODE_LEN(NODE)          HT_LEN (&(NODE)->ident)
-#define NODE_NAME(NODE)         HT_STR (&(NODE)->ident)
+#define CPP_HASHNODE(HNODE)	((cpp_hashnode *) (HNODE))
+#define HT_NODE(NODE)		((ht_identifier *) (NODE))
+#define NODE_LEN(NODE)		HT_LEN (&(NODE)->ident)
+#define NODE_NAME(NODE)		HT_STR (&(NODE)->ident)
 
 /* Specify which field, if any, of the union is used.  */
 
@@ -627,39 +639,37 @@ enum {
   NTV_NONE
 };
 
-#define CPP_HASHNODE_VALUE_IDX(HNODE)                           \
-  ((HNODE.flags & NODE_MACRO_ARG) ? NTV_ARGUMENT                \
-   : HNODE.type == NT_MACRO ? ((HNODE.flags & NODE_BUILTIN)     \
-                               ? NTV_BUILTIN : NTV_MACRO)       \
-   : HNODE.type == NT_ASSERTION ? NTV_ANSWER                    \
+#define CPP_HASHNODE_VALUE_IDX(HNODE)				\
+  ((HNODE.flags & NODE_MACRO_ARG) ? NTV_ARGUMENT		\
+   : HNODE.type == NT_MACRO ? ((HNODE.flags & NODE_BUILTIN) 	\
+			       ? NTV_BUILTIN : NTV_MACRO)	\
+   : HNODE.type == NT_ASSERTION ? NTV_ANSWER			\
    : NTV_NONE)
 
 /* The common part of an identifier node shared amongst all 3 C front
    ends.  Also used to store CPP identifiers, which are a superset of
    identifiers in the grammatical sense.  */
 
-union _cpp_hashnode_value GTY(())
-{
+union GTY(()) _cpp_hashnode_value {
   /* If a macro.  */
   cpp_macro * GTY((tag ("NTV_MACRO"))) macro;
   /* Answers to an assertion.  */
   struct answer * GTY ((tag ("NTV_ANSWER"))) answers;
   /* Code for a builtin macro.  */
-  enum builtin_type GTY ((tag ("NTV_BUILTIN"))) builtin;
+  enum cpp_builtin_type GTY ((tag ("NTV_BUILTIN"))) builtin;
   /* Macro argument index.  */
   unsigned short GTY ((tag ("NTV_ARGUMENT"))) arg_index;
 };
 
-struct cpp_hashnode GTY(())
-{
+struct GTY(()) cpp_hashnode {
   struct ht_identifier ident;
   unsigned int is_directive : 1;
-  unsigned int directive_index : 7;     /* If is_directive,
-                                           then index into directive table.
-                                           Otherwise, a NODE_OPERATOR.  */
-  unsigned char rid_code;               /* Rid code - for front ends.  */
-  ENUM_BITFIELD(node_type) type : 7;    /* CPP node type.  */
-  unsigned int flags : 9;               /* CPP flags.  */
+  unsigned int directive_index : 7;	/* If is_directive,
+					   then index into directive table.
+					   Otherwise, a NODE_OPERATOR.  */
+  unsigned char rid_code;		/* Rid code - for front ends.  */
+  ENUM_BITFIELD(node_type) type : 6;	/* CPP node type.  */
+  unsigned int flags : 10;		/* CPP flags.  */
 
   union _cpp_hashnode_value GTY ((desc ("CPP_HASHNODE_VALUE_IDX (%1)"))) value;
 };
@@ -671,7 +681,7 @@ struct cpp_hashnode GTY(())
    that cpplib will share; this technique is used by the C front
    ends.  */
 extern cpp_reader *cpp_create_reader (enum c_lang, struct ht *,
-                                      struct line_maps *);
+				      struct line_maps *);
 
 /* Reset the cpp_reader's line_map.  This is only used after reading a
    PCH file.  */
@@ -717,47 +727,41 @@ extern void cpp_init_iconv (cpp_reader *);
 
 /* Call this to finish preprocessing.  If you requested dependency
    generation, pass an open stream to write the information to,
-   otherwise NULL.  It is your responsibility to close the stream.
-
-   Returns cpp_errors (pfile).  */
-extern int cpp_finish (cpp_reader *, FILE *deps_stream);
+   otherwise NULL.  It is your responsibility to close the stream.  */
+extern void cpp_finish (cpp_reader *, FILE *deps_stream);
 
 /* Call this to release the handle at the end of preprocessing.  Any
-   use of the handle after this function returns is invalid.  Returns
-   cpp_errors (pfile).  */
+   use of the handle after this function returns is invalid.  */
 extern void cpp_destroy (cpp_reader *);
-
-/* Error count.  */
-extern unsigned int cpp_errors (cpp_reader *);
 
 extern unsigned int cpp_token_len (const cpp_token *);
 extern unsigned char *cpp_token_as_text (cpp_reader *, const cpp_token *);
 extern unsigned char *cpp_spell_token (cpp_reader *, const cpp_token *,
-                                       unsigned char *, bool);
+				       unsigned char *, bool);
 extern void cpp_register_pragma (cpp_reader *, const char *, const char *,
-                                 void (*) (cpp_reader *), bool);
+				 void (*) (cpp_reader *), bool);
 extern void cpp_register_deferred_pragma (cpp_reader *, const char *,
-                                          const char *, unsigned, bool, bool);
+					  const char *, unsigned, bool, bool);
 extern int cpp_avoid_paste (cpp_reader *, const cpp_token *,
-                            const cpp_token *);
+			    const cpp_token *);
 extern const cpp_token *cpp_get_token (cpp_reader *);
 extern const cpp_token *cpp_get_token_with_location (cpp_reader *,
-                                                     source_location *);
+						     source_location *);
 extern const unsigned char *cpp_macro_definition (cpp_reader *,
-                                                  const cpp_hashnode *);
+						  const cpp_hashnode *);
 extern void _cpp_backup_tokens (cpp_reader *, unsigned int);
 extern const cpp_token *cpp_peek_token (cpp_reader *, int);
 
-/* Evaluate a CPP_CHAR or CPP_WCHAR token.  */
+/* Evaluate a CPP_*CHAR* token.  */
 extern cppchar_t cpp_interpret_charconst (cpp_reader *, const cpp_token *,
-                                          unsigned int *, int *);
-/* Evaluate a vector of CPP_STRING or CPP_WSTRING tokens.  */
+					  unsigned int *, int *);
+/* Evaluate a vector of CPP_*STRING* tokens.  */
 extern bool cpp_interpret_string (cpp_reader *,
-                                  const cpp_string *, size_t,
-                                  cpp_string *, enum cpp_ttype);
+				  const cpp_string *, size_t,
+				  cpp_string *, enum cpp_ttype);
 extern bool cpp_interpret_string_notranslate (cpp_reader *,
-                                              const cpp_string *, size_t,
-                                              cpp_string *, enum cpp_ttype);
+					      const cpp_string *, size_t,
+					      cpp_string *, enum cpp_ttype);
 
 /* Convert a host character constant to the execution character set.  */
 extern cppchar_t cpp_host_to_exec_charset (cpp_reader *, cppchar_t);
@@ -765,8 +769,8 @@ extern cppchar_t cpp_host_to_exec_charset (cpp_reader *, cppchar_t);
 /* Used to register macros and assertions, perhaps from the command line.
    The text is the same as the command line argument.  */
 extern void cpp_define (cpp_reader *, const char *);
-extern void cpp_define_formatted (cpp_reader *pfile,
-                                  const char *fmt, ...) ATTRIBUTE_PRINTF_2;
+extern void cpp_define_formatted (cpp_reader *pfile, 
+				  const char *fmt, ...) ATTRIBUTE_PRINTF_2;
 extern void cpp_assert (cpp_reader *, const char *);
 extern void cpp_undef (cpp_reader *, const char *);
 extern void cpp_unassert (cpp_reader *, const char *);
@@ -778,7 +782,7 @@ extern void cpp_pop_definition (cpp_reader *, const char *, cpp_macro *);
 extern void cpp_undef_all (cpp_reader *);
 
 extern cpp_buffer *cpp_push_buffer (cpp_reader *, const unsigned char *,
-                                    size_t, int);
+				    size_t, int);
 extern int cpp_defined (cpp_reader *, const unsigned char *, int);
 
 /* A preprocessing number.  Code assumes that any unused high bits of
@@ -801,32 +805,33 @@ struct cpp_num
    octal, hexadecimal), and type suffixes.  */
 
 #define CPP_N_CATEGORY  0x000F
-#define CPP_N_INVALID   0x0000
-#define CPP_N_INTEGER   0x0001
-#define CPP_N_FLOATING  0x0002
+#define CPP_N_INVALID	0x0000
+#define CPP_N_INTEGER	0x0001
+#define CPP_N_FLOATING	0x0002
 
-#define CPP_N_WIDTH     0x00F0
-#define CPP_N_SMALL     0x0010  /* int, float, shrot _Fract/Accum  */
-#define CPP_N_MEDIUM    0x0020  /* long, double, long _Fract/_Accum.  */
-#define CPP_N_LARGE     0x0040  /* long long, long double,
-                                   long long _Fract/Accum.  */
+#define CPP_N_WIDTH	0x00F0
+#define CPP_N_SMALL	0x0010	/* int, float, shrot _Fract/Accum  */
+#define CPP_N_MEDIUM	0x0020	/* long, double, long _Fract/_Accum.  */
+#define CPP_N_LARGE	0x0040	/* long long, long double,
+				   long long _Fract/Accum.  */
 
-#define CPP_N_WIDTH_MD  0xF0000 /* machine defined.  */
-#define CPP_N_MD_W      0x10000
-#define CPP_N_MD_Q      0x20000
+#define CPP_N_WIDTH_MD	0xF0000	/* machine defined.  */
+#define CPP_N_MD_W	0x10000
+#define CPP_N_MD_Q	0x20000
 
-#define CPP_N_RADIX     0x0F00
-#define CPP_N_DECIMAL   0x0100
-#define CPP_N_HEX       0x0200
-#define CPP_N_OCTAL     0x0400
-#define CPP_N_BINARY    0x0800
+#define CPP_N_RADIX	0x0F00
+#define CPP_N_DECIMAL	0x0100
+#define CPP_N_HEX	0x0200
+#define CPP_N_OCTAL	0x0400
+#define CPP_N_BINARY	0x0800
 
-#define CPP_N_UNSIGNED  0x1000  /* Properties.  */
-#define CPP_N_IMAGINARY 0x2000
-#define CPP_N_DFLOAT    0x4000
+#define CPP_N_UNSIGNED	0x1000	/* Properties.  */
+#define CPP_N_IMAGINARY	0x2000
+#define CPP_N_DFLOAT	0x4000
+#define CPP_N_DEFAULT	0x8000
 
-#define CPP_N_FRACT     0x100000 /* Fract types.  */
-#define CPP_N_ACCUM     0x200000 /* Accum types.  */
+#define CPP_N_FRACT	0x100000 /* Fract types.  */
+#define CPP_N_ACCUM	0x200000 /* Accum types.  */
 
 /* Classify a CPP_NUMBER token.  The return value is a combination of
    the flags from the above sets.  */
@@ -834,7 +839,7 @@ extern unsigned cpp_classify_number (cpp_reader *, const cpp_token *);
 
 /* Evaluate a token classified as category CPP_N_INTEGER.  */
 extern cpp_num cpp_interpret_integer (cpp_reader *, const cpp_token *,
-                                      unsigned int type);
+				      unsigned int type);
 
 /* Sign extend a number, with PRECISION significant bits and all
    others assumed clear, to fill out a cpp_num structure.  */
@@ -845,50 +850,49 @@ cpp_num cpp_num_sign_extend (cpp_num, size_t);
    with a line number of zero.  */
 
 /* Warning, an error with -Werror.  */
-#define CPP_DL_WARNING          0x00
+#define CPP_DL_WARNING		0x00
 /* Same as CPP_DL_WARNING, except it is not suppressed in system headers.  */
-#define CPP_DL_WARNING_SYSHDR   0x01
+#define CPP_DL_WARNING_SYSHDR	0x01
 /* Warning, an error with -pedantic-errors or -Werror.  */
-#define CPP_DL_PEDWARN          0x02
+#define CPP_DL_PEDWARN		0x02
 /* An error.  */
-#define CPP_DL_ERROR            0x03
+#define CPP_DL_ERROR		0x03
 /* An internal consistency check failed.  Prints "internal error: ",
    otherwise the same as CPP_DL_ERROR.  */
-#define CPP_DL_ICE              0x04
-/* Extracts a diagnostic level from an int.  */
-#define CPP_DL_EXTRACT(l)       (l & 0xf)
-/* Nonzero if a diagnostic level is one of the warnings.  */
-#define CPP_DL_WARNING_P(l)     (CPP_DL_EXTRACT (l) >= CPP_DL_WARNING \
-                                 && CPP_DL_EXTRACT (l) <= CPP_DL_PEDWARN)
+#define CPP_DL_ICE		0x04
+/* An informative note following a warning.  */
+#define CPP_DL_NOTE		0x05
+/* A fatal error.  */
+#define CPP_DL_FATAL		0x06
 
 /* Output a diagnostic of some kind.  */
-extern void cpp_error (cpp_reader *, int, const char *msgid, ...)
+extern bool cpp_error (cpp_reader *, int, const char *msgid, ...)
   ATTRIBUTE_PRINTF_3;
 
 /* Output a diagnostic with "MSGID: " preceding the
    error string of errno.  No location is printed.  */
-extern void cpp_errno (cpp_reader *, int, const char *msgid);
+extern bool cpp_errno (cpp_reader *, int, const char *msgid);
 
 /* Same as cpp_error, except additionally specifies a position as a
    (translation unit) physical line and physical column.  If the line is
    zero, then no location is printed.  */
-extern void cpp_error_with_line (cpp_reader *, int, source_location, unsigned,
-                                 const char *msgid, ...) ATTRIBUTE_PRINTF_5;
+extern bool cpp_error_with_line (cpp_reader *, int, source_location, unsigned,
+				 const char *msgid, ...) ATTRIBUTE_PRINTF_5;
 
 /* In lex.c */
 extern int cpp_ideq (const cpp_token *, const char *);
 extern void cpp_output_line (cpp_reader *, FILE *);
 extern unsigned char *cpp_output_line_to_string (cpp_reader *,
-                                                 const unsigned char *);
+						 const unsigned char *);
 extern void cpp_output_token (const cpp_token *, FILE *);
-extern const char *cpp_type2name (enum cpp_ttype);
+extern const char *cpp_type2name (enum cpp_ttype, unsigned char flags);
 /* Returns the value of an escape sequence, truncated to the correct
    target precision.  PSTR points to the input pointer, which is just
    after the backslash.  LIMIT is how much text we have.  WIDE is true
    if the escape sequence is part of a wide character constant or
    string literal.  Handles all relevant diagnostics.  */
 extern cppchar_t cpp_parse_escape (cpp_reader *, const unsigned char ** pstr,
-                                   const unsigned char *limit, int wide);
+				   const unsigned char *limit, int wide);
 
 /* Structure used to hold a comment block at a given location in the
    source code.  */
@@ -925,7 +929,7 @@ extern cpp_comment_table *cpp_get_comments (cpp_reader *);
 /* Lookup an identifier in the hashtable.  Puts the identifier in the
    table if it is not already there.  */
 extern cpp_hashnode *cpp_lookup (cpp_reader *, const unsigned char *,
-                                 unsigned int);
+				 unsigned int);
 
 typedef int (*cpp_cb) (cpp_reader *, cpp_hashnode *, void *);
 extern void cpp_forall_identifiers (cpp_reader *, cpp_cb, void *);
@@ -934,7 +938,7 @@ extern void cpp_forall_identifiers (cpp_reader *, cpp_cb, void *);
 extern void cpp_scan_nooutput (cpp_reader *);
 extern int  cpp_sys_macro_p (cpp_reader *);
 extern unsigned char *cpp_quote_string (unsigned char *, const unsigned char *,
-                                        unsigned int);
+					unsigned int);
 
 /* In files.c */
 extern bool cpp_included (cpp_reader *, const char *);
@@ -957,10 +961,6 @@ extern int cpp_write_pch_state (cpp_reader *, FILE *);
 extern int cpp_valid_state (cpp_reader *, const char *, int);
 extern void cpp_prepare_state (cpp_reader *, struct save_macro_data **);
 extern int cpp_read_state (cpp_reader *, const char *, FILE *,
-                           struct save_macro_data *);
-
-#ifdef __cplusplus
-}
-#endif
+			   struct save_macro_data *);
 
 #endif /* ! LIBCPP_CPPLIB_H */

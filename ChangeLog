@@ -1,3 +1,21 @@
+2010-04-22 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/libcpp/charset.c, support/cpp/libcpp/directives.c,
+	  support/cpp/libcpp/errors.c, support/cpp/libcpp/expr.c,
+	  support/cpp/libcpp/files.c, support/cpp/libcpp/identifiers.c,
+	  support/cpp/libcpp/include/cpp-id-data.h,
+	  support/cpp/libcpp/include/cpplib.h,
+	  support/cpp/libcpp/include/line-map.h,
+	  support/cpp/libcpp/include/symtab.h, support/cpp/libcpp/init.c,
+	  support/cpp/libcpp/internal.h, support/cpp/libcpp/lex.c,
+	  support/cpp/libcpp/line-map.c, support/cpp/libcpp/macro.c,
+	  support/cpp/libcpp/mkdeps.c, support/cpp/libcpp/symtab.c,
+	  support/cpp/libcpp/traditional.c, support/cpp/libiberty/filenames.h,
+	  support/cpp/libiberty/hashtab.c, support/cpp/libiberty/hashtab.h,
+	  support/cpp/libiberty/obstack.h, support/cpp/libiberty/safe-ctype.h,
+	  support/cpp/libiberty/splay-tree.h:
+	  SDCPP synchronized with GCC CPP release version 4.5.0
+
 2010-04-14 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/configure, sim/ucsim/configure.in, sim/ucsim/ddconfig_in.h:

@@ -1,5 +1,5 @@
 /* An expandable hash tables datatype.  
-   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2009
    Free Software Foundation, Inc.
    Contributed by Vladimir Makarov (vmakarov@cygnus.com).
 
@@ -49,6 +49,9 @@ Boston, MA 02110-1301, USA.  */
 #endif
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
+#endif
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -196,7 +199,7 @@ higher_prime_index (unsigned long n)
 static hashval_t
 hash_pointer (const PTR p)
 {
-  return (hashval_t) ((long)p >> 3);
+  return (hashval_t) ((intptr_t)p >> 3);
 }
 
 /* Returns non-zero if P1 and P2 are equal.  */
@@ -759,7 +762,8 @@ htab_traverse_noresize (htab_t htab, htab_trav callback, PTR info)
 void
 htab_traverse (htab_t htab, htab_trav callback, PTR info)
 {
-  if (htab_elements (htab) * 8 < htab_size (htab))
+  size_t size = htab_size (htab);
+  if (htab_elements (htab) * 8 < size && size > 32)
     htab_expand (htab);
 
   htab_traverse_noresize (htab, callback, info);

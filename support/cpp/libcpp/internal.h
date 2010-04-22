@@ -26,15 +26,15 @@ along with this program; see the file COPYING3.  If not see
 #include "symtab.h"
 #include "cpp-id-data.h"
 
-#ifndef HAVE_ICONV_H
-#undef HAVE_ICONV
-#endif
-
 #if HAVE_ICONV
 #include <iconv.h>
 #else
 #define HAVE_ICONV 0
 typedef int iconv_t;  /* dummy */
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 struct directive;		/* Deliberately incomplete.  */
@@ -243,7 +243,8 @@ struct _cpp_line_note
 
   /* Type of note.  The 9 'from' trigraph characters represent those
      trigraphs, '\\' an escaped newline, ' ' an escaped newline with
-     intervening space, and anything else is invalid.  */
+     intervening space, 0 represents a note that has already been handled,
+     and anything else is invalid.  */
   unsigned int type;
 };
 
@@ -401,9 +402,6 @@ struct cpp_reader
   /* Nonzero prevents the lexer from re-using the token runs.  */
   unsigned int keep_tokens;
 
-  /* Error counter for exit code.  */
-  unsigned int errors;
-
   /* Buffer to hold macro definition string.  */
   unsigned char *macro_buffer;
   unsigned int macro_buffer_len;
@@ -411,6 +409,10 @@ struct cpp_reader
   /* Descriptor for converting from the source character set to the
      execution character set.  */
   struct cset_converter narrow_cset_desc;
+
+  /* Descriptor for converting from the source character set to the
+     UTF-8 execution character set.  */
+  struct cset_converter utf8_cset_desc;
 
   /* Descriptor for converting from the source character set to the
      UTF-16 execution character set.  */
@@ -594,6 +596,7 @@ extern cpp_hashnode *_cpp_lex_identifier (cpp_reader *, const char *);
 
 /* In init.c.  */
 extern void _cpp_maybe_push_include_file (cpp_reader *);
+extern const char *cpp_named_operator2name (enum cpp_ttype type);
 
 /* In directives.c */
 extern int _cpp_test_assertion (cpp_reader *, unsigned int *);
@@ -724,5 +727,9 @@ ufputs (const unsigned char *s, FILE *f)
 {
   return fputs ((const char *)s, f);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ! LIBCPP_INTERNAL_H */

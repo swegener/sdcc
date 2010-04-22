@@ -332,9 +332,6 @@ warning (int opt, const char *gmsgid, ...)
 {
   va_list ap;
 
-  if CPP_OPTION (parse_in, warnings_are_errors)
-    ++errorcount;
-
   va_start (ap, gmsgid);
   fprintf (stderr, "%s: warning: ", progname);
   vfprintf (stderr, gmsgid, ap);

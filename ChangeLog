@@ -13,7 +13,8 @@
 	  support/cpp/libcpp/traditional.c, support/cpp/libiberty/filenames.h,
 	  support/cpp/libiberty/hashtab.c, support/cpp/libiberty/hashtab.h,
 	  support/cpp/libiberty/obstack.h, support/cpp/libiberty/safe-ctype.h,
-	  support/cpp/libiberty/splay-tree.h:
+	  support/cpp/libiberty/splay-tree.h, support/cpp/sdcpp.c,
+	  support/cpp/sdcpp.h, support/cpp/sdcpp-opts.c:
 	  SDCPP synchronized with GCC CPP release version 4.5.0
 
 2010-04-14 Borut Razem <borut.razem AT siol.net>

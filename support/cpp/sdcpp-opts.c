@@ -250,7 +250,6 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
          or environment var dependency generation is used.  */
       cpp_opts->deps.style = (code == OPT_M ? DEPS_SYSTEM: DEPS_USER);
       flag_no_output = 1;
-      cpp_opts->inhibit_warnings = 1;
       break;
 
     case OPT_MD:
@@ -312,10 +311,6 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       cpp_opts->warn_endif_labels = value;
       break;
 
-    case OPT_Werror:
-      cpp_opts->warnings_are_errors = value;
-      break;
-
     case OPT_Wimport:
       /* Silently ignore for now.  */
       break;
@@ -325,10 +320,6 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       cpp_opts->warn_invalid_pch = value;
       break;
 #endif
-
-    case OPT_Wsystem_headers:
-      cpp_opts->warn_system_headers = value;
-      break;
 
     case OPT_Wtraditional:
       cpp_opts->warn_traditional = value;
@@ -472,8 +463,6 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
          sdcpp_common_post_options, so that a subsequent -Wno-endif-labels
          is not overridden.  */
     case OPT_pedantic_errors:
-      cpp_opts->pedantic_errors = 1;
-      /* Fall through.  */
     case OPT_pedantic:
       cpp_opts->pedantic = 1;
       cpp_opts->warn_endif_labels = 1;
@@ -512,10 +501,6 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_traditional_cpp:
       cpp_opts->traditional = 1;
-      break;
-
-    case OPT_w:
-      cpp_opts->inhibit_warnings = 1;
       break;
 
     case OPT_v:
@@ -578,10 +563,6 @@ sdcpp_common_post_options (const char **pfilename)
   cb->file_change = cb_file_change;
   cb->dir_change = cb_dir_change;
   cpp_post_options (parse_in);
-
-  /* If an error has occurred in cpplib, note it so we fail
-     immediately.  */
-  errorcount += cpp_errors (parse_in);
 
   *pfilename = this_input_filename
     = cpp_read_main_file (parse_in, in_fnames[0]);
@@ -647,7 +628,7 @@ sdcpp_common_finish (void)
 
   /* For performance, avoid tearing down cpplib's internal structures
      with cpp_destroy ().  */
-  errorcount += cpp_finish (parse_in, deps_stream);
+  cpp_finish (parse_in, deps_stream);
 
   if (deps_stream && deps_stream != out_stream
       && (ferror (deps_stream) || fclose (deps_stream)))

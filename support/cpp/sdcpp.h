@@ -102,6 +102,7 @@ extern void fatal_error (const char *, ...) ATTRIBUTE_PRINTF_1
      ATTRIBUTE_NORETURN;
 extern void inform (const char *, ...) ATTRIBUTE_PRINTF_1;
 
+extern const char *progname;
 extern bool exit_after_options;
 
 extern void print_version (FILE *, const char *);

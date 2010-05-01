@@ -1,3 +1,11 @@
+2010-05-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/C8051F330.h,
+	* device/include/mcs51/C8051F336.h,
+	* device/include/mcs51/C8051F350.h,
+	* device/include/mcs51/C8051F410.h,
+	* device/include/mcs51/C8051T630.h: applied patch 2994867, thanks Steven Borley
+
 2010-04-22 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/libcpp/charset.c, support/cpp/libcpp/directives.c,
@@ -122,7 +130,7 @@
 2010-04-01 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/host/spec.mk.in:
-	  fixed execution of host regression tests on Mac OS X 
+	  fixed execution of host regression tests on Mac OS X
 
 2010-03-28 Borut Razem <borut.razem AT siol.net>
 

@@ -249,7 +249,7 @@ __sbit __at (0xC7) MASTER      ;  /* SMB0CN.7 - SMBUS 0 MASTER/SLAVE INDICATOR  
 __sbit __at (0xC8) T2XCLK      ;  /* TMR2CN.0 - TIMER 2 EXTERNAL CLOCK SELECT      */
 __sbit __at (0xCA) TR2         ;  /* TMR2CN.2 - TIMER 2 ON/OFF CONTROL             */
 __sbit __at (0xCB) T2SPLIT     ;  /* TMR2CN.3 - TIMER 2 SPLIT MODE ENABLE          */
-__sbit __at (0xCD) TF2CEN      ;  /* TMR2CN.5 - TIMER 2 LOW-FREQ OSC CAPTURE ENABLE*/
+__sbit __at (0xCC) TF2CEN      ;  /* TMR2CN.4 - TIMER 2 LOW-FREQ OSC CAPTURE ENABLE*/
 __sbit __at (0xCD) TF2LEN      ;  /* TMR2CN.5 - TIMER 2 LOW BYTE INTERRUPT ENABLE  */
 __sbit __at (0xCE) TF2L        ;  /* TMR2CN.6 - TIMER 2 LOW BYTE OVERFLOW FLAG     */
 __sbit __at (0xCF) TF2         ;  /* TMR2CN.7 - TIMER 2 OVERFLOW FLAG              */

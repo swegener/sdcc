@@ -1,3 +1,9 @@
+2010-05-03 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/Makefile.in, support/cpp/sdcpp-diagnostic.c,
+	  support/cpp/sdcpp.h, support/cpp/sdcpp-opts.c:
+	  added c_cpp_error diagnostic callback function
+
 2010-05-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/C8051F330.h,

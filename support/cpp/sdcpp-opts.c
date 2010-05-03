@@ -171,7 +171,11 @@ defer_opt (enum opt_code code, const char *arg)
 unsigned int
 sdcpp_common_init_options (unsigned int argc, const char **argv ATTRIBUTE_UNUSED)
 {
+  struct cpp_callbacks *cb;
+
   parse_in = cpp_create_reader (CLK_GNUC89, NULL, line_table);
+  cb = cpp_get_callbacks (parse_in);
+  cb->error = c_cpp_error;
 
   cpp_opts = cpp_get_options (parse_in);
   cpp_opts->dollars_in_ident = DOLLARS_IN_IDENTIFIERS;

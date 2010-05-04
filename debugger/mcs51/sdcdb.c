@@ -1214,8 +1214,6 @@ char *completionCmdSource(const char *text, int state)
 // readline completion function for "info" command
 char *completionCmdInfo(const char *text, int state)
 {
-    static char *ptr;
-
     if (state == 0)
     {
         if (completionHelper_GetCurrTokenNumber() != 1)
@@ -1230,8 +1228,6 @@ char *completionCmdInfo(const char *text, int state)
 // readline completion function for "show" command
 char *completionCmdShow(const char *text, int state)
 {
-    static char *ptr;
-
     if (state == 0)
     {
         if (completionHelper_GetCurrTokenNumber() != 1)
@@ -1243,8 +1239,6 @@ char *completionCmdShow(const char *text, int state)
 // readline completion function for "la" command
 char *completionCmdListSymbols(const char *text, int state)
 {
-    static char *ptr;
-
     if (state == 0)
     {
         if (completionHelper_GetCurrTokenNumber() != 1)
@@ -1354,7 +1348,6 @@ char *completionCmdSetUserBp(const char *text, int state)
 
 char *completionCmdSetOption(const char *text, int state)
 {
-    static char *ptr;
     static int currtok;
 
     if (state == 0)
@@ -1391,6 +1384,7 @@ char *completionCmdSetOption(const char *text, int state)
         case 3:
             return completionCompleteFromStrList(text, state, "=\0");
     }
+    return NULL;
 }
 
 // our main readline completion function

@@ -1,3 +1,7 @@
+2010-05-04 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/sdcdb.c: fixed compiler warnings
+
 2010-05-03 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/Makefile.in, support/cpp/sdcpp-diagnostic.c,

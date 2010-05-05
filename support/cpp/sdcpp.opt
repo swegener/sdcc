@@ -125,7 +125,7 @@ SDCPP
 Warn about stray tokens after #elif and #endif
 
 Werror
-SDCPP
+Common
 Treat all warnings as errors
 
 Wfatal-errors
@@ -141,7 +141,7 @@ Deprecated.  This switch has no effect.
 ;***Warn about PCH files that are found but not used
 
 Wsystem-headers
-SDCPP
+Common
 Do not suppress warnings from system headers
 
 Wtraditional
@@ -169,7 +169,7 @@ SDCPP
 A synonym for -std=c89.
 
 d
-SDCPP Joined
+Common SDCPP Joined
 -d<letters>	Enable dumps from specific passes of the compiler
 
 fdollars-in-identifiers
@@ -277,7 +277,7 @@ SDCPP Var(pedantic)
 Issue warnings needed for strict compliance to the standard
 
 pedantic-errors
-SDCPP
+Common SDCPP
 Like -pedantic but issue them as errors
 
 pedantic-parse-number
@@ -325,7 +325,7 @@ Enable verbose output
 ;***Display the compiler's version
 
 w
-SDCPP Var(inhibit_warnings)
+Common Var(inhibit_warnings)
 Suppress warnings
 
 ; This comment is to ensure we retain the blank line above.

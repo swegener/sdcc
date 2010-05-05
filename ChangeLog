@@ -1,3 +1,7 @@
+2010-05-05 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/sdcpp.opt: fixed bug #2996806: Werror broken
+
 2010-05-04 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/sdcdb.c: fixed compiler warnings

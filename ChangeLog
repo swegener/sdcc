@@ -1,3 +1,11 @@
+2010-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_strtok.c: cosmetic changes
+	* sdas/linksrc/aslink.dsp: removed lkgb.c
+	* src/SDCCast.c (gatherImplicitVariables): fixed bug 2956580, const iTemp
+	* src/z80/peeph-gbz80.def (rule 16): fixed non-existent operandsNotSame bug
+	* support/regression/tests/bug2956580.c: new, added
+
 2010-05-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/sdcpp.opt: fixed bug #2996806: Werror broken

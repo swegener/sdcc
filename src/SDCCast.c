@@ -414,7 +414,6 @@ ast * createRMW (ast *target, unsigned op, ast *operand)
     result = newNode(',', tempvar1, result);
 
   return result;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2450,36 +2449,40 @@ gatherImplicitVariables (ast * tree, ast * block)
 
       /* special case for assignment to compiler-generated temporary variable:
          compute type of RHS, and set the symbol's type to match */
-      if (assignee->type == NULL && assignee->infertype) {
-        ast *dtr = decorateType (resolveSymbols(tree->right), RESULT_TYPE_NONE);
+      if (assignee->type == NULL && assignee->infertype)
+        {
+          ast *dtr = decorateType (resolveSymbols (tree->right), RESULT_TYPE_NONE);
 
-        if (dtr != tree->right)
-          tree->right = dtr;
+          if (dtr != tree->right)
+            tree->right = dtr;
 
-        assignee->type = copyLinkChain(TTYPE(dtr));
-        assignee->etype = getSpec(assignee->type);
-        SPEC_SCLS (assignee->etype) = S_AUTO;
-        SPEC_OCLS (assignee->etype) = NULL;
-        SPEC_EXTR (assignee->etype) = 0;
-        SPEC_STAT (assignee->etype) = 0;
-        SPEC_VOLATILE (assignee->etype) = 0;
-        SPEC_ABSA (assignee->etype) = 0;
+          assignee->type = copyLinkChain (TTYPE (dtr));
+          assignee->etype = getSpec (assignee->type);
+          SPEC_SCLS (assignee->etype) = S_AUTO;
+          SPEC_OCLS (assignee->etype) = NULL;
+          SPEC_EXTR (assignee->etype) = 0;
+          SPEC_STAT (assignee->etype) = 0;
+          SPEC_VOLATILE (assignee->etype) = 0;
+          SPEC_ABSA (assignee->etype) = 0;
+          SPEC_CONST (assignee->etype) = 0;
 
-        wassertl (block != NULL, "implicit variable not contained in block");
-        wassert (assignee->next == NULL);
-        if (block != NULL) {
-          symbol **decl = &(block->values.sym);
+          wassertl (block != NULL, "implicit variable not contained in block");
+          wassert (assignee->next == NULL);
+          if (block != NULL)
+            {
+              symbol **decl = &(block->values.sym);
 
-          while (*decl) {
-            wassert (*decl != assignee);  /* should not already be in list */
-            decl = &( (*decl)->next );
-          }
+              while (*decl)
+                {
+                  wassert (*decl != assignee);  /* should not already be in list */
+                  decl = &( (*decl)->next );
+                }
 
-          *decl = assignee;
+              *decl = assignee;
+            }
         }
-      }
     }
-  if (tree->type == EX_VALUE && !(IS_LITERAL(tree->opval.val->etype)) &&
+  if (tree->type == EX_VALUE && !(IS_LITERAL (tree->opval.val->etype)) &&
       tree->opval.val->type == NULL &&
       tree->opval.val->sym &&
       tree->opval.val->sym->infertype)
@@ -4739,10 +4742,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
-      if (!tree->initMode ) {
-        if (IS_CONSTANT(LTYPE(tree)))
-          werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "=");
-      }
+      if (!tree->initMode )
+        {
+          if (IS_CONSTANT(LTYPE(tree)))
+            werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "=");
+        }
       if (LRVAL (tree))
         {
           werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "=");

@@ -35,9 +35,9 @@
 
 char * strtok (
 	char * str,
-	const char * control ) 
+	const char * control )
 {
-	static  char * s;
+	static char * s;
 	register char * s1;
 
 	if ( str )
@@ -51,7 +51,7 @@ char * strtok (
 		else
 			break;
 	}
-	
+
 	s1 = s ;
 
 	while (*s) {
@@ -68,4 +68,4 @@ char * strtok (
 		return s1;
 	else
 		return NULL;
-}  
+}

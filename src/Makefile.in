@@ -17,7 +17,7 @@ PORT_LIBS	= $(PORTS:%=%/port.a)
 
 LIBS		= -lm @LIBS@
 
-#CFLAGS          += -Werror
+CFLAGS          = @CFLAGS@ @WALL_FLAG@
 CPPFLAGS	+= -I$(srcdir)
 LDFLAGS		= @LDFLAGS@
 

@@ -1,3 +1,9 @@
+2010-05-10 Borut Razem <borut.razem AT siol.net>
+
+	* src/Makefile.in: added -Wall
+	* sdas/linksrc/lkarea.c: fixed bug #2999446: ds390 xram limit at 0x400000
+	* asxxsrc/asmain.c: fixed compiler warning
+
 2010-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/cpp/sdcpp.dsp: added sdcpp-diagnostic.c

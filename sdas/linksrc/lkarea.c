@@ -505,59 +505,58 @@ lnkarea()
 	}
 }
 
-/* sdld6808 specific */
+/* sdld specific */
 static
-a_uint find_empty_space(a_uint start, a_uint size, unsigned long *map)
+a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map, unsigned int map_size)
 {
 	int i, j, k;
 	unsigned long mask, b;
 
-	while (1)
-	{
+	while (1) {
 		a_uint a = start;
 		i = start >> 5;
 		j = (start + size) >> 5;
 		mask = -(1 << (start & 0x1F));
 
-		while (i < j)
-		{
-			if (map[i] & mask)
-			{
-				k = 32;
-				for (b=0x80000000; b!=0; b>>=1, k--)
-				{
-					if (map[i] & b)
-					  break;
+		if (j >= map_size) {
+			fprintf(stderr, "xram internal limit is exceeded for %s; xram size = 0x%06X, address = 0x%06X\n", id, map_size << 5, j << 5);
+		}
+		else {
+			while (i < j) {
+				if (map[i] & mask) {
+					k = 32;
+					for (b=0x80000000; b!=0; b>>=1, k--) {
+						if (map[i] & b)
+							break;
+					}
+					start = a + k;
+					break;
 				}
-				start = a + k;
-				break;
+				i++;
+				mask = 0xFFFFFFFF;
+				a += 32;
 			}
-			i++;
-			mask = 0xFFFFFFFF;
-			a += 32;
-		}
-		if (start > a)
-		  continue;
+			if (start > a)
+				continue;
 
-		mask &= (1 << ((start + size) & 0x1F)) - 1;
-		if (map[i] & mask)
-		{
-			k = 32;
-			for (b=0x80000000; b!=0; b>>=1, k--)
-			{
-				if (map[i] & b)
-				  break;
+			mask &= (1 << ((start + size) & 0x1F)) - 1;
+			if (map[i] & mask) {
+				k = 32;
+				for (b=0x80000000; b!=0; b>>=1, k--) {
+					if (map[i] & b)
+						break;
+				}
+				start = (a & ~0x1F) + k;
 			}
-			start = (a & ~0x1F) + k;
+			if (start <= a)
+				break;
 		}
-		if (start <= a)
-		  break;
 	}
 	return start;
 }
 
 static
-a_uint allocate_space(a_uint start, a_uint size, char* id, unsigned long *map)
+a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  unsigned int map_size)
 {
 	int i, j;
 	unsigned long mask;
@@ -566,25 +565,27 @@ a_uint allocate_space(a_uint start, a_uint size, char* id, unsigned long *map)
 	j = (start + size) >> 5;
 	mask = -(1 << (start & 0x1F));
 
-	while (i < j)
-	{
-		if (map[i] & mask)
-		{
+	if (j >= map_size) {
+		fprintf(stderr, "xram internal limit is exceeded for %s; xram size = 0x%06X, address = 0x%06X\n", id, map_size << 5, j << 5);
+	}
+	else {
+		while (i < j) {
+			if (map[i] & mask) {
+				fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+			}
+			map[i++] |= mask;
+			mask = 0xFFFFFFFF;
+			a += 32;
+		}
+		mask &= (1 << ((start + size) & 0x1F)) - 1;
+		if (map[i] & mask) {
 			fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
 		}
-		map[i++] |= mask;
-		mask = 0xFFFFFFFF;
-		a += 32;
+		map[i] |= mask;
 	}
-	mask &= (1 << ((start + size) & 0x1F)) - 1;
-	if (map[i] & mask)
-	{
-		fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
-	}
-	map[i] |= mask;
 	return start;
 }
-/* end sdld6808 specific */
+/* end sdld specific */
 
 /*)Function VOID	lnksect()
  *
@@ -643,7 +644,7 @@ lnksect(struct area *tap)
 		 * Absolute sections
 		 */
 		while (taxp) {
-			allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap6808);
+			allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
 			taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
 			size += taxp->a_size;
 			taxp = taxp->a_axp;
@@ -653,13 +654,13 @@ lnksect(struct area *tap)
 		 * Concatenated sections
 		 */
 		if (TARGET_IS_6808 && tap->a_size) {
-			addr = find_empty_space(addr, tap->a_size, codemap6808);
+			addr = find_empty_space(addr, tap->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
 		}
 		while (taxp) {
 			/* find next unused address now */
 			if (TARGET_IS_6808 && taxp->a_size) {
-				addr = find_empty_space(addr, taxp->a_size, codemap6808);
-				allocate_space(addr, taxp->a_size, tap->a_id, codemap6808);
+				addr = find_empty_space(addr, taxp->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
+				allocate_space(addr, taxp->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
 			}
 			taxp->a_addr = addr;
 			addr += taxp->a_size;
@@ -688,7 +689,7 @@ lnksect(struct area *tap)
 /* sdld specific */
 a_uint lnksect2 (struct area *tap, int locIndex);
 unsigned long codemap8051[524288];
-unsigned long xdatamap[131072];
+unsigned long xdatamap[131216];
 struct area *dseg_ap = NULL;
 a_uint dram_start = 0;
 a_uint iram_start = 0;
@@ -1081,11 +1082,11 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 			}
 			else if (locIndex == 1)
 			{
-				allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap8051);
+				allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
 			}
 			else if (locIndex == 2)
 			{
-				allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, xdatamap);
+				allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
 			}
 			taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
 			size += taxp->a_size;
@@ -1096,11 +1097,11 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 	{
 		if ((locIndex == 1) && tap->a_size)
 		{
-			addr = find_empty_space(addr, tap->a_size, codemap8051);
+			addr = find_empty_space(addr, tap->a_size, tap->a_id, codemap8051, sizeof (codemap6808));
 		}
 		if ((locIndex == 2) && tap->a_size)
 		{
-			addr = find_empty_space(addr, tap->a_size, xdatamap);
+			addr = find_empty_space(addr, tap->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
 		}
 		while (taxp)
 		{
@@ -1182,13 +1183,13 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 				//find next unused address now
 				if ((locIndex == 1) && taxp->a_size)
 				{
-					addr = find_empty_space(addr, taxp->a_size, codemap8051);
-					allocate_space(addr, taxp->a_size, tap->a_id, codemap8051);
+					addr = find_empty_space(addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
+					allocate_space(addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
 				}
 				if ((locIndex == 2) && taxp->a_size)
 				{
-					addr = find_empty_space(addr, taxp->a_size, xdatamap);
-					allocate_space(addr, taxp->a_size, tap->a_id, xdatamap);
+					addr = find_empty_space(addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
+					allocate_space(addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
 				}
 				taxp->a_addr = addr;
 				addr += taxp->a_size;

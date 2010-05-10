@@ -91,17 +91,15 @@ search_path_fopen(const char *filename, const char *mode)
 	fp = fopen(filename, mode);
 	if (fp != NULL || filename[0] == '/' || filename[0] == '\\')
 		return fp;
-	for (j = 0; j < search_path_length; ++j)
-	{
+	for (j = 0; j < search_path_length; ++j) {
 		char path[2000];
 
 		strncpy(path, search_path[j], sizeof(path));
 		if ((path[strlen(path) - 1] != '/') &&
-			(path[strlen(path) - 1] != DIR_SEPARATOR_CHAR))
-		{
-			strncat(path, DIR_SEPARATOR_STRING, sizeof(path));
+			(path[strlen(path) - 1] != DIR_SEPARATOR_CHAR)) {
+			strncat(path, DIR_SEPARATOR_STRING, sizeof(path) - strlen(path));
 		}
-		strncat(path, filename, sizeof(path));
+		strncat(path, filename, sizeof(path) - strlen(path));
 		fp = fopen(path, mode);
 		if (fp != NULL)
 			return fp;

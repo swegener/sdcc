@@ -1,3 +1,7 @@
+2010-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/cpp/sdcpp.dsp: added sdcpp-diagnostic.c
+
 2010-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_strtok.c: cosmetic changes

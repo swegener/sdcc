@@ -253,6 +253,10 @@ SOURCE=.\prefix.c
 # End Source File
 # Begin Source File
 
+SOURCE=".\sdcpp-diagnostic.c"
+# End Source File
+# Begin Source File
+
 SOURCE=".\sdcpp-opts.c"
 # End Source File
 # Begin Source File

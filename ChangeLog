@@ -1,3 +1,7 @@
+2010-05-13 Borut Razem <borut.razem AT siol.net>
+
+	* sdas/asxxsrc/asmain.c: fixed bug #2914707: as-z80 segmentation fault
+
 2010-05-10 Borut Razem <borut.razem AT siol.net>
 
 	* src/Makefile.in: added -Wall

@@ -752,16 +752,17 @@ loop:
 			outall();
 			if (e1.e_flag || e1.e_base.e_ap != dot.s_area)
 				err('.');
-		} else
-		if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
-			err('m');
-		}
-		sp->s_type = S_USER;
-		sp->s_area = e1.e_base.e_ap;
-		sp->s_addr = laddr = e1.e_addr;
-		sp->s_flag |= S_ASG;
-		if (c) {
-			sp->s_flag |= S_GBL;
+		} else {
+			if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
+				err('m');
+			}
+			sp->s_type = S_USER;
+			sp->s_area = e1.e_base.e_ap;
+			sp->s_addr = laddr = e1.e_addr;
+			sp->s_flag |= S_ASG;
+			if (c) {
+				sp->s_flag |= S_GBL;
+			}
 		}
 		lmode = ELIST;
 		goto loop;

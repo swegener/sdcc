@@ -750,20 +750,25 @@ loop:
 		sp = lookup(id);
 		if (sp == &dot) {
 			outall();
-			if (e1.e_flag || e1.e_base.e_ap != dot.s_area)
+			if (e1.e_flag || e1.e_base.e_ap != dot.s_area) {
 				err('.');
+			} else {
+				sp->s_area = e1.e_base.e_ap;
+				sp->s_addr = laddr = e1.e_addr;
+			}
 		} else {
 			if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
 				err('m');
 			}
-			sp->s_type = S_USER;
 			sp->s_area = e1.e_base.e_ap;
-			sp->s_addr = laddr = e1.e_addr;
-			sp->s_flag |= S_ASG;
-			if (c) {
-				sp->s_flag |= S_GBL;
-			}
+			sp->s_addr = e1.e_addr;
 		}
+		sp->s_type = S_USER;
+		sp->s_flag |= S_ASG;
+		if (c) {
+			sp->s_flag |= S_GBL;
+		}
+		laddr = sp->s_addr;
 		lmode = ELIST;
 		goto loop;
 	}

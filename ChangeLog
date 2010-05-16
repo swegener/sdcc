@@ -1,3 +1,8 @@
+2010-05-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Minor peephole improvements.
+
 2010-05-13 Borut Razem <borut.razem AT siol.net>
 
 	* sdas/asxxsrc/asmain.c: fixed bug #2914707: as-z80 segmentation fault

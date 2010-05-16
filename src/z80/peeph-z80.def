@@ -1368,7 +1368,17 @@ replace restart {
 	inc	bc
 } by {
 	ld	bc,#%1 + %2+1
-	; peephole 62 moved increment of bc to constant.
+	; peephole 60 moved increment of bc to constant.
+}
+
+replace restart {
+	ld	hl,#%1
+	add	hl,%2
+	inc	hl
+} by {
+	ld	hl,#%1+1
+	add	hl,%2
+	; peephole 62 moved increment of hl to constant.
 }
 
 replace restart {
@@ -2034,6 +2044,18 @@ replace restart {
 	sbc	a,%1
 	jp	M,%2
 	; peephole z10e' used sign flag instead of testing bit 7.
+}
+
+replace restart {
+	ld	%1,a
+	or	a,a
+	jp	%3,%4
+	ld	a,%1
+} by {
+	ld	%1,a
+	or	a,a
+	jp	%3,%4
+	; peephole z10f used value still in a instead of reloading from %1.
 }
 
 replace restart {

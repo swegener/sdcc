@@ -1,5 +1,10 @@
 2010-05-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/main.c:
+	  A tiny step toward implementing #1921061.
+
+2010-05-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peeph-z80.def:
 	  Minor peephole improvements.
 

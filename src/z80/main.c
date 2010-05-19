@@ -143,6 +143,10 @@ _reg_parm (sym_link * l, bool reentrant)
     }
   else
     {
+      if (!IS_REGISTER(l) || getSize(l) > 2)
+        {
+          return FALSE;
+        }
       if (_G.regParams == 2)
         {
           return FALSE;

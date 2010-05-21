@@ -1,3 +1,9 @@
+2010-05-21 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCopt.c,
+	  src/z80/gen.c,
+	  support/regression/tests/memory.c:
+	  Fixed bug #2995398.
+
 2010-05-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c:

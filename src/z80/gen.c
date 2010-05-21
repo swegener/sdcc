@@ -8194,7 +8194,7 @@ _swap (PAIR_ID one, PAIR_ID two)
     }
 }
 
-static void
+static int
 setupForMemcpy (iCode *ic, int nparams, operand **pparams)
 {
   PAIR_ID ids[NUM_PAIRS][NUM_PAIRS];
@@ -8213,6 +8213,12 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
       ids[dest[i]][getPairId (AOP (pparams[i]))] = TRUE;
     }
 
+  wassertl (AOP_TYPE (pparams[2]) == AOP_LIT, "Last parameter to builtin memcpy() must be literal.");
+
+  /* Check for zero length copy. */
+  if (!((unsigned int) ulFromVal (AOP (pparams[2])->aopu.aop_lit)))
+    return (0);
+
   /* Count the number of unity or iTemp assigns. */
   for (i = 0; i < 3; i++)
     {
@@ -8221,6 +8227,9 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
           nunity++;
         }
     }
+
+  /* The last parameter is a literal. */
+  wassert (nunity);
 
   if (nunity == 3)
     {
@@ -8298,23 +8307,7 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
             fetchPair (dest_pairs[0], AOP (pparams[i_pairs[0]]));
           }
     }
-  else
-    {
-      int next = getPairId (AOP (pparams[0]));
-      emit2 ("push %s", _pairs[next].name);
 
-      if (next == dest[1])
-        {
-          fetchPair (dest[1], AOP (pparams[1]));
-          fetchPair (dest[2], AOP (pparams[2]));
-        }
-      else
-        {
-          fetchPair (dest[2], AOP (pparams[2]));
-          fetchPair (dest[1], AOP (pparams[1]));
-        }
-      emit2 ("pop %s", _pairs[dest[0]].name);
-    }
  done:
   /* Finally pull out all of the iTemps */
   for (i = 0; i < 3; i++)
@@ -8324,6 +8317,7 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
           fetchPair (dest[i], AOP (pparams[i]));
         }
     }
+  return (1);
 }
 
 static void
@@ -8338,29 +8332,18 @@ genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 
   _saveRegsForCall (ic, 0);
 
-  setupForMemcpy (ic, nParams, pparams);
-
-  emit2 ("ldir");
+  if (setupForMemcpy (ic, nParams, pparams))
+    emit2 ("ldir");
 
   freeAsmop (count, NULL, ic->next->next);
+  freeAsmop (to, NULL, ic->next);
   freeAsmop (from, NULL, ic);
 
   spillPair (PAIR_HL);
 
-  _restoreRegsAfterCall();
+  _restoreRegsAfterCall ();
 
-  /* if we need assign a result value */
-  if ((IS_ITEMP (IC_RESULT (ic)) &&
-       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-        OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
-      IS_TRUE_SYMOP (IC_RESULT (ic)))
-    {
-      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-      movLeft2ResultLong (to, 0, IC_RESULT (ic), 0, 0, 2);
-      freeAsmop (IC_RESULT (ic), NULL, ic);
-    }
-
-  freeAsmop (to, NULL, ic->next);
+  /* No need to assign result - would have used ordinary memcpy() call instead. */
 }
 
 /*-----------------------------------------------------------------*/
@@ -8380,7 +8363,7 @@ static void genBuiltIn (iCode *ic)
     /* which function is it */
     bif = OP_SYMBOL(IC_LEFT(bi_iCode));
 
-    if (strcmp(bif->name,"__builtin_memcpy")==0)
+    if (!strcmp(bif->name, "__builtin_memcpy"))
       {
         genBuiltInMemcpy(bi_iCode, nbi_parms, bi_parms);
       }

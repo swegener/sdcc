@@ -827,6 +827,58 @@ found:
 }
 
 /*-----------------------------------------------------------------*/
+/* convertbuiltin - maybe convert some builtins back               */
+/*-----------------------------------------------------------------*/
+static void
+convbuiltin (iCode *const ic, eBBlock * ebp)
+{
+  sym_link *ftype;
+  symbol *bif;
+
+  iCode *icc = ic;
+  iCode *lastparam = ic;
+  while (icc->op != CALL)
+    {
+      if (icc->op != SEND || !icc->builtinSEND)
+        return;
+      lastparam = icc;
+      icc = icc->next;
+    }
+
+  if (!IS_SYMOP (IC_LEFT(icc)))
+    return;
+
+  ftype = operandType (IC_LEFT(icc));
+  if (!IFFUNC_ISBUILTIN (ftype))
+    return;
+
+  bif = OP_SYMBOL (IC_LEFT (icc));
+
+  /* Now we can be sure to have found a builtin function. */
+
+  if (TARGET_IS_Z80 && !strcmp (bif->name, "__builtin_memcpy"))
+    {
+      /* Replace iff return value is used or last parameter is not an integer constant. */
+      if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && IS_OP_LITERAL (IC_LEFT (lastparam)))
+        return;
+      
+      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, "_memcpy");
+    }
+  else
+    return;
+
+  /* Convert parameter passings. */
+  icc = ic;
+  while (icc->op != CALL)
+    {
+      icc->builtinSEND = 0;
+      icc->op = IPUSH;
+      icc->parmPush = 1;
+      icc = icc->next;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* convertToFcall - converts some operations to fcalls             */
 /*-----------------------------------------------------------------*/
 static void
@@ -929,6 +981,10 @@ convertToFcall (eBBlock ** ebbs, int count)
                 {
                   convilong (ic, ebbs[i]);
                 }
+            }
+          if (ic->op == SEND && ic->builtinSEND)
+            {
+              convbuiltin(ic, ebbs[i]);
             }
         }
     }

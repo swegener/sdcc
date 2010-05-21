@@ -7855,6 +7855,8 @@ genXor (iCode * ic, iCode * ifx)
             }
           else if (ifx)
             jmpTrueOrFalse (ifx, tlbl, left, right, result);
+          else              
+            emitLabel (tlbl);
         }
       else
         {

@@ -5333,7 +5333,8 @@ genXor (iCode * ic, iCode * ifx)
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl;
-      wassertl (ifx, "AOP_CPY result without ifx");
+      // this can just happen, if ifx has been optimized away
+      // wassertl (ifx, "AOP_CPY result without ifx");
 
       tlbl = newiTempLabel (NULL);
       size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
@@ -5351,8 +5352,14 @@ genXor (iCode * ic, iCode * ifx)
             emitBranch ("bne", tlbl);
           else
             {
+              /*
+               * I think this is all broken here, (see simulation mismatch in bug1875933.c)
+               *   multiple calls to emitLabel() ?!
+               * and we can't genIfxJump, if there is none
+               */
               emitLabel (tlbl);
-              genIfxJump (ifx, "a");
+              if(ifx)
+                genIfxJump (ifx, "a");
             }
           offset++;
         }

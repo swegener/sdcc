@@ -5837,14 +5837,15 @@ genXor (iCode * ic, iCode * ifx)
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
           emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
-          emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+          if (ifx)      /* emit jmp only, if it is actually used * */
+            emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
           offset++;
         }
       if (ifx)
         {
           jmpTrueOrFalse (ifx, tlbl);
         }
-      else
+      else if(size)
         {
           wassertl (0, "Result of XOR was destined for a bit");
         }

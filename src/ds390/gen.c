@@ -8373,6 +8373,8 @@ genXor (iCode * ic, iCode * ifx)
             }
           else if (ifx)
             jmpTrueOrFalse (ifx, tlbl);
+          else                  // need a target here
+            emitLabel (tlbl);
         }
       else
         {

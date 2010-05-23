@@ -1254,40 +1254,63 @@ parameter_list
    ;
 
 parameter_declaration
-   : type_specifier_list declarator
-               {
-                  symbol *loop ;
-                  pointerTypes($2->type,$1);
-                  addDecl ($2,0,$1);
-                  for (loop=$2;loop;loop->_isparm=1,loop=loop->next);
-                  addSymChain (&$2);
-                  $$ = symbolVal($2);
-                  ignoreTypedefType = 0;
-               }
-   | type_name {
-                  $$ = newValue() ;
-                  $$->type = $1;
-                  $$->etype = getSpec($$->type);
-                  ignoreTypedefType = 0;
-               }
+   : declaration_specifiers declarator
+        {
+          symbol *loop;
+
+          if (!IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
+            {
+              werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, $2->name);
+            }
+          pointerTypes ($2->type, $1);
+          addDecl ($2, 0, $1);
+          for (loop = $2; loop; loop->_isparm = 1, loop = loop->next)
+            ;
+          addSymChain (&$2);
+          $$ = symbolVal ($2);
+          ignoreTypedefType = 0;
+        }
+   | type_name
+        {
+          $$ = newValue ();
+          $$->type = $1;
+          $$->etype = getSpec ($$->type);
+          ignoreTypedefType = 0;
+         }
    ;
 
 type_name
-   : type_specifier_list  { $$ = $1; ignoreTypedefType = 0;}
-   | type_specifier_list abstract_declarator
-               {
-                 /* go to the end of the list */
-                 sym_link *p;
-                 pointerTypes($2,$1);
-                 for ( p = $2 ; p && p->next ; p=p->next);
-                 if (!p) {
-                   werror(E_SYNTAX_ERROR, yytext);
-                 } else {
-                   p->next = $1 ;
-                 }
-                 $$ = $2 ;
-                 ignoreTypedefType = 0;
-               }
+   : declaration_specifiers
+        {
+          if (!IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
+            {
+              werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, "type name");
+            }
+          $$ = $1; ignoreTypedefType = 0;
+        }
+   | declaration_specifiers abstract_declarator
+        {
+          /* go to the end of the list */
+          sym_link *p;
+
+          if (!IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
+            {
+              werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, "type name");
+            }
+          pointerTypes ($2,$1);
+          for (p = $2; p && p->next; p = p->next)
+            ;
+          if (!p)
+            {
+              werror(E_SYNTAX_ERROR, yytext);
+            }
+          else
+            {
+              p->next = $1 ;
+            }
+          $$ = $2 ;
+          ignoreTypedefType = 0;
+        }
    ;
 
 abstract_declarator

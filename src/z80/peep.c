@@ -407,10 +407,17 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
       /* don't optimize across inline assembler,
          e.g. isLabel doesn't work there */
       if ((*pl)->isInline)
-        return S4O_ABORT;
+        {
+          D(("S4O_RD_OP: Inline asm\n"));
+          return S4O_ABORT;
+        }
 
       if ((*pl)->visited)
-        return S4O_VISITED;
+        {
+          D(("S4O_VISITED\n"));
+          return S4O_VISITED;
+        }
+
       (*pl)->visited = TRUE;
 
       if(z80MightRead(*pl, what))

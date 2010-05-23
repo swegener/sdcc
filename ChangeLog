@@ -1,3 +1,9 @@
+2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c,
+	  src/z80/peeph-z80.def:
+	  Minor peephole improvements.
+
 2010-05-23 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/SDCCsymt.h, src/SDCC.y:
@@ -5,6 +11,7 @@
 	  specifier in func
 
 2010-05-21 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/mcs51/gen.c,
 	  src/z80/gen.c,
 	  src/hc08/gen.c,
@@ -13,6 +20,7 @@
 	  Completed fix for #1875933 applying #2892763.
 
 2010-05-21 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCopt.c,
 	  src/z80/gen.c,
 	  support/regression/tests/memory.c:

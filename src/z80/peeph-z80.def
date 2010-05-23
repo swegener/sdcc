@@ -20,24 +20,24 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 replace restart {
-	ld	%1,%1
+	ld	%1, %1
 } by {
 	; peephole -1 removed redundant load.
 } if notVolatile(%1)
 
 replace restart {
-	ld	%1,%2
+	ld	%1, %2
 } by {
 	; peephole 0a removed dead load from %2 into %1.
 } if notVolatile(%1), notUsed(%1)
 // Should probably check for notVolatile(%2), too, but gives many false positives and no regression tests fail.
 
 replace restart {
-	ld	%1,%2
-	ld	a,%1
+	ld	%1, %2
+	ld	a, %1
 } by {
 	; peephole 0b loaded %2 into a directly instead of going through %1.
-	ld	a,%2
+	ld	a, %2
 } if notVolatile(%1), notUsed(%1)
 
 replace restart {
@@ -165,17 +165,29 @@ replace restart {
 } if notUsed('a'), notUsed('hl')
 
 replace restart {
+	ld	c,l
+	ld	b,h
+	ld	a,#%1
+	ld	(bc),a
+} by {
+	ld	c,l
+	ld	b,h
+	ld	(hl),#%1
+	; peephole 0j' loaded #%1 into (hl) instead of (bc).
+}
+
+replace restart {
 	ld	de,#%2 + %3
 	ld	a,(de)
 	ld	e,a
 } by {
-	; peephole 0j' used hl for #%2 + %3 instead of de, not going through a.
+	; peephole 0j'' used hl for #%2 + %3 instead of de, not going through a.
 	ld	hl,#%2 + %3
 	ld	e,(hl)
-} if notUsed('a'), notUsed('hl')
+} if notUsed('a'), notUsed('hl'), notUsed('d')
 
 replace restart {
-	ex	de,hl
+	ex	de, hl
 	push	hl
 } by {
 	; peephole 0k pushed de directly instead of going through hl.
@@ -183,7 +195,7 @@ replace restart {
 } if notUsed('de'), notUsed('hl')
 
 replace restart {
-	ex	de,hl
+	ex	de, hl
 	push	de
 } by {
 	; peephole 0k' pushed hl directly instead of going through de.
@@ -201,7 +213,7 @@ replace restart {
 } if notUsed('hl'), notUsed('e')
 
 replace restart {
-	ex	de,hl
+	ex	de, hl
 	push	bc
 	push	de
 } by {
@@ -434,8 +446,8 @@ replace restart {
 } if notUsed('a'), notUsed('hl')
 
 replace restart {
-	ld	c,l
-	ld	b,h
+	ld	c, l
+	ld	b, h
 	push	bc
 } by {
 	; peephole 0zb pushed hl instead of bc.
@@ -1047,6 +1059,34 @@ replace restart {
 }
 
 replace restart {
+	ld	a, l
+	add	a, #0x%1
+	ld	l, a
+	ld	a, h
+	adc	a, #0x%2
+	ld	h, a
+} by {
+	ld	de, #0x%2%1
+	add	hl, de
+	; peephole 41a used 16-bit addition.
+	ld	a, h
+} if notUsed('de')
+
+replace restart {
+	ld	a, l
+	add	a, #0x%1
+	ld	l, a
+	ld	a, h
+	adc	a, #0x%2
+	ld	h, a
+} by {
+	ld	bc, #0x%2%1
+	add	hl, bc
+	; peephole 41b used 16-bit addition.
+	ld	a, h
+} if notUsed('bc')
+
+replace restart {
 	ld	%1,a
 	ld	a,%2
 	add	a,%1
@@ -1382,6 +1422,16 @@ replace restart {
 }
 
 replace restart {
+	ld	%1,#%2
+	add	hl,%1
+	inc	hl
+} by {
+	ld	%1,#%2+1
+	add	hl,%1
+	; peephole 62a moved increment of hl to constant.
+} if notUsed(%1)
+
+replace restart {
 	ld	bc,#%1
 	ld	a,c
 	add	a,#0x%2
@@ -1561,6 +1611,15 @@ replace restart {
 } if notUsed('de')
 
 replace restart {
+	ex	de, hl
+	push	bc
+	ex	de, hl
+} by {
+	push	bc
+	; peephole 78b canceled subsequent ex de, hl.
+}
+
+replace restart {
 	ld	hl, #%1
 	add	hl, %2
 	ex	de, hl
@@ -1571,6 +1630,17 @@ replace restart {
 	add	hl, %2
 	ex	de, hl
 } if notUsed('hl')
+
+replace restart {
+	ld	e,%1 (ix)
+	ld	d,%2 (ix)
+	ld	l,e
+	ld	h,d
+} by {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	; peephole 79a loaded hl from %1 (ix), %2 (ix) directly instead of going through de.
+} if notUsed('de')
 
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 replace restart {

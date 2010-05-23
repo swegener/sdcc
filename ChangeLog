@@ -1,4 +1,8 @@
 2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
+	* support/regression/tests/bug1875933.c:
+	  Disabled recently introduced regression test on hc08, since it never workes there.
+
+2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,
 	  src/z80/peeph-z80.def:

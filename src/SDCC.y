@@ -1258,10 +1258,12 @@ parameter_declaration
         {
           symbol *loop;
 
+          /* TODO: doesn't work fot typedefs!?
           if (!IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
               werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, $2->name);
             }
+          */
           pointerTypes ($2->type, $1);
           addDecl ($2, 0, $1);
           for (loop = $2; loop; loop->_isparm = 1, loop = loop->next)
@@ -1282,10 +1284,12 @@ parameter_declaration
 type_name
    : declaration_specifiers
         {
+          /* TODO: doesn't work fot typedefs!?
           if (!IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
               werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, "type name");
             }
+          */
           $$ = $1; ignoreTypedefType = 0;
         }
    | declaration_specifiers abstract_declarator
@@ -1293,10 +1297,12 @@ type_name
           /* go to the end of the list */
           sym_link *p;
 
+          /* TODO: doesn't work fot typedefs!?
           if (!IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
               werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, "type name");
             }
+          */
           pointerTypes ($2,$1);
           for (p = $2; p && p->next; p = p->next)
             ;

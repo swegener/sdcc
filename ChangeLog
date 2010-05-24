@@ -2,6 +2,8 @@
 
 	* src/SDCC.y, src/SDCCsymt.h: test if the parameter is a valid storage
 	  class specifier
+	* src/hc08/gen.c, support/regression/tests/bug1875933.c:
+	  fixed bug #3006063: xor broken
 
 2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
 	* support/regression/tests/bug1875933.c:

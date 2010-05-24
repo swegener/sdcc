@@ -5341,12 +5341,19 @@ genXor (iCode * ic, iCode * ifx)
       offset = 0;
       while (size--)
         {
+          bool doTsta = FALSE;
           loadRegFromAop (hc08_reg_a, AOP (left), offset);
-          if ((AOP_TYPE (right) == AOP_LIT)
-              && (((lit >> (offset*8)) & 0xff) == 0))
-            emitcode ("tsta","");
+          if (AOP_TYPE (right) == AOP_LIT)
+            {
+              lit = ulFromVal (AOP (right)->aopu.aop_lit);
+              if (((lit >> (offset * 8)) & 0xff) == 0)
+                doTsta = TRUE;
+            }
+          if (doTsta)
+            emitcode ("tsta", "");
           else
             accopWithAop ("eor", AOP (right), offset);
+
           hc08_freeReg( hc08_reg_a);
           if (size)
             emitBranch ("bne", tlbl);
@@ -5364,9 +5371,6 @@ genXor (iCode * ic, iCode * ifx)
           offset++;
         }
     }
-
-  if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
   offset = 0;

@@ -517,11 +517,11 @@ extern sym_link *validateLink(sym_link  *l,
 #define IS_FIXED(x)      (IS_FIXED16X16(x))
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x) || IS_FIXED(x))
 #define IS_AGGREGATE(x)  (IS_ARRAY(x) || IS_STRUCT(x))
-#define IS_LITERAL(x)    (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
-#define IS_CODE(x)       (IS_SPEC(x)  && SPEC_SCLS(x) == S_CODE)
+#define IS_LITERAL(x)    (IS_SPEC(x) && x->select.s.sclass == S_LITERAL)
+#define IS_CODE(x)       (IS_SPEC(x) && SPEC_SCLS(x) == S_CODE)
 #define IS_REGPARM(x)    (IS_SPEC(x) && SPEC_REGPARM(x))
 
-#define IS_VALID_PARAMETER_STORAGE_CLASS_SPEC(x)    (IS_SPEC(x) && (!SPEC_TYPEDEF(x) && !SPEC_EXTR(x) && !SPEC_STAT(x) && SPEC_SCLS(x) != S_AUTO))
+#define IS_VALID_PARAMETER_STORAGE_CLASS_SPEC(x)    (!SPEC_TYPEDEF(x) && !SPEC_EXTR(x) && !SPEC_STAT(x) && SPEC_SCLS(x) != S_AUTO)
 
 /* symbol check macros */
 #define IS_AUTO(x)       (x->level && !IS_STATIC(x->etype) && !IS_EXTERN(x->etype))

@@ -1,3 +1,8 @@
+2010-05-24 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.y, src/SDCCsymt.h: test if the parameter is a valid storage
+	  class specifier
+
 2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
 	* support/regression/tests/bug1875933.c:
 	  Disabled recently introduced regression test on hc08, since it never workes there.

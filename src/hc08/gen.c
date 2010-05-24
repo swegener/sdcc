@@ -5296,7 +5296,6 @@ genXor (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
 
   D(emitcode (";     genXor",""));
 
@@ -5341,20 +5340,13 @@ genXor (iCode * ic, iCode * ifx)
       offset = 0;
       while (size--)
         {
-          bool doTsta = FALSE;
           loadRegFromAop (hc08_reg_a, AOP (left), offset);
-          if (AOP_TYPE (right) == AOP_LIT)
-            {
-              lit = ulFromVal (AOP (right)->aopu.aop_lit);
-              if (((lit >> (offset * 8)) & 0xff) == 0)
-                doTsta = TRUE;
-            }
-          if (doTsta)
+          if (AOP_TYPE (right) == AOP_LIT && ((ulFromVal (AOP (right)->aopu.aop_lit) >> (offset * 8)) & 0xff) == 0)
             emitcode ("tsta", "");
           else
             accopWithAop ("eor", AOP (right), offset);
 
-          hc08_freeReg( hc08_reg_a);
+          hc08_freeReg (hc08_reg_a);
           if (size)
             emitBranch ("bne", tlbl);
           else
@@ -5379,7 +5371,7 @@ genXor (iCode * ic, iCode * ifx)
       loadRegFromAop (hc08_reg_a, AOP (left), offset);
       accopWithAop ("eor", AOP (right), offset);
       storeRegToAop (hc08_reg_a, AOP (result), offset++);
-      hc08_freeReg( hc08_reg_a);
+      hc08_freeReg (hc08_reg_a);
     }
 
 //release:

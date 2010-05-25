@@ -1,4 +1,5 @@
 2010-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCcse.c:
 	  Simplified division optimization.
 	* src/z80/gen.c:
@@ -16,7 +17,7 @@
 
 2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
 	* support/regression/tests/bug1875933.c:
-	  Disabled recently introduced regression test on hc08, since it never workes there.
+	  Disabled recently introduced regression test on hc08, since it never worked there.
 
 2010-05-23 Philipp Klaus Krause <pkk AT spth.de>
 

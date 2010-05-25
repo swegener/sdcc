@@ -1076,9 +1076,8 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           return;
         }
       /* if this is a division then check if left is zero */
-      /* and right is not then change it to an assignment */
-      if (IS_OP_LITERAL (IC_LEFT (ic)) && IS_OP_LITERAL (IC_RIGHT (ic)) &&
-          (operandLitValue (IC_LEFT (ic)) == 0.0) && (operandLitValue (IC_RIGHT (ic)) != 0.0))
+      /* then change it to an assignment */
+      if (IS_OP_LITERAL (IC_LEFT (ic)) &&  (operandLitValue (IC_LEFT (ic)) == 0.0))
         {
           ic->op = '=';
           IC_RIGHT (ic) = IC_LEFT (ic);
@@ -2396,3 +2395,4 @@ cseAllBlocks (ebbIndex * ebbi, int computeOnly)
 
   return change;
 }
+

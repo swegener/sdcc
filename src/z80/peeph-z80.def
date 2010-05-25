@@ -1698,6 +1698,16 @@ replace restart {
 }
 
 replace restart {
+	ld	%1,a
+	xor	a,a
+	sbc	a,%1
+} by {
+	ld	%1,a
+	neg
+	; peephole 84a used neg for negation.
+} if notVolatile(%1)
+
+replace restart {
 	and	a,#0x01
 	xor	a,#0x01
 	jp	NZ,%1
@@ -1890,11 +1900,19 @@ replace restart {
 
 replace restart {
 	pop	af
+	push	hl
+} by {
+	; peephole 92 used ex to move hl onto the stack.
+	ex	(sp),hl
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	pop	af
 	ld	hl,#%1
 	push	hl
 } by {
 	ld	hl,#%1
-	; peephole 92 used ex to move #%1 onto the stack.
+	; peephole 92a used ex to move #%1 onto the stack.
 	ex	(sp),hl
 } if notUsed('a'), notUsed('hl')
 

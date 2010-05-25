@@ -7106,7 +7106,7 @@ genPackBits (sym_link * etype,
   int extraPair;        /* a tempory register */
   bool needPopExtra=0;  /* need to restore original value of temp reg */
 
-  emitDebug (";     genPackBits","");
+  emitDebug ("; genPackBits","");
 
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);

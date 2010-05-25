@@ -252,6 +252,9 @@ z80MightRead(const lineNode *pl, const char *what)
       return FALSE;
     }
 
+  if(strncmp(pl->line, "neg", 3) == 0 )
+    return(strcmp(what, "a") == 0);
+
   if(strncmp(pl->line, "pop\t", 4) == 0)
     return FALSE;
 

@@ -1,3 +1,12 @@
+2010-05-25 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCcse.c:
+	  Simplified division optimization.
+	* src/z80/gen.c:
+	  Fixed comment alignment.
+	* src/z80/peep.c,
+	  src/z80/peeph-z80.def:
+	  Peephole improvements, mostly negation.
+
 2010-05-24 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y, src/SDCCsymt.h: test if the parameter is a valid storage

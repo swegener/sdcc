@@ -566,6 +566,14 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
+	ld	a,d
+	bit	%1,a
+} by {
+	; peephole 0zj'' tested bit %1 of d directly instead of going through a.
+	bit	%1,d
+} if notUsed('a')
+
+replace restart {
 	ld	bc, #%1 + %2
 	ld	l,c
 	ld	h,b

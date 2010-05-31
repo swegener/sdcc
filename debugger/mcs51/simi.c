@@ -169,62 +169,6 @@ static void init_winsock(void)
     }
 }
 
-static char *argsToCmdLine(char **args, int nargs)
-{
-#define CHUNCK  256
-    int i;
-    int cmdPos = 0;
-    char *cmd = Safe_malloc(CHUNCK);
-    int cmdLen = CHUNCK;
-
-    for (i = 0; i < nargs; i++)
-    {
-        int quote = 0;
-        int argLen = strlen(args[i]);
-
-        if (NULL != strchr(args[i], ' '))
-        {
-            quote = 1;
-            argLen += 2;
-        }
-
-        if (0 < i)
-            ++argLen;
-
-        if (cmdPos + argLen >= cmdLen)
-        {
-            do
-            {
-                cmdLen += cmdLen;
-            }
-            while (cmdPos + argLen >= cmdLen);
-            cmd = Safe_realloc(cmd, cmdLen);
-        }
-
-        if (0 < i)
-        {
-            cmd[cmdPos++] = ' ';
-            --argLen;
-        }
-
-        if (quote)
-        {
-            cmd[cmdPos++] = '"';
-            --argLen;
-        }
-
-        memcpy(&cmd[cmdPos], args[i], argLen);
-        cmdPos += argLen;
-
-        if (quote)
-            cmd[cmdPos++] = '"';
-    }
-
-    cmd[cmdPos] = '\0';
-
-    return cmd;
-}
-
 static PROCESS_INFORMATION *execSimulator(char **args, int nargs)
 {
     STARTUPINFO si;
@@ -237,7 +181,7 @@ static PROCESS_INFORMATION *execSimulator(char **args, int nargs)
 
     // Start the child process.
     if (!CreateProcess(NULL,   // No module name (use command line)
-        cmdLine, // Command line
+        cmdLine,        // Command line
         NULL,           // Process handle not inheritable
         NULL,           // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
@@ -253,7 +197,6 @@ static PROCESS_INFORMATION *execSimulator(char **args, int nargs)
         return NULL;
     }
 
-    Safe_free(cmdLine);
     return &pi;
 }
 

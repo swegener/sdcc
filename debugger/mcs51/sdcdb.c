@@ -46,13 +46,13 @@ int   sdcdbDebug = 0;
 #endif
 
 char *currModName = NULL;
-cdbrecs *recsRoot = NULL ;
+cdbrecs *recsRoot = NULL;
 set  *modules = NULL;    /* set of all modules */
-set  *functions = NULL ; /* set of functions */
-set  *symbols = NULL   ; /* set of symbols */
-set  *sfrsymbols= NULL ; /* set of symbols of sfr or sbit */
+set  *functions = NULL;  /* set of functions */
+set  *symbols = NULL;    /* set of symbols */
+set  *sfrsymbols = NULL; /* set of symbols of sfr or sbit */
 int nStructs = 0 ;
-structdef **structs = NULL ; /* all structures */
+structdef **structs = NULL; /* all structures */
 int nLinkrecs = 0;
 linkrec **linkrecs = NULL; /* all linkage editor records */
 context *currCtxt = NULL;
@@ -66,7 +66,7 @@ char *simArgs[40];
 int nsimArgs = 0;
 char model_str[20];
 /* fake filename & lineno to make linker */
-char *filename=NULL;
+char *filename = NULL;
 int lineno = 0;
 int fatalError = 0;
 
@@ -100,150 +100,193 @@ char *completionCmdSetOption(const char *text, int state);
 /* command table */
 struct cmdtab
 {
-    char      *cmd ;  /* command the user will enter */
-    int (*cmdfunc)(char *,context *);   /* function to execute when command is entered */
+    const char *cmd;     /* command the user will enter */
+    int (*cmdfunc)(char *,context *); /* function to execute when command is entered */
 #ifdef HAVE_READLINE_COMPLETITION
     rl_compentry_func_t *completion_func;
 #else
     void *dummy;
 #endif  /* HAVE_READLINE_COMPLETITION */
-    char *htxt ;    /* short help text */
-
+    const char *htxt;    /* short help text */
 } cmdTab[] = {
     /* NOTE:- the search is done from the top, so "break" should
        precede the synonym "b" */
     /* break point */
     { "break"    ,  cmdSetUserBp  , completionCmdSetUserBp,
-      "{b}reak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]\n",
+      "{b}reak\t[LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]"
     },
     { "tbreak"   ,  cmdSetTmpUserBp , completionCmdSetUserBp/*same as "break"*/,
-      "tbreak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]\n",
+      "tbreak\t[LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]"
     },
     { "b"        ,  cmdSetUserBp  , completionCmdSetUserBp ,  NULL,},
 
     { "jump"   ,  cmdJump , NULL,
-      "jump\t\t\tContinue program being debugged at specified line or address\n [LINE | FILE:LINE | *<address>]\n",
+      "jump\tContinue program being debugged at specified line or address\n"
+      "\t[LINE | FILE:LINE | *<address>]",
     },
     { "clear"    ,  cmdClrUserBp  , completionCmdSetUserBp/*same as "break"*/,
-      "{cl}ear\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n"
+      "{cl}ear\t[LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]"
     },
-    { "cl"       ,  cmdClrUserBp  , completionCmdSetUserBp/*same as "break"*/ , NULL,},
-
+    { "cl"       ,  cmdClrUserBp  , completionCmdSetUserBp/*same as "break"*/ ,
+      NULL
+    },
     { "continue" ,  cmdContinue   ,  NULL,
-      "{c}ontinue\t\t Continue program being debugged, after breakpoint.\n"
+      "{c}ontinue\tContinue program being debugged, after breakpoint."
     },
     { "condition" ,  cmdCondition   ,  completionCmdDelUserBp/*same as "delete"*/,
-      "condition brkpoint_number expr\t\tSet condition for breakpoint.\n"
+      "condition brkpoint_number expr\tSet condition for breakpoint."
     },
     { "ignore" ,  cmdIgnore  ,  completionCmdDelUserBp/*same as "delete"*/,
-      "ignore brkpoint_number count\t\tSet ignore count for breakpoint.\n"
+      "ignore brkpoint_number count\tSet ignore count for breakpoint."
     },
     { "commands" ,  cmdCommands  ,  completionCmdDelUserBp/*same as "delete"*/,
-      "commands [brkpoint_number]\t\tSetting commands for breakpoint.\n"
+      "commands [brkpoint_number]\tSetting commands for breakpoint."
     },
-    { "c"        ,  cmdContinue   , NULL ,  NULL,},
-
-    { "disassemble",cmdDisasmF    ,  NULL, "disassemble [startaddr [endaddress]]\tdisassemble asm commands\n" },
+    { "c"        ,  cmdContinue   , NULL ,
+      NULL
+    },
+    { "disassemble",cmdDisasmF    ,  NULL,
+      "disassemble [startaddr [endaddress]]\tdisassemble asm commands"
+    },
     { "delete" ,  cmdDelUserBp  , completionCmdDelUserBp,
-      "{d}elete n\t\t clears break point number n\n"
+      "{d}elete n\tclears break point number n"
     },
     { "display"    ,  cmdDisplay     , completionCmdPrint/*same as "print"*/,
-      "display [/<fmt>] [<variable>]\t print value of given variable each time the program stops\n"
+      "display [/<fmt>] [<variable>]\tprint value of given variable each time the program stops"
     },
     { "undisplay"  ,  cmdUnDisplay   , completionCmdUnDisplay,
-      "undisplay [<variable>]\t don't display this variable or all\n"
+      "undisplay [<variable>]\tdon't display this variable or all"
     },
     { "down"     ,  cmdDown      , NULL,
-      "down\t\tSelect and print stack frame called by this one.\nAn argument says how many frames down to go.\n"
+      "down\tSelect and print stack frame called by this one.\n"
+      "\tAn argument says how many frames down to go."
     },
-    { "up"       ,  cmdUp      , NULL,
-      "up\t\tSelect and print stack frame that called this one.\nAn argument says how many frames up to go.\n"
+    {
+      "up"       ,  cmdUp      , NULL,
+      "up\tSelect and print stack frame that called this one.\n"
+      "\tAn argument says how many frames up to go."
     },
-    { "d"        ,  cmdDelUserBp  , completionCmdDelUserBp, NULL },
-
+    { "d"        ,  cmdDelUserBp  , completionCmdDelUserBp,
+      NULL
+    },
     { "info"     ,  cmdInfo       , completionCmdInfo,
-      "info <break stack frame registers all-registers line source functions symbols variables>\n"
-      "\t list all break points, call-stack, frame or register information\n"
+      "info <break stack frame registers all-registers line source functions symbols variables>\t"
+      "list all break points, call-stack, frame or register information"
     },
-
     { "listasm"  ,  cmdListAsm    , NULL,
-      "listasm {la}\t\t list assembler code for the current C line\n"
+      "listasm {la}\tlist assembler code for the current C line"
     },
-    { "la"       ,  cmdListAsm    , NULL, NULL },
-    { "ls"       ,  cmdListSymbols  , completionCmdListSymbols, "ls,lf,lm\t\t list symbols,functions,modules\n" },
-    { "lf"       ,  cmdListFunctions, completionCmdListSymbols, NULL },
-    { "lm"       ,  cmdListModules  , completionCmdListSymbols, NULL },
+    { "la"       ,  cmdListAsm    , NULL,
+      NULL
+    },
+    { "ls"       ,  cmdListSymbols  , completionCmdListSymbols,
+      "ls,lf,lm\tlist symbols,functions,modules"
+    },
+    { "lf"       ,  cmdListFunctions, completionCmdListSymbols,
+      NULL
+    },
+    { "lm"       ,  cmdListModules  , completionCmdListSymbols,
+      NULL
+    },
     { "list"     ,  cmdListSrc    , completionCmdSetUserBp/*same as "break"*/,
-      "{l}ist\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n"
+      "{l}ist\t[LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]"
     },
-    { "l"        ,  cmdListSrc    , completionCmdSetUserBp/*same as "break"*/, NULL },
+    { "l"        ,  cmdListSrc    , completionCmdSetUserBp/*same as "break"*/,
+      NULL
+    },
     { "show"     ,  cmdShow       , completionCmdShow,
-      "show"
-      " <copying warranty>\t copying & distribution terms, warranty\n"
+      "show <copying warranty>\tcopying & distribution terms, warranty"
     },
-    { "set"      ,  cmdSetOption  , completionCmdSetOption, "set <srcmode>\t\t toggle between c/asm.\nset variable <var> = >value\t\tset variable to new value\n" },
+    { "set"      ,  cmdSetOption  , completionCmdSetOption,
+      "set <srcmode>\ttoggle between c/asm.\nset variable <var> = >value\tset variable to new value"
+    },
     { "stepi"    ,  cmdStepi      , NULL,
-      "stepi\t\t\tStep one instruction exactly.\n"
+      "stepi\tStep one instruction exactly."
     },
     { "step"     ,  cmdStep       , NULL,
-      "{s}tep\t\t\tStep program until it reaches a different source line.\n"
+      "{s}tep\tStep program until it reaches a different source line."
     },
     { "source"   ,  cmdSource      , completionCmdSource,
-      "source <FILE>\t\t\tRead commands from a file named FILE.\n"
+      "source <FILE>\tRead commands from a file named FILE."
     },
-    { "s"        ,  cmdStep       , NULL, NULL },
+    { "s"        ,  cmdStep       , NULL,
+      NULL
+    },
     { "nexti"    ,  cmdNexti      , NULL,
-      "nexti\t\t\tStep one instruction, but proceed through subroutine calls.\n"
+      "nexti\tStep one instruction, but proceed through subroutine calls."
     },
     { "next"     ,  cmdNext       , NULL,
-      "{n}ext\t\t\tStep program, proceeding through subroutine calls.\n"
+      "{n}ext\tStep program, proceeding through subroutine calls."
     },
-    { "n"        ,  cmdNext       , NULL, NULL },
+    { "n"        ,  cmdNext       , NULL,
+      NULL
+    },
     { "run"      ,  cmdRun        , NULL,
-      "{r}un\t\t\tStart debugged program. \n"
+      "{r}un\tStart debugged program. "
     },
-    { "r"        ,  cmdRun        , NULL, NULL },
+    { "r"        ,  cmdRun        , NULL,
+      NULL
+    },
     { "ptype"    ,  cmdPrintType  , completionCmdPrintType,
-      "{pt}ype <variable>\tprint type information of a variable\n"
+      "{pt}ype <variable>\tprint type information of a variable"
     },
-    { "pt"       ,  cmdPrintType  , NULL, NULL },
+    { "pt"       ,  cmdPrintType  , NULL,
+      NULL
+    },
     { "print"    ,  cmdPrint      , completionCmdPrintType,
-      "{p}rint <variable>\t print value of given variable\n"
+      "{p}rint <variable>\tprint value of given variable"
     },
     { "output"   ,  cmdOutput      , completionCmdPrint/*same as "print"*/,
-      "output <variable>\t print value of given variable without $ and newline \n"
+      "output <variable>\tprint value of given variable without $ and newline"
     },
-    { "p"        ,  cmdPrint      , completionCmdPrintType, NULL },
+    { "p"        ,  cmdPrint      , completionCmdPrintType,
+      NULL
+    },
     { "file"     ,  cmdFile       , completionCmdFile,
-      "file <filename>\t\t load symbolic information from <filename>\n"
+      "file <filename>\tload symbolic information from <filename>"
     },
     { "frame"    ,  cmdFrame      , NULL,
-      "{fr}ame\t\t print information about the current Stack\n"
+      "{fr}ame\tprint information about the current Stack"
     },
     { "finish"   ,  cmdFinish     , NULL,
-      "{fi}nish\t\t execute till return of current function\n"
+      "{fi}nish\texecute till return of current function"
     },
-    { "fi"       ,  cmdFinish     , NULL, NULL },
-    { "where"    ,  cmdWhere      , NULL, "where\t\t print stack\n" },
-    { "fr"       ,  cmdFrame      , NULL, NULL },
-    { "f"        ,  cmdFrame      , NULL, NULL },
-    { "x /i"     ,  cmdDisasm1    , NULL, "x\t\t disassemble one asm command\n" },
+    { "fi"       ,  cmdFinish     , NULL,
+      NULL
+    },
+    { "where"    ,  cmdWhere      , NULL,
+      "where\tprint stack"
+    },
+    { "fr"       ,  cmdFrame      , NULL,
+      NULL
+    },
+    { "f"        ,  cmdFrame      , NULL,
+      NULL
+    },
+    { "x /i"     ,  cmdDisasm1    , NULL,
+      "x\tdisassemble one asm command"
+    },
     { "!"        ,  cmdSimulator  , NULL,
-      "!<simulator command>\t send a command directly to the simulator\n"
+      "!<simulator command>\tsend a command directly to the simulator"
     },
     { "."        ,  cmdSimulator  , NULL,
-      ".{cmd}\t switch from simulator or debugger command mode\n"
+      ".{cmd}\tswitch from simulator or debugger command mode"
     },
     { "help"     ,  cmdHelp       , NULL,
-      "{h|?}elp\t [CMD_NAME | 0,1,2,3(help page)] (general help or specific help)\n"
+      "{h|?}elp\t[CMD_NAME | 0,1,2,3(help page)] (general help or specific help)"
     },
-    { "?"        ,  cmdHelp       , NULL, NULL },
-    { "h"        ,  cmdHelp       , NULL, NULL },
-
+    { "?"        ,  cmdHelp       , NULL,
+      NULL
+    },
+    { "h"        ,  cmdHelp       , NULL,
+      NULL
+    },
     { "quit"     ,  cmdQuit       , NULL,
-      "{q}uit\t\t\t \"Watch me now. I'm going Down. My name is Bobby Brown\"\n"
+      "{q}uit\t\"Watch me now. I'm going Down. My name is Bobby Brown\""
     },
-    { "q"        ,  cmdQuit       , NULL, NULL }
+    { "q"        ,  cmdQuit       , NULL,
+      NULL
+    }
 };
 
 /*-----------------------------------------------------------------*/
@@ -314,7 +357,7 @@ void **resize (void **array, int newSize)
         vptr = calloc(1, sizeof(void **));
 
     if (!vptr) {
-        fprintf(stderr,"sdcdb: out of memory \n");
+        fprintf(stderr,"sdcdb: out of memory\n");
         exit(1);
     }
 
@@ -805,6 +848,49 @@ int cmdSource (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 /* cmdHelp - help command                                          */
 /*-----------------------------------------------------------------*/
+#define TEXT_OFFSET     24
+
+static void printHelpLine(const char *htxt, int offs)
+{
+    static char *spaces = NULL;
+    const char *p;
+    int state = 0;
+
+    if (NULL == spaces)
+    {
+        spaces = Safe_malloc(TEXT_OFFSET + 1);
+        memset(spaces, ' ', TEXT_OFFSET);
+        spaces[TEXT_OFFSET] = '\0';
+    }
+
+    p = htxt;
+
+    do
+    {
+        const char *ps = p;
+        int len;
+        while (*p && *p != '\t' &&  *p != '\n')
+            ++p;
+        len = p - ps;
+
+        if (state == 0)
+        {
+            printf("%.*s%.*s", offs, spaces, len, ps); /* command text */
+
+            if (len >= TEXT_OFFSET - offs)
+                printf("\n%s", spaces);
+            else
+                printf("%.*s", TEXT_OFFSET - offs - len, spaces);
+        }
+        else
+        {
+            printf("%.*s\n", len, ps);  /* help text */
+        }
+        state = *p == '\t';
+    }
+    while (*p++);
+}
+
 int cmdHelp (char *s, context *cctxt)
 {
     int i ;
@@ -824,12 +910,7 @@ int cmdHelp (char *s, context *cctxt)
         {
             if ((cmdTab[i].htxt) && !strcmp(cmdTab[i].cmd,s))
             {
-                s = strrchr(cmdTab[i].htxt,'\t');
-                if ( !s )
-                    s = cmdTab[i].htxt;
-                else
-                    s++;
-                fprintf(stdout,"%s",s);
+                printHelpLine(cmdTab[i].htxt, 0);
                 break;
             }
         }
@@ -841,7 +922,7 @@ int cmdHelp (char *s, context *cctxt)
         /* command string matches */
 
         if ((cmdTab[i].htxt) && (i >= startline))
-            fprintf(stdout,"%s",cmdTab[i].htxt);
+            printHelpLine(cmdTab[i].htxt, 0);
         if (i == endline)
             break;
     }
@@ -1545,15 +1626,155 @@ static void commandLoop(FILE *cmdfile)
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - print the version information                */
 /*-----------------------------------------------------------------*/
-static void printVersionInfo()
+static void printVersionInfo(void)
 {
     fprintf(stdout,
         "SDCDB is free software and you are welcome to distribute copies of it\n"
         "under certain conditions; type \"show copying\" to see the conditions.\n"
         "There is absolutely no warranty for SDCDB; type \"show warranty\" for details.\n"
-        "SDCDB 0.8 . Copyright (C) 1999 Sandeep Dutta (sandeep.dutta@usa.net)\n"
-        "Type ? for help\n");
+        "SDCDB " SDCDB_VERSION ". Copyright (C) 1999 Sandeep Dutta (sandeep.dutta@usa.net)\n");
+}
 
+/*-----------------------------------------------------------------*/
+/* printHelp - print help                                          */
+/*-----------------------------------------------------------------*/
+static void printHelp(void)
+{
+    fprintf(stdout, "Type ? for help\n");
+}
+
+/*-----------------------------------------------------------------*/
+/* escapeQuotes - escape double quotes                             */
+/*-----------------------------------------------------------------*/
+#define CHUNCK  256
+
+static const char *escapeQuotes(const char *arg)
+{
+    static char *str = NULL;
+    static size_t strLen = 0;
+    char *ps;
+    const char *pa;
+
+    if (NULL == str)
+    {
+        str = Safe_malloc(CHUNCK);
+        strLen = CHUNCK;
+    }
+
+    for (ps = str, pa = arg; '\0' != *pa; ++pa)
+    {
+        if ('"' == *pa)
+        {
+            *ps++ = '\\';       /* excape the quote */
+        }
+        *ps++ = *pa;
+    }
+    *ps = '\0';
+
+    return str;
+}
+
+/*-----------------------------------------------------------------*/
+/* argsToCmdLine - concatenate arguments ti command line           */
+/*-----------------------------------------------------------------*/
+char *argsToCmdLine(char **args, int nargs)
+{
+    static char *cmd = NULL;
+    static size_t cmdLen = 0;
+    int i;
+    size_t cmdPos = 0;
+
+    if (NULL == cmd)
+    {
+        cmd = Safe_malloc(CHUNCK);
+        cmdLen = CHUNCK;
+    }
+
+    for (i = 0; i < nargs; ++i)
+    {
+        size_t argLen;
+        size_t allocLen = 0;
+        int quote = 0;
+        const char *arg;
+
+        if (0 < i)
+            ++allocLen;                 /* space for space character */
+
+        if (NULL != strchr(args[i], ' '))
+        {
+            quote = 1;
+            allocLen += 2;              /* space for inital and final quote */
+            arg = escapeQuotes(args[i]);
+        }
+        else {
+            arg = args[i];
+        }
+
+        argLen = strlen(arg);
+        allocLen += argLen;             /* space for argument */
+
+        /* extend the buffer */
+        if (cmdPos + allocLen >= cmdLen)
+        {
+            do
+            {
+                cmdLen += cmdLen;
+            }
+            while (cmdPos + allocLen >= cmdLen);
+            cmd = Safe_realloc(cmd, cmdLen);
+        }
+
+        if (0 < i)
+        {
+            cmd[cmdPos++] = ' ';        /* append space character */
+        }
+
+        if (quote)
+        {
+            cmd[cmdPos++] = '"';        /* append initial quote */
+        }
+
+        memcpy(&cmd[cmdPos], arg, argLen); /* append argument */
+        cmdPos += argLen;
+
+        if (quote)
+            cmd[cmdPos++] = '"';        /* append final quote */
+    }
+
+    cmd[cmdPos] = '\0';
+
+    return cmd;
+}
+
+static void usage(void)
+{
+    const char *args =
+        "-{h|?}, --help\tDisplay this help\n"
+        "-v\tVerbose: show the simulator invocation commald line\n"
+        "--directory=<dir>\tSearch modules in <dir> directory\n"
+        "-fullname\tGive the file name & position\n"
+        "-cd=<dir>, -cd <dir>\tChange directory to <dir>\n"
+#ifdef SDCDB_DEBUG
+        "-d=<msk>\tSet debugging to <mask>\n"
+#endif
+        "-contsim\tContinuous simulation\n"
+        "-q\tIgnored\n"
+        "-m<model>\tModel string: avr, xa, z80\n"
+        "-z\tAll remaining options are for simulator";
+
+    const char *simArgs =
+        "-t <cpu>, -cpu <cpu>\tCpu type\n"
+        "-frequency <frequency>, -X <frequency>\tXTAL Frequency\n"
+        "-{s|S} <serial_port>\tSerial port\n"
+        "-k\tNetwork serial port";
+
+    printf("usage: sdcdb [args] [simulator args] [filename]\n"
+        "args:\n");
+    printHelpLine(args, 2);
+    printf("simulator args:\n");
+    printHelpLine(simArgs, 2);
+    putchar('\n');
+    printVersionInfo();
 }
 
 /*-----------------------------------------------------------------*/
@@ -1561,16 +1782,15 @@ static void printVersionInfo()
 /*-----------------------------------------------------------------*/
 static void parseCmdLine (int argc, char **argv)
 {
-    int i ;
+    int i;
     char *filename = NULL;
     int passon_args_flag = 0;  /* if true, pass on args to simulator */
+    int verbose = 0;
 
     Dprintf(D_sdcdb, ("sdcdb: parseCmdLine\n"));
-    contsim=0;
+    contsim = 0;
 
-    for ( i = 1; i < argc ; i++) {
-        //fprintf(stdout,"%s\n",argv[i]);
-
+    for (i = 1; i < argc ; i++) {
         if (passon_args_flag) { /* if true, pass on args to simulator */
             simArgs[nsimArgs++] = strdup(argv[i]);
             continue;
@@ -1578,9 +1798,22 @@ static void parseCmdLine (int argc, char **argv)
 
         /* if this is an option */
         if (argv[i][0] == '-') {
+            /* display usage */
+            if (strcmp(argv[i], "-h") == 0 ||
+                strcmp(argv[i], "-?") == 0 ||
+                strcmp(argv[i], "--help") == 0) {
+                usage();
+                exit(0);
+            }
+
+            /* verbose */
+            if (strcmp(argv[i], "-v") == 0) {
+                verbose = 1;
+                continue;
+            }
 
             /* if directory then mark directory */
-            if (strncmp(argv[i],"--directory=",12) == 0) {
+            if (strncmp(argv[i], "--directory=", 12) == 0) {
                 if (!ssdirl)
                     ssdirl = &argv[i][12];
                 else {
@@ -1591,12 +1824,12 @@ static void parseCmdLine (int argc, char **argv)
                 continue;
             }
 
-            if (strncmp(argv[i],"-fullname",9) == 0) {
+            if (strcmp(argv[i], "-fullname") == 0) {
                 fullname = TRUE;
                 continue;
             }
 
-            if (strncmp(argv[i],"-cd=",4) == 0) {
+            if (strncmp(argv[i], "-cd=", 4) == 0) {
                 if (0 > chdir(&argv[i][4])) {
                     fprintf(stderr, "can't change directory to %s\n", &argv[i][4]);
                     exit(1);
@@ -1604,7 +1837,7 @@ static void parseCmdLine (int argc, char **argv)
                 continue;
             }
 
-            if (strcmp(argv[i],"-cd") == 0) {
+            if (strcmp(argv[i], "-cd") == 0) {
                 i++;
                 if (0 > chdir(argv[i])) {
                     fprintf(stderr, "can't change directory to %s\n", argv[i]);
@@ -1614,73 +1847,72 @@ static void parseCmdLine (int argc, char **argv)
             }
 
 #ifdef SDCDB_DEBUG
-            if (strncmp(argv[i],"-d=",3) == 0) {
+            if (strncmp(argv[i], "-d=", 3) == 0) {
                 sdcdbDebug = strtol(&argv[i][3],0,0);
                 continue;
             }
 #endif
-            if (strncmp(argv[i],"-contsim",8) == 0) {
+            if (strcmp(argv[i], "-contsim") == 0) {
                 contsim=1;
                 continue;
             }
-            if (strncmp(argv[i],"-q",2) == 0) {
+            if (strcmp(argv[i], "-q") == 0) {
                 continue;
             }
 
             /* model string */
-            if (strncmp(argv[i],"-m",2) == 0) {
+            if (strncmp(argv[i],"-m", 2) == 0) {
                 strncpy(model_str, &argv[i][2], 15);
-                if (strcmp(model_str,"avr") == 0)
+                if (strcmp(model_str, "avr") == 0)
                     simArgs[0] = "savr";
-                else if (strcmp(model_str,"xa") == 0)
+                else if (strcmp(model_str, "xa") == 0)
                     simArgs[0] = "sxa";
-                else if (strcmp(model_str,"z80") == 0)
+                else if (strcmp(model_str, "z80") == 0)
                     simArgs[0] = "sz80";
-                continue ;
+                continue;
             }
 
             /* -z all remaining options are for simulator */
-            if (strcmp(argv[i],"-z") == 0) {
+            if (strcmp(argv[i], "-z") == 0) {
                 passon_args_flag = 1;
-                continue ;
+                continue;
             }
 
             /* the simulator arguments */
 
             /* cpu */
-            if (strcmp(argv[i],"-t") == 0 ||
-                strcmp(argv[i],"-cpu") == 0) {
+            if (strcmp(argv[i], "-t") == 0 ||
+                strcmp(argv[i], "-cpu") == 0) {
 
                 simArgs[nsimArgs++] = "-t";
                 simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue ;
+                continue;
             }
 
             /* XTAL Frequency */
-            if (strcmp(argv[i],"-X") == 0 ||
-                strcmp(argv[i],"-frequency") == 0) {
+            if (strcmp(argv[i], "-X") == 0 ||
+                strcmp(argv[i], "-frequency") == 0) {
                 simArgs[nsimArgs++] = "-X";
                 simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue ;
+                continue;
             }
 
             /* serial port */
-            if ( (strcmp(argv[i],"-S") == 0) ||
-                (strcmp(argv[i],"-s") == 0)) {
+            if ((strcmp(argv[i], "-S") == 0) ||
+                (strcmp(argv[i], "-s") == 0)) {
                 simArgs[nsimArgs++] = strdup(argv[i]);
                 simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue ;
+                continue;
             }
 
             /* network serial port */
-            if ( (strcmp(argv[i],"-k") == 0)) {
+            if ((strcmp(argv[i], "-k") == 0)) {
                 simArgs[nsimArgs++] = strdup(argv[i]);
                 simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue ;
+                continue;
             }
 
-            fprintf(stderr,"unknown option %s --- ignored\n",
-                argv[i]);
+            fprintf(stderr,"unknown option %s --- ignored\n", argv[i]);
 
         } else {
             /* must be file name */
@@ -1705,6 +1937,9 @@ static void parseCmdLine (int argc, char **argv)
 
     if (filename)
         cmdFile(filename,NULL);
+
+    if (verbose)
+	printf("+ %s\n", argsToCmdLine(simArgs, nsimArgs));
 }
 
 /*-----------------------------------------------------------------*/
@@ -1767,16 +2002,19 @@ setsignals()
 
 int main ( int argc, char **argv)
 {
+    /* parse command line */
+    parseCmdLine(argc,argv);
+
     printVersionInfo();
+    printHelp();
     printf("WARNING: SDCDB is EXPERIMENTAL.\n");
 
     simArgs[nsimArgs++] = "s51";
     simArgs[nsimArgs++] = "-P";
-    simArgs[nsimArgs++] = "-r 9756";
-    /* parse command line */
+    simArgs[nsimArgs++] = "-r";
+    simArgs[nsimArgs++] = "9756";
 
     setsignals();
-    parseCmdLine(argc,argv);
 
     commandLoop(stdin);
 

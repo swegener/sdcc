@@ -1,3 +1,11 @@
+2010-05-31 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/simi.c, debugger/mcs51/cmd.c, debugger/mcs51/sdcdb.c,
+	  debugger/mcs51/sdcdb.h: enhanced help text formartting, added usage
+	  (-h, -?, --help) and verbose (-v) command line options, SDCDB_VERSION
+	  bumped to 0.9
+	* doc/sdccman.lyx: asxxxx and aslink renamed to sdas and sdld
+
 2010-05-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:

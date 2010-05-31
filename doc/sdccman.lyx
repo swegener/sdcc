@@ -1,4 +1,4 @@
-#LyX 1.6.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -203,27 +203,27 @@ status collapsed
  It can be retargeted for other microprocessors, support for Microchip PIC,
  Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
- SDCC uses ASXXXX
+ SDCC uses a modified version of ASXXXX
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-asXXXX (as-gbz80, as-hc08, asx8051, as-z80)
+sdas (sdasgb, sdas6808, sdas8051, sdasz80)
 \end_layout
 
 \end_inset
 
  & ASLINK
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-aslink
+sdld
 \end_layout
 
 \end_inset
 
-, an free open source retargetable assembler & linker.
+, free open source retargetable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
 rollers and underlying hardware effectively.
  
@@ -7644,15 +7644,7 @@ http://gcc.gnu.org/
 \end_layout
 
 \begin_layout Subsection
-sdas
-\emph on
-xxxx
-\emph default
-, asld, asld
-\emph on
-xxx
-\emph default
- - The Assemblers and Linkage Editors
+sdas, sdld - The Assemblers and Linkage Editors
 \end_layout
 
 \begin_layout Standard
@@ -9414,8 +9406,8 @@ http://www.mingw.org/
 
 
 \series default
-Both the GNU and BSD ar format variants are suppurated by asxxxx linkers.
- Ar doesn't understand the asxxxx object file format, so there is a special
+Both the GNU and BSD ar format variants are suppurated by sdld linkers.
+ Ar doesn't understand the sdas object file format, so there is a special
  version of ranlib distributed with sdcc, called asranlib, which produces
  the ar symbol lookup table.
 \series bold
@@ -9429,7 +9421,7 @@ Both the GNU and BSD ar format variants are suppurated by asxxxx linkers.
 
 
 \series default
-To create a library containing asxxxx object files, you should use the following
+To create a library containing sdas object files, you should use the following
  sequence:
 \series bold
 
@@ -12700,7 +12692,7 @@ status collapsed
 
 \end_inset
 
- Define assembler name (<Value> is rgbds, asxxxx, isas or z80asm).
+ Define assembler name (<Value> is rgbds, sdas, isas or z80asm).
 \end_layout
 
 \begin_layout List
@@ -30079,7 +30071,7 @@ The inline assembler code can contain any valid code understood by the assembler
 status collapsed
 
 \begin_layout Plain Layout
-asXXXX (as-gbz80, as-hc08, asx8051, as-z80)
+sdas (sdasgb, sdas6808, sdas8051, sdasz80)
 \end_layout
 
 \end_inset
@@ -52977,10 +52969,10 @@ http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/ChangeLog
 \begin_layout Plain Layout
 ASXXXX
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-asXXXX (as-gbz80, as-hc08, asx8051, as-z80)
+sdas (sdasgb, sdas6808, sdas8051, sdasz80)
 \end_layout
 
 \end_inset
@@ -53001,10 +52993,10 @@ Assembler documentation
 
 ASLINK
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-aslink
+sdld
 \end_layout
 
 \end_inset

@@ -24,6 +24,8 @@
 #ifndef  SDCDB_H
 #define  SDCDB_H
 
+#define SDCDB_VERSION	"0.9"
+
 #define SDCDB_DEBUG
 
 #ifdef SDCDB_DEBUG
@@ -270,9 +272,11 @@ extern short fullname;
 extern int srcMode;
 extern char contsim;
 char *searchDirsFname (char *);
-char *getNextCmdLine(void );
-void setCmdLine( char * );
-void stopCommandList( void );
+char *getNextCmdLine(void);
+void setCmdLine(char *);
+void stopCommandList(void);
+
+char *argsToCmdLine(char **args, int nargs);
 
 /* trimming functions */
 extern char *trim_left(char *s);

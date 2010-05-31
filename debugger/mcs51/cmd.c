@@ -714,7 +714,7 @@ void simGo (unsigned int gaddr)
     }
     if ( gaddr == 0 )
     {
-        function *func = NULL;;
+        function *func = NULL;
         if (applyToSet(functions,funcInAddr,gaddr,&func))
             STACK_PUSH(callStack,func);
     }

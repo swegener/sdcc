@@ -1,3 +1,11 @@
+2010-06-01 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c:
+	  Optimization of multibyte comparison.
+	* src/SDCCpeeph.c,
+	  src/SDCCpeeph.h,
+	  src/z80/peeph-z80.def:
+	  Peephole barriers, fixes #1677178.
+
 2010-05-31 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/simi.c, debugger/mcs51/cmd.c, debugger/mcs51/sdcdb.c,

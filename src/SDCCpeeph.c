@@ -1458,7 +1458,8 @@ static peepRule *
 newPeepRule (lineNode * match,
              lineNode * replace,
              char *cond,
-             int restart)
+             int restart,
+             int barrier)
 {
   peepRule *pr;
 
@@ -1466,6 +1467,7 @@ newPeepRule (lineNode * match,
   pr->match = match;
   pr->replace = replace;
   pr->restart = restart;
+  pr->barrier = barrier;
 
   if (cond && *cond)
     {
@@ -1596,7 +1598,7 @@ getPeepLine (lineNode ** head, char **bpp)
 static void
 readRules (char *bp)
 {
-  char restart = 0;
+  char restart = 0, barrier = 0;
   char lines[MAX_PATTERN_LEN];
   char *lp, *rp;
   lineNode *match;
@@ -1607,10 +1609,16 @@ readRules (char *bp)
     return;
 top:
   restart = 0;
+  barrier = 0;
+
   /* look for the token "replace" that is the
      start of a rule */
   while (*bp && strncmp (bp, "replace", 7))
-    bp++;
+    {
+      if (!strncmp (bp, "barrier", 7))
+        barrier = 1;
+      bp++;
+    }
 
   /* if not found */
   if (!*bp)
@@ -1683,11 +1691,11 @@ top:
         }
       *lp = '\0';
 
-      newPeepRule (match, replace, lines, restart);
+      newPeepRule (match, replace, lines, restart, barrier);
     }
   else
     {
-      if (*bp && strncmp (bp, "replace", 7))
+      if (*bp && strncmp (bp, "replace", 7) && strncmp (bp, "barrier", 7))
         {
           /* not the start of a new peeprule, so "if" should be here */
 
@@ -1711,7 +1719,7 @@ top:
           fprintf (stderr, "%s\nexpected '} if ...'\n", strbuff);
           return;
         }
-      newPeepRule (match, replace, NULL, restart);
+      newPeepRule (match, replace, NULL, restart, barrier);
     }
   goto top;
 
@@ -2404,6 +2412,9 @@ peepHole (lineNode ** pls)
       /* for all rules */
       for (pr = rootRules; pr; pr = pr->next)
         {
+          if (restart && pr->barrier)
+            break;
+
           for (spl = *pls; spl; spl = replaced ? spl : spl->next)
             {
               replaced = FALSE;

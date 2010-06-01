@@ -4889,13 +4889,24 @@ genCmp (operand * left, operand * right,
                 }
               goto release;
             }
+          else
+            while (!((lit >> (offset * 8)) & 0xff))
+              {
+                size--;
+                offset++;
+              }
         }
+
+      _moveA (aopGet (AOP (left), offset, FALSE));
+      emit2 ("sub a,%s", aopGet (AOP (right), offset, FALSE));
+      size--;
+      offset++;
 
       while (size--)
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
           /* Subtract through, propagating the carry */
-          emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", aopGet (AOP (right), offset, FALSE));
+          emit2 ("sbc a,%s", aopGet (AOP (right), offset, FALSE));
           offset++;
         }
     }

@@ -77,7 +77,7 @@ replace restart {
 	ld	(hl),a
 } by {
 	ld	(#%1),a
-	; peephole 0d''' loaded (#%1) from a directly instead of using through hl.
+	; peephole 0d''' loaded (#%1) from a directly instead of through hl.
 } if notUsed('hl')
 
 replace restart {
@@ -85,7 +85,7 @@ replace restart {
 	ld	(hl),a
 } by {
 	ld	(#%1 + %2),a
-	; peephole 0d'''' loaded (#%1) from a directly instead of using through hl.
+	; peephole 0d'''' loaded (#%1) from a directly instead of through hl.
 } if notUsed('hl')
 
 replace restart {
@@ -422,6 +422,7 @@ replace restart {
 	ld	d,#%1
 } if notUsed('a')
 
+// Causes infinite loop.
 //replace restart {
 //	ld	%1,a
 //	ld	%2,%1
@@ -430,6 +431,15 @@ replace restart {
 //	ld	%1,a
 //	ld	%2,a
 //} if notVolatile(%1), operandsNotRelated(%1 'a')
+
+// Nerfed version:
+replace restart {
+	ld	%1,a
+	ld	%2,%1
+} by {
+	; peephole 0z'-nerfed loaded %2 from a directly instead of going through %1.
+	ld	%2,a
+} if notUsed(%1)
 
 replace restart {
 	ld	a,%1 (ix)
@@ -664,31 +674,7 @@ replace restart {
 } if labelRefCountChange(%2 -1), labelRefCountChange(%4 +1)
 
 replace restart {
-	jr	Z,%1
-	ld	%4,#0x01
-	jr	%2
-%1:
-	ld	%4,#0x00
-%2:
-	xor	a,a
-	or	a,%4
-	jr	Z,%3
-} by {
-	ld	%4,#0x00
-	jr	Z,%3
-	; peephole 6a' redirected jump from %2 to %3
-	ld	%4,#0x01
-	jr	%2
-%1:
-	ld	%4,#0x00
-%2:
-	xor	a,a
-	or	a,%4
-	jr	Z,%3
-} if labelRefCountChange(%1 -1), labelRefCountChange(%3 +1)
-
-replace restart {
-	jr	%1
+	jp	%1
 	ld	%2, #%3
 %1:
 } by {
@@ -700,7 +686,7 @@ replace restart {
 	ld	%1,#0x01
 	xor	a,a
 	or	a,%1
-	jr	Z,%2
+	jp	Z,%2
 } by {
 	ld	%1,#0x01
 	ld	a,%1
@@ -710,7 +696,7 @@ replace restart {
 replace restart {
 	ld	%1, #0x01
 	bit	0,%1
-	jr	Z,%2
+	jp	Z,%2
 } by {
 	ld	%1, #0x01
 	; peephole 6c eliminated conditional jump to %2
@@ -724,24 +710,10 @@ replace restart {
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
-	jr	%5
-} by {
-	jp	%6
-	; peephole 7' jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
-
-replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
 	; peephole 8 jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
-
-replace restart {
-	jr	%1,%5
-} by {
-	jp	%1,%6
-	; peephole 8' jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
@@ -1695,6 +1667,24 @@ replace restart {
 }
 
 replace restart {
+	ld	a,#0x01
+	jp	%1
+%2:
+	xor	a,a
+%1:
+	sub	a,#0x01
+	ld	a,#0x00
+	rla
+} by {
+	xor	a,a
+	jp	%1
+%2:
+	ld	a,#0x01
+%1:
+	; peephole 84 removed negation.
+} if labelRefCount(%1 1)
+
+replace restart {
 	and	a,#0x01
 	sub	a,#0x01
 	ld	a,#0x00
@@ -1702,7 +1692,7 @@ replace restart {
 } by {
 	and	a,#0x01
 	xor	a,#0x01
-	; peephole 84 used xor for negation.
+	; peephole 84a used xor for negation.
 }
 
 replace restart {
@@ -1712,7 +1702,7 @@ replace restart {
 } by {
 	ld	%1,a
 	neg
-	; peephole 84a used neg for negation.
+	; peephole 84b used neg for negation.
 } if notVolatile(%1)
 
 replace restart {
@@ -1728,31 +1718,11 @@ replace restart {
 replace restart {
 	and	a,#0x01
 	xor	a,#0x01
-	jr	NZ,%1
-} by {
-	and	a,#0x01
-	; peephole 85a' removed xor by inverting jump condition.
-	jr	Z,%1
-} if notUsed('a')
-
-replace restart {
-	and	a,#0x01
-	xor	a,#0x01
 	jp	Z,%1
 } by {
 	and	a,#0x01
 	; peephole 85b removed xor by inverting jump condition.
 	jp	NZ,%1
-} if notUsed('a')
-
-replace restart {
-	and	a,#0x01
-	xor	a,#0x01
-	jr	Z,%1
-} by {
-	and	a,#0x01
-	; peephole 85b' removed xor by inverting jump condition.
-	jr	NZ,%1
 } if notUsed('a')
 
 replace restart {
@@ -1768,31 +1738,11 @@ replace restart {
 replace restart {
 	rlca
 	and	a,#0x01
-	jr	NZ,%1
-} by {
-	rlca
-	; peephole 86a' jumped by carry instead of bit 0.
-	jr	C,%1
-} if notUsed('a')
-
-replace restart {
-	rlca
-	and	a,#0x01
 	jp	Z,%1
 } by {
 	rlca
 	; peephole 86b jumped by carry instead of bit 0.
 	jp	NC,%1
-} if notUsed('a')
-
-replace restart {
-	rlca
-	and	a,#0x01
-	jr	Z,%1
-} by {
-	rlca
-	; peephole 86b' jumped by carry instead of bit 0.
-	jr	NC,%1
 } if notUsed('a')
 
 replace restart {
@@ -1832,17 +1782,6 @@ replace restart {
 	ccf
 	rla
 	or	a,a
-	jr	NZ,%1
-} by {
-	; peephole 89a' jumped by carry instead of going through bit 0 of a.
-	jr	NC,%1
-} if notUsed('a')
-
-replace restart {
-	ld	a,#0x00
-	ccf
-	rla
-	or	a,a
 	jp	Z,%1
 } by {
 	; peephole 89b jumped by carry instead of going through bit 0 of a.
@@ -1850,20 +1789,9 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
-	ld	a,#0x00
-	ccf
-	rla
-	or	a,a
-	jr	Z,%1
-} by {
-	; peephole 89b' jumped by carry instead of going through bit 0 of a.
-	jr	C,%1
-} if notUsed('a')
-
-replace restart {
 	sbc	a,%1
 	rlca
-	jr	C,%2
+	jp	C,%2
 } by {
 	sbc	a,%1
 	; peephole 90a jumped by sign instead of going through carry.
@@ -1873,7 +1801,7 @@ replace restart {
 replace restart {
 	sbc	a,%1
 	rlca
-	jr	NC,%2
+	jp	NC,%2
 } by {
 	sbc	a,%1
 	; peephole 90b jumped by sign instead of going through carry.
@@ -2154,20 +2082,6 @@ replace restart {
 	; peephole z10f used value still in a instead of reloading from %1.
 }
 
-replace restart {
-	jp	%5
-} by {
-	ret
-	; peephole z11 replaced jump by return.
-} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
-
-replace restart {
-	jp	%1,%5
-} by {
-	ret	%1
-	; peephole z11a replaced jump by return.
-} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
-
 // Should be one of the last ones. Opens the code to further peephole optimization.
 replace restart {
 %1:
@@ -2194,68 +2108,38 @@ replace {
 	; peephole z13a removed unused ret.
 }
 
-// These four need to be here since the peephole optimizer continues to apply rules further down the file even for replace restart rules.
 replace restart {
-	jp	NC,%1
-	jp	%2
-%1:
-} by {
-	jp	C,%2
-	; peephole 5' removed jp by using inverse jump logic
-%1:
-} if labelRefCountChange(%1 -1)
-
-replace restart {
-	jp	C,%1
-	jp	%2
-%1:
-} by {
-	jp	NC,%2
-	; peephole 5' removed jp by using inverse jump logic
-%1:
-} if labelRefCountChange(%1 -1)
-
-replace restart {
-	jp	NZ,%1
-	jp	%2
-%1:
-} by {
-	jp	Z,%2
-	; peephole 5' removed jp by using inverse jump logic
-%1:
-} if labelRefCountChange(%1 -1)
-
-replace restart {
-	jp	Z,%1
-	jp	%2
-%1:
-} by {
+	or	a,%1
 	jp	NZ,%2
-	; peephole 6' removed jp by using inverse jump logic
-%1:
-} if labelRefCountChange(%1 -1)
-
-replace restart {
-	jr	NZ,%1
-	jr	%2
-%1:
+	xor	a,a
+	jp	%3
 } by {
-	jp	Z,%2
-	; peephole 5'' removed jp by using inverse jump logic
-%1:
-} if labelRefCountChange(%1 -1)
-
-replace restart {
-	jr	Z,%1
-	jr	%2
-%1:
-} by {
+	or	a,%1
 	jp	NZ,%2
-	; peephole 6'' removed jp by using inverse jump logic
-%1:
-} if labelRefCountChange(%1 -1)
+	; peephole 84' removed redundant zeroing of a (which has just been tested to be #0x00).
+	jp	%3
+}
 
-// These should be the last rules, so that the peepholes above need to look at jp only.
+// Do all jump optimizations before replacing by ret.
+barrier
+
+replace restart {
+	jp	%5
+} by {
+	ret
+	; peephole z11 replaced jump by return.
+} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
+
+replace restart {
+	jp	%1,%5
+} by {
+	ret	%1
+	; peephole z11a replaced jump by return.
+} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
+
+// Ensure that all rules above see only jp, not jr.
+barrier
+
 replace {
 	jp	%5
 } by {
@@ -2290,3 +2174,4 @@ replace {
 	jr	NC,%5
 	; peephole z18 changed absolute to relative conditional jump.
 } if labelInRange()
+

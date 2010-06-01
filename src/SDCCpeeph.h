@@ -51,6 +51,7 @@ typedef struct peepRule
     lineNode *match;
     lineNode *replace;
     unsigned int restart:1;
+    unsigned int barrier:1;
     char *cond;
     hTab *vars;
     struct peepRule *next;

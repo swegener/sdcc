@@ -1,3 +1,8 @@
+2010-06-02 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: corrected z80 assembler name, corrected revision
+	  date format
+
 2010-06-01 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c:
 	  Optimization of multibyte comparison.

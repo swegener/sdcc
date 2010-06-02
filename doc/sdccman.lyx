@@ -123,7 +123,7 @@ SDCC 2.9.7
 \begin_inset Newline newline
 \end_inset
 
-$Date: 2010-01-16 #$ 
+$Date::             $ 
 \begin_inset Newline newline
 \end_inset
 
@@ -12692,7 +12692,7 @@ status collapsed
 
 \end_inset
 
- Define assembler name (<Value> is rgbds, sdas, isas or z80asm).
+ Define assembler name (<Value> is rgbds, sdasz80, isas or z80asm).
 \end_layout
 
 \begin_layout List

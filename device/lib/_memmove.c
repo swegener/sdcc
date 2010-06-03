@@ -42,61 +42,6 @@ void * memmove (
 	size_t acount
 	) 
 {
-#if _SDCC_Z80_STYLE_LIB_OPT
-
-#pragma noinduction
-
-	char * d;
-	char * s;
-	/* PENDING: Divide first to get around sign problems */
-	int count = -(acount >> 2);
-
-	if (((int)src < (int)dst) && ((((int)src)+acount) > (int)dst)) {
-		/*
-		 * copy from higher addresses to lower addresses
-		 */
-		d = ((char *)dst)+acount-1;
-		s = ((char *)src)+acount-1;
-	        while (count) {
-			*d-- = *s--;
-			*d-- = *s--;
-			*d-- = *s--;
-			*d-- = *s--;
-                	count++;
-	        }
-
-	        if (acount & 2) {
-			*d-- = *s--;
-			*d-- = *s--;
-	        }
-	        if (acount & 1) {
-			*d-- = *s--;
-	        }
-	}
-	else {
-		/*
-		 * copy from lower addresses to higher addresses
-		 */
-		d = dst;
-		s = src;
-	        while (count) {
-			*d++ = *s++;
-			*d++ = *s++;
-			*d++ = *s++;
-			*d++ = *s++;
-                	count++;
-	        }
-
-	        if (acount & 2) {
-			*d++ = *s++; 
-			*d++ = *s++;
-	        }
-	        if (acount & 1) {
-			*d++ = *s++;
-	        }
-	}
-	return dst;
-#else
 	void * ret = dst;
 	char * d;
 	char * s;
@@ -123,6 +68,6 @@ void * memmove (
 	}
 
 	return(ret);
-#endif
 }
 #endif
+

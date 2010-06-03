@@ -39,32 +39,6 @@ void * memcpy (
 	size_t acount
 	) 
 {
-#if _SDCC_Z80_STYLE_LIB_OPT
-
-#pragma noinduction
-
-	char * d = dst;
-	char * s = src;
-	/* PENDING: Divide first to get around sign problems */
-	int count = -(acount >> 2);
-
-        while (count) {
-		*d++ = *s++;
-		*d++ = *s++;
-		*d++ = *s++;
-		*d++ = *s++;
-                count++;
-        }
-
-        if (acount & 2) {
-		*d++ = *s++; 
-		*d++ = *s++;
-        }
-        if (acount & 1) {
-		*d++ = *s++;
-        }
-	return dst;
-#else
 	void * ret = dst;
 	char * d = dst;
 	char * s = src;
@@ -77,6 +51,6 @@ void * memcpy (
 	}
 
 	return(ret);
-#endif
 }
 #endif
+

@@ -182,7 +182,6 @@ computeDataFlow (ebbIndex * ebbi)
       /* for all blocks */
       for (i = 0; i < count; i++)
         {
-
           set *pred;
           set *oldOutExprs = NULL;
           set *oldKilledExprs = NULL;

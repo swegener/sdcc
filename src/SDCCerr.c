@@ -448,8 +448,8 @@ struct
    "pointer target lost %s qualifier" },
 { W_DEPRECATED_KEYWORD, ERROR_LEVEL_WARNING,
    "keyword '%s' is deprecated, use '%s' instead" },
-{ E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, ERROR_LEVEL_ERROR,
-   "storage class specified for parameter ‘%s’" },
+{ E_STORAGE_CLASS_FOR_PARAMETER, ERROR_LEVEL_ERROR,
+   "storage class specified for parameter '%s'" },
 };
 
 /*

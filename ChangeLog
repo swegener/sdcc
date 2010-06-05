@@ -1,4 +1,20 @@
+2010-06-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asranlib/asranlib.c (do_ranlib): fixed text output
+	* src/SDCCerr.c,
+	* src/SDCCerr.h,
+	* src/SDCC.y: changed E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER to
+	    E_STORAGE_CLASS_FOR_PARAMETER
+	* src/SDCCcse.c,
+	* src/SDCCdflow.c,
+	* src/SDCCval.c: cosmetic changes
+	* src/SDCCopt.c,
+	* src/SDCCsymt.c,
+	* src/SDCCsymt.h: removed double underscores from function names,
+	    fixed bug 3005305
+
 2010-06-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/_memcpy,
 	  device/lib/_memmove.c:
 	  Library cleanup.
@@ -9,6 +25,7 @@
 	  date format
 
 2010-06-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Optimization of multibyte comparison.
 	* src/SDCCpeeph.c,
@@ -19,7 +36,7 @@
 2010-05-31 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/simi.c, debugger/mcs51/cmd.c, debugger/mcs51/sdcdb.c,
-	  debugger/mcs51/sdcdb.h: enhanced help text formartting, added usage
+	  debugger/mcs51/sdcdb.h: enhanced help text formating, added usage
 	  (-h, -?, --help) and verbose (-v) command line options, SDCDB_VERSION
 	  bumped to 0.9
 	* doc/sdccman.lyx: asxxxx and aslink renamed to sdas and sdld

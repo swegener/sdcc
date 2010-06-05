@@ -3484,38 +3484,38 @@ powof2 (TYPE_TARGET_ULONG num)
   return nshifts - 1;
 }
 
-symbol *__fsadd;
-symbol *__fssub;
-symbol *__fsmul;
-symbol *__fsdiv;
-symbol *__fseq;
-symbol *__fsneq;
-symbol *__fslt;
-symbol *__fslteq;
-symbol *__fsgt;
-symbol *__fsgteq;
+symbol *fsadd;
+symbol *fssub;
+symbol *fsmul;
+symbol *fsdiv;
+symbol *fseq;
+symbol *fsneq;
+symbol *fslt;
+symbol *fslteq;
+symbol *fsgt;
+symbol *fsgteq;
 
-symbol *__fps16x16_add;
-symbol *__fps16x16_sub;
-symbol *__fps16x16_mul;
-symbol *__fps16x16_div;
-symbol *__fps16x16_eq;
-symbol *__fps16x16_neq;
-symbol *__fps16x16_lt;
-symbol *__fps16x16_lteq;
-symbol *__fps16x16_gt;
-symbol *__fps16x16_gteq;
+symbol *fps16x16_add;
+symbol *fps16x16_sub;
+symbol *fps16x16_mul;
+symbol *fps16x16_div;
+symbol *fps16x16_eq;
+symbol *fps16x16_neq;
+symbol *fps16x16_lt;
+symbol *fps16x16_lteq;
+symbol *fps16x16_gt;
+symbol *fps16x16_gteq;
 
 /* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED/BOTH */
-symbol *__muldiv[3][3][4];
+symbol *muldiv[3][3][4];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
-sym_link *__multypes[3][2];
+sym_link *multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
-symbol *__conv[2][3][2];
+symbol *conv[2][3][2];
 /* Dims: to/from fixed16x16, BYTE/WORD/DWORD/FLOAT, SIGNED/USIGNED */
-symbol *__fp16x16conv[2][4][2];
+symbol *fp16x16conv[2][4][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-symbol *__rlrr[2][3][2];
+symbol *rlrr[2][3][2];
 
 sym_link *charType;
 sym_link *floatType;
@@ -3674,7 +3674,7 @@ initCSupport ()
     "rl", "rr"
   };
 
-  int bwd, su, muldivmod, tofrom, rlrr;
+  int bwd, su, muldivmod, tofrom, slsr;
 
   if (getenv("SDCC_NO_C_SUPPORT")) {
     /* for debugging only */
@@ -3698,36 +3698,36 @@ initCSupport ()
         default:
           assert (0);
         }
-      __multypes[bwd][0] = l;
-      __multypes[bwd][1] = copyLinkChain (l);
-      SPEC_USIGN (__multypes[bwd][1]) = 1;
+      multypes[bwd][0] = l;
+      multypes[bwd][1] = copyLinkChain (l);
+      SPEC_USIGN (multypes[bwd][1]) = 1;
     }
 
   floatType = newFloatLink ();
   fixed16x16Type = newFixed16x16Link ();
   charType = (options.unsigned_char) ? UCHARTYPE : SCHARTYPE;
 
-  __fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
-  __fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);
-  __fsmul = funcOfType ("__fsmul", floatType, floatType, 2, options.float_rent);
-  __fsdiv = funcOfType ("__fsdiv", floatType, floatType, 2, options.float_rent);
-  __fseq = funcOfType ("__fseq", charType, floatType, 2, options.float_rent);
-  __fsneq = funcOfType ("__fsneq", charType, floatType, 2, options.float_rent);
-  __fslt = funcOfType ("__fslt", charType, floatType, 2, options.float_rent);
-  __fslteq = funcOfType ("__fslteq", charType, floatType, 2, options.float_rent);
-  __fsgt = funcOfType ("__fsgt", charType, floatType, 2, options.float_rent);
-  __fsgteq = funcOfType ("__fsgteq", charType, floatType, 2, options.float_rent);
+  fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
+  fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);
+  fsmul = funcOfType ("__fsmul", floatType, floatType, 2, options.float_rent);
+  fsdiv = funcOfType ("__fsdiv", floatType, floatType, 2, options.float_rent);
+  fseq = funcOfType ("__fseq", charType, floatType, 2, options.float_rent);
+  fsneq = funcOfType ("__fsneq", charType, floatType, 2, options.float_rent);
+  fslt = funcOfType ("__fslt", charType, floatType, 2, options.float_rent);
+  fslteq = funcOfType ("__fslteq", charType, floatType, 2, options.float_rent);
+  fsgt = funcOfType ("__fsgt", charType, floatType, 2, options.float_rent);
+  fsgteq = funcOfType ("__fsgteq", charType, floatType, 2, options.float_rent);
 
-  __fps16x16_add = funcOfType ("__fps16x16_add", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_sub = funcOfType ("__fps16x16_sub", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_mul = funcOfType ("__fps16x16_mul", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_div = funcOfType ("__fps16x16_div", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_eq = funcOfType ("__fps16x16_eq", charType, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_neq = funcOfType ("__fps16x16_neq", charType, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_lt = funcOfType ("__fps16x16_lt", charType, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_lteq = funcOfType ("__fps16x16_lteq", charType, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_gt = funcOfType ("__fps16x16_gt", charType, fixed16x16Type, 2, options.float_rent);
-  __fps16x16_gteq = funcOfType ("__fps16x16_gteq", charType, fixed16x16Type, 2, options.float_rent);
+  fps16x16_add = funcOfType ("__fps16x16_add", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  fps16x16_sub = funcOfType ("__fps16x16_sub", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  fps16x16_mul = funcOfType ("__fps16x16_mul", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  fps16x16_div = funcOfType ("__fps16x16_div", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  fps16x16_eq = funcOfType ("__fps16x16_eq", charType, fixed16x16Type, 2, options.float_rent);
+  fps16x16_neq = funcOfType ("__fps16x16_neq", charType, fixed16x16Type, 2, options.float_rent);
+  fps16x16_lt = funcOfType ("__fps16x16_lt", charType, fixed16x16Type, 2, options.float_rent);
+  fps16x16_lteq = funcOfType ("__fps16x16_lteq", charType, fixed16x16Type, 2, options.float_rent);
+  fps16x16_gt = funcOfType ("__fps16x16_gt", charType, fixed16x16Type, 2, options.float_rent);
+  fps16x16_gteq = funcOfType ("__fps16x16_gteq", charType, fixed16x16Type, 2, options.float_rent);
 
   for (tofrom = 0; tofrom < 2; tofrom++)
     {
@@ -3738,12 +3738,12 @@ initCSupport ()
               if (tofrom)
                 {
                   SNPRINTF (buffer, sizeof(buffer), "__fs2%s%s", ssu[su*3], sbwd[bwd]);
-                  __conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], floatType, 1, options.float_rent);
+                  conv[tofrom][bwd][su] = funcOfType (buffer, multypes[bwd][su], floatType, 1, options.float_rent);
                 }
               else
                 {
                   SNPRINTF (buffer, sizeof(buffer), "__%s%s2fs", ssu[su*3], sbwd[bwd]);
-                  __conv[tofrom][bwd][su] = funcOfType (buffer, floatType, __multypes[bwd][su], 1, options.float_rent);
+                  conv[tofrom][bwd][su] = funcOfType (buffer, floatType, multypes[bwd][su], 1, options.float_rent);
                 }
             }
         }
@@ -3758,18 +3758,18 @@ initCSupport ()
               if (tofrom)
                 {
                   SNPRINTF (buffer, sizeof(buffer), "__fps16x162%s%s", ssu[su*3], fp16x16sbwd[bwd]);
-                  if(bwd == 3) {
-                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, floatType, fixed16x16Type, 1, options.float_rent);
-                  } else
-                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], fixed16x16Type, 1, options.float_rent);
+                  if(bwd == 3)
+                    fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, floatType, fixed16x16Type, 1, options.float_rent);
+                  else
+                    fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, multypes[bwd][su], fixed16x16Type, 1, options.float_rent);
                 }
               else
                 {
                   SNPRINTF (buffer, sizeof(buffer), "__%s%s2fps16x16", ssu[su*3], fp16x16sbwd[bwd]);
-                  if(bwd == 3) {
-                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, floatType, 1, options.float_rent);
-                  } else
-                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, __multypes[bwd][su], 1, options.float_rent);
+                  if(bwd == 3)
+                    fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, floatType, 1, options.float_rent);
+                  else
+                    fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, multypes[bwd][su], 1, options.float_rent);
                 }
             }
         }
@@ -3787,8 +3787,8 @@ initCSupport ()
                        smuldivmod[muldivmod],
                        ssu[su*3],
                        sbwd[bwd]);
-              __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
-              FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+              muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), multypes[bwd][su], multypes[bwd][su], 2, options.intlong_rent);
+              FUNC_NONBANKED (muldiv[muldivmod][bwd][su]->type) = 1;
             }
         }
     }
@@ -3813,10 +3813,10 @@ initCSupport ()
                   smuldivmod[muldivmod],
                   ssu[su],
                   sbwd[bwd]);
-              __muldiv[muldivmod][bwd][su] = funcOfType (
+              muldiv[muldivmod][bwd][su] = funcOfType (
                   _mangleFunctionName(buffer),
-                  __multypes[bwd][su%2],
-                  __multypes[bwd][su/2],
+                  multypes[bwd][su%2],
+                  multypes[bwd][su/2],
                   2,
                   options.intlong_rent);
             }
@@ -3837,10 +3837,10 @@ initCSupport ()
                       smuldivmod[muldivmod],
                       ssu[su*3],
                       sbwd[bwd]);
-                  __muldiv[muldivmod][bwd][su] = funcOfType (
+                  muldiv[muldivmod][bwd][su] = funcOfType (
                       _mangleFunctionName(buffer),
-                      __multypes[bwd][su],
-                      __multypes[bwd][su],
+                      multypes[bwd][su],
+                      multypes[bwd][su],
                       2,
                       options.intlong_rent);
                 }
@@ -3863,10 +3863,10 @@ initCSupport ()
               smuldivmod[muldivmod],
               ssu[su],
               sbwd[bwd]);
-          __muldiv[muldivmod][bwd][su] = funcOfType (
+          muldiv[muldivmod][bwd][su] = funcOfType (
               _mangleFunctionName(buffer),
-              __multypes[1][su],
-              __multypes[bwd][su],
+              multypes[1][su],
+              multypes[bwd][su],
               2,
               options.intlong_rent);
         }
@@ -3884,17 +3884,17 @@ initCSupport ()
                 "_%s%s",
                 smuldivmod[muldivmod],
                 sbwd[bwd]);
-      __muldiv[muldivmod][bwd][0] = funcOfType (
+      muldiv[muldivmod][bwd][0] = funcOfType (
           _mangleFunctionName(buffer),
-          __multypes[bwd][su],
-          __multypes[bwd][su],
+          multypes[bwd][su],
+          multypes[bwd][su],
           2,
           options.intlong_rent);
       /* signed = unsigned */
-      __muldiv[muldivmod][bwd][1] = __muldiv[muldivmod][bwd][0];
+      muldiv[muldivmod][bwd][1] = muldiv[muldivmod][bwd][0];
     }
 
-  for (rlrr = 0; rlrr < 2; rlrr++)
+  for (slsr = 0; slsr < 2; slsr++)
     {
       for (bwd = 0; bwd < 3; bwd++)
         {
@@ -3902,13 +3902,13 @@ initCSupport ()
             {
               SNPRINTF (buffer, sizeof(buffer),
                         "_%s%s%s",
-                       srlrr[rlrr],
+                       srlrr[slsr],
                        ssu[su*3],
                        sbwd[bwd]);
-              __rlrr[rlrr][bwd][su] = funcOfType (
+              rlrr[slsr][bwd][su] = funcOfType (
                   _mangleFunctionName(buffer),
-                  __multypes[bwd][su],
-                  __multypes[0][0],
+                  multypes[bwd][su],
+                  multypes[0][0],
                   2,
                   options.intlong_rent);
             }

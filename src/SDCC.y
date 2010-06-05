@@ -1260,7 +1260,7 @@ parameter_declaration
 
           if (IS_SPEC ($1) && !IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
-              werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, $2->name);
+              werror (E_STORAGE_CLASS_FOR_PARAMETER, $2->name);
             }
           pointerTypes ($2->type, $1);
           addDecl ($2, 0, $1);
@@ -1284,7 +1284,7 @@ type_name
         {
           if (IS_SPEC ($1) && !IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
-              werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, "type name");
+              werror (E_STORAGE_CLASS_FOR_PARAMETER, "type name");
             }
           $$ = $1; ignoreTypedefType = 0;
         }
@@ -1295,7 +1295,7 @@ type_name
 
           if (IS_SPEC ($1) && !IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
-              werror (E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER, "type name");
+              werror (E_STORAGE_CLASS_FOR_PARAMETER, "type name");
             }
           pointerTypes ($2,$1);
           for (p = $2; p && p->next; p = p->next)

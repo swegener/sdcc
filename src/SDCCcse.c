@@ -2014,7 +2014,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
            ic->op == SEND) &&
           IS_SYMOP (IC_LEFT (ic)))
         {
-
           /* check if they can be replaced */
           if (!computeOnly)
             {
@@ -2032,8 +2031,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
                            ebb->outDefs, &ebb->usesDefs);
             }
 
-
-          /* if we a sending a pointer as a parameter
+          /* if we are sending a pointer as a parameter
              then kill all cse since the pointed to item
              might be changed in the function being called */
           if ((ic->op == IPUSH || ic->op == SEND) &&
@@ -2154,7 +2152,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
           !IS_BITFIELD (OP_SYM_ETYPE (IC_LEFT (ic))) &&
           !computeOnly && ic->op != ADDRESS_OF)
         {
-
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop, checkSign);
           if (pdop)
@@ -2195,7 +2192,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* right operand */
       if (IS_SYMOP (IC_RIGHT (ic)) && !computeOnly)
         {
-
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop, checkSign);
           if (pdop) {

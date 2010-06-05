@@ -223,7 +223,7 @@
 #define E_NEGATIVE_ARRAY_SIZE         195 /* Size of array '%s' is negative */
 #define W_TARGET_LOST_QUALIFIER       196 /* Pointer target lost qualifier */
 #define W_DEPRECATED_KEYWORD          197 /* keyword '%s' is deprecated, use '%s' instead */
-#define E_STORAGE_CLASS_SPECIFIED_FOR_PARAMETER 198 /* storage class specified for parameter ‘%s’ */
+#define E_STORAGE_CLASS_FOR_PARAMETER 198 /* storage class specified for parameter '%s' */
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 
 /** Describes the maximum error level that will be logged.  Any level

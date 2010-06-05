@@ -321,11 +321,11 @@ symbolVal (symbol * sym)
 
   if (*sym->rname)
     {
-        SNPRINTF (val->name, sizeof(val->name), "%s", sym->rname);
+      SNPRINTF (val->name, sizeof(val->name), "%s", sym->rname);
     }
   else
     {
-        SNPRINTF (val->name, sizeof(val->name), "_%s", sym->name);
+      SNPRINTF (val->name, sizeof(val->name), "_%s", sym->name);
     }
 
   return val;

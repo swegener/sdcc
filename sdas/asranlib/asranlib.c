@@ -283,9 +283,9 @@ is_rel (FILE * libfp)
     {
       switch (getc (libfp))
         {
-	case '2':
-	case '3':
-	case '4':
+        case '2':
+        case '3':
+        case '4':
           switch (getc (libfp))
             {
             case '\r':
@@ -421,7 +421,6 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
           free (obj);
 
           ps += strlen(ps) + 1;
-        
         }
       free (buf);
 
@@ -694,7 +693,7 @@ do_ranlib (const char *archive)
 
       if (0 != remove (archive))
         {
-          fprintf (stderr, "asranlib: can't remove %s to %s: ", tmpfile, archive);
+          fprintf (stderr, "asranlib: can't remove %s: ", archive);
           perror (NULL);
         }
       else if (0 != rename (tmpfile, archive))
@@ -749,8 +748,8 @@ struct opt_s
 opts[] =
   {
     { 'v', "verbose", &do_verbose, "Be more verbose about the operation" },
-    { 'V', "version", &print_version, "Print this help message" },
-    { 'h', "help", &usage, "Print version information" },
+    { 'V', "version", &print_version, "Print version information" },
+    { 'h', "help", &usage, "Print this help message" },
     { 't', "list", &do_list, "List the contents of an archive" },
     { 's', "print-armap", &print_armap, "Print the archive index" },
   };

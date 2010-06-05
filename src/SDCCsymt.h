@@ -532,45 +532,45 @@ extern bucket *StructTab[];
 extern bucket *TypedefTab[];
 extern bucket *LabelTab[];
 extern bucket *enumTab[];
-extern symbol *__fsadd;
-extern symbol *__fssub;
-extern symbol *__fsmul;
-extern symbol *__fsdiv;
-extern symbol *__fseq;
-extern symbol *__fsneq;
-extern symbol *__fslt;
-extern symbol *__fslteq;
-extern symbol *__fsgt;
-extern symbol *__fsgteq;
+extern symbol *fsadd;
+extern symbol *fssub;
+extern symbol *fsmul;
+extern symbol *fsdiv;
+extern symbol *fseq;
+extern symbol *fsneq;
+extern symbol *fslt;
+extern symbol *fslteq;
+extern symbol *fsgt;
+extern symbol *fsgteq;
 
-extern symbol *__fps16x16_add;
-extern symbol *__fps16x16_sub;
-extern symbol *__fps16x16_mul;
-extern symbol *__fps16x16_div;
-extern symbol *__fps16x16_eq;
-extern symbol *__fps16x16_neq;
-extern symbol *__fps16x16_lt;
-extern symbol *__fps16x16_lteq;
-extern symbol *__fps16x16_gt;
-extern symbol *__fps16x16_gteq;
+extern symbol *fps16x16_add;
+extern symbol *fps16x16_sub;
+extern symbol *fps16x16_mul;
+extern symbol *fps16x16_div;
+extern symbol *fps16x16_eq;
+extern symbol *fps16x16_neq;
+extern symbol *fps16x16_lt;
+extern symbol *fps16x16_lteq;
+extern symbol *fps16x16_gt;
+extern symbol *fps16x16_gteq;
 
 /* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED/BOTH */
-extern symbol *__muldiv[3][3][4];
+extern symbol *muldiv[3][3][4];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
-extern sym_link *__multypes[3][2];
+extern sym_link *multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
-extern symbol *__conv[2][3][2];
+extern symbol *conv[2][3][2];
 /* Dims: to/from fixed16x16, BYTE/WORD/DWORD/FLOAT, SIGNED/USIGNED */
-extern symbol *__fp16x16conv[2][4][2];
+extern symbol *fp16x16conv[2][4][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-extern symbol *__rlrr[2][3][2];
+extern symbol *rlrr[2][3][2];
 
-#define SCHARTYPE       __multypes[0][0]
-#define UCHARTYPE       __multypes[0][1]
-#define INTTYPE         __multypes[1][0]
-#define UINTTYPE        __multypes[1][1]
-#define LONGTYPE        __multypes[2][0]
-#define ULONGTYPE       __multypes[2][1]
+#define SCHARTYPE       multypes[0][0]
+#define UCHARTYPE       multypes[0][1]
+#define INTTYPE         multypes[1][0]
+#define UINTTYPE        multypes[1][1]
+#define LONGTYPE        multypes[2][0]
+#define ULONGTYPE       multypes[2][1]
 
 extern sym_link *floatType;
 extern sym_link *fixed16x16Type;

@@ -1,3 +1,10 @@
+2010-06-05 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/asm/pic16/features.h, device/include/pic16/*.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/p18fxxx.inc, device/lib/pic16/libsdcc/*.c:
+	  sdcc library license changed to GPL+LE
+
 2010-06-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asranlib/asranlib.c (do_ranlib): fixed text output

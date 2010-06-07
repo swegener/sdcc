@@ -34,11 +34,11 @@ replace restart {
 
 replace restart {
 	ld	%1, %2
-	ld	a, %1
+	ld	%3, %1
 } by {
-	; peephole 0b loaded %2 into a directly instead of going through %1.
-	ld	a, %2
-} if notVolatile(%1), notUsed(%1)
+	; peephole 0b loaded %3 from %2 directly instead of going through %1.
+	ld	%3, %2
+} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
 
 replace restart {
 	ld	%1,%2 (%3)
@@ -330,14 +330,6 @@ replace restart {
 	ld	a,#%2
 	adc	a,#%3
 } if notVolatile(%1)
-
-replace restart {
-	ld	%1,(hl)
-	ld	e,%1
-} by {
-	; peephole 0u loaded e from (hl) instead of going through %1.
-	ld	e,(hl)
-} if notUsed(%1)
 
 replace restart {
 	ld	%1,l
@@ -1065,6 +1057,38 @@ replace restart {
 	; peephole 41b used 16-bit addition.
 	ld	a, h
 } if notUsed('bc')
+
+replace restart {
+	ld	a, l
+	add	a, #0x%1
+	ld	e, a
+	ld	a, h
+	adc	a, #0x%2
+	ld	d, a
+} by {
+	ld	de, #0x%2%1
+	add	hl, de
+	; peephole 41c used 16-bit addition.
+	ld	e, l
+	ld	d, h
+	ld	a, h
+}
+
+replace restart {
+	ld	a, l
+	add	a, #0x%1
+	ld	c, a
+	ld	a, h
+	adc	a, #0x%2
+	ld	b, a
+} by {
+	ld	bc, #0x%2%1
+	add	hl,bc
+	; peephole 41d used 16-bit addition.
+	ld	c, l
+	ld	b, h
+	ld	a, h
+}
 
 replace restart {
 	ld	%1,a

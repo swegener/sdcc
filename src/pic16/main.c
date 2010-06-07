@@ -1150,7 +1150,7 @@ PORT pic16_port =
     ".o",           /* extension for object files */
     0               /* no need for linker file */
   },
-  {
+  {                 /* Peephole optimizer */
     _defaultRules
   },
   {

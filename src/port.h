@@ -145,6 +145,7 @@ typedef struct
         bitVect * (*getRegsWritten)(lineNode *line);
         bool (*deadMove) (const char *reg, lineNode *currPl, lineNode *head);
         bool (*notUsed) (const char *reg, lineNode *currPl, lineNode *head);
+        bool (*canAssign) (const char *op1, const char *op2);
       }
     peep;
 

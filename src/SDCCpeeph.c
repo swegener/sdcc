@@ -1123,6 +1123,40 @@ operandBaseName (const char *op)
   return op;
 }
 
+/*-----------------------------------------------------------------*/
+/* canAssign - Check, if we can do ld dst, src.                    */
+/*-----------------------------------------------------------------*/
+FBYNAME (canAssign)
+{
+  set *operands;
+  const char *dst, *src;
+
+  operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+    {
+      fprintf (stderr,
+               "*** internal error: canAssign peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  dst = setFirstItem (operands);
+  src = setNextItem (operands);
+
+  if (port->peep.canAssign)
+    {  
+      bool ret = port->peep.canAssign (dst, src);
+      deleteSet (&operands);
+      return (ret);
+    }
+
+  deleteSet (&operands);
+
+  fprintf (stderr, "Function canAssign not initialized in port structure\n");
+  return FALSE;
+}
+
 /*-------------------------------------------------------------------*/
 /* operandsNotRelated - returns true if the condition's operands are */
 /* not related (taking into account register name aliases). N-way    */
@@ -1306,6 +1340,9 @@ ftab[] =                                // sorted on the number of times used
   },
   {
     "notUsed", notUsed
+  },
+  {
+    "canAssign", canAssign
   },
   {
     "notSame", notSame

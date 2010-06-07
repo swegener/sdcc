@@ -411,7 +411,7 @@ PORT hc08_port =
     NULL,                       /* crt */
     _libs,                      /* libs */
   },
-  {
+  {                             /* Peephole optimizer */
     _defaultRules
   },
   {

@@ -801,7 +801,8 @@ PORT mcs51_port =
     getRegsRead,
     getRegsWritten,
     mcs51DeadMove,
-    0
+    0,
+    0,
   },
   {
     /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

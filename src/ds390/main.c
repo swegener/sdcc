@@ -1543,11 +1543,14 @@ PORT ds400_port =
     NULL,                       /* crt */
     _libs_ds400,                /* libs */
   },
-  {
+  {                             /* Peephole optimizer */
     _defaultRules,
     getInstructionSize,
     getRegsRead,
-    getRegsWritten
+    getRegsWritten,
+    0,
+    0,
+    0,
   },
   {
         /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

@@ -1,5 +1,20 @@
 2010-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/port.h,
+	  src/SDCCpeeph.c,
+	  src/mcs51/main.c,
+	  src/pic/main.c,
+	  src/z80/peep.h,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def,
+	  src/pic16/main.c,
+	  src/hc08/main.c,
+	  src/ds390/main.c:
+	  Added canAssign() for use in peepholes.
+
+2010-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/mappings.i,
 	  src/z80/peeph-gbz80.def:

@@ -764,7 +764,8 @@ PORT z80_port =
     0,
     0,
     0,
-    z80notUsed
+    z80notUsed,
+    z80canAssign,
   },
   {
         /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
@@ -888,8 +889,14 @@ PORT gbz80_port =
     _crt,                       /* crt */
     _libs_gb,                   /* libs */
   },
-  {
-    _gbz80_defaultRules
+  {                             /* Peephole optimizer */
+    _gbz80_defaultRules,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
   },
   {
     /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

@@ -23,4 +23,5 @@
 -------------------------------------------------------------------------*/
 
 bool z80notUsed(const char *what, lineNode *endPl, lineNode *head);
+bool z80canAssign (const char *dst, const char *src);
 

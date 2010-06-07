@@ -504,11 +504,10 @@ doTermScan (lineNode **pl, const char *what)
     }
 }
 
+/* Regular 8 bit reg */
 static bool
 isReg(const char *what)
 {
-  if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
-    return TRUE;
   if(strlen(what) != 1)
     return FALSE;
   switch(*what)
@@ -525,6 +524,17 @@ isReg(const char *what)
   return FALSE;
 }
 
+/* 8-Bit reg only accessible by 16-bit and undocumented instructions */
+static bool
+isUReg(const char *what)
+{
+  if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
+    return TRUE;
+  if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
+    return TRUE;
+  return FALSE;
+}
+
 static bool
 isRegPair(const char *what)
 {
@@ -535,6 +545,10 @@ isRegPair(const char *what)
   if(strcmp(what, "de") == 0)
     return TRUE;
   if(strcmp(what, "hl") == 0)
+    return TRUE;
+  if(strcmp(what, "sp") == 0)
+    return TRUE;
+  if(strcmp(what, "ix") == 0)
     return TRUE;
   if(strcmp(what, "iy") == 0)
     return TRUE;
@@ -560,7 +574,7 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 
-  if(!isReg(what))
+  if(!isReg(what) && !isUReg(what))
     return FALSE;
 
   _G.head = head;
@@ -572,5 +586,27 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
     return FALSE;
 
   return TRUE;
+}
+
+bool
+z80canAssign (const char *dst, const char *src)
+{
+  // 8-bit regs can be assigned to each other directly.
+  if(isReg(dst) && isReg(src))
+    return TRUE;
+
+  // Same if at most one of them is (hl).
+  if(isReg(dst) && !strcmp(src, "(hl)"))
+    return TRUE;
+  if(!strcmp(dst, "(hl)") && isReg(src))
+    return TRUE;
+
+  // Can assign between a and (bc), (de)
+  if(!strcmp(dst, "a") && (!strcmp(src, "(bc)") || ! strcmp(src, "(de)")))
+    return TRUE;
+  if((!strcmp(dst, "(bc)") || ! strcmp(dst, "(de)")) && !strcmp(src, "a"))
+    return TRUE;
+
+  return FALSE;
 }
 

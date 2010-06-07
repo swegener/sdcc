@@ -344,7 +344,7 @@ PORT pic_port =
     ".o",
     0
   },
-  {
+  {                 /* Peephole optimizer */
     _defaultRules
   },
   {

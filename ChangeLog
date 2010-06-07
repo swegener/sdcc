@@ -1,3 +1,10 @@
+2010-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def,
+	  src/z80/peeph-gbz80.def:
+	  Move generation of short jumps into peepholes.
+
 2010-06-05 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/asm/pic16/features.h, device/include/pic16/*.h,

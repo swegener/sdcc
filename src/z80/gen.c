@@ -3680,7 +3680,7 @@ genPlusIncr (iCode * ic)
           emit2 ("inc %s", aopGet (AOP (IC_RESULT (ic)), offset++, FALSE));
           if (size)
             {
-              emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+              emit2 ("jp NZ,!tlabel", tlbl->key + 100);
             }
         }
       emitLabelNoSpill (tlbl->key + 100);
@@ -3733,7 +3733,7 @@ outBitAcc (operand * result)
     }
   else
     {
-      emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
+      emit2 ("jp Z,!tlabel", tlbl->key + 100);
       emit2 ("ld a,!one");
       emitLabelNoSpill (tlbl->key + 100);
       outAcc (result);
@@ -5122,7 +5122,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           _emitMove (_pairs[pair].l, aopGet (AOP (left), offset, FALSE));
           _moveA (aopGet (AOP (right), offset, FALSE));
           emit2 ("sub a,%s", _pairs[pair].l);
-          emit2 ("!shortjp NZ,!tlabel", lbl->key + 100);
+          emit2 ("jp NZ,!tlabel", lbl->key + 100);
           offset++;
         }
       return pair;
@@ -5142,7 +5142,7 @@ gencjne (operand * left, operand * right, symbol * lbl)
 
   /* PENDING: ?? */
   emit2 ("ld a,!one");
-  emit2 ("!shortjp !tlabel", tlbl->key + 100);
+  emit2 ("jp !tlabel", tlbl->key + 100);
   emitLabel (lbl->key + 100);
   emit2 ("xor a,a");
   emitLabelNoSpill (tlbl->key + 100);
@@ -5201,7 +5201,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               symbol *lbl = newiTempLabel (NULL);
               if(pop != PAIR_INVALID)
                 emit2 ("pop %s", _pairs[pop].name);
-              emit2 ("!shortjp !tlabel", lbl->key + 100);
+              emit2 ("jp !tlabel", lbl->key + 100);
               emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);
               emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
@@ -5298,7 +5298,7 @@ genAndOp (iCode * ic)
     {
       tlbl = newiTempLabel (NULL);
       _toBoolean (left);
-      emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
+      emit2 ("jp Z,!tlabel", tlbl->key + 100);
       _toBoolean (right);
       emitLabelNoSpill (tlbl->key + 100);
       outBitAcc (result);
@@ -5335,7 +5335,7 @@ genOrOp (iCode * ic)
     {
       tlbl = newiTempLabel (NULL);
       _toBoolean (left);
-      emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+      emit2 ("jp NZ,!tlabel", tlbl->key + 100);
       _toBoolean (right);
       emitLabelNoSpill (tlbl->key + 100);
       outBitAcc (result);
@@ -5482,7 +5482,7 @@ genAnd (iCode * ic, iCode * ifx)
                   emit2 ("or a,a");
                 }
               if (size || ifx)  /* emit jmp only, if it is actually used */
-                emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+                emit2 ("jp NZ,!tlabel", tlbl->key + 100);
             }
               offset++;
         }
@@ -5685,7 +5685,7 @@ genOr (iCode * ic, iCode * ifx)
             }
 
           if (ifx)  /* emit jmp only, if it is actually used */
-            emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+            emit2 ("jp NZ,!tlabel", tlbl->key + 100);
 
           offset++;
         }
@@ -5849,7 +5849,7 @@ genXor (iCode * ic, iCode * ifx)
           _moveA (aopGet (AOP (left), offset, FALSE));
           emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
           if (ifx)      /* emit jmp only, if it is actually used * */
-            emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+            emit2 ("jp NZ,!tlabel", tlbl->key + 100);
           offset++;
         }
       if (ifx)
@@ -6113,7 +6113,7 @@ shiftR2Left2Result (operand * left, int offl,
       emitRsh2 (AOP (result), size, is_signed);
 
       emit2 ("dec a");
-      emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+      emit2 ("jp NZ,!tlabel", tlbl->key + 100);
     }
 }
 
@@ -6181,7 +6181,7 @@ shiftL2Left2Result (operand * left, int offl,
         if (shCount > 1)
           {
             emit2 ("ld a,!immedbyte+1", shCount);
-            emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+            emit2 ("jp !tlabel", tlbl1->key + 100);
             emitLabelNoSpill (tlbl->key + 100);
           }
 
@@ -6204,7 +6204,7 @@ shiftL2Left2Result (operand * left, int offl,
           {
             emitLabelNoSpill (tlbl1->key + 100);
             emit2 ("dec a");
-            emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+            emit2 ("jp NZ,!tlabel", tlbl->key + 100);
           }
       }
   }
@@ -6520,7 +6520,7 @@ genLeftShift (iCode * ic)
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
      _pop (PAIR_AF);
 
-  emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+  emit2 ("jp !tlabel", tlbl1->key + 100);
   emitLabelNoSpill (tlbl->key + 100);
   l = aopGet (AOP (result), offset, FALSE);
 
@@ -6540,7 +6540,7 @@ genLeftShift (iCode * ic)
     }
   emitLabelNoSpill (tlbl1->key + 100);
   emit2 ("dec a");
-  emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+  emit2 ("jp NZ,!tlabel", tlbl->key + 100);
 
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -6795,7 +6795,7 @@ genRightShift (iCode * ic)
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
      _pop (PAIR_AF);
 
-  emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+  emit2 ("jp !tlabel", tlbl1->key + 100);
   emitLabelNoSpill (tlbl->key + 100);
   while (size--)
     {
@@ -6812,7 +6812,7 @@ genRightShift (iCode * ic)
     }
   emitLabelNoSpill (tlbl1->key + 100);
   emit2 ("dec a");
-  emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
+  emit2 ("jp NZ,!tlabel", tlbl->key + 100);
 
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -7921,7 +7921,7 @@ genEndCritical (iCode *ic)
       aopOp (IC_RIGHT (ic), ic, FALSE, TRUE);
       _toBoolean (IC_RIGHT (ic));
       //don't enable interrupts if they were off before
-      emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
+      emit2 ("jp Z,!tlabel", tlbl->key + 100);
       emit2 ("!ei");
       emitLabel (tlbl->key + 100);
       freeAsmop (IC_RIGHT (ic), NULL, ic);

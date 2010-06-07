@@ -787,3 +787,13 @@ replace restart {
 //	ld	a,(de)
 //}
 
+// Ensure that all rules above see only jp, not jr.
+barrier
+
+replace {
+	jp	%5
+} by {
+	jr	%5
+	; peephole z14 changed absolute to relative unconditional jump.
+} if labelInRange()
+

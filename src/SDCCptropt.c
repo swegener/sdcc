@@ -393,3 +393,4 @@ ptrPseudoSymConvert (symbol *sym, iCode *dic, char *name)
   IC_LEFT(dic)=NULL;
 #endif
 }
+

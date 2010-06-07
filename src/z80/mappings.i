@@ -13,7 +13,6 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "ldahlsp", "ldhl\tsp,#%d" },
     { "ldaspsp", "lda sp,%d(sp)" },
     { "*pair", "(%s)" },
-    { "shortjp", "jr" },
     { "enter", "" },
     { "enterx", 
       "lda sp,-%d(sp)" },
@@ -78,7 +77,6 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"add\thl,sp\n"
 		"ld\tsp,hl" },
     { "*pair", "(%s)" },
-    { "shortjp", "jp" },
     { "enter", 
 		"push\tix\n"
 		"ld\tix,#0\n"
@@ -210,7 +208,6 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
     { "ldahlsp", "ld hl,[sp+%d]" },
     { "ldaspsp", "add sp,%d" },
     { "*pair", "[%s]" },
-    { "shortjp", "jr" },
     { NULL, NULL }
 };
 
@@ -301,7 +298,6 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
     { "ldahlsp", "ldhl sp,%d" },
     { "ldaspsp", "add sp,%d" },
     { "*pair", "(%s)" },
-    { "shortjp", "jr" },
     { NULL, NULL }
 };
 
@@ -378,7 +374,6 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
 		"add\thl,sp\n"
 		"ld\tsp,hl" },
     { "*pair", "(%s)" },
-    { "shortjp", "jp" },
     { "enter", 
 		"push\tix\n"
 		"ld\tix,0\n"

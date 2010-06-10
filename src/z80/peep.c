@@ -607,6 +607,21 @@ z80canAssign (const char *dst, const char *src)
   if((!strcmp(dst, "(bc)") || ! strcmp(dst, "(de)")) && !strcmp(src, "a"))
     return TRUE;
 
+  // Can load immediate values directly into registers and register pairs.
+  if((isReg(dst) || isRegPair(dst)) && src[0] == '#')
+    return TRUE;
+
+  if((!strcmp(dst, "a") || isRegPair(dst)) && !strncmp(src, "(#", 2))
+    return TRUE;
+  if(!strncmp(dst, "(#", 2) && (!strcmp(src, "a") || isRegPair(src)))
+    return TRUE;
+
+  // Can load immediate values directly into (hl).
+  if(!strcmp(dst, "(hl)") && src[0] == '#')
+    return TRUE;
+
+  /* Todo: Indexed loads, exotic loads (involving sp, r, i) */
+
   return FALSE;
 }
 

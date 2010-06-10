@@ -1141,8 +1141,8 @@ FBYNAME (canAssign)
       return FALSE;
     }
 
-  dst = setFirstItem (operands);
-  src = setNextItem (operands);
+  src = setFirstItem (operands);
+  dst = setNextItem (operands);
 
   if (port->peep.canAssign)
     {  

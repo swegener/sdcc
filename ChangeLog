@@ -1,3 +1,9 @@
+2010-06-12 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/asm/pic/features.h, device/include/pic/*.h,
+	  device/include/pic/p16f_common.inc:
+	  sdcc library license changed to GPL+LE
+
 2010-06-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

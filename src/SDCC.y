@@ -110,7 +110,7 @@ bool uselessDecl = TRUE;
 %type <sym> declarator2_function_attributes while do for critical
 %type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier
-%type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes type_specifier2
+%type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
 %type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
@@ -538,7 +538,7 @@ storage_class_specifier
    ;
 
 function_specifier
-   : INLINE   {
+   : INLINE    {
                   $$ = newLink (SPECIFIER) ;
                   SPEC_INLINE($$) = 1 ;
                }
@@ -559,17 +559,6 @@ Interrupt_storage
    ;
 
 type_specifier
-   : type_specifier2
-   | type_specifier2 AT constant_expr
-        {
-           /* add this to the storage class specifier  */
-           SPEC_ABSA($1) = 1;   /* set the absolute addr flag */
-           /* now get the abs addr from value */
-           SPEC_ADDR($1) = (unsigned int) ulFromVal(constExprValue($3,TRUE)) ;
-        }
-   ;
-
-type_specifier2
    : BOOL      {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_BOOL   ;
@@ -663,6 +652,14 @@ type_specifier2
                   SPEC_BLEN($$) = 1;
                   SPEC_BSTR($$) = 0;
                   ignoreTypedefType = 1;
+               }
+
+   | AT constant_expr {
+                  $$=newLink(SPECIFIER);
+                  /* add this to the storage class specifier  */
+                  SPEC_ABSA($$) = 1;   /* set the absolute addr flag */
+                  /* now get the abs addr from value */
+                  SPEC_ADDR($$) = (unsigned int) ulFromVal(constExprValue($2,TRUE)) ;
                }
 
    | struct_or_union_specifier  {

@@ -21,6 +21,17 @@ typedef struct
 {mem} __at(ADDRESS(B9)) char y = 'y';
 {mem} __at(ADDRESS(B0)) int  k = 0x1234;
 
+char * {mem} __at(ADDRESS(A0)) pc = NULL;
+
+typedef char *Pointer;
+{mem} Pointer __at(ADDRESS(A4)) p = NULL;
+
+typedef char Array[2];
+{mem} Array __at(ADDRESS(A8)) a = {0};
+
+typedef void (* const Function)(void);
+{mem} Function __at(ADDRESS(AC)) f = NULL;
+
 char z = 'z';
 
 void
@@ -36,6 +47,11 @@ testAbsolute(void)
   ASSERT(pC[9] == 'y');
   ASSERT(pC[6] == 's');
   ASSERT(pI[0] == 0x1234);
+
+  ASSERT((unsigned int)&pc==ADDRESS(A0));
+  ASSERT((unsigned int)&p==ADDRESS(A4));
+  ASSERT((unsigned int)&a==ADDRESS(A8));
+  ASSERT((unsigned int)&f==ADDRESS(AC));
 #endif
 }
 

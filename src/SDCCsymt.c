@@ -516,6 +516,8 @@ addDecl (symbol * sym, int type, sym_link * p)
           sym->etype = sym->etype->next = newLink (SPECIFIER);
         }
       SPEC_SCLS (sym->etype) = SPEC_SCLS (DCL_TSPEC (p));
+      SPEC_ABSA (sym->etype) |= SPEC_ABSA (DCL_TSPEC (p));
+      SPEC_ADDR (sym->etype) |= SPEC_ADDR (DCL_TSPEC (p));
       DCL_TSPEC (p) = NULL;
     }
 
@@ -535,25 +537,30 @@ void checkTypeSanity(sym_link *etype, char *name)
 {
   char *noun;
 
-  if (!etype) {
-    if (getenv("DEBUG_SANITY")) {
-      fprintf (stderr, "sanity check skipped for %s (etype==0)\n", name);
+  if (!etype)
+    {
+      if (getenv("DEBUG_SANITY"))
+        {
+          fprintf (stderr, "sanity check skipped for %s (etype==0)\n", name);
+        }
+      return;
     }
-    return;
-  }
 
-  if (!IS_SPEC(etype)) {
-    if (getenv("DEBUG_SANITY")) {
-      fprintf (stderr, "sanity check skipped for %s (!IS_SPEC)\n", name);
+  if (!IS_SPEC(etype))
+    {
+      if (getenv("DEBUG_SANITY"))
+        {
+          fprintf (stderr, "sanity check skipped for %s (!IS_SPEC)\n", name);
+        }
+      return;
     }
-    return;
-  }
 
-  noun=nounName(etype);
+  noun = nounName(etype);
 
-  if (getenv("DEBUG_SANITY")) {
-    fprintf (stderr, "checking sanity for %s %p\n", name, etype);
-  }
+  if (getenv("DEBUG_SANITY"))
+    {
+      fprintf (stderr, "checking sanity for %s %p\n", name, etype);
+    }
 
   if ((SPEC_NOUN(etype)==V_BOOL ||
        SPEC_NOUN(etype)==V_CHAR ||
@@ -561,49 +568,52 @@ void checkTypeSanity(sym_link *etype, char *name)
        SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE ||
        SPEC_NOUN(etype)==V_VOID) &&
-      (SPEC_SHORT(etype) || SPEC_LONG(etype))) {
-    // long or short for char float double or void
-    werror (E_LONG_OR_SHORT_INVALID, noun, name);
-  }
+      (SPEC_SHORT(etype) || SPEC_LONG(etype)))
+    {// long or short for char float double or void
+      werror (E_LONG_OR_SHORT_INVALID, noun, name);
+    }
   if ((SPEC_NOUN(etype)==V_BOOL ||
        SPEC_NOUN(etype)==V_FLOAT ||
        SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE ||
        SPEC_NOUN(etype)==V_VOID) &&
-      (etype->select.s.b_signed || SPEC_USIGN(etype))) {
-    // signed or unsigned for float double or void
-    werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
-  }
+      (etype->select.s.b_signed || SPEC_USIGN(etype)))
+    {// signed or unsigned for float double or void
+      werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
+    }
 
   // special case for "short"
-  if (SPEC_SHORT(etype)) {
-    SPEC_NOUN(etype) = options.shortis8bits ? V_CHAR : V_INT;
-    SPEC_SHORT(etype) = 0;
-  }
+  if (SPEC_SHORT(etype))
+    {
+      SPEC_NOUN(etype) = options.shortis8bits ? V_CHAR : V_INT;
+      SPEC_SHORT(etype) = 0;
+    }
 
   /* if no noun e.g.
      "const a;" or "data b;" or "signed s" or "long l"
      assume an int */
-  if (!SPEC_NOUN(etype)) {
-    SPEC_NOUN(etype) = V_INT;
-  }
+  if (!SPEC_NOUN(etype))
+    {
+      SPEC_NOUN(etype) = V_INT;
+    }
 
   /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
   /* a "plain" int bitfield is unsigned */
   if (SPEC_NOUN(etype)==V_BIT ||
-      SPEC_NOUN(etype)==V_SBIT) {
-    if (!etype->select.s.b_signed)
-      SPEC_USIGN(etype) = 1;
-  }
+      SPEC_NOUN(etype)==V_SBIT)
+    {
+      if (!etype->select.s.b_signed)
+        SPEC_USIGN(etype) = 1;
+    }
 
-  if (etype->select.s.b_signed && SPEC_USIGN(etype)) {
-    // signed AND unsigned
-    werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
-  }
-  if (SPEC_SHORT(etype) && SPEC_LONG(etype)) {
-    // short AND long
-    werror (E_LONG_AND_SHORT_INVALID, noun, name);
-  }
+  if (etype->select.s.b_signed && SPEC_USIGN(etype))
+    {// signed AND unsigned
+      werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
+    }
+  if (SPEC_SHORT(etype) && SPEC_LONG(etype))
+    {// short AND long
+      werror (E_LONG_AND_SHORT_INVALID, noun, name);
+    }
 }
 
 /*------------------------------------------------------------------*/
@@ -2604,12 +2614,14 @@ aggregateToPointer (value * val)
           DCL_TYPE (val->type) = PPOINTER;
           break;
         case S_FIXED:
-          if (SPEC_OCLS(val->etype)) {
-            DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
-          } else {
-            // this happens for (external) function parameters
-            DCL_TYPE (val->type) = port->unqualified_pointer;
-          }
+          if (SPEC_OCLS(val->etype))
+            {
+              DCL_TYPE (val->type) = PTR_TYPE (SPEC_OCLS (val->etype));
+            }
+          else
+            {// this happens for (external) function parameters
+              DCL_TYPE (val->type) = port->unqualified_pointer;
+            }
           break;
         case S_AUTO:
           DCL_TYPE (val->type) = PTR_TYPE(SPEC_OCLS(val->etype));

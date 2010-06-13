@@ -138,8 +138,8 @@ syminit(void)
 struct sym *
 newsym(void)
 {
-  register unsigned i ;
-  register unsigned nglob ;
+        register unsigned i ;
+        register unsigned nglob ;
         register int c ;
         struct sym *tsp;
         struct sym **s;

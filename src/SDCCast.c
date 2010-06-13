@@ -207,7 +207,6 @@ copyAstValues (ast * dest, ast * src)
       AST_FOR (dest, condExpr) = copyAst (AST_FOR (src, condExpr));
       AST_FOR (dest, loopExpr) = copyAst (AST_FOR (src, loopExpr));
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -259,8 +258,8 @@ copyAst (ast * src)
   dest->right = copyAst (src->right);
 exit:
   return dest;
-
 }
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* removeIncDecOps: remove for side effects in *_ASSIGN's          */
@@ -284,7 +283,7 @@ ast *removeIncDecOps (ast * tree) {
   tree->left=removeIncDecOps(tree->left);
   tree->right=removeIncDecOps(tree->right);
 
- return tree;
+  return tree;
 }
 
 /*-----------------------------------------------------------------*/
@@ -307,7 +306,7 @@ ast *removePreIncDecOps (ast * tree) {
   tree->left=removePreIncDecOps(tree->left);
   tree->right=removePreIncDecOps(tree->right);
 
- return tree;
+  return tree;
 }
 
 /*-----------------------------------------------------------------*/
@@ -330,9 +329,10 @@ ast *removePostIncDecOps (ast * tree) {
   tree->left=removePostIncDecOps(tree->left);
   tree->right=removePostIncDecOps(tree->right);
 
- return tree;
+  return tree;
 }
 #endif
+
 /*-----------------------------------------------------------------*/
 /* replaceAstWithTemporary: Replace the AST pointed to by the arg  */
 /*            with a reference to a new temporary variable. Returns*/
@@ -1419,15 +1419,18 @@ gatherAutoInit (symbol * autoChain)
 /*-----------------------------------------------------------------*/
 /* freeStringSymbol - delete a literal string if no more usage     */
 /*-----------------------------------------------------------------*/
-void freeStringSymbol(symbol *sym) {
+void freeStringSymbol(symbol *sym)
+{
   /* make sure this is a literal string */
   assert (sym->isstrlit);
-  if (--sym->isstrlit == 0) { // lower the usage count
-    memmap *segment=SPEC_OCLS(sym->etype);
-    if (segment) {
-      deleteSetItem(&segment->syms, sym);
+  if (--sym->isstrlit == 0)
+    { // lower the usage count
+      memmap *segment=SPEC_OCLS(sym->etype);
+      if (segment)
+        {
+          deleteSetItem(&segment->syms, sym);
+        }
     }
-  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1671,8 +1674,8 @@ isLabelInAst (symbol * label, ast * tree)
 }
 
 /*-----------------------------------------------------------------*/
-/* isLoopCountable - return true if the loop count can be determi- */
-/* -ned at compile time .                                          */
+/* isLoopCountable - return true if the loop count can be          */
+/* determined at compile time .                                    */
 /*-----------------------------------------------------------------*/
 static bool
 isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
@@ -1824,7 +1827,6 @@ astHasPointer (ast * tree)
 
   return astHasPointer (tree->left) ||
     astHasPointer (tree->right);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2127,7 +2129,6 @@ isLoopReversible (ast * loop, symbol ** loopCntrl,
    */
 
   return isConformingBody (loop->left, *loopCntrl, loop->left);
-
 }
 
 /*-----------------------------------------------------------------*/

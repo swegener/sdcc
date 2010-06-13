@@ -79,7 +79,7 @@ static builtins __ds390_builtins[] = {
     { "__builtin_swapw","us",1,{"us"}},                /* unsigned short __builtin_swapw (unsigned short) */
     { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
-    { NULL , NULL,0, {NULL}}                       /* mark end of table */
+    { NULL , NULL,0, {NULL}}                           /* mark end of table */
 };
 void ds390_assignRegisters (ebbIndex * ebbi);
 

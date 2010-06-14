@@ -589,8 +589,31 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
 }
 
 bool
-z80canAssign (const char *dst, const char *src)
+z80canAssign (const char *op1, const char *op2, const char *exotic)
 {
+  const char *dst, *src;
+
+  // Indexed accesses: One is the indexed one, the other one needs to be a reg or immediate.
+  if(exotic)
+  {
+    if(!strcmp(exotic, "ix") || !strcmp(exotic, "iy"))
+    {
+      if(isReg(op1))
+        return TRUE;
+    }
+    else if(!strcmp(op2, "ix") || !strcmp(op2, "iy"))
+    {
+      if(isReg(exotic) || exotic[0] == '#')
+        return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  // Everything else.
+  dst = op1;
+  src = op2;
+
   // 8-bit regs can be assigned to each other directly.
   if(isReg(dst) && isReg(src))
     return TRUE;
@@ -619,8 +642,6 @@ z80canAssign (const char *dst, const char *src)
   // Can load immediate values directly into (hl).
   if(!strcmp(dst, "(hl)") && src[0] == '#')
     return TRUE;
-
-  /* Todo: Indexed loads, exotic loads (involving sp, r, i) */
 
   return FALSE;
 }

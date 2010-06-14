@@ -470,202 +470,6 @@ FBYNAME (notUsed)
 }
 
 /*-----------------------------------------------------------------*/
-/* operandsNotSame2 - check if %1 & %2 are the same                 */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame2)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-
-  if (strcmp (op1, op2) == 0)
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandsNotSame3- check if any pair of %1,%2,%3 are the same    */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame3)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-  char *op3 = hTabItemWithKey (vars, 3);
-
-  if ( (strcmp (op1, op2) == 0) ||
-       (strcmp (op1, op3) == 0) ||
-       (strcmp (op2, op3) == 0) )
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandsNotSame4- check if any pair of %1,%2,%3,.. are the same */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame4)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-  char *op3 = hTabItemWithKey (vars, 3);
-  char *op4 = hTabItemWithKey (vars, 4);
-
-  if ( (strcmp (op1, op2) == 0) ||
-       (strcmp (op1, op3) == 0) ||
-       (strcmp (op1, op4) == 0) ||
-       (strcmp (op2, op3) == 0) ||
-       (strcmp (op2, op4) == 0) ||
-       (strcmp (op3, op4) == 0) )
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandsNotSame5- check if any pair of %1,%2,%3,.. are the same */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame5)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-  char *op3 = hTabItemWithKey (vars, 3);
-  char *op4 = hTabItemWithKey (vars, 4);
-  char *op5 = hTabItemWithKey (vars, 5);
-
-  if ( (strcmp (op1, op2) == 0) ||
-       (strcmp (op1, op3) == 0) ||
-       (strcmp (op1, op4) == 0) ||
-       (strcmp (op1, op5) == 0) ||
-       (strcmp (op2, op3) == 0) ||
-       (strcmp (op2, op4) == 0) ||
-       (strcmp (op2, op5) == 0) ||
-       (strcmp (op3, op4) == 0) ||
-       (strcmp (op3, op5) == 0) ||
-       (strcmp (op4, op5) == 0) )
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandsNotSame6- check if any pair of %1,%2,%3,.. are the same */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame6)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-  char *op3 = hTabItemWithKey (vars, 3);
-  char *op4 = hTabItemWithKey (vars, 4);
-  char *op5 = hTabItemWithKey (vars, 5);
-  char *op6 = hTabItemWithKey (vars, 6);
-
-  if ( (strcmp (op1, op2) == 0) ||
-       (strcmp (op1, op3) == 0) ||
-       (strcmp (op1, op4) == 0) ||
-       (strcmp (op1, op5) == 0) ||
-       (strcmp (op1, op6) == 0) ||
-       (strcmp (op2, op3) == 0) ||
-       (strcmp (op2, op4) == 0) ||
-       (strcmp (op2, op5) == 0) ||
-       (strcmp (op2, op6) == 0) ||
-       (strcmp (op3, op4) == 0) ||
-       (strcmp (op3, op5) == 0) ||
-       (strcmp (op3, op6) == 0) ||
-       (strcmp (op4, op5) == 0) ||
-       (strcmp (op4, op6) == 0) ||
-       (strcmp (op5, op6) == 0) )
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandsNotSame7- check if any pair of %1,%2,%3,.. are the same */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame7)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-  char *op3 = hTabItemWithKey (vars, 3);
-  char *op4 = hTabItemWithKey (vars, 4);
-  char *op5 = hTabItemWithKey (vars, 5);
-  char *op6 = hTabItemWithKey (vars, 6);
-  char *op7 = hTabItemWithKey (vars, 7);
-
-  if ( (strcmp (op1, op2) == 0) ||
-       (strcmp (op1, op3) == 0) ||
-       (strcmp (op1, op4) == 0) ||
-       (strcmp (op1, op5) == 0) ||
-       (strcmp (op1, op6) == 0) ||
-       (strcmp (op1, op7) == 0) ||
-       (strcmp (op2, op3) == 0) ||
-       (strcmp (op2, op4) == 0) ||
-       (strcmp (op2, op5) == 0) ||
-       (strcmp (op2, op6) == 0) ||
-       (strcmp (op2, op7) == 0) ||
-       (strcmp (op3, op4) == 0) ||
-       (strcmp (op3, op5) == 0) ||
-       (strcmp (op3, op6) == 0) ||
-       (strcmp (op3, op7) == 0) ||
-       (strcmp (op4, op5) == 0) ||
-       (strcmp (op4, op6) == 0) ||
-       (strcmp (op4, op7) == 0) ||
-       (strcmp (op5, op6) == 0) ||
-       (strcmp (op5, op7) == 0) ||
-       (strcmp (op6, op7) == 0) )
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandsNotSame8- check if any pair of %1,%2,%3,.. are the same */
-/*-----------------------------------------------------------------*/
-FBYNAME (operandsNotSame8)
-{
-  char *op1 = hTabItemWithKey (vars, 1);
-  char *op2 = hTabItemWithKey (vars, 2);
-  char *op3 = hTabItemWithKey (vars, 3);
-  char *op4 = hTabItemWithKey (vars, 4);
-  char *op5 = hTabItemWithKey (vars, 5);
-  char *op6 = hTabItemWithKey (vars, 6);
-  char *op7 = hTabItemWithKey (vars, 7);
-  char *op8 = hTabItemWithKey (vars, 8);
-
-  if ( (strcmp (op1, op2) == 0) ||
-       (strcmp (op1, op3) == 0) ||
-       (strcmp (op1, op4) == 0) ||
-       (strcmp (op1, op5) == 0) ||
-       (strcmp (op1, op6) == 0) ||
-       (strcmp (op1, op7) == 0) ||
-       (strcmp (op1, op8) == 0) ||
-       (strcmp (op2, op3) == 0) ||
-       (strcmp (op2, op4) == 0) ||
-       (strcmp (op2, op5) == 0) ||
-       (strcmp (op2, op6) == 0) ||
-       (strcmp (op2, op7) == 0) ||
-       (strcmp (op2, op8) == 0) ||
-       (strcmp (op3, op4) == 0) ||
-       (strcmp (op3, op5) == 0) ||
-       (strcmp (op3, op6) == 0) ||
-       (strcmp (op3, op7) == 0) ||
-       (strcmp (op3, op8) == 0) ||
-       (strcmp (op4, op5) == 0) ||
-       (strcmp (op4, op6) == 0) ||
-       (strcmp (op4, op7) == 0) ||
-       (strcmp (op4, op8) == 0) ||
-       (strcmp (op5, op6) == 0) ||
-       (strcmp (op5, op7) == 0) ||
-       (strcmp (op5, op8) == 0) ||
-       (strcmp (op6, op7) == 0) ||
-       (strcmp (op6, op8) == 0) ||
-       (strcmp (op7, op8) == 0) )
-    return FALSE;
-  else
-    return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
 /* labelHashEntry- searches for a label in the list labelHash      */
 /* Builds labelHash, if it does not yet exist.                     */
 /* Returns the labelHashEntry or NULL                              */
@@ -1129,11 +933,11 @@ operandBaseName (const char *op)
 FBYNAME (canAssign)
 {
   set *operands;
-  const char *dst, *src;
+  const char *dst, *src, *exotic;
 
   operands = setFromConditionArgs (cmdLine, vars);
 
-  if (!operands)
+  if (!operands || elementsInSet(operands) < 2 || elementsInSet(operands) > 3)
     {
       fprintf (stderr,
                "*** internal error: canAssign peephole restriction"
@@ -1141,12 +945,22 @@ FBYNAME (canAssign)
       return FALSE;
     }
 
-  src = setFirstItem (operands);
-  dst = setNextItem (operands);
+  if(elementsInSet(operands) == 3)
+    {
+      exotic = setFirstItem (operands);
+      src = setNextItem (operands);
+      dst = setNextItem (operands);
+    }
+  else
+    {
+      exotic = 0;
+      src = setFirstItem (operands);
+      dst = setNextItem (operands);
+    }
 
   if (port->peep.canAssign)
     {  
-      bool ret = port->peep.canAssign (dst, src);
+      bool ret = port->peep.canAssign (dst, src, exotic);
       deleteSet (&operands);
       return (ret);
     }
@@ -1270,84 +1084,67 @@ static const struct ftab
   char *fname;
   int (*func) (hTab *, lineNode *, lineNode *, lineNode *, char *);
 }
-ftab[] =                                // sorted on the number of times used
-{                                       // in the peephole rules on 2007-10-29
+ftab[] =                                            // sorted on the number of times used
+{                                                   // in the peephole rules on 2010-06-12
   {
-    "labelRefCount", labelRefCount                  //105
+    "labelRefCount", labelRefCount                  // 161
   },
   {
-    "notVolatile", notVolatile                      //85
+    "notVolatile", notVolatile                      // 118
   },
   {
-    "labelRefCountChange", labelRefCountChange      //74
+    "notUsed", notUsed                              // 96
   },
   {
-    "labelInRange", labelInRange                    //37
+    "labelRefCountChange", labelRefCountChange      // 86
   },
   {
-    "labelJTInRange", labelJTInRange                //13
+    "labelInRange", labelInRange                    // 51
   },
   {
-    "operandsNotRelated", operandsNotRelated        //9
+    "notSame", notSame                              // 28
   },
   {
-    "24bitMode", flat24bitMode                      //9
+    "operandsNotRelated", operandsNotRelated        // 28
   },
   {
-    "operandsNotSame2", operandsNotSame2            //8
+    "labelJTInRange", labelJTInRange                // 13
   },
   {
-    "operandsNotSame3", operandsNotSame3
+    "24bitMode", flat24bitMode                      // 9
   },
   {
-    "operandsNotSame4", operandsNotSame4
+    "canAssign", canAssign                          // 8
   },
   {
-    "operandsNotSame5", operandsNotSame5
+    "labelIsReturnOnly", labelIsReturnOnly          // 6
   },
   {
-    "operandsNotSame6", operandsNotSame6
+    "operandsLiteral", operandsLiteral              // 6
   },
   {
-    "operandsNotSame7", operandsNotSame7
+    "portIsDS390", portIsDS390                      // 5
   },
   {
-    "operandsNotSame8", operandsNotSame8
+    "labelIsUncondJump", labelIsUncondJump          // 4
   },
   {
-    "xramMovcOption", xramMovcOption
+    "deadMove", deadMove                            // 2
   },
   {
-    "portIsDS390", portIsDS390
+    "deadMove", deadMove                            // 2
   },
   {
-    "labelIsReturnOnly", labelIsReturnOnly
+    "useAcallAjmp", useAcallAjmp                    // 2
   },
   {
-    "labelIsUncondJump", labelIsUncondJump
+    "xramMovcOption", xramMovcOption                // 2
   },
   {
-    "okToRemoveSLOC", okToRemoveSLOC
-  },
-  {
-    "deadMove", deadMove
-  },
-  {
-    "operandsLiteral", operandsLiteral
-  },
-  {
-    "useAcallAjmp", useAcallAjmp
-  },
-  {
-    "notUsed", notUsed
-  },
-  {
-    "canAssign", canAssign
-  },
-  {
-    "notSame", notSame
+    "okToRemoveSLOC", okToRemoveSLOC                // 0
   }
 };
+
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
@@ -1637,6 +1434,7 @@ readRules (char *bp)
 {
   char restart = 0, barrier = 0;
   char lines[MAX_PATTERN_LEN];
+  size_t safetycounter;
   char *lp, *rp;
   lineNode *match;
   lineNode *replace;
@@ -1722,8 +1520,9 @@ top:
 
       /* look for the condition */
       lp = lines;
-      while (*bp && (*bp != '\n'))
+      for (safetycounter = 0; *bp && (*bp != '\n'); safetycounter++)
         {
+          wassertl(safetycounter < MAX_PATTERN_LEN, "Peephole line too long.\n");
           *lp++ = *bp++;
         }
       *lp = '\0';

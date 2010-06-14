@@ -1,3 +1,17 @@
+2010-06-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c,
+	  src/SDCCpeeph.h,
+	  src/port.h,
+	  src/mcs51/peeph.def,
+	  src/ds390/peeph.def,
+	  src/avr/peeph.def,
+	  src/z80/peep.h,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def,
+	  src/z80/peeph-gbz80.def:
+	  Peephole cleanup.
+
 2010-06-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lksym.c,

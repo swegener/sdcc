@@ -156,7 +156,7 @@ replace restart {
 	; peephole 16 moved %3 directly into a instead of going through %2.
 	and	a,%1
 	ld	%2,%4
-} if notVolatile(%2), operandsNotSame2
+} if notVolatile(%2), notSame(%1 %2)
 
 replace restart {
 	ld	%1,a

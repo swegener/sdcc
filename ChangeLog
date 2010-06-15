@@ -1,3 +1,9 @@
+2010-06-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/abs.s,
+	  device/lib/z80/Makefile.in:
+	  Z80-specific abs().
+
 2010-06-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

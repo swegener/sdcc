@@ -1,15 +1,32 @@
+/*-------------------------------------------------------------------------
+   crc16.c - CRC16 checksum generation
+
+   Copyright (C) 2005, Vangelis Rokas <vrokas at otenet.gr>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
 /*
- * crc16.c - CRC16 checksum generation
- *
- * this source is part of the linux kernel distribution
- * 
- * modified for SDCC/pic16 by Vangelis Rokas, 2005 <vrokas AT users.sourceforge.net>
- *
- *
- * PURPOSE
- *	Routines to generate, calculate, and test a 16-bit CRC.
- *
- * DESCRIPTION
  *	The CRC code was devised by Don P. Mitchell of AT&T Bell Laboratories
  *	and Ned W. Rhodes of Software Systems Group. It has been published in
  *	"Design and Validation of Computer Protocols", Prentice Hall,
@@ -18,20 +35,6 @@
  *	Copyright is held by AT&T.
  *
  *	AT&T gives permission for the free use of the CRC source code.
- *
- * CONTACTS
- *	E-mail regarding any portion of the Linux UDF file system should be
- *	directed to the development team mailing list (run by majordomo):
- *		linux_udf@hpesjro.fc.hp.com
- *
- * COPYRIGHT
- *	This file is distributed under the terms of the GNU General Public
- *	License (GPL). Copies of the GPL can be obtained from:
- *		ftp://prep.ai.mit.edu/pub/gnu/GPL
- *	Each contributing author retains all rights to their own work.
- *
- *
- * $Id$
  */
 
 #include <stdint.h>
@@ -71,136 +74,10 @@ __code uint16_t crc_table[256] = {
 	0x6e17U, 0x7e36U, 0x4e55U, 0x5e74U, 0x2e93U, 0x3eb2U, 0x0ed1U, 0x1ef0U
 };
 
-/*
- * udf_crc
- *
- * PURPOSE
- *	Calculate a 16-bit CRC checksum using ITU-T V.41 polynomial.
- *
- * DESCRIPTION
- *	The OSTA-UDF(tm) 1.50 standard states that using CRCs is mandatory.
- *	The polynomial used is:	x^16 + x^12 + x^5 + 1
- *
- * PRE-CONDITIONS
- *	data		Pointer to the data block.
- *	size		Size of the data block.
- *
- * POST-CONDITIONS
- *	<return>	CRC of the data block.
- *
- * HISTORY
- *	July 21, 1997 - Andrew E. Mileski
- *	Adapted from OSTA-UDF(tm) 1.50 standard.
- */
 uint16_t crc16(uint8_t *data, uint32_t size, uint16_t crc)
 {
   while (size--)
-    crc = crc_table[(crc >> 8 ^ *(data++)) & 0xffU] ^ (crc << 8);
+    crc = crc_table[((crc >> 8) ^ *(data++)) & 0xffU] ^ (crc << 8);
 
   return crc;
 }
-
-/****************************************************************************/
-#if defined(CRCTEST)
-
-/*
- * PURPOSE
- *  Test udf_crc()
- *
- * HISTORY
- *  July 21, 1997 - Andrew E. Mileski
- *  Adapted from OSTA-UDF(tm) 1.50 standard.
- */
-
-#include <stdio.h>
-
-unsigned char bytes[] = { 0x70U, 0x6AU, 0x77U };
-
-void dump_table(void)
-{
-  int i, j;
-
-    for(i=j=0;i<256;i++) {
-      printf("0x%ux  ", crc_table[i]);
-      j++;
-      if(j % 8 == 0)printf("\n");
-  }
-}
-
-
-int main(void)
-{
-  unsigned int x;
-
-
-  stdout = STREAM_GPSIM;
-
-  dump_table();
-  
-  x = crc16(bytes, sizeof(bytes), 0);
-  printf("crc16: calculated = %ux, correct = %ux\n", x, 0x3299U);
-
-  printf("test value = %d\n", -45);
-
-  return 0;
-}
-
-#endif /* defined(CRCTEST) */
-
-/****************************************************************************/
-#if defined(CRCGENERATE)
-
-/*
- * PURPOSE
- *  Generate a table for fast 16-bit CRC calculations (any polynomial).
- *
- * DESCRIPTION
- *  The ITU-T V.41 polynomial is 010041.
- *
- * HISTORY
- *  July 21, 1997 - Andrew E. Mileski
- *  Adapted from OSTA-UDF(tm) 1.50 standard.
- */
-
-#include <stdio.h>
-
-int main(int argc, char **argv)
-{
-  unsigned long crc, poly;
-  int n, i;
-
-  /* Get the polynomial */
-  sscanf(argv[1], "%lo", &poly);
-  if (poly & 0xffff0000U){
-    fprintf(stderr, "polynomial is too large\en");
-    exit(1);
-  }
-
-  printf("/* CRC %d 0%o 0x%x */\n", poly, poly, poly);
-
-  /* Create a table */
-  printf("static unsigned short crc_table[256] = {\n");
-  for (n = 0; n < 256; n++){
-    if (n % 8 == 0)
-      printf("\t");
-    crc = n << 8;
-    for (i = 0; i < 8; i++){
-      if(crc & 0x8000U)
-        crc = (crc << 1) ^ poly;
-      else
-        crc <<= 1;
-    crc &= 0xFFFFU;
-    }
-    if (n == 255)
-      printf("0x%04xU ", crc);
-    else
-      printf("0x%04xU, ", crc);
-    if(n % 8 == 7)
-      printf("\n");
-  }
-  printf("};\n");
-
-  return 0;
-}
-
-#endif /* defined(CRCGENERATE) */

@@ -1,3 +1,11 @@
+2010-06-19 Borut Razem <borut.razem AT siol.net>
+	* device/include/pic/pic14devices.txt,
+	  device/include/pic16/pic16devices.txt:
+	  license changed to GPL - files are not part of sdcc library
+	* device/lib/z80/divunsigned.s, device/lib/pic16/debug/gstack/gstack.c,
+	  device/lib/pic16/libsdcc/int/*, device/lib/pic16/libc/stdlib/*:
+	  sdcc library license changed to GPL+LE
+
 2010-06-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/abs.s,

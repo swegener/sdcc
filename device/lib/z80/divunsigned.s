@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  div.s
+;  divunsigned.s
 ;
 ;  Copyright (C) 2000-2010, Michael Hope, Philipp Klaus Krause, Marco Bodrato
 ;

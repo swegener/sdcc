@@ -1926,13 +1926,13 @@ assemble (char **envp)
 
       if (options.cc_only && fullDstFileName && TARGET_PIC_LIKE)
         {
-          /* gpasm assembler don't properly handle the -o option:
+          /* gpasm assembler doesn't properly handle the -o option:
              the file extension is replaced with .o,
-             so we have to rename the object file manually.
+             so sdcc havs to rename the object file manually.
              This has been fixed in gpasm svn:
              http://sourceforge.net/tracker/?func=detail&aid=3018645&group_id=41924&atid=431665
-             TODO: This code should be removed in the next gputils release
-             after gpasm-0.13.7 beta */
+             TODO: This code should be removed when the next gputils version
+             after gpasm-0.13.7 beta will be released */
 	  struct dbuf_s outName;
           dbuf_init (&outName, PATH_MAX);
           dbuf_printf (&outName, "%s%s", dstFileName, port->linker.rel_ext);

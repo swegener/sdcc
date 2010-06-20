@@ -3,6 +3,8 @@
 	* src/SDCCmain.c, src/pic/main.c, src/pic16/main.c:
 	  fixed bug #3015137: -c -o not working as expected (caused by fix for
           #2951083)
+	* device/lib/pic16/libc/string/*:
+	  sdcc library license changed to GPL+LE
 
 2010-06-19 Borut Razem <borut.razem AT siol.net>
 

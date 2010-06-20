@@ -1,49 +1,57 @@
 /*-------------------------------------------------------------------------
-  _strstr.c - part of string library functions
+   strstr.c - part of string library functions
 
-             Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+   Copyright (C) 1999, Sandeep Dutta <sandeep.dutta at usa.net>
 
    This library is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
    later version.
-   
+
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Library General Public License for more details.
-   
-   You should have received a copy of the GNU Library General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
+
 #include <string.h>
 
-char *strstr(char *str1, char *str2) 
+char *
+strstr (char *str1, char *str2) 
 {
   char *cp = str1;
   char *s1;
   char *s2;
 
     
-    if( !*str2 )
-      return str1;
+  if (!*str2)
+    return str1;
 
-    while (*cp) {
+  while (*cp)
+    {
       s1 = cp;
       s2 = str2;
 
-      while ( *s1 && *s2 && !(*s1-*s2) )
-          s1++, s2++;
+      while (*s1 && *s2 && !(*s1-*s2))
+        s1++, s2++;
       
-      if (!*s2)return(cp);
+      if (!*s2)
+        return cp;
 
-      cp++;
+      ++cp;
     }
 
-  return (NULL) ;
+  return NULL;
 }

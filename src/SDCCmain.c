@@ -1882,44 +1882,68 @@ linkEdit (char **envp)
 static void
 assemble (char **envp)
 {
-  /* build assembler output filename */
   struct dbuf_s asmName;
-  dbuf_init (&asmName, PATH_MAX);
-
-  /* -o option overrides default name? */
-  if (options.cc_only && fullDstFileName)
-    {
-      dbuf_append_str (&asmName, fullDstFileName);
-    }
-  else
-    {
-      /* the assembled file gets the name of the first module */
-      dbuf_printf (&asmName, "%s%s", dstFileName, port->linker.rel_ext);
-    }
 
   if (port->assembler.do_assemble)
     {
       port->assembler.do_assemble (asmOptionsSet);
-      return;
-    }
-  else if (port->assembler.cmd)
-    {
-      buildCmdLine (buffer, port->assembler.cmd, dstFileName, dbuf_c_str (&asmName),
-                    options.debug ? port->assembler.debug_opts : port->assembler.plain_opts, asmOptionsSet);
     }
   else
     {
-      buildCmdLine2 (buffer, sizeof (buffer), port->assembler.mcmd);
-    }
+      char buf[PATH_MAX * 2];
 
-  dbuf_destroy (&asmName);
+      /* build assembler output filename */
+      dbuf_init (&asmName, PATH_MAX);
 
-  if (my_system (buffer))
-    {
-      /* either system() or the assembler itself has reported an error
-         perror ("Cannot exec assembler");
-       */
-      exit (EXIT_FAILURE);
+      /* -o option overrides default name? */
+      if (options.cc_only && fullDstFileName)
+        {
+          dbuf_append_str (&asmName, fullDstFileName);
+        }
+      else
+        {
+          /* the assembled file gets the name of the first module */
+          dbuf_printf (&asmName, "%s%s", dstFileName, port->linker.rel_ext);
+        }
+
+      if (port->assembler.cmd)
+        {
+          buildCmdLine (buf, port->assembler.cmd, dstFileName, dbuf_c_str (&asmName),
+                    options.debug ? port->assembler.debug_opts : port->assembler.plain_opts, asmOptionsSet);
+        }
+      else
+        {
+          buildCmdLine2 (buf, sizeof (buf), port->assembler.mcmd);
+        }
+
+      dbuf_destroy (&asmName);
+
+      if (my_system (buf))
+        {
+          /* either system() or the assembler itself has reported an error */
+          exit (EXIT_FAILURE);
+        }
+
+      if (options.cc_only && fullDstFileName && TARGET_PIC_LIKE)
+        {
+          /* gpasm assembler don't properly handle the -o option:
+             the file extension is replaced with .o,
+             so we have to rename the object file manually.
+             This has been fixed in gpasm svn:
+             http://sourceforge.net/tracker/?func=detail&aid=3018645&group_id=41924&atid=431665
+             TODO: This code should be removed in the next gputils release
+             after gpasm-0.13.7 beta */
+	  struct dbuf_s outName;
+          dbuf_init (&outName, PATH_MAX);
+          dbuf_printf (&outName, "%s%s", dstFileName, port->linker.rel_ext);
+
+          if (strcmp (dbuf_c_str (&outName), fullDstFileName))
+            {
+              /* file names are different: rename the genatated object file */
+              remove (fullDstFileName);
+              rename (dbuf_c_str (&outName), fullDstFileName);
+            }
+        }
     }
 }
 

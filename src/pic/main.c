@@ -88,7 +88,7 @@ static const char *_linkCmd[] =
 
 static const char *_asmCmd[] =
 {
-  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", NULL
+  "gpasm", "$l", "$3", "-o", "\"$2\"", "-c", "\"$1.asm\"", NULL
 };
 
 static void

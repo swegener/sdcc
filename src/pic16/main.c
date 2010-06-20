@@ -1116,8 +1116,7 @@ const char *pic16_linkCmd[] =
 */
 const char *pic16_asmCmd[] =
 {
-  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", "-o \"$2\"", NULL
-
+  "gpasm", "$l", "$3", "-o", "\"$2\"", "-c", "\"$1.asm\"", NULL
 };
 
 /* Globals */

@@ -1,3 +1,13 @@
+2010-06-23 Philipp Klaus Krause <pkk AT spth.de>
+	* device/lib/z80/divsigned.s:
+	  Minor cleanup
+	* src/SDCCpeeph.c,
+	  src/z80/peep.h,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def,
+	  Implemented correct instruction size calculation, replacing estimate.
+
 2010-06-20 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/pic/main.c, src/pic16/main.c:

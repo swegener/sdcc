@@ -760,7 +760,7 @@ PORT z80_port =
   },
   {                             /* Peephole optimizer */
     _z80_defaultRules,
-    0,
+    z80instructionSize,
     0,
     0,
     0,

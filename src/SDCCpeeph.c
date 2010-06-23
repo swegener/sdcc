@@ -112,6 +112,7 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
         {
           if (port->peep.getSize)
             {
+//printf("Line: %s, dist: %i\n", pl->line, port->peep.getSize(pl));
               dist += port->peep.getSize(pl);
             }
           else
@@ -227,7 +228,7 @@ FBYNAME (labelJTInRange)
   char *lbl;
   int dist, count, i;
 
-  if (!getenv("SDCC_SJMP_JUMPTABLE"))
+  if (TARGET_IS_MCS51 && !getenv("SDCC_SJMP_JUMPTABLE"))
     return FALSE;
 
   /* Only optimize within a jump table */
@@ -247,7 +248,7 @@ FBYNAME (labelJTInRange)
       dist = pcDistance (currPl, lbl, FALSE);
 
       /* three terms used to calculate allowable distance */
-// printf("\nlabel %s %i dist %i cdist 0x%02x 0x%02x\n", lbl, i, dist, dist -(count-i-1)-(7+3*i), 127+(count-i-1)+(7+3*i) - dist);
+ /* printf("\nlabel %s %i dist %i cdist 0x%02x 0x%02x\n", lbl, i, dist, dist -(count-i-1)-(7+3*i), 127+(count-i-1)+(7+3*i) - dist); */
       if (!dist ||
           dist > 127+           /* range of sjmp */
                  (7+3*i)+       /* offset between this jump and currPl,

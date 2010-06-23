@@ -295,42 +295,51 @@ replace restart {
 } if notUsed('c')
 
 replace restart {
-	ld	c,e
-	ld	b,d
-	ld	a,(bc)
+	ld	c, e
+	ld	b, d
+	ld	a, (bc)
 } by {
 	; peephole 0o used de directly instead of going through bc.
-	ld	a,(de)
+	ld	a, (de)
 } if notUsed('bc')
 
 replace restart {
 	pop	de
-	ld	l,e
-	ld	h,d
+	ld	l, e
+	ld	h, d
 } by {
 	; peephole 0p popped hl directly instead of going through de.
 	pop	hl
 } if notUsed('de')
 
 replace restart {
-	ld	%1 (ix),%2
+	pop	bc
+	ld	l, c
+	ld	h, b
+} by {
+	; peephole 0p' popped hl directly instead of going through bc.
+	pop	hl
+} if notUsed('bc')
+
+replace restart {
+	ld	%1 (ix), %2
 	ld	%3, %1 (ix)
 } by {
 	; peephole 0r loaded %3 from %2 instead of going through %1 (ix).
-	ld	%1 (ix),%2
+	ld	%1 (ix), %2
 	ld	%3, %2
 }
 // Don't need to check for volatile, since ix is used for the stack.
 
 replace restart {
-	ld	%1,a
-	ld	%2,%3
-	ld	%4,%1
+	ld	%1, a
+	ld	%2, %3
+	ld	%4, %1
 } by {
 	; peephole 0t loaded %4 from a instead of going through %1.
-	ld	%1,a
-	ld	%2,%3
-	ld	%4,a
+	ld	%1, a
+	ld	%2, %3
+	ld	%4, a
 } if notVolatile(%1), operandsNotRelated(%1 %3), operandsNotRelated(%1 %2)
 
 replace restart {
@@ -1912,25 +1921,6 @@ replace restart {
 	inc	sp
 } if notUsed('a'), notUsed('hl')
 
-// peeph-z80.def - Z80 peephole rules
-//
-//
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2010
-//
-// This program is free software; you can redistribute it and/or modify it
-// under the terms of the GNU General Public License as published by the
-// Free Software Foundation; either version 2, or (at your option) any
-// later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
 replace restart {
 	ld	a,%1 (%2)
 	or	a,#0x01
@@ -2118,13 +2108,6 @@ replace restart {
 	; peephole z10f used value still in a instead of reloading from %1.
 }
 
-// Should be one of the last ones. Opens the code to further peephole optimization.
-replace restart {
-%1:
-} by {
-	; peephole z12 removed unused label %1.
-} if labelRefCount(%1 0)
-
 // Applying z11 or z11a followed by z12 will often leave a dead ret at the end of the function. Remove it.
 replace {
 	jp	%5
@@ -2156,6 +2139,24 @@ replace restart {
 	jp	%3
 }
 
+replace restart {
+	ld	l, e
+	ld	h, d
+	ld	a, (hl)
+} by {
+	; peephole 85 used de directly instead of going through hl.
+	ld	a, (de)
+} if notUsed('hl')
+
+replace restart {
+	ld	l, c
+	ld	h, b
+	ld	a, (hl)
+} by {
+	; peephole 85a used bc directly instead of going through hl.
+	ld	a, (bc)
+} if notUsed('hl')
+
 barrier
 
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
@@ -2163,7 +2164,7 @@ replace restart {
 	ld	d,h
 	ld	e,l
 } by {
-	; peephole 80 used ex to load hl into de.
+	; peephole 90 used ex to load hl into de.
 	ex	de,hl
 } if notUsed('hl')
 
@@ -2171,7 +2172,7 @@ replace restart {
 	ld	e,l
 	ld	d,h
 } by {
-	; peephole 81 used ex to load hl into de.
+	; peephole 91 used ex to load hl into de.
 	ex	de,hl
 } if notUsed('hl')
 
@@ -2179,7 +2180,7 @@ replace restart {
 	ld	l,e
 	ld	h,d
 } by {
-	; peephole 82 used ex to load de into hl.
+	; peephole 92 used ex to load de into hl.
 	ex	de,hl
 } if notUsed('de')
 
@@ -2200,6 +2201,137 @@ replace restart {
 } if labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 // Ensure that all rules above see only jp, not jr.
+barrier
+
+replace {
+	add	hl,de
+	pop	de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+%2:
+} by {
+	; peephole z12-3 removed addition using short jumps in jump-table.
+	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	pop	de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+%2:
+} by {
+	; peephole z12-4 removed addition using short jumps in jump-table.
+	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	pop	de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+	jp	%9
+%2:
+} by {
+	; peephole z12-5 removed addition using short jumps in jump-table.
+	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+	jr	%9
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	pop	de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+	jp	%9
+	jp	%10
+%2:
+} by {
+	; peephole z12-6 removed addition using short jumps in jump-table.
+	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+	jr	%9
+	jr	%10
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	pop	de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+	jp	%9
+	jp	%10
+	jp	%11
+%2:
+} by {
+	; peephole z12-6 removed addition using short jumps in jump-table.
+	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+	jr	%9
+	jr	%10
+	jr	%11
+%2:
+} if labelJTInRange
+
+barrier
+
+// Should be one of the last ones. Opens the code to further peephole optimization.
+replace restart {
+%1:
+} by {
+	; peephole z12 removed unused label %1.
+} if labelRefCount(%1 0)
+
 barrier
 
 replace {

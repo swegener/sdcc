@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  divmixed.s
+;  modmixed.s
 ;
 ;  Copyright (C) 2010, Philipp Klaus Krause
 ;
@@ -26,7 +26,7 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-__divsuchar_rrx_s::
+__modsuchar_rrx_s::
         ld      hl,#2+1
         add     hl,sp
 
@@ -35,9 +35,11 @@ __divsuchar_rrx_s::
         ld      l,(hl)
         ld      h,#0
 
-        jp      __div_signexte
+        call    __div_signexte
 
-__divuschar_rrx_s::
+	jp	__get_remainder
+
+__moduschar_rrx_s::
         ld      hl,#2+1
         ld      d, h
         add     hl,sp
@@ -51,5 +53,5 @@ __divuschar_rrx_s::
         sbc     a
         ld      h,a
 
-        jp      __div16
+        jp	__get_remainder
 

@@ -1,3 +1,13 @@
+2010-06-25 Philipp Klaus Krause <pkk AT spth.de>
+	* device/lib/z80/mod.s,
+	  device/lib/z80/Makefile.in,
+	  device/lib/z80/modmixed.s,
+	  device/lib/z80/modsigned.s,
+	  device/lib/z80/divmixed.s,
+	  device/lib/z80/divsigned.s,
+	  device/lib/z80/modunsigned.s:
+	  Z80 division library reorganization.
+
 2010-06-23 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/z80/divsigned.s:
 	  Minor cleanup

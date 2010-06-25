@@ -40,8 +40,7 @@ __modschar_rrx_s::
 __modschar_rrx_hds::
         call    __div8
 
-        ex	de,hl
-        ret
+        jp	__get_remainder
 
 __modsint_rrx_s::
         pop     af
@@ -55,7 +54,5 @@ __modsint_rrx_s::
 __modsint_rrx_hds::
         call    __div16
 
-        ex      de,hl
-
-        ret
+        jp	__get_remainder
 

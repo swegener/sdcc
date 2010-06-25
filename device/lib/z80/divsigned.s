@@ -97,7 +97,7 @@ __div16::
 .chkde:
         bit     7, d
         jr      Z, .dodiv       ; Jump if divisor is positive
-        sub     a, a            ; Substract divisor from 0
+        sub     a, a            ; Subtract divisor from 0
         sub     a, e
         ld      e, a
         sbc     a, a            ; Propagate borrow (A=0xFF if borrow)
@@ -108,26 +108,30 @@ __div16::
 .dodiv:
         call    __divu16
 
+.fix_quotient:
         ; Negate quotient if it is negative
         pop     af              ; recover sign of quotient
-        jr      NC, .dorem      ; Jump if quotient is positive
+        ret	NC		; Jump if quotient is positive
         ld      b, a
-        sub     a, a            ; Substract quotient from 0
+        sub     a, a            ; Subtract quotient from 0
         sub     a, l
         ld      l, a
         sbc     a, a            ; Propagate borrow (A=0xFF if borrow)
         sub     a, h
         ld      h, a
         ld      a, b
-.dorem:
-        ; Negate remainder if it is negative
+	ret
+
+__get_remainder::
+        ; Negate remainder if it is negative and move it into hl
         rla
+	ex	de, hl
         ret     NC              ; Return if remainder is positive
-        sub     a               ; Substract remainder from 0
-        sub     e
-        ld      e, a
-        sbc     a               ; Propagate remainder (A=0xFF if borrow)
-        sub     d
-        ld      d, a
+        sub     a, a            ; Subtract remainder from 0
+        sub     a, l
+        ld      l, a
+        sbc     a, a             ; Propagate remainder (A=0xFF if borrow)
+        sub     a, h
+        ld      h, a
         ret
 

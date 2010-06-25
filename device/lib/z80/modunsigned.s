@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  mod.s
+;  modunsigned.s
 ;
-;  Copyright (C) 2009, Philipp Klaus Krause
+;  Copyright (C) 2009-2010, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ __moduchar_rrx_s::
 __moduchar_rrx_hds::
         call    __divu8
 
-        ex      de,hl
+	ex	de,hl
 
         ret
 
@@ -55,26 +55,6 @@ __moduint_rrx_s::
         ;; Fall through
 __moduint_rrx_hds::
         call    __divu16
-
-        ex      de,hl
-
-        ret
-
-__moduschar_rrx_s::
-        ld      hl,#2+1
-        ld      d, h
-        add     hl,sp
-
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
-
-        ld      a,l             ; Sign extend
-        rlca
-        sbc     a
-        ld      h,a
-
-        call    __div16
 
         ex      de,hl
 

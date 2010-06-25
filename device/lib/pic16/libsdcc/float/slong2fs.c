@@ -1,41 +1,39 @@
 /*-------------------------------------------------------------------------
-   slong2fs.c :- 
+   slong2fs.c
 
-   Adopted for float and pic16 port by
-	- Vangelis Rokas, vrokas@otenet.gr (2004)
+   Copyright (C) 2004, Vangelis Rokas <vrokas at otenet.gr>
 
    This library is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
    later version.
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
-
-
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
-
-/*
-** $Id$
-*/
 
 #include <float.h>
 
 /* convert signed long to float */
-float __slong2fs (signed long sl) _FS_REENTRANT
+float
+__slong2fs (signed long sl) _FS_REENTRANT
 {
-  if (sl<0) 
-    return -__ulong2fs(-sl);
+  if (sl < 0) 
+    return -__ulong2fs (-sl);
   else 
-    return __ulong2fs(sl);
+    return __ulong2fs (sl);
 }

@@ -53,5 +53,7 @@ __moduschar_rrx_s::
         sbc     a
         ld      h,a
 
+	call	__div16
+
         jp	__get_remainder
 

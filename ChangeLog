@@ -1,3 +1,6 @@
+2010-07-03 Philipp Klaus Krause <pkk AT spth.de>
+	* support/scripts/sdcc.nsi: removed unix2dos conversion
+
 2010-06-28 Philipp Klaus Krause <pkk AT spth.de>
 	* device/lib/z80/modmixed.s:
 	  Fixed missing line.

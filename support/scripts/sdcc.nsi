@@ -34,6 +34,8 @@
 #   rename it to COPYING.txt and COPYING3.txt and convert it to DOS format:
 #   unix2dos COPYING.txt
 #   unix2dos COPYING3.txt
+#   unix2dos doc/ChangeLog_head.txt
+#   unix2dos doc/README.TXT
 # - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DVER_MAJOR=<SDCC_VER_MAJOR> -DVER_MINOR=<SDCC_VER_MINOR> -DVER_REVISION=<SDCC_VER_DEVEL> -DVER_BUILD=<SDCC_REVISION> sdcc.nsi
@@ -60,6 +62,8 @@
 #   rename it to COPYING.txt and COPYING3.txt and convert it to DOS format:
 #   unix2dos COPYING.txt
 #   unix2dos COPYING3.txt
+#   unix2dos doc/ChangeLog.txt
+#   unix2dos doc/README.TXT
 # - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DFULL_DOC -DVER_MAJOR=<VER_MAJOR> -DVER_MINOR=<VER_MINOR> -DVER_REVISION=<VER_PATCH> -DVER_BUILD=<REVISION> sdcc.nsi
@@ -170,13 +174,6 @@ SetCompressor /SOLID lzma
 !define SDCC_ROOT "."
 
 !define DEV_ROOT "${SDCC_ROOT}"
-
-!ifdef FULL_DOC
-!system "unix2dos ${SDCC_ROOT}\doc\ChangeLog.txt" = 0
-!else
-!system "unix2dos ${SDCC_ROOT}\doc\ChangeLog_head.txt" = 0
-!endif
-!system "unix2dos ${SDCC_ROOT}\doc\README.TXT" = 0
 
 InstType "Full (Bin, ucSim, SDCDB, Doc, Lib, Src)"
 InstType "Medium (Bin, ucSim, SDCDB, Doc, Lib)"

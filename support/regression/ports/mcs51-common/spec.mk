@@ -1,5 +1,7 @@
 # Common regression test specification for the mcs51 targets running with uCsim
 
+CC_FOR_BUILD = $(CC)
+
 ifndef DEV_NULL
   DEV_NULL = /dev/null
 endif
@@ -13,8 +15,10 @@ else
 
   S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
+ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(INC_DIR)/mcs51 -I$(top_srcdir)
   LINKFLAGS += --nostdlib -L$(LIBDIR)
+endif
 endif
 
 SDCCFLAGS += --less-pedantic -DREENTRANT=__reentrant
@@ -43,14 +47,14 @@ $(PORT_CASES_DIR)/fwk.lib:
 	cp $(PORTS_DIR)/mcs51-common/fwk.lib $@
 
 # run simulator with 30 seconds timeout
-%.out: %$(BINEXT) gen/timeout$(EXEEXT)
+%.out: %$(BINEXT) gen/timeout
 	mkdir -p $(dir $@)
 	-gen/timeout 30 "$(S51)" -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51-common/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-gen/timeout$(EXEEXT): $(srcdir)/fwk/lib/timeout.c
-	$(CC) $(CFLAGS) $< -o $@
+gen/timeout: $(srcdir)/fwk/lib/timeout.c
+	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

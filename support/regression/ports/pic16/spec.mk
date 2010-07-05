@@ -1,5 +1,7 @@
 # Regression test specification for the pic16 target running with gpsim
 
+CC_FOR_BUILD = $(CC)
+
 # path to gpsim
 ifdef GPSIM_PATH
   GPSIM := $(GPSIM_PATH)/gpsim$(EXEEXT)
@@ -8,8 +10,10 @@ else
 endif
 
 ifndef SDCC_BIN_PATH
+ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)/device/include/pic16 -I$(top_srcdir)
   LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/pic16
+endif
 endif
 
 SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q -DREENTRANT=reentrant
@@ -37,14 +41,14 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # run simulator with 25 seconds timeout
-%.out: %$(BINEXT) $(CASES_DIR)/timeout$(EXEEXT)
+%.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
 	-$(CASES_DIR)/timeout 25 "$(GPSIM)" -i -s $< -c $(PORTS_DIR)/pic16/gpsim.cmd > $@ || \
 	  echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-$(CASES_DIR)/timeout$(EXEEXT): fwk/lib/timeout.c
-	$(CC) $(CFLAGS) $< -o $@
+$(CASES_DIR)/timeout: fwk/lib/timeout.c
+	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

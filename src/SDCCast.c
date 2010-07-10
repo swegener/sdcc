@@ -917,10 +917,13 @@ processParms (ast *func,
     {
       if (IS_STRUCT ((*actParm)->ftype))
         {
-          werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, (*actParm)->opval.val->name);
+          if (IS_AST_VALUE (*actParm))
+            werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, (*actParm)->opval.val->name);
+          else
+            werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, "");
           return 1;
         }
-	  else
+      else
         {
           werror (E_INCOMPAT_TYPES);
           printFromToType ((*actParm)->ftype, defParm->type);
@@ -6287,7 +6290,7 @@ inlineAddDecl (symbol *sym, ast *block, int addSymTab, int toFront)
         {
           sym->next = block->values.sym;
           block->values.sym = sym;
-	}
+        }
       else
         *decl = sym;
 

@@ -1,3 +1,8 @@
+2010-07-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (processParms): fixed bug 3002698
+	* src/SDCCast.h: cosmetic changes
+
 2010-07-05 Borut Razem <borut.razem AT siol.net>
 	* support/regression/ports/pic14/spec.mk,
 	  support/regression/ports/pic16/spec.mk,

@@ -41,7 +41,6 @@ typedef enum {
 /* expression tree   */
 typedef struct ast
   {
-
     ASTTYPE type;
     unsigned decorated:1;
     unsigned isError:1;
@@ -177,7 +176,7 @@ ast;
                           (x) == AND_ASSIGN || (x) == OR_ASSIGN  || (x) == INC_OP     || (x) == DEC_OP)
 #define IS_DEREF_OP(x) ( ( (x)->opval.op == '*' && (x)->right == NULL) || \
                          (x)->opval.op == '.' || \
-						 (x)->opval.op == PTR_OP )
+                         (x)->opval.op == PTR_OP )
 
 /* forward declarations for global variables */
 extern ast *staticAutos;

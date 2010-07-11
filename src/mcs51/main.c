@@ -39,27 +39,21 @@ static char *_mcs51_keywords[] =
   "critical",
   "data",
   "far",
+  "generic",
   "idata",
   "interrupt",
+  "naked",
   "near",
   "nonbanked",
+  "overlay",
   "pdata",
   "reentrant",
+  "sbit",
   "sfr",
   "sfr16",
   "sfr32",
-  "sbit",
   "using",
   "xdata",
-  "_data",
-  "_code",
-  "_generic",
-  "_near",
-  "_xdata",
-  "_pdata",
-  "_idata",
-  "_naked",
-  "_overlay",
   NULL
 };
 
@@ -709,39 +703,42 @@ getRegsWritten (lineNode *line)
   return line->aln->regsWritten;
 }
 
+static const char * models[] = 
+{
+  "small",  "small-xstack",  "small-stack-auto",  "small-xstack-auto",
+  "medium", "medium-xstack", "medium-stack-auto", "medium-xstack-auto",
+  "large",  "large-xstack",  "large-stack-auto",  "large-xstack-auto",
+  "huge",   "huge-xstack",   "huge-stack-auto",   "huge-xstack-auto",
+};
+
 static const char *
 get_model (void)
 {
+  int index;
+
   switch (options.model)
     {
     case MODEL_SMALL:
-      if (options.stackAuto)
-        return "small-stack-auto";
-      else
-        return "small";
-
+      index = 0;
+      break;
     case MODEL_MEDIUM:
-      if (options.stackAuto)
-        return "medium-stack-auto";
-      else
-        return "medium";
-
+      index = 4;
+      break;
     case MODEL_LARGE:
-      if (options.stackAuto)
-        return "large-stack-auto";
-      else
-        return "large";
-
+      index = 8;
+      break;
     case MODEL_HUGE:
-      if (options.stackAuto)
-        return "huge-stack-auto";
-      else
-        return "huge";
-
+      index = 12;
+      break;
     default:
       werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
       return "unknown";
     }
+  if (options.stackAuto)
+    index += 2;
+  if (options.useXstack)
+    index += 1;
+  return models[index];
 }
 
 /** $1 is always the basename.

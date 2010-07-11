@@ -5,6 +5,8 @@
 	    all subsequent params to fix bug 3004918
 	* support/regression/tests/bug3004918.c: new, added
 	* src/SDCCloop.c: cosmetic changes
+	* src/mcs51/main.c (_mcs51_keywords): removed duplicate keywords,
+	  (get_model): fixed bug 3018737
 
 2010-07-10 Maarten Brock <sourceforge.brock AT dse.nl>
 

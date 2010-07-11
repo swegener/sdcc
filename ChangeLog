@@ -1,3 +1,11 @@
+2010-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.h: added IS_SMALL_PTR
+	* src/mcs51/ralloc.c (packRegsForOneuse): check for small pointers, check
+	    all subsequent params to fix bug 3004918
+	* support/regression/tests/bug3004918.c: new, added
+	* src/SDCCloop.c: cosmetic changes
+
 2010-07-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (processParms): fixed bug 3002698

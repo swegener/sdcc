@@ -656,7 +656,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
   if ((forSym->regType == REG_PTR) || (forSym->regType == REG_GPR))
     {
       selectS = liveRangesWith (lrcs, bitType, ebp, ic);
-      
+
       for (sym = setFirstItem (selectS); sym; sym = setNextItem (selectS))
         {
           bitVectUnSetBit (lrcs, sym->key);
@@ -1298,7 +1298,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                 {
                   sym->usl.spillLoc->allocreq++;
                 }
-                  
+
               /* if it does not need or is spilt
                  or is already assigned to registers
                  or will not live beyond this instructions */
@@ -1611,7 +1611,7 @@ static void fillGaps()
             {
               if (bitVectBitValue(sym->defs,i))
                 {
-                  if (!(ic = hTabItemWithKey(iCodehTab,i))) 
+                  if (!(ic = hTabItemWithKey(iCodehTab,i)))
                     continue;
                   D(printf("  ic->seq = %d\n", ic->seq));
                   if (SKIP_IC(ic))
@@ -1639,7 +1639,7 @@ static void fillGaps()
                       pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
                     }
                   D(printf("   pdone = %d\n", pdone));
-                  if (pdone > 1) 
+                  if (pdone > 1)
                     break;
                 }
             }
@@ -1652,7 +1652,7 @@ static void fillGaps()
                   if (!(ic = hTabItemWithKey(iCodehTab, i)))
                     continue;
                   D(printf("  ic->seq = %d\n", ic->seq));
-                  if (SKIP_IC(ic)) 
+                  if (SKIP_IC(ic))
                     continue;
                   if (POINTER_SET(ic) || POINTER_GET(ic))
                     continue;
@@ -1669,13 +1669,13 @@ static void fillGaps()
                       pdone += (positionRegs(sym, OP_SYMBOL (IC_RESULT (ic)))>0);
                     }
                   D(printf("   pdone = %d\n", pdone));
-                  if (pdone > 1) 
+                  if (pdone > 1)
                     break;
                 }
             }
           if (pdone == 0)
             break; /* second pass only if regs repositioned */
-          if (pdone > 1) 
+          if (pdone > 1)
             break;
         }
       D(printf(" sym->regs = ["));
@@ -2503,7 +2503,8 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
       !POINTER_GET (ic))
     return NULL;
 
-  if (ic->op == SEND && ic->argreg != 1) return NULL;
+  if (ic->op == SEND && ic->argreg != 1)
+    return NULL;
 
   /* this routine will mark the symbol as used in one
      instruction use only && if the definition is local
@@ -2526,8 +2527,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (dic->op == CAST)
     {
       /* to a bigger type */
-      if (getSize(OP_SYM_TYPE(IC_RESULT(dic))) >
-          getSize(OP_SYM_TYPE(IC_RIGHT(dic))))
+      if (getSize(OP_SYM_TYPE(IC_RESULT(dic))) > getSize(OP_SYM_TYPE(IC_RIGHT(dic))))
         {
           /* then we can not, since we cannot predict the usage of b & acc */
           return NULL;
@@ -2535,12 +2535,10 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
     }
 
   /* found the definition now check if it is local */
-  if (dic->seq < ebp->fSeq ||
-      dic->seq > ebp->lSeq)
+  if (dic->seq < ebp->fSeq || dic->seq > ebp->lSeq)
     return NULL;                /* non-local */
 
-  /* now check if it is the return from
-     a function call */
+  /* now check if it is the return from a function call */
   if (dic->op == CALL || dic->op == PCALL)
     {
       if (ic->op != SEND && ic->op != RETURN &&
@@ -2562,14 +2560,13 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
           return NULL;
         }
 
-      /* if pointer set then make sure the pointer
-         is one byte */
+      /* if pointer set then make sure the pointer is one byte */
       if (POINTER_SET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
+          !IS_SMALL_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
         return NULL;
 
       if (POINTER_GET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
+          !IS_SMALL_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
         return NULL;
     }
 
@@ -2592,7 +2589,19 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   sic = dic;
 
-  /* also make sure the intervening instructions
+  if (ic->op == SEND)
+    {
+      /* look for the call to extend following
+         far space search to include all parameters.
+         see bug 3004918 */
+      for ( ; ic; ic = ic->next)
+        if (ic->op == CALL || ic->op == PCALL)
+          break;
+      if (!ic) /* not found */
+        return NULL;
+    }
+
+  /* make sure the intervening instructions
      don't have anything in far space */
   for (dic = dic->next; dic && dic != ic && sic != ic; dic = dic->next)
     {
@@ -2602,14 +2611,14 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
       /* if pointer set then make sure the pointer
          is one byte */
       if (POINTER_SET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
+          !IS_SMALL_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
         return NULL;
 
       if (POINTER_GET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
+          !IS_SMALL_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
         return NULL;
 
-      /* if address of & the result is remat the okay */
+      /* if address of & the result is remat then okay */
       if (dic->op == ADDRESS_OF &&
           OP_SYMBOL (IC_RESULT (dic))->remat)
         continue;
@@ -3043,10 +3052,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
           !isOperandGlobal(IC_RESULT(ic)) &&          /* due to bug 1618050 */
           bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
         {
-          OP_SYMBOL (IC_RESULT (ic))->remat =
-            OP_SYMBOL (IC_RIGHT (ic))->remat;
-          OP_SYMBOL (IC_RESULT (ic))->rematiCode =
-            OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+          OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
+          OP_SYMBOL (IC_RESULT (ic))->rematiCode = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
         }
 
       /* if cast to a generic pointer & the pointer being
@@ -3163,9 +3170,10 @@ packRegisters (eBBlock ** ebpp, int blockno)
          can be eliminated for return statements */
       if ((ic->op == RETURN || (ic->op == SEND && ic->argreg == 1)) &&
           !isOperandInFarSpace (IC_LEFT (ic)) &&
-          options.model == MODEL_SMALL) {
-        packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-      }
+          (options.model == MODEL_SMALL || options.model == MODEL_MEDIUM))
+        {
+          packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+        }
 
       /* if pointer set & left has a size more than
          one and right is not in far space */
@@ -3175,7 +3183,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
           !OP_SYMBOL (IC_RESULT (ic))->remat &&
           !IS_OP_RUONLY (IC_RIGHT (ic)) &&
           getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
-        packRegsForOneuse (ic, IC_RESULT (ic), ebp);
+        {
+          packRegsForOneuse (ic, IC_RESULT (ic), ebp);
+        }
 
       /* if pointer get */
       if (POINTER_GET (ic) &&
@@ -3184,7 +3194,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
           !OP_SYMBOL (IC_LEFT (ic))->remat &&
           !IS_OP_RUONLY (IC_RESULT (ic)) &&
           getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
-        packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+        {
+          packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+        }
 
       /* if this is a cast for intergral promotion then
          check if it's the only use of the definition of the
@@ -3200,7 +3212,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
               getSize (fromType) != getSize (toType) &&
               SPEC_USIGN (fromType) == SPEC_USIGN (toType))
             {
-
               iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
               if (dic)
                 {
@@ -3215,13 +3226,15 @@ packRegisters (eBBlock ** ebpp, int blockno)
                       ic = ic->prev;
                     }
                   else
-                    OP_SYMBOL (IC_RIGHT (ic))->ruonly = 0;
+                    {
+                      OP_SYMBOL (IC_RIGHT (ic))->ruonly = 0;
+                    }
                 }
             }
           else
             {
               /* if the type from and type to are the same
-                 then if this is the only use then packit */
+                 then if this is the only use then pack it */
               if (compareType (operandType (IC_RIGHT (ic)),
                              operandType (IC_LEFT (ic))) == 1)
                 {
@@ -3343,9 +3356,10 @@ mcs51_assignRegisters (ebbIndex * ebbi)
   createRegMask (ebbs, count);
 
   /* redo that offsets for stacked automatic variables */
-  if (currFunc) {
-    redoStackOffsets ();
-  }
+  if (currFunc)
+    {
+      redoStackOffsets ();
+    }
 
   /* make sure r0 & r1 are flagged as used if they might be used */
   /* as pointers */

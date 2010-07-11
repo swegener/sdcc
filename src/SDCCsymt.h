@@ -468,6 +468,9 @@ extern sym_link *validateLink(sym_link  *l,
 
 #define IS_ARRAY(x)      (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
 #define IS_DATA_PTR(x)   (IS_DECL(x) && DCL_TYPE(x) == POINTER)
+#define IS_SMALL_PTR(x)  (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
+                                         DCL_TYPE(x) == IPOINTER   ||    \
+                                         DCL_TYPE(x) == PPOINTER  ))
 #define IS_PTR(x)        (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
                                          DCL_TYPE(x) == FPOINTER   ||    \
                                          DCL_TYPE(x) == GPOINTER   ||    \

@@ -449,7 +449,6 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
   for (lBlock = setFirstItem (theLoop->regBlocks); lBlock;
        lBlock = setNextItem (theLoop->regBlocks))
     {
-
       iCode *ic;
       int domsAllExits;
       int i;
@@ -471,7 +470,6 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
       /* collect those instructions with invariant operands */
       for (ic = lBlock->sch; ic; ic = ic->next)
         {
-
           int lin, rin;
           cseDef *ivar;
 
@@ -493,7 +491,7 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
                   continue;
                 }
 
-              /* Bug 1717943, 
+              /* Bug 1717943,
                * if this is an assignment to a global */
               if (ic->op=='=' && isOperandGlobal(IC_RESULT(ic)))
                 {
@@ -573,14 +571,12 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
               /* make sure this defintion is not used anywhere else */
               if (!domsAllExits)
                 {
-
                   if (isOperandGlobal (IC_RESULT (ic)))
                     continue;
                   /* for successors for all exits */
                   for (sBlock = setFirstItem (theLoop->exits); sBlock;
                        sBlock = setNextItem (theLoop->exits))
                     {
-
                       for (i = 0; i < count; ebbs[i++]->visited = 0);
                       lBlock->visited = 1;
                       if (applyToSet (sBlock->succList, isDefAlive, ic))
@@ -650,7 +646,6 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
               if (sBlock)
                 continue;       /* another definition present in the block */
 
-
               /* now check if it exists in the in of this block */
               /* if not then it was killed before this instruction */
               if (!bitVectBitValue (lBlock->inDefs, ic->key))
@@ -687,7 +682,6 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
       /* create an iCode chain from it */
       for (cdp = setFirstItem (lInvars); cdp; cdp = setNextItem (lInvars))
         {
-
           /* maintain data flow .. add it to the */
           /* ldefs defSet & outExprs of the preheader  */
           preHdr->defSet = bitVectSetBit (preHdr->defSet, cdp->diCode->key);
@@ -695,7 +689,6 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
           cdp->diCode->filename = preHdr->ech->filename;
           cdp->diCode->lineno = preHdr->ech->lineno;
           addSetHead (&preHdr->outExprs, cdp);
-
 
           if (!icFirst)
             icFirst = cdp->diCode;
@@ -717,7 +710,6 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
       icFirst->prev = preHdr->ech;
       preHdr->ech = icLast;
       icLast->next = NULL;
-
     }
   return change;
 }
@@ -1178,7 +1170,6 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
        lBlock && indVars;
        lBlock = setNextItem (loopReg->regBlocks))
     {
-
       iCode *ic, *indIc, *dic;
       induction *ip;
 
@@ -1232,7 +1223,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           /* ask port for size not worth if native instruction
              exist for multiply & divide */
           if (getSize (operandType (IC_LEFT (ic))) <= (unsigned long) port->support.muldiv ||
-          getSize (operandType (IC_RIGHT (ic))) <= (unsigned long) port->support.muldiv)
+              getSize (operandType (IC_RIGHT (ic))) <= (unsigned long) port->support.muldiv)
             continue;
 
           /* if this is a division then the remainder should be zero
@@ -1276,7 +1267,6 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           dic = findDefInRegion (setFromSet (loopReg->regBlocks), aSym, &owner);
           assert (dic);
           addiCodeToeBBlock (owner, indIc, dic);
-
         }
     }
 

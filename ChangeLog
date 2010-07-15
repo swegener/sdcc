@@ -1,3 +1,10 @@
+2010-07-15 Borut Razem <borut.razem AT siol.net>
+	* sdas/as8051/Makefile.in, sdas/asz80/Makefile.in,
+	  sdas/linksrc/Makefile.in, sdas/as6808/Makefile.in,
+	  sdcc/sdas/asgb/Makefile.in:
+	  fixed bug #3030113: assembler Makefile.in missing trailing '@' on
+	  MAKEPDEP= stmt
+
 2010-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.h: added IS_SMALL_PTR

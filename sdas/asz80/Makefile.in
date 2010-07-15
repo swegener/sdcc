@@ -12,7 +12,7 @@ CC              = @CC@
 CPP             = @CPP@
 INSTALL         = @INSTALL@
 STRIP           = @STRIP@
-MAKEDEP         = @MAKEDEP
+MAKEDEP         = @MAKEDEP@
 
 top_builddir    = @top_builddir@
 top_srcdir      = @top_srcdir@

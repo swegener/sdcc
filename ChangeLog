@@ -1,3 +1,11 @@
+2010-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCcse.c,
+	* src/SDCCopt.c,
+	* src/SDCCicode.c: cosmetic changes
+	* src/SDCCloop.c (loopInduction): fixed bug 2889032
+	* support/regression/tests/bug2889032.c: new, added
+
 2010-07-15 Borut Razem <borut.razem AT siol.net>
 	* sdas/as8051/Makefile.in, sdas/asz80/Makefile.in,
 	  sdas/linksrc/Makefile.in, sdas/as6808/Makefile.in,

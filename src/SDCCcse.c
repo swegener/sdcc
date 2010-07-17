@@ -2119,7 +2119,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* see if we can replace it             */
       if (!computeOnly && ic->op == '=')
         {
-
           /* update the spill location for this */
           updateSpillLocation (ic,0);
 
@@ -2179,7 +2178,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
                       ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
                       SET_ISADDR (IC_RESULT (ic), 0);
                     }
-
                 }
               else
                 {
@@ -2194,10 +2192,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
         {
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop, checkSign);
-          if (pdop) {
-            ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
-            change = 1;
-          }
+          if (pdop)
+            {
+              ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
+              change = 1;
+            }
         }
 
       /* if left or right changed then do algebraic */
@@ -2239,28 +2238,33 @@ cseBBlock (eBBlock * ebb, int computeOnly,
         }
 
       /* Alternate code */
-      if (pdic && IS_ITEMP(IC_RESULT(ic))) {
-        if (POINTER_GET(ic) && bitVectBitValue(ebb->ptrsSet,IC_LEFT(ic)->key)) {
-          /* Mmm, found an equivalent pointer get at a lower level.
-             This could be a loop however with the same pointer set
-             later on */
-        } else {
-          /* if previous definition found change this to an assignment */
-          ic->op = '=';
-          IC_LEFT(ic) = NULL;
-          IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
-          SET_ISADDR(IC_RESULT(ic),0);
-          SET_ISADDR(IC_RIGHT (ic),0);
+      if (pdic && IS_ITEMP(IC_RESULT(ic)))
+        {
+          if (POINTER_GET(ic) && bitVectBitValue(ebb->ptrsSet,IC_LEFT(ic)->key))
+            {
+              /* Mmm, found an equivalent pointer get at a lower level.
+                 This could be a loop however with the same pointer set
+                 later on */
+            }
+          else
+            {
+              /* if previous definition found change this to an assignment */
+              ic->op = '=';
+              IC_LEFT(ic) = NULL;
+              IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
+              SET_ISADDR(IC_RESULT(ic),0);
+              SET_ISADDR(IC_RIGHT (ic),0);
+            }
         }
-      }
 
-      if (!(POINTER_SET (ic)) && IC_RESULT (ic)) {
+      if (!(POINTER_SET (ic)) && IC_RESULT (ic))
+        {
           cseDef *csed;
           deleteItemIf (&cseSet, ifDefSymIsX, IC_RESULT (ic));
           csed = newCseDef (IC_RESULT (ic), ic);
           updateCseDefAncestors (csed, cseSet);
           addSetHead (&cseSet, csed);
-      }
+        }
       defic = ic;
 
       /* if assignment to a parameter which is not
@@ -2363,9 +2367,10 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
   for (expr=setFirstItem (ebb->inExprs); expr; expr=setNextItem (ebb->inExprs))
     if (!isinSetWith (cseSet, expr, isCseDefEqual) &&
-        !isinSetWith (ebb->killedExprs, expr, isCseDefEqual)) {
-    addSetHead (&ebb->killedExprs, expr);
-  }
+        !isinSetWith (ebb->killedExprs, expr, isCseDefEqual))
+      {
+        addSetHead (&ebb->killedExprs, expr);
+      }
   setToNull ((void *) &ebb->outExprs);
   ebb->outExprs = cseSet;
   ebb->outDefs = bitVectUnion (ebb->outDefs, ebb->defSet);

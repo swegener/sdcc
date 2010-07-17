@@ -222,7 +222,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       newic->filename = filename;
       newic->lineno = lineno;
       if (IS_SYMOP (left))
-          OP_USES (left) = bitVectSetBit (OP_USES (left), newic->key);
+        OP_USES (left) = bitVectSetBit (OP_USES (left), newic->key);
     }
   /* insert the call */
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
@@ -236,12 +236,12 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC16 || TARGET_IS_PIC)
+  if (TARGET_IS_PIC16 || TARGET_IS_PIC)
     {
       /* normally these functions aren't marked external, so we can use their
        * _extern field to mark as already added to symbol table */
 
-      if(!SPEC_EXTR(func->etype))
+      if (!SPEC_EXTR(func->etype))
         {
           memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
 
@@ -283,7 +283,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
         }
     }
 
-  if(compareType (type, fixed16x16Type) == 1)
+  if (compareType (type, fixed16x16Type) == 1)
     {
       func = fp16x16conv[0][3][0];
       goto found;
@@ -309,21 +309,21 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
-
     }
   else
     {
       /* push the left */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-        newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-        newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-      }
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-      {
-        newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
-        newic->parmPush = 1;
-        bytesPushed += getSize(operandType(IC_RIGHT(ic)));
-      }
+        {
+          newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+          newic->parmPush = 1;
+          bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
@@ -337,18 +337,20 @@ found:
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC16 || TARGET_IS_PIC) {
-        /* normally these functions aren't marked external, so we can use their
-         * _extern field to marked as already added to symbol table */
+  if (TARGET_IS_PIC16 || TARGET_IS_PIC)
+    {
+      /* normally these functions aren't marked external, so we can use their
+       * _extern field to marked as already added to symbol table */
 
-        if(!SPEC_EXTR(func->etype)) {
-            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+      if (!SPEC_EXTR(func->etype))
+        {
+          memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
 
-            SPEC_EXTR(func->etype) = 1;
-            seg = SPEC_OCLS( func->etype );
-            addSet(&seg->syms, func);
+          SPEC_EXTR(func->etype) = 1;
+          seg = SPEC_OCLS( func->etype );
+          addSet(&seg->syms, func);
         }
-  }
+    }
 
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
@@ -390,11 +392,11 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-            {
-                newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-                newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-            }
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
         {
           newic = newiCode ('=', NULL, IC_RIGHT (ic));
@@ -403,14 +405,14 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
-
     }
   else
     {
       /* push the left */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
@@ -431,18 +433,20 @@ found:
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC16 || TARGET_IS_PIC) {
-        /* normally these functions aren't marked external, so we can use their
-         * _extern field to marked as already added to symbol table */
+  if (TARGET_IS_PIC16 || TARGET_IS_PIC)
+    {
+      /* normally these functions aren't marked external, so we can use their
+       * _extern field to marked as already added to symbol table */
 
-        if(!SPEC_EXTR(func->etype)) {
-            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+      if (!SPEC_EXTR(func->etype))
+        {
+          memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
 
-                SPEC_EXTR(func->etype) = 1;
-                seg = SPEC_OCLS( func->etype );
-                addSet(&seg->syms, func);
+          SPEC_EXTR(func->etype) = 1;
+          seg = SPEC_OCLS( func->etype );
+          addSet(&seg->syms, func);
         }
-  }
+    }
 
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
@@ -486,9 +490,10 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
@@ -498,15 +503,14 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
-
     }
   else
     {
-
       /* push the left */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
@@ -517,7 +521,6 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
-
     }
 
   /* make the call */
@@ -528,18 +531,20 @@ found:
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC16 || TARGET_IS_PIC) {
-        /* normally these functions aren't marked external, so we can use their
-         * _extern field to marked as already added to symbol table */
+  if (TARGET_IS_PIC16 || TARGET_IS_PIC)
+    {
+      /* normally these functions aren't marked external, so we can use their
+       * _extern field to marked as already added to symbol table */
 
-        if(!SPEC_EXTR(func->etype)) {
-            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+      if (!SPEC_EXTR(func->etype))
+        {
+          memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
 
-                SPEC_EXTR(func->etype) = 1;
-                seg = SPEC_OCLS( func->etype );
-                addSet(&seg->syms, func);
+          SPEC_EXTR(func->etype) = 1;
+          seg = SPEC_OCLS( func->etype );
+          addSet(&seg->syms, func);
         }
-  }
+    }
 
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
@@ -590,9 +595,10 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
@@ -605,11 +611,11 @@ found:
     }
   else
     {
-
       /* push the left */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
@@ -630,18 +636,20 @@ found:
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC16 || TARGET_IS_PIC) {
-        /* normally these functions aren't marked external, so we can use their
-         * _extern field to marked as already added to symbol table */
+  if (TARGET_IS_PIC16 || TARGET_IS_PIC)
+    {
+      /* normally these functions aren't marked external, so we can use their
+       * _extern field to marked as already added to symbol table */
 
-        if(!SPEC_EXTR(func->etype)) {
-            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+      if (!SPEC_EXTR(func->etype))
+        {
+          memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
 
-                SPEC_EXTR(func->etype) = 1;
-                seg = SPEC_OCLS( func->etype );
-                addSet(&seg->syms, func);
+          SPEC_EXTR(func->etype) = 1;
+          seg = SPEC_OCLS( func->etype );
+          addSet(&seg->syms, func);
         }
-  }
+    }
 
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
@@ -701,12 +709,14 @@ convilong (iCode * ic, eBBlock * ebp)
         {
           if (compareType (leftType, multypes[bwd][su]) == 1)
             {
-              if ((op=='*' || op=='/' || op=='%') &&
-                  compareType (rightType, multypes[bwd][su]) != 1)
+              if ((op=='*' || op=='/' || op=='%'))
                 {
-                  assert(0);
+                  int ret = compareType (rightType, multypes[bwd][su]);
+                  if (ret != 1)
+                    {
+                      assert(0);
+                    }
                 }
-
               if (op == '*')
                 func = muldiv[0][bwd][su];
               else if (op == '/')
@@ -733,9 +743,10 @@ found:
   if (!options.intlong_rent)
     {
       /* first one */
-        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-            newic = newiCode (SEND, IC_LEFT (ic), NULL);
-            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+        {
+          newic = newiCode (SEND, IC_LEFT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
@@ -747,10 +758,11 @@ found:
       newic->lineno = lineno;
 
       /* second one */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype)) {
+      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
+        {
           newic = newiCode (SEND, IC_RIGHT (ic), NULL);
           newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
-      }
+        }
       else
         {
           newic = newiCode ('=', NULL, IC_RIGHT (ic));
@@ -759,7 +771,6 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
-
     }
   else
     {
@@ -797,7 +808,6 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
-
     }
 
   /* for the result */
@@ -810,18 +820,20 @@ found:
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC || TARGET_IS_PIC16) {
-        /* normally these functions aren't marked external, so we can use their
-         * _extern field to marked as already added to symbol table */
+  if (TARGET_IS_PIC || TARGET_IS_PIC16)
+    {
+      /* normally these functions aren't marked external, so we can use their
+       * _extern field to marked as already added to symbol table */
 
-        if(!SPEC_EXTR(func->etype)) {
-            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+      if (!SPEC_EXTR(func->etype))
+        {
+          memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
 
-                SPEC_EXTR(func->etype) = 1;
-                seg = SPEC_OCLS( func->etype );
-                addSet(&seg->syms, func);
+          SPEC_EXTR(func->etype) = 1;
+          seg = SPEC_OCLS( func->etype );
+          addSet(&seg->syms, func);
         }
-  }
+    }
 
   addiCodeToeBBlock (ebp, newic, ip);
 }
@@ -894,13 +906,10 @@ convertToFcall (eBBlock ** ebbs, int count)
       /* for all instructions in the block do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-
           /* floating point operations are
              converted to function calls */
-          if ((IS_CONDITIONAL (ic) ||
-               IS_ARITHMETIC_OP (ic)) &&
-              (IS_FLOAT (operandType (IC_RIGHT (ic))) ||
-               IS_FIXED( operandType (IC_RIGHT (ic)))))
+          if ((IS_CONDITIONAL (ic) || IS_ARITHMETIC_OP (ic)) &&
+              (IS_FLOAT (operandType (IC_RIGHT (ic))) || IS_FIXED( operandType (IC_RIGHT (ic)))))
             {
               cnvToFcall (ic, ebbs[i]);
             }
@@ -1060,7 +1069,6 @@ replaceRegEqv (ebbIndex * ebbi)
               continue;
             }
 
-
           if (ic->op == JUMPTABLE)
             {
               if (IC_JTCOND (ic) &&
@@ -1100,9 +1108,11 @@ replaceRegEqv (ebbIndex * ebbi)
                   IC_RESULT (ic)->isaddr = 1;
                 }
               else
-                IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-                                                 OP_DEFS (IC_RESULT (ic)),
-                                                 OP_USES (IC_RESULT (ic)));
+                {
+                  IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
+                                                   OP_DEFS (IC_RESULT (ic)),
+                                                   OP_USES (IC_RESULT (ic)));
+                }
             }
 
           if (IC_RIGHT (ic) &&
@@ -1207,7 +1217,6 @@ killDeadCode (ebbIndex * ebbi)
   int gchange = 0;
   int i = 0;
 
-
   /* basic algorithm :-                                          */
   /* first the exclusion rules :-                                */
   /*  1. if result is a global or volatile then skip             */
@@ -1288,9 +1297,7 @@ killDeadCode (ebbIndex * ebbi)
                   for (j = 0; j < count; ebbs[j++]->visited = 0);
 
                   /* find out if this definition is alive */
-                  if (applyToSet (ebbs[i]->succList,
-                                  isDefAlive,
-                                  ic))
+                  if (applyToSet (ebbs[i]->succList, isDefAlive, ic))
                     continue;
 
                   kill = 1;
@@ -1391,7 +1398,6 @@ killDeadCode (ebbIndex * ebbi)
                         bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
                     }
                 }
-
             }                   /* end of all instructions */
 
           if (!ebbs[i]->sch && !ebbs[i]->noPath)

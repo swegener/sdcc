@@ -2176,12 +2176,10 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
   }
 
   resType = usualBinaryConversions (&left, &right, resultType, '*');
-#if 1
   rtype = operandType (right);
   retype = getSpec (rtype);
   ltype = operandType (left);
   letype = getSpec (ltype);
-#endif
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */

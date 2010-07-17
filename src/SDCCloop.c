@@ -1163,7 +1163,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
   basicInd = setFromSet (indVars = basicInduction (loopReg, ebbi));
 
   /* find other induction variables : by other we mean definitions of */
-  /* the form x := y (* | / ) <constant> .. we will move  this one to */
+  /* the form x := y (* | / ) <constant> .. we will move this one to  */
   /* beginning of the loop and reduce strength i.e. replace with +/-  */
   /* these expensive expressions: OH! and y must be induction too     */
   for (lBlock = setFirstItem (loopReg->regBlocks), lastBlock = lBlock;
@@ -1181,6 +1181,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
       for (ic = lBlock->sch; ic; ic = ic->next)
         {
           operand *aSym;
+          operand *litSym;
           long litVal;
 
           /* consider only * & / */
@@ -1204,7 +1205,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           if (IS_SYMOP (IC_LEFT (ic)))
             {
               aSym = IC_LEFT (ic);
-              litVal = (long) operandLitValue (IC_RIGHT (ic));
+              litSym = IC_RIGHT (ic);
             }
           else
             {
@@ -1212,8 +1213,9 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
               if (ic->op == '/')
                 continue;
               aSym = IC_RIGHT (ic);
-              litVal = (long) operandLitValue (IC_LEFT (ic));
+              litSym = IC_LEFT (ic);
             }
+          litVal = (long) operandLitValue (litSym);
 
           ip = NULL;
           /* check if this is an induction variable */
@@ -1238,7 +1240,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           /* this will be put on the loop header */
           indIc = newiCode (ic->op,
                             operandFromOperand (aSym),
-                            operandFromLit (litVal));
+                            operandFromOperand (litSym));
           indIc->filename = ic->filename;
           indIc->lineno = ic->lineno;
           IC_RESULT (indIc) = operandFromOperand (IC_RESULT (ic));

@@ -3965,6 +3965,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                  SPEC_STRUCT(LETYPE(tree))->tag);
         }
 #endif
+#if 0 // disbaled to fix bug 2941749
       if (IS_ADDRESS_OF_OP(tree->right)
           && IS_AST_SYM_VALUE (tree->right->left)
           && SPEC_ABSA (AST_SYMBOL (tree->right->left)->etype))
@@ -4008,7 +4009,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->values.cast.literalFromCast = 1;
           return tree;
         }
-
+#endif
       /* handle offsetof macro:            */
       /* #define offsetof(TYPE, MEMBER) \  */
       /* ((unsigned) &((TYPE *)0)->MEMBER) */

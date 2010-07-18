@@ -778,7 +778,6 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       IS_OP_LITERAL (IC_LEFT (ic)) &&
       IS_OP_LITERAL (IC_RIGHT (ic)))
     {
-
       IC_RIGHT (ic) = operandOperation (IC_LEFT (ic),
                                         IC_RIGHT (ic),
                                         ic->op,
@@ -787,7 +786,6 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       IC_LEFT (ic) = NULL;
       SET_RESULT_RIGHT (ic);
       return;
-
     }
   /* if not ifx & only one operand present */
   if (IC_RESULT (ic) &&
@@ -795,7 +793,6 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       IS_OP_LITERAL (IC_LEFT (ic)) &&
       !IC_RIGHT (ic))
     {
-
       IC_RIGHT (ic) = operandOperation (IC_LEFT (ic),
                                         IC_RIGHT (ic),
                                         ic->op,
@@ -806,16 +803,13 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       return;
     }
 
-
   /* a special case : or in short a kludgy solution will think
      about a better solution over a glass of wine someday */
   if (ic->op == GET_VALUE_AT_ADDRESS)
     {
-
       if (IS_ITEMP (IC_RESULT (ic)) &&
           IS_TRUE_SYMOP (IC_LEFT (ic)))
         {
-
           ic->op = '=';
           IC_RIGHT (ic) = operandFromOperand (IC_LEFT (ic));
           IC_RIGHT (ic)->isaddr = 0;
@@ -840,9 +834,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           IC_LEFT (ic) = NULL;
           return;
         }
-
     }
-
 
   /* depending on the operation */
   switch (ic->op)
@@ -957,7 +949,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case '*':
       if (IS_OP_LITERAL (IC_LEFT (ic)))
         {
-         double leftValue = operandLitValue (IC_LEFT (ic));
+          double leftValue = operandLitValue (IC_LEFT (ic));
 
           if (leftValue == 0.0)
             {
@@ -1288,6 +1280,8 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         }
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
+          unsigned val;
+
           /* if BITWISEOR then check if one of them is a zero */
           /* if yes turn it into assignment */
           if (operandLitValue (IC_RIGHT (ic)) == 0.0)
@@ -1300,11 +1294,8 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             }
           /* if BITWISEOR then check if one of them is 0xff... */
           /* if yes turn it into 0xff... assignment */
-          {
-            unsigned val;
-
-            switch (getSize (operandType (IC_RIGHT (ic))))
-              {
+          switch (getSize (operandType (IC_RIGHT (ic))))
+            {
               case 1:
                 val = 0xff;
                 break;
@@ -1316,10 +1307,10 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                 break;
               default:
                 return;
-              }
-            if (((unsigned) double2ul (operandLitValue (IC_RIGHT (ic))) & val) == val)
-              {
-                if (IS_OP_VOLATILE (IC_LEFT (ic)))
+            }
+          if (((unsigned) double2ul (operandLitValue (IC_RIGHT (ic))) & val) == val)
+            {
+              if (IS_OP_VOLATILE (IC_LEFT (ic)))
                 {
                   iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
                   IC_RESULT (newic) = IC_LEFT (ic);
@@ -1327,12 +1318,11 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                   newic->lineno = ic->lineno;
                   addiCodeToeBBlock (ebp, newic, ic->next);
                 }
-                ic->op = '=';
-                IC_LEFT (ic) = NULL;
-                SET_RESULT_RIGHT (ic);
-                return;
-              }
-          }
+              ic->op = '=';
+              IC_LEFT (ic) = NULL;
+              SET_RESULT_RIGHT (ic);
+              return;
+            }
         }
       break;
     case '^':
@@ -1394,72 +1384,68 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 void
 updateSpillLocation (iCode * ic, int induction)
 {
-        sym_link *setype;
+  sym_link *setype;
 
-        if (POINTER_SET (ic))
-                return;
+  if (POINTER_SET (ic))
+    return;
 
-        if (ic->nosupdate)
-                return;
+  if (ic->nosupdate)
+    return;
 
 #if 0
-        /* for the form true_symbol := iTempNN */
-        if (ASSIGN_ITEMP_TO_SYM (ic) &&
-            !SPIL_LOC (IC_RIGHT (ic))) {
+  /* for the form true_symbol := iTempNN */
+  if (ASSIGN_ITEMP_TO_SYM (ic) &&
+      !SPIL_LOC (IC_RIGHT (ic)))
+    {
+      setype = getSpec (operandType (IC_RESULT (ic)));
 
-                setype = getSpec (operandType (IC_RESULT (ic)));
-
-                if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
-                    !IS_VOLATILE (setype) &&
-                    !IN_FARSPACE (SPEC_OCLS (setype)) &&
-                    !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
-                {
-                    wassert(IS_SYMOP(IC_RESULT (ic)));
-                    wassert(IS_SYMOP(IC_RIGHT (ic)));
-                        SPIL_LOC (IC_RIGHT (ic)) =
-                                IC_RESULT (ic)->operand.symOperand;
-                }
-
+      if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
+          !IS_VOLATILE (setype) &&
+          !IN_FARSPACE (SPEC_OCLS (setype)) &&
+          !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
+        {
+          wassert(IS_SYMOP(IC_RESULT (ic)));
+          wassert(IS_SYMOP(IC_RIGHT (ic)));
+          SPIL_LOC (IC_RIGHT (ic)) = IC_RESULT (ic)->operand.symOperand;
         }
+    }
 #endif
 
 #if 0 /* this needs furthur investigation can save a lot of code */
-        if (ASSIGN_SYM_TO_ITEMP(ic) &&
-            !SPIL_LOC(IC_RESULT(ic))) {
-            if (!OTHERS_PARM (OP_SYMBOL (IC_RIGHT (ic))))
-                SPIL_LOC (IC_RESULT (ic)) =
-                    IC_RIGHT (ic)->operand.symOperand;
-        }
+  if (ASSIGN_SYM_TO_ITEMP(ic) &&
+      !SPIL_LOC(IC_RESULT(ic)))
+    {
+      if (!OTHERS_PARM (OP_SYMBOL (IC_RIGHT (ic))))
+          SPIL_LOC (IC_RESULT (ic)) = IC_RIGHT (ic)->operand.symOperand;
+    }
 #endif
-        if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
+  if (ASSIGN_ITEMP_TO_ITEMP (ic))
+    {
+      if (!SPIL_LOC (IC_RIGHT (ic)) &&
+          !bitVectBitsInCommon (OP_DEFS (IC_RIGHT (ic)), OP_USES (IC_RESULT (ic))) &&
+          OP_SYMBOL (IC_RESULT (ic))->isreqv)
+        {
+          setype = getSpec (operandType (IC_RESULT (ic)));
 
-                if (!SPIL_LOC (IC_RIGHT (ic)) &&
-                    !bitVectBitsInCommon (OP_DEFS (IC_RIGHT (ic)), OP_USES (IC_RESULT (ic))) &&
-                    OP_SYMBOL (IC_RESULT (ic))->isreqv) {
-
-                        setype = getSpec (operandType (IC_RESULT (ic)));
-
-                        if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
-                            !IS_VOLATILE (setype) &&
-                            !IN_FARSPACE (SPEC_OCLS (setype)) &&
-                            !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic)))) {
-
-                                SPIL_LOC (IC_RIGHT (ic)) =
-                                        SPIL_LOC (IC_RESULT (ic));
-                                OP_SYMBOL (IC_RIGHT (ic))->prereqv =
-                                        OP_SYMBOL (IC_RESULT (ic))->prereqv;
-                        }
-                }
-                /* special case for inductions */
-                if (induction &&
-                    OP_SYMBOL(IC_RIGHT(ic))->isreqv &&
-                    !OP_SYMBOL(IC_RESULT (ic))->noSpilLoc &&
-                    !SPIL_LOC(IC_RESULT(ic))) {
-                        SPIL_LOC (IC_RESULT (ic)) = SPIL_LOC (IC_RIGHT (ic));
-                        OP_SYMBOL (IC_RESULT (ic))->prereqv =
-                                OP_SYMBOL (IC_RIGHT (ic))->prereqv;
-                }
+          if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
+              !IS_VOLATILE (setype) &&
+              !IN_FARSPACE (SPEC_OCLS (setype)) &&
+              !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
+            {
+              SPIL_LOC (IC_RIGHT (ic)) = SPIL_LOC (IC_RESULT (ic));
+              OP_SYMBOL (IC_RIGHT (ic))->prereqv = OP_SYMBOL (IC_RESULT (ic))->prereqv;
+            }
         }
+      /* special case for inductions */
+      if (induction &&
+          OP_SYMBOL(IC_RIGHT(ic))->isreqv &&
+          !OP_SYMBOL(IC_RESULT (ic))->noSpilLoc &&
+          !SPIL_LOC(IC_RESULT(ic)))
+        {
+          SPIL_LOC (IC_RESULT (ic)) = SPIL_LOC (IC_RIGHT (ic));
+          OP_SYMBOL (IC_RESULT (ic))->prereqv = OP_SYMBOL (IC_RIGHT (ic))->prereqv;
+        }
+    }
 }
 /*-----------------------------------------------------------------*/
 /* setUsesDef - sets the uses def bitvector for a given operand    */
@@ -1779,8 +1765,8 @@ deleteGetPointers (set ** cseSet, set ** pss, operand * op, eBBlock * ebb)
                   if (!isinSetWith (compItems, (void*)IC_RESULT (cdp->diCode),
                                     (insetwithFunc)isOperandEqual))
                     {
-                  addSet (&compItems, IC_RESULT (cdp->diCode));
-                  changes++;
+                      addSet (&compItems, IC_RESULT (cdp->diCode));
+                      changes++;
                     }
                 }
             }
@@ -2109,9 +2095,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* check if the condition can be replaced */
       if (ic->op == IFX)
         {
-          ifxOptimize (ic, cseSet, computeOnly,
-                       ebb, &change,
-                       ebbi);
+          ifxOptimize (ic, cseSet, computeOnly, ebb, &change, ebbi);
           continue;
         }
 
@@ -2159,11 +2143,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
                 {
                   if (IS_ITEMP (pdop) || IS_OP_LITERAL (pdop))
                     {
-                        /* some non dominating block does POINTER_SET with
-                           this variable .. unsafe to remove any POINTER_GETs */
-                        if (bitVectBitValue(ebb->ndompset,IC_LEFT(ic)->key))
-                            ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,pdop->key);
-                        ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
+                      /* some non dominating block does POINTER_SET with
+                         this variable .. unsafe to remove any POINTER_GETs */
+                      if (bitVectBitValue(ebb->ndompset,IC_LEFT(ic)->key))
+                          ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,pdop->key);
+                      ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
                       change = 1;
                     }
                   /* check if there is a pointer set

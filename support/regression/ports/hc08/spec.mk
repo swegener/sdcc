@@ -28,6 +28,10 @@ LINKFLAGS += hc08.lib
 OBJEXT = .rel
 BINEXT = .ihx
 
+# otherwise `make` deletes testfwk.o and `make -j` will fail
+.PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
+
+# Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx

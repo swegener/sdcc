@@ -1222,7 +1222,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
           if (IS_GENPTR (val->type))
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
           else if (IS_PTR (val->type))
-            dbuf_printf (oBuf, ",#%x\n", pointerTypeToGPByte (DCL_TYPE (val->type), NULL, NULL));
+            dbuf_printf (oBuf, ",#%x\n", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, sym->name));
           else
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
         }

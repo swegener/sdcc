@@ -52,6 +52,9 @@ testAbsolute(void)
   ASSERT((unsigned int)&p==ADDRESS(A4));
   ASSERT((unsigned int)&a==ADDRESS(A8));
   ASSERT((unsigned int)&f==ADDRESS(AC));
+
+  //bug 2941749
+  ASSERT((*((TestStruct *)&k)).a == 0x1234);
 #endif
 }
 

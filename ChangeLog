@@ -1,3 +1,15 @@
+2010-07-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (decorateType CAST): fixed bug 2941749
+	* src/SDCCBBlock.c,
+	* src/SDCCcse.c: cosmetic changes
+	* src/SDCCglue.c (printIvalPtr): added names
+	* support/regression/ports/ds390/spec.mk,
+	* support/regression/ports/hc08/spec.mk,
+	* support/regression/ports/mcs51-common/spec.mk,
+	* support/regression/ports/ucz80/spec.mk: added .PRECIOUS for using -j
+	* support/regression/tests/absolute.c: added test for bug 2941749
+
 2010-07-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCcse.c,

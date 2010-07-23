@@ -52,10 +52,6 @@ void __runSuite (void);
 #define FAIL()      FAILM("Failure")
 #define FAILM(_a)   __fail(_a, #_a, __FILE__, __LINE__)
 
-#ifndef NULL
-#define NULL  0
-#endif
-
 #define UNUSED(_a)  if (_a) { }
 
 #endif //__TESTFWK_H

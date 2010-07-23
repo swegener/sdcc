@@ -1,6 +1,7 @@
 /* Division by powers of two.
  */
 #include <testfwk.h>
+#include <stddef.h>
 
 typedef unsigned int UINT;
 

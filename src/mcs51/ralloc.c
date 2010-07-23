@@ -1282,8 +1282,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
               continue;
             }
 
-          /* now we need to allocate registers
-             only for the result */
+          /* now we need to allocate registers only for the result */
           if (IC_RESULT (ic))
             {
               symbol *sym = OP_SYMBOL (IC_RESULT (ic));

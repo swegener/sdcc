@@ -3,6 +3,7 @@
     mem: __code, __xdata
 */
 #include <testfwk.h>
+#include <stddef.h>
 
 #ifdef SDCC_pic16
 # define ADDRESS(x) (0x02 ## x)

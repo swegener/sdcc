@@ -3,6 +3,7 @@
  */
 
 #include <testfwk.h>
+#include <stddef.h>
 
 typedef struct dlnode_good {
   struct dlnode_good __xdata * nxt;

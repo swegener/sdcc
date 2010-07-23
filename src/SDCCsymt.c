@@ -1973,11 +1973,17 @@ computeType (sym_link * type1, sym_link * type2,
 
   etype2 = type2 ? getSpec (type2) : type1;
 
+  /* if one of them is a pointer or array then that prevails */
+  if (IS_PTR (type1) || IS_ARRAY (type1))
+    rType = copyLinkChain (type1);
+  else if (IS_PTR (type2) || IS_ARRAY (type2))
+    rType = copyLinkChain (type2);
+
   /* if one of them is a float then result is a float */
   /* here we assume that the types passed are okay */
   /* and can be cast to one another                */
   /* which ever is greater in size */
-  if (IS_FLOAT (etype1) || IS_FLOAT (etype2))
+  else if (IS_FLOAT (etype1) || IS_FLOAT (etype2))
     rType = newFloatLink ();
   /* if both are fixed16x16 then result is float */
   else if (IS_FIXED16X16(etype1) && IS_FIXED16X16(etype2))
@@ -2007,12 +2013,6 @@ computeType (sym_link * type1, sym_link * type2,
       if (getSize (etype2) > 1)
         SPEC_NOUN (getSpec (rType)) = V_INT;
     }
-  /* if one of them is a pointer or array then that
-     prevails */
-  else if (IS_PTR (type1) || IS_ARRAY (type1))
-    rType = copyLinkChain (type1);
-  else if (IS_PTR (type2) || IS_ARRAY (type2))
-    rType = copyLinkChain (type2);
   else if (getSize (type1) > getSize (type2))
     rType = copyLinkChain (type1);
   else
@@ -2052,6 +2052,10 @@ computeType (sym_link * type1, sym_link * type2,
       case RESULT_TYPE_INT:
       case RESULT_TYPE_NONE:
       case RESULT_TYPE_OTHER:
+        if (!IS_SPEC (rType))
+          {
+            return rType;
+          }
         if (IS_BOOL (reType) || IS_BIT (reType))
           {
             SPEC_NOUN (reType) = V_CHAR;

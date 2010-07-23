@@ -2897,16 +2897,17 @@ setOClass (sym_link * ptr, sym_link * spec)
 /* geniCodeDerefPtr - dereference pointer with '*'                 */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeDerefPtr (operand * op,int lvl)
+geniCodeDerefPtr (operand * op, int lvl)
 {
   sym_link *rtype, *retype;
   sym_link *optype = operandType (op);
 
   // if this is an array then array access
-  if (IS_ARRAY (optype)) {
-    // don't worry, this will be optimized out later
-    return geniCodeArray (op, operandFromLit (0), lvl);
-  }
+  if (IS_ARRAY (optype))
+    {
+      // don't worry, this will be optimized out later
+      return geniCodeArray (op, operandFromLit (0), lvl);
+    }
 
   // just in case someone screws up
   wassert (IS_PTR (optype));

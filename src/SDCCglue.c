@@ -55,33 +55,40 @@ aopLiteralLong (value * val, int offset, int size)
     unsigned char c[4];
   }
   fl;
+  unsigned long v = ulFromVal (val);
 
-  if (!val) {
-    // assuming we have been warned before
-    val = constCharVal (0);
-  }
+  if (!val)
+    {
+      // assuming we have been warned before
+      val = constCharVal (0);
+    }
 
+  if (IS_GENPTR (val->type) && !IS_VOID (val->type->next) &&
+      v && (offset >= FPTRSIZE) && (GPTRSIZE > FPTRSIZE))
+    {
+      werror (E_CANNOT_USE_GENERIC_POINTER,
+              val->name ? val->name : "<null>",
+              "<null>");
+    }
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
-  if (!IS_FLOAT (val->type)) {
-    unsigned long v = ulFromVal (val);
-
-    v >>= (offset * 8);
-    switch (size) {
-    case 1:
-      tsprintf (buffer, sizeof(buffer),
-          "!immedbyte", (unsigned int) v & 0xff);
-      break;
-    case 2:
-      tsprintf (buffer, sizeof(buffer),
-          "!immedword", (unsigned int) v & 0xffff);
-      break;
-    default:
-      /* Hmm.  Too big for now. */
-      assert (0);
+  if (!IS_FLOAT (val->type))
+    {
+      v >>= (offset * 8);
+      switch (size)
+        {
+        case 1:
+          tsprintf (buffer, sizeof(buffer), "!immedbyte", (unsigned int) v & 0xff);
+          break;
+        case 2:
+          tsprintf (buffer, sizeof(buffer), "!immedword", (unsigned int) v & 0xffff);
+          break;
+        default:
+          /* Hmm.  Too big for now. */
+          assert (0);
+        }
+      return Safe_strdup (buffer);
     }
-    return Safe_strdup (buffer);
-  }
 
   /* PENDING: For now size must be 1 */
   assert (size == 1);

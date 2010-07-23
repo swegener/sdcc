@@ -5402,8 +5402,8 @@ genMult (iCode * ic)
     }
 
   /* should have been converted to function call */
-    fprintf (stderr, "left: %d right: %d\n", getSize(OP_SYMBOL(left)->type),
-             getSize(OP_SYMBOL(right)->type));
+  fprintf (stderr, "left: %d right: %d\n", getSize(OP_SYMBOL(left)->type),
+           getSize(OP_SYMBOL(right)->type));
   assert (0);
 
 release:
@@ -10606,7 +10606,7 @@ genPointerGet (iCode * ic, iCode *pi, iCode *ifx)
     }
 
   /* special case when cast remat */
-  if (p_type == GPOINTER && OP_SYMBOL(left)->remat &&
+  if (p_type == GPOINTER && IS_SYMOP(left) && OP_SYMBOL(left)->remat &&
       IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode))
     {
       left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
@@ -11177,7 +11177,7 @@ genPointerSet (iCode * ic, iCode *pi)
     }
 
   /* special case when cast remat */
-  if (p_type == GPOINTER && OP_SYMBOL(result)->remat &&
+  if (p_type == GPOINTER && IS_SYMOP (result) && OP_SYMBOL(result)->remat &&
       IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode))
     {
       result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
@@ -12141,7 +12141,9 @@ gen51Code (iCode * lic)
 {
   iCode *ic;
   int cln = 0;
-  /* int cseq = 0; */
+#ifdef _DEBUG
+  int cseq = 0;
+#endif
 
   _G.currentFunc = NULL;
   lineHead = lineCurr = NULL;
@@ -12170,43 +12172,48 @@ gen51Code (iCode * lic)
             {
               debugFile->writeCLine (ic);
             }
-          if (!options.noCcodeInAsm) {
-            emitcode (";", "%s:%d: %s", ic->filename, ic->lineno,
-                      printCLine(ic->filename, ic->lineno));
-          }
+          if (!options.noCcodeInAsm)
+            {
+              emitcode (";", "%s:%d: %s", ic->filename, ic->lineno,
+                        printCLine(ic->filename, ic->lineno));
+            }
           cln = ic->lineno;
         }
-      #if 0
+#ifdef _DEBUG
       if (ic->seqPoint && ic->seqPoint != cseq)
         {
           emitcode (";", "sequence point %d", ic->seqPoint);
           cseq = ic->seqPoint;
         }
-      #endif
-      if (options.iCodeInAsm) {
-        char regsInUse[80];
-        int i;
-        const char *iLine;
+#endif
+      if (options.iCodeInAsm)
+        {
+          char regsInUse[80];
+          int i;
+          const char *iLine;
 
-        #if 0
-        for (i=0; i<8; i++) {
-          sprintf (&regsInUse[i],
-                   "%c", ic->riu & (1<<i) ? i+'0' : '-'); /* show riu */
-        regsInUse[i]=0;
-        #else
-        strcpy (regsInUse, "--------");
-        for (i=0; i < 8; i++) {
-          if (bitVectBitValue (ic->rMask, i))
+#if 0
+          for (i=0; i<8; i++)
             {
-              int offset = regs8051[i].offset;
-              regsInUse[offset] = offset + '0'; /* show rMask */
+              sprintf (&regsInUse[i],
+                       "%c", ic->riu & (1<<i) ? i+'0' : '-'); /* show riu */
+              regsInUse[i]=0;
             }
-        #endif
+#else
+          strcpy (regsInUse, "--------");
+          for (i=0; i < 8; i++)
+            {
+              if (bitVectBitValue (ic->rMask, i))
+                {
+                  int offset = regs8051[i].offset;
+                  regsInUse[offset] = offset + '0'; /* show rMask */
+                }
+            }
+#endif
+          iLine = printILine(ic);
+          emitcode(";", "[%s] ic:%d: %s", regsInUse, ic->seq, iLine);
+          dbuf_free(iLine);
         }
-        iLine = printILine(ic);
-        emitcode(";", "[%s] ic:%d: %s", regsInUse, ic->seq, iLine);
-        dbuf_free(iLine);
-      }
       /* if the result is marked as
          spilt and rematerializable or code for
          this has already been generated then

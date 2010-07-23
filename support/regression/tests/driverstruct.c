@@ -2,6 +2,7 @@
     many function pointers.
 */
 #include <testfwk.h>
+#include <stddef.h>
 
 /* Set to one to show the bug */
 #if 1

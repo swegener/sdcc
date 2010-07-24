@@ -1,3 +1,13 @@
+2010-07-24 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/libm/*, device/lib/pic16/libio/adc/*,
+	  device/lib/pic16/libio/i2c/*, device/lib/pic16/libio/usart/*,
+	  device/lib/pic16/libsdcc/long/*,
+	  device/lib/pic16/libsdcc/fixed16x16/*,
+	  device/lib/pic16/libsdcc/stack/*, device/lib/pic16/libsdcc/lregs/*,
+	  device/lib/pic16/libsdcc/char/*:
+	  sdcc library license changed to GPL+LE
+
 2010-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c,

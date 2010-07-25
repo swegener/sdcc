@@ -450,6 +450,8 @@ struct
    "keyword '%s' is deprecated, use '%s' instead" },
 { E_STORAGE_CLASS_FOR_PARAMETER, ERROR_LEVEL_ERROR,
    "storage class specified for parameter '%s'" },
+{ E_OFFSETOF_TYPE, ERROR_LEVEL_ERROR,
+   "offsetof can only be applied to structs/unions" },
 };
 
 /*

@@ -21,9 +21,7 @@
 #endif
 
 #include <testfwk.h>
-
-typedef unsigned int size_t;
-#define offsetof(s,m)   (size_t)&(((s *)0)->m)
+#include <stddef.h>
 
 #if defined (STORAGE_auto)
   void Zeropad(void)

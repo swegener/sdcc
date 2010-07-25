@@ -81,7 +81,7 @@ bool uselessDecl = TRUE;
 
 %token <yychar> IDENTIFIER TYPE_NAME
 %token <val> CONSTANT STRING_LITERAL
-%token SIZEOF TYPEOF
+%token SIZEOF TYPEOF OFFSETOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
@@ -116,7 +116,7 @@ bool uselessDecl = TRUE;
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
 %type <sdef> stag opt_stag
 %type <asts> primary_expr
-%type <asts> postfix_expr unary_expr cast_expr multiplicative_expr
+%type <asts> postfix_expr unary_expr offsetof_member_designator cast_expr multiplicative_expr
 %type <asts> additive_expr shift_expr relational_expr equality_expr
 %type <asts> and_expr exclusive_or_expr inclusive_or_expr logical_or_expr
 %type <asts> logical_and_expr conditional_expr assignment_expr constant_expr
@@ -242,17 +242,32 @@ function_attributes
 function_body
    : compound_statement
    | declaration_list compound_statement
-         {
-            werror(E_OLD_STYLE,($1 ? $1->name: "")) ;
-            exit(1);
-         }
+                     {
+                       werror (E_OLD_STYLE, ($1 ? $1->name: "")) ;
+                       exit (1);
+                     }
+   ;
+
+offsetof_member_designator
+   : identifier      { $$ = newAst_VALUE (symbolVal ($1)); }
+   | offsetof_member_designator '.' { ignoreTypedefType = 1; } identifier
+                     {
+                       ignoreTypedefType = 0;
+                       $4 = newSymbol ($4->name, NestLevel);
+                       $4->implicit = 1;
+                       $$ = newNode ('.', $1, newAst_VALUE (symbolVal ($4))) ;
+                     }
+   | offsetof_member_designator '[' expr ']'
+                     {
+                       $$ = newNode ('[', $1, $3);
+                     }
    ;
 
 primary_expr
-   : identifier      {  $$ = newAst_VALUE(symbolVal($1));  }
-   | CONSTANT        {  $$ = newAst_VALUE($1);  }
+   : identifier      { $$ = newAst_VALUE (symbolVal ($1)); }
+   | CONSTANT        { $$ = newAst_VALUE ($1); }
    | string_literal
-   | '(' expr ')'    {  $$ = $2 ;                   }
+   | '(' expr ')'    { $$ = $2; }
    ;
 
 string_literal
@@ -295,12 +310,13 @@ argument_expr_list
 
 unary_expr
    : postfix_expr
-   | INC_OP unary_expr        { $$ = newNode(INC_OP,NULL,$2);  }
-   | DEC_OP unary_expr        { $$ = newNode(DEC_OP,NULL,$2);  }
-   | unary_operator cast_expr { $$ = newNode($1,$2,NULL)    ;  }
-   | SIZEOF unary_expr        { $$ = newNode(SIZEOF,NULL,$2);  }
-   | SIZEOF '(' type_name ')' { $$ = newAst_VALUE(sizeofOp($3)); }
-   | TYPEOF unary_expr        { $$ = newNode(TYPEOF,NULL,$2);  }
+   | INC_OP unary_expr        { $$ = newNode (INC_OP, NULL, $2); }
+   | DEC_OP unary_expr        { $$ = newNode (DEC_OP, NULL, $2); }
+   | unary_operator cast_expr { $$ = newNode ($1, $2, NULL); }
+   | SIZEOF unary_expr        { $$ = newNode (SIZEOF, NULL, $2); }
+   | SIZEOF '(' type_name ')' { $$ = newAst_VALUE (sizeofOp ($3)); }
+   | TYPEOF unary_expr        { $$ = newNode (TYPEOF, NULL, $2); }
+   | OFFSETOF '(' type_name ',' offsetof_member_designator ')' { $$ = offsetofOp($3, $5); }
    ;
 
 unary_operator

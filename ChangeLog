@@ -1,3 +1,11 @@
+2010-07-25 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.y, src/SDCC.lex,
+	  src/SDCCast.c, src/SDCCast.h, device/include/stddef.h,
+	  device/include/pic16/stddef.h, support/regression/tests/zeropad.c:
+	  applied patch #2801126: __builtin_offsetof implementation,
+	  thanks to Robert Larice
+
 2010-07-24 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libm/*, device/lib/pic16/libio/adc/*,

@@ -224,6 +224,7 @@
 #define W_TARGET_LOST_QUALIFIER       196 /* Pointer target lost qualifier */
 #define W_DEPRECATED_KEYWORD          197 /* keyword '%s' is deprecated, use '%s' instead */
 #define E_STORAGE_CLASS_FOR_PARAMETER 198 /* storage class specified for parameter '%s' */
+#define E_OFFSETOF_TYPE               199 /* offsetof can only be applied to structs/unions */
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 
 /** Describes the maximum error level that will be logged.  Any level

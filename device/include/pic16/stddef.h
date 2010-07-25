@@ -39,6 +39,6 @@
   typedef unsigned int size_t;
 #endif
 
-#define offsetof(s,m)   (size_t)&(((s *)0)->m)
+#define offsetof(s, m) __builtin_offsetof (s, m)
 
 #endif  /* __PIC16_STDDEF_H */

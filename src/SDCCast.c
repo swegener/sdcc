@@ -4010,37 +4010,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return tree;
         }
 #endif
-      /* handle offsetof macro:            */
-      /* #define offsetof(TYPE, MEMBER) \  */
-      /* ((unsigned) &((TYPE *)0)->MEMBER) */
-      if (IS_ADDRESS_OF_OP(tree->right)
-          && IS_AST_OP (tree->right->left)
-          && tree->right->left->opval.op == PTR_OP
-          && IS_AST_OP (tree->right->left->left)
-          && tree->right->left->left->opval.op == CAST
-          && IS_AST_LIT_VALUE(tree->right->left->left->right))
-        {
-          symbol *element = getStructElement (
-            SPEC_STRUCT (LETYPE(tree->right->left)),
-            AST_SYMBOL(tree->right->left->right)
-          );
-
-          if (element)
-            {
-              tree->type = EX_VALUE;
-              tree->opval.val = valCastLiteral (
-                LTYPE (tree),
-                element->offset
-                + floatFromVal (valFromType (RTYPE (tree->right->left->left)))
-              );
-
-            TTYPE (tree) = tree->opval.val->type;
-            TETYPE (tree) = getSpec (TTYPE (tree));
-            tree->left = NULL;
-            tree->right = NULL;
-            return tree;
-          }
-      }
 
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree)))
@@ -7588,4 +7557,80 @@ astErrors (ast *t)
     }
 
   return errors;
+}
+
+/*-----------------------------------------------------------------------------
+ * verbatim copy from the gnu gcc-4.1 info page
+ * >
+ * >   info node:   (gcc-4.1)Offsetof
+ * >
+ * >      primary:
+ * >      	"__builtin_offsetof" "(" `typename' "," offsetof_member_designator ")"
+ * >
+ * >      offsetof_member_designator:
+ * >      	  `identifier'
+ * >      	| offsetof_member_designator "." `identifier'
+ * >      	| offsetof_member_designator "[" `expr' "]"
+ * >
+ * >  This extension is sufficient such that
+ * >
+ * >     #define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
+ * >  ...
+ *
+ * Note:
+ *   `expr',  here is indeed any expr valid, not only constants.
+ *   `typename', gcc supports typeof(...) here, but the sdcc typeof has
+ *                a completely different semantic, more sort of typeid
+ *
+ */
+
+static ast *
+offsetofOp_rec (sym_link *type, ast *snd, sym_link **result_type)
+{
+  /* make sure the type is complete and sane */
+  checkTypeSanity (type, "(offsetofOp)");
+
+  /* offsetof can only be applied to structs/unions */
+  if (!IS_STRUCT (type))
+    {
+      werrorfl (snd->filename, snd->lineno, E_OFFSETOF_TYPE);
+      *result_type = NULL;
+      return NULL;
+    }
+
+  /* offsetof(struct_type, symbol); */
+  if (IS_AST_SYM_VALUE (snd))
+    {
+      structdef *structdef = SPEC_STRUCT (type);
+      symbol *element = getStructElement (structdef, AST_SYMBOL (snd));
+      *result_type = element->type;
+      return newAst_VALUE (valueFromLit (element->offset));
+    }
+
+  /* offsetof(struct_type, a.something); */
+  if (IS_AST_OP (snd) && snd->opval.op == '.')
+    {
+      sym_link *tmp;
+      ast *o = offsetofOp_rec (type, snd->left, &tmp);
+      return newNode ('+', o, offsetofOp_rec (tmp, snd->right, result_type));
+    }
+
+  /* offsetof(struct_type, a[expr]); */
+  if (IS_ARRAY_OP (snd))
+    {
+      sym_link *tmp;
+      ast *o = offsetofOp_rec (type, snd->left, &tmp);
+      *result_type = tmp->next;
+      return newNode ('+', o, newNode ('*', newAst_VALUE (valueFromLit (getSize (tmp->next))), snd->right));
+    }
+
+  wassertl (0, "this should never have happened");
+  exit (1);
+}
+
+ast *
+offsetofOp (sym_link *type, ast *snd)
+{
+  sym_link *result_type;
+  return offsetofOp_rec (type, snd, &result_type);
 }

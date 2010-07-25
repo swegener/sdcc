@@ -34,27 +34,28 @@
 
 #include <stdint.h>
 
-
 #ifndef NULL
 # define NULL (void *)0
 #endif
 
 #define RAND_MAX        0x7fffffff
 
+/* absolute value */
+int abs (int j);
+long int labs (long int j);
+
 /* initialize random seed */
-void srand(unsigned long seed);
+void srand (unsigned long seed);
 
 /* return a random number between 0 and RAND_MAX */
-long rand(void);
+long rand (void);
 
 /* reentrant version of rand() */
-long rand_r(unsigned long *ctx);
-
+long rand_r (unsigned long *ctx);
 
 /* returns the CRC16 checksum of the data buffer, takes as
  * last argument an old value of crc16 checksum */
-uint16_t crc16(uint8_t *, uint32_t, uint16_t);
-
+uint16_t crc16 (uint8_t *, uint32_t, uint16_t);
 
 /* convert a ASCII string to float */
 float atof (char *);
@@ -66,18 +67,18 @@ int atoi (char *);
 long atol (char *);
 
 /* convert an unsigned/signed integer to ASCII string */
-void uitoa(unsigned int, __data char *, unsigned char);
-void itoa(int, __data char*, unsigned char);
+void uitoa (unsigned int, __data char *, unsigned char);
+void itoa (int, __data char*, unsigned char);
 
 /* convert an unsigned/signed long integer to ASCII string */
-void ultoa(unsigned long, __data char *, unsigned char);
-void ltoa(long, __data char*, unsigned char);
+void ultoa (unsigned long, __data char *, unsigned char);
+void ltoa (long, __data char*, unsigned char);
 
 /* helper functions: convert a float to ASCII string */
-extern char x_ftoa(float, __data char *, unsigned char, unsigned char);
+extern char x_ftoa (float, __data char *, unsigned char, unsigned char);
 
 /* George M. Gallant's version of ftoa() */
-extern void g_ftoa(__data char *, float, char);
+extern void g_ftoa (__data char *, float, char);
 
 
 #endif	/* __STDLIB_H__ */

@@ -41,7 +41,7 @@ void
 _initEmu(void)
 {
   /* load and configure the libgpsim_modules module */
-  _asm
+  __asm
     ;; Set frequency to 20MHz
     .direct "e", ".frequency=20e6"
     
@@ -60,7 +60,7 @@ _initEmu(void)
 
     ;; Display the received character on terminal
     .direct "e", "U1.console = true"
-  _endasm;
+  __endasm;
 
   /* USART initialization */
   PORTCbits.TX = 1;     // Set TX pin to 1

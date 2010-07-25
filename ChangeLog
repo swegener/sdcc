@@ -5,6 +5,10 @@
 	  device/include/pic16/stddef.h, support/regression/tests/zeropad.c:
 	  applied patch #2801126: __builtin_offsetof implementation,
 	  thanks to Robert Larice
+	* support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/pic16/support.c:
+	  _asm and _endasm changed to __asm and __endasm, reentrant changed to __reentrant
+	* device/include/pic16/stdlib.h: added declarations of abs() and labs()
 
 2010-07-24 Borut Razem <borut.razem AT siol.net>
 

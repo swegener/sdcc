@@ -16,7 +16,7 @@ ifndef CROSSCOMPILING
 endif
 endif
 
-SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q -DREENTRANT=reentrant
+SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q -DREENTRANT=__reentrant
 SDCCFLAGS += --no-peep
 LINKFLAGS += libsdcc.lib libc18f.lib libm18f.lib
 

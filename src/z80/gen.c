@@ -3389,10 +3389,16 @@ genEndFunction (iCode * ic)
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
   if (IFFUNC_ISNAKED(sym->type))
-  {
+    {
       emitDebug("; naked function: no epilogue.");
+      if (!IS_STATIC(sym->etype))
+        {
+          sprintf (buffer, "%s_end", sym->rname);
+          emit2 ("!labeldef", buffer);
+          _G.lines.current->isLabel = 1;
+        }
       return;
-  }
+    }
 
   /* PENDING: calleeSave */
   if (IS_Z80 && _G.omitFramePtr)

@@ -1,3 +1,8 @@
+2010-07-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed #3027961.
+
 2010-07-25 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.y, src/SDCC.lex,
@@ -103,6 +108,7 @@
 	  sdcc library license changed to GPL+LE
 
 2010-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/z80/mod.s,
 	  device/lib/z80/Makefile.in,
 	  device/lib/z80/modmixed.s,
@@ -113,6 +119,7 @@
 	  Z80 division library reorganization.
 
 2010-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/z80/divsigned.s:
 	  Minor cleanup
 	* src/SDCCpeeph.c,

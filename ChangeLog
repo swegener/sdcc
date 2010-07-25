@@ -2,7 +2,8 @@
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.y, src/SDCC.lex,
 	  src/SDCCast.c, src/SDCCast.h, device/include/stddef.h,
-	  device/include/pic16/stddef.h, support/regression/tests/zeropad.c:
+	  device/include/pic16/stddef.h, support/regression/tests/zeropad.c,
+	  support/regression/tests/offsetof.c:
 	  applied patch #2801126: __builtin_offsetof implementation,
 	  thanks to Robert Larice
 	* support/regression/ports/pic16/spec.mk,

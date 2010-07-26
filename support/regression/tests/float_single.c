@@ -31,13 +31,6 @@
 #   define TANF_DISABLED  (1)
 #endif
 
-#if defined(SDCC_z80) || defined(SDCC_gbz80)
-#   define ACOSF_DISABLED (1)
-#   define ASINF_DISABLED (1)
-#   define ATANF_DISABLED (1)
-#endif
-
-
 static float
 dummy (float a)
 {

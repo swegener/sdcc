@@ -848,7 +848,7 @@ PORT z80_port =
   1,                            /* transform >= to ! < */
   1,                            /* transform != to !(a == b) */
   0,                            /* leave == */
-  TRUE,                         /* Array initializer support. */
+  FALSE,                         /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
   _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
@@ -979,7 +979,7 @@ PORT gbz80_port =
   1,                            /* transform >= to ! < */
   1,                            /* transform != to !(a == b) */
   0,                            /* leave == */
-  TRUE,                         /* Array initializer support. */
+  FALSE,                         /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
   NULL,                         /* no builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */

@@ -2497,6 +2497,9 @@ genUminusFloat (operand * op, operand * result)
   emit2("xor a,!immedbyte", 0x80);
   aopPut (AOP (result), "a", MSB32);
 
+  if (operandsEqu (result, op))
+    return;
+
   while (size--)
     {
       aopPut (AOP (result), aopGet (AOP (op), offset, FALSE), offset);
@@ -8115,6 +8118,9 @@ _rleFlush(RLECTX *self)
 /** genArrayInit - Special code for initialising an array with constant
    data.
 */
+
+#if 0
+Disabled since it doesn't work for arrays of float.
 static void
 genArrayInit (iCode * ic)
 {
@@ -8193,6 +8199,7 @@ genArrayInit (iCode * ic)
 
   freeAsmop (IC_LEFT(ic), NULL, ic);
 }
+#endif
 
 static void
 _swap (PAIR_ID one, PAIR_ID two)
@@ -8696,10 +8703,12 @@ genZ80Code (iCode * lic)
             }
           break;
 
+#if 0
         case ARRAYINIT:
           emitDebug ("; genArrayInit");
           genArrayInit(ic);
           break;
+#endif
 
         case DUMMY_READ_VOLATILE:
           emitDebug ("; genDummyRead");

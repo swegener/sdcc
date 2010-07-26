@@ -1,3 +1,10 @@
+2010-07-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/main.c,
+	  support/regression/tests/float_single.c:
+	  Fixed #3027961.
+
 2010-07-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

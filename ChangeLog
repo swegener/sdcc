@@ -1,3 +1,9 @@
+2010-07-26 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCutil.c:
+	  applied patch #3034715: Report correct host for x86_64 Macs,
+	  thanks to Patrik Persson
+
 2010-07-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

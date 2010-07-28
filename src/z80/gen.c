@@ -7948,6 +7948,7 @@ genEndCritical (iCode *ic)
     }
 }
 
+#if 0 //Disabled since it doesn't work for arrays of float.
 enum
   {
     /** Maximum number of bytes to emit per line. */
@@ -8119,8 +8120,6 @@ _rleFlush(RLECTX *self)
    data.
 */
 
-#if 0
-Disabled since it doesn't work for arrays of float.
 static void
 genArrayInit (iCode * ic)
 {

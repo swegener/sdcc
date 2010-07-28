@@ -1,3 +1,13 @@
+2010-07-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/printf_large.c: small optimization
+	* src/hc08/gen.c (transferRegReg, genPointerGet): fixed bug 1115321
+	* src/hc08/ralloc.c: cosmetic changes
+	* src/pic16/glue.c (pic16emitStaticSeg),
+	* src/SDCCglue.c (emitStaticSeg): fixed bug 1474589
+	* src/z80/gen.c: fixed some warnings
+	* support/regression/tests/bug1115321.c: new, added
+
 2010-07-26 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCutil.c:
@@ -78,6 +88,7 @@
 	* support/regression/tests/bug2889032.c: new, added
 
 2010-07-15 Borut Razem <borut.razem AT siol.net>
+
 	* sdas/as8051/Makefile.in, sdas/asz80/Makefile.in,
 	  sdas/linksrc/Makefile.in, sdas/as6808/Makefile.in,
 	  sdcc/sdas/asgb/Makefile.in:
@@ -100,6 +111,7 @@
 	* src/SDCCast.h: cosmetic changes
 
 2010-07-05 Borut Razem <borut.razem AT siol.net>
+
 	* support/regression/ports/pic14/spec.mk,
 	  support/regression/ports/pic16/spec.mk,
 	  support/regression/ports/ds390/spec.mk,
@@ -109,9 +121,11 @@
 	  mingw build cross reggression testing with wine
 
 2010-07-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/scripts/sdcc.nsi: removed unix2dos conversion
 
 2010-06-28 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/z80/modmixed.s:
 	  Fixed missing line.
 

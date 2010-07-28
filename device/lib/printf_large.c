@@ -466,13 +466,13 @@ get_conversion_spec:
 
       if (isdigit(c)) {
         if (decimals==-1) {
-          width = 10*width + (c - '0');
+          width = 10*width + c - '0';
           if (width == 0) {
             /* first character of width is a zero */
             zero_padding = 1;
           }
         } else {
-          decimals = 10*decimals + (c-'0');
+          decimals = 10*decimals + c - '0';
         }
         goto get_conversion_spec;
       }

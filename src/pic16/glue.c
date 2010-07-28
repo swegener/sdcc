@@ -1244,6 +1244,12 @@ pic16emitStaticSeg (memmap * map)
   /* for all variables in this segment do */
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
     {
+      int size = getSize (sym->type);
+
+      if (size==0)
+        {
+          werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
+        }
 
 #if 0
       fprintf (stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\

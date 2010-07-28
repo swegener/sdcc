@@ -239,7 +239,10 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
   dstidx = dreg->rIdx;
 
   if (srcidx==dstidx)
-    return;
+    {
+      hc08_useReg(dreg);
+      return;
+    }
 
   switch (dstidx)
     {
@@ -7366,7 +7369,6 @@ genPointerGet (iCode * ic, iCode *pi, iCode *ifx)
           if (!ifx)
             storeRegToAop (hc08_reg_a, AOP (result), offset);
           offset--;
-          hc08_freeReg (hc08_reg_a);
         }
     }
 

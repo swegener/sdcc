@@ -102,7 +102,7 @@ allocReg (short type)
 }
 
 /*-----------------------------------------------------------------*/
-/* hc08_regWithIdx - returns pointer to register wit index number       */
+/* hc08_regWithIdx - returns pointer to register with index number */
 /*-----------------------------------------------------------------*/
 regs *
 hc08_regWithIdx (int idx)

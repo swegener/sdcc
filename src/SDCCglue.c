@@ -1273,7 +1273,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * oBuf
       return;
     }
 
-  /* if this is an array   */
+  /* if this is an array  */
   if (IS_ARRAY (type))
     {
       printIvalArray (sym, type, ilist, oBuf, check);
@@ -1376,6 +1376,12 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
         }
       else
         {
+          int size = getSize (sym->type);
+
+          if (size==0)
+            {
+              werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
+            }
           /* if it has an initial value */
           if (sym->ival)
             {
@@ -1405,12 +1411,6 @@ emitStaticSeg (memmap * map, struct dbuf_s * oBuf)
           else
             {
               /* allocate space */
-              int size = getSize (sym->type);
-
-              if (size==0)
-                {
-                  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE,sym->name);
-                }
               if (options.debug)
                 {
                   emitDebugSym (oBuf, sym);

@@ -1,3 +1,11 @@
+2010-07-29 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/literalop.c:
+	  fixed regresssion test failure on host targat (gcc -O2):
+	  the test result was udefined by C standard 6.6 #5 and
+	  implementation dependent, so it was removed.
+	  Thanks to Jan Waclawek for the explanation that it is not a gcc bug.
+
 2010-07-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c: small optimization

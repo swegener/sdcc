@@ -61,9 +61,10 @@ testOpOp (void)
   ASSERT (ss == 0x7e02);
   ss = vuc * vuc;
   ASSERT (ss == (short) 0xfc04);
+#ifdef SDCC
   /* after promotion the result of the multiplication is 'signed int', which overflows! */
-  if (sizeof (int) == 2)
-    ASSERT (vuc * vuc < 1);
+  ASSERT(vuc * vuc < 1);
+#endif
 
   /* mul ast: valMult() */
   ASSERT ((stype) -3 * (stype) -1 == (stype)  3);

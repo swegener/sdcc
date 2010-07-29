@@ -113,7 +113,7 @@
 #define W_NO_REFERENCE                 85 /* no reference to local variable */
 #define E_OP_UNKNOWN_SIZE              86 /* unknown size for operand */
 #define W_LONG_UNSUPPORTED             87 /* 'long' not supported yet */
-#define E_LITERAL_GENERIC              88 /* literal being cast to generic pointer */
+#define W_LITERAL_GENERIC              88 /* literal being cast to generic pointer */
 #define E_SFR_ADDR_RANGE               89 /* sfr address out of range */
 #define E_BITVAR_STORAGE               90 /* storage given for 'bit' variable */
 #define E_EXTERN_MISMATCH              91 /* extern declaration mismatches */
@@ -152,7 +152,7 @@
 #define E_CAST_ZERO                   124 /* casting to from size zero */
 #define W_CONST_RANGE                 125 /* constant too large  */
 #define W_CODE_UNREACH                126 /* unreachable code    */
-#define E_NONPTR2_GENPTR              127 /* non pointer cast to generic pointer */
+#define W_NONPTR2_GENPTR              127 /* non pointer cast to generic pointer */
 #define W_POSSBUG                     128 /* possible code generation error */
 #define E_INCOMPAT_PTYPES             129 /* incampatible pointer assignment */
 #define W_UNKNOWN_MODEL               130 /* Unknown memory model */

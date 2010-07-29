@@ -49,7 +49,7 @@
 
 #define SUPPORT_CHAR_C
 
-#ifdef __GNUC__
+#ifndef SDCC
 #   define VA_ARG(args,type) (type)va_arg((args),int)
 #   define SDCC_SNPRINTF    sdcc_snprintf
 #else

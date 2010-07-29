@@ -1124,7 +1124,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s * oB
         case 3:
           if (IS_GENPTR(type) && floatFromVal(val)!=0) {
             // non-zero mcs51 generic pointer
-            werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
+            werrorfl (sym->fileDef, sym->lineDef, W_LITERAL_GENERIC);
           }
           if (port->little_endian) {
             dbuf_printf (oBuf, "\t.byte %s,%s,%s\n",
@@ -1141,7 +1141,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s * oB
         case 4:
           if (IS_GENPTR(type) && floatFromVal(val)!=0) {
             // non-zero ds390 generic pointer
-            werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
+            werrorfl (sym->fileDef, sym->lineDef, W_LITERAL_GENERIC);
           }
           if (port->little_endian) {
             dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",

@@ -1,27 +1,31 @@
-/*-------------------------------------------------------------------------
-  printf_large.c - formatted output conversion
+/*-----------------------------------------------------------------
+   printf_large.c - formatted output conversion
 
-             Written By - Martijn van Balen aed@iae.nl (1999)
-             Added %f By - johan.knol@iduna.nl (2000)
-             Refactored by - Maarten Brock (2004)
+   Copyright (C) 1999, Martijn van Balen <aed AT iae.nl>
+   Added %f By - <johan.knol AT iduna.nl> (2000)
+   Refactored by - Maarten Brock (2004)
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
+   later version.
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 #if defined (SDCC_ds390) || defined (SDCC_USE_XSTACK) || defined (SDCC_MODEL_HUGE)
@@ -97,7 +101,8 @@ typedef union
   #define OUTPUT_CHAR(c, p) { output_char (c, p); charsOutputted++; }
 #else
   #define OUTPUT_CHAR(c, p) _output_char (c)
-  static void _output_char( unsigned char c )
+  static void
+  _output_char (unsigned char c)
   {
     output_char( c, p );
     charsOutputted++;
@@ -107,7 +112,8 @@ typedef union
 /*--------------------------------------------------------------------------*/
 
 #ifdef SDCC_STACK_AUTO
-  static void output_digit( unsigned char n, BOOL lower_case, pfn_outputchar output_char, void* p )
+  static void
+  output_digit (unsigned char n, BOOL lower_case, pfn_outputchar output_char, void* p)
   {
     register unsigned char c = n + (unsigned char)'0';
 
@@ -120,7 +126,8 @@ typedef union
     output_char( c, p );
   }
 #else
-  static void output_digit( unsigned char n )
+  static void
+  output_digit (unsigned char n)
   {
     register unsigned char c = n + (unsigned char)'0';
 
@@ -138,14 +145,16 @@ typedef union
 
 #ifdef SDCC_STACK_AUTO
   #define OUTPUT_2DIGITS( B )   { output_2digits( B, lower_case, output_char, p ); charsOutputted += 2; }
-  static void output_2digits( unsigned char b, BOOL lower_case, pfn_outputchar output_char, void* p )
+  static void
+  output_2digits (unsigned char b, BOOL lower_case, pfn_outputchar output_char, void* p)
   {
     output_digit( b>>4,   lower_case, output_char, p );
     output_digit( b&0x0F, lower_case, output_char, p );
   }
 #else
   #define OUTPUT_2DIGITS( B )   output_2digits( B )
-  static void output_2digits( unsigned char b )
+  static void
+  output_2digits (unsigned char b)
   {
     output_digit( b>>4   );
     output_digit( b&0x0F );
@@ -155,7 +164,8 @@ typedef union
 /*--------------------------------------------------------------------------*/
 
 #if defined SDCC_STACK_AUTO
-static void calculate_digit( value_t _AUTOMEM * value, unsigned char radix )
+static void
+calculate_digit (value_t _AUTOMEM * value, unsigned char radix)
 {
   unsigned long ul = value->ul;
   unsigned char _AUTOMEM * pb4 = &value->byte[4];
@@ -175,7 +185,8 @@ static void calculate_digit( value_t _AUTOMEM * value, unsigned char radix )
   value->ul = ul;
 }
 #else
-static void calculate_digit( unsigned char radix )
+static void
+calculate_digit (unsigned char radix)
 {
   register unsigned long ul = value.ul;
   register unsigned char b4 = value.byte[4];
@@ -399,7 +410,8 @@ output_float (float f, unsigned char reqWidth,
 }
 #endif //USE_FLOATS
 
-int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
+int
+_print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
 {
   BOOL   left_justify;
   BOOL   zero_padding;

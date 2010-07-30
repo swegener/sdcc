@@ -1,3 +1,9 @@
+2010-07-30 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/printf_large.c, device/lib/sprintf.c,
+	  device/lib/vprintf.c:
+	  sdcc library license changed to GPL+LE
+
 2010-07-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.y: fixed bug 1579664
@@ -19,7 +25,7 @@
 
 	* support/regression/tests/literalop.c:
 	  fixed regresssion test failure on host targat (gcc -O2):
-	  the test result was udefined by C standard 6.6 #5 and
+	  the test result was udefined according to C standard 6.5 #5 and
 	  implementation dependent, so it was removed.
 	  Thanks to Jan Waclawek for the explanation that it is not a gcc bug.
 

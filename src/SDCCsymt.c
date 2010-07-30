@@ -326,7 +326,7 @@ newStruct (char *tag)
 
   s = Safe_alloc ( sizeof (structdef));
 
-  strncpyz (s->tag, tag, sizeof(s->tag));               /* copy the tag */
+  strncpyz (s->tag, tag, sizeof(s->tag));           /* copy the tag */
   return s;
 }
 
@@ -2483,7 +2483,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
       (IS_SPEC (dest) && !IS_SPEC (src)))
     return 0;
 
-  /* if one of them is a void then ok */
+  /* if they have a different noun */
   if (SPEC_NOUN (dest) != SPEC_NOUN (src))
     return 0;
 
@@ -2538,10 +2538,12 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
   /* compensate for allocGlobal() */
   if ((srcScls == S_FIXED || srcScls == S_AUTO)
       && port->mem.default_globl_map == xdata
-      && !level)
-    srcScls = S_XDATA;
+      && (level <= 0))
+    {
+      srcScls = S_XDATA;
+    }
 
-  if (level>0 && !SPEC_STAT (dest))
+  if ((level > 0) && !SPEC_STAT (dest))
     {
       /* Compensate for hack-o-matic in checkSClass() */
       if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))

@@ -2,6 +2,8 @@
 
 	* src/SDCC.y: fixed bug 1579664
 	* support/regression/tests/bug1579664.c: new, added
+	* src/SDCCsymt.c (compareTypeExact): fixed bug 1929140
+	* support/regression/tests/bug1929140.c: new, added
 
 2010-07-29 Maarten Brock <sourceforge.brock AT dse.nl>
 

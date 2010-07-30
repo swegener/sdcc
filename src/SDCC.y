@@ -824,13 +824,14 @@ struct_or_union_specifier
    ;
 
 struct_or_union
-   : STRUCT          { $$ = STRUCT ; }
-   | UNION           { $$ = UNION  ; }
+   : STRUCT          { $$ = STRUCT ; ignoreTypedefType = 1; }
+   | UNION           { $$ = UNION  ; ignoreTypedefType = 1; }
    ;
 
 opt_stag
 : stag
 |  {  /* synthesize a name add to structtable */
+     ignoreTypedefType = 0;
      $$ = newStruct(genSymName(NestLevel)) ;
      $$->level = NestLevel ;
      addSym (StructTab, $$, $$->tag,$$->level,currBlockno, 0);
@@ -838,6 +839,7 @@ opt_stag
 
 stag
 :  identifier  {  /* add name to structure table */
+     ignoreTypedefType = 0;
      $$ = findSymWithBlock (StructTab,$1,currBlockno);
      if (! $$ ) {
        $$ = newStruct($1->name) ;

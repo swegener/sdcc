@@ -1,3 +1,8 @@
+2010-08-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug2862650.c:
+	  Redundant regression test for #2862650.
+
 2010-08-01 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/ds80c390.h, device/include/tinibios.h,
@@ -59,7 +64,7 @@
 	* src/z80/gen.c,
 	  src/z80/main.c,
 	  support/regression/tests/float_single.c:
-	  Fixed #3027961.
+	  Fixed #2862650.
 
 2010-07-25 Philipp Klaus Krause <pkk AT spth.de>
 

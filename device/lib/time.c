@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    time.c - stdlib time conversion routines
-  
-   Copyright (C) 2001, Johan Knol, johan.knol@iduna.nl
+
+   Copyright (C) 2001, Johan Knol <johan.knol AT iduna.nl>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -10,7 +10,7 @@
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License 
@@ -207,4 +207,3 @@ time_t mktime(struct tm *timeptr) {
     seconds+= timeptr->tm_sec;
     return seconds;
 }
-

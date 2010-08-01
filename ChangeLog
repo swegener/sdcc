@@ -1,3 +1,12 @@
+2010-08-01 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/ds80c390.h, device/include/tinibios.h,
+	  device/include/time.h, device/include/ds390/serial390.h,
+	  device/lib/time.c, device/lib/gets.c, device/lib/ds390/lcd390.c,
+	  device/lib/ds390/tinibios.c, device/lib/ds390/rtc390.c,
+	  device/lib/ds390/i2c390.c, device/lib/ds400/tinibios.c:
+	  sdcc library license changed to GPL+LE
+
 2010-07-30 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/printf_large.c, device/lib/sprintf.c,

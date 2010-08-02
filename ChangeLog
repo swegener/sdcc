@@ -1,3 +1,10 @@
+2010-08-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/inst.cc:
+	  Fixed #2801879.
+	* support/regression/tests/bug2862650.c:
+	  Improved redundancy.
+
 2010-08-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (ast2iCode): fixed bug 1962613

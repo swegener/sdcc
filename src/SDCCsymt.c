@@ -2536,9 +2536,10 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
     }
 
   /* compensate for allocGlobal() */
-  if ((srcScls == S_FIXED || srcScls == S_AUTO)
-      && port->mem.default_globl_map == xdata
-      && (level <= 0))
+  if ((srcScls == S_FIXED || srcScls == S_AUTO) &&
+      (port->mem.default_globl_map == xdata) &&
+      (destScls == S_XDATA) &&
+      (level <= 0))
     {
       srcScls = S_XDATA;
     }

@@ -246,7 +246,7 @@ void test_s( void )
     ASSERT (ret == 10);
 }
 
-#if !defined __GNUC__ && !defined SDCC_z80
+#if defined SDCC && !defined SDCC_z80
 extern void _putchar(char c);
 
 void putchar(char c)

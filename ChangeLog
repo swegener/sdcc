@@ -1,3 +1,10 @@
+2010-08-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (ast2iCode): fixed bug 1962613
+	* support/regression/tests/bug1962613.c: new, added
+	* src/SDCCsymt.c (compareTypeExact): fixed the fix for bug 1929140
+	* support/regression/tests/bug1115321.c: fixed next problem on solaris
+
 2010-08-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug2862650.c:
@@ -38,7 +45,7 @@
 2010-07-29 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/literalop.c:
-	  fixed regresssion test failure on host targat (gcc -O2):
+	  fixed regresssion test failure on host target (gcc -O2):
 	  the test result was udefined according to C standard 6.5 #5 and
 	  implementation dependent, so it was removed.
 	  Thanks to Jan Waclawek for the explanation that it is not a gcc bug.

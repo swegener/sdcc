@@ -51,7 +51,7 @@ static operand *geniCodeArray (operand *, operand *,int);
 static operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *,int);
-int isLvaluereq(int lvl);
+static int isLvaluereq(int lvl);
 static operand *geniCodeCast (sym_link *, operand *, bool);
 
 #define PRINTFUNC(x) void x (struct dbuf_s *dbuf, iCode *ic, char *s)
@@ -1603,7 +1603,9 @@ operandFromSymbol (symbol * sym)
       !TARGET_IS_HC08 &&
       (!(options.model == MODEL_FLAT24)) ) &&
       options.stackAuto == 0)
-    ok = 0;
+    {
+      ok = 0;
+    }
 
   if (!IS_AGGREGATE (sym->type) &&      /* not an aggregate */
       !IS_FUNC (sym->type) &&           /* not a function   */
@@ -1614,9 +1616,8 @@ operandFromSymbol (symbol * sym)
       !IS_VOLATILE (sym->etype) &&      /* not declared as volatile */
       !sym->islbl &&                    /* not a label */
       ok                                /* farspace check */
-    )
+     )
     {
-
       /* we will use it after all optimizations
          and before liveRange calculation */
       sym->reqv = newiTempOperand (sym->type, 0);
@@ -1661,7 +1662,9 @@ operandFromSymbol (symbol * sym)
       IC_RESULT (ic) = geniCodeArray2Ptr (IC_RESULT (ic));
     }
   else
-    IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (sym->type));
+    {
+      IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (sym->type));
+    }
 
   ADDTOCHAIN (ic);
 
@@ -1721,7 +1724,6 @@ operandFromLit (double i)
 operand *
 operandFromAst (ast * tree, int lvl)
 {
-
   if (!tree)
     return NULL;
 
@@ -4121,50 +4123,51 @@ lvalItem;
 /*-----------------------------------------------------------------*/
 /* addLvaluereq - add a flag for lvalreq for current ast level     */
 /*-----------------------------------------------------------------*/
-void addLvaluereq(int lvl)
+static void addLvaluereq(int lvl)
 {
   lvalItem * lpItem = (lvalItem *)Safe_alloc ( sizeof (lvalItem));
-  lpItem->req=1;
-  lpItem->lvl=lvl;
-  addSetHead(&lvaluereqSet,lpItem);
-
+  lpItem->req = 1;
+  lpItem->lvl = lvl;
+  addSetHead(&lvaluereqSet, lpItem);
 }
 /*-----------------------------------------------------------------*/
 /* delLvaluereq - del a flag for lvalreq for current ast level     */
 /*-----------------------------------------------------------------*/
-void delLvaluereq()
+static void delLvaluereq()
 {
-  lvalItem * lpItem;
-  lpItem = getSet(&lvaluereqSet);
-  if(lpItem) Safe_free(lpItem);
+  lvalItem * lpItem = getSet(&lvaluereqSet);
+  if (lpItem)
+    Safe_free(lpItem);
 }
 /*-----------------------------------------------------------------*/
 /* clearLvaluereq - clear lvalreq flag                             */
 /*-----------------------------------------------------------------*/
-void clearLvaluereq()
+static void clearLvaluereq()
 {
-  lvalItem * lpItem;
-  lpItem = peekSet(lvaluereqSet);
-  if(lpItem) lpItem->req = 0;
+  lvalItem * lpItem = peekSet(lvaluereqSet);
+  if (lpItem)
+    lpItem->req = 0;
 }
 /*-----------------------------------------------------------------*/
 /* getLvaluereq - get the last lvalreq level                       */
 /*-----------------------------------------------------------------*/
+#if 0
 int getLvaluereqLvl()
 {
-  lvalItem * lpItem;
-  lpItem = peekSet(lvaluereqSet);
-  if(lpItem) return lpItem->lvl;
+  lvalItem * lpItem = peekSet(lvaluereqSet);
+  if (lpItem)
+    return lpItem->lvl;
   return 0;
 }
+#endif
 /*-----------------------------------------------------------------*/
 /* isLvaluereq - is lvalreq valid for this level ?                 */
 /*-----------------------------------------------------------------*/
-int isLvaluereq(int lvl)
+static int isLvaluereq(int lvl)
 {
-  lvalItem * lpItem;
-  lpItem = peekSet(lvaluereqSet);
-  if(lpItem) return ((lpItem->req)&&(lvl <= (lpItem->lvl+1)));
+  lvalItem * lpItem = peekSet(lvaluereqSet);
+  if (lpItem)
+    return ((lpItem->req) && (lvl <= (lpItem->lvl+1)));
   return 0;
 }
 
@@ -4232,7 +4235,7 @@ ast2iCode (ast * tree, int lvl)
             IS_ADDRESS_OF_OP (tree) )
           {
             addLvaluereq(lvl);
-            if ((IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
+            if ((!IS_ADDRESS_OF_OP (tree) && IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
                 (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
               clearLvaluereq();
 
@@ -4270,7 +4273,7 @@ ast2iCode (ast * tree, int lvl)
         right = geniCodeRValue (right, TRUE);
       }
 
-      return geniCodeArray (left, right,lvl);
+      return geniCodeArray (left, right, lvl);
 
     case '.':                   /* structure dereference */
       if (IS_PTR (operandType (left)))
@@ -4438,7 +4441,7 @@ ast2iCode (ast * tree, int lvl)
                             tree->opval.op);
       */
       {
-                operand *leftOp, *rightOp;
+        operand *leftOp, *rightOp;
 
         leftOp  = geniCodeRValue (left , FALSE);
         rightOp = geniCodeRValue (right, FALSE);

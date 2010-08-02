@@ -5918,13 +5918,19 @@ static void genDataPointerSet(operand *right,
     assert (IS_SYMOP(result));
     assert (IS_PTR(OP_SYM_TYPE(result)));
 
-    if (AOP_TYPE(right) == AOP_LIT)
-      size = 4;
+    /*
+     * Determine size from right operand (not result):
+     * The result might be a rematerialized pointer to (the first field in) a struct,
+     * which then assumes the type (and size) of the struct rather than the first field.
+     */
+    if (IS_SYMOP (right))
+      size = getSize (OP_SYM_ETYPE (right));
+    else if (IS_VALOP (right))
+      size = getSize (OP_VALUE (right)->type);
     else
-      size = AOP_SIZE(right);
-    ressize = getSize(OP_SYM_ETYPE(result));
-    if (size > ressize) size = ressize;
-    //fprintf (stderr, "%s:%u: size(right): %d, size(result): %d\n", __FUNCTION__,__LINE__, AOP_SIZE(right), ressize);
+      assert (!"Invalid operand.");
+
+    ressize = getSize (OP_SYM_ETYPE (result));
 
     //assert( !"what's going on here?" );
 

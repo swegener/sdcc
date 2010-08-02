@@ -1,3 +1,8 @@
+2010-08-03 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (genDataPointerSet): properly determine operand size,
+	  fixes #3038372
+
 2010-08-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genCast),

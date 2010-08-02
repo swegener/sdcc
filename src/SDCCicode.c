@@ -1996,7 +1996,6 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   sym_link *optype;
   sym_link *opetype = getSpec (optype = operandType (op));
   sym_link *restype;
-  int errors=0;
 
   /* one of them has size zero then error */
   if (IS_VOID (optype))
@@ -2020,100 +2019,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       return operandFromValue (valCastLiteral (type, operandLitValue (op)));
     }
 
-  /* if casting to/from pointers, do some checking */
-  if (IS_PTR(type)) // to a pointer
-    {
-      if (!IS_PTR(optype) && !IS_FUNC(optype) && !IS_AGGREGATE(optype)) // from a non pointer
-        {
-          if (IS_INTEGRAL(optype))
-            {
-              // maybe this is NULL, than it's ok.
-              if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong == 0)))
-                {
-                  if (GPTRSIZE > FPTRSIZE && IS_GENPTR(type))
-                    {
-                      // no way to set the storage
-                      if (IS_LITERAL(optype))
-                        {
-                          werror(W_LITERAL_GENERIC);
-                          errors++;
-                        }
-                      else
-                        {
-                          werror(W_NONPTR2_GENPTR);
-                          errors++;
-                        }
-                    }
-                  else if (implicit)
-                    {
-                      werror(W_INTEGRAL2PTR_NOCAST);
-                      errors++;
-                    }
-                }
-            }
-          else
-            {
-              // shouldn't do that with float, array or structure unless to void
-              if (!IS_VOID(getSpec(type)) &&
-                  !(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype)))
-                {
-                  werror(E_INCOMPAT_TYPES);
-                  errors++;
-                }
-            }
-        }
-      else // from a pointer to a pointer
-        {
-          if (IS_GENPTR(type) && IS_VOID(type->next))
-            { // cast to void* is always allowed
-            }
-          else if (IS_GENPTR(optype) && IS_VOID(optype->next))
-            { // cast from void* is always allowed
-            }
-          else if (port->s.gptr_size > port->s.fptr_size /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80*/)
-            {
-              // if not a pointer to a function
-              if (!(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype)))
-                {
-                  if (implicit) // if not to generic, they have to match
-                    {
-                      if (!IS_GENPTR(type) &&
-                          !((DCL_TYPE(optype) == DCL_TYPE(type)) ||
-                            ((DCL_TYPE(optype) == POINTER) && (DCL_TYPE(type) == IPOINTER))
-                           )
-                         )
-                        {
-                          werror(E_INCOMPAT_PTYPES);
-                          errors++;
-                        }
-                    }
-                }
-            }
-        }
-    }
-  else // to a non pointer
-    {
-      if (IS_PTR(optype)) // from a pointer
-        {
-          if (implicit) // sneaky
-            {
-              if (IS_INTEGRAL(type))
-                {
-                  werror(W_PTR2INTEGRAL_NOCAST);
-                  errors++;
-                }
-              else // shouldn't do that with float, array or structure
-                {
-                  werror(E_INCOMPAT_TYPES);
-                  errors++;
-                }
-            }
-        }
-    }
-  if (errors)
-    {
-      printFromToType (optype, type);
-    }
+  checkPtrCast (type, optype, implicit);
 
   /* if they are the same size create an assignment */
 

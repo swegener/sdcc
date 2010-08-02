@@ -63,13 +63,6 @@ aopLiteralLong (value * val, int offset, int size)
       val = constCharVal (0);
     }
 
-  if (IS_GENPTR (val->type) && !IS_VOID (val->type->next) &&
-      v && (offset >= FPTRSIZE) && (GPTRSIZE > FPTRSIZE))
-    {
-      werror (E_CANNOT_USE_GENERIC_POINTER,
-              val->name ? val->name : "<null>",
-              "<null>");
-    }
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
   if (!IS_FLOAT (val->type))
@@ -602,10 +595,10 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
     case POINTER:
       return GPTYPE_NEAR;
     case GPOINTER:
-      werror (E_CANNOT_USE_GENERIC_POINTER,
+      werror (W_USING_GENERIC_POINTER,
               iname ? iname : "<null>",
               oname ? oname : "<null>");
-      exit (1);
+      return -1;
     case FPOINTER:
       return GPTYPE_FAR;
     case CPOINTER:
@@ -615,7 +608,7 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
     default:
       fprintf (stderr, "*** internal error: unknown pointer type %d in GPByte.\n",
                p_type);
-      break;
+      exit (EXIT_FAILURE);
     }
   return -1;
 }
@@ -627,7 +620,14 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
 static void
 _printPointerType (struct dbuf_s * oBuf, const char *name, int size)
 {
-  if (size == 3)
+  if (size == 4)
+    {
+      if (port->little_endian)
+        dbuf_printf (oBuf, "\t.byte %s,(%s >> 8),(%s >> 16),(%s >> 24)", name, name, name, name);
+      else
+        dbuf_printf (oBuf, "\t.byte (%s >> 24),(%s >> 16),(%s >> 8),%s", name, name, name, name);
+    }
+  else if (size == 3)
     {
       if (port->little_endian)
         dbuf_printf (oBuf, "\t.byte %s,(%s >> 8),(%s >> 16)", name, name, name);
@@ -660,8 +660,17 @@ static void
 printGPointerType (struct dbuf_s * oBuf, const char *iname, const char *oname,
                    int type)
 {
-  _printPointerType (oBuf, iname, (options.model == MODEL_FLAT24) ? 3 : 2);
-  dbuf_printf (oBuf, ",#0x%02x\n", pointerTypeToGPByte (type, iname, oname));
+  int byte = pointerTypeToGPByte (type, iname, oname);
+  int size = (options.model == MODEL_FLAT24) ? 3 : 2;
+  if (byte == -1)
+    {
+      _printPointerType (oBuf, iname, size + 1);
+    }
+  else
+    {
+      _printPointerType (oBuf, iname, size);
+      dbuf_printf (oBuf, ",#0x%02x\n", byte);
+    }
 }
 
 /*-----------------------------------------------------------------*/

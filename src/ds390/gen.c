@@ -618,9 +618,7 @@ newAsmop (short type)
 static int
 pointerCode (sym_link * etype)
 {
-
   return PTR_TYPE (SPEC_OCLS (etype));
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -909,7 +907,9 @@ aopForRemat (symbol * sym)
           sym_link *from_type = operandType(IC_RIGHT(ic));
           aop->aopu.aop_immd.from_cast_remat = 1;
           ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-          ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type), NULL, NULL);
+          ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type),
+              IS_SYMOP (IC_RIGHT (ic)) ? OP_SYMBOL (IC_RIGHT (ic))->name : NULL,
+              sym->name);
           continue;
         }
       else break;
@@ -930,7 +930,7 @@ aopForRemat (symbol * sym)
       if (IS_ASSIGN_ICODE(ic) && isOperandLiteral(IC_RIGHT(ic)))
         {
           SNPRINTF(buffer, sizeof(buffer),
-                   "0x%x",(int) operandLitValue (IC_RIGHT (ic)));
+                   "0x%06x", (int) operandLitValue (IC_RIGHT (ic)));
         }
       else
         {
@@ -942,7 +942,7 @@ aopForRemat (symbol * sym)
   /* set immd2 field if required */
   if (aop->aopu.aop_immd.from_cast_remat)
     {
-      tsprintf(buffer, sizeof(buffer), "#!constbyte",ptr_type);
+      tsprintf(buffer, sizeof(buffer), "#!constbyte", ptr_type);
       aop->aopu.aop_immd.aop_immd2 = Safe_strdup(buffer);
     }
 
@@ -4580,7 +4580,7 @@ adjustArithmeticResult (iCode * ic)
     {
       char buffer[5];
       SNPRINTF (buffer, sizeof(buffer),
-                "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+                "#%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
       aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
     }
 }
@@ -12534,7 +12534,6 @@ genCast (iCode * ic)
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
-
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))
         goto release;
@@ -12557,7 +12556,6 @@ genCast (iCode * ic)
   /* if the result is of type pointer */
   if (IS_PTR (ctype))
     {
-
       int p_type;
       sym_link *type = operandType (right);
 
@@ -12624,17 +12622,21 @@ genCast (iCode * ic)
 
           /* the last byte depending on type */
             {
-                int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
-                char gpValStr[10];
+              int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
+              char gpValStr[10];
 
-                if (gpVal == -1)
+              if (gpVal == -1)
                 {
-                    // pointerTypeToGPByte will have bitched.
-                    exit(1);
+                  // pointerTypeToGPByte will have warned, just copy.
+                  aopPut (result,
+                          aopGet (right, offset, FALSE, FALSE, NULL),
+                          offset);
                 }
-
-                SNPRINTF(gpValStr, sizeof(gpValStr), "#0x%x", gpVal);
-                aopPut (result, gpValStr, GPTRSIZE - 1);
+              else
+                {
+                  SNPRINTF(gpValStr, sizeof(gpValStr), "#0x%02x", gpVal);
+                  aopPut (result, gpValStr, GPTRSIZE - 1);
+                }
             }
           goto release;
         }

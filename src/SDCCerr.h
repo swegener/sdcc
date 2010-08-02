@@ -176,7 +176,7 @@
 #define E_ARGUMENT_MISSING            148 /* Option requires an argument. */
 #define W_STRAY_BACKSLASH             149
 #define W_NEWLINE_IN_STRING           150
-#define E_CANNOT_USE_GENERIC_POINTER  151
+#define W_USING_GENERIC_POINTER       151
 #define W_EXCESS_SHORT_OPTIONS        152
 #define E_VOID_VALUE_USED             153
 #define W_INTEGRAL2PTR_NOCAST         154

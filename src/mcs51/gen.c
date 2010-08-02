@@ -474,7 +474,7 @@ endOfWorld:
   /* now this is REALLY the end of the world */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
           "getFreePtr should never reach here");
-  exit (1);
+  exit (EXIT_FAILURE);
 }
 
 
@@ -551,9 +551,7 @@ newAsmop (short type)
 static int
 pointerCode (sym_link * etype)
 {
-
   return PTR_TYPE (SPEC_OCLS (etype));
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -775,7 +773,9 @@ aopForRemat (symbol * sym)
           sym_link *from_type = operandType(IC_RIGHT(ic));
           aop->aopu.aop_immd.from_cast_remat = 1;
           ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-          ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type), NULL, NULL);
+          ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type),
+              IS_SYMOP (IC_RIGHT (ic)) ? OP_SYMBOL (IC_RIGHT (ic))->name : NULL,
+              sym->name);
           continue;
         }
       else break;
@@ -11753,17 +11753,21 @@ genCast (iCode * ic)
             }
           /* the last byte depending on type */
             {
-                int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
-                char gpValStr[10];
+              int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
+              char gpValStr[10];
 
-                if (gpVal == -1)
+              if (gpVal == -1)
                 {
-                    // pointerTypeToGPByte will have bitched.
-                    exit(1);
+                  // pointerTypeToGPByte will have warned, just copy.
+                  aopPut (result,
+                          aopGet (right, offset, FALSE, FALSE),
+                          offset);
                 }
-
-                sprintf(gpValStr, "#0x%02x", gpVal);
-                aopPut (result, gpValStr, GPTRSIZE - 1);
+              else
+                {
+                  SNPRINTF(gpValStr, sizeof(gpValStr), "#0x%02x", gpVal);
+                  aopPut (result, gpValStr, GPTRSIZE - 1);
+                }
             }
           goto release;
         }

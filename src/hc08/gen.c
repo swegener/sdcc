@@ -7899,7 +7899,6 @@ genAddrOf (iCode * ic)
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -8007,7 +8006,6 @@ genJumpTab (iCode * ic)
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
        jtab = setNextItem (IC_JTLABELS (ic)))
     emitcode (".db", ">%05d$", jtab->key + 100);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -8031,11 +8029,9 @@ genCast (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, FALSE);
 
-
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
-
       /* if they are in the same place */
       #if 0
       if (sameRegs (AOP (right), AOP (result)))
@@ -8053,11 +8049,9 @@ genCast (iCode * ic)
       goto release;
     }
 
-
   /* if the result is of type pointer */
   if (IS_PTR (ctype))
     {
-
       int p_type;
       sym_link *type = operandType (right);
       sym_link *etype = getSpec (type);
@@ -8087,21 +8081,6 @@ genCast (iCode * ic)
               offset++;
             }
           /* the last byte depending on type */
-#if 0
-            {
-                int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
-                char gpValStr[10];
-
-                if (gpVal == -1)
-                {
-                    // pointerTypeToGPByte will have bitched.
-                    exit(1);
-                }
-
-                sprintf(gpValStr, "#0x%x", gpVal);
-                aopPut (AOP (result), gpValStr, GPTRSIZE - 1);
-            }
-#endif
           goto release;
         }
 

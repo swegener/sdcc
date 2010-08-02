@@ -2528,6 +2528,109 @@ CodePtrPointsToConst (sym_link *t)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* checkPtrCast - if casting to/from pointers, do some checking    */
+/*-----------------------------------------------------------------*/
+void
+checkPtrCast (sym_link * newType, sym_link *orgType, bool implicit)
+{
+  int errors = 0;
+
+  if (IS_PTR(newType)) // to a pointer
+    {
+      if (!IS_PTR(orgType) && !IS_FUNC(orgType) && !IS_AGGREGATE(orgType)) // from a non pointer
+        {
+          if (IS_INTEGRAL(orgType))
+            {
+              // maybe this is NULL, than it's ok.
+              if (!(IS_LITERAL(orgType) && (SPEC_CVAL(orgType).v_ulong == 0)))
+                {
+                  if (GPTRSIZE > FPTRSIZE && IS_GENPTR(newType))
+                    {
+                      // no way to set the storage
+                      if (IS_LITERAL(orgType))
+                        {
+                          werror(W_LITERAL_GENERIC);
+                          errors++;
+                        }
+                      else
+                        {
+                          werror(W_NONPTR2_GENPTR);
+                          errors++;
+                        }
+                    }
+                  else if (implicit)
+                    {
+                      werror(W_INTEGRAL2PTR_NOCAST);
+                      errors++;
+                    }
+                }
+            }
+          else
+            {
+              // shouldn't do that with float, array or structure unless to void
+              if (!IS_VOID(getSpec(newType)) &&
+                  !(IS_CODEPTR(newType) && IS_FUNC(newType->next) && IS_FUNC(orgType)))
+                {
+                  werror(E_INCOMPAT_TYPES);
+                  errors++;
+                }
+            }
+        }
+      else // from a pointer to a pointer
+        {
+          if (IS_GENPTR(newType) && IS_VOID(newType->next))
+            { // cast to void* is always allowed
+            }
+          else if (IS_GENPTR(orgType) && IS_VOID(orgType->next))
+            { // cast from void* is always allowed
+            }
+          else if (port->s.gptr_size > port->s.fptr_size /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80*/)
+            {
+              // if not a pointer to a function
+              if (!(IS_CODEPTR(newType) && IS_FUNC(newType->next) && IS_FUNC(orgType)))
+                {
+                  if (implicit) // if not to generic, they have to match
+                    {
+                      if (!IS_GENPTR(newType) &&
+                          !((DCL_TYPE(orgType) == DCL_TYPE(newType)) ||
+                            ((DCL_TYPE(orgType) == POINTER) && (DCL_TYPE(newType) == IPOINTER))
+                           )
+                         )
+                        {
+                          werror(E_INCOMPAT_PTYPES);
+                          errors++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+  else // to a non pointer
+    {
+      if (IS_PTR(orgType)) // from a pointer
+        {
+          if (implicit) // sneaky
+            {
+              if (IS_INTEGRAL(newType))
+                {
+                  werror(W_PTR2INTEGRAL_NOCAST);
+                  errors++;
+                }
+              else // shouldn't do that with float, array or structure
+                {
+                  werror(E_INCOMPAT_TYPES);
+                  errors++;
+                }
+            }
+        }
+    }
+  if (errors)
+    {
+      printFromToType (orgType, newType);
+    }
+}
+
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
@@ -4071,6 +4174,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             {
               unsigned long gpVal = 0;
 
+              /* if casting literal specific pointer to generic pointer */
               if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
                 {
                   if (resultType != RESULT_TYPE_GPTR)
@@ -4084,6 +4188,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                       gpVal &= (1 << (getSize (LTYPE (tree)) * 8)) - 1;
                     }
                 }
+              checkPtrCast (LTYPE (tree), RTYPE (tree), FALSE);
               LRVAL (tree) = 1;
               tree->type = EX_VALUE;
               tree->opval.val =
@@ -4096,6 +4201,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               return tree;
             }
         }
+      checkPtrCast (LTYPE (tree), RTYPE (tree), FALSE);
       if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
         {
           DCL_TYPE (LTYPE (tree)) = DCL_TYPE (RTYPE (tree));

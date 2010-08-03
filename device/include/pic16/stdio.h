@@ -105,7 +105,8 @@ extern int vprintf (const char *fmt, va_list ap);
 extern int vfprintf (FILE *stream, const char *fmt, va_list ap);
 extern int vsprintf (char *str, const char *fmt, va_list ap);
 
-extern void putchar (char c) __wparam;
+#define PUTCHAR(C)  void putchar (char C) __wparam
+extern PUTCHAR (c);
 
 extern void __stream_putchar (FILE *stream, char c);
 

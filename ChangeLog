@@ -1,3 +1,9 @@
+2010-08-03 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/stdio.h,
+	* device/lib/pic16/libc/stdio/putchar.c: resurrect PUTCHAR macro,
+	  fixes #3038656
+
 2010-08-03 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: fixed bug #3038728 (consecutive &=

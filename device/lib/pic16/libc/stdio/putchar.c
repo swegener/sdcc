@@ -27,13 +27,10 @@
 
 #include <stdio.h>
 
-/* this is a dummy function so that sources compile,
- * even when user doesn't give a putchar() function.
- * NOTE that putchar() is declared in stdio.h to
- * have the argument in WCHAR (via the wparam pragma) */
+/* This is a dummy function so that sources compile,
+ * even when user doesn't give a putchar() function. */
 
-void
-putchar (char c) __wparam
+PUTCHAR (c)
 {
   (void)c;
 }

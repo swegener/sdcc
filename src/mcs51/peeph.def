@@ -1576,9 +1576,17 @@ replace {
 	anl	%1,#%2
 	anl	%1,#%3
 } by {
-	;	Peephole 183	avoided anl during execution
+	;	Peephole 183.a	avoided anl during execution
 	anl	%1,#(%2&%3)
-}
+} if notVolatile %1
+
+replace {
+	orl	%1,#%2
+	orl	%1,#%3
+} by {
+	;	Peephole 183.b	avoided orl during execution
+	orl	%1,#(%2|%3)
+} if notVolatile %1
 
 replace {
 	mov	%1,a

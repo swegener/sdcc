@@ -1,3 +1,8 @@
+2010-08-03 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: fixed bug #3038728 (consecutive &=
+	  on volatile variable)
+
 2010-08-03 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (genDataPointerSet): properly determine operand size,

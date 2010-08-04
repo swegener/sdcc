@@ -1,38 +1,40 @@
 /*-------------------------------------------------------------------------
-  Register Declarations for ATMEL 89S8252 and 89LS8252 Processors
+   at89S8252.h - register declarations for ATMEL 89S8252 and 89LS8252 processors
 
-   Written By - Dipl.-Ing. (FH) Michael Schmitt
-    mschmitt@mainz-online.de
-    michael.schmitt@t-online.de
+   Copyright (C) 2005, Dipl.-Ing. (FH) Michael Schmitt <michael.schmitt AT t-online.de>
 
-    Bug-Fix Jun 29 1999
+   Bug-Fix Jun 29 1999
 
-    Additional definitions Nov 23 1999
-      by Bernd Krueger-Knauber <bkk@infratec-plus.de>
+   Additional definitions Nov 23 1999
+     by Bernd Krueger-Knauber <bkk AT infratec-plus.de>
 
-    based on reg51.h by Sandeep Dutta sandeep.dutta@usa.net
-    KEIL C compatible definitions are included
+   based on reg51.h by Sandeep Dutta <sandeep.dutta AT usa.net>
+   KEIL C compatible definitions are included
 
-    Bug-Fix Feb 16 2006
-      by Krzysztof Polomka <del_p@op.pl>
+   Bug-Fix Feb 16 2006
+     by Krzysztof Polomka <del_p AT op.pl>
 
-   This program is free software; you can redistribute it and/or modify it
+   This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   Free Software Foundation; either version 2.1, or (at your option) any
    later version.
 
-   This program is distributed in the hope that it will be useful,
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 #ifndef AT89S8252_H

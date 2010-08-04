@@ -1,3 +1,8 @@
+2010-08-05 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/mcs51at89S8252.h:
+	  sdcc library license changed to GPL+LE
+
 2010-08-04 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/cmdlex.cc: regenerated,

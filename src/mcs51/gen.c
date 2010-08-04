@@ -6053,7 +6053,7 @@ genCmp (operand * left, operand * right,
         }
       /* if unsigned char cmp with direct, do cjne A,right,zz */
       else if ((size == 1) && !sign &&
-          (AOP_TYPE (right) == AOP_REG) || (AOP_TYPE (right) == AOP_DIR))
+          ((AOP_TYPE (right) == AOP_REG) || (AOP_TYPE (right) == AOP_DIR)))
         {
           symbol *lbl = newiTempLabel (NULL);
           MOVA (aopGet (left, offset, FALSE, FALSE));

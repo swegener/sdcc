@@ -2860,7 +2860,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
-      if (IS_PTR (LTYPE (tree)))
+      if (IS_PTR (LTYPE (tree)) && !IS_LITERAL (TETYPE (tree)))
         {
           SPEC_SCLS (TETYPE (tree)) = sclsFromPtr (LTYPE (tree));
         }

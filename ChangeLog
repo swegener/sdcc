@@ -1,3 +1,11 @@
+2010-08-04 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/cmd.src/cmdlex.cc: regenerated,
+	  fix for parch #3038644: Fix for GCC-4.4 compile error
+	* device/include/z80/z180.h, device/include/hc08/mc68hc908apxx.h,
+	  sdcc/device/include/hc08/mc68hc908jkjl.h:
+	  sdcc library license changed to GPL+LE
+
 2010-08-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genCmpGt, genCmpLt),
@@ -7,7 +15,7 @@
 	* src/SDCCset.c: cosmetic changes
 	* support/regression/tests/bug1994062.c: new, added
 
-2010-08-03 Raphael Neider <rneider AT web.de>
+010-08-03 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/stdio.h,
 	* device/lib/pic16/libc/stdio/putchar.c: resurrect PUTCHAR macro,

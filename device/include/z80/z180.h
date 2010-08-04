@@ -1,19 +1,35 @@
+/*-------------------------------------------------------------------------
+   z180.h - definitions on the built in I/O ports for the Z180/HD64180
+            for use with SDCC
+
+   Copyright (C) 2003, Peter Townson <Peter.Townson AT tattsgroup.com>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
 #if !defined( __Z180_H__ )
     #define   __Z180_H__ 
-/*
- *---------------------------------------------------------------------------
- *
- *  FILE   : Z180.H
- *
- *  PURPOSE: definitions on the built in I/O ports for the Z180/HD64180
- *           for use with SDCC
- *
- *           Makes use of the newly included Z80 I/O support in SDCC
- *
- *  AUTHOR : Peter Townson 2003
- *
- *---------------------------------------------------------------------------
- */
+
 #if !defined( Z180_IO_BASE )
     #define   Z180_IO_BASE  0  /* zero is the Reset default */
 #endif
@@ -103,4 +119,3 @@ __sfr __at               0x3F  ICR   ;  /* I/O base control register - does not 
  *---------------------------------------------------------------------------
  */
 #endif  /* __Z180_H__ */
-

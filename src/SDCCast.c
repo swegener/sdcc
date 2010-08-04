@@ -2827,7 +2827,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         /*        array node          */
         /*----------------------------*/
     case '[':
-
       /* first check if this is an array or a pointer */
       if ((!IS_ARRAY (LTYPE (tree))) && (!IS_PTR (LTYPE (tree))))
         {
@@ -2861,6 +2860,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
+      if (IS_PTR (LTYPE (tree)))
+        {
+          SPEC_SCLS (TETYPE (tree)) = sclsFromPtr (LTYPE (tree));
+        }
+
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2906,8 +2910,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* adjust the storage class */
       if (DCL_TYPE (LTYPE (tree)) != ARRAY)
         {
-          setOClass (LTYPE (tree), TETYPE(tree));
-          SPEC_SCLS(TETYPE(tree)) = sclsFromPtr (LTYPE (tree));
+          setOClass (LTYPE (tree), TETYPE (tree));
+          SPEC_SCLS (TETYPE (tree)) = sclsFromPtr (LTYPE (tree));
         }
       /* This breaks with extern declarations, bitfields, and perhaps other */
       /* cases (gcse). Let's leave this optimization disabled for now and   */

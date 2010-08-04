@@ -57,7 +57,6 @@ setFromSet (set * lp)
     }
 
   return lfl;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -76,7 +75,6 @@ setFromSetNonRev (set * lp)
     }
 
   return lfl;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -91,7 +89,7 @@ isSetsEqual (set * dest, set * src)
   for (; dest && src; dest = dest->next, src = src->next)
     {
       if (!isinSet (src1, dest->item))
-	return 0;
+        return 0;
     }
   if (!dest && !src)
     return 1;
@@ -111,7 +109,7 @@ isSetsEqualWith (set * dest, set * src, int (*cFunc) (void *, void *))
   for (; dest && src; dest = dest->next, src = src->next)
     {
       if (!isinSetWith (src1, dest->item, cFunc))
-	return 0;
+        return 0;
     }
   if (!dest && !src)
     return 1;
@@ -124,7 +122,6 @@ isSetsEqualWith (set * dest, set * src, int (*cFunc) (void *, void *))
 void *
 addSetIfnotP (set ** list, void *item)
 {
-
   if (isinSet (*list, item))
     return item;
 
@@ -147,7 +144,6 @@ addSetHead (set ** list, void *item)
   assert (lp != lp->item);
   *list = lp;
   return item;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -197,11 +193,11 @@ deleteItemIf (set ** sset, int (*cond) (void *, va_list),...)
       va_start (ap, cond);
 
       if ((*cond) (sp->item, ap))
-	{
-	  deleteSetItem (sset, sp->item);
-	  sp = *sset;
-	  continue;
-	}
+        {
+          deleteSetItem (sset, sp->item);
+          sp = *sset;
+          continue;
+        }
 
       va_end(ap);
       sp = sp->next;
@@ -221,22 +217,25 @@ deleteSetItem (set ** list, void *item)
     return;
 
   /* if this item is at the head of the list */
-  if ((*list)->item == item) {
-    lp = *list;
-    *list = (*list)->next;
-    Safe_free (lp);
-    return;
-  }
-
-  /* find the item in the list */
-  for (lp = *list; lp->next; lp = lp->next) {
-    if (lp->next->item == item) { /* the next one is it */
-      lp1 = lp->next;             /* this one will need to be freed */
-      lp->next = lp->next->next;  /* take out of list */
-      Safe_free (lp1);
+  if ((*list)->item == item)
+    {
+      lp = *list;
+      *list = (*list)->next;
+      Safe_free (lp);
       return;
     }
-  }
+
+  /* find the item in the list */
+  for (lp = *list; lp->next; lp = lp->next)
+    {
+      if (lp->next->item == item)     /* the next one is it */
+        {
+          lp1 = lp->next;             /* this one will need to be freed */
+          lp->next = lp->next->next;  /* take out of list */
+          Safe_free (lp1);
+          return;
+        }
+    }
 
   /* could not find it */
 }
@@ -277,16 +276,18 @@ isinSetWith (set * list, void *item, int (*cFunc) (void *, void *))
 void
 mergeSets (set **sset, set *list)
 {
-  if (*sset == NULL) {
-    *sset = list;
-  }
-  else {
-    set *lp;
+  if (*sset == NULL)
+    {
+      *sset = list;
+    }
+  else
+    {
+      set *lp;
 
-    for (lp = *sset; lp->next; lp = lp->next)
-      ;
-    lp->next = list;
-  }
+      for (lp = *sset; lp->next; lp = lp->next)
+        ;
+      lp->next = list;
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -395,7 +396,7 @@ intersectSets (set * list1, set * list2, int throw)
 /*-----------------------------------------------------------------*/
 set *
 intersectSetsWith (set * list1, set * list2,
-		   int (*cFunc) (void *, void *), int throw)
+                   int (*cFunc) (void *, void *), int throw)
 {
   set *in = NULL;
   set *lp;
@@ -446,11 +447,12 @@ void *
 indexSet (set * s, int index)
 {
   set *loop=s;
-  
-  while(loop && index) {
-  	index--;
-  	loop = loop->next;
-  }
+
+  while(loop && index)
+    {
+      index--;
+      loop = loop->next;
+    }
 
   return (loop->item);
 }
@@ -459,19 +461,19 @@ indexSet (set * s, int index)
 /*-----------------------------------------------------------------*/
 /* reverseSet - reverse the order of the items of a set            */
 /*-----------------------------------------------------------------*/
-
 set *
 reverseSet (set * s)
 {
   set *t = NULL;
   set *u = NULL;
 
-  while(s->next) {
-    t = s->next;
-    s->next = u;
-    u = s;
-    s = t;
-  }
+  while(s->next)
+    {
+      t = s->next;
+      s->next = u;
+      u = s;
+      s = t;
+    }
   s->next = u;
   return s;
 }
@@ -488,8 +490,8 @@ subtractFromSet (set * left, set * right, int throw)
   if (right)
     {
       for (loop = right; loop; loop = loop->next)
-	if (isinSet (result, loop->item))
-	  deleteSetItem (&result, loop->item);
+        if (isinSet (result, loop->item))
+          deleteSetItem (&result, loop->item);
     }
 
   switch (throw)
@@ -546,7 +548,7 @@ applyToSetFTrue (set * list, int (*somefunc) (void *, va_list),...)
       rvalue += (*somefunc) (lp->item, ap);
       va_end (ap);
       if (rvalue)
-	break;
+        break;
     }
   return rvalue;
 }
@@ -587,13 +589,13 @@ setNextItem (set * sset)
     {
       sset->curr = sset->curr->next;
       if (sset->curr)
-	return sset->curr->item;
+        return sset->curr->item;
     }
   return NULL;
 }
 
 /*-----------------------------------------------------------------*/
-/* getSet - will delete & return the first item from the set   */
+/* getSet - will delete & return the first item from the set       */
 /*-----------------------------------------------------------------*/
 void *
 getSet (set ** list)
@@ -605,10 +607,9 @@ getSet (set ** list)
   if (*list == NULL)
     return (void *) NULL;
 
-
   /* find the item in the list */
   lp = *list;
-  item = lp->item;		/* save the item */
+  item = lp->item;              /* save the item */
 
   *list = lp->next;
   return item;
@@ -620,7 +621,6 @@ getSet (set ** list)
 void
 setToNull (void **item)
 {
-
   if (!item)
     return;
 
@@ -646,11 +646,12 @@ deleteSet (set **s)
 
   curr = *s;
   next = curr->next;
-  while (next) {
-    Safe_free (curr);
-    curr = next;
-    next = next->next;
-  }
+  while (next)
+    {
+      Safe_free (curr);
+      curr = next;
+      next = next->next;
+    }
 
   Safe_free (curr);
 

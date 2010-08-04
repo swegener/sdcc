@@ -1480,7 +1480,7 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
           "aopget got unsupported aop->type");
-  exit (1);
+  exit (EXIT_FAILURE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1541,7 +1541,7 @@ aopPut (operand * result, const char *s, int offset)
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
               "aopPut got offset > aop->size");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /* will assign value to value */
@@ -1613,7 +1613,7 @@ aopPut (operand * result, const char *s, int offset)
         {
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
                   "aopPut writing to code space");
-          exit (1);
+          exit (EXIT_FAILURE);
         }
 
       while (offset > aop->coff)
@@ -1741,7 +1741,7 @@ aopPut (operand * result, const char *s, int offset)
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
               "aopPut got unsupported aop->type");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
     return accuse;
@@ -5181,7 +5181,7 @@ genMultOneByte (operand * left,
       /* this should never happen */
       fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n",
                AOP_SIZE(result), __FILE__, lineno);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /* (if two literals: the value is computed before) */
@@ -6042,12 +6042,23 @@ genCmp (operand * left, operand * right,
 
       /* if unsigned char cmp with lit, do cjne left,#right,zz */
       if ((size == 1) && !sign &&
-          (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR))
+          (AOP_TYPE (right) == AOP_LIT) && (AOP_TYPE (left) != AOP_DIR))
         {
           symbol *lbl = newiTempLabel (NULL);
           emitcode ("cjne", "%s,%s,%05d$",
                     aopGet (left, offset, FALSE, FALSE),
                     aopGet (right, offset, FALSE, FALSE),
+                    lbl->key + 100);
+          emitLabel (lbl);
+        }
+      /* if unsigned char cmp with direct, do cjne A,right,zz */
+      else if ((size == 1) && !sign &&
+          (AOP_TYPE (right) == AOP_REG) || (AOP_TYPE (right) == AOP_DIR))
+        {
+          symbol *lbl = newiTempLabel (NULL);
+          MOVA (aopGet (left, offset, FALSE, FALSE));
+          emitcode ("cjne", "a,%s,%05d$",
+                    aopGet (right, offset, FALSE, TRUE),
                     lbl->key + 100);
           emitLabel (lbl);
         }
@@ -6178,7 +6189,7 @@ genCmpGt (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   sym_link *letype, *retype;
-  int sign;
+  int sign = 0;
 
   D (emitcode (";", "genCmpGt"));
 
@@ -6186,10 +6197,13 @@ genCmpGt (iCode * ic, iCode * ifx)
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
 
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
-           (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
+  if (IS_SPEC (operandType (left)) && IS_SPEC (operandType (right)))
+    {
+      letype = getSpec (operandType (left));
+      retype = getSpec (operandType (right));
+      sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
+               (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
+    }
   /* assign the asmops */
   aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);
@@ -6208,7 +6222,7 @@ genCmpLt (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   sym_link *letype, *retype;
-  int sign;
+  int sign = 0;
 
   D (emitcode (";", "genCmpLt"));
 
@@ -6216,10 +6230,13 @@ genCmpLt (iCode * ic, iCode * ifx)
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
 
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
-           (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
+  if (IS_SPEC (operandType (left)) && IS_SPEC (operandType (right)))
+    {
+      letype = getSpec (operandType (left));
+      retype = getSpec (operandType (right));
+      sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
+               (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
+    }
   /* assign the asmops */
   aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);

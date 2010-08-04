@@ -480,7 +480,7 @@ endOfWorld:
   /* now this is REALLY the end of the world */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
           "getFreePtr should never reach here");
-  exit (1);
+  exit (EXIT_FAILURE);
 
   return NULL; // notreached, but makes compiler happy.
 }
@@ -1660,7 +1660,7 @@ aopGet (operand * oper,
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
           "aopget got unsupported aop->type");
-  exit (1);
+  exit (EXIT_FAILURE);
 
   return NULL;  // not reached, but makes compiler happy.
 }
@@ -1726,7 +1726,7 @@ aopPut (operand * result, const char *s, int offset)
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
               "aopPut got offset > aop->size");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /* will assign value to value */
@@ -1810,7 +1810,7 @@ aopPut (operand * result, const char *s, int offset)
         {
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
                   "aopPut writing to code space");
-          exit (1);
+          exit (EXIT_FAILURE);
         }
 
       while (offset > aop->coff)
@@ -1969,7 +1969,7 @@ aopPut (operand * result, const char *s, int offset)
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
               "aopPut got unsupported aop->type");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
     return accuse;
@@ -5388,7 +5388,7 @@ genMultOneByte (operand * left,
           /* this should never happen */
           fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n",
                    size, __FILE__, lineno);
-          exit (1);
+          exit (EXIT_FAILURE);
         }
 
       aopPut (result, "a", 0);
@@ -5510,7 +5510,7 @@ genMultOneByte (operand * left,
       /* this should never happen */
       fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n",
                size, __FILE__, lineno);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   if (runtimeSign || compiletimeSign)
@@ -6647,17 +6647,20 @@ genCmpGt (iCode * ic, iCode * ifx)
 {
   operand *left, *right;
   sym_link *letype, *retype;
-  int sign;
+  int sign = 0;
 
   D (emitcode (";", "genCmpGt"));
 
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
-
+  if (IS_SPEC (operandType (left)) && IS_SPEC (operandType (right)))
+    {
+      letype = getSpec (operandType (left));
+      retype = getSpec (operandType (right));
+      sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
+               (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
+    }
   /* assign the left & right amsops */
   AOP_OP_2 (ic);
 
@@ -6672,17 +6675,20 @@ genCmpLt (iCode * ic, iCode * ifx)
 {
   operand *left, *right;
   sym_link *letype, *retype;
-  int sign;
+  int sign = 0;
 
   D (emitcode (";", "genCmpLt"));
 
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
-
+  if (IS_SPEC (operandType (left)) && IS_SPEC (operandType (right)))
+    {
+      letype = getSpec (operandType (left));
+      retype = getSpec (operandType (right));
+      sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
+               (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
+    }
   /* assign the left & right amsops */
   AOP_OP_2 (ic);
 
@@ -12148,7 +12154,7 @@ genArrayInit (iCode * ic)
 #if 0
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
               "Unexpected operand to genArrayInit.\n");
-      exit(1);
+      exit(EXIT_FAILURE);
 #else
       // a regression because of SDCCcse.c:1.52
       emitcode ("mov", "dpl,%s", aopGet (left, 0, FALSE, FALSE, NULL));
@@ -12168,7 +12174,7 @@ genArrayInit (iCode * ic)
     {
         werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
                                 "can't determine element size in genArrayInit.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     iLoop = IC_ARRAYILIST(ic);

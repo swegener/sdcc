@@ -1,3 +1,12 @@
+2010-08-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genCmpGt, genCmpLt),
+	* src/mcs51/gen.c (genCmpGt, genCmpLt): fixed bug 1994062 part 1
+	  (genCmp): use optimization from bug 1994062
+	* src/SDCCast.c (decorateType '['):  fixed bug 1994062 part 2
+	* src/SDCCset.c: cosmetic changes
+	* support/regression/tests/bug1994062.c: new, added
+
 2010-08-03 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/stdio.h,

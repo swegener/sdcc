@@ -451,6 +451,8 @@ struct
    "storage class specified for parameter '%s'" },
 { E_OFFSETOF_TYPE, ERROR_LEVEL_ERROR,
    "offsetof can only be applied to structs/unions" },
+{ E_INCOMPLETE_FIELD, ERROR_LEVEL_ERROR,
+   "field '%s' has incomplete type" },
 };
 
 /*

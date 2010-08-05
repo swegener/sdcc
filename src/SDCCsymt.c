@@ -958,15 +958,18 @@ getSize (sym_link * p)
     }
 }
 
+#define FLEXARRAY   1
+#define INCOMPLETE  2
+
 /*------------------------------------------------------------------*/
 /* checkStructFlexArray - check tree behind a struct                */
 /*------------------------------------------------------------------*/
-static bool
+static int
 checkStructFlexArray (symbol *sym, sym_link *p)
 {
   /* if nothing return FALSE */
   if (!p)
-    return FALSE;
+    return 0;
 
   if (IS_SPEC (p))
     {
@@ -974,9 +977,14 @@ checkStructFlexArray (symbol *sym, sym_link *p)
       if (IS_STRUCT (p) && SPEC_STRUCT (p)->b_flexArrayMember)
         {
           werror (W_INVALID_FLEXARRAY);
-          return FALSE;
+          return INCOMPLETE;
         }
-      return FALSE;
+      /* or otherwise incomplete (nested) struct? */
+      if (IS_STRUCT (p) && ((SPEC_STRUCT (p)->size == 0) || !SPEC_STRUCT (p)->fields))
+        {
+          return INCOMPLETE;
+        }
+      return 0;
     }
 
   /* this is a declarator */
@@ -987,12 +995,14 @@ checkStructFlexArray (symbol *sym, sym_link *p)
         {
           if (!options.std_c99)
             werror (W_C89_NO_FLEXARRAY);
-          return TRUE;
+          if (checkStructFlexArray (sym, p->next) == INCOMPLETE)
+            werror (E_INCOMPLETE_FIELD, sym->name);
+          return FLEXARRAY;
         }
       /* walk tree */
       return checkStructFlexArray (sym, p->next);
     }
-  return FALSE;
+  return 0;
 }
 
 /*------------------------------------------------------------------*/
@@ -1485,16 +1495,24 @@ compStructSize (int su, structdef * sdef)
 
           /* search for "flexible array members" */
           /* and do some syntax checks */
-          if (su == STRUCT && checkStructFlexArray (loop, loop->type))
+          if (su == STRUCT)
             {
-              /* found a "flexible array member" */
-              sdef->b_flexArrayMember = TRUE;
-              /* is another struct-member following? */
-              if (loop->next)
-                werror (E_FLEXARRAY_NOTATEND);
-              /* is it the first struct-member? */
-              else if (loop == sdef->fields)
-                werror (E_FLEXARRAY_INEMPTYSTRCT);
+              int ret = checkStructFlexArray (loop, loop->type);
+              if (ret == FLEXARRAY)
+                {
+                  /* found a "flexible array member" */
+                  sdef->b_flexArrayMember = TRUE;
+                  /* is another struct-member following? */
+                  if (loop->next)
+                    werror (E_FLEXARRAY_NOTATEND);
+                  /* is it the first struct-member? */
+                  else if (loop == sdef->fields)
+                    werror (E_FLEXARRAY_INEMPTYSTRCT);
+                }
+              else if (ret == INCOMPLETE)
+                {
+                  werror (E_INCOMPLETE_FIELD, loop->name);
+                }
             }
         }
 
@@ -2318,8 +2336,8 @@ compareType (sym_link * dest, sym_link * src)
             }
           if (IS_PTR (dest) && IS_ARRAY (src))
             {
-              value *val=aggregateToPointer (valFromType(src));
-              int res=compareType (dest, val->type);
+              value *val = aggregateToPointer (valFromType(src));
+              int res = compareType (dest, val->type);
               Safe_free(val->type);
               Safe_free(val);
               return res;

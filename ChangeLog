@@ -1,3 +1,9 @@
+2010-08-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCerr.c,
+	* src/SDCCerr.h: added E_INCOMPLETE_FIELD
+	* src/SDCCsymt.c (checkStructFlexArray, compStructSize): fixed bug 1518279
+
 2010-08-05 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51at89S8252.h:
@@ -6,7 +12,7 @@
 2010-08-04 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/cmdlex.cc: regenerated,
-	  fix for parch #3038644: Fix for GCC-4.4 compile error
+	  fix for patch #3038644: Fix for GCC-4.4 compile error
 	* device/include/z80/z180.h, device/include/hc08/mc68hc908apxx.h,
 	  sdcc/device/include/hc08/mc68hc908jkjl.h:
 	  sdcc library license changed to GPL+LE

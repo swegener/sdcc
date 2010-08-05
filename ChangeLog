@@ -6,7 +6,9 @@
 
 2010-08-05 Borut Razem <borut.razem AT siol.net>
 
-	* device/include/mcs51at89S8252.h:
+	* device/include/mcs51at89S8252.h, device/include/mcs51/at89c55.h,
+	  device/include/mcs51/at89x51.h, sdcc/device/include/mcs51/at89x52.h,
+	  device/include/mcs51/ser.h, device/lib/_ser.c:
 	  sdcc library license changed to GPL+LE
 
 2010-08-04 Borut Razem <borut.razem AT siol.net>

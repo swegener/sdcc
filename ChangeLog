@@ -1,3 +1,9 @@
+2010-08-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c,
+	  support/regression/tests/bool.c:
+	  Fixed #3040914.
+
 2010-08-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCerr.c,
@@ -28,7 +34,7 @@
 	* src/SDCCset.c: cosmetic changes
 	* support/regression/tests/bug1994062.c: new, added
 
-010-08-03 Raphael Neider <rneider AT web.de>
+2010-08-03 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/stdio.h,
 	* device/lib/pic16/libc/stdio/putchar.c: resurrect PUTCHAR macro,

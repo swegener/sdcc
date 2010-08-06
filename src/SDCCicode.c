@@ -2576,6 +2576,8 @@ geniCodePostInc (operand * op)
     ic = newiCode ('+', rv, operandFromValue (constFloatVal ("1.0")));
   else if (IS_FIXED16X16 (rvtype))
     ic = newiCode ('+', rv, operandFromValue (constFixed16x16Val ("1.0")));
+  else if (IS_BOOL (rvtype))
+    ic = newiCode ('=', NULL, operandFromLit (1));
   else
     ic = newiCode ('+', rv, operandFromLit (size));
 
@@ -2616,6 +2618,8 @@ geniCodePreInc (operand * op, bool lvalue)
     ic = newiCode ('+', rop, operandFromValue (constFloatVal ("1.0")));
   else if (IS_FIXED16X16 (roptype))
     ic = newiCode ('+', rop, operandFromValue (constFixed16x16Val ("1.0")));
+  else if (IS_BOOL (roptype))
+    ic = newiCode ('=', NULL, operandFromLit (1));
   else
     ic = newiCode ('+', rop, operandFromLit (size));
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
@@ -2666,6 +2670,8 @@ geniCodePostDec (operand * op)
     ic = newiCode ('-', rv, operandFromValue (constFloatVal ("1.0")));
   else if (IS_FIXED16X16 (rvtype))
     ic = newiCode ('-', rv, operandFromValue (constFixed16x16Val ("1.0")));
+  else if (IS_BOOL (rvtype))
+    ic = newiCode ('!', rv, 0);
   else
     ic = newiCode ('-', rv, operandFromLit (size));
 
@@ -2706,6 +2712,8 @@ geniCodePreDec (operand * op, bool lvalue)
     ic = newiCode ('-', rop, operandFromValue (constFloatVal ("1.0")));
   else if (IS_FIXED16X16 (roptype))
     ic = newiCode ('-', rop, operandFromValue (constFixed16x16Val ("1.0")));
+  else if (IS_BOOL (roptype))
+    ic = newiCode ('!', rop, 0);
   else
     ic = newiCode ('-', rop, operandFromLit (size));
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);

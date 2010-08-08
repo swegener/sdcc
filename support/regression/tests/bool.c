@@ -11,33 +11,42 @@
 #include <stdint.h>
 
 #if !defined __SDCC_WEIRD_BOOL
+  #define __SDCC_WEIRD_BOOL 0
+#endif
 
-struct s
-{
-	bool b;
-};
+#if (__SDCC_WEIRD_BOOL < 2)
+  bool ret_true(void)
+  {
+    return(true);
+  }
 
-bool ret_true(void)
-{
-	return(true);
-}
+  bool ret_false(void)
+  {
+    return(false);
+  }
 
-bool ret_false(void)
-{
-	return(false);
-}
+  volatile bool E;
+#endif
 
-bool (* const pa[])(void) = {&ret_true, &ret_false};
+#if (__SDCC_WEIRD_BOOL == 0)
+  bool (* const pa[])(void) = {&ret_true, &ret_false};
 
-volatile bool E;
+  struct s
+  {
+    bool b;
+  };
+#endif
 
 void
 testBool(void)
 {
+#if (__SDCC_WEIRD_BOOL == 0)
 	ASSERT(true);
 	ASSERT((*(pa[0]))() == true);
 	ASSERT((*(pa[1]))() == false);
+#endif
 
+#if (__SDCC_WEIRD_BOOL < 2)
 	E = true;
 	ASSERT((E ? 1 : 0) == (!(!E)));
 	ASSERT((E += 2) == 1);
@@ -57,16 +66,8 @@ testBool(void)
 	E = true;
 	E++;     ASSERT(E);  // sets E to 1
 	E = false;
-	E--;     ASSERT(E); // sets E to 1-E
+	E--;     ASSERT(E);  // sets E to 1-E
 	E = true;
 	E--;     ASSERT(!E); // sets E to 1-E
-}
-
-#else
-
-void testBool(void)
-{
-}
-
 #endif
-
+}

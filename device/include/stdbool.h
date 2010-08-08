@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -35,7 +35,7 @@
 #if defined (SDCC_hc08) || defined (SDCC_pic14) || defined (SDCC_pic16)
  /* The ports that don't have anything worthy of being bool */
  #define BOOL char
- #define __SDCC_WEIRD_BOOL 1
+ #define __SDCC_WEIRD_BOOL 2
 #elif defined (SDCC_ds390) || defined (SDCC_mcs51) || defined (SDCC_xa51)
  /* The ports that have __bit and use it as an imperfect substitute for bool */
  #define _Bool __bit

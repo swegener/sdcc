@@ -391,15 +391,16 @@ cl_z80::disass(t_addr addr, const char *sep)
 void
 cl_z80::print_regs(class cl_console_base *con)
 {
-  con->dd_printf("SZ-A--P-C  Flags= 0x%02x %3d %c  ",
+  con->dd_printf("SZ-A-PNC  Flags= 0x%02x %3d %c  ",
                  regs.F, regs.F, isprint(regs.F)?regs.F:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",
                  regs.A, regs.A, isprint(regs.A)?regs.A:'.');
-  con->dd_printf("%c%c-%c--%c-%c\n",
+  con->dd_printf("%c%c-%c-%c%c%c\n",
                  (regs.F&BIT_S)?'1':'0',
                  (regs.F&BIT_Z)?'1':'0',
                  (regs.F&BIT_A)?'1':'0',
                  (regs.F&BIT_P)?'1':'0',
+                 (regs.F&BIT_N)?'1':'0',
                  (regs.F&BIT_C)?'1':'0');
   con->dd_printf("BC= 0x%04x [BC]= %02x %3d %c  ",
                  regs.BC, ram->get(regs.BC), ram->get(regs.BC),

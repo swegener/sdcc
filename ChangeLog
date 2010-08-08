@@ -1,3 +1,20 @@
+2010-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sim/ucsim/z80.src/inst.cc (inst_add): moved add_HL_Word to z80mac.h,
+	  (inst_daa, inst_scf, inst_ccf, inst_sub): fixed flags
+	  (inst_jp): fixed JP PO/PE
+	* sim/ucsim/z80.src/inst_ed.cc (inst_ed): fixed flags
+	* sim/ucsim/z80.src/inst_xd.cc (inst_Xd_add): moved add_IX_Word to z80mac.h
+	* sim/ucsim/z80.src/instcl.h: cosmetics
+	* sim/ucsim/z80.src/z80.cc (print_regs): print N flag
+	* sim/ucsim/z80.src/z80mac.h: fixed flags
+	* src/z80/gen.c (genIfxJump): simplified
+	  (genCmp): fixed bug 1757671
+	* device/include/stdbool.h: __SDCC_WEIRD_BOOL==2 for hc08/pic14/pic16
+	* support/regression/tests/bool.c: run test only once,
+	  run half the cases for __bit
+	* support/regression/tests/bug1757671.c: new, added
+
 2010-08-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c,

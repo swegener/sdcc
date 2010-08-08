@@ -1,4 +1,4 @@
-/* avr.src/instcl.h */
+/* z80.src/instcl.h */
 
   virtual int inst_nop(t_mem code);
   virtual int inst_ld(t_mem code);
@@ -94,4 +94,4 @@
   virtual int inst_fdcb_res(t_mem code);
   virtual int inst_fdcb_set(t_mem code);
 
-/* End of avr.src/instcl.h */
+/* End of z80.src/instcl.h */

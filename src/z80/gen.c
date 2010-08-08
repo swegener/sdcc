@@ -4553,6 +4553,7 @@ genIfxJump (iCode * ic, char *jval)
       jlbl = IC_TRUE (ic);
       if (!strcmp (jval, "a"))
         {
+          emit2 ("or a,a");
           inst = "NZ";
         }
       else if (!strcmp (jval, "c"))
@@ -4574,6 +4575,7 @@ genIfxJump (iCode * ic, char *jval)
       else
         {
           /* The buffer contains the bit on A that we should test */
+          emit2 ("bit %s,a", jval);
           inst = "NZ";
         }
     }
@@ -4583,6 +4585,7 @@ genIfxJump (iCode * ic, char *jval)
       jlbl = IC_FALSE (ic);
       if (!strcmp (jval, "a"))
         {
+          emit2 ("or a,a");
           inst = "Z";
         }
       else if (!strcmp (jval, "c"))
@@ -4604,30 +4607,11 @@ genIfxJump (iCode * ic, char *jval)
       else
         {
           /* The buffer contains the bit on A that we should test */
+          emit2 ("bit %s,a", jval);
           inst = "Z";
         }
     }
   /* Z80 can do a conditional long jump */
-  if (!strcmp (jval, "a"))
-    {
-      emit2 ("or a,a");
-    }
-  else if (!strcmp (jval, "c"))
-    {
-    }
-  else if (!strcmp (jval, "nc"))
-    {
-    }
-  else if (!strcmp (jval, "m"))
-    {
-    }
-  else if (!strcmp (jval, "p"))
-    {
-    }
-  else
-    {
-      emit2 ("bit %s,a", jval);
-    }
   emit2 ("jp %s,!tlabel", inst, jlbl->key + 100);
 
   /* mark the icode as generated */
@@ -4921,6 +4905,15 @@ genCmp (operand * left, operand * right,
     }
 
 release:
+  if (sign)
+    {
+      symbol *tlbl = newiTempLabel (NULL);
+      /* check for overflow */
+      emit2 ("jp PO,!tlabel", tlbl->key + 100);
+      emit2 ("xor a,!immedbyte", 0x80);
+      emitLabel (tlbl->key + 100);
+    }
+
   if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
     {
       if (sign)

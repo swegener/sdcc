@@ -9,7 +9,7 @@
  *
  * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
  * some z80 coding from Karl Bongers karl@turbobit.com
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -181,13 +181,6 @@ cl_z80::inst_Xd_ld(t_mem code)
 int
 cl_z80::inst_Xd_add(t_mem code)
 {
-#define add_IX_Word(wr) { \
-      unsigned int tmp; \
-      regs.F &= ~(BIT_A | BIT_N | BIT_C);  /* clear these */ \
-      tmp = (unsigned int)regs_IX_OR_IY + (unsigned int)(wr); \
-      if (tmp > 0xffff) regs.F |= BIT_C; \
-      regs_IX_OR_IY = (unsigned short) tmp; }
-
   switch (code) {
     case 0x09: // ADD IX,BC
       add_IX_Word(regs.BC);

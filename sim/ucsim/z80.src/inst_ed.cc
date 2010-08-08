@@ -3,7 +3,7 @@
  *   ED escaped multi-byte opcodes for Z80.
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -42,7 +42,7 @@ cl_z80::inst_ed_(t_mem code)
   return(resGO);
 }
 
-/******** start CB codes *****************/
+/******** start ED codes *****************/
 int
 cl_z80::inst_ed(void)
 {
@@ -69,11 +69,13 @@ cl_z80::inst_ed(void)
     return(resGO);
     case 0x44: // NEG
       regs.F &= ~(BIT_ALL);  /* clear these */
+      if (regs.A != 0)    regs.F |= BIT_C;
+      if (regs.A == 0x80) regs.F |= BIT_P;
+      if ((regs.A & 0x0F) != 0) regs.F |= BIT_A;
       regs.A -= regs.A;
       regs.F |= BIT_N; /* not addition */
-      if (regs.A == 0) regs.F |= BIT_Z;
-      if (regs.A & 0x80) regs.F |= BIT_S;
-      /* Skip BIT_A for now */
+      if (regs.A == 0)    regs.F |= BIT_Z;
+      if (regs.A & 0x80)  regs.F |= BIT_S;
     return(resGO);
     case 0x45: // RETN (return from non-maskable interrupt)
       pop2(PC);

@@ -4,7 +4,7 @@
  * some z80 code base from Karl Bongers karl@turbobit.com
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -53,7 +53,7 @@ cl_z80::inst_nop(t_mem code)
 /*
  * Load Instruction
  * LD
- * 
+ *
  *----------------------------------------------------------------------------
  */
 
@@ -485,13 +485,6 @@ cl_z80::inst_ex(t_mem code)
 int
 cl_z80::inst_add(t_mem code)
 {
-#define add_HL_Word(wr) { \
-      unsigned int tmp; \
-      regs.F &= ~(BIT_ALL);  /* clear these */ \
-      tmp = (unsigned int)regs.HL + (unsigned int)(wr); \
-      if (tmp > 0xffff) regs.F |= BIT_C; \
-      regs.HL = (unsigned short) tmp; }
-
   switch(code) {
     case 0x09: // ADD HL,BC
       add_HL_Word(regs.BC);
@@ -636,19 +629,25 @@ cl_z80::inst_daa(t_mem code)
      taking the lazy way out for now and just transcribing MH's code.
    */
   unsigned char incr;
+  unsigned char N = regs.F & BIT_N; /* save N */
+  unsigned char C = regs.F & BIT_C; /* save C */
   if ((regs.F & BIT_A) || ((regs.A & 0x0f) > 9))
        incr = 6;
   else incr = 0;
 
-  if ((regs.F & BIT_C) || ((regs.A & 0xf0) > 0x90))
+  if ((regs.F & BIT_C) || ((regs.A & 0xf0) > 0x90) || (regs.A > 0x99))
     incr |= 0x60;
 
   if (regs.F & BIT_N) {  /* not addition */
     sub_A_bytereg(incr);
   } else {
-     if ((regs.A > 0x90) && ((regs.A & 0x0f) >9)) incr |= 0x60;
-     add_A_bytereg(incr);
+    add_A_bytereg(incr);
   }
+  regs.F &= ~(BIT_P | BIT_N);
+  if (parity(regs.A))
+    regs.F |= BIT_P;
+  regs.F |= N; /* restore N */
+  regs.F |= C; /* or with original C */
 
   return(resGO);
 }
@@ -665,6 +664,7 @@ int
 cl_z80::inst_scf(t_mem code)
 {
   /* Set Carry Flag */
+  regs.F &= ~(BIT_A | BIT_N);
   regs.F |= BIT_C;
   return(resGO);
 }
@@ -672,7 +672,10 @@ cl_z80::inst_scf(t_mem code)
 int
 cl_z80::inst_ccf(t_mem code)
 {
-  /* Compliment Carry Flag */
+  /* Complement Carry Flag */
+  regs.F &= ~(BIT_A | BIT_N);
+  if (regs.F & BIT_C)
+    regs.F |= BIT_A;
   regs.F ^= BIT_C;
   return(resGO);
 }
@@ -1221,7 +1224,7 @@ cl_z80::inst_sub(t_mem code)
       }
     break;
     case 0x97: // SUB A
-      regs.A = 0;
+      sub_A_bytereg(regs.A);
     break;
     case 0xD6: // SUB nn
       { unsigned char tmp1;
@@ -1306,7 +1309,7 @@ cl_z80::inst_jp(t_mem code)
     break;
 
     case 0xE2: // JP PO,nnnn
-      if (regs.F & BIT_P) {
+      if (!(regs.F & BIT_P)) {
         PC = fetch2();
       } else {
         jnk = fetch2();
@@ -1317,8 +1320,8 @@ cl_z80::inst_jp(t_mem code)
       PC = regs.HL;
     break;
 
-    case 0xea: // JP PO,nnnn
-      if (!(regs.F & BIT_P)) {
+    case 0xEA: // JP PE,nnnn
+      if (regs.F & BIT_P) {
         PC = fetch2();
       } else {
         jnk = fetch2();
@@ -1333,7 +1336,7 @@ cl_z80::inst_jp(t_mem code)
       }
     break;
 
-    case 0xfa: // JP M,nnnn (sign negative)
+    case 0xFA: // JP M,nnnn (sign negative)
       if (regs.F & BIT_S) {
         PC = fetch2();
       } else {

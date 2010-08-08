@@ -4903,7 +4903,7 @@ genCmp (operand * left, operand * right,
           offset++;
         }
 
-      if (sign)
+      if (sign && !IS_GB)
         {
           symbol *tlbl = newiTempLabel (NULL);
           /* check for overflow, have no idea how to do this on GBZ80 */

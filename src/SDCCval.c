@@ -1342,8 +1342,7 @@ valMult (value * lval, value * rval)
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) * floatFromVal (rval);
-  else
-  if (IS_FIXED16X16 (val->type))
+  else if (IS_FIXED16X16 (val->type))
     SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble(floatFromVal (lval) * floatFromVal (rval));
       /* signed and unsigned mul are the same, as long as the precision of the
          result isn't bigger than the precision of the operands. */
@@ -1507,16 +1506,16 @@ valMinus (value * lval, value * rval)
 
   /* create a new value */
   val = newValue();
-  val->type = val->etype = computeType (lval->etype,
-                                        rval->etype,
-                                        RESULT_TYPE_INT,
-                                        '-');
+  val->type = computeType (lval->etype, rval->etype, RESULT_TYPE_INT, '-');
+  val->etype = getSpec (val->type);
   SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
 
-  if (IS_FLOAT (val->type))
+  if (!IS_SPEC (val->type))
+    SPEC_CVAL (val->etype).v_ulong = (TYPE_TARGET_ULONG) ulFromVal (lval) -
+      (TYPE_TARGET_ULONG) ulFromVal (rval);
+  else if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
-  else
-  if (IS_FIXED16X16 (val->type))
+  else if (IS_FIXED16X16 (val->type))
     SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble( floatFromVal (lval) - floatFromVal (rval) );
   else  if (SPEC_LONG (val->type))
     {

@@ -1,5 +1,11 @@
 2010-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCval.c (valMinus): applied patch from bug 3037889 though not fixed,
+	  thanks Patrik Persson
+	* src/z80/gen.c (genCmp): fixed bug 3041519
+
+2010-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* sim/ucsim/z80.src/inst.cc (inst_add): moved add_HL_Word to z80mac.h,
 	  (inst_daa, inst_scf, inst_ccf, inst_sub): fixed flags
 	  (inst_jp): fixed JP PO/PE

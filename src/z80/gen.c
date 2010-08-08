@@ -4902,18 +4902,18 @@ genCmp (operand * left, operand * right,
           emit2 ("sbc a,%s", aopGet (AOP (right), offset, FALSE));
           offset++;
         }
+
+      if (sign)
+        {
+          symbol *tlbl = newiTempLabel (NULL);
+          /* check for overflow, have no idea how to do this on GBZ80 */
+          emit2 ("jp PO,!tlabel", tlbl->key + 100);
+          emit2 ("xor a,!immedbyte", 0x80);
+          emitLabel (tlbl->key + 100);
+        }
     }
 
 release:
-  if (sign)
-    {
-      symbol *tlbl = newiTempLabel (NULL);
-      /* check for overflow */
-      emit2 ("jp PO,!tlabel", tlbl->key + 100);
-      emit2 ("xor a,!immedbyte", 0x80);
-      emitLabel (tlbl->key + 100);
-    }
-
   if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
     {
       if (sign)

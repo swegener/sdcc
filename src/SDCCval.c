@@ -1506,7 +1506,7 @@ valMinus (value * lval, value * rval)
 
   /* create a new value */
   val = newValue();
-  val->type = computeType (lval->etype, rval->etype, RESULT_TYPE_INT, '-');
+  val->type = computeType (lval->type, rval->type, RESULT_TYPE_INT, '-');
   val->etype = getSpec (val->type);
   SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
 

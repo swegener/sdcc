@@ -482,7 +482,7 @@ vwerror - Output a standard error message with variable number of arguments
 -------------------------------------------------------------------------------
 */
 
-void
+int
 vwerror (int errNum, va_list marker)
 {
   if (_SDCCERRG.out == NULL)
@@ -541,10 +541,12 @@ vwerror (int errNum, va_list marker)
     
         vfprintf (_SDCCERRG.out, ErrTab[errNum].errText,marker);
         fprintf (_SDCCERRG.out, "\n");
+        return 1;
     }
   else
     {
       /* Below the logging level, drop. */
+      return 0;
     }
 }
 
@@ -555,13 +557,15 @@ werror - Output a standard error message with variable number of arguments
 -------------------------------------------------------------------------------
 */
 
-void
+int
 werror (int errNum, ...)
 {
+  int ret;
   va_list marker;
   va_start (marker, errNum);
-  vwerror (errNum, marker);
+  ret = vwerror (errNum, marker);
   va_end (marker);
+  return ret;
 }
 
 /*
@@ -572,22 +576,24 @@ werrorfl - Output a standard error message with variable number of arguments.
 -------------------------------------------------------------------------------
 */
 
-void
+int
 werrorfl (char *newFilename, int newLineno, int errNum, ...)
 {
   char *oldFilename = filename;
   int oldLineno = lineno;
   va_list marker;
+  int ret;
 
   filename = newFilename;
   lineno = newLineno;
 
   va_start (marker,errNum);
-  vwerror (errNum, marker);
+  ret = vwerror (errNum, marker);
   va_end (marker);
 
   filename = oldFilename;
   lineno = oldLineno;
+  return ret;
 }
 
 

@@ -11776,30 +11776,33 @@ genGenPointerSet (operand * right,
   if (AOP_TYPE (result) != AOP_STR)
     {
       _startLazyDPSEvaluation ();
-      /* if this is remateriazable */
+      /* if this is rematerializable */
       if (AOP_TYPE (result) == AOP_IMMD)
         {
           emitcode ("mov", "dptr,%s", aopGet (result, 0, TRUE, FALSE, NULL));
           if (AOP(result)->aopu.aop_immd.from_cast_remat)
-          {
+            {
               MOVB (aopGet (result, AOP_SIZE(result)-1, FALSE, FALSE, NULL));
-          }
+            }
           else
-          {
+            {
               emitcode ("mov",
                         "b,%s + 1", aopGet (result, 0, TRUE, FALSE, NULL));
-          }
+            }
         }
       else
         {                       /* we need to get it byte by byte */
           emitcode ("mov", "dpl,%s", aopGet (result, 0, FALSE, FALSE, NULL));
           emitcode ("mov", "dph,%s", aopGet (result, 1, FALSE, FALSE, NULL));
-          if (options.model == MODEL_FLAT24) {
-            emitcode ("mov", "dpx,%s", aopGet (result, 2, FALSE, FALSE, NULL));
-            emitcode ("mov", "b,%s", aopGet (result, 3, FALSE, FALSE, NULL));
-          } else {
-            emitcode ("mov", "b,%s", aopGet (result, 2, FALSE, FALSE, NULL));
-          }
+          if (options.model == MODEL_FLAT24)
+            {
+              emitcode ("mov", "dpx,%s", aopGet (result, 2, FALSE, FALSE, NULL));
+              emitcode ("mov", "b,%s", aopGet (result, 3, FALSE, FALSE, NULL));
+            }
+          else
+            {
+              emitcode ("mov", "b,%s", aopGet (result, 2, FALSE, FALSE, NULL));
+            }
         }
       _endLazyDPSEvaluation ();
     }
@@ -11854,26 +11857,32 @@ genGenPointerSet (operand * right,
       _endLazyDPSEvaluation ();
     }
 
-  if (pi && AOP_TYPE (result) != AOP_IMMD) {
+  if (pi && AOP_TYPE (result) != AOP_IMMD)
+    {
       _startLazyDPSEvaluation ();
 
-      aopPut (result, "dpl",0);
-      aopPut (result, "dph",1);
-      if (options.model == MODEL_FLAT24) {
-          aopPut (result, "dpx",2);
-          aopPut (result, "b",3);
-      } else {
-          aopPut (result, "b",2);
-      }
+      aopPut (result, "dpl", 0);
+      aopPut (result, "dph", 1);
+      if (options.model == MODEL_FLAT24)
+        {
+          aopPut (result, "dpx", 2);
+          aopPut (result, "b", 3);
+        }
+      else
+        {
+          aopPut (result, "b", 2);
+        }
       _endLazyDPSEvaluation ();
 
       pi->generated=1;
-  } else if (OP_SYMBOL(result)->ruonly && AOP_SIZE(right) > 1 &&
-             (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) {
-
+    }
+  else if (IS_SYMOP (result) && OP_SYMBOL (result)->ruonly && AOP_SIZE (right) > 1 &&
+           (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth))
+    {
       size = AOP_SIZE (right) - 1;
-      while (size--) emitcode ("lcall","__decdptr");
-  }
+      while (size--)
+        emitcode ("lcall","__decdptr");
+    }
   popB (pushedB);
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -11911,18 +11920,18 @@ genPointerSet (iCode * ic, iCode *pi)
     }
 
   /* special case when cast remat */
-  if (p_type == GPOINTER && OP_SYMBOL(result)->remat &&
-      IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode)) {
-          result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
-          type = operandType (result);
-          p_type = DCL_TYPE (type);
-  }
+  if (p_type == GPOINTER && IS_SYMOP (result) && OP_SYMBOL (result)->remat &&
+      IS_CAST_ICODE (OP_SYMBOL (result)->rematiCode))
+    {
+      result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
+      type = operandType (result);
+      p_type = DCL_TYPE (type);
+    }
 
   /* now that we have the pointer type we assign
      the pointer values */
   switch (p_type)
     {
-
     case POINTER:
     case IPOINTER:
       genNearPointerSet (right, result, ic, pi);

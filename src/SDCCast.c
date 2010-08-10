@@ -2550,19 +2550,16 @@ checkPtrCast (sym_link * newType, sym_link *orgType, bool implicit)
                       // no way to set the storage
                       if (IS_LITERAL(orgType))
                         {
-                          werror(W_LITERAL_GENERIC);
-                          errors++;
+                          errors += werror(W_LITERAL_GENERIC);
                         }
                       else
                         {
-                          werror(W_NONPTR2_GENPTR);
-                          errors++;
+                          errors += werror(W_NONPTR2_GENPTR);
                         }
                     }
                   else if (implicit)
                     {
-                      werror(W_INTEGRAL2PTR_NOCAST);
-                      errors++;
+                      errors += werror(W_INTEGRAL2PTR_NOCAST);
                     }
                 }
             }
@@ -2572,8 +2569,7 @@ checkPtrCast (sym_link * newType, sym_link *orgType, bool implicit)
               if (!IS_VOID(getSpec(newType)) &&
                   !(IS_CODEPTR(newType) && IS_FUNC(newType->next) && IS_FUNC(orgType)))
                 {
-                  werror(E_INCOMPAT_TYPES);
-                  errors++;
+                  errors += werror(E_INCOMPAT_TYPES);
                 }
             }
         }
@@ -2598,8 +2594,7 @@ checkPtrCast (sym_link * newType, sym_link *orgType, bool implicit)
                            )
                          )
                         {
-                          werror(E_INCOMPAT_PTYPES);
-                          errors++;
+                          errors += werror(E_INCOMPAT_PTYPES);
                         }
                     }
                 }
@@ -2614,13 +2609,11 @@ checkPtrCast (sym_link * newType, sym_link *orgType, bool implicit)
             {
               if (IS_INTEGRAL(newType))
                 {
-                  werror(W_PTR2INTEGRAL_NOCAST);
-                  errors++;
+                  errors += werror(W_PTR2INTEGRAL_NOCAST);
                 }
               else // shouldn't do that with float, array or structure
                 {
-                  werror(E_INCOMPAT_TYPES);
-                  errors++;
+                  errors += werror(E_INCOMPAT_TYPES);
                 }
             }
         }

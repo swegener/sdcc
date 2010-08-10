@@ -1,3 +1,13 @@
+2010-08-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c: fixed by applying patch from bug 3037889, thanks Patrik
+	  Persson
+	* src/SDCCerr.h,
+	* src/SDCCerr.c (vwerror, werror, werrorfl): return if warning was printed
+	* src/SDCCast.c (checkPtrCast): only print from and to types when warning
+	  or error was printed
+	* support/regression/tests/bug3037889.c: new, added
+
 2010-08-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1757671.c: fixed for 64 bit arch

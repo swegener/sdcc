@@ -281,7 +281,7 @@ vwerror - Output a standard eror message with variable number of arguements
 -------------------------------------------------------------------------------
 */
 
-void vwerror (int errNum, va_list marker);
+int vwerror (int errNum, va_list marker);
 
 /*
 -------------------------------------------------------------------------------
@@ -290,7 +290,7 @@ werror - Output a standard eror message with variable number of arguements
 -------------------------------------------------------------------------------
 */
 
-void werror (int errNum, ... );
+int werror (int errNum, ... );
 
 /*
 -------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ werrorfl - Output a standard eror message with variable number of arguements.
 -------------------------------------------------------------------------------
 */
 
-void werrorfl (char *newFilename, int newLineno, int errNum, ...);
+int werrorfl (char *newFilename, int newLineno, int errNum, ...);
 
 /*
 -------------------------------------------------------------------------------

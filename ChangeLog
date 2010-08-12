@@ -1,3 +1,9 @@
+2010-08-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCloop.c (basicInduction): fixed bug 3034976 with patch 3043854,
+	  thanks Ruud van Silfhout
+	* support/regression/tests/bug3037889.c: added test for bug 3034976
+
 2010-08-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c: fixed by applying patch from bug 3037889, thanks Patrik

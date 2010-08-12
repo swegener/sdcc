@@ -1020,7 +1020,8 @@ basicInduction (region * loopReg, ebbIndex * ebbi)
           if (ic->op != '=')
             continue;
 
-          if (!IS_TRUE_SYMOP (IC_RESULT (ic)) &&
+          if (IS_SYMOP (IC_RESULT (ic)) &&
+              !IS_TRUE_SYMOP (IC_RESULT (ic)) &&
               !OP_SYMBOL (IC_RESULT (ic))->isreqv)
             continue;
 

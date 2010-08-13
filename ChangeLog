@@ -1,3 +1,21 @@
+2010-08-13 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/libc/stdio/fprintf.c,
+	  device/lib/pic16/libc/stdio/printf.c,
+	  device/lib/pic16/libc/stdio/printf_small.c,
+	  device/lib/pic16/libc/stdio/printf_tiny.c,
+	  device/lib/pic16/libc/stdio/putchar.c,
+	  device/lib/pic16/libc/stdio/sprintf.c,
+	  device/lib/pic16/libc/stdio/streams.c,
+	  device/lib/pic16/libc/stdio/strmgpsim.c,
+	  device/lib/pic16/libc/stdio/strmmssp.c,
+	  device/lib/pic16/libc/stdio/strmputchar.c,
+	  device/lib/pic16/libc/stdio/strmusart.c,
+	  device/lib/pic16/libc/stdio/vfprintf.c,
+	  device/lib/pic16/libc/stdio/vprintf.c,
+	  device/lib/pic16/libc/stdio/vsprintf.c:
+	  sdcc library license changed to GPL+LE
+
 2010-08-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCloop.c (basicInduction): fixed bug 3034976 with patch 3043854,

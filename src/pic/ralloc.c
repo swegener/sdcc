@@ -37,10 +37,14 @@ set *dynDirectBitRegs=NULL;
 set *dynInternalRegs=NULL;
 
 
-#define FENTRY2                 1 ? 0 : printf
+#ifdef DEBUG_FENTRY2
+# define FENTRY2        printf
+#else
+# define FENTRY2        1 ? (void)0 : (*(void (*)(const char *, ...))0)
+#endif
 
 /* this should go in SDCCicode.h, but it doesn't. */
-#define IS_REF(op)       (IS_SYMOP(op) && op->operand.symOperand->isref == 1)
+#define IS_REF(op)      (IS_SYMOP(op) && op->operand.symOperand->isref == 1)
 
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */

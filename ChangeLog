@@ -3,6 +3,7 @@
 	* support/regression/tests/bug3037889.c:
 	  testBug3037889() renamed to Bug3037889()
 	  so that the function is compiled but not executed
+	* src/pic/ralloc.c: fixed gcc warnings: statement with no effect
 
 2010-08-13 Borut Razem <borut.razem AT siol.net>
 

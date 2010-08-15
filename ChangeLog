@@ -1,3 +1,7 @@
+2010-08-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asxxsrc/asxxxx.h: changed NCPS to PATH_MAX to fix bug 3041470
+
 2010-08-15 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bug3037889.c:

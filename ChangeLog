@@ -1,3 +1,9 @@
+2010-08-15 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/bug3037889.c:
+	  testBug3037889() renamed to Bug3037889()
+	  so that the function is compiled but not executed
+
 2010-08-13 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libc/stdio/fprintf.c,

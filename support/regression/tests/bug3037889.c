@@ -29,3 +29,11 @@ void Bug3034976 (void)
       *(unsigned char __data *)0 = 0;
     }
 }
+
+/*
+ * dummy test to be executed, to get rid of regression test warning:
+ * Empty function list in ../../../sdcc/support/regression/tests/bug3037889.c!
+ */
+void testDummy (void)
+{
+}

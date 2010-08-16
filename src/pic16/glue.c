@@ -1246,11 +1246,6 @@ pic16emitStaticSeg (memmap * map)
     {
       int size = getSize (sym->type);
 
-      if (size==0)
-        {
-          werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
-        }
-
 #if 0
       fprintf (stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
 CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sname, sym->name, sym->used, SPEC_ABSA (sym->etype), IS_AGGREGATE (sym->type), IS_CODE (sym->etype), IN_CODESPACE (SPEC_OCLS (sym->etype)), IS_CONSTANT (sym->etype), IS_PTR_CONST (sym->etype), SPEC_CONST (sym->etype));
@@ -1261,14 +1256,12 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sn
       if (SPEC_ABSA (sym->etype) && PIC16_IS_CONFIG_ADDRESS (SPEC_ADDR (sym->etype)))
         {
           pic16_assignConfigWordValue (SPEC_ADDR (sym->etype), (int) ulFromVal (list2val (sym->ival)));
-
           continue;
         }
 
       if (SPEC_ABSA (sym->etype) && PIC16_IS_IDLOC_ADDRESS (SPEC_ADDR (sym->etype)))
         {
           pic16_assignIdByteValue (SPEC_ADDR (sym->etype), (char) ulFromVal (list2val (sym->ival)));
-
           continue;
         }
 
@@ -1277,6 +1270,12 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sn
         {
           checkAddSym (&externs, sym);
           continue;
+        }
+
+      /* bail out on incomplete types */
+      if (0 == size)
+        {
+          werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
         }
 
       /* if it is not static add it to the public

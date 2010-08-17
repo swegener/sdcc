@@ -34,8 +34,8 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
-CFLAGS          = @CFLAGS@ @WALL_FLAG@ -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
+CPPFLAGS        = @CPPFLAGS@ -DSDCDB -DNOICE -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
+CFLAGS          = @CFLAGS@ @WALL_FLAG@ $(CPPFLAGS)
 LDFLAGS         = @LDFLAGS@ -lm
 
 OBJDIR = obj
@@ -45,7 +45,7 @@ UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
 ASXXLIB = $(srcdir)/../asxxsrc
-ASXXLIBSRC = asdata.c asexpr.c aslex.c aslist.c asmain.c asnoice.c asout.c assubr.c assym.c sdas.c strcmpi.c
+ASXXLIBSRC = asdbg.c asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c assubr.c assym.c sdas.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
 SRC = z80ext.c z80pst.c z80mch.c z80adr.c

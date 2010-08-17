@@ -1202,7 +1202,7 @@ loop:
 		/* sdas hc08 specific */
 		/* if cdb information then generate the line info */
 		if (cflag && (pass == 1))
-			DefineCDB_Line();
+			DefineSDCC_Line();
 
 		/* JLH: if -j, generate a line number symbol */
 		if (jflag && (pass == 1))

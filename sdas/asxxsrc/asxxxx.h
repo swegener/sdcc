@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include <setjmp.h>
 #include <string.h>
 
-#define VERSION "V02.00 + NoICE + SDCC mods + Flat24 Feb-1999"
+#define VERSION "V02.00 + NoICE + SDCC mods + Flat24"
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #include <unistd.h>
@@ -95,67 +95,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * PATH_MAX
  */
 #include <limits.h>
-#ifndef PATH_MAX			/* POSIX, but not required	*/
+#ifndef PATH_MAX				/* POSIX, but not required	*/
 #if defined(_MSC_VER) || defined(__BORLANDC__)	/* Microsoft C or Borland C*/
 #include <stdlib.h>
 #define PATH_MAX	_MAX_PATH
 #else
-#define PATH_MAX			/* define a reasonable value */
+#define PATH_MAX				/* define a reasonable value */
 #endif
 #endif
 
-#ifdef _WIN32				/* WIN32 native */
+#ifdef _WIN32		/* WIN32 native */
 
 #  define NATIVE_WIN32		1
-#  ifdef __MINGW32__		/* GCC MINGW32 depends on configure */
+#  ifdef __MINGW32__	/* GCC MINGW32 depends on configure */
 #    include "../../sdccconf.h"
 #  else
 #    include "../../sdcc_vc.h"
 #    define PATH_MAX	_MAX_PATH
 #  endif
 
-#else						/* Assume Un*x style system */
+#else			/* Assume Un*x style system */
 #  include "../../sdccconf.h"
 #endif
 
 /*
  * Error definitions
  */
-#define	ER_NONE		0		/* No error */
-#define	ER_WARNING	1		/* Warning */
-#define	ER_ERROR	2		/* Assembly error */
-#define	ER_FATAL	3		/* Fatal error */
+#define	ER_NONE		0	/* No error */
+#define	ER_WARNING	1	/* Warning */
+#define	ER_ERROR	2	/* Assembly error */
+#define	ER_FATAL	3	/* Fatal error */
 
 /*
  * Assembler definitions.
  */
-#define LFTERM	'('			/* Left expression delimeter */
-#define RTTERM	')'			/* Right expression delimeter */
+#define LFTERM	'('		/* Left expression delimeter */
+#define RTTERM	')'		/* Right expression delimeter */
 
 #define NCPS	PATH_MAX	/* Characters per symbol */
 #define ASXXXX_HUGE 1000	/* A huge number */
-#define NERR	3			/* Errors per line */
+#define NERR	3		/* Errors per line */
 #define NINPUT	1024		/* Input buffer size */
-#define NCODE	128			/* Listing code buffer size */
-#define NTITL	80			/* Title buffer size */
-#define NSBTL	80			/* SubTitle buffer size */
-#define NHASH	64			/* Buckets in hash table */
-#define HMASK	077			/* Hash mask */
-#define NLPP	60			/* Lines per page */
-#define MAXFIL	6			/* Maximum command line input files */
-#define MAXINC	6			/* Maximum nesting of include files */
-#define MAXIF	10			/* Maximum nesting of if/else/endif */
-#define FILSPC	256			/* Chars. in filespec */
+#define NCODE	128		/* Listing code buffer size */
+#define NTITL	80		/* Title buffer size */
+#define NSBTL	80		/* SubTitle buffer size */
+#define NHASH	64		/* Buckets in hash table */
+#define HMASK	077		/* Hash mask */
+#define NLPP	60		/* Lines per page */
+#define MAXFIL	6		/* Maximum command line input files */
+#define MAXINC	6		/* Maximum nesting of include files */
+#define MAXIF	10		/* Maximum nesting of if/else/endif */
+#define FILSPC	256		/* Chars. in filespec */
 
-#define NLIST	0			/* No listing */
-#define SLIST	1			/* Source only */
-#define ALIST	2			/* Address only */
-#define BLIST	3			/* Address only with allocation */
-#define CLIST	4			/* Code */
-#define ELIST	5			/* Equate only */
+#define NLIST	0		/* No listing */
+#define SLIST	1		/* Source only */
+#define ALIST	2		/* Address only */
+#define BLIST	3		/* Address only with allocation */
+#define CLIST	4		/* Code */
+#define ELIST	5		/* Equate only */
 
-#define dot	sym[0]			/* Dot, current loc */
-#define dca	area[0]			/* Dca, default code area */
+#define dot	sym[0]		/* Dot, current loc */
+#define dca	area[0]		/* Dca, default code area */
 
 
 /* NB: for Flat24 extentions to work, a_uint must be at least 24
@@ -664,9 +664,9 @@ extern	VOID		out_t24(int);
 extern	VOID		outr19(struct expr *, int, int);
 extern	VOID		outdp(struct area *, struct expr *);
 
-/* asnoice.c */
-extern void DefineNoICE_Line(void);
-extern void DefineCDB_Line(void);
+/* asdbg */
+extern	VOID		DefineNoICE_Line(void);
+extern	VOID		DefineSDCC_Line(void);
 /* end sdas specific */
 
 /* Machine dependent functions */
@@ -701,9 +701,9 @@ extern	VOID		out_t24();
 extern	VOID		outr19(t);
 extern	VOID		outdp();
 
-/* asnoice.c */
-extern void DefineNoICE_Line();
-extern void DefineCDB_Line();
+/* asdbg */
+extern	VOID		DefineNoICE_Line();
+extern	VOID		DefineSDCC_Line();
 /* end sdas specific */
 
 /* Machine dependent functions */

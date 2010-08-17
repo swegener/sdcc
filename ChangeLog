@@ -1,3 +1,10 @@
+2010-08-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/as_hc08.dsp,
+	* sdas/as8051/asx8051.dsp,
+	* sdas/asgb/asgb.dsp,
+	* sdas/asz80/as_z80.dsp: asnoice.c renamed to asdbg.c (sync with asxxxx)
+
 2010-08-17 Borut Razem <borut.razem AT siol.net>
 
 	* sdas/as8051/Makefile.in, sdas/asz80/Makefile.in,
@@ -12,7 +19,8 @@
 	  use dbuf to dynamically allocate debug symbol
 	* sdas/linksrc/aslink.h:
 	  changed NCPS to PATH_MAX - quick & dirty fix for asld part of bug 3041470;
-	  proper solution would be support of arbitrary inetifier lenght using dynamic buffers
+	  proper solution would be support of arbitrary identifier length using
+	  dynamic buffers
 
 2010-08-16 Raphael Neider <rneider AT web.de>
 

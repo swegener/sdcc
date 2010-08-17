@@ -132,7 +132,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define LFTERM	'('		/* Left expression delimeter */
 #define RTTERM	')'		/* Right expression delimeter */
 
-#define NCPS	PATH_MAX	/* Characters per symbol */
+#define NCPS	80		/* Characters per symbol */
 #define ASXXXX_HUGE 1000	/* A huge number */
 #define NERR	3		/* Errors per line */
 #define NINPUT	1024		/* Input buffer size */

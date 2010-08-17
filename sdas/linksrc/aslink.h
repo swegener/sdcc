@@ -123,7 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * relocatable binary file.
  */
 
-#define NCPS	80		/* characters per symbol */
+#define NCPS	PATH_MAX	/* characters per symbol */
 #define NDATA	16		/* actual data */
 #define NINPUT	PATH_MAX	/* Input buffer size */
 #define NHASH	64		/* Buckets in hash table */

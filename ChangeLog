@@ -4,11 +4,15 @@
 	  sdas/as6808/Makefile.in, sdas/asgb/Makefile.in:
 	  asnoice.c renamed to asdbg.c (sync with asxxxx)
 	* sdas/asxxsrc/asxxxx.h:
+	  reverted fix for bug 3041470,
 	  DefineCDB_Line() renamed to DefineSDCC_Line() (sync with asxxxx)
 	* sdas/asxxsrc/asmain.c:
 	  DefineCDB_Line() renamed to DefineSDCC_Line() (sync with asxxxx)
-	* asxxsrc/asdbg.c: renamed from asxxsrc/asnoice.c,
+	* sdas/asxxsrc/asdbg.c: renamed from asxxsrc/asnoice.c,
 	  use dbuf to dynamically allocate debug symbol
+	* sdas/linksrc/aslink.h:
+	  changed NCPS to PATH_MAX - quick & dirty fix for asld part of bug 3041470;
+	  proper solution would be support of arbitrary inetifier lenght using dynamic buffers
 
 2010-08-16 Raphael Neider <rneider AT web.de>
 

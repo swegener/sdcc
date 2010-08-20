@@ -1,3 +1,16 @@
+2010-08-20 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/adc.h,
+	* device/include/pic16/pic18fam.h,
+	* device/include/pic16/usart.h,
+	* device/lib/pic16/libio/adc/*.c,
+	* device/lib/pic16/libio/usart/*.c
+	* doc/sdccman.lyx,
+	* support/scripts/inc2h-pic16.pl,
+	* support/scripts/pic18fam-h-gen.pl: automatized device I/O style
+	  classification, provide USART initialization for more devices,
+	  addresses item 2 from #1631532.
+
 2010-08-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/as_hc08.dsp,

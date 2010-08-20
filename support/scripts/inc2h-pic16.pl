@@ -20,9 +20,19 @@ use strict;
 # 5. either
 #    (a) adjust $SDCC/device/lib/pic16/libio/*.ignore
 #        if the device does not support ADC, I2C, or USART
-#        OR
-#    (b) adjust $SDCC/device/include/pic16/adc.h
-#        adding the new device to the correct ADC style class
+#        --- OR ---
+#    (b) adjust
+#          * SDCC/scripts/pic18fam-h-gen.pl
+#          * SDCC/device/include/pic16/adc.h (if required)
+#          * SDCC/device/include/pic16/usart.h (if required)
+#          * SDCC/device/lib/pic16/libio/*/* (if required)
+#        to add the new device to the appropriate I/O style
+#        and implement new styles (if required).
+#
+#        Having modified pic18fam-h-gen.pl, you need to run the
+#        script to generate pic18fam.h.gen, which in turn must
+#        then replace your .../include/pic16/pic18fam.h to take
+#        effect; see pic18fam-h-gen.pl for usage information.
 # 6. edit $SDCC/device/include/pic16/pic18fregs.h
 # 7. edit $SDCC/device/include/pic16/pic16devices.txt
 #

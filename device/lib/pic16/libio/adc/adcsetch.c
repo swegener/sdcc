@@ -32,17 +32,17 @@
 
 void adc_setchannel(unsigned char channel)
 {
-#if defined(__SDCC_ADC_STYLE242)
+#if (__SDCC_ADC_STYLE == 1802420)
   ADCON0 = (ADCON0 & ~(0x07 << 3)) | ((channel & 0x07) << 3);
-#elif defined(__SDCC_ADC_STYLE1220)
+#elif (__SDCC_ADC_STYLE == 1812200)
   ADCON0 = (ADCON0 & ~(0x07 << 2)) | ((channel & 0x07) << 2);
-#elif defined(__SDCC_ADC_STYLE13K50)
+#elif (__SDCC_ADC_STYLE == 1813502)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
-#elif defined(__SDCC_ADC_STYLE2220)
+#elif (__SDCC_ADC_STYLE == 1822200)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
-#elif defined(__SDCC_ADC_STYLE24J50)
+#elif (__SDCC_ADC_STYLE == 1824501)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
-#elif defined(__SDCC_ADC_STYLE65J50)
+#elif (__SDCC_ADC_STYLE == 1865501)
   WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
 #else /* unsupported ADC style */

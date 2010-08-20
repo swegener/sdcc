@@ -32,7 +32,7 @@
 
 void adc_close(void)
 {
-#if defined(__SDCC_ADC_STYLE65J50)
+#if (__SDCC_ADC_STYLE == 1865501)
   WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
 #endif
   ADCON0bits.ADON = 0;

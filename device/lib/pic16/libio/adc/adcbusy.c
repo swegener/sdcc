@@ -32,24 +32,24 @@
 
 char adc_busy(void) __naked
 {
-#if defined(__SDCC_ADC_STYLE65J50)
+#if (__SDCC_ADC_STYLE == 1865501)
   WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
 #endif
 #if 0
   return (ADCON0bits.GO);
 #else
-#if defined(__SDCC_ADC_STYLE242)
+#if (__SDCC_ADC_STYLE == 1802420)
   __asm
     movlw       0x00
     btfsc       _ADCON0bits, 2
     addlw       0x01
     return
   __endasm;
-#elif defined(__SDCC_ADC_STYLE1220) \
-   || defined(__SDCC_ADC_STYLE13K50) \
-   || defined(__SDCC_ADC_STYLE2220) \
-   || defined(__SDCC_ADC_STYLE24J50) \
-   || defined(__SDCC_ADC_STYLE65J50)
+#elif (__SDCC_ADC_STYLE == 1812200) \
+   || (__SDCC_ADC_STYLE == 1813502) \
+   || (__SDCC_ADC_STYLE == 1822200) \
+   || (__SDCC_ADC_STYLE == 1824501) \
+   || (__SDCC_ADC_STYLE == 1865501)
   __asm
     movlw       0x00
     btfsc       _ADCON0bits, 1

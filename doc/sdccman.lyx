@@ -44813,8 +44813,13 @@ Create picDEVICE.c and picDEVICE.h from pDEVICE.inc using
 
 
 \family typewriter
-perl /path/to/sdcc/support/scripts/inc2h-pic16.pl /path/to/gputils/header/pDEVICE.
-inc
+perl /path/to/sdcc/support/scripts/inc2h-pic16.pl 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+/path/to/gputils/header/pDEVICE.inc
 \end_layout
 
 \begin_layout Enumerate
@@ -44842,26 +44847,99 @@ Note: No 18f prefix here!
 \end_layout
 
 \begin_layout Enumerate
-Edit 
-\family typewriter
-/path/to/sdcc/device/include/pic16/adc.h
-\begin_inset Newline newline
-\end_inset
-
-
-\family default
-Add the new devices to the correct ADC style class (depending on the number
- of ADC channels).
-\begin_inset Newline newline
-\end_inset
-
-Do not touch 
-\family typewriter
-adc.h
-\family default
- if the device does not offer any ADC at all.
+Either
 \end_layout
 
+\begin_deeper
+\begin_layout Enumerate
+add the new device to 
+\family typewriter
+/path/to/sdcc/device/lib/pic16/libio/*.ignore
+\family default
+ to suppress building any of the I/O libraries for the new device
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In fact, the 
+\family typewriter
+.ignore
+\family default
+ files are only used when auto-generating 
+\family typewriter
+Makefile.am
+\family default
+ from steps 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "enu:pic16-edit-makefile-am"
+
+\end_inset
+
+f using the 
+\family typewriter
+.../libio/mkmk.sh
+\family default
+ script; to actually suppress building the I/O library, you must not include
+ the 
+\family typewriter
+adc/
+\family default
+, 
+\family typewriter
+i2c/
+\family default
+ and 
+\family typewriter
+usart/
+\family default
+ sources in the 
+\family typewriter
+Makefile.am
+\family default
+ in step 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "enu:pic16-edit-libio-makefile-am"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+, or
+\end_layout
+
+\begin_layout Enumerate
+add the device (family) to 
+\family typewriter
+/path/to/sdcc/support/scripts/pic18fam-h-gen.pl
+\family default
+ to assign I/O styles, run the 
+\family typewriter
+pic18fam-h-gen.pl
+\family default
+ script to generate 
+\family typewriter
+pic18fam.h.gen
+\family default
+, replace your existing 
+\family typewriter
+pic18fam.h
+\family default
+ with the generated file, and (if required) implement new I/O styles in
+ 
+\family typewriter
+/path/to/sdcc/device/include/pic16/{adc,i2c,usart}.h
+\family default
+ and 
+\family typewriter
+/path/to/sdcc/device/lib/pic16/libio/*/*.
+\end_layout
+
+\end_deeper
 \begin_layout Enumerate
 Edit 
 \family typewriter
@@ -44919,6 +44997,12 @@ Copy and modify an existing entry or create a new one and insert it at the
 \end_layout
 
 \begin_layout Enumerate
+\begin_inset CommandInset label
+LatexCommand label
+name "enu:pic16-edit-makefile-am"
+
+\end_inset
+
 Add the device to 
 \family typewriter
 /path/to/sdcc/device/lib/pic16/libdev/Makefile.am
@@ -44931,6 +45015,12 @@ Copy an existing entry and adjust the device name.
 \end_layout
 
 \begin_layout Enumerate
+\begin_inset CommandInset label
+LatexCommand label
+name "enu:pic16-edit-libio-makefile-am"
+
+\end_inset
+
 Add the device to 
 \family typewriter
 /path/to/sdcc/device/lib/pic16/libio/Makefile.am
@@ -44947,14 +45037,18 @@ If the new device does not offer ADC, I
 \begin_inset Formula $^{\text{2}}$
 \end_inset
 
-C, and/or (E)USART functionality as assumed by the library, remove the lines
- with references to 
+C, and/or (E)USART functionality as assumed by the library, or if you added
+ the new device to 
+\family typewriter
+.../libio/{adc,i2c,usart}.ignore
+\family default
+, remove the lines with references to 
 \family typewriter
 adc/*.c
 \family default
 , 
 \family typewriter
-usart/*.c
+i2c/*.c
 \family default
 , or 
 \family typewriter

@@ -178,71 +178,16 @@
  *   6                  -
  *   7                  ADFM
  */
+#include "pic18fam.h"
 
-/* 18f242-style */
-#if    defined(pic18f242) || defined(pic18f252) || defined(pic18f442) || defined(pic18f452) \
-    || defined(pic18f248) || defined(pic18f258) || defined(pic18f448) || defined(pic18f458)
-
-#define __SDCC_ADC_STYLE242     1
-
-/* 18f1220-style */
-#elif  defined(pic18f1220) || defined(pic18f1320)
-
-#define __SDCC_ADC_STYLE1220    1
-
-/* 18f13k50-style */
-#elif  defined(pic18f13k50) || defined(pic18f14k50)
-
-#define __SDCC_ADC_STYLE13K50   1
-
-/* 18f2220-style, ordered by device family */
-#elif  defined(pic18f2220) || defined(pic18f2320) || defined(pic18f4220) || defined(pic18f4320) \
-    || defined(pic18f2221) || defined(pic18f2321) || defined(pic18f4221) || defined(pic18f4321) \
-    || defined(pic18f23k20) || defined(pic18f24k20) || defined(pic18f25k20) || defined(pic18f26k20) \
-    || defined(pic18f2410) || defined(pic18f2510) || defined(pic18f4410) || defined(pic18f4510) \
-    || defined(pic18f2420) || defined(pic18f2520) || defined(pic18f4420) || defined(pic18f4520) \
-    || defined(pic18f2423) || defined(pic18f2523) || defined(pic18f4423) || defined(pic18f4523) \
-    || defined(pic18f2450) || defined(pic18f4450) \
-    || defined(pic18f2455) || defined(pic18f2550) || defined(pic18f4455) || defined(pic18f4550) \
-    || defined(pic18f2480) || defined(pic18f2580) || defined(pic18f4480) || defined(pic18f4580) \
-    || defined(pic18f24j10) || defined(pic18f25j10) || defined(pic18f44j10) || defined(pic18f45j10) \
-    || defined(pic18f2515) || defined(pic18f2610) || defined(pic18f4515) || defined(pic18f4610) \
-    || defined(pic18f2525) || defined(pic18f2620) || defined(pic18f4525) || defined(pic18f4620) \
-    || defined(pic18f2585) || defined(pic18f2680) || defined(pic18f4585) || defined(pic18f4680) \
-    || defined(pic18f2682) || defined(pic18f2685) || defined(pic18f4682) || defined(pic18f4685) \
-    || defined(pic18f43k20) || defined(pic18f44k20) || defined(pic18f45k20) || defined(pic18f46k20) \
-    || defined(pic18f6520) || defined(pic18f6620) || defined(pic18f6720) \
-    || defined(pic18f6527) || defined(pic18f6622) || defined(pic18f6627) || defined(pic18f6722) \
-    || defined(pic18f6585) || defined(pic18f6680) || defined(pic18f8585) || defined(pic18f8680) \
-    || defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
-    || defined(pic18f8520) || defined(pic18f8620) || defined(pic18f8720) \
-    || defined(pic18f8527) || defined(pic18f8622) || defined(pic18f8627) || defined(pic18f8722) \
-    || defined(pic18f86j60) || defined(pic18f86j65) || defined(pic18f87j60) \
-    || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60) \
-
-#define __SDCC_ADC_STYLE2220    1
-
-/* 18f24j50-style */
-#elif  defined(pic18f24j50) || defined(pic18f25j50) || defined(pic18f26j50) \
-    || defined(pic18f44j50) || defined(pic18f45j50) || defined(pic18f46j50)
-
-#define __SDCC_ADC_STYLE24J50   1
-
-/* 18f65j50-style */
-#elif defined(pic18f65j50) || defined(pic18f66j50) || defined(pic18f66j55) || defined(pic18f67j50) \
-   || defined(pic18f85j50) || defined(pic18f86j50) || defined(pic18f86j55) || defined(pic18f87j50) \
-
-#define __SDCC_ADC_STYLE65J50   1
-
-#else /* unknown device */
-
-#error Device ADC style is unknown, please update your adc.h manually and/or inform the maintainer!
-
-#endif
 
 
 /* Port configuration (PCFG (and VCFG) field(s) in ADCON1) */
-#if defined(__SDCC_ADC_STYLE242)
+#if (__SDCC_ADC_STYLE == 0)
+
+#warning The target device is not supported by the SDCC PIC16 ADC library.
+
+#elif (__SDCC_ADC_STYLE == 1802420)
 
 #define ADC_CFG_8A_0R   0x00
 #define ADC_CFG_7A_1R   0x01
@@ -260,7 +205,7 @@
 #define ADC_CFG_1A_0R   0x0e
 #define ADC_CFG_1A_2R   0x0f
 
-#elif defined(__SDCC_ADC_STYLE1220)
+#elif (__SDCC_ADC_STYLE == 1812200)
 
 /*
  * These devices use a bitmask in ADCON1 to configure AN0..AN6
@@ -281,7 +226,7 @@
 #define ADC_CFG_1A      0x3e
 #define ADC_CFG_0A      0x3f
 
-#elif defined(__SDCC_ADC_STYLE13K50)
+#elif (__SDCC_ADC_STYLE == 1813502)
 
 /*
  * These devices use a bitmask in ANSEL/H to configure
@@ -313,7 +258,7 @@
 #define ADC_CFG_1A      0x0001
 #define ADC_CFG_0A      0x0000
 
-#elif defined(__SDCC_ADC_STYLE2220)
+#elif (__SDCC_ADC_STYLE == 1822200)
 
 /*
  * The reference voltage configuration should be factored out into
@@ -397,7 +342,7 @@
 #define ADC_CFG_01A_2R  0x3e
 #define ADC_CFG_00A_0R  0x0f
 
-#elif defined(__SDCC_ADC_STYLE24J50) || defined(__SDCC_ADC_STYLE65J50)
+#elif (__SDCC_ADC_STYLE == 1824501) || (__SDCC_ADC_STYLE == 1865501)
 
 /*
  * These devices use a bitmask in ANCON0/1 to configure
@@ -433,33 +378,35 @@
 
 #error No supported ADC style selected.
 
-#endif  /* ADC_STYLE */
+#endif  /* __SDCC_ADC_STYLE */
 
 
 
-/* initialize AD module */
-#if    defined(__SDCC_ADC_STYLE13K50) \
-    || defined(__SDCC_ADC_STYLE24J50) \
-    || defined(__SDCC_ADC_STYLE65J50)
-void adc_open(unsigned char channel, unsigned char fosc, unsigned int pcfg, unsigned char config);
+#if    (__SDCC_ADC_STYLE == 1813502) \
+    || (__SDCC_ADC_STYLE == 1824501) \
+    || (__SDCC_ADC_STYLE == 1865501)
+typedef unsigned int sdcc_pcfg_t;
 #else /* other styles */
-void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config);
+typedef unsigned char sdcc_pcfg_t;
 #endif
 
+/* initialize AD module */
+void adc_open (unsigned char channel, unsigned char fosc, sdcc_pcfg_t pcfg, unsigned char config);
+
 /* shutdown AD module */
-void adc_close(void);
+void adc_close (void);
 
 /* begin a conversion */
-void adc_conv(void);
+void adc_conv (void);
 
 /* return 1 if AD is performing a conversion, 0 if done */
-char adc_busy(void) __naked;
+char adc_busy (void) __naked;
 
 /* get value of conversion */
-int adc_read(void) __naked;
+int adc_read (void) __naked;
 
 /* setup conversion channel */
-void adc_setchannel(unsigned char channel);
+void adc_setchannel (unsigned char channel);
 
 #endif
 

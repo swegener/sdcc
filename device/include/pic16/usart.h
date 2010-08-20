@@ -50,6 +50,94 @@
 #define USART_SYNCH_MODE  0xff
 #define USART_ASYNCH_MODE 0xfe
 
+/*
+ * USART styles:
+ *
+ * --- Families with 1 USART ---
+ *
+ * INIT:
+ *      RCSTA<7> = 1    (SPEN)
+ *      TXSTA<4> = 0    (SYNC)
+ *      TXSTA<5> = 1    (TXEN)
+ *
+ * 18f1220:
+ *      RB1/AN5/TX and RB4/AN6/RX
+ *
+ *      TRISB<1> = TRISB<4> = 1 (TX, RX)
+ *      ADCON1<5> = ADCON1<6> = 1 (PCFG<5>, PCFG<6>)
+ *      SPBRGH:SPBRG
+ *
+ * 18f13k50:
+ *      RB7/TX and RB5/AN11/RX
+ *
+ *      TRISB<7> = TRISB<5> = 1 (TX, RX)
+ *      ANSELH<3> = 0 (ANS11/RX)
+ *      SPBRGH:SPBRG
+ *
+ * 18f2220:
+ *      RC6/TX and RC7/RX
+ *
+ *      TRISC<6> = 0    (TX)
+ *      TRISC<7> = 1    (RX)
+ *      SPBRG
+ *
+ * 18f2221/18f2331/18f23k20/18f2410/18f2420/18f2423/18f2455/18f24j10/18f2525:
+ *      RC6/TX and RC7/RX
+ *
+ *      TRISC<6> = TRISC<7> = 1 (TX, RX)
+ *      SPBRGH:SPBRG
+ *
+ * 18f2450/18f2480/18f2585/18f2682:
+ *      RC6/TX and RC7/RX
+ *
+ *      TRISC<6> = 0    (TX)
+ *      TRISC<7> = 1    (RX)
+ *      SPBRGH:SPBRG
+ *
+ * --- Families with 2+ USARTs ---
+ *
+ * INIT:
+ *      RCSTA1<7> = 1   (SPEN)
+ *      TXSTA1<4> = 0   (SYNC)
+ *      TXSTA1<5> = 1   (TXEN)
+ *
+ * 18f24j50/18f6527/18f65j50/18f66j60:
+ *      RC6/TX1 and RC7/RX1 (EUSART1)
+ *
+ *      TRISC<6> = 0    (TX1)
+ *      TRISC<7> = 1    (RX1)
+ *      SPBRGH1:SPBRG1
+ *
+ * 18f6520:
+ *      RC6/TX1 and RC7/RX1 (EUSART1)
+ *
+ *      TRISC<6> = 0    (TX1)
+ *      TRISC<7> = 1    (RX1)
+ *      SPBRG1
+ *
+ */
+#include "pic18fam.h"
+
+#if (__SDCC_USART_STYLE == 0)
+#warning The target device is not supported by the SDCC PIC16 USART library.
+#endif
+
+#if    (__SDCC_PIC16_FAMILY == 1822200) \
+    || (__SDCC_PIC16_FAMILY == 1802420) \
+    || (__SDCC_PIC16_FAMILY == 1802480) \
+    || (__SDCC_PIC16_FAMILY == 1865200) \
+    || (__SDCC_PIC16_FAMILY == 1865850)
+#define __SDCC_NO_SPBRGH        1
+#endif  /* device lacks SPBRGH */
+
+
+#if __SDCC_NO_SPBRGH
+typedef unsigned char sdcc_spbrg_t;
+#else   /* !__SDCC_NO_SPBRGH */
+typedef unsigned int sdcc_spbrg_t;
+#endif  /* !__SDCC_NO_SPBRGH */
+
+
 /* status bits */
 union USART
 {
@@ -64,19 +152,19 @@ union USART
   };
 };
 
-void usart_open(unsigned char config, unsigned int spbrg) __wparam;
-void usart_close(void);
+void usart_open (unsigned char config, sdcc_spbrg_t spbrg) __wparam;
+void usart_close (void);
 
-unsigned char usart_busy(void) __naked;
-unsigned char usart_drdy(void) __naked;
+unsigned char usart_busy (void) __naked;
+unsigned char usart_drdy (void) __naked;
 
-unsigned char usart_getc(void);
-void usart_gets(RAM_SCLS char *buffer, unsigned char len);
+unsigned char usart_getc (void);
+void usart_gets (RAM_SCLS char * buffer, unsigned char len);
 
-void usart_putc(unsigned char data) __wparam __naked;
-void usart_puts(char *data);
+void usart_putc (unsigned char data) __wparam __naked;
+void usart_puts (char * data);
 
 
-void usart_baud(unsigned char baudconfig) __wparam;
+void usart_baud (sdcc_spbrg_t baudconfig) __wparam;
 
 #endif

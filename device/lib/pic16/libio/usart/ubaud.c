@@ -34,7 +34,11 @@
 #include <pic18fregs.h>
 #include <usart.h>
 
-void usart_baud(unsigned char baudconfig) __wparam
+void
+usart_baud (sdcc_spbrg_t baudconfig) __wparam
 {
+#if !__SDCC_NO_SPBRGH
+    SPBRGH = (baudconfig >> 8);
+#endif  /* !__SDCC_NO_SPBRGH */
     SPBRG = baudconfig;
 }

@@ -38,48 +38,43 @@
  *   config:  ADC_FRM_* | ADC_INT_* | ADC_VCFG_* | ADC_NVCFG_* | ADC_PVCFG_*
  */
 
-#if    defined(__SDCC_ADC_STYLE13K50) \
-    || defined(__SDCC_ADC_STYLE24J50) \
-    || defined(__SDCC_ADC_STYLE65J50)
-void adc_open(unsigned char channel, unsigned char fosc, unsigned int pcfg, unsigned char config)
-#else /* other styles */
-void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config)
-#endif
+void
+adc_open(unsigned char channel, unsigned char fosc, sdcc_pcfg_t pcfg, unsigned char config)
 {
   /* disable ADC */
-#if defined(__SDCC_ADC_STYLE65J50)
+#if (__SDCC_ADC_STYLE == 1865501)
   WDTCONbits.ADSHR = 0; /* access ADCON0/1 */
 #endif
   ADCON0 = 0;
 
-#if defined(__SDCC_ADC_STYLE242)
+#if (__SDCC_ADC_STYLE == 1802420)
   ADCON0 = ((channel & 0x07) << 3) | ((fosc & 0x03) << 6);
   ADCON1 = (pcfg & 0x0f) | (config & ADC_FRM_RJUST);
   if (fosc & 0x04) {
     ADCON1bits.ADCS2 = 1;
   }
-#elif defined (__SDCC_ADC_STYLE1220)
+#elif (__SDCC_ADC_STYLE == 1812200)
   ADCON0 = ((channel & 0x07) | (config & ADC_VCFG_AN3_AN2)) << 2;
   ADCON1 = (pcfg & 0x7f);
   ADCON2 = (ADCON2 & 0x38) | (fosc & 0x07) | (config & ADC_FRM_RJUST);
-#elif defined(__SDCC_ADC_STYLE13K50)
+#elif (__SDCC_ADC_STYLE == 1813502)
   ANSEL = pcfg;
   ANSELH = (pcfg >> 8);
   ADCON0 = ((channel & 0x0f) << 2);
   ADCON1 = (config & 0x0f);
   ADCON2 = (config & ADC_FRM_RJUST) | (fosc & 0x3f);
-#elif defined(__SDCC_ADC_STYLE2220)
+#elif (__SDCC_ADC_STYLE == 1822200)
   ADCON0 = (channel & 0x0f) << 2;
   /* XXX: Should be (pcfg & 0x0f) as VCFG comes from config,
    * but we retain compatibility for now ... */
   ADCON1 = (pcfg & 0x3f) | (config & ADC_VCFG_AN3_AN2);
   ADCON2 = (ADCON2 & 0x38) | (fosc & 0x07) | (config & ADC_FRM_RJUST);
-#elif defined(__SDCC_ADC_STYLE24J50)
+#elif (__SDCC_ADC_STYLE == 1824501)
   ANCON0 = pcfg;
   ANCON1 = (pcfg >> 8);
   ADCON0 = ((channel & 0x0f) << 2) | ((config & ADC_VCFG_AN3_AN2) << 2);
   ADCON1 = (config & ADC_FRM_RJUST) | (fosc & 0x7f);
-#elif defined(__SDCC_ADC_STYLE65J50)
+#elif (__SDCC_ADC_STYLE == 1865501)
   WDTCONbits.ADSHR = 1; /* access ANCON0/1 */
   ANCON0 = pcfg;
   ANCON1 = (pcfg >> 8);

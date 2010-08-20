@@ -37,20 +37,24 @@
 
 extern union USART USART_Status;
 
-unsigned char usart_getc(void)
+unsigned char
+usart_getc (void)
 {
   USART_Status.val &= 0xf0;
 
-  if(RCSTAbits.RX9) {
-    USART_Status.RX_NINE = 0;
-    if(RCSTAbits.RX9D)
-      USART_Status.RX_NINE = 1;
-  }
+  if (RCSTAbits.RX9)
+    {
+      USART_Status.RX_NINE = 0;
+      if (RCSTAbits.RX9D)
+        {
+          USART_Status.RX_NINE = 1;
+        }
+    } // if
 
-  if(RCSTAbits.FERR)
+  if (RCSTAbits.FERR)
     USART_Status.FRAME_ERROR = 1;
 
-  if(RCSTAbits.OERR)
+  if (RCSTAbits.OERR)
     USART_Status.OVERRUN_ERROR = 1;
 
   return (RCREG);

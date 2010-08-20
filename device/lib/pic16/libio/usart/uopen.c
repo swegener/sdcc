@@ -38,32 +38,40 @@
 // USART Status Structure
 extern union USART USART_Status;
 
-void usart_open(unsigned char config, unsigned int spbrg) __wparam
+void
+usart_open (unsigned char config, sdcc_spbrg_t spbrg) __wparam
 {
   TXSTA = 0;           // Reset USART registers to POR state
   RCSTA = 0;
 
-  if(config&0x01)TXSTAbits.SYNC = 1;
+  if (config & 0x01)
+    TXSTAbits.SYNC = 1;
 
-  if(config&0x02) {
-    TXSTAbits.TX9 = 1;
-    RCSTAbits.RX9 = 1;
-  }
+  if (config & 0x02)
+    {
+      TXSTAbits.TX9 = 1;
+      RCSTAbits.RX9 = 1;
+    }
 
-  if(config&0x04)TXSTAbits.CSRC = 1;
+  if (config & 0x04)
+    TXSTAbits.CSRC = 1;
 
-  if(config&0x08)RCSTAbits.CREN = 1;
-  else RCSTAbits.SREN = 1;
+  if (config & 0x08)
+    RCSTAbits.CREN = 1;
+  else
+    RCSTAbits.SREN = 1;
 
-  if(config&0x10)TXSTAbits.BRGH = 1;
-  else TXSTAbits.BRGH = 0;
+  if (config & 0x10)
+    TXSTAbits.BRGH = 1;
+  else
+    TXSTAbits.BRGH = 0;
 
   /* TX interrupts */
 #if defined(pic18f66j60) || defined(pic18f66j65) || \
-	defined(pic18f67j60) || defined(pic18f86j60) || \
-	defined(pic18f86j65) || defined(pic18f87j60) || \
-	defined(pic18f96j60) || defined(pic18f96j65) || \
-	defined(pic18f97j60)
+  defined(pic18f67j60) || defined(pic18f86j60) || \
+  defined(pic18f86j65) || defined(pic18f87j60) || \
+  defined(pic18f96j60) || defined(pic18f96j65) || \
+  defined(pic18f97j60)
 
   PIR1bits.TXIF_PIR1 = 0;
 
@@ -73,29 +81,74 @@ void usart_open(unsigned char config, unsigned int spbrg) __wparam
 
 #endif
 
-  if(config&0x40)PIE1bits.RCIE = 1;
-  else PIE1bits.RCIE = 0;
+  if (config & 0x40)
+    PIE1bits.RCIE = 1;
+  else
+    PIE1bits.RCIE = 0;
 
   /* RX interrupts */
   PIR1bits.RCIF = 0;
 
 #if defined(pic18f66j60) || defined(pic18f66j65) || \
-	defined(pic18f67j60) || defined(pic18f86j60) || \
-	defined(pic18f86j65) || defined(pic18f87j60) || \
-	defined(pic18f96j60) || defined(pic18f96j65) || \
-	defined(pic18f97j60)
+  defined(pic18f67j60) || defined(pic18f86j60) || \
+  defined(pic18f86j65) || defined(pic18f87j60) || \
+  defined(pic18f96j60) || defined(pic18f96j65) || \
+  defined(pic18f97j60)
 
-  if(config&0x80)PIE1bits.TXIE_PIE1 = 1;
-  else PIE1bits.TXIE_PIE1 = 0;
+  if (config & 0x80)
+    PIE1bits.TXIE_PIE1 = 1;
+  else
+    PIE1bits.TXIE_PIE1 = 0;
 
 #else   /* all other devices */
 
-  if(config&0x80)PIE1bits.TXIE = 1;
-  else PIE1bits.TXIE = 0;
+  if (config & 0x80)
+    PIE1bits.TXIE = 1;
+  else
+    PIE1bits.TXIE = 0;
 
 #endif
 
-  SPBRG = (char)spbrg;
+#if !__SDCC_NO_SPBRGH
+  SPBRGH = (spbrg >> 8);
+#endif  /* !__SDCC_NO_SPBRGH */
+  SPBRG = spbrg;
+
+#if (__SDCC_USART_STYLE == 1812200)
+  /* Configure RX/TX pins as digital pins. */
+  ADCON1bits.PCFG5 = 1;
+  ADCON1bits.PCFG6 = 1;
+
+  /* Configure RX/TX pins as inputs. */
+  TRISBbits.TRISB1 = 1;
+  TRISBbits.TRISB4 = 1;
+#elif (__SDCC_USART_STYLE == 1813502)
+  /* Configure RX pin as digital pin. */
+  ANSELHbits.ANS11 = 0;
+
+  /* Configure RX/TX pins as inputs. */
+  TRISBbits.TRISB5 = 1;
+  TRISBbits.TRISB7 = 1;
+#elif (__SDCC_USART_STYLE == 1822200)
+  /* Configure RX/TX pins. */
+  TRISCbits.TRISC6 = 0;
+  TRISCbits.TRISC7 = 1;
+#elif (__SDCC_USART_STYLE == 1822210)
+  /* Configure RX/TX pins. */
+  TRISCbits.TRISC6 = 1;
+  TRISCbits.TRISC7 = 1;
+#elif (__SDCC_USART_STYLE == 1824500)
+  /* Configure RX/TX pins. */
+  TRISCbits.TRISC6 = 0;
+  TRISCbits.TRISC7 = 1;
+#elif (__SDCC_USART_STYLE == 1824501) \
+   || (__SDCC_USART_STYLE == 1865200)
+  /* Configure RX1/TX1 pins. */
+  TRISCbits.TRISC6 = 0;
+  TRISCbits.TRISC7 = 1;
+#else /* other devices */
+#error Invalid USART style.
+#endif /* other devices */
 
   TXSTAbits.TXEN = 1;
   RCSTAbits.SPEN = 1;

@@ -2816,12 +2816,12 @@ packRegsForAccUse (iCode * ic)
       uic->op != LEFT_OP &&
       uic->op != RIGHT_OP)
     return;
-
+#if 0
   /* if used in ^ operation then make sure right is not a
      literal (WIML: Why is this?) */
   if (uic->op == '^' && isOperandLiteral (IC_RIGHT (uic)))
     return;
-
+#endif
   /* if shift operation make sure right side is not a literal */
   /* WIML: Why is this? */
   if (uic->op == RIGHT_OP &&

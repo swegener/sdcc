@@ -6829,9 +6829,9 @@ genAnd (iCode * ic, iCode * ifx)
   // result = bit & yy;
   if (AOP_TYPE (left) == AOP_CRY)
     {
-      // c = bit & literal;
       if (AOP_TYPE (right) == AOP_LIT)
         {
+          // c = bit & literal;
           if (lit & 1)
             {
               if (size && sameRegs (AOP (result), AOP (left)))
@@ -7007,9 +7007,11 @@ genAnd (iCode * ic, iCode * ifx)
                   aopPut (result, "a", offset);
                 }
               else
-                emitcode ("anl", "%s,%s",
-                          aopGet (left, offset, FALSE, TRUE),
-                          aopGet (right, offset, FALSE, FALSE));
+                {
+                  emitcode ("anl", "%s,%s",
+                            aopGet (left, offset, FALSE, TRUE),
+                            aopGet (right, offset, FALSE, FALSE));
+                }
             }
           else
             {
@@ -7018,6 +7020,8 @@ genAnd (iCode * ic, iCode * ifx)
                   if (offset)
                     emitcode("mov", "a,b");
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                  if (offset)
+                    emitcode("mov", "b,a");
                 }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
@@ -7041,7 +7045,9 @@ genAnd (iCode * ic, iCode * ifx)
                       aopPut (result, "a", offset);
                     }
                   else
-                    emitcode ("anl", "%s,a", aopGet (left, offset, FALSE, TRUE));
+                    {
+                      emitcode ("anl", "%s,a", aopGet (left, offset, FALSE, TRUE));
+                    }
                 }
             }
         }
@@ -7070,12 +7076,12 @@ genAnd (iCode * ic, iCode * ifx)
               else if (AOP_TYPE(left)==AOP_ACC)
                 {
                   if (!offset)
-                    {
-                      bool pushedB = pushB ();
+                    {//B contains high byte of left
+                      emitcode ("push", "b");
                       emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
                       emitcode("anl", "a,b");
-                      popB (pushedB);
+                      emitcode ("pop", "b");
                     }
                   else
                     {
@@ -7140,18 +7146,10 @@ genAnd (iCode * ic, iCode * ifx)
                     }
                   else if (AOP_TYPE (left) == AOP_ACC)
                     {
-                      if (!offset)
-                        {
-                          emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                          aopPut (result, "a", offset);
-                          continue;
-                        }
-                      else
-                        {
-                          emitcode ("anl", "b,%s", aopGet (right, offset, FALSE, FALSE));
-                          aopPut (result, "b", offset);
-                          continue;
-                        }
+                      char *l = aopGet (left, offset, FALSE, FALSE);
+                      emitcode ("anl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                      aopPut (result, l, offset);
+                      continue;
                     }
                 }
               // faster than result <- left, anl result,right
@@ -7166,12 +7164,12 @@ genAnd (iCode * ic, iCode * ifx)
               else if (AOP_TYPE(left)==AOP_ACC)
                 {
                   if (!offset)
-                    {
-                      bool pushedB = pushB ();
+                    {//B contains high byte of left
+                      emitcode ("push", "b");
                       emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
                       emitcode("anl", "a,b");
-                      popB (pushedB);
+                      emitcode ("pop", "b");
                     }
                   else
                     {
@@ -7241,7 +7239,7 @@ genOr (iCode * ic, iCode * ifx)
       left = tmp;
     }
 
-  /* if result = right then exchange them */
+  /* if result = right then exchange left and right */
   if (sameRegs (AOP (result), AOP (right)))
     {
       operand *tmp = right;
@@ -7420,6 +7418,8 @@ genOr (iCode * ic, iCode * ifx)
                   if (offset)
                     emitcode("mov", "a,b");
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                  if (offset)
+                    emitcode("mov", "b,a");
                 }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
@@ -7474,12 +7474,12 @@ genOr (iCode * ic, iCode * ifx)
               else if (AOP_TYPE(left)==AOP_ACC)
                 {
                   if (!offset)
-                    {
-                      bool pushedB = pushB ();
+                    {//B contains high byte of left
+                      emitcode ("push", "b");
                       emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
                       emitcode("orl", "a,b");
-                      popB (pushedB);
+                      emitcode ("pop", "b");
                     }
                   else
                     {
@@ -7502,7 +7502,7 @@ genOr (iCode * ic, iCode * ifx)
                 {
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (left, offset, FALSE, FALSE));
-              }
+                }
 
               emitcode ("jnz", "%05d$", tlbl->key + 100);
               offset++;
@@ -7542,6 +7542,13 @@ genOr (iCode * ic, iCode * ifx)
                       aopPut (result, "#0xff", offset);
                       continue;
                     }
+                  else if (AOP_TYPE (left) == AOP_ACC)
+                    {// this should be the only use of left so A,B can be overwritten
+                      char *l = aopGet (left, offset, FALSE, FALSE);
+                      emitcode ("orl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                      aopPut (result, l, offset);
+                      continue;
+                    }
                 }
               // faster than result <- left, orl result,right
               // and better if result is SFR
@@ -7555,12 +7562,12 @@ genOr (iCode * ic, iCode * ifx)
               else if (AOP_TYPE(left)==AOP_ACC)
                 {
                   if (!offset)
-                    {
-                      bool pushedB = pushB ();
+                    {//B contains high byte of left
+                      emitcode ("push", "b");
                       emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
                       emitcode("orl", "a,b");
-                      popB (pushedB);
+                      emitcode ("pop", "b");
                     }
                   else
                     {
@@ -7631,7 +7638,7 @@ genXor (iCode * ic, iCode * ifx)
       left = tmp;
     }
 
-  /* if result = right then exchange them */
+  /* if result = right then exchange left and right */
   if (sameRegs (AOP (result), AOP (right)))
     {
       operand *tmp = right;
@@ -7647,7 +7654,6 @@ genXor (iCode * ic, iCode * ifx)
       right = left;
       left = tmp;
     }
-
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
@@ -7659,7 +7665,7 @@ genXor (iCode * ic, iCode * ifx)
     {
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          // c = bit & literal;
+          // c = bit ^ literal;
           if (lit >> 1)
             {
               // lit>>1  != 0 => result = 1
@@ -7773,6 +7779,8 @@ genXor (iCode * ic, iCode * ifx)
                   if (offset)
                     emitcode("mov", "a,b");
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                  if (offset)
+                    emitcode("mov", "b,a");
                 }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
@@ -7796,7 +7804,9 @@ genXor (iCode * ic, iCode * ifx)
                       aopPut (result, "a", offset);
                     }
                   else
-                    emitcode ("xrl", "%s,a", aopGet (left, offset, FALSE, TRUE));
+                    {
+                      emitcode ("xrl", "%s,a", aopGet (left, offset, FALSE, TRUE));
+                    }
                 }
             }
         }
@@ -7831,12 +7841,12 @@ genXor (iCode * ic, iCode * ifx)
               else if (AOP_TYPE(left)==AOP_ACC)
                 {
                   if (!offset)
-                    {
-                      bool pushedB = pushB ();
+                    {//B contains high byte of left
+                      emitcode ("push", "b");
                       emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
                       emitcode("xrl", "a,b");
-                      popB (pushedB);
+                      emitcode ("pop", "b");
                     }
                   else
                     {
@@ -7858,7 +7868,7 @@ genXor (iCode * ic, iCode * ifx)
               else
                 {
                   MOVA (aopGet (right, offset, FALSE, FALSE));
-                  emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, TRUE));
+                  emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, FALSE));
                 }
 
               emitcode ("jnz", "%05d$", tlbl->key + 100);
@@ -7891,6 +7901,13 @@ genXor (iCode * ic, iCode * ifx)
                               offset);
                       continue;
                     }
+                  else if (AOP_TYPE (left) == AOP_ACC)
+                    {// this should be the only use of left so A,B can be overwritten
+                      char *l = aopGet (left, offset, FALSE, FALSE);
+                      emitcode ("xrl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                      aopPut (result, l, offset);
+                      continue;
+                    }
                 }
               // faster than result <- left, xrl result,right
               // and better if result is SFR
@@ -7904,12 +7921,12 @@ genXor (iCode * ic, iCode * ifx)
               else if (AOP_TYPE(left)==AOP_ACC)
                 {
                   if (!offset)
-                    {
-                      bool pushedB = pushB ();
+                    {//B contains high byte of left
+                      emitcode ("push", "b");
                       emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
                       emitcode("xrl", "a,b");
-                      popB (pushedB);
+                      emitcode ("pop", "b");
                     }
                   else
                     {
@@ -7931,7 +7948,7 @@ genXor (iCode * ic, iCode * ifx)
               else
                 {
                   MOVA (aopGet (right, offset, FALSE, FALSE));
-                  emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, TRUE));
+                  emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, FALSE));
                 }
               aopPut (result, "a", offset);
             }
@@ -9301,7 +9318,6 @@ genLeftShift (iCode * ic)
   if (!sameRegs (AOP (left), AOP (result)) &&
       AOP_SIZE (result) > 1)
     {
-
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)

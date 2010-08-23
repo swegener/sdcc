@@ -80,7 +80,7 @@ DefineNoICE_Line (void)
   struct dbuf_s dbuf;
   struct sym *pSym;
 
-        /* symbol is FILE.nnn */
+  /* symbol is FILE.nnn */
   dbuf_init (&dbuf, NCPS);
   dbuf_printf (&dbuf, "%s.%u", BaseFileName (cfile, 0), srcline[cfile]);
 

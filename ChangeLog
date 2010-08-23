@@ -1,3 +1,8 @@
+2010-08-22 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/mcs51/msc1210.h:
+	  sdcc library license changed to GPL+LE
+
 2010-08-20 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/adc.h,
@@ -10,6 +15,13 @@
 	* support/scripts/pic18fam-h-gen.pl: automatized device I/O style
 	  classification, provide USART initialization for more devices,
 	  addresses item 2 from #1631532.
+
+2010-08-18 Borut Razem <borut.razem AT siol.net>
+
+	* sdas/asxxsrc/asdbg.c:
+	  cosmetic change
+	* device/include/malloc.h, device/include/mcs51/serial.h,
+	  device/lib/serial.c: sdcc library license changed to GPL+LE
 
 2010-08-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -31,9 +43,9 @@
 	* sdas/asxxsrc/asdbg.c: renamed from asxxsrc/asnoice.c,
 	  use dbuf to dynamically allocate debug symbol
 	* sdas/linksrc/aslink.h:
-	  changed NCPS to PATH_MAX - quick & dirty fix for asld part of bug 3041470;
-	  proper solution would be support of arbitrary identifier length using
-	  dynamic buffers
+	  changed NCPS to PATH_MAX - quick & dirty fix for asld part of
+	  bug 3041470; proper solution would be support of arbitrary identifier
+	  lenght using dynamic buffers
 
 2010-08-16 Raphael Neider <rneider AT web.de>
 

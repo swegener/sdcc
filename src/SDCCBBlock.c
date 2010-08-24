@@ -30,20 +30,20 @@ int eBBNum = 0;
 set *graphEdges = NULL;         /* list of edges in this flow graph */
 
 struct _dumpFiles dumpFiles[] = {
-  {DUMP_RAW0, ".dumpraw0", NULL},
-  {DUMP_RAW1, ".dumpraw1", NULL},
-  {DUMP_CSE, ".dumpcse", NULL},
-  {DUMP_DFLOW, ".dumpdflow", NULL},
-  {DUMP_GCSE, ".dumpgcse", NULL},
+  {DUMP_RAW0,     ".dumpraw0",     NULL},
+  {DUMP_RAW1,     ".dumpraw1",     NULL},
+  {DUMP_CSE,      ".dumpcse",      NULL},
+  {DUMP_DFLOW,    ".dumpdflow",    NULL},
+  {DUMP_GCSE,     ".dumpgcse",     NULL},
   {DUMP_DEADCODE, ".dumpdeadcode", NULL},
-  {DUMP_LOOP, ".dumploop", NULL},
-  {DUMP_LOOPG, ".dumploopg", NULL},
-  {DUMP_LOOPD, ".dumploopd", NULL},
-  {DUMP_RANGE, ".dumprange", NULL},
-  {DUMP_PACK, ".dumppack", NULL},
-  {DUMP_RASSGN, ".dumprassgn", NULL},
-  {DUMP_LRANGE, ".dumplrange", NULL},
-  {0, NULL, NULL}
+  {DUMP_LOOP,     ".dumploop",     NULL},
+  {DUMP_LOOPG,    ".dumploopg",    NULL},
+  {DUMP_LOOPD,    ".dumploopd",    NULL},
+  {DUMP_RANGE,    ".dumprange",    NULL},
+  {DUMP_PACK,     ".dumppack",     NULL},
+  {DUMP_RASSGN,   ".dumprassgn",   NULL},
+  {DUMP_LRANGE,   ".dumplrange",   NULL},
+  {0,             NULL,            NULL}
 };
 
 /*-----------------------------------------------------------------*/

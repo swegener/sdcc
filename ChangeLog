@@ -1,3 +1,17 @@
+2010-08-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCcse.c (cseBBlock): fixed bug 2686159 with part of patch by Robert
+	  Larice, thanks
+	* src/SDCCBBlock.c,
+	* src/SDCCglobl.h: cosmetic changes
+	* support/regression/tests/bug2686159.c: new, added
+
+2010-08-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genAnd, genOr, genXor): fixed bug 2944399
+	* src/mcs51/ralloc.c (packRegsForAccUse): disabled strange exception
+	* support/regression/tests/bug2944399.c: new, added
+
 2010-08-22 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/msc1210.h:

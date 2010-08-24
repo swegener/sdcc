@@ -1906,8 +1906,7 @@ dumpCseSet(set *cseSet)
 /*             data flow related information is computed by it     */
 /*-----------------------------------------------------------------*/
 int
-cseBBlock (eBBlock * ebb, int computeOnly,
-           ebbIndex * ebbi)
+cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
@@ -2215,10 +2214,14 @@ cseBBlock (eBBlock * ebb, int computeOnly,
         {
           applyToSet (cseSet, findPrevIc, ic, &pdic);
           if (pdic && compareType (operandType (IC_RESULT (pdic)),
-                                 operandType (IC_RESULT (ic))) != 1)
-            pdic = NULL;
-          if (pdic && port->cseOk && (*port->cseOk)(ic,pdic) == 0)
+                                   operandType (IC_RESULT (ic))) != 1)
+            {
               pdic = NULL;
+            }
+          if (pdic && port->cseOk && (*port->cseOk)(ic,pdic) == 0)
+            {
+              pdic = NULL;
+            }
         }
 
       /* Alternate code */
@@ -2307,12 +2310,16 @@ cseBBlock (eBBlock * ebb, int computeOnly,
         }
 
       /* for the result it is special case, put the result */
-      /* in the defuseSet if it a pointer or array access  */
-      if (POINTER_SET (defic) && IS_SYMOP (IC_RESULT (ic)))
+      /* in the defuseSet if it is a pointer or array access */
+      if (POINTER_SET (defic) &&
+		  (IS_SYMOP (IC_RESULT (ic)) || IS_OP_LITERAL (IC_RESULT (ic))))
         {
-          OP_USES(IC_RESULT (ic))=
-            bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
-          setUsesDefs (IC_RESULT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
+          if (IS_SYMOP (IC_RESULT (ic)))
+            {
+              OP_USES(IC_RESULT (ic)) =
+                bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+              setUsesDefs (IC_RESULT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
+            }
           deleteItemIf (&cseSet, ifPointerGet, IC_RESULT (ic));
           ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, IC_RESULT (ic)->key);
           /* delete from inexpressions of all successors which

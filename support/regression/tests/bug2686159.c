@@ -30,9 +30,11 @@ void correct(void)
 
 void testBug(void)
 {
+#ifdef SDCC
 	REG_1 = 0x40;
 	incorrect();
 	ASSERT (REG_1 == 0x43);
+#endif
 	REG_2 = 0x50;
 	correct();
 	ASSERT (REG_2 == 0x53);

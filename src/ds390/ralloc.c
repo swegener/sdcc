@@ -2695,10 +2695,9 @@ packRegsDPTRuse (operand * op)
       if (ic->op == CAST)
         {
           if (!IS_PTR (OP_SYM_TYPE (IC_RESULT (ic))) &&
-              getSize (OP_SYM_TYPE (IC_RESULT (ic))) >
-              getSize (OP_SYM_TYPE (IC_RIGHT (ic))))
+              getSize (OP_SYM_TYPE (IC_RESULT (ic))) > getSize (OP_SYM_TYPE (IC_RIGHT (ic))))
             {
-              return 0;
+              return NULL;
             }
         }
 

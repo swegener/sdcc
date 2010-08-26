@@ -1,3 +1,16 @@
+2010-08-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genCast): fixed bug with ruonly src and dest downcast,
+	  (AOP_IS_STR): replaced thoughout with IS_OP_RUONLY,
+	  synced with mcs51,
+	  (genDjnz): fixed bug 2995824
+	* src/mcs51/gen.c (continueIfTrue, jumpIfTrue, jmpTrueOrFalse, genAnd,
+	  genOr, genXor, genDjnz): fixed bugs 2989562 and 2995824
+	* src/ds390/ralloc.c,
+	* src/SDCC.lex: cosmetic changes
+	* support/regression/tests/bug2686159.c: disabled segfaulting test on host
+	* support/regression/tests/bug2989562.c: new, added
+
 2010-08-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCcse.c (cseBBlock): fixed bug 2686159 with part of patch by Robert

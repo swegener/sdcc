@@ -4813,7 +4813,7 @@ genMinusDec (iCode * ic)
   unsigned int icount;
   unsigned int size = getDataSize (IC_RESULT (ic));
 
-  /* will try to generate an increment */
+  /* will try to generate an decrement */
   /* if the right side is not a literal
      we cannot */
   if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
@@ -6027,8 +6027,7 @@ genCmp (operand * left, operand * right,
   D (emitcode (";", "genCmp"));
 
   /* if left & right are bit variables */
-  if (AOP_TYPE (left) == AOP_CRY &&
-      AOP_TYPE (right) == AOP_CRY)
+  if (AOP_TYPE (left) == AOP_CRY && AOP_TYPE (right) == AOP_CRY)
     {
       emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
       emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
@@ -6053,7 +6052,7 @@ genCmp (operand * left, operand * right,
         }
       /* if unsigned char cmp with direct, do cjne A,right,zz */
       else if ((size == 1) && !sign &&
-          ((AOP_TYPE (right) == AOP_REG) || (AOP_TYPE (right) == AOP_DIR)))
+               ((AOP_TYPE (right) == AOP_REG) || (AOP_TYPE (right) == AOP_DIR)))
         {
           symbol *lbl = newiTempLabel (NULL);
           MOVA (aopGet (left, offset, FALSE, FALSE));
@@ -6721,10 +6720,13 @@ isLiteralBit (unsigned long lit)
 /* continueIfTrue -                                                */
 /*-----------------------------------------------------------------*/
 static void
-continueIfTrue (iCode * ic)
+continueIfTrue (iCode * ic, iCode * popIc)
 {
   if (IC_TRUE (ic))
-    emitcode ("ljmp", "%05d$", IC_TRUE (ic)->key + 100);
+    {
+      popForBranch (popIc, TRUE);
+      emitcode ("ljmp", "%05d$", IC_TRUE (ic)->key + 100);
+    }
   ic->generated = 1;
 }
 
@@ -6732,10 +6734,13 @@ continueIfTrue (iCode * ic)
 /* jmpIfTrue -                                                     */
 /*-----------------------------------------------------------------*/
 static void
-jumpIfTrue (iCode * ic)
+jumpIfTrue (iCode * ic, iCode * popIc)
 {
   if (!IC_TRUE (ic))
-    emitcode ("ljmp", "%05d$", IC_FALSE (ic)->key + 100);
+    {
+      popForBranch (popIc, TRUE);
+      emitcode ("ljmp", "%05d$", IC_FALSE (ic)->key + 100);
+    }
   ic->generated = 1;
 }
 
@@ -6743,7 +6748,7 @@ jumpIfTrue (iCode * ic)
 /* jmpTrueOrFalse -                                                */
 /*-----------------------------------------------------------------*/
 static void
-jmpTrueOrFalse (iCode * ic, symbol * tlbl, operand *left, operand *right, operand *result)
+jmpTrueOrFalse (iCode * ic, symbol * tlbl, operand *left, operand *right, operand *result, iCode * popIc)
 {
   // ugly but optimized by peephole
   if (IC_TRUE (ic))
@@ -6751,6 +6756,7 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl, operand *left, operand *right, operan
       symbol *nlbl = newiTempLabel (NULL);
       emitcode ("sjmp", "%05d$", nlbl->key + 100);
       emitLabel (tlbl);
+      popForBranch (popIc, FALSE);
       freeForBranchAsmop (result);
       freeForBranchAsmop (right);
       freeForBranchAsmop (left);
@@ -6759,6 +6765,7 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl, operand *left, operand *right, operan
     }
   else
     {
+      popForBranch (popIc, FALSE);
       freeForBranchAsmop (result);
       freeForBranchAsmop (right);
       freeForBranchAsmop (left);
@@ -6849,7 +6856,7 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               if ((AOP_TYPE (result) == AOP_CRY) && ifx)
                 {
-                  jumpIfTrue (ifx);
+                  jumpIfTrue (ifx, ic->next);
                   goto release;
                 }
               emitcode ("clr", "c");
@@ -6970,7 +6977,7 @@ genAnd (iCode * ic, iCode * ifx)
           else
             {
               if (ifx)
-                jmpTrueOrFalse (ifx, tlbl, left, right, result);
+                jmpTrueOrFalse (ifx, tlbl, left, right, result, ic->next);
               else
                 emitLabel (tlbl);
               goto release;
@@ -7116,7 +7123,7 @@ genAnd (iCode * ic, iCode * ifx)
               outBitC (result);
             }
           else if (ifx)
-            jmpTrueOrFalse (ifx, tlbl, left, right, result);
+            jmpTrueOrFalse (ifx, tlbl, left, right, result, ic->next);
           else
             emitLabel (tlbl);
         }
@@ -7275,7 +7282,7 @@ genOr (iCode * ic, iCode * ifx)
                   if (size)
                     emitcode ("setb", "%s", AOP (result)->aopu.aop_dir);
                   else if (ifx)
-                    continueIfTrue (ifx);
+                    continueIfTrue (ifx, ic->next);
                   goto release;
                 }
               emitcode ("setb", "c");
@@ -7319,7 +7326,7 @@ genOr (iCode * ic, iCode * ifx)
                             AOP (left)->aopu.aop_dir, tlbl->key + 100);
                   toBoolean (right);
                   emitcode ("jnz", "%05d$", tlbl->key + 100);
-                  jmpTrueOrFalse (ifx, tlbl, left, right, result);
+                  jmpTrueOrFalse (ifx, tlbl, left, right, result, ic->next);
                   goto release;
                 }
               else
@@ -7351,7 +7358,7 @@ genOr (iCode * ic, iCode * ifx)
           if (size)
             emitcode ("setb", "%s", AOP (result)->aopu.aop_dir);
           else if(ifx)
-            continueIfTrue (ifx);
+            continueIfTrue (ifx, ic->next);
           goto release;
         }
       else
@@ -7514,7 +7521,7 @@ genOr (iCode * ic, iCode * ifx)
               outBitC (result);
             }
           else if (ifx)
-            jmpTrueOrFalse (ifx, tlbl, left, right, result);
+            jmpTrueOrFalse (ifx, tlbl, left, right, result, ic->next);
           else
             emitLabel (tlbl);
         }
@@ -7674,7 +7681,7 @@ genXor (iCode * ic, iCode * ifx)
                   if (size)
                     emitcode ("setb", "%s", AOP (result)->aopu.aop_dir);
                   else if (ifx)
-                    continueIfTrue (ifx);
+                    continueIfTrue (ifx, ic->next);
                   goto release;
                 }
               emitcode ("setb", "c");
@@ -7881,7 +7888,7 @@ genXor (iCode * ic, iCode * ifx)
               outBitC (result);
             }
           else if (ifx)
-            jmpTrueOrFalse (ifx, tlbl, left, right, result);
+            jmpTrueOrFalse (ifx, tlbl, left, right, result, ic->next);
           else              
             emitLabel (tlbl);
         }
@@ -10242,9 +10249,10 @@ genNearPointerGet (operand * left,
   /* now some housekeeping stuff */
   if (aop)      /* we had to allocate for this iCode */
     {
-      if (pi) { /* post increment present */
-        aopPut (left, rname, 0);
-      }
+      if (pi)
+	    { /* post increment present */
+          aopPut (left, rname, 0);
+        }
       freeAsmop (NULL, aop, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
     }
   else
@@ -11859,7 +11867,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genDjnz - generate decrement & jump if not zero instrucion      */
+/* genDjnz - generate decrement & jump if not zero instruction     */
 /*-----------------------------------------------------------------*/
 static int
 genDjnz (iCode * ic, iCode * ifx)
@@ -11881,12 +11889,13 @@ genDjnz (iCode * ic, iCode * ifx)
   if (operandLitValue (IC_RIGHT (ic)) != 1)
     return 0;
 
-  /* if the size of this greater than one then no
-     saving */
+  /* if the size of this greater than one then no saving */
   if (getSize (operandType (IC_RESULT (ic))) > 1)
     return 0;
 
   /* otherwise we can save BIG */
+
+  popForBranch (ic->next, TRUE);
 
   D (emitcode (";", "genDjnz"));
 
@@ -12286,7 +12295,7 @@ gen51Code (iCode * lic)
                spilt live range, if there is an ifx statement
                following this pop (or several) then the if statement might
                be using some of the registers being popped which
-               would destory the contents of the register so
+               would destroy the contents of the register so
                we need to check for this condition and handle it */
             for (ifxIc = ic->next; ifxIc && ifxIc->op == IPOP; ifxIc = ifxIc->next);
             for (popIc = ic; popIc && popIc->op == IPOP; popIc = popIc->next)

@@ -581,11 +581,13 @@ out:
 enum {
    P_SAVE = 1,
    P_RESTORE,
+   P_INDUCTION,
    P_NOINDUCTION,
    P_NOINVARIANT,
-   P_INDUCTION,
    P_STACKAUTO,
    P_NOJTBOUND,
+   P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
+                   /* cross-compiling for MINGW32 with gcc 3.2 */
    P_NOOVERLAY,
    P_LESSPEDANTIC,
    P_NOGCSE,
@@ -593,8 +595,6 @@ enum {
    P_EXCLUDE,
    P_NOIV,
    P_LOOPREV,
-   P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
-                   /* cross-compiling for MINGW32 with gcc 3.2 */
    P_DISABLEWARN,
    P_OPTCODESPEED,
    P_OPTCODESIZE,
@@ -751,6 +751,7 @@ doPragma (int id, const char *name, const char *cp)
       }
       break;
 
+    case P_INDUCTION:
     case P_NOINDUCTION:
       cp = get_pragma_token(cp, &token);
       if (TOKEN_EOL != token.type)
@@ -759,7 +760,7 @@ doPragma (int id, const char *name, const char *cp)
           break;
         }
 
-      optimize.loopInduction = 0;
+      optimize.loopInduction = (id == P_INDUCTION) ? 1 : 0;
       break;
 
     case P_NOINVARIANT:
@@ -771,17 +772,6 @@ doPragma (int id, const char *name, const char *cp)
         }
 
       optimize.loopInvariant = 0;
-      break;
-
-    case P_INDUCTION:
-      cp = get_pragma_token(cp, &token);
-      if (TOKEN_EOL != token.type)
-        {
-          err = 1;
-          break;
-        }
-
-      optimize.loopInduction = 1;
       break;
 
     case P_STACKAUTO:
@@ -816,6 +806,16 @@ doPragma (int id, const char *name, const char *cp)
 
       optimize.global_cse = 0;
       break;
+
+    case P_OVERLAY_:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      break; /* notyet */
 
     case P_NOOVERLAY:
       cp = get_pragma_token(cp, &token);
@@ -876,16 +876,6 @@ doPragma (int id, const char *name, const char *cp)
 
       optimize.noLoopReverse = 1;
       break;
-
-    case P_OVERLAY_:
-      cp = get_pragma_token(cp, &token);
-      if (TOKEN_EOL != token.type)
-        {
-          err = 1;
-          break;
-        }
-
-      break; /* notyet */
 
     case P_DISABLEWARN:
       {
@@ -1040,32 +1030,32 @@ doPragma (int id, const char *name, const char *cp)
 }
 
 static struct pragma_s pragma_tbl[] = {
-  { "save",           P_SAVE,         0, doPragma },
-  { "restore",        P_RESTORE,      0, doPragma },
-  { "noinduction",    P_NOINDUCTION,  0, doPragma },
-  { "noinvariant",    P_NOINVARIANT,  0, doPragma },
-  { "noloopreverse",  P_LOOPREV,      0, doPragma },
-  { "induction",      P_INDUCTION,    0, doPragma },
-  { "stackauto",      P_STACKAUTO,    0, doPragma },
-  { "nojtbound",      P_NOJTBOUND,    0, doPragma },
-  { "nogcse",         P_NOGCSE,       0, doPragma },
-  { "nooverlay",      P_NOOVERLAY,    0, doPragma },
-  { "callee_saves",   P_CALLEE_SAVES, 0, doPragma },
-  { "exclude",        P_EXCLUDE,      0, doPragma },
-  { "noiv",           P_NOIV,         0, doPragma },
-  { "overlay",        P_OVERLAY_,     0, doPragma },
-  { "less_pedantic",  P_LESSPEDANTIC, 0, doPragma },
-  { "disable_warning",P_DISABLEWARN,  0, doPragma },
-  { "opt_code_speed", P_OPTCODESPEED, 0, doPragma },
-  { "opt_code_size",  P_OPTCODESIZE,  0, doPragma },
+  { "save",              P_SAVE,            0, doPragma },
+  { "restore",           P_RESTORE,         0, doPragma },
+  { "induction",         P_INDUCTION,       0, doPragma },
+  { "noinduction",       P_NOINDUCTION,     0, doPragma },
+  { "noinvariant",       P_NOINVARIANT,     0, doPragma },
+  { "noloopreverse",     P_LOOPREV,         0, doPragma },
+  { "stackauto",         P_STACKAUTO,       0, doPragma },
+  { "nojtbound",         P_NOJTBOUND,       0, doPragma },
+  { "nogcse",            P_NOGCSE,          0, doPragma },
+  { "overlay",           P_OVERLAY_,        0, doPragma },
+  { "nooverlay",         P_NOOVERLAY,       0, doPragma },
+  { "callee_saves",      P_CALLEE_SAVES,    0, doPragma },
+  { "exclude",           P_EXCLUDE,         0, doPragma },
+  { "noiv",              P_NOIV,            0, doPragma },
+  { "less_pedantic",     P_LESSPEDANTIC,    0, doPragma },
+  { "disable_warning",   P_DISABLEWARN,     0, doPragma },
+  { "opt_code_speed",    P_OPTCODESPEED,    0, doPragma },
+  { "opt_code_size",     P_OPTCODESIZE,     0, doPragma },
   { "opt_code_balanced", P_OPTCODEBALANCED, 0, doPragma },
-  { "std_c89",        P_STD_C89,      0, doPragma },
-  { "std_c99",        P_STD_C99,      0, doPragma },
-  { "std_sdcc89",     P_STD_SDCC89,   0, doPragma },
-  { "std_sdcc99",     P_STD_SDCC99,   0, doPragma },
-  { "codeseg",        P_CODESEG,      0, doPragma },
-  { "constseg",       P_CONSTSEG,     0, doPragma },
-  { NULL,             0,              0, NULL },
+  { "std_c89",           P_STD_C89,         0, doPragma },
+  { "std_c99",           P_STD_C99,         0, doPragma },
+  { "std_sdcc89",        P_STD_SDCC89,      0, doPragma },
+  { "std_sdcc99",        P_STD_SDCC99,      0, doPragma },
+  { "codeseg",           P_CODESEG,         0, doPragma },
+  { "constseg",          P_CONSTSEG,        0, doPragma },
+  { NULL,                0,                 0, NULL },
 };
 
 /*
@@ -1113,7 +1103,7 @@ process_pragma (const char *s)
   s = get_pragma_token(s, &token);
   if (0 != strcmp("#pragma", get_pragma_string(&token)))
     {
-      /* Oops, womething went totally wrong - internal error */
+      /* Oops, something went totally wrong - internal error */
       wassertl(0, "pragma parser internal error");
     }
 

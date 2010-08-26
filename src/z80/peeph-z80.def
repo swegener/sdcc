@@ -1621,7 +1621,7 @@ replace restart {
 	adc	a, #%4
 	ld	%5, a
 	; peephole 76' loaded %6 from a directly instead of going through %1.
-} if notUsed(%1), notSame(%5 %1), notSame(%5 '(hl)' '(de)' '(bc)'), notSame(%5 %6), notSame(%6 '(hl)' '(de)' '(bc)'), notSame(%5, 'a')
+} if notUsed(%1), notSame(%5 %1), notSame(%5 '(hl)' '(de)' '(bc)'), notSame(%5 %6), notSame(%6 '(hl)' '(de)' '(bc)'), notSame(%5 'a')
 
 replace restart {
 	ld	%1, a

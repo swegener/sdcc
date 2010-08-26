@@ -1,3 +1,8 @@
+2010-08-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fixed #3052514.
+
 2010-08-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genCast): fixed bug with ruonly src and dest downcast,

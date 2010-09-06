@@ -46,7 +46,7 @@ fi
 
 # Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN(bor_IS_SUNPRO,
+AC_DEFUN([bor_IS_SUNPRO],
 [AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
   [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
   [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
@@ -63,7 +63,7 @@ bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
 # the compiler returns an error or in case something is writeen to stderr.
 # For example: bor_VALID_OPT(fPIC)
 
-AC_DEFUN(bor_IS_VALID_OPTION,
+AC_DEFUN([bor_IS_VALID_OPTION],
 [ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
 bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
 AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
@@ -144,7 +144,7 @@ dnl adl_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
 AC_DEFUN([adl_NORMALIZE_DEFINE_UNQUOTED], [
   ac_ndu=[$]$1
   adl_NORMALIZE_PATH([ac_ndu], [$]$3)
-  AC_DEFINE_UNQUOTED($2, "${ac_ndu}")
+  AC_DEFINE_UNQUOTED($2, "${ac_ndu}", [XXX])
 ])
 
 
@@ -224,7 +224,7 @@ AC_SUBST(EXEEXT)
 # sdccconf.h
 ############
 
-AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}")
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}", [XXX])
 
 # datadir:
 # default: "${prefix}/share"
@@ -235,7 +235,7 @@ adl_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, sdccconf_h_dir_separato
 norm_lib_dir_suffix=${lib_dir_suffix}
 adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
-                   DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}")
+                   DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}", [XXX])
 
 
 # Generating output files

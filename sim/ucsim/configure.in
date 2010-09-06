@@ -1,7 +1,8 @@
 #!/bin/sh
 
 AC_PREREQ(2.60)
-AC_INIT(.version)
+AC_INIT
+AC_CONFIG_SRCDIR(.version)
 AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
 
 AC_PROG_AWK
@@ -21,10 +22,10 @@ AC_SUBST(VERSION)
 AC_SUBST(VERSIONHI)
 AC_SUBST(VERSIONLO)
 AC_SUBST(VERSIONP)
-AC_DEFINE_UNQUOTED(VERSIONSTR, "${VERSION}")
-AC_DEFINE_UNQUOTED(VERSIONHI, $VERSIONHI)
-AC_DEFINE_UNQUOTED(VERSIONLO, $VERSIONLO)
-AC_DEFINE_UNQUOTED(VERSIONP, $VERSIONP)
+AC_DEFINE_UNQUOTED(VERSIONSTR, "${VERSION}", [XXX])
+AC_DEFINE_UNQUOTED(VERSIONHI, $VERSIONHI, [XXX])
+AC_DEFINE_UNQUOTED(VERSIONLO, $VERSIONLO, [XXX])
+AC_DEFINE_UNQUOTED(VERSIONP, $VERSIONP, [XXX])
 
 # Some options
 #==============
@@ -99,7 +100,7 @@ if test $enable_statistic != "no"; then
    enable_statistic="yes"
 fi,
 enable_statistic="no")
-AC_DEFINE_UNQUOTED(STATISTIC, $enable_statistic)
+AC_DEFINE_UNQUOTED(STATISTIC, $enable_statistic, [XXX])
 
 
 # Required programs
@@ -119,7 +120,7 @@ AC_SUBST(LIBTOOL_DEPS)
 
 AC_PROG_LEX
 if test ${LEX} = "flex"; then
-        AC_DEFINE(HAVE_FLEX)
+        AC_DEFINE(HAVE_FLEX, 1, [XXX])
 fi
 AC_PROG_YACC
 AC_CHECK_PROG(BISON_PLUS_PLUS, bison++, bison++, :)
@@ -139,25 +140,25 @@ AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
 AC_CHECK_HEADERS(getopt.h unistd.h termios.h)
 
 AC_CHECK_HEADER(curses.h,
-  AC_DEFINE(HAVE_CURSES_H)
+  AC_DEFINE(HAVE_CURSES_H, 1, [XXX])
   curses_h_ok=yes,
   curses_h_ok=no
 )
 
 ucsim_cv_socket="unknown"
 AC_CHECK_HEADER(sys/socket.h,
-  AC_DEFINE(HAVE_SYS_SOCKET_H)
-  AC_DEFINE(SOCKET_AVAIL)
-  AC_DEFINE_UNQUOTED(UCSOCKET_T, int)
+  AC_DEFINE(HAVE_SYS_SOCKET_H, 1, [XXX])
+  AC_DEFINE(SOCKET_AVAIL, 1, [XXX])
+  AC_DEFINE_UNQUOTED(UCSOCKET_T, int, [XXX])
   ucsim_cv_socket="<sys/socket.h>"
 )
 
 WINSOCK_AVAIL=0
 if test $ucsim_cv_socket = unknown; then
   AC_CHECK_HEADER(winsock2.h,
-    AC_DEFINE(HAVE_WINSOCK2_H)
-    AC_DEFINE(SOCKET_AVAIL)
-    AC_DEFINE_UNQUOTED(UCSOCKET_T, SOCKET)
+    AC_DEFINE(HAVE_WINSOCK2_H, 1, [XXX])
+    AC_DEFINE(SOCKET_AVAIL, 1, [XXX])
+    AC_DEFINE_UNQUOTED(UCSOCKET_T, SOCKET, [XXX])
     ucsim_cv_socket="<winsock2.h>"
     WINSOCK_AVAIL=1
   )
@@ -167,10 +168,10 @@ AC_SUBST(WINSOCK_AVAIL)
 if test $ucsim_cv_socket != unknown; then
   AC_EGREP_HEADER(socklen_t,
     $ucsim_cv_socket,
-    AC_DEFINE_UNQUOTED(SOCKLEN_T, socklen_t),
-    AC_DEFINE_UNQUOTED(SOCKLEN_T, uint))
+    AC_DEFINE_UNQUOTED(SOCKLEN_T, socklen_t, [XXX]),
+    AC_DEFINE_UNQUOTED(SOCKLEN_T, uint, [XXX]))
 fi
-AC_DEFINE_UNQUOTED(HEADER_SOCKET, ${ucsim_cv_socket})
+AC_DEFINE_UNQUOTED(HEADER_SOCKET, ${ucsim_cv_socket}, [XXX])
 
 AC_CHECK_HEADER(dlfcn.h)
 AC_HEADER_DIRENT
@@ -202,32 +203,32 @@ yes
 
 ucsim_cv_header_ok=0
 if echo $ucsim_cv_fd|grep time >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_TIME_H, 1)
+AC_DEFINE(FD_NEED_TIME_H, 1, [XXX])
 ucsim_cv_header_ok=1
 else
-AC_DEFINE(FD_NEED_TIME_H, 0)
+AC_DEFINE(FD_NEED_TIME_H, 0, [XXX])
 fi
 if echo $ucsim_cv_fd|grep types >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_TYPES_H, 1)
+AC_DEFINE(FD_NEED_TYPES_H, 1, [XXX])
 ucsim_cv_header_ok=1
 else
-AC_DEFINE(FD_NEED_TYPES_H, 0)
+AC_DEFINE(FD_NEED_TYPES_H, 0, [XXX])
 fi
 if echo $ucsim_cv_fd|grep select >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_SELECT_H, 1)
+AC_DEFINE(FD_NEED_SELECT_H, 1, [XXX])
 ucsim_cv_header_ok=1
 else
-AC_DEFINE(FD_NEED_SELECT_H, 0)
+AC_DEFINE(FD_NEED_SELECT_H, 0, [XXX])
 fi
 if echo $ucsim_cv_fd|grep winsock2 >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_WINSOCK2_H, 1)
+AC_DEFINE(FD_NEED_WINSOCK2_H, 1, [XXX])
 ucsim_cv_header_ok=1
 else
-AC_DEFINE(FD_NEED_WINSOCK2_H, 0)
+AC_DEFINE(FD_NEED_WINSOCK2_H, 0, [XXX])
 fi
 
-AC_DEFINE_UNQUOTED(FD_HEADER_OK, ${ucsim_cv_header_ok})
-AC_DEFINE_UNQUOTED(HEADER_FD, ${ucsim_cv_fd})
+AC_DEFINE_UNQUOTED(FD_HEADER_OK, ${ucsim_cv_header_ok}, [XXX])
+AC_DEFINE_UNQUOTED(HEADER_FD, ${ucsim_cv_fd}, [XXX])
 
 
 # Checking for functions/libs
@@ -327,7 +328,7 @@ ucsim_cv_scanf_a="no",
 ucsim_cv_scanf_a="unknown")
 ])
 if test "$ucsim_cv_scanf_a" = "yes"; then
-  AC_DEFINE(SCANF_A)
+  AC_DEFINE(SCANF_A, 1, [XXX])
 fi
 
 AC_CACHE_CHECK(whether getcwd is GNUish, ucsim_cv_getcwd,
@@ -344,10 +345,10 @@ ucsim_cv_getcwd="no",
 ucsim_cv_getcwd="unknown")
 ])
 if test "$ucsim_cv_getcwd" = "yes"; then
-  AC_DEFINE(GNU_GETCWD)
+  AC_DEFINE(GNU_GETCWD, 1, [XXX])
 fi
 
-AC_DEFUN(ucsim_ACCEPT_LENGTH_T,
+AC_DEFUN([ucsim_ACCEPT_LENGTH_T],
  [AC_CACHE_CHECK([for type of length pointer parameter of accept],
    ucsim_cv_accept_length_type,
    [ac_save_CPPFLAGS="$CPPFLAGS"
@@ -375,7 +376,7 @@ ucsim_ACCEPT_LENGTH_T
 
 # Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN(bor_IS_SUNPRO,
+AC_DEFUN([bor_IS_SUNPRO],
 [AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
   [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
   [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
@@ -392,7 +393,7 @@ bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
 # the compiler returns an error or in case something is writeen to stderr.
 # For example: bor_VALID_OPT(fPIC)
 
-AC_DEFUN(bor_IS_VALID_OPTION,
+AC_DEFUN([bor_IS_VALID_OPTION],
 [ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
 bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
 AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
@@ -615,9 +616,14 @@ AC_MSG_RESULT($TYPE_WORD)
 AC_MSG_CHECKING(type name for dword)
 TYPE_DWORD=`type_name 4`
 AC_MSG_RESULT($TYPE_DWORD)
-AC_DEFINE_UNQUOTED(TYPE_BYTE, $TYPE_BYTE)
-AC_DEFINE_UNQUOTED(TYPE_WORD, $TYPE_WORD)
-AC_DEFINE_UNQUOTED(TYPE_DWORD, $TYPE_DWORD)
+AC_DEFINE_UNQUOTED(TYPE_BYTE, [$TYPE_BYTE], [XXX])
+AC_DEFINE_UNQUOTED(TYPE_WORD, [$TYPE_WORD], [XXX])
+AC_DEFINE_UNQUOTED(TYPE_DWORD, [$TYPE_DWORD], [XXX])
+AC_DEFINE_UNQUOTED(TYPE_UBYTE, [unsigned $TYPE_BYTE], [XXX])
+AC_DEFINE_UNQUOTED(TYPE_UWORD, [unsigned $TYPE_WORD], [XXX])
+AC_DEFINE_UNQUOTED(TYPE_UDWORD, [unsigned $TYPE_DWORD], [XXX])
+
+AH_BOTTOM([#include "custom.h"])
 
 if echo $TYPE_DWORD|grep short >/dev/null; then
     A="h"
@@ -632,8 +638,8 @@ elif echo $TYPE_WORD|grep long >/dev/null; then M="l"
 else M=""
 fi
 
-AC_DEFINE_UNQUOTED(_A_, "${A}")
-AC_DEFINE_UNQUOTED(_M_, "${M}")
+AC_DEFINE_UNQUOTED(_A_, "${A}", [XXX])
+AC_DEFINE_UNQUOTED(_M_, "${M}", [XXX])
 
 # Generating output files
 # ===========================================================================

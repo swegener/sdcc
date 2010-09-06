@@ -27,10 +27,10 @@ AC_SUBST(VERSION)
 AC_SUBST(VERSIONHI)
 AC_SUBST(VERSIONLO)
 AC_SUBST(VERSIONP)
-AC_DEFINE_UNQUOTED(SDCC_VERSION_LO, ${VERSIONLO})
-AC_DEFINE_UNQUOTED(SDCC_VERSION_HI, ${VERSIONHI})
-AC_DEFINE_UNQUOTED(SDCC_VERSION_P, ${VERSIONP})
-AC_DEFINE_UNQUOTED(SDCC_VERSION_STR, "${VERSION}")
+AC_DEFINE_UNQUOTED(SDCC_VERSION_LO, ${VERSIONLO}, [XXX])
+AC_DEFINE_UNQUOTED(SDCC_VERSION_HI, ${VERSIONHI}, [XXX])
+AC_DEFINE_UNQUOTED(SDCC_VERSION_P, ${VERSIONP}, [XXX])
+AC_DEFINE_UNQUOTED(SDCC_VERSION_STR, "${VERSION}", [XXX])
 AC_ARG_PROGRAM
 sdcc_cv_version=$VERSION
 sdcc_cv_versionhi=$VERSIONHI
@@ -115,7 +115,7 @@ rm conftest.err conftest.out
 
 # Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN(bor_IS_SUNPRO,
+AC_DEFUN([bor_IS_SUNPRO],
 [AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
   [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
   [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
@@ -132,7 +132,7 @@ bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
 # the compiler returns an error or in case something is writeen to stderr.
 # For example: bor_VALID_OPT(fPIC)
 
-AC_DEFUN(bor_IS_VALID_OPTION,
+AC_DEFUN([bor_IS_VALID_OPTION],
 [ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
 bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
 AC_CACHE_CHECK(whether _AC_LANG accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
@@ -341,7 +341,7 @@ dnl adl_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
 AC_DEFUN([adl_NORMALIZE_DEFINE_UNQUOTED], [
   ac_ndu=[$]$1
   adl_NORMALIZE_PATH([ac_ndu], [$]$3)
-  AC_DEFINE_UNQUOTED($2, "${ac_ndu}")
+  AC_DEFINE_UNQUOTED($2, "${ac_ndu}", [XXX])
 ])
 
 dnl adl_NORMALIZE_PATH_MSG(input_string, var, dir_separator)
@@ -456,13 +456,13 @@ AC_MSG_CHECKING(type name for dword)
 TYPE_DWORD=`type_name 4`
 AC_MSG_RESULT($TYPE_DWORD)
 
-AC_DEFINE_UNQUOTED(TYPE_BYTE,  $TYPE_BYTE)
-AC_DEFINE_UNQUOTED(TYPE_WORD,  $TYPE_WORD)
-AC_DEFINE_UNQUOTED(TYPE_DWORD, $TYPE_DWORD)
+AC_DEFINE_UNQUOTED(TYPE_BYTE,  $TYPE_BYTE,  [XXX])
+AC_DEFINE_UNQUOTED(TYPE_WORD,  $TYPE_WORD,  [XXX])
+AC_DEFINE_UNQUOTED(TYPE_DWORD, $TYPE_DWORD, [XXX])
 
-AC_DEFINE_UNQUOTED(TYPE_UBYTE,  unsigned $TYPE_CHAR)
-AC_DEFINE_UNQUOTED(TYPE_UWORD,  unsigned $TYPE_WORD)
-AC_DEFINE_UNQUOTED(TYPE_UDWORD, unsigned $TYPE_DWORD)
+AC_DEFINE_UNQUOTED(TYPE_UBYTE,  unsigned $TYPE_CHAR,  [XXX])
+AC_DEFINE_UNQUOTED(TYPE_UWORD,  unsigned $TYPE_WORD,  [XXX])
+AC_DEFINE_UNQUOTED(TYPE_UDWORD, unsigned $TYPE_DWORD, [XXX])
 
 
 # SDCC_BUILD_BIGENDIAN ([ACTION-IF-TRUE], [ACTION-IF-FALSE], [ACTION-IF-UNKNOWN])
@@ -593,8 +593,8 @@ AC_SUBST(EXEEXT)
 # sdccconf.h
 ############
 
-AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}")
-AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR, '${sdccconf_h_dir_separator}')
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}", [XXX])
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR, '${sdccconf_h_dir_separator}', [XXX])
 
 # prefix:
 # default: "NONE", ${ac_default_prefix}: "/usr/local"
@@ -620,51 +620,51 @@ adl_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, sdccconf_h_dir_separato
 norm_inc_dir_suffix=${include_dir_suffix}
 adl_NORMALIZE_PATH([norm_inc_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(INCLUDE_DIR_SUFFIX,
-                   DIR_SEPARATOR_STRING "${norm_inc_dir_suffix}")
+                   DIR_SEPARATOR_STRING "${norm_inc_dir_suffix}", [XXX])
 norm_lib_dir_suffix=${lib_dir_suffix}
 adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
-                   DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}")
+                   DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}", [XXX])
 
 # relative paths
 adl_COMPUTE_RELATIVE_PATHS([expanded_bindir:expanded_datadir:bin2data_dir])
 adl_NORMALIZE_PATH(bin2data_dir, [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(BIN2DATA_DIR,
-                   DIR_SEPARATOR_STRING "${bin2data_dir}")
+                   DIR_SEPARATOR_STRING "${bin2data_dir}", [XXX])
 
 adl_COMPUTE_RELATIVE_PATHS([expanded_prefix:expanded_bindir:prefix2bin_dir])
 adl_NORMALIZE_PATH(prefix2bin_dir, [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(PREFIX2BIN_DIR,
-                   DIR_SEPARATOR_STRING "${prefix2bin_dir}")
+                   DIR_SEPARATOR_STRING "${prefix2bin_dir}", [XXX])
 
 adl_COMPUTE_RELATIVE_PATHS([expanded_prefix:expanded_datadir:prefix2data_dir])
 adl_NORMALIZE_PATH(prefix2data_dir, [$sdccconf_h_dir_separator])
 if test "${prefix2data_dir}" = "."; then
     # small optimization for Mingw32; otherwise Borut will complain ;-)
-    AC_DEFINE_UNQUOTED(PREFIX2DATA_DIR, "")
+    AC_DEFINE_UNQUOTED(PREFIX2DATA_DIR, "", [XXX])
 else
     AC_DEFINE_UNQUOTED(PREFIX2DATA_DIR,
-                       DIR_SEPARATOR_STRING "${prefix2data_dir}")
+                       DIR_SEPARATOR_STRING "${prefix2data_dir}", [XXX])
 fi
 
 # standard libs
-AC_DEFINE_UNQUOTED(STD_LIB,       "libsdcc")
-AC_DEFINE_UNQUOTED(STD_INT_LIB,   "libint")
-AC_DEFINE_UNQUOTED(STD_LONG_LIB,  "liblong")
-AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat")
-AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
-AC_DEFINE_UNQUOTED(STD_DS400_LIB, "libds400")
-AC_DEFINE_UNQUOTED(STD_XA51_LIB,  "libxa51")
+AC_DEFINE_UNQUOTED(STD_LIB,       "libsdcc", [XXX])
+AC_DEFINE_UNQUOTED(STD_INT_LIB,   "libint", [XXX])
+AC_DEFINE_UNQUOTED(STD_LONG_LIB,  "liblong", [XXX])
+AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat", [XXX])
+AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390", [XXX])
+AC_DEFINE_UNQUOTED(STD_DS400_LIB, "libds400", [XXX])
+AC_DEFINE_UNQUOTED(STD_XA51_LIB,  "libxa51", [XXX])
 
 # SDCC runtime environment variables
 sdcc_dir_name="SDCC_HOME"
-AC_DEFINE_UNQUOTED(SDCC_DIR_NAME, "${sdcc_dir_name}")
+AC_DEFINE_UNQUOTED(SDCC_DIR_NAME, "${sdcc_dir_name}", [XXX])
 
 sdcc_include_name="SDCC_INCLUDE"
-AC_DEFINE_UNQUOTED(SDCC_INCLUDE_NAME, "${sdcc_include_name}")
+AC_DEFINE_UNQUOTED(SDCC_INCLUDE_NAME, "${sdcc_include_name}", [XXX])
 
 sdcc_lib_name="SDCC_LIB"
-AC_DEFINE_UNQUOTED(SDCC_LIB_NAME, "${sdcc_lib_name}")
+AC_DEFINE_UNQUOTED(SDCC_LIB_NAME, "${sdcc_lib_name}", [XXX])
 
 # Port selection helper
 # ===========================================================================
@@ -681,7 +681,7 @@ AC_DEFUN([AC_DO_ENABLER], [
     OPT_ENABLE_$2=0
   fi
 
-  AC_DEFINE_UNQUOTED(OPT_ENABLE_$2, [$]OPT_ENABLE_$2)
+  AC_DEFINE_UNQUOTED(OPT_ENABLE_$2, [$]OPT_ENABLE_$2, [XXX])
   AC_SUBST(OPT_ENABLE_$2)
 ])
 
@@ -702,7 +702,7 @@ AC_DEFUN([AC_DO_DISABLER], [
     OPT_DISABLE_$2=0
   fi
 
-  AC_DEFINE_UNQUOTED(OPT_DISABLE_$2, [$]OPT_DISABLE_$2)
+  AC_DEFINE_UNQUOTED(OPT_DISABLE_$2, [$]OPT_DISABLE_$2, [XXX])
   AC_SUBST(OPT_DISABLE_$2)
 ])
 
@@ -722,7 +722,7 @@ AC_DEFUN([AC_DO_PORT], [
     OPT_DISABLE_$3=0
   fi
 
-  AC_DEFINE_UNQUOTED(OPT_DISABLE_$3, [$]OPT_DISABLE_$3)
+  AC_DEFINE_UNQUOTED(OPT_DISABLE_$3, [$]OPT_DISABLE_$3, [XXX])
   AC_SUBST(OPT_DISABLE_$3)
 
   echo $2 >>ports.all
@@ -747,7 +747,7 @@ AC_DEFUN([AC_DO_PORT_ENABLER], [
     OPT_DISABLE_$3=1
   fi
 
-  AC_DEFINE_UNQUOTED(OPT_DISABLE_$3, [$]OPT_DISABLE_$3)
+  AC_DEFINE_UNQUOTED(OPT_DISABLE_$3, [$]OPT_DISABLE_$3, [XXX])
   AC_SUBST(OPT_DISABLE_$3)
 
   echo $2 >>ports.all
@@ -765,7 +765,7 @@ AC_DO_PORT(mcs51, mcs51, MCS51, [Excludes the Intel mcs51 port])
 AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(z80,   z80,   Z80,   [Excludes the z80 port])
 AC_DO_PORT(ds390, ds390, DS390, [Excludes the DS390 port])
-AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390)
+AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])
 AC_DO_PORT(ds400, ds400, DS400, [Excludes the DS400 port])
 AC_DO_PORT(pic,   pic,   PIC,   [Excludes the PIC port])
 AC_DO_PORT(pic16, pic16, PIC16, [Excludes the PIC16 port])

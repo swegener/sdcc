@@ -4,7 +4,8 @@
 	  device/lib/pic/configure.in, device/lib/pic16/configure.ac,
 	  sim/ucsim/configure.in, sim/ucsim/custom.h,
 	  sim/ucsim/ddconfig_in.h, support/packihx/configure.in:
-	  updated build system to allow autoreconf -fi to set up the project
+	  updated build system to allow autoreconf -fi to set up the project,
+	  regenerated files
 
 2010-09-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

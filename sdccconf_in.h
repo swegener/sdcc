@@ -1,116 +1,247 @@
-/*
- */
+/* sdccconf_in.h.  Generated from configure.in by autoheader.  */
 
-#ifndef SDCCCONF_HEADER
-#define SDCCCONF_HEADER
+/* XXX */
+#undef BIN2DATA_DIR
 
-
-#undef SDCC_VERSION_HI
-#undef SDCC_VERSION_LO
-#undef SDCC_VERSION_P
-#undef SDCC_VERSION_STR
-
-#undef DIR_SEPARATOR_STRING
-#undef DIR_SEPARATOR_CHAR
-
-#undef PREFIX
-#undef EXEC_PREFIX
+/* XXX */
 #undef BINDIR
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef BUILD_WORDS_BIGENDIAN
+
+/* XXX */
 #undef DATADIR
 
-#undef INCLUDE_DIR_SUFFIX
-#undef LIB_DIR_SUFFIX
+/* XXX */
+#undef DIR_SEPARATOR_CHAR
 
-#undef BIN2DATA_DIR
-#undef PREFIX2BIN_DIR
-#undef PREFIX2DATA_DIR
+/* XXX */
+#undef DIR_SEPARATOR_STRING
 
-/* environment variables */
-#undef SDCC_DIR_NAME
-#undef SDCC_INCLUDE_NAME
-#undef SDCC_LIB_NAME
+/* XXX */
+#undef EXEC_PREFIX
 
-/* standard libraries */
-#undef STD_LIB
-#undef STD_INT_LIB
-#undef STD_LONG_LIB
-#undef STD_FP_LIB
-#undef STD_DS390_LIB
-#undef STD_DS400_LIB
-#undef STD_XA51_LIB
+/* Define to 1 if you have the <endian.h> header file. */
+#undef HAVE_ENDIAN_H
 
-#undef HAVE_STRERROR
-#undef HAVE_VSNPRINTF
-#undef HAVE_SNPRINTF
-#undef HAVE_VSPRINTF
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `gc' library (-lgc). */
+#undef HAVE_LIBGC
+
+/* Define to 1 if you have the <machine/endian.h> header file. */
+#undef HAVE_MACHINE_ENDIAN_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mkstemp' function. */
 #undef HAVE_MKSTEMP
 
-#undef RETSIGTYPE
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
 
-#undef TYPE_BYTE
-#undef TYPE_WORD
-#undef TYPE_DWORD
-#undef TYPE_UBYTE
-#undef TYPE_UWORD
-#undef TYPE_UDWORD
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
 
-#undef HAVE_ENDIAN_H
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/endian.h> header file. */
 #undef HAVE_SYS_ENDIAN_H
-#undef HAVE_MACHINE_ENDIAN_H
-#undef HAVE_SYS_ISA_DEFS_H
 
-/*
- * find out the endianess of host machine
- */
-#if defined __APPLE__ && (defined __BIG_ENDIAN__ || defined _BIG_ENDIAN)
-/* 1) trust the compiler
- * in order to be able to make Mac OS X unified binaries */
-# define WORDS_BIGENDIAN 1
-#elif defined __APPLE__ && (defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN)
-/* do nothing */
-#elif defined __sun && defined HAVE_SYS_ISA_DEFS_H
-/* Solaris defines endianness in <sys/isa_defs.h> */
-# include <sys/isa_defs.h>
-# ifdef _BIG_ENDIAN
-#   define WORDS_BIGENDIAN 1
-# endif
-#else
-# ifdef HAVE_ENDIAN_H
-#   include <endian.h>
-# elif defined HAVE_SYS_ENDIAN_H
-#   include <sys/endian.h>
-# elif defined HAVE_MACHINE_ENDIAN_H
-#   include <machine/endian.h>
-# endif
-# if (defined BYTE_ORDER && defined BIG_ENDIAN && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN && LITTLE_ENDIAN)
-/* 2) trust the header files */
-#   if BYTE_ORDER == BIG_ENDIAN
-#     define WORDS_BIGENDIAN 1
-#   endif
-# else
-/* 3) trust the configure; this actually doesn't work for unified Mac OS X binaries :-( */
-#   undef BUILD_WORDS_BIGENDIAN
-#   if (defined BUILD_WORDS_BIGENDIAN && BUILD_WORDS_BIGENDIAN)
-#     define WORDS_BIGENDIAN  1
-#   endif
-/* 4) assume that host is a little endian machine */
-# endif
-#endif
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
 
-#undef OPT_DISABLE_MCS51
-#undef OPT_DISABLE_GBZ80
-#undef OPT_DISABLE_Z80
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* Define to 1 if you have the `vsprintf' function. */
+#undef HAVE_VSPRINTF
+
+/* XXX */
+#undef INCLUDE_DIR_SUFFIX
+
+/* XXX */
+#undef LIB_DIR_SUFFIX
+
+/* XXX */
 #undef OPT_DISABLE_AVR
+
+/* XXX */
+#undef OPT_DISABLE_DEVICE_LIB
+
+/* XXX */
 #undef OPT_DISABLE_DS390
+
+/* XXX */
 #undef OPT_DISABLE_DS400
-#undef OPT_DISABLE_TININative
-#undef OPT_DISABLE_PIC
-#undef OPT_DISABLE_PIC16
-#undef OPT_DISABLE_XA51
+
+/* XXX */
+#undef OPT_DISABLE_GBZ80
+
+/* XXX */
 #undef OPT_DISABLE_HC08
 
+/* XXX */
+#undef OPT_DISABLE_MCS51
+
+/* XXX */
+#undef OPT_DISABLE_PACKIHX
+
+/* XXX */
+#undef OPT_DISABLE_PIC
+
+/* XXX */
+#undef OPT_DISABLE_PIC16
+
+/* XXX */
+#undef OPT_DISABLE_SDCDB
+
+/* XXX */
+#undef OPT_DISABLE_SDCPP
+
+/* XXX */
+#undef OPT_DISABLE_TININative
+
+/* XXX */
+#undef OPT_DISABLE_UCSIM
+
+/* XXX */
+#undef OPT_DISABLE_XA51
+
+/* XXX */
+#undef OPT_DISABLE_Z80
+
+/* XXX */
+#undef OPT_ENABLE_DOC
+
+/* XXX */
 #undef OPT_ENABLE_LIBGC
 
-#endif
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
 
-/* End of config.h */
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* XXX */
+#undef PREFIX
+
+/* XXX */
+#undef PREFIX2BIN_DIR
+
+/* XXX */
+#undef PREFIX2DATA_DIR
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#undef RETSIGTYPE
+
+/* XXX */
+#undef SDCC_DIR_NAME
+
+/* XXX */
+#undef SDCC_INCLUDE_NAME
+
+/* XXX */
+#undef SDCC_LIB_NAME
+
+/* XXX */
+#undef SDCC_VERSION_HI
+
+/* XXX */
+#undef SDCC_VERSION_LO
+
+/* XXX */
+#undef SDCC_VERSION_P
+
+/* XXX */
+#undef SDCC_VERSION_STR
+
+/* The size of `char', as computed by sizeof. */
+#undef SIZEOF_CHAR
+
+/* The size of `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* XXX */
+#undef STD_DS390_LIB
+
+/* XXX */
+#undef STD_DS400_LIB
+
+/* XXX */
+#undef STD_FP_LIB
+
+/* XXX */
+#undef STD_INT_LIB
+
+/* XXX */
+#undef STD_LIB
+
+/* XXX */
+#undef STD_LONG_LIB
+
+/* XXX */
+#undef STD_XA51_LIB
+
+/* XXX */
+#undef TYPE_BYTE
+
+/* XXX */
+#undef TYPE_DWORD
+
+/* XXX */
+#undef TYPE_UBYTE
+
+/* XXX */
+#undef TYPE_UDWORD
+
+/* XXX */
+#undef TYPE_UWORD
+
+/* XXX */
+#undef TYPE_WORD
+
+/* Define to 1 if type `char' is unsigned and you are not using gcc.  */
+#ifndef __CHAR_UNSIGNED__
+# undef __CHAR_UNSIGNED__
+#endif

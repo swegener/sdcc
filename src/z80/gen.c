@@ -4572,6 +4572,14 @@ genIfxJump (iCode * ic, char *jval)
         {
           inst = "P";
         }
+      else if (!strcmp (jval, "po"))
+        {
+          inst = "PO";
+        }
+      else if (!strcmp (jval, "pe"))
+        {
+          inst = "PE";
+        }
       else
         {
           /* The buffer contains the bit on A that we should test */
@@ -4603,6 +4611,14 @@ genIfxJump (iCode * ic, char *jval)
       else if (!strcmp (jval, "p"))
         {
           inst = "M";
+        }
+      else if (!strcmp (jval, "po"))
+        {
+          inst = "PE";
+        }
+      else if (!strcmp (jval, "pe"))
+        {
+          inst = "PO";
         }
       else
         {
@@ -4908,7 +4924,7 @@ genCmp (operand * left, operand * right,
           symbol *tlbl = newiTempLabel (NULL);
           /* check for overflow, have no idea how to do this on GBZ80 */
           emit2 ("jp PO,!tlabel", tlbl->key + 100);
-          emit2 ("xor a,!immedbyte", 0x80);
+          emit2 ("xor a,!immedbyte", 0x80); /* cpl would be faster, but the bug1757671 regression tests fails and I can't see why */
           emitLabel (tlbl->key + 100);
         }
     }

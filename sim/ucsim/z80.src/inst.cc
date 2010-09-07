@@ -432,7 +432,12 @@ cl_z80::inst_dec(t_mem code)
 int
 cl_z80::inst_rlca(t_mem code)
 {
-  rlc_byte(regs.A);
+  regs.F &= ~(BIT_A | BIT_N | BIT_C);
+  if (regs.A & 0x80) {
+     regs.F |= BIT_C;
+     regs.A = (regs.A << 1) | 0x01;
+   } else
+     regs.A = (regs.A << 1);
 
   return(resGO);
 }
@@ -440,7 +445,13 @@ cl_z80::inst_rlca(t_mem code)
 int
 cl_z80::inst_rrca(t_mem code)
 {
-  rrc_byte(regs.A);
+  regs.F &= ~(BIT_A | BIT_N | BIT_C);
+  if (regs.A & 0x01) {
+     regs.A |= BIT_C;
+     regs.A = (regs.A >> 1) | 0x80;
+   }
+   else
+     regs.A = (regs.A >> 1);
   return(resGO);
 }
 

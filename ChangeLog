@@ -1,3 +1,11 @@
+2010-08-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Minor comments.
+	* sim/ucsim/z80.src/inst.cc:
+	  Fixed #3061455.
+
 2010-09-06 Raphael Neider <rneider AT web.de>
 
 	* configure.in, debugger/mcs51/configure.in,

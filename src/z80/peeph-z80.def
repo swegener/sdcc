@@ -694,6 +694,31 @@ replace restart {
 	jp	Z,%4
 } if labelRefCountChange(%2 -1), labelRefCountChange(%4 +1)
 
+// The following rule causes a SIGSEGV, Reenable it when the bug is fixed.
+//replace restart {
+//	jp      Z,%1
+//	ld      %4,#0x01
+//	jp      %2
+//%1:
+//	ld      %4,#0x00
+//%2:
+//	xor     a,a
+//	or      a,%4
+//	jp      Z,%3
+//} by {
+//	ld      %4,#0x00
+//	jp      Z,%3
+//	; peephole 6a' redirected jump from %2 to %3
+//	ld      %4,#0x01
+//	jp      %2
+//%1:
+//	ld      %4,#0x00
+//%2:
+//	xor     a,a
+//	or      a,%4
+//	jp      Z,%3
+//} if labelRefCountChange(%1 -1), labelRefCountChange(%3 +1)
+
 replace restart {
 	jp	%1
 	ld	%2, #%3

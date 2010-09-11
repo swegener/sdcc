@@ -6,7 +6,7 @@
 	 (genDataPointerSet, genAssign): use genLiteralAssign instead of patch
 	  1490145 for consistency
 
-2010-08-26 Philipp Klaus Krause <pkk AT spth.de>
+2010-09-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  src/z80/peeph-z80.def:

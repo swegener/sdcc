@@ -7886,7 +7886,7 @@ genXor (iCode * ic, iCode * ifx)
             }
           else if (ifx)
             jmpTrueOrFalse (ifx, tlbl, left, right, result, ic->next);
-          else              
+          else
             emitLabel (tlbl);
         }
       else
@@ -10247,7 +10247,7 @@ genNearPointerGet (operand * left,
   if (aop)      /* we had to allocate for this iCode */
     {
       if (pi)
-	    { /* post increment present */
+        { /* post increment present */
           aopPut (left, rname, 0);
         }
       freeAsmop (NULL, aop, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
@@ -10817,7 +10817,7 @@ genPackBits (sym_link * etype,
 /*-----------------------------------------------------------------*/
 static void
 genLiteralAssign (operand * result, operand * right, int size,
-				  bool (*output_fn)(operand * result, const char *s, int offset))
+                  bool (*output_fn)(operand * result, const char *s, int offset))
 {
   unsigned long lit = 0L;
   int offset;

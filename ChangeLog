@@ -21,7 +21,6 @@
 	* sim/ucsim/z80.src/inst.cc:
 	  Fixed #3061455.
 
->>>>>>> .r5958
 2010-09-06 Raphael Neider <rneider AT web.de>
 
 	* configure.in, debugger/mcs51/configure.in,

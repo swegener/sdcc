@@ -1,3 +1,10 @@
+2010-09-11 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/cmd.c, src/SDCCbitv.c, sdas/asranlib/asranlib.c:
+	  fixed deffects, reported by Wipro Static Analysis Report On SDCC
+	* src/SDCCsymt.c: fixed redundant variable in SDCCsymt.c: getSpec(),
+	  thanks to Jan Waclawek
+
 2010-09-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genFunction, genEndFunction): use bitVectIsZero,
@@ -14,6 +21,7 @@
 	* sim/ucsim/z80.src/inst.cc:
 	  Fixed #3061455.
 
+>>>>>>> .r5958
 2010-09-06 Raphael Neider <rneider AT web.de>
 
 	* configure.in, debugger/mcs51/configure.in,

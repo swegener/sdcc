@@ -1732,61 +1732,59 @@ int cmdListFunctions (char *s, context *cctxt)
 |-----------------------------------------------------------------*/
 int cmdListModules (char *s, context *cctxt)
 {
-    module *m;
-    srcLine *cs, *as;
-    int i, mi;
-    int our_verbose = 0;
+  module *m;
+  srcLine *cs, *as;
+  int i, mi;
+  int our_verbose = 0;
 
-    if (strstr(s, "v1")) {
-      our_verbose = 1;
-    } else if (strstr(s, "v2")) {
-      our_verbose = 2;
-    }
+  if (strstr(s, "v1")) {
+    our_verbose = 1;
+  }
+  else if (strstr(s, "v2")) {
+    our_verbose = 2;
+  }
 
-    printf("[modules]\n");
-    m = setFirstItem(modules);
-    mi = 0;
-    for (;;) {
-      if (m == NULL)
-        break;
+  printf("[modules]\n");
+  m = setFirstItem(modules);
+  mi = 0;
+  for (; ; ) {
+    if (m == NULL)
+      break;
 
-      if (our_verbose >= 0) {
+    if (our_verbose >= 0) {
       printf("  %d) cfullname:%s, afullname:%s, name:%s\n", ++mi,
         m->cfullname, m->afullname, m->name);
       printf("    c_name:%s, asm_name:%s, ncLines:%d, nasmLines:%d\n",
-              m->c_name, m->asm_name, m->ncLines, m->nasmLines);
+        m->c_name, m->asm_name, m->ncLines, m->nasmLines);
       printf("    cLines:%p, asmLines:%p\n",
-              m->cLines, m->asmLines);
-      }
-      if (our_verbose >= 2) {
-        if (m->ncLines) {
-          printf("    [cLines] ");
-          if ( our_verbose)
-          for (i=0; i<m->ncLines; i++ ) {
-              cs = m->cLines[i];
-              printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
-                 i, cs->addr, cs->block, cs->level, cs->src);
-          }
-          if (!our_verbose)
-              printf("%d records", i);
-        }
-        if (m->nasmLines) {
-          printf("    [asmLines] ");
-          if ( our_verbose)
-          for (i=0; i<m->nasmLines; i++ ) {
-              as = m->asmLines[i];
-              printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
-                 i, as->addr, as->block, as->level, as->src);
-          }
-          if (!our_verbose)
-              printf("%d records", i);
-        }
-        printf("\n");
-      }
-
-      m = setNextItem(modules);
+        m->cLines, m->asmLines);
     }
-    return 0;
+    if (our_verbose >= 2) {
+      if (m->ncLines) {
+        printf("    [cLines] ");
+        if (our_verbose) {
+          for (i = 0; i < m->ncLines; i++) {
+            cs = m->cLines[i];
+            printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
+              i, cs->addr, cs->block, cs->level, cs->src);
+          }
+        }
+      }
+      if (m->nasmLines) {
+        printf("    [asmLines] ");
+        if (our_verbose) {
+          for (i = 0; i < m->nasmLines; i++) {
+            as = m->asmLines[i];
+            printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
+               i, as->addr, as->block, as->level, as->src);
+          }
+        }
+      }
+      printf("\n");
+    }
+    m = setNextItem(modules);
+  }
+  return 0;
 }
 
 /*-----------------------------------------------------------------

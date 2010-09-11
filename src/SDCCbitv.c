@@ -347,7 +347,7 @@ bitVectEqual (bitVect * bvp1, bitVect * bvp2)
 {
   int i;
 
-  if (!bvp1 || !bvp1)
+  if (!bvp1 || !bvp2)
     return 0;
 
   if (bvp1 == bvp2)

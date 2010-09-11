@@ -683,7 +683,6 @@ do_ranlib (const char *archive)
         {
           fprintf (stderr, "asranlib: can't stat %s: ", archive);
           perror (NULL);
-          fclose (infp);
           can_stat = 0;
         }
       else

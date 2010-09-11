@@ -797,9 +797,6 @@ genSymName (int level)
 sym_link *
 getSpec (sym_link * p)
 {
-  sym_link *loop;
-
-  loop = p;
   while (p && !(IS_SPEC (p)))
     p = p->next;
 

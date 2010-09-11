@@ -3538,7 +3538,7 @@ genFunction (iCode * ic)
           if (!IFFUNC_HASFCALL(sym->type))
             {
               /* if any registers used */
-              if (sym->regsUsed)
+              if (!bitVectIsZero (sym->regsUsed))
                 {
                   /* save the registers used */
                   for (i = 0; i < sym->regsUsed->size; i++)
@@ -3565,93 +3565,92 @@ genFunction (iCode * ic)
         }
       else
         {
-            /* This ISR uses a non-zero bank.
-             *
-             * We assume that the bank is available for our
-             * exclusive use.
-             *
-             * However, if this ISR calls a function which uses some
-             * other bank, we must save that bank entirely.
-             */
-            unsigned long banksToSave = 0;
+          /* This ISR uses a non-zero bank.
+           *
+           * We assume that the bank is available for our
+           * exclusive use.
+           *
+           * However, if this ISR calls a function which uses some
+           * other bank, we must save that bank entirely.
+           */
+          unsigned long banksToSave = 0;
 
-            if (IFFUNC_HASFCALL(sym->type))
+          if (IFFUNC_HASFCALL(sym->type))
             {
 
 #define MAX_REGISTER_BANKS 4
 
-                iCode *i;
-                int ix;
+              iCode *i;
+              int ix;
 
-                for (i = ic; i; i = i->next)
+              for (i = ic; i; i = i->next)
                 {
-                    if (i->op == ENDFUNCTION)
+                  if (i->op == ENDFUNCTION)
                     {
-                        /* we got to the end OK. */
-                        break;
+                      /* we got to the end OK. */
+                      break;
                     }
 
-                    if (i->op == CALL)
+                  if (i->op == CALL)
                     {
-                        sym_link *dtype;
+                      sym_link *dtype;
 
-                        dtype = operandType (IC_LEFT(i));
-                        if (dtype
-                         && FUNC_REGBANK(dtype) != FUNC_REGBANK(sym->type))
+                      dtype = operandType (IC_LEFT(i));
+                      if (dtype && FUNC_REGBANK(dtype) != FUNC_REGBANK(sym->type))
                         {
-                             /* Mark this bank for saving. */
-                             if (FUNC_REGBANK(dtype) >= MAX_REGISTER_BANKS)
+                           /* Mark this bank for saving. */
+                           if (FUNC_REGBANK(dtype) >= MAX_REGISTER_BANKS)
                              {
-                                 werror(E_NO_SUCH_BANK, FUNC_REGBANK(dtype));
+                               werror(E_NO_SUCH_BANK, FUNC_REGBANK(dtype));
                              }
-                             else
+                           else
                              {
-                                 banksToSave |= (1 << FUNC_REGBANK(dtype));
+                               banksToSave |= (1 << FUNC_REGBANK(dtype));
                              }
 
-                             /* And note that we don't need to do it in
-                              * genCall.
-                              */
-                             i->bankSaved = 1;
+                           /* And note that we don't need to do it in
+                            * genCall.
+                            */
+                           i->bankSaved = 1;
                         }
                     }
-                    if (i->op == PCALL)
+                  if (i->op == PCALL)
                     {
-                        /* This is a mess; we have no idea what
-                         * register bank the called function might
-                         * use.
-                         *
-                         * The only thing I can think of to do is
-                         * throw a warning and hope.
-                         */
-                        werror(W_FUNCPTR_IN_USING_ISR);
+                      /* This is a mess; we have no idea what
+                       * register bank the called function might
+                       * use.
+                       *
+                       * The only thing I can think of to do is
+                       * throw a warning and hope.
+                       */
+                      werror(W_FUNCPTR_IN_USING_ISR);
                     }
                 }
 
-                if (banksToSave && options.useXstack)
+              if (banksToSave && options.useXstack)
                 {
-                    /* Since we aren't passing it an ic,
-                     * saveRBank will assume r0 is available to abuse.
-                     *
-                     * So switch to our (trashable) bank now, so
-                     * the caller's R0 isn't trashed.
-                     */
-                    emitcode ("push", "psw");
-                    emitcode ("mov", "psw,#0x%02x",
-                              (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
-                    switchedPSW = TRUE;
+                  /* Since we aren't passing it an ic,
+                   * saveRBank will assume r0 is available to abuse.
+                   *
+                   * So switch to our (trashable) bank now, so
+                   * the caller's R0 isn't trashed.
+                   */
+                  emitcode ("push", "psw");
+                  emitcode ("mov", "psw,#0x%02x",
+                            (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
+                  switchedPSW = TRUE;
                 }
 
-                for (ix = 0; ix < MAX_REGISTER_BANKS; ix++)
+              for (ix = 0; ix < MAX_REGISTER_BANKS; ix++)
                 {
-                     if (banksToSave & (1 << ix))
+                   if (banksToSave & (1 << ix))
                      {
-                         saveRBank(ix, NULL, FALSE);
+                       saveRBank(ix, NULL, FALSE);
                      }
                 }
             }
-            // TODO: this needs a closer look
-            SPEC_ISR_SAVED_BANKS(currFunc->etype) = banksToSave;
+          // TODO: this needs a closer look
+          SPEC_ISR_SAVED_BANKS(currFunc->etype) = banksToSave;
         }
 
       /* Set the register bank to the desired value if nothing else */
@@ -3946,17 +3945,16 @@ genEndFunction (iCode * ic)
     }
 
   /* restore the register bank  */
-  if ( /* FUNC_REGBANK (sym->type) || */ IFFUNC_ISISR (sym->type))
-  {
-    if (!FUNC_REGBANK (sym->type) || !IFFUNC_ISISR (sym->type)
-     || !options.useXstack)
+  if (IFFUNC_ISISR (sym->type))
     {
-        /* Special case of ISR using non-zero bank with useXstack
-         * is handled below.
-         */
-        emitcode ("pop", "psw");
+      if (!FUNC_REGBANK (sym->type) || !options.useXstack)
+        {
+          /* Special case of ISR using non-zero bank with useXstack
+           * is handled below.
+           */
+          emitcode ("pop", "psw");
+        }
     }
-  }
 
   if (IFFUNC_ISISR (sym->type))
     {
@@ -3975,9 +3973,9 @@ genEndFunction (iCode * ic)
           if (!IFFUNC_HASFCALL(sym->type))
             {
               /* if any registers used */
-              if (sym->regsUsed)
+              if (!bitVectIsZero (sym->regsUsed))
                 {
-                  /* save the registers used */
+                  /* restore the registers used */
                   for (i = sym->regsUsed->size; i >= 0; i--)
                     {
                       if (bitVectBitValue (sym->regsUsed, i))
@@ -4002,28 +4000,28 @@ genEndFunction (iCode * ic)
         }
       else
         {
-            /* This ISR uses a non-zero bank.
-             *
-             * Restore any register banks saved by genFunction
-             * in reverse order.
-             */
-            unsigned savedBanks = SPEC_ISR_SAVED_BANKS(currFunc->etype);
-            int ix;
+          /* This ISR uses a non-zero bank.
+           *
+           * Restore any register banks saved by genFunction
+           * in reverse order.
+           */
+          unsigned savedBanks = SPEC_ISR_SAVED_BANKS(currFunc->etype);
+          int ix;
 
-            for (ix = MAX_REGISTER_BANKS - 1; ix >= 0; ix--)
+          for (ix = MAX_REGISTER_BANKS - 1; ix >= 0; ix--)
             {
-                if (savedBanks & (1 << ix))
+              if (savedBanks & (1 << ix))
                 {
-                    unsaveRBank(ix, NULL, FALSE);
+                  unsaveRBank(ix, NULL, FALSE);
                 }
             }
 
-            if (options.useXstack)
+          if (options.useXstack)
             {
-                /* Restore bank AFTER calling unsaveRBank,
-                 * since it can trash r0.
-                 */
-                emitcode ("pop", "psw");
+              /* Restore bank AFTER calling unsaveRBank,
+               * since it can trash r0.
+               */
+              emitcode ("pop", "psw");
             }
         }
 
@@ -4071,7 +4069,6 @@ genEndFunction (iCode * ic)
               emitcode ("pop", "%s", REG_WITH_INDEX (R1_IDX)->dname);
               emitcode ("pop", "%s", REG_WITH_INDEX (R0_IDX)->dname);
             }
-
         }
 
       /* if debug then send end of function */
@@ -4094,7 +4091,7 @@ genEndFunction (iCode * ic)
     return;
 
   /* If this was an interrupt handler using bank 0 that called another */
-  /* function, then all registers must be saved; nothing to optimized. */
+  /* function, then all registers must be saved; nothing to optimize.  */
   if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL(sym->type)
       && !FUNC_REGBANK(sym->type))
     return;
@@ -10815,6 +10812,129 @@ genPackBits (sym_link * etype,
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* genLiteralAssign - assignment of literal                        */
+/*-----------------------------------------------------------------*/
+static void
+genLiteralAssign (operand * result, operand * right, int size,
+				  bool (*output_fn)(operand * result, const char *s, int offset))
+{
+  unsigned long lit = 0L;
+  int offset;
+  int accumulator_value = -1;       /* -1 denotes: not yet set */
+
+  if (!IS_FLOAT (operandType (right)))
+    {
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    }
+  else
+    {
+      union { float f; unsigned char c[4]; } fl;
+
+      fl.f = (float) floatFromVal (AOP (right)->aopu.aop_lit);
+#ifdef WORDS_BIGENDIAN
+      lit = (fl.c[3] << 0) | (fl.c[2] << 8) | (fl.c[1] << 16) | (fl.c[0] << 24);
+#else
+      lit = (fl.c[0] << 0) | (fl.c[1] << 8) | (fl.c[2] << 16) | (fl.c[3] << 24);
+#endif
+    }
+
+  offset = 0;
+  while (size)
+    {
+      /* check whether preloading the accumulator pays off:
+
+            mov     direct,#something       3 byte, 2 cycle
+            mov     direct,a                2 byte, 1 cycle
+
+            mov     @r0,#something          2 byte, 1 cycle
+            mov     @r0,a                   1 byte, 1 cycle
+
+            mov     rx,#something           2 byte, 1 cycle
+            mov     rx,a                    1 byte, 1 cycle
+
+            clr     a                       1 byte, 1 cycle
+            mov     a,#something            2 byte, 1 cycle
+
+           (setting bytes in pdata and xdata need the accumulator anyway)
+       */
+
+      /* clr a needs an extra byte. If two bytes are zero it starts to pay off
+         to preload the accumulator */
+      int clr_num_bytes_saved = -1 +        /* size of clr a */
+                                (int)((((lit >>  0) & 0xff) == 0) && (size >= 1)) +
+                                (int)((((lit >>  8) & 0xff) == 0) && (size >= 2)) +
+                                (int)((((lit >> 16) & 0xff) == 0) && (size >= 3)) +
+                                (int)((((lit >> 24) & 0xff) == 0) && (size >= 4));
+
+      /* mov a,#something needs two extra bytes. If three bytes are identical it starts to pay off */
+      int mov_num_bytes_saved = -2 +        /* size of mov a,#something */
+                                (int)((lit & 0xff) == ((lit >>  0) & 0xff) && (size >= 1)) + /* true */
+                                (int)((lit & 0xff) == ((lit >>  8) & 0xff) && (size >= 2)) +
+                                (int)((lit & 0xff) == ((lit >> 16) & 0xff) && (size >= 3)) +
+                                (int)((lit & 0xff) == ((lit >> 24) & 0xff) && (size >= 4));
+
+      int num_bytes_to_save_before_using_acc_takes_effect = 1;
+
+      if (optimize.codeSpeed && (AOP_TYPE (result) != AOP_DIR))
+        {
+          /* require an extra byte being saved */
+          num_bytes_to_save_before_using_acc_takes_effect++;
+        }
+
+      /* eventually preload accumulator */
+      if ((clr_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) &&
+          (clr_num_bytes_saved >= mov_num_bytes_saved) &&
+          (lit & 0xff) == 0 )
+        {
+          if (0 != accumulator_value)
+            {
+              accumulator_value = 0;
+//              emitcode ("clr", "a");
+              MOVA ("#0x00");
+            }
+        }
+      else if ((mov_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) &&
+               (mov_num_bytes_saved > clr_num_bytes_saved))         /* preferrably have 0 in acc */
+        {
+          if ((lit & 0xff) != accumulator_value)
+            {
+              accumulator_value = lit & 0xff;
+//              emitcode ("mov", "a,%s", aopGet (right, offset, FALSE, FALSE));
+              MOVA (aopGet (right, offset, FALSE, FALSE));
+            }
+        }
+
+      /* write byte */
+      if ((lit & 0xff) == accumulator_value)
+        {
+          /* value in accumulator can be used */
+          output_fn (result, "a", offset);
+        }
+      else
+        {
+          /* otherwise use the normal path that should always work */
+          output_fn (result, aopGet (right, offset, FALSE, FALSE), offset);
+        }
+
+      /* advance */
+      lit >>= 8;
+      offset++;
+      size--;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* dataPut - puts a string for a aop and indicates if acc is in use */
+/*-----------------------------------------------------------------*/
+static bool
+litPut (operand * result, const char *s, int offset)
+{
+  char *l = aopGet (result, 0, FALSE, TRUE);
+  l++; //remove #
+  emitcode ("mov", "(%s + %d),%s", l, offset, s);
+  return FALSE;
+}
 
 /*-----------------------------------------------------------------*/
 /* genDataPointerSet - remat pointer to data space                 */
@@ -10824,8 +10944,8 @@ genDataPointerSet (operand * right,
                    operand * result,
                    iCode * ic)
 {
-  int size, offset = 0;
-  char *l, buffer[256];
+  int size, offset;
+  char *l, *r;
 
   D (emitcode (";", "genDataPointerSet"));
 
@@ -10834,14 +10954,23 @@ genDataPointerSet (operand * right,
   l = aopGet (result, 0, FALSE, TRUE);
   l++; //remove #
   size = max (AOP_SIZE (right), AOP_SIZE (result));
-  while (size--)
+  if ((size > 1) && IS_OP_LITERAL (right))
     {
-      if (offset)
-        SNPRINTF (buffer, sizeof(buffer), "(%s + %d)", l, offset);
-      else
-        SNPRINTF (buffer, sizeof(buffer), "%s", l);
-      emitcode ("mov", "%s,%s", buffer,
-                aopGet (right, offset++, FALSE, FALSE));
+      genLiteralAssign (result, right, size, litPut);
+    }
+  else
+    {
+      char buffer[256];
+
+      for (offset=0; offset<size; offset++)
+        {
+          r = aopGet (right, offset, FALSE, FALSE);
+          if (size > 1)
+            SNPRINTF (buffer, sizeof(buffer), "(%s + %d)", l, offset);
+          else
+            SNPRINTF (buffer, sizeof(buffer), "%s", l);
+          emitcode ("mov", "%s,%s", buffer, r);
+        }
     }
 
   freeAsmop (right, NULL, ic, TRUE);
@@ -11423,7 +11552,6 @@ genAssign (iCode * ic)
 {
   operand *result, *right;
   int size, offset;
-  unsigned long lit = 0L;
 
   D (emitcode (";", "genAssign"));
 
@@ -11464,120 +11592,19 @@ genAssign (iCode * ic)
 
   /* bit variables done */
   /* general case */
-  if (AOP_TYPE (right) == AOP_LIT)
-    {
-      if (!IS_FLOAT (operandType (right)))
-        {
-          lit = ulFromVal (AOP (right)->aopu.aop_lit);
-        }
-      else
-        {
-          union { float f; unsigned char c[4]; } fl;
-
-          fl.f = (float) floatFromVal (AOP (right)->aopu.aop_lit);
-#ifdef WORDS_BIGENDIAN
-          lit = (fl.c[3] << 0) | (fl.c[2] << 8) | (fl.c[1] << 16) | (fl.c[0] << 24);
-#else
-          lit = (fl.c[0] << 0) | (fl.c[1] << 8) | (fl.c[2] << 16) | (fl.c[3] << 24);
-#endif
-        }
-    }
 
   size = getDataSize (result);
-  offset = 0;
 
   if ((size > 1) &&
       (AOP_TYPE (result) != AOP_REG) && /* for registers too? (regression test passes) */
       (AOP_TYPE (right) == AOP_LIT)  &&
       !aopPutUsesAcc (result, aopGet (right, 0, FALSE, FALSE), 0))
     {
-      int accumulator_value = -1;       /* -1 denotes: not yet set */
-
-      while (size)
-        {
-          /* check whether preloading the accumulator pays off:
-
-                mov     direct,#something       3 byte, 2 cycle
-                mov     direct,a                2 byte, 1 cycle
-
-                mov     @r0,#something          2 byte, 1 cycle
-                mov     @r0,a                   1 byte, 1 cycle
-
-                mov     rx,#something           2 byte, 1 cycle
-                mov     rx,a                    1 byte, 1 cycle
-
-                clr     a                       1 byte, 1 cycle
-                mov     a,#something            2 byte, 1 cycle
-
-               (setting bytes in pdata and xdata need the accumulator anyway)
-           */
-
-          /* clr a needs an extra byte. If two bytes are zero it starts to pay off
-             to preload the accumulator */
-          int clr_num_bytes_saved = -1 +        /* size of clr a */
-                                    (int)((((lit >>  0) & 0xff) == 0) && (size >= 1)) +
-                                    (int)((((lit >>  8) & 0xff) == 0) && (size >= 2)) +
-                                    (int)((((lit >> 16) & 0xff) == 0) && (size >= 3)) +
-                                    (int)((((lit >> 24) & 0xff) == 0) && (size >= 4));
-
-          /* mov a,#something needs two extra bytes. If three bytes are identical it starts to pay off */
-          int mov_num_bytes_saved = -2 +        /* size of mov a,#something */
-                                    (int)((lit & 0xff) == ((lit >>  0) & 0xff) && (size >= 1)) + /* true */
-                                    (int)((lit & 0xff) == ((lit >>  8) & 0xff) && (size >= 2)) +
-                                    (int)((lit & 0xff) == ((lit >> 16) & 0xff) && (size >= 3)) +
-                                    (int)((lit & 0xff) == ((lit >> 24) & 0xff) && (size >= 4));
-
-          int num_bytes_to_save_before_using_acc_takes_effect = 1;
-
-          if (optimize.codeSpeed && (AOP_TYPE (result) != AOP_DIR))
-            {
-              /* require an extra byte being safed */
-              num_bytes_to_save_before_using_acc_takes_effect++;
-            }
-
-          /* eventually preload accumulator */
-          if ((clr_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) &&
-              (clr_num_bytes_saved >= mov_num_bytes_saved) &&
-              (lit & 0xff) == 0 )
-            {
-              if (0 != accumulator_value)
-                {
-                  accumulator_value = 0;
-                  emitcode ("clr", "a");
-                }
-            }
-          else if ((mov_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) &&
-                   (mov_num_bytes_saved > clr_num_bytes_saved))         /* preferrably have 0 in acc */
-            {
-              if ((lit & 0xff) != accumulator_value)
-                {
-                  accumulator_value = lit & 0xff;
-                  emitcode ("mov", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                }
-            }
-
-          /* write byte */
-          if ((lit & 0xff) == accumulator_value)
-            {
-              /* value in accumulator can be used */
-              aopPut (result, "a", offset);
-            }
-          else
-            {
-              /* otherwise use the normal path that should always work */
-              aopPut (result,
-                      aopGet (right, offset, FALSE, FALSE),
-                      offset);
-            }
-
-          /* advance */
-          lit >>= 8;
-          offset++;
-          size--;
-        }
+      genLiteralAssign (result, right, size, aopPut);
     }
   else
     {
+      offset = 0;
       while (size--)
         {
           aopPut (result,

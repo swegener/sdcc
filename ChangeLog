@@ -1,3 +1,11 @@
+2010-09-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genFunction, genEndFunction): use bitVectIsZero,
+	 (genLiteralAssign): factored out of genAssign,
+	 (litPut): new helper function for genDataPointerSet,
+	 (genDataPointerSet, genAssign): use genLiteralAssign instead of patch
+	  1490145 for consistency
+
 2010-08-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

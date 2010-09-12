@@ -1944,6 +1944,7 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
 	      break;
 	    default:
+              assert (PCI(pcs)->pcop != NULL);
 	      n = PCI(pcs)->pcop->name;
 	    }
 

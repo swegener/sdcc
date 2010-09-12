@@ -27,7 +27,10 @@ const char * findProgramPath(const char * argv0) {
     start = pathbuf = malloc(strlen(path) + 1);
     if (pathbuf == NULL) return NULL;
     buf = malloc(strlen(path) + strlen(argv0) + sizeof("/"));
-    if (buf == NULL) return NULL;	/* XXX can't happen */
+    if (buf == NULL) {  /* XXX can't happen */
+         free(pathbuf);
+         return NULL;
+    }      
     strcpy(pathbuf, path);
 
     chptr = NULL;

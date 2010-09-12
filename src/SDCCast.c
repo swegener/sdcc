@@ -6845,6 +6845,10 @@ ast_print (ast * tree, FILE * outfile, int indent)
   if (tree->opval.op == FUNCTION)
     {
       int arg = 0;
+
+      assert (tree->left != NULL);
+      assert (tree->left->opval.val != NULL);
+
       value *args = FUNC_ARGS (tree->left->opval.val->type);
       fprintf (outfile, "FUNCTION (%s=%p) type (",
                tree->left->opval.val->name, tree);
@@ -7288,6 +7292,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
     /*----------------------------*/
     case CAST:                 /* change the type   */
       fprintf (outfile, "CAST (%p) from type (", tree);
+      assert (tree->right != NULL);
       printTypeChain (tree->right->ftype, outfile);
       fprintf (outfile, ") to type (");
       printTypeChain (tree->ftype, outfile);

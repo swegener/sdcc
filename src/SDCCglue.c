@@ -1209,6 +1209,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s * o
   /* check the type      */
   if (compareType (type, val->type) == 0)
     {
+      assert (ilist != NULL);
       werrorfl (ilist->filename, ilist->lineno, W_INIT_WRONG);
       printFromToType (val->type, type);
     }

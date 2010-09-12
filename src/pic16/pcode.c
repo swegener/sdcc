@@ -3364,8 +3364,7 @@ void pic16_pcode_test(void)
 
   //initMnemonics();
 
-  if(the_pFile) {
-
+  if (the_pFile) {
     pBlock *pb;
     FILE *pFile;
     char buffer[100];
@@ -3391,6 +3390,7 @@ void pic16_pcode_test(void)
       fprintf(pFile,", dbName =%c\n",getpBlock_dbName(pb));
       pic16_printpBlock(pFile,pb);
     }
+    fclose(pFile);
   }
 }
 

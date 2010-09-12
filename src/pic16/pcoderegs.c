@@ -364,6 +364,7 @@ static void  RemoveRegsFromSet(set *regset)
 	    } 
 	    /* Move the label to the next instruction */
 
+            assert (PCI(pcn) != NULL);
 	    PCI(pcn)->label = PCI(pc)->label;
 
 	  }

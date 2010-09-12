@@ -2270,9 +2270,16 @@ int cmdListSrc (char *s, context *cctxt)
         return 0;
     if ( infomode )
     {
-        unsigned firstaddr , lastaddr ;
-            if ( pline  >= list_mod->ncLines )
-            pline = cctxt->cline;
+        unsigned firstaddr, lastaddr;
+
+        if ( pline  >= list_mod->ncLines )
+            if (!cctxt) {
+                fprintf(stdout, "Missing context at %d. Try list filename:lineno\n", __LINE__);
+                return 0;
+            }
+            else
+                pline = cctxt->cline;
+
         firstaddr = lastaddr = list_mod->cLines[pline]->addr;
         if (!func && cctxt && cctxt->func )
             func = cctxt->func;

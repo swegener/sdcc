@@ -3399,8 +3399,10 @@ geniCodeParms (ast * parms, value *argVals, int *iArg, int *stack,
         }
     }
 
-  if (*iArg >= 0)
+  if (*iArg >= 0) {
+    assert (argVals != NULL);
     argVals = argVals->next;
+  }
   (*iArg)++;
   return argVals;
 }

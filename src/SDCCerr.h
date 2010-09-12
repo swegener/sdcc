@@ -229,6 +229,16 @@
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 
+/** sdcc style assertion */
+#ifdef assert
+#undef assert
+#endif
+#ifdef NDEBUG
+# define assert(expr) (void)0
+#else
+# define assert(expr) ((expr) ? (void)0 : fatal (1, E_INTERNAL_ERROR, __FILE__, __LINE__, #expr))
+#endif
+
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.
  *

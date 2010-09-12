@@ -227,6 +227,7 @@ copyIlist (initList * src)
     }
 
   if (src->next)
+    assert (dest != NULL);
     dest->next = copyIlist (src->next);
 
   return dest;

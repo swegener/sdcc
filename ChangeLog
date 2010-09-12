@@ -1,7 +1,18 @@
 2010-09-11 Borut Razem <borut.razem AT siol.net>
 
+	* debugger/mcs51/cmd.c, src/SDCCpeeph.c, src/SDCChasht.c,
+	  src/SDCCval.c, src/SDCCicode.c, src/SDCCset.c, src/SDCCglue.c,
+	  src/z80/gen.c, src/pic16/pcodepeep.c, src/pic16/pcoderegs.c,
+	  src/pic16/pcode.c, src/SDCCast.c, sdas/asranlib/asranlib.c,
+	  support/makebin/makebin.c, support/Util/findme.c:
+	  fixed defects, reported by Wipro DeepCheck static analysis tool
+	  src/SDCCerr.h, src/SDCCglobl.h, src/common.h:
+	  introduced sdcc style assert
+
+2010-09-11 Borut Razem <borut.razem AT siol.net>
+
 	* debugger/mcs51/cmd.c, src/SDCCbitv.c, sdas/asranlib/asranlib.c:
-	  fixed deffects, reported by Wipro Static Analysis Report On SDCC
+	  fixed defects, reported by Wipro Static Analysis Report On SDCC
 	* src/SDCCsymt.c: fixed redundant variable in SDCCsymt.c: getSpec(),
 	  thanks to Jan Waclawek
 

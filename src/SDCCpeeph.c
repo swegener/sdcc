@@ -2352,6 +2352,7 @@ readFileIntoBuffer (char *fname)
           nch = 0;
         }
     }
+  fclose (f);
 
   /* if some characters left over */
   if (nch)

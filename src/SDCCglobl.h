@@ -4,11 +4,9 @@
 #define SDCCGLOBL_H
 
 #include <memory.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdio.h>
-
 #include "SDCCset.h"
 
 

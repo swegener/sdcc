@@ -436,6 +436,7 @@ main (int argc, char **argv)
   rom = malloc (size);
   if (rom == NULL)
     {
+      fclose (fin);
       fprintf (stderr, "error: couldn't allocate room for the image.\n");
       return 1;
     }

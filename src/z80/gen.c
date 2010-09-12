@@ -8319,6 +8319,7 @@ setupForMemcpy (iCode *ic, int nparams, operand **pparams)
                         }
                       else
                         {
+                          assert (k < 2);
                           dest_pairs[k] = dest[i];
                           src_pairs[k] = j;
                           i_pairs[k] = i;

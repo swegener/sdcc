@@ -411,7 +411,10 @@ process_symbol_table (struct ar_hdr *hdr, FILE *fp)
           po += 4;
 
           if (NULL == (obj = get_member_name_by_offset (fp, offset))) /* member name */
-            return 0;
+            {
+              free (buf);
+              return 0;
+            }
 
           printf ("%s in %s", ps, obj);
           if (verbose)

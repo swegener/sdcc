@@ -1,4 +1,4 @@
-2010-09-11 Borut Razem <borut.razem AT siol.net>
+2010-09-12 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/cmd.c, src/SDCCpeeph.c, src/SDCChasht.c,
 	  src/SDCCval.c, src/SDCCicode.c, src/SDCCset.c, src/SDCCglue.c,
@@ -8,6 +8,9 @@
 	  fixed defects, reported by Wipro DeepCheck static analysis tool
 	  src/SDCCerr.h, src/SDCCglobl.h, src/common.h:
 	  introduced sdcc style assert
+	* ../asxxxx: removed copy of asxxxx v2.0 sources from sdcc source tree:
+	  asxxxx v3.0 sources are availeble at
+	  http://shop-pdp.kent.edu/ashtml/asxarc.htm
 
 2010-09-11 Borut Razem <borut.razem AT siol.net>
 

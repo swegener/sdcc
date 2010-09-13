@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  cvtdec.S - convert a 16-bit binary word to 5 BCD bytes
 ;
-;  Copyright (C) 2004-10-19, George Gallant <ggallant571 AT verizon.net>
+;  Copyright (C) 2004, George Gallant <ggallant571 AT verizon.net>
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -28,6 +28,10 @@
 
 ;--
 ;
+;	File:	cvtdec.asm
+;	Author:	George Gallant
+;	Date:	19OCT04
+;	
 ;	This routine is based on the code and algorithm by
 ;	Nikolai Golovchenko and Scott Dattalo presented in
 ;	the piclist webb site on radix conversion methods.

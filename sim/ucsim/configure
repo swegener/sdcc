@@ -2729,7 +2729,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers ddconfig.h:ddconfig_in.h"
+ac_config_headers="$ac_config_headers ddconfig.h:ddconfig_in.h custom.h:custom_in.h"
 
 
 for ac_prog in gawk mawk nawk awk
@@ -16196,6 +16196,7 @@ _ACEOF
 
 
 
+
 if echo $TYPE_DWORD|grep short >/dev/null; then
     A="h"
 elif echo $TYPE_DWORD|grep long >/dev/null; then
@@ -17269,6 +17270,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "ddconfig.h") CONFIG_HEADERS="$CONFIG_HEADERS ddconfig.h:ddconfig_in.h" ;;
+    "custom.h") CONFIG_HEADERS="$CONFIG_HEADERS custom.h:custom_in.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "main.mk") CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;

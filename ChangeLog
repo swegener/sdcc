@@ -5,6 +5,8 @@
 	* sim/ucsim/configure.in, sim/ucsim/custom.h, sim/ucsim/custom_in.h:
 	  have configure create custom.h next to ddconfig.h in the build tree
 	  so that CPP will find it
+	* configure, sdccconf_in.h, sim/ucsim/configure,
+	  sim/ucsim/ddconfig_in.h: regenerated
 
 2010-09-13 Borut Razem <borut.razem AT siol.net>
 

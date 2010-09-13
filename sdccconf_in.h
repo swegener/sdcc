@@ -1,5 +1,8 @@
 /* sdccconf_in.h.  Generated from configure.in by autoheader.  */
 
+#ifndef SDCCCONF_HEADER
+#define SDCCCONF_HEADER
+
 /* XXX */
 #undef BIN2DATA_DIR
 
@@ -60,6 +63,9 @@
 
 /* Define to 1 if you have the <sys/endian.h> header file. */
 #undef HAVE_SYS_ENDIAN_H
+
+/* Define to 1 if you have the <sys/isa_defs.h> header file. */
+#undef HAVE_SYS_ISA_DEFS_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
@@ -245,3 +251,6 @@
 #ifndef __CHAR_UNSIGNED__
 # undef __CHAR_UNSIGNED__
 #endif
+
+#include "custom.h"
+#endif /* SDCCCONF_HEADER */

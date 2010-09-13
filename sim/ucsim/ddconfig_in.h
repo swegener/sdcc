@@ -1,5 +1,8 @@
 /* ddconfig_in.h.  Generated from configure.in by autoheader.  */
 
+#ifndef DDCONFIG_HEADER
+#define DDCONFIG_HEADER
+
 /* Define to be the type of length parameter of accept (without the \*'). */
 #undef ACCEPT_SOCKLEN_T
 
@@ -262,3 +265,4 @@
 #undef _M_
 
 #include "custom.h"
+#endif /* DDCONFIG_HEADER */

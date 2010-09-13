@@ -1,3 +1,9 @@
+2010-09-13 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/libc/utils/cvtdec.S,
+	  device/lib/pic16/libc/stdlib/g_ftoa.S:
+	  sdcc library license changed to GPL+LE
+
 2010-09-12 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/cmd.c, src/SDCCpeeph.c, src/SDCChasht.c,

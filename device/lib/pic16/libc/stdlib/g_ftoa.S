@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  ftoa.S - floating point to ascii conversion
+;  g_ftoa.S - floating point to ascii conversion
 ;
 ;  Copyright (C) 2004, George Gallant <ggallant571 AT verizon.net>
 ;

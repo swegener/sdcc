@@ -1,3 +1,13 @@
+2010-09-13 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/_divulong.c, device/lib/_decdptr.c, device/lib/_divuint.c,
+	  device/lib/pic16/libsdcc/long/divulong.c,
+	  device/lib/pic16/libsdcc/int/divuint.c,
+	  device/lib/pic16/libsdcc/char/divuchar.c,
+	  device/lib/hc08/_divuint.c, device/lib/hc08/_divulong.c,
+	  device/lib/hc08/_mullong.c:
+	  sdcc library license changed to GPL+LE
+
 2010-09-13 Raphael Neider <rneider AT web.de>
 
 	* configure.in, custom_in.h:

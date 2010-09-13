@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------
    _mullong.c - routine for multiplication of 32 bit (unsigned) long
 
-   Copyright (C) 1999, Sandeep Dutta <sandeep.dutta AT usa.net>
-   Copyright (C) 1999, Jean Louis VERN <jlvern AT writeme.com>
+   Copyright (C) 1999, Jean-Louis Vern <jlvern AT gmail.com>
+   Copyright (C) 1999, Sandeep Dutta <sandeep.dutta AT ieee.org>
    Modified for pic16 port by - Vangelis Rokas <vrokas AT otenet.gr> (2004)
 
    This library is free software; you can redistribute it and/or modify it

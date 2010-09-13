@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 AC_INIT
 AC_CONFIG_SRCDIR(.version)
-AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
+AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h custom.h:custom_in.h)
 
 AC_PROG_AWK
 
@@ -623,7 +623,10 @@ AC_DEFINE_UNQUOTED(TYPE_UBYTE, [unsigned $TYPE_BYTE], [XXX])
 AC_DEFINE_UNQUOTED(TYPE_UWORD, [unsigned $TYPE_WORD], [XXX])
 AC_DEFINE_UNQUOTED(TYPE_UDWORD, [unsigned $TYPE_DWORD], [XXX])
 
-AH_BOTTOM([#include "custom.h"])
+AH_TOP([#ifndef DDCONFIG_HEADER
+#define DDCONFIG_HEADER])
+AH_BOTTOM([#include "custom.h"
+#endif /* DDCONFIG_HEADER */])
 
 if echo $TYPE_DWORD|grep short >/dev/null; then
     A="h"

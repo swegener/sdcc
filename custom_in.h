@@ -1,36 +1,4 @@
-/*
- * Simulator of microcontrollers (custom.h)
- *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
- *
- */
-
-/* This file is part of microcontroller simulator: ucsim.
-
-UCSIM is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-UCSIM is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with UCSIM; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA. */
-/*@1@*/
-
-#ifndef CUSTOM_HEADER
-#define CUSTOM_HEADER
-
-#define DD_TRUE     1
-#define DD_FALSE    0
-#define NIL         0
+/* custom.h -- manual additions to #include into sdccconf.h */
 
 /*
  * find out the endianess of host machine
@@ -62,14 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #   endif
 # else
 /* 3) trust the configure; this actually doesn't work for unified Mac OS X binaries :-( */
-#   undef BUILD_WORDS_BIGENDIAN
 #   if (defined BUILD_WORDS_BIGENDIAN && BUILD_WORDS_BIGENDIAN)
 #     define WORDS_BIGENDIAN  1
 #   endif
 /* 4) assume that host is a little endian machine */
 # endif
 #endif
-
-#endif
-
-/* End of custom.h */

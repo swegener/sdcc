@@ -1,3 +1,11 @@
+2010-09-13 Raphael Neider <rneider AT web.de>
+
+	* configure.in, custom_in.h:
+	  revive support for big-endian machines, broken since r5954
+	* sim/ucsim/configure.in, sim/ucsim/custom.h, sim/ucsim/custom_in.h:
+	  have configure create custom.h next to ddconfig.h in the build tree
+	  so that CPP will find it
+
 2010-09-13 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libc/utils/cvtdec.S,

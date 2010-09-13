@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 AC_INIT(.version)
 AC_CONFIG_SRCDIR([Makefile.in])
-AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h sdas/linksrc/asxxxx_config.h])
+AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h custom.h:custom_in.h sdas/linksrc/asxxxx_config.h])
 
 AC_PROG_AWK
 
@@ -68,7 +68,7 @@ SDCC_REQUIRE_PROG($LEX, flex)
 
 AC_LANG_C
 
-AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h)
+AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
 
 AC_ARG_WITH([ccache],
     AC_HELP_STRING([--without-ccache], [do not use ccache even if available]),
@@ -665,6 +665,12 @@ AC_DEFINE_UNQUOTED(SDCC_INCLUDE_NAME, "${sdcc_include_name}", [XXX])
 
 sdcc_lib_name="SDCC_LIB"
 AC_DEFINE_UNQUOTED(SDCC_LIB_NAME, "${sdcc_lib_name}", [XXX])
+
+# add include guard and custom stuff to sdccconf.h
+AH_TOP([#ifndef SDCCCONF_HEADER
+#define SDCCCONF_HEADER])
+AH_BOTTOM([#include "custom.h"
+#endif /* SDCCCONF_HEADER */])
 
 # Port selection helper
 # ===========================================================================

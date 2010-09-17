@@ -3689,7 +3689,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 {
   int min, max, cnt = 1;
   int i, t;
-  value *vch;
+  value *vch, *maxVal;
   iCode *ic;
   operand *boundary;
   symbol *falseLabel;
@@ -3718,6 +3718,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
       vch = vch->next;
     }
   max = (int) ulFromVal (vch);
+  maxVal = vch;
 
   /* Exit if the range is too large to handle with a jump table. */
   if (1 + max - min > port->jumptableCost.maxCount)
@@ -3825,8 +3826,10 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     {
       sym_link *cetype = getSpec (operandType (cond));
       /* no need to check the lower bound if
+         the condition is always >= min or
          the condition is unsigned & minimum value is zero */
-      if (!(min == 0 && IS_UNSIGNED (cetype)))
+      if ((checkConstantRange (cetype, caseVals->etype, '<', FALSE) != CCR_ALWAYS_FALSE) &&
+          (!(min == 0 && IS_UNSIGNED (cetype))))
         {
           boundary = geniCodeLogic (cond, operandFromLit (min), '<', NULL);
           ic = newiCodeCondition (boundary, falseLabel, NULL);
@@ -3834,9 +3837,12 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
         }
 
       /* now for upper bounds */
-      boundary = geniCodeLogic (cond, operandFromLit (max), '>', NULL);
-      ic = newiCodeCondition (boundary, falseLabel, NULL);
-      ADDTOCHAIN (ic);
+      if (checkConstantRange (cetype, maxVal->etype, '>', FALSE) != CCR_ALWAYS_FALSE)
+        {
+          boundary = geniCodeLogic (cond, operandFromLit (max), '>', NULL);
+          ic = newiCodeCondition (boundary, falseLabel, NULL);
+          ADDTOCHAIN (ic);
+        }
     }
 
   /* if the min is not zero then we no make it zero */
@@ -3880,7 +3886,7 @@ geniCodeSwitch (ast * tree,int lvl)
             {
               SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d%s",
                         tree->values.switchVals.swNum, caseVal,
-			tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
+                        tree->values.switchVals.swSuffix? tree->values.switchVals.swSuffix: "");
               trueLabel = newiTempLabel (buffer);
               geniCodeGoto (trueLabel);
               goto jumpTable;

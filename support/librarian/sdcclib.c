@@ -298,7 +298,8 @@ void AddRel(char * RelName)
     if(lib!=NULL) while(!feof(lib))
     {
         FLine[0]=0;
-        fgets(FLine, MAXLINE, lib);
+        if (fgets(FLine, MAXLINE, lib) == NULL)
+          break;
         CleanLine(FLine);
 
         switch(state)
@@ -307,7 +308,8 @@ void AddRel(char * RelName)
                 if(EQ(FLine, "<FILE>"))
                 {
                     FLine[0]=0;
-                    fgets(FLine, MAXLINE, lib);
+                    if (fgets(FLine, MAXLINE, lib) == NULL)
+                      break;
                     CleanLine(FLine);
                     if(NEQ(FLine, ModName))
                     {
@@ -349,7 +351,8 @@ void AddRel(char * RelName)
         while(!feof(rel))
         {
             FLine[0]=0;
-            fgets(FLine, MAXLINE, rel);
+            if (fgets(FLine, MAXLINE, rel) == NULL)
+              break;
             CleanLine(FLine);
             if(strlen(FLine)>0)
             {
@@ -371,7 +374,8 @@ void AddRel(char * RelName)
             while(!feof(rel))
             {
                 FLine[0]=0;
-                fgets(FLine, MAXLINE, adb);
+                if (fgets(FLine, MAXLINE, adb) == NULL)
+                  break;
                 CleanLine(FLine);
                 if(strlen(FLine)>0)
                 {
@@ -411,7 +415,8 @@ void AddRel(char * RelName)
     while(!feof(libindex))
     {
         FLine[0]=0;
-        fgets(FLine, MAXLINE, libindex);
+        if (fgets(FLine, MAXLINE, libindex) == NULL)
+          break;
         fprintf(lib, "%s", FLine);
     }
     fprintf(lib, "\n</INDEX>\n\n");
@@ -419,7 +424,8 @@ void AddRel(char * RelName)
     while(!feof(newlib))
     {
         FLine[0]=0;
-        fgets(FLine, MAXLINE, newlib);
+        if (fgets(FLine, MAXLINE, newlib) == NULL)
+          break;
         fprintf(lib, "%s", FLine);
     }
     fprintf(lib, "\n</FILES>\n\n");
@@ -469,7 +475,8 @@ void ExtractRel(char * RelName)
     {
         if(state==5) break;
         FLine[0]=0;
-        fgets(FLine, MAXLINE, lib);
+        if (fgets(FLine, MAXLINE, lib) == NULL)
+          break;
         CleanLine(FLine);
 
         switch(state)
@@ -478,7 +485,8 @@ void ExtractRel(char * RelName)
                 if(EQ(FLine, "<FILE>"))
                 {
                     FLine[0]=0;
-                    fgets(FLine, MAXLINE, lib);
+                    if (fgets(FLine, MAXLINE, lib) == NULL)
+                      break;
                     CleanLine(FLine);
                     if(EQ(FLine, ModName)) state=1;
                 }
@@ -521,7 +529,8 @@ void DumpSymbols(void)
     }
 
     FLine[0]=0;
-    fgets(FLine, MAXLINE, lib);
+    if (fgets(FLine, MAXLINE, lib) == NULL)
+      return;
     CleanLine(FLine);
     if(NEQ(FLine, "<SDCCLIB>"))
     {
@@ -533,7 +542,8 @@ void DumpSymbols(void)
     {
         if(state==3) break;
         FLine[0]=0;
-        fgets(FLine, MAXLINE, lib);
+        if (fgets(FLine, MAXLINE, lib) == NULL)
+          break;
         CleanLine(FLine);
 
         switch(state)
@@ -545,7 +555,8 @@ void DumpSymbols(void)
                 if(EQ(FLine, "<MODULE>"))
                 {
                     FLine[0]=0;
-                    fgets(FLine, MAXLINE, lib);
+                    if (fgets(FLine, MAXLINE, lib) == NULL)
+                      break;
                     sscanf(FLine, "%s", ModName);
                     if(action==OPT_DUMP_SYM)
                     {
@@ -610,7 +621,8 @@ void AddList(void)
     while(!feof(list))
     {
         RelName[0]=0;
-        fgets(RelName, PATH_MAX, list);
+        if (fgets(RelName, PATH_MAX, list) == NULL)
+          break;
         CleanLine(RelName);
         if(strlen(RelName)>0) //Skip empty lines
         {
@@ -628,7 +640,8 @@ void AddList(void)
                 {
                     sprintf(CmdLine, "%s %s", cc, SrcName);
                     printf("%s\n", CmdLine);
-                    system(CmdLine);
+                    if (system(CmdLine))
+                      continue;
                 }
             }
             else if(as!=NULL)
@@ -638,7 +651,8 @@ void AddList(void)
                 {
                     sprintf(CmdLine, "%s %s", as, SrcName);
                     printf("%s\n", CmdLine);
-                    system(CmdLine);
+                    if (system(CmdLine))
+                      continue;
                 }
             }
 

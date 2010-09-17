@@ -1,6 +1,9 @@
 2010-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (ast_print): fixed for MSVC
+	* src/SDCCicode.c (geniCodeJumpTable): fixed bug 2947189
+	* support/librarian/sdcclib.c: test return values of system and fgets
+	
 
 2010-09-13 Borut Razem <borut.razem AT siol.net>
 

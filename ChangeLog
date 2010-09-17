@@ -1,3 +1,7 @@
+2010-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (ast_print): fixed for MSVC
+
 2010-09-13 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/_divulong.c, device/lib/_decdptr.c, device/lib/_divuint.c,

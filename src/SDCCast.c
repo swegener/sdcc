@@ -6845,11 +6845,12 @@ ast_print (ast * tree, FILE * outfile, int indent)
   if (tree->opval.op == FUNCTION)
     {
       int arg = 0;
+      value *args;
 
       assert (tree->left != NULL);
       assert (tree->left->opval.val != NULL);
 
-      value *args = FUNC_ARGS (tree->left->opval.val->type);
+      args = FUNC_ARGS (tree->left->opval.val->type);
       fprintf (outfile, "FUNCTION (%s=%p) type (",
                tree->left->opval.val->name, tree);
       printTypeChain (tree->left->opval.val->type->next, outfile);

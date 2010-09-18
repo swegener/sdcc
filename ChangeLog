@@ -1,3 +1,8 @@
+2010-09-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/doc/sdccman.lyx:
+	  Minor update in ANSI conformance section.
+
 2010-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (ast_print): fixed for MSVC

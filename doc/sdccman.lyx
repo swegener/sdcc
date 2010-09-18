@@ -1,4 +1,4 @@
-#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -64987,7 +64987,9 @@ Deviations from the compliance:
 \end_layout
 
 \begin_layout Itemize
-functions are not reentrant
+in some ports (e.
+ g.
+ mcs51) functions are not reentrant
 \begin_inset Index
 status collapsed
 
@@ -65402,7 +65404,7 @@ int i,j; /* is valid in ANSI but not valid in SDCC */
 
 \end_deeper
 \begin_layout Itemize
-Most enhancements in C99 are not supported, e.g.:
+Some enhancements in C99 are not supported, e.g.:
 \end_layout
 
 \begin_deeper
@@ -65417,60 +65419,6 @@ int
  
 \family typewriter
 i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-But some have been added recently in SDCC 2.7.0.
- They must be considered alpha quality however.
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-\series bold
-inline
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-inline (not supported)
-\end_layout
-
-\end_inset
-
-
-\family default
-\series default
- 
-\family typewriter
-int increment (int a) { return a+1; } /* inlines the increment without function
- call overhead */
-\begin_inset Newline newline
-\end_inset
-
-int *
-\family default
- 
-\family typewriter
-\series bold
-restrict
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-inline (not supported)
-\end_layout
-
-\end_inset
-
-
-\family default
-\series default
- 
-\family typewriter
-p; /* accepted but ignored */
 \end_layout
 
 \end_deeper

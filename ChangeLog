@@ -1,3 +1,8 @@
+2010-09-18 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/cmd.c:
+	  fixed warning: suggest explicit braces to avoid ambiguous ‘else’
+
 2010-09-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/doc/sdccman.lyx:
@@ -8,7 +13,6 @@
 	* src/SDCCast.c (ast_print): fixed for MSVC
 	* src/SDCCicode.c (geniCodeJumpTable): fixed bug 2947189
 	* support/librarian/sdcclib.c: test return values of system and fgets
-	
 
 2010-09-13 Borut Razem <borut.razem AT siol.net>
 

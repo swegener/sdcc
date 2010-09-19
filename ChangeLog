@@ -1,3 +1,8 @@
+2010-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (geniCodeJumpTable): fixed bug 3069862
+	* support/regression/tests/bug2947189.c: new, added
+
 2010-09-18 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/cmd.c:

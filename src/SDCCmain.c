@@ -1755,7 +1755,7 @@ linkEdit (char **envp)
                     }
                   if (NULL == s)
                     {
-                      /* not found in standard library directories, serch in user defined linrary paths */
+                      /* not found in standard library directories, serch in user defined library paths */
                       /* TODO: sould be crt searched here at all? */
                       for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
                         {

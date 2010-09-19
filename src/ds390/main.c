@@ -890,7 +890,7 @@ get_model (void)
         return "large";
 
     case MODEL_FLAT24:
-        return port->target_name;
+        return port->target;
 
     default:
       werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);

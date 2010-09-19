@@ -9,6 +9,8 @@
 	  fixed mingw32 cross compiled regression tests:
 	  include top source directory when cross compiling,
 	  launch win32 native simulator with wine
+	* src/SDCCmain.c, src/ds390/main.c:
+	  ds390 default library path was wrong
 
 2010-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

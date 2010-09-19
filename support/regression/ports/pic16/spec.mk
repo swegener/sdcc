@@ -16,6 +16,11 @@ ifndef CROSSCOMPILING
 endif
 endif
 
+ifdef CROSSCOMPILING
+  SDCCFLAGS += -I$(top_srcdir)
+  GPSIM = wine $(GPSIM)
+endif
+
 SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q -DREENTRANT=__reentrant
 SDCCFLAGS += --no-peep
 LINKFLAGS += libsdcc.lib libc18f.lib libm18f.lib

@@ -22,6 +22,12 @@ ifndef CROSSCOMPILING
 endif
 endif
 
+ifdef CROSSCOMPILING
+  SDCCFLAGS += -I$(top_srcdir)
+  UCHC08 = wine $(UCHC08)
+  AS_HC08 = wine $(AS_HC08)
+endif
+
 SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
 LINKFLAGS += hc08.lib
 

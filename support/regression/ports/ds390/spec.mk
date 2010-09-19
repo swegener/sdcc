@@ -2,10 +2,6 @@
 
 CC_FOR_BUILD = $(CC)
 
-ifndef DEV_NULL
-  DEV_NULL = /dev/null
-endif
-
 # path to uCsim
 ifdef SDCC_BIN_PATH
   S51 = $(SDCC_BIN_PATH)/s51$(EXEEXT)
@@ -19,6 +15,15 @@ ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
   LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/ds390
 endif
+endif
+
+ifdef CROSSCOMPILING
+  SDCCFLAGS += -I$(top_srcdir)
+  S51 = wine $(S51)
+
+  DEV_NULL ?= NUL
+else
+  DEV_NULL ?= /dev/null
 endif
 
 SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=__reentrant -Wl-r

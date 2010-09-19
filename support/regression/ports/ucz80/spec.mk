@@ -22,6 +22,12 @@ ifndef CROSSCOMPILING
 endif
 endif
 
+ifdef CROSSCOMPILING
+  SDCCFLAGS += -I$(top_srcdir)
+  UCZ80 = wine $(UCZ80)
+  AS_Z80 = wine $(AS_Z80)
+endif
+
 SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=__reentrant
 LINKFLAGS += z80.lib

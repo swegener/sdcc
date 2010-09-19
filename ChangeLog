@@ -1,3 +1,15 @@
+2010-09-19 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk:
+	  fixed mingw32 cross compiled regression tests:
+	  include top source directory when cross compiling,
+	  lounch win32 native simulator with wine
+
 2010-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (geniCodeJumpTable): fixed bug 3069862

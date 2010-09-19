@@ -51,7 +51,7 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 # run simulator with 25 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 25 "$(GPSIM)" -i -s $< -c $(PORTS_DIR)/pic16/gpsim.cmd > $@ || \
+	-$(CASES_DIR)/timeout 25 $(GPSIM) -i -s $< -c $(PORTS_DIR)/pic16/gpsim.cmd > $@ || \
 	  echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true

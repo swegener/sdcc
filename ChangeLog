@@ -8,9 +8,13 @@
 	  support/regression/ports/mcs51-common/spec.mk:
 	  fixed mingw32 cross compiled regression tests:
 	  include top source directory when cross compiling,
-	  launch win32 native simulator with wine
+	  launch win32 native simulator with wine,
+	  removed wrong quotes, call build machine native timeout utility
 	* src/SDCCmain.c, src/ds390/main.c:
 	  ds390 default library path was wrong
+	* src/SDCC.lex: implemented punctuators, as defined in
+	  ISO/IEC 9899:1999, chapter 6.4.6#3
+	  support/regression/tests/preproc.c: punctuators regression test
 
 2010-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

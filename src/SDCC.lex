@@ -29,6 +29,7 @@ H       [a-fA-F0-9]
 E       [Ee][+-]?{D}+
 FS      (f|F|l|L)
 IS      (u|U|l|L)*
+HASH	(#|%:)
 
 %{
 #include <stdio.h>
@@ -255,15 +256,15 @@ _?"_asm"         {
 "=="           { count (); return EQ_OP; }
 "!="           { count (); return NE_OP; }
 ";"            { count (); return ';'; }
-"{"            { count (); ++NestLevel; ignoreTypedefType = 0; return '{'; }
-"}"            { count (); --NestLevel; return '}'; }
+"{"|"<%"       { count (); ++NestLevel; ignoreTypedefType = 0; return '{'; }
+"}"|"%>"       { count (); --NestLevel; return '}'; }
 ","            { count (); return ','; }
 ":"            { count (); return ':'; }
 "="            { count (); return '='; }
 "("            { count (); ignoreTypedefType = 0; return '('; }
 ")"            { count (); return ')'; }
-"["            { count (); return '['; }
-"]"            { count (); return ']'; }
+"["|"<:"       { count (); return '['; }
+"]"|":>"       { count (); return ']'; }
 "."            { count (); return '.'; }
 "&"            { count (); return '&'; }
 "!"            { count (); return '!'; }
@@ -278,8 +279,8 @@ _?"_asm"         {
 "^"            { count (); return '^'; }
 "|"            { count (); return '|'; }
 "?"            { count (); return '?'; }
-^#pragma.*$    { count (); process_pragma (yytext); }
-^(#line.*"\n")|(#.*"\n") { count (); checkCurrFile (yytext); }
+^{HASH}pragma.*$    { count (); process_pragma (yytext); }
+^({HASH}line.*"\n")|({HASH}.*"\n") { count (); checkCurrFile (yytext); }
 
 ^[^(]+"("[0-9]+") : error"[^\n]+ { werror (E_PRE_PROC_FAILED, yytext); count (); }
 ^[^(]+"("[0-9]+") : warning"[^\n]+ { werror (W_PRE_PROC_WARNING, yytext); count (); }

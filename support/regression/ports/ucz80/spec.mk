@@ -12,9 +12,9 @@ else
   SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80$(EXEEXT)
   SZ80B = $(top_builddir)/bin/sz80$(EXEEXT)
 
-  UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
+  UCZ80C = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 
-  AS_Z80 = $(top_builddir)/bin/sdasz80$(EXEEXT)
+  AS_Z80C = $(top_builddir)/bin/sdasz80$(EXEEXT)
 
 ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
@@ -24,8 +24,12 @@ endif
 
 ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
-  UCZ80 = wine $(UCZ80)
-  AS_Z80 = wine $(AS_Z80)
+
+  UCZ80 = wine $(UCZ80C)
+  AS_Z80 = wine $(AS_Z80C)
+else
+  UCZ80 = $(UCZ80C)
+  AS_Z80 = $(AS_Z80C)
 endif
 
 SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=

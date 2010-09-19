@@ -12,9 +12,9 @@ else
   UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/shc08$(EXEEXT)
   UCHC08B = $(top_builddir)/bin/shc08$(EXEEXT)
 
-  UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
+  UCHC08C = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
 
-  AS_HC08 = $(top_builddir)/bin/sdas6808$(EXEEXT)
+  AS_HC08C = $(top_builddir)/bin/sdas6808$(EXEEXT)
 
 ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
@@ -24,8 +24,12 @@ endif
 
 ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
-  UCHC08 = wine $(UCHC08)
-  AS_HC08 = wine $(AS_HC08)
+
+  UCHC08 = wine $(UCHC08C)
+  AS_HC08 = wine $(AS_HC08C)
+else
+  UCHC08 = $(UCHC08C)
+  AS_HC08 = $(AS_HC08C)
 endif
 
 SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant

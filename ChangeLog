@@ -8,7 +8,7 @@
 	  support/regression/ports/mcs51-common/spec.mk:
 	  fixed mingw32 cross compiled regression tests:
 	  include top source directory when cross compiling,
-	  lounch win32 native simulator with wine
+	  launch win32 native simulator with wine
 
 2010-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

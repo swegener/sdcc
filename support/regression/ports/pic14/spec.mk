@@ -4,9 +4,9 @@ CC_FOR_BUILD = $(CC)
 
 # path to gpsim
 ifdef GPSIM_PATH
-  GPSIM := $(GPSIM_PATH)/gpsim$(EXEEXT)
+  GPSIMC := $(GPSIM_PATH)/gpsim$(EXEEXT)
 else
-  GPSIM := gpsim$(EXEEXT)
+  GPSIMC := gpsim$(EXEEXT)
 endif
 
 ifndef SDCC_BIN_PATH
@@ -18,7 +18,10 @@ endif
 
 ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
-  GPSIM = wine $(GPSIM)
+
+  GPSIM = wine $(GPSIMC)
+else
+  GPSIM = $(GPSIMC)
 endif
 
 SDCCFLAGS += -mpic14 -pp16f877 --less-pedantic -Wl,-q -DREENTRANT=__reentrant

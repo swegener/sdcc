@@ -1,3 +1,8 @@
+2010-09-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/doc/sdccman.lyx:
+	  Fixed #3071726.
+
 2010-09-19 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/pic14/spec.mk,

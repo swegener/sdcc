@@ -57630,7 +57630,7 @@ i /= 2;
 \begin_inset space ~
 \end_inset
 
- /* changed to: */
+ /* for unsigned i changed to: */
 \begin_inset space ~
 \end_inset
 

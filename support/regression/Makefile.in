@@ -185,8 +185,7 @@ endif
 
 make_library: $(MAKE_LIBRARY)
 
-####SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests
-SDCCFLAGS += -V -I$(srcdir)/fwk/include -I$(srcdir)/tests
+SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests
 ifdef INC_DIR
   SDCCFLAGS += -I$(INC_DIR)
 endif

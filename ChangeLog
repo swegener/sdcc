@@ -1,6 +1,7 @@
 2010-09-22 Borut Razem <borut.razem AT siol.net>
 
-	* device/include/mcs51/XC866.h, device/include/mcs51/reg764.h:
+	* device/include/mcs51/XC866.h, device/include/mcs51/reg764.h,
+	  device/include/mcs51/at89s8253.h:
 	  sdcc library license changed to GPL+LE
 
 2010-09-18 Philipp Klaus Krause <pkk AT spth.de>

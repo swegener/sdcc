@@ -32,8 +32,7 @@ else
   AS_HC08 = $(AS_HC08C)
 endif
 
-####SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
-SDCCFLAGS += -V -mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
+SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel

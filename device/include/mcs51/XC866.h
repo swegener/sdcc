@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   reg764 - register Declarations for 87C764
+   XC866.h - register Declarations for the Infineon XC866
 
    Copyright (C) 2005, Llewellyn van Zyl <eduprep AT myconnection.co.za>
 
@@ -401,4 +401,3 @@ __sbit __at (0x8E) TR1;
 #define SFR_PAGE(pg,op) pg+op
 
 #endif
-

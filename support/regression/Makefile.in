@@ -38,7 +38,7 @@
 
 # Uncomment this to show only errors and the summary.
 # Comment this out for debugging.
-####.SILENT:
+.SILENT:
 
 CC = @CC@
 CFLAGS = @CFLAGS@

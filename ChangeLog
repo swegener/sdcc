@@ -1,3 +1,7 @@
+2010-09-24 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/mcs51/XC866.h: fixed copy & paste error in the comment
+
 2010-09-22 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/XC866.h, device/include/mcs51/reg764.h,

@@ -6845,10 +6845,10 @@ genUnpackBits (operand * result, int pair)
 {
   int offset = 0;       /* result byte offset */
   int rsize;            /* result size */
-  int rlen = 0;         /* remaining bitfield length */
-  sym_link *etype;      /* bitfield type information */
-  int blen;             /* bitfield length */
-  int bstr;             /* bitfield starting bit within byte */
+  int rlen = 0;         /* remaining bit-field length */
+  sym_link *etype;      /* bit-field type information */
+  int blen;             /* bit-field length */
+  int bstr;             /* bit-field starting bit within byte */
 
   emitDebug ("; genUnpackBits");
 
@@ -6857,7 +6857,7 @@ genUnpackBits (operand * result, int pair)
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
-  /* If the bitfield length is less than a byte */
+  /* If the bit-field length is less than a byte */
   if (blen < 8)
     {
       emit2 ("ld a,!*pair", _pairs[pair].name);
@@ -6865,7 +6865,7 @@ genUnpackBits (operand * result, int pair)
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (8 - blen));
       if (!SPEC_USIGN (etype))
         {
-          /* signed bitfield */
+          /* signed bit-field */
           symbol *tlbl = newiTempLabel (NULL);
 
           emit2 ("bit %d,a", blen - 1);
@@ -6889,7 +6889,7 @@ genUnpackBits (operand * result, int pair)
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (16 - blen));
       if (!SPEC_USIGN (etype))
         {
-          /* signed bitfield */
+          /* signed bit-field */
           symbol *tlbl = newiTempLabel (NULL);
           emit2 ("bit %d,a", blen - 1 - 8);
           emit2 ("jp Z,!tlabel", tlbl->key + 100);
@@ -6921,7 +6921,7 @@ genUnpackBits (operand * result, int pair)
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (8 - rlen));
       if (!SPEC_USIGN (etype))
         {
-          /* signed bitfield */
+          /* signed bit-field */
           symbol *tlbl = newiTempLabel (NULL);
 
           emit2 ("bit %d,a", rlen - 1);
@@ -6941,7 +6941,7 @@ finish:
         source = "!zero";
       else
         {
-          /* signed bitfield: sign extension with 0x00 or 0xff */
+          /* signed bit-field: sign extension with 0x00 or 0xff */
           emit2 ("rla");
           emit2 ("sbc a,a");
 
@@ -7127,9 +7127,9 @@ genPackBits (sym_link * etype,
              iCode *ic)
 {
   int offset = 0;       /* source byte offset */
-  int rlen = 0;         /* remaining bitfield length */
-  int blen;             /* bitfield length */
-  int bstr;             /* bitfield starting bit within byte */
+  int rlen = 0;         /* remaining bit-field length */
+  int blen;             /* bit-field length */
+  int bstr;             /* bit-field starting bit within byte */
   int litval;           /* source literal value (if AOP_LIT) */
   unsigned char mask;   /* bitmask within current byte */
   int extraPair;        /* a tempory register */
@@ -7140,7 +7140,7 @@ genPackBits (sym_link * etype,
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
-  /* If the bitfield length is less than a byte */
+  /* If the bit-field length is less than a byte */
   if (blen < 8)
     {
       mask = ((unsigned char) (0xFF << (blen + bstr)) |
@@ -7148,7 +7148,7 @@ genPackBits (sym_link * etype,
 
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          /* Case with a bitfield length <8 and literal source
+          /* Case with a bit-field length <8 and literal source
           */
           litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
           litval <<= bstr;
@@ -7163,7 +7163,7 @@ genPackBits (sym_link * etype,
         }
       else
         {
-          /* Case with a bitfield length <8 and arbitrary source
+          /* Case with a bit-field length <8 and arbitrary source
           */
           _moveA (aopGet (AOP (right), 0, FALSE));
           /* shift and mask source value */

@@ -2906,7 +2906,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           setOClass (LTYPE (tree), TETYPE (tree));
           SPEC_SCLS (TETYPE (tree)) = sclsFromPtr (LTYPE (tree));
         }
-      /* This breaks with extern declarations, bitfields, and perhaps other */
+      /* This breaks with extern declarations, bit-fields, and perhaps other */
       /* cases (gcse). Let's leave this optimization disabled for now and   */
       /* ponder if there's a safe way to do this. -- EEP                    */
       #if 0

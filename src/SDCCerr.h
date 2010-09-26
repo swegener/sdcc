@@ -193,7 +193,7 @@
 #define W_INT_OVL                     165 /* integer overflow in expression */
 #define W_USELESS_DECL                166 /* useless declaration */
 #define E_INT_BAD_INTNO               167 /* invalid interrupt number */
-#define W_BITFLD_NAMED                168 /* declarator used with 0 length bitfield */
+#define W_BITFLD_NAMED                168 /* declarator used with 0 length bit-field */
 #define E_FUNC_ATTR                   169 /* function attribute without function */
 #define W_SAVE_RESTORE                170 /* unmatched #pragma SAVE and #pragma RESTORE */
 #define E_INVALID_CRITICAL            171 /* operation invalid in critical sequence */

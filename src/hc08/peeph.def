@@ -299,18 +299,21 @@ replace restart {
 	psha
 }
 
-replace restart {
-	lda	%1
-	sta	%1
-} by {
-	; Peephole 8a  - removed redundant sta
-	lda	%1
-} if notVolatile %1
+// These two have been disabled, since the check for volatile doesn't work: notVolatile checks if %1 is volatile, however we need to know if (%1) is volatile.
 
-replace restart {
-	sta	%1
-	lda	%1
-} by {
-	; Peephole 8b  - removed redundant lda
-	sta	%1
-} if notVolatile %1
+//replace restart {
+//	lda	%1
+//	sta	%1
+//} by {
+//	; Peephole 8a  - removed redundant sta
+//	lda	%1
+//} if notVolatile %1
+
+//replace restart {
+//	sta	%1
+//	lda	%1
+//} by {
+//	; Peephole 8b  - removed redundant lda
+//	sta	%1
+//} if notVolatile %1
+

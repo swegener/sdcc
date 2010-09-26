@@ -2508,11 +2508,11 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   iCode *ic;
   sym_link *type = operandType (left);
   sym_link *etype = getSpec (type);
-  sym_link *retype;
+  sym_link *rtype, *retype;
   symbol *element = getStructElement (SPEC_STRUCT (etype),
                                       right->operand.symOperand);
 
-  wassert(IS_SYMOP(right));
+  wassert(IS_SYMOP (right));
 
   wassert(IS_STRUCT (type) || (IS_PTR (type) && IS_STRUCT (type->next)));
 
@@ -2523,14 +2523,24 @@ geniCodeStruct (operand * left, operand * right, bool islval)
 
   /* preserve the storage & output class of the struct */
   /* as well as the volatile attribute */
-  retype = getSpec (operandType (IC_RESULT (ic)));
+  rtype = operandType (IC_RESULT (ic));
+  retype = getSpec (rtype);
   SPEC_SCLS (retype) = SPEC_SCLS (etype);
   SPEC_OCLS (retype) = SPEC_OCLS (etype);
-  SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
-  SPEC_CONST (retype) |= SPEC_CONST (etype);
 
   if (IS_PTR (element->type))
-    setOperandType (IC_RESULT (ic), aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
+    {
+      DCL_PTR_CONST (rtype)    |= DCL_PTR_CONST (element->type);
+      DCL_PTR_VOLATILE (rtype) |= DCL_PTR_VOLATILE (element->type);
+      DCL_PTR_RESTRICT (rtype) |= DCL_PTR_RESTRICT (element->type);
+      setOperandType (IC_RESULT (ic), aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
+    }
+  else
+    {
+      SPEC_CONST (retype)    |= SPEC_CONST (etype);
+      SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
+      SPEC_RESTRICT (retype) |= SPEC_RESTRICT (etype);
+    }
 
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (element->type));
 

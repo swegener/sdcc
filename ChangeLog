@@ -1,3 +1,8 @@
+2010-09-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (geniCodeStruct): fixed bug 3029630
+	* support/regression/tests/bug3029630.c: new, added
+
 2010-09-24 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/XC866.h: fixed copy & paste error in the comment
@@ -8,7 +13,7 @@
 	  device/include/mcs51/at89s8253.h:
 	  sdcc library license changed to GPL+LE
 
-2010-09-18 Philipp Klaus Krause <pkk AT spth.de>
+2010-09-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/doc/sdccman.lyx:
 	  Fixed #3071726.

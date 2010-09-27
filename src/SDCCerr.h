@@ -226,6 +226,7 @@
 #define E_STORAGE_CLASS_FOR_PARAMETER 198 /* storage class specified for parameter '%s' */
 #define E_OFFSETOF_TYPE               199 /* offsetof can only be applied to structs/unions */
 #define E_INCOMPLETE_FIELD            200 /* struct field has incomplete type */
+#define W_DEPRECATED_OPTION           201 /* deprecated compiler option '%s' */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

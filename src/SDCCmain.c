@@ -1583,6 +1583,8 @@ linkEdit (char **envp)
           fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
           if (!options.no_pack_iram)
             fprintf (lnkfile, "-Y\n");
+          else
+            werror (W_DEPRECATED_OPTION, "--no-pack-iram");
         }
 
       if (!TARGET_Z80_LIKE)   /* Not for the z80, gbz80 */

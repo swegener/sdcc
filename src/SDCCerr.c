@@ -453,6 +453,8 @@ struct
    "offsetof can only be applied to structs/unions" },
 { E_INCOMPLETE_FIELD, ERROR_LEVEL_ERROR,
    "field '%s' has incomplete type" },
+{ W_DEPRECATED_OPTION, ERROR_LEVEL_WARNING,
+   "deprecated compiler option '%s'" },
 };
 
 /*

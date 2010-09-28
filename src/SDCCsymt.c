@@ -2343,6 +2343,9 @@ compareType (sym_link * dest, sym_link * src)
             {
               return compareType (dest->next, src);
             }
+          if (IS_PTR (dest) && IS_VOID (dest->next) && IS_FUNC (src))
+            return -1;
+
           return 0;
         }
       else if (IS_PTR (dest) && IS_INTEGRAL (src))

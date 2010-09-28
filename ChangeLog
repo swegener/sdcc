@@ -1,3 +1,9 @@
+2010-09-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-3034585.c:
+	  Fixed #3034585.
+
 2010-09-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCerr.c,

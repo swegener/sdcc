@@ -30,66 +30,66 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-float atof(char * s)
+float atof(const char * s)
 {
-	float value, fraction;
-	signed char iexp;
-	BOOL sign;
+    float value, fraction;
+    signed char iexp;
+    BOOL sign;
 
-	//Skip leading blanks
-	while (isspace(*s)) s++;
+    //Skip leading blanks
+    while (isspace(*s)) s++;
 
-	//Get the sign
-	if (*s == '-')
-	{
-		sign=1;
-		s++;
-	}
-	else
-	{
-		sign=0;
-		if (*s == '+') s++;
-	}
+    //Get the sign
+    if (*s == '-')
+    {
+        sign=1;
+        s++;
+    }
+    else
+    {
+        sign=0;
+        if (*s == '+') s++;
+    }
 
-	//Get the integer part
-	for (value=0.0; isdigit(*s); s++)
-	{
-		value=10.0*value+(*s-'0');
-	}
+    //Get the integer part
+    for (value=0.0; isdigit(*s); s++)
+    {
+        value=10.0*value+(*s-'0');
+    }
 
-	//Get the fraction
-	if (*s == '.')
-	{
-		s++;
-		for (fraction=0.1; isdigit(*s); s++)
-		{
-			value+=(*s-'0')*fraction;
-			fraction*=0.1;
-		}
-	}
+    //Get the fraction
+    if (*s == '.')
+    {
+        s++;
+        for (fraction=0.1; isdigit(*s); s++)
+        {
+            value+=(*s-'0')*fraction;
+            fraction*=0.1;
+        }
+    }
 
-	//Finally, the exponent (not very efficient, but enough for now*/
-	if (toupper(*s)=='E')
-	{
-		s++;
-		iexp=(signed char)atoi(s);
-		{
-			while(iexp!=0)
-			{
-				if(iexp<0)
-				{
-					value*=0.1;
-					iexp++;
-				}
-				else
-				{
-					value*=10.0;
-					iexp--;
-				}
-			}
-		}
-	}
+    //Finally, the exponent (not very efficient, but enough for now*/
+    if (toupper(*s)=='E')
+    {
+        s++;
+        iexp=(signed char)atoi(s);
+        {
+            while(iexp!=0)
+            {
+                if(iexp<0)
+                {
+                    value*=0.1;
+                    iexp++;
+                }
+                else
+                {
+                    value*=10.0;
+                    iexp--;
+                }
+            }
+        }
+    }
 
-	if(sign) value*=-1.0;
-	return (value);
+    if(sign) value*=-1.0;
+    return (value);
 }

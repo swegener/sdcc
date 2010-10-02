@@ -1,3 +1,10 @@
+2010-10-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdlib.h,
+	* device/lib/_atof.c,
+	* device/lib/_atoi.c,
+	* device/lib/_atol.c: fixed const in prototypes
+
 2010-09-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,

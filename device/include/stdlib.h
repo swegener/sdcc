@@ -38,9 +38,9 @@
 int abs(int j);
 long int labs(long int j);
 
-extern float atof (char *);
-extern int atoi (char *);
-extern long atol (char *);
+extern float atof (const char *);
+extern int atoi (const char *);
+extern long atol (const char *);
 
 extern void _uitoa(unsigned int, char*, unsigned char);
 extern void _itoa(int, char*, unsigned char);

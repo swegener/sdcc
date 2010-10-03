@@ -574,11 +574,26 @@ if test "${include_dir_suffix}" = ""; then
     include_dir_suffix="sdcc/include"
 fi
 
+# non_free_include_dir_suffix:
+# *nix default: "sdcc/non-free/include"
+
+AC_ARG_VAR([non_free_include_dir_suffix], [appended to datadir to define SDCC's non-free include directory])
+if test "${non_free_include_dir_suffix}" = ""; then
+    non_free_include_dir_suffix="sdcc/non-free/include"
+fi
+
 # lib_dir_suffix:
 # *nix default: "sdcc/lib"
 AC_ARG_VAR([lib_dir_suffix], [appended to datadir to define SDCC's library root directory])
 if test "${lib_dir_suffix}" = ""; then
     lib_dir_suffix="sdcc/lib"
+fi
+
+# non_free_lib_dir_suffix:
+# *nix default: "sdcc/non-free/lib"
+AC_ARG_VAR([non_free_lib_dir_suffix], [appended to datadir to define SDCC's non-free library root directory])
+if test "${non_free_lib_dir_suffix}" = ""; then
+    non_free_lib_dir_suffix="sdcc/non-free/lib"
 fi
 
 # docdir:
@@ -621,10 +636,19 @@ norm_inc_dir_suffix=${include_dir_suffix}
 adl_NORMALIZE_PATH([norm_inc_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(INCLUDE_DIR_SUFFIX,
                    DIR_SEPARATOR_STRING "${norm_inc_dir_suffix}", [XXX])
+norm_non_free_inc_dir_suffix=${non_free_include_dir_suffix}
+adl_NORMALIZE_PATH([norm_non_free_inc_dir_suffix], [$sdccconf_h_dir_separator])
+AC_DEFINE_UNQUOTED(NON_FREE_INCLUDE_DIR_SUFFIX,
+                   DIR_SEPARATOR_STRING "${norm_non_free_inc_dir_suffix}", [XXX])
+
 norm_lib_dir_suffix=${lib_dir_suffix}
 adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
                    DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}", [XXX])
+norm_non_free_lib_dir_suffix=${non_free_lib_dir_suffix}
+adl_NORMALIZE_PATH([norm_non_free_lib_dir_suffix], [$sdccconf_h_dir_separator])
+AC_DEFINE_UNQUOTED(NON_FREE_LIB_DIR_SUFFIX,
+                   DIR_SEPARATOR_STRING "${norm_non_free_lib_dir_suffix}", [XXX])
 
 # relative paths
 adl_COMPUTE_RELATIVE_PATHS([expanded_bindir:expanded_datadir:bin2data_dir])

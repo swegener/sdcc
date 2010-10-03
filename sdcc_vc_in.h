@@ -23,6 +23,8 @@
 
 #define INCLUDE_DIR_SUFFIX    "\\include"
 #define LIB_DIR_SUFFIX        "\\lib"
+#define NON_FREE_INCLUDE_DIR_SUFFIX   "\\non-free\\include"
+#define NON_FREE_LIB_DIR_SUFFIX       "\\non-free\\lib"
 
 #define BIN2DATA_DIR          "\\.."
 #define PREFIX2BIN_DIR        "\\bin"

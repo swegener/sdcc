@@ -143,13 +143,14 @@ char buffer[PATH_MAX * 2];
 #define OPTION_CONST_SEG        "--constseg"
 #define OPTION_DOLLARS_IN_IDENT "--fdollars-in-identifiers"
 #define OPTION_UNSIGNED_CHAR    "--funsigned-char"
+#define OPTION_NON_FREE         "--non-free"
 
 static const OPTION optionsTable[] = {
   {0, NULL, NULL, "General options"},
   {0, OPTION_HELP, NULL, "Display this help"},
   {'v', OPTION_VERSION, NULL, "Display sdcc's version"},
   {0, "--verbose", &options.verbose, "Trace calls to the preprocessor, assembler, and linker"},
-  {'V', NULL, &options.verboseExec, "Execute verbosely.  Show sub commands as they are run"},
+  {'V', NULL, &options.verboseExec, "Execute verbosely. Show sub commands as they are run"},
   {'d', NULL, NULL, NULL},
   {'D', NULL, NULL, "Define macro as in -Dmacro"},
   {'I', NULL, NULL, "Add to the include (*.h) path, as in -Ipath"},
@@ -178,6 +179,7 @@ static const OPTION optionsTable[] = {
   {0, OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions (incomplete)"},
   {0, OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0, OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
+  {0, OPTION_NON_FREE, &options.non_free, "Search / include non-free libraries and header files"},
 
   {0, NULL, NULL, "Code generation options"},
   {'m', NULL, NULL, "Set the port to use e.g. -mz80."},
@@ -2149,38 +2151,55 @@ setBinPaths (const char *argv0)
 static void
 setIncludePath (void)
 {
-  char *p;
-  set *tempSet = NULL;
-
   /*
    * Search logic:
    *
-   * 1. - $SDCC_INCLUDE/target
-   * 2. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX/target
-   * 3. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX/target
-   * 4. - DATADIR/INCLUDE_DIR_SUFFIX/target (only on *nix)
-   * 5. - $SDCC_INCLUDE
-   * 6. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX
-   * 7. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
-   * 8. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
+   *  1. - $SDCC_INCLUDE/target
+   *  2. - $SDCC_INCLUDE
+   *  3. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX/target
+   *  4. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX/target
+   *  5. - DATADIR/INCLUDE_DIR_SUFFIX/target (only on *nix)
+   *  6. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX
+   *  7. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
+   *  8. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
+   *  9. - $SDCC_HOME/PREFIX2DATA_DIR/NON_FREE_INCLUDE_DIR_SUFFIX/target
+   * 10. - path(argv[0])/BIN2DATA_DIR/NON_FREE_INCLUDE_DIR_SUFFIX/target
+   * 11. - DATADIR/NON_FREE_INCLUDE_DIR_SUFFIX/target (only on *nix)
+   * 12. - $SDCC_HOME/PREFIX2DATA_DIR/NON_FREE_INCLUDE_DIR_SUFFIX
+   * 13. - path(argv[0])/BIN2DATA_DIR/NON_FREE_INCLUDE_DIR_SUFFIX
+   * 14. - DATADIR/NON_FREE_INCLUDE_DIR_SUFFIX (only on *nix)
    */
 
-  if (options.nostdinc)
-    return;
-
-  tempSet = appendStrSet (dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
-  includeDirsSet = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
-  includeDirsSet = appendStrSet (includeDirsSet, NULL, port->target);
-  mergeSets (&includeDirsSet, tempSet);
-
-  if ((p = getenv (SDCC_INCLUDE_NAME)) != NULL)
+  if (!options.nostdinc)
     {
-      struct dbuf_s dbuf;
+      char *p;
+      set *tempSet;
 
-      dbuf_init (&dbuf, PATH_MAX);
-      addSetHead (&includeDirsSet, p);
-      dbuf_printf (&dbuf, "%s%c%s", p, DIR_SEPARATOR_CHAR, port->target);
-      addSetHead (&includeDirsSet, dbuf_detach (&dbuf));
+      tempSet = appendStrSet (dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
+      includeDirsSet = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
+      includeDirsSet = appendStrSet (includeDirsSet, NULL, port->target);
+      mergeSets (&includeDirsSet, tempSet);
+
+      if (options.non_free)
+        {
+          set *tempSet1;
+
+          tempSet = appendStrSet (dataDirsSet, NULL, NON_FREE_INCLUDE_DIR_SUFFIX);
+          tempSet1 = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
+          tempSet1 = appendStrSet (tempSet1, NULL, port->target);
+          mergeSets (&tempSet1, tempSet);
+          mergeSets (&includeDirsSet, tempSet1);
+        }
+
+      if ((p = getenv (SDCC_INCLUDE_NAME)) != NULL)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, PATH_MAX);
+          addSetHead (&includeDirsSet, p);
+          dbuf_printf (&dbuf, "%s%c%s", p, DIR_SEPARATOR_CHAR, port->target);
+          addSetHead (&includeDirsSet, dbuf_detach (&dbuf));
+        }
     }
 }
 
@@ -2188,9 +2207,6 @@ setIncludePath (void)
 static void
 setLibPath (void)
 {
-  char *p;
-  struct dbuf_s dbuf;
-
   /*
    * Search logic:
    *
@@ -2198,18 +2214,32 @@ setLibPath (void)
    * 2. - $SDCC_HOME/PREFIX2DATA_DIR/LIB_DIR_SUFFIX/<model>
    * 3. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
    * 4. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
+   * 5. - $SDCC_HOME/PREFIX2DATA_DIR/NON_FREE_LIB_DIR_SUFFIX/<model>
+   * 6. - path(argv[0])/BIN2DATA_DIR/NON_FREE_LIB_DIR_SUFFIX/<model>
+   * 7. - DATADIR/NON_FREE_LIB_DIR_SUFFIX/<model> (only on *nix)
    */
 
-  if (options.nostdlib)
-    return;
+  if (!options.nostdlib)
+    {
+      char *p;
+      struct dbuf_s dbuf;
 
-  if ((p = getenv (SDCC_LIB_NAME)) != NULL)
-    addSetHead (&libDirsSet, Safe_strdup (p));
+      if ((p = getenv (SDCC_LIB_NAME)) != NULL)
+        addSetHead (&libDirsSet, Safe_strdup (p));
 
-  dbuf_init (&dbuf, PATH_MAX);
-  dbuf_printf (&dbuf, "%s%c%s", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);
+      dbuf_init (&dbuf, PATH_MAX);
+      dbuf_printf (&dbuf, "%s%c%s", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);
 
-  libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
+      libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
+
+      if (options.non_free)
+        {
+          dbuf_set_length (&dbuf, 0);
+          dbuf_printf (&dbuf, "%s%c%s", NON_FREE_LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);
+
+          mergeSets (&libDirsSet, appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf)));
+        }
+    }
 }
 
 /* Set data path */

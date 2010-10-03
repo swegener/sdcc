@@ -89,6 +89,12 @@
 #undef LIB_DIR_SUFFIX
 
 /* XXX */
+#undef NON_FREE_INCLUDE_DIR_SUFFIX
+
+/* XXX */
+#undef NON_FREE_LIB_DIR_SUFFIX
+
+/* XXX */
 #undef OPT_DISABLE_AVR
 
 /* XXX */

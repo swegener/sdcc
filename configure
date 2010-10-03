@@ -618,7 +618,9 @@ OPT_DISABLE_DS390
 OPT_DISABLE_Z80
 OPT_DISABLE_GBZ80
 OPT_DISABLE_MCS51
+non_free_lib_dir_suffix
 lib_dir_suffix
+non_free_include_dir_suffix
 include_dir_suffix
 LIB_TYPE
 sdccconf_h_dir_separator
@@ -726,7 +728,9 @@ CPP
 sdccconf_h_dir_separator
 LIB_TYPE
 include_dir_suffix
+non_free_include_dir_suffix
 lib_dir_suffix
+non_free_lib_dir_suffix
 docdir'
 ac_subdirs_all='support/cpp
 support/packihx
@@ -1384,8 +1388,13 @@ Some influential environment variables:
   LIB_TYPE    library type: LIB, SDCCLIB, AR or RANLIB (default)
   include_dir_suffix
               appended to datadir to define SDCC's include directory
+  non_free_include_dir_suffix
+              appended to datadir to define SDCC's non-free include directory
   lib_dir_suffix
               appended to datadir to define SDCC's library root directory
+  non_free_lib_dir_suffix
+              appended to datadir to define SDCC's non-free library root
+              directory
   docdir      documentation installation directory
 
 Use these variables to override the choices made by `configure' or to help
@@ -4967,11 +4976,26 @@ if test "${include_dir_suffix}" = ""; then
     include_dir_suffix="sdcc/include"
 fi
 
+# non_free_include_dir_suffix:
+# *nix default: "sdcc/non-free/include"
+
+
+if test "${non_free_include_dir_suffix}" = ""; then
+    non_free_include_dir_suffix="sdcc/non-free/include"
+fi
+
 # lib_dir_suffix:
 # *nix default: "sdcc/lib"
 
 if test "${lib_dir_suffix}" = ""; then
     lib_dir_suffix="sdcc/lib"
+fi
+
+# non_free_lib_dir_suffix:
+# *nix default: "sdcc/non-free/lib"
+
+if test "${non_free_lib_dir_suffix}" = ""; then
+    non_free_lib_dir_suffix="sdcc/non-free/lib"
 fi
 
 # docdir:
@@ -5140,6 +5164,25 @@ cat >>confdefs.h <<_ACEOF
 #define INCLUDE_DIR_SUFFIX DIR_SEPARATOR_STRING "${norm_inc_dir_suffix}"
 _ACEOF
 
+norm_non_free_inc_dir_suffix=${non_free_include_dir_suffix}
+case ":$norm_non_free_inc_dir_suffix:" in
+  ::) norm_non_free_inc_dir_suffix='.' ;;
+  :*[\\/]:) norm_non_free_inc_dir_suffix=`echo "$norm_non_free_inc_dir_suffix" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $sdccconf_h_dir_separator in
+
+    *\\*) norm_non_free_inc_dir_suffix=`echo "$norm_non_free_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) norm_non_free_inc_dir_suffix=`echo "$norm_non_free_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+
+cat >>confdefs.h <<_ACEOF
+#define NON_FREE_INCLUDE_DIR_SUFFIX DIR_SEPARATOR_STRING "${norm_non_free_inc_dir_suffix}"
+_ACEOF
+
+
 norm_lib_dir_suffix=${lib_dir_suffix}
 case ":$norm_lib_dir_suffix:" in
   ::) norm_lib_dir_suffix='.' ;;
@@ -5156,6 +5199,24 @@ esac
 
 cat >>confdefs.h <<_ACEOF
 #define LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}"
+_ACEOF
+
+norm_non_free_lib_dir_suffix=${non_free_lib_dir_suffix}
+case ":$norm_non_free_lib_dir_suffix:" in
+  ::) norm_non_free_lib_dir_suffix='.' ;;
+  :*[\\/]:) norm_non_free_lib_dir_suffix=`echo "$norm_non_free_lib_dir_suffix" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $sdccconf_h_dir_separator in
+
+    *\\*) norm_non_free_lib_dir_suffix=`echo "$norm_non_free_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) norm_non_free_lib_dir_suffix=`echo "$norm_non_free_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+
+cat >>confdefs.h <<_ACEOF
+#define NON_FREE_LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "${norm_non_free_lib_dir_suffix}"
 _ACEOF
 
 

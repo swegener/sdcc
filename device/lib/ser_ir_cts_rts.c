@@ -1,30 +1,33 @@
 /*-------------------------------------------------------------------------
-  ser_ir.c - source file for serial routines
+   ser_ir_cts_rts.c - source file for serial routines
 
-  Written By - Josef Wolf <jw@raven.inka.de> (1999)
+   Copyright (C) 1999, Josef Wolf <jw AT raven.inka.de>
 
-  Revisions:
-  1.0  Bela Torok <bela.torok.kssg.ch> Jul. 2000
-  RTS / CTS protocol added
+   Revisions:
+   1.0  Bela Torok <bela.torok.kssg.ch> Jul. 2000
+   RTS / CTS protocol added
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the
-  Free Software Foundation; either version 2, or (at your option) any
-  later version.
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2.1, or (at your option) any
+   later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 /* This file implements a serial interrupt handler and its supporting
@@ -91,7 +94,8 @@ static unsigned char rxbuf[RXBUFLEN], txbuf[TXBUFLEN];
 static unsigned char rxcnt, txcnt, rxpos, txpos;
 static bit busy;
 
-void ser_init()
+void
+ser_init ()
 {
   ES = 0;
   rxcnt = txcnt = rxpos = txpos = 0;  // init buffers
@@ -111,7 +115,8 @@ void ser_init()
   CTS = ENABLE;
 }
 
-void ser_handler(void) interrupt 4
+void
+ser_handler (void) interrupt 4
 {
   if (RI) {
     RI = 0;
@@ -130,7 +135,8 @@ void ser_handler(void) interrupt 4
   }
 }
 
-void ser_putc(unsigned char c)
+void
+ser_putc (unsigned char c)
 {
   while(txcnt >= TXBUFLEN);   // wait for room in buffer
 
@@ -146,7 +152,8 @@ void ser_putc(unsigned char c)
   ES = 1;
 }
 
-unsigned char ser_getc(void)
+unsigned char
+ser_getc (void)
 {
   unsigned char c;
 
@@ -164,7 +171,8 @@ unsigned char ser_getc(void)
 
 #pragma save
 #pragma noinduction
-void ser_puts(unsigned char *s)
+void
+ser_puts (unsigned char *s)
 {
   unsigned char c;
   while (c= *s++) {
@@ -174,7 +182,8 @@ void ser_puts(unsigned char *s)
 }
 #pragma restore
 
-void ser_gets(unsigned char *s, unsigned char len)
+void
+ser_gets (unsigned char *s, unsigned char len)
 {
   unsigned char pos, c;
 
@@ -188,12 +197,14 @@ void ser_gets(unsigned char *s, unsigned char len)
   s[pos] = '\0';                  // terminate string
 }
 
-unsigned char ser_can_xmt(void)
+unsigned char
+ser_can_xmt (void)
 {
   return TXBUFLEN - txcnt;
 }
 
-unsigned char ser_can_rcv(void)
+unsigned char
+ser_can_rcv (void)
 {
   return rxcnt;
 }

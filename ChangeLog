@@ -1,7 +1,7 @@
 2010-10-03 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/ser_ir.h, device/lib/ser_ir_cts_rts.c,
-	  device/lib/ser_ir.c:
+	  device/lib/ser_ir.c, device/include/pic16/pic18fregs.h:
 	  sdcc library license changed to GPL+LE
 
 2010-10-02 Maarten Brock <sourceforge.brock AT dse.nl>

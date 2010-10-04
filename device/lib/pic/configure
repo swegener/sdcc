@@ -2202,7 +2202,7 @@ fi
 
 # Checks for library functions.
 
-ac_config_files="$ac_config_files Makefile Makefile.common libdev/Makefile libsdcc/Makefile libm/Makefile"
+ac_config_files="$ac_config_files Makefile Makefile.common libsdcc/Makefile libm/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -2904,7 +2904,6 @@ do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "Makefile.common") CONFIG_FILES="$CONFIG_FILES Makefile.common" ;;
-    "libdev/Makefile") CONFIG_FILES="$CONFIG_FILES libdev/Makefile" ;;
     "libsdcc/Makefile") CONFIG_FILES="$CONFIG_FILES libsdcc/Makefile" ;;
     "libm/Makefile") CONFIG_FILES="$CONFIG_FILES libm/Makefile" ;;
 

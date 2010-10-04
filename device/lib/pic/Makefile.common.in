@@ -27,7 +27,7 @@ ARCH   ?= 877
 CFLAGS ?=
 CFLAGS += -mpic14 -p16f$(ARCH)
 CFLAGS += --std-c99
-CFLAGS += -I. -I$(top_srcdir)/../../include/pic
+CFLAGS += -I. -I$(top_srcdir)/../../include/pic -I$(top_srcdir)/../../non-free/include/pic
 
 #################################################
 ### optimization flags
@@ -53,7 +53,7 @@ CFLAGS += --i-code-in-asm
 ### assembler switches
 ASFLAGS ?=
 ASFLAGS += -pp16f$(ARCH)
-ASFLAGS += -I$(top_srcdir)/../../include/pic
+ASFLAGS += -I$(top_srcdir)/../../include/pic -I$(top_srcdir)/../../non-free/include/pic
 ASFLAGS += -I. -I$(srcdir)
 
 #################################################
@@ -82,4 +82,3 @@ RMDIR	?= @RMDIR@
 CP	?= @CP@
 MV	?= @MV@
 RM	?= @RM@
-

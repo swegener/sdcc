@@ -736,8 +736,8 @@ ac_subdirs_all='support/cpp
 support/packihx
 sim/ucsim
 debugger/mcs51
-device/lib/pic
-device/lib/pic16'
+device/lib/pic device/non-free/lib/pic
+device/lib/pic16 device/non-free/lib/pic16'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -6377,13 +6377,13 @@ fi
 if test $OPT_DISABLE_PIC = 0; then
   ac_config_files="$ac_config_files src/pic/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && subdirs="$subdirs device/lib/pic"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && subdirs="$subdirs device/lib/pic device/non-free/lib/pic"
 
 fi
 if test $OPT_DISABLE_PIC16 = 0; then
   ac_config_files="$ac_config_files src/pic16/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && subdirs="$subdirs device/lib/pic16"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && subdirs="$subdirs device/lib/pic16 device/non-free/lib/pic16"
 
 fi
 
@@ -6397,10 +6397,10 @@ if test $OPT_DISABLE_Z80 = 0; then
 
 fi
 
-test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/Makefile"
+test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/Makefile device/non-free/lib/Makefile"
 
 
-ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/linksrc/Makefile sdas/asranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
+ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile device/non-free/include/Makefile sdas/linksrc/Makefile sdas/asranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7114,9 +7114,11 @@ do
     "device/lib/z80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z80/Makefile" ;;
     "device/lib/gbz80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/gbz80/Makefile" ;;
     "device/lib/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
+    "device/non-free/lib/Makefile") CONFIG_FILES="$CONFIG_FILES device/non-free/lib/Makefile" ;;
     "main.mk") CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "device/include/Makefile") CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
+    "device/non-free/include/Makefile") CONFIG_FILES="$CONFIG_FILES device/non-free/include/Makefile" ;;
     "sdas/linksrc/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/linksrc/Makefile" ;;
     "sdas/asranlib/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asranlib/Makefile" ;;
     "support/librarian/Makefile") CONFIG_FILES="$CONFIG_FILES support/librarian/Makefile" ;;

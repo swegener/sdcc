@@ -156,6 +156,8 @@ static const OPTION optionsTable[] = {
   {'I', NULL, NULL, "Add to the include (*.h) path, as in -Ipath"},
   {'A', NULL, NULL, NULL},
   {'U', NULL, NULL, NULL},
+  {0, OPTION_NON_FREE, &options.non_free, "Include non-free linraries and header files"},
+
   {'M', NULL, NULL, "Preprocessor option"},
   {'W', NULL, NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)"},
   {'S', NULL, &noAssemble, "Compile only; do not assemble or link"},
@@ -1996,8 +1998,13 @@ preProcess (char **envp)
       if (options.noOverlay)
         addSet (&preArgvSet, Safe_strdup ("-DSDCC_NOOVERLAY"));
 
+      /* set the macro for unsigned char  */
       if (options.unsigned_char)
         addSet (&preArgvSet, Safe_strdup ("-DSDCC_CHAR_UNSIGNED"));
+
+      /* set the macro for non-free  */
+      if (options.non_free)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_NON_FREE"));
 
       /* set the macro for large model  */
       switch (options.model)

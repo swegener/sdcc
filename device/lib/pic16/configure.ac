@@ -74,7 +74,6 @@ esac
 AC_CONFIG_FILES([Makefile
                  debug/Makefile
                  libc/Makefile
-                 libdev/Makefile
                  libio/Makefile
                  libm/Makefile
                  libsdcc/Makefile

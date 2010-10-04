@@ -1,3 +1,52 @@
+2010-10-04 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: defined symbol SDCC_NON_FREE when --non-free command
+	  line option is used
+	* configure.in, configure, Makefile.in, device/lib/pic/configure.in,
+	  device/lib/pic/configure, device/lib/pic/Makefile.in,
+	  device/lib/pic/Makefile.common.in, device/lib/pic16/configure.ac,
+	  device/lib/pic16/configure, device/lib/pic16/Makefile.am,
+	  device/lib/pic16/Makefile.in,
+	  device/lib/pic16/Makefile.common,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/startup/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in:
+	  pic* device files moved to non-free
+	* device/include/pic/*.h: moved to device/non-free/include/pic
+	* device/include/pic16/*.h: moved to device/non-free/include/pic16
+	* device/lib/pic/libdev/*.c, device/lib/pic/libdev/mkall.sh:
+	  moved to device/non-freelib/pic/libdev
+	* device/lib/pic16/libdev/*.c, device/lib/pic16/libdev/mkmk.sh,
+	  device/lib/pic16/libdev/Makefile.am,
+	  device/lib/pic16/libdev/Makefile.in:
+	  moved to device/non-free/lib/pic16/libdev
+	* device/lib/pic16/pics.all: moved to device/non-free/lib/pic16
+	* device/non-free/include/Makefile.in,
+	  device/non-free/include/clean.mk,
+	  device/non-free/lib/pic16/config.h.in,
+	  device/non-free/lib/pic16/configure,
+	  device/non-free/lib/pic16/Makefile.in,
+	  device/non-free/lib/pic16/configure.ac,
+	  device/non-free/lib/pic16/Makefile.common,
+	  device/non-free/lib/pic16/bootstrap.sh,
+	  device/non-free/lib/pic16/depcomp,
+	  device/non-free/lib/pic16/Makefile.am,
+	  device/non-free/lib/pic16/missing,
+	  device/non-free/lib/pic16/aclocal.m4,
+	  device/non-free/lib/pic16/install-sh,
+	  device/non-free/lib/Makefile.in,
+	  device/non-free/lib/clean.mk,
+	  device/non-free/lib/pic/configure,
+	  device/non-free/lib/pic/Makefile.in,
+	  device/non-free/lib/pic/Makefile.subdir,
+	  device/non-free/lib/pic/configure.in,
+	  device/non-free/lib/pic/Makefile.rules,
+	  device/non-free/lib/pic/Makefile.common.in,
+	  device/non-free/lib/incl.mk: added
+
 2010-10-03 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/mcs51/ser_ir.h, device/lib/ser_ir_cts_rts.c,

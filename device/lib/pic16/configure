@@ -2713,7 +2713,7 @@ case "$CCAS:$LD:$AR" in
         ;;
 esac
 
-ac_config_files="$ac_config_files Makefile debug/Makefile libc/Makefile libdev/Makefile libio/Makefile libm/Makefile libsdcc/Makefile startup/Makefile"
+ac_config_files="$ac_config_files Makefile debug/Makefile libc/Makefile libio/Makefile libm/Makefile libsdcc/Makefile startup/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3427,7 +3427,6 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "debug/Makefile") CONFIG_FILES="$CONFIG_FILES debug/Makefile" ;;
     "libc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/Makefile" ;;
-    "libdev/Makefile") CONFIG_FILES="$CONFIG_FILES libdev/Makefile" ;;
     "libio/Makefile") CONFIG_FILES="$CONFIG_FILES libio/Makefile" ;;
     "libm/Makefile") CONFIG_FILES="$CONFIG_FILES libm/Makefile" ;;
     "libsdcc/Makefile") CONFIG_FILES="$CONFIG_FILES libsdcc/Makefile" ;;

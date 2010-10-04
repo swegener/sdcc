@@ -36,7 +36,7 @@ install : recurse
 endif
 
 
-SUBDIRS	   = libsdcc libdev libm
+SUBDIRS	   = libsdcc libm
 builddir   = build
 installdir = bin
 export installdir

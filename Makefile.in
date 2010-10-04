@@ -48,7 +48,7 @@ endif
 
 ifeq ($(OPT_DISABLE_DEVICE_LIB), 0)
 TARGETS         += sdcc-device-lib
-PKGS            += device/lib
+PKGS            += device/lib device/non-free/lib
 endif
 
 ifeq ($(OPT_DISABLE_PACKIHX), 0)
@@ -68,10 +68,10 @@ endif
 
 TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
 
-PKGS            += $(SDCC_LIBS) src device/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB) $(SDCC_SCRIPTS)
+PKGS            += $(SDCC_LIBS) src device/include device/non-free/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB) $(SDCC_SCRIPTS)
 
 PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/linksrc \
-                  src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
+                  src device/include device/non-free/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
 PORTS           = $(shell cat ports.build)
 ALLPORTS        = $(shell cat ports.all)
 
@@ -110,12 +110,15 @@ sdcc-asranlib:
 
 sdcc-device-inc:
 	$(MAKE) -C device/include
+	$(MAKE) -C device/non-free/include
 
 sdcc-device-lib: sdcc-cc sdcc-as sdcc-ld
 	$(MAKE) -C device/lib
+	$(MAKE) -C device/non-free/lib
 
 sdcc-device-tini:
 	$(MAKE) -C device/include
+	$(MAKE) -C device/non-free/include
 	$(MAKE) -C device/lib model-ds390 model-ds400
 
 # doc depends on latex and latex2html

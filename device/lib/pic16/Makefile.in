@@ -187,7 +187,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = debug libc libdev libio libm libsdcc startup
+SUBDIRS = debug libc libio libm libsdcc startup
 #AM_CFLAGS += --no-optimize-goto
 
 #AM_CFLAGS += --debug-ralloc
@@ -202,10 +202,12 @@ SUBDIRS = debug libc libdev libio libm libsdcc startup
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
 AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 --fomit-frame-pointer \
-	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
-	--i-code-in-asm @USE_FLOATS@
-AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 -I$(srcdir)
+	-I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../non-free/include/pic16 \
+	--fomit-frame-pointer --obanksel=9 --denable-peeps \
+	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
+AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../non-free/include/pic16 -I$(srcdir)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

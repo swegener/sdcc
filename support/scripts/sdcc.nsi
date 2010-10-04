@@ -433,6 +433,10 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\z80\*.h"
   SetOutPath "$INSTDIR\include"
   File "${DEV_ROOT}\include\*.h"
+  SetOutPath "$INSTDIR\non-free\include\pic"
+  File "${DEV_ROOT}\non-free\include\pic\*.h"
+  SetOutPath "$INSTDIR\non-free\include\pic16"
+  File "${DEV_ROOT}\non-free\include\pic16\*.h"
 ${SectionEnd}
 
 ${Section} "SDCC DS390 library" SEC06
@@ -561,9 +565,9 @@ ${Section} "SDCC library sources" SEC17
   File "${DEV_ROOT}\lib\src\pic\libsdcc\*.inc"
 #  File "${DEV_ROOT}\lib\src\pic\libsdcc\Makefile"
   
-  SetOutPath "$INSTDIR\lib\src\pic\libdev"
-  File "${DEV_ROOT}\lib\src\pic\libdev\*.c"
-#  File "${DEV_ROOT}\lib\src\pic\libdev\Makefile"
+  SetOutPath "$INSTDIR\non-free\lib\src\pic\libdev"
+  File "${DEV_ROOT}\non-free\lib\src\pic\libdev\*.c"
+#  File "${DEV_ROOT}\non-free\lib\src\pic\libdev\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic\libm"
   File "${DEV_ROOT}\lib\src\pic\libm\*.c"
@@ -616,9 +620,9 @@ ${Section} "SDCC library sources" SEC17
   File "${DEV_ROOT}\lib\src\pic16\libc\utils\*.S"
 #  File "${DEV_ROOT}\lib\src\pic16\libc\utils\Makefile"
 
-  SetOutPath "$INSTDIR\lib\src\pic16\libdev"
-  File "${DEV_ROOT}\lib\src\pic16\libdev\*.c"
-#  File "${DEV_ROOT}\lib\src\pic16\libdev\Makefile"
+  SetOutPath "$INSTDIR\non-free\lib\src\pic16\libdev"
+  File "${DEV_ROOT}\non-free\lib\src\pic16\libdev\*.c"
+#  File "${DEV_ROOT}\non-free\lib\src\pic16\libdev\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic16\libio"
   File "${DEV_ROOT}\lib\src\pic16\libio\*.ignore"

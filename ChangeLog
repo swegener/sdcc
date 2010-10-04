@@ -13,7 +13,8 @@
 	  device/lib/pic16/libio/Makefile.in,
 	  device/lib/pic16/startup/Makefile.in,
 	  device/lib/pic16/libsdcc/Makefile.in,
-	  device/lib/pic16/libc/Makefile.in:
+	  device/lib/pic16/libc/Makefile.in,
+	  support/scripts/sdcc.nsi:
 	  pic* device files moved to non-free
 	* device/include/pic/*.h: moved to device/non-free/include/pic
 	* device/include/pic16/*.h: moved to device/non-free/include/pic16

@@ -1,3 +1,8 @@
+2010-10-05 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi:
+	  added non-free/lib/pic*/*.lib files to the win32 setup package
+
 2010-10-04 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c: defined symbol SDCC_NON_FREE when --non-free command

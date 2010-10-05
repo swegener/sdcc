@@ -498,12 +498,18 @@ ${Section} "SDCC PIC16 library" SEC15
   SetOutPath "$INSTDIR\lib\pic16"
   File "${DEV_ROOT}\lib\pic16\*.o"
   File "${DEV_ROOT}\lib\pic16\*.lib"
+
+  SetOutPath "$INSTDIR\non-free\lib\pic16"
+  File "${DEV_ROOT}\non-free\lib\pic16\*.lib"
 ${SectionEnd}
 
 ${Section} "SDCC PIC library" SEC16
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic"
   File "${DEV_ROOT}\lib\pic\*.lib"
+
+  SetOutPath "$INSTDIR\non-free\lib\pic"
+  File "${DEV_ROOT}\non-free\lib\pic\*.lib"
 ${SectionEnd}
 
 ${Section} "SDCC library sources" SEC17

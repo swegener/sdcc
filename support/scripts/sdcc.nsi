@@ -851,8 +851,12 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\pic\*.lib"
 
+  Delete "$INSTDIR\non-free\lib\pic\*.lib"
+
   Delete "$INSTDIR\lib\pic16\*.o"
   Delete "$INSTDIR\lib\pic16\*.lib"
+
+  Delete "$INSTDIR\non-free\lib\pic16\*.lib"
 
   Delete "$INSTDIR\lib\hc08\*.lib"
 
@@ -885,7 +889,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\pic\*.h"
   Delete "$INSTDIR\include\pic\*.txt"
   Delete "$INSTDIR\include\pic\*.inc"
+  Delete "$INSTDIR\non-free\include\pic\*.h"
   Delete "$INSTDIR\include\pic16\*.h"
+  Delete "$INSTDIR\non-free\include\pic16\*.h"
   Delete "$INSTDIR\include\pic16\*.txt"
   Delete "$INSTDIR\include\mcs51\*.h"
   Delete "$INSTDIR\include\hc08\*.h"
@@ -929,7 +935,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\uninstall.exe"
 
   RMDir /r "$INSTDIR\lib\src\pic"
+  RMDir /r "$INSTDIR\non-free\lib\src\pic"
   RMDir /r "$INSTDIR\lib\src\pic16"
+  RMDir /r "$INSTDIR\non-free\lib\src\pic16"
   RMDir "$INSTDIR\lib\src\small"
   RMDir "$INSTDIR\lib\src\medium"
   RMDir "$INSTDIR\lib\src\large"
@@ -943,7 +951,9 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src"
 
   RMDir "$INSTDIR\lib\pic"
+  RMDir "$INSTDIR\non-free\lib\pic"
   RMDir "$INSTDIR\lib\pic16"
+  RMDir "$INSTDIR\non-free\lib\pic16"
   RMDir "$INSTDIR\lib\z80"
   RMDir "$INSTDIR\lib\small"
   RMDir "$INSTDIR\lib\medium"
@@ -954,10 +964,13 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\ds400"
   RMDir "$INSTDIR\lib\hc08"
   RMDir "$INSTDIR\lib"
+  RMDir "$INSTDIR\non-free\lib"
 
   RMDir "$INSTDIR\include\asm\z80"
   RMDir "$INSTDIR\include\asm\pic16"
+  RMDir "$INSTDIR\non-free\include\asm\pic16"
   RMDir "$INSTDIR\include\asm\pic"
+  RMDir "$INSTDIR\non-free\include\asm\pic"
   RMDir "$INSTDIR\include\asm\mcs51"
   RMDir "$INSTDIR\include\asm\gbz80"
   RMDir "$INSTDIR\include\asm\ds390"
@@ -969,6 +982,9 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\mcs51"
   RMDir "$INSTDIR\include\hc08"
   RMDir "$INSTDIR\include"
+  RMDir "$INSTDIR\non-free\include"
+
+  RMDir "$INSTDIR\non-free"
 
 !ifdef FULL_DOC
   RMDir /r "$INSTDIR\doc"

@@ -1,7 +1,8 @@
 2010-10-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi:
-	  added non-free/lib/pic*/*.lib files to the win32 setup package
+	  added non-free/lib/pic*/*.lib files to the win32 setup package,
+	  remove non-free on uninstall
 
 2010-10-04 Borut Razem <borut.razem AT siol.net>
 

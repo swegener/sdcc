@@ -1,3 +1,8 @@
+2010-10-06 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/configure, sdcc/configure.in:
+	  show serch non-free paths
+
 2010-10-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi:

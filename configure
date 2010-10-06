@@ -7926,6 +7926,55 @@ esac
 incPath3=`echo "$incPath3" | sed 's,\\\\\\\\,\\\\,g'`
 
 
+nonFreeIncPath1=`echo "/${prefix2data_dir}/${norm_non_free_inc_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$nonFreeIncPath1:" in
+  ::) nonFreeIncPath1='.' ;;
+  :*[\\/]:) nonFreeIncPath1=`echo "$nonFreeIncPath1" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) nonFreeIncPath1=`echo "$nonFreeIncPath1" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) nonFreeIncPath1=`echo "$nonFreeIncPath1" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+nonFreeIncPath1=`echo "$nonFreeIncPath1" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+nonFreeIncPath2=`echo "/${bin2data_dir}/${norm_non_free_inc_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$nonFreeIncPath2:" in
+  ::) nonFreeIncPath2='.' ;;
+  :*[\\/]:) nonFreeIncPath2=`echo "$nonFreeIncPath2" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) nonFreeIncPath2=`echo "$nonFreeIncPath2" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) nonFreeIncPath2=`echo "$nonFreeIncPath2" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+nonFreeIncPath2=`echo "$nonFreeIncPath2" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+nonFreeIncPath3=`echo "${expanded_datadir}/${norm_non_free_inc_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$nonFreeIncPath3:" in
+  ::) nonFreeIncPath3='.' ;;
+  :*[\\/]:) nonFreeIncPath3=`echo "$nonFreeIncPath3" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) nonFreeIncPath3=`echo "$nonFreeIncPath3" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) nonFreeIncPath3=`echo "$nonFreeIncPath3" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+nonFreeIncPath3=`echo "$nonFreeIncPath3" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+
 libPath1=`echo "/${prefix2data_dir}/${norm_lib_dir_suffix}" | sed 's,/\./,/,g'`
 case ":$libPath1:" in
   ::) libPath1='.' ;;
@@ -7974,6 +8023,54 @@ esac
 libPath3=`echo "$libPath3" | sed 's,\\\\\\\\,\\\\,g'`
 
 
+nonFreeLibPath1=`echo "/${prefix2data_dir}/${norm_non_free_lib_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$nonFreeLibPath1:" in
+  ::) nonFreeLibPath1='.' ;;
+  :*[\\/]:) nonFreeLibPath1=`echo "$nonFreeLibPath1" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) nonFreeLibPath1=`echo "$nonFreeLibPath1" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) nonFreeLibPath1=`echo "$nonFreeLibPath1" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+nonFreeLibPath1=`echo "$nonFreeLibPath1" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+nonFreeLibPath2=`echo "/${bin2data_dir}/${norm_non_free_lib_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$nonFreeLibPath2:" in
+  ::) nonFreeLibPath2='.' ;;
+  :*[\\/]:) nonFreeLibPath2=`echo "$nonFreeLibPath2" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) nonFreeLibPath2=`echo "$nonFreeLibPath2" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) nonFreeLibPath2=`echo "$nonFreeLibPath2" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+nonFreeLibPath2=`echo "$nonFreeLibPath2" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+nonFreeLibPath3=`echo "${expanded_datadir}/${norm_non_free_lib_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$nonFreeLibPath3:" in
+  ::) nonFreeLibPath3='.' ;;
+  :*[\\/]:) nonFreeLibPath3=`echo "$nonFreeLibPath3" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) nonFreeLibPath3=`echo "$nonFreeLibPath3" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) nonFreeLibPath3=`echo "$nonFreeLibPath3" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+nonFreeLibPath3=`echo "$nonFreeLibPath3" | sed 's,\\\\\\\\,\\\\,g'`
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: result:
 sdcc ${VERSION} is now configured for
 
@@ -8006,7 +8103,9 @@ sdcc ${VERSION} is now configured for
   Install paths:
     binary files:       ${exec_prefix}
     include files:      ${datadir}/${include_dir_suffix}
+    non-free include files: ${datadir}/${non_free_include_dir_suffix}
     library files:      ${datadir}/${lib_dir_suffix}
+    non-free library files: ${datadir}/${non_free_lib_dir_suffix}
     documentation:      ${docdir}
 
     prefix:             ${prefix}
@@ -8018,9 +8117,15 @@ sdcc ${VERSION} is now configured for
     include files:      ${incPath1}
                         path(argv[0])${incPath2}
                         ${incPath3}
+                        ${nonFreeIncPath1}
+                        path(argv[0])${nonFreeIncPath2}
+                        ${nonFreeIncPath3}
     library files:      \$SDCC_HOME${libPath1}${dirch}<model>
                         path(argv[0])${libPath2}${dirch}<model>
                         ${libPath3}${dirch}<model>
+                        \$SDCC_HOME${nonFreLibPath1}${dirch}<model>
+                        path(argv[0])${nonFreLibPath2}${dirch}<model>
+                        ${nonFreLibPath3}${dirch}<model>
 " >&5
 $as_echo "
 sdcc ${VERSION} is now configured for
@@ -8054,7 +8159,9 @@ sdcc ${VERSION} is now configured for
   Install paths:
     binary files:       ${exec_prefix}
     include files:      ${datadir}/${include_dir_suffix}
+    non-free include files: ${datadir}/${non_free_include_dir_suffix}
     library files:      ${datadir}/${lib_dir_suffix}
+    non-free library files: ${datadir}/${non_free_lib_dir_suffix}
     documentation:      ${docdir}
 
     prefix:             ${prefix}
@@ -8066,8 +8173,14 @@ sdcc ${VERSION} is now configured for
     include files:      ${incPath1}
                         path(argv[0])${incPath2}
                         ${incPath3}
+                        ${nonFreeIncPath1}
+                        path(argv[0])${nonFreeIncPath2}
+                        ${nonFreeIncPath3}
     library files:      \$SDCC_HOME${libPath1}${dirch}<model>
                         path(argv[0])${libPath2}${dirch}<model>
                         ${libPath3}${dirch}<model>
+                        \$SDCC_HOME${nonFreLibPath1}${dirch}<model>
+                        path(argv[0])${nonFreLibPath2}${dirch}<model>
+                        ${nonFreLibPath3}${dirch}<model>
 " >&6; }
 # End of configure/configure.in

@@ -929,9 +929,16 @@ adl_NORMALIZE_PATH_MSG(/${prefix2bin_dir},                         [binPath],  [
 adl_NORMALIZE_PATH_MSG(/${prefix2data_dir}/${norm_inc_dir_suffix}, [incPath1], [$dirch])
 adl_NORMALIZE_PATH_MSG(/${bin2data_dir}/${norm_inc_dir_suffix},    [incPath2], [$dirch])
 adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_inc_dir_suffix}, [incPath3], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${prefix2data_dir}/${norm_non_free_inc_dir_suffix}, [nonFreeIncPath1], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${bin2data_dir}/${norm_non_free_inc_dir_suffix},    [nonFreeIncPath2], [$dirch])
+adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_non_free_inc_dir_suffix}, [nonFreeIncPath3], [$dirch])
+
 adl_NORMALIZE_PATH_MSG(/${prefix2data_dir}/${norm_lib_dir_suffix}, [libPath1], [$dirch])
 adl_NORMALIZE_PATH_MSG(/${bin2data_dir}/${norm_lib_dir_suffix},    [libPath2], [$dirch])
 adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_lib_dir_suffix}, [libPath3], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${prefix2data_dir}/${norm_non_free_lib_dir_suffix}, [nonFreeLibPath1], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${bin2data_dir}/${norm_non_free_lib_dir_suffix},    [nonFreeLibPath2], [$dirch])
+adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_non_free_lib_dir_suffix}, [nonFreeLibPath3], [$dirch])
 
 AC_MSG_RESULT([
 sdcc ${VERSION} is now configured for
@@ -965,7 +972,9 @@ sdcc ${VERSION} is now configured for
   Install paths:
     binary files:       ${exec_prefix}
     include files:      ${datadir}/${include_dir_suffix}
+    non-free include files: ${datadir}/${non_free_include_dir_suffix}
     library files:      ${datadir}/${lib_dir_suffix}
+    non-free library files: ${datadir}/${non_free_lib_dir_suffix}
     documentation:      ${docdir}
 
     prefix:             ${prefix}
@@ -977,8 +986,14 @@ sdcc ${VERSION} is now configured for
     include files:      ${incPath1}
                         path(argv[[0]])${incPath2}
                         ${incPath3}
+                        ${nonFreeIncPath1}
+                        path(argv[[0]])${nonFreeIncPath2}
+                        ${nonFreeIncPath3}
     library files:      \$SDCC_HOME${libPath1}${dirch}<model>
                         path(argv[[0]])${libPath2}${dirch}<model>
                         ${libPath3}${dirch}<model>
+                        \$SDCC_HOME${nonFreLibPath1}${dirch}<model>
+                        path(argv[[0]])${nonFreLibPath2}${dirch}<model>
+                        ${nonFreLibPath3}${dirch}<model>
 ])
 # End of configure/configure.in

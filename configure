@@ -8123,9 +8123,9 @@ sdcc ${VERSION} is now configured for
     library files:      \$SDCC_HOME${libPath1}${dirch}<model>
                         path(argv[0])${libPath2}${dirch}<model>
                         ${libPath3}${dirch}<model>
-                        \$SDCC_HOME${nonFreLibPath1}${dirch}<model>
-                        path(argv[0])${nonFreLibPath2}${dirch}<model>
-                        ${nonFreLibPath3}${dirch}<model>
+                        \$SDCC_HOME${nonFreeLibPath1}${dirch}<model>
+                        path(argv[0])${nonFreeLibPath2}${dirch}<model>
+                        ${nonFreeLibPath3}${dirch}<model>
 " >&5
 $as_echo "
 sdcc ${VERSION} is now configured for
@@ -8179,8 +8179,8 @@ sdcc ${VERSION} is now configured for
     library files:      \$SDCC_HOME${libPath1}${dirch}<model>
                         path(argv[0])${libPath2}${dirch}<model>
                         ${libPath3}${dirch}<model>
-                        \$SDCC_HOME${nonFreLibPath1}${dirch}<model>
-                        path(argv[0])${nonFreLibPath2}${dirch}<model>
-                        ${nonFreLibPath3}${dirch}<model>
+                        \$SDCC_HOME${nonFreeLibPath1}${dirch}<model>
+                        path(argv[0])${nonFreeLibPath2}${dirch}<model>
+                        ${nonFreeLibPath3}${dirch}<model>
 " >&6; }
 # End of configure/configure.in

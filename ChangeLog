@@ -4,12 +4,17 @@
 	  show non-free search paths
 	* support/scripts/sdcc_mingw32, support/scripts/sdcc_cygwin_mingw32:
 	  define non_free_include_dir_suffix and non_free_lib_dir_suffix
+	* support/scripts/sdcc.nsi:
+	  remove non-free directory on uninstall
+	* support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk:
+	  add --non-free option for pic* regression tests
 
 2010-10-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi:
 	  added non-free/lib/pic*/*.lib files to the win32 setup package,
-	  remove non-free on uninstall
+	  remove non-free directory on uninstall
 
 2010-10-04 Borut Razem <borut.razem AT siol.net>
 

@@ -949,6 +949,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\ds400"
   RMDir "$INSTDIR\lib\src\hc08"
   RMDir "$INSTDIR\lib\src"
+  RMDir "$INSTDIR\non-free\lib\src"
 
   RMDir "$INSTDIR\lib\pic"
   RMDir "$INSTDIR\non-free\lib\pic"
@@ -978,7 +979,9 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\asm"
   RMDir "$INSTDIR\include\z80"
   RMDir "$INSTDIR\include\pic"
+  RMDir "$INSTDIR\non-free\include\pic"
   RMDir "$INSTDIR\include\pic16"
+  RMDir "$INSTDIR\non-free\include\pic16"
   RMDir "$INSTDIR\include\mcs51"
   RMDir "$INSTDIR\include\hc08"
   RMDir "$INSTDIR\include"

@@ -1,7 +1,9 @@
 2010-10-06 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/configure, sdcc/configure.in:
-	  show serch non-free paths
+	  show non-free search paths
+	* support/scripts/sdcc_mingw32, support/scripts/sdcc_cygwin_mingw32:
+	  define non_free_include_dir_suffix and non_free_lib_dir_suffix
 
 2010-10-05 Borut Razem <borut.razem AT siol.net>
 

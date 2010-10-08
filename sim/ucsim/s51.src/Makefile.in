@@ -138,7 +138,6 @@ $(top_builddir)/s51.so: $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs:
-	$(MAKE) -C $(top_builddir) libs
 	$(MAKE) -C $(top_builddir)/cmd.src all
 	$(MAKE) -C $(top_builddir)/sim.src all
 	$(MAKE) -C $(top_builddir)/gui.src checkconf ucsim_lib

@@ -1,3 +1,8 @@
+2010-10-08 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/s51.src/Makefile.in:
+	  fixed bug 3082829: S51 is not installed in recent SDCC versions
+
 2010-10-06 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/configure, sdcc/configure.in:

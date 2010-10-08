@@ -864,6 +864,11 @@ cpp_num cpp_num_sign_extend (cpp_num, size_t);
 #define CPP_DL_NOTE		0x05
 /* A fatal error.  */
 #define CPP_DL_FATAL		0x06
+/* Extracts a diagnostic level from an int.  */
+#define CPP_DL_EXTRACT(l)       (l & 0xf)
+/* Nonzero if a diagnostic level is one of the warnings.  */
+#define CPP_DL_WARNING_P(l)     (CPP_DL_EXTRACT (l) >= CPP_DL_WARNING \
+                                 && CPP_DL_EXTRACT (l) <= CPP_DL_PEDWARN)
 
 /* Output a diagnostic of some kind.  */
 extern bool cpp_error (cpp_reader *, int, const char *msgid, ...)

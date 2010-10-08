@@ -75,6 +75,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.*/
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4090 )
 #pragma warning( disable : 4022 )
+
+typedef int intptr_t;
 #endif  /* _MSC_VER */
 
 #endif  /*CPP_VC_H_*/

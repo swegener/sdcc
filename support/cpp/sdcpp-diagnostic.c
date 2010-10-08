@@ -23,6 +23,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "config.h"
 #include "system.h"
 #include "internal.h"
+#include "sdcpp.h"
+#include "options.h"
 
 #ifndef _
 # define _(msgid) (msgid)
@@ -107,35 +109,6 @@ print_location (cpp_reader *pfile, source_location line, unsigned int col)
     }
 }
 
-/* from diagnostic.def */
-
-/* DK_UNSPECIFIED must be first so it has a value of zero.  We never
-   assign this kind to an actual diagnostic, we only use this in
-   variables that can hold a kind, to mean they have yet to have a
-   kind specified.  I.e. they're uninitialized.  Within the diagnostic
-   machinery, this kind also means "don't change the existing kind",
-   meaning "no change is specified".  */
-#define DK_UNSPECIFIED ""
-
-/* If a diagnostic is set to DK_IGNORED, it won't get reported at all.
-   This is used by the diagnostic machinery when it wants to disable a
-   diagnostic without disabling the option which causes it.  */
-#define DK_IGNORED ""
-
-/* The remainder are real diagnostic types.  */
-#define DK_FATAL "fatal error: "
-#define DK_ICE "internal compiler error: "
-#define DK_ERROR "error: "
-#define DK_SORRY "sorry, unimplemented: "
-#define DK_WARNING "warning: "
-#define DK_ANACHRONISM "anachronism: "
-#define DK_NOTE "note: "
-#define DK_DEBUG "debug: "
-/* These two would be re-classified as DK_WARNING or DK_ERROR, so the
-prefix does not matter.  */
-#define DK_PEDWARN "pedwarn: "
-#define DK_PERMERROR "permerror: "
-
 /* from c-common.c */
 
 /* Callback from cpp_error for PFILE to print diagnostics from the
@@ -151,50 +124,44 @@ c_cpp_error (cpp_reader *pfile ATTRIBUTE_UNUSED, int level,
 	     location_t location, unsigned int column_override,
 	     const char *msg, va_list *ap)
 {
-  const char *dlevel;
-  int save_warn_system_headers = warn_system_headers;
-
   switch (level)
     {
-    case CPP_DL_WARNING_SYSHDR:
-      if (flag_no_output)
-	return false;
-      warn_system_headers = 1;
-      /* Fall through.  */
     case CPP_DL_WARNING:
-      if (flag_no_output)
-	return false;
-      dlevel = DK_WARNING;
-      break;
     case CPP_DL_PEDWARN:
-      if (flag_no_output && !flag_pedantic_errors)
+      if (cpp_in_system_header (pfile)
+	  && ! warn_system_headers)
 	return false;
-      dlevel = DK_PEDWARN;
+      /* Fall through.  */
+
+    case CPP_DL_WARNING_SYSHDR:
+      if (warnings_are_errors
+	  || (level == CPP_DL_PEDWARN && flag_pedantic_errors))
+	{
+	  level = CPP_DL_ERROR;
+	  ++errorcount;
+	}
+      else if (inhibit_warnings)
+	return false;
       break;
+
     case CPP_DL_ERROR:
-      dlevel = DK_ERROR;
-      break;
+      /* ICEs cannot be inhibited.  */
     case CPP_DL_ICE:
-      dlevel = DK_ICE;
+      ++errorcount;
       break;
-    case CPP_DL_NOTE:
-      dlevel = DK_NOTE;
-      break;
-    case CPP_DL_FATAL:
-      dlevel = DK_FATAL;
-      break;
-    default:
-      gcc_unreachable ();
     }
 
   print_location (pfile, location, column_override);
-  fputs (_(dlevel), stderr);
+
+  if (CPP_DL_WARNING_P (level))
+    fputs (_("warning: "), stderr);
+  else if (level == CPP_DL_ICE)
+    fputs (_("internal error: "), stderr);
+  else
+    fputs (_("error: "), stderr);
+
   vfprintf (stderr, _(msg), *ap);
   putc ('\n', stderr);
 
-  if (level == CPP_DL_WARNING_SYSHDR)
-    warn_system_headers = save_warn_system_headers;
-
   return true;
 }
-

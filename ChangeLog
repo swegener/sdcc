@@ -1,3 +1,9 @@
+2010-10-09 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/auto-host_vc_in.h, support/cpp/libcpp/include/cpplib.h,
+	  support/cpp/sdcpp-diagnostic.c:
+	  fixed bug #3080422: #error not working as expected
+
 2010-10-08 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/s51.src/Makefile.in:

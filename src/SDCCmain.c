@@ -143,7 +143,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_CONST_SEG        "--constseg"
 #define OPTION_DOLLARS_IN_IDENT "--fdollars-in-identifiers"
 #define OPTION_UNSIGNED_CHAR    "--funsigned-char"
-#define OPTION_NON_FREE         "--non-free"
+#define OPTION_USE_NON_FREE     "--use-non-free"
 
 static const OPTION optionsTable[] = {
   {0, NULL, NULL, "General options"},
@@ -156,8 +156,6 @@ static const OPTION optionsTable[] = {
   {'I', NULL, NULL, "Add to the include (*.h) path, as in -Ipath"},
   {'A', NULL, NULL, NULL},
   {'U', NULL, NULL, NULL},
-  {0, OPTION_NON_FREE, &options.non_free, "Include non-free linraries and header files"},
-
   {'M', NULL, NULL, "Preprocessor option"},
   {'W', NULL, NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)"},
   {'S', NULL, &noAssemble, "Compile only; do not assemble or link"},
@@ -181,7 +179,7 @@ static const OPTION optionsTable[] = {
   {0, OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions (incomplete)"},
   {0, OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0, OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
-  {0, OPTION_NON_FREE, &options.non_free, "Search / include non-free libraries and header files"},
+  {0, OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
 
   {0, NULL, NULL, "Code generation options"},
   {'m', NULL, NULL, "Set the port to use e.g. -mz80."},
@@ -391,7 +389,7 @@ program_name (const char *path)
   char *tmpPath = Safe_strdup (path);
   char *res = Safe_strdup (basename (tmpPath));
 
-  free (tmpPath);
+  Safe_free (tmpPath);
   return res;
 #endif
 }
@@ -2003,8 +2001,8 @@ preProcess (char **envp)
         addSet (&preArgvSet, Safe_strdup ("-DSDCC_CHAR_UNSIGNED"));
 
       /* set the macro for non-free  */
-      if (options.non_free)
-        addSet (&preArgvSet, Safe_strdup ("-DSDCC_NON_FREE"));
+      if (options.use_non_free)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_USE_NON_FREE"));
 
       /* set the macro for large model  */
       switch (options.model)
@@ -2187,7 +2185,7 @@ setIncludePath (void)
       includeDirsSet = appendStrSet (includeDirsSet, NULL, port->target);
       mergeSets (&includeDirsSet, tempSet);
 
-      if (options.non_free)
+      if (options.use_non_free)
         {
           set *tempSet1;
 
@@ -2239,7 +2237,7 @@ setLibPath (void)
 
       libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 
-      if (options.non_free)
+      if (options.use_non_free)
         {
           dbuf_set_length (&dbuf, 0);
           dbuf_printf (&dbuf, "%s%c%s", NON_FREE_LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);

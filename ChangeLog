@@ -3,6 +3,9 @@
 	* support/cpp/auto-host_vc_in.h, support/cpp/libcpp/include/cpplib.h,
 	  support/cpp/sdcpp-diagnostic.c:
 	  fixed bug #3080422: #error not working as expected
+	* src/SDCCmain.c, src/SDCCglobl.h:
+	  --non-free and SDCC_NON_FREE changed to --use-non-free and
+	  SDCC_USE_NON_FREE
 
 2010-10-08 Borut Razem <borut.razem AT siol.net>
 

@@ -117,7 +117,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.9.8
+SDCC 3.0.0
 \size footnotesize
 
 \begin_inset Newline newline
@@ -2273,7 +2273,35 @@ include_dir_suffix environment variable, see table below
 \begin_inset space ~
 \end_inset
 
+non_free_include_dir_suffix environment variable, see table below
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 lib_dir_suffix environment variable, see table below
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+non_free_lib_dir_suffix environment variable, see table below
 \end_layout
 
 \begin_layout List
@@ -2672,7 +2700,7 @@ These defaults are:
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="11" columns="3">
 <features>
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -2960,7 +2988,38 @@ include
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+NON_FREE_INCLUDE_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdcc/non-free/include
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+non-free/include
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2971,7 +3030,7 @@ LIB_DIR_SUFFIX
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2980,11 +3039,42 @@ sdcc/lib
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 lib
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+NON_FREE_LIB_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdcc/non-free/lib
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+non-free/lib
 \end_layout
 
 \end_inset
@@ -3384,11 +3474,39 @@ include
 \begin_inset Newline newline
 \end_inset
 
+non_free_include_dir_suffix=
+\begin_inset Quotes srd
+\end_inset
+
+non-free/include
+\begin_inset Quotes srd
+\end_inset
+
+ 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
 lib_dir_suffix=
 \begin_inset Quotes srd
 \end_inset
 
 lib
+\begin_inset Quotes srd
+\end_inset
+
+ 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+non_free_lib_dir_suffix=
+\begin_inset Quotes srd
+\end_inset
+
+non-free/lib
 \begin_inset Quotes srd
 \end_inset
 
@@ -3578,11 +3696,39 @@ include
 \begin_inset Newline newline
 \end_inset
 
+non_free_include_dir_suffix=
+\begin_inset Quotes srd
+\end_inset
+
+non-free/include
+\begin_inset Quotes srd
+\end_inset
+
+ 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
 lib_dir_suffix=
 \begin_inset Quotes srd
 \end_inset
 
 lib
+\begin_inset Quotes srd
+\end_inset
+
+ 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+non_free_lib_dir_suffix=
+\begin_inset Quotes srd
+\end_inset
+
+non-free/lib
 \begin_inset Quotes srd
 \end_inset
 
@@ -3690,12 +3836,12 @@ Install paths
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="4">
+<lyxtabular version="3" rows="7" columns="4">
 <features>
 <column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="4.5cm">
+<column alignment="left" valignment="top" width="4cm">
+<column alignment="left" valignment="top" width="4cm">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3802,7 +3948,15 @@ Include files
 \begin_layout Plain Layout
 
 \emph on
-$DATADIR/ $INCLUDE_DIR_SUFFIX
+$DATADIR/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$INCLUDE_DIR_SUFFIX
 \end_layout
 
 \end_inset
@@ -3811,7 +3965,11 @@ $DATADIR/ $INCLUDE_DIR_SUFFIX
 \begin_inset Text
 
 \begin_layout Plain Layout
-/usr/local/share/sdcc/include
+/usr/local/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/include
 \end_layout
 
 \end_inset
@@ -3835,7 +3993,7 @@ include
 \begin_inset Text
 
 \begin_layout Plain Layout
-Library file**
+Non-free include files
 \end_layout
 
 \end_inset
@@ -3846,7 +4004,15 @@ Library file**
 \begin_layout Plain Layout
 
 \emph on
-$DATADIR/$LIB_DIR_SUFFIX
+$DATADIR/non-free/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$INCLUDE_DIR_SUFFIX
 \end_layout
 
 \end_inset
@@ -3855,7 +4021,11 @@ $DATADIR/$LIB_DIR_SUFFIX
 \begin_inset Text
 
 \begin_layout Plain Layout
-/usr/local/share/sdcc/lib
+/usr/local/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/non-free/include
 \end_layout
 
 \end_inset
@@ -3867,6 +4037,122 @@ $DATADIR/$LIB_DIR_SUFFIX
 
 \backslash
 sdcc
+\backslash
+non-free
+\backslash
+include
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Library file**
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+$DATADIR/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$LIB_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+/usr/local/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/lib
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\backslash
+sdcc
+\backslash
+lib
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Library file**
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+$DATADIR/non-free/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$LIB_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+/usr/local/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/non-free/lib
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\backslash
+sdcc
+\backslash
+non-free
 \backslash
 lib
 \end_layout
@@ -3899,7 +4185,11 @@ $DOCDIR
 \begin_inset Text
 
 \begin_layout Plain Layout
-/usr/local/share/sdcc/doc
+/usr/local/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/doc
 \end_layout
 
 \end_inset
@@ -4181,12 +4471,22 @@ $PATH
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="9" columns="4">
 <features>
-<column alignment="block" valignment="top" width="1.5in">
-<column alignment="block" valignment="top" width="1.5in">
+<column alignment="block" valignment="top" width="0.5cm">
+<column alignment="block" valignment="top" width="4.8cm">
+<column alignment="block" valignment="top" width="4.8cm">
 <column alignment="block" valignment="top" width="0in">
 <row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+#
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -4220,6 +4520,15 @@ Win32 builds
 \begin_inset Text
 
 \begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 -
 \begin_inset ERT
 status collapsed
@@ -4288,6 +4597,15 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 $SDCC_INCLUDE
 \end_layout
 
@@ -4314,6 +4632,15 @@ $SDCC_INCLUDE
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4324,9 +4651,13 @@ $SDCC_HOME/
 
 \emph on
 $PREFIX2DATA_DIR/
+\emph default
+
 \begin_inset Newline newline
 \end_inset
 
+
+\emph on
 $INCLUDE_DIR_SUFFIX
 \end_layout
 
@@ -4336,15 +4667,11 @@ $INCLUDE_DIR_SUFFIX
 \begin_inset Text
 
 \begin_layout Plain Layout
-$SDCC_ HOME/
+$SDCC_HOME/
 \begin_inset Newline newline
 \end_inset
 
-share/sdcc/
-\begin_inset Newline newline
-\end_inset
-
-include
+share/sdcc/include
 \end_layout
 
 \end_inset
@@ -4363,6 +4690,15 @@ include
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4389,167 +4725,11 @@ $INCLUDE_DIR_SUFFIX
 \begin_inset Text
 
 \begin_layout Plain Layout
-path(argv[0])/
+path(argv[0])/../
 \begin_inset Newline newline
 \end_inset
 
-../sdcc/include
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+sdcc/include
 \end_layout
 
 \end_inset
@@ -4569,7 +4749,16 @@ include
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4588,15 +4777,213 @@ $INCLUDE_DIR_SUFFIX
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-/usr/local/share/sdcc/
+/usr/local/share/
 \begin_inset Newline newline
 \end_inset
 
+sdcc/include
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(not on Win32)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$SDCC_HOME/
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$PREFIX2DATA_DIR/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+non-free/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$INCLUDE_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$SDCC_HOME/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/non-free/include
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$SDCC_HOME
+\backslash
+non-free
+\backslash
 include
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+path(argv[0])/
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$BIN2DATADIR/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+non-free/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$INCLUDE_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+path(argv[0])/../
+\begin_inset Newline newline
+\end_inset
+
+sdcc/non-free/include
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+path(argv[0])
+\backslash
+..
+\backslash
+non-free
+\backslash
+include
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+$DATADIR/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+non-free/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+$INCLUDE_DIR_SUFFIX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+/usr/local/share/
+\begin_inset Newline newline
+\end_inset
+
+sdcc/non-free/include
 \end_layout
 
 \end_inset
@@ -4637,7 +5024,7 @@ status collapsed
 
 \end_inset
 
--nostdinc disables the last two search paths.
+-nostdinc disables all search paths except #1 and #2.
 \begin_inset Newline newline
 \end_inset
 
@@ -4691,13 +5078,23 @@ model
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="9" columns="4">
 <features>
-<column alignment="block" valignment="top" width="1.7in">
-<column alignment="block" valignment="top" width="1.2in">
-<column alignment="block" valignment="top" width="1.2in">
+<column alignment="block" valignment="top" width="0.5cm">
+<column alignment="block" valignment="top" width="4.5cm">
+<column alignment="block" valignment="top" width="5cm">
+<column alignment="block" valignment="top" width="4.5cm">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+#
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4730,6 +5127,15 @@ Win32 builds
 \begin_inset Text
 
 \begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 -
 \begin_inset ERT
 status collapsed
@@ -4798,11 +5204,16 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-$SDCC_LIB/
-\begin_inset Newline newline
+2
+\end_layout
+
 \end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-
+\begin_layout Plain Layout
+$SDCC_LIB/
 \emph on
 <model>
 \end_layout
@@ -4814,10 +5225,6 @@ $SDCC_LIB/
 
 \begin_layout Plain Layout
 $SDCC_LIB/
-\begin_inset Newline newline
-\end_inset
-
-
 \emph on
 <model>
 \end_layout
@@ -4831,10 +5238,6 @@ $SDCC_LIB/
 $SDCC_LIB
 \backslash
 
-\begin_inset Newline newline
-\end_inset
-
-
 \emph on
 <model>
 \end_layout
@@ -4844,6 +5247,15 @@ $SDCC_LIB
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4854,10 +5266,22 @@ $SDCC_HOME/
 
 \emph on
 $PREFIX2DATA_DIR/
+\emph default
+
 \begin_inset Newline newline
 \end_inset
 
-$LIB_DIR_SUFFIX/<model>
+
+\emph on
+$LIB_DIR_SUFFIX/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+<model>
 \end_layout
 
 \end_inset
@@ -4870,13 +5294,9 @@ $SDCC_HOME/
 \begin_inset Newline newline
 \end_inset
 
-share/sdcc/
-\begin_inset Newline newline
-\end_inset
-
-lib/
+share/sdcc/lib/<
 \emph on
-<model>
+model>
 \end_layout
 
 \end_inset
@@ -4887,14 +5307,14 @@ lib/
 \begin_layout Plain Layout
 $SDCC_HOME
 \backslash
-lib
-\backslash
-
-\emph on
 
 \begin_inset Newline newline
 \end_inset
 
+lib
+\backslash
+
+\emph on
 <model>
 \end_layout
 
@@ -4903,6 +5323,15 @@ lib
 </row>
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4920,7 +5349,15 @@ $BIN2DATADIR/
 
 
 \emph on
-$LIB_DIR_SUFFIX/<model>
+$LIB_DIR_SUFFIX/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+<model>
 \end_layout
 
 \end_inset
@@ -4929,173 +5366,13 @@ $LIB_DIR_SUFFIX/<model>
 \begin_inset Text
 
 \begin_layout Plain Layout
-path(argv[0])/
+path(argv[0])/../sdcc/
 \begin_inset Newline newline
 \end_inset
 
-../sdcc/lib/
+lib/
 \emph on
 <model>
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
 \end_layout
 
 \end_inset
@@ -5115,152 +5392,248 @@ path(argv[0])
 lib
 \backslash
 
-\emph on
-<model>
 \begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+<model>
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+$DATADIR/non-free/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+$LIB_DIR_SUFFIX/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+<model>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+/usr/local/share/sdcc/
+\begin_inset Newline newline
+\end_inset
+
+lib/
+\emph on
+<model>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(not on Win32)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$SDCC_HOME/
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+$PREFIX2DATA_DIR/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+non-free/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+$LIB_DIR_SUFFIX/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+<model>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$SDCC_HOME/share/sdcc/
+\begin_inset Newline newline
+\end_inset
+
+non-free/lib/
+\emph on
+<model>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$SDCC_HOME
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+lib
+\backslash
+non-free
+\emph on
+
+\backslash
+<model>
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+path(argv[0])/
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+$BIN2DATADIR/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+non-free/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+$LIB_DIR_SUFFIX/
+\emph default
+
+\begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\emph on
+<model>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+path(argv[0])/../sdcc/
+\begin_inset Newline newline
 \end_inset
 
+non-free/lib/
+\emph on
+<model>
+\end_layout
 
-\begin_inset space ~
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+path(argv[0])
+\backslash
+..
+\backslash
+
+\begin_inset Newline newline
 \end_inset
 
+lib
+\backslash
+non-free
+\emph on
 
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+\backslash
+<model>
 \end_layout
 
 \end_inset
@@ -5271,13 +5644,34 @@ lib
 \begin_inset Text
 
 \begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \emph on
-$DATADIR/
+$DATADIR/non-free/
+\emph default
+
 \begin_inset Newline newline
 \end_inset
 
-$LIB_DIR_SUFFIX/<model>
+
+\emph on
+$LIB_DIR_SUFFIX/
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+<model>
 \end_layout
 
 \end_inset
@@ -5290,7 +5684,11 @@ $LIB_DIR_SUFFIX/<model>
 \begin_inset Newline newline
 \end_inset
 
-lib/
+non-free/lib/
+\begin_inset Newline newline
+\end_inset
+
+
 \emph on
 <model>
 \end_layout
@@ -5353,7 +5751,7 @@ status collapsed
 
 \end_inset
 
--nostdlib disables the last two search paths.
+-nostdlib disables all search paths except #1 and #2.
 \end_layout
 
 \begin_layout Section
@@ -16302,6 +16700,66 @@ reference "sec:Compatibility-with-previous"
 \end_inset
 
 )
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\series default
+
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:--use-non-free"
+
+\end_inset
+
+ Search / include non-free licensed libraries and header files, located
+ under the non-free directory - see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Search-Paths"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -41775,6 +42233,76 @@ http://sourceforge.net/projects/gputils
 \begin_inset Newline newline
 \end_inset
 
+Pic device specific header and c source files are automatically generated
+ from MPLAB include files, which are published by Microchip with a special
+ requirement that they are only to be used with authentic Microchip devices.
+ This reqirement prevents to publish generated header and c source files
+ under the GPL compatible license, so they are located in non-free directory
+ (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Search-Paths"
+
+\end_inset
+
+).
+ In order to include them in include and library search paths, the 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+
+\series default
+ command line option should be defined.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+NOTE: the compiled code, which use non-free pic device specific libraries,
+ is not GPL compatible!
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
 Here is a 
 \family typewriter
 Makefile
@@ -41821,7 +42349,7 @@ Makefile
 \begin_inset space ~
 \end_inset
 
-sdcc -V -mpic14 -p16f877 -c $< 
+sdcc -V --non-free -mpic14 -p16f877 -c $< 
 \begin_inset Newline newline
 \end_inset
 
@@ -41915,7 +42443,7 @@ Makefile
 \begin_inset space ~
 \end_inset
 
-sdcc -S -V -mpic14 -p16f877 $< 
+sdcc -S -V --non-free -mpic14 -p16f877 $< 
 \begin_inset Newline newline
 \end_inset
 
@@ -43972,6 +44500,184 @@ Linker
 
 \end_layout
 
+\begin_layout Standard
+If the 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+
+\series default
+ commad line option is specified, non-free diractories are searched:
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="4">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Directory
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Target
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Command prefix
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PREFIX/sdcc/non-free/include/pic16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PIC16 specific non-free headers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Compiler
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-I
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PREFIX/sdcc/non-free/lib/pic16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PIC16 specific non-free libraries
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Linker
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-L
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Pragmas
 \begin_inset CommandInset label
@@ -44540,6 +45246,83 @@ SECTION    NAME=bank5      RAM=gpr5
 The linker will recognise the section name set in the pragma statement and
  will position the variable at the memory bank set with the RAM field at
  the SECTION line in the linker script file.
+\end_layout
+
+\begin_layout Subsection
+Header Files and Libraries
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:PIC16_Header-Files-and-Libraries"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Pic device specific header and c source files are automatically generated
+ from MPLAB include files, which are published by Microchip with a special
+ requirement that they are only to be used with authentic Microchip devices.
+ This reqirement prevents to publish generated header and c source files
+ under the GPL compatible license, so they are located in non-free directory
+ (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Search-Paths"
+
+\end_inset
+
+).
+ In order to include them in include and library search paths, the 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+
+\series default
+ command line option should be defined.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+NOTE: the compiled code, which use non-free pic device specific libraries,
+ is not GPL compatible!
 \end_layout
 
 \begin_layout Subsection
@@ -45423,10 +46206,6 @@ Large
 stack model is currently not working properly throughout the code generator.
  So its use is not advised.
  Also there are some other points that need special care:
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Enumerate

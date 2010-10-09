@@ -6,6 +6,9 @@
 	* src/SDCCmain.c, src/SDCCglobl.h:
 	  --non-free and SDCC_NON_FREE changed to --use-non-free and
 	  SDCC_USE_NON_FREE
+	* doc/sdccman.lyx: documented --non-free
+	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
+	  changed sdcc version to 3.0.0
 
 2010-10-08 Borut Razem <borut.razem AT siol.net>
 

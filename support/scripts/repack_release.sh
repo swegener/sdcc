@@ -1,7 +1,7 @@
 #
 # repack_release.sh
 #
-# This script repacks sdcc Linux and Mac OS X snapshot build binary abd doc packages
+# This script repacks sdcc Linux and Mac OS X snapshot build binary and doc packages
 # into a sdcc release package.
 #
 # Repacking Linux package example:

@@ -9,6 +9,9 @@
 	* doc/sdccman.lyx: documented --non-free
 	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
 	  changed sdcc version to 3.0.0
+	* src/SDCCmain.c: removed function readCfgFile()
+	* support/scripts/repack_release.sh:
+	  fixed typo
 
 2010-10-08 Borut Razem <borut.razem AT siol.net>
 

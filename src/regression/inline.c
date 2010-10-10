@@ -22,10 +22,10 @@ delay_1ms(void)
 
   do {
     do {
-      _asm
+      __asm
         nop
         nop
-      _endasm;
+      __endasm;
     } while (--cnt500u > 0);
   } while (--cnt1m > 0);
 }
@@ -36,19 +36,19 @@ void main(void)
   TRISA = 0x0f;
 
 #if defined(__pic14)
-  _asm
+  __asm
     BSF   STATUS,RP0
     MOVF  TRISA,W
     BCF   STATUS,RP0
     MOVWF _test_tris
-  _endasm;
+  __endasm;
 #else   // !defined(__pic14)
-  _asm
+  __asm
     BANKSEL _TRISA
     MOVF    _TRISA,W
     BANKSEL _test_tris
     MOVWF   _test_tris
-  _endasm;
+  __endasm;
 #endif  // !defined(__pic14)
 
   if(test_tris != 0x0f)

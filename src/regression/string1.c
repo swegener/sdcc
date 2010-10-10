@@ -17,7 +17,7 @@ done()
   PASSED();
 }
 
-void  isr(void) interrupt 1 using 1
+void  isr(void) __interrupt 1 __using 1
 {
 
   if(arr[3]!=9)

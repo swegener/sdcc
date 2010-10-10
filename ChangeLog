@@ -5,6 +5,9 @@
 	* src/SDCCmain.c: removed readCfgFile() call
 	* support/scripts/sdcc.nsi:
 	  added include/ds390/*.h and include/ds400/*.h to the package
+	* src/regression/Makefile, src/regression/inline.c,
+	  src/regression/string1.c: added non-free search path,
+	  fixed deprecated keyword warnings
 
 2010-10-09 Borut Razem <borut.razem AT siol.net>
 

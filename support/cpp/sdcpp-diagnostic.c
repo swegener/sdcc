@@ -24,7 +24,6 @@ along with GCC; see the file COPYING3.  If not see
 #include "system.h"
 #include "internal.h"
 #include "sdcpp.h"
-#include "options.h"
 
 #ifndef _
 # define _(msgid) (msgid)

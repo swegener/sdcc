@@ -1,3 +1,8 @@
+2010-10-10 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/sdcpp-diagnostic.c, support/cpp/sdcpp.h:
+	  define inhibit_warnings
+
 2010-10-09 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/auto-host_vc_in.h, support/cpp/libcpp/include/cpplib.h,

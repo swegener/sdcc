@@ -151,6 +151,11 @@ extern int flag_signed_char;
 extern int flag_pedantic_errors;
 
 /*
+ * From options.h
+ */
+extern int inhibit_warnings;
+
+/*
  * From c-common.h
  */
 #include "hwint.h"

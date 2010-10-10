@@ -418,6 +418,11 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\asm\pic16\features.h"
   SetOutPath "$INSTDIR\include\asm\z80"
   File "${DEV_ROOT}\include\asm\z80\features.h"
+
+  SetOutPath "$INSTDIR\include\ds390"
+  File "${DEV_ROOT}\include\ds390\*.h"
+  SetOutPath "$INSTDIR\include\ds400"
+  File "${DEV_ROOT}\include\ds400\*.h"
   SetOutPath "$INSTDIR\include\hc08"
   File "${DEV_ROOT}\include\hc08\*.h"
   SetOutPath "$INSTDIR\include\mcs51"
@@ -431,8 +436,10 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\pic16\*.txt"
   SetOutPath "$INSTDIR\include\z80"
   File "${DEV_ROOT}\include\z80\*.h"
+
   SetOutPath "$INSTDIR\include"
   File "${DEV_ROOT}\include\*.h"
+
   SetOutPath "$INSTDIR\non-free\include\pic"
   File "${DEV_ROOT}\non-free\include\pic\*.h"
   SetOutPath "$INSTDIR\non-free\include\pic16"
@@ -895,6 +902,8 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\pic16\*.txt"
   Delete "$INSTDIR\include\mcs51\*.h"
   Delete "$INSTDIR\include\hc08\*.h"
+  Delete "$INSTDIR\include\ds400\*.h"
+  Delete "$INSTDIR\include\ds390\*.h"
   Delete "$INSTDIR\include\*.h"
 
 !ifndef FULL_DOC
@@ -984,6 +993,8 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\non-free\include\pic16"
   RMDir "$INSTDIR\include\mcs51"
   RMDir "$INSTDIR\include\hc08"
+  RMDir "$INSTDIR\include\ds400"
+  RMDir "$INSTDIR\include\ds390"
   RMDir "$INSTDIR\include"
   RMDir "$INSTDIR\non-free\include"
 

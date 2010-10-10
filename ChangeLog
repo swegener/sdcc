@@ -3,6 +3,8 @@
 	* support/cpp/sdcpp-diagnostic.c, support/cpp/sdcpp.h:
 	  define inhibit_warnings
 	* src/SDCCmain.c: removed readCfgFile() call
+	* support/scripts/sdcc.nsi:
+	  added include/ds390/*.h and include/ds400/*.h to the package
 
 2010-10-09 Borut Razem <borut.razem AT siol.net>
 

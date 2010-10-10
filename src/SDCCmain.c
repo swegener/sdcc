@@ -2388,9 +2388,6 @@ main (int argc, char **argv, char **envp)
   setBinPaths (argv[0]);
   setDataPaths (argv[0]);
 
-  if (readCfgFile (".") == 0)   /* check local directory first */
-    readCfgFile (setFirstItem (binPathSet));    /* check sdcc's bin directory */
-
   if (port->initPaths)
     port->initPaths ();
 

@@ -8,6 +8,9 @@
 	* src/regression/Makefile, src/regression/inline.c,
 	  src/regression/string1.c: added non-free search path,
 	  fixed deprecated keyword warnings
+	* device/lib/Makefile.in device/non-free/lib/Makefile.in:
+	  fixed bug #3084827:
+	  Building fails at non-free when disabling PIC/PIC16
 
 2010-10-09 Borut Razem <borut.razem AT siol.net>
 

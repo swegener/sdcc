@@ -175,7 +175,7 @@ endif
 # ------------------------------------------
 all:
 	$(MAKE) checkconf
-ifneq ($(TARGETS), "")
+ifneq ($(TARGETS), )
 	$(MAKE) $(TARGETS)
 endif
 

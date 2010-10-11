@@ -200,8 +200,8 @@ status collapsed
 
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 and
  Zilog Z80 based MCUs.
- It can be retargeted for other microprocessors, support for Microchip PIC,
- Atmel AVR is under development.
+ It can be retargeted for other microprocessors, support for Microchip PIC
+ is under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses a modified version of ASXXXX
 \begin_inset Index
@@ -2395,7 +2395,7 @@ status collapsed
 
 \end_inset
 
--disable-avr-port Excludes the AVR port
+-disable-avr-port Excludes the AVR port (disabled by default)
 \end_layout
 
 \begin_layout List
@@ -2485,7 +2485,7 @@ status collapsed
 
 \end_inset
 
--disable-xa51-port Excludes the XA51 port
+-disable-xa51-port Excludes the XA51 port (disabled by default)
 \end_layout
 
 \begin_layout List
@@ -7938,12 +7938,27 @@ the include files
 \end_layout
 
 \begin_layout Standard
+In <installdir>/share/sdcc/non-free/include
+\end_layout
+
+\begin_layout Itemize
+the non-free include files
+\end_layout
+
+\begin_layout Standard
 In <installdir>/share/sdcc/lib
 \end_layout
 
 \begin_layout Itemize
-the subdirs src and small, large, z80, gbz80 and ds390 with the precompiled
- relocatables.
+the src and target subdirectories with the precompiled relocatables.
+\end_layout
+
+\begin_layout Standard
+In <installdir>/share/sdcc/non-free/lib
+\end_layout
+
+\begin_layout Itemize
+the src and target subdirectories with the non-free precompiled relocatables.
 \end_layout
 
 \begin_layout Standard
@@ -7952,11 +7967,6 @@ In <installdir>/share/sdcc/doc
 
 \begin_layout Itemize
 the documentation
-\end_layout
-
-\begin_layout Standard
-As development for other processors proceeds, this list will expand to include
- executables to support processors like AVR, PIC, etc.
 \end_layout
 
 \begin_layout Subsection
@@ -10068,73 +10078,6 @@ gbz80 (GameBoy Z80)
 \end_inset
 
  processor (Not actively maintained).
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
-
-\series bold
--mavr
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
--mavr
-\end_layout
-
-\end_inset
-
-
-\series default
- Generate code for the Atmel AVR
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-AVR
-\end_layout
-
-\end_inset
-
- processor (Not maintained, not complete).
- AVR users should have a look at winavr 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://sourceforge.net/projects/winavr
-\end_layout
-
-\end_inset
-
- or 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.avrfreaks.net/index.php?name=PNphpBB2&file=index
-\end_layout
-
-\end_inset
-
-, which is based on the gcc compiler.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Plain Layout
-I think it is fair to direct users there for now.
- Open source is also about avoiding unnecessary work .
- But I didn't find the 'official' link.
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout List
@@ -22614,19 +22557,8 @@ Storage class
 \begin_layout Standard
 Note that the compiler (not the linkage editor) makes the decision for overlayin
 g the data items.
- Functions that are called from an interrupt service routine
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Plain Layout
-
-\series bold
-!
-\end_layout
-
-\end_inset
-
- should be preceded by a #pragma
+ Functions that are called from an interrupt service routine should be preceded
+ by a #pragma
 \begin_inset space ~
 \end_inset
 
@@ -48577,8 +48509,8 @@ Oscilloscope
  a realtime application.
  If you need to monitor more pins than your oscilloscope provides you can
  sometimes get away with a small R-2R network.
- On a single channel oscilloscope you could f.e.
- monitor 2 push-pull driven pins by connecting one via a 10
+ On a single channel oscilloscope you could for example monitor 2 push-pull
+ driven pins by connecting one via a 10
 \begin_inset space ~
 \end_inset
 
@@ -52493,25 +52425,10 @@ Use the smallest data type to represent your data-value.
  Please note, that ANSI C requires both signed and unsigned chars to be
  promoted to 'signed int'
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 promotion to signed int
-\end_layout
-
-\end_inset
-
-
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Plain Layout
-
-\series bold
-\begin_inset space ~
-\end_inset
-
-!
 \end_layout
 
 \end_inset
@@ -66905,11 +66822,10 @@ Annotated syntax tree
  There are some MCU specific parsing rules.
  For example the storage classes, the extended storage classes are MCU specific
  while there may be a xdata storage class for 8051 there is no such storage
- class for z80 or Atmel AVR.
+ class for z80.
  SDCC allows MCU specific storage class extensions, i.e.
  xdata will be treated as a storage class specifier when parsing 8051 C
- code but will be treated as a C identifier when parsing z80 or ATMEL AVR
- C code.
+ code but will be treated as a C identifier when parsing z80 code.
 \end_layout
 
 \begin_layout Paragraph*

@@ -1,3 +1,7 @@
+2010-10-11 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: fixes proposed by Sebastien Lorquet
+
 2010-10-10 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/sdcpp-diagnostic.c, support/cpp/sdcpp.h:

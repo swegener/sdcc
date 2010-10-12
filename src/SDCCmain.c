@@ -2086,6 +2086,8 @@ setBinPaths (const char *argv0)
 static void
 setIncludePath (void)
 {
+  const char *target;
+
   /*
    * Search logic:
    *
@@ -2105,6 +2107,10 @@ setIncludePath (void)
    * 14. - DATADIR/NON_FREE_INCLUDE_DIR_SUFFIX (only on *nix)
    */
 
+  /* Fix-up include path suffix for pic14. */
+  /* TODO: pic include and lib directories should be renamed to pic14 */
+  target = (0 == strcmp(target, "pic14")) ? "pic" : port->target;
+
   if (!options.nostdinc)
     {
       char *p;
@@ -2112,7 +2118,7 @@ setIncludePath (void)
 
       tempSet = appendStrSet (dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
       includeDirsSet = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
-      includeDirsSet = appendStrSet (includeDirsSet, NULL, port->target);
+      includeDirsSet = appendStrSet (includeDirsSet, NULL, target);
       mergeSets (&includeDirsSet, tempSet);
 
       if (options.use_non_free)
@@ -2121,7 +2127,7 @@ setIncludePath (void)
 
           tempSet = appendStrSet (dataDirsSet, NULL, NON_FREE_INCLUDE_DIR_SUFFIX);
           tempSet1 = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
-          tempSet1 = appendStrSet (tempSet1, NULL, port->target);
+          tempSet1 = appendStrSet (tempSet1, NULL, target);
           mergeSets (&tempSet1, tempSet);
           mergeSets (&includeDirsSet, tempSet1);
         }
@@ -2132,7 +2138,7 @@ setIncludePath (void)
 
           dbuf_init (&dbuf, PATH_MAX);
           addSetHead (&includeDirsSet, p);
-          dbuf_printf (&dbuf, "%s%c%s", p, DIR_SEPARATOR_CHAR, port->target);
+          dbuf_makePath (&dbuf, p, target);
           addSetHead (&includeDirsSet, dbuf_detach (&dbuf));
         }
     }
@@ -2163,14 +2169,14 @@ setLibPath (void)
         addSetHead (&libDirsSet, Safe_strdup (p));
 
       dbuf_init (&dbuf, PATH_MAX);
-      dbuf_printf (&dbuf, "%s%c%s", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);
+      dbuf_makePath (&dbuf, LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
 
       libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 
       if (options.use_non_free)
         {
           dbuf_set_length (&dbuf, 0);
-          dbuf_printf (&dbuf, "%s%c%s", NON_FREE_LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR, port->general.get_model ? port->general.get_model () : port->target);
+          dbuf_makePath (&dbuf, NON_FREE_LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
 
           mergeSets (&libDirsSet, appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf)));
         }

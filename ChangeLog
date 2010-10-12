@@ -1,3 +1,8 @@
+2010-10-12 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCmain.c (setIncludePath): handle special case of pic14 paths
+	* src/pic/main.c (-_pic14_initPaths): removed, handled in SDCCmain.c
+
 2010-10-12 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic/Makefile.in, device/non-free/lib/pic/Makefile.in:

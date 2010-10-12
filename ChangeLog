@@ -1,3 +1,8 @@
+2010-10-12 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic/Makefile.in, device/non-free/lib/pic/Makefile.in:
+	  fixed target "all" if gputils not found
+
 2010-10-11 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: fixes proposed by Sebastien Lorquet

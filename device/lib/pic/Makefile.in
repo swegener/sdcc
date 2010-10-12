@@ -20,19 +20,15 @@ srcdir = @srcdir@
 
 include $(top_builddir)/Makefile.common
 
-.PHONY : all clean clean-intermediate install
+.PHONY: all clean clean-intermediate install
 
 
 ifeq (:,$(findstring :,$(LD) $(AS) $(LIB)))
-
-all % :
+all:
 	@echo "gputils not found -- PIC14 library not built!"
-
 else
-
-all : install
+all: install
 install : recurse
-
 endif
 
 
@@ -45,7 +41,7 @@ C_SRC = $(notdir $(wildcard $(srcdir)/*.c))
 S_SRC = $(notdir $(wildcard $(srcdir)/*.S))
 OBJS = $(C_SRC:.c=.o) $(S_SRC:.S=.o)
 
-clean : recurse
+clean: recurse
 	$(Q)-$(RMDIR) "$(top_builddir)/$(builddir)"
 	$(Q)-$(RMDIR) bin
 
@@ -53,6 +49,6 @@ distclean: clean
 	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common
 	$(Q)-$(RMDIR) bin
 
-clean-intermediate : recurse
+clean-intermediate: recurse
 
 include $(top_srcdir)/Makefile.rules

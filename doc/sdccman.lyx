@@ -8907,7 +8907,7 @@ http://sf.net/projects/srecord
 
 \end_inset
 
- .
+.
 \end_layout
 
 \begin_layout Subsection
@@ -11756,7 +11756,7 @@ reference "sec:Pragmas"
 
 \end_inset
 
- .
+.
  File sdcc/as/doc/asxhtm.html has more on linker options.
 \end_layout
 
@@ -22557,8 +22557,19 @@ Storage class
 \begin_layout Standard
 Note that the compiler (not the linkage editor) makes the decision for overlayin
 g the data items.
- Functions that are called from an interrupt service routine should be preceded
- by a #pragma
+ Functions that are called from an interrupt service routine
+\begin_inset Marginal
+status collapsed
+
+\begin_layout Plain Layout
+
+\series bold
+!
+\end_layout
+
+\end_inset
+
+ should be preceded by a #pragma
 \begin_inset space ~
 \end_inset
 
@@ -23041,7 +23052,7 @@ http://en.wikipedia.org/wiki/Volatile_variable
 
 \end_inset
 
- .
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -48038,7 +48049,7 @@ The prototypes for these names are defined in the header file
 \emph on
 signal.h
 \emph default
- .
+.
 \end_layout
 
 \begin_layout Standard
@@ -52425,10 +52436,25 @@ Use the smallest data type to represent your data-value.
  Please note, that ANSI C requires both signed and unsigned chars to be
  promoted to 'signed int'
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 promotion to signed int
+\end_layout
+
+\end_inset
+
+
+\begin_inset Marginal
+status collapsed
+
+\begin_layout Plain Layout
+
+\series bold
+\begin_inset space ~
+\end_inset
+
+!
 \end_layout
 
 \end_inset

@@ -1,7 +1,21 @@
+2010-10-14 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/configure.in,
+	  device/lib/pic16/configure.ac,
+	  device/non-free/lib/pic/configure.in,
+	  device/non-free/lib/pic16/configure.ac: abort configure if gputils
+	  are unavailable while the pic14 or pic16 port is enabled
+	* device/lib/pic/configure,
+	  device/lib/pic16/configure,
+	  device/non-free/lib/pic/configure,
+	  device/non-free/lib/pic16/configure: regenerated
+	* doc/sdccman.lyx: fix supported pic14 devices (16hv616 and 16hv785)
+	* src/SDCCmain.c (setIncludePath): do not use 'target' uninitialized
+
 2010-10-12 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCmain.c (setIncludePath): handle special case of pic14 paths
-	* src/pic/main.c (-_pic14_initPaths): removed, handled in SDCCmain.c
+	* src/pic/main.c (__pic14_initPaths): removed, handled in SDCCmain.c
 
 2010-10-12 Borut Razem <borut.razem AT siol.net>
 

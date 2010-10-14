@@ -574,11 +574,11 @@ DEPDIR
 OBJEXT
 RANLIB
 ARFLAGS
+CCASFLAGS
+CFLAGS
 AR
 LD
-CCASFLAGS
 CCAS
-CFLAGS
 CC
 ARCH
 USE_FLOATS
@@ -2240,8 +2240,6 @@ ARCH=${ARCH:-18f452}
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
 CC=\'$abs_top_builddir/../../../bin/sdcc\'
 
-CFLAGS="-mpic16 -p$ARCH"
-
 # Extract the first word of "gpasm", so it can be a program name with args.
 set dummy gpasm; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -2282,10 +2280,6 @@ else
 $as_echo "no" >&6; }
 fi
 
-
-CCAS=\'$CCAS\'
-
-CCASFLAGS="-p$ARCH"
 
 # Extract the first word of "gplink", so it can be a program name with args.
 set dummy gplink; ac_word=$2
@@ -2328,8 +2322,6 @@ $as_echo "no" >&6; }
 fi
 
 
-LD=\'$LD\'
-
 # Extract the first word of "gplib", so it can be a program name with args.
 set dummy gplib; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -2371,9 +2363,25 @@ $as_echo "no" >&6; }
 fi
 
 
-AR=\'$AR\'
+
+case ":$CCAS:$LD:$AR:" in
+    *:::*)
+        as_fn_error "gputils (gpasm, gplink, and gplib) are required but not found.
+Either install gputils or reconfigure with --disable-pic-port and --disable-pic16-port." "$LINENO" 5
+        ;;
+esac;
+
+CFLAGS="-mpic16 -p$ARCH"
+
+CCASFLAGS="-p$ARCH"
 
 ARFLAGS=-c
+
+CCAS=\'$CCAS\'
+
+LD=\'$LD\'
+
+AR=\'$AR\'
 
 
 # $RANLIB is called by the autotools but not provided nor required
@@ -2706,12 +2714,6 @@ fi
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-
-case "$CCAS:$LD:$AR" in
-    *::*)
-        as_fn_error "gputils (gpasm, gplink, and gplib) are required but not found." "$LINENO" 5
-        ;;
-esac
 
 ac_config_files="$ac_config_files Makefile debug/Makefile libc/Makefile libio/Makefile libm/Makefile libsdcc/Makefile startup/Makefile"
 

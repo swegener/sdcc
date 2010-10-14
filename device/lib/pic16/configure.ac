@@ -40,15 +40,23 @@ AC_SUBST(ARCH, [${ARCH:-18f452}])
 
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
 AC_SUBST(CC, [\'$abs_top_builddir/../../../bin/sdcc\'])
-AC_SUBST(CFLAGS, ["-mpic16 -p$ARCH"])
 AC_PATH_PROG(CCAS, gpasm, :)
-AC_SUBST(CCAS, [\'$CCAS\'])
-AC_SUBST(CCASFLAGS, ["-p$ARCH"])
 AC_PATH_PROG(LD, gplink, :)
-AC_SUBST(LD, [\'$LD\'])
 AC_PATH_PROG(AR, gplib, :)
-AC_SUBST(AR, [\'$AR\'])
+
+case ":$CCAS:$LD:$AR:" in
+    *:::*)
+        AC_MSG_ERROR([gputils (gpasm, gplink, and gplib) are required but not found.
+Either install gputils or reconfigure with --disable-pic-port and --disable-pic16-port.])
+        ;;
+esac;
+
+AC_SUBST(CFLAGS, ["-mpic16 -p$ARCH"])
+AC_SUBST(CCASFLAGS, ["-p$ARCH"])
 AC_SUBST(ARFLAGS, [-c])
+AC_SUBST(CCAS, [\'$CCAS\'])
+AC_SUBST(LD, [\'$LD\'])
+AC_SUBST(AR, [\'$AR\'])
 
 # $RANLIB is called by the autotools but not provided nor required
 AC_SUBST(RANLIB, [:])
@@ -64,12 +72,6 @@ _AM_DEPENDENCIES(CCAS)
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-
-case "$CCAS:$LD:$AR" in
-    *::*)
-        AC_MSG_ERROR([gputils (gpasm, gplink, and gplib) are required but not found.])
-        ;;
-esac
 
 AC_CONFIG_FILES([Makefile
                  debug/Makefile

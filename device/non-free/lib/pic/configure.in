@@ -34,6 +34,13 @@ AC_PROG_EGREP
 AC_CHECK_PROG(MKDIR,	mkdir,	[mkdir -p], :)
 AC_CHECK_PROG(RMDIR,	rmdir,	rmdir, :)
 
+case ":$GPASM:$GPLINK:$GPLIB" in
+    *:::*)
+        AC_MSG_ERROR([gputils (gpasm, gplink, and gplib) are required but not found.
+Either install gputils or reconfigure with --disable-pic-port and --disable-pic16-port.])
+        ;;
+esac;
+
 AC_PROG_MAKE_SET
 
 # Checks for libraries.

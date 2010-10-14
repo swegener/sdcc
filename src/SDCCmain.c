@@ -2109,7 +2109,7 @@ setIncludePath (void)
 
   /* Fix-up include path suffix for pic14. */
   /* TODO: pic include and lib directories should be renamed to pic14 */
-  target = (0 == strcmp(target, "pic14")) ? "pic" : port->target;
+  target = (0 == strcmp(port->target, "pic14")) ? "pic" : port->target;
 
   if (!options.nostdinc)
     {

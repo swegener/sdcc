@@ -2162,6 +2162,13 @@ fi
 
 
 
+case ":$GPASM:$GPLINK:$GPLIB" in
+    *:::*)
+        as_fn_error "gputils (gpasm, gplink, and gplib) are required but not found.
+Either install gputils or reconfigure with --disable-pic-port and --disable-pic16-port." "$LINENO" 5
+        ;;
+esac;
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${MAKE-make} sets \$(MAKE)" >&5
 $as_echo_n "checking whether ${MAKE-make} sets \$(MAKE)... " >&6; }
 set x ${MAKE-make}

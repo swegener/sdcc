@@ -9,6 +9,8 @@
 	  device/lib/pic16/configure,
 	  device/non-free/lib/pic/configure,
 	  device/non-free/lib/pic16/configure: regenerated
+	* device/non-free/lib/Makefile.in: avoid trying to install from
+	  non-existing BUILDDIR (if both pic ports are disabled)
 	* doc/sdccman.lyx: fix supported pic14 devices (16hv616 and 16hv785)
 	* src/SDCCmain.c (setIncludePath): do not use 'target' uninitialized
 

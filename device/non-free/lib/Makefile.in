@@ -373,7 +373,7 @@ clean_intermediate-pic14:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
+	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
 	$(CP_U) -r $(srcdir)/pic $(srcdir)/pic16 $(sdcc_libdir)/src
 
 	for src in pic pic16; do \

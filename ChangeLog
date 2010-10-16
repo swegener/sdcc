@@ -1,3 +1,7 @@
+2010-10-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/C8051F920.h: patch 3088689, thanks Steven Borley
+
 2010-10-16 Raphael Neider <rneider AT web.de>
 
 	* device/lib/Makefile.in, device/non-free/lib/Makefile.in:

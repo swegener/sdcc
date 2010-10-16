@@ -469,7 +469,7 @@ SBIT(    SPIF0, 0xF8, 7 )  ; /* SPI0 Interrupt Flag */
 #define PRT0MX           XBR0     /* Port Mux Configuration Register 0 */
 #define PRT1MX           XBR1	  /* Port Mux Configuration Register 1 */
 #define PRT2MX           XBR2	  /* Port Mux Configuration Register 2 */
-#define INT01CF          IT01CF   /* INT0/INT1 Configuration Register */
+#define IT01CF           INT01CF  /* INT0/INT1 Configuration Register */
 #define P0MODE           P0MDIN   /* Port 0 Input Mode Configuration */
 #define P1MODE           P1MDIN   /* Port 1 Input Mode Configuration */
 #define P2MODE           P2MDIN   /* Port 2 Input Mode Configuration */

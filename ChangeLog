@@ -1,3 +1,9 @@
+2010-10-16 Raphael Neider <rneider AT web.de>
+
+	* device/lib/Makefile.in, device/non-free/lib/Makefile.in:
+	  fix parallel make on cygwin by preventing multiple rules
+	  from generating the same library files
+
 2010-10-14 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic/configure.in,

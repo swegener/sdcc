@@ -205,7 +205,7 @@ status collapsed
  The entire source code for the compiler is distributed under GPL.
  SDCC uses a modified version of ASXXXX
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdas (sdasgb, sdas6808, sdas8051, sdasz80)
@@ -215,7 +215,7 @@ sdas (sdasgb, sdas6808, sdas8051, sdasz80)
 
  & ASLINK
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdld
@@ -770,7 +770,7 @@ Status of documentation
 
 
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Obviously this has pros and cons
@@ -7118,7 +7118,7 @@ Currently reading the document in pdf format is recommended, as for unknown
  reason the hyperlinks are working there whereas in the html version they
  are not
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 If you should know why please drop us a note
@@ -11749,7 +11749,7 @@ name "lyx:-Wl option"
  would be typical to set the start of the code segment.
  Either use the double quotes around this option or use no space (e.g.
  -Wl-bCSEG=0x1000).
- See also #pragma constseg and #pragma codeseg in section 
+ See also #pragma constseg and #pragma codeseg in section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Pragmas"
@@ -18956,7 +18956,7 @@ bitfields
 
 
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Not really meant as examples, but nevertheless showing what bitfields are
@@ -19391,7 +19391,7 @@ sfr P0 = 0x80;
 \emph on
 without warning
 \emph default
- by SDCC to an assignment of 0x80 to a variable called P0 
+ by SDCC to an assignment of 0x80 to a variable called P0
 \family typewriter
 
 \begin_inset Marginal
@@ -25185,7 +25185,7 @@ non-interrupt
 \emph default
  function (but may occasionally be useful anyway
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 possible exception: if a function is called ONLY from 'interrupt' functions
@@ -28122,7 +28122,7 @@ crtstart.asm
 \emph on
 asx8051 -plosgff
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Quotes sld
@@ -28906,7 +28906,7 @@ __endasm;
 
 
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Note, that the single underscore form (_asm and _endasm) are not C99 compatible,
@@ -30498,10 +30498,6 @@ http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/as/doc/asxhtm.
 
 \end_inset
 
-
-\begin_inset space ~
-\end_inset
-
 .
 \end_layout
 
@@ -31894,7 +31890,7 @@ per function
 \noun default
 .
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 This is a slightly more stringent rule than absolutely necessary, but stays
@@ -32295,7 +32291,7 @@ clabel:
 
 /* inline assembler cannot reference this label */ 
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Here, the C-label 
@@ -35199,7 +35195,7 @@ convert long to floating point number
 These support routines are developed in ANSI-C so there is room for space
  and speed improvement
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 These floating point routines (
@@ -37048,11 +37044,7 @@ http://sourceforge.net/mail/?group_id=599
 
 \end_inset
 
-
-\begin_inset space ~
-\end_inset
-
-would certainly like to hear about it.
+ would certainly like to hear about it.
 \end_layout
 
 \begin_layout Standard
@@ -37927,15 +37919,15 @@ pedantic
 
 \end_inset
 
- 
+
 \begin_inset CommandInset label
 LatexCommand label
 name "ite:less_pedantic"
 
 \end_inset
 
-- the compiler will not warn you anymore for obvious mistakes, you're on
- your own now ;-( .
+ - the compiler will not warn you anymore for obvious mistakes, you're on
+ your own now ;-(.
  See also the command line option -
 \begin_inset ERT
 status collapsed
@@ -44461,7 +44453,7 @@ status collapsed
 
 -use-non-free
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -44680,7 +44672,7 @@ pragma stack
 The stack pragma should be used only once in a project.
  Multiple pragmas may result in indeterminate behaviour of the program.
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 The old format (ie.
@@ -45233,7 +45225,7 @@ status collapsed
 
 -use-non-free
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -46651,7 +46643,7 @@ not
  at the next interrupt's vector address and cause indeterminate program
  behaviour if that interrupt is raised.
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 This is not a problem when
@@ -46721,7 +46713,7 @@ FSR0 (FSR0L and FSR0H)
 \begin_layout Standard
 These registers are restored upon return from the interrupt routine.
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 NOTE that when the _naked attribute is specified for an interrupt routine,
@@ -53785,7 +53777,7 @@ http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/ChangeLog
 \begin_layout Plain Layout
 ASXXXX
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdas (sdasgb, sdas6808, sdas8051, sdasz80)
@@ -53809,7 +53801,7 @@ Assembler documentation
 
 ASLINK
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdld
@@ -55525,23 +55517,7 @@ http://www.cmake.org
 
 \end_inset
 
- 
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-and a dedicated wiki entry: 
+ and a dedicated wiki entry: 
 \begin_inset Flex URL
 status collapsed
 
@@ -56318,7 +56294,7 @@ no
 \emph default
 , nevertheless knowing these questions may help you to avoid burnout
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 burnout is bad for electronic devices, programmers and motorcycle tyres
@@ -56571,7 +56547,7 @@ download
 
  on sourceforge per day
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 220 daily downloads on average Jan-Sept 2006 and about 150 daily downloads
@@ -56745,7 +56721,7 @@ http://sourceforge.net/mail/?group_id=599
 
 
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
@@ -57248,7 +57224,7 @@ highly
 \emph default
  encouraged
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 the phrase "use in education" might evoke the association "
@@ -60787,7 +60763,7 @@ signed
 \begin_layout Standard
 Note that SDCC stores numbers in little-endian
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Usually 8-bit processors don't care much about endianness.

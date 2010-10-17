@@ -2,6 +2,7 @@
 
 	* support/cpp/sdcpp-opts.c:
 	  fixed bug #3088672: -M (& -MM) not suppressing warnings
+	* doc/sdccman.lyx: small cosmetic changes
 
 2010-10-16 Maarten Brock <sourceforge.brock AT dse.nl>
 

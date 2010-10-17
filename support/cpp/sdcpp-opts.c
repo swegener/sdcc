@@ -254,6 +254,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
          or environment var dependency generation is used.  */
       cpp_opts->deps.style = (code == OPT_M ? DEPS_SYSTEM: DEPS_USER);
       flag_no_output = 1;
+      inhibit_warnings = 1;
       break;
 
     case OPT_MD:

@@ -1,3 +1,8 @@
+2010-10-17 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp/sdcpp-opts.c:
+	  fixed bug #3088672: -M (& -MM) not suppressing warnings
+
 2010-10-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/C8051F920.h: patch 3088689, thanks Steven Borley

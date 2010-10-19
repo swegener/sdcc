@@ -1,3 +1,7 @@
+2010-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: documented --model-huge and other small updates
+
 2010-10-17 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp/sdcpp-opts.c:

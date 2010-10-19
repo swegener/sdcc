@@ -1,4 +1,4 @@
-#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -7917,7 +7917,23 @@ s51 - The ucSim 8051 simulator.
 \end_layout
 
 \begin_layout Itemize
+sz80 - The ucSim Z80 simulator.
+\end_layout
+
+\begin_layout Itemize
+shc08 - The ucSim 6808 simulator.
+\end_layout
+
+\begin_layout Itemize
 sdcdb - The source debugger.
+\end_layout
+
+\begin_layout Itemize
+sdcclib - A tool for creating sdcc libraries
+\end_layout
+
+\begin_layout Itemize
+asranlib - A tool for indexing sdcc ar libraries
 \end_layout
 
 \begin_layout Itemize
@@ -8079,19 +8095,19 @@ http://shop-pdp.kent.edu/
 \end_inset
 
 .
- In 2009 Alan made his ASxxxx Cross Assemblers versin 5.0 available under
+ In 2009 Alan made his ASxxxx Cross Assemblers version 5.0 available under
  the GPL licence (GPLv3 or later), so a reunion could be possible.
  Thanks Alan!
 \end_layout
 
 \begin_layout Subsection
-s51 - The Simulator
+s51, sz80, shc08 - The Simulators
 \end_layout
 
 \begin_layout Standard
-S51
+s51
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 s51 (simulator)
@@ -8099,8 +8115,28 @@ s51 (simulator)
 
 \end_inset
 
- is a free open source simulator developed by Daniel Drotos.
- The simulator is built as part of the build process.
+, sz80
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+sz80 (simulator)
+\end_layout
+
+\end_inset
+
+ and shc08
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+shc08 (simulator)
+\end_layout
+
+\end_inset
+
+ are free open source simulators developed by Daniel Drotos.
+ The simulators are built as part of the build process.
  For more information visit Daniel's web site at: 
 \begin_inset Flex URL
 status collapsed
@@ -8113,8 +8149,8 @@ http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51
 \end_inset
 
 .
- It currently supports the core mcs51, the Dallas DS80C390 and the Phillips
- XA51 family.
+ It currently supports the core mcs51, the Dallas DS80C390, the Phillips
+ XA51 family, the Z80 and the 6808.
 \end_layout
 
 \begin_layout Subsection
@@ -9260,7 +9296,7 @@ Alternatively, instead of having a .rel file for each entry on the library
 \series bold
 sdcclib -?
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 sdcclib
@@ -9344,7 +9380,7 @@ sdcclib libint.lib _divsint.rel
 \family default
 
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 sdcclib
@@ -9497,7 +9533,7 @@ sdcclib -l libint.lib myliblist.txt
 \end_layout
 
 \begin_layout Standard
-Additionally, you can instruct sdcclib to compiles the files before adding
+Additionally, you can instruct sdcclib to compile the files before adding
  them to the library.
  This is achieved using the environment variables SDCCLIB_CC and/or SDCCLIB_AS.
  For example:
@@ -9729,12 +9765,12 @@ status collapsed
 
 \end_inset
 
-, the corresponding debug information file .adb will be include in the library
+, the corresponding debug information file .adb will be included in the library
  file as well.
  The library files created with sdcclib are plain text files, so they can
  be viewed with a text editor.
  It is not recommended to modify a library file created with sdcclib using
- a text editor, as there are file indexes numbers located across the file
+ a text editor, as there are file index numbers located across the file
  used by the linker to quickly locate the required module to link.
  Once a .rel file (as well as a .adb file) is added to a library using sdcclib,
  it can be safely deleted, since all the information required for linking
@@ -9814,10 +9850,10 @@ http://www.mingw.org/
 
 
 \series default
-Both the GNU and BSD ar format variants are suppurated by sdld linkers.
- Ar doesn't understand the sdas object file format, so there is a special
- version of ranlib distributed with sdcc, called asranlib, which produces
- the ar symbol lookup table.
+Both the GNU and BSD ar format variants are supported by sdld linkers.
+ Ar doesn't natively understand the sdas object file format, so there is
+ a special version of ranlib distributed with sdcc, called asranlib, which
+ produces the ar symbol lookup table.
 \series bold
 
 \begin_inset Newline newline
@@ -11757,7 +11793,7 @@ reference "sec:Pragmas"
 \end_inset
 
 .
- File sdcc/as/doc/asxhtm.html has more on linker options.
+ File sdcc/sdas/doc/asxhtm.html has more on linker options.
 \end_layout
 
 \begin_layout Standard
@@ -11836,7 +11872,7 @@ status collapsed
 \size large
  
 \size default
-Generate code for Small Model programs, see section Memory Models for more
+Generate code for Small model programs, see section Memory Models for more
  details.
  This is the default model.
 \end_layout
@@ -11933,6 +11969,55 @@ status collapsed
 
 \series default
  Generate code for Large model programs, see section Memory Models for more
+ details.
+ If this option is used all source files in the project have to be compiled
+ with this option.
+ It must also be used when invoking the linker.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-huge
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-huge
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for Huge model programs, see section Memory Models for more
  details.
  If this option is used all source files in the project have to be compiled
  with this option.
@@ -12254,7 +12339,21 @@ status collapsed
 
  Causes the linker to use unused register banks for data variables and pack
  data, idata and stack together.
- This is the default now.
+ This is the default and this option will probably be removed along with
+ the removal of -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-pack-iram.
 \end_layout
 
 \begin_layout List
@@ -12280,7 +12379,7 @@ status collapsed
 \begin_inset space ~
 \end_inset
 
-
+(deprecated)
 \begin_inset Index
 status collapsed
 
@@ -12304,6 +12403,7 @@ status collapsed
 \end_inset
 
  Causes the linker to use old style for allocating memory areas.
+ This option is now deprecated and will be removed in future versions.
 \end_layout
 
 \begin_layout List
@@ -16028,7 +16128,7 @@ Assembler options
 \end_inset
 
 .
- See file sdcc/as/doc/asxhtm.html for assembler options.cd
+ See file sdcc/sdas/doc/asxhtm.html for assembler options.cd
 \end_layout
 
 \begin_layout List
@@ -19395,7 +19495,7 @@ without warning
 \family typewriter
 
 \begin_inset Marginal
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -25330,7 +25430,7 @@ Runtime library
 \series bold
 
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -28120,7 +28220,7 @@ crtstart.asm
 
 ) into the source directory, adapt it there, then assemble it with 
 \emph on
-asx8051 -plosgff
+sdas8051 -plosgff
 \begin_inset Foot
 status collapsed
 
@@ -30467,7 +30567,7 @@ endasm
 The inline assembler code can contain any valid code understood by the assembler
 , this includes any assembler directives and comment lines.
  The assembler does not like some characters like ':' or ''' in comments.
- You'll find an 100+ pages assembler manual in sdcc/as/doc/asxhtm.html
+ You'll find an 100+ pages assembler manual in sdcc/sdas/doc/asxhtm.html
 \begin_inset Index
 status collapsed
 
@@ -30493,7 +30593,8 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/as/doc/asxhtm.html
+http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/sdas/doc/asxhtm.ht
+ml
 \end_layout
 
 \end_inset
@@ -33349,7 +33450,7 @@ Assemble the assembler routine with the following command:
 
 \family sans
 \series bold
-asx8051 -losg asmfunc.asm
+sdas8051 -losg asmfunc.asm
 \begin_inset Newline newline
 \end_inset
 
@@ -37087,17 +37188,17 @@ MCS51 memory model
 \end_layout
 
 \begin_layout Subsubsection
-Small, Medium and Large
+Small, Medium, Large and Huge
 \end_layout
 
 \begin_layout Standard
-SDCC allows three memory models for MCS51 code, 
+SDCC allows four memory models for MCS51 code, 
 \shape slanted
-small, medium
+small, medium, large
 \shape default
  and 
 \shape slanted
-large
+huge
 \shape default
 .
  Modules compiled with different memory models should 
@@ -37112,9 +37213,9 @@ never
 \end_layout
 
 \begin_layout Standard
-When the medium or large model is used all variables declared without a
- storage class will be allocated into the external ram, this includes all
- parameters and local variables (for non-reentrant
+When the medium, large or huge model is used all variables declared without
+ a storage class will be allocated into the external ram, this includes
+ all parameters and local variables (for non-reentrant
 \begin_inset Index
 status collapsed
 
@@ -37125,8 +37226,25 @@ reentrant
 \end_inset
 
  functions).
+ Medium model uses pdata and large and huge models use xdata.
  When the small model is used variables without storage class are allocated
  in the internal ram.
+\end_layout
+
+\begin_layout Standard
+The huge model compiles all functions as 
+\emph on
+banked
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Bankswitching"
+
+\end_inset
+
+
+\emph default
+ and is otherwise equal to large for now.
+ All other models compile the functions without bankswitching by default.
 \end_layout
 
 \begin_layout Standard
@@ -39985,7 +40103,7 @@ Defines created by the compiler
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="16" columns="2">
+<lyxtabular version="3" rows="17" columns="2">
 <features>
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
@@ -40602,6 +40720,79 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
+SDCC_MODEL_HUGE
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+SDCC!Defines!SDCC
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+MODEL
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+LARGE
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-huge
+\emph default
+ is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 SDCC_USE_XSTACK
 \begin_inset Index
 status collapsed
@@ -41193,7 +41384,7 @@ MCS51 processors are available from many vendors and come in many different
 \end_layout
 
 \begin_layout Subsection
-pdata access by SFR 
+pdata access by SFR
 \end_layout
 
 \begin_layout Standard
@@ -41305,6 +41496,15 @@ __sfr __at (0xaa) _XPAGE; /* some Silicon Labs (Cygnal) chips a.k.a.
 \end_layout
 
 \begin_layout Standard
+There are also devices without anything resembling _XPAGE, but luckily they
+ usually have dual data-pointers.
+ For these devices a different method can be used to correctly initialize
+ xdata variables.
+ A default implementation is already in crtxinit.asm but it needs to be assembled
+ manually with DUAL_DPTR set to 1.
+\end_layout
+
+\begin_layout Standard
 For more exotic implementations further customizations may be needed.
  See section 
 \begin_inset CommandInset ref
@@ -41321,7 +41521,7 @@ Other Features available by SFR
 \end_layout
 
 \begin_layout Standard
-Some MCS51 variants offer features like Double DPTR
+Some MCS51 variants offer features like Dual DPTR
 \begin_inset Index
 status collapsed
 
@@ -41339,6 +41539,13 @@ DPTR
 
 \begin_layout Subsection
 Bankswitching
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Bankswitching"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -45198,8 +45405,8 @@ name "sub:PIC16_Header-Files-and-Libraries"
 Pic device specific header and c source files are automatically generated
  from MPLAB include files, which are published by Microchip with a special
  requirement that they are only to be used with authentic Microchip devices.
- This reqirement prevents to publish generated header and c source files
- under the GPL compatible license, so they are located in non-free directory
+ This requirement prevents to publish generated header and c source files
+ under the GPL compatible license, so they are located in the non-free directory
  (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -53828,7 +54035,7 @@ Linker documentation
 \begin_inset Text
 
 \begin_layout Plain Layout
-sdcc/as/doc/asxhtm.html 
+sdcc/sdas/doc/asxhtm.html 
 \emph on
 
 \begin_inset space ~
@@ -53854,11 +54061,12 @@ online at:
 
 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/as/doc/asxhtm.html
+http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/sdas/doc/asxhtm.ht
+ml
 \end_layout
 
 \end_inset
@@ -56821,7 +57029,7 @@ sdcc -
 \family default
 
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 

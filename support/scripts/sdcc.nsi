@@ -36,7 +36,6 @@
 #   unix2dos COPYING3.txt
 #   unix2dos doc/ChangeLog_head.txt
 #   unix2dos doc/README.TXT
-# - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DVER_MAJOR=<SDCC_VER_MAJOR> -DVER_MINOR=<SDCC_VER_MINOR> -DVER_REVISION=<SDCC_VER_DEVEL> -DVER_BUILD=<SDCC_REVISION> sdcc.nsi
 #   replace <VER_XXX> with the appropriate values, for example for SDCC 2.7.4:
@@ -64,20 +63,16 @@
 #   unix2dos COPYING3.txt
 #   unix2dos doc/ChangeLog.txt
 #   unix2dos doc/README.TXT
-# - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" -DFULL_DOC -DVER_MAJOR=<VER_MAJOR> -DVER_MINOR=<VER_MINOR> -DVER_REVISION=<VER_PATCH> -DVER_BUILD=<REVISION> sdcc.nsi
+#   replace <VER_XXX> with the appropriate values, for example for SDCC 3.0.0:
+#   <SDCC_VER_MAJOR> = 3
+#   <SDCC_VER_MINOR> = 0
+#   <SDCC_VER_DEVEL> = 0
+#   replace <SDCC_REVISION> with the current svn revision number
 # - A setup file setup.exe is created in PKGDIR directory.
 #   Rename it to sdcc-x.x.x-setup.exe and upload it
 #   to sdcc download repository at sourceforge.net
-#
-# How to upload secc setup.exe tosourceforge.net
-#
-# Execute following commands from the cmd prompt:
-# - sftp sdcc.sourceforge.net
-# - cd /home/groups/s/sd/sdcc/htdocs/snapshots/i586-mingw32msvc-setup
-# - put sdcc_yyyymmdd_setup.exe
-# - quit
 #
 # For debugging define -DSDCC.DEBUG command line option
 

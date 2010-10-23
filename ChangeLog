@@ -1,3 +1,15 @@
+2010-10-23 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic/libsdcc/fs2ulong.c, device/lib/pic/libsdcc/fslt.c,
+	  device/lib/pic/libsdcc/fseq.c, device/lib/pic/libsdcc/ulong2fs.c,
+	  device/lib/pic/libsdcc/fsgt.c, device/lib/pic/libsdcc/fsdiv.c,
+	  device/lib/pic/libsdcc/fsneq.c, device/lib/pic/libsdcc/fsadd.c,
+	  device/lib/pic/libsdcc/fssub.c, device/lib/pic/libsdcc/fsmul.c,
+	  device/lib/ds400/ds400rom.c:
+	  sdcc library license changed to GPL+LE
+	* support/scripts/sdcc.nsi:
+	  no need to copy readline5.dll
+
 2010-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented --model-huge and other small updates

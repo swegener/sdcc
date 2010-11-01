@@ -2107,10 +2107,6 @@ setIncludePath (void)
    * 14. - DATADIR/NON_FREE_INCLUDE_DIR_SUFFIX (only on *nix)
    */
 
-  /* Fix-up include path suffix for pic14. */
-  /* TODO: pic include and lib directories should be renamed to pic14 */
-  target = (0 == strcmp(port->target, "pic14")) ? "pic" : port->target;
-
   if (!options.nostdinc)
     {
       char *p;

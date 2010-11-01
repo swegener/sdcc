@@ -11,8 +11,8 @@ endif
 
 ifndef SDCC_BIN_PATH
   ifndef CROSSCOMPILING
-    SDCCFLAGS += --nostdinc -I$(top_srcdir)/device/include/pic -I$(top_srcdir)/device/non-free/include/pic -I$(top_srcdir)
-    LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/pic -L$(top_builddir)/device/non-free/lib/build/pic
+    SDCCFLAGS += --nostdinc -I$(top_srcdir)/device/include/pic14 -I$(top_srcdir)/device/non-free/include/pic -I$(top_srcdir)
+    LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/pic14 -L$(top_builddir)/device/non-free/lib/build/pic
   else
     SDCCFLAGS += --non-free
   endif

@@ -44,7 +44,7 @@ all:
 # ----------------------------------------------------
 install: all installdirs
 	if [ "`grep '^pic$$' $(top_builddir)/ports.build`" = pic ]; then \
-		$(CP) $(srcdir)/pic/*.h   $(sdcc_includedir)/pic ; \
+		$(CP) $(srcdir)/pic14/*.h   $(sdcc_includedir)/pic14 ; \
 	fi
 	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
 		$(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16 ; \
@@ -74,7 +74,7 @@ installcheck:
 # ---------------------------------
 installdirs:
 	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
-	[ -d $(sdcc_includedir)/pic ] || mkdir -p $(sdcc_includedir)/pic
+	[ -d $(sdcc_includedir)/pic14 ] || mkdir -p $(sdcc_includedir)/pic14
 	[ -d $(sdcc_includedir)/pic16 ] || mkdir -p $(sdcc_includedir)/pic16
 
 

@@ -3029,7 +3029,7 @@ static void genFunction (iCode *ic)
     }
 
     if(IFFUNC_ISNAKED(ftype)) {
-      DEBUGpic16_emitcode("; ***", "_naked function, no prologue");
+      DEBUGpic16_emitcode("; ***", "__naked function, no prologue");
       return;
     }
 
@@ -3171,7 +3171,7 @@ static void genEndFunction (iCode *ic)
     FENTRY;
 
     if(IFFUNC_ISNAKED(sym->type)) {
-      DEBUGpic16_emitcode("; ***", "_naked function, no epilogue");
+      DEBUGpic16_emitcode("; ***", "__naked function, no epilogue");
       return;
     }
 

@@ -1,3 +1,8 @@
+2010-11-01 Borut Razem <borut.razem AT siol.net>
+
+	* Small Device C Compiler 3.0.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.0.1
+
 2010-10-23 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic/libsdcc/fs2ulong.c, device/lib/pic/libsdcc/fslt.c,

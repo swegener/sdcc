@@ -64,7 +64,7 @@ OPT_DISABLE_DS400 = @OPT_DISABLE_DS400@
 OPT_DISABLE_GBZ80 = @OPT_DISABLE_GBZ80@
 OPT_DISABLE_HC08  = @OPT_DISABLE_HC08@
 OPT_DISABLE_MCS51 = @OPT_DISABLE_MCS51@
-OPT_DISABLE_PIC   = @OPT_DISABLE_PIC@
+OPT_DISABLE_PIC14   = @OPT_DISABLE_PIC14@
 OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
 OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
 OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
@@ -167,7 +167,7 @@ ifeq ($(OPT_DISABLE_MCS51), 0)
 TARGETS        += models small-mcs51-stack-auto
 endif
 
-ifeq ($(OPT_DISABLE_PIC), 0)
+ifeq ($(OPT_DISABLE_PIC14), 0)
 TARGETS        += model-pic14
 endif
 
@@ -301,8 +301,8 @@ objects-pic16:
 	$(MAKE) clean_intermediate-pic16
 
 model-pic14:
-	if grep '^pic\>' $(top_builddir)/ports.build > /dev/null; then \
-	  $(MAKE) PORT=pic objects-pic14; \
+	if grep '^pic14\>' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) PORT=pic14 objects-pic14; \
 	fi
 
 objects-pic14:
@@ -424,10 +424,10 @@ install: all installdirs
 	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
 	$(CP_U) -r $(MODELS) $(srcdir)/mcs51 $(srcdir)/ds390 $(srcdir)/ds400 \
 	                     $(srcdir)/gbz80 $(srcdir)/z80 $(srcdir)/hc08 \
-	                     $(srcdir)/pic $(srcdir)/pic16 $(srcdir)/*.c $(sdcc_libdir)/src
+	                     $(srcdir)/pic14 $(srcdir)/pic16 $(srcdir)/*.c $(sdcc_libdir)/src
 	$(CP_U) -r $(MODELS) mcs51 ds390 ds400 gbz80 z80 hc08 $(sdcc_libdir)/src
 
-	for src in $(MODELS) ds390 ds400 gbz80 z80 hc08 pic pic16; do \
+	for src in $(MODELS) ds390 ds400 gbz80 z80 hc08 pic14 pic16; do \
 	  find $(sdcc_libdir)/src/$$src -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'autom4te.cache' -o \
@@ -463,7 +463,7 @@ installdirs:
 	for model in $(MODELS); do \
 	  mkdir -p $(sdcc_libdir)/$$model; \
 	done
-	for libdir in small-stack-auto ds390 ds400 hc08 pic16 pic; do \
+	for libdir in small-stack-auto ds390 ds400 hc08 pic16 pic14; do \
 	  mkdir -p $(sdcc_libdir)/$$libdir; \
 	done
 	mkdir -p $(sdcc_libdir)/src

@@ -49,8 +49,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 mcs51\Debug\port.lib z80\Debug\port.lib avr\Debug\port.lib ds390\Debug\port.lib pic\Debug\port.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\bin_vc\sdcc.exe" /pdbtype:sept
-# ADD LINK32 mcs51\Debug\port.lib z80\Debug\port.lib avr\Debug\port.lib ds390\Debug\port.lib pic\Debug\port.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\bin_vc\sdcc.exe" /pdbtype:sept
+# ADD BASE LINK32 mcs51\Debug\port.lib z80\Debug\port.lib avr\Debug\port.lib ds390\Debug\port.lib pic14\Debug\port.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\bin_vc\sdcc.exe" /pdbtype:sept
+# ADD LINK32 mcs51\Debug\port.lib z80\Debug\port.lib avr\Debug\port.lib ds390\Debug\port.lib pic14\Debug\port.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\bin_vc\sdcc.exe" /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "src - Win32 Release"
 
@@ -74,8 +74,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe"
-# ADD LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe"
+# ADD BASE LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic14\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe"
+# ADD LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic14\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe"
 
 !ENDIF 
 

@@ -303,7 +303,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pic"=.\src\pic\pic.dsp - Package Owner=<4>
+Project: "pic14"=.\src\pic14\pic14.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -312,7 +312,7 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name pica
+    Project_Dep_Name pic14a
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name yacc
@@ -351,7 +351,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pica"=.\src\pic\pica.dsp - Package Owner=<4>
+Project: "pic14a"=.\src\pic14\pic14a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -423,7 +423,7 @@ Package=<4>
     Project_Dep_Name z80
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name pic
+    Project_Dep_Name pic14
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name mcs51

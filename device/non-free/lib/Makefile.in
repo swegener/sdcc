@@ -64,7 +64,7 @@ OPT_DISABLE_DS400 = @OPT_DISABLE_DS400@
 OPT_DISABLE_GBZ80 = @OPT_DISABLE_GBZ80@
 OPT_DISABLE_HC08  = @OPT_DISABLE_HC08@
 OPT_DISABLE_MCS51 = @OPT_DISABLE_MCS51@
-OPT_DISABLE_PIC   = @OPT_DISABLE_PIC@
+OPT_DISABLE_PIC14   = @OPT_DISABLE_PIC14@
 OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
 OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
 OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
@@ -151,7 +151,7 @@ OEXT            = .rel
 
 include $(srcdir)/incl.mk
 
-ifeq ($(OPT_DISABLE_PIC), 0)
+ifeq ($(OPT_DISABLE_PIC14), 0)
 TARGETS        += model-pic14
 endif
 
@@ -277,8 +277,8 @@ objects-pic16:
 	$(MAKE) clean_intermediate-pic16
 
 model-pic14:
-	if grep '^pic\>' $(top_builddir)/ports.build > /dev/null; then \
-	  $(MAKE) PORT=pic objects-pic14; \
+	if grep '^pic14\>' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) PORT=pic14 objects-pic14; \
 	fi
 
 objects-pic14:
@@ -397,9 +397,9 @@ clean_intermediate-pic14:
 # ---------------------------------------------------
 install: all installdirs
 	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
-	$(CP_U) -r $(srcdir)/pic $(srcdir)/pic16 $(sdcc_libdir)/src
+	$(CP_U) -r $(srcdir)/pic14 $(srcdir)/pic16 $(sdcc_libdir)/src
 
-	for src in pic pic16; do \
+	for src in pic14 pic16; do \
 	  find $(sdcc_libdir)/src/$$src -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'autom4te.cache' -o \
@@ -427,7 +427,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	for libdir in pic16 pic; do \
+	for libdir in pic16 pic14; do \
 	  mkdir -p $(sdcc_libdir)/$$libdir; \
 	done
 	mkdir -p $(sdcc_libdir)/src

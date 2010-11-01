@@ -2,6 +2,18 @@
 
 	* Small Device C Compiler 3.0.0 released
 	* .version, doc/sdccman.lyx: changed sdcc version to 3.0.1
+	* device/include/pic, device/include/asm/pic, device/lib/pic,
+	  device/non-free/include/pic, device/non-free/lib/pic,
+	  sdcc/src/pic: renamed to */pic14
+	* configure, configure.in, regression/Makefile, src/SDCCmain.c,
+	  device/include/Makefile.in, device/non-free/include/Makefile.in,
+	  support/regression/ports/pic14/spec.mk, support/scripts/sdcc.nsi,
+	  device/non-free/lib/Makefile.in, device/lib/Makefile.in,
+	  sdcc.dsw, src/pic14/pic14.dsp, src/pic14/pic14a.dsp, src/src.dsp:
+	  directories */pic renamed to */pic14
+	* src/pic16/gen.c: _naked renamed to __naked
+	* support/scripts/repack_release.sh:
+	  fix if the packages are not in current directory
 
 2010-10-23 Borut Razem <borut.razem AT siol.net>
 

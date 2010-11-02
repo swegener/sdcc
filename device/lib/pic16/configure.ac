@@ -47,7 +47,7 @@ AC_PATH_PROG(AR, gplib, :)
 case ":$CCAS:$LD:$AR:" in
     *:::*)
         AC_MSG_ERROR([gputils (gpasm, gplink, and gplib) are required but not found.
-Either install gputils or reconfigure with --disable-pic-port and --disable-pic16-port.])
+Either install gputils or reconfigure with --disable-pic14-port and --disable-pic16-port.])
         ;;
 esac;
 
@@ -81,4 +81,3 @@ AC_CONFIG_FILES([Makefile
                  libsdcc/Makefile
                  startup/Makefile])
 AC_OUTPUT
-

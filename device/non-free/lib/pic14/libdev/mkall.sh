@@ -15,13 +15,13 @@ SDCC=$HOME/svn/sdcc
 
 mkdir build;
 cd build;
-cp $SDCC/device/lib/pic/libdev/pic14ports.txt .
+cp $SDCC/device/lib/pic14/libdev/pic14ports.txt .
 
-cat $SDCC/device/lib/pic/libdev/devices.txt | while read PROC; do
+cat $SDCC/device/lib/pic14/libdev/devices.txt | while read PROC; do
     echo $PROC;
     $SDCC/support/scripts/inc2h.pl $PROC $GPUTILS;
 done
 
 cd ..;
 mv build/*.c .
-mv build/*.h $SDCC/device/include/pic/
+mv build/*.h $SDCC/device/include/pic14/

@@ -10,7 +10,7 @@ CP = @CP@
 RM = @RM@
 RMDIR = @RMDIR@
 
-CPPFLAGS = -I$(srcdir)/../../../../include/pic -I$(srcdir)/../../../../non-free/include/pic
+CPPFLAGS = -I$(srcdir)/../../../../include/pic14 -I$(srcdir)/../../../../non-free/include/pic14
 
 C_SRC = $(notdir $(wildcard $(srcdir)/pic1*.c))
 OBJS = $(C_SRC:.c=.o)

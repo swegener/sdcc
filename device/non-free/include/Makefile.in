@@ -43,11 +43,11 @@ all:
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	if [ "`grep '^pic$$' $(top_builddir)/ports.build`" = pic ]; then \
-		$(CP) $(srcdir)/pic14/*.h   $(sdcc_includedir)/pic14 ; \
+	if [ "`grep pic14 $(top_builddir)/ports.build`" = pic14 ]; then \
+	  $(CP) $(srcdir)/pic14/*.h $(sdcc_includedir)/pic14; \
 	fi
 	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
-		$(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16 ; \
+	  $(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16; \
 	fi
 	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
 	# some files in CVS are executable :-(
@@ -91,9 +91,9 @@ include $(srcdir)/clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)/devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then \
 	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" \
-	  freshconf;\
+	  freshconf; \
 	fi
 
 # End of main_in.mk/main.mk

@@ -1,3 +1,8 @@
+2010-11-02 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/Makefile.in, device/non-free/include/Makefile.in:
+	  directories */pic renamed to */pic14
+
 2010-11-01 Borut Razem <borut.razem AT siol.net>
 
 	* Small Device C Compiler 3.0.0 released

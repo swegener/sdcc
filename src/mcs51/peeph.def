@@ -3755,6 +3755,58 @@ replace {
 	movx	@dptr,a
 }
 
+// Peeepholes 248.n to 248.p are like previous peepholes but apply to arrays
+// applies to f.e. bug2686159.c
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	mov	r%2,a
+	orl	ar%2,%3
+	mov	dptr,%1
+	mov	a,r%2
+	movx	@dptr,a
+} by {
+	mov	dptr,%1
+	movx	a,@dptr
+	;	Peephole 248.n	optimized or to xdata array
+	orl	a,%3
+	mov	r%2,a
+	movx	@dptr,a
+}
+
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	mov	r%2,a
+	anl	ar%2,%3
+	mov	dptr,%1
+	mov	a,r%2
+	movx	@dptr,a
+} by {
+	mov	dptr,%1
+	movx	a,@dptr
+	;	Peephole 248.o	optimized and to xdata array
+	anl	a,%3
+	mov	r%2,a
+	movx	@dptr,a
+}
+
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	mov	r%2,a
+	xrl	ar%2,%3
+	mov	dptr,%1
+	mov	a,r%2
+	movx	@dptr,a
+} by {
+	mov	dptr,%1
+	movx	a,@dptr
+	;	Peephole 248.p	optimized xor to xdata array
+	xrl	a,%3
+	mov	r%2,a
+	movx	@dptr,a
+}
 
 replace {
 	jnz	%1
@@ -3806,7 +3858,7 @@ replace {
 replace {
 	ljmp	%5
 } by {
-	;	Peephole 251.a	replaced ljmp to ret with ret
+	;	Peephole 251.a	replaced ljmp %5 to ret with ret
 	ret
 } if labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
@@ -3814,7 +3866,7 @@ replace {
 replace {
 	sjmp	%5
 } by {
-	;	Peephole 251.b	replaced sjmp to ret with ret
+	;	Peephole 251.b	replaced sjmp %5 to ret with ret
 	ret
 } if labelIsReturnOnly(), labelRefCountChange(%5 -1)
 

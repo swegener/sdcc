@@ -1,3 +1,8 @@
+2010-11-02 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added peepholes 248.n to 248.p
+	  optimizing and/or/xor to xdata arrays
+
 2010-11-02 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/Makefile.in, device/non-free/include/Makefile.in:

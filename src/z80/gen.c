@@ -5984,7 +5984,11 @@ genInline (iCode * ic)
         case '\n':
           inComment = FALSE;
           *bp++ = '\0';
-          emit2 (bp1);
+          /* Don't emit whitespace */
+          while(isspace(*bp1))
+            bp1++;
+          if(*bp1)
+            emit2 (bp1);
           bp1 = bp;
           break;
 
@@ -6004,7 +6008,12 @@ genInline (iCode * ic)
         }
     }
   if (bp1 != bp)
-    emit2 (bp1);
+    {
+      while(isspace(*bp1))
+        bp1++;
+      if(*bp1)
+        emit2 (bp1);
+    }
 
   Safe_free (buffer);
 

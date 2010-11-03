@@ -1,3 +1,8 @@
+2010-11-03 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/pic14/sdcc-lib.h:
+	  directories */pic renamed to */pic14
+
 2010-11-02 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added peepholes 248.n to 248.p

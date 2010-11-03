@@ -30,6 +30,6 @@
 #ifndef __PIC14_SDCC_LIB_H
 #define __PIC14_SDCC_LIB_H	1
 
-#include <../asm/pic/features.h>
+#include <../asm/pic14/features.h>
 
 #endif /* __PIC14_SDCC_LIB_H */

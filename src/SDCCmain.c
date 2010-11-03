@@ -2086,7 +2086,7 @@ setBinPaths (const char *argv0)
 static void
 setIncludePath (void)
 {
-  const char *target;
+  const char *target = port->target;
 
   /*
    * Search logic:

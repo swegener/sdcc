@@ -1,3 +1,7 @@
+2010-11-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (setIncludePath): fixed uninitialized target
+
 2010-11-03 Borut Razem <borut.razem AT siol.net>
 
 	* device/include/pic14/sdcc-lib.h:

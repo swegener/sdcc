@@ -38,6 +38,7 @@
 #define OPTION_PORTMODE        "--portmode="
 #define OPTION_ASM             "--asm="
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
+#define OPTION_RESERVE_IY      "--reserve-regs-iy"
 
 static char _z80_defaultRules[] =
 {
@@ -61,6 +62,7 @@ static OPTION _z80_options[] =
     { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
     { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
     { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+    { 0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY" },
     { 0, NULL }
   };
 

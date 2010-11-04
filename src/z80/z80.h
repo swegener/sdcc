@@ -20,6 +20,7 @@ typedef struct
     int calleeSavesBC;
     int port_mode;
     int port_back;
+    int reserveIY;
   }
 Z80_OPTS;
 
@@ -27,6 +28,7 @@ extern Z80_OPTS z80_opts;
 
 #define IS_GB  (z80_opts.sub == SUB_GBZ80)
 #define IS_Z80 (z80_opts.sub == SUB_Z80)
+#define IY_RESERVED (z80_opts.reserveIY)
 
 enum
   {

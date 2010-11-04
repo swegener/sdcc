@@ -26,7 +26,7 @@
 #ifndef  SDCCPEEPH_H
 #define SDCCPEEPH_H 1
 
-#define MAX_PATTERN_LEN 192
+#define MAX_PATTERN_LEN 256
 
 struct asmLineNode;	/* defined in each port */
 struct lineNode;

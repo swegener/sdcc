@@ -2702,7 +2702,7 @@ opPreservesA (iCode * uic)
     }
 
   /* A pointer assign preserves A if A is the left value. */
-  if (uic->op == '=' && POINTER_SET (uic))
+  if (uic->op == '=' && POINTER_SET (uic) && !IY_RESERVED)
     {
       return TRUE;
     }
@@ -2747,7 +2747,7 @@ opCanUseA (iCode * uic)
       return FALSE;
     }
 
-  if (uic->op == '=')
+  if (uic->op == '=' && !(IY_RESERVED && POINTER_SET (uic)))
     {
       return TRUE;
     }
@@ -3145,7 +3145,7 @@ packRegisters (eBBlock * ebp)
       if (!DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)))
         {
           /* PENDING */
-          if (IS_GB)
+          if (IS_GB || IY_RESERVED)
             {
               if (0)
                 packRegsForHLUse (ic);
@@ -3156,7 +3156,7 @@ packRegisters (eBBlock * ebp)
             }
         }
 
-      if (!DISABLE_PACK_IY && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)
+      if (!DISABLE_PACK_IY && !IY_RESERVED && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)
         {
           packRegsForIYUse (ic, IC_RESULT (ic), ebp);
         }

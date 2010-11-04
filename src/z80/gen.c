@@ -856,15 +856,14 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
 
   /* only remaining is far space */
   /* in which case DPTR gets the address */
-  if (IS_GB)
+  if (IS_GB || IY_RESERVED)
     {
       emitDebug ("; AOP_HL for %s", sym->rname);
       sym->aop = aop = newAsmop (AOP_HL);
     }
   else
-    {
       sym->aop = aop = newAsmop (AOP_IY);
-    }
+
   aop->size = getSize (sym->type);
   aop->aopu.aop_dir = sym->rname;
 
@@ -1499,6 +1498,8 @@ makeFreePairId (iCode *ic, bool *pisUsed)
 static void
 fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
 {
+    emitDebug(";fetchPairLong");
+
     /* if this is remateriazable */
     if (isLitWord (aop)) {
         fetchLitPair (pairId, aop, offset);
@@ -1510,7 +1511,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
             /* Do nothing */
           }
         /* we need to get it byte by byte */
-        else if (pairId == PAIR_HL && IS_GB && requiresHL (aop)) {
+        else if (pairId == PAIR_HL && (IS_GB || (IY_RESERVED && aop->type == AOP_HL)) && requiresHL (aop)) {
             aopGet (aop, offset, FALSE);
             switch (aop->size - offset) {
             case 1:
@@ -1520,7 +1521,8 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
             case 2:
               // PENDING: Requires that you are only fetching two bytes.
             case 4:
-                emit2 ("!ldahli");
+                emit2 ("ld a,!*hl");
+                emit2 ("inc hl");
                 emit2 ("ld h,!*hl");
                 emit2 ("ld l,a");
                 break;
@@ -1812,7 +1814,6 @@ aopGet (asmop * aop, int offset, bool bit16)
       return aop->aopu.aop_reg[offset]->name;
 
     case AOP_HL:
-      wassert (IS_GB);
       setupPair (PAIR_HL, aop, offset);
       tsprintf (buffer, sizeof(buffer), "!*hl");
 
@@ -2037,7 +2038,7 @@ aopPut (asmop * aop, const char *s, int offset)
       break;
 
     case AOP_HL:
-      wassert (IS_GB);
+      //wassert (IS_GB);
       /* PENDING: for re-target */
       if (!strcmp (s, "!*hl") || !strcmp (s, "(hl)") || !strcmp (s, "[hl]"))
         {
@@ -2172,7 +2173,7 @@ static void
 commitPair (asmop * aop, PAIR_ID id)
 {
   /* PENDING: Verify this. */
-  if (id == PAIR_HL && requiresHL (aop) && IS_GB)
+  if (id == PAIR_HL && requiresHL (aop) && (IS_GB || IY_RESERVED))
     {
       emit2 ("ld a,l");
       emit2 ("ld d,h");
@@ -7614,7 +7615,7 @@ genAssign (iCode * ic)
           offset++;
         }
     }
-  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && IS_GB)
+  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && (IS_GB /*|| IY_RESERVED*/))
     {
       /* Special case.  Load into a and d, then load out. */
       _moveA (aopGet (AOP (right), 0, FALSE));
@@ -7622,7 +7623,7 @@ genAssign (iCode * ic)
       aopPut (AOP (result), "a", 0);
       aopPut (AOP (result), "e", 1);
     }
-  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && IS_GB)
+  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && (IS_GB /*|| IY_RESERVED*/))
     {
       /* Special case - simple memcpy */
       aopGet (AOP (right), LSB, FALSE);
@@ -7649,7 +7650,7 @@ genAssign (iCode * ic)
       while (size--)
         {
           /* PENDING: do this check better */
-          if (IS_GB && requiresHL (AOP (right)) && requiresHL (AOP (result)))
+          if ((IS_GB || IY_RESERVED) && requiresHL (AOP (right)) && requiresHL (AOP (result)))
             {
               _moveA (aopGet (AOP (right), offset, FALSE));
               aopPut (AOP (result), "a", offset);

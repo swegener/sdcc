@@ -1,4 +1,9 @@
 2010-11-03 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c,
+	  src/z80/peep.c:
+	  Improvements relating to the use of hl as an alternative to iy.
+
+2010-11-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.h,
 	  src/z80/gen.c,
@@ -6,7 +11,7 @@
 	  src/z80/main.c,
 	  src/z80/z80.h,
 	  src/z80/peeph-z80.def:
-	  Some steps towards implementing #3074318 and minor gbz80 fixes.
+	  Some steps towards implementing #3074318, and minor gbz80 fixes.
 
 2010-11-03 Philipp Klaus Krause <pkk AT spth.de>
 

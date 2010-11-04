@@ -572,7 +572,11 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
       low[1] = 0;
       high[1] = 0;
       if(strcmp(what, "iy") == 0)
-        return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
+        {
+          if(IY_RESERVED)
+            return TRUE;
+          return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
+        }
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 

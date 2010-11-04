@@ -1395,6 +1395,8 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
   base = aopGetLitWordLong (left, 0, FALSE);
   wassert (l && pair && base);
 
+  emitDebug(";fetchLitPair");
+
   if (isPtr (pair))
     {
       if (pairId == PAIR_HL || pairId == PAIR_IY)
@@ -1410,7 +1412,8 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
                  }
             }
           if ((_G.pairs[pairId].last_type == AOP_IMMD && left->type == AOP_IMMD) ||
-            (_G.pairs[pairId].last_type == AOP_IY && left->type == AOP_IY))
+            (_G.pairs[pairId].last_type == AOP_IY && left->type == AOP_IY) ||
+            (_G.pairs[pairId].last_type == AOP_HL && left->type == AOP_HL))
             {
               if (_G.pairs[pairId].base && !strcmp (_G.pairs[pairId].base, base))
                 {

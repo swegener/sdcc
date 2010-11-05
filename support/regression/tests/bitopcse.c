@@ -121,6 +121,10 @@ testcse(void)
    ASSERT( a3  == 1);
    ASSERT(ua1  == 1);
    ASSERT( a5  == 1);
+   ASSERT(  b  == 1);
+   ASSERT( ub  == 1);
+   ASSERT(ua0  == 1);
+   ASSERT( a4  == 1);
 #else
    ASSERT( a3  == ({type}) 0x33);
    ASSERT(ua1  == ({type}) 0x7b);

@@ -1714,7 +1714,9 @@ boolCast (iCode * ic, set * cseSet)
     dic->op != AND_OP &&
     dic->op != OR_OP &&
     dic->op != GETHBIT &&
-    dic->op != GETABIT)
+    dic->op != GETABIT &&
+    !(dic->op == BITWISEAND && (IS_BOOL ( operandType (IC_LEFT (ic))) || IS_BOOL ( operandType (IC_RIGHT (ic)))))
+    )
     return 0;
 
   /* Replace cast by assignment. */

@@ -126,7 +126,7 @@ replace restart {
 	ld	a,(hl)
 } by {
 	ld	a,(#%1)
-	; peephole 0d' loaded a from (#%1) directly instead of using through hl.
+	; peephole 0d' loaded a from (#%1) directly instead of using hl.
 } if notUsed('hl')
 
 replace restart {
@@ -142,7 +142,7 @@ replace restart {
 	ld	(hl),a
 } by {
 	ld	(#%1),a
-	; peephole 0d''' loaded (#%1) from a directly instead of through hl.
+	; peephole 0d''' loaded (#%1) from a directly instead of using hl.
 } if notUsed('hl')
 
 replace restart {
@@ -150,7 +150,7 @@ replace restart {
 	ld	(hl),a
 } by {
 	ld	(#%1 + %2),a
-	; peephole 0d'''' loaded (#%1) from a directly instead of through hl.
+	; peephole 0d'''' loaded (#%1) from a directly instead of using hl.
 } if notUsed('hl')
 
 replace restart {

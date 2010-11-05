@@ -1,3 +1,12 @@
+2010-11-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCcse.c:
+	  Optimization for & on booleans.
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def,
+	  support/regression/tests/bitopcse.c:
+	  Fixes for z80 using --reserve-regs-iy and gbz80.
+
 2010-11-05 Raphael Neider <rneider AT web.de>
 
 	* sdas/as8051/Makefile.in,

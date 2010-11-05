@@ -3696,7 +3696,7 @@ genPlusIncr (iCode * ic)
               emit2 ("jp NZ,!tlabel", tlbl->key + 100);
             }
         }
-      emitLabelNoSpill (tlbl->key + 100);
+      AOP_TYPE (IC_LEFT (ic)) == AOP_HL ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
       return TRUE;
     }
 
@@ -4065,7 +4065,7 @@ genPlus (iCode * ic)
     {
       _moveA (aopGet (AOP (IC_LEFT (ic)), 0, FALSE));
       emit2 ("add a,%s", aopGet (AOP (IC_RIGHT (ic)), 0, FALSE));
-      if(strcmp (aopGet (AOP (IC_RESULT (ic)), 0, FALSE), aopGet (AOP (IC_LEFT (ic)), 1, FALSE)))
+      if(AOP (IC_RESULT (ic))->type == AOP_HL || strcmp (aopGet (AOP (IC_RESULT (ic)), 0, FALSE), aopGet (AOP (IC_LEFT (ic)), 1, FALSE)))
         {
           aopPut (AOP (IC_RESULT (ic)), "a", 0);
           _moveA (aopGet (AOP (IC_LEFT (ic)), 1, FALSE));
@@ -4389,10 +4389,37 @@ genMultOneChar (iCode * ic)
       emit2 ("ld b, a");
     }
 
-  if (AOP_SIZE (IC_RESULT (ic)) == 1)
-    aopPut (AOP (IC_RESULT (ic)), "l", 0);
+  if(AOP (IC_RESULT (ic))->type != AOP_HL)
+    {
+    if (AOP_SIZE (IC_RESULT (ic)) == 1)
+      aopPut (AOP (IC_RESULT (ic)), "l", 0);
+    else
+      commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+    }
   else
-    commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+    {
+    if (AOP_SIZE (IC_RESULT (ic)) == 1)
+      {
+        emit2("ld a, l");
+        aopPut (AOP (IC_RESULT (ic)), "a", 0);
+      }
+    else
+      {
+        if(isPairInUse (PAIR_DE, ic))
+          {
+            _push (PAIR_DE);
+            _G.stack.pushedDE = TRUE;
+          }
+        emit2("ld e, l");
+        emit2("ld d, h");
+        commitPair ( AOP (IC_RESULT (ic)), PAIR_DE);
+        if(isPairInUse (PAIR_DE, ic))
+          {
+            _pop (PAIR_DE);
+            _G.stack.pushedDE = FALSE;
+          }
+      }
+    }
 
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RIGHT (ic), NULL, ic);
@@ -5178,10 +5205,13 @@ static void
 genCmpEq (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
+  bool hl_touched;
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
+
+  hl_touched = (AOP_TYPE (IC_LEFT (ic)) == AOP_HL || AOP_TYPE (IC_RIGHT (ic)) == AOP_HL);
 
   emitDebug ("; genCmpEq: left %u, right %u, result %u", AOP_SIZE(IC_LEFT(ic)), AOP_SIZE(IC_RIGHT(ic)), AOP_SIZE(IC_RESULT(ic)));
 
@@ -5214,7 +5244,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               if(pop != PAIR_INVALID)
                 emit2 ("pop %s", _pairs[pop].name);
               emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
-              emitLabelNoSpill (tlbl->key + 100);
+              hl_touched ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);
             }
           else
@@ -5224,7 +5254,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               if(pop != PAIR_INVALID)
                 emit2 ("pop %s", _pairs[pop].name);
               emit2 ("jp !tlabel", lbl->key + 100);
-              emitLabelNoSpill (tlbl->key + 100);
+              hl_touched ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
               _pop (pop);
               emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
               emitLabelNoSpill (lbl->key + 100);

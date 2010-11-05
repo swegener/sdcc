@@ -23,8 +23,8 @@
 -------------------------------------------------------------------------*/
 
 #ifdef _WIN32
-#undef DATADIR
 /* avoid DATADIR definition clash :-( */
+#undef DATADIR
 #include <windows.h>
 #include <stdio.h>
 #include <io.h>
@@ -359,14 +359,14 @@ sdcc_popen_read (char *cmd)
   /* Create a pipe for the child process's STDOUT. */
   if (!CreatePipe (&childIn, &childOut, &sa, 0))
     {
-      *__doserrno () = GetLastError ();
+      _doserrno = GetLastError();
       return NULL;
     }
 
   /* Ensure the read handle to the pipe for STDOUT is not inherited. */
   if (!SetHandleInformation (childIn, HANDLE_FLAG_INHERIT, 0))
     {
-      *__doserrno () = GetLastError ();
+      _doserrno = GetLastError();
       return NULL;
     }
 
@@ -385,7 +385,7 @@ sdcc_popen_read (char *cmd)
   /* Create the child process. */
   if (!CreateProcess (NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
     {
-      *__doserrno () = GetLastError ();
+      _doserrno = GetLastError();
       return NULL;
     }
   else 
@@ -399,30 +399,31 @@ sdcc_popen_read (char *cmd)
 
   if (!CloseHandle (childOut))
     {
-      *__doserrno () = GetLastError ();
+      _doserrno = GetLastError();
       return NULL;
     }
 
   return fdopen (_open_osfhandle ((long)childIn, _O_RDONLY | _O_TEXT), "rt");
 }
 #else
-#define sdcc_popen_read(cmd) popen((cmd), "r")
+#define sdcc_popen_read(cmd) popen ((cmd), "r")
 #endif
 
 FILE *
-my_popen(const char *cmd)
+my_popen (const char *cmd)
 {
   FILE *fp;
-  char *cmdLine = get_path(cmd);
+  char *cmdLine = get_path (cmd);
 
   assert(NULL != cmdLine);
 
-  if (options.verboseExec) {
-      printf("+ %s\n", cmdLine);
-  }
+  if (options.verboseExec)
+    {
+      printf ("+ %s\n", cmdLine);
+    }
 
-  fp = sdcc_popen_read(cmdLine);
-  Safe_free(cmdLine);
+  fp = sdcc_popen_read (cmdLine);
+  Safe_free (cmdLine);
 
   return fp;
 }

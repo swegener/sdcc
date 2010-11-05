@@ -25,6 +25,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "MySystem.h"
 #include "main.h"
 #include "ralloc.h"
 #include "device.h"
@@ -634,7 +635,6 @@ _pic16_initPaths (void)
 
 extern set *linkOptionsSet;
 char *msprintf(hTab *pvals, const char *pformat, ...);
-int my_system(const char *cmd);
 
 /* forward declarations */
 extern const char *pic16_linkCmd[];
@@ -703,7 +703,7 @@ _pic16_linkEdit (void)
 
   lcmd = msprintf(linkValues, lfrm);
 
-  ret = my_system (lcmd);
+  ret = sdcc_system (lcmd);
 
   Safe_free (lcmd);
 

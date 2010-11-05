@@ -268,7 +268,7 @@ _pic14_do_link (void)
 
   lcmd = msprintf(linkValues, lfrm);
 
-  ret = my_system (lcmd);
+  ret = sdcc_system (lcmd);
 
   Safe_free (lcmd);
 

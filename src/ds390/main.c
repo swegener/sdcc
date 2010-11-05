@@ -1168,11 +1168,11 @@ static void _tininative_do_assemble (set *asmOptions)
     char buffer[100];
 
     buildCmdLine(buffer,macroCmd,dstFileName,NULL,NULL,NULL);
-    if (my_system(buffer)) {
+    if (sdcc_system(buffer)) {
         exit(1);
     }
     buildCmdLine(buffer,a390Cmd,dstFileName,NULL,NULL,asmOptions);
-    if (my_system(buffer)) {
+    if (sdcc_system(buffer)) {
         exit(1);
     }
 }

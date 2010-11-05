@@ -1,7 +1,10 @@
 2010-11-05 Borut Razem <borut.razem AT siol.net>
 
-	* support/Util/MySystem.c: use native WIN32 popen solution due to
-	  a bug in wine msvrct.dll popen implementation
+	* support/Util/MySystem.c: use native WIN32 sdcc_popen and sdcc_pclose
+	  solution due to a bug in wine msvrct.dll popen implementation
+	* support/Util/MySystem.c, support/Util/MySystem.h,  src/SDCCmain.c,
+	  src/ds390/main.c, src/pic14/main.c, src/pic16/main.c, src/z80/main.c:
+	  my_xxxx() renamed to sdcc_xxxx()
 
 2010-11-05 Philipp Klaus Krause <pkk AT spth.de>
 

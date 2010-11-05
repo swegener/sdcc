@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
+#include <process.h>
+#include <errno.h>
 #else
 #include <unistd.h>
 #endif
@@ -47,7 +49,7 @@ set *binPathSet = NULL; /* set of binary paths */
  */
 
 static void
-split_command(const char *cmd_line, char **command, char **params)
+split_command (const char *cmd_line, char **command, char **params)
 {
   const char *p, *cmd_start;
   char delim;
@@ -55,48 +57,52 @@ split_command(const char *cmd_line, char **command, char **params)
   unsigned len;
 
   /* skip leading spaces */
-  for (p = cmd_line; isspace(*p); p++)
+  for (p = cmd_line; isspace (*p); p++)
     ;
 
   /* get command */
-  switch (*p) {
-  case '\'':
-  case '"':
-    delim = *p;
-    cmd_start = ++p;
-    break;
+  switch (*p)
+    {
+    case '\'':
+    case '"':
+      delim = *p;
+      cmd_start = ++p;
+      break;
 
-  default:
-    delim = ' ';
-    cmd_start = p;
-  }
+    default:
+      delim = ' ';
+      cmd_start = p;
+    }
 
-  if (delim == ' ') {
-    while (*p != '\0' && !isspace(*p))
-      p++;
-  }
-  else {
-    while (*p != '\0' && *p != delim)
-      p++;
-  }
+  if (delim == ' ')
+    {
+      while (*p != '\0' && !isspace (*p))
+        p++;
+    }
+  else
+    {
+      while (*p != '\0' && *p != delim)
+        p++;
+    }
 
-  if (command != NULL) {
-    len = p - cmd_start;
-    str = Safe_alloc(len + 1);
-    strncpy(str, cmd_start, len);
-    str[len] = '\0';
-    *command = str;
-  }
+  if (command != NULL)
+    {
+      len = p - cmd_start;
+      str = Safe_alloc (len + 1);
+      strncpy (str, cmd_start, len);
+      str[len] = '\0';
+      *command = str;
+    }
 
   p++;
 
   /* skip spaces before parameters */
-  while (isspace(*p))
+  while (isspace (*p))
     p++;
 
   /* get parameters */
   if (params != NULL)
-    *params = Safe_strdup(p);
+    *params = Safe_strdup (p);
 }
 
 
@@ -133,11 +139,11 @@ split_command(const char *cmd_line, char **command, char **params)
  */
 
 static char *
-merge_command(const char *command, const char *params)
+merge_command (const char *command, const char *params)
 {
   /* allocate extra space for ' ' and '\0' */
-  char *cmd_line = (char *)Safe_alloc(strlen(command) + strlen(params) + 2);
-  sprintf(cmd_line, "%s %s", command, params);
+  char *cmd_line = (char *)Safe_alloc (strlen (command) + strlen (params) + 2);
+  sprintf (cmd_line, "%s %s", command, params);
 
   return cmd_line;
 }
@@ -149,38 +155,41 @@ merge_command(const char *command, const char *params)
  */
 
 static char *
-compose_command_line(const char *path, const char *command, const char *args)
+compose_command_line (const char *path, const char *command, const char *args)
 {
   unsigned len;
   char cmdPath[PATH_MAX];
   char shortPath[PATH_MAX];
 
   if (path != NULL)
-    SNPRINTF(cmdPath, sizeof cmdPath,
+    SNPRINTF (cmdPath, sizeof cmdPath,
       "%s" DIR_SEPARATOR_STRING "%s", path, command);
   else
-    strncpyz(cmdPath, command, sizeof cmdPath);
+    strncpyz (cmdPath, command, sizeof cmdPath);
 
   /* Try if cmdPath or cmdPath.exe exist by converting it to the short path name */
-  len = GetShortPathName(cmdPath, shortPath, sizeof shortPath);
-  assert(len < sizeof shortPath);
-  if (0 == len) {
-    len = GetShortPathName(strncatz(cmdPath, EXE_EXT, sizeof cmdPath), shortPath, sizeof shortPath);
-    assert(len < sizeof shortPath);
-  }
-  if (0 != len) {
-    /* compose the command line */
-    return merge_command(shortPath, args);
-  }
-  else {
-    /* path/command not found */
-    return NULL;
-  }
+  len = GetShortPathName (cmdPath, shortPath, sizeof shortPath);
+  assert (len < sizeof shortPath);
+  if (0 == len)
+    {
+      len = GetShortPathName (strncatz (cmdPath, EXE_EXT, sizeof cmdPath), shortPath, sizeof shortPath);
+      assert (len < sizeof shortPath);
+    }
+  if (0 != len)
+    {
+      /* compose the command line */
+      return merge_command (shortPath, args);
+    }
+  else
+    {
+      /* path/command not found */
+      return NULL;
+    }
 }
 
 
 static char *
-get_path(const char *cmd)
+get_path (const char *cmd)
 {
   char *cmdLine;
   char *command;
@@ -188,41 +197,46 @@ get_path(const char *cmd)
   char *path;
 
   /* get the command */
-  split_command(cmd, &command, &args);
+  split_command (cmd, &command, &args);
 
-  if (NULL == (cmdLine = compose_command_line(NULL, command, args))) {
-    /* not an absolute path: try to find the command in predefined binary paths */
-    if (NULL != (path = (char *)setFirstItem(binPathSet))) {
-      while (NULL == (cmdLine  = compose_command_line(path, command, args)) &&
-        NULL != (path = (char *)setNextItem(binPathSet)))
-        ;
-    }
-
-    if (NULL == cmdLine) {
-      /* didn't found the command in predefined binary paths: try with PATH */
-      char *envPath;
-
-      if (NULL != (envPath = getenv("PATH"))) {
-        /* make a local copy; strtok() will modify it */
-        envPath = Safe_strdup(envPath);
-
-        if (NULL != (path = strtok(envPath, ";"))) {
-          while (NULL == (cmdLine = compose_command_line(path, command, args)) &&
-           NULL != (path = strtok(NULL, ";")))
-           ;
+  if (NULL == (cmdLine = compose_command_line (NULL, command, args)))
+    {
+      /* not an absolute path: try to find the command in predefined binary paths */
+      if (NULL != (path = (char *)setFirstItem (binPathSet)))
+        {
+          while (NULL == (cmdLine  = compose_command_line (path, command, args)) &&
+            NULL != (path = (char *)setNextItem (binPathSet)))
+            ;
         }
 
-        Safe_free(envPath);
-      }
+      if (NULL == cmdLine)
+        {
+          /* didn't found the command in predefined binary paths: try with PATH */
+          char *envPath;
+
+          if (NULL != (envPath = getenv ("PATH")))
+            {
+              /* make a local copy; strtok() will modify it */
+              envPath = Safe_strdup (envPath);
+
+                if (NULL != (path = strtok (envPath, ";")))
+                  {
+                    while (NULL == (cmdLine = compose_command_line (path, command, args)) &&
+                      NULL != (path = strtok (NULL, ";")))
+                      ;
+                  }
+
+                Safe_free (envPath);
+              }
+        }
+
+      /* didn't found it; probably this won't help neither :-( */
+      if (NULL == cmdLine)
+        cmdLine = merge_command (command, args);
     }
 
-    /* didn't found it; probably this won't help neither :-( */
-    if (NULL == cmdLine)
-      cmdLine = merge_command(command, args);
-  }
-
-  Safe_free(command);
-  Safe_free(args);
+  Safe_free (command);
+  Safe_free (args);
 
   return cmdLine;
 }
@@ -235,11 +249,11 @@ get_path(const char *cmd)
  */
 
 static char *
-merge_command(const char *command, const char *params)
+merge_command (const char *command, const char *params)
 {
   /* allocate extra space for 2x'"', ' ' and '\0' */
-  char *cmd_line = (char *)Safe_alloc(strlen(command) + strlen(params) + 4);
-  sprintf(cmd_line, "\"%s\" %s", command, params);
+  char *cmd_line = (char *)Safe_alloc (strlen (command) + strlen (params) + 4);
+  sprintf (cmd_line, "\"%s\" %s", command, params);
   return cmd_line;
 }
 
@@ -249,14 +263,14 @@ merge_command(const char *command, const char *params)
  */
 
 static int
-has_path(const char *path)
+has_path (const char *path)
 {
-  return dbuf_splitPath(path, NULL, NULL);
+  return dbuf_splitPath (path, NULL, NULL);
 }
 
 
 static char *
-get_path(const char *cmd)
+get_path (const char *cmd)
 {
   char *cmdLine = NULL;
   char *command;
@@ -266,42 +280,46 @@ get_path(const char *cmd)
 
 
   /* get the command */
-  split_command(cmd, &command, &args);
+  split_command (cmd, &command, &args);
 
-  if (!has_path(command)) {
-    /* try to find the command in predefined binary paths */
-    if (NULL != (path = (char *)setFirstItem(binPathSet))) {
-      do
-      {
-        SNPRINTF(cmdPath, sizeof cmdPath,
-          "%s" DIR_SEPARATOR_STRING "%s", path, command);
+  if (!has_path (command))
+    {
+      /* try to find the command in predefined binary paths */
+      if (NULL != (path = (char *)setFirstItem (binPathSet)))
+        {
+          do
+            {
+              SNPRINTF (cmdPath, sizeof cmdPath,
+                "%s" DIR_SEPARATOR_STRING "%s", path, command);
 
-        /* Try if cmdPath */
-        if (0 == access(cmdPath, X_OK)) {
-          /* compose the command line */
-          cmdLine = merge_command(cmdPath, args);
-          break;
+              /* Try if cmdPath */
+              if (0 == access(cmdPath, X_OK))
+                {
+                  /* compose the command line */
+                  cmdLine = merge_command (cmdPath, args);
+                  break;
+                }
+            } while (NULL != (path = (char *)setNextItem (binPathSet)));
         }
-      } while (NULL != (path = (char *)setNextItem(binPathSet)));
+      if (NULL == cmdLine)
+        cmdLine = merge_command (command, args);
+
+      Safe_free (command);
+      Safe_free (args);
+
+      return cmdLine;
     }
-    if (NULL == cmdLine)
-      cmdLine = merge_command(command, args);
+  else
+    {
+      /*
+       * the command is defined with absolute path:
+       * just return it
+       */
+      Safe_free (command);
+      Safe_free (args);
 
-    Safe_free(command);
-    Safe_free(args);
-
-    return cmdLine;
-  }
-  else {
-    /*
-     * the command is defined with absolute path:
-     * just return it
-     */
-    Safe_free(command);
-    Safe_free(args);
-
-    return Safe_strdup(cmd);
-  }
+      return Safe_strdup (cmd);
+    }
 }
 #endif
 
@@ -311,24 +329,22 @@ get_path(const char *cmd)
  */
 
 int
-my_system(const char *cmd)
+sdcc_system (const char *cmd)
 {
   int e;
-  char *cmdLine = get_path(cmd);
+  char *cmdLine = get_path (cmd);
 
-  assert(NULL != cmdLine);
+  assert (NULL != cmdLine);
 
-  if (options.verboseExec) {
-      printf("+ %s\n", cmdLine);
-  }
+  if (options.verboseExec)
+    printf ("+ %s\n", cmdLine);
 
-  e = system(cmdLine);
+  e = system (cmdLine);
 
-  if (options.verboseExec && e) {
-      printf("+ %s returned errorcode %d\n", cmdLine, e);
-  }
+  if (options.verboseExec && e)
+    printf ("+ %s returned errorcode %d\n", cmdLine, e);
 
-  Safe_free(cmdLine);
+  Safe_free (cmdLine);
 
   return e;
 }
@@ -339,6 +355,7 @@ my_system(const char *cmd)
  */
 
 #ifdef _WIN32
+static HANDLE hProcess = NULL;
 /*
  * use native WIN32 solution due to a bug in wine msvrct.dll popen implementation
  */
@@ -350,31 +367,24 @@ sdcc_popen_read (char *cmd)
   PROCESS_INFORMATION pi;
   STARTUPINFO si;
 
-  /* Set the bInheritHandle flag so pipe handles are inherited. */
- 
+  assert (hProcess == NULL);
+
   sa.nLength = sizeof (SECURITY_ATTRIBUTES);
   sa.bInheritHandle = TRUE;
   sa.lpSecurityDescriptor = NULL;
 
-  /* Create a pipe for the child process's STDOUT. */
   if (!CreatePipe (&childIn, &childOut, &sa, 0))
     {
-      _doserrno = GetLastError();
+      _doserrno = GetLastError ();
       return NULL;
     }
 
-  /* Ensure the read handle to the pipe for STDOUT is not inherited. */
   if (!SetHandleInformation (childIn, HANDLE_FLAG_INHERIT, 0))
     {
-      _doserrno = GetLastError();
+      _doserrno = GetLastError ();
       return NULL;
     }
 
-  /* Set up members of the PROCESS_INFORMATION structure. */
-  memset (&pi, 0, sizeof (PROCESS_INFORMATION));
- 
-  /* Set up members of the STARTUPINFO structure. 
-     This structure specifies the STDIN and STDOUT handles for redirection. */
   memset (&si, 0, sizeof (STARTUPINFO));
   si.cb = sizeof (STARTUPINFO); 
   si.hStdError = GetStdHandle (STD_ERROR_HANDLE);
@@ -382,40 +392,55 @@ sdcc_popen_read (char *cmd)
   si.hStdInput = GetStdHandle (STD_INPUT_HANDLE);
   si.dwFlags |= STARTF_USESTDHANDLES;
 
-  /* Create the child process. */
   if (!CreateProcess (NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
     {
-      _doserrno = GetLastError();
+      _doserrno = GetLastError ();
       return NULL;
-    }
-  else 
-    {
-      /* Close handles to the child process and its primary thread.
-         Some applications might keep these handles to monitor the status
-         of the child process, for example. */
-      CloseHandle (pi.hProcess);
-      CloseHandle (pi.hThread);
     }
 
-  if (!CloseHandle (childOut))
-    {
-      _doserrno = GetLastError();
-      return NULL;
-    }
+  CloseHandle (childOut);
+  CloseHandle (pi.hThread);
+  hProcess = pi.hProcess;
 
   return fdopen (_open_osfhandle ((long)childIn, _O_RDONLY | _O_TEXT), "rt");
 }
+
+int
+sdcc_pclose (FILE *fp)
+{
+  int termstat;
+  int ret = -1;
+
+  if (fp != NULL)
+    {
+      assert (hProcess != NULL);
+
+      fclose (fp);
+
+      if (_cwait (&termstat, (int)hProcess, _WAIT_GRANDCHILD) != -1 || errno == EINTR)
+        ret = termstat;
+
+      hProcess = NULL;
+    }
+
+    return ret;
+}
 #else
-#define sdcc_popen_read(cmd) popen ((cmd), "r")
+#define sdcc_popen_read(cmd)  popen ((cmd), "r")
+int
+sdcc_pclose (FILE *fp)
+{
+  return pclose (fp);
+}
 #endif
 
 FILE *
-my_popen (const char *cmd)
+sdcc_popen (const char *cmd)
 {
   FILE *fp;
   char *cmdLine = get_path (cmd);
 
-  assert(NULL != cmdLine);
+  assert (NULL != cmdLine);
 
   if (options.verboseExec)
     {

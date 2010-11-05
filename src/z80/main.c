@@ -380,7 +380,7 @@ _gbz80_rgblink (void)
 
   buildCmdLine (buffer,port->linker.cmd, dstFileName, NULL, NULL, NULL);
   /* call the linker */
-  if (my_system (buffer))
+  if (sdcc_system (buffer))
     {
       perror ("Cannot exec linker");
       exit (1);

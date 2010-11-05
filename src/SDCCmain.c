@@ -1785,7 +1785,7 @@ linkEdit (char **envp)
 
   dbuf_destroy (&linkerScriptFileName);
 
-  system_ret = my_system (buffer);
+  system_ret = sdcc_system (buffer);
 
   /* if the binary file name is defined,
      rename the linker output file name to binary file name */
@@ -1852,7 +1852,7 @@ assemble (char **envp)
 
       dbuf_destroy (&asmName);
 
-      if (my_system (buf))
+      if (sdcc_system (buf))
         {
           /* either system() or the assembler itself has reported an error */
           exit (EXIT_FAILURE);
@@ -2035,7 +2035,7 @@ preProcess (char **envp)
 
       if (preProcOnly)
         {
-          if (my_system (buffer))
+          if (sdcc_system (buffer))
             {
               exit (EXIT_FAILURE);
             }
@@ -2043,7 +2043,7 @@ preProcess (char **envp)
           exit (EXIT_SUCCESS);
         }
 
-      yyin = my_popen (buffer);
+      yyin = sdcc_popen (buffer);
       if (yyin == NULL)
         {
           perror ("Preproc file not found");
@@ -2433,7 +2433,7 @@ main (int argc, char **argv, char **envp)
       yyparse ();
 
       if (!options.c1mode)
-        if (pclose (yyin))
+        if (sdcc_pclose (yyin))
           fatalError = 1;
 
       if (fatalError)

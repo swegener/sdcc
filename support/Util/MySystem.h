@@ -30,7 +30,8 @@
 
 extern set *binPathSet; /* set of binary paths */
 
-int my_system(const char *cmd);
-FILE *my_popen(const char *cmd);
+int sdcc_system (const char *cmd);
+FILE *sdcc_popen (const char *cmd);
+int sdcc_pclose (FILE *fp);
 
 #endif

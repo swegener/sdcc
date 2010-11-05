@@ -24,9 +24,11 @@
 
 #ifdef _WIN32
 #undef DATADIR
-#include <windows.h>
 /* avoid DATADIR definition clash :-( */
+#include <windows.h>
+#include <stdio.h>
 #include <io.h>
+#include <fcntl.h>
 #else
 #include <unistd.h>
 #endif
@@ -337,9 +339,74 @@ my_system(const char *cmd)
  */
 
 #ifdef _WIN32
-#define popen_read(cmd) _popen((cmd), "rt")
+/*
+ * use native WIN32 solution due to a bug in wine msvrct.dll popen implementation
+ */
+static FILE *
+sdcc_popen_read (char *cmd)
+{ 
+  HANDLE childIn, childOut;
+  SECURITY_ATTRIBUTES sa;
+  PROCESS_INFORMATION pi;
+  STARTUPINFO si;
+
+  /* Set the bInheritHandle flag so pipe handles are inherited. */
+ 
+  sa.nLength = sizeof (SECURITY_ATTRIBUTES);
+  sa.bInheritHandle = TRUE;
+  sa.lpSecurityDescriptor = NULL;
+
+  /* Create a pipe for the child process's STDOUT. */
+  if (!CreatePipe (&childIn, &childOut, &sa, 0))
+    {
+      *__doserrno () = GetLastError ();
+      return NULL;
+    }
+
+  /* Ensure the read handle to the pipe for STDOUT is not inherited. */
+  if (!SetHandleInformation (childIn, HANDLE_FLAG_INHERIT, 0))
+    {
+      *__doserrno () = GetLastError ();
+      return NULL;
+    }
+
+  /* Set up members of the PROCESS_INFORMATION structure. */
+  memset (&pi, 0, sizeof (PROCESS_INFORMATION));
+ 
+  /* Set up members of the STARTUPINFO structure. 
+     This structure specifies the STDIN and STDOUT handles for redirection. */
+  memset (&si, 0, sizeof (STARTUPINFO));
+  si.cb = sizeof (STARTUPINFO); 
+  si.hStdError = GetStdHandle (STD_ERROR_HANDLE);
+  si.hStdOutput = childOut;
+  si.hStdInput = GetStdHandle (STD_INPUT_HANDLE);
+  si.dwFlags |= STARTF_USESTDHANDLES;
+
+  /* Create the child process. */
+  if (!CreateProcess (NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+    {
+      *__doserrno () = GetLastError ();
+      return NULL;
+    }
+  else 
+    {
+      /* Close handles to the child process and its primary thread.
+         Some applications might keep these handles to monitor the status
+         of the child process, for example. */
+      CloseHandle (pi.hProcess);
+      CloseHandle (pi.hThread);
+    }
+
+  if (!CloseHandle (childOut))
+    {
+      *__doserrno () = GetLastError ();
+      return NULL;
+    }
+
+  return fdopen (_open_osfhandle ((long)childIn, _O_RDONLY | _O_TEXT), "rt");
+}
 #else
-#define popen_read(cmd) popen((cmd), "r")
+#define sdcc_popen_read(cmd) popen((cmd), "r")
 #endif
 
 FILE *
@@ -354,7 +421,7 @@ my_popen(const char *cmd)
       printf("+ %s\n", cmdLine);
   }
 
-  fp = popen_read(cmdLine);
+  fp = sdcc_popen_read(cmdLine);
   Safe_free(cmdLine);
 
   return fp;

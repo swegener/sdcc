@@ -1,3 +1,8 @@
+2010-11-05 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/MySystem.c: use native WIN32 popen solution due to
+	  a bug in wine msvrct.dll popen implementation
+
 2010-11-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCcse.c:

@@ -408,17 +408,21 @@ sdcc_popen_read (char *cmd)
 int
 sdcc_pclose (FILE *fp)
 {
-  int termstat;
   int ret = -1;
 
   if (fp != NULL)
     {
+      int exitStatus;
+
       assert (hProcess != NULL);
 
       fclose (fp);
 
-      if (_cwait (&termstat, (int)hProcess, _WAIT_GRANDCHILD) != -1 || errno == EINTR)
-        ret = termstat;
+      if ((WaitForSingleObject (hProcess, (DWORD)(-1L)) == 0) &&
+        GetExitCodeProcess (hProcess, &exitStatus))
+        ret = exitStatus;
+
+      CloseHandle(hProcess);
 
       hProcess = NULL;
     }

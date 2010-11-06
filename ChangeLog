@@ -1,3 +1,7 @@
+2010-11-06 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/MySystem.c: use native WIN32 API calls in sdcc_pclose()
+
 2010-11-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/MySystem.c: use native WIN32 sdcc_popen and sdcc_pclose

@@ -237,8 +237,7 @@ void *dbuf_detach(struct dbuf_s *dbuf)
 /*
  * Add '\0' character at the end of the buffer without
  * count it in the dbuf->len and detach the buffer from dbuf structure.
- * The dbuf structure can be reused by
- * reinitializing it.
+ * The dbuf structure can be reused by reinitializing it.
  *
  * See: dbuf_init()
  */
@@ -246,7 +245,7 @@ void *dbuf_detach(struct dbuf_s *dbuf)
 const char *dbuf_detach_c_str(struct dbuf_s *dbuf)
 {
   dbuf_c_str(dbuf);
-  return dbuf_detach(&dbuf);
+  return dbuf_detach(dbuf);
 }
 
 

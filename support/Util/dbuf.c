@@ -1,8 +1,8 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.2.0, January 6th, 2007
+  version 1.3.0, 2010-11-04
 
-  Copyright (c) 2002-2007 Borut Razem
+  Copyright (c) 2002-2010 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -231,6 +231,22 @@ void *dbuf_detach(struct dbuf_s *dbuf)
   dbuf->alloc = 0;
 
   return ret;
+}
+
+
+/*
+ * Add '\0' character at the end of the buffer without
+ * count it in the dbuf->len and detach the buffer from dbuf structure.
+ * The dbuf structure can be reused by
+ * reinitializing it.
+ *
+ * See: dbuf_init()
+ */
+
+const char *dbuf_detach_c_str(struct dbuf_s *dbuf)
+{
+  dbuf_c_str(dbuf);
+  return dbuf_detach(&dbuf);
 }
 
 

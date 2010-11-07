@@ -6,6 +6,7 @@
 	  TARGET_ID_PIC1 renamed to TARGET_ID_PIC14,
 	  TARGET_IS_PIC renamed to TARGET_IS_PIC14
 	  OPT_DISABLE_PIC renamed to OPT_DISABLE_PIC14
+	* support/Util/dbuf.c, support/Util/dbuf.h: added function dbuf_detach_c_str()
 
 2010-11-06 Borut Razem <borut.razem AT siol.net>
 

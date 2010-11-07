@@ -1,8 +1,8 @@
 /*
   dbuf.h - Dynamic buffer interface
-  version 1.2.0, January 6th, 2007
+  version 1.3.0, 2010-11-04
 
-  Copyright (c) 2002-2007 Borut Razem
+  Copyright (c) 2002-2010 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -51,6 +51,7 @@ size_t dbuf_get_length(struct dbuf_s *dbuf);
 const char *dbuf_c_str(struct dbuf_s *dbuf);
 int dbuf_trim(struct dbuf_s *dbuf);
 void *dbuf_detach(struct dbuf_s *dbuf);
+const char *dbuf_detach_c_str(struct dbuf_s *dbuf);
 void dbuf_destroy(struct dbuf_s *dbuf);
 void dbuf_delete(struct dbuf_s *dbuf);
 void dbuf_free(const void *buf);

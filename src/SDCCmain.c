@@ -311,7 +311,7 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_PIC16
   &pic16_port,
 #endif
-#if !OPT_DISABLE_PIC
+#if !OPT_DISABLE_PIC14
   &pic_port,
 #endif
 #if !OPT_DISABLE_TININative
@@ -1744,7 +1744,7 @@ linkEdit (char **envp)
       set *tempSet = NULL, *libSet = NULL;
 
       strcpy (buffer3, dbuf_c_str (&linkerScriptFileName));
-      if ( /*TARGET_IS_PIC16 || */ TARGET_IS_PIC)
+      if ( /*TARGET_IS_PIC16 || */ TARGET_IS_PIC14)
         {
           /* use $l to set the linker include directories */
           tempSet = appendStrSet (libDirsSet, "-I\"", "\"");
@@ -1999,7 +1999,7 @@ preProcess (char **envp)
       addSet (&preArgvSet, Safe_strdup ("-DSDCC_{port}"));
       addSet (&preArgvSet, Safe_strdup ("-D__{port}"));
 
-      if (port && port->processor && TARGET_IS_PIC)
+      if (port && port->processor && TARGET_IS_PIC14)
         {
           char proc[512];
           SNPRINTF (&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
@@ -2086,8 +2086,6 @@ setBinPaths (const char *argv0)
 static void
 setIncludePath (void)
 {
-  const char *target = port->target;
-
   /*
    * Search logic:
    *
@@ -2114,7 +2112,7 @@ setIncludePath (void)
 
       tempSet = appendStrSet (dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
       includeDirsSet = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
-      includeDirsSet = appendStrSet (includeDirsSet, NULL, target);
+      includeDirsSet = appendStrSet (includeDirsSet, NULL, port->target);
       mergeSets (&includeDirsSet, tempSet);
 
       if (options.use_non_free)
@@ -2123,7 +2121,7 @@ setIncludePath (void)
 
           tempSet = appendStrSet (dataDirsSet, NULL, NON_FREE_INCLUDE_DIR_SUFFIX);
           tempSet1 = appendStrSet (tempSet, NULL, DIR_SEPARATOR_STRING);
-          tempSet1 = appendStrSet (tempSet1, NULL, target);
+          tempSet1 = appendStrSet (tempSet1, NULL, port->target);
           mergeSets (&tempSet1, tempSet);
           mergeSets (&includeDirsSet, tempSet1);
         }
@@ -2134,7 +2132,7 @@ setIncludePath (void)
 
           dbuf_init (&dbuf, PATH_MAX);
           addSetHead (&includeDirsSet, p);
-          dbuf_makePath (&dbuf, p, target);
+          dbuf_makePath (&dbuf, p, port->target);
           addSetHead (&includeDirsSet, dbuf_detach (&dbuf));
         }
     }

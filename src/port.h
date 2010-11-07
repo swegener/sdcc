@@ -15,7 +15,7 @@
 #define TARGET_ID_Z80      3
 #define TARGET_ID_AVR      4
 #define TARGET_ID_DS390    5
-#define TARGET_ID_PIC      6
+#define TARGET_ID_PIC14    6
 #define TARGET_ID_PIC16    7
 #define TARGET_ID_XA51     9
 #define TARGET_ID_DS400    10
@@ -30,14 +30,14 @@
 #define TARGET_IS_AVR      (port->id == TARGET_ID_AVR)
 #define TARGET_IS_DS390    (port->id == TARGET_ID_DS390)
 #define TARGET_IS_DS400    (port->id == TARGET_ID_DS400)
-#define TARGET_IS_PIC      (port->id == TARGET_ID_PIC)
+#define TARGET_IS_PIC14    (port->id == TARGET_ID_PIC14)
 #define TARGET_IS_PIC16    (port->id == TARGET_ID_PIC16)
 #define TARGET_IS_XA51     (port->id == TARGET_ID_XA51)
 #define TARGET_IS_HC08     (port->id == TARGET_ID_HC08)
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
 #define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_GBZ80)
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08)
-#define TARGET_PIC_LIKE    (TARGET_IS_PIC || TARGET_IS_PIC16)
+#define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
 /* is using sdas / sdld assembler / linker */
 #define IS_SDASLD          (TARGET_Z80_LIKE || TARGET_MCS51_LIKE || TARGET_HC08_LIKE)
 
@@ -394,7 +394,7 @@ extern PORT avr_port;
 #if !OPT_DISABLE_DS390
 extern PORT ds390_port;
 #endif
-#if !OPT_DISABLE_PIC
+#if !OPT_DISABLE_PIC14
 extern PORT pic_port;
 #endif
 #if !OPT_DISABLE_PIC16

@@ -1328,12 +1328,13 @@ gatherAutoInit (symbol * autoChain)
        * and not S_CODE, don't emit in gs segment,
        * but allow glue.c:pic16emitRegularMap to put symbol
        * in idata section */
-      if(TARGET_IS_PIC16 &&
+      if (TARGET_IS_PIC16 &&
         IS_STATIC (sym->etype) && sym->ival
-        && SPEC_SCLS(sym->etype) != S_CODE) {
-        SPEC_SCLS (sym->etype) = S_DATA;
-        continue;
-      }
+        && SPEC_SCLS (sym->etype) != S_CODE)
+	{
+          SPEC_SCLS (sym->etype) = S_DATA;
+          continue;
+        }
 #endif
 
       /* if this is a static variable & has an */
@@ -4094,8 +4095,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 default:
                   gptype = 0;
 
-                  if(TARGET_IS_PIC16 && (SPEC_SCLS(sym->etype) == S_FIXED))
-                      gptype = GPTYPE_NEAR;
+                  if (TARGET_IS_PIC16 && (SPEC_SCLS(sym->etype) == S_FIXED))
+                    gptype = GPTYPE_NEAR;
                 }
               addr |= gptype << (8*(GPTRSIZE - 1));
             }

@@ -1,3 +1,12 @@
+2010-11-07 Borut Razem <borut.razem AT siol.net>
+
+	* Makefile.common.in, sdcc_vc_in.h, sdccconf_in.h, src/pic14/main.c,
+	  src/port.h, src/SDCCast.c, src/SDCCmain.c, src/SDCCopt.c,
+	  src/SDCCpeeph.c, src/SDCCsymt.c:
+	  TARGET_ID_PIC1 renamed to TARGET_ID_PIC14,
+	  TARGET_IS_PIC renamed to TARGET_IS_PIC14
+	  OPT_DISABLE_PIC renamed to OPT_DISABLE_PIC14
+
 2010-11-06 Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/MySystem.c: use native WIN32 API calls in sdcc_pclose()

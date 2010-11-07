@@ -52,7 +52,7 @@ static bool matchLine (char *, char *, hTab **);
 #define FBYNAME(x) static int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
         lineNode *head, char *cmdLine)
 
-#if !OPT_DISABLE_PIC
+#if !OPT_DISABLE_PIC14
 void peepRules2pCode(peepRule *);
 #endif
 
@@ -2234,9 +2234,9 @@ peepHole (lineNode ** pls)
   lineNode *mtail = NULL;
   bool restart, replaced;
 
-#if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
+#if !OPT_DISABLE_PIC14 || !OPT_DISABLE_PIC16
   /* The PIC port uses a different peep hole optimizer based on "pCode" */
-  if (TARGET_IS_PIC || TARGET_IS_PIC16)
+  if (TARGET_PIC_LIKE)
     return;
 #endif
 
@@ -2376,7 +2376,7 @@ readFileIntoBuffer (char *fname)
 /* initPeepHole - initialises the peep hole optimizer stuff        */
 /*-----------------------------------------------------------------*/
 void
-initPeepHole ()
+initPeepHole (void)
 {
   char *s;
 
@@ -2395,13 +2395,12 @@ initPeepHole ()
       options.nopeep = 0;
     }
 
-
-#if !OPT_DISABLE_PIC
+#if !OPT_DISABLE_PIC14
   /* Convert the peep rules into pcode.
      NOTE: this is only support in the PIC port (at the moment)
   */
-        if (TARGET_IS_PIC)
-                peepRules2pCode(rootRules);
+  if (TARGET_IS_PIC14)
+    peepRules2pCode (rootRules);
 #endif
 
 #if !OPT_DISABLE_PIC16
@@ -2409,9 +2408,8 @@ initPeepHole ()
      NOTE: this is only support in the PIC port (at the moment)
        and the PIC16 port (VR 030601)
   */
-        if (TARGET_IS_PIC16)
-                pic16_peepRules2pCode(rootRules);
+  if (TARGET_IS_PIC16)
+    pic16_peepRules2pCode (rootRules);
 
 #endif
-
 }

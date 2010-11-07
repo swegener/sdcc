@@ -285,7 +285,7 @@ get_model (void)
 /* Globals */
 PORT pic_port =
 {
-  TARGET_ID_PIC,
+  TARGET_ID_PIC14,
   "pic14",
   "MCU pic",        /* Target name */
   "",               /* Processor */

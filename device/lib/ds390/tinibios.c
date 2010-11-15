@@ -56,12 +56,10 @@ unsigned char _sdcc_external_startup(void)
   // use !CE* for program and/or data memory access
   TIMED_ACCESS(MCON,0xaf);
 
-  // select default cpu speed
-  CpuSpeed(CPU_SPEED);
-
   __asm
     ; save the 24-bit return address
-    pop ar2; msb
+;    pop ar2; msb
+    mov r2, #0x00
     pop ar1
     pop ar0; lsb
 
@@ -78,6 +76,9 @@ unsigned char _sdcc_external_startup(void)
     push ar1
     push ar2; msb
   __endasm;
+
+  // select default cpu speed
+  CpuSpeed(CPU_SPEED);
 
   // Copy the Interrupt Vector Table (128 bytes) from 0x10000 to 0x100000
   // This isn't needed for older bootloaders than the 0515, but it won't harm

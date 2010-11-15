@@ -290,7 +290,9 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
       return TRUE;
     }
 
-  dbuf_printf (oBuf, "\tajmp\t__reset_vect\n");
+  dbuf_printf (oBuf, ".flat24 off\t\t; 16 bit addressing\n");
+  dbuf_printf (oBuf, "\tljmp\t__reset_vect\n");
+  dbuf_printf (oBuf, ".flat24 on\t\t; 24 bit flat addressing\n");
 
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
@@ -305,7 +307,9 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
         }
     }
 
+  dbuf_printf (oBuf, ".flat24 off\t\t; 16 bit addressing\n");
   dbuf_printf (oBuf, "__reset_vect:\n\tljmp\t__sdcc_gsinit_startup\n");
+  dbuf_printf (oBuf, ".flat24 on\t\t; 24 bit flat addressing\n");
 
   return TRUE;
 }
@@ -335,7 +339,16 @@ _ds390_genInitStartup (FILE *of)
       fprintf (of, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
     }
 
-  fprintf (of, "\tlcall\t__sdcc_external_startup\n");
+  if ((options.model == MODEL_FLAT24) && TARGET_IS_DS390)
+    {
+      fputs (".flat24 off\t\t; 16 bit addressing\n", of);
+      fprintf (of, "\tlcall\t__sdcc_external_startup\n");
+      fputs (".flat24 on\t\t; 24 bit flat addressing\n", of);
+    }
+  else
+    {
+      fprintf (of, "\tlcall\t__sdcc_external_startup\n");
+    }
   fprintf (of, "\tmov\ta,dpl\n");
   fprintf (of, "\tjz\t__sdcc_init_data\n");
   fprintf (of, "\tljmp\t__sdcc_program_startup\n");

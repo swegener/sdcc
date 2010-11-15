@@ -1,3 +1,11 @@
+2010-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/main.c (_ds390_genIVT, _ds390_genInitStartup): keep flat24 mode
+	  off before _sdcc_external_startup is called
+	* device/lib/ds390/tinibios.c (_sdcc_external_startup): pop 16 bit address,
+	  push 24 bit, don't call anything before the changeover to flat24 mode
+	* support/regression/ports/ds390/spec.mk: start uCsim in 16 bit mode
+
 2010-11-07 Borut Razem <borut.razem AT siol.net>
 
 	* Makefile.common.in, sdcc_vc_in.h, sdccconf_in.h, src/pic14/main.c,

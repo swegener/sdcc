@@ -197,17 +197,13 @@ FBYNAME (labelInRange)
           strstr (currPl->prev->prev->line, "ljmp"))
         return FALSE;
 
-      /* calculate the label distance : the jump for reladdr can be
-         +/- 127 bytes, here I am assuming that an average 8051
-         instruction is 2 bytes long, so if the label is more than
-         63 intructions away, the label is considered out of range
-         for a relative jump. we could get more precise this will
-         suffice for now since it catches > 90% cases */
+      /* Calculate the label distance. For mcs51 the jump can be
+         -127 to + 127 bytes, for Z80 -126 to +129 bytes.*/
       dist = (pcDistance (currPl, lbl, TRUE) +
               pcDistance (currPl, lbl, FALSE));
-
-      /* changed to 127, now that pcDistance return actual number of bytes */
-      if (!dist || dist > 127)
+      /* Use 125 for now. Could be made more exact using port and
+         exact jump location instead of currPl. */
+      if (!dist || dist > 125)
         return FALSE;
 
       lbl = getPatternVar (vars, &cmdLine);
@@ -250,7 +246,7 @@ FBYNAME (labelJTInRange)
       /* three terms used to calculate allowable distance */
  /* printf("\nlabel %s %i dist %i cdist 0x%02x 0x%02x\n", lbl, i, dist, dist -(count-i-1)-(7+3*i), 127+(count-i-1)+(7+3*i) - dist); */
       if (!dist ||
-          dist > 127+           /* range of sjmp */
+          dist > 125+           /* range of sjmp */
                  (7+3*i)+       /* offset between this jump and currPl,
                                    should use pcDistance instead? */
                  (count-i-1)    /* if peephole applies distance is shortened */

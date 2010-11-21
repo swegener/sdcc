@@ -817,7 +817,7 @@ int z80instructionSize(lineNode *pl)
       return(i);
     }
 
-  fprintf(stderr, "z80instructionSize() failed to parse line node %s\n", pl->line);
+  fprintf(stderr, "Warning: z80instructionSize() failed to parse line node %s\n", pl->line);
 
   return(4);
 }

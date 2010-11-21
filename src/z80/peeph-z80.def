@@ -347,7 +347,7 @@ replace restart {
 	ld	%1, a
 	ld	%2, %3
 	ld	%4, a
-} if notVolatile(%1), operandsNotRelated(%1 %3), operandsNotRelated(%1 %2)
+} if notVolatile(%1), operandsNotRelated(%1 %3), operandsNotRelated(%1 %2), operandsNotRelated(%2 'a')
 
 replace restart {
 	ld	%1,a

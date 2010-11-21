@@ -1,3 +1,8 @@
+2010-11-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Minor peephole fix.
+
 2010-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/main.c (_ds390_genIVT, _ds390_genInitStartup): keep flat24 mode

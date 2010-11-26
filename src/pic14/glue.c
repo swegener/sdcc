@@ -770,7 +770,7 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
         // initialize as zero
         for (i=0; i < size; i++) {
             if (in_code) {
-                dbuf_printf (oBuf, "\tretlw 0x00");
+                dbuf_printf (oBuf, "\tretlw 0x00\n");
             } else {
                 dbuf_printf (oBuf, "%s0x00", (i == 0) ? "" : ", ");
             }

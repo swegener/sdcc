@@ -1,3 +1,8 @@
+2010-11-26 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/glue.c (emitIvals): end retlw instruction with newline,
+	  fixes #3119071.
+
 2010-11-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

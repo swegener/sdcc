@@ -821,16 +821,16 @@ replace restart {
 // This gives many false negatives and without the test no problems are encountered in the regression tests
 // Maybe we can try this after 2.7.0 release
 
-//replace restart {
-//	ld	%1,a
-//	ld	a,%2
-//	or	a,%1
-//} by {
-//	ld	%1,a
-//	or	a,%2
-//	; peephole 17a removed load by reordering or arguments.
-//} if notVolatile(%1)
-// Removed since it triggers for %2 of the form (#...
+replace restart {
+	ld	%1,a
+	ld	a,%2
+	or	a,%1
+} by {
+	ld	%1,a
+	or	a,%2
+	; peephole 17a removed load by reordering or arguments.
+} if notVolatile(%1), canAssign('b' %2)
+// canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
 	ld	%1,a
@@ -1158,7 +1158,8 @@ replace restart {
 } by {
 	; peephole 42 removed loads by exploiting commutativity of addition.
 	add	a,%2
-} if notVolatile(%1), notUsed(%1), operandsNotRelated(%2 '(bc)' '(de)')
+} if notVolatile(%1), notUsed(%1), operandsNotRelated(%2 '(bc)' '(de)'), canAssign('b' %2)
+// canAssign('b' %2) is true, iff add a,%2 is possible.
 
 replace restart {
 	ld	%1 (ix),a
@@ -1243,7 +1244,8 @@ replace restart {
 	ld	%1, a
 	; peephole 43 removed load by exploiting commutativity of addition.
 	add	a,%2
-} if operandsNotRelated(%2 '(bc)' '(de)')
+} if operandsNotRelated(%2 '(bc)' '(de)'), canAssign('b' %2)
+// canAssign('b' %2) is true, iff add a,%2 is possible.
 
 replace restart {
 	ld	c,l
@@ -1334,18 +1336,18 @@ replace restart {
 	; peephole 48 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// Commented out since it triggers for %3 of the form (#...)
-//replace restart {
-//	or	a,%1
-//	jp	NZ,%2
-//	ld	a,%3
-//	or	a,a
-//} by {
-//	or	a,%1
-//	jp	NZ,%2
-//	or	a,%3
-//	; peephole 49 shortened or using a (which has just been tested to be #0x00).
-//} if operandsNotRelated(%3 '(bc)' '(de)')
+replace restart {
+	or	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	or	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole 49 shortened or using a (which has just been tested to be #0x00).
+} if operandsNotRelated(%3 '(bc)' '(de)'), canAssign('b' %2)
+// canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
 	and	a,%1
@@ -1359,19 +1361,18 @@ replace restart {
 	; peephole 50 shortened or using a (which has just been tested to be #0x00).
 } if operandsNotRelated(%3 '(bc)' '(de)')
 
-// Commented out since it triggers for %3 of the form (#...)
-// replace restart {
-//	sub	a,%1
-//	jp	NZ,%2
-//	ld	a,%3
-//	or	a,a
-//} by {
-//	sub	a,%1
-//	jp	NZ,%2
-//	or	a,%3
-//	; peephole 51 shortened or using a (which has just been tested to be #0x00).
-//}
-//if notSame(%3 '(bc)' '(de)')
+replace restart {
+	sub	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	sub	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole 51 shortened or using a (which has just been tested to be #0x00).
+} if notSame(%3 '(bc)' '(de)'), canAssign('b' %2)
+// canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
 	dec	a

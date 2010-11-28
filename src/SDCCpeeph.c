@@ -112,8 +112,8 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
         {
           if (port->peep.getSize)
             {
-//printf("Line: %s, dist: %i\n", pl->line, port->peep.getSize(pl));
               dist += port->peep.getSize(pl);
+/* printf("Line: %s, dist: %i, total: %i\n", pl->line, port->peep.getSize(pl), dist); */
             }
           else
             {
@@ -203,7 +203,7 @@ FBYNAME (labelInRange)
               pcDistance (currPl, lbl, FALSE));
       /* Use 125 for now. Could be made more exact using port and
          exact jump location instead of currPl. */
-      if (!dist || dist > 125)
+      if (!dist || dist > 127)
         return FALSE;
 
       lbl = getPatternVar (vars, &cmdLine);
@@ -246,7 +246,7 @@ FBYNAME (labelJTInRange)
       /* three terms used to calculate allowable distance */
  /* printf("\nlabel %s %i dist %i cdist 0x%02x 0x%02x\n", lbl, i, dist, dist -(count-i-1)-(7+3*i), 127+(count-i-1)+(7+3*i) - dist); */
       if (!dist ||
-          dist > 125+           /* range of sjmp */
+          dist > 127+           /* range of sjmp */
                  (7+3*i)+       /* offset between this jump and currPl,
                                    should use pcDistance instead? */
                  (count-i-1)    /* if peephole applies distance is shortened */

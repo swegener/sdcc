@@ -1,3 +1,13 @@
+/*
+	Bug 3117729
+ 	For
+ 	x = x + state[i] + pKey[mod_16x8(i, iKeyLen)];
+ 	an invalid
+ 	add	a,(#_x + 0)
+ 	was generated.
+ */
+
+
 #include <testfwk.h>
 
 #define UCHAR	unsigned char

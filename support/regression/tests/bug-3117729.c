@@ -15,6 +15,9 @@
 
 #define PCHAR	unsigned char *
 
+#ifndef SDCC_mcs51
+#pragma disable_warning 85
+
 UCHAR mod_16x8(USHORT s16, UCHAR i8)
 {
 	return (0);
@@ -48,6 +51,8 @@ void RC4Init(PCHAR pKey, UCHAR iKeyLen)
 	x = 0;
 	y = 0;
 }
+
+#endif
 
 void
 testBug(void)

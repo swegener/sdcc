@@ -1,4 +1,10 @@
+2010-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-3117729.c:
+	  Disabled test for mcs51.
+
 2010-11-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/bug-3117729.c:
 	  Added bug description.
 

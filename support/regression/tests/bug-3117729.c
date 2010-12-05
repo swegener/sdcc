@@ -15,7 +15,6 @@
 
 #define PCHAR	unsigned char *
 
-#ifndef SDCC_mcs51
 #pragma disable_warning 85
 
 UCHAR mod_16x8(USHORT s16, UCHAR i8)
@@ -23,7 +22,7 @@ UCHAR mod_16x8(USHORT s16, UCHAR i8)
 	return (0);
 }
 
-UCHAR state[256];
+__xdata UCHAR state[256];
 UCHAR x, y;
 
 void swap(PCHAR pa, PCHAR pb)
@@ -52,11 +51,8 @@ void RC4Init(PCHAR pKey, UCHAR iKeyLen)
 	y = 0;
 }
 
-#endif
-
 void
 testBug(void)
 {
-        ASSERT(1);
+	ASSERT(1);
 }
-

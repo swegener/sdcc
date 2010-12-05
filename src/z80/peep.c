@@ -677,7 +677,9 @@ int z80instructionSize(lineNode *pl)
         return(4);
       if((argCont(op1start, "(ix)") || argCont(op1start, "(iy)")) && op2start[0] == '#')
         return(4);
-      if((op1start[0] == '(' && strncmp(op1start, "(bc)", 4) && strncmp(op1start, "(de)", 4) && strncmp(op1start, "(hl)", 4)) && strncmp(op2start, "hl", 2) && strncmp(op2start, "a", 2))
+      if(op1start[0] == '(' && strncmp(op1start, "(bc)", 4) &&
+         strncmp(op1start, "(de)", 4) && strncmp(op1start, "(hl)", 4) &&
+         strncmp(op2start, "hl", 2) && strncmp(op2start, "a", 2))
         return(4);
 
       /* These 4 are the only remaining cases of 3 byte long ld instructions. */
@@ -685,7 +687,8 @@ int z80instructionSize(lineNode *pl)
         return(3);
       if(argCont(op1start, "(ix)") || argCont(op1start, "(iy)"))
         return(3);
-      if(op1start[0] == '(' && strncmp(op1start, "(bc)", 4) && strncmp(op1start, "(de)", 4) && strncmp(op1start, "(hl)", 4) || op2start[0] == '(' && strncmp(op1start, "(bc)", 4) && strncmp(op1start, "(de)", 4) && strncmp(op1start, "(hl)", 4))
+      if((op1start[0] == '(' && strncmp(op1start, "(bc)", 4) && strncmp(op1start, "(de)", 4) && strncmp(op1start, "(hl)", 4)) ||
+         (op2start[0] == '(' && strncmp(op1start, "(bc)", 4) && strncmp(op1start, "(de)", 4) && strncmp(op1start, "(hl)", 4)))
         return(3);
       if((op1start[1] == 'c' || op1start[1] == 'd' || op1start[1] == 'l' || op1start[1] == 'p') && op2start[0] == '#')
         return(3);

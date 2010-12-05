@@ -1,3 +1,8 @@
+2010-12-05 Borut Razem <borut.razem AT siol.net>
+
+	* Makefile.in:
+	  fixed bug #312815: Top level Makefile variable is mis-spelled
+
 2010-12-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-3117729.c:

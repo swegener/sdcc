@@ -75,14 +75,14 @@
 #elif defined(_SDCC_NO_ASM_LIB_FUNCS)
 #warning "printf_tiny not built, _SDCC_NO_ASM_LIB_FUNCS defined"
 #else
-/* Disable "ISO C forbids an empty source file" wraning message */
+/* Disable "ISO C forbids an empty source file" warning message */
 #pragma disable_warning 190
 #endif
 #else /* defines are compatible with printf_tiny */
 
 
 
-void printf_tiny(__code char *fmt, ...) __reentrant
+void printf_tiny(__code const char *fmt, ...) __reentrant
 {
 	fmt;	/* suppress unreferenced variable warning */
 

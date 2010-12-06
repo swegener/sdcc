@@ -143,7 +143,7 @@ static __data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp spac
 #else // defines are compatible with printf_fast
 
 
-void PRINTF_FAST(__code char *fmt, ...) __reentrant
+void PRINTF_FAST(__code const char *fmt, ...) __reentrant
 {
 	fmt;	/* suppress unreferenced variable warning */
 

@@ -1,4 +1,10 @@
-2010-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
+2010-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdio.h,
+	* device/lib/printf_fast.c,
+	* device/lib/printf_tiny.c: fixed bug 3108582
+
+2010-12-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/peep.c (z80instructionSize): fixed warning
 	* support/regression/tests/bug-3117729.c: fixed and enabled for mcs51

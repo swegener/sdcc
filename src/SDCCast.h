@@ -22,8 +22,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#ifndef SDCCEXPR_H
-#define SDCCEXPR_H
+#ifndef SDCCAST_H
+#define SDCCAST_H
 
 #include "SDCCglobl.h"
 #include "SDCCsymt.h"
@@ -32,7 +32,7 @@
 #include "SDCCmem.h"
 
 typedef enum {
-  EX_OP=0,
+  EX_OP = 0,
   EX_VALUE,
   EX_LINK,
   EX_OPERAND

@@ -1,3 +1,12 @@
+2010-12-06 Borut Razem <borut.razem AT siol.net>
+
+	* src/Makefile.in, src/SDCCmain.c, src/src.dsp,
+	  src/pic14/main.c, src/z80/main.c, src/pic16/main.c,
+	  src/ds390/main.c, src/SDCCsystem.c, src/SDCCsystem.h:
+	  support/Util/MySystem.[ch] moved / renamed src/SDCCsystem.[ch]
+	* src/SDCCargs.h, src/SDCCasm.h, src/SDCCast.h:
+	  cosmetic changes
+
 2010-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdio.h,

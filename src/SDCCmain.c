@@ -36,7 +36,7 @@
 #include "dbuf_string.h"
 #include "SDCCerr.h"
 #include "BuildCmd.h"
-#include "MySystem.h"
+#include "SDCCsystem.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
 #include "SDCCdebug.h"

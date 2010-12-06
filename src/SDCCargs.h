@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  SDCCmain.c - main file
+  SDCCargs.c - command line arguments handling
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 

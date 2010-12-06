@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-  MySystem - SDCC Support function
+  SDCCsystem - SDCC system & pipe functions
 
-             Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+             Written By - Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -37,7 +37,7 @@
 #include <ctype.h>
 #include "SDCCglobl.h"
 #include "SDCCutil.h"
-#include "MySystem.h"
+#include "SDCCsystem.h"
 #include "newalloc.h"
 
 

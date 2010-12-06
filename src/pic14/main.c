@@ -5,7 +5,7 @@
     it easier to set a breakpoint using the debugger.
 */
 #include "common.h"
-#include "MySystem.h"
+#include "SDCCsystem.h"
 #include "SDCCmacro.h"
 
 #include "device.h"

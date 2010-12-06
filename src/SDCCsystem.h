@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-  MySystem - SDCC Support function
+  SDCCsystem - SDCC system & pipe functions
 
-             Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+             Written By - Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -22,8 +22,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#ifndef __MYSYSTEM_H
-#define __MYSYSTEM_H
+#ifndef SDCCSYSTEM_H
+#define SDCCSYSTEM_H
 
 #include <stdio.h>
 #include "SDCCset.h"

@@ -25,7 +25,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
-#include "MySystem.h"
+#include "SDCCsystem.h"
 #include "main.h"
 #include "ralloc.h"
 #include "device.h"

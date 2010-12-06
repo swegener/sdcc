@@ -104,10 +104,6 @@ SOURCE=..\support\Util\dbuf_string.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\support\Util\MySystem.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\support\Util\NewAlloc.c
 # End Source File
 # Begin Source File
@@ -245,6 +241,10 @@ SOURCE=.\SDCCsymt.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\SDCCsystem.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\SDCCutil.c
 # End Source File
 # Begin Source File
@@ -270,10 +270,6 @@ SOURCE=..\support\Util\dbuf.h
 # Begin Source File
 
 SOURCE=..\support\Util\dbuf_string.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\support\Util\MySystem.h
 # End Source File
 # Begin Source File
 
@@ -378,6 +374,10 @@ SOURCE=.\SDCCsymt.h
 # Begin Source File
 
 SOURCE=.\SDCCutil.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCsystem.h
 # End Source File
 # Begin Source File
 

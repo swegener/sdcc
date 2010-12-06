@@ -22,8 +22,8 @@
   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#ifndef ASM_PORT_INCLUDE
-#define ASM_PORT_INCLUDE
+#ifndef SDCCASM_H
+#define SDCCASM_H
 
 #include "dbuf.h"
 

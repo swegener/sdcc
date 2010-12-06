@@ -241,7 +241,7 @@ SOURCE=.\SDCCsymt.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\SDCCsystem.c
+SOURCE=.\SDCCsystem.c
 # End Source File
 # Begin Source File
 
@@ -373,11 +373,11 @@ SOURCE=.\SDCCsymt.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SDCCutil.h
+SOURCE=.\SDCCsystem.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SDCCsystem.h
+SOURCE=.\SDCCutil.h
 # End Source File
 # Begin Source File
 

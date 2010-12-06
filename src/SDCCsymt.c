@@ -2092,6 +2092,21 @@ computeType (sym_link * type1, sym_link * type2,
             /* promotion of some special cases */
             switch (op)
               {
+                case ':':
+                  /* Currently only the Z80 really supports _Bool */
+                  if(!TARGET_IS_Z80)
+                    break;
+                  /* Avoid unnecessary cast to _Bool if both operands are _Bool */
+                  if((IS_BOOL(etype1) || (IS_LITERAL(etype1) &&
+                    (floatFromVal (valFromType (etype1)) == 1.0 ||
+                    floatFromVal (valFromType (etype1)) == 0.0))) &&
+                    (IS_BOOL(etype2) || (IS_LITERAL(etype2) &&
+                    (floatFromVal (valFromType (etype2)) == 1.0 ||
+                    floatFromVal (valFromType (etype2)) == 0.0))))
+                    {
+                      SPEC_NOUN (reType) = V_BOOL;
+                    }
+                  break;
                 case '|':
                 case '^':
                   return computeTypeOr (etype1, etype2, reType);

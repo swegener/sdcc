@@ -1,3 +1,8 @@
+2010-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Optimized boolean ternary operator.
+
 2010-12-06 Borut Razem <borut.razem AT siol.net>
 
 	* src/Makefile.in, src/SDCCmain.c, src/src.dsp,

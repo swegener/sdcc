@@ -4856,12 +4856,13 @@ genCmp (operand * left, operand * right,
 {
   int size, offset = 0;
   unsigned long lit = 0L;
+  bool result_in_carry;
 
   /* if left & right are bit variables */
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      /* Cant happen on the Z80 */
+      /* Can't happen on the Z80 */
       wassertl (0, "Tried to compare two bits");
     }
   else
@@ -4869,19 +4870,19 @@ genCmp (operand * left, operand * right,
       /* Do a long subtract of right from left. */
       size = max (AOP_SIZE (left), AOP_SIZE (right));
 
-      if (size > 1 && IS_GB && requiresHL(AOP(right)) && requiresHL(AOP(left)))
+      // On the Gameboy we can't afford to adjust HL as it may trash the carry.
+      if (size > 1 && IS_GB && (requiresHL(AOP(right)) && requiresHL(AOP(left))))
         {
-          // On the Gameboy we can't afford to adjust HL as it may trash the carry.
           // Pull left into DE and right into HL
           aopGet (AOP(left), LSB, FALSE);
-          emit2 ("ld d,h");
-          emit2 ("ld e,l");
+          emit2 ("ld d, h");
+          emit2 ("ld e, l");
           aopGet (AOP(right), LSB, FALSE);
 
           while (size--)
             {
-              emit2 ("ld a,(de)");
-              emit2 ("%s a,(hl)", offset == 0 ? "sub" : "sbc");
+              emit2 ("ld a, (de)");
+              emit2 ("%s a, (hl)", offset == 0 ? "sub" : "sbc");
 
               if (size != 0)
                 {
@@ -4890,8 +4891,73 @@ genCmp (operand * left, operand * right,
                 }
               offset++;
             }
+          if(sign)
+            {
+              emit2("ld a, (de)");
+              emit2("ld d, a");
+              emit2("ld e, (hl)");
+            }
           spillPair (PAIR_HL);
-          goto release;
+          result_in_carry = TRUE;
+          goto fix;
+        }
+      else if (size > 1 && IS_GB && (requiresHL(AOP(right)) && !requiresHL(AOP(left))))
+        {
+          aopGet (AOP(right), LSB, FALSE);
+
+          while (size--)
+            {
+              emit2 ("ld a, %s", aopGet (AOP (left), offset, FALSE));
+              emit2 ("%s a, (hl)", offset == 0 ? "sub" : "sbc");
+
+              if (size != 0)
+                {
+                  emit2 ("inc hl");
+                }
+              offset++;
+            }
+          if(sign)
+            {
+              emit2("ld a, %s", aopGet (AOP (left), offset, FALSE));
+              emit2("ld d, a");
+              emit2("ld e, (hl)");
+            }
+          spillPair (PAIR_HL);
+          result_in_carry = TRUE;
+          goto fix;
+        }
+      else if (size > 1 && IS_GB && (!requiresHL(AOP(right)) && requiresHL(AOP(left))))
+        {
+          aopGet (AOP(left), LSB, FALSE);
+
+          while (size--)
+            {
+              emit2 ("ld a, (hl)");
+              emit2 ("%s a, %s", offset == 0 ? "sub" : "sbc", aopGet (AOP (right), offset, FALSE));
+
+              if (size != 0)
+                {
+                  emit2 ("inc hl");
+                }
+              offset++;
+            }
+          if(sign)
+            {  
+              emit2("ld d, (hl)");
+              emit2("ld a, %s", aopGet (AOP (right), offset, FALSE));
+              emit2("ld e, a");
+            }
+          spillPair (PAIR_HL);
+          result_in_carry = TRUE;
+          goto fix;
+        }
+
+      if(IS_GB && sign)
+        {
+          emit2 ("ld a, %s", aopGet (AOP (right), size - 1, FALSE));
+          emit2 ("ld e, a");
+          emit2 ("ld a, %s", aopGet (AOP (left), size - 1, FALSE));
+          emit2 ("ld d, a");
         }
 
       if (AOP_TYPE (right) == AOP_LIT)
@@ -4904,6 +4970,7 @@ genCmp (operand * left, operand * right,
                 {
                   /* No sign so it's always false */
                   _clearCarry();
+                  result_in_carry = TRUE;
                 }
               else
                 {
@@ -4916,15 +4983,12 @@ genCmp (operand * left, operand * right,
                     }
                   else
                     {
-                      if (!sign)
-                        {
-                          emit2 ("rlc a");
-                        }
                       if (ifx)
                         {
                           genIfxJump (ifx, "nc");
                           return;
                         }
+                      result_in_carry = FALSE;
                     }
                 }
               goto release;
@@ -4938,7 +5002,7 @@ genCmp (operand * left, operand * right,
         }
 
       _moveA (aopGet (AOP (left), offset, FALSE));
-      emit2 ("sub a,%s", aopGet (AOP (right), offset, FALSE));
+      emit2 ("sub a, %s", aopGet (AOP (right), offset, FALSE));
       size--;
       offset++;
 
@@ -4946,24 +5010,52 @@ genCmp (operand * left, operand * right,
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
           /* Subtract through, propagating the carry */
-          emit2 ("sbc a,%s", aopGet (AOP (right), offset, FALSE));
+          emit2 ("sbc a, %s", aopGet (AOP (right), offset, FALSE));
           offset++;
         }
 
-      if (sign && !IS_GB)
+fix:
+      /* There is no good signed compare in the Z80, so we need workarounds */
+      if (sign)
         {
-          symbol *tlbl = newiTempLabel (NULL);
-          /* check for overflow, have no idea how to do this on GBZ80 */
-          emit2 ("jp PO,!tlabel", tlbl->key + 100);
-          emit2 ("xor a,!immedbyte", 0x80); /* cpl would be faster, but the bug1757671 regression tests fails and I can't see why */
-          emitLabel (tlbl->key + 100);
+          if (!IS_GB) /* Directly check for overflow, can't be done on GBZ80 */
+            {
+              symbol *tlbl = newiTempLabel (NULL);
+              emit2 ("jp PO, !tlabel", tlbl->key + 100);
+              emit2 ("xor a, !immedbyte", 0x80);
+              emitLabel (tlbl->key + 100);
+              result_in_carry = FALSE;
+            }
+          else /* Do it the hard way */
+            {
+              /* Test if one operand is negative, while the other is not. If this is the
+                 case we can easily decide which one is greater, and we set/reset the carry
+                 flag. If not, then the unsigned compare gave the correct result and we
+                 don't change the carry flag. */
+              symbol *tlbl1 = newiTempLabel (NULL);
+              symbol *tlbl2 = newiTempLabel (NULL);
+              emit2 ("bit 7, e");
+              emit2 ("jp Z, !tlabel", tlbl1->key + 100);
+              emit2 ("bit 7, d");
+              emit2 ("jp NZ, !tlabel", tlbl2->key + 100);
+              emit2 ("cp a, a");
+              emit2 ("jp !tlabel", tlbl2->key + 100);
+              emitLabel (tlbl1->key + 100);
+              emit2 ("bit 7, d");
+              emit2 ("jp Z, !tlabel", tlbl2->key + 100);
+              emit2 ("scf");
+              emitLabel (tlbl2->key + 100);
+              result_in_carry = TRUE;
+            }
         }
+      else
+        result_in_carry = TRUE;
     }
 
 release:
   if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
     {
-      if (sign)
+      if (!result_in_carry)
         {
           /* Shift the sign bit up into carry */
           emit2 ("rlca");
@@ -4977,26 +5069,22 @@ release:
          code a little differently */
       if (ifx)
         {
-          if (sign)
+          if (!result_in_carry)
             {
-              if (IS_GB)
-                {
-                  emit2 ("rlca");
-                  genIfxJump (ifx, "c");
-                }
+              if(!IS_GB)
+                genIfxJump (ifx, "m");
               else
                 {
-                  genIfxJump (ifx, "m");
+                  emit2("rlca");
+                  genIfxJump (ifx, "c");
                 }
             }
           else
-            {
-              genIfxJump (ifx, "c");
-            }
+            genIfxJump (ifx, "c");
         }
       else
         {
-          if (sign)
+          if (!result_in_carry)
             {
               /* Shift the sign bit up into carry */
               emit2 ("rlca");

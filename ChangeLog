@@ -1,3 +1,7 @@
+2010-12-12 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/gen.c:
+	  Fixed signed comparison for gbz80.
+
 2010-12-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c:

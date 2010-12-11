@@ -1,8 +1,13 @@
-2010-12-12 Philipp Klaus Krause <pkk AT spth.de>
+2010-12-11 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic14/main.c:
+	  fixed bug #3135245: --use-non-free set the wrong dir for the lib
+
+2010-12-10 Philipp Klaus Krause <pkk AT spth.de>
 	* src/z80/gen.c:
 	  Fixed signed comparison for gbz80.
 
-2010-12-02 Philipp Klaus Krause <pkk AT spth.de>
+2010-12-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c:
 	  Optimized boolean ternary operator.

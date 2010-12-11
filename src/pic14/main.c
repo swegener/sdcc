@@ -276,12 +276,6 @@ _pic14_do_link (void)
     exit (1);
 }
 
-static const char *
-get_model (void)
-{
-  return "pic";
-}
-
 /* Globals */
 PORT pic_port =
 {
@@ -294,7 +288,7 @@ PORT pic_port =
     TRUE,           /* Emit glue around main */
     NO_MODEL,
     NO_MODEL,
-    get_model,
+    NULL,           /* model == target */
   },
   {
     _asmCmd,

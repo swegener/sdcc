@@ -657,7 +657,7 @@ _pic16_linkEdit (void)
    * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
    *
    */
-  sprintf (lfrm, "{linker} {incdirs} {lflags} -w -r -o {outfile} {user_ofile} {ofiles} {spec_ofiles} {libs}");
+  sprintf (lfrm, "{linker} {incdirs} {lflags} -w -r -o \"{outfile}\" \"{user_ofile}\" {ofiles} {spec_ofiles} {libs}");
 
   shash_add (&linkValues, "linker", pic16_linkCmd[0]);
 
@@ -672,14 +672,14 @@ _pic16_linkEdit (void)
   if (fullSrcFileName)
     {
       SNPRINTF (temp, sizeof (temp), "%s.o", fullDstFileName ? fullDstFileName : dstFileName);
-//    addSetHead (&relFilesSet, Safe_strdup(temp));
+//    addSetHead (&relFilesSet, Safe_strdup (temp));
       shash_add (&linkValues, "user_ofile", temp);
     }
 
   if (!pic16_options.no_crt)
     shash_add (&linkValues, "spec_ofiles", pic16_options.crt_name);
 
-  shash_add (&linkValues, "ofiles", joinStrSet (relFilesSet));
+  shash_add (&linkValues, "ofiles", joinStrSet (appendStrSet (relFilesSet, "\"", "\"")));
 
   if (!libflags.ignore)
     {
@@ -696,10 +696,10 @@ _pic16_linkEdit (void)
         }
 
       if (libflags.want_libdebug)
-        addSet(&libFilesSet, Safe_strdup("libdebug.lib"));
+        addSet(&libFilesSet, Safe_strdup ("libdebug.lib"));
     }
 
-  shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
+  shash_add (&linkValues, "libs", joinStrSet (appendStrSet (libFilesSet, "\"", "\"")));
 
   lcmd = msprintf(linkValues, lfrm);
 

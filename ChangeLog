@@ -1,4 +1,9 @@
-2010-13-11 Borut Razem <borut.razem AT siol.net>
+2010-12-14 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCdwarf2.c, src/SDCCset.c, src/pic16/pcode.c:
+	  fixed some defects, reported by Wipro DeepCheck static analysis tool
+
+2010-12-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic14/main.c, src/pic16/main.c:
 	  fixed bug #3113082: Filenames with spaces fail on pic backend

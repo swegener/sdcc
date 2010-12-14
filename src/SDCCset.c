@@ -446,15 +446,14 @@ elementsInSet (set * s)
 void *
 indexSet (set * s, int index)
 {
-  set *loop=s;
+  set *loop = s;
 
-  while(loop && index)
+  while (loop && index--)
     {
-      index--;
       loop = loop->next;
     }
 
-  return (loop->item);
+  return loop ? loop->item : NULL;
 }
 
 

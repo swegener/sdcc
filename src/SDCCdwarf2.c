@@ -1210,12 +1210,15 @@ dwMatchTagAttr (const void * tp1v, const void * tp2v)
 {
   const dwtag * tp1 = tp1v;
   const dwtag * tp2 = tp2v;
-  dwattr * ap1 = tp1->attribs;
-  dwattr * ap2 = tp2->attribs;
+  dwattr * ap1;
+  dwattr * ap2;
 
   if (!tp1 || !tp2)
     return 0;
     
+  ap1 = tp1->attribs;
+  ap2 = tp2->attribs;
+
   if (tp1->tag != tp2->tag)
     return 0;
   

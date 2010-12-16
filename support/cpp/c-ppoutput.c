@@ -165,8 +165,13 @@ scan_translation_unit (cpp_reader *pfile)
               || (print.prev == NULL && token->type == CPP_HASH))
             putc (' ', print.outf);
         }
-      else if (token->flags & PREV_WHITE)
-        putc (' ', print.outf);
+      else
+        {
+          if (token->flags & PREV_WHITE)
+            putc (' ', print.outf);
+          if (token->flags & IN_ASM)
+            fputs ("__endasm; __asm ", print.outf);
+        }
 
       avoid_paste = false;
       print.source = NULL;

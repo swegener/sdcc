@@ -1,3 +1,15 @@
+2010-12-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/cpp/c-ppoutput.c (scan_translation_unit): fix bug 1505956/1406219
+	* support/cpp/libcpp/include/cpplib.h: added IN_ASM
+	* support/cpp/libcpp/internal.h: added n__endasm to spec_nodes
+	* support/cpp/libcpp/lex.c (_cpp_process_line_notes): return int in_asm on
+	  continued inline asm lines,
+	  (_cpp_lex_direct): set/reset in_asm flag,
+	  (cpp_output_line): insert __endasm; __asm to fix bug 1505956/1406219
+	* support/cpp/libcpp/macro.c (macro_real_token_count): fixed warning
+	* support/cpp/sdcpp.c (sdcpp_init_options): init n__endasm
+
 2010-12-14 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCdwarf2.c, src/SDCCset.c, src/pic16/pcode.c:

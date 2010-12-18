@@ -196,7 +196,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              VOID    outgsd()
  *              VOID    outrb()
  *              VOID    outrw()
- *		VOID	outr11()
+ *              VOID    outr11()
  *              VOID    outsym()
  *              VOID    out_lb()
  *              VOID    out_lw()
@@ -784,8 +784,8 @@ outdot(void)
  *
  *      functions called:
  *              VOID    outbuf()        asout.c
- *		VOID	out_rw()	asout.c
- *		VOID	out_tw()	asout.c
+ *              VOID    out_rw()        asout.c
+ *              VOID    out_tw()        asout.c
  *
  *      side effects:
  *              Data and relocation buffers may be emptied and initialized.
@@ -809,9 +809,9 @@ outchk(int nt, int nr)
         }
 }
 
-/*)Function	VOID	outbuf(s)
+/*)Function     VOID    outbuf(s)
  *
- *		char *	s		"R" or "P" or ("I" illegal)
+ *              char *  s               "R" or "P" or ("I" illegal)
  *
  *      The function outbuf() will output any bufferred data
  *      and relocation information to the .REL file.  The output
@@ -827,7 +827,7 @@ outchk(int nt, int nr)
  *              FILE *  ofp             relocation output file handle
  *
  *      functions called:
- *		int	fprintf()	c_library
+ *              int     fprintf()       c_library
  *              VOID    out()           asout.c
  *
  *      side effects:
@@ -1064,7 +1064,7 @@ outsym(register struct sym *sp)
         register char *ptr;
 
         fprintf(ofp, "S ");
-	ptr = &sp->s_id[0];	/* JLH */
+        ptr = &sp->s_id[0];     /* JLH */
         fprintf(ofp, "%s", ptr );
         fprintf(ofp, " %s", sp->s_type==S_NEW ? "Ref" : "Def");
         if (xflag == 0) {
@@ -1383,43 +1383,43 @@ hibyte(int n)
  * This function is derived from outrw(), adding the parameter for the
  * 11 bit address.  This form of address is used only on the 8051 and 8048.
  */
-/*)Function	VOID	outr11(esp, op, r)
+/*)Function     VOID    outr11(esp, op, r)
  *
- *		expr *	esp		pointer to expr structure
- *		int	op		opcode
- *		int	r		relocation mode
+ *              expr *  esp             pointer to expr structure
+ *              int     op              opcode
+ *              int     r               relocation mode
  *
- *	The function outr11() processes a word of generated code
- *	in either absolute or relocatable format dependent upon
- *	the data contained in the expr structure esp.  If the
- *	.REL output is enabled then the appropriate information
- *	is loaded into the txt and rel buffers.  The code is output
- *	in a special format to the linker to allow relocation and
- *	merging of the opcode and an 11 bit paged address as required
- *	by the 8051 architecture.
+ *      The function outr11() processes a word of generated code
+ *      in either absolute or relocatable format dependent upon
+ *      the data contained in the expr structure esp.  If the
+ *      .REL output is enabled then the appropriate information
+ *      is loaded into the txt and rel buffers.  The code is output
+ *      in a special format to the linker to allow relocation and
+ *      merging of the opcode and an 11 bit paged address as required
+ *      by the 8051 architecture.
  *
- *	This function based on code by
- *		John L. Hartman
- *		jhartman@compuserve.com
+ *      This function based on code by
+ *              John L. Hartman
+ *              jhartman@compuserve.com
  *
- *	local variables:
- *		int	n		symbol/area reference number
- *		int *	relp		pointer to rel array
- *		int *	txtp		pointer to txt array
+ *      local variables:
+ *              int     n               symbol/area reference number
+ *              int *   relp            pointer to rel array
+ *              int *   txtp            pointer to txt array
  *
- *	global variables:
- *		sym	dot		defined as sym[0]
- *		int	oflag		-o, generate relocatable output flag
- *		int	pass		assembler pass number
- *		
- *	functions called:
- *		VOID	outchk()	asout.c
- *		VOID	out_lw()	asout.c
- *		VOID	out_rw()	asout.c
- *		VOID	out_tw()	asout.c
+ *      global variables:
+ *              sym     dot             defined as sym[0]
+ *              int     oflag           -o, generate relocatable output flag
+ *              int     pass            assembler pass number
+ *              
+ *      functions called:
+ *              VOID    outchk()        asout.c
+ *              VOID    out_lw()        asout.c
+ *              VOID    out_rw()        asout.c
+ *              VOID    out_tw()        asout.c
  *
- *	side effects:
- *		The current assembly address is incremented by 2.
+ *      side effects:
+ *              The current assembly address is incremented by 2.
  */
 VOID
 outr11(register struct expr *esp, int op, int r)

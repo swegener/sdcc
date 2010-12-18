@@ -87,7 +87,7 @@ sdas_init (char *path)
             {
               target = tgt[i].target;
               break;
-	    }
+            }
         }
     }
   /* diagnostic message */

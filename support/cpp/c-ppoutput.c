@@ -129,6 +129,8 @@ init_pp_output (FILE *out_stream)
   print.first_time = 1;
 }
 
+extern int in_asm;
+
 /* Writes out the preprocessed file, handling spacing and paste
    avoidance issues.  */
 static void
@@ -169,7 +171,7 @@ scan_translation_unit (cpp_reader *pfile)
         {
           if (token->flags & PREV_WHITE)
             putc (' ', print.outf);
-          if (token->flags & IN_ASM)
+          if ((token->flags & IN_ASM) || (in_asm && token->flags & PREV_NL))
             fputs ("__endasm; __asm ", print.outf);
         }
 

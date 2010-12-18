@@ -26,7 +26,7 @@ int as_strcmpi (const char *s1, const char *s2)
       c1 = tolower (*p1++);
       c2 = tolower (*p2++);
       if (c1 == '\0')
-	break;
+        break;
     }
   while (c1 == c2);
   
@@ -47,7 +47,7 @@ int as_strncmpi (const char *s1, const char *s2, size_t n)
       c1 = tolower (*p1++);
       c2 = tolower (*p2++);
       if (c1 == '\0')
-	break;
+        break;
     }
   while ((c1 == c2) && --n);
 

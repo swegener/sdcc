@@ -66,7 +66,7 @@ static tokenrun *next_tokenrun (tokenrun *);
 
 static _cpp_buff *new_buff (size_t);
 
-static int in_asm = 0;
+int in_asm = 0;
 
 /* Utility routine:
 
@@ -295,7 +295,7 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
               buffer->next_line = buffer->rlimit;
             }
 
-          ret = in_asm;
+          ret = in_asm | PREV_NL;
 
           buffer->line_base = note->pos;
           CPP_INCREMENT_LINE (pfile, 0);
@@ -2465,7 +2465,7 @@ cpp_output_line (cpp_reader *pfile, FILE *fp)
       token = cpp_get_token (pfile);
       if (token->flags & PREV_WHITE)
         putc (' ', fp);
-      if (token->flags & IN_ASM)
+      if ((token->flags & IN_ASM) || (in_asm && token->flags & PREV_NL))
         fputs ("__endasm; __asm ", fp);
     }
 

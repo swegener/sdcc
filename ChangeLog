@@ -1,3 +1,25 @@
+2010-12-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as8051/i51adr.c,
+	* sdas/as8051/i51ext.c,
+	* sdas/as8051/i51mch.c,
+	* sdas/as8051/i51pst.c,
+	* sdas/as8051/i8051.h,
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asdbg.c,
+	* sdas/asxxsrc/aslex.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asout.c,
+	* sdas/asxxsrc/assubr.c,
+	* sdas/asxxsrc/assym.c,
+	* sdas/asxxsrc/asxxxx.h,
+	* sdas/asxxsrc/sdas.c,
+	* sdas/asxxsrc/strcmpi.c: cosmetic, replaced tabs with spaces
+	* sdas/asxxsrc/asmain.c (asmbl): error on multiple mnemonics on one line
+	* support/cpp/libcpp/include/cpplib.h: added PREV_NL
+	* support/cpp/libcpp/lex.c (_cpp_process_line_notes, cpp_output_line),
+	* support/cpp/c-ppoutput.c (scan_translation_unit): fix macros w/o __asm
+
 2010-12-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/cpp/c-ppoutput.c (scan_translation_unit): fix bug 1505956/1406219

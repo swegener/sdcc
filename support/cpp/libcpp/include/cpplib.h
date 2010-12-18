@@ -182,6 +182,7 @@ struct GTY(()) cpp_string {
                                     operator, or before this token
                                     after a # operator.  */
 #define IN_ASM          (1 <<10) /* inside an __asm __endasm pair.  */
+#define PREV_NL         (1 <<11) /* If a newline before this token.  */
 
 /* Specify which field, if any, of the cpp_token union is used.  */
 

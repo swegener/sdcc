@@ -63,14 +63,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      The function getid() scans the current assembler-source text line
  *      from the current position copying the next LETTER | DIGIT string
  *      into the external string buffer (id).  The string ends when a non
- *	LETTER or DIGIT character is found. The maximum number of characters
- *	copied is NCPS-1.  If the input string is larger than NCPS-1
- *	characters then the string is truncated.  The string is always
- *	NULL terminated.  If the mode argument (c) is >=0 then (c) is
- *	the first character copied to the string buffer, if (c) is <0
- *	then intervening white space (SPACES and TABS) are skipped and
- *	the first character found must be a LETTER else a 'q' error
- *	terminates the parse of this assembler-source text line.
+ *      LETTER or DIGIT character is found. The maximum number of characters
+ *      copied is NCPS-1.  If the input string is larger than NCPS-1
+ *      characters then the string is truncated.  The string is always
+ *      NULL terminated.  If the mode argument (c) is >=0 then (c) is
+ *      the first character copied to the string buffer, if (c) is <0
+ *      then intervening white space (SPACES and TABS) are skipped and
+ *      the first character found must be a LETTER else a 'q' error
+ *      terminates the parse of this assembler-source text line.
  *
  *      local variables:
  *              char *  p               pointer to external string buffer
@@ -127,9 +127,9 @@ char *id;
  *      The function getst() scans the current assembler-source text line
  *      from the current position copying the next character string into
  *      the external string buffer (id).  The string ends when a SPACE or
- *	ILL character is found. The maximum number of characters copied is
- *	NCPS-1.  If the input string is larger than NCPS-1 characters then
- *	the string is truncated.  The string is always NULL terminated.
+ *      ILL character is found. The maximum number of characters copied is
+ *      NCPS-1.  If the input string is larger than NCPS-1 characters then
+ *      the string is truncated.  The string is always NULL terminated.
  *      If the mode argument (c) is >=0 then (c) is the first character
  *      copied to the string buffer, if (c) is <0 then intervening white
  *      space (SPACES and TABS) are skipped and the first character found
@@ -364,47 +364,47 @@ int d;
         return (c);
 }
 
-/*)Function	int	comma(flag)
+/*)Function     int     comma(flag)
  *
- *		int	flag		when flag is non zero a 'q' error is
- *					generated if a COMMA is not found.
+ *              int     flag            when flag is non zero a 'q' error is
+ *                                      generated if a COMMA is not found.
  *
- *	The function comma() skips SPACEs and TABs and returns
- *	a '1' if the next character is a COMMA else a '0' is
- *	returned.  If a COMMA is not found and flag is non zero
- *	then a 'q' error is reported.
+ *      The function comma() skips SPACEs and TABs and returns
+ *      a '1' if the next character is a COMMA else a '0' is
+ *      returned.  If a COMMA is not found and flag is non zero
+ *      then a 'q' error is reported.
  *
- *	local variables:
- *		int	c		last character read from
- *					assembler-source text line
+ *      local variables:
+ *              int     c               last character read from
+ *                                      assembler-source text line
  *
- *	global variables:
- *		none
+ *      global variables:
+ *              none
  *
- *	called functions:
- *		int	getnb()		aslex.c
- *		VOID	qerr()		assubr.c
- *		VOID	unget()		aslex.c
+ *      called functions:
+ *              int     getnb()         aslex.c
+ *              VOID    qerr()          assubr.c
+ *              VOID    unget()         aslex.c
  *
- *	side effects:
- *		assembler-source text line pointer updated
+ *      side effects:
+ *              assembler-source text line pointer updated
  */
 
 int
 comma(flag)
 int flag;
 {
-	int c;
+        int c;
 
-	if ((c = getnb()) != ',') {
-		if (flag) {
-			qerr();
-		} else {
-			unget(c);
-		}
-		return(0);
-	}
-	return(1);
+        if ((c = getnb()) != ',') {
+                if (flag) {
+                        qerr();
+                } else {
+                        unget(c);
+                }
+                return(0);
+        }
+        return(1);
 }
 
 /*)Function     int     as_getline()

@@ -28,20 +28,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 
 struct adsym reg51[] = {        /* R0 thru R7 registers */
-    {	"R0",	R0	},
-    {	"R1",	R1	},
-    {	"R2",	R2	},
-    {	"R3",	R3	},
-    {	"R4",	R4	},
-    {	"R5",	R5	},
-    {	"R6",	R6	},
-    {	"R7",	R7	},
-    {	"A",	A	},
-    {	"DPTR", DPTR	},
-    {	"PC",	PC	},
-    {	"C",	C	},
-    {	"AB",	AB	},
-    {	"",	0x00	}
+    {   "R0",   R0      },
+    {   "R1",   R1      },
+    {   "R2",   R2      },
+    {   "R3",   R3      },
+    {   "R4",   R4      },
+    {   "R5",   R5      },
+    {   "R6",   R6      },
+    {   "R7",   R7      },
+    {   "A",    A       },
+    {   "DPTR", DPTR    },
+    {   "PC",   PC      },
+    {   "C",    C       },
+    {   "AB",   AB      },
+    {   "",     0x00    }
 };
 
 /*  Classify argument as to address mode */
@@ -93,16 +93,16 @@ struct expr *esp;
                 esp->e_base.e_ap = NULL;
         }
         else if (c == '*') {
-		if ((c = getnb()) == '/') {
-			/* Force inverted bit */
-			expr(esp, 0);
-			esp->e_mode = S_NOT_BIT;
-		} else {
-			unget(c);
-			/* Force direct page */
-			expr(esp, 0);
-			esp->e_mode = S_DIR;
-		}
+                if ((c = getnb()) == '/') {
+                        /* Force inverted bit */
+                        expr(esp, 0);
+                        esp->e_mode = S_NOT_BIT;
+                } else {
+                        unget(c);
+                        /* Force direct page */
+                        expr(esp, 0);
+                        esp->e_mode = S_DIR;
+                }
                 if (esp->e_addr & ~0xFF)
                         err('d');
         }
@@ -164,7 +164,7 @@ register struct adsym *sp;
         register int i;
         unget(getnb());
         i = 0;
-	while ( *(ptr = &sp[i].a_str[0]) ) {
+        while ( *(ptr = &sp[i].a_str[0]) ) {
                 if (srch(ptr)) {
                         return(sp[i].a_val);
                 }
@@ -184,12 +184,12 @@ char *str;
         ptr = ip;
 
         while (*ptr && *str) {
-		if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
+                if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
                         break;
                 ptr++;
                 str++;
         }
-	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
+        if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
                 ip = ptr;
                 return(1);
         }

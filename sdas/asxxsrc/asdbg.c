@@ -112,4 +112,3 @@ DefineSDCC_Line (void)
   pSym->s_addr = laddr;
   pSym->s_flag |= S_GBL;
 }
-

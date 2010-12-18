@@ -25,6 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "asxxxx.h"
 #include "i8051.h"
 
-char	*cpu	= "Intel 8051";
-int	hilo	= 1;
-char	*dsft	= "asm";
+char    *cpu    = "Intel 8051";
+int     hilo    = 1;
+char    *dsft   = "asm";

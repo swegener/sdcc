@@ -19,6 +19,7 @@
 	* support/cpp/libcpp/include/cpplib.h: added PREV_NL
 	* support/cpp/libcpp/lex.c (_cpp_process_line_notes, cpp_output_line),
 	* support/cpp/c-ppoutput.c (scan_translation_unit): fix macros w/o __asm
+	* support/regression/tests/bug1505956.c: new, added
 
 2010-12-16 Maarten Brock <sourceforge.brock AT dse.nl>
 

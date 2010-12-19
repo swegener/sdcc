@@ -1210,8 +1210,13 @@ loop:
                 /* end sdas hc08 specific */
         }
 
-        if ((c=endline()) != 0) {
-                err('q');
+        if (is_sdas()) {
+                if ((c = endline()) != 0) {
+                        err('q');
+                }
+        }
+        else {
+                goto loop;
         }
 }
 

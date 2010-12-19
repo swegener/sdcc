@@ -12,6 +12,7 @@
 	* debugger/mcs51/sdcdb.h: include sdcc_vc.h or sdcccon.h
 	* debugger/mcs51/sdcdb.dsp: new, added
 	* sdcc.dsw: added sdcdb.dsp
+	* sdas/asxxsrc/asmain.c (asmbl): error only if is_sdas()
 
 2010-12-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

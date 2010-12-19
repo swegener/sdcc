@@ -63,7 +63,7 @@ static memcache_t memCache[NMEM_CACHE];
 /*-----------------------------------------------------------------*/
 /* get data from  memory cache/ load cache from simulator          */
 /*-----------------------------------------------------------------*/
-static char *getMemCache(unsigned int addr,int cachenum, int size)
+static char *getMemCache(unsigned int addr,int cachenum, unsigned int size)
 {
     char *resp, *buf;
     unsigned int laddr;
@@ -161,7 +161,8 @@ static void init_winsock(void)
         int iResult;
 
         // Initialize Winsock
-        if (0 != WSAStartup(MAKEWORD(2,2), &wsaData))
+        iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+        if (0 != iResult)
         {
             fprintf(stderr, "WSAStartup failed: %d\n", iResult);
             exit(1);
@@ -253,7 +254,7 @@ void openSimulator (char **args, int nargs)
         exit(1);
     }
 
-    fh = _open_osfhandle((intptr_t)sock, _O_TEXT);
+    fh = _open_osfhandle(sock, _O_TEXT);
     if (-1 == fh)
     {
         perror("cannot _open_osfhandle");
@@ -267,7 +268,7 @@ void openSimulator (char **args, int nargs)
         exit(1);
     }
 
-    fh = _open_osfhandle((intptr_t)sock, _O_TEXT);
+    fh = _open_osfhandle(sock, _O_TEXT);
     if (-1 == fh)
     {
         perror("cannot _open_osfhandle");
@@ -399,7 +400,7 @@ void sendSim(char *s)
 
 
 static int getMemString(char *buffer, char wrflag,
-                        unsigned int *addr, char mem, int size )
+                        unsigned int *addr, char mem, unsigned int size )
 {
     int cachenr = NMEM_CACHE;
     char *prefix;
@@ -469,9 +470,10 @@ void simSetPC( unsigned int addr )
     simResponse();
 }
 
-int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
+int simSetValue (unsigned int addr,char mem, unsigned int size, unsigned long val)
 {
-    char cachenr, i;
+    unsigned int i;
+    char cachenr;
     char buffer[40];
     char *s;
 
@@ -501,7 +503,7 @@ int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
 /*-----------------------------------------------------------------*/
 /* simGetValue - get value @ address for mem space                 */
 /*-----------------------------------------------------------------*/
-unsigned long simGetValue (unsigned int addr,char mem, int size)
+unsigned long simGetValue (unsigned int addr,char mem, unsigned int size)
 {
     unsigned int b[4] = {0,0,0,0}; /* can be a max of four bytes long */
     char cachenr;
@@ -550,7 +552,7 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
     }
     else
     {
-        int i;
+        unsigned int i;
 
         for (i = 0 ; i < size ; i++ )
         {

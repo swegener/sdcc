@@ -36,6 +36,8 @@
 #endif  /* HAVE_LIBREADLINE */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#elif defined _WIN32
+#include <direct.h>
 #endif
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
@@ -1915,6 +1917,8 @@ static void parseCmdLine (int argc, char **argv)
             fprintf(stderr,"unknown option %s --- ignored\n", argv[i]);
 
         } else {
+            FILE* file;
+
             /* must be file name */
             if (filename) {
                 fprintf(stderr,"too many filenames .. parameter '%s' ignored\n",
@@ -1922,16 +1926,17 @@ static void parseCmdLine (int argc, char **argv)
                 continue ;
             }
 
-            if (-1 != access(argv[i], 0)) {
+            file = fopen(argv[i], "r");
+            if (file) {
                 /* file exists: strip the cdb or ihx extension */
                 char *p = strrchr(argv[i], '.');
 
+                fclose(file);
                 if (NULL != p &&
                     (0 == strcmp(p, ".cdb") || 0 == strcmp(p, ".ihx")))
                     *p = '\0';
             }
             filename = argv[i];
-
         }
     }
 
@@ -1939,7 +1944,7 @@ static void parseCmdLine (int argc, char **argv)
         cmdFile(filename,NULL);
 
     if (verbose)
-	printf("+ %s\n", argsToCmdLine(simArgs, nsimArgs));
+        printf("+ %s\n", argsToCmdLine(simArgs, nsimArgs));
 }
 
 /*-----------------------------------------------------------------*/

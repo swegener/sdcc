@@ -47,7 +47,13 @@ extern int sdcdbDebug;
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#elif defined(_WIN32) && !defined(__MINGW32__)
+# include "sdcc_vc.h"
+#else
+# include "sdccconf.h"
+#endif
 #include "src/SDCCset.h"
 #include "src/SDCChasht.h"
 

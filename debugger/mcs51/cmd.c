@@ -2612,8 +2612,8 @@ static int printOrSetSymValue (symbol *sym, context *cctxt,
     static int stack = 1;
         symbol *fields;
     st_link *type;
-    unsigned int  addr;
-    int size, n;
+    unsigned int  addr, size;
+    int n;
     char *s, *s2;
     char save_ch, save_ch2;
 

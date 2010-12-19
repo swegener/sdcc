@@ -47,8 +47,8 @@
 
 typedef struct _memcache
 {
-    int addr;
-    int size;
+    unsigned int addr;
+    unsigned int size;
     char buffer[MAX_CACHE_SIZE];
 } memcache_t;
 
@@ -71,6 +71,6 @@ void  simLoadFile(char *);
 void  simReset ();
 char  *simRegs() ;
 unsigned int simGoTillBp (unsigned int);
-unsigned long simGetValue (unsigned int ,char , int );
-int simSetValue (unsigned int ,char , int, unsigned long );
+unsigned long simGetValue (unsigned int ,char , unsigned int );
+int simSetValue (unsigned int ,char , unsigned int, unsigned long );
 #endif

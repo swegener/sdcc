@@ -1,3 +1,9 @@
+2010-12-19 Borut Razem <borut.razem AT siol.net>
+
+	* src/ds390/main.c, src/Makefile.in, src/SDCCbuild_cmd.c,
+	  src/SDCCbuild_cmd.h, src/SDCCmain.c, src/src.dsp, src/z80/main.c:
+	  support/Util/BuildCmed.[ch] moved / renamed to src/SDCCbuild_cmd.[ch]
+
 2010-12-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/cmd.c (printOrSetSymValue),
@@ -67,6 +73,7 @@
 	  fixed bug #3135245: --use-non-free set the wrong dir for the lib
 
 2010-12-10 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fixed signed comparison for gbz80.
 

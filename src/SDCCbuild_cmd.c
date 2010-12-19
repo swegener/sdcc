@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  BuildCmd - SDCC Support function
+  SDCCbuild_cmd.c - SDCC Support function
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
@@ -28,7 +28,7 @@
 #include <string.h>
 #include <assert.h>
 #include "SDCCset.h"
-#include "BuildCmd.h"
+#include "SDCCbuild_cmd.h"
 
 void
 buildCmdLine (char *into, const char **cmds,

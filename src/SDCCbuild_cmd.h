@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  BuildCmd - SDCC Support function
+  SDCCbuild_cmd.h - SDCC Support function
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
@@ -22,8 +22,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#ifndef __BUILDCMD_H
-#define __BUILDCMD_H
+#ifndef SDCCBUILD_CMD_H
+#define SDCCBUILD_CMD_H
 
 void
 buildCmdLine (char *into, const char **cmds,

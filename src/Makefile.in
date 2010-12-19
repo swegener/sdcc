@@ -25,9 +25,9 @@ ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"
 endif
 
-SLIBOBJS	= NewAlloc.o BuildCmd.o dbuf.o dbuf_string.o findme.o
+SLIBOBJS	= NewAlloc.o dbuf.o dbuf_string.o findme.o
 
-OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
+OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o SDCCbuild_cmd.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \

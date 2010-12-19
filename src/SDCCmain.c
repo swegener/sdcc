@@ -35,7 +35,7 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 #include "SDCCerr.h"
-#include "BuildCmd.h"
+#include "SDCCbuild_cmd.h"
 #include "SDCCsystem.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"

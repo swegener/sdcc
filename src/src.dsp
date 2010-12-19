@@ -88,10 +88,6 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\support\Util\BuildCmd.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\cdbFile.c
 # End Source File
 # Begin Source File
@@ -154,6 +150,10 @@ SOURCE=.\SDCCBBlock.c
 # Begin Source File
 
 SOURCE=.\SDCCbitv.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCbuild_cmd.c
 # End Source File
 # Begin Source File
 
@@ -298,6 +298,10 @@ SOURCE=.\SDCCBBlock.h
 # Begin Source File
 
 SOURCE=.\SDCCbitv.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCbuild_cmd.h
 # End Source File
 # Begin Source File
 

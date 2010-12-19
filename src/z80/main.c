@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include "z80.h"
 #include "SDCCsystem.h"
-#include "BuildCmd.h"
+#include "SDCCbuild_cmd.h"
 #include "SDCCutil.h"
 #include "SDCCargs.h"
 #include "dbuf_string.h"

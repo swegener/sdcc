@@ -2007,17 +2007,17 @@ setsignals()
 
 int main ( int argc, char **argv)
 {
-    /* parse command line */
-    parseCmdLine(argc,argv);
-
-    printVersionInfo();
-    printHelp();
-    printf("WARNING: SDCDB is EXPERIMENTAL.\n");
-
     simArgs[nsimArgs++] = "s51";
     simArgs[nsimArgs++] = "-P";
     simArgs[nsimArgs++] = "-r";
     simArgs[nsimArgs++] = "9756";
+
+    /* parse command line */
+    parseCmdLine(argc, argv);
+
+    printVersionInfo();
+    printHelp();
+    printf("WARNING: SDCDB is EXPERIMENTAL.\n");
 
     setsignals();
 

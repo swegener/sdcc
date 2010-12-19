@@ -7,7 +7,8 @@
 	  (init_winsock): fixed uninitialized iResult,
 	  (openSimulator): removed intptr_t cast
 	* debugger/mcs51/sdcdb.c: include <direct.h> for chdir(),
-	  (parseCmdLine): access() is not portable, replaced with fopen/fclose
+	  (parseCmdLine): access() is not portable, replaced with fopen/fclose,
+	  (main): fixed bug 3137466
 	* debugger/mcs51/sdcdb.h: include sdcc_vc.h or sdcccon.h
 	* debugger/mcs51/sdcdb.dsp: new, added
 	* sdcc.dsw: added sdcdb.dsp

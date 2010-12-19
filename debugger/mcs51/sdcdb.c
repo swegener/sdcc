@@ -431,41 +431,58 @@ static int readCdb (FILE *file)
 /*-----------------------------------------------------------------*/
 char *searchDirsFname (char *fname)
 {
-    char *dirs , *sdirs;
-    FILE *rfile = NULL;
-    char buffer[128];
+  char *dirs , *sdirs;
+  FILE *rfile = NULL;
+  char buffer[128];
 
-    /* first try the current directory */
-    if ((rfile = fopen(fname,"r"))) {
-        fclose(rfile);
-        return strdup(fname) ;
+  /* first try the current directory */
+  if ((rfile = fopen(fname, "r")))
+    {
+      fclose(rfile);
+      return strdup(fname) ;
     }
 
-    if (!ssdirl)
-        return strdup(fname);
+  if (!ssdirl)
+      return strdup(fname);
 
-    /* make a copy of the source directories */
-    dirs = sdirs = strdup(ssdirl);
+  /* make a copy of the source directories */
+  dirs = sdirs = strdup(ssdirl);
 
-    /* assume that the separator is ':'
-       and try for each directory in the search list */
-    dirs = strtok(dirs,":");
-    while (dirs) {
-        if (dirs[strlen(dirs)] == '/')
-            sprintf(buffer,"%s%s",dirs,fname);
-        else
-            sprintf(buffer,"%s/%s",dirs,fname);
-        if ((rfile = fopen(buffer,"r")))
-            break ;
-        dirs = strtok(NULL,":");
+  /* assume that the separator is ':'
+     and try for each directory in the search list */
+  dirs = strtok(dirs, ":");
+  while (dirs)
+    {
+      if (dirs[strlen(dirs)] == '/')
+          sprintf(buffer, "%s%s", dirs, fname);
+      else
+          sprintf(buffer, "%s/%s", dirs, fname);
+      if ((rfile = fopen(buffer, "r")))
+          break;
+      dirs = strtok(NULL, ":");
     }
 
-    free(sdirs);
-    if (rfile) {
-        fclose(rfile);
-        return strdup(buffer);
-    } else
-        return strdup(fname);
+  free(sdirs);
+  if (rfile)
+    {
+      fclose(rfile);
+      return strdup(buffer);
+    }
+  else //not found
+    {
+      char *p, *found;
+
+//      sprintf(buffer, "%s", fname);
+      p = fname;
+      while (NULL != (p = strchr(p, '_')))
+        {
+          *p = '.'; // try again with '_' replaced by '.'
+          if (NULL != (found = searchDirsFname(fname)))
+            return found;
+          *p = '_'; // not found, restore '_' and try next '_'
+        }
+    }
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -498,7 +515,6 @@ FILE *searchDirsFopen(char *fname)
 
     free(sdirs);
     return rfile ;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -510,7 +526,6 @@ srcLine **loadFile (char *name, int *nlines)
     char buffer[512];
     char *bp;
     srcLine **slines = NULL;
-
 
     if (!(mfile = searchDirsFopen(name))) {
         fprintf(stderr,"sdcdb: cannot open module %s -- use '--directory=<source directory> option\n",name);
@@ -551,16 +566,13 @@ static void loadModules (void)
             currMod = parseModule(loop->line, TRUE);
             currModName = currMod->name ;
 
+            /* search the c source file and load it into buffer */
             currMod->cfullname = searchDirsFname(currMod->c_name);
-
-            /* load it into buffer */
-            currMod->cLines = loadFile (currMod->c_name,
-            &currMod->ncLines);
+            currMod->cLines = loadFile (currMod->c_name, &currMod->ncLines);
 
             /* do the same for the assembler file */
             currMod->afullname = searchDirsFname(currMod->asm_name);
-            currMod->asmLines=loadFile (currMod->asm_name,
-                &currMod->nasmLines);
+            currMod->asmLines = loadFile (currMod->asm_name, &currMod->nasmLines);
             break;
 
         /* if this is a function record */

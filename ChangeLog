@@ -13,6 +13,8 @@
 	* debugger/mcs51/sdcdb.dsp: new, added
 	* sdcc.dsw: added sdcdb.dsp
 	* sdas/asxxsrc/asmain.c (asmbl): error only if is_sdas()
+	* debugger/mcs51/sdcdb.c (searchDirsFname): retry with '_' replaced
+	  with '.'
 
 2010-12-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

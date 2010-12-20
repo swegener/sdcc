@@ -961,163 +961,196 @@ int cmdDisasmF(char *s, context *cctxt)
 
 static int commonSetUserBp(char *s, context *cctxt, char bpType)
 {
-    char *bp ;
-    function *func = NULL;
+  char *bp ;
+  function *func = NULL;
 
-    /* user break point location specification can be of the following
-       forms
-       a) <nothing>        - break point at current location
-       b) lineno           - number of the current module
-       c) filename:lineno  - line number of the given file
-       e) filename:function- function X in file Y (useful for static functions)
-       f) function         - function entry point
-       g) *addr            - break point at address
-    */
+  /* user break point location specification can be of the following
+     forms
+     a) <nothing>        - break point at current location
+     b) lineno           - number of the current module
+     c) filename:lineno  - line number of the given file
+     e) filename:function- function X in file Y (useful for static functions)
+     f) function         - function entry point
+     g) *addr            - break point at address
+  */
 
-    if (!cctxt) {
-        fprintf(stdout,"No symbol table is loaded.  Use the \"file\" command.\n");
-        return 0;
-    }
-    /* trim left and right */
-    s = trim(s);
-
-    /* case a) nothing */
-    /* if nothing given then current location : we know
-       the current execution location from the currentContext */
-    if (! *s ) {
-
-        /* if current context is known */
-        if (cctxt->func) {
-        Dprintf(D_break, ("commonSetUserBp: a) cctxtaddr:%x \n",cctxt->addr));
-            if (srcMode == SRC_CMODE)
-                /* set the break point */
-                setBreakPoint ( cctxt->addr , CODE , bpType , userBpCB ,
-                                cctxt->func->mod->c_name, cctxt->cline);
-            else
-                setBreakPoint ( cctxt->addr , CODE , bpType , userBpCB ,
-                                cctxt->func->mod->asm_name, cctxt->asmline);
-
-        }
-        else
-            fprintf(stderr,"No default breakpoint address now.\n");
-
-        goto ret ;
-    }
-    /* case g) *addr */
-    if ( *s == '*' && isdigit(*(s+1)))
+  if (!cctxt)
     {
-        int  line   = 0;
-        long braddr = strtol(s+1,0,0);
-        if (!applyToSet(functions,funcInAddr,braddr,&func))
-        {
-            module *modul;
-            if (!applyToSet(modules,moduleLineWithAddr,braddr,&modul,&line))
-            {
-                fprintf(stderr,"Address 0x%08lx not exists in code.\n",braddr);
-            }
-            else
-            {
-                Dprintf(D_break, ("commonSetUserBp: g) addr:%lx \n",braddr));
-                setBreakPoint ( braddr , CODE , bpType , userBpCB ,
-                            modul->c_name,line);
-            }
-            goto ret ;
-        }
-                else
-        {
-            int line = func->exitline;
-            if ( !applyToSet(func->cfpoints,lineAtAddr,braddr,
-                                  &line,NULL,NULL))
-                applyToSet(func->cfpoints,lineNearAddr,braddr,&line,NULL,NULL);
-            setBreakPoint ( braddr , CODE , bpType , userBpCB ,
-                            func->mod->c_name,line);
-        }
-        goto ret ;
+      fprintf (stdout, "No symbol table is loaded.  Use the \"file\" command.\n");
+      return 0;
     }
-    /* case b) lineno */
-    /* check if line number */
-    if ( !strchr(s,':') && isdigit(*s)) {
-        /* get the lineno */
-        int line = atoi(s) -1;
-    Dprintf(D_break, ("commonSetUserBp: b) line:%d \n",line));
-    if ( line < 0 )
+  /* trim left and right */
+  s = trim(s);
+
+  /* case a) nothing */
+  /* if nothing given then current location : we know
+     the current execution location from the currentContext */
+  if (! *s )
     {
-                fprintf(stdout,"linenumber <= 0\n");
-        goto ret;
+      /* if current context is known */
+      if (cctxt->func)
+        {
+          Dprintf (D_break, ("commonSetUserBp: a) cctxtaddr:%x \n", cctxt->addr));
+          if (srcMode == SRC_CMODE)
+            {
+              /* set the break point */
+              setBreakPoint (cctxt->addr, CODE, bpType, userBpCB,
+                             cctxt->func->mod->c_name, cctxt->cline);
+            }
+          else
+            {
+              setBreakPoint (cctxt->addr, CODE, bpType, userBpCB,
+                             cctxt->func->mod->asm_name, cctxt->asmline);
+            }
+        }
+      else
+        {
+          fprintf(stderr, "No default breakpoint address now.\n");
+        }
+
+      goto ret;
     }
-        /* if current context not present then we must get the module
-           which has main & set the break point @ line number provided
-           of that module : if current context known then set the bp
-           at the line number given for the current module
-        */
-        if (cctxt->func) {
-            if (!cctxt->func->mod) {
-                if (!applyToSet(functions,funcWithName,"main"))
-                    fprintf(stderr,"Function \"main\" not defined.\n");
-                else
-                    setBPatModLine(func->mod,line, bpType);
-            } else
-                setBPatModLine(cctxt->func->mod,line, bpType);
-        } else {
-                if (list_mod) {
-                        setBPatModLine(list_mod,line, bpType);
-                } else {
-                  fprintf(stdout,"Sdcdb fails to have module symbol context at %d\n", __LINE__);
+  /* case g) *addr */
+  if (*s == '*' && isdigit(*(s+1)))
+    {
+      int  line   = 0;
+      long braddr = strtol(s+1, 0, 0);
+      if (!applyToSet (functions, funcInAddr, braddr, &func))
+        {
+          module *modul;
+          if (!applyToSet (modules, moduleLineWithAddr, braddr, &modul, &line))
+            {
+              fprintf (stderr, "Address 0x%08lx not exists in code.\n", braddr);
+            }
+          else
+            {
+              Dprintf (D_break, ("commonSetUserBp: g) addr:%lx \n", braddr));
+              setBreakPoint (braddr, CODE, bpType, userBpCB, modul->c_name, line);
+            }
+          goto ret;
+        }
+      else
+        {
+          int line = func->exitline;
+          if (!applyToSet (func->cfpoints, lineAtAddr, braddr, &line, NULL, NULL))
+            {
+              applyToSet (func->cfpoints, lineNearAddr, braddr, &line, NULL, NULL);
+            }
+          setBreakPoint (braddr, CODE, bpType, userBpCB, func->mod->c_name, line);
+        }
+      goto ret;
+    }
+  /* case b) lineno */
+  /* check if line number */
+  if (!strchr(s,':') && isdigit(*s))
+    {
+      /* get the lineno */
+      int line = atoi(s) -1;
+      Dprintf (D_break, ("commonSetUserBp: b) line:%d \n", line));
+      if (line < 0)
+        {
+          fprintf(stdout, "linenumber <= 0\n");
+          goto ret;
+        }
+      /* if current context not present then we must get the module
+         which has main & set the break point @ line number provided
+         of that module : if current context known then set the bp
+         at the line number given for the current module
+      */
+      if (cctxt->func)
+        {
+          if (!cctxt->func->mod)
+            {
+              if (!applyToSet (functions, funcWithName, "main"))
+                {
+                  fprintf (stderr, "Function \"main\" not defined.\n");
                 }
-        }
-
-        goto ret;
-    }
-
-    if ((bp = strchr(s,':'))) {
-
-        module *mod = NULL;
-        *bp = '\0';
-
-        if (srcMode == SRC_CMODE) {
-            if (!applyToSet(modules,moduleWithCName,s,&mod)) {
-                fprintf (stderr,"No source file named %s.\n",s);
-                goto ret;
+              else
+                {
+                  setBPatModLine (func->mod, line, bpType);
+                }
             }
-        } else {
-            if (!applyToSet(modules,moduleWithAsmName,s,&mod)) {
-                fprintf (stderr,"No source file named %s.\n",s);
-                goto ret;
+          else
+            {
+              setBPatModLine(cctxt->func->mod,line, bpType);
             }
         }
-
-        /* case c) filename:lineno */
-        if (isdigit(*(bp +1))) {
-        Dprintf(D_break, ("commonSetUserBp: c) line:%d \n",atoi(bp+1)));
-            setBPatModLine (mod,atoi(bp+1)-1,bpType);
-            goto ret;
-
+      else
+        {
+          if (list_mod)
+            {
+              setBPatModLine (list_mod, line, bpType);
+            }
+          else
+            {
+              fprintf (stdout, "Sdcdb fails to have module symbol context at %d\n", __LINE__);
+            }
         }
-        /* case d) filename:function */
-        if (!applyToSet(functions,funcWithNameModule,bp+1,s,&func))
-            fprintf(stderr,"Function \"%s\" not defined.\n",bp+1);
-        else
-        Dprintf(D_break, ("commonSetUserBp: d) \n"));
-            setBPatModLine (mod,
-                            (srcMode == SRC_CMODE ?
-                             func->entryline :
-                             func->aentryline),bpType);
 
-        goto ret;
+      goto ret;
     }
 
-    /* case e) function */
-    Dprintf(D_break, ("commonSetUserBp: e) \n"));
-    if (!applyToSet(functions,funcWithName,s,&func))
-        fprintf(stderr,"Function \"%s\" not defined.\n",s);
-    else
-        setBPatModLine(func->mod,
-                       (srcMode == SRC_CMODE ?
-                        func->entryline :
-                        func->aentryline),bpType);
+  if ((bp = strchr(s,':')))
+    {
+      module *mod = NULL;
+      *bp = '\0';
 
- ret:
-    return 0;
+      if (srcMode == SRC_CMODE)
+        {
+          if (!applyToSet (modules, moduleWithCName, s, &mod))
+            {
+              fprintf (stderr, "No source file named %s.\n", s);
+              goto ret;
+            }
+        }
+      else
+        {
+          if (!applyToSet (modules, moduleWithAsmName, s, &mod))
+            {
+              fprintf (stderr, "No source file named %s.\n", s);
+              goto ret;
+            }
+        }
+
+      /* case c) filename:lineno */
+      if (isdigit(*(bp +1)))
+        {
+          Dprintf (D_break, ("commonSetUserBp: c) line:%d \n", atoi(bp+1)));
+          setBPatModLine (mod, atoi(bp+1)-1, bpType);
+          goto ret;
+        }
+      /* case d) filename:function */
+      if (!applyToSet (functions, funcWithNameModule, bp+1, s, &func))
+        {
+          fprintf(stderr, "Function \"%s\" not defined.\n", bp+1);
+        }
+      else
+        {
+          Dprintf (D_break, ("commonSetUserBp: d) \n"));
+          setBPatModLine (mod,
+                          (srcMode == SRC_CMODE ?
+                           func->entryline :
+                           func->aentryline),bpType);
+        }
+      goto ret;
+    }
+
+  /* case e) function */
+  Dprintf (D_break, ("commonSetUserBp: e) \n"));
+  if (!applyToSet (functions, funcWithName, s, &func))
+    {
+      fprintf(stderr,"Function \"%s\" not defined.\n", s);
+    }
+  else
+    {
+      setBPatModLine (func->mod,
+                      (srcMode == SRC_CMODE ?
+                       func->entryline :
+                       func->aentryline),bpType);
+    }
+
+ret:
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/

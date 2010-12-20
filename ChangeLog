@@ -1,3 +1,7 @@
+2010-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/cmd.c (commonSetUserBp): fixed bug 1185014
+	
 2010-12-19 Borut Razem <borut.razem AT siol.net>
 
 	* src/ds390/main.c, src/Makefile.in, src/SDCCbuild_cmd.c,

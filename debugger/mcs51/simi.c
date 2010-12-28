@@ -27,7 +27,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <winsock2.h>
-#include <signal.h>
 #include <io.h>
 #include <fcntl.h>
 #else
@@ -37,11 +36,13 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <signal.h>
+#include <sys/ioctl.h>
 #else
 #error "Cannot build debugger without socket support"
 #endif
 #endif
+#include <signal.h>
+#include <time.h>
 
 FILE *simin ; /* stream for simulator input */
 FILE *simout; /* stream for simulator output */
@@ -130,21 +131,23 @@ static void invalidateCache( int cachenum )
 }
 
 /*-----------------------------------------------------------------*/
-/* waitForSim - wait till simulator is done its job                */
+/* waitForSim - wait till simulator is done doing its job          */
 /*-----------------------------------------------------------------*/
 void waitForSim(int timeout_ms, char *expect)
 {
   int ch;
+  clock_t timeout;
 
-Dprintf(D_simi, ("simi: waitForSim start(%d)\n", timeout_ms));
-    sbp = simibuff;
+  Dprintf(D_simi, ("simi: waitForSim start(%d)\n", timeout_ms));
+  sbp = simibuff;
 
-    while ((ch = fgetc(simin)) > 0 ) {
-        *sbp++ = ch;
+  timeout = clock() + ((timeout_ms * CLOCKS_PER_SEC) / 1000);
+  while (((ch = fgetc(simin)) > 0 ) && (clock() <= timeout))
+    {
+      *sbp++ = ch;
     }
-    *sbp = 0;
-    Dprintf(D_simi, ("waitForSim(%d) got[%s]\n", timeout_ms, simibuff));
-
+  *sbp = 0;
+  Dprintf(D_simi, ("waitForSim(%d) got[%s]\n", timeout_ms, simibuff));
 }
 
 /*-----------------------------------------------------------------*/
@@ -206,6 +209,8 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;
     int retry = 0;
     int i;
+    u_long iMode;
+    int iResult;
     int fh;
 
     init_winsock();
@@ -254,6 +259,14 @@ void openSimulator (char **args, int nargs)
         exit(1);
     }
 
+    iMode = 1; /* set non-blocking mode */
+    iResult = ioctlsocket(sock, FIONBIO, &iMode);
+    if (iResult != NO_ERROR)
+    {
+        perror("ioctlsocket failed");
+        exit(1);
+    }
+
     fh = _open_osfhandle(sock, _O_TEXT);
     if (-1 == fh)
     {
@@ -261,7 +274,7 @@ void openSimulator (char **args, int nargs)
         exit(1);
     }
 
-    /* go the socket now turn it into a file handle */
+    /* got the socket now turn it into a file handle */
     if (!(simin = fdopen(fh, "r")))
     {
         perror("cannot open socket for read");
@@ -313,6 +326,8 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;
     int retry = 0;
     int i;
+    u_long iMode;
+    int iResult;
     Dprintf(D_simi, ("simi: openSimulator\n"));
 #ifdef SDCDB_DEBUG
     if (D_simi & sdcdbDebug)
@@ -359,7 +374,16 @@ void openSimulator (char **args, int nargs)
         perror("connect failed :");
         exit(1);
     }
-    /* go the socket now turn it into a file handle */
+
+    iMode = 1; /* set non-blocking mode */
+    iResult = ioctl(sock, FIONBIO, &iMode);
+    if (iResult != 0)
+    {
+        perror("ioctl failed");
+        exit(1);
+    }
+
+    /* got the socket now turn it into a file handle */
     if (!(simin = fdopen(sock,"r")))
     {
         fprintf(stderr,"cannot open socket for read\n");

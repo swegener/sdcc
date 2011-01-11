@@ -1,3 +1,8 @@
+2011-01-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (geniCodeAdd): fixed bug 3153956
+	* support/regression/tests/bug3037889.c: added test for bug 3153956
+
 2010-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/simi.c (waitForSim): implemented timeout,

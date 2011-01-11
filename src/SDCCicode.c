@@ -2328,7 +2328,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
     return left;
 
   /* if left is literal zero return right */
-  if (IS_LITERAL (letype) && left->isLiteral && !floatFromVal (valFromType (ltype)))
+  if (!IS_PTR (ltype) && IS_LITERAL (letype) && left->isLiteral && !floatFromVal (valFromType (ltype)))
     return right;
 
   /* if left is a pointer then size */

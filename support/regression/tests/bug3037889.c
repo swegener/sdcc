@@ -30,6 +30,14 @@ void Bug3034976 (void)
     }
 }
 
+/* caused error 9: FATAL Compiler Internal Error in file '/SDCCicode.c' line number '2865' : code generator internal error
+   Contact Author with source code
+   Internal error: validateLink failed in DCL_TYPE(ptr) @ SDCCicode.c:2813: expected DECLARATOR, got SPECIFIER */
+void Bug3153956 (void)
+{
+  ((char volatile __xdata *)0)[1] = 0;
+}
+
 /*
  * dummy test to be executed, to get rid of regression test warning:
  * Empty function list in ../../../sdcc/support/regression/tests/bug3037889.c!

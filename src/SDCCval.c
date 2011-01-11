@@ -1608,7 +1608,7 @@ valCompare (value * lval, value * rval, int ctype)
   /* create a new value */
   val = newValue ();
   val->type = val->etype = newCharLink ();
-  val->type->class = SPECIFIER;
+  val->type->xclass = SPECIFIER;
   SPEC_NOUN (val->type) = V_CHAR;       /* type is char */
   SPEC_USIGN (val->type) = 1;
   SPEC_SCLS (val->type) = S_LITERAL;    /* will remain literal */
@@ -1798,7 +1798,7 @@ valLogicAndOr (value * lval, value * rval, int op)
   /* create a new value */
   val = newValue ();
   val->type = val->etype = newCharLink ();
-  val->type->class = SPECIFIER;
+  val->type->xclass = SPECIFIER;
   SPEC_SCLS (val->type) = S_LITERAL;    /* will remain literal */
   SPEC_USIGN (val->type) = 1;
 

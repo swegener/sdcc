@@ -311,7 +311,7 @@ newLink (SYM_LINK_CLASS select)
   sym_link *p;
 
   p = Safe_alloc ( sizeof (sym_link));
-  p->class=select;
+  p->xclass=select;
 
   return p;
 }
@@ -1848,11 +1848,11 @@ copyLinkChain (sym_link * p)
 
   /* note: v_struct and v_struct->fields are not copied! */
   curr = p;
-  head = loop = (curr ? newLink (p->class) : (void *) NULL);
+  head = loop = (curr ? newLink (p->xclass) : (void *) NULL);
   while (curr)
     {
       memcpy (loop, curr, sizeof (sym_link));   /* copy it */
-      loop->next = (curr->next ? newLink (curr->next->class) : (void *) NULL);
+      loop->next = (curr->next ? newLink (curr->next->xclass) : (void *) NULL);
       loop = loop->next;
       curr = curr->next;
     }
@@ -3621,33 +3621,33 @@ sym_link *typeFromStr (char *s)
             continue ;
             break ;
         case 'b':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_BOOL;
             break;
         case 'c':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_CHAR;
             break;
         case 's':
         case 'i':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_INT;
             break;
         case 'l':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_INT;
             SPEC_LONG(r) = 1;
             break;
         case 'f':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_FLOAT;
             break;
         case 'q':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_FIXED16X16;
             break;
         case 'v':
-            r->class = SPECIFIER;
+            r->xclass = SPECIFIER;
             SPEC_NOUN(r) = V_VOID;
             break;
         case '*':
@@ -3995,7 +3995,7 @@ sym_link *validateLink(sym_link         *l,
                         const char      *file,
                         unsigned        line)
 {
-  if (l && l->class==select)
+  if (l && l->xclass==select)
     {
       return l;
     }
@@ -4003,7 +4003,7 @@ sym_link *validateLink(sym_link         *l,
           "Internal error: validateLink failed in %s(%s) @ %s:%u:"
           " expected %s, got %s\n",
           macro, args, file, line,
-          DECLSPEC2TXT(select), l ? DECLSPEC2TXT(l->class) : "null-link");
+          DECLSPEC2TXT(select), l ? DECLSPEC2TXT(l->xclass) : "null-link");
   exit(EXIT_FAILURE);
   return l; // never reached, makes compiler happy.
 }

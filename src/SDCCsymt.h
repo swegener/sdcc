@@ -224,7 +224,7 @@ typedef enum {
 
 typedef struct sym_link
   {
-    SYM_LINK_CLASS class;               /* DECLARATOR or SPECIFIER    */
+    SYM_LINK_CLASS xclass;               /* DECLARATOR or SPECIFIER    */
     unsigned tdef:1;                    /* current link created by    */
     /* typedef if this flag is set */
     union
@@ -463,8 +463,8 @@ extern sym_link *validateLink(sym_link  *l,
 #define SPEC_INLINE(x) validateLink(x, "SPEC_INLINE", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_inline
 
 /* type check macros */
-#define IS_DECL(x)       ( x && x->class == DECLARATOR )
-#define IS_SPEC(x)       ( x && x->class == SPECIFIER  )
+#define IS_DECL(x)       ( x && x->xclass == DECLARATOR )
+#define IS_SPEC(x)       ( x && x->xclass == SPECIFIER  )
 
 #define IS_ARRAY(x)      (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
 #define IS_DATA_PTR(x)   (IS_DECL(x) && DCL_TYPE(x) == POINTER)

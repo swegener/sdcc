@@ -1,3 +1,10 @@
+2011-01-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.h,
+	  src/SDCCval.c,
+	  src/SDCCsymt.c:
+	  Changed class to xclass in sym_link for C++ compability, for #3150686.
+
 2011-01-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (geniCodeAdd): fixed bug 3153956

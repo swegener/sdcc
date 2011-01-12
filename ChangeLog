@@ -1,5 +1,10 @@
 2011-01-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCglobl.h:
+	  Use bool from stdbool.h, except for MSVC, where unsigned char is used. For #3150686.
+
+2011-01-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCsymt.h,
 	  src/SDCCval.c,
 	  src/SDCCsymt.c:

@@ -7,6 +7,13 @@
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdio.h>
+
+#ifndef _MSC_VER
+#include <stdbool.h>
+#else
+typedef unsigned char bool;
+#endif
+
 #include "SDCCset.h"
 
 
@@ -73,7 +80,6 @@
 #endif
 
 #define  MAX_REG_PARMS  1
-typedef int bool;
 
 #ifndef max
 #  define max(a,b) (a > b ? a : b)

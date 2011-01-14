@@ -3569,9 +3569,7 @@ z80_ralloc2 (ebbIndex * ebbi)
 void
 z80_assignRegisters (ebbIndex * ebbi)
 {
-  if(IS_GB)
-    z80_ralloc (ebbi);
-  else
-    z80_ralloc2 (ebbi);
+  /* Replace by z80_ralloc(ebbi) to use the old register allocator */
+  z80_ralloc2 (ebbi);
 }
 

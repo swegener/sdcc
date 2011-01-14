@@ -234,7 +234,7 @@ void alive_tree_dec(tree_dec_t &tree_dec, const cfg_t &cfg)
 #define REG_B 1
 #define REG_E 2
 #define REG_D 3
-#define NUM_REGS 4
+#define NUM_REGS (IS_GB ? 2 : 4)
 
 void print_assignment(const assignment &a)
 {

@@ -1,3 +1,7 @@
+2011-01-14 Philipp Klaus Krause <pkk AT spth.de>
+	* src/z80/main.c:
+	  Enable new register allocator options for the GBZ80.
+
 2011-01-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 	* src/z80/ralloc.c,
 	  src/z80/ralloc2.cc:

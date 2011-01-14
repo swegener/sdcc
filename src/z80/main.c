@@ -39,6 +39,8 @@
 #define OPTION_ASM             "--asm="
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
 #define OPTION_RESERVE_IY      "--reserve-regs-iy"
+#define OPTION_MAX_ALLOCS_N    "--max-allocs-per-node"
+#define OPTION_DUMP_GRAPHS     "--dump-graphs"
 
 static char _z80_defaultRules[] =
 {
@@ -63,6 +65,8 @@ static OPTION _z80_options[] =
     { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
     { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
     { 0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY" },
+    { 0, OPTION_MAX_ALLOCS_N,    &z80_opts.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
+    { 0, OPTION_DUMP_GRAPHS,     &z80_opts.dump_graphs, "Dump control flow graph, conflict graph and tree decomposition in register allocator"},
     { 0, NULL }
   };
 
@@ -586,6 +590,7 @@ _setDefaultOptions (void)
   optimize.label4 = 1;
   optimize.loopInvariant = 1;
   optimize.loopInduction = 1;
+  z80_opts.max_allocs_per_node = 8192;
 }
 
 /* Mangling format:

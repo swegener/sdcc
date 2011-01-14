@@ -21,6 +21,8 @@ typedef struct
     int port_mode;
     int port_back;
     int reserveIY;
+    int max_allocs_per_node;
+    int dump_graphs;
   }
 Z80_OPTS;
 

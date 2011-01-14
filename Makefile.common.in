@@ -13,6 +13,7 @@ VERSIONP        = @VERSIONP@
 SHELL		= /bin/sh
 CC		= @CCACHE@ @CC@
 CPP		= @CCACHE@ @CPP@
+CXX		= @CCACHE@ @CXX@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 YACC            = @YACC@
@@ -75,4 +76,4 @@ EXTRALIBS      += @LIBS@
 # Library compilation options
 CLEANSPEC = *.lst *.asm *.sym *~ *.cdb *.dep *.rul
 
-OBJ = $(SOURCES:.c=.o)
+OBJ = $(SOURCES:.c=.o) $(CXXSOURCES:.cc=.o)

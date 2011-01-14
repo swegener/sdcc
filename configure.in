@@ -42,6 +42,7 @@ sdcc_cv_versionp=$VERSIONP
 # ===========================================================================
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
@@ -948,6 +949,8 @@ sdcc ${VERSION} is now configured for
   Source directory:     ${srcdir}
   C compiler:           ${CC}
   CFLAGS:               ${CFLAGS}
+  C++ compiler:         $(CXX)
+  CXXFLAGS:             ${CXXFLAGS}
 
   ENABLED Ports:
     avr                 ${enable_avr_port}

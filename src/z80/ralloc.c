@@ -122,7 +122,7 @@ regs *regsZ80;
 #define Z80_MAX_REGS ((sizeof(_z80_regs)/sizeof(_z80_regs[0]))-1)
 #define GBZ80_MAX_REGS ((sizeof(_gbz80_regs)/sizeof(_gbz80_regs[0]))-1)
 
-static void spillThis (symbol *);
+void spillThis (symbol *);
 static void freeAllRegs ();
 
 /** Allocates register of given type.
@@ -484,12 +484,14 @@ createStackSpil (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
-static void
+void
 spillThis (symbol * sym)
 {
   int i;
 
   D (D_ALLOC, ("spillThis: spilling %p\n", sym));
+
+  sym->for_newralloc = 0;
 
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
@@ -1426,6 +1428,11 @@ rUmaskForOp (operand * op)
 
   for (j = 0; j < sym->nRegs; j++)
     {
+      if(!(sym->regs[j]) || sym->regs[j]->rIdx < C_IDX || sym->regs[j]->rIdx > CND_IDX)
+        {
+          werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "rUmaskForOp: Register not found");
+          exit (0);
+        }
       rumask = bitVectSetBit (rumask, sym->regs[j]->rIdx);
     }
 
@@ -1467,7 +1474,6 @@ regsUsedIniCode (iCode * ic)
     rmask = bitVectUnion (rmask,
                           rUmaskForOp (IC_LEFT (ic)));
 
-
   if (IC_RIGHT (ic))
     rmask = bitVectUnion (rmask,
                           rUmaskForOp (IC_RIGHT (ic)));
@@ -1508,6 +1514,7 @@ createRegMask (eBBlock ** ebbs, int count)
 
           /* first mark the registers used in this
              instruction */
+
           ic->rUsed = regsUsedIniCode (ic);
           _G.funcrUsed = bitVectUnion (_G.funcrUsed, ic->rUsed);
 
@@ -2503,9 +2510,9 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
         continue;
 
       /* Strangely this leads to a code size increase for some functions. */
-      /*if (ic->op == '+' && getSize (operandType (IC_RESULT (ic)))  <= 2 &&
+      if (ic->op == '+' && getSize (operandType (IC_RESULT (ic)))  == 2 &&
           isOperandEqual (op, IC_RESULT (ic)))
-        continue;*/
+        continue;
 
       if (ic->op == '*' && isOperandEqual (op, IC_LEFT (ic)))
         continue;
@@ -2808,57 +2815,6 @@ opIgnoresA (iCode * ic, iCode * uic)
   return FALSE;
 }
 
-
-/* Some optimisation cases:
-
-   1. Part of memcpy
-;       genPointerGet
-        ld      l,-4(ix)
-        ld      h,-3(ix)
-        ld      c,(hl)
-;       genPlus
-        inc     -4(ix)
-        jp      nz,00108$
-        inc     -3(ix)
-00108$:
-;       genAssign (pointer)
-        ld      a,c
-        ld      (de),a
-
-      want to optimise down to:
-        ld       hl,-4(ix) ...
-        ld       a,(hl)
-        inc      -4(ix).w  ...
-        ld       (de),a
-
-      So genPointer get is OK
-      genPlus where the right is constant, left is iTemp, and result is same as left
-      genAssign (pointer) is OK
-
-    2. Part of _strcpy
-;       genPointerGet
-        ld      a,(de)
-        ld      c,a
-;       genIfx
-        xor     a,a
-        or      a,c
-        jp      z,00103$
-;       _strcpy.c 40
-;       genAssign (pointer)
-;       AOP_STK for _strcpy_to_1_1
-        ld      l,-2(ix)
-        ld      h,-1(ix)
-        ld      (hl),c
-
-      want to optimise down to:
-        ld      a,(de)
-        or      a,a
-        jp      z,00103$
-        ld      (bc),a
-
-      So genIfx where IC_COND has size of 1 and is a constant.
-*/
-
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumulator.
@@ -2886,7 +2842,8 @@ packRegsForAccUse2 (iCode * ic)
        ic->op != '>' &&
        ic->op != CAST &&
        ic->op != GETHBIT &&
-       1)
+       !((ic->op == LEFT_OP || ic->op == RIGHT_OP) && IS_OP_LITERAL(IC_RIGHT(ic)))
+       )
     {
       D (D_ACCUSE2, ("  + Dropping as not a 'good' source command\n"));
       return;
@@ -2895,10 +2852,10 @@ packRegsForAccUse2 (iCode * ic)
   /* if + or - then it has to be one byte result.
      MLH: Ok.
    */
-  if ((ic->op == '+' || ic->op == '-')
+  if ((ic->op == '+' || ic->op == '-' || ic->op == LEFT_OP || ic->op == RIGHT_OP)
       && getSize (operandType (IC_RESULT (ic))) > 1)
     {
-      D (D_ACCUSE2, ("  + Dropping as it's a big + or -\n"));
+      D (D_ACCUSE2, ("  + Dropping as it's a big one\n"));
       return;
     }
 
@@ -3227,10 +3184,10 @@ joinPushes (iCode *lic)
 }
 
 /*-----------------------------------------------------------------*/
-/* assignRegisters - assigns registers to each live range as need  */
+/* Old register allocator                                          */
 /*-----------------------------------------------------------------*/
 void
-z80_assignRegisters (ebbIndex * ebbi)
+z80_ralloc (ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
@@ -3289,6 +3246,290 @@ z80_assignRegisters (ebbIndex * ebbi)
     {
 /*      werror(W_TOOMANY_SPILS,"data space", */
 /*             _G.dataExtend,currFunc->name,""); */
+      _G.dataExtend = 0;/*-----------------------------------------------------------------*/
+/* Old register allocator                                          */
+/*-----------------------------------------------------------------*/
+    }
+
+  if (options.dump_rassgn) {
+    dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
+    dumpLiveRanges (DUMP_LRANGE, liveRanges);
+  }
+
+  /* after that create the register mask
+     for each of the instruction */
+  createRegMask (ebbs, count);
+
+  /* now get back the chain */
+  ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));
+
+  ic = joinPushes (ic);
+
+  /* redo that offsets for stacked automatic variables */
+  redoStackOffsets ();
+
+  genZ80Code (ic);
+
+  /* free up any stackSpil locations allocated */
+  applyToSet (_G.stackSpil, deallocStackSpil);
+  _G.slocNum = 0;
+  setToNull ((void *) &_G.stackSpil);
+  setToNull ((void *) &_G.spiltSet);
+  /* mark all registers as free */
+  freeAllRegs ();
+
+  return;
+}
+
+/* C++ parts of new register allocator */
+extern void
+z80_ralloc2_cc (ebbIndex * ebbi);
+
+/** Serially allocate registers to the variables.
+    This was the main register allocation function.  It is called after
+    packing.
+    In the new register allocator it only serves to mark variables for the new register allocator.
+ */
+static void
+serialRegAssignMark (eBBlock ** ebbs, int count)
+{
+  int i;
+  int max_alloc_bytes = 1024;	// Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
+
+  /* for all blocks */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+
+      if (ebbs[i]->noPath &&
+          (ebbs[i]->entryLabel != entryLabel &&
+           ebbs[i]->entryLabel != returnLabel))
+        continue;
+
+      /* for all instructions do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          /* if this is an ipop that means some live
+             range will have to be assigned again */
+          if (ic->op == IPOP)
+            {
+              wassert (0);
+              reassignLR (IC_LEFT (ic));
+            }
+
+          /* if result is present && is a true symbol */
+          if (IC_RESULT (ic) && ic->op != IFX &&
+              IS_TRUE_SYMOP (IC_RESULT (ic)))
+            {
+              OP_SYMBOL (IC_RESULT (ic))->allocreq++;
+            }
+
+          /* take away registers from live
+             ranges that end at this instruction */
+          deassignLRs (ic, ebbs[i]);
+
+          /* some don't need registers */
+          if (SKIP_IC2 (ic) ||
+              ic->op == JUMPTABLE ||
+              ic->op == IFX ||
+              ic->op == IPUSH ||
+              ic->op == IPOP ||
+              (IC_RESULT (ic) && POINTER_SET (ic)))
+            {
+              continue;
+            }
+
+          /* now we need to allocate registers only for the result */
+          if (IC_RESULT (ic))
+            {
+              symbol *sym = OP_SYMBOL (IC_RESULT (ic));
+              bitVect *spillable;
+              int willCS;
+
+              D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
+
+              /* Make sure any spill location is definately allocated */
+              if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
+                  !sym->usl.spillLoc->allocreq)
+                {
+                  sym->usl.spillLoc->allocreq++;
+                }
+
+              /* if it does not need or is spilt
+                 or is already assigned to registers (or marked for the new allocator)
+                 or will not live beyond this instructions */
+              if (!sym->nRegs ||
+                  sym->isspilt ||
+                  bitVectBitValue (_G.regAssigned, sym->key) ||
+                  sym->for_newralloc ||
+                  sym->liveTo <= ic->seq)
+                {
+                  D (D_ALLOC, ("serialRegAssign: won't live long enough.\n"));
+                  continue;
+                }
+
+              /* if some liverange has been spilt at the block level
+                 and this one live beyond this block then spil this
+                 to be safe */
+              if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
+                {
+                  D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
+                  spillThis (sym);
+                  continue;
+                }
+
+              /* if trying to allocate this will cause
+                 a spill and there is nothing to spill
+                 or this one is rematerializable then
+                 spill this one */
+              willCS = willCauseSpill (sym->nRegs, sym->regType);
+              spillable = computeSpillable (ic);
+              if (sym->remat ||
+                  (willCS && bitVectIsZero (spillable)))
+                {
+
+                  D (D_ALLOC, ("serialRegAssign: \"remat spill\"\n"));
+                  spillThis (sym);
+                  continue;
+
+                }
+
+              if (max_alloc_bytes >= sym->nRegs)
+              {
+                sym->for_newralloc = 1;
+                max_alloc_bytes -= sym->nRegs;
+              }
+              else if (!sym->for_newralloc)
+              {
+                spillThis (sym);
+                printf("Spilt %s due to byte limit.\n", sym->name);
+              }
+
+#if 0
+              /* if it shares registers with operands make sure
+                 that they are in the same position */
+              if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
+                  OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=')
+                positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+                              OP_SYMBOL (IC_LEFT (ic)));
+              /* do the same for the right operand */
+              if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
+                  OP_SYMBOL (IC_RIGHT (ic))->nRegs)
+                positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+                              OP_SYMBOL (IC_RIGHT (ic)));
+#endif
+
+            }
+        }
+    }
+}
+
+void RegFix (eBBlock ** ebbs, int count)
+{
+    int i;
+
+    /* Check for and fix any problems with uninitialized operands */
+    for (i = 0; i < count; i++)
+      {
+        iCode *ic;
+
+        if (ebbs[i]->noPath &&
+            (ebbs[i]->entryLabel != entryLabel &&
+             ebbs[i]->entryLabel != returnLabel))
+            continue;
+
+        for (ic = ebbs[i]->sch; ic; ic = ic->next)
+          {
+            if (SKIP_IC2 (ic))
+              continue;
+
+            if (ic->op == IFX)
+              {
+                verifyRegsAssigned (IC_COND (ic), ic);
+                continue;
+              }
+
+            if (ic->op == JUMPTABLE)
+              {
+                verifyRegsAssigned (IC_JTCOND (ic), ic);
+                continue;
+              }
+
+            verifyRegsAssigned (IC_RESULT (ic), ic);
+            verifyRegsAssigned (IC_LEFT (ic), ic);
+            verifyRegsAssigned (IC_RIGHT (ic), ic);
+          }
+      }
+}
+
+/*-----------------------------------------------------------------*/
+/* New register allocator                                          */
+/* For now do everything except for bc, de the old way.            */
+/*-----------------------------------------------------------------*/
+void
+z80_ralloc2 (ebbIndex * ebbi)
+{
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
+  iCode *ic;
+  int i;
+
+  D (D_ALLOC, ("\n-> z80_assignRegisters: entered.\n"));
+
+  setToNull ((void *) &_G.funcrUsed);
+  setToNull ((void *) &_G.totRegAssigned);
+  _G.stackExtend = _G.dataExtend = 0;
+
+  if (IS_GB)
+    {
+      /* DE is required for the code gen. */
+      _G.nRegs = GBZ80_MAX_REGS;
+      regsZ80 = _gbz80_regs;
+    }
+  else
+    {
+      _G.nRegs = Z80_MAX_REGS;
+      regsZ80 = _z80_regs;
+    }
+
+  /* change assignments this will remove some
+     live ranges reducing some register pressure */
+  for (i = 0; i < count; i++)
+    packRegisters (ebbs[i]);
+
+  /* liveranges probably changed by register packing
+     so we compute them again */
+  recomputeLiveRanges (ebbs, count);
+
+  if (options.dump_pack)
+    dumpEbbsToFileExt (DUMP_PACK, ebbi);
+
+  /* first determine for each live range the number of
+     registers & the type of registers required for each */
+  regTypeNum ();
+
+  /* Mark variables for assignment by the new allocator */
+  serialRegAssignMark (ebbs, count);
+
+  /* The new register allocator invokes its magic */
+  z80_ralloc2_cc (ebbi);
+
+  RegFix (ebbs, count);
+
+  /* New register allcoator here. */
+
+  /* if stack was extended then tell the user */
+  if (_G.stackExtend)
+    {
+/*      werror(W_TOOMANY_SPILS,"stack", */
+/*             _G.stackExtend,currFunc->name,""); */
+      _G.stackExtend = 0;
+    }
+
+  if (_G.dataExtend)
+    {
+/*      werror(W_TOOMANY_SPILS,"data space", */
+/*             _G.dataExtend,currFunc->name,""); */
       _G.dataExtend = 0;
     }
 
@@ -3321,3 +3562,16 @@ z80_assignRegisters (ebbIndex * ebbi)
 
   return;
 }
+
+/*-----------------------------------------------------------------*/
+/* assignRegisters - assigns registers to each live range as need  */
+/*-----------------------------------------------------------------*/
+void
+z80_assignRegisters (ebbIndex * ebbi)
+{
+  if(IS_GB)
+    z80_ralloc (ebbi);
+  else
+    z80_ralloc2 (ebbi);
+}
+

@@ -77,4 +77,7 @@ regs *regWithIdx (int);
 void z80_assignRegisters (ebbIndex *);
 bitVect *z80_rUmaskForOp (operand * op);
 
+void spillThis (symbol *);
+void z80_ralloc2_cc(ebbIndex *ebbi);
+
 #endif

@@ -1,3 +1,21 @@
+2011-01-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+	* configure,
+	  configure.in,
+	  src/Makefile.in,
+	  Makefile.common.in,
+	  src/port.mk,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCClrange.c,
+	  src/z80/z80.h,
+	  src/z80/main.c,
+	  src/z80/ralloc.h,
+	  src/z80/ralloc.c,
+	  src/z80/tree_dec.hh,
+	  src/z80/ralloc2.cc,
+	  src/z80/peeph-z80.def:
+	  New register allocator for the Z80.
+
 2011-01-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCglobl.h:

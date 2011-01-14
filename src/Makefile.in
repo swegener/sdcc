@@ -18,7 +18,7 @@ PORT_LIBS	= $(PORTS:%=%/port.a)
 LIBS		= -lm @LIBS@
 
 CFLAGS          = @CFLAGS@ @WALL_FLAG@
-CPPFLAGS	+= -I$(srcdir)
+CPPFLAGS	+= -I$(srcdir) -O2
 LDFLAGS		= @LDFLAGS@
 
 ifdef SDCC_SUB_VERSION
@@ -106,7 +106,7 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 $(TARGET): $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS)
-	$(CC) $(LDFLAGS) -o $@ $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

@@ -8,9 +8,9 @@
 #include <setjmp.h>
 #include <stdio.h>
 
-#ifndef _MSC_VER
+#if !defined _MSC_VER
 #include <stdbool.h>
-#else
+#elif !defined __cplusplus
 typedef unsigned char bool;
 #endif
 

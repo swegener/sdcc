@@ -1,4 +1,10 @@
 2011-01-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* SDCCglobl.h:
+	  Use Maarten's better bool scheme.
+
+2011-01-15 Philipp Klaus Krause <pkk AT spth.de>
+
 	* configure,
 	  configure.in,
 	  src/Makefile.in,
@@ -17,6 +23,7 @@
 	  Reverted to old register allocator.
 
 2011-01-15 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc2.cc:
 	  Small change for MSVC compability:
 

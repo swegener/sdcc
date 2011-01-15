@@ -32,7 +32,6 @@ extern "C"
 #include "SDCCsymt.h"
 #include "SDCCicode.h"
 #include "SDCCBBlock.h"
-#include "SDCCy.h"
 
 #include "z80.h"
 #include "ralloc.h"

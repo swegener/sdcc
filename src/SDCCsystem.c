@@ -215,25 +215,25 @@ get_path (const char *cmd)
             ;
         }
 
-    if (NULL == cmdLine)
-      {
-        /* didn't found the command in predefined binary paths: try with PATH */
-        char *envPath;
+      if (NULL == cmdLine)
+        {
+          /* didn't found the command in predefined binary paths: try with PATH */
+          char *envPath;
 
-        if (NULL != (envPath = getenv("PATH")))
-          {
-            /* make a local copy; strtok() will modify it */
-            envPath = Safe_strdup (envPath);
+          if (NULL != (envPath = getenv("PATH")))
+            {
+              /* make a local copy; strtok() will modify it */
+              envPath = Safe_strdup (envPath);
 
-            if (NULL != (path = strtok (envPath, ";")))
-              {
-                while (NULL == (cmdLine = compose_command_line (path, command, args)) &&
-                  NULL != (path = strtok (NULL, ";")))
-                  ;
-              }
+              if (NULL != (path = strtok (envPath, ";")))
+                {
+                  while (NULL == (cmdLine = compose_command_line (path, command, args)) &&
+                    NULL != (path = strtok (NULL, ";")))
+                    ;
+                }
 
-            Safe_free (envPath);
-        }
+              Safe_free (envPath);
+          }
     }
 
     /* didn't found it; probably this won't help neither :-( */
@@ -373,6 +373,8 @@ static HANDLE hProcess = NULL;
 /*
  * use native WIN32 solution due to a bug in wine msvrct.dll popen implementation
  * (see http://bugs.winehq.org/show_bug.cgi?id=25062)
+ * and due to incorrect wine msvrct.dll pclose implementation
+ * (see http://bugs.winehq.org/show_bug.cgi?id=25063)
  */
 static FILE *
 sdcc_popen_read (char *cmd)

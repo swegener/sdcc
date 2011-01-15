@@ -14,13 +14,17 @@ cases = 0
 tests = 0
 bytes = 0
 ticks = 0
+invalid = 0
 
 # hack for valdiag
 name = ""
 
 for line in lines:
-    if (re.search(r'^--- Running', line)):
-        name = line
+    # --- Running: gen/ucz80/longor/longor
+    m = re.match(r'^--- Running: (.*)$', line)
+    if (m):
+        name = m.group(1)
+
     # '--- Summary: f/t/c: ...', where f = # failures, t = # test points,
     # c = # test cases.
     if (re.search(r'^--- Summary:', line)):
@@ -30,7 +34,7 @@ for line in lines:
         tests = tests + string.atof(ntests)
         cases = cases + string.atof(ncases)
         if (string.atof(nfailures)):
-            print name
+            print "Failure: %s" % name
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
     if (re.search(r'^--- Simulator:', line)):
@@ -39,4 +43,11 @@ for line in lines:
         bytes = bytes + string.atof(nbytes)
         ticks = ticks + string.atof(nticks)
 
+    # Stop at 0x000228: (106) Invalid instruction 0x00fd
+    if (re.search(r'Invalid instruction', line)):
+        invalid += 1;
+        print "Invalid instruction: %s" % name
+
+if (invalid > 0):
+    print "%d invalid instructions," % invalid,
 print "%.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks)

@@ -1,3 +1,7 @@
+2011-01-16 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/collate-results.py: count invalid instructions
+
 2011-01-15 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/SDCCdwarf2.c, src/SDCCdwarf2.h, src/z80/gen.c,

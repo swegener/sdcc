@@ -764,18 +764,20 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
     node = list ? list->init.node : NULL;
 
     in_code = emitIvalLabel(oBuf, sym);
-    if (!in_code) dbuf_printf (oBuf, "\tdb\t");
+    if (!in_code)
+        dbuf_printf (oBuf, "\tdb\t");
 
     if (!node) {
         // initialize as zero
-        for (i=0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             if (in_code) {
                 dbuf_printf (oBuf, "\tretlw 0x00\n");
             } else {
                 dbuf_printf (oBuf, "%s0x00", (i == 0) ? "" : ", ");
             }
         } // for
-        dbuf_printf (oBuf, "\n");
+        if (!in_code)
+            dbuf_printf (oBuf, "\n");
         return;
     } // if
 

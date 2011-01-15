@@ -4,6 +4,7 @@
 	  src/SDCCglobl.h, src/pic16/pcode.h, src/pic16/pcode.c,
 	  src/SDCCsystem.c, src/SDCC.lex:
 	  code cleaning: removed warnings, use const char *
+	* src/pic14/glue.c (emitIvals): removed empty line generation 
 
 2011-01-15 Philipp Klaus Krause <pkk AT spth.de>
 

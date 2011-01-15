@@ -1740,7 +1740,7 @@ linkEdit (char **envp)
       char buffer3[PATH_MAX];
       set *tempSet = NULL, *libSet = NULL;
 
-      strcpy (buffer3, dbuf_detach_c_str (&linkerScriptFileName));
+      strcpy (buffer3, dbuf_c_str (&linkerScriptFileName));
       if ( /*TARGET_IS_PIC16 || */ TARGET_IS_PIC14)
         {
           /* use $l to set the linker include directories */
@@ -1770,7 +1770,7 @@ linkEdit (char **envp)
             buffer3[0] = '\0';
         }
 
-      buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_detach_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
+      buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
                     linkOptionsSet);
 
       buildCmdLine2 (buffer, sizeof (buffer), buffer2);

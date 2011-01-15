@@ -193,7 +193,6 @@ markAlive (iCode * sic, iCode * eic, int key)
 /*-----------------------------------------------------------------*/
 /* findNextUseSym - finds the next use of the symbol and marks it  */
 /*                  alive in between                               */
-/*                  Return 0 iff there is no next use.             */
 /*-----------------------------------------------------------------*/
 static int
 findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
@@ -219,7 +218,7 @@ findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
 
       if (IS_ITEMP(IC_RESULT(ic)))
         if (IC_RESULT(ic)->key == sym->key)
-          return 0;
+	  return 0;
 
       return 1;
     }
@@ -306,7 +305,6 @@ check_successors:
 /*-----------------------------------------------------------------*/
 /* findNextUse - finds the next use of the operand and marks it    */
 /*               alive in between                                  */
-/*               Return 0 iff there is no next use.                */
 /*-----------------------------------------------------------------*/
 static int
 findNextUse (eBBlock *ebp, iCode *ic, operand *op)
@@ -641,9 +639,6 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
                   unvisitBlocks(ebbs, count);
                   ic->rlive = bitVectSetBit (ic->rlive, IC_RESULT(ic)->key);
                   findNextUse (ebbs[i], ic->next, IC_RESULT(ic));
-                  /* findNextUse sometimes returns 0 here, which means that ic is
-                     dead code. Something should be done about this dead code since
-                     e.g. register allocation suffers. */
                 }
 	    }
 

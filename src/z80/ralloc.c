@@ -122,7 +122,7 @@ regs *regsZ80;
 #define Z80_MAX_REGS ((sizeof(_z80_regs)/sizeof(_z80_regs[0]))-1)
 #define GBZ80_MAX_REGS ((sizeof(_gbz80_regs)/sizeof(_gbz80_regs[0]))-1)
 
-void spillThis (symbol *);
+static void spillThis (symbol *);
 static void freeAllRegs ();
 
 /** Allocates register of given type.
@@ -221,6 +221,15 @@ nfreeRegsType (int type)
 }
 
 /*-----------------------------------------------------------------*/
+/* useReg - marks a register  as used                              */
+/*-----------------------------------------------------------------*/
+static void
+useReg (regs * reg)
+{
+  reg->isFree = 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */
 /*-----------------------------------------------------------------*/
 static bitVect *
@@ -275,6 +284,15 @@ rematable (symbol * sym, eBBlock * ebp, iCode * ic)
   return sym->remat;
 }
 
+/*-----------------------------------------------------------------*/
+/* allLRs - return true for all                                    */
+/*-----------------------------------------------------------------*/
+static int
+allLRs (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return 1;
+}
+
 /** liveRangesWith - applies function to a given set of live range
  */
 static set *
@@ -309,6 +327,7 @@ liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
 
   return rset;
 }
+
 
 /** leastUsedLR - given a set determines which is the least used
  */
@@ -465,14 +484,12 @@ createStackSpil (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
-void
+static void
 spillThis (symbol * sym)
 {
   int i;
 
   D (D_ALLOC, ("spillThis: spilling %p\n", sym));
-
-  sym->for_newralloc = 0;
 
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
@@ -504,6 +521,54 @@ spillThis (symbol * sym)
     }
   return;
 }
+
+#if DISABLED
+/*-----------------------------------------------------------------*/
+/* allDefsOutOfRange - all definitions are out of a range          */
+/*-----------------------------------------------------------------*/
+static bool
+allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
+{
+  int i;
+
+  if (!defs)
+    return TRUE;
+
+  for (i = 0; i < defs->size; i++)
+    {
+      iCode *ic;
+
+      if (bitVectBitValue (defs, i) &&
+          (ic = hTabItemWithKey (iCodehTab, i)) &&
+          (ic->seq >= fseq && ic->seq <= toseq))
+
+        return FALSE;
+
+    }
+
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* hasSpilLocnoUptr - will return 1 if the symbol has spil location */
+/*                    but is not used as a pointer                 */
+/*-----------------------------------------------------------------*/
+static int
+hasSpilLocnoUptr (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return ((sym->usl.spillLoc && !sym->uptr) ? 1 : 0);
+}
+
+/*-----------------------------------------------------------------*/
+/* notUsedInRemaining - not used or defined in remain of the block */
+/*-----------------------------------------------------------------*/
+static int
+notUsedInRemaining (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return ((usedInRemaining (operandFromSymbol (sym), ic) ? 0 : 1) &&
+          allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
+}
+#endif
 
 /** Select a iTemp to spil : rather a simple procedure.
  */
@@ -726,6 +791,22 @@ tryAgain:
   goto tryAgain;
 }
 
+static regs *getRegGprNoSpil()
+{
+  regs *reg;
+
+  /* try for gpr type */
+  if ((reg = allocReg (REG_GPR)))
+    {
+      D (D_ALLOC, ("getRegGprNoSpil: got a reg.\n"));
+      return reg;
+    }
+  assert(0);
+
+  /* just to make the compiler happy */
+  return 0;
+}
+
 /** Symbol has a given register.
  */
 static bool
@@ -892,6 +973,48 @@ willCauseSpill (int nr, int rt)
   return 1;
 }
 
+/** The allocator can allocate same registers to result and operand,
+    if this happens make sure they are in the same position as the operand
+    otherwise chaos results.
+*/
+static int
+positionRegs (symbol * result, symbol * opsym)
+{
+  int count = min (result->nRegs, opsym->nRegs);
+  int i, j = 0, shared = 0;
+  int change = 0;
+
+  D (D_ALLOC, ("positionRegs: on result %p opsum %p line %u\n", result, opsym, lineno));
+
+  /* if the result has been spilt then cannot share */
+  if (opsym->isspilt)
+    return 0;
+again:
+  shared = 0;
+  /* first make sure that they actually share */
+  for (i = 0; i < count; i++)
+    {
+      for (j = 0; j < count; j++)
+        {
+          if (result->regs[i] == opsym->regs[j] && i != j)
+            {
+              shared = 1;
+              goto xchgPositions;
+            }
+        }
+    }
+xchgPositions:
+  if (shared)
+    {
+      regs *tmp = result->regs[i];
+      result->regs[i] = result->regs[j];
+      result->regs[j] = tmp;
+      change ++;
+      goto again;
+    }
+  return change ;
+}
+
 /** Try to allocate a pair of registers to the symbol.
  */
 bool
@@ -948,6 +1071,336 @@ verifyRegsAssigned (operand *op, iCode * ic)
   spillThis (sym);
 }
 
+
+/** Serially allocate registers to the variables.
+    This is the main register allocation function.  It is called after
+    packing.
+ */
+static void
+serialRegAssign (eBBlock ** ebbs, int count)
+{
+  int i;
+
+  /* for all blocks */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+
+      if (ebbs[i]->noPath &&
+          (ebbs[i]->entryLabel != entryLabel &&
+           ebbs[i]->entryLabel != returnLabel))
+        continue;
+
+      /* for all instructions do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          /* if this is an ipop that means some live
+             range will have to be assigned again */
+          if (ic->op == IPOP)
+            {
+              wassert (0);
+              reassignLR (IC_LEFT (ic));
+            }
+
+          /* if result is present && is a true symbol */
+          if (IC_RESULT (ic) && ic->op != IFX &&
+              IS_TRUE_SYMOP (IC_RESULT (ic)))
+            {
+              OP_SYMBOL (IC_RESULT (ic))->allocreq++;
+            }
+
+          /* take away registers from live
+             ranges that end at this instruction */
+          deassignLRs (ic, ebbs[i]);
+
+          /* some don't need registers */
+          if (SKIP_IC2 (ic) ||
+              ic->op == JUMPTABLE ||
+              ic->op == IFX ||
+              ic->op == IPUSH ||
+              ic->op == IPOP ||
+              (IC_RESULT (ic) && POINTER_SET (ic)))
+            {
+              continue;
+            }
+
+          /* now we need to allocate registers only for the result */
+          if (IC_RESULT (ic))
+            {
+              symbol *sym = OP_SYMBOL (IC_RESULT (ic));
+              bitVect *spillable;
+              int willCS;
+              int j;
+
+              D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
+
+              /* Make sure any spill location is definately allocated */
+              if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
+                  !sym->usl.spillLoc->allocreq)
+                {
+                  sym->usl.spillLoc->allocreq++;
+                }
+
+              /* if it does not need or is spilt
+                 or is already assigned to registers
+                 or will not live beyond this instructions */
+              if (!sym->nRegs ||
+                  sym->isspilt ||
+                  bitVectBitValue (_G.regAssigned, sym->key) ||
+                  sym->liveTo <= ic->seq)
+                {
+                  D (D_ALLOC, ("serialRegAssign: won't live long enough.\n"));
+                  continue;
+                }
+
+              /* if some liverange has been spilt at the block level
+                 and this one live beyond this block then spil this
+                 to be safe */
+              if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
+                {
+                  D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
+                  spillThis (sym);
+                  continue;
+                }
+              /* if trying to allocate this will cause
+                 a spill and there is nothing to spill
+                 or this one is rematerializable then
+                 spill this one */
+              willCS = willCauseSpill (sym->nRegs, sym->regType);
+              spillable = computeSpillable (ic);
+              if (sym->remat ||
+                  (willCS && bitVectIsZero (spillable)))
+                {
+
+                  D (D_ALLOC, ("serialRegAssign: \"remat spill\"\n"));
+                  spillThis (sym);
+                  continue;
+
+                }
+
+              /* If the live range preceeds the point of definition
+                 then ideally we must take into account registers that
+                 have been allocated after sym->liveFrom but freed
+                 before ic->seq. This is complicated, so spill this
+                 symbol instead and let fillGaps handle the allocation. */
+              if (sym->liveFrom < ic->seq)
+                {
+                    spillThis (sym);
+                    continue;
+                }
+
+              /* if it has a spillocation & is used less than
+                 all other live ranges then spill this */
+              if (willCS) {
+                      if (sym->usl.spillLoc) {
+                              symbol *leastUsed = leastUsedLR (liveRangesWith (spillable,
+                                                                               allLRs, ebbs[i], ic));
+                              if (leastUsed && leastUsed->used > sym->used) {
+                                      spillThis (sym);
+                                      continue;
+                              }
+                      } else {
+                              /* if none of the liveRanges have a spillLocation then better
+                                 to spill this one than anything else already assigned to registers */
+                              if (liveRangesWith(spillable,noSpilLoc,ebbs[i],ic)) {
+                                  /* if this is local to this block then we might find a block spil */
+                                  if (!(sym->liveFrom >= ebbs[i]->fSeq && sym->liveTo <= ebbs[i]->lSeq)) {
+                                      spillThis (sym);
+                                      continue;
+                                  }
+                              }
+                      }
+              }
+
+              /* else we assign registers to it */
+              _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
+              _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);
+
+              /* Special case:  Try to fit into a reg pair if
+                 available */
+              D (D_ALLOC, ("serialRegAssign: actually allocing regs!\n"));
+              if ((sym->nRegs == 2) && tryAllocatingRegPair (sym))
+                {
+                }
+              else
+                {
+                  for (j = 0; j < sym->nRegs; j++)
+                    {
+                      sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
+
+                      /* if the allocation falied which means
+                         this was spilt then break */
+                      if (!sym->regs[j])
+                        {
+                          D (D_ALLOC, ("Couldnt alloc (spill)\n"))
+                            break;
+                        }
+                    }
+                  /* Make sure we didn't allocate a register pair with bytes swapped */
+                  if(sym->nRegs == 2 && sym->regs[0] == sym->regs[1] + 1 && sym->regs[0] != &regsZ80[2])
+                  {
+			freeReg(sym->regs[0]);
+			freeReg(sym->regs[1]);
+			if(!tryAllocatingRegPair(sym))
+				wassertl(0, "Failed to swap register pair bytes back.");
+                  }
+                }
+              /* if it shares registers with operands make sure
+                 that they are in the same position */
+              if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
+                  OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=')
+                positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+                              OP_SYMBOL (IC_LEFT (ic)));
+              /* do the same for the right operand */
+              if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
+                  OP_SYMBOL (IC_RIGHT (ic))->nRegs)
+                positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+                              OP_SYMBOL (IC_RIGHT (ic)));
+
+            }
+        }
+    }
+
+    /* Check for and fix any problems with uninitialized operands */
+    for (i = 0; i < count; i++)
+      {
+        iCode *ic;
+
+        if (ebbs[i]->noPath &&
+            (ebbs[i]->entryLabel != entryLabel &&
+             ebbs[i]->entryLabel != returnLabel))
+            continue;
+
+        for (ic = ebbs[i]->sch; ic; ic = ic->next)
+          {
+            if (SKIP_IC2 (ic))
+              continue;
+
+            if (ic->op == IFX)
+              {
+                verifyRegsAssigned (IC_COND (ic), ic);
+                continue;
+              }
+
+            if (ic->op == JUMPTABLE)
+              {
+                verifyRegsAssigned (IC_JTCOND (ic), ic);
+                continue;
+              }
+
+            verifyRegsAssigned (IC_RESULT (ic), ic);
+            verifyRegsAssigned (IC_LEFT (ic), ic);
+            verifyRegsAssigned (IC_RIGHT (ic), ic);
+          }
+      }
+
+}
+
+/*-----------------------------------------------------------------*/
+/* fillGaps - Try to fill in the Gaps left by Pass1                */
+/*-----------------------------------------------------------------*/
+static void fillGaps()
+{
+    symbol *sym =NULL;
+    int key =0;
+
+    if (getenv("DISABLE_FILL_GAPS")) return;
+
+    /* look for livernages that was spilt by the allocator */
+    for (sym = hTabFirstItem(liveRanges,&key) ; sym ;
+         sym = hTabNextItem(liveRanges,&key)) {
+
+        int i;
+        int pdone = 0;
+
+        if (!sym->spillA || !sym->clashes || sym->remat) continue ;
+
+        /* find the liveRanges this one clashes with, that are
+           still assigned to registers & mark the registers as used*/
+        for ( i = 0 ; i < sym->clashes->size ; i ++) {
+            int k;
+            symbol *clr;
+
+            if (bitVectBitValue(sym->clashes,i) == 0 ||    /* those that clash with this */
+                bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
+                continue ;
+
+            clr = hTabItemWithKey(liveRanges,i);
+            assert(clr);
+
+            /* mark these registers as used */
+            for (k = 0 ; k < clr->nRegs ; k++ )
+                useReg(clr->regs[k]);
+        }
+
+        if (willCauseSpill(sym->nRegs,sym->regType)) {
+            /* NOPE :( clear all registers & and continue */
+            freeAllRegs();
+            continue ;
+        }
+
+        /* THERE IS HOPE !!!! */
+        for (i=0; i < sym->nRegs ; i++ ) {
+                sym->regs[i] = getRegGprNoSpil ();
+        }
+
+        /* for all its definitions check if the registers
+           allocated needs positioning NOTE: we can position
+           only ONCE if more than One positioning required
+           then give up */
+        sym->isspilt = 0;
+        for (i = 0 ; i < sym->defs->size ; i++ ) {
+            if (bitVectBitValue(sym->defs,i)) {
+                iCode *ic;
+                if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+                if (SKIP_IC(ic)) continue;
+                assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
+                /* if left is assigned to registers */
+                if (IS_SYMOP(IC_LEFT(ic)) &&
+                    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
+                    pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
+                }
+                if (IS_SYMOP(IC_RIGHT(ic)) &&
+                    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
+                    pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
+                }
+                if (pdone > 1) break;
+            }
+        }
+        for (i = 0 ; i < sym->uses->size ; i++ ) {
+            if (bitVectBitValue(sym->uses,i)) {
+                iCode *ic;
+                if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+                if (SKIP_IC(ic)) continue;
+                if (!IS_ASSIGN_ICODE(ic)) continue ;
+
+                /* if result is assigned to registers */
+                if (IS_SYMOP(IC_RESULT(ic)) &&
+                    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
+                    pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
+                }
+                if (pdone > 1) break;
+            }
+        }
+        /* had to position more than once GIVE UP */
+        if (pdone > 1) {
+            /* UNDO all the changes we made to try this */
+            sym->isspilt = 1;
+            for (i=0; i < sym->nRegs ; i++ ) {
+                sym->regs[i] = NULL;
+            }
+            freeAllRegs();
+            D(D_FILL_GAPS,("Fill Gap gave up due to positioning for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
+            continue ;
+        }
+        D(D_FILL_GAPS,("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
+        _G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
+        sym->isspilt = sym->spillA = 0 ;
+        sym->usl.spillLoc->allocreq--;
+        freeAllRegs();
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* rUmaskForOp :- returns register mask for an operand             */
 /*-----------------------------------------------------------------*/
@@ -973,11 +1426,6 @@ rUmaskForOp (operand * op)
 
   for (j = 0; j < sym->nRegs; j++)
     {
-      if(!(sym->regs[j]) || sym->regs[j]->rIdx < C_IDX || sym->regs[j]->rIdx > CND_IDX)
-        {
-          werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "rUmaskForOp: Register not found");
-          exit (0);
-        }
       rumask = bitVectSetBit (rumask, sym->regs[j]->rIdx);
     }
 
@@ -1019,6 +1467,7 @@ regsUsedIniCode (iCode * ic)
     rmask = bitVectUnion (rmask,
                           rUmaskForOp (IC_LEFT (ic)));
 
+
   if (IC_RIGHT (ic))
     rmask = bitVectUnion (rmask,
                           rUmaskForOp (IC_RIGHT (ic)));
@@ -1059,7 +1508,6 @@ createRegMask (eBBlock ** ebbs, int count)
 
           /* first mark the registers used in this
              instruction */
-
           ic->rUsed = regsUsedIniCode (ic);
           _G.funcrUsed = bitVectUnion (_G.funcrUsed, ic->rUsed);
 
@@ -2055,9 +2503,9 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
         continue;
 
       /* Strangely this leads to a code size increase for some functions. */
-      if (ic->op == '+' && getSize (operandType (IC_RESULT (ic)))  == 2 &&
+      /*if (ic->op == '+' && getSize (operandType (IC_RESULT (ic)))  <= 2 &&
           isOperandEqual (op, IC_RESULT (ic)))
-        continue;
+        continue;*/
 
       if (ic->op == '*' && isOperandEqual (op, IC_LEFT (ic)))
         continue;
@@ -2360,6 +2808,57 @@ opIgnoresA (iCode * ic, iCode * uic)
   return FALSE;
 }
 
+
+/* Some optimisation cases:
+
+   1. Part of memcpy
+;       genPointerGet
+        ld      l,-4(ix)
+        ld      h,-3(ix)
+        ld      c,(hl)
+;       genPlus
+        inc     -4(ix)
+        jp      nz,00108$
+        inc     -3(ix)
+00108$:
+;       genAssign (pointer)
+        ld      a,c
+        ld      (de),a
+
+      want to optimise down to:
+        ld       hl,-4(ix) ...
+        ld       a,(hl)
+        inc      -4(ix).w  ...
+        ld       (de),a
+
+      So genPointer get is OK
+      genPlus where the right is constant, left is iTemp, and result is same as left
+      genAssign (pointer) is OK
+
+    2. Part of _strcpy
+;       genPointerGet
+        ld      a,(de)
+        ld      c,a
+;       genIfx
+        xor     a,a
+        or      a,c
+        jp      z,00103$
+;       _strcpy.c 40
+;       genAssign (pointer)
+;       AOP_STK for _strcpy_to_1_1
+        ld      l,-2(ix)
+        ld      h,-1(ix)
+        ld      (hl),c
+
+      want to optimise down to:
+        ld      a,(de)
+        or      a,a
+        jp      z,00103$
+        ld      (bc),a
+
+      So genIfx where IC_COND has size of 1 and is a constant.
+*/
+
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumulator.
@@ -2387,8 +2886,7 @@ packRegsForAccUse2 (iCode * ic)
        ic->op != '>' &&
        ic->op != CAST &&
        ic->op != GETHBIT &&
-       !((ic->op == LEFT_OP || ic->op == RIGHT_OP) && IS_OP_LITERAL(IC_RIGHT(ic)))
-       )
+       1)
     {
       D (D_ACCUSE2, ("  + Dropping as not a 'good' source command\n"));
       return;
@@ -2397,10 +2895,10 @@ packRegsForAccUse2 (iCode * ic)
   /* if + or - then it has to be one byte result.
      MLH: Ok.
    */
-  if ((ic->op == '+' || ic->op == '-' || ic->op == LEFT_OP || ic->op == RIGHT_OP)
+  if ((ic->op == '+' || ic->op == '-')
       && getSize (operandType (IC_RESULT (ic))) > 1)
     {
-      D (D_ACCUSE2, ("  + Dropping as it's a big one\n"));
+      D (D_ACCUSE2, ("  + Dropping as it's a big + or -\n"));
       return;
     }
 
@@ -2728,193 +3226,11 @@ joinPushes (iCode *lic)
   return lic;
 }
 
-/* C++ parts of new register allocator */
-extern void
-z80_ralloc2_cc (ebbIndex * ebbi);
-
-/** Serially allocate registers to the variables.
-    This was the main register allocation function.  It is called after
-    packing.
-    In the new register allocator it only serves to mark variables for the new register allocator.
- */
-static void
-serialRegAssignMark (eBBlock ** ebbs, int count)
-{
-  int i;
-  int max_alloc_bytes = 1024;	// Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
-
-  /* for all blocks */
-  for (i = 0; i < count; i++)
-    {
-      iCode *ic;
-
-      if (ebbs[i]->noPath &&
-          (ebbs[i]->entryLabel != entryLabel &&
-           ebbs[i]->entryLabel != returnLabel))
-        continue;
-
-      /* for all instructions do */
-      for (ic = ebbs[i]->sch; ic; ic = ic->next)
-        {
-          /* if this is an ipop that means some live
-             range will have to be assigned again */
-          if (ic->op == IPOP)
-            {
-              wassert (0);
-              reassignLR (IC_LEFT (ic));
-            }
-
-          /* if result is present && is a true symbol */
-          if (IC_RESULT (ic) && ic->op != IFX &&
-              IS_TRUE_SYMOP (IC_RESULT (ic)))
-            {
-              OP_SYMBOL (IC_RESULT (ic))->allocreq++;
-            }
-
-          /* take away registers from live
-             ranges that end at this instruction */
-          deassignLRs (ic, ebbs[i]);
-
-          /* some don't need registers */
-          if (SKIP_IC2 (ic) ||
-              ic->op == JUMPTABLE ||
-              ic->op == IFX ||
-              ic->op == IPUSH ||
-              ic->op == IPOP ||
-              (IC_RESULT (ic) && POINTER_SET (ic)))
-            {
-              continue;
-            }
-
-          /* now we need to allocate registers only for the result */
-          if (IC_RESULT (ic))
-            {
-              symbol *sym = OP_SYMBOL (IC_RESULT (ic));
-              bitVect *spillable;
-              int willCS;
-
-              D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
-
-              /* Make sure any spill location is definately allocated */
-              if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
-                  !sym->usl.spillLoc->allocreq)
-                {
-                  sym->usl.spillLoc->allocreq++;
-                }
-
-              /* if it does not need or is spilt
-                 or is already assigned to registers (or marked for the new allocator)
-                 or will not live beyond this instructions */
-              if (!sym->nRegs ||
-                  sym->isspilt ||
-                  bitVectBitValue (_G.regAssigned, sym->key) ||
-                  sym->for_newralloc ||
-                  sym->liveTo <= ic->seq)
-                {
-                  D (D_ALLOC, ("serialRegAssign: won't live long enough.\n"));
-                  continue;
-                }
-
-              /* if some liverange has been spilt at the block level
-                 and this one live beyond this block then spil this
-                 to be safe */
-              if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
-                {
-                  D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
-                  spillThis (sym);
-                  continue;
-                }
-
-              /* if trying to allocate this will cause
-                 a spill and there is nothing to spill
-                 or this one is rematerializable then
-                 spill this one */
-              willCS = willCauseSpill (sym->nRegs, sym->regType);
-              spillable = computeSpillable (ic);
-              if (sym->remat ||
-                  (willCS && bitVectIsZero (spillable)))
-                {
-
-                  D (D_ALLOC, ("serialRegAssign: \"remat spill\"\n"));
-                  spillThis (sym);
-                  continue;
-
-                }
-
-              if (max_alloc_bytes >= sym->nRegs)
-              {
-                sym->for_newralloc = 1;
-                max_alloc_bytes -= sym->nRegs;
-              }
-              else if (!sym->for_newralloc)
-              {
-                spillThis (sym);
-                printf("Spilt %s due to byte limit.\n", sym->name);
-              }
-
-#if 0
-              /* if it shares registers with operands make sure
-                 that they are in the same position */
-              if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
-                  OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=')
-                positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-                              OP_SYMBOL (IC_LEFT (ic)));
-              /* do the same for the right operand */
-              if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
-                  OP_SYMBOL (IC_RIGHT (ic))->nRegs)
-                positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-                              OP_SYMBOL (IC_RIGHT (ic)));
-#endif
-
-            }
-        }
-    }
-}
-
-void RegFix (eBBlock ** ebbs, int count)
-{
-    int i;
-
-    /* Check for and fix any problems with uninitialized operands */
-    for (i = 0; i < count; i++)
-      {
-        iCode *ic;
-
-        if (ebbs[i]->noPath &&
-            (ebbs[i]->entryLabel != entryLabel &&
-             ebbs[i]->entryLabel != returnLabel))
-            continue;
-
-        for (ic = ebbs[i]->sch; ic; ic = ic->next)
-          {
-            if (SKIP_IC2 (ic))
-              continue;
-
-            if (ic->op == IFX)
-              {
-                verifyRegsAssigned (IC_COND (ic), ic);
-                continue;
-              }
-
-            if (ic->op == JUMPTABLE)
-              {
-                verifyRegsAssigned (IC_JTCOND (ic), ic);
-                continue;
-              }
-
-            verifyRegsAssigned (IC_RESULT (ic), ic);
-            verifyRegsAssigned (IC_LEFT (ic), ic);
-            verifyRegsAssigned (IC_RIGHT (ic), ic);
-          }
-      }
-}
-
 /*-----------------------------------------------------------------*/
-/* New register allocator                                          */
-/* For now do everything except for bc, de the old way.            */
+/* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
 void
-z80_ralloc2 (ebbIndex * ebbi)
+z80_assignRegisters (ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
@@ -2955,15 +3271,11 @@ z80_ralloc2 (ebbIndex * ebbi)
      registers & the type of registers required for each */
   regTypeNum ();
 
-  /* Mark variables for assignment by the new allocator */
-  serialRegAssignMark (ebbs, count);
+  /* and serially allocate registers */
+  serialRegAssign (ebbs, count);
 
-  /* The new register allocator invokes its magic */
-  z80_ralloc2_cc (ebbi);
-
-  RegFix (ebbs, count);
-
-  /* New register allcoator here. */
+  freeAllRegs ();
+  fillGaps();
 
   /* if stack was extended then tell the user */
   if (_G.stackExtend)
@@ -3009,14 +3321,3 @@ z80_ralloc2 (ebbIndex * ebbi)
 
   return;
 }
-
-/*-----------------------------------------------------------------*/
-/* assignRegisters - assigns registers to each live range as need  */
-/*-----------------------------------------------------------------*/
-void
-z80_assignRegisters (ebbIndex * ebbi)
-{
-  /* Replace by z80_ralloc(ebbi) to use the old register allocator */
-  z80_ralloc2 (ebbi);
-}
-

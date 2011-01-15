@@ -443,18 +443,6 @@ replace restart {
 } if notUsed('bc')
 
 replace restart {
-	push	bc
-	inc	sp
-	ld	a, c
-	push	af
-	inc	sp
-} by {
-	push	bc
-	ld	a, c
-	; peephole 0y'' simplified pushing bc.
-}
-
-replace restart {
 	ld	a,#%1
 	ld	d,a
 } by {
@@ -1290,16 +1278,6 @@ replace restart {
 	; peephole 43c removed loads by exploiting commutativity of addition.
 	ld	hl,#%1
 	add	hl,de
-} if notUsed('bc')
-
-replace restart {
-	sla	c
-	rl	b
-	add	hl, bc
-} by {
-	add	hl, bc
-	; peephole 43d replaced left shift of bc by addition.
-	add	hl, bc
 } if notUsed('bc')
 
 replace restart {

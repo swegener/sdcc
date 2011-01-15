@@ -361,8 +361,6 @@ typedef struct symbol
     int recvSize;                       /* size of first argument  */
     struct bitVect *clashes;            /* overlaps with what other symbols */
     struct ast * funcTree;              /* function body ast if inlined */
-
-    bool for_newralloc;
   }
 symbol;
 

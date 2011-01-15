@@ -47,8 +47,6 @@ HASH	(#|%:)
 
 #define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
 
-extern char *filename;
-extern int lineno;
 int column = 0;         /* current column */
 
 /* global definitions */
@@ -367,7 +365,7 @@ checkCurrFile (const char *s)
   if (fullSrcFileName &&
     strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0 && fullSrcFileName[strlen(fullSrcFileName) - 1] == '"')
     {
-      lexFilename = fullSrcFileName;
+      lexFilename = (char *) fullSrcFileName;
     }
   else
     {

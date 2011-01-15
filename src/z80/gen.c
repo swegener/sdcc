@@ -4856,7 +4856,7 @@ genCmp (operand * left, operand * right,
 {
   int size, offset = 0;
   unsigned long lit = 0L;
-  bool result_in_carry;
+  bool result_in_carry = FALSE;
 
   /* if left & right are bit variables */
   if (AOP_TYPE (left) == AOP_CRY &&

@@ -309,14 +309,12 @@ extern int noAssemble;          /* no assembly, stop after code generation */
 extern char *yytext;
 extern char *lexFilename;       /* lex idea of current file name */
 extern int lexLineno;           /* lex idea of line number of the current file */
-extern char *fullSrcFileName;   /* full name for the source file; */
+extern const char *fullSrcFileName; /* full name for the source file; */
                                 /* can be NULL while linking without compiling */
-extern char *fullDstFileName;   /* full name for the output file; */
+extern const char *fullDstFileName; /* full name for the output file; */
                                 /* only given by -o, otherwise NULL */
-extern char *dstFileName;       /* destination file name without extension */
-extern char *dstPath;           /* path for the output files; */
-                                /* "" is equivalent with cwd */
-extern char *moduleName;        /* module name is source file without path and extension */
+extern const char *dstFileName; /* destination file name without extension */
+extern const char *moduleName;  /* module name is source file without path and extension */
                                 /* can be NULL while linking without compiling */
 extern int seqPointNo;          /* current sequence point */
 extern FILE *yyin;              /* */

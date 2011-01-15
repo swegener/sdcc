@@ -1,3 +1,10 @@
+2011-01-15 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/SDCCdwarf2.c, src/SDCCdwarf2.h, src/z80/gen.c,
+	  src/SDCCglobl.h, src/pic16/pcode.h, src/pic16/pcode.c,
+	  src/SDCCsystem.c, src/SDCC.lex:
+	  code cleaning: removed warnings, use const char *
+
 2011-01-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* SDCCglobl.h:

@@ -53,16 +53,12 @@
 extern int yyparse (void);
 
 FILE *srcFile;                  /* source file          */
-char *fullSrcFileName;          /* full name for the source file; */
+const char *fullSrcFileName;    /* full name for the source file; */
                                 /* can be NULL while c1mode or linking without compiling */
-char *fullDstFileName;          /* full name for the output file; */
+const char *fullDstFileName;    /* full name for the output file; */
                                 /* only given by -o, otherwise NULL */
-char *dstFileName;              /* destination file name without extension */
-char *dstPath = "";             /* path for the output files; */
-                                /* "" is equivalent with cwd */
-char *moduleNameBase;           /* module name base is source file without path and extension */
-                                /* can be NULL while linking without compiling */
-char *moduleName;               /* module name is same as module name base, but with all */
+const char *dstFileName;        /* destination file name without extension */
+const char *moduleName;         /* module name is same as module name base, but with all */
                                 /* non-alphanumeric characters replaced with underscore */
 int currRegBank = 0;
 int RegBankUsed[4] = { 1, 0, 0, 0 };    /*JCF: Reg Bank 0 used by default */
@@ -83,11 +79,16 @@ set *includeDirsSet = NULL;     /* list of include search directories */
 set *userIncDirsSet = NULL;     /* list of user include directories */
 set *libDirsSet = NULL;         /* list of lib search directories */
 
+static const char *dstPath = "";    /* path for the output files; */
+                                /* "" is equivalent with cwd */
+static const char *moduleNameBase;  /* module name base is source file without path and extension */
+                                /* can be NULL while linking without compiling */
+
 /* uncomment JAMIN_DS390 to always override and use ds390 port
   for mcs51 work.  This is temporary, for compatibility testing. */
 /* #define JAMIN_DS390 */
 #ifdef JAMIN_DS390
-int ds390_jammed = 0;
+static int ds390_jammed = 0;
 #endif
 
 /* Globally accessible scratch buffer for file names.
@@ -544,10 +545,7 @@ setParseWithComma (set ** dest, const char *src)
       while (p < end && ',' != *p)
         ++p;
       dbuf_append (&dbuf, src, p - src);
-
-      /* null terminate the buffer */
-      dbuf_c_str (&dbuf);
-      addSet (dest, dbuf_detach (&dbuf));
+      addSet (dest, (void *) dbuf_detach_c_str (&dbuf));
 
       src = ++p;
     }
@@ -623,7 +621,7 @@ processFile (char *s)
   extp = dbuf_c_str (&ext);
   if (STRCASECMP (extp, ".c") == 0)
     {
-      char *p;
+      char *p, *m;
 
       dbuf_destroy (&ext);
 
@@ -657,11 +655,12 @@ processFile (char *s)
       dbuf_destroy (&path);
 
       moduleNameBase = Safe_strdup (dbuf_c_str (&ext));
-      moduleName = dbuf_detach (&ext);
+      m = dbuf_detach (&ext);
 
-      for (p = moduleName; *p; ++p)
+      for (p = m; *p; ++p)
         if (!isalnum ((unsigned char) *p))
           *p = '_';
+      moduleName = m;
       return;
     }
 
@@ -780,10 +779,11 @@ tryHandleUnsupportedOpt (char **argv, int *pi)
               (longOpt && unsupportedOptTable[i].longOpt && !strcmp (unsupportedOptTable[i].longOpt, longOpt)))
             {
               /* Found an unsupported opt. */
-              char buffer[100];
-              SNPRINTF (buffer, sizeof (buffer),
-                        "%s%c%c", longOpt ? longOpt : "", shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
-              werror (W_UNSUPP_OPTION, buffer, unsupportedOptTable[i].message);
+              struct dbuf_s dbuf;
+
+              dbuf_init (&dbuf, 100);
+              dbuf_printf (&dbuf, "%s%c%c", longOpt ? longOpt : "", shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
+              werror (W_UNSUPP_OPTION, dbuf_detach_c_str (&dbuf), unsupportedOptTable[i].message);
               return 1;
             }
         }
@@ -1188,9 +1188,12 @@ parseCmdLine (int argc, char **argv)
                 if (IS_DIR_SEPARATOR (outName[len - 1]))
                   {
                     /* only output path specified */
-                    dstPath = Safe_malloc (len);
-                    memcpy (dstPath, outName, len - 1);
-                    dstPath[len - 1] = '\0';
+                    char *p;
+
+                    p = Safe_malloc (len);
+                    memcpy (p, outName, len - 1);
+                    p[len - 1] = '\0';
+                    dstPath = p;
                     fullDstFileName = NULL;
                   }
                 else
@@ -1203,16 +1206,12 @@ parseCmdLine (int argc, char **argv)
                     /* get rid of the "."-extension */
                     dbuf_splitFile (outName, &path, NULL);
 
-                    dbuf_c_str (&path);
-                    dstFileName = dbuf_detach (&path);
+                    dstFileName = dbuf_detach_c_str (&path);
 
                     dbuf_init (&path, PATH_MAX);
                     /* strip module name to get path */
                     if (dbuf_splitPath (dstFileName, &path, NULL))
-                      {
-                        dbuf_c_str (&path);
-                        dstPath = dbuf_detach (&path);
-                      }
+                      dstPath = dbuf_detach_c_str (&path);
                     else
                       dbuf_destroy (&path);
                   }
@@ -1267,6 +1266,7 @@ parseCmdLine (int argc, char **argv)
               {
                 char sOpt = argv[i][1];
                 char *rest;
+                struct dbuf_s dbuf;
 
                 if (argv[i][2] == ' ' || argv[i][2] == '\0')
                   {
@@ -1288,8 +1288,9 @@ parseCmdLine (int argc, char **argv)
                 if (sOpt == 'Y')
                   sOpt = 'I';
 
-                SNPRINTF (buffer, sizeof (buffer), ((sOpt == 'I') ? "-%c\"%s\"" : "-%c%s"), sOpt, rest);
-                addSet (&preArgvSet, Safe_strdup (buffer));
+                dbuf_init (&dbuf, 256);
+                dbuf_printf (&dbuf, ((sOpt == 'I') ? "-%c\"%s\"" : "-%c%s"), sOpt, rest);
+                addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
                 if (sOpt == 'I')
                   {
                     addSet (&includeDirsSet, Safe_strdup (rest));
@@ -1349,12 +1350,13 @@ parseCmdLine (int argc, char **argv)
         }
       else
         {
-          char *p;
+          char *p, *m;
 
-          moduleName = Safe_strdup (dstFileName);
-          for (p = moduleName; *p; ++p)
+          m = Safe_strdup (dstFileName);
+          for (p = m; *p; ++p)
             if (!isalnum ((unsigned char) *p))
               *p = '_';
+          moduleName = m;
         }
     }
   /* if no dstFileName given with -o, we've to find one: */
@@ -1371,8 +1373,7 @@ parseCmdLine (int argc, char **argv)
             {
               dbuf_init (&path, 128);
               dbuf_makePath (&path, dstPath, moduleNameBase);
-              dbuf_c_str (&path);
-              dstFileName = dbuf_detach (&path);
+              dstFileName = dbuf_detach_c_str (&path);
             }
           else
             dstFileName = Safe_strdup (moduleNameBase);
@@ -1387,8 +1388,7 @@ parseCmdLine (int argc, char **argv)
           /* get rid of the "."-extension */
           dbuf_splitFile (s, &file, NULL);
 
-          dbuf_c_str (&file);
-          s = dbuf_detach (&file);
+          s = dbuf_detach_c_str (&file);
 
           dbuf_init (&file, PATH_MAX);
 
@@ -1399,15 +1399,12 @@ parseCmdLine (int argc, char **argv)
               struct dbuf_s path;
 
               dbuf_init (&path, PATH_MAX);
-              dbuf_makePath (&path, dstPath, dbuf_c_str (&file));
-              dbuf_destroy (&file);
-              dbuf_c_str (&path);
-              dstFileName = dbuf_detach (&path);
+              dbuf_makePath (&path, dstPath, dbuf_detach_c_str (&file));
+              dstFileName = dbuf_detach_c_str (&path);
             }
           else
             {
-              dbuf_c_str (&file);
-              dstFileName = dbuf_detach (&file);
+              dstFileName = dbuf_detach_c_str (&file);
             }
         }
       /* else no module given: help text is displayed */
@@ -1743,7 +1740,7 @@ linkEdit (char **envp)
       char buffer3[PATH_MAX];
       set *tempSet = NULL, *libSet = NULL;
 
-      strcpy (buffer3, dbuf_c_str (&linkerScriptFileName));
+      strcpy (buffer3, dbuf_detach_c_str (&linkerScriptFileName));
       if ( /*TARGET_IS_PIC16 || */ TARGET_IS_PIC14)
         {
           /* use $l to set the linker include directories */
@@ -1773,7 +1770,7 @@ linkEdit (char **envp)
             buffer3[0] = '\0';
         }
 
-      buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
+      buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_detach_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
                     linkOptionsSet);
 
       buildCmdLine2 (buffer, sizeof (buffer), buffer2);
@@ -1862,7 +1859,7 @@ assemble (char **envp)
         {
           /* gpasm assembler doesn't properly handle the -o option:
              the file extension is replaced with .o,
-             so sdcc havs to rename the object file manually.
+             so sdcc have to rename the object file manually.
              This has been fixed in gpasm svn:
              http://sourceforge.net/tracker/?func=detail&aid=3018645&group_id=41924&atid=431665
              TODO: This code should be removed when the next gputils version
@@ -1877,6 +1874,7 @@ assemble (char **envp)
               remove (fullDstFileName);
               rename (dbuf_c_str (&outName), fullDstFileName);
             }
+          dbuf_destroy (&outName);
         }
     }
 }
@@ -1898,12 +1896,11 @@ preProcess (char **envp)
 
       if (NULL != port->linker.rel_ext)
         {
-#define OBJ_EXT_STR     "-obj-ext="
-#define OBJ_EXT_LEN     ((sizeof OBJ_EXT_STR) - 1)
-          char *buf = Safe_alloc (strlen (port->linker.rel_ext) + (OBJ_EXT_LEN + 1));
-          strcpy (buf, OBJ_EXT_STR);
-          strcpy (&buf[OBJ_EXT_LEN], port->linker.rel_ext);
-          addSet (&preArgvSet, buf);
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 256);
+          dbuf_printf (&dbuf, "-obj-ext=%s", port->linker.rel_ext);
+          addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
         }
 
       /* if using dollar signs in identifiers */
@@ -1983,16 +1980,20 @@ preProcess (char **envp)
 
       /* add SDCC version number */
       {
-        char buf[20];
-        SNPRINTF (buf, sizeof (buf), "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
-        addSet (&preArgvSet, Safe_strdup (buf));
+        struct dbuf_s dbuf;
+
+        dbuf_init (&dbuf, 20);
+        dbuf_printf (&dbuf, "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
+        addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
       }
 
       /* add SDCC revision number */
       {
-        char buf[25];
-        SNPRINTF (buf, sizeof (buf), "-DSDCC_REVISION=%s", getBuildNumber ());
-        addSet (&preArgvSet, Safe_strdup (buf));
+        struct dbuf_s dbuf;
+
+        dbuf_init (&dbuf, 20);        
+        dbuf_printf (&dbuf, "-DSDCC_REVISION=%s", getBuildNumber ());
+        addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
       }
 
       /* add port (processor information to processor */
@@ -2001,9 +2002,11 @@ preProcess (char **envp)
 
       if (port && port->processor && TARGET_IS_PIC14)
         {
-          char proc[512];
-          SNPRINTF (&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
-          addSet (&preArgvSet, Safe_strdup (proc));
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 512);        
+          dbuf_printf (&dbuf, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
+          addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
         }
 
       /* standard include path */
@@ -2059,7 +2062,6 @@ static void
 setBinPaths (const char *argv0)
 {
   const char *p;
-  char buf[PATH_MAX];
 
   /*
    * Search logic:
@@ -2077,8 +2079,12 @@ setBinPaths (const char *argv0)
 
   if ((p = getenv (SDCC_DIR_NAME)) != NULL)
     {
-      SNPRINTF (buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
-      addSetHead (&binPathSet, Safe_strdup (buf));
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, PATH_MAX);
+      dbuf_append_str (&dbuf, p);
+      dbuf_append_str (&dbuf, PREFIX2BIN_DIR);
+      addSetHead (&binPathSet, (void *) dbuf_detach_c_str (&dbuf));
     }
 }
 
@@ -2174,6 +2180,7 @@ setLibPath (void)
 
           mergeSets (&libDirsSet, appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf)));
         }
+      dbuf_destroy (&dbuf);
     }
 }
 
@@ -2182,7 +2189,6 @@ static void
 setDataPaths (const char *argv0)
 {
   const char *p;
-  char buf[PATH_MAX];
 
   /*
    * Search logic:
@@ -2194,15 +2200,22 @@ setDataPaths (const char *argv0)
 
   if ((p = getenv (SDCC_DIR_NAME)) != NULL)
     {
-      SNPRINTF (buf, sizeof buf, "%s" PREFIX2DATA_DIR, p);
-      addSet (&dataDirsSet, Safe_strdup (buf));
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, PATH_MAX);
+      dbuf_append_str (&dbuf, p);
+      dbuf_append_str (&dbuf, PREFIX2DATA_DIR);
+      addSetHead (&binPathSet, (void *) dbuf_detach_c_str (&dbuf));
     }
 
   if ((p = getBinPath (argv0)) != NULL)
     {
-      SNPRINTF (buf, sizeof buf, "%s" BIN2DATA_DIR, p);
-      Safe_free ((void *) p);
-      addSet (&dataDirsSet, Safe_strdup (buf));
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, PATH_MAX);
+      dbuf_append_str (&dbuf, p);
+      dbuf_append_str (&dbuf, BIN2DATA_DIR);
+      addSetHead (&binPathSet, (void *) dbuf_detach_c_str (&dbuf));
     }
 
 #ifdef _WIN32

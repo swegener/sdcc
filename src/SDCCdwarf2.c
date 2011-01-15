@@ -94,7 +94,7 @@ dwline * dwLineLast = NULL;
 /* dwNewDebugSymbol - returns the name for a new debug symbol           */
 /*----------------------------------------------------------------------*/
 static char *
-dwNewDebugSymbol ()
+dwNewDebugSymbol (void)
 {
   char debugSym[SDCC_NAME_MAX];
         
@@ -112,7 +112,7 @@ dwNewDebugSymbol ()
 /* The label and comment parameters are optional                        */
 /*----------------------------------------------------------------------*/
 static void
-dwWriteByte (char * label, int offset, char * comment)
+dwWriteByte (const char * label, int offset, const char * comment)
 {
   tfprintf (dwarf2FilePtr, "\t!db\t");
   if (label)
@@ -327,7 +327,7 @@ dwSizeofSLEB128 (int value)
 /* non-null characters                                                  */
 /*----------------------------------------------------------------------*/
 static void
-dwWriteString (char * string, char * comment)
+dwWriteString (const char * string, const char * comment)
 {
   /* FIXME: need to safely handle nonalphanumeric data in string */
   
@@ -768,7 +768,7 @@ dwFreeAttr (dwattr * ap)
 /* dwNewAttrString - allocate a new tag attribute node with a string value */
 /*-------------------------------------------------------------------------*/
 static dwattr *
-dwNewAttrString (int attr, char * string)
+dwNewAttrString (int attr, const char * string)
 {
   dwattr * ap;
   

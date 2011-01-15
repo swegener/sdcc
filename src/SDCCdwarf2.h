@@ -349,7 +349,7 @@ typedef struct dwattr
       int length;
     } block;
     int data;
-    char * string;
+    const char * string;
     struct dwtag * ref;
     struct dwloc * loc;
     struct dwloclist * loclist;

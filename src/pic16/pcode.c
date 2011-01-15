@@ -3602,7 +3602,7 @@ pCode *pic16_newpCodeCharP(char *cP)
 /*-----------------------------------------------------------------*/
 
 
-pCode *pic16_newpCodeFunction(char *mod,char *f)
+pCode *pic16_newpCodeFunction(const char *mod, const char *f)
 {
   pCodeFunction *pcf;
 

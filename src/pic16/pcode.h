@@ -1006,7 +1006,7 @@ typedef struct peepCommand {
 pCode *pic16_newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *pic16_newpCodeCharP(char *cP);              // Create a new pCode given a char *
 pCode *pic16_newpCodeInlineP(char *cP);            // Create a new pCode given a char *
-pCode *pic16_newpCodeFunction(char *g, char *f);   // Create a new function
+pCode *pic16_newpCodeFunction(const char *g, const char *f); // Create a new function
 pCode *pic16_newpCodeLabel(char *name,int key);    // Create a new label given a key
 pCode *pic16_newpCodeLabelFORCE(char *name, int key); // Same as newpCodeLabel but label cannot be optimized out
 pCode *pic16_newpCodeCSource(int ln, const char *f, const char *l); // Create a new symbol line

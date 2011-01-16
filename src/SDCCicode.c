@@ -4594,7 +4594,7 @@ static const char *opTypeToStr(OPTYPE op)
 }
 
 
-operand *validateOpType(operand         *op,
+operand *validateOpType(const operand   *op,
                         const char      *macro,
                         const char      *args,
                         OPTYPE          type,

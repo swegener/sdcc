@@ -98,7 +98,7 @@ typedef struct operand
   }
 operand;
 
-extern operand *validateOpType(operand          *op,
+extern operand *validateOpType(const operand    *op,
                                const char       *macro,
                                const char       *args,
                                OPTYPE           type,

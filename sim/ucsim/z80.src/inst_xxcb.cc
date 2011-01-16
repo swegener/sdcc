@@ -410,10 +410,11 @@ cl_z80::inst_XXcb_res(t_mem code)
     case 0x5: // RES x,L
       regs.hl.l = tmp; break;
     case 0x6: // RES x,(HL)
-    break;
+      break;
     case 0x7: // RES x,A
-      regs.A = tmp;
-    break;
+      regs.A = tmp; break;
+    default:
+      return(resINV_INST);
   }
   store1(addr, tmp);
   return(resGO);
@@ -431,7 +432,7 @@ cl_z80::inst_XXcb_set(t_mem code)
   tmp = get1(addr);
   tmp |= (1 << bit_bitnum);
 
-  switch(code) {
+  switch(code & 0x7) {
     case 0x0: // SET x,B
       regs.bc.h = tmp; break;
     case 0x1: // SET x,C
@@ -441,17 +442,15 @@ cl_z80::inst_XXcb_set(t_mem code)
     case 0x3: // SET x,E
       regs.de.l = tmp; break;
     case 0x4: // SET x,H
-      regs.de.h = tmp; break;
+      regs.hl.h = tmp; break;
     case 0x5: // SET x,L
-      regs.de.h = tmp; break;
-    case 0x6: // SET x,(IX+dd)
-    break;
+      regs.hl.h = tmp; break;
+    case 0x6: // SET x,(HL)
+      break;
     case 0x7: // SET x,A
-      regs.de.h = tmp; break;
-    break;
+      regs.A = tmp; break;
     default:
       return(resINV_INST);
-    break;
   }
   store1(addr, tmp);
   return(resGO);

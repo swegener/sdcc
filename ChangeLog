@@ -1,6 +1,7 @@
 2011-01-16 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/collate-results.py: count invalid instructions
+	* sim/ucsim/z80.src/inst_xxcb.cc (inst_XXcb_set): fixed SET and RES handling
 
 2011-01-15 Borut Razem <borut.razem AT siol.net>
 

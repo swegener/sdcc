@@ -1,5 +1,11 @@
 2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* SDCClrange.h,
+	  SDCClrange.c:
+	  Comment on the effects of dead code on live ranges.
+
+2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCicode.h,
 	  src/SDCCicode.c:
 	  Make argument to validateOpType const.

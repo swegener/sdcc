@@ -1,3 +1,10 @@
+2011-01-17 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c: fixed bug introduced by me 2011-01-16
+	* support/Util/dbuf.c, support/Util/dbuf.h, src/SDCCsystem.c:
+	  dbuf_detach_c_str() returns char *, for compatiblity with
+	  dbuf_detach()
+
 2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* SDCClrange.h,

@@ -1,8 +1,8 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.3.0, 2010-11-04
+  version 1.3.1, 2011-01-17
 
-  Copyright (c) 2002-2010 Borut Razem
+  Copyright (c) 2002-2011 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -242,7 +242,7 @@ void *dbuf_detach(struct dbuf_s *dbuf)
  * See: dbuf_init()
  */
 
-const char *dbuf_detach_c_str(struct dbuf_s *dbuf)
+char *dbuf_detach_c_str(struct dbuf_s *dbuf)
 {
   dbuf_c_str(dbuf);
   return dbuf_detach(dbuf);

@@ -545,7 +545,7 @@ setParseWithComma (set ** dest, const char *src)
       while (p < end && ',' != *p)
         ++p;
       dbuf_append (&dbuf, src, p - src);
-      addSet (dest, (void *) dbuf_detach_c_str (&dbuf));
+      addSet (dest, dbuf_detach_c_str (&dbuf));
 
       src = ++p;
     }
@@ -1290,7 +1290,7 @@ parseCmdLine (int argc, char **argv)
 
                 dbuf_init (&dbuf, 256);
                 dbuf_printf (&dbuf, ((sOpt == 'I') ? "-%c\"%s\"" : "-%c%s"), sOpt, rest);
-                addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
+                addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
                 if (sOpt == 'I')
                   {
                     addSet (&includeDirsSet, Safe_strdup (rest));
@@ -1900,7 +1900,7 @@ preProcess (char **envp)
 
           dbuf_init (&dbuf, 256);
           dbuf_printf (&dbuf, "-obj-ext=%s", port->linker.rel_ext);
-          addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
         }
 
       /* if using dollar signs in identifiers */
@@ -1984,7 +1984,7 @@ preProcess (char **envp)
 
         dbuf_init (&dbuf, 20);
         dbuf_printf (&dbuf, "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
-        addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
+        addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
 
       /* add SDCC revision number */
@@ -1993,7 +1993,7 @@ preProcess (char **envp)
 
         dbuf_init (&dbuf, 20);        
         dbuf_printf (&dbuf, "-DSDCC_REVISION=%s", getBuildNumber ());
-        addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
+        addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
 
       /* add port (processor information to processor */
@@ -2006,7 +2006,7 @@ preProcess (char **envp)
 
           dbuf_init (&dbuf, 512);        
           dbuf_printf (&dbuf, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
-          addSet (&preArgvSet, (void *) dbuf_detach_c_str (&dbuf));
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
         }
 
       /* standard include path */
@@ -2084,7 +2084,7 @@ setBinPaths (const char *argv0)
       dbuf_init (&dbuf, PATH_MAX);
       dbuf_append_str (&dbuf, p);
       dbuf_append_str (&dbuf, PREFIX2BIN_DIR);
-      addSetHead (&binPathSet, (void *) dbuf_detach_c_str (&dbuf));
+      addSetHead (&binPathSet, dbuf_detach_c_str (&dbuf));
     }
 }
 
@@ -2205,7 +2205,7 @@ setDataPaths (const char *argv0)
       dbuf_init (&dbuf, PATH_MAX);
       dbuf_append_str (&dbuf, p);
       dbuf_append_str (&dbuf, PREFIX2DATA_DIR);
-      addSetHead (&binPathSet, (void *) dbuf_detach_c_str (&dbuf));
+      addSetHead (&dataDirsSet, dbuf_detach_c_str (&dbuf));
     }
 
   if ((p = getBinPath (argv0)) != NULL)
@@ -2215,7 +2215,7 @@ setDataPaths (const char *argv0)
       dbuf_init (&dbuf, PATH_MAX);
       dbuf_append_str (&dbuf, p);
       dbuf_append_str (&dbuf, BIN2DATA_DIR);
-      addSetHead (&binPathSet, (void *) dbuf_detach_c_str (&dbuf));
+      addSetHead (&dataDirsSet, dbuf_detach_c_str (&dbuf));
     }
 
 #ifdef _WIN32

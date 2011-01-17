@@ -254,7 +254,7 @@ get_path (const char *cmd)
  * merge command and parameters to command line
  */
 
-static const char *
+static char *
 merge_command (const char *command, const char *params)
 {
   struct dbuf_s dbuf;

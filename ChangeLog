@@ -1,3 +1,9 @@
+2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.h,
+	  src/SDCCicode.c:
+	  Make argument to validateOpType non-const.
+
 2011-01-17 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c: fixed bug introduced by me 2011-01-16

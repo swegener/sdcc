@@ -137,7 +137,7 @@ split_command (const char *cmd_line, char **command, char **params)
  * merge command and parameters to command line
  */
 
-static char *
+static const char *
 merge_command (const char *command, const char *params)
 {
   struct dbuf_s dbuf;
@@ -194,10 +194,10 @@ compose_command_line (const char *path, const char *command, const char *args)
 }
 
 
-static char *
+static const char *
 get_path (const char *cmd)
 {
-  char *cmdLine;
+  const char *cmdLine;
   char *command;
   char *args;
   char *path;
@@ -254,7 +254,7 @@ get_path (const char *cmd)
  * merge command and parameters to command line
  */
 
-static char *
+static const char *
 merge_command (const char *command, const char *params)
 {
   struct dbuf_s dbuf;
@@ -377,12 +377,13 @@ static HANDLE hProcess = NULL;
  * (see http://bugs.winehq.org/show_bug.cgi?id=25063)
  */
 static FILE *
-sdcc_popen_read (char *cmd)
+sdcc_popen_read (const char *cmd)
 { 
   HANDLE childIn, childOut;
   SECURITY_ATTRIBUTES sa;
   PROCESS_INFORMATION pi;
   STARTUPINFO si;
+  char *lcmd;
 
   assert (hProcess == NULL);
 
@@ -409,11 +410,14 @@ sdcc_popen_read (char *cmd)
   si.hStdInput = GetStdHandle (STD_INPUT_HANDLE);
   si.dwFlags |= STARTF_USESTDHANDLES;
 
-  if (!CreateProcess (NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+  lcmd = Safe_strdup(cmd);
+  if (!CreateProcess (NULL, lcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
     {
       _doserrno = GetLastError ();
+      Safe_free(lcmd);
       return NULL;
     }
+  Safe_free(lcmd);
 
   CloseHandle (childOut);
   CloseHandle (pi.hThread);
@@ -477,3 +481,4 @@ sdcc_popen (const char *cmd)
 
   return fp;
 }
+

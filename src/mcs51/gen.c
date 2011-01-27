@@ -230,9 +230,15 @@ mova (const char *x)
     return;
 
   /* if it is a literal mov try to get it cheaper */
-  if (*x == '#' &&
-      rtrackMoveALit(x))
+  if (*x == '#' && rtrackMoveALit(x))
     return;
+
+  /* another early peephole optimization */
+  if (!strncmp(x, "#0x00", 5))
+    {
+      emitcode("clr", "a");
+      return;
+    }
 
   emitcode("mov", "a,%s", x);
 }
@@ -368,7 +374,7 @@ Push (const char *s)
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed */
 /*-----------------------------------------------------------------*/
 static regs *
-getFreePtr (iCode * ic, asmop ** aopp, bool result)
+getFreePtr (iCode * ic, asmop * aop, bool result)
 {
   bool r0iu, r1iu;
   bool r0ou, r1ou;
@@ -391,18 +397,18 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
   if (!r0iu && !r0ou)
     {
       ic->rUsed = bitVectSetBit (ic->rUsed, R0_IDX);
-      (*aopp)->type = AOP_R0;
+      aop->type = AOP_R0;
 
-      return (*aopp)->aopu.aop_ptr = REG_WITH_INDEX (R0_IDX);
+      return aop->aopu.aop_ptr = REG_WITH_INDEX (R0_IDX);
     }
 
   /* if no usage of r1 then return it */
   if (!r1iu && !r1ou)
     {
       ic->rUsed = bitVectSetBit (ic->rUsed, R1_IDX);
-      (*aopp)->type = AOP_R1;
+      aop->type = AOP_R1;
 
-      return (*aopp)->aopu.aop_ptr = REG_WITH_INDEX (R1_IDX);
+      return aop->aopu.aop_ptr = REG_WITH_INDEX (R1_IDX);
     }
 
   /* now we know they both have usage */
@@ -423,9 +429,9 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
         }
 
       ic->rUsed = bitVectSetBit (ic->rUsed, R0_IDX);
-      (*aopp)->type = AOP_R0;
+      aop->type = AOP_R0;
 
-      return (*aopp)->aopu.aop_ptr = REG_WITH_INDEX (R0_IDX);
+      return aop->aopu.aop_ptr = REG_WITH_INDEX (R0_IDX);
     }
 
   /* if r1 not used then */
@@ -446,7 +452,7 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
         }
 
       ic->rUsed = bitVectSetBit (ic->rUsed, R1_IDX);
-      (*aopp)->type = AOP_R1;
+      aop->type = AOP_R1;
       return REG_WITH_INDEX (R1_IDX);
     }
 
@@ -455,19 +461,19 @@ endOfWorld:
   /* if this is a result then we can push it on the stack */
   if (result)
     {
-      (*aopp)->type = AOP_STK;
+      aop->type = AOP_STK;
       return NULL;
     }
   /* in the case that result AND left AND right needs a pointer reg
      we can safely use the result's */
   if (bitVectBitValue (mcs51_rUmaskForOp(IC_RESULT(ic)), R0_IDX))
     {
-      (*aopp)->type = AOP_R0;
+      aop->type = AOP_R0;
       return REG_WITH_INDEX (R0_IDX);
     }
   if (bitVectBitValue (mcs51_rUmaskForOp(IC_RESULT(ic)), R1_IDX))
     {
-      (*aopp)->type = AOP_R1;
+      aop->type = AOP_R1;
       return REG_WITH_INDEX (R1_IDX);
     }
 
@@ -621,6 +627,66 @@ leftRightUseAcc(iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopPtrForSym - pointer for symbol                               */
+/*-----------------------------------------------------------------*/
+static void
+aopPtrForSym (symbol * sym, bool accuse, signed char offset, asmop *aop)
+{
+  char * base;
+  struct dbuf_s tmpBuf;
+  dbuf_init (&tmpBuf, 1024);
+  if (sym->onStack)
+    {
+      dbuf_printf(&tmpBuf, "%s", SYM_BP (sym));
+    }
+  else
+    {
+      dbuf_printf(&tmpBuf, "#%s", sym->rname);
+    }
+  dbuf_c_str (&tmpBuf);
+  base = dbuf_detach (&tmpBuf);
+
+  offset += ((sym->stack < 0) ?
+             ((signed char) (sym->stack - _G.nRegsSaved)) :
+             ((signed char) sym->stack)) & 0xff;
+
+  if ((abs(offset) < 3) ||
+      (accuse && (abs(offset) < 4)))
+    {
+      emitcode ("mov", "%s,%s",
+                aop->aopu.aop_ptr->name, base);
+      while (offset < 0)
+        {
+          emitcode ("dec", aop->aopu.aop_ptr->name);
+          offset++;
+        }
+      while (offset > 0)
+        {
+          emitcode ("inc", aop->aopu.aop_ptr->name);
+          offset--;
+        }
+    }
+  else
+    {
+      if (accuse)
+        {
+          emitcode ("xch", "a,%s", aop->aopu.aop_ptr->name);
+          emitcode ("mov", "a,%s", base);
+          emitcode ("add", "a,#0x%02x", offset & 0xff);
+          emitcode ("xch", "a,%s", aop->aopu.aop_ptr->name);
+        }
+      else
+        {
+          emitcode ("mov", "a,%s", base);
+          emitcode ("add", "a,#0x%02x", offset & 0xff);
+          emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
+        }
+    }
+  aop->paged = SPEC_OCLS (sym->etype)->paged;
+  dbuf_free(base);
+}
+
+/*-----------------------------------------------------------------*/
 /* aopForSym - for a true symbol                                   */
 /*-----------------------------------------------------------------*/
 static asmop *
@@ -648,62 +714,17 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   if (sym->onStack || sym->iaccess)
     {
       sym->aop = aop = newAsmop (0);
-      aop->aopu.aop_ptr = getFreePtr (ic, &aop, result);
+      aop->aopu.aop_ptr = getFreePtr (ic, aop, result);
       aop->size = getSize (sym->type);
 
       /* now assign the address of the variable to
          the pointer register */
       if (aop->type != AOP_STK)
         {
-          if (sym->onStack)
-            {
-              signed char offset = ((sym->stack < 0) ?
-                         ((signed char) (sym->stack - _G.nRegsSaved)) :
-                         ((signed char) sym->stack)) & 0xff;
-
-              if ((abs(offset) < 3) ||
-                  (accuse && (abs(offset) < 4)))
-                {
-                  emitcode ("mov", "%s,%s",
-                            aop->aopu.aop_ptr->name, SYM_BP (sym));
-                  while (offset < 0)
-                    {
-                      emitcode ("dec", aop->aopu.aop_ptr->name);
-                      offset++;
-                    }
-                  while (offset > 0)
-                    {
-                      emitcode ("inc", aop->aopu.aop_ptr->name);
-                      offset--;
-                    }
-                }
-              else
-                {
-                  if (accuse)
-                    {
-                      emitcode ("xch", "a,%s", aop->aopu.aop_ptr->name);
-                      emitcode ("mov", "a,%s", SYM_BP (sym));
-                      emitcode ("add", "a,#0x%02x", offset & 0xff);
-                      emitcode ("xch", "a,%s", aop->aopu.aop_ptr->name);
-                    }
-                  else
-                    {
-                      emitcode ("mov", "a,%s", SYM_BP (sym));
-                      emitcode ("add", "a,#0x%02x", offset & 0xff);
-                      emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
-                    }
-                }
-            }
-          else
-            {
-              emitcode ("mov", "%s,#%s",
-                        aop->aopu.aop_ptr->name,
-                        sym->rname);
-            }
-          aop->paged = space->paged;
+          aopPtrForSym (sym, accuse, 0, aop);
         }
       else
-        aop->aopu.aop_stk = sym->stack;
+        aop->aopu.aop_sym = sym;
       return aop;
     }
 
@@ -1142,27 +1163,21 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
     case AOP_STK:
       {
         int sz = aop->size;
-        int stk = aop->aopu.aop_stk + aop->size - 1;
+        symbol * sym = aop->aopu.aop_sym;
         bitVectUnSetBit (ic->rUsed, R0_IDX);
         bitVectUnSetBit (ic->rUsed, R1_IDX);
 
-        getFreePtr (ic, &aop, FALSE);
+        getFreePtr (ic, aop, FALSE);
 
-        if (stk)
-          {
-            emitcode ("mov", "a,_bp");
-            emitcode ("add", "a,#0x%02x", ((char) stk) & 0xff);
-            emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
-          }
-        else
-          {
-            emitcode ("mov", "%s,_bp", aop->aopu.aop_ptr->name);
-          }
+        aopPtrForSym (sym, FALSE, aop->size - 1, aop);
 
         while (sz--)
           {
             emitcode ("pop", "acc");
-            emitcode ("mov", "@%s,a", aop->aopu.aop_ptr->name);
+            if (aop->paged)
+              emitcode ("movx", "@%s,a", aop->aopu.aop_ptr->name);
+            else
+              emitcode ("mov", "@%s,a", aop->aopu.aop_ptr->name);
             if (!sz)
               break;
             emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
@@ -1245,24 +1260,17 @@ freeForBranchAsmop (operand * op)
     case AOP_STK:
       {
         int sz = aop->size;
-        int stk = aop->aopu.aop_stk + aop->size - 1;
 
         emitcode ("mov", "b,r0");
-        if (stk)
-          {
-            emitcode ("mov", "a,_bp");
-            emitcode ("add", "a,#0x%02x", ((char) stk) & 0xff);
-            emitcode ("mov", "r0,a");
-          }
-        else
-          {
-            emitcode ("mov", "r0,_bp");
-          }
+        aopPtrForSym (aop->aopu.aop_sym, FALSE, 0, aop);
 
         while (sz--)
           {
             emitcode ("pop", "acc");
-            emitcode ("mov", "@r0,a");
+            if (aop->paged)
+              emitcode ("movx", "@r0,a");
+            else
+              emitcode ("mov", "@r0,a");
             if (!sz)
               break;
             emitcode ("dec", "r0");
@@ -1270,7 +1278,6 @@ freeForBranchAsmop (operand * op)
         emitcode ("mov", "r0,b");
       }
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -1744,7 +1751,7 @@ aopPut (operand * result, const char *s, int offset)
       exit (EXIT_FAILURE);
     }
 
-    return accuse;
+  return accuse;
 }
 
 
@@ -2601,7 +2608,7 @@ genXpush (iCode * ic)
   D (emitcode (";", "genXpush"));
 
   aopOp (IC_LEFT (ic), ic, FALSE);
-  r = getFreePtr (ic, &aop, FALSE);
+  r = getFreePtr (ic, aop, FALSE);
 
   size = AOP_SIZE (IC_LEFT (ic));
 
@@ -2769,7 +2776,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       else
         {
           aop = newAsmop (0);
-          r = getFreePtr (ic, &aop, FALSE);
+          r = getFreePtr (ic, aop, FALSE);
         }
       // allocate space first
       emitcode ("mov", "%s,%s", r->name, spname);
@@ -2839,7 +2846,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
       else
         {
           aop = newAsmop (0);
-          r = getFreePtr (ic, &aop, FALSE);
+          r = getFreePtr (ic, aop, FALSE);
         }
       emitcode ("mov", "%s,%s", r->name, spname);
     }
@@ -3598,20 +3605,20 @@ genFunction (iCode * ic)
                       dtype = operandType (IC_LEFT(i));
                       if (dtype && FUNC_REGBANK(dtype) != FUNC_REGBANK(sym->type))
                         {
-                           /* Mark this bank for saving. */
-                           if (FUNC_REGBANK(dtype) >= MAX_REGISTER_BANKS)
-                             {
-                               werror(E_NO_SUCH_BANK, FUNC_REGBANK(dtype));
-                             }
-                           else
-                             {
-                               banksToSave |= (1 << FUNC_REGBANK(dtype));
-                             }
+                          /* Mark this bank for saving. */
+                          if (FUNC_REGBANK(dtype) >= MAX_REGISTER_BANKS)
+                            {
+                              werror(E_NO_SUCH_BANK, FUNC_REGBANK(dtype));
+                            }
+                          else
+                            {
+                              banksToSave |= (1 << FUNC_REGBANK(dtype));
+                            }
 
-                           /* And note that we don't need to do it in
-                            * genCall.
-                            */
-                           i->bankSaved = 1;
+                          /* And note that we don't need to do it in
+                           * genCall.
+                           */
+                          i->bankSaved = 1;
                         }
                     }
                   if (i->op == PCALL)
@@ -3643,10 +3650,10 @@ genFunction (iCode * ic)
 
               for (ix = 0; ix < MAX_REGISTER_BANKS; ix++)
                 {
-                   if (banksToSave & (1 << ix))
-                     {
-                       saveRBank(ix, NULL, FALSE);
-                     }
+                  if (banksToSave & (1 << ix))
+                    {
+                      saveRBank(ix, NULL, FALSE);
+                    }
                 }
             }
           // TODO: this needs a closer look
@@ -5097,38 +5104,44 @@ genMinus (iCode * ic)
 
       while (size--)
         {
-          if (aopGetUsesAcc(rightOp, offset)) {
-            if (aopGetUsesAcc(leftOp, offset)) {
-              bool pushedB;
+          if (aopGetUsesAcc(rightOp, offset))
+            {
+              if (aopGetUsesAcc(leftOp, offset))
+                {
+                  bool pushedB;
 
-              MOVA (aopGet (rightOp, offset, FALSE, FALSE));
-              pushedB = pushB ();
-              emitcode ("mov", "b,a");
+                  MOVA (aopGet (rightOp, offset, FALSE, FALSE));
+                  pushedB = pushB ();
+                  emitcode ("mov", "b,a");
+                  if (offset == 0)
+                    CLRC;
+                  MOVA (aopGet (leftOp, offset, FALSE, FALSE));
+                  emitcode ("subb", "a,b");
+                  popB (pushedB);
+                }
+              else
+                {
+                  /* reverse subtraction with 2's complement */
+                  if (offset == 0)
+                    emitcode( "setb", "c");
+                  else
+                    emitcode( "cpl", "c");
+                  wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
+                  MOVA (aopGet(rightOp, offset, FALSE, TRUE));
+                  emitcode("subb", "a,%s", aopGet(leftOp, offset, FALSE, TRUE));
+                  emitcode("cpl", "a");
+                  if (size) /* skip if last byte */
+                    emitcode( "cpl", "c");
+                }
+            }
+          else
+            {
+              MOVA (aopGet (leftOp, offset, FALSE, FALSE));
               if (offset == 0)
                 CLRC;
-              MOVA (aopGet (leftOp, offset, FALSE, FALSE));
-              emitcode ("subb", "a,b");
-              popB (pushedB);
-            } else {
-              /* reverse subtraction with 2's complement */
-              if (offset == 0)
-                emitcode( "setb", "c");
-              else
-                emitcode( "cpl", "c");
-              wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
-              MOVA (aopGet(rightOp, offset, FALSE, TRUE));
-              emitcode("subb", "a,%s", aopGet(leftOp, offset, FALSE, TRUE));
-              emitcode("cpl", "a");
-              if (size) /* skip if last byte */
-                emitcode( "cpl", "c");
+              emitcode ("subb", "a,%s",
+                        aopGet(rightOp, offset, FALSE, TRUE));
             }
-          } else {
-            MOVA (aopGet (leftOp, offset, FALSE, FALSE));
-            if (offset == 0)
-              CLRC;
-            emitcode ("subb", "a,%s",
-                      aopGet(rightOp, offset, FALSE, TRUE));
-          }
 
           aopPut (IC_RESULT (ic), "a", offset++);
         }
@@ -10203,7 +10216,7 @@ genNearPointerGet (operand * left,
         {
           /* otherwise get a free pointer register */
           aop = newAsmop (0);
-          preg = getFreePtr (ic, &aop, FALSE);
+          preg = getFreePtr (ic, aop, FALSE);
           emitcode ("mov", "%s,%s",
                     preg->name,
                     aopGet (left, 0, FALSE, TRUE));
@@ -10313,7 +10326,7 @@ genPagedPointerGet (operand * left,
     {
       /* otherwise get a free pointer register */
       aop = newAsmop (0);
-      preg = getFreePtr (ic, &aop, FALSE);
+      preg = getFreePtr (ic, aop, FALSE);
       emitcode ("mov", "%s,%s",
                 preg->name,
                 aopGet (left, 0, FALSE, TRUE));
@@ -11040,7 +11053,7 @@ genNearPointerSet (operand * right,
         {
           /* otherwise get a free pointer register */
           aop = newAsmop (0);
-          preg = getFreePtr (ic, &aop, FALSE);
+          preg = getFreePtr (ic, aop, FALSE);
           emitcode ("mov", "%s,%s",
                     preg->name,
                     aopGet (result, 0, FALSE, TRUE));
@@ -11157,7 +11170,7 @@ genPagedPointerSet (operand * right,
         {
           /* otherwise get a free pointer register */
           aop = newAsmop (0);
-          preg = getFreePtr (ic, &aop, FALSE);
+          preg = getFreePtr (ic, aop, FALSE);
           emitcode ("mov", "%s,%s",
                     preg->name,
                     aopGet (result, 0, FALSE, TRUE));
@@ -11638,7 +11651,7 @@ genJumpTab (iCode * ic)
     {
       /* this algorithm needs 9 cycles and 7 + 3*n bytes
          if the switch argument is in a register.
-	     (5 + 2*n bytes when options.acall_ajmp is set)
+         (5 + 2*n bytes when options.acall_ajmp is set)
          (8 cycles and 6+2*n bytes if peepholes can change ljmp to sjmp) */
       /* Peephole may not convert ljmp to sjmp or ret
          labelIsReturnOnly & labelInRange must check
@@ -11650,17 +11663,17 @@ genJumpTab (iCode * ic)
       /* multiply by three */
       if (aopGetUsesAcc (IC_JTCOND (ic), 0))
         {
-		  if(options.acall_ajmp==0)
-			emitcode ("mov", "b,#0x03");
-		  else
-			emitcode ("mov", "b,#0x02");
+          if(options.acall_ajmp==0)
+            emitcode ("mov", "b,#0x03");
+          else
+            emitcode ("mov", "b,#0x02");
           emitcode ("mul", "ab");
         }
       else
         {
           emitcode ("add", "a,acc");
-		  if(options.acall_ajmp==0)
-			emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
+          if(options.acall_ajmp==0)
+            emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
         }
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
 

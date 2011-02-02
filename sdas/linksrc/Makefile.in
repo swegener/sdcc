@@ -74,7 +74,7 @@ sdcc-ldgb: checkconf $(top_builddir)/bin/sdldgb$(EXEEXT)
 sdcc-ld6808: checkconf $(top_builddir)/bin/sdld6808$(EXEEXT)
 
 $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT): $(ASLINK)
-	cp $(ASLINK) $@
+	cp -p $(ASLINK) $@
 
 $(ASLINK): $(LKOBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(LKOBJECTS)

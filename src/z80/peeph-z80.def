@@ -455,6 +455,18 @@ replace restart {
 }
 
 replace restart {
+	push	de
+	inc	sp
+	ld	a, #%1
+	push	af
+	inc	sp
+} by {
+	ld	e, #%1
+	push	de
+	; peephole 0y'' simplified pushing de.
+} if notUsed('e')
+
+replace restart {
 	ld	a,#%1
 	ld	d,a
 } by {
@@ -622,6 +634,16 @@ replace restart {
 	; peephole 0zj'' tested bit %1 of d directly instead of going through a.
 	bit	%1,d
 } if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	set	%2, a
+	ld	%1, a
+} by {
+	; peephole 0zj''' set bit %1 of (hl) directly instead of going through a.
+	set	%2, %1
+} if notUsed('a'), canAssign('b' %1)
+// canAssign('b' %1) is true, iff set b, %1 is possible.
 
 replace restart {
 	ld	bc, #%1 + %2

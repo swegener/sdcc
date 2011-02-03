@@ -1,3 +1,9 @@
+2011-02-03 Borut Razem <borut.razem AT siol.net>
+
+	* support/makebin/makebin.c:
+	  fixed bugs #3171768: makebin fails when data is at the last byte,
+	  #3171795: If makebin read_ihx fails, it should exit with an error code
+
 2011-02-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/peeph-z80.def:

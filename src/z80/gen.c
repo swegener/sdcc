@@ -1347,16 +1347,16 @@ isPtr (const char *s)
 }
 
 static void
-adjustPair (const char *pair, int *pold, int new)
+adjustPair (const char *pair, int *pold, int new_val)
 {
   wassert (pair);
 
-  while (*pold < new)
+  while (*pold < new_val)
     {
       emit2 ("inc %s", pair);
       (*pold)++;
     }
-  while (*pold > new)
+  while (*pold > new_val)
     {
       emit2 ("dec %s", pair);
       (*pold)--;
@@ -1380,7 +1380,17 @@ requiresHL (asmop * aop)
     case AOP_STK:
     case AOP_EXSTK:
     case AOP_HLREG:
+
       return TRUE;
+    case AOP_REG:
+      {
+        int i;
+        for (i = 0; i < aop->size; i++)
+          {
+            if (aop->aopu.aop_reg[i]->rIdx == L_IDX || aop->aopu.aop_reg[i]->rIdx == H_IDX)
+              return TRUE;
+          }
+      }
     default:
       return FALSE;
     }
@@ -1957,7 +1967,7 @@ aopPut (asmop * aop, const char *s, int offset)
   s = buffer2;
 
   /* will assign value to value */
-  /* depending on where it is ofcourse */
+  /* depending on where it is of course */
   switch (aop->type)
     {
     case AOP_DUMMY:
@@ -3084,7 +3094,8 @@ emitCall (iCode * ic, bool ispcall)
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-        OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
+        OP_SYMBOL (IC_RESULT (ic))->spildir ||
+        OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);

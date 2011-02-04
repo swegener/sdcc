@@ -5829,7 +5829,7 @@ genOr (iCode * ic, iCode * ifx)
             { /* FIXME, always true, shortcut possible */
               emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
             }
-          else
+          else if (ifx)
             {
               /* For the flags */
               emit2 ("or a,a");
@@ -5854,25 +5854,27 @@ genOr (iCode * ic, iCode * ifx)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
+              bytelit = (lit >> (offset * 8)) & 0x0FFL;
+              if (bytelit == 0x00L)
                 continue;
               else
                 {
                   _moveA (aopGet (AOP (left), offset, FALSE));
-                  emit2 ("or a,%s",
-                            aopGet (AOP (right), offset, FALSE));
+                  if(isLiteralBit(bytelit) >= 0)
+                    emit2 ("set %d, a", isLiteralBit(bytelit));
+                  else
+                    emit2 ("or a, %s", aopGet (AOP (right), offset, FALSE));
                   aopPut (AOP (result), "a", offset);
                 }
             }
           else
             {
               if (AOP_TYPE (left) == AOP_ACC)
-                emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
+                emit2 ("or a, %s", aopGet (AOP (right), offset, FALSE));
               else
                 {
                   _moveA (aopGet (AOP (left), offset, FALSE));
-                  emit2 ("or a,%s",
-                            aopGet (AOP (right), offset, FALSE));
+                  emit2 ("or a, %s", aopGet (AOP (right), offset, FALSE));
                   aopPut (AOP (result), "a", offset);
                 }
             }
@@ -5902,14 +5904,12 @@ genOr (iCode * ic, iCode * ifx)
               }
             // faster than result <- left, anl result,right
             // and better if result is SFR
-            if (AOP_TYPE (left) == AOP_ACC)
-              emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
+            if(AOP_TYPE (left) != AOP_ACC)
+              _moveA (aopGet (AOP (left), offset, FALSE));
+            if(AOP_TYPE (right) == AOP_LIT && isLiteralBit(((lit >> (offset * 8)) & 0x0FFL)) >= 0)
+              emit2 ("set %d, a", isLiteralBit(((lit >> (offset * 8)) & 0x0FFL)));
             else
-              {
-                _moveA (aopGet (AOP (left), offset, FALSE));
-                emit2 ("or a,%s",
-                          aopGet (AOP (right), offset, FALSE));
-              }
+              emit2 ("or a, %s", aopGet (AOP (right), offset, FALSE));
             aopPut (AOP (result), "a", offset);
             /* PENDING: something weird is going on here.  Add exception. */
             if (AOP_TYPE (result) == AOP_ACC)

@@ -410,7 +410,7 @@ cl_z80::inst_cb_set(t_mem code)
       }
     break;
     case 0x7: // SET x,A
-      regs.de.h |= (1 << bit_bitnum); break;
+      regs.A |= (1 << bit_bitnum); break;
   }
   return(resGO);
 }

@@ -44,7 +44,7 @@ set *dynInternalRegs=NULL;
 #endif
 
 /* this should go in SDCCicode.h, but it doesn't. */
-#define IS_REF(op)      (IS_SYMOP(op) && op->operand.symOperand->isref == 1)
+#define IS_REF(op)      (IS_SYMOP(op) && op->svt.symOperand->isref == 1)
 
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
@@ -2669,9 +2669,9 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                         debugLog ("  %d - found config word declaration\n", __LINE__);
                         if(IS_VALOP(IC_RIGHT(ic))) {
                                 debugLog ("  setting config word to %x\n",
-                                        (int) ulFromVal (IC_RIGHT(ic)->operand.valOperand));
+                                        (int) ulFromVal (OP_VALUE (IC_RIGHT(ic))));
                                 pic14_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
-                                        (int) ulFromVal (IC_RIGHT(ic)->operand.valOperand));
+                                        (int) ulFromVal (OP_VALUE (IC_RIGHT(ic))));
                         }
 
                         /* remove the assignment from the iCode chain. */
@@ -2962,9 +2962,8 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
                 for (sic = dic; sic != ic; sic = sic->next)
                         bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
 
-                IC_LEFT (ic)->operand.symOperand =
-                        IC_RIGHT (dic)->operand.symOperand;
-                IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+                OP_SYMBOL (IC_LEFT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
+                IC_LEFT (ic)->key = OP_KEY (IC_RIGHT (dic));
                 remiCodeFromeBBlock (ebp, dic);
                 bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
                 hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
@@ -2999,9 +2998,8 @@ right:
                 for (sic = dic; sic != ic; sic = sic->next)
                         bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
 
-                IC_RIGHT (ic)->operand.symOperand =
-                        IC_RIGHT (dic)->operand.symOperand;
-                IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+                OP_SYMBOL (IC_RIGHT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
+                IC_RIGHT (ic)->key = OP_KEY (IC_RIGHT (dic));
 
                 remiCodeFromeBBlock (ebp, dic);
                 bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);

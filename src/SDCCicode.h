@@ -59,9 +59,9 @@ OPTYPE;
 #define LRETYPE       sym_link *letype= getSpec(ltype)   , \
                            *retype= getSpec(rtype);
 #define LRTYPE        LRFTYPE LRETYPE
-#define IS_ITEMP(op)       (IS_SYMOP(op) && op->operand.symOperand->isitmp == 1)
-#define IS_PARM(op)        (IS_SYMOP(op) && op->operand.symOperand->_isparm)
-#define IS_ITEMPLBL(op)    (IS_ITEMP(op) && op->operand.symOperand->isilbl == 1)
+#define IS_ITEMP(op)       (IS_SYMOP(op) && op->svt.symOperand->isitmp == 1)
+#define IS_PARM(op)        (IS_SYMOP(op) && op->svt.symOperand->_isparm)
+#define IS_ITEMPLBL(op)    (IS_ITEMP(op) && op->svt.symOperand->isilbl == 1)
 #define IS_OP_VOLATILE(op) (IS_SYMOP(op) && op->isvolatile)
 #define IS_OP_LITERAL(op)  (op && op->isLiteral)
 #define IS_OP_GLOBAL(op)   (IS_SYMOP(op) && op->isGlobal)
@@ -91,7 +91,7 @@ typedef struct operand
         struct value *valOperand;       /* operand is of type value  */
         struct sym_link *typeOperand;   /* operand is of type typechain */
       }
-    operand;
+    svt;
 
     bitVect *usesDefs;          /* which definitions are used by this */
     struct asmop *aop;          /* asm op for this operand */
@@ -105,14 +105,24 @@ extern operand *validateOpType(operand          *op,
                                const char       *file,
                                unsigned         line);
 
-#define OP_SYMBOL(op)      validateOpType(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand
-#define OP_VALUE(op)       validateOpType(op, "OP_VALUE", #op, VALUE, __FILE__, __LINE__)->operand.valOperand
-#define OP_SYM_TYPE(op)    validateOpType(op, "OP_SYM_TYPE", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->type
-#define OP_SYM_ETYPE(op)   validateOpType(op, "OP_SYM_ETYPE", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->etype
-#define SPIL_LOC(op)       validateOpType(op, "SPIL_LOC", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->usl.spillLoc
-#define OP_LIVEFROM(op)    validateOpType(op, "OP_LIVEFROM", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->liveFrom
-#define OP_LIVETO(op)      validateOpType(op, "OP_LIVETO", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->liveTo
-#define OP_REQV(op)        validateOpType(op, "OP_REQV", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->reqv
+extern const operand *validateOpTypeConst(const operand    *op,
+                                          const char       *macro,
+                                          const char       *args,
+                                          OPTYPE           type,
+                                          const char       *file,
+                                          unsigned         line);
+
+#define OP_SYMBOL(op)        validateOpType(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand
+#define OP_SYMBOL_CONST(op)  validateOpTypeConst(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand
+#define OP_VALUE(op)         validateOpType(op, "OP_VALUE", #op, VALUE, __FILE__, __LINE__)->svt.valOperand
+#define OP_SYM_TYPE(op)      validateOpType(op, "OP_SYM_TYPE", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->type
+#define OP_SYM_ETYPE(op)     validateOpType(op, "OP_SYM_ETYPE", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->etype
+#define SPIL_LOC(op)         validateOpType(op, "SPIL_LOC", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->usl.spillLoc
+#define OP_LIVEFROM(op)      validateOpType(op, "OP_LIVEFROM", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->liveFrom
+#define OP_LIVETO(op)        validateOpType(op, "OP_LIVETO", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->liveTo
+#define OP_REQV(op)          validateOpType(op, "OP_REQV", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->reqv
+#define OP_KEY(op)           validateOpType(op, "OP_REQV", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->key
+#define OP_TYPE(op)          validateOpType(op, "OP_TYPE", #op, TYPE, __FILE__, __LINE__)->svt.typeOperand
 
 /* definition for intermediate code */
 #define IC_RESULT(x) (x)->ulrrcnd.lrr.result
@@ -293,8 +303,8 @@ iCodeTable;
 #define SET_RESULT_RIGHT(ic) {SET_ISADDR(IC_RIGHT(ic),0); SET_ISADDR(IC_RESULT(ic),0);}
 #define IS_ASSIGN_ICODE(ic) (ASSIGNMENT(ic) && !POINTER_SET(ic))
 
-#define OP_DEFS(op) validateOpType(op, "OP_DEFS", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->defs
-#define OP_USES(op) validateOpType(op, "OP_USES", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->uses
+#define OP_DEFS(op) validateOpType(op, "OP_DEFS", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->defs
+#define OP_USES(op) validateOpType(op, "OP_USES", #op, SYMBOL, __FILE__, __LINE__)->svt.symOperand->uses
 /*-----------------------------------------------------------------*/
 /* forward references for functions                                */
 /*-----------------------------------------------------------------*/

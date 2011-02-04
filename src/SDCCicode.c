@@ -170,7 +170,7 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
       else if (IS_FIXED16X16 (opetype))
         dbuf_printf (dbuf, "%g {", doubleFromFixed16x16(SPEC_CVAL (opetype).v_fixed16x16));
       else
-        dbuf_printf (dbuf, "0x%x {", (unsigned int) ulFromVal (op->operand.valOperand));
+        dbuf_printf (dbuf, "0x%x {", (unsigned int) ulFromVal (OP_VALUE (op)));
       dbuf_printTypeChain (operandType (op), dbuf);
       dbuf_append_char (dbuf, '}');
       break;
@@ -271,7 +271,7 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
 
     case TYPE:
       dbuf_append_char (dbuf, '(');
-      dbuf_printTypeChain (op->operand.typeOperand, dbuf);
+      dbuf_printTypeChain (OP_TYPE (op), dbuf);
       dbuf_append_char (dbuf, ')');
       break;
     }
@@ -785,7 +785,7 @@ newiTempOperand (sym_link * type, char throwType)
       SPEC_OCLS (itmp->etype) = reg;
     }
 
-  op->operand.symOperand = itmp;
+  op->svt.symOperand = itmp;
   op->key = itmp->key = ++operandKey;
   return op;
 }
@@ -800,13 +800,13 @@ operandType (operand * op)
   switch (op->type)
     {
     case VALUE:
-      return op->operand.valOperand->type;
+      return op->svt.valOperand->type;
 
     case SYMBOL:
-      return op->operand.symOperand->type;
+      return op->svt.symOperand->type;
 
     case TYPE:
-      return op->operand.typeOperand;
+      return op->svt.typeOperand;
 
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -848,7 +848,7 @@ isParameterToCall (value * args, operand * op)
   while (tval)
     {
       if (tval->sym &&
-          isSymbolEqual (op->operand.symOperand, tval->sym))
+          isSymbolEqual (OP_SYMBOL (op), tval->sym))
         return 1;
       tval = tval->next;
     }
@@ -868,9 +868,9 @@ isOperandGlobal (operand * op)
     return 0;
 
   if (IS_SYMOP(op) &&
-      (op->operand.symOperand->level == 0 ||
-       IS_STATIC (op->operand.symOperand->etype) ||
-       IS_EXTERN (op->operand.symOperand->etype))
+      (op->svt.symOperand->level == 0 ||
+       IS_STATIC (op->svt.symOperand->etype) ||
+       IS_EXTERN (op->svt.symOperand->etype))
     )
     return 1;
 
@@ -1102,7 +1102,7 @@ operandLitValue (operand * op)
 {
   assert (isOperandLiteral (op));
 
-  return floatFromVal (op->operand.valOperand);
+  return floatFromVal (OP_VALUE (op));
 }
 
 /*-----------------------------------------------------------------*/
@@ -1431,16 +1431,14 @@ isOperandEqual (operand * left, operand * right)
   switch (left->type)
     {
     case SYMBOL:
-      return isSymbolEqual (left->operand.symOperand,
-                            right->operand.symOperand);
+      return isSymbolEqual (left->svt.symOperand, right->svt.symOperand);
     case VALUE:
-      return (compareType (left->operand.valOperand->type,
-                           right->operand.valOperand->type) &&
-              (floatFromVal (left->operand.valOperand) ==
-               floatFromVal (right->operand.valOperand)));
+      return (compareType (left->svt.valOperand->type,
+                           right->svt.valOperand->type) &&
+              (floatFromVal (left->svt.valOperand) ==
+               floatFromVal (right->svt.valOperand)));
     case TYPE:
-      if (compareType (left->operand.typeOperand,
-                     right->operand.typeOperand) == 1)
+      if (compareType (left->svt.typeOperand, right->svt.typeOperand) == 1)
         return 1;
     }
 
@@ -1536,13 +1534,13 @@ operandFromOperand (operand * op)
   switch (nop->type)
     {
     case SYMBOL:
-      nop->operand.symOperand = op->operand.symOperand;
+      nop->svt.symOperand = op->svt.symOperand;
       break;
     case VALUE:
-      nop->operand.valOperand = op->operand.valOperand;
+      nop->svt.valOperand = op->svt.valOperand;
       break;
     case TYPE:
-      nop->operand.typeOperand = op->operand.typeOperand;
+      nop->svt.typeOperand = op->svt.typeOperand;
       break;
     }
 
@@ -1589,7 +1587,7 @@ operandFromSymbol (symbol * sym)
     {
       op = newOperand ();
       op->type = SYMBOL;
-      op->operand.symOperand = sym;
+      op->svt.symOperand = sym;
       op->key = sym->key;
       op->isvolatile = isOperandVolatile (op, TRUE);
       op->isGlobal = isOperandGlobal (op);
@@ -1634,7 +1632,7 @@ operandFromSymbol (symbol * sym)
     {
       op = newOperand ();
       op->type = SYMBOL;
-      op->operand.symOperand = sym;
+      op->svt.symOperand = sym;
       op->isaddr = 1;
       op->key = sym->key;
       op->isvolatile = isOperandVolatile (op, TRUE);
@@ -1649,7 +1647,7 @@ operandFromSymbol (symbol * sym)
 
   ic = newiCode (ADDRESS_OF, newOperand (), NULL);
   IC_LEFT (ic)->type = SYMBOL;
-  IC_LEFT (ic)->operand.symOperand = sym;
+  IC_LEFT (ic)->svt.symOperand = sym;
   IC_LEFT (ic)->key = sym->key;
   (IC_LEFT (ic))->isvolatile = isOperandVolatile (IC_LEFT (ic), TRUE);
   (IC_LEFT (ic))->isGlobal = isOperandGlobal (IC_LEFT (ic));
@@ -1686,7 +1684,7 @@ operandFromValue (value * val)
   /* this is not a symbol */
   op = newOperand ();
   op->type = VALUE;
-  op->operand.valOperand = val;
+  op->svt.valOperand = val;
   op->isLiteral = isOperandLiteral (op);
   return op;
 }
@@ -1705,7 +1703,7 @@ operandFromLink (sym_link * type)
 
   op = newOperand ();
   op->type = TYPE;
-  op->operand.typeOperand = copyLinkChain (type);
+  op->svt.typeOperand = copyLinkChain (type);
   return op;
 }
 
@@ -1760,15 +1758,15 @@ setOperandType (operand * op, sym_link * type)
   switch (op->type)
     {
     case VALUE:
-      op->operand.valOperand->etype =
-        getSpec (op->operand.valOperand->type =
+      op->svt.valOperand->etype =
+        getSpec (op->svt.valOperand->type =
                  copyLinkChain (type));
       return;
 
     case SYMBOL:
-      if (op->operand.symOperand->isitmp)
-        op->operand.symOperand->etype =
-          getSpec (op->operand.symOperand->type =
+      if (op->svt.symOperand->isitmp)
+        op->svt.symOperand->etype =
+          getSpec (op->svt.symOperand->type =
                    copyLinkChain (type));
       else
         werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -1776,7 +1774,7 @@ setOperandType (operand * op, sym_link * type)
       return;
 
     case TYPE:
-      op->operand.typeOperand = copyLinkChain (type);
+      op->svt.typeOperand = copyLinkChain (type);
       return;
     }
 }
@@ -2102,12 +2100,12 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
 
   /* if they are both literal then we know the result */
   if (IS_LITERAL (letype) && IS_LITERAL (retype))
-    return operandFromValue (valMult (left->operand.valOperand,
-                                      right->operand.valOperand));
+    return operandFromValue (valMult (OP_VALUE (left), OP_VALUE (right)));
 
-  if (IS_LITERAL(retype)) {
-    p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (right->operand.valOperand));
-  }
+  if (IS_LITERAL(retype))
+    {
+      p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)));
+    }
 
   resType = usualBinaryConversions (&left, &right, resultType, '*');
   rtype = operandType (right);
@@ -2179,9 +2177,10 @@ geniCodeDivision (operand * left, operand * right, RESULT_TYPE resultType)
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) &&
       IS_UNSIGNED(letype) &&
-      ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (right->operand.valOperand))) > 0)) {
-    ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */
-  }
+      ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0))
+    {
+      ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */
+    }
   else
     {
       ic = newiCode ('/', left, right);         /* normal division */
@@ -2206,8 +2205,7 @@ geniCodeModulus (operand * left, operand * right, RESULT_TYPE resultType)
 
   /* if they are both literal then we know the result */
   if (IS_LITERAL (letype) && IS_LITERAL (retype))
-    return operandFromValue (valMod (left->operand.valOperand,
-                                     right->operand.valOperand));
+    return operandFromValue (valMod (OP_VALUE (left), OP_VALUE (right)));
 
   resType = usualBinaryConversions (&left, &right, resultType, '%');
 
@@ -2236,8 +2234,7 @@ geniCodePtrPtrSubtract (operand * left, operand * right)
   /* if they are both literals then */
   if (IS_LITERAL (letype) && IS_LITERAL (retype))
     {
-      result = operandFromValue (valMinus (left->operand.valOperand,
-                                           right->operand.valOperand));
+      result = operandFromValue (valMinus (OP_VALUE (left), OP_VALUE (right)));
       goto subtractExit;
     }
 
@@ -2276,8 +2273,7 @@ geniCodeSubtract (operand * left, operand * right, RESULT_TYPE resultType)
   /* if they are both literal then we know the result */
   if (IS_LITERAL (letype) && IS_LITERAL (retype)
       && left->isLiteral && right->isLiteral)
-    return operandFromValue (valMinus (left->operand.valOperand,
-                                       right->operand.valOperand));
+    return operandFromValue (valMinus (OP_VALUE (left), OP_VALUE (right)));
 
   /* if left is an array or pointer */
   if (IS_PTR (ltype) || IS_ARRAY (ltype))
@@ -2509,8 +2505,7 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   sym_link *type = operandType (left);
   sym_link *etype = getSpec (type);
   sym_link *rtype, *retype;
-  symbol *element = getStructElement (SPEC_STRUCT (etype),
-                                      right->operand.symOperand);
+  symbol *element = getStructElement (SPEC_STRUCT (etype), OP_SYMBOL (right));
 
   wassert(IS_SYMOP (right));
 
@@ -2909,7 +2904,7 @@ geniCodeUnaryMinus (operand * op)
   sym_link *optype = operandType (op);
 
   if (IS_LITERAL (optype))
-    return operandFromLit (-floatFromVal (op->operand.valOperand));
+    return operandFromLit (-floatFromVal (OP_VALUE (op)));
 
   ic = newiCode (UNARYMINUS, op, NULL);
   IC_RESULT (ic) = newiTempOperand (optype, 0);
@@ -3654,7 +3649,7 @@ geniCodeIfx (ast * tree,int lvl)
   /* if the condition is a literal */
   if (IS_LITERAL (cetype))
     {
-      if (floatFromVal (condition->operand.valOperand))
+      if (floatFromVal (OP_VALUE (condition)))
         {
           if (tree->trueLabel)
             geniCodeGoto (tree->trueLabel);
@@ -3891,7 +3886,7 @@ geniCodeSwitch (ast * tree,int lvl)
     {
       int switchVal, caseVal;
 
-      switchVal = (int) ulFromVal (cond->operand.valOperand);
+      switchVal = (int) ulFromVal (OP_VALUE (cond));
       while (caseVals)
         {
           caseVal = (int) ulFromVal (caseVals);
@@ -4511,11 +4506,11 @@ ast2iCode (ast * tree, int lvl)
       return geniCodeCall (ast2iCode (tree->left, lvl+1),
                            tree->right, lvl);
     case LABEL:
-      geniCodeLabel (ast2iCode (tree->left, lvl+1)->operand.symOperand);
+      geniCodeLabel (OP_SYMBOL (ast2iCode (tree->left, lvl+1)));
       return ast2iCode (tree->right, lvl+1);
 
     case GOTO:
-      geniCodeGoto (ast2iCode (tree->left, lvl+1)->operand.symOperand);
+      geniCodeGoto (OP_SYMBOL (ast2iCode (tree->left, lvl+1)));
       return ast2iCode (tree->right, lvl+1);
 
     case FUNCTION:
@@ -4600,6 +4595,26 @@ operand *validateOpType(operand         *op,
                         OPTYPE          type,
                         const char      *file,
                         unsigned        line)
+{
+    if (op && op->type == type)
+    {
+        return op;
+    }
+    fprintf(stderr,
+            "Internal error: validateOpType failed in %s(%s) @ %s:%u:"
+            " expected %s, got %s\n",
+            macro, args, file, line,
+            opTypeToStr(type), op ? opTypeToStr(op->type) : "null op");
+    exit(EXIT_FAILURE);
+    return op; // never reached, makes compiler happy.
+}
+
+const operand *validateOpTypeConst(const operand   *op,
+                                   const char      *macro,
+                                   const char      *args,
+                                   OPTYPE          type,
+                                   const char      *file,
+                                   unsigned        line)
 {
     if (op && op->type == type)
     {

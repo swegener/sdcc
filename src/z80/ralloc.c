@@ -2785,12 +2785,10 @@ opIgnoresA (iCode * ic, iCode * uic)
        IS_ITEMP (IC_RESULT (uic)) &&
        IS_OP_LITERAL (IC_RIGHT (uic)))
     {
-      unsigned int icount = (unsigned int) ulFromVal (IC_RIGHT (uic)->operand.valOperand);
+      unsigned int icount = (unsigned int) ulFromVal (OP_VALUE (IC_RIGHT (uic)));
 
       /* Being an ITEMP means that we're already a symbol. */
-      if (icount == 1 &&
-          IC_RESULT (uic)->operand.symOperand->key == IC_LEFT (uic)->operand.symOperand->key
-          )
+      if (icount == 1 && OP_KEY (IC_RESULT (uic)) == OP_KEY (IC_LEFT (uic)))
         {
           return TRUE;
         }
@@ -3212,7 +3210,7 @@ joinPushes (iCode *lic)
       val = constVal (buffer);
       SPEC_NOUN (val->type) = V_INT;
       IC_LEFT (ic) = operandFromOperand (IC_LEFT (ic));
-      IC_LEFT (ic)->operand.valOperand = val;
+      OP_VALUE (IC_LEFT (ic)) = val;
 
       /* Now remove the second one from the list. */
       ic->next = uic->next;

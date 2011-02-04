@@ -430,9 +430,8 @@ void pic16_DumpOp(char *prefix, operand *op)
 	DEBUGpic16_emitcode (";", " %s key:%d",prefix,op->key);
 	if(IS_SYMOP(op)) {
 		sprintf(s,"%s (symOperand)",prefix);
-		pic16_DumpSymbol(s,op->operand.symOperand);
+		pic16_DumpSymbol(s, OP_SYMBOL (op));
 	}
-
 }
 
 void pic16_DumpOpX(FILE *fp, char *prefix, operand *op)

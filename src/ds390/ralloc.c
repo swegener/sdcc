@@ -2423,10 +2423,9 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 
       wassert(IS_SYMOP(IC_LEFT (ic)));
       wassert(IS_SYMOP(IC_RIGHT (dic)));
-      IC_LEFT (ic)->operand.symOperand =
-        IC_RIGHT (dic)->operand.symOperand;
+      OP_SYMBOL (IC_LEFT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
       OP_SYMBOL(IC_LEFT(ic))->liveTo = ic->seq;
-      IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+      IC_LEFT (ic)->key = OP_KEY (IC_RIGHT (dic));
       bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
       remiCodeFromeBBlock (ebp, dic);
       hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
@@ -2462,9 +2461,8 @@ right:
 
       wassert(IS_SYMOP(IC_RIGHT (ic)));
       wassert(IS_SYMOP(IC_RIGHT (dic)));
-      IC_RIGHT (ic)->operand.symOperand =
-        IC_RIGHT (dic)->operand.symOperand;
-      IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+      OP_SYMBOL (IC_RIGHT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
+      IC_RIGHT (ic)->key = OP_KEY (IC_RIGHT (dic));
       OP_SYMBOL(IC_RIGHT(ic))->liveTo = ic->seq;
       remiCodeFromeBBlock (ebp, dic);
       bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);

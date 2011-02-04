@@ -2003,11 +2003,8 @@ replace restart {
 	or	a,#0x01
 	ld	%1 (%2),a
 } by {
-	;set	0,%1 (%2)
+	set	0,%1 (%2)
 	; peephole z0 used set instead of or.
-	ld	a,%1 (%2)
-	set	0, a
-	ld	%1 (%2),a	
 } if notUsed('a')
 // TODO: Do this at a higher level using SETABIT icode instead of peephole optimizer
 

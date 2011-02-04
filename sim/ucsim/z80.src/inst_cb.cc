@@ -401,7 +401,7 @@ cl_z80::inst_cb_set(t_mem code)
     case 0x4: // SET x,H
       regs.hl.h |= (1 << bit_bitnum); break;
     case 0x5: // SET x,L
-      regs.hl.h |= (1 << bit_bitnum); break;
+      regs.hl.l |= (1 << bit_bitnum); break;
     case 0x6: // SET x,(HL)
       { unsigned char tmp;
         tmp = get1(regs.HL);

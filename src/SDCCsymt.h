@@ -361,6 +361,8 @@ typedef struct symbol
     int recvSize;                       /* size of first argument  */
     struct bitVect *clashes;            /* overlaps with what other symbols */
     struct ast * funcTree;              /* function body ast if inlined */
+
+    bool for_newralloc;
   }
 symbol;
 
@@ -588,7 +590,7 @@ typedef enum
   RESULT_TYPE_INT,
   RESULT_TYPE_OTHER,    /* operands will be promoted to int */
   RESULT_TYPE_IFX,
-  RESULT_TYPE_GPTR,     /* operands will be promoted to generic ptr */
+  RESULT_TYPE_GPTR      /* operands will be promoted to generic ptr */
 } RESULT_TYPE;
 
 /* forward definitions for the symbol table related functions */

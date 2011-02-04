@@ -299,6 +299,7 @@ newSymbol (char *name, int scope)
   sym->block = currBlockno;
   sym->lineDef = lexLineno;    /* set the line number */
   sym->fileDef = lexFilename;
+  sym->for_newralloc = 0;
   return sym;
 }
 

@@ -1,11 +1,23 @@
-2011-02-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/port.mk,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCglobl.h,
+	  src/SDCCmain.c,
+	  src/SDCCutil.c,
+	  src/SDCClrange.c,
+	  src/mcs51/gen.c:
+	  Minor improvements from the optralloc branch.
+
+2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* sim/ucsim/z80.src/inst_cb.cc:
 	  Fixed #3166058.
 	* src/z80/gen.c:
 	  Improvements from the optralloc branch.
 
-2011-02-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Some fixes from from the optralloc branch.

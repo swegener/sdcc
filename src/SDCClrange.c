@@ -34,7 +34,7 @@ hTab *iCodeSeqhTab = NULL;
 /* all symbols, for which the previous definition is searched
    and warning is emitted if there's none. */
 #define IS_AUTOSYM(op) (IS_ITEMP(op) || \
-                        (IS_SYMOP(op) && IS_AUTO(op->operand.symOperand) && !IS_PARM(op)))
+                        (IS_SYMOP(op) && IS_AUTO(OP_SYMBOL (op)) && !IS_PARM(op)))
 
 /*-----------------------------------------------------------------*/
 /* hashiCodeKeys - add all iCodes to the hash table                */

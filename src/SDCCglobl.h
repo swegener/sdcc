@@ -302,6 +302,7 @@ struct options
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */
 /*  set *olaysSet;               * not implemented yet: overlay segments used in #pragma OVERLAY */
+    int max_allocs_per_node;    /* Maximum number of allocations considered at each node in the tree-decomposition based register allocator */
   };
 
 /* forward definition for variables accessed globally */

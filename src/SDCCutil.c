@@ -572,7 +572,7 @@ hexEscape (const char **src)
     }
   *src = s;
 
-  return value;
+  return (unsigned char)value;
 }
 
 /*------------------------------------------------------------------*/

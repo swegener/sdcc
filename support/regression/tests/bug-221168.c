@@ -2,15 +2,9 @@
  */
 #include <testfwk.h>
 
-#ifdef __mcs51
-#  define XDATA __xdata
-#else
-#  define XDATA
-#endif
+__xdata static char x[10][20];
 
-XDATA static char x[10][20];
-
-XDATA char *
+__xdata char *
 getAddrOfCell (unsigned char y, unsigned char z)
 {
   return &x[y][z];
@@ -19,5 +13,5 @@ getAddrOfCell (unsigned char y, unsigned char z)
 static void
 testMultiDimensionalAddress (void)
 {
-  ASSERT (getAddrOfCell (5, 6) == (char XDATA *)x + 106);
+  ASSERT (getAddrOfCell (5, 6) == (char __xdata *)x + 106);
 }

@@ -1,3 +1,9 @@
+2011-02-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (setOperandType): fixed bug 3166208
+	* support/regression/tests/bug-221168.c: use __xdata from testfwk.h
+	* support/regression/tests/bug3166208.c: new, added
+
 2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/port.mk,
@@ -53,7 +59,7 @@
 2011-01-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (mova): added early optimization,
-	  (getFreePtr): simplified aopp to aop,	
+	  (getFreePtr): simplified aopp to aop,
 	  (aopPtrForSym): factored out of aopForSym,
 	  (freeAsmop,freeForBranchAsmop): fixed bug 3130806 for AOP_STK
 	* src/mcs51/gen.h (asmop): replaced aop_stk with aop_sym
@@ -107,7 +113,7 @@
 	  src/SDCCglobl.h, src/pic16/pcode.h, src/pic16/pcode.c,
 	  src/SDCCsystem.c, src/SDCC.lex:
 	  code cleaning: removed warnings, use const char *
-	* src/pic14/glue.c (emitIvals): removed empty line generation 
+	* src/pic14/glue.c (emitIvals): removed empty line generation
 
 2011-01-15 Philipp Klaus Krause <pkk AT spth.de>
 

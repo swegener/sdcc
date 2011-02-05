@@ -1729,7 +1729,7 @@ operandFromAst (ast * tree, int lvl)
   switch (tree->type)
     {
     case EX_OP:
-      return ast2iCode (tree,lvl+1);
+      return ast2iCode (tree, lvl+1);
       break;
 
     case EX_VALUE:
@@ -1765,9 +1765,16 @@ setOperandType (operand * op, sym_link * type)
 
     case SYMBOL:
       if (op->svt.symOperand->isitmp)
-        op->svt.symOperand->etype =
-          getSpec (op->svt.symOperand->type =
-                   copyLinkChain (type));
+        {
+          op->svt.symOperand->etype =
+            getSpec (op->svt.symOperand->type =
+                     copyLinkChain (type));
+          if (IS_SPEC (op->svt.symOperand->type))
+            {
+              SPEC_SCLS (op->svt.symOperand->etype) = S_REGISTER;
+              SPEC_OCLS (op->svt.symOperand->etype) = reg;
+            }
+        }
       else
         werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
                 "attempt to modify type of source");
@@ -3601,7 +3608,7 @@ geniCodeFunctionBody (ast * tree,int lvl)
   geniCodeReceive (tree->values.args, func);
 
   /* generate code for the body */
-  ast2iCode (tree->right,lvl+1);
+  ast2iCode (tree->right, lvl+1);
 
   /* create a label for return */
   geniCodeLabel (returnLabel);
@@ -3636,7 +3643,7 @@ void
 geniCodeIfx (ast * tree,int lvl)
 {
   iCode *ic;
-  operand *condition = ast2iCode (tree->left,lvl+1);
+  operand *condition = ast2iCode (tree->left, lvl+1);
   sym_link *cetype;
 
   /* if condition is null then exit */

@@ -1596,12 +1596,11 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
       for (sic = dic; sic != ic; sic = sic->next)
 	bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
       
-      IC_RIGHT (ic)->operand.symOperand =
-	IC_RIGHT (dic)->operand.symOperand;
-      IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+      OP_SYMBOL (IC_RIGHT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
+      IC_RIGHT (ic)->key = OP_KEY (IC_RIGHT (dic));
       
       remiCodeFromeBBlock (ebp, dic);
-      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+      bitVectUnSetBit(OP_DEFS(IC_RESULT(dic)), dic->key);
       hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
       change++;
     }

@@ -1,3 +1,10 @@
+2011-02-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/avr/gen.c (aopOp): use OP_VALUE
+	* src/xa51/ralloc.c (packRegsForSupport): use OP_SYMBOL, OP_KEY, OP_DEFS
+	* src/SDCCloop.c (basicInduction): fixed bug 3150679
+	* support/regression/tests/bug3166208.c: added test for bug 3150679
+
 2011-02-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (setOperandType): fixed bug 3166208

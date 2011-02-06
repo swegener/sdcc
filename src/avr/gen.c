@@ -714,7 +714,7 @@ aopOp (operand * op, iCode * ic, bool result)
         /* if this a literal */
         if (IS_OP_LITERAL (op)) {
                 op->aop = aop = newAsmop (AOP_LIT);
-                aop->aopu.aop_lit = op->operand.valOperand;
+                aop->aopu.aop_lit = OP_VALUE (op);
                 aop->size = getSize (operandType (op));
                 return;
         }

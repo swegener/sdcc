@@ -771,10 +771,11 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
         // initialize as zero
         for (i = 0; i < size; i++) {
             if (in_code) {
-                dbuf_printf (oBuf, "\tretlw 0x00\n");
+                dbuf_printf (oBuf, "\tretlw 0x%02x\n", lit & 0xff);
             } else {
-                dbuf_printf (oBuf, "%s0x00", (i == 0) ? "" : ", ");
+                dbuf_printf (oBuf, "%s0x%02x", (i == 0) ? "" : ", ", lit & 0xff);
             }
+            lit >>= 8;
         } // for
         if (!in_code)
             dbuf_printf (oBuf, "\n");
@@ -801,7 +802,7 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
         //printOperand(op, of);
     }
 
-    for (i=0; i < size; i++) {
+    for (i = 0; i < size; i++) {
         char *text;
 
         /*
@@ -814,7 +815,7 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
             PCOI(AOP(op)->aopu.pcop)->offset-=i;
         } else {
             text = op ? aopGet(AOP(op), i, 0, 0)
-            : get_op(newpCodeOpImmd(str, i, 0, inCodeSpace, 0), NULL, 0);
+                : get_op(newpCodeOpImmd(str, i, 0, inCodeSpace, 0), NULL, 0);
         } // if
         if (in_code) {
             dbuf_printf (oBuf, "\tretlw %s\n", text);
@@ -822,7 +823,8 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
             dbuf_printf (oBuf, "%s%s", (i == 0) ? "" : ", ", text);
         }
     } // for
-    dbuf_printf (oBuf, "\n");
+    if (!in_code)
+        dbuf_printf (oBuf, "\n");
 }
 
 /*
@@ -978,13 +980,14 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
             int len = 0;
             if (IS_BITFIELD(sym->type)) {
                 while (sym && IS_BITFIELD(sym->type)) {
+                    int bitoff = SPEC_BSTR(getSpec(sym->type)) + 8 * sym->offset;
                     assert (!list || ((list->type == INIT_NODE)
                                 && IS_AST_LIT_VALUE(list->init.node)));
                     lit = (long) (list ? list2int(list) : 0);
                     DEBUGprintf ( "(bitfield member) %02lx (%d bit, starting at %d, bitfield %02lx)\n",
                             lit, SPEC_BLEN(getSpec(sym->type)),
-                            SPEC_BSTR(getSpec(sym->type)), bitfield);
-                    bitfield |= (lit & ((1ul << SPEC_BLEN(getSpec(sym->type))) - 1)) << SPEC_BSTR(getSpec(sym->type));
+                            bitoff, bitfield);
+                    bitfield |= (lit & ((1ul << SPEC_BLEN(getSpec(sym->type))) - 1)) << bitoff;
                     len += SPEC_BLEN(getSpec(sym->type));
 
                     sym = sym->next;

@@ -44,7 +44,7 @@ RSC=rc.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
 # ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /i ".." /i "..\.." /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -69,7 +69,7 @@ LINK32=link.exe
 # ADD BASE CPP /nologo /ML /W3 /GX /O2 /I ".." /I "..\support\util" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
 # ADD CPP /nologo /ML /W3 /GX /O2 /I "." /I ".." /I "..\support\util" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /i ".." /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -101,10 +101,6 @@ SOURCE=..\support\Util\dbuf_string.c
 # Begin Source File
 
 SOURCE=..\support\Util\NewAlloc.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\support\scripts\resource.rc
 # End Source File
 # Begin Source File
 
@@ -285,6 +281,10 @@ SOURCE=..\sdcc_vc.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\SDCCargs.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SDCCasm.h
 # End Source File
 # Begin Source File
@@ -310,6 +310,10 @@ SOURCE=.\SDCCcflow.h
 # Begin Source File
 
 SOURCE=.\SDCCcse.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCdebug.h
 # End Source File
 # Begin Source File
 
@@ -350,6 +354,10 @@ SOURCE=.\SDCCloop.h
 # Begin Source File
 
 SOURCE=.\SDCClrange.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCmacro.h
 # End Source File
 # Begin Source File
 
@@ -394,6 +402,10 @@ SOURCE=.\sdccy.h
 # Begin Source File
 
 SOURCE=.\spawn.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\version.h
 # End Source File
 # End Group
 # Begin Group "Regression Test"
@@ -465,9 +477,17 @@ SOURCE=.\regression\while.c
 # PROP Exclude_From_Build 1
 # End Source File
 # End Group
+# Begin Group "Resource Files"
+
+# PROP Default_Filter "rc;ico"
+# Begin Source File
+
+SOURCE=..\support\scripts\resource.rc
+# End Source File
 # Begin Source File
 
 SOURCE=..\support\scripts\sdcc.ico
 # End Source File
+# End Group
 # End Target
 # End Project

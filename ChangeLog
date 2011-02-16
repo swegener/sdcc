@@ -1,3 +1,8 @@
+2011-02-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improvements from optralloc branch.
+
 2011-02-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/src.dsp: added some header files, added Resource Files group

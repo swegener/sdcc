@@ -3643,7 +3643,7 @@ genPlusIncr (iCode * ic)
           fetchLitPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)), icount);
           return TRUE;
         }
-      if (isPair (AOP (IC_LEFT (ic))) && resultId == PAIR_HL && icount > 2)
+      if (isPair (AOP (IC_LEFT (ic))) && resultId == PAIR_HL && icount > 3)
         {
           if (getPairId (AOP (IC_LEFT (ic))) == PAIR_HL)
             {
@@ -3667,7 +3667,7 @@ genPlusIncr (iCode * ic)
       /* Inc a pair */
       if (!sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
         {
-          if (icount > 2)
+          if (icount > 3)
             return FALSE;
           movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
         }
@@ -5902,8 +5902,7 @@ genOr (iCode * ic, iCode * ifx)
                     continue;
                   }
               }
-            // faster than result <- left, anl result,right
-            // and better if result is SFR
+            // This is a bit broken, there will be problems for y_0 = x_0 | z_0, x_0 = y_0 | z_1 as either order of the two byte ors will result in the result destroying the second part of the operand. Currently, we use a workaround in the register allocator to avoid this. See also the comment on the 2-byte addition workaround above.
             if(AOP_TYPE (left) != AOP_ACC)
               _moveA (aopGet (AOP (left), offset, FALSE));
             if(AOP_TYPE (right) == AOP_LIT && isLiteralBit(((lit >> (offset * 8)) & 0x0FFL)) >= 0)
@@ -8526,7 +8525,8 @@ genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 /* genBuiltIn - calls the appropriate function to generate code    */
 /* for a built in function                                         */
 /*-----------------------------------------------------------------*/
-static void genBuiltIn (iCode *ic)
+static void
+genBuiltIn (iCode *ic)
 {
     operand *bi_parms[MAX_BUILTIN_ARGS];
     int nbi_parms;

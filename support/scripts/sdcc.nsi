@@ -1,6 +1,6 @@
 # sdcc.nsi - NSIS installer script for SDCC
 #
-# Copyright (c) 2003-2010 Borut Razem
+# Copyright (c) 2003-2011 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -187,6 +187,7 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 !include MUI2.nsh
 !include WordFunc.nsh
 !include StrFunc.nsh
+!include WinVer.nsh
 ${StrStr}
 ${UnStrStr}
 
@@ -1024,18 +1025,15 @@ ${Function} SDCC.AddToPath
   Push $1
   Push $2
   Push $3
-  Push $4
 
   ; don't add if the path doesn't exist
   ${If} ${FileExists} $0
-    Call SDCC.IsNT
-    Pop $4
-    ${If} $4 != 1
-      ; Not on NT: read PATH from environment variable
-      ReadEnvStr $1 PATH
-    ${Else}
+    ${If} ${IsNT}
       ; On NT: read PATH from registry
       ReadRegStr $1 HKCU "Environment" "PATH"
+    ${Else}
+      ; Not on NT: read PATH from environment variable
+      ReadEnvStr $1 PATH
     ${EndIf}
 
     ${StrStr} $2 "$1;" "$0;"
@@ -1047,7 +1045,20 @@ ${Function} SDCC.AddToPath
         ${If} $2 == ""
           ${StrStr} $2 "$1;" "$03\;"
           ${If} $2 == ""
-            ${If} $4 != 1
+            ${If} ${IsNT}
+              ;System PATH variable is at:
+              ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
+              ReadRegStr $1 HKCU "Environment" "PATH"
+              StrCpy $2 $1 1 -1  ; copy last char
+              ${If} $2 == ";"    ; if last char == ;
+                StrCpy $1 $1 -1  ; remove last char
+              ${Endif}
+              ${If} $1 != ""
+                StrCpy $0 "$1;$0"
+              ${Endif}
+              WriteRegExpandStr HKCU "Environment" "PATH" $0
+              SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+            ${Else}
               ; Not on NT
               StrCpy $1 $WINDIR 2
               FileOpen $1 "$1\autoexec.bat" a
@@ -1061,19 +1072,6 @@ ${Function} SDCC.AddToPath
               FileClose $1
               ${DebugMsg} "SetRebootFlag true"
               SetRebootFlag true
-            ${Else}
-              ;System PATH variable is at:
-              ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
-              ReadRegStr $1 HKCU "Environment" "PATH"
-              StrCpy $2 $1 1 -1  ; copy last char
-              ${If} $2 == ";"    ; if last char == ;
-                StrCpy $1 $1 -1  ; remove last char
-              ${Endif}
-              ${If} $1 != ""
-                StrCpy $0 "$1;$0"
-              ${Endif}
-              WriteRegExpandStr HKCU "Environment" "PATH" $0
-              SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
             ${Endif}
           ${Endif}
         ${Endif}
@@ -1081,7 +1079,6 @@ ${Function} SDCC.AddToPath
     ${Endif}
   ${EndIf}
 
-  Pop $4
   Pop $3
   Pop $2
   Pop $1
@@ -1103,9 +1100,42 @@ ${Function} ${un}SDCC.RemoveFromPath
 
   IntFmt $6 "%c" 26 ; DOS EOF
 
-  Call ${un}SDCC.IsNT
-  Pop $1
-  ${If} $1 != 1
+  ${If} ${IsNT}
+    ;System PATH variable is at:
+    ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
+    ReadRegStr $1 HKCU "Environment" "PATH"
+    StrCpy $5 $1 1 -1 ; copy last char
+    ${If} $5 != ";"   ; if last char != ;
+      StrCpy $1 "$1;" ; append ;
+    ${EndIf}
+    Push $1
+    Push "$0;"
+    Call ${un}StrStr  ; Find `$0;` in $1
+    Pop $2            ; pos of our dir
+    ${If} $2 != ""
+      ; it is in path:
+      ; $0 - path to add
+      ; $1 - path var
+      StrLen $3 "$0;"
+      StrLen $4 $2
+      StrCpy $5 $1 -$4   ; $5 is now the part before the path to remove
+      StrCpy $6 $2 "" $3 ; $6 is now the part after the path to remove
+      StrCpy $3 $5$6
+
+      StrCpy $5 $3 1 -1  ; copy last char
+      ${If} $5 == ";"    ; if last char == ;
+        StrCpy $3 $3 -1  ; remove last char
+      ${EndIf}
+      ${If} $3 != ""
+        ; New PATH not empty: update the registry
+        WriteRegExpandStr HKCU "Environment" "PATH" $3
+      ${Else}
+        ; New PATH empty: remove from the registry
+        DeleteRegValue HKCU "Environment" "PATH"
+      ${EndIf}
+      SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+    ${Endif}
+  ${Else}
     ; Not on NT
     StrCpy $1 $WINDIR 2
     FileOpen $1 "$1\autoexec.bat" r
@@ -1145,41 +1175,6 @@ ${Function} ${un}SDCC.RemoveFromPath
     Delete "$1\autoexec.bat"
     CopyFiles /SILENT $4 "$1\autoexec.bat"
     Delete $4
-  ${Else}
-    ;System PATH variable is at:
-    ;HKLM "/SYSTEM/CurrentControlSet/Control/Session Manager/Environment" "Path"
-    ReadRegStr $1 HKCU "Environment" "PATH"
-    StrCpy $5 $1 1 -1 ; copy last char
-    ${If} $5 != ";"   ; if last char != ;
-      StrCpy $1 "$1;" ; append ;
-    ${EndIf}
-    Push $1
-    Push "$0;"
-    Call ${un}StrStr  ; Find `$0;` in $1
-    Pop $2            ; pos of our dir
-    ${If} $2 != ""
-      ; it is in path:
-      ; $0 - path to add
-      ; $1 - path var
-      StrLen $3 "$0;"
-      StrLen $4 $2
-      StrCpy $5 $1 -$4   ; $5 is now the part before the path to remove
-      StrCpy $6 $2 "" $3 ; $6 is now the part after the path to remove
-      StrCpy $3 $5$6
-
-      StrCpy $5 $3 1 -1  ; copy last char
-      ${If} $5 == ";"    ; if last char == ;
-        StrCpy $3 $3 -1  ; remove last char
-      ${EndIf}
-      ${If} $3 != ""
-        ; New PATH not empty: update the registry
-        WriteRegExpandStr HKCU "Environment" "PATH" $3
-      ${Else}
-        ; New PATH empty: remove from the registry
-        DeleteRegValue HKCU "Environment" "PATH"
-      ${EndIf}
-      SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
-    ${Endif}
   ${Endif}
 
   Pop $6
@@ -1193,37 +1188,6 @@ ${FunctionEnd}
 !macroend
 !insertmacro SDCC.RemoveFromPath ""
 !insertmacro SDCC.RemoveFromPath "un."
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Utility Functions                                                           ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; IsNT
-; no input
-; output, top of the stack = 1 if NT or 0 if not
-;
-; Usage:
-;   Call IsNT
-;   Pop $R0
-;  ($R0 at this point is 1 or 0)
-
-!macro SDCC.IsNT un
-${Function} ${un}SDCC.IsNT
-  Push $R0
-  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  ${If} $R0 == ""
-    ; we are not NT.
-    Pop $R0
-    Push 0
-  ${Else}
-    ; NT!!!
-    Pop $R0
-    Push 1
-  ${EndIf}
-${FunctionEnd}
-!macroend
-!insertmacro SDCC.IsNT ""
-!insertmacro SDCC.IsNT "un."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  Uninstall/Reinstall page functions                                         ;

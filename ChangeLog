@@ -1,3 +1,8 @@
+2011-02-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix for --reserve-regs-iy from optralloc branch.
+
 2011-02-17 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: use ${IsNT} from WinVer.nsh

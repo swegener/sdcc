@@ -1434,7 +1434,7 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
                     }
                   if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
                     {
-                       goto adjusted;
+                      goto adjusted;
                     }
                 }
             }
@@ -7783,8 +7783,11 @@ genAssign (iCode * ic)
           /* PENDING: do this check better */
           if ((IS_GB || IY_RESERVED) && requiresHL (AOP (right)) && requiresHL (AOP (result)))
             {
+              emit2("push hl");
               _moveA (aopGet (AOP (right), offset, FALSE));
               aopPut (AOP (result), "a", offset);
+              emit2("pop hl");
+              spillPair (PAIR_HL);
             }
           else
             aopPut (AOP (result),

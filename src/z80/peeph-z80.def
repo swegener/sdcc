@@ -1167,7 +1167,7 @@ replace restart {
 	ld	e, l
 	ld	d, h
 	ld	a, h
-}
+} if notUsed('hl')
 
 replace restart {
 	ld	a, l
@@ -1183,7 +1183,7 @@ replace restart {
 	ld	c, l
 	ld	b, h
 	ld	a, h
-}
+} if notUsed('hl')
 
 replace restart {
 	ld	%1,a

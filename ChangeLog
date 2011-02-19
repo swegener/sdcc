@@ -1,3 +1,8 @@
+2011-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-3184920.c:
+	  Disabled for hc08.
+
 2011-02-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/cmd.c,

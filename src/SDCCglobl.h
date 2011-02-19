@@ -249,6 +249,7 @@ struct options
     int xram_movc;              /* use movc instead of movx to read xram (mcs51) */
     int nopeep;                 /* no peep hole optimization */
     int asmpeep;                /* pass inline assembler thru peep hole */
+    int peepReturn;             /* enable peephole optimization for return instructions */
     int debug;                  /* generate extra debug info */
     int c1mode;                 /* Act like c1 - no pre-proc, asm or link */
     char *peep_file;            /* additional rules for peep hole */
@@ -268,7 +269,7 @@ struct options
     int protect_sp_update;      /* DS390 - will disable interrupts during ESP:SP updates */
     int parms_in_bank1;         /* DS390 - use reg bank1 to pass parameters */
     int stack_size;             /* MCS51/DS390 - Tells the linker to allocate this space for stack */
-    int no_pack_iram;           /* MCS51/DS390 - Tells the linker not to pack variables in internal ram */
+    int no_pack_iram;           /* MCS51/DS390 - Deprecated: Tells the linker not to pack variables in internal ram */
     int acall_ajmp;             /* MCS51 - Use acall/ajmp instead of lcall/ljmp */
     int use_non_free;           /* Search / include non-free licensed libraries and header files */
     /* starting address of the segments */

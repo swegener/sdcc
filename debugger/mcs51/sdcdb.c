@@ -296,26 +296,26 @@ struct cmdtab
 /*-----------------------------------------------------------------*/
 char *trim_left(char *s)
 {
-    while (isspace(*s))
-        ++s;
+  while (isspace(*s))
+      ++s;
 
-    return s;
+  return s;
 }
 
 char *trim_right(char *s)
 {
-    char *p = &s[strlen(s) - 1];
+  char *p = &s[strlen(s) - 1];
 
-    while (p >= s && isspace(*p))
+  while (p >= s && isspace(*p))
       --p;
-    *++p = '\0';
+  *++p = '\0';
 
-    return s;
+  return s;
 }
 
 char *trim(char *s)
 {
-    return trim_right(trim_left(s));
+  return trim_right(trim_left(s));
 }
 
 /*-----------------------------------------------------------------*/
@@ -323,10 +323,10 @@ char *trim(char *s)
 /*-----------------------------------------------------------------*/
 char *gc_strdup(const char *s)
 {
-    char *ret;
-    ret = Safe_malloc(strlen(s)+1);
-    strcpy(ret, s);
-    return ret;
+  char *ret;
+  ret = Safe_malloc(strlen(s)+1);
+  strcpy(ret, s);
+  return ret;
 }
 
 /*-----------------------------------------------------------------*/
@@ -334,16 +334,16 @@ char *gc_strdup(const char *s)
 /*-----------------------------------------------------------------*/
 char *alloccpy ( char *s, int size)
 {
-    char *d;
+  char *d;
 
-    if (!size)
-        return NULL;
+  if (!size)
+      return NULL;
 
-    d = Safe_malloc(size+1);
-    memcpy(d,s,size);
-    d[size] = '\0';
+  d = Safe_malloc(size+1);
+  memcpy(d,s,size);
+  d[size] = '\0';
 
-    return d;
+  return d;
 }
 
 /*-----------------------------------------------------------------*/
@@ -351,20 +351,20 @@ char *alloccpy ( char *s, int size)
 /*-----------------------------------------------------------------*/
 void **resize (void **array, int newSize)
 {
-    void **vptr;
+  void **vptr;
 
-    if (array)
-        vptr = Safe_realloc(array,newSize*(sizeof(void **)));
-    else
-        vptr = calloc(1, sizeof(void **));
+  if (array)
+      vptr = Safe_realloc(array, newSize*(sizeof(void **)));
+  else
+      vptr = calloc(1, sizeof(void **));
 
-    if (!vptr) {
-        fprintf(stderr,"sdcdb: out of memory\n");
-        exit(1);
+  if (!vptr)
+    {
+      fprintf(stderr, "sdcdb: out of memory\n");
+      exit(1);
     }
 
-    return vptr;
-
+  return vptr;
 }
 
 /*-----------------------------------------------------------------*/
@@ -373,57 +373,60 @@ void **resize (void **array, int newSize)
 /*-----------------------------------------------------------------*/
 static int readCdb (FILE *file)
 {
-    cdbrecs *currl ;
-    char buffer[1024];
-    char *bp ;
+  cdbrecs *currl;
+  char buffer[1024];
+  char *bp;
 
-    if (!(bp = fgets(buffer,sizeof(buffer),file)))
-        return 0;
+  if (!(bp = fgets(buffer, sizeof(buffer), file)))
+      return 0;
 
-    currl = Safe_calloc(1,sizeof(cdbrecs));
-    recsRoot = currl ;
+  currl = Safe_calloc(1, sizeof(cdbrecs));
+  recsRoot = currl;
 
-    while (1) {
+  while (1)
+    {
+      /* make sure this is a cdb record */
+      if (strchr("STLFM",*bp) && *(bp+1) == ':')
+        {
+          /* depending on the record type */
 
-        /* make sure this is a cdb record */
-        if (strchr("STLFM",*bp) && *(bp+1) == ':') {
-            /* depending on the record type */
-
-            switch (*bp) {
-            case 'S':
+          switch (*bp)
+            {
+              case 'S':
                 /* symbol record */
                 currl->type = SYM_REC;
                 break;
-            case 'T':
+              case 'T':
                 currl->type = STRUCT_REC;
                 break;
-            case 'L':
+              case 'L':
                 currl->type = LNK_REC;
                 break;
-            case 'F':
+              case 'F':
                 currl->type = FUNC_REC;
                 break;
-            case 'M':
+              case 'M':
                 currl->type = MOD_REC ;
+                break;
             }
 
-            bp += 2;
-            currl->line = Safe_malloc(strlen(bp));
-            strncpy(currl->line,bp,strlen(bp)-1);
-            currl->line[strlen(bp)-1] = '\0';
+          bp += 2;
+          currl->line = Safe_malloc(strlen(bp));
+          strncpy(currl->line, bp, strlen(bp)-1);
+          currl->line[strlen(bp)-1] = '\0';
         }
 
-        if (!(bp = fgets(buffer,sizeof(buffer),file)))
-            break;
+      if (!(bp = fgets(buffer, sizeof(buffer), file)))
+          break;
 
-        if (feof(file))
-            break;
+      if (feof(file))
+          break;
 
-        currl->next = Safe_calloc(1,sizeof(cdbrecs));
-        currl = currl->next;
+      currl->next = Safe_calloc(1, sizeof(cdbrecs));
+      currl = currl->next;
     }
 
-    return (recsRoot->line ? 1 : 0);
+  return (recsRoot->line ? 1 : 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -490,31 +493,33 @@ char *searchDirsFname (char *fname)
 /*-----------------------------------------------------------------*/
 FILE *searchDirsFopen(char *fname)
 {
-    char *dirs , *sdirs;
-    FILE *rfile = NULL;
-    char buffer[128];
+  char *dirs , *sdirs;
+  FILE *rfile = NULL;
+  char buffer[128];
 
-    /* first try the current directory */
-    if ((rfile = fopen(fname,"r")))
-        return rfile;
+  /* first try the current directory */
+  if ((rfile = fopen(fname, "r")))
+      return rfile;
 
-    if (!ssdirl)
-        return NULL;
-    /* make a copy of the source directories */
-    dirs = sdirs = strdup(ssdirl);
+  if (!ssdirl)
+      return NULL;
 
-    /* assume that the separator is ':'
-       and try for each directory in the search list */
-    dirs = strtok(dirs,":");
-    while (dirs) {
-        sprintf(buffer,"%s/%s",dirs,fname);
-        if ((rfile = fopen(buffer,"r")))
-            break ;
-        dirs = strtok(NULL,":");
+  /* make a copy of the source directories */
+  dirs = sdirs = strdup(ssdirl);
+
+  /* assume that the separator is ':'
+     and try for each directory in the search list */
+  dirs = strtok(dirs, ":");
+  while (dirs)
+    {
+      sprintf(buffer, "%s/%s", dirs, fname);
+      if ((rfile = fopen(buffer, "r")))
+          break;
+      dirs = strtok(NULL, ":");
     }
 
-    free(sdirs);
-    return rfile ;
+  free(sdirs);
+  return rfile ;
 }
 
 /*-----------------------------------------------------------------*/
@@ -522,28 +527,30 @@ FILE *searchDirsFopen(char *fname)
 /*-----------------------------------------------------------------*/
 srcLine **loadFile (char *name, int *nlines)
 {
-    FILE *mfile ;
-    char buffer[512];
-    char *bp;
-    srcLine **slines = NULL;
+  FILE *mfile;
+  char buffer[512];
+  char *bp;
+  srcLine **slines = NULL;
 
-    if (!(mfile = searchDirsFopen(name))) {
-        fprintf(stderr,"sdcdb: cannot open module %s -- use '--directory=<source directory> option\n",name);
-        return NULL;
+  if (!(mfile = searchDirsFopen(name)))
+    {
+      fprintf(stderr, "sdcdb: cannot open module %s -- use '--directory=<source directory> option\n", name);
+      return NULL;
     }
 
-    while ((bp = fgets(buffer,sizeof(buffer),mfile))) {
-        (*nlines)++;
+  while ((bp = fgets(buffer, sizeof(buffer), mfile)))
+    {
+      (*nlines)++;
 
-        slines = (srcLine **)resize((void **)slines,*nlines);
+      slines = (srcLine **)resize((void **)slines, *nlines);
 
-        slines[(*nlines)-1] = Safe_calloc(1,sizeof(srcLine));
-        slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));
-        slines[(*nlines)-1]->addr= INT_MAX;
+      slines[(*nlines)-1] = Safe_calloc(1, sizeof(srcLine));
+      slines[(*nlines)-1]->src = alloccpy(bp, strlen(bp));
+      slines[(*nlines)-1]->addr = INT_MAX;
     }
 
-    fclose(mfile);
-    return slines;
+  fclose(mfile);
+  return slines;
 }
 
 
@@ -552,17 +559,18 @@ srcLine **loadFile (char *name, int *nlines)
 /*-----------------------------------------------------------------*/
 static void loadModules (void)
 {
-    cdbrecs *loop;
-    module *currMod;
-    char *rs;
+  cdbrecs *loop;
+  module *currMod;
+  char *rs;
 
-    /* go thru the records & find out the module
-       records & load the modules specified */
-    for ( loop = recsRoot ; loop ; loop = loop->next ) {
-
-        switch (loop->type) {
-        /* for module records do */
-        case MOD_REC:
+  /* go thru the records & find out the module
+     records & load the modules specified */
+  for ( loop = recsRoot ; loop ; loop = loop->next )
+    {
+      switch (loop->type)
+        {
+          /* for module records do */
+          case MOD_REC:
             currMod = parseModule(loop->line, TRUE);
             currModName = currMod->name ;
 
@@ -575,22 +583,22 @@ static void loadModules (void)
             currMod->asmLines = loadFile (currMod->asm_name, &currMod->nasmLines);
             break;
 
-        /* if this is a function record */
-        case FUNC_REC:
+          /* if this is a function record */
+          case FUNC_REC:
             parseFunc(loop->line);
             break;
 
-        /* if this is a structure record */
-        case STRUCT_REC:
+          /* if this is a structure record */
+          case STRUCT_REC:
             parseStruct(loop->line);
             break;
 
-        /* if symbol then parse the symbol */
-        case  SYM_REC:
-            parseSymbol(loop->line,&rs,2);
+          /* if symbol then parse the symbol */
+          case  SYM_REC:
+            parseSymbol(loop->line, &rs, 2);
             break;
 
-        case LNK_REC:
+          case LNK_REC:
             parseLnkRec(loop->line);
             break;
         }
@@ -602,15 +610,12 @@ static void loadModules (void)
 /*-----------------------------------------------------------------*/
 static void specialFunctionRegs (void)
 {
-    symbol *sym;
-    for (sym = setFirstItem(symbols);
-         sym ;
-         sym = setNextItem(symbols))
+  symbol *sym;
+  for (sym = setFirstItem(symbols); sym; sym = setNextItem(symbols))
     {
-        if ( sym->addrspace == 'I' ||
-             sym->addrspace == 'J')
+      if ( sym->addrspace == 'I' || sym->addrspace == 'J')
         {
-            addSet(&sfrsymbols,sym);
+          addSet(&sfrsymbols, sym);
         }
     }
 }
@@ -619,134 +624,135 @@ static void specialFunctionRegs (void)
 /*-----------------------------------------------------------------*/
 static void functionPoints (void)
 {
-    function *func;
-    symbol *sym;
-    exePoint *ep ;
+  function *func;
+  symbol *sym;
+  exePoint *ep;
 
-    // add _main dummy for runtime env
-    if ((func = needExtraMainFunction()))
+  // add _main dummy for runtime env
+  if ((func = needExtraMainFunction()))
     {
-        function *func1;
+      function *func1;
 
-        /* alloc new _main function */
-        func1 = Safe_calloc(1,sizeof(function));
-        *func1 = *func;
-        func1->sym = Safe_calloc(1,sizeof(symbol));
-        *func1->sym =  *func->sym;
-        func1->sym->name  = alloccpy("_main",5);
-        func1->sym->rname = alloccpy("G$_main$0$",10);
-        /* TODO must be set by symbol information */
-        func1->sym->addr  = 0;
-        func1->sym->eaddr = 0x2f;
-        addSet(&functions,func1);
+      /* alloc new _main function */
+      func1 = Safe_calloc(1, sizeof(function));
+      *func1 = *func;
+      func1->sym = Safe_calloc(1, sizeof(symbol));
+      *func1->sym = *func->sym;
+      func1->sym->name  = alloccpy("_main", 5);
+      func1->sym->rname = alloccpy("G$_main$0$", 10);
+      /* TODO must be set by symbol information */
+      func1->sym->addr  = 0;
+      func1->sym->eaddr = 0x2f;
+      addSet(&functions, func1);
     }
 
-    /* for all functions do */
-    for ( func = setFirstItem(functions); func;
-          func = setNextItem(functions)) {
-        int j ;
-        module *mod;
+  /* for all functions do */
+  for ( func = setFirstItem(functions); func; func = setNextItem(functions))
+    {
+      int j ;
+      module *mod;
 
-        sym = func->sym;
+      sym = func->sym;
 
-        Dprintf(D_sdcdb, ("sdcdb: func '%s' has entry '0x%x' exit '0x%x'\n",
-                          func->sym->name,
-                          func->sym->addr,
-                          func->sym->eaddr));
+      Dprintf(D_sdcdb, ("sdcdb: func '%s' has entry '0x%x' exit '0x%x'\n",
+                        func->sym->name,
+                        func->sym->addr,
+                        func->sym->eaddr));
 
-        if (!func->sym->addr && !func->sym->eaddr)
-            continue ;
+      if (!func->sym->addr && !func->sym->eaddr)
+          continue;
 
-        /* for all source lines in the module find
-           the ones with address >= start and <= end
-           and put them in the point */
-        mod = NULL ;
-        if (! applyToSet(modules,moduleWithName,func->modName,&mod))
-            continue ;
-        func->mod = mod ;
-        func->entryline= INT_MAX-2;
-        func->exitline =  0;
-        func->aentryline = INT_MAX-2 ;
-        func->aexitline = 0;
+      /* for all source lines in the module find
+         the ones with address >= start and <= end
+         and put them in the point */
+      mod = NULL ;
+      if (! applyToSet(modules, moduleWithName, func->modName, &mod))
+          continue;
+      func->mod = mod;
+      func->entryline= INT_MAX-2;
+      func->exitline = 0;
+      func->aentryline = INT_MAX-2;
+      func->aexitline = 0;
 
-        /* do it for the C Lines first */
-        for ( j = 0 ; j < mod->ncLines ; j++ ) {
-            if (mod->cLines[j]->addr < INT_MAX &&
-                mod->cLines[j]->addr >= sym->addr &&
-                mod->cLines[j]->addr <= sym->eaddr ) {
-
-
-                /* add it to the execution point */
-                if (func->entryline > j)
-                    func->entryline = j;
-
-                if (func->exitline < j)
-                    func->exitline = j;
-
-                ep = Safe_calloc(1,sizeof(exePoint));
-                ep->addr =  mod->cLines[j]->addr ;
-                ep->line = j;
-                ep->block= mod->cLines[j]->block;
-                ep->level= mod->cLines[j]->level;
-                addSet(&func->cfpoints,ep);
-            }
-        }
-        /* check double line execution points of module */
-        for (ep = setFirstItem(mod->cfpoints); ep;
-             ep = setNextItem(mod->cfpoints))
+      /* do it for the C Lines first */
+      for ( j = 0 ; j < mod->ncLines ; j++ )
         {
-            if (ep->addr >= sym->addr &&
-                ep->addr <= sym->eaddr )
+          if (mod->cLines[j]->addr < INT_MAX &&
+              mod->cLines[j]->addr >= sym->addr &&
+              mod->cLines[j]->addr <= sym->eaddr )
             {
-                addSet(&func->cfpoints,ep);
+              /* add it to the execution point */
+              if (func->entryline > j)
+                  func->entryline = j;
+
+              if (func->exitline < j)
+                  func->exitline = j;
+
+              ep = Safe_calloc(1, sizeof(exePoint));
+              ep->addr =  mod->cLines[j]->addr ;
+              ep->line = j;
+              ep->block= mod->cLines[j]->block;
+              ep->level= mod->cLines[j]->level;
+              addSet(&func->cfpoints, ep);
             }
         }
-        /* do the same for asm execution points */
-        for ( j = 0 ; j < mod->nasmLines ; j++ ) {
-            if (mod->asmLines[j]->addr < INT_MAX &&
-                mod->asmLines[j]->addr >= sym->addr &&
-                mod->asmLines[j]->addr <= sym->eaddr ) {
-
-                exePoint *ep ;
-                /* add it to the execution point */
-                if (func->aentryline > j)
-                    func->aentryline = j;
-
-                if (func->aexitline < j)
-                    func->aexitline = j;
-
-                /* add it to the execution point */
-                ep = Safe_calloc(1,sizeof(exePoint));
-                ep->addr =  mod->asmLines[j]->addr ;
-                ep->line = j;
-                addSet(&func->afpoints,ep);
+      /* check double line execution points of module */
+      for (ep = setFirstItem(mod->cfpoints); ep; ep = setNextItem(mod->cfpoints))
+        {
+          if (ep->addr >= sym->addr && ep->addr <= sym->eaddr )
+            {
+              addSet(&func->cfpoints, ep);
             }
         }
-        if ( func->entryline == INT_MAX-2 )
-            func->entryline = 0;
-        if ( func->aentryline == INT_MAX-2 )
-            func->aentryline = 0;
+      /* do the same for asm execution points */
+      for ( j = 0 ; j < mod->nasmLines ; j++ )
+        {
+          if (mod->asmLines[j]->addr < INT_MAX &&
+              mod->asmLines[j]->addr >= sym->addr &&
+              mod->asmLines[j]->addr <= sym->eaddr )
+            {
+              exePoint *ep ;
+              /* add it to the execution point */
+              if (func->aentryline > j)
+                  func->aentryline = j;
+
+              if (func->aexitline < j)
+                  func->aexitline = j;
+
+              /* add it to the execution point */
+              ep = Safe_calloc(1, sizeof(exePoint));
+              ep->addr =  mod->asmLines[j]->addr;
+              ep->line = j;
+              addSet(&func->afpoints, ep);
+            }
+        }
+      if ( func->entryline == INT_MAX-2 )
+          func->entryline = 0;
+      if ( func->aentryline == INT_MAX-2 )
+          func->aentryline = 0;
 
 #ifdef SDCDB_DEBUG
-        if (!( D_sdcdb & sdcdbDebug))
-            continue;
+      if (!( D_sdcdb & sdcdbDebug))
+          continue;
 
-        Dprintf(D_sdcdb, ("sdcdb: function '%s' has the following C exePoints\n",
-                          func->sym->name));
-        {
-            exePoint *ep;
+      Dprintf(D_sdcdb, ("sdcdb: function '%s' has the following C exePoints\n",
+                        func->sym->name));
+      {
+        exePoint *ep;
 
-            for (ep = setFirstItem(func->cfpoints); ep;
-                 ep = setNextItem(func->cfpoints))
-                Dprintf(D_sdcdb, ("sdcdb: {0x%x,%d} %s",
-                                  ep->addr,ep->line+1,mod->cLines[ep->line]->src));
+        for (ep = setFirstItem(func->cfpoints); ep; ep = setNextItem(func->cfpoints))
+          {
+            Dprintf(D_sdcdb, ("sdcdb: {0x%x,%d} %s",
+                              ep->addr, ep->line+1, mod->cLines[ep->line]->src));
+          }
 
-            Dprintf(D_sdcdb, ("sdcdb:  and the following ASM exePoints\n"));
-            for (ep = setFirstItem(func->afpoints); ep;
-                 ep = setNextItem(func->afpoints))
-                Dprintf (D_sdcdb, ("sdcdb: {0x%x,%d} %s",
-                                   ep->addr,ep->line+1,mod->asmLines[ep->line]->src));
-        }
+        Dprintf(D_sdcdb, ("sdcdb:  and the following ASM exePoints\n"));
+        for (ep = setFirstItem(func->afpoints); ep; ep = setNextItem(func->afpoints))
+          {
+            Dprintf (D_sdcdb, ("sdcdb: {0x%x,%d} %s",
+                               ep->addr, ep->line+1, mod->asmLines[ep->line]->src));
+          }
+      }
 #endif
     }
 }
@@ -757,20 +763,20 @@ static void functionPoints (void)
 /*-----------------------------------------------------------------*/
 DEFSETFUNC(setEntryExitBP)
 {
-    function *func = item;
+  function *func = item;
 
-    if (func->sym && func->sym->addr && func->sym->eaddr) {
+  if (func->sym && func->sym->addr && func->sym->eaddr)
+    {
+      /* set the entry break point */
+      setBreakPoint (func->sym->addr, CODE, FENTRY,
+                     fentryCB, func->mod->c_name, func->entryline);
 
-        /* set the entry break point */
-        setBreakPoint (func->sym->addr , CODE , FENTRY ,
-            fentryCB ,func->mod->c_name , func->entryline);
-
-        /* set the exit break point */
-        setBreakPoint (func->sym->eaddr , CODE , FEXIT  ,
-            fexitCB  ,func->mod->c_name , func->exitline );
+      /* set the exit break point */
+      setBreakPoint (func->sym->eaddr, CODE, FEXIT,
+                     fexitCB, func->mod->c_name, func->exitline);
     }
 
-    return 0;
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -778,66 +784,69 @@ DEFSETFUNC(setEntryExitBP)
 /*-----------------------------------------------------------------*/
 int cmdFile (char *s,context *cctxt)
 {
-    FILE *cdbFile;
-    char buffer[128];
-    char *bp;
+  FILE *cdbFile;
+  char buffer[128];
+  char *bp;
 
-    s = trim_left(s);
+  s = trim_left(s);
 
-    if (!*s) {
-        fprintf(stdout,"No exec file now.\nNo symbol file now.\n");
-        return 0;
+  if (!*s)
+    {
+      fprintf(stdout, "No exec file now.\nNo symbol file now.\n");
+      return 0;
     }
 
-    sprintf(buffer,"%s.cdb",s);
-    /* try creating the cdbfile */
-    if (!(cdbFile = searchDirsFopen(buffer))) {
-        fprintf(stdout,"Cannot open file\"%s\", no symbolic information loaded\n",buffer);
-        // return 0;
+  sprintf(buffer, "%s.cdb", s);
+  /* try creating the cdbfile */
+  if (!(cdbFile = searchDirsFopen(buffer)))
+    {
+      fprintf(stdout, "Cannot open file\"%s\", no symbolic information loaded\n", buffer);
+      // return 0;
     }
 
-    /* allocate for context */
-    currCtxt = Safe_calloc(1,sizeof(context));
+  /* allocate for context */
+  currCtxt = Safe_calloc(1, sizeof(context));
 
-    if (cdbFile) {
-        /* readin the debug information */
-        if (!readCdb (cdbFile)) {
-            fprintf(stdout,"No symbolic information found in file %s.cdb\n",s);
+  if (cdbFile)
+    {
+      /* read in the debug information */
+      if (!readCdb (cdbFile))
+        {
+          fprintf(stdout,"No symbolic information found in file %s.cdb\n",s);
           //return 0;
         }
     }
 
-    /* parse and load the modules required */
-    loadModules();
+  /* parse and load the modules required */
+  loadModules();
 
-    /* determine the execution points for this
-       module */
-    functionPoints();
+  /* determine the execution points for this module */
+  functionPoints();
 
-    /* extract known special function registers */
-    specialFunctionRegs();
+  /* extract known special function registers */
+  specialFunctionRegs();
 
-    /* start the simulator & setup connection to it */
+  /* start the simulator & setup connection to it */
 #ifdef _WIN32
-    if (INVALID_SOCKET == sock)
+  if (INVALID_SOCKET == sock)
 #else
-    if ( sock == -1 )
+  if ( sock == -1 )
 #endif
-        openSimulator((char **)simArgs,nsimArgs);
-    fprintf(stdout,"%s",simResponse());
-    /* now send the filename to be loaded to the simulator */
-    sprintf(buffer,"%s.ihx",s);
-    bp=searchDirsFname(buffer);
-    simLoadFile(bp);
-    free(bp);
+      openSimulator((char **)simArgs, nsimArgs);
+  fprintf(stdout, "%s", simResponse());
+  /* now send the filename to be loaded to the simulator */
+  sprintf(buffer, "%s.ihx", s);
+  bp = searchDirsFname(buffer);
+  simLoadFile(bp);
+  free(bp);
 
-    /*set the break points
-       required by the debugger . i.e. the function entry
-       and function exit break points */
-    applyToSet(functions,setEntryExitBP);
+  /* set the break points
+     required by the debugger . i.e. the function entry
+     and function exit break points */
+  applyToSet(functions, setEntryExitBP);
 
-    setMainContext();
-    return 0;
+  setMainContext();
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -845,18 +854,18 @@ int cmdFile (char *s,context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdSource (char *s, context *cctxt)
 {
-    FILE *cmdfile;
+  FILE *cmdfile;
 
-    s = trim(s);
+  s = trim(s);
 
-    if (!( cmdfile = searchDirsFopen(s)))
+  if (!( cmdfile = searchDirsFopen(s)))
     {
-        fprintf(stderr,"commandfile '%s' not found\n",s);
-        return 0;
+      fprintf(stderr,"commandfile '%s' not found\n",s);
+      return 0;
     }
-    commandLoop( cmdfile );
-    fclose( cmdfile );
-    return 0;
+  commandLoop( cmdfile );
+  fclose( cmdfile );
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -866,82 +875,83 @@ int cmdSource (char *s, context *cctxt)
 
 static void printHelpLine(const char *htxt, int offs)
 {
-    static char *spaces = NULL;
-    const char *p;
-    int state = 0;
+  static char *spaces = NULL;
+  const char *p;
+  int state = 0;
 
-    if (NULL == spaces)
+  if (NULL == spaces)
     {
-        spaces = Safe_malloc(TEXT_OFFSET + 1);
-        memset(spaces, ' ', TEXT_OFFSET);
-        spaces[TEXT_OFFSET] = '\0';
+      spaces = Safe_malloc(TEXT_OFFSET + 1);
+      memset(spaces, ' ', TEXT_OFFSET);
+      spaces[TEXT_OFFSET] = '\0';
     }
 
-    p = htxt;
+  p = htxt;
 
-    do
+  do
     {
-        const char *ps = p;
-        int len;
-        while (*p && *p != '\t' &&  *p != '\n')
-            ++p;
-        len = p - ps;
+      const char *ps = p;
+      int len;
+      while (*p && *p != '\t' &&  *p != '\n')
+          ++p;
+      len = p - ps;
 
-        if (state == 0)
+      if (state == 0)
         {
-            printf("%.*s%.*s", offs, spaces, len, ps); /* command text */
+          printf("%.*s%.*s", offs, spaces, len, ps); /* command text */
 
-            if (len >= TEXT_OFFSET - offs)
-                printf("\n%s", spaces);
-            else
-                printf("%.*s", TEXT_OFFSET - offs - len, spaces);
+          if (len >= TEXT_OFFSET - offs)
+              printf("\n%s", spaces);
+          else
+              printf("%.*s", TEXT_OFFSET - offs - len, spaces);
         }
-        else
+      else
         {
-            printf("%.*s\n", len, ps);  /* help text */
+          printf("%.*s\n", len, ps);  /* help text */
         }
-        state = *p == '\t';
+      state = *p == '\t';
     }
-    while (*p++);
+  while (*p++);
 }
 
 int cmdHelp (char *s, context *cctxt)
 {
-    int i ;
-    int endline = 999;
-    int startline = 0;
+  int i ;
+  int endline = 999;
+  int startline = 0;
 
-    s = trim_left(s);
+  s = trim_left(s);
 
-    if (isdigit(*s)) {
-        endline = ((*s - '0') * 20) + 20;
-        if (endline > 0)
-            startline = endline - 20;
-    }
-    else if (*s)
+  if (isdigit(*s))
     {
-        for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
+      endline = ((*s - '0') * 20) + 20;
+      if (endline > 0)
+          startline = endline - 20;
+    }
+  else if (*s)
+    {
+      for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
         {
-            if ((cmdTab[i].htxt) && !strcmp(cmdTab[i].cmd,s))
+          if ((cmdTab[i].htxt) && !strcmp(cmdTab[i].cmd,s))
             {
-                printHelpLine(cmdTab[i].htxt, 0);
-                break;
+              printHelpLine(cmdTab[i].htxt, 0);
+              break;
             }
         }
-        return 0;
+      return 0;
     }
 
-    for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
+  for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
+    {
+      /* command string matches */
 
-        /* command string matches */
-
-        if ((cmdTab[i].htxt) && (i >= startline))
-            printHelpLine(cmdTab[i].htxt, 0);
-        if (i == endline)
-            break;
+      if ((cmdTab[i].htxt) && (i >= startline))
+          printHelpLine(cmdTab[i].htxt, 0);
+      if (i == endline)
+          break;
     }
 
-    return 0;
+  return 0;
 }
 
 #define MAX_CMD_LEN 512
@@ -954,80 +964,95 @@ static int sim_cmd_mode = 0;
 |-----------------------------------------------------------------*/
 int interpretCmd (char *s)
 {
-    static char *pcmd = NULL;
-    int i ;
-    int rv = 0 ;
+  static char *pcmd = NULL;
+  int i ;
+  int rv = 0 ;
 
-    /* if nothing & previous command exists then
-       execute the previous command again */
-    if (*s == '\n' && pcmd)
-        strcpy(s,pcmd);
+  /* if nothing & previous command exists then
+     execute the previous command again */
+  if (*s == '\n' && pcmd)
+      strcpy(s,pcmd);
 
-    /* if previous command exists & is different
-       from the current command then copy it */
-    if (pcmd) {
-        if (strcmp(pcmd,s)) {
-           free(pcmd);
-           pcmd = strdup(s);
+  /* if previous command exists & is different
+     from the current command then copy it */
+  if (pcmd)
+    {
+      if (strcmp(pcmd,s))
+        {
+          free(pcmd);
+          pcmd = strdup(s);
         }
-    } else
-        pcmd = strdup(s);
+    }
+  else
+    {
+      pcmd = strdup(s);
+    }
 
-    /* trim trailing blanks */
-    s = trim_right(s);
+  /* trim trailing blanks */
+  s = trim_right(s);
 
-    if (sim_cmd_mode) {
-        if (strcmp(s,".") == 0) {
+  if (sim_cmd_mode)
+    {
+      if (strcmp(s,".") == 0)
+        {
           sim_cmd_mode = 0;
           return 0;
         }
-        else if (s[0] == '.') {
-            /* kill the preceeding '.' and pass on as SDCDB command */
-            char *s1 = s+1;
-            char *s2 = s;
-            while (*s1 != 0)
-                *s2++ = *s1++;
-            *s2 = 0;
-        } else {
-            cmdSimulator (s, currCtxt);
-            return 0;
+      else if (s[0] == '.')
+        {
+          /* kill the preceeding '.' and pass on as SDCDB command */
+          char *s1 = s+1;
+          char *s2 = s;
+          while (*s1 != 0)
+              *s2++ = *s1++;
+          *s2 = 0;
         }
-    } else {
-        if (strcmp(s,".") ==0) {
-            sim_cmd_mode = 1;
-            return 0;
+      else
+        {
+          cmdSimulator (s, currCtxt);
+          return 0;
+        }
+    }
+  else
+    {
+      if (strcmp(s,".") ==0)
+        {
+          sim_cmd_mode = 1;
+          return 0;
         }
     }
 
-    for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
+  for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
+    {
+      /* command string matches */
+      if (strncmp(s,cmdTab[i].cmd,strlen(cmdTab[i].cmd)) == 0)
+        {
+          if (!cmdTab[i].cmdfunc)
+              return 1;
 
-        /* command string matches */
-        if (strncmp(s,cmdTab[i].cmd,strlen(cmdTab[i].cmd)) == 0) {
-            if (!cmdTab[i].cmdfunc)
-                return 1;
+          rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
 
-            rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
-
-            /* if full name then give the file name & position */
-            if (fullname && showfull && currCtxt && currCtxt->func) {
-                showfull = 0;
-                if (srcMode == SRC_CMODE)
-                    fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
-                        currCtxt->func->mod->cfullname,
-                        currCtxt->cline+1,currCtxt->addr);
-                else
-                    fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
-                        currCtxt->func->mod->afullname,
-                        currCtxt->asmline,currCtxt->addr);
-                displayAll(currCtxt);
+          /* if full name then give the file name & position */
+          if (fullname && showfull && currCtxt && currCtxt->func)
+            {
+              showfull = 0;
+              if (srcMode == SRC_CMODE)
+                  fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
+                          currCtxt->func->mod->cfullname,
+                          currCtxt->cline+1,currCtxt->addr);
+              else
+                  fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
+                          currCtxt->func->mod->afullname,
+                          currCtxt->asmline,currCtxt->addr);
+              displayAll(currCtxt);
             }
-            goto ret;
+          goto ret;
         }
     }
+  fprintf(stdout,"Undefined command: \"%s\".  Try \"help\".\n",s);
 
-    fprintf(stdout,"Undefined command: \"%s\".  Try \"help\".\n",s);
- ret:
-    return rv;
+ret:
+  return rv;
 }
 
 static FILE *actualcmdfile=NULL ;
@@ -1038,28 +1063,28 @@ static int   stopcmdlist;
 /*-----------------------------------------------------------------*/
 char *getNextCmdLine(void)
 {
-    //fprintf(stderr,"getNextCmdLine() actualcmdfile=%p\n",actualcmdfile);
-    if (!actualcmdfile)
-        return NULL;
-    fprintf(stdout,">");
-    fflush(stdout);
-    if (fgets(cmdbuff,sizeof(cmdbuff),actualcmdfile) == NULL)
+  //fprintf(stderr,"getNextCmdLine() actualcmdfile=%p\n",actualcmdfile);
+  if (!actualcmdfile)
+      return NULL;
+  fprintf(stdout,">");
+  fflush(stdout);
+  if (fgets(cmdbuff,sizeof(cmdbuff),actualcmdfile) == NULL)
     {
-        // fprintf(stderr,"getNextCmdLine() returns null\n");
-        return NULL;
+      // fprintf(stderr,"getNextCmdLine() returns null\n");
+      return NULL;
     }
-    //fprintf(stderr,"getNextCmdLine() returns: %s",cmdbuff);
-    return cmdbuff;
+  //fprintf(stderr,"getNextCmdLine() returns: %s",cmdbuff);
+  return cmdbuff;
 }
 
 void setCmdLine( char *cmds )
 {
-    actualcmds = cmds;
+  actualcmds = cmds;
 }
 
 void stopCommandList()
 {
-    stopcmdlist = 1;
+  stopcmdlist = 1;
 }
 
 #ifdef HAVE_READLINE_COMPLETITION
@@ -1072,30 +1097,30 @@ void stopCommandList()
 // return value: 0=token not found, 1=token found
 int completionHelper_GetTokenNumber(int toknum, int *start, int *end)
 {
-    int tok_index;
-    const char *p = rl_line_buffer;
+  int tok_index;
+  const char *p = rl_line_buffer;
 
-    tok_index = 0;
-    *start = *end = 0;
-    while (p[*end] != 0)
+  tok_index = 0;
+  *start = *end = 0;
+  while (p[*end] != 0)
     {
-        // start = skip blanks from end
-        *start = *end;
-        while (p[*start] && isspace( p[*start] ))
-            (*start)++;
+      // start = skip blanks from end
+      *start = *end;
+      while (p[*start] && isspace( p[*start] ))
+          (*start)++;
 
-        // end = skip non-blanks from start
-        *end = *start;
-        while (p[*end] && !isspace( p[*end] ))
-            (*end)++;
+      // end = skip non-blanks from start
+      *end = *start;
+      while (p[*end] && !isspace( p[*end] ))
+          (*end)++;
 
-        if (tok_index == toknum)
-            return 1;   // found
+      if (tok_index == toknum)
+          return 1;   // found
 
-        tok_index++;
+      tok_index++;
     }
 
-    return 0;   // not found
+  return 0;   // not found
 }
 
 // helper function for doing readline completion.
@@ -1103,18 +1128,18 @@ int completionHelper_GetTokenNumber(int toknum, int *start, int *end)
 // 0=first token (command name), 1=second token...
 int completionHelper_GetCurrTokenNumber()
 {
-    int toknum, start, end;
+  int toknum, start, end;
 
-    toknum = start = end = 0;
-    while (1)
+  toknum = start = end = 0;
+  while (1)
     {
-        if (!completionHelper_GetTokenNumber(toknum, &start, &end))
-            return toknum;
+      if (!completionHelper_GetTokenNumber(toknum, &start, &end))
+          return toknum;
 
-        if (rl_point <= end)
-            return toknum;
+      if (rl_point <= end)
+          return toknum;
 
-        toknum++;
+      toknum++;
     }
 }
 
@@ -1122,99 +1147,101 @@ int completionHelper_GetCurrTokenNumber()
 //          "copying\0warranty\0";
 char *completionCompleteFromStrList(const char *text, int state, char *vallist)
 {
-    static char *ptr;
-    int len;
+  static char *ptr;
+  int len;
 
-    if (state == 0)
-        ptr = vallist;
-    else
-        ptr += strlen(ptr)+1;
+  if (state == 0)
+      ptr = vallist;
+  else
+      ptr += strlen(ptr)+1;
 
-    len = strlen(text);
-    while (*ptr)
+  len = strlen(text);
+  while (*ptr)
     {
-        if ( (len < strlen(ptr)) &&
-              !strncmp(text, ptr, len) )
-            return strdup(ptr);
+      if ( (len < strlen(ptr)) && !strncmp(text, ptr, len) )
+          return strdup(ptr);
 
-        ptr += strlen(ptr)+1;
+      ptr += strlen(ptr)+1;
     }
 
-    return NULL;
+  return NULL;
 }
 
 // readline library completion function.
 // completes from the list of all sdcdb command.
 char *completionCommandsList(const char *text, int state)
 {
-    static int i = 0;
+  static int i = 0;
 
-    if (state == 0) // new completion?
+  if (state == 0) // new completion?
     {   // yes, only complete if this is the first token on the line.
-        int ok = 0; // try to complete this request?
-        char *p = rl_line_buffer;
+      int ok = 0; // try to complete this request?
+      char *p = rl_line_buffer;
 
-        // skip blanks
-        while (p && isspace(*p))
+      // skip blanks
+      while (p && isspace(*p))
         {
-            if (p-rl_line_buffer == rl_point)
-                ok = 1;
-            p++;
+          if (p-rl_line_buffer == rl_point)
+              ok = 1;
+          p++;
         }
 
-        while (p && !isspace(*p))
+      while (p && !isspace(*p))
         {
-            if (p-rl_line_buffer == rl_point)
-                ok = 1;
-            p++;
+          if (p-rl_line_buffer == rl_point)
+              ok = 1;
+          p++;
         }
 
-        if (p-rl_line_buffer == rl_point)
-            ok = 1;
+      if (p-rl_line_buffer == rl_point)
+          ok = 1;
 
-        if ( !ok )
-            return NULL; // no more completions
+      if ( !ok )
+          return NULL; // no more completions
 
-        i = 0;  // ok, gonna complete. initialize static variable.
+      i = 0;  // ok, gonna complete. initialize static variable.
     }
-    else i++;
-
-    for (; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
+  else
     {
-        int len = strlen(text);
-        if (len <= strlen(cmdTab[i].cmd))
+      i++;
+    }
+
+  for (; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
+    {
+      int len = strlen(text);
+      if (len <= strlen(cmdTab[i].cmd))
         {
-            if (strncmp(text,cmdTab[i].cmd,len) == 0)
-                return strdup(cmdTab[i].cmd);
+          if (strncmp(text,cmdTab[i].cmd,len) == 0)
+              return strdup(cmdTab[i].cmd);
         }
     }
 
-    return NULL; // no more completions
+  return NULL; // no more completions
 }
 
 // readline library completion function.
 // completes from the list of symbols.
 char *completionSymbolName(const char *text, int state)
 {
-    static symbol *sy;
+  static symbol *sy;
 
-    if (state == 0) // new completion?
-        sy = setFirstItem(symbols); // yes
-    else
-      sy = setNextItem(symbols);
+  if (state == 0) // new completion?
+      sy = setFirstItem(symbols); // yes
+  else
+    sy = setNextItem(symbols);
 
-    for (; sy != NULL; )
+  for (; sy != NULL; )
     {
-        int len = strlen(text);
-        if (len <= strlen(sy->name))
+      int len = strlen(text);
+      if (len <= strlen(sy->name))
         {
-            if (strncmp(text,sy->name,len) == 0)
-                return strdup(sy->name);
+          if (strncmp(text,sy->name,len) == 0)
+              return strdup(sy->name);
         }
 
-        sy = setNextItem(symbols);
+      sy = setNextItem(symbols);
     }
-    return NULL;
+  return NULL;
 }
 
 // readline library completion function.
@@ -1223,299 +1250,315 @@ char *completionSymbolName(const char *text, int state)
 //               if true, compare against module_name:fnction_name
 char *completionFunctionName(const char *text, int state, int module_flag)
 {
-    static function *f;
+  static function *f;
 
-    if (state == 0) // new completion?
-        f = setFirstItem(functions); // yes
-    else
-      f = setNextItem(functions);
+  if (state == 0) // new completion?
+      f = setFirstItem(functions); // yes
+  else
+    f = setNextItem(functions);
 
-    for (; f != NULL; )
+  for (; f != NULL; )
     {
-        int text_len = strlen(text);
+      int text_len = strlen(text);
 
-        if (!module_flag)
+      if (!module_flag)
         {
-            if (text_len <= strlen(f->sym->name) &&
-                !strncmp(text,f->sym->name,text_len))
-                return strdup(f->sym->name);
+          if (text_len <= strlen(f->sym->name) &&
+              !strncmp(text,f->sym->name,text_len))
+            {
+              return strdup(f->sym->name);
+            }
         }
-        else
+      else
         {
-            int modname_len = strlen(f->mod->c_name);
-            int funcname_len = strlen(f->sym->name);
-            char *functext = malloc(modname_len+funcname_len+2);
-            //assert(functext);
-            strcpy(functext,f->mod->c_name);
-            strcat(functext,":");
-            strcat(functext,f->sym->name);
-            if (text_len <= strlen(functext) &&
-                !strncmp(text,functext,text_len))
-                return functext;
-            else
-                free(functext);
+          int modname_len = strlen(f->mod->c_name);
+          int funcname_len = strlen(f->sym->name);
+          char *functext = malloc(modname_len+funcname_len+2);
+          //assert(functext);
+          strcpy(functext,f->mod->c_name);
+          strcat(functext,":");
+          strcat(functext,f->sym->name);
+          if (text_len <= strlen(functext) &&
+              !strncmp(text,functext,text_len))
+            {
+              return functext;
+            }
+          else
+            {
+              free(functext);
+            }
         }
-        f = setNextItem(functions);
+      f = setNextItem(functions);
     }
-    return NULL;
+  return NULL;
 }
 
 // readline library completion function.
 // completes from the list known modules.
 char *completionModuleName(const char *text, int state)
 {
-    static module *m;
+  static module *m;
 
-    if (state == 0) // new completion?
-        m = setFirstItem(modules); // yes
-    else
+  if (state == 0) // new completion?
+      m = setFirstItem(modules); // yes
+  else
       m = setNextItem(modules);
 
-    for (; m != NULL; )
+  for (; m != NULL; )
     {
-        int len = strlen(text);
-        if ( (len <= strlen(m->c_name)) &&
-             !strncmp(text,m->c_name,len) )
-            return strdup(m->c_name);
+      int len = strlen(text);
+      if ( (len <= strlen(m->c_name)) &&
+           !strncmp(text,m->c_name,len) )
+        {
+          return strdup(m->c_name);
+        }
 
-        if ( (len <= strlen(m->asm_name)) &&
-             (strncmp(text,m->asm_name,len) == 0) )
-            return strdup(m->asm_name);
+      if ( (len <= strlen(m->asm_name)) &&
+           (strncmp(text,m->asm_name,len) == 0) )
+        {
+          return strdup(m->asm_name);
+        }
 
-        m = setNextItem(modules);
+      m = setNextItem(modules);
     }
-    return NULL;
+  return NULL;
 }
 
 // readline completion function for "file" command
 char *completionCmdFile(const char *text, int state)
 {
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
     }
 
-    // we use filename_completion_function() from the readline library.
-    return rl_filename_completion_function(text, state);
+  // we use filename_completion_function() from the readline library.
+  return rl_filename_completion_function(text, state);
 }
 
 // readline completion function for "source" command
 char *completionCmdSource(const char *text, int state)
 {
-    return completionCmdFile(text, state);
+  return completionCmdFile(text, state);
 }
 
 // readline completion function for "info" command
 char *completionCmdInfo(const char *text, int state)
 {
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
     }
 
-    return completionCompleteFromStrList(text, state,
-            "break\0stack\0frame\0registers\0all-registers\0"
-            "line\0source\0functions\0symbols\0variables\0");
+  return completionCompleteFromStrList(text, state,
+          "break\0stack\0frame\0registers\0all-registers\0"
+          "line\0source\0functions\0symbols\0variables\0");
 }
 
 // readline completion function for "show" command
 char *completionCmdShow(const char *text, int state)
 {
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
     }
-    return completionCompleteFromStrList(text, state, "copying\0warranty\0");
+  return completionCompleteFromStrList(text, state, "copying\0warranty\0");
 }
 
 // readline completion function for "la" command
 char *completionCmdListSymbols(const char *text, int state)
 {
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
     }
-    return completionCompleteFromStrList(text, state, "v1\0v2\0");
+  return completionCompleteFromStrList(text, state, "v1\0v2\0");
 }
 
 char *completionCmdPrintType(const char *text, int state)
 {
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
     }
-    return completionSymbolName(text, state);
+  return completionSymbolName(text, state);
 }
 
 char *completionCmdPrint(const char *text, int state)
 {
-    if (state == 0)
+  if (state == 0)
     {
-        int i = completionHelper_GetCurrTokenNumber();
-        if (i != 1 && i != 2)
-            return NULL;
+      int i = completionHelper_GetCurrTokenNumber();
+      if (i != 1 && i != 2)
+          return NULL;
     }
-    return completionSymbolName(text, state);
+  return completionSymbolName(text, state);
 }
 
 char *completionCmdDelUserBp(const char *text, int state)
 {
-    static breakp *bp;
-    static int k;
+  static breakp *bp;
+  static int k;
 
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
 
-        if (!userBpPresent)
-            return NULL;
+      if (!userBpPresent)
+          return NULL;
 
-        bp = hTabFirstItem(bptable,&k);
+      bp = hTabFirstItem(bptable,&k);
     }
-    else
-        bp = hTabNextItem(bptable,&k);
-
-    for ( ; bp ; bp = hTabNextItem(bptable,&k))
+  else
     {
-        if (bp->bpType == USER || bp->bpType == TMPUSER)
+      bp = hTabNextItem(bptable,&k);
+    }
+
+  for ( ; bp ; bp = hTabNextItem(bptable,&k))
+    {
+      if (bp->bpType == USER || bp->bpType == TMPUSER)
         {
-            char buff[20];
-            sprintf(buff, "%d", bp->bpnum);
-            return strdup(buff);
+          char buff[20];
+          sprintf(buff, "%d", bp->bpnum);
+          return strdup(buff);
         }
     }
 
-    return NULL;
+  return NULL;
 }
 
 // readline completion function for "undisplay" command
 char *completionCmdUnDisplay(const char *text, int state)
 {
-    static dsymbol *dsym;
+  static dsymbol *dsym;
 
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
-        dsym = setFirstItem(dispsymbols);
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
+      dsym = setFirstItem(dispsymbols);
     }
 
-    if (dsym)
+  if (dsym)
     {
-        char buff[30];
-        sprintf(buff, "%d", dsym->dnum);
-        dsym = setNextItem(dispsymbols);
-        return strdup(buff);
+      char buff[30];
+      sprintf(buff, "%d", dsym->dnum);
+      dsym = setNextItem(dispsymbols);
+      return strdup(buff);
     }
-    return NULL;
+  return NULL;
 }
 
 char *completionCmdSetUserBp(const char *text, int state)
 {
-    static int internal_state; // 0=calling completionFunctionName(text, state, 0)
+  static int internal_state; // 0=calling completionFunctionName(text, state, 0)
                                // 1=calling completionFunctionName(text, 1, 1)
-    if (state == 0)
+  if (state == 0)
     {
-        if (completionHelper_GetCurrTokenNumber() != 1)
-            return NULL;
+      if (completionHelper_GetCurrTokenNumber() != 1)
+          return NULL;
 
-        internal_state = 0;
+      internal_state = 0;
     }
-    if (internal_state == 0)
+  if (internal_state == 0)
     {
-        char *p = completionFunctionName(text, state, 0);
-        if (p)
-            return p;
-        internal_state = 1;
-        return completionFunctionName(text, 0, 1);
+      char *p = completionFunctionName(text, state, 0);
+      if (p)
+          return p;
+      internal_state = 1;
+      return completionFunctionName(text, 0, 1);
     }
-    else
+  else
     {
-        return completionFunctionName(text, 1, 1);
+      return completionFunctionName(text, 1, 1);
     }
 }
 
 char *completionCmdSetOption(const char *text, int state)
 {
-    static int currtok;
+  static int currtok;
 
-    if (state == 0)
+  if (state == 0)
     {
-        int start,end;
+      int start,end;
 
-        currtok = completionHelper_GetCurrTokenNumber();
+      currtok = completionHelper_GetCurrTokenNumber();
 
-        if (currtok == 2 || currtok == 3)
+      if (currtok == 2 || currtok == 3)
         {
-            // make sure token 1 == "variable"
-            completionHelper_GetTokenNumber(1, &start, &end);
-            if (end - start != 8 ||
-                strncmp(rl_line_buffer+start,"variable",8))
-                return NULL;
+          // make sure token 1 == "variable"
+          completionHelper_GetTokenNumber(1, &start, &end);
+          if (end - start != 8 ||
+              strncmp(rl_line_buffer+start,"variable",8))
+            {
+              return NULL;
+            }
         }
-        else if (currtok != 1)
+      else if (currtok != 1)
         {
-            return NULL;
+          return NULL;
         }
     }
 
-    switch (currtok)
+  switch (currtok)
     {
-        case 1:
-            return completionCompleteFromStrList(text, state,
+      case 1:
+        return completionCompleteFromStrList(text, state,
 #ifdef SDCDB_DEBUG
                 "debug\0"
 #endif
                 "srcmode\0listsize\0variable\0");
-        case 2:
-            return completionSymbolName(text, state);
+      case 2:
+        return completionSymbolName(text, state);
 
-        case 3:
-            return completionCompleteFromStrList(text, state, "=\0");
+      case 3:
+        return completionCompleteFromStrList(text, state, "=\0");
     }
-    return NULL;
+  return NULL;
 }
 
 // our main readline completion function
 // calls the other completion functions as needed.
 char *completionMain(const char *text, int state)
 {
-    static rl_compentry_func_t *compl_func;
-    int i, start, end, len;
+  static rl_compentry_func_t *compl_func;
+  int i, start, end, len;
 
-    if (state == 0) // new completion?
+  if (state == 0) // new completion?
     {
-        compl_func = NULL;
+      compl_func = NULL;
 
-        if (completionHelper_GetCurrTokenNumber() == 0)
-            compl_func = &completionCommandsList;
-        else
-        {   // not completing first token, find the right completion
-            // function according to the first token the user typed.
-            completionHelper_GetTokenNumber(0, &start, &end);
-            len = end-start;
+      if (completionHelper_GetCurrTokenNumber() == 0)
+        {
+          compl_func = &completionCommandsList;
+        }
+      else
+        { // not completing first token, find the right completion
+          // function according to the first token the user typed.
+          completionHelper_GetTokenNumber(0, &start, &end);
+          len = end-start;
 
-            for (i=0; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
+          for (i=0; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
             {
-                if (!strncmp(rl_line_buffer+start,cmdTab[i].cmd,len) &&
-                    cmdTab[i].cmd[len] == '\0')
+              if (!strncmp(rl_line_buffer+start,cmdTab[i].cmd,len) &&
+                  cmdTab[i].cmd[len] == '\0')
                 {
-                    compl_func = cmdTab[i].completion_func;
-                    break;
+                  compl_func = cmdTab[i].completion_func;
+                  break;
                 }
             }
         }
-        if (!compl_func)
-            return NULL;
+      if (!compl_func)
+          return NULL;
     }
 
-    return (*compl_func)(text,state);
+  return (*compl_func)(text,state);
 }
 #endif  /* HAVE_READLINE_COMPLETITION */
 
@@ -1524,53 +1567,53 @@ char *completionMain(const char *text, int state)
 /*-----------------------------------------------------------------*/
 static void commandLoop(FILE *cmdfile)
 {
-    char *line, save_ch, *s;
+  char *line, save_ch, *s;
 #ifdef HAVE_LIBREADLINE
-    char *line_read;
+  char *line_read;
 
-    FILE *old_rl_instream, *old_rl_outstream;
-    actualcmdfile = cmdfile;
+  FILE *old_rl_instream, *old_rl_outstream;
+  actualcmdfile = cmdfile;
 
 #ifdef HAVE_READLINE_COMPLETITION
-    rl_completion_entry_function = completionMain;
+  rl_completion_entry_function = completionMain;
 #endif  /* HAVE_READLINE_COMPLETITION */
-    rl_readline_name = "sdcdb"; // Allow conditional parsing of the ~/.inputrc file.
+  rl_readline_name = "sdcdb"; // Allow conditional parsing of the ~/.inputrc file.
 
-    // save readline's input/output streams
-    // this is done to support nested calls to commandLoop()
-    // i wonder if it works...
-    old_rl_instream = rl_instream;
-    old_rl_outstream = rl_outstream;
+  // save readline's input/output streams
+  // this is done to support nested calls to commandLoop()
+  // i wonder if it works...
+  old_rl_instream = rl_instream;
+  old_rl_outstream = rl_outstream;
 
-    // set new streams for readline
-    if ( cmdfile == stdin )
-        rl_instream = rl_outstream = NULL;  // use stdin/stdout pair
-    else
-        rl_instream = rl_outstream = cmdfile;
+  // set new streams for readline
+  if ( cmdfile == stdin )
+      rl_instream = rl_outstream = NULL;  // use stdin/stdout pair
+  else
+      rl_instream = rl_outstream = cmdfile;
 
-      while (1)
-      {
-          if ( cmdfile == stdin )
-          {
-              if (sim_cmd_mode)
-                  line_read = (char*)readline ("(sim) ");
-              else
-                  line_read = (char*)readline ("(sdcdb) ");
-          }
-          else
-              line_read = (char*)readline ("");
-
-        if (line_read)
+  while (1)
+    {
+      if ( cmdfile == stdin )
         {
-            /* If the line has any text in it,
-               save it on the history. */
-            if (line_read && *line_read)
+          if (sim_cmd_mode)
+            line_read = (char*)readline ("(sim) ");
+          else
+            line_read = (char*)readline ("(sdcdb) ");
+        }
+      else
+        line_read = (char*)readline ("");
+
+      if (line_read)
+        {
+          /* If the line has any text in it,
+             save it on the history. */
+          if (line_read && *line_read)
               add_history (line_read);
 
-             // FIX: readline returns malloced string.
-             //   should check the source to verify it can be used
-             //    directly. for now - just copy it to cmdbuff.
-            strcpy(cmdbuff,line_read);
+           // FIX: readline returns malloced string.
+           //   should check the source to verify it can be used
+           //    directly. for now - just copy it to cmdbuff.
+           strcpy(cmdbuff,line_read);
 #if defined(_WIN32) || defined(HAVE_RL_FREE)
             rl_free(line_read);
 #else
@@ -1578,62 +1621,64 @@ static void commandLoop(FILE *cmdfile)
 #endif
             line_read = NULL;
         }
-        else
-            break;  // EOF
-#else
-    actualcmdfile = cmdfile;
-
-    while (1)
-    {
-        if ( cmdfile == stdin )
+      else
         {
-            if (sim_cmd_mode)
-                printf("(sim) ");
-            else
-                fprintf(stdout,"(sdcdb) ");
-            fflush(stdout);
+          break;  // EOF
         }
-        //fprintf(stderr,"commandLoop actualcmdfile=%p cmdfile=%p\n",
-        //        actualcmdfile,cmdfile);
-        if (fgets(cmdbuff,sizeof(cmdbuff),cmdfile) == NULL)
-            break;
+#else  /* HAVE_LIBREADLINE */
+  actualcmdfile = cmdfile;
+
+  while (1)
+    {
+      if ( cmdfile == stdin )
+        {
+          if (sim_cmd_mode)
+              printf("(sim) ");
+          else
+              fprintf(stdout,"(sdcdb) ");
+          fflush(stdout);
+        }
+      //fprintf(stderr,"commandLoop actualcmdfile=%p cmdfile=%p\n",
+      //        actualcmdfile,cmdfile);
+      if (fgets(cmdbuff,sizeof(cmdbuff),cmdfile) == NULL)
+          break;
 #endif  /* HAVE_LIBREADLINE */
 
-          if (interpretCmd(cmdbuff))
-              break;
+      if (interpretCmd(cmdbuff))
+          break;
 
-        while ( actualcmds )
+      while ( actualcmds )
         {
-            strcpy(cmdbuff,actualcmds);
-            actualcmds = NULL;
-            stopcmdlist= 0;
-            for ( line = cmdbuff; *line ; line = s )
+          strcpy(cmdbuff,actualcmds);
+          actualcmds = NULL;
+          stopcmdlist= 0;
+          for ( line = cmdbuff; *line ; line = s )
             {
-                if ( (s=strchr(line ,'\n')))
+              if ( (s=strchr(line ,'\n')))
                 {
-                    save_ch = *++s;
-                    *s = '\0';
+                  save_ch = *++s;
+                  *s = '\0';
                 }
-                else
+              else
                 {
-                    s += strlen( line );
-                    save_ch = '\0';
+                  s += strlen( line );
+                  save_ch = '\0';
                 }
-                if (interpretCmd( line ))
+              if (interpretCmd( line ))
                 {
-                    *s = save_ch;
-                    break;
+                  *s = save_ch;
+                  break;
                 }
-                *s = save_ch;
-                if ( stopcmdlist )
-                    break;
+              *s = save_ch;
+              if ( stopcmdlist )
+                  break;
             }
         }
     }
 #ifdef HAVE_LIBREADLINE
-    // restore readline's input/output streams
-    rl_instream = old_rl_instream;
-    rl_outstream = old_rl_outstream;
+  // restore readline's input/output streams
+  rl_instream = old_rl_instream;
+  rl_outstream = old_rl_outstream;
 #endif  /* HAVE_LIBREADLINE */
 }
 
@@ -1642,11 +1687,11 @@ static void commandLoop(FILE *cmdfile)
 /*-----------------------------------------------------------------*/
 static void printVersionInfo(void)
 {
-    fprintf(stdout,
-        "SDCDB is free software and you are welcome to distribute copies of it\n"
-        "under certain conditions; type \"show copying\" to see the conditions.\n"
-        "There is absolutely no warranty for SDCDB; type \"show warranty\" for details.\n"
-        "SDCDB " SDCDB_VERSION ". Copyright (C) 1999 Sandeep Dutta (sandeep.dutta@usa.net)\n");
+  fprintf(stdout,
+          "SDCDB is free software and you are welcome to distribute copies of it\n"
+          "under certain conditions; type \"show copying\" to see the conditions.\n"
+          "There is absolutely no warranty for SDCDB; type \"show warranty\" for details.\n"
+          "SDCDB " SDCDB_VERSION ". Copyright (C) 1999 Sandeep Dutta (sandeep.dutta@usa.net)\n");
 }
 
 /*-----------------------------------------------------------------*/
@@ -1654,7 +1699,7 @@ static void printVersionInfo(void)
 /*-----------------------------------------------------------------*/
 static void printHelp(void)
 {
-    fprintf(stdout, "Type ? for help\n");
+  fprintf(stdout, "Type ? for help\n");
 }
 
 /*-----------------------------------------------------------------*/
@@ -1664,28 +1709,28 @@ static void printHelp(void)
 
 static const char *escapeQuotes(const char *arg)
 {
-    static char *str = NULL;
-    static size_t strLen = 0;
-    char *ps;
-    const char *pa;
+  static char *str = NULL;
+  static size_t strLen = 0;
+  char *ps;
+  const char *pa;
 
-    if (NULL == str)
+  if (NULL == str)
     {
-        str = Safe_malloc(CHUNCK);
-        strLen = CHUNCK;
+      str = Safe_malloc(CHUNCK);
+      strLen = CHUNCK;
     }
 
-    for (ps = str, pa = arg; '\0' != *pa; ++pa)
+  for (ps = str, pa = arg; '\0' != *pa; ++pa)
     {
-        if ('"' == *pa)
+      if ('"' == *pa)
         {
-            *ps++ = '\\';       /* excape the quote */
+          *ps++ = '\\';       /* excape the quote */
         }
-        *ps++ = *pa;
+      *ps++ = *pa;
     }
-    *ps = '\0';
+  *ps = '\0';
 
-    return str;
+  return str;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1693,76 +1738,77 @@ static const char *escapeQuotes(const char *arg)
 /*-----------------------------------------------------------------*/
 char *argsToCmdLine(char **args, int nargs)
 {
-    static char *cmd = NULL;
-    static size_t cmdLen = 0;
-    int i;
-    size_t cmdPos = 0;
+  static char *cmd = NULL;
+  static size_t cmdLen = 0;
+  int i;
+  size_t cmdPos = 0;
 
-    if (NULL == cmd)
+  if (NULL == cmd)
     {
-        cmd = Safe_malloc(CHUNCK);
-        cmdLen = CHUNCK;
+      cmd = Safe_malloc(CHUNCK);
+      cmdLen = CHUNCK;
     }
 
-    for (i = 0; i < nargs; ++i)
+  for (i = 0; i < nargs; ++i)
     {
-        size_t argLen;
-        size_t allocLen = 0;
-        int quote = 0;
-        const char *arg;
+      size_t argLen;
+      size_t allocLen = 0;
+      int quote = 0;
+      const char *arg;
 
-        if (0 < i)
-            ++allocLen;                 /* space for space character */
+      if (0 < i)
+          ++allocLen;                 /* space for space character */
 
-        if (NULL != strchr(args[i], ' '))
+      if (NULL != strchr(args[i], ' '))
         {
-            quote = 1;
-            allocLen += 2;              /* space for inital and final quote */
-            arg = escapeQuotes(args[i]);
+          quote = 1;
+          allocLen += 2;              /* space for inital and final quote */
+          arg = escapeQuotes(args[i]);
         }
-        else {
-            arg = args[i];
-        }
-
-        argLen = strlen(arg);
-        allocLen += argLen;             /* space for argument */
-
-        /* extend the buffer */
-        if (cmdPos + allocLen >= cmdLen)
+      else
         {
-            do
+          arg = args[i];
+        }
+
+      argLen = strlen(arg);
+      allocLen += argLen;             /* space for argument */
+
+      /* extend the buffer */
+      if (cmdPos + allocLen >= cmdLen)
+        {
+          do
             {
-                cmdLen += cmdLen;
+              cmdLen += cmdLen;
             }
-            while (cmdPos + allocLen >= cmdLen);
-            cmd = Safe_realloc(cmd, cmdLen);
+          while (cmdPos + allocLen >= cmdLen);
+          cmd = Safe_realloc(cmd, cmdLen);
         }
 
-        if (0 < i)
+      if (0 < i)
         {
-            cmd[cmdPos++] = ' ';        /* append space character */
+          cmd[cmdPos++] = ' ';        /* append space character */
         }
 
-        if (quote)
+      if (quote)
         {
-            cmd[cmdPos++] = '"';        /* append initial quote */
+          cmd[cmdPos++] = '"';        /* append initial quote */
         }
 
-        memcpy(&cmd[cmdPos], arg, argLen); /* append argument */
-        cmdPos += argLen;
+      memcpy(&cmd[cmdPos], arg, argLen); /* append argument */
+      cmdPos += argLen;
 
-        if (quote)
-            cmd[cmdPos++] = '"';        /* append final quote */
+      if (quote)
+          cmd[cmdPos++] = '"';        /* append final quote */
     }
 
-    cmd[cmdPos] = '\0';
+  cmd[cmdPos] = '\0';
 
-    return cmd;
+  return cmd;
 }
 
 static void usage(void)
 {
-    const char *args =
+  const char *args =
         "-{h|?}, --help\tDisplay this help\n"
         "-v\tVerbose: show the simulator invocation commald line\n"
         "--directory=<dir>\tSearch modules in <dir> directory\n"
@@ -1776,19 +1822,19 @@ static void usage(void)
         "-m<model>\tModel string: avr, xa, z80\n"
         "-z\tAll remaining options are for simulator";
 
-    const char *simArgs =
+  const char *simArgs =
         "-t <cpu>, -cpu <cpu>\tCpu type\n"
         "-frequency <frequency>, -X <frequency>\tXTAL Frequency\n"
         "-{s|S} <serial_port>\tSerial port\n"
         "-k\tNetwork serial port";
 
-    printf("usage: sdcdb [args] [simulator args] [filename]\n"
-        "args:\n");
-    printHelpLine(args, 2);
-    printf("simulator args:\n");
-    printHelpLine(simArgs, 2);
-    putchar('\n');
-    printVersionInfo();
+  printf("usage: sdcdb [args] [simulator args] [filename]\n"
+         "args:\n");
+  printHelpLine(args, 2);
+  printf("simulator args:\n");
+  printHelpLine(simArgs, 2);
+  putchar('\n');
+  printVersionInfo();
 }
 
 /*-----------------------------------------------------------------*/
@@ -1796,167 +1842,195 @@ static void usage(void)
 /*-----------------------------------------------------------------*/
 static void parseCmdLine (int argc, char **argv)
 {
-    int i;
-    char *filename = NULL;
-    int passon_args_flag = 0;  /* if true, pass on args to simulator */
-    int verbose = 0;
+  int i;
+  char *filename = NULL;
+  int passon_args_flag = 0;  /* if true, pass on args to simulator */
+  int verbose = 0;
 
-    Dprintf(D_sdcdb, ("sdcdb: parseCmdLine\n"));
-    contsim = 0;
+  Dprintf(D_sdcdb, ("sdcdb: parseCmdLine\n"));
+  contsim = 0;
 
-    for (i = 1; i < argc ; i++) {
-        if (passon_args_flag) { /* if true, pass on args to simulator */
-            simArgs[nsimArgs++] = strdup(argv[i]);
-            continue;
+  for (i = 1; i < argc ; i++)
+    {
+      if (passon_args_flag) /* if true, pass on args to simulator */
+        {
+          simArgs[nsimArgs++] = strdup(argv[i]);
+          continue;
         }
 
-        /* if this is an option */
-        if (argv[i][0] == '-') {
-            /* display usage */
-            if (strcmp(argv[i], "-h") == 0 ||
-                strcmp(argv[i], "-?") == 0 ||
-                strcmp(argv[i], "--help") == 0) {
-                usage();
-                exit(0);
+      /* if this is an option */
+      if (argv[i][0] == '-')
+        {
+          /* display usage */
+          if (strcmp(argv[i], "-h") == 0 ||
+              strcmp(argv[i], "-?") == 0 ||
+              strcmp(argv[i], "--help") == 0)
+            {
+              usage();
+              exit(0);
             }
 
-            /* verbose */
-            if (strcmp(argv[i], "-v") == 0) {
-                verbose = 1;
-                continue;
+          /* verbose */
+          if (strcmp(argv[i], "-v") == 0)
+            {
+              verbose = 1;
+              continue;
             }
 
-            /* if directory then mark directory */
-            if (strncmp(argv[i], "--directory=", 12) == 0) {
-                if (!ssdirl)
-                    ssdirl = &argv[i][12];
-                else {
-                    char *p = Safe_malloc(strlen(ssdirl)+strlen(&argv[i][12])+2);
-                    strcat(strcat(strcpy(p,&argv[i][12]),":"),ssdirl);
-                    ssdirl = p;
+          /* if directory then mark directory */
+          if (strncmp(argv[i], "--directory=", 12) == 0)
+            {
+              if (!ssdirl)
+                {
+                  ssdirl = &argv[i][12];
                 }
-                continue;
-            }
-
-            if (strcmp(argv[i], "-fullname") == 0) {
-                fullname = TRUE;
-                continue;
-            }
-
-            if (strncmp(argv[i], "-cd=", 4) == 0) {
-                if (0 > chdir(&argv[i][4])) {
-                    fprintf(stderr, "can't change directory to %s\n", &argv[i][4]);
-                    exit(1);
+              else
+                {
+                  char *p = Safe_malloc(strlen(ssdirl)+strlen(&argv[i][12])+2);
+                  strcat(strcat(strcpy(p,&argv[i][12]),":"),ssdirl);
+                  ssdirl = p;
                 }
-                continue;
+              continue;
             }
 
-            if (strcmp(argv[i], "-cd") == 0) {
-                i++;
-                if (0 > chdir(argv[i])) {
-                    fprintf(stderr, "can't change directory to %s\n", argv[i]);
-                    exit(1);
+          if (strcmp(argv[i], "-fullname") == 0)
+            {
+              fullname = TRUE;
+              continue;
+            }
+
+          if (strncmp(argv[i], "-cd=", 4) == 0)
+            {
+              if (0 > chdir(&argv[i][4]))
+                {
+                  fprintf(stderr, "can't change directory to %s\n", &argv[i][4]);
+                  exit(1);
                 }
-                continue;
+              continue;
+            }
+
+          if (strcmp(argv[i], "-cd") == 0)
+            {
+              i++;
+              if (0 > chdir(argv[i]))
+                {
+                  fprintf(stderr, "can't change directory to %s\n", argv[i]);
+                  exit(1);
+                }
+              continue;
             }
 
 #ifdef SDCDB_DEBUG
-            if (strncmp(argv[i], "-d=", 3) == 0) {
-                sdcdbDebug = strtol(&argv[i][3],0,0);
-                continue;
+          if (strncmp(argv[i], "-d=", 3) == 0)
+            {
+              sdcdbDebug = strtol(&argv[i][3],0,0);
+              continue;
             }
 #endif
-            if (strcmp(argv[i], "-contsim") == 0) {
-                contsim=1;
-                continue;
+          if (strcmp(argv[i], "-contsim") == 0)
+            {
+              contsim=1;
+              continue;
             }
-            if (strcmp(argv[i], "-q") == 0) {
-                continue;
-            }
-
-            /* model string */
-            if (strncmp(argv[i],"-m", 2) == 0) {
-                strncpy(model_str, &argv[i][2], 15);
-                if (strcmp(model_str, "avr") == 0)
-                    simArgs[0] = "savr";
-                else if (strcmp(model_str, "xa") == 0)
-                    simArgs[0] = "sxa";
-                else if (strcmp(model_str, "z80") == 0)
-                    simArgs[0] = "sz80";
-                continue;
+          if (strcmp(argv[i], "-q") == 0)
+            {
+              continue;
             }
 
-            /* -z all remaining options are for simulator */
-            if (strcmp(argv[i], "-z") == 0) {
-                passon_args_flag = 1;
-                continue;
+          /* model string */
+          if (strncmp(argv[i],"-m", 2) == 0)
+            {
+              strncpy(model_str, &argv[i][2], 15);
+              if (strcmp(model_str, "avr") == 0)
+                  simArgs[0] = "savr";
+              else if (strcmp(model_str, "xa") == 0)
+                  simArgs[0] = "sxa";
+              else if (strcmp(model_str, "z80") == 0)
+                  simArgs[0] = "sz80";
+              continue;
             }
 
-            /* the simulator arguments */
-
-            /* cpu */
-            if (strcmp(argv[i], "-t") == 0 ||
-                strcmp(argv[i], "-cpu") == 0) {
-
-                simArgs[nsimArgs++] = "-t";
-                simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue;
+          /* -z all remaining options are for simulator */
+          if (strcmp(argv[i], "-z") == 0)
+            {
+              passon_args_flag = 1;
+              continue;
             }
 
-            /* XTAL Frequency */
-            if (strcmp(argv[i], "-X") == 0 ||
-                strcmp(argv[i], "-frequency") == 0) {
-                simArgs[nsimArgs++] = "-X";
-                simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue;
+          /* the simulator arguments */
+
+          /* cpu */
+          if (strcmp(argv[i], "-t") == 0 ||
+              strcmp(argv[i], "-cpu") == 0)
+            {
+              simArgs[nsimArgs++] = "-t";
+              simArgs[nsimArgs++] = strdup(argv[++i]);
+              continue;
             }
 
-            /* serial port */
-            if ((strcmp(argv[i], "-S") == 0) ||
-                (strcmp(argv[i], "-s") == 0)) {
-                simArgs[nsimArgs++] = strdup(argv[i]);
-                simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue;
+          /* XTAL Frequency */
+          if (strcmp(argv[i], "-X") == 0 ||
+              strcmp(argv[i], "-frequency") == 0)
+            {
+              simArgs[nsimArgs++] = "-X";
+              simArgs[nsimArgs++] = strdup(argv[++i]);
+              continue;
             }
 
-            /* network serial port */
-            if ((strcmp(argv[i], "-k") == 0)) {
-                simArgs[nsimArgs++] = strdup(argv[i]);
-                simArgs[nsimArgs++] = strdup(argv[++i]);
-                continue;
+          /* serial port */
+          if ((strcmp(argv[i], "-S") == 0) ||
+              (strcmp(argv[i], "-s") == 0))
+            {
+              simArgs[nsimArgs++] = strdup(argv[i]);
+              simArgs[nsimArgs++] = strdup(argv[++i]);
+              continue;
             }
 
-            fprintf(stderr,"unknown option %s --- ignored\n", argv[i]);
-
-        } else {
-            FILE* file;
-
-            /* must be file name */
-            if (filename) {
-                fprintf(stderr,"too many filenames .. parameter '%s' ignored\n",
-                    argv[i]);
-                continue ;
+          /* network serial port */
+          if ((strcmp(argv[i], "-k") == 0))
+            {
+              simArgs[nsimArgs++] = strdup(argv[i]);
+              simArgs[nsimArgs++] = strdup(argv[++i]);
+              continue;
             }
 
-            file = fopen(argv[i], "r");
-            if (file) {
-                /* file exists: strip the cdb or ihx extension */
-                char *p = strrchr(argv[i], '.');
+          fprintf(stderr,"unknown option %s --- ignored\n", argv[i]);
+        }
+      else
+        {
+          FILE* file;
 
-                fclose(file);
-                if (NULL != p &&
-                    (0 == strcmp(p, ".cdb") || 0 == strcmp(p, ".ihx")))
-                    *p = '\0';
+          /* must be file name */
+          if (filename)
+            {
+              fprintf(stderr,
+                      "too many filenames .. parameter '%s' ignored\n",
+                      argv[i]);
+              continue ;
             }
-            filename = argv[i];
+
+          file = fopen(argv[i], "r");
+          if (file)
+            {
+              /* file exists: strip the cdb or ihx extension */
+              char *p = strrchr(argv[i], '.');
+
+              fclose(file);
+              if (NULL != p &&
+                  (0 == strcmp(p, ".cdb") || 0 == strcmp(p, ".ihx")))
+                {
+                  *p = '\0';
+                }
+            }
+          filename = argv[i];
         }
     }
 
-    if (filename)
-        cmdFile(filename,NULL);
+  if (filename)
+      cmdFile(filename,NULL);
 
-    if (verbose)
-        printf("+ %s\n", argsToCmdLine(simArgs, nsimArgs));
+  if (verbose)
+      printf("+ %s\n", argsToCmdLine(simArgs, nsimArgs));
 }
 
 /*-----------------------------------------------------------------*/
@@ -1966,50 +2040,50 @@ static void parseCmdLine (int argc, char **argv)
 static void
 bad_signal(int sig)
 {
-    if ( simactive )
-        closeSimulator();
-    exit(1);
+  if ( simactive )
+      closeSimulator();
+  exit(1);
 }
 
 static void
 sigintr(int sig)
 {
-    /* may be interrupt from user: stop debugger and also simulator */
-    userinterrupt = 1;
-    if ( !nointerrupt )
-        sendSim("stop\n");
+  /* may be interrupt from user: stop debugger and also simulator */
+  userinterrupt = 1;
+  if ( !nointerrupt )
+      sendSim("stop\n");
 }
 
 #ifndef _WIN32
 /* the only child can be the simulator */
 static void sigchld(int sig)
 {
-    /* the only child can be the simulator */
-    int status, retpid;
-    retpid = wait ( &status );
-    /* if ( retpid == simPid ) */
-    simactive = 0;
+  /* the only child can be the simulator */
+  int status, retpid;
+  retpid = wait ( &status );
+  /* if ( retpid == simPid ) */
+  simactive = 0;
 }
 #endif
 
 static void
 setsignals()
 {
-    signal(SIGINT , sigintr );
-    signal(SIGABRT, bad_signal);
-    signal(SIGTERM, bad_signal);
+  signal(SIGINT , sigintr );
+  signal(SIGABRT, bad_signal);
+  signal(SIGTERM, bad_signal);
 
 #ifndef _WIN32
-    signal(SIGHUP , SIG_IGN);
-    signal(SIGCONT, SIG_IGN);
-    signal(SIGCHLD, sigchld );
+  signal(SIGHUP , SIG_IGN);
+  signal(SIGCONT, SIG_IGN);
+  signal(SIGCHLD, sigchld );
 
-    signal(SIGALRM, bad_signal);
-    //signal(SIGFPE,  bad_signal);
-    //signal(SIGILL,  bad_signal);
-    signal(SIGPIPE, bad_signal);
-    signal(SIGQUIT, bad_signal);
-    //signal(SIGSEGV, bad_signal);
+  signal(SIGALRM, bad_signal);
+  //signal(SIGFPE,  bad_signal);
+  //signal(SIGILL,  bad_signal);
+  signal(SIGPIPE, bad_signal);
+  signal(SIGQUIT, bad_signal);
+  //signal(SIGSEGV, bad_signal);
 #endif
 }
 
@@ -2019,21 +2093,21 @@ setsignals()
 
 int main ( int argc, char **argv)
 {
-    simArgs[nsimArgs++] = "s51";
-    simArgs[nsimArgs++] = "-P";
-    simArgs[nsimArgs++] = "-r";
-    simArgs[nsimArgs++] = "9756";
+  simArgs[nsimArgs++] = "s51";
+  simArgs[nsimArgs++] = "-P";
+  simArgs[nsimArgs++] = "-r";
+  simArgs[nsimArgs++] = "9756";
 
-    /* parse command line */
-    parseCmdLine(argc, argv);
+  /* parse command line */
+  parseCmdLine(argc, argv);
 
-    printVersionInfo();
-    printHelp();
-    printf("WARNING: SDCDB is EXPERIMENTAL.\n");
+  printVersionInfo();
+  printHelp();
+  printf("WARNING: SDCDB is EXPERIMENTAL.\n");
 
-    setsignals();
+  setsignals();
 
-    commandLoop(stdin);
+  commandLoop(stdin);
 
-    return 0;
+  return 0;
 }

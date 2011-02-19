@@ -637,7 +637,7 @@ disabled - Disable output of specified warning
 void
 setWarningDisabled (int errNum)
 {
-  if ((errNum < MAX_ERROR_WARNING) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
+  if ((errNum >= 0) && (errNum < MAX_ERROR_WARNING) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
     _SDCCERRG.disabled[errNum] = 1;
 }
 

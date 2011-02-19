@@ -257,6 +257,14 @@ FBYNAME (labelJTInRange)
 }
 
 /*-----------------------------------------------------------------*/
+/* optimizeReturn - is it allowed to optimize RET instructions     */
+/*-----------------------------------------------------------------*/
+FBYNAME (optimizeReturn)
+{
+  return (options.peepReturn >= 0);
+}
+
+/*-----------------------------------------------------------------*/
 /* labelIsReturnOnly - Check if label %5 is followed by RET        */
 /*-----------------------------------------------------------------*/
 FBYNAME (labelIsReturnOnly)
@@ -620,7 +628,7 @@ FBYNAME (labelRefCountChange)
   else
     {
       fprintf (stderr,
-               "*** internal error: labelRefCount peephole restriction"
+               "*** internal error: labelRefCountChange peephole restriction"
                " malformed: %s\n", cmdLine);
     }
   return rc;
@@ -1112,6 +1120,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "canAssign", canAssign                          // 8
+  },
+  {
+    "optimizeReturn", optimizeReturn                // ? just a guess
   },
   {
     "labelIsReturnOnly", labelIsReturnOnly          // 6

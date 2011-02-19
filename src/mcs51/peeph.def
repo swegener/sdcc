@@ -2662,39 +2662,41 @@ replace {
 	xrl	a,r%1
 }
 
-replace {
-	sjmp	%1
-%2:
-	mov	%3,%4
-%1:
-	ret
-} by {
-	;	Peephole 237.a	removed sjmp to ret
-	ret
-%2:
-	mov	%3,%4
-%1:
-	ret
-} if labelRefCountChange(%1 -1)
+// obsoleted by 251.b
+//replace {
+//	sjmp	%1
+//%2:
+//	mov	%3,%4
+//%1:
+//	ret
+//} by {
+//	;	Peephole 237.a	removed sjmp to ret
+//	ret
+//%2:
+//	mov	%3,%4
+//%1:
+//	ret
+//} if labelRefCountChange(%1 -1)
 
-replace {
-	sjmp	%1
-%2:
-	mov	%3,%4
-	mov	dpl,%5
-	mov	dph,%6
-%1:
-	ret
-} by {
-	;	Peephole 237.b	removed sjmp to ret
-	ret
-%2:
-	mov	%3,%4
-	mov	dpl,%5
-	mov	dph,%6
-%1:
-	ret
-} if labelRefCountChange(%1 -1)
+// obsoleted by 251.b
+//replace {
+//	sjmp	%1
+//%2:
+//	mov	%3,%4
+//	mov	dpl,%5
+//	mov	dph,%6
+//%1:
+//	ret
+//} by {
+//	;	Peephole 237.b	removed sjmp to ret
+//	ret
+//%2:
+//	mov	%3,%4
+//	mov	dpl,%5
+//	mov	dph,%6
+//%1:
+//	ret
+//} if labelRefCountChange(%1 -1)
 
 // applies to f.e. device/lib/log10f.c
 replace {
@@ -3860,7 +3862,7 @@ replace {
 } by {
 	;	Peephole 251.a	replaced ljmp %5 to ret with ret
 	ret
-} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 // not before peephole 250.b
 replace {
@@ -3868,7 +3870,7 @@ replace {
 } by {
 	;	Peephole 251.b	replaced sjmp %5 to ret with ret
 	ret
-} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 // applies to shifts.c and when accessing arrays with an unsigned integer index
 // saving 1 byte, 2 cycles
@@ -4160,7 +4162,7 @@ replace {
 	sjmp	%1
 	;	Peephole 259.a	removed redundant label %2 and ret
 	;
-} if labelRefCount %2 0
+} if optimizeReturn(), labelRefCount(%2 0)
 
 // applies to f.e. gets.c
 replace {
@@ -4171,7 +4173,7 @@ replace {
 	ljmp	%1
 	;	Peephole 259.b	removed redundant label %2 and ret
 	;
-} if labelRefCount %2 0
+} if optimizeReturn(), labelRefCount(%2 0)
 
 // optimizing jumptables
 // Please note: to enable peephole 260.x you currently have to set
@@ -4883,7 +4885,7 @@ replace {
 } by {
 	;	Peephole 400.a	replaced lcall/ret with ljmp
 	ljmp	%1
-}
+} if optimizeReturn()
 
 // applies to: void test( char c ) { if( c ) func1(); else func2(); }
 replace {
@@ -4894,7 +4896,7 @@ replace {
 	;	Peephole 400.b	replaced lcall/ret with ljmp
 	ljmp	%1
 	;
-} if labelRefCount %2 0
+} if optimizeReturn(), labelRefCount(%2 0)
 
 // applies to f.e. scott-bool1.c
 replace {
@@ -4906,13 +4908,13 @@ replace {
 	ljmp	%1
 %2:
 	ret
-}
+} if optimizeReturn()
 
 // for programs less than 2k
 replace {
 	lcall	%1
 } by {
-	;	Peephole 400.d	replaced lcall with acall
+	;	Peephole 401.a	replaced lcall with acall
 	acall	%1
 } if useAcallAjmp
 
@@ -4920,7 +4922,7 @@ replace {
 replace {
 	ljmp	%1
 } by {
-	;	Peephole 400.e	replaced ljmp with ajmp
+	;	Peephole 401.b	replaced ljmp with ajmp
 	ajmp	%1
 } if useAcallAjmp
 

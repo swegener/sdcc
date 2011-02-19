@@ -20,7 +20,7 @@ FS="[ \t.]"
 END {
 print ""
 print "#ifndef SDCC_BUILD_NUMBER"
-print "#define SDCC_BUILD_NUMBER	\"0\""
+print "#define SDCC_BUILD_NUMBER    \"0\""
 print "#define SDCC_BUILD_NR        0"
 print "#endif"
 print ""

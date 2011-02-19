@@ -57,7 +57,7 @@ typedef struct
     void *pparameter;
     /** Help text to go with this option.  May be NULL. */
     const char *help;
-    /** Optin argument type */
+    /** Option argument type */
     enum cl_opt_arg_type arg_type;
   } OPTION;
 

@@ -771,9 +771,9 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
         // initialize as zero
         for (i = 0; i < size; i++) {
             if (in_code) {
-                dbuf_printf (oBuf, "\tretlw 0x%02x\n", lit & 0xff);
+                dbuf_printf (oBuf, "\tretlw 0x%02x\n", (int)(lit & 0xff));
             } else {
-                dbuf_printf (oBuf, "%s0x%02x", (i == 0) ? "" : ", ", lit & 0xff);
+                dbuf_printf (oBuf, "%s0x%02x", (i == 0) ? "" : ", ", (int)(lit & 0xff));
             }
             lit >>= 8;
         } // for

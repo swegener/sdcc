@@ -437,7 +437,7 @@ sdcc_pclose (FILE *fp)
 
   if (fp != NULL)
     {
-      int exitStatus;
+      DWORD exitStatus;
 
       assert (hProcess != NULL);
 

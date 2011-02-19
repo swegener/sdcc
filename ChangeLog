@@ -1,3 +1,22 @@
+2011-02-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/cmd.c,
+	* debugger/mcs51/sdcdb.c,
+	* debugger/mcs51/simi.c,
+	* debugger/mcs51/symtab.c,
+	* src/SDCCargs.h,
+	* src/version.awk: cosmetic changes
+	* src/pic14/gen.c (genDataPointerSet),
+	* src/pic14/glue.c (emitIvals),
+	* src/SDCCsystem.c: fixed warnings
+	* src/SDCCerr.c (setWarningDisabled): check errNum
+	* src/SDCCpeeph.c: added optimizeReturn
+	* src/mcs51/peeph.def: disabled 237.x, fixed bug 1653651
+	* src/SDCCglobl.h: added options.peepReturn
+	* src/SDCCmain.c (parseCmdLine): added --peep-return & --no-peep-return
+	* support/scripts/resource.rc: replaced include "winres.h" with "winresrc.h"
+	* support/scripts/winres.h: deleted
+
 2011-01-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def,

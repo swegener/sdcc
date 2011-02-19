@@ -124,6 +124,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_LESS_PEDANTIC    "--less-pedantic"
 #define OPTION_DISABLE_WARNING  "--disable-warning"
 #define OPTION_WERROR           "--Werror"
+#define OPTION_DEBUG            "--debug"
 #define OPTION_NO_GCSE          "--nogcse"
 #define OPTION_SHORT_IS_8BITS   "--short-is-8bits"
 #define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
@@ -145,12 +146,14 @@ char buffer[PATH_MAX * 2];
 #define OPTION_DOLLARS_IN_IDENT "--fdollars-in-identifiers"
 #define OPTION_UNSIGNED_CHAR    "--funsigned-char"
 #define OPTION_USE_NON_FREE     "--use-non-free"
+#define OPTION_PEEP_RETURN      "--peep-return"
+#define OPTION_NO_PEEP_RETURN   "--no-peep-return"
 
 static const OPTION optionsTable[] = {
-  {0, NULL, NULL, "General options"},
-  {0, OPTION_HELP, NULL, "Display this help"},
+  {0,   NULL, NULL, "General options"},
+  {0,   OPTION_HELP, NULL, "Display this help"},
   {'v', OPTION_VERSION, NULL, "Display sdcc's version"},
-  {0, "--verbose", &options.verbose, "Trace calls to the preprocessor, assembler, and linker"},
+  {0,   "--verbose", &options.verbose, "Trace calls to the preprocessor, assembler, and linker"},
   {'V', NULL, &options.verboseExec, "Execute verbosely. Show sub commands as they are run"},
   {'d', NULL, NULL, NULL},
   {'D', NULL, NULL, "Define macro as in -Dmacro"},
@@ -162,97 +165,99 @@ static const OPTION optionsTable[] = {
   {'S', NULL, &noAssemble, "Compile only; do not assemble or link"},
   {'c', "--compile-only", &options.cc_only, "Compile and assemble, but do not link"},
   {'E', "--preprocessonly", &preProcOnly, "Preprocess only, do not compile"},
-  {0, "--c1mode", &options.c1mode, "Act in c1 mode.  The standard input is preprocessed code, the output is assembly code."},
+  {0,   "--c1mode", &options.c1mode, "Act in c1 mode.  The standard input is preprocessed code, the output is assembly code."},
   {'o', NULL, NULL, "Place the output into the given path resp. file"},
-  {0, OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
-  {0, OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
-  {0, OPTION_USE_STDOUT, NULL, "send errors to stdout instead of stderr"},
-  {0, "--nostdlib", &options.nostdlib, "Do not include the standard library directory in the search path"},
-  {0, "--nostdinc", &options.nostdinc, "Do not include the standard include directory in the search path"},
-  {0, OPTION_LESS_PEDANTIC, NULL, "Disable some of the more pedantic warnings"},
-  {0, OPTION_DISABLE_WARNING, NULL, "<nnnn> Disable specific warning"},
-  {0, OPTION_WERROR, NULL, "Treat the warnings as errors"},
-  {0, "--debug", &options.debug, "Enable debugging symbol output"},
-  {0, "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
-  {0, OPTION_STD_C89, NULL, "Use C89 standard only"},
-  {0, OPTION_STD_SDCC89, NULL, "Use C89 standard with SDCC extensions (default)"},
-  {0, OPTION_STD_C99, NULL, "Use C99 standard only (incomplete)"},
-  {0, OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions (incomplete)"},
-  {0, OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
-  {0, OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
-  {0, OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
+  {0,   OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
+  {0,   OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
+  {0,   OPTION_USE_STDOUT, NULL, "send errors to stdout instead of stderr"},
+  {0,   "--nostdlib", &options.nostdlib, "Do not include the standard library directory in the search path"},
+  {0,   "--nostdinc", &options.nostdinc, "Do not include the standard include directory in the search path"},
+  {0,   OPTION_LESS_PEDANTIC, NULL, "Disable some of the more pedantic warnings"},
+  {0,   OPTION_DISABLE_WARNING, NULL, "<nnnn> Disable specific warning"},
+  {0,   OPTION_WERROR, NULL, "Treat the warnings as errors"},
+  {0,   OPTION_DEBUG, NULL, "Enable debugging symbol output"},
+  {0,   "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
+  {0,   OPTION_STD_C89, NULL, "Use C89 standard only"},
+  {0,   OPTION_STD_SDCC89, NULL, "Use C89 standard with SDCC extensions (default)"},
+  {0,   OPTION_STD_C99, NULL, "Use C99 standard only (incomplete)"},
+  {0,   OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions (incomplete)"},
+  {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
+  {0,   OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
+  {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
 
-  {0, NULL, NULL, "Code generation options"},
+  {0,   NULL, NULL, "Code generation options"},
   {'m', NULL, NULL, "Set the port to use e.g. -mz80."},
   {'p', NULL, NULL, "Select port specific processor e.g. -mpic14 -p16f84"},
-  {0, OPTION_SMALL_MODEL, NULL, "internal data space is used (default)"},
-  {0, OPTION_MEDIUM_MODEL, NULL, "external paged data space is used"},
-  {0, OPTION_LARGE_MODEL, NULL, "external data space is used"},
-  {0, OPTION_HUGE_MODEL, NULL, "functions are banked, data in external space"},
-  {0, "--stack-auto", &options.stackAuto, "Stack automatic variables"},
-  {0, "--xstack", &options.useXstack, "Use external stack"},
-  {0, "--int-long-reent", &options.intlong_rent, "Use reentrant calls on the int and long support functions"},
-  {0, "--float-reent", &options.float_rent, "Use reentrant calls on the float support functions"},
-  {0, "--main-return", &options.mainreturn, "Issue a return after main()"},
-  {0, "--xram-movc", &options.xram_movc, "Use movc instead of movx to read xram (xdata)"},
-  {0, OPTION_CALLEE_SAVES, &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers instead of the caller", CLAT_SET},
-  {0, "--profile", &options.profile, "On supported ports, generate extra profiling information"},
-  {0, "--fomit-frame-pointer", &options.omitFramePtr, "Leave out the frame pointer."},
-  {0, "--all-callee-saves", &options.all_callee_saves, "callee will always save registers used"},
-  {0, "--stack-probe", &options.stack_probe, "insert call to function __stack_probe at each function prologue"},
-  {0, OPTION_NO_XINIT_OPT, &options.noXinitOpt, "don't memcpy initialized xram from code"},
-  {0, OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
-  {0, OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
-  {0, OPTION_VERBOSE_ASM, &options.verboseAsm, "include code generator comments"},
-  {0, OPTION_SHORT_IS_8BITS, NULL, "Make short 8 bits (for old times sake)"},
-  {0, OPTION_CODE_SEG, NULL, "<name> use this name for the code segment"},
-  {0, OPTION_CONST_SEG, NULL, "<name> use this name for the const segment"},
+  {0,   OPTION_SMALL_MODEL, NULL, "internal data space is used (default)"},
+  {0,   OPTION_MEDIUM_MODEL, NULL, "external paged data space is used"},
+  {0,   OPTION_LARGE_MODEL, NULL, "external data space is used"},
+  {0,   OPTION_HUGE_MODEL, NULL, "functions are banked, data in external space"},
+  {0,   "--stack-auto", &options.stackAuto, "Stack automatic variables"},
+  {0,   "--xstack", &options.useXstack, "Use external stack"},
+  {0,   "--int-long-reent", &options.intlong_rent, "Use reentrant calls on the int and long support functions"},
+  {0,   "--float-reent", &options.float_rent, "Use reentrant calls on the float support functions"},
+  {0,   "--main-return", &options.mainreturn, "Issue a return after main()"},
+  {0,   "--xram-movc", &options.xram_movc, "Use movc instead of movx to read xram (xdata)"},
+  {0,   OPTION_CALLEE_SAVES, &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers instead of the caller", CLAT_SET},
+  {0,   "--profile", &options.profile, "On supported ports, generate extra profiling information"},
+  {0,   "--fomit-frame-pointer", &options.omitFramePtr, "Leave out the frame pointer."},
+  {0,   "--all-callee-saves", &options.all_callee_saves, "callee will always save registers used"},
+  {0,   "--stack-probe", &options.stack_probe, "insert call to function __stack_probe at each function prologue"},
+  {0,   OPTION_NO_XINIT_OPT, &options.noXinitOpt, "don't memcpy initialized xram from code"},
+  {0,   OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
+  {0,   OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
+  {0,   OPTION_VERBOSE_ASM, &options.verboseAsm, "include code generator comments"},
+  {0,   OPTION_SHORT_IS_8BITS, NULL, "Make short 8 bits (for old times sake)"},
+  {0,   OPTION_CODE_SEG, NULL, "<name> use this name for the code segment"},
+  {0,   OPTION_CONST_SEG, NULL, "<name> use this name for the const segment"},
 
-  {0, NULL, NULL, "Optimization options"},
-  {0, "--nooverlay", &options.noOverlay, "Disable overlaying leaf function auto variables"},
-  {0, OPTION_NO_GCSE, NULL, "Disable the GCSE optimisation"},
-  {0, OPTION_NO_LABEL_OPT, NULL, "Disable label optimisation"},
-  {0, OPTION_NO_LOOP_INV, NULL, "Disable optimisation of invariants"},
-  {0, OPTION_NO_LOOP_IND, NULL, "Disable loop variable induction"},
-  {0, "--nojtbound", &optimize.noJTabBoundary, "Don't generate boundary check for jump tables"},
-  {0, "--noloopreverse", &optimize.noLoopReverse, "Disable the loop reverse optimisation"},
-  {0, "--no-peep", &options.nopeep, "Disable the peephole assembly file optimisation"},
-  {0, "--no-reg-params", &options.noRegParams, "On some ports, disable passing some parameters in registers"},
-  {0, "--peep-asm", &options.asmpeep, "Enable peephole optimization on inline assembly"},
-  {0, OPTION_PEEP_FILE, &options.peep_file, "<file> use this extra peephole file", CLAT_STRING},
-  {0, OPTION_OPT_CODE_SPEED, NULL, "Optimize for code speed rather than size"},
-  {0, OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
+  {0,   NULL, NULL, "Optimization options"},
+  {0,   "--nooverlay", &options.noOverlay, "Disable overlaying leaf function auto variables"},
+  {0,   OPTION_NO_GCSE, NULL, "Disable the GCSE optimisation"},
+  {0,   OPTION_NO_LABEL_OPT, NULL, "Disable label optimisation"},
+  {0,   OPTION_NO_LOOP_INV, NULL, "Disable optimisation of invariants"},
+  {0,   OPTION_NO_LOOP_IND, NULL, "Disable loop variable induction"},
+  {0,   "--nojtbound", &optimize.noJTabBoundary, "Don't generate boundary check for jump tables"},
+  {0,   "--noloopreverse", &optimize.noLoopReverse, "Disable the loop reverse optimisation"},
+  {0,   "--no-peep", &options.nopeep, "Disable the peephole assembly file optimisation"},
+  {0,   "--no-reg-params", &options.noRegParams, "On some ports, disable passing some parameters in registers"},
+  {0,   "--peep-asm", &options.asmpeep, "Enable peephole optimization on inline assembly"},
+  {0,   OPTION_PEEP_RETURN, NULL, "Enable peephole optimization for return instructions"},
+  {0,   OPTION_NO_PEEP_RETURN, NULL, "Disable peephole optimization for return instructions"},
+  {0,   OPTION_PEEP_FILE, &options.peep_file, "<file> use this extra peephole file", CLAT_STRING},
+  {0,   OPTION_OPT_CODE_SPEED, NULL, "Optimize for code speed rather than size"},
+  {0,   OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
 
-  {0, NULL, NULL, "Internal debugging options"},
-  {0, "--dumpraw", &options.dump_raw, "Dump the internal structure after the initial parse"},
-  {0, "--dumpgcse", &options.dump_gcse, NULL},
-  {0, "--dumploop", &options.dump_loop, NULL},
-  {0, "--dumpdeadcode", &options.dump_kill, NULL},
-  {0, "--dumpliverange", &options.dump_range, NULL},
-  {0, "--dumpregpack", &options.dump_pack, NULL},
-  {0, "--dumpregassign", &options.dump_rassgn, NULL},
-  {0, "--dumptree", &options.dump_tree, "dump front-end AST before generating iCode"},
-  {0, OPTION_DUMP_ALL, NULL, "Dump the internal structure at all stages"},
-  {0, OPTION_ICODE_IN_ASM, &options.iCodeInAsm, "include i-code as comments in the asm file"},
+  {0,   NULL, NULL, "Internal debugging options"},
+  {0,   "--dumpraw", &options.dump_raw, "Dump the internal structure after the initial parse"},
+  {0,   "--dumpgcse", &options.dump_gcse, NULL},
+  {0,   "--dumploop", &options.dump_loop, NULL},
+  {0,   "--dumpdeadcode", &options.dump_kill, NULL},
+  {0,   "--dumpliverange", &options.dump_range, NULL},
+  {0,   "--dumpregpack", &options.dump_pack, NULL},
+  {0,   "--dumpregassign", &options.dump_rassgn, NULL},
+  {0,   "--dumptree", &options.dump_tree, "dump front-end AST before generating iCode"},
+  {0,   OPTION_DUMP_ALL, NULL, "Dump the internal structure at all stages"},
+  {0,   OPTION_ICODE_IN_ASM, &options.iCodeInAsm, "include i-code as comments in the asm file"},
 
-  {0, NULL, NULL, "Linker options"},
+  {0,   NULL, NULL, "Linker options"},
   {'l', NULL, NULL, "Include the given library in the link"},
   {'L', NULL, NULL, "Add the next field to the library search path"},
-  {0, OPTION_LIB_PATH, &libPathsSet, "<path> use this path to search for libraries", CLAT_ADD_SET},
-  {0, OPTION_OUT_FMT_IHX, NULL, "Output in Intel hex format"},
-  {0, OPTION_OUT_FMT_S19, NULL, "Output in S19 hex format"},
-  {0, OPTION_XRAM_LOC, &options.xdata_loc, "<nnnn> External Ram start location", CLAT_INTEGER},
-  {0, OPTION_XRAM_SIZE, NULL, "<nnnn> External Ram size"},
-  {0, OPTION_IRAM_SIZE, &options.iram_size, "<nnnn> Internal Ram size", CLAT_INTEGER},
-  {0, OPTION_XSTACK_LOC, &options.xstack_loc, "<nnnn> External Stack start location", CLAT_INTEGER},
-  {0, OPTION_CODE_LOC, &options.code_loc, "<nnnn> Code Segment Location", CLAT_INTEGER},
-  {0, OPTION_CODE_SIZE, &options.code_size, "<nnnn> Code Segment size", CLAT_INTEGER},
-  {0, OPTION_STACK_LOC, &options.stack_loc, "<nnnn> Stack pointer initial value", CLAT_INTEGER},
-  {0, OPTION_DATA_LOC, &options.data_loc, "<nnnn> Direct data start location", CLAT_INTEGER},
-  {0, OPTION_IDATA_LOC, &options.idata_loc, NULL, CLAT_INTEGER},
+  {0,   OPTION_LIB_PATH, &libPathsSet, "<path> use this path to search for libraries", CLAT_ADD_SET},
+  {0,   OPTION_OUT_FMT_IHX, NULL, "Output in Intel hex format"},
+  {0,   OPTION_OUT_FMT_S19, NULL, "Output in S19 hex format"},
+  {0,   OPTION_XRAM_LOC, &options.xdata_loc, "<nnnn> External Ram start location", CLAT_INTEGER},
+  {0,   OPTION_XRAM_SIZE, NULL, "<nnnn> External Ram size"},
+  {0,   OPTION_IRAM_SIZE, &options.iram_size, "<nnnn> Internal Ram size", CLAT_INTEGER},
+  {0,   OPTION_XSTACK_LOC, &options.xstack_loc, "<nnnn> External Stack start location", CLAT_INTEGER},
+  {0,   OPTION_CODE_LOC, &options.code_loc, "<nnnn> Code Segment Location", CLAT_INTEGER},
+  {0,   OPTION_CODE_SIZE, &options.code_size, "<nnnn> Code Segment size", CLAT_INTEGER},
+  {0,   OPTION_STACK_LOC, &options.stack_loc, "<nnnn> Stack pointer initial value", CLAT_INTEGER},
+  {0,   OPTION_DATA_LOC, &options.data_loc, "<nnnn> Direct data start location", CLAT_INTEGER},
+  {0,   OPTION_IDATA_LOC, &options.idata_loc, NULL, CLAT_INTEGER},
 
   /* End of options */
-  {0, NULL}
+  {0,   NULL}
 };
 
 /** Table of all unsupported options and help text to display when one
@@ -1069,10 +1074,7 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_DISABLE_WARNING) == 0)
             {
               int w = getIntArg (OPTION_DISABLE_WARNING, argv, &i, argc);
-              if (w < MAX_ERROR_WARNING)
-                {
-                  setWarningDisabled (w);
-                }
+              setWarningDisabled (w);
               continue;
             }
 
@@ -1138,6 +1140,26 @@ parseCmdLine (int argc, char **argv)
               if (options.const_seg)
                 Safe_free (options.const_seg);
               options.const_seg = dbuf_detach (&segname);
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_PEEP_RETURN) == 0)
+            {
+              options.peepReturn = 1;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_NO_PEEP_RETURN) == 0)
+            {
+              options.peepReturn = -1;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_DEBUG) == 0)
+            {
+              if (options.peepReturn == 0)
+                  options.peepReturn = -1;
+              options.debug = 1;
               continue;
             }
 

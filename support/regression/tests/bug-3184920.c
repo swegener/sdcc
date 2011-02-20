@@ -2,6 +2,7 @@
  */
 #include <testfwk.h>
 
+#include <limits.h>
 
 typedef union registerpair {
 	unsigned int	rp_pair;
@@ -31,7 +32,8 @@ typedef struct regs {
 void
 do_nothing(regs_t *r)
 {
-	r;
+	r->reg_d = 0xaa;
+	r->reg_e = 0x55;
 }
 
 void
@@ -53,9 +55,8 @@ void testBug(void)
 	unsigned char p2;
 
 	read_values(&p1, &p2);
-#if !defined(SDCC_hc08)
+
 	ASSERT(p1 == 0xaa);
 	ASSERT(p2 == 0x55);
-#endif
 }
 

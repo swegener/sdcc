@@ -6060,17 +6060,6 @@ genCmp (operand * left, operand * right,
                     lbl->key + 100);
           emitLabel (lbl);
         }
-      /* if unsigned char cmp with direct, do cjne A,right,zz */
-      else if ((size == 1) && !sign &&
-               ((AOP_TYPE (right) == AOP_REG) || (AOP_TYPE (right) == AOP_DIR)))
-        {
-          symbol *lbl = newiTempLabel (NULL);
-          MOVA (aopGet (left, offset, FALSE, FALSE));
-          emitcode ("cjne", "a,%s,%05d$",
-                    aopGet (right, offset, FALSE, TRUE),
-                    lbl->key + 100);
-          emitLabel (lbl);
-        }
       else
         {
           if (AOP_TYPE (right) == AOP_LIT)

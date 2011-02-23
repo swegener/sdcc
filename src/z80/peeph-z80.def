@@ -1403,7 +1403,7 @@ replace restart {
 	jp	NZ,%2
 	or	a,%3
 	; peephole 50 shortened or using a (which has just been tested to be #0x00).
-} if operandsNotRelated(%3 '(bc)' '(de)')
+} if canAssign('b' %3)
 
 replace restart {
 	sub	a,%1

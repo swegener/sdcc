@@ -1390,7 +1390,7 @@ replace restart {
 	jp	NZ,%2
 	or	a,%3
 	; peephole 49 shortened or using a (which has just been tested to be #0x00).
-} if operandsNotRelated(%3 '(bc)' '(de)'), canAssign('b' %2)
+} if canAssign('b' %3)
 // canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
@@ -1415,7 +1415,7 @@ replace restart {
 	jp	NZ,%2
 	or	a,%3
 	; peephole 51 shortened or using a (which has just been tested to be #0x00).
-} if notSame(%3 '(bc)' '(de)'), canAssign('b' %3)
+} if canAssign('b' %3)
 // canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
@@ -1429,7 +1429,7 @@ replace restart {
 	or	a,%2
 	; peephole 52 shortened or using a (which has just been tested to be #0x00).
 }
-if operandsNotRelated(%2 '(bc)' '(de)')
+if canAssign('b' %3)
 
 replace restart {
 	dec	%1 (%2)

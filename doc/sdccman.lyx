@@ -42491,7 +42491,7 @@ Makefile
 \begin_inset space ~
 \end_inset
 
-sdcc -V --non-free -mpic14 -p16f877 -c $< 
+sdcc -V --use-non-free -mpic14 -p16f877 -c $< 
 \begin_inset Newline newline
 \end_inset
 
@@ -42585,7 +42585,7 @@ Makefile
 \begin_inset space ~
 \end_inset
 
-sdcc -S -V --non-free -mpic14 -p16f877 $< 
+sdcc -S -V --use-non-free -mpic14 -p16f877 $< 
 \begin_inset Newline newline
 \end_inset
 

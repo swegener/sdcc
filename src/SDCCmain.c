@@ -2174,13 +2174,14 @@ setLibPath (void)
   /*
    * Search logic:
    *
-   * 1. - $SDCC_LIB
-   * 2. - $SDCC_HOME/PREFIX2DATA_DIR/LIB_DIR_SUFFIX/<model>
-   * 3. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
-   * 4. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
-   * 5. - $SDCC_HOME/PREFIX2DATA_DIR/NON_FREE_LIB_DIR_SUFFIX/<model>
-   * 6. - path(argv[0])/BIN2DATA_DIR/NON_FREE_LIB_DIR_SUFFIX/<model>
-   * 7. - DATADIR/NON_FREE_LIB_DIR_SUFFIX/<model> (only on *nix)
+   * 1. - $SDCC_LIB/<model>
+   * 2. - $SDCC_LIB
+   * 3. - $SDCC_HOME/PREFIX2DATA_DIR/LIB_DIR_SUFFIX/<model>
+   * 4. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
+   * 5. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
+   * 6. - $SDCC_HOME/PREFIX2DATA_DIR/NON_FREE_LIB_DIR_SUFFIX/<model>
+   * 7. - path(argv[0])/BIN2DATA_DIR/NON_FREE_LIB_DIR_SUFFIX/<model>
+   * 8. - DATADIR/NON_FREE_LIB_DIR_SUFFIX/<model> (only on *nix)
    */
 
   if (!options.nostdlib)
@@ -2188,22 +2189,28 @@ setLibPath (void)
       char *p;
       struct dbuf_s dbuf;
 
-      if ((p = getenv (SDCC_LIB_NAME)) != NULL)
-        addSetHead (&libDirsSet, Safe_strdup (p));
-
       dbuf_init (&dbuf, PATH_MAX);
-      dbuf_makePath (&dbuf, LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
 
+      dbuf_makePath (&dbuf, LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
       libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 
       if (options.use_non_free)
         {
           dbuf_set_length (&dbuf, 0);
           dbuf_makePath (&dbuf, NON_FREE_LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
-
           mergeSets (&libDirsSet, appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf)));
         }
-      dbuf_destroy (&dbuf);
+
+      if ((p = getenv (SDCC_LIB_NAME)) != NULL)
+        {
+          addSetHead (&libDirsSet, Safe_strdup (p));
+
+          dbuf_set_length (&dbuf, 0);
+          dbuf_makePath (&dbuf, p, port->general.get_model ? port->general.get_model () : port->target);
+          addSetHead (&libDirsSet, dbuf_detach (&dbuf));
+        }
+      else
+        dbuf_destroy (&dbuf);
     }
 }
 

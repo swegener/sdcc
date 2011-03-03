@@ -1,3 +1,8 @@
+2011-02-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* sim/ucsim/z80.src/inst_cb.cc:
+	  Fixed broken res b, a instruction.
+
 2011-03-02 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCmain.c, doc/sdccman.lyx:

@@ -379,7 +379,7 @@ cl_z80::inst_cb_res(t_mem code)
       }
     break;
     case 0x7: // RES x,A
-      regs.A &= ~(bit_bitnum); break;
+      regs.A &= ~(1 << bit_bitnum); break;
   }
   return(resGO);
 }

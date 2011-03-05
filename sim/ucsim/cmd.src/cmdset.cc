@@ -28,7 +28,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include "cmdlexcl.h"
-#include "cmdpars.h"
 
 // prj
 #include "i_string.h"
@@ -449,13 +448,9 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
   //con->dd_printf("\"%s\"\n", s);
   i= strspn(s, "abcdefghijklmnopqrstuvwxyz");
   s+= i;
-  //con->dd_printf("\"%s\"\n", s);
-  class YY_cl_ucsim_parser_CLASS *pars;
-  class cl_ucsim_lexer *lexer;
-  lexer= new cl_ucsim_lexer(s);
-  pars= new YY_cl_ucsim_parser_CLASS(lexer);
-  pars->yyparse();
-  delete pars;
+  uc_yy_set_string_to_parse(s);
+  yyparse();
+  uc_yy_free_string_to_parse();
   return(DD_FALSE);
 }
 

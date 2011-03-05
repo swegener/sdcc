@@ -16,7 +16,6 @@ MAKEDEP         = @MAKEDEP@
 
 LEX		= @LEX@
 YACC		= @YACC@
-BISON_PLUS_PLUS	= @BISON_PLUS_PLUS@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -123,16 +122,13 @@ $(top_builddir)/libcmd.a: $(OBJECTS)
 #	mv y.tab.c $*.cc
 #	mv y.tab.h $*.h
 
-ifeq ($(DEVEL),yes)
 .y.cc:
 	rm -f $*.cc $*.h
-	$(BISON_PLUS_PLUS) -d -o $*.cc $<
+	$(YACC) -d -o $*.cc $<
 
 .l.cc:
 	rm -f $*.cc
-	$(LEX) --c++ -o $*.cc $<
-endif
-
+	$(LEX) -o $*.cc $<
 
 # Remaking configuration
 # ----------------------

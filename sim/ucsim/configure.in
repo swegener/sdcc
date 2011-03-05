@@ -123,7 +123,6 @@ if test ${LEX} = "flex"; then
         AC_DEFINE(HAVE_FLEX, 1, [XXX])
 fi
 AC_PROG_YACC
-AC_CHECK_PROG(BISON_PLUS_PLUS, bison++, bison++, :)
 
 
 AC_LANG_CPLUSPLUS

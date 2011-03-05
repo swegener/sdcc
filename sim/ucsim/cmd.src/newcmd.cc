@@ -36,7 +36,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "i_string.h"
 
 #include "cmdlexcl.h"
-#include "cmdpars.h"
 
 // prj
 #include "globals.h"
@@ -342,13 +341,10 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
             }
           else
             {
-              class YY_cl_ucsim_parser_CLASS *pars;
-              class cl_ucsim_lexer *lexer;
-              lexer = new cl_ucsim_lexer(cmdstr);
-              pars = new YY_cl_ucsim_parser_CLASS(lexer);
-              pars->yyparse();
+              uc_yy_set_string_to_parse(cmdstr);
+              yyparse();
+              uc_yy_free_string_to_parse();
               delete cmdline;
-              delete pars;
             }
           /*if (!cm)
             retval= interpret(cmdstr);*/

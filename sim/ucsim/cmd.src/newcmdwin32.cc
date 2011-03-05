@@ -40,9 +40,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "i_string.h"
 
-#include "cmdlexcl.h"
-#include "cmdpars.h"
-
 // prj
 #include "globals.h"
 #include "utils.h"

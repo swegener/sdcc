@@ -1,99 +1,106 @@
 %{
 #include <stdio.h>
 #include "cmdlexcl.h"
-#include "cmdpars.h"
+#include "cmdpars.hh"
 
-static YY_cl_ucsim_parser_STYPE *yylval;
-
-int yywrap(void);
-
-#define tok(x) (YY_cl_ucsim_parser_CLASS::x)
-#define lexer_obj (dynamic_cast<class cl_ucsim_lexer *>(this))
-
+static int uc_yy_check_id(char *token);
+static int uc_yy_input(char *buf, int max_size);
+#define YY_INPUT(buf,result,max_size) result = uc_yy_input(buf, max_size) 
 %}
 
 %%
 
 [ \t]*			;
 
-"+"			return(tok(PTOK_PLUS));
-"-"			return(tok(PTOK_MINUS));
-"*"			return(tok(PTOK_ASTERIX));
-"/"			return(tok(PTOK_SLASH));
-"("			return(tok(PTOK_LEFT_PAREN));
-")"			return(tok(PTOK_RIGHT_PAREN));
-"["			return(tok(PTOK_LEFT_BRACKET));
-"]"			return(tok(PTOK_RIGHT_BRACKET));
-"="			return(tok(PTOK_EQUAL));
-"."			return(tok(PTOK_DOT));
-"&"			return(tok(PTOK_AMPERSAND));
+"+"			return(PTOK_PLUS);
+"-"			return(PTOK_MINUS);
+"*"			return(PTOK_ASTERIX);
+"/"			return(PTOK_SLASH);
+"("			return(PTOK_LEFT_PAREN);
+")"			return(PTOK_RIGHT_PAREN);
+"["			return(PTOK_LEFT_BRACKET);
+"]"			return(PTOK_RIGHT_BRACKET);
+"="			return(PTOK_EQUAL);
+"."			return(PTOK_DOT);
+"&"			return(PTOK_AMPERSAND);
 
 ([0-9]+)|(0x[0-9a-fA-F]+) {
-  yylval->number= strtol(yytext, 0, 0);
-  return(YY_cl_ucsim_parser_CLASS::PTOK_NUMBER);
+  yylval.number = strtol(yytext, 0, 0);
+  return PTOK_NUMBER;
 }
 
-[a-zA-Z_][0-9a-zA-Z_]*	return(lexer_obj->check_id(yytext));
+[a-zA-Z_][0-9a-zA-Z_]*	return(uc_yy_check_id(yytext));
 
 .			;
 
 %%
 
-#undef lexer_obj
-
 int
-yywrap(void)
+yywrap()
 {
-  return(1);
+  return 1;
 }
 
-#include "cmdlexcl.h"
 #include "globals.h"
+static char *string_to_parse = NULL;
 
-int
-cl_ucsim_lexer::LexerInput(char *buf, int max_size)
+void
+uc_yy_set_string_to_parse(const char *str)
 {
-  if (!string_to_parse)
-    return(yyFlexLexer::LexerInput(buf, max_size));
-  int lrem= strlen(string_ptr);
-  int n= max_size;
-  if (lrem < max_size)
-    n= lrem;
-  strncpy(buf, string_ptr, n);
-  string_ptr+= n;
-  return(n);
+  string_to_parse = strdup(str);
 }
 
 void
-cl_ucsim_lexer::activate_lexer_to_parse_into(void *yylv)
+uc_yy_free_string_to_parse()
 {
-  yylval= (YY_cl_ucsim_parser_STYPE *)yylv;
+  free(string_to_parse);
 }
 
-int
-cl_ucsim_lexer::check_id(char *token)
+static int
+uc_yy_input(char *buf, int max_size)
+{
+  static const char *string_ptr = NULL;
+  if (NULL == string_ptr)
+    string_ptr = string_to_parse;
+
+  if (NULL != string_ptr)
+    {
+      int lrem = strlen(string_ptr);
+      int n = max_size;
+      if (lrem < max_size)
+        n = lrem;
+      strncpy(buf, string_ptr, n);
+      string_ptr += n;
+      return n;
+    }
+  else
+    return 0;
+}
+
+static int
+uc_yy_check_id(char *token)
 {
   class cl_uc *uc= application->get_uc();
   //printf("checking id=\"%s\"\n",token);
 
   if (uc)
     {
-      class cl_memory *mem= uc->memory(token);
+      class cl_memory *mem = uc->memory(token);
       if (mem)
 	{
-	  yylval->memory_object= mem;
-	  return(tok(PTOK_MEMORY_OBJECT));
+	  yylval.memory_object = mem;
+	  return PTOK_MEMORY_OBJECT;
 	}
       
       t_addr addr;
       bool found= uc->symbol2address(yytext, uc->sfr_tbl(), &addr);
       if (found)
 	{
-	  /*yylval->number= addr;
-	    return(tok(PTOK_NUMBER));*/
-	  yylval->memory.memory= uc->address_space(MEM_SFR_ID);
-	  yylval->memory.address= addr;
-	  return(tok(PTOK_MEMORY));
+	  /*yylval.number= addr;
+	    return PTOK_NUMBER;*/
+	  yylval.memory.memory = uc->address_space(MEM_SFR_ID);
+	  yylval.memory.address = addr;
+	  return PTOK_MEMORY;
 	}
 
       found= uc->symbol2address(yytext, uc->bit_tbl(), &addr);
@@ -101,13 +108,13 @@ cl_ucsim_lexer::check_id(char *token)
 	{
 	  t_addr memaddr;
 	  t_mem mask;
-	  yylval->bit.memory= uc->bit2mem(addr, &memaddr, &mask);
-	  yylval->bit.mem_address= memaddr;
-	  yylval->bit.bit_address= addr;
-	  yylval->bit.mask= mask;
-	  return(tok(PTOK_BIT));
+	  yylval.bit.memory= uc->bit2mem(addr, &memaddr, &mask);
+	  yylval.bit.mem_address = memaddr;
+	  yylval.bit.bit_address = addr;
+	  yylval.bit.mask = mask;
+	  return PTOK_BIT;
 	}
     }
 
-  return(0);
+  return 0;
 }

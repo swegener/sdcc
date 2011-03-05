@@ -1,3 +1,15 @@
+2011-03-05 Borut Razem <borut.razem AT gmail.com>
+
+	* sim/ucsim/configure, sim/ucsim/cmd.src/cmdlexcl.h,
+	  sim/ucsim/cmd.src/Makefile.in, sim/ucsim/cmd.src/newcmd.cc,
+	  sim/ucsim/cmd.src/cmdset.cc, sim/ucsim/cmd.src/cmdlex.l,
+	  sim/ucsim/cmd.src/newcmdposix.cc, sim/ucsim/cmd.src/newcmdwin32.cc,
+	  sim/ucsim/cmd.src/cmdpars.y, sim/ucsim/configure.in:
+	  use bison instead unsupported bison++
+	* sim/ucsim/cmd.src/flex_lexer.h, sim/ucsim/cmd.src/cmdpars.cc,
+	  sim/ucsim/cmd.src/cmdpars.h, sim/ucsim/cmd.src/FlexLexer.h,
+	  sim/ucsim/cmd.src/cmdlex.cc: deleted
+
 2011-03-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* sim/ucsim/z80.src/inst_cb.cc:

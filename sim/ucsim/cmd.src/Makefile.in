@@ -115,15 +115,13 @@ $(top_builddir)/libcmd.a: $(OBJECTS)
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
-#.y.cc:
-#	rm -f $*.cc $*.h
-#	$(YACC) -d $<
-#	mv y.tab.c $*.cc
-#	mv y.tab.h $*.h
+cmdpars.hh: cmdpars.cc
 
 .y.cc:
-	rm -f $*.cc $*.h
-	$(YACC) -d -o $*.cc $<
+	rm -f $*.cc $*.hh
+	$(YACC) -d $<
+	mv y.tab.c $*.cc
+	mv y.tab.h $*.hh
 
 .l.cc:
 	rm -f $*.cc

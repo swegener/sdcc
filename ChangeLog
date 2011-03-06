@@ -1,6 +1,7 @@
 2011-03-06 Borut Razem <borut.razem AT gmail.com>
 
-	* sim/ucsim/cmd.src/Makefile.in: fixed for bison & byacc
+	* sim/ucsim/cmd.src/Makefile.in:
+          fixed for bison, byacc and flex version 2.5.4
 
 2011-03-05 Borut Razem <borut.razem AT gmail.com>
 

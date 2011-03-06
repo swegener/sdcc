@@ -118,14 +118,14 @@ $(top_builddir)/libcmd.a: $(OBJECTS)
 cmdpars.hh: cmdpars.cc
 
 .y.cc:
-	rm -f $*.cc $*.hh
+	rm -f $@ $*.hh
 	$(YACC) -d $<
-	mv y.tab.c $*.cc
+	mv y.tab.c $@
 	mv y.tab.h $*.hh
 
 .l.cc:
-	rm -f $*.cc
-	$(LEX) -o $*.cc $<
+	rm -f $@
+	$(LEX) -t $< > $@
 
 # Remaking configuration
 # ----------------------

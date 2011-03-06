@@ -41,10 +41,9 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS		= cmdset.o command.o cmdutil.o syntax.o \
+OBJECTS         = cmdset.o command.o cmdutil.o syntax.o \
 		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o \
-		  cmduc.o cmdstat.o cmdmem.o \
-		  cmdpars.o cmdlex.o newcmd.o
+		  cmduc.o cmdstat.o cmdmem.o newcmd.o
 
 ifeq ($(WINSOCK_AVAIL), 1)
 OBJECTS += newcmdwin32.o
@@ -52,7 +51,10 @@ else
 OBJECTS += newcmdposix.o
 endif
 
-DEVEL		= $(shell test -d $(top_builddir)/devel && echo yes)
+LOCAL_OBJECTS   = cmdpars.o cmdlex.o
+
+SOURCES         = $(addprefix $(srcdir)/, $(OBJECTS:.o=.cc))
+LOCAL_SOURCES   = $(LOCAL_OBJECTS:.o=.cc)
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -92,17 +94,14 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
-	$(MAKEDEP) $(CPPFLAGS) $(addprefix $(srcdir)/, $(OBJECTS:.o=.cc)) >Makefile.dep
+Makefile.dep: $(SOURCES) $(LOCAL_SOURCES) $(srcdir)/*.h cmdpars.hh
+	$(MAKEDEP) $(CPPFLAGS) $(SOURCES) $(LOCAL_SOURCES) >Makefile.dep
 
 -include Makefile.dep
 include $(srcdir)/clean.mk
 
-cmdpars.cc: cmdpars.y
-
-ifeq ($(DEVEL),yes)
-  cmdlex.cc: cmdlex.l cmdpars.h
-endif
+cmdpars.cc cmdpars.hh: cmdpars.y
+cmdlex.cc: cmdlex.l cmdpars.hh
 
 # My rules
 # --------

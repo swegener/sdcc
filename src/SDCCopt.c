@@ -846,8 +846,9 @@ convbuiltin (iCode *const ic, eBBlock * ebp)
 {
   sym_link *ftype;
   symbol *bif;
+  int stack;
 
-  iCode *icc = ic;
+  iCode *icc = ic, *icp = ic->prev, *ico;
   iCode *lastparam = ic;
   while (icc->op != CALL)
     {
@@ -879,14 +880,35 @@ convbuiltin (iCode *const ic, eBBlock * ebp)
   else
     return;
 
-  /* Convert parameter passings. */
-  icc = ic;
-  while (icc->op != CALL)
+  /* Convert parameter passings from SEND to PUSH. */
+  stack = 0;
+  for (icc = ic; icc->op != CALL; icc = icc->next)
     {
       icc->builtinSEND = 0;
       icc->op = IPUSH;
       icc->parmPush = 1;
-      icc = icc->next;
+      stack += getSize (operandType (IC_LEFT (icc)));
+    }
+  icc->parmBytes = stack;
+
+  /* Reverse parameters. */
+  for (icc = ic; icc->op != CALL; icc = icc->next)
+    {
+      if(icc->next->op != CALL)
+        icc->prev = icc->next;
+      else
+        icc->prev = icp;
+    }
+  if(icc != ic)
+    {
+      if(icp)
+        icp->next = icc->prev;
+      icc->prev = ic;
+    }
+  for(; icc != icp; ico = icc, icc = icc->prev)
+    {
+      if(icc->op != CALL)
+        icc->next = ico;
     }
 }
 

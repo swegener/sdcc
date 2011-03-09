@@ -9,6 +9,9 @@ const unsigned char source[4] = {0, 1, 2, 3};
 
 void testmemory(void)
 {
+  volatile size_t zero = 0;
+  volatile size_t one = 1;
+
   /* Test memset() */
   destination[3] = 23;
   memset(destination, 42, 3);
@@ -19,10 +22,14 @@ void testmemory(void)
   /* Test memcpy() */
   memcpy(destination, source, 0);
   ASSERT(destination[0] == 42);
+  memcpy(destination, source, zero);
+  ASSERT(destination[0] == 42);
   memcpy(destination + 1, source + 1, 2);
   ASSERT(destination[0] == 42);
   ASSERT(destination[2] == source[2]);
   ASSERT(destination[3] == 23);
+  memcpy(destination, source, one);
+  ASSERT(destination[0] == 0);
 
   /* Test memcmp() */
   memcpy(destination, source, 4);

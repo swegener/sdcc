@@ -809,7 +809,7 @@ processParms (ast *func,
     }
 
   /* if this is a PARAM node then match left & right */
-  if ((*actParm)->type == EX_OP && (*actParm)->opval.op == PARAM)
+  if (IS_AST_PARAM (*actParm))
     {
       (*actParm)->decorated = 1;
       return (processParms (func, defParm,
@@ -899,7 +899,7 @@ processParms (ast *func,
           (*actParm)->filename = (*actParm)->right->filename;
           (*actParm)->lineno = (*actParm)->right->lineno;
 
-          decorateType (*actParm, resultType);
+          *actParm = decorateType (*actParm, resultType);
         }
       return 0;
     } /* vararg */
@@ -945,7 +945,7 @@ processParms (ast *func,
       (*actParm)->left = newAst_LINK (defParm->type);
       (*actParm)->right = pTree;
       (*actParm)->decorated = 0; /* force typechecking */
-      decorateType (*actParm, IS_GENPTR (defParm->type) ? RESULT_TYPE_GPTR : resultType);
+      *actParm = decorateType (*actParm, IS_GENPTR (defParm->type) ? RESULT_TYPE_GPTR : resultType);
     }
 
   /* make a copy and change the regparm type to the defined parm */
@@ -2410,7 +2410,9 @@ getLeftResultType (ast *tree, RESULT_TYPE resultType)
     {
       case '=':
       case CAST:
-        if (IS_PTR (LTYPE (tree)))
+        if (IS_GENPTR (LTYPE (tree)))
+          return RESULT_TYPE_GPTR;
+        else if (IS_PTR (LTYPE (tree)))
           return RESULT_TYPE_NONE;
         else
           return getResultTypeFromType (LETYPE (tree));
@@ -4001,12 +4003,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* make sure the type is complete and sane */
-      changePointer(LTYPE(tree));
-      checkTypeSanity(LETYPE(tree), "(cast)");
+      if ((resultType == RESULT_TYPE_GPTR) && IS_FUNCPTR (LTYPE (tree)))
+        changePointer(LTYPE (tree)->next);
+      else
+        changePointer(LTYPE (tree));
+      checkTypeSanity(LETYPE (tree), "(cast)");
 
       /* if 'from' and 'to' are the same remove the superfluous cast,
        * this helps other optimizations */
-      if (compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
+      if (compareTypeExact (LTYPE (tree), RTYPE (tree), -1) == 1)
         {
           /* mark that the explicit cast has been removed,
            * for proper processing (no integer promotion) of explicitly typecasted variable arguments */
@@ -5665,7 +5670,6 @@ optimizeGetAbit (ast * tree, RESULT_TYPE resultType)
     return tree;
 
   return decorateType (newNode (GETABIT, expr, count), RESULT_TYPE_NONE);
-
 }
 
 /*-----------------------------------------------------------------*/

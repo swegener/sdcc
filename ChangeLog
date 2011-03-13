@@ -1,3 +1,11 @@
+2011-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (processParms): fixed bug 2084206,
+	  (getLeftResultType): return RESULT_TYPE_GPTR for generic pointers,
+	  (decorateType, CAST): don't change function pointer to CPOINTER
+	  when resulttype is generic pointer, necessary for varargs
+	* support/regression/tests/bug2084206.c: new, added
+
 2011-03-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c,

@@ -602,6 +602,7 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
     case FPOINTER:
       return GPTYPE_FAR;
     case CPOINTER:
+    case FUNCTION:
       return GPTYPE_CODE;
     case PPOINTER:
       return GPTYPE_XSTACK;

@@ -1,3 +1,8 @@
+2011-03-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (pointerTypeToGPByte),
+	* src/ds390/gen.c (genCast): ds390 function pointer is no CPOINTER
+
 2011-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (processParms): fixed bug 2084206,

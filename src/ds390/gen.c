@@ -12605,7 +12605,7 @@ genCast (iCode * ic)
       /* pointer to generic pointer */
       if (IS_GENPTR (ctype))
         {
-          if (IS_PTR (type))
+          if (IS_PTR (type) || IS_FUNC (type))
             {
               p_type = DCL_TYPE (type);
             }

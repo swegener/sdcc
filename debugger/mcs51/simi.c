@@ -25,21 +25,24 @@
 #include "newalloc.h"
 
 #ifdef _WIN32
-#include <windows.h>
-#include <winsock2.h>
-#include <io.h>
-#include <fcntl.h>
+# include <windows.h>
+# include <winsock2.h>
+# include <io.h>
+# include <fcntl.h>
 #else
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#else
-#error "Cannot build debugger without socket support"
-#endif
+# ifdef HAVE_SYS_SOCKET_H
+#   ifdef __sun
+#     include <sys/filio.h>
+#   endif
+#   include <sys/types.h>
+#   include <sys/socket.h>
+#   include <netinet/in.h>
+#   include <arpa/inet.h>
+#   include <unistd.h>
+#   include <sys/ioctl.h>
+# else
+#   error "Cannot build debugger without socket support"
+# endif
 #endif
 #include <signal.h>
 #include <time.h>

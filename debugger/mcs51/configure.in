@@ -179,16 +179,16 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
 else
   bor_IS_SUNPRO
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
-    CFLAGS="-xO2 $CFLAGS"
-    WALL_FLAG=
     C99_FLAG="-xc99"
-    MAKEDEP="$CC -xM1"
+    CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
+    WALL_FLAG=
+    MAKEDEP="$CC ${C99_FLAG} -xM1"
   fi
 fi
 
 AC_SUBST(MAKEDEP)
 AC_SUBST(WALL_FLAG)
-
+AC_SUBST(C99_FLAG)
 
 # Set standard installation paths
 # ===========================================================================

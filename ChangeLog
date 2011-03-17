@@ -1,3 +1,10 @@
+2011-03-17 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCloop.c, src/SDCCsymt.c, src/SDCCast.c:
+	  fixed empty statement warnings
+	* sdas/asxxsrc/asmain.c:
+	  fixed bug #3195019: sdcc generates .rel instead of .o
+
 2011-03-15 Borut Razem <borut.razem AT gmail.com>
 
 	* debugger/mcs51/configure.in, debugger/mcs51/configure:

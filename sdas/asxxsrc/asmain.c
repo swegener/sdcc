@@ -359,7 +359,7 @@ char *argv[];
         if (lflag)
                 lfp = afile(q, "lst", 1);
         if (oflag) {
-                ofp = afile(q, "rel", 1);
+                ofp = afile(q, (is_sdas() && p != q) ? "" : "rel", 1);
                 /* sdas specific */
                 // save the file name if we have to delete it on error
                 strcpy(relFile,afn);

@@ -4,6 +4,8 @@
 	  reverted incorrect fix for bug #3195019:
 	  option -o just instructs sdas to generate an object file,
 	  it doesn't take an object output file name as argument
+	* sdas/asxxsrc/asmain.c:
+	  hopefully properly fixed bug #3195019
 
 2011-03-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

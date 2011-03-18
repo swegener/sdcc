@@ -359,7 +359,7 @@ char *argv[];
         if (lflag)
                 lfp = afile(q, "lst", 1);
         if (oflag) {
-                ofp = afile(q, is_sdas() ? "" : "rel", 1);
+                ofp = afile(q, "rel", 1);
                 /* sdas specific */
                 // save the file name if we have to delete it on error
                 strcpy(relFile,afn);
@@ -500,8 +500,7 @@ int i;
 /*)Function     VOID    asmbl()
  *
  *      The function asmbl() scans the assembler-source text for
- *      (1) labels, global labels, equates, global main
-equates, and local
+ *      (1) labels, global labels, equates, global equates, and local
  *      symbols, (2) .if, .else, .endif, and .page directives,
  *      (3) machine independent assembler directives, and (4) machine
  *      dependent mnemonics.

@@ -1,5 +1,4 @@
 # Regression test specification for the z80 target running with uCsim
-#
 
 CC_FOR_BUILD = $(CC)
 
@@ -33,21 +32,21 @@ else
 endif
 
 SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
-#SDCCFLAGS +=--less-pedantic -DREENTRANT=__reentrant
 LINKFLAGS += z80.lib
 
 OBJEXT = .rel
 BINEXT = .ihx
 
-# otherwise `make` deletes testfwk.o and `make -j` will fail
+# otherwise `make` deletes testfwk.rel and `make -j` will fail
 .PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
+FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
 
 # Rule to link into .ihx
-%.ihx: %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
+%.ihx: %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	@# TODO: sdas should place it\'s output in the current dir
@@ -64,15 +63,18 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
+$(PORT_CASES_DIR)/fwk.lib:
+	cp $(PORTS_DIR)/$(PORT)/fwk.lib $@
+
 # run simulator with 10 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 10 $(UCZ80) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
+	-$(CASES_DIR)/timeout 10 $(UCZ80) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	python $(srcdir)/get_ticks.py < $@ >> $@
+	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-$(CASES_DIR)/timeout: fwk/lib/timeout.c
+$(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c
 	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

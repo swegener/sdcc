@@ -28,6 +28,16 @@
 structdef *structWithName (char *);
 DEFSETFUNC(symWithRName);
 
+/*-----------------------------------------------------------------*/
+/* gc_strcat - allocate and return concatenated strings            */
+/*-----------------------------------------------------------------*/
+char *gc_strcat(const char *s1, const char *s2, const char *s3)
+{
+  char *p = Safe_malloc(strlen(s1) + strlen(s2) + strlen(s3) + 1);
+  strcat(strcat(strcpy(p, s1), s2), s3);
+  return p;
+}
+
 /*------------------------------------------------------------------*/
 /* getSize - returns size of a type chain in bits                   */
 /*------------------------------------------------------------------*/
@@ -250,8 +260,8 @@ static char  *parseTypeInfo (symbol *sym, char *s)
 /*-----------------------------------------------------------------*/
 /* symFromRec - parse a symbol record and extract and create a sym */
 /*              expects the input string to be of the form         */
-/*              {G|F<filename>|L<functionName>}'$'<name>'$'<level> */
-/*              '$'<block><type info>                              */
+/*              {G|F<filename>|L<filename>'.'<functionName>}'$'    */
+/*              <name>'$'<level>'$'<block><type info>              */
 /*-----------------------------------------------------------------*/
 symbol *parseSymbol (char *s, char **rs, int doadd)
 {
@@ -267,7 +277,7 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
   nsym = NULL;
   if ( doadd == 2 )
     {
-      /* add only if not present and if linkrecord before symbol record*/
+      /* add only if not present and if linkrecord before symbol record */
       if ( applyToSetFTrue(symbols, symWithRName, s, &nsym))
         {
           if ( nsym->rname != nsym->name )
@@ -555,16 +565,17 @@ DEFSETFUNC(funcWithRName)
 DEFSETFUNC(symLocal)
 {
   symbol *sym = item;
-  V_ARG(char *,name);
-  V_ARG(char *,sname);
-  V_ARG(int   ,block);
-  V_ARG(int   ,level);
-  V_ARG(symbol **,rsym);
+  V_ARG(char *, name);
+  V_ARG(char *, sname);
+  V_ARG(int, block);
+  V_ARG(int, level);
+  V_ARG(symbol **, rsym);
 
-  if (strcmp(name,sym->name) == 0 && /* name matches */
-      sym->scopetype != 'G'       && /* local scope  */
-      (sym->sname && strcmp(sym->sname,sname) == 0) && /* scope == specified scope */
-      sym->block <= block         && /* block & level kindo matches */
+  if (strcmp(name, sym->name) == 0   && /* name matches */
+      sym->scopetype != 'G'          && /* local scope  */
+      sym->sname                     &&
+      strcmp(sym->sname, sname) == 0 && /* scope == specified scope */
+      sym->block <= block            && /* block & level kindo matches */
       sym->level <= level)
     {
       /* if a symbol was previously found then
@@ -586,15 +597,15 @@ DEFSETFUNC(symLocal)
 DEFSETFUNC(symGlobal)
 {
   symbol *sym = item;
-  V_ARG(char *,name);
-  V_ARG(symbol **,rsym);
+  V_ARG(char *, name);
+  V_ARG(symbol **, rsym);
 
   if (*rsym)
       return 0;
 
   /* simple :: global & name matches */
   if (sym->scopetype == 'G' &&
-      strcmp(sym->name,name) == 0)
+      strcmp(sym->name, name) == 0)
     {
       *rsym = sym;
       return 1;
@@ -613,16 +624,19 @@ symbol *symLookup (char *name, context *ctxt)
   if ((ctxt) && (ctxt->func) &&
       (ctxt->func->sym) && (ctxt->func->sym->name))
     {
+      char *sname = gc_strcat(ctxt->func->mod->name, ".", ctxt->func->sym->name);
       /* first try & find a local variable for the given name */
-      if ( applyToSet(symbols,symLocal,
+      if ( applyToSet(symbols, symLocal,
           name,
-          ctxt->func->sym->name,
+          sname,
           ctxt->block,
           ctxt->level,
           &sym))
         {
+          Safe_free(sname);
           return sym;
         }
+      Safe_free(sname);
       sym = NULL;
     }
 
@@ -630,10 +644,12 @@ symbol *symLookup (char *name, context *ctxt)
       (ctxt->func->mod) && (ctxt->func->mod->name))
     {
       /* then try local to this module */
-      if (applyToSet(symbols,symLocal,
+      if (applyToSet(symbols, symLocal,
           name,
           ctxt->func->mod->name,
-          0,0,&sym))
+          0,
+          0,
+          &sym))
         {
           return sym;
         }
@@ -641,7 +657,7 @@ symbol *symLookup (char *name, context *ctxt)
     }
 
   /* no:: try global */
-  if ( applyToSet(symbols,symGlobal,name,&sym))
+  if ( applyToSet(symbols, symGlobal, name, &sym))
       return sym;
 
   /* cannot find return null */

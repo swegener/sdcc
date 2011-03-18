@@ -122,7 +122,6 @@ cdbWriteFunction (symbol *pSym, iCode *ic)
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "cdbFile.c:cdbWriteFunction()\n");
 
-
   if (!cdbFilePtr) return 0;
 
   if (IS_STATIC (pSym->etype))
@@ -130,7 +129,7 @@ cdbWriteFunction (symbol *pSym, iCode *ic)
   else
     sprintf (debugSym, "G$%s$0$0", pSym->name);
   emitDebuggerSymbol (debugSym);
-    
+
   return cdbWriteBasicSymbol (pSym, FALSE, TRUE);
 }
 
@@ -150,12 +149,12 @@ cdbWriteEndFunction (symbol *pSym, iCode *ic, int offset)
     fprintf (stderr, "cdbFile.c:cdbWriteEndFunction()\n");
 
   if (!cdbFilePtr) return 0;
-	  
+
   if (ic)
     {
       sprintf (debugSym, "C$%s$%d$%d$%d",
-	       FileBaseName (ic->filename), pSym->lastLine,
-	       ic->level, ic->block);
+               FileBaseName (ic->filename), pSym->lastLine,
+               ic->level, ic->block);
       spacesToUnderscores (debugSym, debugSym, sizeof (debugSym));
       emitDebuggerSymbol (debugSym);
     }
@@ -183,7 +182,7 @@ cdbWriteLabel (symbol *pSym, iCode *ic)
     fprintf (stderr, "cdbFile.c:cdbWriteLabel()\n");
 
   if (!cdbFilePtr) return 0;
-	  
+
   return 1;
 }
 
@@ -201,7 +200,7 @@ cdbWriteScope (iCode *ic)
     fprintf (stderr, "cdbFile.c:cdbWriteScope()\n");
 
   if (!cdbFilePtr) return 0;
-	  
+
   return 1;
 }
 
@@ -295,10 +294,10 @@ cdbWriteCLine (iCode *ic)
   char debugSym[INITIAL_INLINEASM];
   
   if (!cdbFilePtr) return 0;
-	      
+
   sprintf (debugSym, "C$%s$%d$%d$%d", 
-	   FileBaseName (ic->filename), ic->lineno,
-	   ic->level, ic->block);
+           FileBaseName (ic->filename), ic->lineno,
+           ic->level, ic->block);
   spacesToUnderscores (debugSym, debugSym, sizeof (debugSym));
   emitDebuggerSymbol (debugSym);
 
@@ -334,7 +333,7 @@ cdbWriteFrameAddress (const char *variable, struct regs *reg, int offset)
     fprintf (stderr, "cdbFile.c:cdbWriteFrameAddress()\n");
 
   if (!cdbFilePtr) return 0;
-	  
+
   return 1;
 }
 
@@ -367,24 +366,26 @@ cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
 
   if (!isStructSym)
     {
-      if (!sym->level)
-	{
-	  /* global */
-	  if (IS_STATIC (sym->etype))
-	    fprintf (cdbFilePtr, "F%s$", moduleName);	/* scope is file */
-	  else
-	    fprintf (cdbFilePtr, "G$");	/* scope is global */
-	}
-      else
-	/* symbol is local */
-	fprintf (cdbFilePtr, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
+      if (sym->level && sym->localof)   /* symbol is local */
+        {
+          fprintf (cdbFilePtr, "L%s.%s$", moduleName, sym->localof->name);
+        }
+      else if (IS_STATIC (sym->etype))  /* scope is file */
+        {
+          fprintf (cdbFilePtr, "F%s$", moduleName);
+        }
+      else                              /* scope is global */
+        {
+          fprintf (cdbFilePtr, "G$");
+        }
     }
   else
-    fprintf (cdbFilePtr, "S$");		/* scope is structure */
+    {
+      fprintf (cdbFilePtr, "S$");       /* scope is structure */
+    }
 
   /* print the name, & mangled name */
-  fprintf (cdbFilePtr, "%s$%d$%d(", sym->name,
-	   sym->level, sym->block);
+  fprintf (cdbFilePtr, "%s$%d$%d(", sym->name, sym->level, sym->block);
 
   cdbTypeInfo (sym->type);
 
@@ -400,8 +401,8 @@ cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
 
       for(a = 0; a < 4; a++)
         if(TempSym->regs[a])     
-	  fprintf (cdbFilePtr, "%s%s", port->getRegName(TempSym->regs[a]),
-		  ((a < 3) && (TempSym->regs[a+1])) ? "," : "");
+          fprintf (cdbFilePtr, "%s%s", port->getRegName(TempSym->regs[a]),
+                  ((a < 3) && (TempSym->regs[a+1])) ? "," : "");
 
       fprintf (cdbFilePtr, "]");
     }
@@ -411,7 +412,7 @@ cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
       map = SPEC_OCLS (sym->etype);
 
       fprintf (cdbFilePtr, "%c,%d,%d",
-	       (map ? map->dbName : 'Z'), sym->onStack, SPEC_STAK (sym->etype));
+               (map ? map->dbName : 'Z'), sym->onStack, SPEC_STAK (sym->etype));
     }
 
   /* if assigned to registers then output register names */
@@ -420,7 +421,7 @@ cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
      and the register bank it is using */
   if (isFunc)
     fprintf (cdbFilePtr, ",%d,%d,%d", FUNC_ISISR (sym->type),
-	     FUNC_INTNO (sym->type), FUNC_REGBANK (sym->type));
+             FUNC_INTNO (sym->type), FUNC_REGBANK (sym->type));
   
 
 /* alternate location to find this symbol @ : eg registers
@@ -450,57 +451,56 @@ cdbTypeInfo (sym_link * type)
   while (type)
     {
       if (IS_DECL (type))
-	{
-	  switch (DCL_TYPE (type))
-	    {
-	    case FUNCTION: fprintf (cdbFilePtr, "DF,"); break;
-	    case GPOINTER: fprintf (cdbFilePtr, "DG,"); break;
-	    case CPOINTER: fprintf (cdbFilePtr, "DC,"); break;
-	    case FPOINTER: fprintf (cdbFilePtr, "DX,"); break;
-	    case POINTER:  fprintf (cdbFilePtr, "DD,"); break;
-	    case IPOINTER: fprintf (cdbFilePtr, "DI,"); break;
-	    case PPOINTER: fprintf (cdbFilePtr, "DP,"); break;
-	    case EEPPOINTER: fprintf (cdbFilePtr, "DA,"); break;
-	    case ARRAY: fprintf (cdbFilePtr, "DA%d,", DCL_ELEM (type)); break;
-	    default:
-	      break;
-	    }
-	}
+        {
+          switch (DCL_TYPE (type))
+            {
+            case FUNCTION: fprintf (cdbFilePtr, "DF,"); break;
+            case GPOINTER: fprintf (cdbFilePtr, "DG,"); break;
+            case CPOINTER: fprintf (cdbFilePtr, "DC,"); break;
+            case FPOINTER: fprintf (cdbFilePtr, "DX,"); break;
+            case POINTER:  fprintf (cdbFilePtr, "DD,"); break;
+            case IPOINTER: fprintf (cdbFilePtr, "DI,"); break;
+            case PPOINTER: fprintf (cdbFilePtr, "DP,"); break;
+            case EEPPOINTER: fprintf (cdbFilePtr, "DA,"); break;
+            case ARRAY: fprintf (cdbFilePtr, "DA%d,", DCL_ELEM (type)); break;
+            default: break;
+            }
+        }
       else
-	{
-	  switch (SPEC_NOUN (type))
-	    {
-	    case V_INT:
-	      if (IS_LONG (type))
-		fprintf (cdbFilePtr, "SL");
-	      else
-		fprintf (cdbFilePtr, "SI");
-	      break;
+        {
+          switch (SPEC_NOUN (type))
+            {
+            case V_INT:
+              if (IS_LONG (type))
+                fprintf (cdbFilePtr, "SL");
+              else
+                fprintf (cdbFilePtr, "SI");
+              break;
 
-	    case V_CHAR: fprintf (cdbFilePtr, "SC"); break;
-	    case V_VOID: fprintf (cdbFilePtr, "SV"); break;
-	    case V_FLOAT: fprintf (cdbFilePtr, "SF"); break;
-	    case V_FIXED16X16: fprintf(cdbFilePtr, "SQ"); break;
-	    case V_STRUCT: 
-	      fprintf (cdbFilePtr, "ST%s", SPEC_STRUCT (type)->tag); 
-	      break;
-	    
-	    case V_SBIT: fprintf (cdbFilePtr, "SX"); break;
-	    case V_BIT: 
-	    case V_BITFIELD: 
-	      fprintf (cdbFilePtr, "SB%d$%d", SPEC_BSTR (type), 
-		       SPEC_BLEN (type));
-	      break;
+            case V_CHAR: fprintf (cdbFilePtr, "SC"); break;
+            case V_VOID: fprintf (cdbFilePtr, "SV"); break;
+            case V_FLOAT: fprintf (cdbFilePtr, "SF"); break;
+            case V_FIXED16X16: fprintf(cdbFilePtr, "SQ"); break;
+            case V_STRUCT: 
+              fprintf (cdbFilePtr, "ST%s", SPEC_STRUCT (type)->tag); 
+              break;
 
-	    default:
-	      break;
-	    }
-	  fputs (":", cdbFilePtr);
-	  if (SPEC_USIGN (type))
-	    fputs ("U", cdbFilePtr);
-	  else
-	    fputs ("S", cdbFilePtr);
-	}
+            case V_SBIT: fprintf (cdbFilePtr, "SX"); break;
+            case V_BIT: 
+            case V_BITFIELD: 
+              fprintf (cdbFilePtr, "SB%d$%d", SPEC_BSTR (type), 
+                       SPEC_BLEN (type));
+              break;
+
+            default:
+              break;
+            }
+          fputs (":", cdbFilePtr);
+          if (SPEC_USIGN (type))
+            fputs ("U", cdbFilePtr);
+          else
+            fputs ("S", cdbFilePtr);
+        }
       type = type->next;
     }
 }

@@ -1,5 +1,4 @@
 # Regression test specification for the hc08 target running with uCsim
-#
 
 CC_FOR_BUILD = $(CC)
 
@@ -43,12 +42,11 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
+FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
 
 # Rule to link into .ihx
-#%$(BINEXT): %$(OBJEXT) $(EXTRAS)
-
-%$(BINEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $< -o $@
+%$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 %$(OBJEXT): %.asm
 	$(AS_HC08) -plosgff $<
@@ -62,15 +60,18 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
+$(PORT_CASES_DIR)/fwk.lib:
+	cp $(PORTS_DIR)/$(PORT)/fwk.lib $@
+
 # run simulator with 10 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 10 $(UCHC08) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
+	-$(CASES_DIR)/timeout 10 $(UCHC08) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	python $(srcdir)/get_ticks.py < $@ >> $@
+	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-$(CASES_DIR)/timeout: fwk/lib/timeout.c
+$(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c
 	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

@@ -23,13 +23,12 @@ outputDebugStackSymbols (void)
             debugFile->writeSymbol (sym);
         }
 
-    if (istack)
-      {
-        for (sym = setFirstItem (istack->syms); sym; sym = setNextItem (istack->syms))
-          debugFile->writeSymbol(sym);
-      }
-  }
-
+      if (istack)
+        {
+          for (sym = setFirstItem (istack->syms); sym; sym = setNextItem (istack->syms))
+            debugFile->writeSymbol(sym);
+        }
+    }
 }
 
 
@@ -131,7 +130,7 @@ outputDebugSymbols (void)
           for (sym = setFirstItem (xinit->syms); sym; sym = setNextItem (xinit->syms))
             debugFile->writeSymbol (sym);        
         }
-  }
+    }
 
   return;
 }

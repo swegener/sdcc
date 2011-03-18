@@ -39,7 +39,7 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-FWKLIB = $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
+FWKLIB = $(PORT_CASES_DIR)/T2_isr$(OBJEXT) $(PORT_CASES_DIR)/statics$(OBJEXT)
 
 # Rule to link into .ihx
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib

@@ -113,17 +113,17 @@ aopLiteral (value * val, int offset)
 static void
 emitDebugSym (struct dbuf_s * oBuf, symbol * sym)
 {
-  if (!sym->level) /* global */
+  if (sym->level && sym->localof)   /* symbol scope is local */
     {
-      if (IS_STATIC (sym->etype))
-        dbuf_printf (oBuf, "F%s$", moduleName); /* scope is file */
-      else
-        dbuf_printf (oBuf, "G$");     /* scope is global */
+      dbuf_printf (oBuf, "L%s.%s$", moduleName, sym->localof->name);
     }
-  else
+  else if (IS_STATIC (sym->etype))  /* symbol scope is file */
     {
-      /* symbol is local */
-      dbuf_printf (oBuf, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
+      dbuf_printf (oBuf, "F%s$", moduleName);
+    }
+  else                              /* symbol scope is global */
+    {
+      dbuf_printf (oBuf, "G$");
     }
   dbuf_printf (oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
 }
@@ -1645,18 +1645,7 @@ emitOverlay (struct dbuf_s * aBuf)
           /* print extra debug info if required */
           if (options.debug)
             {
-              if (!sym->level)
-                {               /* global */
-                  if (IS_STATIC (sym->etype))
-                    dbuf_printf (aBuf, "F%s$", moduleName);        /* scope is file */
-                  else
-                    dbuf_printf (aBuf, "G$");      /* scope is global */
-                }
-              else
-                /* symbol is local */
-                dbuf_printf (aBuf, "L%s$",
-                         (sym->localof ? sym->localof->name : "-null-"));
-              dbuf_printf (aBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
+              emitDebugSym(aBuf, sym);
             }
 
           /* if is has an absolute address then generate
@@ -1680,7 +1669,7 @@ emitOverlay (struct dbuf_s * aBuf)
                 dbuf_printf (aBuf, "==.\n");
 
               /* allocate space */
-              dbuf_tprintf (aBuf, "!labeldef\n", sym->rname);
+              dbuf_tprintf (aBuf, "!slabeldef\n", sym->rname);
               dbuf_tprintf (aBuf, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
             }
         }

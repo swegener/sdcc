@@ -15,7 +15,7 @@ INC_DIR = .
 .PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
-EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
+EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT) $(PORT_CASES_DIR)/statics$(OBJEXT)
 
 %.out: %$(BINEXT)
 	mkdir -p $(dir $@)

@@ -1,3 +1,26 @@
+2011-03-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/cdbFile.c (cdbWriteBasicSymbol),
+	* src/SDCCglue.c (emitDebugSym),
+	* debugger/mcs51/symtab.c (gc_strcat, symLookup): concatenate module and
+	  function name seperated by . for locals to fix bug 1477149 with --debug
+	* sdas/linksrc/lkaomf51.c (CollectInfoFromCDB): split S:L and L:L locals,
+	  F:F are static, check modules for L:F and L:X
+	* src/SDCCdebug.c: cosmetics
+	* src/SDCCglue.c (emitOverlay): fixed bug 1477149
+	* support/regression/fwk/lib/statics.c,
+	* support/regression/ports/ds390/fwk.lib,
+	* support/regression/ports/gbz80/fwk.lib,
+	* support/regression/ports/hc08/fwk.lib,
+	* support/regression/ports/ucz80/fwk.lib,
+	* support/regression/tests/bug1477149.c: new, added
+	* support/regression/ports/ds390/spec.mk,
+	* support/regression/ports/hc08/spec.mk,
+	* support/regression/ports/mcs51-common/spec.mk
+	* support/regression/ports/ucz80/spec.mk: added FWKLIB and statics.rel
+	* support/regression/ports/host/spec.mk.in: added statics.o
+	* support/regression/ports/mcs51-common/fwk.lib: added statics.rel
+
 2011-03-17 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCloop.c, src/SDCCsymt.c, src/SDCCast.c:

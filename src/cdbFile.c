@@ -348,6 +348,7 @@ int
 cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
 {
   memmap *map;
+  symbol *sym2;
 
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "cdbFile.c:cdbWriteBasicSymbol()\n");
@@ -397,22 +398,39 @@ cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
       int a;
       symbol *TempSym = OP_SYMBOL (sym->reqv);
 
-      fprintf (cdbFilePtr, "R,0,0,[");
+      if (!TempSym->isspilt || TempSym->remat)
+        {
+          fprintf (cdbFilePtr, "R,0,0,[");
 
-      for(a = 0; a < 4; a++)
-        if(TempSym->regs[a])     
-          fprintf (cdbFilePtr, "%s%s", port->getRegName(TempSym->regs[a]),
-                  ((a < 3) && (TempSym->regs[a+1])) ? "," : "");
+          for (a = 0; a < 4; a++)
+            {
+              if (TempSym->regs[a])
+                {
+                  fprintf (cdbFilePtr, "%s%s", port->getRegName(TempSym->regs[a]),
+                           ((a < 3) && (TempSym->regs[a+1])) ? "," : "");
+                }
+            }
 
-      fprintf (cdbFilePtr, "]");
+          fprintf (cdbFilePtr, "]");
+          sym2 = NULL;
+        }
+      else
+        {
+          sym2 = TempSym->usl.spillLoc;
+        }
     }
   else
     {
+      sym2 = sym;
+    }
+
+  if (sym2)
+    {
       /* print the address space */
-      map = SPEC_OCLS (sym->etype);
+      map = SPEC_OCLS (sym2->etype);
 
       fprintf (cdbFilePtr, "%c,%d,%d",
-               (map ? map->dbName : 'Z'), sym->onStack, SPEC_STAK (sym->etype));
+               (map ? map->dbName : 'Z'), sym2->onStack, SPEC_STAK (sym2->etype));
     }
 
   /* if assigned to registers then output register names */
@@ -423,9 +441,8 @@ cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc)
     fprintf (cdbFilePtr, ",%d,%d,%d", FUNC_ISISR (sym->type),
              FUNC_INTNO (sym->type), FUNC_REGBANK (sym->type));
   
-
 /* alternate location to find this symbol @ : eg registers
-     or spillication */
+     or spillocation */
 
   if (!isStructSym)
     fprintf (cdbFilePtr, "\n");

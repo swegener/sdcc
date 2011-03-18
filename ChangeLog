@@ -20,6 +20,9 @@
 	* support/regression/ports/ucz80/spec.mk: added FWKLIB and statics.rel
 	* support/regression/ports/host/spec.mk.in: added statics.o
 	* support/regression/ports/mcs51-common/fwk.lib: added statics.rel
+	* .version: bumped to 3.0.2
+	* src/cdbFile.c (cdbWriteBasicSymbol): applied patch from bug 1627975,
+	  thanks sandra-l
 
 2011-03-17 Borut Razem <borut.razem AT gmail.com>
 

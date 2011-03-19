@@ -1798,11 +1798,13 @@ linkEdit (char **envp)
       buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
                     linkOptionsSet);
 
-      buildCmdLine2 (buffer, sizeof (buffer), buffer2);
+      //buildCmdLine2 (buffer, sizeof (buffer), buffer2);
+      buildMacros (buffer, buffer2, sizeof (buffer));
     }
   else
     {
-      buildCmdLine2 (buffer, sizeof (buffer), port->linker.mcmd);
+      //buildCmdLine2 (buffer, sizeof (buffer), port->linker.mcmd);
+      buildMacros (buffer, port->linker.mcmd, sizeof (buffer));
     }
 
   dbuf_destroy (&linkerScriptFileName);
@@ -1869,7 +1871,8 @@ assemble (char **envp)
         }
       else
         {
-          buildCmdLine2 (buf, sizeof (buf), port->assembler.mcmd);
+          //buildCmdLine2 (buf, sizeof (buf), port->assembler.mcmd);
+          buildMacros (buffer, port->assembler.mcmd, sizeof (buffer));
         }
 
       dbuf_destroy (&asmName);
@@ -2059,7 +2062,8 @@ preProcess (char **envp)
 
       if (options.verbose)
         printf ("sdcc: Calling preprocessor...\n");
-      buildCmdLine2 (buffer, sizeof (buffer), _preCmd);
+      //buildCmdLine2 (buffer, sizeof (buffer), _preCmd);
+      buildMacros (buffer, _preCmd, sizeof (buffer));
 
       if (preProcOnly)
         {

@@ -41,17 +41,17 @@ char *shell_escape (const char *str);
 
 /** Prints elements of the set to the file, each element on new line
 */
-void fputStrSet (FILE *fp, set *list);
+void fputStrSet (FILE * fp, set * list);
 
 /** Prepend / append given strings to each item of string set. The result is in a
     new string set.
 */
-set *appendStrSet (set *list, const char *pre, const char *post);
+set *appendStrSet (set * list, const char *pre, const char *post);
 
 /** Given a set returns a string containing all of the strings seperated
     by spaces. The returned string is on the heap.
 */
-const char *joinStrSet (set *list);
+const char *joinStrSet (set * list);
 
 /** Split the path string to the directory and file name (including extension) components.
     The directory component doesn't contain trailing directory separator.
@@ -79,6 +79,8 @@ const char *getBinPath (const char *prel);
 bool pathExists (const char *ppath);
 
 void setMainValue (const char *pname, const char *pvalue);
+
+void buildMacros (char *buffer, const char *cmd, size_t len);
 
 void populateMainValues (const char **ppin);
 
@@ -111,7 +113,7 @@ const char *getBuildNumber (void);
 const char *getBuildDate (void);
 
 /* return environment used to build SDCC */
-const char *getBuildEnvironment(void);
+const char *getBuildEnvironment (void);
 
 /* snprintf, by hook or by crook. */
 size_t SDCCsnprintf (char *, size_t, const char *, ...);
@@ -139,12 +141,15 @@ size_t SDCCsnprintf (char *, size_t, const char *, ...);
 
 /** Pragma tokenizer
  */
-enum pragma_token_e { TOKEN_UNKNOWN, TOKEN_STR, TOKEN_INT, TOKEN_EOL };
+enum pragma_token_e
+{ TOKEN_UNKNOWN, TOKEN_STR, TOKEN_INT, TOKEN_EOL };
 
-struct pragma_token_s {
+struct pragma_token_s
+{
   enum pragma_token_e type;
   struct dbuf_s dbuf;
-  union {
+  union
+  {
     int int_val;
   } val;
 };

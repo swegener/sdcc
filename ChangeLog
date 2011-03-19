@@ -1,6 +1,6 @@
 2011-03-19 Borut Razem <borut.razem AT gmail.com>
 
-	* src/SDCCmain.c, src/SDCCutil.c, src/SDCCutil.h:
+	* src/SDCCmain.c, src/SDCCutil.c, src/SDCCutil.h, src/SDCCmacro.c, src/SDCCmacro.h:
 	  fixed bug #3152525: sdcc doesn't pass double-quotes from -D option to sdcpp
 	* debugger/mcs51/simi.c:
 	  call ioctl(sock, FIONBIO, &iMode)

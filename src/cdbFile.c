@@ -22,7 +22,7 @@ int cdbWriteALine (const char *module, int Line);
 int cdbWriteFrameAddress (const char *variable, struct regs *reg, int offset);
 int cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc);
 void cdbTypeInfo (sym_link * type);
-     
+
 
 DEBUGFILE cdbDebugFile = 
   {

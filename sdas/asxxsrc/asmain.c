@@ -234,7 +234,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-        char *p, *q = NULL;
+        char *p = NULL;
+        char *q = NULL;
         int c, i;
         struct area *ap;
 

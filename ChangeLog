@@ -1,3 +1,12 @@
+2011-03-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asxxsrc/asmain.c (main): fixed warning
+	* sdas/linksrc/lkaomf51.c (OutputAOEMF51): fixed bug 1630751
+	  (ParseRegisters, CollectInfoFromCDB): get address for ascending registers
+	* src/cdbFile.c: cosmetics
+	* support/regression/fwk/lib/statics.c,
+	* support/regression/tests/bug1477149.c: fixed for type float
+
 2011-03-18 Borut Razem <borut.razem AT gmail.com>
 
 	* sdas/asxxsrc/asmain.c:

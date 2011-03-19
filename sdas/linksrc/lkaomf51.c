@@ -56,6 +56,7 @@ typedef struct
     int FileNameNumber;
     int BeginAdd;
     int EndAdd;
+    int RegBank;
 } _procedure;
 
 int numproc=0;
@@ -225,7 +226,6 @@ void OutputChkSum(void)
   GlobalChkSum=0;
 }
 
-#ifdef DODUMP
 void DumpForDebug (void)
 {
   char DumpFileName[PATH_MAX];
@@ -258,11 +258,12 @@ void DumpForDebug (void)
   fprintf(DumpFile,"\nPROCEDURES:\n");
   for(j=0; j<numproc; j++)
     {
-      fprintf(DumpFile, "%s, %s, 0x%04x-0x%04x\n",
+      fprintf(DumpFile, "%s, %s, 0x%04x-0x%04x, %c\n",
               procedure[j].name,
               infn[procedure[j].FileNameNumber].PathName,
               procedure[j].BeginAdd,
-              procedure[j].EndAdd);
+              procedure[j].EndAdd,
+              procedure[j].RegBank + '0');
     }
 
   fprintf(DumpFile,"\nLINE NUMBERS:\n");
@@ -277,7 +278,32 @@ void DumpForDebug (void)
 
   fclose(DumpFile);
 }
-#endif
+
+void ParseRegisters(_symbol * symbol, const char * Registers)
+{
+  char c;
+  int i;
+  char regs[0x100][4];
+  int address[4];
+  int nRegs = sscanf(Registers, "[ %[^,] %c %[^,] %c %[^,] %c %[^,] ]",
+                     regs[0], &c, regs[1], &c,  regs[2], &c, regs[3]);
+  nRegs = (nRegs + 1) / 2;
+  for (i=0; i<nRegs; i++)
+    {
+      if ((regs[i][0] == 'r') && isdigit(regs[i][1]))
+        {
+          address[i] = regs[i][1] - '0';
+        }
+    }
+  for (i=1; i<nRegs; i++)
+    {
+      if (address[i] != address[i-1] + 1)
+        {// we need strict ascending registers
+          return;
+        }
+    }
+  symbol->Address = address[0] + procedure[symbol->Procedure].RegBank * 8;
+}
 
 void OutputAOEMF51(void)
 {
@@ -318,20 +344,27 @@ void OutputAOEMF51(void)
       /*Public symbols defined in this module*/
       recsize=2;
       for(k=0; k<numsym; k++)/*Compute the record length*/
-          if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
+        {
+          if ( (symbol[k].FileNameNumber==j) &&
+               (symbol[k].Address!=-1) &&
                (symbol[k].Procedure==-1) &&
-               (symbol[k].Static==-1) ) recsize+=((strlen(symbol[k].name)+1)+5);
+               (symbol[k].Static==-1) )
+            {
+              recsize+=((strlen(symbol[k].name)+1)+5);
+            }
+        }
 
       if(recsize>2) /*If there are any symbols*/
         {
           OutputByte(0x12);       /*REC TYPE*/
-          OutputWord(recsize);/*Record Length*/
+          OutputWord(recsize);    /*Record Length*/
           OutputByte(0x01);       /*DEF TYPE: Public symbols*/
           for(k=0; k<numsym; k++)
             {
-              if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
-                       (symbol[k].Procedure==-1) &&
-                       (symbol[k].Static==-1) )
+              if ( (symbol[k].FileNameNumber==j) &&
+                   (symbol[k].Address!=-1) &&
+                   (symbol[k].Procedure==-1) &&
+                   (symbol[k].Static==-1) )
                 {
                   OutputByte(0x00);/*SEG ID*/
                   OutputByte((unsigned char)symbol[k].UsageType);/*SYM INFO*/
@@ -346,20 +379,27 @@ void OutputAOEMF51(void)
       /*Local symbols defined in this module*/
       recsize=2;
       for(k=0; k<numsym; k++)/*Compute the record length*/
-          if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
-                   (symbol[k].Procedure==-1) &&
-                   (symbol[k].Static==j) ) recsize+=((strlen(symbol[k].name)+1)+5);
+        {
+          if ( (symbol[k].FileNameNumber==j) &&
+               (symbol[k].Address!=-1) &&
+               (symbol[k].Procedure==-1) &&
+               (symbol[k].Static==j) )
+            {
+              recsize+=((strlen(symbol[k].name)+1)+5);
+            }
+        }
 
       if(recsize>2) /*If there are any symbols*/
         {
           OutputByte(0x12);       /*REC TYPE*/
-          OutputWord(recsize);/*Record Length*/
+          OutputWord(recsize);    /*Record Length*/
           OutputByte(0x00);       /*DEF TYPE: Local symbols*/
           for(k=0; k<numsym; k++)
             {
-              if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
-                       (symbol[k].Procedure==-1) &&
-                       (symbol[k].Static==j) )
+              if ( (symbol[k].FileNameNumber==j) &&
+                   (symbol[k].Address!=-1) &&
+                   (symbol[k].Procedure==-1) &&
+                   (symbol[k].Static==j) )
                 {
                   OutputByte(0x00);/*SEG ID*/
                   OutputByte((unsigned char)symbol[k].UsageType);/*SYM INFO*/
@@ -386,7 +426,8 @@ void OutputAOEMF51(void)
 
               /*Content Record*/
               OutputByte(0x06);/*REC TYPE*/
-              if(procedure[k].EndAdd==-1) procedure[k].EndAdd=HexSize;
+              if(procedure[k].EndAdd==-1)
+                  procedure[k].EndAdd=HexSize;
               recsize=procedure[k].EndAdd-procedure[k].BeginAdd+1+4;
               OutputWord(recsize);/*Record Length*/
               OutputByte(0x00);/*SEG ID*/
@@ -399,17 +440,23 @@ void OutputAOEMF51(void)
 
               recsize=2;
               for(i=0; i<numsym; i++)/*Get the record length*/
-                  if(symbol[i].Procedure==k)
+                {
+                  if( (symbol[i].Procedure==k) &&
+                      (symbol[i].Address!=-1) )
+                    {
                       recsize+=((strlen(symbol[i].name)+1)+5);
+                    }
+                }
 
               if(recsize>2) /*If there are any symbols*/
                 {
                   OutputByte(0x12);       /*REC TYPE*/
-                  OutputWord(recsize);/*Record Length*/
+                  OutputWord(recsize);    /*Record Length*/
                   OutputByte(0x00);       /*DEF TYPE: Local symbols*/
                   for(i=0; i<numsym; i++)
                     {
-                      if ( (symbol[i].Procedure==k) )
+                      if ( (symbol[i].Procedure==k) &&
+                           (symbol[i].Address!=-1) )
                         {
                           OutputByte(0x00);/*SEG ID*/
                           OutputByte((unsigned char)symbol[i].UsageType);/*SYM INFO*/
@@ -424,12 +471,13 @@ void OutputAOEMF51(void)
               /*Line Numbers*/
               recsize=2;
               for(i=0; i<numlinenum; i++)/*Get the record length*/
-                  if(linenum[i].Procedure==k) recsize+=5;
+                  if(linenum[i].Procedure==k)
+                      recsize+=5;
 
               if(recsize>2) /*If there are any line numbers*/
                 {
                   OutputByte(0x12);       /*REC TYPE*/
-                  OutputWord(recsize);/*Record Length*/
+                  OutputWord(recsize);    /*Record Length*/
                   OutputByte(0x03);       /*DEF TYPE: Line numbers*/
                   for(i=0; i<numlinenum; i++)
                     {
@@ -503,7 +551,8 @@ void OutputAOEMF51(void)
             OutputWord(k-i+4);/*Record Length*/
             OutputByte(0x00);/*SEG ID*/
             OutputWord(i); /*Offset*/
-            for(; i<k; i++) OutputByte(ihxBuff[i]);
+            for(; i<k; i++)
+                OutputByte(ihxBuff[i]);
             OutputChkSum();
           }
       }
@@ -542,11 +591,14 @@ void CollectInfoFromCDB(void)
   char name[0x100];
   char level[0x100];
   char block[0x100];
-  char Bfmt[]="%[^)] %c %c %c %c %d %c %d";
   char TypeInfo[0x100];
   char AddressSpace;
   int OnStack;
   int StackOffset;
+  int IsISR;
+  int IntNr;
+  int RegBank;
+  char Registers[0x100];
   int Address, CLine;
 
   if(numin==0) return;
@@ -597,6 +649,7 @@ void CollectInfoFromCDB(void)
           /* Example:
           "S:G$actual$0$0({7}ST__00010000:S),E,0,0"
           "S:Lfile.main$j$1$1({2}SI:S),E,0,0"
+          "S:Lfile.main$k$1$1({2}DG,SI:S),R,0,0,[r2,r3]"
           "S:G$DS1306_Reset_SPI$0$0({2}DF,SV:S),C,0,0"
           "S:G$main$0$0({2}DF,SV:S),C,0,0"
           */
@@ -609,11 +662,12 @@ void CollectInfoFromCDB(void)
                    block);
 
             /*<block>(<type info>),<Address Space>,<on Stack?>,<stack offset>*/
-            sscanf(block, Bfmt,
+            sscanf(block, "%[^)] %c %c %c %c %d %c %d %c %s",
                    TypeInfo, &c, &c,
                    &AddressSpace, &c,
                    &OnStack, &c,
-                   &StackOffset);
+                   &StackOffset, &c,
+                   Registers);
 
             i=-1; k=-1;
             switch(scope[2])
@@ -635,8 +689,8 @@ void CollectInfoFromCDB(void)
                     {
                       size_t mlen = strlen(infn[procedure[j].FileNameNumber].ModuleName);
                       if ((!strncmp (&scope[3], infn[procedure[j].FileNameNumber].ModuleName, mlen)) &&
-                                    (scope[mlen+3] == '.') &&
-                                    (EQ(&scope[mlen+4], procedure[j].name)))
+                          (scope[mlen+3] == '.') &&
+                          (EQ(&scope[mlen+4], procedure[j].name)))
                         {
                           k = j; /*Local symbol*/
                           break;
@@ -677,7 +731,11 @@ void CollectInfoFromCDB(void)
 
                     case 'E': /*Internal ram (lower 128) bytes*/
                     case 'I': /*SFR space*/
+                      symbol[numsym].UsageType=0x42;
+                    break;
+
                     case 'R': /*Register Space*/
+                      ParseRegisters(&symbol[numsym], Registers);
                       symbol[numsym].UsageType=0x42;
                     break;
 
@@ -701,10 +759,25 @@ void CollectInfoFromCDB(void)
 
           /*Examples:
           F:G$AsciiToHex$0$0({2}DF,SC:U),C,0,0,0,0,0
-          F:G$main$0$0({2}DF,SV:S),C,0,0,0,0,0   */
+          F:G$main$0$0({2}DF,SV:S),C,0,0,0,0,0
+          F:Fbug1627975$f2$0$0({2}DF,DG,SI:U),C,0,0,0,0,0 */
 
           case 'F':
-            sscanf(buff, "%[^$] %c %[^$]", scope, &c, name);
+            sscanf(buff, "%[^$] %c %[^$] %c %[^$] %c %s",
+                   scope, &c,
+                   name, &c,
+                   level, &c,
+                   block);
+
+            /*<block>(<type info>),<Address Space>,<on Stack?>,<stack offset>,<isr?>,<int nr>,<regbank> */
+            sscanf(block, "%[^)] %c %c %c %c %d %c %d %c %d %c %d %c %d",
+                   TypeInfo, &c, &c,
+                   &AddressSpace, &c,
+                   &OnStack, &c,
+                   &StackOffset, &c,
+                   &IsISR, &c,
+                   &IntNr, &c,
+                   &RegBank);
             /*The same may have been already defined */
             for(j=0; j<numproc; j++)
               {
@@ -721,6 +794,7 @@ void CollectInfoFromCDB(void)
                 procedure[numproc].FileNameNumber=CurrentModule;
                 procedure[numproc].BeginAdd=-1;/*To be collected latter*/
                 procedure[numproc].EndAdd=-1;/*To be collected latter*/
+                procedure[numproc].RegBank=RegBank;
                 numproc++;
               }
 
@@ -1030,9 +1104,9 @@ void CreateAOMF51(void)
   if((dflag) && (!rflag))
     {
       CollectInfoFromCDB();
-      #ifdef DODUMP
+#ifdef DODUMP
       DumpForDebug();
-      #endif
+#endif
       HexSize=ReadHexFile(&HexBegin)+1;
       OutputAOEMF51();
       FreeAll();

@@ -80,7 +80,7 @@ bool pathExists (const char *ppath);
 
 void setMainValue (const char *pname, const char *pvalue);
 
-void buildMacros (char *buffer, const char *cmd, size_t len);
+char *buildMacros (const char *cmd);
 
 void populateMainValues (const char **ppin);
 

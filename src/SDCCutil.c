@@ -374,10 +374,10 @@ setMainValue (const char *pname, const char *pvalue)
   shash_add (&_mainValues, pname, pvalue);
 }
 
-void
-buildMacros (char *buffer, const char *cmd, size_t len)
+char *
+buildMacros (const char *cmd)
 {
-  eval_macros (buffer, _mainValues, cmd, len);
+  return eval_macros (_mainValues, cmd);
 }
 
 void

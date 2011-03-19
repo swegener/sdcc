@@ -23,26 +23,20 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "dbuf_string.h"
 
-enum
-{
-  MAX_STRING_LENGTH = 2048,
-  MAX_MACRO_NAME_LENGTH = 128
-};
-
-void
-eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
+char *
+eval_macros (hTab * pvals, const char *pfrom)
 {
   bool fdidsomething = FALSE;
-  char *pinto = apinto;
-  size_t plen = alen;
   char quote = '\0';
+  struct dbuf_s dbuf;
 
-  assert (pinto);
   assert (pvals);
   assert (pfrom);
 
-  while (plen > 0 && *pfrom)
+  dbuf_init (&dbuf, 256);
+  while (*pfrom)
     {
       switch (*pfrom)
         {
@@ -51,8 +45,7 @@ eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
           if (quote != '\0')
             {
               /* write previous quote */
-              *pinto++ = quote;
-              --plen;
+              dbuf_append_char (&dbuf, quote);
             }
           quote = *pfrom++;
           break;
@@ -60,8 +53,8 @@ eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
         case '{':
           {
             const char *pend = ++pfrom;
-            char name[MAX_MACRO_NAME_LENGTH];
             const char *pval;
+            char *name;
 
             /* Find the end of macro */
             while (*pend && '}' != *pend)
@@ -73,17 +66,13 @@ eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
                 wassertl (0, "Unterminated macro expansion");
               }
 
-            /* Pull out the macro name */
-            if (pend - pfrom >= MAX_MACRO_NAME_LENGTH)
-              {
-                wassertl (0, "macro name too long");
-              }
-
-            strncpy (name, pfrom, pend - pfrom);
+            name = Safe_malloc (pend - pfrom + 1);
+            memcpy (name, pfrom, pend - pfrom);
             name[pend - pfrom] = '\0';
 
             /* Look up the value in the hash table */
             pval = shash_find (pvals, name);
+            Safe_free (name);
 
             if (NULL == pval)
               {
@@ -99,8 +88,7 @@ eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
                     else
                       {
                         /* Start quote not equals end quote: add both */
-                        *pinto++ = quote;
-                        --plen;
+                        dbuf_append_char (&dbuf, quote);
                       }
                   }
               }
@@ -108,18 +96,10 @@ eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
               {
                 if ('\0' != quote)
                   {
-                    /* It was a quote, add it */
-                    *pinto++ = quote;
-                    --plen;
+                    dbuf_append_char (&dbuf, quote);
                   }
-                if (plen > 0)
-                  {
-                    /* Replace macro */
-                    strncpy (pinto, pval, plen);
-                    pinto += strlen (pval);
-                    plen -= plen > strlen (pval) ? strlen (pval) : plen;
-                    fdidsomething = TRUE;
-                  }
+                dbuf_append_str (&dbuf, pval);
+                fdidsomething = TRUE;
               }
 
             quote = '\0';
@@ -130,74 +110,50 @@ eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen)
         default:
           if ('\0' != quote)
             {
-              *pinto++ = quote;
-              --plen;
+              dbuf_append_char (&dbuf, quote);
               quote = '\0';
             }
 
-          if (plen > 0)
-            {
-              /* Pass through */
-              *pinto++ = *pfrom++;
-              --plen;
-            }
+          dbuf_append_char (&dbuf, *pfrom++);
         }
     }
 
-  if (plen > 0 && '\0' != quote)
+  if ('\0' != quote)
     {
-      *pinto++ = quote;
-      --plen;
+      dbuf_append_char (&dbuf, quote);
     }
 
-  if (plen <= 0)
-    {
-      wassertl (0, "macro expansion too long");
-    }
-
-  *pinto = '\0';
 
   /* If we did something then recursivly expand any expanded macros */
   if (fdidsomething)
     {
-      char ainto[MAX_STRING_LENGTH];
-      eval_macros (ainto, pvals, apinto, MAX_STRING_LENGTH);
-      strncpyz (apinto, ainto, alen);
+      char *ret = eval_macros (pvals, dbuf_c_str (&dbuf));
+      dbuf_destroy (&dbuf);
+      return ret;
     }
+
+  return dbuf_detach_c_str (&dbuf);
 }
 
 char *
 mvsprintf (hTab * pvals, const char *pformat, va_list ap)
 {
-  char ainto[MAX_STRING_LENGTH];
-  char atmp[MAX_STRING_LENGTH];
+  char *p;
+  struct dbuf_s dbuf;
+
+  dbuf_init (&dbuf, 256);
 
   /* Recursivly evaluate all the macros in the string */
-  eval_macros (ainto, pvals, pformat, MAX_STRING_LENGTH);
+  p = eval_macros (pvals, pformat);
+
   /* Evaluate all the arguments */
-#if defined(HAVE_VSNPRINTF)
-  if (vsnprintf (atmp, MAX_STRING_LENGTH, ainto, ap) >= MAX_STRING_LENGTH)
-    {
-      fprintf (stderr, "Internal error: mvsprintf output truncated.\n");
-    }
-#else
-  {
-    int wlen;
-
-    wlen = vsprintf (atmp, ainto, ap);
-
-    if (wlen < 0 || wlen >= MAX_STRING_LENGTH)
-      {
-        wassertl (0, "mvsprintf overflowed.");
-      }
-  }
-#endif
+  dbuf_printf(&dbuf, p, ap);
+  Safe_free (p);
 
   /* Recursivly evaluate any macros that were used as arguments */
-  eval_macros (ainto, pvals, atmp, MAX_STRING_LENGTH);
-
-  /* Return a copy of the evaluated string. */
-  return Safe_strdup (ainto);
+  p = eval_macros (pvals, dbuf_c_str (&dbuf));
+  dbuf_destroy (&dbuf);
+  return p;
 }
 
 char *

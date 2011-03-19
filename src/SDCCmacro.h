@@ -30,7 +30,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-void eval_macros (char *apinto, hTab * pvals, const char *pfrom, size_t alen);
+char *eval_macros (hTab * pvals, const char *pfrom);
 char *mvsprintf (hTab * pvals, const char *pformat, va_list ap);
 char *msprintf (hTab * pvals, const char *pformat, ...);
 void mfprintf (FILE * fp, hTab * pvals, const char *pformat, ...);

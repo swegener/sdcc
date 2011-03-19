@@ -6,6 +6,7 @@
 	* src/cdbFile.c: cosmetics
 	* support/regression/fwk/lib/statics.c,
 	* support/regression/tests/bug1477149.c: fixed for type float
+	* sdas/linksrc/lkaomf51.c: disabled DODUMP
 
 2011-03-18 Borut Razem <borut.razem AT gmail.com>
 

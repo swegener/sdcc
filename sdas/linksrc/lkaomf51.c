@@ -23,7 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #define EQ(A,B) !strcmp((A),(B))
 #define MEMSIZE 0x10000
-#define DODUMP 1
+#ifndef DODUMP
+#define DODUMP 0
+#endif
 
 typedef struct
 {
@@ -1104,7 +1106,7 @@ void CreateAOMF51(void)
   if((dflag) && (!rflag))
     {
       CollectInfoFromCDB();
-#ifdef DODUMP
+#if DODUMP
       DumpForDebug();
 #endif
       HexSize=ReadHexFile(&HexBegin)+1;

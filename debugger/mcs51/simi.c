@@ -28,12 +28,8 @@
 # include <windows.h>
 # include <winsock2.h>
 # include <io.h>
-# include <fcntl.h>
 #else
 # ifdef HAVE_SYS_SOCKET_H
-#   ifdef __sun
-#     include <sys/filio.h>
-#   endif
 #   include <sys/types.h>
 #   include <sys/socket.h>
 #   include <netinet/in.h>
@@ -44,6 +40,7 @@
 #   error "Cannot build debugger without socket support"
 # endif
 #endif
+#include <fcntl.h>
 #include <signal.h>
 #include <time.h>
 
@@ -382,7 +379,7 @@ void openSimulator (char **args, int nargs)
     }
 
   iMode = 1; /* set non-blocking mode */
-  iResult = ioctl(sock, FIONBIO, &iMode);
+  iResult = fcntl(sock, F_SETFL, FNONBLOCK | FASYNC);
   if (iResult != 0)
     {
       perror("ioctl failed");

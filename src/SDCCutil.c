@@ -58,6 +58,46 @@ populateStringHash (const char **pin)
   return pret;
 }
 
+
+/** shell escape string
+    returns dynamically allocated string, which should be free-ed
+*/
+char *
+shell_escape (const char *str)
+{
+  struct dbuf_s dbuf;
+
+  dbuf_init (&dbuf, 128);
+
+  while (*str)
+    {
+#ifdef _WIN32
+      switch (*str)
+        {
+        case '\\':
+        case '"':
+          dbuf_append (&dbuf, "\\", 1);
+          dbuf_append (&dbuf, str, 1);
+          break;
+
+        case ' ':
+        case '%':
+          dbuf_append (&dbuf, "\"", 1);
+          dbuf_append (&dbuf, str, 1);
+          dbuf_append (&dbuf, "\"", 1);
+          break;
+        }
+#else
+      if (strchr("\\\"'$ ", *str))
+        dbuf_append (&dbuf, "\\", 1);
+      dbuf_append (&dbuf, str, 1);
+#endif
+      ++str;
+    }
+
+  return dbuf_detach_c_str (&dbuf);
+}
+
 /** Prints elements of the set to the file, each element on new line
 */
 void
@@ -92,9 +132,24 @@ appendStrSet (set *list, const char *pre, const char *post)
       if (post != NULL)
         dbuf_append_str (&dbuf, post);
 
-      /* null terminate the buffer */
-      dbuf_c_str (&dbuf);
-      addSet (&new_list, dbuf_detach(&dbuf));
+      addSet (&new_list, dbuf_detach_c_str(&dbuf));
+    }
+
+  return new_list;
+}
+
+/** shell escape each item of string set. The result is in a
+    new string set.
+*/
+set *
+shellEscapeStrSet (set *list)
+{
+  set *new_list = NULL;
+  const char *item;
+
+  for (item = setFirstItem (list); item != NULL; item = setNextItem (list))
+    {
+      addSet (&new_list, shell_escape (item));
     }
 
   return new_list;

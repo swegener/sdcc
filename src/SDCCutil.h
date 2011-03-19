@@ -34,6 +34,11 @@
 */
 hTab *populateStringHash (const char **pin);
 
+/** Given an array of name, value string pairs creates a new hash
+    containing all of the pairs.
+*/
+char *shell_escape (const char *str);
+
 /** Prints elements of the set to the file, each element on new line
 */
 void fputStrSet (FILE *fp, set *list);

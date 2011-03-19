@@ -1288,7 +1288,7 @@ parseCmdLine (int argc, char **argv)
             case 'U':
               {
                 char sOpt = argv[i][1];
-                char *rest;
+                char *rest, *s;
                 struct dbuf_s dbuf;
 
                 if (argv[i][2] == ' ' || argv[i][2] == '\0')
@@ -1311,8 +1311,10 @@ parseCmdLine (int argc, char **argv)
                 if (sOpt == 'Y')
                   sOpt = 'I';
 
+                s = shell_escape (rest);
                 dbuf_init (&dbuf, 256);
-                dbuf_printf (&dbuf, ((sOpt == 'I') ? "-%c\"%s\"" : "-%c%s"), sOpt, rest);
+                dbuf_printf (&dbuf, "-%c%s", sOpt, s);
+                Safe_free (s);
                 addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
                 if (sOpt == 'I')
                   {

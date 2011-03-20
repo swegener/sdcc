@@ -381,6 +381,105 @@ buildMacros (const char *cmd)
 }
 
 char *
+buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3, set * list)
+{
+  int first = 1;
+  struct dbuf_s dbuf;
+
+  assert (cmds != NULL);
+
+  dbuf_init (&dbuf, 256);
+
+  while (*cmds)
+    {
+      const char *p, *from, *par;
+      int sep = 1;
+
+      from = *cmds;
+      cmds++;
+
+      /* See if it has a '$' anywhere - if not, just copy */
+      if ((p = strchr (from, '$')))
+        {
+          /* include first part of cmd */
+          if (p != from)
+            {
+              if (!first && sep)
+                dbuf_append_char (&dbuf, ' ');
+              dbuf_append (&dbuf, from, p - from);
+              sep = 0;
+            }
+          from = p + 2;
+
+          /* include parameter */
+          p++;
+          switch (*p)
+            {
+            case '1':
+              par = p1;
+              break;
+
+            case '2':
+              par = p2;
+              break;
+
+            case '3':
+              par = p3;
+              break;
+
+            case 'l':
+              {
+                const char *tmp;
+                par = NULL;
+
+                if (list != NULL && (tmp = (const char *) setFirstItem (list)) != NULL)
+                  {
+                    do
+                      {
+                        if (*tmp != '\0')
+                          {
+                            if (sep)
+                              dbuf_append_char (&dbuf, ' ');    /* seperate it */
+                            dbuf_append_str (&dbuf, tmp);
+                            tmp++;
+                            sep = 1;
+                          }
+                      }
+                    while ((tmp = (const char *) setNextItem (list)) != NULL);
+                  }
+              }
+              break;
+
+            default:
+              par = NULL;
+              assert (0);
+            }
+
+          if (par && *par != '\0')
+            {
+              if (!first && sep)
+                dbuf_append_char (&dbuf, ' ');  /* seperate it */
+              dbuf_append_str (&dbuf, par);
+              sep = 0;
+            }
+        }
+
+      /* include the rest of cmd, e.g. ".asm" from "$1.asm" */
+      if (*from != '\0')
+        {
+          if (!first && sep)
+            dbuf_append_char (&dbuf, ' ');      /* seperate it */
+          dbuf_append_str (&dbuf, from);
+          sep = 0;
+        }
+
+      first = 0;
+    }
+
+  return dbuf_detach_c_str (&dbuf);
+}
+
+char *
 buildCmdLine2 (const char *pcmd, ...)
 {
   va_list ap;
@@ -428,7 +527,6 @@ getRuntimeVariables (void)
 {
   return _mainValues;
 }
-
 
 /* strncpy() with guaranteed NULL termination. */
 char *
@@ -509,11 +607,11 @@ getBuildEnvironment (void)
 #elif defined(__BORLANDC__)
   return "BORLANDC";
 #elif defined(__APPLE__)
-# if defined(__i386__)
+#if defined(__i386__)
   return "Mac OS X i386";
-# elif defined(__x86_64__)
+#elif defined(__x86_64__)
   return "Mac OS X x86_64";
-# else
+#else
   return "Mac OS X ppc";
 #endif
 #elif defined(__linux__)
@@ -525,13 +623,13 @@ getBuildEnvironment (void)
 #elif defined(__OpenBSD__)
   return "OpenBSD";
 #elif defined(__sun)
-# if defined(__i386)
+#if defined(__i386)
   return "Solaris i386";
-# elif defined(__amd64)
+#elif defined(__amd64)
   return "Solaris amd64";
-# else
+#else
   return "Solaris SPARC";
-# endif
+#endif
 #else
   return "UNIX";
 #endif
@@ -546,12 +644,12 @@ SDCCsnprintf (char *dst, size_t n, const char *fmt, ...)
 
   va_start (args, fmt);
 
-# if defined(HAVE_VSNPRINTF)
+#if defined(HAVE_VSNPRINTF)
   len = vsnprintf (dst, n, fmt, args);
-# else
+#else
   vsprintf (dst, fmt, args);
   len = strlen (dst) + 1;
-# endif
+#endif
 
   va_end (args);
 

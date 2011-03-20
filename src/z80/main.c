@@ -25,7 +25,6 @@
 #include <sys/stat.h>
 #include "z80.h"
 #include "SDCCsystem.h"
-#include "SDCCbuild_cmd.h"
 #include "SDCCutil.h"
 #include "SDCCargs.h"
 #include "dbuf_string.h"
@@ -350,6 +349,7 @@ _gbz80_rgblink (void)
 {
   FILE *lnkfile;
   struct dbuf_s lnkFileName;
+  char *buffer;
 
   dbuf_init (&lnkFileName, PATH_MAX);
 
@@ -378,13 +378,15 @@ _gbz80_rgblink (void)
 
   fclose (lnkfile);
 
-  buildCmdLine (buffer,port->linker.cmd, dstFileName, NULL, NULL, NULL);
+  buffer = buildCmdLine (port->linker.cmd, dstFileName, NULL, NULL, NULL);
   /* call the linker */
   if (sdcc_system (buffer))
     {
+      Safe_free (buffer);
       perror ("Cannot exec linker");
       exit (1);
     }
+  Safe_free (buffer);
 }
 
 static bool
@@ -479,6 +481,7 @@ static void
 _setValues(void)
 {
   const char *s;
+  struct dbuf_s dbuf;
 
   if (options.nostdlib == FALSE)
     {
@@ -556,8 +559,10 @@ _setValues(void)
   setMainValue ("z80extraobj", (s = joinStrSet (relFilesSet)));
   Safe_free ((void *)s);
 
-  sprintf (buffer, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
-  setMainValue ("z80bases", buffer);
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
+  setMainValue ("z80bases", dbuf_c_str (&dbuf));
+  dbuf_destroy (&dbuf);
 }
 
 static void
@@ -618,14 +623,15 @@ _setDefaultOptions (void)
 static char *
 _mangleSupportFunctionName(char *original)
 {
-  char buffer[128];
+  struct dbuf_s dbuf;
 
-  sprintf(buffer, "%s_rr%s_%s", original,
+  dbuf_init (&dbuf, 128);
+  dbuf_printf(&dbuf, "%s_rr%s_%s", original,
           options.profile ? "f" : "x",
           options.noRegParams ? "s" : "bds" /* MB: but the library only has hds variants ??? */
           );
 
-  return Safe_strdup(buffer);
+  return dbuf_detach_c_str (&dbuf);
 }
 
 static const char *

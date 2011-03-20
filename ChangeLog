@@ -2,6 +2,9 @@
 
 	* src/SDCCmain.c, src/SDCCmacro.c, src/SDCCmacro.h, src/SDCCutil.c,
 	  src/SDCCutil.h: dbuf-ized SDCCmacro.c
+	* src/SDCCutil.c, src/SDCCutil.h, src/SDCCmain.c, src/ds390/main.c, src/z80/main.c:
+	  dbuf-ized buildCmdLine(), moved to SDCCutil
+	* src/SDCCbuild_cmd.[ch]: deleted
 
 2011-03-19 Borut Razem <borut.razem AT gmail.com>
 

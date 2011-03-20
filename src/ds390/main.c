@@ -9,7 +9,6 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
-#include "../SDCCbuild_cmd.h"
 #include "../SDCCutil.h"
 #include "../SDCCglobl.h"
 #include "../SDCCsystem.h"
@@ -1172,22 +1171,26 @@ static void _tininative_genAssemblerEnd (FILE * of)
 /* tininative assembler , calls "macro", if it succeeds calls "a390" */
 static void _tininative_do_assemble (set *asmOptions)
 {
+    char *buf;
     static const char *macroCmd[] = {
         "macro","$1.a51",NULL
     };
     static const char *a390Cmd[] = {
         "a390","$1.mpp",NULL
     };
-    char buffer[100];
 
-    buildCmdLine(buffer,macroCmd,dstFileName,NULL,NULL,NULL);
-    if (sdcc_system(buffer)) {
+    buf = buildCmdLine(macroCmd, dstFileName, NULL, NULL, NULL);
+    if (sdcc_system(buf)) {
+        Safe_free (buf);
         exit(1);
     }
-    buildCmdLine(buffer,a390Cmd,dstFileName,NULL,NULL,asmOptions);
-    if (sdcc_system(buffer)) {
+    Safe_free (buf);
+    buf = buildCmdLine(a390Cmd, dstFileName, NULL, NULL, asmOptions);
+    if (sdcc_system(buf)) {
+        Safe_free (buf);
         exit(1);
     }
+    Safe_free (buf);
 }
 
 /* list of key words used by TININative */

@@ -35,7 +35,6 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 #include "SDCCerr.h"
-#include "SDCCbuild_cmd.h"
 #include "SDCCsystem.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
@@ -1762,7 +1761,7 @@ linkEdit (char **envp)
 
   if (port->linker.cmd)
     {
-      char buffer2[PATH_MAX];
+      char *buffer2;
       char buffer3[PATH_MAX];
       set *tempSet = NULL, *libSet = NULL;
 
@@ -1796,10 +1795,11 @@ linkEdit (char **envp)
             buffer3[0] = '\0';
         }
 
-      buildCmdLine (buffer2, port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
+      buffer2 = buildCmdLine (port->linker.cmd, buffer3, dbuf_c_str (&binFileName), (libSet ? joinStrSet (libSet) : NULL),
                     linkOptionsSet);
 
       buf = buildMacros (buffer2);
+      Safe_free (buffer2);
     }
   else
     {
@@ -1847,8 +1847,7 @@ assemble (char **envp)
     }
   else
     {
-      char buf[PATH_MAX * 2];
-      char *b;
+      char *buf;
 
       /* build assembler output filename */
       dbuf_init (&asmName, PATH_MAX);
@@ -1866,22 +1865,23 @@ assemble (char **envp)
 
       if (port->assembler.cmd)
         {
-          buildCmdLine (buf, port->assembler.cmd, dstFileName, dbuf_c_str (&asmName),
+          buf = buildCmdLine (port->assembler.cmd, dstFileName, dbuf_c_str (&asmName),
                     options.debug ? port->assembler.debug_opts : port->assembler.plain_opts, asmOptionsSet);
-          b = buf;
         }
       else
         {
-          b = buildMacros (port->assembler.mcmd);
+          buf = buildMacros (port->assembler.mcmd);
         }
 
       dbuf_destroy (&asmName);
 
-      if (sdcc_system (b))
+      if (sdcc_system (buf))
         {
+          Safe_free (buf);
           /* either system() or the assembler itself has reported an error */
           exit (EXIT_FAILURE);
         }
+      Safe_free (buf);
 
       if (options.cc_only && fullDstFileName && TARGET_PIC_LIKE)
         {

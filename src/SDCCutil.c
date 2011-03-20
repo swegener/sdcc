@@ -380,13 +380,13 @@ buildMacros (const char *cmd)
   return eval_macros (_mainValues, cmd);
 }
 
-void
-buildCmdLine2 (char *pbuffer, size_t len, const char *pcmd, ...)
+char *
+buildCmdLine2 (const char *pcmd, ...)
 {
   va_list ap;
   char *poutcmd;
 
-  assert (pbuffer && pcmd);
+  assert (pcmd);
   assert (_mainValues);
 
   va_start (ap, pcmd);
@@ -395,8 +395,7 @@ buildCmdLine2 (char *pbuffer, size_t len, const char *pcmd, ...)
 
   va_end (ap);
 
-  strncpyz (pbuffer, poutcmd, len);
-  Safe_free (poutcmd);
+  return poutcmd;
 }
 
 void

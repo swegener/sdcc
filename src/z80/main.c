@@ -483,29 +483,36 @@ _setValues(void)
   if (options.nostdlib == FALSE)
     {
       const char *s;
-      char path[PATH_MAX];
+      char *path;
       struct dbuf_s dbuf;
 
-      dbuf_init(&dbuf, PATH_MAX);
+      dbuf_init (&dbuf, PATH_MAX);
 
-      for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+      for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
         {
-          buildCmdLine2(path, sizeof path, "-k\"%s" DIR_SEPARATOR_STRING "{port}\" ", s);
-          dbuf_append_str(&dbuf, path);
+          path = buildCmdLine2 ("-k\"%s" DIR_SEPARATOR_STRING "{port}\" ", s);
+          dbuf_append_str (&dbuf, path);
+          Safe_free (path);
         }
-      buildCmdLine2(path, sizeof path, "-l\"{port}.lib\"", s);
-      dbuf_append_str(&dbuf, path);
+      path = buildCmdLine2 ("-l\"{port}.lib\"", s);
+      dbuf_append_str (&dbuf, path);
+      Safe_free (path);
 
       setMainValue ("z80libspec", dbuf_c_str(&dbuf));
-      dbuf_destroy(&dbuf);
+      dbuf_destroy (&dbuf);
 
-      for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+      for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
         {
           struct stat stat_buf;
 
-          buildCmdLine2(path, sizeof path, "%s" DIR_SEPARATOR_STRING "{port}" DIR_SEPARATOR_STRING "crt0{objext}", s);
-          if (stat(path, &stat_buf) == 0)
-            break;
+          path = buildCmdLine2 ("%s" DIR_SEPARATOR_STRING "{port}" DIR_SEPARATOR_STRING "crt0{objext}", s);
+          if (stat (path, &stat_buf) == 0)
+            {
+              Safe_free (path);
+              break;
+            }
+          else
+            Safe_free (path);
         }
 
       if (s == NULL)
@@ -513,12 +520,12 @@ _setValues(void)
       else
         {
           char *buf;
-          size_t len = strlen(path) + 3;
+          size_t len = strlen (path) + 3;
 
-          buf = Safe_alloc(len);
-          SNPRINTF(buf, len, "\"%s\"", path);
-          setMainValue("z80crt0", buf);
-          Safe_free(buf);
+          buf = Safe_alloc (len);
+          SNPRINTF (buf, len, "\"%s\"", path);
+          setMainValue ("z80crt0", buf);
+          Safe_free (buf);
         }
     }
   else
@@ -527,10 +534,10 @@ _setValues(void)
       setMainValue ("z80crt0", "");
     }
 
-  setMainValue ("z80extralibfiles", (s = joinStrSet(libFilesSet)));
-  Safe_free((void *)s);
-  setMainValue ("z80extralibpaths", (s = joinStrSet(libPathsSet)));
-  Safe_free((void *)s);
+  setMainValue ("z80extralibfiles", (s = joinStrSet (libFilesSet)));
+  Safe_free ((void *)s);
+  setMainValue ("z80extralibpaths", (s = joinStrSet (libPathsSet)));
+  Safe_free ((void *)s);
 
   if (IS_GB)
     {
@@ -546,8 +553,8 @@ _setValues(void)
   setMainValue ("stdobjdstfilename" , "{dstfilename}{objext}");
   setMainValue ("stdlinkdstfilename", "{dstfilename}{z80outext}");
 
-  setMainValue ("z80extraobj", (s = joinStrSet(relFilesSet)));
-  Safe_free((void *)s);
+  setMainValue ("z80extraobj", (s = joinStrSet (relFilesSet)));
+  Safe_free ((void *)s);
 
   sprintf (buffer, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
   setMainValue ("z80bases", buffer);

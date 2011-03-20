@@ -84,7 +84,7 @@ char *buildMacros (const char *cmd);
 
 void populateMainValues (const char **ppin);
 
-void buildCmdLine2 (char *pbuffer, size_t len, const char *pcmd, ...);
+char *buildCmdLine2 (const char *pcmd, ...);
 
 /** Returns true if sz starts with the string given in key.
  */

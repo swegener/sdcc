@@ -301,24 +301,6 @@ movb (const char *x)
 }
 
 /*-----------------------------------------------------------------*/
-/* movc - moves specified value into the carry                     */
-/*-----------------------------------------------------------------*/
-static void
-movc (const char *s)
-{
-  if (s == zero)
-    CLRC;
-  else if (s == one)
-    SETC;
-  else if (strcmp (s, "c"))
-    {/* it's not in carry already */
-      MOVA (s);
-      /* set C, if a >= 1 */
-      emitcode ("add", "a,#0xff");
-    }
-}
-
-/*-----------------------------------------------------------------*/
 /* pushB - saves register B if necessary                           */
 /*-----------------------------------------------------------------*/
 static bool
@@ -2134,6 +2116,35 @@ toBoolean (operand * oper)
   _endLazyDPSEvaluation ();
 }
 
+/*-----------------------------------------------------------------*/
+/* toCarry - make boolean and move into carry                      */
+/*-----------------------------------------------------------------*/
+static void
+toCarry (operand * oper)
+{
+  /* if the operand is a literal then
+     we know what the value is */
+  if (AOP_TYPE (oper) == AOP_LIT)
+    {
+      if ((int) operandLitValue (oper))
+        SETC;
+      else
+        CLRC;
+    }
+  else if (AOP_TYPE (oper) == AOP_CRY)
+    {
+      if (!IS_OP_ACCUSE (oper))
+        emitcode ("mov", "c,%s", oper->aop->aopu.aop_dir);
+    }
+  else
+    {
+      /* or the operand into a */
+      toBoolean (oper);
+      /* set C, if a >= 1 */
+      emitcode ("add", "a,#0xff");
+    }
+}
+
 
 /*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
@@ -2159,7 +2170,7 @@ genNot (iCode * ic)
         }
       else
         {
-          emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
+          toCarry (IC_LEFT (ic));
           emitcode ("cpl", "c");
           outBitC (IC_RESULT (ic));
         }
@@ -2995,9 +3006,7 @@ static void genSend(set *sendSet)
           else
             {
               /* we need to or */
-              toBoolean (IC_LEFT (sic));
-              /* set C, if a >= 1 */
-              emitcode ("add", "a,#0xff");
+              toCarry (IC_LEFT (sic));
               emitcode ("mov", "b[%d],c", bit);
             }
           bit_count++;
@@ -4208,40 +4217,42 @@ genRet (iCode * ic)
 
   if (IS_BIT(_G.currentFunc->etype))
     {
-      movc (aopGet (IC_LEFT (ic), 0, FALSE, FALSE, NULL));
-      size = 0;
+      if (!IS_OP_RUONLY (IC_LEFT (ic)))
+        toCarry (IC_LEFT (ic));
     }
-
-  while (size--)
+  else
     {
-      char *l;
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
+      while (size--)
         {
-          l = aopGet (IC_LEFT (ic), offset++,
-                      FALSE, TRUE, NULL);
-          emitcode ("push", "%s", l);
-          pushed++;
+          char *l;
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
+            {
+              l = aopGet (IC_LEFT (ic), offset++,
+                          FALSE, TRUE, NULL);
+              emitcode ("push", "%s", l);
+              pushed++;
+            }
+          else
+            {
+              /* Since A is the last element of fReturn,
+               * it is OK to clobber it in the aopGet.
+               */
+              l = aopGet (IC_LEFT (ic), offset,
+                          FALSE, FALSE, NULL);
+              if (strcmp (fReturn[offset], l))
+                emitcode ("mov", "%s,%s", fReturn[offset++], l);
+            }
         }
-      else
-        {
-          /* Since A is the last element of fReturn,
-           * it is OK to clobber it in the aopGet.
-           */
-          l = aopGet (IC_LEFT (ic), offset,
-                      FALSE, FALSE, NULL);
-          if (strcmp (fReturn[offset], l))
-            emitcode ("mov", "%s,%s", fReturn[offset++], l);
-        }
-    }
-  _endLazyDPSEvaluation ();
+      _endLazyDPSEvaluation ();
 
-  while (pushed)
-    {
-      pushed--;
-      if (strcmp (fReturn[pushed], "a"))
-        emitcode ("pop", fReturn[pushed]);
-      else
-        emitcode ("pop", "acc");
+      while (pushed)
+        {
+          pushed--;
+          if (strcmp (fReturn[pushed], "a"))
+            emitcode ("pop", fReturn[pushed]);
+          else
+            emitcode ("pop", "acc");
+        }
     }
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
@@ -7312,15 +7323,16 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
   /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY &&
-      AOP_TYPE (left) != AOP_CRY)
+  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    {
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    }
 
   size = AOP_SIZE (result);
 
@@ -7359,8 +7371,19 @@ genAnd (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit & bit;
-              emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-              emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+              if (IS_OP_ACCUSE (left))
+                {
+                  emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
+                }
+              else if (IS_OP_ACCUSE (right))
+                {
+                  emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
+              else
+                {
+                  emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+                  emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
             }
           else
             {
@@ -7745,15 +7768,16 @@ genOr (iCode * ic, iCode * ifx)
     }
 
   /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY &&
-      AOP_TYPE (left) != AOP_CRY)
+  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    {
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    }
 
   size = AOP_SIZE (result);
 
@@ -7790,8 +7814,19 @@ genOr (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit | bit;
-              emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-              emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
+              if (IS_OP_ACCUSE (left))
+                {
+                  emitcode ("orl", "c,%s", AOP (right)->aopu.aop_dir);
+                }
+              else if (IS_OP_ACCUSE (right))
+                {
+                  emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
+              else
+                {
+                  emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+                  emitcode ("orl", "c,%s", AOP (left)->aopu.aop_dir);
+                }
             }
           else
             {
@@ -7844,8 +7879,8 @@ genOr (iCode * ic, iCode * ifx)
         {
           // lit = 0, result = boolean(left)
           if (size)
-            emitcode ("setb", "c");
-          toBoolean (right);
+            SETC;
+          toBoolean (left);
           if (size)
             {
               symbol *tlbl = newiTempLabel (NULL);
@@ -7882,7 +7917,7 @@ genOr (iCode * ic, iCode * ifx)
                 }
               else if (bytelit == 0x0FF)
                 {
-                  aopPut (result, "#0xFF", offset);
+                  aopPut (result, "#0xff", offset);
                 }
               else if (IS_AOP_PREG (left))
                 {
@@ -8029,7 +8064,7 @@ genOr (iCode * ic, iCode * ifx)
                       /* dummy read of volatile operand */
                       if (isOperandVolatile (left, FALSE))
                         MOVA (aopGet (left, offset, FALSE, FALSE, NULL));
-                      aopPut (result, "#0xFF", offset);
+                      aopPut (result, "#0xff", offset);
                       continue;
                     }
                 }
@@ -8140,15 +8175,16 @@ genXor (iCode * ic, iCode * ifx)
     }
 
   /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY &&
-      AOP_TYPE (left) != AOP_CRY)
+  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    {
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    }
 
   size = AOP_SIZE (result);
 
@@ -8205,25 +8241,21 @@ genXor (iCode * ic, iCode * ifx)
           if (AOP_TYPE (right) == AOP_CRY)
             {
               // c = bit ^ bit;
-              emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+              if (IS_OP_ACCUSE (left))
+                {// left already is in the carry
+                  operand *tmp = right;
+                  right = left;
+                  left = tmp;
+                }
+              else
+                {
+                  toCarry (right);
+                }
             }
           else
             {
-              int sizer = AOP_SIZE (right);
               // c = bit ^ val
-              // if val>>1 != 0, result = 1
-              emitcode ("setb", "c");
-              while (sizer)
-                {
-                  MOVA (aopGet (right, sizer - 1, FALSE, FALSE, NULL));
-                  if (sizer == 1)
-                    // test the msb of the lsb
-                    emitcode ("anl", "a,#!constbyte",0xfe);
-                  emitcode ("jnz", "!tlabel", tlbl->key + 100);
-                  sizer--;
-                }
-              // val = (0,1)
-              emitcode ("rrc", "a");
+              toCarry (right);
             }
           emitcode ("jnb", "%s,!tlabel", AOP (left)->aopu.aop_dir, (tlbl->key + 100));
           emitcode ("cpl", "c");

@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
-  SDCCsymt.c - Code file for Symbols table related structures and MACRO's.
-        Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
+   SDCCsymt.c - Code file for Symbols table related structures and MACRO's.
+   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -184,7 +184,7 @@ addSym (bucket ** stab, void *sym, char *sname, int level, int block, int checkT
 /* deleteSym - deletes a symbol from the hash Table entry          */
 /*-----------------------------------------------------------------*/
 void
-deleteSym (bucket ** stab, void *sym, char *sname)
+deleteSym (bucket ** stab, void *sym, const char *sname)
 {
   int i = 0;
   bucket *bp;
@@ -304,7 +304,7 @@ findSymWithBlock (bucket ** stab, symbol * sym, int block)
 /* newSymbol () - returns a new pointer to a symbol                 */
 /*------------------------------------------------------------------*/
 symbol *
-newSymbol (char *name, int scope)
+newSymbol (const char *name, int scope)
 {
   symbol *sym;
 
@@ -337,7 +337,7 @@ newLink (SYM_LINK_CLASS select)
 /* newStruct - creats a new structdef from the free list            */
 /*------------------------------------------------------------------*/
 structdef *
-newStruct (char *tag)
+newStruct (const char *tag)
 {
   structdef *s;
 
@@ -552,7 +552,7 @@ addDecl (symbol * sym, int type, sym_link * p)
   unsigned float uf;
   ------------------------------------------------------------------*/
 void
-checkTypeSanity (sym_link * etype, char *name)
+checkTypeSanity (sym_link * etype, const char *name)
 {
   char *noun;
 
@@ -654,7 +654,7 @@ finalizeSpec (sym_link * lnk)
 /* mergeSpec - merges two specifiers and returns the new one        */
 /*------------------------------------------------------------------*/
 sym_link *
-mergeSpec (sym_link * dest, sym_link * src, char *name)
+mergeSpec (sym_link * dest, sym_link * src, const char *name)
 {
   if (!IS_SPEC (dest) || !IS_SPEC (src))
     {
@@ -762,7 +762,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
 /* mergeDeclSpec - merges a specifier and a declarator              */
 /*------------------------------------------------------------------*/
 sym_link *
-mergeDeclSpec (sym_link * dest, sym_link * src, char *name)
+mergeDeclSpec (sym_link * dest, sym_link * src, const char *name)
 {
   sym_link *decl, *spec, *lnk;
 
@@ -2971,10 +2971,12 @@ processFuncArgs (symbol * func)
   while (val)
     {
       int argreg = 0;
-      char buffer[SDCC_NAME_MAX + 1];
+      struct dbuf_s dbuf;
 
-      SNPRINTF (buffer, sizeof (buffer), "%s parameter %d", func->name, pNum);
-      checkTypeSanity (val->etype, buffer);
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "%s parameter %d", func->name, pNum);
+      checkTypeSanity (val->etype, dbuf_c_str (&dbuf));
+      dbuf_destroy (&dbuf);
 
       /* mark it as a register parameter if
          the function does not have VA_ARG
@@ -3602,8 +3604,8 @@ sym_link *charType;
 sym_link *floatType;
 sym_link *fixed16x16Type;
 
-static char *
-_mangleFunctionName (char *in)
+static const char *
+_mangleFunctionName (const char *in)
 {
   if (port->getMangledFunctionName)
     {
@@ -3637,7 +3639,7 @@ _mangleFunctionName (char *in)
 /*            "ui" -  unsigned int                                 */
 /*-----------------------------------------------------------------*/
 sym_link *
-typeFromStr (char *s)
+typeFromStr (const char *s)
 {
   sym_link *r = newLink (DECLARATOR);
   int usign = 0;
@@ -3737,7 +3739,7 @@ typeFromStr (char *s)
 /* initCSupport - create functions for C support routines          */
 /*-----------------------------------------------------------------*/
 void
-initCSupport ()
+initCSupport (void)
 {
   const char *smuldivmod[] = {
     "mul", "div", "mod"
@@ -3817,16 +3819,20 @@ initCSupport ()
         {
           for (su = 0; su < 2; su++)
             {
+              struct dbuf_s dbuf;
+
+              dbuf_init (&dbuf, 128);
               if (tofrom)
                 {
-                  SNPRINTF (buffer, sizeof (buffer), "__fs2%s%s", ssu[su * 3], sbwd[bwd]);
-                  conv[tofrom][bwd][su] = funcOfType (buffer, multypes[bwd][su], floatType, 1, options.float_rent);
+                  dbuf_printf (&dbuf, "__fs2%s%s", ssu[su * 3], sbwd[bwd]);
+                  conv[tofrom][bwd][su] = funcOfType (dbuf_c_str (&dbuf), multypes[bwd][su], floatType, 1, options.float_rent);
                 }
               else
                 {
-                  SNPRINTF (buffer, sizeof (buffer), "__%s%s2fs", ssu[su * 3], sbwd[bwd]);
-                  conv[tofrom][bwd][su] = funcOfType (buffer, floatType, multypes[bwd][su], 1, options.float_rent);
+                  dbuf_printf (&dbuf, "__%s%s2fs", ssu[su * 3], sbwd[bwd]);
+                  conv[tofrom][bwd][su] = funcOfType (dbuf_c_str (&dbuf), floatType, multypes[bwd][su], 1, options.float_rent);
                 }
+              dbuf_destroy (&dbuf);
             }
         }
     }
@@ -3837,24 +3843,30 @@ initCSupport ()
         {
           for (su = 0; su < 2; su++)
             {
+              struct dbuf_s dbuf;
+
+              dbuf_init (&dbuf, 128);
               if (tofrom)
                 {
-                  SNPRINTF (buffer, sizeof (buffer), "__fps16x162%s%s", ssu[su * 3], fp16x16sbwd[bwd]);
+                  dbuf_printf (&dbuf, "__fps16x162%s%s", ssu[su * 3], fp16x16sbwd[bwd]);
                   if (bwd == 3)
-                    fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, floatType, fixed16x16Type, 1, options.float_rent);
+                    fp16x16conv[tofrom][bwd][su] =
+                      funcOfType (dbuf_c_str (&dbuf), floatType, fixed16x16Type, 1, options.float_rent);
                   else
                     fp16x16conv[tofrom][bwd][su] =
-                      funcOfType (buffer, multypes[bwd][su], fixed16x16Type, 1, options.float_rent);
+                      funcOfType (dbuf_c_str (&dbuf), multypes[bwd][su], fixed16x16Type, 1, options.float_rent);
                 }
               else
                 {
-                  SNPRINTF (buffer, sizeof (buffer), "__%s%s2fps16x16", ssu[su * 3], fp16x16sbwd[bwd]);
+                  dbuf_printf (&dbuf, "__%s%s2fps16x16", ssu[su * 3], fp16x16sbwd[bwd]);
                   if (bwd == 3)
-                    fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, floatType, 1, options.float_rent);
+                    fp16x16conv[tofrom][bwd][su] =
+                      funcOfType (dbuf_c_str (&dbuf), fixed16x16Type, floatType, 1, options.float_rent);
                   else
                     fp16x16conv[tofrom][bwd][su] =
-                      funcOfType (buffer, fixed16x16Type, multypes[bwd][su], 1, options.float_rent);
+                      funcOfType (dbuf_c_str (&dbuf), fixed16x16Type, multypes[bwd][su], 1, options.float_rent);
                 }
+              dbuf_destroy (&dbuf);
             }
         }
     }
@@ -3866,12 +3878,12 @@ initCSupport ()
         {
           for (su = 0; su < 2; su++)
             {
-              SNPRINTF (buffer, sizeof(buffer),
-                        "_%s%s%s",
-                       smuldivmod[muldivmod],
-                       ssu[su*3],
-                       sbwd[bwd]);
-              muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), multypes[bwd][su], multypes[bwd][su], 2, options.intlong_rent);
+              struct dbuf_s dbuf;
+
+              dbuf_init (&dbuf, 128);
+              dbuf_printf (&dbuf, "_%s%s%s", smuldivmod[muldivmod], ssu[su*3], sbwd[bwd]);
+              muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(dbuf_c_str (&dbuf)), multypes[bwd][su], multypes[bwd][su], 2, options.intlong_rent);
+              dbuf_destroy (&dbuf);
               FUNC_NONBANKED (muldiv[muldivmod][bwd][su]->type) = 1;
             }
         }
@@ -3892,9 +3904,14 @@ initCSupport ()
           /* div and mod : s8_t x s8_t -> s8_t should be s8_t x s8_t -> s16_t, see below */
           if (!TARGET_IS_PIC16 || muldivmod != 1 || su != 0)
             {
-              SNPRINTF (buffer, sizeof (buffer), "_%s%s%s", smuldivmod[muldivmod], ssu[su], sbwd[bwd]);
-              muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName (buffer),
-                                                       multypes[bwd][su % 2], multypes[bwd][su / 2], 2, options.intlong_rent);
+              struct dbuf_s dbuf;
+
+              dbuf_init (&dbuf, 128);
+              dbuf_printf (&dbuf, "_%s%s%s", smuldivmod[muldivmod], ssu[su], sbwd[bwd]);
+              muldiv[muldivmod][bwd][su] =
+                funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[bwd][su % 2], multypes[bwd][su / 2], 2,
+                            options.intlong_rent);
+              dbuf_destroy (&dbuf);
             }
         }
     }
@@ -3908,9 +3925,14 @@ initCSupport ()
               /* div and mod : s8_t x s8_t -> s8_t should be s8_t x s8_t -> s16_t, see below */
               if (!TARGET_IS_PIC16 || muldivmod != 1 || bwd != 0 || su != 0)
                 {
-                  SNPRINTF (buffer, sizeof (buffer), "_%s%s%s", smuldivmod[muldivmod], ssu[su * 3], sbwd[bwd]);
-                  muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName (buffer),
-                                                           multypes[bwd][su], multypes[bwd][su], 2, options.intlong_rent);
+                  struct dbuf_s dbuf;
+
+                  dbuf_init (&dbuf, 128);
+                  dbuf_printf (&dbuf, "_%s%s%s", smuldivmod[muldivmod], ssu[su * 3], sbwd[bwd]);
+                  muldiv[muldivmod][bwd][su] =
+                    funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[bwd][su], multypes[bwd][su], 2,
+                                options.intlong_rent);
+                  dbuf_destroy (&dbuf);
                 }
             }
         }
@@ -3927,9 +3949,13 @@ initCSupport ()
       bwd = 0;
       for (muldivmod = 1; muldivmod < 2; muldivmod++)
         {
-          SNPRINTF (buffer, sizeof (buffer), "_%s%s%s", smuldivmod[muldivmod], ssu[su], sbwd[bwd]);
-          muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName (buffer),
-                                                   multypes[1][su], multypes[bwd][su], 2, options.intlong_rent);
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 128);
+          dbuf_printf (&dbuf, "_%s%s%s", smuldivmod[muldivmod], ssu[su], sbwd[bwd]);
+          muldiv[muldivmod][bwd][su] =
+            funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[1][su], multypes[bwd][su], 2, options.intlong_rent);
+          dbuf_destroy (&dbuf);
         }
     }
 
@@ -3941,9 +3967,13 @@ initCSupport ()
   for (bwd = 1; bwd < 3; bwd++)
     {
       /* mul, int/long */
-      SNPRINTF (buffer, sizeof (buffer), "_%s%s", smuldivmod[muldivmod], sbwd[bwd]);
-      muldiv[muldivmod][bwd][0] = funcOfType (_mangleFunctionName (buffer),
-                                              multypes[bwd][su], multypes[bwd][su], 2, options.intlong_rent);
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "_%s%s", smuldivmod[muldivmod], sbwd[bwd]);
+      muldiv[muldivmod][bwd][0] =
+        funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[bwd][su], multypes[bwd][su], 2, options.intlong_rent);
+      dbuf_destroy (&dbuf);
       /* signed = unsigned */
       muldiv[muldivmod][bwd][1] = muldiv[muldivmod][bwd][0];
     }
@@ -3954,9 +3984,14 @@ initCSupport ()
         {
           for (su = 0; su < 2; su++)
             {
-              SNPRINTF (buffer, sizeof (buffer), "_%s%s%s", srlrr[slsr], ssu[su * 3], sbwd[bwd]);
-              rlrr[slsr][bwd][su] = funcOfType (_mangleFunctionName (buffer),
-                                                multypes[bwd][su], multypes[0][0], 2, options.intlong_rent);
+              struct dbuf_s dbuf;
+
+              dbuf_init (&dbuf, 128);
+              dbuf_printf (&dbuf, "_%s%s%s", srlrr[slsr], ssu[su * 3], sbwd[bwd]);
+              rlrr[slsr][bwd][su] =
+                funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[bwd][su], multypes[0][0], 2,
+                            options.intlong_rent);
+              dbuf_destroy (&dbuf);
             }
         }
     }

@@ -66,9 +66,7 @@ eval_macros (hTab * pvals, const char *pfrom)
                 wassertl (0, "Unterminated macro expansion");
               }
 
-            name = Safe_malloc (pend - pfrom + 1);
-            memcpy (name, pfrom, pend - pfrom);
-            name[pend - pfrom] = '\0';
+            name = Safe_strndup (pfrom, pend - pfrom);
 
             /* Look up the value in the hash table */
             pval = shash_find (pvals, name);
@@ -147,7 +145,7 @@ mvsprintf (hTab * pvals, const char *pformat, va_list ap)
   p = eval_macros (pvals, pformat);
 
   /* Evaluate all the arguments */
-  dbuf_printf(&dbuf, p, ap);
+  dbuf_printf (&dbuf, p, ap);
   Safe_free (p);
 
   /* Recursivly evaluate any macros that were used as arguments */

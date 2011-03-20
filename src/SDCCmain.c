@@ -1210,12 +1210,7 @@ parseCmdLine (int argc, char **argv)
                 if (IS_DIR_SEPARATOR (outName[len - 1]))
                   {
                     /* only output path specified */
-                    char *p;
-
-                    p = Safe_malloc (len);
-                    memcpy (p, outName, len - 1);
-                    p[len - 1] = '\0';
-                    dstPath = p;
+                    dstPath = Safe_strndup (outName, len - 1);
                     fullDstFileName = NULL;
                   }
                 else

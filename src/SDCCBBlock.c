@@ -30,20 +30,20 @@ int eBBNum = 0;
 set *graphEdges = NULL;         /* list of edges in this flow graph */
 
 struct _dumpFiles dumpFiles[] = {
-  {DUMP_RAW0,     ".dumpraw0",     NULL},
-  {DUMP_RAW1,     ".dumpraw1",     NULL},
-  {DUMP_CSE,      ".dumpcse",      NULL},
-  {DUMP_DFLOW,    ".dumpdflow",    NULL},
-  {DUMP_GCSE,     ".dumpgcse",     NULL},
+  {DUMP_RAW0, ".dumpraw0", NULL},
+  {DUMP_RAW1, ".dumpraw1", NULL},
+  {DUMP_CSE, ".dumpcse", NULL},
+  {DUMP_DFLOW, ".dumpdflow", NULL},
+  {DUMP_GCSE, ".dumpgcse", NULL},
   {DUMP_DEADCODE, ".dumpdeadcode", NULL},
-  {DUMP_LOOP,     ".dumploop",     NULL},
-  {DUMP_LOOPG,    ".dumploopg",    NULL},
-  {DUMP_LOOPD,    ".dumploopd",    NULL},
-  {DUMP_RANGE,    ".dumprange",    NULL},
-  {DUMP_PACK,     ".dumppack",     NULL},
-  {DUMP_RASSGN,   ".dumprassgn",   NULL},
-  {DUMP_LRANGE,   ".dumplrange",   NULL},
-  {0,             NULL,            NULL}
+  {DUMP_LOOP, ".dumploop", NULL},
+  {DUMP_LOOPG, ".dumploopg", NULL},
+  {DUMP_LOOPD, ".dumploopd", NULL},
+  {DUMP_RANGE, ".dumprange", NULL},
+  {DUMP_PACK, ".dumppack", NULL},
+  {DUMP_RASSGN, ".dumprassgn", NULL},
+  {DUMP_LRANGE, ".dumplrange", NULL},
+  {0, NULL, NULL}
 };
 
 /*-----------------------------------------------------------------*/
@@ -87,45 +87,51 @@ newEdge (eBBlock * from, eBBlock * to)
 /*-----------------------------------------------------------------*/
 /* createDumpFile - create the dump file                           */
 /*-----------------------------------------------------------------*/
-FILE *createDumpFile (int id) {
-  struct _dumpFiles *dumpFilesPtr=dumpFiles;
-  static int dumpIndex=0;
+FILE *
+createDumpFile (int id)
+{
+  struct _dumpFiles *dumpFilesPtr = dumpFiles;
+  static int dumpIndex = 0;
   static char dumpIndexStr[32];
 
-  while (dumpFilesPtr->id) {
-    if (dumpFilesPtr->id==id)
-      break;
-    dumpFilesPtr++;
-  }
+  while (dumpFilesPtr->id)
+    {
+      if (dumpFilesPtr->id == id)
+        break;
+      dumpFilesPtr++;
+    }
 
-  if (!dumpFilesPtr->id) {
-    fprintf (stdout, "internal error: createDumpFile: unknown dump file.\n");
-    exit (1);
-  }
-
-  sprintf(dumpIndexStr, ".%d", dumpIndex);
-  dumpIndex++;
-
-  if (!dumpFilesPtr->filePtr) {
-    // not used before, create it
-    struct dbuf_s dumpFileName;
-
-    dbuf_init (&dumpFileName, PATH_MAX);
-    dbuf_append_str (&dumpFileName, dstFileName);
-#ifdef _DEBUG
-    dbuf_append_str (&dumpFileName, dumpIndexStr);
-#endif
-    dbuf_append_str (&dumpFileName, dumpFilesPtr->ext);
-    if (!(dumpFilesPtr->filePtr = fopen (dbuf_c_str (&dumpFileName), "w"))) {
-      werror (E_FILE_OPEN_ERR, dbuf_c_str (&dumpFileName));
-      dbuf_destroy (&dumpFileName);
+  if (!dumpFilesPtr->id)
+    {
+      fprintf (stdout, "internal error: createDumpFile: unknown dump file.\n");
       exit (1);
     }
-    dbuf_destroy (&dumpFileName);
-  }
+
+  sprintf (dumpIndexStr, ".%d", dumpIndex);
+  dumpIndex++;
+
+  if (!dumpFilesPtr->filePtr)
+    {
+      // not used before, create it
+      struct dbuf_s dumpFileName;
+
+      dbuf_init (&dumpFileName, PATH_MAX);
+      dbuf_append_str (&dumpFileName, dstFileName);
+#ifdef _DEBUG
+      dbuf_append_str (&dumpFileName, dumpIndexStr);
+#endif
+      dbuf_append_str (&dumpFileName, dumpFilesPtr->ext);
+      if (!(dumpFilesPtr->filePtr = fopen (dbuf_c_str (&dumpFileName), "w")))
+        {
+          werror (E_FILE_OPEN_ERR, dbuf_c_str (&dumpFileName));
+          dbuf_destroy (&dumpFileName);
+          exit (1);
+        }
+      dbuf_destroy (&dumpFileName);
+    }
 
 #if 0
-  fprintf(dumpFilesPtr->filePtr, "Dump file index: %d\n", dumpIndex);
+  fprintf (dumpFilesPtr->filePtr, "Dump file index: %d\n", dumpIndex);
 #endif
 
   return dumpFilesPtr->filePtr;
@@ -134,14 +140,18 @@ FILE *createDumpFile (int id) {
 /*-----------------------------------------------------------------*/
 /* closeDumpFiles - close possible opened dumpfiles                */
 /*-----------------------------------------------------------------*/
-void closeDumpFiles() {
+void
+closeDumpFiles ()
+{
   struct _dumpFiles *dumpFilesPtr;
 
-  for (dumpFilesPtr=dumpFiles; dumpFilesPtr->id; dumpFilesPtr++) {
-    if (dumpFilesPtr->filePtr) {
-      fclose (dumpFilesPtr->filePtr);
+  for (dumpFilesPtr = dumpFiles; dumpFilesPtr->id; dumpFilesPtr++)
+    {
+      if (dumpFilesPtr->filePtr)
+        {
+          fclose (dumpFilesPtr->filePtr);
+        }
     }
-  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -154,25 +164,23 @@ dumpLiveRanges (int id, hTab * liveRanges)
   symbol *sym;
   int k;
 
-  if (id) {
-    file=createDumpFile(id);
-  } else {
-    file = stdout;
-  }
+  if (id)
+    {
+      file = createDumpFile (id);
+    }
+  else
+    {
+      file = stdout;
+    }
 
   if (currFunc)
-      fprintf(file,"------------- Func %s -------------\n",currFunc->name);
-  for (sym = hTabFirstItem (liveRanges, &k); sym;
-       sym = hTabNextItem (liveRanges, &k))
+    fprintf (file, "------------- Func %s -------------\n", currFunc->name);
+  for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k))
     {
 
       fprintf (file, "%s [k%d lr%d:%d so:%d]{ re%d rm%d}",
                (sym->rname[0] ? sym->rname : sym->name),
-               sym->key,
-               sym->liveFrom, sym->liveTo,
-               sym->stack,
-               sym->isreqv, sym->remat
-        );
+               sym->key, sym->liveFrom, sym->liveTo, sym->stack, sym->isreqv, sym->remat);
 
       fprintf (file, "{");
       printTypeChain (sym->type, file);
@@ -181,11 +189,11 @@ dumpLiveRanges (int id, hTab * liveRanges)
           fprintf (file, "}{ sir@ %s", sym->usl.spillLoc->rname);
         }
       fprintf (file, "} clashes with ");
-      bitVectDebugOn(sym->clashes,file);
+      bitVectDebugOn (sym->clashes, file);
       fprintf (file, "\n");
     }
 
-  fflush(file);
+  fflush (file);
 }
 
 
@@ -199,12 +207,12 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
   int i, d;
   eBBlock *bb;
   set *cseSet;
-  eBBlock ** ebbs = ebbi->dfOrder ? ebbi->dfOrder : ebbi->bbOrder;
+  eBBlock **ebbs = ebbi->dfOrder ? ebbi->dfOrder : ebbi->bbOrder;
   int count = ebbi->count;
 
   if (id)
     {
-      of=createDumpFile(id);
+      of = createDumpFile (id);
     }
   else
     {
@@ -219,30 +227,25 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
                ebbs[i]->dfnum, ebbs[i]->bbnum, ebbs[i]->entryLabel->level,
                ebbs[i]->depth,
                ebbs[i]->noPath ? " noPath" : "",
-               ebbs[i]->partOfLoop ? " partOfLoop" : "",
-               ebbs[i]->isLastInLoop ? " isLastInLoop" : "");
+               ebbs[i]->partOfLoop ? " partOfLoop" : "", ebbs[i]->isLastInLoop ? " isLastInLoop" : "");
 
       // a --nolabelopt makes this more readable
       fprintf (of, "\nsuccessors: ");
-      for (bb=setFirstItem(ebbs[i]->succList);
-           bb;
-           bb=setNextItem(ebbs[i]->succList))
+      for (bb = setFirstItem (ebbs[i]->succList); bb; bb = setNextItem (ebbs[i]->succList))
         {
           fprintf (of, "%s ", bb->entryLabel->name);
         }
       fprintf (of, "\npredecessors: ");
-      for (bb=setFirstItem(ebbs[i]->predList);
-           bb;
-           bb=setNextItem(ebbs[i]->predList))
+      for (bb = setFirstItem (ebbs[i]->predList); bb; bb = setNextItem (ebbs[i]->predList))
         {
           fprintf (of, "%s ", bb->entryLabel->name);
         }
       fprintf (of, "\ndominators: ");
-      for (d=0; d<ebbs[i]->domVect->size; d++)
+      for (d = 0; d < ebbs[i]->domVect->size; d++)
         {
-          if (bitVectBitValue(ebbs[i]->domVect, d))
+          if (bitVectBitValue (ebbs[i]->domVect, d))
             {
-              fprintf (of, "%s ", ebbi->bbOrder[d]->entryLabel->name); //ebbs[d]->entryLabel->name);
+              fprintf (of, "%s ", ebbi->bbOrder[d]->entryLabel->name);  //ebbs[d]->entryLabel->name);
             }
         }
       fprintf (of, "\n");
@@ -269,26 +272,26 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
         }
 
       fprintf (of, "\ninExprs:");
-      for (cseSet = ebbs[i]->inExprs; cseSet; cseSet=cseSet->next)
+      for (cseSet = ebbs[i]->inExprs; cseSet; cseSet = cseSet->next)
         {
-          cseDef *item=cseSet->item;
-          fprintf (of, " %s(%d)",OP_SYMBOL(item->sym)->name,item->diCode->key);
+          cseDef *item = cseSet->item;
+          fprintf (of, " %s(%d)", OP_SYMBOL (item->sym)->name, item->diCode->key);
           if (item->fromGlobal)
             fprintf (of, "g");
         }
       fprintf (of, "\noutExprs:");
-      for (cseSet = ebbs[i]->outExprs; cseSet; cseSet=cseSet->next)
+      for (cseSet = ebbs[i]->outExprs; cseSet; cseSet = cseSet->next)
         {
-          cseDef *item=cseSet->item;
-          fprintf (of, " %s(%d)",OP_SYMBOL(item->sym)->name,item->diCode->key);
+          cseDef *item = cseSet->item;
+          fprintf (of, " %s(%d)", OP_SYMBOL (item->sym)->name, item->diCode->key);
           if (item->fromGlobal)
             fprintf (of, "g");
         }
       fprintf (of, "\nkilledExprs:");
-      for (cseSet = ebbs[i]->killedExprs; cseSet; cseSet=cseSet->next)
+      for (cseSet = ebbs[i]->killedExprs; cseSet; cseSet = cseSet->next)
         {
-          cseDef *item=cseSet->item;
-          fprintf (of, " %s(%d)",OP_SYMBOL(item->sym)->name,item->diCode->key);
+          cseDef *item = cseSet->item;
+          fprintf (of, " %s(%d)", OP_SYMBOL (item->sym)->name, item->diCode->key);
           if (item->fromGlobal)
             fprintf (of, "g");
         }
@@ -296,7 +299,7 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
       fprintf (of, "\n----------------------------------------------------------------\n");
       printiCChain (ebbs[i]->sch, of);
     }
-  fflush(of);
+  fflush (of);
 }
 
 /*-----------------------------------------------------------------*/
@@ -316,15 +319,16 @@ iCode2eBBlock (iCode * ic)
     ebb->entryLabel = ic->label;
   else
     {
-      SNPRINTF (buffer, sizeof(buffer), "_eBBlock%d", eBBNum++);
-      ebb->entryLabel = newSymbol (buffer, 1);
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "_eBBlock%d", eBBNum++);
+      ebb->entryLabel = newSymbol (dbuf_c_str (&dbuf), 1);
+      dbuf_destroy (&dbuf);
       ebb->entryLabel->key = labelKey++;
     }
 
-  if (ic &&
-      (ic->op == GOTO ||
-       ic->op == JUMPTABLE ||
-       ic->op == IFX))
+  if (ic && (ic->op == GOTO || ic->op == JUMPTABLE || ic->op == IFX))
     {
       ebb->ech = ebb->sch;
       return ebb;
@@ -335,11 +339,10 @@ iCode2eBBlock (iCode * ic)
     {
       ebb->hasFcall = 1;
       if (currFunc)
-        FUNC_HASFCALL(currFunc->type) = 1;
+        FUNC_HASFCALL (currFunc->type) = 1;
     }
 
-  if ((ic->next && ic->next->op == LABEL) ||
-      !ic->next)
+  if ((ic->next && ic->next->op == LABEL) || !ic->next)
     {
       ebb->ech = ebb->sch;
       return ebb;
@@ -357,15 +360,12 @@ iCode2eBBlock (iCode * ic)
         {
           ebb->hasFcall = 1;
           if (currFunc)
-            FUNC_HASFCALL(currFunc->type) = 1;
+            FUNC_HASFCALL (currFunc->type) = 1;
         }
 
       /* if the next one is a label */
       /* if this is a goto or ifx */
-      if (loop->next->op == LABEL ||
-          loop->op == GOTO ||
-          loop->op == JUMPTABLE ||
-          loop->op == IFX)
+      if (loop->next->op == LABEL || loop->op == GOTO || loop->op == JUMPTABLE || loop->op == IFX)
         break;
     }
 
@@ -381,7 +381,7 @@ iCode2eBBlock (iCode * ic)
 eBBlock *
 eBBWithEntryLabel (ebbIndex * ebbi, symbol * eLabel)
 {
-  eBBlock ** ebbs = ebbi->bbOrder;
+  eBBlock **ebbs = ebbi->bbOrder;
   int count = ebbi->count;
   int i;
 
@@ -459,8 +459,7 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
 
   /* if the last instruction is a goto */
   /* we add it just before the goto    */
-  if (ebp->ech->op == GOTO || ebp->ech->op == JUMPTABLE
-      || ebp->ech->op == RETURN)
+  if (ebp->ech->op == GOTO || ebp->ech->op == JUMPTABLE || ebp->ech->op == RETURN)
     {
       ic->filename = ebp->ech->filename;
       ic->lineno = ebp->ech->lineno;
@@ -525,7 +524,7 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
 void
 remiCodeFromeBBlock (eBBlock * ebb, iCode * ic)
 {
-  wassert (ic->seq>=ebb->fSeq && ic->seq<=ebb->lSeq);
+  wassert (ic->seq >= ebb->fSeq && ic->seq <= ebb->lSeq);
   if (ic->prev)
     ic->prev->next = ic->next;
   else
@@ -549,7 +548,7 @@ iCodeBreakDown (iCode * ic)
 
   ebbi = Safe_alloc (sizeof (ebbIndex));
   ebbi->count = 0;
-  ebbi->dfOrder = NULL; /* no depth first order information yet */
+  ebbi->dfOrder = NULL;         /* no depth first order information yet */
 
   /* allocate for the first entry */
 
@@ -583,9 +582,7 @@ iCodeBreakDown (iCode * ic)
       /* to already exists, if yes then this could   */
       /* be a loop, add a preheader to the block it  */
       /* goes to  if it does not already have one    */
-      if (ebbs[(ebbi->count) - 1]->ech &&
-          (ebbs[(ebbi->count) - 1]->ech->op == GOTO ||
-           ebbs[(ebbi->count) - 1]->ech->op == IFX))
+      if (ebbs[(ebbi->count) - 1]->ech && (ebbs[(ebbi->count) - 1]->ech->op == GOTO || ebbs[(ebbi->count) - 1]->ech->op == IFX))
         {
 
           symbol *label;
@@ -597,11 +594,10 @@ iCodeBreakDown (iCode * ic)
             label = IC_FALSE (ebbs[(ebbi->count) - 1]->ech);
 
           if ((destBlock = eBBWithEntryLabel (ebbi, label)) &&
-              destBlock->preHeader == NULL &&
-              otherPathsPresent (ebbs, destBlock))
+              destBlock->preHeader == NULL && otherPathsPresent (ebbs, destBlock))
             {
 
-              symbol *preHeaderLabel  = newiTempLoopHeaderLabel (1);
+              symbol *preHeaderLabel = newiTempLoopHeaderLabel (1);
               int i, j;
               eBBlock *pBlock;
 
@@ -676,7 +672,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
             {
               bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
               IC_COND (ic) = operandFromOperand (dest);
-              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+              OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
               continue;
             }
 
@@ -685,7 +681,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
               bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
               IC_RIGHT (ic) = operandFromOperand (dest);
               IC_RIGHT (ic)->isaddr = 0;
-              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+              OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
             }
 
           if (isOperandEqual (IC_LEFT (ic), src))
@@ -701,17 +697,16 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
                   IC_LEFT (ic) = operandFromOperand (dest);
                   IC_LEFT (ic)->isaddr = 0;
                 }
-              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+              OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
             }
 
           /* special case for pointer sets */
-          if (POINTER_SET (ic) &&
-              isOperandEqual (IC_RESULT (ic), src))
+          if (POINTER_SET (ic) && isOperandEqual (IC_RESULT (ic), src))
             {
               bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
               IC_RESULT (ic) = operandFromOperand (dest);
               IC_RESULT (ic)->isaddr = 1;
-              OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
+              OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
             }
         }
     }
@@ -767,13 +762,11 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
       if (ebbs[i]->sch == NULL)
         continue;
 
-      if (ebbs[i]->noPath &&
-          (ebbs[i]->entryLabel != entryLabel &&
-           ebbs[i]->entryLabel != returnLabel))
+      if (ebbs[i]->noPath && (ebbs[i]->entryLabel != entryLabel && ebbs[i]->entryLabel != returnLabel))
         {
           iCode *ic = NULL;
           bool foundNonlabel = 0;
-          ic=ebbs[i]->sch;
+          ic = ebbs[i]->sch;
           do
             {
               if (ic->op != LABEL)
@@ -781,7 +774,7 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
                   foundNonlabel = 1;
                   break;
                 }
-              if (ic==ebbs[i]->ech)
+              if (ic == ebbs[i]->ech)
                 break;
               ic = ic->next;
             }
@@ -843,8 +836,7 @@ otherPathsPresent (eBBlock ** ebbs, eBBlock * this)
   /* in this case check if the previous block  */
   /* ends in a goto if it does then we have no */
   /* path else we have a path                  */
-  if (this->bbnum && ebbs[this->bbnum - 1]->ech &&
-      ebbs[this->bbnum - 1]->ech->op == GOTO)
+  if (this->bbnum && ebbs[this->bbnum - 1]->ech && ebbs[this->bbnum - 1]->ech->op == GOTO)
     return 0;
   else
     return 1;

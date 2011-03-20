@@ -1,3 +1,12 @@
+2011-03-20 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCicode.c, src/SDCCicode.h, src/SDCCsymt.c, src/SDCCsymt.h,
+	  src/port.h, src/SDCCast.c, src/SDCCast.h, src/SDCCBBlock.c,
+	  src/SDCCBBlock.h, src/z80/main.c, src/pic16/main.c:
+	  dbuf-ized, get rid of global buffer, code cleaning
+	* src/SDCCmacro.c, src/SDCCmain.c, support/Util/NewAlloc.c,
+	  support/Util/newalloc.h: introduced Safe_strndup()
+
 2011-03-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (movc, toCarry): replaced movc with toCarry,

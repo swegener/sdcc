@@ -831,8 +831,8 @@ _pic16_getRegName (struct regs *reg)
 
 
 #if 1
-static char *
-_pic16_mangleFunctionName (char *sz)
+static const char *
+_pic16_mangleFunctionName (const char *sz)
 {
 //  fprintf(stderr, "mangled function name: %s\n", sz);
 

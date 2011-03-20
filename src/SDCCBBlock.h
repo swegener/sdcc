@@ -28,63 +28,63 @@
 
 /* definition of a basic block */
 typedef struct eBBlock
-  {
-    int dfnum;			/* depth first number */
-    int bbnum;			/* index into array of numbers */
-    int depth;			/* loop depth of this block */
-    int fSeq;			/* sequence number of first iCode */
-    int lSeq;			/* sequence number of the last iCode */
-    unsigned int visited:1;	/* visitied flag      */
-    unsigned int hasFcall:1;	/* has a function call */
-    unsigned int noPath:1;	/* there is no path from _entry to this block */
-    unsigned int isLastInLoop:1;	/* is the last block in a loop */
-    struct eBBlock *isConditionalExitFrom; /* this block ends with a return or goto from a conditional block*/
-    symbol *entryLabel;		/* entry label */
+{
+  int dfnum;                    /* depth first number */
+  int bbnum;                    /* index into array of numbers */
+  int depth;                    /* loop depth of this block */
+  int fSeq;                     /* sequence number of first iCode */
+  int lSeq;                     /* sequence number of the last iCode */
+  unsigned int visited:1;       /* visitied flag      */
+  unsigned int hasFcall:1;      /* has a function call */
+  unsigned int noPath:1;        /* there is no path from _entry to this block */
+  unsigned int isLastInLoop:1;  /* is the last block in a loop */
+  struct eBBlock *isConditionalExitFrom;        /* this block ends with a return or goto from a conditional block */
+  symbol *entryLabel;           /* entry label */
 
-    iCode *sch;			/* pointer to start of code chain */
-    iCode *ech;			/* pointer to last of code chain  */
+  iCode *sch;                   /* pointer to start of code chain */
+  iCode *ech;                   /* pointer to last of code chain  */
 
-    struct eBBlock *preHeader;	/* preheader if this is a loop entry */
-    struct region *partOfLoop;	/* pointer to the loop region this block is part of */
+  struct eBBlock *preHeader;    /* preheader if this is a loop entry */
+  struct region *partOfLoop;    /* pointer to the loop region this block is part of */
 
-    /* control flow analysis */
-    set *succList;		/* list eBBlocks which are successors  */
-    bitVect *succVect;		/* bitVector of successors (index is bbnum) */
-    set *predList;		/* predecessors of this basic block    */
-    bitVect *domVect;		/* list of nodes this is dominated by (index is bbnum) */
+  /* control flow analysis */
+  set *succList;                /* list eBBlocks which are successors  */
+  bitVect *succVect;            /* bitVector of successors (index is bbnum) */
+  set *predList;                /* predecessors of this basic block    */
+  bitVect *domVect;             /* list of nodes this is dominated by (index is bbnum) */
 
-    /* data flow analysis */
-    set *inExprs;		/* in coming common expressions    */
-    set *outExprs;		/* out going common expressions    */
-    set *killedExprs;		/* killed common expressions       */
-    bitVect *inDefs;		/* in coming defintions            */
-    bitVect *outDefs;		/* out going defintions            */
-    bitVect *defSet;		/* symbols defined in block        */
-    bitVect *ldefs;		/* local definitions only          */
-    bitVect *usesDefs;		/* which definitions are used in this block */
-    bitVect *ptrsSet;		/* pointers assigned values in the block */
-    bitVect *inPtrsSet;		/* in coming pointers assigned values */
-    bitVect *ndompset;		/* pointers set by non-dominating basic blocks */
-    set *addrOf;		/* symbols for which addres has been taken in the block */
-    bitVect *linds;		/* if loop exit this contains defNumbers
-				   for the inductions */
-  }
+  /* data flow analysis */
+  set *inExprs;                 /* in coming common expressions    */
+  set *outExprs;                /* out going common expressions    */
+  set *killedExprs;             /* killed common expressions       */
+  bitVect *inDefs;              /* in coming defintions            */
+  bitVect *outDefs;             /* out going defintions            */
+  bitVect *defSet;              /* symbols defined in block        */
+  bitVect *ldefs;               /* local definitions only          */
+  bitVect *usesDefs;            /* which definitions are used in this block */
+  bitVect *ptrsSet;             /* pointers assigned values in the block */
+  bitVect *inPtrsSet;           /* in coming pointers assigned values */
+  bitVect *ndompset;            /* pointers set by non-dominating basic blocks */
+  set *addrOf;                  /* symbols for which addres has been taken in the block */
+  bitVect *linds;               /* if loop exit this contains defNumbers
+                                   for the inductions */
+}
 eBBlock;
 
 typedef struct ebbIndex
-  {
-    int count;			/* number of blocks in the index */
-    eBBlock **bbOrder;		/* blocks in bbnum order */
-    eBBlock **dfOrder;		/* blocks in dfnum (depth first) order */
-  }
+{
+  int count;                    /* number of blocks in the index */
+  eBBlock **bbOrder;            /* blocks in bbnum order */
+  eBBlock **dfOrder;            /* blocks in dfnum (depth first) order */
+}
 ebbIndex;
 
 typedef struct edge
-  {
+{
 
-    eBBlock *from;		/* from basic block */
-    eBBlock *to;		/* to Basic Block   */
-  }
+  eBBlock *from;                /* from basic block */
+  eBBlock *to;                  /* to Basic Block   */
+}
 edge;
 
 
@@ -107,6 +107,6 @@ int otherPathsPresent (eBBlock **, eBBlock *);
 void replaceLabel (eBBlock *, symbol *, symbol *);
 void dumpEbbsToFileExt (int, ebbIndex *);
 void dumpLiveRanges (int, hTab * liveRanges);
-void closeDumpFiles();
+void closeDumpFiles ();
 
 #endif

@@ -620,8 +620,8 @@ _setDefaultOptions (void)
       bds - first two args appear in BC and DE, the rest on the stack
       s - all arguments are on the stack.
 */
-static char *
-_mangleSupportFunctionName(char *original)
+static const char *
+_mangleSupportFunctionName(const char *original)
 {
   struct dbuf_s dbuf;
 

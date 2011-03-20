@@ -25,6 +25,7 @@
 #define DEBUG_CF(x)             /* puts(x); */
 
 #include "common.h"
+#include "dbuf_string.h"
 
 int currLineno = 0;
 set *astList = NULL;
@@ -617,7 +618,7 @@ setAstFileLine (ast * tree, char *filename, int lineno)
 /* funcOfType :- function of type with name                        */
 /*-----------------------------------------------------------------*/
 symbol *
-funcOfType (char *name, sym_link * type, sym_link * argType, int nArgs, int rent)
+funcOfType (const char *name, sym_link * type, sym_link * argType, int nArgs, int rent)
 {
   symbol *sym;
   /* create the symbol */
@@ -4258,20 +4259,23 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*             sizeof         */
       /*----------------------------*/
     case SIZEOF:               /* evaluate wihout code generation */
-      /* change the type to a integer */
       {
+        /* change the type to a integer */
+        struct dbuf_s dbuf;
         int size = getSize (tree->right->ftype);
 
-        SNPRINTF (buffer, sizeof (buffer), "%d", size);
+        dbuf_init (&dbuf, 128);
+        dbuf_printf (&dbuf, "%d", size);
         if (!size && !IS_VOID (tree->right->ftype))
           werrorfl (tree->filename, tree->lineno, E_SIZEOF_INCOMPLETE_TYPE);
-      }
-      tree->type = EX_VALUE;
-      tree->opval.val = constVal (buffer);
-      tree->right = tree->left = NULL;
-      TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
+        tree->type = EX_VALUE;
+        tree->opval.val = constVal (dbuf_c_str (&dbuf));
+        dbuf_destroy (&dbuf);
+        tree->right = tree->left = NULL;
+        TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
 
-      return tree;
+        return tree;
+      }
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/
@@ -4282,6 +4286,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       tree->type = EX_VALUE;
       {
         int typeofv = 0;
+        struct dbuf_s dbuf;
+
         if (IS_SPEC (tree->right->ftype))
           {
             switch (SPEC_NOUN (tree->right->ftype))
@@ -4355,8 +4361,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 break;
               }
           }
-        SNPRINTF (buffer, sizeof (buffer), "%d", typeofv);
-        tree->opval.val = constVal (buffer);
+        dbuf_init (&dbuf, 128);
+        dbuf_printf (&dbuf, "%d", typeofv);
+        tree->opval.val = constVal (dbuf_c_str (&dbuf));
+        dbuf_destroy (&dbuf);
         tree->right = tree->left = NULL;
         TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
       }
@@ -4837,9 +4845,12 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
     {
       static int localLbl = 0;
       symbol *localLabel;
+      struct dbuf_s dbuf;
 
-      SNPRINTF (buffer, sizeof (buffer), "_andif_%d", localLbl++);
-      localLabel = newSymbol (buffer, NestLevel);
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "_andif_%d", localLbl++);
+      localLabel = newSymbol (dbuf_c_str (&dbuf), NestLevel);
+      dbuf_destroy (&dbuf);
 
       tree->left = backPatchLabels (tree->left, localLabel, falseLabel);
 
@@ -4863,9 +4874,12 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
     {
       static int localLbl = 0;
       symbol *localLabel;
+      struct dbuf_s dbuf;
 
-      SNPRINTF (buffer, sizeof (buffer), "_orif_%d", localLbl++);
-      localLabel = newSymbol (buffer, NestLevel);
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "_orif_%d", localLbl++);
+      localLabel = newSymbol (dbuf_c_str (&dbuf), NestLevel);
+      dbuf_destroy (&dbuf);
 
       tree->left = backPatchLabels (tree->left, trueLabel, localLabel);
 
@@ -5089,6 +5103,7 @@ createIf (ast * condAst, ast * ifBody, ast * elseBody)
   static int Lblnum = 0;
   ast *ifTree;
   symbol *ifTrue, *ifFalse, *ifEnd;
+  struct dbuf_s dbuf;
 
   /* if neither exists */
   if (!elseBody && !ifBody)
@@ -5101,19 +5116,25 @@ createIf (ast * condAst, ast * ifBody, ast * elseBody)
     }
 
   /* create the labels */
-  SNPRINTF (buffer, sizeof (buffer), "_iffalse_%d", Lblnum);
-  ifFalse = newSymbol (buffer, NestLevel);
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "_iffalse_%d", Lblnum);
+  ifFalse = newSymbol (dbuf_c_str (&dbuf), NestLevel);
+  dbuf_destroy (&dbuf);
   /* if no else body then end == false */
   if (!elseBody)
     ifEnd = ifFalse;
   else
     {
-      SNPRINTF (buffer, sizeof (buffer), "_ifend_%d", Lblnum);
-      ifEnd = newSymbol (buffer, NestLevel);
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "_ifend_%d", Lblnum);
+      ifEnd = newSymbol (dbuf_c_str (&dbuf), NestLevel);
+      dbuf_destroy (&dbuf);
     }
 
-  SNPRINTF (buffer, sizeof (buffer), "_iftrue_%d", Lblnum);
-  ifTrue = newSymbol (buffer, NestLevel);
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "_iftrue_%d", Lblnum);
+  ifTrue = newSymbol (dbuf_c_str (&dbuf), NestLevel);
+  dbuf_destroy (&dbuf);
 
   Lblnum++;
 

@@ -1,12 +1,10 @@
-/*
-===============================================================================
-NEWALLOC - SDCC Memory allocation functions
+/*-------------------------------------------------------------------------
+   newalloc.c - SDCC Memory allocation functions
 
-These functions are wrappers for the standard malloc, realloc and free
-functions.
+   These functions are wrappers for the standard malloc, realloc and free
+   functions.
 
-
-     This program is free software; you can redistribute it and/or modify it
+   This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
@@ -19,13 +17,7 @@ functions.
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
-
-===============================================================================
-*/
+-------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,36 +48,36 @@ functions.
 #define TRACEMALLOC	0
 
 #if TRACEMALLOC
-enum 
-  {
-    TRACESIZE = 4096
-  };
+enum
+{
+  TRACESIZE = 4096
+};
 
 static int _allocs[TRACESIZE];
 static int _above;
 
 static void
-_dumpTrace(int code, void *parg)
+_dumpTrace (int code, void *parg)
 {
   int i;
   for (i = 0; i < TRACESIZE; i++)
     {
       if (_allocs[i])
         {
-          printf("%u %u\n", _allocs[i], i);
+          printf ("%u %u\n", _allocs[i], i);
         }
     }
-  printf("%u above\n", _above);
+  printf ("%u above\n", _above);
 }
 
 static void
-_log(int size)
+_log (int size)
 {
   static int registered;
 
   if (registered == 0)
     {
-      on_exit(_dumpTrace, NULL);
+      on_exit (_dumpTrace, NULL);
       registered = 1;
     }
   if (size == 12)
@@ -112,26 +104,27 @@ out of memory error detection
 -------------------------------------------------------------------------------
 */
 
-void *Clear_realloc(void *OldPtr,size_t OldSize,size_t NewSize)
-
+void *
+Clear_realloc (void *OldPtr, size_t OldSize, size_t NewSize)
 {
-void *NewPtr ;
+  void *NewPtr;
 
-NewPtr = REALLOC(OldPtr,NewSize) ;
+  NewPtr = REALLOC (OldPtr, NewSize);
 
-if (!NewPtr)
-  {
-  printf("ERROR - No more memory\n") ;
+  if (!NewPtr)
+    {
+      printf ("ERROR - No more memory\n");
 /*  werror(E_OUT_OF_MEM,__FILE__,NewSize);*/
-  exit (1);
-  }
+      exit (1);
+    }
 
-if (NewPtr)
-  if (NewSize > OldSize)
-    memset((char *) NewPtr + OldSize,0x00,NewSize - OldSize) ;
+  if (NewPtr)
+    if (NewSize > OldSize)
+      memset ((char *) NewPtr + OldSize, 0x00, NewSize - OldSize);
 
-return NewPtr ;
+  return NewPtr;
 }
+
 /*
 -------------------------------------------------------------------------------
 Safe_realloc - Reallocate a memory block with out of memory error detection
@@ -139,22 +132,23 @@ Safe_realloc - Reallocate a memory block with out of memory error detection
 -------------------------------------------------------------------------------
 */
 
-void *Safe_realloc(void *OldPtr,size_t NewSize)
-
+void *
+Safe_realloc (void *OldPtr, size_t NewSize)
 {
-void *NewPtr ;
+  void *NewPtr;
 
-NewPtr = REALLOC(OldPtr,NewSize) ;
+  NewPtr = REALLOC (OldPtr, NewSize);
 
-if (!NewPtr)
-  {
-  printf("ERROR - No more memory\n") ;
+  if (!NewPtr)
+    {
+      printf ("ERROR - No more memory\n");
 /*  werror(E_OUT_OF_MEM,__FILE__,NewSize);*/
-  exit (1);
-  }
+      exit (1);
+    }
 
-return NewPtr ;
+  return NewPtr;
 }
+
 /*
 -------------------------------------------------------------------------------
 Safe_calloc - Allocate a block of memory from the application heap, clearing
@@ -163,27 +157,28 @@ all data to zero and checking for out of memory errors.
 -------------------------------------------------------------------------------
 */
 
-void *Safe_calloc(size_t Elements,size_t Size)
-
+void *
+Safe_calloc (size_t Elements, size_t Size)
 {
-void *NewPtr ;
+  void *NewPtr;
 
-NewPtr = MALLOC(Elements*Size) ;
+  NewPtr = MALLOC (Elements * Size);
 #if TRACEMALLOC
- _log(Elements*Size);
+  _log (Elements * Size);
 #endif
- 
-if (!NewPtr)
-  {
-  printf("ERROR - No more memory\n") ;
+
+  if (!NewPtr)
+    {
+      printf ("ERROR - No more memory\n");
 /*  werror(E_OUT_OF_MEM,__FILE__,Size);*/
-  exit (1);
-  }
+      exit (1);
+    }
 
- memset(NewPtr, 0, Elements*Size);
+  memset (NewPtr, 0, Elements * Size);
 
-return NewPtr ;
+  return NewPtr;
 }
+
 /*
 -------------------------------------------------------------------------------
 Safe_malloc - Allocate a block of memory from the application heap
@@ -192,77 +187,91 @@ and checking for out of memory errors.
 -------------------------------------------------------------------------------
 */
 
-void *Safe_malloc(size_t Size)
-
+void *
+Safe_malloc (size_t Size)
 {
-void *NewPtr ;
+  void *NewPtr;
 
-NewPtr = MALLOC(Size) ;
+  NewPtr = MALLOC (Size);
 
 #if TRACEMALLOC
- _log(Size);
+  _log (Size);
 #endif
 
-if (!NewPtr)
-  {
-  printf("ERROR - No more memory\n") ;
+  if (!NewPtr)
+    {
+      printf ("ERROR - No more memory\n");
 /*  werror(E_OUT_OF_MEM,__FILE__,Size);*/
-  exit (1);
-  }
+      exit (1);
+    }
 
-return NewPtr ;
+  return NewPtr;
 }
 
-void *Safe_alloc(size_t Size)
+void *
+Safe_alloc (size_t Size)
 {
-  return Safe_calloc(1, Size);
+  return Safe_calloc (1, Size);
 }
 
-void Safe_free(void *p)
+void
+Safe_free (void *p)
 {
-  FREE(p);
+  FREE (p);
 }
 
-char *Safe_strdup(const char *sz)
+char *
+Safe_strndup (const char *sz, size_t size)
 {
   char *pret;
-  assert(sz);
+  assert (sz);
 
-  pret = Safe_alloc(strlen(sz) +1);
-  strcpy(pret, sz);
+  pret = Safe_alloc (size + 1);
+  strncpy (pret, sz, size);
+  pret[size] = '\0';
 
   return pret;
 }
 
-void *traceAlloc(allocTrace *ptrace, void *p)
+char *
+Safe_strdup (const char *sz)
 {
-  assert(ptrace);
-  assert(p);
+  assert (sz);
+
+  return Safe_strndup (sz, strlen (sz));
+}
+
+void *
+traceAlloc (allocTrace * ptrace, void *p)
+{
+  assert (ptrace);
+  assert (p);
 
   /* Also handles where max == 0 */
   if (ptrace->num == ptrace->max)
     {
       /* Add an offset to handle max == 0 */
-      ptrace->max = (ptrace->max+2)*2;
-      ptrace->palloced = Safe_realloc(ptrace->palloced, ptrace->max * sizeof(*ptrace->palloced));
+      ptrace->max = (ptrace->max + 2) * 2;
+      ptrace->palloced = Safe_realloc (ptrace->palloced, ptrace->max * sizeof (*ptrace->palloced));
     }
   ptrace->palloced[ptrace->num++] = p;
 
   return p;
 }
 
-void freeTrace(allocTrace *ptrace)
+void
+freeTrace (allocTrace * ptrace)
 {
   int i;
-  assert(ptrace);
+  assert (ptrace);
 
   for (i = 0; i < ptrace->num; i++)
     {
-      Safe_free(ptrace->palloced[i]);
+      Safe_free (ptrace->palloced[i]);
     }
   ptrace->num = 0;
 
-  Safe_free(ptrace->palloced);
+  Safe_free (ptrace->palloced);
   ptrace->palloced = NULL;
   ptrace->max = 0;
 }

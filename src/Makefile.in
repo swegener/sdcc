@@ -27,7 +27,7 @@ endif
 
 SLIBOBJS	= NewAlloc.o dbuf.o dbuf_string.o findme.o
 
-OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o SDCCbuild_cmd.o \
+OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \

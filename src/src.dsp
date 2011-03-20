@@ -149,10 +149,6 @@ SOURCE=.\SDCCbitv.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\SDCCbuild_cmd.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\SDCCcflow.c
 # End Source File
 # Begin Source File
@@ -298,10 +294,6 @@ SOURCE=.\SDCCBBlock.h
 # Begin Source File
 
 SOURCE=.\SDCCbitv.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\SDCCbuild_cmd.h
 # End Source File
 # Begin Source File
 

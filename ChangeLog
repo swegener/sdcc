@@ -1,3 +1,7 @@
+2011-03-21 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCval.c, src/SDCCval.h, src/SDCCast.c: dbuf-ized
+
 2011-03-20 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCicode.c, src/SDCCicode.h, src/SDCCsymt.c, src/SDCCsymt.h,

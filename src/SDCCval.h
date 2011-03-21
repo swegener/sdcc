@@ -40,55 +40,55 @@
 
 /* value wrapper */
 typedef struct value
-  {
-    char name[SDCC_NAME_MAX + 1]; /* operand accessing this value     */
-    sym_link *type;               /* start of type chain              */
-    sym_link *etype;              /* end of type chain                */
-    symbol *sym;                  /* Original Symbol                  */
-    struct value *next;           /* used in initializer list         */
-    unsigned vArgs:1;             /* arg list ended with variable arg */
-  }
+{
+  char name[SDCC_NAME_MAX + 1]; /* operand accessing this value     */
+  sym_link *type;               /* start of type chain              */
+  sym_link *etype;              /* end of type chain                */
+  symbol *sym;                  /* Original Symbol                  */
+  struct value *next;           /* used in initializer list         */
+  unsigned vArgs:1;             /* arg list ended with variable arg */
+}
 value;
 
 typedef struct literalList
 {
-    double    literalValue;
-    unsigned  count;
-    struct literalList *next;
+  double literalValue;
+  unsigned count;
+  struct literalList *next;
 } literalList;
 
 enum
-  {
-    INIT_NODE,
-    INIT_DEEP,
-    INIT_HOLE
-  };
+{
+  INIT_NODE,
+  INIT_DEEP,
+  INIT_HOLE
+};
 
 /* initializer lists use this structure */
 typedef struct initList
+{
+  int type;
+  int lineno;
+  char *filename;
+  union
   {
-    int type;
-    int lineno;
-    char *filename;
-    union
-      {
-        struct ast *node;
-        struct initList *deep;
-      }
-    init;
-
-    struct initList *next;
+    struct ast *node;
+    struct initList *deep;
   }
+  init;
+
+  struct initList *next;
+}
 initList;
 
 /* return values from checkConstantRange */
 typedef enum
-  {
-    CCR_OK,           /* evaluate at runtime */
-    CCR_OVL,
-    CCR_ALWAYS_FALSE,
-    CCR_ALWAYS_TRUE
-  }
+{
+  CCR_OK,                       /* evaluate at runtime */
+  CCR_OVL,
+  CCR_ALWAYS_FALSE,
+  CCR_ALWAYS_TRUE
+}
 CCR_RESULT;
 
 #define  IS_VARG(x)             (x->vArgs)
@@ -109,12 +109,12 @@ double floatFromVal (value *);
 unsigned long ulFromVal (value *);
 
 /* convert a fixed16x16 type to double */
-double doubleFromFixed16x16(TYPE_TARGET_ULONG value);
+double doubleFromFixed16x16 (TYPE_TARGET_ULONG value);
 
 /* convert a double type to fixed16x16 */
-TYPE_TARGET_ULONG fixed16x16FromDouble(double value);
+TYPE_TARGET_ULONG fixed16x16FromDouble (double value);
 
-CCR_RESULT checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeOps);
+CCR_RESULT checkConstantRange (sym_link * var, sym_link * lit, int op, bool exchangeOps);
 value *array2Ptr (value *);
 value *valUnaryPM (value *);
 value *valComplement (value *);
@@ -144,7 +144,7 @@ int getNelements (sym_link *, initList *);
 value *valForArray (struct ast *);
 value *valForStructElem (struct ast *, struct ast *);
 value *valForCastAggr (struct ast *, sym_link *, struct ast *, int);
-value *valForCastArr (struct ast * , sym_link *);
-bool convertIListToConstList(initList *src, literalList **lList, int size);
-literalList *copyLiteralList(literalList *src);
+value *valForCastArr (struct ast *, sym_link *);
+bool convertIListToConstList (initList * src, literalList ** lList, int size);
+literalList *copyLiteralList (literalList * src);
 #endif

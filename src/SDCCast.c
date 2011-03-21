@@ -1406,7 +1406,7 @@ freeStringSymbol (symbol * sym)
 static value *
 stringToSymbol (value * val)
 {
-  char name[SDCC_NAME_MAX + 1];
+  struct dbuf_s dbuf;
   static int charLbl = 0;
   symbol *sym;
   set *sp;
@@ -1426,9 +1426,11 @@ stringToSymbol (value * val)
         }
     }
 
-  SNPRINTF (name, sizeof (name), "_str_%d", charLbl++);
-  sym = newSymbol (name, 0);    /* make it @ level 0 */
-  strncpyz (sym->rname, name, SDCC_NAME_MAX);
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "_str_%d", charLbl++);
+  sym = newSymbol (dbuf_c_str (&dbuf), 0);      /* make it @ level 0 */
+  strncpyz (sym->rname, dbuf_c_str (&dbuf), SDCC_NAME_MAX);
+  dbuf_destroy (&dbuf);
 
   /* copy the type from the value passed */
   sym->type = copyLinkChain (val->type);
@@ -4795,19 +4797,23 @@ errorTreeReturn:
 value *
 sizeofOp (sym_link * type)
 {
-  char buff[10];
+  struct dbuf_s dbuf;
+  value *val;
   int size;
 
   /* make sure the type is complete and sane */
   checkTypeSanity (type, "(sizeof)");
 
   /* get the size and convert it to character  */
-  SNPRINTF (buff, sizeof (buff), "%d", size = getSize (type));
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "%d", size = getSize (type));
   if (!size && !IS_VOID (type))
     werror (E_SIZEOF_INCOMPLETE_TYPE);
 
   /* now convert into value  */
-  return constVal (buff);
+  val = constVal (dbuf_c_str (&dbuf));
+  dbuf_destroy (&dbuf);
+  return val;
 }
 
 
@@ -4952,7 +4958,6 @@ ast *
 createLabel (symbol * label, ast * stmnt)
 {
   symbol *csym;
-  char name[SDCC_NAME_MAX + 1];
   ast *rValue;
 
   /* must create fresh symbol if the symbol name  */
@@ -4961,16 +4966,13 @@ createLabel (symbol * label, ast * stmnt)
   if ((csym = findSym (SymbolTab, NULL, label->name)) && (csym->level == label->level))
     label = newSymbol (label->name, label->level);
 
-  /* change the name before putting it in add _ */
-  SNPRINTF (name, sizeof (name), "%s", label->name);
-
   /* put the label in the LabelSymbol table    */
   /* but first check if a label of the same    */
   /* name exists                               */
-  if ((csym = findSym (LabelTab, NULL, name)))
+  if ((csym = findSym (LabelTab, NULL, label->name)))
     werror (E_DUPLICATE_LABEL, label->name);
   else
-    addSym (LabelTab, label, name, label->level, 0, 0);
+    addSym (LabelTab, label, label->name, label->level, 0, 0);
 
   label->isitmp = 1;
   label->islbl = 1;
@@ -4988,7 +4990,7 @@ createLabel (symbol * label, ast * stmnt)
 ast *
 createCase (ast * swStat, ast * caseVal, ast * stmnt)
 {
-  char caseLbl[SDCC_NAME_MAX + 1];
+  struct dbuf_s dbuf;
   ast *rexpr;
   value *val;
 
@@ -5056,9 +5058,11 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
     }
 
   /* create the case label   */
-  SNPRINTF (caseLbl, sizeof (caseLbl), "_case_%d_%d", swStat->values.switchVals.swNum, (int) ulFromVal (caseVal->opval.val));
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "_case_%d_%d", swStat->values.switchVals.swNum, (int) ulFromVal (caseVal->opval.val));
 
-  rexpr = createLabel (newSymbol (caseLbl, 0), stmnt);
+  rexpr = createLabel (newSymbol (dbuf_c_str (&dbuf), 0), stmnt);
+  dbuf_destroy (&dbuf);
   rexpr->filename = 0;
   rexpr->lineno = 0;
   return rexpr;
@@ -5070,7 +5074,8 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
 ast *
 createDefault (ast * swStat, ast * defaultVal, ast * stmnt)
 {
-  char defLbl[SDCC_NAME_MAX + 1];
+  struct dbuf_s dbuf;
+  ast *ret;
 
   /* if the switch statement does not exist */
   /* then case is out of context            */
@@ -5090,8 +5095,11 @@ createDefault (ast * swStat, ast * defaultVal, ast * stmnt)
   swStat->values.switchVals.swDefault = 1;
 
   /* create the label  */
-  SNPRINTF (defLbl, sizeof (defLbl), "_default_%d", swStat->values.switchVals.swNum);
-  return createLabel (newSymbol (defLbl, 0), stmnt);
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "_default_%d", swStat->values.switchVals.swNum);
+  ret = createLabel (newSymbol (dbuf_c_str (&dbuf), 0), stmnt);
+  dbuf_destroy (&dbuf);
+  return ret;
 }
 
 /*-----------------------------------------------------------------*/
@@ -5867,10 +5875,12 @@ DEFSETFUNC (resetParmKey)
 static void
 fixupInlineLabel (symbol * sym)
 {
-  char name[SDCC_NAME_MAX + 1];
+  struct dbuf_s dbuf;
 
-  SNPRINTF (name, sizeof (name), "%s_%d", sym->name, inlineState.count);
-  strcpy (sym->name, name);
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "%s_%d", sym->name, inlineState.count);
+  strncpyz (sym->name, dbuf_c_str (&dbuf), SDCC_NAME_MAX);
+  dbuf_destroy (&dbuf);
 }
 
 /*------------------------------------------------------------------*/
@@ -6002,11 +6012,12 @@ fixupInline (ast * tree, int level)
   /* Update SWITCH branches */
   if (tree->type == EX_OP && tree->opval.op == SWITCH)
     {
-      char name[SDCC_NAME_MAX + 1];
+      struct dbuf_s dbuf;
       const char *oldsuff = tree->values.switchVals.swSuffix;
 
-      SNPRINTF (name, sizeof (name), "%s_%d", oldsuff ? oldsuff : "", inlineState.count);
-      tree->values.switchVals.swSuffix = strdup (name);
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "%s_%d", oldsuff ? oldsuff : "", inlineState.count);
+      tree->values.switchVals.swSuffix = dbuf_detach (&dbuf);
     }
 
   /* Update FOR expression */

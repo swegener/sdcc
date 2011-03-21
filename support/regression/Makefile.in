@@ -196,7 +196,6 @@ endif
 
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
-	echo Processing $(notdir $<)
 	rm -rf $(dir $@)
 	mkdir -p $(dir $@)
 	python $(GENERATE_CASES) $< $(dir $@) > /dev/null
@@ -206,6 +205,7 @@ $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
 # iteration directory.
 $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
+	python $(srcdir)/compact-results.py < $@
 
 # Rule to summaries the results for one port after all of the tests
 # have been run.

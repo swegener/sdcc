@@ -4219,6 +4219,7 @@ genRet (iCode * ic)
     {
       if (!IS_OP_RUONLY (IC_LEFT (ic)))
         toCarry (IC_LEFT (ic));
+      _endLazyDPSEvaluation ();
     }
   else
     {

@@ -21,20 +21,20 @@ ifdef CROSSCOMPILING
   DEV_NULL ?= NUL
   SDCCFLAGS += -I$(top_srcdir)
 
-  S51 = wine $(S51C)
+  EMU = wine $(S51C)
 else
   DEV_NULL ?= /dev/null
 
-  S51 = $(S51C)
+  EMU = $(S51C)
 endif
 
-SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=__reentrant -Wl-r
+SDCCFLAGS += -mds390 --less-pedantic -DREENTRANT=__reentrant -Wl-r
 LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 
 OBJEXT = .rel
 BINEXT = .ihx
 
-# otherwise `make` deletes testfwk.o and `make -j` will fail
+# otherwise `make` deletes testfwk.rel and `make -j` will fail
 .PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
@@ -60,7 +60,7 @@ $(PORT_CASES_DIR)/fwk.lib:
 # run simulator with 25 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 25 $(S51) -tds390 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
+	-$(CASES_DIR)/timeout 25 $(EMU) -tds390 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true

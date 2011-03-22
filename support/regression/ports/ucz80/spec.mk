@@ -24,14 +24,14 @@ endif
 ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 
-  UCZ80 = wine $(UCZ80C)
+  EMU = wine $(UCZ80C)
   AS_Z80 = wine $(AS_Z80C)
 else
-  UCZ80 = $(UCZ80C)
+  EMU = $(UCZ80C)
   AS_Z80 = $(AS_Z80C)
 endif
 
-SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
+SDCCFLAGS += -mz80 --less-pedantic --profile -DREENTRANT=
 LINKFLAGS += z80.lib
 
 OBJEXT = .rel
@@ -69,9 +69,9 @@ $(PORT_CASES_DIR)/fwk.lib:
 # run simulator with 10 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 10 $(UCZ80) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
+	-$(CASES_DIR)/timeout 10 $(EMU) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
+	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 $(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c

@@ -24,20 +24,20 @@ endif
 ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 
-  UCHC08 = wine $(UCHC08C)
+  EMU = wine $(UCHC08C)
   AS_HC08 = wine $(AS_HC08C)
 else
-  UCHC08 = $(UCHC08C)
+  EMU = $(UCHC08C)
   AS_HC08 = $(AS_HC08C)
 endif
 
-SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
+SDCCFLAGS += -mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel
 BINEXT = .ihx
 
-# otherwise `make` deletes testfwk.o and `make -j` will fail
+# otherwise `make` deletes testfwk.rel and `make -j` will fail
 .PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
@@ -66,9 +66,9 @@ $(PORT_CASES_DIR)/fwk.lib:
 # run simulator with 10 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 10 $(UCHC08) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
+	-$(CASES_DIR)/timeout 10 $(EMU) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
+	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 $(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c

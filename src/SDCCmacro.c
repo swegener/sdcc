@@ -145,7 +145,7 @@ mvsprintf (hTab * pvals, const char *pformat, va_list ap)
   p = eval_macros (pvals, pformat);
 
   /* Evaluate all the arguments */
-  dbuf_printf (&dbuf, p, ap);
+  dbuf_vprintf (&dbuf, p, ap);
   Safe_free (p);
 
   /* Recursivly evaluate any macros that were used as arguments */

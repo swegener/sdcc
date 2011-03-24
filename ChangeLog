@@ -1,7 +1,8 @@
 2011-03-24 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCglue.c, src/ds390/gen.c, src/ds390/gen.h,
-	  src/SDCCptropt.c, src/SDCCptropt.h:
+	  src/ds390/ralloc.c, src/ds390/ralloc.h, src/SDCCptropt.c,
+	  src/SDCCptropt.h, src/SDCCicode.c, src/SDCCicode.h:
 	  dbuf-ized, get rid of global buffer, code cleaning,
 	  use dbuf_tprintf() instead of tsprintf()
 

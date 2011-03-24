@@ -319,7 +319,7 @@ operand *operandFromLit (double);
 operand *operandFromOperand (operand *);
 int isParameterToCall (value *, operand *);
 iCode *newiCodeLabelGoto (int, symbol *);
-symbol *newiTemp (char *);
+symbol *newiTemp (const char *);
 symbol *newiTempLabel (const char *);
 #define LOOPEXITLBL "loopExitLbl"
 symbol *newiTempLoopHeaderLabel (bool);

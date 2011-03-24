@@ -609,7 +609,7 @@ newiCodeLabelGoto (int op, symbol * label)
 /* newiTemp - allocate & return a newItemp Variable                */
 /*-----------------------------------------------------------------*/
 symbol *
-newiTemp (char *s)
+newiTemp (const char *s)
 {
   struct dbuf_s dbuf;
   symbol *itmp;

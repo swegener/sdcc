@@ -2943,7 +2943,7 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
 
   ic = newiCode (op, left, right);
   /* store 0 or 1 in result */
-  ttype = (tree && IS_BIT (tree->ftype)) ? newBoolLink () : newCharLink ();
+  ttype = (tree && IS_BOOLEAN (tree->ftype)) ? newBoolLink () : newCharLink ();
   IC_RESULT (ic) = newiTempOperand (ttype, 1);
 
   /* if comparing float
@@ -3011,7 +3011,7 @@ geniCodeLogicAndOr (ast * tree, int lvl)
   ADDTOCHAIN (ic);
 
   /* store 0 or 1 in result */
-  type = (IS_BIT (tree->ftype)) ? newBoolLink () : newCharLink ();
+  type = (IS_BOOLEAN (tree->ftype)) ? newBoolLink () : newCharLink ();
   result = newiTempOperand (type, 1);
 
   geniCodeLabel (falseLabel);
@@ -3218,7 +3218,7 @@ geniCodeSEParms (ast * parms, int lvl)
   if (!parms)
     return;
 
-  if (parms->type == EX_OP && parms->opval.op == PARAM)
+  if (IS_AST_PARAM (parms))
     {
       geniCodeSEParms (parms->left, lvl);
       geniCodeSEParms (parms->right, lvl);
@@ -4228,7 +4228,7 @@ ast2iCode (ast * tree, int lvl)
     case GETHBIT:
       {
         operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
-        if (!IS_BIT (operandType (op)))
+        if (!IS_BOOLEAN (operandType (op)))
           setOperandType (op, UCHARTYPE);
         return op;
       }
@@ -4237,7 +4237,7 @@ ast2iCode (ast * tree, int lvl)
         operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
                                       geniCodeRValue (right, FALSE),
                                       tree->opval.op);
-        if (!IS_BIT (operandType (op)))
+        if (!IS_BOOLEAN (operandType (op)))
           setOperandType (op, UCHARTYPE);
         return op;
       }

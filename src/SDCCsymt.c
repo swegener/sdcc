@@ -1821,7 +1821,7 @@ changePointer (sym_link * p)
   /* unless the function is banked.      */
   for (; p; p = p->next)
     {
-      if (!IS_SPEC (p) && DCL_TYPE (p) == UPOINTER)
+      if (IS_DECL (p) && DCL_TYPE (p) == UPOINTER)
         DCL_TYPE (p) = port->unqualified_pointer;
       if (IS_PTR (p) && IS_FUNC (p->next))
         if (!IFFUNC_ISBANKEDCALL (p->next))
@@ -1921,8 +1921,8 @@ static sym_link *
 computeTypeOr (sym_link * etype1, sym_link * etype2, sym_link * reType)
 {
   /* sanity check */
-  assert ((IS_CHAR (etype1) || IS_BOOL (etype1) || IS_BIT (etype1))
-          && (IS_CHAR (etype2) || IS_BOOL (etype2) || IS_BIT (etype2)));
+  assert ((IS_CHAR (etype1) || IS_BOOLEAN (etype1)) &&
+          (IS_CHAR (etype2) || IS_BOOLEAN (etype2)));
 
   if (SPEC_USIGN (etype1) == SPEC_USIGN (etype2))
     {
@@ -2073,7 +2073,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
         {
           return rType;
         }
-      if (IS_BOOL (reType) || IS_BIT (reType))
+      if (IS_BOOLEAN (reType))
         {
           SPEC_NOUN (reType) = V_CHAR;
           SPEC_SCLS (reType) = 0;
@@ -2377,12 +2377,14 @@ compareType (sym_link * dest, sym_link * src)
   /* it is a specifier */
   if (SPEC_NOUN (dest) != SPEC_NOUN (src))
     {
-      if (SPEC_USIGN (dest) == SPEC_USIGN (src) && IS_INTEGRAL (dest) && IS_INTEGRAL (src) &&
+      if ((SPEC_USIGN (dest) == SPEC_USIGN (src)) &&
+		  IS_INTEGRAL (dest) && IS_INTEGRAL (src) &&
           /* I would prefer
              bitsForType (dest) == bitsForType (src))
              instead of the next two lines, but the regression tests fail with
              them; I guess it's a problem with replaceCheaperOp  */
-          getSize (dest) == getSize (src) && (IS_BIT (dest) == IS_BIT (src)) && !(IS_BOOL (dest) && !IS_BOOL (src)))
+          (getSize (dest) == getSize (src)) &&
+		  (IS_BOOLEAN (dest) == IS_BOOLEAN (src)))
         return 1;
       else if (IS_ARITHMETIC (dest) && IS_ARITHMETIC (src))
         return -1;

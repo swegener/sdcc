@@ -1,3 +1,14 @@
+2011-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.h: added IS_BOOLEAN
+	* src/SDCCast.c (getResultTypeFromType),
+	* src/SDCCicode.c (geniCodeLogic, geniCodeLogicAndOr, ast2iCode),
+	* src/SDCCsymt.c (computeTypeOr, computeType, compareType),
+	* src/SDCCval.c (checkConstantRange): use IS_BOOLEAN
+	* src/SDCCcse.c (boolCast, cseBBlock): disabled boolCast fixed bug 3223041
+	* src/z80/gen.c (_toBoolean): added parameter needflag,
+	  (_castBoolean, genCast): castBoolean factored out of genCast
+
 2011-03-24 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCglue.c, src/ds390/gen.c, src/ds390/gen.h,

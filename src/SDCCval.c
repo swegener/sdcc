@@ -397,7 +397,7 @@ checkConstantRange (sym_link * var, sym_link * lit, int op, bool exchangeLeftRig
   /* special: assignment */
   if (op == '=')
     {
-      if (IS_BOOL (var) || IS_BIT (var))
+      if (IS_BOOLEAN (var))
         return CCR_OK;
 
       if (getenv ("SDCC_VERY_PEDANTIC"))

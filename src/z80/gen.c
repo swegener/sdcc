@@ -183,7 +183,7 @@ enum
  */
 static struct
 {
-  /** Used to optimised setting up of a pair by remebering what it
+  /** Used to optimise setting up of a pair by remembering what it
       contains and adjusting instead of reloading where possible.
   */
   struct
@@ -2338,28 +2338,52 @@ outBitC (operand * result)
 }
 
 /*-----------------------------------------------------------------*/
-/* toBoolean - emit code for orl a,operator(sizeop)                */
+/* toBoolean - emit code for or a,operator(sizeop)                 */
 /*-----------------------------------------------------------------*/
 void
-_toBoolean (operand * oper)
+_toBoolean (operand * oper, bool needflag)
 {
   int size = AOP_SIZE (oper);
   int offset = 0;
+
+  _moveA (aopGet (AOP (oper), offset++, FALSE));
   if (size > 1)
     {
-      emit2 ("ld a,%s", aopGet (AOP (oper), offset++, FALSE));
-      size--;
-      while (size--)
+      while (--size)
         emit2 ("or a,%s", aopGet (AOP (oper), offset++, FALSE));
     }
   else
     {
-      if (AOP (oper)->type != AOP_ACC)
+      if (needflag)
         {
-          _clearCarry();
-          emit2 ("or a,%s", aopGet (AOP (oper), 0, FALSE));
+          emit2 ("or a,a");
         }
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* castBoolean - emit code for casting operand to boolean in a     */
+/*-----------------------------------------------------------------*/
+static void
+_castBoolean (operand *right)
+{
+  int size = AOP_SIZE(right);
+
+  emitDebug("; Casting to bool");
+
+  /* Can do without OR-ing for small arguments */
+  if (size == 1)
+    {
+      emit2("xor a,a");
+      emit2("cp a,%s", aopGet (AOP (right), 0, FALSE));
+    }
+  else
+    {
+      _toBoolean (right, FALSE);
+      emit2 ("add a,!immedbyte", 0xff);
+      emit2 ("ld a,!zero");
+    }
+  emit2 ("rla");
 }
 
 /*-----------------------------------------------------------------*/
@@ -2388,7 +2412,7 @@ genNot (iCode * ic)
       goto release;
     }
 
-  _toBoolean (left);
+  _toBoolean (left, FALSE);
 
   /* Not of A:
      If A == 0, !A = 1
@@ -2594,7 +2618,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* assignResultValue -               */
+/* assignResultValue -                                             */
 /*-----------------------------------------------------------------*/
 void
 assignResultValue (operand * oper)
@@ -2726,33 +2750,39 @@ genIpush (iCode * ic)
       return;
     }
 
-  if (_G.saves.saved == FALSE) {
-    /* Caller saves, and this is the first iPush. */
-    /* Scan ahead until we find the function that we are pushing parameters to.
-       Count the number of addSets on the way to figure out what registers
-       are used in the send set.
-    */
-    int nAddSets = 0;
-    iCode *walk = ic->next;
+  if (_G.saves.saved == FALSE)
+    {
+      /* Caller saves, and this is the first iPush. */
+      /* Scan ahead until we find the function that we are pushing parameters to.
+         Count the number of addSets on the way to figure out what registers
+         are used in the send set.
+      */
+      int nAddSets = 0;
+      iCode *walk = ic->next;
 
-    while (walk) {
-      if (walk->op == SEND) {
-        nAddSets++;
-      }
-      else if (walk->op == CALL || walk->op == PCALL) {
-        /* Found it. */
-        break;
-      }
-      else {
-        /* Keep looking. */
-      }
-      walk = walk->next;
+      while (walk)
+        {
+          if (walk->op == SEND)
+            {
+              nAddSets++;
+            }
+          else if (walk->op == CALL || walk->op == PCALL)
+            {
+              /* Found it. */
+              break;
+            }
+          else
+            {
+              /* Keep looking. */
+            }
+          walk = walk->next;
+        }
+      _saveRegsForCall(walk, nAddSets);
     }
-    _saveRegsForCall(walk, nAddSets);
-  }
-  else {
-    /* Already saved by another iPush. */
-  }
+  else
+    {
+      /* Already saved by another iPush. */
+    }
 
   /* then do the push */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
@@ -3529,7 +3559,7 @@ genEndFunction (iCode * ic)
 static void
 genRet (iCode * ic)
 {
-    const char *l;
+  const char *l;
   /* Errk.  This is a hack until I can figure out how
      to cause dehl to spill on a call */
   int size, offset = 0;
@@ -3574,8 +3604,7 @@ genRet (iCode * ic)
         {
           while (size--)
             {
-              l = aopGet (AOP (IC_LEFT (ic)), offset,
-                          FALSE);
+              l = aopGet (AOP (IC_LEFT (ic)), offset, FALSE);
               if (strcmp (_fReturn[offset], l))
                 emit2 ("ld %s,%s", _fReturn[offset], l);
               offset++;
@@ -4870,8 +4899,7 @@ genCmp (operand * left, operand * right,
   bool result_in_carry = FALSE;
 
   /* if left & right are bit variables */
-  if (AOP_TYPE (left) == AOP_CRY &&
-      AOP_TYPE (right) == AOP_CRY)
+  if (AOP_TYPE (left) == AOP_CRY && AOP_TYPE (right) == AOP_CRY)
     {
       /* Can't happen on the Z80 */
       wassertl (0, "Tried to compare two bits");
@@ -5443,14 +5471,14 @@ genAndOp (iCode * ic)
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      wassertl (0, "Tried to and two bits");
+      wassertl (0, "Tried to AND two bits");
     }
   else
     {
       tlbl = newiTempLabel (NULL);
-      _toBoolean (left);
+      _toBoolean (left, TRUE);
       emit2 ("jp Z,!tlabel", tlbl->key + 100);
-      _toBoolean (right);
+      _toBoolean (right, FALSE);
       emitLabelNoSpill (tlbl->key + 100);
       outBitAcc (result);
     }
@@ -5485,9 +5513,9 @@ genOrOp (iCode * ic)
   else
     {
       tlbl = newiTempLabel (NULL);
-      _toBoolean (left);
+      _toBoolean (left, TRUE);
       emit2 ("jp NZ,!tlabel", tlbl->key + 100);
-      _toBoolean (right);
+      _toBoolean (right, FALSE);
       emitLabelNoSpill (tlbl->key + 100);
       outBitAcc (result);
     }
@@ -5579,13 +5607,13 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
   /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY &&
-      AOP_TYPE (left) != AOP_CRY)
+  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
+
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
@@ -5615,12 +5643,14 @@ genAnd (iCode * ic, iCode * ifx)
       int sizel = AOP_SIZE (left);
       if (size)
         {
-          /* PENDING: Test case for this. */
+          /* PENDING: Test case for this.
+             can't work, AND will destroy carry */
           emit2 ("scf");
         }
       while (sizel--)
         {
-          if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
+          bytelit = (lit >> (offset * 8)) & 0x0FFL;
+          if (bytelit != 0x0L)
             {
               _moveA (aopGet (AOP (left), offset, FALSE));
               if (bytelit != 0x0FFL)
@@ -5635,7 +5665,7 @@ genAnd (iCode * ic, iCode * ifx)
               if (size || ifx)  /* emit jmp only, if it is actually used */
                 emit2 ("jp NZ,!tlabel", tlbl->key + 100);
             }
-              offset++;
+          offset++;
         }
       // bit = left & literal
       if (size)
@@ -5673,8 +5703,7 @@ genAnd (iCode * ic, iCode * ifx)
                   else
                     {
                       _moveA (aopGet (AOP (left), offset, FALSE));
-                      emit2 ("and a,%s",
-                                aopGet (AOP (right), offset, FALSE));
+                      emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
                       aopPut (AOP (left), "a", offset);
                     }
                 }
@@ -5689,8 +5718,7 @@ genAnd (iCode * ic, iCode * ifx)
               else
                 {
                   _moveA (aopGet (AOP (left), offset, FALSE));
-                  emit2 ("and a,%s",
-                            aopGet (AOP (right), offset, FALSE));
+                  emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
                   aopPut (AOP (left), "a", offset);
                 }
             }
@@ -5724,20 +5752,18 @@ genAnd (iCode * ic, iCode * ifx)
                       continue;
                     }
                 }
-              // faster than result <- left, anl result,right
+              // faster than result <- left, and result,right
               // and better if result is SFR
               if (AOP_TYPE (left) == AOP_ACC)
                 emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
               else
                 {
                   _moveA (aopGet (AOP (left), offset, FALSE));
-                  emit2 ("and a,%s",
-                            aopGet (AOP (right), offset, FALSE));
+                  emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
                 }
               aopPut (AOP (result), "a", offset);
             }
         }
-
     }
 
 release:
@@ -5779,13 +5805,13 @@ genOr (iCode * ic, iCode * ifx)
     }
 
   /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY &&
-      AOP_TYPE (left) != AOP_CRY)
+  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
+
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
@@ -5954,13 +5980,13 @@ genXor (iCode * ic, iCode * ifx)
     }
 
   /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY &&
-      AOP_TYPE (left) != AOP_CRY)
+  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
+
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
@@ -7573,8 +7599,10 @@ genIfx (iCode * ic, iCode * popIc)
 
   /* get the value into acc */
   if(AOP_TYPE (cond) != AOP_CRY &&
-    !IS_BOOL (operandType(cond)))
-    _toBoolean (cond);
+     !IS_BOOL (operandType(cond)))
+    {
+      _toBoolean (cond, FALSE);
+    }
   /* Special case: Condition is bool */
   else if(IS_BOOL (operandType(cond)))
     {
@@ -7586,7 +7614,9 @@ genIfx (iCode * ic, iCode * popIc)
       return;
     }
   else
-    isbit = 1;
+    {
+      isbit = 1;
+    }
   /* the result is now in the accumulator */
   freeAsmop (cond, NULL, ic);
 
@@ -7594,9 +7624,8 @@ genIfx (iCode * ic, iCode * popIc)
   if (popIc)
     genIpop (popIc);
 
-  /* if the condition is  a bit variable */
-  if (isbit && IS_ITEMP (cond) &&
-      SPIL_LOC (cond))
+  /* if the condition is a bit variable */
+  if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
     genIfxJump (ic, SPIL_LOC (cond)->rname);
   else if (isbit && !IS_ITEMP (cond))
     genIfxJump (ic, OP_SYMBOL (cond)->rname);
@@ -7862,36 +7891,8 @@ genCast (iCode * ic)
   /* casting to bool */
   if (IS_BOOL(operandType(result)))
     {
-      symbol *tlbl1, *tlbl2;
-      emitDebug("; Casting to bool");
-      size = AOP_SIZE(right);
-
-      /* Can do without branching for small arguments */
-      if(size == 1)
-        {
-          emit2("xor a,a");
-          emit2("cp a,%s", aopGet (AOP (right), 0, FALSE));
-          emit2("rla");
-          aopPut(AOP (result), "a", 0);
-          goto release;
-        }
-
-      tlbl1 = newiTempLabel(0);
-      tlbl2 = newiTempLabel(0);
-      while(--size)
-        {
-          const char *l = aopGet (AOP (right), size, FALSE);
-          _moveA (l);
-          emit2("or a,a");
-          emit2("jp NZ,!tlabel", tlbl1->key + 100);
-        }
-      emit2("cp a,%s", aopGet (AOP (right), 0, FALSE));
-      emit2("rla");
-      emit2("jp !tlabel", tlbl2->key + 100);
-      emitLabelNoSpill(tlbl1->key + 100);
-      emit2("ld a,#0x01");
-      emitLabelNoSpill(tlbl2->key + 100);
-      aopPut(AOP (result), "a", 0);
+      _castBoolean (right);
+      outAcc (result);
       goto release;
     }
 
@@ -8081,7 +8082,7 @@ genEndCritical (iCode *ic)
   else if (IC_RIGHT (ic))
     {
       aopOp (IC_RIGHT (ic), ic, FALSE, TRUE);
-      _toBoolean (IC_RIGHT (ic));
+      _toBoolean (IC_RIGHT (ic), TRUE);
       //don't enable interrupts if they were off before
       emit2 ("jp Z,!tlabel", tlbl->key + 100);
       emit2 ("!ei");

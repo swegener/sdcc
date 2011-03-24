@@ -2186,7 +2186,7 @@ RESULT_TYPE
 getResultTypeFromType (sym_link * type)
 {
   /* type = getSpec (type); */
-  if (IS_BIT (type))
+  if (IS_BOOLEAN (type))
     return RESULT_TYPE_BIT;
   if (IS_BITFIELD (type))
     {

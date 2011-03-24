@@ -1,3 +1,10 @@
+2011-03-24 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCglue.c, src/ds390/gen.c, src/ds390/gen.h,
+	  src/SDCCptropt.c, src/SDCCptropt.h:
+	  dbuf-ized, get rid of global buffer, code cleaning,
+	  use dbuf_tprintf() instead of tsprintf()
+
 2011-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/ds390/spec.mk,

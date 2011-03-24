@@ -8,6 +8,7 @@
 	* src/SDCCcse.c (boolCast, cseBBlock): disabled boolCast fixed bug 3223041
 	* src/z80/gen.c (_toBoolean): added parameter needflag,
 	  (_castBoolean, genCast): castBoolean factored out of genCast
+	* support/regression/tests/bug3223041.c: modified for hc08 without _Bool
 
 2011-03-24 Borut Razem <borut.razem AT gmail.com>
 

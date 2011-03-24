@@ -14,6 +14,12 @@
 #define BOOL bool
 #endif
 
+#ifdef SDCC_hc08
+#define CAST(x)	(x ? true : false)
+#else
+#define CAST(x)	(x)
+#endif
+
 BOOL and(BOOL a, BOOL b, BOOL c, BOOL d)
 {
 	return a & b & c & d;
@@ -35,10 +41,10 @@ testBug(void)
 	unsigned char i, x;
 	for (i=0; i<16; i++)
 	{
-		ASSERT( and(i&0x01, i&0x02, i&0x04, i&0x08) == (i==15) );
-		ASSERT( or (i&0x01, i&0x02, i&0x04, i&0x08) == (i!= 0) );
+		ASSERT( and(CAST(i&0x01), CAST(i&0x02), CAST(i&0x04), CAST(i&0x08)) == (i==15) );
+		ASSERT( or (CAST(i&0x01), CAST(i&0x02), CAST(i&0x04), CAST(i&0x08)) == (i!= 0) );
 		x = i ^ (i>>1);
 		x = x ^ (x>>2);
-		ASSERT( xor(i&0x01, i&0x02, i&0x04, i&0x08) == (x & 0x01) );
+		ASSERT( xor(CAST(i&0x01), CAST(i&0x02), CAST(i&0x04), CAST(i&0x08)) == (x & 0x01) );
 	}
 }

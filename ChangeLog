@@ -1,3 +1,10 @@
+2011-03-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/hc08/gen.c: cosmetics
+	* src/hc08/ralloc.c (packRegsForAssign): fixed bug 1477149 & SINHF,
+	  throughout synced with mcs51/ralloc.c
+	* support/regression/tests/float_single.c: enabled SINHF
+
 2011-05-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCcse.c (boolCast, cseBBlock):

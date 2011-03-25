@@ -27,7 +27,6 @@
 /* now exceptions for targets/functions which would not pass */
 #if defined(SDCC_hc08)
 #   define EXPF_DISABLED  (1)
-#   define SINHF_DISABLED (1)
 #   define TANF_DISABLED  (1)
 #endif
 

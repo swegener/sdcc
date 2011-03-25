@@ -1780,7 +1780,6 @@ aopOp (operand * op, iCode * ic, bool result)
      b) has a spill location */
   if (sym->isspilt || sym->nRegs == 0)
     {
-
 //      printf("checking remat\n");
       /* rematerialize it NOW */
       if (sym->remat)
@@ -1874,7 +1873,6 @@ aopOp (operand * op, iCode * ic, bool result)
     aop->aopu.aop_reg[i] = sym->regs[i];
   aop->op = op;
   aop->isaddr = op->isaddr;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2013,17 +2011,14 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
   char *rs;
   int offset = aop->size - 1 - loffset;
 
-
   /* offset is greater than
      size then zero */
-  if (loffset > (aop->size - 1) &&
-      aop->type != AOP_LIT)
+  if (loffset > (aop->size - 1) && aop->type != AOP_LIT)
     return zero;
 
   /* depending on type */
   switch (aop->type)
     {
-
     case AOP_DUMMY:
       return zero;
 
@@ -2089,12 +2084,11 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       return aop->aopu.aop_str[loffset];
 
     case AOP_SOF:
-        sprintf (s, "%d,s", _G.stackOfs + _G.stackPushes + aop->aopu.aop_stk
-                            + offset + 1);
+      sprintf (s, "%d,s",
+               _G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + offset + 1);
       rs = Safe_calloc (1, strlen (s) + 1);
       strcpy (rs, s);
       return rs;
-
     }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,

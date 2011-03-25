@@ -1718,7 +1718,7 @@ boolCast (iCode * ic, set * cseSet)
       dic->op != OR_OP &&
       dic->op != GETHBIT &&
       dic->op != GETABIT /*&&
-      !(dic->op == BITWISEAND && (IS_BOOL ( operandType (IC_LEFT (ic))) || IS_BOOL ( operandType (IC_RIGHT (ic))))) Triggers bug #3223041*/
+      !(dic->op == BITWISEAND && (IS_BOOL ( operandType (IC_LEFT (ic))) || IS_BOOL ( operandType (IC_RIGHT (ic))))) This line propagates some bug with the end result being observable as bug #3223041*/
      )
     {
       return 0;

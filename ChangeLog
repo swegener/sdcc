@@ -1,3 +1,8 @@
+2011-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCcse.c (boolCast, cseBBlock):
+	  Reenabled boolCast except for the one case that triggers bug 3223041.
+
 2011-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.h: added IS_BOOLEAN

@@ -1,4 +1,4 @@
-2011-05-25 Philipp Klaus Krause <pkk AT spth.de>
+2011-05-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCcse.c (boolCast):
 	  Fully reenabled boolCast, and fixed my stupid typo that triggered bug 3223041.

@@ -1971,7 +1971,7 @@ rematStr (symbol * sym)
     }
   else
     {
-      dbuf_append (&dbuf, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof (buffer));
+      dbuf_append_str (&dbuf, OP_SYMBOL (IC_LEFT (ic))->rname);
     }
   return dbuf_detach_c_str (&dbuf);
 }
@@ -2022,9 +2022,9 @@ regTypeNum ()
 
               if (ptrPseudoSymSafe (sym, ic))
                 {
-                  const char *s = rematStr (OP_SYMBOL (IC_LEFT (ic)));
+                  char *s = rematStr (OP_SYMBOL (IC_LEFT (ic)));
                   ptrPseudoSymConvert (sym, ic, s);
-                  dbuf_free (s);
+                  Safe_free (s);
                   continue;
                 }
 

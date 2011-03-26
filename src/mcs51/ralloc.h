@@ -28,16 +28,16 @@
 #define SDCCRALLOC_H 1
 
 enum
-  {
-    R2_IDX = 0, R3_IDX, R4_IDX, R5_IDX,
-    R6_IDX, R7_IDX, R0_IDX,  R1_IDX,
-    B0_IDX, B1_IDX, B2_IDX,  B3_IDX,
-    B4_IDX, B5_IDX, B6_IDX,  B7_IDX,
-    X8_IDX, X9_IDX, X10_IDX, X11_IDX,
-    X12_IDX, CND_IDX,
-    DPL_IDX, DPH_IDX, B_IDX, A_IDX,
-    END_IDX
-  };
+{
+  R2_IDX = 0, R3_IDX, R4_IDX, R5_IDX,
+  R6_IDX, R7_IDX, R0_IDX, R1_IDX,
+  B0_IDX, B1_IDX, B2_IDX, B3_IDX,
+  B4_IDX, B5_IDX, B6_IDX, B7_IDX,
+  X8_IDX, X9_IDX, X10_IDX, X11_IDX,
+  X12_IDX, CND_IDX,
+  DPL_IDX, DPH_IDX, B_IDX, A_IDX,
+  END_IDX
+};
 
 
 #define REG_PTR 0x01
@@ -46,25 +46,25 @@ enum
 #define REG_BIT 0x08
 /* definition for the registers */
 typedef struct regs
-  {
-    short type;             /* can have value
-                               REG_GPR, REG_PTR or REG_CND */
-    short rIdx;             /* index into register table */
-    short otype;
-    char *name;             /* name */
-    char *dname;            /* name when direct access needed */
-    char *base;             /* base address */
-    short offset;           /* offset from the base */
-    unsigned isFree:1;      /* is currently unassigned  */
+{
+  short type;                   /* can have value
+                                   REG_GPR, REG_PTR or REG_CND */
+  short rIdx;                   /* index into register table */
+  short otype;
+  char *name;                   /* name */
+  char *dname;                  /* name when direct access needed */
+  char *base;                   /* base address */
+  short offset;                 /* offset from the base */
+  unsigned isFree:1;            /* is currently unassigned  */
 
-    struct
-      {
-        unsigned valueKnown:1;
-        unsigned char value;    /* only valid when valueKnown is set */
-        char *symbol;           /* holds symbol if value is known by symbol */
-      }
-    rtrack;
+  struct
+  {
+    unsigned valueKnown:1;
+    unsigned char value;        /* only valid when valueKnown is set */
+    char *symbol;               /* holds symbol if value is known by symbol */
   }
+  rtrack;
+}
 regs;
 extern regs regs8051[];
 

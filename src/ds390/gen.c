@@ -11472,8 +11472,7 @@ genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 
       while (size--)
         {
-          const char *l = aopGet (right, offset, FALSE, TRUE, NULL);
-          MOVA (l);
+          MOVA (aopGet (right, offset, FALSE, TRUE, NULL));
           emitcode ("movx", "@%s,a", rname);
           if (size || pi)
             emitcode ("inc", "%s", rname);

@@ -1,3 +1,8 @@
+2011-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCcse.c (boolCast):
+	  Fully reenabled boolCast, and fixed my stupid typo that triggered bug 3223041.
+
 2011-03-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/hc08/gen.c: cosmetics

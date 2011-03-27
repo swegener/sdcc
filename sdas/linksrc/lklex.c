@@ -1,24 +1,27 @@
-/* lklex.c
+/* lklex.c */
 
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-#include <stdio.h>
-#include <string.h>
-#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lklex.c
@@ -26,16 +29,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *	The module lklex.c contains the general lexical analysis
  *	functions used to scan the text lines from the .rel files.
  *
- *	lklex.c contains the fllowing functions:
+ *	lklex.c contains the following functions:
+ *		VOID	chopcrlf()
  *		char	endline()
- *		char	get()
+ *		int	get()
  *		VOID	getfid()
  *		VOID	getid()
  *		VOID	getSid()
- *		int	lk_getline()
  *		int	getmap()
- *		char	getnb()
+ *		int	getnb()
  *		int	more()
+ *		int	nxtline()
  *		VOID	skip()
  *		VOID	unget()
  *
@@ -72,8 +76,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *					being processed.
  *
  *	called functions:
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -130,8 +134,8 @@ char *id;
  *					being processed.
  *
  *	called functions:
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -157,24 +161,21 @@ getSid (char *id)
 	*p++ = 0;
 }
 
-/*)Function	VOID	getfid(fid,c)
+/*)Function	VOID	getfid(str,c)
  *
  *		char *	str		a pointer to a string of
  *					maximum length FILSPC-1
  *		int	c		this is first character to
  *					copy to the string buffer
  *
- *	asxxxx vesrion:
+ *	asxxxx version:
  *
- *	The function getfid() scans the current input text line
- *	from the current position copying the next string
- *	into the external string buffer (str).  The string ends when a
- *	non SPACE type character is found. The maximum number of
- *	characters copied is FILSPC-1. If the input string is larger than
- *	FILSPC-1 characters then the string is truncated, if the input string
- *	is shorter than FILSPC-1 characters then the string is NULL filled.
+ *	The function getfid() copies a string of characters from
+ *	the current text line into the external string buffer (str).
+ *	The maximum number of characters copied is FILSPC-1.  The
+ *	string is terminated by a 'space', 'tab' or end of string.
  *
- *	sdld vesrion:
+ *	sdld version:
  *
  *	The function getfid() scans the current input text line from
  *	the current position copying the next string into the external
@@ -195,7 +196,7 @@ getSid (char *id)
  *					being processed.
  *
  *	called functions:
- *		char	get()		lklex.c
+ *		int	get()		lklex.c
  *
  *	side effects:
  *		use of get() updates the global pointer ip
@@ -215,8 +216,7 @@ char *str;
 			if (p < &str[FILSPC-1])
 				*p++ = c;
 			c = get();
-		} while (c && (ctype[c] != SPACE));
-		while (p < &str[FILSPC])
+		} while ((c != 0) && (c != ' ') && (c != '\t'));
 			*p++ = 0;
 	}
 	else {
@@ -238,7 +238,7 @@ char *str;
 	}
 }
 
-/*)Function	char	getnb()
+/*)Function	int	getnb()
  *
  *	The function getnb() scans the current input text
  *	line returning the first character not a SPACE or TAB.
@@ -250,14 +250,14 @@ char *str;
  *		none
  *
  *	called functions:
- *		char	get()		lklex.c
+ *		int	get()		lklex.c
  *
  *	side effects:
  *		use of get() updates the global pointer ip, the position
  *		in the current input text line
  */
 
-char
+int
 getnb()
 {
 	int c;
@@ -267,12 +267,13 @@ getnb()
 	return (c);
 }
 
-/*)Function	VOID	skip()
+/*)Function	VOID	skip(c)
  *
  *	The function skip() scans the input text skipping all
  *	letters and digits.
  *
  *	local variables:
+ *		int	c		last character read
  *		none
  *
  *	global variables:
@@ -280,8 +281,8 @@ getnb()
  *					ASCII character
  *
  *	functions called:
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -298,7 +299,7 @@ int c;
 	unget(c);
 }
 
-/*)Function	char	get()
+/*)Function	int	get()
  *
  *	The function get() returns the next character in the
  *	input text line, at the end of the line a
@@ -321,7 +322,7 @@ int c;
  *		line, ip is not updated.
  */
 
-char
+int
 get()
 {
 	int c;
@@ -390,7 +391,7 @@ int c;
  *		none
  *
  *	called functions:
- *		char	get()		lklex.c
+ *		int	get()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -454,21 +455,20 @@ int d;
 	return (c);
 }
 
-/*)Function	int	lk_getline()
+/*)Function	int	nxtline()
  *
- *	The function lk_getline() reads a line of input text from a
+ *	The function nxtline() reads a line of input text from a
  *	.rel source text file, a .lnk command file or from stdin.
  *	Lines of text are processed from a single .lnk file or
  *	multiple .rel files until all files have been read.
  *	The input text line is copied into the global string ib[]
  *	and converted to a NULL terminated string.  The function
- *	lk_getline() returns a (1) after succesfully reading a line
+ *	nxtline() returns a (1) after succesfully reading a line
  *	or a (0) if all files have been read.
  *	This function also opens each input .lst file and output
  *	.rst file as each .rel file is processed.
  *
  *	local variables:
- *		int	i		string length
  *		int	ftype		file type
  *		char *	fid		file name
  *
@@ -494,13 +494,13 @@ int d;
  *		int	uflag		update listing flag
  *
  *	called functions:
+ *		VOID	chopcrlf()	lklex.c
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		char *	fgets()		c_library
  *		int	fprintf()	c_library
  *		VOID	lkulist()	lklist.c
  *		VOID	lkexit()	lkmain.c
- *		int	strlen()	c_library
  *
  *	side effects:
  *		The input stream is scanned.  The .rel files will be
@@ -508,7 +508,7 @@ int d;
  */
 
 int
-lk_getline()
+nxtline()
 {
 	int ftype;
 	char *fid;
@@ -516,9 +516,11 @@ lk_getline()
 loop:	if (pflag && cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
 
-	if (sfp == NULL || fgets(ib, sizeof ib, sfp) == NULL) {
+	if (sfp == NULL || fgets(ib, sizeof(ib), sfp) == NULL) {
 		if (sfp) {
-			fclose(sfp);
+			if(sfp != stdin) {
+				fclose(sfp);
+			}
 			sfp = NULL;
 			lkulist(0);
 		}
@@ -540,10 +542,10 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = afile(fid, LKOBJEXT, 0);
 				if (is_sdld()) {
 					/* if a .adb file exists then copy it over */
-					if (dflag && sfp && dfp && pass == 0) {
+					if (yflag && sfp && yfp && pass == 0) {
 						FILE *xfp = afile(fid,"adb",0); //JCF: Nov 30, 2002
 						if (xfp) {
-							copyfile(dfp,xfp);
+							copyfile(yfp,xfp);
 							fclose(xfp);
 						}
 					}
@@ -561,10 +563,10 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				gline = 1;
 			} else {
 				fprintf(stderr, "Invalid file type\n");
-				lkexit(1);
+				lkexit(ER_FATAL);
 			}
 			if (sfp == NULL) {
-				lkexit(1);
+				lkexit(ER_FATAL);
 			}
 			goto loop;
 		} else {
@@ -572,7 +574,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 			return(0);
 		}
 	}
-	chop_crlf(ib);
+	chopcrlf(ib);
 	return (1);
 }
 
@@ -591,7 +593,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
  *		none
  *
  *	called functions:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -624,7 +626,7 @@ more()
  *		none
  *
  *	called functions:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *
  *	side effects:
  *		Use of getnb() updates the global pointer ip the
@@ -640,7 +642,7 @@ endline()
 	return( (c == '\0' || c == ';') ? 0 : c );
 }
 
-/*)Function	VOID	chop_crlf(str)
+/*)Function	VOID	chopcrlf(str)
  *
  *		char	*str		string to chop
  *
@@ -661,7 +663,7 @@ endline()
  */
 
 VOID
-chop_crlf(str)
+chopcrlf(str)
 char *str;
 {
 	int i;

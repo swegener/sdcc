@@ -1,31 +1,32 @@
-/* lksym.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* lksym.c */
 
 /*
- * 28-Oct-97 JLH:
- *           - lkpsym: Use StoreString for sym construction
- *           - change symeq() to do length-independent string compare
- *           - change hash() to do length-independent hash calculation
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "aslink.h"
 
 /*)Module       lksym.c
@@ -36,15 +37,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      lksym.c contains the following functions:
  *              int     hash()
  *              sym *   lkpsym()
- *              VOID *  new()
+ *              char *  new()
  *              sym *   newsym()
+ *		char *	strsto()
  *              VOID    symdef()
  *              int     symeq()
  *              VOID    syminit()
  *              VOID    symmod()
  *              a_uint  symval()
  *
- *      lksym.c contains no local/static variables.
+ *	lksym.c contains the static variables:
+ *		char *	pnext
+ *		int	bytes
+ *	used by the string store function.
  */
 
 /*)Function     VOID    syminit()
@@ -52,7 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      The function syminit() is called to clear the hashtable.
  *
  *      local variables:
- *              int     h               computed hash value
  *              sym **  spp             pointer to an array of
  *                                      sym structure pointers
  *
@@ -113,8 +117,8 @@ syminit(void)
  *              VOID    exit()          c_library
  *              int     fprintf()       c_library
  *              char    getSid()        lklex.c
- *              char    get()           lklex.c
- *              char    getnb()         lklex.c
+ *              int     get()           lklex.c
+ *              int     getnb()         lklex.c
  *              sym *   lkpsym()        lksym.c
  *
  *      side effects:
@@ -138,13 +142,19 @@ syminit(void)
 struct sym *
 newsym(void)
 {
-        register unsigned i ;
-        register unsigned nglob ;
-        register int c ;
+	a_uint ev;
+        int c, i, nsym;
         struct sym *tsp;
         struct sym **s;
         char id[NCPS];
 
+        if (headp == NULL) {
+                fprintf(stderr, "No header defined\n");
+                lkexit(ER_FATAL);
+        }
+	/*
+	 * Create symbol entry
+	 */
         getSid(id);     // old: getid(id, -1);
         tsp = lkpsym(id, 1);
         c = getnb();get();get();
@@ -156,42 +166,37 @@ newsym(void)
                 }
         } else
         if (c == 'D') {
-                i = eval();
+                ev = eval();
 				if (tsp->s_type & S_DEF &&
-					!(tsp->s_addr == i && ((tsp->s_axp->a_bap->a_flag & A_ABS) == A_ABS))) {
-                        fprintf(stderr, "Multiple definition of %s\n", id);
+				!(tsp->s_addr == ev && ((tsp->s_axp->a_bap->a_flag & A3_ABS) == A3_ABS))) {
+					fprintf(stderr,
+						"Multiple definition of %s\n", id);
                         lkerr++;
                 }
-                tsp->s_type |= S_DEF;
                 /*
                  * Set value and area extension link.
                  */
-                tsp->s_addr = i;
+                tsp->s_addr = ev;
                 tsp->s_axp = axp;
+                tsp->s_type |= S_DEF;
         } else {
                 fprintf(stderr, "Invalid symbol type %c for %s\n", c, id);
-                lkexit(1);
+                lkexit(ER_FATAL);
         }
         /*
          * Place pointer in header symbol list
          */
-        if (headp == NULL) {
-                fprintf(stderr, "No header defined\n");
-                lkexit(1);
-        }
-        nglob = hp->h_nglob;
+        nsym = hp->h_nsym;
         s = hp->s_list;
-        for (i=0; i < nglob ;++i) {
+        for (i=0; i < nsym ;++i) {
                 if (s[i] == NULL) {
                         s[i] = tsp;
                         return(tsp);
                 }
         }
         fprintf(stderr, "Header symbol list overflow\n");
-        lkexit(1);
-
-        /* Never reached */
-        return(0);
+        lkexit(ER_FATAL);
+        return(NULL);
 }
 
 /*)Function     sym *   lkpsym(id,f)
@@ -217,7 +222,7 @@ newsym(void)
  *
  *      functions called:
  *              int     hash()          lksym.c
- *              VOID *  new()           lksym.c
+ *              char *  new()           lksym.c
  *              int     symeq()         lksym.c
  *
  *      side effects:
@@ -228,8 +233,8 @@ newsym(void)
 struct sym *
 lkpsym(char *id, int f)
 {
-        register struct sym *sp;
-        register int h;
+        struct sym *sp;
+        int h;
 
         h = hash(id, zflag);
         sp = symhash[h];
@@ -269,9 +274,9 @@ lkpsym(char *id, int f)
  */
 
 a_uint
-symval(register struct sym *tsp)
+symval(struct sym *tsp)
 {
-        register a_uint val;
+        a_uint val;
 
         val = tsp->s_addr;
         if (tsp->s_axp) {
@@ -310,8 +315,8 @@ symval(register struct sym *tsp)
 VOID
 symdef(FILE *fp)
 {
-        register struct sym *sp;
-        register int i;
+        struct sym *sp;
+        int i;
 
         for (i=0; i<NHASH; ++i) {
                 sp = symhash[i];
@@ -332,7 +337,7 @@ symdef(FILE *fp)
  *
  *      The function symmod() scans the header structures
  *      searching for a reference to the symbol structure
- *      pointer to by tsp.  The function then generates an error
+ *      pointed to by tsp.  The function then generates an error
  *      message whichs names the module having referenced the
  *      undefined variable.
  *
@@ -358,16 +363,20 @@ symdef(FILE *fp)
 VOID
 symmod(FILE *fp, struct sym *tsp)
 {
-        register int i;
+        int i;
         struct sym **p;
 
         if ((hp = headp) != NULL) {
                 while(hp) {
                         p = hp->s_list;
-                        for (i=0; i<hp->h_nglob; ++i) {
+                        for (i=0; i<hp->h_nsym; ++i) {
                                 if (p[i] == tsp) {
-                                        fprintf(fp, "\n?ASlink-Warning-Undefined Global '%s' ", tsp->s_id);
-                                        fprintf(fp, "referenced by module '%s'\n", hp->m_id);
+                                        fprintf(fp,
+                                                "\n?ASlink-Warning-Undefined Global '%s' ",
+                                                tsp->s_id);
+                                        fprintf(fp,
+                                                "referenced by module '%s'\n",
+                                                hp->m_id);
                                         lkerr++;
                                 }
                         }
@@ -404,11 +413,9 @@ symmod(FILE *fp, struct sym *tsp)
  */
 
 int
-symeq(p1, p2, cflag)
-register char *p1, *p2;
-int cflag;
+symeq(char *p1, char *p2, int cflag)
 {
-	register int n;
+	int n;
 
 	n = strlen(p1) + 1;
 	if(cflag) {
@@ -457,11 +464,9 @@ int cflag;
  */
 
 int
-hash(p, cflag)
-register char *p;
-register int cflag;
+hash(char *p, int cflag)
 {
-	register int h;
+	int h;
 
 	h = 0;
 	while (*p) {
@@ -677,8 +682,7 @@ static	char *	pnext = NULL;
 static	int	bytes = 0;
 
 char *
-strsto(str)
-char *str;
+strsto(char *str)
 {
 	int  l;
 	char *p;
@@ -735,8 +739,7 @@ char *str;
  */
 
 char *
-new(n)
-unsigned int n;
+new(unsigned int n)
 {
 	char *p,*q;
 	unsigned int i;
@@ -752,4 +755,3 @@ unsigned int n;
 }
 
 #endif
-

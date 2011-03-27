@@ -1,23 +1,27 @@
-/* lkeval.c
+/* lkeval.c */
 
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-#include <stdio.h>
-#include <string.h>
 #include "aslink.h"
 
 /*)Module	lkeval.c
@@ -56,8 +60,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *	functions called:
  *		int	digit()		lkeval.c
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -66,7 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 a_uint
-eval()
+eval(void)
 {
 	int c, v;
 	a_uint n;
@@ -118,7 +122,7 @@ eval()
  */
 
 a_uint
-expr (n)
+expr (int n)
 {
 	int c, p;
 	a_uint v, ve;
@@ -215,7 +219,7 @@ expr (n)
  */
 
 a_uint
-term()
+term(void)
 {
 	int c, r, n;
 	a_uint v;
@@ -309,7 +313,8 @@ term()
 			return(symval(sp));
 		}
 	}
-	/* Shouldn't get here. */
+	fprintf(stderr, "Unknown operator %c\n", c);
+	lkerr++;
 	return(0);
 }
 
@@ -337,8 +342,7 @@ term()
  */
 
 int
-digit(c, r)
-int c, r;
+digit(int c, int r)
 {
 	if (r == 16) {
 		if (ctype[c] & RAD16) {
@@ -385,8 +389,7 @@ int c, r;
  */
 
 int
-oprio(c)
-int c;
+oprio(int c)
 {
 	if (c == '*' || c == '/' || c == '%')
 		return (10);

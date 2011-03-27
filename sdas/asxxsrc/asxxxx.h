@@ -203,12 +203,12 @@ struct  area
  *      +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define A_CON   0000            /* Concatenating */
-#define A_OVR   0004            /* Overlaying */
-#define A_REL   0000            /* Relocatable */
-#define A_ABS   0010            /* absolute */
-#define A_NOPAG 0000            /* Non-Paged */
-#define A_PAG   0020            /* Paged */
+#define A3_CON   0000            /* Concatenating */
+#define A3_OVR   0004            /* Overlaying */
+#define A3_REL   0000            /* Relocatable */
+#define A3_ABS   0010            /* absolute */
+#define A3_NOPAG 0000            /* Non-Paged */
+#define A3_PAG   0020            /* Paged */
 
 /* sdas specific */
 /* Additional flags for 8051 address spaces */
@@ -234,33 +234,33 @@ struct  area
  *      +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define R_WORD  0x00            /* 16 bit */
-#define R_BYTE  0x01            /*  8 bit */
+#define R3_WORD  0x00            /* 16 bit */
+#define R3_BYTE  0x01            /*  8 bit */
 
-#define R_AREA  0x00            /* Base type */
-#define R_SYM   0x02
+#define R3_AREA  0x00            /* Base type */
+#define R3_SYM   0x02
 
-#define R_NORM  0x00            /* PC adjust */
-#define R_PCR   0x04
+#define R3_NORM  0x00            /* PC adjust */
+#define R3_PCR   0x04
 
-#define R_BYT1  0x00            /* Byte count for R_BYTE = 1 */
-#define R_BYT2  0x08            /* Byte count for R_BYTE = 2 */
+#define R3_BYT1  0x00            /* Byte count for R3_BYTE = 1 */
+#define R3_BYTX  0x08            /* Byte count for R3_BYTE = 2 */
 
-#define R_SGND  0x00            /* Signed Byte */
-#define R_USGN  0x10            /* Unsigned Byte */
+#define R3_SGND  0x00            /* Signed Byte */
+#define R3_USGN  0x10            /* Unsigned Byte */
 
-#define R_NOPAG 0x00            /* Page Mode */
-#define R_PAG0  0x20            /* Page '0' */
-#define R_PAG   0x40            /* Page 'nnn' */
+#define R3_NOPAG 0x00            /* Page Mode */
+#define R3_PAG0  0x20            /* Page '0' */
+#define R3_PAG   0x40            /* Page 'nnn' */
 
-#define R_LSB   0x00            /* low byte */
-#define R_MSB   0x80            /* high byte */
+#define R3_LSB   0x00            /* low byte */
+#define R3_MSB   0x80            /* high byte */
 
-#define R_BYT3  0x100           /* if R_BYTE is set, this is a
+#define R_BYT3  0x100           /* if R3_BYTE is set, this is a
                                                          * 3 byte address, of which
                                                          * the linker must select one byte.
                                                          */
-#define R_HIB   0x200                   /* If R_BYTE & R_BYT3 are set, linker
+#define R_HIB   0x200                   /* If R3_BYTE & R_BYT3 are set, linker
                                          * will select byte 3 of the relocated
                                          * 24 bit address.
                                          */
@@ -269,10 +269,10 @@ struct  area
                                                          * space to bit-addressable space.
                                                          */
 
-#define R_J11   (R_WORD|R_BYT2) /* JLH: 11 bit JMP and CALL (8051) */
-#define R_J19   (R_WORD|R_BYT2|R_MSB)   /* 19 bit JMP/CALL (DS80C390)      */
-#define R_C24   (R_WORD|R_BYT1|R_MSB)   /* 24 bit address (DS80C390)       */
-#define R_J19_MASK      (R_BYTE|R_BYT2|R_MSB)
+#define R_J11           (R3_WORD|R3_BYTX)          /* JLH: 11 bit JMP and CALL (8051) */
+#define R_J19           (R3_WORD|R3_BYTX|R3_MSB)   /* 19 bit JMP/CALL (DS80C390)      */
+#define R_C24           (R3_WORD|R3_BYT1|R3_MSB)   /* 24 bit address (DS80C390)       */
+#define R_J19_MASK      (R3_BYTE|R3_BYTX|R3_MSB)
 
 #define IS_R_J19(x)     (((x) & R_J19_MASK) == R_J19)
 #define IS_R_J11(x)     (((x) & R_J19_MASK) == R_J11)
@@ -737,7 +737,6 @@ extern  char            getnb();
 extern  VOID            getst();
 extern  int             more();
 extern  VOID            unget();
-extern  VOID            chop_crlf();
 
 /* assym.c */
 extern  struct  area *  alookup();

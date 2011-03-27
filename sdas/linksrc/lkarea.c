@@ -366,7 +366,7 @@ lnkarea()
 		ap = areap;
 		/* no need to check first area, it's in front anyway */
 		while (ap && ap->a_ap) {
-			if (ap->a_ap->a_flag & A_ABS)
+			if (ap->a_ap->a_flag & A3_ABS)
 			{/* next area is absolute, move it to front,
 				reversed sequence is no problem for absolutes */
 				abs_ap = ap->a_ap;
@@ -408,7 +408,7 @@ lnkarea()
 
    ap = areap;
    while (ap) {
-		if (ap->a_flag&A_ABS) {
+		if (ap->a_flag&A3_ABS) {
 			/*
 			 * Absolute sections
 			 */
@@ -622,14 +622,14 @@ lnksect(struct area *tap)
 	size = 0;
 	addr = tap->a_addr;
 	if (!TARGET_IS_8051 &&
-		(tap->a_flag&A_PAG) && (addr & 0xFF)) {
+		(tap->a_flag&A3_PAG) && (addr & 0xFF)) {
 		fprintf(stderr,
 			"\n?ASlink-Warning-Paged Area %s Boundary Error\n",
 			tap->a_id);
 		lkerr++;
 	}
 	taxp = tap->a_axp;
-	if (tap->a_flag&A_OVR) {
+	if (tap->a_flag&A3_OVR) {
 		/*
 		 * Overlayed sections
 		 */
@@ -639,7 +639,7 @@ lnksect(struct area *tap)
 				size = taxp->a_size;
 			taxp = taxp->a_axp;
 		}
-	} else if (TARGET_IS_6808 && tap->a_flag & A_ABS) {
+	} else if (TARGET_IS_6808 && tap->a_flag & A3_ABS) {
 		/*
 		 * Absolute sections
 		 */
@@ -669,14 +669,14 @@ lnksect(struct area *tap)
 		}
 	}
 	tap->a_size = size;
-	if ((tap->a_flag&A_PAG) && (size > 256)) {
+	if ((tap->a_flag&A3_PAG) && (size > 256)) {
 		fprintf(stderr,
 			"\n?ASlink-Warning-Paged Area %s Length Error\n",
 			tap->a_id);
 		lkerr++;
 	}
 	if (TARGET_IS_8051 &&
-		(tap->a_flag&A_PAG) && (tap->a_size) &&
+		(tap->a_flag&A3_PAG) && (tap->a_size) &&
 		((tap->a_addr & 0xFFFFFF00) != ((addr-1) & 0xFFFFFF00)))
 	{
 		fprintf(stderr,
@@ -717,7 +717,7 @@ VOID lnkarea2 (void)
 	/* no need to check first area, it's in front anyway */
 	while (ap && ap->a_ap)
 	{
-		if (ap->a_ap->a_flag & A_ABS)
+		if (ap->a_ap->a_flag & A3_ABS)
 		{/* next area is absolute, move it to front,
 			reversed sequence is no problem for absolutes */
 			abs_ap = ap->a_ap;
@@ -737,7 +737,7 @@ VOID lnkarea2 (void)
 	abs_ap = areap;
 	while (ap)
 	{
-		if (ap->a_flag & A_ABS)
+		if (ap->a_flag & A3_ABS)
 		{
 			abs_ap = ap; /* Remember the last abs area */
 		}
@@ -794,7 +794,7 @@ VOID lnkarea2 (void)
 		else if (ap->a_flag & A_BIT)   locIndex = 3;
 		else locIndex = 0;
 
-		if (ap->a_flag & A_ABS) /* Absolute sections */
+		if (ap->a_flag & A3_ABS) /* Absolute sections */
 		{
 			lnksect2(ap, locIndex);
 		}
@@ -886,7 +886,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 	size = 0;
 	addr = tap->a_addr;
 #if 0
-	if ((tap->a_flag&A_PAG) && (addr & 0xFF))
+	if ((tap->a_flag&A3_PAG) && (addr & 0xFF))
 	{
 		fprintf(stderr,
 			"\n?ASlink-Warning-Paged Area %s Boundary Error\n",
@@ -933,7 +933,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 			fchar='K';
 	}
 
-	if (tap->a_flag&A_OVR) /* Overlayed sections */
+	if (tap->a_flag&A3_OVR) /* Overlayed sections */
 	{
 		while (taxp)
 		{
@@ -1066,7 +1066,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 			taxp = taxp->a_axp;
 		}
 	}
-	else if (tap->a_flag & A_ABS) /* Absolute sections */
+	else if (tap->a_flag & A3_ABS) /* Absolute sections */
 	{
 		while (taxp)
 		{
@@ -1201,14 +1201,14 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 	tap->a_size = size;
 	tap->a_addr = tap->a_axp->a_addr;
 
-	if ((tap->a_flag&A_PAG) && (size > 256))
+	if ((tap->a_flag&A3_PAG) && (size > 256))
 	{
 		fprintf(stderr,
 			"\n?ASlink-Warning-Paged Area %s Length Error\n",
 			tap->a_id);
 		lkerr++;
 	}
-	if ((tap->a_flag&A_PAG) && (tap->a_size) &&
+	if ((tap->a_flag&A3_PAG) && (tap->a_size) &&
 		((tap->a_addr & 0xFFFFFF00) != ((addr-1) & 0xFFFFFF00)))
 	{
 		fprintf(stderr,

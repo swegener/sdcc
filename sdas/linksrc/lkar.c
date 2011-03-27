@@ -567,7 +567,7 @@ load_adb (FILE * libfp, struct lbfile *lbfh)
                   assert (0);
                 }
 
-              fwrite (buf, 1, n, dfp);
+              fwrite (buf, 1, n, yfp);
 
               left -= n;
             }
@@ -676,7 +676,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
                           D ("Loading module %s from file %s.\n", hdr.ar_name, lbfh->libspc);
                           load_rel (libfp, hdr.ar_size);
                           ///* if cdb information required & .adb file present */
-                          //if (dflag && dfp)
+                          //if (yflag && yfp)
                           //  {
                           //    if (load_adb(FILE *libfp, struct lbfile *lbfh))
                           //      SaveLinkedFilePath (filspc);
@@ -764,7 +764,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
                           D ("Loading module %s from file %s.\n", hdr.ar_name, lbfh->libspc);
                           load_rel (libfp, hdr.ar_size);
                           ///* if cdb information required & .adb file present */
-                          //if (dflag && dfp)
+                          //if (yflag && yfp)
                           //  {
                           //    if (load_adb(FILE *libfp, struct lbfile *lbfh))
                           //      SaveLinkedFilePath (filspc);
@@ -816,7 +816,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
           /* Opened OK - create a new libraryfile object for it */
           ret = add_rel_file (name, lbnh, hdr.ar_name, filspc, moduleOffset - hdr_size, libfp, hdr.ar_size, type);
           ///* if cdb information required & .adb file present */
-          //if (dflag && dfp)
+          //if (yflag && yfp)
           //  {
           //    if (load_adb(FILE *libfp, struct lbfile *lbfh))
           //      SaveLinkedFilePath (filspc);

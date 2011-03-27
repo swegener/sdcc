@@ -1,36 +1,87 @@
-/* aslink.h
+/* aslink.h */
 
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-/* 28-Oct-97 JLH:
- *	     - add proto for StoreString
- *	     - change s_id from [NCPS] to pointer
- *	     - change NCPS to 80
- *	     - case sensitive
- *	     - add R_J11 for 8051 assembler
- * 31-Oct-97 JLH:
- *	     - add jflag and jfp for NoICE output
- * 30-Jan-98 JLH:
- *	     - add memory space flags to a_flag for 8051
+/*
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
  *
- * Extensions: P. Felber
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ */
+
+/*
+ * System Include Files
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+/*
+ * Local Definitions
  */
 
 #define VERSION "V02.00 + NoICE + sdld"
+
+/*
+ * To include NoICE Debugging set non-zero
+ */
+#define NOICE   1
+
+/*
+ * To include SDCC Debugging set non-zero
+ */
+#define SDCDB   1
+
+/*
+ * The assembler requires certain variables to have
+ * at least 32 bits to allow correct address processing.
+ *
+ * The type INT32 is defined so that compiler dependent
+ * variable sizes may be specified in one place.
+ *
+ * LONGINT is defined when INT32 is 'long' to
+ * select the 'l' forms for format strings.
+ */
+
+/* Turbo C++ 3.0 for DOS */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef	__TURBOC__
+#define		INT32	long
+#define		LONGINT
+#endif
+
+/* Symantec C++ V6.x/V7.x for DOS (not DOSX) */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef	__SC__
+#define		INT32	long
+#define		LONGINT
+#endif
+
+/* The DEFAULT is 'int' is 32 bits */
+#ifndef	INT32
+#define		INT32	int
+#endif
+
 
 /*)Module	aslink.h
  *
@@ -124,132 +175,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 #define NCPS	PATH_MAX	/* characters per symbol */
-#define NDATA	16		/* actual data */
 #define NINPUT	PATH_MAX	/* Input buffer size */
 #define NHASH	64		/* Buckets in hash table */
 #define HMASK	077		/* Hash mask */
 #define NLPP	60		/* Lines per page */
-#define NTXT	16		/* T values */
 #define	NMAX	78		/* Maximum S19/IHX line length */
 #define	FILSPC	PATH_MAX	/* File spec length */
 
+#define NDATA	16		/* actual data */
 /*
- *	The "R_" relocation constants define values used in
- *	generating the assembler relocation output data for
- *	areas, symbols, and code.
+ * NTXT must be defined to have the same value in
+ * the ASxxxx assemblers and ASLink.
  *
- *
- *	Relocation types.
- *
- *	       7     6	   5	 4     3     2	   1	 0
- *	    +-----+-----+-----+-----+-----+-----+-----+-----+
- *	    | MSB | PAGn| PAG0| USGN| BYT2| PCR | SYM | BYT |
- *	    +-----+-----+-----+-----+-----+-----+-----+-----+
+ * The R Line coding allows only 4-bits for coding
+ * the T Line index.  The MAXIMUM value for NTXT
+ * is 16.  It should not be changed.
+ */
+#define NTXT	16		/* T values */
+
+/*
+ *	ASLINK - Version 3 Definitions
  */
 
-#define R_WORD	0x00		/* 16 bit */
-#define R_BYTE	0x01		/*  8 bit */
-
-#define R_AREA	0x00		/* Base type */
-#define R_SYM	0x02
-
-#define R_NORM	0x00		/* PC adjust */
-#define R_PCR	0x04
-
-#define R_BYT1	0x00		/* Byte count for R_BYTE = 1 */
-#define R_BYT2	0x08		/* Byte count for R_BYTE = 2 */
-
-#define R_SGND	0x00		/* Signed Byte */
-#define R_USGN	0x10		/* Unsigned Byte */
-
-#define R_NOPAG 0x00		/* Page Mode */
-#define R_PAG0	0x20		/* Page '0' */
-#define R_PAG	0x40		/* Page 'nnn' */
-
-#define R_LSB	0x00		/* low byte */
-#define R_MSB	0x80		/* high byte */
-
 /*
- *	Additional "R_" functionality is required to support
- *	some microprocesssor architectures.   The 'illegal'
- *	"R_" mode of R_WORD | R_BYT2 is used as a designator
- *	of the extended R_ modes.  The extended modes replace
- *	the PAGING modes and are being added in an adhoc manner
- *	as follows:
+ *	The "A3_" area constants define values used in
+ *	generating the assembler area output data.
  *
- * Extended Mode relocation flags
+ * Area flags
  *
- *	   7	 6     5     4	   3	 2     1     0
+ *	   7     6     5     4     3     2     1     0
  *	+-----+-----+-----+-----+-----+-----+-----+-----+
- *	| MSB |  x  |  x  | USGN|  1  | PCR | SYM |  0	|
+ *	|     |     |     | PAG | ABS | OVR |     |     |
  *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define	R_ECHEK	0011		/* Extended Mode Check Bits */
-#define	R_EXTND	0010		/* Extended Mode Code */
-#define	R_EMASK	0151		/* Extended Mode Mask */
-
-/* #define R_AREA 0000 */	/* Base type */
-/* #define R_SYM  0002 */
-
-/* #define R_NORM 0000 */	/* PC adjust */
-/* #define R_PCR  0004 */
-
-/* #define R_SGND 0000 */	/* Signed value */
-/* #define R_USGN 0020 */	/* Unsigned value */
-
-/* #define R_LSB  0000 */	/* output low byte */
-/* #define R_MSB  0200 */	/* output high byte */
-
-////#define	R_J11	0010		/* JLH: 11 bit JMP and CALL (8051) */
-/* #define R_xxx  0050 */	/* Unused */
-/* #define R_xxx  0110 */	/* Unused */
-/* #define R_xxx  0150 */	/* Unused */
-
-/* sdld specific */
-#define R_BYT3	0x100		/* if R_BYTE is set, this is a
-				 * 3 byte address, of which
-				 * the linker must select one byte.
-				 */
-#define R_HIB	0x200		/* If R_BYTE & R_BYT3 are set, linker
-				 * will select byte 3 of the relocated
-				 * 24 bit address.
-				 */
-
-#define R_BIT	0x400		/* Linker will convert from byte-addressable
-				 * space to bit-addressable space.
-				 */
-
-#define R_J11	(R_WORD|R_BYT2) /* JLH: 11 bit JMP and CALL (8051) */
-#define R_J19	(R_WORD|R_BYT2|R_MSB) /* 19 bit JMP/CALL (DS80C390) */
-#define R_C24	(R_WORD|R_BYT1|R_MSB) /* 24 bit address (DS80C390) */
-#define R_J19_MASK (R_BYTE|R_BYT2|R_MSB)
-
-#define IS_R_J19(x) (((x) & R_J19_MASK) == R_J19)
-#define IS_R_J11(x) (((x) & R_J19_MASK) == R_J11)
-#define IS_C24(x) (((x) & R_J19_MASK) == R_C24)
-
-#define R_ESCAPE_MASK	0xf0	/* Used to escape relocation modes
-				 * greater than 0xff in the .rel
-				 * file.
-				 */
-/* end sdld specific */
-
-/*
- * Global symbol types.
- */
-#define S_REF	1		/* referenced */
-#define S_DEF	2		/* defined */
-
-/*
- * Area type flags
- */
-#define A_CON	  0000		/* concatenate */
-#define A_OVR	  0004		/* overlay */
-#define A_REL	  0000		/* relocatable */
-#define A_ABS	  0010		/* absolute */
-#define A_NOPAG   0000		/* non-paged */
-#define A_PAG	  0020		/* paged */
+#define A3_CON	  000		/* concatenate */
+#define A3_OVR	  004		/* overlay */
+#define A3_REL	  000		/* relocatable */
+#define A3_ABS	  010		/* absolute */
+#define A3_NOPAG   000		/* non-paged */
+#define A3_PAG	  020		/* paged */
 
 /* sdld specific */
 /* Additional flags for 8051 address spaces */
@@ -264,6 +229,109 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /* end sdld specific */
 
 /*
+ *	The "R3_" relocation constants define values used in
+ *	generating the assembler relocation output data for
+ *	areas, symbols, and code.
+ *
+ *
+ *	Relocation types.
+ *
+ *	       7     6	   5	 4     3     2	   1	 0
+ *	    +-----+-----+-----+-----+-----+-----+-----+-----+
+ *	    | MSB | PAGn| PAG0| USGN| BYT2| PCR | SYM | BYT |
+ *	    +-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define R3_WORD	0x00		/* 16 bit */
+#define R3_BYTE	0x01		/*  8 bit */
+
+#define R3_AREA	0x00		/* Base type */
+#define R3_SYM	0x02
+
+#define R3_NORM	0x00		/* PC adjust */
+#define R3_PCR	0x04
+
+#define R3_BYT1	0x00		/* Byte count for R_BYTE = 1 */
+#define R3_BYTX	0x08		/* Byte count for R_BYTE = X */
+
+#define R3_SGND	0x00		/* Signed value */
+#define R3_USGN	0x10		/* Unsigned value */
+
+#define R3_NOPAG 0x00		/* Page Mode */
+#define R3_PAG0	0x20		/* Page '0' */
+#define R3_PAG	0x40		/* Page 'nnn' */
+
+#define R3_LSB	0x00		/* output low byte */
+#define R3_MSB	0x80		/* output high byte */
+
+/*
+ *	Additional "R3_" functionality is required to support
+ *	some microprocesssor architectures.   The 'illegal'
+ *	"R3_" mode of R3_WORD | R3_BYTX is used as a designator
+ *	of the extended R3_ modes.  The extended modes replace
+ *	the PAGING modes and are being added in an adhoc manner
+ *	as follows:
+ *
+ * Extended Mode relocation flags
+ *
+ *	   7	 6     5     4	   3	 2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| MSB |  x  |  x  | USGN|  1  | PCR | SYM |  0	|
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define	R3_ECHEK	0011		/* Extended Mode Check Bits */
+#define	R3_EXTND	0010		/* Extended Mode Code */
+#define	R3_EMASK	0151		/* Extended Mode Mask */
+
+/* #define R3_AREA 0000 */	/* Base type */
+/* #define R3_SYM  0002 */
+
+/* #define R3_NORM 0000 */	/* PC adjust */
+/* #define R3_PCR  0004 */
+
+/* #define R3_SGND 0000 */	/* Signed value */
+/* #define R3_USGN 0020 */	/* Unsigned value */
+
+/* #define R3_LSB  0000 */	/* output low byte */
+/* #define R3_MSB  0200 */	/* output high byte */
+
+#define R_J11	(R3_WORD|R3_BYTX) /* JLH: 11 bit JMP and CALL (8051) */
+#define R_J19	(R3_WORD|R3_BYTX|R3_MSB) /* 19 bit JMP and CALL (DS80C390) */
+#define R_C24	(R3_WORD|R3_BYT1|R3_MSB) /* 24 bit address (DS80C390) */
+#define R_J19_MASK (R3_BYTE|R3_BYTX|R3_MSB)
+
+#define IS_R_J19(x) (((x) & R_J19_MASK) == R_J19)
+#define IS_R_J11(x) (((x) & R_J19_MASK) == R_J11)
+#define IS_C24(x) (((x) & R_J19_MASK) == R_C24)
+
+/* sdld specific */
+#define R_BYT3	0x100		/* if R3_BYTE is set, this is a
+				 * 3 byte address, of which
+				 * the linker must select one byte.
+				 */
+#define R_HIB	0x200		/* If R3_BYTE & R_BYT3 are set, linker
+				 * will select byte 3 of the relocated
+				 * 24 bit address.
+				 */
+
+#define R_BIT	0x400		/* Linker will convert from byte-addressable
+				 * space to bit-addressable space.
+				 */
+
+#define R_ESCAPE_MASK	0xf0	/* Used to escape relocation modes
+				 * greater than 0xff in the .rel
+				 * file.
+				 */
+/* end sdld specific */
+
+/*
+ * Global symbol types.
+ */
+#define S_REF	1		/* referenced */
+#define S_DEF	2		/* defined */
+
+/*
  * File types
  */
 #define	F_OUT	0		/* File.ixx / File.sxx */
@@ -272,18 +340,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	F_REL	3		/* File.rel */
 
 /*
- *	General assembler address type
+ *	The defined type 'a_uint' is used for all address and
+ *	unsigned variable value calculations.  Its size is
+ *	required to be at least 32-bits to allow upto
+ *	32-bit addressing or 32-bit value manipulation.
  */
-typedef unsigned int a_uint;
+typedef	unsigned INT32 a_uint;
 
 /*
- *	The structures of head, area, areax, and sym are created
- *	as the REL files are read during the first pass of the
- *	linker.  The struct head is created upon encountering a
- *	H directive in the REL file.  The structure contains a
- *	link to a link file structure (struct lfile) which describes
- *	the file containing the H directive, the number of data/code
- *	areas contained in this header segment, the number of
+ *	The defined type 'v_sint' is used for address and
+ *	variable value calculations requiring a sign.
+ *	Its size is required to be at least 32-bits to allow
+ *	upto 32-bit addressing or 32-bit value manipulation.
+ */
+typedef	signed INT32 v_sint;
+
+/*
+ *	The structures of head, area, areax, and sym
+ *	are created as the REL files are read during the first
+ *	pass of the linker.  The struct head is created upon
+ *	encountering a H directive in the REL file.  The
+ *	structure contains a link to a link file structure
+ *	(struct lfile) which describes the file containing the H
+ *	directive, the number of data/code areas
+ *	contained in this header segment, the number of
  *	symbols referenced/defined in this header segment, a pointer
  *	to an array of pointers to areax structures (struct areax)
  *	created as each A directive is read, and a pointer to an
@@ -295,12 +375,12 @@ typedef unsigned int a_uint;
  */
 struct	head
 {
-	struct	head   *h_hp;	/* Header link */
-	struct	lfile  *h_lfile;/* Associated file */
+	struct	head  *h_hp;	/* Header link */
+	struct	lfile *h_lfile;	/* Associated file */
 	int	h_narea;	/* # of areas */
 	struct	areax **a_list; /* Area list */
-	int	h_nglob;	/* # of global symbols */
-	struct	sym   **s_list; /* Globle symbol list */
+	int	h_nsym;	/* # of symbols */
+	struct	sym   **s_list; /* Symbol list */
 	char *	m_id;		/* Module name */
 };
 
@@ -309,7 +389,7 @@ struct	head
  *	area definition found as the REL files are read.  The
  *	struct area contains the name of the area, a flag byte
  *	which contains the area attributes (REL/CON/OVR/ABS),
- *	an area subtype (not used in this assembler), and the
+ *	the area subtype (not used in this assembler), and the
  *	area base address and total size which will be filled
  *	in at the end of the first pass through the REL files.
  *	As A directives are read from the REL files a linked
@@ -326,7 +406,7 @@ struct	area
 	a_uint	a_unaloc;	/* Total number of unallocated bytes, for error reporting */
 /* end sdld specific */
 	char	a_type;		/* Area subtype */
-	int	a_flag;		/* Flag byte */
+	int	a_flag;		/* Flags */
 	char *	a_id;		/* Name */
 /* sdld specific */
 	char	*a_image;	/* Something for hc08/lkelf */
@@ -572,10 +652,11 @@ extern	char	afspec[];	/*	The filespec created by afile()
 extern	char	ccase[];	/*	an array of characters which
 				 *	perform the case translation function
 				 */
+
 extern	struct	lfile	*filep; /*	The pointers (lfile *) filep,
 				 *	(lfile *) cfp, and (FILE *) sfp
 				 *	are used in conjunction with
-				 *	the routine lk_getline() to read
+				 *	the routine nxtline() to read
 				 *	aslink commands from
 				 *	(1) the standard input or
 				 *	(2) or a command file
@@ -636,6 +717,12 @@ extern	struct	rerr	rerr;	/*	Structure containing the
 				 */
 extern	FILE	*ofp;		/*	Linker Output file handle
 				 */
+
+#if NOICE
+extern	FILE	*jfp;		/*	NoICE output file handle
+				 */
+#endif
+
 extern	FILE	*mfp;		/*	Map output file handle
 				 */
 extern	FILE	*rfp;		/*	File handle for output
@@ -648,12 +735,29 @@ extern	FILE	*sfp;		/*	The file handle sfp points to the
 extern	FILE	*tfp;		/*	File handle for input
 				 *	ASxxxx listing file
 				 */
+
+#if SDCDB
+extern	FILE	*yfp;		/*	SDCDB output file handle
+				 */
+#endif
+
 extern	int	oflag;		/*	Output file type flag
 				 */
+#if NOICE
+extern	int	jflag;		/*	-j, enable NoICE Debug output
+				 */
+#endif
+
 extern	int	mflag;		/*	Map output flag
 				 */
 extern	int	xflag;		/*	Map file radix type flag
 				 */
+
+#if SDCDB
+extern	int	yflag;		/*	-y, enable SDCC Debug output
+				 */
+#endif
+
 extern	int	pflag;		/*	print linker command file flag
 				 */
 extern	int	uflag;		/*	Listing relocation flag
@@ -708,19 +812,11 @@ extern	struct lbfile *lbfhead; /*	pointer to the first
 				 *	library file structure
 				 */
 /* sdld specific */
-extern	FILE	*jfp;		/*	NoICE output file handle
-				 */
-extern	FILE	*dfp;		/*	File handle for debug info output
-				 */
-extern	int	dflag;		/*	Output debug information flag
-				 */
 extern	int	sflag;		/*	JCF: Memory usage output flag
 				 */
 extern	int	packflag;	/*	Pack data memory flag
 				 */
 extern	int	stacksize;	/*	Pack data memory flag
-				 */
-extern	int	jflag;		/*	NoICE output flag
 				 */
 extern int	rflag;		/*	Extended linear address record flag.
 				*/
@@ -752,9 +848,11 @@ extern	int		fprintf();
 extern	VOID		free();
 extern	VOID *		malloc();
 extern	char		putc();
+extern	char *		sprintf();
 extern	char *		strcpy();
 extern	int		strlen();
 extern	char *		strncpy();
+extern	char *		strrchr();
 */
 
 /* Program function definitions */
@@ -762,8 +860,8 @@ extern	char *		strncpy();
 /* lkmain.c */
 extern	FILE *		afile();
 extern	VOID		bassav();
-extern	int		fndidx(char *str);
 extern	int		fndext(char *str);
+extern	int		fndidx(char *str);
 extern	VOID		gblsav();
 extern	VOID		iramsav();
 extern	VOID		xramsav();
@@ -781,18 +879,18 @@ extern	VOID		usage();
 extern	VOID		copyfile();
 
 /* lklex.c */
+extern	VOID		chopcrlf();
 extern	char		endline();
-extern	char		get();
+extern	int		get();
 extern	VOID		getfid();
 extern	VOID		getid();
 extern	VOID		getSid(char *id);
-extern	int		lk_getline();
 extern	int		getmap();
-extern	char		getnb();
+extern	int		getnb();
 extern	int		more();
+extern	int		nxtline();
 extern	VOID		skip();
 extern	VOID		unget();
-extern	VOID		chop_crlf();
 
 /* lkarea.c */
 extern	VOID		lkparea();
@@ -825,12 +923,16 @@ extern	a_uint		term();
 
 /* lklist.c */
 extern	int		dgt();
+extern	VOID		newpag();
+extern	VOID		slew();
+extern	VOID		lstarea();
 extern	VOID		lkulist();
 extern	VOID		lkalist();
 extern	VOID		lkglist();
-extern	VOID		lstarea();
-extern	VOID		newpag();
-extern	VOID		slew();
+
+/* lknoice.c */
+extern	void		DefineNoICE( char *name, a_uint value, int page );
+
 
 /* lkrloc.c */
 extern	a_uint		adb_b(register a_uint v, register int i);
@@ -879,9 +981,6 @@ extern	VOID		iflush();
 extern	VOID		ihxExtendedLinearAddress(a_uint);
 extern	VOID		ihxNewArea();
 /* end sdlk specific */
-
-/* lknoice.c */
-extern	void		DefineNoICE( char *name, a_uint value, int page );
 
 /* EEP: lkelf.c */
 extern	VOID		elf();

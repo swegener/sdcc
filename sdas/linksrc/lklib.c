@@ -168,13 +168,13 @@ fndsym_lib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
             {
               D ("Loaded module %s from file %s.\n", str, str);
               /* if cdb information required & adb file present */
-              if (dflag && dfp)
+              if (yflag && yfp)
                 {
                   FILE *xfp = afile (str, "adb", 0);    //JCF: Nov 30, 2002
                   if (xfp)
                     {
                       SaveLinkedFilePath (str);
-                      copyfile (dfp, xfp);
+                      copyfile (yfp, xfp);
                       fclose (xfp);
                     }
                 }

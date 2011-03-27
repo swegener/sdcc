@@ -218,7 +218,7 @@ LoadAdb (FILE * libfp)
         case 1:
           if (EQ (str, "</ADB>"))
             return ret;
-          fprintf (dfp, "%s\n", str);
+          fprintf (yfp, "%s\n", str);
           ret = 1;
           break;
         }
@@ -337,7 +337,7 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
                       lkexit (1);
                     }
                   /* if cdb information required & .adb file present */
-                  if (dflag && dfp)
+                  if (yflag && yfp)
                     {
                       if (LoadAdb (libfp))
                         SaveLinkedFilePath (filspc);

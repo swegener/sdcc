@@ -292,7 +292,7 @@ relr()
 	/*
 	 * Verify Area Mode
 	 */
-	if (eval() != (R_WORD | R_AREA) || eval()) {
+	if (eval() != (R3_WORD | R3_AREA) || eval()) {
 		fprintf(stderr, "R input error\n");
 		lkerr++;
 	}
@@ -341,10 +341,10 @@ relr()
 		rindex = evword();
 
 		/*
-		 * R_SYM or R_AREA references
+		 * R3_SYM or R3_AREA references
 		 */
-		if (mode & R_SYM) {
-			if (rindex >= hp->h_nglob) {
+		if (mode & R3_SYM) {
+			if (rindex >= hp->h_nsym) {
 				fprintf(stderr, "R symbol error\n");
 				lkerr++;
 				return;
@@ -367,10 +367,10 @@ relr()
 		}
 
 		/*
-		 * R_PCR addressing
+		 * R3_PCR addressing
 		 */
-		if (mode & R_PCR) {
-			if (mode & R_BYTE) {
+		if (mode & R3_PCR) {
+			if (mode & R3_BYTE) {
 				reli -= (pc + (rtp-rtofst) + 1);
 			} else {
 				reli -= (pc + (rtp-rtofst) + 2);
@@ -378,18 +378,18 @@ relr()
 		}
 
 		/*
-		 * R_PAG0 or R_PAG addressing
+		 * R3_PAG0 or R3_PAG addressing
 		 */
-		if (mode & (R_PAG0 | R_PAG)) {
+		if (mode & (R3_PAG0 | R3_PAG)) {
 			paga  = sdp.s_area->a_addr;
 			pags  = sdp.s_addr;
 			reli -= paga + pags;
 		}
 
 		/*
-		 * R_BYTE or R_WORD operation
+		 * R3_BYTE or R3_WORD operation
 		 */
-		if (mode & R_BYTE) {
+		if (mode & R3_BYTE) {
 			if (mode & R_BYT3)
 			{
 				/* This is a three byte address, of which
@@ -406,9 +406,9 @@ relr()
 					/* printf("24 bit address selecting hi byte.\n"); */
 					relv = adb_24_hi(reli, rtp);
 				}
-				else if (mode & R_MSB)
+				else if (mode & R3_MSB)
 				{
-					/* Note that in 24 bit mode, R_MSB
+					/* Note that in 24 bit mode, R3_MSB
 					 * is really the middle byte, not
 					 * the most significant byte.
 					 *
@@ -424,13 +424,13 @@ relr()
 					relv = adb_24_lo(reli, rtp);
 				}
 			}
-			else if (mode & R_BYT2) {
+			else if (mode & R3_BYTX) {
 				/* This is a two byte address, of
 				 * which we will select one byte.
 				 */
 				if (mode & R_BIT) {
 					relv = adb_bit(reli, rtp);
-				} else if (mode & R_MSB) {
+				} else if (mode & R3_MSB) {
 					relv = adb_hi(reli, rtp);
 				} else {
 					relv = adb_lo(reli, rtp);
@@ -500,10 +500,10 @@ relr()
 		}
 
 		/*
-		 * R_BYTE with R_BYT2 offset adjust
+		 * R3_BYTE with R3_BYTX offset adjust
 		 */
-		if (mode & R_BYTE) {
-			if (mode & R_BYT2) {
+		if (mode & R3_BYTE) {
+			if (mode & R3_BYTX) {
 				rtofst += 1;
 			}
 		}
@@ -511,13 +511,13 @@ relr()
 		/*
 		 * Unsigned Byte Checking
 		 */
-		if (mode & R_USGN && mode & R_BYTE && relv & ~0xFF)
+		if (mode & R3_USGN && mode & R3_BYTE && relv & ~0xFF)
 			error = 1;
 
 		/*
 		 * PCR Relocation Error Checking
 		 */
-		if (mode & R_PCR && mode & R_BYTE) {
+		if (mode & R3_PCR && mode & R3_BYTE) {
 			r = relv & ~0x7F;
 			if (r != (a_uint) ~0x7F && r != 0)
 				error = 2;
@@ -527,9 +527,9 @@ relr()
 		 * Page Relocation Error Checking
 		 */
 		if ((TARGET_IS_GB || TARGET_IS_Z80) &&
-			mode & R_PAG0 && (relv & ~0xFF || paga || pags))
+			mode & R3_PAG0 && (relv & ~0xFF || paga || pags))
 			error = 3;
-		if (mode & R_PAG  && (relv & ~0xFF))
+		if (mode & R3_PAG  && (relv & ~0xFF))
 			error = 4;
 /* sdld specific */
 		if ((mode & R_BIT) && (relv & ~0x87FF))
@@ -703,7 +703,7 @@ relp()
 	/*
 	 * Verify Area Mode
 	 */
-	if (eval() != (R_WORD | R_AREA) || eval()) {
+	if (eval() != (R3_WORD | R3_AREA) || eval()) {
 		fprintf(stderr, "P input error\n");
 		lkerr++;
 	}
@@ -727,10 +727,10 @@ relp()
 		rindex = evword();
 
 		/*
-		 * R_SYM or R_AREA references
+		 * R3_SYM or R3_AREA references
 		 */
-		if (mode & R_SYM) {
-			if (rindex >= hp->h_nglob) {
+		if (mode & R3_SYM) {
+			if (rindex >= hp->h_nsym) {
 				fprintf(stderr, "P symbol error\n");
 				lkerr++;
 				return;
@@ -1477,7 +1477,7 @@ char *str;
 	/*
 	 * Print symbol if symbol based
 	 */
-	if (mode & R_SYM) {
+	if (mode & R3_SYM) {
 		fprintf(fptr, " for symbol  %s\n",
 			&s[rindex]->s_id[0]);
 	} else {
@@ -1501,7 +1501,7 @@ char *str;
 	/*
 	 * Print Def Info
 	 */
-	if (mode & R_SYM) {
+	if (mode & R3_SYM) {
 		raxp = s[rindex]->s_axp;
 	} else {
 		raxp = a[rindex];
@@ -1513,7 +1513,7 @@ char *str;
 			raxp->a_bhp->h_lfile->f_idp,
 			&raxp->a_bhp->m_id[0],
 			&raxp->a_bap->a_id[0]);
-	if (mode & R_SYM) {
+	if (mode & R3_SYM) {
 		prntval(fptr, s[rindex]->s_addr);
 	} else {
 		prntval(fptr, rerr.rval);

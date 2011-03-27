@@ -408,7 +408,7 @@ struct mne *mp;
 				aerr();
 			outab(v2);
 		} else {
-			outrb(&e2, R_PCR);
+			outrb(&e2, R3_PCR);
 		}
 		if (e2.e_mode != S_USER)
 			rerr();

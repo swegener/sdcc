@@ -89,7 +89,7 @@ struct aslib_target *aslib_targets[] = {
  *			    path structure
  *
  *   functions called:
- *	char	getnb()     lklex.c
+ *	int	getnb()     lklex.c
  *	VOID *	new()	    lksym.c
  *	int	strlen()    c_library
  *	char *	strcpy()    c_library
@@ -141,7 +141,7 @@ addpath (void)
  *
  *   functions called:
  *	VOID	addfile()   lklibr.c
- *	char	getnb()     lklex.c
+ *	int	getnb()     lklex.c
  *	VOID	unget()     lklex.c
  *
  *  side effects:
@@ -198,7 +198,7 @@ addlib (void)
  *			    path structure
  *
  *   functions called:
- *	char	getnb()     lklex.c
+ *	int	getnb()     lklex.c
  *	VOID *	new()	    lksym.c
  *	int	strlen()    c_library
  *	char *	strcpy()    c_library
@@ -444,7 +444,7 @@ search (void)
  *	int	fclose()    c_library
  *	FILE	*fopen()    c_library
  *	VOID	free()	    c_library
- *	char	getnb()     lklex.c
+ *	int	getnb()     lklex.c
  *	VOID	lkexit()    lkmain.c
  *	VOID	loadfile()  lklibr.c
  *	VOID *	new()	    lksym.c

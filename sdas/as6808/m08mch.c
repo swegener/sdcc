@@ -82,7 +82,7 @@ struct mne *mp;
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e1, R_PCR);
+			outrb(&e1, R3_PCR);
 		}
 		if (e1.e_mode != S_USER)
 			rerr();
@@ -100,7 +100,7 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op);
-			outrb(&e1, R_PAG0);
+			outrb(&e1, R3_PAG0);
 			break;
 		}
 		if (t1 == S_IX) {
@@ -111,7 +111,7 @@ struct mne *mp;
 			if (chkindx(&e1))
 				aerr();
 			outab(op+0x30);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 			break;
 		}
 		if (t1 == S_SP1 || t1 == S_SP2) {
@@ -119,7 +119,7 @@ struct mne *mp;
 				aerr();
 			outab(0x9e);
 			outab(op+0x30);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 			break;
 		}
 		aerr();
@@ -137,7 +137,7 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			outab(op+0x10);
-			outrb(&e1, R_PAG0);
+			outrb(&e1, R3_PAG0);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -151,7 +151,7 @@ struct mne *mp;
 		}
 		if (t1 == S_IX1) {
 			outab(op+0x40);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 			break;
 		}
 		if (t1 == S_IX2) {
@@ -164,7 +164,7 @@ struct mne *mp;
 				aerr();
 			outab(0x9e);
 			outab(op+0x40);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 			break;
 		}
 		if (t1 == S_SP2) {
@@ -188,7 +188,7 @@ struct mne *mp;
 		if (t2 != S_DIR)
 			aerr();
 		outab(op + 2*(espv&0x07));
-		outrb(&e2, R_PAG0);
+		outrb(&e2, R3_PAG0);
 		break;
 
 	case S_TYP4:
@@ -203,14 +203,14 @@ struct mne *mp;
 		comma(1);
 		expr(&e3, 0);
 		outab(op + 2*(espv&0x07));
-		outrb(&e2, R_PAG0);
+		outrb(&e2, R3_PAG0);
 		if (mchpcr(&e3)) {
 			v1 = e3.e_addr - dot.s_addr - 1;
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e3, R_PCR);
+			outrb(&e3, R3_PCR);
 		}
 		if (e3.e_mode != S_USER)
 			rerr();
@@ -244,7 +244,7 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op | 0x10);
-			outrb(&e1, R_PAG0);
+			outrb(&e1, R3_PAG0);
 			break;
 		}
 		aerr();
@@ -260,7 +260,7 @@ struct mne *mp;
 		} else
 		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op);
-			outrb(&e1, R_PAG0);
+			outrb(&e1, R3_PAG0);
 		} else
 		if (t1 == S_IXP) {
 			outab(op+0x40);
@@ -269,14 +269,14 @@ struct mne *mp;
 			if (chkindx(&e1))
 				aerr();
 			outab(op+0x30);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 		} else
 		if (t1 == S_SP1 || t1 == S_SP2) {
 			if (chkindx(&e1))
 				aerr();
 			outab(0x9E);
 			outab(op+0x30);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 		} else {
 			aerr();
 			break;
@@ -287,7 +287,7 @@ struct mne *mp;
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e2, R_PCR);
+			outrb(&e2, R3_PCR);
 		}
 		if (e2.e_mode != S_USER)
 			rerr();
@@ -307,7 +307,7 @@ struct mne *mp;
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e2, R_PCR);
+			outrb(&e2, R3_PCR);
 		}
 		if (e2.e_mode != S_USER)
 			rerr();
@@ -319,7 +319,7 @@ struct mne *mp;
 		expr(&e2, 0);
 		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op);
-			outrb(&e1, R_PAG0);
+			outrb(&e1, R3_PAG0);
 		} else
 		if (t1 == S_IX) {
 			outab(op+0x40);
@@ -328,14 +328,14 @@ struct mne *mp;
 			if (chkindx(&e1))
 				aerr();
 			outab(op+0x30);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 		} else
 		if (t1 == S_SP1 || t1 == S_SP2) {
 			if (chkindx(&e1))
 				aerr();
 			outab(0x9E);
 			outab(op+0x30);
-			outrb(&e1, R_USGN);
+			outrb(&e1, R3_USGN);
 		} else {
 			aerr();
 			break;
@@ -346,7 +346,7 @@ struct mne *mp;
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e2, R_PCR);
+			outrb(&e2, R3_PCR);
 		}
 		if (e2.e_mode != S_USER)
 			rerr();
@@ -361,7 +361,7 @@ struct mne *mp;
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e1, R_PCR);
+			outrb(&e1, R3_PCR);
 		}
 		if (e1.e_mode != S_USER)
 			rerr();
@@ -373,7 +373,7 @@ struct mne *mp;
 			if (chkindx(&e1))
 				aerr();
 			outab(op+0x10);
-			outrb(&e1, R_PAG0);
+			outrb(&e1, R3_PAG0);
 			break;
 		}
 		comma(1);
@@ -382,22 +382,22 @@ struct mne *mp;
 			if (t2 == S_DIR || t2 == S_EXT) {
 				outab(op+0x20);
 				outrb(&e1, 0);
-				outrb(&e2, R_PAG0);
+				outrb(&e2, R3_PAG0);
 				break;
 			}
 		}
 		if (t1 == S_DIR || t1 == S_EXT) {
 			if (t2 == S_DIR || t2 == S_EXT) {
 				outab(op);
-				outrb(&e1, R_PAG0);
-				outrb(&e2, R_PAG0);
+				outrb(&e1, R3_PAG0);
+				outrb(&e2, R3_PAG0);
 				break;
 			}
 		}
 		if (t1 == S_IXP) {
 			if (t2 == S_DIR || t2 == S_EXT) {
 				outab(op+0x30);
-				outrb(&e2, R_PAG0);
+				outrb(&e2, R3_PAG0);
 				break;
 			}
 		}

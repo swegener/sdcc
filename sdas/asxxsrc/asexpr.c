@@ -149,7 +149,7 @@ expr(register struct expr *esp, int n)
                     /* SD :- moved the abscheck to each case
                        case and change the right shift operator.. if
                        right shift by 8 bits of a relocatable address then
-                       the user wants the higher order byte. set the R_MSB
+                       the user wants the higher order byte. set the R3_MSB
                        for the expression */
                        switch (c) {
 
@@ -201,7 +201,7 @@ expr(register struct expr *esp, int n)
                             /* if the left is a relative address &
                                the right side is == 8 then */
                             if (esp->e_base.e_ap && re.e_addr == 8) {
-                                esp->e_rlcf |= R_MSB ;
+                                esp->e_rlcf |= R3_MSB ;
                                 break;
                             }
                             else if (esp->e_base.e_ap && re.e_addr == 16)
@@ -401,9 +401,9 @@ term(register struct expr *esp)
                         /*
                          * let linker perform msb/lsb, lsb is default
                          */
-                        esp->e_rlcf |= R_BYT2;
+                        esp->e_rlcf |= R3_BYTX;
                         if (c == '>')
-                                esp->e_rlcf |= R_MSB;
+                                esp->e_rlcf |= R3_MSB;
                         return;
                 }
         }
@@ -534,7 +534,7 @@ term(register struct expr *esp)
                         /* MB: abused bit 15 of s_addr to indicate bit-addressable bytes */
                         if ((sp->s_addr & 0x8000) && sp->s_area &&
                             (!strcmp(sp->s_area->a_id, "BSEG_BYTES") || !strcmp(sp->s_area->a_id, "BIT_BANK"))) {
-                                esp->e_rlcf |= R_BIT | R_BYT2;
+                                esp->e_rlcf |= R_BIT | R3_BYTX;
                         }
                 }
                 return;

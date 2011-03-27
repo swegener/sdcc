@@ -135,7 +135,7 @@ void Areas51 (void)
  *
  *	The function main() evaluates the command line arguments to
  *	determine if the linker parameters are to input through 'stdin'
- *	or read from a command file.  The functions lk_getline() and parse()
+ *	or read from a command file.  The functions nxtline() and parse()
  *	are to input and evaluate the linker parameters.  The linking process
  *	proceeds by making the first pass through each .rel file in the order
  *	presented to the linker.  At the end of the first pass the setbase(),
@@ -189,7 +189,7 @@ void Areas51 (void)
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		int	lk_getline()	lklex.c
+ *		int	nxtline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link_main()	lkmain.c
  *		VOID	lkexit()	lkmain.c
@@ -276,7 +276,7 @@ char *argv[];
 	filep = startp;
 	while (1) {
 		ip = ib;
-		if (lk_getline() == 0)
+		if (nxtline() == 0)
 			break;
 		if (pflag && sfp != stdin)
 			fprintf(stdout, "%s\n", ip);
@@ -307,11 +307,11 @@ char *argv[];
 	syminit();
 
 	/* sdld specific */
-	if (dflag){
-		//dfp = afile("temp", "cdb", 1);
+	if (yflag){
+		//yfp = afile("temp", "cdb", 1);
 		SaveLinkedFilePath(linkp->f_idp);	//Must be the first one...
-		dfp = afile(linkp->f_idp, "cdb" ,1);	//JCF: Nov 30, 2002
-		if (dfp == NULL)
+		yfp = afile(linkp->f_idp, "cdb" ,1);	//JCF: Nov 30, 2002
+		if (yfp == NULL)
 			lkexit(1);
 	}
 	/* end sdld specific */
@@ -328,7 +328,7 @@ char *argv[];
 			Areas51(); /*JCF: Create the default 8051 areas in the right order*/
 		/* end sdld specific */
 
-		while (lk_getline()) {
+		while (nxtline()) {
 			ip = ib;
 
 			/* sdld specific */
@@ -483,7 +483,7 @@ int i;
 {
 	/* sdld 8051 specific */
 	if (jfp != NULL) fclose(jfp);
-	if (dfp != NULL) fclose(dfp);
+	if (yfp != NULL) fclose(yfp);
 	/* end sdld 8051 specific */
 	if (mfp != NULL) fclose(mfp);
 	if (ofp != NULL) fclose(ofp);
@@ -799,7 +799,7 @@ map()
  *		int	fprintf()	c_library
  *		VOID	gblsav()	lkmain.c
  *		VOID	getfid()	lklex.c
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	lkexit()	lkmain.c
  *		char *	strsto()	lksym.c
  *		int	strlen()	c_library
@@ -916,16 +916,6 @@ parse()
 						++wflag;
 					break;
 
-				case 'Z':
-				case 'z':
-					if (is_sdld()) {
-						dflag = 1;
-						return(0);
-					}
-					else
-						++zflag;
-					break;
-
 				case 'j':
 				case 'J':
 					if (is_sdld()) {
@@ -997,6 +987,16 @@ parse()
 					addlib();
 					return(0);
 
+				case 'z':
+				case 'Z':
+					if (is_sdld()) {
+						yflag = 1;
+						return(0);
+					}
+					else
+						++zflag;
+					break;
+
 				default:
 				err:
 					fprintf(stderr,
@@ -1048,7 +1048,7 @@ parse()
  *					text line in ib[]
  *
  *	 functions called:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID *	new()		lksym.c
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
@@ -1102,7 +1102,7 @@ bassav()
  *		a_uint	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		int	symeq()		lksym.c
  *
  *	side effects:
@@ -1161,7 +1161,7 @@ setbas()
  *		int	lkerr		error flag
  *
  *	functions called:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID *	new()		lksym.c
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
@@ -1213,7 +1213,7 @@ gblsav()
  *		a_uint	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		sym *	lkpsym()	lksym.c
  *
  *	side effects:
@@ -1466,7 +1466,7 @@ char * str;
  *		iram_size		RAM segment
  *
  *	 functions called:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *		a_uint	expr()		lkeval.c
  *

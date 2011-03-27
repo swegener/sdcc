@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *  local variables: hexPageOverrun, lastHexAddr
  */
 
-/*Intel Hex Format
+/*Intel Format
  *      Record Mark Field    -  This  field  signifies  the  start  of a
  *                              record, and consists of an  ascii  colon
  *                              (:).
@@ -61,13 +61,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *                                  Low digit of low byte of address.
  *
  *                              In an End of File record this field con-
- *                              sists of either four ascii zeros or  the
- *                              program  entry  address.   Currently the
- *                              entry address option is not supported.
+ *                              sists of four ascii zeros, in a start
+ *				address record this is the program entry
+ *				address (low), or in a segment record
+ *				this is the high order address.
  *
  *      Record Type Field    -  This  field  identifies the record type,
- *                              which is either 0 for data records or  1
- *                              for  an End of File record.  It consists
+ *                              which is either 0 for data records,  1
+ *                              for an End of File record, 3 for a
+ *				start address, or 4 for a
+ *				segment record.  It consists
  *                              of two ascii characters, with  the  high
  *                              digit of the record type first, followed
  *                              by the low digit of the record type.

@@ -649,7 +649,7 @@ elfGenerate (void)
     {
       if (ap->a_size)
         {
-          if (ap->a_flag & A_ABS)
+          if (ap->a_flag & A3_ABS)
             elfGenerateAbs (ap, segments, sections);
           else
             elfGenerateRel (ap, segments, sections);
@@ -737,7 +737,7 @@ elf (int i)
       if (!ap->a_image)
         {
           ap->a_image = new (ap->a_size);
-          if (ap->a_flag & A_ABS)
+          if (ap->a_flag & A3_ABS)
             ap->a_used = new (ap->a_size);
         }
 

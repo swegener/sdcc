@@ -1,30 +1,32 @@
-/* lkdata.c
-
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* lkdata.c */
 
 /*
- * 28-Oct-97 JLH:
- *	     - change s_id from [NCPS] to pointer (comment)
- * 31-Oct-97 JLH:
- *	     - add jflag and jfp for NoICE output
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
-#include <stdio.h>
-#include <string.h>
 #include "aslink.h"
 
 /*)Module	lkdata.c
@@ -55,6 +57,16 @@ char	rb[NINPUT];	/*	LST file text line being
 			 */
 int	oflag;		/*	Output file type flag
 			 */
+#if NOICE
+int	jflag;		/*	NoICE output flag
+			 */
+#endif
+
+#if SDCDB
+int	yflag;		/*	SDCDB output flag
+			 */
+#endif
+
 int	mflag;		/*	Map output flag
 			 */
 int	xflag;		/*	Map file radix type flag
@@ -106,8 +118,6 @@ int	gcntr;		/*	LST file relocation active
 /* sdld specific */
 char	*optsdcc;
 char	*optsdcc_module;
-int	dflag;		/*	Debug information output flag
-			 */
 int	sflag;		/*	JCF: Memory usage output flag
 			 */
 int	packflag=0;	/*	JCF: Pack internal memory flag
@@ -115,8 +125,6 @@ int	packflag=0;	/*	JCF: Pack internal memory flag
 int	stacksize=0;	/*	JCF: Stack size
 			 */
 int	aflag;		/*	Overlapping area warning flag
-			 */
-int	jflag;		/*	NoICE output flag
 			 */
 int	rflag;		/*	Extended linear address record flag.
 			 */
@@ -130,8 +138,9 @@ long	code_size = -1;	/*	code size
 
 /*
  *	The structure lfile contains a pointer to a
- *	file specification string, the file type, and
- *	a link to the next lfile structure.
+ *	file specification string, the file type,
+ *	and a link to the next
+ *	lfile structure.
  *
  *	struct	lfile
  *	{
@@ -143,7 +152,7 @@ long	code_size = -1;	/*	code size
 struct	lfile	*filep; /*	The pointers (lfile *) filep,
 			 *	(lfile *) cfp, and (FILE *) sfp
 			 *	are used in conjunction with
-			 *	the routine lk_getline() to read
+			 *	the routine nxtline() to read
 			 *	asmlnk commands from
 			 *	(1) the standard input or
 			 *	(2) or a command file
@@ -158,7 +167,7 @@ struct	lfile	*filep; /*	The pointers (lfile *) filep,
 struct	lfile	*cfp;	/*	The pointer *cfp points to the
 			 *	current lfile structure
 			 */
-struct	lfile	*startp;/*	asmlnk startup file structure
+struct	lfile	*startp;/*	aslink startup file structure
 			 */
 struct	lfile	*linkp; /*	pointer to first lfile structure
 			 *	containing an input REL file
@@ -167,37 +176,42 @@ struct	lfile	*linkp; /*	pointer to first lfile structure
 struct	lfile	*lfp;	/*	pointer to current lfile structure
 			 *	being processed by parse()
 			 */
-FILE	*ofp;		/*	Output file handle
+FILE	*ofp = NULL;	/*	Output file handle
 			 *	for word formats
 			 */
-FILE	*mfp;		/*	Map output file handle
+
+#if NOICE
+FILE	*jfp = NULL;	/*	NoICE output file handle
 			 */
-FILE	*rfp;		/*	File handle for output
+#endif
+
+#if SDCDB
+FILE	*yfp = NULL;	/*	SDCDB output file handle
+			 */
+#endif
+
+FILE	*mfp = NULL;	/*	Map output file handle
+			 */
+FILE	*rfp = NULL;	/*	File handle for output
 			 *	address relocated ASxxxx
 			 *	listing file
 			 */
-FILE	*sfp;		/*	The file handle sfp points to the
+FILE	*sfp = NULL;	/*	The file handle sfp points to the
 			 *	currently open file
 			 */
-FILE	*tfp;		/*	File handle for input
+FILE	*tfp = NULL;	/*	File handle for input
 			 *	ASxxxx listing file
 			 */
-/* sdld specific */
-FILE	*jfp;		/*	NoICE output file handle
-			 */
-FILE	*dfp = NULL ;	/*
-			 *	File handle for debug
-			 *	information output file
-			 */
-/* end sdld specific */
+
 /*
- *	The structures of head, area, areax, and sym are created
- *	as the REL files are read during the first pass of the
- *	linker.  The struct head is created upon encountering a
- *	H directive in the REL file.  The structure contains a
- *	link to a link file structure (struct lfile) which describes
- *	the file containing the H directive, the number of data/code
- *	areas contained in this header segment, the number of
+ *	The structures of head, area, areax, and sym
+ *	are created as the REL files are read during the first
+ *	pass of the linker.  The struct head is created upon
+ *	encountering a H directive in the REL file.  The
+ *	structure contains a link to a link file structure
+ *	(struct lfile) which describes the file containing the H
+ *	directive, the number of data/code areas
+ *	contained in this header segment, the number of
  *	symbols referenced/defined in this header segment, a pointer
  *	to an array of pointers to areax structures (struct areax)
  *	created as each A directive is read, and a pointer to an
@@ -213,8 +227,8 @@ FILE	*dfp = NULL ;	/*
  *		struct	lfile  *h_lfile;	Associated file
  *		int	h_narea;		# of areas
  *		struct	areax **a_list;		Area list
- *		int	h_nglob;		# of global symbols
- *		struct	sym   **s_list;		Global symbol list
+ *		int	h_nsym;			# of symbols
+ *		struct	sym   **s_list;		Symbol list
  *		char *	m_id;			Module name
  *	};
  */
@@ -230,7 +244,7 @@ struct	head	*hp;	/*	Pointer to the current
  *	area definition found as the REL files are read.  The
  *	struct area contains the name of the area, a flag byte
  *	which contains the area attributes (REL/CON/OVR/ABS),
- *	an area subtype (not used in this assembler), and the
+ *	the area subtype (not used in this assembler), and the
  *	area base address and total size which will be filled
  *	in at the end of the first pass through the REL files.
  *	As A directives are read from the REL files a linked
@@ -244,7 +258,7 @@ struct	head	*hp;	/*	Pointer to the current
  *		a_uint	a_addr;			Beginning address of area
  *		a_uint	a_size;			Total size of the area
  *		char	a_type;			Area subtype
- *		char	a_flag;			Flag byte
+ *		int	a_flag;			Flags
  *		char *	a_id;			Name
  *	};
  */
@@ -376,7 +390,7 @@ struct	sdp	sdp;	/* Base Page Structure */
  *		int	aindex;		Linking area
  *		int	mode;		Relocation mode
  *		a_uint	rtbase;		Base address in section
- *		int	rindex;		Area/Symbol reloaction index
+ *		int	rindex;		Area/Symbol relocation index
  *		a_uint	rval;		Area/Symbol offset value
  *	};
  */
@@ -443,8 +457,9 @@ struct	lbname	*lbnhead;	/*	pointer to the first
  *	The element libspc points to the library file path specification
  *	and element relfil points to the object file specification string.
  *	The element filspc is the complete path/file specification for
- *	the library file to be imported into the linker.  The
- *	file specicifation may be formed in one of two ways:
+ *	the library file to be imported into the linker.
+ *	The file specification
+ *	may be formed in one of two ways:
  *
  *	(1)	If the library file contained an absolute
  *		path/file specification then this becomes filspc.

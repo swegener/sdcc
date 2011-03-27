@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  * H n areas n global symbols
  *   |	     |
- *   |	     `---- hp->h_nglob
+ *   |	     `---- hp->h_nsym
  *   `------------ hp->h_narea
  *
  */
@@ -111,15 +111,15 @@ newhead()
 	 * Evaluate and build Global symbol pointer list
 	 */
 	skip(-1);
-	i = hp->h_nglob = eval();
+	i = hp->h_nsym = eval();
 	if (i)
 		hp->s_list = (struct sym **) new (i*sizeof(struct sym *));
 	/*
 	 * Setup Absolute DEF linkage.
 	 */
 	lkparea(_abs_);
-	ap->a_flag = A_ABS;
-    axp->a_addr = 0;
+	ap->a_flag = A3_ABS;
+	axp->a_addr = 0;
 }
 
 /*)Function	VOID	module()

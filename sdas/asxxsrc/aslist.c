@@ -429,11 +429,11 @@ int t;
          */
         if (fflag >= 2) {
                 if (t & R_RELOC) {
-                        if (t & (R_PAG0|R_PAG)) {
+                        if (t & (R3_PAG0|R3_PAG)) {
                                 c = '*';
-                        } else if (t & R_USGN) {
+                        } else if (t & R3_USGN) {
                                 c = 'u';
-                        } else if (t & R_PCR) {
+                        } else if (t & R3_PCR) {
                                 c = 'p';
                         } else {
                                 c = 'r';

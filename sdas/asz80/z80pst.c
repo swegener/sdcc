@@ -31,12 +31,12 @@ struct	mne	mne[] = {
 
 	/* system */
 
-    { NULL,	"CON",		S_ATYP,		0,	A_CON },
-    { NULL,	"OVR",		S_ATYP,		0,	A_OVR },
-    { NULL,	"REL",		S_ATYP,		0,	A_REL },
-    { NULL,	"ABS",		S_ATYP,		0,	A_ABS },
-    { NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG },
-    { NULL,	"PAG",		S_ATYP,		0,	A_PAG },
+    { NULL,	"CON",		S_ATYP,		0,	A3_CON },
+    { NULL,	"OVR",		S_ATYP,		0,	A3_OVR },
+    { NULL,	"REL",		S_ATYP,		0,	A3_REL },
+    { NULL,	"ABS",		S_ATYP,		0,	A3_ABS },
+    { NULL,	"NOPAG",	S_ATYP,		0,	A3_NOPAG },
+    { NULL,	"PAG",		S_ATYP,		0,	A3_PAG },
 
     { NULL,	".byte",	S_BYTE,		0,	0 },
     { NULL,	".db",		S_BYTE,		0,	0 },

@@ -97,7 +97,7 @@ register struct area *xp;
 		if (xflag == 2) {
 			fprintf(mfp, "Decimal\n\n");
 		}
-		if (is_sdld() || wflag) {
+		if (wflag) {
 			fprintf(mfp,
 				"Area                               ");
 			fprintf(mfp,
@@ -120,7 +120,7 @@ register struct area *xp;
 		 * Output Area Header
 		 */
 		ptr = &xp->a_id[0];
-		if (is_sdld() || wflag) {
+		if (wflag) {
 			fprintf(mfp, "%-32.32s", ptr);
 		} else {
 			fprintf(mfp, "%-8.8s", ptr);
@@ -137,17 +137,17 @@ register struct area *xp;
 			fprintf(mfp, "  %05u  %05u", ai, aj);
 		}
 		fprintf(mfp, " = %6u. bytes ", aj);
-		if (xp->a_flag & A_ABS) {
+		if (xp->a_flag & A3_ABS) {
 			fprintf(mfp, "(ABS");
 		} else {
 			fprintf(mfp, "(REL");
 		}
-		if (xp->a_flag & A_OVR) {
+		if (xp->a_flag & A3_OVR) {
 			fprintf(mfp, ",OVR");
 		} else {
 			fprintf(mfp, ",CON");
 		}
-		if (xp->a_flag & A_PAG) {
+		if (xp->a_flag & A3_PAG) {
 			fprintf(mfp, ",PAG");
 		}
 
@@ -165,7 +165,7 @@ register struct area *xp;
 
 		fprintf(mfp, ")\n");
 
-		if (xp->a_flag & A_PAG) {
+		if (xp->a_flag & A3_PAG) {
 			ai = (ai & 0xFF);
 			aj = (aj > 256);
 			if (ai || aj) { fprintf(mfp, "  "); lop += 1; }
@@ -175,7 +175,7 @@ register struct area *xp;
 			if (ai || aj) { fprintf(mfp, " Error\n"); }
 		}
 
-		if (is_sdld() || wflag) {
+		if (wflag) {
 			putc('\n', mfp);
 			fprintf(mfp,
 			"      Value  Global                           ");
@@ -362,7 +362,7 @@ struct area *xp;
 	/* end sdld spcific */
 	i = 0;
 	while (i < nmsym) {
-		if (is_sdld() || wflag || (i % 4 == 0)) {
+		if (wflag || (i % 4 == 0)) {
 			slew(xp);
 			fprintf(mfp, "     ");
 		}
@@ -385,7 +385,7 @@ struct area *xp;
 			fprintf(mfp, " %05u  ", aj);
 		}
 		ptr = &sp->s_id[0];
-		if (is_sdld() || wflag) {
+		if (wflag) {
 			fprintf(mfp, "%-33.33s", ptr);
 			i++;
 			ptr = &sp->m_id[0];
@@ -398,7 +398,7 @@ struct area *xp;
 				if (i % 4 != 0)
 					fprintf(mfp, " | ");
 		}
-		if (is_sdld() || wflag || (i % 4 == 0)) {
+		if (wflag || (i % 4 == 0)) {
 			putc('\n', mfp);
 		}
 
@@ -406,8 +406,8 @@ struct area *xp;
 		ptr = &sp->s_id[0];
 		/* if cdb flag set the output cdb Information
 		   and the symbol has a '$' sign in it then */
-		if (dflag && strchr(ptr,'$'))
-			fprintf(dfp,"L:%s:%X\n",ptr,aj);
+		if (yflag && strchr(ptr,'$'))
+			fprintf(yfp,"L:%s:%X\n",ptr,aj);
 
 		/* NoICE output of symbol */
 		if (jflag) DefineNoICE( ptr, aj, memPage );

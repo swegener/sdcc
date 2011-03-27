@@ -1,3 +1,22 @@
+2011-03-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/m08mch.c,  sdas/as6808/m08pst.c,
+	* sdas/as8051/i51mch.c,  sdas/as8051/i51pst.c,
+	* sdas/asgb/gbmch.c,     sdas/asgb/gbpst.c,
+	* sdas/asz80/z80mch.c,   sdas/asz80/z80pst.c,
+	* sdas/asxxsrc/asdata.c, sdas/asxxsrc/asexpr.c,
+	* sdas/asxxsrc/aslist.c, sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asout.c,  sdas/asxxsrc/asxxxx.h,
+	* sdas/linksrc/aslink.h, sdas/linksrc/lkaomf51.c,
+	* sdas/linksrc/lkar.c,   sdas/linksrc/lkarea.c,
+	* sdas/linksrc/lkdata.c, sdas/linksrc/lkelf.c,
+	* sdas/linksrc/lkeval.c, sdas/linksrc/lkhead.c,
+	* sdas/linksrc/lkihx.c,  sdas/linksrc/lklex.c,
+	* sdas/linksrc/lklib.c,  sdas/linksrc/lklibr.c,
+	* sdas/linksrc/lklist.c, sdas/linksrc/lkmain.c,
+	* sdas/linksrc/lkmem.c,  sdas/linksrc/lkrloc.c,
+	* sdas/linksrc/lksym.c,  sdas/linksrc/lksdcclib.c: first steps towards ASxxxx 5
+
 2011-03-27 Borut Razem <borut.razem AT gmail.com>
 
 	* src/z80/main.c, src/z80/gen.c, src/z80/gen.h,

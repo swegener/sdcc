@@ -131,7 +131,7 @@ void SaveLinkedFilePath(char * filepath)
 {
   int j;
 
-  if((dflag) && (!rflag))
+  if((yflag) && (!rflag))
     {
       char *p;
 
@@ -605,10 +605,10 @@ void CollectInfoFromCDB(void)
 
   if(numin==0) return;
 
-  if (dfp != NULL)
+  if (yfp != NULL)
     {
-      fclose(dfp);
-      dfp=NULL;
+      fclose(yfp);
+      yfp=NULL;
     }
 
   /*Build the source filename*/
@@ -1103,7 +1103,7 @@ int ReadHexFile(int * Begin)
 
 void CreateAOMF51(void)
 {
-  if((dflag) && (!rflag))
+  if((yflag) && (!rflag))
     {
       CollectInfoFromCDB();
 #if DODUMP

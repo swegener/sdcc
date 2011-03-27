@@ -1,6 +1,6 @@
 /*
   dbuf.h - Dynamic buffer interface
-  version 1.3.1, 2011-01-17
+  version 1.4.0, 2011-03-27
 
   Copyright (c) 2002-2011 Borut Razem
 
@@ -44,6 +44,7 @@ extern "C" {
 int _dbuf_expand(struct dbuf_s *dbuf, size_t size);
 struct dbuf_s *dbuf_new(size_t size);
 int dbuf_init(struct dbuf_s *dbuf, size_t size);
+int dbuf_is_initialized (struct dbuf_s *dbuf);
 int dbuf_set_length(struct dbuf_s *dbuf, size_t size);
 int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t len);
 const void *dbuf_get_buf(struct dbuf_s *dbuf);

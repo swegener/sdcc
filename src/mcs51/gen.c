@@ -1325,15 +1325,15 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
   asmop *aop = AOP (oper);
   static struct dbuf_s dbuf = { 0 };
 
-  if (dbuf.buf == NULL)
-    {
-      /* first time: initialize the dynamically allocated buffer */
-      dbuf_init (&dbuf, 128);
-    }
-  else
+  if (dbuf_is_initialized(&dbuf))
     {
       /* reuse the dynamically allocated buffer */
       dbuf_set_length (&dbuf, 0);
+    }
+  else
+    {
+      /* first time: initialize the dynamically allocated buffer */
+      dbuf_init (&dbuf, 128);
     }
 
   /* offset is greater than

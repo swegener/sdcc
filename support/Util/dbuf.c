@@ -1,6 +1,6 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.3.1, 2011-01-17
+  version 1.4.0, 2011-03-27
 
   Copyright (c) 2002-2011 Borut Razem
 
@@ -76,6 +76,29 @@ int dbuf_init(struct dbuf_s *dbuf, size_t size)
   return ((dbuf->buf = malloc(dbuf->alloc)) != NULL);
 }
 
+
+/*
+ * Test if dbuf is initialized.
+ * NOTE: the dbuf structure should be set
+ * to all zeroes at definition:
+ * struct dbuf_s dbuf = { 0 };
+ *
+ * See: dbuf_init()
+ */
+
+int dbuf_is_initialized (struct dbuf_s *dbuf)
+{
+  if (dbuf->buf == NULL) {
+    assert(dbuf->alloc == 0);
+    assert(dbuf->len == 0);
+    return 0;
+  }
+  else {
+    assert(dbuf->alloc != 0);
+    assert(dbuf->len >= 0 && dbuf->len <= dbuf->alloc);
+    return 1;
+  }
+}
 
 /*
  * Allocate new dbuf structure on the heap

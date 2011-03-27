@@ -30,43 +30,43 @@
 #define DEBUG_FAKE_EXTRA_REGS 	0
 
 enum
-  {
-    C_IDX = 0,
-    B_IDX,
-    E_IDX,
-    D_IDX,
-    L_IDX,
-    H_IDX,
+{
+  C_IDX = 0,
+  B_IDX,
+  E_IDX,
+  D_IDX,
+  L_IDX,
+  H_IDX,
 #if DEBUG_FAKE_EXTRA_REGS
-    M_IDX,
-    N_IDX,
-    O_IDX,
-    P_IDX,
-    Q_IDX,
-    R_IDX,
-    S_IDX,
-    T_IDX,
+  M_IDX,
+  N_IDX,
+  O_IDX,
+  P_IDX,
+  Q_IDX,
+  R_IDX,
+  S_IDX,
+  T_IDX,
 #endif
-    CND_IDX
-  };
+  CND_IDX
+};
 
 enum
-  {
-    REG_PTR = 1,
-    REG_GPR = 2,
-    REG_CND = 4,
-    REG_PAIR = 8
-  };
+{
+  REG_PTR = 1,
+  REG_GPR = 2,
+  REG_CND = 4,
+  REG_PAIR = 8
+};
 
 /* definition for the registers */
 typedef struct regs
-  {
-    short type;			/* can have value 
-				   REG_GPR, REG_PTR or REG_CND */
-    short rIdx;			/* index into register table */
-    char *name;			/* name */
-    unsigned isFree:1;		/* is currently unassigned  */
-  }
+{
+  short type;                   /* can have value 
+                                   REG_GPR, REG_PTR or REG_CND */
+  short rIdx;                   /* index into register table */
+  char *name;                   /* name */
+  unsigned isFree:1;            /* is currently unassigned  */
+}
 regs;
 
 extern regs *regsZ80;

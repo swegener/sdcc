@@ -46,9 +46,10 @@ FileBaseName (char *fileFullName)
 {
   char *p = fileFullName;
 
-  if (!fileFullName) {
-    return "unknown";
-  }
+  if (!fileFullName)
+    {
+      return "unknown";
+    }
 
   while (*fileFullName)
     {
@@ -95,12 +96,12 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
 
           dbuf_init (&token, 64);
           sz++;
-          while (isalpha ((unsigned char)*sz) || *sz == '*')
+          while (isalpha ((unsigned char) *sz) || *sz == '*')
             {
               dbuf_append (&token, sz++, 1);
             }
           /* Now find the token in the token list */
-          if ((t = shash_find (_h, dbuf_c_str(&token))))
+          if ((t = shash_find (_h, dbuf_c_str (&token))))
             {
               dbuf_append_str (&tmpDBuf, t);
             }
@@ -108,7 +109,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
             {
               /* Token not recognized as a valid macro: macro is not expanded */
               dbuf_append_char (&tmpDBuf, '!');
-              dbuf_append (&tmpDBuf, dbuf_get_buf(&token), dbuf_get_length(&token));
+              dbuf_append (&tmpDBuf, dbuf_get_buf (&token), dbuf_get_length (&token));
             }
           dbuf_destroy (&token);
         }
@@ -160,7 +161,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
             default:
               // Not one of ours.  Copy until the end.
               dbuf_append_char (&tmpDBuf, '%');
-              while (!isalpha ((unsigned char)*sz))
+              while (!isalpha ((unsigned char) *sz))
                 dbuf_append_char (&tmpDBuf, *sz++);
 
               dbuf_append_char (&tmpDBuf, *sz++);
@@ -189,26 +190,7 @@ dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat, ...)
 }
 
 void
-tsprintf (char *buffer, size_t len, const char *szFormat, ...)
-{
-  va_list ap;
-  struct dbuf_s dbuf;
-  size_t copyLen;
-
-  dbuf_init (&dbuf, INITIAL_INLINEASM);
-
-  va_start (ap, szFormat);
-  dbuf_tvprintf (&dbuf, szFormat, ap);
-  va_end (ap);
-
-  copyLen = min (len - 1, dbuf_get_length (&dbuf));
-  memcpy (buffer, dbuf_get_buf (&dbuf), copyLen);
-  buffer[copyLen] = '\0';
-  dbuf_destroy (&dbuf);
-}
-
-void
-tfprintf (FILE *fp, const char *szFormat, ...)
+tfprintf (FILE * fp, const char *szFormat, ...)
 {
   va_list ap;
   struct dbuf_s dbuf;
@@ -221,12 +203,12 @@ tfprintf (FILE *fp, const char *szFormat, ...)
   va_end (ap);
 
   len = dbuf_get_length (&dbuf);
-  fwrite(dbuf_get_buf (&dbuf), 1, len, fp);
+  fwrite (dbuf_get_buf (&dbuf), 1, len, fp);
   dbuf_destroy (&dbuf);
 }
 
 void
-asm_addTree (const ASM_MAPPINGS *pMappings)
+asm_addTree (const ASM_MAPPINGS * pMappings)
 {
   const ASM_MAPPING *pMap;
 
@@ -234,17 +216,18 @@ asm_addTree (const ASM_MAPPINGS *pMappings)
   if (pMappings->pParent)
     asm_addTree (pMappings->pParent);
   pMap = pMappings->pMappings;
-  while (pMap->szKey && pMap->szValue) {
+  while (pMap->szKey && pMap->szValue)
+    {
       shash_add (&_h, pMap->szKey, pMap->szValue);
       pMap++;
-  }
+    }
 }
 
 /*-----------------------------------------------------------------*/
 /* printILine - return the readable i-code for this ic             */
 /*-----------------------------------------------------------------*/
 const char *
-printILine (iCode *ic)
+printILine (iCode * ic)
 {
   char *verbalICode;
   struct dbuf_s tmpBuf;
@@ -280,7 +263,7 @@ printILine (iCode *ic)
 /* skipLine - skip the line from file infp                         */
 /*-----------------------------------------------------------------*/
 static int
-skipLine (FILE *infp)
+skipLine (FILE * infp)
 {
   int c;
   static char is_eof = 0;
@@ -289,7 +272,7 @@ skipLine (FILE *infp)
   if (is_eof)
     return 0;
 
-  while ((c = getc(infp)) != '\n' && EOF != c)
+  while ((c = getc (infp)) != '\n' && EOF != c)
     ++len;
 
   if (EOF == c)
@@ -347,11 +330,11 @@ printCLine (const char *srcFile, int lineno)
 
   if (!inFile)
     {
-      if (!(inFile = fopen(srcFile, "r")))
+      if (!(inFile = fopen (srcFile, "r")))
         {
           /* can't open the file:
              don't panic, just return the error message */
-          dbuf_printf(&line, "ERROR: %s", strerror(errno));
+          dbuf_printf (&line, "ERROR: %s", strerror (errno));
 
           return dbuf_c_str (&line);
         }
@@ -370,7 +353,7 @@ printCLine (const char *srcFile, int lineno)
       /* rewinds++; */
     }
 
-   /* skip lines until lineno */
+  /* skip lines until lineno */
   while (inLineNo + 1 < lineno)
     {
       if (!skipLine (inFile))
@@ -378,7 +361,7 @@ printCLine (const char *srcFile, int lineno)
       ++inLineNo;
     }
 
-   /* get the line */
+  /* get the line */
   if (0 != (len = dbuf_getline (&line, inFile)))
     {
       const char *inLineString = dbuf_c_str (&line);
@@ -386,7 +369,7 @@ printCLine (const char *srcFile, int lineno)
       ++inLineNo;
 
       /* remove the trailing NL */
-      if (len > 0 &&'\n' == inLineString[len - 1])
+      if (len > 0 && '\n' == inLineString[len - 1])
         {
           dbuf_set_length (&line, --len);
           inLineString = dbuf_c_str (&line);
@@ -400,13 +383,12 @@ printCLine (const char *srcFile, int lineno)
     }
 
 err_no_line:
-  dbuf_printf(&line, "ERROR: no line number %d in file %s", lineno, srcFile);
+  dbuf_printf (&line, "ERROR: no line number %d in file %s", lineno, srcFile);
 
   return dbuf_c_str (&line);
 }
 
-static const ASM_MAPPING _asxxxx_mapping[] =
-{
+static const ASM_MAPPING _asxxxx_mapping[] = {
   {"labeldef", "%s::"},
   {"slabeldef", "%s:"},
   {"tlabeldef", "%05d$:"},
@@ -437,8 +419,7 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   {"functionheader",
    "; ---------------------------------\n"
    "; Function %s\n"
-   "; ---------------------------------"
-  },
+   "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {"los", "(%s & 0xFF)"},
@@ -458,8 +439,7 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   {NULL, NULL}
 };
 
-static const ASM_MAPPING _gas_mapping[] =
-{
+static const ASM_MAPPING _gas_mapping[] = {
   {"labeldef", "%s::"},
   {"slabeldef", "%s:"},
   {"tlabeldef", "%05d$:"},
@@ -491,15 +471,13 @@ static const ASM_MAPPING _gas_mapping[] =
   {"functionheader",
    "; ---------------------------------\n"
    "; Function %s\n"
-   "; ---------------------------------"
-  },
+   "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {NULL, NULL}
 };
 
-static const ASM_MAPPING _a390_mapping[] =
-{
+static const ASM_MAPPING _a390_mapping[] = {
   {"labeldef", "%s:"},
   {"slabeldef", "%s:"},
   {"tlabeldef", "L%05d:"},
@@ -530,8 +508,7 @@ static const ASM_MAPPING _a390_mapping[] =
   {"functionheader",
    "; ---------------------------------\n"
    "; Function %s\n"
-   "; ---------------------------------"
-  },
+   "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {"los", "(%s & 0FFh)"},
@@ -551,8 +528,7 @@ static const ASM_MAPPING _a390_mapping[] =
   {NULL, NULL}
 };
 
-static const ASM_MAPPING _xa_asm_mapping[] =
-{
+static const ASM_MAPPING _xa_asm_mapping[] = {
   {"labeldef", "%s:"},
   {"slabeldef", "%s:"},
   {"tlabeldef", "L%05d:"},
@@ -583,8 +559,7 @@ static const ASM_MAPPING _xa_asm_mapping[] =
   {"functionheader",
    "; ---------------------------------\n"
    "; Function %s\n"
-   "; ---------------------------------"
-  },
+   "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {"los", "(%s & 0FFh)"},
@@ -603,26 +578,22 @@ static const ASM_MAPPING _xa_asm_mapping[] =
   {NULL, NULL}
 };
 
-const ASM_MAPPINGS asm_asxxxx_mapping =
-{
+const ASM_MAPPINGS asm_asxxxx_mapping = {
   NULL,
   _asxxxx_mapping
 };
 
-const ASM_MAPPINGS asm_gas_mapping =
-{
+const ASM_MAPPINGS asm_gas_mapping = {
   NULL,
   _gas_mapping
 };
 
-const ASM_MAPPINGS asm_a390_mapping =
-{
+const ASM_MAPPINGS asm_a390_mapping = {
   NULL,
   _a390_mapping
 };
 
-const ASM_MAPPINGS asm_xa_asm_mapping =
-{
+const ASM_MAPPINGS asm_xa_asm_mapping = {
   NULL,
   _xa_asm_mapping
 };

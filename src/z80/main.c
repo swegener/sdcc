@@ -39,68 +39,63 @@
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
 #define OPTION_RESERVE_IY      "--reserve-regs-iy"
 
-static char _z80_defaultRules[] =
-{
+static char _z80_defaultRules[] = {
 #include "peeph.rul"
 #include "peeph-z80.rul"
 };
 
-static char _gbz80_defaultRules[] =
-{
+static char _gbz80_defaultRules[] = {
 #include "peeph.rul"
 #include "peeph-gbz80.rul"
 };
 
 Z80_OPTS z80_opts;
 
-static OPTION _z80_options[] =
-  {
-    { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_PORTMODE,        NULL, "Determine PORT I/O mode (z80/z180)" },
-    { 0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
-    { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
-    { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
-    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
-    { 0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY" },
-    { 0, NULL }
-  };
+static OPTION _z80_options[] = {
+  {0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC"},
+  {0, OPTION_PORTMODE, NULL, "Determine PORT I/O mode (z80/z180)"},
+  {0, OPTION_ASM, NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)"},
+  {0, OPTION_CODE_SEG, &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+  {0, OPTION_CONST_SEG, &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, OPTION_NO_STD_CRT0, &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+  {0, OPTION_RESERVE_IY, &z80_opts.reserveIY, "Do not use IY"},
+  {0, NULL}
+};
 
-static OPTION _gbz80_options[] =
-  {
-    { 0, OPTION_BO,              NULL, "<num> use code bank <num>" },
-    { 0, OPTION_BA,              NULL, "<num> use data bank <num>" },
-    { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING },
-    { 0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING },
-    { 0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
-    { 0, NULL }
-  };
+static OPTION _gbz80_options[] = {
+  {0, OPTION_BO, NULL, "<num> use code bank <num>"},
+  {0, OPTION_BA, NULL, "<num> use data bank <num>"},
+  {0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC"},
+  {0, OPTION_CODE_SEG, &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+  {0, OPTION_CONST_SEG, &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, OPTION_NO_STD_CRT0, &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+  {0, NULL}
+};
 
 typedef enum
-  {
-    /* Must be first */
-    ASM_TYPE_ASXXXX,
-    ASM_TYPE_RGBDS,
-    ASM_TYPE_ISAS,
-    ASM_TYPE_Z80ASM
-  }
+{
+  /* Must be first */
+  ASM_TYPE_ASXXXX,
+  ASM_TYPE_RGBDS,
+  ASM_TYPE_ISAS,
+  ASM_TYPE_Z80ASM
+}
 ASM_TYPE;
 
 static struct
-  {
-    ASM_TYPE asmType;
-    /* determine if we can register a parameter */
-    int regParams;
-  }
+{
+  ASM_TYPE asmType;
+  /* determine if we can register a parameter */
+  int regParams;
+}
 _G;
 
-static char *_keywords[] =
-{
+static char *_keywords[] = {
   "sfr",
   "nonbanked",
   "banked",
-  "at",       //.p.t.20030714 adding support for 'sfr at ADDR' construct
-  "_naked",   //.p.t.20030714 adding support for '_naked' functions
+  "at",                         //.p.t.20030714 adding support for 'sfr at ADDR' construct
+  "_naked",                     //.p.t.20030714 adding support for '_naked' functions
   "critical",
   "interrupt",
   NULL
@@ -112,8 +107,8 @@ extern PORT z80_port;
 #include "mappings.i"
 
 static builtins _z80_builtins[] = {
-    { "__builtin_memcpy", "vg*", 3, {"vg*", "vg*", "ui" } },
-    { NULL , NULL, 0, {NULL}}
+  {"__builtin_memcpy", "vg*", 3, {"vg*", "vg*", "ui"}},
+  {NULL, NULL, 0, {NULL}}
 };
 
 static void
@@ -144,7 +139,7 @@ _reg_parm (sym_link * l, bool reentrant)
     }
   else
     {
-      if (!IS_REGISTER(l) || getSize(l) > 2)
+      if (!IS_REGISTER (l) || getSize (l) > 2)
         {
           return FALSE;
         }
@@ -160,7 +155,8 @@ _reg_parm (sym_link * l, bool reentrant)
     }
 }
 
-enum {
+enum
+{
   P_BANK = 1,
   P_PORTMODE,
   P_CODESEG,
@@ -168,13 +164,13 @@ enum {
 };
 
 static int
-do_pragma(int id, const char *name, const char *cp)
+do_pragma (int id, const char *name, const char *cp)
 {
   struct pragma_token_s token;
   int err = 0;
   int processed = 1;
 
-  init_pragma_token(&token);
+  init_pragma_token (&token);
 
   switch (id)
     {
@@ -182,9 +178,9 @@ do_pragma(int id, const char *name, const char *cp)
       {
         struct dbuf_s buffer;
 
-        dbuf_init(&buffer, 128);
+        dbuf_init (&buffer, 128);
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
 
         switch (token.type)
           {
@@ -217,7 +213,7 @@ do_pragma(int id, const char *name, const char *cp)
             {
               const char *str = get_pragma_string (&token);
 
-              dbuf_append_str (&buffer, (0 == strcmp("BASE", str)) ? "HOME" : str);
+              dbuf_append_str (&buffer, (0 == strcmp ("BASE", str)) ? "HOME" : str);
             }
             break;
           }
@@ -233,12 +229,12 @@ do_pragma(int id, const char *name, const char *cp)
         /* ugly, see comment in src/port.h (borutr) */
         gbz80_port.mem.code_name = dbuf_detach (&buffer);
         code->sname = gbz80_port.mem.code_name;
-        options.code_seg = (char *)gbz80_port.mem.code_name;
+        options.code_seg = (char *) gbz80_port.mem.code_name;
       }
       break;
 
     case P_PORTMODE:
-      { /*.p.t.20030716 - adding pragma to manipulate z80 i/o port addressing modes */
+      {                         /*.p.t.20030716 - adding pragma to manipulate z80 i/o port addressing modes */
         const char *str;
 
         cp = get_pragma_token (cp, &token);
@@ -258,14 +254,22 @@ do_pragma(int id, const char *name, const char *cp)
             break;
           }
 
-        if (!strcmp(str, "z80"))
-          { z80_opts.port_mode = 80; }
-        else if(!strcmp(str, "z180"))
-          { z80_opts.port_mode = 180; }
-        else if(!strcmp(str, "save"))
-          { z80_opts.port_back = z80_opts.port_mode; }
-        else if(!strcmp(str, "restore" ))
-          { z80_opts.port_mode = z80_opts.port_back; }
+        if (!strcmp (str, "z80"))
+          {
+            z80_opts.port_mode = 80;
+          }
+        else if (!strcmp (str, "z180"))
+          {
+            z80_opts.port_mode = 180;
+          }
+        else if (!strcmp (str, "save"))
+          {
+            z80_opts.port_back = z80_opts.port_mode;
+          }
+        else if (!strcmp (str, "restore"))
+          {
+            z80_opts.port_mode = z80_opts.port_back;
+          }
         else
           err = 1;
       }
@@ -283,7 +287,7 @@ do_pragma(int id, const char *name, const char *cp)
             break;
           }
 
-        segname = Safe_strdup (get_pragma_string(&token));
+        segname = Safe_strdup (get_pragma_string (&token));
 
         cp = get_pragma_token (cp, &token);
         if (token.type != TOKEN_EOL)
@@ -295,12 +299,14 @@ do_pragma(int id, const char *name, const char *cp)
 
         if (id == P_CODESEG)
           {
-            if (options.code_seg) Safe_free(options.code_seg);
+            if (options.code_seg)
+              Safe_free (options.code_seg);
             options.code_seg = segname;
           }
         else
           {
-            if (options.const_seg) Safe_free(options.const_seg);
+            if (options.const_seg)
+              Safe_free (options.const_seg);
             options.const_seg = segname;
           }
       }
@@ -309,38 +315,36 @@ do_pragma(int id, const char *name, const char *cp)
     default:
       processed = 0;
       break;
-  }
+    }
 
-  get_pragma_token(cp, &token);
+  get_pragma_token (cp, &token);
 
   if (1 == err)
-    werror(W_BAD_PRAGMA_ARGUMENTS, name);
+    werror (W_BAD_PRAGMA_ARGUMENTS, name);
 
-  free_pragma_token(&token);
+  free_pragma_token (&token);
   return processed;
 }
 
 static struct pragma_s pragma_tbl[] = {
-  { "bank",     P_BANK,     0, do_pragma },
-  { "portmode", P_PORTMODE, 0, do_pragma },
-  { "codeseg",  P_CODESEG,  0, do_pragma },
-  { "constseg", P_CONSTSEG, 0, do_pragma },
-  { NULL,       0,          0, NULL },
-  };
+  {"bank", P_BANK, 0, do_pragma},
+  {"portmode", P_PORTMODE, 0, do_pragma},
+  {"codeseg", P_CODESEG, 0, do_pragma},
+  {"constseg", P_CONSTSEG, 0, do_pragma},
+  {NULL, 0, 0, NULL},
+};
 
 static int
-_process_pragma(const char *s)
+_process_pragma (const char *s)
 {
-  return process_pragma_tbl(pragma_tbl, s);
+  return process_pragma_tbl (pragma_tbl, s);
 }
 
-static const char *_gbz80_rgbasmCmd[] =
-{
+static const char *_gbz80_rgbasmCmd[] = {
   "rgbasm", "-o\"$1.rel\"", "\"$1.asm\"", NULL
 };
 
-static const char *_gbz80_rgblinkCmd[] =
-{
+static const char *_gbz80_rgblinkCmd[] = {
   "xlink", "-tg", "-n\"$1.sym\"", "-m\"$1.map\"", "-zFF", "\"$1.lnk\"", NULL
 };
 
@@ -368,11 +372,11 @@ _gbz80_rgblink (void)
 
   fprintf (lnkfile, "%s.rel\n", dstFileName);
 
-  fputStrSet(lnkfile, relFilesSet);
+  fputStrSet (lnkfile, relFilesSet);
 
   fprintf (lnkfile, "\n[Libraries]\n");
   /* additional libraries if any */
-  fputStrSet(lnkfile, libFilesSet);
+  fputStrSet (lnkfile, libFilesSet);
 
   fprintf (lnkfile, "\n[Output]\n" "%s.gb", dstFileName);
 
@@ -407,7 +411,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               dbuf_c_str (&buffer);
               /* ugly, see comment in src/port.h (borutr) */
               gbz80_port.mem.code_name = dbuf_detach (&buffer);
-              options.code_seg = (char *)gbz80_port.mem.code_name;
+              options.code_seg = (char *) gbz80_port.mem.code_name;
               return TRUE;
             }
           else if (!strncmp (argv[*i], OPTION_BA, sizeof (OPTION_BA) - 1))
@@ -460,7 +464,7 @@ _parseOptions (int *pargc, char **argv, int *i)
         }
       else if (!strncmp (argv[*i], OPTION_PORTMODE, sizeof (OPTION_PORTMODE) - 1))
         {
-           char *portmode = getStringArg (OPTION_ASM, argv, i, *pargc);
+          char *portmode = getStringArg (OPTION_ASM, argv, i, *pargc);
 
           if (!strcmp (portmode, "z80"))
             {
@@ -473,12 +477,12 @@ _parseOptions (int *pargc, char **argv, int *i)
               return TRUE;
             }
         }
-  }
+    }
   return FALSE;
 }
 
 static void
-_setValues(void)
+_setValues (void)
 {
   const char *s;
   struct dbuf_s dbuf;
@@ -501,7 +505,7 @@ _setValues(void)
       dbuf_append_str (&dbuf, path);
       Safe_free (path);
 
-      setMainValue ("z80libspec", dbuf_c_str(&dbuf));
+      setMainValue ("z80libspec", dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
 
       for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
@@ -522,13 +526,12 @@ _setValues(void)
         setMainValue ("z80crt0", "\"crt0{objext}\"");
       else
         {
-          char *buf;
-          size_t len = strlen (path) + 3;
+          struct dbuf_s dbuf;
 
-          buf = Safe_alloc (len);
-          SNPRINTF (buf, len, "\"%s\"", path);
-          setMainValue ("z80crt0", buf);
-          Safe_free (buf);
+          dbuf_init (&dbuf, 128);
+          dbuf_printf (&dbuf, "\"%s\"", path);
+          setMainValue ("z80crt0", dbuf_c_str (&dbuf));
+          dbuf_destroy (&dbuf);
         }
     }
   else
@@ -538,9 +541,9 @@ _setValues(void)
     }
 
   setMainValue ("z80extralibfiles", (s = joinStrSet (libFilesSet)));
-  Safe_free ((void *)s);
+  Safe_free ((void *) s);
   setMainValue ("z80extralibpaths", (s = joinStrSet (libPathsSet)));
-  Safe_free ((void *)s);
+  Safe_free ((void *) s);
 
   if (IS_GB)
     {
@@ -553,11 +556,11 @@ _setValues(void)
       setMainValue ("z80outext", ".ihx");
     }
 
-  setMainValue ("stdobjdstfilename" , "{dstfilename}{objext}");
+  setMainValue ("stdobjdstfilename", "{dstfilename}{objext}");
   setMainValue ("stdlinkdstfilename", "{dstfilename}{z80outext}");
 
   setMainValue ("z80extraobj", (s = joinStrSet (relFilesSet)));
-  Safe_free ((void *)s);
+  Safe_free ((void *) s);
 
   dbuf_init (&dbuf, 128);
   dbuf_printf (&dbuf, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
@@ -573,7 +576,7 @@ _finaliseOptions (void)
   if (_G.asmType == ASM_TYPE_ASXXXX && IS_GB)
     asm_addTree (&_asxxxx_gb);
 
-  _setValues();
+  _setValues ();
 }
 
 static void
@@ -590,7 +593,7 @@ _setDefaultOptions (void)
   options.code_loc = 0x200;
 
   options.data_loc = IS_GB ? 0xC000 : 0x8000;
-  options.out_fmt = 'i';	/* Default output format is ihx */
+  options.out_fmt = 'i';        /* Default output format is ihx */
   optimize.global_cse = 1;
   optimize.label1 = 1;
   optimize.label2 = 1;
@@ -621,15 +624,13 @@ _setDefaultOptions (void)
       s - all arguments are on the stack.
 */
 static const char *
-_mangleSupportFunctionName(const char *original)
+_mangleSupportFunctionName (const char *original)
 {
   struct dbuf_s dbuf;
 
   dbuf_init (&dbuf, 128);
-  dbuf_printf(&dbuf, "%s_rr%s_%s", original,
-          options.profile ? "f" : "x",
-          options.noRegParams ? "s" : "bds" /* MB: but the library only has hds variants ??? */
-          );
+  dbuf_printf (&dbuf, "%s_rr%s_%s", original, options.profile ? "f" : "x", options.noRegParams ? "s" : "bds"    /* MB: but the library only has hds variants ??? */
+    );
 
   return dbuf_detach_c_str (&dbuf);
 }
@@ -646,30 +647,29 @@ _getRegName (struct regs *reg)
 }
 
 static bool
-_hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
+_hasNativeMulFor (iCode * ic, sym_link * left, sym_link * right)
 {
   sym_link *test = NULL;
   value *val;
 
-  if ( ic->op != '*')
+  if (ic->op != '*')
     {
       return FALSE;
     }
 
-  if ( IS_LITERAL (left))
+  if (IS_LITERAL (left))
     {
       test = left;
       val = OP_VALUE (IC_LEFT (ic));
     }
-  else if ( IS_LITERAL (right))
+  else if (IS_LITERAL (right))
     {
       test = right;
       val = OP_VALUE (IC_RIGHT (ic));
     }
   /* 8x8 unsigned multiplication code is shorter than
      call overhead for the multiplication routine. */
-  else if ( IS_CHAR (right) && IS_UNSIGNED (right) &&
-    IS_CHAR (left) && IS_UNSIGNED(left) && !IS_GB)
+  else if (IS_CHAR (right) && IS_UNSIGNED (right) && IS_CHAR (left) && IS_UNSIGNED (left) && !IS_GB)
     {
       return TRUE;
     }
@@ -678,7 +678,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
       return FALSE;
     }
 
-  if ( getSize (test) <= 2)
+  if (getSize (test) <= 2)
     {
       return TRUE;
     }
@@ -700,7 +700,7 @@ hasExtBitOp (int op, int size)
 static int
 oclsExpense (struct memmap *oclass)
 {
-  if (IN_FARSPACE(oclass))
+  if (IN_FARSPACE (oclass))
     return 1;
 
   return 0;
@@ -719,120 +719,112 @@ oclsExpense (struct memmap *oclass)
     " {z80extraobj}"
 */
 
-static const char *_z80LinkCmd[] =
-{
+static const char *_z80LinkCmd[] = {
   "sdldz80", "-nf", "\"$1\"", NULL
 };
-static const char *_gbLinkCmd[] =
-{
+
+static const char *_gbLinkCmd[] = {
   "sdldgb", "-nf", "\"$1\"", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
-static const char *_z80AsmCmd[] =
-{
+static const char *_z80AsmCmd[] = {
   "sdasz80", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
-static const char *_gbAsmCmd[] =
-{
+
+static const char *_gbAsmCmd[] = {
   "sdasgb", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
-static const char * const _crt[] = { "crt0.rel", NULL, };
-static const char * const _libs_z80[] = { "z80", NULL, };
-static const char * const _libs_gb[] = { "gbz80", NULL, };
+static const char *const _crt[] = { "crt0.rel", NULL, };
+static const char *const _libs_z80[] = { "z80", NULL, };
+static const char *const _libs_gb[] = { "gbz80", NULL, };
 
 /* Globals */
-PORT z80_port =
-{
+PORT z80_port = {
   TARGET_ID_Z80,
   "z80",
   "Zilog Z80",                  /* Target name */
   NULL,                         /* Processor name */
   {
-    glue,
-    FALSE,
-    NO_MODEL,
-    NO_MODEL,
-    NULL,                       /* model == target */
-  },
+   glue,
+   FALSE,
+   NO_MODEL,
+   NO_MODEL,
+   NULL,                        /* model == target */
+   },
   {                             /* Assembler */
-    _z80AsmCmd,
-    NULL,
-    "-plosgffwzc",              /* Options with debug */
-    "-plosgffwz",               /* Options without debug */
-    0,
-    ".asm"
-  },
+   _z80AsmCmd,
+   NULL,
+   "-plosgffwzc",               /* Options with debug */
+   "-plosgffwz",                /* Options without debug */
+   0,
+   ".asm"},
   {                             /* Linker */
-    _z80LinkCmd,	//NULL,
-    NULL,		//LINKCMD,
-    NULL,
-    ".rel",
-    1,
-    _crt,                       /* crt */
-    _libs_z80,                  /* libs */
-  },
+   _z80LinkCmd,                 //NULL,
+   NULL,                        //LINKCMD,
+   NULL,
+   ".rel",
+   1,
+   _crt,                        /* crt */
+   _libs_z80,                   /* libs */
+   },
   {                             /* Peephole optimizer */
-    _z80_defaultRules,
-    z80instructionSize,
-    0,
-    0,
-    0,
-    z80notUsed,
-    z80canAssign,
-  },
+   _z80_defaultRules,
+   z80instructionSize,
+   0,
+   0,
+   0,
+   z80notUsed,
+   z80canAssign,
+   },
   {
-        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 2, 2, 2, 1, 4, 4
-  },
+   /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+   1, 2, 2, 4, 2, 2, 2, 1, 4, 4},
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
   {
-    "XSEG",
-    "STACK",
-    "CODE",
-    "DATA",
-    "ISEG",
-    NULL, /* pdata */
-    "XSEG",
-    "BSEG",
-    "RSEG (ABS)",
-    "GSINIT",
-    "OVERLAY",
-    "GSFINAL",
-    "HOME",
-    NULL, /* xidata */
-    NULL, /* xinit */
-    NULL, /* const_name */
-    "CABS", /* cabs_name */
-    NULL, /* xabs_name */
-    NULL, /* iabs_name */
-    NULL,
-    NULL,
-    1 /* CODE  is read-only */
-  },
-  { NULL, NULL },
+   "XSEG",
+   "STACK",
+   "CODE",
+   "DATA",
+   "ISEG",
+   NULL,                        /* pdata */
+   "XSEG",
+   "BSEG",
+   "RSEG (ABS)",
+   "GSINIT",
+   "OVERLAY",
+   "GSFINAL",
+   "HOME",
+   NULL,                        /* xidata */
+   NULL,                        /* xinit */
+   NULL,                        /* const_name */
+   "CABS",                      /* cabs_name */
+   NULL,                        /* xabs_name */
+   NULL,                        /* iabs_name */
+   NULL,
+   NULL,
+   1                            /* CODE  is read-only */
+   },
+  {NULL, NULL},
   {
-    -1, 0, 0, 4, 0, 2
-  },
-    /* Z80 has no native mul/div commands */
+   -1, 0, 0, 4, 0, 2},
+  /* Z80 has no native mul/div commands */
   {
-    0, 2
-  },
+   0, 2},
   {
-    z80_emitDebuggerSymbol
-  },
+   z80_emitDebuggerSymbol},
   {
-    255,        /* maxCount */
-    3,          /* sizeofElement */
-    /* The rest of these costs are bogus. They approximate */
-    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-    {4,4,4},    /* sizeofMatchJump[] */
-    {0,0,0},    /* sizeofRangeCompare[] */
-    0,          /* sizeofSubtract */
-    3,          /* sizeofDispatch */
-  },
+   255,                         /* maxCount */
+   3,                           /* sizeofElement */
+   /* The rest of these costs are bogus. They approximate */
+   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+   {4, 4, 4},                   /* sizeofMatchJump[] */
+   {0, 0, 0},                   /* sizeofRangeCompare[] */
+   0,                           /* sizeofSubtract */
+   3,                           /* sizeofDispatch */
+   },
   "_",
   _z80_init,
   _parseOptions,
@@ -863,7 +855,7 @@ PORT z80_port =
   1,                            /* transform >= to ! < */
   1,                            /* transform != to !(a == b) */
   0,                            /* leave == */
-  FALSE,                         /* Array initializer support. */
+  FALSE,                        /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
   _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
@@ -873,97 +865,92 @@ PORT z80_port =
 };
 
 /* Globals */
-PORT gbz80_port =
-{
+PORT gbz80_port = {
   TARGET_ID_GBZ80,
   "gbz80",
   "Gameboy Z80-like",           /* Target name */
   NULL,
   {
-    glue,
-    FALSE,
-    NO_MODEL,
-    NO_MODEL,
-    NULL,                       /* model == target */
-  },
+   glue,
+   FALSE,
+   NO_MODEL,
+   NO_MODEL,
+   NULL,                        /* model == target */
+   },
   {                             /* Assembler */
-    _gbAsmCmd,
-    NULL,
-    "-plosgffwzc",              /* Options with debug */
-    "-plosgffwz",               /* Options without debug */
-    0,
-    ".asm",
-    NULL                        /* no do_assemble function */
-  },
+   _gbAsmCmd,
+   NULL,
+   "-plosgffwzc",               /* Options with debug */
+   "-plosgffwz",                /* Options without debug */
+   0,
+   ".asm",
+   NULL                         /* no do_assemble function */
+   },
   {                             /* Linker */
-    _gbLinkCmd,		//NULL,
-    NULL,		//LINKCMD,
-    NULL,
-    ".rel",
-    1,
-    _crt,                       /* crt */
-    _libs_gb,                   /* libs */
-  },
+   _gbLinkCmd,                  //NULL,
+   NULL,                        //LINKCMD,
+   NULL,
+   ".rel",
+   1,
+   _crt,                        /* crt */
+   _libs_gb,                    /* libs */
+   },
   {                             /* Peephole optimizer */
-    _gbz80_defaultRules,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-  },
+   _gbz80_defaultRules,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   },
   {
-    /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 2, 2, 2, 1, 4, 4
-  },
+   /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+   1, 2, 2, 4, 2, 2, 2, 1, 4, 4},
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
   {
-    "XSEG",
-    "STACK",
-    "CODE",
-    "DATA",
-    "ISEG",
-    NULL, /* pdata */
-    "XSEG",
-    "BSEG",
-    "RSEG",
-    "GSINIT",
-    "OVERLAY",
-    "GSFINAL",
-    "HOME",
-    NULL, /* xidata */
-    NULL, /* xinit */
-    NULL, /* const_name */
-    "CABS", /* cabs_name */
-    NULL, /* xabs_name */
-    NULL, /* iabs_name */
-    NULL,
-    NULL,
-    1 /* CODE is read-only */
-  },
-  { NULL, NULL },
+   "XSEG",
+   "STACK",
+   "CODE",
+   "DATA",
+   "ISEG",
+   NULL,                        /* pdata */
+   "XSEG",
+   "BSEG",
+   "RSEG",
+   "GSINIT",
+   "OVERLAY",
+   "GSFINAL",
+   "HOME",
+   NULL,                        /* xidata */
+   NULL,                        /* xinit */
+   NULL,                        /* const_name */
+   "CABS",                      /* cabs_name */
+   NULL,                        /* xabs_name */
+   NULL,                        /* iabs_name */
+   NULL,
+   NULL,
+   1                            /* CODE is read-only */
+   },
+  {NULL, NULL},
   {
-    -1, 0, 0, 2, 0, 4
-  },
-    /* gbZ80 has no native mul/div commands */
+   -1, 0, 0, 2, 0, 4},
+  /* gbZ80 has no native mul/div commands */
   {
-    0, 2
-  },
+   0, 2},
   {
-    z80_emitDebuggerSymbol
-  },
+   z80_emitDebuggerSymbol},
   {
-    255,        /* maxCount */
-    3,          /* sizeofElement */
-    /* The rest of these costs are bogus. They approximate */
-    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-    {4,4,4},    /* sizeofMatchJump[] */
-    {0,0,0},    /* sizeofRangeCompare[] */
-    0,          /* sizeofSubtract */
-    3,          /* sizeofDispatch */
-  },
+   255,                         /* maxCount */
+   3,                           /* sizeofElement */
+   /* The rest of these costs are bogus. They approximate */
+   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+   {4, 4, 4},                   /* sizeofMatchJump[] */
+   {0, 0, 0},                   /* sizeofRangeCompare[] */
+   0,                           /* sizeofSubtract */
+   3,                           /* sizeofDispatch */
+   },
   "_",
   _gbz80_init,
   _parseOptions,
@@ -994,7 +981,7 @@ PORT gbz80_port =
   1,                            /* transform >= to ! < */
   1,                            /* transform != to !(a == b) */
   0,                            /* leave == */
-  FALSE,                         /* Array initializer support. */
+  FALSE,                        /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
   NULL,                         /* no builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */

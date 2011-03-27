@@ -414,27 +414,25 @@ static void
 _vemit2 (const char *szFormat, va_list ap)
 {
   struct dbuf_s dbuf;
-  char *buffer, *nextbuffer;
+  char *buffer, *p, *nextbuffer;
 
   dbuf_init (&dbuf, INITIAL_INLINEASM);
 
   dbuf_tvprintf (&dbuf, szFormat, ap);
 
-  buffer = (char *) dbuf_c_str (&dbuf);
+  buffer = p = dbuf_detach_c_str (&dbuf);
 
   _tidyUp (buffer);
 
   /* Decompose multiline macros */
-  while ((nextbuffer = strchr (buffer, '\n')))
+  while ((nextbuffer = strchr (p, '\n')))
     {
       *nextbuffer = 0;
-      _add_line (buffer);
-      buffer = nextbuffer + 1;
+      _add_line (p);
+      p = nextbuffer + 1;
     }
 
-  _add_line (buffer);
-
-  dbuf_destroy (&dbuf);
+  _add_line (p);
 }
 
 static void
@@ -885,27 +883,27 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
 static asmop *
 aopForRemat (symbol * sym)
 {
-  char *s = buffer;
+  struct dbuf_s dbuf;
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
 
+  dbuf_init (&dbuf, 128);
   while (1)
     {
       /* if plus or minus print the right hand side */
       if (ic->op == '+' || ic->op == '-')
         {
           /* PENDING: for re-target */
-          sprintf (s, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)), ic->op);
-          s += strlen (s);
+          dbuf_printf (&dbuf, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)), ic->op);
           ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
           continue;
         }
       /* we reached the end */
-      sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
+      dbuf_printf (&dbuf, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
       break;
     }
 
-  aop->aopu.aop_immd = traceAlloc (&_G.trace.aops, Safe_strdup (buffer));
+  aop->aopu.aop_immd = traceAlloc (&_G.trace.aops, dbuf_detach_c_str (&dbuf));
   return aop;
 }
 
@@ -1675,11 +1673,15 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
           }
         else
           {
+            struct dbuf_s dbuf;
+
             /* PENDING: Do this better. */
             if (_G.preserveCarry)
               _push (PAIR_AF);
-            sprintf (buffer, "%d", offset + _G.stack.pushed);
-            emit2 ("ld %s,!hashedstr", _pairs[pairId].name, buffer);
+            dbuf_init (&dbuf, 128);
+            dbuf_printf (&dbuf, "%d", offset + _G.stack.pushed);
+            emit2 ("ld %s,!hashedstr", _pairs[pairId].name, dbuf_c_str (&dbuf));
+            dbuf_destroy (&dbuf);
             emit2 ("add %s,sp", _pairs[pairId].name);
             _G.pairs[pairId].last_type = aop->type;
             _G.pairs[pairId].offset = offset;
@@ -3272,8 +3274,12 @@ genFunction (iCode * ic)
   emit2 ("!functionheader", sym->name);
   if (!IS_STATIC (sym->etype))
     {
-      sprintf (buffer, "%s_start", sym->rname);
-      emit2 ("!labeldef", buffer);
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "%s_start", sym->rname);
+      emit2 ("!labeldef", dbuf_c_str (&dbuf));
+      dbuf_detach (&dbuf);
       _G.lines.current->isLabel = 1;
     }
   emit2 ("!functionlabeldef", sym->rname);
@@ -3442,8 +3448,12 @@ genEndFunction (iCode * ic)
       emitDebug ("; naked function: no epilogue.");
       if (!IS_STATIC (sym->etype))
         {
-          sprintf (buffer, "%s_end", sym->rname);
-          emit2 ("!labeldef", buffer);
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 128);
+          dbuf_printf (&dbuf, "%s_end", sym->rname);
+          emit2 ("!labeldef", dbuf_c_str (&dbuf));
+          dbuf_destroy (&dbuf);
           _G.lines.current->isLabel = 1;
         }
       return;
@@ -3544,8 +3554,12 @@ genEndFunction (iCode * ic)
 
   if (!IS_STATIC (sym->etype))
     {
-      sprintf (buffer, "%s_end", sym->rname);
-      emit2 ("!labeldef", buffer);
+      struct dbuf_s dbuf;
+
+      dbuf_init (&dbuf, 128);
+      dbuf_printf (&dbuf, "%s_end", sym->rname);
+      emit2 ("!labeldef", &dbuf);
+      dbuf_destroy (&dbuf);
       _G.lines.current->isLabel = 1;
     }
 

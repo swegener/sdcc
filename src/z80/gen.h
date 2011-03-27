@@ -94,5 +94,4 @@ asmop;
 void genZ80Code (iCode *);
 void z80_emitDebuggerSymbol (const char *);
 
-
 #endif

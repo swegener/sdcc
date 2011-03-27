@@ -477,39 +477,6 @@ z80_emitDebuggerSymbol (const char *debugSym)
   _G.lines.isDebug = 0;
 }
 
-/*-----------------------------------------------------------------*/
-/* emit2 - writes the code into a file : for now it is simple    */
-/*-----------------------------------------------------------------*/
-void
-_emit2 (const char *inst, const char *fmt, ...)
-{
-  va_list ap;
-  char lb[INITIAL_INLINEASM];
-  char *lbp = lb;
-
-  va_start (ap, fmt);
-
-  if (*inst != '\0')
-    {
-      sprintf (lb, "%s\t", inst);
-      vsprintf (lb + (strlen (lb)), fmt, ap);
-    }
-  else
-    vsprintf (lb, fmt, ap);
-
-  while (isspace (*lbp))
-    lbp++;
-
-  if (lbp && *lbp)
-    {
-      _G.lines.current = (_G.lines.current ?
-                          connectLine (_G.lines.current, _newLineNode (lb)) : (_G.lines.head = _newLineNode (lb)));
-    }
-  _G.lines.current->isInline = _G.lines.isInline;
-  _G.lines.current->ic = _G.current_iCode;
-  va_end (ap);
-}
-
 static void
 _emitMove (const char *to, const char *from)
 {
@@ -524,7 +491,7 @@ _emitMove (const char *to, const char *from)
     }
 }
 
-void
+static void
 aopDump (const char *plabel, asmop * aop)
 {
   int i;
@@ -566,7 +533,7 @@ _clearCarry (void)
   emit2 ("xor a,a");
 }
 
-const char *
+static const char *
 getPairName (asmop * aop)
 {
   if (aop->type == AOP_REG)
@@ -635,7 +602,7 @@ getPairId (asmop * aop)
 }
 
 /** Returns TRUE if the registers used in aop form a pair (BC, DE, HL) */
-bool
+static bool
 isPair (asmop * aop)
 {
   return (getPairId (aop) != PAIR_INVALID);
@@ -643,7 +610,7 @@ isPair (asmop * aop)
 
 /** Returns TRUE if the registers used in aop cannot be split into high
     and low halves */
-bool
+static bool
 isUnsplitable (asmop * aop)
 {
   switch (getPairId (aop))
@@ -657,7 +624,7 @@ isUnsplitable (asmop * aop)
   return FALSE;
 }
 
-bool
+static bool
 isPtrPair (asmop * aop)
 {
   PAIR_ID pairId = getPairId (aop);
@@ -703,13 +670,6 @@ spillPairReg (const char *regname)
     }
 }
 
-/** Push a register pair onto the stack */
-void
-genPairPush (asmop * aop)
-{
-  emit2 ("push %s", getPairName (aop));
-}
-
 static void
 _push (PAIR_ID pairId)
 {
@@ -728,7 +688,7 @@ _pop (PAIR_ID pairId)
     }
 }
 
-void
+static void
 genMovePairPair (PAIR_ID srcPair, PAIR_ID dstPair)
 {
   switch (dstPair)
@@ -910,7 +870,7 @@ aopForRemat (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* regsInCommon - two operands have some registers in common       */
 /*-----------------------------------------------------------------*/
-bool
+static bool
 regsInCommon (operand * op1, operand * op2)
 {
   symbol *sym1, *sym2;
@@ -948,7 +908,7 @@ regsInCommon (operand * op1, operand * op2)
 /*-----------------------------------------------------------------*/
 /* operandsEqu - equivalent                                        */
 /*-----------------------------------------------------------------*/
-bool
+static bool
 operandsEqu (operand * op1, operand * op2)
 {
   symbol *sym1, *sym2;
@@ -985,7 +945,7 @@ operandsEqu (operand * op1, operand * op2)
 /*-----------------------------------------------------------------*/
 /* sameRegs - two asmops have the same registers                   */
 /*-----------------------------------------------------------------*/
-bool
+static bool
 sameRegs (asmop * aop1, asmop * aop2)
 {
   int i;
@@ -1215,7 +1175,7 @@ dealloc:
 
 }
 
-bool
+static bool
 isLitWord (asmop * aop)
 {
   /*    if (aop->size != 2)
@@ -1230,34 +1190,40 @@ isLitWord (asmop * aop)
     }
 }
 
-char *
+static const char *
 aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 {
+  static struct dbuf_s dbuf = { 0 };
+
+  if (dbuf_is_initialized (&dbuf))
+    {
+      dbuf_set_length (&dbuf, 0);
+    }
+  else
+    {
+      dbuf_init (&dbuf, 129);
+    }
+
   /* depending on type */
   switch (aop->type)
     {
     case AOP_HL:
     case AOP_IY:
     case AOP_IMMD:
-      {
-        struct dbuf_s dbuf;
-
-        dbuf_init (&dbuf, 128);
-        /* PENDING: for re-target */
-        if (with_hash)
-          {
-            dbuf_tprintf (&dbuf, "!hashedstr + %d", aop->aopu.aop_immd, offset);
-          }
-        else if (offset == 0)
-          {
-            dbuf_tprintf (&dbuf, "%s", aop->aopu.aop_immd);
-          }
-        else
-          {
-            dbuf_tprintf (&dbuf, "%s + %d", aop->aopu.aop_immd, offset);
-          }
-        return traceAlloc (&_G.trace.aops, dbuf_detach_c_str (&dbuf));
-      }
+      /* PENDING: for re-target */
+      if (with_hash)
+        {
+          dbuf_tprintf (&dbuf, "!hashedstr + %d", aop->aopu.aop_immd, offset);
+        }
+      else if (offset == 0)
+        {
+          dbuf_tprintf (&dbuf, "%s", aop->aopu.aop_immd);
+        }
+      else
+        {
+          dbuf_tprintf (&dbuf, "%s + %d", aop->aopu.aop_immd, offset);
+        }
+      break;
 
     case AOP_LIT:
       {
@@ -1267,7 +1233,6 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
         if (!IS_FLOAT (val->type))
           {
             unsigned long v = ulFromVal (val);
-            struct dbuf_s dbuf;
 
             if (offset == 2)
               {
@@ -1282,13 +1247,10 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
                 wassertl (0, "Encountered an invalid offset while fetching a literal");
               }
 
-            dbuf_init (&dbuf, 128);
             if (with_hash)
               dbuf_tprintf (&dbuf, "!immedword", v);
             else
               dbuf_tprintf (&dbuf, "!constword", v);
-
-            return traceAlloc (&_G.trace.aops, dbuf_detach_c_str (&dbuf));
           }
         else
           {
@@ -1299,7 +1261,6 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
             }
             fl;
             unsigned int i;
-            struct dbuf_s dbuf;
 
             /* it is type float */
             fl.f = (float) floatFromVal (val);
@@ -1309,27 +1270,37 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 #else
             i = fl.c[offset] | (fl.c[offset + 1] << 8);
 #endif
-            dbuf_init (&dbuf, 128);
             if (with_hash)
               dbuf_tprintf (&dbuf, "!immedword", i);
             else
               dbuf_tprintf (&dbuf, "!constword", i);
-
-            return traceAlloc (&_G.trace.aops, dbuf_detach_c_str (&dbuf));
           }
       }
+      break;
+
+    case AOP_HLREG:
+    case AOP_REG:
+    case AOP_STK:
+    case AOP_DIR:
+    case AOP_SFR:
+    case AOP_STR:
+    case AOP_CRY:
+    case AOP_ACC:
+    case AOP_SIMPLELIT:
+    case AOP_EXSTK:
+    case AOP_PAIRPTR:
+    case AOP_DUMMY:
+      break;
+
     default:
-      return NULL;
+      dbuf_destroy (&dbuf);
+      wassertl (0, "aopGetLitWordLong got unsupported aop->type");
+      exit (0);
     }
+  return dbuf_c_str (&dbuf);
 }
 
-char *
-aopGetWord (asmop * aop, int offset)
-{
-  return aopGetLitWordLong (aop, offset, TRUE);
-}
-
-bool
+static bool
 isPtr (const char *s)
 {
   if (!strcmp (s, "hl"))
@@ -1394,11 +1365,10 @@ requiresHL (asmop * aop)
 static void
 fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
 {
-  const char *l, *base;
   const char *pair = _pairs[pairId].name;
-  l = aopGetLitWordLong (left, offset, FALSE);
-  base = aopGetLitWordLong (left, 0, FALSE);
-  wassert (l && pair && base);
+  char *l = Safe_strdup (aopGetLitWordLong (left, offset, FALSE));
+  const char *base = aopGetLitWordLong (left, 0, FALSE);
+  wassert (pair);
 
   emitDebug (";fetchLitPair");
 
@@ -1467,9 +1437,11 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
     }
   /* Both a lit on the right and a true symbol on the left */
   emit2 ("ld %s,!hashedstr", pair, l);
+  Safe_free (l);
   return;
 
 adjusted:
+  Safe_free (l);
   _G.pairs[pairId].last_type = left->type;
   _G.pairs[pairId].base = traceAlloc (&_G.trace.aops, Safe_strdup (base));
   _G.pairs[pairId].offset = offset;
@@ -1546,9 +1518,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode * ic, int offset)
         {
           /* Instead of fetching relative to IY, just grab directly
              from the address IY refers to */
-          char *l = aopGetLitWordLong (aop, offset, FALSE);
-          wassert (l);
-          emit2 ("ld %s,(%s)", _pairs[pairId].name, l);
+          emit2 ("ld %s,(%s)", _pairs[pairId].name, aopGetLitWordLong (aop, offset, FALSE));
 
           if (aop->size < 2)
             {
@@ -2203,10 +2173,7 @@ commitPair (asmop * aop, PAIR_ID id)
       /* Special cases */
       if (id == PAIR_HL && aop->type == AOP_IY && aop->size == 2)
         {
-          char *l = aopGetLitWordLong (aop, 0, FALSE);
-          wassert (l);
-
-          emit2 ("ld (%s),%s", l, _pairs[id].name);
+          emit2 ("ld (%s),%s", aopGetLitWordLong (aop, 0, FALSE), _pairs[id].name);
         }
       else
         {
@@ -2819,9 +2786,7 @@ genIpush (iCode * ic)
         {
           if (AOP (IC_LEFT (ic))->type == AOP_IY)
             {
-              char *l = aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE);
-              wassert (l);
-              emit2 ("ld a,(%s)", l);
+              emit2 ("ld a,(%s)", aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE));
               emit2 ("push af");
             }
           else
@@ -3945,9 +3910,8 @@ genPlus (iCode * ic)
   /* Special case when left and right are constant */
   if (isPair (AOP (IC_RESULT (ic))))
     {
-      char *left, *right;
-      left = aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE);
-      right = aopGetLitWordLong (AOP (IC_RIGHT (ic)), 0, FALSE);
+      char *left = Safe_strdup (aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
+      const char *right = aopGetLitWordLong (AOP (IC_RIGHT (ic)), 0, FALSE);
 
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && left && right)
         {
@@ -3957,10 +3921,12 @@ genPlus (iCode * ic)
           /* PENDING: fix */
           dbuf_init (&dbuf, 128);
           dbuf_printf (&dbuf, "#(%s + %s)", left, right);
+          Safe_free (left);
           emit2 ("ld %s,%s", getPairName (AOP (IC_RESULT (ic))), dbuf_c_str (&dbuf));
           dbuf_destroy (&dbuf);
           goto release;
         }
+      Safe_free (left);
     }
 
   if ((isPair (AOP (IC_RIGHT (ic))) || isPair (AOP (IC_LEFT (ic)))) && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL)

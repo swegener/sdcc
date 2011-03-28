@@ -966,6 +966,51 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
   return decorateType (newNode ('=', sym, iExpr), RESULT_TYPE_NONE);
 }
 
+/*------------------------------------------------------------------*/
+/* moveNestedInit - rewrites an initList node with a nested         */
+/*                  designator to remove one level of nesting.      */
+/*------------------------------------------------------------------*/
+static initList *
+moveNestedInit (initList *src)
+{
+  initList *dst;
+
+  /** Create new initList element */
+  switch (src->type)
+    {
+    case INIT_NODE:
+      dst = newiList(INIT_NODE, src->init.node);
+      break;
+    case INIT_DEEP:
+      dst = newiList(INIT_DEEP, src->init.deep);
+      break;
+    }
+  dst->filename = src->filename;
+  dst->lineno = src->lineno;
+  /* remove one level of nesting from the designation */
+  dst->designation = src->designation->next;
+
+  dst = newiList(INIT_DEEP, dst);
+  dst->filename = src->filename;
+  dst->lineno = src->lineno;
+  dst->next = src->next;
+  return dst;
+}
+
+/*-----------------------------------------------------------------*/
+/* findStructField - find a specific field in a struct definition  */
+/*-----------------------------------------------------------------*/
+static symbol *
+findStructField (symbol *fields, symbol *target)
+{
+  for ( ; fields; fields = fields->next)
+    {
+      if (strcmp(fields->name, target->name) == 0)
+        return fields;
+    }
+  return NULL; /* not found */
+}
+
 /*-----------------------------------------------------------------*/
 /* createIvalStruct - generates initial value for structures       */
 /*-----------------------------------------------------------------*/
@@ -986,20 +1031,51 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
 
   iloop = ilist ? ilist->init.deep : NULL;
 
-  for (sflds = SPEC_STRUCT (type)->fields; sflds; sflds = sflds->next)
+  for (sflds = SPEC_STRUCT (type)->fields; ; sflds = sflds->next)
     {
+      /* skip past unnamed bitfields */
+      if (sflds && IS_BITFIELD (sflds->type) && SPEC_BUNNAMED (sflds->etype))
+        continue;
+
+      /* designated initializer? */
+      if (iloop && iloop->designation)
+        {
+          if (iloop->designation->type != DESIGNATOR_STRUCT)
+            {
+              werrorfl (iloop->filename, iloop->lineno, E_BAD_DESIGNATOR);
+            }
+          else /* find this designated element */
+            {
+              sflds = findStructField(SPEC_STRUCT (type)->fields,
+                                      iloop->designation->designator.tag);
+              if (sflds)
+                {
+                  if (iloop->designation->next)
+                    {
+                      iloop = moveNestedInit(iloop);
+                    }
+                }
+              else
+                {
+                  werrorfl (iloop->filename, iloop->lineno, E_NOT_MEMBER,
+                            iloop->designation->designator.tag->name);
+                  sflds = SPEC_STRUCT (type)->fields; /* fixup */
+                }
+            }
+        }
+
       /* if we have come to end */
+      if (!sflds)
+        break;
       if (!iloop && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
         break;
 
-      if (!IS_BITFIELD (sflds->type) || !SPEC_BUNNAMED (sflds->etype))
-        {
-          sflds->implicit = 1;
-          lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
-          lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
-          rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast, rootValue)), RESULT_TYPE_NONE);
-          iloop = iloop ? iloop->next : NULL;
-        }
+      /* initialize this field */
+      sflds->implicit = 1;
+      lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
+      lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
+      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast, rootValue)), RESULT_TYPE_NONE);
+      iloop = iloop ? iloop->next : NULL;
     }
 
   if (iloop)
@@ -1022,15 +1098,19 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
 {
   ast *rast = NULL;
   initList *iloop;
-  int lcnt = 0, size = 0;
+  int lcnt = 0, size = 0, idx = 0;
   literalList *literalL;
   sym_link *etype = getSpec (type);
 
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
-  if (IS_CHAR (type->next))
-    if ((rast = createIvalCharPtr (sym, type, decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE), rootValue)))
+  if (IS_CHAR (type->next) &&
+      ilist && ilist->type == INIT_NODE)
+    if ((rast = createIvalCharPtr (sym,
+                                   type,
+                                   decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE),
+                                   rootValue)))
 
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 
@@ -1049,7 +1129,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
       return NULL;
     }
 
-  if (port->arrayInitializerSuppported && convertIListToConstList (ilist, &literalL, lcnt))
+  if (port->arrayInitializerSuppported && convertIListToConstList (reorderIlist(type,ilist), &literalL, lcnt))
     {
       ast *aSym;
 
@@ -1059,11 +1139,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
       rast->values.constlist = literalL;
 
       // Make sure size is set to length of initializer list.
-      while (iloop)
-        {
-          size++;
-          iloop = iloop->next;
-        }
+      size = getNelements (type, ilist);
 
       if (lcnt && size > lcnt)
         {
@@ -1078,20 +1154,32 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
         {
           ast *aSym;
 
-          if (!iloop && (!lcnt || !DCL_ELEM (type) || !AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
+          if (!iloop && ((lcnt && size >= lcnt) || !DCL_ELEM (type) || !AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
             {
               break;
             }
 
-          aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
-          aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
-          rast = createIval (aSym, type->next, iloop, rast, rootValue);
-          lcnt--;
-          iloop = (iloop ? iloop->next : NULL);
-
-          /* no of elements given and we    */
-          /* have generated for all of them */
-          if (!lcnt && iloop)
+          if (iloop && iloop->designation)
+            {
+              if (iloop->designation->type != DESIGNATOR_ARRAY)
+                {
+                  werrorfl (iloop->filename, iloop->lineno, E_BAD_DESIGNATOR);
+                }
+              else {
+                idx = iloop->designation->designator.elemno;
+                if (iloop->designation->next)
+                  {
+                    iloop = moveNestedInit(iloop);
+                  }
+              }
+            }
+          /* track array size based on the initializers seen */
+          if (size <= idx)
+            {
+              size = idx + 1;
+            }
+          /* too many initializers? */
+          if (iloop && (lcnt && size > lcnt))
             {
               // is this a better way? at least it won't crash
               char *name = (IS_AST_SYM_VALUE (sym)) ? AST_SYMBOL (sym)->name : "";
@@ -1099,6 +1187,12 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
 
               break;
             }
+
+          aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (idx))));
+          aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
+          rast = createIval (aSym, type->next, iloop, rast, rootValue);
+          idx++;
+          iloop = (iloop ? iloop->next : NULL);
         }
     }
 

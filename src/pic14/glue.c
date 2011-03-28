@@ -772,6 +772,7 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
         for (i = 0; i < size; i++) {
             if (in_code) {
                 dbuf_printf (oBuf, "\tretlw 0x%02x\n", (int)(lit & 0xff));
+                // dbuf_printf (oBuf, "\tretlw 0x00\n"); // conflict from merge of sf-patch-2991122 ?
             } else {
                 dbuf_printf (oBuf, "%s0x%02x", (i == 0) ? "" : ", ", (int)(lit & 0xff));
             }
@@ -887,6 +888,10 @@ matchIvalToUnion (initList *list, sym_link *type, int size)
             if (list) list = list->init.deep;
             sym = SPEC_STRUCT(type)->fields;
             while (sym) {
+                while (list && list->type == INIT_HOLE) {
+                  list = list->next;
+                  sym = sym->next;
+                }
                 DEBUGprintf ("Checking UNION member %s.\n", sym->name);
                 if (((IS_STRUCT(sym->type) || getSize(sym->type) == size))
                         && matchIvalToUnion(list, sym->type, size))
@@ -918,6 +923,25 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
     int size, i;
     long lit;
     unsigned char *str;
+
+    /* Handle designated initializers */
+    if (list)
+      list = reorderIlist (my_type, list);
+
+    /* If this is a hole, substitute an appropriate initializer. */
+    if (list && list->type == INIT_HOLE)
+      {
+        if (IS_AGGREGATE (my_type))
+          {
+            list = newiList(INIT_DEEP, NULL); /* init w/ {} */
+          }
+        else
+          {
+            ast *ast = newAst_VALUE (constVal("0"));
+            ast = decorateType (ast, RESULT_TYPE_NONE);
+            list = newiList(INIT_NODE, ast);
+          }
+      }
 
     size = getSize(my_type);
 

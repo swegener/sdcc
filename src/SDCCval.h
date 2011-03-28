@@ -70,6 +70,7 @@ typedef struct initList
   int type;
   int lineno;
   char *filename;
+  struct designation *designation;
   union
   {
     struct ast *node;
@@ -80,6 +81,29 @@ typedef struct initList
   struct initList *next;
 }
 initList;
+
+enum
+  {
+    DESIGNATOR_STRUCT,
+    DESIGNATOR_ARRAY
+  };
+
+/* designated initializers */
+typedef struct designation
+  {
+    int type;
+    int lineno;
+    char *filename;
+    union
+      {
+	struct symbol *tag;             /* tag part of structure          */
+	int elemno;                     /* array element (constant expr)  */
+      }
+    designator;
+
+    struct designation *next;           /* next part of nested designator */
+  }
+designation;
 
 /* return values from checkConstantRange */
 typedef enum
@@ -137,6 +161,10 @@ double list2int (initList *);
 value *list2val (initList *);
 struct ast *list2expr (initList *);
 void resolveIvalSym (initList *, sym_link *);
+designation *newDesignation(int, void *);
+designation *revDesignation (designation *);
+designation *copyDesignation (designation *);
+initList *reorderIlist (sym_link *, initList *);
 value *valFromType (sym_link *);
 value *constFloatVal (const char *);
 value *constFixed16x16Val (const char *);

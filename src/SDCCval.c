@@ -59,6 +59,7 @@ newiList (int type, void *ilist)
   nilist->type = type;
   nilist->filename = lexFilename;
   nilist->lineno = lexLineno;
+  nilist->designation = NULL;
 
   switch (type)
     {
@@ -117,6 +118,11 @@ convertIListToConstList (initList * src, literalList ** lList, int size)
 
   while (iLoop)
     {
+      if (iLoop->designation != NULL)
+        {
+          return FALSE;
+        }
+
       if (iLoop->type != INIT_NODE)
         {
           return FALSE;
@@ -227,6 +233,9 @@ copyIlist (initList * src)
       break;
     }
 
+  if (src->designation)
+    dest->designation = copyDesignation (src->designation);
+
   if (src->next)
     assert (dest != NULL);
   dest->next = copyIlist (src->next);
@@ -241,6 +250,8 @@ double
 list2int (initList * val)
 {
   initList *i = val;
+
+  assert (i->type != INIT_HOLE);
 
   if (i->type == INIT_DEEP)
     return list2int (val->init.deep);
@@ -257,6 +268,9 @@ list2val (initList * val)
   if (!val)
     return NULL;
 
+  if(val->type == INIT_HOLE)
+    return NULL;
+
   if (val->type == INIT_DEEP)
     return list2val (val->init.deep);
 
@@ -271,6 +285,9 @@ list2expr (initList * ilist)
 {
   if (!ilist)
     return NULL;
+
+  assert (ilist->type != INIT_HOLE);
+
   if (ilist->type == INIT_DEEP)
     return list2expr (ilist->init.deep);
   return ilist->init.node;
@@ -298,6 +315,291 @@ resolveIvalSym (initList * ilist, sym_link * type)
 
       ilist = ilist->next;
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* newDesignation - new designation                                */
+/*-----------------------------------------------------------------*/
+designation *
+newDesignation (int type, void *designator)
+{
+  designation *ndesignation;
+
+  ndesignation = Safe_alloc (sizeof (designation));
+
+  ndesignation->type = type;
+  ndesignation->filename = lexFilename;
+  ndesignation->lineno = lexLineno;
+
+  switch (type)
+    {
+    case DESIGNATOR_STRUCT:
+      ndesignation->designator.tag = (struct symbol *) designator;
+      break;
+
+    case DESIGNATOR_ARRAY:
+      ndesignation->designator.elemno = * ((int *) designator);
+      break;
+    }
+
+  return ndesignation;
+}
+
+/*------------------------------------------------------------------*/
+/* revDesignation   - reverses the designation chain                */
+/*------------------------------------------------------------------*/
+designation *
+revDesignation (designation * val)
+{
+  designation *prev, *curr, *next;
+
+  if (!val)
+    return NULL;
+
+  prev = val;
+  curr = val->next;
+
+  while (curr)
+    {
+      next = curr->next;
+      curr->next = prev;
+      prev = curr;
+      curr = next;
+    }
+  val->next = (void *) NULL;
+  return prev;
+}
+
+/*------------------------------------------------------------------*/
+/* copyDesignation - copy designation list                          */
+/*------------------------------------------------------------------*/
+designation *
+copyDesignation (designation * src)
+{
+  designation *dest = NULL;
+
+  if (!src)
+    return NULL;
+
+  switch (src->type)
+    {
+    case DESIGNATOR_STRUCT:
+      dest = newDesignation (DESIGNATOR_STRUCT, copySymbol (src->designator.tag));
+      break;
+    case DESIGNATOR_ARRAY:
+      dest = newDesignation (DESIGNATOR_ARRAY, &(src->designator.elemno) );
+      break;
+    }
+
+  dest->lineno = src->lineno;
+  dest->filename = src->filename;
+
+  if (src->next)
+    dest->next = copyDesignation (src->next);
+
+  return dest;
+}
+
+/*------------------------------------------------------------------*/
+/* moveNestedInit - rewrites an initList node with a nested         */
+/*                  designator to remove one level of nesting.      */
+/*------------------------------------------------------------------*/
+static
+void moveNestedInit(initList *deepParent, initList *src)
+{
+  initList *dst = NULL, **eol;
+
+  /** Create new initList element */
+  switch (src->type)
+    {
+    case INIT_NODE:
+      dst = newiList(INIT_NODE, src->init.node);
+      break;
+    case INIT_DEEP:
+      dst = newiList(INIT_DEEP, src->init.deep);
+      break;
+    }
+  dst->filename = src->filename;
+  dst->lineno = src->lineno;
+  dst->designation = src->designation->next;
+
+  /* add dst to end of deepParent */
+  if (deepParent->type != INIT_DEEP)
+    {
+      werrorfl (deepParent->filename, deepParent->lineno,
+                E_INIT_STRUCT, "<unknown>");
+      return;
+    }
+  for (eol = &(deepParent->init.deep); *eol ; )
+    eol = &((*eol)->next);
+  *eol = dst;
+}
+
+/*-----------------------------------------------------------------*/
+/* findStructField - find a specific field in a struct definition  */
+/*-----------------------------------------------------------------*/
+static int
+findStructField (symbol *fields, symbol *target)
+{
+  int i;
+
+  for (i=0 ; fields; fields = fields->next)
+    {
+      /* skip past unnamed bitfields */
+      if (IS_BITFIELD (fields->type) && SPEC_BUNNAMED (fields->etype))
+        continue;
+      /* is this it? */
+      if (strcmp(fields->name, target->name) == 0)
+        return i;
+      i++;
+    }
+
+  /* not found */
+  werrorfl (target->fileDef, target->lineDef, E_NOT_MEMBER, target->name);
+  return 0;
+}
+
+/*------------------------------------------------------------------*/
+/* reorderIlist - expands an initializer list to match designated   */
+/*                initializers.                                     */
+/*------------------------------------------------------------------*/
+initList *reorderIlist (sym_link * type, initList * ilist)
+{
+  initList *iloop, *nlist, **nlistArray;
+  symbol *sflds;
+  int size=0, idx;
+
+  if (!IS_AGGREGATE (type))
+    /* uninteresting: no designated initializers */
+    return ilist;
+
+  if (ilist && ilist->type == INIT_HOLE)
+    /* ditto; just a uninitialized hole */
+    return ilist;
+
+  /* special case: check for string initializer */
+  if (IS_ARRAY (type) && IS_CHAR (type->next) &&
+      ilist && ilist->type == INIT_NODE)
+    {
+      ast *iast = ilist->init.node;
+      value *v = (iast->type == EX_VALUE ? iast->opval.val : NULL);
+      if (v && IS_ARRAY (v->type) && IS_CHAR (v->etype))
+        {
+          /* yep, it's a string; no changes needed here. */
+          return ilist;
+        }
+    }
+
+  if (ilist && ilist->type != INIT_DEEP)
+    {
+      werrorfl (ilist->filename, ilist->lineno, E_INIT_STRUCT, "<unknown>");
+      return NULL;
+    }
+
+  /* okay, allocate enough space */
+  if (IS_ARRAY (type))
+    size = getNelements(type, ilist);
+  else if (IS_STRUCT (type))
+    {
+      /* compute size from struct type. */
+      size = 0;
+      for (sflds = SPEC_STRUCT (type)->fields; sflds; sflds = sflds->next)
+        {
+          /* skip past unnamed bitfields */
+          if (IS_BITFIELD (sflds->type) && SPEC_BUNNAMED (sflds->etype))
+            continue;
+          size++;
+        }
+    }
+  nlistArray = Safe_calloc ( size, sizeof(initList *) );
+
+  /* pull together all the initializers into an ordered list */
+  iloop = ilist ? ilist->init.deep : NULL;
+  for (idx = 0 ; iloop ; iloop = iloop->next, idx++)
+    {
+      if (iloop->designation)
+        {
+          assert (iloop->type != INIT_HOLE);
+
+          if (IS_ARRAY (type))
+            {
+              if (iloop->designation->type == DESIGNATOR_ARRAY)
+                idx = iloop->designation->designator.elemno;
+              else
+                werrorfl (iloop->filename, iloop->lineno, E_BAD_DESIGNATOR);
+            }
+          else if (IS_STRUCT (type))
+            {
+              if (iloop->designation->type == DESIGNATOR_STRUCT)
+                idx = findStructField (SPEC_STRUCT (type)->fields,
+                                       iloop->designation->designator.tag);
+              else
+                werrorfl (iloop->filename, iloop->lineno, E_BAD_DESIGNATOR);
+            }
+          else assert (0);
+
+          if (iloop->designation->next)
+            {
+              if (nlistArray[idx] == NULL)
+                nlistArray[idx] = newiList(INIT_DEEP, NULL);
+              moveNestedInit(nlistArray[idx], iloop);
+              continue;
+            }
+        }
+
+      /* overwrite any existing entry with iloop */
+      if (iloop->type != INIT_HOLE)
+        {
+          if (nlistArray[idx] != NULL)
+            werrorfl (iloop->filename, iloop->lineno, W_DUPLICATE_INIT, idx);
+
+          nlistArray[idx] = iloop;
+        }
+    }
+
+  /* create new list from nlistArray/size */
+  nlist = NULL;
+  sflds = IS_STRUCT (type) ? SPEC_STRUCT (type)->fields : NULL;
+  for ( idx=0; idx < size; idx++ )
+    {
+      initList *src = nlistArray[idx], *dst = NULL;
+      if (!src || src->type==INIT_HOLE)
+        {
+          dst = newiList(INIT_HOLE, NULL);
+          dst->filename = ilist->filename;
+          dst->lineno = ilist->lineno;
+        }
+      else
+        {
+          switch (src->type)
+            {
+            case INIT_NODE:
+              dst = newiList(INIT_NODE, src->init.node);
+              break;
+            case INIT_DEEP:
+              dst = newiList(INIT_DEEP, src->init.deep);
+              break;
+            }
+          dst->filename = src->filename;
+          dst->lineno = src->lineno;
+        }
+      dst->next = nlist;
+      nlist = dst;
+      /* advance to next field which is not an unnamed bitfield */
+      do
+        {
+          sflds = sflds ? sflds->next : NULL;
+        }
+      while (sflds &&
+             IS_BITFIELD (sflds->type) && SPEC_BUNNAMED (sflds->etype));
+    }
+
+  nlist = newiList(INIT_DEEP, revinit (nlist));
+  nlist->filename = ilist->filename;
+  nlist->lineno = ilist->lineno;
+  nlist->designation = ilist->designation;
+  nlist->next = ilist->next;
+  return nlist;
 }
 
 /*------------------------------------------------------------------*/
@@ -1865,7 +2167,7 @@ valCastLiteral (sym_link * dtype, double fval)
 int
 getNelements (sym_link * type, initList * ilist)
 {
-  int i;
+  int i, size;
 
   if (!ilist)
     return 0;
@@ -1892,13 +2194,29 @@ getNelements (sym_link * type, initList * ilist)
         }
     }
 
+  size = 0;
   i = 0;
   while (ilist)
     {
+      if (ilist->designation)
+        {
+          if (ilist->designation->type != DESIGNATOR_ARRAY)
+            {
+              // structure designator for array, boo.
+              werrorfl (ilist->filename, ilist->lineno, E_BAD_DESIGNATOR);
+            }
+          else {
+            i = ilist->designation->designator.elemno;
+          }
+        }
+      if (size <= i)
+        {
+          size = i + 1; /* array size is one larger than array init element */
+        }
       i++;
       ilist = ilist->next;
     }
-  return i;
+  return size;
 }
 
 /*-----------------------------------------------------------------*/

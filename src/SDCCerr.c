@@ -455,6 +455,10 @@ struct
    "field '%s' has incomplete type" },
 { W_DEPRECATED_OPTION, ERROR_LEVEL_WARNING,
    "deprecated compiler option '%s'" },
+{ E_BAD_DESIGNATOR, ERROR_LEVEL_ERROR,
+   "Invalid designator for designated initializer" },
+{ W_DUPLICATE_INIT, ERROR_LEVEL_WARNING,
+   "Duplicate initializer at position %d; ignoring previous." },
 };
 
 /*

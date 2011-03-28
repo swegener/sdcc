@@ -851,8 +851,27 @@ printIvalStruct (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s 
 
   if (SPEC_STRUCT (type)->type == UNION)
     {
+      int size;
+      /* skip past holes, print value */
+      while (iloop && iloop->type == INIT_HOLE)
+	{
+	  iloop = iloop->next;
+	  sflds = sflds->next;
+	}
       printIval (sym, sflds->type, iloop, oBuf, 1);
-      iloop = iloop ? iloop->next : NULL;
+      /* pad out with zeros if necessary */
+      size = getSize(type) - getSize(sflds->type);
+      for ( ; size > 0 ; size-- )
+	{
+	  dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
+	}
+      /* advance past holes to find out if there were excess initializers */
+      do
+	{
+	  iloop = iloop ? iloop->next : NULL;
+	  sflds = sflds->next;
+	}
+      while (iloop && iloop->type == INIT_HOLE);
     }
   else
     {
@@ -929,7 +948,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
       /* take care of the special   case  */
       /* array of characters can be init  */
       /* by a string                      */
-      if (IS_CHAR (type->next))
+      if (IS_CHAR (type->next) && ilist->type == INIT_NODE)
         {
           val = list2val (ilist);
           if (!val)
@@ -1267,6 +1286,25 @@ void
 printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, bool check)
 {
   sym_link *itype;
+
+  /* Handle designated initializers */
+  if (ilist && ilist->type==INIT_DEEP)
+    ilist = reorderIlist (type, ilist);
+
+  /* If this is a hole, substitute an appropriate initializer. */
+  if (ilist && ilist->type == INIT_HOLE)
+    {
+      if (IS_AGGREGATE (type))
+	{
+	  ilist = newiList(INIT_DEEP, NULL); /* init w/ {} */
+	}
+      else
+	{
+	  ast *ast = newAst_VALUE (constVal("0"));
+	  ast = decorateType (ast, RESULT_TYPE_NONE);
+	  ilist = newiList(INIT_NODE, ast);
+	}
+    }
 
   /* if structure then    */
   if (IS_STRUCT (type))

@@ -75,6 +75,7 @@ bool uselessDecl = TRUE;
     int        yyint;      /* integer value returned     */
     value      *val ;      /* for integer constant       */
     initList   *ilist;     /* initial list               */
+    designation*dsgn;      /* designator                 */
     const char *yyinline;  /* inlined assembler code     */
     ast        *asts;      /* expression tree            */
 }
@@ -125,6 +126,7 @@ bool uselessDecl = TRUE;
 %type <asts> expression_statement selection_statement iteration_statement
 %type <asts> jump_statement function_body else_statement string_literal
 %type <asts> critical_statement
+%type <dsgn> designator designator_list designation designation_opt
 %type <ilist> initializer initializer_list
 %type <yyint> unary_operator assignment_operator struct_or_union
 
@@ -529,6 +531,45 @@ init_declarator
    | declarator '=' initializer  { $1->ival = $3   ; }
    ;
 
+designation_opt
+   :                             { $$ = NULL; }
+   | designation
+   ;
+
+designation
+   : designator_list '='         { $$ = revDesignation($1); }
+   ;
+
+designator_list
+   : designator
+   | designator_list designator  { $2->next = $1; $$ = $2; }
+   ;
+
+designator
+   : '[' constant_expr ']'
+         {
+            value *tval;
+            int elemno;
+
+            tval = constExprValue($2, TRUE);
+            /* if it is not a constant then Error  */
+            if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
+              {
+                werror (E_CONST_EXPECTED);
+                elemno = 0; /* arbitrary fixup */
+              }
+            else
+              {
+                if ((elemno = (int) ulFromVal(tval)) < 0)
+                  {
+                    werror (E_BAD_DESIGNATOR);
+                    elemno = 0; /* arbitrary fixup */
+                  }
+              }
+            $$ = newDesignation(DESIGNATOR_ARRAY, &elemno);
+         }
+   | '.' identifier              { $$ = newDesignation(DESIGNATOR_STRUCT,$2); }
+   ;
 
 storage_class_specifier
    : TYPEDEF   {
@@ -1408,8 +1449,13 @@ initializer
    ;
 
 initializer_list
-   : initializer
-   | initializer_list ',' initializer  {  $3->next = $1; $$ = $3; }
+   : designation_opt initializer    { $2->designation = $1; $$ = $2; }
+   | initializer_list ',' designation_opt initializer
+                                    {
+                                       $4->designation = $3;
+                                       $4->next = $1;
+                                       $$ = $4;
+                                    }
    ;
 
 statement

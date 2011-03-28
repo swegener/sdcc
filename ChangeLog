@@ -1,3 +1,16 @@
+2011-05-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCval.c,
+	  src/SDCCval.h,
+	  src/SDCC.y,
+	  src/SDCCglue.c,
+	  src/pic14/glue.c,
+	  src/pic16/glue.c,
+	  src/SDCCast.c:
+	  Support for designated initializers, thanks C. Scott and R. Quattlebaum.
+
 2011-03-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/m08mch.c,  sdas/as6808/m08pst.c,

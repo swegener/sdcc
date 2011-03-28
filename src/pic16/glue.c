@@ -715,7 +715,8 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
-  if (IS_CHAR (type->next) && ilist) {
+  if (IS_CHAR (type->next) &&
+      ilist && ilist->type == INIT_NODE) {
     if (!IS_LITERAL(list2val(ilist)->etype)) {
       werror (W_INIT_WRONG);
       return;
@@ -907,6 +908,13 @@ pic16_printIvalUnion (symbol * sym, sym_link * type,
 
   size = SPEC_STRUCT(type)->size;
   sflds = SPEC_STRUCT(type)->fields;
+
+  /* skip past holes, print value */
+  while (iloop && iloop->type == INIT_HOLE)
+    {
+      iloop = iloop->next;
+      sflds = sflds->next;
+    }
   pic16_printIval (sym, sflds->type, iloop, ptype, p);
 
   /* if the first field is not the longest, fill with 0s */
@@ -1142,6 +1150,25 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
         fprintf(stderr, "%s: IS_STRUCT: %d  IS_ARRAY: %d  IS_PTR: %d  IS_SPEC: %d\n", sym->name,
                 IS_STRUCT(type), IS_ARRAY(type), IS_PTR(type), IS_SPEC(type));
 #endif
+
+  /* Handle designated initializers */
+  if (ilist)
+    ilist = reorderIlist (type, ilist);
+
+  /* If this is a hole, substitute an appropriate initializer. */
+  if (ilist && ilist->type == INIT_HOLE)
+    {
+      if (IS_AGGREGATE (type))
+        {
+          ilist = newiList(INIT_DEEP, NULL); /* init w/ {} */
+        }
+      else
+        {
+          ast *ast = newAst_VALUE (constVal("0"));
+          ast = decorateType (ast, RESULT_TYPE_NONE);
+          ilist = newiList(INIT_NODE, ast);
+        }
+    }
 
   /* if structure then */
   if (IS_STRUCT (type))

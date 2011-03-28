@@ -227,6 +227,8 @@
 #define E_OFFSETOF_TYPE               199 /* offsetof can only be applied to structs/unions */
 #define E_INCOMPLETE_FIELD            200 /* struct field has incomplete type */
 #define W_DEPRECATED_OPTION           201 /* deprecated compiler option '%s' */
+#define E_BAD_DESIGNATOR              202 /* Bad designated initializer */
+#define W_DUPLICATE_INIT              203 /* duplicate initializer */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

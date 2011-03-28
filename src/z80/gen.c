@@ -414,7 +414,7 @@ static void
 _vemit2 (const char *szFormat, va_list ap)
 {
   struct dbuf_s dbuf;
-  char *buffer, *p, *nextbuffer;
+  char *buffer, *p, *nextp;
 
   dbuf_init (&dbuf, INITIAL_INLINEASM);
 
@@ -422,17 +422,19 @@ _vemit2 (const char *szFormat, va_list ap)
 
   buffer = p = dbuf_detach_c_str (&dbuf);
 
-  _tidyUp (buffer);
+  _tidyUp (p);
 
   /* Decompose multiline macros */
-  while ((nextbuffer = strchr (p, '\n')))
+  while ((nextp = strchr (p, '\n')))
     {
-      *nextbuffer = 0;
+      *nextp = '\0';
       _add_line (p);
-      p = nextbuffer + 1;
+      p = nextp + 1;
     }
 
   _add_line (p);
+
+  Safe_free (buffer);
 }
 
 static void
@@ -1643,7 +1645,7 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
           }
         else
           {
-            struct dbuf_s dbuf;
+        struct dbuf_s dbuf;
 
             /* PENDING: Do this better. */
             if (_G.preserveCarry)
@@ -1912,7 +1914,7 @@ isConstantString (const char *s)
   return (*s == '#' || *s == '$');
 }
 
-bool
+static bool
 canAssignToPtr (const char *s)
 {
   if (isRegString (s))
@@ -2186,7 +2188,7 @@ commitPair (asmop * aop, PAIR_ID id)
 /*-----------------------------------------------------------------*/
 /* getDataSize - get the operand data size                         */
 /*-----------------------------------------------------------------*/
-int
+static int
 getDataSize (operand * op)
 {
   int size;
@@ -2269,7 +2271,7 @@ movLeft2ResultLong (operand * left, int offl, operand * result, int offr, int si
 
 /** Put Acc into a register set
  */
-void
+static void
 outAcc (operand * result)
 {
   int size, offset;
@@ -2289,7 +2291,7 @@ outAcc (operand * result)
 
 /** Take the value in carry and put it into a register
  */
-void
+static void
 outBitC (operand * result)
 {
   /* if the result is bit */
@@ -2309,7 +2311,7 @@ outBitC (operand * result)
 /*-----------------------------------------------------------------*/
 /* toBoolean - emit code for or a,operator(sizeop)                 */
 /*-----------------------------------------------------------------*/
-void
+static void
 _toBoolean (operand * oper, bool needflag)
 {
   int size = AOP_SIZE (oper);
@@ -2585,7 +2587,7 @@ release:
 /*-----------------------------------------------------------------*/
 /* assignResultValue -                                             */
 /*-----------------------------------------------------------------*/
-void
+static void
 assignResultValue (operand * oper)
 {
   int size = AOP_SIZE (oper);
@@ -3523,7 +3525,7 @@ genEndFunction (iCode * ic)
 
       dbuf_init (&dbuf, 128);
       dbuf_printf (&dbuf, "%s_end", sym->rname);
-      emit2 ("!labeldef", &dbuf);
+      emit2 ("!labeldef", dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
       _G.lines.current->isLabel = 1;
     }
@@ -3749,7 +3751,7 @@ genPlusIncr (iCode * ic)
 /*-----------------------------------------------------------------*/
 /* outBitAcc - output a bit in acc                                 */
 /*-----------------------------------------------------------------*/
-void
+static void
 outBitAcc (operand * result)
 {
   symbol *tlbl = newiTempLabel (NULL);
@@ -3767,7 +3769,7 @@ outBitAcc (operand * result)
     }
 }
 
-bool
+static bool
 couldDestroyCarry (asmop * aop)
 {
   if (aop)
@@ -5478,7 +5480,7 @@ genOrOp (iCode * ic)
 /*-----------------------------------------------------------------*/
 /* isLiteralBit - test if lit == 2^n                               */
 /*-----------------------------------------------------------------*/
-int
+static int
 isLiteralBit (unsigned long lit)
 {
   unsigned long pw[32] = { 1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
@@ -7187,7 +7189,7 @@ genPointerGet (iCode * ic)
   genGenPointerGet (left, result, ic);
 }
 
-bool
+static bool
 isRegOrLit (asmop * aop)
 {
   if (aop->type == AOP_REG || aop->type == AOP_LIT || aop->type == AOP_IMMD || aop->type == AOP_HLREG)

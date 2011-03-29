@@ -22,6 +22,7 @@
  * Kent, Ohio  44240
  */
 
+#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lklex.c

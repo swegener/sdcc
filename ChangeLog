@@ -1,3 +1,8 @@
+2011-03-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lklex.c,
+	* src/SDCCast.c: small fixes
+
 2011-03-28 Borut Razem <borut.razem AT gmail.com>
 
 	* src/z80/gen.c: fixed bug, introduced during code cleaning

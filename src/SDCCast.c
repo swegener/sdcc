@@ -984,6 +984,8 @@ moveNestedInit (initList *src)
     case INIT_DEEP:
       dst = newiList(INIT_DEEP, src->init.deep);
       break;
+    default:
+      return NULL;
     }
   dst->filename = src->filename;
   dst->lineno = src->lineno;

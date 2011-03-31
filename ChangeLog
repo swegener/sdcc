@@ -1,3 +1,8 @@
+2011-03-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (regs8051, serialRegAssign),
+	* src/mcs51/ralloc.h: prefer to use adjacent ascending registers
+
 2011-03-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lklex.c,

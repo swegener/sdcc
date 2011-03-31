@@ -61,14 +61,14 @@ int mcs51_ptrRegReq;            /* one byte pointer register required */
 
 /* 8051 registers */
 regs regs8051[] = {
-  {REG_GPR, R2_IDX, REG_GPR, "r2", "ar2", "0", 2, 1},
-  {REG_GPR, R3_IDX, REG_GPR, "r3", "ar3", "0", 3, 1},
-  {REG_GPR, R4_IDX, REG_GPR, "r4", "ar4", "0", 4, 1},
-  {REG_GPR, R5_IDX, REG_GPR, "r5", "ar5", "0", 5, 1},
-  {REG_GPR, R6_IDX, REG_GPR, "r6", "ar6", "0", 6, 1},
   {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1},
-  {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1},
+  {REG_GPR, R6_IDX, REG_GPR, "r6", "ar6", "0", 6, 1},
+  {REG_GPR, R5_IDX, REG_GPR, "r5", "ar5", "0", 5, 1},
+  {REG_GPR, R4_IDX, REG_GPR, "r4", "ar4", "0", 4, 1},
+  {REG_GPR, R3_IDX, REG_GPR, "r3", "ar3", "0", 3, 1},
+  {REG_GPR, R2_IDX, REG_GPR, "r2", "ar2", "0", 2, 1},
   {REG_PTR, R1_IDX, REG_PTR, "r1", "ar1", "0", 1, 1},
+  {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1},
   {REG_BIT, B0_IDX, REG_BIT, "b0", "b0", "bits", 0, 1},
   {REG_BIT, B1_IDX, REG_BIT, "b1", "b1", "bits", 1, 1},
   {REG_BIT, B2_IDX, REG_BIT, "b2", "b2", "bits", 2, 1},
@@ -593,7 +593,7 @@ spillThis (symbol * sym)
   if (!(sym->remat || sym->usl.spillLoc))
     createStackSpil (sym);
 
-  /* mark it has spilt & put it in the spilt set */
+  /* mark it as spilt & put it in the spilt set */
   sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
 
@@ -1398,6 +1398,25 @@ serialRegAssign (eBBlock ** ebbs, int count)
                     }
                 }
 
+              /* for debugging prefer to keep the sym in ascending
+                 registers so sort them by address */
+              if (sym->regs[0])
+                {
+                  for (j = 0; j < sym->nRegs - 1; j++)
+                    {
+                      int k;
+                      for (k=j+1; k<sym->nRegs; k++)
+                        {
+                          if (sym->regs[j]->offset > sym->regs[k]->offset)
+                            {
+                              regs *tmp = sym->regs[j];
+                              sym->regs[j] = sym->regs[k];
+                              sym->regs[k] = tmp;
+                            }
+                        }
+                    }
+                }
+
               if (!POINTER_SET (ic) && !POINTER_GET (ic))
                 {
                   /* if it shares registers with operands make sure
@@ -2056,8 +2075,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       return 0;
     }
 
-  /* find the definition of iTempNN scanning backwards if we find a
-     a use of the true symbol in before we find the definition then
+  /* find the definition of iTempNN scanning backwards if we find
+     a use of the true symbol before we find the definition then
      we cannot */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
@@ -2105,7 +2124,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
             {
               if (POINTER_SET (dic))
                 dic = NULL;
-
               break;
             }
 
@@ -2373,8 +2391,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
               if (IN_FARSPACE (SPEC_OCLS (etype)))
                 return 0;
             }
-          /* found it we need to remove it from the
-             block */
+          /* found it we need to remove it from the block */
           reassignAliasedSym (ebp, dic, ic, IC_RIGHT (ic));
 
           return 1;
@@ -3051,7 +3068,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
           packRegsForOneuse (ic, IC_LEFT (ic), ebp);
         }
 
-      /* if this is a cast for intergral promotion then
+      /* if this is a cast for integral promotion then
          check if it's the only use of the definition of the
          operand being casted/ if yes then replace
          the result of that arithmetic operation with

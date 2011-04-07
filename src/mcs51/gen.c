@@ -86,6 +86,7 @@ static unsigned short rbank = -1;
 #define R0INB   _G.bu.bs.r0InB
 #define R1INB   _G.bu.bs.r1InB
 #define OPINB   _G.bu.bs.OpInB
+#define BITSINB _G.bu.bs.bitsInB
 #define BINUSE  _G.bu.BInUse
 
 static struct
@@ -99,6 +100,7 @@ static struct
       short r0InB:2;            //2 so we can see it overflow
       short r1InB:2;            //2 so we can see it overflow
       short OpInB:2;            //2 so we can see it overflow
+      short bitsInB:2;          //2 so we can see it overflow
     } bs;
     short BInUse;
   } bu;
@@ -2217,32 +2219,25 @@ xstackRegisters (bitVect * rsave, bool push, int count, char szRegs[32])
           regs *reg = REG_WITH_INDEX (i);
           if (reg->type == REG_BIT)
             {
-              mask |= (push) ? 0x01 : 0x100;
+              mask |= 0x01;
               strncat (szRegs, reg->base, 31);
             }
           else
             {
               if (i == R0_IDX)
                 {
-                  mask |= (push) ? 0x100 : 0x01;
-                }
-              else if (i == R1_IDX)
-                {
-                  mask |= 0x02;
+                  mask |= 0x100;
                 }
               else
                 {
-                  //set bit(9-n) for Rn when pushing
-                  //set bit(n) for Rn when popping
-                  mask |= (push) ? (0x80 >> i) : (0x04 << i);
+                  //set bit(n) for Rn
+                  mask |= (0x01 << reg->offset);
                 }
               strncat (szRegs, reg->name, 31);
             }
         }
     }
-  if (push)
-    mask ^= 0x02;               //invert bit1 when pushing
-  return mask ^ 0x01;           //invert bit0
+  return mask ^ 0xFF;           //invert all bits for jbc
 }
 
 /*-----------------------------------------------------------------*/
@@ -2322,13 +2317,17 @@ saveRegisters (iCode * lic)
             {
               char szRegs[32];
               int mask = xstackRegisters (rsave, TRUE, count, szRegs);
+              if (BINUSE)
+                emitcode ("push", "b");
               emitcode ("mov", "a,#0x%02x", count);
               emitcode ("mov", "b,#0x%02x", mask & 0xFF);
               if (mask & 0x100)
-                emitcode ("lcall", "__sdcc_xpush_regs_r0\t;(%s)", szRegs);
+                emitcode ("lcall", "___sdcc_xpush_regs_r0\t;(%s)", szRegs);
               else
-                emitcode ("lcall", "__sdcc_xpush_regs\t;(%s)", szRegs);
+                emitcode ("lcall", "___sdcc_xpush_regs\t;(%s)", szRegs);
               lineCurr->isInline = 1;
+              if (BINUSE)
+                emitcode ("pop", "b");
             }
           else
             {
@@ -2432,9 +2431,9 @@ unsaveRegisters (iCode * ic)
               int mask = xstackRegisters (rsave, FALSE, count, szRegs);
               emitcode ("mov", "b,#0x%02x", mask & 0xFF);
               if (mask & 0x100)
-                emitcode ("lcall", "__sdcc_xpop_regs_bits\t;(%s)", szRegs);
+                emitcode ("lcall", "___sdcc_xpop_regs_r0\t;(%s)", szRegs);
               else
-                emitcode ("lcall", "__sdcc_xpop_regs\t;(%s)", szRegs);
+                emitcode ("lcall", "___sdcc_xpop_regs\t;(%s)", szRegs);
               lineCurr->isInline = 1;
             }
           else
@@ -2902,7 +2901,11 @@ genSend (set * sendSet)
 
   if (options.useXstack || bit_count)
     {
+      if (bit_count)
+        BITSINB++;
       saveRegisters (setFirstItem (sendSet));
+      if (bit_count)
+        BITSINB--;
     }
 
   if (bit_count)
@@ -3314,7 +3317,6 @@ genPcall (iCode * ic)
        !IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
-
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;

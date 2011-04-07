@@ -15,7 +15,7 @@ override PORTDIR = ../build/$(PORT)
 
 OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel \
       crtpagesfr.rel crtbank.rel crtcall.rel \
-      crtxstack.rel crtxpush.rel crtxpushr0.rel crtxpop.rel crtxpopbits.rel
+      crtxstack.rel crtxpush.rel crtxpushr0.rel crtxpop.rel crtxpopr0.rel
 
 LIB = mcs51.lib
 

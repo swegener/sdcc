@@ -38,15 +38,10 @@ bits:
 
 	.area HOME    (CODE)
 
-; Pop registers r0..r7 & bits from xstack
+; Pop registers r0..r7 & bits from xstack (r0 always)
 ; Expect mask in B
-__sdcc_xpop_regs_bits::
-	lcall	__sdcc_xpop_regs
-	push	ar0
+___sdcc_xpop_regs_r0::
 	mov	r0,_spx
 	dec	r0
-	movx	a,@r0		;pop bits
-	mov	bits,a
-	dec	_spx
-	pop	ar0
-	ret
+	movx	a,@r0		;pop R0
+	ljmp	___sdcc_xpop

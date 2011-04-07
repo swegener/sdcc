@@ -40,34 +40,51 @@ bits:
 
 ; Push registers r1..r7 & bits on xstack
 ; Expect allocation size in ACC and mask in B
-__sdcc_xpush_regs::
-	mov	r0,_spx
+___sdcc_xpush_regs::
 	add	a,_spx
 	mov	_spx,a
-	push	ar1
+	xch	a,r0
+___sdcc_xpush::
+	push	acc
 	jbc	B.0,00100$	;if B(0)=0 then
 	mov	a,bits		;push bits
+	dec	r0
 	movx	@r0,a
-	inc	r0
 00100$:
 	jbc	B.1,00101$	;if B(1)=0 then
 	mov	a,r1		;push R1
+	dec	r0
 	movx	@r0,a
-	inc	r0
 00101$:
-	mov	r1,#0x01
-00102$:
-	mov	a,B
-00103$:
-	jz	00104$		;if B=0 we are done
-	inc	r1
-	add	a,acc		;if B(9-n)=1 then
-	jnc	00103$
-	mov	B,a
-	mov	a,@r1		;push Rn
+	jbc	B.2,00102$	;if B(2)=0 then
+	mov	a,r2		;push R2
+	dec	r0
 	movx	@r0,a
-	inc	r0
-	sjmp	00102$
+00102$:
+	jbc	B.3,00103$	;if B(3)=0 then
+	mov	a,r3		;push R3
+	dec	r0
+	movx	@r0,a
+00103$:
+	jbc	B.4,00104$	;if B(4)=0 then
+	mov	a,r4		;push R4
+	dec	r0
+	movx	@r0,a
 00104$:
-	pop	ar1
+	jbc	B.5,00105$	;if B(5)=0 then
+	mov	a,r5		;push R5
+	dec	r0
+	movx	@r0,a
+00105$:
+	jbc	B.6,00106$	;if B(6)=0 then
+	mov	a,r6		;push R6
+	dec	r0
+	movx	@r0,a
+00106$:
+	jbc	B.7,00107$	;if B(7)=0 then
+	mov	a,r7		;push R7
+	dec	r0
+	movx	@r0,a
+00107$:
+	pop	ar0
 	ret

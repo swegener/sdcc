@@ -40,10 +40,10 @@ bits:
 
 ; Push registers r0..r7 & bits on xstack (r0 always)
 ; Expect allocation size in ACC and mask in B
-__sdcc_xpush_regs_r0::
-	push	ar0
-	lcall	__sdcc_xpush_regs
-	pop	acc
+___sdcc_xpush_regs_r0::
+	add	a,_spx
+	mov	_spx,a
+	xch	a,r0		;push R0
+	dec	r0
 	movx	@r0,a
-	mov	r0,a
-	ret
+	ljmp	___sdcc_xpush

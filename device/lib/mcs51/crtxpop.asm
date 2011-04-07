@@ -38,31 +38,53 @@ bits:
 
 	.area HOME    (CODE)
 
-; Pop registers r0..r7 from xstack
+; Pop registers r1..r7 & bits from xstack
 ; Expect mask in B
-__sdcc_xpop_regs::
+___sdcc_xpop_regs::
 	mov	a,r0
 	mov	r0,_spx
-	jbc	B.0,00101$	;if B(0)=0 then
+___sdcc_xpop::
+	push acc
+	jbc	B.0,00100$	;if B(0)=0 then
 	dec	r0
-	movx	a,@r0		;pop R0
-	dec	_spx
+	movx	a,@r0		;pop bits
+	mov	bits,a
+00100$:
+	jbc	B.1,00101$	;if B(1)=0 then
+	dec	r0
+	movx	a,@r0		;pop R1
+	mov	r1,a
 00101$:
-	push	acc
-	mov	r1,#0x08
+	jbc	B.2,00102$	;if B(2)=0 then
+	dec	r0
+	movx	a,@r0		;pop R2
+	mov	r2,a
 00102$:
-	mov	a,B
+	jbc	B.3,00103$	;if B(3)=0 then
+	dec	r0
+	movx	a,@r0		;pop R3
+	mov	r3,a
 00103$:
-	jz	00104$		;if B=0 we are done
-	dec	r1
-	add	a,acc		;if B(n) then
-	jnc	00103$
-	mov	B,a
-	dec	r0		;pop Rn
-	movx	a,@r0
-	mov	@r1,a
-	sjmp	00102$
+	jbc	B.4,00104$	;if B(4)=0 then
+	dec	r0
+	movx	a,@r0		;pop R4
+	mov	r4,a
 00104$:
+	jbc	B.5,00105$	;if B(5)=0 then
+	dec	r0
+	movx	a,@r0		;pop R5
+	mov	r5,a
+00105$:
+	jbc	B.6,00106$	;if B(6)=0 then
+	dec	r0
+	movx	a,@r0		;pop R6
+	mov	r6,a
+00106$:
+	jbc	B.7,00107$	;if B(7)=0 then
+	dec	r0
+	movx	a,@r0		;pop R7
+	mov	r7,a
+00107$:
 	mov	_spx,r0
 	pop	ar0
 	ret

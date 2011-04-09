@@ -20,9 +20,23 @@ alwaysFalse(void)
 }
 
 static {type}
-neverGetHere(void)
+neverGetHere1(void)
 {
-    FAILM("Shouldn't get here");
+    FAILM("Shouldn't get here 1");
+    return 0;
+}
+
+static {type}
+neverGetHere2(void)
+{
+    FAILM("Shouldn't get here 2");
+    return 0;
+}
+
+static {type}
+neverGetHere3(void)
+{
+    FAILM("Shouldn't get here 3");
     return 0;
 }
 
@@ -47,19 +61,21 @@ testLogicalAnd(void)
     {type} true = alwaysTrue();
     {type} false = alwaysFalse();
 
+    ASSERT(true);
+    ASSERT(!false);
     ASSERT(true && true && true);
     ASSERT(true && !false);
     ASSERT(!false && true);
 
     /* Test that the evaluation is aborted on the first false. */
-    if (true && false && neverGetHere()) {
-        /* Tested using neverGetHere() */
+    if (true && false && neverGetHere1()) {
+        /* Tested using neverGetHere1() */
     }
 
     /* Alternate that is similar. */
     if (true && false) {
-        neverGetHere();
-        /* Tested using neverGetHere() */
+        neverGetHere2();
+        /* Tested using neverGetHere2() */
     }
 
     resetGetHere();
@@ -75,13 +91,15 @@ testLogicalOr(void)
     {type} true = alwaysTrue();
     {type} false = alwaysFalse();
 
+    ASSERT(true);
+    ASSERT(!false);
     ASSERT(false || false || true);
     ASSERT(!true || !false);
     ASSERT(false || true);
 
     /* Test that the evaluation is aborted on the first hit. */
-    if (false || true || neverGetHere()) {
-        /* Tested using neverGetHere() */
+    if (false || true || neverGetHere3()) {
+        /* Tested using neverGetHere3() */
     }
 
     resetGetHere();

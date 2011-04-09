@@ -120,8 +120,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
     }
 
   /* Second pass: Expand any macros that we own */
-  dbuf_c_str (&tmpDBuf);
-  sz = noTokens = dbuf_detach (&tmpDBuf);
+  sz = noTokens = dbuf_detach_c_str (&tmpDBuf);
 
   /* recycle tmpDBuf */
   dbuf_init (&tmpDBuf, INITIAL_INLINEASM);

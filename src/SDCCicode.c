@@ -621,7 +621,7 @@ newiTemp (const char *s)
     dbuf_printf (&dbuf, "iTemp%d", iTempNum++);
 
   itmp = newSymbol (dbuf_c_str (&dbuf), 1);
-  dbuf_detach (&dbuf);
+  dbuf_destroy (&dbuf);
   strncpyz (itmp->rname, itmp->name, SDCC_NAME_MAX);
   itmp->isitmp = 1;
 

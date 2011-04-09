@@ -1140,9 +1140,6 @@ ftab[] =                                            // sorted on the number of t
     "deadMove", deadMove                            // 2
   },
   {
-    "deadMove", deadMove                            // 2
-  },
-  {
     "useAcallAjmp", useAcallAjmp                    // 2
   },
   {

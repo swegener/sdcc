@@ -481,4 +481,3 @@ sdcc_popen (const char *cmd)
 
   return fp;
 }
-

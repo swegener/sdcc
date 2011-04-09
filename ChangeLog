@@ -1,7 +1,9 @@
 2011-04-09 Borut Razem <borut.razem AT gmail.com>
 
 	* sim/ucsim/cmd.src/cmdpars.y: removed warnings
-	* support/regression/tests/logic.c: sync with optralloc branch
+	* support/regression/tests/logic.c, src/SDCCpeeph.c, src/SDCCasm.c,
+	  src/SDCCicode.c, src/SDCCglobl.h, src/SDCCsystem.c:
+	  sync with optralloc branch
 
 2011-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 

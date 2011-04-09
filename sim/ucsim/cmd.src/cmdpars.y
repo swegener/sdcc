@@ -4,8 +4,9 @@
 #include "globals.h"
 #include "stypes.h"
 
-static void yyerror(char *msg);
+static void yyerror (const char *msg);
 %}
+%expect 6
 
 %token PTOK_PLUS PTOK_MINUS PTOK_ASTERIX PTOK_SLASH PTOK_EQUAL
 %token PTOK_LEFT_PAREN PTOK_RIGHT_PAREN
@@ -127,8 +128,8 @@ bit:
 
 %%
 
-void
-yyerror(char *msg)
+static void
+yyerror (const char *msg)
 {
-  application->dd_printf("Parser error: %s\n", msg);
+  application->dd_printf ("Parser error: %s\n", msg);
 }

@@ -1,7 +1,7 @@
 /** @file port.h
     Definitions for what a port must provide.
     All ports are referenced in SDCCmain.c.
-*/
+ */
 #ifndef PORT_INCLUDE
 #define PORT_INCLUDE
 
@@ -23,7 +23,7 @@
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
-*/
+ */
 #define TARGET_IS_MCS51    (port->id == TARGET_ID_MCS51)
 #define TARGET_IS_GBZ80    (port->id == TARGET_ID_GBZ80)
 #define TARGET_IS_Z80      (port->id == TARGET_ID_Z80)
@@ -68,32 +68,32 @@ int process_pragma_tbl (const struct pragma_s *pragma_tbl, const char *s);
 /* Processor specific names */
 typedef struct
 {
-/** Unique id for this target */
+  /** Unique id for this target */
   const int id;
-/** Target name used for -m */
+  /** Target name used for -m */
   const char *const target;
 
-/** Target name string, used for --help */
+  /** Target name string, used for --help */
   const char *const target_name;
 
-/** Specific processor for the given target family. specified by -p */
+  /** Specific processor for the given target family. specified by -p */
   char *processor;
 
   struct
   {
-        /** Pointer to glue function */
+    /** Pointer to glue function */
     void (*do_glue) (void);
-        /** TRUE if all types of glue functions should be inserted into
-            the file that also defines main.
-            We dont want this in cases like the z80 where the startup
-            code is provided by a seperate module.
-        */
+    /** TRUE if all types of glue functions should be inserted into
+        the file that also defines main.
+        We dont want this in cases like the z80 where the startup
+        code is provided by a seperate module.
+     */
     bool glue_up_main;
     /* OR of MODEL_* */
     int supported_models;
     int default_model;
-        /** return the model string, used as library destination;
-            port->taget is used as model string if get_model is NULL */
+    /** return the model string, used as library destination;
+        port->taget is used as model string if get_model is NULL */
     const char *(*get_model) (void);
   }
   general;
@@ -101,19 +101,19 @@ typedef struct
   /* assembler related information */
   struct
   {
-        /** Command to run and arguments (eg as-z80) */
+    /** Command to run and arguments (eg as-z80) */
     const char **cmd;
-        /** Alternate macro based form. */
+    /** Alternate macro based form. */
     const char *mcmd;
-        /** Arguments for debug mode. */
+    /** Arguments for debug mode. */
     const char *debug_opts;
-        /** Arguments for normal assembly mode. */
+    /** Arguments for normal assembly mode. */
     const char *plain_opts;
     /* print externs as global */
     int externGlobal;
     /* assembler file extension */
     const char *file_ext;
-        /** If non-null will be used to execute the assembler. */
+    /** If non-null will be used to execute the assembler. */
     void (*do_assemble) (set *);
   }
   assembler;
@@ -121,35 +121,35 @@ typedef struct
   /* linker related info */
   struct
   {
-        /** Command to run (eg link-z80) */
+    /** Command to run (eg link-z80) */
     const char **cmd;
-        /** Alternate macro based form. */
+    /** Alternate macro based form. */
     const char *mcmd;
-        /** If non-null will be used to execute the link. */
+    /** If non-null will be used to execute the link. */
     void (*do_link) (void);
-        /** Extension for object files (.rel, .obj, ...) */
+    /** Extension for object files (.rel, .obj, ...) */
     const char *rel_ext;
-        /** 1 if port needs the .lnk file, 0 otherwise */
+    /** 1 if port needs the .lnk file, 0 otherwise */
     const int needLinkerScript;
     const char *const *crt;
     const char *const *libs;
   }
   linker;
 
+  /** Default peephole rules */
   struct
   {
-/** Default peephole rules */
     char *default_rules;
     int (*getSize) (lineNode * line);
     bitVect *(*getRegsRead) (lineNode * line);
     bitVect *(*getRegsWritten) (lineNode * line);
-      bool (*deadMove) (const char *reg, lineNode * currPl, lineNode * head);
-      bool (*notUsed) (const char *reg, lineNode * currPl, lineNode * head);
-      bool (*canAssign) (const char *op1, const char *op2, const char *op3);
+    bool (*deadMove) (const char *reg, lineNode * currPl, lineNode * head);
+    bool (*notUsed) (const char *reg, lineNode * currPl, lineNode * head);
+    bool (*canAssign) (const char *op1, const char *op2, const char *op3);
   }
   peep;
 
-/** Basic type sizes */
+  /** Basic type sizes */
   struct
   {
     int char_size;
@@ -165,7 +165,7 @@ typedef struct
   }
   s;
 
-/** tags for far, near, xstack, code generic pointers */
+  /** tags for far, near, xstack, code generic pointers */
   struct
   {
     int tag_far;
@@ -175,7 +175,7 @@ typedef struct
   }
   gp_tags;
 
-/** memory regions related stuff */
+  /** memory regions related stuff */
   struct
   {
     const char *const xstack_name;
@@ -218,27 +218,27 @@ typedef struct
   /* stack related information */
   struct
   {
-/** -1 for grows down (z80), +1 for grows up (mcs51) */
+    /** -1 for grows down (z80), +1 for grows up (mcs51) */
     int direction;
-/** Extra overhead when calling between banks */
+    /** Extra overhead when calling between banks */
     int bank_overhead;
-/** Extra overhead when the function is an ISR */
+    /** Extra overhead when the function is an ISR */
     int isr_overhead;
-/** Standard overhead for a function call */
+    /** Standard overhead for a function call */
     int call_overhead;
-/** Re-enterant space */
+    /** Re-enterant space */
     int reent_overhead;
-        /** 'banked' call overhead.
-            Mild overlap with bank_overhead */
+    /** 'banked' call overhead.
+        Mild overlap with bank_overhead */
     int banked_overhead;
   }
   stack;
 
   struct
   {
-        /** One more than the smallest
-            mul/div operation the processor can do natively
-            Eg if the processor has an 8 bit mul, native below is 2 */
+    /** One more than the smallest
+        mul/div operation the processor can do natively
+        Eg if the processor has an 8 bit mul, native below is 2 */
     unsigned muldiv;
     unsigned shift;
   }
@@ -273,31 +273,31 @@ typedef struct
   }
   jumptableCost;
 
-/** Prefix to add to a C function (eg "_") */
+  /** Prefix to add to a C function (eg "_") */
   const char *fun_prefix;
 
-    /** Called once the processor target has been selected.
-        First chance to initalise and set any port specific variables.
-        'port' is set before calling this.  May be NULL.
-    */
+  /** Called once the processor target has been selected.
+      First chance to initalise and set any port specific variables.
+      'port' is set before calling this.  May be NULL.
+  */
   void (*init) (void);
-/** Parses one option + its arguments */
-    bool (*parseOption) (int *pargc, char **argv, int *i);
-/** Optional list of automatically parsed options.  Should be
-    implemented to at least show the help text correctly. */
+  /** Parses one option + its arguments */
+  bool (*parseOption) (int *pargc, char **argv, int *i);
+  /** Optional list of automatically parsed options.  Should be
+      implemented to at least show the help text correctly. */
   OPTION *poptions;
-/** Initialise port spectific paths */
+  /** Initialise port spectific paths */
   void (*initPaths) (void);
-/** Called after all the options have been parsed. */
+  /** Called after all the options have been parsed. */
   void (*finaliseOptions) (void);
-    /** Called after the port has been selected but before any
-        options are parsed. */
+   /** Called after the port has been selected but before any
+       options are parsed. */
   void (*setDefaultOptions) (void);
-/** Does the dirty work. */
+  /** Does the dirty work. */
   void (*assignRegisters) (struct ebbIndex *);
 
-    /** Returns the register name of a symbol.
-        Used so that 'regs' can be an incomplete type. */
+  /** Returns the register name of a symbol.
+      Used so that 'regs' can be an incomplete type. */
   const char *(*getRegName) (struct regs * reg);
 
   /* list of keywords that are used by this
@@ -324,37 +324,37 @@ typedef struct
   void (*reset_regparms) (void);        /* reset the register count */
   int (*reg_parm) (struct sym_link *, bool reentrant);  /* will return 1 if can be passed in register */
 
-    /** Process the pragma string 'sz'.  Returns 0 if recognised and
-        processed, 1 otherwise.  May be NULL.
-    */
+  /** Process the pragma string 'sz'.  Returns 0 if recognised and
+      processed, 1 otherwise.  May be NULL.
+   */
   int (*process_pragma) (const char *sz);
 
-    /** Mangles a support function name to reflect the calling model.
-     */
+  /** Mangles a support function name to reflect the calling model.
+   */
   const char *(*getMangledFunctionName) (const char *szOrginial);
 
-    /** Returns true if the port can multiply the two types nativly
-        without using support functions.
-    */
-    bool (*hasNativeMulFor) (iCode * ic, sym_link * left, sym_link * right);
+  /** Returns true if the port can multiply the two types nativly
+      without using support functions.
+   */
+  bool (*hasNativeMulFor) (iCode * ic, sym_link * left, sym_link * right);
 
-    /** Returns true if the port has implemented certain bit
-        manipulation iCodes (RRC, RLC, SWAP, GETHBIT, GETABIT, GETBYTE, GETWORD)
-    */
-    bool (*hasExtBitOp) (int op, int size);
+  /** Returns true if the port has implemented certain bit
+      manipulation iCodes (RRC, RLC, SWAP, GETHBIT, GETABIT, GETBYTE, GETWORD)
+   */
+  bool (*hasExtBitOp) (int op, int size);
 
-    /** Returns the relative expense of accessing a particular output
-        storage class. Larger values indicate higher expense.
-    */
+  /** Returns the relative expense of accessing a particular output
+      storage class. Larger values indicate higher expense.
+   */
   int (*oclsExpense) (struct memmap * oclass);
 
-    /** If TRUE, then tprintf and !dw will be used for some initalisers
-     */
+  /** If TRUE, then tprintf and !dw will be used for some initalisers
+   */
   bool use_dw_for_init;
 
-    /** TRUE for targets with little endian byte ordering, FALSE for
-        targets with big endian byte ordering.
-     */
+  /** TRUE for targets with little endian byte ordering, FALSE for
+      targets with big endian byte ordering.
+   */
   bool little_endian;
 
   /* condition transformations */
@@ -366,13 +366,13 @@ typedef struct
   bool eq_nne;                  /* transform a == b --> ! (a != b)  */
 
   bool arrayInitializerSuppported;
-    bool (*cseOk) (iCode * ic, iCode * pdic);
+  bool (*cseOk) (iCode * ic, iCode * pdic);
   builtins *builtintable;       /* table of builtin functions */
   int unqualified_pointer;      /* unqualified pointers type is  */
   int reset_labelKey;           /* reset Label no 1 at the start of a function */
   int globals_allowed;          /* global & static locals not allowed ?  0 ONLY TININative */
 #define PORT_MAGIC 0xAC32
-/** Used at runtime to detect if this structure has been completly filled in. */
+  /** Used at runtime to detect if this structure has been completly filled in. */
   int magic;
 }
 PORT;

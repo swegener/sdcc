@@ -1,5 +1,10 @@
 2011-04-09 Borut Razem <borut.razem AT gmail.com>
 
+	* src/z80/gen.c: sync with optralloc branch
+	* src/port.h: cosmetic changes
+
+2011-04-09 Borut Razem <borut.razem AT gmail.com>
+
 	* sim/ucsim/cmd.src/cmdpars.y: removed warnings
 	* support/regression/tests/logic.c, src/SDCCpeeph.c, src/SDCCasm.c,
 	  src/SDCCicode.c, src/SDCCglobl.h, src/SDCCsystem.c:

@@ -36,9 +36,6 @@ typedef struct
 int numin=0;
 _infn * infn=NULL;
 
-char ihxFileName[PATH_MAX];
-char aomf51FileName[PATH_MAX];
-
 typedef struct
 {
     char name[0x100];
@@ -311,8 +308,10 @@ void OutputAOEMF51(void)
 {
   int i, j, k, recsize;
   char MHRname[0x100], Mname[0x100];
+  char aomf51FileName[PATH_MAX];
 
   strcpy(aomf51FileName, infn[0].PathName);
+  strcat(aomf51FileName, ".omf");
 
   aomf51out=fopen(aomf51FileName, "wb");
   if(aomf51out==NULL)
@@ -1028,6 +1027,7 @@ unsigned short GetWord(char * buffer)
 
 int ReadHexFile(int * Begin)
 {
+  char ihxFileName[PATH_MAX];
   char buffer[1024];
   FILE * filein;
   int j;

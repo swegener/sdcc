@@ -1,3 +1,8 @@
+2011-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lkaomf51.c(OutputAOEMF51): use .omf extension
+
+
 2011-04-12 Borut Razem <borut.razem AT gmail.com>
 
 	* sdas/linksrc/lkar.c: fixed bug #3279445 -

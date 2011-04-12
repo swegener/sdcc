@@ -1,3 +1,8 @@
+2011-04-12 Borut Razem <borut.razem AT gmail.com>
+
+	* sdas/linksrc/lkar.c: fixed bug #3279445 -
+	  [z80] Linker map file has /0 instead of divusigned.rel
+
 2011-04-09 Borut Razem <borut.razem AT gmail.com>
 
 	* src/z80/gen.c: sync with optralloc branch

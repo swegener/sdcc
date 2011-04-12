@@ -459,6 +459,8 @@ struct
    "Invalid designator for designated initializer" },
 { W_DUPLICATE_INIT, ERROR_LEVEL_WARNING,
    "Duplicate initializer at position %d; ignoring previous." },
+{ E_INVALID_UNIVERSAL, ERROR_LEVEL_ERROR,
+   "incomplete universal character name \\%s." },
 };
 
 /*

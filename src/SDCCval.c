@@ -1342,6 +1342,9 @@ charVal (const char *s)
         case 'x':
           return constCharVal (hexEscape (&s));
 
+        case 'u':
+          return constCharVal (universalEscape (&s));
+
         default:
           return constCharVal (*s);
         }

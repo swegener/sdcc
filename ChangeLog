@@ -7,8 +7,11 @@
 
 	* sdas/linksrc/lkar.c: fixed bug #3279445 -
 	  [z80] Linker map file has /0 instead of divusigned.rel
+	* src/SDCCerr.c, src/SDCCerr.h, src/SDCCval.c,
+	  src/SDCCutil.c, src/SDCCutil.h:
+	  fixed bug #3252262 - Universal character names broken
 
-2011-04-09 Borut Razem <borut.razem AT gmail.com>
+2011-04-10 Borut Razem <borut.razem AT gmail.com>
 
 	* src/z80/gen.c: sync with optralloc branch
 	* src/port.h: cosmetic changes

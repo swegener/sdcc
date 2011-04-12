@@ -229,6 +229,7 @@
 #define W_DEPRECATED_OPTION           201 /* deprecated compiler option '%s' */
 #define E_BAD_DESIGNATOR              202 /* Bad designated initializer */
 #define W_DUPLICATE_INIT              203 /* duplicate initializer */
+#define E_INVALID_UNIVERSAL           204 /* incomplete universal character name %s. */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

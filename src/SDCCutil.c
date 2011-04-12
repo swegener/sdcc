@@ -761,6 +761,48 @@ hexEscape (const char **src)
 }
 
 /*------------------------------------------------------------------*/
+/* universalEscape - process an hex constant of exactly four digits */
+/* return the hex value, throw a warning for illegal octal          */
+/* adjust src to point at the last proccesed char                   */
+/*------------------------------------------------------------------*/
+
+unsigned char
+universalEscape (const char **str)
+{
+  int digits;
+  unsigned value = 0;
+  const char *s = *str;
+
+  ++*str;                       /* Skip over the 'u' */
+
+  for (digits = 0; digits < 4; ++digits)
+    {
+      if (**str >= '0' && **str <= '7')
+        {
+          value = (value << 4) + (**str - '0');
+          ++*str;
+        }
+      else if ((**str | 0x20) >= 'a' && (**str | 0x20) <= 'f')
+        {
+          value = (value << 4) + (**str - ('a' + 10));
+          ++*str;
+        }
+      else
+          break;
+    }
+  if (digits != 4)
+    {
+      werror (E_INVALID_UNIVERSAL, s);
+    }
+  else if (value > 255)
+    {
+      werror (W_ESC_SEQ_OOR_FOR_CHAR);
+    }
+
+  return value;
+}
+
+/*------------------------------------------------------------------*/
 /* octalEscape - process an octal constant of max three digits      */
 /* return the octal value, throw a warning for illegal octal        */
 /* adjust src to point at the last proccesed char                   */

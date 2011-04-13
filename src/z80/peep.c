@@ -209,6 +209,9 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "call\t__initrleblock") == 0)
     return TRUE;
 
+  if(strcmp(pl->line, "call\t__sdcc_call_hl") == 0 && (strchr(what, 'h') != 0 || strchr(what, 'l') != 0))
+    return TRUE;
+
   if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
     return FALSE;
 
@@ -486,7 +489,7 @@ doTermScan (lineNode **pl, const char *what)
           case S4O_TERM:
           case S4O_VISITED:
           case S4O_WR_OP:
-            /* all these are terminating condtions */
+            /* all these are terminating conditions */
             return TRUE;
           case S4O_CONDJMP:
             /* two possible destinations: recurse */

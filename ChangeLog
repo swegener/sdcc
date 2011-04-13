@@ -1,7 +1,17 @@
+2011-04-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/gbz80/crtcall.s,
+	* device/lib/z80/crtcall.s: new, added for RFE 3284870
+	* device/lib/gbz80/Makefile.in,
+	* device/lib/z80/Makefile.in: added crtcall
+	* src/z80/gen.c(emitCall): use __sdcc_call_hl
+	* src/z80/peep.c(z80MightRead): prevent HL from being optimized out
+	* support/regression/ports/gbz80/spec.mk,
+	* support/regression/ports/z80/spec.mk: added fwklib for statics.rel
+
 2011-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lkaomf51.c(OutputAOEMF51): use .omf extension
-
 
 2011-04-12 Borut Razem <borut.razem AT gmail.com>
 

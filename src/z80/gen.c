@@ -3004,17 +3004,9 @@ emitCall (const iCode * ic, bool ispcall)
         }
       else
         {
-          symbol *rlbl = newiTempLabel (NULL);
           spillPair (PAIR_HL);
-          emit2 ("ld hl,!immed!tlabel", (rlbl->key + 100));
-          emit2 ("push hl");
-          _G.stack.pushed += 2;
-
           fetchHL (AOP (IC_LEFT (ic)));
-          emit2 ("jp !*hl");
-          emit2 ("!tlabeldef", (rlbl->key + 100));
-          _G.lines.current->isLabel = 1;
-          _G.stack.pushed -= 2;
+          emit2 ("call __sdcc_call_hl");
         }
       freeAsmop (IC_LEFT (ic), NULL, ic);
     }

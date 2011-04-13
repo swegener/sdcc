@@ -1,4 +1,4 @@
-# Port specification for the gbz80 port.
+# Regression test specification for the gbz80 target.
 
 EMU = $(SDCC_EXTRA_DIR)/emu/rrgb/rrgb$(EXEEXT)
 MAKEBIN = $(top_builddir)/bin/makebin$(EXEEXT)
@@ -14,10 +14,11 @@ BINEXT = .gb
 
 # Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
+FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
 
 # Rule to link into .ihx
-%.ihx: %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
+%.ihx: %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 # Rule to concert .ihx to .gb
 %$(BINEXT): %.ihx
@@ -34,6 +35,9 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/fwk.lib:
+	cp $(PORTS_DIR)/$(PORT)/fwk.lib $@
 
 # PENDING: Path to sdcc-extra
 %.out: %$(BINEXT)

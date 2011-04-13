@@ -1,10 +1,10 @@
 2011-04-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/string.h,
-	  device/lib/_meset.c,
+	  device/lib/_memset.c,
 	  device/lib/_strchr.c,
 	  device/lib/_strrchr.c:
-	  Make string function parameters standard-compliant for the z80 and gbz80 port.
+	  Make string function parameters standard-compliant for the z80 and gbz80 ports.
 
 2011-04-13 Borut Razem <borut.razem AT gmail.com>
 

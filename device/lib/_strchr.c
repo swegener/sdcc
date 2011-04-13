@@ -28,10 +28,17 @@
 
 #include "string.h"
 
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 char * strchr (
 	const char * string,
 	char ch
 	)
+#else
+char * strchr (
+	const char * string,
+	int ch
+	)
+#endif
 {
 	while (*string && *string != ch)
 		string++;
@@ -40,3 +47,4 @@ char * strchr (
 		return(string);
 	return ( NULL );
 }
+

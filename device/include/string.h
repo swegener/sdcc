@@ -39,6 +39,10 @@
   typedef unsigned int size_t;
 #endif
 
+#if !defined(SDCC_z80) && !defined(SDCC_gbz80)
+#define __SDCC_BROKEN_STRING_FUNCTIONS
+#endif
+
 /* The function prototypes are ordered as in the ISO C99 standard. */
 
 /* Todo: fix the "restrict" stuff for C99 compliance. */
@@ -62,16 +66,29 @@ extern int strncmp(const char *s1, const char *s2, size_t n);
 
 /* Search functions: */
 extern void *memchr (const void *s, int c, size_t n);
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 extern char *strchr (const char *s, char c); /* c should be int according to standard. */
+#else
+extern char *strchr (const char *s, int c);
+#endif
 extern size_t strcspn(const char *s, const char *reject);
 extern char *strpbrk(const char *s, const char *accept);
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 extern char *strrchr(const char *s, char c); /* c should be int according to standard. */
+#else
+extern char *strrchr(const char *s, int c);
+#endif
 extern size_t strspn (const char *s, const char *accept);
 extern char *strstr (const char *haystack, const char *needle);
 extern char *strtok (char * /* restrict*/ str, const char * /*restrict*/ delim);
 
 /* Miscanelleous functions: */
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 extern void *memset (void *s, unsigned char c, size_t n); /* c should be int according to standard. */
+#else
+extern void *memset (void *s, int c, size_t n);
+#endif
+
 /* extern char *strerror(int errnum); */
 extern size_t strlen (const char *s);
 

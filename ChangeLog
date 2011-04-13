@@ -1,3 +1,11 @@
+2011-04-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/string.h,
+	  device/lib/_meset.c,
+	  device/lib/_strchr.c,
+	  device/lib/_strrchr.c:
+	  Make string function parameters standard-compliant for the z80 and gbz80 port.
+
 2011-04-13 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/SDCCval.c, src/SDCCutil.c,
@@ -125,7 +133,7 @@
 	  throughout synced with mcs51/ralloc.c
 	* support/regression/tests/float_single.c: enabled SINHF
 
-2011-05-25 Philipp Klaus Krause <pkk AT spth.de>
+2011-03-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCcse.c (boolCast, cseBBlock):
 	  Reenabled boolCast except for the one case that triggers bug 3223041.

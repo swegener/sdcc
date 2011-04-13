@@ -33,20 +33,22 @@
     (!defined (SDCC_MODEL_SMALL) && !defined (SDCC_MODEL_LARGE)) || \
      (defined (SDCC_STACK_AUTO) || defined (SDCC_PARMS_IN_BANK1) )
 
-  void * memset (
-          void * buf,
-          unsigned char ch ,
-          size_t count) 
-  {
-          register unsigned char * ret = buf;
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+void *memset (void *s, unsigned char c, size_t n)
+#else
+void *memset (void *s, int c, size_t n)
+#endif
+{
+ register unsigned char *ret = s;
 
-          while (count--) {
-                  *(unsigned char *) ret = ch;
-                  ret = ((unsigned char *) ret) + 1;
-          }
+ while (n--)
+   {
+      *(unsigned char *) ret = c;
+      ret = ((unsigned char *) ret) + 1;
+   }
 
-          return buf ;
-  }
+   return s;
+}
 
 #else
 
@@ -177,3 +179,4 @@
   }
 
 #endif
+

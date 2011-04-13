@@ -28,10 +28,17 @@
 
 #include "string.h"
 
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 char * strrchr (
 	const char * string,
 	char ch
-	) 
+	)
+#else
+char * strrchr (
+	const char * string,
+	int ch
+	)
+#endif
 {
 	const char * start = string;
 
@@ -46,3 +53,4 @@ char * strrchr (
 
 	return (NULL) ;
 }
+

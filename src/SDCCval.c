@@ -1343,7 +1343,10 @@ charVal (const char *s)
           return constCharVal (hexEscape (&s));
 
         case 'u':
-          return constCharVal (universalEscape (&s));
+          return constCharVal (universalEscape (&s, 4));
+
+        case 'U':
+          return constCharVal (universalEscape (&s, 8));
 
         default:
           return constCharVal (*s);

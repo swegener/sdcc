@@ -767,15 +767,20 @@ hexEscape (const char **src)
 /*------------------------------------------------------------------*/
 
 unsigned char
-universalEscape (const char **str)
+universalEscape (const char **str, unsigned int n)
 {
   int digits;
   unsigned value = 0;
   const char *s = *str;
 
-  ++*str;                       /* Skip over the 'u' */
+  if (!options.std_c99)
+    {
+      werror (W_UNIVERSAL_C99);
+    }
 
-  for (digits = 0; digits < 4; ++digits)
+  ++*str;                       /* Skip over the 'u'  or 'U' */
+
+  for (digits = 0; digits < n; ++digits)
     {
       if (**str >= '0' && **str <= '7')
         {
@@ -790,7 +795,7 @@ universalEscape (const char **str)
       else
           break;
     }
-  if (digits != 4)
+  if (digits != n)
     {
       werror (E_INVALID_UNIVERSAL, s);
     }
@@ -898,6 +903,16 @@ copyStr (char *dest, const char *src)
 
             case 'x':
               *dest++ = hexEscape (&src);
+              --src;
+              break;
+
+            case 'u':
+              *dest++ = universalEscape (&src, 4);
+              --src;
+              break;
+
+            case 'U':
+              *dest++ = universalEscape (&src, 8);
               --src;
               break;
 

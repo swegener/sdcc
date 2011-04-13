@@ -230,6 +230,7 @@
 #define E_BAD_DESIGNATOR              202 /* Bad designated initializer */
 #define W_DUPLICATE_INIT              203 /* duplicate initializer */
 #define E_INVALID_UNIVERSAL           204 /* incomplete universal character name %s. */
+#define W_UNIVERSAL_C99               205 /* universal character names are only valid in C99 */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

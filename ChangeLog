@@ -1,3 +1,11 @@
+2011-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/aslink.h: include sdld.h
+	* sdas/linksrc/lkarea.c(lkparea, lnkarea, lnkarea2),
+	* sdas/linksrc/lkmain.c(parse, setbas),
+	* sdas/linksrc/lksym.c(newsym, symeq, hash): synced zflag with ASxxxx 5
+	* support/regression/ports/z80/fwk.lib: new, added
+
 2011-04-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/string.h,

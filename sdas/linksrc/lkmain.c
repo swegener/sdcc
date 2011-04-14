@@ -23,10 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *			 - use a_type == 0 as "virgin area" flag: set == 1 if -b
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lkmain.c
@@ -817,7 +813,6 @@ parse()
 
 	if (is_sdld()) {
 		wflag = 1;
-		zflag = 1;
 	}
 
 	while ((c = getnb()) != 0) {
@@ -1122,7 +1117,7 @@ setbas()
 		if (getnb() == '=') {
 			v = expr(0);
 			for (ap = areap; ap != NULL; ap = ap->a_ap) {
-				if (symeq(id, ap->a_id, 0))
+				if (symeq(id, ap->a_id, 1))
 					break;
 			}
 			if (ap == NULL) {

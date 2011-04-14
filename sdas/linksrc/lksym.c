@@ -179,6 +179,7 @@ newsym(void)
                 tsp->s_addr = ev;
                 tsp->s_axp = axp;
                 tsp->s_type |= S_DEF;
+                tsp->m_id = hp->m_id;
         } else {
                 fprintf(stderr, "Invalid symbol type %c for %s\n", c, id);
                 lkexit(ER_FATAL);
@@ -394,8 +395,8 @@ symmod(FILE *fp, struct sym *tsp)
  *      The function symeq() compares the two name strings for a match.
  *      The return value is 1 for a match and 0 for no match.
  *
- *		cflag == 0	case insensitve compare
- *		cflag != 0	case sensitive compare
+ *		cflag == 0	case sensitive compare
+ *		cflag != 0	case insensitive compare
  *
  *      local variables:
  *              int     n               loop counter
@@ -420,18 +421,18 @@ symeq(char *p1, char *p2, int cflag)
 	n = strlen(p1) + 1;
 	if(cflag) {
 		/*
-		 * Case Sensitive Compare
-		 */
-		do {
-			if (*p1++ != *p2++)
-				return (0);
-		} while (--n);
-	} else {
-		/*
 		 * Case Insensitive Compare
 		 */
 		do {
 			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
+				return (0);
+		} while (--n);
+	} else {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
 				return (0);
 		} while (--n);
 	}
@@ -446,8 +447,8 @@ symeq(char *p1, char *p2, int cflag)
  *	The function hash() computes a hash code using the sum
  *	of all characters mod table size algorithm.
  *
- *		cflag == 0	case insensitve hash
- *		cflag != 0	case sensitive hash
+ *		cflag == 0	case sensitive hash
+ *		cflag != 0	case insensitive hash
  *
  *	local variables:
  *		int	h		accumulated character sum
@@ -472,14 +473,14 @@ hash(char *p, int cflag)
 	while (*p) {
 		if(cflag) {
 			/*
-			 * Case Sensitive Hash
-			 */
-			h += *p++;
-		} else {
-			/*
 			 * Case Insensitive Hash
 			 */
 			h += ccase[*p++ & 0x007F];
+		} else {
+			/*
+			 * Case Sensitive Hash
+			 */
+			h += *p++;
 		}
 	}
 	return (h&HMASK);
@@ -515,8 +516,7 @@ hash(char *p, int cflag)
  */
 
 char *
-strsto(str)
-char *str;
+strsto(char *str)
 {
 	int  l;
 	char *p;
@@ -594,8 +594,7 @@ static	char *	pnext = NULL;
 static	int	bytes = 0;
 
 char *
-new(n)
-unsigned int n;
+new(unsigned int n)
 {
 	char *p,*q;
 	unsigned int i;

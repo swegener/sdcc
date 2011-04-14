@@ -22,9 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * 02-Apr-98 JLH: add code to link 8051 data spaces
  */
 
-#include <stdio.h>
-#include <string.h>
-#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lkarea.c
@@ -219,7 +216,7 @@ lkparea(char *id)
 	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB))
 		axp->a_addr = -1; /* default: no address yet */
 	while (ap) {
-		if (symeq(id, ap->a_id, 0)) {
+		if (symeq(id, ap->a_id, 1)) {
 			taxp = ap->a_axp;
 			while (taxp->a_axp)
 				taxp = taxp->a_axp;
@@ -456,8 +453,8 @@ lnkarea()
 		 *	l_<areaname>	the length of the area
 		 */
 
-		if (! symeq(ap->a_id, _abs_, 0)) {
-			strcpy(temp+2,ap->a_id);
+		if (! symeq(ap->a_id, _abs_, 1)) {
+			strcpy(temp+2, ap->a_id);
 			*(temp+1) = '_';
 
 			*temp = 's';
@@ -819,7 +816,7 @@ VOID lnkarea2 (void)
 		 *	l_<areaname>	the length of the area
 		 */
 
-		if (! symeq(ap->a_id, _abs_, 0))
+		if (! symeq(ap->a_id, _abs_, 1))
 		{
 			strcpy(temp+2,ap->a_id);
 			*(temp+1) = '_';

@@ -1,5 +1,9 @@
 2011-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* lkar.c: fixed bug 3288398
+
+2011-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* sdas/linksrc/aslink.h: include sdld.h
 	* sdas/linksrc/lkarea.c(lkparea, lnkarea, lnkarea2),
 	* sdas/linksrc/lkmain.c(parse, setbas),

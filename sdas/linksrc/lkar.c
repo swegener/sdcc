@@ -29,9 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * Extensions: P. Felber
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 
 #include "aslink.h"
@@ -49,8 +46,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #endif
 
 
-#ifdef _MSC_VER
-/* Microsoft MSVC library doesn't have the strndup() fubction */
+#ifdef WIN32
+/* Microsoft VC and cygwin libraries don't have the strndup() function */
 static char *
 strndup (const char *str, size_t len)
 {

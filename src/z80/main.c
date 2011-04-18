@@ -359,7 +359,7 @@ _gbz80_rgblink (void)
 
   /* first we need to create the <filename>.lnk file */
   dbuf_append_str (&lnkFileName, dstFileName);
-  dbuf_append_str (&lnkFileName, ".lnk");
+  dbuf_append_str (&lnkFileName, ".lk");
   if (!(lnkfile = fopen (dbuf_c_str (&lnkFileName), "w")))
     {
       werror (E_FILE_OPEN_ERR, dbuf_c_str (&lnkFileName));

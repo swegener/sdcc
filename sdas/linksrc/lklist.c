@@ -1,20 +1,27 @@
-/* lklist.c
+/* lklist.c */
 
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ */
 
 /*
  * 28-Oct-97 JLH:
@@ -24,10 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * 02-Apr-98 JLH: add XDATA, DATA, BIT flags to area output
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lklist.c
@@ -38,15 +41,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *	lklist.c contains the following functions:
  *		int	dgt()
+ *		VOID	newpag()
+ *		VOID	slew()
  *		VOID	lstarea()
  *		VOID	lkulist()
  *		VOID	lkalist()
  *		VOID	lkglist()
- *		VOID	newpag()
- *		VOID	slew()
  *
  *	lklist.c contains no local variables.
  */
+
+/*)Function	VOID	newpag()
+ *
+ *	The function newpag() outputs a page skip, writes the
+ *	first page header line, sets the line count to 1, and
+ *	increments the page counter.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		int	lop		current line number on page
+ *		int	page		current page number
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		The page and line counters are updated.
+ */
+
+VOID
+newpag(fp)
+FILE *fp;
+{
+	fprintf(fp, "\fASxxxx Linker %s,  page %u.\n", VERSION, ++page);
+	lop = 1;
+}
+
+/*)Function	int	dgt(rdx,str,n)
+ *
+ *		int	rdx		radix bit code
+ *		char	*str		pointer to the test string
+ *		int	n		number of characters to check
+ *
+ *	The function dgt() verifies that the string under test
+ *	is of the specified radix.
+ *
+ *	local variables:
+ *		int	i		loop counter
+ *
+ *	global variables:
+ *		ctype[]			array of character types
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+dgt(int rdx, char *str, int n)
+{
+	int i;
+
+	for (i=0; i<n; i++) {
+		if ((ctype[(unsigned char)(*str++)] & rdx) == 0)
+			return(0);
+	}
+	return(1);
+}
 
 /*)Function	VOID	slew(xp)
  *
@@ -79,11 +144,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 VOID
-slew(xp)
-register struct area *xp;
+slew(struct area *xp)
 {
-	register int i;
-	register char *ptr;
+	int i;
+	char *ptr;
 	a_uint	ai, aj;
 
 	if (lop++ >= NLPP) {
@@ -199,34 +263,6 @@ register struct area *xp;
 	}
 }
 
-/*)Function	VOID	newpag()
- *
- *	The function newpag() outputs a page skip, writes the
- *	first page header line, sets the line count to 1, and
- *	increments the page counter.
- *
- *	local variables:
- *		none
- *
- *	global variables:
- *		int	lop		current line number on page
- *		int	page		current page number
- *
- *	functions called:
- *		int	fprintf()	c_library
- *
- *	side effects:
- *		The page and line counters are updated.
- */
-
-VOID
-newpag(fp)
-FILE *fp;
-{
-	fprintf(fp, "\fASxxxx Linker %s,  page %u.\n", VERSION, ++page);
-	lop = 1;
-}
-
 /* sdld specific */
 /* Used for qsort call in lstsym */
 static int _cmpSymByAddr(const void *p1, const void *p2)
@@ -288,12 +324,11 @@ static int _cmpSymByAddr(const void *p1, const void *p2)
  */
 
 VOID
-lstarea(xp)
-struct area *xp;
+lstarea(struct area *xp)
 {
-	register struct areax *oxp;
-	register int i;
-	register char *ptr;
+	struct areax *oxp;
+	int i;
+	char *ptr;
 	int nmsym;
 	a_uint aj;
 	struct sym *sp;
@@ -329,8 +364,7 @@ struct area *xp;
 	 * Allocate space for an array of pointers to symbols
 	 * and load array.
 	 */
-	if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
-		== NULL) {
+	if ( (p = (struct sym **) malloc (nmsym*sizeof(struct sym *))) == NULL) {
 		fprintf(mfp, "Insufficient space to build Map Segment.\n");
 		return;
 	}
@@ -385,6 +419,23 @@ struct area *xp;
 			fprintf(mfp, " %05u  ", aj);
 		}
 		ptr = &sp->s_id[0];
+
+		ptr = &sp->s_id[0];
+
+#if NOICE
+		/*
+		 * NoICE output of symbol
+		 */
+		if (jflag) DefineNoICE( ptr, aj, memPage );
+#endif
+
+#if SDCDB
+		/*
+		 * SDCDB output of symbol
+		 */
+		if (yflag) DefineSDCDB(ptr, aj);
+#endif
+
 		if (wflag) {
 			fprintf(mfp, "%-33.33s", ptr);
 			i++;
@@ -401,17 +452,6 @@ struct area *xp;
 		if (wflag || (i % 4 == 0)) {
 			putc('\n', mfp);
 		}
-
-		/* sdld specific */
-		ptr = &sp->s_id[0];
-		/* if cdb flag set the output cdb Information
-		   and the symbol has a '$' sign in it then */
-		if (yflag && strchr(ptr,'$'))
-			fprintf(yfp,"L:%s:%X\n",ptr,aj);
-
-		/* NoICE output of symbol */
-		if (jflag) DefineNoICE( ptr, aj, memPage );
-		/* end sdld specific */
 	}
 	if (i % 4 != 0) {
 		putc('\n', mfp);
@@ -690,9 +730,7 @@ loop:	if (tfp == NULL)
  */
 
 VOID
-lkglist(pc, v)
-a_uint pc;
-int v;
+lkglist(a_uint pc, int v)
 {
 	char str[8];
 	int i;
@@ -876,41 +914,4 @@ loop:	if (tfp == NULL)
 			gcntr = -1;
 		}
 	}
-}
-
-/*)Function	int	dgt(rdx,str,n)
- *
- *		int	rdx		radix bit code
- *		char	*str		pointer to the test string
- *		int	n		number of characters to check
- *
- *	The function dgt() verifies that the string under test
- *	is of the specified radix.
- *
- *	local variables:
- *		int	i		loop counter
- *
- *	global variables:
- *		ctype[]			array of character types
- *
- *	functions called:
- *		none
- *
- *	side effects:
- *		none
- */
-
-int
-dgt(rdx, str, n)
-int rdx;
-char *str;
-int n;
-{
-	int i;
-
-	for (i=0; i<n; i++) {
-		if ((ctype[(unsigned char)(*str++)] & rdx) == 0)
-			return(0);
-	}
-	return(1);
 }

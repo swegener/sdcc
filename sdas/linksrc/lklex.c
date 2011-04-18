@@ -22,7 +22,6 @@
  * Kent, Ohio  44240
  */
 
-#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lklex.c
@@ -537,30 +536,29 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = stdin;
 			} else
 			if (ftype == F_LNK) {
-				sfp = afile(fid, "lnk", 0);
+				sfp = afile(fid, "lk", 0);
 			} else
 			if (ftype == F_REL) {
-				sfp = afile(fid, LKOBJEXT, 0);
-				if (is_sdld()) {
-					/* if a .adb file exists then copy it over */
-					if (yflag && sfp && yfp && pass == 0) {
-						FILE *xfp = afile(fid,"adb",0); //JCF: Nov 30, 2002
-						if (xfp) {
-							copyfile(yfp,xfp);
-							fclose(xfp);
+				sfp = afile(fid, "", 0);
+				if (sfp) {
+					if (uflag && (pass != 0)) {
+						if (is_sdld())
+							SaveLinkedFilePath(fid); //Save the linked path for aomf51
+						if ((tfp = afile(fid, "lst", 0)) != NULL) {
+							if ((rfp = afile(fid, "rst", 1)) == NULL) {
+								fclose(tfp);
+								tfp = NULL;
+							}
 						}
 					}
 				}
-				if (uflag && pass != 0) {
-					if (is_sdld())
-						SaveLinkedFilePath(fid); //Save the linked path for aomf51
-					if ((tfp = afile(fid, "lst", 0)) != NULL) {
-						if ((rfp = afile(fid, "rst", 1)) == NULL) {
-							fclose(tfp);
-							tfp = NULL;
-						}
-					}
+
+#if SDCDB
+				if (sfp && (pass == 0)) {
+					SDCDBcopy(fid);
 				}
+#endif
+
 				gline = 1;
 			} else {
 				fprintf(stderr, "Invalid file type\n");

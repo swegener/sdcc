@@ -1515,8 +1515,8 @@ linkEdit (char **envp)
           dbuf_append_str (&binFileName, getOutFmtExt ());
         }
 
-      /* first we need to create the <filename>.lnk file */
-      dbuf_printf (&linkerScriptFileName, "%s.lnk", dstFileName);
+      /* first we need to create the <filename>.lk file */
+      dbuf_printf (&linkerScriptFileName, "%s.lk", dstFileName);
       if (!(lnkfile = fopen (dbuf_c_str (&linkerScriptFileName), "w")))
         {
           werror (E_FILE_OPEN_ERR, dbuf_c_str (&linkerScriptFileName));

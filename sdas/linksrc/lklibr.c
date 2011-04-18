@@ -1,27 +1,30 @@
-/* lklibr.c
-
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-   Copyright (C) 2008-2009 Borut Razem, borut dot razem at siol dot net
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* lklibr.c */
 
 /*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
  * With contributions for the
  * object libraries from
  * Ken Hornstein
- * kenh@cmf.nrl.navy.mil
+ * kenhat cmf dot nrl dot navy dot mil
  *
  */
 
@@ -29,9 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * Extensions: P. Felber
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 #include <assert.h>
 
@@ -186,12 +186,14 @@ addlib (void)
  *  linked list is used by the function fndsym() to attempt
  *  to find any undefined symbols.
  *
- *  The function does not give report an error on invalid
+ *  The function does not report an error on invalid
  *  path / file specifications or if the file is not found.
  *
  *  local variables:
  *	lbname	*lbnh	    pointer to new name structure
  *	lbname	*lbn	    temporary pointer
+ *	char *	str		path / file string
+ *	char *	strend		end of path pointer
  *
  *  global variables:
  *	lbname	*lbnhead    The pointer to the first
@@ -216,7 +218,7 @@ int
 addfile (char *path, char *libfil)
 {
   FILE *fp;
-  char *str;
+  char *str, *strend;
   struct lbname *lbnh, *lbn;
 #ifdef	OTHERSYSTEM
   int libfilinc = 0;
@@ -226,8 +228,9 @@ addfile (char *path, char *libfil)
     {
       str = (char *) new (strlen (path) + strlen (libfil) + 6);
       strcpy (str, path);
+      strend = str + strlen(str) - 1;
 #ifdef	OTHERSYSTEM
-      if (strlen (str) && (str[strlen (str) - 1] != '/') && (str[strlen (str) - 1] != LKDIRSEP))
+      if (strlen (str) && (*strend != '/') && (*strend != LKDIRSEP))
 	{
 	  strcat (str, LKDIRSEPSTR);
 	}
@@ -330,7 +333,7 @@ addfile (char *path, char *libfil)
  *
  *  After a symbol is found and imported by the function
  *  fndsym() the symbol tables are again searched.  The
- *  symbol tables are search until no more symbols can be
+ *  symbol tables are searched until no more symbols can be
  *  resolved within the library files.	This ensures that
  *  back references from one library module to another are
  *  also resolved.
@@ -354,8 +357,8 @@ addfile (char *path, char *libfil)
 VOID
 search (void)
 {
-  register struct sym *sp;
-  register int i, symfnd;
+  struct sym *sp;
+  int i, symfnd;
 
   /*
    * Look for undefined symbols.  Keep
@@ -403,7 +406,7 @@ search (void)
  *  library file specifications (input by the -l option) that
  *  lead to an existing file.
  *
- *  The file specicifation may be formed in one of two ways:
+ *  The file specification may be formed in one of two ways:
  *
  *  (1) If the library file contained an absolute
  *	path/file specification then this becomes filspc.

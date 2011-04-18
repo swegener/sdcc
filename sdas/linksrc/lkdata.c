@@ -36,6 +36,12 @@
  */
 
 /*
+ * Internal ASxxxx Version Variable
+ */
+int	ASxxxx_VERSION;
+
+
+/*
  *	Definitions for all Global Variables
  */
 
@@ -99,15 +105,26 @@ a_uint	rtval[NTXT];	/*	data associated with relocation
 int	rtflg[NTXT];	/*	indicates if rtval[] value is
 			 *	to be sent to the output file.
 			 */
+
 char	rtbuf[NMAX];	/*	S19/IHX output buffer
 			 */
-a_uint	rtadr0 = 0;	/*	rtbuf[] processing
+			/*	rtbuf[] processing
+			 */
+a_uint	rtadr0 = 0;	/*
 			 */
 a_uint	rtadr1 = 0;	/*
 			 */
 a_uint	rtadr2 = 0;	/*
 			 */
+int	a_bytes;	/*	REL file T Line address length
+			 */
 int	hilo;		/*	REL file byte ordering
+			 */
+a_uint	a_mask;		/*	Address Mask
+			 */
+a_uint	s_mask;		/*	Sign Mask
+			 */
+a_uint	v_mask;		/*	Value Mask
 			 */
 int	gline;		/*	LST file relocation active
 			 *	for current line

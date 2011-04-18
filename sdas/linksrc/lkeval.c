@@ -50,6 +50,13 @@
  *	The function eval() evaluates a character string to a
  *	numerical value.
  *
+ *	Notes about the arithmetic:
+ *		The coding emulates X-Bit unsigned
+ *		arithmetic operations.  This allows
+ *		program compilation without regard to the
+ *		intrinsic integer length of the host
+ *		machine.
+ *
  *	local variables:
  *		int	c		character from input string
  *		int	v		value of character in current radix
@@ -82,7 +89,7 @@ eval(void)
 		c = get();
 	}
 	unget(c);
-	return(n);
+	return((n & s_mask) ? n | ~v_mask : n & v_mask);
 }
 
 /*)Function	a_uint	expr(n)
@@ -93,6 +100,13 @@ eval(void)
  *
  *	The function expr() evaluates an expression and
  *	returns the value.
+ *
+ *	Notes about the arithmetic:
+ *		The coding emulates X-Bit unsigned
+ *		arithmetic operations.  This allows
+ *		program compilation without regard to the
+ *		intrinsic integer length of the host
+ *		machine.
  *
  *	local variables:
  *		int	c		current input text character
@@ -137,6 +151,13 @@ expr (int n)
 			return(v);
 		}
 		ve = expr(p);
+
+		/*
+		 * X-Bit Unsigned Arithmetic
+		 */
+		v  &= a_mask;
+		ve &= a_mask;
+
 		if (c == '+') {
 			v += ve;
 		} else
@@ -150,7 +171,11 @@ expr (int n)
 				break;
 
 			case '/':
-				v /= ve;
+				if (ve == 0) {
+					v = 0;
+				} else {
+					v /= ve;
+				}
 				break;
 
 			case '&':
@@ -162,7 +187,11 @@ expr (int n)
 				break;
 
 			case '%':
-				v %= ve;
+				if (ve == 0) {
+					v = 0;
+				} else {
+					v %= ve;
+				}
 				break;
 
 			case '^':
@@ -178,6 +207,7 @@ expr (int n)
 				break;
 			}
 		}
+		v = (v & s_mask) ? v | ~v_mask : v & v_mask;
 	}
 	unget(c);
 	return(v);
@@ -188,6 +218,13 @@ expr (int n)
  *	The function term() evaluates a single constant
  *	or symbol value prefaced by any unary operator
  *	( +, -, ~, ', ", >, or < ).
+ *
+ *	Notes about the arithmetic:
+ *		The coding emulates X-Bit unsigned
+ *		arithmetic operations.  This allows
+ *		program compilation without regard to the
+ *		intrinsic integer length of the host
+ *		machine.
  *
  *	local variables:
  *		int	c		current character
@@ -237,7 +274,7 @@ term(void)
 		return(v);
 	}
 	if (c == '-') {
-		return(-expr(100));
+		return(~expr(100)+1);
 	}
 	if (c == '~') {
 		return(~expr(100));
@@ -253,7 +290,7 @@ term(void)
 			v  =  getmap(-1)&0377;
 			v |= (getmap(-1)&0377)<<8;
 		}
-		return(v);
+		return((v & s_mask) ? v | ~v_mask : v & v_mask);
 	}
 	if (c == '>' || c == '<') {
 		v = expr(100);
@@ -301,7 +338,7 @@ term(void)
 			c = get();
 		}
 		unget(c);
-		return(v);
+		return((v & s_mask) ? v | ~v_mask : v & v_mask);
 	}
 	if (ctype[c] & LETTER) {
 		getid(id, c);

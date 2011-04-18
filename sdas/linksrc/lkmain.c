@@ -1,20 +1,26 @@
-/* lkmain.c
+/* lkmain.c */
 
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
 /*
  * 31-Oct-97 JLH:
@@ -39,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *		VOID	gblsav()
  *		VOID	link_main()
  *		VOID	lkexit()
- *		VOID	main()
+ *		int	main()
  *		VOID	map()
  *		int	parse()
  *		VOID	setbas()
@@ -123,7 +129,7 @@ void Areas51 (void)
 }
 /* end sdld 8051 & 6808 specific */
 
-/*)Function	VOID	main(argc,argv)
+/*)Function	int	main(argc,argv)
  *
  *		int	argc		number of command line arguments + 1
  *		char *	argv[]		array of pointers to the command line
@@ -140,7 +146,7 @@ void Areas51 (void)
  *	and look for undefined symbols.  Following these routines a linker
  *	map file may be produced and the linker output files may be opened.
  *	The second pass through the .rel files will output the linked data
- *	in one of the four supported formats.
+ *	in one of the supported formats.
  *
  *	local variables:
  *		char *	p		pointer to an argument string
@@ -177,7 +183,7 @@ void Areas51 (void)
  *		int	radix		current number conversion radix
  *		FILE	*sfp		The file handle sfp points to the
  *					currently open file
- *		lfile	*startp		asmlnk startup file structure
+ *		lfile	*startp		aslink startup file structure
  *		FILE *	stdin		c_library
  *		FILE *	stdout		c_library
  *
@@ -185,13 +191,13 @@ void Areas51 (void)
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		int	nxtline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link_main()	lkmain.c
  *		VOID	lkexit()	lkmain.c
  *		VOID	lnkarea()	lkarea.c
  *		VOID	map()		lkmain.c
  *		VOID	new()		lksym.c
+ *		int	nxtline()	lklex.c
  *		int	parse()		lkmain.c
  *		VOID	reloc()		lkreloc.c
  *		VOID	search()	lklibr.c
@@ -212,8 +218,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	register char *p;
-	register int c, i;
+	char *p;
+	int c, i;
 
 	/* sdas specific */
 	/* sdas initialization */
@@ -253,7 +259,7 @@ char *argv[];
 					break;
 
 				default:
-					usage();
+					usage(ER_FATAL);
 				}
 			}
 		} else {
@@ -263,9 +269,9 @@ char *argv[];
 		}
 	}
 	if (startp->f_type == 0)
-		usage();
+		usage(ER_FATAL);
 	if (startp->f_type == F_LNK && startp->f_idp == NULL)
-		usage();
+		usage(ER_FATAL);
 
 	cfp = NULL;
 	sfp = NULL;
@@ -286,7 +292,7 @@ char *argv[];
 	}
 
 	if (linkp == NULL)
-		usage();
+		usage(ER_FATAL);
 
 	/*
 	 * If no input file is specified
@@ -302,15 +308,12 @@ char *argv[];
 
 	syminit();
 
-	/* sdld specific */
-	if (yflag){
-		//yfp = afile("temp", "cdb", 1);
-		SaveLinkedFilePath(linkp->f_idp);	//Must be the first one...
-		yfp = afile(linkp->f_idp, "cdb" ,1);	//JCF: Nov 30, 2002
-		if (yfp == NULL)
-			lkexit(1);
-	}
-	/* end sdld specific */
+#if SDCDB
+	/*
+	 * Open SDCC Debug output file
+	 */
+	SDCDBfopen();
+#endif
 
 	for (pass=0; pass<2; ++pass) {
 		cfp = NULL;
@@ -434,6 +437,9 @@ char *argv[];
 			 * Link in library files
 			 */
 			library();
+			/*
+			 * Complete Processing
+			 */
 			reloc('E');
 		}
 	}
@@ -442,10 +448,8 @@ char *argv[];
 		CreateAOMF51();
 	}
 
-	lkexit(lkerr);
-
-	/* Never get here. */
-	return 0;
+	lkexit(lkerr ? ER_ERROR : ER_NONE);
+	return(0);
 }
 
 /*)Function	VOID	lkexit(i)
@@ -477,15 +481,17 @@ VOID
 lkexit(i)
 int i;
 {
-	/* sdld 8051 specific */
+#if NOICE
 	if (jfp != NULL) fclose(jfp);
-	if (yfp != NULL) fclose(yfp);
-	/* end sdld 8051 specific */
+#endif
 	if (mfp != NULL) fclose(mfp);
 	if (ofp != NULL) fclose(ofp);
 	if (rfp != NULL) fclose(rfp);
-	if (sfp != NULL) fclose(sfp);
+	if (sfp != NULL) { if (sfp != stdin) fclose(sfp); }
 	if (tfp != NULL) fclose(tfp);
+#if SDCDB
+	if (yfp != NULL) fclose(yfp);
+#endif
 	exit(i);
 }
 
@@ -504,6 +510,8 @@ int i;
  *					head structure of a linked list
  *		head	*hp		Pointer to the current
  *					head structure
+ *		int	a_bytes		T Line address bytes
+ *		int	hilo		Byte ordering
  *		int	pass		linker pass number
  *		int	radix		current number conversion radix
  *
@@ -523,7 +531,7 @@ int i;
 VOID
 link_main()
 {
-	register char c;
+	char c;
 
 	if ((c=endline()) == 0) { return; }
 	switch (c) {
@@ -550,15 +558,84 @@ link_main()
 	/* end sdld specific */
 
 	case 'X':
-		radix = 16;
-		break;
-
 	case 'D':
-		radix = 10;
-		break;
-
 	case 'Q':
-		radix = 8;
+		ASxxxx_VERSION = 3;
+		if (c == 'X') { radix = 16; } else
+		if (c == 'D') { radix = 10; } else
+		if (c == 'Q') { radix = 8;  }
+
+		while ((c = get()) != 0) {
+			switch(c) {
+			case 'H':
+				hilo = 1;
+				break;
+
+			case 'L':
+				hilo = 0;
+				break;
+
+			case '2':
+				a_bytes = 2;
+				break;
+
+			case '3':
+				a_bytes = 3;
+				break;
+
+			case '4':
+				a_bytes = 4;
+				break;
+
+			default:
+				break;
+			}
+		}
+#ifdef	LONGINT
+		switch(a_bytes) {
+		case 2:
+			a_mask = 0x0000FFFFl;
+			s_mask = 0x00008000l;
+			v_mask = 0x00007FFFl;
+			break;
+
+		case 3:
+			a_mask = 0x00FFFFFFl;
+			s_mask = 0x00800000l;
+			v_mask = 0x007FFFFFl;
+			break;
+
+		default:
+			a_bytes = 4;
+		case 4:
+			a_mask = 0xFFFFFFFFl;
+			s_mask = 0x80000000l;
+			v_mask = 0x7FFFFFFFl;
+				break;
+			}
+#else
+		switch(a_bytes) {
+		case 2:
+			a_mask = 0x0000FFFF;
+			s_mask = 0x00008000;
+			v_mask = 0x00007FFF;
+			break;
+
+		case 3:
+			a_mask = 0x00FFFFFF;
+			s_mask = 0x00800000;
+			v_mask = 0x007FFFFF;
+			break;
+
+		default:
+			a_bytes = 4;
+		case 4:
+			a_mask = 0xFFFFFFFF;
+			s_mask = 0x80000000;
+			v_mask = 0x7FFFFFFF;
+			break;
+		}
+#endif
 		break;
 
 	case 'H':
@@ -577,9 +654,8 @@ link_main()
 		break;
 
 	case 'M':
-		if (pass == 0) {
+		if (pass == 0)
 			module();
-		}
 		break;
 
 	case 'A':
@@ -607,14 +683,6 @@ link_main()
 
 	default:
 		break;
-	}
-	if (c == 'X' || c == 'D' || c == 'Q') {
-		if ((c = get()) == 'H') {
-			hilo = 1;
-		} else
-		if (c == 'L') {
-			hilo = 0;
-		}
 	}
 }
 
@@ -676,16 +744,16 @@ link_main()
 VOID
 map()
 {
-	register int i;
-	register struct head *hdp;
-	register struct lbfile *lbfh;
+	int i;
+	struct head *hdp;
+	struct lbfile *lbfh;
 
 	/*
 	 * Open Map File
 	 */
 	mfp = afile(linkp->f_idp, "map", 1);
 	if (mfp == NULL) {
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 
 	/*
@@ -693,11 +761,10 @@ map()
 	 */
 	page = 0;
 	lop  = NLPP;
-	ap = areap;
-	while (ap) {
+	for (ap = areap; ap != NULL; ap = ap->a_ap) {
 		lstarea(ap);
-		ap = ap->a_ap;
 	}
+
 	/*
 	 * List Linked Files
 	 */
@@ -808,7 +875,7 @@ map()
 int
 parse()
 {
-	register int c;
+	int c;
 	char fid[NINPUT];
 
 	if (is_sdld()) {
@@ -838,31 +905,6 @@ parse()
 				case 'T':
 					if (TARGET_IS_6808)
 						oflag = 3;
-					else
-						goto err;
-					break;
-
-				case 'm':
-				case 'M':
-					++mflag;
-					break;
-
-				case 'y': /*JCF: memory usage summary output*/
-					if (is_sdld()) {
-						++sflag;
-					}
-					else
-						goto err;
-					break;
-
-				case 'Y':
-					if (TARGET_IS_8051) {
-						unget(getnb());
-						packflag=1;
-					}
-					else if (TARGET_IS_6808) {
-						++sflag;
-					}
 					else
 						goto err;
 					break;
@@ -901,14 +943,9 @@ parse()
 						goto err;
 					break;
 
-				case 'w':
-				case 'W':
-					if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
-						codesav();
-						return(0);
-					}
-					else
-						++wflag;
+				case 'm':
+				case 'M':
+					mflag = 1;
 					break;
 
 				case 'j':
@@ -982,6 +1019,36 @@ parse()
 					addlib();
 					return(0);
 
+				case 'w':
+				case 'W':
+					if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
+						codesav();
+						return(0);
+					}
+					else
+						wflag = 1;
+					break;
+
+				case 'y': /*JCF: memory usage summary output*/
+					if (is_sdld()) {
+						++sflag;
+					}
+					else
+						goto err;
+					break;
+
+				case 'Y':
+					if (TARGET_IS_8051) {
+						unget(getnb());
+						packflag=1;
+					}
+					else if (TARGET_IS_6808) {
+						++sflag;
+					}
+					else
+						goto err;
+					break;
+
 				case 'z':
 				case 'Z':
 					if (is_sdld()) {
@@ -989,7 +1056,7 @@ parse()
 						return(0);
 					}
 					else
-						++zflag;
+						zflag = 1;
 					break;
 
 				default:
@@ -1006,7 +1073,7 @@ parse()
 		} else
 		if (ctype[c] & ILL) {
 			fprintf(stderr, "Invalid input\n");
-			lkexit(1);
+			lkexit(ER_FATAL);
 		} else {
 			if (linkp == NULL) {
 				linkp = (struct lfile *)
@@ -1218,8 +1285,8 @@ gblsav()
 VOID
 setgbl()
 {
-	register int v;
-	register struct sym *sp;
+	int v;
+	struct sym *sp;
 	char id[NCPS];
 
 	gsp = globlp;
@@ -1227,14 +1294,13 @@ setgbl()
 		ip = gsp->g_strp;
 		getid(id, -1);
 		if (getnb() == '=') {
-			v = expr(0);
+			v = (int) expr(0);
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
 				fprintf(stderr,
 				"No definition of symbol %s\n", id);
 				lkerr++;
 			} else {
-
 				if (sp->s_type & S_DEF) {
 					fprintf(stderr,
 					"Redefinition of symbol %s\n", id);
@@ -1295,10 +1361,7 @@ setgbl()
  */
 
 FILE *
-afile(fn, ft, wf)
-char *fn;
-char *ft;
-int wf;
+afile(char *fn, char *ft, int wf)
 {
 	char *p1, *p2;
 	int c;
@@ -1306,7 +1369,7 @@ int wf;
 	FILE *fp;
 
 	if (strlen(fn) > (FILSPC-7)) {
-		fprintf(stderr, "?ASlink-Error-<filspc to long> : \"%s\"\n", fn);
+		fprintf(stderr, "?ASlink-Error-<filspc too long> : \"%s\"\n", fn);
 		lkerr++;
 		return(NULL);
 	}
@@ -1325,7 +1388,7 @@ int wf;
 	/*
 	 * Copy File Extension
 	 */
-	 p2 = ft;
+	p2 = ft ? ft : "";
 	 if (*p2 == 0) {
 		if (p1 == NULL) {
 			p2 = LKOBJEXT;
@@ -1356,7 +1419,7 @@ int wf;
 	case 2:	frmt = "wb";	break;
 #endif
 	}
-	if ((fp = fopen(afspec, frmt)) == NULL && strcmp(ft,"adb") != 0) { /* Do not complaint for optional adb files */
+	if ((fp = fopen(afspec, frmt)) == NULL && strcmp(ft,"adb") != 0) { /* Do not complain for optional adb files */
 		fprintf(stderr, "?ASlink-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afspec);
 		lkerr++;
 	}
@@ -1567,7 +1630,7 @@ char *usetxt[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as file[map]",
-	"  -x   Hexidecimal (default)",
+	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
@@ -1600,7 +1663,7 @@ char *usetxt_8051[] = {
 	"Map format:",
 	"  -m   Map output generated as file[map]",
 	"  -w	Wide listing format for map file",
-	"  -x   Hexidecimal (default)",
+	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
@@ -1639,7 +1702,7 @@ char *usetxt_6808[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as file[map]",
-	"  -x   Hexidecimal (default)",
+	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
@@ -1677,7 +1740,7 @@ char *usetxt_z80_gb[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as file[map]",
-	"  -x   Hexidecimal (default)",
+	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
@@ -1692,7 +1755,9 @@ char *usetxt_z80_gb[] = {
 	0
 };
 
-/*)Function	VOID	usage()
+/*)Function	VOID	usage(n)
+ *
+ *		int	n		exit code
  *
  *	The function usage() outputs to the stderr device the
  *	linker name and version and a list of valid linker options.
@@ -1712,15 +1777,16 @@ char *usetxt_z80_gb[] = {
  */
 
 VOID
-usage()
+usage(int n)
 {
-	register char	**dp;
+	char	**dp;
+
 	/* sdld specific */
 	fprintf(stderr, "\n%s Linker %s\n\n", is_sdld() ? "sdld" : "ASxxxx", VERSION);
 	for (dp = TARGET_IS_8051 ? usetxt_8051 : (TARGET_IS_6808 ? usetxt_6808 : ((TARGET_IS_Z80 || TARGET_IS_GB) ? usetxt_z80_gb : usetxt)); *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	/* end sdld specific */
-	lkexit(1);
+	lkexit(n);
 }
 
 /*)Function	VOID	copyfile()
@@ -1739,9 +1805,7 @@ usage()
  *		none
  */
 VOID
-copyfile (dest, src)
-FILE *dest;
-FILE *src;
+copyfile (FILE *dest, FILE *src)
 {
 	int ch;
 

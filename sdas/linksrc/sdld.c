@@ -37,8 +37,13 @@ static char
 {
 #ifdef _WIN32
   static char fname[_MAX_FNAME];
+  char *p;
 
   _splitpath (path, NULL, NULL, fname, NULL);
+  /* convert it to lower case:
+     on DOS and Windows 9x the file name in argv[0] is uppercase */
+  for (p = fname; '\0' != *p; ++p)
+    *p = tolower (*p);
   return fname;
 #else
   return basename (path);
@@ -49,10 +54,11 @@ static char
 static void
 check_init(void)
 {
-  if (sdld == -1) {
-    fprintf(stderr, "sdld_init not called!\n");
-    exit (1);
-  }
+  if (sdld == -1)
+    {
+      fprintf(stderr, "sdld_init not called!\n");
+      exit (1);
+    }
 }
 
 
@@ -71,19 +77,11 @@ sdld_init (char *path)
   int i = NELEM (tgt);
 
   char *progname = program_name (path);
-#if _WIN32
-  /* convert it to lower case:
-     on DOS and Windows 9x the file name in argv[0] is uppercase */
-  char *p;
-
-  for (p = progname; '\0' != *p; ++p)
-    *p = tolower (*p);
-#endif
   if ((sdld = (strncmp(progname, "sdld", 4) == 0)) != 0)
     {
       /* exception: sdld is 8051 linker */
       if (progname[4] == '\0')
-	target = TARGET_ID_8051;
+        target = TARGET_ID_8051;
       else
         {
           for (i = 0; i < NELEM (tgt); ++i)

@@ -1,9 +1,24 @@
+2011-04-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/Makefile.in,
+	* sdas/linksrc/lksdcdb.c: new, added,
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lkdata.c,
+	* sdas/linksrc/lkeval.c,
+	* sdas/linksrc/lklex.c,
+	* sdas/linksrc/lklibr.c,
+	* sdas/linksrc/lklist.c,
+	* sdas/linksrc/lkmain.c: synced further with ASxxxx 5
+	* sdas/linksrc/sdld.c: moved tolower
+	* src/SDCCmain.c(linkEdit),
+	* src/z80/main.c(_gbz80_rgblink): changed .lnk to .lk
+
 2011-04-18 Borut Razem <borut.razem AT gmail.com>
 
 	* lkar.c: strndup() is a GNU extension,
 	  so it is defined here for all platforms
 
-2011-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* lkar.c: fixed bug 3288398
 

@@ -46,8 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #endif
 
 
-#ifdef _WIN32
-/* Microsoft VC and cygwin libraries don't have the strndup() function */
 static char *
 strndup (const char *str, size_t len)
 {
@@ -56,7 +54,6 @@ strndup (const char *str, size_t len)
   s[len] = '\0';
   return s;
 }
-#endif
 
 static int
 is_ar (FILE * libfp)

@@ -12,6 +12,7 @@
 	* sdas/linksrc/sdld.c: moved tolower
 	* src/SDCCmain.c(linkEdit),
 	* src/z80/main.c(_gbz80_rgblink): changed .lnk to .lk
+	* lkar.c(strndup): removed static
 
 2011-04-18 Borut Razem <borut.razem AT gmail.com>
 

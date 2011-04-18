@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #endif
 
 
-static char *
+char *
 strndup (const char *str, size_t len)
 {
   char *s = (char *) malloc (len + 1);

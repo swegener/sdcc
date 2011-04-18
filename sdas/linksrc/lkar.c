@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #endif
 
 
-#ifdef WIN32
+#ifdef _WIN32
 /* Microsoft VC and cygwin libraries don't have the strndup() function */
 static char *
 strndup (const char *str, size_t len)

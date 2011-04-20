@@ -1,3 +1,7 @@
+2011-04-20 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/simi.c: fixed compiletion on Solaris
+
 2011-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/aslink.dsp: added lksdcdb.c

@@ -39,6 +39,9 @@
 # else
 #   error "Cannot build debugger without socket support"
 # endif
+# ifdef __sun
+#   include <sys/file.h>
+# endif
 #endif
 #include <fcntl.h>
 #include <signal.h>

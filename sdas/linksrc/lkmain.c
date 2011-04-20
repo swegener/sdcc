@@ -23,8 +23,6 @@
  */
 
 /*
- * 31-Oct-97 JLH:
- *			 - add jflag and jfp to control NoICE output file generation
  *	3-Nov-97 JLH:
  *			 - use a_type == 0 as "virgin area" flag: set == 1 if -b
  */
@@ -214,9 +212,7 @@ void Areas51 (void)
  */
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
 	char *p;
 	int c, i;
@@ -366,24 +362,16 @@ char *argv[];
 			 * Check for undefined globals.
 			 */
 			symdef(stderr);
-
-			/* sdld specific */
-			/* Open NoICE output file if requested */
-			if (jflag) {
-				jfp = afile(linkp->f_idp, "noi", 1);
-				if (jfp == NULL) {
-					lkexit(1);
-				}
-			}
-			/* end sdld specific */
-
+#if NOICE
 			/*
-			 * Output Link Map if requested,
-			 * or if NoICE output requested (since NoICE
-			 * file is generated in part by map() processing)
+			 * Open NoICE output file
 			 */
-			if (mflag || jflag)
-				map();
+			NoICEfopen();
+#endif
+			/*
+			 * Output Link Map.
+			 */
+			map();
 
 			/* sdld specific */
 			if (sflag) {	/*JCF: memory usage summary output*/
@@ -463,6 +451,7 @@ char *argv[];
  *		none
  *
  *	global variables:
+ *		FILE *	jfp		file handle for .noi
  *		FILE *	mfp		file handle for .map
  *		FILE *	ofp		file handle for .ihx/.s19
  *		FILE *	rfp		file hanlde for .rst
@@ -726,6 +715,7 @@ link_main()
  *					containing an input REL file
  *					specification
  *		int	lop		current line number on page
+ *		int	mflag		Map output flag
  *		FILE	*mfp		Map output file handle
  *		int	page		current page number
  *
@@ -742,11 +732,13 @@ link_main()
  */
 
 VOID
-map()
+map(void)
 {
 	int i;
 	struct head *hdp;
 	struct lbfile *lbfh;
+
+	if (mflag == 0) return;
 
 	/*
 	 * Open Map File
@@ -769,12 +761,14 @@ map()
 	 * List Linked Files
 	 */
 	newpag(mfp);
-	fprintf(mfp,
-"\nFiles Linked                              [ module(s) ]\n\n");
+	fprintf(mfp, "\nFiles Linked                              [ module(s) ]\n\n");
 	hdp = headp;
 	filep = linkp->f_flp;
 	while (filep) {
-		fprintf(mfp, "%-40.40s  [ ", filep->f_idp);
+		if (strlen (filep->f_idp) > 40)
+			fprintf(mfp, "%s\n%44s  [ ", filep->f_idp, "");
+		else
+			fprintf(mfp, "%-40.40s  [ ", filep->f_idp);
 		i = 0;
 		while ((hdp != NULL) && (hdp->h_lfile == filep)) {
 			if (i)
@@ -783,9 +777,7 @@ map()
 			hdp = hdp->h_hp;
 			i++;
 		}
-		if (i)
-			fprintf(mfp, " ]");
-		fprintf(mfp, "\n");
+		fprintf(mfp, " ]\n");
 		filep = filep->f_flp;
 	}
 	fprintf(mfp, "\n");
@@ -793,11 +785,14 @@ map()
 	 * List Linked Libraries
 	 */
 	if (lbfhead != NULL) {
-		fprintf(mfp,
-"\nLibraries Linked                          [ object file ]\n\n");
+		fprintf(mfp, "\nLibraries Linked                          [ object file ]\n\n");
 		for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
-			fprintf(mfp, "%-40.40s  [ %-.32s ]\n",
-				lbfh->libspc, lbfh->relfil);
+			if (strlen (lbfh->libspc) > 40)
+				fprintf(mfp, "%s\n%44s  [ %-.32s ]\n",
+					lbfh->libspc, "", lbfh->relfil);
+			else
+				fprintf(mfp, "%-40.40s  [ %-.32s ]\n",
+					lbfh->libspc, lbfh->relfil);
 		}
 		fprintf(mfp, "\n");
 	}
@@ -948,14 +943,12 @@ parse()
 					mflag = 1;
 					break;
 
+#if NOICE
 				case 'j':
 				case 'J':
-					if (is_sdld()) {
-						jflag = 1;
-					}
-					else
-						goto err;
+					jflag = 1;
 					break;
+#endif
 
 				case 'r':
 				case 'R':
@@ -1389,7 +1382,7 @@ afile(char *fn, char *ft, int wf)
 	 * Copy File Extension
 	 */
 	p2 = ft ? ft : "";
-	 if (*p2 == 0) {
+	if (*p2 == 0) {
 		if (p1 == NULL) {
 			p2 = LKOBJEXT;
 		} else {
@@ -1617,11 +1610,11 @@ char *usetxt[] = {
 	"Usage: [-Options] [-Option with arg] file",
 	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
 	"Startup:",
-	"  -c                           Command line input",
-	"  -f   file[lnk]               File input",
-	"  -p   Prompt and echo of file[lnk] to stdout (default)",
-	"  -n   No echo of file[lnk] to stdout",
-	"Usage: [-Options] file [file ...]",
+	"  -p   Echo commands to stdout (default)",
+	"  -n   No echo of commands to stdout",
+	"Alternates to Command Line Input:",
+	"  -c                   ASlink >> prompt input",
+	"  -f   file[.lnk]      Command File input",
 	"Libraries:",
 	"  -k	Library path specification, one per -k",
 	"  -l	Library file specification, one per -l",
@@ -1629,13 +1622,13 @@ char *usetxt[] = {
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
-	"  -m   Map output generated as file[map]",
+	"  -m   Map output generated as (out)file[.map]",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[ihx]",
-	"  -s   Motorola S19 as file[s19]",
+	"  -i   Intel Hex as (out)file[.ihx]",
+	"  -s   Motorola S Record as (out)file[.s19]",
 	"List:",
 	"  -u	Update listing file(s) with link data as file(s)[.rst]",
 	"Case Sensitivity:",
@@ -1650,10 +1643,11 @@ char *usetxt_8051[] = {
 	"Usage: [-Options] [-Option with arg] file",
 	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
 	"Startup:",
-	"  -c                           Command line input",
-	"  -f   file[lnk]               File input",
-	"  -p   Prompt and echo of file[lnk] to stdout (default)",
-	"  -n   No echo of file[LNK] to stdout",
+	"  -p   Echo commands to stdout (default)",
+	"  -n   No echo of commands to stdout",
+	"Alternates to Command Line Input:",
+	"  -c                   ASlink >> prompt input",
+	"  -f   file[.lnk]      Command File input",
 	"Libraries:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1661,23 +1655,27 @@ char *usetxt_8051[] = {
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
-	"  -m   Map output generated as file[map]",
+	"  -m   Map output generated as (out)file[.map]",
 	"  -w	Wide listing format for map file",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[ihx]",
-	"  -s   Motorola S19 as file[s19]",
-	"  -j   Produce NoICE debug as file[noi]",
-	"  -z   Produce SDCdb debug as file[cdb]",
+	"  -i   Intel Hex as (out)file[.ihx]",
+	"  -s   Motorola S Record as (out)file[.s19]",
+#if NOICE
+	"  -j   NoICE Debug output as (out)file[.noi]",
+#endif
+#if SDCDB
+	"  -z   SDCDB Debug output as (out)file[.cdb]",
+#endif
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Miscellaneous:\n"
 	"  -a   [iram-size] Check for internal RAM overflow",
 	"  -v   [xram-size] Check for external RAM overflow",
 	"  -w   [code-size] Check for code overflow",
-	"  -y   Generate memory usage summary file[mem]",
+	"  -y   Generate memory usage summary file[.mem]",
 	"  -Y   Pack internal ram",
 	"  -A   [stack-size] Allocate space for stack",
 	"End:",
@@ -1690,10 +1688,11 @@ char *usetxt_6808[] = {
 	"Usage: [-Options] [-Option with arg] file",
 	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
 	"Startup:",
-	"  -c                           Command line input",
-	"  -f   file[lnk]               File input",
-	"  -p   Prompt and echo of file[lnk] to stdout (default)",
-	"  -n   No echo of file[lnk] to stdout",
+	"  -p   Echo commands to stdout (default)",
+	"  -n   No echo of commands to stdout",
+	"Alternates to Command Line Input:",
+	"  -c                   ASlink >> prompt input",
+	"  -f   file[.lnk]      Command File input",
 	"Libraries:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1701,23 +1700,27 @@ char *usetxt_6808[] = {
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
-	"  -m   Map output generated as file[map]",
+	"  -m   Map output generated as (out)file[.map]",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[ihx]",
-	"  -s   Motorola S19 as file[s19]",
-	"  -t   ELF executable as file[elf]",
-	"  -j   Produce NoICE debug as file[noi]",
-	"  -z   Produce SDCdb debug as file[cdb]",
+	"  -i   Intel Hex as (out)file[.ihx]",
+	"  -s   Motorola S Record as (out)file[.s19]",
+	"  -t   ELF executable as file[.elf]",
+#if NOICE
+	"  -j   NoICE Debug output as (out)file[.noi]",
+#endif
+#if SDCDB
+	"  -z   SDCDB Debug output as (out)file[.cdb]",
+#endif
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Miscellaneous:\n"
 	"  -a   [iram-size] Check for internal RAM overflow",
 	"  -v   [xram-size] Check for external RAM overflow",
 	"  -w   [code-size] Check for code overflow",
-	"  -y   Generate memory usage summary file[mem]",
+	"  -y   Generate memory usage summary file[.mem]",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
@@ -1728,10 +1731,11 @@ char *usetxt_z80_gb[] = {
 	"Usage: [-Options] [-Option with arg] file",
 	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
 	"Startup:",
-	"  -c                           Command line input",
-	"  -f   file[lnk]               File input",
-	"  -p   Prompt and echo of file[lnk] to stdout (default)",
-	"  -n   No echo of file[lnk] to stdout",
+	"  -p   Echo commands to stdout (default)",
+	"  -n   No echo of commands to stdout",
+	"Alternates to Command Line Input:",
+	"  -c                   ASlink >> prompt input",
+	"  -f   file[.lnk]      Command File input",
 	"Libraries:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1739,14 +1743,16 @@ char *usetxt_z80_gb[] = {
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
-	"  -m   Map output generated as file[map]",
+	"  -m   Map output generated as (out)file[.map]",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[ihx]",
-	"  -s   Motorola S19 as file[s19]",
-	"  -z   Produce SDCdb debug as file[cdb]",
+	"  -i   Intel Hex as (out)file[.ihx]",
+	"  -s   Motorola S Record as (out)file[.s19]",
+#if SDCDB
+	"  -z   SDCDB Debug output as (out)file[.cdb]",
+#endif
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"End:",

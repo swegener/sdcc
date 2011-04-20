@@ -168,6 +168,10 @@ SOURCE=lksdcclib.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\lksdcdb.c
+# End Source File
+# Begin Source File
+
 SOURCE=lksym.c
 # End Source File
 # Begin Source File

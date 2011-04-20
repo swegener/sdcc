@@ -1,32 +1,35 @@
-/* lknoice.c - Extensions to CUG 292 linker ASLINK to produce NoICE debug files
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* lknoice.c */
 
 /*
- * Extensions to CUG 292 linker ASLINK to produce NoICE debug files
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *
+ * Extensions to produce NoICE debug files
  *
  * 31-Oct-1997 by John Hartman
  * 30-Jan-98 JLH add page to DefineNoICE for 8051
  *  2-Feb-98 JLH Allow optional .nest on local vars - C scoping rules...
  */
 
-#include <stdio.h>
 #include <setjmp.h>
-#include <string.h>
 #include "aslink.h"
 
 static void DefineGlobal( char *name, a_uint value, int page );
@@ -37,6 +40,42 @@ static void DefineStaticFunction( char *name, a_uint value, int page );
 static void DefineEndFunction( a_uint value, int page );
 static void DefineLine( char *lineString, a_uint value, int page );
 static void PagedAddress( a_uint value, int page );
+
+/*)Function	VOID	NoICEfopen()
+ * 
+ *	The function NoICEfile() opens the NoICE output file
+ *	and sets the map flag, mflag, to create a map file.
+ *	NoICE processing is performed during map generation.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		int	jflag		NoICE Debug flag
+ *		FILE *	jfp		NoICE Debug File handle
+ *		struct lfile *linkp	Pointer to the Linker output file name
+ *		int	mflag		Map output flag
+ *
+ *	functions called:
+ *		FILE *	afile()		lkmain.c
+ *		VOID	lkexit()	lkmain.c
+ *
+ *	side effects:
+ *		The NoICE output file is opened.
+ *		Failure to open the file will
+ *		terminate the linker.
+ */
+
+VOID NoICEfopen(void)
+{
+	if (jflag) {
+		jfp = afile(linkp->f_idp, "noi", 1);
+		if (jfp == NULL) {
+			lkexit(1);
+		}
+		mflag = 1;
+	}
+}
 
 /*
  * Called from lstarea in lklist.c for each symbol.

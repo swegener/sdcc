@@ -952,6 +952,7 @@ extern	VOID		lkalist(a_uint cpc);
 extern	VOID		lkglist(a_uint pc, int v);
 
 /* lknoice.c */
+extern	VOID		NoICEfopen(void);
 extern	VOID		DefineNoICE( char *name, a_uint value, int page );
 
 

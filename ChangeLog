@@ -15,6 +15,9 @@
 	* sdas/linksrc/sdld.c: cosmetic changes
 	* sdas/linksrc/lklist.c,
 	* sdas/linksrc/lknoice.c: synced with ASxxxx 5
+	* src/mcs51/gen.c(genCall): fixed bug 3290691
+	* support/regression/tests/bug3290691.c: new, added
+
 
 2011-04-20 Borut Razem <borut.razem AT gmail.com>
 

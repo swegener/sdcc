@@ -90,7 +90,7 @@ sdld_init (char *path)
                 {
                   target = tgt[i].target;
                   break;
-		}
+                }
             }
         }
     }

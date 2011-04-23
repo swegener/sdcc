@@ -167,10 +167,10 @@ newsym(void)
         } else
         if (c == 'D') {
                 ev = eval();
-				if (tsp->s_type & S_DEF &&
-				!(tsp->s_addr == ev && ((tsp->s_axp->a_bap->a_flag & A3_ABS) == A3_ABS))) {
-					fprintf(stderr,
-						"Multiple definition of %s\n", id);
+                if (tsp->s_type & S_DEF &&
+                    !(tsp->s_addr == ev && ((tsp->s_axp->a_bap->a_flag & A3_ABS) == A3_ABS))) {
+                        fprintf(stderr,
+                                "Multiple definition of %s\n", id);
                         lkerr++;
                 }
                 /*
@@ -388,7 +388,7 @@ symmod(FILE *fp, struct sym *tsp)
 
 /*)Function     int     symeq(p1, p2, cflag)
  *
- *		int	cflag		case sensitive flag
+ *              int     cflag           case sensitive flag
  *              char *  p1              name string
  *              char *  p2              name string
  *

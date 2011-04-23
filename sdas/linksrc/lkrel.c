@@ -29,7 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * Extensions: P. Felber
  */
 
-#include <string.h>
 #include <assert.h>
 
 #include "lk_readnl.h"
@@ -48,9 +47,9 @@ is_rel (FILE * libfp)
     {
       switch (getc (libfp))
         {
-	case '2':
-	case '3':
-	case '4':
+        case '2':
+        case '3':
+        case '4':
           switch (getc (libfp))
             {
             case '\r':

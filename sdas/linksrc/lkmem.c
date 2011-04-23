@@ -582,7 +582,7 @@ int summary2(struct area * areap)
         if(j%16==0) fprintf(of, "\n0x%02x:|", j);
         fprintf(of, "%c|", idatamap[j]);
     }
-        fprintf(of, "\n0-3:Reg Banks, T:Bit regs, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack, A:Absolute\n");
+    fprintf(of, "\n0-3:Reg Banks, T:Bit regs, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack, A:Absolute\n");
 
     for(j=0; j<256; j++)
     {

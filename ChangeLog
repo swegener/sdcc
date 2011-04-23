@@ -1,3 +1,21 @@
+2011-04-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lkar.c(get_member_name, fndsym_ar): small fixes
+	* sdas/linksrc/lkmain.c(main): fixed bug 3290988
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lkhead.c,
+	* sdas/linksrc/lkihx.c,
+	* sdas/linksrc/lklex.c,
+	* sdas/linksrc/lklibr.c,
+	* sdas/linksrc/lklibr.h,
+	* sdas/linksrc/lkmem.c,
+	* sdas/linksrc/lkrel.c,
+	* sdas/linksrc/lks19.c,
+	* sdas/linksrc/lksym.c,
+	* sdas/linksrc/sdld.c: cosmetic changes
+	* sdas/linksrc/lklist.c,
+	* sdas/linksrc/lknoice.c: synced with ASxxxx 5
+
 2011-04-20 Borut Razem <borut.razem AT gmail.com>
 
 	* debugger/mcs51/simi.c: fixed compiletion on Solaris

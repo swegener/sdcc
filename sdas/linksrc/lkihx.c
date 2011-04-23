@@ -210,7 +210,7 @@ hexRecord(unsigned addr, int rtvalIndex)
  */
 
 VOID
-ihx(i)
+ihx(int i)
 {
     a_uint n;
     if (i) {

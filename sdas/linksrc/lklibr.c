@@ -190,8 +190,10 @@ addlib (void)
  *  path / file specifications or if the file is not found.
  *
  *  local variables:
- *	lbname	*lbnh	    pointer to new name structure
- *	lbname	*lbn	    temporary pointer
+ *	lbname	*lbnh		pointer to new name structure
+ *	lbname	*lbn		temporary pointer
+ *	char *	str		path / file string
+ *	char *	strend		end of path pointer
  *	char *	str		path / file string
  *	char *	strend		end of path pointer
  *

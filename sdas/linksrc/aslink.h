@@ -236,7 +236,7 @@ extern	int	ASxxxx_VERSION;
 #define A3_OVR	  004		/* overlay */
 #define A3_REL	  000		/* relocatable */
 #define A3_ABS	  010		/* absolute */
-#define A3_NOPAG   000		/* non-paged */
+#define A3_NOPAG  000		/* non-paged */
 #define A3_PAG	  020		/* paged */
 
 /* sdld specific */
@@ -265,27 +265,27 @@ extern	int	ASxxxx_VERSION;
  *	    +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define R3_WORD	0x00		/* 16 bit */
-#define R3_BYTE	0x01		/*  8 bit */
+#define R3_WORD	 0x00		/* 16 bit */
+#define R3_BYTE	 0x01		/*  8 bit */
 
-#define R3_AREA	0x00		/* Base type */
-#define R3_SYM	0x02
+#define R3_AREA	 0x00		/* Base type */
+#define R3_SYM	 0x02
 
-#define R3_NORM	0x00		/* PC adjust */
-#define R3_PCR	0x04
+#define R3_NORM	 0x00		/* PC adjust */
+#define R3_PCR	 0x04
 
-#define R3_BYT1	0x00		/* Byte count for R_BYTE = 1 */
-#define R3_BYTX	0x08		/* Byte count for R_BYTE = X */
+#define R3_BYT1	 0x00		/* Byte count for R_BYTE = 1 */
+#define R3_BYTX  0x08		/* Byte count for R_BYTE = X */
 
-#define R3_SGND	0x00		/* Signed value */
-#define R3_USGN	0x10		/* Unsigned value */
+#define R3_SGND  0x00		/* Signed value */
+#define R3_USGN  0x10		/* Unsigned value */
 
 #define R3_NOPAG 0x00		/* Page Mode */
-#define R3_PAG0	0x20		/* Page '0' */
-#define R3_PAG	0x40		/* Page 'nnn' */
+#define R3_PAG0	 0x20		/* Page '0' */
+#define R3_PAG	 0x40		/* Page 'nnn' */
 
-#define R3_LSB	0x00		/* output low byte */
-#define R3_MSB	0x80		/* output high byte */
+#define R3_LSB	 0x00		/* output low byte */
+#define R3_MSB	 0x80		/* output high byte */
 
 /*
  *	Additional "R3_" functionality is required to support
@@ -949,7 +949,7 @@ extern	VOID		slew(struct area *xp);
 extern	VOID		lstarea(struct area *xp);
 extern	VOID		lkulist(int i);
 extern	VOID		lkalist(a_uint cpc);
-extern	VOID		lkglist(a_uint pc, int v);
+extern	VOID		lkglist(a_uint cpc, int v);
 
 /* lknoice.c */
 extern	VOID		NoICEfopen(void);
@@ -962,30 +962,30 @@ extern	VOID		SDCDBcopy(char * str);
 extern	VOID		DefineSDCDB(char *name, a_uint value);
 
 /* lkrloc.c */
-extern	a_uint		adb_b(register a_uint v, register int i);
-extern	a_uint		adb_bit(register a_uint v, register int i);
-extern	a_uint		adb_hi(a_uint  v, int i);
-extern	a_uint		adb_lo(a_uint  v, int i);
-extern	a_uint		adb_24_bit(register a_uint v, register int i);
+extern	a_uint		adb_b(a_uint v, int i);
+extern	a_uint		adb_bit(a_uint v, int i);
+extern	a_uint		adb_24_bit(a_uint v, int i);
 extern	a_uint		adb_24_hi(a_uint v, int i);
 extern	a_uint		adb_24_mid(a_uint v, int i);
 extern	a_uint		adb_24_lo(a_uint v, int i);
-extern	a_uint		adw_w(register a_uint v, register int i);
+extern	a_uint		adw_w(a_uint v, int i);
 extern	a_uint		adw_24(a_uint v, int i);
-extern	a_uint		adw_hi(a_uint  v, int i);
-extern	a_uint		adw_lo(a_uint  v, int i);
-extern	a_uint		evword(VOID);
+extern	a_uint		adw_hi(a_uint v, int i);
+extern	a_uint		adw_lo(a_uint v, int i);
+extern	a_uint		evword(void);
+extern	VOID		prntval(FILE *fptr, a_uint v);
+extern	a_uint		adb_hi(a_uint  v, int i);
+extern	a_uint		adb_lo(a_uint  v, int i);
+extern	char *		errmsg[];
+extern	VOID		errdmp(FILE *fptr, char *str);
+extern	VOID		erpdmp(FILE *fptr, char *str);
 extern	VOID		rele(VOID);
 extern	VOID		reloc(char c);
 extern	VOID		relt(VOID);
 extern	VOID		relr(VOID);
 extern	VOID		relp(VOID);
 extern	VOID		relerr(char *str);
-extern	char *		errmsg[];
-extern	VOID		errdmp(FILE *fptr, char *str);
 extern	VOID		relerp(char *str);
-extern	VOID		erpdmp(FILE *fptr, char *str);
-extern	VOID		prntval(FILE *fptr, a_uint v);
 extern	int		lastExtendedAddress;
 
 /* lklibr.c */
@@ -997,17 +997,17 @@ extern	VOID		library(void);
 extern	VOID		loadfile(char *filspc);
 extern	VOID		search(void);
 
-/* lks19.c */
-extern	VOID		s19();
-extern	VOID		sflush();
-
 /* lkihx.c */
-extern	VOID		ihx();
-extern	VOID		iflush();
-/* sdlk specific */
+extern	VOID		ihx(int i);
+extern	VOID		iflush(void);
+/* sdld specific */
 extern	VOID		ihxExtendedLinearAddress(a_uint);
 extern	VOID		ihxNewArea();
-/* end sdlk specific */
+/* end sdld specific */
+
+/* lks19.c */
+extern	VOID		s19(int i);
+extern	VOID		sflush(void);
 
 /* EEP: lkelf.c */
 extern	VOID		elf();

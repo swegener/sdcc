@@ -108,7 +108,8 @@ get_long_name (const char *name)
 static char *
 get_member_name (char *name, size_t *p_size, int allocate, FILE * libfp)
 {
-  *p_size = 0;
+  if (p_size != NULL)
+    *p_size = 0;
 
   if (0 == memcmp (name, "#1/", 3))
     {
@@ -126,6 +127,7 @@ get_member_name (char *name, size_t *p_size, int allocate, FILE * libfp)
               if (fread (n, 1, len, libfp) != len)
                 {
                   /* not an ar archive or broken ar archive */
+                  free (n);
                   return NULL;
                 }
               else
@@ -671,7 +673,7 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
   /* walk trough all archive members */
   while ((hdr_size = ar_get_header (&hdr, libfp, &obj_name)) != 0)
     {
-      char filspc[PATH_MAX];
+      char filspc[PATH_MAX] = { 0 };
 
       if (lbnh->path != NULL)
         {

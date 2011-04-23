@@ -72,7 +72,7 @@ struct aslib_target
 {
   int (*is_lib) (FILE * libfp);
 #ifdef INDEXLIB
-    pmlibraryfile (*buildlibraryindex) (struct lbname * lbnh, FILE * libfp, pmlibraryfile This, int type);
+  pmlibraryfile (*buildlibraryindex) (struct lbname * lbnh, FILE * libfp, pmlibraryfile This, int type);
 #else
   int (*fndsym) (const char *name, struct lbname * lbnh, FILE * libfp, int type);
 #endif

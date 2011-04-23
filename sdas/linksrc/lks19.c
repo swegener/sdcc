@@ -120,8 +120,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	MAXBYTES	((NMAX - 10)/2)
 
 VOID
-s19(i)
-int i;
+s19(int i)
 {
 	register a_uint j;
 

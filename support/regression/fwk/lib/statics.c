@@ -29,3 +29,14 @@ float get_float_1(void)
 {
 	return s_get_float_1();
 }
+
+/* for bug 3038028 */
+static char s_get_indexed(char index, char *msg)
+{
+	return msg[index];
+}
+
+char get_indexed(char index, char *msg)
+{
+	return s_get_indexed(index, msg);
+}

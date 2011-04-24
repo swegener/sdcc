@@ -185,7 +185,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       /* if global variable & not static or extern
          and addPublics allowed then add it to the public set */
       if ((sym->level == 0 ||
-           (sym->_isparm && !IS_REGPARM (sym->etype))) &&
+           (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
           addPublics && !IS_STATIC (sym->etype) && (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : 1))
         {
           addSetHead (&publics, sym);
@@ -1652,7 +1652,7 @@ emitOverlay (struct dbuf_s *aBuf)
 
           /* if global variable & not static or extern
              and addPublics allowed then add it to the public set */
-          if ((sym->_isparm && !IS_REGPARM (sym->etype)) && !IS_STATIC (sym->etype))
+          if ((sym->_isparm && !IS_REGPARM (sym->etype)) && !IS_STATIC (sym->etype) && !IS_STATIC (sym->localof->etype))
             {
               addSetHead (&publics, sym);
             }

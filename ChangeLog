@@ -1,3 +1,9 @@
+2011-04-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c(emitRegularMap, emitOverlay): fixed bug 3038028
+	* support/regression/tests/bug1477149.c,
+	* support/regression/fwk/lib/statics.c: added s_get_indexed for bug 3038028
+
 2011-04-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lkar.c(get_member_name, fndsym_ar): small fixes
@@ -17,7 +23,6 @@
 	* sdas/linksrc/lknoice.c: synced with ASxxxx 5
 	* src/mcs51/gen.c(genCall): fixed bug 3290691
 	* support/regression/tests/bug3290691.c: new, added
-
 
 2011-04-20 Borut Razem <borut.razem AT gmail.com>
 

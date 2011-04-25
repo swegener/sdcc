@@ -104,6 +104,10 @@ SOURCE=lkarea.c
 # End Source File
 # Begin Source File
 
+SOURCE=lkbank.c
+# End Source File
+# Begin Source File
+
 SOURCE=lkdata.c
 # End Source File
 # Begin Source File
@@ -168,7 +172,7 @@ SOURCE=lksdcclib.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lksdcdb.c
+SOURCE=lksdcdb.c
 # End Source File
 # Begin Source File
 

@@ -1,33 +1,36 @@
-/* lkrloc.c
-
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* lkrloc.c */
 
 /*
- * 29-Oct-97 JLH:
- *		 - errdmp: show s_id as string rather than array [NCPS]
- *		 - relr: add support for 11 bit 8051 addressing
- * 02-Apr-98 JLH: don't output empty hex records
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from:
+ *
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
+ *	Bill McKinnon (BM)
+ *	w_mckinnon@conknet.com
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
-#include "sdld.h"
 #include "aslink.h"
 
 /*)Module	lkrloc.c
@@ -614,7 +617,7 @@ relr()
 	}
 /* sdld specific */
 	else
-	if ((oflag == 3) && (rtcnt > 2)) {
+	if ((oflag == 4) && (rtcnt > 2)) {
 		elf(1);
 	}
 /* end sdld specific */
@@ -803,7 +806,7 @@ rele()
 	}
 /* sdld specific */
 	else
-	if (oflag == 3) {
+	if (oflag == 4) {
 		elf(0);
 	}
 /* end sdld specific */

@@ -919,6 +919,10 @@ extern	VOID		lnkarea(void);
 extern	VOID		lnkarea2(void);
 extern	VOID		newarea(void);
 
+/* lkbank.c */
+extern	VOID		lkfclose(void);
+extern	VOID		lkfopen(void);
+
 /* lkhead.c */
 extern	VOID		module(void);
 extern	VOID		newhead(void);

@@ -192,6 +192,7 @@ void Areas51 (void)
  *		VOID	library()	lklibr.c
  *		VOID	link_main()	lkmain.c
  *		VOID	lkexit()	lkmain.c
+ *		VOID	lkfopen()	lkbank.c
  *		VOID	lnkarea()	lkarea.c
  *		VOID	map()		lkmain.c
  *		VOID	new()		lksym.c
@@ -398,34 +399,7 @@ main(int argc, char *argv[])
 			/*
 			 * Open output file(s)
 			 */
-			if (oflag == 1) {
-				ofp = afile(linkp->f_idp, "ihx", 1);
-				if (ofp == NULL) {
-					lkexit(1);
-				}
-				/* sdld specific */
-				/* include NoICE command to load hex file */
-				if (jfp) fprintf( jfp, "LOAD %s.ihx\n", linkp->f_idp );
-				/* end sdld specific */
-			} else
-			if (oflag == 2) {
-				ofp = afile(linkp->f_idp, "s19", 1);
-				if (ofp == NULL) {
-					lkexit(1);
-				}
-				/* sdld specific */
-				/* include NoICE command to load hex file */
-				if (jfp) fprintf( jfp, "LOAD %s.s19\n", linkp->f_idp );
-				/* end sdld specific */
-			} else
-			/* sdld specific */
-			if (oflag == 3) {
-				ofp = afile(linkp->f_idp, "elf", 2);
-				if (ofp == NULL) {
-					lkexit(1);
-				}
-			}
-			/* end sdld specific */
+			lkfopen();
 		} else {
 			/*
 			 * Link in library files
@@ -467,6 +441,7 @@ main(int argc, char *argv[])
  *	functions called:
  *		int	fclose()	c_library
  *		VOID	exit()		c_library
+ *		VOID	lkfclose()	lkbank.c
  *
  *	side effects:
  *		All files closed. Program terminates.
@@ -476,11 +451,11 @@ VOID
 lkexit(i)
 int i;
 {
+	lkfclose();
 #if NOICE
 	if (jfp != NULL) fclose(jfp);
 #endif
 	if (mfp != NULL) fclose(mfp);
-	if (ofp != NULL) fclose(ofp);
 	if (rfp != NULL) fclose(rfp);
 	if (sfp != NULL) { if (sfp != stdin) fclose(sfp); }
 	if (tfp != NULL) fclose(tfp);
@@ -904,7 +879,7 @@ parse()
 
 				case 't':
 				case 'T':
-					oflag = 3;
+					oflag = 4;
 					break;
 
 				case 'A':

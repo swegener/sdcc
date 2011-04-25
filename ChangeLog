@@ -1,3 +1,12 @@
+2011-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lkbank.c: new, added
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/aslink.dsp,
+	* sdas/linksrc/Makefile.in: added lkbank.c
+	* sdas/linksrc/lkmain.c(main, lkexit): factored out lkfopen and lkfclose
+	* sdas/linksrc/lkrloc.c(relr, rele): changed oflag=4 for ELF
+
 2011-04-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c(emitRegularMap, emitOverlay): fixed bug 3038028

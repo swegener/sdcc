@@ -481,6 +481,7 @@ struct	lfile
 	struct	lfile	*f_flp; /* lfile link */
 	int	f_type;		/* File type */
 	char	*f_idp;		/* Pointer to file spec */
+	int	f_idx;		/* Index to file name */
 };
 
 /*

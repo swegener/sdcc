@@ -100,7 +100,7 @@ _hc08_parseOptions (int *pargc, char **argv, int *i)
 {
   if (!strcmp (argv[*i], "--out-fmt-elf"))
     {
-      options.out_fmt = 't';
+      options.out_fmt = 'E';
       debugFile = &dwarf2DebugFile;
       return TRUE;
     }
@@ -239,7 +239,7 @@ _hc08_genAssemblerPreamble (FILE * of)
 static void
 _hc08_genAssemblerEnd (FILE * of)
 {
-  if (options.out_fmt == 't' && options.debug)
+  if (options.out_fmt == 'E' && options.debug)
     {
       dwarf2FinalizeFile (of);
     }

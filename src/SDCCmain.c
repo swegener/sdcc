@@ -1480,7 +1480,7 @@ getOutFmtExt (void)
     case 's':
       return ".s19";
 
-    case 't':
+    case 'E':
       return ".elf";
     }
 }
@@ -1525,11 +1525,11 @@ linkEdit (char **envp)
 
       if (TARGET_Z80_LIKE)
         {
-          fprintf (lnkfile, "-mjx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
+          fprintf (lnkfile, "-mjwx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
         }
-      else                      /* For all the other portswhich need linker script */
+      else                      /* For all the other ports which need linker script */
         {
-          fprintf (lnkfile, "-myux\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
+          fprintf (lnkfile, "-mMuwx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
           if (!options.no_pack_iram)
             fprintf (lnkfile, "-Y\n");
           else
@@ -1540,23 +1540,23 @@ linkEdit (char **envp)
         {
           /* if iram size specified */
           if (options.iram_size)
-            fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
+            fprintf (lnkfile, "-I 0x%04x\n", options.iram_size);
 
           /* if stack size specified */
           if (options.stack_size)
-            fprintf (lnkfile, "-A 0x%02x\n", options.stack_size);
+            fprintf (lnkfile, "-S 0x%02x\n", options.stack_size);
 
           /* if xram size specified */
           if (options.xram_size_set)
-            fprintf (lnkfile, "-v 0x%04x\n", options.xram_size);
+            fprintf (lnkfile, "-X 0x%04x\n", options.xram_size);
 
           /* if code size specified */
           if (options.code_size)
-            fprintf (lnkfile, "-w 0x%04x\n", options.code_size);
+            fprintf (lnkfile, "-C 0x%04x\n", options.code_size);
         }
 
       if (options.debug)
-        fprintf (lnkfile, "-z\n");
+        fprintf (lnkfile, "-y\n");
 
 #define WRITE_SEG_LOC(N, L) \
   if (N) \

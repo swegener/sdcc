@@ -98,6 +98,7 @@
 		LKMAIN.C
 		LKLEX.C
 		LKAREA.C
+		LKBANK.C
 		LKHEAD.C
 		LKSYM.C
 		LKEVAL.C
@@ -884,6 +885,7 @@ extern	VOID		bassav(void);
 extern	int		fndidx(char *str);
 extern	int		fndext(char *str);
 extern	VOID		gblsav(void);
+extern	int		intsiz(void);
 extern	VOID		iramsav(void);
 extern	VOID		xramsav(void);
 extern	VOID		codesav(void);
@@ -894,6 +896,7 @@ extern	int		main(int argc, char *argv[]);
 extern	VOID		map(void);
 extern	VOID		sym(void);
 extern	int		parse(void);
+extern	VOID		doparse(void);
 extern	VOID		setbas(void);
 extern	VOID		setgbl(void);
 extern	VOID		usage(int n);

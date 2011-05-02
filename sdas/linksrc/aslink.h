@@ -775,7 +775,7 @@ extern	int	uflag;		/*	Listing relocation flag
 				 */
 extern	int	wflag;		/*	Enable wide format listing
 				 */
-extern	int	zflag;		/*	Enable symbol case sensitivity
+extern	int	zflag;		/*	Disable symbol case sensitivity
 				 */
 extern	int	radix;		/*	current number conversion radix:
 				 *	2 (binary), 8 (octal), 10 (decimal),

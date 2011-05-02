@@ -83,7 +83,7 @@ int	uflag;		/*	Listing relocation flag
 			 */
 int	wflag;		/*	Enable wide format listing
 			 */
-int	zflag;		/*	Enable symbol case sensitivity
+int	zflag;		/*	Disable symbol case sensitivity
 			 */
 int	radix;		/*	current number conversion radix:
 			 *	2 (binary), 8 (octal), 10 (decimal),

@@ -872,7 +872,7 @@ map(void)
  *		int	uflag		Relocated listing flag
  *		int	xflag		Map file radix type flag
  *		int	wflag		Wide listing format
- *		int	zflag		Enable symbol case sensitivity
+ *		int	zflag		Disable symbol case sensitivity
  *
  *	Functions called:
  *		VOID	addlib()	lklibr.c
@@ -1708,7 +1708,7 @@ char *usetxt[] = {
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
 	"  -c                   ASlink >> prompt input",
-	"  -f   file[.lnk]      Command File input",
+	"  -f   file[.lk]       Command File input",
 	"Libraries:",
 	"  -k	Library path specification, one per -k",
 	"  -l	Library file specification, one per -l",
@@ -1717,16 +1717,26 @@ char *usetxt[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as (out)file[.map]",
+	"  -w	Wide listing format for map file",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
 	"  -i   Intel Hex as (out)file[.ihx]",
 	"  -s   Motorola S Record as (out)file[.s19]",
+//	"  -t   Tandy CoCo Disk BASIC binary as (out)file[.bi-]",
+#if NOICE
+	"  -j   NoICE Debug output as (out)file[.noi]",
+#endif
+#if SDCDB
+	"  -y   SDCDB Debug output as (out)file[.cdb]",
+#endif
+//	"  -o   Linked file/library object output enable (default)",
+//	"  -v   Linked file/library object output disable",
 	"List:",
 	"  -u	Update listing file(s) with link data as file(s)[.rst]",
 	"Case Sensitivity:",
-	"  -z	Enable Case Sensitivity for Symbols",
+	"  -z	Disable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
@@ -1741,7 +1751,7 @@ char *usetxt_8051[] = {
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
 	"  -c                   ASlink >> prompt input",
-	"  -f   file[.lnk]      Command File input",
+	"  -f   file[.lk]       Command File input",
 	"Libraries:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1765,6 +1775,8 @@ char *usetxt_8051[] = {
 #endif
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
+	"Case Sensitivity:",
+	"  -z	Disable Case Sensitivity for Symbols",
 	"Miscellaneous:\n"
 	"  -I   [iram-size] Check for internal RAM overflow",
 	"  -X   [xram-size] Check for external RAM overflow",
@@ -1786,7 +1798,7 @@ char *usetxt_6808[] = {
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
 	"  -c                   ASlink >> prompt input",
-	"  -f   file[.lnk]      Command File input",
+	"  -f   file[.lk]       Command File input",
 	"Libraries:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1795,6 +1807,7 @@ char *usetxt_6808[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as (out)file[.map]",
+	"  -w	Wide listing format for map file",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
@@ -1810,6 +1823,8 @@ char *usetxt_6808[] = {
 #endif
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
+	"Case Sensitivity:",
+	"  -z	Disable Case Sensitivity for Symbols",
 	"Miscellaneous:\n"
 	"  -I   [iram-size] Check for internal RAM overflow",
 	"  -X   [xram-size] Check for external RAM overflow",
@@ -1829,7 +1844,7 @@ char *usetxt_z80_gb[] = {
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
 	"  -c                   ASlink >> prompt input",
-	"  -f   file[.lnk]      Command File input",
+	"  -f   file[.lk]       Command File input",
 	"Libraries:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1838,6 +1853,7 @@ char *usetxt_z80_gb[] = {
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as (out)file[.map]",
+	"  -w	Wide listing format for map file",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
@@ -1849,6 +1865,8 @@ char *usetxt_z80_gb[] = {
 #endif
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
+	"Case Sensitivity:",
+	"  -z	Disable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	"",

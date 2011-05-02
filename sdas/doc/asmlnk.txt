@@ -887,14 +887,14 @@
 
                 $#,   0d, 0D            Decimal radix operator.
 
-                $$,   0h, 0H, 0x, 0X    Hexidecimal radix operator.
+                $$,   0h, 0H, 0x, 0X    Hexadecimal radix operator.
 
 
                 Potential  ambiguities arising from the use of 0b and 0d
                 as temporary radix operators may be circumvented by pre-
-                ceding  all  non-prefixed  hexidecimal  numbers with 00.
+                ceding  all  non-prefixed  hexadecimal  numbers with 00.
                 Leading 0's are required in any  case  where  the  first
-                hexidecimal  digit is abcdef as the assembler will treat
+                hexadecimal  digit is abcdef as the assembler will treat
                 the letter sequence as a label.
 
         ----------------------------------------------------------------
@@ -1103,8 +1103,8 @@
            ASxxxx  assumes that all numbers in the source program are to
         be interpreted in decimal radix unless otherwise specified.  The
         .radix  directive  may  be used to specify the default as octal,
-        decimal, or hexidecimal.  Individual numbers can  be  designated
-        as  binary, octal, decimal, or hexidecimal through the temporary
+        decimal, or hexadecimal.  Individual numbers can  be  designated
+        as  binary, octal, decimal, or hexadecimal through the temporary
         radix prefixes shown in table 6.
 
            Negative  numbers  must be preceeded by a minus sign;  ASxxxx
@@ -1453,7 +1453,7 @@
                         D,d     Decimal
                         'blank'
 
-                        H,h     Hexidecimal
+                        H,h     Hexadecimal
                         X,x
 
 
@@ -1985,7 +1985,7 @@
 
            The generated code follows the program location.  The listing
         radix determines the number of bytes that will be  displayed  in
-        this field.  Hexidecimal listing allows six bytes of data within
+        this field.  Hexadecimal listing allows six bytes of data within
         the field, decimal and octal allow four bytes within the  field.
         If more than one field of data is generated from the assembly of
         a single line of source code, then the data field is repeated on
@@ -2082,7 +2082,7 @@
         following designators:
 
                 [XDQ][HL]
-                        X       Hexidecimal radix
+                        X       Hexadecimal radix
                         D       Decimal radix
                         Q       Octal radix
 
@@ -2170,11 +2170,11 @@
 
         -c/-f           command line / command file modes
 
-        -p/-n           enable/disable echo file.lnk input to stdout
+        -p/-n           enable/disable echo file.lk input to stdout
 
            If  command  line  mode is selected, all linker commands come
         from stdin, if the command file mode is  selected  the  commands
-        are input from the specified file (extension must be .lnk).
+        are input from the specified file (default extension is .lk).
 
            The linker is started via
 
@@ -2195,7 +2195,7 @@
                  linker
 
              4.  -xdq    Specifies  the  number  radix  for the map file
-                 (Hexidecimal, Decimal, or Octal).
+                 (Hexadecimal, Decimal, or Octal).
 
              5.  fileN   Files  to  be linked.  Files may be on the same
                  line as the above options or on a separate line(s)  one
@@ -2240,15 +2240,15 @@
 
         Output:
           -j   Produce NoICE debug as file[NOI]
-          -z   Produce SDCdb debug as file[cdb]
+          -y   Produce SDCdb debug as file[cdb]
           -u   Update listing file(s) with link data as file(s)[.RST]
         Miscellaneous:
-          -a   [iram-size] Check for internal RAM overflow
-          -v   [xram-size] Check for external RAM overflow
-          -w   [code-size] Check for code overflow
-          -y   Generate memory usage summary file[mem]
+          -I   [iram-size] Check for internal RAM overflow
+          -X   [xram-size] Check for external RAM overflow
+          -C   [code-size] Check for code overflow
+          -M   Generate memory usage summary file[mem]
           -Y   Pack internal ram
-          -A   [stack-size] Allocate space for stack
+          -S   [stack-size] Allocate space for stack
 
 
         link-z80 (Zilog Z80 / Hitachi HD64180) specific options:
@@ -2256,7 +2256,7 @@
         Map format:
           -j   no$gmb symbol file generated as file[SYM]
         Output:
-          -z   Produce SDCdb debug as file[cdb]
+          -y   Produce SDCdb debug as file[cdb]
           -Z   Gameboy image as file[GB]
         List:
           -u   Update listing file(s) with link data as file(s)[.RST]
@@ -2280,14 +2280,14 @@
 
         link-hc08 (Motorola 68HC08) specific options:
         Output:
-          -t   ELF executable as file[elf]
+          -E   ELF executable as file[elf]
           -j    Produce NoICE debug as file[NOI]
-          -z   Produce SDCdb debug as file[cdb]
+          -y   Produce SDCdb debug as file[cdb]
           -u    Update listing file(s) with link data as file(s)[.RST]
         Miscellaneous:
-          -a    [iram-size] Check for internal RAM overflow
-          -v    [xram-size] Check for external RAM overflow
-          -w    [code-size] Check for code overflow
+          -I    [iram-size] Check for internal RAM overflow
+          -X    [xram-size] Check for external RAM overflow
+          -C    [code-size] Check for code overflow
 
 
 
@@ -2446,7 +2446,7 @@
         The object module contains the following designators:
 
                 [XDQ][HL]
-                        X       Hexidecimal radix
+                        X       Hexadecimal radix
                         D       Decimal radix
 
 
@@ -2472,7 +2472,7 @@
 
 
            The  first  line  of  an object module contains the [XDQ][HL]
-        format specifier (i.e.  XH indicates  a  hexidecimal  file  with
+        format specifier (i.e.  XH indicates  a  hexadecimal  file  with
         most significant byte first) for the following designators.
 
 

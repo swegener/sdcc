@@ -536,7 +536,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = stdin;
 			} else
 			if (ftype == F_LNK) {
-				sfp = afile(fid, "lk", 0);
+				sfp = afile(fid, strrchr(fid, FSEPX) ? "" : "lk", 0);
 			} else
 			if (ftype == F_REL) {
 				sfp = afile(fid, "", 0);

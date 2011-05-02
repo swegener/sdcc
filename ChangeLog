@@ -1,3 +1,13 @@
+2011-05-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lklex.c(nxtline): use provided linker script extension
+	  instead of forcing .lnk or .lk
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lkdata.c,
+	* sdas/linksrc/lkmain.c,
+	* sdas/doc/asmlnk.txt,
+	* sdas/doc/asxhtm.html: documented changed flags
+
 2011-04-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/aslink.h,

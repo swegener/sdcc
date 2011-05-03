@@ -562,6 +562,14 @@ resolveSymbols (ast * tree)
           tree->opval.val->sym = csym;
           tree->opval.val->type = csym->type;
           tree->opval.val->etype = csym->etype;
+          if (*csym->rname)
+            {
+              SNPRINTF (tree->opval.val->name, sizeof (tree->opval.val->name), "%s", csym->rname);
+            }
+          else
+            {
+              SNPRINTF (tree->opval.val->name, sizeof (tree->opval.val->name), "_%s", csym->name);
+            }
         }
 
       /* if not found in the symbol table */

@@ -1,3 +1,8 @@
+2011-05-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(resolveSymbols): fixed bug 3188899
+	* support/regression/tests/bug3188899.c: new, added
+
 2011-05-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lklex.c(nxtline): use provided linker script extension

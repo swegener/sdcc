@@ -4192,7 +4192,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
               fprintf (stderr, "comparing type ");
               printTypeChain (LTYPE (tree), stderr);
-              fprintf (stderr, "to type ");
+              fprintf (stderr, " to type ");
               printTypeChain (RTYPE (tree), stderr);
               fprintf (stderr, "\n");
               goto errorTreeReturn;
@@ -4208,7 +4208,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
                 fprintf (stderr, "comparing type ");
                 printTypeChain (LTYPE (tree), stderr);
-                fprintf (stderr, "to type ");
+                fprintf (stderr, " to type ");
                 printTypeChain (RTYPE (tree), stderr);
                 fprintf (stderr, "\n");
                 goto errorTreeReturn;

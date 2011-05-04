@@ -3,6 +3,7 @@
 	* support/regression/ports/gbz80/spec.mk,
 	* support/regression/ports/ucz80/spec.mk,
 	* support/regression/ports/z80/spec.mk: fixed bug 3158245
+	* src/SDCCast.c(decorateType): fixed bug 3297181
 
 2011-05-03 Maarten Brock <sourceforge.brock AT dse.nl>
 

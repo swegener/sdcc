@@ -3,26 +3,29 @@
 EMU = $(SDCC_EXTRA_DIR)/emu/rrgb/rrgb$(EXEEXT)
 MAKEBIN = $(top_builddir)/bin/makebin$(EXEEXT)
 
-SDCCFLAGS +=-mgbz80 --nostdinc --less-pedantic -DREENTRANT= -I$(top_srcdir)
-LINKFLAGS = --nostdlib
-LINKFLAGS += --out-fmt-ihx gbz80.lib
-LIBDIR = $(top_builddir)/device/lib/build/gbz80
+SDCCFLAGS += --nostdinc -I$(top_srcdir)
+LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/gbz80
 
+SDCCFLAGS += -mgbz80 --less-pedantic -DREENTRANT=
+LINKFLAGS += --out-fmt-ihx gbz80.lib
+
+OBJEXT = .rel
 BINEXT = .gb
 
-.PRECIOUS: gen/gbz80/support.rel gen/gbz80/testfwk.rel %.ihx
+# otherwise `make` deletes testfwk.rel and `make -j` will fail
+.PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
 
-# Rule to link into .ihx
-%.ihx: %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
-
-# Rule to concert .ihx to .gb
+# Rule to convert .ihx to .gb
 %$(BINEXT): %.ihx
 	$(MAKEBIN) -Z -yn ABS $< $@
+
+# Rule to link into .ihx
+%.ihx: %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	@# TODO: sdas should place it\'s output in the current dir
@@ -31,6 +34,9 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	rm $(PORT_CASES_DIR)/$(notdir $<)
 
 %$(OBJEXT): %.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c

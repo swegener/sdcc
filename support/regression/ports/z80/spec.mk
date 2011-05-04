@@ -1,14 +1,20 @@
-# Regression test specification for the z80 target running ontop of the Java based
+# Regression test specification for the z80 target running on top of the Java based
 # 'ConsoleZ80' emulator.
 
-RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80$(EXEEXT)
+EMU = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80$(EXEEXT)
+MAKEBIN = $(top_builddir)/bin/makebin$(EXEEXT)
 
-SDCCFLAGS +=-mz80 --nostdinc --less-pedantic --profile -DREENTRANT= -I$(top_srcdir)
-LINKFLAGS = --nostdlib
-LINKFLAGS += z80.lib
-LIBDIR = $(top_builddir)/device/lib/build/z80
+SDCCFLAGS += --nostdinc -I$(top_srcdir)
+LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/z80
 
+SDCCFLAGS += -mz80 --less-pedantic --profile -DREENTRANT=
+LINKFLAGS += --out-fmt-ihx z80.lib
+
+OBJEXT = .rel
 BINEXT = .bin
+
+# otherwise `make` deletes testfwk.rel and `make -j` will fail
+.PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
@@ -16,11 +22,11 @@ FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
 
 # Rule to generate a Emulator .bin file from the .ihx linker output.
 %$(BINEXT): %.ihx
-	$(top_builddir)/bin/makebin -s 32768 < $< > $@
+	$(MAKEBIN) -s 32768 < $< > $@
 
 # Rule to link into .ihx
-%.ihx: %.c $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L$(LIBDIR) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
+%.ihx: %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	@# TODO: sdas should place it\'s output in the current dir
@@ -43,7 +49,7 @@ $(PORT_CASES_DIR)/fwk.lib:
 # PENDING: Path to sdcc-extra
 %.out: %$(BINEXT)
 	mkdir -p $(dir $@)
-	$(RRZ80) --maxruntime=3 --mapfile=$(<:.bin=.sym) $< > $@
+	$(EMU) --maxruntime=3 --mapfile=$(<:.bin=.sym) $< > $@
 	-grep -n FAIL $@ /dev/null || true
 
 _clean:

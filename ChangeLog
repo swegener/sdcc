@@ -1,3 +1,9 @@
+2011-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/gbz80/spec.mk,
+	* support/regression/ports/ucz80/spec.mk,
+	* support/regression/ports/z80/spec.mk: fixed bug 3158245
+
 2011-05-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c(resolveSymbols): fixed bug 3188899

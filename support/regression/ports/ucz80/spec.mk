@@ -25,10 +25,10 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 
   EMU = wine $(UCZ80C)
-  AS_Z80 = wine $(AS_Z80C)
+  AS = wine $(AS_Z80C)
 else
   EMU = $(UCZ80C)
-  AS_Z80 = $(AS_Z80C)
+  AS = $(AS_Z80C)
 endif
 
 SDCCFLAGS += -mz80 --less-pedantic --profile -DREENTRANT=

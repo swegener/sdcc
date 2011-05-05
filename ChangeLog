@@ -1,3 +1,7 @@
+2011-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/ucz80/spec.mk: fixed
+
 2011-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/gbz80/spec.mk,

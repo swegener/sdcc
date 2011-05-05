@@ -4,9 +4,9 @@ CC_FOR_BUILD = $(CC)
 
 # path to uCsim
 ifdef SDCC_BIN_PATH
-  UCZ80 = $(SDCC_BIN_PATH)/sz80$(EXEEXT)
+  UCZ80C = $(SDCC_BIN_PATH)/sz80$(EXEEXT)
 
-  AS_Z80 = $(SDCC_BIN_PATH)/sdasz80$(EXEEXT)
+  AS_Z80C = $(SDCC_BIN_PATH)/sdasz80$(EXEEXT)
 else
   SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80$(EXEEXT)
   SZ80B = $(top_builddir)/bin/sz80$(EXEEXT)
@@ -51,7 +51,7 @@ FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	@# TODO: sdas should place it\'s output in the current dir
 	cp $< $(PORT_CASES_DIR)
-	$(AS_Z80) -plosgff $(PORT_CASES_DIR)/$(notdir $<)
+	$(AS) -plosgff $(PORT_CASES_DIR)/$(notdir $<)
 	rm $(PORT_CASES_DIR)/$(notdir $<)
 
 %$(OBJEXT): %.c

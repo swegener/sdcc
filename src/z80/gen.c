@@ -1629,13 +1629,16 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
       {
         int offset = aop->aopu.aop_stk + _G.stack.offset;
 
+        if (aop->aopu.aop_stk >= 0)
+          offset += _G.stack.param_offset;
+
         if (_G.pairs[pairId].last_type == aop->type && _G.pairs[pairId].offset == offset)
           {
             /* Already setup */
           }
         else
           {
-        struct dbuf_s dbuf;
+            struct dbuf_s dbuf;
 
             /* PENDING: Do this better. */
             if (_G.preserveCarry)
@@ -1821,6 +1824,13 @@ aopGet (asmop * aop, int offset, bool bit16)
             {
               setupPair (PAIR_HL, aop, offset);
               dbuf_tprintf (&dbuf, "!*hl");
+            }
+          else if (_G.omitFramePtr)
+            {
+              if (aop->aopu.aop_stk >= 0)
+                offset += _G.stack.param_offset;
+              setupPair (PAIR_IX, aop, offset);
+              dbuf_tprintf (&dbuf, "!*ixx", offset);
             }
           else
             {
@@ -3192,8 +3202,6 @@ resultRemat (const iCode * ic)
   return 0;
 }
 
-extern set *publics;
-
 /*-----------------------------------------------------------------*/
 /* genFunction - generated code for function entry                 */
 /*-----------------------------------------------------------------*/
@@ -3349,7 +3357,7 @@ genFunction (const iCode * ic)
     }
   sym = OP_SYMBOL (IC_LEFT (ic));
 
-  _G.omitFramePtr = options.omitFramePtr;
+  _G.omitFramePtr = (IS_Z80 && options.omitFramePtr);
   if (IS_Z80 && !stackParm && !sym->stack)
     {
       /* When the conflicts between AOP_EXSTK && AOP_HLREG are fixed, */
@@ -3365,7 +3373,8 @@ genFunction (const iCode * ic)
       if ((optimize.codeSize && sym->stack <= 8) || sym->stack <= 4)
         {
           int stack = sym->stack;
-          emit2 ("!enter");
+          if (!_G.omitFramePtr)
+            emit2 ("!enter");
           while (stack > 1)
             {
               emit2 ("push af");
@@ -3375,11 +3384,21 @@ genFunction (const iCode * ic)
             emit2 ("dec sp");
         }
       else
-        emit2 ("!enterx", sym->stack);
+        {
+          if (_G.omitFramePtr)
+            emit2 ("!ldaspsp", -sym->stack);
+          else
+            emit2 ("!enterx", sym->stack);
+        }
     }
   else
-    emit2 ("!enter");
+    {
+      if (!_G.omitFramePtr)
+        emit2 ("!enter");
+    }
 
+  if (_G.omitFramePtr)
+    _G.stack.param_offset -= 2;
   _G.stack.offset = sym->stack;
 }
 

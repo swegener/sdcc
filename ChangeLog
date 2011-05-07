@@ -1,5 +1,7 @@
 2011-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCerr.c,
+	* src/SDCCerr.h,
 	* src/SDCCsymt.c(checkSClass): removed E_EXTERN_INIT error, see 6.9.2-2
 	* src/SDCCglue.c(emitRegularMap, emitStaticSeg): fixed extern definitions
 	  (printIvalType): use ulFromVal

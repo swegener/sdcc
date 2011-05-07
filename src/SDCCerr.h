@@ -100,7 +100,7 @@
 #define E_INT_ARGS                     72 /* interrupt rtn cannot have args */
 #define E_INCLUDE_MISSING              73 /* compiler include missing */
 #define E_NO_MAIN                      74 /* main function undefined */
-#define E_EXTERN_INIT                  75 /* extern variable initialised */
+#define E_UNUSED_75                    75 /* - removed error code - */
 #define E_PRE_PROC_FAILED              76 /* preprocessor failed */
 #define E_DUP_FAILED                   77 /* file DUP failed     */
 #define E_INCOMPAT_TYPES               78 /* incompatible types casting */

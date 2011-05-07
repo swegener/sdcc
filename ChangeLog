@@ -1,3 +1,28 @@
+2011-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c(checkSClass): removed E_EXTERN_INIT error, see 6.9.2-2
+	* src/SDCCglue.c(emitRegularMap, emitStaticSeg): fixed extern definitions
+	  (printIvalType): use ulFromVal
+	* support/regression/tests/inline.c(inlined_function): added test
+	* support/regression/fwk/lib/extern1.c,
+	* support/regression/fwk/lib/extern2.c: new, added for inline.c test
+	* support/regression/ports/ds390/fwk.lib,
+	* support/regression/ports/gbz80/fwk.lib,
+	* support/regression/ports/hc08/fwk.lib,
+	* support/regression/ports/mcs51-common/fwk.lib,
+	* support/regression/ports/ucz80/fwk.lib,
+	* support/regression/ports/z80/fwk.lib,
+	* support/regression/fwk/lib/fwk.lib,
+	* support/regression/ports/ds390/spec.mk,
+	* support/regression/ports/gbz80/spec.mk,
+	* support/regression/ports/hc08/spec.mk,
+	* support/regression/ports/host/spec.mk.in,
+	* support/regression/ports/mcs51-common/spec.mk,
+	* support/regression/ports/ucz80/spec.mk,
+	* support/regression/ports/z80/spec.mk,
+	* support/regression/fwk/lib/spec.mk: moved non-port-specific test library
+	* support/regression/Makefile.in: cosmetic
+
 2011-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/gen.c(setupPair, aopGet, genFunction): partial fix for

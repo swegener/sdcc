@@ -39,7 +39,7 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
+include fwk/lib/spec.mk
 
 # Rule to link into .ihx
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
@@ -54,8 +54,8 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib:
-	cp $(PORTS_DIR)/$(PORT)/fwk.lib $@
+$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
+	cat < fwk/lib/fwk.lib > $@
 
 # run simulator with 25 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout

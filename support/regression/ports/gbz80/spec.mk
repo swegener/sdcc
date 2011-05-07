@@ -17,7 +17,7 @@ BINEXT = .gb
 
 # Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
+include fwk/lib/spec.mk
 
 # Rule to convert .ihx to .gb
 %$(BINEXT): %.ihx
@@ -42,8 +42,8 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib:
-	cp $(PORTS_DIR)/$(PORT)/fwk.lib $@
+$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
+	cat < fwk/lib/fwk.lib > $@
 
 # PENDING: Path to sdcc-extra
 %.out: %$(BINEXT)

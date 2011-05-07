@@ -139,11 +139,25 @@ bug_1864577 (void)
   ASSERT (PlatformP__LedsInit__init () == SUCCESS);
 }
 
+/*--------------
+    inline definition with external linkage
+    the corresponding external definition is in fwk/lib/externs.c
+*/
+inline char inlined_function (void)
+{
+	return 1;
+}
+
+extern char (*inlined_function_pointer) (void);
+
 /*--------------*/
 
 void
 testInline (void)
 {
+  ASSERT (inlined_function() == 1);
+  ASSERT (inlined_function_pointer() == 2);
+
   bug_1717305 ();
   bug_1767885 ();
   bug_1864577 ();

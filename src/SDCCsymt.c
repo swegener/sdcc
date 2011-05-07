@@ -1727,13 +1727,6 @@ checkSClass (symbol * sym, int isProto)
       SPEC_SCLS (sym->etype) = S_FIXED;
     }
 
-  /* extern variables cannot be initialized */
-  if (IS_EXTERN (sym->etype) && sym->ival)
-    {
-      werror (E_EXTERN_INIT, sym->name);
-      sym->ival = NULL;
-    }
-
   /* if this is an automatic symbol */
   if (sym->level && (options.stackAuto || reentrant))
     {
@@ -2890,7 +2883,7 @@ checkFunction (symbol * sym, symbol * csym)
 }
 
 /*------------------------------------------------------------------*/
-/* cdbStructBlock - calls struct printing for a blcks               */
+/* cdbStructBlock - calls struct printing for a blocks              */
 /*------------------------------------------------------------------*/
 void
 cdbStructBlock (int block)

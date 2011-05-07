@@ -4,9 +4,9 @@ CC_FOR_BUILD = $(CC)
 
 # path to uCsim
 ifdef SDCC_BIN_PATH
-  UCHC08 = $(SDCC_BIN_PATH)/shc08$(EXEEXT)
+  UCHC08C = $(SDCC_BIN_PATH)/shc08$(EXEEXT)
 
-  AS_HC08 = $(SDCC_BIN_PATH)/sdas6808$(EXEEXT)
+  AS_HC08C = $(SDCC_BIN_PATH)/sdas6808$(EXEEXT)
 else
   UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/shc08$(EXEEXT)
   UCHC08B = $(top_builddir)/bin/shc08$(EXEEXT)
@@ -25,10 +25,10 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 
   EMU = wine $(UCHC08C)
-  AS_HC08 = wine $(AS_HC08C)
+  AS = wine $(AS_HC08C)
 else
   EMU = $(UCHC08C)
-  AS_HC08 = $(AS_HC08C)
+  AS = $(AS_HC08C)
 endif
 
 SDCCFLAGS += -mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
@@ -42,14 +42,14 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-FWKLIB = $(PORT_CASES_DIR)/statics$(OBJEXT)
+include fwk/lib/spec.mk
 
 # Rule to link into .ihx
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
 %$(OBJEXT): %.asm
-	$(AS_HC08) -plosgff $<
+	$(AS) -plosgff $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
@@ -60,8 +60,8 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib:
-	cp $(PORTS_DIR)/$(PORT)/fwk.lib $@
+$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
+	cat < fwk/lib/fwk.lib > $@
 
 # run simulator with 10 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout

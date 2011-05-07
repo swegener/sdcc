@@ -15,15 +15,16 @@ INC_DIR = .
 .PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
-EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT) $(PORT_CASES_DIR)/statics$(OBJEXT)
+EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
+include fwk/lib/spec.mk
 
 %.out: %$(BINEXT)
 	mkdir -p $(dir $@)
 	-$< > $@
 	-grep -n FAIL $@ /dev/null || true
 
-%$(BINEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(SDLDFLAGS) -o $@ $< $(EXTRAS) -lm
+%$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB)
+	$(SDCC) $(SDCCFLAGS) $(SDLDFLAGS) -o $@ $< $(EXTRAS) $(FWKLIB) -lm
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

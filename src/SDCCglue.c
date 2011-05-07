@@ -162,13 +162,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     {
       symbol *newSym = NULL;
 
-      /* if extern then add it into the extern list */
-      if (IS_EXTERN (sym->etype))
-        {
-          addSetHead (&externs, sym);
-          continue;
-        }
-
       /* if allocation required check is needed
          then check if the symbol really requires
          allocation only for local variables */
@@ -186,9 +179,19 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          and addPublics allowed then add it to the public set */
       if ((sym->level == 0 ||
            (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
-          addPublics && !IS_STATIC (sym->etype) && (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : 1))
+          addPublics &&
+          !IS_STATIC (sym->etype) &&
+          (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
+          !(IFFUNC_ISINLINE (sym->type) && !IS_STATIC (sym->etype) && !IS_EXTERN (sym->etype)))
         {
           addSetHead (&publics, sym);
+        }
+
+      /* if extern then add it into the extern list */
+      if (IS_EXTERN (sym->etype) && !sym->ival)
+        {
+          addSetHead (&externs, sym);
+          continue;
         }
 
       /* if extern then do nothing or is a function
@@ -323,6 +326,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
             dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
           dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
         }
+
       sym->ival = NULL;
     }
 }
@@ -663,6 +667,7 @@ void
 printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf)
 {
   value *val;
+  unsigned long ulVal = 0;
 
   /* if initList is deep */
   if (ilist && (ilist->type == INIT_DEEP))
@@ -685,6 +690,9 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
       val = valCastLiteral (type, floatFromVal (val));
     }
 
+  if (IS_INTEGRAL (val->type))
+    ulVal = ulFromVal (val);
+
   switch (getSize (type))
     {
     case 1:
@@ -694,14 +702,14 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
         {
           if (IS_UNSIGNED (val->type))
             {
-              dbuf_tprintf (oBuf, "\t!dbs\t; %u", aopLiteral (val, 0), (unsigned int) floatFromVal (val));
+              dbuf_tprintf (oBuf, "\t!dbs\t; %u", aopLiteral (val, 0), (unsigned int) ulVal);
             }
           else
             {
-              dbuf_tprintf (oBuf, "\t!dbs\t; % d", aopLiteral (val, 0), (int) floatFromVal (val));
+              dbuf_tprintf (oBuf, "\t!dbs\t; % d", aopLiteral (val, 0), (int) ulVal);
             }
-          if (isalpha ((char) floatFromVal (val)))
-            dbuf_tprintf (oBuf, "\t%c\n", (char) floatFromVal (val));
+          if (isalnum ((int) ulVal))
+            dbuf_tprintf (oBuf, "\t'%c'\n", (int) ulVal);
           else
             dbuf_tprintf (oBuf, "\n");
         }
@@ -709,17 +717,24 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 
     case 2:
       if (port->use_dw_for_init)
-        dbuf_tprintf (oBuf, "\t!dws\n", aopLiteralLong (val, 0, 2));
+        {
+          dbuf_tprintf (oBuf, "\t!dws\n", aopLiteralLong (val, 0, 2));
+          break;
+        }
       else if (port->little_endian)
         {
-          if (IS_UNSIGNED (val->type))
-            dbuf_printf (oBuf, "\t.byte %s,%s\t; %u\n",
-                         aopLiteral (val, 0), aopLiteral (val, 1), (unsigned int) floatFromVal (val));
-          else
-            dbuf_printf (oBuf, "\t.byte %s,%s\t; % d\n", aopLiteral (val, 0), aopLiteral (val, 1), (int) floatFromVal (val));
+          dbuf_printf (oBuf, "\t.byte %s,%s",
+                       aopLiteral (val, 0), aopLiteral (val, 1));
         }
       else
-        dbuf_printf (oBuf, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
+        {
+          dbuf_printf (oBuf, "\t.byte %s,%s",
+                       aopLiteral (val, 1), aopLiteral (val, 0));
+        }
+      if (IS_UNSIGNED (val->type))
+        dbuf_printf (oBuf, "\t; %u\n", (unsigned int) ulVal);
+      else
+        dbuf_printf (oBuf, "\t; % d\n", (int) ulVal);
       break;
 
     case 4:
@@ -747,9 +762,9 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
           else
             {
               if (IS_UNSIGNED (val->type))
-                dbuf_printf (oBuf, "\t; %u\n", (unsigned int) floatFromVal (val));
+                dbuf_printf (oBuf, "\t; %u\n", (unsigned int) ulVal);
               else
-                dbuf_printf (oBuf, "\t; % d\n", (int) floatFromVal (val));
+                dbuf_printf (oBuf, "\t; % d\n", (int) ulVal);
             }
         }
       break;
@@ -1393,7 +1408,7 @@ emitStaticSeg (memmap * map, struct dbuf_s *oBuf)
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
     {
       /* if it is "extern" then do nothing */
-      if (IS_EXTERN (sym->etype))
+      if (IS_EXTERN (sym->etype) && !sym->ival)
         continue;
 
       /* if it is not static add it to the public table */

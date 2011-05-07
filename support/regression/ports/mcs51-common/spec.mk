@@ -34,12 +34,13 @@ LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 OBJEXT = .rel
 BINEXT = .ihx
 
-# otherwise `make` deletes testfwk.o and `make -j` will fail
+# otherwise `make` deletes testfwk.rel and `make -j` will fail
 .PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-FWKLIB = $(PORT_CASES_DIR)/T2_isr$(OBJEXT) $(PORT_CASES_DIR)/statics$(OBJEXT)
+include fwk/lib/spec.mk
+FWKLIB += $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
 
 # Rule to link into .ihx
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
@@ -54,8 +55,9 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51-common/%.c
 $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib:
-	cp $(PORTS_DIR)/mcs51-common/fwk.lib $@
+$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
+	cat < fwk/lib/fwk.lib > $@
+	cat < $(PORTS_DIR)/mcs51-common/fwk.lib >> $@
 
 # run simulator with 30 seconds timeout
 %.out: %$(BINEXT) gen/timeout

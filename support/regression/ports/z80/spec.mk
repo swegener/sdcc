@@ -18,7 +18,7 @@ BINEXT = .bin
 
 # Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-include fwk/lib/spec.mk
+include $(srcdir)/fwk/lib/spec.mk
 
 # Rule to generate a Emulator .bin file from the .ihx linker output.
 %$(BINEXT): %.ihx

@@ -1,3 +1,13 @@
+2011-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/ds390/spec.mk,
+	* support/regression/ports/gbz80/spec.mk,
+	* support/regression/ports/hc08/spec.mk,
+	* support/regression/ports/host/spec.mk.in,
+	* support/regression/ports/mcs51-common/spec.mk,
+	* support/regression/ports/ucz80/spec.mk,
+	* support/regression/ports/z80/spec.mk: hopefully fixed include path spec.mk
+
 2011-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCerr.c,

@@ -29,7 +29,8 @@ else
 endif
 
 SDCCFLAGS += -mds390 --less-pedantic -DREENTRANT=__reentrant -Wl-r
-LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
+LINKFLAGS += libsdcc.lib liblong.lib libint.lib libfloat.lib
+LINKFLAGS += libds390.lib
 
 OBJEXT = .rel
 BINEXT = .ihx
@@ -39,7 +40,7 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-include fwk/lib/spec.mk
+include $(srcdir)/fwk/lib/spec.mk
 
 # Rule to link into .ihx
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib

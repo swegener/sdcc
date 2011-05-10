@@ -32,6 +32,7 @@ else
 endif
 
 SDCCFLAGS += -mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
+LINKFLAGS += libsdcc.lib liblong.lib libint.lib libfloat.lib
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel
@@ -42,7 +43,7 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-include fwk/lib/spec.mk
+include $(srcdir)/fwk/lib/spec.mk
 
 # Rule to link into .ihx
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib

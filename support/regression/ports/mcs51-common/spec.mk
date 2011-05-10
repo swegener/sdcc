@@ -21,11 +21,11 @@ ifdef CROSSCOMPILING
   DEV_NULL ?= NUL
   SDCCFLAGS += -I$(top_srcdir)
 
-  S51 = wine $(S51C)
+  EMU = wine $(S51C)
 else
   DEV_NULL ?= /dev/null
 
-  S51 = $(S51C)
+  EMU = $(S51C)
 endif
 
 SDCCFLAGS += --less-pedantic -DREENTRANT=__reentrant
@@ -39,7 +39,7 @@ BINEXT = .ihx
 
 # Required extras
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
-include fwk/lib/spec.mk
+include $(srcdir)/fwk/lib/spec.mk
 FWKLIB += $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
 
 # Rule to link into .ihx
@@ -60,14 +60,14 @@ $(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
 	cat < $(PORTS_DIR)/mcs51-common/fwk.lib >> $@
 
 # run simulator with 30 seconds timeout
-%.out: %$(BINEXT) gen/timeout
+%.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-gen/timeout 30 $(S51) -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51-common/uCsim.cmd > $(@:.out=.sim) \
+	-$(CASES_DIR)/timeout 30 $(EMU) -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51-common/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-gen/timeout: $(srcdir)/fwk/lib/timeout.c
+$(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c
 	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

@@ -1,3 +1,9 @@
+2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCbitv.h,
+	  src/SDCCbitv.c:
+	  Use const in bitvector functions in some places, where appropriate.
+
 2011-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/ds390/spec.mk,

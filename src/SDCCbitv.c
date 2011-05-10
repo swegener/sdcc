@@ -114,7 +114,7 @@ bitVectSetBit (bitVect * bvp, int pos)
 /* bitVectUnSetBit - unsets the value of a bit in a bitvector      */
 /*-----------------------------------------------------------------*/
 void 
-bitVectUnSetBit (bitVect * bvp, int pos)
+bitVectUnSetBit (const bitVect *bvp, int pos)
 {
   int byteSize;
   int offset;
@@ -135,7 +135,7 @@ bitVectUnSetBit (bitVect * bvp, int pos)
 /* bitVectBitValue - returns value value at bit position           */
 /*-----------------------------------------------------------------*/
 int 
-bitVectBitValue (bitVect * bvp, int pos)
+bitVectBitValue (const bitVect *bvp, int pos)
 {
   int byteSize;
   int offset;

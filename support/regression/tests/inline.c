@@ -141,13 +141,15 @@ bug_1864577 (void)
 
 /*--------------
     inline definition with external linkage
-    the corresponding external definition is in fwk/lib/externs.c
+    the corresponding external definition is in fwk/lib/extern1.c
 */
 inline char inlined_function (void)
 {
 	return 1;
 }
 
+/*  function pointer defined in fwk/lib/extern2.c initialized to the 
+    externally defined inlined_function */
 extern char (*inlined_function_pointer) (void);
 
 /*--------------*/
@@ -155,8 +157,9 @@ extern char (*inlined_function_pointer) (void);
 void
 testInline (void)
 {
-  ASSERT (inlined_function() == 1);
-  ASSERT (inlined_function_pointer() == 2);
+  char x = inlined_function(); /* can use the inlined or the external implementation */
+  ASSERT (x == 1 || x == 2);
+  ASSERT (inlined_function_pointer() == 2); /* must use the external one */
 
   bug_1717305 ();
   bug_1767885 ();

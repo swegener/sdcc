@@ -7,6 +7,7 @@
 	* support/regression/ports/mcs51-common/spec.mk,
 	* support/regression/ports/ucz80/spec.mk,
 	* support/regression/ports/z80/spec.mk: second try to fix include path spec.mk
+	* support/regression/tests/inline.c(inlined_function): fixed for host
 
 2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

@@ -58,11 +58,11 @@ include $(srcdir)/fwk/lib/spec.mk
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
+$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
-	cat < fwk/lib/fwk.lib > $@
+$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
+	cat < $(srcdir)/fwk/lib/fwk.lib > $@
 
 # run simulator with 10 seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout

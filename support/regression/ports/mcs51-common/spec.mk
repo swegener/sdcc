@@ -52,11 +52,11 @@ FWKLIB += $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51-common/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
+$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
-	cat < fwk/lib/fwk.lib > $@
+$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib $(PORTS_DIR)/mcs51-common/fwk.lib
+	cat < $(srcdir)/fwk/lib/fwk.lib > $@
 	cat < $(PORTS_DIR)/mcs51-common/fwk.lib >> $@
 
 # run simulator with 30 seconds timeout

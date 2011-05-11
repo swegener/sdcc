@@ -32,7 +32,7 @@ include $(srcdir)/fwk/lib/spec.mk
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
+$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 _clean:

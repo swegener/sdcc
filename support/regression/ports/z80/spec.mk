@@ -40,11 +40,11 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
+$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORT_CASES_DIR)/fwk.lib: fwk/lib/fwk.lib
-	cat < fwk/lib/fwk.lib > $@
+$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
+	cat < $(srcdir)/fwk/lib/fwk.lib > $@
 
 # PENDING: Path to sdcc-extra
 %.out: %$(BINEXT)

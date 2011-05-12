@@ -1,3 +1,8 @@
+2011-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/doc/asmlnk.txt,
+	* sdas/doc/asxhtm.html: added -w flag
+
 2011-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/ds390/spec.mk,

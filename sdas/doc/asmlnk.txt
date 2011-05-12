@@ -2190,6 +2190,8 @@
                  dresses,  sizes  of  linked  areas,  and  other linking
                  information.
 
+             2.a -w      Wide listing format for map file.
+
              3.  -u      Generate  an  updated  listing  file (file.rst)
                  derived from the relocated addresses and data from  the
                  linker
@@ -2281,13 +2283,13 @@
         link-hc08 (Motorola 68HC08) specific options:
         Output:
           -E   ELF executable as file[elf]
-          -j    Produce NoICE debug as file[NOI]
+          -j   Produce NoICE debug as file[NOI]
           -y   Produce SDCdb debug as file[cdb]
-          -u    Update listing file(s) with link data as file(s)[.RST]
+          -u   Update listing file(s) with link data as file(s)[.RST]
         Miscellaneous:
-          -I    [iram-size] Check for internal RAM overflow
-          -X    [xram-size] Check for external RAM overflow
-          -C    [code-size] Check for code overflow
+          -I   [iram-size] Check for internal RAM overflow
+          -X   [xram-size] Check for external RAM overflow
+          -C   [code-size] Check for code overflow
 
 
 

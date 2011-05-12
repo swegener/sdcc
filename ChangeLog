@@ -2,6 +2,8 @@
 
 	* sdas/doc/asmlnk.txt,
 	* sdas/doc/asxhtm.html: added -w flag
+	* sdas/linksrc/lklist.c(slew),
+	* sdas/linksrc/lkmain.c(usetxt*): fixed 3299364
 
 2011-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
 

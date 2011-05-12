@@ -165,13 +165,13 @@ slew(struct area *xp)
 		fprintf(mfp, "\n");
 		if (wflag) {
 			fprintf(mfp,
-				"Area                               ");
+				"Area                                    Addr");
 			fprintf(mfp,
-				"Addr   Size   Decimal Bytes (Attributes)\n");
+				"        Size        Decimal Bytes (Attributes)\n");
 			fprintf(mfp,
-				"--------------------------------   ");
+				"--------------------------------        ----");
 			fprintf(mfp,
-				"----   ----   ------- ----- ------------\n");
+				"        ----        ------- ----- ------------\n");
 		} else {
 			fprintf(mfp,
 				"Area                       Addr   ");
@@ -204,7 +204,7 @@ slew(struct area *xp)
 			case 0: frmta = "        %04lX        %04lX"; break;
 			case 1: frmta = "      %06lo      %06lo"; break;
 			case 2: frmta = "       %05lu       %05lu"; break;
-		}
+			}
 			frmtb = " =      %6lu. bytes "; break;
 		case 3:
 			switch(xflag) {

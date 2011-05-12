@@ -33,7 +33,7 @@
 # Each source suite is processesd producing multiple device specific test suites.
 # Each device specific test suite is compiled.
 # Each device specific test suite is run, and the output recorded.
-# The output from each device specific test suite derrived from a source
+# The output from each device specific test suite derived from a source
 # test suite are collated.
 
 # Uncomment this to show only errors and the summary.
@@ -194,7 +194,7 @@ endif
 # disk space is free.
 .PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT)
 
-# Rule to generate the iterations of a test suite off the soure suite.
+# Rule to generate the iterations of a test suite off the source suite.
 $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	rm -rf $(dir $@)
 	mkdir -p $(dir $@)
@@ -207,7 +207,7 @@ $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
 	python $(srcdir)/compact-results.py < $@
 
-# Rule to summaries the results for one port after all of the tests
+# Rule to summarise the results for one port after all of the tests
 # have been run.
 port-results: port-dirs $(PORT_RESULTS)
 	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | python $(srcdir)/collate-results.py`
@@ -250,7 +250,7 @@ $(RESULTS): $(SUB_RESULTS)
 
 clean:
 	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
-	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i; done
+	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); done
 
 distclean: clean
 	rm -f Makefile

@@ -4,6 +4,7 @@
 	* sdas/doc/asxhtm.html: added -w flag
 	* sdas/linksrc/lklist.c(slew),
 	* sdas/linksrc/lkmain.c(usetxt*): fixed 3299364
+	* support/regression/Makefile.in: and a third try to fix include path spec.mk
 
 2011-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
 

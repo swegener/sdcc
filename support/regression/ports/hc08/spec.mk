@@ -32,7 +32,6 @@ else
 endif
 
 SDCCFLAGS += -mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
-LINKFLAGS += libsdcc.lib liblong.lib libint.lib libfloat.lib
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel

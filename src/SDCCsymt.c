@@ -2973,6 +2973,11 @@ processFuncArgs (symbol * func)
       checkTypeSanity (val->etype, dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
 
+      if (IS_AGGREGATE (val->type))
+        {
+          aggregateToPointer (val);
+        }
+
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */
@@ -2980,15 +2985,18 @@ processFuncArgs (symbol * func)
         {
           SPEC_REGPARM (val->etype) = 1;
           SPEC_ARGREG (val->etype) = argreg;
+
+          /* is there is a symbol associated then */
+          /* change the type of the symbol as well */
+          if (val->sym)
+            {
+              SPEC_REGPARM (val->sym->etype) = 1;
+              SPEC_ARGREG (val->sym->etype) = argreg;
+            }
         }
       else if (IFFUNC_ISREENT (funcType))
         {
           FUNC_HASSTACKPARM (funcType) = 1;
-        }
-
-      if (IS_AGGREGATE (val->type))
-        {
-          aggregateToPointer (val);
         }
 
       val = val->next;

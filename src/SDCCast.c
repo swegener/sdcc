@@ -4295,7 +4295,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               /* the overlapping value range of a '(un)signed char' is 0...127;
                  if 0 <= the actual value < 128 it can be changed to (un)signed */
               if (val >= 0 && val < 128)
-            {
+                {
                   /* now we've got 2 '(un)signed char'! */
                   SPEC_USIGN (RETYPE (tree)) = SPEC_USIGN (LETYPE (tree));
                 }

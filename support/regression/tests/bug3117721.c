@@ -18,3 +18,8 @@ char GenerateBug(unsigned char iKey)
 	}
 	return 0;
 }
+
+void testBug(void)
+{
+	ASSERT(1);
+}

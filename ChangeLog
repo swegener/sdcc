@@ -2,6 +2,8 @@
 
 	* support/regression/fwk/lib/extern1.c,
 	* support/regression/fwk/lib/extern2.c: removed inline for NetBSD builds
+	* src/SDCCast.c(decorateType): fixed bug 3117721
+	* support/regression/tests/bug3117721.c: new, added
 
 2011-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

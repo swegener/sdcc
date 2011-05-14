@@ -4285,23 +4285,29 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* it's necessary to promote to int */
       if (IS_CHAR (RTYPE (tree)) && IS_CHAR (LTYPE (tree)) && (IS_UNSIGNED (RTYPE (tree)) != IS_UNSIGNED (LTYPE (tree))))
         {
-          /* Literals are 'optimized' to 'unsigned char'. Try to figure out,
-             if it's possible to use a 'signed char' */
+          /* Small literal integers are 'optimized' to 'unsigned char' but chars in single quotes are 'char'.
+             Try to figure out, if it's possible to do without a cast to integer */
 
-          /* is left a 'unsigned char'? */
-          if (IS_LITERAL (RTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)) &&
-              /* the value range of a 'unsigned char' is 0...255;
-                 if the actual value is < 128 it can be changed to signed */
-              (int) ulFromVal (valFromType (RETYPE (tree))) < 128)
+          /* is right a small literal char? */
+          if (IS_LITERAL (RTYPE (tree)))
             {
-              /* now we've got 2 'signed char'! */
-              SPEC_USIGN (RETYPE (tree)) = 0;
+              int val = (int) ulFromVal (valFromType (RETYPE (tree)));
+              /* the overlapping value range of a '(un)signed char' is 0...127;
+                 if 0 <= the actual value < 128 it can be changed to (un)signed */
+              if (val >= 0 && val < 128)
+            {
+                  /* now we've got 2 '(un)signed char'! */
+                  SPEC_USIGN (RETYPE (tree)) = SPEC_USIGN (LETYPE (tree));
+                }
             }
           /* same test for the left operand: */
-          else if (IS_LITERAL (LTYPE (tree)) && IS_UNSIGNED (LTYPE (tree)) &&
-                   (int) ulFromVal (valFromType (LETYPE (tree))) < 128)
+          else if (IS_LITERAL (LTYPE (tree)))
             {
-              SPEC_USIGN (LETYPE (tree)) = 0;
+              int val = (int) ulFromVal (valFromType (LETYPE (tree)));
+              if (val >= 0 && val < 128)
+                {
+                  SPEC_USIGN (LETYPE (tree)) = SPEC_USIGN (RETYPE (tree));
+                }
             }
           else
             {

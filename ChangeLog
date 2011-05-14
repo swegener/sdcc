@@ -1,3 +1,8 @@
+2011-05-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/fwk/lib/extern1.c,
+	* support/regression/fwk/lib/extern2.c: removed inline for NetBSD builds
+
 2011-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/doc/asmlnk.txt,

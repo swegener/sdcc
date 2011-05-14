@@ -4,7 +4,7 @@
 #pragma std_sdcc99
 #endif
 
-extern inline char inlined_function (void)
+extern char inlined_function (void)
 {
 	return 2;
 }

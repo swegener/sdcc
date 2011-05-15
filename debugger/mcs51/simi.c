@@ -39,9 +39,6 @@
 # else
 #   error "Cannot build debugger without socket support"
 # endif
-# ifdef __sun
-#   include <sys/file.h>
-# endif
 #endif
 #include <fcntl.h>
 #include <signal.h>
@@ -382,7 +379,7 @@ void openSimulator (char **args, int nargs)
     }
 
   iMode = 1; /* set non-blocking mode */
-  iResult = fcntl(sock, F_SETFL, FNONBLOCK | FASYNC);
+  iResult = fcntl(sock, F_SETFL, O_NONBLOCK | O_ASYNC);
   if (iResult != 0)
     {
       perror("ioctl failed");

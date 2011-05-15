@@ -1,3 +1,7 @@
+2011-05-15 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/simi.c: replace FNONBLOCK and FASYNC with O_NONBLOCK and O_ASYNC
+
 2011-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/rtrack.c: fixed bug 3302328
@@ -151,7 +155,7 @@
 
 2011-04-20 Borut Razem <borut.razem AT gmail.com>
 
-	* debugger/mcs51/simi.c: fixed compiletion on Solaris
+	* debugger/mcs51/simi.c: fixed compilation on Solaris
 
 2011-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
 

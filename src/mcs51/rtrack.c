@@ -62,7 +62,7 @@ static int enableextraverbose = -1;
 static unsigned int rx_num_to_idx (const unsigned int num)
 {
   const unsigned int regidx[8] =
-    { R2_IDX, R3_IDX, R4_IDX, R5_IDX, R6_IDX, R7_IDX, R0_IDX, R1_IDX };
+    { R7_IDX, R6_IDX, R5_IDX, R4_IDX, R3_IDX, R2_IDX, R1_IDX, R0_IDX };
 
   assert( 7 >= num );
 
@@ -72,7 +72,7 @@ static unsigned int rx_num_to_idx (const unsigned int num)
 
 static void rtrack_data_unset (const unsigned int idx)
 {
-  assert (idx >= R2_IDX);
+  assert (idx >= 0);
   assert (idx < END_IDX);
 
   if (regs8051[idx].rtrack.symbol || regs8051[idx].rtrack.valueKnown)
@@ -91,7 +91,7 @@ static void rtrack_data_unset (const unsigned int idx)
 
 static void rtrack_data_set_val (const unsigned int idx, const unsigned char value)
 {
-  assert (idx >= R2_IDX);
+  assert (idx >= 0);
   assert (idx < END_IDX);
 
   regs8051[idx].rtrack.value = value;
@@ -112,7 +112,7 @@ static void rtrack_data_set_val (const unsigned int idx, const unsigned char val
 
 static void rtrack_data_set_symbol (const unsigned int idx, const char * const symbol)
 {
-  assert (idx >= R2_IDX);
+  assert (idx >= 0);
   assert (idx < END_IDX);
 
   /* in case it was set by value, unset value */
@@ -143,9 +143,9 @@ static int rtrack_data_is_same (const unsigned int idxdst, const unsigned int id
 
 static void rtrack_data_copy_dst_src (const unsigned int idxdst, const unsigned int idxsrc)
 {
-  assert (idxdst >= R2_IDX);
+  assert (idxdst >= 0);
   assert (idxdst < END_IDX);
-  assert (idxsrc >= R2_IDX);
+  assert (idxsrc >= 0);
   assert (idxsrc < END_IDX);
 
   DD

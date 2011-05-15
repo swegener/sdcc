@@ -33,7 +33,7 @@ include $(top_builddir)/Makefile.common
 
 $(LIB): $(OBJ)
 	rm -f $(LIB)
-	$(AR) r $(LIB) $(OBJ)
+	$(AR) rc $(LIB) $(OBJ)
 	$(RANLIB) $(LIB)
 
 %.rul: %.def

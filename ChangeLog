@@ -1,3 +1,8 @@
+2011-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/rtrack.c: fixed bug 3302328
+	* src/port.mk: made ar quiet
+
 2011-05-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/fwk/lib/extern1.c,

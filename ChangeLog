@@ -1,3 +1,7 @@
+2011-05-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/inline.c: disabled failing test for NetBSD
+
 2011-05-15 Borut Razem <borut.razem AT gmail.com>
 
 	* debugger/mcs51/simi.c: replace FNONBLOCK and FASYNC with O_NONBLOCK and O_ASYNC

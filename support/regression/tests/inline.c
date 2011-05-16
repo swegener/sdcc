@@ -139,6 +139,14 @@ bug_1864577 (void)
   ASSERT (PlatformP__LedsInit__init () == SUCCESS);
 }
 
+#if defined(__NetBSD__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL__ == 3)
+/* inline definition seems to be broken on NetBSD GCC 4.1.3
+   it gets external linkage where it should not */
+#define SKIP_EXTERNAL
+#warning inline definition skipped
+#endif
+
+#ifndef SKIP_EXTERNAL
 /*--------------
     inline definition with external linkage
     the corresponding external definition is in fwk/lib/extern1.c
@@ -148,19 +156,21 @@ inline char inlined_function (void)
 	return 1;
 }
 
-/*  function pointer defined in fwk/lib/extern2.c initialized to the 
+/*  function pointer defined in fwk/lib/extern2.c initialized to the
     externally defined inlined_function */
 extern char (*inlined_function_pointer) (void);
+#endif
 
 /*--------------*/
 
 void
 testInline (void)
 {
+#ifndef SKIP_EXTERNAL
   char x = inlined_function(); /* can use the inlined or the external implementation */
   ASSERT (x == 1 || x == 2);
   ASSERT (inlined_function_pointer() == 2); /* must use the external one */
-
+#endif
   bug_1717305 ();
   bug_1767885 ();
   bug_1864577 ();

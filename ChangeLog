@@ -1,3 +1,9 @@
+2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug3303325.c:
+	  Fixed bug #3303325.
+
 2011-05-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/inline.c: disabled failing test for NetBSD

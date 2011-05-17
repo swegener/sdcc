@@ -7712,10 +7712,10 @@ genAssign (iCode * ic)
           /* PENDING: do this check better */
           if ((IS_GB || IY_RESERVED) && requiresHL (AOP (right)) && requiresHL (AOP (result)))
             {
-              emit2 ("push hl");
+              _push (PAIR_HL);
               _moveA (aopGet (AOP (right), offset, FALSE));
               aopPut (AOP (result), "a", offset);
-              emit2 ("pop hl");
+              _pop (PAIR_HL);
               spillPair (PAIR_HL);
             }
           else
@@ -7740,7 +7740,7 @@ genJumpTab (const iCode * ic)
   aopOp (IC_JTCOND (ic), ic, FALSE, FALSE);
   /* get the condition into accumulator */
   if (!IS_GB)
-    emit2 ("push de");
+    _push (PAIR_DE);
   emit2 ("ld e,%s", aopGet (AOP (IC_JTCOND (ic)), 0, FALSE));
   emit2 ("ld d,!zero");
   jtab = newiTempLabel (NULL);
@@ -7751,7 +7751,7 @@ genJumpTab (const iCode * ic)
   emit2 ("add hl,de");
   freeAsmop (IC_JTCOND (ic), NULL, ic);
   if (!IS_GB)
-    emit2 ("pop de");
+    _pop (PAIR_DE);
   emit2 ("jp !*hl");
   emitLabel (jtab->key + 100);
   /* now generate the jump labels */

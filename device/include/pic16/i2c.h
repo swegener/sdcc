@@ -66,10 +66,10 @@
 /* generate restart condition */
 #define I2C_RESTART()	SSPCON2bits.RSEN=1
 
-/* generate not acknoledge condition */
+/* generate not acknowledge condition */
 #define I2C_NACK()	SSPCON2bits.ACKDT=1; SSPCON2bits.ACKEN=1
 
-/* generate acknoledge condition */
+/* generate acknowledge condition */
 #define I2C_ACK()	SSPCON2bits.ACKDT=0; SSPCON2bits.ACKEN=1
 
 /* wait until I2C is idle */
@@ -90,10 +90,10 @@ void i2c_start(void);
 /* restart */
 void i2c_restart(void);
 
-/* not acknoledge */
+/* not acknowledge */
 void i2c_nack(void);
 
-/* acknoledge */
+/* acknowledge */
 void i2c_ack(void);
 
 /* wait until I2C goes idle */

@@ -1,3 +1,9 @@
+2011-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c(genPlusIncr, genMinusDec): fixed bug 3304184
+	* src/SDCCutil.c: fixed warnings
+	* support/regression/tests/bug3304184.c: new, added
+
 2011-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/pic16/i2c.h: applied patch 3303565

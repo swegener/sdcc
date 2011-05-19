@@ -4279,26 +4279,9 @@ genPlusIncr (iCode * ic)
       !isOperandVolatile (IC_RESULT (ic), FALSE) && (size > 1) && (icount == 1))
     {
       symbol *tlbl;
-      int emitTlbl;
-      int labelRange;
       const char *l;
 
-      /* If the next instruction is a goto and the goto target
-       * is < 10 instructions previous to this, we can generate
-       * jumps straight to that target.
-       */
-      if (ic->next && ic->next->op == GOTO
-          && (labelRange = findLabelBackwards (ic, IC_LABEL (ic->next)->key)) != 0 && labelRange <= 10)
-        {
-          D (emitcode (";", "tail increment optimized (range %d)", labelRange));
-          tlbl = IC_LABEL (ic->next);
-          emitTlbl = 0;
-        }
-      else
-        {
-          tlbl = newiTempLabel (NULL);
-          emitTlbl = 1;
-        }
+      tlbl = newiTempLabel (NULL);
       l = aopGet (IC_RESULT (ic), LSB, FALSE, FALSE);
       emitcode ("inc", "%s", l);
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG || IS_AOP_PREG (IC_RESULT (ic)))
@@ -4348,11 +4331,7 @@ genPlusIncr (iCode * ic)
 
           emitcode ("inc", "%s", aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE));
         }
-
-      if (emitTlbl)
-        {
-          emitLabel (tlbl);
-        }
+      emitLabel (tlbl);
       return TRUE;
     }
 
@@ -4737,27 +4716,9 @@ genMinusDec (iCode * ic)
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && (size > 1) && (icount == 1))
     {
       symbol *tlbl;
-      int emitTlbl;
-      int labelRange;
       const char *l;
 
-      /* If the next instruction is a goto and the goto target
-       * is <= 10 instructions previous to this, we can generate
-       * jumps straight to that target.
-       */
-      if (ic->next && ic->next->op == GOTO
-          && (labelRange = findLabelBackwards (ic, IC_LABEL (ic->next)->key)) != 0 && labelRange <= 10)
-        {
-          D (emitcode (";", "tail decrement optimized (range %d)", labelRange));
-          tlbl = IC_LABEL (ic->next);
-          emitTlbl = 0;
-        }
-      else
-        {
-          tlbl = newiTempLabel (NULL);
-          emitTlbl = 1;
-        }
-
+      tlbl = newiTempLabel (NULL);
       l = aopGet (IC_RESULT (ic), LSB, FALSE, FALSE);
       emitcode ("dec", "%s", l);
 
@@ -4805,10 +4766,7 @@ genMinusDec (iCode * ic)
             }
           emitcode ("dec", "%s", aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE));
         }
-      if (emitTlbl)
-        {
-          emitLabel (tlbl);
-        }
+      emitLabel (tlbl);
       return TRUE;
     }
 

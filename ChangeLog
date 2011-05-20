@@ -2,6 +2,7 @@
 
 	* debugger/mcs51/simi.c:
 	  reverted to ioctl(sock, FIONBIO, &iMode) instead F_SETFL, O_NONBLOCK | O_ASYNC) on Solaris
+	* src/SDCCutil.c, src/SDCCsystem.c: fixed warnings on Solaris
 
 2011-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

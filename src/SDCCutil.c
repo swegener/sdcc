@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #include <math.h>
+#include <string.h>
 #include <ctype.h>
 
 #ifdef _WIN32

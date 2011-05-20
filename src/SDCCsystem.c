@@ -32,6 +32,7 @@
 #else
 #include <unistd.h>
 #endif
+#include <string.h>
 #include <ctype.h>
 #include "SDCCglobl.h"
 #include "SDCCutil.h"

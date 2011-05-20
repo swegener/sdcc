@@ -1,3 +1,8 @@
+2011-05-20 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/simi.c:
+	  reverted to ioctl(sock, FIONBIO, &iMode) instead F_SETFL, O_NONBLOCK | O_ASYNC) on Solaris
+
 2011-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c(genPlusIncr, genMinusDec): fixed bug 3304184

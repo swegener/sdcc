@@ -211,9 +211,9 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;
     int retry = 0;
     int i;
-    u_long iMode;
     int iResult;
     int fh;
+    u_long iMode;
 
   init_winsock();
 
@@ -329,8 +329,11 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;
     int retry = 0;
     int i;
-    u_long iMode;
     int iResult;
+#ifdef __sun
+    u_long iMode;
+#endif
+
     Dprintf(D_simi, ("simi: openSimulator\n"));
 #ifdef SDCDB_DEBUG
   if (D_simi & sdcdbDebug)
@@ -378,8 +381,12 @@ void openSimulator (char **args, int nargs)
       exit(1);
     }
 
+#if __sun
   iMode = 1; /* set non-blocking mode */
+  iResult = ioctl(sock, FIONBIO, &iMode);
+#else
   iResult = fcntl(sock, F_SETFL, O_NONBLOCK | O_ASYNC);
+#endif
   if (iResult != 0)
     {
       perror("ioctl failed");

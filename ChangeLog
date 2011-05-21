@@ -9,6 +9,7 @@
 	* src/SDCCmem.c(printAllocInfoSeg): print stack base
 	* support/regression/fwk/lib/spec.mk: cosmetic
 	* support/regression/tests/interrupt.c: new, added
+	* .version: bumped to 3.0.3
 
 2011-05-20 Borut Razem <borut.razem AT gmail.com>
 

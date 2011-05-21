@@ -1,9 +1,13 @@
+2011-05-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/simi.c: added #include <sys/file.h> for Solaris
+
 2011-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/abs.c: optimized
 	* src/mcs51/gen.c: replaced strcmp with EQ,
 	  implemented --fomit-frame-pointer (except for --xstack),
-	  added freeForBranchAsmops & swapOperands	
+	  added freeForBranchAsmops & swapOperands
 	* src/mcs51/main.c(_mcs51_finaliseOptions): --fomit-frame-pointer
 	* src/mcs51/peep.c(scan4op): detect sp manipulations
 	* src/SDCCmem.c(printAllocInfoSeg): print stack base

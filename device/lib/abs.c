@@ -41,13 +41,9 @@ static void dummy(void) __naked
 _abs:
 	mov	a, dph
 	jnb	acc.7, 00001$
-	clr	c
-	clr	a
-	subb	a,dpl
-	mov	dpl,a
-	clr	a
-	subb	a,dph
-	mov	dph,a
+	xrl	dpl,#0xFF
+	xrl	dph,#0xFF
+	inc	dptr
 00001$:
 	_RETURN
 	__endasm;

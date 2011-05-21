@@ -168,6 +168,9 @@ _mcs51_finaliseOptions (void)
   if (!options.useXstack)
     options.float_rent = 1;
 
+  if (options.omitFramePtr)
+    port->stack.reent_overhead = 0;
+
   /* set up external stack location if not explicitly specified */
   if (!options.xstack_loc)
     options.xstack_loc = options.xdata_loc;

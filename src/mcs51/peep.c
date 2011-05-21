@@ -293,6 +293,9 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
   bool isConditionalJump;
   int rIdx;
   S4O_RET ret;
+  bool findPushPop;
+
+  findPushPop = untilOp && (strcmp (untilOp, "push") == 0 || strcmp (untilOp, "pop") == 0);
 
   /* pReg points to e.g. "ar0"..."ar7" */
   len = strlen (pReg);
@@ -342,6 +345,10 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
         {
           /* skip '\t' */
           p++;
+
+          /* when looking for push or pop and we find a direct access of sp: abort */
+          if (findPushPop && strstr (p, "sp"))
+            return S4O_ABORT;
 
           /* course search */
           if (strstr (p, pReg + 1))
@@ -611,9 +618,6 @@ removeDeadPopPush (const char *pReg, lineNode *currPl, lineNode *head)
       ;    - "push" opcode, which doesn't push ar0 
       ;    - inline assembly
       ;    - a jump in or out of area 1 (see checkLabelRef())
-
-      ; Direct manipulation of sp is not detected. This isn't necessary
-      ; as long as sdcc doesn't emit such code in area 1.
 
       ; area 1 must be terminated by a:
      push ar0

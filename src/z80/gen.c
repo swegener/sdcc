@@ -4368,8 +4368,15 @@ genMultOneChar (const iCode * ic)
   tlbl1 = newiTempLabel (NULL);
   tlbl2 = newiTempLabel (NULL);
 
-  emit2 ("ld e,%s", aopGet (AOP (IC_RIGHT (ic)), LSB, FALSE));
-  emit2 ("ld h,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
+  if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG || AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx != E_IDX)
+    {
+      emit2 ("ld e,%s", aopGet (AOP (IC_RIGHT (ic)), LSB, FALSE));
+      emit2 ("ld h,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
+    }
+  else
+    emit2 ("ld h,%s", aopGet (AOP (IC_RIGHT (ic)), LSB, FALSE));
+
+
   emit2 ("ld l,#0x00");
   emit2 ("ld d,l");
   emit2 ("ld b,#0x08");

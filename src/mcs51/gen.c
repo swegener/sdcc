@@ -81,7 +81,8 @@ static unsigned short rbank = -1;
                        (x->aopu.aop_reg[0] == REG_WITH_INDEX(R0_IDX) || \
                         x->aopu.aop_reg[0] == REG_WITH_INDEX(R1_IDX) )))
 
-#define SYM_BP(sym)   (SPEC_OCLS (sym->etype)->paged ? "_bpx" : options.omitFramePtr ? "sp" : "_bp")
+#define SP_BP(sp, bp) (options.omitFramePtr ? sp : bp)
+#define SYM_BP(sym)   (SPEC_OCLS (sym->etype)->paged ? SP_BP("_spx", "_bpx") : SP_BP("sp", "_bp"))
 
 #define EQ(a, b)      (strcmp (a, b) == 0)
 
@@ -112,9 +113,12 @@ static struct
   struct
   {
     int pushed;
-    int nRegsSaved;
-    int param_offset;
+    int pushedregs;
     int offset;
+    int param_offset;
+    int xpushed;
+    int xpushedregs;
+    int xoffset;
   } stack;
   set *sendSet;
   iCode *current_iCode;
@@ -272,7 +276,7 @@ movb (const char *x)
 }
 
 /*-----------------------------------------------------------------*/
-/* emitpush - push something on stack                              */
+/* emitpush - push something on internal stack                     */
 /*-----------------------------------------------------------------*/
 static void
 emitpush (const char * arg)
@@ -285,7 +289,7 @@ emitpush (const char * arg)
 }
 
 /*-----------------------------------------------------------------*/
-/* emitpop - pop something from stack                              */
+/* emitpop - pop something from internal stack                     */
 /*-----------------------------------------------------------------*/
 static void
 emitpop (const char * arg)
@@ -391,7 +395,7 @@ Push (const char *s)
     {
       char buf[8] = "";
 
-      snprintf (buf, 8, "a%s", s);
+      SNPRINTF (buf, 8, "a%s", s);
       emitpush (buf);
     }
   else
@@ -654,6 +658,25 @@ leftRightUseAcc (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* stackoffset - stack offset for symbol                           */
+/*-----------------------------------------------------------------*/
+static int
+stackoffset (symbol * sym)
+{
+  int offset = sym->stack;
+  if (options.omitFramePtr)
+    {
+      if (SPEC_OCLS (sym->etype)->paged)
+        offset -= _G.stack.xoffset + _G.stack.xpushed;
+      else
+        offset -= _G.stack.offset + _G.stack.pushed;
+    }
+  if (sym->stack < 0)
+    offset -= _G.stack.param_offset;
+  return offset;
+}
+
+/*-----------------------------------------------------------------*/
 /* aopPtrForSym - pointer for symbol                               */
 /*-----------------------------------------------------------------*/
 static void
@@ -672,11 +695,7 @@ aopPtrForSym (symbol * sym, bool accuse, signed char offset, asmop * aop)
     }
   base = dbuf_detach_c_str (&tmpBuf);
 
-  offset += sym->stack;
-  if (options.omitFramePtr)
-    offset -= _G.stack.pushed + _G.stack.offset;
-  if (sym->stack < 0)
-    offset -= _G.stack.param_offset;
+  offset += stackoffset(sym);
 
   if ((abs (offset) < 3) || (accuse && (abs (offset) < 4)))
     {
@@ -2363,6 +2382,7 @@ saveRegisters (iCode * lic)
           emitcode ("mov", "r0,%s", spname);
           emitcode ("inc", "%s", spname);       // allocate before use
           emitcode ("movx", "@r0,a");
+          _G.stack.xpushed++;
           emitpop (REG_WITH_INDEX (R0_IDX)->dname);
         }
       else if (count != 0)
@@ -2382,6 +2402,7 @@ saveRegisters (iCode * lic)
               lineCurr->isInline = 1;
               if (BINUSE)
                 emitpop ("b");
+              _G.stack.xpushed += count;
             }
           else
             {
@@ -2409,6 +2430,7 @@ saveRegisters (iCode * lic)
                           emitcode ("mov", "a,%s", reg->name);
                         }
                       emitcode ("movx", "@r0,a");
+                      _G.stack.xpushed++;
                       if (--count)
                         {
                           emitcode ("inc", "r0");
@@ -2467,6 +2489,7 @@ unsaveRegisters (iCode * ic)
           emitcode ("mov", "r0,%s", spname);
           emitcode ("dec", "r0");
           emitcode ("movx", "a,@r0");
+          _G.stack.xpushed--;
           if (reg->type == REG_BIT)
             {
               emitcode ("mov", "%s,a", reg->base);
@@ -2489,6 +2512,7 @@ unsaveRegisters (iCode * ic)
               else
                 emitcode ("lcall", "___sdcc_xpop_regs\t;(%s)", szRegs);
               lineCurr->isInline = 1;
+              _G.stack.xpushed -= count;
             }
           else
             {
@@ -2505,6 +2529,7 @@ unsaveRegisters (iCode * ic)
                       regs *reg = REG_WITH_INDEX (i);
                       emitcode ("dec", "r0");
                       emitcode ("movx", "a,@r0");
+                      _G.stack.xpushed--;
                       if (i == R0_IDX)
                         {
                           emitpush ("acc");
@@ -2651,13 +2676,14 @@ genXpush (iCode * ic)
       emitcode ("add", "a,#0x%02x", size);
       emitcode ("mov", "%s,a", spname);
 
-      while (size--)
+      while (offset < size)
         {
           MOVA (aopGet (IC_LEFT (ic), offset++, FALSE, FALSE));
           emitcode ("movx", "@%s,a", r->name);
           emitcode ("inc", "%s", r->name);
         }
     }
+  _G.stack.xpushed += size;
 
   freeAsmop (NULL, aop, ic, TRUE);
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
@@ -2819,13 +2845,14 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
         {
           emitcode ("mov", "a,(%s+%d)", regs8051[i].base, 8 * bank + regs8051[i].offset);
           emitcode ("movx", "@%s,a", r->name);
+          _G.stack.xpushed++;
           if (--count)
             emitcode ("inc", "%s", r->name);
         }
       else
         {
           char buf[16] = "";
-          snprintf (buf, 16, "(%s+%d)", regs8051[i].base, 8 * bank + regs8051[i].offset);
+          SNPRINTF (buf, 16, "(%s+%d)", regs8051[i].base, 8 * bank + regs8051[i].offset);
           emitpush (buf);
         }
     }
@@ -2836,6 +2863,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
         {
           emitcode ("mov", "a,psw");
           emitcode ("movx", "@%s,a", r->name);
+          _G.stack.xpushed++;
         }
       else
         {
@@ -2888,6 +2916,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
           emitcode ("dec", "%s", r->name);
           emitcode ("movx", "a,@%s", r->name);
           emitcode ("mov", "psw,a");
+          _G.stack.xpushed--;
         }
       else
         {
@@ -2902,11 +2931,12 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
           emitcode ("dec", "%s", r->name);
           emitcode ("movx", "a,@%s", r->name);
           emitcode ("mov", "(%s+%d),a", regs8051[i].base, 8 * bank + regs8051[i].offset);
+          _G.stack.xpushed--;
         }
       else
         {
           char buf[16] = "";
-          snprintf (buf, 16, "(%s+%d)", regs8051[i].base, 8 * bank + regs8051[i].offset);
+          SNPRINTF (buf, 16, "(%s+%d)", regs8051[i].base, 8 * bank + regs8051[i].offset);
           emitpop (buf);
         }
     }
@@ -3163,7 +3193,10 @@ genCall (iCode * ic)
           emitcode ("mov", "a,%s", spname);
           emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
           emitcode ("mov", "%s,a", spname);
-          _G.stack.pushed -= options.useXstack ? 0 : ic->parmBytes;
+          if (options.useXstack)
+            _G.stack.xpushed -= ic->parmBytes;
+          else
+            _G.stack.pushed -= ic->parmBytes;
 
           /* unsaveRegisters from xstack needs acc, but */
           /* unsaveRegisters from stack needs this popped */
@@ -3177,7 +3210,10 @@ genCall (iCode * ic)
         {
           for (i = 0; i < ic->parmBytes; i++)
             emitcode ("dec", "%s", spname);
-          _G.stack.pushed -= options.useXstack ? 0 : ic->parmBytes;
+          if (options.useXstack)
+            _G.stack.xpushed -= ic->parmBytes;
+          else
+            _G.stack.pushed -= ic->parmBytes;
         }
     }
 
@@ -3307,11 +3343,11 @@ genPcall (iCode * ic)
                   char buf[8] = "";
                   int reg = ((FUNC_REGBANK (dtype)) << 3) & 0xff;
                   emitcode ("mov", "psw,#0x%02x", reg);
-                  snprintf (buf, 8, "0x%02x", reg + 2);
+                  SNPRINTF (buf, 8, "0x%02x", reg + 2);
                   emitpop (buf);
-                  snprintf (buf, 8, "0x%02x", reg + 1);
+                  SNPRINTF (buf, 8, "0x%02x", reg + 1);
                   emitpop (buf);
-                  snprintf (buf, 8, "0x%02x", reg + 0);
+                  SNPRINTF (buf, 8, "0x%02x", reg + 0);
                   emitpop (buf);
                 }
               else
@@ -3416,13 +3452,19 @@ genPcall (iCode * ic)
           emitcode ("mov", "a,%s", spname);
           emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
           emitcode ("mov", "%s,a", spname);
-          _G.stack.pushed -= options.useXstack ? 0 : ic->parmBytes;
+          if (options.useXstack)
+            _G.stack.xpushed -= ic->parmBytes;
+          else
+            _G.stack.pushed -= ic->parmBytes;
         }
       else
         {
           for (i = 0; i < ic->parmBytes; i++)
             emitcode ("dec", "%s", spname);
-          _G.stack.pushed -= options.useXstack ? 0 : ic->parmBytes;
+          if (options.useXstack)
+            _G.stack.xpushed -= ic->parmBytes;
+          else
+            _G.stack.pushed -= ic->parmBytes;
         }
     }
 
@@ -3538,7 +3580,9 @@ genFunction (iCode * ic)
 
   _G.stack.param_offset = 0;
   _G.stack.offset = sym->stack;
+  _G.stack.xoffset = sym->xstack;
   wassertl (_G.stack.pushed == 0, "stack over/underflow");
+  wassertl (_G.stack.xpushed == 0, "xstack over/underflow");
 
   /* if this is an interrupt service routine then
      save acc, b, dpl, dph  */
@@ -3907,10 +3951,11 @@ genFunction (iCode * ic)
         }
     }
 
-  if (!options.useXstack)
-    _G.stack.param_offset = _G.stack.pushed;
-  _G.stack.nRegsSaved = _G.stack.pushed;
+  _G.stack.param_offset = options.useXstack ? _G.stack.xpushed : _G.stack.pushed;
+  _G.stack.pushedregs = _G.stack.pushed;
+  _G.stack.xpushedregs = _G.stack.xpushed;
   _G.stack.pushed = 0;
+  _G.stack.xpushed = 0;
 
   /* if critical function then turn interrupts off */
   if (IFFUNC_ISCRITICAL (ftype))
@@ -3963,35 +4008,32 @@ genEndFunction (iCode * ic)
         }
     }
 
-  _G.stack.pushed = _G.stack.nRegsSaved;
+  _G.stack.xpushed = _G.stack.xpushedregs;
+  _G.stack.pushed = _G.stack.pushedregs;
 
   if (fReentrant)
     {
       if (options.omitFramePtr)
         {
+          bool cy_in_r0 = FALSE;
+          bool acc_in_r0 = FALSE;
+
           if (sym->stack > 3)
             {
-              bool accuse = FALSE;
-
               if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
                 {
-                  emitcode ("rlc", "a");        /* save c in a */
-                  accuse = TRUE;
+                  emitcode ("mov", "r0,psw");   /* save cy in r0 */
+                  cy_in_r0 = TRUE;
                 }
               if (getSize (OP_SYM_ETYPE (IC_LEFT (ic))) >= 4)
-                accuse = TRUE;
-              if (accuse)
-                emitcode ("xch", "a,r0");       /* save a in r0 */
+                {
+                  emitcode ("xch", "a,r0");     /* save a in r0 */
+                  acc_in_r0 = TRUE;
+                }
 
               emitcode ("mov", "a,sp");
               emitcode ("add", "a,#0x%02X", (-sym->stack) & 0xff);
               emitcode ("mov", "sp,a");
-
-              if (accuse)
-                emitcode ("xch", "a,r0");       /* restore a from r0 */
-
-              if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
-                emitcode ("rrc", "a");          /* restore c from a */
             }
           else
             {
@@ -3999,6 +4041,37 @@ genEndFunction (iCode * ic)
               while (i--)
                 emitcode ("dec", "sp");
             }
+          if (sym->xstack > 3)
+            {
+              if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
+                {
+                  if (!cy_in_r0)
+                    emitcode ("mov", "r0,psw"); /* save cy in r0 */
+                  cy_in_r0 = TRUE;
+                }
+              if (getSize (OP_SYM_ETYPE (IC_LEFT (ic))) >= 4)
+                {
+                  if (!acc_in_r0)
+                    emitcode ("xch", "a,r0");   /* save a in r0 */
+                  acc_in_r0 = TRUE;
+                }
+
+              emitcode ("mov", "a,_spx");
+              emitcode ("add", "a,#0x%02X", (-sym->xstack) & 0xff);
+              emitcode ("mov", "_spx,a");
+            }
+          else
+            {
+              int i = sym->xstack;
+              while (i--)
+                emitcode ("dec", "_spx");
+            }
+
+          if (acc_in_r0)
+            emitcode ("xch", "a,r0");           /* restore a from r0 */
+
+          if (cy_in_r0)
+            emitcode ("mov", "psw,r0");         /* restore c from r0 */
         }
       else
         {
@@ -4174,6 +4247,9 @@ genEndFunction (iCode * ic)
           emitcode ("ret", "");
         }
     }
+
+  wassertl (_G.stack.pushed == 0, "stack over/underflow");
+  wassertl (_G.stack.xpushed == 0, "xstack over/underflow");
 
   if (!port->peep.getRegsRead || !port->peep.getRegsWritten || options.nopeep)
     return;
@@ -11199,11 +11275,8 @@ genAddrOf (iCode * ic)
      variable */
   if (sym->onStack)
     {
-      int stack_offset = sym->stack;
-      if (options.omitFramePtr)
-        stack_offset -= _G.stack.pushed + _G.stack.offset;
-      if (sym->stack < 0)
-        stack_offset -= _G.stack.param_offset;
+      int stack_offset = stackoffset(sym);
+
       /* if it has an offset then we need to compute it */
       if (stack_offset)
         {

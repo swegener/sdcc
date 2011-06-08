@@ -1049,7 +1049,7 @@ convertToFcall (eBBlock ** ebbs, int count)
             {
               convbuiltin (ic, ebbs[i]);
             }
-          if ((ic->op == CALL || ic->op == PCALL) && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))))
+          if (ic->op == CALL && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))) || ic->op == PCALL && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))->next))
             {
               convoptlink (ic, ebbs[i]);
             }

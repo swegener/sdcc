@@ -147,6 +147,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_USE_NON_FREE     "--use-non-free"
 #define OPTION_PEEP_RETURN      "--peep-return"
 #define OPTION_NO_PEEP_RETURN   "--no-peep-return"
+#define OPTION_NO_OPTSDCC_IN_ASM "--no-optsdcc-in-asm"
 
 static const OPTION optionsTable[] = {
   {0,   NULL, NULL, "General options"},
@@ -255,6 +256,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_DATA_LOC, &options.data_loc, "<nnnn> Direct data start location", CLAT_INTEGER},
   {0,   OPTION_IDATA_LOC, &options.idata_loc, NULL, CLAT_INTEGER},
 
+  {0,   OPTION_NO_OPTSDCC_IN_ASM, &options.noOptsdccInAsm, "Do not emit .optsdcc in asm"},
   /* End of options */
   {0,   NULL}
 };

@@ -1776,7 +1776,8 @@ glue (void)
   tfprintf (asmFile, "\t!module\n", moduleName);
   if (mcs51_like)
     {
-      fprintf (asmFile, "\t.optsdcc -m%s", port->target);
+      if(!options.noOptsdccInAsm)
+        fprintf (asmFile, "\t.optsdcc -m%s", port->target);
 
       switch (options.model)
         {
@@ -1815,7 +1816,7 @@ glue (void)
         fprintf (asmFile, " --parms-in-bank1");
       fprintf (asmFile, "\n");
     }
-  else if (TARGET_Z80_LIKE || TARGET_IS_HC08)
+  else if ((TARGET_Z80_LIKE || TARGET_IS_HC08) && !options.noOptsdccInAsm)
     {
       fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
     }

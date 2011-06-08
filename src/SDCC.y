@@ -100,7 +100,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE RESTRICT
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE RESTRICT OPTLINK
 
 %type <yyint> Interrupt_storage
 %type <sym> identifier declarator declarator2 declarator3 enumerator_list enumerator
@@ -238,6 +238,9 @@ function_attributes
                         $$ = newLink (SPECIFIER) ;
                         FUNC_INTNO($$) = $1 ;
                         FUNC_ISISR($$) = 1;
+                     }
+   |  OPTLINK        {  $$ = newLink (SPECIFIER);
+                        FUNC_ISOPTLINK($$)=1;
                      }
    ;
 

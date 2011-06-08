@@ -254,6 +254,7 @@ typedef struct sym_link
     unsigned intrtn:1;          /* this is an interrupt routine         */
     unsigned rbank:1;           /* seperate register bank               */
     unsigned inlinereq:1;       /* inlining requested                   */
+    unsigned optlink:1;         /* Parameters on stack are passed in reverse order */
     unsigned intno;             /* 1=Interrupt svc routine              */
     short regbank;              /* register bank 2b used                */
     unsigned builtin;           /* is a builtin function                */
@@ -422,6 +423,8 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISJAVANATIVE(x) (IS_FUNC(x) && FUNC_ISJAVANATIVE(x))
 #define FUNC_ISOVERLAY(x) (x->funcAttrs.overlay)
 #define IFFUNC_ISOVERLAY(x) (IS_FUNC(x) && FUNC_ISOVERLAY(x))
+#define FUNC_ISOPTLINK(x) (x->funcAttrs.optlink)
+#define IFFUNC_ISOPTLINK(x) (IS_FUNC(x) && FUNC_ISOPTLINK(x))
 
 #define BANKED_FUNCTIONS        ( options.model == MODEL_HUGE || \
                                   ( (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \

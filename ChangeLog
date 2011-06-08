@@ -1,5 +1,13 @@
 2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCsymt.h,
+	  src/SDCCopt.c:
+	  Add __optlink to allow passing arguments in reverse order.
+
+2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCmain.c,
 	  src/SDCCglue.c,
 	  src/SDCCglobl.h:

@@ -842,7 +842,7 @@ found:
 /* convertbuiltin - maybe convert some builtins back               */
 /*-----------------------------------------------------------------*/
 static void
-convbuiltin (iCode *const ic, eBBlock * ebp)
+convbuiltin (iCode *const ic, eBBlock *ebp)
 {
   sym_link *ftype;
   symbol *bif;
@@ -908,6 +908,38 @@ convbuiltin (iCode *const ic, eBBlock * ebp)
   for(; icc != icp; ico = icc, icc = icc->prev)
     {
       if(icc->op != CALL)
+        icc->next = ico;
+    }
+}
+
+static void
+convoptlink (iCode *ic, eBBlock *ebp)
+{
+  iCode *icc, *icp, *ico;
+
+  assert (ic->op == CALL || ic->op == PCALL);
+
+  for(icc = ic->prev; icc && icc->op == IPUSH; icc = icc->prev);
+  icp = icc;
+  ic = icp->next;
+
+  /* Reverse parameters. */
+  for (icc = ic; icc->op != CALL && icc->op != PCALL; icc = icc->next)
+    {
+      if(icc->next->op != CALL && icc->next->op != PCALL)
+        icc->prev = icc->next;
+      else
+        icc->prev = icp;
+    }
+  if(icc != ic)
+    {
+      if(icp)
+        icp->next = icc->prev;
+      icc->prev = ic;
+    }
+  for(; icc != icp; ico = icc, icc = icc->prev)
+    {
+      if(icc->op != CALL && icc->op != PCALL)
         icc->next = ico;
     }
 }
@@ -1015,7 +1047,11 @@ convertToFcall (eBBlock ** ebbs, int count)
             }
           if (ic->op == SEND && ic->builtinSEND)
             {
-              convbuiltin(ic, ebbs[i]);
+              convbuiltin (ic, ebbs[i]);
+            }
+          if ((ic->op == CALL || ic->op == PCALL) && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))))
+            {
+              convoptlink (ic, ebbs[i]);
             }
         }
     }

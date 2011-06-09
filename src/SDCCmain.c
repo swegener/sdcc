@@ -1531,7 +1531,9 @@ linkEdit (char **envp)
         }
       else                      /* For all the other ports which need linker script */
         {
-          fprintf (lnkfile, "-mMuwx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
+          fprintf (lnkfile, "-muwx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
+          if (TARGET_MCS51_LIKE)
+            fprintf (lnkfile, "-M\n");
           if (!options.no_pack_iram)
             fprintf (lnkfile, "-Y\n");
           else

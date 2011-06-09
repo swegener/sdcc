@@ -347,46 +347,56 @@ DEFSETFUNC (findCheaperOp)
   /* and this is not the defining one          */
   if (cop->key == cdp->key)
     {
-
       /* do a special check this will help in */
       /* constant propagation & dead code elim */
       /* for assignments only                 */
-      if (cdp->diCode->op == '=') {
-        /* if the result is volatile then return result */
-        if (IS_OP_VOLATILE (IC_RESULT (cdp->diCode)))
-          *opp = IC_RESULT (cdp->diCode);
-        else
-          /* if this is a straight assignment and
-             left is a temp then prefer the temporary to the
-             true symbol */
-          if (!POINTER_SET (cdp->diCode) &&
-              IS_ITEMP (IC_RESULT (cdp->diCode)) &&
-              IS_TRUE_SYMOP (IC_RIGHT (cdp->diCode)))
-            *opp = IC_RESULT (cdp->diCode);
-          else {
-            /* if straight assignment and both
-               are temps then prefer the one that
-               will not need extra space to spil, also
-               take into consideration if right side
-               is an induction variable
-            */
-            if (!POINTER_SET (cdp->diCode) &&
-                IS_ITEMP (IC_RESULT (cdp->diCode)) &&
-                IS_ITEMP (IC_RIGHT (cdp->diCode)) &&
-                !OP_SYMBOL (IC_RIGHT (cdp->diCode))->isind &&
-                !OP_SYMBOL(IC_RIGHT (cdp->diCode))->isreqv &&
-                ((!SPIL_LOC (IC_RIGHT (cdp->diCode)) &&
-                  SPIL_LOC (IC_RESULT (cdp->diCode))) ||
-                 (SPIL_LOC (IC_RESULT (cdp->diCode)) &&
-                  SPIL_LOC (IC_RESULT (cdp->diCode)) ==
-                  SPIL_LOC (IC_RIGHT (cdp->diCode)))))
+      if (cdp->diCode->op == '=')
+        {
+          /* if the result is volatile then return result */
+          if (IS_OP_VOLATILE (IC_RESULT (cdp->diCode)))
+            {
               *opp = IC_RESULT (cdp->diCode);
-            else
-              *opp = IC_RIGHT (cdp->diCode);
-          }
-      }
+            }
+          else
+            {
+              /* if this is a straight assignment and
+                 left is a temp then prefer the temporary to the
+                 true symbol */
+              if (!POINTER_SET (cdp->diCode) &&
+                  IS_ITEMP (IC_RESULT (cdp->diCode)) &&
+                  IS_TRUE_SYMOP (IC_RIGHT (cdp->diCode)))
+                {
+                  *opp = IC_RESULT (cdp->diCode);
+                }
+              else
+                {
+                  /* if straight assignment and both
+                     are temps then prefer the one that
+                     will not need extra space to spil, also
+                     take into consideration if right side
+                     is an induction variable
+                  */
+                  if (!POINTER_SET (cdp->diCode) &&
+                      IS_ITEMP (IC_RESULT (cdp->diCode)) &&
+                      IS_ITEMP (IC_RIGHT (cdp->diCode)) &&
+                      !OP_SYMBOL (IC_RIGHT (cdp->diCode))->isind &&
+                      !OP_SYMBOL(IC_RIGHT (cdp->diCode))->isreqv &&
+                      ((!SPIL_LOC (IC_RIGHT (cdp->diCode)) && SPIL_LOC (IC_RESULT (cdp->diCode))) ||
+                       (SPIL_LOC (IC_RESULT (cdp->diCode)) && SPIL_LOC (IC_RESULT (cdp->diCode)) == SPIL_LOC (IC_RIGHT (cdp->diCode)))))
+                    {
+                      *opp = IC_RESULT (cdp->diCode);
+                    }
+                  else
+                    {
+                      *opp = IC_RIGHT (cdp->diCode);
+                    }
+                }
+            }
+        }
       else
-        *opp = IC_RESULT (cdp->diCode);
+        {
+          *opp = IC_RESULT (cdp->diCode);
+        }
     }
 
   /* if this is an assign to a temp. then check
@@ -397,7 +407,9 @@ DEFSETFUNC (findCheaperOp)
       cop->key == IC_RIGHT (cdp->diCode)->key &&
       !isGlobalInNearSpace (IC_RIGHT (cdp->diCode)) &&
       IS_ITEMP (IC_RESULT (cdp->diCode)))
-    *opp = IC_RESULT (cdp->diCode);
+    {
+      *opp = IC_RESULT (cdp->diCode);
+    }
 
   if ((*opp) &&
       (isOperandLiteral(*opp) || !checkSign ||
@@ -405,12 +417,9 @@ DEFSETFUNC (findCheaperOp)
         IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
         (SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
          (SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp)))))))
-      {
-
-      if ((isGlobalInNearSpace (cop) &&
-           !isOperandLiteral (*opp)) ||
-          isOperandVolatile (*opp, FALSE)
-        )
+    {
+      if ((isGlobalInNearSpace (cop) && !isOperandLiteral (*opp)) ||
+          isOperandVolatile (*opp, FALSE))
         {
           *opp = NULL;
           return 0;
@@ -433,33 +442,30 @@ DEFSETFUNC (findCheaperOp)
           && isOperandLiteral(*opp)
           && SPEC_NOUN(operandType(*opp)) == SPEC_NOUN(operandType(cop))
           && SPEC_USIGN(operandType(*opp)) != SPEC_USIGN(operandType(cop)))
-      {
+        {
           SPEC_USIGN(operandType(*opp)) = SPEC_USIGN(operandType(cop));
-      }
+        }
 
       if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
           SPEC_NOUN(operandType(cop)) != SPEC_NOUN(operandType(*opp)))
         {
-            // special case: we can make an unsigned char literal
-            // into an int literal with no cost.
-            if (isOperandLiteral(*opp)
-             && SPEC_NOUN(operandType(*opp)) == V_CHAR
-             && SPEC_NOUN(operandType(cop)) == V_INT)
+          // special case: we can make an unsigned char literal
+          // into an int literal with no cost.
+          if (isOperandLiteral(*opp) &&
+              SPEC_NOUN(operandType(*opp)) == V_CHAR &&
+              SPEC_NOUN(operandType(cop)) == V_INT)
             {
-                *opp = operandFromOperand (*opp);
-                SPEC_NOUN(operandType(*opp)) = V_INT;
+              *opp = operandFromOperand (*opp);
+              SPEC_NOUN(operandType(*opp)) = V_INT;
             }
-            else
+          else
             {
-                // No clue...
-                *opp = NULL;
-                return 0;
+              // No clue...
+              *opp = NULL;
+              return 0;
             }
-
         }
-
       return 1;
-
     }
   *opp=NULL;
   return 0;
@@ -1377,6 +1383,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 
   return;
 }
+
 #define OTHERS_PARM(s) (s->_isparm && !s->ismyparm)
 /*-----------------------------------------------------------------*/
 /* updateSpillLocation - keeps track of register spill location    */
@@ -1447,6 +1454,7 @@ updateSpillLocation (iCode * ic, int induction)
         }
     }
 }
+
 /*-----------------------------------------------------------------*/
 /* setUsesDef - sets the uses def bitvector for a given operand    */
 /*-----------------------------------------------------------------*/
@@ -1687,7 +1695,6 @@ constFold (iCode * ic, set * cseSet)
       SPIL_LOC (IC_RESULT (ic)) = NULL;
       OP_SYMBOL(IC_RESULT (ic))->noSpilLoc = 1;
     }
-
 
   return 1;
 }
@@ -1972,8 +1979,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (ic->op == PCALL || ic->op == CALL || ic->op == RECEIVE)
         {
           /* add to defSet of the symbol */
-          OP_DEFS(IC_RESULT (ic))=
-            bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+          OP_DEFS (IC_RESULT (ic)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
           /* add to the definition set of this block */
           ebb->defSet = bitVectSetBit (ebb->defSet, ic->key);
           ebb->ldefs = bitVectSetBit (ebb->ldefs, ic->key);
@@ -2110,7 +2116,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (!computeOnly && ic->op == '=')
         {
           /* update the spill location for this */
-          updateSpillLocation (ic,0);
+          updateSpillLocation (ic, 0);
 
           if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)) &&
               !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))
@@ -2137,9 +2143,10 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       /* then replace them with those from cseSet */
       /* left operand */
       /* and left is a symbol  */
-      if (IS_SYMOP (IC_LEFT (ic)) &&
-          !IS_BITFIELD (OP_SYM_ETYPE (IC_LEFT (ic))) &&
-          !computeOnly && ic->op != ADDRESS_OF)
+      if (!computeOnly &&
+          ic->op != ADDRESS_OF &&
+          IS_SYMOP (IC_LEFT (ic)) &&
+          !IS_BITFIELD (OP_SYM_ETYPE (IC_LEFT (ic))))
         {
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop, checkSign);
@@ -2151,9 +2158,9 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
                     {
                       /* some non dominating block does POINTER_SET with
                          this variable .. unsafe to remove any POINTER_GETs */
-                      if (bitVectBitValue(ebb->ndompset,IC_LEFT(ic)->key))
-                          ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,pdop->key);
-                      ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
+                      if (bitVectBitValue (ebb->ndompset, IC_LEFT (ic)->key))
+                          ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, pdop->key);
+                      ReplaceOpWithCheaperOp (&IC_LEFT (ic), pdop);
                       change = 1;
                     }
                   /* check if there is a pointer set
@@ -2165,26 +2172,39 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
                     {
                       ic->op = '=';
                       IC_LEFT (ic) = NULL;
-                      ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
+                      ReplaceOpWithCheaperOp (&IC_RIGHT (ic), pdop);
                       SET_ISADDR (IC_RESULT (ic), 0);
                     }
                 }
               else
                 {
-                  ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
+                  ReplaceOpWithCheaperOp (&IC_LEFT (ic), pdop);
                   change = 1;
                 }
             }
         }
 
       /* right operand */
-      if (IS_SYMOP (IC_RIGHT (ic)) && !computeOnly)
+      if (!computeOnly && IS_SYMOP (IC_RIGHT (ic)))
         {
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop, checkSign);
           if (pdop)
             {
-              ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
+              ReplaceOpWithCheaperOp (&IC_RIGHT (ic), pdop);
+              change = 1;
+            }
+        }
+
+      if (!computeOnly &&
+          POINTER_SET (ic) &&
+          IS_SYMOP (IC_RESULT (ic)))
+        {
+          pdop = NULL;
+          applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop, checkSign);
+          if (pdop)
+            {
+              ReplaceOpWithCheaperOp (&IC_RESULT (ic), pdop);
               change = 1;
             }
         }
@@ -2225,16 +2245,16 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
             {
               pdic = NULL;
             }
-          if (pdic && port->cseOk && (*port->cseOk)(ic,pdic) == 0)
+          if (pdic && port->cseOk && (*port->cseOk)(ic, pdic) == 0)
             {
               pdic = NULL;
             }
         }
 
       /* Alternate code */
-      if (pdic && IS_ITEMP(IC_RESULT(ic)))
+      if (pdic && IS_ITEMP (IC_RESULT (ic)))
         {
-          if (POINTER_GET(ic) && bitVectBitValue(ebb->ptrsSet,IC_LEFT(ic)->key))
+          if (POINTER_GET (ic) && bitVectBitValue (ebb->ptrsSet, IC_LEFT (ic)->key))
             {
               /* Mmm, found an equivalent pointer get at a lower level.
                  This could be a loop however with the same pointer set
@@ -2244,10 +2264,10 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
             {
               /* if previous definition found change this to an assignment */
               ic->op = '=';
-              IC_LEFT(ic) = NULL;
-              IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
-              SET_ISADDR(IC_RESULT(ic),0);
-              SET_ISADDR(IC_RIGHT (ic),0);
+              IC_LEFT (ic) = NULL;
+              IC_RIGHT (ic) = operandFromOperand (IC_RESULT (pdic));
+              SET_ISADDR (IC_RESULT (ic), 0);
+              SET_ISADDR (IC_RIGHT (ic), 0);
             }
         }
 
@@ -2304,14 +2324,14 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       /* add the left & right to the defUse set */
       if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
         {
-          OP_USES(IC_LEFT (ic))=
+          OP_USES (IC_LEFT (ic)) =
             bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
           setUsesDefs (IC_LEFT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
         }
 
       if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
         {
-          OP_USES(IC_RIGHT (ic))=
+          OP_USES (IC_RIGHT (ic)) =
             bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
           setUsesDefs (IC_RIGHT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
         }
@@ -2323,7 +2343,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
         {
           if (IS_SYMOP (IC_RESULT (ic)))
             {
-              OP_USES(IC_RESULT (ic)) =
+              OP_USES (IC_RESULT (ic)) =
                 bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
               setUsesDefs (IC_RESULT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
             }
@@ -2376,9 +2396,9 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
   return change;
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 /* cseAllBlocks - will sequentially go thru & do cse for all blocks */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 int
 cseAllBlocks (ebbIndex * ebbi, int computeOnly)
 {

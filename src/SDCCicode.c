@@ -161,7 +161,6 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
 
   switch (op->type)
     {
-
     case VALUE:
       opetype = getSpec (operandType (op));
       if (IS_FLOAT (opetype))
@@ -1365,6 +1364,10 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       retval = operandFromLit (!operandLitValue (left));
       break;
 
+    case ADDRESS_OF:
+      retval = operandFromValue (valCastLiteral (type, operandLitValue (left)));
+      break;
+
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, " operandOperation invalid operator ");
       assert (0);
@@ -1375,7 +1378,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
 
 
 /*-----------------------------------------------------------------*/
-/* isOperandEqual - compares two operand & return 1 if they r =    */
+/* isOperandEqual - compares two operand & return 1 if they are =  */
 /*-----------------------------------------------------------------*/
 int
 isOperandEqual (operand * left, operand * right)
@@ -1384,7 +1387,7 @@ isOperandEqual (operand * left, operand * right)
   if (left == right)
     return 1;
 
-  /* if either of them null then false */
+  /* if either of them is null then false */
   if (!left || !right)
     return 0;
 
@@ -1400,8 +1403,7 @@ isOperandEqual (operand * left, operand * right)
     case SYMBOL:
       return isSymbolEqual (left->svt.symOperand, right->svt.symOperand);
     case VALUE:
-      return (compareType (left->svt.valOperand->type,
-                           right->svt.valOperand->type) &&
+      return (compareType (left->svt.valOperand->type, right->svt.valOperand->type) &&
               (floatFromVal (left->svt.valOperand) == floatFromVal (right->svt.valOperand)));
     case TYPE:
       if (compareType (left->svt.typeOperand, right->svt.typeOperand) == 1)
@@ -1428,7 +1430,6 @@ isiCodeEqual (iCode * left, iCode * right)
   /* if operand are the same */
   if (left->op == right->op)
     {
-
       /* compare all the elements depending on type */
       if (left->op != IFX)
         {
@@ -1436,7 +1437,6 @@ isiCodeEqual (iCode * left, iCode * right)
             return 0;
           if (!isOperandEqual (IC_RIGHT (left), IC_RIGHT (right)))
             return 0;
-
         }
       else
         {

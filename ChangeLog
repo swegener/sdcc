@@ -1,3 +1,13 @@
+2011-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCcse.c(cseBBlock): fixed cse bug 2729218 reading pointer for result
+	* src/SDCCdflow.c: cosmetics
+	* src/SDCCicode.c(operandOperation): fixed fatal error for literal pointer
+	* src/SDCCmain.c(linkEdit): only use -M for mcs51 and ds390
+	* src/SDCCopt.c: fixed warnings
+	* src/SDCCval.c(floatFromVal, ulFromVal): handle structs
+	* support/regression/tests/bug2729218.c: new, added
+
 2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

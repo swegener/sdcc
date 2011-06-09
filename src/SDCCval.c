@@ -1424,6 +1424,9 @@ floatFromVal (value * val)
   if (SPEC_NOUN (val->etype) == V_VOID)
     return SPEC_CVAL (val->etype).v_ulong;
 
+  if (SPEC_NOUN (val->etype) == V_STRUCT)
+    return SPEC_CVAL (val->etype).v_ulong;
+
   /* we are lost ! */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "floatFromVal: unknown value");
   return 0;
@@ -1483,6 +1486,9 @@ ulFromVal (value * val)
     return SPEC_CVAL (val->etype).v_uint;
 
   if (SPEC_NOUN (val->etype) == V_VOID)
+    return SPEC_CVAL (val->etype).v_ulong;
+
+  if (SPEC_NOUN (val->etype) == V_STRUCT)
     return SPEC_CVAL (val->etype).v_ulong;
 
   /* we are lost ! */

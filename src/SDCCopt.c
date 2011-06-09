@@ -848,7 +848,7 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
   symbol *bif;
   int stack;
 
-  iCode *icc = ic, *icp = ic->prev, *ico;
+  iCode *icc = ic, *icp = ic->prev, *ico = NULL;
   iCode *lastparam = ic;
   while (icc->op != CALL)
     {
@@ -1049,7 +1049,8 @@ convertToFcall (eBBlock ** ebbs, int count)
             {
               convbuiltin (ic, ebbs[i]);
             }
-          if (ic->op == CALL && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))) || ic->op == PCALL && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))->next))
+          if ((ic->op == CALL  && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic)))) ||
+              (ic->op == PCALL && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))->next)))
             {
               convoptlink (ic, ebbs[i]);
             }

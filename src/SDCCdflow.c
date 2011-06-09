@@ -151,31 +151,29 @@ DEFSETFUNC (mergeInDefs)
   if (!dest->inDefs && *firstTime)
     dest->inDefs = bitVectCopy (ebp->outDefs);
   else
-    dest->inDefs = bitVectUnion (dest->inDefs,
-                                 ebp->outDefs);
+    dest->inDefs = bitVectUnion (dest->inDefs, ebp->outDefs);
 
   *firstTime = 0;
 
   return 0;
-
 }
 
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 /* computeDataFlow - does computations for data flow accross blocks */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 void
 computeDataFlow (ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->dfOrder;
   int count = ebbi->count;
   int i;
-  int change = 1;
+  int change;
 
   for (i = 0; i < count; i++)
     ebbs[i]->killedExprs = NULL;
 
-  while (change)
+  do
     {
       change = 0;
 
@@ -242,7 +240,7 @@ computeDataFlow (ebbIndex * ebbi)
           setToNull ((void *) &pred);
 
           /* do cse with computeOnly flag set to TRUE */
-          /* this by far the quickest way of computing */
+          /* this is by far the quickest way of computing */
           cseBBlock (ebbs[i], TRUE, ebbi);
 
           /* if it change we will need to iterate */
@@ -253,10 +251,8 @@ computeDataFlow (ebbIndex * ebbi)
             }
           change += !bitVectEqual (ebbs[i]->outDefs, oldOutDefs);
         }
-
-      if (!change)      /* iterate till no change */
-        break;
     }
+  while (change);      /* iterate till no change */
 
   return;
 }
@@ -271,22 +267,24 @@ usedBetweenPoints (operand * op, iCode * start, iCode * end)
 
   for (; lic != end; lic = lic->next)
     {
-
       /* if the operand is a parameter */
       /* then check for calls and return */
       /* true if there is a call       */
       if (IS_PARM (op) &&
-          (lic->op == CALL ||
-           lic->op == PCALL)) {
-        value *args;
-        if (lic->op == CALL) {
-          args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type);
-        } else {
-          args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type->next);
+          (lic->op == CALL || lic->op == PCALL))
+        {
+          value *args;
+          if (lic->op == CALL)
+            {
+              args = FUNC_ARGS (OP_SYMBOL (IC_LEFT (lic))->type);
+            }
+          else
+            {
+              args = FUNC_ARGS (OP_SYMBOL (IC_LEFT (lic))->type->next);
+            }
+          if (isParameterToCall (args, op))
+            return 1;
         }
-        if (isParameterToCall (args, op))
-          return 1;
-      }
 
       if (SKIP_IC2 (lic))
         continue;
@@ -320,9 +318,9 @@ usedBetweenPoints (operand * op, iCode * start, iCode * end)
 }
 
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 /* usedInRemaining - returns point of usage for an operand if found */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 iCode *
 usedInRemaining (operand * op, iCode * ic)
 {

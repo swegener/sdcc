@@ -1,3 +1,7 @@
+2011-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCcse.c(cseBBlock): fixed the fix
+
 2011-06-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,
@@ -15,6 +19,7 @@
 	* src/SDCCopt.c: fixed warnings
 	* src/SDCCval.c(floatFromVal, ulFromVal): handle structs
 	* support/regression/tests/bug2729218.c: new, added
+	* src/SDCCcse.c(cseBBlock): fixed the fix
 
 2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
 

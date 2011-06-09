@@ -2198,7 +2198,8 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
 
       if (!computeOnly &&
           POINTER_SET (ic) &&
-          IS_SYMOP (IC_RESULT (ic)))
+          IS_SYMOP (IC_RESULT (ic)) &&
+          !IS_BITFIELD (OP_SYM_ETYPE (IC_RESULT (ic))))
         {
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop, checkSign);

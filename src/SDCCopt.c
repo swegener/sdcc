@@ -913,7 +913,7 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
 }
 
 static void
-convoptlink (iCode *ic, eBBlock *ebp)
+convsmallc (iCode *ic, eBBlock *ebp)
 {
   iCode *icc, *icp, *ico;
 
@@ -1049,10 +1049,10 @@ convertToFcall (eBBlock ** ebbs, int count)
             {
               convbuiltin (ic, ebbs[i]);
             }
-          if ((ic->op == CALL  && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic)))) ||
-              (ic->op == PCALL && IFFUNC_ISOPTLINK (operandType (IC_LEFT (ic))->next)))
+          if ((ic->op == CALL  && IFFUNC_ISSMALLC (operandType (IC_LEFT (ic)))) ||
+              (ic->op == PCALL && IFFUNC_ISSMALLC (operandType (IC_LEFT (ic))->next)))
             {
-              convoptlink (ic, ebbs[i]);
+              convsmallc (ic, ebbs[i]);
             }
         }
     }

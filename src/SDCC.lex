@@ -207,7 +207,7 @@ _?"_asm"         {
 "__overlay"    { count (); TKEYWORD (OVERLAY); }
 "inline"       { count (); TKEYWORD99 (INLINE); }
 "restrict"     { count (); TKEYWORD99 (RESTRICT); }
-"__optlink"    { count (); return OPTLINK; }
+"__smallc"     { count (); return SMALLC; }
 {L}({L}|{D})*  {
   if (!options.dollars_in_ident && strchr (yytext, '$'))
     {

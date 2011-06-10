@@ -2505,7 +2505,7 @@ static unsigned long getValBasic(symbol *sym, st_link *type, char *val)
 
   if (IS_FLOAT(type))
     {
-      v.f = strtod(val,NULL);
+      v.f = (float)strtod(val,NULL);
     }
   else if (IS_PTR(type))
     {
@@ -2524,13 +2524,13 @@ static unsigned long getValBasic(symbol *sym, st_link *type, char *val)
           if (( s = strchr(val,'\'')))
             {
               if ( s[1] == '\\' )
-                  v.b[0] = strtol(s+2,NULL,8);
+                  v.b[0] = (unsigned char)strtol(s+2,NULL,8);
               else
                   v.b[0] = s[1];
             }
           else
             {
-              v.b[0] = strtol(val,NULL,0);
+              v.b[0] = (unsigned char)strtol(val,NULL,0);
             }
         }
       else if (IS_INT(etype))
@@ -2538,7 +2538,7 @@ static unsigned long getValBasic(symbol *sym, st_link *type, char *val)
           if (IS_LONG(etype))
               v.val = strtol(val,NULL,0);
           else
-              v.i.lo = strtol(val,NULL,0);
+              v.i.lo = (unsigned short)strtol(val,NULL,0);
         }
       else
         {

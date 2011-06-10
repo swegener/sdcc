@@ -453,28 +453,6 @@ FBYNAME (deadMove)
 }
 
 /*-----------------------------------------------------------------*/
-/* notUsed - Check, if value in register is not read again         */
-/*-----------------------------------------------------------------*/
-FBYNAME (notUsed)
-{
-  const char *what;
-
-  if(cmdLine[0] != '\'')
-    what = hTabItemWithKey (vars, 1);
-  else
-  {
-    cmdLine[strlen(cmdLine) - 1] = 0;
-    what = cmdLine + 1;
-  }
-
-  if (port->peep.notUsed)
-    return port->peep.notUsed (what, endPl, head);
-
-  fprintf (stderr, "Function notUsed not initialized in port structure\n");
-  return FALSE;
-}
-
-/*-----------------------------------------------------------------*/
 /* labelHashEntry- searches for a label in the list labelHash      */
 /* Builds labelHash, if it does not yet exist.                     */
 /* Returns the labelHashEntry or NULL                              */
@@ -933,6 +911,57 @@ operandBaseName (const char *op)
 }
 
 /*-----------------------------------------------------------------*/
+/* notUsed - Check, if value in register is not read again         */
+/*-----------------------------------------------------------------*/
+FBYNAME (notUsed)
+{
+  const char *what;
+  set *operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands || elementsInSet(operands) != 1)
+  {
+    fprintf (stderr,
+             "*** internal error: notUsed peephole restriction"
+             " malformed: %s\n", cmdLine);
+    return FALSE;
+  }
+
+  what = setFirstItem (operands);
+
+  if (port->peep.notUsed)
+    return port->peep.notUsed (what, endPl, head);
+
+  fprintf (stderr, "Function notUsed not initialized in port structure\n");
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* notUsed - Check, if value in register is not read again starting from label */
+/*-----------------------------------------------------------------*/
+FBYNAME (notUsedFrom)
+{
+  const char *what, *label;
+  set *operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands || elementsInSet(operands) != 2)
+  {
+    fprintf (stderr,
+             "*** internal error: notUsedFrom peephole restriction"
+             " malformed: %s\n", cmdLine);
+    return FALSE;
+  }
+
+  what = setFirstItem (operands);
+  label = setNextItem (operands); 
+
+  if (port->peep.notUsedFrom)
+    return port->peep.notUsedFrom (what, label, head);
+
+  fprintf (stderr, "Function notUsed not initialized in port structure\n");
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
 /* canAssign - Check, if we can do ld dst, src.                    */
 /*-----------------------------------------------------------------*/
 FBYNAME (canAssign)
@@ -1123,6 +1152,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "optimizeReturn", optimizeReturn                // ? just a guess
+  },
+  {
+    "notUsedFrom", notUsedFrom                      // ? just a guess
   },
   {
     "labelIsReturnOnly", labelIsReturnOnly          // 6

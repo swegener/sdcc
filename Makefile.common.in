@@ -13,6 +13,7 @@ VERSIONP        = @VERSIONP@
 SHELL		= /bin/sh
 CC		= @CCACHE@ @CC@
 CPP		= @CCACHE@ @CPP@
+CXX		= @CCACHE@ @CXX@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 YACC            = @YACC@
@@ -64,6 +65,7 @@ transform       = @program_transform_name@
 DEFS           += $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS       += @CPPFLAGS@ $(INCLUDEFLAGS) -I. -I$(top_builddir) -I$(srcdir)/$(SLIB) -I$(srcdir)
 CFLAGS         += @CFLAGS@ @WALL_FLAG@
+CXXFLAGS       += @CXXFLAGS@
 LDFLAGS        += @LDFLAGS@
 
 EXTRALIBS      += @LIBS@
@@ -75,4 +77,4 @@ EXTRALIBS      += @LIBS@
 # Library compilation options
 CLEANSPEC = *.lst *.asm *.sym *~ *.cdb *.dep *.rul
 
-OBJ = $(SOURCES:.c=.o)
+OBJ = $(SOURCES:.c=.o) $(CXXSOURCES:.cc=.o)

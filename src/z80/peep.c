@@ -94,11 +94,11 @@ isReturned(const char *what)
         NOTUSEDERROR();
       spec = &(sym->etype->select.s);
       if(spec->noun == V_VOID)
-         size = 0;
+        size = 0;
       else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
-         size = 1;
+        size = 1;
       else if(spec->noun == V_INT && !(spec->b_long))
-         size = 2;
+        size = 2;
       else
         size = 4;
 
@@ -577,7 +577,7 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
       if(strcmp(what, "iy") == 0)
         {
           if(IY_RESERVED)
-            return TRUE;
+            return FALSE;
           return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
         }
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
@@ -595,6 +595,21 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
     return FALSE;
 
   return TRUE;
+}
+
+bool
+z80notUsedFrom (const char *what, const char *label, lineNode *head)
+{
+  lineNode *cpl;
+
+  for (cpl = _G.head; cpl; cpl = cpl->next)
+    {
+      if (cpl->isLabel && !strncmp (label, cpl->line, strlen(label)))
+        {
+          return z80notUsed (what, cpl, head);
+        }
+    }
+  return FALSE;
 }
 
 bool
@@ -713,6 +728,11 @@ int z80instructionSize(lineNode *pl)
     return(1);
   if(ISINST(pl->line, "ex"))
     {
+      if(!op2start)
+        {
+          fprintf(stderr, "Warning: z80instructionSize() failed to parse line node %s\n", pl->line);
+          return(4);
+        }
       if(!strncmp(op2start, "ix", 2) || !strncmp(op2start, "iy", 2))
         return(2);
       return(1);

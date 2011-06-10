@@ -136,7 +136,7 @@ static char  *parseTypeInfo (symbol *sym, char *s)
 
   s += 2; /* go past the ({ */
   /* get the size */
-  sym->size = strtol (s, &bp, 10);
+  sym->size = (short)strtol (s, &bp, 10);
   /* bp now points to '}' ... go past it */
   s = ++bp;
   while (*s != ')') /* till we reach the end */
@@ -183,7 +183,7 @@ static char  *parseTypeInfo (symbol *sym, char *s)
               case 'A':
                 s++;
                 DCL_TYPE(type) = ARRAY ;
-                DCL_ELEM(type) = strtol(s,&s,10);
+                DCL_ELEM(type) = (short)strtol(s,&s,10);
                 break;
             }
         }
@@ -311,10 +311,10 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
 
   s++;
   /* get the level number */
-  nsym->level = strtol (s, &bp, 10);
+  nsym->level = (short)strtol (s, &bp, 10);
   s = ++bp;
   /* skip the '$' & get the block number */
-  nsym->block = strtol (s, &bp, 10);
+  nsym->block = (short)strtol (s, &bp, 10);
 
   s = parseTypeInfo(nsym, bp);
 
@@ -323,7 +323,7 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
   nsym->addrspace = *s;
 
   s+= 2;
-  nsym->isonstack = strtol(s, &s, 10);
+  nsym->isonstack = (short)strtol(s, &s, 10);
   /* get the stack offset */
   s++;
   nsym->offset = strtol(s, &s, 10);

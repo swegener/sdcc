@@ -56,7 +56,7 @@ enum {
 //#define REG_TMP 0x20  
 
 /* definition for the registers */
-typedef struct regs
+typedef struct reg_info
   {
     short type;			/* can have value 
 				 * REG_GPR, REG_PTR or REG_CND 
@@ -77,13 +77,13 @@ typedef struct regs
     unsigned address;           /* reg's address if isFixed | isMapped is true */
     unsigned size;              /* 0 for byte, 1 for int, 4 for long */
     unsigned alias;             /* Alias mask if register appears in multiple banks */
-    struct regs *reg_alias;     /* If more than one register share the same address 
+    struct reg_info *reg_alias;     /* If more than one register share the same address 
 				 * then they'll point to each other. (primarily for bits)*/
     operand *regop;		/* reference to the operand used to create the register */
     pCodeRegLives reglives; /* live range mapping */
   }
-regs;
-extern regs regspic16[];
+reg_info;
+extern reg_info regspic16[];
 extern int pic16_nRegs;
 extern int pic16_Gstack_base_addr;
 
@@ -107,22 +107,22 @@ extern set *pic16_equ_data;
 extern set *pic16_int_regs;
 extern set *pic16_acs_udata;
 
-regs *pic16_regWithIdx (int);
-regs *pic16_typeRegWithIdx(int, int, int);
-regs *pic16_dirregWithName (char *name );
-regs *pic16_allocregWithName(char *name);
-regs *pic16_regWithName(char *name);
+reg_info *pic16_regWithIdx (int);
+reg_info *pic16_typeRegWithIdx(int, int, int);
+reg_info *pic16_dirregWithName (char *name );
+reg_info *pic16_allocregWithName(char *name);
+reg_info *pic16_regWithName(char *name);
 void  pic16_freeAllRegs ();
 void  pic16_deallocateAllRegs ();
-regs *pic16_findFreeReg(short type);
-regs *pic16_findFreeRegNext(short type, regs *creg);
-regs *pic16_allocWithIdx (int idx);
+reg_info *pic16_findFreeReg(short type);
+reg_info *pic16_findFreeRegNext(short type, reg_info *creg);
+reg_info *pic16_allocWithIdx (int idx);
 
-regs *pic16_allocDirReg (operand *op );
-regs *pic16_allocRegByName (char *name, int size, operand *op);
+reg_info *pic16_allocDirReg (operand *op );
+reg_info *pic16_allocRegByName (char *name, int size, operand *op);
 extern char *pic16_decodeOp(unsigned int op);
 
-regs* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop);
+reg_info* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop);
 
 /* Define register address that are constant across PIC16 family */
 #define IDX_TMR0    0xfd6

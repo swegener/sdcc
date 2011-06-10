@@ -1575,7 +1575,7 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 				// method of optimisation does not allow a means to distiguishing what may change, it is
 				// best to just negate any match.
 				if (PCI(pcs)->pcop) {
-					struct regs *r;
+					struct reg_info *r;
 					pCodeOp *pcop = PCI(pcs)->pcop;
 					switch(pcop->type) {
 					case PO_W:

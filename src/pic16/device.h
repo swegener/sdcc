@@ -127,10 +127,10 @@ extern stats_t statistics;
 /****************************************/
 void pic16_assignConfigWordValue(int address, unsigned int value);
 void pic16_assignIdByteValue(int address, char value);
-int pic16_isREGinBank(regs *reg, int bank);
-int pic16_REGallBanks(regs *reg);
+int pic16_isREGinBank(reg_info *reg, int bank);
+int pic16_REGallBanks(reg_info *reg);
 
-int checkAddReg(set **set, regs *reg);
+int checkAddReg(set **set, reg_info *reg);
 int checkAddSym(set **set, symbol *reg);
 int checkSym(set *set, symbol *reg);
 

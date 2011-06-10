@@ -65,9 +65,9 @@ typedef struct asmop
   {
     short dptr;                 /* if AOP_DPTRn */
     value *aop_lit;             /* if literal */
-    regs *aop_reg[4];           /* array of registers */
+    reg_info *aop_reg[4];       /* array of registers */
     char *aop_dir;              /* if direct  */
-    regs *aop_ptr;              /* either -> to r0 or r1 */
+    reg_info *aop_ptr;          /* either -> to r0 or r1 */
     struct
     {
       int from_cast_remat;      /* cast remat created this : immd2 field used for highest order */

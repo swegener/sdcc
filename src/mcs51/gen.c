@@ -345,7 +345,7 @@ popB (bool pushedB)
 static bool
 pushReg (int index, bool bits_pushed)
 {
-  regs *reg = REG_WITH_INDEX (index);
+  const reg_info *reg = REG_WITH_INDEX (index);
   if (reg->type == REG_BIT)
     {
       if (!bits_pushed)
@@ -363,7 +363,7 @@ pushReg (int index, bool bits_pushed)
 static bool
 popReg (int index, bool bits_popped)
 {
-  regs *reg = REG_WITH_INDEX (index);
+  const reg_info *reg = REG_WITH_INDEX (index);
   if (reg->type == REG_BIT)
     {
       if (!bits_popped)
@@ -407,7 +407,7 @@ Push (const char *s)
 /*-----------------------------------------------------------------*/
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getFreePtr (iCode * ic, asmop * aop, bool result)
 {
   bool r0iu, r1iu;
@@ -522,7 +522,7 @@ endOfWorld:
 /*               number of registers were available, 0 otherwise.  */
 /*-----------------------------------------------------------------*/
 int
-getTempRegs (regs ** tempRegs, int size, iCode * ic)
+getTempRegs (reg_info ** tempRegs, int size, iCode * ic)
 {
   bitVect *freeRegs;
   int i;
@@ -2289,7 +2289,7 @@ xstackRegisters (bitVect * rsave, bool push, int count, char szRegs[32])
     {
       if (bitVectBitValue (rsave, i))
         {
-          regs *reg = REG_WITH_INDEX (i);
+          reg_info *reg = REG_WITH_INDEX (i);
           if (reg->type == REG_BIT)
             {
               mask |= 0x01;
@@ -2369,7 +2369,7 @@ saveRegisters (iCode * lic)
 
       if (count == 1)
         {
-          regs *reg = REG_WITH_INDEX (bitVectFirstBit (rsave));
+          reg_info *reg = REG_WITH_INDEX (bitVectFirstBit (rsave));
           emitpush (REG_WITH_INDEX (R0_IDX)->dname);
           if (reg->type == REG_BIT)
             {
@@ -2415,7 +2415,7 @@ saveRegisters (iCode * lic)
                 {
                   if (bitVectBitValue (rsave, i))
                     {
-                      regs *reg = REG_WITH_INDEX (i);
+                      reg_info *reg = REG_WITH_INDEX (i);
                       if (i == R0_IDX)
                         {
                           emitpop ("acc");
@@ -2485,7 +2485,7 @@ unsaveRegisters (iCode * ic)
 
       if (count == 1)
         {
-          regs *reg = REG_WITH_INDEX (bitVectFirstBit (rsave));
+          reg_info *reg = REG_WITH_INDEX (bitVectFirstBit (rsave));
           emitcode ("mov", "r0,%s", spname);
           emitcode ("dec", "r0");
           emitcode ("movx", "a,@r0");
@@ -2526,7 +2526,7 @@ unsaveRegisters (iCode * ic)
                 {
                   if (bitVectBitValue (rsave, i))
                     {
-                      regs *reg = REG_WITH_INDEX (i);
+                      reg_info *reg = REG_WITH_INDEX (i);
                       emitcode ("dec", "r0");
                       emitcode ("movx", "a,@r0");
                       _G.stack.xpushed--;
@@ -2651,7 +2651,7 @@ static void
 genXpush (iCode * ic)
 {
   asmop *aop = newAsmop (0);
-  regs *r;
+  reg_info *r;
   int size, offset = 0;
 
   D (emitcode (";", "genXpush"));
@@ -2818,7 +2818,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
   int i;
   int count = 8 + (pushPsw ? 1 : 0);
   asmop *aop = NULL;
-  regs *r = NULL;
+  reg_info *r = NULL;
 
   if (options.useXstack)
     {
@@ -2892,7 +2892,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
 {
   int i;
   asmop *aop = NULL;
-  regs *r = NULL;
+  reg_info *r = NULL;
 
   if (options.useXstack)
     {
@@ -10026,7 +10026,7 @@ static void
 genNearPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iCode * ifx)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   char *ifxCond = "a";
   sym_link *rtype, *retype;
@@ -10164,7 +10164,7 @@ static void
 genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iCode * ifx)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   char *ifxCond = "a";
   sym_link *rtype, *retype;
@@ -10840,7 +10840,7 @@ static void
 genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   sym_link *retype, *letype;
   sym_link *ptype = operandType (result);
@@ -10964,7 +10964,7 @@ static void
 genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   sym_link *retype, *letype;
 
@@ -11805,7 +11805,7 @@ genReceive (iCode * ic)
       if ((isOperandInFarSpace (IC_RESULT (ic)) ||
            isOperandInPagedSpace (IC_RESULT (ic))) && (OP_SYMBOL (IC_RESULT (ic))->isspilt || IS_TRUE_SYMOP (IC_RESULT (ic))))
         {
-          regs *tempRegs[4];
+          reg_info *tempRegs[4];
           int receivingA = 0;
           int roffset = 0;
 
@@ -11868,7 +11868,7 @@ genReceive (iCode * ic)
     }
   else if (ic->argreg > 12)
     {                           /* bit parameters */
-      regs *reg = OP_SYMBOL (IC_RESULT (ic))->regs[0];
+      reg_info *reg = OP_SYMBOL (IC_RESULT (ic))->regs[0];
 
       BitBankUsed = 1;
       if (!reg || reg->rIdx != ic->argreg - 5)

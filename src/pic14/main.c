@@ -142,7 +142,7 @@ _pic14_setDefaultOptions (void)
 }
 
 static const char *
-_pic14_getRegName (struct regs *reg)
+_pic14_getRegName (const struct reg_info *reg)
 {
   if (reg)
     return reg->name;

@@ -1097,20 +1097,24 @@ operandLitValue (operand * op)
   return floatFromVal (OP_VALUE (op));
 }
 
+extern bool regalloc_dry_run;
+
 /*-----------------------------------------------------------------*/
 /* getBuiltInParms - returns parameters to a builtin function      */
 /*-----------------------------------------------------------------*/
 iCode *
-getBuiltinParms (iCode * ic, int *pcount, operand ** parms)
+getBuiltinParms (iCode * fic, int *pcount, operand ** parms)
 {
   sym_link *ftype;
+  iCode *ic = fic;
 
   *pcount = 0;
   /* builtin function uses only SEND for parameters */
   while (ic->op != CALL)
     {
       assert (ic->op == SEND && ic->builtinSEND);
-      ic->generated = 1;        /* mark the icode as generated */
+      if(!regalloc_dry_run || ic != fic)
+        ic->generated = 1;        /* mark the icode as generated */
       parms[*pcount] = IC_LEFT (ic);
       ic = ic->next;
       (*pcount)++;

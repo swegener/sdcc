@@ -2881,8 +2881,8 @@ pCodeInstruction pic16_pciBANKSEL = {
 pCodeInstruction *pic16Mnemonics[MAX_PIC16MNEMONICS];
 
 extern set *externs;
-extern regs *pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
-extern regs *pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias);
+extern reg_info *pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
+extern reg_info *pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias);
 
 void  pic16_pCodeInitRegisters(void)
 {
@@ -4047,7 +4047,7 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
         pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
         pcop->type = PO_IMMEDIATE;
         if(name) {
-                regs *r = pic16_dirregWithName(name);
+                reg_info *r = pic16_dirregWithName(name);
                 pcop->name = Safe_strdup(name);
                 PCOI(pcop)->r = r;
 
@@ -4189,7 +4189,7 @@ pCodeOp *pic16_newpCodeOpBit_simple (struct asmop *op, int offs, int bit)
 pCodeOp *pic16_newpCodeOpReg(int rIdx)
 {
   pCodeOp *pcop;
-  regs *r;
+  reg_info *r;
 
   pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 
@@ -4219,7 +4219,7 @@ pCodeOp *pic16_newpCodeOpReg(int rIdx)
 pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv)
 {
   pCodeOp *pcop;
-  regs *r;
+  reg_info *r;
 
     pcop = Safe_calloc(1, sizeof(pCodeOpReg));
     pcop->name = NULL;
@@ -4245,7 +4245,7 @@ pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv)
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
 {
   pCodeOp *pcop;
-  regs *r;
+  reg_info *r;
 
         pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
         PCOR(pcop)->r = r = pic16_allocRegByName(name, 1, NULL);
@@ -4700,7 +4700,7 @@ static void genericDestruct(pCode *pc)
   if(isPCI(pc)) {
     /* For instructions, tell the register (if there's one used)
      * that it's no longer needed */
-    regs *reg = pic16_getRegFromInstruction(pc);
+    reg_info *reg = pic16_getRegFromInstruction(pc);
     if(reg)
       deleteSetItem (&(reg->reglives.usedpCodes),pc);
 
@@ -4732,7 +4732,7 @@ const char *immdmod[3]={"LOW", "HIGH", "UPPER"};
 
 char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
-    regs *r;
+    reg_info *r;
     static char b[128];
     char *s;
     int use_buffer = 1;    // copy the string to the passed buffer pointer
@@ -4884,7 +4884,7 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 {
     char *s = str;
-    regs *r;
+    reg_info *r;
 
 #if 0
     if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
@@ -5649,7 +5649,7 @@ static void AnalyzeRETURN(pCode *pc)
 /*                            part of pic16_getRegFromInstruction(2) */
 /*-------------------------------------------------------------------*/
 
-regs * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
+reg_info * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
   if (!pcop) return NULL;
 
   switch(pcop->type) {
@@ -5725,7 +5725,7 @@ regs * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-regs * pic16_getRegFromInstruction(pCode *pc)
+reg_info * pic16_getRegFromInstruction(pCode *pc)
 {
   if(!pc                   ||
      !isPCI(pc)            ||
@@ -5745,7 +5745,7 @@ regs * pic16_getRegFromInstruction(pCode *pc)
 /*-------------------------------------------------------------------------------*/
 /* pic16_getRegFromInstruction2 - variant to support two memory operand commands */
 /*-------------------------------------------------------------------------------*/
-regs * pic16_getRegFromInstruction2(pCode *pc)
+reg_info * pic16_getRegFromInstruction2(pCode *pc)
 {
 
   if(!pc                   ||
@@ -5790,7 +5790,7 @@ static void AnalyzepBlock(pBlock *pb)
         /* Loop through all of the registers declared so far in
            this block and see if we find this one there */
 
-        regs *r = setFirstItem(pb->tregisters);
+        reg_info *r = setFirstItem(pb->tregisters);
 
         while(r) {
           if(r->rIdx == PCOR(PCI(pc)->pcop)->r->rIdx) {
@@ -6057,7 +6057,7 @@ static void FlowStats(pCodeFlow *pcflow)
 
 static int isBankInstruction(pCode *pc)
 {
-  regs *reg;
+  reg_info *reg;
   int bank = -1;
 
   if(!isPCI(pc))
@@ -6846,7 +6846,7 @@ pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval)
 /*----------------------------------------------------------------------*
  * pic16_areRegsSame - check to see if the names of two registers match *
  *----------------------------------------------------------------------*/
-int pic16_areRegsSame(regs *r1, regs *r2)
+int pic16_areRegsSame(reg_info *r1, reg_info *r2)
 {
         if(!strcmp(r1->name, r2->name))return 1;
 
@@ -6860,7 +6860,7 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 {
   pCode *pc=NULL;
   pCode *pcprev=NULL;
-  regs *reg, *prevreg;
+  reg_info *reg, *prevreg;
   unsigned char flag=0;
 
         if(!pb)
@@ -7756,7 +7756,7 @@ static void buildCallTree(void    )
   pBranch *pbr;
   pBlock  *pb;
   pCode   *pc;
-  regs *r;
+  reg_info *r;
 
   if(!the_pFile)
     return;
@@ -7920,7 +7920,7 @@ void pic16_AnalyzepCode(char dbName)
 
 /* convert a series of movff's of local regs to stack, with a single call to
  * a support functions which does the same thing via loop */
-static void pic16_convertLocalRegs2Support(pCode *pcstart, pCode *pcend, int count, regs *r, int entry)
+static void pic16_convertLocalRegs2Support(pCode *pcstart, pCode *pcend, int count, reg_info *r, int entry)
 {
   pBranch *pbr;
   pCode *pc, *pct;
@@ -7993,7 +7993,7 @@ void pic16_OptimizeLocalRegs(void)
   pCodeOpLocalReg *pclr;
   int regCount=0;
   int inRegCount=0;
-  regs *r, *lastr=NULL, *firstr=NULL;
+  reg_info *r, *lastr=NULL, *firstr=NULL;
   pCode *pcstart=NULL, *pcend=NULL;
   int inEntry=0;
   char *curFunc=NULL;
@@ -8154,7 +8154,7 @@ static void pBlockStats(FILE *of, pBlock *pb)
 {
 
   pCode *pc;
-  regs  *r;
+  reg_info  *r;
 
         if(!pic16_pcode_verbose)return;
 
@@ -9137,7 +9137,7 @@ void pic16_OptimizeBanksel ()
   int len0, len1;
   pBlock *pb;
   set *set;
-  regs *reg;
+  reg_info *reg;
   unsigned int bankselsTotal = 0, bankselsRemoved = 0;
 
   //fprintf (stderr, "%s:%s:%d: entered.\n", __FILE__, __FUNCTION__, __LINE__);
@@ -9308,7 +9308,7 @@ typedef unsigned int valnum_t;
 #define PTR_TO_INT(x) (((char *)(x)) - ((char *) 0))
 #endif
 
-static int pic16_regIsLocal (regs *r);
+static int pic16_regIsLocal (reg_info *r);
 static int pic16_safepCodeRemove (pCode *pc, char *comment);
 
 /* statistics */
@@ -10514,7 +10514,7 @@ static int pic16_symIsSpecial (symbol_t sym) {
 }
 
 /* Check whether a register should be considered local (to the current function) or not. */
-static int pic16_regIsLocal (regs *r) {
+static int pic16_regIsLocal (reg_info *r) {
   symbol_t sym;
   if (r) {
     if (r->type == REG_TMP) return 1;
@@ -10553,7 +10553,7 @@ static int pic16_regIsLocal (regs *r) {
 static int pic16_pCodeIsAlive (pCode *pc) {
   pCodeInstruction *pci;
   defmap_t *map, *lastpc;
-  regs *checkreg;
+  reg_info *checkreg;
 
   /* we can only handle PCIs */
   if (!isPCI(pc)) return 1;
@@ -11414,7 +11414,7 @@ static void assignValnums (pCode *pc) {
   symbol_t sym1, sym2;
   int cond, isSpecial1, isSpecial2, count, mask, lit;
   defmap_t *list, *val, *oldval, *dummy;
-  regs *reg1 = NULL, *reg2 = NULL;
+  reg_info *reg1 = NULL, *reg2 = NULL;
   valnum_t litnum;
 
   /* only works for pCodeInstructions... */
@@ -11820,7 +11820,7 @@ static int pic16_pBlockHasAsmdirs (pBlock *pb) {
 static int pic16_removeUnusedRegistersDF () {
   pCode *pc, *pc2;
   pBlock *pb;
-  regs *reg1, *reg2, *reg3;
+  reg_info *reg1, *reg2, *reg3;
   set *seenRegs = NULL;
   int cond, i;
   int islocal, change = 0;

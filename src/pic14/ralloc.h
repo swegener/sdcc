@@ -42,7 +42,7 @@ enum {
 };
 
 /* definition for the registers */
-typedef struct regs
+typedef struct reg_info
 {
   short type;  /* can have value 
                 * REG_GPR, REG_PTR or REG_CND 
@@ -62,12 +62,12 @@ typedef struct regs
   unsigned address;           /* reg's address if isFixed | isMapped is true */
   unsigned size;              /* 0 for byte, 1 for int, 4 for long */
   unsigned alias;             /* Alias mask if register appears in multiple banks */
-  struct regs *reg_alias;     /* If more than one register share the same address 
+  struct reg_info *reg_alias; /* If more than one register share the same address 
                                * then they'll point to each other. (primarily for bits)*/
   pCodeRegLives reglives;     /* live range mapping */
 }
-regs;
-extern regs regspic14[];
+reg_info;
+extern reg_info regspic14[];
 extern int Gstack_base_addr;
 
 /*
@@ -84,22 +84,22 @@ extern set *dynInternalRegs;
 
 
 void initStack(int base_address, int size, int shared);
-regs *pic14_regWithIdx (int);
-regs *dirregWithName (char *name );
+reg_info *pic14_regWithIdx (int);
+reg_info *dirregWithName (char *name );
 void pic14_assignRegisters (ebbIndex *ebbi);
-regs *pic14_findFreeReg(short type);
-regs *pic14_allocWithIdx (int idx);
-regs *typeRegWithIdx (int idx, int type, int fixed);
-regs *regFindWithName (const char *name);
+reg_info *pic14_findFreeReg(short type);
+reg_info *pic14_allocWithIdx (int idx);
+reg_info *typeRegWithIdx (int idx, int type, int fixed);
+reg_info *regFindWithName (const char *name);
 
 void pic14_debugLogClose(void);
 void writeUsedRegs(FILE *of);
 
-regs *allocDirReg (operand *op );
-regs *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
-regs *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
-regs *allocRegByName (char *name, int size );
-regs *allocNewDirReg (sym_link *symlnk,const char *name);
+reg_info *allocDirReg (operand *op );
+reg_info *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
+reg_info *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
+reg_info *allocRegByName (char *name, int size );
+reg_info *allocNewDirReg (sym_link *symlnk,const char *name);
 
 /* Define register address that are constant across PIC family */
 #define IDX_INDF    0

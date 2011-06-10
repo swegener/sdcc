@@ -72,9 +72,9 @@ typedef struct asmop
     union
       {
 	value *aop_lit;		/* if literal */
-	regs *aop_reg[4];	/* array of registers */
+	reg_info *aop_reg[4];	/* array of registers */
 	char *aop_dir;		/* if direct  */
-	regs *aop_ptr;		/* either -> to r0 or r1 */
+	reg_info *aop_ptr;		/* either -> to r0 or r1 */
 	int aop_stk;		/* stack offset when AOP_STK */
 	char *aop_str[4];	/* just a string array containing the location */
 /*	regs *aop_alloc_reg;     * points to a dynamically allocated register */

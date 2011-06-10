@@ -48,8 +48,8 @@
 char *aopLiteral (value * val, int offset);
 char *aopLiteralLong (value * val, int offset, int size);
 extern int allocInfo;
-static int pushReg (regs *reg, bool freereg);
-static void pullReg (regs *reg);
+static int pushReg (reg_info *reg, bool freereg);
+static void pullReg (reg_info *reg);
 static void transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs);
 
 static char *zero = "#0x00";
@@ -85,7 +85,7 @@ extern int hc08_nRegs;
 extern struct dbuf_s *codeOutBuf;
 //static void saveRBank (int, iCode *, bool);
 static bool operandsEqu (operand * op1, operand * op2);
-static void loadRegFromConst (regs *reg, char *c);
+static void loadRegFromConst (reg_info *reg, char *c);
 static char *aopName (asmop *aop);
 static asmop * newAsmop (short type);
 static char * aopAdrStr (asmop * aop, int loffset, bool bit16);
@@ -214,7 +214,7 @@ hc08_emitDebuggerSymbol (const char * debugSym)
 /*                  reuse. sreg and dreg must be of equal size              */
 /*--------------------------------------------------------------------------*/
 static void
-transferRegReg (regs *sreg, regs *dreg, bool freesrc)
+transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
 {
   int srcidx;
   int dstidx;
@@ -348,7 +348,7 @@ updateCFA(void)
 /*           marked free and available for reuse.                           */
 /*--------------------------------------------------------------------------*/
 static int
-pushReg (regs *reg, bool freereg)
+pushReg (reg_info *reg, bool freereg)
 {
   int regidx = reg->rIdx;
 
@@ -397,7 +397,7 @@ pushReg (regs *reg, bool freereg)
 /* pullReg - Pull register reg off the stack.                               */
 /*--------------------------------------------------------------------------*/
 static void
-pullReg (regs *reg)
+pullReg (reg_info *reg)
 {
   int regidx = reg->rIdx;
 
@@ -460,7 +460,7 @@ pullNull (int n)
 /*                 push was performed, false otherwise.                     */
 /*--------------------------------------------------------------------------*/
 static bool
-pushRegIfUsed (regs *reg)
+pushRegIfUsed (reg_info *reg)
 {
   if (!reg->isFree)
     {
@@ -476,7 +476,7 @@ pushRegIfUsed (regs *reg)
 /*                 stack. Otherwise register reg is marked as free.         */
 /*--------------------------------------------------------------------------*/
 static void
-pullOrFreeReg (regs *reg, bool needpull)
+pullOrFreeReg (reg_info *reg, bool needpull)
 {
   if (needpull)
     pullReg (reg);
@@ -570,7 +570,7 @@ aopName (asmop *aop)
 /* loadRegFromAop - Load register reg from logical offset loffset of aop.   */
 /*--------------------------------------------------------------------------*/
 static void
-loadRegFromAop (regs *reg, asmop *aop, int loffset)
+loadRegFromAop (reg_info *reg, asmop *aop, int loffset)
 {
   int regidx = reg->rIdx;
 
@@ -781,7 +781,7 @@ forceload:
 static asmop *
 forceStackedAop (asmop *aop, bool copyOrig)
 {
-  regs *reg;
+  reg_info *reg;
   int loffset;
   asmop *newaop = newAsmop (aop->type);
   memcpy (newaop, aop, sizeof(*newaop));
@@ -829,7 +829,7 @@ forceStackedAop (asmop *aop, bool copyOrig)
 /* storeRegToAop - Store register reg to logical offset loffset of aop.     */
 /*--------------------------------------------------------------------------*/
 static void
-storeRegToAop (regs *reg, asmop *aop, int loffset)
+storeRegToAop (reg_info *reg, asmop *aop, int loffset)
 {
   int regidx = reg->rIdx;
   #if 0
@@ -982,7 +982,7 @@ storeRegToAop (regs *reg, asmop *aop, int loffset)
 /* loadRegFromConst - Load register reg from constant c.                    */
 /*--------------------------------------------------------------------------*/
 static void
-loadRegFromConst (regs *reg, char *c)
+loadRegFromConst (reg_info *reg, char *c)
 {
   switch (reg->rIdx)
     {
@@ -1094,7 +1094,7 @@ storeConstToAop (char *c, asmop *aop, int loffset)
 /*                          zeroed. reg must be an 8-bit register.          */
 /*--------------------------------------------------------------------------*/
 static void
-storeRegSignToUpperAop (regs *reg, asmop *aop, int loffset, bool isSigned)
+storeRegSignToUpperAop (reg_info *reg, asmop *aop, int loffset, bool isSigned)
 {
 //  int regidx = reg->rIdx;
   int size = aop->size;
@@ -1128,7 +1128,7 @@ storeRegSignToUpperAop (regs *reg, asmop *aop, int loffset, bool isSigned)
 /*                     true, sign extension will take place in the padding. */
 /*--------------------------------------------------------------------------*/
 static void
-storeRegToFullAop (regs *reg, asmop *aop, bool isSigned)
+storeRegToFullAop (reg_info *reg, asmop *aop, bool isSigned)
 {
   int regidx = reg->rIdx;
   int size = aop->size;
@@ -1174,7 +1174,7 @@ static void
 transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
 {
   bool needpula = FALSE;
-  regs *reg = NULL;
+  reg_info *reg = NULL;
   int regIdx;
   bool keepreg = FALSE;
 
@@ -1318,7 +1318,7 @@ accopWithAop (char *accop, asmop *aop, int loffset)
 /*              Supports: com, dec, inc, lsl, lsr, neg, rol, ror            */
 /*--------------------------------------------------------------------------*/
 static void
-rmwWithReg (char *rmwop, regs *reg)
+rmwWithReg (char *rmwop, reg_info *reg)
 {
   char rmwbuf[10];
   char *rmwaop = rmwbuf;
@@ -2323,7 +2323,7 @@ genCpl (iCode * ic)
 {
   int offset = 0;
   int size;
-  regs* reg = hc08_reg_a;
+  reg_info* reg = hc08_reg_a;
 
   D(emitcode (";     genCpl",""));
 
@@ -2930,7 +2930,7 @@ genFunction (iCode * ic)
           D(emitcode (";     genReceive",""));
           for (ofs=0; ofs < rsymSize; ofs++)
             {
-              regs * reg = hc08_aop_pass[ofs+(ric->argreg-1)]->aopu.aop_reg[0];
+              reg_info *reg = hc08_aop_pass[ofs+(ric->argreg-1)]->aopu.aop_reg[0];
               pushReg (reg, TRUE);
               if (reg->rIdx == A_IDX)
                 accIsFree = 1;
@@ -3143,7 +3143,7 @@ static void
 genLabel (iCode * ic)
 {
   int i;
-  regs *reg;
+  reg_info *reg;
 
   /* For the high level labels we cannot depend on any */
   /* register's contents. Amnesia time.                */
@@ -8419,7 +8419,7 @@ genhc08Code (iCode * lic)
 
       {
         int i;
-        regs *reg;
+        reg_info *reg;
         symbol *sym;
 
         for (i=A_IDX;i<=XA_IDX;i++)

@@ -331,7 +331,7 @@ typedef struct symbol
   short nRegs;                  /* number of registers required */
   short regType;                /* type of register required    */
 
-  struct regs *regs[4];         /* can have at the most 4 registers */
+  struct reg_info *regs[4];     /* can have at the most 4 registers */
   struct asmop *aop;            /* asmoperand for this symbol */
   struct iCode *fuse;           /* furthest use */
   struct iCode *rematiCode;     /* rematerialise with which instruction */

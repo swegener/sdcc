@@ -146,6 +146,7 @@ typedef struct
     bool (*deadMove) (const char *reg, lineNode * currPl, lineNode * head);
     bool (*notUsed) (const char *reg, lineNode * currPl, lineNode * head);
     bool (*canAssign) (const char *op1, const char *op2, const char *op3);
+    bool (*notUsedFrom) (const char *reg, const char *label, lineNode *head);
   }
   peep;
 
@@ -249,7 +250,7 @@ typedef struct
     void (*emitDebuggerSymbol) (const char *);
     struct
     {
-      int (*regNum) (struct regs *);
+      int (*regNum) (const struct reg_info *);
       bitVect *cfiSame;
       bitVect *cfiUndef;
       int addressSize;
@@ -297,8 +298,8 @@ typedef struct
   void (*assignRegisters) (struct ebbIndex *);
 
   /** Returns the register name of a symbol.
-      Used so that 'regs' can be an incomplete type. */
-  const char *(*getRegName) (struct regs * reg);
+      Used so that 'reg_info' can be an incomplete type. */
+  const char *(*getRegName) (const struct reg_info *reg);
 
   /* list of keywords that are used by this
      target (used by lexer) */

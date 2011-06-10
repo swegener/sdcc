@@ -47,7 +47,7 @@ enum
 #define REG_CND 0x04
 #define REG_BIT 0x08
 /* definition for the registers */
-typedef struct regs
+typedef struct reg_info
 {
   short type;                   /* can have value 
                                    REG_GPR, REG_PTR or REG_CND */
@@ -60,10 +60,10 @@ typedef struct regs
   unsigned isFree:1;            /* is currently unassigned  */
   int print;                    /* needs to be printed */
 }
-regs;
-extern regs regs390[];
+reg_info;
+extern reg_info regs390[];
 
-regs *ds390_regWithIdx (int);
+reg_info *ds390_regWithIdx (int);
 
 bitVect *ds390_rUmaskForOp (operand * op);
 bitVect *ds390_allBitregs (void);

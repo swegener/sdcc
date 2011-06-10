@@ -170,7 +170,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                         /* new version */
                         if(IS_STATIC(sym->etype)
                                 && !sym->ival) /* && !sym->level*/ {
-                          regs *reg;
+                          reg_info *reg;
                           sectSym *ssym;
                           int found=0;
 
@@ -222,7 +222,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
                         /* emit only if it is global */
                         if(sym->level == 0) {
-                          regs *reg;
+                          reg_info *reg;
 
                                 reg = pic16_dirregWithName( sym->name );
                                 if(!reg) {
@@ -250,7 +250,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                         }
                 } else {
                         if(!sym->used && (sym->level == 0)) {
-                          regs *reg;
+                          reg_info *reg;
 
                                 /* symbol not used, just declared probably, but its in
                                  * level 0, so we must declare it fine as global */

@@ -71,7 +71,7 @@ extern char *iComments2;
 void
 pic16_dump_equates (FILE *of, set *equs)
 {
-  regs *r;
+  reg_info *r;
 
   r = setFirstItem (equs);
   if (!r)
@@ -91,7 +91,7 @@ pic16_dump_equates (FILE *of, set *equs)
 void
 pic16_dump_access (FILE *of, set *section)
 {
-  regs *r;
+  reg_info *r;
 
   r = setFirstItem (section);
   if (!r)
@@ -112,8 +112,8 @@ pic16_dump_access (FILE *of, set *section)
 int
 regCompare (const void *a, const void *b)
 {
-  const regs *const *i = a;
-  const regs *const *j = b;
+  const reg_info *const *i = a;
+  const reg_info *const *j = b;
 
   /* Sort primarily by the address ... */
   if ((*i)->address > (*j)->address)
@@ -164,16 +164,16 @@ pic16_dump_usection (FILE *of, set *section, int fix)
 {
   static int abs_usection_no = 0;
   static unsigned int usection_no = 0;
-  regs *r, *rprev;
+  reg_info *r, *rprev;
   unsigned int init_addr, i;
-  regs **rlist;
-  regs *r1;
+  reg_info **rlist;
+  reg_info *r1;
 
   /* put all symbols in an array */
   if (!elementsInSet (section))
     return;
 
-  rlist = Safe_calloc (elementsInSet (section), sizeof (regs *));
+  rlist = Safe_calloc (elementsInSet (section), sizeof (reg_info *));
   r = rlist[0];
   i = 0;
   for (rprev = setFirstItem (section); rprev; rprev = setNextItem (section))
@@ -191,7 +191,7 @@ pic16_dump_usection (FILE *of, set *section, int fix)
     } // if
 
   /* sort symbols according to their address */
-  qsort (rlist, i, sizeof (regs *), regCompare);
+  qsort (rlist, i, sizeof (reg_info *), regCompare);
 
   if (!fix)
     {
@@ -262,7 +262,7 @@ pic16_dump_usection (FILE *of, set *section, int fix)
 void
 pic16_dump_gsection (FILE *of, set *sections)
 {
-  regs *r;
+  reg_info *r;
   sectName *sname;
 
   for (sname = setFirstItem (sections); sname; sname = setNextItem (sections))
@@ -395,15 +395,15 @@ pic16_dump_isection (FILE *of, set *section, int fix)
 void
 pic16_dump_int_registers (FILE *of, set *section)
 {
-  regs *r, *rprev;
+  reg_info *r, *rprev;
   int i;
-  regs **rlist;
+  reg_info **rlist;
 
   /* put all symbols in an array */
   if (!elementsInSet (section))
     return;
 
-  rlist = Safe_calloc (elementsInSet (section), sizeof (regs *));
+  rlist = Safe_calloc (elementsInSet (section), sizeof (reg_info *));
   r = rlist[0];
   i = 0;
   for (rprev = setFirstItem (section); rprev; rprev = setNextItem (section))
@@ -421,7 +421,7 @@ pic16_dump_int_registers (FILE *of, set *section)
     } // if
 
   /* sort symbols according to their address */
-  qsort (rlist, i, sizeof (regs *), regCompare);
+  qsort (rlist, i, sizeof (reg_info *), regCompare);
 
   fprintf (of, "\n\n; Internal registers\n");
 
@@ -893,9 +893,9 @@ char *pic16_processor_base_name(void)
 /*
  * return 1 if register wasn't found and added, 0 otherwise
  */
-int checkAddReg(set **set, regs *reg)
+int checkAddReg(set **set, reg_info *reg)
 {
-  regs *tmp;
+  reg_info *tmp;
 
 
         if(!reg)return 0;
@@ -983,7 +983,7 @@ int checkSym(set *set, symbol *sym)
  *-----------------------------------------------------------------*/
 void pic16_groupRegistersInSection(set *regset)
 {
-  regs *reg;
+  reg_info *reg;
   sectSym *ssym;
   int docontinue=0;
 

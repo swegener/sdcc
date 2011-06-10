@@ -345,7 +345,7 @@ popB (bool pushedB)
 static bool
 pushReg (int index, bool bits_pushed)
 {
-  regs *reg = REG_WITH_INDEX (index);
+  reg_info *reg = REG_WITH_INDEX (index);
   if (reg->type == REG_BIT)
     {
       if (!bits_pushed)
@@ -363,7 +363,7 @@ pushReg (int index, bool bits_pushed)
 static bool
 popReg (int index, bool bits_popped)
 {
-  regs *reg = REG_WITH_INDEX (index);
+  reg_info *reg = REG_WITH_INDEX (index);
   if (reg->type == REG_BIT)
     {
       if (!bits_popped)
@@ -378,7 +378,7 @@ popReg (int index, bool bits_popped)
 /*-----------------------------------------------------------------*/
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getFreePtr (iCode * ic, asmop ** aopp, bool result)
 {
   bool r0iu, r1iu;
@@ -2443,7 +2443,7 @@ unsavermask (bitVect * rs_mask)
         {
           if (bitVectBitValue (rs_mask, i))
             {
-              regs *reg = REG_WITH_INDEX (i);
+              reg_info *reg = REG_WITH_INDEX (i);
               emitcode ("dec", "r0");
               emitcode ("movx", "a,@r0");
               if (i == R0_IDX)
@@ -2605,7 +2605,7 @@ static void
 genXpush (iCode * ic)
 {
   asmop *aop = newAsmop (0);
-  regs *r;
+  reg_info *r;
   int size, offset = 0;
 
   D (emitcode (";", "genXpush"));
@@ -2775,7 +2775,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
   int i;
   int count = 8 + (ds390_nBitRegs / 8) + (pushPsw ? 1 : 0);
   asmop *aop = NULL;
-  regs *r = NULL;
+  reg_info *r = NULL;
 
   if (options.useXstack)
     {
@@ -2859,7 +2859,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
 {
   int i;
   asmop *aop = NULL;
-  regs *r = NULL;
+  reg_info *r = NULL;
 
   if (options.useXstack)
     {
@@ -10508,7 +10508,7 @@ static void
 genNearPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   sym_link *rtype, *retype, *letype;
   sym_link *ltype = operandType (left);
@@ -10614,7 +10614,7 @@ static void
 genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   sym_link *rtype, *retype, *letype;
 
@@ -11330,7 +11330,7 @@ static void
 genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   sym_link *retype, *letype;
   sym_link *ptype = operandType (result);
@@ -11431,7 +11431,7 @@ static void
 genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
   asmop *aop = NULL;
-  regs *preg = NULL;
+  reg_info *preg = NULL;
   const char *rname;
   sym_link *retype, *letype;
 
@@ -14064,7 +14064,7 @@ genReceive (iCode * ic)
     }
   else if (ic->argreg > 12)
     {                           /* bit parameters */
-      regs *reg = OP_SYMBOL (IC_RESULT (ic))->regs[0];
+      reg_info *reg = OP_SYMBOL (IC_RESULT (ic))->regs[0];
 
       if (!reg || reg->rIdx != ic->argreg - 5)
         {

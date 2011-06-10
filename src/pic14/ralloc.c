@@ -310,10 +310,10 @@ static int regname2key(char const *name)
 /*-----------------------------------------------------------------*/
 /* regWithIdx - Search through a set of registers that matches idx */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 regWithIdx (set *dRegs, int idx, int fixed)
 {
-        regs *dReg;
+        reg_info *dReg;
 
         for (dReg = setFirstItem(dRegs) ; dReg ;
         dReg = setNextItem(dRegs)) {
@@ -330,10 +330,10 @@ regWithIdx (set *dRegs, int idx, int fixed)
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int size, int alias)
+static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int size, int alias)
 {
 
-        regs *dReg, *reg_alias;
+        reg_info *dReg, *reg_alias;
 
         /* check whether a matching register already exists */
         dReg = dirregWithName( name );
@@ -347,7 +347,7 @@ static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int si
         if (!reg_alias) reg_alias = regWithIdx( dynDirectRegs, rIdx, 1 );
 
         // create a new register
-        dReg = Safe_calloc(1,sizeof(regs));
+        dReg = Safe_calloc(1,sizeof(reg_info));
         dReg->type = type;
         dReg->pc_type = pc_type;
         dReg->rIdx = rIdx;
@@ -383,10 +383,10 @@ static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int si
 /*-----------------------------------------------------------------*/
 /* regWithName - Search through a set of registers that matches name */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 regWithName (set *dRegs, const char *name)
 {
-        regs *dReg;
+        reg_info *dReg;
 
         for (dReg = setFirstItem(dRegs) ; dReg ;
         dReg = setNextItem(dRegs)) {
@@ -402,10 +402,10 @@ regWithName (set *dRegs, const char *name)
 /*-----------------------------------------------------------------*/
 /* regWithName - Search for a registers that matches name          */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 regFindWithName (const char *name)
 {
-        regs *dReg;
+        reg_info *dReg;
 
         if( (dReg = regWithName ( dynDirectRegs, name)) != NULL ) {
                 debugLog ("Found a Direct Register!\n");
@@ -441,10 +441,10 @@ regFindWithName (const char *name)
 /*-----------------------------------------------------------------*/
 /* regFindFree - Search for a free register in a set of registers  */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 regFindFree (set *dRegs)
 {
-        regs *dReg;
+        reg_info *dReg;
 
         for (dReg = setFirstItem(dRegs) ; dReg ;
         dReg = setNextItem(dRegs)) {
@@ -471,7 +471,7 @@ void initStack(int base_address, int size, int shared)
 
         for(i = 0; i<size; i++) {
                 char buffer[16];
-                regs *r;
+                reg_info *r;
                 SNPRINTF(&buffer[0], 16, "STK%02d", i);
                 // multi-bank device, sharebank prohibited by user
                 r = newReg(REG_STK, PO_GPR_TEMP, base_address--, buffer, 1, shared ? (pic ? pic->bankMask : 0x180) : 0x0);
@@ -485,7 +485,7 @@ void initStack(int base_address, int size, int shared)
 
 /*-----------------------------------------------------------------*
 *-----------------------------------------------------------------*/
-regs *
+reg_info *
 allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 {
 
@@ -496,10 +496,10 @@ allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 /*-----------------------------------------------------------------*
 *-----------------------------------------------------------------*/
 
-regs *
+reg_info *
 allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias)
 {
-        regs * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias);
+        reg_info *reg = newReg(REG_GPR, po_type, rIdx, name,1,alias);
 
         //fprintf(stderr,"allocInternalRegister %s addr =0x%x\n",name,rIdx);
         if(reg) {
@@ -512,10 +512,10 @@ allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias)
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 allocReg (short type)
 {
-        regs *reg;
+        reg_info *reg;
 
         debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
         //fprintf(stderr,"allocReg\n");
@@ -536,11 +536,11 @@ allocReg (short type)
 /*-----------------------------------------------------------------*/
 /* dirregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 dirregWithName (char *name)
 {
         int hkey;
-        regs *reg;
+        reg_info *reg;
 
         if(!name)
                 return NULL;
@@ -569,10 +569,10 @@ dirregWithName (char *name)
 /*-----------------------------------------------------------------*/
 /* allocNewDirReg - allocates a new register of given type         */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 allocNewDirReg (sym_link *symlnk,const char *name)
 {
-        regs *reg;
+        reg_info *reg;
         int address = 0;
         sym_link *spec = getSpec (symlnk);
 
@@ -632,11 +632,11 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 /*-----------------------------------------------------------------*/
 /* allocDirReg - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 allocDirReg (operand *op )
 {
 
-        regs *reg;
+        reg_info *reg;
         char *name;
 
         if(!IS_SYMOP(op)) {
@@ -764,11 +764,11 @@ allocDirReg (operand *op )
 /*-----------------------------------------------------------------*/
 /* allocRegByName - allocates register with given name             */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 allocRegByName (char *name, int size)
 {
 
-        regs *reg;
+        reg_info *reg;
 
         if(!name) {
                 fprintf(stderr, "%s - allocating a NULL register\n",__FUNCTION__);
@@ -839,11 +839,11 @@ allocRegByName (char *name, int size)
 /*-----------------------------------------------------------------*/
 /* RegWithIdx - returns pointer to register with index number       */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 typeRegWithIdx (int idx, int type, int fixed)
 {
 
-        regs *dReg;
+        reg_info *dReg;
 
         debugLog ("%s - requesting index = 0x%x\n", __FUNCTION__,idx);
 
@@ -895,10 +895,10 @@ typeRegWithIdx (int idx, int type, int fixed)
 /*-----------------------------------------------------------------*/
 /* pic14_regWithIdx - returns pointer to register with index number*/
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 pic14_regWithIdx (int idx)
 {
-        regs *dReg;
+        reg_info *dReg;
 
         if( (dReg = typeRegWithIdx(idx,REG_GPR,0)) != NULL)
                 return dReg;
@@ -912,11 +912,11 @@ pic14_regWithIdx (int idx)
 /*-----------------------------------------------------------------*/
 /* pic14_regWithIdx - returns pointer to register with index number       */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 pic14_allocWithIdx (int idx)
 {
 
-        regs *dReg;
+        reg_info *dReg;
 
         debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
 
@@ -950,11 +950,11 @@ pic14_allocWithIdx (int idx)
 }
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 pic14_findFreeReg(short type)
 {
         //  int i;
-        regs* dReg;
+        reg_info* dReg;
 
         switch (type) {
         case REG_GPR:
@@ -980,7 +980,7 @@ pic14_findFreeReg(short type)
 /* freeReg - frees a register                                      */
 /*-----------------------------------------------------------------*/
 static void
-freeReg (regs * reg)
+freeReg (reg_info * reg)
 {
         debugLog ("%s\n", __FUNCTION__);
         reg->isFree = 1;
@@ -1029,9 +1029,9 @@ nfreeRegsType (int type)
 static void packBits(set *bregs)
 {
         set *regset;
-        regs *breg;
-        regs *bitfield=NULL;
-        regs *relocbitfield=NULL;
+        reg_info *breg;
+        reg_info *bitfield=NULL;
+        reg_info *relocbitfield=NULL;
         int bit_no=0;
         int byte_no=-1;
         char buffer[20];
@@ -1095,7 +1095,7 @@ static void packBits(set *bregs)
 
 static void bitEQUs(FILE *of, set *bregs)
 {
-        regs *breg,*bytereg;
+        reg_info *breg,*bytereg;
         int bit_no=0;
 
         //fprintf(stderr," %s\n",__FUNCTION__);
@@ -1731,10 +1731,10 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 /*-----------------------------------------------------------------*/
 /* getRegPtr - will try for PTR if not a GPR type if not spil      */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
-        regs *reg;
+        reg_info *reg;
         int j;
 
         debugLog ("%s\n", __FUNCTION__);
@@ -1764,10 +1764,10 @@ tryAgain:
 /*-----------------------------------------------------------------*/
 /* getRegGpr - will try for GPR if not spil                        */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
-        regs *reg;
+        reg_info *reg;
         int j;
 
         debugLog ("%s\n", __FUNCTION__);
@@ -1798,7 +1798,7 @@ tryAgain:
 /* symHasReg - symbol has a given register                         */
 /*-----------------------------------------------------------------*/
 static bool
-symHasReg (symbol * sym, regs * reg)
+symHasReg (symbol *sym, reg_info *reg)
 {
         int i;
 
@@ -2039,7 +2039,7 @@ again:
 xchgPositions:
         if (shared)
         {
-                regs *tmp = result->regs[i];
+                reg_info *tmp = result->regs[i];
                 result->regs[i] = result->regs[j];
                 result->regs[j] = tmp;
                 goto again;
@@ -3867,7 +3867,7 @@ pic14_assignRegisters (ebbIndex *ebbi)
    * disjoint sets of registers are allocated to functions */
   if (1)
     {
-      regs *r;
+      reg_info *r;
 
       for (r = setFirstItem (dynAllocRegs);
            r;
@@ -3884,7 +3884,7 @@ pic14_assignRegisters (ebbIndex *ebbi)
 
   if (1)
     {
-      regs *reg;
+      reg_info *reg;
       int hkey;
       int i = 0;
 

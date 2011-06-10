@@ -991,7 +991,6 @@ redoStackOffsets (void)
   for (sym = setFirstItem (istack->syms); sym;
        sym = setNextItem (istack->syms))
     {
-
       int size = getSize (sym->type);
       /* nothing to do with parameters so continue */
       if ((sym->_isparm && !IS_REGPARM (sym->etype)))
@@ -1038,7 +1037,6 @@ redoStackOffsets (void)
   for (sym = setFirstItem (xstack->syms); sym;
        sym = setNextItem (xstack->syms))
     {
-
       int size = getSize (sym->type);
       /* nothing to do with parameters so continue */
       if ((sym->_isparm && !IS_REGPARM (sym->etype)))

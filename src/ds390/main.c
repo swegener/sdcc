@@ -220,7 +220,7 @@ _ds390_setDefaultOptions (void)
 }
 
 static const char *
-_ds390_getRegName (struct regs *reg)
+_ds390_getRegName (const struct reg_info *reg)
 {
   if (reg)
     return reg->name;

@@ -189,7 +189,7 @@ dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat, ...)
 }
 
 void
-tfprintf (FILE * fp, const char *szFormat, ...)
+tfprintf (FILE *fp, const char *szFormat, ...)
 {
   va_list ap;
   struct dbuf_s dbuf;

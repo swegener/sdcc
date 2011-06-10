@@ -60,7 +60,7 @@ _G;
 int mcs51_ptrRegReq;            /* one byte pointer register required */
 
 /* 8051 registers */
-regs regs8051[] = {
+reg_info regs8051[] = {
   {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1},
   {REG_GPR, R6_IDX, REG_GPR, "r6", "ar6", "0", 6, 1},
   {REG_GPR, R5_IDX, REG_GPR, "r5", "ar5", "0", 5, 1},
@@ -96,7 +96,7 @@ static void freeAllRegs ();
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 allocReg (short type)
 {
   int i;
@@ -128,8 +128,8 @@ allocReg (short type)
 /*-----------------------------------------------------------------*/
 /* allocThisReg - allocates a particular register (if free)        */
 /*-----------------------------------------------------------------*/
-static regs *
-allocThisReg (regs * reg)
+static reg_info *
+allocThisReg (reg_info *reg)
 {
   if (!reg->isFree)
     return NULL;
@@ -145,12 +145,12 @@ allocThisReg (regs * reg)
 /*-----------------------------------------------------------------*/
 /* mcs51_regWithIdx - returns pointer to register with index number*/
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 mcs51_regWithIdx (int idx)
 {
   int i;
 
-  for (i = 0; i < sizeof (regs8051) / sizeof (regs); i++)
+  for (i = 0; i < sizeof (regs8051) / sizeof (reg_info); i++)
     if (regs8051[i].rIdx == idx)
       return &regs8051[i];
 
@@ -162,7 +162,7 @@ mcs51_regWithIdx (int idx)
 /* freeReg - frees a register                                      */
 /*-----------------------------------------------------------------*/
 static void
-freeReg (regs * reg)
+freeReg (reg_info *reg)
 {
   if (!reg)
     {
@@ -209,7 +209,7 @@ nfreeRegsType (int type)
 /* useReg - marks a register  as used                              */
 /*-----------------------------------------------------------------*/
 static void
-useReg (regs * reg)
+useReg (reg_info *reg)
 {
   reg->isFree = 0;
 }
@@ -428,7 +428,7 @@ static void
 spillLRWithPtrReg (symbol * forSym)
 {
   symbol *lrsym;
-  regs *r0, *r1;
+  reg_info *r0, *r1;
   int k;
 
   if (!_G.regAssigned || bitVectIsZero (_G.regAssigned))
@@ -803,10 +803,10 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 /*-----------------------------------------------------------------*/
 /* getRegPtr - will try for PTR if not a GPR type if not spil      */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
-  regs *reg;
+  reg_info *reg;
   int j;
 
 tryAgain:
@@ -835,10 +835,10 @@ tryAgain:
 /*-----------------------------------------------------------------*/
 /* getRegGpr - will try for GPR if not spil                        */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
-  regs *reg;
+  reg_info *reg;
   int j;
 
 tryAgain:
@@ -867,10 +867,10 @@ tryAgain:
 /*-----------------------------------------------------------------*/
 /* getRegBit - will try for Bit if not spill this                  */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegBit (symbol * sym)
 {
-  regs *reg;
+  reg_info *reg;
 
   /* try for a bit type */
   if ((reg = allocReg (REG_BIT)))
@@ -883,10 +883,10 @@ getRegBit (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* getRegPtrNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegPtrNoSpil ()
 {
-  regs *reg;
+  reg_info *reg;
 
   /* try for a ptr type */
   if ((reg = allocReg (REG_PTR)))
@@ -905,10 +905,10 @@ getRegPtrNoSpil ()
 /*-----------------------------------------------------------------*/
 /* getRegGprNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegGprNoSpil ()
 {
-  regs *reg;
+  reg_info *reg;
   if ((reg = allocReg (REG_GPR)))
     return reg;
 
@@ -925,10 +925,10 @@ getRegGprNoSpil ()
 /*-----------------------------------------------------------------*/
 /* getRegBitNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegBitNoSpil ()
 {
-  regs *reg;
+  reg_info *reg;
 
   /* try for a ptr type */
   if ((reg = allocReg (REG_BIT)))
@@ -948,7 +948,7 @@ getRegBitNoSpil ()
 /* symHasReg - symbol has a given register                         */
 /*-----------------------------------------------------------------*/
 static bool
-symHasReg (symbol * sym, regs * reg)
+symHasReg (symbol * sym, reg_info * reg)
 {
   int i;
 
@@ -1166,7 +1166,7 @@ again:
 xchgPositions:
   if (shared)
     {
-      regs *tmp = result->regs[i];
+      reg_info *tmp = result->regs[i];
       result->regs[i] = result->regs[j];
       result->regs[j] = tmp;
       change++;
@@ -1409,7 +1409,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                         {
                           if (sym->regs[j]->offset > sym->regs[k]->offset)
                             {
-                              regs *tmp = sym->regs[j];
+                              reg_info *tmp = sym->regs[j];
                               sym->regs[j] = sym->regs[k];
                               sym->regs[k] = tmp;
                             }

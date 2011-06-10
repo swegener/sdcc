@@ -15,7 +15,7 @@ typedef struct DebugFile
   int (*writeType) (structdef *sdef, int block, int inStruct, const char *tag);
   int (*writeCLine) (iCode *ic);
   int (*writeALine) (const char *module, int Line);
-  int (*writeFrameAddress) (const char *variable, struct regs *reg, int offset);
+  int (*writeFrameAddress) (const char *variable, struct reg_info *reg, int offset);
 }DEBUGFILE;
 
 extern DEBUGFILE *debugFile;

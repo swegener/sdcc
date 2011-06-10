@@ -307,7 +307,7 @@ pic14printLocals (struct dbuf_s *oBuf)
 {
     set *allregs[6] = { dynAllocRegs/*, dynStackRegs, dynProcessorRegs*/,
         dynDirectRegs, dynDirectBitRegs/*, dynInternalRegs */ };
-    regs *reg;
+    reg_info *reg;
     int i, is_first = 1;
     static unsigned sectionNr = 0;
 
@@ -768,7 +768,6 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
         dbuf_printf (oBuf, "\tdb\t");
 
     if (!node) {
-        // initialize as zero
         for (i = 0; i < size; i++) {
             if (in_code) {
                 dbuf_printf (oBuf, "\tretlw 0x%02x\n", (int)(lit & 0xff));
@@ -1201,4 +1200,3 @@ showAllMemmaps(FILE *of)
 
     extBuf = gloBuf = gloDefBuf = ivalBuf = NULL;
 }
-

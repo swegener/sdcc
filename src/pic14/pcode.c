@@ -2060,7 +2060,7 @@ pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space, int i
 	pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
 	pcop->type = PO_IMMEDIATE;
 	if(name) {
-		regs *r = NULL;
+		reg_info *r = NULL;
 		pcop->name = Safe_strdup(name);
 		
 		if(!is_func) 
@@ -2131,7 +2131,7 @@ static symbol *symFindWithName(memmap * map, const char *name)
 pCodeOp *newpCodeOpBit(char *name, int ibit, int inBitSpace)
 {
 	pCodeOp *pcop;
-	struct regs *r = 0;
+	struct reg_info *r = 0;
 	
 	pcop = Safe_calloc(1,sizeof(pCodeOpRegBit) );
 	pcop->type = PO_GPR_BIT;
@@ -2454,7 +2454,7 @@ static void genericDestruct(pCode *pc)
 	if(isPCI(pc)) {
 	/* For instructions, tell the register (if there's one used)
 		* that it's no longer needed */
-		regs *reg = getRegFromInstruction(pc);
+		reg_info *reg = getRegFromInstruction(pc);
 		if(reg)
 			deleteSetItem (&(reg->reglives.usedpCodes),pc);
 	}
@@ -2696,7 +2696,7 @@ void pCodeDeleteChain(pCode *f,pCode *t)
 /*-----------------------------------------------------------------*/
 char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
-	regs *r;
+	reg_info *r;
 	static char b[50];
 	char *s;
 	int use_buffer = 1;    // copy the string to the passed buffer pointer
@@ -3354,9 +3354,9 @@ pCode * findPrevInstruction(pCode *pci)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-regs * getRegFromInstruction(pCode *pc)
+reg_info * getRegFromInstruction(pCode *pc)
 {
-	regs *r;
+	reg_info *r;
 	if(!pc                   || 
 		!isPCI(pc)            ||
 		!PCI(pc)->pcop        ||
@@ -3425,7 +3425,7 @@ static void AnalyzepBlock(pBlock *pb)
 				/* Loop through all of the registers declared so far in
 				this block and see if we find this one there */
 				
-				regs *r = setFirstItem(pb->tregisters);
+				reg_info *r = setFirstItem(pb->tregisters);
 				
 				while(r) {
 					if((r->rIdx == PCOR(PCI(pc)->pcop)->r->rIdx) && (r->type == PCOR(PCI(pc)->pcop)->r->type)) {
@@ -4098,7 +4098,7 @@ pic14_operandsAllocatedInSameBank(const char *str1, const char *str2) {
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static int sameBank(regs *reg, regs *previous_reg, const char *new_bank, const char *cur_bank, unsigned max_mask)
+static int sameBank(reg_info *reg, reg_info *previous_reg, const char *new_bank, const char *cur_bank, unsigned max_mask)
 {
     if (!cur_bank) return 0;
 
@@ -4124,8 +4124,8 @@ static void FixRegisterBanking(pBlock *pb)
 {
     pCode *pc;
     pCodeInstruction *pci;
-    regs *reg;
-    regs *previous_reg;		// contains the previous variable access info
+    reg_info *reg;
+    reg_info *previous_reg;		// contains the previous variable access info
     const char *cur_bank, *new_bank;
     unsigned cur_mask, new_mask, max_mask;
     int allRAMmshared;
@@ -4714,7 +4714,7 @@ void AnalyzeBanking(void)
 /*-----------------------------------------------------------------*/
 static DEFSETFUNC (resetrIdx)
 {
-	regs *r = (regs *)item;
+	reg_info *r = (reg_info *)item;
 	if (!r->isFixed) {
 		r->rIdx = 0;
 	}
@@ -4731,7 +4731,7 @@ static void InitReuseReg(void)
 	/* Start from begining of GPR. Note may not be 0x20 on some PICs */
 	/* XXX: Avoid clashes with fixed registers, start late. */
 	unsigned maxIdx = 0x1000;
-	regs *r;
+	reg_info *r;
 	for (r = setFirstItem(dynDirectRegs); r; r = setNextItem(dynDirectRegs)) {
 		if (r->type != REG_SFR) {
 			maxIdx += r->size; /* Increment for all statically allocated variables */
@@ -4765,7 +4765,7 @@ register_reassign(pBlock *pb, unsigned startIdx, unsigned level)
       idx = 0;
       while (regset)
         {
-          temp = ((regs *)regset->item)->rIdx;
+          temp = ((reg_info *)regset->item)->rIdx;
           if (temp > idx)
             idx = temp;
           regset = regset->next;
@@ -4839,7 +4839,7 @@ register_reassign(pBlock *pb, unsigned startIdx, unsigned level)
 
   if (pb->tregisters)
     {
-      regs *r;
+      reg_info *r;
       for (r = setFirstItem(pb->tregisters); r; r = setNextItem(pb->tregisters))
         {
           if ((r->type == REG_GPR) && (!r->isFixed) && (r->rIdx < (int)idx))
@@ -4855,7 +4855,7 @@ register_reassign(pBlock *pb, unsigned startIdx, unsigned level)
                 {
                   regset = pb->tregisters;
                   // do not touch s->curr ==> outer loop!
-                  while (regset && ((regs *)regset->item)->rIdx != idx)
+                  while (regset && ((reg_info *)regset->item)->rIdx != idx)
                     regset = regset->next;
                   if (regset)
                     idx++;
@@ -5087,7 +5087,7 @@ static void pBlockStats(FILE *of, pBlock *pb)
 {
 	
 	pCode *pc;
-	regs  *r;
+	reg_info *r;
 	
 	fprintf(of,";***\n;  pBlock Stats: dbName = %c\n;***\n",getpBlock_dbName(pb));
 	

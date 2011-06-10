@@ -1,3 +1,12 @@
+2011-06-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge the optralloc branch.
+
+2011-06-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed register-assignment-related multiplication bug.
+
 2011-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCcse.c(cseBBlock): fixed the fix
@@ -23,314 +32,398 @@
 
 2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/SDCC.lex,
-	  src/SDCC.y,
-	  src/SDCCsymt.h,
-	  src/SDCCopt.c:
-	  Add __optlink to allow passing arguments in reverse order.
+	* Merge from trunk.
 
-2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
+2011-06-05 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/SDCCmain.c,
-	  src/SDCCglue.c,
-	  src/SDCCglobl.h:
-	  Add --no-sdccopt-in-asm option, since the .optsdcc directive confuses some assemblers.
+	* src/SDCCralloc.hpp,
+	  src/z80/gen.c:
+	  Ensure that SEND iCodes, except for the first in each chain are deactivated for cost function calculation.
+
+2011-06-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed use of arbitrary register combinations as return value.
+
+2011-06-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/gen.h:
+	  Emit info about the register assignment being optimal when using --fverbose-asm.
+
+2011-05-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge from trunk.
+
+2011-05-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/z80/ralloc2.cc:
+	  Workarounds for compiler warnings.
 
 2011-05-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* src/mcs51/gen.c: changed snprintf to SNPRINTF,
-	  implemented --fomit-frame-pointer for --xstack
-	* src/SDCCmem.c(printAllocInfoSeg): print stack/xstack offsets
+	* src/hc08/main.c(hc08_dwarfRegNum): fixed interface
+	* src/mcs51/gen.c: fixed MSVC errors by changing snprintf to SNPRINTF
+	* src/port.h: fixed regNum and getRegName function pointer definitions
+	* src/z80/gen.c(genJumpTab): fixed warning
 
 2011-05-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/z80/gen.c,
-	  support/regression/tests/bug3299577.c:
-	  Fixed bug #3299577.
+	* src/z80/gen.c:
+	  Workarounds for compiler warnings.
 
-2011-05-22 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* debugger/mcs51/simi.c: added #include <sys/file.h> for Solaris
+	* Merge from trunk.
 
-2011-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* device/lib/abs.c: optimized
-	* src/mcs51/gen.c: replaced strcmp with EQ,
-	  implemented --fomit-frame-pointer (except for --xstack),
-	  added freeForBranchAsmops & swapOperands
-	* src/mcs51/main.c(_mcs51_finaliseOptions): --fomit-frame-pointer
-	* src/mcs51/peep.c(scan4op): detect sp manipulations
-	* src/SDCCmem.c(printAllocInfoSeg): print stack base
-	* support/regression/fwk/lib/spec.mk: cosmetic
-	* support/regression/tests/interrupt.c: new, added
-	* .version: bumped to 3.0.3
+	* src/SDCCicode.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Exact cost for builtin function calls.
 
-2011-05-20 Borut Razem <borut.razem AT gmail.com>
+2011-05-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* debugger/mcs51/simi.c:
-	  reverted to ioctl(sock, FIONBIO, &iMode) instead F_SETFL, O_NONBLOCK | O_ASYNC) on Solaris
-	* src/SDCCutil.c, src/SDCCsystem.c: fixed warnings on Solaris
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Fixed bug in Thorup heuristic, that resulted in much higher width of tree-decomposition.
 
-2011-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-21 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/mcs51/gen.c(genPlusIncr, genMinusDec): fixed bug 3304184
-	* src/SDCCutil.c: fixed warnings
-	* support/regression/tests/bug3304184.c: new, added
+	* Merge from trunk.
 
-2011-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* device/include/pic16/i2c.h: applied patch 3303565
+	* src/z80/gen.c:
+	  Remove unnecessary statement, debug message cleanup.
+
+2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/z80/rallo2.cc:
+	  Debug message cleanup.
+
+2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Ported reorganization of cast to bool from trunk.
+
+2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Merge from trunk.
 
 2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug3303325.c:
-	  Fixed bug #3303325.
+	  Merge from trunk: Fixed bug #3303325.
 
-2011-05-16 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* support/regression/tests/inline.c: disabled failing test for NetBSD
+	* src/z80/gen.c:
+	  Code cleanup wrt. temporary labels.
 
-2011-05-15 Borut Razem <borut.razem AT gmail.com>
+2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* debugger/mcs51/simi.c: replace FNONBLOCK and FASYNC with O_NONBLOCK and O_ASYNC
+	* configure.in:
+	  Give an error when boost is not detected.
 
-2011-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/mcs51/rtrack.c: fixed bug 3302328
-	* src/port.mk: made ar quiet
+	* Merge from trunk.
 
-2011-05-14 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-16 Philipp Klaus Krause <pkk@spth.de>
 
-	* support/regression/fwk/lib/extern1.c,
-	* support/regression/fwk/lib/extern2.c: removed inline for NetBSD builds
-	* src/SDCCast.c(decorateType): fixed bug 3117721
-	* support/regression/tests/bug3117721.c: new, added
-	* support/regression/ports/hc08/spec.mk: removed accidently added libs
-	* src/SDCCsymt.c(processFuncArgs): fixed bug 1932626
-	* support/regression/tests/bug1932626.c: new, added
+	* src/z80/gen.c:
+	  Fixed crash when running on cygwin.
 
-2011-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-15 Philipp Klaus Krause <pkk@spth.de>
 
-	* sdas/doc/asmlnk.txt,
-	* sdas/doc/asxhtm.html: added -w flag
-	* sdas/linksrc/lklist.c(slew),
-	* sdas/linksrc/lkmain.c(usetxt*): fixed 3299364
-	* support/regression/Makefile.in: and a third try to fix include path spec.mk
+	* Merge from trunk.
 
-2011-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* support/regression/ports/ds390/spec.mk,
-	* support/regression/ports/gbz80/spec.mk,
-	* support/regression/ports/hc08/spec.mk,
-	* support/regression/ports/host/spec.mk.in,
-	* support/regression/ports/mcs51-common/spec.mk,
-	* support/regression/ports/ucz80/spec.mk,
-	* support/regression/ports/z80/spec.mk: second try to fix include path spec.mk
-	* support/regression/tests/inline.c(inlined_function): fixed for host
+	* sdas/linksrc/aslink.vcxproj,
+	* sdas/linksrc/aslink.vcxproj.filters: added lkbank.c
+	* src/z80/ralloc.c: moved z80_init_asmops prototype
+
+2011-05-13 Philipp Klaus Krause <pkk@spth.de>
+
+	* Merge from trunk.
+
+2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  configure.in:
+	  Make STX library optional and detect it in configure script.
+
+2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Minor code cleanup and cost function accuracy improvement.
+
+2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Merge from trunk.
+
+2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/peeph-z80.def:
+	  Fixed some bit-manipulation peepholes for immediate operands.
+	* src/z80/gen.c:
+	  Fixed operand loading in complement.
 
 2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/SDCCbitv.h,
-	  src/SDCCbitv.c:
-	  Use const in bitvector functions in some places, where appropriate.
+	* Merge from trunk.
 
-2011-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* support/regression/ports/ds390/spec.mk,
-	* support/regression/ports/gbz80/spec.mk,
-	* support/regression/ports/hc08/spec.mk,
-	* support/regression/ports/host/spec.mk.in,
-	* support/regression/ports/mcs51-common/spec.mk,
-	* support/regression/ports/ucz80/spec.mk,
-	* support/regression/ports/z80/spec.mk: hopefully fixed include path spec.mk
+	* src/z80/z80.h,
+	  src/z80/main.c,
+	  src/z80/ralloc.c:
+	  Reintegrated old register allocator (option --oldralloc).
 
-2011-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/SDCCerr.c,
-	* src/SDCCerr.h,
-	* src/SDCCsymt.c(checkSClass): removed E_EXTERN_INIT error, see 6.9.2-2
-	* src/SDCCglue.c(emitRegularMap, emitStaticSeg): fixed extern definitions
-	  (printIvalType): use ulFromVal
-	* support/regression/tests/inline.c(inlined_function): added test
-	* support/regression/fwk/lib/extern1.c,
-	* support/regression/fwk/lib/extern2.c: new, added for inline.c test
-	* support/regression/ports/ds390/fwk.lib,
-	* support/regression/ports/gbz80/fwk.lib,
-	* support/regression/ports/hc08/fwk.lib,
-	* support/regression/ports/mcs51-common/fwk.lib,
-	* support/regression/ports/ucz80/fwk.lib,
-	* support/regression/ports/z80/fwk.lib,
-	* support/regression/fwk/lib/fwk.lib,
-	* support/regression/ports/ds390/spec.mk,
-	* support/regression/ports/gbz80/spec.mk,
-	* support/regression/ports/hc08/spec.mk,
-	* support/regression/ports/host/spec.mk.in,
-	* support/regression/ports/mcs51-common/spec.mk,
-	* support/regression/ports/ucz80/spec.mk,
-	* support/regression/ports/z80/spec.mk,
-	* support/regression/fwk/lib/spec.mk: moved non-port-specific test library
-	* support/regression/Makefile.in: cosmetic
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Handle the check for result bytes overwriting operand bytes in the conflict graph instead of the cost function.
 
-2011-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-08 Philipp Klaus Krause <pkk@spth.de>
 
-	* src/z80/gen.c(setupPair, aopGet, genFunction): partial fix for
-	  --fomit-frame-pointer
+	* src/z80/ralloc2.cc
+	  Fixed over-eager early HLinst_OK() use.
 
-2011-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-08 Philipp Klaus Krause <pkk@spth.de>
 
-	* support/regression/ports/ucz80/spec.mk: fixed
+	* Merge from trunk.
 
-2011-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-06 Philipp Klaus Krause <pkk@spth.de>
 
-	* support/regression/ports/gbz80/spec.mk,
-	* support/regression/ports/ucz80/spec.mk,
-	* support/regression/ports/z80/spec.mk: fixed bug 3158245
-	* src/SDCCast.c(decorateType): fixed bug 3297181
+	* src/z80/gen.c:
+	  Remove some leftover debug stuff.
+	* src/z80/peeph-z80.def:
+	  Generalize optimization of bit setting and resetting.
 
-2011-05-03 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-06 Philipp Klaus Krause <pkk@spth.de>
 
-	* src/SDCCast.c(resolveSymbols): fixed bug 3188899
-	* support/regression/tests/bug3188899.c: new, added
+	* Merge everything except src/z80/gen.c from trunk,
+	  but mark gen.c as merged, so that further changes in gen.c
+	  will be merged.
 
-2011-05-02 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* sdas/linksrc/lklex.c(nxtline): use provided linker script extension
-	  instead of forcing .lnk or .lk
-	* sdas/linksrc/aslink.h,
-	* sdas/linksrc/lkdata.c,
-	* sdas/linksrc/lkmain.c,
-	* sdas/doc/asmlnk.txt,
-	* sdas/doc/asxhtm.html: documented changed flags
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc
+	  Improved performance, reduced memory usage.
 
-2011-04-27 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-05-02 Borut Razem <borut.razem AT gmail.com>
 
-	* sdas/linksrc/aslink.h,
-	* sdas/linksrc/lkmain.c(intsiz, doparse, parse, main, usage): synced with
-	  ASxxxx 5, changed command line flags
-	* src/hc08/main.c,
-	* src/SDCCmain.c: use new flags
+	* configure.in, configure:
+	  don't use "-pipe" on x86 Solaris g++, since src/z80/ralloc2.cc dies
+
+2011-04-29 Philipp Klaus Krause <pkk@spth.de>
+
+	* Merge everything except src/z80/gen.c from trunk.
+
+2011-04-29 Philipp Klaus Krause <pkk@spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc
+	  Some performance improvements.
+
+2011-04-25 Philipp Klaus Krause <pkk@spth.de>
+
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* sdas/linksrc/lkbank.c: new, added
-	* sdas/linksrc/aslink.h,
-	* sdas/linksrc/aslink.dsp,
-	* sdas/linksrc/Makefile.in: added lkbank.c
-	* sdas/linksrc/lkmain.c(main, lkexit): factored out lkfopen and lkfclose
-	* sdas/linksrc/lkrloc.c(relr, rele): changed oflag=4 for ELF
+	* debugger/mcs51/cmd.c,
+	* debugger/mcs51/symtab.c,
+	* src/z80/ralloc2.cc: fixed some warnings
+	* sdas/linksrc/aslink.vcxproj,
+	* sdas/linksrc/aslink.vcxproj.filters: added lksdcdb.c
+	* src/src.vcxproj,
+	* src/src.vcxproj.filters,
+	* sdcc.sln: added dependencies on config, removed avr & xa51
+	* sdcc_vc_in.h: set OPT_DISABLE_AVR & OPT_DISABLE_XA51
+	* src/pic14/ralloc.h: fixed rename of struct regs to reg_info
+	* src/z80/gen.c: replaced true/false with TRUE/FALSE
 
-2011-04-24 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-21 Philipp Klaus Krause <pkk@spth.de>
 
-	* src/SDCCglue.c(emitRegularMap, emitOverlay): fixed bug 3038028
-	* support/regression/tests/bug1477149.c,
-	* support/regression/fwk/lib/statics.c: added s_get_indexed for bug 3038028
+	* src/SDCCdebug.h,
+	  src/mcs51/gen.c,
+	  src/mcs51/ralloc.c,
+	  src/mcs51/gen.h,
+	  src/mcs51/ralloc.h,
+	  src/mcs51/main.c,
+	  src/mcs51/rtrack.c,
+	  src/SDCCsymt.h,
+	  src/SDCCdwarf2.c,
+	  src/port.h,
+	  src/pic14/pcode.h,
+	  src/pic14/pcodepeep.c,
+	  src/pic14/pcoderegs.c,
+	  src/pic14/ralloc.c,
+	  src/pic14/gen.h,
+	  src/pic14/ralloc.h,
+	  src/pic14/main.c,
+	  src/pic14/pcode.c,
+	  src/pic14/glue.c,
+	  src/z80/ralloc.c,
+	  src/z80/gen.h,
+	  src/z80/ralloc.h,
+	  src/z80/main.c,
+	  src/pic16/pcode.h,
+	  src/pic16/device.c,
+	  src/pic16/device.h,
+	  src/pic16/gen.c,
+	  src/pic16/pcoderegs.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/gen.h,
+	  src/pic16/ralloc.h,
+	  src/pic16/main.c,
+	  src/pic16/main.h,
+	  src/pic16/pcode.c,
+	  src/pic16/glue.c,
+	  src/hc08/gen.h,
+	  src/hc08/ralloc.h,
+	  src/hc08/main.c,
+	  src/hc08/gen.c,
+	  src/hc08/ralloc.c,
+	  src/ds390/gen.h,
+	  src/ds390/ralloc.h,
+	  src/ds390/main.c,
+	  src/ds390/gen.c,
+	  src/ds390/ralloc.c,
+	  src/cdbFile.c:
+	  Renamed regs struct to reg_info, since g++ pollutes the global namespace with "regs" on OpenSolaris, even when using --std=c++98.
 
-2011-04-23 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-21 Philipp Klaus Krause <pkk@spth.de>
 
-	* sdas/linksrc/lkar.c(get_member_name, fndsym_ar): small fixes
-	* sdas/linksrc/lkmain.c(main): fixed bug 3290988
-	* sdas/linksrc/aslink.h,
-	* sdas/linksrc/lkhead.c,
-	* sdas/linksrc/lkihx.c,
-	* sdas/linksrc/lklex.c,
-	* sdas/linksrc/lklibr.c,
-	* sdas/linksrc/lklibr.h,
-	* sdas/linksrc/lkmem.c,
-	* sdas/linksrc/lkrel.c,
-	* sdas/linksrc/lks19.c,
-	* sdas/linksrc/lksym.c,
-	* sdas/linksrc/sdld.c: cosmetic changes
-	* sdas/linksrc/lklist.c,
-	* sdas/linksrc/lknoice.c: synced with ASxxxx 5
-	* src/mcs51/gen.c(genCall): fixed bug 3290691
-	* support/regression/tests/bug3290691.c: new, added
+	* Merge everything except src/z80/gen.c from trunk.
 
-2011-04-20 Borut Razem <borut.razem AT gmail.com>
+2011-04-20 Philipp Klaus Krause <pkk@spth.de>
 
-	* debugger/mcs51/simi.c: fixed compilation on Solaris
+	* src/z80/gen.c:
+	  Fixed bug in assignments to bitfields of size < 8.
 
-2011-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-20 Philipp Klaus Krause <pkk@spth.de>
 
-	* sdas/linksrc/aslink.dsp: added lksdcdb.c
-	* sdas/linksrc/aslink.h,
-	* sdas/linksrc/lknoice.c(NoICEfopen),
-	* sdas/linksrc/lkmain.c(main): factored out NoICEfopen
+	* src/SDCCralloc.hpp:
+	  Allow extremly low values of --max-allocs-per-node.
 
-2011-04-18 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* sdas/linksrc/Makefile.in,
-	* sdas/linksrc/lksdcdb.c: new, added,
-	* sdas/linksrc/aslink.h,
-	* sdas/linksrc/lkdata.c,
-	* sdas/linksrc/lkeval.c,
-	* sdas/linksrc/lklex.c,
-	* sdas/linksrc/lklibr.c,
-	* sdas/linksrc/lklist.c,
-	* sdas/linksrc/lkmain.c: synced further with ASxxxx 5
-	* sdas/linksrc/sdld.c: moved tolower
-	* src/SDCCmain.c(linkEdit),
-	* src/z80/main.c(_gbz80_rgblink): changed .lnk to .lk
-	* lkar.c(strndup): removed static
+	* src/z80/gen.c:
+	  Make some cheapMove()s for more optimization potential (moving some optimizations from the peephole optimizer to code generation, where they can be seen by the cost function).
 
-2011-04-18 Borut Razem <borut.razem AT gmail.com>
+2011-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* lkar.c: strndup() is a GNU extension,
-	  so it is defined here for all platforms
+	* src/z80/peeph-z80.def:
+	  Added some peephole rules to better optimize shifting and dead loads.
 
-2011-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* lkar.c: fixed bug 3288398
+	* Merge everything except src/z80/gen.c from trunk.
 
-2011-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* sdas/linksrc/aslink.h: include sdld.h
-	* sdas/linksrc/lkarea.c(lkparea, lnkarea, lnkarea2),
-	* sdas/linksrc/lkmain.c(parse, setbas),
-	* sdas/linksrc/lksym.c(newsym, symeq, hash): synced zflag with ASxxxx 5
-	* support/regression/ports/z80/fwk.lib: new, added
+	* src/z80/gen.c:
+	  Fixed result assignment bug in addition.
 
-2011-04-13 Philipp Klaus Krause <pkk AT spth.de>
+2011-04-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* device/include/string.h,
-	  device/lib/_memset.c,
-	  device/lib/_strchr.c,
-	  device/lib/_strrchr.c:
-	  Make string function parameters standard-compliant for the z80 and gbz80 ports.
+	* src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  src/z80/main.c,
+	  src/z80/z80.h:
+	  Added --optralloc-remat option for handling rematerialization in the new allocator,
+	  fixed cost function bug when reading beyond the size of operands,
+	  removed option for the use of an exact cost function and made the exact cost function the default,
+	  improved code generation for addition.
 
-2011-04-13 Borut Razem <borut.razem AT gmail.com>
+2011-04-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/SDCCerr.c, src/SDCCerr.h, src/SDCCval.c, src/SDCCutil.c,
-	  src/SDCCutil.h: added support for universal characters in strings,
-	  support for "\Uxxxxxxxx", warning if not C99
+	* src/z80/gen.c:
+	  Fixed a bug triggered by assigning rematerializeable variables to register A or IY.
 
-2011-04-13 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* device/lib/gbz80/crtcall.s,
-	* device/lib/z80/crtcall.s: new, added for RFE 3284870
-	* device/lib/gbz80/Makefile.in,
-	* device/lib/z80/Makefile.in: added crtcall
-	* src/z80/gen.c(emitCall): use __sdcc_call_hl
-	* src/z80/peep.c(z80MightRead): prevent HL from being optimized out
-	* support/regression/ports/gbz80/spec.mk,
-	* support/regression/ports/z80/spec.mk: added fwklib for statics.rel
+	* Merge everything except src/z80/gen.c from trunk.
 
-2011-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-04-17 Philipp Klaus Krause <pkk AT spth.de>
 
-	* sdas/linksrc/lkaomf51.c(OutputAOEMF51): use .omf extension
+	* src/z80/gen.c:
+	  Fixed bug in bitfield reading that occoured when reading from (HL) and writing the result to L.
 
-2011-04-12 Borut Razem <borut.razem AT gmail.com>
+2011-04-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* sdas/linksrc/lkar.c: fixed bug #3279445 -
-	  [z80] Linker map file has /0 instead of divusigned.rel
-	* src/SDCCerr.c, src/SDCCerr.h, src/SDCCval.c,
-	  src/SDCCutil.c, src/SDCCutil.h:
-	  fixed bug #3252262 - Universal character names broken
+	* Merge everything except src/z80/gen.c from trunk.
+
+2011-04-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Merge everything except src/z80/gen.c from trunk.
+
+2011-04-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Some optimizations for using a pointer to a bitfield in iy,
+	  improve pushing of 4-byte parameters.
+
+2011-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fixed genAssign to be able to handle arbitrary register-to-register assignments.
+
+2011-04-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed another genPointerGet() bug.
 
 2011-04-10 Borut Razem <borut.razem AT gmail.com>
 
-	* src/z80/gen.c: sync with optralloc branch
-	* src/port.h: cosmetic changes
+	* src/z80/gen.c: dbuf-ized
+	* src/SDCCglobl.h: sync with trunk
+
+2011-04-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Cleaned up some leftover debug messages,
+	  fixed assignment of lh to hl,
+	  implemented exact cost for EXSTK to SFR assignment,
+	  fixed genPointerGet() bug that made simplefloat regression tests fail.
+
+2011-04-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Added warning in commitPair() for lh to hl assignment.
+
+2011-04-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed bug that could result in slightly wrong cost function.
+
+2011-04-09 Borut Razem <borut.razem AT gmail.com>
+
+	* Merge from trunk
+	* support/regression/tests/bug3166208.c: sync with trunk
+
+2011-04-09 Borut Razem <borut.razem AT gmail.com>
+
+	* src/z80/gen.c, src/z80/ralloc2.cc:
+	  changed with the Philipp's version from his private
+	  sdcc-or-2011-4-8 branch; fixed MSVC 2010 compilation
+	* src/SDCCicode.c: dbuf_detach() replaced with dbuf_destroy()
+	* support/regression/ports/ucz80/spec.mk:
+	  added --optralloc-exact-cost to SDCCFLAGS
 
 2011-04-09 Borut Razem <borut.razem AT gmail.com>
 
@@ -338,6 +431,29 @@
 	* support/regression/tests/logic.c, src/SDCCpeeph.c, src/SDCCasm.c,
 	  src/SDCCicode.c, src/SDCCglobl.h, src/SDCCsystem.c:
 	  sync with optralloc branch
+
+2011-04-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c:
+	  Fixed bug that allowed old register allocator to use IY even when the new one does, too,
+	  which led to conflicts in the assignment.
+
+2011-04-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/port.h,
+	  src/SDCCpeeph.c,
+	  src/z80/main.c,
+	  src/z80/peep.h,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def:
+	  Added new peephole function notUsedFrom() to check for variable uses starting from label,
+	  added it as condition in peepholes where appropriate, modified notUsed()
+	  peephole function to not rely on first argument being constant or %1.
+
+2011-04-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed SIGSEGV crash due to incorrect register pair cache spilling.
 
 2011-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -349,12 +465,116 @@
 	* src/mcs51/gen.c (xstackRegisters, saveRegisters, unsaveRegisters,
 	  genSend): fixed for new register order
 
+2011-04-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Give warning instead of crashing when failing to parse ex line node.
+
+2011-04-05 Borut Razem <borut.razem AT gmail.com>
+
+	* src/src.vcxproj, src/src.vcxproj.filters, src/z80/gen.c:
+	  fixed MSVC 2010 compilation
+	* src/SDCCasm.c, src/SDCCasm.h:
+	  removed tsprintf(), dbuf_tprintf() is used instead
+	* src/z80/gen.c: fixed bug in fetchLitPair()
+
+2011-04-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Avoid assignments where the result overwrites operands in some unary operations.
+	* src/z80/gen.c:
+	  Avoid unnecessary saving of iy in builtin memcpy().
+
+2011-04-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Avoid assignments where the result overwrites operands in subtraction, addition, bitwise and, xor;
+	  get correct cost for bitwise or.
+	* src/z80/gen.c:
+	  Remove workaround for result overwritings operands in addition; fixed commitPair() for swapped bytes in target.
+
+2011-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed broken or when result is sfr.
+	* src/z80/peeph-z80.def:
+	  Fixed broken peephole for combining additions next to pushes.
+
+2011-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Allow iy as operand to left shift and decrement.
+
+2011-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Fixed broken caching of values in hl during pointer assignment.
+
+2011-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Do not allocate operands to hl when the code generator will use (hl) for the result in addition.
+
+2011-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix for restoring of register iy when other register pairs are restored as well.
+
+2011-03-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fix peephole 76' so it doesn't overwrite accumulator during multibyte addition.
+
+2011-03-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix for genPointerGet when result is lh.
+
+2011-03-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix for addition with literal when right operand is partially in hl.
+
 2011-03-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (regs8051, serialRegAssign),
 	* src/mcs51/ralloc.h: prefer to use adjacent ascending registers
 
-2011-03-27 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-03-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lklex.c,
+	* src/SDCCast.c: small fixes
+
+2011-03-29 Borut Razem <borut.razem AT gmail.com>
+
+	* Partially merge from trunk
+
+2011-03-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/z80.h,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc,
+	  src/z80/peeph-z80.def:
+	  Handle IY in the new allocator.
+
+2011-03-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  src/z80/z80.h:
+	  Preparations for handling IY in the new allocator.
+
+2011-03-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  Fixes for the exact cost function.
+
+2011-03-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lklex.c,
 	* src/SDCCast.c: small fixes
@@ -363,7 +583,7 @@
 
 	* src/z80/gen.c: fixed bug, introduced during code cleaning
 
-2011-05-28 Philipp Klaus Krause <pkk AT spth.de>
+2011-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCerr.c,
 	  src/SDCCerr.h,
@@ -430,6 +650,13 @@
 	* src/SDCCcse.c (boolCast, cseBBlock):
 	  Reenabled boolCast except for the one case that triggers bug 3223041.
 
+2011-03-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  gbz80 fixes.
+
 2011-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.h: added IS_BOOLEAN
@@ -450,11 +677,37 @@
 	  dbuf-ized, get rid of global buffer, code cleaning,
 	  use dbuf_tprintf() instead of tsprintf()
 
+2011-03-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/SDCCicode.h,
+	  src/z80/ralloc2.cc:
+	  Make sdcc the best compiler for the Z80.
+
+2011-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  sfr fixes for accurate cost function.
+
+2011-03-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Code reorganization for a more accurate cost function.
+
+
 2011-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/ds390/spec.mk,
 	* support/regression/ports/hc08/spec.mk,
 	* support/regression/ports/ucz80/spec.mk: fixed output
+
+2011-03-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Code reorganization for a more accurate cost function.
 
 2011-03-21 Borut Razem <borut.razem AT gmail.com>
 
@@ -471,6 +724,20 @@
 2011-03-21 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCval.c, src/SDCCval.h, src/SDCCast.c: dbuf-ized
+
+2011-03-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/z80.h,
+	  src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Code reorganization for a more accurate cost function.
+
+2011-03-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/z80.h,
+	  src/z80/main.c:
+	  Register allocator option cleanup.
 
 2011-03-20 Borut Razem <borut.razem AT gmail.com>
 
@@ -489,6 +756,14 @@
 	* src/mcs51/gen.c (toCarry): handle IS_OP_ACCUSE,
 	  (genCmpEq, genAnd, genOr, genXor): fixed bug 3223041
 	* support/regression/tests/bug3223041.c: new, added
+
+2011-03-20 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCmain.c, src/SDCCmacro.c, src/SDCCmacro.h, src/SDCCutil.c,
+	  src/SDCCutil.h: dbuf-ized SDCCmacro.c
+	* src/SDCCutil.c, src/SDCCutil.h, src/SDCCmain.c, src/ds390/main.c, src/z80/main.c:
+	  dbuf-ized buildCmdLine(), moved to SDCCutil
+	* src/SDCCbuild_cmd.[ch]: deleted
 
 2011-03-20 Borut Razem <borut.razem AT gmail.com>
 
@@ -559,6 +834,30 @@
 	  fixed empty statement warnings
 	* sdas/asxxsrc/asmain.c:
 	  fixed bug #3195019: sdcc generates .rel instead of .o
+	* src/Makefile.in:
+	  removed -O2 from CPPFLAFS
+
+2011-03-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  src/z80/main.c:
+	  Code reorganization for a more accurate cost function.
+
+2011-03-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/z80.h:
+	  Solaris fix.
+
+2011-03-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/gen.h,
+	  src/z80/z80.h:
+	  Code reorganization for a more accurate cost function.
 
 2011-03-15 Borut Razem <borut.razem AT gmail.com>
 
@@ -566,10 +865,23 @@
 	  added C99_FLAG to CFLAGS and MAKEDEP for SunPro C compiler
 	* debugger/mcs51/simi.c: include <sys/filio.h> in Solaris
 
+2011-03-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/main.c,
+	  src/z80/gen.h,
+	  src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Code reorganization for a more accurate cost function.
+
 2011-03-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (pointerTypeToGPByte),
 	* src/ds390/gen.c (genCast): ds390 function pointer is no CPOINTER
+
+2011-03-14 Borut Razem <borut.razem AT gmail.com>
+
+	* configure, configure.in: don't use C99_FLAG in CXXFLAGS
+	  for SunPro C++ compiler
 
 2011-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -579,16 +891,38 @@
 	  when resulttype is generic pointer, necessary for varargs
 	* support/regression/tests/bug2084206.c: new, added
 
+2011-03-13 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCglobl.h: don't incude stdbool.h if compiled with c++
+
+2011-03-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Preparations for rematerialization support in new allocator.
+	* src/z80/ralloc.c:
+	  Old register allocator cleanup.
+	* src/z80/gen.c:
+	  Code reorganization for a more accurate cost function.
+
 2011-03-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c,
 	  support/regression/tests/memory.c:
-	  Fix for #3188357 from optralloc branch.
+	  Completed fix for #3188357.
+
+2011-03-07 Borut Razem <borut.razem AT gmail.com>
+
+	* configure, configure.in, src/Makefile.in: CXXFLAGS fixes
 
 2011-03-06 Borut Razem <borut.razem AT gmail.com>
 
 	* sim/ucsim/cmd.src/Makefile.in:
 	  fixed for bison, byacc and flex version 2.5.4
+
+2011-03-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Partial fix for #3188357.
 
 2011-03-05 Borut Razem <borut.razem AT gmail.com>
 
@@ -597,7 +931,7 @@
 	  sim/ucsim/cmd.src/cmdset.cc, sim/ucsim/cmd.src/cmdlex.l,
 	  sim/ucsim/cmd.src/newcmdposix.cc, sim/ucsim/cmd.src/newcmdwin32.cc,
 	  sim/ucsim/cmd.src/cmdpars.y, sim/ucsim/configure.in:
-	  use bison instead unsupported bison++
+	  use bison instead of unsupported bison++
 	* sim/ucsim/cmd.src/flex_lexer.h, sim/ucsim/cmd.src/cmdpars.cc,
 	  sim/ucsim/cmd.src/cmdpars.h, sim/ucsim/cmd.src/FlexLexer.h,
 	  sim/ucsim/cmd.src/cmdlex.cc: deleted
@@ -614,23 +948,64 @@
 	  first search in $SDCC_LIB/<model>
 	  then search in $SDCC_LIB
 
+2011-03-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Improved coalescing.
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Minor improvements.
+
+2011-02-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-z80.def:
+	  Various minor improvements.
+
+2011-02-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def
+	  Minor peephole improvements.
+
 2011-02-24 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: fixed bug #3191324: PIC instructions in documentation
 
-2011-02-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-02-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/z80/peeph-z80.def:
-	  Minor peephole fix.
+	* src/mcs51/gen.c,
+	  src/z80/peeph-z80.def:
+	  Merge from trunk.
 
-2011-02-20 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-02-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/mcs51/gen.c (genCmp): removed regression, fixes bug 3090354
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Improvements for --optralloc-all.
 
-2011-01-19 Philipp Klaus Krause <pkk AT spth.de>
+2011-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/main.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Fixes for --fomit-frame-pointer.
+	* src/mcs51/gen.c:
+	  Merge from trunk.
+
+2011-02-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Liverange fix.
+	* src/z80/peep.c,
+	  src/z80/gen.c:
+	  Fixes for --reserve-regs-iy.
 	* support/regression/tests/bug-3184920.c:
-	  Disabled for hc08.
+	  Merge from trunk.
 
 2011-02-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -655,127 +1030,388 @@
 
 	* src/z80/peeph-z80.def,
 	  support/regression/tests/bug-3184920.c:
-	  Fixed #3184920.
+	  Fix for #3184920 from trunk.
 
 2011-02-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* support/scripts/sdcc.nsi:
+	  Merge from trunk.
+	* src/z80/ralloc2.cc:
+	  Fix for --optralloc-all.
 	* src/z80/gen.c:
-	  Fix for --reserve-regs-iy from optralloc branch.
-
-2011-02-17 Borut Razem <borut.razem AT gmail.com>
-
-	* support/scripts/sdcc.nsi: use ${IsNT} from WinVer.nsh
+	  Fix for --reserve-regs-iy.
 
 2011-02-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Improved heuristics wrt. junction nodes.
+	* src/version.awk,
+	  src/src.dsp,
+	  support/scripts/resource.rc:
+	  Merge from trunk.
 	* src/z80/gen.c:
-	  Improvements from optralloc branch.
+	  Improved addition by increment.
 
-2011-02-13 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/src.dsp: added some header files, added Resource Files group
-	* src/version.awk: added SDCC_BUILD_NR
-	* support/scripts/resource.rc: added VERSIONINFO
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Early elimination of some impossible assignments.
+
+2011-02-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Avoid result overwriting operand bug in |.
+
+2011-02-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Changed style from Allman to GNU.
 
 2011-02-07 Borut Razem <borut.razem AT gmail.com>
 
-	* src/pic14/glue.c: applied patch #2924048:
-	  __code initialized structures cause asm syntax error +patch.
-	  Thanks Philip Gladstone
+	* Merged from trunk
 
 2011-02-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* src/avr/gen.c (aopOp): use OP_VALUE
-	* src/xa51/ralloc.c (packRegsForSupport): use OP_SYMBOL, OP_KEY, OP_DEFS
-	* src/SDCCloop.c (basicInduction): fixed bug 3150679
-	* support/regression/tests/bug3166208.c: added test for bug 3150679
+	* all.vcxproj: fixed missing ;'s
+	* all.vcxproj.filters: added sdld6808, sdldgb, sdldz80
 
-2011-02-05 Maarten Brock <sourceforge.brock AT dse.nl>
+2011-02-05 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/SDCCicode.c (setOperandType): fixed bug 3166208
-	* support/regression/tests/bug-221168.c: use __xdata from testfwk.h
-	* support/regression/tests/bug3166208.c: new, added
+	* src/SDCCicode.c (setOperandType),
+	  support/regression/tests/bug-221168.c,
+	  support/regression/tests/bug3166208.c:
+	  Maarten's fix of #3166208 from trunk.
 
 2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/port.mk,
-	  src/SDCCsymt.h,
-	  src/SDCCsymt.c,
-	  src/SDCCglobl.h,
-	  src/SDCCmain.c,
-	  src/SDCCutil.c,
-	  src/SDCClrange.c,
-	  src/SDCCicode.h,
-	  src/SDCCicode.c,
+	* src/mcs51/gen.h,
 	  src/mcs51/gen.c,
-	  src/z80/ralloc.c,
-	  src/pic14/gen.c,
-	  src/pic14/ralloc.c,
-	  src/pic16/gen.c,
-	  src/pic16/genutils.c,
-	  src/hc08/gen.c,
-	  src/ds390/gen.c,
-	  src/ds390/ralloc.c:
-	  Minor improvements from the optralloc branch.
+	  sdas/linksrc/Makefile.in,
+	  support/makebin/makebin.c,
+	  support/regression/tests/bug3130806.c:
+	  Fixes from trunk.
 
 2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* sim/ucsim/z80.src/inst_cb.cc:
 	  Fixed #3166058.
-	* src/z80/gen.c:
-	  Improvements from the optralloc branch.
 
-2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-01-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/z80/gen.c:
-	  Some fixes from from the optralloc branch.
+	* src/z80/ralloc2.cc:
+	  Improved handling of HL.
 
-2011-02-03 Borut Razem <borut.razem AT gmail.com>
+2011-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
-	* support/makebin/makebin.c:
-	  fixed bugs #3171768: makebin fails when data is at the last byte,
-	  #3171795: If makebin read_ihx fails, it should exit with an error code
+	* src/z80/ralloc2.cc:
+	  Improved handling of HL.
 
-2011-02-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/peeph-z80.def:
-	  Peephole improvements from the optralloc branch.
-	* src/z80/gen.c:
-	  Some cleanups from the optralloc branch.
+	* src/z80/ralloc2.cc,
+	  src/z80/peeph-z80.def:
+	  Improved handling of A and HL.
 
-2011-02-02 Borut Razem <borut.razem AT gmail.com>
+2011-01-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* sdas/linksrc/Makefile.in:
-	  fixed bug #3170674: Incorrect file ownerships after make install
-
-2011-01-27 Maarten Brock <sourceforge.brock AT dse.nl>
-
-	* src/mcs51/gen.c (mova): added early optimization,
-	  (getFreePtr): simplified aopp to aop,
-	  (aopPtrForSym): factored out of aopForSym,
-	  (freeAsmop,freeForBranchAsmop): fixed bug 3130806 for AOP_STK
-	* src/mcs51/gen.h (asmop): replaced aop_stk with aop_sym
-	* support/regression/tests/bug3130806.c: new, added
+	* Makefile.common.in,
+	  src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Improved handling of A and HL.
 
 2011-01-25 Borut Razem <borut.razem AT gmail.com>
 
-	* src/SDCCsysytem.c: removed MSCV 2010 warnings
+	* src/z80/gen.c:
+	  removed MSCV 2010 warning C4018: '<' : signed/unsigned mismatch
+	* src/SDCCsysytem.c, src/SDCCutil.c: removed MSCV 2010 warnings
+
+2011-01-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Improved handling of A and HL.
+
+2011-01-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCglobl.h,
+	  src/SDCCralloc.hpp,
+	  std/SDCCmain.c,
+	  src/z80/z80.h,
+	  src/z80/main.c:
+	  Modified fix for MSVC 2010 warnings, changed handling of --max-allocs-per-node option.
+
+2011-01-24 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCralloc.hpp, src/z80/main.c, src/z80/ralloc2.cc,
+	  src/z80/z80.h, src/z80/z80.vcxproj: fixed msvc 2010 warnings
+
+2011-01-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improved handling of HL in the new allocator.
+
+2011-01-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Fixed bug in handling of register A.
+
+2011-01-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc,
+	  src/z80/z80.h,
+	  src/z80/main.c,
+	  src/z80/gen.c:
+	  Improved handling of A in the new register allocator and made it the default.
+
+2011-01-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/z80.h,
+	  src/z80/main.c,
+	  src/z80/ralloc.c:
+	  Added option to handle hl, but not a (or iy) by new allocator.
+
+2011-01-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/z80.h,
+	  src/SDCCtree_dec.hpp,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc2.cc:
+	  Feature enable macro cleanup.
+
+2011-01-23 Borut Razem <borut.razem AT gmail.com>
+
+	* sdcc.sln, */*.vcxproj: MSVC 2010 project files cleaning
+	* */*.vcxproj.filters: added to svn
+	* debugger/mcs51/simi.c:
+	  fixed warning C4273: '_environ' : inconsistent dll linkage
+	* Merged from trunk
+
+2011-01-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Re-rooting of the tree-decomposition.
+
+2011-01-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Fixed MSVC++ compilation problem, preparations for re-rooting the tree decomposition.
+
+2011-01-23 Borut Razem <borut.razem AT gmail.com>
+
+	* src/avr/avr.vcxproj, src/ds390/ds390.vcxproj, src/hc08/hc08.vcxproj,
+	  src/mcs51/mcs51.vcxproj, src/pic14/pic14.vcxproj,
+	  src/pic16/pic16.vcxproj, src/xa51/xa51.vcxproj, src/z80/z80.vcxproj:
+	  remove /Zm1000 command line option from all projects
+
+2011-01-22 Borut Razem <borut.razem AT gmail.com>
+
+	* all.vcxproj, config.vcxproj, sdas/linksrc/sdld_all.vcxproj,
+	  src/avr/avra.vcxproj, src/ds390/ds390a.vcxproj,
+	  src/hc08/hc08a.vcxproj, src/mcs51/mcs51a.vcxproj,
+	  src/pic14/pic14a.vcxproj, src/pic16/pic16a.vcxproj,
+	  src/src.vcxproj, src/xa51/xa51a.vcxproj, src/yacc.vcxproj,
+	  src/z80/z80a.vcxproj, support/cpp/sdcppa.vcxproj:
+	  fixed Custom Builds
+
+2011-01-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Simplified allocation algorithm by requiring leafs of the tree decomposition to be empty.
+
+2011-01-22 Borut Razem <borut.razem AT gmail.com>
+
+	* src/z80/main.c(598):
+	  fixed error C2065: 'false' : undeclared identifier
+
+2011-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Fixed vertex iterator / descriptor problem that caused errors in MSVC++.
+
+2011-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/main.c:
+	  Disabled forgotten debug message.
+
+2011-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/Makefile.in,
+	  src/SDCCralloc.hpp,
+	  src/z80/z80.h,
+	  src/z80/main.c,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc2.cc:
+	  Added option to enable experimental support for A and HL.
+
+2011-01-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Added missing boost:: prefix.
+
+2011-01-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.sln,
+	* [*].vcxproj: added project files for Microsoft Visual C++ Express 2010
+
+2011-01-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/sdld_all.dsp: renamed dldgb.exe to sdldgb.exe
+	* src/avr/gen.c,
+	* src/ds390/gen.c,
+	* src/ds390/ralloc.c,
+	* src/hc08/gen.c,
+	* src/mcs51/gen.c,
+	* src/pic14/gen.c,
+	* src/pic14/ralloc.c,
+	* src/pic16/gen.c,
+	* src/pic16/genutils.c,
+	* src/SDCCicode.c,
+	* src/SDCCicode.h,
+	* src/SDCClrange.c,
+	* src/xa51/ralloc.c,
+	* src/z80/gen.c,
+	* src/z80/ralloc.c,
+	* src/z80/ralloc2.cc: renamed union operand to union svt,
+	  added OP_KEY and OP_TYPE, use OP_xxx macros more often
+
+2011-01-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc.h,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc2.cc:
+	  Handle A in new register allocator.
+
+2011-01-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80ralloc2.cc:
+	  Reg name cleanup.
+
+2011-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80ralloc2.cc:
+	  Preparaton for use of a and hl in the new allocator.
+
+2011-01-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Fixed const-correctness of iterators.
+
+2011-01-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/ralloc2.cc:
+	  Fixed confusion of std::map/std::multimap iterators.
+
+2011-01-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp
+	  Fixed std::vector<bool> active initalization in tree_decomposition_from_elimination_ordering()
+
+2011-01-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Made operands in assign_cost() const.
+
+2011-01-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCralloc.hpp: do not include "sdccconf.h" directly, it does not
+	  exist when building with MSVC. Let it come through SDCCglobl.h
+
+2011-01-17 Borut Razem <borut.razem AT gmail.com>
+
+	* Merged from trunk
 
 2011-01-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.h,
-	  src/SDCCicode.c:
-	  Make argument to validateOpType non-const.
+	  src/SDCCicode.c,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Split validateOpType() into const and non-const version.
 
-2011-01-17 Borut Razem Borut Razem <borut.razem AT gmail.com>
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/SDCCmain.c: fixed bug introduced by me 2011-01-16
-	* support/Util/dbuf.c, support/Util/dbuf.h, src/SDCCsystem.c:
-	  dbuf_detach_c_str() returns char *, for compatiblity with
-	  dbuf_detach()
-	* configure.in, configure: fixed Solaris SunPro C compiler errors:
-	  #error: "Use of <stdbool.h> is valid only in a c99 compilation environment."
-	  by adding -xc99 option to CFLAGS and MAKEDEP
+	* src/SDCCralloc.hpp:
+	  Some documenting comments.
+
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Fixed some forgotten debug statements.
+
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Fixed the allocator for gbz80.
+
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/z80/tree_dec.hh,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc:
+	  Moved some generic parts of the new allocator out of the z80 directory.
+
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Type fixes.
+
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Preparations for the use of a better cost function and handling a, hl and iy in the new allocator.
+
+2011-01-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.h,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc2.cc:
+	  Improved variable handling and C++ standard conformance.
+
+2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Removed local assignment map.
+
+2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure.in,
+	  configure,
+	  Makefile.common.in,
+	  src/Makefile.in,
+	  src/port.mk,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/z80/z80.h,
+	  src/z80/main.c,
+	  src/z80/ralloc.h,
+	  src/z80/ralloc.c,
+	  src/z80/tree_dec.hh,
+	  src/z80/ralloc2.cc:
+	  Initial import of the new register allocator.
+
+2011-01-16 Borut Razem <borut.razem AT gmail.com>
+
+	* Created Optimal Register allocator (optralloc) branch
 
 2011-01-16 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -1956,7 +2592,7 @@
 
 	* src/SDCCmain.c, src/pic/main.c, src/pic16/main.c:
 	  fixed bug #3015137: -c -o not working as expected (caused by fix for
-          #2951083)
+	  #2951083)
 	* device/lib/pic16/libc/string/*, device/lib/pic16/libc/utils/cnvint.S,
 	  device/lib/pic16/libc/utils/cnvfrac.S:
 	  sdcc library license changed to GPL+LE

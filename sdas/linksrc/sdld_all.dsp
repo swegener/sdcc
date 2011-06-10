@@ -7,19 +7,19 @@
 CFG=sdld_all - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "sdld_all.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "sdld_all.mak" CFG="sdld_all - Win32 Debug"
-!MESSAGE 
+!MESSAGE
 !MESSAGE Possible choices for configuration are:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "sdld_all - Win32 Release" (based on "Win32 (x86) Generic Project")
 !MESSAGE "sdld_all - Win32 Debug" (based on "Win32 (x86) Generic Project")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -53,7 +53,7 @@ MTL=midl.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 
-!ENDIF 
+!ENDIF
 
 # Begin Target
 
@@ -68,11 +68,11 @@ SOURCE=..\..\bin_vc\sdld.exe
 # Begin Custom Build
 InputPath=..\..\bin_vc\sdld.exe
 
-"..\..\bin_vc\sdldz80.exe  ..\..\bin_vc\dldgb.exe ..\..\bin_vc\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) ..\..\bin_vc\sdldz80.exe 
-	copy $(InputPath) ..\..\bin_vc\sdldgb.exe 
-	copy $(InputPath) ..\..\bin_vc\sdld6808.exe 
-	
+"..\..\bin_vc\sdldz80.exe  ..\..\bin_vc\sdldgb.exe ..\..\bin_vc\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) ..\..\bin_vc\sdldz80.exe
+	copy $(InputPath) ..\..\bin_vc\sdldgb.exe
+	copy $(InputPath) ..\..\bin_vc\sdld6808.exe
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "sdld_all - Win32 Debug"
@@ -80,14 +80,14 @@ InputPath=..\..\bin_vc\sdld.exe
 # Begin Custom Build
 InputPath=..\..\bin_vc\sdld.exe
 
-"..\..\bin_vc\sdldz80.exe  ..\..\bin_vc\dldgb.exe ..\..\bin_vc\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) ..\..\bin_vc\sdldz80.exe 
-	copy $(InputPath) ..\..\bin_vc\sdldgb.exe 
-	copy $(InputPath) ..\..\bin_vc\sdld6808.exe 
-	
+"..\..\bin_vc\sdldz80.exe  ..\..\bin_vc\sdldgb.exe ..\..\bin_vc\sdld6808.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) ..\..\bin_vc\sdldz80.exe
+	copy $(InputPath) ..\..\bin_vc\sdldgb.exe
+	copy $(InputPath) ..\..\bin_vc\sdld6808.exe
+
 # End Custom Build
 
-!ENDIF 
+!ENDIF
 
 # End Source File
 # End Target

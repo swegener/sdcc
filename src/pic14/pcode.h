@@ -30,7 +30,7 @@
 #define GPTRTAG_CODE	0x80
 
 /* Cyclic dependency with ralloc.h: */
-struct regs;
+struct reg_info;
 
 /*
    Post code generation
@@ -315,7 +315,7 @@ typedef struct pCodeOpImmd
 	unsigned _function:1; /* is a (pointer to a) function */
 
 	int rIdx;             /* If this immd points to a register */
-	struct regs *r;       /* then this is the reg. */
+	struct reg_info *r;       /* then this is the reg. */
 
 } pCodeOpImmd;
 
@@ -330,7 +330,7 @@ typedef struct pCodeOpReg
 {
 	pCodeOp pcop;    // Can be either GPR or SFR
 	int rIdx;        // Index into the register table
-	struct regs *r;
+	struct reg_info *r;
 	int instance;    // byte # of Multi-byte registers
 	struct pBlock *pb;
 } pCodeOpReg;
@@ -842,7 +842,7 @@ pCodeOp *popCopyReg(pCodeOpReg *pc);
 
 pBranch *pBranchAppend(pBranch *h, pBranch *n);
 
-struct regs * getRegFromInstruction(pCode *pc);
+struct reg_info * getRegFromInstruction(pCode *pc);
 
 char *get_op(pCodeOp *pcop, char *buff, size_t buf_size);
 char *pCode2str(char *str, size_t size, pCode *pc);

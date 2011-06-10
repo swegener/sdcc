@@ -42,6 +42,7 @@ sdcc_cv_versionp=$VERSIONP
 # ===========================================================================
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
@@ -69,6 +70,10 @@ SDCC_REQUIRE_PROG($LEX, flex)
 AC_LANG_C
 
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS(stx/btree_set.h stx/btree_map.h,,AC_MSG_WARN([[STX library missing, using STL instead.]]))
+AC_CHECK_HEADERS(boost/graph/adjacency_list.hpp,,AC_MSG_ERROR([[boost library not found (boost/graph/adjacency_list.hpp).]]))
+AC_LANG_POP([C++])
 
 AC_ARG_WITH([ccache],
     AC_HELP_STRING([--without-ccache], [do not use ccache even if available]),
@@ -374,14 +379,21 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
   bor_IS_VALID_OPTION(ggdb)
   if test "$bor_cv_c_ggdb" = "yes"; then
     CFLAGS="-ggdb ${CFLAGS}"
+    CXXFLAGS="-ggdb ${CXXFLAGS}"
   fi
 
   bor_IS_VALID_OPTION(pipe)
   if test "$bor_cv_c_pipe" = "yes"; then
     CFLAGS="-pipe ${CFLAGS}"
+    # Don't use "-pipe" on x86 Solaris g++, since src/z80/ralloc2.cc dies with:
+    # Assembler: ralloc2.cc
+    #         "<stdin>", line 117637 : Internal: Out of symbol table
+    if test `uname` != "SunOS" -o \( `uname` = "SunOS" -a `uname -m` != "i86pc" \); then
+      CXXFLAGS="-pipe ${CXXFLAGS}"
+    fi
   fi
 
-  WALL_FLAG="-Wall"
+  WALL_FLAG="-Wall -Wno-parentheses"
   C99_FLAG="--std=c99"
   MAKEDEP="$CC $sdcc_cv_MM"
 else
@@ -389,6 +401,7 @@ else
   if test "$bor_cv_c_compiler_sunpro" = "yes"; then
     C99_FLAG="-xc99"
     CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
+    CXXFLAGS="-xO2 ${CXXFLAGS}"
     WALL_FLAG=
     MAKEDEP="$CC ${C99_FLAG} -xM1"
   fi
@@ -948,6 +961,8 @@ sdcc ${VERSION} is now configured for
   Source directory:     ${srcdir}
   C compiler:           ${CC}
   CFLAGS:               ${CFLAGS}
+  C++ compiler:         ${CXX}
+  CXXFLAGS:             ${CXXFLAGS}
 
   ENABLED Ports:
     avr                 ${enable_avr_port}

@@ -25,7 +25,7 @@ typedef struct sectName {
 typedef struct sectSym {
 	sectName *section;
 	char *name;
-	regs *reg;
+	reg_info *reg;
 } sectSym;
 
 extern set *absSymSet;

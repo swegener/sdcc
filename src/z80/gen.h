@@ -58,7 +58,7 @@ typedef enum
   AOP_EXSTK,
   /* Is referenced by a pointer in a register pair. */
   AOP_PAIRPTR,
-  /* Read as 0, discard writes */
+  /* Read undefined, discard writes */
   AOP_DUMMY
 }
 AOP_TYPE;
@@ -74,12 +74,11 @@ typedef struct asmop
   unsigned code:1;              /* is in Code space */
   unsigned paged:1;             /* in paged memory  */
   unsigned freed:1;             /* already freed    */
-  unsigned bcInUse:1;
-  unsigned deInUse:1;
+  unsigned bcInUse:1;           /* for banked I/O, which uses bc for the I/O address */
   union
   {
     value *aop_lit;             /* if literal */
-    regs *aop_reg[4];           /* array of registers */
+    reg_info *aop_reg[4];       /* array of registers */
     char *aop_dir;              /* if direct  */
     char *aop_immd;             /* if immediate others are implied */
     int aop_stk;                /* stack offset when AOP_STK */
@@ -93,5 +92,7 @@ asmop;
 
 void genZ80Code (iCode *);
 void z80_emitDebuggerSymbol (const char *);
+
+extern bool assignment_optimal;
 
 #endif

@@ -46,7 +46,7 @@ int dwWriteType (structdef *sdef, int block, int inStruct, const char *tag);
 int dwWriteModule (const char *name);
 int dwWriteCLine (iCode *ic);
 int dwWriteALine (const char *module, int Line);
-int dwWriteFrameAddress (const char *variable, struct regs *reg, int offset);
+int dwWriteFrameAddress (const char *variable, struct reg_info *reg, int offset);
 int dwWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc);
      
 
@@ -2958,7 +2958,7 @@ dwWriteCLine (iCode *ic)
 /*                       no current frame pointer address defined.       */
 /*-----------------------------------------------------------------------*/
 int
-dwWriteFrameAddress(const char *variable, struct regs *reg, int offset)
+dwWriteFrameAddress(const char *variable, struct reg_info *reg, int offset)
 {
   char * debugSym = NULL;
   dwlocregion * lrp;

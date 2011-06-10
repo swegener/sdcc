@@ -1164,7 +1164,7 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
                 }
 
                 if (_G.sregsAllocSet) {
-                  regs *sr;
+                  reg_info *sr;
 
                     _G.sregsAllocSet = reverseSet( _G.sregsAllocSet );
                     for(sr=setFirstItem(_G.sregsAllocSet) ; sr; sr=setFirstItem(_G.sregsAllocSet)) {
@@ -1448,7 +1448,7 @@ pCodeOp *pic16_popGetTempRegCond(bitVect *f, bitVect *v, int lock)
 
 
               {
-                regs *sr;
+                reg_info *sr;
 
                   for(sr=setFirstItem(_G.sregsAllocSet);sr;sr=setNextItem(_G.sregsAllocSet)) {
 
@@ -3191,7 +3191,7 @@ static void genEndFunction (iCode *ic)
 
     /* first restore registers that might be used for stack access */
     if(_G.sregsAllocSet) {
-    regs *sr;
+    reg_info *sr;
 
       _G.sregsAllocSet = reverseSet( _G.sregsAllocSet );
       for(sr=setFirstItem(_G.sregsAllocSet) ; sr; sr=setNextItem(_G.sregsAllocSet)) {

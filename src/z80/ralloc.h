@@ -37,6 +37,8 @@ enum
   D_IDX,
   L_IDX,
   H_IDX,
+  IYL_IDX,
+  IYH_IDX,
 #if DEBUG_FAKE_EXTRA_REGS
   M_IDX,
   N_IDX,
@@ -59,22 +61,24 @@ enum
 };
 
 /* definition for the registers */
-typedef struct regs
+typedef struct reg_info
 {
   short type;                   /* can have value 
                                    REG_GPR, REG_PTR or REG_CND */
   short rIdx;                   /* index into register table */
   char *name;                   /* name */
   unsigned isFree:1;            /* is currently unassigned  */
-}
-regs;
+} reg_info;
 
-extern regs *regsZ80;
+extern reg_info *regsZ80;
 
 void assignRegisters (eBBlock **, int);
-regs *regWithIdx (int);
+reg_info *regWithIdx (int);
 
 void z80_assignRegisters (ebbIndex *);
-bitVect *z80_rUmaskForOp (operand * op);
+bitVect *z80_rUmaskForOp (const operand * op);
+
+void spillThis (symbol *);
+void z80_ralloc2_cc(ebbIndex *ebbi);
 
 #endif

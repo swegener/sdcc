@@ -932,7 +932,7 @@ char * rtrackGetLit(const char *x)
       if (x+1 != s)
         {
           /* try to get from acc */
-          regs *r = &regs8051[A_IDX];
+          reg_info *r = &regs8051[A_IDX];
           if (r->rtrack.valueKnown &&
               r->rtrack.value == val)
             {
@@ -942,7 +942,7 @@ char * rtrackGetLit(const char *x)
           /* try to get from register R0..R7 */
           for (i = 0; i < 8; i++)
             {
-              regs *r = &regs8051[rx_num_to_idx(i)];
+              reg_info *r = &regs8051[rx_num_to_idx(i)];
               if (r->rtrack.valueKnown &&
                   r->rtrack.value == val)
                 {
@@ -973,7 +973,7 @@ int rtrackMoveALit (const char *x)
   /* if it is a literal mov try to get it cheaper */
   if ( *x == '#' )
     {
-      regs *a = &regs8051[A_IDX];
+      reg_info *a = &regs8051[A_IDX];
 
       char *s;
       int val = strtol (x+1, &s, 16);
@@ -1060,7 +1060,7 @@ int rtrackMoveALit (const char *x)
             /* not yet giving up - try to calculate from register R0..R7 */
             for (i = 0; i < 8; i++)
               {
-                regs *r = &regs8051[rx_num_to_idx(i)];
+                reg_info *r = &regs8051[rx_num_to_idx(i)];
 
                 if (a->rtrack.valueKnown && r->rtrack.valueKnown)
                   {

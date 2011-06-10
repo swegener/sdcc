@@ -148,7 +148,7 @@ _hc08_setDefaultOptions (void)
 }
 
 static const char *
-_hc08_getRegName (struct regs *reg)
+_hc08_getRegName (const struct reg_info *reg)
 {
   if (reg)
     return reg->name;
@@ -347,7 +347,7 @@ oclsExpense (struct memmap *oclass)
 /*   Application Binary Interface (M8/16EABI)"                          */
 /*----------------------------------------------------------------------*/
 static int
-hc08_dwarfRegNum (regs * reg)
+hc08_dwarfRegNum (const struct reg_info *reg)
 {
   switch (reg->rIdx)
     {

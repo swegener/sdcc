@@ -58,7 +58,7 @@ _G;
 int hc08_ptrRegReq;             /* one byte pointer register required */
 
 /* 8051 registers */
-regs regshc08[] =
+reg_info regshc08[] =
 {
 
   {REG_GPR, A_IDX,   "a",  1, NULL, 0, 1},
@@ -72,12 +72,12 @@ regs regshc08[] =
 };
 int hc08_nRegs = 7;
 
-regs *hc08_reg_a;
-regs *hc08_reg_x;
-regs *hc08_reg_h;
-regs *hc08_reg_hx;
-regs *hc08_reg_xa;
-regs *hc08_reg_sp;
+reg_info *hc08_reg_a;
+reg_info *hc08_reg_x;
+reg_info *hc08_reg_h;
+reg_info *hc08_reg_hx;
+reg_info *hc08_reg_xa;
+reg_info *hc08_reg_sp;
 
 static void spillThis (symbol *);
 static void freeAllRegs ();
@@ -85,7 +85,7 @@ static void freeAllRegs ();
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 allocReg (short type)
 {
   return NULL;
@@ -104,7 +104,7 @@ allocReg (short type)
 /*-----------------------------------------------------------------*/
 /* hc08_regWithIdx - returns pointer to register with index number */
 /*-----------------------------------------------------------------*/
-regs *
+reg_info *
 hc08_regWithIdx (int idx)
 {
   int i;
@@ -122,7 +122,7 @@ hc08_regWithIdx (int idx)
 /* hc08_freeReg - frees a register                                      */
 /*-----------------------------------------------------------------*/
 void
-hc08_freeReg (regs * reg)
+hc08_freeReg (reg_info * reg)
 {
   if (!reg)
     {
@@ -204,7 +204,7 @@ nfreeRegsType (int type)
 /* hc08_useReg - marks a register  as used                         */
 /*-----------------------------------------------------------------*/
 void
-hc08_useReg (regs * reg)
+hc08_useReg (reg_info * reg)
 {
   reg->isFree = 0;
 
@@ -245,7 +245,7 @@ hc08_useReg (regs * reg)
 /* hc08_dirtyReg - marks a register as dirty                       */
 /*-----------------------------------------------------------------*/
 void
-hc08_dirtyReg (regs * reg, bool freereg)
+hc08_dirtyReg (reg_info * reg, bool freereg)
 {
   reg->aop = NULL;
 
@@ -490,7 +490,7 @@ static void
 spillLRWithPtrReg (symbol * forSym)
 {
   symbol *lrsym;
-  regs *hx;
+  reg_info *hx;
   int k;
 
   if (!_G.regAssigned || bitVectIsZero (_G.regAssigned))
@@ -852,10 +852,10 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 /*-----------------------------------------------------------------*/
 /* getRegPtr - will try for PTR if not a GPR type if not spil      */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
-  regs *reg;
+  reg_info *reg;
 
 tryAgain:
   /* try for a ptr type */
@@ -878,10 +878,10 @@ tryAgain:
 /*-----------------------------------------------------------------*/
 /* getRegGpr - will try for GPR if not spil                        */
 /*-----------------------------------------------------------------*/
-static regs *
+static reg_info *
 getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
-  regs *reg;
+  reg_info *reg;
 
 tryAgain:
   /* try for gpr type */
@@ -904,9 +904,9 @@ tryAgain:
 /*-----------------------------------------------------------------*/
 /* getRegPtrNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
-static regs *getRegPtrNoSpil()
+static reg_info *getRegPtrNoSpil()
 {
-  regs *reg;
+  reg_info *reg;
 
   /* try for a ptr type */
   if ((reg = allocReg (REG_PTR)))
@@ -925,9 +925,9 @@ static regs *getRegPtrNoSpil()
 /*-----------------------------------------------------------------*/
 /* getRegGprNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
-static regs *getRegGprNoSpil()
+static reg_info *getRegGprNoSpil()
 {
-  regs *reg;
+  reg_info *reg;
   if ((reg = allocReg (REG_GPR)))
     return reg;
 
@@ -945,7 +945,7 @@ static regs *getRegGprNoSpil()
 /* symHasReg - symbol has a given register                         */
 /*-----------------------------------------------------------------*/
 static bool
-symHasReg (symbol * sym, regs * reg)
+symHasReg (symbol * sym, reg_info * reg)
 {
   int i;
 
@@ -1173,7 +1173,7 @@ again:
 xchgPositions:
   if (shared)
     {
-      regs *tmp = result->regs[i];
+      reg_info *tmp = result->regs[i];
       result->regs[i] = result->regs[j];
       result->regs[j] = tmp;
       change ++;

@@ -19,7 +19,7 @@ int cdbWriteType (structdef *sdef, int block, int inStruct, const char *tag);
 int cdbWriteModule (const char *name);
 int cdbWriteCLine (iCode *ic);
 int cdbWriteALine (const char *module, int Line);
-int cdbWriteFrameAddress (const char *variable, struct regs *reg, int offset);
+int cdbWriteFrameAddress (const char *variable, struct reg_info *reg, int offset);
 int cdbWriteBasicSymbol (symbol *sym, int isStructSym, int isFunc);
 void cdbTypeInfo (sym_link * type);
 
@@ -327,7 +327,7 @@ cdbWriteALine (const char *module, int Line)
  *****************************************************************/
 
 int
-cdbWriteFrameAddress (const char *variable, struct regs *reg, int offset)
+cdbWriteFrameAddress (const char *variable, struct reg_info *reg, int offset)
 {
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "cdbFile.c:cdbWriteFrameAddress()\n");

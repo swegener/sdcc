@@ -25,6 +25,10 @@
 /* XXX */
 #undef EXEC_PREFIX
 
+/* Define to 1 if you have the <boost/graph/adjacency_list.hpp> header file.
+   */
+#undef HAVE_BOOST_GRAPH_ADJACENCY_LIST_HPP
+
 /* Define to 1 if you have the <endian.h> header file. */
 #undef HAVE_ENDIAN_H
 
@@ -60,6 +64,12 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
+
+/* Define to 1 if you have the <stx/btree_map.h> header file. */
+#undef HAVE_STX_BTREE_MAP_H
+
+/* Define to 1 if you have the <stx/btree_set.h> header file. */
+#undef HAVE_STX_BTREE_SET_H
 
 /* Define to 1 if you have the <sys/endian.h> header file. */
 #undef HAVE_SYS_ENDIAN_H

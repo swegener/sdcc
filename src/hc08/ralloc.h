@@ -44,7 +44,7 @@ enum
 #define REG_CND 0x04
 
 /* definition for the registers */
-typedef struct regs
+typedef struct reg_info
   {
     short type;			/* can have value 
 				   REG_GPR, REG_PTR or REG_CND */
@@ -55,19 +55,19 @@ typedef struct regs
     int aopofs;			/* last operand offset */
     unsigned isFree:1;		/* is currently unassigned  */
   }
-regs;
-extern regs regshc08[];
-extern regs *hc08_reg_a;
-extern regs *hc08_reg_x;
-extern regs *hc08_reg_h;
-extern regs *hc08_reg_hx;
-extern regs *hc08_reg_xa;
-extern regs *hc08_reg_sp;
+reg_info;
+extern reg_info regshc08[];
+extern reg_info *hc08_reg_a;
+extern reg_info *hc08_reg_x;
+extern reg_info *hc08_reg_h;
+extern reg_info *hc08_reg_hx;
+extern reg_info *hc08_reg_xa;
+extern reg_info *hc08_reg_sp;
 
-regs *hc08_regWithIdx (int);
-void hc08_useReg (regs * reg);
-void hc08_freeReg (regs * reg);
-void hc08_dirtyReg (regs * reg, bool freereg);
+reg_info *hc08_regWithIdx (int);
+void hc08_useReg (reg_info * reg);
+void hc08_freeReg (reg_info * reg);
+void hc08_dirtyReg (reg_info * reg, bool freereg);
 bitVect *hc08_rUmaskForOp (operand * op);
 
 #endif

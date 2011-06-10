@@ -181,7 +181,7 @@ do_pragma (int id, const char *name, const char *cp)
     case  P_STACK:
       {
         unsigned int stackPos, stackLen;
-        regs *reg;
+        reg_info *reg;
         symbol *sym;
 
         cp = get_pragma_token(cp, &token);
@@ -822,7 +822,7 @@ _pic16_setDefaultOptions (void)
 }
 
 static const char *
-_pic16_getRegName (struct regs *reg)
+_pic16_getRegName (const struct reg_info *reg)
 {
   if (reg)
     return reg->name;

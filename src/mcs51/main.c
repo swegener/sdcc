@@ -182,7 +182,7 @@ _mcs51_setDefaultOptions (void)
 }
 
 static const char *
-_mcs51_getRegName (struct regs *reg)
+_mcs51_getRegName (const struct reg_info *reg)
 {
   if (reg)
     return reg->name;

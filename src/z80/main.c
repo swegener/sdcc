@@ -38,6 +38,10 @@
 #define OPTION_ASM             "--asm="
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
 #define OPTION_RESERVE_IY      "--reserve-regs-iy"
+#define OPTION_OPTRALLOC_REMAT "--optralloc-remat"
+#define OPTION_DUMP_GRAPHS     "--dump-graphs"
+#define OPTION_MAX_ALLOCS_NODE "--max-allocs-per-node"
+#define OPTION_OLDRALLOC       "--oldralloc"
 
 static char _z80_defaultRules[] = {
 #include "peeph.rul"
@@ -53,22 +57,28 @@ Z80_OPTS z80_opts;
 
 static OPTION _z80_options[] = {
   {0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC"},
-  {0, OPTION_PORTMODE, NULL, "Determine PORT I/O mode (z80/z180)"},
-  {0, OPTION_ASM, NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)"},
-  {0, OPTION_CODE_SEG, &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
-  {0, OPTION_CONST_SEG, &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
-  {0, OPTION_NO_STD_CRT0, &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
-  {0, OPTION_RESERVE_IY, &z80_opts.reserveIY, "Do not use IY"},
+  {0, OPTION_PORTMODE,        NULL, "Determine PORT I/O mode (z80/z180)"},
+  {0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)"},
+  {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+  {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+  {0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY"},
+  {0, OPTION_MAX_ALLOCS_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
+  {0, OPTION_OPTRALLOC_REMAT, &z80_opts.optralloc_remat, "Handle rematerializeable variables in new register allocator"},
+  {0, OPTION_DUMP_GRAPHS,     &z80_opts.dump_graphs, "Dump control flow graph, conflict graph and tree decomposition in register allocator"},
+  {0, OPTION_OLDRALLOC,       &z80_opts.oldralloc, "Use old register allocator"},
   {0, NULL}
 };
 
 static OPTION _gbz80_options[] = {
-  {0, OPTION_BO, NULL, "<num> use code bank <num>"},
-  {0, OPTION_BA, NULL, "<num> use data bank <num>"},
+  {0, OPTION_BO,              NULL, "<num> use code bank <num>"},
+  {0, OPTION_BA,              NULL, "<num> use data bank <num>"},
   {0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC"},
-  {0, OPTION_CODE_SEG, &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
-  {0, OPTION_CONST_SEG, &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
-  {0, OPTION_NO_STD_CRT0, &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+  {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+  {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
+  {0, OPTION_MAX_ALLOCS_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
+  {0, OPTION_DUMP_GRAPHS, &z80_opts.dump_graphs, "Dump control flow graph, conflict graph and tree decomposition in register allocator"},
   {0, NULL}
 };
 
@@ -566,6 +576,9 @@ _setValues (void)
   dbuf_printf (&dbuf, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
   setMainValue ("z80bases", dbuf_c_str (&dbuf));
   dbuf_destroy (&dbuf);
+
+  if (IS_Z80 && options.omitFramePtr)
+    z80_port.stack.call_overhead = 2;
 }
 
 static void
@@ -601,6 +614,8 @@ _setDefaultOptions (void)
   optimize.label4 = 1;
   optimize.loopInvariant = 1;
   optimize.loopInduction = 1;
+  z80_opts.optralloc_remat = 0;
+  z80_opts.dump_graphs = 0;
 }
 
 /* Mangling format:
@@ -636,7 +651,7 @@ _mangleSupportFunctionName (const char *original)
 }
 
 static const char *
-_getRegName (struct regs *reg)
+_getRegName (const struct reg_info *reg)
 {
   if (reg)
     {
@@ -777,6 +792,7 @@ PORT z80_port = {
    0,
    z80notUsed,
    z80canAssign,
+   z80notUsedFrom,
    },
   {
    /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

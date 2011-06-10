@@ -45,7 +45,7 @@ enum
 #define REG_CND 0x04
 #define REG_BIT 0x08
 /* definition for the registers */
-typedef struct regs
+typedef struct reg_info
 {
   short type;                   /* can have value
                                    REG_GPR, REG_PTR or REG_CND */
@@ -65,10 +65,11 @@ typedef struct regs
   }
   rtrack;
 }
-regs;
-extern regs regs8051[];
+reg_info;
 
-regs *mcs51_regWithIdx (int);
+extern reg_info regs8051[];
+
+reg_info *mcs51_regWithIdx (int);
 
 bitVect *mcs51_rUmaskForOp (operand * op);
 bitVect *mcs51_allBitregs (void);

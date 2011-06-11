@@ -1,3 +1,34 @@
+2011-06-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug3299577.c: fixed warnings
+	* support/regression/tests/abs.c,
+	  support/regression/tests/bool.c,
+	  support/regression/tests/bug-1292721.c,
+	  support/regression/tests/bug-2646174.c,
+	  support/regression/tests/bug-2890326.c,
+	  support/regression/tests/bug-2982135.c,
+	  support/regression/tests/bug-3034585.c,
+	  support/regression/tests/bug-3117729.c,
+	  support/regression/tests/bug-3184920.c,
+	  support/regression/tests/bug1477149.c,
+	  support/regression/tests/bug1536762.c,
+	  support/regression/tests/bug1838000.c,
+	  support/regression/tests/bug2084206.c,
+	  support/regression/tests/bug2729218.c,
+	  support/regression/tests/bug2862650.c,
+	  support/regression/tests/bug3029630.c,
+	  support/regression/tests/bug3130806.c,
+	  support/regression/tests/bug3166208.c,
+	  support/regression/tests/bug3303325.c,
+	  support/regression/tests/bugs-1596270-1736867.c,
+	  support/regression/tests/interrupt.c,
+	  support/regression/tests/memory.c,
+	  support/regression/tests/strcmp.c,
+	  support/regression/tests/strcpy.c,
+	  support/regression/tests/strncmp.c,
+	  support/regression/tests/strpbrk.c,
+	  support/regression/tests/strspn.c: changed svn eol-style
+
 2011-06-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merge the optralloc branch.

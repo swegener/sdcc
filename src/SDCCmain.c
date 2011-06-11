@@ -77,6 +77,7 @@ set *dataDirsSet = NULL;        /* list of data search directories */
 set *includeDirsSet = NULL;     /* list of include search directories */
 set *userIncDirsSet = NULL;     /* list of user include directories */
 set *libDirsSet = NULL;         /* list of lib search directories */
+bool regalloc_dry_run = FALSE;
 
 static const char *dstPath = "";    /* path for the output files; */
                                 /* "" is equivalent with cwd */

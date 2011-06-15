@@ -1,3 +1,8 @@
+2011-06-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/inst_xd.cc:
+	  Fixed bug #3315215.
+
 2011-06-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c,

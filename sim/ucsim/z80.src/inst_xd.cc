@@ -261,7 +261,7 @@ cl_z80::inst_Xd_dec(t_mem code)
       dec(regs_iX_h);
     break;
     case 0x2B: // DEC IX
-      --regs.IX;
+      --regs_IX_OR_IY;
     break;
     case 0x2D: // DEC LX
       dec(regs_iX_l);

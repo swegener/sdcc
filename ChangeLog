@@ -1,3 +1,7 @@
+2011-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug1962613.c: fixed clash with Bessel functions
+
 2011-06-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/z80.src/inst_xd.cc:

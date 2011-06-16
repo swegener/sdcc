@@ -14,11 +14,11 @@ struct a {
 	const char *r[2];
 };
 
-const struct b y0[3] = {
+const struct b c0[3] = {
 	{000, 001}, {010, 011}, {020, 021}
 };
 
-const struct b y1[3] = {
+const struct b c1[3] = {
 	{100, 101}, {110, 111}, {120, 121}
 };
 
@@ -26,7 +26,7 @@ const char k0[3] = { 50, 51, 52 };
 const char k1[3] = { 60, 61, 62 };
 
 const struct a x = {
-	{y0, y1}, {k0, k1}
+	{c0, c1}, {k0, k1}
 };
 
 void testBug(void)

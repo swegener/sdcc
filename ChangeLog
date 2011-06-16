@@ -1,6 +1,7 @@
 2011-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1962613.c: fixed clash with Bessel functions
+	* support/regression/tests/strtok.c: disabled test for GCC on Solaris
 
 2011-06-15 Philipp Klaus Krause <pkk AT spth.de>
 

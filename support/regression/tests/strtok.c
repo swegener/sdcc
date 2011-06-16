@@ -21,8 +21,8 @@ teststrtok(void)
   ASSERT( token && 0 == strcmp (token, "x"));
   token = strtok(NULL, "ab");
   ASSERT( token == NULL);
-#ifndef __SUNPRO_C
-  /* SunPro C compiler has problem with strtok-ing after NULL */
+#if !defined (__SUNPRO_C) && !defined (__sun__)
+  /* SunPro C compiler and GCC on Solaris have problem with strtok-ing after NULL */
   token = strtok(NULL, "a");
   ASSERT( token == NULL);
 #endif

@@ -44719,7 +44719,7 @@ status collapsed
 
 
 \series default
- commad line option is specified, non-free diractories are searched:
+ command line option is specified, non-free directories are searched:
 \begin_inset Newline newline
 \end_inset
 
@@ -45735,7 +45735,7 @@ configure
 \end_layout
 
 \begin_layout Standard
-The more common appraoch of compiling 
+The more common approach of compiling 
 \family typewriter
 vfprintf.c
 \family default
@@ -46871,7 +46871,7 @@ Interrupt Vector Address
 interrupt entry point
 \emph default
  function.
- The actuall ISR code is placed as normally would in the code space.
+ The actual ISR code is placed as normally would in the code space.
  Upon interrupt request, the GOTO instruction is executed which jumps to
  the ISR code.
  When declaring interrupt functions as _naked this GOTO instruction is 
@@ -48305,7 +48305,7 @@ name
 
 \begin_layout List
 \labelwidthstring 00.00.0000
-DEF_INTLOW(name) begin the definition of the interrupt dispatch table fo
+DEF_INTLOW(name) begin the definition of the interrupt dispatch table for
  low priority interrupt.
  
 \emph on
@@ -48506,7 +48506,7 @@ status collapsed
 
 \end_inset
 
--fomit-frame-pointer might reduce stack usage by not creating unnecessery
+-fomit-frame-pointer might reduce stack usage by not creating unnecessary
  stack frames.
  Other ways to reduce stack usage may exist.
 \end_layout

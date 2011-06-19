@@ -1,3 +1,8 @@
+2011-06-19 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx: fixed bug #3322383 - Spelling mistakes
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.0.4
+
 2011-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1962613.c: fixed clash with Bessel functions

@@ -1,4 +1,4 @@
-#LyX 1.6.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -117,9 +117,9 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 3.0.1
+SDCC 3.0.
 \size footnotesize
-
+4
 \begin_inset Newline newline
 \end_inset
 
@@ -43734,7 +43734,7 @@ status collapsed
 
 \end_inset
 
--use-crt= Use a custom run-time module instead of the defaults.
+-use-crt= Use a custom run-time module instead of the default (crt0i).
 \end_layout
 
 \begin_layout Description

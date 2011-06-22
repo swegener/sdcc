@@ -2441,28 +2441,31 @@ right:
 }
 
 
-/*-----------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 /* packRegsDPTRnuse - color live ranges that can go into extra DPTRS */
-/*-----------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 static int
 packRegsDPTRnuse (operand * op, unsigned dptr)
 {
+  symbol * opsym;
   int i, key;
   iCode *ic;
 
   if (!IS_SYMOP (op) || !IS_ITEMP (op))
     return 0;
-  if (OP_SYMBOL (op)->remat || OP_SYMBOL (op)->ruonly || OP_SYMBOL (op)->dptr)
+  opsym = OP_SYMBOL (op);
+
+  if (opsym->remat || opsym->ruonly || opsym->dptr)
     return 0;
 
   /* first check if any overlapping liverange has already been
      assigned to this DPTR */
-  if (OP_SYMBOL (op)->clashes)
+  if (opsym->clashes)
     {
-      for (i = 0; i < OP_SYMBOL (op)->clashes->size; i++)
+      for (i = 0; i < opsym->clashes->size; i++)
         {
           symbol *sym;
-          if (bitVectBitValue (OP_SYMBOL (op)->clashes, i))
+          if (bitVectBitValue (opsym->clashes, i))
             {
               sym = hTabItemWithKey (liveRanges, i);
               if (sym->dptr == dptr)
@@ -2474,19 +2477,19 @@ packRegsDPTRnuse (operand * op, unsigned dptr)
   /* future for more dptrs */
   if (dptr > 1)
     {
-      OP_SYMBOL (op)->dptr = dptr;
+      opsym->dptr = dptr;
       return 1;
     }
 
-  /* DPTR1 is special since it is also used as a scratch by the backend .
+  /* DPTR1 is special since it is also used as a scratch by the backend.
      so we walk thru the entire live range of this operand and make sure
-     DPTR1 will not be used by the backed . The logic here is to find out if
+     DPTR1 will not be used by the backend. The logic here is to find out if
      more than one operand in an icode is in far space then we give up : we
      don't keep it live across functions for now
    */
 
-  ic = hTabFirstItemWK (iCodeSeqhTab, OP_SYMBOL (op)->liveFrom);
-  for (; ic && ic->seq <= OP_SYMBOL (op)->liveTo; ic = hTabNextItem (iCodeSeqhTab, &key))
+  ic = hTabFirstItemWK (iCodeSeqhTab, opsym->liveFrom);
+  for (; ic && ic->seq <= opsym->liveTo; ic = hTabNextItem (iCodeSeqhTab, &key))
     {
       int nfs = 0;
 
@@ -2504,45 +2507,59 @@ packRegsDPTRnuse (operand * op, unsigned dptr)
           else
             continue;
         }
-      /* two special cases first */
+      /* four special cases first */
       if (POINTER_GET (ic) && !isOperandEqual (IC_LEFT (ic), op) &&     /* pointer get */
-          !OP_SYMBOL (IC_LEFT (ic))->ruonly &&  /* with result in far space */
+          !OP_SYMBOL (IC_LEFT (ic))->ruonly &&                          /* with result in far space */
           (isOperandInFarSpace (IC_RESULT (ic)) && !isOperandInReg (IC_RESULT (ic))))
         {
           return 0;
         }
 
+      if (POINTER_GET (ic) && !isOperandEqual (IC_LEFT (ic), op) &&     /* pointer get */
+          !OP_SYMBOL (IC_LEFT (ic))->ruonly &&                          /* with left in far space */
+          (isOperandInFarSpace (IC_LEFT (ic)) && !isOperandInReg (IC_LEFT (ic))))
+        {
+          return 0;
+        }
+
       if (POINTER_SET (ic) && !isOperandEqual (IC_RESULT (ic), op) &&   /* pointer set */
-          !OP_SYMBOL (IC_RESULT (ic))->ruonly &&        /* with right in far space */
+          !OP_SYMBOL (IC_RESULT (ic))->ruonly &&                        /* with right in far space */
           (isOperandInFarSpace (IC_RIGHT (ic)) && !isOperandInReg (IC_RIGHT (ic))))
         {
           return 0;
         }
 
-      if (IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) &&        /* if symbol operand */
-          !isOperandEqual (IC_RESULT (ic), op) &&       /* not the same as this */
-          ((isOperandInFarSpace (IC_RESULT (ic)) ||     /* in farspace or */
-            OP_SYMBOL (IC_RESULT (ic))->onStack) &&     /* on the stack   */
-           !isOperandInReg (IC_RESULT (ic))))
-        {                       /* and not in register */
+      if (POINTER_SET (ic) && !isOperandEqual (IC_RESULT (ic), op) &&   /* pointer set */
+          !OP_SYMBOL (IC_RESULT (ic))->ruonly &&                        /* with result in far space */
+          (isOperandInFarSpace (IC_RESULT (ic)) && !isOperandInReg (IC_RESULT (ic))))
+        {
+          return 0;
+        }
+
+      if (IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) &&    /* if symbol operand */
+          !isOperandEqual (IC_RESULT (ic), op) &&		    /* not the same as this */
+          ((isOperandInFarSpace (IC_RESULT (ic)) ||         /* in farspace or */
+            OP_SYMBOL (IC_RESULT (ic))->onStack) &&         /* on the stack   */
+           !isOperandInReg (IC_RESULT (ic))))               /* and not in register */
+        {
           nfs++;
         }
       /* same for left */
-      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&    /* if symbol operand */
-          !isOperandEqual (IC_LEFT (ic), op) && /* not the same as this */
-          ((isOperandInFarSpace (IC_LEFT (ic)) ||       /* in farspace or */
-            OP_SYMBOL (IC_LEFT (ic))->onStack) &&       /* on the stack   */
-           !isOperandInReg (IC_LEFT (ic))))
-        {                       /* and not in register */
+      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&        /* if symbol operand */
+          !isOperandEqual (IC_LEFT (ic), op) &&             /* not the same as this */
+          ((isOperandInFarSpace (IC_LEFT (ic)) ||           /* in farspace or */
+            OP_SYMBOL (IC_LEFT (ic))->onStack) &&           /* on the stack   */
+           !isOperandInReg (IC_LEFT (ic))))                 /* and not in register */
+        {
           nfs++;
         }
       /* same for right */
-      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&  /* if symbol operand */
-          !isOperandEqual (IC_RIGHT (ic), op) &&        /* not the same as this */
-          ((isOperandInFarSpace (IC_RIGHT (ic)) ||      /* in farspace or */
-            OP_SYMBOL (IC_RIGHT (ic))->onStack) &&      /* on the stack   */
-           !isOperandInReg (IC_RIGHT (ic))))
-        {                       /* and not in register */
+      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&      /* if symbol operand */
+          !isOperandEqual (IC_RIGHT (ic), op) &&            /* not the same as this */
+          ((isOperandInFarSpace (IC_RIGHT (ic)) ||          /* in farspace or */
+            OP_SYMBOL (IC_RIGHT (ic))->onStack) &&          /* on the stack   */
+           !isOperandInReg (IC_RIGHT (ic))))                /* and not in register */
+        {
           nfs++;
         }
 
@@ -2551,7 +2568,7 @@ packRegsDPTRnuse (operand * op, unsigned dptr)
       // But it isn't always, see bug 769624.
       if (IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->dptr == 1))
         {
-          //fprintf(stderr, "dptr1 already in use in live range #1\n");
+          //fprintf(stderr, "dptr1 already in use in live range # 1\n");
           return 0;
         }
 
@@ -2573,7 +2590,7 @@ packRegsDPTRnuse (operand * op, unsigned dptr)
       if (nfs > 1)
         return 0;
     }
-  OP_SYMBOL (op)->dptr = dptr;
+  opsym->dptr = dptr;
   return 1;
 }
 

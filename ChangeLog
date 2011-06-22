@@ -1,3 +1,8 @@
+2011-06-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/ralloc.c(packRegsDPTRnuse): fixed bug 1665511
+	* support/regression/tests/bug1665511.c: new, added
+
 2011-06-19 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: fixed bug #3322383 - Spelling mistakes

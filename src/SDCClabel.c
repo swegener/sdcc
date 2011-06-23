@@ -134,7 +134,6 @@ labelIfx (iCode * ic)
   iCode *loop;
   int change = 0;
 
-
   for (loop = ic; loop; loop = loop->next)
     {
       /*   if  condition  goto label */
@@ -143,27 +142,25 @@ labelIfx (iCode * ic)
          regardless of the condition in this case the 
          condition can be eliminated with a WARNING ofcource */
       if (loop->op == IFX &&
-	  loop->next &&
-	  loop->next->op == GOTO)
-	{
-	  if (IC_TRUE (loop) &&
-	      IC_TRUE (loop)->key == IC_LABEL (loop->next)->key)
-	    {
-	      deleteIfx (loop, IC_TRUE (loop)->key);
-	      change++;
+	    loop->next &&
+        loop->next->op == GOTO)
+        {
+          if (IC_TRUE (loop) && IC_TRUE (loop)->key == IC_LABEL (loop->next)->key)
+            {
+              deleteIfx (loop, IC_TRUE (loop)->key);
+              change++;
               continue;
-	    }
-	  else
-	    {
-	      if (IC_FALSE (loop) &&
-		  IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)
-		{
-		  deleteIfx (loop, IC_FALSE (loop)->key);
-		  change++;
-		  continue;
-		}
-	    }
-	}
+            }
+          else
+            {
+              if (IC_FALSE (loop) && IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)
+                {
+                  deleteIfx (loop, IC_FALSE (loop)->key);
+                  change++;
+                  continue;
+                }
+            }
+        }
       /* same as above but with a twist */
       /* if condition goto label */
       /* label:                  */
@@ -450,18 +447,18 @@ iCodeLabelOptimize (iCode * ic)
       /* first eliminate any goto statement */
       /* that goes to the next statement    */
       if (optimize.label1)
-	change += labelGotoNext (ic);
+        change += labelGotoNext (ic);
 
       if (optimize.label2)
-	change += labelIfx (ic);
+        change += labelIfx (ic);
 
       /* target of a goto is a goto then rename this goto */
       if (optimize.label3)
-	change += labelGotoGoto (ic);
+        change += labelGotoGoto (ic);
 
       /* remove unreference labels */
       if (optimize.label4)
-	change += labelUnrefLabel (ic);
+        change += labelUnrefLabel (ic);
 
       /* remove unreachable code */
       change += labelUnreach (ic);

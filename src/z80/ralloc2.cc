@@ -980,7 +980,7 @@ float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, 
         case JUMPTABLE:
         case CAST:
         //case RECEIVE:
-        case SEND:	// todo: Make builtins work
+        case SEND:
         case DUMMY_READ_VOLATILE:
         case CRITICAL:
         case ENDCRITICAL:

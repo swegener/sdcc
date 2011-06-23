@@ -1042,6 +1042,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_NO_LABEL_OPT) == 0)
             {
+              optimize.label2 = 0;
               optimize.label4 = 0;
               continue;
             }

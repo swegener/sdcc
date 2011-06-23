@@ -9853,7 +9853,7 @@ dryZ80iCode (iCode *ic)
     for(pairId = 0; pairId < NUM_PAIRS; pairId++)
       spillPair (pairId);
   }
-  
+
   return(regalloc_dry_run_cost);
 }
 

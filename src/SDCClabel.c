@@ -169,11 +169,11 @@ labelIfx (iCode * ic)
 	  loop->next->op == LABEL &&
 	  ((IC_TRUE (loop) && IC_TRUE (loop)->key == IC_LABEL (loop->next)->key) ||
 	   (IC_FALSE (loop) && IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)))
-	{
-	  deleteIfx (loop, IC_LABEL (loop->next)->key);
-	  change++;
-	  continue;
-	}
+        {
+          deleteIfx (loop, IC_LABEL (loop->next)->key);
+          change++;
+          continue;
+        }
 
       /* we will eliminate certain special case situations */
       /* of the conditional statement :-                  */
@@ -181,9 +181,9 @@ labelIfx (iCode * ic)
       /*       goto _falseLabel                           */
       /* _trueLabel :                                     */
       /*       ...                                        */
-      /* in these cases , if this is the only reference   */
-      /* to the _trueLabel, we can change it to :-        */
+      /* in these cases we can change it to :-            */
       /*       if cond == 0 goto _falseLabel              */
+      /* _trueLabel :                                     */
       /*       ...                                        */
       /* similarly if we have a situation like :-         */
       /*       if cond == 0 goto _falseLabel              */
@@ -191,28 +191,19 @@ labelIfx (iCode * ic)
       /* _falseLabel :                                    */
       /* we can change this to                            */
       /*       if cond != 0 goto _someLabel               */
+      /* _falseLabel :                                    */
       /*       ...                                        */
-      if (loop->op == IFX &&
-	  loop->next &&
-	  loop->next->op == GOTO &&
-	  loop->next->next &&
-	  loop->next->next->op == LABEL)
-	{
+      if (loop->op == IFX && loop->next && loop->next->op == GOTO &&
+	    loop->next->next && loop->next->next->op == LABEL)
+        {
+          if (IC_TRUE (loop) && (IC_TRUE (loop))->key != (IC_LABEL (loop->next->next))->key ||
+            (IC_FALSE (loop) && (IC_FALSE (loop))->key != (IC_LABEL (loop->next->next))->key))
+            continue;
 
-
-	  /* now check that the last label is the */
-	  /* same as the _trueLabel of this       */
-	  if (IC_TRUE (loop))
-	    if ((IC_TRUE (loop))->key != (IC_LABEL (loop->next->next))->key)
-	      continue;
-	    else;
-	  else if ((IC_FALSE (loop))->key != (IC_LABEL (loop->next->next))->key)
-	    continue;
-
-	  /* now make sure that this is the only */
-	  /* referenece to the _trueLabel        */
-	  if (IC_TRUE (loop) && hTabItemWithKey (labelRef, (IC_TRUE (loop))->key))
-	    {
+          /* now make sure that this is the only */
+          /* referenece to the _trueLabel        */
+          if (IC_TRUE (loop) && hTabItemWithKey (labelRef, (IC_TRUE (loop))->key))
+            {
 
 	      /* we just change the falseLabel */
 	      /* to the next goto statement    */
@@ -234,22 +225,20 @@ labelIfx (iCode * ic)
 	      continue;
 	    }
 
-	  /* now do the same with the false labels */
-	  if (IC_FALSE (loop) &&
-	      hTabItemWithKey (labelRef, (IC_FALSE (loop))->key))
-	    {
-
-	      hTabDeleteItem (&labelRef, (IC_FALSE (loop))->key, loop, DELETE_ITEM, NULL);
-	      IC_FALSE (loop) = NULL;
-	      IC_TRUE (loop) = IC_LABEL (loop->next);
-	      hTabAddItem (&labelRef, (IC_TRUE (loop))->key, loop);
-	      hTabDeleteItem (&labelRef, (IC_LABEL (loop->next))->key, loop->next, DELETE_ITEM, NULL);
-	      loop->next = loop->next->next;
-	      loop->next->prev = loop;
-	      change++;
-	      continue;
-	    }
-	}
+          /* now do the same with the false labels */
+          if (IC_FALSE (loop) && hTabItemWithKey (labelRef, (IC_FALSE (loop))->key))
+            {
+              hTabDeleteItem (&labelRef, (IC_FALSE (loop))->key, loop, DELETE_ITEM, NULL);
+              IC_FALSE (loop) = NULL;
+              IC_TRUE (loop) = IC_LABEL (loop->next);
+              hTabAddItem (&labelRef, (IC_TRUE (loop))->key, loop);
+              hTabDeleteItem (&labelRef, (IC_LABEL (loop->next))->key, loop->next, DELETE_ITEM, NULL);
+              loop->next = loop->next->next;
+              loop->next->prev = loop;
+              change++;
+              continue;
+            }
+        }
     }
 
   return change;

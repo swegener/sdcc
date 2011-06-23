@@ -246,7 +246,7 @@ add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>,
 }
 
 // A quick-and-dirty function to get the CFG from sdcc.
-inline void
+inline iCode *
 create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 {
   eBBlock **ebbs = ebbi->bbOrder;
@@ -402,6 +402,8 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             cfg[i].dying.erase(*v);
         }
     }
+
+  return(start_ic);
 }
 
 // Computes live ranges for tree decomposition from live ranges from cfg.

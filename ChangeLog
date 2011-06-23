@@ -1,5 +1,13 @@
 2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc.h,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc2.cc,
+	  src/SDCClabel.c:
+	  Fixed bug #3325223.
+
+2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCMain.c:
 	  Disable labelIfx() optimization when using --nolabelopt.
 

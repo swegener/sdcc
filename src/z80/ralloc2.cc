@@ -1259,8 +1259,10 @@ void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
     set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
 }
 
-void z80_ralloc2_cc(ebbIndex *ebbi)
+iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 {
+  iCode *ic;
+
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Processing " << currFunc->name << " from " << dstFileName << "\n"; std::cout.flush();
 #endif
@@ -1269,7 +1271,7 @@ void z80_ralloc2_cc(ebbIndex *ebbi)
 
   con_t conflict_graph;
 
-  create_cfg(control_flow_graph, conflict_graph, ebbi);
+  ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
   if(z80_opts.dump_graphs)
     dump_cfg(control_flow_graph);
@@ -1293,5 +1295,7 @@ void z80_ralloc2_cc(ebbIndex *ebbi)
     dump_tree_decomposition(tree_decomposition);
 
   tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+
+  return(ic);
 }
 

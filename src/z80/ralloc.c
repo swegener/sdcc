@@ -2846,9 +2846,6 @@ joinPushes (iCode * lic)
   return lic;
 }
 
-/* C++ parts of new register allocator */
-extern void z80_ralloc2_cc (ebbIndex * ebbi);
-
 /** Serially allocate registers to the variables.
     This was the main register allocation function.  It is called after
     packing.
@@ -3145,7 +3142,7 @@ z80_ralloc (ebbIndex * ebbi)
   serialRegMark (ebbs, count);
 
   /* The new register allocator invokes its magic */
-  z80_ralloc2_cc (ebbi);
+  ic = z80_ralloc2_cc (ebbi);
 
   RegFix (ebbs, count);
 
@@ -3179,9 +3176,6 @@ z80_ralloc (ebbIndex * ebbi)
   /* after that create the register mask
      for each of the instruction */
   createRegMask (ebbs, count);
-
-  /* now get back the chain */
-  ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));
 
   ic = joinPushes (ic);
 

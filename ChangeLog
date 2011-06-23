@@ -1,8 +1,14 @@
 2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc:
+	  Disallow use of h or l operand in addition when result is true symop.
+
+2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc.h,
 	  src/z80/ralloc.c,
 	  src/z80/ralloc2.cc,
+      src/SDCCralloc.hpp,
 	  src/SDCClabel.c:
 	  Fixed bug #3325223.
 

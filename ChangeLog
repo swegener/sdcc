@@ -1,7 +1,7 @@
 2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:
-	  Disallow use of h or l operand in addition when result is true symop.
+	  Disallow use of h or l operand in addition when result in true symop.
 
 2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
 

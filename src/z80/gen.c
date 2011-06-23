@@ -3659,50 +3659,9 @@ emitCall (const iCode *ic, bool ispcall)
         }
       else
         {
-          symbol *rlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
-          // At least one of BC, DE, HL is free now, so use it to push the return address.
-          if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG ||
-              AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx != B_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx != C_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx != B_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx != C_IDX)
-            {
-              if (!regalloc_dry_run)
-                {
-                  emit2 ("ld bc,!immed!tlabel", (rlbl->key + 100));
-                  emit2 ("push bc");
-                  _G.stack.pushed += 2;
-                }
-            }
-          else if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG ||
-              AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx != D_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx != E_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx != D_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx != E_IDX)
-            {
-              if (!regalloc_dry_run)
-                {
-                  emit2 ("ld de,!immed!tlabel", (rlbl->key + 100));
-                  emit2 ("push de");
-                  _G.stack.pushed += 2;
-                }
-            }
-          else
-            {
-              spillPair (PAIR_HL);
-              if (!regalloc_dry_run)
-                {
-                  emit2 ("ld hl,!immed!tlabel", (rlbl->key + 100));
-                  emit2 ("push hl");
-                  _G.stack.pushed += 2;
-                }
-            }
-          regalloc_dry_run_cost += 4;
-
+          spillPair (PAIR_HL);
           fetchHL (AOP (IC_LEFT (ic)));
-          
-          if (!regalloc_dry_run)
-            {
-              emit2 ("jp !*hl");
-               emit2 ("!tlabeldef", (rlbl->key + 100));
-              _G.lines.current->isLabel = 1;
-              _G.stack.pushed -= 2;
-            }
-          regalloc_dry_run_cost += 1;
+          emit2 ("call __sdcc_call_hl");
         }
       freeAsmop (IC_LEFT (ic), NULL, ic);
     }

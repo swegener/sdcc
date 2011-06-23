@@ -1,5 +1,10 @@
 2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Restore RFE #3284870, which was lost during the optralloc merge.
+
+2011-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc2.cc:
 	  Disallow use of h or l operand in addition when result in true symop.
 

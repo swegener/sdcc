@@ -3186,18 +3186,68 @@ assignResultValue (operand * oper)
     }
   else
     {
-      if ((AOP_TYPE (oper) == AOP_REG) && (AOP_SIZE (oper) == 4) &&
-          !strcmp (AOP (oper)->aopu.aop_reg[size-1]->name, _fReturn[size-2]))
+      if (AOP_TYPE (oper) == AOP_REG)
         {
-          size--;
-          cheapMove (ASMOP_A, 0, _fReturn3[size - 1], 0);
-          cheapMove (_fReturn3[size - 1], 0, _fReturn3[size], 0);
-          cheapMove (_fReturn3[size], 0, ASMOP_A, 0);
-          cheapMove (AOP (oper), size - 1, _fReturn3[size], 0);
-          size--;
+          // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
+        
+          bool assigned[4] = {FALSE, FALSE, FALSE, FALSE};	// This has to be made bigger when sdcc supports variables larger than 4 bytes in registers.
+          int cached_byte = -1;
+
+          while (size--)
+            {
+              int i;
+              
+              // Find lowest byte that can be assigned and needs to be assigned.
+              for (i = 0; i < AOP_SIZE (oper); i++)
+                {
+                  int j;
+                  
+                  if (assigned[i])
+                    continue;
+                    
+                  for (j = 0; j < AOP_SIZE (oper); j++)
+                    {
+                      if (!assigned[j] && i != j && AOP (oper)->aopu.aop_reg[i]->rIdx == _fReturn3[j]->aopu.aop_reg[0]->rIdx)
+                        goto skip_byte; // We can't write this one without overwriting the source.
+                    }
+                  
+                  break; // Found byte that can be written safely.
+                  
+                  skip_byte:;
+                }
+
+              if (i < AOP_SIZE (oper))
+                {
+                  cheapMove (AOP (oper), i, _fReturn3[i], 0); // We can safely assign a byte.
+                  assigned[i] = TRUE;
+                  continue;
+                }
+              
+              // No byte can be assigned safely (i.e. the assignment is a permutation). Cache one in the accumulator.
+ 
+              if (cached_byte != -1)
+                {
+                  // Already one cached. Can happen when the assignment is a permutation consisting of multiple cycles.
+                  cheapMove (AOP (oper), cached_byte, ASMOP_A, 0);
+                  cached_byte = -1;
+                  continue;
+                }
+              
+              for (i = 0; i < AOP_SIZE (oper); i++)
+                if (!assigned[i])
+                  break;
+              wassertl (i != AOP_SIZE (oper), "assignResultValue error: Trying to cache non-existant byte in accumulator."); 
+              cheapMove (ASMOP_A, 0, _fReturn3[i], 0);
+              assigned[i] = TRUE;
+              cached_byte = i;
+            }
+           
+          if (cached_byte != -1)
+            cheapMove (AOP (oper), cached_byte, ASMOP_A, 0);
         }
-      while(size--)
-        cheapMove (AOP (oper), size, _fReturn3[size], 0);
+      else
+        while (size--)
+          cheapMove (AOP (oper), size, _fReturn3[size], 0);
     }
 }
 

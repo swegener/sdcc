@@ -95,3 +95,4 @@ float sincoshf(const float x, const int iscosh)
     }
     return z;
 }
+

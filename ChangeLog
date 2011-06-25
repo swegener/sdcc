@@ -1,6 +1,11 @@
 2011-06-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:
+	  Peephole renumbering.
+
+2011-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
 	  Remove unused (sdcc lib, regr. tests, contiki OS, libcv, my own programs) peepholes.
 
 2011-06-25 Philipp Klaus Krause <pkk AT spth.de>

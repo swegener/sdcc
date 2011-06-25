@@ -1088,7 +1088,7 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (&argv[i][1], OPTION_SHORT_IS_8BITS) == 0)
+          if (strcmp (argv[i], OPTION_SHORT_IS_8BITS) == 0)
             {
               options.shortis8bits = 1;
               continue;

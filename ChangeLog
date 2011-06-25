@@ -1,3 +1,8 @@
+2011-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c:
+	  Fixed #3324913.
+
 2011-06-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

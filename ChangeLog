@@ -1,6 +1,11 @@
 2011-06-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:
+	  Minor peephole improvement.
+
+2011-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
 	  Peephole renumbering.
 
 2011-06-25 Philipp Klaus Krause <pkk AT spth.de>

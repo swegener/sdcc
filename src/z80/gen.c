@@ -9987,27 +9987,5 @@ _isPairUsed (iCode * ic, PAIR_ID pairId)
     }
   return ret;
 }
-
-static char *
-fetchLitSpecial (asmop * aop, bool negate, bool xor)
-{
-  unsigned long v;
-  value *val = aop->aopu.aop_lit;
-
-  wassert (aop->type == AOP_LIT);
-  wassert (!IS_FLOAT (val->type));
-
-  v = ulFromVal (val);
-
-  if (xor)
-    v ^= 0x8000;
-  if (negate)
-    v = 0-v;
-  v &= 0xFFFF;
-
-  tsprintf (buffer, sizeof(buffer), "!immedword", v);
-  return traceAlloc(&_G.trace.aops, Safe_strdup (buffer));
-}
-
-
 */
+

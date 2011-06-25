@@ -481,6 +481,15 @@ replace restart {
 } if notUsed('iy'), notUsed('hl'), operandsNotRelated(%4 'h'), operandsNotRelated(%4 'l')
 
 replace restart {
+	ld	iy,#%1
+	bit	%2,%3 (iy)
+} by {
+	; peephole 49a used hl instead of iy.
+	ld	hl,#%1+%3
+	bit	%2, (hl)
+} if notUsed('iy'), notUsed('hl')
+
+replace restart {
 	ld	%1,(hl)
 	or	a,%1
 } by {

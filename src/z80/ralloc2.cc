@@ -760,12 +760,11 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   //bool result_only_IY = (result_in_IYL || unused_IYL || dying_IYL) && (result_in_IYH || unused_IYH || dying_IYH);
 
-  //std::cout << "IYinst_ok: IY unused?\n";
-
   if(unused_IYL && unused_IYH)
     return(true);	// Register IY not in use.
-
-  //std::cout << "IYinst_ok: IY partially used?\n";
+    
+  if(options.omitFramePtr)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+	return(false);
 
   // Code generator cannot handle variables that are only partially in IY.
   if(unused_IYL ^ unused_IYH)

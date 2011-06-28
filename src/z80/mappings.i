@@ -73,9 +73,9 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"ld hl,#%d\n"
 		"add\thl,sp" },
     { "ldaspsp", 
-		"ld hl,#%d\n"
-		"add\thl,sp\n"
-		"ld\tsp,hl" },
+		"ld iy,#%d\n"
+		"add\tiy,sp\n"
+		"ld\tsp,iy" },
     { "*pair", "(%s)" },
     { "enter", 
 		"push\tix\n"
@@ -370,9 +370,9 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
 		"ld hl,%d\n"
 		"add\thl,sp" },
     { "ldaspsp", 
-		"ld hl,%d\n"
-		"add\thl,sp\n"
-		"ld\tsp,hl" },
+		"ld iy,%d\n"
+		"add\tiy,sp\n"
+		"ld\tsp,iy" },
     { "*pair", "(%s)" },
     { "enter", 
 		"push\tix\n"

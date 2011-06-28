@@ -4124,8 +4124,6 @@ genFunction (const iCode * ic)
         emit2 ("!enter");
     }
 
-  if (_G.omitFramePtr)
-    _G.stack.param_offset -= 2;
   _G.stack.offset = sym->stack;
 }
 

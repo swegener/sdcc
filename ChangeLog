@@ -1,3 +1,11 @@
+2011-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/mappings.i,
+	  src/z80/main.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Fix --fomit-frame-pointer for z80.
+
 2011-06-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:

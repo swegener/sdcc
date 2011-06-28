@@ -2136,6 +2136,39 @@ isLabelDefinition (const char *line, const char **start, int *len,
   return TRUE;
 }
 
+/* Not perfect, will not find all references yet. 
+   Will however find references in call on Z80, which is sufficient to fix #2970351. */
+bool
+isLabelReference (const char *line, const char **start, int *len)
+{
+  const char *s, *e;
+  if (!TARGET_Z80_LIKE)
+    return FALSE;
+
+  s = line;
+  while (ISCHARSPACE (*s))
+    ++s;
+  	
+  if(strncmp(s, "call", 4))
+    return FALSE;
+  s += 4;
+  
+  while (ISCHARSPACE (*s))
+    ++s;
+  
+  /* Skip condition in conditional call */
+  if (strchr(s, ',')) 
+    s = strchr(s, ',') + 1;
+    
+  e = s, len = 0;
+  while(!e && !ISCHARSPACE (*e))
+    ++e, ++len;
+    
+  *start = s;
+  
+  return TRUE;
+}
+
 /* Quick & dirty string hash function. */
 static int
 hashSymbolName (const char *name)
@@ -2173,41 +2206,47 @@ buildLabelRefCountHash (lineNode * head)
   /* First pass: locate all the labels. */
   for (line = head; line; line = line->next)
     {
-      if (line->isLabel  ||
-          line->isInline)
+      bool ref = FALSE;
+      /* run isLabelDefinition to:
+         - look for labels in inline assembler
+         - calculate labelLen
+      */ 
+      if ((line->isLabel  || line->isInline) && isLabelDefinition (line->line, &label, &labelLen, FALSE) ||
+        (ref = TRUE) && isLabelReference (line->line, &label, &labelLen))
         {
-          /* run isLabelDefinition to:
-             - look for labels in inline assembler
-             - calculate labelLen
-          */
-          if (isLabelDefinition (line->line, &label, &labelLen, FALSE) &&
-              labelLen <= SDCC_NAME_MAX)
-            {
-              labelHashEntry *entry;
+          labelHashEntry *entry, *e;
 
-              entry = traceAlloc (&_G.labels, Safe_alloc(sizeof (labelHashEntry)));
+          assert (labelLen <= SDCC_NAME_MAX);
+              
+          entry = traceAlloc (&_G.labels, Safe_alloc(sizeof (labelHashEntry)));
 
-              memcpy (entry->name, label, labelLen);
-              entry->name[labelLen] = 0;
-              entry->refCount = -1;
+          memcpy (entry->name, label, labelLen);
+          entry->name[labelLen] = 0;
+          entry->refCount = -1;
+          
+          for (e = hTabFirstItemWK (labelHash, hashSymbolName (entry->name)); e; e = hTabNextItemWK (labelHash))
+            if (!strcmp (entry->name, e->name))
+              goto c;
 
-              /* Assume function entry points are referenced somewhere,   */
-              /* even if we can't find a reference (might be from outside */
-              /* the function) */
-              if (line->ic && (line->ic->op == FUNCTION))
-                entry->refCount++;
+          /* Assume function entry points are referenced somewhere,   */
+          /* even if we can't find a reference (might be from outside */
+          /* the function) */
+          if (line->ic && (line->ic->op == FUNCTION) || ref)
+            entry->refCount++;
 
-              hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
-            }
+          hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
         }
+      c:;
     }
 
 
   /* Second pass: for each line, note all the referenced labels. */
   /* This is ugly, O(N^2) stuff. Optimizations welcome... */
-  line = head;
-  while (line)
+  for (line = head; line; line = line->next)
     {
+      if (line->isComment)
+        continue;
+        
       for (i = 0; i < HTAB_SIZE; i++)
         {
           labelHashEntry *thisEntry;
@@ -2223,7 +2262,6 @@ buildLabelRefCountHash (lineNode * head)
               thisEntry = hTabNextItemWK (labelHash);
             }
         }
-      line = line->next;
     }
 
 #if 0

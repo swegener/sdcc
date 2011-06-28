@@ -1,5 +1,11 @@
 2011-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCpeeph.c,
+	  src/z80/peeph-z80.def:
+	  Fixed #2970351, reenabling basic tail-call optimization.
+
+2011-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/mappings.i,
 	  src/z80/main.c,
 	  src/z80/gen.c,

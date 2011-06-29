@@ -2256,7 +2256,7 @@ buildLabelRefCountHash (lineNode * head)
           while (thisEntry)
             {
               const char *s;
-              if ((s = strstr (line->line, thisEntry->name)) && !isalnum (*(s + strlen (thisEntry->name))) && (s == line->line || !isalnum (*(s - 1))))
+              if ((s = strstr (line->line, thisEntry->name)) && !ISCHARALNUM (*(s + strlen (thisEntry->name))) && (s == line->line || !ISCHARALNUM (*(s - 1))))
                 thisEntry->refCount++;
 
               thisEntry = hTabNextItemWK (labelHash);

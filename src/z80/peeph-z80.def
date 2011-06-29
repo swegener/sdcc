@@ -193,6 +193,19 @@ replace restart {
 } if notVolatile(%1), notUsed(%1)
 
 replace restart {
+	ld	e, l
+	ld	d, h
+	ld	a, (de)
+	srl	a
+	ld	(de), a
+} by {
+	ld	e, l
+	ld	d, h
+	srl	(hl)
+	; peephole 21a shifted in (hl) instead of a.
+} notUsed('a')
+
+replace restart {
 	ld	%1,(hl)
 	ld	a,%2 (%3)
 	sub	a,%1

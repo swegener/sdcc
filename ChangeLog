@@ -1,5 +1,10 @@
 2011-06-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/peeph-z80.def:
+	  Minor peephole improvement.
+
+2011-06-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCpeeph.c:
 	  Improve accuracy of label reference counting.
 

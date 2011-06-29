@@ -1,3 +1,8 @@
+2011-06-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCpeeph.c:
+	  Improve accuracy of label reference counting.
+
 2011-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCpeeph.c,

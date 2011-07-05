@@ -203,7 +203,7 @@ replace restart {
 	ld	d, h
 	srl	(hl)
 	; peephole 21a shifted in (hl) instead of a.
-} notUsed('a')
+} if notUsed('a')
 
 replace restart {
 	ld	%1,(hl)

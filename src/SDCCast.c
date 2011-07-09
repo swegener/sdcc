@@ -4177,8 +4177,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return lt;
       }
 
+      /* C does not allow comparison of struct or union. */
+      if (IS_STRUCT (LTYPE (tree)) || IS_STRUCT (RTYPE (tree)))
+        {
+          werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
+          goto errorTreeReturn;
+        }
+
       /* if they are pointers they must be castable */
-      if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
+      else if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
         {
           if (tree->opval.op == EQ_OP && !IS_GENPTR (LTYPE (tree)) && IS_GENPTR (RTYPE (tree)))
             {

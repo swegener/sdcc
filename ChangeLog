@@ -1,5 +1,12 @@
 2011-07-09 Philipp Klaus Krause <pkk@spth.de>
 
+	* device/include/string.h,
+	  device/lib/strxfrm.c,
+	  device/lib/incl.mk:
+	  Added missing strxfrm() and strcoll() functions.
+
+2011-07-09 Philipp Klaus Krause <pkk@spth.de>
+
 	* src/SDCCast.c:
 	  Fixed bug #3107180.
 

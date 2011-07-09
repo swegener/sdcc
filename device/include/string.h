@@ -60,9 +60,10 @@ extern char *strncat(char * /*restrict*/ dest, const char * /*restrict*/ src, si
 /* Comparison functions: */
 extern int memcmp (const void *s1, const void *s2, size_t n);
 extern int strcmp (const char *s1, const char *s2);
-/*inline int strcoll(const char *s1, const char *s2) {return strcmp(s1, s2);}*/
+#define strcoll(s1, s2) strcmp(s1, s2)
+/*int strcoll(const char *s1, const char *s2) {return strcmp(s1, s2);}*/
 extern int strncmp(const char *s1, const char *s2, size_t n);
-/*inline size_t strxfrm(char *dest, const char *src, size_t n) {strncpy(dest, src, n); return strlen(src);}*/
+extern size_t strxfrm(char *dest, const char *src, size_t n);
 
 /* Search functions: */
 extern void *memchr (const void *s, int c, size_t n);

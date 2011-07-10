@@ -2152,7 +2152,7 @@ isLabelReference (const char *line, const char **start, int *len)
   if(strncmp(s, "call", 4))
     return FALSE;
   s += 4;
-  
+
   while (ISCHARSPACE (*s))
     ++s;
   
@@ -2160,12 +2160,12 @@ isLabelReference (const char *line, const char **start, int *len)
   if (strchr(s, ',')) 
     s = strchr(s, ',') + 1;
     
-  e = s, len = 0;
-  while(!e && !ISCHARSPACE (*e))
-    ++e, ++len;
+  e = s, *len = 0;
+  while(*e && !ISCHARSPACE (*e) && *e != ';')
+    ++e, ++(*len);
     
   *start = s;
-  
+
   return TRUE;
 }
 

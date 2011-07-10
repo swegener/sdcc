@@ -1,5 +1,11 @@
 2011-07-09 Philipp Klaus Krause <pkk@spth.de>
 
+	* src/SDCCpeeph.c,
+	  support/regression/tests/bug3361290.c:
+	  Fixed bug #3361290.
+
+2011-07-09 Philipp Klaus Krause <pkk@spth.de>
+
 	* src/z80/gen.c:
 	  Fixed bug #3361280.
 

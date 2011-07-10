@@ -725,6 +725,8 @@ ld_cost(asmop *op1, asmop *op2)
           return(5);
         case AOP_HL:    /* 3 from ld hl, #... */
           return(6);
+        case AOP_SFR:
+          return(4);
         case AOP_IY:    /* 4 from ld iy, #... */
         case AOP_EXSTK: /* 4 from ld iy, #... */
           return(9);

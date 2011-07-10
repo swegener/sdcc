@@ -1,5 +1,10 @@
 2011-07-09 Philipp Klaus Krause <pkk@spth.de>
 
+	* src/z80/gen.c:
+	  Fixed bug #3361280.
+
+2011-07-09 Philipp Klaus Krause <pkk@spth.de>
+
 	* device/include/string.h,
 	  device/lib/strxfrm.c,
 	  device/lib/incl.mk:

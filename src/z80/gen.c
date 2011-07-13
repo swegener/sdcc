@@ -319,7 +319,7 @@ static const char *aopNames[] = {
   "AOP_DUMMY"
 };
 
-struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_zero, asmop_one;
+struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
 struct asmop *const ASMOP_A = &asmop_a;
 struct asmop *const ASMOP_B = &asmop_b;
 struct asmop *const ASMOP_C = &asmop_c;
@@ -327,6 +327,8 @@ struct asmop *const ASMOP_D = &asmop_d;
 struct asmop *const ASMOP_E = &asmop_e;
 struct asmop *const ASMOP_H = &asmop_h;
 struct asmop *const ASMOP_L = &asmop_l;
+struct asmop *const ASMOP_IYH = &asmop_iyh;
+struct asmop *const ASMOP_IYL = &asmop_iyl;
 struct asmop *const ASMOP_ZERO = &asmop_zero;
 struct asmop *const ASMOP_ONE = &asmop_one;
 
@@ -334,6 +336,9 @@ static asmop *_z80_return3[] =
   {&asmop_l, &asmop_h, &asmop_e, &asmop_d};
 static asmop *_gbz80_return3[] =
   {&asmop_e, &asmop_d, &asmop_l, &asmop_h};
+  
+static asmop *asmopregs[] = 
+  {&asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh};
 
 static asmop **_fReturn3;
 
@@ -362,6 +367,12 @@ z80_init_asmops(void)
   asmop_l.type = AOP_REG;
   asmop_l.size = 1;
   asmop_l.aopu.aop_reg[0] = regsZ80 + L_IDX;
+  asmop_iyh.type = AOP_REG;
+  asmop_iyh.size = 1;
+  asmop_iyh.aopu.aop_reg[0] = regsZ80 + IYH_IDX;
+  asmop_iyl.type = AOP_REG;
+  asmop_iyl.size = 1;
+  asmop_iyl.aopu.aop_reg[0] = regsZ80 + IYL_IDX;
   
   asmop_zero.type = AOP_SIMPLELIT;
   asmop_zero.aopu.aop_simplelit = 0;
@@ -2928,6 +2939,69 @@ _castBoolean (const operand *right)
   regalloc_dry_run_cost += 1;
 }
 
+/* Shuffle src reg array into dst reg array. */
+static void regMove(short *dst, short *src, size_t n)
+{
+  bool assigned[6] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
+  int cached_byte = -1;
+  size_t size = n;
+  
+  wassert (n < 6);
+
+  // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
+  while (size--)
+    {
+      int i;
+              
+      // Find lowest byte that can be assigned and needs to be assigned.
+      for (i = 0; i < n; i++)
+        {
+          int j;
+                  
+          if (assigned[i])
+            continue;
+                    
+          for (j = 0; j < n; j++)
+            {
+              if (!assigned[j] && i != j && dst[i] == src[j])
+                goto skip_byte; // We can't write this one without overwriting the source.
+            }
+                  
+          break; // Found byte that can be written safely.
+                  
+          skip_byte:;
+        }
+
+      if (i < n)
+        {
+          cheapMove (asmopregs[dst[i]], 0, asmopregs[src[i]], 0); // We can safely assign a byte.
+          assigned[i] = TRUE;
+          continue;
+        }
+              
+      // No byte can be assigned safely (i.e. the assignment is a permutation). Cache one in the accumulator.
+ 
+      if (cached_byte != -1)
+        {
+          // Already one cached. Can happen when the assignment is a permutation consisting of multiple cycles.
+          cheapMove (asmopregs[dst[cached_byte]], 0, ASMOP_A, 0);
+          cached_byte = -1;
+          continue;
+        }
+              
+      for (i = 0; i < n; i++)
+        if (!assigned[i])
+          break;
+      wassertl (i != n, "regMove error: Trying to cache non-existant byte in accumulator."); 
+      cheapMove (ASMOP_A, 0, asmopregs[src[i]], 0);
+      assigned[i] = TRUE;
+      cached_byte = i;
+    }
+           
+  if (cached_byte != -1)
+    cheapMove (asmopregs[dst[cached_byte]], 0, ASMOP_A, 0);
+}
+
 /*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
 /*-----------------------------------------------------------------*/
@@ -3190,62 +3264,16 @@ assignResultValue (operand * oper)
     {
       if (AOP_TYPE (oper) == AOP_REG)
         {
-          // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
-        
-          bool assigned[4] = {FALSE, FALSE, FALSE, FALSE};	// This has to be made bigger when sdcc supports variables larger than 4 bytes in registers.
-          int cached_byte = -1;
-
-          while (size--)
-            {
-              int i;
-              
-              // Find lowest byte that can be assigned and needs to be assigned.
-              for (i = 0; i < AOP_SIZE (oper); i++)
-                {
-                  int j;
-                  
-                  if (assigned[i])
-                    continue;
-                    
-                  for (j = 0; j < AOP_SIZE (oper); j++)
-                    {
-                      if (!assigned[j] && i != j && AOP (oper)->aopu.aop_reg[i]->rIdx == _fReturn3[j]->aopu.aop_reg[0]->rIdx)
-                        goto skip_byte; // We can't write this one without overwriting the source.
-                    }
-                  
-                  break; // Found byte that can be written safely.
-                  
-                  skip_byte:;
-                }
-
-              if (i < AOP_SIZE (oper))
-                {
-                  cheapMove (AOP (oper), i, _fReturn3[i], 0); // We can safely assign a byte.
-                  assigned[i] = TRUE;
-                  continue;
-                }
-              
-              // No byte can be assigned safely (i.e. the assignment is a permutation). Cache one in the accumulator.
- 
-              if (cached_byte != -1)
-                {
-                  // Already one cached. Can happen when the assignment is a permutation consisting of multiple cycles.
-                  cheapMove (AOP (oper), cached_byte, ASMOP_A, 0);
-                  cached_byte = -1;
-                  continue;
-                }
-              
-              for (i = 0; i < AOP_SIZE (oper); i++)
-                if (!assigned[i])
-                  break;
-              wassertl (i != AOP_SIZE (oper), "assignResultValue error: Trying to cache non-existant byte in accumulator."); 
-              cheapMove (ASMOP_A, 0, _fReturn3[i], 0);
-              assigned[i] = TRUE;
-              cached_byte = i;
-            }
-           
-          if (cached_byte != -1)
-            cheapMove (AOP (oper), cached_byte, ASMOP_A, 0);
+          int i;
+          short retarray[4], oparray[4];
+          
+          for(i = 0; i < size; i++)
+          {
+             retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
+             oparray[i] = AOP (oper)->aopu.aop_reg[i]->rIdx;
+          }
+          
+          regMove(oparray, retarray, size);
         }
       else
         while (size--)
@@ -4297,62 +4325,16 @@ genRet (const iCode *ic)
         }
       else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
         {
-          // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
-        
-          bool assigned[4] = {FALSE, FALSE, FALSE, FALSE};	// This has to be made bigger when sdcc supports variables larger than 4 bytes in registers.
-          int cached_byte = -1;
-
-          while (size--)
-            {
-              int i;
-              
-              // Find lowest byte that can be assigned and needs to be assigned.
-              for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
-                {
-                  int j;
-                  
-                  if (assigned[i])
-                    continue;
-                    
-                  for (j = 0; j < AOP_SIZE (IC_LEFT (ic)); j++)
-                    {
-                      if (!assigned[j] && i != j && _fReturn3[i]->aopu.aop_reg[0]->rIdx == AOP (IC_LEFT (ic))->aopu.aop_reg[j]->rIdx)
-                        goto skip_byte; // We can't write this one without overwriting the source.
-                    }
-                  
-                  break; // Found byte that can be written safely.
-                  
-                  skip_byte:;
-                }
-
-              if (i < AOP_SIZE (IC_LEFT (ic)))
-                {
-                  cheapMove (_fReturn3[i], 0, AOP(IC_LEFT (ic)), i); // We can safely assign a byte.
-                  assigned[i] = TRUE;
-                  continue;
-                }
-              
-              // No byte can be assigned safely (i.e. the assignment is a permutation). Cache one in the accumulator.
- 
-              if (cached_byte != -1)
-                {
-                  // Already one cached. Can happen when the assignment is a permutation consisting of multiple cycles.
-                  cheapMove (_fReturn3[cached_byte], 0, ASMOP_A, 0);
-                  cached_byte = -1;
-                  continue;
-                }
-              
-              for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
-                if (!assigned[i])
-                  break;
-              wassertl (i != AOP_SIZE (IC_LEFT (ic)), "genAssign error: Trying to cache non-existant byte in accumulator."); 
-              cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), i);
-              assigned[i] = TRUE;
-              cached_byte = i;
-            }
-           
-          if (cached_byte != -1)
-            cheapMove (_fReturn3[cached_byte], 0, ASMOP_A, 0);
+          int i;
+          short retarray[4], oparray[4];
+          
+          for(i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
+          {
+             retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
+             oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
+          }
+             
+          regMove(retarray, oparray, AOP_SIZE (IC_LEFT (ic)));
         }
       else
         {
@@ -9369,13 +9351,18 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
   };
   int i, j, nunity = 0;
   memset (ids, PAIR_INVALID, sizeof (ids));
+  
+  bool skip[3] = {FALSE, FALSE, FALSE};
+  short dstregs[4];
+  short srcregs[4];
+  size_t regparamsize = 0;
 
   /* Sanity checks */
   wassertl (nparams == 3, "Built-in memcpy() must have three parameters");
 
   for (i = 0; i < nparams; i++)
     {
-      aopOp (pparams[i], ic, FALSE, FALSE);	// Todo: Free these!
+      aopOp (pparams[i], ic, FALSE, FALSE);	// Todo: Free these.
       ids[dest[i]][getPairId (AOP (pparams[i]))] = TRUE;
     }
 
@@ -9385,6 +9372,35 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
   if (!((unsigned int) ulFromVal (AOP (pparams[2])->aopu.aop_lit)))
     return (0);
 
+#if 1
+  if(AOP_TYPE (pparams[0]) == AOP_REG)
+  {
+    srcregs[regparamsize] = AOP (pparams[0])->aopu.aop_reg[0]->rIdx;
+    dstregs[regparamsize++] = E_IDX;
+    srcregs[regparamsize] = AOP (pparams[0])->aopu.aop_reg[1]->rIdx;
+    dstregs[regparamsize++] = D_IDX;
+    skip[0] = TRUE;
+  }
+  if(AOP_TYPE (pparams[1]) == AOP_REG)
+  {
+    srcregs[regparamsize] = AOP (pparams[1])->aopu.aop_reg[0]->rIdx;
+    dstregs[regparamsize++] = L_IDX;
+    srcregs[regparamsize] = AOP (pparams[1])->aopu.aop_reg[1]->rIdx;
+    dstregs[regparamsize++] = H_IDX;
+    skip[1] = TRUE;
+  }
+
+  if(regparamsize)
+    regMove (dstregs, srcregs, regparamsize);
+
+  for (i = 0; i < 3; i++)
+    {
+      if (!skip[i])
+        fetchPair (dest[i], AOP (pparams[i]));
+    }
+
+  return (1);
+#else 
   /* Count the number of unity or iTemp assigns. */
   for (i = 0; i < 3; i++)
     {
@@ -9484,7 +9500,9 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
           fetchPair (dest[i], AOP (pparams[i]));
         }
     }
+
   return (1);
+#endif
 }
 
 static void

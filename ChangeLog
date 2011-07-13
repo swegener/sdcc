@@ -1,3 +1,8 @@
+2011-07-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Refactored register shuffling code, fixing a memcpy() bug.
+
 2011-07-09 Philipp Klaus Krause <pkk@spth.de>
 
 	* src/SDCCpeeph.c,

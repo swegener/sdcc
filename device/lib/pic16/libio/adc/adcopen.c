@@ -63,6 +63,16 @@ adc_open(unsigned char channel, unsigned char fosc, sdcc_pcfg_t pcfg, unsigned c
   ADCON0 = ((channel & 0x0f) << 2);
   ADCON1 = (config & 0x0f);
   ADCON2 = (config & ADC_FRM_RJUST) | (fosc & 0x3f);
+#elif (__SDCC_ADC_STYLE == 1823222)
+  /* use ANSELA, ANSELB, ANSELC, ANSELD, ANSELE registers and
+     TRISA, TRISB, TRISC, TRISD, TRISE registers to set
+     corresponding port to analog mode */
+  /* 46k22 supports up to 28 ADC ports */
+  ADCON0 = ((channel & 0x1f) << 2);
+  /* TRIGSEL — — — PVCFG<1:0> NVCFG<1:0> */
+  ADCON1 = (fosc & ADC_TRIGGER) | (config & 0x0f);
+  /* ADFM — ACQT<2:0> ADCS<2:0> */
+  ADCON2 = (config & ADC_FRM_RJUST) | (fosc & 0x3f);
 #elif (__SDCC_ADC_STYLE == 1822200)
   ADCON0 = (channel & 0x0f) << 2;
   /* XXX: Should be (pcfg & 0x0f) as VCFG comes from config,

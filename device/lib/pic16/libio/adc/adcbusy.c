@@ -48,6 +48,7 @@ char adc_busy(void) __naked
 #elif (__SDCC_ADC_STYLE == 1812200) \
    || (__SDCC_ADC_STYLE == 1813502) \
    || (__SDCC_ADC_STYLE == 1822200) \
+   || (__SDCC_ADC_STYLE == 1823222) \
    || (__SDCC_ADC_STYLE == 1824501) \
    || (__SDCC_ADC_STYLE == 1865501)
   __asm

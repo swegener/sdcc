@@ -62,16 +62,32 @@
 #define ADC_CHN_DAC             0x0e  /* 13k50-style */
 #define ADC_CHN_15              0x0f
 #define ADC_CHN_FVR             0x0f  /* 13k50-style */
+/* more channels: 23k22-style */
+#define ADC_CHN_16              0x10
+#define ADC_CHN_17              0x11
+#define ADC_CHN_18              0x12
+#define ADC_CHN_19              0x13
+#define ADC_CHN_20              0x14
+#define ADC_CHN_21              0x15
+#define ADC_CHN_22              0x16
+#define ADC_CHN_23              0x17
+#define ADC_CHN_24              0x18
+#define ADC_CHN_25              0x19
+#define ADC_CHN_26              0x1a
+#define ADC_CHN_27              0x1b
+#define ADC_CHN_K_CTMU          0x1d
+#define ADC_CHN_K_DAC           0x1e
+#define ADC_CHN_K_FVR           0x1f
 
 
 /*
  * adc_open's `fosc' argument:
  *
- * ADC_FOSC_* | ADC_ACQT_* | ADC_CAL
+ * ADC_FOSC_* | ADC_ACQT_* | ADC_CAL | ADC_TRIGSEL_*
  *
  *    7     6     5     4     3     2     1     0
  * +-----+-----+-----+-----+-----+-----+-----+-----+
- * | --- | CAL |       ACQT      |    FOSC/ADCS    |
+ * | TRG | CAL |       ACQT      |    FOSC/ADCS    |
  * +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
@@ -96,6 +112,9 @@
 
 /* calibration enable (24j50/65j50-style only) */
 #define ADC_CAL                 0x40
+
+/* trigger selection (23k22-style only) */
+#define ADC_TRIGGER             0x80
 
 
 /*
@@ -138,6 +157,12 @@
 #define ADC_PVCFG_AN4           (0x01 << 2)
 #define ADC_PVCFG_FVR           (0x02 << 2)
 
+/* reference voltage configuration (23k22-style) */
+#define ADC_NVCFG_AN2           0x01
+#define ADC_PVCFG_AN3           (0x01 << 2)
+#define ADC_TRIGSEL_CCP5        (0x00 << 7)
+#define ADC_TRIGSEL_CTMU        (0x01 << 7)
+
 
 /*
  * Distinguishing between ADC-styles:
@@ -146,37 +171,37 @@
  *   18f65j50-style devices multiplex ANCONx and ADCONx
  *
  * ADCON0:
- * bit  18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50
- *  0   ADON    ADON    ADON      ADON    ADON      ADON
- *  1   -       GO      GO        GO      GO        GO
- *  2   GO      CHS0    CHS0      CHS0    CHS0      CHS0
- *  3   CHS0    CHS1    CHS1      CHS1    CHS1      CHS1
- *  4   CHS1    CHS2    CHS2      CHS2    CHS2      CHS2
- *  5   CHS2    -       CHS3      CHS3    CHS3      CHS3
- *  6   ADCS0   VCFG0   -         -       VCFG0     VCFG0
- *  7   ADCS1   VCFG1   -         (ADCAL) VCFG1     VCFG1
+ * bit  18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
+ *  0   ADON    ADON    ADON      ADON    ADON      ADON      ADON
+ *  1   -       GO      GO        GO      GO        GO        GO
+ *  2   GO      CHS0    CHS0      CHS0    CHS0      CHS0      CHS0
+ *  3   CHS0    CHS1    CHS1      CHS1    CHS1      CHS1      CHS1
+ *  4   CHS1    CHS2    CHS2      CHS2    CHS2      CHS2      CHS2
+ *  5   CHS2    -       CHS3      CHS3    CHS3      CHS3      CHS3
+ *  6   ADCS0   VCFG0   -         -       VCFG0     VCFG0     CHS4
+ *  7   ADCS1   VCFG1   -         (ADCAL) VCFG1     VCFG1     -
  *
  * ADCON1:
- *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50
- *   0  PCFG0   PCFG0   NVCFG0    PCFG0   ADCS0     ADCS0
- *   1  PCFG1   PCFG1   NVCFG1    PCFG1   ADCS1     ADCS1
- *   2  PCFG2   PCFG2   PVCFG0    PCFG2   ADCS2     ADCS2
- *   3  PCFG3   PCFG3   PVCFG1    PCFG3   ACQT0     ACQT0
- *   4  -       PCFG4   -         VCFG0   ACQT1     ACQT1
- *   5  -       PCFG5   -         VCFG1   ACQT2     ACQT2
- *   6  ADCS2   PCFG6   -         -       ADCAL     ADCAL
- *   7  ADFM    -       -         -       ADFM      ADFM
+ *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
+ *   0  PCFG0   PCFG0   NVCFG0    PCFG0   ADCS0     ADCS0     NVCFG0
+ *   1  PCFG1   PCFG1   NVCFG1    PCFG1   ADCS1     ADCS1     NVCFG1
+ *   2  PCFG2   PCFG2   PVCFG0    PCFG2   ADCS2     ADCS2     PVCFG0
+ *   3  PCFG3   PCFG3   PVCFG1    PCFG3   ACQT0     ACQT0     PVCFG1
+ *   4  -       PCFG4   -         VCFG0   ACQT1     ACQT1     -
+ *   5  -       PCFG5   -         VCFG1   ACQT2     ACQT2     -
+ *   6  ADCS2   PCFG6   -         -       ADCAL     ADCAL     -
+ *   7  ADFM    -       -         -       ADFM      ADFM      TRIGSEL
  *
  * ADCON2:
- *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50
- *   0                  ADCS0
- *   1                  ADCS1
- *   2                  ADCS2
- *   3                  ACQT0
- *   4                  ACQT1
- *   5                  ACQT2
- *   6                  -
- *   7                  ADFM
+ *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
+ *   0                  ADCS0                                 ADCS0
+ *   1                  ADCS1                                 ADCS1
+ *   2                  ADCS2                                 ADCS2
+ *   3                  ACQT0                                 ACQT0
+ *   4                  ACQT1                                 ACQT1
+ *   5                  ACQT2                                 ACQT2
+ *   6                  -                                     -
+ *   7                  ADFM                                  ADFM
  */
 #include "pic18fam.h"
 
@@ -341,6 +366,14 @@
 #define ADC_CFG_01A_1R  0x1e
 #define ADC_CFG_01A_2R  0x3e
 #define ADC_CFG_00A_0R  0x0f
+
+#elif (__SDCC_ADC_STYLE == 1823222)
+
+/* use ANSELA, ANSELB, ANSELC, ANSELD, ANSELE registers and
+ * TRISA, TRISB, TRISC, TRISD, TRISE registers to set
+ * corresponding port to analog mode
+ * Note: 46k22 supports up to 28 ADC ports */
+
 
 #elif (__SDCC_ADC_STYLE == 1824501) || (__SDCC_ADC_STYLE == 1865501)
 

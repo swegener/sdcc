@@ -40,6 +40,8 @@ void adc_setchannel(unsigned char channel)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
 #elif (__SDCC_ADC_STYLE == 1822200)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
+#elif (__SDCC_ADC_STYLE == 1823222)
+  ADCON0 = (ADCON0 & ~(0x1f << 2)) | ((channel & 0x1f) << 2);
 #elif (__SDCC_ADC_STYLE == 1824501)
   ADCON0 = (ADCON0 & ~(0x0f << 2)) | ((channel & 0x0f) << 2);
 #elif (__SDCC_ADC_STYLE == 1865501)

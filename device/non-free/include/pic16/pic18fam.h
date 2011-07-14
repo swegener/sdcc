@@ -53,6 +53,16 @@
     || defined(pic18f46k20)
 #define __SDCC_PIC16_FAMILY 1823202
 
+#elif  defined(pic18f23k22) \
+    || defined(pic18f24k22) \
+    || defined(pic18f25k22) \
+    || defined(pic18f26k22) \
+    || defined(pic18f43k22) \
+    || defined(pic18f44k22) \
+    || defined(pic18f45k22) \
+    || defined(pic18f46k22)
+#define __SDCC_PIC16_FAMILY 1823222
+
 #elif  defined(pic18f2331) \
     || defined(pic18f2431) \
     || defined(pic18f4331) \
@@ -215,6 +225,9 @@
     || (__SDCC_PIC16_FAMILY == 1866601)
 #define __SDCC_ADC_STYLE    1822200
 
+#elif  (__SDCC_PIC16_FAMILY == 1823222)
+#define __SDCC_ADC_STYLE    1823222
+
 #elif  (__SDCC_PIC16_FAMILY == 1824501)
 #define __SDCC_ADC_STYLE    1824501
 
@@ -244,6 +257,7 @@
 
 #elif  (__SDCC_PIC16_FAMILY == 1822210) \
     || (__SDCC_PIC16_FAMILY == 1823202) \
+    || (__SDCC_PIC16_FAMILY == 1823222) \
     || (__SDCC_PIC16_FAMILY == 1823310) \
     || (__SDCC_PIC16_FAMILY == 1824100) \
     || (__SDCC_PIC16_FAMILY == 1824101) \

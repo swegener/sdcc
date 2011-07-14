@@ -809,7 +809,7 @@ symHasReg (symbol *sym, const reg_info *reg)
     free up the registers
 */
 static void
-deassignLRs (iCode * ic, eBBlock * ebp)
+deassignLRs (iCode *ic, eBBlock *ebp)
 {
   symbol *sym;
   int k;
@@ -859,8 +859,9 @@ deassignLRs (iCode * ic, eBBlock * ebp)
           /* if the result of this one needs registers
              and does not have it then assign it right
              away */
-          if (z80_opts.oldralloc && IC_RESULT (ic) && !(SKIP_IC2 (ic) ||      /* not a special icode */
-                                  ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || ic->op == RETURN) && (result = OP_SYMBOL (IC_RESULT (ic))) &&    /* has a result */
+          if (z80_opts.oldralloc && IC_RESULT (ic) &&
+              !(SKIP_IC2 (ic) || ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || ic->op == RETURN) &&
+              IS_SYMOP (IC_RESULT (ic)) && (result = OP_SYMBOL (IC_RESULT (ic))) &&    /* has a result */
               result->liveTo > ic->seq &&       /* and will live beyond this */
               result->liveTo <= ebp->lSeq &&    /* does not go beyond this block */
               result->liveFrom == ic->seq &&    /* does not start before here */
@@ -912,7 +913,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 /** Reassign this to registers.
  */
 static void
-reassignLR (operand * op)
+reassignLR (operand *op)
 {
   symbol *sym = OP_SYMBOL (op);
   int i;

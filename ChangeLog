@@ -29,6 +29,7 @@
 	 device/non-free/lib/pic16/libdev/pic18f45k22.c:
 	 applied patch #3311538 - Add new pic18f2xk22/pic18f4xk22 family,
 	 thanks Strobl Anton
+	* doc/sdccman.lyx: added support for pic18f2xk22/pic18f4xk22 family
 
 2011-07-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

@@ -8784,7 +8784,7 @@ genJumpTab (const iCode *ic)
 
   aopOp (IC_JTCOND (ic), ic, FALSE, FALSE);
   /* get the condition into accumulator */
-  if (!IS_GB)
+  if (!IS_GB && !isPairDead(PAIR_DE, ic))
     _push (PAIR_DE);
   cheapMove (ASMOP_E, 0, AOP (IC_JTCOND (ic)), 0);
   if(!regalloc_dry_run)
@@ -8803,7 +8803,7 @@ genJumpTab (const iCode *ic)
     }
   regalloc_dry_run_cost += 5;
   freeAsmop (IC_JTCOND (ic), NULL, ic);
-  if (!IS_GB)
+  if (!IS_GB && !isPairDead(PAIR_DE, ic))
     _pop (PAIR_DE);
   if(!regalloc_dry_run)
     {

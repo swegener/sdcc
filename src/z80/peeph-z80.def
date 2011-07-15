@@ -1599,6 +1599,24 @@ replace {
 
 replace {
 	add	hl,de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+%2:
+} by {
+	; peephole 150-3' removed addition using short jumps in jump-table.
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
 	pop	de
 	jp	(hl)
 %1:
@@ -1610,6 +1628,26 @@ replace {
 } by {
 	; peephole 150-4 removed addition using short jumps in jump-table.
 	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+%2:
+} by {
+	; peephole 150-4' removed addition using short jumps in jump-table.
 	jp	(hl)
 %1:
 	jr	%5
@@ -1633,6 +1671,28 @@ replace {
 } by {
 	; peephole 150-5 removed addition using short jumps in jump-table.
 	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+	jr	%9
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+	jp	%9
+%2:
+} by {
+	; peephole 150-5' removed addition using short jumps in jump-table.
 	jp	(hl)
 %1:
 	jr	%5
@@ -1671,6 +1731,30 @@ replace {
 
 replace {
 	add	hl,de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+	jp	%9
+	jp	%10
+%2:
+} by {
+	; peephole 150-6' removed addition using short jumps in jump-table.
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+	jr	%9
+	jr	%10
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
 	pop	de
 	jp	(hl)
 %1:
@@ -1685,6 +1769,32 @@ replace {
 } by {
 	; peephole 150-7 removed addition using short jumps in jump-table.
 	pop	de
+	jp	(hl)
+%1:
+	jr	%5
+	jr	%6
+	jr	%7
+	jr	%8
+	jr	%9
+	jr	%10
+	jr	%11
+%2:
+} if labelJTInRange
+
+replace {
+	add	hl,de
+	jp	(hl)
+%1:
+	jp	%5
+	jp	%6
+	jp	%7
+	jp	%8
+	jp	%9
+	jp	%10
+	jp	%11
+%2:
+} by {
+	; peephole 150-7' removed addition using short jumps in jump-table.
 	jp	(hl)
 %1:
 	jr	%5

@@ -1,5 +1,11 @@
 2011-07-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Optimized jumptable generation.
+
+2011-07-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCpeep.c:
 	  labelJTInRange() fix, to ensure that jp by jr replacement is correct in jumptables.
 

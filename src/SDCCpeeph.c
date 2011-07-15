@@ -241,13 +241,14 @@ FBYNAME (labelJTInRange)
       if (!lbl)
         return FALSE;
 
-      dist = pcDistance (currPl, lbl, FALSE);
+      dist = (pcDistance (currPl, lbl, TRUE) +
+              pcDistance (currPl, lbl, FALSE));
 
       /* three terms used to calculate allowable distance */
- /* printf("\nlabel %s %i dist %i cdist 0x%02x 0x%02x\n", lbl, i, dist, dist -(count-i-1)-(7+3*i), 127+(count-i-1)+(7+3*i) - dist); */
+      /* Could be made more exact and port-specific. */
       if (!dist ||
           dist > 127+           /* range of sjmp */
-                 (7+3*i)+       /* offset between this jump and currPl,
+                 (3+3*i)+       /* offset between this jump and currPl,
                                    should use pcDistance instead? */
                  (count-i-1)    /* if peephole applies distance is shortened */
          )

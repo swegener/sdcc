@@ -1,3 +1,8 @@
+2011-07-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCpeep.c:
+	  labelJTInRange() fix, to ensure that jp by jr replacement is correct in jumptables.
+
 2011-07-14 Borut Razem <borut.razem AT gmail.com>
 
 	* device/include/pic16/pic18fregs.h,

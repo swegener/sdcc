@@ -1,3 +1,8 @@
+2011-07-15 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/tests/bug1665511.c:
+	  fixed host regression test bus error crash on sparc Solaris
+
 2011-07-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,
@@ -12,34 +17,34 @@
 2011-07-14 Borut Razem <borut.razem AT gmail.com>
 
 	* device/include/pic16/pic18fregs.h,
-	 device/include/pic16/pic16devices.txt,
-	 device/include/pic16/adc.h,
-	 device/lib/pic16/libio/adc/adcsetch.c,
-	 device/lib/pic16/libio/adc/adcopen.c,
-	 device/lib/pic16/libio/adc/adcbusy.c,
-	 device/lib/pic16/libio/Makefile.am,
-	 device/non-free/include/pic16/pic18fam.h,
-	 device/non-free/lib/pic16/libdev/Makefile.am,
-	 device/non-free/lib/pic16/pics.all,
-	 support/scripts/pic18fam-h-gen.pl,
-	 device/non-free/include/pic16/pic18f26k22.h,
-	 device/non-free/include/pic16/pic18f46k22.h,
-	 device/non-free/include/pic16/pic18f23k22.h,
-	 device/non-free/include/pic16/pic18f43k22.h,
-	 device/non-free/include/pic16/pic18f24k22.h,
-	 device/non-free/include/pic16/pic18f44k22.h,
-	 device/non-free/include/pic16/pic18f25k22.h,
-	 device/non-free/include/pic16/pic18f45k22.h,
-	 device/non-free/lib/pic16/libdev/pic18f26k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f46k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f23k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f43k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f24k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f44k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f25k22.c,
-	 device/non-free/lib/pic16/libdev/pic18f45k22.c:
-	 applied patch #3311538 - Add new pic18f2xk22/pic18f4xk22 family,
-	 thanks Strobl Anton
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/adc.h,
+	  device/lib/pic16/libio/adc/adcsetch.c,
+	  device/lib/pic16/libio/adc/adcopen.c,
+	  device/lib/pic16/libio/adc/adcbusy.c,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/non-free/include/pic16/pic18fam.h,
+	  device/non-free/lib/pic16/libdev/Makefile.am,
+	  device/non-free/lib/pic16/pics.all,
+	  support/scripts/pic18fam-h-gen.pl,
+	  device/non-free/include/pic16/pic18f26k22.h,
+	  device/non-free/include/pic16/pic18f46k22.h,
+	  device/non-free/include/pic16/pic18f23k22.h,
+	  device/non-free/include/pic16/pic18f43k22.h,
+	  device/non-free/include/pic16/pic18f24k22.h,
+	  device/non-free/include/pic16/pic18f44k22.h,
+	  device/non-free/include/pic16/pic18f25k22.h,
+	  device/non-free/include/pic16/pic18f45k22.h,
+	  device/non-free/lib/pic16/libdev/pic18f26k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f46k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f23k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f43k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f24k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f44k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f25k22.c,
+	  device/non-free/lib/pic16/libdev/pic18f45k22.c:
+	  applied patch #3311538 - Add new pic18f2xk22/pic18f4xk22 family,
+	  thanks Strobl Anton
 	* doc/sdccman.lyx: added support for pic18f2xk22/pic18f4xk22 family
 
 2011-07-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>

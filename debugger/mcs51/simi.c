@@ -29,6 +29,10 @@
 # include <winsock2.h>
 # include <io.h>
 #else
+# ifdef __sun
+#   define BSD_COMP
+#   include <sys/file.h>
+# endif
 # ifdef HAVE_SYS_SOCKET_H
 #   include <sys/types.h>
 #   include <sys/socket.h>
@@ -38,9 +42,6 @@
 #   include <sys/ioctl.h>
 # else
 #   error "Cannot build debugger without socket support"
-# endif
-# ifdef __sun
-#   include <sys/file.h>
 # endif
 #endif
 #include <fcntl.h>

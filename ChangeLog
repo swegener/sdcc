@@ -1,3 +1,9 @@
+2011-07-16 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/simi.c:
+	  define BSD_COMP on Solaris so that gcc includes <sys/filio.h>
+	  which defines FIONBIO
+
 2011-07-15 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/tests/bug1665511.c:

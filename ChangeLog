@@ -1,3 +1,7 @@
+2011-07-19 Borut Razem <borut.razem AT gmail.com>
+
+	* src/z80/gen.c: fixed MSVC 2010 compilation
+
 2011-07-16 Borut Razem <borut.razem AT gmail.com>
 
 	* debugger/mcs51/simi.c:

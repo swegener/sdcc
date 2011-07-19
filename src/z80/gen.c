@@ -9349,13 +9349,13 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
   PAIR_ID dest[3] = {
     PAIR_DE, PAIR_HL, PAIR_BC
   };
-  int i, j, nunity = 0;
-  memset (ids, PAIR_INVALID, sizeof (ids));
-  
+  int i, nunity = 0;
   bool skip[3] = {FALSE, FALSE, FALSE};
   short dstregs[4];
   short srcregs[4];
   size_t regparamsize = 0;
+
+  memset (ids, PAIR_INVALID, sizeof (ids));
 
   /* Sanity checks */
   wassertl (nparams == 3, "Built-in memcpy() must have three parameters");

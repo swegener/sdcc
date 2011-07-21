@@ -1,4 +1,11 @@
-2011-07-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-07-22 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCmem.c, src/SDCCopt.c: applied 2nd and 3rd part of patch
+	  #2702889 - Summary of all uncommitted changes I applied on "my" SDCC
+	  thanks Hubert Sack
+	* support/regression/tests/compare_2_n.c: added
+
+2011-07-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCmain.c:
 	  Reduce default value for --max-allocs-per-node to reduce compiler runtime.

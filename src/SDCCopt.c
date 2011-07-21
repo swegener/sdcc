@@ -1059,6 +1059,90 @@ convertToFcall (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* miscOpt - miscellaneous optimizations                           */
+/*-----------------------------------------------------------------*/
+static void
+miscOpt (eBBlock ** ebbs, int count)
+{
+  int i;
+
+  /* for all blocks do */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+
+      /* for all instructions in the block do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          // patch ID: 2702889 - Summary of all uncommitted changes I applied on "my" SDCC
+          if (ic->op == '<' && isOperandLiteral(IC_RIGHT(ic)) && IS_UNSIGNED(operandType(IC_LEFT(ic))))
+            {
+              unsigned litVal = abs((int)operandLitValue(IC_RIGHT(ic)));
+
+              // See if literal value is greather 255 and a power of 2.
+              if (litVal > 255)
+                {
+                  int AndMaskVal = 0 - litVal;
+
+                  while (litVal && !(litVal & 1))
+                    {
+                      litVal >>= 1;
+                    }
+                  if (litVal)
+                    {
+                      // discard lowest set bit.
+                      litVal >>= 1;
+                    }
+                  if (!litVal)
+                    {
+                      iCode *ic_nxt = ic->next;
+
+                      if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
+                        {
+                          /* invert jump logic */
+                          symbol *TrueLabel = IC_TRUE(ic_nxt);
+                          IC_TRUE(ic_nxt) = IC_FALSE(ic_nxt);
+                          IC_FALSE(ic_nxt) = TrueLabel;
+
+                          /* set op to bitwise and */
+                          ic->op = BITWISEAND;
+                          IC_RIGHT(ic) = operandFromLit(AndMaskVal);
+                          continue;
+                        }
+                    }
+                }
+            }
+          if (ic->op == '>' && isOperandLiteral(IC_RIGHT(ic)) && IS_UNSIGNED(operandType(IC_LEFT(ic))))
+            {
+              unsigned litVal = abs((int)operandLitValue(IC_RIGHT(ic)));
+
+              // See if literal value is greather equal 255 and a power of 2.
+              if (++litVal > 255)
+                {
+                  int AndMaskVal = 0 - litVal;
+
+                  while (litVal && !(litVal & 1))
+                    {
+                      litVal >>= 1;
+                    }
+                  if (litVal)
+                    {
+                      // discard lowest set bit.
+                      litVal >>= 1;
+                    }
+                  if (!litVal)
+                    {
+                      ic->op = BITWISEAND;
+                      IC_RIGHT(ic) = operandFromLit(AndMaskVal);
+                      continue;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* isLocalWithoutDef - return 1 if sym might be used without a     */
 /*                     defining iCode                              */
 /*-----------------------------------------------------------------*/
@@ -1743,6 +1827,9 @@ eBBlockFromiCode (iCode * ic)
      operations to be as they are for optimizations */
   convertToFcall (ebbi->bbOrder, ebbi->count);
 
+  /* miscelaneous optimizations */
+  miscOpt (ebbi->bbOrder, ebbi->count);
+
   /* compute the live ranges */
   computeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
 
@@ -1762,6 +1849,3 @@ eBBlockFromiCode (iCode * ic)
 
   return NULL;
 }
-
-
-/* (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 4))) */

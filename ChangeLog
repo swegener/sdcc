@@ -1,3 +1,8 @@
+2011-07-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCmain.c:
+	  Reduce default value for --max-allocs-per-node to reduce compiler runtime.
+
 2011-07-19 Borut Razem <borut.razem AT gmail.com>
 
 	* src/z80/gen.c: fixed MSVC 2010 compilation

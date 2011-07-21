@@ -583,7 +583,7 @@ setDefaultOptions (void)
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.stack10bit = 0;
   options.out_fmt = 0;
-  options.max_allocs_per_node = 10000;
+  options.max_allocs_per_node = 3000;
 
   /* now for the optimizations */
   /* turn on the everything */

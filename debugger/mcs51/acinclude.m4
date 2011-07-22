@@ -23,7 +23,7 @@ AC_DEFUN([wi_LIB_READLINE], [
 wi_LIB_READLINE_VERSION RL_VERSION_MAJOR RL_VERSION_MINOR
 EOF
 
-    wi_READLINE_VERSION=$($CPP $CPPFLAGS conftest.$ac_ext | sed -n -e "s/^wi_LIB_READLINE_VERSION  *\([[0-9\]][[0-9\]]*\)  *\([[0-9\]][[0-9\]]*\)$/\1.\2/p")
+    wi_READLINE_VERSION=$($CPP $CPPFLAGS conftest.$ac_ext | sed -n -e "s/^wi_LIB_READLINE_VERSION  *\([[0-9]][[0-9]]*\)  *\([[0-9]][[0-9]]*\)$/\1.\2/p")
     rm -rf conftest*
 
     if test -n "$wi_READLINE_VERSION"; then

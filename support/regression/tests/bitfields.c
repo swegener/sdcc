@@ -252,18 +252,18 @@ void
 testBitfieldsMultibitLiteral(void)
 {
 #if !defined(SDCC_pic16)
-  size2c_bf.b0 = 0xff;	/* should truncate to 0x0f */
+  size2c_bf.b0 = 0xff;   /* should truncate to 0x0f */
   size2c_bf.b1 = 0;
   ASSERT(size2c_bf.b0==0x0f);
   ASSERT(size2c_bf.b1==0);
 
-  size2c_bf.b1 = 0xff;	/* should truncate to 0x1f */
+  size2c_bf.b1 = 0xff;   /* should truncate to 0x1f */
   size2c_bf.b0 = 0;
   ASSERT(size2c_bf.b0==0);
   ASSERT(size2c_bf.b1==0x1f);
 
-  size2c_bf.b0 = 0xff;	/* should truncate to 0x0f */
-  size2c_bf.b1 = 0xff;	/* should truncate to 0x1f */
+  size2c_bf.b0 = 0xff;   /* should truncate to 0x0f */
+  size2c_bf.b1 = 0xff;   /* should truncate to 0x1f */
   ASSERT(size2c_bf.b0==0x0f);
   ASSERT(size2c_bf.b1==0x1f);
 
@@ -302,12 +302,12 @@ testBitfieldsMultibit(void)
   volatile int zero = 0;
   volatile int x;
 
-  size2c_bf.b0 = allones;	/* should truncate to 0x0f */
+  size2c_bf.b0 = allones; /* should truncate to 0x0f */
   size2c_bf.b1 = zero;
   ASSERT(size2c_bf.b0==0x0f);
   ASSERT(size2c_bf.b1==0);
 
-  size2c_bf.b1 = allones;	/* should truncate to 0x1f */
+  size2c_bf.b1 = allones; /* should truncate to 0x1f */
   size2c_bf.b0 = zero;
   ASSERT(size2c_bf.b0==0);
   ASSERT(size2c_bf.b1==0x1f);
@@ -430,6 +430,14 @@ struct
 } s2366757 = {0};
 
 /* test case for const struct with bitfields */
+
+#if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
+/* Workaround to fix the strange (cs.f == 1) test failure, which suddenly appeared between svn builds 6661 and 6666.
+ * The failure only occurs on Solaris i386 host with gcc 4.6 if -O2 is set.
+ * This seems like a gcc bug to me. (Borut)
+ */
+volatile
+#endif
 const struct
 {
   unsigned int a : 4;

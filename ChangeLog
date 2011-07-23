@@ -1,6 +1,8 @@
 2011-07-23 Borut Razem <borut.razem AT gmail.com>
 
 	* debugger/mcs51/acinclude.m4, debugger/mcs51/configure: fix for solaris
+	* support/regression/test/bitfields.c:
+	  fixed a strange failure on Solaris i386 host with gcc 4.6
 
 2011-07-22 Borut Razem <borut.razem AT gmail.com>
 

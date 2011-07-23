@@ -28,7 +28,7 @@ EOF
 
     if test -n "$wi_READLINE_VERSION"; then
       wi_MAJOR=$(expr $wi_READLINE_VERSION : '\([[0-9]][[0-9]]*\)\.')
-      wi_MINOR=$(expr $wi_READLINE_VERSION : '[[0-9]][[0-9]]*\.\([[0-9]][[0-9]]*$\)')
+      wi_MINOR=$(expr $wi_READLINE_VERSION : '[[0-9]][[0-9]]*\.\([[0-9]][[0-9]]*\)')
       if test $wi_MINOR -lt 10; then
         wi_MINOR=$(expr $wi_MINOR \* 10)
       fi
@@ -36,6 +36,7 @@ EOF
     else
       wi_READLINE_VERSION=-1
     fi
+    AC_MSG_CHECKING([for GNU Readline version: $wi_READLINE_VERSION])
 
     dnl check for the readline library
 

@@ -1,6 +1,6 @@
 2011-07-23 Borut Razem <borut.razem AT gmail.com>
 
-	* debugger/mcs51/acinclude.m4: fix for solaris
+	* debugger/mcs51/acinclude.m4, debugger/mcs51/configure: fix for solaris
 
 2011-07-22 Borut Razem <borut.razem AT gmail.com>
 

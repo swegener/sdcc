@@ -17,6 +17,7 @@ AC_DEFUN([wi_LIB_READLINE], [
   if test "$ac_cv_header_readline_readline_h" = yes; then
     dnl check the readline version
 
+    AC_MSG_CHECKING([for GNU Readline version])
     cat > conftest.$ac_ext <<EOF
 #include <stdio.h>
 #include <readline/readline.h>
@@ -36,7 +37,7 @@ EOF
     else
       wi_READLINE_VERSION=-1
     fi
-    AC_MSG_CHECKING([for GNU Readline version: $wi_READLINE_VERSION])
+    AC_MSG_RESULT($wi_READLINE_VERSION)
 
     dnl check for the readline library
 

@@ -3205,6 +3205,8 @@ fi
 
   if test "$ac_cv_header_readline_readline_h" = yes; then
 
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GNU Readline version" >&5
+$as_echo_n "checking for GNU Readline version... " >&6; }
     cat > conftest.$ac_ext <<EOF
 #include <stdio.h>
 #include <readline/readline.h>
@@ -3224,8 +3226,8 @@ EOF
     else
       wi_READLINE_VERSION=-1
     fi
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GNU Readline version: $wi_READLINE_VERSION" >&5
-$as_echo_n "checking for GNU Readline version: $wi_READLINE_VERSION... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $wi_READLINE_VERSION" >&5
+$as_echo "$wi_READLINE_VERSION" >&6; }
 
 
     ac_save_LIBS="$LIBS"

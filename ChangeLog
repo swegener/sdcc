@@ -3,6 +3,8 @@
 	* support/regression/test/bitfields.c:
 	  fixed a regtest failure on Solaris i386 host with gcc 4.6
 	  by turning off the -O2 optimization
+	* support/regression/tests/compare_2_n.c:
+	  added test for unsigned long type
 
 2011-07-23 Borut Razem <borut.razem AT gmail.com>
 

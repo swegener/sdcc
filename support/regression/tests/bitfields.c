@@ -431,13 +431,6 @@ struct
 
 /* test case for const struct with bitfields */
 
-#if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
-/* Workaround to fix the strange (cs.f == 1) test failure, which suddenly appeared between svn builds 6661 and 6666.
- * The failure only occurs on Solaris i386 host with gcc 4.6 if -O2 is set.
- * This seems like a gcc bug to me. (Borut)
- */
-volatile
-#endif
 const struct
 {
   unsigned int a : 4;
@@ -450,6 +443,14 @@ const struct
   unsigned int g;
 } cs = { 1, 2, 345, 6, 2, 1, 54321};
 
+#if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
+/* Workaround to fix the strange (cs.f == 1) test failure, which appeared in svn builds 6665, when -O2 gcc option was included.
+ * The failure only occurs on Solaris i386 host with gcc 4.6 if -O2 is set. 
+ * This seems like a gcc bug to me. (Borut)
+ */
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
 void
 testCS(void)
 {
@@ -461,3 +462,6 @@ testCS(void)
   ASSERT(cs.f == 1);
   ASSERT(cs.g == 54321U);
 }
+#if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
+#pragma GCC pop_options
+#endif

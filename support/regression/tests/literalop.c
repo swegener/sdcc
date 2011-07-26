@@ -92,10 +92,10 @@ testOpOp (void)
   ASSERT (-1 * 65527  == -65527); // 65527 (== 0xfff7) is stored in 'signed LONG'
   ASSERT (-1 * 33000  == -33000);
 
-  ASSERT (1 *  10000  * is8 == (sizeof(int) == 2 ? 14464  :  80000)); /* int	 */
-  ASSERT (1 *  10000l * is8 == 80000);				     /* LONG     */
+  ASSERT (1 *  10000  * is8 == (sizeof(int) == 2 ? 14464  :  80000)); /* int      */
+  ASSERT (1 *  10000l * is8 == 80000);                                /* LONG     */
   ASSERT (1 *  40000u * is8 == (sizeof(int) == 2 ? 57856u : 320000)); /* unsigned */
-  ASSERT (1 *  40000  * is8 == 320000);				     /* LONG	 */
+  ASSERT (1 *  40000  * is8 == 320000);                               /* LONG     */
   ASSERT (1 * 0x4000  * is8 == (sizeof(int) == 2 ? 0 : 0x20000));     /* unsigned */
 
   ASSERT (-2 * 1  < 1); /* comparison with 0 is optimized, so let's use 1 instead */
@@ -120,7 +120,11 @@ testOpOp (void)
   uc = (unsigned char ) 0xfffffff8;
   ASSERT (uc * (unsigned char ) 0xfffffff7 == 0xef48);
   us = (unsigned short) 0xfffffff8;
+#if !(defined(PORT_HOST) && defined(__NetBSD__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 1))
+  /* this test fails on i386 and sparc64 NetBSD gcc 4.1 when compiled with -O2:
+   * the result of us * (unsigned short) 0xfffffff7 is 0x7fffffff */
   ASSERT (us * (unsigned short) 0xfffffff7 == (sizeof(int) == 2 ? 0x0048 : 0xffef0048));
+#endif
   ul = (unsigned LONG ) 0xfffffff8;
   ASSERT (ul * (unsigned LONG ) 0xfffffff7 == 0x0048);
   ul = (unsigned LONG ) 0xfffffff8;

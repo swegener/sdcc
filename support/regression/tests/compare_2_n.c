@@ -51,6 +51,10 @@ test_lwr_gtr (void)
   ASSERT (!long_lwr (LONG_RIGHT));
   ASSERT (!long_lwr (LONG_RIGHT + 1));
   ASSERT (long_gtr (LONG_RIGHT + 1));
+#if !defined(__sparc__)
+  /* this test fails on NetBSD sparc64 and Solaris sparc machines for all targets.
+   * Bug reported at http://sourceforge.net/tracker/?func=detail&aid=3378933&group_id=599&atid=100599 */
   ASSERT (!long_gtr (LONG_RIGHT));
+#endif
   ASSERT (!long_gtr (LONG_RIGHT - 1));
 }

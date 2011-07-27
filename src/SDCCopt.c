@@ -1074,12 +1074,12 @@ miscOpt (eBBlock ** ebbs, int count)
       /* for all instructions in the block do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          // patch ID: 2702889 - Summary of all uncommitted changes I applied on "my" SDCC
-          if (ic->op == '<' && isOperandLiteral(IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
+          /* patch ID: 2702889 - Summary of all uncommitted changes I applied on "my" SDCC */
+          if (ic->op == '<' && isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
             {
               unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
-              // See if literal value is greather 255 and a power of 2.
+              /* See if literal value is greather 255 and a power of 2. */
               if (litVal > 255)
                 {
                   int AndMaskVal = 0 - litVal;
@@ -1090,7 +1090,7 @@ miscOpt (eBBlock ** ebbs, int count)
                     }
                   if (litVal)
                     {
-                      // discard lowest set bit.
+                      /* discard lowest set bit. */
                       litVal >>= 1;
                     }
                   if (!litVal)
@@ -1112,11 +1112,11 @@ miscOpt (eBBlock ** ebbs, int count)
                     }
                 }
             }
-          if (ic->op == '>' && isOperandLiteral(IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
+          if (ic->op == '>' && isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
             {
               unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
-              // See if literal value is greather equal 255 and a power of 2.
+              /* See if literal value is greather equal 255 and a power of 2. */
               if (++litVal > 255)
                 {
                   int AndMaskVal = 0 - litVal;
@@ -1127,7 +1127,7 @@ miscOpt (eBBlock ** ebbs, int count)
                     }
                   if (litVal)
                     {
-                      // discard lowest set bit.
+                      /* discard lowest set bit. */
                       litVal >>= 1;
                     }
                   if (!litVal)

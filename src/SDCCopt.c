@@ -1075,9 +1075,9 @@ miscOpt (eBBlock ** ebbs, int count)
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
           // patch ID: 2702889 - Summary of all uncommitted changes I applied on "my" SDCC
-          if (ic->op == '<' && isOperandLiteral(IC_RIGHT(ic)) && IS_UNSIGNED(operandType(IC_LEFT(ic))))
+          if (ic->op == '<' && isOperandLiteral(IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
             {
-              unsigned litVal = abs((int)operandLitValue(IC_RIGHT(ic)));
+              unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
               // See if literal value is greather 255 and a power of 2.
               if (litVal > 255)
@@ -1100,21 +1100,21 @@ miscOpt (eBBlock ** ebbs, int count)
                       if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
                         {
                           /* invert jump logic */
-                          symbol *TrueLabel = IC_TRUE(ic_nxt);
-                          IC_TRUE(ic_nxt) = IC_FALSE(ic_nxt);
-                          IC_FALSE(ic_nxt) = TrueLabel;
+                          symbol *TrueLabel = IC_TRUE (ic_nxt);
+                          IC_TRUE (ic_nxt) = IC_FALSE (ic_nxt);
+                          IC_FALSE (ic_nxt) = TrueLabel;
 
                           /* set op to bitwise and */
                           ic->op = BITWISEAND;
-                          IC_RIGHT(ic) = operandFromLit(AndMaskVal);
+                          IC_RIGHT (ic) = operandFromLit (AndMaskVal);
                           continue;
                         }
                     }
                 }
             }
-          if (ic->op == '>' && isOperandLiteral(IC_RIGHT(ic)) && IS_UNSIGNED(operandType(IC_LEFT(ic))))
+          if (ic->op == '>' && isOperandLiteral(IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
             {
-              unsigned litVal = abs((int)operandLitValue(IC_RIGHT(ic)));
+              unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
               // See if literal value is greather equal 255 and a power of 2.
               if (++litVal > 255)
@@ -1133,7 +1133,7 @@ miscOpt (eBBlock ** ebbs, int count)
                   if (!litVal)
                     {
                       ic->op = BITWISEAND;
-                      IC_RIGHT(ic) = operandFromLit(AndMaskVal);
+                      IC_RIGHT (ic) = operandFromLit (AndMaskVal);
                       continue;
                     }
                 }

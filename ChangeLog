@@ -1,3 +1,10 @@
+2011-07-27 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCopt.c: fixed bug
+	  #3378933: Regression test compare_2_n.c fails on sparc machines
+	* support/regression/test/compare_2_n.c:
+	  reeabled bug #3378933 test case
+
 2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,

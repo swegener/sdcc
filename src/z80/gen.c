@@ -6429,16 +6429,9 @@ genAnd (const iCode *ic, iCode * ifx)
             }
           else
             {
-              if (AOP_TYPE (left) == AOP_ACC)
-                {
-                  wassertl (0, "Tried to perform an AND where the left operand is allocated into A");
-                }
-              else
-                {
-                  cheapMove (ASMOP_A, 0, AOP (left), offset);
-                  emit3_o (A_AND, ASMOP_A, 0, AOP (right), offset);
-                  cheapMove (AOP (left), offset, ASMOP_A, 0);
-                }
+              cheapMove (ASMOP_A, 0, AOP (left), offset);
+              emit3_o (A_AND, ASMOP_A, 0, AOP (right), offset);
+              cheapMove (AOP (left), offset, ASMOP_A, 0);
             }
         }
     }
@@ -6616,14 +6609,9 @@ genOr (const iCode *ic, iCode * ifx)
             }
           else
             {
-              if (AOP_TYPE (left) == AOP_ACC)
-                emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
-              else
-                {
-                  cheapMove (ASMOP_A, 0, AOP (left), offset);
-                  emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
-                  cheapMove (AOP (result), offset, ASMOP_A, 0);
-                }
+              cheapMove (ASMOP_A, 0, AOP (left), offset);
+              emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
+              cheapMove (AOP (result), offset, ASMOP_A, 0);
             }
         }
     }

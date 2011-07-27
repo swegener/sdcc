@@ -1,3 +1,9 @@
+2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug3379732.c:
+	  Bitwise-op cleanup, fixed bug #3379732.
+
 2011-07-26 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/test/literalop.c:

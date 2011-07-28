@@ -1,3 +1,12 @@
+2011-07-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/setjmp.h,
+	  device/lib/_setjmp.c,
+	  support/regression/tests/setjmp.c:
+	  Fixed some setjmp() / longjmp() bugs.
+	* support/regression/tests/bug3379723.c:
+	  Do not compile on host.
+
 2011-07-27 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCopt.c: fixed bug

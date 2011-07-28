@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#if !defined(PORT_HOST)
+
 #define UCHAR	unsigned char
 
 __sfr __at 0xf0 rGPIO_B_Output_Enable;
@@ -26,6 +28,7 @@ UCHAR _Check_B_By_B(UCHAR iAndMask)		// pull low
 
 	return iVal;
 }
+#endif
 
 void
 testBug (void)

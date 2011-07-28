@@ -229,7 +229,7 @@ static void dummy (void) __naked
 ;	 function setjmp
 ;	-----------------------------------------
 	.globl _setjmp
-_setjmp:
+___setjmp:
 	ar2 = 0x02
 	ar3 = 0x03
 	ar4 = 0x04
@@ -389,7 +389,7 @@ _longjmp:
 extern unsigned char __data spx;
 extern unsigned char __data bpx;
 
-int setjmp (jmp_buf buf)
+int __setjmp (jmp_buf buf)
 {
     /* registers would have been saved on the
        stack anyway so we need to save SP
@@ -411,6 +411,10 @@ int setjmp (jmp_buf buf)
 int longjmp (jmp_buf buf, int rv)
 {
     unsigned char lsp;
+
+	if (!rv)
+		rv = 1;
+
 #ifdef SDCC_USE_XSTACK
     spx = *buf++;
     bpx = *buf++;

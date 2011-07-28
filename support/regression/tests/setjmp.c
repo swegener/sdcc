@@ -27,6 +27,24 @@ try_fun (jmp_buf catch, int except)
 
 #endif
 
+jmp_buf b;
+
+void g(void)
+{
+	longjmp(b, 0); // When called with an argument of 0, longjmp() makes setjmp() return 1 instead.
+	g();
+}
+
+void f1(void)
+{
+	static int i;
+	int j = setjmp(b);
+	ASSERT(i == j);
+	i++;
+	if(!j)
+		g();
+}
+
 void
 testJmp (void)
 {
@@ -51,4 +69,14 @@ testJmp (void)
     }
   ASSERT (exception == 1);
 #endif
+
+// C99 requires setjmp to be a macro.
+#ifndef setjmp
+  ASSERT(0);
+#endif
+
+#if defined(SDCC_mcs51) || defined(PORT_HOST)
+  f1();
+#endif
 }
+

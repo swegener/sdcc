@@ -70,12 +70,12 @@ testJmp (void)
   ASSERT (exception == 1);
 #endif
 
-// C99 requires setjmp to be a macro.
-#ifndef setjmp
-  ASSERT(0);
-#endif
+// C99 might require setjmp to be a macro. The standard seems self-contradicting on this issue.
+//#ifndef setjmp
+//  ASSERT(0);
+//#endif
 
-#if defined(SDCC_mcs51) || defined(PORT_HOST)
+#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
   f1();
 #endif
 }

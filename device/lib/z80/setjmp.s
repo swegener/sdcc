@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  abs.s
 ;
-;  Copyright (C) 2010, Philipp Klaus Krause
+;  Copyright (C) 2011, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -28,34 +28,49 @@
 
 	.area   _CODE
 
-	.globl _abs
+	.globl ___setjmp
 
-; 12B; 86T for nonnegative arguments, 78T for negative.
-_abs:
+___setjmp:
 	pop	hl
-	pop	de
-	push	de
+	pop	iy
+	push	af
 	push	hl
+	ld	0(iy), l
+	ld	1(iy), h
 	xor	a, a
 	ld	l, a
 	ld	h, a
-	sbc	hl, de
-	ret	P
-	ex	de, hl
+	ld	hl, #0
+	add	hl, sp
+	ld	2(iy), l
+	ld	3(iy), h
+	ld	l, a
+	ld	h, a
 	ret
 
-; 14B; 59T for nonegative arguments, 94T for negative:
-;_abs:
-;	pop	de
-;	pop	hl
-;	push	hl
-;	push	de
-;	bit	7, h
-;	ret	Z
-;	xor	a, a
-;	ld	e, a
-;	ld	d, a
-;	ex	de, hl
-;	sbc	hl, de
-;	ret
+.globl _longjmp
+
+_longjmp:
+	pop	af
+	pop	iy
+	pop	de
+
+	; Ensure that return value is non-zero.
+	ld	a, e
+	or	a, d
+	jr	NZ, jump
+	ld	de, #1
+jump:
+
+	ld	l, 0(iy)
+	ld	h, 1(iy)
+	push	hl
+	ld	l, 2(iy)
+	ld	h, 3(iy)
+	pop	iy
+	ld	sp, hl
+	inc	sp
+	inc	sp
+	ex	de, hl
+	jp	(iy)
 

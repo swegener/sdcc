@@ -55,7 +55,7 @@ typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE
 
 int __setjmp (jmp_buf);
 
-// The C99 standard requires setjmp to be a macro.
+// C99 might require setjmp to be a macro. The standard seems self-contradicting on this issue.
 #define setjmp(jump_buf) __setjmp(jump_buf)
 
 int longjmp(jmp_buf, int);

@@ -17,7 +17,7 @@ T2_isr (void) __interrupt 5 //no using
 }
 #endif
 
-#if defined(SDCC_mcs51) || defined(PORT_HOST)
+#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
 
 void
 try_fun (jmp_buf catch, int except)
@@ -48,7 +48,7 @@ void f1(void)
 void
 testJmp (void)
 {
-#if defined(SDCC_mcs51) || defined(PORT_HOST)
+#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
   jmp_buf catch;
   int exception;
 

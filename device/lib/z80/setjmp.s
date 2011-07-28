@@ -35,8 +35,12 @@ ___setjmp:
 	pop	iy
 	push	af
 	push	hl
+
+	; Store return address.
 	ld	0(iy), l
 	ld	1(iy), h
+
+	; Store stack pointer.
 	xor	a, a
 	ld	l, a
 	ld	h, a
@@ -44,6 +48,14 @@ ___setjmp:
 	add	hl, sp
 	ld	2(iy), l
 	ld	3(iy), h
+
+	; Store frame pointer.
+	push	ix
+	pop	hl
+	ld	4(iy), l
+	ld	5(iy), h
+
+	; Return 0.
 	ld	l, a
 	ld	h, a
 	ret
@@ -62,15 +74,25 @@ _longjmp:
 	ld	de, #1
 jump:
 
-	ld	l, 0(iy)
-	ld	h, 1(iy)
+	; Restore frame pointer.
+	ld	l, 4(iy)
+	ld	h, 5(iy)
 	push	hl
+	pop	ix
+
+	; Adjust stack pointer.
 	ld	l, 2(iy)
 	ld	h, 3(iy)
-	pop	iy
 	ld	sp, hl
 	inc	sp
 	inc	sp
+
+	; Move return value into hl.
 	ex	de, hl
-	jp	(iy)
+
+	; Jump.
+	ld	c, 0(iy)
+	ld	b, 1(iy)
+	push	bc
+	ret
 

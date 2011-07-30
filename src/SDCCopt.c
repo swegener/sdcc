@@ -1075,11 +1075,17 @@ miscOpt (eBBlock ** ebbs, int count)
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
           /* patch ID: 2702889 - Summary of all uncommitted changes I applied on "my" SDCC */
+          /* MB: This seems rather incomplete.
+             What if using <= or >= ?
+             Why do we need IFX in the first case and not in the second ?
+          */
+          assert (ic->op != LE_OP);
+          assert (ic->op != GE_OP);
           if (ic->op == '<' && isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
             {
               unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
-              /* See if literal value is greather 255 and a power of 2. */
+              /* See if literal value is greater than 255 and a power of 2. */
               if (litVal > 255)
                 {
                   int AndMaskVal = 0 - litVal;
@@ -1088,12 +1094,7 @@ miscOpt (eBBlock ** ebbs, int count)
                     {
                       litVal >>= 1;
                     }
-                  if (litVal)
-                    {
-                      /* discard lowest set bit. */
-                      litVal >>= 1;
-                    }
-                  if (!litVal)
+                  if (litVal == 1)
                     {
                       iCode *ic_nxt = ic->next;
 
@@ -1116,7 +1117,7 @@ miscOpt (eBBlock ** ebbs, int count)
             {
               unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
-              /* See if literal value is greather equal 255 and a power of 2. */
+              /* See if literal value is greater than equal 255 and a power of 2. */
               if (++litVal > 255)
                 {
                   int AndMaskVal = 0 - litVal;
@@ -1125,12 +1126,7 @@ miscOpt (eBBlock ** ebbs, int count)
                     {
                       litVal >>= 1;
                     }
-                  if (litVal)
-                    {
-                      /* discard lowest set bit. */
-                      litVal >>= 1;
-                    }
-                  if (!litVal)
+                  if (litVal == 1)
                     {
                       ic->op = BITWISEAND;
                       IC_RIGHT (ic) = operandFromLit (AndMaskVal);

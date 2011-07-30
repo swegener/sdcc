@@ -1,3 +1,10 @@
+2011-07-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_setjmp.c: fixed mcs51 stack-auto and xstack implementations
+	* src/SDCCopt.c(miscOpt): added my doubts
+	* support/regression/tests/bug3379723.c: disabled for hc08 which has no sfr
+	* support/regression/tests/setjmp.c: test only on supported targets
+
 2011-07-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/setjmp.h,
@@ -33,7 +40,7 @@
 	* support/regression/test/literalop.c:
 	  disabled failing test on i386 and sparc64 NetBSD gcc 4.1
 	* support/regression/test/compare_2_n.c:
-	  excluded failing test on NetBSD sparc64 and Solaris sparc machines 
+	  excluded failing test on NetBSD sparc64 and Solaris sparc machines
 	  for all targets;
 	  see bug #3378933: Regression test compare_2_n.c fails on sparc machines
 

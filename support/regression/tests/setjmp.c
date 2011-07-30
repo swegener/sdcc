@@ -25,8 +25,6 @@ try_fun (jmp_buf catch, int except)
   longjmp (catch, except);
 }
 
-#endif
-
 jmp_buf b;
 
 void g(void)
@@ -44,6 +42,10 @@ void f1(void)
 	if(!j)
 		g();
 }
+
+#else
+#warning Skipped setjmp/longjmp test
+#endif
 
 void
 testJmp (void)

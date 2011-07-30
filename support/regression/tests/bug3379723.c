@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !defined(PORT_HOST)
+#if !defined(PORT_HOST) && !defined(SDCC_hc08)
 
 #define UCHAR	unsigned char
 

@@ -4,6 +4,9 @@
 	* src/SDCCopt.c(miscOpt): added my doubts
 	* support/regression/tests/bug3379723.c: disabled for hc08 which has no sfr
 	* support/regression/tests/setjmp.c: test only on supported targets
+	* support/regression/tests/bug3361290.c,
+	* support/regression/tests/bug3366711.c,
+	* support/regression/tests/bug3379723.c: set native eolstyle property
 
 2011-07-28 Philipp Klaus Krause <pkk AT spth.de>
 

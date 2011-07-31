@@ -4290,7 +4290,7 @@ genEndFunction (iCode * ic)
       if (lnp->ic && lnp->ic->op == FUNCTION)
         {
           if (!lnp->prev || (lnp->prev->ic && lnp->prev->ic->op != FUNCTION))
-        break;
+            break;
         }
       lnp = lnp->prev;
     }

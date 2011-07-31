@@ -1,3 +1,10 @@
+2011-07-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c(genEndFunction): added mov PSW removal based on patch
+	  2702889 by Hubert Sack
+	* src/mcs51/ralloc.c: added findAllBankregs, mcs51_allBankregs
+	* src/mcs51/ralloc.h: added mcs51_allBankregs
+
 2011-07-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_setjmp.c: fixed mcs51 stack-auto and xstack implementations

@@ -3523,7 +3523,6 @@ inExcludeList (char *s)
   if (p == NULL || STRCASECMP (p, "none") == 0)
     return FALSE;
 
-
   return isinSetWith (options.excludeRegsSet, s, regsCmp);
 }
 
@@ -3977,9 +3976,10 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   bool fReentrant = (IFFUNC_ISREENT (sym->type) || options.stackAuto);
-  lineNode *lnp = lineCurr;
+  lineNode *lineBodyEnd = lineCurr;
+  lineNode *linePrologueStart = NULL;
+  lineNode *lnp;
   bitVect *regsUsed;
-  bitVect *regsUsedPrologue;
   bitVect *regsUnneeded;
   int idx;
 
@@ -4270,29 +4270,31 @@ genEndFunction (iCode * ic)
 
   /* Compute the registers actually used */
   regsUsed = newBitVect (mcs51_nRegs);
-  regsUsedPrologue = newBitVect (mcs51_nRegs);
+  lnp = lineBodyEnd;
   while (lnp)
     {
-      if (lnp->ic && lnp->ic->op == FUNCTION)
-        regsUsedPrologue = bitVectUnion (regsUsedPrologue, port->peep.getRegsWritten (lnp));
+      /* Remove change of register bank if no registers used */
+      if (lnp->ic && lnp->ic->op == FUNCTION &&
+          !strncmp(lnp->line, "mov", 3) &&
+          bitVectFirstBit (port->peep.getRegsWritten(lnp)) == CND_IDX &&
+          !bitVectBitsInCommon (mcs51_allBankregs (), regsUsed))
+        {
+          emitcode (";", "eliminated unneeded mov psw,# (no regs used in bank)");
+          connectLine (lnp->prev, lnp->next);
+        }
       else
-        regsUsed = bitVectUnion (regsUsed, port->peep.getRegsWritten (lnp));
+        {
+          regsUsed = bitVectUnion (regsUsed, port->peep.getRegsWritten (lnp));
+        }
 
-      if (lnp->ic && lnp->ic->op == FUNCTION && lnp->prev && lnp->prev->ic && lnp->prev->ic->op == ENDFUNCTION)
+      if (lnp->ic && lnp->ic->op == FUNCTION)
+        {
+          if (!lnp->prev || (lnp->prev->ic && lnp->prev->ic->op != FUNCTION))
         break;
-      if (!lnp->prev)
-        break;
+        }
       lnp = lnp->prev;
     }
-
-  if (bitVectBitValue (regsUsedPrologue, CND_IDX) && !bitVectBitValue (regsUsed, CND_IDX))
-    {
-      regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
-      if (IFFUNC_ISISR (sym->type) && !FUNC_REGBANK (sym->type) && !sym->stack && !FUNC_ISCRITICAL (sym->type))
-        bitVectUnSetBit (regsUsed, CND_IDX);
-    }
-  else
-    regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
+  linePrologueStart = lnp;
 
   /* If this was an interrupt handler that called another function */
   /* function, then assume A, B, DPH, & DPL may be modified by it. */
@@ -4307,11 +4309,11 @@ genEndFunction (iCode * ic)
 
   /* Remove the unneeded push/pops */
   regsUnneeded = newBitVect (mcs51_nRegs);
-  while (lnp)
+  for (lnp = lineCurr; lnp != linePrologueStart; lnp = lnp->prev)
     {
-      if (lnp->ic && (lnp->ic->op == FUNCTION || lnp->ic->op == ENDFUNCTION))
+      if (lnp->ic)
         {
-          if (!strncmp (lnp->line, "push", 4))
+          if (lnp->ic && (lnp->ic->op == FUNCTION) && !strncmp (lnp->line, "push", 4))
             {
               idx = bitVectFirstBit (port->peep.getRegsRead (lnp));
               if (idx >= 0 && !bitVectBitValue (regsUsed, idx))
@@ -4320,7 +4322,7 @@ genEndFunction (iCode * ic)
                   regsUnneeded = bitVectSetBit (regsUnneeded, idx);
                 }
             }
-          if (!strncmp (lnp->line, "pop", 3) || !strncmp (lnp->line, "mov", 3))
+          if (lnp->ic && (lnp->ic->op == ENDFUNCTION) && !strncmp (lnp->line, "pop", 3))
             {
               idx = bitVectFirstBit (port->peep.getRegsWritten (lnp));
               if (idx >= 0 && !bitVectBitValue (regsUsed, idx))
@@ -4330,7 +4332,6 @@ genEndFunction (iCode * ic)
                 }
             }
         }
-      lnp = lnp->next;
     }
 
   for (idx = 0; idx < regsUnneeded->size; idx++)
@@ -4339,7 +4340,6 @@ genEndFunction (iCode * ic)
 
   freeBitVect (regsUnneeded);
   freeBitVect (regsUsed);
-  freeBitVect (regsUsedPrologue);
 }
 
 /*-----------------------------------------------------------------*/

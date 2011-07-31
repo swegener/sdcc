@@ -53,6 +53,7 @@ static struct
   int stackExtend;
   int dataExtend;
   bitVect *allBitregs;          /* all bit registers */
+  bitVect *allBankregs;         /* all bank registers */
 }
 _G;
 
@@ -1701,6 +1702,33 @@ mcs51_allBitregs (void)
 }
 
 /*-----------------------------------------------------------------*/
+/* findAllBankregs :- returns bit vector of all bank registers     */
+/*-----------------------------------------------------------------*/
+static bitVect *
+findAllBankregs (void)
+{
+  bitVect *rmask = newBitVect (mcs51_nRegs);
+  int j;
+
+  for (j = 0; j < mcs51_nRegs; j++)
+    {
+      if ((regs8051[j].type == REG_GPR) || (regs8051[j].type == REG_PTR))
+        rmask = bitVectSetBit (rmask, regs8051[j].rIdx);
+    }
+
+  return rmask;
+}
+
+/*-----------------------------------------------------------------*/
+/* mcs51_allBankregs :- returns bit vector of all bank registers   */
+/*-----------------------------------------------------------------*/
+bitVect *
+mcs51_allBankregs (void)
+{
+  return _G.allBankregs;
+}
+
+/*-----------------------------------------------------------------*/
 /* rUmaskForOp :- returns register mask for an operand             */
 /*-----------------------------------------------------------------*/
 bitVect *
@@ -3176,6 +3204,7 @@ mcs51_assignRegisters (ebbIndex * ebbi)
       mcs51_nRegs = 8;
     }
   _G.allBitregs = findAllBitregs ();
+  _G.allBankregs = findAllBankregs ();
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */

@@ -14,12 +14,12 @@
 static inline int
 f (const int a)
 {
-	return (a + 3);
+  return (a + 3);
 }
 
 int g (int b)
 {
-	return (f (b));
+  return (f (b));
 }
 
 void
@@ -139,7 +139,7 @@ bug_1864577 (void)
   ASSERT (PlatformP__LedsInit__init () == SUCCESS);
 }
 
-#if (defined(__NetBSD__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL__ == 3)) || (defined(__APPLE__) && (__GNUC__ == ) && (__GNUC_MINOR__ == 0) && (__GNUC_PATCHLEVEL__ == 1))
+#if (defined(__NetBSD__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL__ == 3)) || (defined(__APPLE__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 0) && (__GNUC_PATCHLEVEL__ == 1))
 /* inline definition seems to be broken on NetBSD GCC 4.1.3 and Mac OS X GCC 4.0.1
    it gets external linkage where it should not */
 #define SKIP_EXTERNAL
@@ -153,7 +153,7 @@ bug_1864577 (void)
 */
 inline char inlined_function (void)
 {
-	return 1;
+  return 1;
 }
 
 /*  function pointer defined in fwk/lib/extern2.c initialized to the

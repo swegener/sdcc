@@ -1,3 +1,8 @@
+2011-08-01 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/tests/inline.c:
+	  excluded failing regression test case on Mac OS X GCC 4.0.1
+
 2011-07-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c(genEndFunction): added mov PSW removal based on patch

@@ -474,6 +474,15 @@ replace restart {
 
 replace restart {
 	ld	iy,#%1
+	ld	h,%3 (iy)
+} by {
+	; peephole 46a used hl instead of iy.
+	ld	hl,#%1 + %3
+	ld	h, (hl)
+} if notUsed('iy'), notUsed('l')
+
+replace restart {
+	ld	iy,#%1
 	ld	%2,0 (iy)
 	ld	%3,1 (iy)
 } by {

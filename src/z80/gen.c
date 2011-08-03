@@ -5233,13 +5233,18 @@ genMultOneChar (const iCode * ic)
       savedB = TRUE;
     }
 
-  if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG || AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx != H_IDX)
+  // genMult() already swapped operands if necessary.
+  if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
+    AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == H_IDX && !requiresHL (AOP (IC_LEFT (ic))))
+    {
+      cheapMove (ASMOP_E, 0, AOP (IC_LEFT (ic)), LSB);
+      cheapMove (ASMOP_H, 0, AOP (IC_RIGHT (ic)), LSB);
+    }
+  else
     {
       cheapMove (ASMOP_E, 0, AOP (IC_RIGHT (ic)), LSB);
       cheapMove (ASMOP_H, 0, AOP (IC_LEFT (ic)), LSB);
     }
-  else
-    cheapMove (ASMOP_E, 0, AOP (IC_RIGHT (ic)), LSB);
 
   if (!regalloc_dry_run)
     {
@@ -5332,7 +5337,7 @@ genMult (iCode *ic)
     }
 
   /* Swap left and right such that right is a literal */
-  if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT))
+  if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);

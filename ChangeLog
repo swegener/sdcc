@@ -1,14 +1,20 @@
-2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-08-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Fixed code generation bug in 8-bit multiplication with operands and e (hl).
+
+2011-08-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/peeph-z80.def:
 	  Minor peephole improvement.
 
-2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-08-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCralloc.hpp:
 	  Fixed SIGSEGV that occured for extremly low values of --max-allocs-per-node.
 
-2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-08-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug3381400.c:

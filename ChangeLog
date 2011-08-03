@@ -1,3 +1,37 @@
+2011-08-03 Borut Razem <borut.razem AT gmail.com>
+
+	* sdcc development documentation moved from doc to sdcc wiki:
+	* doc/builtins.txt: removed,
+	  published as Developer Documentation on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Builtins
+	* doc/macro-sys-design.txt: removed,
+	  published as Developer Documentation on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Macro%20system%20design
+	* doc/random-notes.txt: removed,
+	  published as Developer Documentation on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Random%20notes%20about%20sdcc%20and%20how%20it%20works
+	* doc/cdbfileformat.lyx: removed,
+	  published as Developer Documentation on SDCC wiki at
+	  https://sourceforge.net/apps/trac/sdcc/wiki/CDB%20File%20Format
+	* doc/test_suite_spec.lyx: removed,
+	  published as an Obsolete document on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Proposed%20Test%20Suite%20Design
+	* doc/avr/avr_design.txt: removed,
+	  published as an Obsolete document on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Design%20Document%20for%20AVR%20Port
+	* doc/z80/combined_i186_z80_design.tex, doc/z80/*: removed,
+	  published as an Obsolete document on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Combined%20i186/Z80%20backend%20design
+	* doc/choices.txt: removed,
+	  published as an Obsolete document on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Some%20of%20the%20implementation%20choices
+	* doc/libdoc.txt: removed,
+	  published as an Obsolete document on SDCC wiki at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/List%20of%20the%20SDCC%20library
+	* doc/figures/ddd_example.png, doc/figures/ddd_example.eps: removed,
+	  pucure inserted into page "Visually debug for 8051 under Windows using DDD/SDCDB/S51" at
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Visually%20debug%20for%208051%20under%20Windows%20using%20DDD/SDCDB/S51
+
 2011-08-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,

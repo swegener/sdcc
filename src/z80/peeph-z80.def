@@ -336,6 +336,17 @@ replace restart {
 // Don't need to check for volatile, since ix is used for the stack.
 
 replace restart {
+	ld	%1 (ix), a
+	push	de
+	ld	%2, %1 (ix)
+} by {
+	ld	%1 (ix), a
+	push	de
+	; peephole 34a loaded %2 from a instead of %1 (ix)
+	ld	%2, a
+}	
+
+replace restart {
 	push	af
 	inc	sp
 	ld	a,e
@@ -1281,6 +1292,22 @@ replace restart {
 	; peephole 122 removed addition and loads exploiting commutativity of addition.
 } if notUsed('de')
 
+replace restart {
+	ld	%1,l
+	ld	%2,h
+	ex	de,hl
+	ld	(hl),%1
+	inc	hl
+	ld	(hl),%2
+} by {
+	ld	%1,l
+	ex	de,hl
+	; peephole 122a used de instead of going through %1%2.
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+} if notUsed(%2), notSame(%1 'l' 'h' 'e' 'd'), notSame(%2 'l' 'h' 'e' 'd')
+	
 replace restart {
 	ld	e, l
 	ld	d, h

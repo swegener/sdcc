@@ -1,3 +1,9 @@
+2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug3381400.c:
+	  Fixed bug #3381400.
+
 2011-08-03 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/Makefile.in,

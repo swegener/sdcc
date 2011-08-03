@@ -4635,6 +4635,7 @@ static void
 genPlus (iCode * ic)
 {
   int size, offset = 0;
+  bool premoved;
 
   /* special cases :- */
 
@@ -4954,10 +4955,24 @@ genPlus (iCode * ic)
           goto release;
         }
     }
-  setupToPreserveCarry (ic);
-  while (size--)
+  
+  // Avoid overwriting operand in h or l when setupToPreserveCarry () loads hl.
+  if(!couldDestroyCarry (AOP (IC_LEFT (ic))))
     {
       cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+      premoved = TRUE;
+    }
+  else
+    premoved = FALSE;
+    
+  setupToPreserveCarry (ic);
+
+  while (size--)
+    {
+      if(!premoved)
+        cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+      else
+        premoved = FALSE;
       if (offset == 0)
       {
         if(size == 0 && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) == 1)

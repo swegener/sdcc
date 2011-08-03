@@ -1,25 +1,43 @@
 /** Compare with 2^n greater then 255
     test for patch #2702889 - Summary of all uncommitted changes I applied on "my" SDCC
- 
-    int_right: 0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000, 0x00ff, 0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff
 */
 
 #include <testfwk.h>
 
+foreach(`int_right', (0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000), `
 int
-lwr (unsigned left)
+lwr_`'int_right (unsigned left)
 {
-  if (left < {int_right})
+  if (left < int_right)
     return 1;
   else
     return 0;
 }
 
-int
-gtr (unsigned left)
+void
+test_lwr_`'int_right (void)
 {
-  return (left > {int_right}) ? 1 : 0;
+  ASSERT (lwr_`'int_right (int_right - 1));
+  ASSERT (!lwr_`'int_right (int_right));
+  ASSERT (!lwr_`'int_right (int_right + 1));
 }
+')dnl
+
+foreach(`int_right', (0x00ff, 0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff), `
+int
+gtr_`'int_right (unsigned left)
+{
+  return (left > int_right) ? 1 : 0;
+}
+
+void
+test_gtr_`'int_right (void)
+{
+  ASSERT (gtr_`'int_right (int_right + 1));
+  ASSERT (!gtr_`'int_right (int_right));
+  ASSERT (!gtr_`'int_right (int_right - 1));
+}
+')dnl
 
 #define LONG_RIGHT_LWR 0x80000000
 int
@@ -41,13 +59,6 @@ long long_gtr (unsigned long left)
 void
 test_lwr_gtr (void)
 {
-  ASSERT (lwr ({int_right} - 1));
-  ASSERT (!lwr ({int_right}));
-  ASSERT (!lwr ({int_right} + 1));
-  ASSERT (gtr ({int_right} + 1));
-  ASSERT (!gtr ({int_right}));
-  ASSERT (!gtr ({int_right} - 1));
-
   ASSERT (long_lwr (LONG_RIGHT_LWR - 1));
   ASSERT (!long_lwr (LONG_RIGHT_LWR));
   ASSERT (!long_lwr (LONG_RIGHT_LWR + 1));

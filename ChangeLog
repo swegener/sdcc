@@ -1,3 +1,12 @@
+2011-08-03 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/ds390/spec.mk:
+	  added m4 preprocessing of .m4 regtest files
+	* support/regression/tests/compare_2_n.m4:
+	  adopted for m4 preprocessing, renamed to .m4
+	* support/regression/m4include/*: added
+
 2011-08-01 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/tests/inline.c:
@@ -42,7 +51,7 @@
 	* src/SDCCopt.c: fixed bug
 	  #3378933: Regression test compare_2_n.c fails on sparc machines
 	* support/regression/test/compare_2_n.c:
-	  reeabled bug #3378933 test case
+	  reenabled bug #3378933 test case
 
 2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

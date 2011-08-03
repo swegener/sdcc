@@ -1,5 +1,7 @@
 # Regression test specification for the ds390 target running with uCsim
 
+.PRECIOUS: %.c
+
 CC_FOR_BUILD = $(CC)
 
 # path to uCsim

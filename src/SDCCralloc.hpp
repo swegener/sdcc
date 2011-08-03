@@ -549,13 +549,13 @@ void drop_worst_assignments(assignment_list_t &alist, unsigned short int i, cons
   size_t alist_size;
   assignment_list_t::iterator ai, an;
 
-  if ((alist_size = alist.size()) * NUM_REGS <= static_cast<size_t>(options.max_allocs_per_node))
+  if ((alist_size = alist.size()) * NUM_REGS <= static_cast<size_t>(options.max_allocs_per_node) || alist_size <= 1)
     return;
 
   assignment_optimal = false;
 
 #ifdef DEBUG_RALLOC_DEC
-  std::cout << "Too many assignments here (" << i << "):" << alist_size << " > " << options.max_allocs_per_node / NUM_REGS << ". Dropping some.\n";
+  std::cout << "Too many assignments here (" << i << "):" << alist_size << " > " << options.max_allocs_per_node / NUM_REGS << ". Dropping some.\n"; std::cout.flush();
 #endif
 
   assignment_rep *arep = new assignment_rep[alist_size];
@@ -568,9 +568,9 @@ void drop_worst_assignments(assignment_list_t &alist, unsigned short int i, cons
 
   std::nth_element(arep + 1, arep + options.max_allocs_per_node / NUM_REGS, arep + alist_size);
 
-  //std::cout << "nth elem. est. cost: " << arep[options.max_allocs_per_node / NUM_REGS].s << "\n";
+  //std::cout << "nth elem. est. cost: " << arep[options.max_allocs_per_node / NUM_REGS].s << "\n"; std::cout.flush();
 
-  for (n = options.max_allocs_per_node / NUM_REGS; n < alist_size; n++)
+  for (n = options.max_allocs_per_node / NUM_REGS + 1; n < alist_size; n++)
     alist.erase(arep[n].i);
     
   delete[] arep;
@@ -590,6 +590,15 @@ void tree_dec_ralloc_leaf(T_t &T, typename boost::graph_traits<T_t>::vertex_desc
   a.s = 0;
   a.global.resize(boost::num_vertices(I), -1);
   alist.push_back(a);
+  
+#ifdef DEBUG_RALLOC_DEC_ASS
+  assignment_list_t::iterator ai;
+  for(ai = alist.begin(); ai != alist.end(); ++ai)
+  	print_assignment(*ai);
+  assignment best;
+  get_best_local_assignment(best, t, T);
+  std::cout << "Best: "; print_assignment(best); std::cout << "\n";
+#endif
 }
 
 // Handle introduce nodes in the nice tree decomposition

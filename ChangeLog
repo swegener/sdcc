@@ -1,5 +1,10 @@
 2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCralloc.hpp:
+	  Fixed SIGSEGV that occured for extremly low values of --max-allocs-per-node.
+
+2011-07-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug3381400.c:
 	  Fixed bug #3381400.

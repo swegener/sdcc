@@ -1,5 +1,12 @@
 2011-08-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/peep.c:
+	  Handle cp, improve accuracy of checking for hl reads in notUsed().
+	* src/z80/peeph-z80.def:
+	  Minor peephole improvements.
+
+2011-08-04 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc2.cc:
 	  Fixed bug #3385978.
 

@@ -224,7 +224,7 @@ z80MightRead(const lineNode *pl, const char *what)
     return FALSE;
   if(ISINST(pl->line, "ld\t"))
     {
-      if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#' && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[2] == '#'))
+      if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#' && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[2] == '#') && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[3] != ')' && strchr(pl->line, ',')[4] != ')'))
         return TRUE;
       if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) && (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')))
         return TRUE;
@@ -248,7 +248,7 @@ z80MightRead(const lineNode *pl, const char *what)
       return FALSE;
     }
 
-  if(ISINST(pl->line, "or\t"))
+  if(ISINST(pl->line, "or\t") || ISINST(pl->line, "cp\t") )
     {
       if(argCont(pl->line + 3, what))
         return TRUE;

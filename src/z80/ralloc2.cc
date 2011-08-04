@@ -522,6 +522,7 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
         !((ic->op == RIGHT_OP || ic->op == LEFT_OP) && (IS_OP_LITERAL(IC_RIGHT(ic)) || operand_in_reg(IC_RIGHT(ic), REG_A, ia, i, G))) &&
         !(ic->op == '=' && !(IY_RESERVED && POINTER_SET(ic))) &&
         !IS_BITWISE_OP (ic) &&
+        !(ic->op == '~') &&
         !(ic->op == '*' && IS_ITEMP(IC_LEFT(ic)) && IS_ITEMP(IC_RIGHT(ic))) &&
         !((ic->op == '-' || ic->op == '+' || ic->op == EQ_OP) && IS_OP_LITERAL(IC_RIGHT(ic))))
         {

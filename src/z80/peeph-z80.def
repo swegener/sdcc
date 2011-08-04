@@ -483,6 +483,15 @@ replace restart {
 
 replace restart {
 	ld	iy,#%1
+	ld	%2 (iy), %3
+} by {
+	; peephole 46b used hl instead of iy.
+	ld	hl,#%1 + %2
+	ld	(hl), %3
+} if notUsed('iy'), notUsed('hl'), notSame(%3 'h' 'l')
+
+replace restart {
+	ld	iy,#%1
 	ld	%2,0 (iy)
 	ld	%3,1 (iy)
 } by {
@@ -674,6 +683,21 @@ replace restart {
 	jp	%1,%6
 	; peephole 65 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+// A peephole that makes the code longer. Let's hope it's worth it in speed gain and furhter optimization potential.
+replace restart {
+	ld	a,#0x00
+%1:
+	bit	%2,a
+	jp	Z,%3
+} by {
+	ld	a,#0x00
+	jp	%3
+	; peephole 65a jumped directly to %3 instead of testing a first.
+%1:
+	bit	%2,a
+	jp	Z,%3
+} if labelRefCountChange(%3 +1)
 
 replace restart {
 	xor	a,a

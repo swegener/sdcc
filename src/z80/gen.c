@@ -5333,7 +5333,7 @@ genMult (iCode *ic)
       AOP_SIZE (IC_RIGHT (ic)) > 2 ||
       AOP_SIZE (IC_RESULT (ic)) > 2)
     {
-      wassertl (0, "Multiplication is handled through support function calls");
+      wassertl (0, "Multiplication is handled through support function calls.");
     }
 
   /* Swap left and right such that right is a literal */
@@ -5350,13 +5350,13 @@ genMult (iCode *ic)
       goto release;
     }
 
-  wassertl (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT, "Right must be a literal");
+  wassertl (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT, "Right must be a literal.");
 
   val = (int) ulFromVal ( AOP (IC_RIGHT (ic))->aopu.aop_lit);
   //  wassertl (val > 0, "Multiply must be positive");
   wassertl (val != 1, "Can't multiply by 1");
 
-  if (IS_Z80 && !isPairDead (PAIR_DE, ic)) {
+  if (IS_Z80 && (byteResult ? bitVectBitValue (ic->rSurv, E_IDX) : !isPairDead (PAIR_DE, ic))) {
     _push (PAIR_DE);
     _G.stack.pushedDE = TRUE;
   }
@@ -5376,9 +5376,7 @@ genMult (iCode *ic)
         }
     }
   else
-    {
-      fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
-    }
+    fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
 
   i = val;
 

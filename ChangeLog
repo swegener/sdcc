@@ -1,4 +1,9 @@
-2011-08-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-08-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/bug3381400.c:
+	  Don't try to compile the sfr stuff on host.
+
+2011-08-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Minor improvement in 8-bit by literal multiplication.

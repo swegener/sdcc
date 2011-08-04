@@ -636,7 +636,8 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(result_only_HL && ic->op == PCALL)
     return(true);
 
-  if(ic->op == '+' && getSize(operandType(IC_RESULT(ic))) >= 2 && IS_TRUE_SYMOP (result)) // Might use (hl) for result.
+  if(ic->op == '+' && getSize(operandType(IC_RESULT(ic))) >= 2 &&
+    (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || IS_TRUE_SYMOP (right))) // Might use (hl).
     return(false);
 
   if(ic->op == '+' && input_in_HL && IS_TRUE_SYMOP (result)) // Might use (hl) for result.

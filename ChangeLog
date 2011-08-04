@@ -1,3 +1,8 @@
+2011-08-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Fixed bug #3385978.
+
 2011-08-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/bug3381400.c:

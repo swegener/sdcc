@@ -4,6 +4,8 @@
 	  Handle cp, improve accuracy of checking for hl reads in notUsed().
 	* src/z80/peeph-z80.def:
 	  Minor peephole improvements.
+	* src/z80/ralloc2.c:
+	  Allow accumulator arguments in bitwise complement.
 
 2011-08-04 Philipp Klaus Krause <pkk AT spth.de>
 

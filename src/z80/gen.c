@@ -7706,9 +7706,18 @@ genUnpackBits (operand * result, int pair)
       wassertl (rsize == 2, "HL must be of size 2");
       emit2 ("ld a,!*hl");
       emit2 ("inc hl");
-      emit2 ("ld h,!*hl");
-      emit2 ("ld l,a");
-      emit2 ("ld a,h");
+      if(AOP_TYPE (result) != AOP_REG || AOP (result)->aopu.aop_reg[0]->rIdx != H_IDX)
+        {
+          emit2 ("ld h,!*hl");
+          cheapMove (AOP (result), offset++, ASMOP_A, 0);
+          emit2 ("ld a,h");
+        }
+      else
+        {
+          emit2 ("ld l,!*hl");
+          cheapMove (AOP (result), offset++, ASMOP_A, 0);
+          emit2 ("ld a,l");
+        }
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (16 - blen));
       regalloc_dry_run_cost += 7;
       if (!SPEC_USIGN (etype))
@@ -7724,7 +7733,7 @@ genUnpackBits (operand * result, int pair)
             }
           regalloc_dry_run_cost += 7;
         }
-      emit2 ("ld h,a");
+      cheapMove (AOP (result), offset++, ASMOP_A, 0);
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
       return;

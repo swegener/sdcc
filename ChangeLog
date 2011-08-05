@@ -1,3 +1,8 @@
+2011-08-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed bitfield unpacking bug #3386784.
+
 2011-08-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/peeph-z80.def:

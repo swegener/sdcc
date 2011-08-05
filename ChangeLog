@@ -2,6 +2,8 @@
 
 	* src/z80/peeph-z80.def:
 	  Minor peephole improvements.
+	* src/z80/gen.c:
+	  Removed incorrect comment regarding arithmetic right shift.
 
 2011-08-04 Philipp Klaus Krause <pkk AT spth.de>
 

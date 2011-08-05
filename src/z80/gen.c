@@ -7570,13 +7570,6 @@ genRightShift (const iCode *ic)
 
   is_signed = !SPEC_USIGN (retype);
 
-  /* signed & unsigned types are treated the same : i.e. the
-     signed is NOT propagated inwards : quoting from the
-     ANSI - standard : "for E1 >> E2, is equivalent to division
-     by 2**E2 if unsigned or if it has a non-negative value,
-     otherwise the result is implementation defined ", MY definition
-     is that the sign does not get propagated */
-
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);

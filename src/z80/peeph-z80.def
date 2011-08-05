@@ -700,6 +700,35 @@ replace restart {
 } if labelRefCountChange(%3 +1)
 
 replace restart {
+	ld	%1, %2
+	jp	%3
+	jp	%4
+} by {
+	ld	%1, %2
+	jp	%3
+	; peephole 65b removed unreachable jump to %3.
+}
+
+replace restart {
+	ld	%1, %2
+	jp	%3
+%3:
+} by {
+	ld	%1, %2
+%3:
+	; peephole 65c removed redundant jump to %3.
+} if labelRefCountChange(%3 -1)
+
+replace restart {
+	ld	%1, #0x01
+	bit	0, %1
+	jp	Z, %2
+} by {
+	ld	%1, #0x01
+	; peephole 65d removed impossible jump to %2.
+} if labelRefCountChange(%2 -1)
+	
+replace restart {
 	xor	a,a
 	ld	a,#0x00
 } by {
@@ -1203,6 +1232,28 @@ replace restart {
 	pop	hl
 	; peephole 111 incremented in hl instead of iy.
 }
+
+replace restart {
+	push	hl
+	pop	iy
+	inc	iy
+} by {
+	inc	hl
+	push	hl
+	pop	iy
+	; peephole 111a incremented in hl instead of iy.
+} if notUsed('hl')
+
+replace restart {
+	ld	hl,%1
+	add	hl,%2
+	push	hl
+	pop	iy
+} by {
+	ld	iy,%1
+	add	iy,%2
+	; peephole 111b added in iy instead of hl.
+} if notUsed('hl'), notSame(%2 'hl')
 
 replace restart {
 	pop	af

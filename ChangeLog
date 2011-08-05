@@ -1,5 +1,11 @@
 2011-08-05 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  support/regression/tests/bug3368945.c:
+	  Fixed bug #3386945.
+
+2011-08-05 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fixed bitfield unpacking bug #3386784.
 

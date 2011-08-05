@@ -2068,8 +2068,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               }
           }
         /* PENDING: check? */
-        if (pairId == PAIR_HL)
-          spillPair (PAIR_HL);
+        spillPair (pairId);
     }
 }
 

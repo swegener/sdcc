@@ -1059,6 +1059,19 @@ convertToFcall (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* isPowerOf2 - test if val is power of 2                          */
+/*-----------------------------------------------------------------*/
+static bool
+isPowerOf2 (unsigned long val)
+{
+  while (val && !(val & 1))
+    {
+      val >>= 1;
+    }
+  return val == 1;
+}
+
+/*-----------------------------------------------------------------*/
 /* miscOpt - miscellaneous optimizations                           */
 /*-----------------------------------------------------------------*/
 static void
@@ -1067,7 +1080,7 @@ miscOpt (eBBlock ** ebbs, int count)
   int i;
 
   /* for all blocks do */
-  for (i = 0; i < count; i++)
+  for (i = 0; i < count; ++i)
     {
       iCode *ic;
 
@@ -1076,66 +1089,70 @@ miscOpt (eBBlock ** ebbs, int count)
         {
           /* patch ID: 2702889 - Summary of all uncommitted changes I applied on "my" SDCC */
           /* MB: This seems rather incomplete.
-             What if using <= or >= ?
-             Why do we need IFX in the first case and not in the second ?
+             MB: What if using <= or >= ?
+             Borut: Currently <= and >= are transformed to > and < on all targets.
+               Transformation depends on lt_nge, gt_nle, bool le_ngt,
+               ge_nlt, ne_neq and eq_nne members of PORT structure.
+             MB: Why do we need IFX in the first case and not in the second ?
+             Borutr: Currently the optimization works only in combination with following IFX.
+               The missing IFX in the second case was a bug, at least acording to compare_2_n.m4
+               regression test results, so I added it.
+               TODO: implement the optimiazation for cases without the following IFX
           */
-          assert (ic->op != LE_OP);
-          assert (ic->op != GE_OP);
-          if (ic->op == '<' && isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
+          switch (ic->op)
             {
-              unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
-
-              /* See if literal value is greater than 255 and a power of 2. */
-              if (litVal > 255)
+            case '<':
+            case LE_OP:
+            case '>':
+            case GE_OP:
+              if (isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
                 {
-                  int AndMaskVal = 0 - litVal;
+                  unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
+                  iCode *ic_nxt = ic->next;
 
-                  while (litVal && !(litVal & 1))
+                  /* Only if the next instruction is IFX */
+                  if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
                     {
-                      litVal >>= 1;
-                    }
-                  if (litVal == 1)
-                    {
-                      iCode *ic_nxt = ic->next;
-
-                      if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
+                      switch (ic->op)
                         {
-                          /* invert jump logic */
-                          symbol *TrueLabel = IC_TRUE (ic_nxt);
-                          IC_TRUE (ic_nxt) = IC_FALSE (ic_nxt);
-                          IC_FALSE (ic_nxt) = TrueLabel;
+                        case LE_OP:
+                          ++litVal;
+                          /* fall through */
+                        case '<':
+                          /* See if literal value is greater than 255 and a power of 2. */
+                          if (litVal > 255 && isPowerOf2 (litVal))
+                            {
+                              int AndMaskVal = 0 - litVal;
+                              symbol *TrueLabel;
 
-                          /* set op to bitwise and */
-                          ic->op = BITWISEAND;
-                          IC_RIGHT (ic) = operandFromLit (AndMaskVal);
-                          continue;
-                        }
-                    }
-                }
-            }
-          if (ic->op == '>' && isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
-            {
-              unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
+                              /* set op to bitwise and */
+                              ic->op = BITWISEAND;
+                              IC_RIGHT (ic) = operandFromLit (AndMaskVal);
 
-              /* See if literal value is greater than equal 255 and a power of 2. */
-              if (++litVal > 255)
-                {
-                  int AndMaskVal = 0 - litVal;
+                              /* invert jump logic */
+                              TrueLabel = IC_TRUE (ic_nxt);
+                              IC_TRUE (ic_nxt) = IC_FALSE (ic_nxt);
+                              IC_FALSE (ic_nxt) = TrueLabel;
+                            }
 
-                  while (litVal && !(litVal & 1))
-                    {
-                      litVal >>= 1;
-                    }
-                  if (litVal == 1)
-                    {
-                      ic->op = BITWISEAND;
-                      IC_RIGHT (ic) = operandFromLit (AndMaskVal);
-                      continue;
-                    }
-                }
-            }
-        }
-    }
+                        case '>':
+                          ++litVal;
+                          /* fall through */
+                        case GE_OP:
+                          /* See if literal value is greater than equal 255 and a power of 2. */
+                          if (litVal > 255 && isPowerOf2 (litVal))
+                            {
+                              int AndMaskVal = 0 - litVal;
+
+                              ic->op = BITWISEAND;
+                              IC_RIGHT (ic) = operandFromLit (AndMaskVal);
+                            }
+                        } /* switch */
+                    } /* if */
+                } /* if */
+            } /* switch */
+        } /* for */
+    } /* for */
 }
 
 /*-----------------------------------------------------------------*/

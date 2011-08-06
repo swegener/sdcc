@@ -3,6 +3,9 @@
 	* doc/Makefile.in: applied patch #3387171:
 	  Binary build fails due to documentation cleanup,
 	  thanks Strobl Anton
+	* src/SDCCopt.c: further enhancements & fixes of patch #2702889:
+	  added <= and >= optimizations, optimize > only if IFX
+	* support/regression/test/compare_2_n.c: added test cases without IFX
 
 2011-08-05 Philipp Klaus Krause <pkk AT spth.de>
 

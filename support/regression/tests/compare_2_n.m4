@@ -6,7 +6,7 @@
 
 foreach(`int_right', (0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000), `
 int
-lwr_`'int_right (unsigned left)
+lwr_if_`'int_right (unsigned left)
 {
   if (left < int_right)
     return 1;
@@ -14,9 +14,19 @@ lwr_`'int_right (unsigned left)
     return 0;
 }
 
+int
+lwr_`'int_right (unsigned left)
+{
+  return left < int_right;
+}
+
 void
 test_lwr_`'int_right (void)
 {
+  ASSERT (lwr_if_`'int_right (int_right - 1));
+  ASSERT (!lwr_if_`'int_right (int_right));
+  ASSERT (!lwr_if_`'int_right (int_right + 1));
+
   ASSERT (lwr_`'int_right (int_right - 1));
   ASSERT (!lwr_`'int_right (int_right));
   ASSERT (!lwr_`'int_right (int_right + 1));
@@ -25,14 +35,24 @@ test_lwr_`'int_right (void)
 
 foreach(`int_right', (0x00ff, 0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff), `
 int
-gtr_`'int_right (unsigned left)
+gtr_if_`'int_right (unsigned left)
 {
   return (left > int_right) ? 1 : 0;
+}
+
+int
+gtr_`'int_right (unsigned left)
+{
+  return left > int_right;
 }
 
 void
 test_gtr_`'int_right (void)
 {
+  ASSERT (gtr_if_`'int_right (int_right + 1));
+  ASSERT (!gtr_if_`'int_right (int_right));
+  ASSERT (!gtr_if_`'int_right (int_right - 1));
+
   ASSERT (gtr_`'int_right (int_right + 1));
   ASSERT (!gtr_`'int_right (int_right));
   ASSERT (!gtr_`'int_right (int_right - 1));

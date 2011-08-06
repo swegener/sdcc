@@ -1,3 +1,9 @@
+2011-08-06 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/Makefile.in: applied patch #3387171:
+	  Binary build fails due to documentation cleanup,
+	  thanks Strobl Anton
+
 2011-08-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

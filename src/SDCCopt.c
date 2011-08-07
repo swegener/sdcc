@@ -1094,10 +1094,10 @@ miscOpt (eBBlock ** ebbs, int count)
                Transformation depends on lt_nge, gt_nle, bool le_ngt,
                ge_nlt, ne_neq and eq_nne members of PORT structure.
              MB: Why do we need IFX in the first case and not in the second ?
-             Borutr: Currently the optimization works only in combination with following IFX.
-               The missing IFX in the second case was a bug, at least acording to compare_2_n.m4
-               regression test results, so I added it.
-               TODO: implement the optimiazation for cases without the following IFX
+             Borutr: Because the result of comparision is logically negated,
+               so in case of IFX the jump logic is inverted for '<' and '<='.
+               TODO: The logical negation of the result should be implemeted
+               for '<' and '<=' in case when the following instruction is not IFX.
           */
           switch (ic->op)
             {
@@ -1109,19 +1109,20 @@ miscOpt (eBBlock ** ebbs, int count)
               if (isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
                 {
                   unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
-                  iCode *ic_nxt = ic->next;
 
-                  /* Only if the literal value is greater than 255 and a power of 2 and
-                     next instruction is IFX */
-                  if (litVal > 255 && isPowerOf2 (litVal) &&
-                    ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
+                  /* Only if the literal value is greater than 255 and a power of 2 */
+                  if (litVal > 255 && isPowerOf2 (litVal))
                     {
+                      iCode *ic_nxt = ic->next;
+
                       switch (ic->op)
                         {
                         case LE_OP:
                           ++litVal;
                           /* fall through */
                         case '<':
+                          /* Only if the next instruction is IFX */
+                          if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
                             {
                               int AndMaskVal = 0 - litVal;
                               symbol *TrueLabel;

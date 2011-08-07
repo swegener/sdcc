@@ -1,6 +1,8 @@
 2011-08-07 Borut Razem <borut.razem AT gmail.com>
 
-	* src/SDCCopt.c: fixed bug #3387421: Incorrect code in revision 6723
+	* src/SDCCopt.c: fixed bug #3387421: Incorrect code in revision 6723,
+	  optimize '>' and '>=' also in case when the following instruction
+	  is not IFX
 	* support/regression/test/compare_2_n.c:
 	  added test cases for bug #3387421 and for 0x0000 and 0xffff
 

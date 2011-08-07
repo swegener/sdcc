@@ -59,6 +59,59 @@ test_gtr_`'int_right (void)
 }
 ')dnl
 
+/* special case for 0x0000 */
+lwr_if_0x0000 (unsigned left)
+{
+  if (left < 0x0000)
+    return 1;
+  else
+    return 0;
+}
+
+int
+lwr_0x0000 (unsigned left)
+{
+  return left < 0x0000;
+}
+
+void
+test_lwr_0x0000 (void)
+{
+  ASSERT (!lwr_if_0x0000 (0x0000 - 1));
+  ASSERT (!lwr_if_0x0000 (0x0000));
+  ASSERT (!lwr_if_0x0000 (0x0000 + 1));
+
+  ASSERT (!lwr_0x0000 (0x0000 - 1));
+  ASSERT (!lwr_0x0000 (0x0000));
+  ASSERT (!lwr_0x0000 (0x0000 + 1));
+}
+
+/* special case for 0xffff */
+int
+gtr_if_0xffff (unsigned left)
+{
+  return (left > 0xffff) ? 1 : 0;
+}
+
+int
+gtr_0xffff (unsigned left)
+{
+  return left > 0xffff;
+}
+
+void
+test_gtr_0xffff (void)
+{
+  ASSERT (!gtr_if_0xffff (0xffff + 1));
+  ASSERT (!gtr_if_0xffff (0xffff));
+  ASSERT (!gtr_if_0xffff (0xffff - 1));
+
+  ASSERT (!gtr_0xffff (0xffff + 1));
+  ASSERT (!gtr_0xffff (0xffff));
+  ASSERT (!gtr_0xffff (0xffff - 1));
+}
+
+/* unsigned long test cases */
 #define LONG_RIGHT_LWR 0x80000000
 int
 long_lwr (unsigned long left)

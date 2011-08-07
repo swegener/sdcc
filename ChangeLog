@@ -1,3 +1,8 @@
+2011-08-07 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCopt.c: fixed bug #3387421: Incorrect code in revision 6723
+	* support/regression/test/compare_2_n.c: added test cases for bug #3387421
+
 2011-08-06 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/Makefile.in: applied patch #3387171:

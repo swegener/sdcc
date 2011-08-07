@@ -1105,13 +1105,16 @@ miscOpt (eBBlock ** ebbs, int count)
             case LE_OP:
             case '>':
             case GE_OP:
+              /* Only if the the right operand is literal and left operant is unsigned */
               if (isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
                 {
                   unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
                   iCode *ic_nxt = ic->next;
 
-                  /* Only if the next instruction is IFX */
-                  if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
+                  /* Only if the literal value is greater than 255 and a power of 2 and
+                     next instruction is IFX */
+                  if (litVal > 255 && isPowerOf2 (litVal) &&
+                    ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
                     {
                       switch (ic->op)
                         {
@@ -1119,8 +1122,6 @@ miscOpt (eBBlock ** ebbs, int count)
                           ++litVal;
                           /* fall through */
                         case '<':
-                          /* See if literal value is greater than 255 and a power of 2. */
-                          if (litVal > 255 && isPowerOf2 (litVal))
                             {
                               int AndMaskVal = 0 - litVal;
                               symbol *TrueLabel;
@@ -1134,19 +1135,19 @@ miscOpt (eBBlock ** ebbs, int count)
                               IC_TRUE (ic_nxt) = IC_FALSE (ic_nxt);
                               IC_FALSE (ic_nxt) = TrueLabel;
                             }
+                          break;
 
                         case '>':
                           ++litVal;
                           /* fall through */
                         case GE_OP:
-                          /* See if literal value is greater than equal 255 and a power of 2. */
-                          if (litVal > 255 && isPowerOf2 (litVal))
                             {
                               int AndMaskVal = 0 - litVal;
 
                               ic->op = BITWISEAND;
                               IC_RIGHT (ic) = operandFromLit (AndMaskVal);
                             }
+                          break;
                         } /* switch */
                     } /* if */
                 } /* if */

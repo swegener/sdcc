@@ -7,7 +7,7 @@
 foreach(`int_right', (0x0080, 0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000), `
 int
 lwr_if_`'int_right (unsigned left)
-{
+{ 
   if (left < int_right)
     return 1;
   else
@@ -86,6 +86,7 @@ test_lwr_0x0000 (void)
   ASSERT (!lwr_0x0000 (0x0000 + 1));
 }
 
+#if !defined(PORT_HOST)
 /* special case for 0xffff */
 int
 gtr_if_0xffff (unsigned left)
@@ -110,6 +111,7 @@ test_gtr_0xffff (void)
   ASSERT (!gtr_0xffff (0xffff));
   ASSERT (!gtr_0xffff (0xffff - 1));
 }
+#endif
 
 /* unsigned long test cases */
 #define LONG_RIGHT_LWR 0x80000000

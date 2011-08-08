@@ -99,10 +99,12 @@ gtr_0xffff (unsigned left)
 {
   return left > 0xffff;
 }
+#endif
 
 void
 test_gtr_0xffff (void)
 {
+#if !defined(PORT_HOST)
   ASSERT (!gtr_if_0xffff (0xffff + 1));
   ASSERT (!gtr_if_0xffff (0xffff));
   ASSERT (!gtr_if_0xffff (0xffff - 1));
@@ -110,8 +112,8 @@ test_gtr_0xffff (void)
   ASSERT (!gtr_0xffff (0xffff + 1));
   ASSERT (!gtr_0xffff (0xffff));
   ASSERT (!gtr_0xffff (0xffff - 1));
-}
 #endif
+}
 
 /* unsigned long test cases */
 #define LONG_RIGHT_LWR 0x80000000

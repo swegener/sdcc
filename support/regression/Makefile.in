@@ -45,8 +45,6 @@ CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@ -DNO_VARARGS
 EXEEXT = @EXEEXT@
 
-# support VPATH:
-VPATH        = @srcdir@
 srcdir       = @srcdir@
 top_srcdir   = @top_srcdir@
 top_builddir = @top_builddir@
@@ -76,6 +74,9 @@ ALL_PORTS = $(filter-out .svn xa51 z80 gbz80 pic16 pic14 mcs51-common,$(notdir $
 CLEAN_PORTS = $(filter-out .svn mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 MAKE_LIBRARY =
+
+# support VPATH:
+vpath %.c $(CASES_DIR):$(TESTS_DIR)
 
 all: test-ports
 
@@ -204,15 +205,10 @@ $(CASES_DIR)/%.c: $(TESTS_DIR)/%.m4
 	m4 -I $(srcdir)/m4include rtmacros.m4 $< > $@
 
 # Rule to generate the iterations of a test suite off the source suite.
-$(PORT_CASES_DIR)/%/iterations.stamp: $(GENERATE_CASES)
+$(PORT_CASES_DIR)/%/iterations.stamp: %.c $(GENERATE_CASES)
 	rm -rf $(dir $@)
 	mkdir -p $(dir $@)
-	if test -f $(CASES_DIR)/$(notdir $(patsubst %/,%,$(dir $@))).c; \
-	then \
-	  python $(GENERATE_CASES) $(CASES_DIR)/$(notdir $(patsubst %/,%,$(dir $@))).c $(dir $@) > /dev/null; \
-	else \
-	  python $(GENERATE_CASES) $(TESTS_DIR)/$(notdir $(patsubst %/,%,$(dir $@))).c $(dir $@) > /dev/null; \
-	fi
+	python $(GENERATE_CASES) $< $(dir $@)
 	touch $@
 
 # Rule linking the combined results log to all of the files in the
@@ -231,7 +227,9 @@ port-dirs:
 	mkdir -p $(PORT_CASES_DIR) $(PORT_RESULTS_DIR)
 	echo Running $(PORT) regression tests
 
-test-port: $(CASES_DIR) $(M_CASES) port-results
+test-port: $(CASES_DIR) $(M_CASES)
+	# recurse: force vpath to re-read the $(CASES_DIR)
+	$(MAKE) port-results PORT=$(PORT)
 
 # Begin rules that process each iteration generated from the source
 # test

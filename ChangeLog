@@ -1,3 +1,7 @@
+2011-08-09 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/Makefile.in: fixed dependency checking using vpath
+
 2011-08-07 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCopt.c: fixed bug #3387421: Incorrect code in revision 6723,

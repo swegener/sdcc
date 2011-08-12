@@ -139,14 +139,18 @@ bug_1864577 (void)
   ASSERT (PlatformP__LedsInit__init () == SUCCESS);
 }
 
-#if (defined(__NetBSD__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL__ == 3)) || (defined(__APPLE__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 0) && (__GNUC_PATCHLEVEL__ == 1))
 /* inline definition seems to be broken on NetBSD GCC 4.1.3 and Mac OS X GCC 4.0.1
    it gets external linkage where it should not */
+#if (defined(__NetBSD__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL__ == 3))
 #define SKIP_EXTERNAL
-#warning inline definition skipped
+#endif
+#if (defined(__APPLE__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 0) && (__GNUC_PATCHLEVEL__ == 1))
+#define SKIP_EXTERNAL
 #endif
 
-#ifndef SKIP_EXTERNAL
+#ifdef SKIP_EXTERNAL
+#warning inline definition skipped
+#else
 /*--------------
     inline definition with external linkage
     the corresponding external definition is in fwk/lib/extern1.c

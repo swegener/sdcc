@@ -1,3 +1,17 @@
+2011-08-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/mcs51/gptr_cmp.asm: new, added
+	* device/lib/mcs51/Makefile.in: added gptr_cmp.rel
+	* src/mcs51/gen.c(aopGet AOP_LIT): fixed generic pointer type
+	  (toBoolean, genCmp, gencjneshort): fixed generic pointer comparison
+	* src/SDCCast.c(checkPtrCast): no warning for banked function pointers,
+	  (decorateType, EQ_OP NE_OP): optimize ifx(0==op) and null pointers
+	* src/SDCCglue.c(aopLiteralGptr): added,
+	  (printIvalCharPtr): fixed generic pointers
+	* support/regression/tests/genptrs.c: new, added
+	* support/regression/tests/bug3366711.c: fixed warning
+	* support/regression/tests/inline.c: split #ifdef for readability
+
 2011-08-09 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/Makefile.in: fixed dependency checking using vpath

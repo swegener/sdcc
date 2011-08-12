@@ -48,6 +48,26 @@ int noInit = 0;                 /* no initialization */
 
 
 char *
+aopLiteralGptr (const char * name, value * val)
+{
+  unsigned long v = ulFromVal (val);
+  struct dbuf_s dbuf;
+
+  dbuf_init (&dbuf, 128);
+
+  v >>= ((GPTRSIZE - 1) * 8);
+
+  if (IS_FUNCPTR (val->type))
+    dbuf_tprintf (&dbuf, "!immedbyte", v | pointerTypeToGPByte (DCL_TYPE (val->type->next), val->name, name));
+  else if (IS_PTR (val->type) && !IS_GENPTR (val->type))
+    dbuf_tprintf (&dbuf, "!immedbyte", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, name));
+  else
+    dbuf_tprintf (&dbuf, "!immedbyte", (unsigned int) v & 0xff);
+
+  return dbuf_detach_c_str (&dbuf);
+}
+
+char *
 aopLiteralLong (value * val, int offset, int size)
 {
   union
@@ -1161,35 +1181,63 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s *oBu
             dbuf_tprintf (oBuf, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
           break;
         case 3:
-          if (IS_GENPTR (type) && floatFromVal (val) != 0)
+          if (IS_GENPTR (type) && GPTRSIZE > FPTRSIZE && floatFromVal (val) != 0)
             {
-              // non-zero mcs51 generic pointer
-              werrorfl (sym->fileDef, sym->lineDef, W_LITERAL_GENERIC);
-            }
-          if (port->little_endian)
-            {
-              dbuf_printf (oBuf, "\t.byte %s,%s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2));
+              if (!IS_PTR (val->type) && !IS_FUNC (val->type))
+                {
+                  // non-zero mcs51 generic pointer
+                  werrorfl (sym->fileDef, sym->lineDef, W_LITERAL_GENERIC);
+                }
+              if (port->little_endian)
+                dbuf_printf (oBuf, "\t.byte %s,%s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1), aopLiteralGptr (sym->name, val));
+              else
+                dbuf_printf (oBuf, "\t.byte %s,%s,%s\n", aopLiteralGptr (sym->name, val), aopLiteral (val, 1), aopLiteral (val, 0));
             }
           else
             {
-              dbuf_printf (oBuf, "\t.byte %s,%s,%s\n", aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
+              if (port->little_endian)
+                dbuf_printf (oBuf, "\t.byte %s,%s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2));
+              else
+                dbuf_printf (oBuf, "\t.byte %s,%s,%s\n", aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
             }
           break;
         case 4:
-          if (IS_GENPTR (type) && floatFromVal (val) != 0)
+          if (IS_GENPTR (type) && GPTRSIZE > FPTRSIZE && floatFromVal (val) != 0)
             {
-              // non-zero ds390 generic pointer
-              werrorfl (sym->fileDef, sym->lineDef, W_LITERAL_GENERIC);
-            }
-          if (port->little_endian)
-            {
-              dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",
-                           aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2), aopLiteral (val, 3));
+              if (!IS_PTR (val->type) && !IS_FUNC (val->type))
+                {
+                  // non-zero ds390 generic pointer
+                  werrorfl (sym->fileDef, sym->lineDef, W_LITERAL_GENERIC);
+                }
+              if (port->little_endian)
+                {
+                  dbuf_printf (oBuf, "\t.byte %s,%s,%s", aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2));
+                  if (IS_PTR (val->type) && !IS_GENPTR (val->type))
+                    dbuf_tprintf (oBuf, ",!immedbyte\n", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, sym->name));
+                  else
+                    dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 3));
+                }
+              else
+                {
+                  if (IS_PTR (val->type) && !IS_GENPTR (val->type))
+                    dbuf_tprintf (oBuf, "\t.byte !immedbyte\n", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, sym->name));
+                  else
+                    dbuf_printf (oBuf, "\t.byte %s\n", aopLiteral (val, 3));
+                  dbuf_printf (oBuf, ",%s,%s,%s", aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
+                }
             }
           else
             {
-              dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",
-                           aopLiteral (val, 3), aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
+              if (port->little_endian)
+                {
+                  dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",
+                               aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2), aopLiteral (val, 3));
+                }
+              else
+                {
+                  dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n",
+                               aopLiteral (val, 3), aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
+                }
             }
           break;
         default:
@@ -1266,7 +1314,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
           if (IS_GENPTR (val->type))
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
           else if (IS_PTR (val->type))
-            dbuf_printf (oBuf, ",#%x\n", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, sym->name));
+            dbuf_tprintf (oBuf, ",!immedbyte\n", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, sym->name));
           else
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
         }

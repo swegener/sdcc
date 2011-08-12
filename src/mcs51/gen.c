@@ -46,6 +46,7 @@
 
 char *aopLiteral (value * val, int offset);
 char *aopLiteralLong (value * val, int offset, int size);
+char *aopLiteralGptr (const char * name, value * val);
 extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of
@@ -1330,6 +1331,20 @@ freeForBranchAsmops (operand * op1, operand * op2, operand * op3)
 }
 
 /*-----------------------------------------------------------------*/
+/* opIsGptr: returns non-zero if the passed operand is             */
+/* a generic pointer type.                                         */
+/*-----------------------------------------------------------------*/
+static int
+opIsGptr (operand * op)
+{
+  if (op && (AOP_SIZE (op) == GPTRSIZE) && (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))))
+    {
+      return 1;
+    }
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* swapOperands - swap two operands                                */
 /*-----------------------------------------------------------------*/
 static void
@@ -1544,8 +1559,15 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           break;
 
         case AOP_LIT:
-          dbuf_append_str (&dbuf,
-                           bit16 ? aopLiteralLong (aop->aopu.aop_lit, offset, 2) : aopLiteral (aop->aopu.aop_lit, offset));
+          if (opIsGptr(oper) && IS_FUNCPTR (operandType(oper)) && offset == GPTRSIZE-1)
+            {
+              dbuf_append_str (&dbuf, aopLiteralGptr (NULL, aop->aopu.aop_lit));
+            }
+          else
+            {
+              dbuf_append_str (&dbuf,
+                               bit16 ? aopLiteralLong (aop->aopu.aop_lit, offset, 2) : aopLiteral (aop->aopu.aop_lit, offset));
+            }
           break;
 
         case AOP_STR:
@@ -1813,6 +1835,72 @@ aopPut (operand * result, const char *s, int offset)
   return accuse;
 }
 
+/*--------------------------------------------------------------------*/
+/* loadDptrFromOperand - load dptr (and optionally B) from operand op */
+/*--------------------------------------------------------------------*/
+static void
+loadDptrFromOperand (operand * op, bool loadBToo)
+{
+  if (AOP_TYPE (op) != AOP_STR)
+    {
+      /* if this is rematerializable */
+      if (AOP_TYPE (op) == AOP_IMMD)
+        {
+          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE));
+          if (loadBToo)
+            {
+              if (AOP (op)->aopu.aop_immd.from_cast_remat)
+                emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE));
+              else
+                {
+                  wassertl (FALSE, "need pointerCode");
+                  emitcode (";", "mov b,???");
+                  /* genPointerGet and genPointerSet originally did different
+                   ** things for this case. Both seem wrong.
+                   ** from genPointerGet:
+                   **  emitcode ("mov", "b,#%d", pointerCode (retype));
+                   ** from genPointerSet:
+                   **  emitcode ("mov", "b,%s + 1", aopGet (result, 0, TRUE, FALSE));
+                   */
+                }
+            }
+        }
+      else if (AOP_TYPE (op) == AOP_DPTR)
+        {
+          if (loadBToo)
+            {
+              MOVA (aopGet (op, 0, FALSE, FALSE));
+              emitpush ("acc");
+              MOVA (aopGet (op, 1, FALSE, FALSE));
+              emitpush ("acc");
+              emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
+              emitpop ("dph");
+              emitpop ("dpl");
+            }
+          else
+            {
+              MOVA (aopGet (op, 0, FALSE, FALSE));
+              emitpush ("acc");
+              emitcode ("mov", "dph,%s", aopGet (op, 1, FALSE, FALSE));
+              emitpop ("dpl");
+            }
+        }
+      else if (AOP_TYPE (op) == AOP_LIT)
+        {
+          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE));
+          if (loadBToo)
+            emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
+        }
+      else
+        {                       /* we need to get it byte by byte */
+          emitcode ("mov", "dpl,%s", aopGet (op, 0, FALSE, FALSE));
+          emitcode ("mov", "dph,%s", aopGet (op, 1, FALSE, FALSE));
+          if (loadBToo)
+            emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
+        }
+    }
+}
+
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -1866,20 +1954,6 @@ reAdjustPreg (asmop * aop)
       break;
     }
   aop->coff = 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* opIsGptr: returns non-zero if the passed operand is             */
-/* a generic pointer type.                                         */
-/*-----------------------------------------------------------------*/
-static int
-opIsGptr (operand * op)
-{
-  if (op && (AOP_SIZE (op) == GPTRSIZE) && (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))))
-    {
-      return 1;
-    }
-  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1961,7 +2035,16 @@ toBoolean (operand * oper)
       AccUsed |= aopGetUsesAcc (oper, offset++);
     }
 
-  size = AOP_SIZE (oper) - 1;
+  if (opIsGptr(oper))
+    {
+      /* assumes that banks never map to address 0x0000
+         so it suffices to check dptr part only and ignore b */
+      size = AOP_SIZE (oper) - 2;
+    }
+  else
+    {
+      size = AOP_SIZE (oper) - 1;
+    }
   offset = 1;
   MOVA (aopGet (oper, 0, FALSE, FALSE));
   if (size && AccUsed && (AOP (oper)->type != AOP_ACC))
@@ -6059,6 +6142,29 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
       emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
       emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
     }
+  /* generic pointers require special handling since all NULL pointers must compare equal */
+  else if (opIsGptr (left))
+    {
+      /* push right */
+      while (offset < GPTRSIZE)
+        {
+          char *l = Safe_strdup (aopGet (right, offset++, FALSE, TRUE));
+          if (l[0] == '@' || l[0] == '#')
+            {
+              MOVA(l);
+              emitcode ("push", "acc");
+            }
+          else
+            {
+              emitcode ("push", "%s", l);
+            }
+          Safe_free (l);
+        }
+      loadDptrFromOperand (left, TRUE);
+      emitcode ("lcall", "___gptr_cmp");
+      for (offset = 0; offset < GPTRSIZE; offset++)
+        emitcode ("dec", "sp");
+    }
   else
     {
       /* subtract right from left if at the
@@ -6285,8 +6391,33 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
+  /* generic pointers require special handling since all NULL pointers must compare equal */
+  if (opIsGptr (left))
+    {
+      /* push right */
+      while (offset < size)
+        {
+          char *l = Safe_strdup (aopGet (right, offset++, FALSE, TRUE));
+          if (l[0] == '@' || l[0] == '#')
+            {
+              MOVA(l);
+              emitcode ("push", "acc");
+            }
+          else
+            {
+              emitcode ("push", "%s", l);
+            }
+          Safe_free (l);
+        }
+      loadDptrFromOperand (left, TRUE);
+      emitcode ("lcall", "___gptr_cmp");
+      for (offset = 0; offset < GPTRSIZE; offset++)
+        emitcode ("dec", "sp");
+      emitcode ("jnz", "%05d$", lbl->key + 100);
+    }
+
   /* if the right side is a literal then anything goes */
-  if (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_IMMD)
+  else if (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_IMMD)
     {
       while (size--)
         {
@@ -10246,72 +10377,6 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
   freeAsmop (left, NULL, ic, TRUE);
   if (pi)
     pi->generated = 1;
-}
-
-/*--------------------------------------------------------------------*/
-/* loadDptrFromOperand - load dptr (and optionally B) from operand op */
-/*--------------------------------------------------------------------*/
-static void
-loadDptrFromOperand (operand * op, bool loadBToo)
-{
-  if (AOP_TYPE (op) != AOP_STR)
-    {
-      /* if this is rematerializable */
-      if (AOP_TYPE (op) == AOP_IMMD)
-        {
-          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE));
-          if (loadBToo)
-            {
-              if (AOP (op)->aopu.aop_immd.from_cast_remat)
-                emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE));
-              else
-                {
-                  wassertl (FALSE, "need pointerCode");
-                  emitcode (";", "mov b,???");
-                  /* genPointerGet and genPointerSet originally did different
-                   ** things for this case. Both seem wrong.
-                   ** from genPointerGet:
-                   **  emitcode ("mov", "b,#%d", pointerCode (retype));
-                   ** from genPointerSet:
-                   **  emitcode ("mov", "b,%s + 1", aopGet (result, 0, TRUE, FALSE));
-                   */
-                }
-            }
-        }
-      else if (AOP_TYPE (op) == AOP_DPTR)
-        {
-          if (loadBToo)
-            {
-              MOVA (aopGet (op, 0, FALSE, FALSE));
-              emitpush ("acc");
-              MOVA (aopGet (op, 1, FALSE, FALSE));
-              emitpush ("acc");
-              emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
-              emitpop ("dph");
-              emitpop ("dpl");
-            }
-          else
-            {
-              MOVA (aopGet (op, 0, FALSE, FALSE));
-              emitpush ("acc");
-              emitcode ("mov", "dph,%s", aopGet (op, 1, FALSE, FALSE));
-              emitpop ("dpl");
-            }
-        }
-      else if (AOP_TYPE (op) == AOP_LIT)
-        {
-          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE));
-          if (loadBToo)
-            emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
-        }
-      else
-        {                       /* we need to get it byte by byte */
-          emitcode ("mov", "dpl,%s", aopGet (op, 0, FALSE, FALSE));
-          emitcode ("mov", "dph,%s", aopGet (op, 1, FALSE, FALSE));
-          if (loadBToo)
-            emitcode ("mov", "b,%s", aopGet (op, 2, FALSE, FALSE));
-        }
-    }
 }
 
 /*-----------------------------------------------------------------*/

@@ -90,9 +90,9 @@ bool uselessDecl = TRUE;
 %token <yyint> XOR_ASSIGN OR_ASSIGN
 %token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
-%token NONBANKED BANKED SHADOWREGS WPARAM
-%token BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE FIXED16X16 CONST VOLATILE VOID BIT
-%token STRUCT UNION ENUM RANGE FAR
+%token NONBANKED BANKED SHADOWREGS SD_WPARAM
+%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT
+%token STRUCT UNION ENUM RANGE SD_FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED JAVANATIVE OVERLAY
 %token <yyinline> INLINEASM
@@ -224,7 +224,7 @@ function_attributes
    |  SHADOWREGS     {$$ = newLink (SPECIFIER);
                         FUNC_ISSHADOWREGS($$) = 1;
                      }
-   |  WPARAM         {$$ = newLink (SPECIFIER);
+   |  SD_WPARAM      {$$ = newLink (SPECIFIER);
                         FUNC_ISWPARAM($$) = 1;
                      }
    |  BANKED         {$$ = newLink (SPECIFIER);
@@ -619,27 +619,27 @@ Interrupt_storage
    ;
 
 type_specifier
-   : BOOL      {
+   : SD_BOOL   {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_BOOL   ;
                   ignoreTypedefType = 1;
                }
-   | CHAR      {
+   | SD_CHAR   {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_CHAR  ;
                   ignoreTypedefType = 1;
                }
-   | SHORT     {
+   | SD_SHORT  {
                   $$=newLink(SPECIFIER);
                   SPEC_SHORT($$) = 1 ;
                   ignoreTypedefType = 1;
                }
-   | INT       {
+   | SD_INT    {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_INT   ;
                   ignoreTypedefType = 1;
                }
-   | LONG      {
+   | SD_LONG   {
                   $$=newLink(SPECIFIER);
                   SPEC_LONG($$) = 1       ;
                   ignoreTypedefType = 1;
@@ -654,12 +654,12 @@ type_specifier
                   SPEC_USIGN($$) = 1      ;
                   ignoreTypedefType = 1;
                }
-   | VOID      {
+   | SD_VOID   {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_VOID  ;
                   ignoreTypedefType = 1;
                }
-   | CONST     {
+   | SD_CONST  {
                   $$=newLink(SPECIFIER);
                   SPEC_CONST($$) = 1;
                }
@@ -671,7 +671,7 @@ type_specifier
                   $$=newLink(SPECIFIER);
                   SPEC_RESTRICT($$) = 1 ;
                }
-   | FLOAT     {
+   | SD_FLOAT  {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_FLOAT;
                   ignoreTypedefType = 1;

@@ -119,13 +119,13 @@ _?"_asm"         {
 "auto"         { count (); return AUTO; }
 "bit"          { count (); TKEYWORDSDCC (BIT); }
 "__bit"        { count (); TKEYWORD (BIT); }
-"_Bool"        { count (); TKEYWORD99 (BOOL); }
+"_Bool"        { count (); TKEYWORD99 (SD_BOOL); }
 "break"        { count (); return BREAK; }
 "case"         { count (); return CASE; }
-"char"         { count (); return CHAR; }
+"char"         { count (); return SD_CHAR; }
 "code"         { count (); TKEYWORDSDCC (CODE); }
 "__code"       { count (); TKEYWORD (CODE); }
-"const"        { count (); return CONST; }
+"const"        { count (); return SD_CONST; }
 "continue"     { count (); return CONTINUE; }
 "critical"     { count (); TKEYWORDSDCC (CRITICAL); }
 "__critical"   { count (); TKEYWORD (CRITICAL); }
@@ -133,7 +133,7 @@ _?"_asm"         {
 "__data"       { count (); TKEYWORD (DATA); }
 "default"      { count (); return DEFAULT; }
 "do"           { count (); return DO; }
-"double"       { count (); werror (W_DOUBLE_UNSUPPORTED); return FLOAT; }
+"double"       { count (); werror (W_DOUBLE_UNSUPPORTED); return SD_FLOAT; }
 "else"         { count (); return ELSE; }
 "enum"         { count (); return ENUM; }
 "extern"       { count (); return EXTERN; }
@@ -141,7 +141,7 @@ _?"_asm"         {
 "__far"        { count (); TKEYWORD (XDATA); }
 "eeprom"       { count (); TKEYWORDSDCC (EEPROM); }
 "__eeprom"     { count (); TKEYWORD (EEPROM); }
-"float"        { count (); return FLOAT; }
+"float"        { count (); return SD_FLOAT; }
 "fixed16x16"   { count (); TKEYWORDSDCC (FIXED16X16); }
 "__fixed16x16" { count (); TKEYWORD (FIXED16X16); }
 "flash"        { count (); TKEYWORDSDCC (CODE); }
@@ -151,14 +151,14 @@ _?"_asm"         {
 "idata"        { count (); TKEYWORDSDCC (IDATA); }
 "__idata"      { count (); TKEYWORD (IDATA); }
 "if"           { count (); return IF; }
-"int"          { count (); return INT; }
+"int"          { count (); return SD_INT; }
 "interrupt"    { count (); TKEYWORDSDCC (INTERRUPT); }
 "__interrupt"  { count (); TKEYWORD (INTERRUPT); }
 "nonbanked"    { count (); TKEYWORDSDCC (NONBANKED); }
 "__nonbanked"  { count (); TKEYWORD (NONBANKED); }
 "banked"       { count (); TKEYWORDSDCC (BANKED); }
 "__banked"     { count (); TKEYWORD (BANKED); }
-"long"         { count (); return LONG; }
+"long"         { count (); return SD_LONG; }
 "near"         { count (); TKEYWORDSDCC (DATA); }
 "__near"       { count (); TKEYWORD (DATA); }
 "pdata"        { count (); TKEYWORDSDCC (PDATA); }
@@ -167,8 +167,8 @@ _?"_asm"         {
 "__reentrant"  { count (); TKEYWORD (REENTRANT); }
 "shadowregs"   { count (); TKEYWORDSDCC (SHADOWREGS); }
 "__shadowregs" { count (); TKEYWORD (SHADOWREGS); }
-"wparam"       { count (); TKEYWORDSDCC (WPARAM); }
-"__wparam"     { count (); TKEYWORD (WPARAM); }
+"wparam"       { count (); TKEYWORDSDCC (SD_WPARAM); }
+"__wparam"     { count (); TKEYWORD (SD_WPARAM); }
 "register"     { count (); return REGISTER; }
 "return"       { count (); return RETURN; }
 "sfr"          { count (); TKEYWORDSDCC (SFR); }
@@ -179,7 +179,7 @@ _?"_asm"         {
 "__sfr32"      { count (); TKEYWORD (SFR32); }
 "sbit"         { count (); TKEYWORDSDCC (SBIT); }
 "__sbit"       { count (); TKEYWORD (SBIT); }
-"short"        { count (); return SHORT; }
+"short"        { count (); return SD_SHORT; }
 "signed"       { count (); return SIGNED; }
 "sizeof"       { count (); return SIZEOF; }
 "__builtin_offsetof" { count (); return OFFSETOF; }
@@ -191,7 +191,7 @@ _?"_asm"         {
 "typedef"      { count (); return TYPEDEF; }
 "union"        { count (); return UNION; }
 "unsigned"     { count (); return UNSIGNED; }
-"void"         { count (); return VOID; }
+"void"         { count (); return SD_VOID; }
 "volatile"     { count (); return VOLATILE; }
 "using"        { count (); TKEYWORDSDCC (USING); }
 "__using"      { count (); TKEYWORD (USING); }

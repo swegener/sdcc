@@ -1,3 +1,8 @@
+2011-08-14 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCC.y, src/SDCC.lex, src/pic14/ralloc.c, src/pic16/ralloc.c:
+	  fixed clash with i586-mingw32msvc/include/windef.h
+
 2011-08-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/mcs51/gptr_cmp.asm: new, added

@@ -4268,7 +4268,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       /* 'ifx (0 == op)' -> 'ifx (!(op))' */
       if (IS_LITERAL (LETYPE (tree)) &&
-          floatFromVal (valFromType (LETYPE (tree))) == 0 &&
+          floatFromVal (valFromType (LTYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BIT))
         {
           tree->opval.op = '!';
@@ -4280,7 +4280,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       /* 'ifx (op == 0)' -> 'ifx (!(op))' */
       if (IS_LITERAL (RETYPE (tree)) &&
-          floatFromVal (valFromType (RETYPE (tree))) == 0 &&
+          floatFromVal (valFromType (RTYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BIT))
         {
           tree->opval.op = '!';

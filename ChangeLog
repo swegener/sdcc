@@ -1,3 +1,8 @@
+2011-08-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(decorateType, EQ_OP NE_OP): fixed floatFromVal bug on big
+	  endian host for pointers
+
 2011-08-14 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.y, src/SDCC.lex, src/pic14/ralloc.c, src/pic16/ralloc.c:

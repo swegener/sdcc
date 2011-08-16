@@ -1,6 +1,11 @@
 2011-08-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* doc/sdccman.lyx:
+	  Reverted documentation change, to avoid LyX version incompability.
+
+2011-08-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* doc/sdccman.lyx:
 	  Document --reserve-regs-iy option and __smallc calling convention.
 
 2011-08-15 Maarten Brock <sourceforge.brock AT dse.nl>

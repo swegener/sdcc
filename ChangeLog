@@ -1,5 +1,4 @@
-2011-08-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
-
+2011-08-17 Borut Razem <borut.razem AT gmail.com>
 	* device/non-free/lib/pic16/libdev/Makefile.in:
 	  regenerated to include support for pic18f2xk22/pic18f4xk22 family
 

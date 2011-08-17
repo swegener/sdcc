@@ -1,9 +1,17 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 2.0.0 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass book
 \begin_preamble
+% Added by lyx2lyx
+%  for proper underlining
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+\let\cite@rig\cite
+\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
+  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
+\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
@@ -31,7 +39,6 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \paperfontsize default
 \spacing single
@@ -50,15 +57,12 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
 \end_header
 
 \begin_body
@@ -13268,6 +13272,58 @@ status collapsed
 \end_inset
 
  Use <Value> for the const segment name.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-reserve-regs-iy
+\series default
+
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+Z80!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-reserve-regs-iy
+\end_layout
+
+\end_inset
+
+
+\size large
+ 
+\size default
+This option tells the compiler that it is not allowed to use register pair
+ iy.
+ The option can be useful for systems where iy is reserved for the OS.
+ 
 \end_layout
 
 \begin_layout List
@@ -34240,6 +34296,22 @@ The compiling and linking procedure remains the same, however note the extra
  entry & exit linkage required for the assembler code, _bp is the stack
  frame pointer and is used to compute the offset into the stack for parameters
  and local variables.
+\end_layout
+
+\begin_layout Subsection
+Small-C calling convention
+\end_layout
+
+\begin_layout Standard
+Functions declared as __smallc are called using the Small-C calling convention.
+ This way assembler routines orginally written for Small-C or code genrated
+ by Small-C canbe called from sdcc.
+ Currently variable arguments are not supported and neither are function
+ definitions using __smallc (as would be useful for calling sdcc-generated
+ functions from Small-C.
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace bigskip
 \end_inset
 

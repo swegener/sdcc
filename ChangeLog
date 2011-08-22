@@ -1,3 +1,8 @@
+2011-08-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #3396441.
+
 2011-08-17 Borut Razem <borut.razem AT gmail.com>
 	* device/non-free/lib/pic16/libdev/Makefile.in:
 	  regenerated to include support for pic18f2xk22/pic18f4xk22 family
@@ -5,7 +10,7 @@
 2011-08-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* doc/sdccman.lyx:
-	  Reverted documentation change, to avoid LyX version incompability.
+	  Redid documentation change, in LyX 1.6 format this time.
 
 2011-08-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

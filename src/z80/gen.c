@@ -2704,7 +2704,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset)
     return;
   if (to->type == AOP_REG && from->type == AOP_REG && to->aopu.aop_reg[to_offset] == from->aopu.aop_reg[from_offset])
     return;
-
+  if (to->type == AOP_HLREG && from->type == AOP_HLREG && !strcmp(to->aopu.aop_str[to_offset], from->aopu.aop_str[from_offset]))
+    return;
   aopPut3 (to, to_offset, from, from_offset);
 }
 

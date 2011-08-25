@@ -1,9 +1,15 @@
+2011-08-25 Borut Razem <borut.razem AT gmail.com>
+
+	* src/pic14/pcodepeep.c, src/pic16/pcodepeep.c:
+	  fixed name clash with mingw_w64: _DLL renamed to DLList
+
 2011-08-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Fixed bug #3396441.
 
 2011-08-17 Borut Razem <borut.razem AT gmail.com>
+
 	* device/non-free/lib/pic16/libdev/Makefile.in:
 	  regenerated to include support for pic18f2xk22/pic18f4xk22 family
 

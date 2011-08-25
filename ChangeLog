@@ -2,6 +2,7 @@
 
 	* src/pic14/pcodepeep.c, src/pic16/pcodepeep.c:
 	  fixed name clash with mingw_w64: _DLL renamed to DLList
+	* src/SDCCutil.c: added MINGW64 build environment detection
 
 2011-08-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

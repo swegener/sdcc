@@ -599,6 +599,8 @@ getBuildEnvironment (void)
 {
 #ifdef __CYGWIN__
   return "CYGWIN";
+#elif defined __MINGW64__
+  return "MINGW64";
 #elif defined __MINGW32__
   return "MINGW32";
 #elif defined __DJGPP__

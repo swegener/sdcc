@@ -22,6 +22,7 @@
 -------------------------------------------------------------------------*/
 
 #include "sdcdb.h"
+#undef DATADIR
 #include "symtab.h"
 #include "simi.h"
 #include "break.h"

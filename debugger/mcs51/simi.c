@@ -21,6 +21,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 #include "sdcdb.h"
+#undef DATADIR
 #include "simi.h"
 #include "newalloc.h"
 

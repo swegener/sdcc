@@ -22,6 +22,10 @@
 -------------------------------------------------------------------------*/
 
 #include "sdcdb.h"
+
+char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "small" ;
+
+#undef DATADIR
 #include "symtab.h"
 #include "simi.h"
 #include "break.h"
@@ -63,7 +67,6 @@ short showfull = 0;
 char userinterrupt = 0;
 char nointerrupt = 0;
 char contsim = 0;
-char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "small" ;
 char *simArgs[40];
 int nsimArgs = 0;
 char model_str[20];
@@ -1709,6 +1712,8 @@ static void printHelp(void)
 
 static const char *escapeQuotes(const char *arg)
 {
+#define extend(n)  do { if (ps - str + (n) > strLen) str = Safe_realloc (str, strLen += CHUNCK); } while (0)
+
   static char *str = NULL;
   static size_t strLen = 0;
   char *ps;
@@ -1716,18 +1721,25 @@ static const char *escapeQuotes(const char *arg)
 
   if (NULL == str)
     {
-      str = Safe_malloc(CHUNCK);
       strLen = CHUNCK;
+      str = Safe_malloc (strLen);
     }
 
   for (ps = str, pa = arg; '\0' != *pa; ++pa)
     {
       if ('"' == *pa)
         {
+          extend (2);
           *ps++ = '\\';       /* excape the quote */
+          *ps++ = *pa;
         }
-      *ps++ = *pa;
+      else
+        {
+          extend (1);
+          *ps++ = *pa;
+        }
     }
+  extend (1);
   *ps = '\0';
 
   return str;

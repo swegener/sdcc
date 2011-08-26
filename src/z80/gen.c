@@ -1458,7 +1458,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 
   if (!op)
     return;
-emitDebug(";aopOp");
+
   /* if this a literal */
   if (IS_OP_LITERAL (op))
     {
@@ -1480,7 +1480,7 @@ emitDebug(";aopOp");
 
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
-    {emitDebug(";aopOp: sym");
+    {
       op->aop = OP_SYMBOL (op)->aop;
       if (op->aop->type == AOP_SFR)
         {
@@ -1491,7 +1491,7 @@ emitDebug(";aopOp");
 
   /* if this is a true symbol */
   if (IS_TRUE_SYMOP (op))
-    {emitDebug(";aopOp: true");
+    {
       op->aop = aopForSym (ic, OP_SYMBOL (op), result, requires_a);
       return;
     }
@@ -1518,7 +1518,7 @@ emitDebug(";aopOp");
      a) is rematerialize
      b) has a spill location */
   if (sym->isspilt || sym->nRegs == 0)
-    {emitDebug(";aopOp: Spilt %s", sym->name);
+    {
       if (sym->ruonly)
         {
           int i;
@@ -1530,7 +1530,7 @@ emitDebug(";aopOp");
         }
 
       if (sym->accuse)
-        {emitDebug(";aopOp: accuse.");
+        {
           if (sym->accuse == ACCUSE_A)
             {
               aop = op->aop = sym->aop = newAsmop (AOP_ACC);
@@ -1564,7 +1564,7 @@ emitDebug(";aopOp");
         
       /* rematerialize it NOW */
       if (sym->remat)
-        {emitDebug(";aopOp: remat.");
+        {
           sym->aop = op->aop = aop =
             aopForRemat (sym);
           aop->size = getSize (sym->type);

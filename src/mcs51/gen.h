@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  SDCCgen51.h - header file for code generation for 8051
+  gen.h - header file for code generation for 8051
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -7,19 +7,19 @@
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #ifndef SDCCGEN51_H
@@ -34,7 +34,7 @@ enum
   AOP_CRY, AOP_ACC, AOP_DUMMY
 };
 
-/* type asmop : a homogenised type for 
+/* type asmop : a homogenised type for
    all the different spaces an operand can be
    in */
 typedef struct asmop
@@ -47,7 +47,7 @@ typedef struct asmop
      AOP_DPTR   -  dptr contains address of operand
      AOP_R0/R1  -  r0/r1 contains address of operand
      AOP_STK    -  should be pushed on stack this
-     can happen only for the result
+                   can happen only for the result
      AOP_IMMD   -  immediate value for eg. remateriazable 
      AOP_CRY    -  carry contains the value of this
      AOP_STR    -  array of strings
@@ -62,9 +62,9 @@ typedef struct asmop
   union
   {
     value *aop_lit;             /* if literal */
-    reg_info *aop_reg[4];           /* array of registers */
+    reg_info *aop_reg[4];       /* array of registers */
     char *aop_dir;              /* if direct  */
-    reg_info *aop_ptr;              /* either -> to r0 or r1 */
+    reg_info *aop_ptr;          /* either -> to r0 or r1 */
     struct
     {
       int from_cast_remat;      /* cast remat created this : immd2 field used for highest order */

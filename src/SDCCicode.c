@@ -1269,6 +1269,10 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
         {
           retval = operandFromLit (operandLitValue (left) == operandLitValue (right));
         }
+      else if (IS_PTR (operandType (left)) || IS_PTR (operandType (right)))
+        {
+          retval = operandFromLit (operandLitValue (left) == operandLitValue (right));
+        }
       else
         {
           /* this op doesn't care about signedness */
@@ -1573,14 +1577,14 @@ operandFromSymbol (symbol * sym)
     }
 
   if (!IS_AGGREGATE (sym->type) &&      /* not an aggregate */
-      !IS_FUNC (sym->type) &&   /* not a function   */
-      !sym->_isparm &&          /* not a parameter  */
-      IS_AUTO (sym) &&          /* is a local auto variable */
-      !sym->addrtaken &&        /* whose address has not been taken */
-      !sym->reqv &&             /* does not already have a reg equivalence */
+      !IS_FUNC (sym->type) &&           /* not a function   */
+      !sym->_isparm &&                  /* not a parameter  */
+      IS_AUTO (sym) &&                  /* is a local auto variable */
+      !sym->addrtaken &&                /* whose address has not been taken */
+      !sym->reqv &&                     /* does not already have a reg equivalence */
       !IS_VOLATILE (sym->etype) &&      /* not declared as volatile */
-      !sym->islbl &&            /* not a label */
-      ok                        /* farspace check */
+      !sym->islbl &&                    /* not a label */
+      ok                                /* farspace check */
     )
     {
       /* we will use it after all optimizations
@@ -1895,37 +1899,6 @@ geniCodeRValue (operand * op, bool force)
   return IC_RESULT (ic);
 }
 
-static DECLARATOR_TYPE
-getPtrType (sym_link * type)
-{
-  //for Z80 anything goes
-  if (TARGET_Z80_LIKE)
-    return POINTER;
-
-  //preserve original behaviour for PIC16
-  if (TARGET_IS_PIC16)
-    return POINTER;
-
-  //for HC08 only zeropage ptr is different
-  if (TARGET_IS_HC08)
-    {
-      if (IS_DATA_PTR (type))
-        return POINTER;
-      else
-        return FPOINTER;
-    }
-
-  if (IS_DATA_PTR (type) && TARGET_MCS51_LIKE)
-    return IPOINTER;
-  if (IS_PTR (type))
-    return DCL_TYPE (type);
-  else if (IS_FUNC (type))
-    return CPOINTER;
-  else if (IS_ARRAY (type))
-    return PTR_TYPE (SPEC_OCLS (getSpec (type)));
-  return UPOINTER;
-}
-
 /*-----------------------------------------------------------------*/
 /* checkPtrQualifiers - check for lost pointer qualifers           */
 /*-----------------------------------------------------------------*/
@@ -1982,36 +1955,8 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 
   checkPtrCast (type, optype, implicit);
 
-  /* if they are the same size create an assignment */
-
-  /* This seems very dangerous to me, since there are several */
-  /* optimizations (for example, gcse) that don't notice the  */
-  /* cast hidden in this assignment and may simplify an       */
-  /* iCode to use the original (uncasted) operand.            */
-  /* Unfortunately, other things break when this cast is      */
-  /* made explicit. Need to fix this someday.                 */
-  /* -- EEP, 2004/01/21                                       */
-  if (getSize (type) == getSize (optype) &&
-      !IS_BOOL (type) &&
-      !IS_BITFIELD (type) &&
-      !IS_FLOAT (type) &&
-      !IS_FLOAT (optype) &&
-      !IS_FIXED (type) &&
-      !IS_FIXED (optype) &&
-      ((IS_SPEC (type) && IS_SPEC (optype)) ||
-       (IS_DECL (type) && IS_DECL (optype) && getPtrType (type) == getPtrType (optype))))
-    {
-      ic = newiCode ('=', NULL, op);
-      IC_RESULT (ic) = newiTempOperand (type, 0);
-      if (IS_TRUE_SYMOP (op) && !IS_VOLATILE (optype))
-        SPIL_LOC (IC_RESULT (ic)) = OP_SYMBOL (op);
-      IC_RESULT (ic)->isaddr = 0;
-    }
-  else
-    {
-      ic = newiCode (CAST, operandFromLink (type), geniCodeRValue (op, FALSE));
-      IC_RESULT (ic) = newiTempOperand (type, 0);
-    }
+  ic = newiCode (CAST, operandFromLink (type), geniCodeRValue (op, FALSE));
+  IC_RESULT (ic) = newiTempOperand (type, 0);
 
   /* preserve the storage class & output class */
   /* of the original variable                  */
@@ -2699,7 +2644,7 @@ geniCodeAddressOf (operand * op)
   sym_link *optype = operandType (op);
   sym_link *opetype = getSpec (optype);
 
-  if (IS_ITEMP (op) && op->isaddr && IS_PTR (optype))
+  if (IS_ITEMP (op) && IS_PTR (optype))
     {
       op = operandFromOperand (op);
       op->isaddr = 0;
@@ -4383,6 +4328,7 @@ ast2iCode (ast * tree, int lvl)
 
     case CALL:
       return geniCodeCall (ast2iCode (tree->left, lvl + 1), tree->right, lvl);
+
     case LABEL:
       geniCodeLabel (OP_SYMBOL (ast2iCode (tree->left, lvl + 1)));
       return ast2iCode (tree->right, lvl + 1);

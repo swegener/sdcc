@@ -100,6 +100,10 @@ aopLiteralLong (value * val, int offset, int size)
         case 2:
           dbuf_tprintf (&dbuf, "!immedword", (unsigned int) v & 0xffff);
           break;
+        case 3:
+          // we don't have a !immedword24 yet for ds390
+          dbuf_printf (&dbuf, "#0x%06X", (unsigned int) v & 0xffffff);
+          break;
         default:
           /* Hmm.  Too big for now. */
           assert (0);
@@ -510,7 +514,7 @@ initPointer (initList * ilist, sym_link * toType)
   /* (char *)(expr1) */
   if (IS_CAST_OP (expr))
     {
-      if (compareType (toType, expr->left->ftype) != 1)
+      if (compareType (toType, expr->left->ftype) == 0)
         {
           werror (W_INIT_WRONG);
           printFromToType (expr->left->ftype, toType);

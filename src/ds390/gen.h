@@ -48,7 +48,7 @@ typedef struct asmop
                                    AOP_DPTR2  -  dptr2 contains address of operand (DS80C390 only).
                                    AOP_R0/R1  -  r0/r1 contains address of operand
                                    AOP_STK    -  should be pushed on stack this
-                                   can happen only for the result
+                                                 can happen only for the result
                                    AOP_IMMD   -  immediate value for eg. remateriazable
                                    AOP_CRY    -  carry contains the value of this
                                    AOP_STR    -  array of strings

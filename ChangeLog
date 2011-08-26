@@ -1,3 +1,25 @@
+2011-08-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c: use !tlabeldef and #!constbyte,
+	  merged Push into emitpush,
+	  changed many aopGet(dname=TRUE) to FALSE
+	  (aopForRemat): do not warn for intermediate generic pointers,
+	  (aopPut): use static dbuf_s,
+	  (loadDptrFromOperand): optimized for AOP_DPTR,
+	  (pointToEnd, findLabelBackwards, old adjustArithmeticResult): removed,
+	* src/mcs51/gen.h: cosmetics
+	* src/ds390/gen.c: synchronized with mcs51, removed genArrayInit
+	* src/ds390/gen.h: cosmetics
+	* src/SDCCcse.c (algebraicOpts CAST): handle generic pointers
+	* src/SDCCglue.c (aopLiteralLong): handle size=3 for ds390 dptr,
+	  (initPointer): no warning for castable pointers
+	* src/SDCCicode.c (operandOperation EQ_OP): handle literal pointers,
+	  (getPtrType): removed
+	  (geniCodeCast): removed strange hidden cast after cse fix
+	  (geniCodeAddressOf): removed op->isaddr check for operandFromOperand
+	* src/z80/gen.c (aopForRemat): synced with mcs51 for CAST,
+	  (regMove): fixed warnings
+
 2011-08-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,

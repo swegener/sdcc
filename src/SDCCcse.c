@@ -1152,12 +1152,23 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           sym_link *otype = operandType(IC_RIGHT(ic));
           sym_link *ctype = operandType(IC_LEFT(ic));
           /* if this is a cast of a literal value */
-          if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
-              !(IS_GENPTR(ctype) && (IS_PTR(otype) && !IS_GENPTR(otype))))
+          if (IS_OP_LITERAL (IC_RIGHT (ic)))
             {
+              double litval = operandLitValue (IC_RIGHT (ic));
+              if (IS_GENPTR(ctype) && IS_PTR(otype))
+                {
+                  unsigned long gpVal = 0;
+                  const char *name = IS_SYMOP (IC_RESULT (ic)) ? OP_SYMBOL (IC_RESULT (ic))->name : NULL;
+                  if (IS_FUNCPTR(otype))
+                    gpVal = pointerTypeToGPByte (DCL_TYPE (otype->next), NULL, name);
+                  if (!IS_GENPTR(otype))
+                    gpVal = pointerTypeToGPByte (DCL_TYPE (otype), NULL, name);
+                  gpVal <<= ((GPTRSIZE - 1) * 8);
+                  gpVal |= (unsigned long)litval;
+                  litval = gpVal;
+                }
               ic->op = '=';
-              IC_RIGHT (ic) = operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)),
-                                                                operandLitValue (IC_RIGHT (ic))));
+              IC_RIGHT (ic) = operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)), litval));
               IC_LEFT (ic) = NULL;
               SET_ISADDR (IC_RESULT (ic), 0);
             }

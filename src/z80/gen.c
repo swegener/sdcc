@@ -1300,35 +1300,45 @@ aopForSym (const iCode * ic, symbol * sym, bool result, bool requires_a)
 /*-----------------------------------------------------------------*/
 /* aopForRemat - rematerializes an object                          */
 /*-----------------------------------------------------------------*/
-/* TODO borutr: why this doesn't work if the buffer is non-static?! */
 static asmop *
 aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
-  static struct dbuf_s dbuf = { 0 };
+  int val = 0;
+  struct dbuf_s dbuf;
 
-  if (dbuf_is_initialized (&dbuf))
+  for (;;)
     {
-      dbuf_set_length (&dbuf, 0);
+      if (ic->op == '+')
+        {
+          val += (int) operandLitValue (IC_RIGHT (ic));
+          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+        }
+      else if (ic->op == '-')
+        {
+          val -= (int) operandLitValue (IC_RIGHT (ic));
+          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+        }
+      else if (IS_CAST_ICODE (ic))
+        {
+          ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+        }
+      else
+        break;
+    }
+
+  dbuf_init (&dbuf, 128);
+  if (val)
+    {
+      dbuf_printf (&dbuf, "(%s %c 0x%04x)", OP_SYMBOL (IC_LEFT (ic))->rname, val >= 0 ? '+' : '-', abs (val) & 0xffff);
     }
   else
     {
-      dbuf_init (&dbuf, 128);
+      dbuf_append_str (&dbuf, OP_SYMBOL (IC_LEFT (ic))->rname);
     }
 
-  /* if plus or minus print the right hand side */
-  while (ic->op == '+' || ic->op == '-')
-    {
-      /* PENDING: for re-target */
-      dbuf_printf (&dbuf, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)), ic->op);
-      ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-    }
-
-  /* we reached the end */
-  dbuf_append_str (&dbuf, OP_SYMBOL (IC_LEFT (ic))->rname);
-
-  aop->aopu.aop_immd = traceAlloc (&_G.trace.aops, Safe_strdup (dbuf_c_str (&dbuf)));
+  aop->aopu.aop_immd = traceAlloc (&_G.trace.aops, dbuf_detach_c_str (&dbuf));
   return aop;
 }
 
@@ -2951,12 +2961,12 @@ static void regMove(short *dst, short *src, size_t n)
   // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
   while (size--)
     {
-      int i;
+      size_t i;
               
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {
-          int j;
+          size_t j;
                   
           if (assigned[i])
             continue;

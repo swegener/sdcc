@@ -19,6 +19,7 @@
 	  (geniCodeAddressOf): removed op->isaddr check for operandFromOperand
 	* src/z80/gen.c (aopForRemat): synced with mcs51 for CAST,
 	  (regMove): fixed warnings
+	* support/regression/tests/bug3389647.c: new, added
 
 2011-08-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

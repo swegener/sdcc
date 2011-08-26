@@ -1,3 +1,9 @@
+2011-08-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  support/regression/tests/bug3397636.c:
+	  Fixed bug #3397636.
+
 2011-08-25 Borut Razem <borut.razem AT gmail.com>
 
 	* src/pic14/pcodepeep.c, src/pic16/pcodepeep.c:

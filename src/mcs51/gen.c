@@ -2086,7 +2086,6 @@ assignBit (operand * result, operand * right)
     }
 }
 
-
 /*-------------------------------------------------------------------*/
 /* xch_a_aopGet - for exchanging acc with value of the aop           */
 /*-------------------------------------------------------------------*/
@@ -2111,7 +2110,6 @@ xch_a_aopGet (operand * oper, int offset, bool bit16, bool dname)
     }
   return l;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
@@ -2157,7 +2155,6 @@ release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
   freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
 }
-
 
 /*-----------------------------------------------------------------*/
 /* genCpl - generate code for complement                           */
@@ -2215,7 +2212,6 @@ genCpl (iCode * ic)
       emitcode ("cpl", "a");
       aopPut (IC_RESULT (ic), "a", offset++);
     }
-
 
 release:
   /* release the aops */
@@ -8544,6 +8540,8 @@ AccAXLsh1 (const char *x)
 static void
 AccAXLsh (const char *x, int shCount)
 {
+  unsigned char mask;
+
   switch (shCount)
     {
     case 0:
@@ -8557,54 +8555,40 @@ AccAXLsh (const char *x, int shCount)
       break;
     case 3:
     case 4:
-    case 5:                    // AAAAABBB:CCCCCDDD
-
-      AccRol (shCount);         // BBBAAAAA:CCCCCDDD
-
-      emitcode ("anl", "a,#!constbyte", SLMask[shCount]);   // BBB00000:CCCCCDDD
-
-      emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBB00000
-
-      AccRol (shCount);         // DDDCCCCC:BBB00000
-
-      emitcode ("xch", "a,%s", x);      // BBB00000:DDDCCCCC
-
-      emitcode ("xrl", "a,%s", x);      // (BBB^DDD)CCCCC:DDDCCCCC
-
-      emitcode ("xch", "a,%s", x);      // DDDCCCCC:(BBB^DDD)CCCCC
-
-      emitcode ("anl", "a,#!constbyte", SLMask[shCount]);   // DDD00000:(BBB^DDD)CCCCC
-
-      emitcode ("xch", "a,%s", x);      // (BBB^DDD)CCCCC:DDD00000
-
-      emitcode ("xrl", "a,%s", x);      // BBBCCCCC:DDD00000
-
+    case 5:                                     // AAAAABBB:CCCCCDDD
+      mask = SLMask[shCount];
+      AccRol (shCount);                         // BBBAAAAA:CCCCCDDD
+      emitcode ("anl", "a,#!constbyte", mask);  // BBB00000:CCCCCDDD
+      emitcode ("xch", "a,%s", x);              // CCCCCDDD:BBB00000
+      AccRol (shCount);                         // DDDCCCCC:BBB00000
+      emitcode ("xch", "a,%s", x);              // BBB00000:DDDCCCCC
+      emitcode ("xrl", "a,%s", x);              // (BBB^DDD)CCCCC:DDDCCCCC
+      emitcode ("xch", "a,%s", x);              // DDDCCCCC:(BBB^DDD)CCCCC
+      emitcode ("anl", "a,#!constbyte", mask);  // DDD00000:(BBB^DDD)CCCCC
+      emitcode ("xch", "a,%s", x);              // (BBB^DDD)CCCCC:DDD00000
+      emitcode ("xrl", "a,%s", x);              // BBBCCCCC:DDD00000
       break;
-    case 6:                    // AAAAAABB:CCCCCCDD
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000000BB:CCCCCCDD
-      emitcode ("mov", "c,acc.0");      // c = B
-      emitcode ("xch", "a,%s", x);      // CCCCCCDD:000000BB
+    case 6:                                     // AAAAAABB:CCCCCCDD
+      mask = SRMask[shCount];
+      emitcode ("anl", "a,#!constbyte", mask);  // 000000BB:CCCCCCDD
+      emitcode ("mov", "c,acc.0");              // c = B
+      emitcode ("xch", "a,%s", x);              // CCCCCCDD:000000BB
       emitcode ("rrc", "a");
       emitcode ("xch", "a,%s", x);
       emitcode ("rrc", "a");
-      emitcode ("mov", "c,acc.0");      //<< get correct bit
+      emitcode ("mov", "c,acc.0");              //<< get correct bit
       emitcode ("xch", "a,%s", x);
-
       emitcode ("rrc", "a");
       emitcode ("xch", "a,%s", x);
       emitcode ("rrc", "a");
       emitcode ("xch", "a,%s", x);
       break;
-    case 7:                    // a:x <<= 7
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 0000000B:CCCCCCCD
-
-      emitcode ("mov", "c,acc.0");      // c = B
-
-      emitcode ("xch", "a,%s", x);      // CCCCCCCD:0000000B
-
-      AccAXRrl1 (x);            // BCCCCCCC:D0000000
-
+    case 7:                                     // a:x <<= 7
+      mask = SRMask[shCount];
+      emitcode ("anl", "a,#!constbyte", mask);  // 0000000B:CCCCCCCD
+      emitcode ("mov", "c,acc.0");              // c = B
+      emitcode ("xch", "a,%s", x);              // CCCCCCCD:0000000B
+      AccAXRrl1 (x);                            // BCCCCCCC:D0000000
       break;
     default:
       break;
@@ -8617,71 +8601,49 @@ AccAXLsh (const char *x, int shCount)
 static void
 AccAXRsh (const char *x, int shCount)
 {
+  unsigned char mask = SRMask[shCount];
+
   switch (shCount)
     {
     case 0:
       break;
     case 1:
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
-
+      AccAXRrl1 (x);                            // 0->a:x
       break;
     case 2:
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
-
+      AccAXRrl1 (x);                            // 0->a:x
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
-
+      AccAXRrl1 (x);                            // 0->a:x
       break;
     case 3:
     case 4:
-    case 5:                    // AAAAABBB:CCCCCDDD = a:x
-
-      AccRol (8 - shCount);     // BBBAAAAA:DDDCCCCC
-
-      emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBBAAAAA
-
-      AccRol (8 - shCount);     // DDDCCCCC:BBBAAAAA
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000CCCCC:BBBAAAAA
-
-      emitcode ("xrl", "a,%s", x);      // BBB(CCCCC^AAAAA):BBBAAAAA
-
-      emitcode ("xch", "a,%s", x);      // BBBAAAAA:BBB(CCCCC^AAAAA)
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000AAAAA:BBB(CCCCC^AAAAA)
-
-      emitcode ("xch", "a,%s", x);      // BBB(CCCCC^AAAAA):000AAAAA
-
-      emitcode ("xrl", "a,%s", x);      // BBBCCCCC:000AAAAA
-
-      emitcode ("xch", "a,%s", x);      // 000AAAAA:BBBCCCCC
-
+    case 5:                                     // AAAAABBB:CCCCCDDD = a:x
+      AccRol (8 - shCount);                     // BBBAAAAA:DDDCCCCC
+      emitcode ("xch", "a,%s", x);              // CCCCCDDD:BBBAAAAA
+      AccRol (8 - shCount);                     // DDDCCCCC:BBBAAAAA
+      emitcode ("anl", "a,#!constbyte", mask);  // 000CCCCC:BBBAAAAA
+      emitcode ("xrl", "a,%s", x);              // BBB(CCCCC^AAAAA):BBBAAAAA
+      emitcode ("xch", "a,%s", x);              // BBBAAAAA:BBB(CCCCC^AAAAA)
+      emitcode ("anl", "a,#!constbyte", mask);  // 000AAAAA:BBB(CCCCC^AAAAA)
+      emitcode ("xch", "a,%s", x);              // BBB(CCCCC^AAAAA):000AAAAA
+      emitcode ("xrl", "a,%s", x);              // BBBCCCCC:000AAAAA
+      emitcode ("xch", "a,%s", x);              // 000AAAAA:BBBCCCCC
       break;
-    case 6:                    // AABBBBBB:CCDDDDDD
-
+    case 6:                                     // AABBBBBB:CCDDDDDD
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // ABBBBBBC:CDDDDDDA
-
+      AccAXLrl1 (x);                            // ABBBBBBC:CDDDDDDA
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // BBBBBBCC:DDDDDDAA
-
-      emitcode ("xch", "a,%s", x);      // DDDDDDAA:BBBBBBCC
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000000AA:BBBBBBCC
-
+      AccAXLrl1 (x);                            // BBBBBBCC:DDDDDDAA
+      emitcode ("xch", "a,%s", x);              // DDDDDDAA:BBBBBBCC
+      emitcode ("anl", "a,#!constbyte", mask);  // 000000AA:BBBBBBCC
       break;
-    case 7:                    // ABBBBBBB:CDDDDDDD
-
-      emitcode ("mov", "c,acc.7");      // c = A
-
-      AccAXLrl1 (x);            // BBBBBBBC:DDDDDDDA
-
-      emitcode ("xch", "a,%s", x);      // DDDDDDDA:BBBBBBCC
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 0000000A:BBBBBBBC
-
+    case 7:                                     // ABBBBBBB:CDDDDDDD
+      emitcode ("mov", "c,acc.7");              // c = A
+      AccAXLrl1 (x);                            // BBBBBBBC:DDDDDDDA
+      emitcode ("xch", "a,%s", x);              // DDDDDDDA:BBBBBBCC
+      emitcode ("anl", "a,#!constbyte", mask);  // 0000000A:BBBBBBBC
       break;
     default:
       break;
@@ -8695,86 +8657,63 @@ static void
 AccAXRshS (const char *x, int shCount)
 {
   symbol *tlbl;
+  unsigned char mask = SRMask[shCount];
+
   switch (shCount)
     {
     case 0:
       break;
     case 1:
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
-
+      AccAXRrl1 (x);                            // s->a:x
       break;
     case 2:
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
-
+      AccAXRrl1 (x);                            // s->a:x
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
-
+      AccAXRrl1 (x);                            // s->a:x
       break;
     case 3:
     case 4:
-    case 5:                    // AAAAABBB:CCCCCDDD = a:x
-
+    case 5:                                     // AAAAABBB:CCCCCDDD = a:x
       tlbl = newiTempLabel (NULL);
-      AccRol (8 - shCount);     // BBBAAAAA:CCCCCDDD
-
-      emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBBAAAAA
-
-      AccRol (8 - shCount);     // DDDCCCCC:BBBAAAAA
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000CCCCC:BBBAAAAA
-
-      emitcode ("xrl", "a,%s", x);      // BBB(CCCCC^AAAAA):BBBAAAAA
-
-      emitcode ("xch", "a,%s", x);      // BBBAAAAA:BBB(CCCCC^AAAAA)
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000AAAAA:BBB(CCCCC^AAAAA)
-
-      emitcode ("xch", "a,%s", x);      // BBB(CCCCC^AAAAA):000AAAAA
-
-      emitcode ("xrl", "a,%s", x);      // BBBCCCCC:000AAAAA
-
-      emitcode ("xch", "a,%s", x);      // 000SAAAA:BBBCCCCC
-
+      AccRol (8 - shCount);                     // BBBAAAAA:CCCCCDDD
+      emitcode ("xch", "a,%s", x);              // CCCCCDDD:BBBAAAAA
+      AccRol (8 - shCount);                     // DDDCCCCC:BBBAAAAA
+      emitcode ("anl", "a,#!constbyte", mask);  // 000CCCCC:BBBAAAAA
+      emitcode ("xrl", "a,%s", x);              // BBB(CCCCC^AAAAA):BBBAAAAA
+      emitcode ("xch", "a,%s", x);              // BBBAAAAA:BBB(CCCCC^AAAAA)
+      emitcode ("anl", "a,#!constbyte", mask);  // 000AAAAA:BBB(CCCCC^AAAAA)
+      emitcode ("xch", "a,%s", x);              // BBB(CCCCC^AAAAA):000AAAAA
+      emitcode ("xrl", "a,%s", x);              // BBBCCCCC:000AAAAA
+      emitcode ("xch", "a,%s", x);              // 000SAAAA:BBBCCCCC
       emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
-      emitcode ("orl", "a,#!constbyte", (unsigned char) ~SRMask[shCount]);  // 111AAAAA:BBBCCCCC
-
+      mask = ~SRMask[shCount];
+      emitcode ("orl", "a,#!constbyte", mask);  // 111AAAAA:BBBCCCCC
       emitLabel (tlbl);
-      break;                    // SSSSAAAA:BBBCCCCC
-
-    case 6:                    // AABBBBBB:CCDDDDDD
-
+      break;                                    // SSSSAAAA:BBBCCCCC
+    case 6:                                     // AABBBBBB:CCDDDDDD
       tlbl = newiTempLabel (NULL);
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // ABBBBBBC:CDDDDDDA
-
+      AccAXLrl1 (x);                            // ABBBBBBC:CDDDDDDA
       emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // BBBBBBCC:DDDDDDAA
-
-      emitcode ("xch", "a,%s", x);      // DDDDDDAA:BBBBBBCC
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 000000AA:BBBBBBCC
-
+      AccAXLrl1 (x);                            // BBBBBBCC:DDDDDDAA
+      emitcode ("xch", "a,%s", x);              // DDDDDDAA:BBBBBBCC
+      emitcode ("anl", "a,#!constbyte", mask);  // 000000AA:BBBBBBCC
       emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
-      emitcode ("orl", "a,#!constbyte", (unsigned char) ~SRMask[shCount]);  // 111111AA:BBBBBBCC
-
+      mask = ~SRMask[shCount];
+      emitcode ("orl", "a,#!constbyte", mask);  // 111111AA:BBBBBBCC
       emitLabel (tlbl);
       break;
-    case 7:                    // ABBBBBBB:CDDDDDDD
-
+    case 7:                                     // ABBBBBBB:CDDDDDDD
       tlbl = newiTempLabel (NULL);
-      emitcode ("mov", "c,acc.7");      // c = A
-
-      AccAXLrl1 (x);            // BBBBBBBC:DDDDDDDA
-
-      emitcode ("xch", "a,%s", x);      // DDDDDDDA:BBBBBBCC
-
-      emitcode ("anl", "a,#!constbyte", SRMask[shCount]);   // 0000000A:BBBBBBBC
-
+      emitcode ("mov", "c,acc.7");              // c = A
+      AccAXLrl1 (x);                            // BBBBBBBC:DDDDDDDA
+      emitcode ("xch", "a,%s", x);              // DDDDDDDA:BBBBBBCC
+      emitcode ("anl", "a,#!constbyte", mask);  // 0000000A:BBBBBBBC
       emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
-      emitcode ("orl", "a,#!constbyte", (unsigned char) ~SRMask[shCount]);  // 1111111A:BBBBBBBC
-
+      mask = ~SRMask[shCount];
+      emitcode ("orl", "a,#!constbyte", mask);  // 1111111A:BBBBBBBC
       emitLabel (tlbl);
       break;
     default:
@@ -8830,7 +8769,6 @@ shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int sh
     }
 }
 
-
 /*-----------------------------------------------------------------*/
 /* shiftR2Left2Result - shift right two bytes from left to result  */
 /*-----------------------------------------------------------------*/
@@ -8879,9 +8817,9 @@ shiftR2Left2Result (operand * left, int offl, operand * result, int offr, int sh
     aopPut (result, "a", offr + MSB16);
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 /* shiftLLeftOrResult - shift left one byte from left, or to result */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 static void
 shiftLLeftOrResult (operand * left, int offl, operand * result, int offr, int shCount)
 {
@@ -9141,14 +9079,14 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
   int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
-  D (emitcode (";", "genLeftShiftLiteral"));
+  size = getSize (operandType (result));
+
+  D (emitcode (";", "genLeftShiftLiteral (%d), size %d", shCount, size));
 
   freeAsmop (right, NULL, ic, TRUE);
 
   aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);
-
-  size = getSize (operandType (result));
 
 #if VIEW_SIZE
   emitcode ("; shift left ", "result %d, left %d", size, AOP_SIZE (left));
@@ -9184,6 +9122,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
         case 4:
           genlshFour (result, left, shCount);
           break;
+
         default:
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
           break;
@@ -9223,12 +9162,23 @@ genLeftShift (iCode * ic)
   /* shift count is unknown then we have to form
      a loop get the loop count in B : Note: we take
      only the lower order byte since shifting
-     more that 32 bits make no sense anyway, ( the
+     more that 32 bits makes no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
 
   pushedB = pushB ();
-  MOVB (aopGet (right, 0, FALSE, FALSE));
-  emitcode ("inc", "b");
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      /* Really should be handled by genLeftShiftLiteral,
+       * but since I'm too lazy to fix that today, at least we can make
+       * some small improvement.
+       */
+      emitcode ("mov", "b,#!constbyte", ((int) ulFromVal (AOP (right)->aopu.aop_lit)) + 1);
+    }
+  else
+    {
+      MOVB (aopGet (right, 0, FALSE, FALSE));
+      emitcode ("inc", "b");
+    }
   freeAsmop (right, NULL, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);
@@ -9329,7 +9279,9 @@ genrshTwo (operand * result, operand * left, int shCount, int sign)
 
   /*  1 <= shCount <= 7 */
   else
-    shiftR2Left2Result (left, LSB, result, LSB, shCount, sign);
+    {
+      shiftR2Left2Result (left, LSB, result, LSB, shCount, sign);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -9514,7 +9466,9 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
   int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
-  D (emitcode (";", "genRightShiftLiteral"));
+  size = getSize (operandType (result)); //getDataSize (left);
+
+  D (emitcode (";", "genRightShiftLiteral (%d), size %d", shCount, size));
 
   freeAsmop (right, NULL, ic, TRUE);
 
@@ -9525,7 +9479,6 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
   emitcode ("; shift right ", "result %d, left %d", AOP_SIZE (result), AOP_SIZE (left));
 #endif
 
-  size = getDataSize (left);
   /* test the LEFT size !!! */
 
   /* I suppose that the left size >= result size */
@@ -9559,6 +9512,7 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
         case 4:
           genrshFour (result, left, shCount, sign);
           break;
+
         default:
           break;
         }
@@ -9601,8 +9555,19 @@ genSignedRightShift (iCode * ic)
      largest size of an object can be only 32 bits ) */
 
   pushedB = pushB ();
-  MOVB (aopGet (right, 0, FALSE, FALSE));
-  emitcode ("inc", "b");
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      /* Really should be handled by genRightShiftLiteral,
+       * but since I'm too lazy to fix that today, at least we can make
+       * some small improvement.
+       */
+      emitcode ("mov", "b,#!constbyte", ((int) ulFromVal (AOP (right)->aopu.aop_lit)) + 1);
+    }
+  else
+    {
+      MOVB (aopGet (right, 0, FALSE, FALSE));
+      emitcode ("inc", "b");
+    }
   freeAsmop (right, NULL, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);
@@ -9725,8 +9690,19 @@ genRightShift (iCode * ic)
      largest size of an object can be only 32 bits ) */
 
   pushedB = pushB ();
-  MOVB (aopGet (right, 0, FALSE, FALSE));
-  emitcode ("inc", "b");
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      /* Really should be handled by genRightShiftLiteral,
+       * but since I'm too lazy to fix that today, at least we can make
+       * some small improvement.
+       */
+      emitcode ("mov", "b,#!constbyte", ((int) ulFromVal (AOP (right)->aopu.aop_lit)) + 1);
+    }
+  else
+    {
+      MOVB (aopGet (right, 0, FALSE, FALSE));
+      emitcode ("inc", "b");
+    }
   freeAsmop (right, NULL, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);

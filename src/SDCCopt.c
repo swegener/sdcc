@@ -1673,6 +1673,10 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
                  continue;
 
+              /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
+              if (SPEC_NOUN (type2) == V_BOOL && SPEC_NOUN(type3) != V_BOOL)
+                 continue;
+
               /* Change the first cast to a simple assignment and */
               /* let the second cast do all the work */
               ic->op = '=';

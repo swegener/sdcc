@@ -70,6 +70,8 @@ nounName (sym_link * sl)
       return "label";
     case V_BITFIELD:
       return "bitfield";
+    case V_BBITFIELD:
+      return "_Boolbitfield";
     case V_BIT:
       return "bit";
     case V_SBIT:
@@ -949,6 +951,7 @@ getSize (sym_link * p)
         case V_BIT:
           return BITSIZE;
         case V_BITFIELD:
+        case V_BBITFIELD:
           return ((SPEC_BLEN (p) / 8) + (SPEC_BLEN (p) % 8 ? 1 : 0));
         default:
           return 0;
@@ -1068,6 +1071,7 @@ bitsForType (sym_link * p)
         case V_BIT:
           return 1;
         case V_BITFIELD:
+        case V_BBITFIELD:
           return SPEC_BLEN (p);
         default:
           return 0;
@@ -1430,7 +1434,7 @@ compStructSize (int su, structdef * sdef)
           SPEC_BUNNAMED (loop->etype) = loop->bitUnnamed;
 
           /* change it to a unsigned bit */
-          SPEC_NOUN (loop->etype) = V_BITFIELD;
+          SPEC_NOUN (loop->etype) = SPEC_NOUN(loop->etype) == V_BOOL ? V_BBITFIELD : V_BITFIELD;
           /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
           /* a "plain" int bitfield is unsigned */
           if (!loop->etype->select.s.b_signed)
@@ -1762,7 +1766,8 @@ checkSClass (symbol * sym, int isProto)
   if ((IS_ARRAY (sym->type) || IS_PTR (sym->type)) &&
       !IS_FUNCPTR (sym->type) &&
       (SPEC_NOUN (sym->etype) == V_BIT ||
-       SPEC_NOUN (sym->etype) == V_SBIT || SPEC_NOUN (sym->etype) == V_BITFIELD || SPEC_SCLS (sym->etype) == S_SFR))
+       SPEC_NOUN (sym->etype) == V_SBIT || SPEC_NOUN (sym->etype) == V_BITFIELD || SPEC_NOUN (sym->etype) == V_BBITFIELD ||
+       SPEC_SCLS (sym->etype) == S_SFR))
     werror (E_BIT_ARRAY, sym->name);
 
   /* if this is a bit|sbit then set length & start  */
@@ -2360,6 +2365,9 @@ compareType (sym_link * dest, sym_link * src)
     return -1;
 
   if (SPEC_NOUN (dest) != V_VOID && SPEC_NOUN (src) == V_VOID)
+    return -1;
+
+  if (SPEC_NOUN (src) == V_BBITFIELD && SPEC_NOUN (dest) != V_BBITFIELD || SPEC_NOUN (src) != V_BBITFIELD && SPEC_NOUN (dest) == V_BBITFIELD)
     return -1;
 
   /* if they are both bitfields then if the lengths
@@ -3259,6 +3267,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_printf (dbuf, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
               break;
 
+            case V_BBITFIELD:
+              dbuf_printf (dbuf, "_Boolbitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+              break;
+
             case V_DOUBLE:
               dbuf_append_str (dbuf, "double");
               break;
@@ -3526,6 +3538,10 @@ printTypeChainRaw (sym_link * start, FILE * of)
 
             case V_BITFIELD:
               fprintf (of, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+              break;
+
+            case V_BBITFIELD:
+              fprintf (of, "_Boolbitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
               break;
 
             case V_DOUBLE:

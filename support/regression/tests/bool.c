@@ -35,15 +35,27 @@
   {
     bool b;
   };
+
+  struct
+  {
+    bool b : 1;
+  } s2;
 #endif
 
 void
 testBool(void)
 {
+	volatile unsigned char z = 2;
+
 #if (__SDCC_WEIRD_BOOL == 0)
 	ASSERT(true);
 	ASSERT((*(pa[0]))() == true);
 	ASSERT((*(pa[1]))() == false);
+
+	s2.b = (z & 2);
+	ASSERT(s2.b);
+	s2.b = (bool)(z & 2);
+	ASSERT(s2.b);
 #endif
 
 #if (__SDCC_WEIRD_BOOL < 2)

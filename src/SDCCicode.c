@@ -1924,7 +1924,7 @@ checkPtrQualifiers (sym_link * ltype, sym_link * rtype)
 /* geniCodeCast - changes the value from one type to another       */
 /*-----------------------------------------------------------------*/
 static operand *
-geniCodeCast (sym_link * type, operand * op, bool implicit)
+geniCodeCast (sym_link *type, operand *op, bool implicit)
 {
   iCode *ic;
   sym_link *optype;
@@ -1966,6 +1966,11 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       SPEC_SCLS (restype) = SPEC_SCLS (opetype);
       SPEC_OCLS (restype) = SPEC_OCLS (opetype);
     }
+
+  /* Convert cast to _Bool bitfield members to casts to _Bool. */
+  if (SPEC_NOUN (restype) == V_BBITFIELD)
+    SPEC_NOUN (restype) = V_BOOL;
+
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
 }

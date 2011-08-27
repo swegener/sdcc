@@ -114,6 +114,7 @@ typedef enum
   V_LABEL,
   V_BIT,
   V_BITFIELD,
+  V_BBITFIELD,
   V_SBIT,
   V_DOUBLE
 }
@@ -513,14 +514,17 @@ extern sym_link *validateLink (sym_link * l,
                                          x->select.s.noun == V_BITFIELD || \
                                          x->select.s.noun == V_BIT ||  \
                                          x->select.s.noun == V_SBIT ))
-#define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD))
+#define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
+                                         x->select.s.noun == V_BBITFIELD ))
 #define IS_BITVAR(x)     (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
+                                         x->select.s.noun == V_BBITFIELD || \
                                          x->select.s.noun == V_BIT || \
                                          x->select.s.noun == V_SBIT ))
 #define IS_BIT(x)        (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
                                          x->select.s.noun == V_SBIT ))
 #define IS_BOOLEAN(x)    (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
                                          x->select.s.noun == V_SBIT ||   \
+                                         x->select.s.noun == V_BBITFIELD || \
                                          x->select.s.noun == V_BOOL ))
 #define IS_FLOAT(x)      (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
 #define IS_FIXED16X16(x) (IS_SPEC(x) && x->select.s.noun == V_FIXED16X16)

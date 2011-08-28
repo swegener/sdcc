@@ -12,6 +12,19 @@
 	* src/SDCCicode.c:
 	  applied patch #3285611: Workaround gcc 4.6.0 bug with sdcc 3.0.0,
 	  thanks Roy Rankin
+	* support\cpp\libiberty\concat.c, support\cpp\libiberty\filenames.h,
+	  support\cpp\libiberty\hashtab.c, support\cpp\libiberty\vasprintf.c,
+	  support\cpp\libiberty\xmemdup.c, support\cpp\libiberty\hashtab.h,
+	  support\cpp\libiberty\splay-tree.c, support\cpp\libiberty\lbasename.c,
+	  support\cpp\libiberty\splay-tree.h, support\cpp\libiberty\getpwd.c,
+	  support\cpp\libiberty\fopen_unlocked.c, support\cpp\libcpp\directives.c,
+	  support\cpp\libcpp\macro.c, support\cpp\libcpp\files.c,
+	  support\cpp\libcpp\include\cpplib.h, support\cpp\libcpp\include\symtab.h,
+	  support\cpp\libcpp\include\line-map.h, support\cpp\libcpp\init.c,
+	  support\cpp\libcpp\errors.c, support\cpp\libcpp\expr.c,
+	  support\cpp\libcpp\internal.h, support\cpp\libcpp\lex.c,
+	  support\cpp\libcpp\system.h, support\cpp\libcpp\charset.c:
+	  SDCPP synchronized with GCC CPP release version 4.6.1
 
 2011-08-27 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -1,5 +1,5 @@
 /* Map logical line numbers to (source file, line number) pairs.
-   Copyright (C) 2001, 2003, 2004, 2007, 2008, 2009
+   Copyright (C) 2001, 2003, 2004, 2007, 2008, 2009, 2010
    Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify it
@@ -39,8 +39,6 @@ enum lc_reason {LC_ENTER = 0, LC_LEAVE, LC_RENAME, LC_RENAME_VERBATIM};
 typedef unsigned int linenum_type;
 
 /* A logical line/column number, i.e. an "index" into a line_map.  */
-/* Long-term, we want to use this to replace struct location_s (in input.h),
-   and effectively typedef source_location location_t.  */
 typedef unsigned int source_location;
 
 /* Memory allocation function typedef.  Works like xrealloc.  */

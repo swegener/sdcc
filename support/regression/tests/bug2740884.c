@@ -32,13 +32,13 @@ void foo(void) {
 void bar(void) {
   char i;
   for (i = 1; i <= 2; i++)
-    doors[i].Route++;
+    doors[i].Route ++;
 }
 
 void baz(void) {
   char i;
   for (i = 1; i <= 2; i++)
-    doors[i].Route--;
+    doors[i].Route --;
 }
 
 

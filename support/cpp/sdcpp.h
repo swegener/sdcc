@@ -251,8 +251,8 @@ extern int errorcount;
 #define ATTRIBUTE_GCC_CDIAG(m, n) ATTRIBUTE_NONNULL(m)
 #endif
 
-extern bool c_cpp_error (cpp_reader *, int, location_t, unsigned int,
+extern bool c_cpp_error (cpp_reader *, int, int, location_t, unsigned int,
 			 const char *, va_list *)
-     ATTRIBUTE_GCC_CDIAG(5,0);
+     ATTRIBUTE_GCC_CDIAG(6,0);
 
 #endif  /* __SDCPP_H */

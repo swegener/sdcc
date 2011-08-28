@@ -434,9 +434,9 @@ cpp_classify_number (cpp_reader *pfile, const cpp_token *token)
 		                : N_("use of C99 long long integer constant");
 
 	  if (CPP_OPTION (pfile, c99))
-            cpp_warning (pfile, CPP_W_LONG_LONG, message);
+            cpp_warning (pfile, CPP_W_LONG_LONG, "%s", message);
           else
-            cpp_pedwarning (pfile, CPP_W_LONG_LONG, message);
+            cpp_pedwarning (pfile, CPP_W_LONG_LONG, "%s", message);
         }
 
       result |= CPP_N_INTEGER;

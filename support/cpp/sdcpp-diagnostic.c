@@ -99,8 +99,6 @@ print_location (cpp_reader *pfile, source_location line, unsigned int col)
 
       if (lin == 0)
 	fprintf (stderr, "%s:", map->to_file);
-      else if (CPP_OPTION (pfile, show_column) == 0)
-	fprintf (stderr, "%s:%u:", map->to_file, lin);
       else
 	fprintf (stderr, "%s:%u:%u:", map->to_file, lin, col);
 
@@ -119,10 +117,17 @@ print_location (cpp_reader *pfile, source_location line, unsigned int col)
    otherwise.  */
 
 bool
-c_cpp_error (cpp_reader *pfile ATTRIBUTE_UNUSED, int level,
+c_cpp_error (cpp_reader *pfile ATTRIBUTE_UNUSED, int level, int reason ATTRIBUTE_UNUSED,
 	     location_t location, unsigned int column_override,
 	     const char *msg, va_list *ap)
 {
+/* Moved here from cpplib.h */
+/* Extracts a diagnostic level from an int.  */
+#define CPP_DL_EXTRACT(l)       (l & 0xf)
+/* Nonzero if a diagnostic level is one of the warnings.  */
+#define CPP_DL_WARNING_P(l)     (CPP_DL_EXTRACT (l) >= CPP_DL_WARNING \
+                                 && CPP_DL_EXTRACT (l) <= CPP_DL_PEDWARN)
+
   switch (level)
     {
     case CPP_DL_WARNING:

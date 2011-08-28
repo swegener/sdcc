@@ -1,3 +1,12 @@
+2011-08-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/ds390/gptr_cmp.c: new, added
+	* src/ds390/gen.c (loadDptrFromOperand): factored out,
+	  (genFarPointerGet, genCodePointerGet, genGenPointerGet, genFarPointerSet,
+	   genGenPointerSet): use loadDptrFromOperand
+	  (genCmp, gencjneshort): fixed generic pointer comparison
+	* support/regression/tests/genptrs.c: expanded and enabled tests for ds390
+
 2011-08-28 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCicode.c:

@@ -71,7 +71,7 @@ void testPtrs(void)
 	ASSERT (eq(xp0, fp0));
 	ASSERT (eq(xp0, gp0));
 
-#if defined(SDCC_mcs51)
+#if defined(SDCC_mcs51) || defined(SDCC_ds390)
 	ASSERT (neq(xp1, ip1));
 	ASSERT (neq(xp1, pp1));
 	ASSERT (neq(xp1, cp1));
@@ -83,6 +83,12 @@ void testPtrs(void)
 	ASSERT (smaller(xp1, cp1) || greater(xp1, cp1));
 	ASSERT (smaller(xp1, fp1) || greater(xp1, fp1));
 	ASSERT (smaller(xp1, gp2) || greater(xp1, gp2));
+
+	ASSERT (!smaller(xp0, ip0) && !greater(xp0, ip0));
+	ASSERT (!smaller(xp0, pp0) && !greater(xp0, pp0));
+	ASSERT (!smaller(xp0, cp0) && !greater(xp0, cp0));
+	ASSERT (!smaller(xp0, fp0) && !greater(xp0, fp0));
+	ASSERT (!smaller(xp0, gp0) && !greater(xp0, gp0));
 #endif
 
 	ASSERT (eq(cp1, fp1));

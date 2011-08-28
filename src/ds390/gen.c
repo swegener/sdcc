@@ -1994,6 +1994,95 @@ aopPut (operand * result, const char *s, int offset)
 }
 
 /*--------------------------------------------------------------------*/
+/* loadDptrFromOperand - load dptr (and optionally B) from operand op */
+/*--------------------------------------------------------------------*/
+static int
+loadDptrFromOperand (operand * op, bool loadBToo)
+{
+  int dopi = 1;
+
+  /* if the operand is already in dptr
+     then we do nothing else we move the value to dptr */
+  if (AOP_TYPE (op) != AOP_STR && !AOP_INDPTRn (op))
+    {
+      /* if this is rematerializable */
+      if (AOP_TYPE (op) == AOP_IMMD)
+        {
+          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE, NULL));
+          if (loadBToo)
+            {
+              if (AOP (op)->aopu.aop_immd.from_cast_remat)
+                emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE, NULL));
+              else
+                {
+                  wassertl (FALSE, "need pointerCode");
+                  emitcode (";", "mov b,???");
+                  /* genPointerGet and genPointerSet originally did different
+                   ** things for this case. Both seem wrong.
+                   ** from genPointerGet:
+                   **  emitcode ("mov", "b,#%d", pointerCode (retype));
+                   ** from genPointerSet:
+                   **  emitcode ("mov", "b,%s + 1", aopGet (result, 0, TRUE, ANY));
+                   */
+                }
+            }
+        }
+      else if (AOP_TYPE (op) == AOP_LIT)
+        {
+          emitcode ("mov", "dptr,%s", aopGet (op, 0, TRUE, FALSE, NULL));
+          if (loadBToo)
+            emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE, NULL));
+        }
+      else if (AOP_TYPE (op) == AOP_DPTR)
+        {
+          /* we need to get it byte by byte */
+          _startLazyDPSEvaluation ();
+          /* We need to generate a load to DPTR indirect through DPTR. */
+          D (emitcode (";", "genFarPointerGet -- indirection special case."));
+          emitpush (aopGet (op, 0, FALSE, TRUE, NULL));
+          if (loadBToo || options.model == MODEL_FLAT24)
+            {
+              emitpush (aopGet (op, 1, FALSE, TRUE, NULL));
+              if (options.model == MODEL_FLAT24)
+                {
+                  if (loadBToo)
+                    {
+                      emitpush (aopGet (op, 2, FALSE, TRUE, NULL));
+                      emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE, NULL));
+                      emitpop ("dpx");
+                    }
+                  else
+                    {
+                      emitcode ("mov", "dpx,%s", aopGet (op, 2, FALSE, FALSE, NULL));
+                    }
+                }
+              else
+                {
+                  emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE, NULL));
+                }
+              emitpop ("dph");
+            }
+          emitpop ("dpl");
+          _endLazyDPSEvaluation ();
+          dopi = 0;
+        }
+      else
+        {
+          /* we need to get it byte by byte */
+          _startLazyDPSEvaluation ();
+          emitcode ("mov", "dpl,%s", aopGet (op, 0, FALSE, FALSE, NULL));
+          emitcode ("mov", "dph,%s", aopGet (op, 1, FALSE, FALSE, NULL));
+          if (options.model == MODEL_FLAT24)
+            emitcode ("mov", "dpx,%s", aopGet (op, 2, FALSE, FALSE, NULL));
+          if (loadBToo)
+            emitcode ("mov", "b,%s", aopGet (op, AOP_SIZE (op) - 1, FALSE, FALSE, NULL));
+          _endLazyDPSEvaluation ();
+        }
+    }
+  return dopi;
+}
+
+/*--------------------------------------------------------------------*/
 /* reAdjustPreg - points a register back to where it should (coff==0) */
 /*--------------------------------------------------------------------*/
 static void
@@ -6548,6 +6637,19 @@ genCmp (operand * left, operand * right, iCode * ic, iCode * ifx, int sign)
       emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
       emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
     }
+  /* generic pointers require special handling since all NULL pointers must compare equal */
+  else if (opIsGptr (left) || opIsGptr (right))
+    {
+      /* push right */
+      while (offset < GPTRSIZE)
+        {
+          emitpush (aopGet (left, offset++, FALSE, TRUE, NULL));
+        }
+      loadDptrFromOperand (right, TRUE);
+      emitcode ("lcall", "___gptr_cmp");
+      for (offset = 0; offset < GPTRSIZE; offset++)
+        emitpop (NULL);
+    }
   else
     {
       /* subtract right from left if at the
@@ -6556,7 +6658,8 @@ genCmp (operand * left, operand * right, iCode * ic, iCode * ifx, int sign)
       size = max (AOP_SIZE (left), AOP_SIZE (right));
 
       /* if unsigned char cmp with lit, do cjne left,#right,zz */
-      if (size == 1 && !sign && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_STR)
+      if (size == 1 && !sign && AOP_TYPE (right) == AOP_LIT &&
+          AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_STR)
         {
           char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE, NULL));
           symbol *lbl = newiTempLabel (NULL);
@@ -6755,20 +6858,25 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
+  /* generic pointers require special handling since all NULL pointers must compare equal */
   if (opIsGptr (left) || opIsGptr (right))
     {
-      /* We are comparing a generic pointer to something.
-       * Exclude the generic type byte from the comparison.
-       */
-      size--;
-      D (emitcode (";", "cjneshort: generic ptr special case.");
-        );
+      /* push left */
+      while (offset < size)
+        {
+          emitpush (aopGet (left, offset++, FALSE, TRUE, NULL));
+        }
+      loadDptrFromOperand (right, TRUE);
+      emitcode ("lcall", "___gptr_cmp");
+      for (offset = 0; offset < GPTRSIZE; offset++)
+        emitpop (NULL);
+      emitcode ("jnz", "!tlabel", lbl->key + 100);
     }
 
   /* if the right side is a literal then anything goes */
-  if (AOP_TYPE (right) == AOP_LIT &&
-      AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_IMMD &&
-      AOP_TYPE (left) != AOP_STR && AOP_TYPE (left) != AOP_DPTRn)
+  else if (AOP_TYPE (right) == AOP_LIT &&
+           AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_IMMD &&
+           AOP_TYPE (left) != AOP_STR && AOP_TYPE (left) != AOP_DPTRn)
     {
       while (size--)
         {
@@ -6785,7 +6893,8 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
            AOP_TYPE (right) == AOP_DIR ||
            AOP_TYPE (right) == AOP_LIT ||
            AOP_TYPE (right) == AOP_IMMD ||
-           (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) || (IS_AOP_PREG (left) && !IS_AOP_PREG (right)))
+           (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) ||
+           (IS_AOP_PREG (left) && !IS_AOP_PREG (right)))
     {
       while (size--)
         {
@@ -10633,50 +10742,15 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 static void
 genFarPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 {
-  int size, offset, dopi = 1;
+  int size, offset, dopi;
   sym_link *retype = getSpec (operandType (result));
   sym_link *letype = getSpec (operandType (left));
-  D (emitcode (";", "genFarPointerGet");
-    );
+
+  D (emitcode (";", "genFarPointerGet"));
 
   aopOp (left, ic, FALSE, FALSE);
+  dopi = loadDptrFromOperand (left, FALSE);
 
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (left) != AOP_STR && !AOP_INDPTRn (left))
-    {
-      /* if this is rematerializable */
-      if (AOP_TYPE (left) == AOP_IMMD)
-        {
-          emitcode ("mov", "dptr,%s", aopGet (left, 0, TRUE, FALSE, NULL));
-        }
-      else
-        {
-          /* we need to get it byte by byte */
-          _startLazyDPSEvaluation ();
-          if (AOP_TYPE (left) != AOP_DPTR)
-            {
-              emitcode ("mov", "dpl,%s", aopGet (left, 0, FALSE, FALSE, NULL));
-              emitcode ("mov", "dph,%s", aopGet (left, 1, FALSE, FALSE, NULL));
-              if (options.model == MODEL_FLAT24)
-                emitcode ("mov", "dpx,%s", aopGet (left, 2, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              /* We need to generate a load to DPTR indirect through DPTR. */
-              D (emitcode (";", "genFarPointerGet -- indirection special case.");
-                );
-              emitcode ("push", "%s", aopGet (left, 0, FALSE, TRUE, NULL));
-              emitcode ("push", "%s", aopGet (left, 1, FALSE, TRUE, NULL));
-              if (options.model == MODEL_FLAT24)
-                emitcode ("mov", "dpx,%s", aopGet (left, 2, FALSE, FALSE, NULL));
-              emitcode ("pop", "dph");
-              emitcode ("pop", "dpl");
-              dopi = 0;
-            }
-          _endLazyDPSEvaluation ();
-        }
-    }
   /* so dptr now contains the address */
   aopOp (result, ic, FALSE, (AOP_INDPTRn (left) ? FALSE : TRUE));
 
@@ -10774,46 +10848,14 @@ genFarPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 static void
 genCodePointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 {
-  int size, offset, dopi = 1;
+  int size, offset, dopi;
   sym_link *retype = getSpec (operandType (result));
 
-  aopOp (left, ic, FALSE, FALSE);
+  D (emitcode (";", "genCodePointerGet"));
 
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (left) != AOP_STR && !AOP_INDPTRn (left))
-    {
-      /* if this is rematerializable */
-      if (AOP_TYPE (left) == AOP_IMMD)
-        {
-          emitcode ("mov", "dptr,%s", aopGet (left, 0, TRUE, FALSE, NULL));
-        }
-      else
-        {                       /* we need to get it byte by byte */
-          _startLazyDPSEvaluation ();
-          if (AOP_TYPE (left) != AOP_DPTR)
-            {
-              emitcode ("mov", "dpl,%s", aopGet (left, 0, FALSE, FALSE, NULL));
-              emitcode ("mov", "dph,%s", aopGet (left, 1, FALSE, FALSE, NULL));
-              if (options.model == MODEL_FLAT24)
-                emitcode ("mov", "dpx,%s", aopGet (left, 2, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              /* We need to generate a load to DPTR indirect through DPTR. */
-              D (emitcode (";", "gencodePointerGet -- indirection special case.");
-                );
-              emitcode ("push", "%s", aopGet (left, 0, FALSE, TRUE, NULL));
-              emitcode ("push", "%s", aopGet (left, 1, FALSE, TRUE, NULL));
-              if (options.model == MODEL_FLAT24)
-                emitcode ("mov", "dpx,%s", aopGet (left, 2, FALSE, FALSE, NULL));
-              emitcode ("pop", "dph");
-              emitcode ("pop", "dpl");
-              dopi = 0;
-            }
-          _endLazyDPSEvaluation ();
-        }
-    }
+  aopOp (left, ic, FALSE, FALSE);
+  dopi = loadDptrFromOperand (left, FALSE);
+
   /* so dptr now contains the address */
   aopOp (result, ic, FALSE, (AOP_INDPTRn (left) ? FALSE : TRUE));
 
@@ -10922,42 +10964,8 @@ genGenPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
   D (emitcode (";", "genGenPointerGet"));
 
   aopOp (left, ic, FALSE, (IS_OP_RUONLY (left) ? FALSE : TRUE));
-
   pushedB = pushB ();
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (left) != AOP_STR)
-    {
-      /* if this is rematerializable */
-      if (AOP_TYPE (left) == AOP_IMMD)
-        {
-          emitcode ("mov", "dptr,%s", aopGet (left, 0, TRUE, FALSE, NULL));
-          if (AOP (left)->aopu.aop_immd.from_cast_remat)
-            {
-              MOVB (aopGet (left, AOP_SIZE (left) - 1, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              emitcode ("mov", "b,#%d", pointerCode (retype));
-            }
-        }
-      else
-        {                       /* we need to get it byte by byte */
-          _startLazyDPSEvaluation ();
-          emitcode ("mov", "dpl,%s", aopGet (left, 0, FALSE, FALSE, NULL));
-          emitcode ("mov", "dph,%s", aopGet (left, 1, FALSE, FALSE, NULL));
-          if (options.model == MODEL_FLAT24)
-            {
-              emitcode ("mov", "dpx,%s", aopGet (left, 2, FALSE, FALSE, NULL));
-              emitcode ("mov", "b,%s", aopGet (left, 3, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              emitcode ("mov", "b,%s", aopGet (left, 2, FALSE, FALSE, NULL));
-            }
-          _endLazyDPSEvaluation ();
-        }
-    }
+  loadDptrFromOperand (left, TRUE);
 
   /* so dptr-b now contains the address */
   aopOp (result, ic, FALSE, TRUE);
@@ -11454,47 +11462,15 @@ genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 static void
 genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
-  int size, offset, dopi = 1;
+  int size, offset, dopi;
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
+  D (emitcode (";", "genFarPointerSet"));
+
   aopOp (result, ic, FALSE, FALSE);
+  dopi = loadDptrFromOperand (result, FALSE);
 
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (result) != AOP_STR && !AOP_INDPTRn (result))
-    {
-      /* if this is remateriazable */
-      if (AOP_TYPE (result) == AOP_IMMD)
-        emitcode ("mov", "dptr,%s", aopGet (result, 0, TRUE, FALSE, NULL));
-      else
-        {
-          /* we need to get it byte by byte */
-          _startLazyDPSEvaluation ();
-          if (AOP_TYPE (result) != AOP_DPTR)
-            {
-              emitcode ("mov", "dpl,%s", aopGet (result, 0, FALSE, FALSE, NULL));
-              emitcode ("mov", "dph,%s", aopGet (result, 1, FALSE, FALSE, NULL));
-              if (options.model == MODEL_FLAT24)
-                emitcode ("mov", "dpx,%s", aopGet (result, 2, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              /* We need to generate a load to DPTR indirect through DPTR. */
-              D (emitcode (";", "genFarPointerSet -- indirection special case.");
-                );
-
-              emitcode ("push", "%s", aopGet (result, 0, FALSE, TRUE, NULL));
-              emitcode ("push", "%s", aopGet (result, 1, FALSE, TRUE, NULL));
-              if (options.model == MODEL_FLAT24)
-                emitcode ("mov", "dpx,%s", aopGet (result, 2, FALSE, FALSE, NULL));
-              emitcode ("pop", "dph");
-              emitcode ("pop", "dpl");
-              dopi = 0;
-            }
-          _endLazyDPSEvaluation ();
-        }
-    }
   /* so dptr now contains the address */
   aopOp (right, ic, FALSE, (AOP_INDPTRn (result) ? FALSE : TRUE));
 
@@ -11605,41 +11581,9 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   aopOp (result, ic, FALSE, IS_OP_RUONLY (result) ? FALSE : TRUE);
 
   pushedB = pushB ();
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (result) != AOP_STR)
-    {
-      _startLazyDPSEvaluation ();
-      /* if this is rematerializable */
-      if (AOP_TYPE (result) == AOP_IMMD)
-        {
-          emitcode ("mov", "dptr,%s", aopGet (result, 0, TRUE, FALSE, NULL));
-          if (AOP (result)->aopu.aop_immd.from_cast_remat)
-            {
-              MOVB (aopGet (result, AOP_SIZE (result) - 1, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              emitcode ("mov", "b,%s + 1", aopGet (result, 0, TRUE, FALSE, NULL));
-            }
-        }
-      else
-        {                       /* we need to get it byte by byte */
-          emitcode ("mov", "dpl,%s", aopGet (result, 0, FALSE, FALSE, NULL));
-          emitcode ("mov", "dph,%s", aopGet (result, 1, FALSE, FALSE, NULL));
-          if (options.model == MODEL_FLAT24)
-            {
-              emitcode ("mov", "dpx,%s", aopGet (result, 2, FALSE, FALSE, NULL));
-              emitcode ("mov", "b,%s", aopGet (result, 3, FALSE, FALSE, NULL));
-            }
-          else
-            {
-              emitcode ("mov", "b,%s", aopGet (result, 2, FALSE, FALSE, NULL));
-            }
-        }
-      _endLazyDPSEvaluation ();
-    }
-  /* so dptr + b now contains the address */
+  loadDptrFromOperand (result, TRUE);
+
+  /* so dptr-b now contains the address */
   aopOp (right, ic, FALSE, TRUE);
 
   /* if bit then unpack */

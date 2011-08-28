@@ -1128,8 +1128,15 @@ getBuiltinParms (iCode * fic, int *pcount, operand ** parms)
   return ic;
 }
 
+/* This seems to be a GCC 4.6.[12] bug
+ * see http://sourceforge.net/tracker/?func=detail&aid=3285611&group_id=599&atid=300599
+ */
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 6 && (__GNUC_PATCHLEVEL__ == 0 || __GNUC_PATCHLEVEL__ == 1)
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
 /*-----------------------------------------------------------------*/
-/* operandOperation - performs operations on operands             */
+/* operandOperation - performs operations on operands              */
 /*-----------------------------------------------------------------*/
 operand *
 operandOperation (operand * left, operand * right, int op, sym_link * type)
@@ -1383,7 +1390,12 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
 
   return retval;
 }
-
+/* This seems to be a GCC 4.6.[12] bug
+ * see http://sourceforge.net/tracker/?func=detail&aid=3285611&group_id=599&atid=300599
+ */
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 6 && (__GNUC_PATCHLEVEL__ == 0 || __GNUC_PATCHLEVEL__ == 1)
+#pragma GCC pop_options
+#endif
 
 /*-----------------------------------------------------------------*/
 /* isOperandEqual - compares two operand & return 1 if they are =  */
@@ -3431,7 +3443,6 @@ geniCodeFunctionBody (ast * tree, int lvl)
 {
   iCode *ic;
   operand *func;
-  sym_link *fetype;
   char *savefilename;
   int savelineno;
 
@@ -3442,7 +3453,6 @@ geniCodeFunctionBody (ast * tree, int lvl)
   operandKey = 0;
   iCodeKey = 0;
   func = ast2iCode (tree->left, lvl + 1);
-  fetype = getSpec (operandType (func));
 
   savefilename = filename;
   savelineno = lineno;

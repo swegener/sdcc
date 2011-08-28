@@ -1,3 +1,9 @@
+2011-08-28 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCicode.c:
+	  applied patch #3285611: Workaround gcc 4.6.0 bug with sdcc 3.0.0,
+	  thanks Roy Rankin
+
 2011-08-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.h,

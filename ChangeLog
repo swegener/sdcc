@@ -1,3 +1,7 @@
+2011-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/ds390/Makefile.in: added gptr_cmp.rel
+
 2011-08-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/include/stdbool.h,

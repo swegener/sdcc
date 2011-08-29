@@ -13,7 +13,7 @@ override PORTDIR = ../build/ds390
 
 #VERBOSE = --verbose
 
-OBJECTS = tinibios.rel memcpyx.rel  lcd390.rel i2c390.rel rtc390.rel putchar.rel
+OBJECTS = tinibios.rel memcpyx.rel  lcd390.rel i2c390.rel rtc390.rel putchar.rel gptr_cmp.rel
 
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 

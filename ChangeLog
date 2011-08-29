@@ -1,3 +1,9 @@
+2011-08-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/include/stdbool.h,
+	  support/regression/tests/bool.c:
+	  Fixed bug #2939485.
+
 2011-08-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/ds390/gptr_cmp.c: new, added

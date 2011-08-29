@@ -46,7 +46,6 @@
 #else
  /* The ports that have bool */
  #define bool _Bool
- #define BOOL _Bool
  #define __bool_true_false_are_defined 1
 #endif
 

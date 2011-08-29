@@ -48,6 +48,8 @@ testBool(void)
 	volatile unsigned char z = 2;
 
 #if (__SDCC_WEIRD_BOOL == 0)
+	const char *BOOL = "George Boole";
+
 	ASSERT(true);
 	ASSERT((*(pa[0]))() == true);
 	ASSERT((*(pa[1]))() == false);

@@ -1,3 +1,9 @@
+2011-08-29 Borut Razem <borut.razem AT gmail.com>
+
+	* support/cpp/libiberty/getpwd.c: reverted; it was committed by mistake
+	* support/cpp/libcpp/lex.c: disable fast scanner using SSE due to
+	  bug #3400132: fatal error: ../gcc/config/i386/cpuid.h
+
 2011-08-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/ds390/Makefile.in: added gptr_cmp.rel

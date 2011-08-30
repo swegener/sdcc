@@ -1,7 +1,9 @@
 2011-08-30 Borut Razem <borut.razem AT gmail.com>
 
-        * support/cpp/libcpp/lex.c: reverted to revision r6084
-          (before sdcpp 4.6.1 synchronization)
+        * support/cpp/libcpp/lex.c:
+	  reverted to revision r6084 (before sdcpp 4.6.1 synchronization),
+	  partialy re-synchronized with sdcpp 4.6.1
+	* support/cpp/libcpp/macro.c: fixed naked hash handling
 
 2011-08-29 Borut Razem <borut.razem AT gmail.com>
 

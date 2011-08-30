@@ -1,5 +1,5 @@
 /* CPP Library - lexical analysis.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2010
    Free Software Foundation, Inc.
    Contributed by Per Bothner, 1994-95.
    Based on CCCP program by Paul Rubin, June 1986
@@ -306,14 +306,16 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
               && (!in_comment || warn_in_comment (pfile, note)))
             {
               if (CPP_OPTION (pfile, trigraphs))
-                cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
+                cpp_warning_with_line (pfile, CPP_W_TRIGRAPHS,
+                                     pfile->line_table->highest_line, col,
                                      "trigraph ??%c converted to %c",
                                      note->type,
                                      (int) _cpp_trigraph_map[note->type]);
               else
                 {
-                  cpp_error_with_line 
-                    (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
+		  cpp_warning_with_line 
+		    (pfile, CPP_W_TRIGRAPHS,
+                     pfile->line_table->highest_line, col,
                      "trigraph ??%c ignored, use -trigraphs to enable",
                      note->type);
                 }
@@ -410,7 +412,7 @@ _cpp_skip_block_comment (cpp_reader *pfile)
               && cur[0] == '*' && cur[1] != '/')
             {
               buffer->cur = cur;
-              cpp_error_with_line (pfile, CPP_DL_WARNING,
+              cpp_warning_with_line (pfile, CPP_W_COMMENTS,
                                    pfile->line_table->highest_line, CPP_BUF_COL (buffer),
                                    "\"/*\" within comment");
             }
@@ -515,10 +517,10 @@ warn_about_normalization (cpp_reader *pfile,
 
       sz = cpp_spell_token (pfile, token, buf, false) - buf;
       if (NORMALIZE_STATE_RESULT (s) == normalized_C)
-        cpp_error_with_line (pfile, CPP_DL_WARNING, token->src_loc, 0,
+        cpp_warning_with_line (pfile, CPP_W_NORMALIZE, token->src_loc, 0,
                              "`%.*s' is not in NFKC", (int) sz, buf);
       else
-        cpp_error_with_line (pfile, CPP_DL_WARNING, token->src_loc, 0,
+        cpp_warning_with_line (pfile, CPP_W_NORMALIZE, token->src_loc, 0,
                              "`%.*s' is not in NFC", (int) sz, buf);
     }
 }
@@ -600,7 +602,7 @@ lex_identifier_intern (cpp_reader *pfile, const uchar *base)
 
       /* For -Wc++-compat, warn about use of C++ named operators.  */
       if (result->flags & NODE_WARN_OPERATOR)
-        cpp_error (pfile, CPP_DL_WARNING,
+        cpp_warning (pfile, CPP_W_CXX_OPERATOR_NAMES,
                    "identifier \"%s\" is a special operator name in C++",
                    NODE_NAME (result));
     }
@@ -677,7 +679,7 @@ lex_identifier (cpp_reader *pfile, const uchar *base, bool starts_ucn,
 
       /* For -Wc++-compat, warn about use of C++ named operators.  */
       if (result->flags & NODE_WARN_OPERATOR)
-        cpp_error (pfile, CPP_DL_WARNING,
+        cpp_warning (pfile, CPP_W_CXX_OPERATOR_NAMES,
                    "identifier \"%s\" is a special operator name in C++",
                    NODE_NAME (result));
     }
@@ -1198,7 +1200,9 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
                                        raw_prefix_len) == 0
                            && cur[raw_prefix_len+1] == '"')
                     {
-                      cur += raw_prefix_len+2;
+		      BUF_APPEND (")", 1);
+		      base++;
+                      cur += raw_prefix_len + 2;
                       goto break_outer_loop;
                     }
                   else
@@ -1487,7 +1491,7 @@ save_comment (cpp_reader *pfile, cpp_token *token, const unsigned char *from,
               cppchar_t type)
 {
   unsigned char *buffer;
-  unsigned int len, clen;
+  unsigned int len, clen, i;
 
   len = pfile->buffer->cur - from + 1; /* + 1 for the initial '/'.  */
 
@@ -1496,13 +1500,14 @@ save_comment (cpp_reader *pfile, cpp_token *token, const unsigned char *from,
   if (is_vspace (pfile->buffer->cur[-1]))
     len--;
 
-  /* If we are currently in a directive, then we need to store all
+  /* If we are currently in a directive or in argument parsing, then
      C++ comments as C comments internally, and so we need to
      allocate a little extra space in that case.
 
      Note that the only time we encounter a directive here is
      when we are saving comments in a "#define".  */
-  clen = (pfile->state.in_directive && type == '/') ? len + 2 : len;
+  clen = ((pfile->state.in_directive || pfile->state.parsing_args)
+	  && type == '/') ? len + 2 : len;
 
   buffer = _cpp_unaligned_alloc (pfile, clen);
 
@@ -1515,11 +1520,16 @@ save_comment (cpp_reader *pfile, cpp_token *token, const unsigned char *from,
   copy_text_chars (buffer + 1, from, len);
 
   /* Finish conversion to a C comment, if necessary.  */
-  if (pfile->state.in_directive && type == '/')
+  if ((pfile->state.in_directive || pfile->state.parsing_args) && type == '/')
     {
       buffer[1] = '*';
       buffer[clen - 2] = '*';
       buffer[clen - 1] = '/';
+      /* As there can be in a C++ comments illegal sequences for C comments
+         we need to filter them out.  */
+      for (i = 2; i < (clen - 2); i++)
+        if (buffer[i] == '/' && (buffer[i - 1] == '*' || buffer[i + 1] == '*'))
+          buffer[i] = '|';
     }
 
   /* Finally store this comment for use by clients of libcpp. */
@@ -1952,7 +1962,7 @@ _cpp_lex_direct (cpp_reader *pfile)
             }
 
           if (skip_line_comment (pfile) && CPP_OPTION (pfile, warn_comments))
-            cpp_error (pfile, CPP_DL_WARNING, "multi-line comment");
+	    cpp_warning (pfile, CPP_W_COMMENTS, "multi-line comment");
         }
       else if (c == '=')
         {

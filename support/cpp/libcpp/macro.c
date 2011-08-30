@@ -1747,7 +1747,9 @@ create_iso_definition (cpp_reader *pfile, cpp_macro *macro)
               macro->count--;
             }
           /* Let assembler get away with murder.  */
-	  else if (CPP_OPTION (pfile, lang) != CLK_ASM)
+          /* sdcpp specific: don't complain abuout naked hash */
+          else if ((CPP_OPTION (pfile, lang) != CLK_ASM)
+            && (!CPP_OPTION(pfile, allow_naked_hash)))
             {
               cpp_error (pfile, CPP_DL_ERROR,
                          "'#' is not followed by a macro parameter");

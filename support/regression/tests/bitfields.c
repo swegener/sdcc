@@ -443,9 +443,9 @@ const struct
   unsigned int g;
 } cs = { 1, 2, 345, 6, 2, 1, 54321};
 
-#if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
+#if defined(PORT_HOST) && (defined(__x86_64__) || defined(__i386__)) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
 /* Workaround to fix the (cs.f == 1) test failure, which appeared in svn build 6665, when -O2 gcc option was included.
- * The failure only occurs on Solaris i386 host with gcc 4.6 if -O2 is set. 
+ * The failure only occurs on i386 and x86_64 host architectures with gcc 4.6 if -O2 is set. 
  * This seems like a gcc bug to me. (Borut)
  */
 #pragma GCC push_options

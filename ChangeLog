@@ -1,3 +1,8 @@
+2011-08-30 Borut Razem <borut.razem AT gmail.com>
+
+        * support/cpp/libcpp/lex.c: reverted to revision r6084
+          (before sdcpp 4.6.1 synchronization)
+
 2011-08-29 Borut Razem <borut.razem AT gmail.com>
 
 	* support/cpp/libiberty/getpwd.c: reverted; it was committed by mistake

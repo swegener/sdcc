@@ -35,6 +35,10 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 #define r1      -0.1666665668E+0
 #define r2       0.8333025139E-2
 #define r3      -0.1980741872E-3

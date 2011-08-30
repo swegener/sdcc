@@ -31,6 +31,10 @@
 #include <math.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 float asincosf(const float x, const BOOL isacos);
 
 float acosf(const float x) _FLOAT_FUNC_REENTRANT

@@ -30,6 +30,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 float atof(const char * s)
 {
     float value, fraction;
@@ -93,3 +97,4 @@ float atof(const char * s)
     if(sign) value*=-1.0;
     return (value);
 }
+

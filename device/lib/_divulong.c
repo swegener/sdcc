@@ -33,6 +33,10 @@
 
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)

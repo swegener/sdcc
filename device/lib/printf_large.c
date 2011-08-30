@@ -39,6 +39,10 @@
 #include <stdbool.h>
 #include <sdcc-lib.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 #define PTR value.ptr
 
 #ifdef SDCC_ds390

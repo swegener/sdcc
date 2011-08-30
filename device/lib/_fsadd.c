@@ -32,6 +32,9 @@
 #include <stdbool.h>
 #include <sdcc-lib.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
 
 #ifdef FLOAT_ASM_MCS51
 

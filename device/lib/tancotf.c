@@ -35,6 +35,10 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 #define P0  0.100000000E+1
 #define P1 -0.958017723E-1
 #define Q0  0.100000000E+1

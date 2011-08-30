@@ -32,6 +32,10 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 float tancotf(const float x, const BOOL iscotan);
 
 float cotf(const float x) _FLOAT_FUNC_REENTRANT

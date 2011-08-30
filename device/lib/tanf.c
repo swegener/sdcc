@@ -31,6 +31,10 @@
 #include <math.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
+
 float tancotf(const float x, const BOOL iscotan);
 
 float tanf(const float x) _FLOAT_FUNC_REENTRANT

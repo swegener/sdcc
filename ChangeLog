@@ -1,3 +1,22 @@
+2011-08-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/tancotf.c,
+	  device/lib/acosf.c,
+	  device/lib/sinf.c,
+	  device/lib/asincosf.c,
+	  device/lib/_fsadd.c,
+	  device/lib/asinf.c,
+	  device/lib/printf_large.c,
+	  device/lib/_divulong.c,
+	  device/lib/_atof.c,
+	  device/lib/cotf.c,
+	  device/lib/expf.c,
+	  device/lib/sincosf.c,
+	  device/lib/tanf.c,
+	  device/lib/sincoshf.c,
+	  device/lib/cosf.c:
+	  Use BOOL or _Bool.
+
 2011-08-30 Borut Razem <borut.razem AT gmail.com>
 
 	* support/cpp/libcpp/lex.c:

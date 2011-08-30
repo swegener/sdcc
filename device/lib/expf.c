@@ -36,6 +36,9 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#ifndef BOOL
+#define BOOL _Bool
+#endif
 
 #ifdef MATH_ASM_MCS51
 

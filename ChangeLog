@@ -1,3 +1,8 @@
+2011-08-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp:
+	  Construct conflict graph again instead of trusting the one from sdcc.
+	  
 2011-08-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/tancotf.c,

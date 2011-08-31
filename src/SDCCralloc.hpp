@@ -349,6 +349,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
       add_operand_conflicts_in_node(cfg[key_to_index[ic->key]], con);
     }
 
+#if 0
   // Get conflict graph from sdcc
   for (var_t i = 0; static_cast<boost::graph_traits<cfg_t>::vertices_size_type>(i) < num_vertices(con); i++)
     {
@@ -363,6 +364,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
               boost::add_edge(i, sym_to_index[std::pair<int, reg_t>(j, k)], con);
           }
     }
+#endif
 
   // Check for unconnected live ranges, some might have survived dead code elimination.
   // Todo: Improve efficiency, e.g. using subgraph or filtered_graph.
@@ -402,7 +404,38 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             cfg[i].dying.erase(*v);
         }
     }
-
+    
+  // Construct conflict graph
+  for (boost::graph_traits<cfg_t>::vertices_size_type i = 0; i < num_vertices(cfg); i++)
+    {
+      std::set<var_t>::const_iterator v, v_end;
+      const iCode *ic = cfg[i].ic;
+      
+      for (v = cfg[i].alive.begin(), v_end = cfg[i].alive.end(); v != v_end; ++v)
+        {
+          std::set<var_t>::const_iterator v2, v2_end;
+          
+          // Conflict between operands are handled by add_operand_conflicts_in_node().
+          if (cfg[i].dying.find (*v) != cfg[i].dying.end())
+            continue;
+          if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)))
+            {
+              operand_map_t::const_iterator oi, oi_end; 
+              for(boost::tie(oi, oi_end) = cfg[i].operands.equal_range(OP_SYMBOL_CONST(IC_RESULT(ic))->key); oi != oi_end; ++oi)
+                if(oi->second == *v)
+                  goto next_var;
+            }
+          
+          // Here, v is a variable that survives cfg[i].
+          for (v2 = cfg[i].alive.begin(), v2_end = cfg[i].alive.end(); v2 != v2_end; ++v2)
+            if(*v != *v2)
+              boost::add_edge(*v, *v2, con);
+          
+          next_var:
+            ;
+        }
+    }
+  
   return(start_ic);
 }
 

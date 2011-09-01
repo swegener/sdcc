@@ -15,7 +15,10 @@
 2011-09-01 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi:
-	  dont't include readline5.dll in 64bit package
+	  dont't include readline5.dll in 64bit package;
+	  remove libgcc_s_sjlj-1.dll and libstdc++-6.dll on uninstallation;
+	  don't install 64 bit version on 32 bit Windows;
+	  use proper Program Files and registry for 64 bit installation
 	* support/regression/ports/pic14/spec.mk,
 	  support/regression/ports/pic16/spec.mk,
 	  support/regression/ports/hc08/spec.mk,

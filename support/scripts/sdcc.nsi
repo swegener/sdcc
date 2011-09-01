@@ -190,6 +190,7 @@ InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 !include WordFunc.nsh
 !include StrFunc.nsh
 !include WinVer.nsh
+!include x64.nsh
 ${StrStr}
 ${UnStrStr}
 
@@ -281,7 +282,6 @@ ${FunctionEnd}
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 BrandingText ""
 OutFile "setup.exe"
-InstallDir "$PROGRAMFILES\SDCC"
 ;;;;ShowInstDetails show
 ;;;;ShowUnInstDetails show
 
@@ -289,31 +289,37 @@ InstallDir "$PROGRAMFILES\SDCC"
 ${Function} .onInit
   ${DebugMsg} "Pre INSTDIR = $INSTDIR"
 
+  ${If} ${RunningX64}
+    StrCpy $INSTDIR "$PROGRAMFILES64\${PRODUCT_NAME}"
+    SetRegView 64
+  ${Else}
+  !ifdef WIN64
+    MessageBox MB_OK|MB_ICONSTOP \
+      "This installation package is not supported on this platform. Contact your application vendor."
+    Abort
+  !endif
+    StrCpy $INSTDIR "$PROGRAMFILES\${PRODUCT_NAME}"
+  ${Endif}
+
 !ifndef VER_MAJOR & VER_MINOR & VER_REVISION & VER_BUILD
   ; Old unistallation method
   ; Uninstall the old version, if present
   ReadRegStr $R0 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
-  StrCmp $R0 "" inst
+  ${If} $R0 != ""
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+      "$(^Name) is already installed. $\n$\nClick 'OK' to remove the previous version or 'Cancel' to cancel this upgrade." \
+      IDOK +2
+    Abort
 
-  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-  "$(^Name) is already installed. $\n$\nClick 'OK' to remove the \
-  previous version or 'Cancel' to cancel this upgrade." \
-  IDOK uninst
-  Abort
-
-uninst:
-  ; Run the uninstaller
-  ClearErrors
-  ExecWait '$R0'
-
-  Goto done
-inst:
-
-  ; Install the new version
-  MessageBox MB_YESNO|MB_ICONQUESTION "This will install $(^Name). Do you wish to continue?" IDYES +2
-  Abort
-
-done:
+    ; Run the uninstaller
+    ClearErrors
+    ExecWait '$R0'
+  ${Else}
+    ; Install the new version
+    MessageBox MB_YESNO|MB_ICONQUESTION "This will install $(^Name). Do you wish to continue?" \
+      IDYES +2
+    Abort
+  ${Endif}
 !else
   ; If the registry key exists it is an uninstallation or reinstallation:
   ;  take the old installation directory
@@ -331,8 +337,11 @@ done:
 ${FunctionEnd}
 
 ${Function} un.onInit
-
   ${DebugMsg} "Pre INSTDIR = $INSTDIR"
+
+  ${If} ${RunningX64}
+    SetRegView 64
+  ${Endif}
 
   Push $R0
   ReadRegStr $R0 ${UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallLocation"
@@ -929,7 +938,12 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdcclib.exe"
   Delete "$INSTDIR\bin\sdcpp.exe"
   Delete "$INSTDIR\bin\as2gbmap.cmd"
+!ifdef WIN64
+  Delete "$INSTDIR\bin\libgcc_s_sjlj-1.dll"
+  Delete "$INSTDIR\bin\libstdc++-6.dll"
+!else
   Delete "$INSTDIR\bin\readline5.dll"
+!endif
 
 
   Delete "$INSTDIR\bin\s51.exe"

@@ -638,7 +638,7 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
       if (*var=='@')
         return FALSE;
     }
-  if (TARGET_IS_Z80 || TARGET_IS_GBZ80)
+  if (TARGET_Z80_LIKE)
     {
       if (strstr(var,"(bc)"))
         return FALSE;

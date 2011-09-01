@@ -2094,7 +2094,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
             {
             case ':':
               /* Currently only the Z80 really supports _Bool */
-              if (!TARGET_IS_Z80)
+              if (!TARGET_Z80_LIKE)
                 break;
               /* Avoid unnecessary cast to _Bool if both operands are _Bool */
               if ((IS_BOOL (etype1) || (IS_LITERAL (etype1) &&

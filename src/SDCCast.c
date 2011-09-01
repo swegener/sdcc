@@ -3074,7 +3074,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       p = newLink (DECLARATOR);
       /* if bit field then error */
-      if (IS_BITFIELD (tree->left->etype) || (IS_BITVAR (tree->left->etype) && !TARGET_Z80_LIKE))
+      if (IS_BITFIELD (tree->left->etype) || (IS_BITVAR (tree->left->etype) && !(TARGET_Z80_LIKE || TARGET_IS_HC08)))
         {
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of bit variable");
           goto errorTreeReturn;

@@ -1,4 +1,12 @@
-2011-08-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-09-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.c,
+	  src/hc08/gen.c,
+	  src/SDCCast.c,
+	  device/include/stdbool.h:
+	  _Bool / bool for hc08.
+
+2011-08-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCsymt.c,
 	  src/SDCCpeeph.c:

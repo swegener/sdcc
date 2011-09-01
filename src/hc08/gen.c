@@ -8023,6 +8023,13 @@ genCast (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, FALSE);
 
+  if (IS_BOOL (operandType (result)))
+    {
+      asmopToBool (AOP (right), true);
+      storeRegToAop (hc08_reg_a, AOP (result), 0);
+      goto release;
+    }
+
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {

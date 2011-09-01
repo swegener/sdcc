@@ -32,7 +32,7 @@
 #define true 1
 #define false 0
 
-#if defined (SDCC_hc08) || defined (SDCC_pic14) || defined (SDCC_pic16)
+#if defined (SDCC_pic14) || defined (SDCC_pic16)
  /* The ports that don't have anything worthy of being bool */
  #define BOOL char
  #define __SDCC_WEIRD_BOOL 2

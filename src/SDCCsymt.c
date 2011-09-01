@@ -2093,8 +2093,8 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
           switch (op)
             {
             case ':':
-              /* Currently only the Z80 really supports _Bool */
-              if (!TARGET_Z80_LIKE)
+              /* Currently only the Z80 and derivatives and the HC08 really supports _Bool */
+              if (!(TARGET_Z80_LIKE || TARGET_IS_HC08))
                 break;
               /* Avoid unnecessary cast to _Bool if both operands are _Bool */
               if ((IS_BOOL (etype1) || (IS_LITERAL (etype1) &&

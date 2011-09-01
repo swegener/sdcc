@@ -2,6 +2,13 @@
 
 	* support/scripts/sdcc.nsi:
 	  dont't include readline5.dll in 64bit package
+	* support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk:
+	  configurable $(WINE)
 
 2011-08-31 Borut Razem <borut.razem AT gmail.com>
 

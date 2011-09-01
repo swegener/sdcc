@@ -11,7 +11,7 @@ else
   S51A = $(top_builddir)/sim/ucsim/s51.src/s51$(EXEEXT)
   S51B = $(top_builddir)/bin/s51$(EXEEXT)
 
-  S51C = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
+  EMU = $(WINE) $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
 ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
@@ -22,12 +22,8 @@ endif
 ifdef CROSSCOMPILING
   DEV_NULL ?= NUL
   SDCCFLAGS += -I$(top_srcdir)
-
-  EMU = wine $(S51C)
 else
   DEV_NULL ?= /dev/null
-
-  EMU = $(S51C)
 endif
 
 SDCCFLAGS += -mds390 --less-pedantic -DREENTRANT=__reentrant -Wl-r

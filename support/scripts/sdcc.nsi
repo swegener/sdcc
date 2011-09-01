@@ -42,7 +42,8 @@
 #   <SDCC_VER_MAJOR> = 2
 #   <SDCC_VER_MINOR> = 7
 #   <SDCC_VER_DEVEL> = 4
-#   replace <SDCC_REVISION> with the current svn revision number
+#   replace <SDCC_REVISION> with the current svn revision number.
+#   Define -DWIN64 if createing a 64bit package.
 # - A setup file setup.exe is created in PKGDIR directory.
 #   Rename it to sdcc-yyyymmdd-rrrr-setup.exe and upload it
 #   to sdcc download repository at sourceforge.net
@@ -69,7 +70,8 @@
 #   <SDCC_VER_MAJOR> = 3
 #   <SDCC_VER_MINOR> = 0
 #   <SDCC_VER_DEVEL> = 0
-#   replace <SDCC_REVISION> with the current svn revision number
+#   replace <SDCC_REVISION> with the current svn revision number.
+#   Define -DWIN64 if createing a 64bit package.
 # - A setup file setup.exe is created in PKGDIR directory.
 #   Rename it to sdcc-x.x.x-setup.exe and upload it
 #   to sdcc download repository at sourceforge.net
@@ -368,10 +370,11 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\sdcclib.exe"
   File "${SDCC_ROOT}\bin\sdcpp.exe"
   File "${SDCC_ROOT}\bin\as2gbmap.cmd"
-  File "${SDCC_ROOT}\bin\readline5.dll"
 !ifdef WIN64
   File "${SDCC_ROOT}\bin\libgcc_s_sjlj-1.dll"
   File "${SDCC_ROOT}\bin\libstdc++-6.dll"
+!else
+  File "${SDCC_ROOT}\bin\readline5.dll"
 !endif
 ${SectionEnd}
 

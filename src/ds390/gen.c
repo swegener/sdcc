@@ -1455,7 +1455,6 @@ aopGetUsesAcc (operand * oper, int offset)
 
   switch (aop->type)
     {
-
     case AOP_R0:
     case AOP_R1:
       if (aop->paged)
@@ -2189,7 +2188,17 @@ toBoolean (operand * oper)
 {
   int size = AOP_SIZE (oper) - 1;
   int offset = 1;
+  bool AccUsed;
+  sym_link *type = operandType (oper);
   bool pushedB;
+
+  /* always need B for float */
+  AccUsed = IS_FLOAT (type);
+
+  while (!AccUsed && size--)
+    {
+      AccUsed |= aopGetUsesAcc (oper, offset++);
+    }
 
   /* The generic part of a generic pointer should
    * not participate in it's truth value.
@@ -2205,23 +2214,27 @@ toBoolean (operand * oper)
     {
       size = AOP_SIZE (oper) - 1;
     }
+
+  offset = 0;
   _startLazyDPSEvaluation ();
-  MOVA (aopGet (oper, 0, FALSE, FALSE, NULL));
-  if (size && AOP_NEEDSACC (oper) && (AOP (oper)->type != AOP_ACC))
+  if (size && AccUsed && (AOP (oper)->type != AOP_ACC))
     {
       pushedB = pushB ();
-      emitcode ("mov", "b,a");
+      MOVB (aopGet (oper, offset++, FALSE, FALSE, NULL));
       while (--size)
         {
           MOVA (aopGet (oper, offset++, FALSE, FALSE, NULL));
           emitcode ("orl", "b,a");
         }
       MOVA (aopGet (oper, offset++, FALSE, FALSE, NULL));
+      if (IS_FLOAT (type))
+        emitcode ("anl", "a,#0x7F");  //clear sign bit
       emitcode ("orl", "a,b");
       popB (pushedB);
     }
   else
     {
+      MOVA (aopGet (oper, offset++, FALSE, FALSE, NULL));
       while (size--)
         {
           emitcode ("orl", "a,%s", aopGet (oper, offset++, FALSE, FALSE, NULL));

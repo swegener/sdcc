@@ -112,6 +112,9 @@ char __fsgt (float a1, float a2)
   fl1.f = a1;
   fl2.f = a2;
 
+  if (((fl1.l | fl2.l) & 0x7FFFFFFF) == 0)
+    return (0);
+
   if (fl1.l<0 && fl2.l<0) {
     if (fl2.l > fl1.l)
       return (1);

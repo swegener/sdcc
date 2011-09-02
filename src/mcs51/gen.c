@@ -1993,8 +1993,12 @@ toBoolean (operand * oper)
 {
   int size = AOP_SIZE (oper) - 1;
   int offset = 1;
-  bool AccUsed = FALSE;
+  bool AccUsed;
+  sym_link *type = operandType (oper);
   bool pushedB;
+
+  /* always need B for float */
+  AccUsed = IS_FLOAT (type);
 
   while (!AccUsed && size--)
     {
@@ -2011,23 +2015,26 @@ toBoolean (operand * oper)
     {
       size = AOP_SIZE (oper) - 1;
     }
-  offset = 1;
-  MOVA (aopGet (oper, 0, FALSE, FALSE));
+
+  offset = 0;
   if (size && AccUsed && (AOP (oper)->type != AOP_ACC))
     {
       pushedB = pushB ();
-      emitcode ("mov", "b,a");
+      MOVB (aopGet (oper, offset++, FALSE, FALSE));
       while (--size)
         {
           MOVA (aopGet (oper, offset++, FALSE, FALSE));
           emitcode ("orl", "b,a");
         }
       MOVA (aopGet (oper, offset++, FALSE, FALSE));
+      if (IS_FLOAT (type))
+        emitcode ("anl", "a,#0x7F");  //clear sign bit
       emitcode ("orl", "a,b");
       popB (pushedB);
     }
   else
     {
+      MOVA (aopGet (oper, offset++, FALSE, FALSE));
       while (size--)
         {
           emitcode ("orl", "a,%s", aopGet (oper, offset++, FALSE, FALSE));

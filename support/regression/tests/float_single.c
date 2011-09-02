@@ -1,6 +1,6 @@
 /** Test of float functions with a single float argument
 
-   func: SINF, SINHF, ASINF, COSF, COSHF, ACOSF, TANF, TANHF, ATANF, SQRTF, EXPF, LOGF, LOG10F, FLOORF, CEILF, FABSF
+   func: SINF, SINHF, ASINF, COSF, COSHF, ACOSF, TANF, TANHF, ATANF, SQRTF, EXPF, LOGF, LOG10F, FLOORF, CEILF, FABSF, NEG
 */
 
 #include <testfwk.h>
@@ -34,6 +34,12 @@ static float
 dummy (float a)
 {
   return a;
+}
+
+static float
+neg (float a)
+{
+  return -a;
 }
 
 typedef float (*float_test_func)(float) __reentrant;
@@ -179,8 +185,7 @@ static const testpoint[] =
     #   else
     { floorf,     1.0+0.000001,           1.0,            TOLERANCE },
     { floorf,     1.0-0.000001,           0.0,            TOLERANCE },
-    //{ floorf,   1.0-0.000001,          -0.0,            TOLERANCE }, /* oops */
-    //{ dummy,    0.0,                   -0.0,            TOLERANCE }, /* oops */
+    { floorf,     1.0-0.000001,          -0.0,            TOLERANCE },
     { floorf,    -1.0+0.000001,          -1.0,            TOLERANCE },
     { floorf,    -1.0-0.000001,          -2.0,            TOLERANCE },
     #   endif
@@ -198,6 +203,17 @@ static const testpoint[] =
     #if FABSF
     { fabsf,     -1.0e-20,                1.0e-20,        TOLERANCE },
     { fabsf,      9999999,                9999999,        TOLERANCE },
+    #endif
+
+
+    #if NEG
+    #   if {func}_DISABLED
+    #       warning {func} disabled
+    { dummy,      0.0,                    0.0,            TOLERANCE },
+    #   else
+    { neg,        0.0,                   -0.0,            TOLERANCE },
+    { dummy,      0.0,                   -0.0,            TOLERANCE },
+    #   endif
     #endif
 
 };
@@ -222,4 +238,3 @@ testFloat (void)
       ASSERT (fabsf (rel_error) < testpoint[i].tolerance);
     }
 }
-

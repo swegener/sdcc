@@ -250,7 +250,7 @@ static struct
   } pairs[NUM_PAIRS];
   struct
   {
-    int last;
+//    int last;
     int pushed;
     int param_offset;
     int offset;
@@ -981,6 +981,7 @@ _emitMove3(asmop *to, int to_offset, asmop *from, int from_offset)
   emit3_o(A_LD, to, to_offset, from, from_offset);
 }
 
+#if 0
 static void
 aopDump(const char *plabel, asmop *aop)
 {
@@ -1009,6 +1010,7 @@ aopDump(const char *plabel, asmop *aop)
       break;
     }
 }
+#endif
 
 static void
 _moveA(const char *moveFrom)
@@ -2912,16 +2914,28 @@ static void
 _toBoolean (const operand *oper, bool needflag)
 {
   int size = AOP_SIZE (oper);
-  int offset = 0;
+  sym_link *type = operandType (oper);
+  int offset = size - 1;
 
-  cheapMove (ASMOP_A, 0, AOP (oper), offset++);
+  cheapMove (ASMOP_A, 0, AOP (oper), offset--);
   if (size > 1)
     {
-      while (--size)
-        emit3_o (A_OR, ASMOP_A, 0, AOP (oper), offset++);
+      if (IS_FLOAT (type))
+        {
+          emit2 ("and a,#0x7F"); //clear sign bit
+          while (--size)
+            emit3_o (A_OR, ASMOP_A, 0, AOP (oper), offset--);
+        }
+      else
+        {
+          while (--size)
+            emit3_o (A_OR, ASMOP_A, 0, AOP (oper), offset--);
+        }
     }
   else if (needflag)
-    emit3 (A_OR, ASMOP_A, ASMOP_A);
+    {
+      emit3 (A_OR, ASMOP_A, ASMOP_A);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -4106,7 +4120,7 @@ genFunction (const iCode * ic)
   _G.calleeSaves.pushedDE = deInUse;
 
   /* adjust the stack for the function */
-  _G.stack.last = sym->stack;
+//  _G.stack.last = sym->stack;
 
   stackParm = FALSE;
   for (sym = setFirstItem (istack->syms); sym;
@@ -6453,7 +6467,6 @@ genAnd (const iCode *ic, iCode * ifx)
                     emit3_o (A_AND, ASMOP_A, 0, AOP (right), offset);
                   cheapMove (AOP (left), offset, ASMOP_A, 0);
                 }
-
             }
           else
             {
@@ -6501,7 +6514,6 @@ genAnd (const iCode *ic, iCode * ifx)
               cheapMove (AOP (result), offset, ASMOP_A, 0);
             }
         }
-
     }
 
 release:

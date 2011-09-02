@@ -2138,135 +2138,143 @@ getDataSize (operand * op)
 static void
 asmopToBool (asmop *aop, bool resultInA)
 {
+  bool isFloat = IS_FLOAT (operandType (AOP_OP (aop)));
   symbol *tlbl, *tlbl1;
   int size = aop->size;
   bool needpula = FALSE;
   bool flagsonly = TRUE;
-  int offset = 0;
-
+  int offset = size - 1;
 
   if (resultInA)
     hc08_freeReg(hc08_reg_a);
 
   switch (aop->type)
     {
-      case AOP_REG:
-        if (IS_AOP_A(aop))
-          {
-            emitcode ("tsta", "");
-            flagsonly = FALSE;
-          }
-        else if (IS_AOP_X(aop))
-            emitcode ("tstx", "");
-        else if (IS_AOP_H(aop))
-          {
-            if (hc08_reg_a->isFree)
-              {
-                transferRegReg (hc08_reg_h,hc08_reg_a, FALSE);
-                emitcode ("tsta", "");
-                flagsonly = FALSE;
-                hc08_freeReg(hc08_reg_a);
-              }
-            else if (hc08_reg_x->isFree)
-              {
-                transferRegReg (hc08_reg_h,hc08_reg_x, FALSE);
-                emitcode ("tstx", "");
-                hc08_freeReg(hc08_reg_x);
-              }
-            else
-              {
-                emitcode ("pshh", "");
-                emitcode ("tst", "1,s");
-                emitcode ("ais", "#1");
-              }
-          }
-        else if (IS_AOP_HX(aop))
+    case AOP_REG:
+      if (IS_AOP_A(aop))
+        {
+          emitcode ("tsta", "");
+          flagsonly = FALSE;
+        }
+      else if (IS_AOP_X(aop))
+        {
+          emitcode ("tstx", "");
+        }
+      else if (IS_AOP_H(aop))
+        {
+          if (hc08_reg_a->isFree)
+            {
+              transferRegReg (hc08_reg_h, hc08_reg_a, FALSE);
+              emitcode ("tsta", "");
+              flagsonly = FALSE;
+              hc08_freeReg(hc08_reg_a);
+            }
+          else if (hc08_reg_x->isFree)
+            {
+              transferRegReg (hc08_reg_h, hc08_reg_x, FALSE);
+              emitcode ("tstx", "");
+              hc08_freeReg(hc08_reg_x);
+            }
+          else
+            {
+              emitcode ("pshh", "");
+              emitcode ("tst", "1,s");
+              emitcode ("ais", "#1");
+            }
+        }
+      else if (IS_AOP_HX(aop))
+        {
           emitcode ("cphx", zero);
-        else if (IS_AOP_XA(aop))
-          {
-            symbol *tlbl = newiTempLabel (NULL);
-            emitcode ("tsta", "");
-            emitcode ("bne", "%05d$", (tlbl->key + 100));
-            emitcode ("tstx", "");
-            emitLabel (tlbl);
-          }
-        else
-          {
-            werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-                    "Bad rIdx in asmToBool");
-            return;
-          }
-        break;
-      case AOP_EXT:
-        if (resultInA)
-          needpula = FALSE;
-        else
-          needpula = pushRegIfUsed (hc08_reg_a);
-        loadRegFromAop (hc08_reg_a, aop, 0);
-        for (offset=1; offset<size; offset++)
-          accopWithAop ("ora", aop, offset);
-        if (needpula)
-          pullReg (hc08_reg_a);
-        else
-          {
-            hc08_freeReg (hc08_reg_a);
-            flagsonly = FALSE;
-          }
-        break;
-      case AOP_LIT:
-        /* Higher levels should optimize this case away but let's be safe */
-        if (ulFromVal (aop->aopu.aop_lit))
-          loadRegFromConst (hc08_reg_a, one);
-        else
-          loadRegFromConst (hc08_reg_a, zero);
-        hc08_freeReg(hc08_reg_a);
-        break;
-      default:
-        if (size==1)
-          {
-            if (resultInA)
-              {
-                loadRegFromAop (hc08_reg_a, aop, 0);
-                hc08_freeReg (hc08_reg_a);
-                flagsonly = FALSE;
-              }
-            else
+        }
+      else if (IS_AOP_XA(aop))
+        {
+          symbol *tlbl = newiTempLabel (NULL);
+          emitcode ("tsta", "");
+          emitcode ("bne", "%05d$", (tlbl->key + 100));
+          emitcode ("tstx", "");
+          emitLabel (tlbl);
+        }
+      else
+        {
+          werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                  "Bad rIdx in asmToBool");
+          return;
+        }
+      break;
+    case AOP_EXT:
+      if (resultInA)
+        needpula = FALSE;
+      else
+        needpula = pushRegIfUsed (hc08_reg_a);
+      loadRegFromAop (hc08_reg_a, aop, offset--);
+      if (isFloat)
+        emitcode ("and", "#0x7F"); //clear sign bit
+      while (--size)
+        accopWithAop ("ora", aop, offset--);
+      if (needpula)
+        pullReg (hc08_reg_a);
+      else
+        {
+          hc08_freeReg (hc08_reg_a);
+          flagsonly = FALSE;
+        }
+      break;
+    case AOP_LIT:
+      /* Higher levels should optimize this case away but let's be safe */
+      if (ulFromVal (aop->aopu.aop_lit))
+        loadRegFromConst (hc08_reg_a, one);
+      else
+        loadRegFromConst (hc08_reg_a, zero);
+      hc08_freeReg(hc08_reg_a);
+      break;
+    default:
+      if (size==1)
+        {
+          if (resultInA)
+            {
+              loadRegFromAop (hc08_reg_a, aop, 0);
+              hc08_freeReg (hc08_reg_a);
+              flagsonly = FALSE;
+            }
+          else
+            emitcode ("tst", "%s", aopAdrStr (aop, 0, FALSE));
+          break;
+        }
+      else if (size==2)
+        {
+          if (hc08_reg_a->isFree)
+            {
+              loadRegFromAop (hc08_reg_a, aop, 0);
+              accopWithAop ("ora", aop, 1);
+              hc08_freeReg (hc08_reg_a);
+              flagsonly = FALSE;
+            }
+          else
+            {
+              tlbl = newiTempLabel (NULL);
               emitcode ("tst", "%s", aopAdrStr (aop, 0, FALSE));
-            break;
-          }
-        else if (size==2)
-          {
-            if (hc08_reg_a->isFree)
-              {
-                loadRegFromAop (hc08_reg_a, aop, 0);
-                accopWithAop ("ora", aop, 1);
-                hc08_freeReg (hc08_reg_a);
-                flagsonly = FALSE;
-              }
-            else
-              {
-                tlbl = newiTempLabel (NULL);
-                emitcode ("tst", "%s", aopAdrStr (aop, 0, FALSE));
-                emitcode ("bne", "%05d$", (tlbl->key + 100));
-                emitcode ("tst", "%s", aopAdrStr (aop, 1, FALSE));
-                emitLabel (tlbl);
-                break;
-              }
-          }
-        else
-          {
-            needpula = pushRegIfUsed (hc08_reg_a);
-            loadRegFromAop (hc08_reg_a, aop, 0);
-            for (offset=1; offset<size; offset++)
-              accopWithAop ("ora", aop, offset);
-            if (needpula)
-              pullReg (hc08_reg_a);
-            else
-              {
-                hc08_freeReg (hc08_reg_a);
-                flagsonly = FALSE;
-              }
-          }
+              emitcode ("bne", "%05d$", (tlbl->key + 100));
+              emitcode ("tst", "%s", aopAdrStr (aop, 1, FALSE));
+              emitLabel (tlbl);
+              break;
+            }
+        }
+      else
+        {
+          needpula = pushRegIfUsed (hc08_reg_a);
+          loadRegFromAop (hc08_reg_a, aop, offset--);
+          if (isFloat)
+            emitcode ("and", "#0x7F");
+          while (--size)
+            accopWithAop ("ora", aop, offset--);
+          if (needpula)
+            pullReg (hc08_reg_a);
+          else
+            {
+              hc08_freeReg (hc08_reg_a);
+              flagsonly = FALSE;
+            }
+        }
     }
 
   if (resultInA)
@@ -8025,7 +8033,7 @@ genCast (iCode * ic)
 
   if (IS_BOOL (operandType (result)))
     {
-      asmopToBool (AOP (right), true);
+      asmopToBool (AOP (right), TRUE);
       storeRegToAop (hc08_reg_a, AOP (result), 0);
       goto release;
     }

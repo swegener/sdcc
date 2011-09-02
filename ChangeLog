@@ -1,3 +1,16 @@
+2011-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_fsgt.c,
+	* device/lib/_fslt.c: test for -0.0
+	* src/ds390/gen.c (toBoolean),
+	* src/hc08/gen.c (asmopToBool),
+	* src/mcs51/gen.c (toBoolean),
+	* src/z80/gen.c (_toBoolean): ignore sign of float,
+	  (aopDump): disabled unused code
+	* support/regression/tests/float_single.c: enabled floorf(1.0-0.000001),
+	  added NEG
+	* support/regression/tests/bug3183823.c: new, added
+
 2011-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/bug3401973.c:
@@ -16,7 +29,7 @@
 	  device/include/stdbool.h:
 	  _Bool / bool for hc08.
 
-2011-08-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-09-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCsymt.c,
 	  src/SDCCpeeph.c:

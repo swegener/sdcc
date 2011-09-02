@@ -1,3 +1,8 @@
+2011-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Use res instead of and to clear sign bit.
+
 2011-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_fsgt.c,

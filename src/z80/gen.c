@@ -2922,7 +2922,8 @@ _toBoolean (const operand *oper, bool needflag)
     {
       if (IS_FLOAT (type))
         {
-          emit2 ("and a,#0x7F"); //clear sign bit
+          emit2 ("res a, 7"); //clear sign bit
+          regalloc_dry_run_cost += 2;
           while (--size)
             emit3_o (A_OR, ASMOP_A, 0, AOP (oper), offset--);
         }

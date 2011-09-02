@@ -1,3 +1,8 @@
+2011-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/bug1723128.c:
+	  Disable failing regression test for hc08.
+
 2011-09-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCsymt.c,

@@ -1,5 +1,10 @@
 2011-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* support/regression/tests/bug3401973.c:
+	  Regression test for bug 3401973.
+
+2011-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/tests/bug1723128.c:
 	  Disable failing regression test for hc08.
 

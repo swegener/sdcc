@@ -52,6 +52,8 @@ void testBug(void)
 {
   unsigned int i;
 
+  i;
+
   gm = 0;
 
   Sub_9000();

@@ -1,3 +1,11 @@
+2011-09-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug3368945.c,
+	* support/regression/tests/bug3381400.c,
+	* support/regression/tests/bug3397636.c: fixed line endings and svn props
+	* support/regression/tests/bug3401973.c: put large struct in large memory
+	* support/regression/tests/bug3403429.c: fixed warnings, explained bug
+
 2011-09-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* tests/bug3403429.c:

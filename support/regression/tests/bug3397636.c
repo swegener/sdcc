@@ -1,5 +1,5 @@
 /*
-   bug33976.c
+   bug3397636.c
 */
 
 #include <testfwk.h>

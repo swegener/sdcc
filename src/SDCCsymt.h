@@ -512,6 +512,7 @@ extern sym_link *validateLink (sym_link * l,
                                          x->select.s.noun == V_BOOL || \
                                          x->select.s.noun == V_CHAR || \
                                          x->select.s.noun == V_BITFIELD || \
+                                         x->select.s.noun == V_BBITFIELD || \
                                          x->select.s.noun == V_BIT ||  \
                                          x->select.s.noun == V_SBIT ))
 #define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \

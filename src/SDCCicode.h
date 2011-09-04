@@ -325,7 +325,7 @@ symbol *newiTempLabel (const char *);
 #define LOOPEXITLBL "loopExitLbl"
 symbol *newiTempLoopHeaderLabel (bool);
 iCode *newiCode (int, operand *, operand *);
-sym_link *operandType (operand *);
+sym_link *operandType (const operand *);
 unsigned int operandSize (operand *);
 operand *operandFromValue (value *);
 operand *operandFromSymbol (symbol *);

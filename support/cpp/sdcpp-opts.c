@@ -604,7 +604,7 @@ sdcpp_common_init (void)
 
   finish_options ();
   preprocess_file (parse_in);
-  return false;
+  return true;
 }
 
 /* Common finish hook for the C, ObjC and C++ front ends.  */

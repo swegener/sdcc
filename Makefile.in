@@ -135,15 +135,15 @@ sdcc-bin: sdcc-cc sdcc-as sdcc-ld sdcc-misc
 
 sdcc-base: sdcc-cc sdcc-as sdcc-ld
 
-# Compiling and installing everything and runing test
-# ---------------------------------------------------
-install:
+# Compiling and installing everything and running test
+# ----------------------------------------------------
+install: checkconf sdcc
 	$(MAKE) -f main.mk install
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg install ;\
 	done
 
-install-tini:
+install-tini: checkconf sdcc
 	$(MAKE) -f main.mk install
 	@for pkg in $(PKGS_TINI); do\
 	  $(MAKE) -C $$pkg install ;\
@@ -225,7 +225,7 @@ installcheck:
 
 # Creating dependencies
 # ---------------------
-dep:
+dep: $(SDCC_LIBS)
 	$(MAKE) -f main.mk dep
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg dep ;\

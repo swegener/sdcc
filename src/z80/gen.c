@@ -299,26 +299,6 @@ static struct
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static const char *aopNames[] = {
-  "AOP_INVALID",
-  "AOP_LIT",
-  "AOP_REG",
-  "AOP_DIR",
-  "AOP_SFR",
-  "AOP_STK",
-  "AOP_IMMD",
-  "AOP_STR",
-  "AOP_CRY",
-  "AOP_IY",
-  "AOP_HL",
-  "AOP_ACC",
-  "AOP_HLREG",
-  "AOP_SIMPLELIT",
-  "AOP_EXSTK",
-  "AOP_PAIRPT",
-  "AOP_DUMMY"
-};
-
 struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
 struct asmop *const ASMOP_A = &asmop_a;
 struct asmop *const ASMOP_B = &asmop_b;
@@ -982,6 +962,26 @@ _emitMove3(asmop *to, int to_offset, asmop *from, int from_offset)
 }
 
 #if 0
+static const char *aopNames[] = {
+  "AOP_INVALID",
+  "AOP_LIT",
+  "AOP_REG",
+  "AOP_DIR",
+  "AOP_SFR",
+  "AOP_STK",
+  "AOP_IMMD",
+  "AOP_STR",
+  "AOP_CRY",
+  "AOP_IY",
+  "AOP_HL",
+  "AOP_ACC",
+  "AOP_HLREG",
+  "AOP_SIMPLELIT",
+  "AOP_EXSTK",
+  "AOP_PAIRPT",
+  "AOP_DUMMY"
+};
+
 static void
 aopDump(const char *plabel, asmop *aop)
 {
@@ -9355,6 +9355,7 @@ genArrayInit (iCode * ic)
 }
 #endif
 
+#ifdef UNITY
 static void
 _swap (PAIR_ID one, PAIR_ID two)
 {
@@ -9372,6 +9373,7 @@ _swap (PAIR_ID one, PAIR_ID two)
       emit2 ("ld %s,a", _pairs[two].h);
     }
 }
+#endif
 
 static int
 setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
@@ -9380,7 +9382,10 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
   PAIR_ID dest[3] = {
     PAIR_DE, PAIR_HL, PAIR_BC
   };
-  int i, nunity = 0;
+  int i;
+#ifdef UNITY
+  int nunity = 0;
+#endif
   bool skip[3] = {FALSE, FALSE, FALSE};
   short dstregs[4];
   short srcregs[4];
@@ -9403,7 +9408,7 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
   if (!((unsigned int) ulFromVal (AOP (pparams[2])->aopu.aop_lit)))
     return (0);
 
-#if 1
+#ifndef UNITY
   if(AOP_TYPE (pparams[0]) == AOP_REG)
   {
     srcregs[regparamsize] = AOP (pparams[0])->aopu.aop_reg[0]->rIdx;

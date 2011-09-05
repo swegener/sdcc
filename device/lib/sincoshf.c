@@ -26,6 +26,9 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+/* [1] William James Cody and W.  M.  Waite.  _Software manual for the
+   elementary functions_, Englewood Cliffs, N.J.:Prentice-Hall, 1980. */
+
 /* Version 1.0 - Initial release */
 
 #include <math.h>
@@ -99,4 +102,3 @@ float sincoshf(const float x, const int iscosh)
     }
     return z;
 }
-

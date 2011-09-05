@@ -10,7 +10,6 @@
 
 #include <stdbool.h>
 
-#ifndef SDCC_hc08
 #ifdef __bool_true_false_are_defined
 
 union USUINT {
@@ -30,7 +29,14 @@ typedef struct {
   unsigned char CRC;                         // 10
 } AUTOCAL_CFG;
 
+#ifndef SDCC_hc08
 __code __at (0x8000) AUTOCAL_CFG AutoCal_CFG = {0};
+#else
+/* The "__at (0x8000)" is suppressed on the hc08 to avoid */
+/* overlaying executable code. (hc08 regression test code */
+/* area begins at 0x8000) */
+__code AUTOCAL_CFG AutoCal_CFG = {0};
+#endif
 
 static __code unsigned char crc_table[256] =
 {   0x00,0x2F,0x5E,0x71,0xBC,0x93,0xE2,0xCD,
@@ -91,16 +97,13 @@ NotZero (unsigned int t)
 }
 
 #endif //__bool_true_false_are_defined
-#endif
 
 void
 testBug (void)
 {
-#ifndef SDCC_hc08
 #ifdef __bool_true_false_are_defined
     rx_index = 1;
     ASSERT (VerifyCRC ());
     ASSERT (NotZero (300));
 #endif //__bool_true_false_are_defined
-#endif
 }

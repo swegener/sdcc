@@ -1,3 +1,7 @@
+2011-09-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug1723128.c: fixed bug 3403038
+
 2011-09-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.h,

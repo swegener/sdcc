@@ -2,7 +2,8 @@
 
 	* debugger/mcs51/sdcdb.h, src/SDCCsystem.c, src/pic14/glue.c:
 	  fixed WIN64 warnings: cast from pointer to integer of different size
-	* src/SDCCsystem.c: fixed TRUE and FALSE redefinition
+	* src/SDCCsystem.c: fixed WIN64 TRUE and FALSE redefinition
+	* src/SDCCglobal.c: fixed stack overflow
 
 2011-09-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

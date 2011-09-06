@@ -145,42 +145,42 @@ typedef unsigned char bool;
 
 
 /* general purpose stack related macros */
-#define  STACK_DCL(stack,type,size)                                   \
-         typedef  type  t_##stack   ;                                 \
-         t_##stack   stack[size]    ;                                 \
-         t_##stack   (*p_##stack) = stack;
+#define STACK_DCL(stack, type, size)                                \
+        typedef type t_##stack;                                     \
+        t_##stack stack[size];                                      \
+        t_##stack (*p_##stack) = stack - 1;
 
 /* define extern stack */
-#define EXTERN_STACK_DCL(stack,type,size)                             \
-        typedef type t_##stack     ;                                  \
-        extern t_##stack stack[size] ;                                \
+#define EXTERN_STACK_DCL(stack, type, size)                         \
+        typedef type t_##stack;                                     \
+        extern t_##stack stack[size];                               \
         extern t_##stack *p_##stack;
 
-#define  STACK_EMPTY(stack)     ((p_##stack) <= stack )
-#define  STACK_FULL(stack)      ((p_##stack) >= (stack +              \
-                                sizeof(stack)/sizeof(*stack))         )
+#define STACK_EMPTY(stack)     ((p_##stack) < stack)
+#define STACK_FULL(stack)      ((p_##stack) >= (stack +             \
+                                sizeof(stack) / sizeof(*stack) - 1) )
 
-#define  STACK_PUSH_(stack, x)  (*++p_##stack = (x))
-#define  STACK_POP_(stack)      (*p_##stack--)
+#define STACK_PUSH_(stack, x)  (*++p_##stack = (x))
+#define STACK_POP_(stack)      (*p_##stack--)
 
-#define  STACK_PUSH(stack, x)   (STACK_FULL(stack)                    \
-                                ? (STACK_ERR(1, stack), *p_##stack)   \
-                                : STACK_PUSH_(stack,x)                )
+#define STACK_PUSH(stack, x)   (STACK_FULL(stack)                   \
+                               ? (STACK_ERR(1, stack), *p_##stack)  \
+                               : STACK_PUSH_(stack,x)               )
 
-#define  STACK_POP(stack)       (STACK_EMPTY(stack)                   \
-                                ? (STACK_ERR(-1, stack), *p_##stack)  \
-                                : STACK_POP_(stack)                   )
+#define STACK_POP(stack)       (STACK_EMPTY(stack)                  \
+                               ? (STACK_ERR(-1, stack), *stack)     \
+                               : STACK_POP_(stack)                  )
 
-#define  STACK_PEEK(stack)      (STACK_EMPTY(stack)                   \
-                                ? (STACK_ERR(0, stack), *p_##stack)   \
-                                : *p_##stack                          )
+#define STACK_PEEK(stack)      (STACK_EMPTY(stack)                  \
+                               ? (STACK_ERR(0, stack), *stack)      \
+                               : *p_##stack                         )
 
-#define  STACK_ERR(o, stack)    (fatal(1, E_STACK_VIOLATION, #stack,  \
-                                        (o < 0)                       \
-                                        ? "underflow"                 \
-                                        : (o > 0)                     \
-                                          ? "overflow"                \
-                                          : "empty"))
+#define STACK_ERR(o, stack)    (fatal(1, E_STACK_VIOLATION, #stack, \
+                                       (o < 0)                      \
+                                       ? "underflow"                \
+                                       : (o > 0)                    \
+                                         ? "overflow"               \
+                                         : "empty"))
 
 /* optimization options */
 /*

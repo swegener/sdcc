@@ -103,7 +103,7 @@ typedef short bool;
 
 #define STACK_EMPTY(stack)     ((p_##stack) < stack)
 #define STACK_FULL(stack)      ((p_##stack) >= (stack +                   \
-                               sizeof(stack) / sizeof(*stack))            )
+                               sizeof(stack) / sizeof(*stack) - 1)        )
 
 #define STACK_PUSH_(stack, x)  (*++p_##stack = (x))
 #define STACK_POP_(stack)      (*p_##stack--)

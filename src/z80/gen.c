@@ -3199,7 +3199,7 @@ static void
 genUminus (const iCode *ic)
 {
   int offset, size;
-  sym_link *optype, *rtype;
+  sym_link *optype;
 
   /* assign asmops */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
@@ -3215,7 +3215,6 @@ genUminus (const iCode *ic)
     }
 
   optype = operandType (IC_LEFT (ic));
-  rtype = operandType (IC_RESULT (ic));
 
   /* if float then do float stuff */
   if (IS_FLOAT (optype))
@@ -3270,10 +3269,8 @@ static void
 assignResultValue (operand * oper)
 {
   int size = AOP_SIZE (oper);
-  bool topInA = 0;
 
   wassertl (size <= 4, "Got a result that is bigger than four bytes");
-  topInA = requiresHL (AOP (oper));
 
   if (IS_GB && size == 4 && requiresHL (AOP (oper)))
     {
@@ -4004,6 +4001,7 @@ genFunction (const iCode * ic)
   emit2 ("!functionheader", sym->name);
 
   emitDebug(assignment_optimal ? "; Register assignment is optimal." : "; Register assignment might be sub-optimal.");
+  emitDebug("; Stack space usage: %d bytes.", sym->stack);
 
   if (!IS_STATIC(sym->etype))
     {
@@ -9382,10 +9380,12 @@ setupForMemcpy (const iCode *ic, int nparams, operand **pparams)
   PAIR_ID dest[3] = {
     PAIR_DE, PAIR_HL, PAIR_BC
   };
+
   int i;
 #ifdef UNITY
   int nunity = 0;
 #endif
+
   bool skip[3] = {FALSE, FALSE, FALSE};
   short dstregs[4];
   short srcregs[4];

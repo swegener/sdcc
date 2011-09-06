@@ -945,7 +945,7 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
     size = getSize(my_type);
 
     if (IS_PTR(my_type)) {
-        DEBUGprintf ("(pointer, %d byte) %p\n", size, list ? (void *)(long)list2int(list) : NULL);
+        DEBUGprintf ("(pointer, %d byte) 0x%x\n", size, list ? (unsigned int)list2int(list) : 0);
         emitIvals(oBuf, topsym, list, 0, size);
         return;
     }

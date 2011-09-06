@@ -26,6 +26,8 @@
 /* avoid DATADIR definition clash :-( */
 #undef DATADIR
 #include <windows.h>
+#undef TRUE
+#undef FALSE
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
@@ -424,7 +426,7 @@ sdcc_popen_read (const char *cmd)
   CloseHandle (pi.hThread);
   hProcess = pi.hProcess;
 
-  return fdopen (_open_osfhandle ((long)childIn, _O_RDONLY | _O_TEXT), "rt");
+  return fdopen (_open_osfhandle ((intptr_t)childIn, _O_RDONLY | _O_TEXT), "rt");
 }
 
 /*

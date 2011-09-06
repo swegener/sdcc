@@ -88,68 +88,71 @@ typedef short bool;
  */
 
 /* generalpurpose stack related macros */
-#define  STACK_DCL(stack,type,size)                   \
-         typedef  type  t_##stack   ;                 \
-         t_##stack   stack[size]    ;                 \
-         t_##stack   (*p_##stack) = stack + (size);   \
-         t_##stack   (*w_##stack)   ;
+#define  STACK_DCL(stack, type, size)                                      \
+         typedef type t_##stack;                                           \
+         t_##stack stack[size];                                            \
+         t_##stack *p_##stack = stack - 1;                               \
+         t_##stack *w_##stack;
 
 /* define extern stack */
-#define EXTERN_STACK_DCL(stack,type,size)             \
-        typedef type t_##stack     ;                  \
-        extern t_##stack stack[size] ;                \
-        extern t_##stack *p_##stack;                  \
+#define EXTERN_STACK_DCL(stack, type, size)                                \
+        typedef type t_##stack;                                            \
+        extern t_##stack stack[size];                                      \
+        extern t_##stack *p_##stack;                                       \
         extern t_##stack *w_##stack;
 
-#define  STACK_FULL(stack)    ((p_##stack) <= stack )
-#define  STACK_EMPTY(stack)   ((p_##stack) >= (stack +      \
-                              sizeof(stack)/sizeof(*stack)) )
+#define STACK_EMPTY(stack)     ((p_##stack) < stack)
+#define STACK_FULL(stack)      ((p_##stack) >= (stack +                   \
+                               sizeof(stack) / sizeof(*stack))            )
 
-#define  STACK_PUSH_(stack,x) (*--p_##stack = (x))
-#define  STACK_POP_(stack)    (*p_##stack++)
+#define STACK_PUSH_(stack, x)  (*++p_##stack = (x))
+#define STACK_POP_(stack)      (*p_##stack--)
 
-#define  STACK_PUSH(stack,x)  (STACK_FULL(stack)                  \
-                              ?((t_##stack)(long)(STACK_ERR(1)))  \
-                              : STACK_PUSH_(stack,x)              )
+#define STACK_PUSH(stack, x)   (STACK_FULL(stack)                         \
+                               ? (STACK_ERR(1, stack), *p_##stack)        \
+                               : STACK_PUSH_(stack, x)                    )
 
-#define  STACK_POP(stack)     (STACK_EMPTY(stack)                 \
-                              ?((t_##stack) NULL)  \
-                              : STACK_POP_(stack)                 )
+#define STACK_POP(stack)       (STACK_EMPTY(stack)                        \
+                               ? (STACK_ERR(-1, stack), *stack)           \
+                               : STACK_POP_(stack)                        )
 
-#define  STACK_PEEK(stack)    (STACK_EMPTY(stack)                 \
-                              ?((t_##stack) NULL)                 \
-                              : *p_##stack                        )
+#define STACK_PEEK(stack)      (STACK_EMPTY(stack)                        \
+                               ? (STACK_ERR(0, stack), *stack)            \
+                               : *p_##stack                               )
 
-#define  STACK_PPEEK(stack)    (((p_##stack + 1) >= (stack +      \
-                              sizeof(stack)/sizeof(*stack)))      \
-                              ?((t_##stack) NULL)                 \
-                              : *(p_##stack + 1)                  )
+#define STACK_PPEEK(stack)     (((p_##stack - 1) < stack)                 \
+                               ? (STACK_ERR(0, stack), *stack)            \
+                               : *(p_##stack - 1)                         )
 
-#define  STACK_ERR(o)         ( o                                 \
-                              ? fprintf(stderr,"stack Overflow\n")\
-                              : fprintf(stderr,"stack underflow\n"))
+#define STACK_ERR(o, stack)    (fprintf(stderr, "stack '%s' %s\n",        \
+                                        #stack,                           \
+                                        (o < 0)                           \
+                                        ? "underflow"                     \
+                                        : (o > 0)                         \
+                                          ? "overflow"                    \
+                                          : "empty")                      )
 
-#define  STACK_STARTWALK(stack)   (w_##stack = p_##stack)
+#define STACK_STARTWALK(stack) (w_##stack = p_##stack)
 
-#define  STACK_WALK(stack)    (w_##stack >= (stack + sizeof(stack)/sizeof(*stack)) \
-                               ? NULL : *w_##stack++ )
+#define STACK_WALK(stack)      (w_##stack >= stack                        \
+                               ? NULL : STACK_POP_(stack)                 )
 
 #include "src/SDCCbitv.h"
 
 enum {
     SYM_REC = 1,
-    LNK_REC ,
-    FUNC_REC ,
+    LNK_REC,
+    FUNC_REC,
     STRUCT_REC,
     MOD_REC
 };
 
 enum {
-    FMT_NON =  0,
-    FMT_BIN =  1,
-    FMT_OCT =  2,
-    FMT_DEZ =  3,
-    FMT_HEX =  4
+    FMT_NON = 0,
+    FMT_BIN = 1,
+    FMT_OCT = 2,
+    FMT_DEZ = 3,
+    FMT_HEX = 4
 };
 
 enum { SRC_CMODE = 1, SRC_AMODE };

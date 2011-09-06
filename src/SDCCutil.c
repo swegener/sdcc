@@ -28,6 +28,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#undef TRUE
+#undef FALSE
 #endif
 #include <sys/stat.h>
 #include "dbuf.h"

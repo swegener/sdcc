@@ -1,5 +1,10 @@
 2011-09-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCralloc.hpp:
+	  Connect unconnected live-ranges instead of just spilling.
+
+2011-09-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c:
 	  Minor cleanup from the stack-compact branch.
 

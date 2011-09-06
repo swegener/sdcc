@@ -385,10 +385,10 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
       if (boost::connected_components(cfg2, &component[0]) > 1)
         {
 #ifdef DEBUG_RALLOC_DEC
-          std::cerr << "Non-connected liverange found and spilt:" << con[i].name << "\n";
+          std::cerr << "Non-connected liverange found and globalized:" << con[i].name << "\n";
 #endif
           for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
-            cfg[k].alive./*insert*/erase(i);
+            cfg[k].alive.insert(i);
         }
     }
 

@@ -67,9 +67,13 @@ typedef uintptr_t md5_uintptr;
 #   endif
 #  endif
 # endif
+# ifdef WIN32
+typedef uintptr_t md5_uintptr;
+# else
 /* We have to make a guess about the integer type equivalent in size
    to pointers which should always be correct.  */
 typedef unsigned long int md5_uintptr;
+# endif
 #endif
 
 #ifdef __cplusplus

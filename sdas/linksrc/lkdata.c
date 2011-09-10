@@ -97,6 +97,8 @@ int	lop;		/*	current line number on page
 			 */
 int	pass;		/*	linker pass number
 			 */
+int	pcb;		/*	current bytes per pc word
+			 */
 int	rtcnt;		/*	count of elements in the
 			 *	rtval[] and rtflg[] arrays
 			 */
@@ -105,7 +107,9 @@ a_uint	rtval[NTXT];	/*	data associated with relocation
 int	rtflg[NTXT];	/*	indicates if rtval[] value is
 			 *	to be sent to the output file.
 			 */
-
+int	rterr[NTXT];	/*	indicates if rtval[] value should
+			 *	be flagged as a relocation error.
+			 */
 char	rtbuf[NMAX];	/*	S19/IHX output buffer
 			 */
 			/*	rtbuf[] processing

@@ -516,7 +516,7 @@ a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map,
 		mask = -(1 << (start & 0x1F));
 
 		if (j >= map_size) {
-			fprintf(stderr, "xram internal limit is exceeded for %s; xram size = 0x%06X, address = 0x%06X\n", id, map_size << 5, j << 5);
+			fprintf(stderr, "internal memory limit is exceeded for %s; memory size = 0x%06X, address = 0x%06X\n", id, map_size << 5, start + size - 1);
 		}
 		else {
 			while (i < j) {
@@ -563,7 +563,7 @@ a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  
 	mask = -(1 << (start & 0x1F));
 
 	if (j >= map_size) {
-		fprintf(stderr, "xram internal limit is exceeded for %s; xram size = 0x%06X, address = 0x%06X\n", id, map_size << 5, j << 5);
+		fprintf(stderr, "internal memory limit is exceeded for %s; memory size = 0x%06X, address = 0x%06X\n", id, map_size << 5, start + size - 1);
 	}
 	else {
 		while (i < j) {

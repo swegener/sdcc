@@ -628,18 +628,21 @@ lstarea(struct area *xp)
  *
  *	local variables:
  *		a_uint	cpc		current program counter address in PC increments
+ *		int	cbytes		bytes so far in T line
  *
  *	global variables:
  *		int	a_bytes		T Line Address Bytes
  *		int	hilo		byte order
  *		int	gline		get a line from the LST file
  *					to translate for the RST file
+ *		int	pcb		bytes per instruction word
  *		char	rb[]		read listing file text line
  *		FILE	*rfp		The file handle to the current
  *					output RST file
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
  *		a_uint	rtval[]		relocated data
+ *		int	rterr[]		error flag ???
  *		FILE	*tfp		The file handle to the current
  *					LST file being scanned
  *
@@ -659,6 +662,7 @@ VOID
 lkulist(int i)
 {
 	a_uint cpc;
+	int cbytes;
 
 	/*
 	 * Exit if listing file is not open
@@ -689,9 +693,12 @@ lkulist(int i)
 		 * Line with address and code
 		 */
 		} else {
+			cbytes = 0;
 			for (i=a_bytes; i < rtcnt; i++) {
 				if (rtflg[i]) {
-					lkglist(cpc++, rtval[i] & 0xFF);
+					lkglist(cpc, (int) (rtval[i] & 0xFF), rterr[i]);
+					cbytes += 1;
+					cpc += (cbytes % pcb) ? 0 : 1;
 				}
 			}
 		}
@@ -970,10 +977,11 @@ loop:	if (tfp == NULL)
 	gcntr = 0;
 }
 
-/*)Function	VOID	lkglist(cpc,v)
+/*)Function	VOID	lkglist(cpc,v,err)
  *
  *		int	cpc		current program counter value
  *		int	v		value of byte at this address
+ *		int	err		error flag for this value
  *
  *	The function lkglist() performs the following functions:
  *
@@ -1011,6 +1019,7 @@ loop:	if (tfp == NULL)
  *					output RST file
  *		FILE	*tfp		The file handle to the current
  *					LST file being scanned
+ *		char	*errmsg[]	array of pointers to error strings
  *
  *	functions called:
  *		int	dgt()		lklist.c
@@ -1096,7 +1105,7 @@ ee DDDDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(32)
 */
 
 VOID
-lkglist(a_uint cpc, int v)
+lkglist(a_uint cpc, int v, int err)
 {
 	char str[16];
 	char *afrmt, *frmt;
@@ -1251,6 +1260,19 @@ loop:	if (tfp == NULL)
 		if (dgt(r, &rb[n], m)) {
 			sprintf(str, afrmt, cpc);
 			strncpy(&rb[n], str, m);
+		}
+	}
+	/*
+	 * Output an error line if required
+	 */
+	if (err) {
+		switch(ASxxxx_VERSION) {
+		case 3:
+			fprintf(rfp, "?ASlink-Warning-%s\n", errmsg[err]);
+			break;
+
+		default:
+			break;
 		}
 	}
 	/*

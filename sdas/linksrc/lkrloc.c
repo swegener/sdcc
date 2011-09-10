@@ -323,6 +323,11 @@ relr()
 	 */
 	pc = adw_w(a[aindex]->a_addr, 0);
 
+	/*
+	 * Number of 'bytes' per PC address
+	 */
+	pcb = 1;
+
 	#if 0
 	printf("area %d base address: 0x%x size: 0x%x rtbase: 0x%x\n", aindex,
 		a[aindex]->a_addr, a[aindex]->a_size, rtbase);

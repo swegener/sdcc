@@ -789,6 +789,8 @@ extern	int	lop;		/*	current line number on page
 				 */
 extern	int	pass;		/*	linker pass number
 				 */
+extern	int	pcb;		/*	current bytes per pc word
+				 */
 extern	int	rtcnt;		/*	count of elements in the
 				 *	rtval[] and rtflg[] arrays
 				 */
@@ -796,6 +798,9 @@ extern	a_uint	rtval[];	/*	data associated with relocation
 				 */
 extern	int	rtflg[];	/*	indicates if rtval[] value is
 				 *	to be sent to the output file.
+				 */
+extern	int	rterr[];	/*	indicates if rtval[] value should
+				 *	be flagged as a relocation error.
 				 */
 extern	char	rtbuf[];	/*	S19/IHX output buffer
 				 */
@@ -957,7 +962,7 @@ extern	VOID		slew(struct area *xp);
 extern	VOID		lstarea(struct area *xp);
 extern	VOID		lkulist(int i);
 extern	VOID		lkalist(a_uint cpc);
-extern	VOID		lkglist(a_uint cpc, int v);
+extern	VOID		lkglist(a_uint cpc, int v, int err);
 
 /* lknoice.c */
 extern	VOID		NoICEfopen(void);

@@ -1,3 +1,15 @@
+2011-09-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/aslink.h: added pcb & rterr, modified lkglist
+	* sdas/linksrc/lkarea.c (find_empty_space, allocate_space): changed warnings
+	* sdas/linksrc/lkdata.c: added pcb & rterr
+	* sdas/linksrc/lkeval.c (eval, expr, term): no signed arithmetic,
+	  (term): accept closing quotes	
+	* sdas/linksrc/lklist.c: sync with ASxxxx 5
+	* sdas/linksrc/lkmain.c (link_main): reset a_bytes and hilo to defaults 2,0
+	  fixes bug 3305824	
+	* sdas/linksrc/lkrloc.c (relr): set default pcb
+
 2011-09-09 Borut Razem <borut.razem AT gmail.com>
 
 	* support/cpp/md5.h:

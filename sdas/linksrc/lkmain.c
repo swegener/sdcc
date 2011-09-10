@@ -573,6 +573,8 @@ link_main()
 	case 'D':
 	case 'Q':
 		ASxxxx_VERSION = 3;
+		a_bytes = 2;	/* use default if unspecified */
+		hilo = 0;	/* use default if unspecified */
 		if (c == 'X') { radix = 16; } else
 		if (c == 'D') { radix = 10; } else
 		if (c == 'Q') { radix = 8;  }
@@ -605,6 +607,8 @@ link_main()
 		}
 #ifdef	LONGINT
 		switch(a_bytes) {
+		default:
+			a_bytes = 2;
 		case 2:
 			a_mask = 0x0000FFFFl;
 			s_mask = 0x00008000l;
@@ -617,8 +621,6 @@ link_main()
 			v_mask = 0x007FFFFFl;
 			break;
 
-		default:
-			a_bytes = 4;
 		case 4:
 			a_mask = 0xFFFFFFFFl;
 			s_mask = 0x80000000l;
@@ -627,6 +629,8 @@ link_main()
 			}
 #else
 		switch(a_bytes) {
+		default:
+			a_bytes = 2;
 		case 2:
 			a_mask = 0x0000FFFF;
 			s_mask = 0x00008000;
@@ -639,8 +643,6 @@ link_main()
 			v_mask = 0x007FFFFF;
 			break;
 
-		default:
-			a_bytes = 4;
 		case 4:
 			a_mask = 0xFFFFFFFF;
 			s_mask = 0x80000000;

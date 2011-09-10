@@ -89,7 +89,7 @@ eval(void)
 		c = get();
 	}
 	unget(c);
-	return((n & s_mask) ? n | ~v_mask : n & v_mask);
+	return (n & a_mask);
 }
 
 /*)Function	a_uint	expr(n)
@@ -207,7 +207,7 @@ expr (int n)
 				break;
 			}
 		}
-		v = (v & s_mask) ? v | ~v_mask : v & v_mask;
+		v = (v & a_mask);
 	}
 	unget(c);
 	return(v);
@@ -280,7 +280,10 @@ term(void)
 		return(~expr(100));
 	}
 	if (c == '\'') {
-		return(getmap(-1)&0377);
+		v = getmap(-1)&0377;
+		c = get();
+		if (c != '\'') { unget(c); }
+		return(v);
 	}
 	if (c == '\"') {
 		if (hilo) {
@@ -290,7 +293,9 @@ term(void)
 			v  =  getmap(-1)&0377;
 			v |= (getmap(-1)&0377)<<8;
 		}
-		return((v & s_mask) ? v | ~v_mask : v & v_mask);
+		c = get();
+		if (c != '\"') { unget(c); }
+		return(v & a_mask);
 	}
 	if (c == '>' || c == '<') {
 		v = expr(100);
@@ -338,7 +343,7 @@ term(void)
 			c = get();
 		}
 		unget(c);
-		return((v & s_mask) ? v | ~v_mask : v & v_mask);
+		return(v & a_mask);
 	}
 	if (ctype[c] & LETTER) {
 		getid(id, c);

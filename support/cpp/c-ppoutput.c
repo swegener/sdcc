@@ -166,13 +166,15 @@ scan_translation_unit (cpp_reader *pfile)
                   && cpp_avoid_paste (pfile, print.prev, token))
               || (print.prev == NULL && token->type == CPP_HASH))
             putc (' ', print.outf);
+          if (in_asm && print.source->flags & PREV_NL)
+            fputs ("‡ ", print.outf);
         }
       else
         {
           if (token->flags & PREV_WHITE)
             putc (' ', print.outf);
-          if ((token->flags & IN_ASM) || (in_asm && token->flags & PREV_NL))
-            fputs ("__endasm; __asm ", print.outf);
+          if (in_asm && token->flags & PREV_NL)
+            fputs ("‡ ", print.outf);
         }
 
       avoid_paste = false;

@@ -295,7 +295,7 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
               buffer->next_line = buffer->rlimit;
             }
 
-          ret = in_asm | PREV_NL;
+          ret = PREV_NL;
 
           buffer->line_base = note->pos;
           CPP_INCREMENT_LINE (pfile, 0);
@@ -1917,11 +1917,11 @@ _cpp_lex_direct (cpp_reader *pfile)
               /* Save the _asm block as a token in its own right.  */
               _sdcpp_save_asm (pfile, result, comment_start, result->val.node.node == pfile->spec_nodes.n__asm);
             }
-          in_asm = IN_ASM;
+          result->flags |= ENTER_ASM;
         }
       else if (result->val.node.node == pfile->spec_nodes.n__endasm || result->val.node.node == pfile->spec_nodes.n__endasm1)
         {
-          in_asm = 0;
+          result->flags |= EXIT_ASM;
         }
       /* Convert named operators to their proper types.  */
       else if (result->val.node.node->flags & NODE_OPERATOR)
@@ -2327,6 +2327,11 @@ cpp_type2name (enum cpp_ttype type, unsigned char flags)
 void
 cpp_output_token (const cpp_token *token, FILE *fp)
 {
+  if (token->flags & ENTER_ASM)
+    in_asm++;
+  if (token->flags & EXIT_ASM)
+    in_asm--;
+
   switch (TOKEN_SPELL (token))
     {
     case SPELL_OPERATOR:
@@ -2475,8 +2480,8 @@ cpp_output_line (cpp_reader *pfile, FILE *fp)
       token = cpp_get_token (pfile);
       if (token->flags & PREV_WHITE)
         putc (' ', fp);
-      if ((token->flags & IN_ASM) || (in_asm && token->flags & PREV_NL))
-        fputs ("__endasm; __asm ", fp);
+      if (in_asm && token->flags & PREV_NL)
+        fputs ("‡ ", fp);
     }
 
   putc ('\n', fp);

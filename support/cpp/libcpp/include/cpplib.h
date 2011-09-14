@@ -182,8 +182,9 @@ struct GTY(()) cpp_string {
 #define SP_PREV_WHITE   (1 << 9) /* If whitespace before a ##
                                     operator, or before this token
                                     after a # operator.  */
-#define IN_ASM          (1 <<10) /* inside an __asm __endasm pair.  */
 #define PREV_NL         (1 <<11) /* If a newline before this token.  */
+#define ENTER_ASM       (1 <<12) /* enter an __asm __endasm pair.  */
+#define EXIT_ASM        (1 <<13) /* exit an __asm __endasm pair.  */
 
 /* Specify which field, if any, of the cpp_token union is used.  */
 

@@ -114,9 +114,34 @@ void bug_DS400_ROM (void)
     __endasm;
 }
 
+// macro with other macro
+#define ADDRESS _count
+#define RECURSIVE __asm inc ADDRESS \
+                        inc ADDRESS \
+                  __endasm
+
+void bug3407198 (void)
+{
+	RECURSIVE;
+}
+
+#else
+
+#define RECURSIVE
+
 #endif
+
+__data char count = 0;
+
+// __asm ... __endasm must stay one C statement
+char bug3407279 (char x)
+{
+	if (x)
+		RECURSIVE;
+	return count;
+}
 
 void testBug(void)
 {
-	ASSERT(1);
+	ASSERT(bug3407279(0) == 0);
 }

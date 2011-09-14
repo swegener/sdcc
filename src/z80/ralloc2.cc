@@ -821,6 +821,9 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   if(ic->op == IPUSH)	// todo: More instructions that can use IY.
     return(true);
+    
+  if(ic->op == GET_VALUE_AT_ADDRESS && isOperandInDirSpace(IC_RESULT(ic)))
+    return(false);
 
   if(input_in_IY && !result_in_IY &&
     (ic->op == '=' && !POINTER_SET(ic) ||

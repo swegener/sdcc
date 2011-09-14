@@ -57,10 +57,9 @@ void testBug(void)
   
   buggy_dequeue( );
   
-#ifndef SDCC_z80
   ASSERT( delaying_task_head == 10 );
   ASSERT( delay_next[ 7] == NULL_IDX );
   ASSERT( delay_next[10] == 8 );
   ASSERT( delay_next[ 8] == NULL_IDX );
-#endif
 }
+

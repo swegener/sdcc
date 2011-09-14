@@ -1,5 +1,11 @@
 2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c,
+	  support/regression/tests/bug3401973.c:
+	  Fixed bug #3401973.
+
+2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCopt.c,
 	  support/regression/bug3407632.c:
 	  Fixed bug #3407632.

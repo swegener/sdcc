@@ -1,3 +1,9 @@
+2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c,
+	  support/regression/bug3407632.c:
+	  Fixed bug #3407632.
+
 2011-09-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/aslink.h: added pcb & rterr, modified lkglist

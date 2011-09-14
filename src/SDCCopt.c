@@ -1098,6 +1098,8 @@ miscOpt (eBBlock ** ebbs, int count)
                so in case of IFX the jump logic is inverted for '<' and '<='.
                TODO: The logical negation of the result should be implemeted
                for '<' and '<=' in case when the following instruction is not IFX.
+             Philipp: Added the test for ifx in the second case, too:
+             We want 0 or 1 as a result, the bitwise and won't do, unless we add a cast to bool.
           */
           switch (ic->op)
             {
@@ -1111,7 +1113,9 @@ miscOpt (eBBlock ** ebbs, int count)
                   unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
                   /* Only if the literal value is greater than 255 and a power of 2 */
-                  if (litVal > 255 && isPowerOf2 (litVal))
+                  if (litVal >= 255 &&
+                    (isPowerOf2 (litVal) && (ic->op == '<' || ic->op == GE_OP) ||
+                    isPowerOf2 (litVal + 1) && (ic->op == '>' || ic->op == LE_OP)))
                     {
                       iCode *ic_nxt = ic->next;
 
@@ -1142,6 +1146,7 @@ miscOpt (eBBlock ** ebbs, int count)
                           ++litVal;
                           /* fall through */
                         case GE_OP:
+                            if (ic_nxt && (ic_nxt->op == IFX) && (ic->eBBlockNum == ic_nxt->eBBlockNum))
                             {
                               int AndMaskVal = 0 - litVal;
 

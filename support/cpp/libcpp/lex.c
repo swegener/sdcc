@@ -2481,7 +2481,7 @@ cpp_output_line (cpp_reader *pfile, FILE *fp)
       if (token->flags & PREV_WHITE)
         putc (' ', fp);
       if (in_asm && token->flags & PREV_NL)
-        fputs ("‡ ", fp);
+        fputs ("\x87 ", fp);
     }
 
   putc ('\n', fp);

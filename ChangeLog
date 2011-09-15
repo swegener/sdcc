@@ -1,3 +1,14 @@
+2011-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genInline),
+	* src/hc08/gen.c (genInline),
+	* src/mcs51/gen.c (genInline),
+	* src/pic14/gen.c (genInline),
+	* src/pic16/gen.c (genInline),
+	* src/z80/gen.c (genInline),
+	* support/cpp/c-ppoutput.c (scan_translation_unit),
+	* support/cpp/libcpp/lex.c (cpp_output_line): replaced character by 0x87
+
 2011-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genInline),
@@ -5,13 +16,13 @@
 	* src/mcs51/gen.c (genInline),
 	* src/pic14/gen.c (genInline),
 	* src/pic16/gen.c (genInline),
-	* src/z80/gen.c (genInline): convert '' (0x87) to newline
+	* src/z80/gen.c (genInline): convert (0x87) to newline
 	* support/cpp/libcpp/include/cpplib.h: removed IN_ASM, added ENTER_ASM and
 	  EXIT_ASM
 	* support/cpp/c-ppoutput.c (scan_translation_unit),
 	* support/cpp/libcpp/lex.c (_cpp_process_line_notes, _cpp_lex_direct,
 	  cpp_output_token, cpp_output_line): fixed bugs 3407198 and 3407279 by
-	  inserting  (0x87) for newlines
+	  inserting (0x87) for newlines
 	* support/regression/tests/bug1505956.c: added tests
 
 2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>

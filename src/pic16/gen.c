@@ -6362,7 +6362,7 @@ static void genInline (iCode *ic)
           ++bp;
           break;
 
-        case '‡':
+        case 0x87:
         case '\n':
           inComment = FALSE;
           *bp++ = '\0';

@@ -167,14 +167,14 @@ scan_translation_unit (cpp_reader *pfile)
               || (print.prev == NULL && token->type == CPP_HASH))
             putc (' ', print.outf);
           if (in_asm && print.source->flags & PREV_NL)
-            fputs ("‡ ", print.outf);
+            fputs ("\x87 ", print.outf);
         }
       else
         {
           if (token->flags & PREV_WHITE)
             putc (' ', print.outf);
           if (in_asm && token->flags & PREV_NL)
-            fputs ("‡ ", print.outf);
+            fputs ("\x87 ", print.outf);
         }
 
       avoid_paste = false;

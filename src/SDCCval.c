@@ -2193,13 +2193,8 @@ getNelements (sym_link * type, initList * ilist)
     {
       ast *iast = ilist->init.node;
       value *v = (iast->type == EX_VALUE ? iast->opval.val : NULL);
-      if (!v)
-        {
-          werror (E_CONST_EXPECTED);
-          return 0;
-        }
 
-      if (IS_ARRAY (v->type) && IS_CHAR (v->etype))
+      if (v && IS_ARRAY (v->type) && IS_CHAR (v->etype))
         /* yep, it's a string */
         {
           return DCL_ELEM (v->type);

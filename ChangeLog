@@ -1,5 +1,7 @@
 2011-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCval.c (getNelements): fixed bug 3135551
+	* support/regression/tests/bug3135551.c: new, added
 	* src/ds390/gen.c (genInline),
 	* src/hc08/gen.c (genInline),
 	* src/mcs51/gen.c (genInline),
@@ -7,7 +9,7 @@
 	* src/pic16/gen.c (genInline),
 	* src/z80/gen.c (genInline),
 	* support/cpp/c-ppoutput.c (scan_translation_unit),
-	* support/cpp/libcpp/lex.c (cpp_output_line): replaced character by 0x87
+	* support/cpp/libcpp/lex.c (cpp_output_line): replaced character by '\x87'
 
 2011-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
 

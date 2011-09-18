@@ -19,7 +19,7 @@
 // An optimal, polynomial-time register allocator.
 
 //#define DEBUG_RALLOC_DEC // Uncomment to get debug messages while doing register allocation on the tree decomposition.
-//#define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (m,uch more verbose than the one above).
+//#define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
 
 #include "SDCCralloc.hpp"
 
@@ -724,7 +724,8 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   const i_assignment_t &ia = a.i_assignment;
 
-  //std::cout << "IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+  //if(ic->key == 118)
+//		std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
 
   bool unused_IYL = (ia.registers[REG_IYL][1] < 0);
   bool unused_IYH = (ia.registers[REG_IYH][1] < 0);
@@ -791,7 +792,7 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   std::cout << "IYinst_ok: Assignment: ";
   print_assignment(a);
   std::cout << "\n";
-  std::cout << "IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+  std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
 #endif
 
   if(result_in_IY &&
@@ -831,7 +832,7 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(true);
 
 #if 0
-  if(ia.registers[REG_IYL][1] == 2)
+  if(ic->key == 118)
     {
       std::cout << "Default drop.\n";
       std::cout << "result is pair: " << operand_is_pair(IC_RESULT(ic), a, i, G) << "\n";

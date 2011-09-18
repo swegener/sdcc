@@ -367,6 +367,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 #endif
 
   // Check for unconnected live ranges, some might have survived dead code elimination.
+  // This is essentially a workaround for broken dead code alimination.
   // Todo: Improve efficiency, e.g. using subgraph or filtered_graph.
   // Todo: Split live ranges instead?
   for (var_t i = boost::num_vertices(con) - 1; i >= 0; i--)
@@ -385,10 +386,25 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
       if (boost::connected_components(cfg2, &component[0]) > 1)
         {
 #ifdef DEBUG_RALLOC_DEC
-          std::cerr << "Non-connected liverange found and globalized:" << con[i].name << "\n";
+          std::cerr << "Non-connected liverange found and extended to connected component of the CFG:" << con[i].name << "\n";
 #endif
-          for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
-            cfg[k].alive.insert(i);
+          // Non-connected CFGs shouldn't exist either. Another problem with dead code eliminarion.
+          cfg_sym_t cfg2;
+          boost::copy_graph(cfg, cfg2);
+          std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
+          boost::connected_components(cfg2, &component[0]);
+
+          for (boost::graph_traits<cfg_t>::vertices_size_type j = 0; j < boost::num_vertices(cfg) - 1; j++)
+            {
+              if(cfg[j].alive.find(i) != cfg[j].alive.end())
+                {
+                  for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
+                    {
+                      if(component[j] == component[k])
+                        cfg[k].alive.insert(i);
+                    }
+                }
+            }
         }
     }
 
@@ -735,6 +751,7 @@ void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
       std::set<var_t>::const_iterator oi, oi_end;
       for (oi = old_vars.begin(), oi_end = old_vars.end(); oi != oi_end; ++oi)
         ai->local.erase(*oi);
+
       ai->i_costs.erase(i);
     }
 
@@ -766,7 +783,11 @@ void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
   // Free memory in the std::set<var_t, boost::pool_allocator<var_t> > that live in the assignments in the list.
   //boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(var_t)>::release_memory();
 
-#if 0
+#ifdef DEBUG_RALLOC_DEC
+  std::cout << "Remaining assignments: " << alist.size() << "\n"; std::cout.flush();
+#endif
+
+#ifdef DEBUG_RALLOC_DEC_ASS
   for(ai = alist.begin(); ai != alist.end(); ++ai)
   	print_assignment(*ai);
   std::cout << "\n";

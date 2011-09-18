@@ -1,4 +1,4 @@
-#LyX 2.0.0 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -39,6 +39,7 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
+
 \graphics default
 \paperfontsize default
 \spacing single
@@ -57,12 +58,14 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
+\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
+\author "" 
 \end_header
 
 \begin_body
@@ -2544,6 +2547,26 @@ status collapsed
 \end_inset
 
 -disable-packihx Disables building packihx
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-enable-new-pics Enables support for PIC devices that are not supported
+ by the current 0.13.7 release of gputils, namely 18f[24][3456]k22.
+ Enabling this probably requires gputils to be built from recent SVN sources!
 \begin_inset Newline newline
 \end_inset
 

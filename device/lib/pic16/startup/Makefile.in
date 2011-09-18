@@ -193,6 +193,8 @@ libcrt0iz_a_SOURCES = crt0iz.c
 # Force installation of .o files into $libdir
 crtdir = $(libdir)
 crt_DATA = crt0.o crt0i.o crt0iz.o
+AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
 
 #AM_CFLAGS += --debug-ralloc
@@ -206,11 +208,9 @@ crt_DATA = crt0.o crt0i.o crt0iz.o
 #AM_CFLAGS += --noinduction
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
-AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 \
-	-I$(top_srcdir)/../../non-free/include/pic16 \
-	--fomit-frame-pointer --obanksel=9 --denable-peeps \
-	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
+AM_CFLAGS = --std-c99 --asm="$(CCAS)" --fomit-frame-pointer \
+	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
+	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \
 	-I$(top_srcdir)/../../non-free/include/pic16 -I$(srcdir)
 all: all-am

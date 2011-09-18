@@ -1,8 +1,10 @@
+AM_CPPFLAGS =
+AM_CPPFLAGS += -I.
+AM_CPPFLAGS += -I$(top_srcdir)/../../../include/pic16 -I$(top_srcdir)/../../../non-free/include/pic16
+
 AM_CFLAGS =
 AM_CFLAGS += --std-c99
 AM_CFLAGS += --asm="$(CCAS)"
-AM_CFLAGS += -I.
-AM_CFLAGS += -I$(top_srcdir)/../../../include/pic16 -I$(top_srcdir)/../../../non-free/include/pic16
 ##AM_CFLAGS += -Wa,-q
 
 AM_CFLAGS += --fomit-frame-pointer

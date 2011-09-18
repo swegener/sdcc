@@ -32,6 +32,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+@HAVE_NEW_PICS_TRUE@am__append_1 = libdev18f23k22.a
+@HAVE_NEW_PICS_TRUE@am__append_2 = libdev18f24k22.a
+@HAVE_NEW_PICS_TRUE@am__append_3 = libdev18f25k22.a
+@HAVE_NEW_PICS_TRUE@am__append_4 = libdev18f26k22.a
+@HAVE_NEW_PICS_TRUE@am__append_5 = libdev18f43k22.a
+@HAVE_NEW_PICS_TRUE@am__append_6 = libdev18f44k22.a
+@HAVE_NEW_PICS_TRUE@am__append_7 = libdev18f45k22.a
+@HAVE_NEW_PICS_TRUE@am__append_8 = libdev18f46k22.a
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Makefile.common
 subdir = libdev
@@ -784,30 +792,30 @@ top_srcdir = @top_srcdir@
 lib_LIBRARIES = libdev18f1220.a libdev18f1320.a libdev18f13k50.a \
 	libdev18f14k50.a libdev18f2220.a libdev18f2221.a \
 	libdev18f2320.a libdev18f2321.a libdev18f2331.a \
-	libdev18f23k20.a libdev18f23k22.a libdev18f2410.a \
+	libdev18f23k20.a $(am__append_1) libdev18f2410.a \
 	libdev18f242.a libdev18f2420.a libdev18f2423.a libdev18f2431.a \
 	libdev18f2450.a libdev18f2455.a libdev18f248.a libdev18f2480.a \
 	libdev18f24j10.a libdev18f24j50.a libdev18f24k20.a \
-	libdev18f24k22.a libdev18f2510.a libdev18f2515.a \
-	libdev18f252.a libdev18f2520.a libdev18f2523.a libdev18f2525.a \
+	$(am__append_2) libdev18f2510.a libdev18f2515.a libdev18f252.a \
+	libdev18f2520.a libdev18f2523.a libdev18f2525.a \
 	libdev18f2550.a libdev18f258.a libdev18f2580.a libdev18f2585.a \
 	libdev18f25j10.a libdev18f25j50.a libdev18f25k20.a \
-	libdev18f25k22.a libdev18f2610.a libdev18f2620.a \
+	$(am__append_3) libdev18f2610.a libdev18f2620.a \
 	libdev18f2680.a libdev18f2682.a libdev18f2685.a \
-	libdev18f26j50.a libdev18f26k20.a libdev18f26k22.a \
+	libdev18f26j50.a libdev18f26k20.a $(am__append_4) \
 	libdev18f4220.a libdev18f4221.a libdev18f4320.a \
 	libdev18f4321.a libdev18f4331.a libdev18f43k20.a \
-	libdev18f43k22.a libdev18f4410.a libdev18f442.a \
-	libdev18f4420.a libdev18f4423.a libdev18f4431.a \
-	libdev18f4450.a libdev18f4455.a libdev18f448.a libdev18f4480.a \
+	$(am__append_5) libdev18f4410.a libdev18f442.a libdev18f4420.a \
+	libdev18f4423.a libdev18f4431.a libdev18f4450.a \
+	libdev18f4455.a libdev18f448.a libdev18f4480.a \
 	libdev18f44j10.a libdev18f44j50.a libdev18f44k20.a \
-	libdev18f44k22.a libdev18f4510.a libdev18f4515.a \
-	libdev18f452.a libdev18f4520.a libdev18f4523.a libdev18f4525.a \
+	$(am__append_6) libdev18f4510.a libdev18f4515.a libdev18f452.a \
+	libdev18f4520.a libdev18f4523.a libdev18f4525.a \
 	libdev18f4550.a libdev18f458.a libdev18f4580.a libdev18f4585.a \
 	libdev18f45j10.a libdev18f45j50.a libdev18f45k20.a \
-	libdev18f45k22.a libdev18f4610.a libdev18f4620.a \
+	$(am__append_7) libdev18f4610.a libdev18f4620.a \
 	libdev18f4680.a libdev18f4682.a libdev18f4685.a \
-	libdev18f46j50.a libdev18f46k20.a libdev18f46k22.a \
+	libdev18f46j50.a libdev18f46k20.a $(am__append_8) \
 	libdev18f6520.a libdev18f6527.a libdev18f6585.a \
 	libdev18f65j50.a libdev18f6620.a libdev18f6622.a \
 	libdev18f6627.a libdev18f6680.a libdev18f66j50.a \
@@ -1066,6 +1074,8 @@ libdev18f96j65_a_SOURCES = pic18f96j65.c
 libdev18f96j65_a_CFLAGS = -p18f96j65 $(AM_CFLAGS)
 libdev18f97j60_a_SOURCES = pic18f97j60.c
 libdev18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
+AM_CPPFLAGS = -I. -I$(top_srcdir)/../../../include/pic16 \
+	-I$(top_srcdir)/../../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
 
 #AM_CFLAGS += --debug-ralloc
@@ -1079,11 +1089,9 @@ libdev18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
 #AM_CFLAGS += --noinduction
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
-AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../../include/pic16 \
-	-I$(top_srcdir)/../../../non-free/include/pic16 \
-	--fomit-frame-pointer --obanksel=9 --denable-peeps \
-	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
+AM_CFLAGS = --std-c99 --asm="$(CCAS)" --fomit-frame-pointer \
+	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
+	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../../include/pic16 \
 	-I$(top_srcdir)/../../../non-free/include/pic16 -I$(srcdir)
 all: all-am

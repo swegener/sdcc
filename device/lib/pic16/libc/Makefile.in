@@ -223,6 +223,8 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 	string/strpbrk.c string/strrchr.c string/strspn.c \
 	string/strstr.c string/strtok.c string/strupr.c \
 	utils/cnvfrac.S utils/cnvint.S utils/cvtdec.S
+AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
 
 #AM_CFLAGS += --debug-ralloc
@@ -236,11 +238,9 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 #AM_CFLAGS += --noinduction
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
-AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 \
-	-I$(top_srcdir)/../../non-free/include/pic16 \
-	--fomit-frame-pointer --obanksel=9 --denable-peeps \
-	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
+AM_CFLAGS = --std-c99 --asm="$(CCAS)" --fomit-frame-pointer \
+	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
+	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \
 	-I$(top_srcdir)/../../non-free/include/pic16 -I$(srcdir)
 all: all-am

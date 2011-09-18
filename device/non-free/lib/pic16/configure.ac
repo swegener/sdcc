@@ -32,6 +32,21 @@ AC_ARG_ENABLE(
     [if test "yes" = $enableval; then USE_FLOATS="-DUSE_FLOATS=1"; fi]
 )
 
+NEWPICS=no;
+AC_ARG_ENABLE(
+    [new-pics],
+    AS_HELP_STRING([--enable-new-pics], [Enable use of PIC devices added to gputils after the 0.13.7 release. Requires custom-built gputils obtained from their SVN repository!]),
+    [ case "x$enableval" in
+      xyes) NEWPICS=yes;
+            AC_MSG_NOTICE([Enabling support for PICs from unreleased gputils -- make sure you have up-to-date gputils from SVN.]);;
+      xno) NEWPICS=no;;
+      *) AC_MSG_ERROR([bad value "${enableval}" for --enable-new-pics]);;
+      esac],
+    [ NEWPICS=no ]
+)
+
+AM_CONDITIONAL([HAVE_NEW_PICS], [ test x$NEWPICS = xyes ])
+
 # Checks for programs.
 
 # The default architecture can be selected at configure time by setting the

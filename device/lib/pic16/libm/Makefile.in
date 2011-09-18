@@ -184,6 +184,8 @@ libm18f_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c \
 	ceilf.c cosf.c coshf.c cotf.c errno.c expf.c fabsf.c floorf.c \
 	frexpf.c ldexpf.c log10f.c logf.c modff.c powf.c sincosf.c \
 	sincoshf.c sinf.c sinhf.c sqrtf.c tancotf.c tanf.c tanhf.c
+AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
 
 #AM_CFLAGS += --debug-ralloc
@@ -197,11 +199,9 @@ libm18f_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c \
 #AM_CFLAGS += --noinduction
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
-AM_CFLAGS = --std-c99 --asm="$(CCAS)" -I. \
-	-I$(top_srcdir)/../../include/pic16 \
-	-I$(top_srcdir)/../../non-free/include/pic16 \
-	--fomit-frame-pointer --obanksel=9 --denable-peeps \
-	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
+AM_CFLAGS = --std-c99 --asm="$(CCAS)" --fomit-frame-pointer \
+	--obanksel=9 --denable-peeps --optimize-cmp --optimize-df \
+	--i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \
 	-I$(top_srcdir)/../../non-free/include/pic16 -I$(srcdir)
 all: all-am

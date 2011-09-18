@@ -73,6 +73,7 @@ adc_open(unsigned char channel, unsigned char fosc, sdcc_pcfg_t pcfg, unsigned c
   ADCON1 = (fosc & ADC_TRIGGER) | (config & 0x0f);
   /* ADFM — ACQT<2:0> ADCS<2:0> */
   ADCON2 = (config & ADC_FRM_RJUST) | (fosc & 0x3f);
+  (void)pcfg; /* quieten compiler warning */
 #elif (__SDCC_ADC_STYLE == 1822200)
   ADCON0 = (channel & 0x0f) << 2;
   /* XXX: Should be (pcfg & 0x0f) as VCFG comes from config,

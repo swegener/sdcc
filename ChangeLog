@@ -1,3 +1,10 @@
+2011-09-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (processParms): fixed bugs 3166064 and 3394118
+	* support/regression/tests/bug3166064.c: new, added
+	* .version,
+	* doc/sdccman.lyx: bumped version to 3.0.5
+
 2011-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCval.c (getNelements): fixed bug 3135551

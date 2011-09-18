@@ -3710,6 +3710,8 @@ genFunction (iCode * ic)
 
               for (i = ic; i; i = i->next)
                 {
+                  sym_link *dtype = NULL;
+
                   if (i->op == ENDFUNCTION)
                     {
                       /* we got to the end OK. */
@@ -3718,26 +3720,7 @@ genFunction (iCode * ic)
 
                   if (i->op == CALL)
                     {
-                      sym_link *dtype;
-
                       dtype = operandType (IC_LEFT (i));
-                      if (dtype && FUNC_REGBANK (dtype) != FUNC_REGBANK (sym->type))
-                        {
-                          /* Mark this bank for saving. */
-                          if (FUNC_REGBANK (dtype) >= MAX_REGISTER_BANKS)
-                            {
-                              werror (E_NO_SUCH_BANK, FUNC_REGBANK (dtype));
-                            }
-                          else
-                            {
-                              banksToSave |= (1 << FUNC_REGBANK (dtype));
-                            }
-
-                          /* And note that we don't need to do it in
-                           * genCall.
-                           */
-                          i->bankSaved = 1;
-                        }
                     }
                   if (i->op == PCALL)
                     {
@@ -3748,7 +3731,25 @@ genFunction (iCode * ic)
                        * The only thing I can think of to do is
                        * throw a warning and hope.
                        */
-                      werror (W_FUNCPTR_IN_USING_ISR);
+//                      werror (W_FUNCPTR_IN_USING_ISR);
+                      dtype = operandType (IC_LEFT (i))->next;
+                    }
+                  if (dtype && FUNC_REGBANK (dtype) != FUNC_REGBANK (sym->type))
+                    {
+                      /* Mark this bank for saving. */
+                      if (FUNC_REGBANK (dtype) >= MAX_REGISTER_BANKS)
+                        {
+                          werror (E_NO_SUCH_BANK, FUNC_REGBANK (dtype));
+                        }
+                      else
+                        {
+                          banksToSave |= (1 << FUNC_REGBANK (dtype));
+                        }
+
+                      /* And note that we don't need to do it in
+                       * genCall.
+                       */
+                      i->bankSaved = 1;
                     }
                 }
 

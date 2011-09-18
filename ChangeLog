@@ -1,3 +1,13 @@
+2011-09-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genFunction),
+	* src/mcs51/gen.c (genFunction): handle function pointers, fixed bug 3410620
+	* src/SDCCsymt.c (compareFuncType): check regbank for non-isr,
+	  (dbuf_printTypeChain): print reentrancy, register bank & bankswitching
+	* src/SDCCsymt.h: removed unused & buggy IFFUNC_RBANK
+	* support/Util/dbuf.c (dbuf_set_length): auto-init dbuf
+	* support/regression/tests/bug3410620.c: new, added
+
 2011-09-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,

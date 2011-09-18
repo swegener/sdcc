@@ -2229,6 +2229,17 @@ compareFuncType (sym_link * dest, sym_link * src)
       return 0;
     }
 
+  /* compare register bank */
+  if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))
+    { /* except for ISR's whose prototype need not match
+         since they are the top of a call-tree and
+         the prototype is only necessary for its vector in main */
+      if (!IFFUNC_ISISR (dest) || !IFFUNC_ISISR (src))
+        {
+          return 0;
+        }
+    }
+
   /* compare expected args with actual args */
   exargs = FUNC_ARGS (dest);
   acargs = FUNC_ARGS (src);
@@ -3125,6 +3136,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
   value *args;
   sym_link *type, *search;
   STORAGE_CLASS scls;
+  static struct dbuf_s dbuf2;
 
   if (start == NULL)
     {
@@ -3150,8 +3162,9 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
           switch (DCL_TYPE (type))
             {
             case FUNCTION:
-              dbuf_printf (dbuf, "function %s %s",
-                           (IFFUNC_ISBUILTIN (type) ? "__builtin__" : " "), (IFFUNC_ISJAVANATIVE (type) ? "_JavaNative" : " "));
+              dbuf_printf (dbuf, "function %s%s",
+                           (IFFUNC_ISBUILTIN (type) ? "__builtin__ " : ""),
+                           (IFFUNC_ISJAVANATIVE (type) ? "_JavaNative " : ""));
               dbuf_append_str (dbuf, "( ");
               for (args = FUNC_ARGS (type); args; args = args->next)
                 {
@@ -3159,7 +3172,17 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                   if (args->next)
                     dbuf_append_str (dbuf, ", ");
                 }
-              dbuf_append_str (dbuf, ") ");
+              dbuf_append_str (dbuf, ")");
+              if (IFFUNC_ISREENT (type))
+                dbuf_append_str (dbuf, " __reentrant");
+              if (FUNC_REGBANK (type))
+                {
+                  dbuf_set_length (&dbuf2, 0);
+                  dbuf_printf (&dbuf2, " __using(%d)", FUNC_REGBANK (type));
+                  dbuf_append_str (dbuf, dbuf_c_str (&dbuf2));
+                }
+              if (IFFUNC_ISBANKEDCALL (type))
+                dbuf_append_str (dbuf, " __banked");
               break;
             case GPOINTER:
               dbuf_append_str (dbuf, "generic*");

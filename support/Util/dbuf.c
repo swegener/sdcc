@@ -128,6 +128,9 @@ struct dbuf_s *dbuf_new(size_t size)
 
 int dbuf_set_length(struct dbuf_s *dbuf, size_t len)
 {
+  if (!dbuf_is_initialized (dbuf))
+    dbuf_init (dbuf, len ? len : 1);
+
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);
   assert(len <= dbuf->len);

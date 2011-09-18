@@ -256,7 +256,7 @@ typedef struct sym_link
     unsigned rbank:1;               /* seperate register bank               */
     unsigned inlinereq:1;           /* inlining requested                   */
     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
-    unsigned intno;                 /* 1=Interrupt svc routine              */
+    unsigned intno;                 /* 1=Interrupt service routine          */
     short regbank;                  /* register bank 2b used                */
     unsigned builtin;               /* is a builtin function                */
     unsigned javaNative;            /* is a JavaNative Function (TININative ONLY) */
@@ -397,7 +397,6 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_CALLEESAVES(x) (IS_FUNC(x) && FUNC_CALLEESAVES(x))
 #define FUNC_ISISR(x) (x->funcAttrs.intrtn)
 #define IFFUNC_ISISR(x) (IS_FUNC(x) && FUNC_ISISR(x))
-#define IFFUNC_RBANK(x) (IS_FUNC(x) && FUNC_RBANK(x))
 #define FUNC_INTNO(x) (x->funcAttrs.intno)
 #define FUNC_REGBANK(x) (x->funcAttrs.regbank)
 #define FUNC_HASSTACKPARM(x) (x->funcAttrs.hasStackParms)

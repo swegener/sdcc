@@ -14,7 +14,6 @@
   #define __SDCC_WEIRD_BOOL 0
 #endif
 
-#if (__SDCC_WEIRD_BOOL < 2)
   bool ret_true(void)
   {
     return(true);
@@ -26,7 +25,6 @@
   }
 
   volatile bool E;
-#endif
 
 #if (__SDCC_WEIRD_BOOL == 0)
   bool (* const pa[])(void) = {&ret_true, &ret_false};
@@ -60,7 +58,6 @@ testBool(void)
 	ASSERT(s2.b);
 #endif
 
-#if (__SDCC_WEIRD_BOOL < 2)
 	E = true;
 	ASSERT((E ? 1 : 0) == (!(!E)));
 	ASSERT((E += 2) == 1);
@@ -83,5 +80,4 @@ testBool(void)
 	E--;     ASSERT(E);  // sets E to 1-E
 	E = true;
 	E--;     ASSERT(!E); // sets E to 1-E
-#endif
 }

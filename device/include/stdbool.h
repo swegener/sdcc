@@ -32,11 +32,7 @@
 #define true 1
 #define false 0
 
-#if defined (SDCC_pic14) || defined (SDCC_pic16)
- /* The ports that don't have anything worthy of being bool */
- #define BOOL char
- #define __SDCC_WEIRD_BOOL 2
-#elif defined (SDCC_ds390) || defined (SDCC_mcs51) || defined (SDCC_xa51)
+#if defined (SDCC_ds390) || defined (SDCC_mcs51) || defined (SDCC_xa51)
  /* The ports that have __bit and use it as an imperfect substitute for bool */
  #define _Bool __bit
  #define BOOL  __bit

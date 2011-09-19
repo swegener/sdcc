@@ -9697,6 +9697,15 @@ static void genCast (iCode *ic)
 
                 goto release;
         }
+        
+        if (IS_BOOL(operandType(result)))
+        {
+          pic16_toBoolean (right);
+          emitSKPNZ;
+          pic16_emitpcode(POC_MOVLW, pic16_popGetLit(1));
+          pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),0));
+          goto release;
+        }
 
         if(IS_BITFIELD(getSpec(restype))
           && IS_BITFIELD(getSpec(rtype))) {

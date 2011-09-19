@@ -3,7 +3,9 @@
 	* src/pic16/gen.c,
 	  src/pic14/gen.c,
 	  device/include/stdbool.h,
-	  support/regression/bool.c:
+	  support/regression/bool.c,
+	  src/SDCCsymt.c,
+	  src/SDCCast.c:
 	  _Bool support for the pics.
 
 2011-09-19 Raphael Neider <rneider AT web.de>

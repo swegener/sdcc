@@ -878,17 +878,17 @@ opt_stag
      ignoreTypedefType = 0;
      $$ = newStruct(genSymName(NestLevel)) ;
      $$->level = NestLevel ;
-     addSym (StructTab, $$, $$->tag,$$->level,currBlockno, 0);
+     addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
 };
 
 stag
 :  identifier  {  /* add name to structure table */
      ignoreTypedefType = 0;
-     $$ = findSymWithBlock (StructTab,$1,currBlockno);
+     $$ = findSymWithBlock (StructTab, $1, currBlockno);
      if (! $$ ) {
        $$ = newStruct($1->name) ;
        $$->level = NestLevel ;
-       addSym (StructTab, $$, $$->tag,$$->level,currBlockno,0);
+       addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
      }
 };
 
@@ -1423,25 +1423,26 @@ abstract_declarator2
      $1->next=p;
    }
    | abstract_declarator2 '(' { NestLevel++ ; currBlockno++; } parameter_type_list ')' {
-       sym_link *p=newLink(DECLARATOR);
+       sym_link *p = newLink(DECLARATOR);
        DCL_TYPE(p) = FUNCTION;
 
        FUNC_HASVARARGS(p) = IS_VARG($4);
        FUNC_ARGS(p) = reverseVal($4);
 
        /* nest level was incremented to take care of the parms  */
-       NestLevel-- ;
+       NestLevel--;
        currBlockno--;
        if (!$1) {
          /* ((void (code *) (void)) 0) () */
-         $1=newLink(DECLARATOR);
-         DCL_TYPE($1)=CPOINTER;
+         $1 = newLink(DECLARATOR);
+         DCL_TYPE($1) = CPOINTER;
          $$ = $1;
        }
-       $1->next=p;
+       $1->next = p;
 
-       // remove the symbol args (if any)
-       cleanUpLevel(SymbolTab,NestLevel+1);
+       // disabled to fix bug 3190029
+//       // remove the symbol args (if any)
+//       cleanUpLevel(SymbolTab, NestLevel+1);
    }
    ;
 
@@ -1519,7 +1520,7 @@ labeled_statement
 
 start_block : '{'
               {
-                STACK_PUSH(blockNum,currBlockno);
+                STACK_PUSH(blockNum, currBlockno);
                 currBlockno = ++blockNo ;
                 ignoreTypedefType = 0;
               }

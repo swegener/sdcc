@@ -1,5 +1,10 @@
 2011-09-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/peep.c:
+	  Handle Z180 mlt instruction in peephole optimizer.
+
+2011-09-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* Merged z180 branch.
 
 2011-09-24 Philipp Klaus Krause <pkk AT spth.de>

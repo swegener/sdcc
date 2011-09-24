@@ -313,6 +313,9 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "djnz\t"))
     return(strchr(what, 'b') != 0);
 
+  if(ISINST(pl->line, "mlt\t"))
+    return(strstr(pl->line + 4, what) != 0);
+
   return TRUE;
 }
 
@@ -835,6 +838,9 @@ int z80instructionSize(lineNode *pl)
 
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(1);
+
+  if(ISINST(pl->line, "mlt"))
+    return(2);
 
   if(ISINST(pl->line, ".db"))
     {

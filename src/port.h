@@ -20,13 +20,15 @@
 #define TARGET_ID_XA51     9
 #define TARGET_ID_DS400    10
 #define TARGET_ID_HC08     11
+#define TARGET_ID_Z180     12
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
  */
 #define TARGET_IS_MCS51    (port->id == TARGET_ID_MCS51)
-#define TARGET_IS_GBZ80    (port->id == TARGET_ID_GBZ80)
 #define TARGET_IS_Z80      (port->id == TARGET_ID_Z80)
+#define TARGET_IS_Z180     (port->id == TARGET_ID_Z180)
+#define TARGET_IS_GBZ80    (port->id == TARGET_ID_GBZ80)
 #define TARGET_IS_AVR      (port->id == TARGET_ID_AVR)
 #define TARGET_IS_DS390    (port->id == TARGET_ID_DS390)
 #define TARGET_IS_DS400    (port->id == TARGET_ID_DS400)
@@ -35,7 +37,7 @@
 #define TARGET_IS_XA51     (port->id == TARGET_ID_XA51)
 #define TARGET_IS_HC08     (port->id == TARGET_ID_HC08)
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
-#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_GBZ80)
+#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GBZ80)
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08)
 #define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
 /* is using sdas / sdld assembler / linker */
@@ -383,11 +385,14 @@ extern PORT *port;
 #if !OPT_DISABLE_MCS51
 extern PORT mcs51_port;
 #endif
-#if !OPT_DISABLE_GBZ80
-extern PORT gbz80_port;
-#endif
 #if !OPT_DISABLE_Z80
 extern PORT z80_port;
+#endif
+#if !OPT_DISABLE_Z180
+extern PORT z180_port;
+#endif
+#if !OPT_DISABLE_GBZ80
+extern PORT gbz80_port;
 #endif
 #if !OPT_DISABLE_AVR
 extern PORT avr_port;

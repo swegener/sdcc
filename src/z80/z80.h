@@ -10,6 +10,7 @@
 typedef enum
   {
     SUB_Z80,
+    SUB_Z180,
     SUB_GBZ80
   }
 Z80_SUB_PORT;
@@ -29,13 +30,15 @@ Z80_OPTS;
 
 extern Z80_OPTS z80_opts;
 
-#define IS_GB  (z80_opts.sub == SUB_GBZ80)
 #define IS_Z80 (z80_opts.sub == SUB_Z80)
+#define IS_Z180 (z80_opts.sub == SUB_Z180)
+#define IS_GB  (z80_opts.sub == SUB_GBZ80)
+
 #define IY_RESERVED (z80_opts.reserveIY)
 
 #define OPTRALLOC_REMAT (z80_opts.optralloc_remat)
-#define OPTRALLOC_EXACT_COST IS_Z80 // Todo: Implement exact cost for gbz80.
-#define OPTRALLOC_HL IS_Z80
+#define OPTRALLOC_EXACT_COST (!IS_GB) // Todo: Implement exact cost for gbz80.
+#define OPTRALLOC_HL (!IS_GB)
 #define OPTRALLOC_A 1
 #define OPTRALLOC_IY !IY_RESERVED
 
@@ -45,3 +48,4 @@ enum
     ACCUSE_SCRATCH,
     ACCUSE_IY
   };
+

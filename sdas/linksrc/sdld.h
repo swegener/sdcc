@@ -22,6 +22,7 @@ enum sdld_target_e {
   TARGET_ID_UNKNOWN,
   TARGET_ID_GB,
   TARGET_ID_Z80,
+  TARGET_ID_Z180,
   TARGET_ID_8051,
   TARGET_ID_6808,
 };
@@ -34,6 +35,7 @@ int is_sdld_target_8051_like(void);
 
 #define TARGET_IS_GB	(get_sdld_target() == TARGET_ID_GB)
 #define TARGET_IS_Z80   (get_sdld_target() == TARGET_ID_Z80)
+#define TARGET_IS_Z180   (get_sdld_target() == TARGET_ID_Z180)
 #define TARGET_IS_8051  (get_sdld_target() == TARGET_ID_8051)
 #define TARGET_IS_6808 	(get_sdld_target() == TARGET_ID_6808)
 

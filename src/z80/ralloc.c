@@ -2778,7 +2778,7 @@ packRegisters (eBBlock * ebp)
         if (!IS_GB && !IY_RESERVED)
           packRegsForHLUse3 (ic, IC_RESULT (ic), ebp);
 
-      if ((z80_opts.oldralloc || !OPTRALLOC_IY) && !DISABLE_PACK_IY && !IY_RESERVED && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)
+      if ((z80_opts.oldralloc || !OPTRALLOC_IY) && !DISABLE_PACK_IY && !IY_RESERVED && IS_ITEMP (IC_RESULT (ic)) && !IS_GB)
         packRegsForIYUse (ic, IC_RESULT (ic), ebp);
 
       if ((z80_opts.oldralloc || !OPTRALLOC_A) && !DISABLE_PACK_ACC && IS_ITEMP (IC_RESULT (ic)) &&

@@ -44,7 +44,7 @@ public:
   class cl_memory *rom;
   struct t_regs regs;
 public:
-  cl_z80(class cl_sim *asim);
+  cl_z80(int Itype, int Itech, class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
 

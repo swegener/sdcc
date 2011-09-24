@@ -50,7 +50,7 @@ extern char *copying;
 
 extern struct cpu_entry *cpus;
 extern struct cpu_entry cpus_51[];
-
+extern struct cpu_entry cpus_z80[];
 
 #endif
 

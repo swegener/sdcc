@@ -534,7 +534,7 @@ relr()
 		/*
 		 * Page Relocation Error Checking
 		 */
-		if ((TARGET_IS_GB || TARGET_IS_Z80) &&
+		if ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB) &&
 			mode & R3_PAG0 && (relv & ~0xFF || paga || pags))
 			error = 3;
 		if (mode & R3_PAG  && (relv & ~0xFF))
@@ -561,7 +561,7 @@ relr()
 	}
 
 	/* JLH: output only if data (beyond two byte address) */
-	if ((TARGET_IS_GB || TARGET_IS_Z80) && oflag == 1) {
+	if ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB) && oflag == 1) {
 		ihx(1);
 	}
 	else if ((oflag == 1) && (rtcnt > 2)) {

@@ -310,6 +310,9 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_Z80
   &z80_port,
 #endif
+#if !OPT_DISABLE_Z180
+  &z180_port,
+#endif
 #if !OPT_DISABLE_AVR
   &avr_port,
 #endif
@@ -1574,7 +1577,7 @@ linkEdit (char **envp)
     if (segName) { Safe_free (segName); } \
   }
 
-      if (!TARGET_Z80_LIKE)   /* Not for the z80, gbz80 */
+      if (!TARGET_Z80_LIKE)   /* Not for the z80, z180, gbz80 */
         {
 
           /* code segment start */
@@ -1616,7 +1619,7 @@ linkEdit (char **envp)
               WRITE_SEG_LOC ("SSEG", options.stack_loc);
             }
         }
-      else                      /*For the z80, gbz80 */
+      else                      /* For the z80, z180, gbz80 */
         {
           WRITE_SEG_LOC ("_CODE", options.code_loc);
           WRITE_SEG_LOC ("_DATA", options.data_loc);
@@ -2194,17 +2197,22 @@ setLibPath (void)
   if (!options.nostdlib)
     {
       char *p;
+      const char *targetname;
+
       struct dbuf_s dbuf;
 
       dbuf_init (&dbuf, PATH_MAX);
 
-      dbuf_makePath (&dbuf, LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
+      /* Use common library for z80 and z180. */
+      targetname = strcmp(port->target, "z180") ? port->target : "z80";
+
+      dbuf_makePath (&dbuf, LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : targetname);
       libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));
 
       if (options.use_non_free)
         {
           dbuf_set_length (&dbuf, 0);
-          dbuf_makePath (&dbuf, NON_FREE_LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : port->target);
+          dbuf_makePath (&dbuf, NON_FREE_LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : targetname);
           mergeSets (&libDirsSet, appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf)));
         }
 
@@ -2213,7 +2221,7 @@ setLibPath (void)
           addSetHead (&libDirsSet, Safe_strdup (p));
 
           dbuf_set_length (&dbuf, 0);
-          dbuf_makePath (&dbuf, p, port->general.get_model ? port->general.get_model () : port->target);
+          dbuf_makePath (&dbuf, p, port->general.get_model ? port->general.get_model () : targetname);
           addSetHead (&libDirsSet, dbuf_detach (&dbuf));
         }
       else

@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  gen.c - Z80 specific code generator.
+  gen.c - code generator for Z80 / Z180 / GBZ80.
 
   Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de (2011)
   Michael Hope <michaelh@juju.net.nz> 2000
@@ -464,7 +464,7 @@ getDeadPairId (const iCode *ic)
     {
       return PAIR_BC;
     }
-  else if (IS_Z80 && isPairDead (PAIR_DE, ic))
+  else if (!IS_GB && isPairDead (PAIR_DE, ic))
     {
       return PAIR_DE;
     }
@@ -481,7 +481,7 @@ getFreePairId (const iCode *ic)	// Todo: Cost
     {
       return PAIR_BC;
     }
-  else if (IS_Z80 && !isPairInUse (PAIR_DE, ic))
+  else if (!IS_GB && !isPairInUse (PAIR_DE, ic))
     {
       return PAIR_DE;
     }
@@ -1226,7 +1226,7 @@ aopForSym (const iCode * ic, symbol * sym, bool result, bool requires_a)
          Normally everything is AOP_STK, but for offsets of < -128 or
          > 127 on the Z80 an extended stack pointer is used.
       */
-      if (IS_Z80 && (_G.omitFramePtr || sym->stack < INT8MIN || sym->stack > (int)(INT8MAX-getSize (sym->type))))
+      if (!IS_GB && (_G.omitFramePtr || sym->stack < INT8MIN || sym->stack > (int)(INT8MAX-getSize (sym->type))))
         {
           emitDebug ("; AOP_EXSTK for %s, _G.omitFramePtr %d, sym->stack %d, size %d", sym->rname, (int)(_G.omitFramePtr), sym->stack, getSize (sym->type));
           sym->aop = aop = newAsmop (AOP_EXSTK);
@@ -1648,7 +1648,7 @@ freeAsmop (operand *op, asmop *aaop, const iCode *ic)
 
   aop->freed = 1;
 
-  if (aop->type == AOP_PAIRPTR && IS_Z80 && aop->aopu.aop_pairId == PAIR_DE)
+  if (aop->type == AOP_PAIRPTR && !IS_GB && aop->aopu.aop_pairId == PAIR_DE)
     {
       _pop (aop->aopu.aop_pairId);
     }
@@ -1956,7 +1956,7 @@ makeFreePairId (const iCode *ic, bool *pisUsed)
         {
           return PAIR_BC;
         }
-      else if (IS_Z80 && !bitVectBitValue (ic->rMask, D_IDX) && !bitVectBitValue(ic->rMask, E_IDX))
+      else if (!IS_GB && !bitVectBitValue (ic->rMask, D_IDX) && !bitVectBitValue(ic->rMask, E_IDX))
         {
           return PAIR_DE;
         }
@@ -2012,7 +2012,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               break;
             }
           }
-        else if (IS_Z80 && aop->type == AOP_IY) {
+        else if (!IS_GB && aop->type == AOP_IY) {
           /* Instead of fetching relative to IY, just grab directly
              from the address IY refers to */
           emit2 ("ld %s,(%s)", _pairs[pairId].name, aopGetLitWordLong (aop, offset, FALSE));
@@ -2144,7 +2144,7 @@ setupPair (PAIR_ID pairId, asmop *aop, int offset)
       break;
 
     case AOP_EXSTK:
-      wassertl (IS_Z80, "Only the Z80 has an extended stack");
+      wassertl (!IS_GB, "The GBZ80 doesn't have an extended stack");
       wassertl (pairId == PAIR_IY || pairId == PAIR_HL, "The Z80 extended stack must be in IY or HL");
 
       {
@@ -2333,13 +2333,13 @@ aopGet (asmop * aop, int offset, bool bit16)
           break;
 
         case AOP_IY:
-          wassert (IS_Z80);
+          wassert (!IS_GB);
           setupPair (PAIR_IY, aop, offset);
           dbuf_tprintf (&dbuf, "!*iyx", offset);
           break;
 
         case AOP_EXSTK:
-          wassert (IS_Z80);
+          wassert (!IS_GB);
           setupPair (PAIR_IY, aop, offset);
           dbuf_tprintf (&dbuf, "!*iyx", offset);
           break;
@@ -4090,7 +4090,7 @@ genFunction (const iCode * ic)
                   break;
                 case D_IDX:
                 case E_IDX:
-                  if (IS_Z80) {
+                  if (!IS_GB) {
                     deInUse = TRUE;
                   }
                   else {
@@ -4133,9 +4133,9 @@ genFunction (const iCode * ic)
     }
   sym = OP_SYMBOL (IC_LEFT (ic));
 
-  _G.omitFramePtr = (IS_Z80 && options.omitFramePtr);
+  _G.omitFramePtr = (!IS_GB && options.omitFramePtr);
 
-  if (IS_Z80 && !IY_RESERVED && !stackParm && !sym->stack)
+  if (!IS_GB && !IY_RESERVED && !stackParm && !sym->stack)
     {
       /* When the conflicts between AOP_EXSTK && AOP_HLREG are fixed, */
       /* the above !sym->stack condition can be removed. -- EEP       */
@@ -4207,7 +4207,7 @@ genEndFunction (iCode * ic)
     }
 
   /* PENDING: calleeSave */
-  if (IS_Z80 && _G.omitFramePtr)
+  if (!IS_GB && _G.omitFramePtr)
     {
       if (_G.stack.offset)
         emit2 ("!ldaspsp", _G.stack.offset);
@@ -4288,7 +4288,7 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISISR (sym->type))
     {
       /* "critical interrupt" is used to imply NMI handler */
-      if (IS_Z80 && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO(sym->type) == INTNO_UNSPEC)
+      if (!IS_GB && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO(sym->type) == INTNO_UNSPEC)
         emit2 ("retn");
       else
         emit2 ("reti");
@@ -4470,7 +4470,7 @@ genPlusIncr (const iCode *ic)
       return TRUE;
     }
 
-  if (IS_Z80 && isLitWord (AOP (IC_LEFT (ic))) && size == 2)
+  if (!IS_GB && isLitWord (AOP (IC_LEFT (ic))) && size == 2)
     {
       fetchLitPair (PAIR_HL, AOP (IC_LEFT (ic)), icount);
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
@@ -4578,7 +4578,7 @@ shiftIntoPair (int idx, asmop *aop)
 {
   PAIR_ID id = PAIR_INVALID;
 
-  wassertl (IS_Z80, "Only implemented for the Z80");
+  wassertl (!IS_GB, "Not implemented for the GBZ80");
   //  wassertl (aop->type == AOP_EXSTK, "Only implemented for EXSTK");
 
   emitDebug ("; Shift into pair idx %u", idx);
@@ -4619,7 +4619,7 @@ setupToPreserveCarry (const iCode *ic)
 
   wassert (left && right);
 
-  if (IS_Z80)
+  if (!IS_GB)
     {
       if (couldDestroyCarry (right) && couldDestroyCarry (result))
         {
@@ -5238,10 +5238,42 @@ genMultOneChar (const iCode * ic)
   symbol *tlbl1, *tlbl2;
   bool savedB = FALSE;
 
+  asmop *result = AOP (IC_RESULT (ic));
+  int resultsize = AOP_SIZE (IC_RESULT (ic));
+
   if(IS_GB)
     {
       wassertl (0, "Multiplication is handled through support function calls on gbz80");
       return;
+    }
+
+  if (IS_Z180 &&
+    AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+    {
+      if ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == B_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX ||
+        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == B_IDX) &&
+        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == B_IDX : !bitVectBitValue (ic->rSurv, B_IDX)) && result->aopu.aop_reg[0]->rIdx == C_IDX)
+        {
+          emit2 ("mlt bc");
+          regalloc_dry_run_cost += 2;
+          return;
+        }
+      if ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == D_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
+        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX) &&
+        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == D_IDX : !bitVectBitValue (ic->rSurv, D_IDX)) && result->aopu.aop_reg[0]->rIdx == E_IDX)
+        {
+          emit2 ("mlt de");
+          regalloc_dry_run_cost += 2;
+          return;
+        }
+      if ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == H_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == L_IDX ||
+        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == L_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == H_IDX) &&
+        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == H_IDX : !bitVectBitValue (ic->rSurv, H_IDX)) && result->aopu.aop_reg[0]->rIdx == L_IDX)
+        {
+          emit2 ("mlt hl");
+          regalloc_dry_run_cost += 2;
+          return;
+        }
     }
 
   if (!isPairDead (PAIR_DE, ic))
@@ -5298,20 +5330,20 @@ genMultOneChar (const iCode * ic)
       _G.stack.pushedDE = FALSE;
     }
 
-  if(AOP (IC_RESULT (ic))->type != AOP_HL)
+  if(result->type != AOP_HL)
     {
-    if (AOP_SIZE (IC_RESULT (ic)) == 1)
-      cheapMove (AOP (IC_RESULT (ic)), 0, ASMOP_L, 0);
+    if (resultsize == 1)
+      cheapMove (result, 0, ASMOP_L, 0);
     else
-      commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+      commitPair (result, PAIR_HL);
     }
   else
     {
-    if (AOP_SIZE (IC_RESULT (ic)) == 1)
+    if (resultsize == 1)
       {
         emit2("ld a, l");
         regalloc_dry_run_cost += 1;
-        cheapMove (AOP (IC_RESULT (ic)), 0, ASMOP_A, 0);
+        cheapMove (result, 0, ASMOP_A, 0);
       }
     else
       {
@@ -5323,7 +5355,7 @@ genMultOneChar (const iCode * ic)
         emit2("ld e, l");
         emit2("ld d, h");
         regalloc_dry_run_cost += 2;
-        commitPair ( AOP (IC_RESULT (ic)), PAIR_DE);
+        commitPair (result, PAIR_DE);
         if(!isPairDead (PAIR_DE, ic))
           {
             _pop (PAIR_DE);
@@ -5379,7 +5411,7 @@ genMult (iCode *ic)
   //  wassertl (val > 0, "Multiply must be positive");
   wassertl (val != 1, "Can't multiply by 1");
 
-  if (IS_Z80 && (byteResult ? bitVectBitValue (ic->rSurv, E_IDX) : !isPairDead (PAIR_DE, ic))) {
+  if (!IS_GB && (byteResult ? bitVectBitValue (ic->rSurv, E_IDX) : !isPairDead (PAIR_DE, ic))) {
     _push (PAIR_DE);
     _G.stack.pushedDE = TRUE;
   }
@@ -5441,7 +5473,7 @@ genMult (iCode *ic)
 
   spillPair(PAIR_HL);
 
-  if (IS_Z80 && _G.stack.pushedDE)
+  if (!IS_GB && _G.stack.pushedDE)
     {
       _pop (PAIR_DE);
       _G.stack.pushedDE = FALSE;

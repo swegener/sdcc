@@ -246,7 +246,7 @@ void test_s( void )
     ASSERT (ret == 10);
 }
 
-#if defined SDCC && !defined SDCC_z80
+#if defined SDCC && !defined SDCC_z80 && !defined SDCC_z180
 extern void _putchar(char c);
 
 void putchar(char c)
@@ -254,3 +254,4 @@ void putchar(char c)
 	_putchar(c);
 }
 #endif
+

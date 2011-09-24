@@ -121,6 +121,10 @@ test-ds390:
 test-ucz80:
 	$(MAKE) test-port PORT=ucz80
 
+# Helper rule for testing the z80 port only(use ucSim simulator)
+test-ucz180:
+	$(MAKE) test-port PORT=ucz180
+
 # Helper rule for testing the hc08 port only(use ucSim simulator)
 test-hc08:
 	$(MAKE) test-port PORT=hc08

@@ -101,6 +101,11 @@ cl_z80::inst_ed(void)
       tw = fetch2();
       regs.BC = get2(tw);
     return(resGO);
+	case 0x4C: // MLT BC
+      if(type != CPU_Z180)
+        return(resINV_INST);
+      regs.BC = (unsigned long)(regs.bc.h) * (unsigned long)(regs.bc.l);
+    return(resGO);
     case 0x4D: // RETI (return from interrupt)
       pop2(PC);
     return(resGO);
@@ -140,7 +145,11 @@ cl_z80::inst_ed(void)
       tw = fetch2();
       regs.DE = get2(tw);
     return(resGO);
-
+    case 0x5C: // MLT DE
+      if(type != CPU_Z180)
+        return(resINV_INST);
+      regs.DE = (unsigned long)(regs.de.h) * (unsigned long)(regs.de.l);
+    return(resGO);
 #if 0
     case 0x5E: // IM 2
     return(resGO);
@@ -175,7 +184,11 @@ cl_z80::inst_ed(void)
       tw = fetch2();
       regs.HL = get2(tw);
     return(resGO);
-
+    case 0x6C: // MLT HL
+      if(type != CPU_Z180)
+        return(resINV_INST);
+      regs.HL = (unsigned long)(regs.hl.h) * (unsigned long)(regs.hl.l);
+    return(resGO);
 #if 0
     case 0x6F: // RLD
       /* rotate 1 bcd digit left between ACC and memory location */
@@ -208,6 +221,11 @@ cl_z80::inst_ed(void)
       regs.SP = get2(tw);
     return(resGO);
 
+    case 0x7C: // MLT SP
+      //if(type != CPU_Z180)
+        return(resINV_INST);
+      //regs.SP = (unsigned long)(regs.sp.h) * (unsigned long)(regs.sp.l);
+    return(resGO);
     case 0xA0: // LDI
       // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
       regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */

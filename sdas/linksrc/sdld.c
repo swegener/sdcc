@@ -71,6 +71,7 @@ sdld_init (char *path)
   } tgt[] = {
     { "gb", TARGET_ID_GB, },
     { "z80", TARGET_ID_Z80, },
+    { "z180", TARGET_ID_Z180, },
     { "8051", TARGET_ID_8051, },
     { "6808", TARGET_ID_6808, },
   };
@@ -125,7 +126,7 @@ int
 is_sdld_target_z80_like(void)
 {
   check_init();
-  return target == TARGET_ID_Z80 || target == TARGET_ID_GB;
+  return target == TARGET_ID_Z80 || target == TARGET_ID_Z180 || target == TARGET_ID_GB;
 }
 
 

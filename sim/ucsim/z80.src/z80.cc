@@ -56,10 +56,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base type of Z80 controllers
  */
 
-cl_z80::cl_z80(class cl_sim *asim):
+cl_z80::cl_z80(int Itype, int Itech, class cl_sim *asim):
   cl_uc(asim)
 {
-  type= CPU_Z80;
+  type= Itype;
 }
 
 int

@@ -623,8 +623,9 @@ OPT_DISABLE_PIC16
 OPT_DISABLE_PIC14
 OPT_DISABLE_DS400
 OPT_DISABLE_DS390
-OPT_DISABLE_Z80
 OPT_DISABLE_GBZ80
+OPT_DISABLE_Z180
+OPT_DISABLE_Z80
 OPT_DISABLE_MCS51
 non_free_lib_dir_suffix
 lib_dir_suffix
@@ -711,8 +712,9 @@ ac_user_opts='
 enable_option_checking
 with_ccache
 enable_mcs51_port
-enable_gbz80_port
 enable_z80_port
+enable_z180_port
+enable_gbz80_port
 enable_ds390_port
 enable_ds400_port
 enable_pic14_port
@@ -1368,8 +1370,9 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-mcs51-port    Excludes the Intel mcs51 port
-  --disable-gbz80-port    Excludes the Gameboy gbz80 port
   --disable-z80-port      Excludes the z80 port
+  --disable-z180-port     Excludes the z180 port
+  --disable-gbz80-port    Excludes the Gameboy gbz80 port
   --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic14-port    Excludes the PIC14 port
@@ -6288,32 +6291,6 @@ _ACEOF
   fi
 
 
-  # Check whether --enable-gbz80-port was given.
-if test "${enable_gbz80_port+set}" = set; then :
-  enableval=$enable_gbz80_port;
-fi
-
-
-  if test "$enable_gbz80_port" = "no"; then
-    OPT_DISABLE_GBZ80=1
-  else
-    enable_gbz80_port="yes"
-    OPT_DISABLE_GBZ80=0
-  fi
-
-
-cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_GBZ80 $OPT_DISABLE_GBZ80
-_ACEOF
-
-
-
-  echo z80 >>ports.all
-  if test $OPT_DISABLE_GBZ80 = 0; then
-    echo z80 >>ports.build
-  fi
-
-
   # Check whether --enable-z80-port was given.
 if test "${enable_z80_port+set}" = set; then :
   enableval=$enable_z80_port;
@@ -6336,6 +6313,58 @@ _ACEOF
 
   echo z80 >>ports.all
   if test $OPT_DISABLE_Z80 = 0; then
+    echo z80 >>ports.build
+  fi
+
+
+  # Check whether --enable-z180-port was given.
+if test "${enable_z180_port+set}" = set; then :
+  enableval=$enable_z180_port;
+fi
+
+
+  if test "$enable_z180_port" = "no"; then
+    OPT_DISABLE_Z180=1
+  else
+    enable_z180_port="yes"
+    OPT_DISABLE_Z180=0
+  fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_Z180 $OPT_DISABLE_Z180
+_ACEOF
+
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_Z180 = 0; then
+    echo z80 >>ports.build
+  fi
+
+
+  # Check whether --enable-gbz80-port was given.
+if test "${enable_gbz80_port+set}" = set; then :
+  enableval=$enable_gbz80_port;
+fi
+
+
+  if test "$enable_gbz80_port" = "no"; then
+    OPT_DISABLE_GBZ80=1
+  else
+    enable_gbz80_port="yes"
+    OPT_DISABLE_GBZ80=0
+  fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_GBZ80 $OPT_DISABLE_GBZ80
+_ACEOF
+
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_GBZ80 = 0; then
     echo z80 >>ports.build
   fi
 
@@ -8746,6 +8775,7 @@ sdcc ${VERSION} is now configured for
     pic16               ${enable_pic16_port}
     xa51                ${enable_xa51_port}
     z80                 ${enable_z80_port}
+    z180                ${enable_z180_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}
@@ -8804,6 +8834,7 @@ sdcc ${VERSION} is now configured for
     pic16               ${enable_pic16_port}
     xa51                ${enable_xa51_port}
     z80                 ${enable_z80_port}
+    z180                ${enable_z180_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}

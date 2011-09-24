@@ -139,13 +139,13 @@ newarea()
 		ap->a_flag = eval();
 	} else {
 		i = eval();
-		if ((!is_sdld() || TARGET_IS_Z80 || TARGET_IS_GB) &&
+		if ((!is_sdld() || TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB) &&
 			i && (ap->a_flag != i)) {
 			fprintf(stderr, "Conflicting flags in area %8s\n", id);
 			lkerr++;
 		}
 	}
-	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
+	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB)) {
 		/*
 		 * Evaluate area address
 		 */
@@ -213,7 +213,7 @@ lkparea(char *id)
 
 	ap = areap;
 	axp = (struct areax *) new (sizeof(struct areax));
-	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB))
+	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB))
 		axp->a_addr = -1; /* default: no address yet */
 	while (ap) {
 		if (symeq(id, ap->a_id, 1)) {
@@ -240,7 +240,7 @@ lkparea(char *id)
 	axp->a_bap = ap;
 	axp->a_bhp = hp;
 	ap->a_id = strsto(id);
-	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB))
+	if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB))
 		ap->a_addr = 0;
 }
 
@@ -428,7 +428,7 @@ lnkarea()
 			/*
 			 * Relocatable sections
 			 */
-			if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_GB) {
+			if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB) {
 				if (ap->a_addr == 0)
 					ap->a_addr = rloc[locIndex];
 			}
@@ -460,7 +460,7 @@ lnkarea()
 			*temp = 's';
 			sp = lkpsym(temp, 1);
 			sp->s_addr = ap->a_addr ;
-			if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_GB)
+			if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB)
 				sp->s_axp = NULL;
 			sp->s_type |= S_DEF;
 
@@ -471,7 +471,7 @@ lnkarea()
 			sp->s_type |= S_DEF;
 		}
 
-		if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_GB)) {
+		if (is_sdld() && !(TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB)) {
 			/*JCF: Since area BSEG is defined just before BSEG_BYTES, use the bit size of BSEG
 			to compute the byte size of BSEG_BYTES: */
 			if (!strcmp(ap->a_id, "BSEG")) {

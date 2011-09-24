@@ -805,8 +805,9 @@ rm -f ports.all ports.build
 
 # Supported targets
 AC_DO_PORT(mcs51, mcs51, MCS51, [Excludes the Intel mcs51 port])
-AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(z80,   z80,   Z80,   [Excludes the z80 port])
+AC_DO_PORT(z180,  z80,   Z180,  [Excludes the z180 port])
+AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(ds390, ds390, DS390, [Excludes the DS390 port])
 AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])
 AC_DO_PORT(ds400, ds400, DS400, [Excludes the DS400 port])
@@ -975,6 +976,7 @@ sdcc ${VERSION} is now configured for
     pic16               ${enable_pic16_port}
     xa51                ${enable_xa51_port}
     z80                 ${enable_z80_port}
+    z180                ${enable_z180_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}

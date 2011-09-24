@@ -150,6 +150,9 @@
 #undef OPT_DISABLE_XA51
 
 /* XXX */
+#undef OPT_DISABLE_Z180
+
+/* XXX */
 #undef OPT_DISABLE_Z80
 
 /* XXX */

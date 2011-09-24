@@ -129,6 +129,13 @@ _z80_init (void)
 }
 
 static void
+_z180_init (void)
+{
+  z80_opts.sub = SUB_Z180;
+  asm_addTree (&_asxxxx_z80);
+}
+
+static void
 _gbz80_init (void)
 {
   z80_opts.sub = SUB_GBZ80;
@@ -577,7 +584,7 @@ _setValues (void)
   setMainValue ("z80bases", dbuf_c_str (&dbuf));
   dbuf_destroy (&dbuf);
 
-  if (IS_Z80 && options.omitFramePtr)
+  if ((IS_Z80 || IS_Z180) && options.omitFramePtr)
     z80_port.stack.call_overhead = 2;
 }
 
@@ -843,6 +850,130 @@ PORT z80_port = {
    },
   "_",
   _z80_init,
+  _parseOptions,
+  _z80_options,
+  NULL,
+  _finaliseOptions,
+  _setDefaultOptions,
+  z80_assignRegisters,
+  _getRegName,
+  _keywords,
+  0,                            /* no assembler preamble */
+  NULL,                         /* no genAssemblerEnd */
+  0,                            /* no local IVT generation code */
+  0,                            /* no genXINIT code */
+  NULL,                         /* genInitStartup */
+  _reset_regparm,
+  _reg_parm,
+  _process_pragma,
+  _mangleSupportFunctionName,
+  _hasNativeMulFor,
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
+  TRUE,
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
+  FALSE,                        /* Array initializer support. */
+  0,                            /* no CSE cost estimation yet */
+  _z80_builtins,                /* builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
+  PORT_MAGIC
+};
+
+PORT z180_port = {
+  TARGET_ID_Z180,
+  "z180",
+  "Zilog Z180",                  /* Target name */
+  NULL,                         /* Processor name */
+  {
+   glue,
+   FALSE,
+   NO_MODEL,
+   NO_MODEL,
+   NULL,                        /* model == target */
+   },
+  {                             /* Assembler */
+   _z80AsmCmd,
+   NULL,
+   "-plosgffwzc",               /* Options with debug */
+   "-plosgffwz",                /* Options without debug */
+   0,
+   ".asm"},
+  {                             /* Linker */
+   _z80LinkCmd,                 //NULL,
+   NULL,                        //LINKCMD,
+   NULL,
+   ".rel",
+   1,
+   _crt,                        /* crt */
+   _libs_z80,                   /* libs */
+   },
+  {                             /* Peephole optimizer */
+   _z80_defaultRules,
+   z80instructionSize,
+   0,
+   0,
+   0,
+   z80notUsed,
+   z80canAssign,
+   z80notUsedFrom,
+   },
+  {
+   /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+   1, 2, 2, 4, 2, 2, 2, 1, 4, 4},
+  /* tags for generic pointers */
+  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  {
+   "XSEG",
+   "STACK",
+   "CODE",
+   "DATA",
+   "ISEG",
+   NULL,                        /* pdata */
+   "XSEG",
+   "BSEG",
+   "RSEG (ABS)",
+   "GSINIT",
+   "OVERLAY",
+   "GSFINAL",
+   "HOME",
+   NULL,                        /* xidata */
+   NULL,                        /* xinit */
+   NULL,                        /* const_name */
+   "CABS",                      /* cabs_name */
+   NULL,                        /* xabs_name */
+   NULL,                        /* iabs_name */
+   NULL,
+   NULL,
+   1                            /* CODE  is read-only */
+   },
+  {NULL, NULL},
+  {
+   -1, 0, 0, 4, 0, 2},
+  /* Z80 has no native mul/div commands */
+  {
+   0, 2},
+  {
+   z80_emitDebuggerSymbol},
+  {
+   255,                         /* maxCount */
+   3,                           /* sizeofElement */
+   /* The rest of these costs are bogus. They approximate */
+   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+   {4, 4, 4},                   /* sizeofMatchJump[] */
+   {0, 0, 0},                   /* sizeofRangeCompare[] */
+   0,                           /* sizeofSubtract */
+   3,                           /* sizeofDispatch */
+   },
+  "_",
+  _z180_init,
   _parseOptions,
   _z80_options,
   NULL,

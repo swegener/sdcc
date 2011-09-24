@@ -1,3 +1,7 @@
+2011-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/printf_large.c: accept int modifiers
+
 2011-09-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c,
@@ -9,7 +13,7 @@
 	* src/SDCC.y (abstract_declarator2): fixed bug 3190029
 	* support/regression/tests/bug3190029.c: new, added
 
-2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-09-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/pic16/gen.c,
 	  src/pic14/gen.c,
@@ -127,10 +131,10 @@
 	* sdas/linksrc/lkarea.c (find_empty_space, allocate_space): changed warnings
 	* sdas/linksrc/lkdata.c: added pcb & rterr
 	* sdas/linksrc/lkeval.c (eval, expr, term): no signed arithmetic,
-	  (term): accept closing quotes	
+	  (term): accept closing quotes
 	* sdas/linksrc/lklist.c: sync with ASxxxx 5
 	* sdas/linksrc/lkmain.c (link_main): reset a_bytes and hilo to defaults 2,0
-	  fixes bug 3305824	
+	  fixes bug 3305824
 	* sdas/linksrc/lkrloc.c (relr): set default pcb
 
 2011-09-09 Borut Razem <borut.razem AT gmail.com>
@@ -7650,7 +7654,7 @@
 
 2008-02-26 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCCast.c, doc/sdccman.lyx: fixed RFE #1901171: inerger promotion
+	* src/SDCCast.c, doc/sdccman.lyx: fixed RFE #1901171: integer promotion
 	  of casted varargs
 	* support/scripts/sdcc.nsi: added MULTIUSER page,
 	  NSIS upgraded to version 2.35

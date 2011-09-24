@@ -15,7 +15,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -257,21 +257,27 @@ output_float (float f, unsigned char reqWidth,
   signed char exp = -128;
 
   // save the sign
-  if (f<0) {
+  if (f<0)
+  {
     negative=1;
     f=-f;
   }
 
-  if (f>0x00ffffff) {
+  if (f>0x00ffffff)
+  {
     // this part is from Frank van der Hulst
 
     for (exp = 0; f >= 10.0; exp++) f /=10.0;
     for (       ; f < 1.0;   exp--) f *=10.0;
 
-    if (negative) {
+    if (negative)
+    {
       OUTPUT_CHAR ('-', p);
-    } else {
-      if (sign) {
+    }
+    else
+    {
+      if (sign)
+      {
         OUTPUT_CHAR ('+', p);
       }
     }
@@ -288,7 +294,8 @@ output_float (float f, unsigned char reqWidth,
 
   // round the float
   rounding = 0.5;
-  for (i=reqDecimals; i>0; i--) {
+  for (i=reqDecimals; i>0; i--)
+  {
       rounding /= 10.0;
   }
   f += rounding;
@@ -298,11 +305,13 @@ output_float (float f, unsigned char reqWidth,
   decimalPart = f - integerPart;
 
   // fill the buffer with the integerPart (in reversed order!)
-  while (integerPart) {
+  while (integerPart)
+  {
     fpBuffer[fpBI++]='0' + integerPart%10;
     integerPart /= 10;
   }
-  if (!fpBI) {
+  if (!fpBI)
+  {
     // we need at least a 0
     fpBuffer[fpBI++]='0';
   }
@@ -310,7 +319,8 @@ output_float (float f, unsigned char reqWidth,
   // fill buffer with the decimalPart (in normal order)
   fpBD=fpBI;
 
-  for (i=reqDecimals; i>0; i--) {
+  for (i=reqDecimals; i>0; i--)
+  {
       decimalPart *= 10.0;
       // truncate the float
       integerPart = decimalPart;
@@ -323,8 +333,10 @@ output_float (float f, unsigned char reqWidth,
   if (negative || sign || space)
     minWidth++; // and maybe even this :)
 
-  if (!left && reqWidth>i) {
-    if (zero) {
+  if (!left && reqWidth>i)
+  {
+    if (zero)
+    {
       if (negative)
       {
         OUTPUT_CHAR('-', p);
@@ -341,7 +353,9 @@ output_float (float f, unsigned char reqWidth,
       {
         OUTPUT_CHAR('0', p);
       }
-    } else {
+    }
+    else
+    {
       while (reqWidth-->minWidth)
       {
         OUTPUT_CHAR(' ', p);
@@ -359,7 +373,9 @@ output_float (float f, unsigned char reqWidth,
         OUTPUT_CHAR(' ', p);
       }
     }
-  } else {
+  }
+  else
+  {
     if (negative)
     {
       OUTPUT_CHAR('-', p);
@@ -381,7 +397,8 @@ output_float (float f, unsigned char reqWidth,
   } while (i--);
 
   // ouput the decimal part
-  if (reqDecimals) {
+  if (reqDecimals)
+  {
     OUTPUT_CHAR ('.', p);
     i=fpBI;
     while (reqDecimals--)
@@ -390,16 +407,19 @@ output_float (float f, unsigned char reqWidth,
     }
   }
 
-  if (left && reqWidth>minWidth) {
+  if (left && reqWidth>minWidth)
+  {
     while (reqWidth-->minWidth)
     {
       OUTPUT_CHAR(' ', p);
     }
   }
 
-  if (exp != -128) {
+  if (exp != -128)
+  {
     OUTPUT_CHAR ('e', p);
-    if (exp<0) {
+    if (exp<0)
+    {
       OUTPUT_CHAR ('-', p);
       exp = -exp;
     }
@@ -450,7 +470,8 @@ _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
   charsOutputted = 0;
 
 #ifdef SDCC_ds390
-  if (format==0) {
+  if (format==0)
+  {
     format=NULL_STRING;
   }
 #endif
@@ -475,26 +496,34 @@ get_conversion_spec:
 
       c = *format++;
 
-      if (c=='%') {
+      if (c=='%')
+      {
         OUTPUT_CHAR(c, p);
         continue;
       }
 
-      if (isdigit(c)) {
-        if (decimals==-1) {
+      if (isdigit(c))
+      {
+        if (decimals==-1)
+        {
           width = 10*width + c - '0';
-          if (width == 0) {
+          if (width == 0)
+          {
             /* first character of width is a zero */
             zero_padding = 1;
           }
-        } else {
+        }
+        else
+        {
           decimals = 10*decimals + c - '0';
         }
         goto get_conversion_spec;
       }
 
-      if (c=='.') {
-        if (decimals==-1) decimals=0;
+      if (c=='.')
+      {
+        if (decimals==-1)
+          decimals=0;
         else
           ; // duplicate, ignore
         goto get_conversion_spec;
@@ -519,10 +548,16 @@ get_conversion_spec:
       case ' ':
         prefix_space = 1;
         goto get_conversion_spec;
-      case 'B':
+      case 'B': /* byte */
         char_argument = 1;
         goto get_conversion_spec;
-      case 'L':
+//      case '#': /* not supported */
+      case 'H': /* short */
+      case 'J': /* intmax_t */
+      case 'T': /* ptrdiff_t */
+      case 'Z': /* size_t */
+        goto get_conversion_spec;
+      case 'L': /* long */
         long_argument = 1;
         goto get_conversion_spec;
 
@@ -538,10 +573,13 @@ get_conversion_spec:
         PTR = va_arg(ap,ptr_t);
 
 #ifdef SDCC_ds390
-        if (PTR==0) {
+        if (PTR==0)
+        {
           PTR=NULL_STRING;
           length=NULL_STRING_LENGTH;
-        } else {
+        }
+        else
+        {
           length = strlen(PTR);
         }
 #else
@@ -656,8 +694,9 @@ get_conversion_spec:
         break;
       }
 
-      if (float_argument) {
-        value.f=va_arg(ap,float);
+      if (float_argument)
+      {
+        value.f = va_arg(ap, float);
 #if !USE_FLOATS
         PTR="<NO FLOAT>";
         while (c=*PTR++)
@@ -679,7 +718,8 @@ get_conversion_spec:
                      zero_padding, prefix_sign, prefix_space);
 #endif //SDCC_STACK_AUTO
 #endif //USE_FLOATS
-      } else if (radix != 0)
+      }
+      else if (radix != 0)
       {
         // Apparently we have to output an integral type
         // with radix "radix"
@@ -689,7 +729,7 @@ get_conversion_spec:
         // store value in byte[0] (LSB) ... byte[3] (MSB)
         if (char_argument)
         {
-          value.l = va_arg(ap,char);
+          value.l = va_arg(ap, char);
           if (!signed_argument)
           {
             value.l &= 0xFF;
@@ -697,11 +737,11 @@ get_conversion_spec:
         }
         else if (long_argument)
         {
-          value.l = va_arg(ap,long);
+          value.l = va_arg(ap, long);
         }
         else // must be int
         {
-          value.l = va_arg(ap,int);
+          value.l = va_arg(ap, int);
           if (!signed_argument)
           {
             value.l &= 0xFFFF;
@@ -744,7 +784,7 @@ get_conversion_spec:
           // default width. We set it to 1 to output
           // at least one character in case the value itself
           // is zero (i.e. length==0)
-          width=1;
+          width = 1;
         }
 
         /* prepend spaces if needed */
@@ -782,10 +822,12 @@ get_conversion_spec:
 
         /* prepend zeroes/spaces if needed */
         if (!left_justify)
+        {
           while ( width-- > length )
           {
             OUTPUT_CHAR( zero_padding ? '0' : ' ', p );
           }
+        }
         else
         {
           /* spaces are appended after the digits */
@@ -816,10 +858,12 @@ get_conversion_spec:
 #endif
         }
         if (left_justify)
+        {
           while (width-- > 0)
           {
             OUTPUT_CHAR(' ', p);
           }
+        }
       }
     }
     else

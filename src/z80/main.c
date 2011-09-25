@@ -673,6 +673,7 @@ _hasNativeMulFor (iCode * ic, sym_link * left, sym_link * right)
 {
   sym_link *test = NULL;
   value *val;
+  int result_size = IS_SYMOP(IC_RESULT(ic)) ? getSize(OP_SYM_TYPE(IC_RESULT(ic))) : 4;
 
   if (ic->op != '*')
     {
@@ -692,6 +693,11 @@ _hasNativeMulFor (iCode * ic, sym_link * left, sym_link * right)
   /* 8x8 unsigned multiplication code is shorter than
      call overhead for the multiplication routine. */
   else if (IS_CHAR (right) && IS_UNSIGNED (right) && IS_CHAR (left) && IS_UNSIGNED (left) && !IS_GB)
+    {
+      return TRUE;
+    }
+  /* Same for any multiplication with 8 bit result. */
+  else if (result_size == 1 && !IS_GB)
     {
       return TRUE;
     }

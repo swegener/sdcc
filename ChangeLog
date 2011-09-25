@@ -1,5 +1,10 @@
 2011-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/main.c:
+	  Always use native multiplication for Z80 and Z180 when the result is 8 bits.
+
+2011-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Always use of Z180 mlt instruction for unsigned 8x8 multiplication,
 	  fixed bug in register-to-register cast.

@@ -5248,27 +5248,50 @@ genMultOneChar (const iCode * ic)
     }
 
   if (IS_Z180 &&
-    AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+    /*AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&*/ AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
     {
-      if ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == B_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX ||
-        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == B_IDX) &&
+      if (/*(AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == B_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX ||
+        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == B_IDX) &&*/
         (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == B_IDX : !bitVectBitValue (ic->rSurv, B_IDX)) && result->aopu.aop_reg[0]->rIdx == C_IDX)
         {
+          if(AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX ||
+            AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == B_IDX)
+            {
+              cheapMove(ASMOP_C, 0, AOP (IC_LEFT (ic)), LSB);
+              cheapMove(ASMOP_B, 0, AOP (IC_RIGHT (ic)), LSB);
+            }
+          else
+            {
+              cheapMove(ASMOP_B, 0, AOP (IC_LEFT (ic)), LSB);
+              cheapMove(ASMOP_C, 0, AOP (IC_RIGHT (ic)), LSB);
+            }
           emit2 ("mlt bc");
           regalloc_dry_run_cost += 2;
           return;
         }
-      if ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == D_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
-        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX) &&
+      if (/*(AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == D_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
+        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX) &&*/
         (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == D_IDX : !bitVectBitValue (ic->rSurv, D_IDX)) && result->aopu.aop_reg[0]->rIdx == E_IDX)
         {
+          if(AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
+            AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX)
+            {
+              cheapMove(ASMOP_E, 0, AOP (IC_LEFT (ic)), LSB);
+              cheapMove(ASMOP_D, 0, AOP (IC_RIGHT (ic)), LSB);
+            }
+          else
+            {
+              cheapMove(ASMOP_D, 0, AOP (IC_LEFT (ic)), LSB);
+              cheapMove(ASMOP_E, 0, AOP (IC_RIGHT (ic)), LSB);
+            }
           emit2 ("mlt de");
           regalloc_dry_run_cost += 2;
           return;
         }
-      if ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == H_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == L_IDX ||
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&
+        ((AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == H_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == L_IDX ||
         AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == L_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == H_IDX) &&
-        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == H_IDX : !bitVectBitValue (ic->rSurv, H_IDX)) && result->aopu.aop_reg[0]->rIdx == L_IDX)
+        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == H_IDX : !bitVectBitValue (ic->rSurv, H_IDX)) && result->aopu.aop_reg[0]->rIdx == L_IDX))
         {
           emit2 ("mlt hl");
           regalloc_dry_run_cost += 2;
@@ -5281,8 +5304,8 @@ genMultOneChar (const iCode * ic)
       _push (PAIR_DE);
       _G.stack.pushedDE = TRUE;
     }
-  if (!z80_opts.oldralloc && bitVectBitValue (ic->rSurv, B_IDX) ||
-    z80_opts.oldralloc && bitVectBitValue (ic->rMask, B_IDX) && !(getPairId (AOP (IC_RESULT (ic))) == PAIR_BC))
+  if (!IS_Z180 && (!z80_opts.oldralloc && bitVectBitValue (ic->rSurv, B_IDX) ||
+    z80_opts.oldralloc && bitVectBitValue (ic->rMask, B_IDX) && !(getPairId (AOP (IC_RESULT (ic))) == PAIR_BC)))
     {
       _push (PAIR_BC);
       savedB = TRUE;
@@ -5301,7 +5324,13 @@ genMultOneChar (const iCode * ic)
       cheapMove (ASMOP_H, 0, AOP (IC_LEFT (ic)), LSB);
     }
 
-  if (!regalloc_dry_run)
+  if (IS_Z180)
+    {
+      emit2 ("ld l, e");
+      emit2 ("mlt hl");
+      regalloc_dry_run_cost += 3;
+    }
+  else if (!regalloc_dry_run)
     {
       tlbl1 = newiTempLabel (NULL);
       tlbl2 = newiTempLabel (NULL);
@@ -5314,8 +5343,10 @@ genMultOneChar (const iCode * ic)
       emit2 ("add hl,de");
       emitLabelNoSpill (tlbl2->key + 100);
       emit2 ("djnz !tlabel", tlbl1->key + 100);
+      regalloc_dry_run_cost += 12;
     }
-  regalloc_dry_run_cost += 12;
+  else
+    regalloc_dry_run_cost += 12;
 
 
   spillPair(PAIR_HL);
@@ -8916,18 +8947,34 @@ genCast (const iCode *ic)
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
+      size = AOP_SIZE (result);
 
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))
         goto release;
 
-      /* if they in different places then copy */
-      size = AOP_SIZE (result);
-      offset = 0;
-      while (size--)
+      if (AOP_TYPE (right) == AOP_REG && AOP_TYPE (result) == AOP_REG)
         {
-          cheapMove (AOP (result), offset, AOP (right), offset);
-          offset++;
+          int i;
+          short rightarray[4], resarray[4];
+          
+          for(i = 0; i < size; i++)
+          {
+             rightarray[i] = AOP (right)->aopu.aop_reg[i]->rIdx;
+             resarray[i] = AOP (result)->aopu.aop_reg[i]->rIdx;
+          }
+          
+          regMove(resarray, rightarray, size);
+        }
+      else
+        {
+          /* if they in different places then copy */
+          offset = 0;
+          while (size--)
+            {
+              cheapMove (AOP (result), offset, AOP (right), offset);
+              offset++;
+            }
         }
       goto release;
     }

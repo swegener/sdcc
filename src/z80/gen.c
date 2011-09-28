@@ -8655,7 +8655,7 @@ genAddrOf (const iCode *ic)
 /* genAssign - generate code for assignment                        */
 /*-----------------------------------------------------------------*/
 static void
-genAssign (iCode * ic)
+genAssign (const iCode *ic)
 {
   operand *result, *right;
   int size, offset;
@@ -8947,35 +8947,7 @@ genCast (const iCode *ic)
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
-      size = AOP_SIZE (result);
-
-      /* if they are in the same place */
-      if (sameRegs (AOP (right), AOP (result)))
-        goto release;
-
-      if (AOP_TYPE (right) == AOP_REG && AOP_TYPE (result) == AOP_REG)
-        {
-          int i;
-          short rightarray[4], resarray[4];
-          
-          for(i = 0; i < size; i++)
-          {
-             rightarray[i] = AOP (right)->aopu.aop_reg[i]->rIdx;
-             resarray[i] = AOP (result)->aopu.aop_reg[i]->rIdx;
-          }
-          
-          regMove(resarray, rightarray, size);
-        }
-      else
-        {
-          /* if they in different places then copy */
-          offset = 0;
-          while (size--)
-            {
-              cheapMove (AOP (result), offset, AOP (right), offset);
-              offset++;
-            }
-        }
+      genAssign (ic);
       goto release;
     }
 

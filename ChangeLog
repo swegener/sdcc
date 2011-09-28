@@ -1,3 +1,8 @@
+2011-09-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* ChangeLog:
+	  Reconstruct ChangeLog entries lost during the z180 branch merge.
+
 2011-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c:
@@ -18,9 +23,9 @@
 
 	* Merged z180 branch.
 
-2011-09-24 Philipp Klaus Krause <pkk AT spth.de>
+2011-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* Merge from trunk.
+	* device/lib/printf_large.c: accept int modifiers
 
 2011-09-24 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -97,7 +102,205 @@
 
 2011-09-23 Philipp Klaus Krause <pkk AT spth.de>
 
-	* Merge from trunk.
+	* src/SDCCicode.c,
+	  support/regression/tests/bug2942247.c:
+	  Fixed bug #2942247.
+
+2011-09-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y (abstract_declarator2): fixed bug 3190029
+	* support/regression/tests/bug3190029.c: new, added
+
+2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/pic16/gen.c,
+	  src/pic14/gen.c,
+	  device/include/stdbool.h,
+	  support/regression/bool.c,
+	  src/SDCCsymt.c,
+	  src/SDCCast.c:
+	  _Bool support for the pics.
+
+2011-09-19 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libio/adc/adcopen.c:
+	  suppress 'pcfg unused' compiler warning
+
+	* device/lib/pic16/Makefile.common
+	  device/non-free/lib/pic16/Makefile.common:
+	  move -Ipath to AM_CPPFLAGS for use by depmod
+
+	* device/lib/pic16/configure.ac,
+	  device/non-free/lib/pic16/configure.ac:
+	  add --enable-new-pics switch to build support libs for devices added
+	  to gputils only after the 0.13.7 release; by default, only libs for
+	  devices that are supported in gputils 0.13.7 are built to avoid build
+	  failures
+
+	* device/lib/pic16/libio/Makefile.am,
+	  device/non-free/lib/pic16/libdev/Makefile.am:
+	  honor --enable-new-pics switch to include/exclude certain devices
+
+	* doc/sdccman.lyx:
+	  document the new configure switch
+
+	* device/lib/pic16/Makefile.in,
+	* device/lib/pic16/aclocal.m4,
+	* device/lib/pic16/configure,
+	* device/lib/pic16/debug/Makefile.in,
+	* device/lib/pic16/libc/Makefile.in,
+	* device/lib/pic16/libio/Makefile.in,
+	* device/lib/pic16/libm/Makefile.in,
+	* device/lib/pic16/libsdcc/Makefile.in,
+	* device/lib/pic16/startup/Makefile.in,
+	* device/non-free/lib/pic16/Makefile.in,
+	* device/non-free/lib/pic16/aclocal.m4,
+	* device/non-free/lib/pic16/configure,
+	* device/non-free/lib/pic16/libdev/Makefile.in:
+	  regenerated
+
+2011-09-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genFunction),
+	* src/mcs51/gen.c (genFunction): handle function pointers, fixed bug 3410620
+	* src/SDCCsymt.c (compareFuncType): check regbank for non-isr,
+	  (dbuf_printTypeChain): print reentrancy, register bank & bankswitching
+	* src/SDCCsymt.h: removed unused & buggy IFFUNC_RBANK
+	* support/Util/dbuf.c (dbuf_set_length): auto-init dbuf
+	* support/regression/tests/bug3410620.c: new, added
+
+2011-09-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  support/regression/tests/bug3410878.c:
+	  Fixed bug #3410878.
+
+2011-09-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (processParms): fixed bugs 3166064 and 3394118
+	* support/regression/tests/bug3166064.c: new, added
+	* .version,
+	* doc/sdccman.lyx: bumped version to 3.0.5
+
+2011-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCval.c (getNelements): fixed bug 3135551
+	* support/regression/tests/bug3135551.c: new, added
+	* src/ds390/gen.c (genInline),
+	* src/hc08/gen.c (genInline),
+	* src/mcs51/gen.c (genInline),
+	* src/pic14/gen.c (genInline),
+	* src/pic16/gen.c (genInline),
+	* src/z80/gen.c (genInline),
+	* support/cpp/c-ppoutput.c (scan_translation_unit),
+	* support/cpp/libcpp/lex.c (cpp_output_line): replaced character by '\x87'
+
+2011-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genInline),
+	* src/hc08/gen.c (genInline),
+	* src/mcs51/gen.c (genInline),
+	* src/pic14/gen.c (genInline),
+	* src/pic16/gen.c (genInline),
+	* src/z80/gen.c (genInline): convert (0x87) to newline
+	* support/cpp/libcpp/include/cpplib.h: removed IN_ASM, added ENTER_ASM and
+	  EXIT_ASM
+	* support/cpp/c-ppoutput.c (scan_translation_unit),
+	* support/cpp/libcpp/lex.c (_cpp_process_line_notes, _cpp_lex_direct,
+	  cpp_output_token, cpp_output_line): fixed bugs 3407198 and 3407279 by
+	  inserting (0x87) for newlines
+	* support/regression/tests/bug1505956.c: added tests
+
+2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug3401973.c:
+	  Fixed bug #3401973.
+
+2011-09-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c,
+	  support/regression/bug3407632.c:
+	  Fixed bug #3407632.
+
+2011-09-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/aslink.h: added pcb & rterr, modified lkglist
+	* sdas/linksrc/lkarea.c (find_empty_space, allocate_space): changed warnings
+	* sdas/linksrc/lkdata.c: added pcb & rterr
+	* sdas/linksrc/lkeval.c (eval, expr, term): no signed arithmetic,
+	  (term): accept closing quotes	
+	* sdas/linksrc/lklist.c: sync with ASxxxx 5
+	* sdas/linksrc/lkmain.c (link_main): reset a_bytes and hilo to defaults 2,0
+	  fixes bug 3305824	
+	* sdas/linksrc/lkrloc.c (relr): set default pcb
+
+2011-09-09 Borut Razem <borut.razem AT gmail.com>
+
+	* support/cpp/md5.h:
+	  included stdint.h for uintptr_t declaration
+
+2011-09-08 Borut Razem <borut.razem AT gmail.com>
+
+	* support/cpp/md5.h:
+	  fixed WIN64 warning: cast from pointer to integer of different size
+
+2011-09-07 Borut Razem <borut.razem AT gmail.com>
+
+	* support/cpp/version.c: updated version to 4.6.1
+
+2011-09-06 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/sdcdb.h, src/SDCCsystem.c, src/pic14/glue.c:
+	  fixed WIN64 warnings: cast from pointer to integer of different size
+	* src/SDCCsystem.c: fixed WIN64 TRUE and FALSE redefinition
+	* src/SDCCglobal.c: fixed stack overflow
+
+2011-09-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp:
+	  Connect unconnected live-ranges instead of just spilling.
+
+2011-09-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Minor cleanup from the stack-compact branch.
+
+2011-09-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/sincoshf.c: fixed bug 3326853
+
+2011-09-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug1723128.c: fixed bug 3403038
+
+2011-09-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.h,
+	  support/regression/tests/bug3404101.c:
+	  Fixed bug #3404101.
+
+2011-09-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* Makefile.in: added some dependencies to fix bug 3148465
+	* src/mcs51/gen.c (gencjneshort,genOr): small optimizations
+	* src/SDCCicode.h,
+	* src/SDCCicode.c (operandType): fixed warning
+	* src/SDCCsymt.h: cosmetics
+	* src/z80/gen.c: fixed warnings
+	* support/cpp/sdcpp-opts.c (sdcpp_common_init): return true on success
+
+2011-09-04 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/sdcc.nsi: include readline5.dll in 64bit package
+
+2011-09-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug3368945.c,
+	* support/regression/tests/bug3381400.c,
+	* support/regression/tests/bug3397636.c: fixed line endings and svn props
+	* support/regression/tests/bug3401973.c: put large struct in large memory
+	* support/regression/tests/bug3403429.c: fixed warnings, explained bug
 
 2011-09-03 Philipp Klaus Krause <pkk AT spth.de>
 

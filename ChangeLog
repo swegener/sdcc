@@ -1,3 +1,8 @@
+2011-09-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* configure.in,
+	  configure: create device/lib/z180/Makefile during configuration
+
 2011-09-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

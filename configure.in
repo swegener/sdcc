@@ -906,6 +906,7 @@ if test $OPT_DISABLE_Z80 = 0; then
                    sdas/asz80/Makefile
                    sdas/asgb/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile
+                                                       device/lib/z180/Makefile
                                                        device/lib/gbz80/Makefile])
 fi
 

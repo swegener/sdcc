@@ -1310,8 +1310,8 @@ PORT tininative_port =
     getRegsWritten
   },
   {
-        /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 1, 3, 3, 1, 4, 4
+        /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+    1, 2, 2, 4, 8, 1, 3, 3, 1, 4, 4
   },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */

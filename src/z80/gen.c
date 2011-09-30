@@ -2967,7 +2967,7 @@ _castBoolean (const operand *right)
 /* Shuffle src reg array into dst reg array. */
 static void regMove(short *dst, short *src, size_t n)
 {
-  bool assigned[6] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
+  bool assigned[8] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
   int cached_byte = -1;
   size_t size = n;
   
@@ -8789,7 +8789,7 @@ genAssign (const iCode *ic)
         {
           // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
         
-          bool assigned[4] = {FALSE, FALSE, FALSE, FALSE};	// This has to be made bigger when sdcc supports variables larger than 4 bytes in registers.
+          bool assigned[8] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};	// This has to be made bigger when sdcc supports variables larger than 8 bytes in registers.
           int cached_byte = -1;
 
           while (size--)

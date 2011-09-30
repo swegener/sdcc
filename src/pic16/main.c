@@ -1146,6 +1146,7 @@ PORT pic16_port =
     2,      /* short */
     2,      /* int */
     4,      /* long */
+    8,      /* long long */
     2,      /* ptr */
     3,      /* fptr, far pointers (see Microchip) */
     3,      /* gptr */

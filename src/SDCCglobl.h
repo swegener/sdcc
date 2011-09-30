@@ -112,6 +112,7 @@ typedef unsigned char bool;
 #define SHORTSIZE   port->s.short_size
 #define INTSIZE     port->s.int_size
 #define LONGSIZE    port->s.long_size
+#define LONGLONGSIZE port->s.longlong_size
 #define PTRSIZE     port->s.ptr_size
 #define FPTRSIZE    port->s.fptr_size
 #define GPTRSIZE    port->s.gptr_size

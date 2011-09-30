@@ -48,6 +48,8 @@ nounName (sym_link * sl)
     {
     case V_INT:
       {
+        if (SPEC_LONGLONG (sl))
+          return "long long";
         if (SPEC_LONG (sl))
           return "long";
         if (SPEC_SHORT (sl))
@@ -587,7 +589,7 @@ checkTypeSanity (sym_link * etype, const char *name)
        SPEC_NOUN (etype) == V_CHAR ||
        SPEC_NOUN (etype) == V_FLOAT ||
        SPEC_NOUN (etype) == V_FIXED16X16 ||
-       SPEC_NOUN (etype) == V_DOUBLE || SPEC_NOUN (etype) == V_VOID) && (SPEC_SHORT (etype) || SPEC_LONG (etype)))
+       SPEC_NOUN (etype) == V_DOUBLE || SPEC_NOUN (etype) == V_VOID) && (SPEC_SHORT (etype) || SPEC_LONG (etype) || SPEC_LONGLONG (etype)))
     {                           // long or short for char float double or void
       werror (E_LONG_OR_SHORT_INVALID, noun, name);
     }
@@ -687,10 +689,11 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
         }
     }
 
-  if ((SPEC_SHORT (src) || SPEC_LONG (src)) && (SPEC_SHORT (dest) || SPEC_LONG (dest)))
+  if ((SPEC_SHORT (src) || SPEC_LONG (src) || SPEC_LONGLONG (src)) &&
+    (SPEC_SHORT (dest) || SPEC_LONG (dest) || SPEC_LONGLONG (dest)))
     {
-      /* Todo: long long for C99 */    
-      werror (E_SHORTLONG, name);
+      if (!(options.std_c99 && SPEC_LONG (src) && SPEC_LONG (dest) && TARGET_IS_Z80)) /* C99 has long long */
+        werror (E_SHORTLONG, name);
     }
 
   if (SPEC_SCLS (src))
@@ -725,7 +728,14 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
 #endif
   // but there are more important thing right now
 
-  SPEC_LONG (dest) |= SPEC_LONG (src);
+  if (options.std_c99 && SPEC_LONG (src) && SPEC_LONG (dest))
+    {
+      SPEC_LONG (dest) = 0;
+      SPEC_LONGLONG (dest) = 1;
+    }
+  else
+    SPEC_LONG (dest) |= SPEC_LONG (src);
+  SPEC_LONGLONG (dest) |= SPEC_LONGLONG (src);
   SPEC_SHORT (dest) |= SPEC_SHORT (src);
   SPEC_USIGN (dest) |= SPEC_USIGN (src);
   dest->select.s.b_signed |= src->select.s.b_signed;
@@ -938,7 +948,7 @@ getSize (sym_link * p)
       switch (SPEC_NOUN (p))
         {                       /* depending on the specifier type */
         case V_INT:
-          return (IS_LONG (p) ? LONGSIZE : INTSIZE);
+          return (IS_LONGLONG (p) ? LONGLONGSIZE : (IS_LONG (p) ? LONGSIZE : INTSIZE));
         case V_FLOAT:
           return FLOATSIZE;
         case V_FIXED16X16:
@@ -1690,8 +1700,10 @@ checkSClass (symbol * sym, int isProto)
         size = 8;
       else if (SPEC_LONG (sym->etype) == 0)
         size = 16;
-      else
+      else if (SPEC_LONGLONG (sym->etype) == 0)
         size = 32;
+      else
+        size = 64;
 
       addr = SPEC_ADDR (sym->etype);
       for (n = 0; n < size; n += 8)
@@ -2419,6 +2431,9 @@ compareType (sym_link * dest, sym_link * src)
   if (SPEC_LONG (dest) != SPEC_LONG (src))
     return -1;
 
+  if (SPEC_LONGLONG (dest) != SPEC_LONGLONG (src))
+    return -1;
+
   if (SPEC_USIGN (dest) != SPEC_USIGN (src))
     return -2;
 
@@ -2527,9 +2542,11 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
       if (SPEC_USIGN (dest) != SPEC_USIGN (src))
         return 0;
       /* size must match */
+      if (SPEC_SHORT (dest) != SPEC_SHORT (src))
+        return 0;
       if (SPEC_LONG (dest) != SPEC_LONG (src))
         return 0;
-      if (SPEC_SHORT (dest) != SPEC_SHORT (src))
+      if (SPEC_LONGLONG (dest) != SPEC_LONGLONG (src))
         return 0;
     }
 
@@ -2725,7 +2742,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if (IS_AGGREGATE (sym->type->next))
+  if (IS_AGGREGATE (sym->type->next) || IS_LONGLONG (sym->type->next))
     {
       werror (E_FUNC_AGGR, sym->name);
       return 0;
@@ -3255,7 +3272,9 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
           switch (SPEC_NOUN (type))
             {
             case V_INT:
-              if (IS_LONG (type))
+              if (IS_LONGLONG (type))
+                dbuf_append_str (dbuf, "longlong-");
+              else if (IS_LONG (type))
                 dbuf_append_str (dbuf, "long-");
               dbuf_append_str (dbuf, "int");
               break;

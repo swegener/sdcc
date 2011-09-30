@@ -159,6 +159,7 @@ typedef struct
     int short_size;
     unsigned int int_size;
     int long_size;
+    int longlong_size;
     int ptr_size;               //near
     int fptr_size;              //far
     int gptr_size;              //generic

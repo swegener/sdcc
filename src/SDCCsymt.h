@@ -43,6 +43,7 @@ enum
   TYPEOF_BOOL,
   TYPEOF_CHAR,
   TYPEOF_LONG,
+  TYPEOF_LONGLONG,
   TYPEOF_FLOAT,
   TYPEOF_FIXED16X16,
   TYPEOF_BIT,
@@ -155,9 +156,10 @@ typedef struct specifier
   STORAGE_CLASS sclass;             /* REGISTER,AUTO,FIX,CONSTANT */
   struct memmap *oclass;            /* output storage class       */
   unsigned b_long:1;                /* 1=long                     */
+  unsigned b_longlong:1;            /* 1=long long                */
   unsigned b_short:1;               /* 1=short int                */
   unsigned b_unsigned:1;            /* 1=unsigned, 0=signed       */
-  unsigned b_signed:1;              /* just for sanity checks only */
+  unsigned b_signed:1;              /* just for sanity checks only*/
   unsigned b_static:1;              /* 1=static keyword found     */
   unsigned b_extern:1;              /* 1=extern found             */
   unsigned b_inline:1;              /* inline function requested  */
@@ -434,6 +436,7 @@ extern sym_link *validateLink (sym_link * l,
 
 #define SPEC_NOUN(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.noun
 #define SPEC_LONG(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_long
+#define SPEC_LONGLONG(x) validateLink(x, "SPEC_LONGLONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_longlong
 #define SPEC_SHORT(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_short
 #define SPEC_USIGN(x) validateLink(x, "SPEC_USIGN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_unsigned
 #define SPEC_SCLS(x) validateLink(x, "SPEC_SCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.sclass
@@ -491,6 +494,7 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_FUNCPTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == CPOINTER || DCL_TYPE(x) == GPOINTER) && IS_FUNC(x->next))
 #define IS_FUNC(x)       (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
 #define IS_LONG(x)       (IS_SPEC(x) && x->select.s.b_long)
+#define IS_LONGLONG(x)   (IS_SPEC(x) && x->select.s.b_longlong)
 #define IS_UNSIGNED(x)   (IS_SPEC(x) && x->select.s.b_unsigned)
 #define IS_TYPEDEF(x)    (IS_SPEC(x) && x->select.s.b_typedef)
 #define IS_CONSTANT(x)   (isConstant (x))

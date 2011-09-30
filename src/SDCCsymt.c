@@ -907,6 +907,21 @@ newLongLink ()
 }
 
 /*------------------------------------------------------------------*/
+/* newLongLongLink() - new long long type                           */
+/*------------------------------------------------------------------*/
+sym_link *
+newLongLongLink ()
+{
+  sym_link *p;
+
+  p = newLink (SPECIFIER);
+  SPEC_NOUN (p) = V_INT;
+  SPEC_LONGLONG (p) = 1;
+
+  return p;
+}
+
+/*------------------------------------------------------------------*/
 /* newIntLink() - creates an int type                               */
 /*------------------------------------------------------------------*/
 sym_link *

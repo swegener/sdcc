@@ -1,3 +1,10 @@
+2011-09-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCsymt.c:
+	  Drop support for declarations like "long short short long short int x;".
+
 2011-09-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* configure.in,

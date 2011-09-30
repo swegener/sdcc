@@ -463,6 +463,8 @@ struct
    "incomplete universal character name \\%s." },
 { W_UNIVERSAL_C99, ERROR_LEVEL_WARNING,
    "universal character names are only valid in C99" },
+{ E_SHORTLONG, ERROR_LEVEL_ERROR,
+   "invalid combination of short / long" },
 };
 
 /*

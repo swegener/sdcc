@@ -687,6 +687,12 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
         }
     }
 
+  if ((SPEC_SHORT (src) || SPEC_LONG (src)) && (SPEC_SHORT (dest) || SPEC_LONG (dest)))
+    {
+      /* Todo: long long for C99 */    
+      werror (E_SHORTLONG, name);
+    }
+
   if (SPEC_SCLS (src))
     {
       /* if destination has no storage class */

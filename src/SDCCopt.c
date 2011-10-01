@@ -737,7 +737,8 @@ convilong (iCode * ic, eBBlock * ebp)
             }
         }
     }
-  assert (0);
+  werror (E_INVALID_OP);
+  return;
 found:
   /* if int & long support routines NOT compiled as reentrant */
   if (!options.intlong_rent)

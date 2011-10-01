@@ -1,5 +1,10 @@
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCopt.c:
+	  Slightly more informative error message when attempting to multipli, etc long long.
+
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Reorganized pointer access functions, fixed the remaining warning in the z80 port.
 

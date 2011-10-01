@@ -126,7 +126,7 @@ enum {
   E_STRUCT_AS_ARG               =  97, /* structure passed as argument */
   E_PREV_DEF_CONFLICT           =  98, /* previous definition conflicts with current */
   E_CODE_NO_INIT                =  99, /* vars in code space must have initializer */
-  E_OPS_INTEGRAL                = 100, /* operans must be integral for certian assignments */
+  E_OPS_INTEGRAL                = 100, /* operans must be integral for certain assignments */
   E_TOO_MANY_PARMS              = 101, /* too many parameters */
   E_TOO_FEW_PARMS               = 102, /* to few parameters   */
   E_FUNC_NO_CODE                = 103, /* fatalError          */

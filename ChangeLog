@@ -1,3 +1,22 @@
+2011-10-01 Raphael Neider <rneider AT web.de>
+
+	* device/non-free/include/pic14/pic12f1822.h,
+	  device/non-free/lib/pic14/libdev/pic12f1822.c,
+	  device/include/pic14/pic14devices.txt,
+	  device/lib/pic14/libdev/devices.txt:
+	  Add support for 12f1822 devices, requires --enable-new-pics to be
+	  passed to configure, closes #3416092.
+
+	* device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/lib/pic14/configure.in:
+	  Add --enable-new-pics switch to build device libs for devices added
+	  to gputils only after the 0.13.7 release; by default, only libs for
+	  devices that are supported in gputils 0.13.7 are built to avoid build
+	  failures.
+
+	* device/non-free/lib/pic14/configure:
+	  Regenerated.
+
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

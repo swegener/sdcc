@@ -1012,6 +1012,18 @@ processor 16c926
 #
 # 12F series devices with 14 bit core
 #
+processor 12f1822
+        program         2K
+        data            128
+        eeprom          256
+        io              6
+        maxram          0x07f
+        bankmsk         0xf80
+        confsiz         2
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x70 0x7f 0xf80
+
+
 processor 12f629, 12f675
 	program		1K
 	data		64

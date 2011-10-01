@@ -1,4 +1,9 @@
-2011-09-30 Philipp Klaus Krause <pkk AT spth.de>
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Enable long long for gbz80 and z180 ports.
+
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/src/izt/tlcs900h.c,
 	  src/izt/i186.c,

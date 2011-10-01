@@ -6596,8 +6596,8 @@ static void genCast (iCode *ic)
         {
           pic14_toBoolean (right);
           emitSKPNZ;
-          emitpcode(POC_MOVLW, pic16_popGetLit(1));
-          emitpcode(POC_MOVWF,pic16_popGet(AOP(result),0));
+          emitpcode(POC_MOVLW, popGetLit(1));
+          emitpcode(POC_MOVWF, popGet(AOP(result),0));
           goto release;
         }
 

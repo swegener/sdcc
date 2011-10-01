@@ -2,6 +2,8 @@
 
 	* src/SDCCsymt.c:
 	  Enable long long for gbz80 and z180 ports.
+	* src/pic14/gen.c:
+	  Fixed use of pic16 functions in pic14 port.
 
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -1,5 +1,9 @@
 2011-10-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/ds390/main.c: added missing long long type size entries
+
+2011-10-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* sim/ucsim/z80.src/sz80.cc: enable sz80 -H option
 	* sim/ucsim/globals.cc,
 	* sim/ucsim/globals.h,

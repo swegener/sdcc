@@ -80,7 +80,7 @@ typedef signed char             int_fast8_t;
 typedef int                     int_fast16_t;
 typedef long int                int_fast32_t;
 #ifdef __SDCC_LONGLONG
-typedef unsigned long long int  uint_fast64_t;
+typedef long long int           int_fast64_t;
 #endif
 
 /* Unsigned.  */

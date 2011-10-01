@@ -1,5 +1,10 @@
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/include/stdint.h:
+	  Added typedefs for 64-bit integer types.
+
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCerr.h,
 	  src/SDCCerr.c,
 	  src/SDCCval.c:

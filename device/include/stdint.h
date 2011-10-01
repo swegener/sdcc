@@ -2,6 +2,7 @@
    stdint.h - ISO C99 7.18 Integer types <stdint.h>
 
    Copyright (C) 2005, Maarten Brock, sourceforge.brock@dse.nl
+   Copyright (C) 2011, Philipp Klaus Krause, pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -31,17 +32,28 @@
 
 /* Exact integral types.  */
 
+#if defined (SDCC_z80) || defined (SDCC_z180) || defined (SDCC_gbz80)
+#if __STDC_VERSION__ >= 199901L
+#define __SDCC_LONGLONG
+#endif
+#endif
+
 /* Signed.  */
 
 typedef signed char             int8_t;
 typedef short int               int16_t;
 typedef long int                int32_t;
+#ifdef __SDCC_LONGLONG
+typedef long long int           int64_t;
+#endif
 
 /* Unsigned.  */
 typedef unsigned char           uint8_t;
 typedef unsigned short int      uint16_t;
 typedef unsigned long int       uint32_t;
-
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint64_t;
+#endif
 
 /* Small types.  */
 
@@ -49,12 +61,17 @@ typedef unsigned long int       uint32_t;
 typedef signed char             int_least8_t;
 typedef short int               int_least16_t;
 typedef long int                int_least32_t;
+#ifdef __SDCC_LONGLONG
+typedef long long int           int_least64_t;
+#endif
 
 /* Unsigned.  */
 typedef unsigned char           uint_least8_t;
 typedef unsigned short int      uint_least16_t;
 typedef unsigned long int       uint_least32_t;
-
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint_least64_t;
+#endif
 
 /* Fast types.  */
 
@@ -62,12 +79,17 @@ typedef unsigned long int       uint_least32_t;
 typedef signed char             int_fast8_t;
 typedef int                     int_fast16_t;
 typedef long int                int_fast32_t;
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint_fast64_t;
+#endif
 
 /* Unsigned.  */
 typedef unsigned char           uint_fast8_t;
 typedef unsigned int            uint_fast16_t;
 typedef unsigned long int       uint_fast32_t;
-
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint_fast64_t;
+#endif
 
 /* Types for `void *' pointers.  */
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
@@ -167,11 +189,13 @@ typedef unsigned long int       uintmax_t;
 # define INT8_C(c)      c
 # define INT16_C(c)     c
 # define INT32_C(c)     c ## L
+# define INT64_C(c)     c ## LL
 
 /* Unsigned.  */
 # define UINT8_C(c)     c ## U
 # define UINT16_C(c)    c ## U
 # define UINT32_C(c)    c ## UL
+# define UINT64_C(c)    c ## ULL
 
 /* Maximal type.  */
 # define INTMAX_C(c)    c ## L

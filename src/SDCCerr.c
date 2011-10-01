@@ -468,6 +468,8 @@ struct
      "universal character names are only valid in C99", 0 },
   { E_SHORTLONG, ERROR_LEVEL_ERROR,
      "invalid combination of short / long", 0 },
+  { E_INTEGERSUFFIX, ERROR_LEVEL_ERROR,
+     "Invalid integer suffix '%s' in integer constant", 0},
 };
 
 /*

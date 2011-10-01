@@ -1,3 +1,10 @@
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCval.c:
+	  Error for invalid integer suffix, as in 1ullul.
+
 2011-10-01 Raphael Neider <rneider AT web.de>
 
 	* device/non-free/include/pic14/pic12f1822.h,
@@ -20,7 +27,7 @@
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:
-	  Slightly more informative error message when attempting to multipli, etc long long.
+	  Slightly more informative error message when attempting to multiply, etc long long.
 
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 

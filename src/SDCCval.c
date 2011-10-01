@@ -645,7 +645,7 @@ cheapestVal (value * val)
     return val;
 
   /* long must not be changed */
-  if (SPEC_LONG (val->type))
+  if (SPEC_LONG (val->type) || SPEC_LONGLONG (val->type))
     return val;
 
   /* unsigned must not be changed */
@@ -1022,7 +1022,7 @@ value *
 constVal (const char *s)
 {
   value *val;
-  char *p;
+  char *p, *p2;
   double dval;
   bool is_integral = 0;
 
@@ -1055,16 +1055,30 @@ constVal (const char *s)
 
   /* Setup the flags first */
   /* set the unsigned flag if 'uU' is found */
-  if (strchr (p, 'u') || strchr (p, 'U'))
+  if ((p2 = strchr (p, 'u')) || (p2 = strchr (p, 'U')))
     {
       SPEC_USIGN (val->type) = 1;
+      p2++;
+      if (strchr (p2, 'u') || strchr (p2, 'U'))
+        werror (E_INTEGERSUFFIX, p);
     }
 
-  /* set the b_long flag if 'lL' is found */
-  if (strchr (p, 'l') || strchr (p, 'L'))
+  if ((p2 = strstr (p, "ll")) || (p2 = strstr (p, "LL")))
+    {
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_LONGLONG (val->type) = 1;
+      p2 += 2;
+      if (strchr (p2, 'l') || strchr (p2, 'L'))
+        werror (E_INTEGERSUFFIX, p); 
+    }
+  /* set the b_long flag if 'l' or 'L' is found */
+  else if ((p2 = strchr (p, 'l')) || (p2 = strchr (p, 'L')))
     {
       SPEC_NOUN (val->type) = V_INT;
       SPEC_LONG (val->type) = 1;
+      p2++;
+      if (strchr (p2, 'l') || strchr (p2, 'L'))
+        werror (E_INTEGERSUFFIX, p);  
     }
   else
     {
@@ -1074,10 +1088,10 @@ constVal (const char *s)
             {                   /* check if we have to promote to int */
               SPEC_NOUN (val->type) = V_INT;
             }
-          if (dval < -32768)
-            {                   /* check if we have to promote to long int */
-              SPEC_LONG (val->type) = 1;
-            }
+          if (dval < -2147483648) /* check if we have to promote to long long int */  
+            SPEC_LONGLONG (val->type) = 1;
+          else if (dval < -32768) /* check if we have to promote to long int */              
+            SPEC_LONG (val->type) = 1;
         }
       else
         {                       /* >=0 */
@@ -1093,7 +1107,7 @@ constVal (const char *s)
             {                   /* store char's always as unsigned; this helps other optimizations */
               SPEC_USIGN (val->type) = 1;
             }
-          if (dval > 0xffff && SPEC_USIGN (val->type))
+          if (dval > 0xffff && SPEC_USIGN (val->type) && !SPEC_LONGLONG (val->type))
             {                   /* check if we have to promote to long */
               SPEC_LONG (val->type) = 1;
             }
@@ -1108,10 +1122,19 @@ constVal (const char *s)
                 {
                   SPEC_LONG (val->type) = 1;
                   if (dval > 0x7fffffff)
-                    {
-                      SPEC_USIGN (val->type) = 1;
-                    }
+                    SPEC_USIGN (val->type) = 1;
                 }
+            }
+          if (dval > 0xffffffff && SPEC_USIGN (val->type) && !SPEC_LONGLONG (val->type))
+            {
+              SPEC_LONG (val->type) = 0;
+              SPEC_LONGLONG (val->type) = 1;
+            }
+          else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
+            {
+              SPEC_LONGLONG (val->type) = 1;
+              if (dval > 0x7fffffffffffffff)
+                SPEC_USIGN (val->type) = 1;
             }
         }
     }

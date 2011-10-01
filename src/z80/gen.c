@@ -7899,15 +7899,19 @@ _moveFrom_tpair_(asmop *aop, int offset, PAIR_ID pair)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGenPointerGet -  get value from generic pointer space        */
+/* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
 static void
-genGenPointerGet (operand * left,
-                  operand * result, const iCode *ic)
+genPointerGet (const iCode *ic)
 {
+  operand *left, *result;
   int size, offset;
-  sym_link *retype = getSpec (operandType (result));
   int pair = PAIR_HL;
+  sym_link *retype;
+
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  retype = getSpec (operandType (result));
 
   if (IS_GB)
     pair = PAIR_DE;
@@ -8131,26 +8135,6 @@ release:
   freeAsmop (result, NULL, ic);
 }
 
-/*-----------------------------------------------------------------*/
-/* genPointerGet - generate code for pointer get                   */
-/*-----------------------------------------------------------------*/
-static void
-genPointerGet (const iCode *ic)
-{
-  operand *left, *result;
-  sym_link *type, *etype;
-
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-
-  /* depending on the type of pointer we need to
-     move it to the correct pointer register */
-  type = operandType (left);
-  etype = getSpec (type);
-
-  genGenPointerGet (left, result, ic);
-}
-
 static bool
 isRegOrLit (asmop * aop)
 {
@@ -8364,19 +8348,23 @@ genPackBits (sym_link * etype,
     }
 }
 
-
 /*-----------------------------------------------------------------*/
-/* genGenPointerSet - stores the value into a pointer location        */
+/* genPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
 static void
-genGenPointerSet (operand * right,
-                  operand * result, iCode * ic)
+genPointerSet (iCode * ic)
 {
   int size, offset;
-  sym_link *retype = getSpec (operandType (right));
-  sym_link *letype = getSpec (operandType (result));
+  operand *right, *result;
   PAIR_ID pairId = PAIR_HL;
   bool isBitvar;
+  sym_link *retype; 
+  sym_link *letype;
+  
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  retype = getSpec (operandType (right));
+  letype = getSpec (operandType (result));
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
@@ -8517,26 +8505,6 @@ genGenPointerSet (operand * right,
 release:
   freeAsmop (right, NULL, ic);
   freeAsmop (result, NULL, ic);
-}
-
-/*-----------------------------------------------------------------*/
-/* genPointerSet - stores the value into a pointer location        */
-/*-----------------------------------------------------------------*/
-static void
-genPointerSet (iCode * ic)
-{
-  operand *right, *result;
-  sym_link *type, *etype;
-
-  right = IC_RIGHT (ic);
-  result = IC_RESULT (ic);
-
-  /* depending on the type of pointer we need to
-     move it to the correct pointer register */
-  type = operandType (result);
-  etype = getSpec (type);
-
-  genGenPointerSet (right, result, ic);
 }
 
 /*-----------------------------------------------------------------*/

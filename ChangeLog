@@ -1,7 +1,17 @@
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Reorganized pointer access functions, fixed the remaining warning in the z80 port.
+
 2011-09-01 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.lex:
 	  SDCCerr code cleanup
+
+2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Reorganized pointer access functions, fixed the remaining warning in the z80 port.
 
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 

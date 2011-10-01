@@ -29,7 +29,7 @@ H       [a-fA-F0-9]
 E       [Ee][+-]?{D}+
 FS      (f|F|l|L)
 IS      (u|U|l|L)*
-HASH	(#|%:)
+HASH    (#|%:)
 
 %{
 #include <stdio.h>
@@ -73,7 +73,7 @@ static void deprecated_keyword (char *yytext);
 _?"_asm"         {
   count ();
   if (yytext[1] != '_') /* deprecated single underscore */
-    {      
+    {
       if (!options.std_sdcc)
         return check_type ();
       else
@@ -710,7 +710,7 @@ doPragma (int id, const char *name, const char *cp)
 
   init_pragma_token(&token);
 
-  switch (id) 
+  switch (id)
     {
     case P_SAVE:
       {
@@ -896,8 +896,7 @@ doPragma (int id, const char *name, const char *cp)
             break;
           }
 
-        if (warn < MAX_ERROR_WARNING)
-          setWarningDisabled(warn);
+        setWarningDisabled(warn);
       }
       break;
 

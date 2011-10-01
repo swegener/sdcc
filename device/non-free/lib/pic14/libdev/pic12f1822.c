@@ -5,10 +5,12 @@
  */
 #include <pic12f1822.h>
 
+__sfr  __at (INDF0_ADDR)                   INDF;
 __sfr  __at (INDF0_ADDR)                   INDF0;
 __sfr  __at (INDF1_ADDR)                   INDF1;
 __sfr  __at (PCL_ADDR)                     PCL;
 __sfr  __at (STATUS_ADDR)                  STATUS;
+__sfr  __at (FSR0_ADDR)                    FSR;
 __sfr  __at (FSR0_ADDR)                    FSR0;
 __sfr  __at (FSR0L_ADDR)                   FSR0L;
 __sfr  __at (FSR0H_ADDR)                   FSR0H;

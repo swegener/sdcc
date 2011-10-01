@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include "globals.h"
 
 // local
 #include "simhc08cl.h"
@@ -38,7 +39,34 @@ cl_simhc08::cl_simhc08(class cl_app *the_app):
 class cl_uc *
 cl_simhc08::mk_controller(void)
 {
-  return(new cl_hc08(this));
+  int i;
+  const char *typ= NIL;
+  class cl_optref type_option(this);
+
+  type_option.init();
+  type_option.use("cpu_type");
+  i= 0;
+  if ((typ= type_option.get_value(typ)) == NIL)
+    typ= "HC08";
+
+  while ((cpus_hc08[i].type_str != NULL) &&
+	 (strcmp(typ, cpus_hc08[i].type_str) != 0))
+    i++;
+  if (cpus_hc08[i].type_str == NULL)
+    {
+      fprintf(stderr, "Unknown processor type. "
+	      "Use -H option to see known types.\n");
+      return(NULL);
+    }
+
+  switch (cpus_hc08[i].type)
+    {
+    case CPU_HC08:
+    case CPU_HCS08:
+      return(new cl_hc08(cpus_hc08[i].type, cpus_hc08[i].technology, this));
+    }
+
+  return(NULL);
 }
 
 

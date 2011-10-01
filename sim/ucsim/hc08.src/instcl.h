@@ -2,6 +2,7 @@
 
   virtual void incx(void);
   virtual int fetchea(t_mem code, bool prefix);
+  virtual int fetch2(void);
   virtual int inst_nop(t_mem code, bool prefix);
   virtual int inst_transfer(t_mem code, bool prefix);
   virtual int inst_setclearflags(t_mem code, bool prefix);

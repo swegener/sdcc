@@ -37,7 +37,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hc08mac.h"
 
 
-
 void
 cl_hc08::incx(void)
 {
@@ -45,6 +44,15 @@ cl_hc08::incx(void)
   hx++;
   regs.H = (hx >> 8) & 0xff;
   regs.X = hx & 0xff;
+}
+
+int
+cl_hc08::fetch2(void)
+{
+  int result;
+  result = fetch() << 8;
+  result |= fetch();
+  return result;
 }
 
 int
@@ -1061,7 +1069,21 @@ cl_hc08::inst_mov(t_mem code, bool prefix)
 int
 cl_hc08::inst_sthx(t_mem code, bool prefix)
 {
-  int ea = fetch1();
+  int ea;
+  
+  if (code == 0x35) {
+    ea = fetch();
+  }
+  else if ((code == 0x96) && (type == CPU_HCS08))
+  {
+    ea = fetch2();
+  }
+  else if (prefix && (code == 0xff) && (type == CPU_HCS08))
+  {
+    ea = regs.SP + fetch();
+  }
+  else
+    return(resHALT);
   
   store1(ea, regs.H);
   store1((ea+1) & 0xffff, regs.X);
@@ -1083,6 +1105,31 @@ cl_hc08::inst_ldhx(t_mem code, bool prefix)
   }
   else if (code == 0x55) {
     ea = fetch();
+    regs.H = get1(ea);
+    regs.X = get1(ea+1);
+  }
+  else if ((code == 0x32) && (type == CPU_HCS08)) {
+    ea = fetch2();
+    regs.H = get1(ea);
+    regs.X = get1(ea+1);
+  }
+  else if (prefix && (code == 0xae) && (type == CPU_HCS08)) {
+    ea = (regs.H << 8) | regs.X;
+    regs.H = get1(ea);
+    regs.X = get1(ea+1);
+  }
+  else if (prefix && (code == 0xbe) && (type == CPU_HCS08)) {
+    ea = ((regs.H << 8) | regs.X) + fetch2();
+    regs.H = get1(ea);
+    regs.X = get1(ea+1);
+  }
+  else if (prefix && (code == 0xce) && (type == CPU_HCS08)) {
+    ea = ((regs.H << 8) | regs.X) + fetch();
+    regs.H = get1(ea);
+    regs.X = get1(ea+1);
+  }
+  else if (prefix && (code == 0xfe) && (type == CPU_HCS08)) {
+    ea = regs.SP + fetch();
     regs.H = get1(ea);
     regs.X = get1(ea+1);
   }
@@ -1109,6 +1156,14 @@ cl_hc08::inst_cphx(t_mem code, bool prefix)
   }
   else if (code == 0x75) {
     ea = fetch();
+    operand = (get1(ea) << 8) | get1(ea+1);
+  }
+  else if ((code == 0x3e) && (type == CPU_HCS08)) {
+    ea = fetch2();
+    operand = (get1(ea) << 8) | get1(ea+1);
+  }
+  else if (prefix && (code == 0xf3) && (type == CPU_HCS08)) {
+    ea = ((unsigned char)fetch())+regs.SP;
     operand = (get1(ea) << 8) | get1(ea+1);
   }
   else

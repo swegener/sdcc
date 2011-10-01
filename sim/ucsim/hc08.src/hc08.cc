@@ -57,10 +57,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base type of HC08 controllers
  */
 
-cl_hc08::cl_hc08(class cl_sim *asim):
+cl_hc08::cl_hc08(int Itype, int Itech, class cl_sim *asim):
   cl_uc(asim)
 {
-  type= CPU_HC08;
+  type= Itype;
 }
 
 int
@@ -426,6 +426,7 @@ cl_hc08::exec_inst(void)
         case 0x1: return(inst_cbeq(code, false));
         case 0x2:
           switch (code) {
+            case 0x32: return(inst_ldhx(code, false));
             case 0x42: return(inst_mul(code, false));
             case 0x52: return(inst_div(code, false));
             case 0x62: return(inst_nsa(code, false));
@@ -453,6 +454,7 @@ cl_hc08::exec_inst(void)
         case 0xd: return(inst_tst(code, false));
         case 0xe:
           switch (code) {
+            case 0x3e: return(inst_cphx(code, false));
             case 0x4e:
             case 0x5e:
             case 0x6e:
@@ -516,6 +518,21 @@ cl_hc08::exec_inst(void)
                 case 0xf: return(inst_clr(code, true));
                 default: return(resHALT);
               }
+            case 0xa:
+              switch (code & 0x5) {
+                case 0xe: return(inst_ldhx(code,true));
+                default: return(resHALT);
+              }
+            case 0xb:
+              switch (code & 0x5) {
+                case 0xe: return(inst_ldhx(code,true));
+                default: return(resHALT);
+              }
+            case 0xc:
+              switch (code & 0x5) {
+                case 0xe: return(inst_ldhx(code,true));
+                default: return(resHALT);
+              }
             case 0xd:
             case 0xe:
               switch (code & 0xf) {
@@ -536,6 +553,12 @@ cl_hc08::exec_inst(void)
                 case 0xe: return(inst_ldx(code, true));
                 case 0xf: return(inst_stx(code, true));
                 default: return(resHALT);
+              }
+            case 0xf:
+              switch (code & 0xf) {
+                case 0x3: return(inst_cphx(code, true));
+                case 0xe: return(inst_ldhx(code, true));
+                case 0xf: return(inst_sthx(code, true));
               }
             default: return(resHALT);
           }

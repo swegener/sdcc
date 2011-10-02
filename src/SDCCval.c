@@ -1088,7 +1088,7 @@ constVal (const char *s)
             {                   /* check if we have to promote to int */
               SPEC_NOUN (val->type) = V_INT;
             }
-          if (dval < -2147483648) /* check if we have to promote to long long int */  
+          if (dval < -2147483648.0) /* check if we have to promote to long long int */
             SPEC_LONGLONG (val->type) = 1;
           else if (dval < -32768) /* check if we have to promote to long int */              
             SPEC_LONG (val->type) = 1;

@@ -1,3 +1,8 @@
+2011-10-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/hc08.src/glob.cc: add HCS08 instructions to disassembler
+	* src/SDCCval.c: fixed constant to avoid unintended long long literal
+
 2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdint.h:

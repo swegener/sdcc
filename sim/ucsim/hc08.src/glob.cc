@@ -96,6 +96,7 @@ struct dis_entry disass_hc08[]= {
 
   { 0x0030, 0x00ff, ' ', 2, "neg %d" },
   { 0x0031, 0x00ff, 'R', 3, "cbeq %d,%p" },
+  { 0x0032, 0x00ff, ' ', 3, "ldhx %x" },  //HCS08 only
   { 0x0033, 0x00ff, ' ', 2, "com %d" },
   { 0x0034, 0x00ff, ' ', 2, "lsr %d" },
   { 0x0035, 0x00ff, ' ', 2, "sthx %d" },
@@ -107,6 +108,7 @@ struct dis_entry disass_hc08[]= {
   { 0x003b, 0x00ff, 'R', 3, "dbnz %d,%d" },
   { 0x003c, 0x00ff, ' ', 2, "inc %d" },
   { 0x003d, 0x00ff, ' ', 2, "tst %d" },
+  { 0x003e, 0x00ff, ' ', 3, "cphx %x" },  //HCS08 only
   { 0x003f, 0x00ff, ' ', 2, "clr %d" },
 
   { 0x0040, 0x00ff, ' ', 1, "nega" },
@@ -195,6 +197,7 @@ struct dis_entry disass_hc08[]= {
 
   { 0x0080, 0x00ff, ' ', 1, "rti" },
   { 0x0081, 0x00ff, ' ', 1, "rts" },
+  { 0x0082, 0x00ff, ' ', 1, "bgnd" },  //HCS08 only
   { 0x0083, 0x00ff, ' ', 1, "swi" },
   { 0x0084, 0x00ff, ' ', 1, "tap" },
   { 0x0085, 0x00ff, ' ', 1, "tpa" },
@@ -214,6 +217,7 @@ struct dis_entry disass_hc08[]= {
   { 0x0093, 0x00ff, 'R', 2, "ble %p" },
   { 0x0094, 0x00ff, ' ', 1, "txs" },
   { 0x0095, 0x00ff, ' ', 1, "tsx" },
+  { 0x0096, 0x00ff, ' ', 3, "sthx %x" },  //HCS08 only
   { 0x0097, 0x00ff, ' ', 1, "tax" },
   { 0x0098, 0x00ff, ' ', 1, "clc" },
   { 0x0099, 0x00ff, ' ', 1, "sec" },
@@ -343,6 +347,12 @@ struct dis_entry disass_hc08_9e[]= {
   { 0x006d, 0x00ff, ' ', 2, "tst %1,sp" },
   { 0x006f, 0x00ff, ' ', 2, "clr %1,sp" },
 
+  { 0x00ae, 0x00ff, ' ', 1, "ldhx ,x" },  //HCS08 only
+
+  { 0x00be, 0x00ff, ' ', 3, "ldhx %2,x" },  //HCS08 only
+
+  { 0x00ce, 0x00ff, ' ', 2, "ldhx %1,x" },  //HCS08 only
+
   { 0x00d0, 0x00ff, ' ', 3, "sub %2,sp" },
   { 0x00d1, 0x00ff, ' ', 3, "cmp %2,sp" },
   { 0x00d2, 0x00ff, ' ', 3, "sbc %2,sp" },
@@ -372,6 +382,10 @@ struct dis_entry disass_hc08_9e[]= {
   { 0x00eb, 0x00ff, ' ', 2, "add %1,sp" },
   { 0x00ee, 0x00ff, ' ', 2, "ldx %1,sp" },
   { 0x00ef, 0x00ff, ' ', 2, "stx %1,sp" },
+
+  { 0x00f3, 0x00ff, ' ', 2, "cphx %1,sp" },  //HCS08 only
+  { 0x00fe, 0x00ff, ' ', 2, "ldhx %1,sp" },  //HCS08 only
+  { 0x00ff, 0x00ff, ' ', 2, "sthx %1,sp" },  //HCS08 only
 
   { 0, 0, 0, 0, NULL }
 };

@@ -429,6 +429,8 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\asm\pic16\features.h"
   SetOutPath "$INSTDIR\include\asm\z80"
   File "${DEV_ROOT}\include\asm\z80\features.h"
+  SetOutPath "$INSTDIR\include\asm\z180"
+  File "${DEV_ROOT}\include\asm\z180\features.h"
 
   SetOutPath "$INSTDIR\include\ds390"
   File "${DEV_ROOT}\include\ds390\*.h"
@@ -447,6 +449,8 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\pic16\*.txt"
   SetOutPath "$INSTDIR\include\z80"
   File "${DEV_ROOT}\include\z80\*.h"
+#  SetOutPath "$INSTDIR\include\z180"
+#  File "${DEV_ROOT}\include\z180\*.h"
 
   SetOutPath "$INSTDIR\include"
   File "${DEV_ROOT}\include\*.h"
@@ -550,6 +554,10 @@ ${Section} "SDCC library sources" SEC17
   SetOutPath "$INSTDIR\lib\src\z80"
   File "${DEV_ROOT}\lib\src\z80\*.s"
 #  File "${DEV_ROOT}\lib\src\z80\Makefile"
+
+  SetOutPath "$INSTDIR\lib\src\z180"
+  File "${DEV_ROOT}\lib\src\z180\*.s"
+#  File "${DEV_ROOT}\lib\src\z180\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\hc08"
   File "${DEV_ROOT}\lib\src\hc08\*.c"
@@ -712,6 +720,12 @@ ${Section} "SDCC library sources" SEC17
   File "${DEV_ROOT}\lib\src\*.c"
 ${SectionEnd}
 
+${Section} "SDCC Z180 library" SEC18
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\z180"
+  File "${DEV_ROOT}\lib\z180\*.*"
+${SectionEnd}
+
 ;--------------------------------
 ;Descriptions
 
@@ -733,6 +747,7 @@ LangString DESC_SEC14 ${LANG_ENGLISH} "SDCC HC08 library"
 LangString DESC_SEC15 ${LANG_ENGLISH} "SDCC PIC16 library"
 LangString DESC_SEC16 ${LANG_ENGLISH} "SDCC PIC14 library"
 LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC library sources"
+LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC Z180 library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -753,6 +768,7 @@ LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC library sources"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC15} $(DESC_SEC15)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC16} $(DESC_SEC16)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC17} $(DESC_SEC17)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC18} $(DESC_SEC18)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 
@@ -849,6 +865,11 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\z80\README"
   Delete "$INSTDIR\lib\src\z80\Makefile"
 
+  Delete "$INSTDIR\lib\src\z180\*.s"
+  Delete "$INSTDIR\lib\src\z180\z80.lib"
+  Delete "$INSTDIR\lib\src\z180\README"
+  Delete "$INSTDIR\lib\src\z180\Makefile"
+
   Delete "$INSTDIR\lib\src\gbz80\*.s"
   Delete "$INSTDIR\lib\src\gbz80\gbz80.lib"
   Delete "$INSTDIR\lib\src\gbz80\README"
@@ -881,6 +902,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\z80\*.rel"
   Delete "$INSTDIR\lib\z80\*.lib"
 
+  Delete "$INSTDIR\lib\z180\*.rel"
+  Delete "$INSTDIR\lib\z180\*.lib"
+
   Delete "$INSTDIR\lib\small\*.lib"
 
   Delete "$INSTDIR\lib\medium\*.lib"
@@ -897,6 +921,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\ds400\*.lib"
 
   Delete "$INSTDIR\include\asm\z80\*.h"
+  Delete "$INSTDIR\include\asm\z180\*.h"
   Delete "$INSTDIR\include\asm\pic16\*.h"
   Delete "$INSTDIR\include\asm\pic14\*.h"
   Delete "$INSTDIR\include\asm\mcs51\*.h"
@@ -904,6 +929,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\asm\ds390\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
   Delete "$INSTDIR\include\z80\*.h"
+#  Delete "$INSTDIR\include\z180\*.h"
   Delete "$INSTDIR\include\pic14\*.h"
   Delete "$INSTDIR\include\pic14\*.txt"
   Delete "$INSTDIR\include\pic14\*.inc"
@@ -967,6 +993,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\large"
   RMDir "$INSTDIR\lib\src\mcs51"
   RMDir "$INSTDIR\lib\src\z80"
+  RMDir "$INSTDIR\lib\src\z180"
   RMDir "$INSTDIR\lib\src\gbz80"
   RMDir "$INSTDIR\lib\src\ds390\examples"
   RMDir "$INSTDIR\lib\src\ds390"
@@ -980,6 +1007,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\pic16"
   RMDir "$INSTDIR\non-free\lib\pic16"
   RMDir "$INSTDIR\lib\z80"
+  RMDir "$INSTDIR\lib\z180"
   RMDir "$INSTDIR\lib\small"
   RMDir "$INSTDIR\lib\medium"
   RMDir "$INSTDIR\lib\large"
@@ -992,6 +1020,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\non-free\lib"
 
   RMDir "$INSTDIR\include\asm\z80"
+  RMDir "$INSTDIR\include\asm\z180"
   RMDir "$INSTDIR\include\asm\pic16"
   RMDir "$INSTDIR\non-free\include\asm\pic16"
   RMDir "$INSTDIR\include\asm\pic14"
@@ -1002,6 +1031,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\asm\default"
   RMDir "$INSTDIR\include\asm"
   RMDir "$INSTDIR\include\z80"
+#  RMDir "$INSTDIR\include\z180"
   RMDir "$INSTDIR\include\pic14"
   RMDir "$INSTDIR\non-free\include\pic14"
   RMDir "$INSTDIR\include\pic16"

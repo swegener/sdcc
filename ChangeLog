@@ -1,3 +1,7 @@
+2011-10-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/scripts/sdcc.nsi: add Z180 lib and include files to package
+
 2011-10-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sim/ucsim/hc08.src/glob.cc: add HCS08 instructions to disassembler

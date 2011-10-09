@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "simz80cl.h"
 #include "z80cl.h"
-
+#include "r2kcl.h"
 
 cl_simz80::cl_simz80(class cl_app *the_app):
   cl_sim(the_app)
@@ -65,6 +65,9 @@ cl_simz80::mk_controller(void)
     case CPU_Z180:
       return(new cl_z80(cpus_z80[i].type, cpus_z80[i].technology, this));
     // Add Rabbits, etc here.
+
+    case CPU_R2K:
+      return(new cl_r2k(cpus_z80[i].type, cpus_z80[i].technology, this));
     }
 
   return(NULL);

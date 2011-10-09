@@ -447,7 +447,7 @@ cl_z80::inst_rrca(t_mem code)
 {
   regs.F &= ~(BIT_A | BIT_N | BIT_C);
   if (regs.A & 0x01) {
-     regs.A |= BIT_C;
+     regs.F |= BIT_C;
      regs.A = (regs.A >> 1) | 0x80;
    }
    else

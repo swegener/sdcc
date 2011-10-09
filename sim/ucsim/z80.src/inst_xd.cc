@@ -446,11 +446,6 @@ cl_z80::inst_Xd(void)
       case 0x2C: // INC LX
       case 0x34: // INC (IX+dd)
         return(inst_Xd_inc(code));
-      {
-        t_addr addr;
-        addr = add_u16_disp(regs_IX_OR_IY,fetch());
-        store1(addr, get1(addr)+1);
-      }
 
       case 0x09: // ADD IX,BC
       case 0x19: // ADD IX,DE

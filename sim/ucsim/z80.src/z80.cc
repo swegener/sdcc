@@ -624,5 +624,38 @@ cl_z80::exec_inst(void)
   return(resINV_INST);
 }
 
+void cl_z80::store1( TYPE_UWORD addr, t_mem val ) {
+  ram->set(addr, val);
+}
+
+void cl_z80::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
+  ram->set(addr,   val & 0xff);
+  ram->set(addr+1, (val >> 8) & 0xff);
+}
+
+TYPE_UBYTE  cl_z80::get1( TYPE_UWORD addr ) {
+  return ram->get(addr);
+}
+
+TYPE_UWORD  cl_z80::get2( TYPE_UWORD addr ) {
+  TYPE_UWORD  l, h;
+  
+  l = ram->get(addr  );
+  h = ram->get(addr+1);
+  
+  return (h << 8) | l;
+}
+
+t_mem       cl_z80::fetch1( void ) {
+  return fetch( );
+}
+
+TYPE_UWORD  cl_z80::fetch2( void ) {
+  TYPE_UWORD  c1, c2;
+  
+  c1 = fetch( );
+  c2 = fetch( );
+  return (c2 << 8) | c1;
+}
 
 /* End of z80.src/z80.cc */

@@ -53,6 +53,11 @@ static char _gbz80_defaultRules[] = {
 #include "peeph-gbz80.rul"
 };
 
+static char _r2k_defaultRules[] = {
+#include "peeph.rul"
+#include "peeph-r2k.rul"
+};
+
 Z80_OPTS z80_opts;
 
 static OPTION _z80_options[] = {
@@ -113,6 +118,7 @@ static char *_keywords[] = {
 
 extern PORT gbz80_port;
 extern PORT z80_port;
+extern PORT r2k_port;
 
 #include "mappings.i"
 
@@ -133,6 +139,13 @@ _z180_init (void)
 {
   z80_opts.sub = SUB_Z180;
   asm_addTree (&_asxxxx_z80);
+}
+
+static void
+_r2k_init (void)
+{
+  z80_opts.sub = SUB_R2K;
+  asm_addTree (&_asxxxx_r2k);
 }
 
 static void
@@ -764,8 +777,14 @@ static const char *_gbAsmCmd[] = {
   "sdasgb", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
+static const char *_r2kAsmCmd[] = {
+  "sdasrab", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+};
+
 static const char *const _crt[] = { "crt0.rel", NULL, };
 static const char *const _libs_z80[] = { "z80", NULL, };
+static const char *const _libs_z180[] = { "z180", NULL, };
+static const char *const _libs_r2k[] = { "r2k", NULL, };
 static const char *const _libs_gb[] = { "gbz80", NULL, };
 
 /* Globals */
@@ -919,7 +938,7 @@ PORT z180_port = {
    ".rel",
    1,
    _crt,                        /* crt */
-   _libs_z80,                   /* libs */
+   _libs_z180,                  /* libs */
    },
   {                             /* Peephole optimizer */
    _z80_defaultRules,
@@ -1137,6 +1156,132 @@ PORT gbz80_port = {
   FALSE,                        /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
   NULL,                         /* no builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
+  PORT_MAGIC
+};
+
+
+
+PORT r2k_port = {
+  TARGET_ID_R2K,
+  "r2k",
+  "Rabbit 2000",                  /* Target name */
+  NULL,                         /* Processor name */
+  {
+   glue,
+   FALSE,
+   NO_MODEL,
+   NO_MODEL,
+   NULL,                        /* model == target */
+   },
+  {                             /* Assembler */
+   _r2kAsmCmd,
+   NULL,
+   "-plosgffwzc",               /* Options with debug */
+   "-plosgffwz",                /* Options without debug */
+   0,
+   ".asm"},
+  {                             /* Linker */
+   _z80LinkCmd,                 //NULL,
+   NULL,                        //LINKCMD,
+   NULL,
+   ".rel",
+   1,
+   _crt,                        /* crt */
+   _libs_r2k,                   /* libs */
+   },
+  {                             /* Peephole optimizer */
+   _r2k_defaultRules,
+   z80instructionSize,
+   0,
+   0,
+   0,
+   z80notUsed,
+   z80canAssign,
+   z80notUsedFrom,
+   },
+  {
+   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+  /* tags for generic pointers */
+  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  {
+   "XSEG",
+   "STACK",
+   "CODE",
+   "DATA",
+   "ISEG",
+   NULL,                        /* pdata */
+   "XSEG",
+   "BSEG",
+   "RSEG (ABS)",
+   "GSINIT",
+   "OVERLAY",
+   "GSFINAL",
+   "HOME",
+   NULL,                        /* xidata */
+   NULL,                        /* xinit */
+   NULL,                        /* const_name */
+   "CABS",                      /* cabs_name */
+   NULL,                        /* xabs_name */
+   NULL,                        /* iabs_name */
+   NULL,
+   NULL,
+   1                            /* CODE  is read-only */
+   },
+  {NULL, NULL},
+  {
+   -1, 0, 0, 4, 0, 2},
+  /* Z80 has no native mul/div commands */
+  {
+   0, 2},
+  {
+   z80_emitDebuggerSymbol},
+  {
+   255,                         /* maxCount */
+   3,                           /* sizeofElement */
+   /* The rest of these costs are bogus. They approximate */
+   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+   {4, 4, 4},                   /* sizeofMatchJump[] */
+   {0, 0, 0},                   /* sizeofRangeCompare[] */
+   0,                           /* sizeofSubtract */
+   3,                           /* sizeofDispatch */
+   },
+  "_",
+  _r2k_init,
+  _parseOptions,
+  _z80_options,
+  NULL,
+  _finaliseOptions,
+  _setDefaultOptions,
+  z80_assignRegisters,
+  _getRegName,
+  _keywords,
+  0,                            /* no assembler preamble */
+  NULL,                         /* no genAssemblerEnd */
+  0,                            /* no local IVT generation code */
+  0,                            /* no genXINIT code */
+  NULL,                         /* genInitStartup */
+  _reset_regparm,
+  _reg_parm,
+  _process_pragma,
+  _mangleSupportFunctionName,
+  _hasNativeMulFor,
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
+  TRUE,
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
+  FALSE,                        /* Array initializer support. */
+  0,                            /* no CSE cost estimation yet */
+  _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
   1,                            /* globals & local static allowed */

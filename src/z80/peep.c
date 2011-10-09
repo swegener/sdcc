@@ -205,6 +205,8 @@ z80MightRead(const lineNode *pl, const char *what)
 {
   if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
     what = "iy";
+  if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
+    what = "ix";
 
   if(strcmp(pl->line, "call\t__initrleblock") == 0)
     return TRUE;
@@ -220,7 +222,7 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(strcmp(pl->line, "ex\t(sp),hl") == 0 && strchr(what, 'h') == 0 && strchr(what, 'l') == 0)
     return FALSE;
-  if(strcmp(pl->line, "ex\tde,hl") == 0 && strchr(what, 'h') == 0 && strchr(what, 'l') == 0 && strchr(what, 'd') == 0&& strchr(what, 'e') == 0)
+  if(strcmp(pl->line, "ex\tde,hl") == 0 && strchr(what, 'h') == 0 && strchr(what, 'l') == 0 && strchr(what, 'd') == 0 && strchr(what, 'e') == 0)
     return FALSE;
   if(ISINST(pl->line, "ld\t"))
     {
@@ -341,6 +343,11 @@ z80CondJump(const lineNode *pl)
 static bool
 z80SurelyWrites(const lineNode *pl, const char *what)
 {
+  if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
+    what = "iy";
+  if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
+    what = "ix";
+
   if(strcmp(pl->line, "xor\ta,a") == 0 && strcmp(what, "a") == 0)
     return TRUE;
   if(ISINST(pl->line, "ld\t") && strncmp(pl->line + 3, "hl", 2) == 0 && (what[0] == 'h' || what[0] == 'l'))
@@ -353,12 +360,13 @@ z80SurelyWrites(const lineNode *pl, const char *what)
     return TRUE;
   if(ISINST(pl->line, "pop\t") && strstr(pl->line + 4, what))
     return TRUE;
-  if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0)
+  if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0  && strcmp(what, "ix"))
     return TRUE;
   if(strcmp(pl->line, "ret") == 0)
     return TRUE;
   if(ISINST(pl->line, "ld\tiy") && strncmp(what, "iy", 2) == 0)
     return TRUE;
+
   return FALSE;
 }
 
@@ -583,6 +591,12 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
             return FALSE;
           return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
         }
+      if(strcmp(what, "ix") == 0)
+        {
+          if(IY_RESERVED)
+            return FALSE;
+          return(z80notUsed("ixl", endPl, head) && z80notUsed("ixh", endPl, head));
+        }
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 
@@ -703,6 +717,11 @@ int z80instructionSize(lineNode *pl)
          strncmp(op2start, "hl", 2) && strncmp(op2start, "a", 2))
         return(4);
 
+      if(IS_R2K && !strncmp(op1start, "hl", 2) && (argCont(op2start, "(hl)") || argCont(op2start, "(iy)")))
+        return(4);
+      if(IS_R2K && !strncmp(op1start, "hl", 2) && (argCont(op2start, "(sp)") || argCont(op2start, "(ix)")))
+        return(3);
+
       /* These 4 are the only remaining cases of 3 byte long ld instructions. */
       if(argCont(op2start, "(ix)") || argCont(op2start, "(iy)"))
         return(3);
@@ -736,7 +755,7 @@ int z80instructionSize(lineNode *pl)
           fprintf(stderr, "Warning: z80instructionSize() failed to parse line node %s\n", pl->line);
           return(4);
         }
-      if(!strncmp(op2start, "ix", 2) || !strncmp(op2start, "iy", 2))
+      if(argCont(op1start, "(sp)") && (IS_R2K || !strncmp(op2start, "ix", 2) || !strncmp(op2start, "iy", 2)))
         return(2);
       return(1);
     }
@@ -749,14 +768,17 @@ int z80instructionSize(lineNode *pl)
       return(1);
     }
 
-  /* 16 bit add / subtract */
-  if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc")) && !strncmp(op1start, "hl", 2))
+  /* 16 bit add / subtract / and */
+  if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc") || IS_R2K && ISINST(pl->line, "and")) && !strncmp(op1start, "hl", 2))
     {
-      if(ISINST(pl->line, "add"))
+      if(ISINST(pl->line, "add") || ISINST(pl->line, "and"))
         return(1);
       return(2);
     }
   if(ISINST(pl->line, "add") && (!strncmp(op1start, "ix", 2) || !strncmp(op1start, "iy", 2)))
+    return(2);
+
+  if(IS_R2K && ISINST(pl->line, "add") && !strncmp(op1start, "sp", 2))
     return(2);
 
   /* 8 bit arithmetic, two operands */
@@ -812,6 +834,12 @@ int z80instructionSize(lineNode *pl)
       return(3);
     }
 
+  if (TARGET_IS_R2K &&
+      (ISINST(pl->line, "ipset3") || ISINST(pl->line, "ipset2") ||
+       ISINST(pl->line, "ipset1") || ISINST(pl->line, "ipset0") ||
+       ISINST(pl->line, "ipres")))
+    return(2);
+  
   if(ISINST(pl->line, "reti") || ISINST(pl->line, "retn"))
     return(2);
 
@@ -839,8 +867,11 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(1);
 
-  if(ISINST(pl->line, "mlt"))
+  if(IS_Z180 && ISINST(pl->line, "mlt"))
     return(2);
+
+  if(IS_R2K && ISINST(pl->line, "mul"))
+    return(1);
 
   if(ISINST(pl->line, ".db"))
     {

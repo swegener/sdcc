@@ -67,6 +67,7 @@ struct t_regs
   DEF_REGPAIR(aBC, a_bc);
   DEF_REGPAIR(aDE, a_de);
   DEF_REGPAIR(aHL, a_hl);
+  
   TYPE_UBYTE iv;  /* interrupt vector, see ed 47 ld A,IV.. */
 };
 

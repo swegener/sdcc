@@ -32,7 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "regsz80.h"
 
-
 /*
  * Base type of Z80 microcontrollers
  */
@@ -43,6 +42,7 @@ public:
   class cl_memory *ram;
   class cl_memory *rom;
   struct t_regs regs;
+  
 public:
   cl_z80(int Itype, int Itech, class cl_sim *asim);
   virtual int init(void);
@@ -66,9 +66,24 @@ public:
                         int *ret_branch,
                         int *immed_offset);
 
+  
+  virtual void store1( TYPE_UWORD addr, t_mem val );
+  virtual void store2( TYPE_UWORD addr, TYPE_UWORD val );
+  
+  virtual TYPE_UBYTE  get1( TYPE_UWORD addr );
+  virtual TYPE_UWORD  get2( TYPE_UWORD addr );
+  
+  virtual t_mem       fetch1( void );
+  virtual TYPE_UWORD  fetch2( void );
+  
+  //virtual t_mem fetch(void);
+
 #include "instcl.h"
 };
 
+
+unsigned   word_parity( TYPE_UWORD  x );
+/* returns parity for a 16-bit value */
 
 #endif
 

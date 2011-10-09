@@ -92,7 +92,8 @@ struct cpu_entry
 
 #define CPU_Z80		0x0001
 #define CPU_Z180	0x0002
-#define CPU_ALL_Z80	(CPU_Z80|CPU_Z180)
+#define CPU_R2K		0x0004
+#define CPU_ALL_Z80	(CPU_Z80|CPU_Z180|CPU_R2K)
 
 #define CPU_XA		0x0001
 #define CPU_ALL_XA	(CPU_XA)

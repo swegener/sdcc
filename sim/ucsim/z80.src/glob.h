@@ -30,7 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stypes.h"
 
-
 extern struct dis_entry disass_z80[];
 
 extern struct dis_entry disass_z80_ed[];
@@ -40,6 +39,15 @@ extern struct dis_entry disass_z80_fd[];
 extern struct dis_entry disass_z80_ddcb[];
 extern struct dis_entry disass_z80_fdcb[];
 
+
+extern struct dis_entry disass_r2k[];
+
+extern struct dis_entry disass_r2k_ed[];
+extern struct dis_entry disass_r2k_cb[];
+extern struct dis_entry disass_r2k_dd[];
+extern struct dis_entry disass_r2k_fd[];
+extern struct dis_entry disass_r2k_ddcb[];
+extern struct dis_entry disass_r2k_fdcb[];
 
 #endif
 

@@ -1,5 +1,9 @@
 2011-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
+	* Merge the Rabbit2000 branch.
+
+2011-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/include/z80/z180.h,
 	  device/include/z80/types.h,
 	  device/include/z80/README,
@@ -14,6 +18,226 @@
 2011-10-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: add Z180 lib and include files to package
+
+2011-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peep.c:
+	  Use r2k-specific ld n (sp), hl,  ld n (sp), iy, ld n (ix), ld iy, n (sp), ld hl, n (sp) and ld hl, n (ix).
+
+2011-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-r2k.def,
+	  src/z80/peeph-z80.def:
+	  Preparations for use of r2k-specific ld hl, n (sp) and ld hl, n (ix).
+
+2011-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Preparations for use of r2k-specific ld iy,hl.
+
+2011-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph-r2k.def,
+	  src/z80/peeph-z80.def:
+	  Allow use of r2k-specific ld hl, (hl) instruction.
+
+2011-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Make better use of the r2k-specific add sp, d instruction.
+
+2011-10-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  More flexible use of r2k-specific and hl, de instruction.
+
+2011-10-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Allow use of r2k-specific instructions in right shift.
+	* sim/ucsim/z80.src/inst.cc:
+	  Fix flag handling in z80/z180/r2k rrca instruction.
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix handling of carry bit in r2k 16-bit rr and rl instructions.
+
+2011-10-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Minor peephole improvement.
+
+2011-10-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix signed multiplication to use two's complement instead of sign-magnitude, 3rd attempt.
+
+2011-10-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix signed multiplication to use two's complement instead of sign-magnitude, 2nd attempt.
+
+2011-10-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* sim/ucsim/z80.src/inst_r2k.cc,
+	  sim/ucsim/z80.src/r2k.cc,
+	  sim/ucsim/z80.src/z80cl.h,
+	  sim/ucsim/z80.src/inst_ed_r2k.cc,
+	  sim/ucsim/z80.src/inst_xd.cc,
+	  sim/ucsim/z80.src/r2kcl.h,
+	  sim/ucsim/z80.src/glob.cc:
+	  Leland Morrison's support for some more r2k-specific instructions.
+
+2011-10-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix signed multiplication to use two's complement instead of sign-magnitude.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/r2k.cc,
+	  sim/ucsim/z80.src/r2kcl.h:
+	  Forgotten files from Leland Morrison's Rabbit 2000 ucsim port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  sim/ucsim/z80.src/inst_r2k.cc:
+	  Fixed multiplication using r2k mul instruction.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asrab/rabbitmch.c:
+	  Leland Morrison's support for ld iy, hl.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/inst_r2k.cc,
+	  sim/ucsim/z80.src/glob_r2k.cc,
+	  sim/ucsim/z80.src/inst_ed_r2k.cc:
+	  Forgotten files from Leland Morrison's Rabbit 2000 ucsim port, support for r2k mul and ld iy, hl instructions in ucsim.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Handle r2k mul instruction in code size calculation.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/z80.src/Makefile.in,
+	  sim/ucsim/z80.src/z80cl.h,
+	  sim/ucsim/z80.src/regsz80.h,
+	  sim/ucsim/z80.src/sz80.cc,
+	  sim/ucsim/z80.src/z80mac.h,
+	  sim/ucsim/z80.src/inst_xd.cc,
+	  sim/ucsim/z80.src/z80.cc,
+	  sim/ucsim/z80.src/glob.cc,
+	  sim/ucsim/z80.src/inst_dd.cc,
+	  sim/ucsim/z80.src/glob.h,
+	  sim/ucsim/z80.src/inst_fd.cc,
+	  sim/ucsim/z80.src/simz80.cc,
+	  sim/ucsim/stypes.h,
+	  sim/ucsim/sim.src/uc.cc,
+	  sim/ucsim/globals.cc:
+	  Leland Morrison's Rabbit 2000 ucsim port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use add sp, #n in function entry in r2k port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use Rabbit-specific instructions in and, multiplication and assignment for r2k port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peep.c:
+	  Preparations for use of add sp, #n in function entry in r2k port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug1115321.c
+	  support/regression/Makefile.in
+	  support/regression/fwk/include/testfwk.h
+	  support/regression/ports/ucr2k
+	  Leland Morrison's Rabbit 2000 regression test port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c:
+	  Fix library path. r2k port works now.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdint.h:
+	  Enable 64 bit integer types for r2k port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/asm/r2k,
+	  device/include/asm/r2k/features.h,
+	  device/lib/r2k/Makefile.in,
+	  Makefile.in,
+	  src/SDCCmain.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  device/lib/Makefile.in,
+	  configure.in,
+	  device/lib/r2k/Makefile.in,
+	  device/lib/r2k/strlen.s:
+	  r2k library cleanup.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/r2k,
+	  device/include/sdcc-lib.h,
+	  device/include/math.h,
+	  device/include/stdarg.h:
+	  Leland Morrison's Rabbit 2000 library port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure.in:
+	  Add r2k port.
+	* src/port.h,
+	  src/z80/gen.c
+	  src/z80/main.c
+	  src/z80/z80.h:
+	  Code cleanup.
+	* src/z80/peep.c:
+	  Fix code size for ex (sp), hl in r2k port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/SDCCmain.c,
+	  src/SDCCglue.c,
+	  src/port.h,
+	  src/z80/peeph-r2k.def,
+	  src/z80/gen.c,
+	  src/z80/mappings.i,
+	  src/z80/main.c,
+	  src/z80/z80.h,
+	  src/z80/peep.c:
+	  Leland Morrison's Rabbit 2000 compiler port.
+
+2011-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asrab,
+	  sdas/asrab/Makefile.in,
+	  sdas/asrab/rabbitext.c,
+	  sdas/asrab/clean.mk,
+	  sdas/asrab/rabbit.h,
+	  sdas/asrab/rabbitadr.c,
+	  sdas/asrab/rabbitpst.c,
+	  sdas/asrab/rabbitmch.c:
+	  Leland Morrison's assembler for Rabbit 2000 and Rabbit 4000.
 
 2011-10-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

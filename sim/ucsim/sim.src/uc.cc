@@ -1530,6 +1530,7 @@ cl_uc::fetch(t_mem *code)
 int
 cl_uc::do_inst(int step)
 {
+  TYPE_UWORD  PCsave;
   int res= resGO;
 
   if (step < 0)
@@ -1538,7 +1539,13 @@ cl_uc::do_inst(int step)
          res == resGO)
     {
       pre_inst();
+      PCsave = PC;
       res= exec_inst();
+
+      if (res == resINV_INST)
+	/* backup to start of instruction */
+	PC = PCsave;
+      
       post_inst();
     }
   if (res != resGO)

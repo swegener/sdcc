@@ -122,6 +122,73 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
     { NULL, NULL }
 };
 
+static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
+    /* We want to prepend the _ */
+    { "area", ".area _%s" },
+    { "areacode", ".area _%s" },
+    { "areadata", ".area _%s" },
+    { "areahome", ".area _%s" },
+    { "*ixx", "%d (ix)" },
+    { "*iyx", "%d (iy)" },
+    { "*hl", "(hl)" },
+    { "di", "ipset3" },
+    { "ei", "ipres" },
+    { "ldahli", 
+		"ld a,(hl)\n"
+		"inc\thl" },
+    { "ldahlsp", 
+		"ld hl,#%d\n"
+		"add\thl,sp" },
+    { "ldaspsp", 
+		"ld iy,#%d\n"
+		"add\tiy,sp\n"
+		"ld\tsp,iy" },
+    { "*pair", "(%s)" },
+    { "enter", 
+		"push\tix\n"
+		"ld\tix,#0\n"
+		"add\tix,sp" },
+    { "enterx", 
+		"push\tix\n"
+		"ld\tix,#0\n"
+		"add\tix,sp\n"
+		"ld\thl,#-%d\n"
+		"add\thl,sp\n"
+		"ld\tsp,hl" 
+        },
+    { "leave", 
+		"pop\tix"
+    },
+    { "leavex", 
+		"ld sp,ix\n"
+		"pop\tix"
+    },
+    { "pusha", 
+      		"push af\n"
+      		"push\tbc\n"
+      		"push\tde\n"
+      		"push\thl\n"
+		"push\tiy"
+    },
+    { "popa",
+		"pop iy\n"
+		"pop\thl\n"
+		"pop\tde\n"
+		"pop\tbc\n"
+		"pop\taf"
+    },
+    { "adjustsp", "lda sp,-%d(sp)" },
+    { "profileenter",
+                "ld a,#3\n"
+                "rst\t0x28"
+    },
+    { "profileexit",
+                "ld a,#4\n"
+                "rst\t0x28"
+    },
+    { NULL, NULL }
+};
+
 static const ASM_MAPPING _rgbds_mapping[] = {
     { "global", "GLOBAL %s" },
     { "extern", "GLOBAL %s" },
@@ -457,4 +524,9 @@ static const ASM_MAPPINGS _z80asm = {
 const ASM_MAPPINGS _z80asm_z80 = {
     &_z80asm,
     _z80asm_z80_mapping
+};
+
+const ASM_MAPPINGS _asxxxx_r2k = {
+    &asm_asxxxx_mapping,
+    _asxxxx_r2k_mapping
 };

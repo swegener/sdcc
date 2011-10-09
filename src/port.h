@@ -21,6 +21,7 @@
 #define TARGET_ID_DS400    10
 #define TARGET_ID_HC08     11
 #define TARGET_ID_Z180     12
+#define TARGET_ID_R2K      13
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -36,8 +37,12 @@
 #define TARGET_IS_PIC16    (port->id == TARGET_ID_PIC16)
 #define TARGET_IS_XA51     (port->id == TARGET_ID_XA51)
 #define TARGET_IS_HC08     (port->id == TARGET_ID_HC08)
+#define TARGET_IS_R2K      (port->id == TARGET_ID_R2K)
+
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
-#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GBZ80)
+#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GBZ80 || TARGET_IS_R2K)
+#define TARGET_IS_RABBIT   (TARGET_IS_R2K)
+
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08)
 #define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
 /* is using sdas / sdld assembler / linker */
@@ -391,6 +396,9 @@ extern PORT z80_port;
 #endif
 #if !OPT_DISABLE_Z180
 extern PORT z180_port;
+#endif
+#if !OPT_DISABLE_R2K
+extern PORT r2k_port;  /* rabbit 2000/3000 */
 #endif
 #if !OPT_DISABLE_GBZ80
 extern PORT gbz80_port;

@@ -18,7 +18,7 @@ void __printf(const char *szFormat, ...);
  #define _STATMEM
 #endif
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_gbz80)
+#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_r2k)|| defined(SDCC_gbz80)
 # define __data
 # define __idata
 # define __pdata

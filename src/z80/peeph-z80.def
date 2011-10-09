@@ -33,6 +33,12 @@ replace restart {
 // Should probably check for notVolatile(%2), too, but gives many false positives and no regression tests fail.
 
 replace restart {
+	add	ix,sp
+} by {
+	; peephole 1a removed dead frame pointer setup.
+} if notUsed('ix')
+
+replace restart {
 	ld	%1, %2 + %3
 } by {
 	; peephole 2 removed dead load from %2 + %3 into %1.
@@ -133,6 +139,7 @@ replace restart {
 	ld	%2 (%3), %7
 } if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4)
 
+// Broken= What if %1 == h and %5 == (hl)? Real bug on r2k, thus removed there.
 replace restart {
 	ld	%1, %2 (%3)
 	ld	%4, %5
@@ -141,7 +148,7 @@ replace restart {
 	ld	%7, %2 (%3)
 	; peephole 15 loaded %2 (%3) into %7 directly instead of going through %1.
 	ld	%4, %5
-} if canAssign(%7 %2 %3), notVolatile(%1), notUsed(%1), notSame(%1 %5), notSame(%7 %4), notSame(%4 '(hl)' '(de)' '(bc)')
+} if canAssign(%7 %2 %3), notVolatile(%1), notUsed(%1), notSame(%1 %5), notSame(%7 %4), notSame(%4 '(hl)' '(de)' '(bc)'), notSame(%5 '(hl)' '(de)' '(bc)')
 
 replace restart {
 	ld	%1,#%2
@@ -383,6 +390,17 @@ replace restart {
 	ld	c,#%1
 	push	bc
 } if notUsed('bc')
+
+replace restart {
+	push	bc
+	inc	sp
+	push	de
+	inc	sp
+} by {
+	ld	c, d
+	; peephole 37a combined pushing of b and d.
+	push	bc
+} if notUsed('c')
 
 replace restart {
 	push	bc

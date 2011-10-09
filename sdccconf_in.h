@@ -135,6 +135,9 @@
 #undef OPT_DISABLE_PIC16
 
 /* XXX */
+#undef OPT_DISABLE_R2K
+
+/* XXX */
 #undef OPT_DISABLE_SDCDB
 
 /* XXX */

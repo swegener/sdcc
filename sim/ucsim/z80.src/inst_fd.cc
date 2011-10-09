@@ -47,6 +47,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define inst_Xd inst_fd
 #define inst_Xdcb inst_fdcb
 
+#define inst_Xfix  0xFD
+
 #include "inst_xd.cc"
 
 /* End of z80.src/inst_fd.cc */

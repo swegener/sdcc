@@ -29,7 +29,7 @@
 #ifndef __SDC51_STDARG_H
 #define __SDC51_STDARG_H 1
 
-#if defined(__z80) || defined(__z180) || defined(__gbz80) || defined(__hc08)
+#if defined(__z80) || defined(__z180) || defined(__r2k) || defined(__gbz80) || defined(__hc08)
 
 typedef unsigned char * va_list;
 #define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }

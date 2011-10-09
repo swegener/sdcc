@@ -807,6 +807,7 @@ rm -f ports.all ports.build
 AC_DO_PORT(mcs51, mcs51, MCS51, [Excludes the Intel mcs51 port])
 AC_DO_PORT(z80,   z80,   Z80,   [Excludes the z80 port])
 AC_DO_PORT(z180,  z80,   Z180,  [Excludes the z180 port])
+AC_DO_PORT(r2k,   z80,   R2K,  [Excludes the r2k port])
 AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(ds390, ds390, DS390, [Excludes the DS390 port])
 AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])
@@ -904,9 +905,11 @@ test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 if test $OPT_DISABLE_Z80 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile
                    sdas/asz80/Makefile
+                   sdas/asrab/Makefile
                    sdas/asgb/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile
                                                        device/lib/z180/Makefile
+                                                       device/lib/r2k/Makefile
                                                        device/lib/gbz80/Makefile])
 fi
 
@@ -978,6 +981,7 @@ sdcc ${VERSION} is now configured for
     xa51                ${enable_xa51_port}
     z80                 ${enable_z80_port}
     z180                ${enable_z180_port}
+    r2k                 ${enable_r2k_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}

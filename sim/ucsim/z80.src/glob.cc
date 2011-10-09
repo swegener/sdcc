@@ -6,6 +6,7 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
+/* Modified for rabbit 2000 support by Leland Morrison 2011 */
 
 /* This file is part of microcontroller simulator: ucsim.
 
@@ -29,6 +30,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stypes.h"
 
+#ifndef R2K
+#define  DISASS_NAME(X)  disass_z80##X
+#else
+#define  DISASS_NAME(X)  disass_r2k##X
+#endif
 
 /* 
 %d - signed compl.,byte jump 
@@ -36,7 +42,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 %b - byte imm. value
   */
 /*  uint  code, mask;  char  branch;  uchar length;  char  *mnemonic; */
-struct dis_entry disass_z80[]= {
+
+struct dis_entry DISASS_NAME() []= {
   { 0x0000, 0x00ff, ' ', 1, "NOP" },
   { 0x0001, 0x00ff, ' ', 3, "LD BC,%w" },
   { 0x0002, 0x00ff, ' ', 1, "LD (BC),A" },
@@ -66,7 +73,7 @@ struct dis_entry disass_z80[]= {
 
   { 0x0018, 0x00ff, 'R', 2, "JR %d" },
   { 0x0019, 0x00ff, ' ', 3, "ADD HL,DE" },
-  { 0x001a, 0x00ff, ' ', 1, "LD A,DE" },
+  { 0x001a, 0x00ff, ' ', 1, "LD A,(DE)" },
   { 0x001b, 0x00ff, ' ', 1, "DEC DE" },
   { 0x001c, 0x00ff, ' ', 1, "INC E" },
   { 0x001d, 0x00ff, ' ', 1, "DEC E" },
@@ -80,7 +87,11 @@ struct dis_entry disass_z80[]= {
   { 0x0024, 0x00ff, ' ', 1, "INC H" },
   { 0x0025, 0x00ff, ' ', 1, "DEC H" },
   { 0x0026, 0x00ff, ' ', 2, "LD H,%b" },
+#ifndef R2K
   { 0x0027, 0x00ff, ' ', 1, "DAA" },
+#else
+  { 0x0027, 0x00ff, ' ', 2, "ADD SP,%d" },
+#endif
 
   { 0x0028, 0x00ff, 'R', 2, "JR Z,%d" },
   { 0x0029, 0x00ff, ' ', 1, "ADD HL,HL" },
@@ -169,7 +180,11 @@ struct dis_entry disass_z80[]= {
   { 0x0073, 0x00ff, ' ', 1, "LD (HL),E" },
   { 0x0074, 0x00ff, ' ', 1, "LD (HL),H" },
   { 0x0075, 0x00ff, ' ', 1, "LD (HL),L" },
+#ifndef R2K
   { 0x0076, 0x00ff, ' ', 1, "HALT" },
+#else
+  { 0x0076, 0x00ff, ' ', 1, "ALTD" },
+#endif
   { 0x0077, 0x00ff, ' ', 1, "LD (HL),A" },
 
   { 0x0078, 0x00ff, ' ', 1, "LD A,B" },
@@ -257,25 +272,47 @@ struct dis_entry disass_z80[]= {
   { 0x00c1, 0x00ff, ' ', 1, "POP BC" },
   { 0x00c2, 0x00ff, 'A', 3, "JP NZ, %w" },
   { 0x00c3, 0x00ff, 'A', 3, "JP %w" },
+#ifndef R2K
   { 0x00c4, 0x00ff, 'l', 3, "CALL NZ,%w" },
+#else
+  { 0x00c4, 0x00ff, ' ', 2, "LD HL,(SP+%d)" },
+#endif
   { 0x00c5, 0x00ff, ' ', 1, "PUSH BC" },
   { 0x00c6, 0x00ff, ' ', 2, "ADD A,%b" },
+#ifndef R2K
   { 0x00c7, 0x00ff, ' ', 1, "RST 0" },
+#else
+  { 0x00c7, 0x00ff, ' ', 4, "LJP %w,%b" },
+#endif
 
   { 0x00c8, 0x00ff, ' ', 1, "RET Z" },
   { 0x00c9, 0x00ff, ' ', 1, "RET" },
   { 0x00ca, 0x00ff, 'A', 3, "JP Z,%w" },
   { 0x00cb, 0x00ff, ' ', 2, "?cb?" }, /* ESC code to lots of op-codes, all 2-byte */
+
+#ifndef R2K
   { 0x00cc, 0x00ff, 'l', 3, "CALL Z,%w" },
+#else
+  { 0x00cc, 0x00ff, 'l', 1, "BOOL  HL" },  
+#endif
   { 0x00cd, 0x00ff, 'l', 3, "CALL %w" },
   { 0x00ce, 0x00ff, ' ', 2, "ADC A,%b" },
+#ifndef R2K
   { 0x00cf, 0x00ff, ' ', 1, "RST 8" },
-
+#else
+  { 0x00cf, 0x00ff, ' ', 4, "LCALL  %w,%b" },
+#endif
+  
   { 0x00d0, 0x00ff, ' ', 1, "RET NC" },
   { 0x00d1, 0x00ff, ' ', 1, "POP DE" },
   { 0x00d2, 0x00ff, 'A', 3, "JP NC,%w" },
+#ifndef R2K
   { 0x00d3, 0x00ff, ' ', 2, "OUT (%b),A" },
   { 0x00d4, 0x00ff, 'l', 3, "CALL NC,%w" },
+#else
+  { 0x00d3, 0x00ff, ' ', 1, "IOI" },
+  { 0x00d4, 0x00ff, 'l', 2, "LD (SP+%d),HL" },
+#endif
   { 0x00d5, 0x00ff, ' ', 1, "PUSH DE" },
   { 0x00d6, 0x00ff, ' ', 2, "sub %b" },
   { 0x00d7, 0x00ff, ' ', 1, "RST 10H" },
@@ -283,9 +320,13 @@ struct dis_entry disass_z80[]= {
   { 0x00d8, 0x00ff, ' ', 1, "RET C" },
   { 0x00d9, 0x00ff, ' ', 1, "EXX" },
   { 0x00da, 0x00ff, 'A', 3, "JP C,%w" },
+#ifndef R2K
   { 0x00db, 0x00ff, ' ', 2, "IN A,(%b)" },
   { 0x00dc, 0x00ff, 'l', 3, "CALL C,%w" },
-
+#else
+  { 0x00db, 0x00ff, ' ', 1, "IOE" },
+  { 0x00dc, 0x00ff, 'l', 1, "AND HL,DE" },
+#endif
   { 0x00dd, 0x00ff, ' ', 2, "?dd?" },  /* 0xdd - ESC codes,about 284, vary lengths, IX centric */
   { 0x00de, 0x00ff, ' ', 2, "SBC A,%b" },
   { 0x00df, 0x00ff, ' ', 1, "RST 18H" },
@@ -293,8 +334,13 @@ struct dis_entry disass_z80[]= {
   { 0x00e0, 0x00ff, ' ', 1, "RET PO" },
   { 0x00e1, 0x00ff, ' ', 1, "POP HL" },
   { 0x00e2, 0x00ff, 'A', 3, "JP PO,%w" },
+#ifndef R2K
   { 0x00e3, 0x00ff, ' ', 1, "EX (SP),HL" },
   { 0x00e4, 0x00ff, 'l', 3, "CALL PO,%w" },
+#else
+  { 0x00e3, 0x00ff, ' ', 1, "EX DE',HL" },
+  { 0x00e4, 0x00ff, 'l', 2, "LD HL,(IX+%d)" },
+#endif
   { 0x00e5, 0x00ff, ' ', 1, "PUSH HL" },
   { 0x00e6, 0x00ff, ' ', 2, "AND %b" },
   { 0x00e7, 0x00ff, ' ', 1, "RST 20H" },
@@ -303,25 +349,44 @@ struct dis_entry disass_z80[]= {
   { 0x00e9, 0x00ff, 'A', 1, "JP (HL)" },
   { 0x00ea, 0x00ff, 'A', 3, "JP PE,%w" },
   { 0x00eb, 0x00ff, ' ', 1, "EX DE,HL" },
+#ifndef R2K
   { 0x00ec, 0x00ff, 'l', 3, "CALL PE, %w" },
   { 0x00ed, 0x00ff, ' ', 2, "?ed?" },  /* ESC code to about 80 opcodes of various lengths */
+#else
+  { 0x00ec, 0x00ff, 'l', 1, "OR HL,DE" },
+  { 0x00ed, 0x00ff, ' ', 1, "?ed?" },  /* ESC code to about 80 opcodes of various lengths */
+#endif
+  
   { 0x00ee, 0x00ff, ' ', 2, "XOR %b" },
   { 0x00ef, 0x00ff, ' ', 1, "RST 28H" },
 
   { 0x00f0, 0x00ff, ' ', 1, "RET P" },
   { 0x00f1, 0x00ff, ' ', 1, "POP AF" },
   { 0x00f2, 0x00ff, 'A', 3, "JP P,%w" },
+#ifndef R2K
   { 0x00f3, 0x00ff, ' ', 1, "DI" },
   { 0x00f4, 0x00ff, 'l', 3, "CALL P,%w" },
+#else
+  { 0x00f3, 0x00ff, ' ', 1, "RL DE" },
+  { 0x00f4, 0x00ff, 'l', 2, "LD (IX+%d),HL" },
+#endif
   { 0x00f5, 0x00ff, ' ', 1, "PUSH AF" },
   { 0x00f6, 0x00ff, ' ', 2, "OR %b" },
+#ifndef R2K
   { 0x00f7, 0x00ff, ' ', 1, "RST 30H" },
-
+#else
+  { 0x00f7, 0x00ff, ' ', 1, "MUL" },
+#endif
   { 0x00f8, 0x00ff, ' ', 1, "RET M" },
   { 0x00f9, 0x00ff, ' ', 1, "LD SP,HL" },
   { 0x00fa, 0x00ff, ' ', 3, "JP M,%w" },
+#ifndef R2K
   { 0x00fb, 0x00ff, ' ', 1, "EI" },
   { 0x00fc, 0x00ff, 'l', 3, "CALL M,%w" },
+#else
+  { 0x00fb, 0x00ff, ' ', 1, "RR DE" },
+  { 0x00fc, 0x00ff, 'l', 1, "RR HL" },
+#endif
   { 0x00fd, 0x00ff, ' ', 1, "?fd?" }, /* ESC codes,about 284, vary lengths, IY centric */
   { 0x00fe, 0x00ff, ' ', 2, "CP %b" },
   { 0x00ff, 0x00ff, ' ', 1, "RST 38H" },
@@ -330,6 +395,7 @@ struct dis_entry disass_z80[]= {
 };
 
 
+#ifndef R2K
 struct dis_entry disass_z80_ed[]= {
   { 0x0000, 0x00ff, ' ', 1, "RLC B" },
   { 0x0040, 0x00ff, ' ', 1, "IN B,(C)" },
@@ -394,8 +460,88 @@ struct dis_entry disass_z80_ed[]= {
   { 0x00BB, 0x00ff, ' ', 1, "OTDR" },
   { 0, 0, 0, 0, NULL }
 };
+#endif
 
-struct dis_entry disass_z80_cb[]= {
+#ifdef R2K
+struct dis_entry disass_r2k_ed[]= {
+#if 0 /* oops, rabbit 4000 only */
+  { 0x0000, 0x00ff, ' ', 2, "CBM %d" },
+  { 0x0002, 0x00ff, ' ', 1, "SBOX A" },
+  { 0x0010, 0x00ff, 'R', 2, "DWJNZ %d" },
+  
+  { 0x0040, 0x00ff, ' ', 1, "LD HTR,A" },
+#endif
+  { 0x0041, 0x00ff, ' ', 1, "LD BC',DE" },
+  { 0x0042, 0x00ff, ' ', 1, "SBC HL,BC" },
+  { 0x0043, 0x00ff, ' ', 3, "LD (%w),BC" },
+  { 0x0044, 0x00ff, ' ', 1, "NEG" },
+  { 0x0045, 0x00ff, ' ', 1, "LRET" },
+  { 0x0046, 0x00ff, ' ', 1, "IPSET 0" },
+  { 0x0047, 0x00ff, ' ', 1, "LD EIR,A" },
+
+  { 0x0048, 0x00ff, ' ', 1, "CP HL,DE" },
+  { 0x0049, 0x00ff, ' ', 1, "LD BC',BC" },
+  { 0x004A, 0x00ff, ' ', 1, "ADC HL,BC" },
+  { 0x004B, 0x00ff, ' ', 3, "LD BC,(%w)" },
+  { 0x004C, 0x00ff, ' ', 1, "TEST BC" },
+  { 0x004D, 0x00ff, ' ', 1, "RETI" },
+  { 0x004E, 0x00ff, ' ', 1, "IPSET 2" },
+  { 0x004F, 0x00ff, ' ', 1, "LD IIR,A" },
+  
+  /* { 0x0050, 0x00ff, ' ', 1, "LD A,HTR" }, * rabbit 4000 only */
+  { 0x0051, 0x00ff, ' ', 1, "LD DE',DE" },
+  { 0x0052, 0x00ff, ' ', 1, "SBC HL,DE" },
+  { 0x0053, 0x00ff, ' ', 3, "LD (%w),DE" },
+  { 0x0056, 0x00ff, ' ', 1, "IPSET 1" },
+  { 0x0057, 0x00ff, ' ', 1, "LD A,EIR" },
+  
+  { 0x0059, 0x00ff, ' ', 1, "LD DE',BC" },
+  { 0x005A, 0x00ff, ' ', 1, "ADC HL,DE" },
+  { 0x005B, 0x00ff, ' ', 3, "LD DE,(%w)" },
+  { 0x005D, 0x00ff, ' ', 1, "IPRES" },
+  { 0x005E, 0x00ff, ' ', 1, "IPSET 3" },
+  { 0x005F, 0x00ff, ' ', 1, "LD A,IIR" },
+  
+  { 0x0061, 0x00ff, ' ', 1, "LD HL',DE" },
+  { 0x0062, 0x00ff, ' ', 1, "SBC HL,HL" },
+  { 0x0063, 0x00ff, ' ', 3, "LD (nnnn),HL" },
+  { 0x0067, 0x00ff, ' ', 1, "LD XPC,A" },
+  
+  { 0x006A, 0x00ff, ' ', 1, "ADC HL,HL" },
+  { 0x006B, 0x00ff, ' ', 3, "LD HL,(nnnn)" },
+  
+  { 0x0072, 0x00ff, ' ', 1, "SBC HL,SP" },
+  { 0x0073, 0x00ff, ' ', 3, "LD (nnnn),SP" },
+  { 0x0076, 0x00ff, ' ', 1, "PUSH IP" },
+  { 0x0077, 0x00ff, ' ', 1, "LD A,XPC" },
+  
+  { 0x007A, 0x00ff, ' ', 1, "ADC HL,SP" },
+  { 0x007B, 0x00ff, ' ', 3, "LD SP,(nnnn)" },
+  { 0x007E, 0x00ff, ' ', 1, "POP IP" },
+  
+#if 0
+  { 0x0080, 0x00ff, ' ', 1, "COPY" },   /* Rabbit 4000 and up */
+  { 0x0083, 0x00ff, ' ', 1, "SRET" },   /* Rabbit 4000 and up */  
+  { 0x0088, 0x00ff, ' ', 1, "COPYR" },  /* Rabbit 4000 and up */
+  { 0x008B, 0x00ff, ' ', 1, "LLRET" },  /* Rabbit 4000 and up */  
+  
+  { 0x0090, 0x00ff, ' ', 1, "LDISR" },  /* Rabbit 3000 and up */
+  { 0x0098, 0x00ff, ' ', 1, "LDDSR" },  /* Rabbit 3000 and up */
+#endif
+  
+  { 0x00A0, 0x00ff, ' ', 1, "LDI" },
+  { 0x00A8, 0x00ff, ' ', 1, "LDD" },
+  
+  { 0x00B0, 0x00ff, ' ', 1, "LDIR" },
+  { 0x00B8, 0x00ff, ' ', 1, "LDDR" },
+  
+  { 0x00EA, 0x00ff, ' ', 1, "CALL (HL)" },
+  
+  { 0, 0, 0, 0, NULL }
+};
+#endif
+
+struct dis_entry DISASS_NAME(_cb)[]= {
   { 0x0000, 0x00ff, ' ', 1, "RLC B" },
   { 0x0001, 0x00ff, ' ', 1, "RLC C" },
   { 0x0002, 0x00ff, ' ', 1, "RLC D" },
@@ -655,7 +801,7 @@ struct dis_entry disass_z80_cb[]= {
   { 0, 0, 0, 0, NULL }
 };
 
-struct dis_entry disass_z80_dd[]= {
+struct dis_entry DISASS_NAME(_dd)[]= {
   { 0x0021, 0x00ff, ' ', 3, "LD IX,%w" },
   { 0x0022, 0x00ff, ' ', 3, "LD (%w),IX" },
   { 0x0026, 0x00ff, ' ', 2, "LD HX,%b" },
@@ -696,8 +842,13 @@ struct dis_entry disass_z80_dd[]= {
   { 0x0074, 0x00ff, ' ', 2, "LD (IX+%d),H" },
   { 0x0075, 0x00ff, ' ', 2, "LD (IX+%d),L" },
   { 0x0077, 0x00ff, ' ', 2, "LD (IX+%d),A" },
+#ifndef R2K
   { 0x007C, 0x00ff, ' ', 1, "LD A,HX" },
   { 0x007D, 0x00ff, ' ', 1, "LD A,LX" },
+#else
+  { 0x007C, 0x00ff, ' ', 1, "LD HL,IX" },
+  { 0x007D, 0x00ff, ' ', 1, "LD IX,HL" },
+#endif
   { 0x007E, 0x00ff, ' ', 2, "LD A,(IX+%d)" },
   { 0x00F9, 0x00ff, ' ', 1, "LD SP,IX" },
 
@@ -749,7 +900,7 @@ struct dis_entry disass_z80_dd[]= {
   { 0, 0, 0, 0, NULL }
 };
 
-struct dis_entry disass_z80_fd[]= {
+struct dis_entry DISASS_NAME(_fd)[]= {
   { 0x0021, 0x00ff, ' ', 3, "LD IY,%w" },
   { 0x0022, 0x00ff, ' ', 3, "LD (%w),IY" },
   { 0x0026, 0x00ff, ' ', 2, "LD HX,%b" },
@@ -790,8 +941,13 @@ struct dis_entry disass_z80_fd[]= {
   { 0x0074, 0x00ff, ' ', 2, "LD (IY+%d),H" },
   { 0x0075, 0x00ff, ' ', 2, "LD (IY+%d),L" },
   { 0x0077, 0x00ff, ' ', 2, "LD (IY+%d),A" },
+#ifndef R2K
   { 0x007C, 0x00ff, ' ', 1, "LD A,HX" },
   { 0x007D, 0x00ff, ' ', 1, "LD A,LX" },
+#else
+  { 0x007C, 0x00ff, ' ', 1, "LD HL,IX" },
+  { 0x007D, 0x00ff, ' ', 1, "LD IX,HL" },
+#endif
   { 0x007E, 0x00ff, ' ', 2, "LD A,(IY+%d)" },
   { 0x00F9, 0x00ff, ' ', 1, "LD SP,IY" },
 
@@ -844,7 +1000,7 @@ struct dis_entry disass_z80_fd[]= {
 };
 
 
-struct dis_entry disass_z80_ddcb[]= {
+struct dis_entry DISASS_NAME(_ddcb)[]= {
   { 0x0000, 0x00ff, ' ', 2, "RLC (IX+%d)->B" },
   { 0x0001, 0x00ff, ' ', 2, "RLC (IX+%d)->C" },
   { 0x0002, 0x00ff, ' ', 2, "RLC (IX+%d)->D" },
@@ -1054,7 +1210,7 @@ struct dis_entry disass_z80_ddcb[]= {
   { 0, 0, 0, 0, NULL }
 };
 
-struct dis_entry disass_z80_fdcb[]= {
+struct dis_entry DISASS_NAME(_fdcb)[]= {
   { 0x0000, 0x00ff, ' ', 2, "RLC (IY+%d)->B" },
   { 0x0001, 0x00ff, ' ', 2, "RLC (IY+%d)->C" },
   { 0x0002, 0x00ff, ' ', 2, "RLC (IY+%d)->D" },

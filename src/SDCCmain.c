@@ -2203,8 +2203,7 @@ setLibPath (void)
 
       dbuf_init (&dbuf, PATH_MAX);
 
-      /* Use common library for z80 and z180. */
-      targetname = strcmp(port->target, "z180") ? port->target : "z80";
+      targetname = port->target;
 
       dbuf_makePath (&dbuf, LIB_DIR_SUFFIX, port->general.get_model ? port->general.get_model () : targetname);
       libDirsSet = appendStrSet (dataDirsSet, NULL, dbuf_c_str (&dbuf));

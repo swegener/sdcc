@@ -1,4 +1,12 @@
-2011-10-01 Philipp Klaus Krause <pkk AT spth.de>
+2011-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/z80/z180.h,
+	  device/include/z80/types.h,
+	  device/include/z80/README,
+	  device/include/z80/z180.h:
+	  Move z180 include file.
+
+2011-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c:
 	  Cleanup z180 library handling.

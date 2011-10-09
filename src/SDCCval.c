@@ -1133,7 +1133,7 @@ constVal (const char *s)
           else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
             {
               SPEC_LONGLONG (val->type) = 1;
-              if (dval > 0x7fffffffffffffff)
+              if (dval > 0x7fffffffffffffffp0)
                 SPEC_USIGN (val->type) = 1;
             }
         }

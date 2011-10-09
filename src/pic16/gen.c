@@ -2835,10 +2835,10 @@ static void genPcall (iCode *ic)
     pic16_emitpcode(POC_MOVLW, pic16_popGetImmd(pcop_lbl->name, 2, 0));
     pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_tosu));
 
-
-    /* restore interrupt control register */
-    pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_preinc1));
-    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_intcon));
+    /* Conditionally re-enable interrupts, but keep interrupt flags in
+     * INTCON intact (thanks to J. van der Boon, #3420588). */
+    pic16_emitpcode(POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_preinc1), 7));
+    pic16_emitpcode(POC_BSF, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_intcon), 7));
 
     /* make the call by writing the pointer into pc */
     mov2fp(pic16_popCopyReg(&pic16_pc_pclatu), AOP(IC_LEFT(ic)), 2);

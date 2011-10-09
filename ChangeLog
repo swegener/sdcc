@@ -1,3 +1,9 @@
+2011-10-09 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCval.c (constVal): avoid compiler warning
+	* src/pic16/gen.c (genPcall): do not clobber interrupt flags in
+	  INTCON during indirect function call, closes #3420588
+
 2011-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merge the Rabbit2000 branch.

@@ -447,10 +447,8 @@ ${Section} "SDCC include files" SEC05
   SetOutPath "$INSTDIR\include\pic16"
   File "${DEV_ROOT}\include\pic16\*.h"
   File "${DEV_ROOT}\include\pic16\*.txt"
-  SetOutPath "$INSTDIR\include\z80"
-  File "${DEV_ROOT}\include\z80\*.h"
-#  SetOutPath "$INSTDIR\include\z180"
-#  File "${DEV_ROOT}\include\z180\*.h"
+  SetOutPath "$INSTDIR\include\z180"
+  File "${DEV_ROOT}\include\z180\*.h"
 
   SetOutPath "$INSTDIR\include"
   File "${DEV_ROOT}\include\*.h"
@@ -479,43 +477,49 @@ ${Section} "SDCC GBZ80 library" SEC08
   File "${DEV_ROOT}\lib\gbz80\*.*"
 ${SectionEnd}
 
-${Section} "SDCC Z80 library" SEC09
+${Section} "SDCC Z180 library" SEC09
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\z180"
+  File "${DEV_ROOT}\lib\z180\*.*"
+${SectionEnd}
+
+${Section} "SDCC Z80 library" SEC10
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\z80"
   File "${DEV_ROOT}\lib\z80\*.*"
 ${SectionEnd}
 
-${Section} "SDCC small model library" SEC10
+${Section} "SDCC small model library" SEC11
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small"
   File "${DEV_ROOT}\lib\small\*.*"
 ${SectionEnd}
 
-${Section} "SDCC medium model library" SEC11
+${Section} "SDCC medium model library" SEC12
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\medium"
   File "${DEV_ROOT}\lib\medium\*.*"
 ${SectionEnd}
 
-${Section} "SDCC large model library" SEC12
+${Section} "SDCC large model library" SEC13
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\large"
   File "${DEV_ROOT}\lib\large\*.*"
 ${SectionEnd}
 
-${Section} "SDCC small-stack-auto model library" SEC13
+${Section} "SDCC small-stack-auto model library" SEC14
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small-stack-auto"
   File "${DEV_ROOT}\lib\small-stack-auto\*.*"
 ${SectionEnd}
 
-${Section} "SDCC HC08 library" SEC14
+${Section} "SDCC HC08 library" SEC15
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\hc08"
   File "${DEV_ROOT}\lib\hc08\*.*"
 ${SectionEnd}
 
-${Section} "SDCC PIC16 library" SEC15
+${Section} "SDCC PIC16 library" SEC16
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic16"
   File "${DEV_ROOT}\lib\pic16\*.o"
@@ -525,7 +529,7 @@ ${Section} "SDCC PIC16 library" SEC15
   File "${DEV_ROOT}\non-free\lib\pic16\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC PIC14 library" SEC16
+${Section} "SDCC PIC14 library" SEC17
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic14"
   File "${DEV_ROOT}\lib\pic14\*.lib"
@@ -534,7 +538,7 @@ ${Section} "SDCC PIC14 library" SEC16
   File "${DEV_ROOT}\non-free\lib\pic14\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC library sources" SEC17
+${Section} "SDCC library sources" SEC18
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
   File "${DEV_ROOT}\lib\src\ds390\examples\MOVED"
@@ -720,12 +724,6 @@ ${Section} "SDCC library sources" SEC17
   File "${DEV_ROOT}\lib\src\*.c"
 ${SectionEnd}
 
-${Section} "SDCC Z180 library" SEC18
-  SectionIn 1 2
-  SetOutPath "$INSTDIR\lib\z180"
-  File "${DEV_ROOT}\lib\z180\*.*"
-${SectionEnd}
-
 ;--------------------------------
 ;Descriptions
 
@@ -738,16 +736,16 @@ LangString DESC_SEC05 ${LANG_ENGLISH} "SDCC include files"
 LangString DESC_SEC06 ${LANG_ENGLISH} "SDCC DS390 library"
 LangString DESC_SEC07 ${LANG_ENGLISH} "SDCC DS400 library"
 LangString DESC_SEC08 ${LANG_ENGLISH} "SDCC GBZ80 library"
-LangString DESC_SEC09 ${LANG_ENGLISH} "SDCC Z80 library"
-LangString DESC_SEC10 ${LANG_ENGLISH} "SDCC small model library"
-LangString DESC_SEC11 ${LANG_ENGLISH} "SDCC medium model library"
-LangString DESC_SEC12 ${LANG_ENGLISH} "SDCC large model library"
-LangString DESC_SEC13 ${LANG_ENGLISH} "SDCC small-stack-auto model library"
-LangString DESC_SEC14 ${LANG_ENGLISH} "SDCC HC08 library"
-LangString DESC_SEC15 ${LANG_ENGLISH} "SDCC PIC16 library"
-LangString DESC_SEC16 ${LANG_ENGLISH} "SDCC PIC14 library"
-LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC library sources"
-LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC Z180 library"
+LangString DESC_SEC09 ${LANG_ENGLISH} "SDCC Z180 library"
+LangString DESC_SEC10 ${LANG_ENGLISH} "SDCC Z80 library"
+LangString DESC_SEC11 ${LANG_ENGLISH} "SDCC small model library"
+LangString DESC_SEC12 ${LANG_ENGLISH} "SDCC medium model library"
+LangString DESC_SEC13 ${LANG_ENGLISH} "SDCC large model library"
+LangString DESC_SEC14 ${LANG_ENGLISH} "SDCC small-stack-auto model library"
+LangString DESC_SEC15 ${LANG_ENGLISH} "SDCC HC08 library"
+LangString DESC_SEC16 ${LANG_ENGLISH} "SDCC PIC16 library"
+LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC PIC14 library"
+LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC library sources"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -928,8 +926,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\asm\gbz80\*.h"
   Delete "$INSTDIR\include\asm\ds390\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
-  Delete "$INSTDIR\include\z80\*.h"
-#  Delete "$INSTDIR\include\z180\*.h"
+  Delete "$INSTDIR\include\z180\*.h"
   Delete "$INSTDIR\include\pic14\*.h"
   Delete "$INSTDIR\include\pic14\*.txt"
   Delete "$INSTDIR\include\pic14\*.inc"
@@ -1030,8 +1027,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\asm\ds390"
   RMDir "$INSTDIR\include\asm\default"
   RMDir "$INSTDIR\include\asm"
-  RMDir "$INSTDIR\include\z80"
-#  RMDir "$INSTDIR\include\z180"
+  RMDir "$INSTDIR\include\z180"
   RMDir "$INSTDIR\include\pic14"
   RMDir "$INSTDIR\non-free\include\pic14"
   RMDir "$INSTDIR\include\pic16"

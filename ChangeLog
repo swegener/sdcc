@@ -1,3 +1,7 @@
+2011-10-10 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/sdcc.nsi: removed include/z80 added include/z180
+
 2011-10-09 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCval.c (constVal): avoid compiler warning
@@ -291,7 +295,7 @@
 	* src/z80/gen.c:
 	  Reorganized pointer access functions, fixed the remaining warning in the z80 port.
 
-2011-09-01 Borut Razem <borut.razem AT gmail.com>
+2011-10-01 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/SDCC.lex:
 	  SDCCerr code cleanup

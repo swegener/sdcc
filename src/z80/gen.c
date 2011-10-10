@@ -1314,8 +1314,16 @@ aopForRemat (symbol * sym)
     {
       if (ic->op == '+')
         {
-          val += (int) operandLitValue (IC_RIGHT (ic));
-          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+          if(isOperandLiteral (IC_RIGHT (ic)))
+            {
+              val += (int) operandLitValue (IC_RIGHT (ic));
+              ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+            }
+          else
+           {
+             val += (int) operandLitValue (IC_LEFT (ic));
+              ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+           }
         }
       else if (ic->op == '-')
         {

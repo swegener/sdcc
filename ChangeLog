@@ -1,3 +1,10 @@
+2011-10-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/main.c,
+	  src/z80/main.c,
+	  src/z80/z80.h:
+	  Fix code generation for handling of rematerialization by the new register allocator, enable it for the ports with exact cost function and remove the option.
+
 2011-10-10 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: removed include/z80 added include/z180

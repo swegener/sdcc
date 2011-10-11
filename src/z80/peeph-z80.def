@@ -1235,7 +1235,7 @@ replace restart {
 	ld	%1, %2 (iy)
 } by {
 	ld	%1, %2+1 (iy)
-	; peephole 110 moved decrement of iy to offset.
+	; peephole 110 moved increment of iy to offset.
 } if notUsed('iy')
 
 replace restart {

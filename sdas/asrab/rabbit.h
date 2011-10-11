@@ -130,6 +130,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	S_IDIX	55
 #define	S_IDIY	56
 #define	S_INDM	57
+#define S_IDHL_OFFSET  58
 
 /*
  * Instruction types

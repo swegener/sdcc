@@ -1230,39 +1230,39 @@ replace restart {
 	; peephole 109 moved decrement of hl to constant.
 } if notUsed(%1)
 
-//replace restart {
-//	inc	hl
-//	inc	hl
-//	inc	hl
-//	ld	hl, (hl)
-//} by {
-//	; peephole 109a moved decrement of hl to offset.
-//	ld	hl, 3 (hl)
-//}
+replace restart {
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	hl, (hl)
+} by {
+	; peephole 109a moved increment of hl to offset.
+	ld	hl, 3 (hl)
+}
 
-//replace restart {
-//	inc	hl
-//	inc	hl
-//	ld	hl, (hl)
-//} by {
-//	; peephole 109b moved decrement of hl to offset.
-//	ld	hl, 2 (hl)
-//}
+replace restart {
+	inc	hl
+	inc	hl
+	ld	hl, (hl)
+} by {
+	; peephole 109b moved increment of hl to offset.
+	ld	hl, 2 (hl)
+}
 
-//replace restart {
-//	inc	hl
-//	ld	hl, (hl)
-//} by {
-//	; peephole 109c moved decrement of hl to offset.
-//	ld	hl, 1 (hl)
-//}
+replace restart {
+	inc	hl
+	ld	hl, (hl)
+} by {
+	; peephole 109c moved increment of hl to offset.
+	ld	hl, 1 (hl)
+}
 
 replace restart {
 	inc	iy
 	ld	%1, %2 (iy)
 } by {
 	ld	%1, %2+1 (iy)
-	; peephole 110 moved decrement of iy to offset.
+	; peephole 110 moved increment of iy to offset.
 } if notUsed('iy')
 
 replace restart {

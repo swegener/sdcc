@@ -139,11 +139,13 @@ struct expr *esp;
                         esp->e_base.e_ap = NULL;
                 }
                 if ((c = getnb()) == LFIND) {
-		  if ( ((indx=admode(R16))!=0) &&
-		       ((indx&0xFF)==IX || (indx&0xFF)==IY ||
-			(indx&0xFF)==SP) )
+		  indx=admode(R16);
+		  if ((indx&0xFF)==IX || (indx&0xFF)==IY ||
+		      (indx&0xFF)==SP)
 		  {
 		    esp->e_mode = S_INDR + (indx&0xFF);
+		  } else if ( (indx&0xFF)==HL ) {
+		    esp->e_mode = S_IDHL_OFFSET;
 		  } else {
                                 aerr();
                         }

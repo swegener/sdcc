@@ -1,3 +1,12 @@
+2011-10-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* sdas/asrab/rabbit.h,
+	  sdas/asrab/rabbitadr.c,
+	  sdas/asrab/rabbitmch.c:
+	  Leland Morrison's fix for ld n (hl), hl and ld hl, n (hl).
+	* src/z80/peeph-r2k.def:
+	  Enable peepholes using ld hl, n (hl).
+
 2011-10-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/main.c,

@@ -51,11 +51,11 @@ install: all installdirs
 	    for mask in '*.h' '*.inc' '*.txt'; \
 	    do \
 	      test "`echo $(srcdir)/$${target}/$${mask}`" != "$(srcdir)/$${target}/$${mask}" && \
-	        $(CP) $(srcdir)/$${target}/$${mask} $(sdcc_includedir)/$${target}; \
+	        $(CP) $(srcdir)/$${target}/$${mask} $(sdcc_includedir)/$${target}/; \
 	    done; \
 	  fi; \
 	done;
-	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
+	find $(sdcc_includedir) -type d -name '.svn' -exec rm -rf {} \;
 	# correct file modes
 	find $(sdcc_includedir) -type f -exec chmod 644 {} \;
 
@@ -79,10 +79,10 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
+	mkdir -p $(sdcc_includedir)
 	-for target in mcs51 ds390 ds400 pic14 pic16 z80 z180 hc08; \
 	do \
-	  [ -d $(srcdir)/$${target} ] || mkdir -p $(sdcc_includedir)/$${target}; \
+	  test -d $(srcdir)/$${target} && mkdir -p $(sdcc_includedir)/$${target}; \
 	done
 
 

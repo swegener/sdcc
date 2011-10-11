@@ -1,6 +1,8 @@
 2011-10-11 Borut Razem <borut.razem AT gmail.com>
 
 	* device/include/Makefile.in: install/copy only existing files
+	* src/SDCCicode.c: disable -O2 optimization for all i386 platforms;
+	  see patch #3285611: Workaround gcc 4.6.0 bug with sdcc 3.0.0
 
 2011-10-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

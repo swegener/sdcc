@@ -1,5 +1,10 @@
 2011-10-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	*  configure.in:
+	  Fixed bug #3413688.
+
+2011-10-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* sdas/asrab/rabbit.h,
 	  sdas/asrab/rabbitadr.c,
 	  sdas/asrab/rabbitmch.c:

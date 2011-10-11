@@ -7071,10 +7071,29 @@ fi
 test $OPT_DISABLE_XA51 = 0 && ac_config_files="$ac_config_files src/xa51/Makefile"
 
 
-if test $OPT_DISABLE_Z80 = 0; then
-  ac_config_files="$ac_config_files src/z80/Makefile sdas/asz80/Makefile sdas/asrab/Makefile sdas/asgb/Makefile"
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_GBZ80 = 0; then
+  ac_config_files="$ac_config_files src/z80/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/z80/Makefile device/lib/z180/Makefile device/lib/r2k/Makefile device/lib/gbz80/Makefile"
+fi
+
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0; then
+  ac_config_files="$ac_config_files sdas/asz80/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/z80/Makefile device/lib/z180/Makefile"
+
+fi
+
+if test $OPT_DISABLE_GBZ80 = 0; then
+  ac_config_files="$ac_config_files sdas/asgb/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/gbz80/Makefile"
+
+fi
+
+if test $OPT_DISABLE_R2K = 0; then
+  ac_config_files="$ac_config_files sdas/asrab/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/r2k/Makefile"
 
 fi
 
@@ -7810,12 +7829,12 @@ do
     "src/xa51/Makefile") CONFIG_FILES="$CONFIG_FILES src/xa51/Makefile" ;;
     "src/z80/Makefile") CONFIG_FILES="$CONFIG_FILES src/z80/Makefile" ;;
     "sdas/asz80/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asz80/Makefile" ;;
-    "sdas/asrab/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asrab/Makefile" ;;
-    "sdas/asgb/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asgb/Makefile" ;;
     "device/lib/z80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z80/Makefile" ;;
     "device/lib/z180/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z180/Makefile" ;;
-    "device/lib/r2k/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2k/Makefile" ;;
+    "sdas/asgb/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asgb/Makefile" ;;
     "device/lib/gbz80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/gbz80/Makefile" ;;
+    "sdas/asrab/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asrab/Makefile" ;;
+    "device/lib/r2k/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2k/Makefile" ;;
     "device/lib/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
     "device/non-free/lib/Makefile") CONFIG_FILES="$CONFIG_FILES device/non-free/lib/Makefile" ;;
     "main.mk") CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;

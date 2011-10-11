@@ -45,32 +45,48 @@ all:
 install: all installdirs
 	$(CP) -r $(srcdir)/asm $(srcdir)/*.h $(sdcc_includedir)
 	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
-	  $(CP) $(srcdir)/mcs51/*.h $(sdcc_includedir)/mcs51; \
+	  test "`echo $(srcdir)/mcs51/*.h`" != "$(srcdir)/mcs51/*.h" && \
+	    $(CP) $(srcdir)/mcs51/*.h $(sdcc_includedir)/mcs51; \
 	fi
 	if [ "`grep ds390 $(top_builddir)/ports.build`" = ds390 ]; then \
-	  $(CP) $(srcdir)/ds390/*.h $(sdcc_includedir)/ds390; \
+	  test "`echo $(srcdir)/ds390/*.h`" != "$(srcdir)/ds390/*.h" && \
+	    $(CP) $(srcdir)/ds390/*.h $(sdcc_includedir)/ds390; \
 	fi
 	if [ "`grep ds400 $(top_builddir)/ports.build`" = ds400 ]; then \
-	  $(CP) $(srcdir)/ds400/*.h $(sdcc_includedir)/ds400; \
+	  test "`echo $(srcdir)/ds400/*.h`" != "$(srcdir)/ds400/*.h" && \
+	    $(CP) $(srcdir)/ds400/*.h $(sdcc_includedir)/ds400; \
 	fi
 	if [ "`grep xa51 $(top_builddir)/ports.build`" = xa51 ]; then \
-	  $(CP) $(srcdir)/xa51/*.h $(sdcc_includedir)/xa51; \
+	  test "`echo $(srcdir)/xa51/*.h`" != "$(srcdir)/xa51/*.h" && \
+	    $(CP) $(srcdir)/xa51/*.h $(sdcc_includedir)/xa51; \
 	fi
 	if [ "`grep pic14 $(top_builddir)/ports.build`" = pic14 ]; then \
-	  $(CP) $(srcdir)/pic14/*.h   $(sdcc_includedir)/pic14; \
-	  $(CP) $(srcdir)/pic14/*.inc $(sdcc_includedir)/pic14; \
-	  $(CP) $(srcdir)/pic14/*.txt $(sdcc_includedir)/pic14; \
-	  $(CP) $(srcdir)/pic14/pic14devices.txt $(sdcc_includedir)/pic14; \
+	  test "`echo $(srcdir)/pic14/*.h`" != "$(srcdir)/pic14/*.h" && \
+	    $(CP) $(srcdir)/pic14/*.h   $(sdcc_includedir)/pic14; \
+	  test "`echo $(srcdir)/pic14/*.inc`" != "$(srcdir)/pic14/*.inc" && \
+	    $(CP) $(srcdir)/pic14/*.inc $(sdcc_includedir)/pic14; \
+	  test "`echo $(srcdir)/pic14/*.txt`" != "$(srcdir)/pic14/*.txt" && \
+	    $(CP) $(srcdir)/pic14/*.txt $(sdcc_includedir)/pic14; \
+	  test -e $(srcdir)/pic14/pic14devices.txt && \
+	    $(CP) $(srcdir)/pic14/pic14devices.txt $(sdcc_includedir)/pic14; \
 	fi
 	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
-	  $(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16; \
-	  $(CP) $(srcdir)/pic16/*.txt $(sdcc_includedir)/pic16; \
+	  test "`echo $(srcdir)/pic16/*.h`" != "$(srcdir)/pic16/*.h" && \
+	    $(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16; \
+	  test "`echo $(srcdir)/pic16/*.txt`" != "$(srcdir)/pic16/*.txt" && \
+	    $(CP) $(srcdir)/pic16/*.txt $(sdcc_includedir)/pic16; \
 	fi
 	if [ "`grep z80 $(top_builddir)/ports.build`" = z80 ]; then \
-	  $(CP) $(srcdir)/z80/*.h $(sdcc_includedir)/z80; \
+	  test "`echo $(srcdir)/z80/*.h`" != "$(srcdir)/z80/*.h" && \
+	    $(CP) $(srcdir)/z80/*.h $(sdcc_includedir)/z80; \
+	fi
+	if [ "`grep z180 $(top_builddir)/ports.build`" = z180 ]; then \
+	  test "`echo $(srcdir)/z180/*.h`" != "$(srcdir)/z180/*.h" && \
+	    $(CP) $(srcdir)/z180/*.h $(sdcc_includedir)/z180; \
 	fi
 	if [ "`grep hc08 $(top_builddir)/ports.build`" = hc08 ]; then \
-	  $(CP) $(srcdir)/hc08/*.h $(sdcc_includedir)/hc08; \
+	  test "`echo $(srcdir)/hc08/*.h`" != "$(srcdir)/hc08/*.h" && \
+	    $(CP) $(srcdir)/hc08/*.h $(sdcc_includedir)/hc08; \
 	fi
 	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
 	# some files in CVS are executable :-(
@@ -103,7 +119,7 @@ installdirs:
 	[ -d $(sdcc_includedir)/xa51 ] || mkdir -p $(sdcc_includedir)/xa51
 	[ -d $(sdcc_includedir)/pic14 ] || mkdir -p $(sdcc_includedir)/pic14
 	[ -d $(sdcc_includedir)/pic16 ] || mkdir -p $(sdcc_includedir)/pic16
-	[ -d $(sdcc_includedir)/z80 ] || mkdir -p $(sdcc_includedir)/z80
+	[ -d $(sdcc_includedir)/z180 ] || mkdir -p $(sdcc_includedir)/z180
 	[ -d $(sdcc_includedir)/hc08 ] || mkdir -p $(sdcc_includedir)/hc08
 
 

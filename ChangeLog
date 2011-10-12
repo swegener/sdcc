@@ -2,6 +2,7 @@
 
 	* device/include/Makefile.in:
 	  fixed detection if files with the given extension exist
+	* support/scripts/sdcc.nsi: added Rabbit 2000 support
 
 2011-10-11 Borut Razem <borut.razem AT gmail.com>
 

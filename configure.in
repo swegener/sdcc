@@ -806,8 +806,8 @@ rm -f ports.all ports.build
 # Supported targets
 AC_DO_PORT(mcs51, mcs51, MCS51, [Excludes the Intel mcs51 port])
 AC_DO_PORT(z80,   z80,   Z80,   [Excludes the z80 port])
-AC_DO_PORT(z180,  z80,   Z180,  [Excludes the z180 port])
-AC_DO_PORT(r2k,   z80,   R2K,  [Excludes the r2k port])
+AC_DO_PORT(z180,  z180,  Z180,  [Excludes the z180 port])
+AC_DO_PORT(r2k,   r2k,   R2K,   [Excludes the r2k port])
 AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(ds390, ds390, DS390, [Excludes the DS390 port])
 AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])

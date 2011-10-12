@@ -1,3 +1,8 @@
+2011-10-12 Borut Razem <borut.razem AT gmail.com>
+
+	* device/include/Makefile.in:
+	  fixed detection if files with the given extension exist
+
 2011-10-11 Borut Razem <borut.razem AT gmail.com>
 
 	* device/include/Makefile.in: install/copy only existing files

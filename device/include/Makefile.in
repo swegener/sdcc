@@ -50,7 +50,7 @@ install: all installdirs
 	  then \
 	    for mask in '*.h' '*.inc' '*.txt'; \
 	    do \
-	      if [ "`echo $(srcdir)/$${target}/$${mask}`" != "$(srcdir)/$${target}/$${mask}" ]; \
+	      if `ls $(srcdir)/$${target}/$${mask} > /dev/null 2>&1`; \
 	      then \
 	        $(CP) $(srcdir)/$${target}/$${mask} $(sdcc_includedir)/$${target}/; \
 	      fi; \
@@ -104,7 +104,8 @@ include $(srcdir)/clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)/devel ]; then \
+	@if [ -f $(top_builddir)/devel ]; \
+	then \
 	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" \
 	  freshconf; \
 	fi

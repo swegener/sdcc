@@ -4,6 +4,12 @@
 	  fixed detection if files with the given extension exist;
 	  specially treat z80 faily: z180, r2k and gbz80 targets
 	* support/scripts/sdcc.nsi: added Rabbit 2000 support
+	* sdas/asrab/asrab.vcxproj, sdas/asrab/asrab.vcxproj.filters,
+	  sdcc.sln, src/src.vcxproj, src/src.vcxproj.filters, 
+	  src/z80/z80.vcxproj, src/z80/z80.vcxproj.filters:
+	  added sdasrab assembler to the project
+	* src/SDCCval.c: fixed long long constant suffix
+	* .version, doc/sdccman.lyx: bumped version to 3.0.6
 
 2011-10-11 Borut Razem <borut.razem AT gmail.com>
 
@@ -30,7 +36,9 @@
 	* src/z80/main.c,
 	  src/z80/main.c,
 	  src/z80/z80.h:
-	  Fix code generation for handling of rematerialization by the new register allocator, enable it for the ports with exact cost function and remove the option.
+	  Fix code generation for handling of rematerialization by the new
+	  register allocator, enable it for the ports with exact cost function
+	  and remove the option.
 
 2011-10-10 Borut Razem <borut.razem AT gmail.com>
 

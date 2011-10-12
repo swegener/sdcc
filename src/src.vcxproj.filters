@@ -146,9 +146,6 @@
     <ClCompile Include="regression\sub.c">
       <Filter>Regression Test</Filter>
     </ClCompile>
-    <ClCompile Include="regression\TempTest.c">
-      <Filter>Regression Test</Filter>
-    </ClCompile>
     <ClCompile Include="regression\while.c">
       <Filter>Regression Test</Filter>
     </ClCompile>

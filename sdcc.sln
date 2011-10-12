@@ -77,6 +77,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdcdb", "debugger\mcs51\sdc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yacc", "src\yacc.vcxproj", "{EA40C4BB-7537-4422-AE03-629A05F3D4C5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asrab", "sdas\asrab\asrab.vcxproj", "{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -167,6 +169,10 @@ Global
 		{EA40C4BB-7537-4422-AE03-629A05F3D4C5}.Debug|Win32.Build.0 = Debug|Win32
 		{EA40C4BB-7537-4422-AE03-629A05F3D4C5}.Release|Win32.ActiveCfg = Release|Win32
 		{EA40C4BB-7537-4422-AE03-629A05F3D4C5}.Release|Win32.Build.0 = Release|Win32
+		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Debug|Win32.Build.0 = Debug|Win32
+		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Release|Win32.ActiveCfg = Release|Win32
+		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

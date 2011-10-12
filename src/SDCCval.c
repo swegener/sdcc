@@ -1133,7 +1133,13 @@ constVal (const char *s)
           else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
             {
               SPEC_LONGLONG (val->type) = 1;
-              if (dval > 0x7fffffffffffffffll)
+#ifdef _MSC_VER <= 1600
+              /* Microsoft C compiler doesn't support
+               * hexadecimal floating-point literals */
+              if (dval > (double)0x7fffffffffffffffll)
+#else
+              if (dval > 0x7fffffffffffffffp0)
+#endif
                 SPEC_USIGN (val->type) = 1;
             }
         }

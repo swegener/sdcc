@@ -335,7 +335,7 @@ void openSimulator (char **args, int nargs)
     int retry = 0;
     int i;
     int iResult;
-#ifdef __sun
+#if defined(__sun) || defined(__CYGWIN__)
     u_long iMode;
 #endif
 
@@ -386,7 +386,7 @@ void openSimulator (char **args, int nargs)
       exit(1);
     }
 
-#if __sun
+#if defined(__sun) || defined(__CYGWIN__)
   iMode = 1; /* set non-blocking mode */
   iResult = ioctl(sock, FIONBIO, &iMode);
 #else

@@ -8,7 +8,9 @@
 	  sdcc.sln, src/src.vcxproj, src/src.vcxproj.filters, 
 	  src/z80/z80.vcxproj, src/z80/z80.vcxproj.filters:
 	  added sdasrab assembler to the project
-	* src/SDCCval.c: fixed long long constant suffix
+	* src/SDCCval.c: Microsoft C compiler doesn't support
+	  hexadecimal floating-point literals
+	* debugger/mcs51/simi.c: cygwin doesn't support O_ASYNC
 	* .version, doc/sdccman.lyx: bumped version to 3.0.6
 
 2011-10-11 Borut Razem <borut.razem AT gmail.com>

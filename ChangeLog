@@ -1,6 +1,13 @@
 2011-10-13 Borut Razem <borut.razem AT gmail.com>
 
 	* .version, doc/sdccman.lyx: bumped version to 3.0.6
+	* src/SDCCicode.c:
+	  disable -O2 optimization for i386 Linux and mingw platforms
+	  (solaris i386 is OK);
+	  see patch #3285611: Workaround gcc 4.6.0 bug with sdcc 3.0.0
+	* src/SDCCval.c:
+	  Microsoft C compiler doesn't support hexadecimal floating-point
+	  literals
 
 2011-10-12 Borut Razem <borut.razem AT gmail.com>
 
@@ -12,8 +19,6 @@
 	  sdcc.sln, src/src.vcxproj, src/src.vcxproj.filters, 
 	  src/z80/z80.vcxproj, src/z80/z80.vcxproj.filters:
 	  added sdasrab assembler to the project
-	* src/SDCCval.c: Microsoft C compiler doesn't support
-	  hexadecimal floating-point literals
 	* debugger/mcs51/simi.c: cygwin doesn't support O_ASYNC
 
 2011-10-11 Borut Razem <borut.razem AT gmail.com>

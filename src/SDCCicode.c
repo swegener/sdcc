@@ -1128,10 +1128,10 @@ getBuiltinParms (iCode * fic, int *pcount, operand ** parms)
   return ic;
 }
 
-/* This seems to be a GCC 4.6.[01] bug
+/* This seems to be a GCC 4.6.[01] bug on i386 Linux and mingw platforms
  * see http://sourceforge.net/tracker/?func=detail&aid=3285611&group_id=599&atid=300599
  */
-#if defined(__i386__) && defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 6 && (__GNUC_PATCHLEVEL__ == 0 || __GNUC_PATCHLEVEL__ == 1)
+#if (defined(__linux__) || defined(__MINGW32__)) && defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 6 && (__GNUC_PATCHLEVEL__ == 0 || __GNUC_PATCHLEVEL__ == 1)
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
 #endif
@@ -1390,10 +1390,10 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
 
   return retval;
 }
-/* This seems to be a GCC 4.6.[01] bug
+/* This seems to be a GCC 4.6.[01] bug on i386 Linux and mingw platforms
  * see http://sourceforge.net/tracker/?func=detail&aid=3285611&group_id=599&atid=300599
  */
-#if defined(__linux__) && defined(__i386__) && defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 6 && (__GNUC_PATCHLEVEL__ == 0 || __GNUC_PATCHLEVEL__ == 1)
+#if (defined(__linux__) || defined(__MINGW32__)) && defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ == 6 && (__GNUC_PATCHLEVEL__ == 0 || __GNUC_PATCHLEVEL__ == 1)
 #pragma GCC pop_options
 #endif
 

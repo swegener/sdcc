@@ -14,18 +14,18 @@
     <ClCompile Include="asranlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\support\Util\dbuf.c">
+    <ClCompile Include="..\..\support\util\dbuf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\support\Util\dbuf_string.c">
+    <ClCompile Include="..\..\support\util\dbuf_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\support\Util\dbuf.h">
+    <ClInclude Include="..\..\support\util\dbuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\support\Util\dbuf_string.h">
+    <ClInclude Include="..\..\support\util\dbuf_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\linksrc\lkar.h">

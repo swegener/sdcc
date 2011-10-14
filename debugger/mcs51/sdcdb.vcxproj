@@ -91,7 +91,7 @@
   <ItemGroup>
     <ClCompile Include="break.c" />
     <ClCompile Include="cmd.c" />
-    <ClCompile Include="..\..\support\Util\NewAlloc.c" />
+    <ClCompile Include="..\..\support\util\NewAlloc.c" />
     <ClCompile Include="..\..\src\SDCCerr.c" />
     <ClCompile Include="..\..\src\SDCChasht.c" />
     <ClCompile Include="..\..\src\SDCCset.c" />
@@ -102,7 +102,7 @@
   <ItemGroup>
     <ClInclude Include="break.h" />
     <ClInclude Include="cmd.h" />
-    <ClInclude Include="..\..\support\Util\newalloc.h" />
+    <ClInclude Include="..\..\support\util\newalloc.h" />
     <ClInclude Include="..\..\src\SDCCerr.h" />
     <ClInclude Include="..\..\src\SDCChasht.h" />
     <ClInclude Include="..\..\src\SDCCset.h" />

@@ -34,14 +34,14 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS        = @CPPFLAGS@ -DSDCDB -DNOICE -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/Util
+CPPFLAGS        = @CPPFLAGS@ -DSDCDB -DNOICE -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/util
 CFLAGS          = @CFLAGS@ @WALL_FLAG@ $(CPPFLAGS)
 LDFLAGS         = @LDFLAGS@
 LIBS            = -lm
 
 OBJDIR = obj
 
-UTILLIB = $(srcdir)/../../support/Util
+UTILLIB = $(srcdir)/../../support/util
 UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 

@@ -17,7 +17,7 @@
     <ClCompile Include="cmd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\support\Util\NewAlloc.c">
+    <ClCompile Include="..\..\support\util\NewAlloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\SDCCerr.c">
@@ -46,7 +46,7 @@
     <ClInclude Include="cmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\support\Util\newalloc.h">
+    <ClInclude Include="..\..\support\util\newalloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\SDCCerr.h">

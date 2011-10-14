@@ -3,6 +3,7 @@
 	* support/scripts/sdcc.nsi: remove include/asm/r2k directoriy
 	  during uninstallation
 	* */*.dsw, */*.dsw: removed obsolete VS6 project files
+	* support/Util: renamed to support/util
 
 2011-10-13 Borut Razem <borut.razem AT gmail.com>
 

@@ -56,10 +56,10 @@
     <ClCompile Include="..\asxxsrc\strcmpi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\support\Util\dbuf.c">
+    <ClCompile Include="..\..\support\util\dbuf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\support\Util\dbuf_string.c">
+    <ClCompile Include="..\..\support\util\dbuf_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -55,7 +55,7 @@ OPT_DISABLE_PACKIHX   = @OPT_DISABLE_PACKIHX@
 OPT_ENABLE_DOC        = @OPT_ENABLE_DOC@
 OPT_DISABLE_SDCPP     = @OPT_DISABLE_SDCPP@
 
-SLIB			= $(top_builddir)/support/Util
+SLIB			= $(top_builddir)/support/util
 
 EXEEXT          = @EXEEXT@
 transform       = @program_transform_name@

@@ -46,10 +46,10 @@ dep:
 $(TARGET): $(OBJECTS) dbuf.o dbuf_string.o
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) dbuf.o dbuf_string.o
 
-dbuf.o: $(srcdir)/../../support/Util/dbuf.c
+dbuf.o: $(srcdir)/../../support/util/dbuf.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
-dbuf_string.o: $(srcdir)/../../support/Util/dbuf_string.c
+dbuf_string.o: $(srcdir)/../../support/util/dbuf_string.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .c.o:

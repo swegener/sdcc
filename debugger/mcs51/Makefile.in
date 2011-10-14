@@ -11,7 +11,7 @@ MAKEDEP         = @MAKEDEP@
 
 top_builddir	= ../../
 top_srcdir	= @srcdir@/../..
-SLIB		= $(top_srcdir)/support/Util
+SLIB		= $(top_srcdir)/support/util
 SDCCLIB		= $(top_srcdir)/src
 
 VPATH           = @srcdir@

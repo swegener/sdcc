@@ -20,13 +20,13 @@
     <ClCompile Include="cdbFile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\support\Util\dbuf.c">
+    <ClCompile Include="..\support\util\dbuf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\support\Util\dbuf_string.c">
+    <ClCompile Include="..\support\util\dbuf_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\support\Util\NewAlloc.c">
+    <ClCompile Include="..\support\util\NewAlloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDCCasm.c">
@@ -165,13 +165,13 @@
     <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\support\Util\dbuf.h">
+    <ClInclude Include="..\support\util\dbuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\support\Util\dbuf_string.h">
+    <ClInclude Include="..\support\util\dbuf_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\support\Util\newalloc.h">
+    <ClInclude Include="..\support\util\newalloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="port.h">

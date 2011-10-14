@@ -1,3 +1,8 @@
+2011-10-14 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/sdcc.nsi: remove include/asm/r2k directoriy
+	  during uninstallation
+
 2011-10-13 Borut Razem <borut.razem AT gmail.com>
 
 	* .version, doc/sdccman.lyx: bumped version to 3.0.6
@@ -13,7 +18,7 @@
 
 	* device/include/Makefile.in:
 	  fixed detection if files with the given extension exist;
-	  specially treat z80 faily: z180, r2k and gbz80 targets
+	  specially treat z80 family: z180, r2k and gbz80 targets
 	* support/scripts/sdcc.nsi: added Rabbit 2000 support
 	* sdas/asrab/asrab.vcxproj, sdas/asrab/asrab.vcxproj.filters,
 	  sdcc.sln, src/src.vcxproj, src/src.vcxproj.filters, 
@@ -29,7 +34,7 @@
 
 2011-10-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	*  configure.in:
+	* configure.in:
 	  Fixed bug #3413688.
 
 2011-10-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>

@@ -1042,6 +1042,7 @@ ${Section} Uninstall SECUNINSTALL
 
   RMDir "$INSTDIR\include\asm\z80"
   RMDir "$INSTDIR\include\asm\z180"
+  RMDir "$INSTDIR\include\asm\r2k"
   RMDir "$INSTDIR\include\asm\pic16"
   RMDir "$INSTDIR\non-free\include\asm\pic16"
   RMDir "$INSTDIR\include\asm\pic14"

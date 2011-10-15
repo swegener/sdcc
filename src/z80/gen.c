@@ -2028,7 +2028,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               break;
             }
           }
-        else if (!IS_GB && aop->type == AOP_IY) {
+        else if (!IS_GB && aop->type == AOP_IY && !(pairId == PAIR_IY && aop->size < 2)) {
           /* Instead of fetching relative to IY, just grab directly
              from the address IY refers to */
           emit2 ("ld %s,(%s)", _pairs[pairId].name, aopGetLitWordLong (aop, offset, FALSE));

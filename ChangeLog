@@ -1,5 +1,11 @@
 2011-10-15 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  support/regression/tests/bug3424150.c:
+	  Fixed bug #3424150.
+
+2011-10-15 Philipp Klaus Krause <pkk AT spth.de>
+
 	* doc/sdccman.lyx:
 	  Mentioned z180 and r2k ports and long long data type in manual.
 

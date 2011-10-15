@@ -1,9 +1,17 @@
-#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+#LyX 2.0.1 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass book
 \begin_preamble
+% Added by lyx2lyx
+%  for proper underlining
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+\let\cite@rig\cite
+\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
+  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
+\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 % Added by lyx2lyx
 %  for proper underlining
 \PassOptionsToPackage{normalem}{ulem}
@@ -39,7 +47,6 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \paperfontsize default
 \spacing single
@@ -58,14 +65,12 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
-\author "" 
 \end_header
 
 \begin_body
@@ -238,6 +243,16 @@ rollers and underlying hardware effectively.
 \end_inset
 
 
+\emph on
+Warning: Large parts of this manual apply to the mc51 port only
+\emph default
+.
+ Further information on the z80, z180, r2k and gbz80 ports and standard
+ compliance can be found in the sdcc wiki.
+\begin_inset Newline newline
+\end_inset
+
+
 \begin_inset Newline newline
 \end_inset
 
@@ -300,7 +315,7 @@ Supported data-types are:
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="5">
+<lyxtabular version="3" rows="9" columns="5">
 <features>
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -543,7 +558,7 @@ signed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -552,11 +567,68 @@ long
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 32 bits, 4 bytes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+signed
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2.147.483.648, +2.147.483.647
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0, +4.294.967.295
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+long long
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+only supported in the z80, z180, r2k and gbz80 ports as of sdcc 3.1.0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+64 bits, 8 bytes
 \end_layout
 
 \end_inset
@@ -574,7 +646,7 @@ signed
 \begin_inset Text
 
 \begin_layout Plain Layout
--2.147.483.648, +2.147.483.647
+
 \end_layout
 
 \end_inset
@@ -583,7 +655,7 @@ signed
 \begin_inset Text
 
 \begin_layout Plain Layout
-0, +4.294.967.295
+
 \end_layout
 
 \end_inset
@@ -42045,11 +42117,11 @@ ftp://ftp.dalsemi.com/pub/tini/ds80c400/c_libraries/sdcc/index.html
 \end_layout
 
 \begin_layout Section
-The Z80 and gbz80 port
+The Z80, Z180, Rabbit 2000/3000 and GBZ80 ports
 \end_layout
 
 \begin_layout Standard
-SDCC can target both the Zilog Z80
+SDCC can target the Z80
 \begin_inset Index
 status collapsed
 
@@ -42059,7 +42131,7 @@ Z80
 
 \end_inset
 
- and the Nintendo GameBoy's Z80-like gbz80
+, Z180, Rabbit 2000/3000 and the Nintendo GameBoy's Z80-like gbz80
 \begin_inset Index
 status collapsed
 

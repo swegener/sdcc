@@ -1,3 +1,8 @@
+2011-10-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Mentioned z180 and r2k ports and long long data type in manual.
+
 2011-10-14 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: remove include/asm/r2k directoriy

@@ -26,6 +26,11 @@ for line in lines:
     if (m):
         name = m.group(1)
 
+    # in case the test program crashes before the "--- Running" message
+    m = re.match(r'^[0-9]+ words read from (.*)\.ihx$',line)
+    if (m):
+        name = m.group(1)
+
     base = name
     m = re.match(r'([^/]*)/([^/]*)/([^/]*)/(.*)$', name)
     if (m >= 3):

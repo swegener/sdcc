@@ -79,7 +79,7 @@ adc_open(unsigned char channel, unsigned char fosc, sdcc_pcfg_t pcfg, unsigned c
   /* XXX: Should be (pcfg & 0x0f) as VCFG comes from config,
    * but we retain compatibility for now ... */
   ADCON1 = (pcfg & 0x3f) | (config & ADC_VCFG_AN3_AN2);
-  ADCON2 = (ADCON2 & 0x38) | (fosc & 0x07) | (config & ADC_FRM_RJUST);
+  ADCON2 = (config & ADC_FRM_RJUST) | (fosc & 0x3f);
 #elif (__SDCC_ADC_STYLE == 1824501)
   ANCON0 = pcfg;
   ANCON1 = (pcfg >> 8);

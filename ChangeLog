@@ -3,6 +3,9 @@
 	* device/include/pic16/i2c.h,
 	* device/lib/pic16/libio/i2c/i2cwritec.c:
 	  addressed issues from #3413443
+	* device/include/pic16/adc.h,
+	* device/lib/pic16/libio/adc/adcopen.c:
+	  addressed issues from #3409666
 
 2011-10-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

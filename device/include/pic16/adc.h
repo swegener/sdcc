@@ -100,7 +100,7 @@
 #define ADC_FOSC_64             0x06
 #define ADC_FOSC_RC             0x07
 
-/* acquisition time (13k50/24j50/65j50-styles only) */
+/* acquisition time (13k50/2220/24j50/65j50-styles only) */
 #define ADC_ACQT_0              (0x00 << 3)
 #define ADC_ACQT_2              (0x01 << 3)
 #define ADC_ACQT_4              (0x02 << 3)
@@ -194,14 +194,14 @@
  *
  * ADCON2:
  *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
- *   0                  ADCS0                                 ADCS0
- *   1                  ADCS1                                 ADCS1
- *   2                  ADCS2                                 ADCS2
- *   3                  ACQT0                                 ACQT0
- *   4                  ACQT1                                 ACQT1
- *   5                  ACQT2                                 ACQT2
- *   6                  -                                     -
- *   7                  ADFM                                  ADFM
+ *   0                  ADCS0     ADCS0                       ADCS0
+ *   1                  ADCS1     ADCS1                       ADCS1
+ *   2                  ADCS2     ADCS2                       ADCS2
+ *   3                  ACQT0     ADQT0                       ACQT0
+ *   4                  ACQT1     ADQT1                       ACQT1
+ *   5                  ACQT2     ADQT2                       ACQT2
+ *   6                  -         -                           -
+ *   7                  ADFM      ADFM                        ADFM
  */
 #include "pic18fam.h"
 

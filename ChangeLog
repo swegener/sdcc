@@ -1,6 +1,9 @@
 2011-10-16 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: added dedication to Dennis M. Ritchie
+	* support/cpp/c-ppoutput.c:
+	  fixed bug #3408654: SDCC shows wrong line number in warning 94:
+	  disabled # LINE directive generation in __asm __endasm block
 
 2011-10-16 Raphael Neider <rneider AT web.de>
 

@@ -227,7 +227,8 @@ maybe_print_line (source_location src_loc)
       print.printed = 0;
     }
 
-  if (src_line >= print.src_line && src_line < print.src_line + 8)
+  /* sdcpp specific: disabled # LINE directive generation  in __asm __endasm block */
+  if (in_asm || (src_line >= print.src_line && src_line < print.src_line + 8))
     {
       while (src_line > print.src_line)
         {

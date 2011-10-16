@@ -52,28 +52,28 @@
 
 
 /* slew rate control */
-#define I2C_SLEW_OFF	0xc0
+#define I2C_SLEW_OFF	0x80
 #define I2C_SLEW_ON	0x00
 
 /* macros to generate hardware conditions on I2C module */
 
 /* generate stop condition */
-#define I2C_STOP()	SSPCON2bits.PEN=1
+#define I2C_STOP()	do { SSPCON2bits.PEN = 1; } while (0)
 
 /* generate start condition */
-#define I2C_START()	SSPCON2bits.SEN=1
+#define I2C_START()	do { SSPCON2bits.SEN = 1; } while (0)
 
 /* generate restart condition */
-#define I2C_RESTART()	SSPCON2bits.RSEN=1
+#define I2C_RESTART()	do { SSPCON2bits.RSEN = 1; } while (0)
 
 /* generate not acknowledge condition */
-#define I2C_NACK()	SSPCON2bits.ACKDT=1; SSPCON2bits.ACKEN=1
+#define I2C_NACK()	do { SSPCON2bits.ACKDT = 1; SSPCON2bits.ACKEN = 1; } while (0)
 
 /* generate acknowledge condition */
-#define I2C_ACK()	SSPCON2bits.ACKDT=0; SSPCON2bits.ACKEN=1
+#define I2C_ACK()	do { SSPCON2bits.ACKDT = 0; SSPCON2bits.ACKEN = 1; } while (0)
 
 /* wait until I2C is idle */
-#define I2C_IDLE()	while((SSPCON2 & 0x1f) | (SSPSTATbits.R_W));
+#define I2C_IDLE()	do { /* busy waiting */ } while ((SSPCON2 & 0x1f) | (SSPSTATbits.R_W))
 
 /* is data ready from I2C module ?? */
 #define I2C_DRDY()	(SSPSTATbits.BF)

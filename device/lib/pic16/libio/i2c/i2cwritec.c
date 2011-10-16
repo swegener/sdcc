@@ -31,11 +31,12 @@
 
 char i2c_writechar(unsigned char dat)
 {
+  SSPCON1bits.WCOL = 0;
   SSPBUF = dat;
   if( SSPCON1bits.WCOL ) {
     return -1;
   } else {
-    while( I2C_DRDY() );
+    I2C_IDLE();
     return 0;
   }
 }

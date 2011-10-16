@@ -1,8 +1,13 @@
+2011-10-16 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/i2c.h,
+	* device/lib/pic16/libio/i2c/i2cwritec.c:
+	  addressed issues from #3413443
+
 2011-10-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/collate-results.py,
 	  support/regression/compact-results.py: fixed bug #3413437
-
 
 2011-10-15 Philipp Klaus Krause <pkk AT spth.de>
 

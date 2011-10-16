@@ -1,3 +1,7 @@
+2011-10-16 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/sdcc.nsi: added dedication to Dennis M. Ritchie
+
 2011-10-16 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/i2c.h,

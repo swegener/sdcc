@@ -41,8 +41,8 @@
   #define NULL (void *)0
 #endif
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
   typedef unsigned int size_t;
 #endif
 

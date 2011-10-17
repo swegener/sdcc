@@ -46,6 +46,24 @@ returnSecondArg(int marker, ...)
     return i;
 }
 
+static {type2}
+returnSecondArgCopy(int marker, ...)
+{
+    va_list ap1, ap2;
+    {type2} i;
+
+    va_start(ap1, marker);
+    UNUSED(va_arg(ap1, {type1}));
+    va_copy(ap2, ap1);
+    i = va_arg(ap2, {type2});
+
+    va_end(ap1);
+    va_end(ap2);
+
+    LOG(("Returning %u\n", i));
+    return i;
+}
+
 static {type3}
 returnThirdArg(int marker, ...)
 {
@@ -74,7 +92,11 @@ testArgs(void)
 
     ASSERT(returnSecondArg(marker, ({type1})1, ({type2})-23, ({type3})64) == ({type2})-23);
     ASSERT(returnSecondArg(marker, ({type1})1, ({type2})8, ({type3})64) == ({type2})8);
+    
+    ASSERT(returnSecondArgCopy(marker, ({type1})1, ({type2})-23, ({type3})64) == ({type2})-23);
+    ASSERT(returnSecondArgCopy(marker, ({type1})1, ({type2})8, ({type3})64) == ({type2})8);
 
     ASSERT(returnThirdArg(marker, ({type1})-33, ({type2})-34, ({type3})-35) == ({type3})-35);
     ASSERT(returnThirdArg(marker, ({type1})-33, ({type2})-34, ({type3})35) == ({type3})35);
 }
+

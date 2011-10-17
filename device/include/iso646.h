@@ -1,8 +1,7 @@
 /*-------------------------------------------------------------------------
-   stdarg.h - ANSI macros for variable parameter list
+   iso646.h
 
-   Copyright (C) 2000, Michael Hope
-   Copyright (C) 2011, Philipp Klaus Krause pkk@spth.de
+   Copyright (C) 2011, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,36 +26,20 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDC51_STDARG_H
-#define __SDC51_STDARG_H 1
+#ifndef __SDC51_FLOAT_H
+#define __SDC51_FLOAT_H 1
 
-#if defined(__z80) || defined(__z180) || defined(__r2k) || defined(__gbz80) || defined(__hc08)
-
-typedef unsigned char * va_list;
-#define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
-#define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
-
-#elif defined(__ds390) || defined(__ds400)
-
-typedef unsigned char * va_list;
-#define va_start(marker, first) { marker = (va_list)&first; }
-#define va_arg(marker, type)    *((type *)(marker -= sizeof(type)))
-
-#elif defined(SDCC_USE_XSTACK)
-
-typedef unsigned char __pdata * va_list;
-#define va_start(marker, first) { marker = (va_list)&first; }
-#define va_arg(marker, type)    *((type __pdata *)(marker -= sizeof(type)))
-
-#else
-
-typedef unsigned char __data * va_list;
-#define va_start(marker, first) { marker = (va_list)&first; }
-#define va_arg(marker, type)    *((type __data * )(marker -= sizeof(type)))
+#define and &&
+#define and_eq &=
+#define bitand &
+#define bitor |
+#define complement ~
+#define not !
+#define not_eq !=
+#define or ||
+#define or_eq |=
+#define xor ^
+#define xor_eq ^=
 
 #endif
 
-#define va_copy(dest, src)      { dest = src; }
-#define va_end(marker)          { marker = (va_list) 0; };
-
-#endif

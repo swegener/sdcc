@@ -1,3 +1,22 @@
+2011-10-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/iso646.h,
+	  support/regression/tests/iso646.c:
+	  Added macros required by C99  (this header is now C99-compliant).
+	* device/include/limits.h:
+	  Removed UCHAR_MIN, added macros for long long (this header is now C99-compliant).
+	* device/include/stdint.h:
+	  Code cleanup, added macros for 64 bit integers, wchar_t and wint_t (this header is now C99-compliant except for intmax_t and uintmax_t having less than 64 bits).
+	* device/include/string.h:
+	  Renamed namespace-polluting _SIZE_T_DEFINED.
+	* device/include/stddef.h:
+	  Renamed namespace-polluting _SIZE_T_DEFINED, added ptrdiff_t and wchar_t (this header is now C99-compliant).
+	* device/include/stdio.h:
+	  Renamed namespace-polluting _SIZE_T_DEFINED.
+	* device/include/stdarg.h,
+	  support/regression/tests/vaargs.c:
+	  Fixed va_end, added va_copy (this header is now C99-compliant).
+
 2011-10-16 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: added dedication to Dennis M. Ritchie

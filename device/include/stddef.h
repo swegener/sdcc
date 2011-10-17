@@ -2,6 +2,7 @@
    stddef.h - ANSI functions forward declarations
 
    Copyright (C) 2004, Maarten Brock / sourceforge.brock@dse.nl
+   Copyright (C) 2011, Philipp Klaus Krause / pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -33,9 +34,23 @@
   #define NULL (void *)0
 #endif
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef __PTRDIFF_T_DEFINED
+#define __PTRDIFF_T_DEFINED
+#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+  typedef long int ptrdiff_t;
+#else
+  typedef int ptrdiff_t;
+#endif
+#endif
+
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
   typedef unsigned int size_t;
+#endif
+
+#ifndef __WCHAR_T_DEFINED
+#define __WCHAR_T_DEFINED
+  typedef char wchar_t;
 #endif
 
 #define offsetof(s, m) __builtin_offsetof (s, m)

@@ -109,97 +109,140 @@ typedef unsigned long int       uintmax_t;
 /* Limits of integral types.  */
 
 /* Minimum of signed integral types.  */
-# define INT8_MIN               (-128)
-# define INT16_MIN              (-32767-1)
-# define INT32_MIN              (-2147483647L-1)
+#define INT8_MIN               (-128)
+#define INT16_MIN              (-32767-1)
+#define INT32_MIN              (-2147483647L-1)
+#ifdef __SDCC_LONGLONG
+#define INT64_MIN              (-9223372036854775807LL-1)
+#endif
+
 /* Maximum of signed integral types.  */
-# define INT8_MAX               (127)
-# define INT16_MAX              (32767)
-# define INT32_MAX              (2147483647L)
+#define INT8_MAX               (127)
+#define INT16_MAX              (32767)
+#define INT32_MAX              (2147483647L)
+#ifdef __SDCC_LONGLONG
+#define INT64_MAX              (9223372036854775807LL)
+#endif
 
 /* Maximum of unsigned integral types.  */
-# define UINT8_MAX              (255)
-# define UINT16_MAX             (65535)
-# define UINT32_MAX             (4294967295UL)
+#define UINT8_MAX              (255)
+#define UINT16_MAX             (65535)
+#define UINT32_MAX             (4294967295UL)
+#ifdef __SDCC_LONGLONG
+#define UINT64_MAX             (18446744073709551615ULL)
+#endif
 
 /* Minimum of signed integral types having a minimum size.  */
-# define INT_LEAST8_MIN         (-128)
-# define INT_LEAST16_MIN        (-32767-1)
-# define INT_LEAST32_MIN        (-2147483647L-1)
+#define INT_LEAST8_MIN         INT8_MIN
+#define INT_LEAST16_MIN        INT16_MIN
+#define INT_LEAST32_MIN        INT32_MIN
+#ifdef __SDCC_LONGLONG
+#define INT_LEAST64_MIN        INT64_MIN
+#endif
+
 /* Maximum of signed integral types having a minimum size.  */
-# define INT_LEAST8_MAX         (127)
-# define INT_LEAST16_MAX        (32767)
-# define INT_LEAST32_MAX        (2147483647L)
+#define INT_LEAST8_MAX         INT8_MAX
+#define INT_LEAST16_MAX        INT16_MAX
+#define INT_LEAST32_MAX        INT32_MAX
+#ifdef __SDCC_LONGLONG
+#define INT_LEAST64_MAX        INT64_MAX
+#endif
 
 /* Maximum of unsigned integral types having a minimum size.  */
-# define UINT_LEAST8_MAX        (255)
-# define UINT_LEAST16_MAX       (65535)
-# define UINT_LEAST32_MAX       (4294967295UL)
+#define UINT_LEAST8_MAX        UINT8_MAX
+#define UINT_LEAST16_MAX       UINT16_MAX
+#define UINT_LEAST32_MAX       UINT32_MAX
+#ifdef __SDCC_LONGLONG
+#define UINT_LEAST64_MAX       UINT64_MAX
+#endif
 
 /* Minimum of fast signed integral types having a minimum size.  */
-# define INT_FAST8_MIN          (-128)
-# define INT_FAST16_MIN         (-32767-1)
-# define INT_FAST32_MIN         (-2147483647L-1)
+#define INT_FAST8_MIN          INT8_MIN
+#define INT_FAST16_MIN         INT16_MIN
+#define INT_FAST32_MIN         INT32_MIN
+#ifdef __SDCC_LONGLONG
+#define INT_FAST64_MIN         INT64_MIN
+#endif
 
 /* Maximum of fast signed integral types having a minimum size.  */
-# define INT_FAST8_MAX          (127)
-# define INT_FAST16_MAX         (32767)
-# define INT_FAST32_MAX         (2147483647L)
+#define INT_FAST8_MAX          INT8_MAX
+#define INT_FAST16_MAX         INT16_MAX
+#define INT_FAST32_MAX         INT32_MAX
+#ifdef __SDCC_LONGLONG
+#define INT_FAST64_MAX         INT64_MAX
+#endif
 
 /* Maximum of fast unsigned integral types having a minimum size.  */
-# define UINT_FAST8_MAX         (255)
-# define UINT_FAST16_MAX        (65535)
-# define UINT_FAST32_MAX        (4294967295UL)
+#define UINT_FAST8_MAX         UINT8_MAX
+#define UINT_FAST16_MAX        UINT16_MAX
+#define UINT_FAST32_MAX        UINT32_MAX
+#ifdef __SDCC_LONGLONG
+#define UINT_FAST64_MAX        UINT64_MAX
+#endif
 
 /* Values to test for integral types holding `void *' pointer.  */
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
-# define INTPTR_MIN             (-2147483647L-1)
-# define INTPTR_MAX             (2147483647L)
-# define UINTPTR_MAX            (4294967295UL)
+#define INTPTR_MIN             (-2147483647L-1)
+#define INTPTR_MAX             (2147483647L)
+#define UINTPTR_MAX            (4294967295UL)
 #else
-# define INTPTR_MIN             (-32767-1)
-# define INTPTR_MAX             (32767)
-# define UINTPTR_MAX            (65535)
+#define INTPTR_MIN             (-32767-1)
+#define INTPTR_MAX             (32767)
+#define UINTPTR_MAX            (65535)
 #endif
 
 /* Minimum for largest signed integral type.  */
-# define INTMAX_MIN             (-__INT32_C(-2147483647L)-1)
+#define INTMAX_MIN             (-__INT32_C(-2147483647L)-1)
 /* Maximum for largest signed integral type.  */
-# define INTMAX_MAX             (__INT32_C(2147483647L))
+#define INTMAX_MAX             (__INT32_C(2147483647L))
 
 /* Maximum for largest unsigned integral type.  */
-# define UINTMAX_MAX            (__UINT32_C(4294967295UL))
+#define UINTMAX_MAX            (__UINT32_C(4294967295UL))
 
 
 /* Limits of other integer types.  */
 
 /* Limits of `ptrdiff_t' type.  */
 #if defined (SDCC_mcs51) || defined (SDCC_ds390)
-# define PTRDIFF_MIN           (-2147483647L-1)
-# define PTRDIFF_MAX           (2147483647L)
+#define PTRDIFF_MIN           (-2147483647L-1)
+#define PTRDIFF_MAX           (2147483647L)
 #else
-# define PTRDIFF_MIN           (-32767-1)
-# define PTRDIFF_MAX           (32767)
+#define PTRDIFF_MIN           (-32767-1)
+#define PTRDIFF_MAX           (32767)
 #endif
 
 /* Limit of `size_t' type.  */
-# define SIZE_MAX               (65535)
+#define SIZE_MAX               (65535)
 
 /* Signed.  */
-# define INT8_C(c)      c
-# define INT16_C(c)     c
-# define INT32_C(c)     c ## L
-# define INT64_C(c)     c ## LL
+#define INT8_C(c)      c
+#define INT16_C(c)     c
+#define INT32_C(c)     c ## L
+#ifdef __SDCC_LONGLONG
+#define INT64_C(c)     c ## LL
+#endif
 
 /* Unsigned.  */
-# define UINT8_C(c)     c ## U
-# define UINT16_C(c)    c ## U
-# define UINT32_C(c)    c ## UL
-# define UINT64_C(c)    c ## ULL
+#define UINT8_C(c)     c ## U
+#define UINT16_C(c)    c ## U
+#define UINT32_C(c)    c ## UL
+#ifdef __SDCC_LONGLONG
+#define UINT64_C(c)    c ## ULL
+#endif
+
+#define WCHAR_MIN      CHAR_MIN
+#define WCHAR_MAX      CHAR_MAX
+
+#define WINT_MIN       INT_MIN
+#define WINT_MAX       INT_MAX
 
 /* Maximal type.  */
-# define INTMAX_C(c)    c ## L
-# define UINTMAX_C(c)   c ## UL
-
+#ifdef __SDCC_LONGLONG
+#define INTMAX_C(c)    c ## LL
+#define UINTMAX_C(c)   c ## ULL
+#else
+#define INTMAX_C(c)    c ## L
+#define UINTMAX_C(c)   c ## UL
+#endif
 
 #endif /* stdint.h */

@@ -1,3 +1,8 @@
+2011-10-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Makefile.in:
+	  Fixed bug #3424968.
+
 2011-10-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/iso646.h,

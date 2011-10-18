@@ -36,8 +36,18 @@ SDCC_MISC       += debugger/mcs51
 endif
 
 ifeq ($(OPT_DISABLE_Z80), 0)
-SDCC_AS         += sdas/asz80 sdas/asrab sdas/asgb
-SDCC_LD         += sdcc-ldz80 sdcc-ldgb
+SDCC_AS         += sdas/asz80
+SDCC_LD         += sdcc-ldz80
+endif
+
+ifeq ($(OPT_DISABLE_R2K), 0)
+SDCC_AS         += sdas/asrab
+SDCC_LD         += sdcc-ldz80
+endif
+
+ifeq ($(OPT_DISABLE_GBZ80), 0)
+SDCC_AS         += sdas/asgb
+SDCC_LD         += sdcc-ldgb
 endif
 
 ifeq ($(OPT_DISABLE_UCSIM), 0)

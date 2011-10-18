@@ -1,25 +1,9 @@
-#LyX 2.0.1 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass book
 \begin_preamble
-% Added by lyx2lyx
-%  for proper underlining
-\PassOptionsToPackage{normalem}{ulem}
-\usepackage{ulem}
-\let\cite@rig\cite
-\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
-  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
-\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
-% Added by lyx2lyx
-%  for proper underlining
-\PassOptionsToPackage{normalem}{ulem}
-\usepackage{ulem}
-\let\cite@rig\cite
-\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
-  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
-\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
@@ -47,6 +31,7 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
+
 \graphics default
 \paperfontsize default
 \spacing single
@@ -65,12 +50,15 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
+\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
+\author "" 
+\author "" 
 \end_header
 
 \begin_body
@@ -211,7 +199,17 @@ status collapsed
 \end_inset
 
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 and
- Zilog Z80 based MCUs.
+ Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+Z80, Z180, GBZ80, Rabbit 2000/3000 CPU
+\end_layout
+
+\end_inset
+
+).
  It can be retargeted for other microprocessors, support for Microchip PIC
  is under development.
  The entire source code for the compiler is distributed under GPL.
@@ -6334,7 +6332,7 @@ tabulator spacing (8 columns)
 \end_layout
 
 \begin_layout Subsection
-Building SDCC Using Microsoft Visual C++ 6.0/NET (MSVC)
+Building SDCC Using Microsoft Visual C++ 2010 (MSVC)
 \end_layout
 
 \begin_layout Standard
@@ -6363,9 +6361,9 @@ http://sdcc.sourceforge.net/snap.php
 -yyyymmdd-rrrr.tar.bz2.
 
 \series default
- SDCC is distributed with all the projects, workspaces, and files you need
- to build it using Visual C++ 6.0/NET (except for SDCDB and ucSim).
- The workspace name is 'sdcc.dsw'.
+ SDCC is distributed with all the project, solution and other files you
+ need to build it using Visual C++ 2010 (except for ucSim).
+ The solution name is 'sdcc.sln'.
  Please note that as it is now, all the executables are created in a folder
  called sdcc
 \backslash
@@ -6376,55 +6374,6 @@ bin_vc to sdcc
 \backslash
 bin before running SDCC.
  
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-WARNING: Visual studio is very picky with line terminations; it expects
- the 0x0d, 0x0a DOS style line endings, not the 0x0a Unix style line endings.
- When using the Subversion repository it's easiest to configure the svn
- client to convert automatically for you.
- If however you are getting a message such as "This makefile was not generated
- by Developer Studio etc.
- etc.
-\begin_inset Quotes srd
-\end_inset
-
- when opening the sdcc.dsw workspace or any of the *.dsp projects, then you
- need to convert the Unix style line endings to DOS style line endings.
- To do so you can use the 
-\begin_inset Quotes sld
-\end_inset
-
-unix2dos
-\begin_inset Quotes srd
-\end_inset
-
- utility freely available on the internet.
- Doug Hawkins reported in the sdcc-user list that this works:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-C:
-\backslash
-Programming
-\backslash
-SDCC> unix2dos sdcc.dsw
-\begin_inset Newline newline
-\end_inset
-
-C:
-\backslash
-Programming
-\backslash
-SDCC> for /R %I in (*.dsp) do @unix2dos "%I"
 \begin_inset Newline newline
 \end_inset
 
@@ -6489,15 +6438,13 @@ a) Extract UnxUtils.zip to your C:
 \begin_inset Newline newline
 \end_inset
 
-b) In the Visual C++ IDE click Tools, Options, select the Directory tab,
- in 'Show directories for:' select 'Executable files', and in the directories
- window add a new path: 'C:
+b) Add 'C:
 \backslash
 user
 \backslash
 local
 \backslash
-wbin', click ok.
+wbin' to VC++ Directories / Executable Directories.
 \begin_inset Newline newline
 \end_inset
 
@@ -6626,12 +6573,10 @@ Steps 'c' and 'd' are needed because bison requires by default that the
 \begin_inset Newline newline
 \end_inset
 
-e) In the Visual C++ IDE click Tools, Options, select the Directory tab,
- in 'Show directories for:' select 'Executable files', and in the directories
- window add a new path: 'c:
+e) Add 'C:
 \backslash
-util', click ok.
- Note that you can use any other path instead of 'c:
+util' to VC++ Directories / Executable Directories.
+ Note that you can use any other path instead of 'C:
 \backslash
 util', even the path where the Visual C++ tools are, probably: 'C:
 \backslash
@@ -6647,7 +6592,7 @@ Tools'.
 
 \begin_layout Standard
 That is it.
- Open 'sdcc.dsw' in Visual Studio, click 'build all', when it finishes copy
+ Open 'sdcc.sln' in Visual Studio, click 'build all', when it finishes copy
  the executables from sdcc
 \backslash
 bin_vc to sdcc
@@ -6674,15 +6619,15 @@ http://sdcc.sf.net/snap.php
  and unpack it using your favorite unpacking tool (gunzip, WinZip, etc).
  This should unpack to a group of sub-directories.
  An example directory structure after unpacking the mingw32 package is:
- c:
+ C:
 \backslash
 sdcc
 \backslash
-bin for the executables, c:
+bin for the executables, C:
 \backslash
 sdcc
 \backslash
-include and c:
+include and C:
 \backslash
 sdcc
 \backslash

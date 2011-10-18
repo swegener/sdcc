@@ -452,7 +452,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       if (!out_fname)
         out_fname = arg;
       else
-        error ("output filename specified twice");
+        error ("output filename specified several times");
       break;
 
       /* SDCPP specfic */
@@ -527,6 +527,14 @@ sdcpp_common_post_options (const char **pfilename)
   else if (strcmp (in_fnames[0], "-") == 0)
     in_fnames[0] = "";
 
+  if (num_in_fnames > 1)
+    {
+      if (!out_fname)
+        out_fname = in_fnames[1];
+      else
+        error ("output filename specified several times");
+    }
+
   if (out_fname == NULL || !strcmp (out_fname, "-"))
     out_fname = "";
 
@@ -554,7 +562,7 @@ sdcpp_common_post_options (const char **pfilename)
       return false;
     }
 
-  if (num_in_fnames > 1)
+  if (num_in_fnames > 2)
     error ("too many filenames given.  Type %s --help for usage",
            progname);
 

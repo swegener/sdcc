@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx: changed MS Visual C++ 6.0 to MS Visual C++ 2010,
 	  reverted to LyX version 1.6.7 format, as prpbosed by Robert Larice
+	* support/cpp/sdcpp-opts.c: fixed bug #3388478:
+	  Preprocessor Error when Invoking sdcc with -E/-M/-MM and -o
 
 2011-10-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

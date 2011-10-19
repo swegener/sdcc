@@ -10,12 +10,12 @@ VERSIONLO       = @VERSIONLO@
 VERSIONP        = @VERSIONP@
 
 # Programs
-SHELL		= /bin/sh
-CC		= @CCACHE@ @CC@
-CPP		= @CCACHE@ @CPP@
-CXX		= @CCACHE@ @CXX@
-RANLIB		= @RANLIB@
-INSTALL		= @INSTALL@
+SHELL           = /bin/sh
+CC              = @CCACHE@ @CC@
+CPP             = @CCACHE@ @CPP@
+CXX             = @CCACHE@ @CXX@
+RANLIB          = @RANLIB@
+INSTALL         = @INSTALL@
 YACC            = @YACC@
 LEX             = @LEX@
 AWK             = @AWK@
@@ -48,6 +48,8 @@ OPT_DISABLE_PIC14 = @OPT_DISABLE_PIC14@
 OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
 OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
 OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
+OPT_DISABLE_Z180  = @OPT_DISABLE_Z180@
+OPT_DISABLE_R2K   = @OPT_DISABLE_R2K@
 
 OPT_DISABLE_UCSIM     = @OPT_DISABLE_UCSIM@
 OPT_DISABLE_DEVICE_LIB= @OPT_DISABLE_DEVICE_LIB@
@@ -55,7 +57,7 @@ OPT_DISABLE_PACKIHX   = @OPT_DISABLE_PACKIHX@
 OPT_ENABLE_DOC        = @OPT_ENABLE_DOC@
 OPT_DISABLE_SDCPP     = @OPT_DISABLE_SDCPP@
 
-SLIB			= $(top_builddir)/support/util
+SLIB                  = $(top_builddir)/support/util
 
 EXEEXT          = @EXEEXT@
 transform       = @program_transform_name@

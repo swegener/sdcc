@@ -1,3 +1,7 @@
+2011-10-19 Borut Razem <borut.razem AT gmail.com>
+
+	* Makefile.common.in: added OPT_DISABLE_Z180, OPT_DISABLE_R2K
+
 2011-10-18 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: changed MS Visual C++ 6.0 to MS Visual C++ 2010,

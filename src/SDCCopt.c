@@ -870,13 +870,13 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
 
   /* Now we can be sure to have found a builtin function. */
 
-  if ((TARGET_IS_Z80 || TARGET_IS_Z180) && !strcmp (bif->name, "__builtin_memcpy"))
+  if ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_R2K) && (!strcmp (bif->name, "__builtin_memcpy") || !strcmp (bif->name, "__builtin_memset")))
     {
       /* Replace iff return value is used or last parameter is not an integer constant. */
       if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && IS_OP_LITERAL (IC_LEFT (lastparam)))
         return;
       
-      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, "_memcpy");
+      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "_memcpy" : "_memset");
     }
   else
     return;

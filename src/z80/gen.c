@@ -9801,9 +9801,12 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
   if (!direct_c)
     cheapMove(ASMOP_A, 0, AOP (c), 0);
   fetchPair (PAIR_HL, AOP (dst));
-  if(!regalloc_dry_run)
+  if (!regalloc_dry_run)
     emit2 ( "ld (hl), %s", aopGet(direct_c ? AOP (c) : ASMOP_A, 0, FALSE));
   regalloc_dry_run_cost += (direct_c && AOP_TYPE (c) == AOP_LIT) ? 2 : 1;
+  if (ulFromVal (AOP (n)->aopu.aop_lit) <= 1)
+    goto done;
+
   emit2 ("ld e, l");
   emit2 ("ld d, h");
   emit2 ("inc de");
@@ -9812,9 +9815,9 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
   emit2 ("ldir");
   regalloc_dry_run_cost += 5;
 
+done:
   spillPair (PAIR_HL);
 
-done:
   freeAsmop (n, NULL, ic->next->next);
   freeAsmop (c, NULL, ic->next);
   freeAsmop (dst, NULL, ic);

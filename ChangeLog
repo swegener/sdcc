@@ -3,7 +3,8 @@
 	* src/SDCCopt.c,
 	  src/z80/gen.c,
 	  src/z80/main.c,
-	  device/include/string.h:
+	  device/include/string.h,
+	  support/regression/tests/memory.c:
 	  Built-in memset() for z80, z180 and r2k.
 
 2011-10-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>

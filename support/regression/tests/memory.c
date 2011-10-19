@@ -18,6 +18,10 @@ void testmemory(void)
   ASSERT(destination[0] == 42);
   ASSERT(destination[2] == 42);
   ASSERT(destination[3] == 23);
+  memset(destination, 23, 1);
+  ASSERT(destination[0] == 23);
+  ASSERT(destination[1] == 42);
+  memset(destination, 42, 1);
 
   /* Test memcpy() */
   memcpy(destination, source, 0);

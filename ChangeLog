@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Use ld hl, n (sp) on the gbz80.
+	* src/z80/ralloc2.cc:
+	  When in doubt, try to honour register keyword.
 
 2011-10-19 Borut Razem <borut.razem AT gmail.com>
 

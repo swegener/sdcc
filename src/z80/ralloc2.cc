@@ -1188,7 +1188,12 @@ float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &
 
   varset_t::const_iterator v, v_end;
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)
-    c -= *v * 0.01f;
+    {
+      const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
+      if(IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
+        c += 4.0f;
+      c -= *v * 0.01f;
+    }
 
   c -= a.local.size() * 0.2f;
 

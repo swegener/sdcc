@@ -1,3 +1,8 @@
+2011-10-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Use ld hl, n (sp) on the gbz80.
+
 2011-10-19 Borut Razem <borut.razem AT gmail.com>
 
 	* Makefile.common.in: added OPT_DISABLE_Z180, OPT_DISABLE_R2K

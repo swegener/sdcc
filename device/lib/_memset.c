@@ -29,6 +29,8 @@
 
 #include "string.h" 
 
+#undef memset /* Avoid conflict with builtin memset() in Z80 and some related ports */
+
 #if defined (_SDCC_NO_ASM_LIB_FUNCS) || !defined (SDCC_mcs51) || \
     (!defined (SDCC_MODEL_SMALL) && !defined (SDCC_MODEL_LARGE)) || \
      (defined (SDCC_STACK_AUTO) || defined (SDCC_PARMS_IN_BANK1) )

@@ -31,7 +31,7 @@
 
 #if !_SDCC_PORT_PROVIDES_MEMCPY
 
-#undef memcpy /* Avoid conflict with builtin memcpy() in Z80 port */
+#undef memcpy /* Avoid conflict with builtin memcpy() in Z80 and some related ports */
 
 void * memcpy (
 	void * dst,

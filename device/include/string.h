@@ -97,9 +97,9 @@ extern size_t strlen (const char *s);
 extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;
 #endif
 
-#ifdef SDCC_z80
+#if defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_r2k)
 #define memcpy(dst, src, n) __builtin_memcpy(dst, src, n)
-/*#define memset(dst, c, n) __builtin_memset(dst, c, n)*/
+#define memset(dst, c, n) __builtin_memset(dst, c, n)
 #endif
 
 #endif

@@ -1,9 +1,16 @@
-2011-10-19 Borut Razem <borut.razem AT gmail.com>
+2011-10-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/include/string.h,
+	  device/lib/_memcpy.c,
+	  device/lib/_memset.c:
+	  Reenable built-in memset() for z80, enable it and built-in memcpy() for z180 and r2k.
+
+2011-10-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* Makefile.common.in:
 	  Handle OPT_DISABLE_GBZ80.
 
-2011-10-19 Philipp Klaus Krause <pkk AT spth.de>
+2011-10-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/string.h:
 	  Disable built-in memset until the library build problem is fixed.

@@ -99,7 +99,7 @@ extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;
 
 #ifdef SDCC_z80
 #define memcpy(dst, src, n) __builtin_memcpy(dst, src, n)
-#define memset(dst, c, n) __builtin_memset(dst, c, n)
+/*#define memset(dst, c, n) __builtin_memset(dst, c, n)*/
 #endif
 
 #endif

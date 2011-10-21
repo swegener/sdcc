@@ -34,19 +34,13 @@ static PIC_device *pic = NULL;
 static int num_of_supported_PICS = 0;
 static int maxRAMaddress = 0;
 
-#define CONFIG_WORD_ADDRESS 0x2007
-#define CONFIG2_WORD_ADDRESS 0x2008
-#define DEFAULT_CONFIG_WORD 0x3fff
-#define DEFAULT_CONFIG2_WORD 0x3ffc
-
 #define DEVICE_FILE_NAME "pic14devices.txt"
 #define PIC14_STRING_LEN 256
 #define SPLIT_WORDS_MAX 16
 
 /* Keep track of whether we found an assignment to the __config words. */
 static int pic14_hasSetConfigWord = 0;
-static unsigned int config_word = DEFAULT_CONFIG_WORD;
-static unsigned int config2_word = DEFAULT_CONFIG2_WORD;
+static unsigned int config_word[MAX_NUM_CONFIGS];
 static memRange *rangeRAM = NULL;
 
 
@@ -119,7 +113,8 @@ sanitise_processor_name (char *name)
 /* create a structure for a pic processor */
 static PIC_device *
 create_pic (char *pic_name, int maxram, int bankmsk, int confsiz,
-            int program, int data, int eeprom, int io)
+            int config[MAX_NUM_CONFIGS], int program, int data, int eeprom,
+            int io)
 {
   PIC_device *new_pic;
   char *simple_pic_name = sanitise_processor_name (pic_name);
@@ -129,7 +124,8 @@ create_pic (char *pic_name, int maxram, int bankmsk, int confsiz,
 
   new_pic->defMaxRAMaddrs = maxram;
   new_pic->bankMask = bankmsk;
-  new_pic->hasSecondConfigReg = confsiz > 1;
+  new_pic->num_configs = confsiz;
+  memcpy(new_pic->config, config, MAX_NUM_CONFIGS * sizeof(int));
 
   new_pic->programMemSize = program;
   new_pic->dataMemSize = data;
@@ -227,6 +223,7 @@ find_device (char *pic_name)
   int pic_maxram = 0;
   int pic_bankmsk = 0;
   int pic_confsiz = 0;
+  int pic_config[MAX_NUM_CONFIGS];
   int pic_program = 0;
   int pic_data = 0;
   int pic_eeprom = 0;
@@ -238,9 +235,16 @@ find_device (char *pic_name)
   char **pic_word;
   int num_pic_words;
   int wcount;
+  int i;
 
   pic_word = Safe_calloc (sizeof (char *), SPLIT_WORDS_MAX);
   processor_name = Safe_calloc (sizeof (char *), SPLIT_WORDS_MAX);
+
+  for (i = 0; i < MAX_NUM_CONFIGS; i++)
+    {
+      config_word[i] = -1;
+      pic_config[i] = -1;
+    } // for
 
   /* allow abbreviations of the form "f877" - convert to "16f877" */
   simple_pic_name = sanitise_processor_name (pic_name);
@@ -343,8 +347,9 @@ find_device (char *pic_name)
                       for (dcount = 1; dcount < num_processor_names; dcount++)
                         {
                           create_pic (processor_name[dcount], pic_maxram,
-                                      pic_bankmsk, pic_confsiz, pic_program,
-                                      pic_data, pic_eeprom, pic_io);
+                                      pic_bankmsk, pic_confsiz, pic_config,
+                                      pic_program, pic_data, pic_eeprom,
+                                      pic_io);
                         } // for
                     } // if
 
@@ -389,8 +394,15 @@ find_device (char *pic_name)
                   else if (STRCASECMP (pic_word[0], "bankmsk") == 0 && num_pic_words > 1)
                     pic_bankmsk = parse_config_value (pic_word[1]);
 
-                  else if (STRCASECMP (pic_word[0], "confsiz") == 0 && num_pic_words > 1)
-                    pic_confsiz = parse_config_value (pic_word[1]);
+                  else if (STRCASECMP (pic_word[0], "config") == 0 && num_pic_words > 1)
+                    {
+                      pic_confsiz = 0;
+                      for (i = 1; (i < num_pic_words) && (i < MAX_NUM_CONFIGS + 1); i++)
+                        {
+                          pic_config[i - 1] = parse_config_value (pic_word[i]);
+                          pic_confsiz++;
+                        } // for
+                    }
 
                   else if (STRCASECMP (pic_word[0], "program") == 0 && num_pic_words > 1)
                     pic_program = parse_config_value (pic_word[1]);
@@ -442,8 +454,8 @@ find_device (char *pic_name)
           for (dcount = 1; dcount < num_processor_names; dcount++)
             {
               create_pic (processor_name[dcount], pic_maxram, pic_bankmsk,
-                          pic_confsiz, pic_program, pic_data, pic_eeprom,
-                          pic_io);
+                          pic_confsiz, pic_config, pic_program, pic_data,
+                          pic_eeprom, pic_io);
             } // for
         } // if
     } // if
@@ -457,8 +469,8 @@ find_device (char *pic_name)
 
           /* create a new pic entry */
           return create_pic (pic_name, pic_maxram, pic_bankmsk,
-                             pic_confsiz, pic_program, pic_data,
-                             pic_eeprom, pic_io);
+                             pic_confsiz, pic_config, pic_program,
+                             pic_data, pic_eeprom, pic_io);
         } // if
     } // if
 
@@ -598,9 +610,18 @@ char *processor_base_name(void)
 
 int IS_CONFIG_ADDRESS(int address)
 {
+  int i;
 
-        return ((address == CONFIG_WORD_ADDRESS)
-                || (address == CONFIG2_WORD_ADDRESS));
+  for (i = 0; i < pic->num_configs; i++)
+    {
+      if ((-1 != address) && (address == pic->config[i]))
+        {
+          /* address is used for config words */
+          return (1);
+        } // if
+    } // for
+
+  return (0);
 }
 
 /*-----------------------------------------------------------------*
@@ -608,54 +629,23 @@ int IS_CONFIG_ADDRESS(int address)
  *
  * Most midrange PICs have one config word at address 0x2007.
  * Newer PIC14s have a second config word at address 0x2008.
+ * Even newer PICs have moved this address to 0x8007+...
  * This routine will assign values to those addresses.
  *
  *-----------------------------------------------------------------*/
 
-void pic14_assignConfigWordValue(int address, int value)
+void
+pic14_assignConfigWordValue(int address, int value)
 {
-	if (CONFIG_WORD_ADDRESS == address)
-		config_word = value;
-	
-	else if (CONFIG2_WORD_ADDRESS == address)
-		config2_word = value;
-	
-	//fprintf(stderr,"setting config word 0x%x to 0x%x\n", address, value);
-	pic14_hasSetConfigWord = 1;
-}
-
-/*-----------------------------------------------------------------*
- * int pic14_getConfigWord(int address)
- *
- * Get the current value of a config word.
- *
- *-----------------------------------------------------------------*/
-
-static int pic14_getConfigWord(int address)
-{
-	switch (address)
-	{
-	case CONFIG_WORD_ADDRESS:
-		return config_word;
-	
-	case CONFIG2_WORD_ADDRESS:
-		return config2_word;
-	
-	default:
-		return 0;
-	}
-}
-
-/*-----------------------------------------------------------------*
-*  int getHasSecondConfigReg(void) - check if the device has a 
-*  second config register, rather than just one.
-*-----------------------------------------------------------------*/
-static int pic14_getHasSecondConfigReg(void)
-{
-	if(!pic)
-		return 0;
-	else
-		return pic->hasSecondConfigReg;
+  int i;
+  for (i = 0; i < pic->num_configs; i++)
+    {
+      if ((-1 != address) && (address == pic->config[i]))
+        {
+          config_word[i] = value;
+          pic14_hasSetConfigWord = 1;
+        } // if
+    } // for
 }
 
 /*-----------------------------------------------------------------*
@@ -664,23 +654,36 @@ static int pic14_getHasSecondConfigReg(void)
  * Emit the __config directives iff we found a previous assignment
  * to the config word.
  *-----------------------------------------------------------------*/
-int pic14_emitConfigWord (FILE * vFile)
+int
+pic14_emitConfigWord (FILE * vFile)
 {
-  if (pic14_hasSetConfigWord)
-  {
-    fprintf (vFile, "%s", iComments2);
-    fprintf (vFile, "; config word \n");
-    fprintf (vFile, "%s", iComments2);
-    if (pic14_getHasSecondConfigReg())
-    {
-      fprintf (vFile, "\t__config _CONFIG1, 0x%x\n", pic14_getConfigWord(0x2007));
-      fprintf (vFile, "\t__config _CONFIG2, 0x%x\n", pic14_getConfigWord(0x2008));
-    }
-    else
-      fprintf (vFile, "\t__config 0x%x\n", pic14_getConfigWord(0x2007));
+  int i;
 
-    return 1;
-  }
+  if (pic14_hasSetConfigWord)
+    {
+      fprintf (vFile, "%s", iComments2);
+      fprintf (vFile, "; config word(s)\n");
+      fprintf (vFile, "%s", iComments2);
+      if (pic->num_configs > 1)
+        {
+          for (i = 0; i < pic->num_configs; i++)
+            {
+              if (-1 != config_word[i])
+                {
+                  fprintf (vFile, "\t__config _CONFIG%u, 0x%x\n", i + 1, config_word[i]);
+                } //if
+            } // for
+        }
+      else
+        {
+          if (-1 != config_word[0])
+            {
+              fprintf (vFile, "\t__config 0x%x\n", config_word[0]);
+            } // if
+        } // if
+
+      return 1;
+    }
   return 0;
 }
 

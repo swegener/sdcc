@@ -586,7 +586,7 @@ allocNewDirReg (sym_link *symlnk,const char *name)
         * a new one and put it in the hash table AND in the
         * dynDirectRegNames set */
         if (IS_CONFIG_ADDRESS(address)) {
-                debugLog ("  -- %s is declared at address 0x2007\n",name);
+                debugLog ("  -- %s is declared at a config word address (0x%x)\n",name, address);
                 reg = 0;
         } else {
                 int idx;
@@ -735,7 +735,7 @@ allocDirReg (operand *op )
 
 
                 } else {
-                        debugLog ("  -- %s is declared at address 0x2007\n",name);
+                        debugLog ("  -- %s is declared at a config word address (0x%x)\n",name, address);
 
                 }
         }

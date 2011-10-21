@@ -1,3 +1,11 @@
+2011-10-21 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/device.c, src/pic14/device.h, src/pic14/ralloc.c:
+	  rewrite config word handling to support locations other than
+	  0x2007 and 0x2008 (16f1936 has config words at 0x8007, 0x8008)
+	* device/include/pic14/pic14devices.txt:
+	  replace confsiz directive with list of config word addresses
+
 2011-10-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/include/string.h,

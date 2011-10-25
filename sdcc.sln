@@ -19,9 +19,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdasgb", "sdas\asgb\asgb.vc
 		{2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1} = {2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdld", "sdas\linksrc\aslink.vcxproj", "{6E94DB45-345E-4697-98DA-6C72237D6ECA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdld", "support\linksrc\aslink.vcxproj", "{6E94DB45-345E-4697-98DA-6C72237D6ECA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asranlib", "sdas\asranlib\asranlib.vcxproj", "{58C6355B-ED8A-4F0D-8911-D8A77E7E2096}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdranlib", "support\sdranlib\sdranlib.vcxproj", "{58C6355B-ED8A-4F0D-8911-D8A77E7E2096}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdas8051", "sdas\as8051\asx8051.vcxproj", "{C14982C0-731B-46A0-9DD2-845E3811CF18}"
 	ProjectSection(ProjectDependencies) = postProject

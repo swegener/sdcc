@@ -1,4 +1,4 @@
-/* asranlib.c - ranlib for asxxxx arvhives
+/* sdranlib.c - ranlib for asxxxx arvhives
    version 1.0.0, April 27th, 2008
 
    Copyright (C) 2008-2010 Borut Razem, borut dot razem at siol dot net
@@ -567,7 +567,7 @@ get_symbols (FILE * fp, const char *archive)
         {
           if (verbose || list)
             {
-              fprintf (stderr, "asranlib: %s: File format not recognized\n", name);
+              fprintf (stderr, "sdranlib: %s: File format not recognized\n", name);
               free (name);
             }
 
@@ -587,14 +587,14 @@ do_ranlib (const char *archive)
 
   if (NULL == (infp = fopen (archive, "rb")))
     {
-      fprintf (stderr, "asranlib: %s: ", archive);
+      fprintf (stderr, "sdranlib: %s: ", archive);
       perror (NULL);
       exit (1);
     }
 
   if (!get_symbols (infp, archive))
     {
-      fprintf (stderr, "asranlib: %s: Malformed archive\n", archive);
+      fprintf (stderr, "sdranlib: %s: Malformed archive\n", archive);
       fclose (infp);
       exit (1);
     }
@@ -615,7 +615,7 @@ do_ranlib (const char *archive)
       if (NULL == _mktemp (tmpfile) || NULL == (outfp = fopen (tmpfile, "wb")))
         {
           fclose (infp);
-          fprintf (stderr, "asranlib: %s: ", tmpfile);
+          fprintf (stderr, "sdranlib: %s: ", tmpfile);
           perror (NULL);
           exit (1);
         }
@@ -623,7 +623,7 @@ do_ranlib (const char *archive)
       if ((pad = mkstemp (tmpfile)) < 0)
         {
           fclose (infp);
-          fprintf (stderr, "asranlib: %s: ", tmpfile);
+          fprintf (stderr, "sdranlib: %s: ", tmpfile);
           perror (NULL);
           exit (1);
         }
@@ -632,7 +632,7 @@ do_ranlib (const char *archive)
         {
           close (pad);
           fclose (infp);
-          perror ("asranlib");
+          perror ("sdranlib");
           exit (1);
         }
 #endif
@@ -684,7 +684,7 @@ do_ranlib (const char *archive)
 
       if (0 != fstat(fileno(infp), &stat_buf))
         {
-          fprintf (stderr, "asranlib: can't stat %s: ", archive);
+          fprintf (stderr, "sdranlib: can't stat %s: ", archive);
           perror (NULL);
           can_stat = 0;
         }
@@ -695,17 +695,17 @@ do_ranlib (const char *archive)
 
       if (0 != remove (archive))
         {
-          fprintf (stderr, "asranlib: can't remove %s: ", archive);
+          fprintf (stderr, "sdranlib: can't remove %s: ", archive);
           perror (NULL);
         }
       else if (0 != rename (tmpfile, archive))
         {
-          fprintf (stderr, "asranlib: can't rename %s to %s: ", tmpfile, archive);
+          fprintf (stderr, "sdranlib: can't rename %s to %s: ", tmpfile, archive);
           perror (NULL);
         }
       else if (!can_stat || 0 != chmod (archive, stat_buf.st_mode))
         {
-          fprintf (stderr, "asranlib: can't chmod %s: ", archive);
+          fprintf (stderr, "sdranlib: can't chmod %s: ", archive);
           perror (NULL);
         }
     }
@@ -761,7 +761,7 @@ usage (void)
 {
   int i;
 
-  printf ("Usage: asranlib [options] archive\n"
+  printf ("Usage: sdranlib [options] archive\n"
     " Generate an index to speed access to archives\n"
     " The options are:\n");
 
@@ -784,7 +784,7 @@ usage (void)
       printf ("%s\n", opts[i].comment);
     }
 
-  printf ("asranlib: supported targets: asxxxx\n");
+  printf ("sdranlib: supported targets: asxxxx\n");
 
   exit (1);
 }
@@ -826,7 +826,7 @@ main (int argc, char *argv[])
                     }
                   if (i >= NELEM (opts))
                     {
-                      fprintf (stderr, "asranlib: unrecognized option `%s'\n", *argp);
+                      fprintf (stderr, "sdranlib: unrecognized option `%s'\n", *argp);
                       usage ();
                     }
                 }
@@ -851,7 +851,7 @@ main (int argc, char *argv[])
                     }
                   if (i >= NELEM (opts))
                     {
-                      fprintf (stderr, "asranlib: invalid option -- %c\n", *optp);
+                      fprintf (stderr, "sdranlib: invalid option -- %c\n", *optp);
                       usage ();
                     }
                 }

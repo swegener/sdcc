@@ -11,7 +11,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="asranlib.c">
+    <ClCompile Include="sdranlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\support\util\dbuf.c">

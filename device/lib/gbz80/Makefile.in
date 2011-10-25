@@ -63,7 +63,7 @@ else
   else
     ifeq ($(LIB_TYPE), RANLIB)
 	$(AR_S) -cq $@ $(OBJ) $(Z8OBJECTS)
-	$(top_builddir)/bin/asranlib $@
+	$(top_builddir)/bin/sdranlib $@
     else
 	rm -f $@; \
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done

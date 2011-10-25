@@ -1,3 +1,16 @@
+2011-10-25 Borut Razem <borut.razem AT gmail.com>
+
+	* configure.in, configure, Makefile.in, device/lib/z180/Makefile.in,
+	  device/lib/z180/Makefile, device/lib/z80/Makefile.in,
+	  device/lib/gbz80/Makefile.in, device/lib/ds390/Makefile.in,
+	  device/lib/Makefile.in, device/lib/ds400/Makefile.in,
+	  device/lib/ds400/ds400rom.c, device/lib/mcs51/Makefile.in,
+	  device/lib/r2k/Makefile.in, device/lib/hc08/Makefile.in,
+	  device/non-free/lib/Makefile.in, all.vcxproj,
+	  doc/sdccman.lyx, sdcc.sln. support/scripts/sdcc.nsi:
+	  asranlib renamed to sdranlib
+	* sdas/asranlib/*: sdas/asranlib ,oved to support/sdranlib
+
 2011-10-23 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic14/pic14devices.txt:

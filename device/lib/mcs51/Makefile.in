@@ -38,7 +38,7 @@ else
   else
     ifeq ($(LIB_TYPE), RANLIB)
 	$(AR_S) -cq $@ $(OBJ)
-	$(top_builddir)/bin/asranlib $@
+	$(top_builddir)/bin/sdranlib $@
     else
 	rm -f $@
 	for i in $(basename $(OBJ)); do echo $$i >>$@; done

@@ -20,9 +20,9 @@ SDCC_EXTRA      = support/regression support/valdiag
 
 SDCC_PACKIHX    = support/packihx
 SDCC_LIBRARIAN  = support/librarian
-SDCC_ASRANLIB   = sdas/asranlib
+SDCC_SDRANLIB   = support/sdranlib
 
-TARGETS         = sdcc-librarian sdcc-asranlib
+TARGETS         = sdcc-librarian sdcc-sdranlib
 
 ifeq ($(OPT_DISABLE_HC08), 0)
 SDCC_AS         += sdas/as6808
@@ -78,7 +78,7 @@ endif
 
 TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
 
-PKGS            += $(SDCC_LIBS) src device/include device/non-free/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_ASRANLIB) $(SDCC_SCRIPTS)
+PKGS            += $(SDCC_LIBS) src device/include device/non-free/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_SDRANLIB) $(SDCC_SCRIPTS)
 
 PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/linksrc \
                   src device/include device/non-free/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
@@ -115,8 +115,8 @@ sdcc-packihx:
 sdcc-librarian:
 	$(MAKE) -C $(SDCC_LIBRARIAN)
 
-sdcc-asranlib:
-	$(MAKE) -C $(SDCC_ASRANLIB)
+sdcc-sdranlib:
+	$(MAKE) -C $(SDCC_SDRANLIB)
 
 sdcc-device-inc:
 	$(MAKE) -C device/include
@@ -137,7 +137,7 @@ sdcc-doc:
 
 sdcc: $(TARGETS)
 
-sdcc-tini: sdcc-librarian sdcc-asranlib sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
+sdcc-tini: sdcc-librarian sdcc-sdranlib sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules

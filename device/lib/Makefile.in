@@ -266,7 +266,7 @@ else
   else
     ifeq ($(LIB_TYPE), RANLIB)
 	$(AR_S) -q $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
-	$(top_builddir)/bin/asranlib $(PORTDIR)/lib$(PORT).lib
+	$(top_builddir)/bin/sdranlib $(PORTDIR)/lib$(PORT).lib
     else
 	rm -f $(PORTDIR)/lib$(PORT).lib
 	for i in $(notdir $(basename $(XA51OBJECTS))); do echo $$i >> $(PORTDIR)/lib$(PORT).lib; done
@@ -392,16 +392,16 @@ $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
     ifeq ($(LIB_TYPE), RANLIB)
 
 $(PORTDIR)/libfloat.lib: $(OBJECTS_FLOAT)
-	$(AR_S) -cq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT); $(top_builddir)/bin/asranlib $(PORTDIR)/libfloat.lib
+	$(AR_S) -cq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT); $(top_builddir)/bin/sdranlib $(PORTDIR)/libfloat.lib
 
 $(PORTDIR)/libint.lib: $(OBJECTS_INT)
-	$(AR_S) -cq $(PORTDIR)/libint.lib $(OBJECTS_INT); $(top_builddir)/bin/asranlib $(PORTDIR)/libint.lib
+	$(AR_S) -cq $(PORTDIR)/libint.lib $(OBJECTS_INT); $(top_builddir)/bin/sdranlib $(PORTDIR)/libint.lib
 
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
-	$(AR_S) -cq $(PORTDIR)/liblong.lib $(OBJECTS_LONG); $(top_builddir)/bin/asranlib $(PORTDIR)/liblong.lib
+	$(AR_S) -cq $(PORTDIR)/liblong.lib $(OBJECTS_LONG); $(top_builddir)/bin/sdranlib $(PORTDIR)/liblong.lib
 
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
-	$(AR_S) -cq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC); $(top_builddir)/bin/asranlib $(PORTDIR)/libsdcc.lib
+	$(AR_S) -cq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC); $(top_builddir)/bin/sdranlib $(PORTDIR)/libsdcc.lib
 
     else
 

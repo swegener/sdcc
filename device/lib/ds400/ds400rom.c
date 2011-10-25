@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -30,7 +30,7 @@
 
 // ---------------------------------------------------------------------------
 //  Copyright (C) 2003 Dallas Semiconductor Corporation, All Rights Reserved.
-// 
+//
 //  Permission is hereby granted, free of charge, to any person obtaining a
 //  copy of this software and associated documentation files (the "Software"),
 //  to deal in the Software without restriction, including without limitation
@@ -64,7 +64,7 @@ __data unsigned char __at (0x6d) DSS_curr_pc[3];
 __data unsigned char __at (0x72) DSS_sched[3];
 __data unsigned char __at (0x74) DSS_ms_count[5];
 __data unsigned char __at (0x7b) DSS_hb_chandle[5];
-    
+
 // Register bank 3 equates.
 #define R0_B3     0x18
 #define R1_B3     0x19
@@ -77,17 +77,17 @@ __data unsigned char __at (0x7b) DSS_hb_chandle[5];
 
 
 // The top of the redirect function table in RAM.
-#define CALL_TABLE_TOP	256
-    
+#define CALL_TABLE_TOP  256
+
 // The bank the ROM is stored in.  Should be 0FFh for production
 // 400's.  Change this value when running with a debug ROM.
 
-#define ROM_BANK	0xFF
+#define ROM_BANK        0xFF
 
 // The address of the ROM export table is stored
 // at (ROM_BANK << 16) | ROM_EXPORTTABLE_OFFS
 
-#define ROM_EXPORTTABLE_OFFS 	2
+#define ROM_EXPORTTABLE_OFFS    2
 
 //
 // Each entry in the ROM export table is 3 bytes.
@@ -104,7 +104,7 @@ __data unsigned char __at (0x7b) DSS_hb_chandle[5];
 // ROM EXPORT TABLE FUNCTIONS (denoted with ROMXT)
 //
 
-// UTILITY functions 
+// UTILITY functions
 #define ROMXT_CRC16                     (1 * ROMXT_ENTRYSIZE) //
 #define ROMXT_MEM_CLEAR_16              (2 * ROMXT_ENTRYSIZE) //
 #define ROMXT_MEM_COPY_16               (3 * ROMXT_ENTRYSIZE) //
@@ -262,20 +262,20 @@ __data unsigned char __at (0x7b) DSS_hb_chandle[5];
 #define ROMRT_UNDEREF                       (28 * ROMRT_ENTRYSIZE)
 
 
-#define GETC		\
-    clr  a		\
+#define GETC            \
+    clr  a              \
     movc a, @a+dptr
-    
+
 
 // expects function number in R6_B3 (low byte) & R7_B3 (high byte)
 void _romcall(void) __naked
 {
-__asm    
+__asm
       push  dpx                               ; dptr0 preserved here
       push  dph
       push  dpl
 
-      ; point to the address of the table		
+      ; point to the address of the table
       mov   dptr, #(ROM_BANK << 16 | ROM_EXPORTTABLE_OFFS)
 
       push  acc                               ; acc preserved here
@@ -311,7 +311,7 @@ __asm
       push  R4_B3
       push  R5_B3
       ret                                     ; this is not a ret, it is a call!
-	
+
       ; the called function ends with a ret which will return to our original caller.
 __endasm ;
 }
@@ -350,7 +350,7 @@ __asm
       ret                       ; this is not a ret, it is a call!
 
       ; the called function ends with a ret which will return to our original caller.
-__endasm;	
+__endasm;
 }
 
 
@@ -359,51 +359,51 @@ __endasm;
 // pragma.
 #pragma sdcc_hash +
 #define ROMCALL(x) \
-	mov     R6_B3, #(x & 0xff) 		\
-	mov     R7_B3, #((x >> 8) & 0xff)	\
-	lcall   __romcall
+        mov     R6_B3, #(x & 0xff)              \
+        mov     R7_B3, #((x >> 8) & 0xff)       \
+        lcall   __romcall
 
 #define ROMREDIRECT(x) \
-	mov     R6_B3, #(x & 0xff) 		\
-	mov     R7_B3, #((x >> 8) & 0xff)	\
-	lcall   __romredirect
+        mov     R6_B3, #(x & 0xff)              \
+        mov     R7_B3, #((x >> 8) & 0xff)       \
+        lcall   __romredirect
 
 
 // init_rom: the ds400 ROM_INIT ROM function.
 unsigned char init_rom(void __xdata *loMem,
-		       void __xdata *hiMem) __naked
-{    
+                       void __xdata *hiMem) __naked
+{
     // shut compiler up about unused parameters.
     loMem;
     hiMem;
-    
+
 __asm
-	; load params.
-	; loMem is already in DPTR.
-	mov	r2, dpx
-	mov	r1, dph
-	mov     r0, dpl
-	; hiMem is in _init_rom_PARM_2
-	mov	dptr, #_init_rom_PARM_2
-	mov	r5, dpx
-	mov     r4, dph
-	mov     r3, dpl
+        ; load params.
+        ; loMem is already in DPTR.
+        mov     r2, dpx
+        mov     r1, dph
+        mov     r0, dpl
+        ; hiMem is in _init_rom_PARM_2
+        mov     dptr, #_init_rom_PARM_2
+        mov     r5, dpx
+        mov     r4, dph
+        mov     r3, dpl
 
-	ROMCALL(ROMXT_ROM_INIT)
+        ROMCALL(ROMXT_ROM_INIT)
 
-	; result is in acc, move to dpl for C convention.
-	mov	dpl, a
-	ret
-__endasm	;
+        ; result is in acc, move to dpl for C convention.
+        mov     dpl, a
+        ret
+__endasm        ;
 }
 
 // DSS_gettimemillis: note that the ROM actually returns 5 bytes of time,
 // we're discarding the high byte here.
 unsigned long task_gettimemillis_long(void) __naked
 {
-__asm    
-    ; no parameters to load. 
-    ROMREDIRECT(ROMRT_GETTIMEMILLIS)
+__asm
+   ; no parameters to load.
+   ROMREDIRECT(ROMRT_GETTIMEMILLIS)
    ; results in r4 - r0, return in DPTR/B
    mov dpl, r0
    mov dph, r1
@@ -415,22 +415,21 @@ __endasm;
 
 unsigned char task_getthreadID(void) __naked
 {
-__asm    
-    ; no parameters to load. 
-    ROMREDIRECT(ROMRT_GETTHREADID)
+__asm
+   ; no parameters to load.
+   ROMREDIRECT(ROMRT_GETTHREADID)
    ; results in acc, return in dpl
    mov dpl, a
    ret
-__endasm;    
+__endasm;
 }
 
 unsigned int task_gettickreload(void)
 {
-    return DSS_timerReload;
+  return DSS_timerReload;
 }
 
 void task_settickreload(unsigned int rl)
 {
-    DSS_timerReload = rl;
+  DSS_timerReload = rl;
 }
-

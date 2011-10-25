@@ -4,24 +4,24 @@ top_builddir = @top_builddir@
 
 include $(top_builddir)/Makefile.common
 
-CFLAGS          += -I$(srcdir)/../linksrc
+CFLAGS          += -I$(srcdir)/../../sdas/linksrc
 
-OBJECTS         = asranlib.o
+OBJECTS         = sdranlib.o
 
 SOURCES         = $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET          = $(top_builddir)/bin/asranlib$(EXEEXT)
+TARGET          = $(top_builddir)/bin/sdranlib$(EXEEXT)
 
 all: $(TARGET)
 
 install: all installdirs
-	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/asranlib$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/asranlib$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/sdranlib$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdranlib$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/asranlib$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sdranlib$(EXEEXT)
 
 # Performing self-test
 # --------------------
@@ -61,7 +61,7 @@ checkconf:
 clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
-	rm -f $(top_builddir)/bin/asranlib$(EXEEXT)
+	rm -f $(top_builddir)/bin/sdranlib$(EXEEXT)
 
 distclean realclean: clean
 	rm -f Makefile

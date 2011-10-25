@@ -2035,6 +2035,10 @@ in sdcc version 3.0 and higher sdldgb and sdldz80 don't support generation
  no$gmb file formats.
 \end_layout
 
+\begin_layout Itemize
+asranlib utility was renamed to sdranlib in sdcc version 3.1.0.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -8013,7 +8017,7 @@ sdcclib - A tool for creating sdcc libraries
 \end_layout
 
 \begin_layout Itemize
-asranlib - A tool for indexing sdcc ar libraries
+sdranlib - A tool for indexing sdcc ar libraries
 \end_layout
 
 \begin_layout Itemize
@@ -9932,7 +9936,7 @@ http://www.mingw.org/
 \series default
 Both the GNU and BSD ar format variants are supported by sdld linkers.
  Ar doesn't natively understand the sdas object file format, so there is
- a special version of ranlib distributed with sdcc, called asranlib, which
+ a special version of ranlib distributed with sdcc, called sdranlib, which
  produces the ar symbol lookup table.
 \series bold
 
@@ -9966,7 +9970,7 @@ ar -Sq <library name>.lib <list of .rel files>
 
 \family sans
 \series bold
-asranlib <library name>.lib
+sdranlib <library name>.lib
 \end_layout
 
 \begin_layout Standard

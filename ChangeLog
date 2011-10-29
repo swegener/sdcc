@@ -1,3 +1,8 @@
+2011-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lkmain.c (main): fixed banking, bug 3420365
+	* src/SDCCast.c: cosmetics
+
 2011-10-25 Borut Razem <borut.razem AT gmail.com>
 
 	* configure.in, configure, Makefile.in, device/lib/z180/Makefile.in,
@@ -9,7 +14,7 @@
 	  device/non-free/lib/Makefile.in, all.vcxproj,
 	  doc/sdccman.lyx, sdcc.sln. support/scripts/sdcc.nsi:
 	  asranlib renamed to sdranlib
-	* sdas/asranlib/*: sdas/asranlib ,oved to support/sdranlib
+	* sdas/asranlib/*: sdas/asranlib moved to support/sdranlib
 
 2011-10-23 Raphael Neider <rneider AT web.de>
 

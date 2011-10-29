@@ -6226,7 +6226,6 @@ inlineAddDecl (symbol * sym, ast * block, int addSymTab, int toFront)
 
       if (addSymTab)
         addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 0);
-
     }
 }
 
@@ -6822,7 +6821,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
     {
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*        array node          */
+    /*        array node          */
     /*----------------------------*/
     case '[':
       fprintf (outfile, "ARRAY_OP (%p) type (", tree);
@@ -6834,7 +6833,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*      struct/union          */
+    /*      struct/union          */
     /*----------------------------*/
     case '.':
       fprintf (outfile, "STRUCT_ACCESS (%p) type (", tree);
@@ -6846,7 +6845,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*    struct/union pointer    */
+    /*    struct/union pointer    */
     /*----------------------------*/
     case PTR_OP:
       fprintf (outfile, "PTR_ACCESS (%p) type (", tree);
@@ -6858,7 +6857,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*  ++/-- operation           */
+    /*  ++/-- operation           */
     /*----------------------------*/
     case INC_OP:
       if (tree->left)
@@ -6886,7 +6885,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*  bitwise and               */
+    /*  bitwise and               */
     /*----------------------------*/
     case '&':
       if (tree->right)
@@ -6908,7 +6907,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
       return;
 
     /*----------------------------*/
-      /*  bitwise or                */
+    /*  bitwise or                */
     /*----------------------------*/
     case '|':
       fprintf (outfile, "OR (%p) type (", tree);
@@ -6920,7 +6919,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*  bitwise xor               */
+    /*  bitwise xor               */
     /*----------------------------*/
     case '^':
       fprintf (outfile, "XOR (%p) type (", tree);
@@ -6932,7 +6931,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*  division                  */
+    /*  division                  */
     /*----------------------------*/
     case '/':
       fprintf (outfile, "DIV (%p) type (", tree);
@@ -6944,7 +6943,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*            modulus         */
+    /*            modulus         */
     /*----------------------------*/
     case '%':
       fprintf (outfile, "MOD (%p) type (", tree);
@@ -6956,7 +6955,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*  address dereference       */
+    /*  address dereference       */
     /*----------------------------*/
     case '*':                  /* can be unary  : if right is null then unary operation */
       if (!tree->right)
@@ -6969,7 +6968,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
         }
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*      multiplication        */
+    /*      multiplication        */
     /*----------------------------*/
       fprintf (outfile, "MULT (%p) type (", tree);
       printTypeChain (tree->ftype, outfile);
@@ -6981,7 +6980,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*    unary '+' operator      */
+    /*    unary '+' operator      */
     /*----------------------------*/
     case '+':
       /* if unary plus */
@@ -6996,7 +6995,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
         {
       /*------------------------------------------------------------------*/
       /*----------------------------*/
-          /*      addition              */
+      /*      addition              */
       /*----------------------------*/
           fprintf (outfile, "ADD (%p) type (", tree);
           printTypeChain (tree->ftype, outfile);
@@ -7008,7 +7007,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*      unary '-'             */
+    /*      unary '-'             */
     /*----------------------------*/
     case '-':                  /* can be unary   */
       if (!tree->right)
@@ -7022,7 +7021,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
         {
       /*------------------------------------------------------------------*/
       /*----------------------------*/
-          /*      subtraction           */
+      /*      subtraction           */
       /*----------------------------*/
           fprintf (outfile, "SUB (%p) type (", tree);
           printTypeChain (tree->ftype, outfile);
@@ -7034,7 +7033,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*    complement              */
+    /*    complement              */
     /*----------------------------*/
     case '~':
       fprintf (outfile, "COMPL (%p) type (", tree);
@@ -7045,7 +7044,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*           not              */
+    /*           not              */
     /*----------------------------*/
     case '!':
       fprintf (outfile, "NOT (%p) type (", tree);
@@ -7056,7 +7055,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*           shift            */
+    /*           shift            */
     /*----------------------------*/
     case RRC:
       fprintf (outfile, "RRC (%p) type (", tree);
@@ -7128,7 +7127,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*         casting            */
+    /*         casting            */
     /*----------------------------*/
     case CAST:                 /* change the type   */
       fprintf (outfile, "CAST (%p) from type (", tree);
@@ -7158,7 +7157,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*     comparison operators   */
+    /*     comparison operators   */
     /*----------------------------*/
     case '>':
       fprintf (outfile, "GT(>) (%p) type (", tree);
@@ -7208,7 +7207,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
       ast_print (tree->right, outfile, indent + 2);
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*             sizeof         */
+    /*             sizeof         */
     /*----------------------------*/
     case SIZEOF:               /* evaluate wihout code generation */
       fprintf (outfile, "SIZEOF %d\n", (getSize (tree->right->ftype)));
@@ -7216,7 +7215,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /* conditional operator  '?'  */
+    /* conditional operator  '?'  */
     /*----------------------------*/
     case '?':
       fprintf (outfile, "QUEST(?) (%p) type (", tree);
@@ -7236,7 +7235,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*    assignment operators    */
+    /*    assignment operators    */
     /*----------------------------*/
     case MUL_ASSIGN:
       fprintf (outfile, "MULASS(*=) (%p) type (", tree);
@@ -7296,7 +7295,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*    -= operator             */
+    /*    -= operator             */
     /*----------------------------*/
     case SUB_ASSIGN:
       fprintf (outfile, "SUBASS(-=) (%p) type (", tree);
@@ -7308,7 +7307,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*          += operator       */
+    /*          += operator       */
     /*----------------------------*/
     case ADD_ASSIGN:
       fprintf (outfile, "ADDASS(+=) (%p) type (", tree);
@@ -7320,7 +7319,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*      straight assignemnt   */
+    /*      straight assignemnt   */
     /*----------------------------*/
     case '=':
       fprintf (outfile, "ASSIGN(=) (%p) type (", tree);
@@ -7332,7 +7331,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*      comma operator        */
+    /*      comma operator        */
     /*----------------------------*/
     case ',':
       fprintf (outfile, "COMMA(,) (%p) type (", tree);
@@ -7344,7 +7343,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*       function call        */
+    /*       function call        */
     /*----------------------------*/
     case CALL:
     case PCALL:
@@ -7366,7 +7365,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*     return statement       */
+    /*     return statement       */
     /*----------------------------*/
     case RETURN:
       fprintf (outfile, "RETURN (%p) type (", tree);
@@ -7380,7 +7379,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*     label statement        */
+    /*     label statement        */
     /*----------------------------*/
     case LABEL:
       fprintf (outfile, "LABEL (%p)\n", tree);
@@ -7390,7 +7389,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /*     switch statement       */
+    /*     switch statement       */
     /*----------------------------*/
     case SWITCH:
       {
@@ -7411,7 +7410,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /* ifx Statement              */
+    /* ifx Statement              */
     /*----------------------------*/
     case IFX:
       fprintf (outfile, "IF (%p) \n", tree);
@@ -7430,7 +7429,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
       return;
 
     /*----------------------------*/
-      /* goto Statement              */
+    /* goto Statement              */
     /*----------------------------*/
     case GOTO:
       fprintf (outfile, "GOTO (%p) \n", tree);
@@ -7440,7 +7439,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-      /* for Statement              */
+    /* for Statement              */
     /*----------------------------*/
     case FOR:
       fprintf (outfile, "FOR (%p) \n", tree);

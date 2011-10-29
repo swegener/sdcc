@@ -367,10 +367,20 @@ main(int argc, char *argv[])
 			 * Search libraries for global symbols
 			 */
 			search();
+
+			/* sdas specific */
+			/* use these defaults for parsing the .lk script */
+			a_bytes = 4;
+			a_mask = 0xFFFFFFFF;
+			s_mask = 0x80000000;
+			v_mask = 0x7FFFFFFF;
+			/* end sdas specific */
+
 			/*
 			 * Set area base addresses.
 			 */
 			setbas();
+
 			/*
 			 * Link all area addresses.
 			 */
@@ -1262,7 +1272,7 @@ bassav()
 VOID
 setbas()
 {
-	register int v;
+	int v;
 	char id[NCPS];
 
 	bsp = basep;

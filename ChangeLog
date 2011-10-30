@@ -1,3 +1,7 @@
+2011-10-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (processParams): fixed bug #3424385
+
 2011-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lkmain.c (main): fixed banking, bug 3420365

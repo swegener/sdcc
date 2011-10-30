@@ -927,7 +927,8 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
     }
 
   /* if the parameter is castable then add the cast */
-  if (compareType (defParm->type, (*actParm)->ftype) < 0)
+  if ((IS_ARRAY((*actParm)->ftype) && IS_PTR(defParm->type)) ||
+      (compareType (defParm->type, (*actParm)->ftype) < 0))
     {
       ast *pTree;
 

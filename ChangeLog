@@ -1,3 +1,13 @@
+2011-10-30 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/device.c, src/pic14/device.h,
+	  device/include/pic14/pic14devices.txt:
+	  declare enhanced cores as such
+	* src/pic14/gen.c:
+	  do not save/restore W, STATUS, BSR, FSRx, or PCLATH around
+	  interrupts on enhanced devices, as these registers will be
+	  saved automatically and FSR is not present on these devices
+
 2011-10-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (processParams): fixed bug #3424385

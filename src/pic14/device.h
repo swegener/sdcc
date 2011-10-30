@@ -75,6 +75,7 @@ typedef struct PIC_device {
 	int dataMemSize;            /* data (RAM) memory size in bytes - for device listing only */
 	int eepromMemSize;          /* EEPROM memory size in bytes - for device listing only */
 	int ioPins;                 /* number of I/O pins - for device listing only */
+        int isEnhancedCore;         /* enhanced cores (19f1934) feature automatic context saving */
 
 } PIC_device;
 

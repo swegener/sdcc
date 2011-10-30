@@ -25,6 +25,9 @@
 # program = program memory in 14 bit words
 # data = data memory in bytes
 # eeprom = eeprom storage
+# enhanced = 0 | 1
+#   0: regular device (default)
+#   1: indicate that this is an enhanced core (automatic context saving on IRQ)
 # io = io lines
 # maxram = maximum memmap address for unique general purpose registers
 # bankmsk = mask for memmap bank selecting. 0x80 for two banks usable, 
@@ -1056,6 +1059,7 @@ processor 12f1822, 16f1823
         program         2K
         data            128
         eeprom          256
+        enhanced        1
         io              6
         maxram          0x07f
         bankmsk         0xf80
@@ -1067,6 +1071,7 @@ processor 16f1934
         program         4K
         data            256
         eeprom          256
+        enhanced        1
         io              6
         maxram          0x07f
         bankmsk         0xf80
@@ -1078,6 +1083,7 @@ processor 16f1936, 16f1937
         program         8K
         data            512
         eeprom          256
+        enhanced        1
         io              6
         maxram          0x07f
         bankmsk         0xf80

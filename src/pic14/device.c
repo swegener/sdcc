@@ -114,7 +114,7 @@ sanitise_processor_name (char *name)
 static PIC_device *
 create_pic (char *pic_name, int maxram, int bankmsk, int confsiz,
             int config[MAX_NUM_CONFIGS], int program, int data, int eeprom,
-            int io)
+            int io, int is_enhanced)
 {
   PIC_device *new_pic;
   char *simple_pic_name = sanitise_processor_name (pic_name);
@@ -131,6 +131,7 @@ create_pic (char *pic_name, int maxram, int bankmsk, int confsiz,
   new_pic->dataMemSize = data;
   new_pic->eepromMemSize = eeprom;
   new_pic->ioPins = io;
+  new_pic->isEnhancedCore = is_enhanced;
 
   new_pic->ram = rangeRAM;
 
@@ -228,6 +229,7 @@ find_device (char *pic_name)
   int pic_data = 0;
   int pic_eeprom = 0;
   int pic_io = 0;
+  int pic_is_enhanced = 0;
   char *simple_pic_name;
   char *dir;
   char filename[512];
@@ -349,7 +351,7 @@ find_device (char *pic_name)
                           create_pic (processor_name[dcount], pic_maxram,
                                       pic_bankmsk, pic_confsiz, pic_config,
                                       pic_program, pic_data, pic_eeprom,
-                                      pic_io);
+                                      pic_io, pic_is_enhanced);
                         } // for
                     } // if
 
@@ -413,6 +415,9 @@ find_device (char *pic_name)
                   else if (STRCASECMP (pic_word[0], "eeprom") == 0 && num_pic_words > 1)
                     pic_eeprom = parse_config_value (pic_word[1]);
 
+                  else if (STRCASECMP (pic_word[0], "enhanced") == 0 && num_pic_words > 1)
+                    pic_is_enhanced = parse_config_value (pic_word[1]);
+
                   else if (STRCASECMP (pic_word[0], "io") == 0 && num_pic_words > 1)
                     pic_io = parse_config_value (pic_word[1]);
 
@@ -455,7 +460,7 @@ find_device (char *pic_name)
             {
               create_pic (processor_name[dcount], pic_maxram, pic_bankmsk,
                           pic_confsiz, pic_config, pic_program, pic_data,
-                          pic_eeprom, pic_io);
+                          pic_eeprom, pic_io, pic_is_enhanced);
             } // for
         } // if
     } // if
@@ -470,7 +475,7 @@ find_device (char *pic_name)
           /* create a new pic entry */
           return create_pic (pic_name, pic_maxram, pic_bankmsk,
                              pic_confsiz, pic_config, pic_program,
-                             pic_data, pic_eeprom, pic_io);
+                             pic_data, pic_eeprom, pic_io, pic_is_enhanced);
         } // if
     } // if
 

@@ -1,3 +1,13 @@
+2011-10-31 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/device.c (init_pic): reformatted,
+	  fixup enhanced cores' name for INDF
+	* src/pic14/pcode.c, src/pic14/pcode.h, src/pic14/ralloc.h:
+	  provide indirect memory access registers for enhanced cores
+	* src/pic14/gen.c (setup_fsr):
+	  setup FSR0L and FSR0H on enhanced cores,
+	  fix access to INDF vs. INDF0, closes #3431024
+
 2011-10-30 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/device.c, src/pic14/device.h,

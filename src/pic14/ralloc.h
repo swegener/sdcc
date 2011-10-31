@@ -103,12 +103,13 @@ reg_info *allocNewDirReg (sym_link *symlnk,const char *name);
 
 /* Define register address that are constant across PIC family */
 #define IDX_INDF    0
+#define IDX_INDF0   0
 #define IDX_TMR0    1
 #define IDX_PCL     2
 #define IDX_STATUS  3
 #define IDX_FSR     4
-#define IDX_PORTA   5
-#define IDX_PORTB   6
+#define IDX_FSR0L   4
+#define IDX_FSR0H   5
 #define IDX_PCLATH  0x0a
 #define IDX_INTCON  0x0b
 

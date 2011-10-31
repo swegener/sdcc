@@ -5180,11 +5180,21 @@ static void SetIrp(operand *result)
 static void
 setup_fsr (operand *ptr)
 {
-  mov2w_op(ptr, 0);
-  emitpcode(POC_MOVWF, popCopyReg (&pc_fsr));
+  if (pic14_getPIC()->isEnhancedCore)
+    {
+      mov2w_op(ptr, 0);
+      emitpcode(POC_MOVWF, popCopyReg (&pc_fsr0l));
+      mov2w_op(ptr, 1);
+      emitpcode(POC_MOVWF, popCopyReg (&pc_fsr0h));
+    }
+  else
+    {
+      mov2w_op(ptr, 0);
+      emitpcode(POC_MOVWF, popCopyReg (&pc_fsr));
 
-  /* also setup-up IRP */
-  SetIrp (ptr);
+      /* also setup-up IRP */
+      SetIrp (ptr);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -5298,7 +5308,7 @@ genUnpackBits (operand *result, operand *left, int ptype, iCode *ifx)
           else
             {
               setup_fsr (left);
-              pcop = newpCodeOpBit (pc_indf.pcop.name, bstr, 0);
+              pcop = newpCodeOpBit (pc_indf->pcop.name, bstr, 0);
             }
           emitpcode ((rIfx.condition) ? POC_BTFSC : POC_BTFSS, pcop);
           emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
@@ -5494,7 +5504,7 @@ static void genNearPointerGet (operand *left,
             if (direct)
                 emitpcode(POC_MOVWF,popGet(AOP(left),0));
             else
-                emitpcode(POC_MOVFW,popCopyReg(&pc_indf));
+                emitpcode(POC_MOVFW,popCopyReg(pc_indf));
             if (AOP_TYPE(result) == AOP_LIT) {
                 emitpcode(POC_MOVLW,popGet(AOP(result),offset));
             } else {
@@ -5771,7 +5781,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,int p_typ
     case POINTER:
     case FPOINTER:
       setup_fsr (result);
-      emitpcode(lit?POC_BSF:POC_BCF,newpCodeOpBit(PCOP(&pc_indf)->name,bstr,0));
+      emitpcode(lit?POC_BSF:POC_BCF,newpCodeOpBit(PCOP(pc_indf)->name,bstr,0));
       break;
 
     case CPOINTER:
@@ -6048,7 +6058,7 @@ static void genNearPointerSet (operand *right,
         while (size--) {
             char *l = aopGet(AOP(right),offset,FALSE,TRUE);
             if (*l == '@' ) {
-                emitpcode(POC_MOVFW,popCopyReg(&pc_indf));
+                emitpcode(POC_MOVFW,popCopyReg(pc_indf));
             } else {
                 if (AOP_TYPE(right) == AOP_LIT) {
                     emitpcode(POC_MOVLW,popGet(AOP(right),offset));
@@ -6058,7 +6068,7 @@ static void genNearPointerSet (operand *right,
                 if (direct)
                     emitpcode(POC_MOVWF,popGet(AOP(result),0));
                 else
-                    emitpcode(POC_MOVWF,popCopyReg(&pc_indf));
+                    emitpcode(POC_MOVWF,popCopyReg(pc_indf));
             }
             if (size && !direct)
                 emitpcode(POC_INCF,popCopyReg(&pc_fsr));

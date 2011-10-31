@@ -29,11 +29,16 @@
 
 // Eventually this will go into device dependent files:
 pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
-pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,0,NULL};
 pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,0,NULL};
+pCodeOpReg pc_fsr0l     = {{PO_FSR,     "FSR0L"}, -1, NULL,0,NULL};
+pCodeOpReg pc_fsr0h     = {{PO_FSR,     "FSR0H"}, -1, NULL,0,NULL};
+pCodeOpReg pc_indf_     = {{PO_INDF,    "INDF"}, -1, NULL,0,NULL};
+pCodeOpReg pc_indf0     = {{PO_INDF,    "INDF0"}, -1, NULL,0,NULL};
 pCodeOpReg pc_intcon    = {{PO_INTCON,  "INTCON"}, -1, NULL,0,NULL};
 pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
 pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
+
+pCodeOpReg *pc_indf     = &pc_indf_;
 
 pCodeOpReg pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
@@ -1206,13 +1211,19 @@ void  pCodeInitRegisters(void)
 	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x180);
 	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
 	pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x180);
+	pc_indf_.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x180);
+	pc_indf0.r = allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF, 0x180);
 	pc_fsr.r = allocProcessorRegister(IDX_FSR,"FSR", PO_FSR, 0x180);
-	pc_indf.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x180);
+	pc_fsr0l.r = allocProcessorRegister(IDX_FSR0L,"FSR0L", PO_FSR, 0x180);
+	pc_fsr0h.r = allocProcessorRegister(IDX_FSR0H,"FSR0H", PO_FSR, 0x180);
 	pc_intcon.r = allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x180);
 	
 	pc_status.rIdx = IDX_STATUS;
 	pc_fsr.rIdx = IDX_FSR;
-	pc_indf.rIdx = IDX_INDF;
+	pc_fsr0l.rIdx = IDX_FSR0L;
+	pc_fsr0h.rIdx = IDX_FSR0H;
+	pc_indf_.rIdx = IDX_INDF;
+	pc_indf0.rIdx = IDX_INDF0;
 	pc_intcon.rIdx = IDX_INTCON;
 	pc_pcl.rIdx = IDX_PCL;
 	pc_pclath.rIdx = IDX_PCLATH;

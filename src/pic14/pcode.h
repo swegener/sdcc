@@ -859,8 +859,12 @@ void dumppCodeStatistics (FILE *of);
 
 extern pCodeOpReg pc_status;
 extern pCodeOpReg pc_intcon;
-extern pCodeOpReg pc_indf;
 extern pCodeOpReg pc_fsr;
+extern pCodeOpReg pc_fsr0l;
+extern pCodeOpReg pc_fsr0h;
+extern pCodeOpReg *pc_indf; /* pointer to either pc_indf_ or pc_indf0 */
+extern pCodeOpReg pc_indf_;
+extern pCodeOpReg pc_indf0;
 extern pCodeOpReg pc_pcl;
 extern pCodeOpReg pc_pclath;
 extern pCodeOpReg pc_wsave;     /* wsave, ssave and psave are used to save W, the Status and PCLATH*/

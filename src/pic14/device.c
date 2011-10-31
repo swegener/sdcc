@@ -19,6 +19,7 @@
 -------------------------------------------------------------------------*/
 
 #include "device.h"
+#include "pcode.h"
 
 /*
  * Imports
@@ -566,27 +567,37 @@ list_valid_pics(int ncols)
 /*-----------------------------------------------------------------*
 *  
 *-----------------------------------------------------------------*/
-PIC_device *init_pic(char *pic_type)
+PIC_device *
+init_pic (char *pic_type)
 {
-	char long_name[PIC14_STRING_LEN];
-	
-	pic = find_device(pic_type);
-	
-	if (pic == NULL) {
-		/* check for shortened "16xxx" form */
-		sprintf(long_name, "16%s", pic_type);
-		pic = find_device(long_name);
-		if (pic == NULL) {
-			if(pic_type != NULL && pic_type[0] != '\0')
-				fprintf(stderr, "'%s' was not found.\n", pic_type);
-			else
-				fprintf(stderr, "No processor has been specified (use -pPROCESSOR_NAME)\n");
-		
-			list_valid_pics(7);
-			exit(1);
-		}
-	}
-	return pic;
+  char long_name[PIC14_STRING_LEN];
+
+  pic = find_device(pic_type);
+
+  if (pic == NULL)
+    {
+      /* check for shortened "16xxx" form */
+      sprintf(long_name, "16%s", pic_type);
+      pic = find_device(long_name);
+      if (pic == NULL)
+        {
+          if (pic_type != NULL && pic_type[0] != '\0')
+            fprintf(stderr, "'%s' was not found.\n", pic_type);
+          else
+            fprintf(stderr, "No processor has been specified (use -pPROCESSOR_NAME)\n");
+
+          list_valid_pics(7);
+          exit(1);
+        }
+    }
+
+  if (pic && pic->isEnhancedCore)
+    {
+      /* Hack: Fixup enhanced core's SFR(s). */
+      pc_indf = &pc_indf0;
+    }
+
+  return pic;
 }
 
 /*-----------------------------------------------------------------*

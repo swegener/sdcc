@@ -1,5 +1,15 @@
 2011-11-01 Raphael Neider <rneider AT web.de>
 
+	* src/pic14/gen.c (inc_fsr): new code to handle FSR{,0} increments,
+	  (emitPtrByteGet,emitPtrByteSet): fix pointer derefence,
+	  (genNearPointerGet,genNearPointerSet): fixed for enhanced cores,
+	  really closes #3431024
+	* src/pic14/pcode.c (pCodeInitRegisters):
+	  declare all "core registers" to reside in all banks to avoid
+	  unnecessary BANKSELs
+
+2011-11-01 Raphael Neider <rneider AT web.de>
+
 	* src/pic14/main.c (_pic14_do_link):
 	  link with libsdcce.lib for enhanced devices
 

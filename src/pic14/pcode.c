@@ -1208,15 +1208,15 @@ void  pCodeInitRegisters(void)
 	initStack(shareBankAddress, stkSize, haveShared);
 	
 	/* TODO: Read aliases for SFRs from regmap lines in device description. */
-	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x180);
-	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
-	pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x180);
-	pc_indf_.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x180);
-	pc_indf0.r = allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF, 0x180);
-	pc_fsr.r = allocProcessorRegister(IDX_FSR,"FSR", PO_FSR, 0x180);
-	pc_fsr0l.r = allocProcessorRegister(IDX_FSR0L,"FSR0L", PO_FSR, 0x180);
-	pc_fsr0h.r = allocProcessorRegister(IDX_FSR0H,"FSR0H", PO_FSR, 0x180);
-	pc_intcon.r = allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x180);
+	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0xf80);
+	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0xf80);
+	pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0xf80);
+	pc_indf_.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0xf80);
+	pc_indf0.r = allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF, 0xf80);
+	pc_fsr.r = allocProcessorRegister(IDX_FSR,"FSR", PO_FSR, 0xf80);
+	pc_fsr0l.r = allocProcessorRegister(IDX_FSR0L,"FSR0L", PO_FSR, 0xf80);
+	pc_fsr0h.r = allocProcessorRegister(IDX_FSR0H,"FSR0H", PO_FSR, 0xf80);
+	pc_intcon.r = allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0xf80);
 	
 	pc_status.rIdx = IDX_STATUS;
 	pc_fsr.rIdx = IDX_FSR;
@@ -1229,7 +1229,7 @@ void  pCodeInitRegisters(void)
 	pc_pclath.rIdx = IDX_PCLATH;
 	
 	/* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
-	pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, pic ? pic->bankMask : 0x180);
+	pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, pic ? pic->bankMask : 0xf80);
 	/* Interrupt storage for status register. */
 	pc_ssave.r = allocInternalRegister(IDX_SSAVE,pc_ssave.pcop.name,pc_ssave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
 	/* Interrupt storage for pclath register. */

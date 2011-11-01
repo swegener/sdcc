@@ -5197,6 +5197,49 @@ setup_fsr (operand *ptr)
     }
 }
 
+static void
+inc_fsr (int delta)
+{
+  if (0 == delta) {
+      /* Nothing to do. */
+      return;
+  } // if
+
+  if (pic14_getPIC()->isEnhancedCore)
+    {
+      assert(delta >= -32);
+      assert(delta < 32);
+      /* Hack: Turn this into a PCI (not that easy due to the argument structure). */
+      addpCode2pBlock(pb,newpCodeAsmDir("ADDFSR", "FSR0, %d", delta));
+    }
+  else
+    {
+      switch (delta)
+        {
+          case 1:
+                emitpcode(POC_INCF, popCopyReg(&pc_fsr));
+                break;
+          case -1:
+                emitpcode(POC_DECF, popCopyReg(&pc_fsr));
+                break;
+          case 0:
+                break;
+          default:
+              while (delta > 0)
+                {
+                  inc_fsr (1);
+                  --delta;
+                }
+              while (delta < 0)
+                {
+                  inc_fsr(-1);
+                  ++delta;
+                }
+              break;
+        } // switch
+    } // if
+}
+
 /*-----------------------------------------------------------------*/
 /* emitPtrByteGet - emits code to get a byte into WREG from an     */
 /*                  arbitrary pointer (__code, __data, generic)    */
@@ -5210,7 +5253,7 @@ emitPtrByteGet (operand *src, int p_type, bool alreadyAddressed)
     case POINTER:
     case FPOINTER:
       if (!alreadyAddressed) setup_fsr (src);
-      emitpcode(POC_MOVFW, popCopyReg (&pc_fsr));
+      emitpcode(POC_MOVFW, popCopyReg (pc_indf));
       break;
 
     case CPOINTER:
@@ -5252,7 +5295,7 @@ emitPtrByteSet (operand *dst, int p_type, bool alreadyAddressed)
     case POINTER:
     case FPOINTER:
       if (!alreadyAddressed) setup_fsr (dst);
-      emitpcode(POC_MOVWF, popCopyReg (&pc_fsr));
+      emitpcode(POC_MOVWF, popCopyReg (pc_indf));
       break;
 
     case CPOINTER:
@@ -5511,7 +5554,9 @@ static void genNearPointerGet (operand *left,
                 emitpcode(POC_MOVWF,popGet(AOP(result),offset));
             }
             if (size && !direct)
-                emitpcode(POC_INCF,popCopyReg(&pc_fsr));
+              {
+                inc_fsr(1);
+              }
             offset++;
         }
     }
@@ -5521,6 +5566,8 @@ static void genNearPointerGet (operand *left,
         /* we had to allocate for this iCode */
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
         freeAsmop(NULL,aop,ic,TRUE);
+    } else if (!direct) {
+        /* nothing to do */
     } else {
         /* we did not allocate which means left
         already in a pointer register, then
@@ -5533,8 +5580,7 @@ static void genNearPointerGet (operand *left,
             ( OP_SYMBOL(left)->liveTo > ic->seq ||
             ic->depth )) {
             int size = AOP_SIZE(result) - 1;
-            while (size--)
-                emitpcode(POC_DECF, popCopyReg(&pc_fsr));
+            inc_fsr(-size);
         }
     }
 
@@ -6071,7 +6117,7 @@ static void genNearPointerSet (operand *right,
                     emitpcode(POC_MOVWF,popCopyReg(pc_indf));
             }
             if (size && !direct)
-                emitpcode(POC_INCF,popCopyReg(&pc_fsr));
+              inc_fsr(1);
             offset++;
         }
     }
@@ -6081,6 +6127,8 @@ static void genNearPointerSet (operand *right,
     if (aop) {
         /* we had to allocate for this iCode */
         freeAsmop(NULL,aop,ic,TRUE);
+    } else if (!direct) {
+        /* nothing to do */
     } else {
         /* we did not allocate which means left
         already in a pointer register, then
@@ -6093,8 +6141,7 @@ static void genNearPointerSet (operand *right,
             ( OP_SYMBOL(result)->liveTo > ic->seq ||
             ic->depth )) {
             int size = AOP_SIZE(right) - 1;
-            while (size--)
-                emitpcode(POC_DECF, popCopyReg(&pc_fsr));
+            inc_fsr(-size);
         }
     }
 

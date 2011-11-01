@@ -7,6 +7,8 @@
 	* src/pic14/pcode.c (pCodeInitRegisters):
 	  declare all "core registers" to reside in all banks to avoid
 	  unnecessary BANKSELs
+	* doc/sdccman.lyx: document definition of config words and the use
+	  of libsdcce.lib and libme.lib for enhanced pic14 devices
 
 2011-11-01 Raphael Neider <rneider AT web.de>
 

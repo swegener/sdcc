@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -2639,8 +2639,13 @@ status collapsed
 \end_inset
 
 -enable-new-pics Enables support for PIC devices that are not supported
- by the current 0.13.7 release of gputils, namely 18f[24][3456]k22.
- Enabling this probably requires gputils to be built from recent SVN sources!
+ by the current 0.13.7 release of gputils, namely 12f1822, 16f1934, 16f1936,
+ and 16f1937 for the PIC14 target and 18f[24][3456]k22 for PIC16.
+ Enabling this probably requires gputils
+\begin_inset Formula $\geq$
+\end_inset
+
+0.14.0 or a recent SVN revision!
 \begin_inset Newline newline
 \end_inset
 
@@ -42298,6 +42303,20 @@ Currently supported devices include:
 
 \begin_layout Standard
 \noindent
+\align left
+Supported devices with enhanced cores:
+\end_layout
+
+\begin_layout Standard
+12F: 1822
+\end_layout
+
+\begin_layout Standard
+16F: 1823, 1934, 1936, 1937
+\end_layout
+
+\begin_layout Standard
+\noindent
 An up-to-date list of currently supported devices can be obtained via 
 \family typewriter
 sdcc -mpic14 -phelp foo.c
@@ -42487,6 +42506,84 @@ T0IF = 0; /* Clear timer interrupt */
 \end_inset
 
 }
+\end_layout
+
+\begin_layout Subsection
+Configuration Bits
+\end_layout
+
+\begin_layout Standard
+Configuration bits (also known as fuses) can be configured using `
+\family typewriter
+__code
+\family default
+' and `
+\family typewriter
+__at
+\family default
+' modifiers.
+ Possible options should be ANDed and can be found in your processor header
+ file.
+ Example for PIC16F88:
+\end_layout
+
+\begin_layout LyX-Code
+
+\family typewriter
+#include <pic16f88.h> //Contains config addresses and options
+\begin_inset Newline newline
+\end_inset
+
+#include <stdint.h> //Needed for uint16_t
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+static __code uint16_t __at (_CONFIG1) configword1 = _INTRC_IO &
+\begin_inset Newline newline
+\end_inset
+
+  _CP_ALL & _WDT_OFF & [...];
+\begin_inset Newline newline
+\end_inset
+
+static __code uint16_t __at (_CONFIG2) configword2 = [...];
+\end_layout
+
+\begin_layout Standard
+Although data type is ignored if the address (
+\family typewriter
+__at()
+\family default
+) refers to a config word location, using a type large enough for the configurat
+ion word (
+\family typewriter
+uint16_t
+\family default
+ in this case) is recommended to prevent changes in the compiler (implicit,
+ early range check and enforcement) from breaking the definition.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+If your processor header file doesn't contain config addresses you can declare
+ it manually or use a literal address:
+\end_layout
+
+\begin_layout LyX-Code
+
+\family typewriter
+static __code uint16_t __at (0x2007) configword1 = _INTRC_IO &
+\begin_inset Newline newline
+\end_inset
+
+  _CP_ALL & _WDT_OFF & [...];
 \end_layout
 
 \begin_layout Subsection
@@ -43011,6 +43108,47 @@ status collapsed
  sets the size if the argument passing stack (default: 16, minimum: 4)
 \end_layout
 
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+PIC14!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+ make non-free device headers and libraries available in the compiler's
+ search paths (implicit -I and -L options)
+\end_layout
+
 \begin_layout Subsection
 Environment Variables
 \end_layout
@@ -43137,6 +43275,60 @@ The PIC14 library currently only contains support routines required by the
 device/lib
 \family default
 ) should also compile with the PIC14 port.
+\end_layout
+
+\begin_layout Subsubsection
+Enhanced cores
+\end_layout
+
+\begin_layout Standard
+SDCC/PIC14 has experimental support for devices with the enhanced 14-bit
+ cores (such as pic12f1822).
+ Due to differences in required code, the libraries provided with SDCC (
+\family typewriter
+libm.lib
+\family default
+ and 
+\family typewriter
+libsdcc.lib
+\family default
+) are now provided in two variants: 
+\family typewriter
+libm.lib
+\family default
+ and 
+\family typewriter
+libsdcc.lib
+\family default
+ are compiled for the regular, non-enhanced devices.
+ 
+\family typewriter
+libme.lib
+\family default
+ and 
+\family typewriter
+libsdcce.lib
+\family default
+ (note the trailing '
+\family typewriter
+e
+\family default
+') are compiled for enhanced devices.
+ When linking manually, make sure to select the proper variant!
+\end_layout
+
+\begin_layout Standard
+When SDCC is used to invoke the linker, SDCC will automatically select the
+ 
+\family typewriter
+libsdcc.lib
+\family default
+-variant suitable for the target device.
+ However, no such magic has been conjured up for 
+\family typewriter
+libm.lib
+\family default
+!
 \end_layout
 
 \begin_layout Subsubsection
@@ -43471,6 +43663,47 @@ status collapsed
 \end_inset
 
  Frame pointer will be omitted when the function uses no local variables.
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+PIC16!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+ Make non-free device headers and libraries available in the compiler's
+ search paths (implicit -I and -L options).
 \end_layout
 
 \begin_layout Subsection
@@ -47370,6 +47603,61 @@ unimplemented pointer type
 \noindent
 Generic pointer are read and written with a set of library functions which
  read/write 1, 2, 3, 4 bytes.
+\end_layout
+
+\begin_layout Subsection
+Configuration Bits
+\end_layout
+
+\begin_layout Standard
+Configuration bits (also known as fuses) can be configured using `
+\family typewriter
+__code
+\family default
+' and `
+\family typewriter
+__at
+\family default
+' modifiers.
+ Possible options should be ANDed and can be found in your processor header
+ file.
+ Example for PIC18F2550:
+\end_layout
+
+\begin_layout LyX-Code
+
+\family typewriter
+#include <pic18fregs.h> //Contains config addresses and options
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+static __code char __at(__CONFIG1L) configword1l = 
+\begin_inset Newline newline
+\end_inset
+
+  _USBPLL_CLOCK_SRC_FROM_96MHZ_PLL_2_1L &
+\end_layout
+
+\begin_layout LyX-Code
+
+\family typewriter
+  _PLLDIV_NO_DIVIDE__4MHZ_INPUT__1L & [...];
+\begin_inset Newline newline
+\end_inset
+
+static __code char __at(__CONFIG1H) configword1h = [...];
+\begin_inset Newline newline
+\end_inset
+
+static __code char __at(__CONFIG2L) configword2l = [...];
+\begin_inset Newline newline
+\end_inset
+
+//More configuration words
 \end_layout
 
 \begin_layout Subsection

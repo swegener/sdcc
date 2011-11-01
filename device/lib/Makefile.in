@@ -354,9 +354,10 @@ port-specific-objects-pic16:
 
 port-specific-objects-pic14:
 	-if [ -f $(PORT)/Makefile ]; then \
-	  mkdir -p $(PORT)/bin; \
 	  $(MAKE) -C $(PORT); \
-	  cp -f $(PORT)/bin/*.* $(PORTDIR); \
+          find $(PORT) -name 'lib*.a' | while read i; do \
+            cp -f "$$i" $(PORTDIR)/`basename "$$i" .a`.lib; \
+          done; \
 	fi
 
 ifeq ($(LIB_TYPE), SDCCLIB)

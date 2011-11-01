@@ -1,3 +1,19 @@
+--- 2011-11-01  Raphael Neider
+
+To accomodate for devices with enhanced cores, there are now
+two variants of libm and libsdcc:
+Applications targetting regular, non-enhanced devices should
+link with libm.lib and libsdcc.lib (no change).
+Applications that target enhaned devices should link with
+libme.lib and libsdcce.lib instead. When the linker is
+invoked via sdcc, the proper libsdcc{,e}.lib will be chosen
+automatically -- no such mechanism has been established for
+libm{,e}.lib!
+
+The build system has also been converted to an Automake-based
+one and libdev/ has been moved completely to the non-free
+subtree.
+
 --- 2006-03-21  Raphael Neider
 
 Added device specific SFR definitions in libdev/.

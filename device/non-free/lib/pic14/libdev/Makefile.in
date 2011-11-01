@@ -12,7 +12,12 @@ RMDIR = @RMDIR@
 
 CPPFLAGS = -I$(srcdir)/../../../../include/pic14 -I$(srcdir)/../../../../non-free/include/pic14
 
-NEW_PICS_yes = pic12f1822.c
+NEW_PICS_yes = \
+    pic12f1822.c \
+    pic16f1934.c \
+    pic16f1936.c \
+    pic16f1937.c
+
 C_SRC = \
     pic12f629.c \
     pic12f635.c \

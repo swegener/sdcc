@@ -53,6 +53,7 @@ __sfr  __at (ADCON1_ADDR)                  ADCON1;
 // bitfield definitions
 // 
 volatile __ADCON0_bits_t __at(ADCON0_ADDR) ADCON0_bits;
+volatile __ADCON1_bits_t __at(ADCON1_ADDR) ADCON1_bits;
 volatile __ANSEL_bits_t __at(ANSEL_ADDR) ANSEL_bits;
 volatile __CCP1CON_bits_t __at(CCP1CON_ADDR) CCP1CON_bits;
 volatile __CM1CON0_bits_t __at(CM1CON0_ADDR) CM1CON0_bits;

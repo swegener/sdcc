@@ -1,3 +1,88 @@
+2011-11-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/main.c (_pic14_do_link):
+	  link with libsdcce.lib for enhanced devices
+
+	* device/lib/Makefile.in:
+	  find, copy, and rename enhanced core libraries as well
+
+	* device/lib/pic14/NEWS:
+	  document structural changes and support for enhanced cores
+
+	* device/lib/pic14/Makefile.am,
+	* device/lib/pic14/Makefile.common,
+	* device/lib/pic14/Makefile.common.in (removed),
+	* device/lib/pic14/Makefile.rules (removed),
+	* device/lib/pic14/Makefile.subdir (removed),
+	* device/lib/pic14/configure.in:
+	  switch pic14 library to Autotools-based build system,
+	  support --enable-new-pics
+
+	* device/lib/pic14/libm/Makefile.am,
+	* device/lib/pic14/libsdcc/Makefile.in (removed),
+	* device/lib/pic14/libsdcc/enhanced/Makefile.am,
+	* device/lib/pic14/libsdcc/regular/Makefile.am:
+	  build separate libm and libsdcc for regular and enhanced cores
+
+	* device/lib/pic14/libsdcc/{ => regular/,enhanced/}_gptrget{1,2,3,4}.S,
+	* device/lib/pic14/libsdcc/{ => regular/,enhanced/}_gptrput{1,2,3,4}.S,
+	* device/lib/pic14/libsdcc/{ => regular/,enhanced/}macros.inc:
+	  separated implementation of generic pointer routines and
+	  reimplemented for enhanced devices
+
+	* device/lib/pic14/libsdcc/{ => regular/}shadowregs.c:
+	  moved to be included only in the non-enhanced devices' libsdcc.lib
+
+	* device/{ => non-free/}lib/pic14/libdev/devices.txt,
+	* device/{ => non-free/}lib/pic14/libdev/pic14ports.txt:
+	  make libdev/ more self-contained
+
+	* device/non-free/lib/pic14/libdev/mkall.sh:
+	  interactively update device library files (.c and .h)
+
+	* device/non-free/include/pic14/pic12f635.h,
+	* device/non-free/include/pic14/pic16f616.h,
+	* device/non-free/include/pic14/pic16f688.h,
+	* device/non-free/include/pic14/pic16f785.h,
+	* device/non-free/include/pic14/pic16f913.h,
+	* device/non-free/include/pic14/pic16f914.h,
+	* device/non-free/include/pic14/pic16f916.h,
+	* device/non-free/include/pic14/pic16f917.h,
+	* device/non-free/include/pic14/pic16hv616.h,
+	* device/non-free/lib/pic14/libdev/pic12f1822.c,
+	* device/non-free/lib/pic14/libdev/pic16f616.c,
+	* device/non-free/lib/pic14/libdev/pic16f688.c,
+	* device/non-free/lib/pic14/libdev/pic16f785.c,
+	* device/non-free/lib/pic14/libdev/pic16f886.c,
+	* device/non-free/lib/pic14/libdev/pic16f887.c,
+	* device/non-free/lib/pic14/libdev/pic16f913.c,
+	* device/non-free/lib/pic14/libdev/pic16f914.c,
+	* device/non-free/lib/pic14/libdev/pic16f916.c,
+	* device/non-free/lib/pic14/libdev/pic16f917.c,
+	* device/non-free/lib/pic14/libdev/pic16hv616.c:
+	  updated from recent gputils' headers
+
+	* device/non-free/include/pic14/pic16f193{4,6,7}.h,
+	* device/non-free/lib/pic14/libdev/Makefile.in,
+	* device/non-free/lib/pic14/libdev/devices.txt,
+	* device/non-free/lib/pic14/libdev/pic16f193{4,6,7}.c:
+	  add support for 16f1934/16f1936/16f1937 devices
+
+	* device/lib/pic14/Makefile.in,
+	* device/lib/pic14/aclocal.m4,
+	* device/lib/pic14/config.h.in,
+	* device/lib/pic14/configure,
+	* device/lib/pic14/depcomp,
+	* device/lib/pic14/install-sh,
+	* device/lib/pic14/libm/Makefile.in,
+	* device/lib/pic14/libsdcc/enhanced/Makefile.in,
+	* device/lib/pic14/libsdcc/regular/Makefile.in,
+	* device/lib/pic14/missing,
+	* device/lib/pic16/configure,
+	* device/non-free/lib/pic14/configure,
+	* device/non-free/lib/pic16/configure:
+	  automatically (re)generated files
+
 2011-10-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (computeType): fixed bug #3431210

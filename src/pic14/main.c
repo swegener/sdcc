@@ -263,7 +263,14 @@ _pic14_do_link (void)
       procName = "16f877";
     }
 
-  addSet (&libFilesSet, Safe_strdup ("libsdcc.lib"));
+  if (pic14_getPIC()->isEnhancedCore)
+    {
+      addSet (&libFilesSet, Safe_strdup ("libsdcce.lib"));
+    }
+  else
+    {
+      addSet (&libFilesSet, Safe_strdup ("libsdcc.lib"));
+    }
   SNPRINTF (temp, sizeof (temp), "pic%s.lib", procName);
   addSet (&libFilesSet, Safe_strdup (temp));
   shash_add (&linkValues, "libs", joinStrSet (appendStrSet (libFilesSet, "\"", "\"")));

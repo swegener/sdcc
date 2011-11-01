@@ -2022,6 +2022,48 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
 
   etype2 = type2 ? getSpec (type2) : type1;
 
+  /* Conditional operator has some special type conversion rules */
+  if (op == ':')
+    {
+      /* If either type is an array, convert to pointer */
+      if (IS_ARRAY(type1))
+        {
+          value * val = aggregateToPointer (valFromType (type1));
+          type1 = val->type;
+          Safe_free (val);
+          etype1 = getSpec (type1);
+        }
+      if (IS_ARRAY(type2))
+        {
+          value * val = aggregateToPointer (valFromType (type2));
+          type2 = val->type;
+          Safe_free (val);
+          etype2 = getSpec (type2);
+        }
+
+      /* If NULL and another pointer, use the non-NULL pointer type. */
+      /* Note that NULL can be defined as either 0 or (void *)0. */
+      if (IS_LITERAL (etype1) && 
+          ((IS_PTR (type1) && IS_VOID (type1->next)) || IS_INTEGRAL (type1)) &&
+          (floatFromVal (valFromType (etype1)) == 0) &&
+          IS_PTR (type2))
+        return copyLinkChain (type2);
+      else if (IS_LITERAL (etype2) && 
+               ((IS_PTR (type2) && IS_VOID (type2->next)) || IS_INTEGRAL (type2)) &&
+               (floatFromVal (valFromType (etype2)) == 0) &&
+               IS_PTR (type1))
+        return copyLinkChain (type1);
+
+      /* If a void pointer, use the void pointer type */
+      else if (IS_PTR(type1) && IS_VOID(type1->next))
+        return copyLinkChain (type1);
+      else if (IS_PTR(type2) && IS_VOID(type2->next))
+        return copyLinkChain (type2);
+
+      /* Otherwise fall through to the general case */
+    }
+  
+
   /* if one of them is a pointer or array then that prevails */
   if (IS_PTR (type1) || IS_ARRAY (type1))
     rType = copyLinkChain (type1);

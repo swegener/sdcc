@@ -1,3 +1,8 @@
+2011-11-02 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic14/pic14devices.txt: prevent SDCC from assuming
+	  a single data bank by specifying more memmap records (per device)
+
 2011-11-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): allow array/integral type

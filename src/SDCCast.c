@@ -4568,7 +4568,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
     case ':':
       /* if they don't match we have a problem */
-      if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) && (compareType (RTYPE (tree), LTYPE (tree)) == 0))
+
+      if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
+          (compareType (RTYPE (tree), LTYPE (tree)) == 0) &&
+          !(IS_ARRAY(LTYPE (tree)) && IS_INTEGRAL(RTYPE (tree))) &&
+          !(IS_ARRAY(RTYPE (tree)) && IS_INTEGRAL(LTYPE (tree))))
         {
           werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "conditional operator", " ");
           goto errorTreeReturn;

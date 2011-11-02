@@ -1,3 +1,10 @@
+2011-11-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): allow array/integral type
+	  combination in conditional operator (will promote to pointer)
+	* support/regression/tests/condopptr.c: new regression
+	  test to check pointer operand cases in conditional operator
+
 2011-11-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/gen.c (inc_fsr): new code to handle FSR{,0} increments,

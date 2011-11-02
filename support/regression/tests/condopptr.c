@@ -88,10 +88,10 @@ testCondOpPtrTypes1(void)
 
   /* These resolve to type void * and so are compatible with */
   /* the char * parameter */
-  ASSERT (deref2 (cond ? testarray : vp1) == 3);
 #if !defined(SDCC_ds390)
-  ASSERT (deref2 (cond ? ip1 : vp1) == 7);
+  ASSERT (deref2 (cond ? testarray : vp1) == 3);
 #endif
+  ASSERT (deref2 (cond ? ip1 : vp1) == 7);
 }
 
 void
@@ -142,8 +142,8 @@ testCondOpPtrTypes2(void)
 
   /* These resolve to type void * and so are compatible with */
   /* the char * parameter */
-  ASSERT (deref2 (cond ? vp1 : testarray) == 3);
 #if !defined(SDCC_ds390)
-  ASSERT (deref2 (cond ? vp1 : ip1) == 7);
+  ASSERT (deref2 (cond ? vp1 : testarray) == 3);
 #endif
+  ASSERT (deref2 (cond ? vp1 : ip1) == 7);
 }

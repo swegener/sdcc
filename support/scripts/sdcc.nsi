@@ -609,12 +609,17 @@ ${Section} "SDCC library sources" SEC19
   File "${DEV_ROOT}\lib\src\pic14\TEMPLATE.c"
   File "${DEV_ROOT}\lib\src\pic14\TEMPLATE.S"
 
-  SetOutPath "$INSTDIR\lib\src\pic14\libsdcc"
-  File "${DEV_ROOT}\lib\src\pic14\libsdcc\*.c"
-  File "${DEV_ROOT}\lib\src\pic14\libsdcc\*.S"
-  File "${DEV_ROOT}\lib\src\pic14\libsdcc\*.inc"
+  SetOutPath "$INSTDIR\lib\src\pic14\libsdcc\regular"
+  File "${DEV_ROOT}\lib\src\pic14\libsdcc\regular\*.c"
+  File "${DEV_ROOT}\lib\src\pic14\libsdcc\regular\*.S"
+  File "${DEV_ROOT}\lib\src\pic14\libsdcc\regular\*.inc"
 #  File "${DEV_ROOT}\lib\src\pic14\libsdcc\Makefile"
-  
+
+  SetOutPath "$INSTDIR\lib\src\pic14\libsdcc\enhanced"
+  File "${DEV_ROOT}\lib\src\pic14\libsdcc\enhanced\*.S"
+  File "${DEV_ROOT}\lib\src\pic14\libsdcc\enhanced\*.inc"
+#  File "${DEV_ROOT}\lib\src\pic14\libsdcc\Makefile"
+
   SetOutPath "$INSTDIR\non-free\lib\src\pic14\libdev"
   File "${DEV_ROOT}\non-free\lib\src\pic14\libdev\*.c"
 #  File "${DEV_ROOT}\non-free\lib\src\pic14\libdev\Makefile"

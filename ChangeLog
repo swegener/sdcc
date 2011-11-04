@@ -1,5 +1,6 @@
 2011-11-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* sdas/linksrc/lkmain.c (main): fixed bug #3362385
 	* src/ds390/ralloc.c (packRegisters): fixed bug #3432159
 	* support/regression/tests/condopptr.c: enable for all targets
 

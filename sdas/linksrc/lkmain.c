@@ -441,7 +441,7 @@ main(int argc, char *argv[])
 			reloc('E');
 		}
 	}
-	if (TARGET_IS_8051 || TARGET_IS_6808) {
+	if (TARGET_IS_8051) {
 		//JCF:
 		CreateAOMF51();
 	}

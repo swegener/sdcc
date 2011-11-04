@@ -4814,8 +4814,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               reverseParms (tree->right);
             }
 
-          TTYPE (tree) = functype->next;
+          TTYPE (tree) = copyLinkChain(functype->next);
           TETYPE (tree) = getSpec (TTYPE (tree));
+          SPEC_SCLS (TETYPE (tree)) = S_FIXED;
         }
       return tree;
 

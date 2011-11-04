@@ -2674,7 +2674,7 @@ assignResultValue (operand * oper, operand * func)
   bool accuse = FALSE;
   bool pushedA = FALSE;
 
-  if (func && IS_BIT (OP_SYM_ETYPE (func)))
+  if (func && IS_BIT (getSpec (operandType (func))))
     {
       outBitC (oper);
       return FALSE;

@@ -3044,7 +3044,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
       /* if cast to a generic pointer & the pointer being
          cast is remat, then we can remat this cast as well */
-      if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)) && !OP_SYMBOL (IC_RESULT (ic))->isreqv && OP_SYMBOL (IC_RIGHT (ic))->remat)
+      if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)) && !OP_SYMBOL (IC_RESULT (ic))->isreqv && OP_SYMBOL (IC_RIGHT (ic))->remat &&
+          bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
         {
           sym_link *to_type = operandType (IC_LEFT (ic));
           sym_link *from_type = operandType (IC_RIGHT (ic));

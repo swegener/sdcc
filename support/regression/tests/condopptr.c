@@ -52,9 +52,7 @@ testCondOpPtrTypes1(void)
   ip2 = cond ? testarray : ip1;    /* int[], int *  ==> int *  */
   ASSERT (*ip2 == 3);
   ip2 = cond ? ip1 : testarray;    /* int *, int[]  ==> int *  */
-#if !defined(SDCC_ds390)
   ASSERT (*ip2 == 7);
-#endif
 
   ip2 = cond ? testarray : 0;      /* int[], 0      ==> int *  */
   ASSERT (*ip2 == 3);
@@ -78,9 +76,7 @@ testCondOpPtrTypes1(void)
   ASSERT ((int *)cp == ip1);
 
   ASSERT (deref1 (cond ? testarray : ip1) == 3);
-#if !defined(SDCC_ds390)
   ASSERT (deref1 (cond ? ip1 : testarray) == 7);
-#endif
   ASSERT (deref1 (cond ? testarray : 0) == 3);
   ASSERT (deref1 (cond ? ip1 : 0) == 7);
   ASSERT (deref1 (cond ? testarray : (void *)0) == 3);
@@ -88,9 +84,7 @@ testCondOpPtrTypes1(void)
 
   /* These resolve to type void * and so are compatible with */
   /* the char * parameter */
-#if !defined(SDCC_ds390)
   ASSERT (deref2 (cond ? testarray : vp1) == 3);
-#endif
   ASSERT (deref2 (cond ? ip1 : vp1) == 7);
 }
 
@@ -142,8 +136,6 @@ testCondOpPtrTypes2(void)
 
   /* These resolve to type void * and so are compatible with */
   /* the char * parameter */
-#if !defined(SDCC_ds390)
   ASSERT (deref2 (cond ? vp1 : testarray) == 3);
-#endif
   ASSERT (deref2 (cond ? vp1 : ip1) == 7);
 }

@@ -1,5 +1,7 @@
 2011-11-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/mcs51/ralloc.c (isFree),
+	* src/ds390/ralloc.c (isFree): fixed bug #3400845
 	* src/SDCCast.c (decorateTree),
 	* src/mcs51/gen.c (assignResultValue): fixed bug #3419769
 	* sdas/linksrc/lkmain.c (main): fixed bug #3362385

@@ -413,7 +413,8 @@ DEFSETFUNC (isFree)
      this does not have any overlapping live ranges
      with the one currently being assigned and
      the size can be accomodated  */
-  if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type))
+  if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type)
+      && (IS_BIT (sym->type) == IS_BIT (fsym->type)))
     {
       *sloc = sym;
       return 1;

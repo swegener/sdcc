@@ -1,3 +1,9 @@
+2011-11-05 Borut Razem <borut.razem AT gmail.com>
+
+	* src/port.mk: fixed bug #3401455: Missing dependency
+	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
+	  changed sdcc version to 3.0.0
+
 2011-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/cc2430.h: applied patch 3114002, thanks to

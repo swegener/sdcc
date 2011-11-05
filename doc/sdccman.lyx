@@ -2639,8 +2639,8 @@ status collapsed
 \end_inset
 
 -enable-new-pics Enables support for PIC devices that are not supported
- by the current 0.13.7 release of gputils, namely 12f1822, 16f1934, 16f1936,
- and 16f1937 for the PIC14 target and 18f[24][3456]k22 for PIC16.
+ by the current 0.13.7 release of gputils, namely 12f1822, 16f1933, 16f1934,
+ 16f1936, and 16f1937 for the PIC14 target and 18f[24][3456]k22 for PIC16.
  Enabling this probably requires gputils
 \begin_inset Formula $\geq$
 \end_inset
@@ -42312,7 +42312,7 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-16F: 1823, 1934, 1936, 1937
+16F: 1933, 1934, 1936, 1937
 \end_layout
 
 \begin_layout Standard

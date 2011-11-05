@@ -1,3 +1,8 @@
+2011-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/cc2430.h: applied patch 3114002, thanks to
+	  George Oikonomou
+
 2011-11-05 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic14/pic14devices.txt: add descriptions for a number
@@ -322,7 +327,7 @@
 	  specially treat z80 family: z180, r2k and gbz80 targets
 	* support/scripts/sdcc.nsi: added Rabbit 2000 support
 	* sdas/asrab/asrab.vcxproj, sdas/asrab/asrab.vcxproj.filters,
-	  sdcc.sln, src/src.vcxproj, src/src.vcxproj.filters, 
+	  sdcc.sln, src/src.vcxproj, src/src.vcxproj.filters,
 	  src/z80/z80.vcxproj, src/z80/z80.vcxproj.filters:
 	  added sdasrab assembler to the project
 	* debugger/mcs51/simi.c: cygwin doesn't support O_ASYNC
@@ -961,10 +966,10 @@
 	* sdas/linksrc/lkarea.c (find_empty_space, allocate_space): changed warnings
 	* sdas/linksrc/lkdata.c: added pcb & rterr
 	* sdas/linksrc/lkeval.c (eval, expr, term): no signed arithmetic,
-	  (term): accept closing quotes	
+	  (term): accept closing quotes
 	* sdas/linksrc/lklist.c: sync with ASxxxx 5
 	* sdas/linksrc/lkmain.c (link_main): reset a_bytes and hilo to defaults 2,0
-	  fixes bug 3305824	
+	  fixes bug 3305824
 	* sdas/linksrc/lkrloc.c (relr): set default pcb
 
 2011-09-09 Borut Razem <borut.razem AT gmail.com>

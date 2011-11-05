@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -109,6 +109,7 @@ SFR(S1CON,    0x9B); // Interrupt Flags 3
 SFR(T2PEROF0, 0x9C); // Timer 2 Overflow Capture/Compare 0
 SFR(T2PEROF1, 0x9D); // Timer 2 Overflow Capture/Compare 1
 SFR(T2PEROF2, 0x9E); // Timer 2 Overflow Capture/Compare 2
+SFR(FMAP    , 0x9F); // Flash Bank Map
 SFR(P2,       0xA0); // Port 2
    SBIT(P2_0,     0xA0, 0); // Port 2 bit 0
    SBIT(P2_1,     0xA0, 1); // Port 2 bit 1

@@ -41,7 +41,7 @@ $(LIB): $(OBJ)
 
 dep: Makefile.dep
 
-Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(SPECIAL)
+Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(CXXSOURCES) $(SPECIAL)
 	$(MAKEDEP) $(CPPFLAGS) $(filter %.c %.cc,$^) >Makefile.dep
 
 # don't include Makefile.dep for the listed targets:

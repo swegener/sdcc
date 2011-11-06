@@ -1,7 +1,7 @@
 SDCC - free open source, retargettable, optimizing ANSI-C compiler
 ------------------------------------------------------------------
 
-SDCC 3.1.0 release is dedicated to memory of Dennis M. Ritchie,
+SDCC 3.1.0 release is dedicated to the memory of Dennis M. Ritchie,
 father of the C programming language.
 
 Welcome to SDCC, free open source, retargettable, optimizing ANSI C compiler

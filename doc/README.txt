@@ -1,11 +1,12 @@
 SDCC - free open source, retargettable, optimizing ANSI-C compiler
 ------------------------------------------------------------------
-$Id$
 
+SDCC 3.1.0 release is dedicated to memory of Dennis M. Ritchie,
+father of the C programming language.
 
 Welcome to SDCC, free open source, retargettable, optimizing ANSI C compiler
-that supports a growing list of processors including the Intel mcs51
-family, the Zilog z80, the Maxim ds390 and ds400, the Motorola HC08 and the
+that supports a growing list of processors including the Intel 8051,
+Maxim 80DS390, Zilog Z80, Z180, Rabbit 2000, Motorola 68HC08 and the
 PIC16 and PIC18 familiy.
 
 See share/sdcc/doc/INSTALL.txt for the installation instructions for
@@ -75,6 +76,7 @@ Authors and interested persons:
 * Hans-Juergen Dorn    <hans.dorn AT apl-landau.de>
 * Klaus Flittner       <klaus_flittner AT gmx.de>
 * Philipp Klaus Krause <pkk AT spth.de>
+* Leland Morrison      <enigmalee.AT.sourceforget.net>
 
 SDCC includes code from:
 * Alan Baldwin      <baldwin AT shop-pdp.kent.edu>

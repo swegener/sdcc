@@ -2,7 +2,8 @@
 
 	* src/port.mk: fixed bug #3401455: Missing dependency
 	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
-	  changed sdcc version to 3.0.0
+	  changed sdcc version to 3.1.0
+	* doc/README.txt: updated
 
 2011-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
 

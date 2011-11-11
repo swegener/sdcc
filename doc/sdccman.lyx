@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -42308,11 +42308,23 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-12F: 1822
+12F: 1822, 1840
 \end_layout
 
 \begin_layout Standard
-16F: 1933, 1934, 1936, 1937
+16F: 1507
+\end_layout
+
+\begin_layout Standard
+16F: 1823, 1824, 1825, 1826, 1827, 1828, 1829
+\end_layout
+
+\begin_layout Standard
+16F: 1933, 1934, 1936, 1937, 1938, 1939
+\end_layout
+
+\begin_layout Standard
+16LF: 1902, 1903, 1904, 1906, 1907
 \end_layout
 
 \begin_layout Standard
@@ -43329,6 +43341,55 @@ libsdcc.lib
 libm.lib
 \family default
 !
+\end_layout
+
+\begin_layout Subsubsection
+Naming of special function registers
+\end_layout
+
+\begin_layout Standard
+With the 3.1.0 release, structured access to SFR via 
+\family typewriter
+<sfrname>_bits.<bitname>
+\family default
+ is deprecated and replaced by 
+\family typewriter
+<sfrname>bits.<bitname>
+\family default
+.
+ This was done to align the naming conventions with the PIC16 port and competing
+ compiler vendors.
+ You can disable legacy names (those including an underscore) via 
+\family typewriter
+#define NO_LEGACY_NAMES
+\family default
+ prior to the inclusion of the device header.
+\end_layout
+
+\begin_layout Subsubsection
+Accessing bits of special function registers
+\end_layout
+
+\begin_layout Standard
+Individual bits within SFRs can be accessed either using 
+\family typewriter
+<sfrname>bits.<bitname>
+\family default
+ or using a shorthand 
+\family typewriter
+<bitname>
+\family default
+, which is defined in the respective device header for all 
+\family typewriter
+<bitname>
+\family default
+s.
+ In order to avoid polluting the global namespace with the names of all
+ the bits, you can 
+\family typewriter
+#define NO_BIT_DEFINES
+\family default
+ before inclusion of the device header file.
 \end_layout
 
 \begin_layout Subsubsection

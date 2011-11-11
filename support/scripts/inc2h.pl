@@ -509,6 +509,8 @@ EOT
 }
 
 my $structs = "";
+my $defines = {};
+my $legacy_names = ();
 ## create struct declarations
 foreach my $reg (sort keys %bits)
 {
@@ -541,34 +543,67 @@ foreach my $reg (sort keys %bits)
 #	$structs .= "  };\n";
       }
     } # for
-    $structs .= "  };\n";
-    $idx++;
-  } while ($idx < $max);
-  $structs .= "} __${reg}_bits_t;\n";
-  #if(defined $sfrs{$reg}) {
-    $structs .= "extern volatile __${reg}_bits_t __at(${reg}_ADDR) ${reg}_bits;\n\n";
-    $c_head .= "volatile __${reg}_bits_t __at(${reg}_ADDR) ${reg}_bits;\n";
-  #}
-  
-  # emit defines for individual bits
-  $structs .= "#ifndef NO_BIT_DEFINES\n";
+      $structs .= "  };\n";
+      $idx++;
+    } while ($idx < $max);
+    $structs .= "} __${reg}bits_t;\n";
+#if(defined $sfrs{$reg}) {
+    $structs .= "extern volatile __${reg}bits_t __at(${reg}_ADDR) ${reg}bits;\n\n";
+    push @$legacy_names, $reg;
+    $c_head .= "volatile __${reg}bits_t __at(${reg}_ADDR) ${reg}bits;\n";
+#}
+
+# emit defines for individual bits
   for (my $i=0; $i < 8; $i++)
   {
     my @names = @{$bits{$reg}->{oct($i)}};
     foreach my $field (@names) {
-      $structs .= sprintf("#define %-20s ${reg}_bits.$field\n", $field);
+      if (defined $defines->{$field}) {
+          my $d = $defines->{$field};
+          if (0) {
+              print "#define $field ${reg}bits.$field /* $i */ dropped in favour of "
+                  . $d->[2] . "." . $d->[1] . " /* " . $d->[0] . " */\n";
+          } # if
+          push @{$defines->{$field}}, ${reg}."bits";
+      } else {
+          $defines->{$field} = [ $i, $field, ${reg}."bits" ];
+      } # if
     } # foreach
   }
-  $structs .= "#endif /* NO_BIT_DEFINES */\n";
-  $structs .= "\n";
 } # foreach
+
+my $defs = "#ifndef NO_BIT_DEFINES\n";
+my $prev = "";
+for my $d (sort {$a->[2]."/".$a->[0]."/".$a->[1] cmp $b->[2]."/".$b->[0]."/".$b->[1]} values %$defines) {
+    if ($d->[2] ne $prev) {
+        $defs .= "\n";
+        $prev = $d->[2];
+    } # if
+    my $aliases = "";
+    my $len = scalar @$d;
+    if ($len > 3) {
+        $aliases = ", shadows bit in " . join(", ", @$d[3 .. $#$d]);
+    } # if
+    $defs .= sprintf("#define %-20s %-30s /* bit %u%s */\n", $d->[1], $d->[2].".".$d->[1], $d->[0], $aliases);
+} # for
+$defs .= "#endif /* NO_BIT_DEFINES */\n";
+$defs .= "\n";
+
+my $legacy = "#ifndef NO_LEGACY_NAMES\n";
+for my $name (sort @$legacy_names) {
+    $legacy .= sprintf("#define %-20s %s\n", $name."_bits", $name."bits");
+} # for
+$legacy .= "#endif /* NO_LEGACY_NAMES */\n";
+$legacy .= "\n";
 
 open(HEAD, ">$headFile") or die "Could not open $headFile for writing.";
 print HEAD $header
     . $addresses . "\n"
     . $pragmas . "\n\n"
     . $body . "\n"
-    . $structs
+    . $structs . "\n"
+    . $defs
+    . $legacy
     . "#endif\n";
 close(HEAD);
 

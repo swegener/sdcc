@@ -1,3 +1,44 @@
+2011-11-11 Raphael Neider <rneider AT web.de>
+
+	* device/non-free/lib/pic14/libdev/mkall.sh:
+	  simplify device library update process further
+
+	* support/scripts/inc2h.pl:
+	  avoid generating duplicate bit defines;
+	  rename XXX_bits to XXXbits to be compatible with PIC16 and HiTech,
+	  but retain XXX_bits symbols for compatibility (to prevent legacy
+	  names from being visible, #define NO_LEGACY_NAMES before
+	  #include'ing device headers
+
+	* device/include/pic14/pic14devices.txt,
+	* device/non-free/lib/pic14/libdev/devices.txt:
+	  updated device names: 16{f => lf}190x, 1{2 => 6}f1847,
+	  no devices exist with the original names
+
+	* device/non-free/include/pic14/pic12f1840.h,
+	* device/non-free/include/pic14/pic16f1507.h,
+	* device/non-free/include/pic14/pic16f182[34589].h,
+	* device/non-free/include/pic14/pic16f1847.h,
+	* device/non-free/include/pic14/pic16f193[89].h,
+	* device/non-free/include/pic14/pic16lf190[23467].h,
+	* device/non-free/lib/pic14/libdev/Makefile.in,
+	* device/non-free/lib/pic14/libdev/pic12f1840.c,
+	* device/non-free/lib/pic14/libdev/pic16f1507.c,
+	* device/non-free/lib/pic14/libdev/pic16f182[34589].c,
+	* device/non-free/lib/pic14/libdev/pic16f1847.c,
+	* device/non-free/lib/pic14/libdev/pic16f193[89].c,
+	* device/non-free/lib/pic14/libdev/pic16lf190[23467].c:
+	  add device libraries for more enhanced core devices,
+	  no legacy names (XXX_bits) here!
+
+	* device/non-free/include/pic14/pic*.h,
+	* device/non-free/lib/pic14/libdev/pic*.c:
+	  regenerated from new sources using the new inc2h.pl
+
+	* doc/sdccman.lyx: updated list of supported devices,
+	  documented change of naming schemes and the use of
+	  #define NO_BIT_DEFINES and #define NO_LEGACY_NAMES
+
 2011-11-11 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCsystem.c: removed wine bug workaround:

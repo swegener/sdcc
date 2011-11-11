@@ -87,24 +87,24 @@
 
 # enhanced cores
 12f1822
-#12f1840 # not in gputils 0.14.0
-#12f1847 # not in gputils 0.14.0
-#16f1507 # not in gputils 0.14.0
-#16f1823 # not in gputils 0.14.0
-#16f1824 # not in gputils 0.14.0
-#16f1825 # not in gputils 0.14.0
+12f1840
+16f1507
+16f1823
+16f1824
+16f1825
 16f1826
 16f1827
-#16f1828 # not in gputils 0.14.0
-#16f1829 # not in gputils 0.14.0
-#16f1902 # not in gputils 0.14.0
-#16f1903 # not in gputils 0.14.0
-#16f1904 # not in gputils 0.14.0
-#16f1906 # not in gputils 0.14.0
-#16f1907 # not in gputils 0.14.0
+16f1828
+16f1829
+16f1847
+16lf1902 # not in gputils 0.14.1
+16lf1903 # not in gputils 0.14.1
+16lf1904 # not in gputils 0.14.1
+16lf1906 # not in gputils 0.14.1
+16lf1907 # not in gputils 0.14.1
 16f1933
 16f1934
 16f1936
 16f1937
-#16f1938 # not in gputils 0.14.0
-#16f1939 # not in gputils 0.14.0
+16f1938
+16f1939

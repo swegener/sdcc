@@ -1190,7 +1190,7 @@ processor 12f1840
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 12f1847
+processor 16f1847
         program         8K
         data            1024
         eeprom          256
@@ -1203,8 +1203,8 @@ processor 12f1847
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-# PIC16F190x family
-processor 16f1902
+# PIC16LF190x family
+processor 16lf1902
         program         2K
         data            128
         eeprom          0
@@ -1217,7 +1217,7 @@ processor 16f1902
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1903
+processor 16lf1903
         program         4K
         data            256
         eeprom          0
@@ -1230,7 +1230,7 @@ processor 16f1903
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1904
+processor 16lf1904
         program         4K
         data            256
         eeprom          0
@@ -1243,7 +1243,7 @@ processor 16f1904
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1906
+processor 16lf1906
         program         8K
         data            512
         eeprom          0
@@ -1256,7 +1256,7 @@ processor 16f1906
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1907
+processor 16lf1907
         program         8K
         data            512
         eeprom          0

@@ -31,18 +31,46 @@ cp ../pic14ports.txt .
 
 if true; then
     sed -e 's/\s*#.*$//' ../devices.txt | grep -v '^\s*$' | while read PROC; do
-        echo $PROC;
+        echo "### Generating files for $PROC ...";
         $SDCC/support/scripts/inc2h.pl $PROC $GPUTILS;
     done;
 fi;
 
 for i in *.c; do
-    if [ -f "$i" ]; then
-        h="${i%.c}.h";
-        echo "";
-        echo "### $i";
-        diff -up "../$i" "$i";
-        diff -up "$HEADERS/$h" "$h";
+    newc=1;
+    newh=1;
+    differs=0;
+    h="${i%.c}.h";
+    echo "";
+    echo "### Checking $i and $h ...";
+    if [ -f "../$i" ]; then
+        newc=0;
+        if diff -wup "../$i" "$i"; then
+            # identical
+            :
+        else
+            differs=1;
+        fi;
+    fi;
+    if [ -f "$HEADERS/$h" ]; then
+        newh=0;
+        if diff -wup "$HEADERS/$h" "$h"; then
+            # identical
+            :
+        else
+            differs=1;
+        fi;
+    fi;
+    if [ "x$newc$newh" = "x11" ]; then
+        # new device -- copy into place
+        echo "Installing new files ...";
+        mv -f "$i" ..;
+        mv -f "$h" "$HEADERS/$h";
+    elif [ "x$differs" = "x0" ]; then
+        # identical files -- ignore
+        echo "No change -- keeping files ...";
+        rm -f "$i" "$h";
+    else
         ok=no;
         while [ ! xyes = "x$ok" ]; do
             echo "Replace? [y/n]";
@@ -64,10 +92,6 @@ for i in *.c; do
                     ;;
             esac;
         done;
-    else
-        echo "NEW: $i";
-        mv -f "$i" ..;
-        mv -f "$h" "$HEADERS/$h";
     fi;
 done;
 

@@ -485,21 +485,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __ADCON0_bits_t;
-extern volatile __ADCON0_bits_t __at(ADCON0_ADDR) ADCON0_bits;
-
-#ifndef NO_BIT_DEFINES
-#define ADON                 ADCON0_bits.ADON
-#define NOT_DONE             ADCON0_bits.NOT_DONE
-#define GO_DONE              ADCON0_bits.GO_DONE
-#define GO                   ADCON0_bits.GO
-#define CHS0                 ADCON0_bits.CHS0
-#define CHS1                 ADCON0_bits.CHS1
-#define CHS2                 ADCON0_bits.CHS2
-#define VCFG0                ADCON0_bits.VCFG0
-#define VCFG1                ADCON0_bits.VCFG1
-#define ADFM                 ADCON0_bits.ADFM
-#endif /* NO_BIT_DEFINES */
+} __ADCON0bits_t;
+extern volatile __ADCON0bits_t __at(ADCON0_ADDR) ADCON0bits;
 
 // ----- ADCON1 bits --------------------
 typedef union {
@@ -513,14 +500,8 @@ typedef union {
     unsigned char ADCS2:1;
     unsigned char :1;
   };
-} __ADCON1_bits_t;
-extern volatile __ADCON1_bits_t __at(ADCON1_ADDR) ADCON1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define ADCS0                ADCON1_bits.ADCS0
-#define ADCS1                ADCON1_bits.ADCS1
-#define ADCS2                ADCON1_bits.ADCS2
-#endif /* NO_BIT_DEFINES */
+} __ADCON1bits_t;
+extern volatile __ADCON1bits_t __at(ADCON1_ADDR) ADCON1bits;
 
 // ----- ANSEL bits --------------------
 typedef union {
@@ -544,21 +525,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __ANSEL_bits_t;
-extern volatile __ANSEL_bits_t __at(ANSEL_ADDR) ANSEL_bits;
-
-#ifndef NO_BIT_DEFINES
-#define ANS0                 ANSEL_bits.ANS0
-#define AN0                  ANSEL_bits.AN0
-#define ANS1                 ANSEL_bits.ANS1
-#define AN1                  ANSEL_bits.AN1
-#define ANS2                 ANSEL_bits.ANS2
-#define AN2                  ANSEL_bits.AN2
-#define ANS3                 ANSEL_bits.ANS3
-#define AN3                  ANSEL_bits.AN3
-#define ANS4                 ANSEL_bits.ANS4
-#define AN4                  ANSEL_bits.AN4
-#endif /* NO_BIT_DEFINES */
+} __ANSELbits_t;
+extern volatile __ANSELbits_t __at(ANSEL_ADDR) ANSELbits;
 
 // ----- CCP1CON bits --------------------
 typedef union {
@@ -572,17 +540,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __CCP1CON_bits_t;
-extern volatile __CCP1CON_bits_t __at(CCP1CON_ADDR) CCP1CON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define CCP1M0               CCP1CON_bits.CCP1M0
-#define CCP1M1               CCP1CON_bits.CCP1M1
-#define CCP1M2               CCP1CON_bits.CCP1M2
-#define CCP1M3               CCP1CON_bits.CCP1M3
-#define CCP1Y                CCP1CON_bits.CCP1Y
-#define CCP1X                CCP1CON_bits.CCP1X
-#endif /* NO_BIT_DEFINES */
+} __CCP1CONbits_t;
+extern volatile __CCP1CONbits_t __at(CCP1CON_ADDR) CCP1CONbits;
 
 // ----- CMCON0 bits --------------------
 typedef union {
@@ -596,19 +555,8 @@ typedef union {
     unsigned char C1OUT:1;
     unsigned char C2OUT:1;
   };
-} __CMCON0_bits_t;
-extern volatile __CMCON0_bits_t __at(CMCON0_ADDR) CMCON0_bits;
-
-#ifndef NO_BIT_DEFINES
-#define CM0                  CMCON0_bits.CM0
-#define CM1                  CMCON0_bits.CM1
-#define CM2                  CMCON0_bits.CM2
-#define CIS                  CMCON0_bits.CIS
-#define C1INV                CMCON0_bits.C1INV
-#define C2INV                CMCON0_bits.C2INV
-#define C1OUT                CMCON0_bits.C1OUT
-#define C2OUT                CMCON0_bits.C2OUT
-#endif /* NO_BIT_DEFINES */
+} __CMCON0bits_t;
+extern volatile __CMCON0bits_t __at(CMCON0_ADDR) CMCON0bits;
 
 // ----- CMCON1 bits --------------------
 typedef union {
@@ -622,13 +570,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __CMCON1_bits_t;
-extern volatile __CMCON1_bits_t __at(CMCON1_ADDR) CMCON1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define C2SYNC               CMCON1_bits.C2SYNC
-#define T1GSS                CMCON1_bits.T1GSS
-#endif /* NO_BIT_DEFINES */
+} __CMCON1bits_t;
+extern volatile __CMCON1bits_t __at(CMCON1_ADDR) CMCON1bits;
 
 // ----- EEADRH bits --------------------
 typedef union {
@@ -642,16 +585,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __EEADRH_bits_t;
-extern volatile __EEADRH_bits_t __at(EEADRH_ADDR) EEADRH_bits;
-
-#ifndef NO_BIT_DEFINES
-#define EEADRH0              EEADRH_bits.EEADRH0
-#define EEADRH1              EEADRH_bits.EEADRH1
-#define EEADRH2              EEADRH_bits.EEADRH2
-#define EEADRH3              EEADRH_bits.EEADRH3
-#define EEADRH4              EEADRH_bits.EEADRH4
-#endif /* NO_BIT_DEFINES */
+} __EEADRHbits_t;
+extern volatile __EEADRHbits_t __at(EEADRH_ADDR) EEADRHbits;
 
 // ----- EEADRL bits --------------------
 typedef union {
@@ -665,19 +600,8 @@ typedef union {
     unsigned char EEADRL6:1;
     unsigned char EEADRL7:1;
   };
-} __EEADRL_bits_t;
-extern volatile __EEADRL_bits_t __at(EEADRL_ADDR) EEADRL_bits;
-
-#ifndef NO_BIT_DEFINES
-#define EEADRL0              EEADRL_bits.EEADRL0
-#define EEADRL1              EEADRL_bits.EEADRL1
-#define EEADRL2              EEADRL_bits.EEADRL2
-#define EEADRL3              EEADRL_bits.EEADRL3
-#define EEADRL4              EEADRL_bits.EEADRL4
-#define EEADRL5              EEADRL_bits.EEADRL5
-#define EEADRL6              EEADRL_bits.EEADRL6
-#define EEADRL7              EEADRL_bits.EEADRL7
-#endif /* NO_BIT_DEFINES */
+} __EEADRLbits_t;
+extern volatile __EEADRLbits_t __at(EEADRL_ADDR) EEADRLbits;
 
 // ----- EECON1 bits --------------------
 typedef union {
@@ -701,18 +625,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __EECON1_bits_t;
-extern volatile __EECON1_bits_t __at(EECON1_ADDR) EECON1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RD                   EECON1_bits.RD
-#define EERD                 EECON1_bits.EERD
-#define WR                   EECON1_bits.WR
-#define EEWR                 EECON1_bits.EEWR
-#define WREN                 EECON1_bits.WREN
-#define WRERR                EECON1_bits.WRERR
-#define EEPGD                EECON1_bits.EEPGD
-#endif /* NO_BIT_DEFINES */
+} __EECON1bits_t;
+extern volatile __EECON1bits_t __at(EECON1_ADDR) EECON1bits;
 
 // ----- INTCON bits --------------------
 typedef union {
@@ -736,21 +650,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __INTCON_bits_t;
-extern volatile __INTCON_bits_t __at(INTCON_ADDR) INTCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RBIF                 INTCON_bits.RBIF
-#define INTF                 INTCON_bits.INTF
-#define T0IF                 INTCON_bits.T0IF
-#define TMR0IF               INTCON_bits.TMR0IF
-#define RBIE                 INTCON_bits.RBIE
-#define INTE                 INTCON_bits.INTE
-#define T0IE                 INTCON_bits.T0IE
-#define TMR0IE               INTCON_bits.TMR0IE
-#define PEIE                 INTCON_bits.PEIE
-#define GIE                  INTCON_bits.GIE
-#endif /* NO_BIT_DEFINES */
+} __INTCONbits_t;
+extern volatile __INTCONbits_t __at(INTCON_ADDR) INTCONbits;
 
 // ----- IOC bits --------------------
 typedef union {
@@ -764,15 +665,8 @@ typedef union {
     unsigned char IOC6:1;
     unsigned char IOC7:1;
   };
-} __IOC_bits_t;
-extern volatile __IOC_bits_t __at(IOC_ADDR) IOC_bits;
-
-#ifndef NO_BIT_DEFINES
-#define IOC4                 IOC_bits.IOC4
-#define IOC5                 IOC_bits.IOC5
-#define IOC6                 IOC_bits.IOC6
-#define IOC7                 IOC_bits.IOC7
-#endif /* NO_BIT_DEFINES */
+} __IOCbits_t;
+extern volatile __IOCbits_t __at(IOC_ADDR) IOCbits;
 
 // ----- IOCB bits --------------------
 typedef union {
@@ -786,15 +680,8 @@ typedef union {
     unsigned char IOCB6:1;
     unsigned char IOCB7:1;
   };
-} __IOCB_bits_t;
-extern volatile __IOCB_bits_t __at(IOCB_ADDR) IOCB_bits;
-
-#ifndef NO_BIT_DEFINES
-#define IOCB4                IOCB_bits.IOCB4
-#define IOCB5                IOCB_bits.IOCB5
-#define IOCB6                IOCB_bits.IOCB6
-#define IOCB7                IOCB_bits.IOCB7
-#endif /* NO_BIT_DEFINES */
+} __IOCBbits_t;
+extern volatile __IOCBbits_t __at(IOCB_ADDR) IOCBbits;
 
 // ----- LCDCON bits --------------------
 typedef union {
@@ -808,19 +695,8 @@ typedef union {
     unsigned char SLPEN:1;
     unsigned char LCDEN:1;
   };
-} __LCDCON_bits_t;
-extern volatile __LCDCON_bits_t __at(LCDCON_ADDR) LCDCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define LMUX0                LCDCON_bits.LMUX0
-#define LMUX1                LCDCON_bits.LMUX1
-#define CS0                  LCDCON_bits.CS0
-#define CS1                  LCDCON_bits.CS1
-#define VLCDEN               LCDCON_bits.VLCDEN
-#define WERR                 LCDCON_bits.WERR
-#define SLPEN                LCDCON_bits.SLPEN
-#define LCDEN                LCDCON_bits.LCDEN
-#endif /* NO_BIT_DEFINES */
+} __LCDCONbits_t;
+extern volatile __LCDCONbits_t __at(LCDCON_ADDR) LCDCONbits;
 
 // ----- LCDDATA0 bits --------------------
 typedef union {
@@ -844,27 +720,8 @@ typedef union {
     unsigned char S6C0:1;
     unsigned char S7C0:1;
   };
-} __LCDDATA0_bits_t;
-extern volatile __LCDDATA0_bits_t __at(LCDDATA0_ADDR) LCDDATA0_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG0COM0             LCDDATA0_bits.SEG0COM0
-#define S0C0                 LCDDATA0_bits.S0C0
-#define SEG1COM0             LCDDATA0_bits.SEG1COM0
-#define S1C0                 LCDDATA0_bits.S1C0
-#define SEG2COM0             LCDDATA0_bits.SEG2COM0
-#define S2C0                 LCDDATA0_bits.S2C0
-#define SEG3COM0             LCDDATA0_bits.SEG3COM0
-#define S3C0                 LCDDATA0_bits.S3C0
-#define SEG4COM0             LCDDATA0_bits.SEG4COM0
-#define S4C0                 LCDDATA0_bits.S4C0
-#define SEG5COM0             LCDDATA0_bits.SEG5COM0
-#define S5C0                 LCDDATA0_bits.S5C0
-#define SEG6COM0             LCDDATA0_bits.SEG6COM0
-#define S6C0                 LCDDATA0_bits.S6C0
-#define SEG7COM0             LCDDATA0_bits.SEG7COM0
-#define S7C0                 LCDDATA0_bits.S7C0
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA0bits_t;
+extern volatile __LCDDATA0bits_t __at(LCDDATA0_ADDR) LCDDATA0bits;
 
 // ----- LCDDATA1 bits --------------------
 typedef union {
@@ -888,27 +745,8 @@ typedef union {
     unsigned char S14C0:1;
     unsigned char S15C0:1;
   };
-} __LCDDATA1_bits_t;
-extern volatile __LCDDATA1_bits_t __at(LCDDATA1_ADDR) LCDDATA1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG8COM0             LCDDATA1_bits.SEG8COM0
-#define S8C0                 LCDDATA1_bits.S8C0
-#define SEG9COM0             LCDDATA1_bits.SEG9COM0
-#define S9C0                 LCDDATA1_bits.S9C0
-#define SEG10COM0            LCDDATA1_bits.SEG10COM0
-#define S10C0                LCDDATA1_bits.S10C0
-#define SEG11COM0            LCDDATA1_bits.SEG11COM0
-#define S11C0                LCDDATA1_bits.S11C0
-#define SEG12COM0            LCDDATA1_bits.SEG12COM0
-#define S12C0                LCDDATA1_bits.S12C0
-#define SEG13COM0            LCDDATA1_bits.SEG13COM0
-#define S13C0                LCDDATA1_bits.S13C0
-#define SEG14COM0            LCDDATA1_bits.SEG14COM0
-#define S14C0                LCDDATA1_bits.S14C0
-#define SEG15COM0            LCDDATA1_bits.SEG15COM0
-#define S15C0                LCDDATA1_bits.S15C0
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA1bits_t;
+extern volatile __LCDDATA1bits_t __at(LCDDATA1_ADDR) LCDDATA1bits;
 
 // ----- LCDDATA10 bits --------------------
 typedef union {
@@ -932,27 +770,8 @@ typedef union {
     unsigned char S14C3:1;
     unsigned char S15C3:1;
   };
-} __LCDDATA10_bits_t;
-extern volatile __LCDDATA10_bits_t __at(LCDDATA10_ADDR) LCDDATA10_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG8COM3             LCDDATA10_bits.SEG8COM3
-#define S8C3                 LCDDATA10_bits.S8C3
-#define SEG9COM3             LCDDATA10_bits.SEG9COM3
-#define S9C3                 LCDDATA10_bits.S9C3
-#define SEG10COM3            LCDDATA10_bits.SEG10COM3
-#define S10C3                LCDDATA10_bits.S10C3
-#define SEG11COM3            LCDDATA10_bits.SEG11COM3
-#define S11C3                LCDDATA10_bits.S11C3
-#define SEG12COM3            LCDDATA10_bits.SEG12COM3
-#define S12C3                LCDDATA10_bits.S12C3
-#define SEG13COM3            LCDDATA10_bits.SEG13COM3
-#define S13C3                LCDDATA10_bits.S13C3
-#define SEG14COM3            LCDDATA10_bits.SEG14COM3
-#define S14C3                LCDDATA10_bits.S14C3
-#define SEG15COM3            LCDDATA10_bits.SEG15COM3
-#define S15C3                LCDDATA10_bits.S15C3
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA10bits_t;
+extern volatile __LCDDATA10bits_t __at(LCDDATA10_ADDR) LCDDATA10bits;
 
 // ----- LCDDATA3 bits --------------------
 typedef union {
@@ -976,27 +795,8 @@ typedef union {
     unsigned char S6C1:1;
     unsigned char S7C1:1;
   };
-} __LCDDATA3_bits_t;
-extern volatile __LCDDATA3_bits_t __at(LCDDATA3_ADDR) LCDDATA3_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG0COM1             LCDDATA3_bits.SEG0COM1
-#define S0C1                 LCDDATA3_bits.S0C1
-#define SEG1COM1             LCDDATA3_bits.SEG1COM1
-#define S1C1                 LCDDATA3_bits.S1C1
-#define SEG2COM1             LCDDATA3_bits.SEG2COM1
-#define S2C1                 LCDDATA3_bits.S2C1
-#define SEG3COM1             LCDDATA3_bits.SEG3COM1
-#define S3C1                 LCDDATA3_bits.S3C1
-#define SEG4COM1             LCDDATA3_bits.SEG4COM1
-#define S4C1                 LCDDATA3_bits.S4C1
-#define SEG5COM1             LCDDATA3_bits.SEG5COM1
-#define S5C1                 LCDDATA3_bits.S5C1
-#define SEG6COM1             LCDDATA3_bits.SEG6COM1
-#define S6C1                 LCDDATA3_bits.S6C1
-#define SEG7COM1             LCDDATA3_bits.SEG7COM1
-#define S7C1                 LCDDATA3_bits.S7C1
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA3bits_t;
+extern volatile __LCDDATA3bits_t __at(LCDDATA3_ADDR) LCDDATA3bits;
 
 // ----- LCDDATA4 bits --------------------
 typedef union {
@@ -1020,27 +820,8 @@ typedef union {
     unsigned char S14C1:1;
     unsigned char S15C1:1;
   };
-} __LCDDATA4_bits_t;
-extern volatile __LCDDATA4_bits_t __at(LCDDATA4_ADDR) LCDDATA4_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG8COM1             LCDDATA4_bits.SEG8COM1
-#define S8C1                 LCDDATA4_bits.S8C1
-#define SEG9COM1             LCDDATA4_bits.SEG9COM1
-#define S9C1                 LCDDATA4_bits.S9C1
-#define SEG10COM1            LCDDATA4_bits.SEG10COM1
-#define S10C1                LCDDATA4_bits.S10C1
-#define SEG11COM1            LCDDATA4_bits.SEG11COM1
-#define S11C1                LCDDATA4_bits.S11C1
-#define SEG12COM1            LCDDATA4_bits.SEG12COM1
-#define S12C1                LCDDATA4_bits.S12C1
-#define SEG13COM1            LCDDATA4_bits.SEG13COM1
-#define S13C1                LCDDATA4_bits.S13C1
-#define SEG14COM1            LCDDATA4_bits.SEG14COM1
-#define S14C1                LCDDATA4_bits.S14C1
-#define SEG15COM1            LCDDATA4_bits.SEG15COM1
-#define S15C1                LCDDATA4_bits.S15C1
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA4bits_t;
+extern volatile __LCDDATA4bits_t __at(LCDDATA4_ADDR) LCDDATA4bits;
 
 // ----- LCDDATA6 bits --------------------
 typedef union {
@@ -1064,27 +845,8 @@ typedef union {
     unsigned char S6C2:1;
     unsigned char S7C2:1;
   };
-} __LCDDATA6_bits_t;
-extern volatile __LCDDATA6_bits_t __at(LCDDATA6_ADDR) LCDDATA6_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG0COM2             LCDDATA6_bits.SEG0COM2
-#define S0C2                 LCDDATA6_bits.S0C2
-#define SEG1COM2             LCDDATA6_bits.SEG1COM2
-#define S1C2                 LCDDATA6_bits.S1C2
-#define SEG2COM2             LCDDATA6_bits.SEG2COM2
-#define S2C2                 LCDDATA6_bits.S2C2
-#define SEG3COM2             LCDDATA6_bits.SEG3COM2
-#define S3C2                 LCDDATA6_bits.S3C2
-#define SEG4COM2             LCDDATA6_bits.SEG4COM2
-#define S4C2                 LCDDATA6_bits.S4C2
-#define SEG5COM2             LCDDATA6_bits.SEG5COM2
-#define S5C2                 LCDDATA6_bits.S5C2
-#define SEG6COM2             LCDDATA6_bits.SEG6COM2
-#define S6C2                 LCDDATA6_bits.S6C2
-#define SEG7COM2             LCDDATA6_bits.SEG7COM2
-#define S7C2                 LCDDATA6_bits.S7C2
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA6bits_t;
+extern volatile __LCDDATA6bits_t __at(LCDDATA6_ADDR) LCDDATA6bits;
 
 // ----- LCDDATA7 bits --------------------
 typedef union {
@@ -1108,27 +870,8 @@ typedef union {
     unsigned char S14C2:1;
     unsigned char S15C2:1;
   };
-} __LCDDATA7_bits_t;
-extern volatile __LCDDATA7_bits_t __at(LCDDATA7_ADDR) LCDDATA7_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG8COM2             LCDDATA7_bits.SEG8COM2
-#define S8C2                 LCDDATA7_bits.S8C2
-#define SEG9COM2             LCDDATA7_bits.SEG9COM2
-#define S9C2                 LCDDATA7_bits.S9C2
-#define SEG10COM2            LCDDATA7_bits.SEG10COM2
-#define S10C2                LCDDATA7_bits.S10C2
-#define SEG11COM2            LCDDATA7_bits.SEG11COM2
-#define S11C2                LCDDATA7_bits.S11C2
-#define SEG12COM2            LCDDATA7_bits.SEG12COM2
-#define S12C2                LCDDATA7_bits.S12C2
-#define SEG13COM2            LCDDATA7_bits.SEG13COM2
-#define S13C2                LCDDATA7_bits.S13C2
-#define SEG14COM2            LCDDATA7_bits.SEG14COM2
-#define S14C2                LCDDATA7_bits.S14C2
-#define SEG15COM2            LCDDATA7_bits.SEG15COM2
-#define S15C2                LCDDATA7_bits.S15C2
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA7bits_t;
+extern volatile __LCDDATA7bits_t __at(LCDDATA7_ADDR) LCDDATA7bits;
 
 // ----- LCDDATA9 bits --------------------
 typedef union {
@@ -1152,27 +895,8 @@ typedef union {
     unsigned char S6C3:1;
     unsigned char S7C3:1;
   };
-} __LCDDATA9_bits_t;
-extern volatile __LCDDATA9_bits_t __at(LCDDATA9_ADDR) LCDDATA9_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SEG0COM3             LCDDATA9_bits.SEG0COM3
-#define S0C3                 LCDDATA9_bits.S0C3
-#define SEG1COM3             LCDDATA9_bits.SEG1COM3
-#define S1C3                 LCDDATA9_bits.S1C3
-#define SEG2COM3             LCDDATA9_bits.SEG2COM3
-#define S2C3                 LCDDATA9_bits.S2C3
-#define SEG3COM3             LCDDATA9_bits.SEG3COM3
-#define S3C3                 LCDDATA9_bits.S3C3
-#define SEG4COM3             LCDDATA9_bits.SEG4COM3
-#define S4C3                 LCDDATA9_bits.S4C3
-#define SEG5COM3             LCDDATA9_bits.SEG5COM3
-#define S5C3                 LCDDATA9_bits.S5C3
-#define SEG6COM3             LCDDATA9_bits.SEG6COM3
-#define S6C3                 LCDDATA9_bits.S6C3
-#define SEG7COM3             LCDDATA9_bits.SEG7COM3
-#define S7C3                 LCDDATA9_bits.S7C3
-#endif /* NO_BIT_DEFINES */
+} __LCDDATA9bits_t;
+extern volatile __LCDDATA9bits_t __at(LCDDATA9_ADDR) LCDDATA9bits;
 
 // ----- LCDPS bits --------------------
 typedef union {
@@ -1186,19 +910,8 @@ typedef union {
     unsigned char BIASMD:1;
     unsigned char WFT:1;
   };
-} __LCDPS_bits_t;
-extern volatile __LCDPS_bits_t __at(LCDPS_ADDR) LCDPS_bits;
-
-#ifndef NO_BIT_DEFINES
-#define LP0                  LCDPS_bits.LP0
-#define LP1                  LCDPS_bits.LP1
-#define LP2                  LCDPS_bits.LP2
-#define LP3                  LCDPS_bits.LP3
-#define WA                   LCDPS_bits.WA
-#define LCDA                 LCDPS_bits.LCDA
-#define BIASMD               LCDPS_bits.BIASMD
-#define WFT                  LCDPS_bits.WFT
-#endif /* NO_BIT_DEFINES */
+} __LCDPSbits_t;
+extern volatile __LCDPSbits_t __at(LCDPS_ADDR) LCDPSbits;
 
 // ----- LCDSE0 bits --------------------
 typedef union {
@@ -1222,27 +935,8 @@ typedef union {
     unsigned char SEGEN6:1;
     unsigned char SEGEN7:1;
   };
-} __LCDSE0_bits_t;
-extern volatile __LCDSE0_bits_t __at(LCDSE0_ADDR) LCDSE0_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SE0                  LCDSE0_bits.SE0
-#define SEGEN0               LCDSE0_bits.SEGEN0
-#define SE1                  LCDSE0_bits.SE1
-#define SEGEN1               LCDSE0_bits.SEGEN1
-#define SE2                  LCDSE0_bits.SE2
-#define SEGEN2               LCDSE0_bits.SEGEN2
-#define SE3                  LCDSE0_bits.SE3
-#define SEGEN3               LCDSE0_bits.SEGEN3
-#define SE4                  LCDSE0_bits.SE4
-#define SEGEN4               LCDSE0_bits.SEGEN4
-#define SE5                  LCDSE0_bits.SE5
-#define SEGEN5               LCDSE0_bits.SEGEN5
-#define SE6                  LCDSE0_bits.SE6
-#define SEGEN6               LCDSE0_bits.SEGEN6
-#define SE7                  LCDSE0_bits.SE7
-#define SEGEN7               LCDSE0_bits.SEGEN7
-#endif /* NO_BIT_DEFINES */
+} __LCDSE0bits_t;
+extern volatile __LCDSE0bits_t __at(LCDSE0_ADDR) LCDSE0bits;
 
 // ----- LCDSE1 bits --------------------
 typedef union {
@@ -1266,27 +960,8 @@ typedef union {
     unsigned char SEGEN14:1;
     unsigned char SEGEN15:1;
   };
-} __LCDSE1_bits_t;
-extern volatile __LCDSE1_bits_t __at(LCDSE1_ADDR) LCDSE1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SE8                  LCDSE1_bits.SE8
-#define SEGEN8               LCDSE1_bits.SEGEN8
-#define SE9                  LCDSE1_bits.SE9
-#define SEGEN9               LCDSE1_bits.SEGEN9
-#define SE10                 LCDSE1_bits.SE10
-#define SEGEN10              LCDSE1_bits.SEGEN10
-#define SE11                 LCDSE1_bits.SE11
-#define SEGEN11              LCDSE1_bits.SEGEN11
-#define SE12                 LCDSE1_bits.SE12
-#define SEGEN12              LCDSE1_bits.SEGEN12
-#define SE13                 LCDSE1_bits.SE13
-#define SEGEN13              LCDSE1_bits.SEGEN13
-#define SE14                 LCDSE1_bits.SE14
-#define SEGEN14              LCDSE1_bits.SEGEN14
-#define SE15                 LCDSE1_bits.SE15
-#define SEGEN15              LCDSE1_bits.SEGEN15
-#endif /* NO_BIT_DEFINES */
+} __LCDSE1bits_t;
+extern volatile __LCDSE1bits_t __at(LCDSE1_ADDR) LCDSE1bits;
 
 // ----- LVDCON bits --------------------
 typedef union {
@@ -1300,16 +975,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __LVDCON_bits_t;
-extern volatile __LVDCON_bits_t __at(LVDCON_ADDR) LVDCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define LVDL0                LVDCON_bits.LVDL0
-#define LVDL1                LVDCON_bits.LVDL1
-#define LVDL2                LVDCON_bits.LVDL2
-#define LVDEN                LVDCON_bits.LVDEN
-#define IRVST                LVDCON_bits.IRVST
-#endif /* NO_BIT_DEFINES */
+} __LVDCONbits_t;
+extern volatile __LVDCONbits_t __at(LVDCON_ADDR) LVDCONbits;
 
 // ----- OPTION_REG bits --------------------
 typedef union {
@@ -1323,19 +990,8 @@ typedef union {
     unsigned char INTEDG:1;
     unsigned char NOT_RBPU:1;
   };
-} __OPTION_REG_bits_t;
-extern volatile __OPTION_REG_bits_t __at(OPTION_REG_ADDR) OPTION_REG_bits;
-
-#ifndef NO_BIT_DEFINES
-#define PS0                  OPTION_REG_bits.PS0
-#define PS1                  OPTION_REG_bits.PS1
-#define PS2                  OPTION_REG_bits.PS2
-#define PSA                  OPTION_REG_bits.PSA
-#define T0SE                 OPTION_REG_bits.T0SE
-#define T0CS                 OPTION_REG_bits.T0CS
-#define INTEDG               OPTION_REG_bits.INTEDG
-#define NOT_RBPU             OPTION_REG_bits.NOT_RBPU
-#endif /* NO_BIT_DEFINES */
+} __OPTION_REGbits_t;
+extern volatile __OPTION_REGbits_t __at(OPTION_REG_ADDR) OPTION_REGbits;
 
 // ----- OSCCON bits --------------------
 typedef union {
@@ -1349,18 +1005,8 @@ typedef union {
     unsigned char IRCF2:1;
     unsigned char :1;
   };
-} __OSCCON_bits_t;
-extern volatile __OSCCON_bits_t __at(OSCCON_ADDR) OSCCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SCS                  OSCCON_bits.SCS
-#define LTS                  OSCCON_bits.LTS
-#define HTS                  OSCCON_bits.HTS
-#define OSTS                 OSCCON_bits.OSTS
-#define IRCF0                OSCCON_bits.IRCF0
-#define IRCF1                OSCCON_bits.IRCF1
-#define IRCF2                OSCCON_bits.IRCF2
-#endif /* NO_BIT_DEFINES */
+} __OSCCONbits_t;
+extern volatile __OSCCONbits_t __at(OSCCON_ADDR) OSCCONbits;
 
 // ----- OSCTUNE bits --------------------
 typedef union {
@@ -1374,16 +1020,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __OSCTUNE_bits_t;
-extern volatile __OSCTUNE_bits_t __at(OSCTUNE_ADDR) OSCTUNE_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TUN0                 OSCTUNE_bits.TUN0
-#define TUN1                 OSCTUNE_bits.TUN1
-#define TUN2                 OSCTUNE_bits.TUN2
-#define TUN3                 OSCTUNE_bits.TUN3
-#define TUN4                 OSCTUNE_bits.TUN4
-#endif /* NO_BIT_DEFINES */
+} __OSCTUNEbits_t;
+extern volatile __OSCTUNEbits_t __at(OSCTUNE_ADDR) OSCTUNEbits;
 
 // ----- PCON bits --------------------
 typedef union {
@@ -1407,15 +1045,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __PCON_bits_t;
-extern volatile __PCON_bits_t __at(PCON_ADDR) PCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define NOT_BO               PCON_bits.NOT_BO
-#define NOT_BOR              PCON_bits.NOT_BOR
-#define NOT_POR              PCON_bits.NOT_POR
-#define SBOREN               PCON_bits.SBOREN
-#endif /* NO_BIT_DEFINES */
+} __PCONbits_t;
+extern volatile __PCONbits_t __at(PCON_ADDR) PCONbits;
 
 // ----- PIE1 bits --------------------
 typedef union {
@@ -1429,19 +1060,8 @@ typedef union {
     unsigned char ADIE:1;
     unsigned char EEIE:1;
   };
-} __PIE1_bits_t;
-extern volatile __PIE1_bits_t __at(PIE1_ADDR) PIE1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TMR1IE               PIE1_bits.TMR1IE
-#define TMR2IE               PIE1_bits.TMR2IE
-#define CCP1IE               PIE1_bits.CCP1IE
-#define SSPIE                PIE1_bits.SSPIE
-#define TXIE                 PIE1_bits.TXIE
-#define RCIE                 PIE1_bits.RCIE
-#define ADIE                 PIE1_bits.ADIE
-#define EEIE                 PIE1_bits.EEIE
-#endif /* NO_BIT_DEFINES */
+} __PIE1bits_t;
+extern volatile __PIE1bits_t __at(PIE1_ADDR) PIE1bits;
 
 // ----- PIE2 bits --------------------
 typedef union {
@@ -1455,16 +1075,8 @@ typedef union {
     unsigned char C2IE:1;
     unsigned char OSFIE:1;
   };
-} __PIE2_bits_t;
-extern volatile __PIE2_bits_t __at(PIE2_ADDR) PIE2_bits;
-
-#ifndef NO_BIT_DEFINES
-#define LVDIE                PIE2_bits.LVDIE
-#define LCDIE                PIE2_bits.LCDIE
-#define C1IE                 PIE2_bits.C1IE
-#define C2IE                 PIE2_bits.C2IE
-#define OSFIE                PIE2_bits.OSFIE
-#endif /* NO_BIT_DEFINES */
+} __PIE2bits_t;
+extern volatile __PIE2bits_t __at(PIE2_ADDR) PIE2bits;
 
 // ----- PIR1 bits --------------------
 typedef union {
@@ -1478,19 +1090,8 @@ typedef union {
     unsigned char ADIF:1;
     unsigned char EEIF:1;
   };
-} __PIR1_bits_t;
-extern volatile __PIR1_bits_t __at(PIR1_ADDR) PIR1_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TMR1IF               PIR1_bits.TMR1IF
-#define TMR2IF               PIR1_bits.TMR2IF
-#define CCP1IF               PIR1_bits.CCP1IF
-#define SSPIF                PIR1_bits.SSPIF
-#define TXIF                 PIR1_bits.TXIF
-#define RCIF                 PIR1_bits.RCIF
-#define ADIF                 PIR1_bits.ADIF
-#define EEIF                 PIR1_bits.EEIF
-#endif /* NO_BIT_DEFINES */
+} __PIR1bits_t;
+extern volatile __PIR1bits_t __at(PIR1_ADDR) PIR1bits;
 
 // ----- PIR2 bits --------------------
 typedef union {
@@ -1504,16 +1105,8 @@ typedef union {
     unsigned char C2IF:1;
     unsigned char OSFIF:1;
   };
-} __PIR2_bits_t;
-extern volatile __PIR2_bits_t __at(PIR2_ADDR) PIR2_bits;
-
-#ifndef NO_BIT_DEFINES
-#define LVDIF                PIR2_bits.LVDIF
-#define LCDIF                PIR2_bits.LCDIF
-#define C1IF                 PIR2_bits.C1IF
-#define C2IF                 PIR2_bits.C2IF
-#define OSFIF                PIR2_bits.OSFIF
-#endif /* NO_BIT_DEFINES */
+} __PIR2bits_t;
+extern volatile __PIR2bits_t __at(PIR2_ADDR) PIR2bits;
 
 // ----- PORTA bits --------------------
 typedef union {
@@ -1527,17 +1120,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __PORTA_bits_t;
-extern volatile __PORTA_bits_t __at(PORTA_ADDR) PORTA_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RA0                  PORTA_bits.RA0
-#define RA1                  PORTA_bits.RA1
-#define RA2                  PORTA_bits.RA2
-#define RA3                  PORTA_bits.RA3
-#define RA4                  PORTA_bits.RA4
-#define RA5                  PORTA_bits.RA5
-#endif /* NO_BIT_DEFINES */
+} __PORTAbits_t;
+extern volatile __PORTAbits_t __at(PORTA_ADDR) PORTAbits;
 
 // ----- PORTB bits --------------------
 typedef union {
@@ -1551,19 +1135,8 @@ typedef union {
     unsigned char RB6:1;
     unsigned char RB7:1;
   };
-} __PORTB_bits_t;
-extern volatile __PORTB_bits_t __at(PORTB_ADDR) PORTB_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RB0                  PORTB_bits.RB0
-#define RB1                  PORTB_bits.RB1
-#define RB2                  PORTB_bits.RB2
-#define RB3                  PORTB_bits.RB3
-#define RB4                  PORTB_bits.RB4
-#define RB5                  PORTB_bits.RB5
-#define RB6                  PORTB_bits.RB6
-#define RB7                  PORTB_bits.RB7
-#endif /* NO_BIT_DEFINES */
+} __PORTBbits_t;
+extern volatile __PORTBbits_t __at(PORTB_ADDR) PORTBbits;
 
 // ----- PORTC bits --------------------
 typedef union {
@@ -1577,19 +1150,8 @@ typedef union {
     unsigned char RC6:1;
     unsigned char RC7:1;
   };
-} __PORTC_bits_t;
-extern volatile __PORTC_bits_t __at(PORTC_ADDR) PORTC_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RC0                  PORTC_bits.RC0
-#define RC1                  PORTC_bits.RC1
-#define RC2                  PORTC_bits.RC2
-#define RC3                  PORTC_bits.RC3
-#define RC4                  PORTC_bits.RC4
-#define RC5                  PORTC_bits.RC5
-#define RC6                  PORTC_bits.RC6
-#define RC7                  PORTC_bits.RC7
-#endif /* NO_BIT_DEFINES */
+} __PORTCbits_t;
+extern volatile __PORTCbits_t __at(PORTC_ADDR) PORTCbits;
 
 // ----- PORTE bits --------------------
 typedef union {
@@ -1603,14 +1165,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __PORTE_bits_t;
-extern volatile __PORTE_bits_t __at(PORTE_ADDR) PORTE_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RE0                  PORTE_bits.RE0
-#define RE1                  PORTE_bits.RE1
-#define RE2                  PORTE_bits.RE2
-#endif /* NO_BIT_DEFINES */
+} __PORTEbits_t;
+extern volatile __PORTEbits_t __at(PORTE_ADDR) PORTEbits;
 
 // ----- RCSTA bits --------------------
 typedef union {
@@ -1654,23 +1210,8 @@ typedef union {
     unsigned char RC8_9:1;
     unsigned char :1;
   };
-} __RCSTA_bits_t;
-extern volatile __RCSTA_bits_t __at(RCSTA_ADDR) RCSTA_bits;
-
-#ifndef NO_BIT_DEFINES
-#define RX9D                 RCSTA_bits.RX9D
-#define RCD8                 RCSTA_bits.RCD8
-#define OERR                 RCSTA_bits.OERR
-#define FERR                 RCSTA_bits.FERR
-#define ADDEN                RCSTA_bits.ADDEN
-#define CREN                 RCSTA_bits.CREN
-#define SREN                 RCSTA_bits.SREN
-#define RX9                  RCSTA_bits.RX9
-#define RC9                  RCSTA_bits.RC9
-#define NOT_RC8              RCSTA_bits.NOT_RC8
-#define RC8_9                RCSTA_bits.RC8_9
-#define SPEN                 RCSTA_bits.SPEN
-#endif /* NO_BIT_DEFINES */
+} __RCSTAbits_t;
+extern volatile __RCSTAbits_t __at(RCSTA_ADDR) RCSTAbits;
 
 // ----- SSPCON bits --------------------
 typedef union {
@@ -1684,19 +1225,8 @@ typedef union {
     unsigned char SSPOV:1;
     unsigned char WCOL:1;
   };
-} __SSPCON_bits_t;
-extern volatile __SSPCON_bits_t __at(SSPCON_ADDR) SSPCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SSPM0                SSPCON_bits.SSPM0
-#define SSPM1                SSPCON_bits.SSPM1
-#define SSPM2                SSPCON_bits.SSPM2
-#define SSPM3                SSPCON_bits.SSPM3
-#define CKP                  SSPCON_bits.CKP
-#define SSPEN                SSPCON_bits.SSPEN
-#define SSPOV                SSPCON_bits.SSPOV
-#define WCOL                 SSPCON_bits.WCOL
-#endif /* NO_BIT_DEFINES */
+} __SSPCONbits_t;
+extern volatile __SSPCONbits_t __at(SSPCON_ADDR) SSPCONbits;
 
 // ----- SSPSTAT bits --------------------
 typedef union {
@@ -1760,31 +1290,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __SSPSTAT_bits_t;
-extern volatile __SSPSTAT_bits_t __at(SSPSTAT_ADDR) SSPSTAT_bits;
-
-#ifndef NO_BIT_DEFINES
-#define BF                   SSPSTAT_bits.BF
-#define UA                   SSPSTAT_bits.UA
-#define R                    SSPSTAT_bits.R
-#define I2C_READ             SSPSTAT_bits.I2C_READ
-#define NOT_W                SSPSTAT_bits.NOT_W
-#define NOT_WRITE            SSPSTAT_bits.NOT_WRITE
-#define R_W                  SSPSTAT_bits.R_W
-#define READ_WRITE           SSPSTAT_bits.READ_WRITE
-#define S                    SSPSTAT_bits.S
-#define I2C_START            SSPSTAT_bits.I2C_START
-#define P                    SSPSTAT_bits.P
-#define I2C_STOP             SSPSTAT_bits.I2C_STOP
-#define D                    SSPSTAT_bits.D
-#define I2C_DATA             SSPSTAT_bits.I2C_DATA
-#define NOT_A                SSPSTAT_bits.NOT_A
-#define NOT_ADDRESS          SSPSTAT_bits.NOT_ADDRESS
-#define D_A                  SSPSTAT_bits.D_A
-#define DATA_ADDRESS         SSPSTAT_bits.DATA_ADDRESS
-#define CKE                  SSPSTAT_bits.CKE
-#define SMP                  SSPSTAT_bits.SMP
-#endif /* NO_BIT_DEFINES */
+} __SSPSTATbits_t;
+extern volatile __SSPSTATbits_t __at(SSPSTAT_ADDR) SSPSTATbits;
 
 // ----- STATUS bits --------------------
 typedef union {
@@ -1798,19 +1305,8 @@ typedef union {
     unsigned char RP1:1;
     unsigned char IRP:1;
   };
-} __STATUS_bits_t;
-extern volatile __STATUS_bits_t __at(STATUS_ADDR) STATUS_bits;
-
-#ifndef NO_BIT_DEFINES
-#define C                    STATUS_bits.C
-#define DC                   STATUS_bits.DC
-#define Z                    STATUS_bits.Z
-#define NOT_PD               STATUS_bits.NOT_PD
-#define NOT_TO               STATUS_bits.NOT_TO
-#define RP0                  STATUS_bits.RP0
-#define RP1                  STATUS_bits.RP1
-#define IRP                  STATUS_bits.IRP
-#endif /* NO_BIT_DEFINES */
+} __STATUSbits_t;
+extern volatile __STATUSbits_t __at(STATUS_ADDR) STATUSbits;
 
 // ----- T1CON bits --------------------
 typedef union {
@@ -1844,21 +1340,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __T1CON_bits_t;
-extern volatile __T1CON_bits_t __at(T1CON_ADDR) T1CON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TMR1ON               T1CON_bits.TMR1ON
-#define TMR1CS               T1CON_bits.TMR1CS
-#define NOT_T1SYNC           T1CON_bits.NOT_T1SYNC
-#define T1INSYNC             T1CON_bits.T1INSYNC
-#define T1SYNC               T1CON_bits.T1SYNC
-#define T1OSCEN              T1CON_bits.T1OSCEN
-#define T1CKPS0              T1CON_bits.T1CKPS0
-#define T1CKPS1              T1CON_bits.T1CKPS1
-#define T1GE                 T1CON_bits.T1GE
-#define T1GINV               T1CON_bits.T1GINV
-#endif /* NO_BIT_DEFINES */
+} __T1CONbits_t;
+extern volatile __T1CONbits_t __at(T1CON_ADDR) T1CONbits;
 
 // ----- T2CON bits --------------------
 typedef union {
@@ -1872,18 +1355,8 @@ typedef union {
     unsigned char TOUTPS3:1;
     unsigned char :1;
   };
-} __T2CON_bits_t;
-extern volatile __T2CON_bits_t __at(T2CON_ADDR) T2CON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define T2CKPS0              T2CON_bits.T2CKPS0
-#define T2CKPS1              T2CON_bits.T2CKPS1
-#define TMR2ON               T2CON_bits.TMR2ON
-#define TOUTPS0              T2CON_bits.TOUTPS0
-#define TOUTPS1              T2CON_bits.TOUTPS1
-#define TOUTPS2              T2CON_bits.TOUTPS2
-#define TOUTPS3              T2CON_bits.TOUTPS3
-#endif /* NO_BIT_DEFINES */
+} __T2CONbits_t;
+extern volatile __T2CONbits_t __at(T2CON_ADDR) T2CONbits;
 
 // ----- TRISA bits --------------------
 typedef union {
@@ -1897,17 +1370,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __TRISA_bits_t;
-extern volatile __TRISA_bits_t __at(TRISA_ADDR) TRISA_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TRISA0               TRISA_bits.TRISA0
-#define TRISA1               TRISA_bits.TRISA1
-#define TRISA2               TRISA_bits.TRISA2
-#define TRISA3               TRISA_bits.TRISA3
-#define TRISA4               TRISA_bits.TRISA4
-#define TRISA5               TRISA_bits.TRISA5
-#endif /* NO_BIT_DEFINES */
+} __TRISAbits_t;
+extern volatile __TRISAbits_t __at(TRISA_ADDR) TRISAbits;
 
 // ----- TRISB bits --------------------
 typedef union {
@@ -1921,19 +1385,8 @@ typedef union {
     unsigned char TRISB6:1;
     unsigned char TRISB7:1;
   };
-} __TRISB_bits_t;
-extern volatile __TRISB_bits_t __at(TRISB_ADDR) TRISB_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TRISB0               TRISB_bits.TRISB0
-#define TRISB1               TRISB_bits.TRISB1
-#define TRISB2               TRISB_bits.TRISB2
-#define TRISB3               TRISB_bits.TRISB3
-#define TRISB4               TRISB_bits.TRISB4
-#define TRISB5               TRISB_bits.TRISB5
-#define TRISB6               TRISB_bits.TRISB6
-#define TRISB7               TRISB_bits.TRISB7
-#endif /* NO_BIT_DEFINES */
+} __TRISBbits_t;
+extern volatile __TRISBbits_t __at(TRISB_ADDR) TRISBbits;
 
 // ----- TRISC bits --------------------
 typedef union {
@@ -1947,19 +1400,8 @@ typedef union {
     unsigned char TRISC6:1;
     unsigned char TRISC7:1;
   };
-} __TRISC_bits_t;
-extern volatile __TRISC_bits_t __at(TRISC_ADDR) TRISC_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TRISC0               TRISC_bits.TRISC0
-#define TRISC1               TRISC_bits.TRISC1
-#define TRISC2               TRISC_bits.TRISC2
-#define TRISC3               TRISC_bits.TRISC3
-#define TRISC4               TRISC_bits.TRISC4
-#define TRISC5               TRISC_bits.TRISC5
-#define TRISC6               TRISC_bits.TRISC6
-#define TRISC7               TRISC_bits.TRISC7
-#endif /* NO_BIT_DEFINES */
+} __TRISCbits_t;
+extern volatile __TRISCbits_t __at(TRISC_ADDR) TRISCbits;
 
 // ----- TRISE bits --------------------
 typedef union {
@@ -1973,14 +1415,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __TRISE_bits_t;
-extern volatile __TRISE_bits_t __at(TRISE_ADDR) TRISE_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TRISE0               TRISE_bits.TRISE0
-#define TRISE1               TRISE_bits.TRISE1
-#define TRISE2               TRISE_bits.TRISE2
-#endif /* NO_BIT_DEFINES */
+} __TRISEbits_t;
+extern volatile __TRISEbits_t __at(TRISE_ADDR) TRISEbits;
 
 // ----- TXSTA bits --------------------
 typedef union {
@@ -2014,21 +1450,8 @@ typedef union {
     unsigned char TX8_9:1;
     unsigned char :1;
   };
-} __TXSTA_bits_t;
-extern volatile __TXSTA_bits_t __at(TXSTA_ADDR) TXSTA_bits;
-
-#ifndef NO_BIT_DEFINES
-#define TX9D                 TXSTA_bits.TX9D
-#define TXD8                 TXSTA_bits.TXD8
-#define TRMT                 TXSTA_bits.TRMT
-#define BRGH                 TXSTA_bits.BRGH
-#define SYNC                 TXSTA_bits.SYNC
-#define TXEN                 TXSTA_bits.TXEN
-#define TX9                  TXSTA_bits.TX9
-#define NOT_TX8              TXSTA_bits.NOT_TX8
-#define TX8_9                TXSTA_bits.TX8_9
-#define CSRC                 TXSTA_bits.CSRC
-#endif /* NO_BIT_DEFINES */
+} __TXSTAbits_t;
+extern volatile __TXSTAbits_t __at(TXSTA_ADDR) TXSTAbits;
 
 // ----- VRCON bits --------------------
 typedef union {
@@ -2042,17 +1465,8 @@ typedef union {
     unsigned char :1;
     unsigned char VREN:1;
   };
-} __VRCON_bits_t;
-extern volatile __VRCON_bits_t __at(VRCON_ADDR) VRCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define VR0                  VRCON_bits.VR0
-#define VR1                  VRCON_bits.VR1
-#define VR2                  VRCON_bits.VR2
-#define VR3                  VRCON_bits.VR3
-#define VRR                  VRCON_bits.VRR
-#define VREN                 VRCON_bits.VREN
-#endif /* NO_BIT_DEFINES */
+} __VRCONbits_t;
+extern volatile __VRCONbits_t __at(VRCON_ADDR) VRCONbits;
 
 // ----- WDTCON bits --------------------
 typedef union {
@@ -2076,17 +1490,8 @@ typedef union {
     unsigned char :1;
     unsigned char :1;
   };
-} __WDTCON_bits_t;
-extern volatile __WDTCON_bits_t __at(WDTCON_ADDR) WDTCON_bits;
-
-#ifndef NO_BIT_DEFINES
-#define SWDTEN               WDTCON_bits.SWDTEN
-#define SWDTE                WDTCON_bits.SWDTE
-#define WDTPS0               WDTCON_bits.WDTPS0
-#define WDTPS1               WDTCON_bits.WDTPS1
-#define WDTPS2               WDTCON_bits.WDTPS2
-#define WDTPS3               WDTCON_bits.WDTPS3
-#endif /* NO_BIT_DEFINES */
+} __WDTCONbits_t;
+extern volatile __WDTCONbits_t __at(WDTCON_ADDR) WDTCONbits;
 
 // ----- WPU bits --------------------
 typedef union {
@@ -2100,19 +1505,8 @@ typedef union {
     unsigned char WPU6:1;
     unsigned char WPU7:1;
   };
-} __WPU_bits_t;
-extern volatile __WPU_bits_t __at(WPU_ADDR) WPU_bits;
-
-#ifndef NO_BIT_DEFINES
-#define WPU0                 WPU_bits.WPU0
-#define WPU1                 WPU_bits.WPU1
-#define WPU2                 WPU_bits.WPU2
-#define WPU3                 WPU_bits.WPU3
-#define WPU4                 WPU_bits.WPU4
-#define WPU5                 WPU_bits.WPU5
-#define WPU6                 WPU_bits.WPU6
-#define WPU7                 WPU_bits.WPU7
-#endif /* NO_BIT_DEFINES */
+} __WPUbits_t;
+extern volatile __WPUbits_t __at(WPU_ADDR) WPUbits;
 
 // ----- WPUB bits --------------------
 typedef union {
@@ -2126,18 +1520,579 @@ typedef union {
     unsigned char WPUB6:1;
     unsigned char WPUB7:1;
   };
-} __WPUB_bits_t;
-extern volatile __WPUB_bits_t __at(WPUB_ADDR) WPUB_bits;
+} __WPUBbits_t;
+extern volatile __WPUBbits_t __at(WPUB_ADDR) WPUBbits;
+
 
 #ifndef NO_BIT_DEFINES
-#define WPUB0                WPUB_bits.WPUB0
-#define WPUB1                WPUB_bits.WPUB1
-#define WPUB2                WPUB_bits.WPUB2
-#define WPUB3                WPUB_bits.WPUB3
-#define WPUB4                WPUB_bits.WPUB4
-#define WPUB5                WPUB_bits.WPUB5
-#define WPUB6                WPUB_bits.WPUB6
-#define WPUB7                WPUB_bits.WPUB7
+
+#define ADON                 ADCON0bits.ADON                /* bit 0 */
+#define GO                   ADCON0bits.GO                  /* bit 1 */
+#define GO_DONE              ADCON0bits.GO_DONE             /* bit 1 */
+#define NOT_DONE             ADCON0bits.NOT_DONE            /* bit 1 */
+#define CHS0                 ADCON0bits.CHS0                /* bit 2 */
+#define CHS1                 ADCON0bits.CHS1                /* bit 3 */
+#define CHS2                 ADCON0bits.CHS2                /* bit 4 */
+#define VCFG0                ADCON0bits.VCFG0               /* bit 5 */
+#define VCFG1                ADCON0bits.VCFG1               /* bit 6 */
+#define ADFM                 ADCON0bits.ADFM                /* bit 7 */
+
+#define ADCS0                ADCON1bits.ADCS0               /* bit 4 */
+#define ADCS1                ADCON1bits.ADCS1               /* bit 5 */
+#define ADCS2                ADCON1bits.ADCS2               /* bit 6 */
+
+#define AN0                  ANSELbits.AN0                  /* bit 0 */
+#define ANS0                 ANSELbits.ANS0                 /* bit 0 */
+#define AN1                  ANSELbits.AN1                  /* bit 1 */
+#define ANS1                 ANSELbits.ANS1                 /* bit 1 */
+#define AN2                  ANSELbits.AN2                  /* bit 2 */
+#define ANS2                 ANSELbits.ANS2                 /* bit 2 */
+#define AN3                  ANSELbits.AN3                  /* bit 3 */
+#define ANS3                 ANSELbits.ANS3                 /* bit 3 */
+#define AN4                  ANSELbits.AN4                  /* bit 4 */
+#define ANS4                 ANSELbits.ANS4                 /* bit 4 */
+
+#define CCP1M0               CCP1CONbits.CCP1M0             /* bit 0 */
+#define CCP1M1               CCP1CONbits.CCP1M1             /* bit 1 */
+#define CCP1M2               CCP1CONbits.CCP1M2             /* bit 2 */
+#define CCP1M3               CCP1CONbits.CCP1M3             /* bit 3 */
+#define CCP1Y                CCP1CONbits.CCP1Y              /* bit 4 */
+#define CCP1X                CCP1CONbits.CCP1X              /* bit 5 */
+
+#define CM0                  CMCON0bits.CM0                 /* bit 0 */
+#define CM1                  CMCON0bits.CM1                 /* bit 1 */
+#define CM2                  CMCON0bits.CM2                 /* bit 2 */
+#define CIS                  CMCON0bits.CIS                 /* bit 3 */
+#define C1INV                CMCON0bits.C1INV               /* bit 4 */
+#define C2INV                CMCON0bits.C2INV               /* bit 5 */
+#define C1OUT                CMCON0bits.C1OUT               /* bit 6 */
+#define C2OUT                CMCON0bits.C2OUT               /* bit 7 */
+
+#define C2SYNC               CMCON1bits.C2SYNC              /* bit 0 */
+#define T1GSS                CMCON1bits.T1GSS               /* bit 1 */
+
+#define EEADRH0              EEADRHbits.EEADRH0             /* bit 0 */
+#define EEADRH1              EEADRHbits.EEADRH1             /* bit 1 */
+#define EEADRH2              EEADRHbits.EEADRH2             /* bit 2 */
+#define EEADRH3              EEADRHbits.EEADRH3             /* bit 3 */
+#define EEADRH4              EEADRHbits.EEADRH4             /* bit 4 */
+
+#define EEADRL0              EEADRLbits.EEADRL0             /* bit 0 */
+#define EEADRL1              EEADRLbits.EEADRL1             /* bit 1 */
+#define EEADRL2              EEADRLbits.EEADRL2             /* bit 2 */
+#define EEADRL3              EEADRLbits.EEADRL3             /* bit 3 */
+#define EEADRL4              EEADRLbits.EEADRL4             /* bit 4 */
+#define EEADRL5              EEADRLbits.EEADRL5             /* bit 5 */
+#define EEADRL6              EEADRLbits.EEADRL6             /* bit 6 */
+#define EEADRL7              EEADRLbits.EEADRL7             /* bit 7 */
+
+#define EERD                 EECON1bits.EERD                /* bit 0 */
+#define RD                   EECON1bits.RD                  /* bit 0 */
+#define EEWR                 EECON1bits.EEWR                /* bit 1 */
+#define WR                   EECON1bits.WR                  /* bit 1 */
+#define WREN                 EECON1bits.WREN                /* bit 2 */
+#define WRERR                EECON1bits.WRERR               /* bit 3 */
+#define EEPGD                EECON1bits.EEPGD               /* bit 7 */
+
+#define RBIF                 INTCONbits.RBIF                /* bit 0 */
+#define INTF                 INTCONbits.INTF                /* bit 1 */
+#define T0IF                 INTCONbits.T0IF                /* bit 2 */
+#define TMR0IF               INTCONbits.TMR0IF              /* bit 2 */
+#define RBIE                 INTCONbits.RBIE                /* bit 3 */
+#define INTE                 INTCONbits.INTE                /* bit 4 */
+#define T0IE                 INTCONbits.T0IE                /* bit 5 */
+#define TMR0IE               INTCONbits.TMR0IE              /* bit 5 */
+#define PEIE                 INTCONbits.PEIE                /* bit 6 */
+#define GIE                  INTCONbits.GIE                 /* bit 7 */
+
+#define IOCB4                IOCBbits.IOCB4                 /* bit 4 */
+#define IOCB5                IOCBbits.IOCB5                 /* bit 5 */
+#define IOCB6                IOCBbits.IOCB6                 /* bit 6 */
+#define IOCB7                IOCBbits.IOCB7                 /* bit 7 */
+
+#define IOC4                 IOCbits.IOC4                   /* bit 4 */
+#define IOC5                 IOCbits.IOC5                   /* bit 5 */
+#define IOC6                 IOCbits.IOC6                   /* bit 6 */
+#define IOC7                 IOCbits.IOC7                   /* bit 7 */
+
+#define LMUX0                LCDCONbits.LMUX0               /* bit 0 */
+#define LMUX1                LCDCONbits.LMUX1               /* bit 1 */
+#define CS0                  LCDCONbits.CS0                 /* bit 2 */
+#define CS1                  LCDCONbits.CS1                 /* bit 3 */
+#define VLCDEN               LCDCONbits.VLCDEN              /* bit 4 */
+#define WERR                 LCDCONbits.WERR                /* bit 5 */
+#define SLPEN                LCDCONbits.SLPEN               /* bit 6 */
+#define LCDEN                LCDCONbits.LCDEN               /* bit 7 */
+
+#define S0C0                 LCDDATA0bits.S0C0              /* bit 0 */
+#define SEG0COM0             LCDDATA0bits.SEG0COM0          /* bit 0 */
+#define S1C0                 LCDDATA0bits.S1C0              /* bit 1 */
+#define SEG1COM0             LCDDATA0bits.SEG1COM0          /* bit 1 */
+#define S2C0                 LCDDATA0bits.S2C0              /* bit 2 */
+#define SEG2COM0             LCDDATA0bits.SEG2COM0          /* bit 2 */
+#define S3C0                 LCDDATA0bits.S3C0              /* bit 3 */
+#define SEG3COM0             LCDDATA0bits.SEG3COM0          /* bit 3 */
+#define S4C0                 LCDDATA0bits.S4C0              /* bit 4 */
+#define SEG4COM0             LCDDATA0bits.SEG4COM0          /* bit 4 */
+#define S5C0                 LCDDATA0bits.S5C0              /* bit 5 */
+#define SEG5COM0             LCDDATA0bits.SEG5COM0          /* bit 5 */
+#define S6C0                 LCDDATA0bits.S6C0              /* bit 6 */
+#define SEG6COM0             LCDDATA0bits.SEG6COM0          /* bit 6 */
+#define S7C0                 LCDDATA0bits.S7C0              /* bit 7 */
+#define SEG7COM0             LCDDATA0bits.SEG7COM0          /* bit 7 */
+
+#define S8C3                 LCDDATA10bits.S8C3             /* bit 0 */
+#define SEG8COM3             LCDDATA10bits.SEG8COM3         /* bit 0 */
+#define S9C3                 LCDDATA10bits.S9C3             /* bit 1 */
+#define SEG9COM3             LCDDATA10bits.SEG9COM3         /* bit 1 */
+#define S10C3                LCDDATA10bits.S10C3            /* bit 2 */
+#define SEG10COM3            LCDDATA10bits.SEG10COM3        /* bit 2 */
+#define S11C3                LCDDATA10bits.S11C3            /* bit 3 */
+#define SEG11COM3            LCDDATA10bits.SEG11COM3        /* bit 3 */
+#define S12C3                LCDDATA10bits.S12C3            /* bit 4 */
+#define SEG12COM3            LCDDATA10bits.SEG12COM3        /* bit 4 */
+#define S13C3                LCDDATA10bits.S13C3            /* bit 5 */
+#define SEG13COM3            LCDDATA10bits.SEG13COM3        /* bit 5 */
+#define S14C3                LCDDATA10bits.S14C3            /* bit 6 */
+#define SEG14COM3            LCDDATA10bits.SEG14COM3        /* bit 6 */
+#define S15C3                LCDDATA10bits.S15C3            /* bit 7 */
+#define SEG15COM3            LCDDATA10bits.SEG15COM3        /* bit 7 */
+
+#define S8C0                 LCDDATA1bits.S8C0              /* bit 0 */
+#define SEG8COM0             LCDDATA1bits.SEG8COM0          /* bit 0 */
+#define S9C0                 LCDDATA1bits.S9C0              /* bit 1 */
+#define SEG9COM0             LCDDATA1bits.SEG9COM0          /* bit 1 */
+#define S10C0                LCDDATA1bits.S10C0             /* bit 2 */
+#define SEG10COM0            LCDDATA1bits.SEG10COM0         /* bit 2 */
+#define S11C0                LCDDATA1bits.S11C0             /* bit 3 */
+#define SEG11COM0            LCDDATA1bits.SEG11COM0         /* bit 3 */
+#define S12C0                LCDDATA1bits.S12C0             /* bit 4 */
+#define SEG12COM0            LCDDATA1bits.SEG12COM0         /* bit 4 */
+#define S13C0                LCDDATA1bits.S13C0             /* bit 5 */
+#define SEG13COM0            LCDDATA1bits.SEG13COM0         /* bit 5 */
+#define S14C0                LCDDATA1bits.S14C0             /* bit 6 */
+#define SEG14COM0            LCDDATA1bits.SEG14COM0         /* bit 6 */
+#define S15C0                LCDDATA1bits.S15C0             /* bit 7 */
+#define SEG15COM0            LCDDATA1bits.SEG15COM0         /* bit 7 */
+
+#define S0C1                 LCDDATA3bits.S0C1              /* bit 0 */
+#define SEG0COM1             LCDDATA3bits.SEG0COM1          /* bit 0 */
+#define S1C1                 LCDDATA3bits.S1C1              /* bit 1 */
+#define SEG1COM1             LCDDATA3bits.SEG1COM1          /* bit 1 */
+#define S2C1                 LCDDATA3bits.S2C1              /* bit 2 */
+#define SEG2COM1             LCDDATA3bits.SEG2COM1          /* bit 2 */
+#define S3C1                 LCDDATA3bits.S3C1              /* bit 3 */
+#define SEG3COM1             LCDDATA3bits.SEG3COM1          /* bit 3 */
+#define S4C1                 LCDDATA3bits.S4C1              /* bit 4 */
+#define SEG4COM1             LCDDATA3bits.SEG4COM1          /* bit 4 */
+#define S5C1                 LCDDATA3bits.S5C1              /* bit 5 */
+#define SEG5COM1             LCDDATA3bits.SEG5COM1          /* bit 5 */
+#define S6C1                 LCDDATA3bits.S6C1              /* bit 6 */
+#define SEG6COM1             LCDDATA3bits.SEG6COM1          /* bit 6 */
+#define S7C1                 LCDDATA3bits.S7C1              /* bit 7 */
+#define SEG7COM1             LCDDATA3bits.SEG7COM1          /* bit 7 */
+
+#define S8C1                 LCDDATA4bits.S8C1              /* bit 0 */
+#define SEG8COM1             LCDDATA4bits.SEG8COM1          /* bit 0 */
+#define S9C1                 LCDDATA4bits.S9C1              /* bit 1 */
+#define SEG9COM1             LCDDATA4bits.SEG9COM1          /* bit 1 */
+#define S10C1                LCDDATA4bits.S10C1             /* bit 2 */
+#define SEG10COM1            LCDDATA4bits.SEG10COM1         /* bit 2 */
+#define S11C1                LCDDATA4bits.S11C1             /* bit 3 */
+#define SEG11COM1            LCDDATA4bits.SEG11COM1         /* bit 3 */
+#define S12C1                LCDDATA4bits.S12C1             /* bit 4 */
+#define SEG12COM1            LCDDATA4bits.SEG12COM1         /* bit 4 */
+#define S13C1                LCDDATA4bits.S13C1             /* bit 5 */
+#define SEG13COM1            LCDDATA4bits.SEG13COM1         /* bit 5 */
+#define S14C1                LCDDATA4bits.S14C1             /* bit 6 */
+#define SEG14COM1            LCDDATA4bits.SEG14COM1         /* bit 6 */
+#define S15C1                LCDDATA4bits.S15C1             /* bit 7 */
+#define SEG15COM1            LCDDATA4bits.SEG15COM1         /* bit 7 */
+
+#define S0C2                 LCDDATA6bits.S0C2              /* bit 0 */
+#define SEG0COM2             LCDDATA6bits.SEG0COM2          /* bit 0 */
+#define S1C2                 LCDDATA6bits.S1C2              /* bit 1 */
+#define SEG1COM2             LCDDATA6bits.SEG1COM2          /* bit 1 */
+#define S2C2                 LCDDATA6bits.S2C2              /* bit 2 */
+#define SEG2COM2             LCDDATA6bits.SEG2COM2          /* bit 2 */
+#define S3C2                 LCDDATA6bits.S3C2              /* bit 3 */
+#define SEG3COM2             LCDDATA6bits.SEG3COM2          /* bit 3 */
+#define S4C2                 LCDDATA6bits.S4C2              /* bit 4 */
+#define SEG4COM2             LCDDATA6bits.SEG4COM2          /* bit 4 */
+#define S5C2                 LCDDATA6bits.S5C2              /* bit 5 */
+#define SEG5COM2             LCDDATA6bits.SEG5COM2          /* bit 5 */
+#define S6C2                 LCDDATA6bits.S6C2              /* bit 6 */
+#define SEG6COM2             LCDDATA6bits.SEG6COM2          /* bit 6 */
+#define S7C2                 LCDDATA6bits.S7C2              /* bit 7 */
+#define SEG7COM2             LCDDATA6bits.SEG7COM2          /* bit 7 */
+
+#define S8C2                 LCDDATA7bits.S8C2              /* bit 0 */
+#define SEG8COM2             LCDDATA7bits.SEG8COM2          /* bit 0 */
+#define S9C2                 LCDDATA7bits.S9C2              /* bit 1 */
+#define SEG9COM2             LCDDATA7bits.SEG9COM2          /* bit 1 */
+#define S10C2                LCDDATA7bits.S10C2             /* bit 2 */
+#define SEG10COM2            LCDDATA7bits.SEG10COM2         /* bit 2 */
+#define S11C2                LCDDATA7bits.S11C2             /* bit 3 */
+#define SEG11COM2            LCDDATA7bits.SEG11COM2         /* bit 3 */
+#define S12C2                LCDDATA7bits.S12C2             /* bit 4 */
+#define SEG12COM2            LCDDATA7bits.SEG12COM2         /* bit 4 */
+#define S13C2                LCDDATA7bits.S13C2             /* bit 5 */
+#define SEG13COM2            LCDDATA7bits.SEG13COM2         /* bit 5 */
+#define S14C2                LCDDATA7bits.S14C2             /* bit 6 */
+#define SEG14COM2            LCDDATA7bits.SEG14COM2         /* bit 6 */
+#define S15C2                LCDDATA7bits.S15C2             /* bit 7 */
+#define SEG15COM2            LCDDATA7bits.SEG15COM2         /* bit 7 */
+
+#define S0C3                 LCDDATA9bits.S0C3              /* bit 0 */
+#define SEG0COM3             LCDDATA9bits.SEG0COM3          /* bit 0 */
+#define S1C3                 LCDDATA9bits.S1C3              /* bit 1 */
+#define SEG1COM3             LCDDATA9bits.SEG1COM3          /* bit 1 */
+#define S2C3                 LCDDATA9bits.S2C3              /* bit 2 */
+#define SEG2COM3             LCDDATA9bits.SEG2COM3          /* bit 2 */
+#define S3C3                 LCDDATA9bits.S3C3              /* bit 3 */
+#define SEG3COM3             LCDDATA9bits.SEG3COM3          /* bit 3 */
+#define S4C3                 LCDDATA9bits.S4C3              /* bit 4 */
+#define SEG4COM3             LCDDATA9bits.SEG4COM3          /* bit 4 */
+#define S5C3                 LCDDATA9bits.S5C3              /* bit 5 */
+#define SEG5COM3             LCDDATA9bits.SEG5COM3          /* bit 5 */
+#define S6C3                 LCDDATA9bits.S6C3              /* bit 6 */
+#define SEG6COM3             LCDDATA9bits.SEG6COM3          /* bit 6 */
+#define S7C3                 LCDDATA9bits.S7C3              /* bit 7 */
+#define SEG7COM3             LCDDATA9bits.SEG7COM3          /* bit 7 */
+
+#define LP0                  LCDPSbits.LP0                  /* bit 0 */
+#define LP1                  LCDPSbits.LP1                  /* bit 1 */
+#define LP2                  LCDPSbits.LP2                  /* bit 2 */
+#define LP3                  LCDPSbits.LP3                  /* bit 3 */
+#define WA                   LCDPSbits.WA                   /* bit 4 */
+#define LCDA                 LCDPSbits.LCDA                 /* bit 5 */
+#define BIASMD               LCDPSbits.BIASMD               /* bit 6 */
+#define WFT                  LCDPSbits.WFT                  /* bit 7 */
+
+#define SE0                  LCDSE0bits.SE0                 /* bit 0 */
+#define SEGEN0               LCDSE0bits.SEGEN0              /* bit 0 */
+#define SE1                  LCDSE0bits.SE1                 /* bit 1 */
+#define SEGEN1               LCDSE0bits.SEGEN1              /* bit 1 */
+#define SE2                  LCDSE0bits.SE2                 /* bit 2 */
+#define SEGEN2               LCDSE0bits.SEGEN2              /* bit 2 */
+#define SE3                  LCDSE0bits.SE3                 /* bit 3 */
+#define SEGEN3               LCDSE0bits.SEGEN3              /* bit 3 */
+#define SE4                  LCDSE0bits.SE4                 /* bit 4 */
+#define SEGEN4               LCDSE0bits.SEGEN4              /* bit 4 */
+#define SE5                  LCDSE0bits.SE5                 /* bit 5 */
+#define SEGEN5               LCDSE0bits.SEGEN5              /* bit 5 */
+#define SE6                  LCDSE0bits.SE6                 /* bit 6 */
+#define SEGEN6               LCDSE0bits.SEGEN6              /* bit 6 */
+#define SE7                  LCDSE0bits.SE7                 /* bit 7 */
+#define SEGEN7               LCDSE0bits.SEGEN7              /* bit 7 */
+
+#define SE8                  LCDSE1bits.SE8                 /* bit 0 */
+#define SEGEN8               LCDSE1bits.SEGEN8              /* bit 0 */
+#define SE9                  LCDSE1bits.SE9                 /* bit 1 */
+#define SEGEN9               LCDSE1bits.SEGEN9              /* bit 1 */
+#define SE10                 LCDSE1bits.SE10                /* bit 2 */
+#define SEGEN10              LCDSE1bits.SEGEN10             /* bit 2 */
+#define SE11                 LCDSE1bits.SE11                /* bit 3 */
+#define SEGEN11              LCDSE1bits.SEGEN11             /* bit 3 */
+#define SE12                 LCDSE1bits.SE12                /* bit 4 */
+#define SEGEN12              LCDSE1bits.SEGEN12             /* bit 4 */
+#define SE13                 LCDSE1bits.SE13                /* bit 5 */
+#define SEGEN13              LCDSE1bits.SEGEN13             /* bit 5 */
+#define SE14                 LCDSE1bits.SE14                /* bit 6 */
+#define SEGEN14              LCDSE1bits.SEGEN14             /* bit 6 */
+#define SE15                 LCDSE1bits.SE15                /* bit 7 */
+#define SEGEN15              LCDSE1bits.SEGEN15             /* bit 7 */
+
+#define LVDL0                LVDCONbits.LVDL0               /* bit 0 */
+#define LVDL1                LVDCONbits.LVDL1               /* bit 1 */
+#define LVDL2                LVDCONbits.LVDL2               /* bit 2 */
+#define LVDEN                LVDCONbits.LVDEN               /* bit 4 */
+#define IRVST                LVDCONbits.IRVST               /* bit 5 */
+
+#define PS0                  OPTION_REGbits.PS0             /* bit 0 */
+#define PS1                  OPTION_REGbits.PS1             /* bit 1 */
+#define PS2                  OPTION_REGbits.PS2             /* bit 2 */
+#define PSA                  OPTION_REGbits.PSA             /* bit 3 */
+#define T0SE                 OPTION_REGbits.T0SE            /* bit 4 */
+#define T0CS                 OPTION_REGbits.T0CS            /* bit 5 */
+#define INTEDG               OPTION_REGbits.INTEDG          /* bit 6 */
+#define NOT_RBPU             OPTION_REGbits.NOT_RBPU        /* bit 7 */
+
+#define SCS                  OSCCONbits.SCS                 /* bit 0 */
+#define LTS                  OSCCONbits.LTS                 /* bit 1 */
+#define HTS                  OSCCONbits.HTS                 /* bit 2 */
+#define OSTS                 OSCCONbits.OSTS                /* bit 3 */
+#define IRCF0                OSCCONbits.IRCF0               /* bit 4 */
+#define IRCF1                OSCCONbits.IRCF1               /* bit 5 */
+#define IRCF2                OSCCONbits.IRCF2               /* bit 6 */
+
+#define TUN0                 OSCTUNEbits.TUN0               /* bit 0 */
+#define TUN1                 OSCTUNEbits.TUN1               /* bit 1 */
+#define TUN2                 OSCTUNEbits.TUN2               /* bit 2 */
+#define TUN3                 OSCTUNEbits.TUN3               /* bit 3 */
+#define TUN4                 OSCTUNEbits.TUN4               /* bit 4 */
+
+#define NOT_BO               PCONbits.NOT_BO                /* bit 0 */
+#define NOT_BOR              PCONbits.NOT_BOR               /* bit 0 */
+#define NOT_POR              PCONbits.NOT_POR               /* bit 1 */
+#define SBOREN               PCONbits.SBOREN                /* bit 4 */
+
+#define TMR1IE               PIE1bits.TMR1IE                /* bit 0 */
+#define TMR2IE               PIE1bits.TMR2IE                /* bit 1 */
+#define CCP1IE               PIE1bits.CCP1IE                /* bit 2 */
+#define SSPIE                PIE1bits.SSPIE                 /* bit 3 */
+#define TXIE                 PIE1bits.TXIE                  /* bit 4 */
+#define RCIE                 PIE1bits.RCIE                  /* bit 5 */
+#define ADIE                 PIE1bits.ADIE                  /* bit 6 */
+#define EEIE                 PIE1bits.EEIE                  /* bit 7 */
+
+#define LVDIE                PIE2bits.LVDIE                 /* bit 2 */
+#define LCDIE                PIE2bits.LCDIE                 /* bit 4 */
+#define C1IE                 PIE2bits.C1IE                  /* bit 5 */
+#define C2IE                 PIE2bits.C2IE                  /* bit 6 */
+#define OSFIE                PIE2bits.OSFIE                 /* bit 7 */
+
+#define TMR1IF               PIR1bits.TMR1IF                /* bit 0 */
+#define TMR2IF               PIR1bits.TMR2IF                /* bit 1 */
+#define CCP1IF               PIR1bits.CCP1IF                /* bit 2 */
+#define SSPIF                PIR1bits.SSPIF                 /* bit 3 */
+#define TXIF                 PIR1bits.TXIF                  /* bit 4 */
+#define RCIF                 PIR1bits.RCIF                  /* bit 5 */
+#define ADIF                 PIR1bits.ADIF                  /* bit 6 */
+#define EEIF                 PIR1bits.EEIF                  /* bit 7 */
+
+#define LVDIF                PIR2bits.LVDIF                 /* bit 2 */
+#define LCDIF                PIR2bits.LCDIF                 /* bit 4 */
+#define C1IF                 PIR2bits.C1IF                  /* bit 5 */
+#define C2IF                 PIR2bits.C2IF                  /* bit 6 */
+#define OSFIF                PIR2bits.OSFIF                 /* bit 7 */
+
+#define RA0                  PORTAbits.RA0                  /* bit 0 */
+#define RA1                  PORTAbits.RA1                  /* bit 1 */
+#define RA2                  PORTAbits.RA2                  /* bit 2 */
+#define RA3                  PORTAbits.RA3                  /* bit 3 */
+#define RA4                  PORTAbits.RA4                  /* bit 4 */
+#define RA5                  PORTAbits.RA5                  /* bit 5 */
+
+#define RB0                  PORTBbits.RB0                  /* bit 0 */
+#define RB1                  PORTBbits.RB1                  /* bit 1 */
+#define RB2                  PORTBbits.RB2                  /* bit 2 */
+#define RB3                  PORTBbits.RB3                  /* bit 3 */
+#define RB4                  PORTBbits.RB4                  /* bit 4 */
+#define RB5                  PORTBbits.RB5                  /* bit 5 */
+#define RB6                  PORTBbits.RB6                  /* bit 6 */
+#define RB7                  PORTBbits.RB7                  /* bit 7 */
+
+#define RC0                  PORTCbits.RC0                  /* bit 0 */
+#define RC1                  PORTCbits.RC1                  /* bit 1 */
+#define RC2                  PORTCbits.RC2                  /* bit 2 */
+#define RC3                  PORTCbits.RC3                  /* bit 3 */
+#define RC4                  PORTCbits.RC4                  /* bit 4 */
+#define RC5                  PORTCbits.RC5                  /* bit 5 */
+#define RC6                  PORTCbits.RC6                  /* bit 6 */
+#define RC7                  PORTCbits.RC7                  /* bit 7 */
+
+#define RE0                  PORTEbits.RE0                  /* bit 0 */
+#define RE1                  PORTEbits.RE1                  /* bit 1 */
+#define RE2                  PORTEbits.RE2                  /* bit 2 */
+
+#define RCD8                 RCSTAbits.RCD8                 /* bit 0 */
+#define RX9D                 RCSTAbits.RX9D                 /* bit 0 */
+#define OERR                 RCSTAbits.OERR                 /* bit 1 */
+#define FERR                 RCSTAbits.FERR                 /* bit 2 */
+#define ADDEN                RCSTAbits.ADDEN                /* bit 3 */
+#define CREN                 RCSTAbits.CREN                 /* bit 4 */
+#define SREN                 RCSTAbits.SREN                 /* bit 5 */
+#define NOT_RC8              RCSTAbits.NOT_RC8              /* bit 6 */
+#define RC8_9                RCSTAbits.RC8_9                /* bit 6 */
+#define RC9                  RCSTAbits.RC9                  /* bit 6 */
+#define RX9                  RCSTAbits.RX9                  /* bit 6 */
+#define SPEN                 RCSTAbits.SPEN                 /* bit 7 */
+
+#define SSPM0                SSPCONbits.SSPM0               /* bit 0 */
+#define SSPM1                SSPCONbits.SSPM1               /* bit 1 */
+#define SSPM2                SSPCONbits.SSPM2               /* bit 2 */
+#define SSPM3                SSPCONbits.SSPM3               /* bit 3 */
+#define CKP                  SSPCONbits.CKP                 /* bit 4 */
+#define SSPEN                SSPCONbits.SSPEN               /* bit 5 */
+#define SSPOV                SSPCONbits.SSPOV               /* bit 6 */
+#define WCOL                 SSPCONbits.WCOL                /* bit 7 */
+
+#define BF                   SSPSTATbits.BF                 /* bit 0 */
+#define UA                   SSPSTATbits.UA                 /* bit 1 */
+#define I2C_READ             SSPSTATbits.I2C_READ           /* bit 2 */
+#define NOT_W                SSPSTATbits.NOT_W              /* bit 2 */
+#define NOT_WRITE            SSPSTATbits.NOT_WRITE          /* bit 2 */
+#define R                    SSPSTATbits.R                  /* bit 2 */
+#define READ_WRITE           SSPSTATbits.READ_WRITE         /* bit 2 */
+#define R_W                  SSPSTATbits.R_W                /* bit 2 */
+#define I2C_START            SSPSTATbits.I2C_START          /* bit 3 */
+#define S                    SSPSTATbits.S                  /* bit 3 */
+#define I2C_STOP             SSPSTATbits.I2C_STOP           /* bit 4 */
+#define P                    SSPSTATbits.P                  /* bit 4 */
+#define D                    SSPSTATbits.D                  /* bit 5 */
+#define DATA_ADDRESS         SSPSTATbits.DATA_ADDRESS       /* bit 5 */
+#define D_A                  SSPSTATbits.D_A                /* bit 5 */
+#define I2C_DATA             SSPSTATbits.I2C_DATA           /* bit 5 */
+#define NOT_A                SSPSTATbits.NOT_A              /* bit 5 */
+#define NOT_ADDRESS          SSPSTATbits.NOT_ADDRESS        /* bit 5 */
+#define CKE                  SSPSTATbits.CKE                /* bit 6 */
+#define SMP                  SSPSTATbits.SMP                /* bit 7 */
+
+#define C                    STATUSbits.C                   /* bit 0 */
+#define DC                   STATUSbits.DC                  /* bit 1 */
+#define Z                    STATUSbits.Z                   /* bit 2 */
+#define NOT_PD               STATUSbits.NOT_PD              /* bit 3 */
+#define NOT_TO               STATUSbits.NOT_TO              /* bit 4 */
+#define RP0                  STATUSbits.RP0                 /* bit 5 */
+#define RP1                  STATUSbits.RP1                 /* bit 6 */
+#define IRP                  STATUSbits.IRP                 /* bit 7 */
+
+#define TMR1ON               T1CONbits.TMR1ON               /* bit 0 */
+#define TMR1CS               T1CONbits.TMR1CS               /* bit 1 */
+#define NOT_T1SYNC           T1CONbits.NOT_T1SYNC           /* bit 2 */
+#define T1INSYNC             T1CONbits.T1INSYNC             /* bit 2 */
+#define T1SYNC               T1CONbits.T1SYNC               /* bit 2 */
+#define T1OSCEN              T1CONbits.T1OSCEN              /* bit 3 */
+#define T1CKPS0              T1CONbits.T1CKPS0              /* bit 4 */
+#define T1CKPS1              T1CONbits.T1CKPS1              /* bit 5 */
+#define T1GE                 T1CONbits.T1GE                 /* bit 6 */
+#define T1GINV               T1CONbits.T1GINV               /* bit 7 */
+
+#define T2CKPS0              T2CONbits.T2CKPS0              /* bit 0 */
+#define T2CKPS1              T2CONbits.T2CKPS1              /* bit 1 */
+#define TMR2ON               T2CONbits.TMR2ON               /* bit 2 */
+#define TOUTPS0              T2CONbits.TOUTPS0              /* bit 3 */
+#define TOUTPS1              T2CONbits.TOUTPS1              /* bit 4 */
+#define TOUTPS2              T2CONbits.TOUTPS2              /* bit 5 */
+#define TOUTPS3              T2CONbits.TOUTPS3              /* bit 6 */
+
+#define TRISA0               TRISAbits.TRISA0               /* bit 0 */
+#define TRISA1               TRISAbits.TRISA1               /* bit 1 */
+#define TRISA2               TRISAbits.TRISA2               /* bit 2 */
+#define TRISA3               TRISAbits.TRISA3               /* bit 3 */
+#define TRISA4               TRISAbits.TRISA4               /* bit 4 */
+#define TRISA5               TRISAbits.TRISA5               /* bit 5 */
+
+#define TRISB0               TRISBbits.TRISB0               /* bit 0 */
+#define TRISB1               TRISBbits.TRISB1               /* bit 1 */
+#define TRISB2               TRISBbits.TRISB2               /* bit 2 */
+#define TRISB3               TRISBbits.TRISB3               /* bit 3 */
+#define TRISB4               TRISBbits.TRISB4               /* bit 4 */
+#define TRISB5               TRISBbits.TRISB5               /* bit 5 */
+#define TRISB6               TRISBbits.TRISB6               /* bit 6 */
+#define TRISB7               TRISBbits.TRISB7               /* bit 7 */
+
+#define TRISC0               TRISCbits.TRISC0               /* bit 0 */
+#define TRISC1               TRISCbits.TRISC1               /* bit 1 */
+#define TRISC2               TRISCbits.TRISC2               /* bit 2 */
+#define TRISC3               TRISCbits.TRISC3               /* bit 3 */
+#define TRISC4               TRISCbits.TRISC4               /* bit 4 */
+#define TRISC5               TRISCbits.TRISC5               /* bit 5 */
+#define TRISC6               TRISCbits.TRISC6               /* bit 6 */
+#define TRISC7               TRISCbits.TRISC7               /* bit 7 */
+
+#define TRISE0               TRISEbits.TRISE0               /* bit 0 */
+#define TRISE1               TRISEbits.TRISE1               /* bit 1 */
+#define TRISE2               TRISEbits.TRISE2               /* bit 2 */
+
+#define TX9D                 TXSTAbits.TX9D                 /* bit 0 */
+#define TXD8                 TXSTAbits.TXD8                 /* bit 0 */
+#define TRMT                 TXSTAbits.TRMT                 /* bit 1 */
+#define BRGH                 TXSTAbits.BRGH                 /* bit 2 */
+#define SYNC                 TXSTAbits.SYNC                 /* bit 4 */
+#define TXEN                 TXSTAbits.TXEN                 /* bit 5 */
+#define NOT_TX8              TXSTAbits.NOT_TX8              /* bit 6 */
+#define TX8_9                TXSTAbits.TX8_9                /* bit 6 */
+#define TX9                  TXSTAbits.TX9                  /* bit 6 */
+#define CSRC                 TXSTAbits.CSRC                 /* bit 7 */
+
+#define VR0                  VRCONbits.VR0                  /* bit 0 */
+#define VR1                  VRCONbits.VR1                  /* bit 1 */
+#define VR2                  VRCONbits.VR2                  /* bit 2 */
+#define VR3                  VRCONbits.VR3                  /* bit 3 */
+#define VRR                  VRCONbits.VRR                  /* bit 5 */
+#define VREN                 VRCONbits.VREN                 /* bit 7 */
+
+#define SWDTE                WDTCONbits.SWDTE               /* bit 0 */
+#define SWDTEN               WDTCONbits.SWDTEN              /* bit 0 */
+#define WDTPS0               WDTCONbits.WDTPS0              /* bit 1 */
+#define WDTPS1               WDTCONbits.WDTPS1              /* bit 2 */
+#define WDTPS2               WDTCONbits.WDTPS2              /* bit 3 */
+#define WDTPS3               WDTCONbits.WDTPS3              /* bit 4 */
+
+#define WPUB0                WPUBbits.WPUB0                 /* bit 0 */
+#define WPUB1                WPUBbits.WPUB1                 /* bit 1 */
+#define WPUB2                WPUBbits.WPUB2                 /* bit 2 */
+#define WPUB3                WPUBbits.WPUB3                 /* bit 3 */
+#define WPUB4                WPUBbits.WPUB4                 /* bit 4 */
+#define WPUB5                WPUBbits.WPUB5                 /* bit 5 */
+#define WPUB6                WPUBbits.WPUB6                 /* bit 6 */
+#define WPUB7                WPUBbits.WPUB7                 /* bit 7 */
+
+#define WPU0                 WPUbits.WPU0                   /* bit 0 */
+#define WPU1                 WPUbits.WPU1                   /* bit 1 */
+#define WPU2                 WPUbits.WPU2                   /* bit 2 */
+#define WPU3                 WPUbits.WPU3                   /* bit 3 */
+#define WPU4                 WPUbits.WPU4                   /* bit 4 */
+#define WPU5                 WPUbits.WPU5                   /* bit 5 */
+#define WPU6                 WPUbits.WPU6                   /* bit 6 */
+#define WPU7                 WPUbits.WPU7                   /* bit 7 */
 #endif /* NO_BIT_DEFINES */
+
+#ifndef NO_LEGACY_NAMES
+#define ADCON0_bits          ADCON0bits
+#define ADCON1_bits          ADCON1bits
+#define ANSEL_bits           ANSELbits
+#define CCP1CON_bits         CCP1CONbits
+#define CMCON0_bits          CMCON0bits
+#define CMCON1_bits          CMCON1bits
+#define EEADRH_bits          EEADRHbits
+#define EEADRL_bits          EEADRLbits
+#define EECON1_bits          EECON1bits
+#define INTCON_bits          INTCONbits
+#define IOC_bits             IOCbits
+#define IOCB_bits            IOCBbits
+#define LCDCON_bits          LCDCONbits
+#define LCDDATA0_bits        LCDDATA0bits
+#define LCDDATA1_bits        LCDDATA1bits
+#define LCDDATA10_bits       LCDDATA10bits
+#define LCDDATA3_bits        LCDDATA3bits
+#define LCDDATA4_bits        LCDDATA4bits
+#define LCDDATA6_bits        LCDDATA6bits
+#define LCDDATA7_bits        LCDDATA7bits
+#define LCDDATA9_bits        LCDDATA9bits
+#define LCDPS_bits           LCDPSbits
+#define LCDSE0_bits          LCDSE0bits
+#define LCDSE1_bits          LCDSE1bits
+#define LVDCON_bits          LVDCONbits
+#define OPTION_REG_bits      OPTION_REGbits
+#define OSCCON_bits          OSCCONbits
+#define OSCTUNE_bits         OSCTUNEbits
+#define PCON_bits            PCONbits
+#define PIE1_bits            PIE1bits
+#define PIE2_bits            PIE2bits
+#define PIR1_bits            PIR1bits
+#define PIR2_bits            PIR2bits
+#define PORTA_bits           PORTAbits
+#define PORTB_bits           PORTBbits
+#define PORTC_bits           PORTCbits
+#define PORTE_bits           PORTEbits
+#define RCSTA_bits           RCSTAbits
+#define SSPCON_bits          SSPCONbits
+#define SSPSTAT_bits         SSPSTATbits
+#define STATUS_bits          STATUSbits
+#define T1CON_bits           T1CONbits
+#define T2CON_bits           T2CONbits
+#define TRISA_bits           TRISAbits
+#define TRISB_bits           TRISBbits
+#define TRISC_bits           TRISCbits
+#define TRISE_bits           TRISEbits
+#define TXSTA_bits           TXSTAbits
+#define VRCON_bits           VRCONbits
+#define WDTCON_bits          WDTCONbits
+#define WPU_bits             WPUbits
+#define WPUB_bits            WPUBbits
+#endif /* NO_LEGACY_NAMES */
 
 #endif

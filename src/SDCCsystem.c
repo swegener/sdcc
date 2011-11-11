@@ -372,90 +372,11 @@ sdcc_system (const char *cmd)
  */
 
 #ifdef _WIN32
-static HANDLE hProcess = NULL;
-/*
- * use native WIN32 solution due to a bug in wine msvrct.dll popen implementation
- * (see http://bugs.winehq.org/show_bug.cgi?id=25062)
- * and due to incorrect wine msvrct.dll pclose implementation
- * (see http://bugs.winehq.org/show_bug.cgi?id=25063)
- */
-static FILE *
-sdcc_popen_read (const char *cmd)
-{ 
-  HANDLE childIn, childOut;
-  SECURITY_ATTRIBUTES sa;
-  PROCESS_INFORMATION pi;
-  STARTUPINFO si;
-  char *lcmd;
-
-  assert (hProcess == NULL);
-
-  sa.nLength = sizeof (SECURITY_ATTRIBUTES);
-  sa.bInheritHandle = TRUE;
-  sa.lpSecurityDescriptor = NULL;
-
-  if (!CreatePipe (&childIn, &childOut, &sa, 0))
-    {
-      _doserrno = GetLastError ();
-      return NULL;
-    }
-
-  if (!SetHandleInformation (childIn, HANDLE_FLAG_INHERIT, 0))
-    {
-      _doserrno = GetLastError ();
-      return NULL;
-    }
-
-  memset (&si, 0, sizeof (STARTUPINFO));
-  si.cb = sizeof (STARTUPINFO); 
-  si.hStdError = GetStdHandle (STD_ERROR_HANDLE);
-  si.hStdOutput = childOut;
-  si.hStdInput = GetStdHandle (STD_INPUT_HANDLE);
-  si.dwFlags |= STARTF_USESTDHANDLES;
-
-  lcmd = Safe_strdup(cmd);
-  if (!CreateProcess (NULL, lcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
-    {
-      _doserrno = GetLastError ();
-      Safe_free(lcmd);
-      return NULL;
-    }
-  Safe_free(lcmd);
-
-  CloseHandle (childOut);
-  CloseHandle (pi.hThread);
-  hProcess = pi.hProcess;
-
-  return fdopen (_open_osfhandle ((intptr_t)childIn, _O_RDONLY | _O_TEXT), "rt");
-}
-
-/*
- * use native WIN32 solution due to incorrect wine msvrct.dll pclose implementation
- * (see http://bugs.winehq.org/show_bug.cgi?id=25063)
- */
+#define sdcc_popen_read(cmd)  _popen ((cmd), "rt")
 int
 sdcc_pclose (FILE *fp)
 {
-  int ret = -1;
-
-  if (fp != NULL)
-    {
-      DWORD exitStatus;
-
-      assert (hProcess != NULL);
-
-      if ((WaitForSingleObject (hProcess, (DWORD)(-1L)) == 0) &&
-        GetExitCodeProcess (hProcess, &exitStatus))
-        ret = exitStatus;
-
-      CloseHandle (hProcess);
-
-      fclose (fp);
-
-      hProcess = NULL;
-    }
-
-    return ret;
+  return _pclose (fp);
 }
 #else
 #define sdcc_popen_read(cmd)  popen ((cmd), "r")

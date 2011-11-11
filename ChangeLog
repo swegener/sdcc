@@ -1,3 +1,8 @@
+2011-11-11 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCsystem.c: removed wine bug workaround:
+	  wine bug #25062 was fixed in wine 1.3.8
+
 2011-11-05 Borut Razem <borut.razem AT gmail.com>
 
 	* src/port.mk: fixed bug #3401455: Missing dependency

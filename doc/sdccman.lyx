@@ -1,4 +1,4 @@
-#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -2006,7 +2006,7 @@ reference "sub:Using-ar-to"
 
 \begin_layout Itemize
 special sdcc keywords which are not preceded by a double underscore are
- deprecated in version 3.0 and higher.
+ deprecated in version 3.0.0 and higher.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2018,18 +2018,18 @@ reference "sub:ANSI-Compliance"
 \end_layout
 
 \begin_layout Itemize
-targets for xa51 and avr are disabled by default in version 3.0 and higher.
+targets for xa51 and avr are disabled by default in version 3.0.0 and higher.
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.0 and higher sdldgb and sdldz80 don't support generation
+in sdcc version 3.0.0 and higher sdldgb and sdldz80 don't support generation
  of GameBoy binary image format.
  The makebin utility can be used to convert Intel Hex format to GameBoy
  binary image format.
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.0 and higher sdldgb and sdldz80 don't support generation
+in sdcc version 3.0.0 and higher sdldgb and sdldz80 don't support generation
  of rrgb (GameBoy simulator) map file and no$gmb symbol file formats.
  The as2gbmap utility can be used to convert sdld map format to rrgb and
  no$gmb file formats.
@@ -2037,6 +2037,27 @@ in sdcc version 3.0 and higher sdldgb and sdldz80 don't support generation
 
 \begin_layout Itemize
 asranlib utility was renamed to sdranlib in sdcc version 3.1.0.
+\end_layout
+
+\begin_layout Itemize
+in sdcc version 3.1.0 pic 14 traget, structured access to SFR via 
+\family typewriter
+<sfrname>_bits.<bitname>
+\family default
+ is deprecated and replaced by 
+\family typewriter
+<sfrname>bits.<bitname>
+\family default
+.
+ It will be obsoleted (removed) in one of next sdcc releases.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Naming-of-special"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -43345,6 +43366,13 @@ libm.lib
 
 \begin_layout Subsubsection
 Naming of special function registers
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Naming-of-special"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

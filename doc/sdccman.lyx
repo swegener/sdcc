@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -6218,6 +6218,10 @@ make
 \end_layout
 
 \begin_layout Itemize
+libboost-dev
+\end_layout
+
+\begin_layout Itemize
 rxvt ; a nice console, which makes life much easier under windoze (see below)
 \end_layout
 
@@ -6404,6 +6408,27 @@ bin_vc to sdcc
 \backslash
 bin before running SDCC.
  
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Apart from the SDCC sources you also need to have the BOOST libraries installed
+ for MSVC.
+ Get it here 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.boost.org/
+\end_layout
+
+\end_inset
+
+
 \begin_inset Newline newline
 \end_inset
 
@@ -12944,7 +12969,7 @@ status collapsed
 \series bold
 -
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -14442,6 +14467,186 @@ status collapsed
 
 \end_inset
 
+-peep-return
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-return
+\end_layout
+
+\end_inset
+
+
+\series default
+ Let the peep hole optimizer do return optimizations.
+ This is the default without 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series default
+debug
+\series bold
+
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-debug
+\end_layout
+
+\end_inset
+
+
+\series default
+.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep-return
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep-return
+\end_layout
+
+\end_inset
+
+
+\series default
+ Do not let the peep hole optimizer do return optimizations.
+ This is the default with 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series default
+debug
+\series bold
+
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-debug
+\end_layout
+
+\end_inset
+
+
+\series default
+.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
 -opt-code-speed
 \begin_inset Index
 status collapsed
@@ -14515,6 +14720,51 @@ status collapsed
 \series default
  The compiler will optimize code generation towards compact code, possibly
  at the expense of code speed.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+fomit-frame-pointer
+\series default
+
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fomit-frame-pointer
+\end_layout
+
+\end_inset
+
+ Frame pointer will be omitted when the function uses no local variables.
 \end_layout
 
 \begin_layout Standard
@@ -14908,7 +15158,7 @@ reference "sec:Parameters-and-Local-Variables"
 \series bold
 
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -14925,7 +15175,7 @@ status open
 \series bold
 
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -15202,7 +15452,8 @@ When this option is used the compiler will generate debug information.
  The debug information collected in a file with .cdb extension can be used
  with the SDCDB.
  For more information see documentation for SDCDB.
- Another file with no extension contains debug information in AOMF or AOMF51
+ Another file with a .omf extension contains debug information in AOMF or
+ AOMF51
 \begin_inset Index
 status collapsed
 
@@ -30657,7 +30908,7 @@ t_b_end$:
 \begin_inset space ~
 \end_inset
 
-_endasm
+__endasm
 \begin_inset Index
 status collapsed
 
@@ -30905,9 +31156,229 @@ push/pop
 \end_layout
 
 \begin_layout Standard
-It is recommended that each assembly instruction (including labels) be placed
- in a separate line (as the example shows).
- When the -
+It is required that each assembly instruction be placed on a separate line.
+ This is also recommended for labels (as the example shows).
+ This is especially important to note when the inline assembler is placed
+ in a C preprocessor macro as the preprocessor will normally put all replacing
+ code on a single line.
+ Only when the macro has each assembly instruction on a single line that
+ ends with a line continuation character will it be placed as separate lines
+ in the resulting .asm file.
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+#define
+\begin_inset space ~
+\end_inset
+
+DELAY
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+__asm
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+nop
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+nop
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+__endasm
+\end_layout
+
+\begin_layout Standard
+When the -
 \begin_inset ERT
 status collapsed
 
@@ -30963,7 +31434,7 @@ Peephole optimizer
  cause some unexpected changes in the inline assembler code.
  Please go through the peephole optimizer rules defined in file 
 \emph on
-SDCCpeeph.def
+peeph.def
 \emph default
  before using this option.
 \end_layout
@@ -34375,7 +34846,7 @@ Small-C calling convention
 \begin_layout Standard
 Functions declared as __smallc are called using the Small-C calling convention.
  This way assembler routines orginally written for Small-C or code genrated
- by Small-C canbe called from sdcc.
+ by Small-C can be called from sdcc.
  Currently variable arguments are not supported and neither are function
  definitions using __smallc (as would be useful for calling sdcc-generated
  functions from Small-C.
@@ -43712,46 +44183,6 @@ status collapsed
 \end_inset
 
 -all-callee-saves
-\end_layout
-
-\begin_layout Description
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fomit-frame-pointer
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-PIC16!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fommit-frame-pointer
-\end_layout
-
-\end_inset
-
- Frame pointer will be omitted when the function uses no local variables.
 \end_layout
 
 \begin_layout Description
@@ -66259,7 +66690,7 @@ with
 
 \begin_layout Standard
 A conditional function can be attached to a rule.
- Attaching rules are somewhat more involved, let me illustrate this with
+ Attaching rules are somewhat more involved, let's illustrate this with
  an example.
 \end_layout
 
@@ -66329,8 +66760,8 @@ labelInRange
 \emph default
 .
  If it finds a corresponding entry the function is called.
- Note there can be no parameters specified for these functions, in this
- case the use of 
+ Note there can be no parameters specified for some of these functions,
+ in this case the use of 
 \emph on
 %5
 \emph default
@@ -66344,22 +66775,31 @@ g the variable bindings is passed as a parameter).
  labelInRange and the calling mechanism in source file SDCCpeeph.c.
  Currently implemented are 
 \emph on
-labelInRange, labelRefCount, labelIsReturnOnly, operandsNotSame, xramMovcOption,
- 24bitMode, portIsDS390, 24bitModeAndPortDS390
+labelInRange, labelRefCount, labelRefCountChange, labelIsReturnOnly, xramMovcOpt
+ion, portIsDS390, 24bitMode, notVolatile
+\emph default
+.
+ 
+\emph on
+notUsed, notSame, operandsNotRelated, labelJTInRange, canAssign, optimizeReturn,
+ notUsedFrom, labelIsReturnOnly, operandsLiteral, labelIsUncondJump, deadMove,
+ useAcallAjmp
 \emph default
  and 
 \emph on
-notVolatile
-\emph default
-.
+okToRemoveSLOC.
 \end_layout
 
 \begin_layout Standard
-I know this whole thing is a little kludgey, but maybe some day we will
- have some better means.
- If you are looking at this file, you will see the default rules that are
- compiled into the compiler, you can add your own rules in the default set
- there if you get tired of specifying the -
+This whole thing is a little kludgy, but maybe some day SDCC will have some
+ better means.
+ If you are looking at the 
+\family typewriter
+peeph*.def
+\family default
+ files, you will see the default rules that are compiled into the compiler,
+ you can add your own rules in the default set there if you get tired of
+ specifying the -
 \begin_inset ERT
 status collapsed
 

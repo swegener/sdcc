@@ -1,4 +1,4 @@
-#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -42804,7 +42804,7 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-16F: 1507
+16F: 1455, 1458, 1459, 1507, 1782, 1783
 \end_layout
 
 \begin_layout Standard
@@ -43836,36 +43836,6 @@ libm.lib
 \end_layout
 
 \begin_layout Subsubsection
-Naming of special function registers
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Naming-of-special"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-With the 3.1.0 release, structured access to SFR via 
-\family typewriter
-<sfrname>_bits.<bitname>
-\family default
- is deprecated and replaced by 
-\family typewriter
-<sfrname>bits.<bitname>
-\family default
-.
- This was done to align the naming conventions with the PIC16 port and competing
- compiler vendors.
- You can disable legacy names (those including an underscore) via 
-\family typewriter
-#define NO_LEGACY_NAMES
-\family default
- prior to the inclusion of the device header.
-\end_layout
-
-\begin_layout Subsubsection
 Accessing bits of special function registers
 \end_layout
 
@@ -43889,6 +43859,72 @@ s.
 #define NO_BIT_DEFINES
 \family default
  before inclusion of the device header file.
+\end_layout
+
+\begin_layout Subsubsection
+Naming of special function registers
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Naming-of-special"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\family typewriter
+NO_BIT_DEFINES
+\family default
+ is used, individual bits of the SFRs can be accessed as 
+\family typewriter
+<sfrname>bits.<bitname>
+\family default
+.
+ With the 3.1.0 release, the previously used 
+\family typewriter
+<sfrname>_bits.<bitname>
+\family default
+ (note the underscore) is deprecated.
+ This was done to align the naming conventions with the PIC16 port and competing
+ compiler vendors.
+ To avoid polluting the global namespace with the legacy names, you can
+ prevent their definition using 
+\family typewriter
+#define NO_LEGACY_NAMES
+\family default
+ prior to the inclusion of the device header.
+\end_layout
+
+\begin_layout Standard
+You 
+\family typewriter
+\series bold
+must
+\family default
+\series default
+ also 
+\family typewriter
+#define NO_BIT_DEFINES
+\family default
+ in order to access SFRs as 
+\family typewriter
+<sfrname>bits.<bitname>
+\family default
+, otherwise 
+\family typewriter
+<bitname>
+\family default
+ will expand to 
+\family typewriter
+<sfrname>bits.<bitname>
+\family default
+, yielding the undefined expression 
+\family typewriter
+<sfrname>bits.<sfrname>bits.<bitname>
+\family default
+.
 \end_layout
 
 \begin_layout Subsubsection

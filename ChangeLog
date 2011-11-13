@@ -1,3 +1,21 @@
+2011-11-14 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic14/pic14devices.txt,
+	* device/non-free/include/pic14/pic16f145[589].h,
+	* device/non-free/include/pic14/pic16f178[23].h,
+	* device/non-free/lib/pic14/libdev/Makefile.in,
+	* device/non-free/lib/pic14/libdev/devices.txt,
+	* device/non-free/lib/pic14/libdev/pic16f145[589].c,
+	* device/non-free/lib/pic14/libdev/pic16f178[23].c:
+	  add support for 16f145[589] and 16f178[23] devices
+
+	* device/non-free/include/pic14/pic12f683.h,
+	* device/non-free/lib/pic14/libdev/pic12f683.c:
+	  updated from new sources
+
+	* doc/sdccman.lyx:
+	  update device list, clarify use of NO_LEGACY_NAMES
+
 2011-11-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: added the boost dependency,

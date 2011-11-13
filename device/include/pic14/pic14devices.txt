@@ -1058,12 +1058,78 @@ processor 12f683
 #
 # Enhanced instruction set 14-bit devices
 #
+
+processor 16f1455, 16lf1455
+        program         0
+        data            0
+        eeprom          0
+        io              0
+        enhanced        1
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1458, 16lf1458
+        program         0
+        data            0
+        eeprom          0
+        io              0
+        enhanced        1
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1459, 16lf1459
+        program         0
+        data            0
+        eeprom          0
+        io              0
+        enhanced        1
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
 processor 16f1507
         program         2K
         data            128
         eeprom          0
         enhanced        1
         io              18
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1782, 16lf1782
+        program         2K
+        data            256
+        eeprom          256
+        enhanced        1
+        io              25
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1783, 16lf1783
+        program         4K
+        data            512
+        eeprom          256
+        enhanced        1
+        io              25
         maxram          0x07f
         bankmsk         0xf80
         config          0x8007 0x8008

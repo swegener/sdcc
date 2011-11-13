@@ -15,7 +15,12 @@ CPPFLAGS = -I$(srcdir)/../../../../include/pic14 -I$(srcdir)/../../../../non-fre
 NEW_PICS_yes = \
     pic12f1822.c \
     pic12f1840.c \
+    pic16f1455.c \
+    pic16f1458.c \
+    pic16f1459.c \
     pic16f1507.c \
+    pic16f1782.c \
+    pic16f1783.c \
     pic16f1823.c \
     pic16f1824.c \
     pic16f1825.c \

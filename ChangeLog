@@ -1,3 +1,8 @@
+2011-11-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #3440327.
+
 2011-11-14 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic14/pic14devices.txt,

@@ -368,6 +368,10 @@ z80_init_asmops(void)
 extern bool regalloc_dry_run;
 unsigned char regalloc_dry_run_cost; 
 
+/* WARNING: This function is dangerous to use. It works literally:
+   It will return true if ic the the last use of op, even if ic might
+   be executed again, e.g. due to a loop. Most of the time you will want
+   to use isPairDead(), or ic->rSurv instead of this function. */
 static bool
 isLastUse (const iCode *ic, operand *op)
 {
@@ -8268,7 +8272,7 @@ genPointerGet (const iCode *ic)
             }
         }
       /* Fixup HL back down */
-      if (getPairId (AOP (left)) == pair && !isLastUse (ic, left))
+      if (getPairId (AOP (left)) == pair && !isPairDead (pair, ic))
         for (size = AOP_SIZE (result)-1; size; size--)
           {
             emit2 ("dec %s", _pairs[pair].name);

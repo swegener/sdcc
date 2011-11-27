@@ -1,3 +1,9 @@
+2011-11-27 Borut Razem <borut.razem AT gmail.com>
+
+	* Small Device C Compiler 3.1.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.1.1
+	* support/scripts/gen_known_bugs.pl: adopted to the new SF bug tracker
+
 2011-11-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

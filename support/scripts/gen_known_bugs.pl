@@ -1,6 +1,6 @@
 # gen_known_bugs.pl - generate knownbugs.html
 #
-# Copyright (c) 2007 - 2008 Borut Razem
+# Copyright (c) 2007 - 2011 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -30,8 +30,16 @@ use LWP::Simple;
 use HTML::TreeBuilder;
 
 
-my @headerList = ('Request ID', 'Summary', 'Open Date', 'Priority', 'Status', 'Assigned To', 'Submitted By');
+# trim function to remove whitespace from the start and end of the string
+sub trim($)
+{
+  my $string = shift;
+  $string =~ s/^\s+//;
+  $string =~ s/\s+$//;
+  return $string;
+}
 
+my @headerList = ('ID', 'Summary', 'Status', 'Opened', 'Assignee', 'Submitter', 'Resolution', 'Priority');
 
 # check if the line is a correct header
 sub is_header($)
@@ -39,17 +47,23 @@ sub is_header($)
   my ($line) = @_;
   
   if (ref($line)) {
-    my $i = 0;
-    foreach ($line->look_down('_tag', 'td')) {
-      if ($_->as_text() ne $headerList[$i++]) {
+    my @headers = $line->look_down('_tag', 'th');
+    foreach my $header (@headerList) {
+      my $found = 0;
+      foreach (@headers) {
+        my $content = trim($_->as_text());
+        if ($content eq $header) {
+          $found = 1;
+          last;
+        }
+      }
+      if (!$found) {
         return 0;
       }
     }
     return 1;
   }
-  else {
-    return 0;
-  }
+  return 0;
 }
 
 
@@ -118,11 +132,12 @@ sub process_page($)
   # find table with the required header
   my $lines = 0;
   foreach my $table ($tree->look_down('_tag', 'table')) {
-    my @lines = $table->content_list();
-    if (is_header($lines[0])) {
-      shift(@lines);  #remove the header
+    my $thead = $table->look_down('_tag', 'thead');
+    if (is_header($thead)) {
+      my $tbody = $table->look_down('_tag', 'tbody');
+      my @lines = $tbody->content_list();
 
-      # process the following lines in table
+      # process the lines in table
       # if they have required number of fields
       foreach my $line (@lines) {
         if (ref($line) && has_all_fields($line)) {
@@ -207,12 +222,15 @@ EOF
 
 # main procedure
 {
-  my $url = "http://sourceforge.net/tracker/index.php?func=browse&group_id=599&atid=100599&set=custom&_assigned_to=0&_status=1&_category=100&_group=100&order=artifact_id&sort=DESC&offset=";
+  my $firstUrl = "http://sourceforge.net/tracker/?func=&group_id=599&atid=100599&assignee=&status=Open&category=&artgroup=&keyword=&submitter=&artifact_id=&assignee=&status=1&category=&artgroup=&submitter=&keyword=&artifact_id=&submit=Filter&limit=";
+  my $nextUrl = "http://sourceforge.net/tracker/?words=tracker_browse&group_id=599&atid=100599&assignee=&status=1&category=&artgroup=&keyword=&submitter=&artifact_id=&offset=";
 
   if ($#ARGV != 0) {
     printf("Usage: gen_known_bugs.pl <version>\n");
     exit(1);
   }
+
+  my $limit = 25;
 
   # get the SDCC version number from command line
   my $version = $ARGV[0];
@@ -223,7 +241,7 @@ EOF
   print_header($version);
 
   # get pages from SF bug tracker
-  for (my $i = 0; my $html = get($url . $i); $i += 50) {
+  for (my $i = 0; my $html = get((($i == 0) ? $firstUrl : $nextUrl) . $i); $i += $limit) {
     # and process them
     last if (!(my $myLines = process_page($html)));
     $lines += $myLines;

@@ -1,3 +1,7 @@
+2011-11-28 Borut Razem <borut.razem AT gmail.com>
+
+	* sim/ucsim/libltdl: direcrory removed since it is not used
+
 2011-11-27 Borut Razem <borut.razem AT gmail.com>
 
 	* Small Device C Compiler 3.1.0 released

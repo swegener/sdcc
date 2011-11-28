@@ -311,7 +311,7 @@ pic16_decodeOp (unsigned int op)
                 case SEND:              return "SEND";
                 case DUMMY_READ_VOLATILE:       return "DUMMY_READ_VOLATILE";
         }
-        sprintf (buffer, "unkown op %d %c", op, op & 0xff);
+        sprintf (buffer, "unknown op %d %c", op, op & 0xff);
 
   return buffer;
 }

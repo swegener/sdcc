@@ -1100,7 +1100,7 @@ parse()
 				default:
 				err:
 					fprintf(stderr,
-					    "Unkown option -%c ignored\n", c);
+					    "Unknown option -%c ignored\n", c);
 					break;
 				}
 			}

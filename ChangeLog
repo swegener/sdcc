@@ -21,6 +21,11 @@
 
 	* sim/ucsim/libltdl: direcrory removed since it is not used
 	* support/scripts/gen_known_bugs.pl: warious fixes
+	* src/pic16/ralloc.c, sim/ucsim/pobj.cc, sim/ucsim/utils.cc,
+	  sdas/linksrc/lkmain.c:
+	  fixed bug #3444387: Minor spelling fix in binary files;
+	  thanks to Gudjon I. Gudjonsson for the patch
+
 
 2011-11-27 Borut Razem <borut.razem AT gmail.com>
 

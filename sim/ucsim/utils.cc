@@ -142,7 +142,7 @@ object_name(class cl_base *o)
     name= o->get_name();
   if (name && *name)
     return(name);
-  return("(unkown)");
+  return("(unknown)");
 }
 
 

@@ -157,7 +157,7 @@ cl_base::add_child(class cl_base *child)
     {
       char *s;
       s= (char*)malloc(strlen(get_name("?"))+100);
-      sprintf(s, "childs of %s", get_name("?"));
+      sprintf(s, "children of %s", get_name("?"));
       children= new cl_list(1, 1, s);
       free(s);
     }

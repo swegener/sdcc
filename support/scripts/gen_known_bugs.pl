@@ -1,6 +1,6 @@
 # gen_known_bugs.pl - generate knownbugs.html
 #
-# Copyright (c) 2007 - 2011 Borut Razem
+# Copyright (c) 2007-2011 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -38,6 +38,7 @@ sub trim($)
   $string =~ s/\s+$//;
   return $string;
 }
+
 
 my @headerList = ('ID', 'Summary', 'Status', 'Opened', 'Assignee', 'Submitter', 'Resolution', 'Priority');
 
@@ -84,31 +85,31 @@ sub process_line($)
 
   my $i = 0;
   foreach ($line->look_down('_tag', 'td')) {
-    if ($i == 0) {
-      # remove nowrap attribute from 'Request ID' field
-      $_->attr('nowrap', undef);
-    }
-    elsif ($i == 1) {
+    #if ($headerList[$i] == 'ID') {
+    #  # remove nowrap attribute from 'Request ID' field
+    #  $_->attr('nowrap', undef);
+    #}
+    if ($headerList[$i] eq 'Summary') {
       # convert relative to absolute href in the 'Summary' field
       foreach ($_->look_down('_tag', 'a')) {
         my $attr = $_->attr('href');
-        if (defined($attr) && $attr =~ m!^/tracker/index.php?!) {
+        if (defined($attr) && $attr =~ m!^/tracker/?!) {
           $_->attr('href', 'http://sourceforge.net' . $attr);
         }
       }
     }
-    elsif ($i == 2) {
-      # remove text formatting from 'Open Date' field
-      my $text = $_->as_text();
-      $text =~ s/^\W*\**\W//;
-      $_->delete_content();
-      $_->push_content($text);
-    }
-    elsif ($i == 4) {
-      # remove the 'Status' field
+    #elsif ($headerList[$i] == 'Opened') {
+    #  # remove text formatting from 'Open Date' field
+    #  my $text = $_->as_text();
+    #  $text =~ s/^\W*\**\W//;
+    #  $_->delete_content();
+    #  $_->push_content($text);
+    #}
+    elsif ($headerList[$i] eq 'Status' || $headerList[$i] eq 'Resolution') {
+      # don't print Status and Resolution columns
       $_->delete();
     }
-    elsif ($i == 5 || $i == 6) {
+    elsif ($headerList[$i] eq 'Assignee' || $headerList[$i] eq 'Submitter') {
       # remove hrefs in 'Assigned To' and 'Submitted By' fields
       foreach ($_->look_down('_tag', 'a')) {
        $_->replace_with($_->as_text());
@@ -172,6 +173,17 @@ This file is generated automagicaly by gen_known_bugs.pl script.
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>SourceForge.net: Known Bugs</title>
+    <style type="text/css">
+      .p1 {background-color: #9ff;}
+      .p2 {background-color: #cff;}
+      .p3 {background-color: #9fc;}
+      .p4 {background-color: #cfc;}
+      .p5 {background-color: #cf9;}
+      .p6 {background-color: #ffc;}
+      .p7 {background-color: #ff9;}
+      .p8 {background-color: #fc9;}
+      .p9 {background-color: #fcc; color: #300;}
+    </style>
   </head>
   <body>
     <h2>Small Device C Compiler - Release $version Known Bug List</h2>
@@ -181,14 +193,15 @@ This file is generated automagicaly by gen_known_bugs.pl script.
     </ul>
     <table width="100%" border="0" cellspacing="2" cellpadding="3">
       <tr bgcolor="#ffffff">
-        <td align="center"><font color="#000000"><b>Request ID</b></font></td>
-        <td align="center"><font color="#000000"><b>Summary</b></font></td>
-        <td align="center"><font color="#000000"><b>Open Date</b></font></td>
-        <td align="center"><font color="#000000"><b>Priority</b></font></td>
-        <td align="center"><font color="#000000"><b>Assigned To</b></font></td>
-        <td align="center"><font color="#000000"><b>Submitted By</b></font></td>
-      </tr>
 EOF
+
+  foreach my $header (@headerList) {
+    # don't print Status and Resolution columns
+    if ($header ne 'Status' && $header ne 'Resolution') {
+      print('        <td align="center"><font color="#000000"><b>' . $header . "</b></font></td>\n");
+    }
+  }
+  print("      </tr>\n");
 }
 
 
@@ -202,15 +215,15 @@ sub print_footer($)
     <p><b>Priority Colors:</b></p>
     <table border="0">
       <tr>
-        <td bgcolor="#dadada">1</td>
-        <td bgcolor="#dad0d0">2</td>
-        <td bgcolor="#dacaca">3</td>
-        <td bgcolor="#dac0c0">4</td>
-        <td bgcolor="#dababa">5</td>
-        <td bgcolor="#dab0b0">6</td>
-        <td bgcolor="#daaaaa">7</td>
-        <td bgcolor="#da9090">8</td>
-        <td bgcolor="#da8a8a">9</td>
+        <td class="p1">1</td>
+        <td class="p2">2</td>
+        <td class="p3">3</td>
+        <td class="p4">4</td>
+        <td class="p5">5</td>
+        <td class="p6">6</td>
+        <td class="p7">7</td>
+        <td class="p8">8</td>
+        <td class="p9">9</td>
       </tr>
     </table>
   </body>
@@ -222,29 +235,27 @@ EOF
 
 # main procedure
 {
-  my $firstUrl = "http://sourceforge.net/tracker/?func=&group_id=599&atid=100599&assignee=&status=Open&category=&artgroup=&keyword=&submitter=&artifact_id=&assignee=&status=1&category=&artgroup=&submitter=&keyword=&artifact_id=&submit=Filter&limit=";
-  my $nextUrl = "http://sourceforge.net/tracker/?words=tracker_browse&group_id=599&atid=100599&assignee=&status=1&category=&artgroup=&keyword=&submitter=&artifact_id=&offset=";
+  my $firstUrl = "http://sourceforge.net/tracker/?func=&group_id=599&atid=100599&assignee=&status=Open&category=&artgroup=&keyword=&submitter=&artifact_id=&assignee=&status=1&category=&artgroup=&submitter=&keyword=&artifact_id=&submit=Filter&limit=%d";
+  my $nextUrl = "http://sourceforge.net/tracker/?words=tracker_browse&group_id=599&atid=100599&assignee=&status=1&category=&artgroup=&keyword=&submitter=&artifact_id=&offset=%d";
 
   if ($#ARGV != 0) {
     printf("Usage: gen_known_bugs.pl <version>\n");
     exit(1);
   }
 
-  my $limit = 25;
+  my $limit = 100;
 
   # get the SDCC version number from command line
   my $version = $ARGV[0];
-
-  my $lines = 0;  # number of lines
 
   # print HTML header
   print_header($version);
 
   # get pages from SF bug tracker
-  for (my $i = 0; my $html = get((($i == 0) ? $firstUrl : $nextUrl) . $i); $i += $limit) {
-    # and process them
-    last if (!(my $myLines = process_page($html)));
-    $lines += $myLines;
+  # and process them
+  my $lines = 0;
+  while (my $linesRead = process_page(get(($lines == 0) ? sprintf($firstUrl, $limit) : sprintf($nextUrl, $lines)))) {
+    $lines += $linesRead;
   }
 
   # print HTML footer

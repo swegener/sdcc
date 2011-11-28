@@ -20,6 +20,7 @@
 2011-11-28 Borut Razem <borut.razem AT gmail.com>
 
 	* sim/ucsim/libltdl: direcrory removed since it is not used
+	* support/scripts/gen_known_bugs.pl: warious fixes
 
 2011-11-27 Borut Razem <borut.razem AT gmail.com>
 

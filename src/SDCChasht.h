@@ -100,7 +100,10 @@ void *hTabNextItem (hTab *, int *);
 hTab *hTabFromTable (hTab *);
 int isHtabsEqual (hTab *, hTab *, int (*compareFunc) (void *, void *));
 hashtItem *hTabSearch (hTab *, int);
+
+/* return the first item with the given key */
 void *hTabItemWithKey (hTab *, int);
+
 void hTabAddItemIfNotP (hTab **, int, void *);
 void hTabDeleteAll (hTab *);
 void *hTabFirstItemWK (hTab * htab, int wk);

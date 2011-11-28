@@ -132,6 +132,7 @@ int
 labelIfx (iCode * ic)
 {
   iCode *loop;
+  iCode *stat;
   int change = 0;
 
   for (loop = ic; loop; loop = loop->next)
@@ -235,6 +236,66 @@ labelIfx (iCode * ic)
               hTabDeleteItem (&labelRef, (IC_LABEL (loop->next))->key, loop->next, DELETE_ITEM, NULL);
               loop->next = loop->next->next;
               loop->next->prev = loop;
+              change++;
+              continue;
+            }
+        }
+
+      /* Optimize hidden jump-to-jump:
+         Simplify
+           v = 1;
+           goto l1;
+         l0:
+           v = 0;
+         l1:
+           if (v) goto l3;
+         Into
+           v = 1;
+           goto l3;
+         l0:
+           v = 0;
+         l1: */
+      if (loop->op == LABEL &&
+        loop->next && loop->next->op == IFX &&
+        (stat = hTabFirstItemWK (labelRef, (IC_LABEL (loop))->key)) &&
+        !hTabNextItemWK (labelRef) &&
+        stat && stat->op == GOTO &&
+        stat->prev && stat->prev->op == '=' && IS_OP_LITERAL (IC_RIGHT (stat->prev)) &&
+        loop->prev && loop->prev->op == '=' && IS_OP_LITERAL (IC_RIGHT (loop->prev)) &&
+        IC_RESULT (stat->prev)->key == IC_COND (loop->next)->key &&
+        IC_RESULT (loop->prev)->key == IC_COND (loop->next)->key &&
+        !IS_OP_VOLATILE (IC_COND (loop->next)) &&
+        (!operandLitValue (IC_RIGHT (stat->prev)) ^ !operandLitValue (IC_RIGHT (loop->prev))))
+        {
+          if (IC_FALSE (loop->next) && !operandLitValue (IC_RIGHT (loop->prev)) ||
+            IC_TRUE (loop->next) && operandLitValue (IC_RIGHT (loop->prev)))
+            /* Complicated case: Insert goto, remove conditional jump. */
+            {
+              /* Change IFX to GOTO. */
+              stat = loop->next;
+              IC_LABEL (stat) = IC_TRUE (stat) ? IC_TRUE (stat) : IC_FALSE (stat);
+              stat->op = GOTO;
+
+             /* Move to desired location. */
+              if (loop->next->next)
+                loop->next->next->prev = stat;
+              loop->next = loop->next->next;
+              stat->prev = loop->prev;
+              stat->prev->next = stat;
+              stat->next = loop;
+              loop->prev = stat;
+              change++;
+              continue;
+            }
+          else /* Simple case: Redirect goto, remove conditional jump. */
+            {
+              hTabDeleteItem (&labelRef, (IC_LABEL (stat))->key, stat, DELETE_ITEM, NULL);
+              IC_LABEL (stat) = IC_TRUE (loop->next) ? IC_TRUE (loop->next) : IC_FALSE (loop->next);
+              hTabAddItem (&labelRef, (IC_LABEL (stat))->key, stat);
+              hTabDeleteItem (&labelRef, IC_LABEL (stat)->key, loop->next, DELETE_ITEM, NULL);
+              if (loop->next->next)
+                loop->next->next->prev = loop;
+              loop->next = loop->next->next;
               change++;
               continue;
             }

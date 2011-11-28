@@ -1,5 +1,10 @@
 2011-11-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCClabel.c:
+	  Optimize hidden jump-to-jump.
+
+2011-11-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c:
 	  Replaced some uses of isLastUse() by the safer isPairDead().
 

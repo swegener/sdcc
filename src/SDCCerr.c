@@ -470,6 +470,8 @@ struct
      "invalid combination of short / long", 0 },
   { E_INTEGERSUFFIX, ERROR_LEVEL_ERROR,
      "Invalid integer suffix '%s' in integer constant", 0},
+  { E_AUTO_ADDRSPACE, ERROR_LEVEL_ERROR,
+     "named address space not allowed for automatic var '%s'", 0},
 };
 
 /*

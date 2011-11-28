@@ -30,6 +30,15 @@ typedef struct memmap
   }
 memmap;
 
+/* For performance we might want to use a hash map instead of the linked list */
+typedef struct namedspacemap
+  {
+    char *name;
+    memmap *map;
+    struct namedspacemap *next;
+  }
+namedspacemap;
+
 extern FILE *junkFile;
 
 /* memory map prefixes  MOF added the DATA,CODE,XDATA,BIT */
@@ -75,6 +84,8 @@ extern memmap *generic;         /* unknown                      */
 extern memmap *overlay;         /* the overlay segment          */
 extern memmap *eeprom;          /* eeprom space                 */
 extern memmap *home;            /* Non-banked home space        */
+
+extern namedspacemap *namedspacemaps;
 
 extern int fatalError;
 

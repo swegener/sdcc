@@ -783,6 +783,12 @@ newiTempOperand (sym_link * type, char throwType)
       SPEC_SCLS (itmp->etype) = S_REGISTER;
       SPEC_OCLS (itmp->etype) = reg;
     }
+    
+  /* iTemps always live in the default address space */
+  if (IS_DECL (itmp->type))
+    DCL_PTR_ADDRSPACE (itmp->type) = 0;
+  else
+    SPEC_ADDRSPACE (itmp->etype) = 0;
 
   op->svt.symOperand = itmp;
   op->key = itmp->key = ++operandKey;
@@ -2784,6 +2790,16 @@ geniCodeDerefPtr (operand * op, int lvl)
   if (!isLvaluereq (lvl))
     op = geniCodeRValue (op, TRUE);
 
+  if (IS_DECL (rtype))
+    {
+      DCL_PTR_ADDRSPACE (rtype) = 0;
+      DCL_PTR_VOLATILE (rtype) = 0;
+    }
+  else
+    {
+      SPEC_ADDRSPACE (rtype) = 0;
+      SPEC_VOLATILE (rtype) = 0;
+    }
   setOperandType (op, rtype);
 
   return op;

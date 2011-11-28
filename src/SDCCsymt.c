@@ -89,6 +89,7 @@ bucket *StructTab[256];         /* the structure table  */
 bucket *TypedefTab[256];        /* the typedef   table  */
 bucket *LabelTab[256];          /* the Label     table  */
 bucket *enumTab[256];           /* enumerated    table  */
+bucket *AddrspaceTab[256];      /* the named address space table  */
 
 /*------------------------------------------------------------------*/
 /* initSymt () - initialises symbol table related stuff             */
@@ -772,6 +773,11 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_INTNO (dest) |= FUNC_INTNO (src);
   FUNC_REGBANK (dest) |= FUNC_REGBANK (src);
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
+  
+  if (SPEC_ADDRSPACE (src) && SPEC_ADDRSPACE (dest))
+    werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);
+  if (SPEC_ADDRSPACE (src))
+    SPEC_ADDRSPACE (dest) = SPEC_ADDRSPACE (src);
 
   return dest;
 }
@@ -814,8 +820,14 @@ mergeDeclSpec (sym_link * dest, sym_link * src, const char *name)
   DCL_PTR_CONST (decl) |= SPEC_CONST (spec);
   DCL_PTR_VOLATILE (decl) |= SPEC_VOLATILE (spec);
   DCL_PTR_RESTRICT (decl) |= SPEC_RESTRICT (spec);
+  if (DCL_PTR_ADDRSPACE (decl) && SPEC_ADDRSPACE (spec) &&
+    strcmp (DCL_PTR_ADDRSPACE (decl)->name, SPEC_ADDRSPACE (spec)->name))
+    werror (E_SYNTAX_ERROR, yytext);
+  if (SPEC_ADDRSPACE (spec))
+    DCL_PTR_ADDRSPACE (decl) = SPEC_ADDRSPACE (spec);
 
   SPEC_CONST (spec) = SPEC_VOLATILE (spec) = SPEC_RESTRICT (spec) = 0;
+  SPEC_ADDRSPACE (spec) = 0;
 
   lnk = decl;
   while (lnk && !IS_SPEC (lnk->next))
@@ -945,6 +957,20 @@ newBoolLink ()
 
   p = newLink (SPECIFIER);
   SPEC_NOUN (p) = V_BIT;
+
+  return p;
+}
+
+/*------------------------------------------------------------------*/
+/* newVoidLink() - creates an void type                             */
+/*------------------------------------------------------------------*/
+sym_link *
+newVoidLink ()
+{
+  sym_link *p;
+
+  p = newLink (SPECIFIER);
+  SPEC_NOUN (p) = V_VOID;
 
   return p;
 }
@@ -1683,6 +1709,7 @@ checkSClass (symbol * sym, int isProto)
       werrorfl (sym->fileDef, sym->lineDef, E_BAD_RESTRICT);
       SPEC_RESTRICT (sym->etype) = 0;
     }
+#warning check address space
   t = sym->type;
   while (t)
     {
@@ -1792,6 +1819,15 @@ checkSClass (symbol * sym, int isProto)
     {
       werror (E_AUTO_ABSA, sym->name);
       SPEC_ABSA (sym->etype) = 0;
+    }
+    
+  if (sym->level && !IS_STATIC (sym->etype) && (IS_DECL (sym->type) ? DCL_PTR_ADDRSPACE (sym->type) : SPEC_ADDRSPACE (sym->type)) && (options.stackAuto || reentrant))
+    {
+      werror (E_AUTO_ADDRSPACE, sym->name);
+      if (IS_DECL (sym->type))
+        DCL_PTR_ADDRSPACE (sym->type) = 0;
+      else
+        SPEC_ADDRSPACE (sym->type) = 0;
     }
 
   /* arrays & pointers cannot be defined for bits   */
@@ -1943,6 +1979,14 @@ cleanUpLevel (bucket ** table, int level)
             }
         }
     }
+}
+
+symbol *
+getAddrspace (sym_link *type)
+{
+  if (IS_DECL (type))
+    return (DCL_PTR_ADDRSPACE (type));
+  return (SPEC_ADDRSPACE (type));
 }
 
 /*------------------------------------------------------------------*/
@@ -2356,6 +2400,9 @@ comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
 {
   int res;
 
+  if (getAddrspace (src->next) != getAddrspace (dest->next))
+    bMustCast = 1;
+    
   if (IS_VOID (src->next) && IS_VOID (dest->next))
     return bMustCast ? -1 : 1;
   if ((IS_VOID (src->next) && !IS_VOID (dest->next)) || (!IS_VOID (src->next) && IS_VOID (dest->next)))

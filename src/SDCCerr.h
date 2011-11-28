@@ -234,6 +234,7 @@ enum {
   W_UNIVERSAL_C99               = 205, /* universal character names are only valid in C99 */
   E_SHORTLONG                   = 206, /* Invalid combination of short / long */
   E_INTEGERSUFFIX               = 207, /* Invalid integer suffix */
+  E_AUTO_ADDRSPACE              = 208, /* named address space for auto var*/
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

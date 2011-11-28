@@ -48,6 +48,7 @@ memmap *generic = NULL;         /* is a generic pointer        */
 memmap *overlay = NULL;         /* overlay segment             */
 memmap *eeprom = NULL;          /* eeprom location             */
 memmap *home = NULL;            /* Unswitchable code bank      */
+namedspacemap *namedspacemaps = 0; /* memory segments for named address spaces */
 
 /* this is a set of sets each set containing
    symbols in a single overlay */
@@ -392,8 +393,29 @@ initMem ()
 /* allocIntoSeg - puts a symbol into a memory segment              */
 /*-----------------------------------------------------------------*/
 void
-allocIntoSeg (symbol * sym)
+allocIntoSeg (symbol *sym)
 {
+  if (SPEC_ADDRSPACE (sym->etype))
+    {
+      namedspacemap *nm;
+      for (nm = namedspacemaps; nm; nm = nm->next)
+        if (!strcmp (nm->name, SPEC_ADDRSPACE (sym->etype)->name))
+          break;
+          
+      if (!nm)
+        {
+          nm = Safe_alloc (sizeof (namedspacemap));
+          nm->name = Safe_alloc (strlen(SPEC_ADDRSPACE (sym->etype)->name) + 1);
+          strcpy (nm->name, SPEC_ADDRSPACE (sym->etype)->name);
+          nm->map = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, SPEC_ADDRSPACE (sym->etype)->name, 'E', POINTER);
+          nm->next = namedspacemaps;
+          namedspacemaps = nm;
+        }
+        
+      addSet (&nm->map->syms, sym);
+      
+      return;
+    }
   memmap *segment = SPEC_OCLS (sym->etype);
   addSet (&segment->syms, sym);
   if (segment == pdata)
@@ -416,7 +438,7 @@ void deleteFromSeg(symbol *sym)
 /* defaultOClass - set the output segment based on SCLASS          */
 /*-----------------------------------------------------------------*/
 bool
-defaultOClass (symbol * sym)
+defaultOClass (symbol *sym)
 {
   switch (SPEC_SCLS (sym->etype))
     {

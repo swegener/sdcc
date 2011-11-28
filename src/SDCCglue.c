@@ -1541,6 +1541,7 @@ emitStaticSeg (memmap * map, struct dbuf_s *oBuf)
 void
 emitMaps (void)
 {
+  namedspacemap *nm;
   int publicsfr = TARGET_IS_MCS51;      /* Ideally, this should be true for all  */
   /* ports but let's be conservative - EEP */
 
@@ -1548,6 +1549,8 @@ emitMaps (void)
   /* no special considerations for the following
      data, idata & bit & xdata */
   emitRegularMap (data, TRUE, TRUE);
+  for (nm = namedspacemaps; nm; nm = nm->next)
+    emitRegularMap (nm->map, TRUE, TRUE);
   emitRegularMap (idata, TRUE, TRUE);
   emitRegularMap (d_abs, TRUE, TRUE);
   emitRegularMap (i_abs, TRUE, TRUE);
@@ -1774,6 +1777,7 @@ glue (void)
   struct dbuf_s asmFileName;
   FILE *asmFile;
   int mcs51_like;
+  namedspacemap *nm;
 
   dbuf_init (&vBuf, 4096);
   dbuf_init (&ovrBuf, 4096);
@@ -1945,6 +1949,14 @@ glue (void)
   fprintf (asmFile, "%s", iComments2);
   dbuf_write_and_destroy (&data->oBuf, asmFile);
 
+  /* copy segments for named address spaces */
+  for (nm = namedspacemaps; nm; nm = nm->next)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; %s ram data\n", nm->name);
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&nm->map->oBuf, asmFile);
+    }
 
   /* create the overlay segments */
   if (overlay)

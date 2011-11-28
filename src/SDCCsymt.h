@@ -167,6 +167,7 @@ typedef struct specifier
   unsigned b_volatile:1;            /* is marked as volatile      */
   unsigned b_const:1;               /* is a constant              */
   unsigned b_restrict:1;            /* is restricted              */
+  struct symbol *addrspace;         /* is in named address space  */
   unsigned b_typedef:1;             /* is typedefed               */
   unsigned b_isregparm:1;           /* is the first parameter     */
   unsigned b_isenum:1;              /* is an enumerated type      */
@@ -216,6 +217,8 @@ typedef struct declarator
   unsigned ptr_const:1;             /* pointer is constant        */
   unsigned ptr_volatile:1;          /* pointer is volatile        */
   unsigned ptr_restrict:1;          /* pointer is resticted       */
+  struct symbol *ptr_addrspace;     /* pointer is in named address space  */
+
   struct sym_link *tspec;           /* pointer type specifier     */
 }
 declarator;
@@ -368,6 +371,7 @@ typedef struct symbol
   int recvSize;                     /* size of first argument  */
   struct bitVect *clashes;          /* overlaps with what other symbols */
   struct ast *funcTree;             /* function body ast if inlined */
+  struct symbol *addressmod[2];     /* access functions for named address spaces */
 
   bool for_newralloc;
 }
@@ -384,6 +388,7 @@ extern sym_link *validateLink (sym_link * l,
 #define DCL_PTR_CONST(l) validateLink(l, "DCL_PTR_CONST", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_const
 #define DCL_PTR_VOLATILE(l) validateLink(l, "DCL_PTR_VOLATILE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_volatile
 #define DCL_PTR_RESTRICT(l) validateLink(l, "DCL_PTR_RESTRICT", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_restrict
+#define DCL_PTR_ADDRSPACE(l) validateLink(l, "DCL_PTR_ADDRSPACE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_addrspace
 #define DCL_TSPEC(l) validateLink(l, "DCL_TSPEC", #l, DECLARATOR, __FILE__, __LINE__)->select.d.tspec
 
 #define FUNC_DEBUG              //assert(IS_FUNC(x));
@@ -463,6 +468,7 @@ extern sym_link *validateLink (sym_link * l,
 #define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_volatile
 #define SPEC_CONST(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_const
 #define SPEC_RESTRICT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_restrict
+#define SPEC_ADDRSPACE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.addrspace
 #define SPEC_STRUCT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.v_struct
 #define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_typedef
 #define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isregparm
@@ -550,6 +556,7 @@ extern bucket *StructTab[];
 extern bucket *TypedefTab[];
 extern bucket *LabelTab[];
 extern bucket *enumTab[];
+extern bucket *AddrspaceTab[];
 extern symbol *fsadd;
 extern symbol *fssub;
 extern symbol *fsmul;
@@ -638,11 +645,13 @@ sym_link *newIntLink ();
 sym_link *newCharLink ();
 sym_link *newLongLink ();
 sym_link *newBoolLink ();
+sym_link *newVoidLink ();
 int compareType (sym_link *, sym_link *);
 int compareTypeExact (sym_link *, sym_link *, int);
 int checkFunction (symbol *, symbol *);
 void cleanUpLevel (bucket **, int);
 void cleanUpBlock (bucket **, int);
+symbol *getAddrspace (sym_link *type);
 int funcInChain (sym_link *);
 void addSymChain (symbol **);
 sym_link *structElemType (sym_link *, value *);

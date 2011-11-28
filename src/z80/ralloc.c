@@ -1688,9 +1688,11 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   D (D_ALLOC, ("packRegsForAssign: running on ic %p\n", ic));
 
   if (!IS_ITEMP (IC_RIGHT (ic)) || OP_SYMBOL (IC_RIGHT (ic))->isind || OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
-    {
-      return 0;
-    }
+    return 0;
+  
+  /* Avoid having multiple named address spaces in one iCode. */
+  if (IS_SYMOP (IC_RESULT (ic)) && SPEC_ADDRSPACE (OP_SYMBOL (IC_RESULT (ic))->etype))
+    return 0;
 
   /* find the definition of iTempNN scanning backwards if we find a
      a use of the true symbol in before we find the definition then
@@ -1751,7 +1753,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
               dic = NULL;
               break;
             }
-
         }
     }
 

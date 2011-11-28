@@ -1,3 +1,7 @@
+2011-11-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Merged the addrspacequal branch (named address spaces).
+
 2011-11-28 Borut Razem <borut.razem AT gmail.com>
 
 	* sim/ucsim/libltdl: direcrory removed since it is not used
@@ -12,6 +16,47 @@
 
 	* src/z80/gen.c:
 	  Fixed bug #3440327.
+
+2011-11-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCast.c,
+	  src/SDCCopt.c:
+	  Error message for implicit casts between named address spaces, fix live-range analysis (regression tests passing now).
+
+2011-11-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c:
+	  Error message for attemting to use named address spacces for auto variables.
+
+2011-11-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c:
+	  Fix broken control and data flow handling (regression tests passing now, exept for bug-895992.c).
+
+2011-11-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c:
+	  Improve handling of variables in named address space passed as parameters.
+
+2011-11-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c:
+	  Avoid emitting some unecessary bank switching calls.
+
+2011-11-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCast.c:
+	  Keep global named address spaces alive over functions.
+
+2011-11-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCicode.c,
+	  src/SDCCopt.c:
+	  Debug message cleanup, reenable address space splitting.
 
 2011-11-14 Raphael Neider <rneider AT web.de>
 
@@ -38,6 +83,23 @@
 	  the use of .omf extension,
 	  single mnemonic per assembly line,
 	  available peephole functions
+
+2011-11-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCcse.c,
+	  src/SDCCicode.c,
+	  src/SDCCopt.c:
+	  Basic support for pointers into named address spaces.
+
+2011-11-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCC.y,
+	  src/SDCCopt.c,
+	  src/SDCCast.c:
+	  Debug messages related to pointers to named address spaces.
 
 2011-11-12 Borut Razem <borut.razem AT gmail.com>
 
@@ -88,7 +150,40 @@
 2011-11-11 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCsystem.c: removed wine bug workaround:
-	  wine bug #25062 was fixed in wine 1.3.8
+	  wine bug #25062 was fixed in wine 1.3.
+
+2011-11-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCmem.h,
+	  src/SDCCmem.c,
+	  src/SDCCglue.c:
+	  Use named address space as segment name for the linker.
+
+2011-11-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCC.y,
+	  src/SDCCopt.c:
+	  Basic compiler-side named address space support.
+
+2011-11-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.h,
+	  src/SDCC.y,
+	  src/SDCCopt.c,
+	  src/SDCCicode.c
+	  src/z80/ralloc.c:
+	  Preparations for named address space support.
+
+2011-11-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCC.y,
+	  src/SDCC.lex,
+	  src/SDCCast.c:
+	  Preparations for named address space support.
 
 2011-11-05 Borut Razem <borut.razem AT gmail.com>
 

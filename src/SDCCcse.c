@@ -823,6 +823,11 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           IC_RESULT (ic) = operandFromOperand (IC_RESULT (ic));
           IC_RESULT (ic)->isaddr = 0;
           setOperandType (IC_RESULT (ic), operandType (IC_RIGHT (ic)));
+          if (IS_DECL (operandType (IC_RESULT (ic))))
+            {
+              DCL_PTR_VOLATILE (operandType (IC_RESULT (ic))) = 0;
+              DCL_PTR_ADDRSPACE (operandType (IC_RESULT (ic))) = 0;
+            }
           return;
         }
 

@@ -208,6 +208,7 @@ _?"_asm"         {
 "inline"       { count (); TKEYWORD99 (INLINE); }
 "restrict"     { count (); TKEYWORD99 (RESTRICT); }
 "__smallc"     { count (); return SMALLC; }
+"__addressmod" { count (); return ADDRESSMOD; }
 {L}({L}|{D})*  {
   if (!options.dollars_in_ident && strchr (yytext, '$'))
     {
@@ -429,6 +430,9 @@ check_type (void)
   if (!ignoreTypedefType && sym && IS_SPEC (sym->etype)
       && SPEC_TYPEDEF (sym->etype) && findSym(TypedefTab, NULL, yytext))
     return (TYPE_NAME);
+  /* check if it is a named address space */
+  else if (findSym (AddrspaceTab, NULL, yytext))
+    return (ADDRSPACE_NAME);
   else
     return(IDENTIFIER);
 }

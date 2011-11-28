@@ -8599,7 +8599,7 @@ genPointerSet (iCode * ic)
         }
       goto release;
     }
-  else if (getPairId (AOP (result)) == PAIR_HL && !isLastUse (ic, result)
+  else if (getPairId (AOP (result)) == PAIR_HL && !isPairDead (PAIR_HL, ic)
            && !isBitvar)
     {
       offset = 0;
@@ -8641,7 +8641,7 @@ genPointerSet (iCode * ic)
   if (AOP_TYPE (result) != AOP_STR)
     {
       if (isBitvar && getPairId( AOP (result)) != PAIR_INVALID &&
-        (getPairId( AOP (result)) != PAIR_IY || SPEC_BLEN (IS_BITVAR (retype) ? retype : letype) < 8 || isLastUse (ic, result))) /* Avoid destroying result by increments */
+        (getPairId( AOP (result)) != PAIR_IY || SPEC_BLEN (IS_BITVAR (retype) ? retype : letype) < 8 || isPairDead (getPairId (AOP (result)), ic))) /* Avoid destroying result by increments */
         pairId = getPairId( AOP (result));
       else
         fetchPair (pairId, AOP (result));

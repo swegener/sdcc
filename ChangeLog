@@ -1,3 +1,8 @@
+2011-11-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Cleanup leftover warning.
+
 2011-11-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,

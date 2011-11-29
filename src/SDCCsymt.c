@@ -1709,7 +1709,7 @@ checkSClass (symbol * sym, int isProto)
       werrorfl (sym->fileDef, sym->lineDef, E_BAD_RESTRICT);
       SPEC_RESTRICT (sym->etype) = 0;
     }
-#warning check address space
+
   t = sym->type;
   while (t)
     {

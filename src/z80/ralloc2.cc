@@ -857,7 +857,7 @@ void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G,
   std::set<var_t>::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
     if(G[i].dying.find(*v) == G[i].dying.end())
-      if(!(IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
+      if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
         ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
 }
 
@@ -1276,7 +1276,7 @@ void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
           sym->isspilt = false;
         }
     }
-    
+
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
 }

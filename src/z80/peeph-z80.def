@@ -443,16 +443,16 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	ld	a,%1 (ix)
+	ld	a,%1 (%3)
 	push	af
 	inc	sp
-	ld	a,%2 (ix)
+	ld	a,%2 (%3)
 	push	af
 	inc	sp
 } by {
-	; peephole 42 pushed %1 (ix), %2(ix) through hl instead of af.
-	ld	h,%1 (ix)
-	ld	l,%2 (ix)
+	; peephole 42 pushed %1 (%3), %2(%3) through hl instead of af.
+	ld	h,%1 (%3)
+	ld	l,%2 (%3)
 	push	hl
 } if notUsed('a'), notUsed('hl')
 
@@ -567,6 +567,71 @@ replace restart {
 	ld	c,l
 	ld	b,h
 } if notUsed('hl')
+
+replace restart {
+	ld	iy, #%1
+	inc	%2 (iy)
+} by {
+	; peephole 51a incremented in (hl) instead of %2 (iy).
+	ld	hl, #%1+%2
+	inc	(hl)
+} if notUsed('hl'), notUsed('iy')
+
+replace restart {
+	ld	iy, #%1
+	dec	%2 (iy)
+} by {
+	; peephole 51a' decremented in (hl) instead of %2 (iy).
+	ld	hl, #%1+%2
+	dec	(hl)
+} if notUsed('hl'), notUsed('iy')
+
+replace restart {
+	add	hl, hl
+	ld	e, l
+	ld	d, h
+	inc	de
+	inc	de
+} by {
+	inc	hl
+	; peephole 51b incremented once in hl instead of incrementing in de twice.
+	add	hl, hl
+	ld	e, l
+	ld	d, h
+} if notUsed('hl')
+
+replace restart {
+	add	hl, hl
+	inc	hl
+	inc	hl
+} by {
+	inc	hl
+	; peephole 51c incremented once in hl instead of incrementing in hl twice.
+	add	hl, hl
+}
+
+replace restart {
+	add	a, a
+	add	a, a
+	add	a, #0x04
+} by {
+	inc	a
+	; peephole 51d incremented a once instead of adding #0x04 to a.
+	add	a, a
+	add	a, a
+}
+
+replace restart {
+	add	hl, hl
+	pop	de
+	inc	hl
+	inc	hl
+} by {
+	inc	hl
+	; peephole 51e incremented once in hl instead of incrementing in hl twice.
+	add	hl, hl
+	pop	de
+}
 
 replace restart {
 	ld	a,%1 (%2)

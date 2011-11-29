@@ -1,6 +1,13 @@
 2011-11-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  Some small improvements to the generated code.
+
+2011-11-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
 	  support/regression/tests/bug3444293.c:
 	  Fixed bug #3444293.
 

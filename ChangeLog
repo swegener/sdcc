@@ -1,5 +1,10 @@
 2011-11-30 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/bug3440327.c:
+	  Disable bug 3440327 test on mcs51.
+
+2011-11-30 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCsymt.c:
 	  Cleanup leftover warning.
 

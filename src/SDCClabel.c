@@ -255,7 +255,8 @@ labelIfx (iCode * ic)
          l0:
            v = 0;
          l1: */
-      if (loop->op == LABEL &&
+      if (!TARGET_IS_MCS51 && /* TODO: Why does this optimization break a regression test for mcs51-large and mcs51-huge? */
+        loop->op == LABEL &&
         loop->next && loop->next->op == IFX &&
         (stat = hTabFirstItemWK (labelRef, (IC_LABEL (loop))->key)) &&
         !hTabNextItemWK (labelRef) &&

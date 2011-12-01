@@ -1,3 +1,8 @@
+2011-11-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClabel.c:
+	  Disable hidden jump-to-jump optimization for mcs51, since it breaks large and huge.
+
 2011-11-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug3440327.c:

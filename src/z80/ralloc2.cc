@@ -677,6 +677,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(true);
   if(POINTER_GET(ic) && input_in_L && input_in_H && (getSize(operandType(IC_RESULT(ic))) == 1 || !result_in_HL))
     return(true);
+
   if(ic->op == LEFT_OP && isOperandLiteral(IC_RIGHT(ic)))
     return(true);
 
@@ -702,6 +703,12 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   // HL overwritten by result.
   if(result_only_HL && (ic->op == CALL || ic->op == PCALL))
+    return(true);
+
+  if(POINTER_GET(ic) && getSize(operandType(IC_RESULT(ic))) == 1 && !IS_BITVAR(getSpec(operandType(result))) &&
+    (operand_in_reg(right, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && operand_in_reg(right, REG_B, ia, i, G) || // Uses ld a, (bc)
+    operand_in_reg(right, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && operand_in_reg(right, REG_D, ia, i, G) || // Uses ld a, (de)
+    operand_in_reg(right, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(right, REG_IYH, ia, i, G))) // Uses ld r, 0 (iy)
     return(true);
 
   if((ic->op == '=' || ic->op == CAST) && POINTER_SET(ic) && !result_only_HL)	// loads result pointer into (hl) first.

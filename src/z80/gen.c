@@ -8649,6 +8649,23 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
+  if (!IS_GB && !isBitvar && isLitWord (AOP (result)) && size == 2 &&
+    (AOP_TYPE (right) == AOP_REG && getPairId (AOP (right)) != PAIR_INVALID || isLitWord (AOP (right))))
+    {
+      if (isLitWord (AOP (right)))
+        {
+          pairId = PAIR_HL;
+          fetchPair (pairId, AOP (right));
+        }
+      else
+        pairId = getPairId (AOP (right));
+
+      fetchPair (pairId, AOP (right));
+      emit2 ("ld (%s), %s", aopGetLitWordLong (AOP (result), offset, FALSE), _pairs[pairId].name);
+      regalloc_dry_run_cost += (pairId == PAIR_HL) ? 3 : 4;
+      goto release;
+    }
+
   /* if the operand is already in dptr
      then we do nothing else we move the value to dptr */
   if (AOP_TYPE (result) != AOP_STR)

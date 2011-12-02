@@ -260,7 +260,7 @@ iCodeTable;
                                 x->op == '|'        || \
                                 x->op == '^'))
 
-#define IS_ASSOCIATIVE(x) (x && (x->op == EQ_OP      || \
+#define IS_COMMUTATIVE(x) (x && (x->op == EQ_OP      || \
                                  x->op == NE_OP      || \
                                  x->op == '+'        || \
                                  x->op == '*'        || \

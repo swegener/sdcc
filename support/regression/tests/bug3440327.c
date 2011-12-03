@@ -5,7 +5,7 @@
 #include <testfwk.h>
 #include <setjmp.h>
 
-#if defined(SDCC_z80) || defined(PORT_HOST)
+#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
 
 jmp_buf b;
 
@@ -32,14 +32,13 @@ int fnct(char c)
 
 fstruct tab[DIM]={{2, fnct}, {3, 0}};
 
-int bug(void) 
+int bug(void)
 {
 	register fstruct *dt = tab;
 	char val;
-	
-	while (dt < tab+DIM) 
+
+	while (dt < tab+DIM)
 	{
-	
 		val = 0;
 		while (val < dt->id)
 		{
@@ -47,7 +46,7 @@ int bug(void)
 		}
 		++dt;
 	}
-	
+
 	return 0;
 }
 
@@ -55,7 +54,7 @@ int bug(void)
 
 void testBug (void)
 {
-#if defined(SDCC_z80) || defined(PORT_HOST)
+#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
 	if (setjmp (b))
 	{
 		ASSERT (j == 42);
@@ -67,6 +66,3 @@ void testBug (void)
 	}
 #endif
 }
-
-
-

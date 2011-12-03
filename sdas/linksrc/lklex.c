@@ -87,9 +87,7 @@
  */
 
 VOID
-getid(id, c)
-int c;
-char *id;
+getid(char *id, int c)
 {
 	char *p;
 
@@ -128,10 +126,7 @@ char *id;
  *		int	c		current character value
  *
  *	global variables:
- *		char	ctype[]		a character array which defines the
- *					type of character being processed.
- *					This index is the character
- *					being processed.
+ *		none
  *
  *	called functions:
  *		int	get()		lklex.c
@@ -204,9 +199,7 @@ getSid (char *id)
  */
 
 VOID
-getfid(str, c)
-int c;
-char *str;
+getfid(char *str, int c)
 {
 	char *p;
 
@@ -231,7 +224,7 @@ char *str;
 		} while (c);
 		/* trim trailing spaces */
 		--p;
-		while (p >= str && ctype[(int)*p] == SPACE)
+		while (p >= str && ctype[*p & 0x007F] == SPACE)
 			--p;
 		/* terminate the string */
 		*(++p) = '\0';
@@ -329,7 +322,7 @@ get()
 
 	if ((c = *ip) != 0)
 		++ip;
-	return (c);
+	return (c & 0x007F);
 }
 
 /*)Function	VOID	unget(c)
@@ -492,6 +485,7 @@ int d;
  *		FILE	*tfp		The file handle to the current
  *					LST file being scanned
  *		int	uflag		update listing flag
+ *		int	obj_flag	linked file/library object output flag
  *
  *	called functions:
  *		VOID	chopcrlf()	lklex.c
@@ -517,6 +511,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
 
 	if (sfp == NULL || fgets(ib, sizeof(ib), sfp) == NULL) {
+		obj_flag = 0;
 		if (sfp) {
 			if(sfp != stdin) {
 				fclose(sfp);
@@ -539,8 +534,9 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = afile(fid, strrchr(fid, FSEPX) ? "" : "lk", 0);
 			} else
 			if (ftype == F_REL) {
+				obj_flag = cfp->f_obj;
 				sfp = afile(fid, "", 0);
-				if (sfp) {
+				if (sfp && (obj_flag == 0)) {
 					if (uflag && (pass != 0)) {
 						if (is_sdld())
 							SaveLinkedFilePath(fid); //Save the linked path for aomf51

@@ -1,20 +1,26 @@
-/* lkarea.c
+/* lkarea.c */
 
-   Copyright (C) 1989-1998 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
 /*
  *	3-Nov-97 JLH:
@@ -65,8 +71,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *	local variables:
  *		areax **halp		pointer to an array of pointers
- *		int	i		counter, loop variable, value
+ *		a_uint	i		value
  *		char	id[]		id string
+ *		int	k		counter, loop variable
  *		int	narea		number of areas in this head structure
  *		areax *	taxp		pointer to an areax structure
  *					to areax structures
@@ -81,7 +88,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *		int	lkerr		error flag
  *
  *	functions called:
- *		addr_t	eval()		lkeval.c
+ *		a_uint	eval()		lkeval.c
  *		VOID	exit()		c_library
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
@@ -102,19 +109,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  * A xxxxxx size nnnn flags mm
  *   |           |          |
- *   |           |          `--  ap->a_flag
- *   |           `------------- axp->a_size
- *   `-------------------------  ap->a_id
+ *   |           |          `----------  ap->a_flag
+ *   |           `--------------------- axp->a_size
+ *   `---------------------------------  ap->a_id
  *
  */
 VOID
 newarea()
 {
-	int i, narea;
+	a_uint i;
+	int k, narea;
 	struct areax *taxp;
 	struct areax **halp;
 	char id[NCPS];
 
+	if (headp == NULL) {
+		fprintf(stderr, "No header defined\n");
+		lkexit(ER_FATAL);
+	}
 	/*
 	 * Create Area entry
 	 */
@@ -155,20 +167,16 @@ newarea()
 	/*
 	 * Place pointer in header area list
 	 */
-	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
-		lkexit(1);
-	}
 	narea = hp->h_narea;
 	halp = hp->a_list;
-	for (i=0; i < narea ;++i) {
-		if (halp[i] == NULL) {
-			halp[i] = taxp;
+	for (k=0; k < narea ;++k) {
+		if (halp[k] == NULL) {
+			halp[k] = taxp;
 			return;
 		}
 	}
 	fprintf(stderr, "Header area list overflow\n");
-	lkexit(1);
+	lkexit(ER_FATAL);
 }
 
 /*)Function	VOID	lkparea(id)
@@ -405,7 +413,7 @@ lnkarea()
 
    ap = areap;
    while (ap) {
-		if (ap->a_flag&A3_ABS) {
+		if (ap->a_flag & A3_ABS) {
 			/*
 			 * Absolute sections
 			 */
@@ -459,7 +467,7 @@ lnkarea()
 
 			*temp = 's';
 			sp = lkpsym(temp, 1);
-			sp->s_addr = ap->a_addr ;
+			sp->s_addr = ap->a_addr;
 			if (!is_sdld() || TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GB)
 				sp->s_axp = NULL;
 			sp->s_type |= S_DEF;
@@ -506,7 +514,7 @@ lnkarea()
 static
 a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map, unsigned int map_size)
 {
-	int i, j, k;
+	a_uint i, j, k;
 	unsigned long mask, b;
 
 	while (1) {
@@ -555,7 +563,7 @@ a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map,
 static
 a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  unsigned int map_size)
 {
-	int i, j;
+	a_uint i, j;
 	unsigned long mask;
 	a_uint a = start;
 	i = start >> 5;
@@ -584,7 +592,7 @@ a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  
 }
 /* end sdld specific */
 
-/*)Function VOID	lnksect()
+/*)Function VOID	lnksect(tap)
  *
  *		area *	tap			pointer to an area structure
  *
@@ -606,7 +614,7 @@ a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  
  *		none
  *
  *	side effects:
- *		All area and areax addresses and sizes area determined
+ *		All area and areax addresses and sizes are determined
  *		and linked into the structures.
  */
 
@@ -626,7 +634,7 @@ lnksect(struct area *tap)
 		lkerr++;
 	}
 	taxp = tap->a_axp;
-	if (tap->a_flag&A3_OVR) {
+	if (tap->a_flag & A3_OVR) {
 		/*
 		 * Overlayed sections
 		 */
@@ -666,14 +674,14 @@ lnksect(struct area *tap)
 		}
 	}
 	tap->a_size = size;
-	if ((tap->a_flag&A3_PAG) && (size > 256)) {
+	if ((tap->a_flag & A3_PAG) && (size > 256)) {
 		fprintf(stderr,
 			"\n?ASlink-Warning-Paged Area %s Length Error\n",
 			tap->a_id);
 		lkerr++;
 	}
 	if (TARGET_IS_8051 &&
-		(tap->a_flag&A3_PAG) && (tap->a_size) &&
+		(tap->a_flag & A3_PAG) && (tap->a_size) &&
 		((tap->a_addr & 0xFFFFFF00) != ((addr-1) & 0xFFFFFF00)))
 	{
 		fprintf(stderr,

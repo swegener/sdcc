@@ -173,8 +173,8 @@ void Areas51 (void)
  *					containing an input .rel file
  *					specification
  *		int	lkerr		error flag
- *		int	mflag		Map output flag
  *		int	oflag		Output file type flag
+ *		int	objflg		Linked file/library output object flag
  *		FILE	*ofp		Output file handle
  *					for word formats
  *		FILE	*ofph		Output file handle
@@ -326,6 +326,7 @@ main(int argc, char *argv[])
 		lfp->f_flp = (struct lfile *) new (sizeof (struct lfile));
 		lfp = lfp->f_flp;
 		lfp->f_idp = strsto(linkp->f_idp);
+		lfp->f_obj = objflg;
 		lfp->f_type = F_REL;
 	}
 
@@ -879,6 +880,7 @@ map(void)
  *					specification
  *		int	mflag		Map output flag
  *		int	oflag		Output file type flag
+ *		int	objflg		Linked file/library output object flag
  *		int	pflag		print linker command file flag
  *		FILE *	stderr		c_library
  *		int	uflag		Relocated listing flag
@@ -984,6 +986,16 @@ parse()
 				case 't':
 				case 'T':
 					oflag = 3;
+					break;
+
+				case 'o':
+				case 'O':
+					objflg = 0;
+					break;
+
+				case 'v':
+				case 'V':
+					objflg = 1;
 					break;
 
 				case 'M':
@@ -1123,6 +1135,7 @@ parse()
 			}
 			getfid(fid, c);
 			lfp->f_idp = strsto(fid);
+			lfp->f_obj = objflg;
 		} else {
 			fprintf(stderr, "Invalid input\n");
 			lkexit(ER_FATAL);

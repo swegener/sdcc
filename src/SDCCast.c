@@ -771,20 +771,6 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
   else
     functype = func->ftype;
 
-  /* if the function is being called via a pointer &  */
-  /* it has not been defined reentrant then we cannot */
-  /* have parameters                                  */
-  /* PIC16 port can... */
-  if (!TARGET_IS_PIC16)
-    {
-      if (func->type != EX_VALUE && !IFFUNC_ISREENT (functype) && !options.stackAuto)
-        {
-          werror (E_NONRENT_ARGS);
-          fatalError++;
-          return 1;
-        }
-    }
-
   /* if defined parameters ended but actual parameters */
   /* exist and this is not defined as a variable arg   */
   if (!defParm && *actParm && !IFFUNC_HASVARARGS (functype))
@@ -4026,7 +4012,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                   break;
                 default:
                   gptype = 0;
-
                   if (TARGET_IS_PIC16 && (SPEC_SCLS (sym->etype) == S_FIXED))
                     gptype = GPTYPE_NEAR;
                 }

@@ -106,7 +106,7 @@ dgt(int rdx, char *str, int n)
 	int i;
 
 	for (i=0; i<n; i++) {
-		if ((ctype[(unsigned char)(*str++)] & rdx) == 0)
+		if ((ctype[*str++ & 0x007F] & rdx) == 0)
 			return(0);
 	}
 	return(1);
@@ -359,8 +359,8 @@ static int _cmpSymByAddr(const void *p1, const void *p2)
  *
  *	local variables:
  *		areax * oxp		pointer to an area extension structure
- *		int	c		character value
  *		int	i		loop counter
+ *		int	j		bubble sort update status
  *		int	n		repeat counter
  *		char *	frmt		temporary format specifier
  *		char *	ptr		pointer to an id string
@@ -394,15 +394,15 @@ VOID
 lstarea(struct area *xp)
 {
 	struct areax *oxp;
-	int i, n;
+	int i, j, n;
 	char *frmt, *ptr;
 	int nmsym;
-	a_uint aj;
+	a_uint a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
-	/* sdld spcific */
+	/* sdld specific */
 	int memPage;
-	/* end sdld spcific */
+	/* end sdld specific */
 
 	/*
 	 * Find number of symbols in area
@@ -455,10 +455,32 @@ lstarea(struct area *xp)
 		oxp = oxp->a_axp;
 	}
 
-	/* sdld specific */
-	/* asxxxx use bubble sort */
+	if (is_sdld()) {
+		/*
+		 * Quick Sort of Addresses in Symbol Table Array
+		 */
 	qsort(p, nmsym, sizeof(struct sym *), _cmpSymByAddr);
-	/* end sdld specific */
+	} else {
+		/*
+		 * Bubble Sort of Addresses in Symbol Table Array
+		 */
+		j = 1;
+		while (j) {
+			j = 0;
+			sp = p[0];
+			a0 = sp->s_addr + sp->s_axp->a_addr;
+			for (i=1; i<nmsym; ++i) {
+				sp = p[i];
+				ai = sp->s_addr + sp->s_axp->a_addr;
+				if (a0 > ai) {
+					j = 1;
+					p[i] = p[i-1];
+					p[i-1] = sp;
+				}
+				a0 = ai;
+			}
+		}
+	}
 
 	/*
 	 * Repeat Counter
@@ -473,20 +495,33 @@ lstarea(struct area *xp)
 	/*
 	 * Symbol Table Output
 	 */
-	/* sdld spcific */
+	/* sdld specific */
 	memPage = (xp->a_flag & A_CODE) ? 0x0C : ((xp->a_flag & A_XDATA) ? 0x0D : ((xp->a_flag & A_BIT) ? 0x0B : 0x00));
-	/* end sdld spcific */
+	/* end sdld specific */
 	i = 0;
 	while (i < nmsym) {
 		if (wflag) {
 			slew(xp);
-			switch(a_bytes) {
-			default:
-			case 2: frmt = "        "; break;
-			case 3:
-			case 4: frmt = "   "; break;
+			if (is_sdld()) {
+				switch(a_bytes) {
+				default:
+				case 2: frmt = "        "; break;
+				case 3:
+				case 4: frmt = ""; break;
+				}
+				if (memPage != 0)
+					fprintf(mfp, "%s%X:", frmt, memPage);
+				else
+					fprintf(mfp, "%s  ", frmt);
+			} else {
+				switch(a_bytes) {
+				default:
+				case 2: frmt = "        "; break;
+				case 3:
+				case 4: frmt = "   "; break;
+				}
+				fprintf(mfp, "%s", frmt);
 			}
-			fprintf(mfp, "%s", frmt);
 		} else
 		if ((i % n) == 0) {
 			slew(xp);
@@ -497,14 +532,6 @@ lstarea(struct area *xp)
 			case 4: frmt = "  "; break;
 			}
 			fprintf(mfp, "%s", frmt);
-		}
-
-		if (is_sdld()) {
-			int memPage = (xp->a_flag & A_CODE) ? 0x0C : ((xp->a_flag & A_XDATA) ? 0x0D : ((xp->a_flag & A_BIT) ? 0x0B : 0x00));
-			if (memPage != 0)
-				fprintf(mfp, "  %02X:", memPage);
-			else
-				fprintf(mfp, "     ");
 		}
 
 		sp = p[i];
@@ -635,6 +662,7 @@ lstarea(struct area *xp)
  *		int	hilo		byte order
  *		int	gline		get a line from the LST file
  *					to translate for the RST file
+ *		a_uint	pc		current program counter address in bytes
  *		int	pcb		bytes per instruction word
  *		char	rb[]		read listing file text line
  *		FILE	*rfp		The file handle to the current
@@ -675,24 +703,16 @@ lkulist(int i)
 	 */
 	if (i) {
 		/*
-		 * Evaluate current code address
-		 */
-		if (hilo == 0) {
-			cpc = ((rtval[1] & 0xFF) << 8) + (rtval[0] & 0xFF);
-		} else {
-			cpc = ((rtval[0] & 0xFF) << 8) + (rtval[1] & 0xFF);
-		}
-
-		/*
 		 * Line with only address
 		 */
 		if (rtcnt == a_bytes) {
-			lkalist(cpc);
+			lkalist(pc);
 
 		/*
 		 * Line with address and code
 		 */
 		} else {
+			cpc = pc;
 			cbytes = 0;
 			for (i=a_bytes; i < rtcnt; i++) {
 				if (rtflg[i]) {
@@ -1019,7 +1039,7 @@ loop:	if (tfp == NULL)
  *					output RST file
  *		FILE	*tfp		The file handle to the current
  *					LST file being scanned
- *		char	*errmsg[]	array of pointers to error strings
+ *		char	*errmsg3[]	array of pointers to error strings
  *
  *	functions called:
  *		int	dgt()		lklist.c
@@ -1268,7 +1288,7 @@ loop:	if (tfp == NULL)
 	if (err) {
 		switch(ASxxxx_VERSION) {
 		case 3:
-			fprintf(rfp, "?ASlink-Warning-%s\n", errmsg[err]);
+			fprintf(rfp, "?ASlink-Warning-%s\n", errmsg3[err]);
 			break;
 
 		default:

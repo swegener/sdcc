@@ -1,3 +1,33 @@
+2011-12-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/aslink.vcxproj,
+	* sdas/linksrc/aslink.vcxproj.filters,
+	* sdas/linksrc/lkar.c,
+	* sdas/linksrc/lkarea.c,
+	* sdas/linksrc/lkbank.c,
+	* sdas/linksrc/lkdata.c,
+	* sdas/linksrc/lkhead.c,
+	* sdas/linksrc/lklex.c,
+	* sdas/linksrc/lklibr.c,
+	* sdas/linksrc/lklist.c,
+	* sdas/linksrc/lkmain.c,
+	* sdas/linksrc/lkmem.c,
+	* sdas/linksrc/lknoice.c,
+	* sdas/linksrc/lkout.c,
+	* sdas/linksrc/lkrloc.c,
+	* sdas/linksrc/lkrloc3.c,
+	* sdas/linksrc/lks19.c,
+	* sdas/linksrc/lksdcclib.c,
+	* sdas/linksrc/lksdcdb.c,
+	* sdas/linksrc/lksym.c,
+	* sdas/linksrc/Makefile.in: next step towards ASxxxx v5
+	* src/SDCCmem.c (allocIntoSeg): MSVC 2010 still needs all declarations at
+	  the start of a block in C mode
+	* src/z80/gen.c (genPointerSet): fixed warning
+	* src/SDCCast.c (processParms): removed incorrect function pointer check
+	* support/regression/tests/bug3440327.c: reenabled test for mcs51
+
 2011-12-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug3444293.c

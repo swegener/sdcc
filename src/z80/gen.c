@@ -8547,13 +8547,13 @@ genPackBits (sym_link * etype,
 static void
 genPointerSet (iCode * ic)
 {
-  int size, offset;
+  int size, offset = 0;
   operand *right, *result;
   PAIR_ID pairId = PAIR_HL;
   bool isBitvar;
-  sym_link *retype; 
+  sym_link *retype;
   sym_link *letype;
-  
+
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
   retype = getSpec (operandType (right));
@@ -8593,7 +8593,6 @@ genPointerSet (iCode * ic)
   if ( getPairId( AOP (result)) == PAIR_IY && !isBitvar)
     {
       /* Just do it */
-      offset = 0;
       while (size--)
         {
           if (canAssignToPtr3 (AOP (right)))
@@ -8615,8 +8614,6 @@ genPointerSet (iCode * ic)
   else if (getPairId (AOP (result)) == PAIR_HL && !isPairDead (PAIR_HL, ic)
            && !isBitvar)
     {
-      offset = 0;
-
       while (size--)
         {
           if (isRegOrLit (AOP (right)) && !IS_GB)

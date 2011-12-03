@@ -35,9 +35,6 @@
     <ClCompile Include="lkhead.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lkihx.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lklex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -86,15 +83,18 @@
     <ClCompile Include="lkbank.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lkrloc3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkout.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aslink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="asxxxx_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="getline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lk_readnl.h">

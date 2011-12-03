@@ -155,7 +155,7 @@ newsym(void)
 	/*
 	 * Create symbol entry
 	 */
-        getSid(id);     // old: getid(id, -1);
+        getSid(id);
         tsp = lkpsym(id, 1);
         c = getnb();get();get();
         if (c == 'R') {

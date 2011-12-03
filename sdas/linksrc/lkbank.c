@@ -98,7 +98,7 @@ lkfopen()
 		case 4: frmt = "bi4"; break;
 		}
 		fp = afile(linkp->f_idp, frmt, 2);
-	}
+	} else
 	/* sdld specific */
 	if (oflag == 4) {
 		fp = afile(linkp->f_idp, "elf", 2);
@@ -143,6 +143,7 @@ VOID
 lkfclose()
 {
 	if (ofp != NULL) {
+		lkout(0);
 		if (ofp != stderr) {
 			fclose(ofp);
 		}

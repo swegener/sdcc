@@ -42,7 +42,7 @@ static void PagedAddress( a_uint value, int page );
 
 /*)Function	VOID	NoICEfopen()
  * 
- *	The function NoICEfile() opens the NoICE output file
+ *	The function NoICEfopen() opens the NoICE output file
  *	and sets the map flag, mflag, to create a map file.
  *	NoICE processing is performed during map generation.
  *

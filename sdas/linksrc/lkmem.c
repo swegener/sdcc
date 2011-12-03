@@ -614,8 +614,8 @@ int summary2(struct area * areap)
 
     /*Report the position of the begining of the stack*/
     if(Stack_Start!=256)
-        fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx) with %ld bytes available.",
-            rflag ? "16 bit mode initial s" : "S", Stack_Start, Stack_Start-1, Stack_Size);
+        fprintf(of, "\n%s starts at: 0x%02lx (sp set to 0x%02lx) with %ld bytes available.",
+            rflag ? "16 bit mode initial stack" : "Stack", Stack_Start, Stack_Start-1, Stack_Size);
     else
         fprintf(of, "\nI don't have a clue where the stack ended up! Sorry...");
 

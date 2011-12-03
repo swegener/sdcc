@@ -122,7 +122,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 VOID
 s19(int i)
 {
-	register a_uint j;
+	a_uint j;
+	int k;
 
 	if (i) {
 		if (TARGET_IS_6808 && ap->a_flag & A_NOLOAD)
@@ -141,9 +142,9 @@ s19(int i)
 			sflush();
 			rtadr0 = rtadr1 = rtadr2;
 		}
-		for (j=2; j<rtcnt; j++) {
-			if (rtflg[j]) {
-				rtbuf[rtadr1++ - rtadr0] = rtval[j];
+		for (k=2; k<rtcnt; k++) {
+			if (rtflg[k]) {
+				rtbuf[rtadr1++ - rtadr0] = rtval[k];
 				if (rtadr1 - rtadr0 == MAXBYTES) {
 					sflush();
 				}
@@ -194,7 +195,7 @@ VOID
 sflush()
 {
 	a_uint	chksum;
-	register int i,max,reclen;
+	a_uint i, max, reclen;
 
 	max = rtadr1 - rtadr0;
 	if (max == 0) {
@@ -220,6 +221,6 @@ sflush()
 	/*
 	 * 1's complement
 	 */
-	fprintf(ofp, "%02X\n", (-chksum-1) & 0x00ff);
+	fprintf(ofp, "%02X\n", (~chksum) & 0x00ff);
 	rtadr0 = rtadr1;
 }

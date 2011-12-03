@@ -107,9 +107,10 @@
 		LKNOICE.C
 		LKSDCDB.C
 		LKRLOC.C
+		LKRLOC3.C
 		LKLIBR.C
+		LKOUT.C
 		LKS19.C
-		LKIHX.C
 	}
 	$(STACK) = 2000
 */
@@ -197,7 +198,10 @@
 #define NHASH	(1 << 6)	/* Buckets in hash table */
 #define HMASK	(NHASH - 1)	/* Hash mask */
 #define NLPP	60		/* Lines per page */
-#define	NMAX	78		/* Maximum S19/IHX line length */
+#define	NMAX	78		/* IXX/SXX/DBX Buffer Length */
+#define		IXXMAXBYTES	32	/* NMAX > (2 * IXXMAXBYTES) */
+#define		SXXMAXBYTES	32	/* NMAX > (2 * SXXMAXBYTES) */
+#define		DBXMAXBYTES	64	/* NMAX > (  DBXMAXBYTES  ) */
 #define	FILSPC	PATH_MAX	/* File spec length */
 
 #define NDATA	16		/* actual data */
@@ -320,13 +324,13 @@ extern	int	ASxxxx_VERSION;
 /* #define R3_LSB  0000 */	/* output low byte */
 /* #define R3_MSB  0200 */	/* output high byte */
 
-#define R_J11	(R3_WORD|R3_BYTX) /* JLH: 11 bit JMP and CALL (8051) */
-#define R_J19	(R3_WORD|R3_BYTX|R3_MSB) /* 19 bit JMP and CALL (DS80C390) */
+#define R3_J11     (R3_WORD|R3_BYTX)        /* JLH: 11 bit JMP and CALL (8051) */
+#define R3_J19     (R3_WORD|R3_BYTX|R3_MSB) /* BM:  19 bit JMP and CALL (DS80C390) */
 #define R_C24	(R3_WORD|R3_BYT1|R3_MSB) /* 24 bit address (DS80C390) */
 #define R_J19_MASK (R3_BYTE|R3_BYTX|R3_MSB)
 
-#define IS_R_J19(x) (((x) & R_J19_MASK) == R_J19)
-#define IS_R_J11(x) (((x) & R_J19_MASK) == R_J11)
+#define IS_R_J19(x) (((x) & R_J19_MASK) == R3_J19)
+#define IS_R_J11(x) (((x) & R_J19_MASK) == R3_J11)
 #define IS_C24(x) (((x) & R_J19_MASK) == R_C24)
 
 /* sdld specific */
@@ -473,8 +477,10 @@ struct	sym
 
 /*
  *	The structure lfile contains a pointer to a
- *	file specification string, the file type, and
- *	a link to the next lfile structure.
+ *	file specification string, an index which points
+ *	to the file name (past the 'path'), the file type,
+ *	an object output flag, and a link to the next
+ *	lfile structure.
  */
 struct	lfile
 {
@@ -482,6 +488,7 @@ struct	lfile
 	int	f_type;		/* File type */
 	char	*f_idp;		/* Pointer to file spec */
 	int	f_idx;		/* Index to file name */
+	int	f_obj;		/* Object output flag */
 };
 
 /*
@@ -575,6 +582,7 @@ struct lbname {
 	char		*path;
 	char		*libfil;
 	char		*libspc;
+	int		f_obj;
 };
 
 /*
@@ -590,8 +598,10 @@ struct lbname {
  *	The element libspc points to the library file path specification
  *	and element relfil points to the object file specification string.
  *	The element filspc is the complete path/file specification for
- *	the library file to be imported into the linker.  The
- *	file specicifation may be formed in one of two ways:
+ *	the library file to be imported into the linker.  The f_obj
+ *	flag specifies if the object code from this file is
+ *	to be output by the linker.  The file specification
+ *	may be formed in one of two ways:
  *
  *	(1)	If the library file contained an absolute
  *		path/file specification then this becomes filspc.
@@ -610,6 +620,7 @@ struct lbfile {
 	char		*libspc;
 	char		*relfil;
 	char		*filspc;
+	int		f_obj;
 /* sdld specific */
 	long		offset;
 	unsigned int	type;
@@ -754,6 +765,9 @@ extern	FILE	*yfp;		/*	SDCDB output file handle
 
 extern	int	oflag;		/*	Output file type flag
 				 */
+extern	int	objflg;		/*	Linked file/library object output flag
+				 */
+
 #if NOICE
 extern	int	jflag;		/*	-j, enable NoICE Debug output
 				 */
@@ -789,6 +803,8 @@ extern	int	lop;		/*	current line number on page
 				 */
 extern	int	pass;		/*	linker pass number
 				 */
+extern	a_uint	pc;		/*	current relocation address
+				 */
 extern	int	pcb;		/*	current bytes per pc word
 				 */
 extern	int	rtcnt;		/*	count of elements in the
@@ -804,13 +820,15 @@ extern	int	rterr[];	/*	indicates if rtval[] value should
 				 */
 extern	char	rtbuf[];	/*	S19/IHX output buffer
 				 */
-				/*	rtbuf[] processing
+extern	int	rtaflg;		/*	rtbuf[] processing
 				 */
 extern	a_uint	rtadr0;		/*
 				 */
 extern	a_uint	rtadr1;		/*
 				 */
 extern	a_uint	rtadr2;		/*
+				 */
+extern	int	obj_flag;	/*	Linked file/library object output flag
 				 */
 extern	int	a_bytes;	/*	REL file T Line address length
 				 */
@@ -966,7 +984,7 @@ extern	VOID		lkglist(a_uint cpc, int v, int err);
 
 /* lknoice.c */
 extern	VOID		NoICEfopen(void);
-extern	VOID		DefineNoICE( char *name, a_uint value, int page );
+extern	VOID		DefineNoICE(char *name, a_uint value, int page);
 
 
 /* lksdcdb.c */
@@ -975,31 +993,33 @@ extern	VOID		SDCDBcopy(char * str);
 extern	VOID		DefineSDCDB(char *name, a_uint value);
 
 /* lkrloc.c */
-extern	a_uint		adb_b(a_uint v, int i);
+extern	a_uint		adb_1b(a_uint v, int i);
+extern	a_uint		adb_2b(a_uint v, int i);
+extern	a_uint		adb_3b(a_uint v, int i);
+extern	a_uint		adb_4b(a_uint v, int i);
+extern	a_uint		adb_xb(a_uint v, int i);
+extern	a_uint		evword(void);
+extern	VOID		prntval(FILE *fptr, a_uint v);
+extern	VOID		reloc(int c);
+
+/* lkrloc3.c */
 extern	a_uint		adb_bit(a_uint v, int i);
 extern	a_uint		adb_24_bit(a_uint v, int i);
 extern	a_uint		adb_24_hi(a_uint v, int i);
 extern	a_uint		adb_24_mid(a_uint v, int i);
 extern	a_uint		adb_24_lo(a_uint v, int i);
-extern	a_uint		adw_w(a_uint v, int i);
-extern	a_uint		adw_24(a_uint v, int i);
-extern	a_uint		adw_hi(a_uint v, int i);
-extern	a_uint		adw_lo(a_uint v, int i);
-extern	a_uint		evword(void);
-extern	VOID		prntval(FILE *fptr, a_uint v);
 extern	a_uint		adb_hi(a_uint  v, int i);
 extern	a_uint		adb_lo(a_uint  v, int i);
-extern	char *		errmsg[];
-extern	VOID		errdmp(FILE *fptr, char *str);
-extern	VOID		erpdmp(FILE *fptr, char *str);
-extern	VOID		rele(VOID);
-extern	VOID		reloc(char c);
-extern	VOID		relt(VOID);
-extern	VOID		relr(VOID);
-extern	VOID		relp(VOID);
-extern	VOID		relerr(char *str);
-extern	VOID		relerp(char *str);
-extern	int		lastExtendedAddress;
+extern	char *		errmsg3[];
+extern	VOID		errdmp3(FILE *fptr, char *str);
+extern	VOID		erpdmp3(FILE *fptr, char *str);
+extern	VOID		rele3(void);
+extern	VOID		reloc3(int c);
+extern	VOID		relt3(void);
+extern	VOID		relr3(void);
+extern	VOID		relp3(void);
+extern	VOID		relerr3(char *str);
+extern	VOID		relerp3(char *str);
 
 /* lklibr.c */
 extern	int		addfile(char *path, char *libfil);
@@ -1010,13 +1030,13 @@ extern	VOID		library(void);
 extern	VOID		loadfile(char *filspc);
 extern	VOID		search(void);
 
-/* lkihx.c */
-extern	VOID		ihx(int i);
+/* lkout.c */
+extern	VOID		lkout(int i);
+extern	VOID		lkflush(void);
+extern	VOID		ixx(int i);
 extern	VOID		iflush(void);
-/* sdld specific */
-extern	VOID		ihxExtendedLinearAddress(a_uint);
-extern	VOID		ihxNewArea();
-/* end sdld specific */
+extern	VOID		dbx(int i);
+extern	VOID		dflush(void);
 
 /* lks19.c */
 extern	VOID		s19(int i);

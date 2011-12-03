@@ -325,8 +325,10 @@ findsym_sdcclib (const char *name, struct lbname *lbnh, FILE * libfp, int type)
                   lbfh->libspc = lbnh->libspc;
                   lbfh->filspc = strdup (filspc);
                   lbfh->relfil = strdup (ModName);
+                  lbfh->f_obj = lbnh->f_obj;
                   /* Library embedded file, so lbfh->offset must be >=0 */
                   lbfh->offset = IndexOffset + FileOffset;
+                  obj_flag = lbfh->f_obj;
 
                   /* Jump to where the .rel begins and load it. */
                   fseek (libfp, lbfh->offset, SEEK_SET);

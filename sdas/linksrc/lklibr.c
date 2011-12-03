@@ -198,8 +198,9 @@ addlib (void)
  *	char *	strend		end of path pointer
  *
  *  global variables:
- *	lbname	*lbnhead    The pointer to the first
- *			    path structure
+ *	lbname	*lbnhead	The pointer to the first
+ *				path structure
+ *	int	objflg		linked file/library object output flag
  *
  *   functions called:
  *	int	getnb()     lklex.c
@@ -316,6 +317,7 @@ addfile (char *path, char *libfil)
       lbnh->path = path;
       lbnh->libfil = strdup (libfil);
       lbnh->libspc = str;
+      lbnh->f_obj = objflg;
       return 1;
     }
   else
@@ -444,6 +446,7 @@ search (void)
  *			    name structure
  *	lbfile	*lbfhead    The pointer to the first
  *			    file structure
+ *	int	obj_flag    linked file/library object output flag
  *
  *   functions called:
  *	int	fclose()    c_library
@@ -828,6 +831,7 @@ fndsym (const char *name)
  *
  *  global variables:
  *	lbfile	*lbfhead    pointer to first lbfile structure
+ *	int	obj_flag    linked file/library object output flag
  *
  *   functions called:
  *	VOID	loadfile    lklibr.c
@@ -841,8 +845,10 @@ library (void)
 {
   struct lbfile *lbfh;
 
-  for (lbfh = lbfhead; lbfh; lbfh = lbfh->next)
+  for (lbfh = lbfhead; lbfh; lbfh = lbfh->next) {
+    obj_flag = lbfh->f_obj;
     (*aslib_targets[lbfh->type]->loadfile) (lbfh);
+  }
 
 #ifdef INDEXLIB
   freelibraryindex ();

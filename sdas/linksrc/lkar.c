@@ -678,12 +678,10 @@ fndsym_ar (const char *name, struct lbname *lbnh, FILE * libfp, int type)
       if (lbnh->path != NULL)
         {
           strcpy (filspc, lbnh->path);
-#ifdef  OTHERSYSTEM
           if (*filspc != '\0' && (filspc[strlen (filspc) - 1] != '/') && (filspc[strlen (filspc) - 1] != LKDIRSEP))
             {
               strcat (filspc, LKDIRSEPSTR);
             }
-#endif
         }
 
       if (AR_IS_SYMBOL_TABLE (obj_name))

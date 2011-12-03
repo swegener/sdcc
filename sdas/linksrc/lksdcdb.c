@@ -70,6 +70,7 @@ VOID SDCDBfopen(void)
 		if (yfp == NULL) {
 			lkexit(1);
 		}
+		mflag = 1;
 	}
 }
 
@@ -78,7 +79,7 @@ VOID SDCDBfopen(void)
  * 
  *		char *	str		pointer to the file spec
  *
- *	The function SDCDBcopy() copies an existing cdb file
+ *	The function SDCDBcopy() copies an existing adb file
  *	into the linker cdb file.
  *
  * 	The function is called from lklex.c and lklibr.c

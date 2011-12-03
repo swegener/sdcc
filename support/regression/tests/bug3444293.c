@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-void *s[3];
+void __code* s[3];
 
 void f(void)
 {
@@ -14,8 +14,8 @@ void f(void)
 
 void testBug(void)
 {
-	s[0] = (void *)(0xffff);
-	s[1] = (void *)(0xffff);
+	s[0] = (void __code*)(0xffff);
+	s[1] = (void __code*)(0xffff);
 	f();
 	ASSERT(!s[0]);
 	ASSERT(!s[1]);

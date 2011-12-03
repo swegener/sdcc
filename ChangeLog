@@ -1,3 +1,8 @@
+2011-12-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug3444293.c
+	  Fix warning in regression test.
+
 2011-12-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCcse.c,

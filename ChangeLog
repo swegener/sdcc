@@ -1,3 +1,8 @@
+2011-12-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc.c:
+	  Fixed bug #3441816.
+
 2011-12-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/aslink.h,

@@ -1,3 +1,20 @@
+2011-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lkarea.c,
+	* sdas/linksrc/lkbank.c,
+	* sdas/linksrc/lkdata.c,
+	* sdas/linksrc/lklex.c,
+	* sdas/linksrc/lklist.c,
+	* sdas/linksrc/lkmain.c,
+	* sdas/linksrc/lknoice.c,
+	* sdas/linksrc/lkout.c,
+	* sdas/linksrc/lkrloc.c,
+	* sdas/linksrc/lkrloc3.c,
+	* sdas/linksrc/lks19.c,
+	* sdas/linksrc/lksym.c,
+	* sdas/linksrc/Makefile.in: and another step towards ASxxxx v5
+
 2011-12-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc.c:

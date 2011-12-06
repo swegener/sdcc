@@ -22,8 +22,8 @@
  * Kent, Ohio  44240
  *
  *   With enhancements from
- *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *      John L. Hartman (JLH)
+ *      jhartman@compuserve.com
  *
  */
 
@@ -39,17 +39,17 @@
  *              sym *   lkpsym()
  *              char *  new()
  *              sym *   newsym()
- *		char *	strsto()
+ *              char *  strsto()
  *              VOID    symdef()
  *              int     symeq()
  *              VOID    syminit()
  *              VOID    symmod()
  *              a_uint  symval()
  *
- *	lksym.c contains the static variables:
- *		char *	pnext
- *		int	bytes
- *	used by the string store function.
+ *      lksym.c contains the static variables:
+ *              char *  pnext
+ *              int     bytes
+ *      used by the string store function.
  */
 
 /*)Function     VOID    syminit()
@@ -142,7 +142,7 @@ syminit(void)
 struct sym *
 newsym(void)
 {
-	a_uint ev;
+        a_uint ev;
         int c, i, nsym;
         struct sym *tsp;
         struct sym **s;
@@ -152,9 +152,9 @@ newsym(void)
                 fprintf(stderr, "No header defined\n");
                 lkexit(ER_FATAL);
         }
-	/*
-	 * Create symbol entry
-	 */
+        /*
+         * Create symbol entry
+         */
         getSid(id);
         tsp = lkpsym(id, 1);
         c = getnb();get();get();
@@ -168,7 +168,7 @@ newsym(void)
         if (c == 'D') {
                 ev = eval();
                 if (tsp->s_type & S_DEF &&
-                    !(tsp->s_addr == ev && ((tsp->s_axp->a_bap->a_flag & A3_ABS) == A3_ABS))) {
+                    !(tsp->s_addr == ev && tsp->s_axp && tsp->s_axp->a_bap && ((tsp->s_axp->a_bap->a_flag & A3_ABS) == A3_ABS))) {
                         fprintf(stderr,
                                 "Multiple definition of %s\n", id);
                         lkerr++;
@@ -395,8 +395,8 @@ symmod(FILE *fp, struct sym *tsp)
  *      The function symeq() compares the two name strings for a match.
  *      The return value is 1 for a match and 0 for no match.
  *
- *		cflag == 0	case sensitive compare
- *		cflag != 0	case insensitive compare
+ *              cflag == 0      case sensitive compare
+ *              cflag != 0      case insensitive compare
  *
  *      local variables:
  *              int     n               loop counter
@@ -416,122 +416,122 @@ symmod(FILE *fp, struct sym *tsp)
 int
 symeq(char *p1, char *p2, int cflag)
 {
-	int n;
+        int n;
 
-	n = strlen(p1) + 1;
-	if(cflag) {
-		/*
-		 * Case Insensitive Compare
-		 */
-		do {
-			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
-				return (0);
-		} while (--n);
-	} else {
-		/*
-		 * Case Sensitive Compare
-		 */
-		do {
-			if (*p1++ != *p2++)
-				return (0);
-		} while (--n);
-	}
-	return (1);
+        n = strlen(p1) + 1;
+        if(cflag) {
+                /*
+                 * Case Insensitive Compare
+                 */
+                do {
+                        if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
+                                return (0);
+                } while (--n);
+        } else {
+                /*
+                 * Case Sensitive Compare
+                 */
+                do {
+                        if (*p1++ != *p2++)
+                                return (0);
+                } while (--n);
+        }
+        return (1);
 }
 
-/*)Function	int	hash(p, cflag)
+/*)Function     int     hash(p, cflag)
  *
- *		char *	p		pointer to string to hash
- *		int	cflag		case sensitive flag
+ *              char *  p               pointer to string to hash
+ *              int     cflag           case sensitive flag
  *
- *	The function hash() computes a hash code using the sum
- *	of all characters mod table size algorithm.
+ *      The function hash() computes a hash code using the sum
+ *      of all characters mod table size algorithm.
  *
- *		cflag == 0	case sensitive hash
- *		cflag != 0	case insensitive hash
+ *              cflag == 0      case sensitive hash
+ *              cflag != 0      case insensitive hash
  *
- *	local variables:
- *		int	h		accumulated character sum
+ *      local variables:
+ *              int     h               accumulated character sum
  *
- *	global variables:
- *		char	ccase[]		an array of characters which
- *					perform the case translation function
+ *      global variables:
+ *              char    ccase[]         an array of characters which
+ *                                      perform the case translation function
  *
- *	functions called:
- *		none
+ *      functions called:
+ *              none
  *
- *	side effects:
- *		none
+ *      side effects:
+ *              none
  */
 
 int
 hash(char *p, int cflag)
 {
-	int h;
+        int h;
 
-	h = 0;
-	while (*p) {
-		if(cflag) {
-			/*
-			 * Case Insensitive Hash
-			 */
-			h += ccase[*p++ & 0x007F];
-		} else {
-			/*
-			 * Case Sensitive Hash
-			 */
-			h += *p++;
-		}
-	}
-	return (h&HMASK);
+        h = 0;
+        while (*p) {
+                if(cflag) {
+                        /*
+                         * Case Insensitive Hash
+                         */
+                        h += ccase[*p++ & 0x007F];
+                } else {
+                        /*
+                         * Case Sensitive Hash
+                         */
+                        h += *p++;
+                }
+        }
+        return (h&HMASK);
 }
 
-#if	decus
+#if     decus
 
-/*)Function	char *	strsto(str)
+/*)Function     char *  strsto(str)
  *
- *		char *	str		pointer to string to save
+ *              char *  str             pointer to string to save
  *
- *	Allocate space for "str", copy str into new space.
- *	Return a pointer to the allocated string.
+ *      Allocate space for "str", copy str into new space.
+ *      Return a pointer to the allocated string.
  *
- *	This function based on code by
- *		John L. Hartman
- *		jhartman@compuserve.com
+ *      This function based on code by
+ *              John L. Hartman
+ *              jhartman@compuserve.com
  *
- *	local variables:
- *		int	l		string length + 1
- *		char *	p		string location
+ *      local variables:
+ *              int     l               string length + 1
+ *              char *  p               string location
  *
- *	global variables:
- *		none
+ *      global variables:
+ *              none
  *
- *	functions called:
- *		char *	new()		assym.c
- *		char *	strncpy()	c_library
+ *      functions called:
+ *              char *  new()           assym.c
+ *              char *  strncpy()       c_library
  *
- *	side effects:
- *		Space allocated for string, string copied
- *		to space.  Out of Space terminates linker.
+ *      side effects:
+ *              Space allocated for string, string copied
+ *              to space.  Out of Space terminates linker.
  */
 
 char *
 strsto(char *str)
 {
-	int  l;
-	char *p;
+        int  l;
+        char *p;
 
-	/*
-	 * What we need, including a null.
-	 */
-	l = strlen(str) + 1;
-	p = (char *) new (l);
+        /*
+         * What we need, including a null.
+         */
+        l = strlen(str) + 1;
+        p = (char *) new (l);
 
-	/*
-	 * Copy the name and terminating null.
-	 */
-	strncpy(p, str, l);
-	return(p);
+        /*
+         * Copy the name and terminating null.
+         */
+        strncpy(p, str, l);
+        return(p);
 }
 
 /*
@@ -548,38 +548,38 @@ strsto(char *str)
  * requirement.
  */
 
-/*)Function	char *	new(n)
+/*)Function     char *  new(n)
  *
- *		unsigned int	n	allocation size in bytes
+ *              unsigned int    n       allocation size in bytes
  *
- *	The function new() allocates n bytes of space and returns
- *	a pointer to this memory.  If no space is available the
- *	linker is terminated.
+ *      The function new() allocates n bytes of space and returns
+ *      a pointer to this memory.  If no space is available the
+ *      linker is terminated.
  *
- *	Allocate space for "str", copy str into new space.
- *	Return a pointer to the allocated string.
+ *      Allocate space for "str", copy str into new space.
+ *      Return a pointer to the allocated string.
  *
- *	This function based on code by
- *		John L. Hartman
- *		jhartman@compuserve.com
+ *      This function based on code by
+ *              John L. Hartman
+ *              jhartman@compuserve.com
  *
- *	local variables:
- *		int	bytes		bytes remaining in buffer area
- *		int	i		loop counter
- *		char *	p		pointer to head of copied string
- *		char *	pnext		next location in buffer area
- *		char *	q		a general pointer
+ *      local variables:
+ *              int     bytes           bytes remaining in buffer area
+ *              int     i               loop counter
+ *              char *  p               pointer to head of copied string
+ *              char *  pnext           next location in buffer area
+ *              char *  q               a general pointer
  *
- *	global variables:
- *		none
+ *      global variables:
+ *              none
  *
- *	functions called:
- *		int	fprintf()	c_library
- *		VOID *	malloc()	c_library
+ *      functions called:
+ *              int     fprintf()       c_library
+ *              VOID *  malloc()        c_library
  *
- *	side effects:
- *		Memory is allocated, if allocation fails
- *		the linker is terminated.
+ *      side effects:
+ *              Memory is allocated, if allocation fails
+ *              the linker is terminated.
  */
 
 /*
@@ -588,86 +588,86 @@ strsto(char *str)
  * These static variables remember our hunk.
  */
 
-#define	STR_SPC	1024
-#define	STR_MIN	16
-static	char *	pnext = NULL;
-static	int	bytes = 0;
+#define STR_SPC 1024
+#define STR_MIN 16
+static  char *  pnext = NULL;
+static  int     bytes = 0;
 
 char *
 new(unsigned int n)
 {
-	char *p,*q;
-	unsigned int i;
+        char *p,*q;
+        unsigned int i;
 
-	/*
-	 * Always an even byte count
-	 */
-	n = (n+1) & 0xFFFE;
+        /*
+         * Always an even byte count
+         */
+        n = (n+1) & 0xFFFE;
 
-	if (n > STR_MIN) {
-		/*
-		 * For allocations larger than
-		 * most structures and short strings
-		 * allocate the space directly.
-		 */
-		p = (char *) malloc(n);
-	} else {
-		/*
-		 * For smaller structures and
-		 * strings allocate from the hunk.
-		 */
-		if (n > bytes) {
-			/*
-			 * No space.  Allocate a new hunk.
-			 * We lose the pointer to any old hunk.
-			 * We don't care, as the pieces are never deleted.
-			*/
-			pnext = (char *) malloc (STR_SPC);
-			bytes = STR_SPC;
-		}
-		p = pnext;
-		pnext += n;
-		bytes -= n;
-	}
-	if (p == NULL) {
-		fprintf(stderr, "Out of space!\n");
-		lkexit(ER_FATAL);
-	}
-	for (i=0,q=p; i<n; i++) {
-		*q++ = 0;
-	}
-	return (p);
+        if (n > STR_MIN) {
+                /*
+                 * For allocations larger than
+                 * most structures and short strings
+                 * allocate the space directly.
+                 */
+                p = (char *) malloc(n);
+        } else {
+                /*
+                 * For smaller structures and
+                 * strings allocate from the hunk.
+                 */
+                if (n > bytes) {
+                        /*
+                         * No space.  Allocate a new hunk.
+                         * We lose the pointer to any old hunk.
+                         * We don't care, as the pieces are never deleted.
+                        */
+                        pnext = (char *) malloc (STR_SPC);
+                        bytes = STR_SPC;
+                }
+                p = pnext;
+                pnext += n;
+                bytes -= n;
+        }
+        if (p == NULL) {
+                fprintf(stderr, "Out of space!\n");
+                lkexit(ER_FATAL);
+        }
+        for (i=0,q=p; i<n; i++) {
+                *q++ = 0;
+        }
+        return (p);
 }
 
 #else
 
-/*)Function	char *	strsto(str)
+/*)Function     char *  strsto(str)
  *
- *		char *	str		pointer to string to save
+ *              char *  str             pointer to string to save
  *
- *	Allocate space for "str", copy str into new space.
- *	Return a pointer to the allocated string.
+ *      Allocate space for "str", copy str into new space.
+ *      Return a pointer to the allocated string.
  *
- *	This function based on code by
- *		John L. Hartman
- *		jhartman@compuserve.com
+ *      This function based on code by
+ *              John L. Hartman
+ *              jhartman@compuserve.com
  *
- *	local variables:
- *		int	l		string length + 1
- *		int	bytes		bytes remaining in buffer area
- *		char *	p		pointer to head of copied string
- *		char *	pnext		next location in buffer area
+ *      local variables:
+ *              int     l               string length + 1
+ *              int     bytes           bytes remaining in buffer area
+ *              char *  p               pointer to head of copied string
+ *              char *  pnext           next location in buffer area
  *
- *	global variables:
- *		none
+ *      global variables:
+ *              none
  *
- *	functions called:
- *		char *	new()		assym.c
- *		char *	strncpy()	c_library
+ *      functions called:
+ *              char *  new()           assym.c
+ *              char *  strncpy()       c_library
  *
- *	side effects:
- *		Space allocated for string, string copied
- *		to space.  Out of Space terminates assembler.
+ *      side effects:
+ *              Space allocated for string, string copied
+ *              to space.  Out of Space terminates assembler.
  */
 
 /*
@@ -676,81 +676,81 @@ new(unsigned int n)
  * These static variables remember our hunk
  */
 
-#define	STR_SPC	1024
-static	char *	pnext = NULL;
-static	int	bytes = 0;
+#define STR_SPC 1024
+static  char *  pnext = NULL;
+static  int     bytes = 0;
 
 char *
 strsto(char *str)
 {
-	int  l;
-	char *p;
+        int  l;
+        char *p;
 
-	/*
-	 * What we need, including a null.
-	 */
-	l = strlen(str) + 1;
+        /*
+         * What we need, including a null.
+         */
+        l = strlen(str) + 1;
 
-	if (l > bytes) {
-		/*
-		 * No space.  Allocate a new hunk.
-		 * We lose the pointer to any old hunk.
-		 * We don't care, as the strings are never deleted.
-		*/
-		pnext = (char *) new (STR_SPC);
-		bytes = STR_SPC;
-	}
+        if (l > bytes) {
+                /*
+                 * No space.  Allocate a new hunk.
+                 * We lose the pointer to any old hunk.
+                 * We don't care, as the strings are never deleted.
+                */
+                pnext = (char *) new (STR_SPC);
+                bytes = STR_SPC;
+        }
 
-	/*
-	 * Copy the name and terminating null.
-	 */
-	p = pnext;
-	strncpy(p, str, l);
+        /*
+         * Copy the name and terminating null.
+         */
+        p = pnext;
+        strncpy(p, str, l);
 
-	pnext += l;
-	bytes -= l;
+        pnext += l;
+        bytes -= l;
 
-	return(p);
+        return(p);
 }
 
-/*)Function	char *	new(n)
+/*)Function     char *  new(n)
  *
- *		unsigned int	n	allocation size in bytes
+ *              unsigned int    n       allocation size in bytes
  *
- *	The function new() allocates n bytes of space and returns
- *	a pointer to this memory.  If no space is available the
- *	linker is terminated.
+ *      The function new() allocates n bytes of space and returns
+ *      a pointer to this memory.  If no space is available the
+ *      linker is terminated.
  *
- *	local variables:
- *		char *	p		a general pointer
- *		char *	q		a general pointer
+ *      local variables:
+ *              char *  p               a general pointer
+ *              char *  q               a general pointer
  *
- *	global variables:
- *		none
+ *      global variables:
+ *              none
  *
- *	functions called:
- *		int	fprintf()	c_library
- *		VOID *	malloc()	c_library
+ *      functions called:
+ *              int     fprintf()       c_library
+ *              VOID *  malloc()        c_library
  *
- *	side effects:
- *		Memory is allocated, if allocation fails
- *		the linker is terminated.
+ *      side effects:
+ *              Memory is allocated, if allocation fails
+ *              the linker is terminated.
  */
 
 char *
 new(unsigned int n)
 {
-	char *p,*q;
-	unsigned int i;
+        char *p,*q;
+        unsigned int i;
 
-	if ((p = (char *) malloc(n)) == NULL) {
-		fprintf(stderr, "Out of space!\n");
-		lkexit(ER_FATAL);
-	}
-	for (i=0,q=p; i<n; i++) {
-		*q++ = 0;
-	}
-	return (p);
+        if ((p = (char *) malloc(n)) == NULL) {
+                fprintf(stderr, "Out of space!\n");
+                lkexit(ER_FATAL);
+        }
+        for (i=0,q=p; i<n; i++) {
+                *q++ = 0;
+        }
+        return (p);
 }
 
 #endif

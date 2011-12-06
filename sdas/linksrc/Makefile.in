@@ -57,6 +57,8 @@ OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 LKOBJECTS = $(OBJS) $(LKOBJS) $(ASXXLIBOBJS)
 
+$(LKOBJECTS) : aslink.h
+
 ASLINK          = $(top_builddir)/bin/sdld$(EXEEXT)
 
 transform       = @program_transform_name@

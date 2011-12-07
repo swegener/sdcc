@@ -1,5 +1,12 @@
 2011-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/include/stdbool.h: removed BOOL
+	* src/SDCCast.c (decorateType, addess of),
+	* src/SDCCsymt.c (checkSClass): fixed bug 2934292
+	* support/regression/tests/bool.c: enabled function pointer tests
+
+2011-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* sdas/linksrc/aslink.h,
 	* sdas/linksrc/lkarea.c,
 	* sdas/linksrc/lkbank.c,

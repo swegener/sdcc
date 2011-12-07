@@ -2592,8 +2592,8 @@ checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
       else                      // from a pointer to a pointer
         {
           if (implicit && getAddrspace (newType->next) != getAddrspace (orgType->next))
-            {  
-              errors += werror (E_INCOMPAT_PTYPES);                 
+            {
+              errors += werror (E_INCOMPAT_PTYPES);
             }
           else if (IS_GENPTR (newType) && IS_VOID (newType->next))
             {                   // cast to void* is always allowed
@@ -3072,9 +3072,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       /*  address of                */
       /*----------------------------*/
-      p = newLink (DECLARATOR);
+      if (IS_FUNC (LTYPE (tree)))
+        {
+          // this ought to be ignored
+          return (tree->left);
+        }
+
       /* if bit field then error */
-      if (IS_BITFIELD (tree->left->etype) || (IS_BITVAR (tree->left->etype) && (TARGET_IS_MCS51 || TARGET_IS_XA51 || TARGET_IS_DS390)))
+      if (IS_BITFIELD (tree->left->etype) || (IS_BITVAR (tree->left->etype) && TARGET_MCS51_LIKE))
         {
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of bit variable");
           goto errorTreeReturn;
@@ -3084,12 +3089,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of register variable");
           goto errorTreeReturn;
-        }
-
-      if (IS_FUNC (LTYPE (tree)))
-        {
-          // this ought to be ignored
-          return (tree->left);
         }
 
       if (IS_LITERAL (LTYPE (tree)))
@@ -3103,6 +3102,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "address of");
           goto errorTreeReturn;
         }
+
+      p = newLink (DECLARATOR);
       if (!LETYPE (tree))
         DCL_TYPE (p) = POINTER;
       else if (SPEC_SCLS (LETYPE (tree)) == S_CODE)
@@ -6242,7 +6243,7 @@ inlineTempVar (sym_link * type, int level)
   SPEC_EXTR (sym->etype) = 0;
   SPEC_STAT (sym->etype) = 0;
   if (IS_SPEC (sym->type))
-    { 
+    {
       SPEC_VOLATILE (sym->type) = 0;
       SPEC_ADDRSPACE (sym->type) = 0;
     }
@@ -7512,12 +7513,12 @@ astErrors (ast * t)
  * >   info node:   (gcc-4.1)Offsetof
  * >
  * >      primary:
- * >      	"__builtin_offsetof" "(" `typename' "," offsetof_member_designator ")"
+ * >        "__builtin_offsetof" "(" `typename' "," offsetof_member_designator ")"
  * >
  * >      offsetof_member_designator:
- * >      	  `identifier'
- * >      	| offsetof_member_designator "." `identifier'
- * >      	| offsetof_member_designator "[" `expr' "]"
+ * >          `identifier'
+ * >        | offsetof_member_designator "." `identifier'
+ * >        | offsetof_member_designator "[" `expr' "]"
  * >
  * >  This extension is sufficient such that
  * >

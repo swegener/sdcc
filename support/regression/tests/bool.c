@@ -26,9 +26,9 @@
 
   volatile bool E;
 
-#if (__SDCC_WEIRD_BOOL == 0)
   bool (* const pa[])(void) = {&ret_true, &ret_false};
 
+#if (__SDCC_WEIRD_BOOL == 0)
   struct s
   {
     bool b;
@@ -45,13 +45,13 @@ testBool(void)
 {
 	volatile unsigned char z = 2;
 
-#if (__SDCC_WEIRD_BOOL == 0)
 	const char *BOOL = "George Boole";
 
 	ASSERT(true);
 	ASSERT((*(pa[0]))() == true);
 	ASSERT((*(pa[1]))() == false);
 
+#if (__SDCC_WEIRD_BOOL == 0)
 	s2.b = (z & 2);
 	ASSERT(s2.b);
 	s2.b = (bool)(z & 2);

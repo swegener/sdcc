@@ -10,11 +10,7 @@
 
 #include <stdbool.h>
 
-#ifndef BOOL
-#define BOOL bool
-#endif
-
-BOOL foo(char i, BOOL bv)
+bool foo(char i, bool bv)
 {
 	bv &= (i == 1);
 	return bv;

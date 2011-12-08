@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -35,10 +35,6 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#ifndef BOOL
-#define BOOL _Bool
-#endif
-
 #define P0  0.100000000E+1
 #define P1 -0.958017723E-1
 #define Q0  0.100000000E+1
@@ -54,7 +50,7 @@
 //A reasonable choice for YMAX is the integer part of B**(t/2)*PI/2:
 #define YMAX 6433.0
 
-float tancotf(const float x, const BOOL iscotan)
+float tancotf(const float x, const bool iscotan)
 {
     float f, g, xn, xnum, xden;
     int n;

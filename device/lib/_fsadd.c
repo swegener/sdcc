@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,10 +31,6 @@
 #include <float.h>
 #include <stdbool.h>
 #include <sdcc-lib.h>
-
-#ifndef BOOL
-#define BOOL _Bool
-#endif
 
 #ifdef FLOAT_ASM_MCS51
 
@@ -177,7 +173,7 @@ float __fsadd (float a1, float a2)
   long _AUTOMEM *pfl1;
   long _AUTOMEM *pfl2;
   int exp1, exp2, expd;
-  BOOL sign = false;
+  bool sign = false;
 
   pfl2 = (long _AUTOMEM *)&a2;
   exp2 = EXP (*pfl2);

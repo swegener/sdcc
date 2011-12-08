@@ -10,11 +10,7 @@
 
 #include <stdbool.h>
 
-#ifndef BOOL
-#define BOOL bool
-#endif
-
-BOOL foo_b(BOOL b)
+bool foo_b(bool b)
 {
 	return !b;
 }
@@ -29,7 +25,7 @@ unsigned char foo_c(unsigned char c)
 	return !c;
 }
 
-BOOL bar_b(BOOL c)
+bool bar_b(bool c)
 {
 	return foo_c(c);
 }

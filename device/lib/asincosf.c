@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -35,10 +35,6 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#ifndef BOOL
-#define BOOL _Bool
-#endif
-
 #define P1  0.933935835E+0
 #define P2 -0.504400557E+0
 #define Q0  0.560363004E+1
@@ -48,11 +44,11 @@
 #define P(g) (P2 * g + P1)
 #define Q(g) ((Q2 * g + Q1) * g + Q0)
 
-float asincosf(const float x, const BOOL isacos)
+float asincosf(const float x, const bool isacos)
 {
     float y, g, r;
     unsigned char i;
-    BOOL quartPI = isacos;
+    bool quartPI = isacos;
 
     static const float a[2] = { 0.0, QUART_PI };
     static const float b[2] = { HALF_PI, QUART_PI };

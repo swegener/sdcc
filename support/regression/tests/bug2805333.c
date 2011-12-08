@@ -10,16 +10,12 @@
 
 #include <stdbool.h>
 
-#ifndef BOOL
-#define BOOL bool
-#endif
-
 void g(char c)
 {
   c;
 }
 
-BOOL b;
+bool b;
 
 void test_bug(void)
 {

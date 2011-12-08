@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -35,10 +35,6 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#ifndef BOOL
-#define BOOL _Bool
-#endif
-
 #define r1      -0.1666665668E+0
 #define r2       0.8333025139E-2
 #define r3      -0.1980741872E-3
@@ -51,11 +47,11 @@
 /*A reasonable value for YMAX is the int part of PI*B**(t/2)=3.1416*2**(12)*/
 #define YMAX     12867.0
 
-float sincosf(const float x, const BOOL iscos)
+float sincosf(const float x, const bool iscos)
 {
     float y, f, r, g, XN;
     int N;
-    BOOL sign;
+    bool sign;
 
     if(iscos)
     {

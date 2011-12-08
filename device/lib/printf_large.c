@@ -39,10 +39,6 @@
 #include <stdbool.h>
 #include <sdcc-lib.h>
 
-#ifndef BOOL
-#define BOOL _Bool
-#endif
-
 #define PTR value.ptr
 
 #ifdef SDCC_ds390
@@ -92,7 +88,7 @@ typedef union
 } value_t;
 
 #ifndef SDCC_STACK_AUTO
-  static BOOL lower_case;
+  static bool lower_case;
   static pfn_outputchar output_char;
   static void* p;
   static value_t value;
@@ -117,7 +113,7 @@ typedef union
 
 #ifdef SDCC_STACK_AUTO
   static void
-  output_digit (unsigned char n, BOOL lower_case, pfn_outputchar output_char, void* p)
+  output_digit (unsigned char n, bool lower_case, pfn_outputchar output_char, void* p)
   {
     register unsigned char c = n + (unsigned char)'0';
 
@@ -150,7 +146,7 @@ typedef union
 #ifdef SDCC_STACK_AUTO
   #define OUTPUT_2DIGITS( B )   { output_2digits( B, lower_case, output_char, p ); charsOutputted += 2; }
   static void
-  output_2digits (unsigned char b, BOOL lower_case, pfn_outputchar output_char, void* p)
+  output_2digits (unsigned char b, bool lower_case, pfn_outputchar output_char, void* p)
   {
     output_digit( b>>4,   lower_case, output_char, p );
     output_digit( b&0x0F, lower_case, output_char, p );
@@ -230,7 +226,7 @@ calculate_digit (unsigned char radix)
 static unsigned char
 output_float (float f, unsigned char reqWidth,
               signed char reqDecimals,
-              BOOL left, BOOL zero, BOOL sign, BOOL space,
+              bool left, bool zero, bool sign, bool space,
               pfn_outputchar output_char, void* p)
 {
   unsigned char charsOutputted = 0;
@@ -244,11 +240,11 @@ output_float (float f, unsigned char reqWidth,
 static void
 output_float (float f, unsigned char reqWidth,
               signed char reqDecimals,
-              BOOL left, BOOL zero, BOOL sign, BOOL space)
+              bool left, bool zero, bool sign, bool space)
 {
   __xdata char fpBuffer[128];
 #endif //SDCC_STACK_AUTO
-  BOOL negative = 0;
+  bool negative = 0;
   unsigned long integerPart;
   float rounding;
   float decimalPart;
@@ -437,20 +433,20 @@ output_float (float f, unsigned char reqWidth,
 int
 _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
 {
-  BOOL   left_justify;
-  BOOL   zero_padding;
-  BOOL   prefix_sign;
-  BOOL   prefix_space;
-  BOOL   signed_argument;
-  BOOL   char_argument;
-  BOOL   long_argument;
-  BOOL   float_argument;
+  bool   left_justify;
+  bool   zero_padding;
+  bool   prefix_sign;
+  bool   prefix_space;
+  bool   signed_argument;
+  bool   char_argument;
+  bool   long_argument;
+  bool   float_argument;
 #ifdef SDCC_STACK_AUTO
-  BOOL   lower_case;
+  bool   lower_case;
   value_t value;
   int charsOutputted;
 #endif
-  BOOL   lsd;
+  bool   lsd;
 
   unsigned char radix;
   unsigned char  width;

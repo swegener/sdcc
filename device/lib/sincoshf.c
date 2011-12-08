@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -34,10 +34,6 @@
 #include <math.h>
 #include <errno.h>
 #include <stdbool.h>
-
-#ifndef BOOL
-#define BOOL _Bool
-#endif
 
 #define P0 -0.713793159E+1
 #define P1 -0.190333999E+0
@@ -60,7 +56,7 @@
 float sincoshf(const float x, const int iscosh)
 {
     float y, w, z;
-	BOOL sign;
+    bool sign;
 
     if (x<0.0) { y=-x; sign=1; }
           else { y=x;  sign=0; }

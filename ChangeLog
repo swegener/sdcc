@@ -1,3 +1,28 @@
+2011-12-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_atof.c,
+	* device/lib/_divuint.c,
+	* device/lib/_divulong.c,
+	* device/lib/_fsadd.c,
+	* device/lib/acosf.c,
+	* device/lib/asincosf.c,
+	* device/lib/asinf.c,
+	* device/lib/cosf.c,
+	* device/lib/cotf.c,
+	* device/lib/expf.c,
+	* device/lib/printf_large.c,
+	* device/lib/sincosf.c,
+	* device/lib/sincoshf.c,
+	* device/lib/sinf.c,
+	* device/lib/tancotf.c,
+	* device/lib/tanf.c,
+	* support/regression/tests/bug1337835.c,
+	* support/regression/tests/bug2719592.c,
+	* support/regression/tests/bug2805333.c,
+	* support/regression/tests/bug3223041.c,
+	* support/regression/tests/bug3290691.c,
+	* support/regression/tests/funptrs.c: changed BOOL to bool
+
 2011-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdbool.h: removed BOOL

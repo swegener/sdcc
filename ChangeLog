@@ -1,3 +1,7 @@
+2011-12-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/cc2530.h: new, added, thanks Zafi Ramarosandratana
+
 2011-12-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_atof.c,

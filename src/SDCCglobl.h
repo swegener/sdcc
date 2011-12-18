@@ -250,7 +250,7 @@ struct options
     int cc_only;                /* compile only flag              */
     int intlong_rent;           /* integer & long support routines reentrant */
     int float_rent;             /* floating point routines are reentrant */
-    int out_fmt;                /* 0 = undefined, 'i' = intel Hex format, 's' = motorola S19 format, 't' = elf format, 'Z' = gb format */
+    int out_fmt;                /* 0 = undefined, 'i' = intel Hex format, 's' = motorola S19 format, 'E' = elf format, 'Z' = gb format */
     int cyclomatic;             /* print cyclomatic information */
     int noOverlay;              /* don't overlay local variables & parameters */
     int mainreturn;             /* issue a return after main */

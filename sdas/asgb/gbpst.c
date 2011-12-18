@@ -124,5 +124,5 @@ struct	mne	mne[] = {
     { NULL,	"reti",		S_INH1,		0,	0xD9 },
     { NULL,	"ldh",		S_LDH,		0,	0xE0 },
     { NULL,	"lda",		S_LDA,		0,	0xE8 },
-    { NULL,	"ldhl",		S_LDHL,		S_END,	0xF }
+    { NULL,	"ldhl",		S_LDHL,		S_EOL,	0xF }
 };

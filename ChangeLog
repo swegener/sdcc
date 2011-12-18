@@ -1,3 +1,42 @@
+2011-12-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/sdcdb.c (escapeQuotes): fixed warning
+	* sdas/asrab/rabbitmch.c: fixed bug 3461821 by calling outrb with 0
+	* sdas/as6808/m08pst.c,
+	* sdas/as8051/i51adr.c,
+	* sdas/as8051/i51mch.c,
+	* sdas/as8051/i51pst.c,
+	* sdas/as8051/i8051.h,
+	* sdas/asgb/gbpst.c,
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asexpr.c,
+	* sdas/asxxsrc/aslex.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asout.c,
+	* sdas/asxxsrc/assym.c,
+	* sdas/asxxsrc/asxxxx.h,
+	* sdas/asz80/z80mch.c,
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lkarea.c,
+	* sdas/linksrc/lkhead.c,
+	* sdas/linksrc/lklex.c,
+	* sdas/linksrc/lklist.c,
+	* sdas/linksrc/sdld.c,
+	* sdas/linksrc/sdld.h: another step towards ASxxxx v5
+	* sdas/asrab/rabbit.h,
+	* sdas/asrab/rabbitadr.c,
+	* sdas/asrab/rabbitext.c,
+	* sdas/asrab/rabbitpst.c: native line endings, no TABs
+	* src/ds390/main.c,
+	* src/mcs51/main.c,
+	* src/z80/main.c: asxxx -z flag is now case INsensitive
+	* src/hc08/main.c: fixed bug 1666106 by adding (PAG) to DSEG and OSEG
+	* src/SDCCglobl.h: fixed -E comment
+	* src/SDCCicode.c (geniCodeAdd),
+	* src/SDCCsymt.c (compStructSize): added error for unknown struct size
+	* src/SDCClabel.c: no TABs
+
 2011-12-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/cc2530.h: new, added, thanks Zafi Ramarosandratana
@@ -20569,7 +20608,7 @@
 	wherever there is enough space for it, and IDATA can be anywhere
 	in internal RAM.  For now compile using	-Wl-Y[stack_size].
 	The mem file is different for this option as well, since it
-	makes no sense of talking about DSEG lenght.
+	makes no sense of talking about DSEG length.
 
 2004-01-02 Vangelis Rokas <vrokas AT otenet.gr>
 
@@ -24077,6 +24116,7 @@
 2001-11-07  Michael Hope  <michaelh AT juju.net.nz>
 
 	* support/regression/tests/float.c (testFloatAdd): Fixed up warning.
+
 2001-11-18  Bernhard Held  <bernhard AT bernhardheld.de>
 
 	* sdcc/support/regression/tests/bug-460010.c: fix seg violation on host

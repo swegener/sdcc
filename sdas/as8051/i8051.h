@@ -1,24 +1,31 @@
-/* i8051.h
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* i8051.h */
 
 /*
- * Ported from 8085 to 8051 by John Hartman 30-Apr-1995
- * Continued, 2-Jun-95
+ *  Copyright (C) 1998-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   This Assember Ported by
+ *      John L. Hartman	(JLH)
+ *      jhartman at compuserve dot com
+ *      noice at noicedebugger dot com
+ *
  */
 
 /*)BUILD
@@ -137,6 +144,7 @@ extern  int             mchpcr(struct expr *esp);
 extern  VOID            minit(void);
 
 #else
+
         /* i51adr.c */
 extern  struct  adsym   reg51[];
 extern  int             addr();
@@ -149,4 +157,5 @@ extern  int             reg();
 extern  VOID            machine();
 extern  int             mchpcr();
 extern  VOID            minit();
+
 #endif

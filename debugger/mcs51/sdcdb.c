@@ -1708,11 +1708,11 @@ static void printHelp(void)
 /*-----------------------------------------------------------------*/
 /* escapeQuotes - escape double quotes                             */
 /*-----------------------------------------------------------------*/
-#define CHUNCK  256
+#define CHUNK  256
 
 static const char *escapeQuotes(const char *arg)
 {
-#define extend(n)  do { if (ps - str + (n) > strLen) str = Safe_realloc (str, strLen += CHUNCK); } while (0)
+#define extend(n)  do { if ((size_t)(ps - str + (n)) > strLen) str = Safe_realloc (str, strLen += CHUNK); } while (0)
 
   static char *str = NULL;
   static size_t strLen = 0;
@@ -1721,7 +1721,7 @@ static const char *escapeQuotes(const char *arg)
 
   if (NULL == str)
     {
-      strLen = CHUNCK;
+      strLen = CHUNK;
       str = Safe_malloc (strLen);
     }
 
@@ -1757,8 +1757,8 @@ char *argsToCmdLine(char **args, int nargs)
 
   if (NULL == cmd)
     {
-      cmd = Safe_malloc(CHUNCK);
-      cmdLen = CHUNCK;
+      cmd = Safe_malloc(CHUNK);
+      cmdLen = CHUNK;
     }
 
   for (i = 0; i < nargs; ++i)

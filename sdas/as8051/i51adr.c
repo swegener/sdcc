@@ -1,28 +1,33 @@
-/* i51adr.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* i51adr.c */
 
 /*
- * Ported from 8085 to 8051 by John Hartman 30-Apr-1995
- * Continued, 29-May-95
+ *  Copyright (C) 1998-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *      This Assember Ported by
+ *      John L. Hartman (JLH)
+ *      jhartman at compuserve dot com
+ *      noice at noicedebugger dot com
+ *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "i8051.h"
 
@@ -46,8 +51,7 @@ struct adsym reg51[] = {        /* R0 thru R7 registers */
 
 /*  Classify argument as to address mode */
 int
-addr(esp)
-struct expr *esp;
+addr(struct expr *esp)
 {
         int c;
         unsigned rd;
@@ -138,6 +142,7 @@ struct expr *esp;
                         }
                 } else {
                         /* Must be an expression */
+                        esp->e_addr = 0;
                         expr(esp, 0);
                         if ((!esp->e_flag)
                                 && (esp->e_base.e_ap==NULL)
@@ -157,11 +162,10 @@ struct expr *esp;
  * -1 for no match.
  */
 int
-admode(sp)
-register struct adsym *sp;
+admode(struct adsym *sp)
 {
-        register char *ptr;
-        register int i;
+        char *ptr;
+        int i;
         unget(getnb());
         i = 0;
         while ( *(ptr = &sp[i].a_str[0]) ) {
@@ -177,8 +181,7 @@ register struct adsym *sp;
  *      srch --- does string match ?
  */
 int
-srch(str)
-char *str;
+srch(char *str)
 {
         char *ptr;
         ptr = ip;
@@ -206,9 +209,7 @@ char *str;
  *      any --- does str contain c?
  */
 int
-any(c,str)
-int c;
-char *str;
+any(int c, char *str)
 {
         while (*str)
                 if(*str++ == c)
@@ -220,7 +221,7 @@ char *str;
  * Read a register name.  Return register value, -1 if no register found
  */
 int
-reg()
+reg(void)
 {
         struct mne *mp;
         char id[NCPS];

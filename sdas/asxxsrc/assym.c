@@ -101,21 +101,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 VOID
 syminit(void)
 {
-        register struct mne  *mp;
+        struct mne  *mp;
         struct mne **mpp;
-        register struct sym  *sp;
+        struct sym  *sp;
         struct sym **spp;
-        register int h;
+        int h;
 
         mpp = &mnehash[0];
         while (mpp < &mnehash[NHASH])
                 *mpp++ = NULL;
         mp = &mne[0];
         for (;;) {
-                h = hash(mp->m_id);
+                h = hash(mp->m_id, 1);
                 mp->m_mp = mnehash[h];
                 mnehash[h] = mp;
-                if (mp->m_flag&S_END)
+                if (mp->m_flag&S_EOL)
                         break;
                 ++mp;
         }
@@ -125,10 +125,10 @@ syminit(void)
                 *spp++ = NULL;
         sp = &sym[0];
         for (;;) {
-                h = hash(sp->s_id);
+                h = hash(sp->s_id, zflag);
                 sp->s_sp = symhash[h];
                 symhash[h] = sp;
-                if (sp->s_flag&S_END)
+                if (sp->s_flag&S_EOL)
                         break;
                 ++sp;
         }
@@ -200,16 +200,16 @@ alookup(char *id)
 struct mne *
 mlookup(char *id)
 {
-        register struct mne *mp;
-        register int h;
+        struct mne *mp;
+        int h;
 
-        h = hash(id);
+        /*
+         * JLH: case insensitive lookup always
+         */
+        h = hash(id, 1);
         mp = mnehash[h];
         while (mp) {
-                /*
-                 * JLH: case insensitive lookup always
-                 */
-                if(symeq(id, mp->m_id, 0))
+                if(symeq(id, mp->m_id, 1))
                         return (mp);
                 mp = mp->m_mp;
         }
@@ -231,10 +231,10 @@ mlookup(char *id)
  *              sym *   sp              pointer to a sym structure
  *
  *      global varaibles:
- *              sym * symhash[]         array of pointers to NHASH
+ *              sym *   symhash[]       array of pointers to NHASH
  *                                      linked symbol lists
-  *             int     zflag           enable symbol case sensitivity
-*
+ *              int     zflag           disable symbol case sensitivity
+ *
  *      functions called:
  *              int     hash()          assym.c
  *              VOID *  new()           assym.c
@@ -247,12 +247,12 @@ mlookup(char *id)
  */
 
 struct sym *
-lookup(char *id)
+lookup(const char *id)
 {
-        register struct sym *sp;
-        register int h;
+        struct sym *sp;
+        int h;
 
-        h = hash(id);
+        h = hash(id, zflag);
         sp = symhash[h];
         while (sp) {
                 if(symeq(id, sp->s_id, zflag))
@@ -296,8 +296,8 @@ lookup(char *id)
 VOID
 symglob(void)
 {
-        register struct sym *sp;
-        register int i;
+        struct sym *sp;
+        int i;
 
         for (i=0; i<NHASH; ++i) {
                 sp = symhash[i];
@@ -333,8 +333,8 @@ symglob(void)
 VOID
 allglob(void)
 {
-        register struct sym *sp;
-        register int i;
+        struct sym *sp;
+        int i;
 
         for (i=0; i<NHASH; ++i) {
                 sp = symhash[i];
@@ -346,17 +346,17 @@ allglob(void)
         }
 }
 
-/*)Function     int     symeq(p1, p2, cflag)
+/*)Function     int     symeq(p1, p2, flag)
  *
- *              int     cflag           case sensitive flag
+ *              int     flag            case sensitive flag
  *              char *  p1              name string
  *              char *  p2              name string
  *
  *      The function symeq() compares the two name strings for a match.
  *      The return value is 1 for a match and 0 for no match.
  *
- *              cflag == 0      case insensitve compare
- *              cflag != 0      case sensitive compare
+ *              flag == 0      case sensitive compare
+ *              flag != 0      case insensitive compare
  *
  *      local variables:
  *              int     n               loop counter
@@ -374,14 +374,20 @@ allglob(void)
  */
 
 int
-symeq(p1, p2, cflag)
-register char *p1, *p2;
-int cflag;
+symeq(const char *p1, const char *p2, int flag)
 {
-        register size_t n;
+        size_t n;
 
         n = strlen(p1) + 1;
-        if(cflag) {
+        if(flag) {
+                /*
+                 * Case Insensitive Compare
+                 */
+                do {
+                        if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
+                                return (0);
+                } while (--n);
+        } else {
                 /*
                  * Case Sensitive Compare
                  */
@@ -389,23 +395,20 @@ int cflag;
                         if (*p1++ != *p2++)
                                 return (0);
                 } while (--n);
-        } else {
-                /*
-                 * Case Insensitive Compare
-                 */
-                do {
-                        if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])                             return (0);
-                } while (--n);
         }
         return (1);
 }
 
-/*)Function     int     hash(p)
+/*)Function     int     hash(p, flag)
  *
  *              char *  p               pointer to string to hash
+ *              int     flag            case sensitive flag
  *
  *      The function hash() computes a hash code using the sum
  *      of all characters mod table size algorithm.
+ *
+ *              flag == 0       case insensitve hash
+ *              flag != 0       case sensitive hash
  *
  *      local variables:
  *              int     h               accumulated character sum
@@ -423,18 +426,23 @@ int cflag;
  */
 
 int
-hash(char *p)
+hash(const char *p, int flag)
 {
-        register int h;
+        int h;
 
         h = 0;
         while (*p) {
-                /*
-                 * JLH: case insensitive hash:
-                 * Doesn't much affect hashing, and allows
-                 * same function for mnemonics and symbols.
-                 */
-                h += ccase[*p++ & 0x007F];
+                if(flag) {
+                        /*
+                         * Case Insensitive Hash
+                         */
+                        h += ccase[*p++ & 0x007F];
+                } else {
+                        /*
+                         * Case Sensitive Hash
+                         */
+                        h += *p++;
+                }
         }
         return (h&HMASK);
 }
@@ -479,17 +487,17 @@ static  char *  pnext = NULL;
 static  int     bytes = 0;
 
 char *
-strsto(char *str)
+strsto(const char *str)
 {
-        int  l;
+        int  len;
         char *p;
 
         /*
          * What we need, including a null.
          */
-        l = strlen(str) + 1;
+        len = strlen(str) + 1;
 
-        if (l > bytes) {
+        if (len > bytes) {
                 /*
                  * No space.  Allocate a new hunk.
                  * We lose the pointer to any old hunk.
@@ -503,10 +511,10 @@ strsto(char *str)
          * Copy the name and terminating null.
          */
         p = pnext;
-        strncpy(p, str, l);
+        strncpy(p, str, len);
 
-        pnext += l;
-        bytes -= l;
+        pnext += len;
+        bytes -= len;
 
         return(p);
 }
@@ -538,11 +546,11 @@ strsto(char *str)
 VOID *
 new(unsigned int n)
 {
-        register VOID *p;
+        VOID *p;
 
         if ((p = (VOID *) malloc(n)) == NULL) {
                 fprintf(stderr, "Out of space!\n");
-                asexit(1);
+                asexit(ER_FATAL);
         }
         return (p);
 }

@@ -102,7 +102,7 @@ _mcs51_regparm (sym_link * l, bool reentrant)
   else
     {
       int size = getSize(l);
-      int remain ;
+      int remain;
 
       /* first one goes the usual way to DPTR */
       if (regParmFlg == 0)
@@ -780,8 +780,8 @@ PORT mcs51_port =
   {                             /* Assembler */
     _asmCmd,
     NULL,
-    "-plosgffwzc",              /* Options with debug */
-    "-plosgffwz",               /* Options without debug */
+    "-plosgffwc",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */

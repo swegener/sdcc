@@ -87,7 +87,7 @@
  */
 
 VOID
-list()
+list(void)
 {
         char *wp;
         int *wpt;
@@ -291,9 +291,7 @@ list()
  */
 
 VOID
-list1(wp, wpt, nb, f)
-char *wp;
-int *wpt, nb, f;
+list1(char *wp, int *wpt, int nb, int f)
 {
         int i;
 
@@ -405,8 +403,7 @@ int *wpt, nb, f;
  */
 
 VOID
-list2(t)
-int t;
+list2(int t)
 {
         int c;
 
@@ -479,9 +476,7 @@ int t;
  */
 
 VOID
-slew(fp,flag)
-FILE *fp;
-int flag;
+slew(FILE *fp, int flag)
 {
         if ((lop++ >= NLPP) && flag) {
                 fprintf(fp, "\fASxxxx Assembler %s  (%s), page %u.\n",
@@ -546,8 +541,7 @@ static int _cmpSym(const void *p1, const void *p2)
  */
 
 VOID
-lstsym(fp)
-FILE *fp;
+lstsym(FILE *fp)
 {
         int i, j, k;
         char *ptr;

@@ -115,7 +115,7 @@ getid(char *id, int c)
  *      The function getSid() scans the current input text line
  *      from the current position copying the next string
  *      into the external string buffer (id).  The string ends when a space
- *  character (space, tab, \0) is found. The maximum number of
+ *      character (space, tab, \0) is found. The maximum number of
  *      characters copied is NCPS.  If the input string is larger than
  *      NCPS characters then the string is truncated, if the input string
  *      is shorter than NCPS characters then the string is NULL filled.

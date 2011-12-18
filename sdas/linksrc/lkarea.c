@@ -626,13 +626,6 @@ lnksect(struct area *tap)
 
         size = 0;
         addr = tap->a_addr;
-        if (!TARGET_IS_8051 &&
-                (tap->a_flag&A3_PAG) && (addr & 0xFF)) {
-                fprintf(stderr,
-                        "\n?ASlink-Warning-Paged Area %s Boundary Error\n",
-                        tap->a_id);
-                lkerr++;
-        }
         taxp = tap->a_axp;
         if (tap->a_flag & A3_OVR) {
                 /*
@@ -959,15 +952,6 @@ a_uint lnksect2 (struct area *tap, int locIndex)
 
         size = 0;
         addr = tap->a_addr;
-#if 0
-        if ((tap->a_flag & A3_PAG) && (addr & 0xFF))
-        {
-                fprintf(stderr,
-                        "\n?ASlink-Warning-Paged Area %s Boundary Error\n",
-                        tap->a_id);
-                lkerr++;
-        }
-#endif
         taxp = tap->a_axp;
 
         /*Use a letter to identify each area in the internal RAM layout map*/
@@ -1250,6 +1234,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                         }
                         else /*For concatenated BIT, CODE, and XRAM areax's*/
                         {
+                                //expand external stack
                                 if((fchar=='K') && (taxp->a_size == 1))
                                 {
                                         taxp->a_size = 256-(addr & 0xFF);

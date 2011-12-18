@@ -946,8 +946,8 @@ PORT ds390_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffwzc",              /* Options with debug */
-    "-plosgffwz",               /* Options without debug */
+    "-plosgffwc",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */
@@ -1544,8 +1544,8 @@ PORT ds400_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffwzc",              /* Options with debug */
-    "-plosgffwz",               /* Options without debug */
+    "-plosgffwc",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */

@@ -1187,6 +1187,7 @@ extern  VOID            setbank(void);
 /* lkhead.c */
 extern  VOID            module(void);
 extern  VOID            newhead(void);
+extern  VOID            newmode(void);
 
 /* lksym.c */
 extern  int             hash(char *p, int cflag);

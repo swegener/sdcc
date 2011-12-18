@@ -374,6 +374,8 @@ term(register struct expr *esp)
         if (c == '\'') {
                 esp->e_mode = S_USER;
                 esp->e_addr = getmap(-1)&0377;
+                c = get();
+                if (c != '\'') { unget(c); }
                 return;
         }
         if (c == '\"') {
@@ -385,6 +387,8 @@ term(register struct expr *esp)
                     esp->e_addr  = (getmap(-1)&0377);
                     esp->e_addr |= (getmap(-1)&0377)<<8;
                 }
+                c = get();
+                if (c != '\"') { unget(c); }
                 return;
         }
         if (c == '>' || c == '<') {

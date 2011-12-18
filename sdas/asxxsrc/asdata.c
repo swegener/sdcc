@@ -98,7 +98,7 @@ int     pflag;          /*      -p, enable listing pagination
                          */
 int     wflag;          /*      -w, enable wide listing format
                          */
-int     zflag;          /*      -z, enable symbol case sensitivity
+int     zflag;          /*      -z, disable symbol case sensitivity
                          */
 int     xflag;          /*      -x, listing radix flag
                          */
@@ -212,7 +212,7 @@ struct  mne     *mnehash[NHASH];
  */
 struct  sym     sym[] = {
     {NULL,      NULL,   ".",            S_USER, 0,                      NULL,   0,      0,      0},
-    {NULL,      NULL,   ".__.ABS.",     S_USER, S_ASG|S_GBL|S_END,      NULL,   0,      0,      0}
+    {NULL,      NULL,   ".__.ABS.",     S_USER, S_ASG|S_GBL|S_EOL,      NULL,   0,      0,      0}
 };
 
 struct  sym     *symp;          /*      pointer to a symbol structure

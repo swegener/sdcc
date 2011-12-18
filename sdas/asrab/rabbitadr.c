@@ -53,20 +53,20 @@ struct expr *esp;
                 expr(esp, 0);
                 esp->e_mode = S_IMMED;
 #if 0
-		/* ljm - leading digit is used for offset for dd(ix|iy|sp) */
+                /* ljm - leading digit is used for offset for dd(ix|iy|sp) */
         } else if ((c == '-') || ((c >= '0') && (c <= '9'))) {
           unget(c);
-	  expr(esp, 0);
-	  esp->e_mode = S_IMMED;
+          expr(esp, 0);
+          esp->e_mode = S_IMMED;
 #endif
-	} else
+        } else
         if (c == LFIND) {
-	  /* ljm comment -
-	   *      '(' number ')'   
-	   *  or  '(' register=[hl,ix,iy,sp,bc,de] ')'
-	   *     ref to memory, scan the next 'symbol' to see if
-	   *     it is a register or an absolute address
-	   */
+          /* ljm comment -
+           *      '(' number ')'   
+           *  or  '(' register=[hl,ix,iy,sp,bc,de] ')'
+           *     ref to memory, scan the next 'symbol' to see if
+           *     it is a register or an absolute address
+           */
                 if ((indx = admode(R8)) != 0) {
                         mode = S_INDB;
                 } else
@@ -81,7 +81,7 @@ struct expr *esp;
                         mode = S_R16X;
                         aerr();
                 } else {
-			mode = S_INDM;
+                        mode = S_INDM;
                         expr(esp, 0);
                         esp->e_mode = mode;
                 }
@@ -89,25 +89,25 @@ struct expr *esp;
                         esp->e_mode = (mode + indx)&0xFF;
                         esp->e_base.e_ap = NULL;
                 }
-		/* ljm comment -
-		 *   flag an error if the closing paren is absent
-		 */
+                /* ljm comment -
+                 *   flag an error if the closing paren is absent
+                 */
                 if ((c = getnb()) != RTIND)
                         qerr();
         } else {
                 unget(c);
-	  /* ljm -
-	   *   cases:
-	   *     register
-	   *     symbol
-	   *     symbol(register)
-	   *     number
-	   *     number(register)
-	   *
-	   * scan the list(s) of registers to see if the
-	   * name matches the name of one of the processor
-	   * registers
-	   */
+          /* ljm -
+           *   cases:
+           *     register
+           *     symbol
+           *     symbol(register)
+           *     number
+           *     number(register)
+           *
+           * scan the list(s) of registers to see if the
+           * name matches the name of one of the processor
+           * registers
+           */
                 if ((indx = admode(R8)) != 0) {
                         mode = S_R8;
                 } else
@@ -119,17 +119,17 @@ struct expr *esp;
                 } else
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
-		} else
-		if ((indx = admode(R32_JKHL)) != 0) {
-		        mode = S_R32_JKHL;
-		} else
-		if ((indx = admode(R32_BCDE)) != 0) {
-		        mode = S_R32_BCDE;
-		} else
-		if ((indx = admode(RXPC)) != 0) {
-		        mode = S_RXPC;
+                } else
+                if ((indx = admode(R32_JKHL)) != 0) {
+                        mode = S_R32_JKHL;
+                } else
+                if ((indx = admode(R32_BCDE)) != 0) {
+                        mode = S_R32_BCDE;
+                } else
+                if ((indx = admode(RXPC)) != 0) {
+                        mode = S_RXPC;
                 } else {
-			mode = S_USER;
+                        mode = S_USER;
                         expr(esp, 0);
                         esp->e_mode = mode;
                 }
@@ -139,14 +139,14 @@ struct expr *esp;
                         esp->e_base.e_ap = NULL;
                 }
                 if ((c = getnb()) == LFIND) {
-		  indx=admode(R16);
-		  if ((indx&0xFF)==IX || (indx&0xFF)==IY ||
-		      (indx&0xFF)==SP)
-		  {
-		    esp->e_mode = S_INDR + (indx&0xFF);
-		  } else if ( (indx&0xFF)==HL ) {
-		    esp->e_mode = S_IDHL_OFFSET;
-		  } else {
+                  indx=admode(R16);
+                  if ((indx&0xFF)==IX || (indx&0xFF)==IY ||
+                      (indx&0xFF)==SP)
+                  {
+                    esp->e_mode = S_INDR + (indx&0xFF);
+                  } else if ( (indx&0xFF)==HL ) {
+                    esp->e_mode = S_IDHL_OFFSET;
+                  } else {
                                 aerr();
                         }
                         if ((c = getnb()) != RTIND)
@@ -175,7 +175,7 @@ struct adsym *sp;
         unget(getnb());
 
         i = 0;
-	while ( *(ptr = &sp[i].a_str[0]) ) {
+        while ( *(ptr = &sp[i].a_str[0]) ) {
                 if (srch(ptr)) {
                         return(sp[i].a_val);
                 }
@@ -264,7 +264,7 @@ struct  adsym   R16[] = {
 };
 
 struct  adsym   R16X[] = {
-    { "af'",    AF|0400 },	/* af' must be first !!! */
+    { "af'",    AF|0400 },      /* af' must be first !!! */
     { "af",     AF|0400 },
     { "",       0000 }
 };

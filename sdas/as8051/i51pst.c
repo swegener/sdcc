@@ -1,147 +1,157 @@
-/* i85pst.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* i51pst.c */
 
 /*
- * 28-Oct-97 Ported from 8085 to 8051 by John Hartman
- * 30-Jan-98 JLH: add memory-space flags for .AREA
+ *  Copyright (C) 1998-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   This Assember Ported by
+ *      John L. Hartman	(JLH)
+ *      jhartman at compuserve dot com
+ *      noice at noicedebugger dot com
+ *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "i8051.h"
 
+/*
+ * Mnemonic Structure
+ */
 struct  mne     mne[] = {
 
         /* machine */
 
         /* system */
 
-        { NULL, "CON",          S_ATYP,         0,      A3_CON},
-        { NULL, "OVR",          S_ATYP,         0,      A3_OVR},
-        { NULL, "REL",          S_ATYP,         0,      A3_REL},
-        { NULL, "ABS",          S_ATYP,         0,      A3_ABS},
-        { NULL, "NOPAG",        S_ATYP,         0,      A3_NOPAG},
-        { NULL, "PAG",          S_ATYP,         0,      A3_PAG},
+        { NULL, "CON",          S_ATYP,         0,      A3_CON  },
+        { NULL, "OVR",          S_ATYP,         0,      A3_OVR  },
+        { NULL, "REL",          S_ATYP,         0,      A3_REL  },
+        { NULL, "ABS",          S_ATYP,         0,      A3_ABS  },
+        { NULL, "NOPAG",        S_ATYP,         0,      A3_NOPAG },
+        { NULL, "PAG",          S_ATYP,         0,      A3_PAG  },
 
-        { NULL, "CODE",         S_ATYP,         0,      A_CODE},
-        { NULL, "DATA",         S_ATYP,         0,      A_DATA},
-        { NULL, "XDATA",        S_ATYP,         0,      A_XDATA},
-        { NULL, "BIT",          S_ATYP,         0,      A_BIT},
+        { NULL, "CODE",         S_ATYP,         0,      A_CODE  },
+        { NULL, "DATA",         S_ATYP,         0,      A_DATA  },
+        { NULL, "XDATA",        S_ATYP,         0,      A_XDATA },
+        { NULL, "BIT",          S_ATYP,         0,      A_BIT   },
 
-        { NULL, ".byte",        S_BYTE,         0,      0},
-        { NULL, ".db",          S_BYTE,         0,      0},
-        { NULL, ".word",        S_WORD,         0,      0},
-        { NULL, ".dw",          S_WORD,         0,      0},
-        { NULL, ".ascii",       S_ASCII,        0,      0},
-        { NULL, ".asciz",       S_ASCIZ,        0,      0},
-        { NULL, ".blkb",        S_BLK,          0,      1},
-        { NULL, ".ds",          S_BLK,          0,      1},
-        { NULL, ".blkw",        S_BLK,          0,      2},
-        { NULL, ".page",        S_PAGE,         0,      0},
-        { NULL, ".title",       S_TITLE,        0,      0},
-        { NULL, ".sbttl",       S_SBTL,         0,      0},
-        { NULL, ".globl",       S_GLOBL,        0,      0},
-        { NULL, ".area",        S_DAREA,        0,      0},
-        { NULL, ".even",        S_EVEN,         0,      0},
-        { NULL, ".odd",         S_ODD,          0,      0},
-        { NULL, ".if",          S_IF,           0,      0},
-        { NULL, ".else",        S_ELSE,         0,      0},
-        { NULL, ".endif",       S_ENDIF,        0,      0},
-        { NULL, ".include",     S_INCL,         0,      0},
-        { NULL, ".radix",       S_RADIX,        0,      0},
-        { NULL, ".org",         S_ORG,          0,      0},
-        { NULL, ".module",      S_MODUL,        0,      0},
-        { NULL, ".ascis",       S_ASCIS,        0,      0},
-        { NULL, ".flat24",      S_FLAT24,       0,      0},
+        { NULL, ".page",        S_PAGE,         0,      0       },
+        { NULL, ".title",       S_TITLE,        0,      0       },
+        { NULL, ".sbttl",       S_SBTL,         0,      0       },
+        { NULL, ".module",      S_MODUL,        0,      0       },
+        { NULL, ".include",     S_INCL,         0,      0       },
+        { NULL, ".area",        S_DAREA,        0,      0       },
+        { NULL, ".org",         S_ORG,          0,      0       },
+        { NULL, ".radix",       S_RADIX,        0,      0       },
+        { NULL, ".globl",       S_GLOBL,        0,      0       },
+        { NULL, ".if",          S_IF,           0,      0       },
+        { NULL, ".else",        S_ELSE,         0,      0       },
+        { NULL, ".endif",       S_ENDIF,        0,      0       },
+
+        { NULL, ".flat24",      S_FLAT24,       0,      0       },
 /* sdas specific */
-        { NULL, ".optsdcc",     S_OPTSDCC,      0,      0},
+        { NULL, ".optsdcc",     S_OPTSDCC,      0,      0       },
 /* end sdas specific */
+        { NULL, ".byte",        S_BYTE,         0,      0       },
+        { NULL, ".db",          S_BYTE,         0,      0       },
+        { NULL, ".word",        S_WORD,         0,      0       },
+        { NULL, ".dw",          S_WORD,         0,      0       },
+        { NULL, ".ascii",       S_ASCII,        0,      0       },
+        { NULL, ".ascis",       S_ASCIS,        0,      0       },
+        { NULL, ".asciz",       S_ASCIZ,        0,      0       },
+        { NULL, ".blkb",        S_BLK,          0,      1       },
+        { NULL, ".ds",          S_BLK,          0,      1       },
+        { NULL, ".blkw",        S_BLK,          0,      2       },
+        { NULL, ".even",        S_EVEN,         0,      0       },
+        { NULL, ".odd",         S_ODD,          0,      0       },
 
         /* 8051 */
+	/* machine */
 
-        { NULL, "a",            S_A,            0,      A},
-        { NULL, "ab",           S_AB,           0,      0},
-        { NULL, "dptr",         S_DPTR,         0,      DPTR},
-        { NULL, "pc",           S_PC,           0,      PC},
-        { NULL, "r0",           S_REG,          0,      R0},
-        { NULL, "r1",           S_REG,          0,      R1},
-        { NULL, "r2",           S_REG,          0,      R2},
-        { NULL, "r3",           S_REG,          0,      R3},
-        { NULL, "r4",           S_REG,          0,      R4},
-        { NULL, "r5",           S_REG,          0,      R5},
-        { NULL, "r6",           S_REG,          0,      R6},
-        { NULL, "r7",           S_REG,          0,      R7},
+        { NULL, "a",            S_A,            0,      A       },
+        { NULL, "ab",           S_AB,           0,      0       },
+        { NULL, "dptr",         S_DPTR,         0,      DPTR    },
+        { NULL, "pc",           S_PC,           0,      PC      },
+        { NULL, "r0",           S_REG,          0,      R0      },
+        { NULL, "r1",           S_REG,          0,      R1      },
+        { NULL, "r2",           S_REG,          0,      R2      },
+        { NULL, "r3",           S_REG,          0,      R3      },
+        { NULL, "r4",           S_REG,          0,      R4      },
+        { NULL, "r5",           S_REG,          0,      R5      },
+        { NULL, "r6",           S_REG,          0,      R6      },
+        { NULL, "r7",           S_REG,          0,      R7      },
 
-        { NULL, "nop",          S_INH,          0,      0x00},
-        { NULL, "ret",          S_INH,          0,      0x22},
-        { NULL, "reti",         S_INH,          0,      0x32},
+        { NULL, "nop",          S_INH,          0,      0x00    },
+        { NULL, "ret",          S_INH,          0,      0x22    },
+        { NULL, "reti",         S_INH,          0,      0x32    },
 
-        { NULL, "ajmp",         S_JMP11,        0,      0x01},
-        { NULL, "acall",        S_JMP11,        0,      0x11},
-        { NULL, "ljmp",         S_JMP16,        0,      0x02},
-        { NULL, "lcall",        S_JMP16,        0,      0x12},
+        { NULL, "ajmp",         S_JMP11,        0,      0x01    },
+        { NULL, "acall",        S_JMP11,        0,      0x11    },
+        { NULL, "ljmp",         S_JMP16,        0,      0x02    },
+        { NULL, "lcall",        S_JMP16,        0,      0x12    },
 
-        { NULL, "rr",           S_ACC,          0,      0x03},
-        { NULL, "rrc",          S_ACC,          0,      0x13},
-        { NULL, "rl",           S_ACC,          0,      0x23},
-        { NULL, "rlc",          S_ACC,          0,      0x33},
-        { NULL, "swap",         S_ACC,          0,      0xC4},
-        { NULL, "da",           S_ACC,          0,      0xD4},
+        { NULL, "rr",           S_ACC,          0,      0x03    },
+        { NULL, "rrc",          S_ACC,          0,      0x13    },
+        { NULL, "rl",           S_ACC,          0,      0x23    },
+        { NULL, "rlc",          S_ACC,          0,      0x33    },
+        { NULL, "swap",         S_ACC,          0,      0xC4    },
+        { NULL, "da",           S_ACC,          0,      0xD4    },
 
-        { NULL, "inc",          S_TYP1,         0,      0x00},
-        { NULL, "dec",          S_TYP1,         0,      0x10},
+        { NULL, "inc",          S_TYP1,         0,      0x00    },
+        { NULL, "dec",          S_TYP1,         0,      0x10    },
 
-        { NULL, "add",          S_TYP2,         0,      0x20},
-        { NULL, "addc",         S_TYP2,         0,      0x30},
-        { NULL, "subb",         S_TYP2,         0,      0x90},
+        { NULL, "add",          S_TYP2,         0,      0x20    },
+        { NULL, "addc",         S_TYP2,         0,      0x30    },
+        { NULL, "subb",         S_TYP2,         0,      0x90    },
 
-        { NULL, "orl",          S_TYP3,         0,      0x40},
-        { NULL, "anl",          S_TYP3,         0,      0x50},
-        { NULL, "xrl",          S_TYP3,         0,      0x60},
+        { NULL, "orl",          S_TYP3,         0,      0x40    },
+        { NULL, "anl",          S_TYP3,         0,      0x50    },
+        { NULL, "xrl",          S_TYP3,         0,      0x60    },
 
-        { NULL, "xch",          S_TYP4,         0,      0xC0},
+        { NULL, "xch",          S_TYP4,         0,      0xC0    },
 
-        { NULL, "mov",          S_MOV,          0,      0x00},
+        { NULL, "mov",          S_MOV,          0,      0x00    },
 
-        { NULL, "jbc",          S_BITBR,        0,      0x10},
-        { NULL, "jb",           S_BITBR,        0,      0x20},
-        { NULL, "jnb",          S_BITBR,        0,      0x30},
+        { NULL, "jbc",          S_BITBR,        0,      0x10    },
+        { NULL, "jb",           S_BITBR,        0,      0x20    },
+        { NULL, "jnb",          S_BITBR,        0,      0x30    },
 
-        { NULL, "jc",           S_BR,           0,      0x40},
-        { NULL, "jnc",          S_BR,           0,      0x50},
-        { NULL, "jz",           S_BR,           0,      0x60},
-        { NULL, "jnz",          S_BR,           0,      0x70},
-        { NULL, "sjmp",         S_BR,           0,      0x80},
+        { NULL, "jc",           S_BR,           0,      0x40    },
+        { NULL, "jnc",          S_BR,           0,      0x50    },
+        { NULL, "jz",           S_BR,           0,      0x60    },
+        { NULL, "jnz",          S_BR,           0,      0x70    },
+        { NULL, "sjmp",         S_BR,           0,      0x80    },
 
-        { NULL, "cjne",         S_CJNE,         0,      0xB0},
-        { NULL, "djnz",         S_DJNZ,         0,      0xD0},
-        { NULL, "jmp",          S_JMP,          0,      0x73},
-        { NULL, "movc",         S_MOVC,         0,      0x83},
-        { NULL, "movx",         S_MOVX,         0,      0x00},
-        { NULL, "div",          S_AB,           0,      0x84},
-        { NULL, "mul",          S_AB,           0,      0xA4},
-        { NULL, "clr",          S_ACBIT,        0,      0xC2},
-        { NULL, "cpl",          S_ACBIT,        0,      0xB2},
-        { NULL, "setb",         S_SETB,         0,      0xD2},
-        { NULL, "push",         S_DIRECT,       0,      0xC0},
-        { NULL, "pop",          S_DIRECT,       0,      0xD0},
-        { NULL, "xchd",         S_XCHD,         S_END,  0xD6}
+        { NULL, "cjne",         S_CJNE,         0,      0xB0    },
+        { NULL, "djnz",         S_DJNZ,         0,      0xD0    },
+        { NULL, "jmp",          S_JMP,          0,      0x73    },
+        { NULL, "movc",         S_MOVC,         0,      0x83    },
+        { NULL, "movx",         S_MOVX,         0,      0x00    },
+        { NULL, "div",          S_AB,           0,      0x84    },
+        { NULL, "mul",          S_AB,           0,      0xA4    },
+        { NULL, "clr",          S_ACBIT,        0,      0xC2    },
+        { NULL, "cpl",          S_ACBIT,        0,      0xB2    },
+        { NULL, "setb",         S_SETB,         0,      0xD2    },
+        { NULL, "push",         S_DIRECT,       0,      0xC0    },
+        { NULL, "pop",          S_DIRECT,       0,      0xD0    },
+        { NULL, "xchd",         S_XCHD,         S_EOL,  0xD6    }
 };
 
 struct PreDef preDef[] = {

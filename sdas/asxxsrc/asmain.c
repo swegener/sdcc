@@ -193,7 +193,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     tlevel          current conditional level
  *              int     wflag           -w, enable wide listing format
  *              int     xflag           -x, listing radix flag
- *              int     zflag           -z, enable symbol case sensitivity
+ *              int     zflag           -z, disable symbol case sensitivity
  *              FILE *  lfp             list output file handle
  *              FILE *  ofp             relocation output file handle
  *              FILE *  tfp             symbol table output file handle
@@ -206,7 +206,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              VOID    diag()          assubr.c
  *              VOID    err()           assubr.c
  *              int     fprintf()       c-library
- *              int     as_getline()    aslex.c
+ *              int     nxtline()       aslex.c
  *              VOID    list()          aslist.c
  *              VOID    lstsym()        aslist.c
  *              VOID    minit()         ___mch.c
@@ -230,9 +230,7 @@ char relFile[128];
 /* end sdas specific */
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
         char *p = NULL;
         char *q = NULL;
@@ -406,7 +404,7 @@ char *argv[];
                 outchk(0,0);
                 symp = &dot;
                 minit();
-                while (as_getline()) {
+                while (nxtline()) {
                         cp = cb;
                         cpt = cbt;
                         ep = eb;
@@ -472,8 +470,7 @@ char *argv[];
  */
 
 VOID
-asexit(i)
-int i;
+asexit(int i)
 {
         int j;
 
@@ -589,7 +586,7 @@ int i;
  */
 
 VOID
-asmbl()
+asmbl(void)
 {
         struct mne *mp;
         struct sym *sp;
@@ -874,7 +871,7 @@ loop:
                 do {
                         double f1, f2;
                         unsigned int mantissa, exponent;
-                        const char readbuffer[80];
+                        char readbuffer[80];
 
                         getid(readbuffer, ' '); /* Hack :) */
                         if ((c = getnb()) == '.') {
@@ -1263,10 +1260,7 @@ loop:
  */
 
 FILE *
-afile(fn, ft, wf)
-char *fn;
-char *ft;
-int wf;
+afile(char *fn, char *ft, int wf)
 {
         char *p2, *p3;
         int c;
@@ -1334,8 +1328,7 @@ int wf;
  */
 
 VOID
-newdot(nap)
-struct area *nap;
+newdot(struct area *nap)
 {
         struct area *oap;
 
@@ -1401,9 +1394,7 @@ struct area *nap;
  */
 
 VOID
-phase(ap, a)
-struct area *ap;
-a_uint a;
+phase(struct area *ap, a_uint a)
 {
         if (ap != dot.s_area || a != dot.s_addr)
                 err('p');
@@ -1456,7 +1447,7 @@ char *usetxt[] = {
  */
 
 VOID
-usage(n)
+usage(int n)
 {
         char **dp;
 

@@ -335,8 +335,8 @@ oclsExpense (struct memmap *oclass)
     return -2;
   if (IN_FARSPACE (oclass))     /* extended addressing mode is almost at fast */
     return -1;
-  if (oclass == istack) /* stack is the slowest, but still faster than */
-    return 0;           /* trying to copy to a temp location elsewhere */
+  if (oclass == istack)         /* stack is the slowest, but still faster than */
+    return 0;                   /* trying to copy to a temp location elsewhere */
 
   return 0; /* anything we missed */
 }
@@ -396,8 +396,8 @@ PORT hc08_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffwzc",              /* Options with debug */
-    "-plosgffwz",               /* Options without debug */
+    "-plosgffwc",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
     0,
     ".asm",
     NULL                        /* no do_assemble function */
@@ -424,17 +424,17 @@ PORT hc08_port =
   {
     "XSEG",
     "STACK",
-    "CSEG (CODE)",
-    "DSEG",
+    "CSEG    (CODE)",
+    "DSEG    (PAG)",
     NULL, /* "ISEG" */
     NULL, /* "PSEG" */
     "XSEG",
     "BSEG",
-    "RSEG (ABS)",
-    "GSINIT (CODE)",
-    "OSEG    (OVR)",
+    "RSEG    (ABS)",
+    "GSINIT  (CODE)",
+    "OSEG    (PAG, OVR)",
     "GSFINAL (CODE)",
-    "HOME (CODE)",
+    "HOME    (CODE)",
     "XISEG", // initialized xdata
     "XINIT", // a code copy of xiseg
     "CONST   (CODE)",     // const_name - const data (code or not)

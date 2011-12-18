@@ -288,17 +288,6 @@ slew(struct area *xp, struct bank *yp)
                 /* end sdld specific */
 
                 fprintf(mfp, ")\n");
-
-                if (xp->a_flag & A3_PAG) {
-                        ai = (ai & 0xFF);
-                        aj = (aj > 256);
-                        if (ai || aj) { fprintf(mfp, "  "); lop += 1; }
-                        if (ai)      { fprintf(mfp, " Boundary"); }
-                        if (ai & aj)  { fprintf(mfp, " /"); }
-                        if (aj)      { fprintf(mfp, " Length"); }
-                        if (ai || aj) { fprintf(mfp, " Error\n"); }
-                }
-
                 if (wflag) {
                         putc('\n', mfp);
                         fprintf(mfp,

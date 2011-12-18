@@ -2233,6 +2233,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
 {
   iCode *ic;
   sym_link *resType;
+  unsigned int nBytes;
   operand *size;
   int isarray = 0;
   bool indexUnsigned;
@@ -2251,10 +2252,13 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
   if (IS_PTR (ltype) || IS_ARRAY (ltype))
     {
       isarray = left->isaddr;
+      nBytes = getSize (ltype->next);
+      if (nBytes == 0)
+        werror (E_UNKNOWN_SIZE, IS_SYMOP (left) ? OP_SYMBOL (left)->name : "<no name>");
       // there is no need to multiply with 1
-      if (getSize (ltype->next) != 1)
+      if (nBytes != 1)
         {
-          size = operandFromLit (getSize (ltype->next));
+          size = operandFromLit (nBytes);
           SPEC_USIGN (getSpec (operandType (size))) = 1;
           indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
           right = geniCodeMultiply (right, size, resultType);

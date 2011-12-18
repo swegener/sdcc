@@ -1140,10 +1140,10 @@ out(char *p, int n)
  */
 
 VOID
-out_lb(register int b, register int t)
+out_lb(a_uint v, int t)
 {
         if (cp < &cb[NCODE]) {
-                *cp++ = b;
+                *cp++ = v;
                 *cpt++ = t;
         }
 }
@@ -1172,14 +1172,14 @@ out_lb(register int b, register int t)
  */
 
 VOID
-out_lw(register int n, register int t)
+out_lw(a_uint v, int t)
 {
         if (hilo) {
-                out_lb(hibyte(n),t ? t|R_HIGH : 0);
-                out_lb(lobyte(n),t);
+                out_lb(hibyte(v),t ? t|R_HIGH : 0);
+                out_lb(lobyte(v),t);
         } else {
-                out_lb(lobyte(n),t);
-                out_lb(hibyte(n),t ? t|R_HIGH : 0);
+                out_lb(lobyte(v),t);
+                out_lb(hibyte(v),t ? t|R_HIGH : 0);
         }
 }
 
@@ -1244,20 +1244,20 @@ out_l24(int n, int t)
  */
 
 VOID
-out_rw(register int n)
+out_rw(a_uint v)
 {
         if (hilo) {
-                *relp++ = hibyte(n);
-                *relp++ = lobyte(n);
+                *relp++ = hibyte(v);
+                *relp++ = lobyte(v);
         } else {
-                *relp++ = lobyte(n);
-                *relp++ = hibyte(n);
+                *relp++ = lobyte(v);
+                *relp++ = hibyte(v);
         }
 }
 
 /*)Function     VOID    out_tw(n)
  *
- *              int     n               data word
+ *              a_uint  n               data word
  *
  *      The function out_tw() outputs the text (T)
  *      data word as two bytes ordered according to hilo.
@@ -1277,7 +1277,7 @@ out_rw(register int n)
  */
 
 VOID
-out_tw(register int n)
+out_tw(a_uint n)
 {
         if (hilo) {
                 *txtp++ = hibyte(n);
@@ -1346,9 +1346,9 @@ out_t24(int n)
  */
 
 int
-lobyte(int n)
+lobyte(a_uint v)
 {
-        return (n&0377);
+        return (v&0377);
 }
 
 /*)Function     int     hibyte(n)
@@ -1372,9 +1372,9 @@ lobyte(int n)
  */
 
 int
-hibyte(int n)
+hibyte(a_uint v)
 {
-        return ((n>>8)&0377);
+        return ((v>>8)&0377);
 }
 
 /*

@@ -1,28 +1,33 @@
-/* i85mch.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* i51mch.c */
 
 /*
- * 28-Oct-97 Ported from 8085 to 8051 by John Hartman
+ *  Copyright (C) 1998-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   This Assember Ported by
+ *      John L. Hartman	(JLH)
+ *      jhartman at compuserve dot com
+ *      noice at noicedebugger dot com
+ *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "asxxxx.h"
 #include "i8051.h"
 
@@ -30,11 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * Process machine ops.
  */
 VOID
-machine(mp)
-struct mne *mp;
+machine(struct mne *mp)
 {
-        register unsigned op;
-        register int t, t1, v1;
+        unsigned op;
+        int t, t1, v1;
         struct expr e, e1;
 
         clrexpr(&e);
@@ -489,6 +493,7 @@ struct mne *mp;
 
                 default:
                         aerr();
+                        break;
                 }
 
                 /* branch destination */
@@ -684,6 +689,7 @@ struct mne *mp;
                 case S_AT_R:
                         outab(op + e1.e_addr);
                         break;
+
                 default:
                         aerr();
                 }
@@ -698,8 +704,7 @@ struct mne *mp;
  * Branch/Jump PCR Mode Check
  */
 int
-mchpcr(esp)
-struct expr *esp;
+mchpcr(struct expr *esp)
 {
         if (esp->e_base.e_ap == dot.s_area) {
                 return(1);
@@ -719,14 +724,14 @@ struct expr *esp;
         return(0);
 }
 
- /*
-  * Machine specific initialization
-  */
+/*
+ * Machine specific initialization
+ */
 
-static int beenHere=0;      /* set non-zero if we have done that... */
+static int beenHere = 0;        /* set non-zero if we have done that... */
 
 VOID
-minit()
+minit(void)
 {
         struct sym      *sp;
         struct PreDef   *pd;

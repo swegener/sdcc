@@ -1472,6 +1472,11 @@ compStructSize (int su, structdef * sdef)
   int bitOffset = 0;
   symbol *loop;
 
+  if (!sdef->fields)
+    {
+      werror (E_UNKNOWN_SIZE, sdef->tag);
+    }
+
   /* for the identifiers  */
   loop = sdef->fields;
   while (loop)

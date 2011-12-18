@@ -39,8 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      aslex.c contains the following functions:
  *              char    endline()
  *              char    get()
- *              VOID    getid(id,c)
- *              int     as_getline()
+ *              VOID    getid()
+ *              int     nxtline()
  *              int     getmap()
  *              char    getnb()
  *              VOID    getst()
@@ -62,7 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *
  *      The function getid() scans the current assembler-source text line
  *      from the current position copying the next LETTER | DIGIT string
- *      into the external string buffer (id).  The string ends when a non
+ *      into the external string buffer id[].  The string ends when a non
  *      LETTER or DIGIT character is found. The maximum number of characters
  *      copied is NCPS-1.  If the input string is larger than NCPS-1
  *      characters then the string is truncated.  The string is always
@@ -83,22 +83,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *                                      being processed.
  *
  *      called functions:
- *              char    get()           aslex.c
- *              char    getnb()         aslex.c
+ *              int     get()           aslex.c
+ *              int     getnb()         aslex.c
  *              VOID    unget()         aslex.c
+ *              VOID    qerr()          assubr.c
  *
  *      side effects:
- *              use of getnb(), get(), and unget() updates the
+ *              Use of getnb(), get(), and unget() updates the
  *              global pointer ip, the position in the current
  *              assembler-source text line.
  */
 
 VOID
-getid(id, c)
-register int c;
-char *id;
+getid(char *id, int c)
 {
-        register char *p;
+        char *p;
 
         if (c < 0) {
                 c = getnb();
@@ -158,9 +157,7 @@ char *id;
  */
 
 VOID
-getst(id, c)
-register int c;
-char *id;
+getst(char *id, int c)
 {
         register char *p;
 
@@ -198,10 +195,10 @@ char *id;
  *              in the current assembler-source text line
  */
 
-char
-getnb()
+int
+getnb(void)
 {
-        register int c;
+        int c;
 
         while ((c=get()) == ' ' || c == '\t')
                 ;
@@ -231,10 +228,10 @@ getnb()
  *              line, ip is not updated.
  */
 
-char
-get()
+int
+get(void)
 {
-        register int c;
+        int c;
 
         if ((c = *ip) != 0)
                 ++ip;
@@ -270,8 +267,7 @@ get()
  */
 
 VOID
-unget(c)
-int c;
+unget(int c)
 {
         if (c)
                 if (ip != ib)
@@ -309,8 +305,7 @@ int c;
  */
 
 int
-getmap(d)
-int d;
+getmap(int d)
 {
         register int c, n, v;
 
@@ -391,8 +386,7 @@ int d;
  */
 
 int
-comma(flag)
-int flag;
+comma(int flag)
 {
         int c;
 
@@ -407,18 +401,18 @@ int flag;
         return(1);
 }
 
-/*)Function     int     as_getline()
+/*)Function     int     nxtline()
  *
- *      The function as_getline() reads a line of assembler-source text
+ *      The function nxtline() reads a line of assembler-source text
  *      from an assembly source text file or an include file.
  *      Lines of text are processed from assembler-source files until
  *      all files have been read.  If an include file is opened then
  *      lines of text are read from the include file (or nested
  *      include file) until the end of the include file is found.
- *      The input text line is copied into the global string ib[]
- *      and converted to a NULL terminated string.  The function
- *      as_getline() returns a (1) after succesfully reading a line
- *      or a (0) if all files have been read.
+ *      The input text line is transferred into the global string
+ *      ib[] and converted to a NULL terminated string.  The function
+ *      nxtline() returns a (1) after succesfully reading
+ *      a line, or a (0) if all files have been read.
  *
  *      local variables:
  *              int     i               string length
@@ -458,7 +452,7 @@ int flag;
  */
 
 int
-as_getline(void)
+nxtline(void)
 {
   static struct dbuf_s dbuf;
   static char dbufInitialized = 0;
@@ -542,7 +536,7 @@ loop:
  */
 
 int
-more()
+more(void)
 {
         register int c;
 
@@ -574,7 +568,7 @@ more()
  */
 
 char
-endline()
+endline(void)
 {
         register int c;
 

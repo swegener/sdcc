@@ -28,6 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "asxxxx.h"
 #include "rabbit.h"
 
-char	*cpu	= "Rabbit 2000/4000";
-int	hilo	= 0;
-char	*dsft	= "asm";
+char    *cpu    = "Rabbit 2000/4000";
+int     hilo    = 0;
+char    *dsft   = "asm";

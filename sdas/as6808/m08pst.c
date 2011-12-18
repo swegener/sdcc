@@ -207,5 +207,5 @@ struct	mne	mne[] = {
     {	NULL,	"sei",		S_INH,		0,	0x9B	},
     {	NULL,	"rsp",		S_INH,		0,	0x9C	},
     {	NULL,	"nop",		S_INH,		0,	0x9D	},
-    {	NULL,	"txa",		S_INH,		S_END,	0x9F	}
+    {	NULL,	"txa",		S_INH,		S_EOL,	0x9F	}
 };

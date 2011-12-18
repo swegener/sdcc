@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * Extensions: P. Felber
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "z80.h"
 

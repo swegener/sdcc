@@ -166,5 +166,5 @@ struct	mne	mne[] = {
     { NULL,	"mlt",		X_MLT,		0,	0x4C },
 
     { NULL,	"tst",		X_TST,		0,	0x04 },
-    { NULL,	"tstio",	X_TSTIO,	S_END,	0x74 }
+    { NULL,	"tstio",	X_TSTIO,	S_EOL,	0x74 }
 };

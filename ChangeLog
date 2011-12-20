@@ -1,3 +1,11 @@
+2011-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/Makefile.in,
+	* sdas/as8051/Makefile.in,
+	* sdas/asgb/Makefile.in,
+	* sdas/asrab/Makefile.in,
+	* sdas/asz80/Makefile.in: added dependencies
+
 2011-12-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asz80/z80pst.c: forgot this one, probably sdas dependencies are

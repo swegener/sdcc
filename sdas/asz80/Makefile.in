@@ -56,8 +56,6 @@ ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c
 
 ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
-$(ASOBJECTS) : $(ASXXLIB)/asxxxx.h $(ASXXLIB)/sdas.h
-
 ASX = $(top_builddir)/bin/sdasz80$(EXEEXT)
 DEST = $(DESTDIR)$(bindir)/sdasz80$(EXEEXT)
 

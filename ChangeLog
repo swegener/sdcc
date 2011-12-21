@@ -1,3 +1,24 @@
+2011-12-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* tests/gcc-torture-execute-pure-1.c,
+	  tests/gcc-torture-execute-string-opt-17.c,
+	  tests/gcc-torture-execute-pta-field-1.c,
+	  tests/gcc-torture-execute-string-opt-18.c,
+	  tests/gcc-torture-execute-struct-ini-1.c,
+	  tests/gcc-torture-execute-pta-field-2.c,
+	  tests/gcc-torture-execute-ptr-arith-1.c,
+	  tests/gcc-torture-execute-unroll-1.c,
+	  tests/gcc-torture-execute-struct-ini-2.c,
+	  tests/gcc-torture-execute-struct-ini-3.c,
+	  tests/gcc-torture-execute-string-opt-5.c,
+	  tests/gcc-torture-execute-stdarg-3.c,
+	  tests/gcc-torture-execute-shiftopt-1.c,
+	  tests/gcc-torture-execute-struct-ini-4.c,
+	  tests/gcc-torture-execute-stdarg-4.c,
+	  tests/gcc-torture-execute-switch-1.c,
+	  tests/gcc-torture-execute-scope-1.c:
+	* Added some tests from the execute part of the gcc torture regression test suite.
+
 2011-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/Makefile.in,

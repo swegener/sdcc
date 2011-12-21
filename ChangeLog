@@ -55,7 +55,12 @@
 	  support/regression/tests/gcc-torture-execute-mod-1.c,
 	  support/regression/tests/gcc-torture-execute-divcmp-2.c,
 	  support/regression/tests/gcc-torture-execute-int-compare.c,
-	  support/regression/tests/gcc-torture-execute-divcmp-3.c:
+	  support/regression/tests/gcc-torture-execute-divcmp-3.c,
+	  support/regression/tests/gcc-torture-execute-anon-1.c,
+	  support/regression/tests/gcc-torture-execute-arith-1.c,
+	  support/regression/tests/gcc-torture-execute-postmod-1.c,
+	  support/regression/tests/gcc-torture-execute-bitfld-1.c,
+	  support/regression/tests/gcc-torture-execute-pending-4.c:
 	  Added some tests from the execute part of the gcc torture regression test suite.
 
 2011-12-20 Maarten Brock <sourceforge.brock AT dse.nl>

@@ -1,4 +1,13 @@
-2011-12-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2011-12-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCC.y,
+	  src/SDCC.lex,
+	  device/include/stdnoreturn.h:
+	  Accept C11 keyword _Noreturn.
+
+2011-12-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCmain.c,
 	  src/SDCCglobl.h,

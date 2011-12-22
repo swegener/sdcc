@@ -743,6 +743,7 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
   SPEC_INLINE (dest) |= SPEC_INLINE (src);
+  SPEC_NORETURN (dest) |= SPEC_NORETURN(src);
   SPEC_CONST (dest) |= SPEC_CONST (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
   SPEC_VOLATILE (dest) |= SPEC_VOLATILE (src);
@@ -773,6 +774,7 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_INTNO (dest) |= FUNC_INTNO (src);
   FUNC_REGBANK (dest) |= FUNC_REGBANK (src);
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
+  FUNC_ISNORETURN (dest) |= FUNC_ISNORETURN (src);
 
   if (SPEC_ADDRSPACE (src) && SPEC_ADDRSPACE (dest))
     werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);
@@ -2847,11 +2849,16 @@ checkFunction (symbol * sym, symbol * csym)
       return 0;
     }
 
-  /* move inline specifier from return type to function attributes */
+  /* move function specifier from return type to function attributes */
   if (IS_INLINE (sym->etype))
     {
       SPEC_INLINE (sym->etype) = 0;
       FUNC_ISINLINE (sym->type) = 1;
+    }
+  if (IS_NORETURN (sym->etype))
+    {
+      SPEC_NORETURN (sym->etype) = 0;
+      FUNC_ISNORETURN (sym->type) = 1;
     }
 
   /* make sure the type is complete and sane */
@@ -3565,6 +3572,10 @@ printTypeChainRaw (sym_link * start, FILE * of)
               if (IFFUNC_ISINLINE (type))
                 {
                   fprintf (of, "inline-");
+                }
+              if (IFFUNC_ISNORETURN (type))
+                {
+                  fprintf (of, "_Noreturn-");
                 }
               fprintf (of, "function %s %s",
                        (IFFUNC_ISBUILTIN (type) ? "__builtin__" : " "), (IFFUNC_ISJAVANATIVE (type) ? "_JavaNative" : " "));

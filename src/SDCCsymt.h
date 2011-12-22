@@ -163,6 +163,7 @@ typedef struct specifier
   unsigned b_static:1;              /* 1=static keyword found     */
   unsigned b_extern:1;              /* 1=extern found             */
   unsigned b_inline:1;              /* inline function requested  */
+  unsigned b_noreturn:1;            /* promised not to return     */
   unsigned b_absadr:1;              /* absolute address specfied  */
   unsigned b_volatile:1;            /* is marked as volatile      */
   unsigned b_const:1;               /* is a constant              */
@@ -260,6 +261,7 @@ typedef struct sym_link
     unsigned intrtn:1;              /* this is an interrupt routine         */
     unsigned rbank:1;               /* seperate register bank               */
     unsigned inlinereq:1;           /* inlining requested                   */
+    unsigned noreturn:1;            /* promised not to return               */
     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
     unsigned intno;                 /* 1=Interrupt service routine          */
     short regbank;                  /* register bank 2b used                */
@@ -409,6 +411,8 @@ extern sym_link *validateLink (sym_link * l,
 #define FUNC_HASSTACKPARM(x) (x->funcAttrs.hasStackParms)
 #define FUNC_ISINLINE(x) (x->funcAttrs.inlinereq)
 #define IFFUNC_ISINLINE(x) (IS_FUNC(x) && FUNC_ISINLINE(x))
+#define FUNC_ISNORETURN(x) (x->funcAttrs.noreturn)
+#define IFFUNC_ISNORETURN(x) (IS_FUNC(x) && FUNC_ISNORETURN(x))
 
 #define FUNC_ISREENT(x) (x->funcAttrs.reent)
 #define IFFUNC_ISREENT(x) (IS_FUNC(x) && FUNC_ISREENT(x))
@@ -474,6 +478,7 @@ extern sym_link *validateLink (sym_link * l,
 #define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isregparm
 #define SPEC_ARGREG(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.argreg
 #define SPEC_INLINE(x) validateLink(x, "SPEC_INLINE", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_inline
+#define SPEC_NORETURN(x) validateLink(x, "SPEC_NORETURN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_noreturn
 
 /* type check macros */
 #define IS_DECL(x)       ( x && x->xclass == DECLARATOR )
@@ -511,6 +516,7 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_RENT(x)       (IS_SPEC(x) && x->select.s._reent )
 #define IS_STATIC(x)     (IS_SPEC(x) && SPEC_STAT(x))
 #define IS_INLINE(x)     (IS_SPEC(x) && SPEC_INLINE(x))
+#define IS_NORETURN(x)   (IS_SPEC(x) && SPEC_NORETURN(x))
 #define IS_INT(x)        (IS_SPEC(x) && x->select.s.noun == V_INT)
 #define IS_VOID(x)       (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_BOOL(x)       (IS_SPEC(x) && x->select.s.noun == V_BOOL)

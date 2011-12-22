@@ -206,6 +206,7 @@ _?"_asm"         {
 "_overlay"     { count (); TKEYWORDSDCC (OVERLAY); }
 "__overlay"    { count (); TKEYWORD (OVERLAY); }
 "inline"       { count (); TKEYWORD99 (INLINE); }
+"_Noreturn"    { count (); return NORETURN;}
 "restrict"     { count (); TKEYWORD99 (RESTRICT); }
 "__smallc"     { count (); return SMALLC; }
 "__addressmod" { count (); return ADDRESSMOD; }

@@ -58,7 +58,11 @@ extern int vprintf (const char *, va_list);
 extern int sprintf (char *, const char *, ...);
 extern int vsprintf (char *, const char *, va_list);
 extern int puts(const char *);
+
+#if __STDC_VERSION__ < 201112L
 extern char *gets(char *);
+#endif
+
 extern char getchar(void);
 extern void putchar(char);
 

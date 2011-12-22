@@ -1,3 +1,7 @@
+2011-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCerr.c: changed E_NONRENT_ARGS description
+
 2011-12-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCmain.c,

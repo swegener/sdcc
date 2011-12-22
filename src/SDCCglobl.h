@@ -302,6 +302,7 @@ struct options
     int use_stdout;             /* send errors to stdout instead of stderr */
     int no_std_crt0;            /* for the z80/gbz80 do not link default crt0.o*/
     int std_c99;                /* enable C99 keywords/constructs */
+    int std_c11;                /* enable C11 keywords/constructs */
     int std_sdcc;               /* enable SDCC extensions to C */
     int dollars_in_ident;       /* zero means dollar signs are punctuation */
     int unsigned_char;          /* use unsigned for char without signed/unsigned modifier */

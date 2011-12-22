@@ -139,6 +139,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_OPT_CODE_SIZE    "--opt-code-size"
 #define OPTION_STD_C89          "--std-c89"
 #define OPTION_STD_C99          "--std-c99"
+#define OPTION_STD_C11          "--std-c11"
 #define OPTION_STD_SDCC89       "--std-sdcc89"
 #define OPTION_STD_SDCC99       "--std-sdcc99"
 #define OPTION_CODE_SEG         "--codeseg"
@@ -178,10 +179,11 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_WERROR, NULL, "Treat the warnings as errors"},
   {0,   OPTION_DEBUG, NULL, "Enable debugging symbol output"},
   {0,   "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
-  {0,   OPTION_STD_C89, NULL, "Use C89 standard only"},
+  {0,   OPTION_STD_C89, NULL, "Use C89 standard (sligthly incomplete)"},
   {0,   OPTION_STD_SDCC89, NULL, "Use C89 standard with SDCC extensions (default)"},
-  {0,   OPTION_STD_C99, NULL, "Use C99 standard only (incomplete)"},
-  {0,   OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions (incomplete)"},
+  {0,   OPTION_STD_C99, NULL, "Use C99 standard (incomplete)"},
+  {0,   OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions"},
+  {0,   OPTION_STD_C11, NULL, "Use C11 standard (very incomplete)"},
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0,   OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
@@ -585,6 +587,7 @@ setDefaultOptions (void)
   options.shortis8bits = 0;
   options.std_sdcc = 1;         /* enable SDCC language extensions */
   options.std_c99 = 0;          /* default to C89 until more C99 support */
+  options.std_c11 = 0;          /* default to C89 until more C11 support */
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.stack10bit = 0;
@@ -1110,6 +1113,14 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_STD_C99) == 0)
             {
               options.std_c99 = 1;
+              options.std_sdcc = 0;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_C11) == 0)
+            {
+              options.std_c99 = 1;
+              options.std_c11 = 1;
               options.std_sdcc = 0;
               continue;
             }
@@ -2313,16 +2324,8 @@ initValues (void)
    * Make sure the preprocessor is called with the "-std" option
    * corresponding to the --std used to start sdcc
    */
-  if (options.std_c99)
-    {
-      if (!options.std_sdcc)
-        setMainValue ("cppstd", "-std=c99 ");
-    }
-  else
-    {
-      if (!options.std_sdcc)
-        setMainValue ("cppstd", "-std=c89 ");
-    }
+  if (!options.std_sdcc)
+    setMainValue ("cppstd", options.std_c11 ? "-std=c11 " : (options.std_c99 ? "-std=c99 " : "-std=c89 "));
 }
 
 static void

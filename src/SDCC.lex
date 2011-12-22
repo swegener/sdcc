@@ -605,6 +605,7 @@ enum {
    P_OPTCODEBALANCED,
    P_STD_C89,
    P_STD_C99,
+   P_STD_C11,
    P_STD_SDCC89,
    P_STD_SDCC99,
    P_CODESEG,
@@ -949,6 +950,7 @@ doPragma (int id, const char *name, const char *cp)
         }
 
       options.std_c99 = 0;
+      options.std_c11 = 0;
       options.std_sdcc = 0;
       break;
 
@@ -964,6 +966,19 @@ doPragma (int id, const char *name, const char *cp)
       options.std_sdcc = 0;
       break;
 
+    case P_STD_C11:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 1;
+      options.std_c11 = 1;
+      options.std_sdcc = 0;
+      break;
+
     case P_STD_SDCC89:
       cp = get_pragma_token(cp, &token);
       if (TOKEN_EOL != token.type)
@@ -973,6 +988,7 @@ doPragma (int id, const char *name, const char *cp)
         }
 
       options.std_c99 = 0;
+      options.std_c11 = 0;
       options.std_sdcc = 1;
       break;
 
@@ -985,6 +1001,7 @@ doPragma (int id, const char *name, const char *cp)
         }
 
       options.std_c99 = 1;
+      options.std_c11 = 0;
       options.std_sdcc = 1;
       break;
 
@@ -1054,6 +1071,7 @@ static struct pragma_s pragma_tbl[] = {
   { "opt_code_balanced", P_OPTCODEBALANCED, 0, doPragma },
   { "std_c89",           P_STD_C89,         0, doPragma },
   { "std_c99",           P_STD_C99,         0, doPragma },
+  { "std_c11",           P_STD_C11,         0, doPragma },
   { "std_sdcc89",        P_STD_SDCC89,      0, doPragma },
   { "std_sdcc99",        P_STD_SDCC99,      0, doPragma },
   { "codeseg",           P_CODESEG,         0, doPragma },

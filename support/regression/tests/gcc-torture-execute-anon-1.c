@@ -5,8 +5,7 @@
 #include <testfwk.h>
 
 #ifdef SDCC
-#pragma std_c89
-#endif
+#pragma std_c11
 
 /* Copyright (C) 2001 Free Software Foundation, Inc.  */
 
@@ -25,10 +24,12 @@ struct
     };
   };
 } foo;
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifdef SDCC
   foo.b = 6;
   foo.a = 5;
 
@@ -36,5 +37,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }
 

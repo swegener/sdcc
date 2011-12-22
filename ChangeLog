@@ -1,3 +1,12 @@
+2011-12-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCmain.c,
+	  src/SDCCglobl.h,
+	  src/SDCC.lex:
+	  Add option and pragma for ISO C11.
+	* support/regression/tests/gcc-torture-execute-anon-1.c:
+	  Disable for compilers other than sdcc and use sdcc in C11 mode.
+
 2011-12-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/Makefile.in,

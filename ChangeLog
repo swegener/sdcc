@@ -1,3 +1,16 @@
+2011-12-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCicode.c:
+	  Warn about return statements in _Noreturn functions.
+	* device/include/setjmp.h,
+	  device/lib/_setjmp.c:
+	  Make longjmp() a _Noreturn function, as required by the C11 standard.
+	* src/SDCClabel.c,
+	  src/z80/gen.c:
+	  Do some basic optimizations for _Noreturn functions.
+
 2011-12-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClabel.c (labelIfx): fixed bug 3463455

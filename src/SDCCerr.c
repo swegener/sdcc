@@ -472,6 +472,8 @@ struct
      "Invalid integer suffix '%s' in integer constant", 0},
   { E_AUTO_ADDRSPACE, ERROR_LEVEL_ERROR,
      "named address space not allowed for automatic var '%s'", 0},
+  { W_NORETURNRETURN, ERROR_LEVEL_WARNING,
+     "return in _Noreturn function", 0},
 };
 
 /*

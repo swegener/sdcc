@@ -428,7 +428,8 @@ labelUnreach (iCode * ic)
 
       /* found a goto || return && the next */
       /* statement is not a label           */
-      if (loop->op == GOTO || loop->op == RETURN)
+      if (loop->op == GOTO || loop->op == RETURN ||
+        loop->op == CALL && IFFUNC_ISNORETURN (operandType (IC_LEFT (loop))))
         {
           if (loop->next &&
               (loop->next->op == LABEL || loop->next->op == ENDFUNCTION))

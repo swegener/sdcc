@@ -3516,6 +3516,10 @@ geniCodeReturn (operand * op)
 {
   iCode *ic;
 
+  /* return in _Noreturn function */ 
+  if (currFunc && IFFUNC_ISNORETURN (currFunc->type))
+    werror (W_NORETURNRETURN);
+
   /* if the operand is present force an rvalue */
   if (op)
     op = geniCodeRValue (op, FALSE);

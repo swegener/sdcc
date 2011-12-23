@@ -3884,7 +3884,14 @@ emitCall (const iCode *ic, bool ispcall)
   _G.saves.saved = FALSE;
 
   /* adjust the stack for parameters if required */
-  if (ic->parmBytes)
+  if (ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
+    {
+      /* This is just a workaround to not confuse the peephole optimizer too much. */
+      /* Todo: Check fo _Noreturn in the peephole optimizer and do not emit the inc sp here. */
+      emit2 ("inc sp");
+      regalloc_dry_run_cost += 1;
+    }
+  else if (ic->parmBytes)
     {
       int i = ic->parmBytes;
 
@@ -4295,9 +4302,9 @@ genEndFunction (iCode * ic)
 
   wassert (!regalloc_dry_run);
 
-  if (IFFUNC_ISNAKED(sym->type))
+  if (IFFUNC_ISNAKED (sym->type) || IFFUNC_ISNORETURN (sym->type))
     {
-      emitDebug("; naked function: no epilogue.");
+      emitDebug (IFFUNC_ISNAKED (sym->type) ? "; naked function: no epilogue." : "; _Noreturn function: no epilogue.");
       if (!IS_STATIC(sym->etype))
         {
           struct dbuf_s dbuf;

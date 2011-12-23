@@ -419,7 +419,7 @@ int __setjmp (jmp_buf buf)
     return 0;
 }
 
-int longjmp (jmp_buf buf, int rv)
+_Noreturn int longjmp (jmp_buf buf, int rv)
 {
     unsigned char lsp;
 

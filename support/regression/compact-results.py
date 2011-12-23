@@ -59,7 +59,7 @@ for line in lines:
         invalid += 1;
         print "Invalid instruction: %s" % name
 
-print "%-20.20s" % base,
+print "%-35.35s" % base,
 
 if (invalid > 0):
     print "%d invalid instructions," % invalid,

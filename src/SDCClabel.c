@@ -242,20 +242,19 @@ labelIfx (iCode * ic)
 
       /* Optimize hidden jump-to-jump:
          Simplify
-           v = 1;
-           goto l1;
+           v = 1;              stat->prev
+           goto l1;            stat
          l0:
-           v = 0;
-         l1:
-           if (v) goto l3;
+           v = 0;              loop->prev
+         l1:                   loop
+           if (v) goto l3;     loop->next
          Into
            v = 1;
            goto l3;
          l0:
            v = 0;
          l1: */
-      if (!TARGET_IS_MCS51 && /* TODO: Why does this optimization break a regression test for mcs51-large and mcs51-huge? */
-          loop->op == LABEL &&
+      if (loop->op == LABEL &&
           loop->next && loop->next->op == IFX &&
           (stat = hTabFirstItemWK (labelRef, (IC_LABEL (loop))->key)) &&
           !hTabNextItemWK (labelRef) &&
@@ -278,7 +277,7 @@ labelIfx (iCode * ic)
 
              /* Move to desired location. */
               if (loop->next->next)
-                loop->next->next->prev = stat;
+                loop->next->next->prev = loop;
               loop->next = loop->next->next;
               stat->prev = loop->prev;
               stat->prev->next = stat;

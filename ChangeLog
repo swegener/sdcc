@@ -1,3 +1,10 @@
+2011-12-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClabel.c (labelIfx): fixed bug 3463455
+	* support/regression/tests/gcc-torture-execute-loop-12.c:
+	  reenable tests for hc08 and ds390
+	* support/regression/compact-results.py: wider test name field
+
 2011-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCerr.c: changed E_NONRENT_ARGS description

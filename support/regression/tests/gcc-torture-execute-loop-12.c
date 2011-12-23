@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if !defined(SDCC_ds390) && !defined(SDCC_hc08)
 
 /* Checks that pure functions are not treated as const.  */
 
@@ -27,15 +26,12 @@ void foo (void)
   while (!is_end_of_statement ())
     p++;
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(SDCC_ds390) && !defined(SDCC_hc08)
   p = "abc\n";
   foo ();
   return;
-#endif
 }
 

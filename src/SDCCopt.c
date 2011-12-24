@@ -1396,6 +1396,9 @@ replaceRegEqv (ebbIndex * ebbi)
   for (i = 0; i < count; i++)
     {
       iCode *ic;
+      
+      if (ebbs[i]->noPath)
+        continue;
 
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {

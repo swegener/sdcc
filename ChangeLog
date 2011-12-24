@@ -1,3 +1,7 @@
+2011-12-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c (replaceRegEqv): fixed bug 2938101
+
 2011-12-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCerr.h,

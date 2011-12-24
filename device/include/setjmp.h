@@ -62,7 +62,9 @@ int __setjmp (jmp_buf);
 // C99 might require setjmp to be a macro. The standard seems self-contradicting on this issue.
 #define setjmp(jump_buf) __setjmp(jump_buf)
 
-_Noreturn int longjmp(jmp_buf, int);
+#ifndef HIDE_LONGJMP
+_Noreturn void longjmp(jmp_buf, int);
+#endif
 
 #undef RET_SIZE
 #undef SP_SIZE

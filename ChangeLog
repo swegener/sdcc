@@ -1,3 +1,8 @@
+2011-12-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/setjmp.h: changed longjmp return type to void
+	* device/lib/_setjmp.c: but use int for the implementation
+
 2011-12-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (replaceRegEqv): fixed bug 2938101

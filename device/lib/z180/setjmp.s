@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  abs.s
+;  setjmp.s
 ;
 ;  Copyright (C) 2011, Philipp Klaus Krause
 ;
@@ -44,7 +44,6 @@ ___setjmp:
 	xor	a, a
 	ld	l, a
 	ld	h, a
-	ld	hl, #0
 	add	hl, sp
 	ld	2(iy), l
 	ld	3(iy), h
@@ -84,8 +83,7 @@ jump:
 	ld	l, 2(iy)
 	ld	h, 3(iy)
 	ld	sp, hl
-	inc	sp
-	inc	sp
+	pop	hl
 
 	; Move return value into hl.
 	ex	de, hl
@@ -95,4 +93,3 @@ jump:
 	ld	b, 1(iy)
 	push	bc
 	ret
-

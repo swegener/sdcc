@@ -1,3 +1,9 @@
+2011-12-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/r2k/setjmp.s,
+	* device/lib/z180/setjmp.s,
+	* device/lib/z80/setjmp.s: optimized
+
 2011-12-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/setjmp.h: changed longjmp return type to void

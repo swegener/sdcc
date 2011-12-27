@@ -257,8 +257,8 @@ _?"_asm"         {
 "=="           { count (); return EQ_OP; }
 "!="           { count (); return NE_OP; }
 ";"            { count (); return ';'; }
-"{"|"<%"       { count (); ++NestLevel; ignoreTypedefType = 0; return '{'; }
-"}"|"%>"       { count (); --NestLevel; return '}'; }
+"{"|"<%"       { count (); ignoreTypedefType = 0; return '{'; }
+"}"|"%>"       { count (); return '}'; }
 ","            { count (); return ','; }
 ":"            { count (); return ':'; }
 "="            { count (); return '='; }
@@ -439,7 +439,7 @@ check_type (void)
 }
 
 /*
- * Change by JTV 2001-05-19 to not concantenate strings
+ * Change by JTV 2001-05-19 to not concatenate strings
  * to support ANSI hex and octal escape sequences in string literals
  */
 

@@ -137,8 +137,9 @@ bool uselessDecl = TRUE;
 
 file
    : /* empty */
-        { if (!options.lessPedantic)
-                    werror(W_EMPTY_SOURCE_FILE);
+        {
+          if (!options.lessPedantic)
+              werror(W_EMPTY_SOURCE_FILE);
         }
    | program
    ;
@@ -149,32 +150,31 @@ program
    ;
 
 external_definition
-   : function_definition     {
-                               blockNo=0;
-                             }
-   | declaration             {
-                               ignoreTypedefType = 0;
-                               if ($1 && $1->type
-                                && IS_FUNC($1->type))
-                               {
-                                   /* The only legal storage classes for
-                                    * a function prototype (declaration)
-                                    * are extern and static. extern is the
-                                    * default. Thus, if this function isn't
-                                    * explicitly marked static, mark it
-                                    * extern.
-                                    */
-                                   if ($1->etype
-                                    && IS_SPEC($1->etype)
-                                    && !SPEC_STAT($1->etype))
-                                   {
-                                        SPEC_EXTR($1->etype) = 1;
-                                   }
-                               }
-                               addSymChain (&$1);
-                               allocVariables ($1) ;
-                               cleanUpLevel (SymbolTab,1);
-                             }
+   : function_definition
+        {
+          // blockNo = 0;
+        }
+   | declaration
+        {
+          ignoreTypedefType = 0;
+          if ($1 && $1->type && IS_FUNC($1->type))
+            {
+              /* The only legal storage classes for
+               * a function prototype (declaration)
+               * are extern and static. extern is the
+               * default. Thus, if this function isn't
+               * explicitly marked static, mark it
+               * extern.
+               */
+              if ($1->etype && IS_SPEC($1->etype) && !SPEC_STAT($1->etype))
+                {
+                  SPEC_EXTR($1->etype) = 1;
+                }
+            }
+          addSymChain (&$1);
+          allocVariables ($1);
+          cleanUpLevel (SymbolTab, 1);
+        }
    | addressmod
    ;
 
@@ -812,69 +812,73 @@ sfr_attributes
 struct_or_union_specifier
    : struct_or_union opt_stag
         {
-           if (!$2->type)
-             {
-               $2->type = $1;
-             }
-           else
-             {
-               if ($2->type != $1)
-                 werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
-             }
-
+          if (!$2->type)
+            {
+              $2->type = $1;
+            }
+          else
+            {
+              if ($2->type != $1)
+                  werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
+            }
         }
-           '{' struct_declaration_list '}'
+     '{' struct_declaration_list '}'
         {
-           structdef *sdef ;
-           symbol *sym, *dsym;
+          structdef *sdef;
+          symbol *sym, *dsym;
 
-           // check for errors in structure members
-           for (sym=$5; sym; sym=sym->next) {
-             if (IS_ABSOLUTE(sym->etype)) {
-               werrorfl(sym->fileDef, sym->lineDef, E_NOT_ALLOWED, "'at'");
-               SPEC_ABSA(sym->etype) = 0;
-             }
-             if (IS_SPEC(sym->etype) && SPEC_SCLS(sym->etype)) {
-               werrorfl(sym->fileDef, sym->lineDef, E_NOT_ALLOWED, "storage class");
-               printTypeChainRaw (sym->type,NULL);
-               SPEC_SCLS(sym->etype) = 0;
-             }
-             for (dsym=sym->next; dsym; dsym=dsym->next) {
-               if (*dsym->name && strcmp(sym->name, dsym->name)==0) {
-                 werrorfl(sym->fileDef, sym->lineDef, E_DUPLICATE_MEMBER,
-                        $1==STRUCT ? "struct" : "union", sym->name);
-                 werrorfl(dsym->fileDef, dsym->lineDef, E_PREVIOUS_DEF);
-               }
-             }
-           }
+          // check for errors in structure members
+          for (sym=$5; sym; sym=sym->next)
+            {
+              if (IS_ABSOLUTE(sym->etype))
+                {
+                  werrorfl(sym->fileDef, sym->lineDef, E_NOT_ALLOWED, "'at'");
+                  SPEC_ABSA(sym->etype) = 0;
+                }
+              if (IS_SPEC(sym->etype) && SPEC_SCLS(sym->etype))
+                {
+                  werrorfl(sym->fileDef, sym->lineDef, E_NOT_ALLOWED, "storage class");
+                  printTypeChainRaw (sym->type, NULL);
+                  SPEC_SCLS(sym->etype) = 0;
+                }
+              for (dsym=sym->next; dsym; dsym=dsym->next)
+                {
+                  if (*dsym->name && strcmp(sym->name, dsym->name)==0)
+                    {
+                      werrorfl(sym->fileDef, sym->lineDef, E_DUPLICATE_MEMBER,
+                               $1==STRUCT ? "struct" : "union", sym->name);
+                      werrorfl(dsym->fileDef, dsym->lineDef, E_PREVIOUS_DEF);
+                    }
+                }
+            }
 
-           /* Create a structdef   */
-           sdef = $2 ;
-           sdef->fields   = reverseSyms($5) ;   /* link the fields */
-           sdef->size  = compStructSize($1,sdef);   /* update size of  */
-           promoteAnonStructs ($1, sdef);
+          /* Create a structdef   */
+          sdef = $2;
+          sdef->fields = reverseSyms($5);        /* link the fields */
+          sdef->size = compStructSize($1, sdef); /* update size of  */
+          promoteAnonStructs ($1, sdef);
 
-           /* Create the specifier */
-           $$ = newLink (SPECIFIER) ;
-           SPEC_NOUN($$) = V_STRUCT;
-           SPEC_STRUCT($$)= sdef ;
+          /* Create the specifier */
+          $$ = newLink (SPECIFIER);
+          SPEC_NOUN($$) = V_STRUCT;
+          SPEC_STRUCT($$)= sdef;
         }
    | struct_or_union stag
-         {
-            $$ = newLink(SPECIFIER) ;
-            SPEC_NOUN($$) = V_STRUCT;
-            SPEC_STRUCT($$) = $2;
+        {
+          $$ = newLink(SPECIFIER);
+          SPEC_NOUN($$) = V_STRUCT;
+          SPEC_STRUCT($$) = $2;
 
-           if (!$2->type)
-             {
-               $2->type = $1;
-             }
-           else
-             {
-               if ($2->type != $1)
-                 werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
-             }
-         }
+          if (!$2->type)
+            {
+              $2->type = $1;
+            }
+          else
+            {
+              if ($2->type != $1)
+                  werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
+            }
+        }
    ;
 
 struct_or_union
@@ -883,206 +887,212 @@ struct_or_union
    ;
 
 opt_stag
-: stag
-|  {  /* synthesize a name add to structtable */
-     ignoreTypedefType = 0;
-     $$ = newStruct(genSymName(NestLevel)) ;
-     $$->level = NestLevel ;
-     addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
-};
+   : stag
+   |    {  /* synthesize a name add to structtable */
+          ignoreTypedefType = 0;
+          $$ = newStruct(genSymName(NestLevel));
+          $$->level = NestLevel;
+          addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
+        }
+   ;
 
 stag
-:  identifier  {  /* add name to structure table */
-     ignoreTypedefType = 0;
-     $$ = findSymWithBlock (StructTab, $1, currBlockno);
-     if (! $$ ) {
-       $$ = newStruct($1->name) ;
-       $$->level = NestLevel ;
-       addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
-     }
-};
-
+   : identifier
+        {  /* add name to structure table */
+          ignoreTypedefType = 0;
+          $$ = findSymWithBlock (StructTab, $1, currBlockno);
+          if (! $$ )
+            {
+              $$ = newStruct($1->name);
+              $$->level = NestLevel;
+              addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
+            }
+        }
+   ;
 
 struct_declaration_list
    : struct_declaration
    | struct_declaration_list struct_declaration
-       {
-           symbol *sym=$2;
+        {
+          symbol *sym = $2;
 
-           /* go to the end of the chain */
-           while (sym->next) sym=sym->next;
-           sym->next = $1 ;
+          /* go to the end of the chain */
+          while (sym->next) sym = sym->next;
+          sym->next = $1;
 
            $$ = $2;
-       }
+        }
    ;
 
 struct_declaration
    : type_specifier_list struct_declarator_list ';'
-       {
-           /* add this type to all the symbols */
-           symbol *sym ;
-           for ( sym = $2 ; sym != NULL ; sym = sym->next ) {
-               sym_link *btype = copyLinkChain($1);
+        {
+          /* add this type to all the symbols */
+          symbol *sym ;
+          for ( sym = $2 ; sym != NULL ; sym = sym->next )
+            {
+              sym_link *btype = copyLinkChain($1);
 
-               /* make the symbol one level up */
-               sym->level-- ;
-
-               pointerTypes(sym->type,btype);
-               if (!sym->type) {
-                   sym->type = btype;
-                   sym->etype = getSpec(sym->type);
-               }
-               else
-                 addDecl (sym,0,btype);
-               /* make sure the type is complete and sane */
-               checkTypeSanity(sym->etype, sym->name);
-           }
-           ignoreTypedefType = 0;
-           $$ = $2;
-       }
+              pointerTypes(sym->type, btype);
+              if (!sym->type)
+                {
+                  sym->type = btype;
+                  sym->etype = getSpec(sym->type);
+                }
+              else
+                  addDecl (sym, 0, btype);
+              /* make sure the type is complete and sane */
+              checkTypeSanity(sym->etype, sym->name);
+            }
+          ignoreTypedefType = 0;
+          $$ = $2;
+        }
    ;
 
 struct_declarator_list
    : struct_declarator
    | struct_declarator_list ',' struct_declarator
-       {
-           $3->next  = $1 ;
-           $$ = $3 ;
-       }
+        {
+          $3->next  = $1;
+          $$ = $3;
+        }
    ;
 
 struct_declarator
    : declarator
-   | ':' constant_expr  {
-                           unsigned int bitsize;
-                           $$ = newSymbol (genSymName(NestLevel),NestLevel) ;
-                           bitsize = (unsigned int) ulFromVal(constExprValue($2,TRUE));
-                           if (bitsize > (port->s.int_size * 8)) {
-                             bitsize = port->s.int_size * 8;
-                             werror(E_BITFLD_SIZE, bitsize);
-                           }
-                           if (!bitsize)
-                             bitsize = BITVAR_PAD;
-                           $$->bitVar = bitsize;
-                           $$->bitUnnamed = 1;
-                        }
+   | ':' constant_expr
+        {
+          unsigned int bitsize;
+          $$ = newSymbol (genSymName(NestLevel), NestLevel);
+          bitsize = (unsigned int) ulFromVal(constExprValue($2, TRUE));
+          if (bitsize > (port->s.int_size * 8))
+            {
+              bitsize = port->s.int_size * 8;
+              werror(E_BITFLD_SIZE, bitsize);
+            }
+          if (!bitsize)
+              bitsize = BITVAR_PAD;
+          $$->bitVar = bitsize;
+          $$->bitUnnamed = 1;
+        }
    | declarator ':' constant_expr
-                        {
-                          unsigned int bitsize;
-                          bitsize = (unsigned int) ulFromVal(constExprValue($3,TRUE));
-                          if (bitsize > (port->s.int_size * 8)) {
-                            bitsize = port->s.int_size * 8;
-                            werror(E_BITFLD_SIZE, bitsize);
-                          }
-                          if (!bitsize) {
-                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ;
-                            $$->bitVar = BITVAR_PAD;
-                            werror(W_BITFLD_NAMED);
-                          }
-                          else
-                            $1->bitVar = bitsize;
-                        }
-   | { $$ = newSymbol ("", NestLevel) ; }
-
+        {
+          unsigned int bitsize;
+          bitsize = (unsigned int) ulFromVal(constExprValue($3, TRUE));
+          if (bitsize > (port->s.int_size * 8))
+            {
+              bitsize = port->s.int_size * 8;
+              werror(E_BITFLD_SIZE, bitsize);
+            }
+          if (!bitsize)
+            {
+              $$ = newSymbol (genSymName(NestLevel), NestLevel);
+              $$->bitVar = BITVAR_PAD;
+              werror(W_BITFLD_NAMED);
+            }
+          else
+              $1->bitVar = bitsize;
+        }
+   | { $$ = newSymbol ("", NestLevel); }
    ;
 
 enum_specifier
-   : ENUM            '{' enumerator_list '}' {
-           $$ = newEnumType ($3);       //copyLinkChain(cenum->type);
-           SPEC_SCLS(getSpec($$)) = 0;
-         }
+   : ENUM '{' enumerator_list '}'
+        {
+          $$ = newEnumType ($3);
+          SPEC_SCLS(getSpec($$)) = 0;
+        }
+   | ENUM identifier '{' enumerator_list '}'
+        {
+          symbol *csym ;
+          sym_link *enumtype;
 
-   | ENUM identifier '{' enumerator_list '}' {
-     symbol *csym ;
-     sym_link *enumtype;
+          csym = findSymWithLevel(enumTab, $2);
+          if ((csym && csym->level == $2->level))
+            {
+              werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF, csym->name);
+              werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+            }
 
-     csym=findSym(enumTab,$2,$2->name);
-     if ((csym && csym->level == $2->level))
-       {
-         werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF,csym->name);
-         werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
-       }
+          enumtype = newEnumType ($4);
+          SPEC_SCLS(getSpec(enumtype)) = 0;
+          $2->type = enumtype;
 
-     enumtype = newEnumType ($4);       //copyLinkChain(cenum->type);
-     SPEC_SCLS(getSpec(enumtype)) = 0;
-     $2->type = enumtype;
+          /* add this to the enumerator table */
+          if (!csym)
+              addSym (enumTab, $2, $2->name, $2->level, $2->block, 0);
+          $$ = copyLinkChain(enumtype);
+        }
+   | ENUM identifier
+        {
+          symbol *csym ;
 
-     /* add this to the enumerator table */
-     if (!csym)
-       addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
-     $$ = copyLinkChain(enumtype);
-   }
-   | ENUM identifier                         {
-     symbol *csym ;
-
-     /* check the enumerator table */
-     if ((csym = findSym(enumTab,$2,$2->name)))
-       $$ = copyLinkChain(csym->type);
-     else  {
-       $$ = newLink(SPECIFIER) ;
-       SPEC_NOUN($$) = V_INT   ;
-     }
-   }
+          /* check the enumerator table */
+          if ((csym = findSymWithLevel(enumTab, $2)))
+              $$ = copyLinkChain(csym->type);
+          else
+            {
+              $$ = newLink(SPECIFIER);
+              SPEC_NOUN($$) = V_INT;
+            }
+        }
    ;
 
 enumerator_list
-    : enumerator
-    | enumerator_list ','
-    | enumerator_list ',' enumerator
-      {
-        $3->next = $1 ;
-        $$ = $3  ;
-      }
-    ;
+   : enumerator
+   | enumerator_list ','
+   | enumerator_list ',' enumerator
+        {
+          $3->next = $1;
+          $$ = $3;
+        }
+   ;
 
 enumerator
-    : identifier opt_assign_expr
-      {
-        symbol *sym;
+   : identifier opt_assign_expr
+        {
+          symbol *sym;
 
-        /* make the symbol one level up */
-        $1->level-- ;
-        // check if the symbol at the same level already exists
-        if ((sym = findSymWithLevel (SymbolTab, $1)) &&
-          sym->level == $1->level)
-          {
-            werrorfl ($1->fileDef, $1->lineDef, E_DUPLICATE_MEMBER, "enum", $1->name);
-            werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
-          }
-        $1->type = copyLinkChain ($2->type);
-        $1->etype= getSpec ($1->type);
-        SPEC_ENUM ($1->etype) = 1;
-        $$ = $1 ;
-        // do this now, so we can use it for the next enums in the list
-        addSymChain (&$1);
-      }
-    ;
+          // check if the symbol at the same level already exists
+          if ((sym = findSymWithLevel (SymbolTab, $1)) && sym->level == $1->level)
+            {
+              werrorfl ($1->fileDef, $1->lineDef, E_DUPLICATE_MEMBER, "enum", $1->name);
+              werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
+            }
+          $1->type = copyLinkChain ($2->type);
+          $1->etype = getSpec ($1->type);
+          SPEC_ENUM ($1->etype) = 1;
+          $$ = $1;
+          // do this now, so we can use it for the next enums in the list
+          addSymChain (&$1);
+        }
+   ;
 
 opt_assign_expr
-   :  '='   constant_expr  {
-                              value *val ;
+   : '=' constant_expr
+        {
+          value *val;
 
-                              val = constExprValue($2,TRUE);
-                              if (!IS_INT(val->type) && !IS_CHAR(val->type) && !IS_BOOL(val->type))
-                                {
-                                  werror(E_ENUM_NON_INTEGER);
-                                  SNPRINTF(lbuff, sizeof(lbuff),
-                                          "%d", (int) ulFromVal(val));
-                                  val = constVal(lbuff);
-                                }
-                              $$ = cenum = val ;
-                           }
-   |                       {
-                              if (cenum)  {
-                                 SNPRINTF(lbuff, sizeof(lbuff),
-                                          "%d", (int) ulFromVal(cenum)+1);
-                                 $$ = cenum = constVal(lbuff);
-                              }
-                              else {
-                                 $$ = cenum = constCharVal(0);
-                              }
-                           }
+          val = constExprValue($2, TRUE);
+          if (!IS_INT(val->type) && !IS_CHAR(val->type) && !IS_BOOL(val->type))
+            {
+              werror(E_ENUM_NON_INTEGER);
+              SNPRINTF(lbuff, sizeof(lbuff), "%d", (int) ulFromVal(val));
+              val = constVal(lbuff);
+            }
+          $$ = cenum = val ;
+        }
+   |    {
+          if (cenum)
+            {
+              SNPRINTF(lbuff, sizeof(lbuff), "%d", (int) ulFromVal(cenum)+1);
+              $$ = cenum = constVal(lbuff);
+            }
+          else
+            {
+              $$ = cenum = constCharVal(0);
+            }
+        }
    ;
 
 declarator
@@ -1185,40 +1195,48 @@ declarator2
    ;
 
 function_declarator2
-   : declarator2 '('  ')'       {  addDecl ($1,FUNCTION,NULL) ;   }
-   | declarator2 '('            { NestLevel++ ; currBlockno++;  }
-                     parameter_type_list ')'
-         {
-             sym_link *funcType;
+   : declarator2 '('  ')'
+        {
+          addDecl ($1, FUNCTION, NULL);
+        }
+   | declarator2 '('
+        {
+          NestLevel++;
+          STACK_PUSH(blockNum, currBlockno);
+          currBlockno = ++blockNo;
+        }
+     parameter_type_list ')'
+        {
+          sym_link *funcType;
 
-             addDecl ($1,FUNCTION,NULL) ;
+          addDecl ($1, FUNCTION, NULL);
 
-             funcType = $1->type;
-             while (funcType && !IS_FUNC(funcType))
-               funcType = funcType->next;
+          funcType = $1->type;
+          while (funcType && !IS_FUNC(funcType))
+              funcType = funcType->next;
 
-             assert (funcType);
+          assert (funcType);
 
-             FUNC_HASVARARGS(funcType) = IS_VARG($4);
-             FUNC_ARGS(funcType) = reverseVal($4);
+          FUNC_HASVARARGS(funcType) = IS_VARG($4);
+          FUNC_ARGS(funcType) = reverseVal($4);
 
-             /* nest level was incremented to take care of the parms  */
-             NestLevel-- ;
-             currBlockno--;
+          /* nest level was incremented to take care of the parms  */
+          NestLevel--;
+          currBlockno = STACK_POP(blockNum);
 
-             // if this was a pointer (to a function)
-             if (!IS_FUNC($1->type))
-               cleanUpLevel(SymbolTab,NestLevel+1);
+          // if this was a pointer (to a function)
+          if (!IS_FUNC($1->type))
+              cleanUpLevel(SymbolTab, NestLevel + 1);
 
-             $$ = $1;
-         }
+          $$ = $1;
+        }
    | declarator2 '(' identifier_list ')'
-         {
-           werror(E_OLD_STYLE,$1->name) ;
-           /* assume it returns an int */
-           $1->type = $1->etype = newIntLink();
-           $$ = $1 ;
-         }
+        {
+          werror(E_OLD_STYLE,$1->name);
+          /* assume it returns an int */
+          $1->type = $1->etype = newIntLink();
+          $$ = $1;
+        }
    ;
 
 pointer
@@ -1434,27 +1452,35 @@ abstract_declarator2
      }
      $1->next=p;
    }
-   | abstract_declarator2 '(' { NestLevel++ ; currBlockno++; } parameter_type_list ')' {
-       sym_link *p = newLink(DECLARATOR);
-       DCL_TYPE(p) = FUNCTION;
+   | abstract_declarator2 '('
+        {
+          NestLevel++;
+          STACK_PUSH(blockNum, currBlockno);
+          currBlockno = ++blockNo;
+        }
+     parameter_type_list ')'
+        {
+          sym_link *p = newLink(DECLARATOR);
+          DCL_TYPE(p) = FUNCTION;
 
-       FUNC_HASVARARGS(p) = IS_VARG($4);
-       FUNC_ARGS(p) = reverseVal($4);
+          FUNC_HASVARARGS(p) = IS_VARG($4);
+          FUNC_ARGS(p) = reverseVal($4);
 
-       /* nest level was incremented to take care of the parms  */
-       NestLevel--;
-       currBlockno--;
-       if (!$1) {
-         /* ((void (code *) (void)) 0) () */
-         $1 = newLink(DECLARATOR);
-         DCL_TYPE($1) = CPOINTER;
-         $$ = $1;
-       }
-       $1->next = p;
+          /* nest level was incremented to take care of the parms  */
+          NestLevel--;
+          currBlockno = STACK_POP(blockNum);
+          if (!$1)
+            {
+              /* ((void (code *) (void)) 0) () */
+              $1 = newLink(DECLARATOR);
+              DCL_TYPE($1) = CPOINTER;
+              $$ = $1;
+            }
+          $1->next = p;
 
-       // disabled to fix bug 3190029
-//       // remove the symbol args (if any)
-//       cleanUpLevel(SymbolTab, NestLevel+1);
+          // disabled to fix bug 3190029
+//        // remove the symbol args (if any)
+//        cleanUpLevel(SymbolTab, NestLevel + 1);
    }
    ;
 
@@ -1530,16 +1556,23 @@ labeled_statement
      }
    ;
 
-start_block : '{'
-              {
-                STACK_PUSH(blockNum, currBlockno);
-                currBlockno = ++blockNo ;
-                ignoreTypedefType = 0;
-              }
-            ;
+start_block
+   : '{'
+        {
+          NestLevel++;
+          STACK_PUSH(blockNum, currBlockno);
+          currBlockno = ++blockNo;
+          ignoreTypedefType = 0;
+        }
+   ;
 
-end_block   : '}'     { currBlockno = STACK_POP(blockNum); }
-            ;
+end_block
+   : '}'
+        {
+          NestLevel--;
+          currBlockno = STACK_POP(blockNum);
+        }
+   ;
 
 compound_statement
    : start_block end_block                    { $$ = createBlock(NULL, NULL); }
@@ -1547,7 +1580,7 @@ compound_statement
    | start_block declaration_list end_block   { $$ = createBlock($2, NULL); }
    | start_block
           declaration_list statement_list
-     end_block                                {$$ = createBlock($2, $3); }
+     end_block                                { $$ = createBlock($2, $3); }
    | error ';'                                { $$ = NULL ; }
    ;
 
@@ -1803,6 +1836,6 @@ addressmod
    ;
 
 identifier
-   : IDENTIFIER   { $$ = newSymbol ($1,NestLevel) ; }
+   : IDENTIFIER   { $$ = newSymbol ($1, NestLevel); }
    ;
 %%

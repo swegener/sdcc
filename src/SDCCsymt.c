@@ -287,7 +287,7 @@ findSymWithLevel (bucket ** stab, symbol * sym)
 }
 
 /*-----------------------------------------------------------------*/
-/* findSymWithBlock - finds a symbol with name in with a block     */
+/* findSymWithBlock - finds a symbol with name in a block          */
 /*-----------------------------------------------------------------*/
 void *
 findSymWithBlock (bucket ** stab, symbol * sym, int block)
@@ -1027,8 +1027,6 @@ getSize (sym_link * p)
         }
       else
         {
-          //    werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-          //    "can not tell the size of an array[]");
           return 0;
         }
     case IPOINTER:
@@ -1885,15 +1883,6 @@ checkSClass (symbol * sym, int isProto)
       if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))
         {
           SPEC_SCLS (sym->etype) = (options.useXstack ? S_XSTACK : S_STACK);
-        }
-      else
-        {
-          /* hack-o-matic! I see no reason why the useXstack option should ever
-           * control this allocation, but the code was originally that way, and
-           * changing it for non-390 ports breaks the compiler badly.
-           */
-          bool useXdata = (TARGET_IS_DS390 || TARGET_IS_DS400) ? 1 : options.useXstack;
-          SPEC_SCLS (sym->etype) = (useXdata ? S_XDATA : S_FIXED);
         }
     }
 }

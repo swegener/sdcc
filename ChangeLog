@@ -1,3 +1,10 @@
+2011-12-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.lex,
+	* src/SDCC.y: fixed bugs 1810965 and 2698805
+	* src/SDCCsymt.c (checkSClass): removed old hack-o-matic
+	* support/regression/tests/bug1810965.c: new, added
+
 2011-12-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp:

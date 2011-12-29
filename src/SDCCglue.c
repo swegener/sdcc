@@ -1543,7 +1543,7 @@ emitMaps (void)
 {
   namedspacemap *nm;
   int publicsfr = TARGET_IS_MCS51;      /* Ideally, this should be true for all  */
-  /* ports but let's be conservative - EEP */
+                                        /* ports but let's be conservative - EEP */
 
   inInitMode++;
   /* no special considerations for the following
@@ -1694,9 +1694,6 @@ emitOverlay (struct dbuf_s *aBuf)
 {
   set *ovrset;
 
-  if (!elementsInSet (ovrSetSets))
-    dbuf_tprintf (aBuf, "\t!area\n", port->mem.overlay_name);
-
   /* for each of the sets in the overlay segment do */
   for (ovrset = setFirstItem (ovrSetSets); ovrset; ovrset = setNextItem (ovrSetSets))
     {
@@ -1704,7 +1701,7 @@ emitOverlay (struct dbuf_s *aBuf)
 
       if (elementsInSet (ovrset))
         {
-          /* output the area informtion */
+          /* output the area information */
           dbuf_printf (aBuf, "\t.area\t%s\n", port->mem.overlay_name);  /* MOF */
         }
 
@@ -1945,7 +1942,7 @@ glue (void)
 
   /* copy the data segment */
   fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; %s ram data\n", mcs51_like ? "internal" : "");
+  fprintf (asmFile, ";%s ram data\n", mcs51_like ? " internal" : "");
   fprintf (asmFile, "%s", iComments2);
   dbuf_write_and_destroy (&data->oBuf, asmFile);
 
@@ -1962,7 +1959,7 @@ glue (void)
   if (overlay)
     {
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; overlayable items in %s ram \n", mcs51_like ? "internal" : "");
+      fprintf (asmFile, "; overlayable items in%s ram \n", mcs51_like ? " internal" : "");
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&ovrBuf, asmFile);
     }
@@ -1977,7 +1974,7 @@ glue (void)
     }
 
   /* create the idata segment */
-  if ((idata) && (mcs51_like))
+  if (idata)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; indirectly addressable internal ram data\n");
@@ -1986,17 +1983,19 @@ glue (void)
     }
 
   /* create the absolute idata/data segment */
-  if ((i_abs) && (mcs51_like))
+  if (d_abs || i_abs)
     {
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; absolute internal ram data\n");
+      fprintf (asmFile, "; absolute%s ram data\n", mcs51_like ? " internal" : "");
       fprintf (asmFile, "%s", iComments2);
-      dbuf_write_and_destroy (&d_abs->oBuf, asmFile);
-      dbuf_write_and_destroy (&i_abs->oBuf, asmFile);
+      if (d_abs)
+        dbuf_write_and_destroy (&d_abs->oBuf, asmFile);
+      if (i_abs)
+        dbuf_write_and_destroy (&i_abs->oBuf, asmFile);
     }
 
   /* copy the bit segment */
-  if (mcs51_like)
+  if (bit)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; bit data\n");
@@ -2005,7 +2004,7 @@ glue (void)
     }
 
   /* copy paged external ram data */
-  if (mcs51_like)
+  if (pdata)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; paged external ram data\n");
@@ -2023,7 +2022,7 @@ glue (void)
     }
 
   /* copy external ram data */
-  if (mcs51_like)
+  if (xdata && mcs51_like)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; external ram data\n");
@@ -2032,7 +2031,7 @@ glue (void)
     }
 
   /* create the absolute xdata segment */
-  if (mcs51_like || TARGET_IS_HC08)
+  if (x_abs)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; absolute external ram data\n");
@@ -2041,10 +2040,13 @@ glue (void)
     }
 
   /* copy external initialized ram data */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; external initialized ram data\n");
-  fprintf (asmFile, "%s", iComments2);
-  dbuf_write_and_destroy (&xidata->oBuf, asmFile);
+  if (xidata)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; external initialized ram data\n");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&xidata->oBuf, asmFile);
+    }
 
   /* If the port wants to generate any extra areas, let it do so. */
   if (port->extraAreas.genExtraAreaDeclaration)

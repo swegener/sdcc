@@ -8,6 +8,8 @@ static int uc_yy_input(char *buf, int max_size);
 #define YY_INPUT(buf,result,max_size) result = uc_yy_input(buf, max_size) 
 %}
 
+%option nounput
+
 %%
 
 [ \t]*			;

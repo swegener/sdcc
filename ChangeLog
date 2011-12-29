@@ -1,3 +1,15 @@
+2011-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/clean.mk: added z180 and r2k
+	* sim/ucsim/cmd.src/cmdlex.l: fixed unused yyunput warning
+	* src/hc08/main.c: removed unused BSEG
+	* src/SDCCglue.c (glue): suppress unused segments
+	* src/SDCCmem.c (allocMap, initMem): skip when name==NULL,
+	  (allocGlobal): use x_abs for __at on z80, fixed bug 2040874
+	* src/z80/main.c: removed ISEG, XSEG, BSEG, OVERLAY, added DABS (x_abs)
+	* support/regression/fwk/include/testfwk.h,
+	* support/regression/tests/absolute.c: z80 supports __at
+
 2011-12-29 Borut Razem <borut.razem AT gmail.com>
 
 	* support/cpp/libcpp/lex.c:

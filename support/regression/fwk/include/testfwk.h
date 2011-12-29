@@ -26,8 +26,11 @@ void __printf(const char *szFormat, ...);
 # define __code
 # define __near
 # define __far
-# define __at(x)
 # define __reentrant
+#endif
+
+#if defined(PORT_HOST)
+# define __at(x)
 #endif
 
 #if defined(SDCC_hc08)

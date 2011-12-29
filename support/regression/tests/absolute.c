@@ -38,7 +38,7 @@ char z = 'z';
 void
 testAbsolute(void)
 {
-#if defined(SDCC_mcs51) || defined(SDCC_ds390) || defined(SDCC_hc08)
+#if !defined(PORT_HOST)
   static {mem} __at(ADDRESS(B6)) char s = 's';
   char {mem} *pC = (char {mem} *)(ADDRESS(B0));
   int  {mem} *pI = (int  {mem} *)(ADDRESS(B0));

@@ -2294,16 +2294,16 @@ local_prefix=
 # Check whether --with-local-prefix was given.
 if test "${with_local_prefix+set}" = set; then :
   withval=$with_local_prefix; case "${withval}" in
-yes)	as_fn_error $? "bad value ${withval} given for local include directory prefix" "$LINENO" 5 ;;
-no)	;;
-*)	local_prefix=$with_local_prefix ;;
+yes)    as_fn_error $? "bad value ${withval} given for local include directory prefix" "$LINENO" 5 ;;
+no)     ;;
+*)      local_prefix=$with_local_prefix ;;
 esac
 fi
 
 
 # Default local prefix if it is empty
 if test x$local_prefix = x; then
-	local_prefix=/usr/local
+        local_prefix=/usr/local
 fi
 
 test "$program_prefix" != NONE &&
@@ -3798,10 +3798,10 @@ fi
 $as_echo_n "checking whether a default assembler was specified... " >&6; }
 if test x"${DEFAULT_ASSEMBLER+set}" = x"set"; then
     if test x"$gas_flag" = x"no"; then
-    	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_ASSEMBLER)" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_ASSEMBLER)" >&5
 $as_echo "yes ($DEFAULT_ASSEMBLER)" >&6; }
     else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_ASSEMBLER - GNU as)" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_ASSEMBLER - GNU as)" >&5
 $as_echo "yes ($DEFAULT_ASSEMBLER - GNU as)" >&6; }
     fi
 else
@@ -3813,10 +3813,10 @@ fi
 $as_echo_n "checking whether a default linker was specified... " >&6; }
 if test x"${DEFAULT_LINKER+set}" = x"set"; then
     if test x"$gnu_ld_flag" = x"no"; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_LINKER)" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_LINKER)" >&5
 $as_echo "yes ($DEFAULT_LINKER)" >&6; }
     else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_LINKER - GNU ld)" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes ($DEFAULT_LINKER - GNU ld)" >&5
 $as_echo "yes ($DEFAULT_LINKER - GNU ld)" >&6; }
     fi
 else
@@ -4395,9 +4395,9 @@ done
 
 
 for ac_header in limits.h stddef.h string.h strings.h stdlib.h time.h \
-		 fcntl.h unistd.h sys/file.h sys/time.h \
-		 sys/param.h sys/stat.h \
-		 direct.h malloc.h
+                 fcntl.h unistd.h sys/file.h sys/time.h \
+                 sys/param.h sys/stat.h \
+                 direct.h malloc.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -4484,79 +4484,229 @@ _ACEOF
 
 fi
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking byte ordering" >&5
-$as_echo_n "checking byte ordering... " >&6; }
-if ${ac_cv_c_compile_endian+:} false; then :
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether byte ordering is bigendian" >&5
+$as_echo_n "checking whether byte ordering is bigendian... " >&6; }
+if ${ac_cv_c_bigendian+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_cv_c_compile_endian=unknown
+  ac_cv_c_bigendian=unknown
+    # See if we're dealing with a universal compiler.
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifndef __APPLE_CC__
+	       not a universal capable compiler
+	     #endif
+	     typedef int dummy;
 
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
 
-cat > conftest.$ac_ext <<EOF
-#line 4501 "configure"
-#include "confdefs.h"
-
-#ifdef HAVE_LIMITS_H
-# include <limits.h>
-#endif
-/* This structure must have no internal padding.  */
-  struct {
-    char prefix[sizeof "\nendian:" - 1];
-    short word;
-    char postfix[2];
- } tester = {
-    "\nendian:",
-#if SIZEOF_SHORT == 4
-    ('A' << (CHAR_BIT * 3)) | ('B' << (CHAR_BIT * 2)) |
-#endif
-    ('A' << CHAR_BIT) | 'B',
-    'X', '\n'
-};
-EOF
-if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  od -c conftest.o |
-    sed 's/^[0-7]*[ 	]*/ /
-	  s/\*/./g
-	  s/ \\n/*/g
-	  s/ [0-9][0-9][0-9]/./g
-	  s/  \\[^ ]/./g' |
-    tr -d '
- ' | tr -s '*' '
-' | fold | sed '$a\
-' > conftest.dmp
-  if   grep 'endian:AB' conftest.dmp >/dev/null 2>&1; then
-    ac_cv_c_compile_endian=big-endian
-  elif grep 'endian:BA' conftest.dmp >/dev/null 2>&1; then
-    ac_cv_c_compile_endian=little-endian
-  fi
+	# Check for potential -arch flags.  It is not universal unless
+	# there are at least two -arch flags with different values.
+	ac_arch=
+	ac_prev=
+	for ac_word in $CC $CFLAGS $CPPFLAGS $LDFLAGS; do
+	 if test -n "$ac_prev"; then
+	   case $ac_word in
+	     i?86 | x86_64 | ppc | ppc64)
+	       if test -z "$ac_arch" || test "$ac_arch" = "$ac_word"; then
+		 ac_arch=$ac_word
+	       else
+		 ac_cv_c_bigendian=universal
+		 break
+	       fi
+	       ;;
+	   esac
+	   ac_prev=
+	 elif test "x$ac_word" = "x-arch"; then
+	   ac_prev=arch
+	 fi
+       done
 fi
-rm -rf conftest*
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+    if test $ac_cv_c_bigendian = unknown; then
+      # See if sys/param.h defines the BYTE_ORDER macro.
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/types.h>
+	     #include <sys/param.h>
 
+int
+main ()
+{
+#if ! (defined BYTE_ORDER && defined BIG_ENDIAN \
+		     && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN \
+		     && LITTLE_ENDIAN)
+	      bogus endian macros
+	     #endif
 
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  # It does; now see whether it defined to BIG_ENDIAN or not.
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/types.h>
+		#include <sys/param.h>
+
+int
+main ()
+{
+#if BYTE_ORDER != BIG_ENDIAN
+		 not big endian
+		#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_c_bigendian=yes
+else
+  ac_cv_c_bigendian=no
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_c_compile_endian" >&5
-$as_echo "$ac_cv_c_compile_endian" >&6; }
-if test $ac_cv_c_compile_endian = unknown; then
-  as_fn_error $? "*** unable to determine endianness" "$LINENO" 5
-elif test $ac_cv_c_compile_endian = big-endian; then
-
-$as_echo "#define HOST_WORDS_BIG_ENDIAN 1" >>confdefs.h
-
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+    fi
+    if test $ac_cv_c_bigendian = unknown; then
+      # See if <limits.h> defines _LITTLE_ENDIAN or _BIG_ENDIAN (e.g., Solaris).
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+
+int
+main ()
+{
+#if ! (defined _LITTLE_ENDIAN || defined _BIG_ENDIAN)
+	      bogus endian macros
+	     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  # It does; now see whether it defined to _BIG_ENDIAN or not.
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+
+int
+main ()
+{
+#ifndef _BIG_ENDIAN
+		 not big endian
+		#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_c_bigendian=yes
+else
+  ac_cv_c_bigendian=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+    fi
+    if test $ac_cv_c_bigendian = unknown; then
+      # Compile a test program.
+      if test "$cross_compiling" = yes; then :
+  # Try to guess by grepping values from an object file.
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+short int ascii_mm[] =
+		  { 0x4249, 0x4765, 0x6E44, 0x6961, 0x6E53, 0x7953, 0 };
+		short int ascii_ii[] =
+		  { 0x694C, 0x5454, 0x656C, 0x6E45, 0x6944, 0x6E61, 0 };
+		int use_ascii (int i) {
+		  return ascii_mm[i] + ascii_ii[i];
+		}
+		short int ebcdic_ii[] =
+		  { 0x89D3, 0xE3E3, 0x8593, 0x95C5, 0x89C4, 0x9581, 0 };
+		short int ebcdic_mm[] =
+		  { 0xC2C9, 0xC785, 0x95C4, 0x8981, 0x95E2, 0xA8E2, 0 };
+		int use_ebcdic (int i) {
+		  return ebcdic_mm[i] + ebcdic_ii[i];
+		}
+		extern int foo;
+
+int
+main ()
+{
+return use_ascii (foo) == use_ebcdic (foo);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  if grep BIGenDianSyS conftest.$ac_objext >/dev/null; then
+	      ac_cv_c_bigendian=yes
+	    fi
+	    if grep LiTTleEnDian conftest.$ac_objext >/dev/null ; then
+	      if test "$ac_cv_c_bigendian" = unknown; then
+		ac_cv_c_bigendian=no
+	      else
+		# finding both strings is unlikely to happen, but who knows?
+		ac_cv_c_bigendian=unknown
+	      fi
+	    fi
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_includes_default
+int
+main ()
+{
+
+	     /* Are we little or big endian?  From Harbison&Steele.  */
+	     union
+	     {
+	       long int l;
+	       char c[sizeof (long int)];
+	     } u;
+	     u.l = 1;
+	     return u.c[sizeof (long int) - 1] == 1;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  ac_cv_c_bigendian=no
+else
+  ac_cv_c_bigendian=yes
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+    fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_c_bigendian" >&5
+$as_echo "$ac_cv_c_bigendian" >&6; }
+ case $ac_cv_c_bigendian in #(
+   yes)
+     $as_echo "#define WORDS_BIGENDIAN 1" >>confdefs.h
+;; #(
+   no)
+      ;; #(
+   universal)
+
+$as_echo "#define AC_APPLE_UNIVERSAL_BUILD 1" >>confdefs.h
+
+     ;; #(
+   *)
+     as_fn_error $? "unknown endianness
+ presetting ac_cv_c_bigendian=no (or yes) will help" "$LINENO" 5 ;;
+ esac
 
 
 # See if we have the mktemp command.
@@ -5107,7 +5257,7 @@ fi
 saved_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/../include"
 for ac_func in getenv abort strsignal errno \
-	malloc realloc calloc free clock
+        malloc realloc calloc free clock
 do
   ac_tr_decl=HAVE_DECL_`echo $ac_func | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $ac_func is declared" >&5
@@ -5246,7 +5396,7 @@ host_exeext=
 # then we decode the target machine and forget everything else
 # that came from the host machine.
 #for machine in $build $host $target; do
-#	. ${srcdir}/config.gcc
+#       . ${srcdir}/config.gcc
 #done
 
 extra_objs="${host_extra_objs} ${extra_objs}"
@@ -5285,29 +5435,29 @@ fi
 # work to find out the build config parameters.
 if test x$host = x$build
 then
-	build_auto=auto-host.h
+        build_auto=auto-host.h
 else
-	# We create a subdir, then run autoconf in the subdir.
-	# To prevent recursion we set host and build for the new
-	# invocation of configure to the build for this invocation
-	# of configure.
-	tempdir=build.$$
-	rm -rf $tempdir
-	mkdir $tempdir
-	cd $tempdir
-	case ${srcdir} in
-	/* | A-Za-z:\\/* ) realsrcdir=${srcdir};;
-	*) realsrcdir=../${srcdir};;
-	esac
-	CC=${CC_FOR_BUILD} ${realsrcdir}/configure \
-		--target=$target --host=$build --build=$build
+        # We create a subdir, then run autoconf in the subdir.
+        # To prevent recursion we set host and build for the new
+        # invocation of configure to the build for this invocation
+        # of configure.
+        tempdir=build.$$
+        rm -rf $tempdir
+        mkdir $tempdir
+        cd $tempdir
+        case ${srcdir} in
+        /* | A-Za-z:\\/* ) realsrcdir=${srcdir};;
+        *) realsrcdir=../${srcdir};;
+        esac
+        CC=${CC_FOR_BUILD} ${realsrcdir}/configure \
+                --target=$target --host=$build --build=$build
 
-	# We just finished tests for the build machine, so rename
-	# the file auto-build.h in the gcc directory.
-	mv auto-host.h ../auto-build.h
-	cd ..
-	rm -rf $tempdir
-	build_auto=auto-build.h
+        # We just finished tests for the build machine, so rename
+        # the file auto-build.h in the gcc directory.
+        mv auto-host.h ../auto-build.h
+        cd ..
+        rm -rf $tempdir
+        build_auto=auto-build.h
 fi
 
 tm_file="${tm_file} defaults.h"
@@ -5317,14 +5467,14 @@ xm_file="ansidecl.h ${xm_file} ${tm_file}"
 
 # Truncate the target if necessary
 if test x$host_truncate_target != x; then
-	target=`echo $target | sed -e 's/\(..............\).*/\1/'`
+        target=`echo $target | sed -e 's/\(..............\).*/\1/'`
 fi
 
 # Get the version trigger filename from the toplevel
 if test "${with_gcc_version_trigger+set}" = set; then
-	gcc_version_trigger=$with_gcc_version_trigger
+        gcc_version_trigger=$with_gcc_version_trigger
 else
-	gcc_version_trigger=${srcdir}/version.c
+        gcc_version_trigger=${srcdir}/version.c
 fi
 gcc_version_full=`grep version_string ${gcc_version_trigger} | sed -e 's/.*"\([^"]*\)".*/\1/'`
 gcc_version=`echo ${gcc_version_full} | sed -e 's/\([^ ]*\) .*/\1/'`
@@ -5364,76 +5514,76 @@ gcc_cv_gas_major_version=
 gcc_cv_gas_minor_version=
 gcc_cv_as_gas_srcdir=`echo $srcdir | sed -e 's,/gcc$,,'`/gas
 if test -x "$DEFAULT_ASSEMBLER"; then
-	gcc_cv_as="$DEFAULT_ASSEMBLER"
+        gcc_cv_as="$DEFAULT_ASSEMBLER"
 elif test -x "$AS"; then
-	gcc_cv_as="$AS"
+        gcc_cv_as="$AS"
 elif test -x as$host_exeext; then
-	# Build using assembler in the current directory.
-	gcc_cv_as=./as$host_exeext
+        # Build using assembler in the current directory.
+        gcc_cv_as=./as$host_exeext
 elif test -f $gcc_cv_as_gas_srcdir/configure.in -a -f ../gas/Makefile; then
-	# Single tree build which includes gas.
-	for f in $gcc_cv_as_gas_srcdir/configure $gcc_cv_as_gas_srcdir/configure.in $gcc_cv_as_gas_srcdir/Makefile.in
-	do
-		gcc_cv_gas_version=`grep '^VERSION=[0-9]*\.[0-9]*' $f`
-		if test x$gcc_cv_gas_version != x; then
-			break
-		fi
-	done
-	gcc_cv_gas_major_version=`expr "$gcc_cv_gas_version" : "VERSION=\([0-9]*\)"`
-	gcc_cv_gas_minor_version=`expr "$gcc_cv_gas_version" : "VERSION=[0-9]*\.\([0-9]*\)"`
+        # Single tree build which includes gas.
+        for f in $gcc_cv_as_gas_srcdir/configure $gcc_cv_as_gas_srcdir/configure.in $gcc_cv_as_gas_srcdir/Makefile.in
+        do
+                gcc_cv_gas_version=`grep '^VERSION=[0-9]*\.[0-9]*' $f`
+                if test x$gcc_cv_gas_version != x; then
+                        break
+                fi
+        done
+        gcc_cv_gas_major_version=`expr "$gcc_cv_gas_version" : "VERSION=\([0-9]*\)"`
+        gcc_cv_gas_minor_version=`expr "$gcc_cv_gas_version" : "VERSION=[0-9]*\.\([0-9]*\)"`
 fi
 
 if test "x$gcc_cv_as" = x -a x$host = x$target; then
-	# Native build.
-	# Search the same directories that the installed compiler will
-	# search.  Else we may find the wrong assembler and lose.  If we
-	# do not find a suitable assembler binary, then try the user's
-	# path.
-	#
-	# Also note we have to check MD_EXEC_PREFIX before checking the
-	# user's path.  Unfortunately, there is no good way to get at the
-	# value of MD_EXEC_PREFIX here.  So we do a brute force search
-	# through all the known MD_EXEC_PREFIX values.  Ugh.  This needs
-	# to be fixed as part of the make/configure rewrite too.
+        # Native build.
+        # Search the same directories that the installed compiler will
+        # search.  Else we may find the wrong assembler and lose.  If we
+        # do not find a suitable assembler binary, then try the user's
+        # path.
+        #
+        # Also note we have to check MD_EXEC_PREFIX before checking the
+        # user's path.  Unfortunately, there is no good way to get at the
+        # value of MD_EXEC_PREFIX here.  So we do a brute force search
+        # through all the known MD_EXEC_PREFIX values.  Ugh.  This needs
+        # to be fixed as part of the make/configure rewrite too.
 
-	if test "x$exec_prefix" = xNONE; then
-		if test "x$prefix" = xNONE; then
-			test_prefix=/usr/local
-		else
-			test_prefix=$prefix
-		fi
-	else
-		test_prefix=$exec_prefix
-	fi
+        if test "x$exec_prefix" = xNONE; then
+                if test "x$prefix" = xNONE; then
+                        test_prefix=/usr/local
+                else
+                        test_prefix=$prefix
+                fi
+        else
+                test_prefix=$exec_prefix
+        fi
 
-	# If the loop below does not find an assembler, then use whatever
-	# one we can find in the users's path.
-	# user's path.
-	gcc_cv_as=as$host_exeext
+        # If the loop below does not find an assembler, then use whatever
+        # one we can find in the users's path.
+        # user's path.
+        gcc_cv_as=as$host_exeext
 
-	test_dirs="$test_prefix/lib/gcc-lib/$target/$gcc_version \
-		   $test_prefix/lib/gcc-lib/$target \
-		   /usr/lib/gcc/$target/$gcc_version \
-		   /usr/lib/gcc/$target \
-		   $test_prefix/$target/bin/$target/$gcc_version \
-		   $test_prefix/$target/bin \
-		   /usr/libexec \
-		   /usr/ccs/gcc \
-		   /usr/ccs/bin \
-		   /udk/usr/ccs/bin \
-		   /bsd43/usr/lib/cmplrs/cc \
-		   /usr/cross64/usr/bin \
-		   /usr/lib/cmplrs/cc \
-		   /sysv/usr/lib/cmplrs/cc \
-		   /svr4/usr/lib/cmplrs/cc \
-		   /usr/bin"
+        test_dirs="$test_prefix/lib/gcc-lib/$target/$gcc_version \
+                   $test_prefix/lib/gcc-lib/$target \
+                   /usr/lib/gcc/$target/$gcc_version \
+                   /usr/lib/gcc/$target \
+                   $test_prefix/$target/bin/$target/$gcc_version \
+                   $test_prefix/$target/bin \
+                   /usr/libexec \
+                   /usr/ccs/gcc \
+                   /usr/ccs/bin \
+                   /udk/usr/ccs/bin \
+                   /bsd43/usr/lib/cmplrs/cc \
+                   /usr/cross64/usr/bin \
+                   /usr/lib/cmplrs/cc \
+                   /sysv/usr/lib/cmplrs/cc \
+                   /svr4/usr/lib/cmplrs/cc \
+                   /usr/bin"
 
-	for dir in $test_dirs; do
-		if test -f $dir/as$host_exeext; then
-			gcc_cv_as=$dir/as$host_exeext
-			break;
-		fi
-	done
+        for dir in $test_dirs; do
+                if test -f $dir/as$host_exeext; then
+                        gcc_cv_as=$dir/as$host_exeext
+                        break;
+                fi
+        done
 fi
 if test x$gcc_cv_gas_major_version != x -a x$gcc_cv_gas_minor_version != x; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: \"newly built gas\"" >&5
@@ -5447,10 +5597,10 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking what nm to use" >&5
 $as_echo_n "checking what nm to use... " >&6; }
 if test -x nm$host_exeext; then
-	gcc_cv_nm=./nm$host_exeext
+        gcc_cv_nm=./nm$host_exeext
 elif test x$host = x$target; then
-	# Native build.
-	gcc_cv_nm=nm$host_exeext
+        # Native build.
+        gcc_cv_nm=nm$host_exeext
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gcc_cv_nm" >&5
 $as_echo "$gcc_cv_nm" >&6; }
@@ -5665,6 +5815,7 @@ done
 LIBOBJS=$ac_libobjs
 
 LTLIBOBJS=$ac_ltlibobjs
+
 
 
 

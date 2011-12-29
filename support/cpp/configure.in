@@ -49,7 +49,7 @@ if test x"${DEFAULT_LINKER+set}" = x"set"; then
     gnu_ld_flag=yes
   fi
   AC_DEFINE_UNQUOTED(DEFAULT_LINKER,"$DEFAULT_LINKER",
-	[Define to enable the use of a default linker.])
+        [Define to enable the use of a default linker.])
 fi
 
 # With GNU as
@@ -68,7 +68,7 @@ if test x"${DEFAULT_ASSEMBLER+set}" = x"set"; then
     gas_flag=yes
   fi
   AC_DEFINE_UNQUOTED(DEFAULT_ASSEMBLER,"$DEFAULT_ASSEMBLER",
-	[Define to enable the use of a default assembler.])
+        [Define to enable the use of a default assembler.])
 fi
 
 # With stabs
@@ -88,14 +88,14 @@ local_prefix=
 AC_ARG_WITH(local-prefix,
 [  --with-local-prefix=DIR specifies directory to put local include],
 [case "${withval}" in
-yes)	AC_MSG_ERROR(bad value ${withval} given for local include directory prefix) ;;
-no)	;;
-*)	local_prefix=$with_local_prefix ;;
+yes)    AC_MSG_ERROR(bad value ${withval} given for local include directory prefix) ;;
+no)     ;;
+*)      local_prefix=$with_local_prefix ;;
 esac])
 
 # Default local prefix if it is empty
 if test x$local_prefix = x; then
-	local_prefix=/usr/local
+        local_prefix=/usr/local
 fi
 
 AC_ARG_PROGRAM
@@ -147,9 +147,9 @@ AC_PROG_MAKE_SET
 AC_MSG_CHECKING([whether a default assembler was specified])
 if test x"${DEFAULT_ASSEMBLER+set}" = x"set"; then
     if test x"$gas_flag" = x"no"; then
-    	AC_MSG_RESULT([yes ($DEFAULT_ASSEMBLER)])
+        AC_MSG_RESULT([yes ($DEFAULT_ASSEMBLER)])
     else
-	AC_MSG_RESULT([yes ($DEFAULT_ASSEMBLER - GNU as)])
+        AC_MSG_RESULT([yes ($DEFAULT_ASSEMBLER - GNU as)])
     fi
 else
     AC_MSG_RESULT(no)
@@ -158,9 +158,9 @@ fi
 AC_MSG_CHECKING([whether a default linker was specified])
 if test x"${DEFAULT_LINKER+set}" = x"set"; then
     if test x"$gnu_ld_flag" = x"no"; then
-	AC_MSG_RESULT([yes ($DEFAULT_LINKER)])
+        AC_MSG_RESULT([yes ($DEFAULT_LINKER)])
     else
-	AC_MSG_RESULT([yes ($DEFAULT_LINKER - GNU ld)])
+        AC_MSG_RESULT([yes ($DEFAULT_LINKER - GNU ld)])
     fi
 else
     AC_MSG_RESULT(no)
@@ -185,15 +185,15 @@ gcc_AC_HEADER_STDBOOL
 gcc_AC_HEADER_STRING
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(limits.h stddef.h string.h strings.h stdlib.h time.h \
-		 fcntl.h unistd.h sys/file.h sys/time.h \
-		 sys/param.h sys/stat.h \
-		 direct.h malloc.h)
+                 fcntl.h unistd.h sys/file.h sys/time.h \
+                 sys/param.h sys/stat.h \
+                 direct.h malloc.h)
 
 # Check for thread headers.
 
 # These tests can't be done till we know if we have limits.h.
 gcc_AC_C_CHAR_BIT
-gcc_AC_C_COMPILE_ENDIAN
+AC_C_BIGENDIAN
 
 # See if we have the mktemp command.
 AC_CHECK_PROG(have_mktemp_command, mktemp, yes, no)
@@ -218,7 +218,7 @@ AC_FUNC_MMAP_FILE
 saved_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/../include"
 gcc_AC_CHECK_DECLS(getenv abort strsignal errno \
-	malloc realloc calloc free clock, , ,[
+        malloc realloc calloc free clock, , ,[
 #include "ansidecl.h"
 #include "system.h"])
 
@@ -249,7 +249,7 @@ host_exeext=
 # then we decode the target machine and forget everything else
 # that came from the host machine.
 #for machine in $build $host $target; do
-#	. ${srcdir}/config.gcc
+#       . ${srcdir}/config.gcc
 #done
 
 extra_objs="${host_extra_objs} ${extra_objs}"
@@ -288,29 +288,29 @@ fi
 # work to find out the build config parameters.
 if test x$host = x$build
 then
-	build_auto=auto-host.h
+        build_auto=auto-host.h
 else
-	# We create a subdir, then run autoconf in the subdir.
-	# To prevent recursion we set host and build for the new
-	# invocation of configure to the build for this invocation
-	# of configure.
-	tempdir=build.$$
-	rm -rf $tempdir
-	mkdir $tempdir
-	cd $tempdir
-	case ${srcdir} in
-	/* | [A-Za-z]:[\\/]* ) realsrcdir=${srcdir};;
-	*) realsrcdir=../${srcdir};;
-	esac
-	CC=${CC_FOR_BUILD} ${realsrcdir}/configure \
-		--target=$target --host=$build --build=$build
+        # We create a subdir, then run autoconf in the subdir.
+        # To prevent recursion we set host and build for the new
+        # invocation of configure to the build for this invocation
+        # of configure.
+        tempdir=build.$$
+        rm -rf $tempdir
+        mkdir $tempdir
+        cd $tempdir
+        case ${srcdir} in
+        /* | [A-Za-z]:[\\/]* ) realsrcdir=${srcdir};;
+        *) realsrcdir=../${srcdir};;
+        esac
+        CC=${CC_FOR_BUILD} ${realsrcdir}/configure \
+                --target=$target --host=$build --build=$build
 
-	# We just finished tests for the build machine, so rename
-	# the file auto-build.h in the gcc directory.
-	mv auto-host.h ../auto-build.h
-	cd ..
-	rm -rf $tempdir
-	build_auto=auto-build.h
+        # We just finished tests for the build machine, so rename
+        # the file auto-build.h in the gcc directory.
+        mv auto-host.h ../auto-build.h
+        cd ..
+        rm -rf $tempdir
+        build_auto=auto-build.h
 fi
 
 tm_file="${tm_file} defaults.h"
@@ -320,14 +320,14 @@ xm_file="ansidecl.h ${xm_file} ${tm_file}"
 
 # Truncate the target if necessary
 if test x$host_truncate_target != x; then
-	target=`echo $target | sed -e 's/\(..............\).*/\1/'`
+        target=`echo $target | sed -e 's/\(..............\).*/\1/'`
 fi
 
 # Get the version trigger filename from the toplevel
 if test "${with_gcc_version_trigger+set}" = set; then
-	gcc_version_trigger=$with_gcc_version_trigger
+        gcc_version_trigger=$with_gcc_version_trigger
 else
-	gcc_version_trigger=${srcdir}/version.c
+        gcc_version_trigger=${srcdir}/version.c
 fi
 changequote(,)dnl
 gcc_version_full=`grep version_string ${gcc_version_trigger} | sed -e 's/.*"\([^"]*\)".*/\1/'`
@@ -339,9 +339,9 @@ changequote([,])dnl
 PACKAGE=sdcc
 VERSION="$gcc_version"
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE",
-	[Define to the name of the distribution.])
+        [Define to the name of the distribution.])
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION",
-	[Define to the version of the distribution.])
+        [Define to the version of the distribution.])
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 
@@ -362,80 +362,80 @@ gcc_cv_gas_major_version=
 gcc_cv_gas_minor_version=
 gcc_cv_as_gas_srcdir=`echo $srcdir | sed -e 's,/gcc$,,'`/gas
 if test -x "$DEFAULT_ASSEMBLER"; then
-	gcc_cv_as="$DEFAULT_ASSEMBLER"
+        gcc_cv_as="$DEFAULT_ASSEMBLER"
 elif test -x "$AS"; then
-	gcc_cv_as="$AS"
+        gcc_cv_as="$AS"
 elif test -x as$host_exeext; then
-	# Build using assembler in the current directory.
-	gcc_cv_as=./as$host_exeext
+        # Build using assembler in the current directory.
+        gcc_cv_as=./as$host_exeext
 elif test -f $gcc_cv_as_gas_srcdir/configure.in -a -f ../gas/Makefile; then
-	# Single tree build which includes gas.
-	for f in $gcc_cv_as_gas_srcdir/configure $gcc_cv_as_gas_srcdir/configure.in $gcc_cv_as_gas_srcdir/Makefile.in
-	do
+        # Single tree build which includes gas.
+        for f in $gcc_cv_as_gas_srcdir/configure $gcc_cv_as_gas_srcdir/configure.in $gcc_cv_as_gas_srcdir/Makefile.in
+        do
 changequote(,)dnl
-		gcc_cv_gas_version=`grep '^VERSION=[0-9]*\.[0-9]*' $f`
+                gcc_cv_gas_version=`grep '^VERSION=[0-9]*\.[0-9]*' $f`
 changequote([,])dnl
-		if test x$gcc_cv_gas_version != x; then
-			break
-		fi
-	done
+                if test x$gcc_cv_gas_version != x; then
+                        break
+                fi
+        done
 changequote(,)dnl
-	gcc_cv_gas_major_version=`expr "$gcc_cv_gas_version" : "VERSION=\([0-9]*\)"`
-	gcc_cv_gas_minor_version=`expr "$gcc_cv_gas_version" : "VERSION=[0-9]*\.\([0-9]*\)"`
+        gcc_cv_gas_major_version=`expr "$gcc_cv_gas_version" : "VERSION=\([0-9]*\)"`
+        gcc_cv_gas_minor_version=`expr "$gcc_cv_gas_version" : "VERSION=[0-9]*\.\([0-9]*\)"`
 changequote([,])dnl
 fi
 
 if test "x$gcc_cv_as" = x -a x$host = x$target; then
-	# Native build.
-	# Search the same directories that the installed compiler will
-	# search.  Else we may find the wrong assembler and lose.  If we
-	# do not find a suitable assembler binary, then try the user's
-	# path.
-	#
-	# Also note we have to check MD_EXEC_PREFIX before checking the
-	# user's path.  Unfortunately, there is no good way to get at the
-	# value of MD_EXEC_PREFIX here.  So we do a brute force search
-	# through all the known MD_EXEC_PREFIX values.  Ugh.  This needs
-	# to be fixed as part of the make/configure rewrite too.
+        # Native build.
+        # Search the same directories that the installed compiler will
+        # search.  Else we may find the wrong assembler and lose.  If we
+        # do not find a suitable assembler binary, then try the user's
+        # path.
+        #
+        # Also note we have to check MD_EXEC_PREFIX before checking the
+        # user's path.  Unfortunately, there is no good way to get at the
+        # value of MD_EXEC_PREFIX here.  So we do a brute force search
+        # through all the known MD_EXEC_PREFIX values.  Ugh.  This needs
+        # to be fixed as part of the make/configure rewrite too.
 
-	if test "x$exec_prefix" = xNONE; then
-		if test "x$prefix" = xNONE; then
-			test_prefix=/usr/local
-		else
-			test_prefix=$prefix
-		fi
-	else
-		test_prefix=$exec_prefix
-	fi
+        if test "x$exec_prefix" = xNONE; then
+                if test "x$prefix" = xNONE; then
+                        test_prefix=/usr/local
+                else
+                        test_prefix=$prefix
+                fi
+        else
+                test_prefix=$exec_prefix
+        fi
 
-	# If the loop below does not find an assembler, then use whatever
-	# one we can find in the users's path.
-	# user's path.
-	gcc_cv_as=as$host_exeext
+        # If the loop below does not find an assembler, then use whatever
+        # one we can find in the users's path.
+        # user's path.
+        gcc_cv_as=as$host_exeext
 
-	test_dirs="$test_prefix/lib/gcc-lib/$target/$gcc_version \
-		   $test_prefix/lib/gcc-lib/$target \
-		   /usr/lib/gcc/$target/$gcc_version \
-		   /usr/lib/gcc/$target \
-		   $test_prefix/$target/bin/$target/$gcc_version \
-		   $test_prefix/$target/bin \
-		   /usr/libexec \
-		   /usr/ccs/gcc \
-		   /usr/ccs/bin \
-		   /udk/usr/ccs/bin \
-		   /bsd43/usr/lib/cmplrs/cc \
-		   /usr/cross64/usr/bin \
-		   /usr/lib/cmplrs/cc \
-		   /sysv/usr/lib/cmplrs/cc \
-		   /svr4/usr/lib/cmplrs/cc \
-		   /usr/bin"
+        test_dirs="$test_prefix/lib/gcc-lib/$target/$gcc_version \
+                   $test_prefix/lib/gcc-lib/$target \
+                   /usr/lib/gcc/$target/$gcc_version \
+                   /usr/lib/gcc/$target \
+                   $test_prefix/$target/bin/$target/$gcc_version \
+                   $test_prefix/$target/bin \
+                   /usr/libexec \
+                   /usr/ccs/gcc \
+                   /usr/ccs/bin \
+                   /udk/usr/ccs/bin \
+                   /bsd43/usr/lib/cmplrs/cc \
+                   /usr/cross64/usr/bin \
+                   /usr/lib/cmplrs/cc \
+                   /sysv/usr/lib/cmplrs/cc \
+                   /svr4/usr/lib/cmplrs/cc \
+                   /usr/bin"
 
-	for dir in $test_dirs; do
-		if test -f $dir/as$host_exeext; then
-			gcc_cv_as=$dir/as$host_exeext
-			break;
-		fi
-	done
+        for dir in $test_dirs; do
+                if test -f $dir/as$host_exeext; then
+                        gcc_cv_as=$dir/as$host_exeext
+                        break;
+                fi
+        done
 fi
 if test x$gcc_cv_gas_major_version != x -a x$gcc_cv_gas_minor_version != x; then
   AC_MSG_RESULT("newly built gas")
@@ -446,10 +446,10 @@ fi
 # Figure out what nm we will be using.
 AC_MSG_CHECKING(what nm to use)
 if test -x nm$host_exeext; then
-	gcc_cv_nm=./nm$host_exeext
+        gcc_cv_nm=./nm$host_exeext
 elif test x$host = x$target; then
-	# Native build.
-	gcc_cv_nm=nm$host_exeext
+        # Native build.
+        gcc_cv_nm=nm$host_exeext
 fi
 AC_MSG_RESULT($gcc_cv_nm)
 

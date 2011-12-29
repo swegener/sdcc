@@ -1,3 +1,9 @@
+2011-12-29 Borut Razem <borut.razem AT gmail.com>
+
+	* support/cpp/libcpp/lex.c:
+	  partialy synchronized with sdcpp 4.6.[12]: no mmx, sse, altivec
+	* support/cpp/version.c: updated version to 4.6.2
+
 2011-12-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.lex,
@@ -355,7 +361,6 @@
 	  sdas/linksrc/lkmain.c:
 	  fixed bug #3444387: Minor spelling fix in binary files;
 	  thanks to Gudjon I. Gudjonsson for the patch
-
 
 2011-11-27 Borut Razem <borut.razem AT gmail.com>
 

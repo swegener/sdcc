@@ -126,7 +126,7 @@ SDCCy.c: SDCC.y
 	$(YACC) -d -v -o $@ $<
 
 SDCClex.c: SDCC.lex SDCCy.h
-	$(LEX) -t $< >$@
+	$(LEX) -f -t $< >$@
 
 version.h: ../ChangeLog
 	$(AWK) -f $(srcdir)/version.awk $< > $@

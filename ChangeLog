@@ -1,3 +1,10 @@
+2012-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/src.vcxproj: increased stack size 32M/64M so it never overflows
+	* src/Makefile.in: added flex fast flag -f
+	* src/SDCC.lex: removed preprocessor warning and error rules,
+	  removed EOL after #... rules
+
 2011-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/clean.mk: added z180 and r2k

@@ -2,6 +2,7 @@
 
 	* sdcc/SDCC.lex: included unistd.h, needed by flex 2.5.4 on
 	  NetBSD 5.0.1 sparc64 for read() declaration
+	* sdas/linksrc/lkar.h: '\n' replaced by '\012'
 
 2012-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
 

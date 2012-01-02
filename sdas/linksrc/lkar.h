@@ -1,6 +1,6 @@
 /* lkar.h - ar library format handling
 
-   Copyright (C) 2008-2009 Borut Razem, borut dot razem at siol dot net
+   Copyright (C) 2008-2012 Borut Razem, borut dot razem at siol dot net
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -32,10 +32,14 @@ typedef _off_t off_t;
 #define sgetl(buf)  (((((((unsigned char)(buf)[0] << 8) + (unsigned char)(buf)[1]) << 8) + (unsigned char)(buf)[2]) << 8) + (unsigned char)(buf)[3])
 #define sputl(value, buf)  ((buf)[0] = (value) >> 24, (buf)[1] = (value) >> 16, (buf)[2] = (value) >> 8, (buf)[3] = (value))
 
-#define ARMAG   "!<arch>\n"           /* magic string */
+/* Note that the usual '\n' in magic strings may translate to different
+   characters, as allowed by ANSI.  '\012' has a fixed value, and remains
+   compatible with existing BSDish archives. */
+
+#define ARMAG   "!<arch>\012"         /* magic string */
 #define SARMAG  (sizeof (ARMAG) - 1)  /* length of magic string */
 
-#define ARFMAG  "`\n"                 /* header trailer string */
+#define ARFMAG  "`\012"               /* header trailer string */
 
 #define AR_NAME_OFFSET  0
 #define AR_NAME_LEN     16

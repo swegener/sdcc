@@ -38,6 +38,10 @@ HASH    (#|%:)
 #include "common.h"
 #include "newalloc.h"
 #include "dbuf_string.h"
+/* Needed by flex 2.5.4 on NetBSD 5.0.1 sparc64 */
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
                                 check_type())

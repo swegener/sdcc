@@ -1,3 +1,8 @@
+2012-01-02 Borut Razem <borut.razem AT gmail.com>
+
+	* sdcc/SDCC.lex: included unistd.h, needed by flex 2.5.4 on
+	  NetBSD 5.0.1 sparc64 for read() declaration
+
 2012-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/src.vcxproj: increased stack size 32M/64M so it never overflows

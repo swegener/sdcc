@@ -1,23 +1,27 @@
-/* m08pst.c
+/* m08pst.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
+/*
+ *  Copyright (C) 1993-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6808.h"
 
@@ -40,35 +44,35 @@ struct	mne	mne[] = {
     {	NULL,	"LOAD",		S_ATYP,		0,	A_LOAD	},
     {	NULL,	"NOLOAD",	S_ATYP,		0,	A_NOLOAD },
 
+    {	NULL,	".page",	S_PAGE,		0,	0	},
+    {	NULL,	".title",	S_TITLE,	0,	0	},
+    {	NULL,	".sbttl",	S_SBTL,		0,	0	},
+    {	NULL,	".module",	S_MODUL,	0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".area",	S_DAREA,	0,	0	},
+    {	NULL,	".org",		S_ORG,		0,	0	},
+    {	NULL,	".radix",	S_RADIX,	0,	0	},
+    {	NULL,	".globl",	S_GLOBL,	0,	0	},
+    {	NULL,	".if",		S_IF,		0,	0	},
+    {	NULL,	".else",	S_ELSE,		0,	0	},
+    {	NULL,	".endif",	S_ENDIF,	0,	0	},
     {	NULL,	".uleb128",	S_ULEB128,	0,	0	},
     {	NULL,	".sleb128",	S_SLEB128,	0,	0	},
     {	NULL,	".byte",	S_BYTE,		0,	1	},
     {	NULL,	".db",		S_BYTE,		0,	1	},
     {	NULL,	".word",	S_WORD,		0,	2	},
     {	NULL,	".dw",		S_WORD,		0,	2	},
-    {	NULL,	".ascii",	S_ASCII,	0,	0	},
-    {	NULL,	".asciz",	S_ASCIZ,	0,	0	},
     {	NULL,	".blkb",	S_BLK,		0,	1	},
     {	NULL,	".ds",		S_BLK,		0,	1	},
     {	NULL,	".blkw",	S_BLK,		0,	2	},
-    {	NULL,	".page",	S_PAGE,		0,	0	},
-    {	NULL,	".title",	S_TITLE,	0,	0	},
-    {	NULL,	".sbttl",	S_SBTL,		0,	0	},
-    {	NULL,	".globl",	S_GLOBL,	0,	0	},
-    {	NULL,	".area",	S_DAREA,	0,	0	},
-    {	NULL,	".even",	S_EVEN,		0,	0	},
-    {	NULL,	".odd",		S_ODD,		0,	0	},
-    {	NULL,	".if",		S_IF,		0,	0	},
-    {	NULL,	".else",	S_ELSE,		0,	0	},
-    {	NULL,	".endif",	S_ENDIF,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
-    {	NULL,	".radix",	S_RADIX,	0,	0	},
-    {	NULL,	".org",		S_ORG,		0,	0	},
-    {	NULL,	".module",	S_MODUL,	0,	0	},
+    {	NULL,	".ascii",	S_ASCII,	0,	0	},
     {	NULL,	".ascis",	S_ASCIS,	0,	0	},
+    {	NULL,	".asciz",	S_ASCIZ,	0,	0	},
 /* sdas specific */
     {	NULL,	".optsdcc",	S_OPTSDCC,	0,	0	},
 /* end sdas specific */
+    {	NULL,	".even",	S_EVEN,		0,	0	},
+    {	NULL,	".odd",		S_ODD,		0,	0	},
 //    {	NULL,	".assume",	S_ERROR,	0,	0	},
 //    {	NULL,	".error",	S_ERROR,	0,	1	},
 

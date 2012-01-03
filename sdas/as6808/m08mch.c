@@ -1,25 +1,33 @@
-/* m08mch.c
+/* m08mch.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
+/*
+ *  Copyright (C) 1993-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6808.h"
+
+char	*cpu	= "Motorola 68HC(S)08";
+int	hilo	= 1;
+char	*dsft	= "asm";
 
 /*
  * Process a machine op.
@@ -38,7 +46,7 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	clrexpr(&e3);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
 
@@ -77,7 +85,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -205,7 +213,7 @@ struct mne *mp;
 		outab(op + 2*(espv&0x07));
 		outrb(&e2, R3_PAG0);
 		if (mchpcr(&e3)) {
-			v1 = e3.e_addr - dot.s_addr - 1;
+			v1 = (int) (e3.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -221,7 +229,7 @@ struct mne *mp;
 		if (t1 == S_IMMED) {
 			outab(op);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
-				v1 = e1.e_addr;
+				v1 = (int) e1.e_addr;
 				if ((v1 < -128) || (v1 > 127))
 					aerr();
 				outab(v1);
@@ -282,7 +290,7 @@ struct mne *mp;
 			break;
 		}
 		if (mchpcr(&e2)) {
-			v1 = e2.e_addr - dot.s_addr - 1;
+			v1 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -302,7 +310,7 @@ struct mne *mp;
 		outab(op);
 		outrb(&e1, 0);
 		if (mchpcr(&e2)) {
-			v1 = e2.e_addr - dot.s_addr - 1;
+			v1 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -341,7 +349,7 @@ struct mne *mp;
 			break;
 		}
 		if (mchpcr(&e2)) {
-			v1 = e2.e_addr - dot.s_addr - 1;
+			v1 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -356,7 +364,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -406,6 +414,7 @@ struct mne *mp;
 
 	default:
 		err('o');
+		break;
 	}
 }
 
@@ -455,4 +464,9 @@ struct expr *esp;
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 }

@@ -1,20 +1,26 @@
-/* m6808.h
+/* m6808.h */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1993-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
 /*)BUILD
 	$(PROGRAM) =	AS6808
@@ -23,11 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 		M6808.H
 	}
 	$(FILES) = {
-		M08EXT.C
 		M08MCH.C
 		M08ADR.C
 		M08PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C
@@ -82,10 +88,25 @@ struct adsym
 #define	S_DZAX	71
 #define	S_MOV	72
 
+#define	S_INH8	73
+#define	S_INH8S	74
+#define	S_BRA8	75
+
 /*
- * Set Direct Pointer
+ * Special Types
  */
 #define	S_SDP	80
+#define	S_CPU	81
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_HC08	0
+#define X_HCS08	1
+#define	X_6805	2
+#define	X_HC05	3
+
+
 
 
 	/* machine dependent functions */

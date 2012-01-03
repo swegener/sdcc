@@ -49,7 +49,7 @@ ASXXLIB = $(srcdir)/../asxxsrc
 ASXXLIBSRC = asdbg.c asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c assubr.c assym.c sdas.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
-SRC = m08ext.c m08pst.c m08mch.c m08adr.c
+SRC = m08pst.c m08mch.c m08adr.c
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
 ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)

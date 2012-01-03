@@ -1,3 +1,15 @@
+2012-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/m08ext.c,
+	* sdas/as6808/as_hc08.vcxproj,
+	* sdas/as6808/as_hc08.vcxproj.filters,
+	* sdas/as6808/Makefile.in: removed m08ext.c
+	* sdas/as6808/m08adr.c,
+	* sdas/as6808/m08mch.c, 
+	* sdas/as6808/m08pst.c,
+	* sdas/as6808/m6808.h,
+	* sdas/asxxsrc/asout.c: synced with ASxxxx v5 to fix bug 2894291
+
 2012-01-02 Borut Razem <borut.razem AT gmail.com>
 
 	* sdcc/SDCC.lex: included unistd.h, needed by flex 2.5.4 on

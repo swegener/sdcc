@@ -47,9 +47,6 @@
     <ClCompile Include="m08adr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="m08ext.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="m08mch.c">
       <Filter>Source Files</Filter>
     </ClCompile>

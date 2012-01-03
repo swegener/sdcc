@@ -107,13 +107,12 @@ testTortureExecute (void)
       || y != 5
       || memcmp (buf + 8, "---\0\0\0", 7))
     ASSERT (0);
-#if 0
-// Fails on z80 and related
+
   if (memset (buf + (x += 4), 0, 6) != buf + 15
       || x != 15
       || memcmp (buf + 10, "-\0\0\0\0\0\0\0\0\0", 11))
     ASSERT (0);
-#endif
+
 #endif
   return;
 #endif

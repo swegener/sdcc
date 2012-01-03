@@ -8894,6 +8894,12 @@ genAssign (const iCode *ic)
     {
       fetchPairLong (getPairId (AOP (result)), AOP (right), ic, LSB);
     }
+  else if (isPair (AOP (right)) && AOP_TYPE (result) == AOP_IY && size == 2)
+    {
+      /* Assigning directly is cheaper than using IY. */
+      emit2("ld (%s), %s", AOP (result)->aopu.aop_dir, getPairName (AOP (right)));
+      regalloc_dry_run_cost += 4;
+    }
   else if (getPairId (AOP (right)) == PAIR_IY)
     {
       while (size--)
@@ -8905,17 +8911,41 @@ genAssign (const iCode *ic)
               emit2 ("pop af");
               emit2 ("inc sp");
               regalloc_dry_run_cost += 5;
-              cheapMove (AOP (result), size, ASMOP_A , 0);
+              if (AOP_TYPE(result) == AOP_IY) /* Take care not to overwrite iy */
+                {
+                  emit2("ld (%s+%d), a", AOP (result)->aopu.aop_dir, size);
+                  regalloc_dry_run_cost += 3;
+                }
+              else
+                cheapMove (AOP (result), size, ASMOP_A , 0);
             }
           else if(size == 1)
             {
-              emit2 ("push iy");
-              emit2 ("pop af");
-              regalloc_dry_run_cost += 3;
-              cheapMove (AOP (result), size, ASMOP_A , 0);
+              if (AOP_TYPE(result) == AOP_IY) /* Take care not to overwrite iy */
+                {
+                  emit2("ld (%s), iy", AOP (result)->aopu.aop_dir);
+                  regalloc_dry_run_cost += 4;
+                  size--;
+                }
+              else
+                {
+                  emit2 ("push iy");
+                  emit2 ("pop af");
+                  regalloc_dry_run_cost += 3;
+                  cheapMove (AOP (result), size, ASMOP_A , 0);
+                }
             }
           else
-            cheapMove (AOP (result), size, ASMOP_ZERO, 0);
+            {
+              if (AOP_TYPE(result) == AOP_IY) /* Take care not to overwrite iy */
+                {
+                  cheapMove (ASMOP_A, 0, ASMOP_ZERO , 0);
+                  emit2("ld (%s+%d), a", AOP (result)->aopu.aop_dir, size);
+                  regalloc_dry_run_cost += 3;
+                }
+              else
+                cheapMove (AOP (result), size, ASMOP_ZERO , 0);
+            }
         }
     }
   else if ((size > 1) &&

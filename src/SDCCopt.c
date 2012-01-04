@@ -1620,6 +1620,10 @@ killDeadCode (ebbIndex * ebbi)
               if (IC_RESULT (ic) && POINTER_SET (ic))
                 continue;
 
+              /* if the results address has been taken then skip */
+              if (IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic))->addrtaken)
+                continue;
+
               if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next)
                   && !SPIL_LOC (IC_RESULT (ic)))
                 continue;

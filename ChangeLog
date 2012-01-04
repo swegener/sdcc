@@ -1,4 +1,9 @@
-2011-12-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-01-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCopt.c (killDeadCode): fixed bug 2862308
+	* support/regression/tests/bug2862308.c: new, added
+
+2012-01-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/gcc-torture-execute-string-opt-5.c:

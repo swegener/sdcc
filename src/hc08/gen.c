@@ -2885,6 +2885,7 @@ genFunction (iCode * ic)
   emitcode (";", "-----------------------------------------");
   emitcode (";", " function %s", sym->name);
   emitcode (";", "-----------------------------------------");
+  emitcode (";", " Stack space usage: %d bytes.", sym->stack);
 
   emitcode ("", "%s:", sym->rname);
   lineCurr->isLabel = 1;

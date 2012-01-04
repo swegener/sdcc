@@ -1,3 +1,8 @@
+2012-01-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/hc08/gen.c:
+	  More explicit stack size reporting for hc08.
+
 2012-01-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCopt.c (killDeadCode): fixed bug 2862308

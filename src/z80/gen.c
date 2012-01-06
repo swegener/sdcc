@@ -1758,7 +1758,7 @@ aopGetLitWordLong (const asmop *aop, int offset, bool with_hash)
                 wassertl(0, "Encountered an invalid offset while fetching a literal");
               }
 
-            dbuf_tprintf (&dbuf, with_hash ? "!immedword" : "!constword", v);
+            dbuf_tprintf (&dbuf, with_hash ? "!immedword" : "!constword", v & 0xfffful);
           }
         else
           {

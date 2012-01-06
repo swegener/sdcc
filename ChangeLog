@@ -6,6 +6,7 @@
 2012-01-06 Borut Razem <borut.razem AT gmail.com>
 
 	* sdas/linksrc/Makefile.in: removed LKLIB
+	* device/non-free/lib/Makefile.in: removed SOURCES
 
 2012-01-04 Philipp Klaus Krause <pkk AT spth.de>
 

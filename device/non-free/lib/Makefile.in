@@ -69,54 +69,6 @@ OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
 OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
 OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
 
-SOURCES_FLOAT = $(COMMON_FLOAT) \
-  _fscmp.c \
-  _fsget1arg.c \
-  _fsget2args.c \
-  _fsnormalize.c \
-  _fsreturnval.c \
-  _fsrshift.c \
-  _fsswapargs.c \
-  _logexpf.c
-
-SOURCES_INT = $(COMMON_INT) \
-  _divsint.c \
-  _divuint.c \
-  _modsint.c \
-  _moduint.c \
-  _mulint.c
-
-SOURCES_LONG = $(COMMON_LONG) \
-  _divulong.c \
-  _mullong.c
-
-SOURCES_SDCC = $(COMMON_SDCC) \
-  _autobaud.c \
-  _bp.c \
-  _decdptr.c \
-  _gptrget.c \
-  _gptrgetc.c \
-  _gptrput.c \
-  _ser.c \
-  _setjmp.c \
-  serial.c \
-  _itoa.c \
-  _ltoa.c \
-  _spx.c \
-  _startup.c \
-  _strlen.c \
-  _memmove.c \
-  _heap.c \
-  sprintf.c \
-  vprintf.c \
-  printf_fast.c \
-  printf_fast_f.c \
-  printf_tiny.c \
-  printfl.c \
-  bpx.c
-
-SOURCES = $(SOURCES_FLOAT) $(SOURCES_INT) $(SOURCES_LONG) $(SOURCES_SDCC)
-
 OBJECTS_FLOAT = $(SOURCES_FLOAT:%.c=$(PORT)/%.rel)
 OBJECTS_INT = $(SOURCES_INT:%.c=$(PORT)/%.rel)
 OBJECTS_LONG = $(SOURCES_LONG:%.c=$(PORT)/%.rel)
@@ -436,7 +388,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(SOURCES) $(INCDIR)/*.h $(PORTINCDIR)/*.h
+Makefile.dep: $(INCDIR)/*.h $(PORTINCDIR)/*.h
 	rm -f Makefile.dep
 	for i in $(filter %.c,$^); do \
 	  $(CPP) -std=c99 -M $(CPPFLAGS) $$i >$${i}.dep; \

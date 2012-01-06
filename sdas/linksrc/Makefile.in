@@ -42,8 +42,6 @@ OBJDIR = obj
 
 ASXXLIB = $(srcdir)/../asxxsrc
 
-LKLIB = $(srcdir)/..
-
 ASXXLIBSRC = strcmpi.c
 
 SRC = lk_readnl.c lkaomf51.c lkar.c lkarea.c lkdata.c lkelf.c lkeval.c \
@@ -119,7 +117,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(LKSOURCES) $(LKLIB)/*.h $(top_builddir)/*.h
+Makefile.dep: $(LKSOURCES) $(top_builddir)/*.h
 	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \

@@ -42,6 +42,10 @@ HASH    (#|%:)
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+/* MSVC has no unistd.h but has read() declaration in io.h */
+#if defined(_MSC_VER)
+# include <io.h>
+#endif
 
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
                                 check_type())
@@ -350,7 +354,7 @@ checkCurrFile (const char *s)
   s = tptr;
 
   /* adjust the line number */
-  lineno = lexLineno = lNum;
+  lineno = lexLineno = lNum - 1;
 
   /* now see if we have a file name */
   while (*s != '"' && *s)

@@ -1,5 +1,10 @@
 2012-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCC.lex: included io.h for read() declaration with MSVC,
+	  fixed linenr bug
+	* src/SDCCerr.c: made W_LIT_OVERFLOW pedantic
+	* src/SDCCglue.c (printIvalType, printIvalBitFields),
+	* src/SDCCicode.c checkTypes): removed lessPedantic check
 	* src/SDCCicode.c (geniCodeCast): fixed bug 3470368
 
 2012-01-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>

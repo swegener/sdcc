@@ -704,7 +704,7 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
     }
 
   /* check if the literal value is within bounds */
-  if (checkConstantRange (type, val->etype, '=', FALSE) == CCR_OVL && !options.lessPedantic)
+  if (checkConstantRange (type, val->etype, '=', FALSE) == CCR_OVL)
     {
       werror (W_LIT_OVERFLOW);
     }
@@ -830,7 +830,7 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
             size = (bit_length + 7) / 8;
 
           /* check if the literal value is within bounds */
-          if (val && checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL && !options.lessPedantic)
+          if (val && checkConstantRange (lsym->etype, val->etype, '=', FALSE) == CCR_OVL)
             {
               werror (W_LIT_OVERFLOW);
             }

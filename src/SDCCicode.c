@@ -3081,7 +3081,7 @@ checkTypes (operand * left, operand * right)
   /* left is integral type and right is literal then
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype) &&
-      checkConstantRange (ltype, rtype, '=', FALSE) == CCR_OVL && !options.lessPedantic)
+      checkConstantRange (ltype, rtype, '=', FALSE) == CCR_OVL)
     {
       werror (W_LIT_OVERFLOW);
     }

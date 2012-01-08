@@ -369,7 +369,7 @@ struct
      "symbol name too long, truncated to %d chars", 0 },
   { W_CAST_STRUCT_PTR, ERROR_LEVEL_WARNING,
      "cast of struct %s * to struct %s * ", 0 },
-  { W_LIT_OVERFLOW, ERROR_LEVEL_WARNING,
+  { W_LIT_OVERFLOW, ERROR_LEVEL_PEDANTIC,
      "overflow in implicit constant conversion", 0 },
   { E_PARAM_NAME_OMITTED, ERROR_LEVEL_ERROR,
      "in function %s: name omitted for parameter %d", 0 },
@@ -532,9 +532,9 @@ vwerror (int errNum, va_list marker)
       if (filename && lineno)
         {
           if (_SDCCERRG.style)
-            fprintf (_SDCCERRG.out, "%s(%d) : ",filename,lineno);
+            fprintf (_SDCCERRG.out, "%s(%d) : ", filename, lineno);
           else
-            fprintf (_SDCCERRG.out, "%s:%d: ",filename,lineno);
+            fprintf (_SDCCERRG.out, "%s:%d: ", filename, lineno);
         }
       else if (lineno)
         {
@@ -567,7 +567,7 @@ vwerror (int errNum, va_list marker)
           break;
         }
 
-      vfprintf (_SDCCERRG.out, ErrTab[errNum].errText,marker);
+      vfprintf (_SDCCERRG.out, ErrTab[errNum].errText, marker);
       fprintf (_SDCCERRG.out, "\n");
       return 1;
     }

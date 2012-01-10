@@ -1,3 +1,7 @@
+2011-01-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c: fixed bug 3466784
+
 2012-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.lex: included io.h for read() declaration with MSVC,

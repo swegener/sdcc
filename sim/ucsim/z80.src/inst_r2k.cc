@@ -170,7 +170,10 @@ t_mem cl_r2k::fetch(void) {
 
 /******** start rabbit 2000 specific codes *****************/
 int cl_r2k::inst_add_sp_d(t_mem code) {
-  regs.SP = add_u16_disp(regs.SP, fetch());
+  TYPE_UWORD  d = fetch( );
+  /* sign-extend d from 8-bits to 16-bits */
+  d |= (d>>7)*0xFF00;
+  regs.SP = (regs.SP + d) & 0xffff;
   return(resGO);
 }
 

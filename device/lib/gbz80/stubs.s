@@ -29,28 +29,34 @@
 ; Just stubs - not copyrightable
 
         ;; Stubs to match between function names
-        .area   _CODE
+        .area	_CODE
 
         .globl  __mullong
         .globl  __modslong
         .globl  __modulong
         .globl  __divslong
         .globl  __divulong
-        .globl  __divschar_rrx_s
-        .globl  __divsint_rrx_s
-        .globl  __divuchar_rrx_s
-        .globl  __divuint_rrx_s
-        .globl  __mulschar_rrx_s
-        .globl  __muluchar_rrx_s
-        .globl  __mulint_rrx_s
-        .globl  __moduchar_rrx_s
+        .globl	__divschar_rrx_s
+        .globl	__divuchar_rrx_s
+        .globl	__divsuchar_rrx_s
+        .globl	__divuschar_rrx_s
+        .globl	__divsint_rrx_s
+        .globl	__divuint_rrx_s
+        .globl	__mulschar_rrx_s
+        .globl	__muluchar_rrx_s
+        .globl	__mulsuchar_rrx_s
+        .globl	__muluschar_rrx_s
+        .globl	__mulint_rrx_s
         .globl  __modschar_rrx_s
+        .globl  __moduchar_rrx_s
+        .globl  __modsuchar_rrx_s
+        .globl  __moduschar_rrx_s
         .globl  __moduint_rrx_s
         .globl  __modsint_rrx_s
-        .globl  __rrulong_rrx_s
-        .globl  __rrslong_rrx_s
-        .globl  __rlulong_rrx_s
-        .globl  __rlslong_rrx_s
+        .globl	__rrulong_rrx_s
+        .globl	__rrslong_rrx_s
+        .globl	__rlulong_rrx_s
+        .globl	__rlslong_rrx_s
 
 __mullong_rrx_s::
 __mullong_rrf_s::
@@ -75,74 +81,104 @@ __divulong_rrf_s::
 __mulint_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __mulint_rrx_s
+        jp	__mulint_rrx_s
 
 __divsint_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __divsint_rrx_s
+        jp	__divsint_rrx_s
 
 __divuint_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __divuint_rrx_s
+        jp	__divuint_rrx_s
 
 __mulschar_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __mulschar_rrx_s
+        jp	__mulschar_rrx_s
 
 __divschar_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __divschar_rrx_s
-
-__muluchar_rrf_s::
-        ld      a,#5
-        rst     0x08
-        jp      __muluchar_rrx_s
-
-__divuchar_rrf_s::
-        ld      a,#5
-        rst     0x08
-        jp      __divuchar_rrx_s
+        jp	__divschar_rrx_s
 
 __modschar_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __modschar_rrx_s
+        jp	__modschar_rrx_s
+
+__muluchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__muluchar_rrx_s
+
+__divuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__divuchar_rrx_s
 
 __moduchar_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __moduchar_rrx_s
+        jp	__moduchar_rrx_s
+
+__mulsuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__mulsuchar_rrx_s
+
+__divsuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__divsuchar_rrx_s
+
+__modsuchar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__modsuchar_rrx_s
+
+__muluschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__muluschar_rrx_s
+
+__divuschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__divuschar_rrx_s
+
+__moduschar_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__moduschar_rrx_s
 
 __modsint_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __modsint_rrx_s
+        jp	__modsint_rrx_s
 
 __moduint_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __moduint_rrx_s
+        jp	__moduint_rrx_s
 
 __rrulong_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __rrulong_rrx_s
+        jp	__rrulong_rrx_s
 
 __rrslong_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __rrslong_rrx_s
+        jp	__rrslong_rrx_s
 
 __rlulong_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __rlulong_rrx_s
+        jp	__rlulong_rrx_s
 
 __rlslong_rrf_s::
         ld      a,#5
         rst     0x08
-        jp      __rlslong_rrx_s
+        jp	__rlslong_rrx_s

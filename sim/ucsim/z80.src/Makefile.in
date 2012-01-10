@@ -56,6 +56,7 @@ OBJECTS_SHARED	= glob.o \
 		  inst_ddcb.o \
 		  inst_fdcb.o \
 		  glob_r2k.o inst_r2k.o inst_ed_r2k.o r2k.o \
+		  glob_lr35902.o inst_lr35902.o lr35902.o \
 		  simz80.o z80.o
 OBJECTS_EXE	= sz80.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

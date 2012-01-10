@@ -125,6 +125,10 @@ test-ucz80:
 test-ucz180:
 	$(MAKE) test-port PORT=ucz180
 
+# Helper rule for testing the gb/lr35902 port only(use ucSim simulator)
+test-ucgbz80:
+	$(MAKE) test-port PORT=ucgbz80
+
 # Helper rule for testing the r2k port only(use ucSim simulator)
 test-ucr2k:
 	$(MAKE) test-port PORT=ucr2k

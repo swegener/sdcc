@@ -658,4 +658,8 @@ TYPE_UWORD  cl_z80::fetch2( void ) {
   return (c2 << 8) | c1;
 }
 
+t_mem       cl_z80::peek1 ( void ) {
+  return rom->read(PC);
+}
+
 /* End of z80.src/z80.cc */

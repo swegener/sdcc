@@ -49,6 +49,9 @@ extern struct dis_entry disass_r2k_fd[];
 extern struct dis_entry disass_r2k_ddcb[];
 extern struct dis_entry disass_r2k_fdcb[];
 
+extern struct dis_entry disass_lr35902[];
+extern struct dis_entry disass_lr35902_cb[];
+
 #endif
 
 /* End of z80.src/glob.h */

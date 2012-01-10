@@ -75,6 +75,7 @@ public:
   
   virtual t_mem       fetch1( void );
   virtual TYPE_UWORD  fetch2( void );
+  virtual t_mem       peek1 ( void );
   
   //virtual t_mem fetch(void);
 

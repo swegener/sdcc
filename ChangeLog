@@ -2,6 +2,23 @@
 
 	* src/SDCCicode.c: fixed bug 3466784
 
+2012-01-09 Leland Morrison <enigmalee AT sourceforge.net>
+	
+	* sim/ucsim/z80.src/glob_lr35902.cc: disassemble for gb processor
+	* sim/ucsim/z80.src/inst_lr35902.cc: instruction simulation for gb
+	* sim/ucsim/z80.src/lr35902.cc,
+	* sim/ucsim/z80.src/lr35902cl.h: definition of gb processor
+	* sim/ucsim/z80.src/z80cl.h,
+	* sim/ucsim/z80.src/z80.cc: added peek1 function to look at next opcode
+	* sim/ucsim/z80.src/glob.cc: fixes to disassembly for "ld e,<byte>",
+	  "inc (hl)", and "dec (hl)" for z80 processor
+	* sim/ucsim/z80.src/glob.h: added declaration for gb disassembly table
+	* sim/ucsim/z80.src/inst_r2k.h: fix to sign extension for add sp,d
+	* sim/ucsim/z80.src/simz80.cc: added -tlr35902 option for gameboy
+	* support/regression/Makefile.in,
+	* support/regression/ports/ucgbz80/*: added option to run regression
+	  tests for the gb processor using ucsim
+	
 2012-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.lex: included io.h for read() declaration with MSVC,

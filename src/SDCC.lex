@@ -289,7 +289,7 @@ _?"_asm"                {
 "|"                     { count (); return '|'; }
 "?"                     { count (); return '?'; }
 ^{HASH}pragma.*         { count (); process_pragma (yytext); }
-^({HASH}line.*)|({HASH}.*) { count (); checkCurrFile (yytext); }
+^{HASH}.*               { count (); checkCurrFile (yytext); }
 
 "\r\n"                  { count (); }
 "\n"                    { count (); }
@@ -338,14 +338,6 @@ checkCurrFile (const char *s)
   /* skip '#' character */
   if (*s++ != '#')
     return 0;
-
-  /* check if this is a #line
-    this is not standard and can be removed in the future */
-#define LINE_STR  "line"
-#define LINE_LEN  ((sizeof LINE_STR) - 1)
-
-  if (strncmp(s, LINE_STR, LINE_LEN) == 0)
-    s += LINE_LEN;
 
   /* get the line number */
   lNum = strtol(s, &tptr, 10);

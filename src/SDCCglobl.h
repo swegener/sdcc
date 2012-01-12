@@ -247,6 +247,7 @@ struct options
     int dump_pack;              /* dump after register packing */
     int dump_rassgn;            /* dump after register assignment */
     int dump_tree;              /* dump front-end tree before lowering to iCode */
+    int dump_graphs;            /* Dump graphs in .dot format (control-flow, conflict, etc) */
     int cc_only;                /* compile only flag              */
     int intlong_rent;           /* integer & long support routines reentrant */
     int float_rent;             /* floating point routines are reentrant */
@@ -312,7 +313,7 @@ struct options
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */
 /*  set *olaysSet;               * not implemented yet: overlay segments used in #pragma OVERLAY */
-    int max_allocs_per_node;    /* Maximum number of allocations considered at each node in the tree-decomposition based register allocator */
+    int max_allocs_per_node;    /* Maximum number of allocations / combinations considered at each node in the tree-decomposition based algorithms */
     int noOptsdccInAsm;         /* Do not emit .optsdcc in asm */
   };
 

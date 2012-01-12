@@ -34,7 +34,7 @@ OBJECTS         = SDCCy.o SDCChasht.o SDCCmain.o \
                   SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
                   SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o \
                   SDCCasm.o SDCCmacro.o SDCCutil.o SDCCdebug.o cdbFile.o SDCCdwarf2.o\
-                  SDCCerr.o SDCCsystem.o
+                  SDCCerr.o SDCCsystem.o SDCCnaddr.o
 
 SPECIAL         = SDCCy.h 
 ifeq ($(USE_ALT_LEX), 1)

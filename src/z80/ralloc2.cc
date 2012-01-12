@@ -1307,10 +1307,10 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 
   ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
-  if(z80_opts.dump_graphs)
+  if(options.dump_graphs)
     dump_cfg(control_flow_graph);
 
-  if(z80_opts.dump_graphs)
+  if(options.dump_graphs)
     dump_con(conflict_graph);
 
   tree_dec_t tree_decomposition;
@@ -1325,7 +1325,7 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   nicify(tree_decomposition);
   alive_tree_dec(tree_decomposition, control_flow_graph);
 
-  if(z80_opts.dump_graphs)
+  if(options.dump_graphs)
     dump_tree_decomposition(tree_decomposition);
 
   tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);

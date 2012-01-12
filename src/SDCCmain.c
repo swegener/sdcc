@@ -150,6 +150,8 @@ char buffer[PATH_MAX * 2];
 #define OPTION_PEEP_RETURN      "--peep-return"
 #define OPTION_NO_PEEP_RETURN   "--no-peep-return"
 #define OPTION_NO_OPTSDCC_IN_ASM "--no-optsdcc-in-asm"
+#define OPTION_DUMP_GRAPHS      "--dump-graphs"
+#define OPTION_MAX_ALLOCS_PER_NODE  "--max-allocs-per-node"
 
 static const OPTION optionsTable[] = {
   {0,   NULL, NULL, "General options"},
@@ -230,6 +232,8 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_PEEP_FILE, &options.peep_file, "<file> use this extra peephole file", CLAT_STRING},
   {0,   OPTION_OPT_CODE_SPEED, NULL, "Optimize for code speed rather than size"},
   {0,   OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
+  {0,   OPTION_MAX_ALLOCS_PER_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
+
 
   {0,   NULL, NULL, "Internal debugging options"},
   {0,   "--dumpraw", &options.dump_raw, "Dump the internal structure after the initial parse"},
@@ -242,6 +246,7 @@ static const OPTION optionsTable[] = {
   {0,   "--dumptree", &options.dump_tree, "dump front-end AST before generating iCode"},
   {0,   OPTION_DUMP_ALL, NULL, "Dump the internal structure at all stages"},
   {0,   OPTION_ICODE_IN_ASM, &options.iCodeInAsm, "include i-code as comments in the asm file"},
+  {0,   OPTION_DUMP_GRAPHS, &options.dump_graphs, "Dump graphs (control-flow, conflict, etc)"},
 
   {0,   NULL, NULL, "Linker options"},
   {'l', NULL, NULL, "Include the given library in the link"},
@@ -592,7 +597,7 @@ setDefaultOptions (void)
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.stack10bit = 0;
   options.out_fmt = 0;
-  options.max_allocs_per_node = 3000;
+  options.dump_graphs = 0;
 
   /* now for the optimizations */
   /* turn on the everything */
@@ -603,6 +608,7 @@ setDefaultOptions (void)
   optimize.label4 = 1;
   optimize.loopInvariant = 1;
   optimize.loopInduction = 1;
+  options.max_allocs_per_node = 3000;
 
   /* now for the ports */
   port->setDefaultOptions ();

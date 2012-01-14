@@ -4620,7 +4620,7 @@ genPlusIncr (const iCode *ic)
             }
         }
       if (!regalloc_dry_run)
-        AOP_TYPE (IC_LEFT (ic)) == AOP_HL ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
+        (AOP_TYPE (IC_LEFT (ic)) == AOP_HL || IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK)? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
       else if (AOP_TYPE (IC_LEFT (ic)) == AOP_HL)
         spillCached ();
       return TRUE;

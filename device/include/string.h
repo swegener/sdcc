@@ -50,7 +50,7 @@
 /* Copying functions: */
 extern void *memcpy (void * /*restrict */ dest, const void * /*restrict*/ src, size_t n);
 extern void *memmove (void *dest, const void *src, size_t n);
-extern char *strcpy (char * /*restrit*/ dest, const char * /*restrict*/ src);
+extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src);
 extern char *strncpy(char * /*restrict*/ dest, const char * /*restrict*/ src, size_t n);
 
 /* Concatenation functions: */

@@ -1,3 +1,8 @@
+2011-01-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #3473863.
+
 2011-01-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/main.c:

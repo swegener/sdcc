@@ -12,6 +12,8 @@ void testmemory(void)
   volatile size_t zero = 0;
   volatile size_t one = 1;
 
+  ASSERT(source[0] == 0);
+
   /* Test memset() */
   destination[3] = 23;
   memset(destination, 42, 3);

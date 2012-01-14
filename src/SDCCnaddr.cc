@@ -1,4 +1,4 @@
-// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2011
+﻿// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2011
 //
 // (c) 2011 Goethe-Universität Frankfurt
 //

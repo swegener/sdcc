@@ -1,3 +1,14 @@
+2012-01-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version,
+	* doc/sdccman.lyx: bumped version to 3.1.2
+	* src/SDCCicode.c (checkTypes): fixed bug 2942343
+	* src/SDCCnaddr.cc: svn properties
+	* src/SDCCnaddr.hpp: removed some typename keywords for MSVC,
+	  fixed warning
+	* src/src.vcxproj: added SDCCnaddr.*, added boost include path
+	* src/z80/z80.vcxproj: upgraded boost include path
+
 2012-01-11 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.lex: removed #line rule handled by preprocessor

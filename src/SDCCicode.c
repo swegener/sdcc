@@ -3077,14 +3077,7 @@ checkTypes (operand * left, operand * right)
 {
   sym_link *ltype = operandType (left);
   sym_link *rtype = operandType (right);
-
-  /* left is integral type and right is literal then
-     check if the literal value is within bounds */
-  if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype) &&
-      checkConstantRange (ltype, rtype, '=', FALSE) == CCR_OVL)
-    {
-      werror (W_LIT_OVERFLOW);
-    }
+  bool always_cast = FALSE;
 
   /* if the left & right type don't exactly match */
   /* if pointer set then make sure the check is
@@ -3096,22 +3089,25 @@ checkTypes (operand * left, operand * right)
     {
       if (left->aggr2ptr)
         {
-          right = geniCodeCast (ltype, right, TRUE);
-          checkPtrQualifiers (ltype, rtype);
+          always_cast = TRUE;
         }
       else
         {
-          if (compareType (ltype->next, rtype) < 0)
-            right = geniCodeCast (ltype->next, right, TRUE);
-          checkPtrQualifiers (ltype->next, rtype);
+          ltype = ltype->next;
         }
     }
-  else
+
+  /* left is integral type and right is literal then
+     check if the literal value is within bounds */
+  if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype) &&
+      checkConstantRange (ltype, rtype, '=', FALSE) == CCR_OVL)
     {
-      if (compareType (ltype, rtype) < 0)
-        right = geniCodeCast (ltype, right, TRUE);
-      checkPtrQualifiers (ltype, rtype);
+      werror (W_LIT_OVERFLOW);
     }
+
+  if (always_cast || compareType (ltype, rtype) < 0)
+    right = geniCodeCast (ltype, right, TRUE);
+  checkPtrQualifiers (ltype, rtype);
   return right;
 }
 

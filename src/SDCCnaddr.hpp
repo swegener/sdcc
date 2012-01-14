@@ -155,7 +155,8 @@ create_cfg_naddr(cfg_t &cfg, iCode *start_ic, ebbIndex *ebbi)
 // Annotate nodes of the control flow graph with the set of possible named address spaces active there.
 void annotate_cfg_naddr(cfg_t &cfg)
 {
-  typedef typename boost::graph_traits<cfg_t>::vertex_descriptor vertex_t;
+  /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
+  typedef /*typename*/ boost::graph_traits<cfg_t>::vertex_descriptor vertex_t;
 
   std::map<const symbol *, naddrspace_t> sym_to_index;
   naddrspace_t na_max = -1;
@@ -197,7 +198,8 @@ void annotate_cfg_naddr(cfg_t &cfg)
 
       size_t oldsize = cfg[i].possible_naddrspaces.size();
       {
-        typedef typename boost::graph_traits<cfg_t>::out_edge_iterator n_iter_t;
+        /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
+        typedef /*typename*/ boost::graph_traits<cfg_t>::out_edge_iterator n_iter_t;
         n_iter_t n, n_end;    
         for (boost::tie(n, n_end) = boost::out_edges(i, cfg);  n != n_end; ++n)
           {
@@ -206,7 +208,8 @@ void annotate_cfg_naddr(cfg_t &cfg)
           }
       }
       {
-        typedef typename boost::graph_traits<cfg_t>::in_edge_iterator n_iter_t;
+        /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
+        typedef /*typename*/ boost::graph_traits<cfg_t>::in_edge_iterator n_iter_t;
         n_iter_t n, n_end;    
         for (boost::tie(n, n_end) = boost::in_edges(i, cfg);  n != n_end; ++n)
           {
@@ -262,7 +265,7 @@ int tree_dec_naddrswitch_introduce(T_t &T, typename boost::graph_traits<T_t>::ve
 
   alist.clear();
 
-  return(alist2.size() <= options.max_allocs_per_node ? 0 : -1);
+  return((int)alist2.size() <= options.max_allocs_per_node ? 0 : -1);
 }
 
 // Handle forget nodes in the nice tree decomposition

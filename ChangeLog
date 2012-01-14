@@ -8,6 +8,7 @@
 	  fixed warning
 	* src/src.vcxproj: added SDCCnaddr.*, added boost include path
 	* src/z80/z80.vcxproj: upgraded boost include path
+	* support/regression/tests/bug2942343.c: new, added
 
 2012-01-11 Borut Razem <borut.razem AT gmail.com>
 

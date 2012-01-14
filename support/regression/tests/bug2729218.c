@@ -29,7 +29,11 @@ struct iglobals
   unsigned char input_cnt;
 };
 
+#ifndef SDCC_gbz80
 #define ig (*(__idata struct iglobals *) 0xf0)
+#else
+struct iglobals ig;
+#endif
 
 unsigned char count;
 

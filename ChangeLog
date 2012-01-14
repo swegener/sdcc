@@ -4,6 +4,8 @@
 	  Fixed bug #3473863 in increment of pointers, fixed similar bug in equality comparison.
 	* support/regression/tests/memory.c:
 	  Enable a memchr() test.
+	* support/regression/tests/bug2729218.c:
+	  Move struct out of ROM for gbz80.
 
 2011-01-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

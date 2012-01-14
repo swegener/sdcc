@@ -1,7 +1,7 @@
 2011-01-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Fixed bug #3473863.
+	  Fixed bug #3473863 in increment of pointers, fixed similar bug in equality comparison.
 	* support/regression/tests/memory.c:
 	  Enable a memchr() test.
 

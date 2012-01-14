@@ -1,3 +1,8 @@
+2011-01-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/main.c:
+	  Remove unnecessary value calculation in _hasNativeMulFor().
+
 2012-01-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version,

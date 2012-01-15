@@ -6,6 +6,8 @@
 	  Pretend to live in the year 2012 to not cause suspicion.
 	* device/lib/_memmove.c:
 	  Simplified test deciding copy direction for memmove().
+	* src/z80/peeph-gbz80.def:
+	  Use gbz80-specific load-and-increment/decrement instructions.
 
 2012-01-15 Borut Razem <borut.razem AT gmail.com>
 

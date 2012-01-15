@@ -36,7 +36,8 @@ VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -DSDCDB -DNOICE -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/util
 CFLAGS          = @CFLAGS@ @WALL_FLAG@ $(CPPFLAGS)
-LDFLAGS         = @LDFLAGS@ -lm
+LDFLAGS         = @LDFLAGS@
+LIBS            = -lm
 
 OBJDIR = obj
 
@@ -65,7 +66,7 @@ transform       = @program_transform_name@
 all: checkconf $(ASX)
 
 $(ASX): $(ASOBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS) $(LIBS)
 
 # Compiling and installing everything and running test
 # ----------------------------------------------------

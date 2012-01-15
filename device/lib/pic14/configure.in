@@ -73,8 +73,8 @@ Either install gputils or reconfigure with --disable-pic14-port and --disable-pi
         ;;
 esac;
 
-AC_SUBST(CFLAGS, [])
-AC_SUBST(CCASFLAGS, [])
+AC_SUBST(CFLAGS, [""])
+AC_SUBST(CCASFLAGS, [""])
 AC_SUBST(LDFLAGS, ["-m -l -w"])
 AC_SUBST(ARFLAGS, ["-c"])
 AC_SUBST(CCAS, [\'$CCAS\'])

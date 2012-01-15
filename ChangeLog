@@ -2,6 +2,9 @@
 
 	* sdas/asrab/Makefile.in: fixed linking with -lm math library
 	* src/SDCCnaddr.cc: removed unicode BOM
+	* device/lib/pic14/configure.in, device/lib/pic14/configure,
+	  device/lib/pic14/aclocal.m4: fixed transfer of gcc CFLAGS to
+	  sdcc while generating dependencies
 
 2011-01-14 Philipp Klaus Krause <pkk AT spth.de>
 

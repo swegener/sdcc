@@ -8,6 +8,8 @@
 	  Simplified test deciding copy direction for memmove().
 	* src/z80/peeph-gbz80.def:
 	  Use gbz80-specific load-and-increment/decrement instructions.
+	* src/z80/mappings.i:
+	  Use more intuitive add sp, d syntax instead of lda sp, d(sp).
 
 2012-01-15 Borut Razem <borut.razem AT gmail.com>
 

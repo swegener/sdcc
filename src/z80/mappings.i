@@ -11,11 +11,11 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     /*{ "ldahli", "ldi\ta,(hl)" }, use when assembler update is complete*/
     {"ldahli", "ld\ta,(hl)\ninc\thl"},
     { "ldahlsp", "ldhl\tsp,#%d" },
-    { "ldaspsp", "lda sp,%d(sp)" },
+    { "ldaspsp", "add sp, #%d" },
     { "*pair", "(%s)" },
     { "enter", "" },
     { "enterx", 
-      "lda sp,-%d(sp)" },
+      "add sp, #-%d" },
     { "enterxl",
                 "ld hl,#-%d\n"
                 "add\thl,sp\n"

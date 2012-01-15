@@ -3899,7 +3899,8 @@ emitCall (const iCode *ic, bool ispcall)
         _G.stack.pushed -= i;
       if (IS_GB)
         {
-          emit2 ("!ldaspsp", i);
+          emit2 ("add sp, #%d", i);
+          regalloc_dry_run_cost += 3;
         }
       else
         {

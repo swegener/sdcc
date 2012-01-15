@@ -7393,6 +7393,12 @@ AccRol (int shCount)
   switch (shCount)
     {
     case 4:
+      if (IS_GB)
+        {
+          emit2("swap a");
+          regalloc_dry_run_cost += 2;
+          break;
+        }
       emit3 (A_RLCA, 0, 0);
     case 3:
       emit3 (A_RLCA, 0, 0);

@@ -134,7 +134,15 @@ int cl_lr35902::inst_add_sp_d(t_mem code) {
   TYPE_UWORD  d = fetch( );
   /* sign-extend d from 8-bits to 16-bits */
   d |= (d>>7)*0xFF00;
+  
+  regs.F &= ~(BIT_ALL);  /* clear these */
+  if ((regs.SP & 0x0FFF) + (d & 0x0FFF) > 0x0FFF)
+    regs.F |= BIT_A;
+  if (regs.SP + (int)(d) > 0xffff)
+    regs.F |= BIT_C;
+  
   regs.SP = (regs.SP + d) & 0xffff;
+
   return(resGO);
 }
 
@@ -155,6 +163,13 @@ int cl_lr35902::inst_ldhl_sp (t_mem code) {
   TYPE_UWORD  d = fetch( );
   /* sign-extend d from 8-bits to 16-bits */
   d |= (d>>7)*0xFF00;
+
+  regs.F &= ~(BIT_ALL);  /* clear these */
+  if ((regs.SP & 0x0FFF) + (d & 0x0FFF) > 0x0FFF)
+    regs.F |= BIT_A;
+  if (regs.SP + (int)(d) > 0xffff)
+    regs.F |= BIT_C;
+  
   regs.HL = (regs.SP + d) & 0xffff;
   return resGO;
 }

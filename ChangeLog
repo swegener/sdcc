@@ -1,6 +1,7 @@
 2012-01-15 Borut Razem <borut.razem AT gmail.com>
 
 	* sdas/asrab/Makefile.in: fixed linking with -lm math library
+	* src/SDCCnaddr.cc: removed unicode BOM
 
 2011-01-14 Philipp Klaus Krause <pkk AT spth.de>
 

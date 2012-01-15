@@ -4,6 +4,8 @@
 	  Fix #3473876.
 	* Changelog:
 	  Pretend to live in the year 2012 to not cause suspicion.
+	* device/lib/_memmove.c:
+	  Simplified test deciding copy direction for memmove().
 
 2012-01-15 Borut Razem <borut.razem AT gmail.com>
 

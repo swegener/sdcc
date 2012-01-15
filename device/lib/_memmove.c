@@ -46,7 +46,7 @@ void * memmove (
 	char * d;
 	char * s;
 
-	if (((int)src < (int)dst) && ((((int)src)+acount) > (int)dst)) {
+	if ((int)src < (int)dst) {
 		/*
 		 * copy from higher addresses to lower addresses
 		 */

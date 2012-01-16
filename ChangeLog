@@ -4,6 +4,8 @@
 	  Fix signed comparison on gbz80.
 	* device/lib/_memmove.c:
 	  Fix comparison in pointer location for memmove().
+	* src/z80/peeph-gbz80.def:
+	  Enable some jump peepholes for gbz80.
 
 2012-01-15 Philipp Klaus Krause <pkk AT spth.de>
 

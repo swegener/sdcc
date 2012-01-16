@@ -5,7 +5,7 @@
 	* device/lib/_memmove.c:
 	  Fix comparison in pointer location for memmove().
 
-2012-01-14 Philipp Klaus Krause <pkk AT spth.de>
+2012-01-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fix #3473876.

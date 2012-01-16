@@ -33,7 +33,7 @@ replace restart {
 %1:
 } by {
 	jp	C,%2
-	; peephole 3 removed jp by using inverse jump logic
+	; peephole 60 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -43,7 +43,7 @@ replace restart {
 %1:
 } by {
 	jp	NC,%2
-	; peephole 4 removed jp by using inverse jump logic
+	; peephole 61 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -53,7 +53,7 @@ replace restart {
 %1:
 } by {
 	jp	Z,%2
-	; peephole 5 removed jp by using inverse jump logic
+	; peephole 62 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -63,7 +63,7 @@ replace restart {
 %1:
 } by {
 	jp	NZ,%2
-	; peephole 6 removed jp by using inverse jump logic
+	; peephole 63 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -71,28 +71,59 @@ replace restart {
 	jp	%5
 } by {
 	jp	%6
-	; peephole 7 redirected jump-to-jump at %5 by jump to %6
+	; peephole 64 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
-	; peephole 8 redirected jump-to-jump at %5 by jump to %6
+	; peephole 65 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
+// A peephole that makes the code longer. Let's hope it's worth it in speed gain and furhter optimization potential.
 replace restart {
-	ld	%2,%3
-	jp	%4
-%5:
-	ld	%2,%3
-%4:
+	ld	a,#0x00
+%1:
+	bit	%2,a
+	jp	Z,%3
 } by {
-	; peephole 9 removed jump and redundant load.
-%5:
-	ld	%2,%3
-%4:
-} if labelRefCountChange(%4 -1)
+	ld	a,#0x00
+	jp	%3
+	; peephole 65a jumped directly to %3 instead of testing a first.
+%1:
+	bit	%2,a
+	jp	Z,%3
+} if labelRefCountChange(%3 +1)
+
+replace restart {
+	ld	%1, %2
+	jp	%3
+	jp	%4
+} by {
+	ld	%1, %2
+	jp	%3
+	; peephole 65b removed unreachable jump to %3.
+}
+
+replace restart {
+	ld	%1, %2
+	jp	%3
+%3:
+} by {
+	ld	%1, %2
+%3:
+	; peephole 65c removed redundant jump to %3.
+} if labelRefCountChange(%3 -1)
+
+replace restart {
+	ld	%1, #0x01
+	bit	0, %1
+	jp	Z, %2
+} by {
+	ld	%1, #0x01
+	; peephole 65d removed impossible jump to %2.
+} if labelRefCountChange(%2 -1)
 
 replace restart {
 	xor	a,a

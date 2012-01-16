@@ -2115,7 +2115,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               }
 
             /* Operand resides (partially) in the pair */
-            else if (!regalloc_dry_run && !strcmp(aopGet (aop, offset + 1, FALSE), _pairs[pairId].l))	// Todo: Exact cost
+            else if (!regalloc_dry_run && !strcmp(aopGet (aop, offset + 1, FALSE), _pairs[pairId].l))	// aopGet (aop, offset + 1, FALSE) is problematic: It prevents calcualtion of exact cost, and results in redundatn code being generated. Todo: Exact cost
               {
                 _moveA3 (aop, offset + 1);
                 if(!regalloc_dry_run)
@@ -2131,7 +2131,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                     emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
                     emit2 ("ld %s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
                   }
-                regalloc_dry_run_cost += ld_cost(ASMOP_L, aop) * 2;           
+                regalloc_dry_run_cost += ld_cost(ASMOP_L, aop) * 2;
               }
           }
         /* PENDING: check? */
@@ -5883,9 +5883,9 @@ genCmp (operand * left, operand * right,
               offset++;
             }
           if(sign)
-            {  
+            {
               emit2("ld d, (hl)");
-              emit2("ld a, %s", aopGet (AOP (right), offset, FALSE));
+              emit2("ld a, %s", aopGet (AOP (right), offset - 1, FALSE));
               emit2("ld e, a");
             }
           spillPair (PAIR_HL);

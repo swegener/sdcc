@@ -1,3 +1,10 @@
+2012-01-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix signed comparison on gbz80.
+	* device/lib/_memmove.c:
+	  Fix comparison in pointer location for memmove().
+
 2012-01-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

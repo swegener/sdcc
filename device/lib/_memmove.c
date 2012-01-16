@@ -28,6 +28,7 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 #include "string.h" 
+#include <stdint.h>
 #include <sdcc-lib.h>
 
 #ifndef _SDCC_PORT_PROVIDES_MEMMOVE
@@ -46,7 +47,7 @@ void * memmove (
 	char * d;
 	char * s;
 
-	if ((int)src < (int)dst) {
+	if ((uintptr_t)src < (uintptr_t)dst) {
 		/*
 		 * copy from higher addresses to lower addresses
 		 */

@@ -64,13 +64,12 @@ fs_normalize_a:
 	mov	a, r4
 00003$:
 	mov	r0, #32
+	inc	exp_a
 00004$:
 	jb	acc.7, 00006$
-	inc	exp_a
 	djnz	exp_a, 00005$
 	ret			;denormalized
 00005$:
-	dec	exp_a
 	clr	c
 	mov	a, r1
 	rlc	a
@@ -86,6 +85,7 @@ fs_normalize_a:
 	mov	r4, a
 	djnz	r0, 00004$
 00006$:
+	dec	exp_a
 	ret
 	__endasm;
 }

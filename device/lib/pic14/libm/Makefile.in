@@ -32,7 +32,6 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-@HAVE_NEW_PICS_TRUE@am__append_1 = libme.a
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Makefile.common
 subdir = libm
@@ -64,10 +63,6 @@ am_libm_a_OBJECTS = libm_a-acosf.$(OBJEXT) libm_a-asincosf.$(OBJEXT) \
 libm_a_OBJECTS = $(am_libm_a_OBJECTS)
 libme_a_AR = $(AR) $(ARFLAGS)
 libme_a_LIBADD =
-am__libme_a_SOURCES_DIST = acosf.c asincosf.c asinf.c atan2f.c atanf.c \
-	ceilf.c cosf.c coshf.c cotf.c errno.c expf.c fabsf.c floorf.c \
-	frexpf.c ldexpf.c log10f.c logf.c modff.c powf.c sincosf.c \
-	sincoshf.c sinf.c sinhf.c sqrtf.c tancotf.c tanf.c tanhf.c
 am__objects_1 = acosf.$(OBJEXT) asincosf.$(OBJEXT) asinf.$(OBJEXT) \
 	atan2f.$(OBJEXT) atanf.$(OBJEXT) ceilf.$(OBJEXT) \
 	cosf.$(OBJEXT) coshf.$(OBJEXT) cotf.$(OBJEXT) errno.$(OBJEXT) \
@@ -77,7 +72,7 @@ am__objects_1 = acosf.$(OBJEXT) asincosf.$(OBJEXT) asinf.$(OBJEXT) \
 	sincosf.$(OBJEXT) sincoshf.$(OBJEXT) sinf.$(OBJEXT) \
 	sinhf.$(OBJEXT) sqrtf.$(OBJEXT) tancotf.$(OBJEXT) \
 	tanf.$(OBJEXT) tanhf.$(OBJEXT)
-@HAVE_NEW_PICS_TRUE@am_libme_a_OBJECTS = $(am__objects_1)
+am_libme_a_OBJECTS = $(am__objects_1)
 libme_a_OBJECTS = $(am_libme_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -88,7 +83,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libm_a_SOURCES) $(libme_a_SOURCES)
-DIST_SOURCES = $(libm_a_SOURCES) $(am__libme_a_SOURCES_DIST)
+DIST_SOURCES = $(libm_a_SOURCES) $(libme_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -181,14 +176,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LIBRARIES = libm.a $(am__append_1)
+noinst_LIBRARIES = libm.a libme.a
 libm_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c ceilf.c \
 	cosf.c coshf.c cotf.c errno.c expf.c fabsf.c floorf.c frexpf.c \
 	ldexpf.c log10f.c logf.c modff.c powf.c sincosf.c sincoshf.c \
 	sinf.c sinhf.c sqrtf.c tancotf.c tanf.c tanhf.c
 libm_a_CFLAGS = -p$(ARCH) $(AM_CFLAGS)
-@HAVE_NEW_PICS_TRUE@libme_a_SOURCES = $(libm_a_SOURCES)
-@HAVE_NEW_PICS_TRUE@limbe_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
+libme_a_SOURCES = $(libm_a_SOURCES)
+limbe_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic14 \
 	-I$(top_srcdir)/../../non-free/include/pic14
 #AM_CFLAGS += --asm="$(CCAS)"

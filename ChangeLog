@@ -1,3 +1,12 @@
+2012-01-19 Borut Razem <borut.razem AT gmail.com>
+
+	* device/lib/pic14/configure.in,device/lib/pic14/configure,
+	  device/lib/pic14/Makefile.am, device/lib/pic14/Makefile.in,
+	  device/lib/pic14/libm/Makefile.am,
+	  device/lib/pic14/libm/Makefile.in:
+	  pic14 enhanced cores enabled by default; gputils 0.14.1 or
+	  newer required
+
 2012-01-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_fsget1arg.c,

@@ -1280,7 +1280,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-new-pics       Enable use of PIC devices added to gputils after the
-                          0.13.7 release. Requires custom-built gputils
+                          0.14.1 release. Requires custom-built gputils
                           obtained from their SVN repository!
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors

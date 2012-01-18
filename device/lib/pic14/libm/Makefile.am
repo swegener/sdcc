@@ -1,6 +1,6 @@
 ## Process this file with Automake to create Makefile.in
 
-noinst_LIBRARIES = libm.a
+noinst_LIBRARIES = libm.a libme.a
 
 libm_a_SOURCES =
 libm_a_SOURCES += acosf.c
@@ -33,13 +33,8 @@ libm_a_SOURCES += tanhf.c
 
 libm_a_CFLAGS = -p$(ARCH) $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
-noinst_LIBRARIES += libme.a
-
 libme_a_SOURCES = $(libm_a_SOURCES)
 
 limbe_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
-endif
 
 include $(top_srcdir)/Makefile.common
-

@@ -42,20 +42,20 @@ static void dummy(void) __naked
 	.globl	fsgetargs
 fsgetargs:
 	// extract the two inputs, placing them into:
-	//      sign     exponent   mantiassa
-	//      ----     --------   ---------
-	//  a:  sign_a   exp_a     r4/r3/r2
-	//  b:  sign_b   exp_b     r7/r6/r5
+	//      sign     exponent   mantissa
+	//      ----     --------   --------
+	//  a:  sign_a   exp_a      r4/r3/r2
+	//  b:  sign_b   exp_b      r7/r6/r5
 	//
 	mov	r2, dpl
 	mov	r3, dph
 	mov	c, b.7
 	rlc	a
 	mov	sign_a, c
+	mov	exp_a, a
 	jz	00001$
 	setb	b.7
 00001$:
-	mov	exp_a, a
 	mov	r4, b
 	// now extract the 2nd parameter from the stack
 	mov	a, sp
@@ -73,10 +73,10 @@ fsgetargs:
 	mov	c, b.7
 	rlc	a
 	mov	sign_b, c
+	mov	exp_b, a
 	jz	00002$
 	setb	b.7
 00002$:
-	mov	exp_b, a
 	mov	r7, b
 	ret
 	__endasm;

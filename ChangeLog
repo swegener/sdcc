@@ -1,3 +1,10 @@
+2012-01-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_fsget1arg.c,
+	* device/lib/_fsget2args.c: cosmetics
+	* device/lib/_fsnormalize.c: fixed bug 3474855
+	* support/regression/tests/bug3474855.c: new, added
+
 2012-01-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

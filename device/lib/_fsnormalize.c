@@ -41,9 +41,14 @@ static void dummy(void) __naked
 fs_normalize_a:
 #ifdef FLOAT_SHIFT_SPEEDUP
 	mov	r0, #4
-00001$:
 	mov	a, r4
+00001$:
 	jnz	00003$
+	mov	a, exp_a
+	add	a, #248
+	jnc	00002$	;denormalized
+	mov	exp_a, a
+	clr	a
 	xch	a, r1
 	xch	a, r2
 	xch	a, r3
@@ -52,18 +57,19 @@ fs_normalize_a:
 	//mov	r3, ar2
 	//mov	r2, ar1
 	//mov	r1, #0
-	mov	a, exp_a
-	add	a, #248
-	mov	exp_a, a
 	djnz	r0, 00001$
 	ret
-#else
-	mov	a, r4
 #endif
+00002$:
+	mov	a, r4
 00003$:
 	mov	r0, #32
-00005$:
+00004$:
 	jb	acc.7, 00006$
+	inc	exp_a
+	djnz	exp_a, 00005$
+	ret			;denormalized
+00005$:
 	dec	exp_a
 	clr	c
 	mov	a, r1
@@ -78,7 +84,7 @@ fs_normalize_a:
 	mov	a, r4
 	rlc	a
 	mov	r4, a
-	djnz	r0, 00005$
+	djnz	r0, 00004$
 00006$:
 	ret
 	__endasm;

@@ -191,37 +191,42 @@ void annotate_cfg_naddr(cfg_t &cfg, std::map<naddrspace_t, const symbol *> &addr
     }
 
   // Extend.
-  for(bool change = true; change; change = false)
-    for (vertex_t i = 0; i < boost::num_vertices (cfg); i++)
+  bool change;
+  do
     {
-      if (predetermined[i])
-        continue;
-
-      size_t oldsize = cfg[i].possible_naddrspaces.size();
+      change = false;
+      for (vertex_t i = 0; i < boost::num_vertices (cfg); i++)
       {
-        /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
-        typedef /*typename*/ boost::graph_traits<cfg_t>::out_edge_iterator n_iter_t;
-        n_iter_t n, n_end;    
-        for (boost::tie(n, n_end) = boost::out_edges(i, cfg);  n != n_end; ++n)
-          {
-            vertex_t v = boost::target(*n, cfg);
-            cfg[i].possible_naddrspaces.insert(cfg[v].possible_naddrspaces.begin(), cfg[v].possible_naddrspaces.end());
-          }
-      }
-      {
-        /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
-        typedef /*typename*/ boost::graph_traits<cfg_t>::in_edge_iterator n_iter_t;
-        n_iter_t n, n_end;    
-        for (boost::tie(n, n_end) = boost::in_edges(i, cfg);  n != n_end; ++n)
-          {
-            vertex_t v = boost::source(*n, cfg);
-            cfg[i].possible_naddrspaces.insert(cfg[v].possible_naddrspaces.begin(), cfg[v].possible_naddrspaces.end());
-          }
-      }
+        if (predetermined[i])
+          continue;
 
-      if (oldsize != cfg[i].possible_naddrspaces.size())
+        size_t oldsize = cfg[i].possible_naddrspaces.size();
+        {
+          /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
+          typedef /*typename*/ boost::graph_traits<cfg_t>::out_edge_iterator n_iter_t;
+          n_iter_t n, n_end;    
+          for (boost::tie(n, n_end) = boost::out_edges(i, cfg);  n != n_end; ++n)
+            {
+              vertex_t v = boost::target(*n, cfg);
+              cfg[i].possible_naddrspaces.insert(cfg[v].possible_naddrspaces.begin(), cfg[v].possible_naddrspaces.end());
+            }
+        }
+        {
+          /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
+          typedef /*typename*/ boost::graph_traits<cfg_t>::in_edge_iterator n_iter_t;
+          n_iter_t n, n_end;    
+          for (boost::tie(n, n_end) = boost::in_edges(i, cfg);  n != n_end; ++n)
+            {
+              vertex_t v = boost::source(*n, cfg);
+              cfg[i].possible_naddrspaces.insert(cfg[v].possible_naddrspaces.begin(), cfg[v].possible_naddrspaces.end());
+            }
+        }
+
+        if (oldsize != cfg[i].possible_naddrspaces.size())
           change = true;
+      }
     }
+  while(change);
 }
 
 // Handle Leaf nodes in the nice tree decomposition

@@ -1,5 +1,10 @@
 2012-01-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCnaddr.hpp:
+	  Fix preprocessing step for named address spaces.
+
+2012-01-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCnaddr.cc,
 	  src/SDCCnaddr.hpp,
 	  src/SDCCopt.c,

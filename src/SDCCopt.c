@@ -1312,23 +1312,29 @@ getAddrspaceiCode (const iCode *ic)
   addrspace = leftaddrspace;
   if (rightaddrspace)
     {
-      wassertl (!addrspace || addrspace == rightaddrspace, "Multiple named address spaces in icode");
+      wassertl (!addrspace || addrspace == rightaddrspace, "Multiple named address spaces in icode.");
       addrspace = rightaddrspace;
     }
   if (resultaddrspace)
     {
-      wassertl (!addrspace || addrspace == resultaddrspace, "Multiple named address spaces in icode");
+      wassertl (!addrspace || addrspace == resultaddrspace, "Multiple named address spaces in icode.");
       addrspace = resultaddrspace;
     }
 
   return (addrspace);
 }
 
+/*-----------------------------------------------------------------*/
+/* switchAddressSpaceAt - insert a bank selection instruction      */
+/*-----------------------------------------------------------------*/
 void
-switchAddressSpaceAt (iCode *ic)
+switchAddressSpaceAt (iCode *ic, const symbol *const addrspace)
 {
-  const symbol *const addrspace = getAddrspaceiCode (ic);
-  iCode *newic = newiCode (CALL, operandFromSymbol (addrspace->addressmod[0]), 0);
+  iCode *newic;
+  const symbol *const laddrspace = getAddrspaceiCode (ic);
+  wassertl(!laddrspace || laddrspace == addrspace, "Switching to invalid address space.");
+
+  newic = newiCode (CALL, operandFromSymbol (addrspace->addressmod[0]), 0);
 
   IC_RESULT (newic) = newiTempOperand (newVoidLink (), 1);
   newic->filename = ic->filename;
@@ -1357,7 +1363,7 @@ switchAddressSpaces (iCode *ic)
  
       if (addrspace && addrspace != oldaddrspace)
         { 
-          switchAddressSpaceAt (ic);
+          switchAddressSpaceAt (ic, addrspace);
           
           oldaddrspace = addrspace;
         }

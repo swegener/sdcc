@@ -1,3 +1,12 @@
+2012-01-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCnaddr.cc,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCopt.c,
+	  src/SDCCopt.h,
+	  support/regression/tests/bug3475990.c:
+	  Fixed bug #3475990.
+
 2012-01-19 Borut Razem <borut.razem AT gmail.com>
 
 	* device/lib/pic14/configure.in,device/lib/pic14/configure,

@@ -153,7 +153,7 @@ create_cfg_naddr(cfg_t &cfg, iCode *start_ic, ebbIndex *ebbi)
 }
 
 // Annotate nodes of the control flow graph with the set of possible named address spaces active there.
-void annotate_cfg_naddr(cfg_t &cfg)
+void annotate_cfg_naddr(cfg_t &cfg, std::map<naddrspace_t, const symbol *> &addrspaces)
 {
   /* MSVC 2010 doesn't like the typename here, though it accepts it elsewhere */
   typedef /*typename*/ boost::graph_traits<cfg_t>::vertex_descriptor vertex_t;
@@ -181,6 +181,7 @@ void annotate_cfg_naddr(cfg_t &cfg)
           if (sym_to_index.find (addrspace) == sym_to_index.end ())
             sym_to_index[addrspace] = ++na_max;
           na = sym_to_index[addrspace];
+          addrspaces[na] = addrspace;
 
           cfg[i].possible_naddrspaces.insert (na);
           predetermined[i] = true;
@@ -429,7 +430,7 @@ int tree_dec_naddrswitch_nodes(T_t &T, typename boost::graph_traits<T_t>::vertex
 }
 
 template <class G_t>
-void implement_assignment(const assignment_naddr &a, const G_t &G)
+void implement_assignment(const assignment_naddr &a, const G_t &G, const std::map<naddrspace_t, const symbol *> addrspaces)
 {
   typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_t;
   typedef typename boost::graph_traits<G_t>::edge_iterator ei_t;
@@ -450,12 +451,12 @@ void implement_assignment(const assignment_naddr &a, const G_t &G)
       if(G[source].ic->next != G[target].ic)
         std::cerr << "Trying to switch address space at weird edge in CFG.";
 
-      switchAddressSpaceAt(G[target].ic);
+      switchAddressSpaceAt(G[target].ic, addrspaces.find(targetspace)->second);
     }
 }
 
 template <class T_t, class G_t>
-int tree_dec_address_switch(T_t &T, const G_t &G)
+int tree_dec_address_switch(T_t &T, const G_t &G, const std::map<naddrspace_t, const symbol *> addrspaces)
 {
   if(tree_dec_naddrswitch_nodes(T, find_root(T), G))
     return(-1);
@@ -473,7 +474,7 @@ int tree_dec_address_switch(T_t &T, const G_t &G)
   std::cout.flush();
 #endif
 
-  implement_assignment(winner, G);
+  implement_assignment(winner, G, addrspaces);
 
   return(0);
 }

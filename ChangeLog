@@ -1,3 +1,12 @@
+2012-01-20 Borut Razem <borut.razem AT gmail.com>
+
+	* device/lib/pic14/Makefile.am, device/lib/pic14/Makefile.in,
+	  device/lib/pic14/libm/Makefile.am,
+	  device/lib/pic14/libm/Makefile.in:
+	  added template for NEW_PICS 
+	* device/non-free/lib/pic14/libdev/Makefile.in:
+	  pic14 enhanced cores enabled by default
+
 2012-01-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bug2942343.c: disable for test-host
@@ -20,7 +29,7 @@
 
 2012-01-19 Borut Razem <borut.razem AT gmail.com>
 
-	* device/lib/pic14/configure.in,device/lib/pic14/configure,
+	* device/lib/pic14/configure.in, device/lib/pic14/configure,
 	  device/lib/pic14/Makefile.am, device/lib/pic14/Makefile.in,
 	  device/lib/pic14/libm/Makefile.am,
 	  device/lib/pic14/libm/Makefile.in:

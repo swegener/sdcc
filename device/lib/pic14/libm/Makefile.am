@@ -37,4 +37,19 @@ libme_a_SOURCES = $(libm_a_SOURCES)
 
 limbe_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
 
+if HAVE_NEW_PICS
+# add new pics libraries to be built here
+noinst_LIBRARIES +=
+
+## replace <new_pics> with the new library name,
+## add sources for new libraries and
+## uncomment the following line
+#<new_pics>_a_SOURCES = $(libm_a_SOURCES)
+
+## replace <new_pics> with the new library name,
+## add CFLAGS for compiling new libraries and
+## uncomment the following line
+#<new_pics>_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
+endif
+
 include $(top_srcdir)/Makefile.common

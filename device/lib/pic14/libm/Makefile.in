@@ -32,6 +32,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+
+# add new libraries to be built here
+@HAVE_NEW_PICS_TRUE@am__append_1 = 
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Makefile.common
 subdir = libm
@@ -176,7 +179,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LIBRARIES = libm.a libme.a
+noinst_LIBRARIES = libm.a libme.a $(am__append_1)
 libm_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c ceilf.c \
 	cosf.c coshf.c cotf.c errno.c expf.c fabsf.c floorf.c frexpf.c \
 	ldexpf.c log10f.c logf.c modff.c powf.c sincosf.c sincoshf.c \
@@ -911,6 +914,10 @@ clean-intermediate: clean-local
 	  echo "Making $@ in $$subdir"; \
 	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
 	done
+
+#<new_pics>_a_SOURCES = $(libm_a_SOURCES)
+
+#<new_pics>_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

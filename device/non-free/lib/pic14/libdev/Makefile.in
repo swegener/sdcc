@@ -12,7 +12,10 @@ RMDIR = @RMDIR@
 
 CPPFLAGS = -I$(srcdir)/../../../../include/pic14 -I$(srcdir)/../../../../non-free/include/pic14
 
-NEW_PICS_yes = \
+# add new pics source files here
+NEW_PICS_yes =
+
+PIC14_ENHANCED = \
     pic12f1822.c \
     pic12f1840.c \
     pic16f1455.c \
@@ -128,6 +131,7 @@ C_SRC = \
     pic16f916.c \
     pic16f917.c \
     pic16hv616.c \
+    $(PIC14_ENHANCED) \
     $(NEW_PICS_@HAVE_NEW_PICS@)
 OBJS = $(C_SRC:.c=.o)
 LIBS = $(addprefix $(INSTALL_DIR)/,$(OBJS:.o=.lib))

@@ -1,3 +1,9 @@
+2012-01-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug2942343.c: disable for test-host
+	* support/regression/tests/bug3475990.c: skip named address space
+	  declaration for test-host
+
 2012-01-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCnaddr.hpp:

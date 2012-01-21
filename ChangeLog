@@ -1,3 +1,7 @@
+2012-01-21 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/tests/bug2942343.c: corrected test if SDCC
+
 2012-01-20 Borut Razem <borut.razem AT gmail.com>
 
 	* device/lib/pic14/Makefile.am, device/lib/pic14/Makefile.in,

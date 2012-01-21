@@ -769,7 +769,7 @@ replace {
 	inc	hl
 } by {
 	ld	a,(hl+)
-	; peephole A used ldi to increment hl after load
+	; peephole GB1 used ldi to increment hl after load
 }
 
 replace {
@@ -777,7 +777,7 @@ replace {
 	dec	hl
 } by {
 	ld	a,(hl-)
-	; peephole B used ldd to decrement hl after load
+	; peephole GB2 used ldd to decrement hl after load
 }
 
 replace {
@@ -785,7 +785,7 @@ replace {
 	inc	hl
 } by {
 	ld	(hl+),a
-	; peephole C used ldi to increment hl after load
+	; peephole GB3 used ldi to increment hl after load
 }
 
 replace {
@@ -793,7 +793,14 @@ replace {
 	dec	hl
 } by {
 	ld	(hl-),a
-	; peephole D used ldd to decrement hl after load
+	; peephole GB4 used ldd to decrement hl after load
+}
+
+replace {
+	inc hl
+	dec hl
+} by {
+	; peephole GB5 removed inc hl / dec hl pair
 }
 
 // Old gbz80 rules from here onward
@@ -827,10 +834,19 @@ replace {
 	inc	hl
 } by {
 	ld	(hl+),a
-	; peepholr E used ldi to increment hl
+	; peephole E used ldi to increment hl
 	inc	de
 	ld	a,(de)
 }
+
+barrier
+
+// Should be one of the last ones. Opens the code to further peephole optimization.
+replace restart {
+%1:
+} by {
+	; peephole 149 removed unused label %1.
+} if labelRefCount(%1 0)
 
 // Ensure that all rules above see only jp, not jr.
 barrier

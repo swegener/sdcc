@@ -1,3 +1,8 @@
+2012-01-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-gbz80.def:
+	  Enable some more peephole rules for the gbz80.
+
 2012-01-21 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/tests/bug2942343.c: corrected test if SDCC

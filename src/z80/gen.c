@@ -2922,14 +2922,14 @@ movLeft2ResultLong (operand * left, int offl,
       wassertl (offl == 0 && offr == 0, "Only implemented for zero offset");
       wassertl (size == 2, "Only implemented for two bytes or one");
 
-      if ( IS_GB && requiresHL ( AOP (left)) && getPairId ( AOP (result)) == PAIR_HL)
+      if (IS_GB && requiresHL (AOP (left)) && getPairId (AOP (result)) == PAIR_HL)
         {
           emit2 ("ld a,%s", aopGet (AOP (left), LSB, FALSE));
           emit2 ("ld h,%s", aopGet (AOP (left), MSB16, FALSE));
           emit2 ("ld l,a");
           spillPair (PAIR_HL);
         }
-      else if ( getPairId ( AOP (result)) == PAIR_IY)
+      else if (getPairId (AOP (result)) == PAIR_IY)
         {
           PAIR_ID id = getPairId (AOP (left));
           if (id != PAIR_INVALID)

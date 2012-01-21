@@ -1,5 +1,11 @@
 2012-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc,
+	  support/regression/tests/bug3475630.c:
+	  Fixed bug #3475630.
+
+2012-01-21 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peeph-gbz80.def:
 	  Enable some more peephole rules for the gbz80.
 

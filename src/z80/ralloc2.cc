@@ -740,6 +740,8 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   //if(ic->key == 118)
 //		std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
 
+  bool exstk = (options.omitFramePtr || (currFunc && currFunc->stack > 127));
+
   bool unused_IYL = (ia.registers[REG_IYL][1] < 0);
   bool unused_IYH = (ia.registers[REG_IYH][1] < 0);
 
@@ -779,7 +781,7 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(unused_IYL && unused_IYH)
     return(true);	// Register IY not in use.
     
-  if(options.omitFramePtr)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+  if(exstk)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer or using lots of local variables.
 	return(false);
 
   // Code generator cannot handle variables that are only partially in IY.

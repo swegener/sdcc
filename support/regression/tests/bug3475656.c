@@ -6,63 +6,64 @@
 
 #include <testfwk.h>
 
-#define UCHAR	unsigned char
-#define USHORT	unsigned short
-#define PCHAR	unsigned char *
+#define UCHAR   unsigned char
+#define USHORT  unsigned short
+#define PCHAR   unsigned char *
 
 UCHAR mod_16x8(USHORT s16, UCHAR i8)
 {
-	return(s16 % i8);
+    return(s16 % i8);
 }
 
 USHORT div_16x8(USHORT s16, UCHAR i8)
 {
-	return(s16 / i8);
+    return(s16 / i8);
 }
 
+#if 0
 void itoa(USHORT sVal, PCHAR pBuf, UCHAR iRadix)
 {
-    PCHAR p;            // pointer to traverse string 
-    PCHAR pFirstDigit;  // pointer to first digit 
-	UCHAR iTmp;          // temp UCHAR 
+    PCHAR p;            // pointer to traverse string
+    PCHAR pFirstDigit;  // pointer to first digit
+    UCHAR iTmp;         // temp UCHAR
 
     p = pBuf;
-    pFirstDigit = p;        // save pointer to first digit 
+    pFirstDigit = p;    // save pointer to first digit
 
     do 
     {
-		iTmp = mod_16x8(sVal, iRadix);
-		sVal = div_16x8(sVal, iRadix);
+        iTmp = mod_16x8(sVal, iRadix);
+        sVal = div_16x8(sVal, iRadix);
 
-        // convert to ascii and store 
-		*p++ = (iTmp > 9) ? iTmp - 10 + 'A' : iTmp + '0';  // a letter or a digit
+        // convert to ascii and store
+        *p++ = (iTmp > 9) ? iTmp - 10 + 'A' : iTmp + '0';  // a letter or a digit
     } while (sVal > 0);
 
-	// We now have the digit of the number in the buffer, but in reverse order.  Thus we reverse them now. 
-	
-    *p-- = '\0';            // terminate string; p points to last digit 
+    // We now have the digit of the number in the buffer, but in reverse order.  Thus we reverse them now.
 
-    do 
+    *p-- = '\0';               // terminate string; p points to last digit
+
+    do
     {
-		iTmp = *p;
+        iTmp = *p;
         *p = *pFirstDigit;
-        *pFirstDigit = iTmp;   // swap *p and *pFirstDigit 
+        *pFirstDigit = iTmp;   // swap *p and *pFirstDigit
         --p;
-        ++pFirstDigit;         // advance to next two digits 
-    } while (pFirstDigit < p); // repeat until halfway 
+        ++pFirstDigit;         // advance to next two digits
+    } while (pFirstDigit < p); // repeat until halfway
 }
+#endif
 
 void testBug(void)
 {
-	unsigned char c[8];
-	unsigned short i;
+    unsigned char c[8];
+    unsigned short i;
 
-	i = 192;
-	itoa(i, c, 10);
+    i = 192;
 #if 0
-	ASSERT(c[0] == '1');
-	ASSERT(c[1] == '9');
-	ASSERT(c[2] == '2');
+    itoa(i, c, 10);
+    ASSERT(c[0] == '1');
+    ASSERT(c[1] == '9');
+    ASSERT(c[2] == '2');
 #endif
 }
-

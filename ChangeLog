@@ -1,3 +1,9 @@
+2012-01-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug3475630.c,
+	* support/regression/tests/bug3475656.c: fixed for mcs51, native eol
+	* device/include/mcs51/stc12.h: new, added, thanks intron
+
 2012-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

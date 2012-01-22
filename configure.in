@@ -412,7 +412,9 @@ AC_SUBST(WALL_FLAG)
 AC_SUBST(C99_FLAG)
 
 # does AR accept the -S flag
-echo '!<arch>' > conftest.ar
+touch $$.tmp
+$AR -qc conftest.ar $$.tmp
+rm $$.tmp
 AC_MSG_CHECKING([whether $AR accepts -S])
 bor_EXECUTE_IFELSE([$AR -S -t conftest.ar],
   [AC_MSG_RESULT([yes])

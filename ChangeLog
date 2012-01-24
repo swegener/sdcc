@@ -1,3 +1,7 @@
+2012-01-25 Borut Razem <borut.razem AT gmail.com>
+
+	* device/lib/make51lib.bat: rewritten for ar / sdranlib
+
 2012-01-23 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: pic14 enhanced cores enabled by default

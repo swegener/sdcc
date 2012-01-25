@@ -1,3 +1,8 @@
+2012-01-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* doc/sdccman.lyx:
+	  Mention -mz180, -mr2k, named address spaces and use non-deprectaed form of sdcc-specific keywords.
+
 2012-01-25 Borut Razem <borut.razem AT gmail.com>
 
 	* device/lib/make51lib.bat: rewritten for ar / sdranlib

@@ -1,9 +1,17 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 2.0.2 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass book
 \begin_preamble
+% Added by lyx2lyx
+%  for proper underlining
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+\let\cite@rig\cite
+\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
+  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
+\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
@@ -31,7 +39,6 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \paperfontsize default
 \spacing single
@@ -50,15 +57,12 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
 \end_header
 
 \begin_body
@@ -10216,6 +10220,54 @@ Z80
 \labelwidthstring 00.00.0000
 
 \series bold
+-mz180
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+-mz180
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the Zilog Z180
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+Z180
+\end_layout
+
+\end_inset
+
+ family of processors.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-mr2k
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+-mr2k
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the Rabbit 2000 / Rabbit 3000 family of processors.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
 -mgbz80
 \begin_inset Index
 status collapsed
@@ -18287,19 +18339,9 @@ In addition to the ANSI storage classes SDCC allows the following MCS51
 \end_layout
 
 \begin_layout Subsubsection
-data
+__data
 \begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-data (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -18332,19 +18374,9 @@ data (mcs51, ds390 storage class)
 
 \end_inset
 
- / near
+ / __near
 \begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-near (storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -18385,23 +18417,7 @@ This is the
 \series bold
 default
 \series default
- storage class for the Small Memory model (
-\emph on
-data
-\emph default
- and 
-\emph on
-near
-\emph default
- or the more ANSI-C compliant forms 
-\emph on
-__data
-\emph default
- and 
-\emph on
-__near
-\emph default
- can be used synonymously).
+ storage class for the Small Memory model.
  Variables declared with this storage class will be allocated in the directly
  addressable portion of the internal RAM of a 8051, e.g.:
 \end_layout
@@ -18443,19 +18459,9 @@ _test_data,#0x01
 \end_layout
 
 \begin_layout Subsubsection
-xdata
+__xdata
 \begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -18488,17 +18494,7 @@ xdata (mcs51, ds390 storage class)
 
 \end_inset
 
- / far
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-far (storage class)
-\end_layout
-
-\end_inset
-
-
+ / __far
 \begin_inset Index
 status collapsed
 
@@ -18667,17 +18663,7 @@ movx
 \end_layout
 
 \begin_layout Subsubsection
-idata
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-idata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
+__idata
 \begin_inset Index
 status collapsed
 
@@ -18835,17 +18821,7 @@ stack
 \end_layout
 
 \begin_layout Subsubsection
-pdata
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-pdata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
+__pdata
 \begin_inset Index
 status collapsed
 
@@ -19066,17 +19042,7 @@ status collapsed
 \end_layout
 
 \begin_layout Subsubsection
-code
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-code
-\end_layout
-
-\end_inset
-
-
+__code
 \begin_inset Index
 status collapsed
 
@@ -19337,17 +19303,7 @@ movc a,@a+dptr
 \end_layout
 
 \begin_layout Subsubsection
-bit
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-bit
-\end_layout
-
-\end_inset
-
-
+__bit
 \begin_inset Index
 status collapsed
 
@@ -19474,17 +19430,7 @@ Not really meant as examples, but nevertheless showing what bitfields are
 \end_layout
 
 \begin_layout Subsubsection
-sfr
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-sfr
-\end_layout
-
-\end_inset
-
-
+__sfr
 \begin_inset Index
 status collapsed
 
@@ -19519,17 +19465,7 @@ sfr
 
 \end_inset
 
- / sfr16
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-sfr16
-\end_layout
-
-\end_inset
-
-
+ / __sfr16
 \begin_inset Index
 status collapsed
 
@@ -19564,17 +19500,7 @@ sfr16
 
 \end_inset
 
- / sfr32
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-sfr32
-\end_layout
-
-\end_inset
-
-
+ / __sfr32
 \begin_inset Index
 status collapsed
 
@@ -19609,42 +19535,7 @@ sfr32
 
 \end_inset
 
- / sbit
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-sbit
-\end_layout
-
-\end_inset
-
-
+ / __sbit
 \begin_inset Index
 status collapsed
 
@@ -19690,16 +19581,6 @@ bit
 
 \family typewriter
 __sfr __at
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index
 status collapsed
 
@@ -19771,16 +19652,6 @@ __sfr16 __at (0x8C8A) TMR0;
 \end_inset
 
 __sbit __at
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index
 status collapsed
 
@@ -20863,17 +20734,7 @@ Z80!Storage class
 \end_layout
 
 \begin_layout Subsubsection
-sfr
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-sfr
-\end_layout
-
-\end_inset
-
-
+__sfr
 \begin_inset Index
 status collapsed
 
@@ -21046,16 +20907,6 @@ banked sfr
 status collapsed
 
 \begin_layout Plain Layout
-sfr
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
 \begin_inset ERT
 status collapsed
 
@@ -21101,16 +20952,6 @@ banked
 
 \family typewriter
 __sfr __banked __at
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index
 status collapsed
 
@@ -21227,17 +21068,7 @@ out (c),a
 \end_layout
 
 \begin_layout Subsubsection
-sfr
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-sfr
-\end_layout
-
-\end_inset
-
-
+__sfr
 \begin_inset Index
 status collapsed
 
@@ -21391,17 +21222,7 @@ HC08!Storage class
 \end_layout
 
 \begin_layout Subsubsection
-data
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-data (hc08 storage class)
-\end_layout
-
-\end_inset
-
-
+__data
 \begin_inset Index
 status collapsed
 
@@ -21440,7 +21261,7 @@ data (hc08 storage class)
 \end_layout
 
 \begin_layout Standard
-The data storage class declares a variable that resides in the first 256
+The __data storage class declares a variable that resides in the first 256
  bytes of memory (the direct page).
  The HC08
 \begin_inset Index
@@ -21456,17 +21277,7 @@ HC08
 \end_layout
 
 \begin_layout Subsubsection
-xdata
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-xdata (hc08 storage class)
-\end_layout
-
-\end_inset
-
-
+__xdata
 \begin_inset Index
 status collapsed
 
@@ -21505,7 +21316,7 @@ xdata (hc08 storage class)
 \end_layout
 
 \begin_layout Standard
-The xdata storage class declares a variable that can reside anywhere in
+The __xdata storage class declares a variable that can reside anywhere in
  memory.
  This is the default if no storage class is specified.
  
@@ -21536,9 +21347,84 @@ Binary constants
 \begin_layout Standard
 SDCC supports the use of binary constants, such as 0b01100010.
  This feature is only enabled when the compiler is invoked using --std-sdccxx.
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Named address spaces
 \end_layout
 
 \begin_layout Standard
+SDCC supports named address spaces.
+ See the Embedded C standard for more information on them.
+ So far SDCC only supports them for bank-switching.
+ You need to have a function that witches to the desired memory bank and
+ declare a corresponding named address space:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+void setb0(void); // The function that sets the currently active memory
+ bank to b0
+\end_layout
+
+\begin_layout Plain Layout
+
+void setb1(void); // The function that sets the currently active memory
+ bank to b1
+\end_layout
+
+\begin_layout Plain Layout
+
+__addressmod setb0 spaceb0; // Declare a named address space called spaceb0
+ that uses setb0()
+\end_layout
+
+\begin_layout Plain Layout
+
+__addressmod setb1 spaceb1; // Declare a named address space called spaceb1
+ that uses setb1()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+spaceb0 int x; // An int in address space spaceb0
+\end_layout
+
+\begin_layout Plain Layout
+
+spaceb1 int *y; // A pointer to an int in address space spaceb1
+\end_layout
+
+\begin_layout Plain Layout
+
+spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that points
+ to an int in address space spaceb0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SDCC will automatically insert calls to the correspionding function before
+ accessing the variable.
+ SDCC inserts the minimum possible number calls to the bank selection functions.
 \begin_inset VSpace bigskip
 \end_inset
 

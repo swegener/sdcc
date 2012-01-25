@@ -4,6 +4,8 @@
 	  Mention -mz180, -mr2k, named address spaces and use non-deprectaed form of sdcc-specific keywords.
 	* src/SDCC.lex:
 	  Remove support for deprecated keywords.
+	* src/z80/gen.c:
+	  Fixed bug #3427564.
 
 2012-01-25 Borut Razem <borut.razem AT gmail.com>
 

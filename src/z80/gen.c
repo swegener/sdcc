@@ -830,7 +830,7 @@ op8_cost(asmop *op2)
       if(op2->aopu.aop_pairId == PAIR_HL)
         return(1);
       if(op2->aopu.aop_pairId == PAIR_IY || op2->aopu.aop_pairId == PAIR_IX)
-        return(3);     
+        return(3);   
     default:
       printf("op8_cost op2: %d", (int)(op2->type));
       wassert(0);
@@ -5793,7 +5793,7 @@ _getPairIdName (PAIR_ID id)
  */
 static void
 genCmp (operand * left, operand * right,
-        operand * result, iCode * ifx, int sign)
+        operand * result, iCode * ifx, int sign, const iCode *ic)
 {
   int size, offset = 0;
   unsigned long lit = 0L;
@@ -5810,6 +5810,43 @@ genCmp (operand * left, operand * right,
     {
       /* Do a long subtract of right from left. */
       size = max (AOP_SIZE (left), AOP_SIZE (right));
+
+      if(AOP_TYPE(right) == AOP_SFR) /* Avoid overwriting A */
+        {
+          bool save_a, save_b, save_bc;
+          wassertl (size == 1, "Right side sfr in comparison with more than 8 bits.");
+
+          save_a = (AOP_TYPE(left) == AOP_ACC);
+          save_b = bitVectBitValue (ic->rSurv, B_IDX);
+          save_bc = (save_b && bitVectBitValue (ic->rSurv, C_IDX));
+
+          if (save_bc)
+            {
+              emit2("push bc");
+              regalloc_dry_run_cost += 1;
+            }
+          if (save_a)
+            {
+              emit2("push af");
+              regalloc_dry_run_cost += 1;
+            }
+          cheapMove (ASMOP_A, 0, AOP (right), 0);
+          cheapMove (save_b ? ASMOP_C : ASMOP_B, 0, ASMOP_A, 0);
+          if (save_a)
+            {
+              emit2("pop af");
+              regalloc_dry_run_cost += 1;
+            }
+          cheapMove (ASMOP_A, 0, AOP (left), 0);
+          emit3_o (A_SUB, ASMOP_A, 0, save_b ? ASMOP_C : ASMOP_B, offset);
+          if (save_bc)
+            {
+              emit2("pop bc");
+              regalloc_dry_run_cost += 1;
+            }
+          result_in_carry = TRUE;
+          goto fix;
+        }
 
       // On the Gameboy we can't afford to adjust HL as it may trash the carry.
       if (size > 1 && IS_GB && (requiresHL(AOP(right)) && requiresHL(AOP(left))))
@@ -6068,7 +6105,7 @@ genCmpGt (iCode *ic, iCode *ifx)
 
   setupToPreserveCarry (ic);
 
-  genCmp (right, left, result, ifx, sign);
+  genCmp (right, left, result, ifx, sign, ic);
 
   _G.preserveCarry = FALSE;
   freeAsmop (left, NULL, ic);
@@ -6101,7 +6138,7 @@ genCmpLt (iCode *ic, iCode *ifx)
 
   setupToPreserveCarry (ic);
 
-  genCmp (left, right, result, ifx, sign);
+  genCmp (left, right, result, ifx, sign, ic);
 
   _G.preserveCarry = FALSE;
   freeAsmop (left, NULL, ic);

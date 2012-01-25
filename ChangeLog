@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  Mention -mz180, -mr2k, named address spaces and use non-deprectaed form of sdcc-specific keywords.
+	* src/SDCC.lex:
+	  Remove support for deprecated keywords.
 
 2012-01-25 Borut Razem <borut.razem AT gmail.com>
 

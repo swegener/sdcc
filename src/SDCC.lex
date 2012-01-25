@@ -78,15 +78,8 @@ static void deprecated_keyword (char *yytext);
 
 %x asm
 %%
-_?"_asm"                {
+"__asm"                {
   count ();
-  if (yytext[1] != '_') /* deprecated single underscore */
-    {
-      if (!options.std_sdcc)
-        return check_type ();
-      else
-        deprecated_keyword (yytext);
-    }
   if (asmbuff.buf == NULL)
     dbuf_init (&asmbuff, INITIAL_INLINEASM);
   else
@@ -94,26 +87,11 @@ _?"_asm"                {
 
   BEGIN (asm);
 }
-<asm>_?"_endasm"        {
+<asm>"__endasm"        {
   count ();
-  if (yytext[1] != '_') /* deprecated single underscore */
-    {
-      if (!options.std_sdcc)
-        dbuf_append_str (&asmbuff, yytext);
-      else
-        {
-          deprecated_keyword (yytext);
-          yylval.yyinline = dbuf_c_str (&asmbuff);
-          BEGIN (INITIAL);
-          return INLINEASM;
-        }
-    }
-  else
-    {
-      yylval.yyinline = dbuf_c_str (&asmbuff);
-      BEGIN (INITIAL);
-      return INLINEASM;
-    }
+  yylval.yyinline = dbuf_c_str (&asmbuff);
+  BEGIN (INITIAL);
+  return INLINEASM;
 }
 <asm>\n                 {
   count ();
@@ -122,22 +100,17 @@ _?"_asm"                {
 <asm>.                  {
   dbuf_append_char(&asmbuff, *yytext);
 }
-"at"                    { count (); TKEYWORDSDCC (AT); }
 "__at"                  { count (); TKEYWORD (AT); }
 "auto"                  { count (); return AUTO; }
-"bit"                   { count (); TKEYWORDSDCC (BIT); }
 "__bit"                 { count (); TKEYWORD (BIT); }
 "_Bool"                 { count (); TKEYWORD99 (SD_BOOL); }
 "break"                 { count (); return BREAK; }
 "case"                  { count (); return CASE; }
 "char"                  { count (); return SD_CHAR; }
-"code"                  { count (); TKEYWORDSDCC (CODE); }
 "__code"                { count (); TKEYWORD (CODE); }
 "const"                 { count (); return SD_CONST; }
 "continue"              { count (); return CONTINUE; }
-"critical"              { count (); TKEYWORDSDCC (CRITICAL); }
 "__critical"            { count (); TKEYWORD (CRITICAL); }
-"data"                  { count (); TKEYWORDSDCC (DATA); }
 "__data"                { count (); TKEYWORD (DATA); }
 "default"               { count (); return DEFAULT; }
 "do"                    { count (); return DO; }
@@ -145,53 +118,35 @@ _?"_asm"                {
 "else"                  { count (); return ELSE; }
 "enum"                  { count (); return ENUM; }
 "extern"                { count (); return EXTERN; }
-"far"                   { count (); TKEYWORDSDCC (XDATA); }
 "__far"                 { count (); TKEYWORD (XDATA); }
-"eeprom"                { count (); TKEYWORDSDCC (EEPROM); }
 "__eeprom"              { count (); TKEYWORD (EEPROM); }
 "float"                 { count (); return SD_FLOAT; }
-"fixed16x16"            { count (); TKEYWORDSDCC (FIXED16X16); }
 "__fixed16x16"          { count (); TKEYWORD (FIXED16X16); }
-"flash"                 { count (); TKEYWORDSDCC (CODE); }
 "__flash"               { count (); TKEYWORD (CODE); }
 "for"                   { count (); return FOR; }
 "goto"                  { count (); return GOTO; }
-"idata"                 { count (); TKEYWORDSDCC (IDATA); }
 "__idata"               { count (); TKEYWORD (IDATA); }
 "if"                    { count (); return IF; }
 "int"                   { count (); return SD_INT; }
-"interrupt"             { count (); TKEYWORDSDCC (INTERRUPT); }
 "__interrupt"           { count (); TKEYWORD (INTERRUPT); }
-"nonbanked"             { count (); TKEYWORDSDCC (NONBANKED); }
 "__nonbanked"           { count (); TKEYWORD (NONBANKED); }
-"banked"                { count (); TKEYWORDSDCC (BANKED); }
 "__banked"              { count (); TKEYWORD (BANKED); }
 "long"                  { count (); return SD_LONG; }
-"near"                  { count (); TKEYWORDSDCC (DATA); }
 "__near"                { count (); TKEYWORD (DATA); }
-"pdata"                 { count (); TKEYWORDSDCC (PDATA); }
 "__pdata"               { count (); TKEYWORD (PDATA); }
-"reentrant"             { count (); TKEYWORDSDCC (REENTRANT); }
 "__reentrant"           { count (); TKEYWORD (REENTRANT); }
-"shadowregs"            { count (); TKEYWORDSDCC (SHADOWREGS); }
 "__shadowregs"          { count (); TKEYWORD (SHADOWREGS); }
-"wparam"                { count (); TKEYWORDSDCC (SD_WPARAM); }
 "__wparam"              { count (); TKEYWORD (SD_WPARAM); }
 "register"              { count (); return REGISTER; }
 "return"                { count (); return RETURN; }
-"sfr"                   { count (); TKEYWORDSDCC (SFR); }
 "__sfr"                 { count (); TKEYWORD (SFR); }
-"sfr16"                 { count (); TKEYWORDSDCC (SFR16); }
 "__sfr16"               { count (); TKEYWORD (SFR16); }
-"sfr32"                 { count (); TKEYWORDSDCC (SFR32); }
 "__sfr32"               { count (); TKEYWORD (SFR32); }
-"sbit"                  { count (); TKEYWORDSDCC (SBIT); }
 "__sbit"                { count (); TKEYWORD (SBIT); }
 "short"                 { count (); return SD_SHORT; }
 "signed"                { count (); return SIGNED; }
 "sizeof"                { count (); return SIZEOF; }
 "__builtin_offsetof"    { count (); return OFFSETOF; }
-"sram"                  { count (); TKEYWORDSDCC (XDATA); }
 "__sram"                { count (); TKEYWORD (XDATA); }
 "static"                { count (); return STATIC; }
 "struct"                { count (); return STRUCT; }
@@ -201,17 +156,13 @@ _?"_asm"                {
 "unsigned"              { count (); return UNSIGNED; }
 "void"                  { count (); return SD_VOID; }
 "volatile"              { count (); return VOLATILE; }
-"using"                 { count (); TKEYWORDSDCC (USING); }
 "__using"               { count (); TKEYWORD (USING); }
-"_naked"                { count (); TKEYWORDSDCC (NAKED); }
 "__naked"               { count (); TKEYWORD (NAKED); }
 "while"                 { count (); return WHILE; }
-"xdata"                 { count (); TKEYWORDSDCC (XDATA); }
 "__xdata"               { count (); TKEYWORD (XDATA); }
 "..."                   { count (); return VAR_ARGS; }
 "__typeof"              { count (); return TYPEOF; }
 "_JavaNative"           { count (); TKEYWORD (JAVANATIVE); }
-"_overlay"              { count (); TKEYWORDSDCC (OVERLAY); }
 "__overlay"             { count (); TKEYWORD (OVERLAY); }
 "inline"                { count (); TKEYWORD99 (INLINE); }
 "_Noreturn"             { count (); return NORETURN;}

@@ -3320,14 +3320,30 @@ genUminus (const iCode *ic)
 
   offset = 0;
 
+   if (size == 2 && IS_GB && requiresHL (AOP (IC_RESULT (ic))))
+    {
+      cheapMove(ASMOP_E, 0,  AOP (IC_LEFT (ic)), 0);
+      cheapMove(ASMOP_D, 0,  AOP (IC_LEFT (ic)), 1);
+      emit3 (A_XOR, ASMOP_A,ASMOP_A);
+      emit3 (A_SUB, ASMOP_A, ASMOP_E);
+      emit3 (A_LD, ASMOP_E, ASMOP_A);
+      emit3 (A_LD, ASMOP_A, ASMOP_ZERO);
+      emit3 (A_SBC, ASMOP_A, ASMOP_D);
+      cheapMove(AOP (IC_RESULT (ic)), 1, ASMOP_A, 0);
+      cheapMove(AOP (IC_RESULT (ic)), 0, ASMOP_E, 0);
+      offset = 2;
+      goto remaining;
+    }
+
   _clearCarry();
   while (size--)
     {
       emit3 (A_LD, ASMOP_A, ASMOP_ZERO);
-      emit3_o (A_SBC, ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+      emit3_o ((IS_GB && !offset) ? A_SUB : A_SBC, ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
       cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
     }
 
+remaining :
   /* if any remaining bytes in the result */
   /* we just need to propagate the sign   */
   if ((size = (AOP_SIZE (IC_RESULT (ic)) - AOP_SIZE (IC_LEFT (ic)))))
@@ -5901,7 +5917,7 @@ genCmp (operand * left, operand * right,
             }
           if(sign)
             {
-              emit2("ld a, %s", aopGet (AOP (left), offset, FALSE));
+              emit2("ld a, %s", aopGet (AOP (left), offset - 1, FALSE));
               emit2("ld d, a");
               emit2("ld e, (hl)");
             }

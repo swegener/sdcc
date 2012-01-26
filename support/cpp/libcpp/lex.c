@@ -507,15 +507,15 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
   return ret;
 }
 
-/* SDCC _asm specific */
-/* Skip an _asm ... _endasm block.  We find the end of the comment by
-   seeing _endasm.  Returns non-zero if _asm terminated by EOF, zero
+/* SDCC __asm specific */
+/* Skip an __asm ... __endasm block.  We find the end of the comment by
+   seeing __endasm.  Returns non-zero if _asm terminated by EOF, zero
    otherwise.  */
 static int
 _sdcpp_skip_asm_block (cpp_reader *pfile)
 {
-#define _ENDASM_STR "endasm"
-#define _ENDASM_LEN ((sizeof _ENDASM_STR) - 1)
+#define ENDASM_STR "endasm"
+#define ENDASM_LEN ((sizeof ENDASM_STR) - 1)
 
   cpp_buffer *buffer = pfile->buffer;
   uchar c = EOF;
@@ -526,15 +526,14 @@ _sdcpp_skip_asm_block (cpp_reader *pfile)
       prev_space = is_space(c);
       c = *buffer->cur++;
 
-      if (prev_space && c == '_')
+      if (prev_space && c == '_' && *buffer->cur == '_')
         {
-          /* check if it is _endasm or __endasm */
-          if (*buffer->cur == '_')
-            ++buffer->cur;
-          if (buffer->cur + _ENDASM_LEN <= buffer->rlimit &&
-            strncmp((const char *)buffer->cur, _ENDASM_STR, _ENDASM_LEN) == 0)
+          /* check if it is __endasm */
+          ++buffer->cur;
+          if (buffer->cur + ENDASM_LEN <= buffer->rlimit &&
+            strncmp((const char *)buffer->cur, ENDASM_STR, ENDASM_LEN) == 0)
             {
-              buffer->cur += _ENDASM_LEN;
+              buffer->cur += ENDASM_LEN;
               break;
             }
         }
@@ -2083,21 +2082,21 @@ _cpp_lex_direct (cpp_reader *pfile)
         warn_about_normalization (pfile, result, &nst);
       }
 
-      /* SDCC _asm specific */
-      /* handle _asm ... _endasm ;  */
-      if (result->val.node.node == pfile->spec_nodes.n__asm || result->val.node.node == pfile->spec_nodes.n__asm1)
+      /* SDCC __asm specific */
+      /* handle __asm ... __endasm ;  */
+      if (result->val.node.node == pfile->spec_nodes.n__asm)
         {
           if (CPP_OPTION (pfile, preproc_asm) == 0)
             {
               comment_start = buffer->cur;
               result->type = CPP_ASM;
               _sdcpp_skip_asm_block (pfile);
-              /* Save the _asm block as a token in its own right.  */
+              /* Save the __asm block as a token in its own right.  */
               _sdcpp_save_asm (pfile, result, comment_start, result->val.node.node == pfile->spec_nodes.n__asm);
             }
           result->flags |= ENTER_ASM;
         }
-      else if (result->val.node.node == pfile->spec_nodes.n__endasm || result->val.node.node == pfile->spec_nodes.n__endasm1)
+      else if (result->val.node.node == pfile->spec_nodes.n__endasm)
         {
           result->flags |= EXIT_ASM;
         }

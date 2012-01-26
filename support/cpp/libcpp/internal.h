@@ -231,9 +231,7 @@ struct spec_nodes
   cpp_hashnode *n_false;                /* C++ keyword false */
   cpp_hashnode *n__VA_ARGS__;           /* C99 vararg macros */
   /* SDCC _asm specific */
-  cpp_hashnode *n__asm1;                /* _asm ... _endasm ; */
   cpp_hashnode *n__asm;                 /* __asm ... __endasm ; */
-  cpp_hashnode *n__endasm1;             /* _asm ... _endasm ; */
   cpp_hashnode *n__endasm;              /* __asm ... __endasm ; */
 };
 

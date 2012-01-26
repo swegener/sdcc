@@ -234,9 +234,7 @@ sdcpp_init_options (unsigned int argc, const char **argv)
   cpp_register_pragma(parse_in, 0, "pedantic_parse_number", do_pragma_pedantic_parse_number, false);
 
   /* SDCC _asm specific */
-  parse_in->spec_nodes.n__asm1 = cpp_lookup (parse_in, DSC("_asm"));
   parse_in->spec_nodes.n__asm = cpp_lookup (parse_in, DSC("__asm"));
-  parse_in->spec_nodes.n__endasm1 = cpp_lookup (parse_in, DSC("_endasm"));
   parse_in->spec_nodes.n__endasm = cpp_lookup (parse_in, DSC("__endasm"));
 
   return ret;

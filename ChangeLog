@@ -1,3 +1,16 @@
+2012-01-26 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/pcodepeep.c,
+	  src/pic14/gen.c,
+	  src/pic14/glue.c,
+	  src/pic16/device.c,
+	  src/pic16/pcodepeep.c,
+	  src/pic16/gen.c,
+	  src/pic16/pcoderegs.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/pcode.c,
+	  src/pic16/genutils.c: avoid compiler warnings
+
 2012-01-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/cpp/libcpp/internal.h,

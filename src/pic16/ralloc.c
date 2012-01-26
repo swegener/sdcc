@@ -844,14 +844,15 @@ pic16_allocDirReg (operand *op )
         reg = pic16_dirregWithName(name);
 
         if(!reg) {
-          int address = 0;
           int regtype = REG_GPR;
 
                 /* if this is at an absolute address, then get the address. */
-                if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-                        address = SPEC_ADDR ( OP_SYM_ETYPE(op));
-//                      fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
-                }
+                if (0 && SPEC_ABSA ( OP_SYM_ETYPE(op)) )
+                  {
+                    int address = 0;
+                    address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+                    fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
+                  }
 
                 /* Register wasn't found in hash, so let's create
                  * a new one and put it in the hash table AND in the
@@ -4401,22 +4402,20 @@ pic16_assignRegisters (ebbIndex * ebbi)
     pic16_packRegisters (ebbs[i]);
 
 
-  {
-    reg_info *reg;
-    int hkey;
+  if (0)
+    {
+      reg_info *reg;
+      int hkey;
 
-    debugLog("dir registers allocated so far:\n");
-    reg = hTabFirstItem(dynDirectRegNames, &hkey);
+      debugLog("dir registers allocated so far:\n");
+      reg = hTabFirstItem(dynDirectRegNames, &hkey);
 
-#if 0
-    while(reg) {
-      debugLog("  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
-//      fprintf(stderr, "  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
-      reg = hTabNextItem(dynDirectRegNames, &hkey);
+      while(reg) {
+          debugLog("  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
+          //      fprintf(stderr, "  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
+          reg = hTabNextItem(dynDirectRegNames, &hkey);
+      }
     }
-#endif
-
-  }
 
   /* liveranges probably changed by register packing
      so we compute them again */

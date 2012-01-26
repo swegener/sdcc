@@ -69,9 +69,6 @@
 /*-----------------------------------------------------------------*/
 void pic16_genNot (iCode *ic)
 {
-  int size;
-//  symbol *tlbl;
-
 /*
  * result[AOP_CRY,AOP_REG]  = ! left[AOP_CRY, AOP_REG]
  */
@@ -96,9 +93,8 @@ void pic16_genNot (iCode *ic)
       goto release;
     }
 
-    size = AOP_SIZE(IC_LEFT(ic));
 #if 0
-    if(size == 1) {
+    if(AOP_SIZE(IC_LEFT(ic)) == 1) {
       pic16_emitpcode(POC_COMFW,pic16_popGet(AOP(IC_LEFT(ic)),0));
       pic16_emitpcode(POC_ANDLW,pic16_popGetLit(1));
       pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));

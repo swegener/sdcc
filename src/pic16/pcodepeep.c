@@ -780,12 +780,9 @@ static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb)
 {
   parsedPattern *p = pp;
   int opcode;
-  int dest;  // or could be bit position in the register
 
   pCodeInstruction *pci=NULL;
   pCodeOp *pcosubtype=NULL;
-
-  dest = cvt_extract_destination(&p[3]);
 
   DFPRINTF((stderr,"altpat_mnem3 %s var %s bit (%d)\n",
           p->pct[0].tok.s,
@@ -838,12 +835,9 @@ static void * cvt_altpat_mnem4(void *pp, pCodeWildBlock *pcwb)
 {
   parsedPattern *p = pp;
   int opcode;
-  int dest;  // or could be bit position in the register
 
   pCodeInstruction *pci=NULL;
   pCodeOp *pcosubtype=NULL;
-
-  dest = cvt_extract_destination(&p[3]);
 
   DFPRINTF((stderr,"altpat_mnem4 %s fsr %d source %s\n",
           p->pct[0].tok.s,
@@ -890,12 +884,9 @@ static void * cvt_altpat_mnem4a(void *pp, pCodeWildBlock *pcwb)
 {
   parsedPattern *p = pp;
   int opcode;
-  int dest;  // or could be bit position in the register
 
   pCodeInstruction *pci=NULL;
   pCodeOp *pcosubtype=NULL;
-
-  dest = cvt_extract_destination(&p[3]);
 
   DFPRINTF((stderr,"altpat_mnem4a %s fsr %d value 0x%02x\n",
           p->pct[0].tok.s,
@@ -1199,21 +1190,12 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 #endif
 
   {
-    int lparsedPatIdx=0;
+    int lparsedPatIdx = 0;
     int lpcpIdx;
-    int ltokIdx =0;
+    int ltokIdx = 0;
     int matching = 0;
-    int j=0;
-    int k=0;
-
-    char * cPmnem  = NULL;     // Pointer to non-wild mnemonic (if any)
-    char * cP1stop = NULL;
-    char * cP2ndop = NULL;
-
-    //pCodeOp *pcl   = NULL;       // Storage for a label
-    //pCodeOp *pco1  = NULL;       // 1st operand
-    //pCodeOp *pco2  = NULL;       // 2nd operand
-    //pCode   *pc    = NULL;       // Mnemonic
+    int j = 0;
+    int k = 0;
 
     typedef enum {
       PS_START,
@@ -1254,12 +1236,10 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
             case PS_START:
             case PS_HAVE_LABEL:
               DFPRINTF((stderr,"  mnem\n"));
-              cPmnem = tokArr[ltokIdx].tok.s;
               state = PS_HAVE_MNEM;
               break;
             case PS_HAVE_MNEM:
               DFPRINTF((stderr,"  1st operand\n"));
-              cP1stop = tokArr[ltokIdx].tok.s;
               //pco1 = pic16_newpCodeOp(NULL,PO_GPR_REGISTER);
               state = PS_HAVE_1OPERAND;
               break;
@@ -1268,7 +1248,6 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
               break;
             case PS_HAVE_COMMA:
               DFPRINTF((stderr,"  2 operands\n"));
-              cP2ndop = tokArr[ltokIdx].tok.s;
               break;
             case PS_HAVE_2OPERANDS:
               break;
@@ -1607,21 +1586,22 @@ void  pic16_peepRules2pCode(peepRule *rules)
     //return; // debug ... don't want to go through all the rules yet
   }
 
-  {
-    pCodePeep *peepBlock;
-    DLList *peeprules;
+  if (0)
+    {
+      pCodePeep *peepBlock;
+      DLList *peeprules;
 
-    peeprules = (DLList *)peepSnippets;
-    //fprintf(stderr,"target rules\n");
-    while(peeprules) {
-      //fprintf(stderr,"   rule:\n");
-      peepBlock = ((pCodePeepSnippets*)peeprules)->peep;
-      //pic16_printpBlock(stderr, peepBlock->target.pb);
-      peeprules = peeprules->next;
-    }
-    //fprintf(stderr," ... done\n");
-  }
-
+      peeprules = (DLList *)peepSnippets;
+      fprintf(stderr,"target rules\n");
+      while (peeprules)
+        {
+          fprintf(stderr,"   rule:\n");
+          peepBlock = ((pCodePeepSnippets*)peeprules)->peep;
+          pic16_printpBlock(stderr, peepBlock->target.pb);
+          peeprules = peeprules->next;
+        } // while
+      fprintf(stderr," ... done\n");
+    } // if
 }
 #if 0
 static void printpCodeString(FILE *of, pCode *pc, int max)

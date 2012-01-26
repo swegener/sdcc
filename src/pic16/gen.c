@@ -704,10 +704,9 @@ static asmop *aopForRemat (operand *op, bool result) // x symbol *sym)
 {
   symbol *sym = OP_SYMBOL(op);
   operand *refop;
-  iCode *ic = NULL, *oldic;
+  iCode *ic = NULL;
   asmop *aop = newAsmop(AOP_PCODE);
   int val = 0;
-  int offset = 0;
   int viaimmd=0;
 
     FENTRY2;
@@ -720,8 +719,6 @@ static asmop *aopForRemat (operand *op, bool result) // x symbol *sym)
 
 //    if(!result)               /* fixme-vr */
         for (;;) {
-                oldic = ic;
-
 //              chat *iLine = printILine(ic);
 //              pic16_emitpcomment("ic: %s\n", iLine);
 //              dbuf_free(iLine);
@@ -736,7 +733,6 @@ static asmop *aopForRemat (operand *op, bool result) // x symbol *sym)
                 ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
         }
 
-        offset = OP_SYMBOL(IC_LEFT(ic))->offset;
         refop = IC_LEFT(ic);
 
         if(!op->isaddr)viaimmd++; else viaimmd=0;
@@ -2297,7 +2293,7 @@ static void genUminusFloat(operand *op,operand *result)
 static void genUminus (iCode *ic)
 {
   int lsize, rsize, i;
-  sym_link *optype, *rtype;
+  sym_link *optype;
   symbol *label;
   int needLabel=0;
 
@@ -2318,8 +2314,6 @@ static void genUminus (iCode *ic)
     }
 
     optype = operandType(IC_LEFT(ic));
-    rtype = operandType(IC_RESULT(ic));
-
 
     /* if float then do float stuff */
     if (IS_FLOAT(optype) || IS_FIXED(optype)) {
@@ -8019,22 +8013,18 @@ static void pic16_derefPtr (operand *ptr, int p_type, int doWrite, int *fsr0_set
 static void genUnpackBits (operand *result, operand *left, char *rname, int ptype)
 {
   int shCnt ;
-  sym_link *etype, *letype;
+  sym_link *etype;
   int blen=0, bstr=0;
-  int lbstr;
   int same;
   pCodeOp *op;
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   etype = getSpec(operandType(result));
-  letype = getSpec(operandType(left));
 
   //    if(IS_BITFIELD(etype)) {
   blen = SPEC_BLEN(etype);
   bstr = SPEC_BSTR(etype);
   //    }
-
-  lbstr = SPEC_BSTR( letype );
 
   DEBUGpic16_emitcode ("; ***","%s  %d - reading %s bitfield int %s destination",__FUNCTION__,__LINE__,
       SPEC_USIGN(OP_SYM_ETYPE(left)) ? "an unsigned" : "a signed", SPEC_USIGN(OP_SYM_TYPE(result)) ? "an unsigned" : "a signed");
@@ -8119,8 +8109,6 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
   fprintf(stderr, "SDCC pic16 port error: the port currently does not support *reading*\n");
   fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailing out...\n");
   exit(EXIT_FAILURE);
-
-  return ;
 }
 
 
@@ -8222,7 +8210,7 @@ static void genNearPointerGet (operand *left,
     ) {
       iCode *nextic;
       pCodeOp *jop;
-      int bitstrt, bytestrt;
+      int bitstrt;
 
         /* if this is bitfield of size 1, see if we are checking the value
          * of a single bit in an if-statement,
@@ -8243,7 +8231,6 @@ static void genNearPointerGet (operand *left,
             /* everything is ok then */
             /* find a way to optimize the genIfx iCode */
 
-            bytestrt = SPEC_BSTR(retype)/8;
             bitstrt = SPEC_BSTR(retype)%8;
 
             jop = pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bitstrt);
@@ -8553,9 +8540,8 @@ static void genPackBits (sym_link    *etype , operand *result,
         && IS_BITFIELD(retype)
         && (AOP_TYPE(right) == AOP_REG || AOP_TYPE(right) == AOP_DIR)
         && (blen == 1)) {
-      int rblen, rbstr;
+      int rbstr;
 
-      rblen = SPEC_BLEN( retype );
       rbstr = SPEC_BSTR( retype );
 
       if(IS_BITFIELD(etype)) {
@@ -9989,7 +9975,6 @@ release:
 /*-----------------------------------------------------------------*/
 static int genDjnz (iCode *ic, iCode *ifx)
 {
-    symbol *lbl, *lbl1;
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
     if (!ifx)
@@ -10015,9 +10000,6 @@ static int genDjnz (iCode *ic, iCode *ifx)
         return 0;
 
     /* otherwise we can save BIG */
-    lbl = newiTempLabel(NULL);
-    lbl1= newiTempLabel(NULL);
-
     pic16_aopOp(IC_RESULT(ic),ic,FALSE);
 
     pic16_emitpcode(POC_DECFSZ,pic16_popGet(AOP(IC_RESULT(ic)),0));

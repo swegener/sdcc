@@ -70,7 +70,6 @@ static void
 emitPseudoStack(struct dbuf_s *oBuf, struct dbuf_s *oBufExt)
 {
     int shared, low, high, size, i;
-    PIC_device *pic;
 
     /* also emit STK symbols
      * XXX: This is ugly and fails as soon as devices start to get
@@ -80,8 +79,6 @@ emitPseudoStack(struct dbuf_s *oBuf, struct dbuf_s *oBufExt)
     shared = pic14_getSharedStack(&low, &high, &size);
     if (!pic14_options.isLibrarySource)
     {
-        pic = pic14_getPIC();
-
         dbuf_printf (oBuf, "\n");
         dbuf_printf (oBuf, "\tglobal PSAVE\n");
         dbuf_printf (oBuf, "\tglobal SSAVE\n");

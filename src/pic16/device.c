@@ -347,7 +347,6 @@ pic16_dump_isection (FILE *of, set *section, int fix)
   else
     {
       unsigned int j = 0;
-      symbol *s1;
 
       sprev = NULL;
       init_addr = SPEC_ADDR (slist[j]->etype);
@@ -356,10 +355,6 @@ pic16_dump_isection (FILE *of, set *section, int fix)
       for (j = 0; j < i; j++)
         {
           s = slist[j];
-          s1 = NULL;
-          if (j < i - 1)
-            s1 = slist[j + 1];
-
           init_addr = SPEC_ADDR (s->etype);
 
           if (sprev && (init_addr > (SPEC_ADDR (sprev->etype) + getSize (sprev->etype))))

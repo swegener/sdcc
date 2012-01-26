@@ -598,12 +598,9 @@ static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb)
 {
   parsedPattern *p = pp;
   int opcode;
-  int dest;  // or could be bit position in the register
 
   pCodeInstruction *pci=NULL;
   pCodeOp *pcosubtype=NULL;
-
-  dest = cvt_extract_destination(&p[3]);
 
   DFPRINTF((stderr,"altpat_mnem3 %s var %s bit (%d)\n",
     p->pct[0].tok.s,
@@ -918,10 +915,6 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
     int j=0;
     int k=0;
 
-    char * cPmnem  = NULL;     // Pointer to non-wild mnemonic (if any)
-    char * cP1stop = NULL;
-    char * cP2ndop = NULL;
-
     //pCodeOp *pcl   = NULL;       // Storage for a label
     //pCodeOp *pco1  = NULL;       // 1st operand
     //pCodeOp *pco2  = NULL;       // 2nd operand
@@ -966,12 +959,10 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
             case PS_START:
             case PS_HAVE_LABEL:
               DFPRINTF((stderr,"  mnem\n"));
-              cPmnem = tokArr[ltokIdx].tok.s;
               state = PS_HAVE_MNEM;
               break;
             case PS_HAVE_MNEM:
               DFPRINTF((stderr,"  1st operand\n"));
-              cP1stop = tokArr[ltokIdx].tok.s;
               //pco1 = newpCodeOp(NULL,PO_GPR_REGISTER);
               state = PS_HAVE_1OPERAND;
               break;
@@ -980,7 +971,6 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
               break;
             case PS_HAVE_COMMA:
               DFPRINTF((stderr,"  2 operands\n"));
-              cP2ndop = tokArr[ltokIdx].tok.s;
               break;
             case PS_HAVE_2OPERANDS:
               break;
@@ -1273,21 +1263,22 @@ void peepRules2pCode(peepRule *rules)
     //return; // debug ... don't want to go through all the rules yet
   }
 
-  {
-    pCodePeep *peepBlock;
-    DLList *peeprules;
+  if (0)
+    {
+      pCodePeep *peepBlock;
+      DLList *peeprules;
 
-    peeprules = (DLList *)peepSnippets;
-    //fprintf(stderr,"target rules\n");
-    while(peeprules) {
-      //fprintf(stderr,"   rule:\n");
-      peepBlock = ((pCodePeepSnippets*)peeprules)->peep;
-      //printpBlock(stderr, peepBlock->target.pb);
-      peeprules = peeprules->next;
-    }
-    //fprintf(stderr," ... done\n");
-  }
-
+      peeprules = (DLList *)peepSnippets;
+      fprintf(stderr,"target rules\n");
+      while (peeprules)
+        {
+          fprintf(stderr,"   rule:\n");
+          peepBlock = ((pCodePeepSnippets*)peeprules)->peep;
+          printpBlock(stderr, peepBlock->target.pb);
+          peeprules = peeprules->next;
+        } // while
+      fprintf(stderr," ... done\n");
+    } // if
 }
 
 /*-----------------------------------------------------------------*/

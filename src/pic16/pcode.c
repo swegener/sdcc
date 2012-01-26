@@ -6058,14 +6058,12 @@ static void FlowStats(pCodeFlow *pcflow)
 static int isBankInstruction(pCode *pc)
 {
   reg_info *reg;
-  int bank = -1;
 
   if(!isPCI(pc))
     return 0;
 
   if( PCI(pc)->op == POC_MOVLB ||
       (( (reg = pic16_getRegFromInstruction(pc)) != NULL) && isBSR_REG(reg))) {
-    bank = PCOL(pc)->lit;
   }
 
   return 1;
@@ -6078,7 +6076,6 @@ static void FillFlow(pCodeFlow *pcflow)
 {
 
   pCode *pc;
-  int cur_bank;
 
   if(!isPCFL(pcflow))
     return;
@@ -6091,8 +6088,6 @@ static void FillFlow(pCodeFlow *pcflow)
     //fprintf(stderr, " FillFlow - empty flow (seq=%d)\n", pcflow->pc.seq);
     return;
   }
-
-  cur_bank = -1;
 
   do {
     isBankInstruction(pc);
@@ -6374,7 +6369,7 @@ static void insertBankSwitch(unsigned char position, pCode *pc)
                           symbol *tlbl;
                           pCode *pcnext, *pcprev, *npci, *ppc;
                           PIC_OPCODE ipci;
-                          int ofs1=0, ofs2=0, len=0;
+                          int ofs1=0, ofs2=0;
 
                         /* just like 0, but previous was a skip instruction,
                          * so some care should be taken */
@@ -6391,7 +6386,6 @@ static void insertBankSwitch(unsigned char position, pCode *pc)
 
                                 /* copy info from old pCode */
                                 ofs1 = ofs2 = sizeof( pCode ) + sizeof(PIC_OPCODE);
-                                len = sizeof(pCodeInstruction) - ofs1 - sizeof( char const * const *);
                                 ofs1 += strlen( PCI(pcprev)->mnemonic) + 1;
                                 ofs2 += strlen( PCI(npci)->mnemonic) + 1;
                                 memcpy(&PCI(npci)->from, &PCI(pcprev)->from, (char *)(&(PCI(npci)->pci_magic)) - (char *)(&(PCI(npci)->from)));
@@ -10076,7 +10070,7 @@ static int defmapFindAll (symbol_t sym, pCode *pc, defmap_t **chain) {
   dynstack_t *todo;     /** stack of state_t */
   dynstack_t *done;     /** stack of state_t */
 
-  int firstState, n_defs;
+  int n_defs;
 
   assert (pc && isPCI(pc) && PCI(pc)->pcflow);
   assert (chain);
@@ -10126,7 +10120,7 @@ static int defmapFindAll (symbol_t sym, pCode *pc, defmap_t **chain) {
   /* no definition found in pc's flow preceeding pc */
   todo = newStack ();
   done = newStack ();
-  n_defs = 0; firstState = 1;
+  n_defs = 0;
   stackPush (todo, newState (PCI(pic16_findNextInstruction(pc->pb->pcHead))->pcflow, res));
 
   while (!stackIsEmpty (todo)) {
@@ -10171,54 +10165,58 @@ static int defmapFindAll (symbol_t sym, pCode *pc, defmap_t **chain) {
 
 #else // !FORWARD_FLOW_ANALYSIS
 
-  /* no definition found in pc's flow preceeding pc */
-  todo = newStack ();
-  done = newStack ();
-  n_defs = 0; firstState = 1;
-  stackPush (todo, newState (PCI(pc)->pcflow, res));
+    {
+      int firstState = 1;
 
-  while (!stackIsEmpty (todo)) {
-    state = (state_t *) stackPop (todo);
-    curr = state->flow;
+      /* no definition found in pc's flow preceeding pc */
+      todo = newStack ();
+      done = newStack ();
+      n_defs = 0;
+      stackPush (todo, newState (PCI(pc)->pcflow, res));
 
-    if (firstState) {
-      firstState = 0;
-      /* only check predecessor flows */
-    } else {
-      /* get (last) definition of sym in this flow */
-      res = defmapFindDef (curr->defmap, sym, NULL);
-    }
+      while (!stackIsEmpty (todo)) {
+          state = (state_t *) stackPop (todo);
+          curr = state->flow;
 
-    if (res) {
-      /* definition found */
-      //fprintf (stderr, "reaching definition for %s @ %p found @ %p (val: %x)\n", strFromSym(sym), pc, res->pc, res->val);
-      if (defmapAddCopyIfNew (chain, res)) n_defs++;
-    } else {
-      /* no definition found -- check predecessor flows */
-      state = newState (NULL, NULL);
-      succ = (pCodeFlowLink *) setFirstItem (curr->from);
+          if (firstState) {
+              firstState = 0;
+              /* only check predecessor flows */
+          } else {
+              /* get (last) definition of sym in this flow */
+              res = defmapFindDef (curr->defmap, sym, NULL);
+          }
 
-      /* if no flow predecessor available -- sym might be uninitialized */
-      if (!succ) {
-        //fprintf (stder, "sym %s might be used uninitialized at %p\n", strFromSym (sym), pc);
-        res = newDefmap (sym, 0xff, 0, 1, NULL, 0, *chain);
-        if (defmapAddCopyIfNew (chain, res)) n_defs++;
-        deleteDefmap (res); res = NULL;
-      }
+          if (res) {
+              /* definition found */
+              //fprintf (stderr, "reaching definition for %s @ %p found @ %p (val: %x)\n", strFromSym(sym), pc, res->pc, res->val);
+              if (defmapAddCopyIfNew (chain, res)) n_defs++;
+          } else {
+              /* no definition found -- check predecessor flows */
+              state = newState (NULL, NULL);
+              succ = (pCodeFlowLink *) setFirstItem (curr->from);
 
-      while (succ) {
-        //fprintf (stderr, "  %p --> %p with %x\n", curr, succ->pcflow, res ? res->val : 0);
-        state->flow = succ->pcflow;
-        state->lastdef = res;
-        if (stateIsNew (state, todo, done)) {
-          stackPush (todo, state);
-          state = newState (NULL, NULL);
-        } // if
-        succ = (pCodeFlowLink *) setNextItem (curr->from);
+              /* if no flow predecessor available -- sym might be uninitialized */
+              if (!succ) {
+                  //fprintf (stder, "sym %s might be used uninitialized at %p\n", strFromSym (sym), pc);
+                  res = newDefmap (sym, 0xff, 0, 1, NULL, 0, *chain);
+                  if (defmapAddCopyIfNew (chain, res)) n_defs++;
+                  deleteDefmap (res); res = NULL;
+              }
+
+              while (succ) {
+                  //fprintf (stderr, "  %p --> %p with %x\n", curr, succ->pcflow, res ? res->val : 0);
+                  state->flow = succ->pcflow;
+                  state->lastdef = res;
+                  if (stateIsNew (state, todo, done)) {
+                      stackPush (todo, state);
+                      state = newState (NULL, NULL);
+                  } // if
+                  succ = (pCodeFlowLink *) setNextItem (curr->from);
+              } // while
+              deleteState (state);
+          }
       } // while
-      deleteState (state);
     }
-  } // while
 
 #endif
 
@@ -10428,7 +10426,6 @@ int pic16_isAliveInFlow (symbol_t sym, int mask, pCodeFlow *pcfl, pCode *pc) {
 /* Check whether a symbol is alive (AFTER pc). */
 static int pic16_isAlive (symbol_t sym, pCode *pc) {
   int mask, visit;
-  defmap_t *map;
   dynstack_t *todo, *done;
   state_t *state;
   pCodeFlow *pcfl;
@@ -10438,7 +10435,6 @@ static int pic16_isAlive (symbol_t sym, pCode *pc) {
 
   assert (isPCI(pc));
   pcfl = PCI(pc)->pcflow;
-  map = pcfl->defmap;
 
   todo = newStack ();
   done = newStack ();
@@ -10552,7 +10548,7 @@ static int pic16_regIsLocal (reg_info *r) {
  * Returns 0 if no symbol is used later on, 1 otherwise. */
 static int pic16_pCodeIsAlive (pCode *pc) {
   pCodeInstruction *pci;
-  defmap_t *map, *lastpc;
+  defmap_t *map;
   reg_info *checkreg;
 
   /* we can only handle PCIs */
@@ -10637,9 +10633,6 @@ static int pic16_pCodeIsAlive (pCode *pc) {
     }
     return 1;
   }
-
-  /* remember first item assigned to pc for later use */
-  lastpc = map;
 
   /* check all symbols being modified by pc */
   while (map && map->pc == pc) {
@@ -10830,7 +10823,6 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
   pCodeInstruction *pci;
   int cond, inCond, outCond;
   int mask = 0xff, smask;
-  int isSpecial, isSpecial2;
   symbol_t sym, sym2;
   char *name;
 
@@ -11002,19 +10994,18 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
     //fprintf (stderr, "pc %p: def STATUS & %02x\n", pc, smask);
   } // if
 
-  isSpecial = isSpecial2 = 0;
   sym = sym2 = 0;
   if (cond & PCC_REGISTER) {
     name = pic16_get_op (pci->pcop, NULL, 0);
     sym = symFromStr (name);
-    isSpecial = fixupSpecialOperands (sym, mask, mask, pc, newValnum(), &list, inCond & PCC_REGISTER, outCond & PCC_REGISTER);
+    fixupSpecialOperands (sym, mask, mask, pc, newValnum(), &list, inCond & PCC_REGISTER, outCond & PCC_REGISTER);
     //fprintf (stderr, "pc %p: def REG %s(%x) & %02x\n", pc, name, sym, mask);
   }
 
   if (cond & PCC_REGISTER2) {
     name = pic16_get_op2 (pci->pcop, NULL, 0);
     sym2 = symFromStr (name);
-    isSpecial2 = fixupSpecialOperands (sym2, mask, mask, pc, newValnum(), &list, inCond & PCC_REGISTER2, outCond & PCC_REGISTER2);
+    fixupSpecialOperands (sym2, mask, mask, pc, newValnum(), &list, inCond & PCC_REGISTER2, outCond & PCC_REGISTER2);
     //fprintf (stderr, "pc %p: def REG2 %s(%x) & %02x\n", pc, name, sym2, mask);
   }
 
@@ -11332,9 +11323,8 @@ static void showAllDefs (symbol_t sym, pCode *pc) {
 /* safepCodeUnlink and remove pc from defmap. */
 static int pic16_safepCodeRemove (pCode *pc, char *comment) {
   defmap_t *map, *next, **head;
-  int res, ispci;
+  int res;
 
-  ispci = isPCI(pc);
   map = isPCI(pc) ? PCI(pc)->pcflow->defmap : NULL;
   head = isPCI(pc) ? &PCI(pc)->pcflow->defmap : NULL;
   res = pic16_safepCodeUnlink (pc, comment);

@@ -156,9 +156,7 @@ void dbg_dumpregusage(void)
  *-----------------------------------------------------------------*/
 static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 {
-
   pCode *pc=NULL;
-  pCode *pcprev=NULL;
 
   reg_info *reg;
 
@@ -168,65 +166,60 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 
   pc = pic16_findNextInstruction(pcfl->pc.next);
 
-  while(pic16_isPCinFlow(pc,PCODE(pcfl))) {
+  while (pic16_isPCinFlow(pc,PCODE(pcfl)))
+    {
+      reg = pic16_getRegFromInstruction(pc);
 
-
-    reg = pic16_getRegFromInstruction(pc);
-
-    if(reg && (reg->type != REG_TMP)) {
-
+      if (reg && (reg->type != REG_TMP))
+        {
 #if 0
-      fprintf(stderr, "reg= %p\n", reg);
-      fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
-      fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x ",
-      	      reg->address,reg->type,reg->rIdx);
-      fprintf(stderr, "command = %s\n", PCI(pc)->mnemonic);
-      	      
+          fprintf(stderr, "reg= %p\n", reg);
+          fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
+          fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x ",
+                  reg->address,reg->type,reg->rIdx);
+          fprintf(stderr, "command = %s\n", PCI(pc)->mnemonic);
 #endif
 
-//      fprintf(stderr, "%s:%d: trying to get first operand from pCode reg= %s\n", __FILE__, __LINE__, reg->name);
-      addSetIfnotP(& (PCFL(pcfl)->registers), reg);
+          //fprintf(stderr, "%s:%d: trying to get first operand from pCode reg= %s\n", __FILE__, __LINE__, reg->name);
+          addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
-      if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
-	addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
+          if ((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
+            addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
 
-      if(PCC_REGISTER & PCI(pc)->outCond)
-	addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
+          if (PCC_REGISTER & PCI(pc)->outCond)
+            addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
 
-	addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+          addSetIfnotP(& (reg->reglives.usedpCodes), pc);
 
-//    reg->wasUsed=1;
+          //reg->wasUsed=1;
 
 #if 1
-	/* check to see if this pCode has 2 memory operands,
-	   and set up the second operand too */
-	if(PCI(pc)->is2MemOp) {
-			reg = pic16_getRegFromInstruction2(pc);
-			if(reg) {
-//				fprintf(stderr, "%s:%d: trying to get second operand from pCode reg= %s\n", __FILE__, __LINE__, reg->name);
-				addSetIfnotP(& (PCFL(pcfl)->registers), reg);
+          /* check to see if this pCode has 2 memory operands,
+             and set up the second operand too */
+          if (PCI(pc)->is2MemOp)
+            {
+              reg = pic16_getRegFromInstruction2(pc);
+              if (reg)
+                {
+                  //fprintf(stderr, "%s:%d: trying to get second operand from pCode reg= %s\n", __FILE__, __LINE__, reg->name);
+                  addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
-				if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
-					addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
-					
-				if((PCC_REGISTER | PCC_REGISTER2) & PCI(pc)->outCond)
-					addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
-			
-				addSetIfnotP(& (reg->reglives.usedpCodes), pc);
-				
-//				reg->wasUsed=1;
-			}
-	}
+                  if ((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
+                    addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
+
+                  if ((PCC_REGISTER | PCC_REGISTER2) & PCI(pc)->outCond)
+                    addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
+
+                  addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+
+                  //reg->wasUsed=1;
+                } // if
+            } // if
 #endif
+        } // if
 
-    }
-
-
-    pcprev = pc;
-    pc = pic16_findNextInstruction(pc->next);
-
-  }
-
+      pc = pic16_findNextInstruction(pc->next);
+    } // while
 }
 
 /*-----------------------------------------------------------------*

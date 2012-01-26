@@ -1,3 +1,8 @@
+2012-01-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Correctly handle some forgotten corner cases in the fix for #3427564.
+
 2012-01-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* doc/sdccman.lyx:

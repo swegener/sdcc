@@ -5816,9 +5816,11 @@ genCmp (operand * left, operand * right,
           bool save_a, save_b, save_bc;
           wassertl (size == 1, "Right side sfr in comparison with more than 8 bits.");
 
-          save_a = (AOP_TYPE(left) == AOP_ACC);
           save_b = bitVectBitValue (ic->rSurv, B_IDX);
           save_bc = (save_b && bitVectBitValue (ic->rSurv, C_IDX));
+          save_a = ((AOP_TYPE(left) == AOP_ACC) ||
+            AOP_TYPE(left) == AOP_REG && AOP (left)->aopu.aop_reg[0]->rIdx == B_IDX && save_b ||
+            AOP_TYPE(left) == AOP_REG && AOP (left)->aopu.aop_reg[0]->rIdx == C_IDX && !save_b  && save_bc);
 
           if (save_bc)
             {
@@ -5827,10 +5829,12 @@ genCmp (operand * left, operand * right,
             }
           if (save_a)
             {
+              cheapMove (ASMOP_A, 0, AOP (right), 0);
               emit2("push af");
               regalloc_dry_run_cost += 1;
             }
-          cheapMove (ASMOP_A, 0, AOP (right), 0);
+          else
+            cheapMove (ASMOP_A, 0, AOP (right), 0);
           cheapMove (save_b ? ASMOP_C : ASMOP_B, 0, ASMOP_A, 0);
           if (save_a)
             {

@@ -5841,7 +5841,8 @@ genCmp (operand * left, operand * right,
               emit2("pop af");
               regalloc_dry_run_cost += 1;
             }
-          cheapMove (ASMOP_A, 0, AOP (left), 0);
+          else
+            cheapMove (ASMOP_A, 0, AOP (left), 0);
           emit3_o (A_SUB, ASMOP_A, 0, save_b ? ASMOP_C : ASMOP_B, offset);
           if (save_bc)
             {

@@ -7959,7 +7959,7 @@ genRightShift (const iCode *ic)
   if(!regalloc_dry_run)
     {
       emit2 ("jp !tlabel", tlbl1->key + 100);
-      emitLabelNoSpill (tlbl->key + 100);
+      IS_GB ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
     }
   regalloc_dry_run_cost += 3;
   
@@ -7978,7 +7978,7 @@ genRightShift (const iCode *ic)
     }
   if(!regalloc_dry_run)
     {
-      emitLabelNoSpill (tlbl1->key + 100);
+      IS_GB ? emitLabel (tlbl1->key + 100) : emitLabelNoSpill (tlbl1->key + 100);
       emit2 ("dec a");
       emit2 ("jp NZ,!tlabel", tlbl->key + 100);
     }

@@ -2,6 +2,8 @@
 
 	* src/z80/peeph-gbz80.def:
 	  Fix remaining gbz80 regression failures when using --max-allocs-per-node 5.
+	* src/z80/gen.c:
+	  Fix right shift for gbz80 using --max-allocs-per-node 1.
 
 2012-01-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

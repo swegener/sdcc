@@ -3056,15 +3056,15 @@ static void regMove(short *dst, short *src, size_t n)
   wassert (n < 6);
 
   // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
-  while (size--)
+  while (size)
     {
       size_t i;
-              
+
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {
           size_t j;
-                  
+      
           if (assigned[i])
             continue;
                     
@@ -3082,10 +3082,11 @@ static void regMove(short *dst, short *src, size_t n)
       if (i < n)
         {
           cheapMove (asmopregs[dst[i]], 0, asmopregs[src[i]], 0); // We can safely assign a byte.
+          size--;
           assigned[i] = TRUE;
           continue;
         }
-              
+       
       // No byte can be assigned safely (i.e. the assignment is a permutation). Cache one in the accumulator.
  
       if (cached_byte != -1)
@@ -3099,12 +3100,14 @@ static void regMove(short *dst, short *src, size_t n)
       for (i = 0; i < n; i++)
         if (!assigned[i])
           break;
+
       wassertl (i != n, "regMove error: Trying to cache non-existant byte in accumulator."); 
       cheapMove (ASMOP_A, 0, asmopregs[src[i]], 0);
+      size--;
       assigned[i] = TRUE;
       cached_byte = i;
     }
-           
+   
   if (cached_byte != -1)
     cheapMove (asmopregs[dst[cached_byte]], 0, ASMOP_A, 0);
 }

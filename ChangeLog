@@ -1,5 +1,11 @@
 2012-01-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c,
+	  support/regression/tests/gcc-torture-execute-stdarg-4.c:
+	  Fix bug #3463344.
+
+2012-01-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/peeph-gbz80.def:
 	  Fix remaining gbz80 regression failures when using --max-allocs-per-node 5.
 	* src/z80/gen.c:

@@ -147,11 +147,11 @@ testTortureExecute (void)
   if (x != 43L || y != 6L)
     ASSERT (0);
   f4 (5, 7.0, 21.0, 1.0, 17L, 126.0);
-#if 0
+
 // Fails on z80 and related
   if (x != 144L || y != 28L)
     ASSERT (0);
-#endif
+
   return;
 #endif
 }

@@ -163,9 +163,7 @@ replace restart {
 } by {
 	ld	%1,a
 	; peephole 14 removed redundant load from %1 into a.
-} if notVolatile(%1)
-// This gives many false negatives and without the test no problems are encountered in the regression tests
-// Maybe we can try this after 2.7.0 release
+} if notVolatile(%1), notSame(%1 '(hl+)'), notSame(%1 '(hl-)')
 
 replace restart {
 	ld	a,%1
@@ -173,9 +171,7 @@ replace restart {
 } by {
 	ld	a,%1
 	; peephole 15 removed redundant load from a into %1.
-} if notVolatile(%1)
-// This gives many false negatives and without the test no problems are encountered in the regression tests
-// Maybe we can try this after 2.7.0 release
+} if notVolatile(%1), notSame(%1 '(hl+)'), notSame(%1 '(hl-)')
 
 replace restart {
 	ld	%2,%3

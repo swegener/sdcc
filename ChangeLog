@@ -1,3 +1,8 @@
+2012-01-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/peeph-gbz80.def:
+	  Fix remaining gbz80 regression failures when using --max-allocs-per-node 5.
+
 2012-01-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

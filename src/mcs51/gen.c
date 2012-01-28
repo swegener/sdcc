@@ -2089,7 +2089,7 @@ assignBit (operand * result, operand * right)
   else
     {
       toCarry (right);
-      aopPut (result, "c", 0);
+      outBitC (result);
     }
 }
 
@@ -11386,8 +11386,10 @@ release:
 static void
 genJumpTab (iCode * ic)
 {
+  operand *cond = IC_JTCOND (ic);
   symbol *jtab, *jtablo, *jtabhi;
   unsigned int count;
+  const char *l;
 
   D (emitcode (";", "genJumpTab"));
 
@@ -11402,25 +11404,31 @@ genJumpTab (iCode * ic)
       /* Peephole may not convert ljmp to sjmp or ret
          labelIsReturnOnly & labelInRange must check
          currPl->ic->op != JUMPTABLE */
-      aopOp (IC_JTCOND (ic), ic, FALSE);
+      aopOp (cond, ic, FALSE);
       /* get the condition into accumulator */
-      MOVA (aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
+      l = aopGet (cond, 0, FALSE, FALSE);
+      MOVA (l);
       /* multiply by three */
-      if (aopGetUsesAcc (IC_JTCOND (ic), 0))
+      if ((AOP_TYPE (cond) == AOP_REG) ||
+          (IS_AOP_PREG (cond) && !AOP(cond)->paged && !IS_VOLATILE (operandType (cond))))
         {
+          emitcode ("add", "a,%s", l);
           if (options.acall_ajmp == 0)
-            emitcode ("mov", "b,#0x03");
-          else
-            emitcode ("mov", "b,#0x02");
-          emitcode ("mul", "ab");
+            emitcode ("add", "a,%s", l);
         }
       else
         {
-          emitcode ("add", "a,acc");
           if (options.acall_ajmp == 0)
-            emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
+            {
+              emitcode ("mov", "b,#0x03");
+              emitcode ("mul", "ab");
+            }
+          else
+            {
+              emitcode ("add", "a,acc");
+            }
         }
-      freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+      freeAsmop (cond, NULL, ic, TRUE);
 
       jtab = newiTempLabel (NULL);
       emitcode ("mov", "dptr,#!tlabel", jtab->key + 100);
@@ -11432,8 +11440,6 @@ genJumpTab (iCode * ic)
     }
   else
     {
-      const char *l;
-
       /* this algorithm needs 14 cycles and 13 + 2*n bytes
          if the switch argument is in a register.
          For n>6 this algorithm may be more compact */
@@ -11442,16 +11448,19 @@ genJumpTab (iCode * ic)
 
       /* get the condition into accumulator.
          Using b as temporary storage, if register push/pop is needed */
-      aopOp (IC_JTCOND (ic), ic, FALSE);
-      l = aopGet (IC_JTCOND (ic), 0, FALSE, FALSE);
-      if ((AOP_TYPE (IC_JTCOND (ic)) == AOP_R0 && _G.r0Pushed) || (AOP_TYPE (IC_JTCOND (ic)) == AOP_R1 && _G.r1Pushed))
+      aopOp (cond, ic, FALSE);
+      l = aopGet (cond, 0, FALSE, FALSE);
+      if ((AOP_TYPE (cond) == AOP_R0 && _G.r0Pushed) ||
+          (AOP_TYPE (cond) == AOP_R1 && _G.r1Pushed) ||
+          EQ (l, "a") || EQ (l, "acc") ||
+          IS_VOLATILE (operandType (cond)))
         {
           // (MB) what if B is in use???
           wassertl (!BINUSE, "B was in use");
           emitcode ("mov", "b,%s", l);
           l = "b";
         }
-      freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+      freeAsmop (cond, NULL, ic, TRUE);
       MOVA (l);
       if (count <= 112)
         {
@@ -11515,14 +11524,14 @@ genCast (iCode * ic)
   aopOp (result, ic, FALSE);
 
   /* if the result is a bit (and not a bitfield) */
-  if (IS_BIT (OP_SYMBOL (result)->type))
+  if (IS_BOOLEAN (OP_SYMBOL (result)->type))
     {
       assignBit (result, right);
       goto release;
     }
 
   /* if they are the same size : or less */
-  if (AOP_SIZE (result) <= AOP_SIZE (right))
+  if (AOP_SIZE (result) <= AOP_SIZE (right) && !IS_BOOLEAN (operandType (result)))
     {
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))

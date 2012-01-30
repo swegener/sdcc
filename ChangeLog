@@ -1,3 +1,8 @@
+2012-01-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #3480597.
+
 2012-01-29 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/tests/key.c: fixed for Mac OS X

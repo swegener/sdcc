@@ -1847,11 +1847,11 @@ requiresHL (const asmop *aop)
     {
     case AOP_IY:
     case AOP_HL:
-    case AOP_STK:
     case AOP_EXSTK:
     case AOP_HLREG:
-
       return TRUE;
+    case AOP_STK:
+      return (IS_GB || _G.omitFramePtr);
     case AOP_REG:
       {
         int i;
@@ -1862,6 +1862,8 @@ requiresHL (const asmop *aop)
               return TRUE;
           }
       }
+    case AOP_PAIRPTR:
+      return (aop->aopu.aop_pairId == PAIR_HL);
     default:
       return FALSE;
     }
@@ -4797,6 +4799,7 @@ static void
 genPlus (iCode * ic)
 {
   int size, offset = 0;
+  signed char cached[2];
   bool premoved;
 
   /* special cases :- */
@@ -5136,6 +5139,8 @@ genPlus (iCode * ic)
     
   setupToPreserveCarry (ic);
 
+  cached[0] = -1;
+  cached[1] = -1;
   while (size--)
     {
       if(!premoved)
@@ -5151,8 +5156,23 @@ genPlus (iCode * ic)
       }
       else
         emit3_o (A_ADC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
-      cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
+      if (size != 0 &&
+        (requiresHL (AOP (IC_RIGHT (ic))) && !AOP_TYPE (IC_RIGHT (ic)) == AOP_REG || requiresHL (AOP (IC_LEFT (ic))) && !AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+        && AOP_TYPE (IC_RESULT (ic)) == AOP_REG && (AOP (IC_RESULT (ic))->aopu.aop_reg[offset]->rIdx == L_IDX || AOP (IC_RESULT (ic))->aopu.aop_reg[offset]->rIdx == H_IDX))
+        {
+          wassert (cached[0] == -1 || cached[1] == -1);
+          cached[cached[0] == -1 ? 0 : 1] = offset++;
+          _push(PAIR_AF);
+        }
+      else
+        cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
     }
+  for (size = 0; size < 2; size++)
+    if (cached[size] != -1)
+      {emitDebug(";HERE");
+        _pop(PAIR_AF);
+        cheapMove (AOP (IC_RESULT (ic)), cached[size], ASMOP_A, 0);
+      }
 release:
   _G.preserveCarry = FALSE;
   freeAsmop (IC_LEFT (ic), NULL, ic);

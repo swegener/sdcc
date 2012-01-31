@@ -436,6 +436,24 @@ bool operand_in_reg(const operand *o, reg_t r, const i_assignment_t &ia, unsigne
   return(false);
 }
 
+// Return true, iff the operand is placed on the stack.
+template <class G_t>
+bool operand_on_stack(const operand *o, const assignment &a, unsigned short int i, const G_t &G)
+{
+  if(!o || !IS_SYMOP(o))
+    return(false);
+
+  operand_map_t::const_iterator oi, oi_end;
+  for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); oi != oi_end; ++oi)
+    if(a.global[oi->second] >= 0)
+      return(false);
+
+  if(OP_SYMBOL_CONST(o)->remat)
+    return(false);
+
+  return(true);
+}
+
 template <class G_t>
 bool operand_is_pair(const operand *o, const assignment &a, unsigned short int i, const G_t &G)
 {
@@ -573,6 +591,8 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(TARGET_IS_GBZ80)
     return(true);
 
+  bool exstk = (options.omitFramePtr || (currFunc && currFunc->stack > 127));
+
   const i_assignment_t &ia = a.i_assignment;
 
   bool unused_L = (ia.registers[REG_L][1] < 0);
@@ -641,7 +661,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || IS_TRUE_SYMOP (right))) // Might use (hl).
     return(false);
 
-  if(ic->op == '+' && input_in_HL && IS_TRUE_SYMOP (result)) // Might use (hl) for result.
+  if(ic->op == '+' && input_in_HL && (IS_TRUE_SYMOP (result) || operand_on_stack(result, a, i, G) && exstk)) // Might use (hl) for result.
     return(false);
     
   // HL overwritten by result.

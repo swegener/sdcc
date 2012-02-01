@@ -1,4 +1,11 @@
-2012-01-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-01-31 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/ucgbz80/spec.mk:
+	  simulation timeout increased to 20s due to timeout failure on
+	  gcc-torture-execute-divcmp-3 regressin test on
+	  mypants.neurotica.com NetBSD/Sparc64 build machine
+
+2012-01-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,
 	  support/regression/tests/bug3482146.c:

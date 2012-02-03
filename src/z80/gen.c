@@ -2648,6 +2648,11 @@ aopPut (asmop *aop, const char *s, int offset)
           emit2 ("ld a,!*hl");
           s = "a";
         }
+      else if (strstr (s, "(ix)") || strstr (s, "(iy)"))
+        {
+          emit2 ("ld a, %s", s);
+          s = "a";
+        }
       setupPair (PAIR_HL, aop, offset);
 
       emit2 ("ld !*hl,%s", s);
@@ -2776,6 +2781,7 @@ aopPut3 (asmop *op1, int offset1, asmop *op2, int offset2)
 
   if(!regalloc_dry_run)
     aopPut (op1, aopGet(op2, offset2, FALSE), offset1);
+
   regalloc_dry_run_cost = cost + ld_cost(op1, offset2 < op2->size ? op2 : ASMOP_ZERO);
 }
 

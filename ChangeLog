@@ -1,3 +1,8 @@
+2012-02-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix generation of invalid instructions when --reserve-regs-iy is used.
+
 2012-01-31 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/ports/ucgbz80/spec.mk:

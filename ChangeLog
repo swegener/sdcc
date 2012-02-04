@@ -1,3 +1,8 @@
+2012-02-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCval.c (constVal): fixed bug 2935162
+	* support/regression/tests/bug2935162.c: new, added
+
 2012-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

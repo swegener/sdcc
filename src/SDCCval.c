@@ -1088,10 +1088,10 @@ constVal (const char *s)
             {                   /* check if we have to promote to int */
               SPEC_NOUN (val->type) = V_INT;
             }
+          if (dval < -32768) /* check if we have to promote to long int */              
+            SPEC_LONG (val->type) = 1;
           if (dval < -2147483648.0) /* check if we have to promote to long long int */
             SPEC_LONGLONG (val->type) = 1;
-          else if (dval < -32768) /* check if we have to promote to long int */              
-            SPEC_LONG (val->type) = 1;
         }
       else
         {                       /* >=0 */
@@ -1121,26 +1121,18 @@ constVal (const char *s)
               else
                 {
                   SPEC_LONG (val->type) = 1;
-                  if (dval > 0x7fffffff)
-                    SPEC_USIGN (val->type) = 1;
                 }
             }
           if (dval > 0xffffffff && SPEC_USIGN (val->type) && !SPEC_LONGLONG (val->type))
             {
-              SPEC_LONG (val->type) = 0;
               SPEC_LONGLONG (val->type) = 1;
             }
           else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
             {
-              SPEC_LONGLONG (val->type) = 1;
-#if defined(_MSC_VER) && _MSC_VER <= 1600
-              /* Microsoft C compiler doesn't support
-               * hexadecimal floating-point literals */
-              if (dval > (double)0x7fffffffffffffffll)
-#else
-              if (dval > 0x7fffffffffffffffp0)
-#endif
+              if (is_integral)
                 SPEC_USIGN (val->type) = 1;
+              else
+                SPEC_LONGLONG (val->type) = 1;
             }
         }
     }
@@ -1151,7 +1143,7 @@ constVal (const char *s)
       dval = -2147483648.0;
       werror (W_INVALID_INT_CONST, s, dval);
     }
-  if (dval > 2147483647.0 && !SPEC_USIGN (val->type))
+  if (dval > 2147483648.0 && !SPEC_USIGN (val->type))
     {
       dval = 2147483647.0;
       werror (W_INVALID_INT_CONST, s, dval);
@@ -1592,30 +1584,27 @@ valUnaryPM (value * val)
     SPEC_CVAL (val->etype).v_float = -1.0 * SPEC_CVAL (val->etype).v_float;
   else if (SPEC_NOUN (val->etype) == V_FIXED16X16)
     SPEC_CVAL (val->etype).v_fixed16x16 = (TYPE_TARGET_ULONG) - ((long) SPEC_CVAL (val->etype).v_fixed16x16);
+  else if (SPEC_LONG (val->etype))
+    {
+      if (SPEC_USIGN (val->etype))
+        SPEC_CVAL (val->etype).v_ulong = 0 - SPEC_CVAL (val->etype).v_ulong;
+      else
+        SPEC_CVAL (val->etype).v_long = -SPEC_CVAL (val->etype).v_long;
+    }
   else
     {
-      if (SPEC_LONG (val->etype))
-        {
-          if (SPEC_USIGN (val->etype))
-            SPEC_CVAL (val->etype).v_ulong = 0 - SPEC_CVAL (val->etype).v_ulong;
-          else
-            SPEC_CVAL (val->etype).v_long = -SPEC_CVAL (val->etype).v_long;
-        }
+      if (SPEC_USIGN (val->etype))
+        SPEC_CVAL (val->etype).v_uint = 0 - SPEC_CVAL (val->etype).v_uint;
       else
-        {
-          if (SPEC_USIGN (val->etype))
-            SPEC_CVAL (val->etype).v_uint = 0 - SPEC_CVAL (val->etype).v_uint;
-          else
-            SPEC_CVAL (val->etype).v_int = -SPEC_CVAL (val->etype).v_int;
+        SPEC_CVAL (val->etype).v_int = -SPEC_CVAL (val->etype).v_int;
 
-          if (SPEC_NOUN (val->etype) == V_CHAR)
-            {
-              /* promote to 'signed int', cheapestVal() might reduce it again */
-              SPEC_USIGN (val->etype) = 0;
-              SPEC_NOUN (val->etype) = V_INT;
-            }
-          return cheapestVal (val);
+      if (SPEC_NOUN (val->etype) == V_CHAR)
+        {
+          /* promote to 'signed int', cheapestVal() might reduce it again */
+          SPEC_USIGN (val->etype) = 0;
+          SPEC_NOUN (val->etype) = V_INT;
         }
+      return cheapestVal (val);
     }
   return val;
 }
@@ -2117,7 +2106,6 @@ valLogicAndOr (value * lval, value * rval, int op)
       break;
     }
 
-
   return val;
 }
 
@@ -2241,9 +2229,10 @@ getNelements (sym_link * type, initList * ilist)
               // structure designator for array, boo.
               werrorfl (ilist->filename, ilist->lineno, E_BAD_DESIGNATOR);
             }
-          else {
-            i = ilist->designation->designator.elemno;
-          }
+          else
+            {
+              i = ilist->designation->designator.elemno;
+            }
         }
       if (size <= i)
         {

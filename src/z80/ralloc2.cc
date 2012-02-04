@@ -651,6 +651,9 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if((IS_GB || IY_RESERVED) && (IS_TRUE_SYMOP(left) || IS_TRUE_SYMOP(right)))
     return(false);
 
+  if((IS_GB || IY_RESERVED) && IS_TRUE_SYMOP(result) && getSize(operandType(IC_RESULT(ic))) > 2)
+    return(false);
+
   if(options.omitFramePtr)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
 	return(false);
 

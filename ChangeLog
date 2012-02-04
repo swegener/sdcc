@@ -1,3 +1,9 @@
+2012-02-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Fixes for #3482732, preparations for exact cost function in gbz80 port.
+
 2012-02-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

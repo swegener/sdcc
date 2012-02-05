@@ -8206,18 +8206,18 @@ genPointerGet (const iCode *ic)
   int size, offset;
   int pair = PAIR_HL;
   sym_link *retype;
+  bool pushed_de = FALSE;
 
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
   retype = getSpec (operandType (result));
 
-  if (IS_GB)
-    pair = PAIR_DE;
-
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
-
   size = AOP_SIZE (result);
+
+  if (IS_GB || IY_RESERVED && requiresHL (AOP (result)) && size > 1 && AOP_TYPE (result) != AOP_REG)
+    pair = PAIR_DE;
 
   if (isPair (AOP (left)) && size == 1 && !IS_BITVAR (retype))
     {
@@ -8279,7 +8279,11 @@ genPointerGet (const iCode *ic)
   if(!IS_GB && (getPairId (AOP (left)) == PAIR_BC || getPairId (AOP (left)) == PAIR_DE) && AOP_TYPE (result) == AOP_STK || getPairId (AOP (left)) == PAIR_IY && SPEC_BLEN (getSpec (operandType (result))) < 8)
     pair = getPairId (AOP (left));
   else
-    fetchPair (pair, AOP (left));
+    {
+      if (pair == PAIR_DE && !isPairDead (PAIR_DE, ic))
+        _push(PAIR_DE), pushed_de = TRUE;
+      fetchPair (pair, AOP (left));
+    }
 
   /* if bit then unpack */
   if (IS_BITVAR (retype))
@@ -8289,7 +8293,7 @@ genPointerGet (const iCode *ic)
     }
   else if (getPairId (AOP (result)) == PAIR_HL || size == 2 && AOP_TYPE (result) == AOP_REG && (AOP (result)->aopu.aop_reg[0] == regsZ80 + L_IDX || AOP (result)->aopu.aop_reg[0] == regsZ80 + H_IDX))
     {
-       wassertl (size == 2, "HL must be of size 2");
+      wassertl (size == 2, "HL must be of size 2");
       if (IS_R2K && getPairId (AOP (result)) == PAIR_HL)
         {
           emit2 ("ld hl, (hl)");
@@ -8444,6 +8448,9 @@ genPointerGet (const iCode *ic)
     }
 
 release:
+  if (pushed_de)
+    _pop (PAIR_DE);
+
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
 }

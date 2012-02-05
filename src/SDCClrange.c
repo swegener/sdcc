@@ -814,7 +814,7 @@ notUsedInBlock (symbol * sym, eBBlock * ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* adjustIChain - correct the sch and ech pointers                 */
 /*-----------------------------------------------------------------*/
-static void
+void
 adjustIChain (eBBlock ** ebbs, int count)
 {
   int i;

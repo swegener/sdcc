@@ -38,4 +38,6 @@ void recomputeLiveRanges (eBBlock **, int);
 void setToRange (operand *, int, bool);
 void hashiCodeKeys (eBBlock **, int);
 
+void adjustIChain (eBBlock ** ebbs, int count);
+
 #endif

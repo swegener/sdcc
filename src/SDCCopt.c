@@ -1192,7 +1192,7 @@ separateAddressSpaces (eBBlock ** ebbs, int count)
           right = IC_RIGHT (ic);
           result = IC_RESULT (ic);
           
-          //printf ("Looking at ic %d, op %d\n", ic->key, (int)(ic->op));
+          /*printf ("Looking at ic %d, op %d\n", ic->key, (int)(ic->op));*/
           
           if (left && IS_SYMOP (left))
             { 
@@ -2038,12 +2038,13 @@ eBBlockFromiCode (iCode * ic)
 
   /* enforce restrictions on acesses to named address spaces */
   separateAddressSpaces (ebbi->bbOrder, ebbi->count);
-  
+
   /* insert bank switching instructions. Do it here, before the
      other support routines, since we can assume that there is no
      bank switching happening in those other support routines
      (but assume that it can happen in other functions) */
-  ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+  adjustIChain(ebbi->bbOrder, ebbi->count);
+  ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
   if(switchAddressSpacesOptimally (ic, ebbi))
     switchAddressSpaces (ic); /* Fallback. Very unlikely to be triggered, unless --max-allocs-per-node is set to very small values or very weird control-flow graphs */
 

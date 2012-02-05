@@ -1,3 +1,13 @@
+2012-02-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #3482732.
+	* src/SDCClrange.h,
+	  src/SDCClrange.c,
+	  src/SDCCopt.c,
+	  support/Regression/bug3482217.c:
+	  Fixed bug #3482217.
+
 2012-02-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCval.c (constVal): fixed bug 2935162

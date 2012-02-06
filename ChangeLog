@@ -1,3 +1,7 @@
+2012-02-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug2935162.c: don't assume 32-bit long host
+
 2012-02-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

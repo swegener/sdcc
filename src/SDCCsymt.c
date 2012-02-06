@@ -1764,7 +1764,7 @@ checkSClass (symbol * sym, int isProto)
 
   /* global variables declared const put into code */
   /* if no other storage class specified */
-  if (sym->level == 0 && SPEC_SCLS (sym->etype) == S_FIXED && !IS_FUNC (sym->type))
+  if ((sym->level == 0 || SPEC_STAT(sym->etype)) && SPEC_SCLS (sym->etype) == S_FIXED && !IS_FUNC (sym->type))
     {
       /* find the first non-array link */
       t = sym->type;
@@ -1775,7 +1775,7 @@ checkSClass (symbol * sym, int isProto)
     }
 
   /* global variable in code space is a constant */
-  if (sym->level == 0 && SPEC_SCLS (sym->etype) == S_CODE && port->mem.code_ro)
+  if ((sym->level == 0 || SPEC_STAT(sym->etype)) && SPEC_SCLS (sym->etype) == S_CODE && port->mem.code_ro)
     {
       /* find the first non-array link */
       t = sym->type;

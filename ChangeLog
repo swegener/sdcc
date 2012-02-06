@@ -2,6 +2,8 @@
 
 	* src/SDCCast.c:
 	  Fixed bug #3073647.
+	* src/SDCCsymt.c:
+	  Fixed #3034739.
 
 2012-02-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

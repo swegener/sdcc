@@ -4745,6 +4745,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (IS_CONSTANT (LTYPE (tree)))
             werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "=");
         }
+      if (tree->initMode && SPEC_STAT (getSpec (LTYPE (tree))) && !constExprTree (tree->right))
+        werrorfl (tree->filename, tree->lineno, E_CONST_EXPECTED, "=");
       if (LRVAL (tree))
         {
           werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "=");

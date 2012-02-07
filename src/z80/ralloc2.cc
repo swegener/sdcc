@@ -715,7 +715,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
          ic->op == '<' ||
          ic->op == EQ_OP ||*/
          (ic->op == '+' && getSize(operandType(IC_RESULT(ic))) == 1) ||
-         (ic->op == '+' && getSize(operandType(IC_RESULT(ic))) <= 2 && result_only_HL) ))))	// 16 bit addition might use add hl, rr
+         (ic->op == '+' && getSize(operandType(IC_RESULT(ic))) <= 2 && (result_only_HL || !IS_GB)) ))))	// 16 bit addition on gbz80 might need to use add hl, rr.
     return(true);
 
   if((ic->op == '<' || ic->op == '>') && (IS_ITEMP(left) || IS_OP_LITERAL(left) || IS_ITEMP(right) || IS_OP_LITERAL(right)))	// Todo: Fix for large stack.

@@ -4618,7 +4618,7 @@ genPlusIncr (const iCode *ic)
         {
           if (icount > 3)
             return FALSE;
-          movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
+          fetchPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)));
         }
       while (icount--)
         {
@@ -4963,7 +4963,7 @@ genPlus (iCode * ic)
       goto release;
     }
 
-  if (isPair (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_LEFT (ic)) == AOP_IMMD && getPairId (AOP (IC_RIGHT (ic))) != PAIR_HL)
+  if (isPair (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_LEFT (ic)) == AOP_IMMD && getPairId (AOP (IC_RIGHT (ic))) != PAIR_HL && isPairDead (PAIR_HL, ic))
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
       emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
@@ -4973,7 +4973,7 @@ genPlus (iCode * ic)
       goto release;
     }
 
-  if (isPair (AOP (IC_LEFT (ic))) && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && getPairId (AOP (IC_LEFT (ic))) != PAIR_HL)
+  if (isPair (AOP (IC_LEFT (ic))) && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && getPairId (AOP (IC_LEFT (ic))) != PAIR_HL && isPairDead (PAIR_HL, ic))
     {
       fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
       emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
@@ -4983,7 +4983,7 @@ genPlus (iCode * ic)
       goto release;
     }
 
-  if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_LEFT (ic))) == PAIR_HL)
+  if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_LEFT (ic))) == PAIR_HL && isPairDead (PAIR_HL, ic))
     {
       emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
       regalloc_dry_run_cost += 1;
@@ -4992,7 +4992,7 @@ genPlus (iCode * ic)
       goto release;
     }
 
-  if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_RIGHT (ic))) == PAIR_HL)
+  if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_RIGHT (ic))) == PAIR_HL && isPairDead (PAIR_HL, ic))
     {
       emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
       regalloc_dry_run_cost += 1;
@@ -9018,7 +9018,12 @@ genAssign (const iCode *ic)
     {
       /* Assigning directly is cheaper than using IY. */
       emit2("ld (%s), %s", AOP (result)->aopu.aop_dir, getPairName (AOP (right)));
-      regalloc_dry_run_cost += 4;
+      regalloc_dry_run_cost += (getPairId (AOP (right)) == PAIR_HL) ? 3 : 4;
+    }
+  else if (!IS_GB && AOP_TYPE (right) == AOP_STK && AOP_TYPE (result) == AOP_IY && size == 2 && isPairDead (PAIR_HL, ic))
+    {
+      fetchPair (PAIR_HL, AOP (right));
+      commitPair (AOP (result), PAIR_HL, ic);
     }
   else if (getPairId (AOP (right)) == PAIR_IY)
     {

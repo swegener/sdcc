@@ -1,3 +1,8 @@
+2012-02-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Improve handling hl for pointer setting in register allocator.
+
 2012-02-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c:

@@ -734,6 +734,9 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     operand_in_reg(right, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(right, REG_IYH, ia, i, G))) // Uses ld r, 0 (iy)
     return(true);
 
+  if((ic->op == '=') && POINTER_SET(ic) && operand_in_reg(result, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(result, REG_IYH, ia, i, G))	// Uses ld 0 (iy), l etc
+    return(true);
+
   if((ic->op == '=' || ic->op == CAST) && POINTER_SET(ic) && !result_only_HL)	// loads result pointer into (hl) first.
     return(false);
 

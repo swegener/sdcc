@@ -1360,6 +1360,28 @@ replace restart {
 } if notUsed('hl')
 
 replace restart {
+	push	bc
+	pop	iy
+	inc	iy
+} by {
+	inc	bc
+	push	bc
+	pop	iy
+	; peephole 111b incremented in bc instead of iy.
+} if notUsed('bc')
+
+replace restart {
+	push	de
+	pop	iy
+	inc	iy
+} by {
+	inc	de
+	push	de
+	pop	iy
+	; peephole 111c incremented in de instead of iy.
+} if notUsed('de')
+
+replace restart {
 	ld	hl,%1
 	add	hl,%2
 	push	hl

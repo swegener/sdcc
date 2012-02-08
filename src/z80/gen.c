@@ -5070,6 +5070,21 @@ genPlus (iCode * ic)
       regalloc_dry_run_cost += 1;
       goto release;
     }
+
+  if (getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && getPairId (AOP (IC_LEFT (ic))) == PAIR_HL && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT)
+    {
+      PAIR_ID pair = getFreePairId (ic);
+      bool pair_alive; 
+      if (pair == PAIR_INVALID)
+        pair = PAIR_DE;
+      if (pair_alive = !isPairDead (pair, ic))
+        _push (pair);
+      fetchPair (pair, AOP (IC_RIGHT (ic)));
+      emit2 ("add hl, %s", _pairs[pair].name);
+      regalloc_dry_run_cost += 1;
+      if (pair_alive)
+        _pop (pair);
+    }
     
   /* Special case:
      ld hl,sp+n trashes C so we can't afford to do it during an

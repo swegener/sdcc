@@ -243,11 +243,7 @@ z80MightRead(const lineNode *pl, const char *what)
     ISINST(pl->line, "sub\t") ||
     ISINST(pl->line, "xor\t"))
     {
-      if(argCont(pl->line + 4, what))
-        return TRUE;
-      if(strstr(pl->line + 4, "hl") == 0 && strcmp("a", what) == 0)
-        return TRUE;
-      return FALSE;
+      return(argCont(pl->line + 4, what));
     }
 
   if(ISINST(pl->line, "or\t") || ISINST(pl->line, "cp\t") )

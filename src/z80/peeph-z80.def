@@ -209,8 +209,19 @@ replace restart {
 	ld	e, l
 	ld	d, h
 	srl	(hl)
+	ld	a, (hl)
 	; peephole 21a shifted in (hl) instead of a.
-} if notUsed('a')
+}
+
+replace restart {
+	ld	a, %1 (%2)
+	srl	a
+	ld	%1 (%2), a
+} by {
+	srl	%1 (%2)
+	ld	a, %1 (%2)
+	; peephole 21b shifted in (hl) instead of a.
+}
 
 replace restart {
 	ld	%1,(hl)

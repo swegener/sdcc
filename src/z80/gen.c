@@ -6711,13 +6711,19 @@ genAnd (const iCode *ic, iCode * ifx)
         {
           if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
             {
-              cheapMove (ASMOP_A, 0, AOP (left), offset);
-              if (bytelit != 0x0FFL)
-                emit3_o (A_AND, ASMOP_A, 0, AOP (right), offset);
+              if (isLiteralBit (bytelit) >= 0 && ifx && (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_ACC || AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[0]->rIdx != IYL_IDX))
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("bit %d, %s", isLiteralBit (bytelit),  aopGet (AOP (left), offset, FALSE));
+                  regalloc_dry_run_cost += AOP_TYPE (left) == AOP_STK ? 4 : 2;
+                }
               else
                 {
-                  /* For the flags */
-                  emit3 (A_OR, ASMOP_A, ASMOP_A);
+                  cheapMove (ASMOP_A, 0, AOP (left), offset);
+                  if (bytelit != 0x0FFL)
+                    emit3_o (A_AND, ASMOP_A, 0, AOP (right), offset);
+                  else
+                    emit3 (A_OR, ASMOP_A, ASMOP_A);	/* For the flags */
                 }
               if (size || ifx)  /* emit jmp only, if it is actually used */
                 {

@@ -4625,8 +4625,9 @@ genPlusIncr (const iCode *ic)
         }
       while (icount--)
         {
-          emit2 ("inc %s", getPairName (AOP (delayed_move ? IC_LEFT (ic) : IC_RESULT (ic))));
-          regalloc_dry_run_cost += (getPairId (AOP (delayed_move ? IC_LEFT (ic) : IC_RESULT (ic))) == PAIR_IY ? 2 : 1);
+          PAIR_ID pair = delayed_move ? getPairId (AOP (IC_LEFT (ic))) : getPairId (AOP (IC_RESULT (ic)));
+          emit2 ("inc %s",  _pairs[pair].name);
+          regalloc_dry_run_cost += (pair == PAIR_IY ? 2 : 1);
         }
       if (delayed_move)
         fetchPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)));

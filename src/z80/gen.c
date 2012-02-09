@@ -4585,6 +4585,7 @@ genPlusIncr (const iCode *ic)
   /* If result is a pair */
   if (resultId != PAIR_INVALID)
     {
+      bool delayed_move;
       if (isLitWord (AOP (IC_LEFT (ic))))
         {
           fetchLitPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)), icount);
@@ -4614,17 +4615,21 @@ genPlusIncr (const iCode *ic)
       if (icount > 5)
         return FALSE;
       /* Inc a pair */
+      delayed_move == (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY && getPairId (AOP (IC_LEFT (ic))) != PAIR_INVALID && isPairDead (getPairId (AOP (IC_LEFT (ic)))));
       if (!sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
         {
           if (icount > 3)
             return FALSE;
-          fetchPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)));
+          if(!delayed_move)
+            fetchPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)));
         }
       while (icount--)
         {
           emit2 ("inc %s", getPairName (AOP (IC_RESULT (ic))));
-          regalloc_dry_run_cost += (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY ? 2 : 1);
+          regalloc_dry_run_cost += (getPairId (AOP (delayed_move ? IC_LEFT (ic) : IC_RESULT (ic))) == PAIR_IY ? 2 : 1);
         }
+      if (delayed_move)
+        fetchPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)));
       return TRUE;
     }
 

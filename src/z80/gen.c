@@ -5084,6 +5084,7 @@ genPlus (iCode * ic)
       regalloc_dry_run_cost += 1;
       if (pair_alive)
         _pop (pair);
+      goto release;
     }
     
   /* Special case:

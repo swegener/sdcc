@@ -1,5 +1,10 @@
 2012-02-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z,80/gen.c:
+	  Fix for yesterdays addition improvement.
+
+2012-02-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c,
 	  src/z80/peeph-z80.def:
 	  Minor addition improvement.

@@ -6,6 +6,10 @@
 
 #include <testfwk.h>
 
+#ifdef SDCC
+#pragma disable_warning 85
+#endif
+
 #define UCHAR   unsigned char
 #define USHORT  unsigned short
 #define PCHAR   unsigned char *

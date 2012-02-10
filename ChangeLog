@@ -1,5 +1,11 @@
 2012-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Increase flexibility of handling of register pair hl over function calls.
+
+2012-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/tests/*
 	  Added some more tests from the execute part of the gcc torture regression test suite.
 

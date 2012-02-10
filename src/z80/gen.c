@@ -254,6 +254,7 @@ static struct
     int pushed;
     int param_offset;
     int offset;
+    int pushedHL;
     int pushedBC;
     int pushedDE;
     int pushedIY;
@@ -2149,12 +2150,6 @@ fetchPair (PAIR_ID pairId, asmop * aop)
 }
 
 static void
-fetchHL (asmop * aop)
-{
-  fetchPair (PAIR_HL, aop);
-}
-
-static void
 setupPairFromSP (PAIR_ID id, int offset)
 {
   wassertl (id == PAIR_HL, "Setup relative to SP only implemented for HL");
@@ -3429,21 +3424,27 @@ assignResultValue (operand * oper)
 static void
 _restoreRegsAfterCall(void)
 {
+  if (_G.stack.pushedIY)
+    {
+      _pop (PAIR_IY);
+      _G.stack.pushedIY = FALSE;
+    }
   if (_G.stack.pushedDE)
     {
-      _pop ( PAIR_DE);
+      _pop (PAIR_DE);
       _G.stack.pushedDE = FALSE;
     }
   if (_G.stack.pushedBC)
     {
-      _pop ( PAIR_BC);
+      _pop (PAIR_BC);
       _G.stack.pushedBC = FALSE;
     }
-  if (_G.stack.pushedIY)
+  if (_G.stack.pushedHL)
     {
-      _pop ( PAIR_IY);
-      _G.stack.pushedIY = FALSE;
+      _pop (PAIR_HL);
+      _G.stack.pushedHL = FALSE;
     }
+  
   _G.saves.saved = FALSE;
 }
 
@@ -3460,7 +3461,7 @@ _saveRegsForCall(const iCode *ic, int sendSetSize, bool dontsaveIY)
       o The iPushes for other parameters occur before any addSets
 
      Logic: (to be run inside the first iPush or if none, before sending)
-      o Compute if DE and/or BC are in use over the call
+      o Compute if DE, BC, HL, IY are in use over the call
       o Compute if DE is used in the send set
       o Compute if DE and/or BC are used to hold the result value
       o If (DE is used, or in the send set) and is not used in the result, push.
@@ -3473,7 +3474,7 @@ _saveRegsForCall(const iCode *ic, int sendSetSize, bool dontsaveIY)
   */
   
   if (_G.saves.saved == FALSE) {
-    bool push_bc, push_de, push_iy;
+    bool push_bc, push_de, push_hl, push_iy;
     
     if(z80_opts.oldralloc)
       {
@@ -3493,15 +3494,21 @@ _saveRegsForCall(const iCode *ic, int sendSetSize, bool dontsaveIY)
 
         push_bc = bcInUse && !bcInRet;
         push_de = deInUse && !deInRet;
+        push_hl = FALSE;
         push_iy = FALSE;
       }
     else
       {
         push_bc = bitVectBitValue (ic->rSurv, B_IDX) || bitVectBitValue (ic->rSurv, C_IDX);
         push_de = bitVectBitValue (ic->rSurv, D_IDX) || bitVectBitValue (ic->rSurv, E_IDX);
+        push_hl = bitVectBitValue (ic->rSurv, H_IDX) || bitVectBitValue (ic->rSurv, L_IDX);
         push_iy = !dontsaveIY && (bitVectBitValue (ic->rSurv, IYH_IDX) || bitVectBitValue (ic->rSurv, IYL_IDX));
       }
 
+    if (push_hl) {
+      _push(PAIR_HL);
+      _G.stack.pushedHL = TRUE;
+    }
     if (push_bc) {
       _push(PAIR_BC);
       _G.stack.pushedBC = TRUE;
@@ -3582,10 +3589,14 @@ genIpush (const iCode * ic)
     {
       if (size == 2)
         {
-          fetchHL (AOP (IC_LEFT (ic)));
+          PAIR_ID pair = getDeadPairId (ic);
+          if (pair == PAIR_INVALID || isPairDead (PAIR_HL, ic))
+            pair = PAIR_HL; /* hl sometimes is cheaper to load than other pairs. */
+
+          fetchPair (pair, AOP (IC_LEFT (ic)));
           if(!regalloc_dry_run)
             {
-              emit2 ("push hl");
+              emit2 ("push %s", _pairs[pair].name);
               _G.stack.pushed += 2;
             }
           regalloc_dry_run_cost += 1;
@@ -3790,7 +3801,7 @@ _opUsesPair (operand * op, const iCode * ic, PAIR_ID pairId)
 static void
 emitCall (const iCode *ic, bool ispcall)
 {
-  bool bInRet, cInRet, dInRet, eInRet;
+  bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec(dtype);
 
@@ -3882,7 +3893,7 @@ emitCall (const iCode *ic, bool ispcall)
       else
         {
           spillPair (PAIR_HL);
-          fetchHL (AOP (IC_LEFT (ic)));
+          fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
           emit2 ("call __sdcc_call_hl");
         }
       freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -3997,10 +4008,12 @@ emitCall (const iCode *ic, bool ispcall)
   if (IC_RESULT (ic))
     {
       bitVect *result = z80_rUmaskForOp (IC_RESULT (ic));
-      bInRet = bitVectBitValue(result, B_IDX);
-      cInRet = bitVectBitValue(result, C_IDX);
-      dInRet = bitVectBitValue(result, D_IDX);
-      eInRet = bitVectBitValue(result, E_IDX);
+      bInRet = bitVectBitValue (result, B_IDX);
+      cInRet = bitVectBitValue (result, C_IDX);
+      dInRet = bitVectBitValue (result, D_IDX);
+      eInRet = bitVectBitValue (result, E_IDX);
+      hInRet = bitVectBitValue (result, H_IDX);
+      lInRet = bitVectBitValue (result, L_IDX);
     }
   else
     {
@@ -4008,6 +4021,8 @@ emitCall (const iCode *ic, bool ispcall)
       cInRet = FALSE;
       dInRet = FALSE;
       eInRet = FALSE;
+      hInRet = FALSE;
+      lInRet = FALSE;
     }
 
   if (_G.stack.pushedIY)
@@ -4072,6 +4087,35 @@ emitCall (const iCode *ic, bool ispcall)
           _pop (PAIR_BC);
         }
       _G.stack.pushedBC = FALSE;
+    }
+
+   if (_G.stack.pushedHL)
+    {
+      if (hInRet && lInRet)
+        {
+          wassertl (0, "Shouldn't push DE if it's wiped out by the return");
+        }
+      else if (hInRet)
+        {
+          /* Only restore E */
+          emit2 ("ld a,h");
+          regalloc_dry_run_cost += 1;
+          _pop (PAIR_HL);
+          emit2 ("ld h,a");
+          regalloc_dry_run_cost += 1;
+        }
+      else if (lInRet)
+        {
+          /* Only restore D */
+          _pop (PAIR_AF);
+          emit2 ("ld h,a");
+          regalloc_dry_run_cost += 1;
+        }
+      else
+        {
+          _pop (PAIR_HL);
+        }
+      _G.stack.pushedHL = FALSE;
     }
 }
 

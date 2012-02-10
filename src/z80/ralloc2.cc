@@ -487,6 +487,8 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
   const iCode *ic = G[i].ic;
   const i_assignment_t &ia = a.i_assignment;
 
+  const operand *left = IC_LEFT(ic);
+
   if(ia.registers[REG_A][1] < 0)
     return(true);	// Register A not in use.
 
@@ -526,6 +528,13 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
         return(true);
 
       if(ic->op == GOTO || ic->op == LABEL)
+        return(true);
+
+      if(ic->op == IPUSH && getSize(operandType(IC_LEFT(ic))) <= 2 &&
+        (operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_B, ia, i, G))||
+        operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_D, ia, i, G)) ||
+        operand_in_reg(left, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_H, ia, i, G)) ||
+        operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
         return(true);
 
       //if(i == 15) std::cout << "Not Used: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
@@ -655,7 +664,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(false);
 
   if(options.omitFramePtr)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
-	return(false);
+    return(false);
 
   if(result_only_HL && ic->op == PCALL)
     return(true);
@@ -666,7 +675,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   if(ic->op == '+' && input_in_HL && (IS_TRUE_SYMOP (result) || operand_on_stack(result, a, i, G) && exstk)) // Might use (hl) for result.
     return(false);
-    
+  
   // HL overwritten by result.
   if(result_only_HL && !POINTER_SET(ic) &&
       (ic->op == ADDRESS_OF ||
@@ -693,10 +702,17 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(true);
   if(ic->op == IPUSH && input_in_H && (getSize(operandType(IC_LEFT(ic))) <= 2 || I[ia.registers[REG_L][1]].byte == 2 && I[ia.registers[REG_H][1]].byte == 3))
     return(true);
-  if(ic->op == IPUSH && getSize(operandType(IC_LEFT(ic))) <= 2 &&
-    (operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(IC_LEFT(ic))) < 2 || operand_in_reg(left, REG_B, ia, i, G))||
-    operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && (getSize(operandType(IC_LEFT(ic))) < 2 || operand_in_reg(left, REG_D, ia, i, G)) ||
-    operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(IC_LEFT(ic))) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
+
+  if(ic->op == IPUSH && ic->next && ic->next->op == CALL)
+    return(true);
+
+  if(ic->op == IPUSH && getSize(operandType(left)) == 2 &&
+    (ia.registers[REG_C][1] < 0 && ia.registers[REG_B][1] < 0 || ia.registers[REG_E][1] < 0 && ia.registers[REG_D][1] < 0)) // Can use pair other than HL.
+    return(true);
+  if(ic->op == IPUSH && getSize(operandType(left)) <= 2 &&
+    (operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_B, ia, i, G))||
+    operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_D, ia, i, G)) ||
+    operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
     return(true);
   if(POINTER_GET(ic) && input_in_L && input_in_H && (getSize(operandType(IC_RESULT(ic))) == 1 || !result_in_HL))
     return(true);
@@ -724,8 +740,11 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(IS_VALOP(right) && ic->op == EQ_OP)
     return(true);
 
+  if(ic->op == CALL)
+    return(true);
+
   // HL overwritten by result.
-  if(result_only_HL && (ic->op == CALL || ic->op == PCALL))
+  if(result_only_HL && ic->op == PCALL)
     return(true);
 
   if(POINTER_GET(ic) && getSize(operandType(IC_RESULT(ic))) == 1 && !IS_BITVAR(getSpec(operandType(result))) &&

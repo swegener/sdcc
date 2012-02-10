@@ -138,6 +138,9 @@
 #undef OPT_DISABLE_R2K
 
 /* XXX */
+#undef OPT_DISABLE_SDBINUTILS
+
+/* XXX */
 #undef OPT_DISABLE_SDCDB
 
 /* XXX */

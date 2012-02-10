@@ -411,20 +411,6 @@ AC_SUBST(MAKEDEP)
 AC_SUBST(WALL_FLAG)
 AC_SUBST(C99_FLAG)
 
-# does AR accept the -S flag
-touch $$.tmp
-$AR -qc conftest.ar $$.tmp
-rm $$.tmp
-AC_MSG_CHECKING([whether $AR accepts -S])
-bor_EXECUTE_IFELSE([$AR -S -t conftest.ar],
-  [AC_MSG_RESULT([yes])
-    AR_S_FLAG="-S"],
-  [AC_MSG_RESULT([no])
-    AR_S_FLAG=""])
-rm conftest.ar
-AC_SUBST(AR_S_FLAG)
-
-
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
 AC_TYPE_SIGNAL
@@ -827,6 +813,7 @@ AC_DO_DISABLER(device-lib, DEVICE_LIB, [Disables building device libraries])
 AC_DO_DISABLER(packihx,    PACKIHX,    [Disables building packihx])
 AC_DO_DISABLER(sdcpp,      SDCPP,      [Disables building sdcpp])
 AC_DO_DISABLER(sdcdb,      SDCDB,      [Disables building sdcdb])
+AC_DO_DISABLER(sdbinutils, SDBINUTILS, [Disables configuring and building of sdbinutils])
 
 AC_DO_ENABLER(doc,   DOC,   [Enables building the documentation])
 AC_CHECK_PROG([LYX],        [lyx],        [lyx],        [:])
@@ -863,6 +850,7 @@ test $OPT_DISABLE_SDCPP   = 0 && AC_CONFIG_SUBDIRS(support/cpp)
 test $OPT_DISABLE_PACKIHX = 0 && AC_CONFIG_SUBDIRS(support/packihx)
 test $OPT_DISABLE_UCSIM   = 0 && AC_CONFIG_SUBDIRS(sim/ucsim)
 test $OPT_DISABLE_SDCDB   = 0 && AC_CONFIG_SUBDIRS(debugger/mcs51)
+test $OPT_DISABLE_SDBINUTILS = 0 && AC_CONFIG_SUBDIRS(support/sdbinutils)
 AC_CONFIG_FILES([doc/Makefile])
 
 test $OPT_DISABLE_AVR = 0 && AC_CONFIG_FILES([src/avr/Makefile])
@@ -999,6 +987,7 @@ sdcc ${VERSION} is now configured for
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
   Disable sdcpp:        ${OPT_DISABLE_SDCPP}
   Disable sdcdb:        ${OPT_DISABLE_SDCDB}
+  Disable sdbinutil:    ${OPT_DISABLE_SDBINUTILS}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 

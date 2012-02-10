@@ -1,7 +1,23 @@
-2012-02-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-02-10 Borut Razem <borut.razem AT gmail.com>
+
+	* configure, Makefile.in, configure.in, sdccconf_in.h,
+	  device/lib/z180/Makefile.in, device/lib/small/Makefile.in,
+	  device/lib/z80/Makefile.in, device/lib/gbz80/Makefile.in,
+	  device/lib/ds390/Makefile.in, device/lib/medium/Makefile.in,
+	  device/lib/Makefile.in, device/lib/ds400/Makefile.in,
+	  device/lib/mcs51/Makefile.in, device/lib/huge/Makefile.in,
+	  device/lib/large/Makefile.in, device/lib/r2k/Makefile.in,
+	  device/lib/hc08/Makefile.in, Makefile.common.in,
+	  support/scripts/sdcc.nsi, support/sdbinutils/*:
+	  device/lib/z180/Makefileadded sdbinutils: sdar and sdranlib
+	* device/lib/z180/Makefile:
+	  deleted, generated from device/lib/z180/Makefile.in
+
+2012-02-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z,80/gen.c:
-	  Fix for yesterdays addition improvement, decide in which pair to increment in code generator instead of peephole optimizer.
+	  Fix for yesterdays addition improvement, decide in which pair
+          to increment in code generator instead of peephole optimizer.
 
 2012-02-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

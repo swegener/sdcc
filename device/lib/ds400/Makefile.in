@@ -1,12 +1,12 @@
+# libc/ds400 Makefile
+
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
 
-AR_S            = @AR@ @AR_S_FLAG@
-
 LIB_TYPE     = @LIB_TYPE@
 
-CC = ../../../bin/sdcc
+CC = $(top_builddir)/bin/sdcc
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/ds400
@@ -32,14 +32,13 @@ distclean: clean
 $(PORTDIR)/libds400.lib: $(OBJECTS)
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	../../../bin/sdcclib -a $@ $(OBJECTS)
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(AR_S) -cq $@ $(OBJECTS)
+	$(top_builddir)/bin/sdar -rcS $@ $(OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(AR_S) -cq $@ $(OBJECTS)
-	$(top_builddir)/bin/sdranlib $@
+	$(top_builddir)/bin/sdar -rc $@ $(OBJECTS)
     else
 	rm -f $@;
 	for libfile in $(basename $(OBJECTS)); do echo $$libfile >>$@; done

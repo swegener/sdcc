@@ -10,7 +10,6 @@ VERSIONP        = @VERSIONP@
 SHELL           = /bin/sh
 INSTALL         = @INSTALL@
 CP              = @CP@
-AR_S            = @AR@ @AR_S_FLAG@
 
 LIB_TYPE        = @LIB_TYPE@
 
@@ -259,14 +258,13 @@ objects-xa51:
 
 $(PORTDIR)/lib$(PORT).lib: $(XA51OBJECTS)
 ifeq ($(LIB_TYPE), SDCCLIB)
-	../../bin/sdcclib -a $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
+	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(AR_S) -q $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
+	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(AR_S) -q $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
-	$(top_builddir)/bin/sdranlib $(PORTDIR)/lib$(PORT).lib
+	$(top_builddir)/bin/sdar -rc $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
     else
 	rm -f $(PORTDIR)/lib$(PORT).lib
 	for i in $(notdir $(basename $(XA51OBJECTS))); do echo $$i >> $(PORTDIR)/lib$(PORT).lib; done
@@ -363,46 +361,46 @@ port-specific-objects-pic14:
 ifeq ($(LIB_TYPE), SDCCLIB)
 
 $(PORTDIR)/libfloat.lib: $(OBJECTS_FLOAT)
-	../../bin/sdcclib -a $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
+	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
 
 $(PORTDIR)/libint.lib: $(OBJECTS_INT)
-	../../bin/sdcclib -a $(PORTDIR)/libint.lib $(OBJECTS_INT)
+	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/libint.lib $(OBJECTS_INT)
 
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
-	../../bin/sdcclib -a $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
+	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
-	../../bin/sdcclib -a $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
+	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 
 else
   ifeq ($(LIB_TYPE), AR)
 
 $(PORTDIR)/libfloat.lib: $(OBJECTS_FLOAT)
-	$(AR_S) -cq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
+	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
 
 $(PORTDIR)/libint.lib: $(OBJECTS_INT)
-	$(AR_S) -cq $(PORTDIR)/libint.lib $(OBJECTS_INT)
+	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/libint.lib $(OBJECTS_INT)
 
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
-	$(AR_S) -cq $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
+	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
-	$(AR_S) -cq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
+	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 
   else
     ifeq ($(LIB_TYPE), RANLIB)
 
 $(PORTDIR)/libfloat.lib: $(OBJECTS_FLOAT)
-	$(AR_S) -cq $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT); $(top_builddir)/bin/sdranlib $(PORTDIR)/libfloat.lib
+	$(top_builddir)/bin/sdar -rc $(PORTDIR)/libfloat.lib $(OBJECTS_FLOAT)
 
 $(PORTDIR)/libint.lib: $(OBJECTS_INT)
-	$(AR_S) -cq $(PORTDIR)/libint.lib $(OBJECTS_INT); $(top_builddir)/bin/sdranlib $(PORTDIR)/libint.lib
+	$(top_builddir)/bin/sdar -rc $(PORTDIR)/libint.lib $(OBJECTS_INT)
 
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
-	$(AR_S) -cq $(PORTDIR)/liblong.lib $(OBJECTS_LONG); $(top_builddir)/bin/sdranlib $(PORTDIR)/liblong.lib
+	$(top_builddir)/bin/sdar -rc $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
-	$(AR_S) -cq $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC); $(top_builddir)/bin/sdranlib $(PORTDIR)/libsdcc.lib
+	$(top_builddir)/bin/sdar -rc $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 
     else
 

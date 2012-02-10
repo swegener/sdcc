@@ -1,12 +1,12 @@
+# libc/mcs51 Makefile
+
 VPATH  = @srcdir@
 srcdir = @srcdir@
 
 top_srcdir   = @top_srcdir@
 top_builddir = @top_builddir@
 
-AR_S            = @AR@ @AR_S_FLAG@
-
-LIB_TYPE        = @LIB_TYPE@
+LIB_TYPE     = @LIB_TYPE@
 SAS = $(top_builddir)/bin/sdas8051
 SCC = $(top_builddir)/bin/sdcc
 
@@ -31,14 +31,13 @@ all: $(PORTDIR)/$(LIB)
 $(PORTDIR)/$(LIB): $(OBJ) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	../../../bin/sdcclib -a $@ $(OBJ)
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(AR_S) -cq $@ $(OBJ)
+	$(top_builddir)/bin/sdar -rcS $@ $(OBJ)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(AR_S) -cq $@ $(OBJ)
-	$(top_builddir)/bin/sdranlib $@
+	$(top_builddir)/bin/sdar -rc $@ $(OBJ)
     else
 	rm -f $@
 	for i in $(basename $(OBJ)); do echo $$i >>$@; done

@@ -4,14 +4,10 @@ VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
 
-AR_S            = @AR@ @AR_S_FLAG@
+LIB_TYPE     = @LIB_TYPE@
 
-LIB_TYPE        = @LIB_TYPE@
-
-TOPDIR = ../../..
-
-SCC = $(TOPDIR)/bin/sdcc -mhc08
-SAS = $(TOPDIR)/bin/sdas6808
+SCC = $(top_builddir)/bin/sdcc -mhc08
+SAS = $(top_builddir)/bin/sdas6808
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/hc08
@@ -55,14 +51,13 @@ all: $(PORTDIR)/$(LIB)
 $(PORTDIR)/$(LIB): $(OBJ) $(HC08OBJECTS) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	../../../bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(AR_S) -cq $@ $(OBJ) $(HC08OBJECTS)
+	$(top_builddir)/bin/sdar -rcS $@ $(OBJ) $(HC08OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(AR_S) -cq $@ $(OBJ) $(HC08OBJECTS)
-	$(top_builddir)/bin/sdranlib $@
+	$(top_builddir)/bin/sdar -rc $@ $(OBJ) $(HC08OBJECTS)
     else
 	rm -f $@
 	for i in $(basename $(OBJ) $(HC08OBJECTS)); do echo $$i >>$@; done

@@ -1,17 +1,13 @@
-# libc/z80 Makefile
+# libc/z180 Makefile
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
 
-AR_S            = @AR@ @AR_S_FLAG@
+LIB_TYPE     = @LIB_TYPE@
 
-LIB_TYPE        = @LIB_TYPE@
-
-TOPDIR = ../../..
-
-SCC = $(TOPDIR)/bin/sdcc -mz180
-SAS = $(TOPDIR)/bin/sdasz80
+SCC = $(top_builddir)/bin/sdcc -mz180
+SAS = $(top_builddir)/bin/sdasz80
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/z180
@@ -55,14 +51,13 @@ $(PORTDIR)/crt0.rel: crt0.rel
 $(PORTDIR)/$(LIB): $(OBJ) $(Z8OBJECTS) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	../../../bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(AR_S) -cq $@ $(OBJ) $(Z8OBJECTS)
+	$(top_builddir)/bin/sdar -rcS $@ $(OBJ) $(Z8OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(AR_S) -cq $@ $(OBJ) $(Z8OBJECTS)
-	$(top_builddir)/bin/sdranlib $@
+	$(top_builddir)/bin/sdar -rc $@ $(OBJ) $(Z8OBJECTS)
     else
 	rm -f $@; \
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done

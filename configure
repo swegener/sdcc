@@ -611,6 +611,7 @@ PDFLATEX
 LATEX2HTML
 LYX
 OPT_ENABLE_DOC
+OPT_DISABLE_SDBINUTILS
 OPT_DISABLE_SDCDB
 OPT_DISABLE_SDCPP
 OPT_DISABLE_PACKIHX
@@ -634,7 +635,6 @@ non_free_include_dir_suffix
 include_dir_suffix
 LIB_TYPE
 sdccconf_h_dir_separator
-AR_S_FLAG
 C99_FLAG
 WALL_FLAG
 MAKEDEP
@@ -729,6 +729,7 @@ enable_device_lib
 enable_packihx
 enable_sdcpp
 enable_sdcdb
+enable_sdbinutils
 enable_doc
 enable_libgc
 '
@@ -756,6 +757,7 @@ ac_subdirs_all='support/cpp
 support/packihx
 sim/ucsim
 debugger/mcs51
+support/sdbinutils
 device/lib/pic14 device/non-free/lib/pic14
 device/lib/pic16 device/non-free/lib/pic16'
 
@@ -1388,6 +1390,7 @@ Optional Features:
   --disable-packihx       Disables building packihx
   --disable-sdcpp         Disables building sdcpp
   --disable-sdcdb         Disables building sdcdb
+  --disable-sdbinutils    Disables configuring and building of sdbinutils
   --enable-doc            Enables building the documentation
   --enable-libgc          Use the Bohem memory allocator. Lower runtime
                           footprint.
@@ -5114,52 +5117,6 @@ fi
 
 
 
-# does AR accept the -S flag
-touch $$.tmp
-$AR -qc conftest.ar $$.tmp
-rm $$.tmp
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $AR accepts -S" >&5
-$as_echo_n "checking whether $AR accepts -S... " >&6; }
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if { { ac_try="$AR -S -t conftest.ar "
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$AR -S -t conftest.ar ") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } > conftest.out && {
-	 test ! -s conftest.err
-       }; then :
-  ac_retval=0
-else
-  ac_retval=1
-fi
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-  if test "$ac_retval" = 0; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-    AR_S_FLAG="-S"
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    AR_S_FLAG=""
-fi
-rm conftest.err conftest.out
-
-rm conftest.ar
-
-
-
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking return type of signal handlers" >&5
@@ -6700,6 +6657,28 @@ _ACEOF
 
 
 
+  # Check whether --enable-sdbinutils was given.
+if test "${enable_sdbinutils+set}" = set; then :
+  enableval=$enable_sdbinutils;
+fi
+
+
+      arg1=`echo sdbinutils | sed s/-/_/`
+
+  if test "`eval echo \\$enable_$arg1`" = "no"; then
+    OPT_DISABLE_SDBINUTILS=1
+  else
+    OPT_DISABLE_SDBINUTILS=0
+  fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_SDBINUTILS $OPT_DISABLE_SDBINUTILS
+_ACEOF
+
+
+
+
 
   # Check whether --enable-doc was given.
 if test "${enable_doc+set}" = set; then :
@@ -7022,6 +7001,8 @@ test $OPT_DISABLE_PACKIHX = 0 && subdirs="$subdirs support/packihx"
 test $OPT_DISABLE_UCSIM   = 0 && subdirs="$subdirs sim/ucsim"
 
 test $OPT_DISABLE_SDCDB   = 0 && subdirs="$subdirs debugger/mcs51"
+
+test $OPT_DISABLE_SDBINUTILS = 0 && subdirs="$subdirs support/sdbinutils"
 
 ac_config_files="$ac_config_files doc/Makefile"
 
@@ -8836,6 +8817,7 @@ sdcc ${VERSION} is now configured for
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
   Disable sdcpp:        ${OPT_DISABLE_SDCPP}
   Disable sdcdb:        ${OPT_DISABLE_SDCDB}
+  Disable sdbinutil:    ${OPT_DISABLE_SDBINUTILS}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 
@@ -8896,6 +8878,7 @@ sdcc ${VERSION} is now configured for
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
   Disable sdcpp:        ${OPT_DISABLE_SDCPP}
   Disable sdcdb:        ${OPT_DISABLE_SDCDB}
+  Disable sdbinutil:    ${OPT_DISABLE_SDBINUTILS}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 

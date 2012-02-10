@@ -1,5 +1,5 @@
 #
-#
+# sdcc project main Makefile
 #
 
 SHELL           = /bin/sh
@@ -20,68 +20,79 @@ SDCC_EXTRA      = support/regression support/valdiag
 
 SDCC_PACKIHX    = support/packihx
 SDCC_LIBRARIAN  = support/librarian
-SDCC_SDRANLIB   = support/sdranlib
+####SDCC_SDRANLIB   = support/sdranlib
+SDCC_SDBINUTILS = support/sdbinutils
 
-TARGETS         = sdcc-librarian sdcc-sdranlib
+####TARGETS         = sdcc-librarian sdcc-sdranlib
+TARGETS         = sdcc-librarian
 
 ifeq ($(OPT_DISABLE_HC08), 0)
-SDCC_AS         += sdas/as6808
-SDCC_LD         += sdcc-ld6808
+SDCC_AS        += sdas/as6808
+SDCC_LD        += sdcc-ld6808
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)
-SDCC_AS         += sdas/as8051
-SDCC_LD         += sdcc-ld8051
-SDCC_MISC       += debugger/mcs51
+SDCC_AS        += sdas/as8051
+SDCC_LD        += sdcc-ld8051
+SDCC_MISC      += debugger/mcs51
 endif
 
 ifeq ($(OPT_DISABLE_Z80), 0)
-SDCC_AS         += sdas/asz80
-SDCC_LD         += sdcc-ldz80
+SDCC_AS        += sdas/asz80
+SDCC_LD        += sdcc-ldz80
 endif
 
 ifeq ($(OPT_DISABLE_R2K), 0)
-SDCC_AS         += sdas/asrab
-SDCC_LD         += sdcc-ldz80
+SDCC_AS        += sdas/asrab
+SDCC_LD        += sdcc-ldz80
 endif
 
 ifeq ($(OPT_DISABLE_GBZ80), 0)
-SDCC_AS         += sdas/asgb
-SDCC_LD         += sdcc-ldgb
+SDCC_AS        += sdas/asgb
+SDCC_LD        += sdcc-ldgb
 endif
 
 ifeq ($(OPT_DISABLE_UCSIM), 0)
-TARGETS         += sdcc-misc
-SDCC_MISC       += sim/ucsim
-PKGS            += $(SDCC_MISC)
+TARGETS        += sdcc-misc
+SDCC_MISC      += sim/ucsim
+PKGS           += $(SDCC_MISC)
+endif
+
+ifeq ($(OPT_DISABLE_SDBINUTILS), 0)
+TARGETS        += sdcc-sdbinutils
+PKGS           += $(SDCC_SDBINUTILS)
 endif
 
 ifeq ($(OPT_DISABLE_DEVICE_LIB), 0)
-TARGETS         += sdcc-device-lib
-PKGS            += device/lib device/non-free/lib
+TARGETS        += sdcc-device-lib
+PKGS           += device/lib device/non-free/lib
 endif
 
 ifeq ($(OPT_DISABLE_PACKIHX), 0)
-TARGETS         += sdcc-packihx
-PKGS            += $(SDCC_PACKIHX)
+TARGETS        += sdcc-packihx
+PKGS           += $(SDCC_PACKIHX)
 endif
 
 ifeq ($(OPT_ENABLE_DOC), 1)
-TARGETS         += sdcc-doc
+TARGETS        += sdcc-doc
 endif
 # always install docs, which don't need to be built 
 PKGS            += $(SDCC_DOC)
 
 ifeq ($(OPT_DISABLE_SDCPP), 0)
-SDCC_LIBS       += support/cpp
+SDCC_LIBS      += support/cpp
 endif
 
-TARGETS         += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
+TARGETS        += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
 
-PKGS            += $(SDCC_LIBS) src device/include device/non-free/include $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_SDRANLIB) $(SDCC_SCRIPTS)
+####PKGS           += $(SDCC_LIBS) src device/include device/non-free/include \
+####                  $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) \
+####                  $(SDCC_SDRANLIB) $(SDCC_SDBINUTILS) $(SDCC_SCRIPTS)
 
-PKGS_TINI       = $(SDCC_LIBS) $(SDCC_AS) sdas/linksrc \
-                  src device/include device/non-free/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
+PKGS           += $(SDCC_LIBS) src device/include device/non-free/include \
+                  $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) \
+                  $(SDCC_SDBINUTILS) $(SDCC_SCRIPTS)
+
 PORTS           = $(shell cat ports.build)
 ALLPORTS        = $(shell cat ports.all)
 
@@ -115,8 +126,12 @@ sdcc-packihx:
 sdcc-librarian:
 	$(MAKE) -C $(SDCC_LIBRARIAN)
 
-sdcc-sdranlib:
-	$(MAKE) -C $(SDCC_SDRANLIB)
+####sdcc-sdranlib:
+####	$(MAKE) -C $(SDCC_SDRANLIB)
+
+sdcc-sdbinutils:
+	$(MAKE) -C $(SDCC_SDBINUTILS)
+	cp $(SDCC_SDBINUTILS)/binutils/sdar $(SDCC_SDBINUTILS)/binutils/sdranlib bin
 
 sdcc-device-inc:
 	$(MAKE) -C device/include
@@ -137,7 +152,8 @@ sdcc-doc:
 
 sdcc: $(TARGETS)
 
-sdcc-tini: sdcc-librarian sdcc-sdranlib sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
+####sdcc-tini: sdcc-librarian sdcc-sdranlib sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
+sdcc-tini: sdcc-librarian sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules
@@ -153,15 +169,6 @@ install: checkconf sdcc
 	  $(MAKE) -C $$pkg install ;\
 	done
 
-install-tini: checkconf sdcc
-	$(MAKE) -f main.mk install
-	@for pkg in $(PKGS_TINI); do\
-	  $(MAKE) -C $$pkg install ;\
-	done
-	$(MAKE) -C device/lib install
-
-
-
 # Deleting all the installed files
 # --------------------------------
 uninstall:
@@ -169,7 +176,6 @@ uninstall:
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg uninstall ;\
 	done
-
 
 # Deleting all files created by building the program
 # --------------------------------------------------
@@ -202,7 +208,6 @@ mostlyclean: clean
 	  $(MAKE) -C $$pkg PORTS="$(PORTS)" EXEEXT=$(EXEEXT) mostlyclean ;\
 	done
 
-
 # Deleting everything that can reconstructed by this Makefile. It deletes
 # everything deleted by distclean plus files created by bison, stc.
 # -----------------------------------------------------------------------
@@ -211,7 +216,6 @@ realclean: distclean
 	for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg PORTS="$(PORTS)" EXEEXT=$(EXEEXT) realclean ;\
 	done
-
 
 # Creating distribution
 # ---------------------
@@ -222,16 +226,13 @@ dist: distclean
 	  mkdist sdcc;\
 	fi
 
-
 # Performing self-test
 # --------------------
 check:
 
-
 # Performing installation test
 # ----------------------------
 installcheck:
-
 
 # Creating dependencies
 # ---------------------
@@ -240,7 +241,6 @@ dep: $(SDCC_LIBS)
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg dep ;\
 	done
-
 
 # My rules
 # --------
@@ -256,7 +256,6 @@ newer: distclean
 
 putcopyright:
 	'put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
-
 
 # Remaking configuration
 # ----------------------

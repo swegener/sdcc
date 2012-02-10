@@ -1,3 +1,5 @@
+# libc/huge Makefile
+
 all:
 	$(MAKE) -C ../mcs51 all
 	cp ../mcs51/*.rel .

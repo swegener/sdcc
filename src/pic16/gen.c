@@ -6510,6 +6510,67 @@ static void genGetHbit (iCode *ic)
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
+static void genGetABit (iCode *ic)
+{
+  operand *left, *right, *result;
+  int shCount;
+  int offset;
+  int i;
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+
+  pic16_aopOp (left, ic, FALSE);
+  pic16_aopOp (right, ic, FALSE);
+  pic16_aopOp (result, ic, TRUE);
+
+  shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+  offset = shCount / 8;
+  shCount %= 8;
+
+  /* load and mask the source byte */
+  pic16_mov2w (AOP (left), offset);
+  pic16_emitpcode (POC_ANDLW, pic16_popGetLit (1 << shCount));
+
+  /* move selected bit to bit 0 */
+  switch (shCount)
+    {
+      case 0:
+          /* nothing more to do */
+          break;
+      case 1:
+          /* shift bit 1 into bit 0 */
+          pic16_emitpcode (POC_RRNCFW, pic16_popCopyReg (&pic16_pc_wreg));
+          break;
+      case 4:
+          /* shift bit 4 into bit 0 */
+          pic16_emitpcode (POC_SWAPFW, pic16_popCopyReg (&pic16_pc_wreg));
+          break;
+      case 7:
+          /* shift bit 7 into bit 0 */
+          pic16_emitpcode (POC_RLNCFW, pic16_popCopyReg (&pic16_pc_wreg));
+          break;
+      default:
+          /* keep W==0, force W=0x01 otherwise */
+          emitSKPZ;
+          pic16_emitpcode (POC_MOVLW, pic16_popGetLit (1));
+          break;
+    } // switch
+
+  /* write result */
+  pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP (result), 0));
+
+  for (i = 1; i < AOP_SIZE (result); ++i)
+    {
+      pic16_emitpcode (POC_CLRF, pic16_popGet (AOP (result), i));
+    } // for
+
+  pic16_freeAsmop (left, NULL, ic, TRUE);
+  pic16_freeAsmop (right, NULL, ic, TRUE);
+  pic16_freeAsmop (result, NULL, ic, TRUE);
+}
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* AccRol - rotate left accumulator by known count                 */
@@ -10285,6 +10346,10 @@ void genpic16Code (iCode *lic)
           genRLC (ic);
           break;
 
+        case GETABIT:
+          genGetABit (ic);
+          break;
+
         case GETHBIT:
           genGetHbit (ic);
           break;
@@ -10337,6 +10402,7 @@ void genpic16Code (iCode *lic)
           break;
 
         default :
+          fprintf(stderr, "UNHANDLED iCode: "); piCode(ic, stderr);
           ic = ic;
       }
     }

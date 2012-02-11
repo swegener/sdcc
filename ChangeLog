@@ -1,3 +1,11 @@
+2012-02-12 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/gen.c (genGetABit, genpic14Code),
+	  src/pic14/main.c (hasExtBitOp),
+	  src/pic16/gen.c (genGetABit, genpic16Code),
+	  src/pic16/main.c (hasExtBitOp):
+	  implement GETABIT iCode, fixes #2986039
+
 2012-02-11 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/signal.h:

@@ -1065,6 +1065,7 @@ hasExtBitOp (int op, int size)
 {
   if (op == RRC
       || op == RLC
+      || op == GETABIT
       /* || op == GETHBIT */ /* GETHBIT doesn't look complete for PIC */
      )
     return TRUE;

@@ -4590,6 +4590,55 @@ static void genRLC (iCode *ic)
     freeAsmop(result,NULL,ic,TRUE);
 }
 
+static void genGetABit (iCode *ic)
+{
+  operand *left, *right, *result;
+  int shCount;
+  int offset;
+  int i;
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+
+  aopOp (left, ic, FALSE);
+  aopOp (right, ic, FALSE);
+  aopOp (result, ic, TRUE);
+
+  shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+  offset = shCount / 8;
+  shCount %= 8;
+
+  /* load and mask the source byte */
+  mov2w (AOP (left), offset);
+  emitpcode (POC_ANDLW, popGetLit (1 << shCount));
+
+  /* move selected bit to bit 0 */
+  switch (shCount)
+    {
+      case 0:
+          /* nothing more to do */
+          break;
+      default:
+          /* keep W==0, force W=0x01 otherwise */
+          emitSKPZ;
+          emitpcode (POC_MOVLW, popGetLit (1));
+          break;
+    } // switch
+
+  /* write result */
+  emitpcode (POC_MOVWF, popGet (AOP (result), 0));
+
+  for (i = 1; i < AOP_SIZE (result); ++i)
+    {
+      emitpcode (POC_CLRF, popGet (AOP (result), i));
+    } // for
+
+  freeAsmop (left, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
+}
+
 /*-----------------------------------------------------------------*/
 /* genGetHbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
@@ -7076,6 +7125,10 @@ void genpic14Code (iCode *lic)
 
         case RLC:
             genRLC (ic);
+            break;
+
+        case GETABIT:
+            genGetABit (ic);
             break;
 
         case GETHBIT:

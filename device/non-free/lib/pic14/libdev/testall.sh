@@ -27,10 +27,16 @@ trap "cleanup" INT;
 cat > sample.c <<EOT
 #include <pic14regs.h>
 
+void foo(char *c)
+{
+  if (*c)
+    *c = 1;
+}
+
 void main()
 {
-  TRISA = 0x00;
-  PORTA = 0x55;
+  OPTION_REG = PCLATH;
+  INTCON = 0;
 }
 EOT
 

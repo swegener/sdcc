@@ -2,6 +2,8 @@
 
 	* support/regression/tests/gcc-torture-execute-pr20601-1.c:
 	  Disabled test for host, since _Noreturn support is required.
+	* support/regression/tests/gcc-torture-execute-pr23047.c:
+	  Removed test, since it seems to test for implementation-defined behaviour.
 
 2012-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

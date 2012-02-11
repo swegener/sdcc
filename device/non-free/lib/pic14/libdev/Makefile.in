@@ -21,7 +21,16 @@ PIC14_ENHANCED = \
     pic16f1455.c \
     pic16f1458.c \
     pic16f1459.c \
+    pic16f1503.c \
     pic16f1507.c \
+    pic16f1508.c \
+    pic16f1509.c \
+    pic16f1516.c \
+    pic16f1517.c \
+    pic16f1518.c \
+    pic16f1519.c \
+    pic16f1526.c \
+    pic16f1527.c \
     pic16f1782.c \
     pic16f1783.c \
     pic16f1823.c \

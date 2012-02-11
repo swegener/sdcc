@@ -1060,10 +1060,10 @@ processor 12f683
 #
 
 processor 16f1455, 16lf1455
-        program         0
-        data            0
+        program         8K
+        data            512
         eeprom          0
-        io              0
+        io              12
         enhanced        1
         maxram          0x07f
         bankmsk         0xf80
@@ -1073,10 +1073,10 @@ processor 16f1455, 16lf1455
         memmap          0x70 0x7f 0xf80
 
 processor 16f1458, 16lf1458
-        program         0
-        data            0
+        program         4K
+        data            512
         eeprom          0
-        io              0
+        io              18
         enhanced        1
         maxram          0x07f
         bankmsk         0xf80
@@ -1086,10 +1086,10 @@ processor 16f1458, 16lf1458
         memmap          0x70 0x7f 0xf80
 
 processor 16f1459, 16lf1459
-        program         0
-        data            0
+        program         8K
+        data            1024
         eeprom          0
-        io              0
+        io              18
         enhanced        1
         maxram          0x07f
         bankmsk         0xf80
@@ -1098,12 +1098,129 @@ processor 16f1459, 16lf1459
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1507
+processor 16f1503, 16lf1503
+        program         2K
+        data            128
+        eeprom          0
+        enhanced        1
+        io              12
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1507, 16lf1507
         program         2K
         data            128
         eeprom          0
         enhanced        1
         io              18
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1508, 16lf1508
+        program         4K
+        data            256
+        eeprom          0
+        enhanced        1
+        io              18
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1509, 16lf1509
+        program         8K
+        data            512
+        eeprom          0
+        enhanced        1
+        io              18
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1516, 16lf1516
+        program         8K
+        data            512
+        eeprom          0
+        enhanced        1
+        io              25
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1517, 16lf1517
+        program         8K
+        data            512
+        eeprom          0
+        enhanced        1
+        io              36
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1518, 16lf1518
+        program         16K
+        data            1024
+        eeprom          0
+        enhanced        1
+        io              25
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1519, 16lf1519
+        program         16K
+        data            1024
+        eeprom          0
+        enhanced        1
+        io              36
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1526, 16lf1526
+        program         8K
+        data            768
+        eeprom          0
+        enhanced        1
+        io              55
+        maxram          0x07f
+        bankmsk         0xf80
+        config          0x8007 0x8008
+        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+        memmap          0x20 0x6f 0x000
+        memmap          0x70 0x7f 0xf80
+
+processor 16f1527, 16lf1527
+        program         16K
+        data            1536
+        eeprom          0
+        enhanced        1
+        io              55
         maxram          0x07f
         bankmsk         0xf80
         config          0x8007 0x8008
@@ -1138,7 +1255,7 @@ processor 16f1783, 16lf1783
         memmap          0x70 0x7f 0xf80
 
 # PICxxF182x family
-processor 12f1822
+processor 12f1822, 12lf1822
         program         2K
         data            128
         eeprom          256
@@ -1151,7 +1268,7 @@ processor 12f1822
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1823
+processor 16f1823, 16lf1823
         program         2K
         data            128
         eeprom          256
@@ -1164,7 +1281,7 @@ processor 16f1823
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1824
+processor 16f1824, 16lf1824
         program         4K
         data            256
         eeprom          256
@@ -1177,7 +1294,7 @@ processor 16f1824
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1825
+processor 16f1825, 16lf1825
         program         8K
         data            1024
         eeprom          256
@@ -1190,7 +1307,7 @@ processor 16f1825
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1826
+processor 16f1826, 16lf1826
         program         2K
         data            256
         eeprom          256
@@ -1203,7 +1320,7 @@ processor 16f1826
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1827
+processor 16f1827, 16lf1827
         program         4K
         data            384
         eeprom          256
@@ -1216,7 +1333,7 @@ processor 16f1827
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1828
+processor 16f1828, 16lf1828
         program         4K
         data            256
         eeprom          256
@@ -1229,7 +1346,7 @@ processor 16f1828
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1829
+processor 16f1829, 16lf1829
         program         8K
         data            1024
         eeprom          256
@@ -1243,7 +1360,7 @@ processor 16f1829
         memmap          0x70 0x7f 0xf80
 
 # PICxxF184x family
-processor 12f1840
+processor 12f1840, 12lf1840
         program         4K
         data            256
         eeprom          256
@@ -1256,7 +1373,7 @@ processor 12f1840
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1847
+processor 16f1847, 16lf1847
         program         8K
         data            1024
         eeprom          256
@@ -1336,7 +1453,7 @@ processor 16lf1907
         memmap          0x70 0x7f 0xf80
 
 # PIC16F193x family
-processor 16f1933
+processor 16f1933, 16lf1933
         program         4K
         data            256
         eeprom          256
@@ -1349,7 +1466,7 @@ processor 16f1933
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1934
+processor 16f1934, 16lf1934
         program         4K
         data            256
         eeprom          256
@@ -1362,7 +1479,7 @@ processor 16f1934
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1936
+processor 16f1936, 16lf1936
         program         8K
         data            512
         eeprom          256
@@ -1375,7 +1492,7 @@ processor 16f1936
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1937
+processor 16f1937, 16lf1937
         program         8K
         data            512
         eeprom          256
@@ -1388,7 +1505,7 @@ processor 16f1937
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1938
+processor 16f1938, 16lf1938
         program         16K
         data            1024
         eeprom          256
@@ -1401,7 +1518,7 @@ processor 16f1938
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16f1939
+processor 16f1939, 16lf1939
         program         16K
         data            1024
         eeprom          256
@@ -1413,3 +1530,29 @@ processor 16f1939
         regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
+
+#processor 16f1946, 16lf946
+#        program         8K
+#        data            512
+#        eeprom          256
+#        enhanced        1
+#        io              53
+#        maxram          0x07f
+#        bankmsk         0xf80
+#        config          0x8007 0x8008
+#        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+#        memmap          0x20 0x6f 0x000
+#        memmap          0x70 0x7f 0xf80
+#
+#processor 16f1947, 16lf947
+#        program         16K
+#        data            1024
+#        eeprom          256
+#        enhanced        1
+#        io              53
+#        maxram          0x07f
+#        bankmsk         0xf80
+#        config          0x8007 0x8008
+#        regmap          0xf80 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b
+#        memmap          0x20 0x6f 0x000
+#        memmap          0x70 0x7f 0xf80

@@ -1,3 +1,31 @@
+2012-02-11 Borut Razem <borut.razem AT gmail.com>
+
+	* device/include/pic14/pic14devices.txt,
+	  device/non-free/include/pic14/pic16f1503.h,
+	  device/non-free/include/pic14/pic16f1507.h,
+	  device/non-free/include/pic14/pic16f1508.h,
+	  device/non-free/include/pic14/pic16f1509.h,
+	  device/non-free/include/pic14/pic16f1516.h,
+	  device/non-free/include/pic14/pic16f1517.h,
+	  device/non-free/include/pic14/pic16f1518.h,
+	  device/non-free/include/pic14/pic16f1519.h,
+	  device/non-free/include/pic14/pic16f1526.h,
+	  device/non-free/include/pic14/pic16f1527.h,
+	  device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/pic16f1503.c,
+	  device/non-free/lib/pic14/libdev/pic16f1507.c,
+	  device/non-free/lib/pic14/libdev/pic16f1508.c,
+	  device/non-free/lib/pic14/libdev/pic16f1509.c,
+	  device/non-free/lib/pic14/libdev/pic16f1516.c,
+	  device/non-free/lib/pic14/libdev/pic16f1517.c,
+	  device/non-free/lib/pic14/libdev/pic16f1518.c,
+	  device/non-free/lib/pic14/libdev/pic16f1519.c,
+	  device/non-free/lib/pic14/libdev/pic16f1526.c,
+	  device/non-free/lib/pic14/libdev/pic16f1527.c:
+	  applied patch #3471142: [PIC14] more enchanced core devices,
+	  thanks to Gal Zsolt
+
 2012-02-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-pr20601-1.c:

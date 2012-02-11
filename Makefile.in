@@ -9,6 +9,8 @@ srcdir          = @srcdir@
 top_builddir    = @top_builddir@
 top_srcdir      = @top_srcdir@
 
+EXEEXT          = @EXEEXT@
+
 include Makefile.common
 
 SDCC_LIBS       = support/makebin
@@ -131,7 +133,7 @@ sdcc-librarian:
 
 sdcc-sdbinutils:
 	$(MAKE) -C $(SDCC_SDBINUTILS)
-	cp $(SDCC_SDBINUTILS)/binutils/sdar $(SDCC_SDBINUTILS)/binutils/sdranlib bin
+	cp $(SDCC_SDBINUTILS)/binutils/sdar$(EXEEXT) $(SDCC_SDBINUTILS)/binutils/sdranlib$(EXEEXT) bin
 
 sdcc-device-inc:
 	$(MAKE) -C device/include

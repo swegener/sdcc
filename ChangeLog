@@ -45,6 +45,10 @@
 	  applied patch #3471142: [PIC14] more enchanced core devices,
 	  thanks to Gal Zsolt
 	* doc/sdccman.lyx: added new 16f15xx devices to the list
+	* support/sdbinutils/include/fopen-bin.h:
+	  added, required by mingw build
+	* Makefile.in: added EXEEXT required by mingw build
+	* support/scripts/sdcc_mingw32: added TARGETAR
 
 2012-02-11 Philipp Klaus Krause <pkk AT spth.de>
 

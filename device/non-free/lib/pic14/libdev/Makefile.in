@@ -47,6 +47,8 @@ PIC14_ENHANCED = \
     pic16f1937.c \
     pic16f1938.c \
     pic16f1939.c \
+    pic16f1946.c \
+    pic16f1947.c \
     pic16lf1902.c \
     pic16lf1903.c \
     pic16lf1904.c \

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script is supposed to recreate all device libraries and their
 # accompanying header files from the gputils' header/*.inc files
@@ -32,7 +32,11 @@ cp ../pic14ports.txt .
 if true; then
     sed -e 's/\s*#.*$//' ../devices.txt | grep -v '^\s*$' | while read PROC; do
         echo "### Generating files for $PROC ...";
-        $SDCC/support/scripts/inc2h.pl $PROC $GPUTILS;
+        EMIT_LEGACY_NAMES=0;
+        if grep -q 'NO_LEGACY_NAMES' "$HEADERS/pic${PROC}.h" >/dev/null 2>&1; then
+            EMIT_LEGACY_NAMES=1;
+        fi;
+        $SDCC/support/scripts/inc2h.pl $PROC $GPUTILS $EMIT_LEGACY_NAMES;
     done;
 fi;
 
@@ -74,7 +78,7 @@ for i in *.c; do
         ok=no;
         while [ ! xyes = "x$ok" ]; do
             echo "Replace? [y/n]";
-            read ans;
+            read -n1 ans;
             case "$ans" in
                 y|Y)
                     echo "Replacing ...";

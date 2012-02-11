@@ -61,11 +61,12 @@ my ($junk, $file, $version, $date, $time, $programmer, $status)
     = split(/\s+/, $rcsid);
 my ($programName) = ($file =~ /(\S+)/);
 
-if ($#ARGV < 0 || $#ARGV > 1 ) {
+if ($#ARGV < 0 || $#ARGV > 2) {
     Usage();
 }
 my $processor = uc(shift);
 my $path = shift;
+my $emit_legacy_names = shift;
 my %sfrs = ();
 my %alias = ();
 my %bits = ();
@@ -98,19 +99,19 @@ sub fixname {
 sub checkname {
     my $name = shift;
     if (not exists $sfrs{$name}) {
-	print "SFR $name not defined (yet).\n";
-	# Find similar ones.
-	if (exists $sfrs{$name."0"}) {
-	    print "  but ".$name."0 exists---using that instead.\n";
-	    return $name."0";
-	}
-	my $try = $name;
-	$try =~ s/[0-9]$//;
-	if (exists $sfrs{$try}) {
-	    print "  but $try exists---using that instead.\n";
-	    return $try;
-	}
-	die "Not found a similar SFR---aborting.\n";
+        print "SFR $name not defined (yet).\n";
+        # Find similar ones.
+        if (exists $sfrs{$name."0"}) {
+            print "  but ".$name."0 exists---using that instead.\n";
+            return $name."0";
+        }
+        my $try = $name;
+        $try =~ s/[0-9]$//;
+        if (exists $sfrs{$try}) {
+            print "  but $try exists---using that instead.\n";
+            return $try;
+        }
+        die "Not found a similar SFR---aborting.\n";
     }
     return $name;
 }
@@ -121,7 +122,7 @@ sub contained {
     my $arr = shift;
 
     foreach my $item (@$arr) {
-	return 1 if ($name eq $item); 
+        return 1 if ($name eq $item); 
     }
     return 0;
 }
@@ -130,30 +131,32 @@ sub contained {
 $path = "" if (!defined $path);
 if ($^O eq 'MSWin32') {
     if ($path eq '') {
-	if (defined($path = $ENV{'GPUTILS_HEADER_PATH'}) || defined($path = $ENV{'GPUTILS_LKR_PATH'})) {
-	    $path .= '\\..';
-	}
-	else {
-	    die "Could not find gpasm includes.\n";
-	}
+        if (defined($path = $ENV{'GPUTILS_HEADER_PATH'}) || defined($path = $ENV{'GPUTILS_LKR_PATH'})) {
+            $path .= '\\..';
+        }
+        else {
+            die "Could not find gpasm includes.\n";
+        }
     }
     $path_delim = '\\';
 }
 else {
     # Nathan Hurst <njh@mail.csse.monash.edu.au>: find gputils on Debian
     if ($path eq '') {
-	if ( -x "/usr/share/gputils") {
-	    $path = "/usr/share/gputils";
-	} elsif ( -x "/usr/share/gpasm") {
-	    $path = "/usr/share/gpasm";
-	} elsif ( -x "/usr/local/share/gputils") {
-	    $path = "/usr/local/share/gputils";
-	} else {
-	    die "Could not find gpasm includes.\n";
-	}
+        if ( -x "/usr/share/gputils") {
+            $path = "/usr/share/gputils";
+        } elsif ( -x "/usr/share/gpasm") {
+            $path = "/usr/share/gpasm";
+        } elsif ( -x "/usr/local/share/gputils") {
+            $path = "/usr/local/share/gputils";
+        } else {
+            die "Could not find gpasm includes.\n";
+        }
     }
     $path_delim = '/';
 }
+
+$emit_legacy_names = 0 if (!defined $emit_legacy_names);
 
 #
 # Read the symbols at the end of this file.
@@ -162,51 +165,51 @@ while (<DATA>) {
     next if /^\s*#/;
 
     if (/^\s*alias\s+(\S+)\s+(\S+)/) {
-	#
-	# Set an alias for a special function register.
-	# Some MPASM include files are not entirely consistent
-	# with sfr names.
-	#
-	$alias{fixname($2)} = fixname($1);
+        #
+        # Set an alias for a special function register.
+        # Some MPASM include files are not entirely consistent
+        # with sfr names.
+        #
+        $alias{fixname($2)} = fixname($1);
     } elsif (/^\s*address\s+(\S+)\s+(\S+)/) {
-	#
-	# Set a default address for a special function register.
-	# Some MPASM include files don't specify the address
-	# of all registers.
-	# 
-	# $addr{"$1"} = $2;
-	foreach my $device (split(/[,\s]+/, $devices)) {
-	    $addr{"p$device", "$1"} = $2;
-	}
+        #
+        # Set a default address for a special function register.
+        # Some MPASM include files don't specify the address
+        # of all registers.
+        # 
+        # $addr{"$1"} = $2;
+        foreach my $device (split(/[,\s]+/, $devices)) {
+            $addr{"p$device", "$1"} = $2;
+        }
     } elsif (/^\s*bitmask\s+(\S+)\s+/) {
-	#
-	# Set the bitmask that will be used in the 'memmap' pragma.
-	#
-	my $bitmask = "$1";
-	foreach my $register (split(/\s+/, $')) {
-	    $bitmasks{"$register"} = $bitmask;
-	}
+        #
+        # Set the bitmask that will be used in the 'memmap' pragma.
+        #
+        my $bitmask = "$1";
+        foreach my $register (split(/\s+/, $')) {
+            $bitmasks{"$register"} = $bitmask;
+        }
     } elsif (/^\s*ram\s+(\S+)\s+(\S+)\s+(\S+)/) {
-	# This info is now provided in "include/pic/pic14devices.txt".
-	#$lo = $1;
-	#$hi = $2;
-	#my $bitmask = $3;
-	#foreach $device (split(/[,\s]+/, $devices)) {
-	#    $ram{"p$device"} .= "#pragma memmap $lo $hi RAM $bitmask$'";
-	#}
+        # This info is now provided in "include/pic/pic14devices.txt".
+        #$lo = $1;
+        #$hi = $2;
+        #my $bitmask = $3;
+        #foreach $device (split(/[,\s]+/, $devices)) {
+        #    $ram{"p$device"} .= "#pragma memmap $lo $hi RAM $bitmask$'";
+        #}
     } elsif (/^\s*processor\s+/) {
-	$devices = $';
-	$type = '';
+        $devices = $';
+        $type = '';
     } elsif (/^\s*(\S+)/) {
-	$type = $1;
-	$_ = $';
-	foreach my $key (split) {
-	    eval "\$types{'$key'} = $type;";
-	}
+        $type = $1;
+        $_ = $';
+        foreach my $key (split) {
+            eval "\$types{'$key'} = $type;";
+        }
     } else {
-	foreach my $key (split) {
-	    eval "\$types{'$key'} = $type;";
-	}
+        foreach my $key (split) {
+            eval "\$types{'$key'} = $type;";
+        }
     }
 }
 
@@ -218,17 +221,17 @@ while (<DATA>) {
 #      || die "$programName: Error: Cannot open linker file $linkFile ($!)\n";
 #  while (<LINK>) {
 #      if (/^(\S+)\s+NAME=(\S+)\s+START=(\S+)\s+END=(\S+)\s+(PROTECTED)?/) {
-#  	$type = $1;
-#  	$name = $2;
-#  	$start = $3;
-#  	$end = $4;
-#  	$protected = 1 if ($5 =~ /protected/i);
+#       $type = $1;
+#       $name = $2;
+#       $start = $3;
+#       $end = $4;
+#       $protected = 1 if ($5 =~ /protected/i);
 
-#  	if ($type =~ /(SHAREBANK)|(DATABANK)/i) {
-#  	    $ram{"p$processor"} .=
-#  		sprintf("#pragma memmap %7s %7s RAM 0x000\t// $name\n",
-#  			$start, $end);
-#  	}
+#       if ($type =~ /(SHAREBANK)|(DATABANK)/i) {
+#           $ram{"p$processor"} .=
+#               sprintf("#pragma memmap %7s %7s RAM 0x000\t// $name\n",
+#                       $start, $end);
+#       }
 #      } elsif (/^SECTION\s+NAME=(\S+)\s+ROM=(\S+)\s+/) {
 #      }
 #  }
@@ -238,7 +241,7 @@ my $lcproc = "pic" . lc($processor);
 my $c_head = <<EOT;
 /* Register definitions for $lcproc.
  * This file was automatically generated by:
- *   $programName V$version
+ *   $programName
  *   Copyright (c) 2002, Kevin L. Pauba, All Rights Reserved
  */
 #include <${lcproc}.h>
@@ -264,164 +267,164 @@ open(HEADER, "<$includeFile")
 while (<HEADER>) {
     
     if (/^;-+ Register Files/i) {
-	$defaultType = 'sfr';
-	s/;/\/\//;
-	$body .= "$_";
+        $defaultType = 'sfr';
+        s/;/\/\//;
+        $body .= "$_";
     } elsif (/^;-+\s*(\S+)\s+Bits/i || /^;-+\s*(\S+)\s+-+/i) {
-	# The second case is usually bits, but the word Bits is missing
+        # The second case is usually bits, but the word Bits is missing
         # also accept "UIE/UIR Bits"
-	foreach my $name (split(/\//, $1)) {
-	    $name = fixname($name);
-	    $name = checkname($name);
+        foreach my $name (split(/\//, $1)) {
+            $name = fixname($name);
+            $name = checkname($name);
 
-	    if (defined($alias{$name})) {
-		$defaultType = "bits $alias{$name}";
-	    } else {
-		$defaultType = "bits $name";
-	    }
-	}
-	s/;/\/\//;
-	$body .= "$_";
+            if (defined($alias{$name})) {
+                $defaultType = "bits $alias{$name}";
+            } else {
+                $defaultType = "bits $name";
+            }
+        }
+        s/;/\/\//;
+        $body .= "$_";
     } elsif (/^;=+/i) {
-	$defaultType = '';
-	s/;/\/\//;
-	$body .= "$_";
+        $defaultType = '';
+        s/;/\/\//;
+        $body .= "$_";
     } elsif (/^\s*;/) {
-	#
-	# Convert ASM comments to C style.
-	#
-	$body .= "//$'";
+        #
+        # Convert ASM comments to C style.
+        #
+        $body .= "//$'";
     } elsif (/^\s*IFNDEF\s+__(\S+)/) {
-	#
-	# Processor type.
-	#
-	$processor = $1;
-	$body .= "//$_";
+        #
+        # Processor type.
+        #
+        $processor = $1;
+        $body .= "//$_";
     } elsif (/^\s*(\S+)\s+EQU\s+H'(.+)'/) {
-	#
-	# Useful bit of information.
-	#
-	my $name = $1;
-	my $value = $2;
-	my $rest = $';
-	my $bitmask = "0x0000";
+        #
+        # Useful bit of information.
+        #
+        my $name = $1;
+        my $value = $2;
+        my $rest = $';
+        my $bitmask = "0x0000";
 
-	$rest =~ s/;/\/\//;
-	chomp($rest);
+        $rest =~ s/;/\/\//;
+        chomp($rest);
 
-	if (defined($types{"p$processor", "$name"})) {
-	    $type = $types{"p$processor", "$name"};
-	} elsif (defined($types{"$name"})) {
-	    $type = $types{"$name"};
-	} else {
-	    $type = $defaultType;
-	}
-	#print "$name --> $type\n"; ## DEBUG
+        if (defined($types{"p$processor", "$name"})) {
+            $type = $types{"p$processor", "$name"};
+        } elsif (defined($types{"$name"})) {
+            $type = $types{"$name"};
+        } else {
+            $type = $defaultType;
+        }
+        #print "$name --> $type\n"; ## DEBUG
 
-	if (defined($bitmasks{"p$processor", "$name"})) {
-	    $bitmask = $bitmasks{"p$processor", "$name"};
-#	} elsif (defined($bitmasks{"$name"})) {
-#	    $bitmask = $bitmasks{"$name"};
-	}
+        if (defined($bitmasks{"p$processor", "$name"})) {
+            $bitmask = $bitmasks{"p$processor", "$name"};
+#       } elsif (defined($bitmasks{"$name"})) {
+#           $bitmask = $bitmasks{"$name"};
+        }
 
-	if ($type eq 'sfr') {
-	    #
-	    # A special function register.
-	    #
-#	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
-#				. "SFR %s\t// %s\n",
-#				$name, $name, $bitmask, $name);
-	    $name = fixname($name);
-	    if (defined $addr{"p$processor", "$name"}) {
-		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
-	    } else {
-		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
-	    }
-	    $body .= sprintf("extern __sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
-	    $c_head .= sprintf("__sfr  __at %-30s $name;\n", "(${name}_ADDR)");
-	    $addr{"p$processor", "$name"} = "0x$value";
-	    $sfrs{$name}=1;
-	} elsif ($type eq 'volatile') {
-	    #
-	    # A location that can change without 
-	    # direct program manipulation.
-	    #
-	    $name = fixname($name);
-#	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
-#				. "SFR %s\t// %s\n",
-#				$name, $name, $bitmask, $name);
-	    $body .= sprintf("extern __data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
-	    $c_head .= sprintf("__data __at %-30s $name;\n", "(${name}_ADDR) volatile char");
-	    if (defined $addr{"p$processor", "$name"}) {
-		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
-	    } else {
-		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
-	    }
-	} elsif ($type =~ /^bits/) {
-	    my ($junk, $register) = split(/\s/, $type);
-	    my $bit = hex($value);
-	    my $addr = $addr{"$register"};
+        if ($type eq 'sfr') {
+            #
+            # A special function register.
+            #
+#           $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
+#                               . "SFR %s\t// %s\n",
+#                               $name, $name, $bitmask, $name);
+            $name = fixname($name);
+            if (defined $addr{"p$processor", "$name"}) {
+                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
+            } else {
+                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
+            }
+            $body .= sprintf("extern __sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
+            $c_head .= sprintf("__sfr  __at %-30s $name;\n", "(${name}_ADDR)");
+            $addr{"p$processor", "$name"} = "0x$value";
+            $sfrs{$name}=1;
+        } elsif ($type eq 'volatile') {
+            #
+            # A location that can change without 
+            # direct program manipulation.
+            #
+            $name = fixname($name);
+#           $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
+#                               . "SFR %s\t// %s\n",
+#                               $name, $name, $bitmask, $name);
+            $body .= sprintf("extern __data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
+            $c_head .= sprintf("__data __at %-30s $name;\n", "(${name}_ADDR) volatile char");
+            if (defined $addr{"p$processor", "$name"}) {
+                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
+            } else {
+                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
+            }
+        } elsif ($type =~ /^bits/) {
+            my ($junk, $register) = split(/\s/, $type);
+            my $bit = hex($value);
+            my $addr = $addr{"$register"};
 
-	    # prepare struct declaration
-	    if (0) { # DEBUG
-		foreach my $key (keys %bits) {
-		    print "   $key\n";
-		}
-		print "$register // $bit // ".$bits{"$register"}."\n";
-	    }
-	    if (!defined $bits{"$register"}) {
-		$bits{"$register"} = {}; # reference to empty hash
-	    }
-	    if (!defined $bits{"$register"}->{oct($bit)}) {
-		$bits{"$register"}->{oct($bit)} = []; # reference to empty array
-	    }
-	    for (my $k=0; $k < scalar @{$bits{"$register"}->{oct($bit)}}; $k++) {
-	      $name = "" if ($bits{"$register"}->{oct($bit)} eq $name)
-	    }
-	    if (($name ne "")
-		and (1 != contained($name, \@{$bits{"$register"}->{oct($bit)}}))
-	    ) {
-	      push @{$bits{"$register"}->{oct($bit)}}, $name;
-	    }
-	} else {
-	    #
-	    # Other registers, bits and/or configurations.
-	    #
-	    $name = fixname($name);
-	    if ($type eq 'other') {
-		#
-		# A known symbol.
-		#
-		$body .= sprintf("#define %-20s 0x%s$rest\n", $name, $value);
-	    } else {
-		#
-		# A symbol that isn't defined in the data
-		# section at the end of the file.  Let's 
-		# add a comment so that we can add it later.
-		#
-		$body .= sprintf("#define %-20s 0x%s$rest\n",
-				 $name, $value);
-	    }
-	}
+            # prepare struct declaration
+            if (0) { # DEBUG
+                foreach my $key (keys %bits) {
+                    print "   $key\n";
+                }
+                print "$register // $bit // ".$bits{"$register"}."\n";
+            }
+            if (!defined $bits{"$register"}) {
+                $bits{"$register"} = {}; # reference to empty hash
+            }
+            if (!defined $bits{"$register"}->{oct($bit)}) {
+                $bits{"$register"}->{oct($bit)} = []; # reference to empty array
+            }
+            for (my $k=0; $k < scalar @{$bits{"$register"}->{oct($bit)}}; $k++) {
+              $name = "" if ($bits{"$register"}->{oct($bit)} eq $name)
+            }
+            if (($name ne "")
+                and (1 != contained($name, \@{$bits{"$register"}->{oct($bit)}}))
+            ) {
+              push @{$bits{"$register"}->{oct($bit)}}, $name;
+            }
+        } else {
+            #
+            # Other registers, bits and/or configurations.
+            #
+            $name = fixname($name);
+            if ($type eq 'other') {
+                #
+                # A known symbol.
+                #
+                $body .= sprintf("#define %-20s 0x%s$rest\n", $name, $value);
+            } else {
+                #
+                # A symbol that isn't defined in the data
+                # section at the end of the file.  Let's 
+                # add a comment so that we can add it later.
+                #
+                $body .= sprintf("#define %-20s 0x%s$rest\n",
+                                 $name, $value);
+            }
+        }
     } elsif (/^\s*$/) {
-	#
-	# Blank line.
-	#
-	$body .= "\n";
+        #
+        # Blank line.
+        #
+        $body .= "\n";
     } elsif (/__MAXRAM\s+H'([0-9a-fA-F]+)'/) {
-	my $maxram .= "//\n// Memory organization.\n//\n";
-	if (!defined $ram{"p$processor"}) {
-	    $ram{"p$processor"} = "";
-	}
-	$pragmas = $maxram
-	    . $ram{"p$processor"} . "\n"
-		. $pragmas;
-	$body .= "// $_";
+        my $maxram .= "//\n// Memory organization.\n//\n";
+        if (!defined $ram{"p$processor"}) {
+            $ram{"p$processor"} = "";
+        }
+        $pragmas = $maxram
+            . $ram{"p$processor"} . "\n"
+                . $pragmas;
+        $body .= "// $_";
     } else {
-	#
-	# Anything else we'll just comment out.
-	#
-	$body .= "// $_";
+        #
+        # Anything else we'll just comment out.
+        #
+        $body .= "// $_";
     }
 }
 $header .= <<EOT;
@@ -431,7 +434,7 @@ $header .= <<EOT;
 //
 // This header file was automatically generated by:
 //
-//\t$programName V$version
+//\t$programName
 //
 //\tCopyright (c) 2002, Kevin L. Pauba, All Rights Reserved
 //
@@ -470,20 +473,20 @@ EOT
   my $defpinfo = undef;
   open(P14PORTS, "< pic14ports.txt") && do {
     while(<P14PORTS>) {
-	s/\r//g; chomp;
-	if(/^\s*(\*|\w*)\s*([ABCDE0-7,-]+)\s*$/) {
-	    if(lc($1) eq lc($processor)) {
-		die if defined $pinfo;
-		$pinfo = $2;
-	    } elsif($1 eq "*") {
-		die if defined $defpinfo;
-		$defpinfo = $2;
-	    }
-	} elsif(/^\s*#/ || /^\s*$/) {
-	    # ignore blanks, comments
-	} else {
-	    die "bad line in pic14ports '$_'";
-	}
+        s/\r//g; chomp;
+        if(/^\s*(\*|\w*)\s*([ABCDE0-7,-]+)\s*$/) {
+            if(lc($1) eq lc($processor)) {
+                die if defined $pinfo;
+                $pinfo = $2;
+            } elsif($1 eq "*") {
+                die if defined $defpinfo;
+                $defpinfo = $2;
+            }
+        } elsif(/^\s*#/ || /^\s*$/) {
+            # ignore blanks, comments
+        } else {
+            die "bad line in pic14ports '$_'";
+        }
     }
     close P14PORTS;
   };
@@ -492,18 +495,18 @@ EOT
 
   if(defined $pinfo) {
     foreach  (split /,/, $pinfo) {
-	if(/^([ABCDE])([0-7])-([0-7])$/) {
-	    my($prt, $low, $high) = ($1, $2, $3);
-	    next unless defined $sfrs{"PORT$prt"} && defined $sfrs{"TRIS$prt"};
-	    next if     defined $bits{"PORT$prt"};
-	    for(my $i = $low; $i <= $high; $i++) {
-		push @{$bits{"PORT$prt"}->{oct($i)}}, "R$prt".$i;
-	    }
-	    next if     defined $bits{"TRIS$prt"};
-	    for(my $i = $low; $i <= $high; $i++) {
-		push @{$bits{"TRIS$prt"}->{oct($i)}}, "TRIS$prt".$i;
-	    }
-	} else { die }
+        if(/^([ABCDE])([0-7])-([0-7])$/) {
+            my($prt, $low, $high) = ($1, $2, $3);
+            next unless defined $sfrs{"PORT$prt"} && defined $sfrs{"TRIS$prt"};
+            next if     defined $bits{"PORT$prt"};
+            for(my $i = $low; $i <= $high; $i++) {
+                push @{$bits{"PORT$prt"}->{oct($i)}}, "R$prt".$i;
+            }
+            next if     defined $bits{"TRIS$prt"};
+            for(my $i = $low; $i <= $high; $i++) {
+                push @{$bits{"TRIS$prt"}->{oct($i)}}, "TRIS$prt".$i;
+            }
+        } else { die }
     }
   }
 }
@@ -523,24 +526,24 @@ foreach my $reg (sort keys %bits)
     for (my $i=0; $i < 8; $i++)
     {
       if (!defined $bits{$reg}) {
-	  #print "bits{$reg} undefined\n";
+          #print "bits{$reg} undefined\n";
       }
       if (!defined $bits{$reg}->{oct($i)}) {
-	  #print "bits{$reg}->{".oct($i)."} undefined\n";
-	  $bits{$reg}->{oct($i)} = []; # empty array reference
+          #print "bits{$reg}->{".oct($i)."} undefined\n";
+          $bits{$reg}->{oct($i)} = []; # empty array reference
       }
       my @names = @{$bits{$reg}->{oct($i)}};
       if ($max < scalar @names) { $max = scalar @names; }
       if ($idx >= scalar @names) {
-	$structs .= "    unsigned char :1;\n";
+        $structs .= "    unsigned char :1;\n";
       } else { # (1 == scalar @names) {
-	$structs .= "    unsigned char " . $names[$idx] . ":1;\n";
+        $structs .= "    unsigned char " . $names[$idx] . ":1;\n";
 #      } else {
-#	$structs .= "  union {\n";
-#	foreach $name (@names) {
-#	  $structs .= "    unsigned char " . $name . ":1;\n";
-#	} # foreach
-#	$structs .= "  };\n";
+#       $structs .= "  union {\n";
+#       foreach $name (@names) {
+#         $structs .= "    unsigned char " . $name . ":1;\n";
+#       } # foreach
+#       $structs .= "  };\n";
       }
     } # for
       $structs .= "  };\n";
@@ -603,7 +606,7 @@ print HEAD $header
     . $body . "\n"
     . $structs . "\n"
     . $defs
-    . $legacy
+    . ($emit_legacy_names ? $legacy : "")
     . "#endif\n";
 close(HEAD);
 
@@ -612,31 +615,34 @@ print DEFS $c_head . "\n";
 close DEFS;
 
 sub Usage {
-	print STDERR <<EOT;
+        print STDERR <<EOT;
 
 inc2h.pl - A utility to convert MPASM include files to header files
            suitable for the SDCC compiler.
 
 License: Copyright (c) 2002 Kevin L. Pauba
 
-	 SDCC is licensed under the GNU Public license (GPL) v2; see
-	 http://www.gnu.org/copyleft/gpl.html See http://sdcc.sourceforge.net/
-	 for the latest information on sdcc.
+         SDCC is licensed under the GNU Public license (GPL) v2; see
+         http://www.gnu.org/copyleft/gpl.html See http://sdcc.sourceforge.net/
+         for the latest information on sdcc.
 
-Usage:   $programName processor [path]
+Usage:   $programName processor [path] [emit_legacy_names]
 
-	 where:
+         where:
 
-         processor	The name of the processor (16f84, 16f877, etc.)
+         processor      The name of the processor (16f84, 16f877, etc.)
 
          path           The path to the parent of the "header" and "lkr"
                         directories.  The default is "/usr/share/gpasm".
 
-	 The header file will be written to the standard output.
+         emit_legacy_names
+                        0 to suppress the HAVE_LEGACY_NAMES block (default),
+                        1 to enable it.
 
-	 $#ARGV
+         The header file will be written to the standard output.
+
 EOT
-	exit;
+        exit;
 }
 
 __END__

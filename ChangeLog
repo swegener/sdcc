@@ -1,5 +1,10 @@
 2012-02-11 Raphael Neider <rneider AT web.de>
 
+	* device/include/pic16/signal.h:
+	  explicitly access SFRs via access bank, closes #3482876
+
+2012-02-11 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic14/pic14devices.txt,
 	  device/non-free/include/pic14/pic16f1946.h,
 	  device/non-free/include/pic14/pic16f1947.h,
@@ -89,7 +94,7 @@
 
 	* src/z,80/gen.c:
 	  Fix for yesterdays addition improvement, decide in which pair
-          to increment in code generator instead of peephole optimizer.
+	  to increment in code generator instead of peephole optimizer.
 
 2012-02-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

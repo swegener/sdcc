@@ -4,6 +4,8 @@
 	  Disabled test for host, since _Noreturn support is required.
 	* support/regression/tests/gcc-torture-execute-pr23047.c:
 	  Removed test, since it seems to test for implementation-defined behaviour.
+	* support/regression/tests/gcc-torture-execute-pr33779-1.c:
+	  Use exact-width integer types from stdint.h instead, no longer require long to be 32 bits.
 
 2012-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

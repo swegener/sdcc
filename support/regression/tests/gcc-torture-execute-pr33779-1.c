@@ -8,9 +8,11 @@
 #pragma std_c99
 #endif
 
-int foo(long int i)
+#include <stdint.h>
+
+int foo(int32_t i)
 {
-  if (((unsigned long)(i + 1)) * 4 == 0)
+  if (((uint32_t)(i + 1)) * 4 == 0)
     return 1;
   return 0;
 }

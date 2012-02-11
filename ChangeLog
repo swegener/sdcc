@@ -25,6 +25,7 @@
 	  device/non-free/lib/pic14/libdev/pic16f1527.c:
 	  applied patch #3471142: [PIC14] more enchanced core devices,
 	  thanks to Gal Zsolt
+	* doc/sdccman.lyx: added new 16f15xx devices to the list
 
 2012-02-11 Philipp Klaus Krause <pkk AT spth.de>
 

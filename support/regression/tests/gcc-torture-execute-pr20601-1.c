@@ -20,7 +20,7 @@ struct T
   char **t3;
 };
 
-#ifndef SDCC_mcs51
+#if defined (SDCC) && !defined (SDCC_mcs51)
 int a[5];
 int b;
 const char **c;
@@ -122,7 +122,7 @@ setup2 (void)
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#if defined (SDCC) && !defined (SDCC_mcs51)
   int x;
   c = g;
   b = 4;

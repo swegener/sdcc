@@ -1,3 +1,8 @@
+2012-02-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-pr20601-1.c:
+	  Disabled test for host, since _Noreturn support is required.
+
 2012-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,

@@ -1,4 +1,9 @@
-2012-02-12 Raphael Neider <rneider AT web.de>
+2012-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/gcc-torture-execute-pr42833.c:
+	  don't redefine ssize_t if host already defines
+
+	2012-02-12 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/pcode.c (newpCodeOpBit):
 	  prevent SIGSEGV on copying temporary registers

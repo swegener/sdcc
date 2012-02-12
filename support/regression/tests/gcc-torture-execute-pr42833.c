@@ -10,8 +10,19 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
 
+/* If SSIZE_MAX is defined in limits.h, then we are running in a POSIX    */
+/* environment that already has a ssize_t definition (which may have been */
+/* included indirectly via string.h). In this case, use the guaranteed    */
+/* definition in sys/types.h, otherwise assume int compatible and hope    */
+/* for the best. */
+#ifdef SSIZE_MAX
+#include <sys/types.h>
+#else
 typedef int ssize_t;
+#endif
+
 typedef struct { int8_t v1; int8_t v2; int8_t v3; int8_t v4; } neon_s8;
 
 uint32_t helper_neon_rshl_s8 (uint32_t arg1, uint32_t arg2);

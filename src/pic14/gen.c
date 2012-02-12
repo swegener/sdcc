@@ -51,6 +51,8 @@ extern set *externs;
 static pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
 static pCodeOp *popRegFromString(char *str, int size, int offset);
 static int aop_isLitLike(asmop *aop);
+static void genCritical (iCode *ic);
+static void genEndCritical (iCode *ic);
 
 /* The PIC port(s) need not differentiate between POINTER and FPOINTER. */
 #define PIC_IS_DATA_PTR(x)  (IS_DATA_PTR(x) || IS_FARPTR(x))
@@ -2280,10 +2282,6 @@ static void genFunction (iCode *ic)
 
     ftype = operandType(IC_LEFT(ic));
 
-    /* if critical function then turn interrupts off */
-    if (IFFUNC_ISCRITICAL(ftype))
-        pic14_emitcode("clr","ea");
-
         /* here we need to generate the equates for the
     register bank if required */
 #if 0
@@ -2354,6 +2352,17 @@ static void genFunction (iCode *ic)
             }
         }
     }
+
+    /* if critical function then turn interrupts off */
+    if (IFFUNC_ISCRITICAL(ftype))
+      {
+        genCritical(NULL);
+        if (IFFUNC_ARGS (sym->type))
+          {
+            fprintf(stderr, "PIC14: Functions with __critical (%s) must not have arguments for now.\n", sym->name);
+            exit (1);
+          } // if
+      } // if
 
     /* set the register bank to the desired value */
     if (FUNC_REGBANK(sym->type) || FUNC_ISISR(sym->type)) {
@@ -2447,6 +2456,12 @@ static void genEndFunction (iCode *ic)
     /* restore the register bank    */
     if (FUNC_REGBANK(sym->type) || FUNC_ISISR(sym->type))
         pic14_emitcode ("pop","psw");
+
+    /* if critical function then turn interrupts off */
+    if (IFFUNC_ISCRITICAL (sym->type))
+      {
+        genEndCritical (NULL);
+      } // if
 
     if (IFFUNC_ISISR(sym->type)) {
 
@@ -2571,6 +2586,44 @@ jumpret:
         emitpcode(POC_GOTO,popGetLabel(returnLabel->key));
     }
 
+}
+
+static set *critical_temps = NULL;
+
+static void genCritical (iCode *ic)
+{
+  pCodeOp *saved_intcon;
+
+  (void)ic;
+
+  if (!critical_temps)
+    critical_temps = newSet();
+
+  saved_intcon = popGetTempReg ();
+  addSetHead (&critical_temps, saved_intcon);
+
+  /* This order saves one BANKSEL back to INTCON. */
+  emitpcode (POC_MOVFW, popCopyReg (&pc_intcon));
+  emitpcode (POC_BCF, popCopyGPR2Bit (popCopyReg (&pc_intcon), 7));
+  emitpcode (POC_MOVWF, pCodeOpCopy (saved_intcon));
+}
+
+static void genEndCritical (iCode *ic)
+{
+  pCodeOp *saved_intcon = NULL;
+
+  (void)ic;
+
+  saved_intcon = getSet (&critical_temps);
+  if (!saved_intcon)
+    {
+      fprintf(stderr, "Critical section left, but none entered -- ignoring for now.\n");
+      return;
+    } // if
+
+  emitpcode (POC_BTFSC, popCopyGPR2Bit (pCodeOpCopy (saved_intcon), 7));
+  emitpcode (POC_BSF, popCopyGPR2Bit (popCopyReg (&pc_intcon), 7));
+  popReleaseTempReg (saved_intcon);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7180,6 +7233,14 @@ void genpic14Code (iCode *lic)
 
         case DUMMY_READ_VOLATILE:
             genDummyRead (ic);
+            break;
+
+        case CRITICAL:
+            genCritical (ic);
+            break;
+
+        case ENDCRITICAL:
+            genEndCritical (ic);
             break;
 
         default :

@@ -1,3 +1,13 @@
+2012-02-12 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/pcode.c (newpCodeOpBit):
+	  prevent SIGSEGV on copying temporary registers
+
+	* src/pic14/gen.c (gen{,End}Function, gen{,End}Critical, genpic14Code),
+	  src/pic16/gen.c (gen{,End}Function, gen{,End}Critical, genpic16Code):
+	  implement __critical (block and function attribute, PIC14 limited to
+	  no-arg functions: arg0 in W would be corrupted)
+
 2012-02-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-pr42833.c,

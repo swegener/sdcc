@@ -2150,8 +2150,8 @@ pCodeOp *newpCodeOpBit(char *name, int ibit, int inBitSpace)
 	PCORB(pcop)->bit = ibit;
 	PCORB(pcop)->inBitSpace = inBitSpace;
 	
-	if (name) r = regFindWithName(name);
-	if (!r) {
+        if (name) r = regFindWithName(name);
+	if (name && !r) {
 		// Register has not been allocated - check for symbol information
 		symbol *sym;
 		sym = symFindWithName(bit, name);
@@ -2170,11 +2170,13 @@ pCodeOp *newpCodeOpBit(char *name, int ibit, int inBitSpace)
 		pcop->name = NULL;
 		PCOR(pcop)->r = r;
 		PCOR(pcop)->rIdx = r->rIdx;
-	} else {
+	} else if (name) {
 		pcop->name = Safe_strdup(name);   
 		PCOR(pcop)->r = NULL;
 		PCOR(pcop)->rIdx = 0;
-	}
+	} else {
+                //fprintf(stderr, "Unnamed register duplicated for bit-access?!? Hope for the best ...\n");
+        }
 	return pcop;
 }
 
@@ -2247,7 +2249,7 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
 	switch(type) {
 	case PO_BIT:
 	case PO_GPR_BIT:
-		pcop = newpCodeOpBit(name, -1,0);
+		pcop = newpCodeOpBit(name, -1, 0);
 		break;
 		
 	case PO_LITERAL:
@@ -4500,9 +4502,9 @@ static int OptimizepCode(char dbName)
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval)
 {
 	pCodeOp *pcop;
-	
+
 	pcop = newpCodeOpBit(pc->name, bitval, 0);
-	
+
 	if( !( (pcop->type == PO_LABEL) ||
 		(pcop->type == PO_LITERAL) ||
 		(pcop->type == PO_STR) ))

@@ -1,3 +1,7 @@
+2012-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/sdbinutils/include/mach-o/*: added missing files for Mac OS
+
 2012-02-12 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/gen.c (genGetABit, genpic14Code),

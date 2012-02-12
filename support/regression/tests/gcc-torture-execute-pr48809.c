@@ -58,6 +58,7 @@ foo (signed char x)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 5))
   if (foo (98) != 18 || foo (97) != 0 || foo (99) != 0)
     ASSERT (0);
   if (foo (-62) != 19 || foo (-63) != 0 || foo (-61) != 0)
@@ -65,5 +66,6 @@ testTortureExecute (void)
   if (foo (28) != 105 || foo (27) != 102 || foo (29) != 111)
     ASSERT (0);
   return;
+#endif
 }
 

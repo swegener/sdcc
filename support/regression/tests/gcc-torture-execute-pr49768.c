@@ -13,7 +13,7 @@
 void
 testTortureExecute (void)
 {
-#if defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 || __GNUC_MINOR < 6)
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 7))
   static struct { unsigned int : 1; unsigned int s : 1; } s = { .s = 1 };
   if (s.s != 1)
     ASSERT (0);

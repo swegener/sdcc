@@ -21,8 +21,10 @@ int foo(struct a *a)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 4))
   if (foo((struct a *)0) != 0)
     ASSERT (0);
   return;
+#endif
 }
 

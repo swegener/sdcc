@@ -1,3 +1,16 @@
+2012-02-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-pr42833.c,
+	  support/regression/tests/gcc-torture-execute-pr44555.c,
+	  support/regression/tests/gcc-torture-execute-pr48809.c,
+	  support/regression/tests/gcc-torture-execute-pr48973-1.c,
+	  support/regression/tests/gcc-torture-execute-pr48973-2.c,
+	  support/regression/tests/gcc-torture-execute-pr49039.c,
+	  support/regression/tests/gcc-torture-execute-pr49123.c,
+	  support/regression/tests/gcc-torture-execute-pr49161.c,
+	  support/regression/tests/gcc-torture-execute-pr49768.c:
+	  Disable some tests for older gcc.
+
 2012-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/sdbinutils/include/mach-o/*: added missing files for Mac OS

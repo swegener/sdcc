@@ -4997,9 +4997,9 @@ genPlus (iCode * ic)
             pair = PAIR_DE;
           else
             pair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
+          if (!isPairDead (pair, ic))
+            save_pair = TRUE;
         }
-      if (!isPairDead (pair, ic))
-        save_pair = TRUE;
       fetchPair (PAIR_IY, AOP (IC_LEFT (ic)));
       if (save_pair)
         _push (pair);

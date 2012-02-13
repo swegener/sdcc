@@ -1,5 +1,15 @@
 2012-02-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* support/regression/tests/gcc-torture-execute-pr49073.c,
+	  support/regression/tests/gcc-torture-execute-pr36691.c:
+	  Disablde some tests for older gcc.
+	* support/regression/tests/gcc-torture-execute-*.c:
+	  Added some more tests from the execute part of the gcc torture regression test suite.
+	* src/z80/gen.c:
+	  Improve handling of bc, de in addition.
+
+2012-02-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/ralloc2.cc,
 	  src/z80/gen.c:
 	  Improve handling of hl in address calculations, minor decrement improvement.
@@ -147,7 +157,7 @@
 
 2012-02-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/z,80/gen.c:
+	* src/z80/gen.c:
 	  Fix for yesterdays addition improvement, decide in which pair
 	  to increment in code generator instead of peephole optimizer.
 

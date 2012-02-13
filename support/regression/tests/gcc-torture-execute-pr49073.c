@@ -15,6 +15,7 @@ int a[] = { 1, 2, 3, 4, 5, 6, 7 }, c;
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 7))
   int d = 1, i = 1;
   _Bool f = 0;
   do
@@ -32,5 +33,6 @@ testTortureExecute (void)
   if (c != 1)
     ASSERT (0);
   return;
+#endif
 }
 

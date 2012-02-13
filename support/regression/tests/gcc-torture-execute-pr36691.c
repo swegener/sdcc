@@ -19,9 +19,11 @@ void func_1 (void)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 4))
   func_1 ();
   if (g_5 != 0)
     ASSERT (0);
   return;
+#endif
 }
 

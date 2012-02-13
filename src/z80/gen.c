@@ -4991,17 +4991,15 @@ genPlus (iCode * ic)
       pair = getPairId (AOP (IC_RIGHT (ic)));
       if (pair != PAIR_BC && pair != PAIR_DE)
         {
-          if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && !bitVectBitValue (ic->rSurv, B_IDX))
+          if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && (!bitVectBitValue (ic->rSurv, B_IDX) || !isPairDead (PAIR_DE, ic)))
             pair = PAIR_BC;
-          else if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && !bitVectBitValue (ic->rSurv, D_IDX))
+          else if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && (!bitVectBitValue (ic->rSurv, D_IDX) || !isPairDead (PAIR_BC, ic)))
             pair = PAIR_DE;
           else
-            {
-              pair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
-              if (!isPairDead (pair, ic))
-                save_pair = TRUE;
-            }
+            pair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
         }
+      if (!isPairDead (pair, ic))
+        save_pair = TRUE;
       fetchPair (PAIR_IY, AOP (IC_LEFT (ic)));
       if (save_pair)
         _push (pair);
@@ -5330,6 +5328,14 @@ genMinusDec (const iCode * ic)
      registers and the registers are the same */
   if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
     {
+      while (icount--)
+        emit3 (A_DEC, AOP (IC_RESULT (ic)), 0);
+      return TRUE;
+    }
+
+  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+    {
+      cheapMove (AOP (IC_RESULT (ic)), 0, AOP (IC_LEFT (ic)), 0);
       while (icount--)
         emit3 (A_DEC, AOP (IC_RESULT (ic)), 0);
       return TRUE;

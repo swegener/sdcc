@@ -1,3 +1,9 @@
+2012-02-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improve handling of hl in address calculations, minor decrement improvement.
+
 2012-02-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/gcc-torture-execute-pr34070-1.c,

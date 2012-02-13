@@ -702,10 +702,8 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(true);
   if(ic->op == IPUSH && input_in_H && (getSize(operandType(IC_LEFT(ic))) <= 2 || I[ia.registers[REG_L][1]].byte == 2 && I[ia.registers[REG_H][1]].byte == 3))
     return(true);
-
   if(ic->op == IPUSH && ic->next && ic->next->op == CALL)
     return(true);
-
   if(ic->op == IPUSH && getSize(operandType(left)) == 2 &&
     (ia.registers[REG_C][1] < 0 && ia.registers[REG_B][1] < 0 || ia.registers[REG_E][1] < 0 && ia.registers[REG_D][1] < 0)) // Can use pair other than HL.
     return(true);
@@ -715,6 +713,11 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
     return(true);
   if(POINTER_GET(ic) && input_in_L && input_in_H && (getSize(operandType(IC_RESULT(ic))) == 1 || !result_in_HL))
+    return(true);
+  if(!IS_GB && ic->op == ADDRESS_OF &&
+    (operand_in_reg(result, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(result, REG_IYH, ia, i, G) ||
+    !OP_SYMBOL_CONST (left)->onStack && operand_in_reg(result, REG_C, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && operand_in_reg(result, REG_B, ia, i, G) ||
+    !OP_SYMBOL_CONST (left)->onStack && operand_in_reg(result, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && operand_in_reg(result, REG_D, ia, i, G)))
     return(true);
 
   if(ic->op == LEFT_OP && isOperandLiteral(IC_RIGHT(ic)))

@@ -3,6 +3,7 @@
  */
 
 #include <testfwk.h>
+#include <stdint.h>
 
 #ifdef SDCC
 #pragma std_c99
@@ -14,7 +15,12 @@
    fall-through code, while that register held a pointer used in code at
    the branch target.  */
 
+/* Assume that if stdint.h defined INTPTR_MAX, it has also defined intptr_t */
+/* oƒ otherwise, define it ourselves */
+#ifndef INTPTR_MAX
 typedef int intptr_t;
+#endif
+
 typedef intptr_t W;
 union u0
 {

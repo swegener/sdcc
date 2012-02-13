@@ -1,9 +1,18 @@
+2012-02-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/gcc-torture-execute-pr34070-1.c,
+	  support/regression/tests/gcc-torture-execute-pr34070-2.c:
+	  Disable more tests for older gcc
+	* support/regression/tests/gcc-torture-execute-pr15296.c,
+	  support/regression/tests/bug1115321.c: Fix test to be compatible
+	  with hosts in which int and pointers differ in size.
+
 2012-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/gcc-torture-execute-pr42833.c:
 	  don't redefine ssize_t if host already defines
 
-	2012-02-12 Raphael Neider <rneider AT web.de>
+2012-02-12 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/pcode.c (newpCodeOpBit):
 	  prevent SIGSEGV on copying temporary registers

@@ -16,8 +16,10 @@ int f(unsigned int x)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 3))
   if (f(-1) != -1)
     ASSERT (0);
   return;
+#endif
 }
 

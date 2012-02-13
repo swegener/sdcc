@@ -265,21 +265,6 @@ static void deprecated_keyword (char *yytext);
 #define yytext_ptr yytext
 #endif
 
-static void
-deprecated_keyword (char *yytext)
-{
-  struct dbuf_s dbuf;
-
-  dbuf_init (&dbuf, 32);
-
-  dbuf_append_char (&dbuf, '_');
-  if ('_' != yytext[0])
-    dbuf_append_char (&dbuf, '_');
-  dbuf_append_str (&dbuf, yytext);
-  werror (W_DEPRECATED_KEYWORD, yytext, dbuf_c_str(&dbuf));
-  dbuf_destroy (&dbuf);
-}
-
 static int
 checkCurrFile (const char *s)
 {

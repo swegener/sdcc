@@ -1,8 +1,13 @@
+2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-pr28651.c:
+	  Disable test for older gcc.
+
 2012-02-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-pr49073.c,
 	  support/regression/tests/gcc-torture-execute-pr36691.c:
-	  Disablde some tests for older gcc.
+	  Disabled some tests for older gcc.
 	* support/regression/tests/gcc-torture-execute-*.c:
 	  Added some more tests from the execute part of the gcc torture regression test suite.
 	* src/z80/gen.c:

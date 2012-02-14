@@ -19,10 +19,12 @@ foo (unsigned int u)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 1))
   unsigned int u = INT_MAX;
 
   if (foo (u) == 0)
     ASSERT (0);
   return;
+#endif
 }
 

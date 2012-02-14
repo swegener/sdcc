@@ -1,5 +1,10 @@
 2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  Fix addition when multiple operands are on the stack and --fomit-frame-pointer is used.
+
+2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/peeph-z80.def,
 	  src/z80/gen.c,
 	  src/z80/ralloc2.cc:

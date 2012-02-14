@@ -4834,7 +4834,7 @@ setupToPreserveCarry (const iCode *ic)
           /* check result again, in case right == result */
           if (couldDestroyCarry (result))
             {
-              if (!isPairInUse (PAIR_DE, ic))
+              if (couldDestroyCarry (left))
                 shiftIntoPair (1, result);
               else
                 shiftIntoPair (2, result);
@@ -5134,7 +5134,7 @@ genPlus (iCode * ic)
         _pop (pair);
       goto release;
     }
-    
+
   /* Special case:
      ld hl,sp+n trashes C so we can't afford to do it during an
      add with stack based variables.  Worst case is:
@@ -5207,7 +5207,7 @@ genPlus (iCode * ic)
           goto release;
         }
     }
-  
+
   // Avoid overwriting operand in h or l when setupToPreserveCarry () loads hl.
   if(!couldDestroyCarry (AOP (IC_LEFT (ic))))
     {
@@ -5249,7 +5249,7 @@ genPlus (iCode * ic)
     }
   for (size = 0; size < 2; size++)
     if (cached[size] != -1)
-      {emitDebug(";HERE");
+      {
         _pop(PAIR_AF);
         cheapMove (AOP (IC_RESULT (ic)), cached[size], ASMOP_A, 0);
       }

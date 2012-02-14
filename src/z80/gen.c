@@ -10535,7 +10535,7 @@ genZ80Code (iCode *lic)
         }
       regalloc_dry_run_cost = 0;
       genZ80iCode (ic);
-      //emitDebug("; iCode %d total cost: %d", ic->key, (int)(regalloc_dry_run_cost));
+      /*emitDebug("; iCode %d total cost: %d", ic->key, (int)(regalloc_dry_run_cost));*/
     }
 
 
@@ -10568,25 +10568,4 @@ genZ80Code (iCode *lic)
   freeTrace(&_G.lines.trace);
   freeTrace(&_G.trace.aops);
 }
-
-/*
-  Attic
-static int
-_isPairUsed (iCode * ic, PAIR_ID pairId)
-{
-  int ret = 0;
-  switch (pairId)
-    {
-    case PAIR_DE:
-      if (bitVectBitValue (ic->rMask, D_IDX))
-        ret++;
-      if (bitVectBitValue (ic->rMask, E_IDX))
-        ret++;
-      break;
-    default:
-      wassert (0);
-    }
-  return ret;
-}
-*/
 

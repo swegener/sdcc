@@ -1,5 +1,12 @@
 2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/peeph-z80.def,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Generate better code when using --fomit-frame-ppinter.
+
+2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/tests/gcc-torture-execute-pr28651.c:
 	  Disable test for older gcc.
 

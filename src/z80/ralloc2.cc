@@ -443,15 +443,18 @@ bool operand_on_stack(const operand *o, const assignment &a, unsigned short int 
   if(!o || !IS_SYMOP(o))
     return(false);
 
-  operand_map_t::const_iterator oi, oi_end;
-  for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); oi != oi_end; ++oi)
-    if(a.global[oi->second] >= 0)
-      return(false);
-
   if(OP_SYMBOL_CONST(o)->remat)
     return(false);
 
-  return(true);
+  if(OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
+    return(true);
+
+  operand_map_t::const_iterator oi, oi_end;
+  for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); oi != oi_end; ++oi)
+    if(a.global[oi->second] < 0)
+      return(true);
+
+  return(false);
 }
 
 template <class G_t>
@@ -663,11 +666,11 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if((IS_GB || IY_RESERVED) && IS_TRUE_SYMOP(result) && getSize(operandType(IC_RESULT(ic))) > 2)
     return(false);
 
-  if(options.omitFramePtr)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
-    return(false);
-
   if(result_only_HL && ic->op == PCALL)
     return(true);
+
+  if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+    return(false);
 
   if(ic->op == '+' && getSize(operandType(IC_RESULT(ic))) >= 2 &&
     (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || IS_TRUE_SYMOP (right))) // Might use (hl).

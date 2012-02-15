@@ -1,8 +1,25 @@
+2012-02-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-pr37924.c,
+	  support/regression/tests/gcc-torture-execute-pr33779-2.c:
+	  Disable tests for older gcc.
+	* src/SDCCast.c
+	  Fix setting of CurrFunc for non-functions.
+	* src/z80/main.c, src/z80/gen.h, src/z80/gen.c, src/z80/ralloc2.cc:
+	  Fixes for --fomit-frame-pointer, omit frame pointer by default for functions with low register pressure and few stack accesses.
+
 2012-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (createWhile, createDo, backPatchLabels): put label
 	  nodes above IFX nodes rather than between IFX and condition
 	* src/SDCCicode.c (geniCodeIfx, ast2iCode): fixed bug #3429793
+
+2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.h,
+	  src/z80/gen.c:
+	  Omit frame pointer for functions with low register pressure and few parameter accesses.
 
 2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

@@ -31,6 +31,7 @@ test2 (void)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 4))
   a = 0;
   if (test1 () != (-1U >> 9))
     ASSERT (0);
@@ -56,5 +57,6 @@ testTortureExecute (void)
   if (test2 () != (-1U >> 9))
     ASSERT (0);
   return;
+#endif
 }
 

@@ -39,7 +39,7 @@
   typedef unsigned int size_t;
 #endif
 
-#if !defined(SDCC_z80) && !defined(SDCC_z180) && !defined(SDCC_gbz80)
+#if defined(SDCC_mcs51) || defined(SDCC_hc08) || defined(SDCC_ds390) || defined(SDCC_pic14) || defined(SDCC_pic16)
 #define __SDCC_BROKEN_STRING_FUNCTIONS
 #endif
 

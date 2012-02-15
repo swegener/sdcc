@@ -590,7 +590,8 @@ _setValues (void)
   setMainValue ("z80bases", dbuf_c_str (&dbuf));
   dbuf_destroy (&dbuf);
 
-  if ((IS_Z80 || IS_Z180) && options.omitFramePtr)
+  /* For the old register allocator (with the new one we decide to omit the frame pointer for each function individually) */
+  if (!IS_GB && options.omitFramePtr)
     z80_port.stack.call_overhead = 2;
 }
 

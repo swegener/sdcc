@@ -16,8 +16,10 @@ int foo(long int i)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 4))
   if (foo(0x3fffffff) != 0)
     ASSERT (0);
   return;
+#endif
 }
 

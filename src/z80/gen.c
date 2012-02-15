@@ -1483,7 +1483,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 
   if (!op)
     return;
-
+emitDebug(";aopOp");
   /* if this a literal */
   if (IS_OP_LITERAL (op))
     {
@@ -1502,7 +1502,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
         }
       return;
     }
-
+emitDebug(";new aop");
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
@@ -1516,7 +1516,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 
   /* if this is a true symbol */
   if (IS_TRUE_SYMOP (op))
-    {
+    {emitDebug(";aop for true symbol");
       op->aop = aopForSym (ic, OP_SYMBOL (op), result, requires_a);
       return;
     }
@@ -1604,7 +1604,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
         }
         
       if (sym->usl.spillLoc)
-        {
+        {emitDebug(";aop for spilt");
           asmop *oldAsmOp = NULL;
 
           if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
@@ -4319,7 +4319,7 @@ genFunction (const iCode * ic)
     }
   sym = OP_SYMBOL (IC_LEFT (ic));
 
-  _G.omitFramePtr = (!IS_GB && options.omitFramePtr);
+  _G.omitFramePtr = z80_opts.oldralloc ? (!IS_GB && options.omitFramePtr) : should_omit_frame_ptr;
 
   if (!IS_GB && !IY_RESERVED && !stackParm && !sym->stack)
     {
@@ -6346,6 +6346,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
            AOP_TYPE (right) == AOP_HL  ||
            AOP_TYPE (right) == AOP_IY  ||
            AOP_TYPE (right) == AOP_STK ||
+           AOP_TYPE (right) == AOP_EXSTK ||
            AOP_IS_PAIRPTR (right, PAIR_HL) ||
            AOP_IS_PAIRPTR (right, PAIR_IX) ||
            AOP_IS_PAIRPTR (right, PAIR_IY))
@@ -10452,6 +10453,7 @@ dryZ80iCode (iCode *ic)
     }
     
   _G.lines.head = _G.lines.current = NULL;
+  _G.omitFramePtr = should_omit_frame_ptr;
   
   genZ80iCode(ic);
   

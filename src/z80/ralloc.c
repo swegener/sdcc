@@ -3149,10 +3149,6 @@ z80_ralloc (ebbIndex * ebbi)
 
   RegFix (ebbs, count);
 
-  /* When --max-allocs-per-node is too low, there can be gaps. */
-  //freeAllRegs ();
-  //fillGaps();
-
   /* New register allcoator here. */
 
   /* if stack was extended then tell the user */

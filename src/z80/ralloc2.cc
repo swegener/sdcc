@@ -27,6 +27,7 @@
 extern "C"
 {
   unsigned char dryZ80iCode (iCode * ic);
+  bool should_omit_frame_ptr;
 };
 
 #define REG_C 0
@@ -603,7 +604,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(TARGET_IS_GBZ80)
     return(true);
 
-  bool exstk = (options.omitFramePtr || (currFunc && currFunc->stack > 127));
+  bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127));
 
   const i_assignment_t &ia = a.i_assignment;
 
@@ -791,7 +792,7 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   //if(ic->key == 118)
 //		std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
 
-  bool exstk = (options.omitFramePtr || (currFunc && currFunc->stack > 127));
+  bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127));
 
   bool unused_IYL = (ia.registers[REG_IYL][1] < 0);
   bool unused_IYH = (ia.registers[REG_IYH][1] < 0);
@@ -832,8 +833,8 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(unused_IYL && unused_IYH)
     return(true);	// Register IY not in use.
     
-  if(exstk)	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer or using lots of local variables.
-	return(false);
+  if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+    return(false);
 
   // Code generator cannot handle variables that are only partially in IY.
   if(unused_IYL ^ unused_IYH)
@@ -1346,6 +1347,56 @@ void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
     set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
 }
 
+// Omit the frame pointer for functions with low register pressure and few parameter accesses.
+template <class G_t>
+static bool omit_frame_ptr(const G_t &G)
+{
+  if(IS_GB)
+    return(false);
+
+  if(options.omitFramePtr)
+    return(true);
+    
+  signed char omitcost = -16;
+  for(unsigned int i = 0; i < boost::num_vertices(G); i++)
+    {
+      if(G[i].alive.size() > NUM_REGS - 4)
+        return(false);
+
+      const iCode *const ic = G[i].ic;
+      const operand *o;
+      o = IC_RESULT(ic);
+      if(o && IS_SYMOP(o) && OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
+        omitcost += 6;
+      o = IC_LEFT(ic);
+      if(o && IS_SYMOP(o) && OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
+        omitcost += 6;
+      o = IC_RIGHT(ic);
+      if(o && IS_SYMOP(o) && OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
+        omitcost += 6;
+
+      if(omitcost > 14) // Chosen greater than zero, since the peephole optimizer often can optimize the use of iy into use of hl, reducing the cost.
+        return(false);
+    }
+
+  return(true);
+}
+
+// Adjust stack location when deciding to omit frame pointer.
+void move_parms(void)
+{
+  if(!currFunc || IS_GB || options.omitFramePtr || !should_omit_frame_ptr)
+    return;
+
+  for(value *val = FUNC_ARGS (currFunc->type); val; val = val->next)
+    {
+      if(IS_REGPARM(val->sym->etype) || !val->sym->onStack)
+        continue;
+
+      val->sym->stack -= 2;
+    }
+}
+
 iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 {
   iCode *ic;
@@ -1359,6 +1410,9 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   con_t conflict_graph;
 
   ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
+
+  should_omit_frame_ptr = omit_frame_ptr(control_flow_graph);
+  move_parms();
 
   if(options.dump_graphs)
     dump_cfg(control_flow_graph);

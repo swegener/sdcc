@@ -6636,7 +6636,6 @@ createFunction (symbol * name, ast * body)
     }
 
 skipall:
-
   /* dealloc the block variables */
   processBlockVars (body, &stack, DEALLOCATE);
   outputDebugStackSymbols ();
@@ -6655,6 +6654,7 @@ skipall:
   addSet (&operKeyReset, name);
   applyToSet (operKeyReset, resetParmKey);
 
+
   if (options.debug)
     cdbStructBlock (1);
 
@@ -6665,6 +6665,7 @@ skipall:
 
   xstack->syms = NULL;
   istack->syms = NULL;
+  currFunc = NULL;
   return NULL;
 }
 

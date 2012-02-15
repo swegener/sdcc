@@ -6067,7 +6067,7 @@ genCmp (operand * left, operand * right,
           goto fix;
         }
 
-      if(IS_GB && sign)
+      if (IS_GB && sign)
         {
           cheapMove (ASMOP_A, 0, AOP (right), size - 1);
           cheapMove (ASMOP_E, 0, ASMOP_A, 0);
@@ -6078,6 +6078,7 @@ genCmp (operand * left, operand * right,
       if (AOP_TYPE (right) == AOP_LIT)
         {
           lit = ulFromVal (AOP (right)->aopu.aop_lit);
+
           /* optimize if(x < 0) or if(x >= 0) */
           if (lit == 0)
             {
@@ -6108,12 +6109,43 @@ genCmp (operand * left, operand * right,
                 }
               goto release;
             }
-          else
-            while (!((lit >> (offset * 8)) & 0xff))
-              {
-                size--;
-                offset++;
-              }
+
+          while (!((lit >> (offset * 8)) & 0xff))
+            {
+              size--;
+              offset++;
+            }
+
+          if (sign) /* Map signed operands to unsigned ones. This pre-subtraction workaroud to lack of signed comparison is cheaper than the post-subtraction one at fix. */
+            {
+              cheapMove (ASMOP_A, 0, AOP (left), offset);
+              if (size == 1)
+                {
+                  emit2 ("xor a, #0x80");
+                  regalloc_dry_run_cost += 2;
+                }
+              emit2 ("sub a, #0x%X", ((lit >> (offset * 8)) & 0xff) ^ (size == 1 ? 0x80 : 0x00));
+              regalloc_dry_run_cost += 2;
+              size--;
+              offset++;
+
+              while (size--)
+                {
+                  cheapMove (ASMOP_A, 0, AOP (left), offset);
+                  if (!size)
+                    {
+                      emit2 ("rla");
+                      emit2 ("ccf");
+                      emit2 ("rra");
+                      regalloc_dry_run_cost += 3;
+                    }
+                  /* Subtract through, propagating the carry */
+                  emit2 ("sbc a, #0x%X", ((lit >> (offset++ * 8)) & 0xff) ^ (size ? 0x00 : 0x80));
+                  regalloc_dry_run_cost += 2;
+                }
+              result_in_carry = TRUE;
+              goto release;
+            }
         }
 
       cheapMove (ASMOP_A, 0, AOP (left), offset);

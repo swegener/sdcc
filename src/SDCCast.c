@@ -5005,8 +5005,8 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
       if (IS_IFX (tree->right))
         return newNode (NULLOP, tree->left, createLabel (localLabel, tree->right));
 
-      tree->right = createLabel (localLabel, tree->right);
       tree->right = newIfxNode (tree->right, trueLabel, falseLabel);
+      tree->right = createLabel (localLabel, tree->right);
 
       return newNode (NULLOP, tree->left, tree->right);
     }
@@ -5034,8 +5034,8 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
       if (IS_IFX (tree->right))
         return newNode (NULLOP, tree->left, createLabel (localLabel, tree->right));
 
-      tree->right = createLabel (localLabel, tree->right);
       tree->right = newIfxNode (tree->right, trueLabel, falseLabel);
+      tree->right = createLabel (localLabel, tree->right);
 
       return newNode (NULLOP, tree->left, tree->right);
     }
@@ -5328,7 +5328,7 @@ createDo (symbol * trueLabel, symbol * continueLabel, symbol * falseLabel, ast *
     {
       condAst = backPatchLabels (condAst, continueLabel, falseLabel);
       doTree = (IS_IFX (condAst) ? createLabel (continueLabel, condAst)
-                : newNode (IFX, createLabel (continueLabel, condAst), NULL));
+                : createLabel (continueLabel, newNode (IFX, condAst, NULL)));
       doTree->trueLabel = continueLabel;
       doTree->falseLabel = NULL;
 
@@ -5426,9 +5426,16 @@ createWhile (symbol * trueLabel, symbol * continueLabel, symbol * falseLabel, as
 
   /* put the continue label */
   condExpr = backPatchLabels (condExpr, trueLabel, falseLabel);
-  condExpr = createLabel (continueLabel, condExpr);
-  condExpr->filename = NULL;
-  condExpr->lineno = 0;
+  if (condExpr && !IS_IFX (condExpr))
+    {
+      condExpr = newNode (IFX, condExpr, NULL);
+      /* put the true & false labels in place */
+      condExpr->trueLabel = trueLabel;
+      condExpr->falseLabel = falseLabel;
+    }
+  whileTree = createLabel (continueLabel, condExpr);
+  whileTree->filename = NULL;
+  whileTree->lineno = 0;
 
   /* put the body label in front of the body */
   whileBody = createLabel (trueLabel, whileBody);
@@ -5440,16 +5447,6 @@ createWhile (symbol * trueLabel, symbol * continueLabel, symbol * falseLabel, as
                        whileBody, newNode (GOTO, newAst_VALUE (symbolVal (continueLabel)), createLabel (falseLabel, NULL)));
 
   /* put it all together */
-  if (IS_IFX (condExpr))
-    whileTree = condExpr;
-  else
-    {
-      whileTree = newNode (IFX, condExpr, NULL);
-      /* put the true & false labels in place */
-      whileTree->trueLabel = trueLabel;
-      whileTree->falseLabel = falseLabel;
-    }
-
   return newNode (NULLOP, whileTree, whileBody);
 }
 

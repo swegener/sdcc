@@ -1,3 +1,9 @@
+2012-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (createWhile, createDo, backPatchLabels): put label
+	  nodes above IFX nodes rather than between IFX and condition
+	* src/SDCCicode.c (geniCodeIfx, ast2iCode): fixed bug #3429793
+
 2012-02-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

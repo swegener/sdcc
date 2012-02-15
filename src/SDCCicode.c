@@ -3566,7 +3566,10 @@ geniCodeIfx (ast * tree, int lvl)
     }
 
 exit:
-  ast2iCode (tree->right, lvl + 1);
+  if (tree->right && tree->right->type == EX_VALUE)
+    geniCodeDummyRead (ast2iCode (tree->right, lvl + 1));
+  else
+    ast2iCode (tree->right, lvl + 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4357,7 +4360,13 @@ ast2iCode (ast * tree, int lvl)
 
     case LABEL:
       geniCodeLabel (OP_SYMBOL (ast2iCode (tree->left, lvl + 1)));
-      return ast2iCode (tree->right, lvl + 1);
+      if (tree->right && tree->right->type == EX_VALUE)
+        {
+          geniCodeDummyRead (ast2iCode (tree->right, lvl + 1));
+	  return NULL;
+	}
+      else
+	return ast2iCode (tree->right, lvl + 1);
 
     case GOTO:
       geniCodeGoto (OP_SYMBOL (ast2iCode (tree->left, lvl + 1)));

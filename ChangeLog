@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Cheaper signed comparison when right operand is a literal.
+	* support/regression/tests/gcc-torture-execute-pr37924.c:
+	  Disable even more of a test for older gcc.
 
 2012-02-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

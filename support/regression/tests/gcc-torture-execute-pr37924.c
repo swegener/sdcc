@@ -14,6 +14,7 @@
 signed char a;
 unsigned char b;
 
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 4))
 int
 test1 (void)
 {
@@ -27,6 +28,7 @@ test2 (void)
   int c = -1;
   return ((unsigned int) (b ^ c)) >> 9;
 }
+#endif
 
 void
 testTortureExecute (void)

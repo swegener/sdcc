@@ -1483,7 +1483,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 
   if (!op)
     return;
-emitDebug(";aopOp");
+
   /* if this a literal */
   if (IS_OP_LITERAL (op))
     {
@@ -1502,7 +1502,7 @@ emitDebug(";aopOp");
         }
       return;
     }
-emitDebug(";new aop");
+
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
@@ -1516,7 +1516,7 @@ emitDebug(";new aop");
 
   /* if this is a true symbol */
   if (IS_TRUE_SYMOP (op))
-    {emitDebug(";aop for true symbol");
+    {
       op->aop = aopForSym (ic, OP_SYMBOL (op), result, requires_a);
       return;
     }
@@ -1604,7 +1604,7 @@ emitDebug(";new aop");
         }
         
       if (sym->usl.spillLoc)
-        {emitDebug(";aop for spilt");
+        {
           asmop *oldAsmOp = NULL;
 
           if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
@@ -6387,7 +6387,6 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       _push (pair);
       while (size--)
         {
-          emit2 ("; direct compare");
           if(!regalloc_dry_run)
             _emitMove (_pairs[pair].l, aopGet (AOP (left), offset, FALSE));
           else

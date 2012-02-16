@@ -2048,13 +2048,11 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
         }
         else if (pairId == PAIR_IY)
           {
-#ifdef ALL_RABBIT
             if (isPair (aop) && IS_R2K && getPairId (aop) == PAIR_HL)
               {
                 emit2 ("ld iy, hl");
                 regalloc_dry_run_cost += 2;
               }
-#endif
             if (isPair (aop))
               {
                 emit2 ("push %s", _pairs[getPairId(aop)].name);
@@ -2075,14 +2073,13 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                     
                   }
                 regalloc_dry_run_cost += ld_cost(ASMOP_L, aop) + ld_cost(ASMOP_H, aop);
-#ifdef ALL_RABBIT
-                if (IS_R2K && id == PAIR_HL) ld iy, hl is not yet supported by the assembler
+
+                if (IS_R2K && id == PAIR_HL)
                   {
                     emit2 ("ld iy, hl");
                     regalloc_dry_run_cost += 2;
                   }
                 else
-#endif
                   {
                     emit2 ("push %s", _pairs[id].name);
                     emit2 ("pop iy");
@@ -2108,8 +2105,8 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                 emit2 ("ld hl, %d (sp)", sp_offset); /* Fetch relative to stack pointer. */
                 // TODO: Cost.
               }
-            else if (IS_R2K && aop->size - offset >= 2 && aop->type == AOP_STK && (pairId == PAIR_HL || pairId == PAIR_IY) &&
-              (abs (fp_offset) <= 127 && pairId == PAIR_HL || abs (sp_offset) <= 127))
+            else if (IS_R2K && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (pairId == PAIR_HL || pairId == PAIR_IY) &&
+              (abs (fp_offset) <= 127 && pairId == PAIR_HL && aop->type == AOP_STK || abs (sp_offset) <= 127))
               {
                 if (abs (sp_offset) <= 127)
                   emit2 ("ld %s, %d (sp)", pairId == PAIR_IY ? "iy" : "hl", sp_offset); /* Fetch relative to stack pointer. */
@@ -2808,8 +2805,8 @@ commitPair (asmop * aop, PAIR_ID id, const iCode *ic)
 {
   int fp_offset = aop->aopu.aop_stk + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
   int sp_offset = fp_offset + _G.stack.pushed;
-  if (IS_R2K && aop->type == AOP_STK && (id == PAIR_HL || id == PAIR_IY) &&
-    (id == PAIR_HL && abs (fp_offset) <= 127 || abs (sp_offset) <= 127))
+  if (IS_R2K && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
+    (id == PAIR_HL && abs (fp_offset) <= 127 && aop->type == AOP_STK || abs (sp_offset) <= 127))
     {
       if (abs (sp_offset) <= 127)
         emit2 ("ld %d (sp), %s", sp_offset, id == PAIR_IY ? "iy" : "hl"); /* Relative to stack pointer. */

@@ -1,3 +1,10 @@
+2012-02-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-r2k.def:
+	  Use some peepholes useful when omitting the frame pointer from z80 for r2k.
+	* src/z80/gen.c:
+	  Improve code generation for r2k when omitting frame pointer, enable use of ld iy, hl on r2k.
+
 2012-02-16 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/include/opcode/sparc.h,

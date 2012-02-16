@@ -1,3 +1,9 @@
+2012-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/main.c (hasExtBitOp),
+	  src/hc08/gen.c (genGetAbit, genGetByte, genGetWord, genhc08Code):
+	  implemented the GETABIT, GETBYTE, and GETWORD iCodes for HC08
+
 2012-02-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

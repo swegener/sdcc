@@ -5696,6 +5696,131 @@ genGetHbit (iCode * ic)
   freeAsmop (result, NULL, ic, TRUE);
 }
 
+
+/*-----------------------------------------------------------------*/
+/* genGetAbit - generates code get a single bit                    */
+/*-----------------------------------------------------------------*/
+static void
+genGetAbit (iCode * ic)
+{
+  operand *left, *right, *result;
+  int shCount;
+
+  D (emitcode (";     genGetAbit",""));
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE);
+  aopOp (right, ic, FALSE);
+  aopOp (result, ic, FALSE);
+
+  shCount = (int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+
+  /* get the needed byte into a */
+  loadRegFromAop (hc08_reg_a, AOP (left), shCount/8);
+  shCount %= 8;
+  if (AOP_TYPE (result) == AOP_CRY)
+    {
+      emitcode ("and", "#0x%02x", 1 << shCount);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      hc08_freeReg (hc08_reg_a);
+    }
+  else
+    {
+      switch (shCount)
+        {
+        case 3:
+          emitcode ("lsra", "");
+          //fallthrough
+        case 2:
+          emitcode ("lsra", "");
+          //fallthrough
+        case 1:
+          emitcode ("lsra", "");
+          //fallthrough
+        case 0:
+          emitcode ("and", "#0x01");
+          break;
+        case 4:
+          emitcode ("nsa", "");
+          emitcode ("and", "#0x01");
+          break;
+        case 5:
+          emitcode ("rola", "");
+          //fallthrough
+        case 6:
+          emitcode ("rola", "");
+          //fallthrough
+        case 7:
+          emitcode ("rola", "");
+	  emitcode ("clra", "");
+          emitcode ("rola", "");
+          break;
+        }
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      storeRegToFullAop (hc08_reg_a, AOP (result), FALSE);
+      hc08_freeReg (hc08_reg_a);
+    }
+
+  freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genGetByte - generates code get a single byte                   */
+/*-----------------------------------------------------------------*/
+static void
+genGetByte (iCode * ic)
+{
+  operand *left, *right, *result;
+  int offset;
+
+  D (emitcode (";", "genGetByte"));
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE);
+  aopOp (right, ic, FALSE);
+  aopOp (result, ic, FALSE);
+
+  offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
+  transferAopAop (AOP (left), offset, AOP (result), 0);
+
+  freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genGetWord - generates code get two bytes                       */
+/*-----------------------------------------------------------------*/
+static void
+genGetWord (iCode * ic)
+{
+  operand *left, *right, *result;
+  int offset;
+
+  D (emitcode (";", "genGetWord"));
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE);
+  aopOp (right, ic, FALSE);
+  aopOp (result, ic, FALSE);
+
+  offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
+  transferAopAop (AOP (left), offset+1, AOP (result), 1);
+  transferAopAop (AOP (left), offset, AOP (result), 0);
+  
+  freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
+}
+
 /*-----------------------------------------------------------------*/
 /* genSwap - generates code to swap nibbles or bytes               */
 /*-----------------------------------------------------------------*/
@@ -8609,6 +8734,18 @@ genhc08Code (iCode * lic)
 
         case GETHBIT:
           genGetHbit (ic);
+          break;
+
+        case GETABIT:
+          genGetAbit (ic);
+          break;
+
+        case GETBYTE:
+          genGetByte (ic);
+          break;
+
+        case GETWORD:
+          genGetWord (ic);
           break;
 
         case LEFT_OP:

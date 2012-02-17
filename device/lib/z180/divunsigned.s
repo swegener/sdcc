@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  divunsigned.s
 ;
-;  Copyright (C) 2000-2010, Michael Hope, Philipp Klaus Krause, Marco Bodrato
+;  Copyright (C) 2000-2012, Michael Hope, Philipp Klaus Krause, Marco Bodrato
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -64,19 +64,16 @@ __divu8::
         ;; Exit conditions
         ;;   HL = quotient
         ;;   DE = remainder
-        ;;   If divisor is non-zero, carry=0
-        ;;   If divisor is 0, carry=1 and both quotient and remainder are 0
+        ;;   carry = 0
+        ;;   If divisor is 0, quotient is set to "infinity", i.e HL = 0xFFFF.
         ;;
         ;; Register used: AF,B,DE,HL
 __divuint_rrx_hds::
 __divu16::
-        ;; Check for division by zero
-        ld      a,e
-        or      d
         ;; Two algorithms: one assumes divisor <2^7, the second
         ;; assumes divisor >=2^7; choose the applicable one.
-        and     #0x80
-        jr      NZ,.morethan7bits
+        ld      a,e
+        and     a,#0x80
         or      d
         jr      NZ,.morethan7bits
         ;; Both algorithms "rotate" 24 bits (H,L,A) but roles change.

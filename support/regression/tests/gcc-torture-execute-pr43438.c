@@ -21,6 +21,7 @@ static void func_12(int p_13)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 4))
   unsigned char l_11 = 254;
   *l_8 |= g_2;
   l_11 |= *l_8;
@@ -28,5 +29,6 @@ testTortureExecute (void)
   if (g_9 != 1)
     ASSERT (0);
   return;
+#endif
 } 
 

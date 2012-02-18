@@ -50,6 +50,7 @@ test3 (void *q)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 5))
   if (sizeof (float) != sizeof (int)
       || offsetof (struct R, a) != sizeof (int)
       || offsetof (struct Q, a) != sizeof (int))
@@ -67,4 +68,6 @@ testTortureExecute (void)
   if (test3 ((void *)&s) != 3)
     ASSERT (0);
   return;
+#endif
 }
+

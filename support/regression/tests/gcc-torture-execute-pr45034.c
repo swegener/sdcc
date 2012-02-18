@@ -25,7 +25,7 @@ void foo(int x, int y, int v)
     ASSERT(0);
 }
 
-int test_neg(void)
+int ftest_neg(void)
 {
   signed char x, y;
   int v, err;
@@ -47,10 +47,12 @@ int test_neg(void)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 6))
   if (sizeof (char) != 1)
     return;
-  if (test_neg() != 0)
+  if (ftest_neg() != 0)
     ASSERT(0);
   return;
+#endif
 }
 

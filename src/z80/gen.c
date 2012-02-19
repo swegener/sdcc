@@ -5169,7 +5169,7 @@ genPlus (iCode * ic)
           if ((AOP_SIZE (IC_LEFT (ic)) == 2 ||
                AOP_SIZE (IC_RIGHT (ic)) == 2) &&
               (AOP_SIZE (IC_LEFT (ic)) <= 2 &&
-               AOP_SIZE (IC_RIGHT (ic)) <= 2))
+               AOP_SIZE (IC_RIGHT (ic)) <= 2 || size == 2))
             {
               if (getPairId (AOP (IC_RIGHT (ic))) == PAIR_BC)
                 {
@@ -8649,6 +8649,7 @@ genPackBits (sym_link * etype,
                 }
             }
           emit2 ("ld %s,a", _pairs[extraPair].l);
+          spillPair (extraPair);
           regalloc_dry_run_cost += 1;
           emit2 ("ld a,!*pair", _pairs[pair].name);
           regalloc_dry_run_cost += (pair == PAIR_IX || pair == PAIR_IY) ? 3 : 1;
@@ -8742,6 +8743,7 @@ genPackBits (sym_link * etype,
             }
             
           emit2 ("ld %s,a", _pairs[extraPair].l);
+          spillPair (extraPair);
           regalloc_dry_run_cost += 1;
           
           if (pair == PAIR_IX || pair == PAIR_IY)

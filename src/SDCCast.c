@@ -537,6 +537,13 @@ resolveSymbols (ast * tree)
         }
     }
 
+  if (tree->type == EX_OP && tree->opval.op == FOR)
+    {
+      AST_FOR (tree, initExpr) = resolveSymbols (AST_FOR (tree, initExpr));
+      AST_FOR (tree, condExpr) = resolveSymbols (AST_FOR (tree, condExpr));
+      AST_FOR (tree, loopExpr) = resolveSymbols (AST_FOR (tree, loopExpr));
+    }
+
   /* if this is a label resolve it from the labelTab */
   if (IS_AST_VALUE (tree) && tree->opval.val->sym && tree->opval.val->sym->islbl)
     {
@@ -599,6 +606,28 @@ resolveSymbols (ast * tree)
         }
     }
 
+    /* If entering a block with symbols defined, mark the symbols in-scope */
+    /* before continuing down the tree, and mark them out-of-scope again   */
+    /* on the way back up */ 
+    if (tree->type == EX_OP && tree->opval.op == BLOCK && tree->values.sym)
+      {
+        symbol * sym = tree->values.sym;
+        while (sym)
+          {
+            sym->isinscope = 1;
+            sym = sym->next;
+          }
+        resolveSymbols (tree->left);
+        resolveSymbols (tree->right);
+        sym = tree->values.sym;
+        while (sym)
+          {
+            sym->isinscope = 0;
+            sym = sym->next;
+          }
+        return tree;
+      }
+      
 resolveChildren:
   resolveSymbols (tree->left);
   resolveSymbols (tree->right);
@@ -1567,6 +1596,13 @@ processBlockVars (ast * tree, int *stack, int action)
   if (tree->type == EX_OP && tree->opval.op == BLOCK)
     {
       ast *autoInit;
+      symbol * sym = tree->values.sym;
+
+      while (sym)
+        {
+          sym->isinscope = 1;
+          sym = sym->next;
+        }
 
       if (action == ALLOCATE)
         {
@@ -1583,6 +1619,19 @@ processBlockVars (ast * tree, int *stack, int action)
 
   processBlockVars (tree->left, stack, action);
   processBlockVars (tree->right, stack, action);
+
+  /* if this is a block */
+  if (tree->type == EX_OP && tree->opval.op == BLOCK)
+    {
+      symbol * sym = tree->values.sym;
+
+      while (sym)
+        {
+          sym->isinscope = 0;
+          sym = sym->next;
+        }
+    }
+    
   return tree;
 }
 

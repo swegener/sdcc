@@ -58,11 +58,9 @@ void testBug(void)
 
   Sub_9000();
 
-#ifdef PORT_HOST
   for(i = 1; i <= 4; i++)
     {
       ASSERT(C[i][1] == 0);
       ASSERT(C[i][2] == 0);
     }
-#endif
 }

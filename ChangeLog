@@ -1,3 +1,11 @@
+2012-02-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c (findSymWithLevel),
+	  src/SDCCast.c (resolveSymbols, processBlockVars): fixed bugs 3403429,
+	  3153215, 3107914 
+	* support/regression/tests/bug3403429.c: enabled test
+
 2012-02-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-pr44468.c,

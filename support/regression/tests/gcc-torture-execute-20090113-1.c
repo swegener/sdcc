@@ -9,7 +9,6 @@
 #endif
 
 #ifndef SDCC_mcs51
-
 typedef struct descriptor_dimension
 {
   int stride;
@@ -52,7 +51,7 @@ msum_i4 (gfc_array_i4 * const retarray,
       int result = 0;
 
       for (n = 0; n < len; n++, base++)
-	result += *base;
+        result += *base;
       *dest = result;
 
       count[0]++;
@@ -66,7 +65,6 @@ void
 testTortureExecute (void)
 {
 #ifndef SDCC_mcs51
-#ifndef SDCC_gbz80
   int rdata[3];
   int adata[9];
   gfc_array_i4 retarray = { rdata, 265, { { 1, 1, 3 } } };
@@ -74,7 +72,6 @@ testTortureExecute (void)
   int dim = 2;
   msum_i4 (&retarray, &array, &dim);
   return;
-#endif
 #endif
 }
 

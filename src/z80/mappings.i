@@ -23,7 +23,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     },
     { "leave", ""
     },
-    { "leavex", "lda sp,%d(sp)"
+    { "leavex", "add\tsp,#%d"
     },
     { "leavexl",
                 "ld hl,#%d\n"

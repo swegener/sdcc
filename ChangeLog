@@ -1,3 +1,10 @@
+2012-02-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/gcc-torture-execute-pr43236.c,
+	  support/regression/tests/gcc-torture-execute-20090113-1.c:
+	  Fixed bugs #3486543 and #3487324.
+
 2012-02-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h,

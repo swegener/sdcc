@@ -2166,7 +2166,7 @@ setupPairFromSP (PAIR_ID id, int offset)
   else
     {
       emit2 ("!ldahlsp", offset);
-      regalloc_dry_run_cost += 4;	// Todo: More exact cost.
+      regalloc_dry_run_cost += 3;
     }
 
   if (_G.preserveCarry)
@@ -5191,6 +5191,7 @@ genPlus (iCode * ic)
                   emit2 ("add hl,de");
                   regalloc_dry_run_cost += 1;
                 }
+              spillPair (PAIR_HL);
               commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
               goto release;
             }

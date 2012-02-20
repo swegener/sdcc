@@ -97,6 +97,7 @@ typedef struct ast
                                          * type resulting from a typecast.
                                          */
       unsigned removedCast:1;   /* true if the explicit cast has been removed */
+      unsigned implicitCast:1;  /* true if compiler added this cast */
     } cast;
     int argreg;                 /* argreg number when operand type == EX_OPERAND */
   }

@@ -1,3 +1,10 @@
+2012-02-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h,
+	  src/SDCCast.h,
+	  src/SDCCast.c (decorateType, processParms, checkPtrCast, copyAstValues):
+	  fixed bug #3438706
+
 2012-02-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

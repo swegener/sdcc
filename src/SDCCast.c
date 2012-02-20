@@ -200,6 +200,12 @@ copyAstValues (ast * dest, ast * src)
       AST_FOR (dest, initExpr) = copyAst (AST_FOR (src, initExpr));
       AST_FOR (dest, condExpr) = copyAst (AST_FOR (src, condExpr));
       AST_FOR (dest, loopExpr) = copyAst (AST_FOR (src, loopExpr));
+      break;
+
+    case CAST:
+      dest->values.cast.literalFromCast = src->values.cast.literalFromCast;
+      dest->values.cast.removedCast = src->values.cast.removedCast;
+      dest->values.cast.implicitCast = src->values.cast.implicitCast;
     }
 }
 
@@ -909,6 +915,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
           *actParm = newNode (CAST, newType, *actParm);
           (*actParm)->filename = (*actParm)->right->filename;
           (*actParm)->lineno = (*actParm)->right->lineno;
+          AST_VALUES (*actParm, cast.implicitCast) = 1;
 
           *actParm = decorateType (*actParm, resultType);
         }
@@ -951,11 +958,10 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
       pTree = resolveSymbols (copyAst (*actParm));
 
       /* now change the current one to a cast */
-      (*actParm)->type = EX_OP;
-      (*actParm)->opval.op = CAST;
-      (*actParm)->left = newAst_LINK (defParm->type);
-      (*actParm)->right = pTree;
-      (*actParm)->decorated = 0;        /* force typechecking */
+      *actParm = newNode (CAST, newAst_LINK (defParm->type), pTree);
+      (*actParm)->filename = (*actParm)->right->filename;
+      (*actParm)->lineno = (*actParm)->right->lineno;
+      AST_VALUES (*actParm, cast.implicitCast) = 1;
       *actParm = decorateType (*actParm, IS_GENPTR (defParm->type) ? RESULT_TYPE_GPTR : resultType);
     }
 
@@ -2601,6 +2607,14 @@ void
 checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
 {
   int errors = 0;
+  
+  if (IS_ARRAY (orgType))
+    {
+      value *val;
+      val = aggregateToPointer (valFromType (orgType));
+      orgType = val->type;
+      Safe_free (val);
+    }
 
   if (IS_PTR (newType))         // to a pointer
     {
@@ -4152,7 +4166,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                       gpVal &= (1 << (getSize (LTYPE (tree)) * 8)) - 1;
                     }
                 }
-              checkPtrCast (LTYPE (tree), RTYPE (tree), FALSE);
+              checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
               LRVAL (tree) = 1;
               tree->type = EX_VALUE;
               tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | ulFromVal (valFromType (RTYPE (tree))));
@@ -4164,7 +4178,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               return tree;
             }
         }
-      checkPtrCast (LTYPE (tree), RTYPE (tree), FALSE);
+      checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
       if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
         {
           DCL_TYPE (LTYPE (tree)) = DCL_TYPE (RTYPE (tree));
@@ -4887,10 +4901,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if there is going to be a casting required then add it */
       if (compareType (currFunc->type->next, RTYPE (tree)) < 0)
         {
-          tree->right =
-            decorateType (newNode (CAST,
-                                   newAst_LINK (copyLinkChain (currFunc->type->next)),
-                                   tree->right), IS_GENPTR (currFunc->type->next) ? RESULT_TYPE_GPTR : RESULT_TYPE_NONE);
+          tree->right = newNode (CAST,
+                                 newAst_LINK (copyLinkChain (currFunc->type->next)),
+                                 tree->right);
+          tree->right->values.cast.implicitCast = 1;
+          tree->right = decorateType (tree->right, IS_GENPTR (currFunc->type->next) ? RESULT_TYPE_GPTR : RESULT_TYPE_NONE);
         }
 
       RRVAL (tree) = 1;

@@ -691,6 +691,7 @@ void promoteAnonStructs (int, structdef *);
 int isConstant (sym_link * type);
 int isVolatile (sym_link * type);
 int isRestrict (sym_link * type);
+value *aggregateToPointer (value *);
 
 
 extern char *nounName (sym_link *);     /* noun strings */

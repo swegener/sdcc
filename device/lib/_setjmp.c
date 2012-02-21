@@ -28,7 +28,7 @@
 
 #include <8051.h>
 #include <sdcc-lib.h>
-#define HIDE_LONGJMP
+#define __SDCC_HIDE_LONGJMP
 #include <setjmp.h>
 
 #if defined(SDCC_STACK_AUTO) && defined(SDCC_USE_XSTACK)

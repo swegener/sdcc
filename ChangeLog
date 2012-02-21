@@ -1,3 +1,8 @@
+2012-02-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (cseBBlock): fixed bug #3482753
+	* support/regression/tests/bug3482753.c: new
+
 2012-02-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h,

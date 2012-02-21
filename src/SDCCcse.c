@@ -2334,6 +2334,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (!(POINTER_SET (ic)) && IS_SYMOP (IC_RESULT (ic)))
         {
           deleteItemIf (&cseSet, ifOperandsHave, IC_RESULT (ic));
+          deleteItemIf (&ptrSetSet, ifOperandsHave, IC_RESULT (ic));
           /* delete any previous definitions */
           ebb->defSet = bitVectCplAnd (ebb->defSet, OP_DEFS (IC_RESULT (ic)));
         }

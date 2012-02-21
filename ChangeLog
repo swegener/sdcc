@@ -1,7 +1,8 @@
 2012-02-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/include/setjmp.h,
-	  support/regression/tests/setjmp.c:
+	  support/regression/tests/setjmp.c,
+	  device/lib/_setjmp.c:
 	  Rename HIDE_LONGJMP to __SDCC_HIDE_LONGJMP for standard compliance, enable setjmp/longjmp for z180 and r2k.
 
 2012-02-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

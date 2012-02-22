@@ -1,3 +1,12 @@
+2012-02-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug2935162.c,
+	* device/include/limits.h: changed constants to be compatible with
+	  both C89 and C99 integer constant type rules
+	* src/SDCCval.c (constVal): fixed bug #3489899
+	* src/mcs51/peeph.def: don't tail call optimize longjmp()
+	* src/SDCCsymt.c (addSymChain): fixed bug #3489870
+
 2012-02-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/include/setjmp.h,

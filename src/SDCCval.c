@@ -1078,7 +1078,10 @@ constVal (const char *s)
       SPEC_LONG (val->type) = 1;
       p2++;
       if (strchr (p2, 'l') || strchr (p2, 'L'))
-        werror (E_INTEGERSUFFIX, p);  
+        werror (E_INTEGERSUFFIX, p);
+      /* c89 allows unsigned long without explicit u suffix */
+      if (!options.std_c99 && dval > 0x7fffffff && dval <= 0xffffffff)
+         SPEC_USIGN (val->type) = 1;
     }
   else
     {
@@ -1129,7 +1132,9 @@ constVal (const char *s)
             }
           else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
             {
-              if (is_integral)
+              /* integral constants can be unsigned long. */
+              /* c89 also allows unsigned long decimal constants without explicit suffix */
+              if (is_integral || (!options.std_c99 && dval <= 0xffffffff))
                 SPEC_USIGN (val->type) = 1;
               else
                 SPEC_LONGLONG (val->type) = 1;

@@ -1266,6 +1266,12 @@ addSymChain (symbol ** symHead)
       changePointer (sym->type);
       checkTypeSanity (sym->etype, sym->name);
 
+      if (IS_NORETURN (sym->etype))
+        {
+          SPEC_NORETURN (sym->etype) = 0;
+          FUNC_ISNORETURN (sym->type) = 1;
+        }
+
       if (!sym->level && !(IS_SPEC (sym->etype) && IS_TYPEDEF (sym->etype)))
         elemsFromIval = checkDecl (sym, 0);
       else

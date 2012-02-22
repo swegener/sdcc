@@ -29,7 +29,7 @@
 #include <sdcc-lib.h>
 #include <malloc.h>
 
-#if defined(SDCC_STACK_AUTO) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_gbz80)
+#if defined(__SDCC_STACK_AUTO) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_gbz80)
   #define CRITICAL __critical
 #else
   #define CRITICAL

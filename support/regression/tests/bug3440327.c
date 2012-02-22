@@ -5,7 +5,7 @@
 #include <testfwk.h>
 #include <setjmp.h>
 
-#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__PORT_HOST)
 
 jmp_buf b;
 
@@ -54,7 +54,7 @@ int bug(void)
 
 void testBug (void)
 {
-#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__PORT_HOST)
 	if (setjmp (b))
 	{
 		ASSERT (j == 42);
@@ -66,3 +66,4 @@ void testBug (void)
 	}
 #endif
 }
+

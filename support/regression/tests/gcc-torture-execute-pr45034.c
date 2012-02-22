@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #pragma disable_warning 85
 #endif
@@ -47,7 +47,7 @@ int ftest_neg(void)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 6))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 6))
   if (sizeof (char) != 1)
     return;
   if (ftest_neg() != 0)

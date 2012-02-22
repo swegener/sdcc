@@ -38,10 +38,10 @@ unsigned long _divulong (unsigned long x, unsigned long y);
      mcs51 small stack-auto
 */
 
-#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-#  if defined(SDCC_mcs51)
-#    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+#  if defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_SMALL)
+#      if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _DIVSLONG_ASM_SMALL_AUTO
 #      else
 #        define _DIVSLONG_ASM_SMALL

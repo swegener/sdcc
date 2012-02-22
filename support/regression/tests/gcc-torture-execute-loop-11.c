@@ -4,11 +4,11 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 static int a[199];
 
 static void
@@ -23,7 +23,7 @@ foo ()
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   int i;
   foo ();
   for (i = 0; i < 199; i++)

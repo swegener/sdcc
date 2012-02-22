@@ -4,12 +4,12 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
 // Some ports do not support long long yet.
-#if !defined(SDCC_mcs51) && !defined(SDCC_hc08) && !defined(SDCC_ds390) && !defined(SDCC_pic14) && !defined(SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 int a = 0x101;
 int b = 0x100;
 
@@ -24,7 +24,7 @@ foo (void)
 void
 testTortureExecute (void)
 {
-#if !defined(SDCC_mcs51) && !defined(SDCC_hc08) && !defined(SDCC_ds390) && !defined(SDCC_pic14) && !defined(SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   ASSERT (!(1 - foo ()));
 #endif
 }

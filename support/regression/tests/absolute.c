@@ -5,7 +5,7 @@
 #include <testfwk.h>
 #include <stddef.h>
 
-#ifdef SDCC_pic16
+#ifdef __SDCC_pic16
 # define ADDRESS(x) (0x02 ## x)
 #else
 # define ADDRESS(x) (0xCA ## x)
@@ -59,7 +59,7 @@ testAbsolute(void)
 #endif
 }
 
-#if defined(SDCC_mcs51) || defined(SDCC_ds390)
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390)
 volatile __data __at(0x20) unsigned char Byte0 = 0x00;
 volatile __data __at(0x22) unsigned char Byte1 = 0x00;
 volatile __bit Bit0, Bit1, Bit2, Bit3, Bit4, Bit5, Bit6, Bit7, Bit8;
@@ -68,7 +68,7 @@ volatile __bit Bit0, Bit1, Bit2, Bit3, Bit4, Bit5, Bit6, Bit7, Bit8;
 void
 testAbsBdata(void)
 {
-#if defined(SDCC_mcs51) || defined(SDCC_ds390)
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390)
   Bit0 = 1;
   ASSERT(Byte0 == 0x00);
   Byte0 = 0xFF;
@@ -76,3 +76,4 @@ testAbsBdata(void)
   ASSERT(Byte0 == 0xFF);
 #endif
 }
+

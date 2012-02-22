@@ -5,7 +5,7 @@
 
 #include <testfwk.h>
 
-#if defined (SDCC)
+#if defined (__SDCC)
   #pragma disable_warning 196 //no warning about pointer const qualifier (W_TARGET_LOST_QUALIFIER)
   #include <sdcc-lib.h> /* just to get _STATMEM */
 #endif

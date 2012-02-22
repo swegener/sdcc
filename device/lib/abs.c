@@ -28,9 +28,9 @@
 
 #include <stdlib.h>
 
-#if defined (SDCC_mcs51)
+#if defined (__SDCC_mcs51)
 
-#if defined(SDCC)
+#if defined(__SDCC)
  #include <sdcc-lib.h>
 #endif
 

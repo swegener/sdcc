@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -19,7 +19,7 @@ foo (unsigned int u)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 1))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 1))
   unsigned int u = INT_MAX;
 
   if (foo (u) == 0)

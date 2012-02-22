@@ -3,7 +3,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -81,3 +81,4 @@ testBool(void)
 	E = true;
 	E--;     ASSERT(!E); // sets E to 1-E
 }
+

@@ -26,7 +26,7 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
   __data unsigned char bpx ;
 #else
   __data unsigned int bpx ;

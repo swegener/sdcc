@@ -17,7 +17,7 @@ char * correct(void)
 
 void testBug(void)
 {
-#ifdef SDCC
+#ifdef __SDCC
   foo();
   ASSERT (*(unsigned char __xdata *)(0xF064) == 0x12);
 #endif

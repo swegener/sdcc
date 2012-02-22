@@ -110,7 +110,7 @@ static __data unsigned char field_width;
 #endif
 
 #ifdef FLOAT
-#define SDCC_FLOAT_LIB
+#define __SDCC_FLOAT_LIB
 #include <float.h>
 static __bit continue_float;
 #ifndef FLOAT_FIXED4
@@ -132,10 +132,10 @@ static __data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp spac
 #endif
 
 
-#if !defined(SDCC_mcs51) || defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
+#if !defined(__SDCC_mcs51) || defined(__SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
 // Does printf_fast really work on ds390 and ds400?
 // If it does, enable them in the line above
-#if defined(SDCC_USE_XSTACK)
+#if defined(__SDCC_USE_XSTACK)
 #warning "printf_fast not built, does not support --xstack"
 #elif defined(_SDCC_NO_ASM_LIB_FUNCS)
 #warning "printf_fast not built, _SDCC_NO_ASM_LIB_FUNCS defined"

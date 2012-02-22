@@ -187,7 +187,7 @@ _gptrput (char *gptr, char c) __naked
 
 #endif
 
-#ifdef SDCC_ds390
+#ifdef __SDCC_ds390
 
 void
 _gptrputWord ()

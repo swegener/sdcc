@@ -30,7 +30,7 @@ testCmp (void)
 void
 testDiv (void)
 {
-#if defined (__mcs51) && !defined (SDCC_STACK_AUTO)
+#if defined (__SDCC_mcs51) && !defined (__SDCC_STACK_AUTO)
   __idata __at 0xd0
 #endif
   volatile float left;

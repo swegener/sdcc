@@ -10,7 +10,7 @@
  * the following tests are applicable only for SDCC,
  * since they are using SDCC specific pragmas
  */
-#ifdef SDCC
+#ifdef __SDCC
 /*
  * test for bug 135170
  */

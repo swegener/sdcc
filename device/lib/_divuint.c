@@ -33,10 +33,10 @@
 
 #include <stdbool.h>
 
-#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-#  if defined(SDCC_mcs51)
-#    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+#  if defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_SMALL)
+#      if defined(__SDCC_STACK_AUTO)
 #        define _DIVUINT_ASM_SMALL_AUTO
 #      else
 #        define _DIVUINT_ASM_SMALL
@@ -66,7 +66,7 @@ __divuint:
 	#define yl      (b1_0)
 	#define yh      (b1_1)
 #else // SDCC_PARMS_IN_BANK1
-  #if defined(SDCC_STACK_AUTO)
+  #if defined(__SDCC_STACK_AUTO)
 
 	.globl __divint
 
@@ -87,7 +87,7 @@ __divint:			; entry point for __divsint
 
   #else // SDCC_STACK_AUTO
 
-    #if defined(SDCC_NOOVERLAY)
+    #if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
     #else
 	.area OSEG    (OVR,DATA)

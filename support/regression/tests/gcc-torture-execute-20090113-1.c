@@ -4,11 +4,11 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 typedef struct descriptor_dimension
 {
   int stride;
@@ -64,7 +64,7 @@ msum_i4 (gfc_array_i4 * const retarray,
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   int rdata[3];
   int adata[9];
   gfc_array_i4 retarray = { rdata, 265, { { 1, 1, 3 } } };

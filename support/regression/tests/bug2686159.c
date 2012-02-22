@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC_pic16
+#ifdef __SDCC_pic16
 # define ADDRESS(x) (0x02 ## x)
 #else
 # define ADDRESS(x) (0xCA ## x)
@@ -30,7 +30,7 @@ void correct(void)
 
 void testBug(void)
 {
-#ifdef SDCC
+#ifdef __SDCC
 	REG_1 = 0x40;
 	incorrect();
 	ASSERT (REG_1 == 0x43);

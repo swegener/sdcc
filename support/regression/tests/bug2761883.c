@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC_STACK_AUTO
+#ifdef __SDCC_STACK_AUTO
 #define __xdata
 #endif
 

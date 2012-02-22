@@ -6,7 +6,7 @@
 unsigned int global_int = 0;
 unsigned int *gpInt;
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 #include <8052.h>
 
 void
@@ -17,7 +17,7 @@ T2_isr (void) __interrupt 5 //no using
 }
 #endif
 
-#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_r2k) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(PORT_HOST)
 
 void
 try_fun (jmp_buf catch, int except)
@@ -50,11 +50,11 @@ void f1(void)
 void
 testJmp (void)
 {
-#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_r2k) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(PORT_HOST)
   jmp_buf catch;
   int exception;
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
   gpInt = &global_int;
   //enable the interrupt and set it's flag to generate some heavy stack usage
   ET2 = 1;
@@ -77,7 +77,7 @@ testJmp (void)
 //  ASSERT(0);
 //#endif
 
-#if defined(SDCC_mcs51) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_r2k) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(PORT_HOST)
   f1();
 #endif
 }

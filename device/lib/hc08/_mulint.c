@@ -44,7 +44,7 @@ _mulint (int a, int b)
 {
   a,b;	/* reference to make compiler happy */
 
-#if !defined(SDCC_STACK_AUTO)
+#if !defined(__SDCC_STACK_AUTO)
     __asm
    	ais #-2
 	psha
@@ -112,7 +112,7 @@ union uu {
 int
 _mulint (int a, int b)
 {
-#if !defined(SDCC_STACK_AUTO) && (defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390))	// still needed for large
+#if !defined(__SDCC_STACK_AUTO) && (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_ds390))	// still needed for large
 	union uu __xdata *x;
 	union uu __xdata *y;
 	union uu t;
@@ -135,3 +135,4 @@ _mulint (int a, int b)
 
 
 #undef _MULINT_ASM
+

@@ -4,11 +4,11 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 
 #include <string.h>
 
@@ -84,7 +84,7 @@ PgHdr *sort_pagelist(PgHdr *pIn)
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   PgHdr a[5];
   PgHdr *p;
   a[0].pgno = 5;

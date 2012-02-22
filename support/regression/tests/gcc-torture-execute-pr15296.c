@@ -5,7 +5,7 @@
 #include <testfwk.h>
 #include <stdint.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #pragma disable_warning 85
 #endif
@@ -78,7 +78,7 @@ void g (void *a, char *b) { ASSERT(0); }
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   union u0 uv[] = {{ .i = 111 }, { .i = 222 }, { .i = 333 }, { .i = 444 }};
   struct s1 s = { 0, {{ .i = 555 }, { .i = 0 }, { .i = 999 }, { .i = 777 }}};
   f (0, &s, 0, 20000, 10000, (W) uv);
@@ -89,3 +89,4 @@ testTortureExecute (void)
   return;
 #endif
 }
+

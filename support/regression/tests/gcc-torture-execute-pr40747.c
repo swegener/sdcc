@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -28,3 +28,4 @@ testTortureExecute (void)
   if (foo (5) != 4) ASSERT (0);
   return;
 }
+

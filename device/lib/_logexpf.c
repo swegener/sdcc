@@ -26,7 +26,7 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#define SDCC_MATH_LIB
+#define __SDCC_MATH_LIB
 #include <math.h>
 
 

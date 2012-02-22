@@ -6,7 +6,7 @@
 
 #include <testfwk.h>
 
-#if defined SDCC_mcs51 || defined SDCC_ds390
+#if defined __SDCC_mcs51 || defined __SDCC_ds390
 
 #define TEST_MACRO_20() { \
 	/*this macro has 20 instructions in it*/ \
@@ -145,3 +145,4 @@ void testBug(void)
 {
 	ASSERT(bug3407279(0) == 0);
 }
+

@@ -28,7 +28,7 @@
 
 #include "string.h" 
 
-#if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
+#if defined(__SDCC_MODEL_LARGE) || defined (__SDCC_MODEL_FLAT24)
 #pragma noinduction
 #pragma noinvariant
 #endif
@@ -69,3 +69,4 @@ char * strtok (
 	else
 		return NULL;
 }
+

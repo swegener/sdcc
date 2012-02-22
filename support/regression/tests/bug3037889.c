@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma disable_warning 88 //no warning about casting LITERAL value to 'generic' pointer
 #endif
 

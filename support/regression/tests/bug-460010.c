@@ -2,8 +2,8 @@
  */
 #include <testfwk.h>
 
-#ifdef SDCC
-#ifdef SDCC_pic16
+#ifdef __SDCC
+#ifdef __SDCC_pic16
 #define ADDRESS 0x0070
 #else
 #define ADDRESS 0xa000
@@ -19,7 +19,7 @@ func (unsigned char a)
 void
 testBadPromotion (void)
 {
-#ifdef SDCC
+#ifdef __SDCC
   unsigned char c = *((unsigned __xdata char*)(ADDRESS));
 #else
   unsigned char loc_c;

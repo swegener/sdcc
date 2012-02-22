@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c11
 
 /* Copyright (C) 2001 Free Software Foundation, Inc.  */
@@ -29,7 +29,7 @@ struct
 void
 testTortureExecute (void)
 {
-#ifdef SDCC
+#ifdef __SDCC
   foo.b = 6;
   foo.a = 5;
 

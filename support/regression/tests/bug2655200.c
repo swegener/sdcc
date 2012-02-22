@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 char thing;
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
 __code char thing_code = 0;
 __data char thing_data;
 __idata char thing_idata;
@@ -25,7 +25,7 @@ __pdata char thing_apdata[2];
 
 const char * __code test_array[] = {
  &thing
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
  , &thing_code
  , &thing_data, &thing_idata, &thing_xdata, &thing_pdata
  , thing_apdata, (char *)thing_apdata
@@ -34,7 +34,7 @@ const char * __code test_array[] = {
 
 
 const char *gime_thing() { return &thing; }
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
 const char *gime_thing_code() { return &thing_code; }
 const char *gime_thing_data() { return &thing_data; }
 const char *gime_thing_idata() { return &thing_idata; }
@@ -49,7 +49,7 @@ testBug(void)
 {
  ASSERT(test_array[0] == gime_thing());
 
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
  ASSERT(test_array[1] == gime_thing_code());
  ASSERT(test_array[2] == gime_thing_data());
  ASSERT(test_array[3] == gime_thing_idata());

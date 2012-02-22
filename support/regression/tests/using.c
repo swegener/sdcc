@@ -5,7 +5,7 @@
 
 #define _{using}
 
-#if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL)
+#if defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)
 
   #ifndef _no_proto
     #if defined (_both)
@@ -28,7 +28,7 @@
 void
 testUsing (void)
 {
-#if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL)
+#if defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)
   ASSERT ((unsigned char)(&array[0]) >= 0x10);
   ASSERT ((unsigned char)&__numTests >= 0x10);
 #endif

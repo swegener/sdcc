@@ -31,14 +31,14 @@
 
 /* Version 1.0 - Initial release */
 
-#define SDCC_MATH_LIB
+#define __SDCC_MATH_LIB
 #include <math.h>
 #include <errno.h>
 
 
 #ifdef MATH_ASM_MCS51
 
-#define SDCC_FLOAT_LIB
+#define __SDCC_FLOAT_LIB
 #include <float.h>
 
 // TODO: share with other temps
@@ -215,8 +215,8 @@ logf_exit:
 
 float logf(const float x) _FLOAT_FUNC_REENTRANT
 {
-#if     defined(SDCC_mcs51) && defined(SDCC_MODEL_SMALL) \
-    && !defined(SDCC_NOOVERLAY)
+#if     defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL) \
+    && !defined(__SDCC_NOOVERLAY)
     volatile
 #endif
     float Rz;

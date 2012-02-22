@@ -7,7 +7,7 @@
 void
 testBug(void)
 {
-#if !defined(SDCC_mcs51)
+#if !defined(__SDCC_mcs51)
   unsigned char buff[176];
   unsigned char i;
   for(i = 0; i < 22*8; ++i)

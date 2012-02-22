@@ -42,15 +42,15 @@
      char _AUTOMEM * pAr = Ar;
    }
 */
-#if defined(SDCC_STACK_AUTO)
-  #if defined(SDCC_USE_XSTACK)
+#if defined(__SDCC_STACK_AUTO)
+  #if defined(__SDCC_USE_XSTACK)
     #define _AUTOMEM __pdata
   #else
     #define _AUTOMEM __idata
   #endif
-#elif defined(SDCC_MODEL_SMALL)
+#elif defined(__SDCC_MODEL_SMALL)
   #define _AUTOMEM __data
-#elif defined(SDCC_MODEL_MEDIUM)
+#elif defined(__SDCC_MODEL_MEDIUM)
   #define _AUTOMEM __pdata
 #else
   #define _AUTOMEM __xdata
@@ -65,9 +65,9 @@
      char _STATMEM * pAr = Ar;
    }
 */
-#if defined(SDCC_MODEL_SMALL)
+#if defined(__SDCC_MODEL_SMALL)
   #define _STATMEM __data
-#elif defined(SDCC_MODEL_MEDIUM)
+#elif defined(__SDCC_MODEL_MEDIUM)
   #define _STATMEM __pdata
 #else
   #define _STATMEM __xdata
@@ -76,7 +76,7 @@
 
 /* define _RETURN for correct returning from inline asm functions
 */
-#if defined(SDCC_MODEL_HUGE)
+#if defined(__SDCC_MODEL_HUGE)
  #define _RETURN ljmp __sdcc_banked_ret
 #else
  #define _RETURN ret

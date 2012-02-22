@@ -5,11 +5,11 @@
 #include <stdarg.h>
 #endif
 
-#ifdef SDCC_ds390
+#ifdef __SDCC_ds390
 #include <tinibios.h> /* main() must see the ISR declarations */
 #endif
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
 /* until changed, isr's must have a prototype in the module containing main */
 void T2_isr (void) __interrupt 5;
 #define MEMSPACE_BUF __idata

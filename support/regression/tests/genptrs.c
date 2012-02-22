@@ -34,7 +34,7 @@ char __code  * cp0 = NULL;
 char __code  * cp1 = (char __code *)0x0001;
 void (* fp0)(void) = NULL;
 void (* fp1)(void) = (void (*)(void))0x0001;
-#if defined (SDCC_MODEL_HUGE)
+#if defined (__SDCC_MODEL_HUGE)
 void (* fpE)(void) = (void (*)(void))0x7E8000;	//SDCC assumes banked pointers have physical address != 0
 void (* fpF)(void) = (void (*)(void))0x7F8000;	//choose the banks to be mapped to 0x8000 for the test
 #endif
@@ -43,7 +43,7 @@ char         * gp2 = (char __pdata *)0x0002;
 
 void testPtrs(void)
 {
-#if defined (SDCC_MODEL_HUGE)
+#if defined (__SDCC_MODEL_HUGE)
 	char __code  * cp2 = (char __code *)0x0002;
 	void (* fp2)(void) = (void (*)(void))0x0002;
 
@@ -71,7 +71,7 @@ void testPtrs(void)
 	ASSERT (eq(xp0, fp0));
 	ASSERT (eq(xp0, gp0));
 
-#if defined(SDCC_mcs51) || defined(SDCC_ds390)
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390)
 	ASSERT (neq(xp1, ip1));
 	ASSERT (neq(xp1, pp1));
 	ASSERT (neq(xp1, cp1));

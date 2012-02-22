@@ -35,12 +35,12 @@
    variables if external data memory needs to be
    enabled first. */
 
-#if defined(SDCC_ds390) || defined(SDCC_ds400)
+#if defined(__SDCC_ds390) || defined(__SDCC_ds400)
 
 /* Disable "ISO C forbids an empty source file" warning message */
 #pragma disable_warning 190
 
-#elif defined(SDCC_mcs51) || defined(SDCC_z80)
+#elif defined(__SDCC_mcs51) || defined(__SDCC_z80)
 
 unsigned char _sdcc_external_startup (void) __nonbanked
 {

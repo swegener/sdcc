@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if (defined PORT_HOST) || defined (SDCC_STACK_AUTO)
+#if (defined PORT_HOST) || defined (__SDCC_STACK_AUTO)
 
 /*****************************************************************************
 * Product; Jongle Reconfigurable USB hardware

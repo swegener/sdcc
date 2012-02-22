@@ -7,7 +7,7 @@
 
 #define INTREGBANK {bank}
 
-#if defined(SDCC_mcs51) || defined (SDCC_ds390)
+#if defined(__SDCC_mcs51) || defined (__SDCC_ds390)
 
 void handler1(void) __using(INTREGBANK)
 {

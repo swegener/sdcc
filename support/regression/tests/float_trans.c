@@ -6,7 +6,7 @@
 #include <testfwk.h>
 #include <math.h>
 
-#if defined (__STDC_IEC_559__) || defined (SDCC)
+#if defined (__STDC_IEC_559__) || defined (__SDCC)
 #define {func} 1
 #endif
 
@@ -22,7 +22,7 @@ testTrans(void)
 #endif
 #ifdef POWF
   /*  too big for small model */
-# ifndef SDCC_MODEL_SMALL
+# ifndef __SDCC_MODEL_SMALL
     ASSERT(fabsf (powf (1.5, 2.0) -   2.24999976) < 0.00001);
 # endif
 #endif

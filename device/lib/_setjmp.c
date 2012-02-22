@@ -31,7 +31,7 @@
 #define __SDCC_HIDE_LONGJMP
 #include <setjmp.h>
 
-#if defined(SDCC_STACK_AUTO) && defined(SDCC_USE_XSTACK)
+#if defined(__SDCC_STACK_AUTO) && defined(__SDCC_USE_XSTACK)
 
 static void dummy (void) __naked
 {
@@ -102,7 +102,7 @@ ___setjmp:
 ;     genPointerSet
 ;     genGenPointerSet
 	lcall	__gptrput
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
 	inc	dptr
 ;../../device/lib/_setjmp.c:189:*buf   = *((unsigned char __data *)SP - 2);
 ;     genCast
@@ -188,7 +188,7 @@ _longjmp:
 ;     genPointerSet
 ;     genNearPointerSet
 	mov	@r0,a
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
 	inc	dptr
 ;../../device/lib/_setjmp.c:199:*((unsigned char __data *) lsp - 2) = *buf;
 ;     genMinus
@@ -219,7 +219,7 @@ _longjmp:
 	__endasm;
 }
 
-#elif defined(SDCC_STACK_AUTO)
+#elif defined(__SDCC_STACK_AUTO)
 
 static void dummy (void) __naked
 {
@@ -278,7 +278,7 @@ ___setjmp:
 ;     genPointerSet
 ;     genGenPointerSet
 	lcall	__gptrput
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
 	inc	dptr
 ;../../device/lib/_setjmp.c:129:*buf++ = *((unsigned char __data *)SP - 2);
 ;     genCast
@@ -322,7 +322,7 @@ _longjmp:
 	mov	r0,sp
 	dec	r0
 	dec	r0
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
 	dec	r0
 #endif
 	mov	ar2,@r0
@@ -363,7 +363,7 @@ _longjmp:
 ;     genPointerSet
 ;     genNearPointerSet
 	mov	@r0,a
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
 	inc	dptr
 ;../../device/lib/_setjmp.c:34:*((unsigned char __data *) lsp - 2) = *buf;
 ;     genCast
@@ -406,7 +406,7 @@ int __setjmp (jmp_buf buf)
     /* registers would have been saved on the
        stack anyway so we need to save SP
        and the return address */
-#ifdef SDCC_USE_XSTACK
+#ifdef __SDCC_USE_XSTACK
     *buf++ = spx;
     *buf++ = bpx;
 #endif
@@ -414,7 +414,7 @@ int __setjmp (jmp_buf buf)
 //    *buf++ = bp;
     *buf++ = *((unsigned char __data *) SP - 0);
     *buf++ = *((unsigned char __data *) SP - 1);
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
     *buf++ = *((unsigned char __data *) SP - 2);
 #endif
     return 0;
@@ -424,7 +424,7 @@ int longjmp (jmp_buf buf, int rv)
 {
     unsigned char lsp;
 
-#ifdef SDCC_USE_XSTACK
+#ifdef __SDCC_USE_XSTACK
     spx = *buf++;
     bpx = *buf++;
 #endif
@@ -432,7 +432,7 @@ int longjmp (jmp_buf buf, int rv)
 //    bp = *buf++;
     *((unsigned char __data *) lsp - 0) = *buf++;
     *((unsigned char __data *) lsp - 1) = *buf++;
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
     *((unsigned char __data *) lsp - 2) = *buf++;
 #endif
     SP = lsp;
@@ -440,3 +440,4 @@ int longjmp (jmp_buf buf, int rv)
 }
 
 #endif
+

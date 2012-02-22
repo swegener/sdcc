@@ -8,7 +8,7 @@
 
 #define SWAP_4(x) ((unsigned char)((x)<<4)|(unsigned char)((x)>>4))
     
-#ifdef SDCC
+#ifdef __SDCC
 typedef unsigned int uint16;
 typedef unsigned long uint32;
 #else
@@ -47,7 +47,7 @@ static void testSwap_8(void)
     x.i = SWAP_8(x.i);
     ASSERT( x.i == SWAP_8(TEST_VECT_16));
 
-#if defined (SDCC_mcs51)
+#if defined (__SDCC_mcs51)
     /* this was filed as bug #1638622 (rejected) */
     x.i = t;
     x.i = x.c[1] + 256*x.c[0];
@@ -104,9 +104,9 @@ static void testSwap_16(void)
 /* now for something ugly */
 static void testSwap_16_ptr(void)
 {
-#if defined (SDCC)
+#if defined (__SDCC)
 #include <sdcc-lib.h> /* just to get _AUTOMEM or _STATMEM */
-#if defined (SDCC_STACK_AUTO)
+#if defined (__SDCC_STACK_AUTO)
 #define MY_STATIC static
 #else
 #define MY_STATIC
@@ -139,3 +139,4 @@ testSwap(void)
    testSwap_16();
    testSwap_16_ptr();
 }
+

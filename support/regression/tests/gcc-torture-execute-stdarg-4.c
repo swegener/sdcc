@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -12,7 +12,7 @@
 
 #include <stdarg.h>
 
-#ifndef SDCC_ds390
+#ifndef __SDCC_ds390
 long x, y;
 
 inline void
@@ -126,7 +126,7 @@ f4 (int i, ...)
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_ds390
+#ifndef __SDCC_ds390
   f1 (3, 16.0, 128L, 32.0);
   if (x != 176L)
     ASSERT (0);

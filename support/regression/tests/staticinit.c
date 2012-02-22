@@ -28,7 +28,7 @@ testSmallDense (void)
   ASSERT (smallDense[5] == 6);
 }
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
 __idata  __at 0xa0	/* leave space for the stack */
 #endif
 static {type} smallSparse[] = {
@@ -49,7 +49,7 @@ testSmallSparse (void)
   ASSERT (smallSparse[8] == 1);
 }
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
 __idata __at 0xd0
 #endif
 static {type} smallSparseZero[] = {
@@ -76,9 +76,9 @@ testSmallSparseZero (void)
   ASSERT (smallSparseZeroTail[0] == 1);
 }
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
 __xdata
-#elif SDCC_pic16
+#elif __SDCC_pic16
 __code
 #endif
 static {type} largeMixed[] = {
@@ -133,3 +133,4 @@ testLargeMixed (void)
   ASSERT (largeMixed[143+8+1] == 4);
   ASSERT (largeMixed[143+16+1] == 4);
 }
+

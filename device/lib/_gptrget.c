@@ -216,7 +216,7 @@ _gptrget (char *gptr) __naked
 
 #endif
 
-#ifdef SDCC_ds390
+#ifdef __SDCC_ds390
 /* the  return value is expected to be in acc/_ap, and not in the standard
  * location dpl/dph. Therefore we choose return type void here: */
 

@@ -4,11 +4,10 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
-#endif
-
 #pragma disable_warning 85
+#endif
 
 #include <limits.h>
 

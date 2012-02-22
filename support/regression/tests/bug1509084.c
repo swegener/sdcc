@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_sdcc99
 #endif
 
@@ -43,3 +43,4 @@ testBug(void)
 	leds_name_repaint();
 	ASSERT(aa == 17);
 }
+

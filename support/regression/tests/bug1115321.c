@@ -51,7 +51,7 @@
 
 /* Normally a char is promoted to int when passed as varargs parameter */
 /* but SDCC leaves it as char. */
-#ifndef SDCC
+#ifndef __SDCC
 #   define VA_ARG_CHAR int
 #   define VA_ARG(args,type) va_arg((args),type)
 #   define SDCC_SNPRINTF    sdcc_snprintf
@@ -250,7 +250,7 @@ void test_s( void )
     ASSERT (ret == 10);
 }
 
-#if defined SDCC && !defined SDCC_z80 && !defined SDCC_z180 && !defined SDCC_r2k && !defined SDCC_gbz80
+#if defined SDCC && !defined __SDCC_z80 && !defined __SDCC_z180 && !defined __SDCC_r2k && !defined __SDCC_gbz80
 extern void _putchar(char c);
 
 void putchar(char c)

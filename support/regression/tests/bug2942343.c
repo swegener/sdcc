@@ -15,8 +15,9 @@ void testBug(void)
 {
 /* Test fails on big endian hosts that use a _Bool larger than char */
 /* (for example, Mac PPC), so just skip this test for non-SDCC */
-#ifdef SDCC
+#ifdef __SDCC
   ASSERT(1 == *(char*)(&foo[1]));
   ASSERT(1 == *(char*)(&bar[2]));
 #endif
 }
+

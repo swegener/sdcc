@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -58,7 +58,7 @@ foo (signed char x)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR < 5))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 5))
   if (foo (98) != 18 || foo (97) != 0 || foo (99) != 0)
     ASSERT (0);
   if (foo (-62) != 19 || foo (-63) != 0 || foo (-61) != 0)

@@ -26,7 +26,7 @@ int tst_char_to_int()   { return ~                 '\200'; }
 void
 testBug(void)
 {
-#ifdef SDCC_CHAR_UNSIGNED
+#ifdef __SDCC_CHAR_UNSIGNED
   ASSERT(CHAR_MAX ==  255);
   ASSERT(CHAR_MIN ==    0);
 #else
@@ -40,7 +40,7 @@ testBug(void)
   ASSERT(tst_schar_to_int() ==  127);
   ASSERT(glb_schar_to_int   ==  127);
 
-#ifdef SDCC_CHAR_UNSIGNED
+#ifdef __SDCC_CHAR_UNSIGNED
   ASSERT(tst_char_to_int() == -129);
   ASSERT(glb_char_to_int   == -129);
 #else

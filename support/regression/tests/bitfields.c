@@ -10,7 +10,7 @@ struct {
   char c3_5 : 5;
 } c_bf;
 
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
 struct {
   int i0_7 : 7;
   int i7_9 : 9;
@@ -34,7 +34,7 @@ struct {
   unsigned int b8 : 1;
   unsigned int b9 : 1;
 } sb_bf;
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 
 struct {
   unsigned int b0 : 1;
@@ -59,7 +59,7 @@ struct {
   unsigned int b1 : 1;
 } size2a_bf;
 
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
 struct {
   unsigned int b0 : 1;
   unsigned int b1 : 1;
@@ -94,7 +94,7 @@ struct {
   signed int s7_1  : 1;
   signed int s8_9  : 9;
 } s_bf;
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 
 void
 testBitfieldSizeof(void)
@@ -106,13 +106,13 @@ testBitfieldSizeof(void)
   ASSERT( sizeof(size1a_bf) >= 1);
   ASSERT( sizeof(size1b_bf) >= 1);
   ASSERT( sizeof(size1c_bf) >= 1);
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   ASSERT( sizeof(size2b_bf) >= 2);
   ASSERT( sizeof(size2c_bf) >= 2);
   ASSERT( sizeof(size2d_bf) >= 2);
   ASSERT( sizeof(size3a_bf) >= 2);
   ASSERT( sizeof(size1a_bf) <= sizeof(size1b_bf));
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
   /* Some SDCC specific assertions. SDCC uses 8 bit storage units.
      Bitfields that are less than 8 bits, but would (due to earlier
      bitfield declarations) span a storage unit boundary are
@@ -120,17 +120,17 @@ testBitfieldSizeof(void)
      8 or greater bits are always aligned to start on a storage
      unit boundary.
   */
-#ifdef SDCC
+#ifdef __SDCC
   ASSERT( sizeof(size1a_bf) == 1);
   ASSERT( sizeof(size1b_bf) == 1);
   ASSERT( sizeof(size1c_bf) == 1);
   ASSERT( sizeof(size2a_bf) == 2);
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   ASSERT( sizeof(size2b_bf) == 2);
   ASSERT( sizeof(size2c_bf) == 2);
   ASSERT( sizeof(size2d_bf) == 2);
   ASSERT( sizeof(size3a_bf) == 3);
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 #endif
 }
 
@@ -138,7 +138,7 @@ testBitfieldSizeof(void)
 void
 testBitfieldsSingleBitLiteral(void)
 {
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   size2b_bf.b0 = 0;
   size2b_bf.b1 = 0;
   size2b_bf.b2 = 0;
@@ -186,13 +186,13 @@ testBitfieldsSingleBitLiteral(void)
   ASSERT(size2b_bf.b7==0);
   ASSERT(size2b_bf.b8==0);
   ASSERT(size2b_bf.b9==1);
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 }
 
 void
 testBitfieldsSingleBit(void)
 {
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   volatile unsigned char c;
 
   c = 0;
@@ -245,13 +245,13 @@ testBitfieldsSingleBit(void)
   ASSERT(size2b_bf.b7==0);
   ASSERT(size2b_bf.b8==0);
   ASSERT(size2b_bf.b9==1);
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 }
 
 void
 testBitfieldsMultibitLiteral(void)
 {
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   size2c_bf.b0 = 0xff;   /* should truncate to 0x0f */
   size2c_bf.b1 = 0;
   ASSERT(size2c_bf.b0==0x0f);
@@ -291,13 +291,13 @@ testBitfieldsMultibitLiteral(void)
   size2d_bf.b1 = 5;
   ASSERT(size2d_bf.b0==0x0a46);
   ASSERT(size2d_bf.b1==5);
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 }
 
 void
 testBitfieldsMultibit(void)
 {
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   volatile int allones = 0xffff;
   volatile int zero = 0;
   volatile int x;
@@ -335,7 +335,7 @@ testBitfieldsMultibit(void)
   size2d_bf.b1 = x;
   ASSERT(size2d_bf.b0==0x0a46);
   ASSERT(size2d_bf.b1==5);
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 }
 
 void
@@ -365,7 +365,7 @@ testBitfields(void)
 void
 testSignedBitfields(void)
 {
-#if !defined(SDCC_pic16)
+#if !defined(__SDCC_pic16)
   s_bf.s0_7 =   0xf0;
   s_bf.s7_1 =      1;
   s_bf.s8_9 = 0xfff8;
@@ -384,7 +384,7 @@ testSignedBitfields(void)
   ASSERT(s_bf.s8_9 == 0xff);
   ASSERT(s_bf.s0_7 > 0);
   ASSERT(s_bf.s8_9 > 0);
-#endif  /* !SDCC_pic16 */
+#endif  /* !__SDCC_pic16 */
 }
 
 /* test case for enhancement request #2291335 : Unnamed bit-field initialization */
@@ -465,3 +465,4 @@ testCS(void)
 #if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
 #pragma GCC pop_options
 #endif
+

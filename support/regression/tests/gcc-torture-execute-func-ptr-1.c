@@ -4,11 +4,10 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
-#endif
-
 #pragma disable_warning 93 // Using float for double.
+#endif
 
 static double f (float a);
 static double (*fp) (float a);
@@ -16,7 +15,7 @@ static double (*fp) (float a);
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_hc08
+#ifndef __SDCC_hc08
   fp = f;
   if (fp ((float) 1) != 1.0)
     ASSERT (0);

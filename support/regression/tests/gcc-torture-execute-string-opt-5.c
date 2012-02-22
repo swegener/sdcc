@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 // mcs51 small model does not have enough RAM to hold buf.
 int x = 6;
 int y = 1;
@@ -28,7 +28,7 @@ char buf [64];
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   const char *const foo = "hello world";
   char dst [64];
 
@@ -81,7 +81,7 @@ testTortureExecute (void)
       || strcmp (dst + 1, "ello "))
     ASSERT (0);
   memset (dst, ' ', sizeof dst);
-#ifndef SDCC_ds390
+#ifndef __SDCC_ds390
   if (strncpy (dst + (++x & 1), (y++ & 3) + "foo", 10) != dst + 1
       || x != 7
       || y != 2

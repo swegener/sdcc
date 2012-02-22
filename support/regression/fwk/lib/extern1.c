@@ -1,6 +1,6 @@
 /* needed by tests/inline.c */
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_sdcc99
 #endif
 

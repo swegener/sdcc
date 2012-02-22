@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 #define SZ_SIZE 89
 #else
 #define SZ_SIZE 90

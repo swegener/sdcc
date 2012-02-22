@@ -4,11 +4,11 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c89
 #endif
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 
 #define DECLARE_ARRAY(A) array##A[0x10]
 #define DECLARE_COUNTER(A) counter##A = 0
@@ -66,7 +66,7 @@ void
 testTortureExecute (void)
 {
   int exit_code = 0;
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   MANY (INIT_ARRAY);
   foo (1);
   MANY (CHECK_ARRAY);

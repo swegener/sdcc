@@ -33,7 +33,7 @@
 #define SCHAR_MAX   127
 #define SCHAR_MIN  -128
 #define UCHAR_MAX   0xff
-#ifdef SDCC_CHAR_UNSIGNED
+#ifdef __SDCC_CHAR_UNSIGNED
 #define CHAR_MAX    UCHAR_MAX
 #define CHAR_MIN    0
 #else

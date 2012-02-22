@@ -29,7 +29,7 @@
 
 #include <string.h>
 
-#if (!defined (SDCC_mcs51))
+#if (!defined (__SDCC_mcs51))
 
   /* Generic routine first */
   size_t strlen ( const char * str )
@@ -44,7 +44,7 @@
 
 #else
 
-#if defined(SDCC)
+#if defined(__SDCC)
  #include <sdcc-lib.h>
 #endif
 

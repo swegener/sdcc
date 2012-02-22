@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
@@ -74,7 +74,7 @@ float args[] =
   -987654321.0F
 };
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 
 int correct_results[] =
 {
@@ -148,7 +148,7 @@ int correct_results[] =
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   int i, j, *res = correct_results;
 
   for (i = 0; i < 8; i++)

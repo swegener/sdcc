@@ -46,7 +46,7 @@
 #define K2  0.7320508076 /* sqrt(3)-1 */
 #define K3  1.7320508076 /* sqrt(3)   */
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
    #define myconst __code
 #else
    #define myconst const

@@ -26,7 +26,7 @@
 ;  might be covered by the GNU General Public License.
 ;------------------------------------------------------------------------*/
 
-#ifdef SDCC_MODEL_FLAT24
+#ifdef __SDCC_MODEL_FLAT24
 
 static void dummy(void) __naked
 {
@@ -95,3 +95,4 @@ ___gptr_cmp::
 }
 
 #endif
+

@@ -32,7 +32,7 @@
 
 /* Exact integral types.  */
 
-#if defined (SDCC_z80) || defined (SDCC_z180) || defined (SDCC_r2k) || defined (SDCC_gbz80)
+#if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_gbz80)
 #if __STDC_VERSION__ >= 199901L
 #define __SDCC_LONGLONG
 #endif
@@ -92,7 +92,7 @@ typedef unsigned long long int  uint_fast64_t;
 #endif
 
 /* Types for `void *' pointers.  */
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
   typedef long int              intptr_t;
   typedef unsigned long int     uintptr_t;
 #else
@@ -181,7 +181,7 @@ typedef unsigned long int       uintmax_t;
 #endif
 
 /* Values to test for integral types holding `void *' pointer.  */
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
 #define INTPTR_MIN             (-2147483647L-1)
 #define INTPTR_MAX             (2147483647L)
 #define UINTPTR_MAX            (4294967295UL)
@@ -203,7 +203,7 @@ typedef unsigned long int       uintmax_t;
 /* Limits of other integer types.  */
 
 /* Limits of `ptrdiff_t' type.  */
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
 #define PTRDIFF_MIN           (-2147483647L-1)
 #define PTRDIFF_MAX           (2147483647L)
 #else
@@ -246,3 +246,4 @@ typedef unsigned long int       uintmax_t;
 #endif
 
 #endif /* stdint.h */
+

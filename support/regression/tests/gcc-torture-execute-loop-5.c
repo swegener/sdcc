@@ -4,11 +4,11 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
-#if !defined(SDCC_ds390)
+#if !defined(__SDCC_ds390)
 static int ap(int i);
 static void testit(void){
   int ir[4] = {0,1,2,3};
@@ -36,7 +36,7 @@ static int ap(int i){
 void
 testTortureExecute (void)
 {
-#if !defined(SDCC_ds390)
+#if !defined(__SDCC_ds390)
   testit();
   if (a[0] != 0)
     ASSERT (0);

@@ -4,13 +4,13 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
 #include <string.h>
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 typedef struct PgHdr PgHdr;
 typedef unsigned char u8;
 struct PgHdr {
@@ -90,7 +90,7 @@ PgHdr *sort_pagelist(PgHdr *pIn)
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
  PgHdr a[5];
  PgHdr *p;
  a[0].x.pgno = 5;

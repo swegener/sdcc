@@ -3,7 +3,7 @@
  */
 #include <testfwk.h>
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 
 #include <8052.h>
 
@@ -16,7 +16,7 @@ volatile long lC = 0;
 void
 testInterrupt (void)
 {
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
   register long x = lC;
 
   //enable the interrupt and set it
@@ -32,7 +32,7 @@ testInterrupt (void)
 #endif
 }
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 // Timer2 interrupt service routine
 // with register and (stack)spil usage
 void

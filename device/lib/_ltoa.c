@@ -46,7 +46,7 @@
 # warning _ltoa() and _ultoa() are not save for radix 2
 #endif
 
-#if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL) && !defined (SDCC_STACK_AUTO)
+#if defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL) && !defined (__SDCC_STACK_AUTO)
 # define MEMSPACE_BUFFER __idata	/* eventually __pdata or __xdata */
 # pragma nogcse
 #else
@@ -81,3 +81,4 @@ void _ltoa(long value, char* string, unsigned char radix)
   }
   _ultoa(value, string, radix);
 }
+

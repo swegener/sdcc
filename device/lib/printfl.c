@@ -45,7 +45,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef __ds390
+#ifndef __SDCC_ds390
 /* just for the SP */
 #include <8051.h>
 #endif

@@ -20,7 +20,7 @@ spoil(int a)
   return a;
 }
 
-#if defined(SDCC_mcs51) || defined(SDCC_pic16)
+#if defined(__SDCC_mcs51) || defined(__SDCC_pic16)
 
 // test devices with much less memory
 #define ABOVE_MEM_SIZE       30
@@ -57,3 +57,4 @@ testBP(void)
   ASSERT(verifyBlock(below, BELOW_MEM_TEST_SIZE, sizeof(below)));
 
 }
+

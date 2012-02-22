@@ -45,7 +45,7 @@ void testBug (void)
 
 /* These first two tests assume LONG_MAX and LONG_MIN are 32-bit. This */
 /* is not true for some 64-bit host compilers. Check SDCC only. */
-#ifdef SDCC
+#ifdef __SDCC
     ASSERT(a[0] > +2.1e9 && a[0] < +2.2e9);
     ASSERT(a[1] < -2.1e9 && a[1] > -2.2e9);
 #endif

@@ -31,14 +31,14 @@
 
 /* Version 1.0 - Initial release */
 
-#define SDCC_MATH_LIB
+#define __SDCC_MATH_LIB
 #include <math.h>
 #include <errno.h>
 #include <stdbool.h>
 
 #ifdef MATH_ASM_MCS51
 
-#define SDCC_FLOAT_LIB
+#define __SDCC_FLOAT_LIB
 #include <float.h>
 
 // TODO: share with other temps

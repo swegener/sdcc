@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 #include <8052.h>
 
 typedef union
@@ -29,7 +29,7 @@ get_global (void) __critical
 void
 testCritical (void)
 {
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
   big x;
   unsigned char i;
 
@@ -63,7 +63,7 @@ testCritical (void)
 #endif
 }
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 void
 T2_isr (void) __interrupt 5 __using 2
 {

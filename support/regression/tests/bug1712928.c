@@ -4,12 +4,12 @@
 
 #include <testfwk.h>
 
-#if defined (SDCC_mcs51)
+#if defined (__SDCC_mcs51)
 unsigned char NakedFunc(void) __naked
 {
 	__asm
 	mov	dpl,#0x01
-#if defined (SDCC_MODEL_HUGE)
+#if defined (__SDCC_MODEL_HUGE)
 	ljmp	__sdcc_banked_ret
 #else
 	ret
@@ -21,7 +21,7 @@ unsigned char NakedFunc(void) __naked
 void
 testBug(void)
 {
-#if defined (SDCC_mcs51)
+#if defined (__SDCC_mcs51)
 	unsigned char hsum, sum;
 
 	hsum = NakedFunc();

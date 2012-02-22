@@ -26,18 +26,18 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef SDCC_SETJMP_H
-#define SDCC_SETJMP_H
+#ifndef __SDCC_SETJMP_H
+#define __SDCC_SETJMP_H
 
 #define SP_SIZE		1
 
-#ifdef SDCC_STACK_AUTO
+#ifdef __SDCC_STACK_AUTO
 #define BP_SIZE		SP_SIZE
 #else
 #define BP_SIZE		0
 #endif
 
-#ifdef SDCC_USE_XSTACK
+#ifdef __SDCC_USE_XSTACK
 #define SPX_SIZE	1
 #else
 #define SPX_SIZE	0
@@ -45,13 +45,13 @@
 
 #define BPX_SIZE	SPX_SIZE
 
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
 #define RET_SIZE	3
 #else
 #define RET_SIZE	2
 #endif
 
-#if defined (SDCC_z80) || defined (SDCC_z180) || defined (SDCC_r2k)
+#if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k)
 typedef unsigned char jmp_buf[6]; // 2 for the stack pointer, 2 for the return address, 2 for the frame pointer.
 #else
 typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];

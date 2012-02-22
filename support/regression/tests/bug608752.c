@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #include <sdcc-lib.h>
 #else
 #define _STATMEM

@@ -14,3 +14,4 @@ testAbs(void)
   ASSERT( labs(-1000000L)    == 1000000L );
   ASSERT( labs(-2147483647L) == 2147483647L );
 }
+

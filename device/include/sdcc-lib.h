@@ -30,22 +30,22 @@
 #ifndef __SDC51_SDCC_LIB_H
 #define __SDC51_SDCC_LIB_H	1
 
-#if defined(__z80)
+#if defined(__SDCC_z80)
 #include <asm/z80/features.h>
 
-#elif defined(__z180)
+#elif defined(__SDCC_z180)
 #include <asm/z180/features.h>
 
-#elif defined(__r2k)
+#elif defined(__SDCC_r2k)
 #include <asm/r2k/features.h>
 
-#elif defined(__gbz80)
+#elif defined(__SDCC_gbz80)
 #include <asm/gbz80/features.h>
 
-#elif defined(__mcs51)
+#elif defined(__SDCC_mcs51)
 #include <asm/mcs51/features.h>
 
-#elif defined(__ds390)
+#elif defined(__SDCC_ds390)
 #include <asm/ds390/features.h>
 
 #else
@@ -55,3 +55,4 @@
 #endif
 
 #endif
+

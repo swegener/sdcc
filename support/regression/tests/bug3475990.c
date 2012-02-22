@@ -6,7 +6,7 @@ void set_b(void)
 {
 }
 
-#if defined(SDCC)
+#if defined(__SDCC)
 __addressmod set_b b;
 #else
 #define b

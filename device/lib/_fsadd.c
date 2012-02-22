@@ -27,7 +27,7 @@
 -------------------------------------------------------------------------*/
 
 
-#define SDCC_FLOAT_LIB
+#define __SDCC_FLOAT_LIB
 #include <float.h>
 #include <stdbool.h>
 #include <sdcc-lib.h>

@@ -35,7 +35,7 @@ dummy (void) __naked
         .globl  __decdptr
 __decdptr:
 
-#ifdef SDCC_ds390
+#ifdef __SDCC_ds390
         orl     dps, #0xc0
         inc     dptr
         anl     dps, #0x3f

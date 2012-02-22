@@ -36,7 +36,7 @@
 
 #ifndef __PTRDIFF_T_DEFINED
 #define __PTRDIFF_T_DEFINED
-#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
   typedef long int ptrdiff_t;
 #else
   typedef int ptrdiff_t;
@@ -56,3 +56,4 @@
 #define offsetof(s, m) __builtin_offsetof (s, m)
 
 #endif
+

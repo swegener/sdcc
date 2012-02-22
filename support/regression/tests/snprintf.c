@@ -37,10 +37,10 @@ struct
   {01234, "%o(oct)", "1234(oct)"},
 
   // do we want to check these:
-#if defined(SDCC) && !defined(SDCC_z80) && CHECK_B
+#if defined(__SDCC) && !defined(__SDCC_z80) && CHECK_B
   {0x4142, "%bc %bx", "\x41 42"},       /* non-std: print as bytes! */
   {0xfffe, "0x%02bX%02bx", "0xFFfe"},   /* non-std: print as bytes! */
-#elif defined(SDCC) && defined(SDCC_z80) && CHECK_B
+#elif defined(__SDCC) && defined(__SDCC_z80) && CHECK_B
   {0x4142, "%bc %bx", "\x42 41"},       /* non-std: print as bytes! */
   {0xfffe, "0x%02bX%02bx", "0xFEff"},   /* non-std: print as bytes! */
 #endif
@@ -102,7 +102,7 @@ struct
 } static const cases[] = {
   // arg, fmt,    result
   // ... there should be more ...
-#if defined(SDCC) && !defined(SDCC_ds390) && !(defined(SDCC_mcs51) && (defined(SDCC_USE_XSTACK) || defined(SDCC_MODEL_HUGE)))
+#if defined(__SDCC) && !defined(__SDCC_ds390) && !(defined(__SDCC_mcs51) && (defined(__SDCC_USE_XSTACK) || defined(__SDCC_MODEL_HUGE)))
   {1.0, "%f", "<NO FLOAT>"},
 #else
   {1.0, "%f", "1.000000"},
@@ -135,3 +135,4 @@ test_snprintf (void)
 
   ASSERT (buf[sizeof buf - 10] == 0xfe);        /* check for cookie */
 }
+

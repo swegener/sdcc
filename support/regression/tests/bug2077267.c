@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifndef SDCC
+#ifndef __SDCC
 #define __critical
 #endif
 

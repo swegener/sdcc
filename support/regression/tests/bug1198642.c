@@ -7,7 +7,7 @@
 void
 test_cse_generic_ptr (void)
 {
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
   volatile void *p1;
   volatile void *p2;
 

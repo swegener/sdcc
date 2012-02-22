@@ -11,14 +11,14 @@ void foo(void)
 {
 }
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
 func GetFunc(void) __naked
 {
   __asm
 
     ; some assembler code
     mov dptr,#_foo
-#ifdef SDCC_MODEL_HUGE
+#ifdef __SDCC_MODEL_HUGE
     mov B,#_foo>>16
     ljmp __sdcc_banked_ret
 #else
@@ -30,7 +30,7 @@ func GetFunc(void) __naked
 
 void testCaller(void)
 {
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
   GetFunc()();
 #endif
 

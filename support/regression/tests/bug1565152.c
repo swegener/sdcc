@@ -7,7 +7,7 @@
 // no need to call this, it generates compiler error for xstack-auto
 //   error 9: FATAL Compiler Internal Error
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 #include <8051.h>
 
 unsigned int foo(void)

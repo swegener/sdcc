@@ -32,10 +32,10 @@
      mcs51 small stack-auto
 */
 
-#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-#  if defined(SDCC_mcs51)
-#    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+#  if defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_SMALL)
+#      if defined(__SDCC_STACK_AUTO)
 #        define _MODUINT_ASM_SMALL_AUTO
 #      else
 #        define _MODUINT_ASM_SMALL
@@ -59,7 +59,7 @@ __moduint:
 	#define al      dpl
 	#define ah      dph
 
-#if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 
 	ar0 = 0			; BUG register set is not considered
 	ar1 = 1
@@ -82,7 +82,7 @@ __modint:			; entry point for __modsint
 #else // SDCC_STACK_AUTO
 
 #if !defined(SDCC_PARMS_IN_BANK1)
-#if defined(SDCC_NOOVERLAY)
+#if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
 #else
 	.area OSEG    (OVR,DATA)

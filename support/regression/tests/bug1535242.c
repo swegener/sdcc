@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 #include <8052.h>
 #include <stdbool.h>
 
@@ -22,7 +22,7 @@ complement (bool x)
 void
 testSaveBits (void)
 {
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
   //enable the interrupt and set it
   ET2 = 1;
   EA = 1;
@@ -44,7 +44,7 @@ testSaveBits (void)
 #endif
 }
 
-#if defined(SDCC_mcs51)
+#if defined(__SDCC_mcs51)
 void
 T2_isr (void) __interrupt 5 __using 2
 {
@@ -54,3 +54,4 @@ T2_isr (void) __interrupt 5 __using 2
   manipulate_bits (true);
 }
 #endif
+

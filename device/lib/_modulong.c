@@ -32,10 +32,10 @@
      mcs51 small stack-auto
 */
 
-#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-#  if defined(SDCC_mcs51)
-#    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO) && !defined (SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+#  if defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_SMALL)
+#      if defined(__SDCC_STACK_AUTO) && !defined (SDCC_PARMS_IN_BANK1)
 #        define _MODULONG_ASM_SMALL_AUTO
 #      else
 #        define _MODULONG_ASM_SMALL
@@ -66,7 +66,7 @@ __modulong:
 	#define b2      (b1_2)
 	#define b3      (b1_3)
 #else
-#if defined(SDCC_NOOVERLAY)
+#if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
 #else
 	.area OSEG    (OVR,DATA)
@@ -363,3 +363,4 @@ _modulong (unsigned long a, unsigned long b)
 }
 
 #endif // _MODULONG_ASM
+

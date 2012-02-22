@@ -35,16 +35,16 @@
      mcs51 small stack-auto
 */
 
-#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-#  if defined(SDCC_mcs51)
-#    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+#  if defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_SMALL)
+#      if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _MULLONG_ASM_SMALL_AUTO
 #      else
 #        define _MULLONG_ASM_SMALL
 #      endif
-#    elif defined(SDCC_MODEL_LARGE)
-#      if !defined(SDCC_STACK_AUTO)
+#    elif defined(__SDCC_MODEL_LARGE)
+#      if !defined(__SDCC_STACK_AUTO)
 #        define _MULLONG_ASM_LARGE
 #      endif
 #    endif
@@ -78,14 +78,14 @@ __mullong:
 	; c2  a2 * b0 + a1 * b1 + a0 * b2
 	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
 
-#if !defined(SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
 #if defined(SDCC_PARMS_IN_BANK1)
 	#define b0  (b1_0)
 	#define b1  (b1_1)
 	#define b2  (b1_2)
 	#define b3  (b1_3)
 #else
-#if defined(SDCC_NOOVERLAY)
+#if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
 #else
 	.area OSEG    (OVR,DATA)
@@ -490,7 +490,7 @@ __mullong_PARM_2:
 	__endasm;
 }
 
-#elif defined(SDCC_USE_XSTACK) && defined(SDCC_STACK_AUTO)
+#elif defined(__SDCC_USE_XSTACK) && defined(__SDCC_STACK_AUTO)
 
 void
 _mullong_dummy (void) __naked
@@ -629,7 +629,7 @@ struct some_struct {
 	short a ;
 	char b;
 	long c ;};
-#if defined(SDCC_hc08)
+#if defined(__SDCC_hc08)
 /* big endian order */
 union bil {
         struct {unsigned char b3,b2,b1,b0 ;} b;
@@ -647,7 +647,7 @@ union bil {
 } ;
 #endif
 
-#if defined(SDCC)
+#if defined(__SDCC)
  #include <sdcc-lib.h>
 #endif
 
@@ -671,7 +671,7 @@ union bil {
                         |3.0|         G
                           |-------> only this side 32 x 32 -> 32
 */
-#if defined(SDCC_USE_XSTACK)
+#if defined(__SDCC_USE_XSTACK)
 // currently the original code without u fails with --xstack
 // it runs out of pointer registers
 long

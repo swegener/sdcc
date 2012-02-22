@@ -11,14 +11,14 @@ void __printf(const char *szFormat, ...);
 #define LOG(_a)     /* hollow log */
 #endif
 
-#ifdef SDCC
+#ifdef __SDCC
  #include <sdcc-lib.h>
 #else
  #define _AUTOMEM
  #define _STATMEM
 #endif
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_z180) || defined(SDCC_r2k)|| defined(SDCC_gbz80)
+#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k)|| defined(__SDCC_gbz80)
 # define __data
 # define __idata
 # define __pdata
@@ -33,12 +33,12 @@ void __printf(const char *szFormat, ...);
 # define __at(x)
 #endif
 
-#if defined(SDCC_hc08)
+#if defined(__SDCC_hc08)
 # define __idata __data
 # define __pdata __data
 #endif
 
-#if defined(SDCC_pic16)
+#if defined(__SDCC_pic16)
 # define __idata __data
 # define __xdata __data
 # define __pdata __data

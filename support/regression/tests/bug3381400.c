@@ -10,7 +10,7 @@
 #define USHORT	unsigned short
 #define PCHAR	unsigned char *
 
-#ifdef SDCC_z80
+#ifdef __SDCC_z80
 __sfr __at 0x05 rSRAM_Page;
 #endif
 
@@ -51,7 +51,7 @@ void _DspLoadFile(DSP_PAGE * pDspPage, USHORT sDMOffset)
 	for (i = 0; i < BUF_PAGE_NUM+2; i ++)
 	{
 	}
-#ifdef SDCC_z80
+#ifdef __SDCC_z80
 	rSRAM_Page = DEFAULT_MEMORY_PAGE;
 #endif
 }

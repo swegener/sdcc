@@ -4,13 +4,13 @@
 
 #include <testfwk.h>
 
-#ifdef SDCC
+#ifdef __SDCC
 #pragma std_c99
 #endif
 
 #include <limits.h>
 
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
 void * a[255];
 
 void f (int m)
@@ -30,7 +30,7 @@ void f (int m)
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_mcs51
+#ifndef __SDCC_mcs51
   a[0x10] = 0;
   a[0x08] = 0;
   f (INT_MAX/2 + INT_MAX/4 + 2);

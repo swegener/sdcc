@@ -63,7 +63,7 @@ void ClockMicroSecondsDelay(unsigned int us);
 #define SERIAL_1_RECEIVE_BUFFER_SIZE 64
 
 /* I know someone is fooling with the crystals */
-#if defined(SDCC_ds400)
+#if defined(__SDCC_ds400)
 # define OSCILLATOR 14745600L
 #else
 # define OSCILLATOR 18432000L
@@ -125,12 +125,12 @@ unsigned char _sdcc_external_startup(void);
 void Serial0IrqHandler (void) __interrupt 4;
 void Serial1IrqHandler (void) __interrupt 7;
 
-#if !defined(SDCC_ds400)
+#if !defined(__SDCC_ds400)
 void ClockInit();
 void ClockIrqHandler (void) __interrupt 1 __naked;
 #endif
 
-#if defined(SDCC_ds400)
+#if defined(__SDCC_ds400)
 /* functions for dealing with the ds400 ROM firmware. */
 
 /* A wrapper which calls rom_init allocating all available RAM in CE0

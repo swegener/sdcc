@@ -21,10 +21,10 @@
   #define REVDIV 1
 #endif
 
-#ifdef SDCC_mcs51
+#ifdef __SDCC_mcs51
 #  define STORAGE __xdata
 #  define XDATA __xdata
-#elif SDCC_pic16
+#elif __SDCC_pic16
 #  define STORAGE __code
 #  define XDATA
 #else

@@ -31,9 +31,9 @@
 
 #undef memset /* Avoid conflict with builtin memset() in Z80 and some related ports */
 
-#if defined (_SDCC_NO_ASM_LIB_FUNCS) || !defined (SDCC_mcs51) || \
-    (!defined (SDCC_MODEL_SMALL) && !defined (SDCC_MODEL_LARGE)) || \
-     (defined (SDCC_STACK_AUTO) || defined (SDCC_PARMS_IN_BANK1) )
+#if defined (_SDCC_NO_ASM_LIB_FUNCS) || !defined (__SDCC_mcs51) || \
+    (!defined (__SDCC_MODEL_SMALL) && !defined (__SDCC_MODEL_LARGE)) || \
+     (defined (__SDCC_STACK_AUTO) || defined (__SDCC_PARMS_IN_BANK1) )
 
 #ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 void *memset (void *s, unsigned char c, size_t n)
@@ -61,9 +61,9 @@ void *memset (void *s, int c, size_t n)
 
   /* assigning function parameters to registers.
      SDCC_PARMS_IN_BANK1 or SDCC_STACK_AUTO not yet implemented. */
-  #if defined (SDCC_MODEL_SMALL)
+  #if defined (__SDCC_MODEL_SMALL)
 
-    #if defined(SDCC_NOOVERLAY)
+    #if defined(__SDCC_NOOVERLAY)
         .area DSEG    (DATA)
     #else
         .area OSEG    (OVR,DATA)

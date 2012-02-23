@@ -2016,7 +2016,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
             _push (extrapair);
           }
         /* Todo: Use even cheaper ex hl, (sp) and ex iy, (sp) when possible. */
-        else if (!regalloc_dry_run && !IS_R2K &&
+        else if (!regalloc_dry_run && (!IS_R2K || pairId == PAIR_BC || pairId == PAIR_DE) &&
           (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 0)
           {
             _pop (pairId);
@@ -2120,19 +2120,24 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
             /* The Rabbit has the ld hl, n (sp) and ld hl, n (ix) instructions. */
             int fp_offset = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
             int sp_offset = fp_offset + _G.stack.pushed;
-            if (IS_GB && aop->size - offset >= 2 && aop->type == AOP_STK && pairId == PAIR_HL && abs (sp_offset) <= 127)
-              {
-                emit2 ("ld hl, %d (sp)", sp_offset); /* Fetch relative to stack pointer. */
-                // TODO: Cost.
-              }
-            else if (IS_R2K && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (pairId == PAIR_HL || pairId == PAIR_IY) &&
+            if (IS_R2K && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (pairId == PAIR_HL || pairId == PAIR_IY || pairId == PAIR_DE) &&
               (abs (fp_offset) <= 127 && pairId == PAIR_HL && aop->type == AOP_STK || abs (sp_offset) <= 127))
               {
+                if (pairId == PAIR_DE)
+                  {
+                    emit2("ex de, hl");
+                    regalloc_dry_run_cost += 1;
+                  }
                 if (abs (sp_offset) <= 127)
                   emit2 ("ld %s, %d (sp)", pairId == PAIR_IY ? "iy" : "hl", sp_offset); /* Fetch relative to stack pointer. */
                 else
                   emit2 ("ld hl, %d (ix)", fp_offset); /* Fetch relative to frame pointer. */
-                regalloc_dry_run_cost += (pairId == PAIR_HL ? 2 : 3);
+                regalloc_dry_run_cost += (pairId == PAIR_IY ? 3 : 2);
+                if (pairId == PAIR_DE)
+                  {
+                    emit2("ex de, hl");
+                    regalloc_dry_run_cost += 1;
+                  }
               }
 
             /* Operand resides (partially) in the pair */

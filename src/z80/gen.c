@@ -1988,6 +1988,7 @@ makeFreePairId (const iCode *ic, bool *pisUsed)
     }
 }
 
+/* If ic != 0, we can safely use isPairDead(). */
 static void
 fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
 {
@@ -2001,6 +2002,25 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
         if (getPairId (aop) == pairId)
           {
             /* Do nothing */
+          }
+        /* Getting the parameter by a pop / push sequence is cheaper when we have a free pair (except for r2k, which has an even cheaper sp-relative load).
+           Stack allocation can change after register allocation, so assume this optimization is not possible for the allcoator's cost function. */
+        else if (!regalloc_dry_run && !IS_R2K &&
+          (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 2 &&
+          ic && (pairId != PAIR_BC && isPairDead (PAIR_BC, ic) || pairId != PAIR_DE && isPairDead (PAIR_DE, ic)))
+          {
+            PAIR_ID extrapair = (pairId != PAIR_BC && isPairDead (PAIR_BC, ic)) ? PAIR_BC : PAIR_DE;
+            _pop (extrapair);
+            _pop (pairId);
+            _push (pairId);
+            _push (extrapair);
+          }
+        /* Todo: Use even cheaper ex hl, (sp) and ex iy, (sp) when possible. */
+        else if (!regalloc_dry_run && !IS_R2K &&
+          (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 0)
+          {
+            _pop (pairId);
+            _push (pairId);
           }
         /* we need to get it byte by byte */
         else if (pairId == PAIR_HL && (IS_GB || (IY_RESERVED && aop->type == AOP_HL)) && requiresHL (aop))
@@ -2801,11 +2821,17 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset)
 #define AOP_IS_PAIRPTR(x, p) (AOP_TYPE (x) == AOP_PAIRPTR && AOP (x)->aopu.aop_pairId == p)
 
 static void
-commitPair (asmop * aop, PAIR_ID id, const iCode *ic)
+commitPair (asmop * aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
 {
   int fp_offset = aop->aopu.aop_stk + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
   int sp_offset = fp_offset + _G.stack.pushed;
-  if (IS_R2K && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
+  /* Stack positions will change, so do not assume this is impossible in the cost function. */
+  if (!regalloc_dry_run && !IS_GB && !sp_offset && (!IS_R2K && id == PAIR_HL) || id == PAIR_IY && !dont_destroy)
+    {
+      emit2 ("ex (sp), %s", _pairs[id].name);
+      regalloc_dry_run_cost += ((id == PAIR_IY || IS_R2K) ? 2 : 1);
+    }
+  else if (IS_R2K && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
     (id == PAIR_HL && abs (fp_offset) <= 127 && aop->type == AOP_STK || abs (sp_offset) <= 127))
     {
       if (abs (sp_offset) <= 127)
@@ -3590,7 +3616,7 @@ genIpush (const iCode * ic)
           if (pair == PAIR_INVALID || isPairDead (PAIR_HL, ic))
             pair = PAIR_HL; /* hl sometimes is cheaper to load than other pairs. */
 
-          fetchPair (pair, AOP (IC_LEFT (ic)));
+          fetchPairLong (pair, AOP (IC_LEFT (ic)), ic, 0);
           if(!regalloc_dry_run)
             {
               emit2 ("push %s", _pairs[pair].name);
@@ -3613,7 +3639,7 @@ genIpush (const iCode * ic)
             }
           else
             {
-              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
+              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 2);
               emit2 ("push hl");
               regalloc_dry_run_cost += 1;
             }
@@ -3632,7 +3658,7 @@ genIpush (const iCode * ic)
             }
           else
             {
-              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
+              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 0);
               emit2 ("push hl");
               regalloc_dry_run_cost += 1;
             }
@@ -3890,7 +3916,7 @@ emitCall (const iCode *ic, bool ispcall)
       else
         {
           spillPair (PAIR_HL);
-          fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
           emit2 ("call __sdcc_call_hl");
         }
       freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -4536,14 +4562,14 @@ genRet (const iCode *ic)
 
   if (size==2)
     {
-      fetchPair(IS_GB ? PAIR_DE : PAIR_HL, AOP (IC_LEFT (ic)));
+      fetchPairLong (IS_GB ? PAIR_DE : PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
     }
   else
     {
       if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
         {
-          fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
-          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
+          fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), 0, 0);
+          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 2);
         }
       else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
         {
@@ -4678,7 +4704,7 @@ genPlusIncr (const iCode *ic)
   if (!IS_GB && isLitWord (AOP (IC_LEFT (ic))) && size == 2)
     {
       fetchLitPair (PAIR_HL, AOP (IC_LEFT (ic)), icount);
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
       return TRUE;
     }
 
@@ -5014,7 +5040,7 @@ genPlus (iCode * ic)
       emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
       goto release;
     }
 
@@ -5024,7 +5050,7 @@ genPlus (iCode * ic)
       emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
       goto release;
     }
 
@@ -5033,7 +5059,7 @@ genPlus (iCode * ic)
       emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
       goto release;
     }
 
@@ -5042,7 +5068,7 @@ genPlus (iCode * ic)
       emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
       goto release;
     }
 
@@ -5192,7 +5218,7 @@ genPlus (iCode * ic)
                   regalloc_dry_run_cost += 1;
                 }
               spillPair (PAIR_HL);
-              commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+              commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
               goto release;
             }
         }
@@ -5311,7 +5337,7 @@ genMinusDec (const iCode * ic)
           emit2 ("dec %s", _getTempPairName());
         regalloc_dry_run_cost += 1;
 
-      commitPair (AOP (IC_RESULT (ic)), _getTempPairId(), ic);
+      commitPair (AOP (IC_RESULT (ic)), _getTempPairId(), ic, FALSE);
 
       return TRUE;
     }
@@ -5629,7 +5655,7 @@ genMultOneChar (const iCode * ic)
     if (resultsize == 1)
       cheapMove (result, 0, ASMOP_L, 0);
     else
-      commitPair (result, PAIR_HL, ic);
+      commitPair (result, PAIR_HL, ic, FALSE);
     }
   else
     {
@@ -5649,7 +5675,7 @@ genMultOneChar (const iCode * ic)
         emit2("ld e, l");
         emit2("ld d, h");
         regalloc_dry_run_cost += 2;
-        commitPair (result, PAIR_DE, ic);
+        commitPair (result, PAIR_DE, ic, FALSE);
         if(!isPairDead (PAIR_DE, ic))
           {
             _pop (PAIR_DE);
@@ -5776,7 +5802,7 @@ genMult (iCode *ic)
   if (byteResult)
     cheapMove (AOP (IC_RESULT (ic)), 0, ASMOP_A, 0);
   else
-    commitPair ( AOP (IC_RESULT (ic)), PAIR_HL, ic);
+    commitPair ( AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
 
 release:
   freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -7461,7 +7487,7 @@ shiftR2Left2Result (const iCode *ic, operand * left, int offl,
         }
       emit2 ("and hl, de");
       regalloc_dry_run_cost += 1;
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, TRUE);
       return;
     }
 
@@ -9030,13 +9056,13 @@ genAddrOf (const iCode *ic)
             {
               setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
             }
-          commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic);
+          commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
         }
       else
         {
           emit2 ("ld de,!hashedstr", sym->rname);
           regalloc_dry_run_cost += 3;
-          commitPair (AOP (IC_RESULT (ic)), PAIR_DE, ic);
+          commitPair (AOP (IC_RESULT (ic)), PAIR_DE, ic, FALSE);
         }
     }
   else
@@ -9073,7 +9099,7 @@ genAddrOf (const iCode *ic)
           emit2 ("ld %s,!hashedstr", _pairs[pair].name, sym->rname);
           regalloc_dry_run_cost += (pair == PAIR_IY ? 4 : 3);
         }
-      commitPair (AOP (IC_RESULT (ic)), pair, ic);
+      commitPair (AOP (IC_RESULT (ic)), pair, ic, FALSE);
     }
   freeAsmop (IC_RESULT (ic), NULL, ic);
 }
@@ -9133,7 +9159,7 @@ genAssign (const iCode *ic)
   else if (!IS_GB && AOP_TYPE (right) == AOP_STK && AOP_TYPE (result) == AOP_IY && size == 2 && isPairDead (PAIR_HL, ic))
     {
       fetchPair (PAIR_HL, AOP (right));
-      commitPair (AOP (result), PAIR_HL, ic);
+      commitPair (AOP (result), PAIR_HL, ic, FALSE);
     }
   else if (getPairId (AOP (right)) == PAIR_IY)
     {

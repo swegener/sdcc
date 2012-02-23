@@ -498,6 +498,24 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	push	hl
+	pop	bc
+} by {
+	ld	c, l
+	ld	b, h
+	; peephole 44a replaced push/pop pair by loads.
+} if notUsed('hl')
+
+replace restart {
+	push	hl
+	pop	de
+} by {
+	ld	e, l
+	ld	d, h
+	; peephole 44b replaced push/pop pair by loads.
+} if notUsed('hl')
+
+replace restart {
 	ld	iy,#%1
 	or	a,%2 (iy)
 } by {

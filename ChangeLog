@@ -1,5 +1,11 @@
 2012-02-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def:
+	  More efficient access to two-byte variables near the stack pointer.
+
+2012-02-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCmain.c,
 	  device/*,
 	  support/regression/*:

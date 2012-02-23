@@ -1,7 +1,7 @@
 2012-02-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
-	  More efficient access to two-byte variables near the stack pointer for r2k.
+	  More efficient access to two-byte variables near the stack pointer for r2k, fix a bug when fetching 1-byte variables.
 
 2012-02-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

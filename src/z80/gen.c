@@ -2005,7 +2005,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
           }
         /* Getting the parameter by a pop / push sequence is cheaper when we have a free pair (except for r2k, which has an even cheaper sp-relative load).
            Stack allocation can change after register allocation, so assume this optimization is not possible for the allcoator's cost function. */
-        else if (!regalloc_dry_run && !IS_R2K &&
+        else if (!regalloc_dry_run && !IS_R2K && aop->size - offset >= 2 &&
           (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 2 &&
           ic && (pairId != PAIR_BC && isPairDead (PAIR_BC, ic) || pairId != PAIR_DE && isPairDead (PAIR_DE, ic)))
           {
@@ -2016,7 +2016,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
             _push (extrapair);
           }
         /* Todo: Use even cheaper ex hl, (sp) and ex iy, (sp) when possible. */
-        else if (!regalloc_dry_run && (!IS_R2K || pairId == PAIR_BC || pairId == PAIR_DE) &&
+        else if (!regalloc_dry_run && (!IS_R2K || pairId == PAIR_BC || pairId == PAIR_DE) && aop->size - offset >= 2 &&
           (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 0)
           {
             _pop (pairId);

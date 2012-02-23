@@ -188,7 +188,7 @@ helper_neon_rshl_s8 (uint32_t arg1, uint32_t arg2)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 3))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 5))
   uint32_t r = helper_neon_rshl_s8 (0x05050505, 0x01010101);
   if (r != 0x0a0a0a0a)
     ASSERT (0);

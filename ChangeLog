@@ -3,6 +3,8 @@
 	* src/z80/gen.c,
 	  src/z80/peeph-z80.def:
 	  More efficient access to two-byte variables near the stack pointer.
+	* support/regression/tests/gcc-torture-execute-pr42833.c:
+	  Disable test for even more gcc versions.
 
 2012-02-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

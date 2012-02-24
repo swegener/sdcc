@@ -1,3 +1,8 @@
+2012-02-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-pr42833.c:
+	  Disable test for all gcc versions earlier than 5.0.
+
 2012-02-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (createDo): fixed bug #3489326

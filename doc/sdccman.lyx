@@ -66,6 +66,7 @@
 \tracking_changes false
 \output_changes false
 \author "" 
+\author "" 
 \end_header
 
 \begin_body
@@ -124,7 +125,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 3.1.2
+SDCC 3.1.3
 \size footnotesize
 
 \begin_inset Newline newline
@@ -2004,7 +2005,7 @@ libraries, included in sdcc packages, are in ar format in sdcc version 2.9.0
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Using-ar-to"
+reference "sub:Using-sdar-to"
 
 \end_inset
 
@@ -2065,6 +2066,18 @@ reference "sub:Naming-of-special"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Itemize
+sdar archive managing utility was introduced in version 3.2.0.
+ sdar and sdranlib are derived from GNU binutils package.
+\end_layout
+
+\begin_layout Itemize
+with sdcc version 3.2.0 the sdcclib utility is deprecated.
+ Sdar utility should be used to create sdcc object file archives.
+ Sdcclib utility will become obsolete in one of next sdcc releases and will
+ be removed from sdcc packages.
 \end_layout
 
 \begin_layout Section
@@ -8061,11 +8074,11 @@ sdcdb - The source debugger.
 \end_layout
 
 \begin_layout Itemize
-sdcclib - A tool for creating sdcc libraries
+sdcclib - A tool for creating sdcc libraries (deprecated)
 \end_layout
 
 \begin_layout Itemize
-sdranlib - A tool for indexing sdcc ar libraries
+sdar, sdranlib - The sdcc archive managing and indexing utilites.
 \end_layout
 
 \begin_layout Itemize
@@ -9394,7 +9407,70 @@ libsdcc.lib
 \end_layout
 
 \begin_layout Subsection
-Using sdcclib to Create and Manage Libraries
+Using sdar to Create and Manage Libraries
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+sdar
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Using-sdar-to"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Support for sdar format libraries was introduced in sdcc 2.9.0.
+\series bold
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series default
+Both the GNU and BSD ar format variants are supported by sdld linkers.
+\series bold
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series default
+To create a library containing sdas object files, you should use the following
+ sequence:
+\series bold
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family sans
+\series bold
+sdar -rc <library name>.lib <list of .rel files>
+\end_layout
+
+\begin_layout Subsection
+Using sdcclib to Create and Manage Libraries (deprecated)
 \begin_inset Index
 status collapsed
 
@@ -9408,6 +9484,18 @@ sdcclib
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+With sdcc version 3.2.0 the sdcclib utility is deprecated.
+ Sdar utility should be used to create sdcc object file archives.
+ Sdcclib utility will become obsolete in one of next sdcc releases and will
+ be removed from sdcc packages.
+\end_layout
+
+\end_inset
+
 Alternatively, instead of having a .rel file for each entry on the library
  file as described in the preceding section, sdcclib can be used to embed
  all the modules belonging to such library in the library file itself.
@@ -9909,116 +9997,6 @@ status collapsed
  is embedded in the library file itself.
  Library files created using sdcclib are used as described in the preceding
  sections.
-\end_layout
-
-\begin_layout Subsection
-Using ar to Create and Manage Libraries
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-ar
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Using-ar-to"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Support for ar format libraries was introduced in sdcc 2.9.0.
- Ar is a standard archive managing utility on unices (Linux, Mac OS X, several
- unix flavors) so it is not included in the sdcc package.
-\series bold
-
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\series default
-For Windows platform you can find ar utility in GNU binutils package included
- in several projects: Cygwin at 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.cygwin.com/
-\end_layout
-
-\end_inset
-
-, MinGW at 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.mingw.org/
-\end_layout
-
-\end_inset
-
-.
-\series bold
-
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\series default
-Both the GNU and BSD ar format variants are supported by sdld linkers.
- Ar doesn't natively understand the sdas object file format, so there is
- a special version of ranlib distributed with sdcc, called sdranlib, which
- produces the ar symbol lookup table.
-\series bold
-
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\series default
-To create a library containing sdas object files, you should use the following
- sequence:
-\series bold
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family sans
-\series bold
-ar -Sq <library name>.lib <list of .rel files>
-\end_layout
-
-\begin_layout Standard
-
-\family sans
-\series bold
-sdranlib <library name>.lib
 \end_layout
 
 \begin_layout Standard

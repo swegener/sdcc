@@ -1,3 +1,19 @@
+2012-02-25 Raphael Neider <rneider AT web.de>
+
+	* device/non-free/include/pic14/pic16f720.h,
+	  device/non-free/include/pic14/pic16f721.h,
+	  device/non-free/lib/pic14/libdev/pic16f720.c,
+	  device/non-free/lib/pic14/libdev/pic16f721.c,
+	  device/include/pic14/pic14devices.txt,
+	  device/non-free/lib/pic14/libdev/devices.txt:
+	  added support for 16f720/16f721
+
+	* device/non-free/include/pic14/pic14regs.h:
+	  fixed to use __SDCC_PROCESSOR instead of SDCC_PROCESSOR
+
+	* device/non-free/lib/pic16/libdev/testall.sh:
+	  test support for all devices by compiling a source file
+
 2012-02-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c: fixed bug #3473062

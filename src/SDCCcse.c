@@ -345,7 +345,7 @@ DEFSETFUNC (findCheaperOp)
 
   /* not found it yet check if this is the one */
   /* and this is not the defining one          */
-  if (cop->key == cdp->key)
+  if (cop->key && cop->key == cdp->key)
     {
       /* do a special check this will help in */
       /* constant propagation & dead code elim */
@@ -482,6 +482,7 @@ DEFSETFUNC (findPointerSet)
   V_ARG (operand *, rop);
 
   if (POINTER_SET (cdp->diCode) &&
+      op->key &&
       IC_RESULT (cdp->diCode)->key == op->key &&
       !isOperandVolatile (IC_RESULT (cdp->diCode), TRUE) &&
       !isOperandVolatile (IC_RIGHT (cdp->diCode), TRUE) &&
@@ -667,7 +668,7 @@ DEFSETFUNC (ifDefSymIsX)
   V_ARG (operand *, op);
   int match;
 
-  if (op && cdp->sym)
+  if (op && cdp->sym && op->key)
     match = cdp->sym->key == op->key;
   else
     match = (isOperandEqual (cdp->sym, op));
@@ -711,7 +712,7 @@ DEFSETFUNC (ifPointerGet)
   iCode *dic = cdp->diCode;
   operand *left = IC_LEFT (cdp->diCode);
 
-  if (POINTER_GET (dic) && left->key == op->key)
+  if (POINTER_GET (dic) && op->key && left->key == op->key)
     return 1;
 
   return 0;
@@ -725,7 +726,7 @@ DEFSETFUNC (ifPointerSet)
   cseDef *cdp = item;
   V_ARG (operand *, op);
 
-  if (POINTER_SET (cdp->diCode) &&
+  if (POINTER_SET (cdp->diCode) && op->key &&
       IC_RESULT (cdp->diCode)->key == op->key)
     return 1;
 

@@ -4325,9 +4325,14 @@ genCmp (iCode * ic, iCode * ifx)
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
+  sign = 0;
+  if (IS_SPEC (operandType (left)) && IS_SPEC (operandType (right)))
+    {
+      letype = getSpec (operandType (left));
+      retype = getSpec (operandType (right));
+      sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
+    }
+
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -4452,8 +4457,7 @@ static void
 genCmpEQorNE (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
-  sym_link *letype, *retype;
-  int sign, opcode;
+  int opcode;
   int size, offset = 0;
   char *sub;
   symbol *jlbl = NULL;
@@ -4468,9 +4472,6 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);

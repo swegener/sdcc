@@ -1,6 +1,10 @@
 2012-02-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c: fixed bug #3473062
+	* src/z80/gen.c (genCmpGt, genCmpLt),
+	  src/hc08/gen.c (genCmp, genCmpEQorNE),
+	  src/pic16/gen.c (genCmpGt, genCmpLt),
+	  src/pic14/gen.c (genCmpGt, genCmpLt): fixed bug #3487025
 
 2012-02-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

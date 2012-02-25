@@ -1,7 +1,7 @@
 2012-02-25 Borut Razem <borut.razem AT gmail.com>
 
-	* Makefile.in, sdcc.sln, doc/sdccman.lyx, support/sdranlib/*:
-	  support\sdranlib removed
+	* configure.in, configure, Makefile.in, sdcc.sln,
+	  doc/sdccman.lyx, support/sdranlib/*: support\sdranlib removed
 	* .version, doc/sdccman.lyx: bumped version to 3.1.3
 
 2012-02-25 Raphael Neider <rneider AT web.de>

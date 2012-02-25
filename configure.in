@@ -919,7 +919,6 @@ src/Makefile
 device/include/Makefile
 device/non-free/include/Makefile
 sdas/linksrc/Makefile
-support/sdranlib/Makefile
 support/librarian/Makefile
 support/makebin/Makefile
 support/regression/Makefile

@@ -7083,7 +7083,7 @@ fi
 test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/Makefile device/non-free/lib/Makefile"
 
 
-ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile device/non-free/include/Makefile sdas/linksrc/Makefile support/sdranlib/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
+ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile device/non-free/include/Makefile sdas/linksrc/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7825,7 +7825,6 @@ do
     "device/include/Makefile") CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
     "device/non-free/include/Makefile") CONFIG_FILES="$CONFIG_FILES device/non-free/include/Makefile" ;;
     "sdas/linksrc/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/linksrc/Makefile" ;;
-    "support/sdranlib/Makefile") CONFIG_FILES="$CONFIG_FILES support/sdranlib/Makefile" ;;
     "support/librarian/Makefile") CONFIG_FILES="$CONFIG_FILES support/librarian/Makefile" ;;
     "support/makebin/Makefile") CONFIG_FILES="$CONFIG_FILES support/makebin/Makefile" ;;
     "support/regression/Makefile") CONFIG_FILES="$CONFIG_FILES support/regression/Makefile" ;;

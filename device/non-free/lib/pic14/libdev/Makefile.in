@@ -110,6 +110,8 @@ C_SRC = \
     pic16f690.c \
     pic16f716.c \
     pic16f72.c \
+    pic16f720.c \
+    pic16f721.c \
     pic16f73.c \
     pic16f737.c \
     pic16f74.c \

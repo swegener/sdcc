@@ -1,11 +1,12 @@
 2012-02-25 Raphael Neider <rneider AT web.de>
 
-	* device/non-free/include/pic14/pic16f720.h,
+	* device/include/pic14/pic14devices.txt,
+	  device/non-free/include/pic14/pic16f720.h,
 	  device/non-free/include/pic14/pic16f721.h,
+	  device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/lib/pic14/libdev/devices.txt,
 	  device/non-free/lib/pic14/libdev/pic16f720.c,
-	  device/non-free/lib/pic14/libdev/pic16f721.c,
-	  device/include/pic14/pic14devices.txt,
-	  device/non-free/lib/pic14/libdev/devices.txt:
+	  device/non-free/lib/pic14/libdev/pic16f721.c:
 	  added support for 16f720/16f721
 
 	* device/non-free/include/pic14/pic14regs.h:

@@ -70,7 +70,7 @@
 /** SDCC - Small Device C Compiler
   * http://sdcc.sf.net
  */
-#if defined SDCC
+#if defined (SDCC) || defined (__SDCC)
 # define SBIT(name, addr, bit)  __sbit  __at(addr+bit)                    name
 # define SFR(name, addr)        __sfr   __at(addr)                        name
 # define SFRX(name, addr)       __xdata volatile unsigned char __at(addr) name
@@ -183,3 +183,4 @@
 #endif
 
 #endif //COMPILER_H
+

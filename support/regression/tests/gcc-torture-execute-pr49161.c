@@ -47,7 +47,7 @@ l4:
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 6))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   foo (3);
   if (c != 3)
     ASSERT (0);

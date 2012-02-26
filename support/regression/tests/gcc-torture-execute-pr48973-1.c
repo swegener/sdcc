@@ -23,7 +23,7 @@ foo (unsigned int x)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 4))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   s.f = (v & 1) > 0;
   foo (s.f);
   return;

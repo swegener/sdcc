@@ -16,7 +16,7 @@ int v = -1;
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5 && __GNUC_MINOR__ < 5))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   s.f = v < 0;
   if ((unsigned int) s.f != -1U)
     ASSERT (0);

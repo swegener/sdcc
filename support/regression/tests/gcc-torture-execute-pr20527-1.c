@@ -84,12 +84,10 @@ long b[] = {1, 5, 11, 23};
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390_do_anyway
   long l[3];
   f (l, b, 0, 2);
   if (l[0] != 3 || l[1] != 9 || l[2] != 21)
     ASSERT (0);
   return;
-#endif
 }
 

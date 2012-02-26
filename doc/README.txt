@@ -7,7 +7,7 @@ father of the C programming language.
 Welcome to SDCC, free open source, retargettable, optimizing ANSI C
 compiler that supports a growing list of processors including the
 Intel 8051, Maxim 80DS390, Zilog Z80, Z180, Rabbit 2000, gbz80,
-Motorola 68HC08 and the PIC16 and PIC18 familiy.
+Motorola 68HC08, Microchip PIC16 and PIC18 targets.
 
 See share/sdcc/doc/INSTALL.txt for the installation instructions for
 the binary kits.
@@ -31,7 +31,8 @@ requires that "The header files should state that they are only to be
 used with authentic Microchip devices" which makes them incompatible
 with GPL. Pic device libraries and header files are located at
 non-free\lib and non-free\include directories respectively. Sdcc should
-be run with the --use-non-free command line option.
+be run with the --use-non-free command line option in order to include
+non-free header files and libraries.
 
 See:
 
@@ -49,22 +50,21 @@ questions on the user mailing list.  See:
 
  http://sourceforge.net/mail/?group_id=599
 
-
 Notes:
 * The ds400, pic14 and pic16 are currently experimental, but work is in
 progress. Please check http://sdcc.sourceforge.net/snap.php for snapshots.
 * The TININative, avr and xa51 targets are no longer maintained.
 
+
 Roadmap:
-COPYING         - GPL v2
-as/             - Assembler, derived from asxxxx
-debugger/
-device/         - Device libraries and examples
-doc/            - sdcc and target specific documentation
-link/           - Linker, also derived from asxxxx
-sim/            - Simulator (mcs51 only)
-src/            - Source to the C compiler and targets
-support/        - Libraries and apps that may not be provided by your system.
+COPYING    - GPL v2
+debugger/  - sdcdb debugger
+device/    - Device libraries and examples
+doc/       - sdcc and target specific documentation
+sdas/      - Assemblers and linkers, derived from asxxxx
+sim/       - ucsim simulator
+src/       - Source to the C compiler and targets
+support/   - Libraries and apps that may not be provided by your system.
 
 
 Authors and interested persons:

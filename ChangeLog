@@ -8,6 +8,8 @@
 	  support/regression/tests/gcc-torture-execute-pr48973-1.c,
 	  support/regression/tests/gcc-torture-execute-pr48973-2.c:
 	  Disable tests for all gcc older than 5.0.
+	* doc/sdccman.lyx:
+	  Document feature macro rename.
 
 2012-02-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

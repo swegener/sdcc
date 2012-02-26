@@ -1,9 +1,17 @@
-#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+#LyX 2.0.2 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass book
 \begin_preamble
+% Added by lyx2lyx
+%  for proper underlining
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+\let\cite@rig\cite
+\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
+  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
+\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 % Added by lyx2lyx
 %  for proper underlining
 \PassOptionsToPackage{normalem}{ulem}
@@ -39,7 +47,6 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \paperfontsize default
 \spacing single
@@ -58,15 +65,12 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
 \end_header
 
 \begin_body
@@ -40609,7 +40613,7 @@ Defines created by the compiler
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="2">
+<lyxtabular version="3" rows="16" columns="2">
 <features>
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
@@ -40642,19 +40646,19 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC
+__SDCC
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-SDCC!Defines!SDCC (version macro)
+SDCC!Defines!__SDCC (version macro)
 \end_layout
 
 \end_inset
 
 
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 version macro
@@ -40672,8 +40676,11 @@ version macro
 
 \begin_layout Plain Layout
 Always defined.
- Since version 2.5.6 the version number as an int (ex.
- 256)
+ Version number string (e.g.
+ SDCC_3_2_0 for sdcc 3.2.0).
+ In older versions SDCC was always defined instead.
+ From version 2.5.6 SDCC was the version number as an int (ex.
+ 256).
 \end_layout
 
 \end_inset
@@ -40684,12 +40691,12 @@ Always defined.
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_mcs51
+__SDCC_mcs51
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-SDCC!Defines!SDCC
+SDCC!Defines!__SDCC
 \begin_inset ERT
 status collapsed
 
@@ -40707,12 +40714,12 @@ mcs51
 
 \end_inset
 
- or SDCC_ds390
+ or __SDCC_ds390
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-SDCC!Defines!SDCC
+SDCC!Defines!__SDCC
 \begin_inset ERT
 status collapsed
 
@@ -40730,12 +40737,12 @@ ds390
 
 \end_inset
 
- or SDCC_z80
+ or __SDCC_z80
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-SDCC!Defines!SDCC
+SDCC!Defines!__SDCC
 \begin_inset ERT
 status collapsed
 
@@ -40762,7 +40769,9 @@ z80
 \begin_inset Text
 
 \begin_layout Plain Layout
-depending on the model used (e.g.: -mds390)
+depending on the model used (e.g.: -mds390).
+ Older versions used SDCC_mcs51, etc instead.
+ 
 \end_layout
 
 \end_inset
@@ -40773,168 +40782,7 @@ depending on the model used (e.g.: -mds390)
 \begin_inset Text
 
 \begin_layout Plain Layout
-__mcs51
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-mcs51
-\end_layout
-
-\end_inset
-
-, __ds390
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-ds390
-\end_layout
-
-\end_inset
-
-, __hc08
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-hc08
-\end_layout
-
-\end_inset
-
-, __z80
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-z80
-\end_layout
-
-\end_inset
-
-, etc
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-depending on the model used (e.g.
- -mz80)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-SDCC_STACK_AUTO
+__SDCC_STACK_AUTO
 \begin_inset Index
 status collapsed
 
@@ -41007,7 +40855,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_MODEL_SMALL
+__SDCC_MODEL_SMALL
 \begin_inset Index
 status collapsed
 
@@ -41080,7 +40928,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_MODEL_MEDIUM
+__SDCC_MODEL_MEDIUM
 \begin_inset Index
 status collapsed
 
@@ -41153,7 +41001,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_MODEL_LARGE
+__SDCC_MODEL_LARGE
 \begin_inset Index
 status collapsed
 
@@ -41226,7 +41074,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_MODEL_HUGE
+__SDCC_MODEL_HUGE
 \begin_inset Index
 status collapsed
 
@@ -41299,7 +41147,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_USE_XSTACK
+__SDCC_USE_XSTACK
 \begin_inset Index
 status collapsed
 
@@ -41372,7 +41220,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_CHAR_UNSIGNED
+__SDCC_CHAR_UNSIGNED
 \begin_inset Index
 status collapsed
 
@@ -41445,7 +41293,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_STACK_TENBIT
+__SDCC_STACK_TENBIT
 \begin_inset Index
 status collapsed
 
@@ -41505,7 +41353,7 @@ when
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_MODEL_FLAT24
+__SDCC_MODEL_FLAT24
 \begin_inset Index
 status collapsed
 
@@ -41565,7 +41413,7 @@ when
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_REVISION
+__SDCC_REVISION
 \begin_inset Index
 status collapsed
 
@@ -41598,7 +41446,8 @@ REVISION (svn revision number)
 
 \begin_layout Plain Layout
 Always defined.
- SDCC svn revision number
+ SDCC svn revision number.
+ Older versions of sdcc used SDCC_REVISION instead.
 \end_layout
 
 \end_inset
@@ -41695,7 +41544,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_FLOAT_REENT
+__SDCC_FLOAT_REENT
 \begin_inset Index
 status collapsed
 
@@ -41768,7 +41617,7 @@ status collapsed
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_INT_LONG_REENT
+__SDCC_INT_LONG_REENT
 \begin_inset Index
 status collapsed
 
@@ -44885,7 +44734,7 @@ PIC16
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="5" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -44914,12 +44763,12 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_pic16
+__SDCC_pic16
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
-SDCC!Defines!SDCC
+SDCC!Defines!__SDCC
 \begin_inset ERT
 status collapsed
 
@@ -44947,75 +44796,6 @@ pic16
 
 \begin_layout Plain Layout
 Port identification
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-_
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-_pic16
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-PIC16!Defines!
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-pic16
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Port identification (same as above)
 \end_layout
 
 \end_inset
@@ -45252,7 +45032,7 @@ xxxx
 \begin_inset Text
 
 \begin_layout Plain Layout
-SDCC_MODEL_nnn
+__SDCC_MODEL_nnn
 \end_layout
 
 \end_inset

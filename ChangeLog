@@ -1,3 +1,12 @@
+2012-02-26 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/ds390/spec.mk:
+	  simulation timeout icreased to 40s due to
+	  gcc-torture-execute-20090113-1 test failure on
+	  x86_64-w64-mingw32 and sparc64-unknown-netbsd platforms
+	* doc/README.txt: added gbz80 to supported targets,
+	  explanation of sdcc run time libraries licensing
+
 2012-02-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/mcs51/compiler.h:

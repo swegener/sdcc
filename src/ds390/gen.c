@@ -12054,7 +12054,7 @@ genAssign (iCode * ic)
   if (operandsEqu (result, right) && !isOperandVolatile (result, FALSE) && !isOperandVolatile (right, FALSE))
     return;
 
-  aopOp (right, ic, FALSE, FALSE);
+  aopOp (right, ic, FALSE, IS_OP_RUONLY( IC_RESULT (ic)));
 
   emitcode (";", "genAssign: resultIsFar = %s", isOperandInFarSpace (result) ? "TRUE" : "FALSE");
 

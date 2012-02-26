@@ -12,7 +12,6 @@
 
 #include <stdarg.h>
 
-#ifndef __SDCC_ds390
 long x, y;
 
 inline void
@@ -121,12 +120,10 @@ f4 (int i, ...)
   va_end (ap);
 }
 
-#endif
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390
   f1 (3, 16.0, 128L, 32.0);
   if (x != 176L)
     ASSERT (0);
@@ -153,6 +150,5 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }
 

@@ -1,6 +1,8 @@
 2012-02-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/ds390/gen.c (genAssign): fixed bug #3463343
+	* support/regression/tests/gcc-torture-execute-string-opt-5.c:
+	  reenabled for ds390
 
 2012-02-26 Borut Razem <borut.razem AT gmail.com>
 

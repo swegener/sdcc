@@ -81,7 +81,6 @@ testTortureExecute (void)
       || strcmp (dst + 1, "ello "))
     ASSERT (0);
   memset (dst, ' ', sizeof dst);
-#ifndef __SDCC_ds390
   if (strncpy (dst + (++x & 1), (y++ & 3) + "foo", 10) != dst + 1
       || x != 7
       || y != 2
@@ -113,7 +112,6 @@ testTortureExecute (void)
       || memcmp (buf + 10, "-\0\0\0\0\0\0\0\0\0", 11))
     ASSERT (0);
 
-#endif
   return;
 #endif
 }

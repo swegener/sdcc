@@ -3,6 +3,9 @@
 	* src/ds390/gen.c (genAssign): fixed bug #3463343
 	* support/regression/tests/gcc-torture-execute-string-opt-5.c:
 	  reenabled for ds390
+	* src/ds390/gen.c (genPlus, genMinus): fix bug #3486541
+	* support/regression/tests/gcc-torture-execute-pr20527-1.c:
+	  reenabled for ds390
 
 2012-02-26 Borut Razem <borut.razem AT gmail.com>
 

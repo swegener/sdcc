@@ -5081,6 +5081,7 @@ genPlus (iCode * ic)
   if (pushResult)
     {
       aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+      adjustArithmeticResult (ic);
 
       size = getDataSize (IC_LEFT (ic));
       rSize = getDataSize (IC_RESULT (ic));
@@ -5095,8 +5096,8 @@ genPlus (iCode * ic)
         }
       _endLazyDPSEvaluation ();
     }
-
-  adjustArithmeticResult (ic);
+  else
+    adjustArithmeticResult (ic);
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
@@ -5416,6 +5417,7 @@ genMinus (iCode * ic)
   if (pushResult)
     {
       aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+      adjustArithmeticResult (ic);
 
       size = getDataSize (IC_LEFT (ic));
       rSize = getDataSize (IC_RESULT (ic));
@@ -5430,8 +5432,8 @@ genMinus (iCode * ic)
         }
       _endLazyDPSEvaluation ();
     }
-
-  adjustArithmeticResult (ic);
+  else
+    adjustArithmeticResult (ic);
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);

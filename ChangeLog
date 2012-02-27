@@ -1,3 +1,8 @@
+2012-02-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/2000*.c:
+	  More tests from gcc.
+
 2012-02-26 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/ports/ds390/spec.mk:

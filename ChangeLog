@@ -1,5 +1,10 @@
 2012-02-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* support/regression/tests/2000*.c:
+	  More tests from gcc.
+
+2012-02-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/tests/gcc-torture-execute-20000402-1.c:
 	  Disable test since unsigned long long is not yet fully supported.
 	* support/regression/tests/gcc-torture-execute-20000314-1.c:

@@ -3,6 +3,7 @@
 	* support/regression/ports/ucz80/spec.mk:
 	  simulation timeout icreased to 20s due to several tests
 	  failures on sparc64-unknown-netbsd platform
+	* configure.in, configure: report CPPFLAGS and LDFLAGS settings
 
 2012-03-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -74,7 +75,7 @@
 2012-02-25 Borut Razem <borut.razem AT gmail.com>
 
 	* configure.in, configure, Makefile.in, sdcc.sln,
-	  doc/sdccman.lyx, support/sdranlib/*: support\sdranlib removed
+	  doc/sdccman.lyx, support/sdranlib/*: support/sdranlib removed
 	* .version, doc/sdccman.lyx: bumped version to 3.1.3
 
 2012-02-25 Raphael Neider <rneider AT web.de>

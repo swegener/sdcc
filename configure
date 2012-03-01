@@ -8796,6 +8796,8 @@ sdcc ${VERSION} is now configured for
   CFLAGS:               ${CFLAGS}
   C++ compiler:         ${CXX}
   CXXFLAGS:             ${CXXFLAGS}
+  CPPFLAGS:             ${CPPFLAGS}
+  LDFLAGS:              ${LDFLAGS}
 
   ENABLED Ports:
     avr                 ${enable_avr_port}
@@ -8857,6 +8859,8 @@ sdcc ${VERSION} is now configured for
   CFLAGS:               ${CFLAGS}
   C++ compiler:         ${CXX}
   CXXFLAGS:             ${CXXFLAGS}
+  CPPFLAGS:             ${CPPFLAGS}
+  LDFLAGS:              ${LDFLAGS}
 
   ENABLED Ports:
     avr                 ${enable_avr_port}

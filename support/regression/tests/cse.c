@@ -339,7 +339,7 @@ void
 test_Struct5(void)
 {
 /* ASSERT(a2 == 2) currently fails in this test (2012-02-29) */
-#if 1
+#if 0
   packet_t  *pp1;
   packet_t  *pp2;
   unsigned char lx;

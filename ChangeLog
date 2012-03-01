@@ -1,3 +1,7 @@
+2012-03-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/cse.c: new tests checking for CSE problems
+
 2012-02-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/2000*.c:

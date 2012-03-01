@@ -1,3 +1,9 @@
+2012-03-01 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/ucz80/spec.mk:
+	  simulation timeout icreased to 20s due to several tests
+	  failures on sparc64-unknown-netbsd platform
+
 2012-03-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-20080506-1.c,

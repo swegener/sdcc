@@ -16,6 +16,7 @@
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 5))
   unsigned int u;
   int i = -1;
 
@@ -27,5 +28,6 @@ testTortureExecute (void)
   if (u != 0)
     ASSERT (0);
   return;
+#endif
 }
 

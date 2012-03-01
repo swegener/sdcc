@@ -1,3 +1,9 @@
+2012-03-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-20080506-1.c,
+	  support/regression/tests/gcc-torture-execute-20080506-2.c:
+	  Disable tests for gcc versions earlier than 5.0.
+
 2012-03-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/cse.c: new tests checking for CSE problems

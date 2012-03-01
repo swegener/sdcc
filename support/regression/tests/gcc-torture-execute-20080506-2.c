@@ -22,9 +22,11 @@ foo (int **restrict p, int **restrict q)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 5))
   int a;
   int *p1 = &a, *p2 = &a;
   foo (&p1, &p2);
   return;
+#endif
 }
 

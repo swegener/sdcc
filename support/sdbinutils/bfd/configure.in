@@ -110,8 +110,10 @@ if test $want_elf_stt_common = true; then
     [Define if we may generate symbols with ELF's STT_COMMON type])
 fi
 	 
-ACX_PKGVERSION([GNU Binutils])
-ACX_BUGURL([http://www.sourceware.org/bugzilla/])
+####ACX_PKGVERSION([GNU Binutils])
+####ACX_BUGURL([http://www.sourceware.org/bugzilla/])
+ACX_PKGVERSION([sdbinutils derived from GNU Binutils])
+ACX_BUGURL([http://sourceforge.net/tracker/?group_id=599&atid=100599])
 
 AM_BINUTILS_WARNINGS
 

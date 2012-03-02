@@ -3,6 +3,7 @@
 	* doc/sdccman.lyx: fixed pdf generation;
 	  added chapter 1.2 SDCC Suite Licenses;
 	  libraries license should be at least as liberal as the GPLv2+LE;
+	  note about GPL incompatible pic device libraries;
 	  formatting cleaning
 
 2012-03-01 Borut Razem <borut.razem AT gmail.com>

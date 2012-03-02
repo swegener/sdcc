@@ -36065,9 +36065,20 @@ Libraries
 
 \emph on
 <pending: this is messy and incomplete - a little more information is in
- sdcc/doc/libdoc.txt
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://sourceforge.net/apps/trac/sdcc/wiki/List%20of%20the%20SDCC%20library
+\end_layout
+
+\end_inset
+
+
 \emph default
- >
+>
 \end_layout
 
 \begin_layout Subsection
@@ -37822,24 +37833,12 @@ GNUv2+LE
 
 \end_inset
 
- .
-\end_layout
-
-\begin_layout Standard
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Plain Layout
-Exception are pic device libraries and header files which are derived from
+.
+ Exception are pic device libraries and header files which are derived from
  Microchip header (.inc) and linker script (.lkr) files.
  Microchip requires that "The header files should state that they are only
  to be used with authentic Microchip devices" which makes them incompatible
  with GPL.
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard

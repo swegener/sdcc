@@ -4,6 +4,7 @@
 	  added chapter 1.2 SDCC Suite Licenses;
 	  libraries license should be at least as liberal as the GPLv2+LE;
 	  note about GPL incompatible pic device libraries;
+	  added link to "List of the SDCC library" wiki page;
 	  formatting cleaning
 
 2012-03-01 Borut Razem <borut.razem AT gmail.com>

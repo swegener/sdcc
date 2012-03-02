@@ -298,7 +298,6 @@ switch
 \begin_layout Standard
 For the back-end SDCC uses a global register allocation scheme which should
  be well suited for other 8 bit MCUs.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -308,7 +307,6 @@ For the back-end SDCC uses a global register allocation scheme which should
 
 The peep hole optimizer uses a rule based substitution mechanism which is
  MCU independent.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -807,7 +805,6 @@ status collapsed
 -cyclomatic) to report the relative complexity of a function.
  These functions can then be further optimized, or hand coded in assembly
  if needed.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -3838,7 +3835,7 @@ i586-mingw32msvc-g++
 
  
 \backslash
- 
+
 \begin_inset Newline newline
 \end_inset
 
@@ -4301,13 +4298,6 @@ status collapsed
 Install paths
 \end_layout
 
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace medskip
 \end_inset
 
 
@@ -5513,7 +5503,7 @@ status collapsed
 \end_inset
 
 3.
- Library files 
+ Library files
 \begin_inset Newline newline
 \end_inset
 
@@ -5548,7 +5538,6 @@ model
 \shape default
  is auto-appended by the compiler (e.g.
  small, large, z80, ds390 etc.).
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -6916,7 +6905,7 @@ d) Create a batch file 'bison.bat' in 'C:
 \backslash
 util
 \backslash
-' and add these lines: 
+' and add these lines:
 \begin_inset Newline newline
 \end_inset
 
@@ -7063,7 +7052,7 @@ Download the setup program
 \emph on
 sdcc-x.y.z-setup.exe
 \emph default
- for an official release from 
+ for an official release from
 \begin_inset Newline newline
 \end_inset
 
@@ -7615,7 +7604,6 @@ If you should know why please drop us a note
 \end_inset
 
 .
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -7641,7 +7629,6 @@ http://sdcc.sf.net/doc/sdccman.pdf
 \end_inset
 
 .
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -9470,10 +9457,6 @@ foomain.c (contains more functions and the function main)
 
 \size default
 The first two files will need to be compiled separately with the commands:
-\size footnotesize
- 
-\size default
-
 \begin_inset Newline newline
 \end_inset
 
@@ -9537,7 +9520,7 @@ Linker
 
 \end_inset
 
- the files together with the following command: 
+ the files together with the following command:
 \begin_inset Newline newline
 \end_inset
 
@@ -9585,7 +9568,7 @@ Alternatively,
 \emph on
 foomain.c
 \emph default
- can be separately compiled as well: 
+ can be separately compiled as well:
 \family sans
 \series bold
 
@@ -10342,13 +10325,6 @@ status collapsed
  sections.
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 Command Line Options
 \begin_inset Index
@@ -10743,13 +10719,6 @@ SDCC inspects the program name it was called with so the processor family
  can also be selected by renaming the sdcc binary (to f.e.
  z80-sdcc) or by calling SDCC from a suitable link.
  Option -m has higher priority than setting from program name.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -11210,13 +11179,6 @@ sdcpp (preprocessor)
 
 .
  
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -12297,13 +12259,6 @@ reference "sec:Pragmas"
  File sdcc/sdas/doc/asxhtm.html has more on linker options.
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 MCS51 Options
 \begin_inset Index
@@ -12960,13 +12915,6 @@ status collapsed
  lcall/ljmp instructions..
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 DS390 / DS400 Options
 \begin_inset Index
@@ -13419,13 +13367,6 @@ status collapsed
 \series default
  generate code for DS390 Arithmetic Accelerator.
  
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -18852,7 +18793,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-dptr,#_test_xdata 
+dptr,#_test_xdata
 \begin_inset Newline newline
 \end_inset
 
@@ -18892,7 +18833,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,#0x01 
+a,#0x01
 \begin_inset Newline newline
 \end_inset
 
@@ -19234,7 +19175,7 @@ mov r0,#_test_pdata
 \begin_inset space ~
 \end_inset
 
-mov a,#0x01 
+mov a,#0x01
 \begin_inset Newline newline
 \end_inset
 
@@ -19675,7 +19616,6 @@ _test_bit
 \begin_layout Standard
 The bit addressable memory consists of 128 bits which are located from 0x20
  to 0x2f in data memory.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -20152,7 +20092,7 @@ Pointer declaration examples:
 
 \family typewriter
 /* pointer physically in internal ram pointing to object in external ram
- */ 
+ */
 \begin_inset Newline newline
 \end_inset
 
@@ -20165,7 +20105,7 @@ __xdata unsigned char * __data p;
 \end_inset
 
 /* pointer physically in external ram pointing to object in internal ram
- */ 
+ */
 \begin_inset Newline newline
 \end_inset
 
@@ -20177,7 +20117,7 @@ __data unsigned char * __xdata p;
 \begin_inset Newline newline
 \end_inset
 
-/* pointer physically in code rom pointing to data in xdata space */ 
+/* pointer physically in code rom pointing to data in xdata space */
 \begin_inset Newline newline
 \end_inset
 
@@ -20189,7 +20129,7 @@ __xdata unsigned char * __code p;
 \begin_inset Newline newline
 \end_inset
 
-/* pointer physically in code space pointing to data in code space */ 
+/* pointer physically in code space pointing to data in code space */
 \begin_inset Newline newline
 \end_inset
 
@@ -20244,7 +20184,6 @@ char (* __data fp)(void);
 
 \begin_layout Standard
 Well you get the idea.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -20257,7 +20196,6 @@ All unqualified pointers are treated as 3-byte (4-byte for the ds390)
 generic
 \emph default
  pointers.
- 
 \size small
 
 \begin_inset Newline newline
@@ -20329,7 +20267,6 @@ The 8051 family of microcontrollers have a minimum of 128 bytes of internal
 \end_inset
 
 - Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R0 to R7,
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -20343,7 +20280,7 @@ bit
 
 \end_inset
 
- variables and, 
+ variables and,
 \begin_inset Newline newline
 \end_inset
 
@@ -21309,7 +21246,7 @@ ld bc,#_IoPort
 \begin_inset space ~
 \end_inset
 
-ld a,#0x01 
+ld a,#0x01
 \begin_inset Newline newline
 \end_inset
 
@@ -22083,7 +22020,7 @@ If needed adapt polarity of clock, polarity of data and bit order
 \begin_inset Newline newline
 \end_inset
 
-unsigned char spi_io(unsigned char out_byte) 
+unsigned char spi_io(unsigned char out_byte)
 \begin_inset Newline newline
 \end_inset
 
@@ -22163,7 +22100,7 @@ do {
 \begin_inset space ~
 \end_inset
 
-MOSI = out_byte & 0x80; 
+MOSI = out_byte & 0x80;
 \begin_inset Newline newline
 \end_inset
 
@@ -22235,7 +22172,7 @@ out_byte <<= 1;
 \begin_inset space ~
 \end_inset
 
-MCLK = 1; 
+MCLK = 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -22339,7 +22276,7 @@ MCLK = 1;
 \begin_inset space ~
 \end_inset
 
-if(MISO) 
+if(MISO)
 \begin_inset Newline newline
 \end_inset
 
@@ -22391,7 +22328,7 @@ if(MISO)
 \begin_inset space ~
 \end_inset
 
-out_byte += 1; 
+out_byte += 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -22427,7 +22364,7 @@ out_byte += 1;
 \begin_inset space ~
 \end_inset
 
-MCLK = 0; 
+MCLK = 0;
 \begin_inset Newline newline
 \end_inset
 
@@ -22467,7 +22404,7 @@ MCLK = 0;
 \begin_inset space ~
 \end_inset
 
-return out_byte; 
+return out_byte;
 \begin_inset Newline newline
 \end_inset
 
@@ -22847,7 +22784,7 @@ reentrant
 \begin_layout Verse
 
 \family typewriter
-unsigned char foo(char i) __reentrant 
+unsigned char foo(char i) __reentrant
 \begin_inset Newline newline
 \end_inset
 
@@ -22951,7 +22888,7 @@ Absolute addressing
 \begin_layout Verse
 
 \family typewriter
-unsigned char foo(__xdata int parm) 
+unsigned char foo(__xdata int parm)
 \begin_inset Newline newline
 \end_inset
 
@@ -23426,7 +23363,6 @@ set_error(10);
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -23490,11 +23426,11 @@ outines to be coded in C, with some extended keywords.
 \begin_layout Verse
 
 \family typewriter
-void timer_isr (void) __interrupt (1) __using (1) 
+void timer_isr (void) __interrupt (1) __using (1)
 \begin_inset Newline newline
 \end_inset
 
-{ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -23515,7 +23451,6 @@ void timer_isr (void) __interrupt (1) __using (1)
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -23643,7 +23578,6 @@ using (mcs51, ds390 register bank)
 \emph default
  can be used to tell the compiler to use the specified register bank when
  generating code for this function.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -24605,7 +24539,7 @@ void nmi_isr (void) critical interrupt
 \begin_inset Newline newline
 \end_inset
 
-{ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -24626,7 +24560,6 @@ void nmi_isr (void) critical interrupt
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -29653,7 +29586,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-r2,dpl 
+r2,dpl
 \begin_inset Newline newline
 \end_inset
 
@@ -29719,7 +29652,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,_tail 
+a,_tail
 \begin_inset Newline newline
 \end_inset
 
@@ -29747,7 +29680,7 @@ dec
 \begin_inset space ~
 \end_inset
 
-a 
+a
 \begin_inset Newline newline
 \end_inset
 
@@ -29775,7 +29708,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-r3,a 
+r3,a
 \begin_inset Newline newline
 \end_inset
 
@@ -29803,7 +29736,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,_head 
+a,_head
 \begin_inset Newline newline
 \end_inset
 
@@ -29823,7 +29756,7 @@ a,_head
 \begin_inset space ~
 \end_inset
 
-cjne a,ar3,00106$ 
+cjne a,ar3,00106$
 \begin_inset Newline newline
 \end_inset
 
@@ -29847,7 +29780,7 @@ ret
 \begin_inset Newline newline
 \end_inset
 
-00106$: 
+00106$:
 \begin_inset Newline newline
 \end_inset
 
@@ -29889,7 +29822,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-r3,_head 
+r3,_head
 \begin_inset Newline newline
 \end_inset
 
@@ -29917,7 +29850,7 @@ inc
 \begin_inset space ~
 \end_inset
 
-_head 
+_head
 \begin_inset Newline newline
 \end_inset
 
@@ -29945,7 +29878,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-dpl,r3 
+dpl,r3
 \begin_inset Newline newline
 \end_inset
 
@@ -29973,7 +29906,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-dph,#(_buf >> 8) 
+dph,#(_buf >> 8)
 \begin_inset Newline newline
 \end_inset
 
@@ -30001,7 +29934,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,r2 
+a,r2
 \begin_inset Newline newline
 \end_inset
 
@@ -30021,11 +29954,11 @@ a,r2
 \begin_inset space ~
 \end_inset
 
-movx @dptr,a 
+movx @dptr,a
 \begin_inset Newline newline
 \end_inset
 
-00103$: 
+00103$:
 \begin_inset Newline newline
 \end_inset
 
@@ -30382,7 +30315,6 @@ asm
 \end_inset
 
 ; save used registers here.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -30419,7 +30351,6 @@ asm
 \end_inset
 
 ; If we were still using r2,r3 we would have to push them here.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -32800,7 +32731,7 @@ asm
 
 \end_inset
 
- 
+
 \begin_inset Newline newline
 \end_inset
 
@@ -32840,11 +32771,11 @@ mov
 \begin_inset space ~
 \end_inset
 
-b,#10 
+b,#10
 \begin_inset Newline newline
 \end_inset
 
-00001$: 
+00001$:
 \begin_inset Newline newline
 \end_inset
 
@@ -32880,7 +32811,7 @@ djnz
 \begin_inset space ~
 \end_inset
 
-b,00001$ 
+b,00001$
 \begin_inset Newline newline
 \end_inset
 
@@ -32962,7 +32893,7 @@ Labels
 \begin_layout Verse
 
 \family typewriter
-foo() { 
+foo() {
 \begin_inset Newline newline
 \end_inset
 
@@ -32982,7 +32913,7 @@ foo() {
 \begin_inset space ~
 \end_inset
 
-/* some c code */ 
+/* some c code */
 \begin_inset Newline newline
 \end_inset
 
@@ -33002,35 +32933,7 @@ foo() {
 \begin_inset space ~
 \end_inset
 
-__asm 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-; some assembler code 
+__asm
 \begin_inset Newline newline
 \end_inset
 
@@ -33058,7 +32961,7 @@ __asm
 \begin_inset space ~
 \end_inset
 
-ljmp 0003$ 
+; some assembler code
 \begin_inset Newline newline
 \end_inset
 
@@ -33078,7 +32981,15 @@ ljmp 0003$
 \begin_inset space ~
 \end_inset
 
-__endasm; 
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ljmp 0003$
 \begin_inset Newline newline
 \end_inset
 
@@ -33098,7 +33009,27 @@ __endasm;
 \begin_inset space ~
 \end_inset
 
-/* some more c code */ 
+__endasm;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+/* some more c code */
 \begin_inset Newline newline
 \end_inset
 
@@ -33165,7 +33096,7 @@ __asm
 \begin_inset space ~
 \end_inset
 
-0003$: ;label (can be referenced by inline assembler only) 
+0003$: ;label (can be referenced by inline assembler only)
 \begin_inset Newline newline
 \end_inset
 
@@ -33242,7 +33173,7 @@ endasm
 
 \end_inset
 
- ; 
+ ;
 \begin_inset Newline newline
 \end_inset
 
@@ -33722,7 +33653,7 @@ The corresponding assembler function is:
 \begin_layout Verse
 
 \family typewriter
-.globl _asm_func_PARM_2 
+.globl _asm_func_PARM_2
 \begin_inset Newline newline
 \end_inset
 
@@ -33758,7 +33689,7 @@ The corresponding assembler function is:
 \begin_inset space ~
 \end_inset
 
-.globl _asm_func 
+.globl _asm_func
 \begin_inset Newline newline
 \end_inset
 
@@ -33794,7 +33725,7 @@ The corresponding assembler function is:
 \begin_inset space ~
 \end_inset
 
-.area OSEG 
+.area OSEG
 \begin_inset Newline newline
 \end_inset
 
@@ -33834,7 +33765,7 @@ _asm_func_PARM_2:
 \begin_inset space ~
 \end_inset
 
-.ds    1 
+.ds    1
 \begin_inset Newline newline
 \end_inset
 
@@ -33870,11 +33801,11 @@ _asm_func_PARM_2:
 \begin_inset space ~
 \end_inset
 
-.area CSEG 
+.area CSEG
 \begin_inset Newline newline
 \end_inset
 
-_asm_func: 
+_asm_func:
 \begin_inset Newline newline
 \end_inset
 
@@ -33926,7 +33857,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,dpl 
+a,dpl
 \begin_inset Newline newline
 \end_inset
 
@@ -33978,7 +33909,7 @@ add
 \begin_inset space ~
 \end_inset
 
-a,_asm_func_PARM_2 
+a,_asm_func_PARM_2
 \begin_inset Newline newline
 \end_inset
 
@@ -34030,7 +33961,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-dpl,a 
+dpl,a
 \begin_inset Newline newline
 \end_inset
 
@@ -34092,7 +34023,7 @@ DPTR, DPH, DPL
 
 \end_inset
 
-,#0x00 
+,#0x00
 \begin_inset Newline newline
 \end_inset
 
@@ -34274,7 +34205,7 @@ int c_func (unsigned char i, unsigned char j, unsigned char k) reentrant
 \begin_inset space ~
 \end_inset
 
-return asm_func(i,j,k); 
+return asm_func(i,j,k);
 \begin_inset Newline newline
 \end_inset
 
@@ -34310,7 +34241,7 @@ int main()
 \begin_inset space ~
 \end_inset
 
-return c_func(10,9,8); 
+return c_func(10,9,8);
 \begin_inset Newline newline
 \end_inset
 
@@ -34324,11 +34255,11 @@ The corresponding (unoptimized) assembler routine is:
 \begin_layout Verse
 
 \family typewriter
-.globl _asm_func 
+.globl _asm_func
 \begin_inset Newline newline
 \end_inset
 
-_asm_func: 
+_asm_func:
 \begin_inset Newline newline
 \end_inset
 
@@ -34352,7 +34283,7 @@ push
 \begin_inset space ~
 \end_inset
 
-_bp 
+_bp
 \begin_inset Newline newline
 \end_inset
 
@@ -34536,7 +34467,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-r0,a 
+r0,a
 \begin_inset Newline newline
 \end_inset
 
@@ -34564,7 +34495,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,_bp 
+a,_bp
 \begin_inset Newline newline
 \end_inset
 
@@ -34640,7 +34571,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-r1,a 
+r1,a
 \begin_inset Newline newline
 \end_inset
 
@@ -34840,7 +34771,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-dph,#0x00 
+dph,#0x00
 \begin_inset Newline newline
 \end_inset
 
@@ -34868,7 +34799,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-sp,_bp 
+sp,_bp
 \begin_inset Newline newline
 \end_inset
 
@@ -34896,7 +34827,7 @@ pop
 \begin_inset space ~
 \end_inset
 
-_bp 
+_bp
 \begin_inset Newline newline
 \end_inset
 
@@ -36064,8 +35995,10 @@ Libraries
 \begin_layout Standard
 
 \emph on
-<pending: this is messy and incomplete - a little more information is in
+<pending: this is messy and incomplete - a little more information is at
  
+\emph default
+
 \begin_inset Flex URL
 status collapsed
 
@@ -36076,8 +36009,6 @@ http://sourceforge.net/apps/trac/sdcc/wiki/List%20of%20the%20SDCC%20library
 
 \end_inset
 
-
-\emph default
 >
 \end_layout
 
@@ -36173,7 +36104,7 @@ putchar()
 \begin_layout Verse
 
 \family typewriter
-void putchar (char c) { 
+void putchar (char c) {
 \begin_inset Newline newline
 \end_inset
 
@@ -38247,7 +38178,6 @@ status collapsed
 -model-large
 \emph default
  option, variables will by default be placed into the XDATA segment.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -40285,7 +40215,7 @@ void foo (void)
 \begin_inset Newline newline
 \end_inset
 
-{ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -40302,7 +40232,6 @@ void foo (void)
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -40335,11 +40264,10 @@ ThreeNops;
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
-} 
+}
 \begin_inset Newline newline
 \end_inset
 
@@ -40600,7 +40528,7 @@ pragma save
 \begin_inset space ~
 \end_inset
 
-/* save the current settings */ 
+/* save the current settings */
 \begin_inset Newline newline
 \end_inset
 
@@ -40646,7 +40574,7 @@ pragma nogcse
 \begin_inset space ~
 \end_inset
 
-/* turnoff global subexpression elimination */ 
+/* turnoff global subexpression elimination */
 \begin_inset Newline newline
 \end_inset
 
@@ -40672,40 +40600,15 @@ pragma noinduction
 
 \end_inset
 
- /* turn off induction optimizations */ 
+ /* turn off induction optimizations */
 \begin_inset Newline newline
 \end_inset
 
-int foo () 
+int foo ()
 \begin_inset Newline newline
 \end_inset
 
-{ 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
- 
-\begin_inset space ~
-\end_inset
-
- ...
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
- 
-\begin_inset space ~
-\end_inset
-
- /* large code */ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -40718,11 +40621,34 @@ int foo ()
 \end_inset
 
  ...
- 
 \begin_inset Newline newline
 \end_inset
 
-} 
+
+\begin_inset space ~
+\end_inset
+
+ 
+\begin_inset space ~
+\end_inset
+
+ /* large code */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ 
+\begin_inset space ~
+\end_inset
+
+ ...
+\begin_inset Newline newline
+\end_inset
+
+}
 \begin_inset Newline newline
 \end_inset
 
@@ -43122,7 +43048,7 @@ Makefile
 \begin_inset space ~
 \end_inset
 
-sdcc -V --use-non-free -mpic14 -p16f877 -c $< 
+sdcc -V --use-non-free -mpic14 -p16f877 -c $<
 \begin_inset Newline newline
 \end_inset
 
@@ -43130,7 +43056,7 @@ sdcc -V --use-non-free -mpic14 -p16f877 -c $<
 \begin_inset Newline newline
 \end_inset
 
-$(PRJ).hex: $(OBJS) 
+$(PRJ).hex: $(OBJS)
 \begin_inset Newline newline
 \end_inset
 
@@ -43216,7 +43142,7 @@ Makefile
 \begin_inset space ~
 \end_inset
 
-sdcc -S -V --use-non-free -mpic14 -p16f877 $< 
+sdcc -S -V --use-non-free -mpic14 -p16f877 $<
 \begin_inset Newline newline
 \end_inset
 
@@ -43260,7 +43186,7 @@ mpasmwin /q /o $*.asm
 \begin_inset Newline newline
 \end_inset
 
-$(PRJ).hex: $(OBJS) 
+$(PRJ).hex: $(OBJS)
 \begin_inset Newline newline
 \end_inset
 
@@ -43898,15 +43824,6 @@ Though the small subset of regression tests in src/regression passes, SDCC
  regression test suite does not, indicating that there are still major bugs
  in the port.
  However, many smaller projects have successfully used SDCC in the past...
-\end_layout
-
-\begin_layout Standard
-
-\size footnotesize
-\begin_inset Newpage newpage
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -48000,7 +47917,7 @@ __at
 \begin_inset Newline newline
 \end_inset
 
-static __code char __at(__CONFIG1L) configword1l = 
+static __code char __at(__CONFIG1L) configword1l =
 \begin_inset Newline newline
 \end_inset
 
@@ -50382,7 +50299,7 @@ ion is complete.
 \family typewriter
 (load-file sdcdbsrc.el)
 \family default
- 
+
 \begin_inset Newline newline
 \end_inset
 
@@ -50394,7 +50311,7 @@ ion is complete.
  The files can also be loaded dynamically while XEmacs is running, set the
  environment variable 'EMACSLOADPATH' to the installation bin directory
  (<installdir>/bin), then enter the following command ESC-x load-file sdcdbsrc.
- To start the interface enter the following command: 
+ To start the interface enter the following command:
 \begin_inset Newline newline
 \end_inset
 
@@ -50417,7 +50334,6 @@ ESC-x sdcdbsrc
 \end_inset
 
 You will prompted to enter the file name to be debugged.
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -50460,7 +50376,7 @@ The following is a list of key mapping for the debugger interface.
 \begin_inset space ~
 \end_inset
 
-Current Listing :: 
+Current Listing ::
 \begin_inset Newline newline
 \end_inset
 
@@ -50608,7 +50524,7 @@ binding
 \begin_inset space ~
 \end_inset
 
-Comment 
+Comment
 \begin_inset Newline newline
 \end_inset
 
@@ -50868,7 +50784,7 @@ sdcdb-next-from-src
 \begin_inset space ~
 \end_inset
 
-SDCDB next command 
+SDCDB next command
 \begin_inset Newline newline
 \end_inset
 
@@ -50976,7 +50892,7 @@ sdcdb-back-from-src
 \begin_inset space ~
 \end_inset
 
-SDCDB back command 
+SDCDB back command
 \begin_inset Newline newline
 \end_inset
 
@@ -51192,7 +51108,7 @@ sdcdb-step-from-src
 \begin_inset space ~
 \end_inset
 
-SDCDB step command 
+SDCDB step command
 \begin_inset Newline newline
 \end_inset
 
@@ -51300,7 +51216,7 @@ sdcdb-whatis-c-sexp
 \begin_inset space ~
 \end_inset
 
-SDCDB ptypecommand for data at 
+SDCDB ptypecommand for data at
 \begin_inset Newline newline
 \end_inset
 
@@ -51492,7 +51408,7 @@ SDCDB ptypecommand for data at
 \begin_inset space ~
 \end_inset
 
-buffer point 
+buffer point
 \begin_inset Newline newline
 \end_inset
 
@@ -51616,7 +51532,7 @@ sdcdbsrc-delete
 \begin_inset space ~
 \end_inset
 
-SDCDB Delete all breakpoints if no arg 
+SDCDB Delete all breakpoints if no arg
 \begin_inset Newline newline
 \end_inset
 
@@ -51808,7 +51724,7 @@ SDCDB Delete all breakpoints if no arg
 \begin_inset space ~
 \end_inset
 
-given or delete arg (C-u arg x) 
+given or delete arg (C-u arg x)
 \begin_inset Newline newline
 \end_inset
 
@@ -51936,7 +51852,7 @@ sdcdbsrc-frame
 \begin_inset space ~
 \end_inset
 
-SDCDB Display current frame if no arg, 
+SDCDB Display current frame if no arg,
 \begin_inset Newline newline
 \end_inset
 
@@ -52128,7 +52044,7 @@ SDCDB Display current frame if no arg,
 \begin_inset space ~
 \end_inset
 
-given or display frame arg 
+given or display frame arg
 \begin_inset Newline newline
 \end_inset
 
@@ -52320,7 +52236,7 @@ given or display frame arg
 \begin_inset space ~
 \end_inset
 
-buffer point 
+buffer point
 \begin_inset Newline newline
 \end_inset
 
@@ -52428,7 +52344,7 @@ sdcdbsrc-goto-sdcdb
 \begin_inset space ~
 \end_inset
 
-Goto the SDCDB output buffer 
+Goto the SDCDB output buffer
 \begin_inset Newline newline
 \end_inset
 
@@ -52540,7 +52456,7 @@ sdcdb-print-c-sexp
 \begin_inset space ~
 \end_inset
 
-SDCDB print command for data at 
+SDCDB print command for data at
 \begin_inset Newline newline
 \end_inset
 
@@ -52732,7 +52648,7 @@ SDCDB print command for data at
 \begin_inset space ~
 \end_inset
 
-buffer point 
+buffer point
 \begin_inset Newline newline
 \end_inset
 
@@ -52840,7 +52756,7 @@ sdcdbsrc-goto-sdcdb
 \begin_inset space ~
 \end_inset
 
-Goto the SDCDB output buffer 
+Goto the SDCDB output buffer
 \begin_inset Newline newline
 \end_inset
 
@@ -52972,11 +52888,11 @@ sdcdbsrc-mode
 \begin_inset space ~
 \end_inset
 
-Toggles Sdcdbsrc mode (turns it off) 
+Toggles Sdcdbsrc mode (turns it off)
 \begin_inset Newline newline
 \end_inset
 
-;; 
+;;
 \begin_inset Newline newline
 \end_inset
 
@@ -53056,11 +52972,11 @@ sdcdb-finish-from-src
 \begin_inset space ~
 \end_inset
 
-SDCDB finish command 
+SDCDB finish command
 \begin_inset Newline newline
 \end_inset
 
-;; 
+;;
 \begin_inset Newline newline
 \end_inset
 
@@ -53180,7 +53096,7 @@ sdcdb-break
 \begin_inset space ~
 \end_inset
 
-Set break for line with point 
+Set break for line with point
 \begin_inset Newline newline
 \end_inset
 
@@ -53300,7 +53216,7 @@ sdcdbsrc-mode
 \begin_inset space ~
 \end_inset
 
-Toggle Sdcdbsrc mode 
+Toggle Sdcdbsrc mode
 \begin_inset Newline newline
 \end_inset
 
@@ -53408,7 +53324,7 @@ sdcdbsrc-srcmode
 \begin_inset space ~
 \end_inset
 
-Toggle list mode 
+Toggle list mode
 \begin_inset Newline newline
 \end_inset
 
@@ -53527,7 +53443,6 @@ uc * uc
 (int) uc * (int) uc = (int) 0xfe * (int) 0xfe = (int) 0xfc04 = -1024
 \family default
 .
- 
 \begin_inset Newline newline
 \end_inset
 

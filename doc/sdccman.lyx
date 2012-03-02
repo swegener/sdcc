@@ -30906,7 +30906,7 @@ t_b_end$:
 \begin_inset space ~
 \end_inset
 
-; restore used registers here 
+; restore used registers here
 \begin_inset Newline newline
 \end_inset
 
@@ -33653,6 +33653,37 @@ The corresponding assembler function is:
 \begin_layout Verse
 
 \family typewriter
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 .globl _asm_func_PARM_2
 \begin_inset Newline newline
 \end_inset
@@ -34185,7 +34216,7 @@ int c_func (unsigned char i, unsigned char j, unsigned char k) reentrant
 \begin_inset Newline newline
 \end_inset
 
-{ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -34209,7 +34240,7 @@ return asm_func(i,j,k);
 \begin_inset Newline newline
 \end_inset
 
-} 
+}
 \begin_inset Newline newline
 \end_inset
 
@@ -34217,11 +34248,11 @@ return asm_func(i,j,k);
 \begin_inset Newline newline
 \end_inset
 
-int main() 
+int main()
 \begin_inset Newline newline
 \end_inset
 
-{ 
+{
 \begin_inset Newline newline
 \end_inset
 

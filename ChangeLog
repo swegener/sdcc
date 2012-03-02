@@ -1,6 +1,7 @@
 2012-03-02 Borut Razem <borut.razem AT gmail.com>
 
-	* doc/sdccman.lyx: fixed pdf generation
+	* doc/sdccman.lyx: fixed pdf generation;
+	  added chapter 1.2 SDCC Suite Licenses
 
 2012-03-01 Borut Razem <borut.razem AT gmail.com>
 

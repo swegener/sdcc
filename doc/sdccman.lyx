@@ -934,6 +934,15 @@ SDCC run-time libraries:
 \end_inset
 
 The great majority of SDCC run-time libraries are licensed under GPLv2+LE
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+GPLv2+LE
+\end_layout
+
+\end_inset
+
  which allows linking of SDCC run-time libraries with proprietary (closed
  source) applications.
 \begin_inset Newline newline
@@ -13778,14 +13787,6 @@ This option tells the compiler that it is not allowed to use register pair
  
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 GBZ80 Options
 \begin_inset Index
@@ -14047,13 +14048,6 @@ status collapsed
 \end_inset
 
  Use <Value> for the const segment name.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -15122,13 +15116,6 @@ status collapsed
 \end_inset
 
  Frame pointer will be omitted when the function uses no local variables.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -17575,13 +17562,6 @@ reference "sub:Search-Paths"
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 Intermediate Dump Options
 \begin_inset CommandInset label
@@ -18148,13 +18128,6 @@ status collapsed
 Will cause all the above mentioned dumps to be created.
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 Redirecting output on Windows Shells
 \end_layout
@@ -18322,12 +18295,6 @@ status collapsed
 \series bold
 \emph default
 -model-large -c $(InputPath)
-\series default
-
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -18623,11 +18590,6 @@ SDCC!Environment variables!undocumented
 \end_inset
 
 .
- 
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -21028,10 +20990,6 @@ status collapsed
  allocation, take a look at either the .map or .mem files to find out what
  the problem is.
  The .mem file may even suggest a solution to the problem.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -21516,10 +21474,6 @@ in/out
 \family default
 .
  If you include the file z180.h this will be set automatically.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -21635,10 +21589,6 @@ The __xdata storage class declares a variable that can reside anywhere in
  memory.
  This is the default if no storage class is specified.
  
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -21662,10 +21612,6 @@ Binary constants
 \begin_layout Standard
 SDCC supports the use of binary constants, such as 0b01100010.
  This feature is only enabled when the compiler is invoked using --std-sdccxx.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -21740,10 +21686,6 @@ spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that points
 SDCC will automatically insert calls to the correspionding function before
  accessing the variable.
  SDCC inserts the minimum possible number calls to the bank selection functions.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -22724,10 +22666,6 @@ and you can use the same hardware dependent routine without changes, as
  for example in a library.
  This is somehow similar to sbit, but only one absolute address has to be
  specified in the whole project.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -23343,7 +23281,7 @@ Division
 \begin_layout Verse
 
 \family typewriter
-#pragma save 
+#pragma save
 \begin_inset Newline newline
 \end_inset
 
@@ -23369,11 +23307,11 @@ pragma nooverlay
 
 \end_inset
 
- 
+
 \begin_inset Newline newline
 \end_inset
 
-void set_error(unsigned char errcd) 
+void set_error(unsigned char errcd)
 \begin_inset Newline newline
 \end_inset
 
@@ -23405,7 +23343,7 @@ P3 = errcd;
 \begin_inset Newline newline
 \end_inset
 
-#pragma restore 
+#pragma restore
 \begin_inset Newline newline
 \end_inset
 
@@ -23516,10 +23454,6 @@ nooverlay was not present, this could cause unpredictable runtime behavior
 
 nooverlay ensures that the parameters and local variables for the function
  are NOT overlaid.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -24182,10 +24116,6 @@ reference "sub:Functions-using-private-banks"
 \end_inset
 
 about Functions using private register banks.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -24584,10 +24514,6 @@ stack
 
 .
  This scheme is recommended for larger interrupt service routines.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -24629,10 +24555,6 @@ reference "sub:Startup-Code"
 \end_inset
 
  for details on customizing startup.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -24720,10 +24642,6 @@ critical
  keyword.
  To distinguish between this and an nmi_isr you must provide an interrupt
  number.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -24814,32 +24732,11 @@ critical
 
 \end_inset
 
- 
+
 \begin_inset Newline newline
 \end_inset
 
-{ 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
- 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -24860,7 +24757,26 @@ critical
 \end_inset
 
 ...
- 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
 \begin_inset Newline newline
 \end_inset
 
@@ -25670,7 +25586,7 @@ volatile
 
 \end_inset
 
- bit resource_is_free; 
+ bit resource_is_free;
 \begin_inset Newline newline
 \end_inset
 
@@ -25678,19 +25594,7 @@ volatile
 \begin_inset Newline newline
 \end_inset
 
-if (resource_is_free) 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-{ 
+if (resource_is_free)
 \begin_inset Newline newline
 \end_inset
 
@@ -25702,6 +25606,14 @@ if (resource_is_free)
 \begin_inset space ~
 \end_inset
 
+{
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
 
 \begin_inset space ~
 \end_inset
@@ -25710,7 +25622,11 @@ if (resource_is_free)
 \begin_inset space ~
 \end_inset
 
-resource_is_free=0; 
+
+\begin_inset space ~
+\end_inset
+
+resource_is_free=0;
 \begin_inset Newline newline
 \end_inset
 
@@ -25731,7 +25647,6 @@ resource_is_free=0;
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -25985,10 +25900,6 @@ It is most efficient if your ISR calls no other functions.
  It is very inefficient to call a function using a different, non-zero bank
  from an ISR.
  
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -28867,13 +28778,6 @@ crtstart.rst
  is generated.
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 HC08 Startup Code
 \end_layout
@@ -28890,10 +28794,6 @@ HC08
 \end_inset
 
  startup code follows the same scheme as the MCS51 startup code.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -28961,10 +28861,6 @@ status collapsed
 
  and provide your own crt0.rel.
  
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -35043,13 +34939,6 @@ Functions declared as __smallc are called using the Small-C calling convention.
  functions from Small-C.
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 int (16 bit)
 \begin_inset Index
@@ -36156,10 +36045,6 @@ not
  Also notice that you don't have to call this routines directly.
  The compiler will use them automatically every time a floating point operation
  is required.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -37927,22 +37812,17 @@ Libraries
 
 \end_inset
 
- included in SDCC should have a license at least as liberal as the GNU Lesser
- General Public License
+ included in SDCC should have a license at least as liberal as the GPLv2+LE
 \begin_inset Index
 status collapsed
 
 \begin_layout Plain Layout
-GNU Lesser General Public License, LGPL
+GNUv2+LE
 \end_layout
 
 \end_inset
 
- 
-\emph on
-LGPL
-\emph default
-.
+ .
 \end_layout
 
 \begin_layout Standard
@@ -37950,14 +37830,11 @@ LGPL
 status collapsed
 
 \begin_layout Plain Layout
-license statements for the libraries are missing.
- sdcc/device/lib/ser_ir.c
-\end_layout
-
-\begin_layout Plain Layout
-or _decdptr f.e.
- come with a GPL (as opposed to LGPL) License - this will not be liberal
- enough for many embedded programmers.
+Exception are pic device libraries and header files which are derived from
+ Microchip header (.inc) and linker script (.lkr) files.
+ Microchip requires that "The header files should state that they are only
+ to be used with authentic Microchip devices" which makes them incompatible
+ with GPL.
 \end_layout
 
 \end_inset
@@ -37993,10 +37870,6 @@ Programmers coding for embedded systems are not especially famous for being
  enthusiastic, so don't expect a big hurray but as the mailing list is searchabl
 e these references are very valuable.
  Let's help to create a climate where information is shared.
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -40883,18 +40756,6 @@ pragma restore
 The compiler will generate a warning message when extra space is allocated.
  It is strongly recommended that the save and restore pragmas be used when
  changing options for a function.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -42541,13 +42402,6 @@ reference "lyx:-Wl option"
  The linker will not check for overflows, again this is your responsibility.
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace bigskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 DS400 port
 \end_layout
@@ -42592,10 +42446,6 @@ ftp://ftp.dalsemi.com/pub/tini/ds80c400/c_libraries/sdcc/index.html
 
 .
  
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -42681,10 +42531,6 @@ Z80!return value
  The gbz80 port use the same set of registers for the return values, but
  in a different order of significance: E (one byte), DE (two bytes), or
  HLDE (four bytes).
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -42719,10 +42565,6 @@ reference "sec:Quality-control"
 \end_inset
 
 ).
-\begin_inset VSpace bigskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -48654,7 +48496,7 @@ PUTCHAR( c )
 \end_layout
 
 \begin_layout LyX-Code
-} 
+}
 \begin_inset Newline newline
 \end_inset
 
@@ -53571,17 +53413,7 @@ Toggle list mode
 \begin_inset Newline newline
 \end_inset
 
-;; 
-\begin_inset Newline newline
-\end_inset
-
-
-\family default
-
-\begin_inset Newpage newpage
-\end_inset
-
-
+;;
 \end_layout
 
 \begin_layout Chapter
@@ -57015,10 +56847,6 @@ vendor
 \end_inset
 
 
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -58562,10 +58390,6 @@ give students a chance to publicly prove their skills and to possibly see
 \begin_layout Standard
 then SDCC is probably among the first choices.
  Well, probably SDCC might be the only choice.
-\begin_inset Newpage newpage
-\end_inset
-
-
 \end_layout
 
 \begin_layout Chapter
@@ -58629,7 +58453,7 @@ limination, e.g.:
 \begin_layout Verse
 
 \family typewriter
-i = x + y + 1; 
+i = x + y + 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -58643,11 +58467,11 @@ will be translated to
 \begin_layout Verse
 
 \family typewriter
-iTemp = x + y; 
+iTemp = x + y;
 \begin_inset Newline newline
 \end_inset
 
-i = iTemp + 1; 
+i = iTemp + 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -58661,7 +58485,7 @@ Some subexpressions are not as obvious as the above example, e.g.:
 \begin_layout Verse
 
 \family typewriter
-a->b[i].c = 10; 
+a->b[i].c = 10;
 \begin_inset Newline newline
 \end_inset
 
@@ -58676,11 +58500,11 @@ In this case the address arithmetic a->b[i] will be computed only once;
 \begin_layout Verse
 
 \family typewriter
-iTemp = a->b[i]; 
+iTemp = a->b[i];
 \begin_inset Newline newline
 \end_inset
 
-iTemp.c = 10; 
+iTemp.c = 10;
 \begin_inset Newline newline
 \end_inset
 
@@ -58716,7 +58540,7 @@ int global;
 \begin_inset Newline newline
 \end_inset
 
-void f () { 
+void f () {
 \begin_inset Newline newline
 \end_inset
 
@@ -58728,7 +58552,7 @@ void f () {
 \begin_inset space ~
 \end_inset
 
-int i; 
+int i;
 \begin_inset Newline newline
 \end_inset
 
@@ -58760,7 +58584,7 @@ i = 1;
 \begin_inset space ~
 \end_inset
 
-/* dead store */ 
+/* dead store */
 \begin_inset Newline newline
 \end_inset
 
@@ -58776,7 +58600,7 @@ global = 1;
 \begin_inset space ~
 \end_inset
 
-/* dead store */ 
+/* dead store */
 \begin_inset Newline newline
 \end_inset
 
@@ -58788,7 +58612,7 @@ global = 1;
 \begin_inset space ~
 \end_inset
 
-global = 2; 
+global = 2;
 \begin_inset Newline newline
 \end_inset
 
@@ -58800,7 +58624,7 @@ global = 2;
 \begin_inset space ~
 \end_inset
 
-return; 
+return;
 \begin_inset Newline newline
 \end_inset
 
@@ -58816,7 +58640,7 @@ global = 3;
 \begin_inset space ~
 \end_inset
 
-/* unreachable */ 
+/* unreachable */
 \begin_inset Newline newline
 \end_inset
 
@@ -58874,7 +58698,7 @@ Copy propagation
 \begin_layout Verse
 
 \family typewriter
-int f() { 
+int f() {
 \begin_inset Newline newline
 \end_inset
 
@@ -58886,7 +58710,7 @@ int f() {
 \begin_inset space ~
 \end_inset
 
-int i, j; 
+int i, j;
 \begin_inset Newline newline
 \end_inset
 
@@ -58898,7 +58722,7 @@ int i, j;
 \begin_inset space ~
 \end_inset
 
-i = 10; 
+i = 10;
 \begin_inset Newline newline
 \end_inset
 
@@ -58910,7 +58734,7 @@ i = 10;
 \begin_inset space ~
 \end_inset
 
-j = i; 
+j = i;
 \begin_inset Newline newline
 \end_inset
 
@@ -58922,7 +58746,7 @@ j = i;
 \begin_inset space ~
 \end_inset
 
-return j; 
+return j;
 \begin_inset Newline newline
 \end_inset
 
@@ -58936,7 +58760,7 @@ will be changed to
 \begin_layout Verse
 
 \family typewriter
-int f() { 
+int f() {
 \begin_inset Newline newline
 \end_inset
 
@@ -58948,7 +58772,7 @@ int f() {
 \begin_inset space ~
 \end_inset
 
-int i, j; 
+int i, j;
 \begin_inset Newline newline
 \end_inset
 
@@ -58960,7 +58784,7 @@ int i, j;
 \begin_inset space ~
 \end_inset
 
-i = 10; 
+i = 10;
 \begin_inset Newline newline
 \end_inset
 
@@ -58972,7 +58796,7 @@ i = 10;
 \begin_inset space ~
 \end_inset
 
-j = 10; 
+j = 10;
 \begin_inset Newline newline
 \end_inset
 
@@ -58984,7 +58808,7 @@ j = 10;
 \begin_inset space ~
 \end_inset
 
-return 10; 
+return 10;
 \begin_inset Newline newline
 \end_inset
 
@@ -59108,7 +58932,7 @@ Loop Invariant:
 \begin_layout Verse
 
 \family typewriter
-for (i = 0 ; i < 100 ; i ++) 
+for (i = 0 ; i < 100 ; i ++)
 \begin_inset Newline newline
 \end_inset
 
@@ -59138,11 +58962,11 @@ changed to
 \begin_layout Verse
 
 \family typewriter
-itemp = k + l; 
+itemp = k + l;
 \begin_inset Newline newline
 \end_inset
 
-for (i = 0; i < 100; i++) 
+for (i = 0; i < 100; i++)
 \begin_inset Newline newline
 \end_inset
 
@@ -59221,35 +59045,15 @@ changed to
 \begin_layout Verse
 
 \family typewriter
-itemp1 = 0; 
+itemp1 = 0;
 \begin_inset Newline newline
 \end_inset
 
-itemp2 = 0; 
+itemp2 = 0;
 \begin_inset Newline newline
 \end_inset
 
-for (i=0;i< 100;i++) { 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-ar[itemp1] = itemp2; 
+for (i=0;i< 100;i++) {
 \begin_inset Newline newline
 \end_inset
 
@@ -59269,7 +59073,7 @@ ar[itemp1] = itemp2;
 \begin_inset space ~
 \end_inset
 
-itemp1 += 5; 
+ar[itemp1] = itemp2;
 \begin_inset Newline newline
 \end_inset
 
@@ -59289,7 +59093,27 @@ itemp1 += 5;
 \begin_inset space ~
 \end_inset
 
-itemp2 += 3; 
+itemp1 += 5;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+itemp2 += 3;
 \begin_inset Newline newline
 \end_inset
 
@@ -59457,7 +59281,7 @@ i = j + 0;
 \begin_inset space ~
 \end_inset
 
- i = j; 
+ i = j;
 \begin_inset Newline newline
 \end_inset
 
@@ -59505,7 +59329,7 @@ i /= 2;
 \begin_inset space ~
 \end_inset
 
- i >>= 1; 
+ i >>= 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -59541,7 +59365,7 @@ i = j - j;
 \begin_inset space ~
 \end_inset
 
- i = 0; 
+ i = 0;
 \begin_inset Newline newline
 \end_inset
 
@@ -59746,7 +59570,7 @@ switch(i) {
 \begin_inset space ~
 \end_inset
 
-switch (i) { 
+switch (i) {
 \begin_inset Newline newline
 \end_inset
 
@@ -59867,7 +59691,6 @@ case 4: ...
 \end_inset
 
 case 0: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -59988,7 +59811,6 @@ case 5: ...
 \end_inset
 
 case 1: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -60229,7 +60051,6 @@ case 6: ...
 \end_inset
 
 case 3: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -60350,7 +60171,6 @@ case 7: ...
 \end_inset
 
 case 4: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -60471,7 +60291,6 @@ case 8: ...
 \end_inset
 
 case 5: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -60592,7 +60411,6 @@ case 9: ...
 \end_inset
 
 case 6: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -60709,7 +60527,6 @@ case 10: ...
 \end_inset
 
 case 7: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -60826,7 +60643,6 @@ case 11: ...
 \end_inset
 
 case 8: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61012,7 +60828,7 @@ Switch statements which have large gaps in the numeric sequence or those
 \begin_layout Verse
 
 \family typewriter
-switch (i) { 
+switch (i) {
 \begin_inset Newline newline
 \end_inset
 
@@ -61025,7 +60841,6 @@ switch (i) {
 \end_inset
 
 case 1: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61038,7 +60853,6 @@ case 1: ...
 \end_inset
 
 case 2: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61051,7 +60865,6 @@ case 2: ...
 \end_inset
 
 case 3: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61064,7 +60877,6 @@ case 3: ...
 \end_inset
 
 case 4: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61077,7 +60889,6 @@ case 4: ...
 \end_inset
 
 case 5: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61090,7 +60901,6 @@ case 5: ...
 \end_inset
 
 case 6: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61103,7 +60913,6 @@ case 6: ...
 \end_inset
 
 case 7: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61116,7 +60925,6 @@ case 7: ...
 \end_inset
 
 case 101: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61129,7 +60937,6 @@ case 101: ...
 \end_inset
 
 case 102: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61142,7 +60949,6 @@ case 102: ...
 \end_inset
 
 case 103: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61155,7 +60961,6 @@ case 103: ...
 \end_inset
 
 case 104: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61168,7 +60973,6 @@ case 104: ...
 \end_inset
 
 case 105: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61181,7 +60985,6 @@ case 105: ...
 \end_inset
 
 case 106: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61194,7 +60997,6 @@ case 106: ...
 \end_inset
 
 case 107: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61208,7 +61010,7 @@ If the above switch statement is broken down into two switch statements
 \begin_layout Verse
 
 \family typewriter
-switch (i) { 
+switch (i) {
 \begin_inset Newline newline
 \end_inset
 
@@ -61221,7 +61023,6 @@ switch (i) {
 \end_inset
 
 case 1: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61234,7 +61035,6 @@ case 1: ...
 \end_inset
 
 case 2: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61247,7 +61047,6 @@ case 2: ...
 \end_inset
 
 case 3: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61260,7 +61059,6 @@ case 3: ...
 \end_inset
 
 case 4: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61273,7 +61071,6 @@ case 4: ...
 \end_inset
 
 case 5: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61286,7 +61083,6 @@ case 5: ...
 \end_inset
 
 case 6: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61299,7 +61095,6 @@ case 6: ...
 \end_inset
 
 case 7: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61313,7 +61108,7 @@ and
 \begin_layout Verse
 
 \family typewriter
-switch (i) { 
+switch (i) {
 \begin_inset Newline newline
 \end_inset
 
@@ -61326,7 +61121,6 @@ switch (i) {
 \end_inset
 
 case 101: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61339,7 +61133,6 @@ case 101: ...
 \end_inset
 
 case 102: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61352,7 +61145,6 @@ case 102: ...
 \end_inset
 
 case 103: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61365,7 +61157,6 @@ case 103: ...
 \end_inset
 
 case 104: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61378,7 +61169,6 @@ case 104: ...
 \end_inset
 
 case 105: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61391,7 +61181,6 @@ case 105: ...
 \end_inset
 
 case 106: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61404,7 +61193,6 @@ case 106: ...
 \end_inset
 
 case 107: ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -61513,11 +61301,10 @@ unsigned char i;
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
-i >>= 4; 
+i >>= 4;
 \begin_inset Newline newline
 \end_inset
 
@@ -61535,11 +61322,11 @@ mov
 \begin_inset space ~
 \end_inset
 
- a,_i 
+ a,_i
 \begin_inset Newline newline
 \end_inset
 
-swap a 
+swap a
 \begin_inset Newline newline
 \end_inset
 
@@ -61547,7 +61334,7 @@ anl
 \begin_inset space ~
 \end_inset
 
- a,#0x0f 
+ a,#0x0f
 \begin_inset Newline newline
 \end_inset
 
@@ -61566,16 +61353,15 @@ In general SDCC will never setup a loop if the shift count is known.
 \begin_layout Verse
 
 \family typewriter
-unsigned int i; 
+unsigned int i;
 \begin_inset Newline newline
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
-i >>= 9; 
+i >>= 9;
 \begin_inset Newline newline
 \end_inset
 
@@ -61597,7 +61383,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,(_i + 1) 
+a,(_i + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -61609,7 +61395,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-(_i + 1),#0x00 
+(_i + 1),#0x00
 \begin_inset Newline newline
 \end_inset
 
@@ -61621,7 +61407,7 @@ clr
 \begin_inset space ~
 \end_inset
 
-c 
+c
 \begin_inset Newline newline
 \end_inset
 
@@ -61633,7 +61419,7 @@ rrc
 \begin_inset space ~
 \end_inset
 
-a 
+a
 \begin_inset Newline newline
 \end_inset
 
@@ -61734,18 +61520,17 @@ char i;
 \begin_inset space ~
 \end_inset
 
-/* unsigned is needed for rotation */ 
+/* unsigned is needed for rotation */
 \begin_inset Newline newline
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
 i = ((i << 1) | (i >> 7));
 \family default
- 
+
 \begin_inset Newline newline
 \end_inset
 
@@ -61769,7 +61554,7 @@ mov
 \begin_inset space ~
 \end_inset
 
-a,_i 
+a,_i
 \begin_inset Newline newline
 \end_inset
 
@@ -61785,7 +61570,7 @@ rl
 \begin_inset space ~
 \end_inset
 
-a 
+a
 \begin_inset Newline newline
 \end_inset
 
@@ -61843,7 +61628,7 @@ unsigned
 \begin_inset space ~
 \end_inset
 
-char i; 
+char i;
 \begin_inset Newline newline
 \end_inset
 
@@ -61859,12 +61644,11 @@ unsigned
 \begin_inset space ~
 \end_inset
 
-int j; 
+int j;
 \begin_inset Newline newline
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -62007,7 +61791,7 @@ It is frequently required to obtain the highest order bit of an integral
 \begin_layout Verse
 
 \family typewriter
-unsigned int gint; 
+unsigned int gint;
 \begin_inset Newline newline
 \end_inset
 
@@ -62015,19 +61799,7 @@ unsigned int gint;
 \begin_inset Newline newline
 \end_inset
 
-foo () { 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-unsigned char hob1, aob1; 
+foo () {
 \begin_inset Newline newline
 \end_inset
 
@@ -62039,7 +61811,19 @@ unsigned char hob1, aob1;
 \begin_inset space ~
 \end_inset
 
-bit hob2, hob3, aob2, aob3; 
+unsigned char hob1, aob1;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+bit hob2, hob3, aob2, aob3;
 \begin_inset Newline newline
 \end_inset
 
@@ -62052,7 +61836,6 @@ bit hob2, hob3, aob2, aob3;
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -62064,7 +61847,7 @@ bit hob2, hob3, aob2, aob3;
 \begin_inset space ~
 \end_inset
 
-hob1 = (gint >> 15) & 1; 
+hob1 = (gint >> 15) & 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -62076,7 +61859,7 @@ hob1 = (gint >> 15) & 1;
 \begin_inset space ~
 \end_inset
 
-hob2 = (gint >> 15) & 1; 
+hob2 = (gint >> 15) & 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -62088,7 +61871,7 @@ hob2 = (gint >> 15) & 1;
 \begin_inset space ~
 \end_inset
 
-hob3 = gint & 0x8000; 
+hob3 = gint & 0x8000;
 \begin_inset Newline newline
 \end_inset
 
@@ -62100,7 +61883,7 @@ hob3 = gint & 0x8000;
 \begin_inset space ~
 \end_inset
 
-aob1 = (gint >> 9) & 1; 
+aob1 = (gint >> 9) & 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -62112,7 +61895,7 @@ aob1 = (gint >> 9) & 1;
 \begin_inset space ~
 \end_inset
 
-aob2 = (gint >> 8) & 1; 
+aob2 = (gint >> 8) & 1;
 \begin_inset Newline newline
 \end_inset
 
@@ -62124,7 +61907,7 @@ aob2 = (gint >> 8) & 1;
 \begin_inset space ~
 \end_inset
 
-aob3 = gint & 0x0800; 
+aob3 = gint & 0x0800;
 \begin_inset Newline newline
 \end_inset
 
@@ -62136,8 +61919,7 @@ aob3 = gint & 0x0800;
 \begin_inset space ~
 \end_inset
 
-..
- 
+...
 \begin_inset Newline newline
 \end_inset
 
@@ -62254,7 +62036,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 7 
+ hob.c 7
 \begin_inset Newline newline
 \end_inset
 
@@ -62358,7 +62140,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,(_gint + 1) 
+ a,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -62478,7 +62260,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a 
+ a
 \begin_inset Newline newline
 \end_inset
 
@@ -62582,7 +62364,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,#0x01 
+ a,#0x01
 \begin_inset Newline newline
 \end_inset
 
@@ -62686,7 +62468,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_hob1_1_1,a 
+ _foo_hob1_1_1,a
 \begin_inset Newline newline
 \end_inset
 
@@ -62794,7 +62576,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 8 
+ hob.c 8
 \begin_inset Newline newline
 \end_inset
 
@@ -62898,7 +62680,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,(_gint + 1) 
+ a,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -63014,7 +62796,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a 
+ a
 \begin_inset Newline newline
 \end_inset
 
@@ -63118,7 +62900,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_hob2_1_1,c 
+ _foo_hob2_1_1,c
 \begin_inset Newline newline
 \end_inset
 
@@ -63226,7 +63008,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 9 
+ hob.c 9
 \begin_inset Newline newline
 \end_inset
 
@@ -63330,7 +63112,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,(_gint + 1) 
+ a,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -63446,7 +63228,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a 
+ a
 \begin_inset Newline newline
 \end_inset
 
@@ -63550,7 +63332,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_hob3_1_1,c 
+ _foo_hob3_1_1,c
 \begin_inset Newline newline
 \end_inset
 
@@ -63658,7 +63440,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 10 
+ hob.c 10
 \begin_inset Newline newline
 \end_inset
 
@@ -63762,7 +63544,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,(_gint + 1) 
+ a,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -63882,7 +63664,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a 
+ a
 \begin_inset Newline newline
 \end_inset
 
@@ -63986,7 +63768,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,#0x01 
+ a,#0x01
 \begin_inset Newline newline
 \end_inset
 
@@ -64090,7 +63872,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_aob1_1_1,a 
+ _foo_aob1_1_1,a
 \begin_inset Newline newline
 \end_inset
 
@@ -64198,7 +63980,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 11 
+ hob.c 11
 \begin_inset Newline newline
 \end_inset
 
@@ -64302,7 +64084,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,(_gint + 1) 
+ a,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -64418,7 +64200,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a 
+ a
 \begin_inset Newline newline
 \end_inset
 
@@ -64522,7 +64304,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_aob2_1_1,c 
+ _foo_aob2_1_1,c
 \begin_inset Newline newline
 \end_inset
 
@@ -64630,7 +64412,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 12 
+ hob.c 12
 \begin_inset Newline newline
 \end_inset
 
@@ -64734,7 +64516,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- a,(_gint + 1) 
+ a,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -64838,7 +64620,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- c,acc[3] 
+ c,acc[3]
 \begin_inset Newline newline
 \end_inset
 
@@ -64942,7 +64724,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_aob3_1_1,c 
+ _foo_aob3_1_1,c
 \end_layout
 
 \begin_layout Standard
@@ -65001,31 +64783,19 @@ It is also frequently required to obtain a higher order byte or word of
 \begin_layout Verse
 
 \family typewriter
-unsigned int gint; 
+unsigned int gint;
 \begin_inset Newline newline
 \end_inset
 
-unsigned long int glong; 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-foo () { 
+unsigned long int glong;
 \begin_inset Newline newline
 \end_inset
 
 
-\begin_inset space ~
+\begin_inset Newline newline
 \end_inset
 
-
-\begin_inset space ~
-\end_inset
-
-unsigned char hob1, hob2; 
+foo () {
 \begin_inset Newline newline
 \end_inset
 
@@ -65037,7 +64807,19 @@ unsigned char hob1, hob2;
 \begin_inset space ~
 \end_inset
 
-unsigned int how1, how2; 
+unsigned char hob1, hob2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+unsigned int how1, how2;
 \begin_inset Newline newline
 \end_inset
 
@@ -65050,7 +64832,6 @@ unsigned int how1, how2;
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -65062,7 +64843,7 @@ unsigned int how1, how2;
 \begin_inset space ~
 \end_inset
 
-hob1 = (gint >> 8) & 0xFF; 
+hob1 = (gint >> 8) & 0xFF;
 \begin_inset Newline newline
 \end_inset
 
@@ -65074,7 +64855,7 @@ hob1 = (gint >> 8) & 0xFF;
 \begin_inset space ~
 \end_inset
 
-hob2 = glong >> 24; 
+hob2 = glong >> 24;
 \begin_inset Newline newline
 \end_inset
 
@@ -65086,7 +64867,7 @@ hob2 = glong >> 24;
 \begin_inset space ~
 \end_inset
 
-how1 = (glong >> 16) & 0xFFFF; 
+how1 = (glong >> 16) & 0xFFFF;
 \begin_inset Newline newline
 \end_inset
 
@@ -65098,7 +64879,7 @@ how1 = (glong >> 16) & 0xFFFF;
 \begin_inset space ~
 \end_inset
 
-how2 = glong >> 8; 
+how2 = glong >> 8;
 \begin_inset Newline newline
 \end_inset
 
@@ -65110,8 +64891,7 @@ how2 = glong >> 8;
 \begin_inset space ~
 \end_inset
 
-..
- 
+...
 \begin_inset Newline newline
 \end_inset
 
@@ -65228,7 +65008,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 15 
+ hob.c 15
 \begin_inset Newline newline
 \end_inset
 
@@ -65320,7 +65100,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_hob1_1_1,(_gint + 1) 
+ _foo_hob1_1_1,(_gint + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -65428,7 +65208,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 16 
+ hob.c 16
 \begin_inset Newline newline
 \end_inset
 
@@ -65520,7 +65300,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_hob2_1_1,(_glong + 3) 
+ _foo_hob2_1_1,(_glong + 3)
 \begin_inset Newline newline
 \end_inset
 
@@ -65628,7 +65408,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- hob.c 17 
+ hob.c 17
 \begin_inset Newline newline
 \end_inset
 
@@ -65720,7 +65500,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_how1_1_1,(_glong + 2) 
+ _foo_how1_1_1,(_glong + 2)
 \begin_inset Newline newline
 \end_inset
 
@@ -65812,7 +65592,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- (_foo_how1_1_1 + 1),(_glong + 3) 
+ (_foo_how1_1_1 + 1),(_glong + 3)
 \begin_inset Newline newline
 \end_inset
 
@@ -65904,7 +65684,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- _foo_how2_1_1,(_glong + 1) 
+ _foo_how2_1_1,(_glong + 1)
 \begin_inset Newline newline
 \end_inset
 
@@ -65996,7 +65776,7 @@ will generate the following code:
 \begin_inset space ~
 \end_inset
 
- (_foo_how2_1_1 + 1),(_glong + 2) 
+ (_foo_how2_1_1 + 1),(_glong + 2)
 \end_layout
 
 \begin_layout Standard
@@ -66107,7 +65887,7 @@ status collapsed
 \begin_layout Verse
 
 \family typewriter
-replace { 
+replace {
 \begin_inset Newline newline
 \end_inset
 
@@ -66119,7 +65899,7 @@ replace {
 \begin_inset space ~
 \end_inset
 
-mov %1,a 
+mov %1,a
 \begin_inset Newline newline
 \end_inset
 
@@ -66171,7 +65951,7 @@ Assembler routines
 \begin_layout Verse
 
 \family typewriter
-mov r1,a 
+mov r1,a
 \begin_inset Newline newline
 \end_inset
 
@@ -66200,7 +65980,7 @@ Note: All occurrences of a
 \begin_layout Verse
 
 \family typewriter
-mov r1,a 
+mov r1,a
 \begin_inset Newline newline
 \end_inset
 
@@ -66274,7 +66054,7 @@ acall
 \begin_layout Verse
 
 \family typewriter
-replace { lcall %1 } by { acall %1 } 
+replace { lcall %1 } by { acall %1 }
 \begin_inset Newline newline
 \end_inset
 
@@ -66355,7 +66135,7 @@ The syntax for a rule is as follows:
 \family typewriter
 rule := replace [ restart ] '{' <assembly sequence> '
 \backslash
-n' 
+n'
 \begin_inset Newline newline
 \end_inset
 
@@ -66417,7 +66197,7 @@ n'
 
  '}' by '{' '
 \backslash
-n' 
+n'
 \begin_inset Newline newline
 \end_inset
 
@@ -66487,7 +66267,7 @@ n'
 
  <assembly sequence> '
 \backslash
-n' 
+n'
 \begin_inset Newline newline
 \end_inset
 
@@ -66549,7 +66329,7 @@ n'
 
  '}' [if <functionName> ] '
 \backslash
-n' 
+n'
 \end_layout
 
 \begin_layout Standard
@@ -66575,7 +66355,7 @@ The optimizer will apply to the rules one by one from the top in the sequence
 \begin_layout Verse
 
 \family typewriter
-replace restart { 
+replace restart {
 \begin_inset Newline newline
 \end_inset
 
@@ -66587,7 +66367,7 @@ replace restart {
 \begin_inset space ~
 \end_inset
 
-pop %1 
+pop %1
 \begin_inset Newline newline
 \end_inset
 
@@ -66599,7 +66379,7 @@ pop %1
 \begin_inset space ~
 \end_inset
 
-push %1 } by { 
+push %1 } by {
 \begin_inset Newline newline
 \end_inset
 
@@ -66611,7 +66391,7 @@ push %1 } by {
 \begin_inset space ~
 \end_inset
 
-; nop 
+; nop
 \begin_inset Newline newline
 \end_inset
 
@@ -66627,15 +66407,15 @@ Note that the replace pattern cannot be a blank, but can be a comment line.
 \begin_layout Verse
 
 \family typewriter
-pop ar1 
+pop ar1
 \begin_inset Newline newline
 \end_inset
 
-pop ar2 
+pop ar2
 \begin_inset Newline newline
 \end_inset
 
-push ar2 
+push ar2
 \begin_inset Newline newline
 \end_inset
 
@@ -66649,11 +66429,11 @@ would result in:
 \begin_layout Verse
 
 \family typewriter
-pop ar1 
+pop ar1
 \begin_inset Newline newline
 \end_inset
 
-; nop 
+; nop
 \begin_inset Newline newline
 \end_inset
 
@@ -66672,7 +66452,7 @@ with
 \begin_layout Verse
 
 \family typewriter
-; nop 
+; nop
 \begin_inset Newline newline
 \end_inset
 
@@ -66688,7 +66468,7 @@ A conditional function can be attached to a rule.
 \begin_layout Verse
 
 \family typewriter
-replace { 
+replace {
 \begin_inset Newline newline
 \end_inset
 
@@ -66704,7 +66484,7 @@ replace {
 \begin_inset space ~
 \end_inset
 
-ljmp %5 
+ljmp %5
 \begin_inset Newline newline
 \end_inset
 
@@ -66712,7 +66492,7 @@ ljmp %5
 \begin_inset Newline newline
 \end_inset
 
-} by { 
+} by {
 \begin_inset Newline newline
 \end_inset
 
@@ -66728,7 +66508,7 @@ ljmp %5
 \begin_inset space ~
 \end_inset
 
-sjmp %5 
+sjmp %5
 \begin_inset Newline newline
 \end_inset
 
@@ -66950,60 +66730,19 @@ return value
 
 \family typewriter
 struct s { ...
- }; 
+ };
 \begin_inset Newline newline
 \end_inset
 
-struct s s1, s2; 
+struct s s1, s2;
 \begin_inset Newline newline
 \end_inset
 
-foo() 
+foo()
 \begin_inset Newline newline
 \end_inset
 
-{ 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -67024,7 +66763,46 @@ s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
 \end_inset
 
 ...
- 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
 \begin_inset Newline newline
 \end_inset
 
@@ -67050,7 +66828,7 @@ s parms) /* invalid in SDCC although allowed in ANSI */
 \begin_inset Newline newline
 \end_inset
 
-{ 
+{
 \begin_inset Newline newline
 \end_inset
 
@@ -67070,7 +66848,7 @@ s parms) /* invalid in SDCC although allowed in ANSI */
 \begin_inset space ~
 \end_inset
 
-struct s rets; 
+struct s rets;
 \begin_inset Newline newline
 \end_inset
 
@@ -67091,7 +66869,6 @@ struct s rets;
 \end_inset
 
 ...
- 
 \begin_inset Newline newline
 \end_inset
 
@@ -67111,7 +66888,7 @@ struct s rets;
 \begin_inset space ~
 \end_inset
 
-return rets; /* is invalid in SDCC although allowed in ANSI */ 
+return rets; /* is invalid in SDCC although allowed in ANSI */
 \begin_inset Newline newline
 \end_inset
 
@@ -67234,11 +67011,11 @@ R style
 \begin_layout Verse
 
 \family typewriter
-foo(i,j) /* this old style of function declarations */ 
+foo(i,j) /* this old style of function declarations */
 \begin_inset Newline newline
 \end_inset
 
-int i,j; /* is valid in ANSI but not valid in SDCC */ 
+int i,j; /* is valid in ANSI but not valid in SDCC */
 \begin_inset Newline newline
 \end_inset
 
@@ -70190,7 +69967,7 @@ int j ;
 \begin_inset space ~
 \end_inset
 
-while (*x) *x++ = *p++; 
+while (*x) *x++ = *p++;
 \begin_inset Newline newline
 \end_inset
 
@@ -70210,7 +69987,7 @@ while (*x) *x++ = *p++;
 \begin_inset space ~
 \end_inset
 
-sum = 0 ; 
+sum = 0 ;
 \begin_inset Newline newline
 \end_inset
 

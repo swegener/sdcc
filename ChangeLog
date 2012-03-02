@@ -12,7 +12,10 @@
 	  libraries license should be at least as liberal as the GPLv2+LE;
 	  note about GPL incompatible pic device libraries;
 	  added link to "List of the SDCC library" wiki page;
+	  added link to "SDCC - Small Device C Compiler Wiki" wiki page;
+	  use term "SDCC suite";
 	  formatting cleaning
+	* doc/README.txt: changed chapters Licenses and Authors and interested persons
 
 2012-03-01 Borut Razem <borut.razem AT gmail.com>
 

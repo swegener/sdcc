@@ -12,14 +12,6 @@
 \newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
   \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
 \renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
-% Added by lyx2lyx
-%  for proper underlining
-\PassOptionsToPackage{normalem}{ulem}
-\usepackage{ulem}
-\let\cite@rig\cite
-\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
-  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
-\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
@@ -213,7 +205,7 @@ status collapsed
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 and
  Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Z80, Z180, GBZ80, Rabbit 2000/3000 CPU
@@ -621,7 +613,7 @@ signed
 \begin_layout Plain Layout
 long long
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 only supported in the z80, z180, r2k and gbz80 ports as of sdcc 3.1.0
@@ -1631,20 +1623,7 @@ b = ~
 status collapsed
 
 \begin_layout Plain Layout
-̃
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
- Operator
+~ Operator
 \end_layout
 
 \end_inset
@@ -8256,7 +8235,7 @@ s51, sz80, shc08 - The Simulators
 \begin_layout Standard
 s51
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 s51 (simulator)
@@ -8266,7 +8245,7 @@ s51 (simulator)
 
 , sz80
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sz80 (simulator)
@@ -8276,7 +8255,7 @@ sz80 (simulator)
 
  and shc08
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 shc08 (simulator)
@@ -9003,7 +8982,7 @@ sourcefile.ihx -intel
 \series default
 An example for a more complex command line
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 the command backfills
@@ -9413,7 +9392,7 @@ libsdcc.lib
 \begin_layout Subsection
 Using sdar to Create and Manage Libraries
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdar
@@ -9520,7 +9499,7 @@ Alternatively, instead of having a .rel file for each entry on the library
 \series bold
 sdcclib -?
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdcclib
@@ -9604,7 +9583,7 @@ sdcclib libint.lib _divsint.rel
 \family default
 
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 sdcclib
@@ -10207,7 +10186,7 @@ Z80
 \series bold
 -mz180
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -mz180
@@ -10219,7 +10198,7 @@ status open
 \series default
  Generate code for the Zilog Z180
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Z180
@@ -10236,7 +10215,7 @@ Z180
 \series bold
 -mr2k
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -mr2k
@@ -12926,7 +12905,7 @@ status collapsed
 \series bold
 -
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -15746,7 +15725,7 @@ unsigned
 \series bold
 
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -16132,7 +16111,7 @@ status collapsed
 \series bold
 
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -18264,7 +18243,7 @@ There are some more environment variables recognized by SDCC, but these
  are mainly used for debugging purposes.
  They can change or disappear very quickly, and will never be documented
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 if you are curious search in SDCC's sources for 
@@ -18326,7 +18305,7 @@ In addition to the ANSI storage classes SDCC allows the following MCS51
 \begin_layout Subsubsection
 __data
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -18361,7 +18340,7 @@ data (mcs51, ds390 storage class)
 
  / __near
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -18446,7 +18425,7 @@ _test_data,#0x01
 \begin_layout Subsubsection
 __xdata
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19754,7 +19733,7 @@ without warning
 \family typewriter
 
 \begin_inset Marginal
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -21355,7 +21334,7 @@ SDCC supports named address spaces.
 \family typewriter
 \begin_inset listings
 inline false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -36161,7 +36140,7 @@ FLOATS
 \emph on
 -
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -40648,7 +40627,7 @@ Description
 \begin_layout Plain Layout
 __SDCC
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 SDCC!Defines!__SDCC (version macro)
@@ -40658,7 +40637,7 @@ SDCC!Defines!__SDCC (version macro)
 
 
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 version macro
@@ -40693,7 +40672,7 @@ Always defined.
 \begin_layout Plain Layout
 __SDCC_mcs51
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 SDCC!Defines!__SDCC
@@ -40716,7 +40695,7 @@ mcs51
 
  or __SDCC_ds390
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 SDCC!Defines!__SDCC
@@ -40739,7 +40718,7 @@ ds390
 
  or __SDCC_z80
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 SDCC!Defines!__SDCC
@@ -42613,7 +42592,7 @@ Adding New Devices to the Port
 \begin_layout Standard
 Adding support for a new 14
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -42865,7 +42844,7 @@ status collapsed
 
 -use-non-free
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -43665,7 +43644,7 @@ Processor mismatch in file ``XXX''.
 This warning can usually be ignored due to the very good compatibility amongst
  14
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -44765,7 +44744,7 @@ Description
 \begin_layout Plain Layout
 __SDCC_pic16
 \begin_inset Index
-status open
+status collapsed
 
 \begin_layout Plain Layout
 SDCC!Defines!__SDCC
@@ -50154,7 +50133,7 @@ ddd -debugger "sdcdb -cpu 8032 ddd_example"
 
 \begin_layout Standard
 \begin_inset Note Note
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Check that the double quotes or an apostrophe within the command line survive
@@ -53675,20 +53654,7 @@ operator
 status collapsed
 
 \begin_layout Plain Layout
-̃
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
- Operator
+~ Operator
 \end_layout
 
 \end_inset
@@ -54697,7 +54663,7 @@ online at:
 
 
 \begin_inset Flex URL
-status open
+status collapsed
 
 \begin_layout Plain Layout
 

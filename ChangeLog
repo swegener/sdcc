@@ -1,3 +1,10 @@
+2012-03-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  support/regression/tests/bug-3495411.c,
+	  Fixed #3495411 and another --oldralloc bug.
+
 2012-03-02 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: fixed pdf generation;

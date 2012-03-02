@@ -437,24 +437,18 @@ isPairInUse (PAIR_ID id, const iCode *ic)
 static bool
 isPairDead(PAIR_ID id, const iCode *ic)
 {
-  const bitVect *r = (z80_opts.oldralloc ? bitVectCplAnd (bitVectCopy (ic->rMask), z80_rUmaskForOp (IC_RESULT (ic))) : ic->rSurv);
+  const bitVect *r = (!z80_opts.oldralloc ? ic->rSurv :
+    (POINTER_SET (ic) ? ic->rMask :
+    (bitVectCplAnd (bitVectCopy (ic->rMask), z80_rUmaskForOp (IC_RESULT (ic))))));
 
   if (id == PAIR_DE)
-    {
-      return !(bitVectBitValue (r, D_IDX) || bitVectBitValue(r, E_IDX));
-    }
+    return !(bitVectBitValue (r, D_IDX) || bitVectBitValue(r, E_IDX));
   else if (id == PAIR_BC)
-    {
-      return !(bitVectBitValue (r, B_IDX) || bitVectBitValue(r, C_IDX));
-    }
+    return !(bitVectBitValue (r, B_IDX) || bitVectBitValue(r, C_IDX));
   else if (id == PAIR_HL)
-    {
-      return !(bitVectBitValue (r, H_IDX) || bitVectBitValue(r, L_IDX));
-    }
+    return !(bitVectBitValue (r, H_IDX) || bitVectBitValue(r, L_IDX));
   else if (id == PAIR_IY)
-    {
-      return !(bitVectBitValue (r, IYH_IDX) || bitVectBitValue(r, IYL_IDX));
-    }
+     return !(bitVectBitValue (r, IYH_IDX) || bitVectBitValue(r, IYL_IDX));
   else
     {
       wassertl (0, "Only implemented for DE, BC, HL and IY");
@@ -1564,6 +1558,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 
               aop->aopu.aop_str[0] = _pairs[PAIR_AF].h;
             }
+#if 0 // HL is not handled as any other register pair.
           else if (sym->accuse == ACCUSE_SCRATCH)
             {
               aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
@@ -1572,6 +1567,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
               aop->aopu.aop_str[0] = _pairs[PAIR_HL].l;
               aop->aopu.aop_str[1] = _pairs[PAIR_HL].h;
             }
+#endif
           else if (sym->accuse == ACCUSE_IY)
             {
               aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
@@ -1582,7 +1578,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
             }
           else
             {
-              wassertl (0, "Marked as being allocated into A or HL but is actually in neither");
+              wassertl (0, "Marked as being allocated into A or IY but is actually in neither");
             }
           return;
         }

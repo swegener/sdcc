@@ -1,3 +1,10 @@
+2012-03-03 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/ucz180/spec.mk:
+	  simulation timeout doubled due to several tests
+	  failures on sparc64-unknown-netbsd platform
+
 2012-03-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
@@ -20,7 +27,7 @@
 2012-03-01 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/ports/ucz80/spec.mk:
-	  simulation timeout icreased to 20s due to several tests
+	  simulation timeout increased to 20s due to several tests
 	  failures on sparc64-unknown-netbsd platform
 	* configure.in, configure: report CPPFLAGS and LDFLAGS settings
 	* support/sdbinutils/bfd/configure.in,
@@ -28,7 +35,7 @@
 	  PKGVERSION set to (sdbinutils derived from GNU Binutils),
 	  BUGURL set to http://sourceforge.net/tracker/?group_id=599&atid=100599
 	* support/sdbinutils/binutils/version.c:
-	  --vesion shown sd* names instead GNU *
+	  --vesion shows sd* names instead GNU *
 
 2012-03-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

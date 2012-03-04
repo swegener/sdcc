@@ -73,7 +73,6 @@ static int process_pragma (const char *);
 static int check_type (void);
 static int isTargetKeyword (const char *s);
 static int checkCurrFile (const char *s);
-static void deprecated_keyword (char *yytext);
 %}
 
 %x asm

@@ -1,3 +1,9 @@
+2012-03-04 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/README.txt, doc/sdccman.lyx: small corrections
+	* src/SDCC.lex: removed forward declaration of non existing
+	  function deprecated_keyword()
+
 2012-03-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h,

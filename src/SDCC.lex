@@ -50,9 +50,6 @@ HASH    (#|%:)
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
                                 check_type())
 
-#define TKEYWORDSDCC(token) return (options.std_sdcc && isTargetKeyword(yytext)\
-                                    ? deprecated_keyword (yytext), token : check_type())
-
 #define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
 
 int column = 0;         /* current column */

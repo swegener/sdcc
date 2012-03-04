@@ -2,7 +2,10 @@
 
 	* doc/README.txt, doc/sdccman.lyx: small corrections
 	* src/SDCC.lex: removed forward declaration of non existing
-	  function deprecated_keyword()
+	  function deprecated_keyword(), removed macro TKEYWORDSDCC
+	* support/cpp/opts.c, support/cpp/sdcpp.c,
+	  support/cpp/version.c, support/cpp/version.h:
+	  updated version to 4.6.3
 
 2012-03-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

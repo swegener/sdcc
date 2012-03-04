@@ -25,6 +25,7 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
 #include "intl.h"
 #include "opts.h"
 #include "options.h"
+#include "version.h"
 
 /* True if we should exit after parsing options.  */
 bool exit_after_options;
@@ -403,6 +404,9 @@ print_help (void)
 	      lang_names[i]);
       print_filtered_help (1U << i);
     }
+
+  printf (_("\nFor bug reporting instructions, please see:\n"));
+  printf ("%s.\n", bug_report_url);
 }
 
 /* Print help for a specific front-end, etc.  */

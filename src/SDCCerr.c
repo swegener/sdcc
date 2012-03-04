@@ -474,6 +474,8 @@ struct
      "named address space not allowed for automatic var '%s'", 0},
   { W_NORETURNRETURN, ERROR_LEVEL_WARNING,
      "return in _Noreturn function", 0},
+  { E_STRUCT_REDEF, ERROR_LEVEL_ERROR,
+     "struct/union '%s' redefined", 0 },
 };
 
 /*

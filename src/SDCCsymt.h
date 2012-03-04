@@ -94,11 +94,13 @@ typedef struct structdef
 {
   char tag[SDCC_NAME_MAX + 1];  /* tag part of structure      */
   unsigned char level;          /* Nesting level              */
+  int block;                    /* belongs to which block     */
   struct symbol *fields;        /* pointer to fields          */
   unsigned size;                /* sizeof the table in bytes  */
   int type;                     /* STRUCT or UNION            */
   bool b_flexArrayMember;       /* has got a flexible array member,
                                    only needed for syntax checks */
+  struct symbol *tagsym;        /* tag symbol (NULL if no tag) */
 }
 structdef;
 

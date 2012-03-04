@@ -481,6 +481,23 @@ constant_expr
 declaration
    : declaration_specifiers ';'
       {
+         /* Special case: if incomplete struct/union declared without name, */
+         /* make sure an incomplete type for it exists in the current scope */
+         if (IS_STRUCT($1))
+           {
+             structdef *sdef = SPEC_STRUCT($1);
+             structdef *osdef;
+             osdef = findSymWithBlock (StructTab, sdef->tagsym, currBlockno);
+             if (osdef && osdef->block != currBlockno)
+               {
+                 sdef = newStruct(osdef->tagsym->name);
+                 sdef->level = NestLevel;
+                 sdef->block = currBlockno;
+                 sdef->tagsym = newSymbol (osdef->tagsym->name, NestLevel);
+                 addSym (StructTab, sdef, sdef->tag, sdef->level, currBlockno, 0);
+                 uselessDecl = FALSE;
+               }
+           }
          if (uselessDecl)
            werror(W_USELESS_DECL);
          uselessDecl = TRUE;
@@ -812,6 +829,46 @@ sfr_attributes
 struct_or_union_specifier
    : struct_or_union opt_stag
         {
+          structdef *sdef;
+
+          if (! $2->tagsym)
+            {
+              /* no tag given, so new struct def for current scope */
+              addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+            }
+          else
+            {
+              sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno);
+              if (sdef)
+                {
+                  /* Error if a complete type already defined in this scope */
+                  if (sdef->block == currBlockno)
+                    {
+                      if (sdef->fields)
+                        {
+                          werror(E_STRUCT_REDEF, $2->tag);
+                          werrorfl(sdef->tagsym->fileDef, sdef->tagsym->lineDef, E_PREVIOUS_DEF);
+                        }
+                      else
+                        {
+                          $2 = sdef; /* We are completing an incomplete type */
+                        }
+                    }
+                  else
+                    {
+                      /* There is an existing struct def in an outer scope. */
+                      /* Create new struct def for current scope */
+                      addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+                    }
+                }
+              else
+               {
+                 /* There is no existing struct def at all. */
+                 /* Create new struct def for current scope */
+                 addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+               }
+            }
+
           if (!$2->type)
             {
               $2->type = $1;
@@ -865,6 +922,16 @@ struct_or_union_specifier
         }
    | struct_or_union stag
         {
+          structdef *sdef;
+
+          sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno);
+          if (sdef)
+            $2 = sdef;
+          else
+            {
+              /* new struct def for current scope */
+              addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+            }
           $$ = newLink(SPECIFIER);
           SPEC_NOUN($$) = V_STRUCT;
           SPEC_STRUCT($$) = $2;
@@ -892,7 +959,9 @@ opt_stag
           ignoreTypedefType = 0;
           $$ = newStruct(genSymName(NestLevel));
           $$->level = NestLevel;
-          addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
+          $$->block = currBlockno;
+          $$->tagsym = NULL;
+          //addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
         }
    ;
 
@@ -900,13 +969,18 @@ stag
    : identifier
         {  /* add name to structure table */
           ignoreTypedefType = 0;
-          $$ = findSymWithBlock (StructTab, $1, currBlockno);
-          if (! $$ )
-            {
-              $$ = newStruct($1->name);
-              $$->level = NestLevel;
-              addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
-            }
+          $$ = newStruct($1->name);
+          $$->level = NestLevel;
+          $$->block = currBlockno;
+          $$->tagsym = $1;
+          //$$ = findSymWithBlock (StructTab, $1, currBlockno);
+          //if (! $$ )
+          //  {
+          //    $$ = newStruct($1->name);
+          //    $$->level = NestLevel;
+          //    $$->tagsym = $1;
+          //    //addSym (StructTab, $$, $$->tag, $$->level, currBlockno, 0);
+          //  }
         }
    ;
 
@@ -1577,10 +1651,18 @@ end_block
 compound_statement
    : start_block end_block                    { $$ = createBlock(NULL, NULL); }
    | start_block statement_list end_block     { $$ = createBlock(NULL, $2); }
-   | start_block declaration_list end_block   { $$ = createBlock($2, NULL); }
+   | start_block declaration_list end_block
+     {
+       $$ = createBlock($2, NULL); 
+       cleanUpLevel(StructTab, NestLevel + 1);
+     }
    | start_block
           declaration_list statement_list
-     end_block                                { $$ = createBlock($2, $3); }
+     end_block
+     {
+       $$ = createBlock($2, $3); 
+       cleanUpLevel(StructTab, NestLevel + 1);
+     }
    | error ';'                                { $$ = NULL ; }
    ;
 

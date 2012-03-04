@@ -236,6 +236,7 @@ enum {
   E_INTEGERSUFFIX               = 207, /* Invalid integer suffix */
   E_AUTO_ADDRSPACE              = 208, /* named address space for auto var */
   W_NORETURNRETURN              = 209, /* return in _noreturn function */
+  E_STRUCT_REDEF                = 210, /* struct or union tag redefined */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -3,6 +3,11 @@
 AC_PREREQ(2.60)
 AC_INIT(.version)
 AC_CONFIG_SRCDIR([Makefile.in])
+
+# Determine the host and build type.
+# ===========================================================================
+AC_CANONICAL_HOST
+
 AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h custom.h:custom_in.h sdas/linksrc/asxxxx_config.h])
 
 AC_PROG_AWK
@@ -959,8 +964,8 @@ adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_non_free_lib_dir_suffix}, [non
 AC_MSG_RESULT([
 sdcc ${VERSION} is now configured for
 
-  Build:                ${build_alias}
-  Host:                 ${host_alias}
+  Build:                ${build}
+  Host:                 ${host}
   Source directory:     ${srcdir}
   C compiler:           ${CC}
   CFLAGS:               ${CFLAGS}

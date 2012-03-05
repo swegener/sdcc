@@ -3,6 +3,10 @@
 	* src/SDCCicode.c:
 	  disable -O2 optimization for gcc 4.6.3, see bug #3285611
 	* support/scripts/sdcc_mingw32: minor cosmetical fix
+	* configure.in, configure, config.guess, config.sub:
+	  added host and build type detection
+	* device/lib/pic14/Makefile.in,
+	  device/lib/pic14/libm/Makefile.in: regenerated
 
 2012-03-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

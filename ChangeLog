@@ -1,3 +1,9 @@
+2012-03-05 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCicode.c:
+	  disable -O2 optimization for gcc 4.6.3, see bug #3285611
+	* support/scripts/sdcc_mingw32: minor cosmetical fix
+
 2012-03-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (separateAddressSpaces): fixed bug #3476041

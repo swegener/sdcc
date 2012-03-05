@@ -1165,7 +1165,7 @@ miscOpt (eBBlock ** ebbs, int count)
 
 /*-----------------------------------------------------------------*/
 /* separateAddressSpaces - enforce restrictions on bank switching  */
-/* Operands of a singel iCode must may be in at most one           */
+/* Operands of a single iCode must be in at most one               */
 /* named address space. Use temporaries and additional assignments */
 /* to enforce the rule.                                            */
 /*-----------------------------------------------------------------*/
@@ -1181,13 +1181,24 @@ separateAddressSpaces (eBBlock ** ebbs, int count)
       iCode *ic;
       symbol *source;
 
+      /* Skip this block if not reachable; other routines may have */
+      /* also skipped it, so these iCodes may be undercooked. */
+      if (ebbs[i]->noPath)
+        continue;
+
       /* for all instructions in the block do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
           iCode *iic = 0, *newic = 0;
           operand *left, *right, *result;
           const symbol *leftaddrspace = 0, *rightaddrspace = 0, *resultaddrspace = 0;
-          
+
+          /* JUMPTABLE and IFX do not have left/right/result operands. */
+          /* However, they only have a single operand so they cannot   */
+          /* have more than one address space to worry about. */
+          if (ic->op == JUMPTABLE || ic->op == IFX)
+            continue;
+
           left = IC_LEFT (ic);
           right = IC_RIGHT (ic);
           result = IC_RESULT (ic);
@@ -1195,7 +1206,7 @@ separateAddressSpaces (eBBlock ** ebbs, int count)
           /*printf ("Looking at ic %d, op %d\n", ic->key, (int)(ic->op));*/
           
           if (left && IS_SYMOP (left))
-            { 
+            {
               if (POINTER_GET (ic))
                 {
                   assert (!(IS_DECL (OP_SYMBOL (left)->type) && DCL_PTR_ADDRSPACE (OP_SYMBOL (left)->type)));
@@ -1262,8 +1273,8 @@ separateAddressSpaces (eBBlock ** ebbs, int count)
             
           if (newic)
             {
-              newic->filename = filename;
-              newic->lineno = lineno;
+              newic->filename = ic->filename;
+              newic->lineno = ic->lineno;
               addiCodeToeBBlock (ebbs[i], newic, iic);
             } 
             

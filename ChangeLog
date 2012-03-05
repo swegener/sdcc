@@ -1,3 +1,7 @@
+2012-03-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c (separateAddressSpaces): fixed bug #3476041
+
 2012-03-04 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/README.txt, doc/sdccman.lyx: small corrections

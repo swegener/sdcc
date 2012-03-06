@@ -5326,10 +5326,9 @@ genMinusDec (const iCode * ic)
       return TRUE;
     }
 
-  /* if increment 16 bits in register */
-  if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
-      (size == 2)
-      )
+  /* if decrement 16 bits in register */
+  if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && size == 2 &&
+    isPairDead (_getTempPairId(), ic))
     {
       fetchPair (_getTempPairId(), AOP (IC_RESULT (ic)));
 

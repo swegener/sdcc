@@ -61,6 +61,10 @@ endif
 ifeq ($(OPT_DISABLE_SDBINUTILS), 0)
 TARGETS        += sdcc-sdbinutils
 PKGS           += $(SDCC_SDBINUTILS)
+SDBINUTILS_BINS = \
+               $(SDCC_SDBINUTILS)/binutils/sdar$(EXEEXT) \
+               $(SDCC_SDBINUTILS)/binutils/sdranlib$(EXEEXT) \
+               $(SDCC_SDBINUTILS)/binutils/sdnm$(EXEEXT)
 endif
 
 ifeq ($(OPT_DISABLE_DEVICE_LIB), 0)
@@ -128,7 +132,7 @@ sdcc-librarian:
 
 sdcc-sdbinutils:
 	$(MAKE) -C $(SDCC_SDBINUTILS)
-	cp $(SDCC_SDBINUTILS)/binutils/sdar$(EXEEXT) $(SDCC_SDBINUTILS)/binutils/sdranlib$(EXEEXT) bin
+	cp $(SDBINUTILS_BINS) bin
 
 sdcc-device-inc:
 	$(MAKE) -C device/include

@@ -85,6 +85,84 @@
 #include "libiberty.h"
 #include "safe-ctype.h"
 
+#define NELEM(x) (sizeof (x) / sizeof (x)[0])
+
+/* ******************* from asld aslink.h ******************* */
+/*
+ *      ASLINK - Version 3 Definitions
+ */
+
+/*
+ *      The "A3_" area constants define values used in
+ *      generating the assembler area output data.
+ *
+ * Area flags
+ *
+ *         8      7     6     5     4     3     2     1     0
+ *         A_     A_    A_    A_   A3_   A3_   A3_
+ *      +-----++-----+-----+-----+-----+-----+-----+-----+-----+
+ *      |LOAD || BIT |XDATA|CODE | PAG | ABS | OVR |     |     |
+ *      +-----++-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define A3_CON    000           /* concatenate */
+#define A3_OVR    004           /* overlay */
+#define A3_REL    000           /* relocatable */
+#define A3_ABS    010           /* absolute */
+#define A3_NOPAG  000           /* non-paged */
+#define A3_PAG    020           /* paged */
+
+/* sdld specific */
+/* Additional flags for 8051 address spaces */
+#define A_DATA    0000          /* data space (default)*/
+#define A_CODE    0040          /* code space */
+#define A_XDATA   0100          /* external data space */
+#define A_BIT     0200          /* bit addressable space */
+
+/* Additional flags for hc08 */
+#define A_NOLOAD  0400          /* nonloadable */
+#define A_LOAD    0000          /* loadable (default) */
+/* end sdld specific */
+
+/*
+ *      ASLINK - Version 4 Definitions
+ */
+
+/*
+ *      The "A4_" area constants define values used in
+ *      generating the assembler area output data.
+ *
+ * Area flags
+ *
+ *         7     6     5     4     3     2     1     0
+ *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ *      | BNK | SEG |     | PAG | ABS | OVR | WL1 | WL0 |
+ *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define A4_BYTE         0x0000          /*  8 bit */
+#define A4_WORD         0x0001          /* 16 bit */
+
+#define A4_1BYTE        0x0000          /* 1 Byte Word Length */
+#define A4_2BYTE        0x0001          /* 2 Byte Word Length */
+#define A4_3BYTE        0x0002          /* 3 Byte Word Length */
+#define A4_4BYTE        0x0003          /* 4 Byte Word Length */
+#define A4_WLMSK        0x0003          /* Word Length Mask */
+
+#define A4_CON          0x0400          /* Concatenating */
+#define A4_OVR          0x0404          /* Overlaying */
+#define A4_REL          0x0800          /* Relocatable */
+#define A4_ABS          0x0808          /* absolute */
+#define A4_NOPAG        0x1000          /* Non-Paged */
+#define A4_PAG          0x1010          /* Paged */
+
+#define A4_CSEG         0x4000          /* CSEG */
+#define A4_DSEG         0x4040          /* DSEG */
+#define A4_NOBNK        0x8000          /* Non-Banked */
+#define A4_BNK          0x8080          /* Banked */
+
+#define A4_OUT          0x0100          /* Output Code Flag */
+/* ********************************************************** */
 
 /* Macros for converting between hex and binary.  */
 
@@ -98,19 +176,6 @@ static const char digs[] = "0123456789ABCDEF";
         ch += ((x) & 0xff);
 #define ISHEX(x)    hex_p(x)
 
-/* When writing an asxxxx .rel file, the asxxxx .rel records can not be output as
-   they are seen.  This structure is used to hold them in memory.  */
-
-struct asxxxx_data_list_struct
-{
-  struct asxxxx_data_list_struct *next;
-  bfd_byte *data;
-  bfd_vma where;
-  bfd_size_type size;
-};
-
-typedef struct asxxxx_data_list_struct asxxxx_data_list_type;
-
 /* When scanning the asxxxx .rel file, a linked list of asxxxx_symbol
    structures is built to represent the symbol table (if there is
    one).  */
@@ -119,19 +184,82 @@ struct asxxxx_symbol
 {
   struct asxxxx_symbol *next;
   const char *name;
-  bfd_vma val;
+  symvalue val;
+  flagword flags;
+  struct bfd_section *section;
 };
 
 /* The asxxxx .rel tdata information.  */
 
+enum asxxxx_cpu_type_e
+  {
+    CPU_UNKNOWN = 0,
+    CPU_MCS51,
+    CPU_DS390,
+    CPU_DS400,
+    CPU_HC08,
+    CPU_Z80,
+    CPU_GBZ80,
+    CPU_R2K,
+  };
+
+enum asxxxx_rel_version_e
+  {
+    REL_VER_3 = 0,
+    REL_VER_4,
+  };
+
+enum asxxxx_radix_e
+  {
+    RADIX_OCT = 8,
+    RADIX_DEC = 10,
+    RADIX_HEX = 16,
+  };
+
+enum asxxxx_endian_e
+  {
+    ENDIAN_LITTLE = 0,
+    ENDIAN_BIG,
+  };
+
+enum asxxxx_address_size_e
+  {
+    ADDR_SIZE_2 = 2,
+    ADDR_SIZE_3 = 3,
+    ADDR_SIZE_4 = 4,
+  };
+
 typedef struct asxxxx_data_struct
   {
-    asxxxx_data_list_type *head;
-    asxxxx_data_list_type *tail;
-    unsigned int type;
     struct asxxxx_symbol *symbols;
     struct asxxxx_symbol *symtail;
     asymbol *csymbols;
+    asection *sections;
+    asection *secttail;
+#define CURRENT_SECT(abfd) ((abfd)->tdata.asxxxx_data->secttail)
+
+    unsigned int sect_id;
+#define NEXT_SECT_ID(abfd) (++(abfd)->tdata.asxxxx_data->sect_id)
+
+    enum asxxxx_cpu_type_e cpu_type;
+#define SET_CPU_TYPE(abfd, type) ((abfd)->tdata.asxxxx_data->cpu_type = (type))
+#define GET_CPU_TYPE(abfd) ((abfd)->tdata.asxxxx_data->cpu_type)
+
+    enum asxxxx_rel_version_e rel_version;
+#define SET_REL_VERSION(abfd, version) ((abfd)->tdata.asxxxx_data->rel_version = (version))
+#define GET_REL_VERSION(abfd) ((abfd)->tdata.asxxxx_data->rel_version)
+
+    enum asxxxx_radix_e radix;
+#define SET_RADIX(abfd, r) ((abfd)->tdata.asxxxx_data->radix = (r))
+#define GET_RADIX(abfd) ((abfd)->tdata.asxxxx_data->radix)
+
+    enum asxxxx_endian_e endian;
+#define SET_ENDIAN(abfd, e) ((abfd)->tdata.asxxxx_data->endian = (e))
+#define GET_ENDIAN(abfd) ((abfd)->tdata.asxxxx_data->endian)
+
+    enum asxxxx_address_size_e address_size;
+#define SET_ADDRESS_SIZE(abfd, as) ((abfd)->tdata.asxxxx_data->address_size = (as))
+#define GET_ADDRESS_SIZE(abfd) ((abfd)->tdata.asxxxx_data->address_size)
   }
 tdata_type;
 
@@ -158,17 +286,11 @@ asxxxx_mkobject (bfd *abfd)
 
   asxxxx_init ();
 
-  tdata = (tdata_type *) bfd_alloc (abfd, sizeof (tdata_type));
+  tdata = (tdata_type *) bfd_zalloc (abfd, sizeof (tdata_type));
   if (tdata == NULL)
     return FALSE;
 
   abfd->tdata.asxxxx_data = tdata;
-  tdata->type = 1;
-  tdata->head = NULL;
-  tdata->tail = NULL;
-  tdata->symbols = NULL;
-  tdata->symtail = NULL;
-  tdata->csymbols = NULL;
 
   return TRUE;
 }
@@ -197,8 +319,8 @@ asxxxx_get_byte (bfd *abfd, bfd_boolean *errorptr)
 
 static void
 asxxxx_bad_byte (bfd *abfd,
-               unsigned int lineno,
                int c,
+               unsigned int lineno,
                bfd_boolean error)
 {
   if (c == EOF)
@@ -227,7 +349,7 @@ asxxxx_bad_byte (bfd *abfd,
 /* Add a new symbol found in an asxxxx .rel file.  */
 
 static bfd_boolean
-asxxxx_new_symbol (bfd *abfd, const char *name, bfd_vma val)
+asxxxx_new_symbol (bfd *abfd, const char *name, symvalue val, flagword flags, struct bfd_section *section)
 {
   struct asxxxx_symbol *n;
 
@@ -237,6 +359,8 @@ asxxxx_new_symbol (bfd *abfd, const char *name, bfd_vma val)
 
   n->name = name;
   n->val = val;
+  n->flags = flags;
+  n->section = section;
 
   if (abfd->tdata.asxxxx_data->symbols == NULL)
     abfd->tdata.asxxxx_data->symbols = n;
@@ -250,15 +374,276 @@ asxxxx_new_symbol (bfd *abfd, const char *name, bfd_vma val)
   return TRUE;
 }
 
+/* Add a new section found in an asxxxx .rel file.  */
+
+static flagword
+asxxxx_to_asection_flags(bfd *abfd, unsigned int flags, unsigned int sect_size)
+{
+  flagword sect_flags = SEC_NO_FLAGS;
+
+  if (sect_size)
+     sect_flags |= SEC_HAS_CONTENTS;
+
+  if (GET_REL_VERSION (abfd) == REL_VER_3)
+    {
+      /*
+       *         8      7     6     5     4     3     2     1     0
+       *         A_     A_    A_    A_   A3_   A3_   A3_
+       *      +-----++-----+-----+-----+-----+-----+-----+-----+-----+
+       *      |LOAD || BIT |XDATA|CODE | PAG | ABS | OVR |     |     |
+       *      +-----++-----+-----+-----+-----+-----+-----+-----+-----+
+       */
+
+      if (!(flags & A3_ABS))
+        sect_flags |= SEC_RELOC;
+
+      switch (GET_CPU_TYPE (abfd))
+        {
+        case CPU_MCS51:
+          sect_flags |= SEC_LOAD;
+          if (flags & A_CODE)
+            sect_flags |= (SEC_CODE | SEC_ROM | SEC_READONLY);
+          if (flags & (A_XDATA | A_BIT) || !(flags & (A_CODE | A_XDATA | A_BIT)))
+            sect_flags |= SEC_DATA;
+          break;
+
+        case CPU_HC08:
+          sect_flags |= SEC_CODE;
+          sect_flags |= (flags & A_LOAD) ? SEC_LOAD : SEC_NEVER_LOAD;
+          break;
+
+        default:
+          sect_flags |= SEC_CODE;
+          sect_flags |= SEC_LOAD;
+          break;
+        }
+    }
+  else
+    {
+      /*
+       *         7     6     5     4     3     2     1     0
+       *      +-----+-----+-----+-----+-----+-----+-----+-----+
+       *      | BNK | SEG |     | PAG | ABS | OVR | WL1 | WL0 |
+       *      +-----+-----+-----+-----+-----+-----+-----+-----+
+       */
+
+      if (!(flags & A4_ABS))
+        sect_flags |= SEC_RELOC;
+
+      sect_flags |= (flags & A4_DSEG) ? SEC_DATA : SEC_CODE;
+      sect_flags |= SEC_LOAD;
+    }
+
+  return sect_flags;
+}
+
+static bfd_boolean
+asxxxx_new_section (bfd *abfd, const char *sect_name, unsigned int sect_size, unsigned int sect_flags, unsigned int sect_addr)
+{
+  asection *sect;
+
+  if ((sect = (asection *) bfd_zalloc (abfd, sizeof (*sect))) == NULL)
+    return FALSE;
+
+  sect->name = sect_name;
+  sect->id = sect->index = NEXT_SECT_ID(abfd);
+  sect->flags = asxxxx_to_asection_flags(abfd, sect_flags, sect_size);
+  sect->size = sect->rawsize = sect_size;
+  sect->vma = sect->lma = sect_addr;
+
+  if (abfd->tdata.asxxxx_data->sections == NULL)
+    abfd->tdata.asxxxx_data->sections = sect;
+  else
+    {
+      sect->prev = abfd->tdata.asxxxx_data->secttail;
+      abfd->tdata.asxxxx_data->secttail->next = sect;
+    }
+  abfd->tdata.asxxxx_data->secttail = sect;
+
+  return TRUE;
+}
+
 /* Read the asxxxx .rel file and turn it into sections.  We create a new
    section for each contiguous set of bytes.  */
+
+static bfd_boolean
+asxxxx_skip_spaces (bfd *abfd, int *p_c, unsigned int lineno, bfd_boolean *errorptr)
+{
+  if (! ISSPACE (*p_c))
+    {
+      asxxxx_bad_byte (abfd, *p_c, lineno, *errorptr);
+      return FALSE;
+    }
+
+  while (ISSPACE (*p_c = asxxxx_get_byte (abfd, errorptr)))
+    ;
+
+  return TRUE;
+}
+
+static bfd_boolean
+asxxxx_skip_word (bfd *abfd, char *word, int *p_c, unsigned int lineno, bfd_boolean *errorptr)
+{
+  char *p;
+
+  for (p = word; *p != '\0'; ++p)
+    {
+      if (*p_c == *p)
+        {
+          *p_c = asxxxx_get_byte (abfd, errorptr);
+        }
+      else
+        {
+          asxxxx_bad_byte (abfd, *p_c, lineno, *errorptr);
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
+static bfd_boolean
+asxxxx_get_word (bfd *abfd, char **p_word, int *p_c, unsigned int lineno, bfd_boolean *errorptr)
+{
+  bfd_size_type alc;
+  char *p, *symname;
+  char *symbuf;
+
+  alc = 10;
+  symbuf = (char *) bfd_malloc (alc + 1);
+  if (symbuf == NULL)
+    goto error_return;
+
+  p = symbuf;
+
+  *p++ = *p_c;
+  while (! ISSPACE (*p_c = asxxxx_get_byte (abfd, errorptr)) && *p_c != EOF)
+    {
+      if ((bfd_size_type) (p - symbuf) >= alc)
+        {
+          char *n;
+
+          alc *= 2;
+          n = (char *) bfd_realloc (symbuf, alc + 1);
+          if (n == NULL)
+            goto error_return;
+          p = n + (p - symbuf);
+          symbuf = n;
+        }
+
+      *p++ = *p_c;
+    }
+
+  if (*p_c == EOF)
+   {
+     asxxxx_bad_byte (abfd, *p_c, lineno, *errorptr);
+     goto error_return;
+   }
+
+   *p++ = '\0';
+
+  symname = (char *) bfd_alloc (abfd, (bfd_size_type) (p - symbuf));
+  if (symname == NULL)
+    goto error_return;
+
+  strcpy (symname, symbuf);
+  free (symbuf);
+
+  *p_word = symname;
+
+  return TRUE;
+
+error_return:
+  if (symbuf != NULL)
+    free (symbuf);
+
+  *p_word = NULL;
+
+  return FALSE;
+}
+
+static bfd_boolean
+asxxxx_get_hex (bfd *abfd, unsigned int *p_val, int *p_c, unsigned int lineno, bfd_boolean *errorptr)
+{
+  *p_val = 0;
+  while (ISHEX (*p_c))
+    {
+      *p_val = (*p_val << 4) + NIBBLE (*p_c);
+      *p_c = asxxxx_get_byte (abfd, errorptr);
+    }
+
+  if (*p_c == EOF)
+   {
+     asxxxx_bad_byte (abfd, *p_c, lineno, *errorptr);
+     return FALSE;
+   }
+
+  return TRUE;
+}
+
+static bfd_boolean
+asxxxx_get_eol (bfd *abfd, int *p_c, unsigned int *p_lineno, bfd_boolean *errorptr)
+{
+  if (*p_c == '\n')
+    {
+      ++*p_lineno;
+      return TRUE;
+    }
+  else if (*p_c != '\r')
+    {
+      asxxxx_bad_byte (abfd, *p_c, *p_lineno, *errorptr);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static bfd_boolean
+asxxxx_skip_line (bfd *abfd, int *p_c, unsigned int *p_lineno, bfd_boolean *errorptr)
+{
+  while ((*p_c = asxxxx_get_byte (abfd, errorptr)) != EOF && *p_c != '\n' && *p_c != '\r')
+    ;
+
+  return asxxxx_get_eol (abfd, p_c, p_lineno, errorptr);
+}
+
+static void
+asxxxx_set_cpu_type(bfd *abfd, const char *cpu_type)
+{
+  struct cpu
+    {
+      const char *name;
+      enum asxxxx_cpu_type_e type;
+    }
+  cpus[] =
+    {
+      { "-mmcs51", CPU_MCS51 },
+      { "-mds390", CPU_DS390 },
+      { "-mds400", CPU_DS400 },
+      { "-mhc08",  CPU_HC08  },
+      { "-mz80",   CPU_Z80   },
+      { "-mgbz80", CPU_GBZ80 },
+      { "-mr2K",   CPU_R2K   },
+    };
+  size_t i;
+
+  for (i = 0; i < NELEM (cpus); ++i)
+    {
+      if (! strcmp (cpu_type, cpus[i].name))
+        {
+          SET_CPU_TYPE (abfd, cpus[i].type);
+          return;
+        }
+    }
+
+  SET_CPU_TYPE (abfd, CPU_UNKNOWN);
+}
 
 static bfd_boolean
 asxxxx_scan (bfd *abfd, unsigned int *p_lineno)
 {
   int c;
   bfd_boolean error = FALSE;
-  char *symbuf = NULL;
 
   bfd_set_error (bfd_error_file_truncated);
 
@@ -268,7 +653,7 @@ asxxxx_scan (bfd *abfd, unsigned int *p_lineno)
         {
         default:
           /* unknown line */
-          asxxxx_bad_byte (abfd, *p_lineno, c, error);
+          asxxxx_bad_byte (abfd, c, *p_lineno, error);
           goto error_return;
           break;
 
@@ -279,132 +664,153 @@ asxxxx_scan (bfd *abfd, unsigned int *p_lineno)
         case '\r':
           break;
 
+        case 'A':
+          /* A CSEG size 12E2 flags 20 addr 0 */
+          {
+            char *sect_name;
+            unsigned int sect_size, sect_flags, sect_addr;
+
+            /* Starting a symbol definition.  */
+            c = asxxxx_get_byte (abfd, &error);
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_get_word (abfd, &sect_name, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+ 
+            if (! asxxxx_skip_word (abfd, "size", &c, *p_lineno, &error))
+              goto error_return;
+ 
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_get_hex (abfd, &sect_size, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_word (abfd, "flags", &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_get_hex (abfd, &sect_flags, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_word (abfd, "addr", &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_get_hex (abfd, &sect_addr, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_get_eol (abfd, &c, p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_new_section (abfd, sect_name, sect_size, sect_flags, sect_addr))
+              goto error_return;
+          }
+          break;
+        case 'O':
+          /*
+           * O -mds390 --model-flat24
+           * O -mds400 --model-flat24
+           * O -mhc08
+           * O -mmcs51 --model-huge
+           * O -mmcs51 --model-large
+           * O -mmcs51 --model-medium
+           * O -mmcs51 --model-small
+           * O -mmcs51 --model-small --xstack
+           */
+          {
+            char *cpu_type;
+
+            /* check if the next character is space */
+            c = asxxxx_get_byte (abfd, &error);
+
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
+
+            if (! asxxxx_get_word (abfd, &cpu_type, &c, *p_lineno, &error))
+              goto error_return;
+
+            /* eat the rest of line */
+            if (! asxxxx_skip_line (abfd, &c, p_lineno, &error))
+              goto error_return;
+
+            asxxxx_set_cpu_type(abfd, cpu_type);
+          }
+          break;
+        case 'G': /* V 4.XX+ */
+        case 'B': /* V 4.XX+ */
+          SET_REL_VERSION (abfd, REL_VER_4);
+          /* fall through */
         case 'H':
         case 'M':
-        case 'G':
-        case 'B':
-        case 'A':
         case 'T':
         case 'R':
         case 'P':
-        case 'O':
           /* check if the next character is space */
-          if ((c = asxxxx_get_byte (abfd, &error)) != ' ')
-            {
-              asxxxx_bad_byte (abfd, *p_lineno, c, error);
-              goto error_return;
-            }
+          c = asxxxx_get_byte (abfd, &error);
+
+          if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+            goto error_return;
 
           /* eat the rest of line */
-          while ((c = asxxxx_get_byte (abfd, &error)) != EOF
-                 && (c != '\n' && c != '\r'))
-            ;
-          if (c == '\n')
-            ++*p_lineno;
-          else if (c != '\r')
-            {
-              asxxxx_bad_byte (abfd, *p_lineno, c, error);
-              goto error_return;
-            }
+          if (! asxxxx_skip_line (abfd, &c, p_lineno, &error))
+            goto error_return;
           break;
 
         case 'S':
           /* S __ret3 Def0001 */
           {
-            bfd_size_type alc;
-            char *p, *symname;
-            bfd_vma symval;
+            char *symname = NULL;
+            unsigned int symval;
             bfd_boolean is_def;
 
             /* Starting a symbol definition.  */
-            while ((c = asxxxx_get_byte (abfd, &error))  == ' ' || c == '\t')
-              ;
+            c = asxxxx_get_byte (abfd, &error);
 
-            if (c == EOF)
-              {
-                asxxxx_bad_byte (abfd, *p_lineno, c, error);
-                goto error_return;
-              }
-
-            alc = 10;
-            symbuf = (char *) bfd_malloc (alc + 1);
-            if (symbuf == NULL)
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
               goto error_return;
 
-            p = symbuf;
+            if (! asxxxx_get_word (abfd, &symname, &c, *p_lineno, &error))
+              goto error_return;
 
-            *p++ = c;
-            while (! ISSPACE (c = asxxxx_get_byte (abfd, &error)))
-              {
-                if ((bfd_size_type) (p - symbuf) >= alc)
-                  {
-                    char *n;
-
-                    alc *= 2;
-                    n = (char *) bfd_realloc (symbuf, alc + 1);
-                    if (n == NULL)
-                      goto error_return;
-                    p = n + (p - symbuf);
-                    symbuf = n;
-                  }
-
-                *p++ = c;
-              }
-
-            if (c == EOF)
-              {
-                asxxxx_bad_byte (abfd, *p_lineno, c, error);
-                goto error_return;
-              }
-
-            *p++ = '\0';
-
-            while ((c = asxxxx_get_byte (abfd, &error)) == ' ' || c == '\t')
-              ;
+            if (! asxxxx_skip_spaces (abfd, &c, *p_lineno, &error))
+              goto error_return;
 
             if (c != 'D' && c != 'R')
               {
-                asxxxx_bad_byte (abfd, *p_lineno, c, error);
+                asxxxx_bad_byte (abfd, c, *p_lineno, error);
                 goto error_return;
               }
 
             is_def = (c == 'D');
 
-            if ((c = asxxxx_get_byte (abfd, &error)) != 'e' ||
-                (c = asxxxx_get_byte (abfd, &error)) != 'f')
-              {
-                asxxxx_bad_byte (abfd, *p_lineno, c, error);
-                goto error_return;
-              }
+            c = asxxxx_get_byte (abfd, &error);
+            if (! asxxxx_skip_word (abfd, "ef", &c, *p_lineno, &error))
+              goto error_return;
 
-            symval = 0;
-            while (ISHEX (c = asxxxx_get_byte (abfd, &error)))
-              {
-                symval <<= 4;
-                symval += NIBBLE (c);
-                c = asxxxx_get_byte (abfd, &error);
-              }
+            if (! asxxxx_get_hex(abfd, &symval, &c, *p_lineno, &error))
+              goto error_return;
 
-            if (c == '\n')
-              ++*p_lineno;
-            else if (c != '\r')
-              {
-                asxxxx_bad_byte (abfd, *p_lineno, c, error);
-                goto error_return;
-              }
+            if (! asxxxx_get_eol (abfd, &c, p_lineno, &error))
+              goto error_return;
 
-            if (is_def && strncmp (symbuf, ".__.ABS.", 8))
-              {
-                symname = (char *) bfd_alloc (abfd, (bfd_size_type) (p - symbuf));
-                if (symname == NULL)
-                  goto error_return;
-                strcpy (symname, symbuf);
-                free (symbuf);
-                symbuf = NULL;
-
-                if (! asxxxx_new_symbol (abfd, symname, symval))
-                  goto error_return;
-              }
+            if (! asxxxx_new_symbol (abfd, symname, symval, BSF_GLOBAL, CURRENT_SECT(abfd) ? CURRENT_SECT(abfd) : (is_def ? bfd_abs_section_ptr : bfd_und_section_ptr)))
+              goto error_return;
           }
           break;
         }
@@ -412,11 +818,10 @@ asxxxx_scan (bfd *abfd, unsigned int *p_lineno)
 
   if (error)
     goto error_return;
+
   return TRUE;
 
 error_return:
-  if (symbuf != NULL)
-    free (symbuf);
   return FALSE;
 }
 
@@ -433,69 +838,71 @@ asxxxx_is_rel (bfd *abfd, unsigned int *p_lineno)
     {
     default:
       /* unknown line */
-      asxxxx_bad_byte (abfd, *p_lineno, c, error);
+      asxxxx_bad_byte (abfd, c, *p_lineno, error);
       return FALSE;
       break;
 
     case ';':
-      if ((c = asxxxx_get_byte (abfd, &error)) != '!' ||
-          (c = asxxxx_get_byte (abfd, &error)) != 'F' ||
-          (c = asxxxx_get_byte (abfd, &error)) != 'I' ||
-          (c = asxxxx_get_byte (abfd, &error)) != 'L' ||
-          (c = asxxxx_get_byte (abfd, &error)) != 'E' ||
-          (c = asxxxx_get_byte (abfd, &error)) != ' ')
+      c = asxxxx_get_byte (abfd, &error);
+
+      if (! asxxxx_skip_word (abfd, "!FILE ", &c, *p_lineno, &error))
         {
-          asxxxx_bad_byte (abfd, *p_lineno, c, error);
           return FALSE;
         }
       /* eat the rest of line */
-      while ((c = asxxxx_get_byte (abfd, &error)) != '\n' && c != '\r')
-        ;
-      if (c == '\n')
-        ++*p_lineno;
-      else if (c != '\r')
-        {
-          asxxxx_bad_byte (abfd, *p_lineno, c, error);
-          return FALSE;
-        }
+      if (! asxxxx_skip_line (abfd, &c, p_lineno, &error))
+        return FALSE;
       break;
 
     case 'X':
+      SET_RADIX (abfd, RADIX_HEX);
+      goto get_endian;
     case 'D':
+      SET_RADIX (abfd, RADIX_DEC);
+      goto get_endian;
     case 'Q':
+      SET_RADIX (abfd, RADIX_OCT);
+    get_endian:
       switch (c = asxxxx_get_byte (abfd, &error))
         {
         default:
-          asxxxx_bad_byte (abfd, *p_lineno, c, error);
+          asxxxx_bad_byte (abfd, c, *p_lineno, error);
           return FALSE;
           break;
 
         case 'H':
+          SET_ENDIAN (abfd, ENDIAN_BIG);
+          goto get_addr_size;
         case 'L':
+          SET_ENDIAN (abfd, ENDIAN_LITTLE);
+        get_addr_size:
           switch (c = asxxxx_get_byte (abfd, &error))
             {
             default:
-              asxxxx_bad_byte (abfd, *p_lineno, c, error);
+              asxxxx_bad_byte (abfd, c, *p_lineno, error);
               return FALSE;
               break;
 
             case '\n':
               ++*p_lineno;
+              /* fall through */
+            case '\r':
+              SET_ADDRESS_SIZE (abfd, ADDR_SIZE_2);
               break;
 
             case '2':
+              SET_ADDRESS_SIZE (abfd, ADDR_SIZE_2);
+              goto get_eol;
             case '3':
+              SET_ADDRESS_SIZE (abfd, ADDR_SIZE_3);
+              goto get_eol;
             case '4':
-              if ((c = asxxxx_get_byte (abfd, &error)) == '\n')
-                ++*p_lineno;
-              else if (c != '\r')
-                {
-                  asxxxx_bad_byte (abfd, *p_lineno, c, error);
-                  return FALSE;
-                }
+              SET_ADDRESS_SIZE (abfd, ADDR_SIZE_4);
+            get_eol:
+              if (! asxxxx_get_eol (abfd, &c, p_lineno, &error))
+                return FALSE;
               break;
 
-            case '\r':
               break;
            }
           break;
@@ -505,51 +912,6 @@ asxxxx_is_rel (bfd *abfd, unsigned int *p_lineno)
   return error ? FALSE : TRUE;
 }
 
-#if 0
-{
-  if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) == 0
-      && bfd_bread (buf, (bfd_size_type) 4, abfd) == 4)
-    {
-      if ((buf[0] == 'X' || buf[0] == 'D' || buf[0] == 'Q') && (buf[1] == 'H' || buf[1] == 'L'))
-        {
-         bfd_boolean error = FALSE;
-
-         switch (buf[2])
-            {
-            case '2':
-            case '3':
-            case '4':
-              switch (buf[3])
-                {
-                case '\r':
-                  if (asxxxx_get_byte(abfd, &error) == '\n')
-                    ret = TRUE;
-                  break;
-
-                case '\n':
-                  ret = TRUE;
-                }
-              break;
-
-            case '\r':
-              if (asxxxx_get_byte(abfd, &error) == '\n')
-                ret = TRUE;
-              break;
-
-            case '\n':
-              ret = TRUE;
-            }
-        }
-      else if (buf[0] == ';' && buf[1] == '!' && buf[2] == 'F' && buf[3] == 'I')
-        {
-          if (bfd_bread (buf, (bfd_size_type) 3, abfd) == 3 && buf[0] == 'L' && buf[1] == 'E' && buf[2] == ' ')
-            ret = TRUE;
-        }
-    }
-  return ret;
-}
-#endif
-
 static const bfd_target *
 asxxxx_object_p (bfd *abfd)
 {
@@ -558,14 +920,14 @@ asxxxx_object_p (bfd *abfd)
 
   asxxxx_init ();
 
-  if (! asxxxx_is_rel (abfd, &lineno))
+  if (! asxxxx_mkobject (abfd) || ! asxxxx_is_rel (abfd, &lineno))
     {
       bfd_set_error (bfd_error_wrong_format);
       return NULL;
     }
 
   tdata_save = abfd->tdata.any;
-  if (! asxxxx_mkobject (abfd) || ! asxxxx_scan (abfd, &lineno))
+  if (! asxxxx_scan (abfd, &lineno))
     {
       if (abfd->tdata.any != tdata_save && abfd->tdata.any != NULL)
         bfd_release (abfd, abfd->tdata.any);
@@ -657,8 +1019,8 @@ asxxxx_canonicalize_symtab (bfd *abfd, asymbol **alocation)
           c->the_bfd = abfd;
           c->name = s->name;
           c->value = s->val;
-          c->flags = BSF_GLOBAL;
-          c->section = bfd_abs_section_ptr;
+          c->flags = s->flags;
+          c->section = s->section;
           c->udata.p = NULL;
         }
     }

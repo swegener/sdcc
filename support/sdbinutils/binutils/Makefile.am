@@ -46,7 +46,7 @@ SDRANLIB_PROG=sdranlib
 
 # These should all be the same program too.
 ####SIZE_PROG=size
-####NM_PROG=nm-new
+SDNM_PROG=sdnm
 ####OBJDUMP_PROG=objdump
 
 # This is the demangler, as a standalone program.
@@ -73,13 +73,15 @@ EXTRA_SCRIPTS = embedspu
 ## We need a special rule to install the programs which are built with
 ## -new, and to rename cxxfilt to c++filt.
 ####RENAMED_PROGS = $(NM_PROG) $(STRIP_PROG) $(DEMANGLER_PROG)
-####noinst_PROGRAMS = $(RENAMED_PROGS) @BUILD_MISC@
+RENAMED_PROGS = $(SDNM_PROG)
+noinst_PROGRAMS = $(RENAMED_PROGS) @BUILD_MISC@
 
 ####EXTRA_PROGRAMS = $(NLMCONV_PROG) srconv sysdump coffdump $(DLLTOOL_PROG) $(WINDRES_PROG) $(WINDMC_PROG) $(DLLWRAP_PROG)
+EXTRA_PROGRAMS =
 
 # Stuff that goes in tooldir/ if appropriate.
 ####TOOL_PROGS = nm-new strip-new ar ranlib dlltool objdump objcopy
-TOOL_PROGS = ar ranlib
+TOOL_PROGS = sdnm ar ranlib
 
 BASEDIR = $(srcdir)/..
 BFDDIR = $(BASEDIR)/bfd
@@ -124,8 +126,8 @@ BUILT_SOURCES = $(GENERATED_HFILES)
 ####	windmc.c mclex.c
 
 CFILES = \
-	arparse.y arlex.l ar.c not-ranlib.c arsup.c rename.c binemul.c \
-	emul_vanilla.c bucomm.c version.c filemode.c
+	ar.c arsup.c binemul.c bucomm.c emul_vanilla.c filemode.c nm.c \
+	not-ranlib.c rename.c version.c 
 
 ####++GENERATED_CFILES = \
 ####	arparse.c arlex.c sysroff.c sysinfo.c syslex.c \
@@ -195,7 +197,7 @@ installcheck-local:
 # non-empty until configure time.  Ugh!
 ####size_DEPENDENCIES =      $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####objdump_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB) $(OPCODES) $(OBJDUMP_PRIVATE_OFILES)
-####nm_new_DEPENDENCIES =    $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
+sdnm_DEPENDENCIES =      $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####ar_DEPENDENCIES =        $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 sdar_DEPENDENCIES =      $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####strings_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
@@ -232,7 +234,7 @@ LDADD = $(BFDLIB) $(LIBIBERTY) $(LIBINTL)
 
 ####strip_new_SOURCES = objcopy.c is-strip.c rename.c $(WRITE_DEBUG_SRCS) $(BULIBS)
 
-####nm_new_SOURCES = nm.c $(BULIBS)
+sdnm_SOURCES = nm.c $(BULIBS)
 
 ####objdump_SOURCES = objdump.c dwarf.c prdbg.c $(DEBUG_SRCS) $(BULIBS) $(ELFLIBS)
 ####EXTRA_objdump_SOURCES = od-xcoff.c

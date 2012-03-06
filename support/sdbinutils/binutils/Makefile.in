@@ -37,13 +37,15 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 bin_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2)
+noinst_PROGRAMS = $(am__EXEEXT_4) @BUILD_MISC@
+EXTRA_PROGRAMS =
 subdir = .
 DIST_COMMON = NEWS README ChangeLog $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
 	$(am__configure_deps) $(srcdir)/config.in \
 	$(srcdir)/../mkinstalldirs arparse.h arparse.c arlex.c \
-	arparse.h arparse.c arlex.c arparse.h arparse.c arlex.c \
-	$(srcdir)/../depcomp $(srcdir)/../ylwrap
+	arparse.h arparse.c arlex.c $(srcdir)/../depcomp \
+	$(srcdir)/../ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../bfd/acinclude.m4 \
 	$(top_srcdir)/../config/zlib.m4 \
@@ -75,13 +77,18 @@ CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = sdar$(EXEEXT)
 am__EXEEXT_2 = sdranlib$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
+am__EXEEXT_3 = sdnm$(EXEEXT)
+am__EXEEXT_4 = $(am__EXEEXT_3)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_1 = bucomm.$(OBJEXT) version.$(OBJEXT) filemode.$(OBJEXT)
 am_sdar_OBJECTS = arparse.$(OBJEXT) arlex.$(OBJEXT) ar.$(OBJEXT) \
 	not-ranlib.$(OBJEXT) arsup.$(OBJEXT) rename.$(OBJEXT) \
 	binemul.$(OBJEXT) emul_$(EMULATION).$(OBJEXT) $(am__objects_1)
 sdar_OBJECTS = $(am_sdar_OBJECTS)
 am__DEPENDENCIES_1 =
+am_sdnm_OBJECTS = nm.$(OBJEXT) $(am__objects_1)
+sdnm_OBJECTS = $(am_sdnm_OBJECTS)
+sdnm_LDADD = $(LDADD)
 am_sdranlib_OBJECTS = ar.$(OBJEXT) is-ranlib.$(OBJEXT) \
 	arparse.$(OBJEXT) arlex.$(OBJEXT) arsup.$(OBJEXT) \
 	rename.$(OBJEXT) binemul.$(OBJEXT) emul_$(EMULATION).$(OBJEXT) \
@@ -131,7 +138,8 @@ YLWRAP = $(top_srcdir)/../ylwrap
 YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
 LTYACCCOMPILE = $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=compile $(YACC) $(YFLAGS) $(AM_YFLAGS)
-SOURCES = $(sdar_SOURCES) $(EXTRA_sdar_SOURCES) $(sdranlib_SOURCES)
+SOURCES = $(sdar_SOURCES) $(EXTRA_sdar_SOURCES) $(sdnm_SOURCES) \
+	$(sdranlib_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -324,17 +332,29 @@ AM_CFLAGS = $(WARN_CFLAGS)
 ####RANLIB_PROG=ranlib
 SDAR_PROG = sdar
 SDRANLIB_PROG = sdranlib
+
+# objcopy and strip should be the same program
+####OBJCOPY_PROG=objcopy
+####STRIP_PROG=strip-new
+
+####STRINGS_PROG=strings
+
+####READELF_PROG=readelf
+
+####ELFEDIT_PROG=elfedit
+
+# These should all be the same program too.
+####SIZE_PROG=size
+SDNM_PROG = sdnm
 bin_SCRIPTS = @BUILD_INSTALL_MISC@
 EXTRA_SCRIPTS = embedspu
 
 ####RENAMED_PROGS = $(NM_PROG) $(STRIP_PROG) $(DEMANGLER_PROG)
-####noinst_PROGRAMS = $(RENAMED_PROGS) @BUILD_MISC@
-
-####EXTRA_PROGRAMS = $(NLMCONV_PROG) srconv sysdump coffdump $(DLLTOOL_PROG) $(WINDRES_PROG) $(WINDMC_PROG) $(DLLWRAP_PROG)
+RENAMED_PROGS = $(SDNM_PROG)
 
 # Stuff that goes in tooldir/ if appropriate.
 ####TOOL_PROGS = nm-new strip-new ar ranlib dlltool objdump objcopy
-TOOL_PROGS = ar ranlib
+TOOL_PROGS = sdnm ar ranlib
 BASEDIR = $(srcdir)/..
 BFDDIR = $(BASEDIR)/bfd
 INCDIR = $(BASEDIR)/include
@@ -376,8 +396,8 @@ BUILT_SOURCES = $(GENERATED_HFILES)
 ####	windres.c winduni.c wrstabs.c \
 ####	windmc.c mclex.c
 CFILES = \
-	arparse.y arlex.l ar.c not-ranlib.c arsup.c rename.c binemul.c \
-	emul_vanilla.c bucomm.c version.c filemode.c
+	ar.c arsup.c binemul.c bucomm.c emul_vanilla.c filemode.c nm.c \
+	not-ranlib.c rename.c version.c 
 
 
 ####++GENERATED_CFILES = \
@@ -430,7 +450,7 @@ CC_FOR_TARGET = ` \
 # non-empty until configure time.  Ugh!
 ####size_DEPENDENCIES =      $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####objdump_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB) $(OPCODES) $(OBJDUMP_PRIVATE_OFILES)
-####nm_new_DEPENDENCIES =    $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
+sdnm_DEPENDENCIES = $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####ar_DEPENDENCIES =        $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 sdar_DEPENDENCIES = $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####strings_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
@@ -465,8 +485,7 @@ LDADD = $(BFDLIB) $(LIBIBERTY) $(LIBINTL)
 ####elfedit_LDADD = $(LIBINTL) $(LIBIBERTY)
 
 ####strip_new_SOURCES = objcopy.c is-strip.c rename.c $(WRITE_DEBUG_SRCS) $(BULIBS)
-
-####nm_new_SOURCES = nm.c $(BULIBS)
+sdnm_SOURCES = nm.c $(BULIBS)
 
 ####objdump_SOURCES = objdump.c dwarf.c prdbg.c $(DEBUG_SRCS) $(BULIBS) $(ELFLIBS)
 ####EXTRA_objdump_SOURCES = od-xcoff.c
@@ -775,6 +794,15 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
 arparse.h: arparse.c
 	@if test ! -f $@; then \
 	  rm -f arparse.c; \
@@ -783,6 +811,9 @@ arparse.h: arparse.c
 sdar$(EXEEXT): $(sdar_OBJECTS) $(sdar_DEPENDENCIES) 
 	@rm -f sdar$(EXEEXT)
 	$(LINK) $(sdar_OBJECTS) $(sdar_LDADD) $(LIBS)
+sdnm$(EXEEXT): $(sdnm_OBJECTS) $(sdnm_DEPENDENCIES) 
+	@rm -f sdnm$(EXEEXT)
+	$(LINK) $(sdnm_OBJECTS) $(sdnm_LDADD) $(LIBS)
 sdranlib$(EXEEXT): $(sdranlib_OBJECTS) $(sdranlib_DEPENDENCIES) 
 	@rm -f sdranlib$(EXEEXT)
 	$(LINK) $(sdranlib_OBJECTS) $(sdranlib_LDADD) $(LIBS)
@@ -837,6 +868,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emul_vanilla.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filemode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-ranlib.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/not-ranlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rename.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Po@am__quote@
@@ -1093,7 +1125,8 @@ maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -1172,17 +1205,17 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-DEJAGNU check-am clean \
-	clean-binPROGRAMS clean-generic clean-libtool ctags \
-	ctags-recursive distclean distclean-DEJAGNU distclean-compile \
-	distclean-generic distclean-hdr distclean-libtool \
-	distclean-tags dvi dvi-am html html-am info info-am install \
-	install-am install-binPROGRAMS install-binSCRIPTS install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-exec-local install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installcheck-local \
-	installdirs installdirs-am maintainer-clean \
+	clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS ctags ctags-recursive distclean \
+	distclean-DEJAGNU distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-tags dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-binSCRIPTS install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-exec-local \
+	install-html install-html-am install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installcheck-local installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool mostlyclean-local pdf \
 	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \

@@ -1291,6 +1291,21 @@ getAddrspaceiCode (const iCode *ic)
   const symbol *leftaddrspace = 0, *rightaddrspace = 0, *resultaddrspace = 0;
   const symbol *addrspace;
 
+  /* Not safe to use IC_LEFT, IC_RIGHT, or IC_RESULT macros on */
+  /* IFX or JUMPTABLE iCodes. Handle these as a special case.  */
+  if (ic->op == IFX || ic->op == JUMPTABLE)
+    {
+      operand *cond;
+      if (ic->op == IFX)
+        cond = IC_COND (ic);
+      else
+        cond = IC_JTCOND (ic);
+      if (IS_SYMOP (cond))
+        return getAddrspace (OP_SYMBOL (cond)->type);
+      else
+        return NULL;
+    }
+
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);

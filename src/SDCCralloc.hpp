@@ -342,10 +342,17 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             }
         }
 
-      add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RESULT(ic), sym_to_index);
-      add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_LEFT(ic), sym_to_index);
-      add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RIGHT(ic), sym_to_index);
-      
+      if (ic->op == IFX)
+        add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_COND(ic), sym_to_index);
+      else if (ic->op == JUMPTABLE)
+        add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_JTCOND(ic), sym_to_index);
+      else
+        {
+          add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RESULT(ic), sym_to_index);
+          add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_LEFT(ic), sym_to_index);
+          add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RIGHT(ic), sym_to_index);
+        }
+
       add_operand_conflicts_in_node(cfg[key_to_index[ic->key]], con);
     }
 
@@ -434,7 +441,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
           // Conflict between operands are handled by add_operand_conflicts_in_node().
           if (cfg[i].dying.find (*v) != cfg[i].dying.end())
             continue;
-          if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)))
+          if (ic->op != IFX && ic->op != JUMPTABLE && IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)))
             {
               operand_map_t::const_iterator oi, oi_end; 
               for(boost::tie(oi, oi_end) = cfg[i].operands.equal_range(OP_SYMBOL_CONST(IC_RESULT(ic))->key); oi != oi_end; ++oi)

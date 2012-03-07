@@ -1,3 +1,7 @@
+2012-03-07 Borut Razem <borut.razem AT gmail.com>
+
+	* Makefile.in: copy correct sdbinutils executables to bin
+
 2012-03-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (getAddrspaceiCode),

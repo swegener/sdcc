@@ -61,10 +61,7 @@ endif
 ifeq ($(OPT_DISABLE_SDBINUTILS), 0)
 TARGETS        += sdcc-sdbinutils
 PKGS           += $(SDCC_SDBINUTILS)
-SDBINUTILS_BINS = \
-               $(SDCC_SDBINUTILS)/binutils/sdar$(EXEEXT) \
-               $(SDCC_SDBINUTILS)/binutils/sdranlib$(EXEEXT) \
-               $(SDCC_SDBINUTILS)/binutils/sdnm$(EXEEXT)
+SDBINUTILS_BINS = sdar$(EXEEXT) sdranlib$(EXEEXT) sdnm$(EXEEXT)
 endif
 
 ifeq ($(OPT_DISABLE_DEVICE_LIB), 0)
@@ -88,10 +85,6 @@ SDCC_LIBS      += support/cpp
 endif
 
 TARGETS        += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
-
-####PKGS           += $(SDCC_LIBS) src device/include device/non-free/include \
-####                  $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) \
-####                  $(SDCC_SDRANLIB) $(SDCC_SDBINUTILS) $(SDCC_SCRIPTS)
 
 PKGS           += $(SDCC_LIBS) src device/include device/non-free/include \
                   $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) \
@@ -132,7 +125,14 @@ sdcc-librarian:
 
 sdcc-sdbinutils:
 	$(MAKE) -C $(SDCC_SDBINUTILS)
-	cp $(SDBINUTILS_BINS) bin
+	# in some cases (cygwin) the real binaries are in .libs
+	for bin in $(SDBINUTILS_BINS); do \
+	  if [ -e $(SDCC_SDBINUTILS)/binutils/.libs/$$bin ]; then \
+	    cp $(SDCC_SDBINUTILS)/binutils/.libs/$$bin bin; \
+	  else \
+	    cp $(SDCC_SDBINUTILS)/binutils/$$bin bin; \
+	  fi \
+	done
 
 sdcc-device-inc:
 	$(MAKE) -C device/include

@@ -5159,6 +5159,30 @@ genPlus (iCode * ic)
       goto release;
     }
 
+  /* Using the 16 bit addition results in smaller and faster code than using the 8-bit addition. */
+  if (size == 1 && isPairDead (PAIR_HL, ic) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG && AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT(ic)) == AOP_REG &&
+    AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == L_IDX &&
+    (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == L_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == L_IDX) &&
+    (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX))
+    {
+      PAIR_ID pair = (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX) ? PAIR_BC : PAIR_DE;
+      emit2 ("add hl, %s", _pairs[pair].name);
+      regalloc_dry_run_cost += 1;
+      goto release;
+    }
+
+  /* When adding a literal, the 16 bit addition results in smaller, slower code. */
+  if (optimize.codeSize && size == 1 && isPairDead (PAIR_HL, ic) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG && AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT(ic)) == AOP_LIT &&
+    AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == L_IDX && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == L_IDX &&
+    (!bitVectBitValue (ic->rSurv, C_IDX) || !bitVectBitValue (ic->rSurv, E_IDX)))
+    {
+      PAIR_ID pair = bitVectBitValue (ic->rSurv, C_IDX) ? PAIR_DE : PAIR_BC;
+      emit2 ("ld %s, #0x%X", _pairs[pair].l, ((unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) & 0xff);
+      emit2 ("add hl, %s", _pairs[pair].name);
+      regalloc_dry_run_cost += 3;
+      goto release;
+    }
+
   /* Special case:
      ld hl,sp+n trashes C so we can't afford to do it during an
      add with stack based variables.  Worst case is:

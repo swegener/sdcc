@@ -11548,15 +11548,15 @@ genCast (iCode * ic)
       goto release;
     }
 
-  /* if the result is of type pointer */
-  if (IS_PTR (ctype))
+  /* if the either is of type pointer */
+  if (IS_PTR (ctype) || IS_PTR(rtype))
     {
       int p_type;
       sym_link *type = operandType (right);
       sym_link *etype = getSpec (type);
 
-      /* pointer to generic pointer */
-      if (IS_GENPTR (ctype))
+      /* pointer to generic pointer or long */
+      if (AOP_SIZE (result) >= GPTRSIZE)
         {
           if (IS_PTR (type))
             {
@@ -11584,9 +11584,16 @@ genCast (iCode * ic)
               aopPut (result, aopGet (right, offset, FALSE, FALSE), offset);
               offset++;
             }
-          /* the last byte depending on type */
+          /* the third byte depending on type */
           {
-            int gpVal = pointerTypeToGPByte (p_type, NULL, NULL);
+            int gpVal;
+
+            /* If there will be no loss of precision, handle generic */
+	    /* pointer as special case to avoid generating warning */
+            if (p_type == GPOINTER && AOP_SIZE (result) >= GPTRSIZE)
+              gpVal = -1;
+            else
+              gpVal = pointerTypeToGPByte (p_type, NULL, NULL);
 
             if (gpVal == -1)
               {
@@ -11603,6 +11610,15 @@ genCast (iCode * ic)
                 dbuf_destroy (&dbuf);
               }
           }
+
+          /* 8051 uses unsigned address spaces, so no sign extension needed. */
+          /* Pad the remaining bytes of the result (if any) with 0. */
+          size = AOP_SIZE (result) - GPTRSIZE;
+          offset = GPTRSIZE;
+          while (size--)
+           {
+             aopPut (result, zero, offset++);
+           }
           goto release;
         }
 

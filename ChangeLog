@@ -1,6 +1,7 @@
 2012-03-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genCast): fixed bug #3486542
+	* support/regression/tests/gcc-torture-execute-pr15296.c: re-enabled
 
 2012-03-09 Borut Razem <borut.razem AT gmail.com>
 

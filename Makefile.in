@@ -127,7 +127,7 @@ sdcc-sdbinutils:
 	$(MAKE) -C $(SDCC_SDBINUTILS)
 	# in some cases (cygwin) the real binaries are in .libs
 	for bin in $(SDBINUTILS_BINS); do \
-	  if [ -e $(SDCC_SDBINUTILS)/binutils/.libs/$$bin ]; then \
+	  if [ -f $(SDCC_SDBINUTILS)/binutils/.libs/$$bin ]; then \
 	    cp $(SDCC_SDBINUTILS)/binutils/.libs/$$bin bin; \
 	  else \
 	    cp $(SDCC_SDBINUTILS)/binutils/$$bin bin; \

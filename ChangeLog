@@ -2,6 +2,9 @@
 
 	* doc/README.txt:
 	  added info about included code from gcc test suite
+	* Makefile.in:
+	  replaced test -e with -f, since -e is not available in sh
+	  on Solaris
 
 2012-03-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

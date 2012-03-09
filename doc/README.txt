@@ -110,12 +110,13 @@ SDCC includes code from:
    Some of the Z80 related files are borrowed from the Gameboy
    Development Kit (GBDK).
 * The GCC development team http://gcc.gnu.org/
-   for GNU C preprocessor, the basis of sdcpp preprocessor
+   for GNU C preprocessor, the basis of sdcpp preprocessor and
+   gcc test suite, partially included into the SDCC regression test suite
 * The GNU Binutils development team http://www.gnu.org/software/binutils/
    for GNU Binutils, the basis of sdbinutils
 * Boost Community http://www.boost.org/
    for Boost C++ libraries used in sdcc compiler
 * Timo Bingmann http://idlebox.net/2007/stx-btree/
-   Sfor TX B+ Tree C++ Template Classes used in sdcc compiler
+   for TX B+ Tree C++ Template Classes used in sdcc compiler
 * Malini Dutta <malini AT mediaone.net>
    Sandeep's wife, for her patience and support.

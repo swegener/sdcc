@@ -1,4 +1,9 @@
-2012-03-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-03-09 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/README.txt:
+	  added info about included code from gcc test suite
+
+2012-03-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Use 16-bit addition instructions for 8-bit additions when cheaper and possible.

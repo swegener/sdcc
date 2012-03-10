@@ -4,6 +4,10 @@
 	  backslashes replaced with slashes in non-free paths;
 	  obsoleted special sdcc keywords which are not preceded
 	  by a double underscore
+	* support/scripts/inc2h-pic16.pl, support/scripts/inc2h.pl:
+	  added comment about Microchip "The header files should state
+	  that they are only to be used with authentic Microchip
+	  devices" requirement.
 
 2012-03-10 Philipp Klaus Krause <pkk AT spth.de>
 

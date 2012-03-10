@@ -2827,7 +2827,7 @@ commitPair (asmop * aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
   int fp_offset = aop->aopu.aop_stk + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
   int sp_offset = fp_offset + _G.stack.pushed;
   /* Stack positions will change, so do not assume this is impossible in the cost function. */
-  if (!regalloc_dry_run && !IS_GB && !sp_offset && (!IS_R2K && id == PAIR_HL) || id == PAIR_IY && !dont_destroy)
+  if (!regalloc_dry_run && !IS_GB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset && (!IS_R2K && id == PAIR_HL) || id == PAIR_IY && !dont_destroy)
     {
       emit2 ("ex (sp), %s", _pairs[id].name);
       regalloc_dry_run_cost += ((id == PAIR_IY || IS_R2K) ? 2 : 1);

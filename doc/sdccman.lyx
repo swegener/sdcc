@@ -968,10 +968,7 @@ Exception are pic device libraries and header files which are derived from
  Microchip requires that "The header files should state that they are only
  to be used with authentic Microchip devices" which makes them incompatible
  with the GPL.
- Pic device libraries and header files are located at non-free
-\backslash
-lib and non-free
-\backslash
+ Pic device libraries and header files are located at non-free/lib and non-free/
 include directories respectively.
  Sdcc should be run with the 
 \series bold
@@ -2370,19 +2367,6 @@ reference "sub:Using-sdar-to"
 \end_layout
 
 \begin_layout Itemize
-special sdcc keywords which are not preceded by a double underscore are
- deprecated in version 3.0.0 and higher.
- See section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:ANSI-Compliance"
-
-\end_inset
-
- ANSI-Compliance.
-\end_layout
-
-\begin_layout Itemize
 targets for xa51 and avr are disabled by default in version 3.0.0 and higher.
 \end_layout
 
@@ -2436,6 +2420,19 @@ with sdcc version 3.2.0 the sdcclib utility is deprecated.
  Sdar utility should be used to create sdcc object file archives.
  Sdcclib utility will become obsolete in one of next sdcc releases and will
  be removed from sdcc packages.
+\end_layout
+
+\begin_layout Itemize
+special sdcc keywords which are not preceded by a double underscore are
+ obsoleted (removed) in version 3.2.0 and higher.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:ANSI-Compliance"
+
+\end_inset
+
+ ANSI-Compliance.
 \end_layout
 
 \begin_layout Section

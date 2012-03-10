@@ -35,7 +35,7 @@ from Microchip header (.inc) and linker script (.lkr) files. Microchip
 requires that "The header files should state that they are only to be
 used with authentic Microchip devices" which makes them incompatible
 with the GPL. Pic device libraries and header files are located at
-non-free\lib and non-free\include directories respectively. Sdcc should
+non-free/lib and non-free/include directories respectively. Sdcc should
 be run with the --use-non-free command line option in order to include
 non-free header files and libraries.
 

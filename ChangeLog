@@ -1,4 +1,11 @@
-2012-03-10Philipp Klaus Krause <pkk AT spth.de>
+2012-03-10 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/README.txt, doc/sdccman.lyx:
+	  backslashes replaced with slashes in non-free paths;
+	  obsoleted special sdcc keywords which are not preceded
+	  by a double underscore
+
+2012-03-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fixed bug #3501019.

@@ -1,3 +1,11 @@
+2012-03-11 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libio/usart/uopen.c:
+	  properly setup BAUDCONbits.BRG16, closes #3495815
+
+	* device/non-free/include/pic16/pic18f1220.h:
+	  added BAUDCON alias and structure definition for BAUDCTL
+
 2012-03-10 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx:

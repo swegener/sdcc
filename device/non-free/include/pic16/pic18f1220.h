@@ -271,6 +271,25 @@ extern __sfr __at (0xfa7) EECON2;
 extern __sfr __at (0xfa8) EEDATA;
 extern __sfr __at (0xfa9) EEADR;
 extern __sfr __at (0xfaa) BAUDCTL;
+typedef union {
+	struct {
+		unsigned ABDEN:1;
+		unsigned WUE:1;
+		unsigned :1;
+		unsigned BRG16:1;
+		unsigned SCKP:1;
+		unsigned :1;
+		unsigned RCIDL:1;
+		unsigned :1;
+	};
+} __BAUDCTLbits_t;
+
+extern volatile __BAUDCTLbits_t __at (0xfaa) BAUDCTLbits;
+
+/* Cheat a bit to simplify the USART library. */
+#define BAUDCON         BAUDCTL
+#define BAUDCONbits     BAUDCTLbits
+
 extern __sfr __at (0xfab) RCSTA;
 typedef union {
 	struct {

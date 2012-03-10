@@ -17,7 +17,7 @@ lib_LIBRARIES =
 
 HEREDOC
 
-sed -e 's/\s*#.*$//' ../pics.all | grep -v "^\s*$" | sort | while read arch; do
+sed -e 's/\s*#.*$//' ../../../non-free/lib/pic16/pics.all | grep -v "^\s*$" | sort | while read arch; do
     echo "Generating for device >>${arch}<<" >&2;
     cat <<HERE
 lib_LIBRARIES += libio18f${arch}.a

@@ -27,6 +27,10 @@
     || defined(pic18f1320)
 #define __SDCC_PIC16_FAMILY 1812200
 
+#elif  defined(pic18f1230) \
+    || defined(pic18f1330)
+#define __SDCC_PIC16_FAMILY 1812300
+
 #elif  defined(pic18f13k50) \
     || defined(pic18f14k50)
 #define __SDCC_PIC16_FAMILY 1813502
@@ -203,6 +207,9 @@
 #elif  (__SDCC_PIC16_FAMILY == 1812200)
 #define __SDCC_ADC_STYLE    1812200
 
+#elif  (__SDCC_PIC16_FAMILY == 1812300)
+#define __SDCC_ADC_STYLE    1812300
+
 #elif  (__SDCC_PIC16_FAMILY == 1813502)
 #define __SDCC_ADC_STYLE    1813502
 
@@ -245,6 +252,9 @@
 
 #if    (__SDCC_PIC16_FAMILY == 1812200)
 #define __SDCC_USART_STYLE  1812200
+
+#elif  (__SDCC_PIC16_FAMILY == 1812300)
+#define __SDCC_USART_STYLE  1812300
 
 #elif  (__SDCC_PIC16_FAMILY == 1813502)
 #define __SDCC_USART_STYLE  1813502

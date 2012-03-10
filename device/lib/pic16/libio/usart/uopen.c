@@ -122,6 +122,10 @@ usart_open (unsigned char config, sdcc_spbrg_t spbrg) __wparam
   /* Configure RX/TX pins as inputs. */
   TRISBbits.TRISB1 = 1;
   TRISBbits.TRISB4 = 1;
+#elif (__SDCC_USART_STYLE == 1812300)
+  /* Configure RX/TX pins as inputs. */
+  TRISAbits.TRISA2 = 1;
+  TRISAbits.TRISA3 = 1;
 #elif (__SDCC_USART_STYLE == 1813502)
   /* Configure RX pin as digital pin. */
   ANSELHbits.ANS11 = 0;

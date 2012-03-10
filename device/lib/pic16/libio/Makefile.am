@@ -13,6 +13,16 @@ libio18f1220_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f1220_a_SOURCES += usart/usartd.c
 libio18f1220_a_CFLAGS = -p18f1220 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f1230.a
+libio18f1230_a_SOURCES = dummy.c
+libio18f1230_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
+libio18f1230_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
+libio18f1230_a_SOURCES += usart/ubaud.c usart/ubusy.c usart/uclose.c
+libio18f1230_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
+libio18f1230_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
+libio18f1230_a_SOURCES += usart/usartd.c
+libio18f1230_a_CFLAGS = -p18f1230 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f1320.a
 libio18f1320_a_SOURCES = dummy.c
 libio18f1320_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -22,6 +32,16 @@ libio18f1320_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f1320_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f1320_a_SOURCES += usart/usartd.c
 libio18f1320_a_CFLAGS = -p18f1320 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f1330.a
+libio18f1330_a_SOURCES = dummy.c
+libio18f1330_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
+libio18f1330_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
+libio18f1330_a_SOURCES += usart/ubaud.c usart/ubusy.c usart/uclose.c
+libio18f1330_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
+libio18f1330_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
+libio18f1330_a_SOURCES += usart/usartd.c
+libio18f1330_a_CFLAGS = -p18f1330 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f13k50.a
 libio18f13k50_a_SOURCES = dummy.c
@@ -136,9 +156,7 @@ libio18f23k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f23k20_a_SOURCES += usart/usartd.c
 libio18f23k20_a_CFLAGS = -p18f23k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f23k22.a
-endif HAVE_NEW_PICS
 libio18f23k22_a_SOURCES = dummy.c
 libio18f23k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f23k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -321,9 +339,7 @@ libio18f24k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f24k20_a_SOURCES += usart/usartd.c
 libio18f24k20_a_CFLAGS = -p18f24k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f24k22.a
-endif HAVE_NEW_PICS
 libio18f24k22_a_SOURCES = dummy.c
 libio18f24k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f24k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -533,9 +549,7 @@ libio18f25k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f25k20_a_SOURCES += usart/usartd.c
 libio18f25k20_a_CFLAGS = -p18f25k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f25k22.a
-endif HAVE_NEW_PICS
 libio18f25k22_a_SOURCES = dummy.c
 libio18f25k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f25k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -655,9 +669,7 @@ libio18f26k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f26k20_a_SOURCES += usart/usartd.c
 libio18f26k20_a_CFLAGS = -p18f26k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f26k22.a
-endif HAVE_NEW_PICS
 libio18f26k22_a_SOURCES = dummy.c
 libio18f26k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f26k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -755,9 +767,7 @@ libio18f43k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f43k20_a_SOURCES += usart/usartd.c
 libio18f43k20_a_CFLAGS = -p18f43k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f43k22.a
-endif HAVE_NEW_PICS
 libio18f43k22_a_SOURCES = dummy.c
 libio18f43k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f43k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -940,9 +950,7 @@ libio18f44k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f44k20_a_SOURCES += usart/usartd.c
 libio18f44k20_a_CFLAGS = -p18f44k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f44k22.a
-endif HAVE_NEW_PICS
 libio18f44k22_a_SOURCES = dummy.c
 libio18f44k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f44k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -1152,9 +1160,7 @@ libio18f45k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f45k20_a_SOURCES += usart/usartd.c
 libio18f45k20_a_CFLAGS = -p18f45k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f45k22.a
-endif HAVE_NEW_PICS
 libio18f45k22_a_SOURCES = dummy.c
 libio18f45k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f45k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c
@@ -1274,9 +1280,7 @@ libio18f46k20_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f46k20_a_SOURCES += usart/usartd.c
 libio18f46k20_a_CFLAGS = -p18f46k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libio18f46k22.a
-endif HAVE_NEW_PICS
 libio18f46k22_a_SOURCES = dummy.c
 libio18f46k22_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
 libio18f46k22_a_SOURCES += adc/adcopen.c adc/adcread.c adc/adcsetch.c

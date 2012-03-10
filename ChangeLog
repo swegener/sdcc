@@ -1,3 +1,37 @@
+2012-03-10 Raphael Neider <rneider AT web.de>
+
+	* Makefile.in:
+	  device/lib build depends on sdcc-sdbinutils
+
+	* device/include/pic16/adc.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/adc/adcbusy.c,
+	  device/lib/pic16/libio/adc/adcopen.c,
+	  device/lib/pic16/libio/adc/adcsetch.c,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart/uopen.c,
+	  device/non-free/include/pic16/pic18f1230.h,
+	  device/non-free/include/pic16/pic18f1330.h,
+	  device/non-free/lib/pic16/libdev/Makefile.am,
+	  device/non-free/lib/pic16/libdev/pic18f1230.c,
+	  device/non-free/lib/pic16/libdev/pic18f1330.c,
+	  device/non-free/lib/pic16/pics.all,
+	  support/scripts/pic18fam-h-gen.pl:
+	  add support for 18f1230 and 18f1330 devices
+
+	* device/lib/pic16/libio/mkmk.sh:
+	  adjust path to pics.all
+
+	* device/lib/pic16/libdev:
+	  removed obsolete, empty directory
+
+	* device/lib/pic16/libio/Makefile.in,
+	  device/non-free/include/pic16/pic18fam.h,
+	  device/non-free/lib/pic16/libdev/Makefile.in:
+	  regenerated
+
 2012-03-10 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/README.txt, doc/sdccman.lyx:

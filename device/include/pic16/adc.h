@@ -171,37 +171,37 @@
  *   18f65j50-style devices multiplex ANCONx and ADCONx
  *
  * ADCON0:
- * bit  18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
- *  0   ADON    ADON    ADON      ADON    ADON      ADON      ADON
- *  1   -       GO      GO        GO      GO        GO        GO
- *  2   GO      CHS0    CHS0      CHS0    CHS0      CHS0      CHS0
- *  3   CHS0    CHS1    CHS1      CHS1    CHS1      CHS1      CHS1
- *  4   CHS1    CHS2    CHS2      CHS2    CHS2      CHS2      CHS2
- *  5   CHS2    -       CHS3      CHS3    CHS3      CHS3      CHS3
- *  6   ADCS0   VCFG0   -         -       VCFG0     VCFG0     CHS4
- *  7   ADCS1   VCFG1   -         (ADCAL) VCFG1     VCFG1     -
+ * bit  18f242  18f1220 18f1230 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
+ *  0   ADON    ADON    ADON    ADON      ADON    ADON      ADON      ADON
+ *  1   -       GO      GO      GO        GO      GO        GO        GO
+ *  2   GO      CHS0    CHS0    CHS0      CHS0    CHS0      CHS0      CHS0
+ *  3   CHS0    CHS1    CHS1    CHS1      CHS1    CHS1      CHS1      CHS1
+ *  4   CHS1    CHS2    -       CHS2      CHS2    CHS2      CHS2      CHS2
+ *  5   CHS2    -       -       CHS3      CHS3    CHS3      CHS3      CHS3
+ *  6   ADCS0   VCFG0   -       -         -       VCFG0     VCFG0     CHS4
+ *  7   ADCS1   VCFG1   SEVTEN  -         (ADCAL) VCFG1     VCFG1     -
  *
  * ADCON1:
- *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
- *   0  PCFG0   PCFG0   NVCFG0    PCFG0   ADCS0     ADCS0     NVCFG0
- *   1  PCFG1   PCFG1   NVCFG1    PCFG1   ADCS1     ADCS1     NVCFG1
- *   2  PCFG2   PCFG2   PVCFG0    PCFG2   ADCS2     ADCS2     PVCFG0
- *   3  PCFG3   PCFG3   PVCFG1    PCFG3   ACQT0     ACQT0     PVCFG1
- *   4  -       PCFG4   -         VCFG0   ACQT1     ACQT1     -
- *   5  -       PCFG5   -         VCFG1   ACQT2     ACQT2     -
- *   6  ADCS2   PCFG6   -         -       ADCAL     ADCAL     -
- *   7  ADFM    -       -         -       ADFM      ADFM      TRIGSEL
+ *  bit 18f242  18f1220 18f1230 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
+ *   0  PCFG0   PCFG0   PCFG0   NVCFG0    PCFG0   ADCS0     ADCS0     NVCFG0
+ *   1  PCFG1   PCFG1   PCFG1   NVCFG1    PCFG1   ADCS1     ADCS1     NVCFG1
+ *   2  PCFG2   PCFG2   PCFG2   PVCFG0    PCFG2   ADCS2     ADCS2     PVCFG0
+ *   3  PCFG3   PCFG3   PCFG3   PVCFG1    PCFG3   ACQT0     ACQT0     PVCFG1
+ *   4  -       PCFG4   VCFG0   -         VCFG0   ACQT1     ACQT1     -
+ *   5  -       PCFG5           -         VCFG1   ACQT2     ACQT2     -
+ *   6  ADCS2   PCFG6           -         -       ADCAL     ADCAL     -
+ *   7  ADFM    -               -         -       ADFM      ADFM      TRIGSEL
  *
  * ADCON2:
- *  bit 18f242  18f1220 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
- *   0                  ADCS0     ADCS0                       ADCS0
- *   1                  ADCS1     ADCS1                       ADCS1
- *   2                  ADCS2     ADCS2                       ADCS2
- *   3                  ACQT0     ADQT0                       ACQT0
- *   4                  ACQT1     ADQT1                       ACQT1
- *   5                  ACQT2     ADQT2                       ACQT2
- *   6                  -         -                           -
- *   7                  ADFM      ADFM                        ADFM
+ *  bit 18f242  18f1220 18f1230 18f13k50  18f2220 18f24j50  18f65j50  18f23k22
+ *   0                  ADCS0   ADCS0     ADCS0                       ADCS0
+ *   1                  ADCS1   ADCS1     ADCS1                       ADCS1
+ *   2                  ADCS2   ADCS2     ADCS2                       ADCS2
+ *   3                  ACQT0   ACQT0     ADQT0                       ACQT0
+ *   4                  ACQT1   ACQT1     ADQT1                       ACQT1
+ *   5                  ACQT2   ACQT2     ADQT2                       ACQT2
+ *   6                  -       -         -                           -
+ *   7                  ADFM    ADFM      ADFM                        ADFM
  */
 #include "pic18fam.h"
 
@@ -250,6 +250,28 @@
 #define ADC_CFG_2A      0x3c
 #define ADC_CFG_1A      0x3e
 #define ADC_CFG_0A      0x3f
+
+#elif (__SDCC_ADC_STYLE == 1812300)
+
+/*
+ * These devices use a bitmask in ADCON1 to configure AN0..AN3
+ * as digital ports (bit set) or analog input (bit clear).
+ *
+ * These settings are selected based on their similarity with
+ * the 2220-style settings; 1230-style is more flexible, though.
+ *
+ * Reference voltages are configured via adc_open's config parameter
+ * using ADC_VCFG_*.
+ */
+
+#define ADC_CFG_4A      0x00
+#define ADC_CFG_3A      0x08
+#define ADC_CFG_2A      0x0c
+#define ADC_CFG_1A      0x0e
+#define ADC_CFG_0A      0x0f
+
+#define ADC_VCFG_AVDD   0x00    /* AVdd */
+#define ADC_VCFG_VREF   0x10    /* Vref+ */
 
 #elif (__SDCC_ADC_STYLE == 1813502)
 

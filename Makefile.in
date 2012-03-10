@@ -58,10 +58,12 @@ SDCC_MISC      += sim/ucsim
 PKGS           += $(SDCC_MISC)
 endif
 
+SDCC_BINUTILS   = 
 ifeq ($(OPT_DISABLE_SDBINUTILS), 0)
 TARGETS        += sdcc-sdbinutils
 PKGS           += $(SDCC_SDBINUTILS)
 SDBINUTILS_BINS = sdar$(EXEEXT) sdranlib$(EXEEXT) sdnm$(EXEEXT)
+SDCC_BINUTILS   = sdcc-sdbinutils
 endif
 
 ifeq ($(OPT_DISABLE_DEVICE_LIB), 0)
@@ -138,7 +140,7 @@ sdcc-device-inc:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/non-free/include
 
-sdcc-device-lib: sdcc-cc sdcc-as sdcc-ld
+sdcc-device-lib: sdcc-cc sdcc-as sdcc-ld $(SDCC_BINUTILS)
 	$(MAKE) -C device/lib
 	$(MAKE) -C device/non-free/lib
 

@@ -7,9 +7,17 @@ lib_LIBRARIES += libdev18f1220.a
 libdev18f1220_a_SOURCES = pic18f1220.c
 libdev18f1220_a_CFLAGS = -p18f1220 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f1230.a
+libdev18f1230_a_SOURCES = pic18f1230.c
+libdev18f1230_a_CFLAGS = -p18f1230 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f1320.a
 libdev18f1320_a_SOURCES = pic18f1320.c
 libdev18f1320_a_CFLAGS = -p18f1320 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f1330.a
+libdev18f1330_a_SOURCES = pic18f1330.c
+libdev18f1330_a_CFLAGS = -p18f1330 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f13k50.a
 libdev18f13k50_a_SOURCES = pic18f13k50.c

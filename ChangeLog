@@ -1,3 +1,8 @@
+2012-03-10 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx:
+	  documented support for 18f1230/18f1330 device family
+
 2012-03-10 Raphael Neider <rneider AT web.de>
 
 	* Makefile.in:

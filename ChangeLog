@@ -1,7 +1,7 @@
 2012-03-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Fixed bug that made copying from hl to iy ineffcient on r2k, fix another check in commitPair().
+	  Fixed bug that made copying from hl to iy ineffcient on r2k, fix another check in commitPair(), improved stack adjustment after function call.
 
 2012-03-11 Raphael Neider <rneider AT web.de>
 

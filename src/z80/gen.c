@@ -2034,7 +2034,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
             case 4:
               if (IS_R2K)
                 {
-                  emit2 ("ld hl, (hl)");
+                  emit2 ("ld hl, 0 (hl)");
                   regalloc_dry_run_cost += 3;
                 }
               else
@@ -2086,7 +2086,6 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                   {
                     emit2 ("ld %s,%s", _pairs[id].l, aopGet (aop, offset, FALSE));
                     emit2 ("ld %s,%s", _pairs[id].h, aopGet (aop, offset + 1, FALSE));
-                    
                   }
                 regalloc_dry_run_cost += ld_cost(ASMOP_L, aop) + ld_cost(ASMOP_H, aop);
 
@@ -3825,7 +3824,7 @@ _opUsesPair (operand * op, const iCode * ic, PAIR_ID pairId)
 static void
 emitCall (const iCode *ic, bool ispcall)
 {
-  bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet;
+  bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet, SomethingReturned;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec(dtype);
 
@@ -3956,6 +3955,32 @@ emitCall (const iCode *ic, bool ispcall)
   /* Mark the registers as restored. */
   _G.saves.saved = FALSE;
 
+  SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
+       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
+        OP_SYMBOL (IC_RESULT (ic))->spildir ||
+        OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) ||
+      IS_TRUE_SYMOP (IC_RESULT (ic));
+
+  if (SomethingReturned)
+    {
+      bitVect *result = z80_rUmaskForOp (IC_RESULT (ic));
+      bInRet = bitVectBitValue (result, B_IDX);
+      cInRet = bitVectBitValue (result, C_IDX);
+      dInRet = bitVectBitValue (result, D_IDX);
+      eInRet = bitVectBitValue (result, E_IDX);
+      hInRet = bitVectBitValue (result, H_IDX);
+      lInRet = bitVectBitValue (result, L_IDX);
+    }
+  else
+    {
+      bInRet = FALSE;
+      cInRet = FALSE;
+      dInRet = FALSE;
+      eInRet = FALSE;
+      hInRet = FALSE;
+      lInRet = FALSE;
+    }
+
   /* adjust the stack for parameters if required */
   if (ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
     {
@@ -3970,7 +3995,7 @@ emitCall (const iCode *ic, bool ispcall)
 
       if (!regalloc_dry_run)
         _G.stack.pushed -= i;
-      if (IS_GB)
+      if (IS_GB && i > 2)
         {
           emit2 ("add sp, #%d", i);
           regalloc_dry_run_cost += 3;
@@ -3978,7 +4003,14 @@ emitCall (const iCode *ic, bool ispcall)
       else
         {
           spillCached ();
-          if (IS_R2K ? i > 127 * 4 - 1 : i > 8)
+          if ((IS_R2K ? i > 127 * 4 - 1 : i > (optimize.codeSize ? 8 : 5)) && !SomethingReturned)
+            {
+              emit2 ("ld hl,!immedword", i);
+              emit2 ("add hl,sp");
+              emit2 ("ld sp,hl");
+              regalloc_dry_run_cost += 5;
+            }
+          else if (IS_R2K ? i > 127 * 4 - 1 : i > 8)
             {
               emit2 ("ld iy,!immedword", i);
               emit2 ("add iy,sp");
@@ -4014,11 +4046,7 @@ emitCall (const iCode *ic, bool ispcall)
     }
 
   /* if we need assign a result value */
-  if ((IS_ITEMP (IC_RESULT (ic)) &&
-       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-        OP_SYMBOL (IC_RESULT (ic))->spildir ||
-        OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) ||
-      IS_TRUE_SYMOP (IC_RESULT (ic)))
+  if (SomethingReturned)
     {
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
 
@@ -4028,26 +4056,6 @@ emitCall (const iCode *ic, bool ispcall)
     }
 
   spillCached ();
-  
-  if (IC_RESULT (ic))
-    {
-      bitVect *result = z80_rUmaskForOp (IC_RESULT (ic));
-      bInRet = bitVectBitValue (result, B_IDX);
-      cInRet = bitVectBitValue (result, C_IDX);
-      dInRet = bitVectBitValue (result, D_IDX);
-      eInRet = bitVectBitValue (result, E_IDX);
-      hInRet = bitVectBitValue (result, H_IDX);
-      lInRet = bitVectBitValue (result, L_IDX);
-    }
-  else
-    {
-      bInRet = FALSE;
-      cInRet = FALSE;
-      dInRet = FALSE;
-      eInRet = FALSE;
-      hInRet = FALSE;
-      lInRet = FALSE;
-    }
 
   if (_G.stack.pushedIY)
     {
@@ -4117,7 +4125,7 @@ emitCall (const iCode *ic, bool ispcall)
     {
       if (hInRet && lInRet)
         {
-          wassertl (0, "Shouldn't push DE if it's wiped out by the return");
+          wassertl (0, "Shouldn't push HL if it's wiped out by the return");
         }
       else if (hInRet)
         {
@@ -8416,7 +8424,7 @@ genPointerGet (const iCode *ic)
     {
       if (IS_R2K && getPairId (AOP (result)) == PAIR_HL)
         {
-          emit2 ("ld hl, (iy)");
+          emit2 ("ld hl, 0 (iy)");
           regalloc_dry_run_cost += 3;
           goto release;
         }
@@ -8463,7 +8471,7 @@ genPointerGet (const iCode *ic)
       wassertl (size == 2, "HL must be of size 2");
       if (IS_R2K && getPairId (AOP (result)) == PAIR_HL)
         {
-          emit2 ("ld hl, (hl)");
+          emit2 ("ld hl, 0 (hl)");
           regalloc_dry_run_cost += 3;
         }
       else

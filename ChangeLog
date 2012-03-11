@@ -1,5 +1,13 @@
 2012-03-11 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCpeeph.c,
+	  src/z80/peeph-r2k.def,
+	  src/z80/peeph-z80.def,
+	  support/regression/tests/bug3501942.c:
+	  Fixed bug #3501942.
+
+2012-03-11 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fixed bug that made copying from hl to iy ineffcient on r2k, fix another check in commitPair(), improved stack adjustment after function call.
 

@@ -907,6 +907,19 @@ operandBaseName (const char *op)
       if (op[0] == '@')
         return operandBaseName(op+1);
     }
+  if (TARGET_Z80_LIKE)
+    {
+      if (!strcmp (op, "d") || !strcmp (op, "e") || !strcmp (op, "(de)"))
+        return "de";
+      if (!strcmp (op, "b") || !strcmp (op, "c") || !strcmp (op, "(bc)"))
+        return "bc";
+      if (!strcmp (op, "h") || !strcmp (op, "l") || strchr (op, "(hl)"))
+        return "hl";
+      if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || strchr (op, "(iy)"))
+        return "iy";
+      if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || strchr (op, "(ix)"))
+        return "ix";
+    }
 
   return op;
 }

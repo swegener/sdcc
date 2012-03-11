@@ -561,7 +561,7 @@ replace restart {
 	ld	%2, (hl)
 	inc	hl
 	ld	%3, (hl)
-} if notUsed('iy'), notUsed('hl'), operandsNotRelated(%2 'h'), operandsNotRelated(%2 'l')
+} if notUsed('iy'), notUsed('hl'), operandsNotRelated(%2 'hl')
 
 replace restart {
 	ld	iy,#%1
@@ -581,7 +581,7 @@ replace restart {
 	; peephole 49 used hl instead of iy.
 	ld	hl,#%1 + %2
 	ld	(hl), %4
-} if notUsed('iy'), notUsed('hl'), operandsNotRelated(%4 'h'), operandsNotRelated(%4 'l')
+} if notUsed('iy'), notUsed('hl'), operandsNotRelated(%4 'hl')
 
 replace restart {
 	ld	iy,#%1
@@ -652,7 +652,7 @@ replace restart {
 } by {
 	or	a,(hl)
 	; peephole 50 used (hl) directly instead of going through %1.
-} if notUsed(%1), operandsNotRelated(%1 'a')
+} if notUsed(%1), notSame(%1 'a')
 
 replace restart {
 	ld	c,l
@@ -1241,7 +1241,7 @@ replace restart {
 	ld	%1, a
 	; peephole 94 removed load by exploiting commutativity of addition.
 	add	a,%2
-} if operandsNotRelated(%2 '(bc)' '(de)'), canAssign('b' %2)
+} if notSame(%2 '(bc)' '(de)'), canAssign('b' %2)
 // canAssign('b' %2) is true, iff add a,%2 is possible.
 
 replace restart {
@@ -1800,7 +1800,7 @@ replace restart {
 	; peephole 138 used #%2 directly instead of going through %1 using indirect addressing.
 	pop	af
 	ld	%1,#%5
-} if operandsNotRelated(%3 'a')
+} if notSame(%3 'a')
 
 replace restart {
 	ld	%1,a

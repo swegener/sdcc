@@ -2069,7 +2069,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                 emit2 ("ld iy, hl");
                 regalloc_dry_run_cost += 2;
               }
-            if (isPair (aop))
+            else if (isPair (aop))
               {
                 emit2 ("push %s", _pairs[getPairId(aop)].name);
                 emit2 ("pop iy");

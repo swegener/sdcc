@@ -1,3 +1,9 @@
+2012-03-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-2001*.c,
+	  support/regression/tests/gcc-torture-execute-2003*.c:
+	  Added some more tests from the execute part of the gcc torture regression test suite.
+
 2012-03-12 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/TININative.txt: removed, available at 

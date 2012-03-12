@@ -1,3 +1,8 @@
+2012-03-12 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/TININative.txt: removed, available at 
+	  http://sourceforge.net/apps/trac/sdcc/wiki/Using%20SDCC%20to%20develop%20Native%20Java%20functions
+
 2012-03-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,
@@ -9,7 +14,9 @@
 2012-03-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Fixed bug that made copying from hl to iy ineffcient on r2k, fix another check in commitPair(), improved stack adjustment after function call.
+	  Fixed bug that made copying from hl to iy ineffcient on r2k,
+	  fix another check in commitPair(), improved stack adjustment
+	  after function call.
 
 2012-03-11 Raphael Neider <rneider AT web.de>
 

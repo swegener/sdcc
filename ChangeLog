@@ -2,6 +2,8 @@
 
 	* doc/TININative.txt: removed, available at 
 	  http://sourceforge.net/apps/trac/sdcc/wiki/Using%20SDCC%20to%20develop%20Native%20Java%20functions
+	* doc/Makefile.in:
+	  don't generate unusable html and txt versions of sdccman
 
 2012-03-11 Philipp Klaus Krause <pkk AT spth.de>
 

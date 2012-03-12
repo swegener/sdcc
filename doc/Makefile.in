@@ -7,13 +7,14 @@ PDFLATEX   = @PDFLATEX@
 MAKEINDEX  = @MAKEINDEX@
 PDFOPT     = @PDFOPT@
 
-QUIET	   = >/dev/null 2>/dev/null
+QUIET      = >/dev/null 2>/dev/null
 
 include ../Makefile.common
 
 MANUAL = sdccman
 
-all: $(MANUAL).pdf $(MANUAL).html/index.html $(MANUAL).txt
+#all: $(MANUAL).pdf $(MANUAL).html/index.html $(MANUAL).txt
+all: $(MANUAL).pdf
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(docdir)

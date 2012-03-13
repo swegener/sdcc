@@ -1,4 +1,11 @@
-2012-03-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-03-14 Borut Razem <borut.razem AT gmail.com>
+
+	* device/non-free/include/*, device/non-free/lib/*:
+	  added info about "The header files should state that they are
+	  only to be used with authentic Microchip devices" Microchip
+	  requirement and GPL incompatibility
+
+2012-03-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-20010224-1.c,
 	  support/regression/tests/gcc-torture-execute-20030714-1.c:

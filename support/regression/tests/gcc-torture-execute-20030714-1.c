@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
 /* derived from PR optimization/11440  */
 
 typedef _Bool bool;
@@ -175,11 +176,12 @@ bool RenderBox_isTableCell (RenderBox *this)
   (void) this;
   return false;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
-
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   g_this.m_relPositioned = false;
   g_this.m_positioned = false;
   g_this.m_floating = false;
@@ -198,5 +200,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }
 

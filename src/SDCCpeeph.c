@@ -913,11 +913,11 @@ operandBaseName (const char *op)
         return "de";
       if (!strcmp (op, "b") || !strcmp (op, "c") || !strcmp (op, "(bc)"))
         return "bc";
-      if (!strcmp (op, "h") || !strcmp (op, "l") || strchr (op, "(hl)"))
+      if (!strcmp (op, "h") || !strcmp (op, "l") || !strcmp (op, "(hl)"))
         return "hl";
-      if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || strchr (op, "(iy)"))
+      if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || !strcmp (op, "(iy)"))
         return "iy";
-      if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || strchr (op, "(ix)"))
+      if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || !strcmp (op, "(ix)"))
         return "ix";
     }
 
@@ -1116,7 +1116,7 @@ FBYNAME (operandsLiteral)
 
   for (op = setFirstItem (operands); op; op = setNextItem (operands))
     {
-      if (!isdigit(*op))
+      if (!isdigit( (unsigned char)(*op) ))
         {
           deleteSet (&operands);
           return FALSE;

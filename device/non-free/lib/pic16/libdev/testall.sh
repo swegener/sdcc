@@ -26,6 +26,7 @@ trap "cleanup" INT;
 
 cat > sample.c <<EOT
 #include <pic18fregs.h>
+#include <stdio.h>
 #pragma stack 0x00c0 0x40
 
 void foo(char *c)
@@ -38,6 +39,7 @@ void main()
 {
   PORTA = INTCON;
   LATB = TRISB;
+  printf_tiny("foo"); /* printf() is too large for the smallest devices ... */
 }
 EOT
 

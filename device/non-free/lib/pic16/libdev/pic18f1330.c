@@ -297,4 +297,5 @@ __sfr __at (0xFFE) TOSH;
 
 __sfr __at (0xFFF) TOSU;
 
-
+/* Hack to facilitate using stream_putchar with this family. */
+unsigned char SSPBUF;

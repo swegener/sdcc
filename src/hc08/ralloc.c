@@ -2624,7 +2624,6 @@ static int
 canUseAccOperand (iCode * ic, operand * op)
 {
   int size;
-  operand * otherOp;
 
   if (ic->op == IFX)
     {
@@ -2645,11 +2644,7 @@ canUseAccOperand (iCode * ic, operand * op)
   if (POINTER_SET (ic) && isOperandEqual (op, IC_RESULT (ic)))
     return 1;
 
-  if (isOperandEqual (op, IC_LEFT (ic)))
-    otherOp = IC_RIGHT (ic);
-  else if (isOperandEqual (op, IC_RIGHT (ic)))
-    otherOp = IC_LEFT (ic);
-  else
+  if (!isOperandEqual (op, IC_LEFT (ic)) && !isOperandEqual (op, IC_RIGHT (ic)))
     return 0;
 
   /* Generation of SEND is deferred until CALL; not safe */

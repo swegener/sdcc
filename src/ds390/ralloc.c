@@ -2608,7 +2608,7 @@ packRegsDPTRuse (operand * op)
   int i, key;
   symbol *sym;
   iCode *ic, *dic;
-  sym_link *type, *etype;
+  sym_link *type;
 
   if (!IS_SYMOP (op) || !IS_ITEMP (op))
     return NULL;
@@ -2652,7 +2652,7 @@ packRegsDPTRuse (operand * op)
         {
           if (OP_SYMBOL (IC_RESULT (ic))->liveTo == OP_SYMBOL (IC_RESULT (ic))->liveFrom)
             continue;
-          etype = getSpec (type = operandType (IC_RESULT (ic)));
+          type = operandType (IC_RESULT (ic));
           if (getSize (type) == 0 || isOperandEqual (op, IC_RESULT (ic)))
             continue;
           return NULL;

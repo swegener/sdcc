@@ -3467,7 +3467,6 @@ static void
 genPcall (iCode * ic)
 {
   sym_link *dtype;
-  sym_link *etype;
   symbol *rlbl = newiTempLabel (NULL);
   bool restoreBank = FALSE;
   bool resultInF0 = FALSE;
@@ -3475,7 +3474,6 @@ genPcall (iCode * ic)
   D (emitcode (";", "genPcall"));
 
   dtype = operandType (IC_LEFT (ic))->next;
-  etype = getSpec (dtype);
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);
@@ -6961,7 +6959,6 @@ gencjne (operand * left, operand * right, symbol * lbl)
 static void
 genCmpEq (iCode * ic, iCode * ifx)
 {
-  bool swappedLR = FALSE;
   operand *left, *right, *result;
   iCode *popIc = ic->next;
 
@@ -6976,7 +6973,6 @@ genCmpEq (iCode * ic, iCode * ifx)
   if ((AOP_TYPE (left) == AOP_LIT) || (IS_AOP_PREG (right) && !IS_AOP_PREG (left)))
     {
       swapOperands (&left, &right);
-      swappedLR = TRUE;
     }
 
   if (ifx &&                    /* !AOP_SIZE(result) */

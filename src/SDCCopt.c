@@ -916,31 +916,32 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
 static void
 convsmallc (iCode *ic, eBBlock *ebp)
 {
-  iCode *icc, *icp, *ico;
+  iCode *icc, *icp, *ico = NULL;
 
   assert (ic->op == CALL || ic->op == PCALL);
 
-  for(icc = ic->prev; icc && icc->op == IPUSH; icc = icc->prev);
+  for (icc = ic->prev; icc && icc->op == IPUSH; icc = icc->prev)
+    ;
   icp = icc;
   ic = icp->next;
 
   /* Reverse parameters. */
   for (icc = ic; icc->op != CALL && icc->op != PCALL; icc = icc->next)
     {
-      if(icc->next->op != CALL && icc->next->op != PCALL)
+      if (icc->next->op != CALL && icc->next->op != PCALL)
         icc->prev = icc->next;
       else
         icc->prev = icp;
     }
-  if(icc != ic)
+  if (icc != ic)
     {
-      if(icp)
+      if (icp)
         icp->next = icc->prev;
       icc->prev = ic;
     }
-  for(; icc != icp; ico = icc, icc = icc->prev)
+  for (; icc != icp; ico = icc, icc = icc->prev)
     {
-      if(icc->op != CALL && icc->op != PCALL)
+      if (icc->op != CALL && icc->op != PCALL)
         icc->next = ico;
     }
 }

@@ -2391,7 +2391,7 @@ static void
 genUminus (iCode * ic)
 {
   int offset, size;
-  sym_link *optype, *rtype;
+  sym_link *optype;
   char *sub;
   bool needpula;
   asmop *result;
@@ -2403,7 +2403,6 @@ genUminus (iCode * ic)
   aopOp (IC_RESULT (ic), ic, TRUE);
 
   optype = operandType (IC_LEFT (ic));
-  rtype = operandType (IC_RESULT (ic));
 
   /* if float then do float stuff */
   if (IS_FLOAT (optype))
@@ -7835,15 +7834,11 @@ genPointerSet (iCode * ic, iCode *pi)
 {
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
-  sym_link *type, *etype;
   int size, offset;
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
   D(emitcode (";     genPointerSet",""));
-
-  type = operandType (result);
-  etype = getSpec (type);
 
   aopOp (result, ic, FALSE);
 
@@ -8189,26 +8184,9 @@ genCast (iCode * ic)
   /* if the result is of type pointer */
   if (IS_PTR (ctype))
     {
-      int p_type;
-      sym_link *type = operandType (right);
-      sym_link *etype = getSpec (type);
-
       /* pointer to generic pointer */
       if (IS_GENPTR (ctype))
         {
-          if (IS_PTR (type))
-            p_type = DCL_TYPE (type);
-          else
-            {
-              if (SPEC_SCLS(etype)==S_REGISTER) {
-                // let's assume it is a generic pointer
-                p_type=GPOINTER;
-              } else {
-                /* we have to go by the storage class */
-                p_type = PTR_TYPE (SPEC_OCLS (etype));
-              }
-            }
-
           /* the first two bytes are known */
           size = GPTRSIZE - 1;
           offset = 0;

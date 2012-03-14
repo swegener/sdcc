@@ -2071,9 +2071,8 @@ sigintr(int sig)
 static void sigchld(int sig)
 {
   /* the only child can be the simulator */
-  int status, retpid;
-  retpid = wait ( &status );
-  /* if ( retpid == simPid ) */
+  int status;
+  wait ( &status );
   simactive = 0;
 }
 #endif

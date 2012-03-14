@@ -47,23 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //                        class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_gui_start_cmd)
 {
-  class cl_hw *hw;
-  class cl_memory *mem;
-  t_addr start, end;
-  class cl_cmd_arg *params[4]= { cmdline->param(0),
-                                 cmdline->param(1),
-                                 cmdline->param(2),
-                                 cmdline->param(3) };
-
-  if (cmdline->syntax_match(uc, HW)) {
-    hw= params[0]->value.hw;
-  }
-  else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
-    mem= params[0]->value.memory.memory;
-    start= params[1]->value.address;
-    end= params[2]->value.address;
-  }
-  else
+  if (!cmdline->syntax_match(uc, HW) && !cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS))
     {
       con->dd_printf("Error: wrong syntax\n"
                      "%s\n", short_help?short_help:"no help");

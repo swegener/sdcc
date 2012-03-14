@@ -207,13 +207,11 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 //                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_APP(cl_help_cmd)
 {
-  class cl_sim *sim;
   class cl_commander_base *commander;
   class cl_cmdset *cmdset= 0;
   int i;
   class cl_cmd_arg *parm= cmdline->param(0);
 
-  sim= app->get_sim();
   if ((commander= app->get_commander()) != 0)
     cmdset= commander->cmdset;
   if (!cmdset)

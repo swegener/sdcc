@@ -377,7 +377,7 @@ write_rmode(int r)
 VOID
 outrb(struct expr *esp, int r)
 {
-        a_uint m, n;
+        a_uint n;
 
         if (pass == 2) {
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
@@ -385,7 +385,7 @@ outrb(struct expr *esp, int r)
                          * const byte to the T line and don't
                          * generate any relocation info.
                          */
-			m = (a_uint) ~0x0000007F;	n = (a_uint) ~0x000000FF;		/* 1 byte  */
+			n = (a_uint) ~0x000000FF;		/* 1 byte  */
 			/*
 			 * Page0 Range Check
 			 */

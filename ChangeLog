@@ -1,3 +1,13 @@
+2012-03-14 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/sdcdb.c, src/mcs51/gen.c, src/SDCCopt.c,
+	  src/hc08/gen.c, src/hc08/ralloc.c, src/ds390/gen.c,
+	  src/ds390/ralloc.c, sim/ucsim/cmd.src/cmdset.cc,
+	  sim/ucsim/cmd.src/cmdstat.cc, sim/ucsim/cmd.src/cmdgui.cc,
+	  sim/ucsim/z80.src/inst.cci, sdas/asxxsrc/asout.c:
+	  fixed gcc 4.6.1 warnimgs, mainly warning: 'xxx' may be used
+	  uninitialized in this function [-Wuninitialized] 
+
 2012-03-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.c,

@@ -6265,7 +6265,6 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 {
   int size = max (AOP_SIZE (left), AOP_SIZE (right));
   int offset = 0;
-  unsigned long lit = 0L;
 
   D (emitcode (";", "gencjneshort"));
 
@@ -6280,9 +6279,6 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       right = left;
       left = t;
     }
-
-  if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   /* generic pointers require special handling since all NULL pointers must compare equal */
   if (opIsGptr (left) || opIsGptr (right))

@@ -10,8 +10,10 @@
 #endif
 
 #ifndef __SDCC_mcs51
+#ifndef __SDCC_gbz80
 #ifndef __SDCC_hc08
-double x[100][100];
+double x[100][100]; /* Too big for mcs51 and gbz80. */
+#endif
 #endif
 #endif
 void

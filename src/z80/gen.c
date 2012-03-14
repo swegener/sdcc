@@ -4654,8 +4654,6 @@ genPlusIncr (const iCode *ic)
   if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
     return FALSE;
 
-  emitDebug ("; genPlusIncr");
-
   icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
   /* If result is a pair */
@@ -5557,12 +5555,9 @@ genMultOneChar (const iCode * ic)
       return;
     }
 
-  if (IS_Z180 &&
-    /*AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&*/ AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+  if (IS_Z180 && AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
     {
-      if (/*(AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == B_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX ||
-        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == B_IDX) &&*/
-        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == B_IDX : !bitVectBitValue (ic->rSurv, B_IDX)) && result->aopu.aop_reg[0]->rIdx == C_IDX)
+      if ((resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == B_IDX : !bitVectBitValue (ic->rSurv, B_IDX)) && result->aopu.aop_reg[0]->rIdx == C_IDX)
         {
           if(AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX ||
             AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == B_IDX)
@@ -5579,9 +5574,7 @@ genMultOneChar (const iCode * ic)
           regalloc_dry_run_cost += 2;
           return;
         }
-      if (/*(AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == D_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
-        AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX) &&*/
-        (resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == D_IDX : !bitVectBitValue (ic->rSurv, D_IDX)) && result->aopu.aop_reg[0]->rIdx == E_IDX)
+      if ((resultsize > 1 ? result->aopu.aop_reg[1]->rIdx == D_IDX : !bitVectBitValue (ic->rSurv, D_IDX)) && result->aopu.aop_reg[0]->rIdx == E_IDX)
         {
           if(AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX ||
             AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX)

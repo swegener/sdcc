@@ -25,14 +25,16 @@
 
 static void foo ()
 {
+#ifndef __SDCC_gbz80
 #ifndef __SDCC_mcs51
-    char a[ARRAY_SIZE];
+    char a[ARRAY_SIZE]; /* Too big for mcs51 and gbz80. */
 
     a[0]=0;
     memset( &a[0], 0xCD, STRLEN );
     a[STRLEN]=0;
     if (strlen(a) != STRLEN)
       ASSERT (0);
+#endif
 #endif
 }
 

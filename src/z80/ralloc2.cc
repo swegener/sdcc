@@ -496,7 +496,7 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
   if(ia.registers[REG_A][1] < 0)
     return(true);	// Register A not in use.
 
-  //if(i == 15) std::cout << "Ainst_ok: A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
+  //std::cout << "Ainst_ok: A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
 
   // Code generator cannot handle variables that are only partially in A.
   if(I[ia.registers[REG_A][1]].size > 1 || ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1)
@@ -550,14 +550,15 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
   if(input_in_A && (result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end()))
     {
       if(ic->op != IFX &&
+        ic->op != RETURN &&
         !((ic->op == RIGHT_OP || ic->op == LEFT_OP) && (IS_OP_LITERAL(IC_RIGHT(ic)) || operand_in_reg(IC_RIGHT(ic), REG_A, ia, i, G))) &&
         !((ic->op == '=' || ic->op == CAST) && !(IY_RESERVED && POINTER_SET(ic))) &&
         !IS_BITWISE_OP (ic) &&
         !(ic->op == '~') &&
-        !(ic->op == '*' && IS_ITEMP(IC_LEFT(ic)) && IS_ITEMP(IC_RIGHT(ic))) &&
+        !(ic->op == '*' && (IS_ITEMP(IC_LEFT(ic)) || IS_OP_LITERAL(IC_LEFT(ic))) && (IS_ITEMP(IC_RIGHT(ic)) || IS_OP_LITERAL(IC_RIGHT(ic)))) &&
         !((ic->op == '-' || ic->op == '+' || ic->op == EQ_OP) && IS_OP_LITERAL(IC_RIGHT(ic))))
         {
-          //if(i == 15) std::cout << "Last use: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << ")\n";
+          //std::cout << "Last use: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << ")\n";
           return(false);
         }
     }
@@ -575,6 +576,7 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
       !POINTER_GET(ic) &&
       ic->op != '+' &&
       ic->op != '-' &&
+      (ic->op != '*' || !IS_OP_LITERAL(IC_LEFT(ic)) && !IS_OP_LITERAL(IC_RIGHT(ic))) &&
       !IS_BITWISE_OP(ic) &&
       ic->op != '=' &&
       ic->op != EQ_OP &&
@@ -586,11 +588,11 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
       ic->op != GETHBIT &&
       !((ic->op == LEFT_OP || ic->op == RIGHT_OP) && IS_OP_LITERAL(IC_RIGHT(ic))))
     {
-      //if(i == 15) std::cout << "First use: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
+      //std::cout << "First use: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
       return(false);
     }
 
-  //if(i == 15) std::cout << "Default OK\n";
+  //std::cout << "Default OK\n";
 
   return(true);
 }

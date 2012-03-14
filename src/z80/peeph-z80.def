@@ -925,6 +925,14 @@ replace {
 }
 
 replace {
+	ld	d,#0x%1
+	ld	e,#0x%2
+} by {
+	ld	de,#0x%1%2
+	; peephole 67a combined constant loads into register pair.
+}
+
+replace {
 	ld	l,#0x%1
 	ld	h,#0x%2
 } by {
@@ -933,11 +941,27 @@ replace {
 }
 
 replace {
+	ld	h,#0x%1
+	ld	l,#0x%2
+} by {
+	ld	hl,#0x%1%2
+	; peephole 68a combined constant loads into register pair.
+}
+
+replace {
 	ld	c,#0x%1
 	ld	b,#0x%2
 } by {
 	ld	bc,#0x%2%1
 	; peephole 69 combined constant loads into register pair.
+}
+
+replace {
+	ld	b,#0x%1
+	ld	c,#0x%2
+} by {
+	ld	bc,#0x%1%2
+	; peephole 69a combined constant loads into register pair.
 }
 
 replace restart {

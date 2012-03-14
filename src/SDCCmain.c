@@ -1963,56 +1963,82 @@ preProcess (char **envp)
       /* if using external stack define the macro */
       if (options.useXstack)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_USE_XSTACK"));
+      if (options.std_sdcc && options.useXstack)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_USE_XSTACK"));
 
       /* set the macro for stack autos  */
       if (options.stackAuto)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_STACK_AUTO"));
+      if (options.std_sdcc && options.stackAuto)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_STACK_AUTO"));
 
       /* set the macro for stack autos  */
       if (options.stack10bit)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_STACK_TENBIT"));
+      if (options.std_sdcc && options.stack10bit)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_STACK_TENBIT"));
 
       /* set the macro for no overlay  */
       if (options.noOverlay)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_NOOVERLAY"));
+      if (options.std_sdcc && options.noOverlay)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_NOOVERLAY"));
 
       /* set the macro for unsigned char  */
       if (options.unsigned_char)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_UNSIGNED"));
+      if (options.std_sdcc && options.unsigned_char)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_CHAR_UNSIGNED"));
 
       /* set the macro for non-free  */
       if (options.use_non_free)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_USE_NON_FREE"));
+      if (options.std_sdcc && options.use_non_free)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_USE_NON_FREE"));
 
       /* set the macro for large model  */
       switch (options.model)
         {
         case MODEL_LARGE:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_LARGE"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_LARGE"));
           break;
 
         case MODEL_SMALL:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_SMALL"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_SMALL"));
           break;
 
         case MODEL_COMPACT:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_COMPACT"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_COMPACT"));
           break;
 
         case MODEL_MEDIUM:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_MEDIUM"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_MEDIUM"));
           break;
 
         case MODEL_HUGE:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_HUGE"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_HUGE"));
           break;
 
         case MODEL_FLAT24:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_FLAT24"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_FLAT24"));
           break;
 
         case MODEL_PAGE0:
           addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_PAGE0"));
+          if (options.std_sdcc)
+            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_PAGE0"));
           break;
 
         case NO_MODEL:
@@ -2026,10 +2052,14 @@ preProcess (char **envp)
       /* set macro corresponding to compiler option */
       if (options.intlong_rent)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_INT_LONG_REENT"));
+      if (options.std_sdcc && options.intlong_rent)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_INT_LONG_REENT"));
 
       /* set macro corresponding to compiler option */
       if (options.float_rent)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_FLOAT_REENT"));
+      if (options.std_sdcc && options.float_rent)
+        addSet (&preArgvSet, Safe_strdup ("-DSDCC_FLOAT_REENT"));
 
       /* add SDCC version number */
       {
@@ -2039,6 +2069,14 @@ preProcess (char **envp)
         dbuf_printf (&dbuf, "-D__SDCC=%d_%d_%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
+      if (options.std_sdcc)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 20);
+          dbuf_printf (&dbuf, "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
 
       /* add SDCC revision number */
       {
@@ -2048,9 +2086,22 @@ preProcess (char **envp)
         dbuf_printf (&dbuf, "-D__SDCC_REVISION=%s", getBuildNumber ());
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
+      if (options.std_sdcc)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 20);        
+          dbuf_printf (&dbuf, "-DSDCC_REVISION=%s", getBuildNumber ());
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
 
       /* add port (processor information to processor */
       addSet (&preArgvSet, Safe_strdup ("-D__SDCC_{port}"));
+      if (options.std_sdcc)
+        {
+          addSet (&preArgvSet, Safe_strdup ("-DSDCC_{port}"));
+          addSet (&preArgvSet, Safe_strdup ("-D__{port}"));
+        }
 
       if (port && port->processor && TARGET_IS_PIC14)
         {
@@ -2058,6 +2109,14 @@ preProcess (char **envp)
 
           dbuf_init (&dbuf, 512);        
           dbuf_printf (&dbuf, "-D__SDCC_PROCESSOR=\"%s\"", port->processor);
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
+      if (options.std_sdcc && port && port->processor && TARGET_IS_PIC14)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 512);        
+          dbuf_printf (&dbuf, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
           addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
         }
 
@@ -2549,3 +2608,4 @@ main (int argc, char **argv, char **envp)
 
   return 0;
 }
+

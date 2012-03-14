@@ -2219,19 +2219,12 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
           ic->op == UNARYMINUS ||
           ic->op == RETURN ||
           ic->op == RIGHT_OP ||
-          ic->op == '-' ||
+          (ic->op == '-'  && getSize (operandType (IC_RESULT (ic))) == 1) ||
           ic->op == BITWISEAND ||
           ic->op == '|' ||
           ic->op == '>' || ic->op == '<' || ic->op == EQ_OP || (ic->op == '+' && getSize (operandType (IC_RESULT (ic))) == 1))
         /* 16 bit addition uses add hl, rr */
         continue;
-
-      /* Strangely this leads to a code size increase for some functions. */
-      if(!z80_opts.oldralloc)
-        {
-          if (ic->op == '+' && getSize (operandType (IC_RESULT (ic))) == 2 && isOperandEqual (op, IC_RESULT (ic)))
-            continue;
-        }
 
       if (ic->op == '*' && isOperandEqual (op, IC_LEFT (ic)))
         continue;

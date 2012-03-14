@@ -1,3 +1,16 @@
+2012-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c,
+	  support/regression/tests/bug3502965.c:
+	  Fixed bug #3502965.
+	* support/regression/tests/gcc-torture-execute-20030209-1.c,
+	  support/regression/tests/gcc-torture-execute-20031012-1.c:
+	  Added explanation for why tests don't work on gbz80.
+	* src/SDCCmain.c:
+	  Reenable non-compliant SDCC macros (but not for --std-c89, --std-c99, --std-c11).
+	* src/z80/ralloc2.cc:
+	  More flecible handling of accumulator in multipliation and return.
+
 2012-03-14 Borut Razem <borut.razem AT gmail.com>
 
 	* device/non-free/include/*, device/non-free/lib/*:
@@ -5,7 +18,7 @@
 	  only to be used with authentic Microchip devices" Microchip
 	  requirement and GPL incompatibility
 
-2012-03-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-03-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-20010224-1.c,
 	  support/regression/tests/gcc-torture-execute-20030714-1.c:

@@ -1,17 +1,17 @@
-/* 
+/*
  * pic18f2455.h - PIC18F2455 Device Library Sources
- * 
+ *
  * This file is part of the GNU PIC Library.
- * 
+ *
  * May, 2005
  * The GNU PIC Library is maintained by
  *     Raphael Neider <rneider AT web.de>
- * 
+ *
  * originally designed by
  *     Vangelis Rokas <vrokas@otenet.gr>
- * 
+ *
  * $Id$
- * 
+ *
  */
 
 #include <pic18f2455.h>

@@ -15,12 +15,12 @@
 #undef __CONFIG3H
 
 // Configuration Bits
-#define	__CONFIG1L          	0xFFF8
-#define	__CONFIG1H          	0xFFF9
-#define	__CONFIG2L          	0xFFFA
-#define	__CONFIG2H          	0xFFFB
-#define	__CONFIG3L          	0xFFFC
-#define	__CONFIG3H          	0xFFFD
+#define __CONFIG1L              0xFFF8
+#define __CONFIG1H              0xFFF9
+#define __CONFIG2L              0xFFFA
+#define __CONFIG2H              0xFFFB
+#define __CONFIG3L              0xFFFC
+#define __CONFIG3H              0xFFFD
 
 #endif
 

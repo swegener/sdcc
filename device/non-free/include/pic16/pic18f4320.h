@@ -1,4 +1,4 @@
-/* 
+/*
  * pic18f4320.h - PIC18F4320 Device Library Header
  */
 

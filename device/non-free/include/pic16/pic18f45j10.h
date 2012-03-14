@@ -1,4 +1,4 @@
-/* 
+/*
  * pic18f45j10.h - device specific declarations
  */
 

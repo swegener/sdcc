@@ -15,12 +15,12 @@
 #undef __CONFIG3L
 #undef __CONFIG3H
 
-#define	__CONFIG1L          	0x7FF8
-#define	__CONFIG1H          	0x7FF9
-#define	__CONFIG2L          	0x7FFA
-#define	__CONFIG2H          	0x7FFB
-#define	__CONFIG3L          	0x7FFC
-#define	__CONFIG3H          	0x7FFD
+#define __CONFIG1L              0x7FF8
+#define __CONFIG1H              0x7FF9
+#define __CONFIG2L              0x7FFA
+#define __CONFIG2H              0x7FFB
+#define __CONFIG3L              0x7FFC
+#define __CONFIG3H              0x7FFD
 
 #endif
 

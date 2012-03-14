@@ -5,7 +5,7 @@
  *
  * January, 2004
  * The GNU PIC Library is maintained by,
- * 	Vangelis Rokas <vrokas@otenet.gr>
+ *      Vangelis Rokas <vrokas@otenet.gr>
  *
  * $Id$
  *

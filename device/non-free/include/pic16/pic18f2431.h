@@ -1,4 +1,4 @@
-/* 
+/*
  * pic18f2431.h - device specific declarations
  */
 

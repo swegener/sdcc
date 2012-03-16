@@ -516,6 +516,7 @@ a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map,
 {
         a_uint i, j, k;
         unsigned long mask, b;
+        map_size /= sizeof(*map); /* Convert from bytes to number of elements */
 
         while (1) {
                 a_uint a = start;
@@ -523,8 +524,9 @@ a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map,
                 j = (start + size) >> 5;
                 mask = -(1 << (start & 0x1F));
 
-                if (j >= map_size) {
+                if (j > map_size) {
                         fprintf(stderr, "internal memory limit is exceeded for %s; memory size = 0x%06X, address = 0x%06X\n", id, map_size << 5, start + size - 1);
+                        break;
                 }
                 else {
                         while (i < j) {
@@ -545,7 +547,7 @@ a_uint find_empty_space(a_uint start, a_uint size, char *id, unsigned long *map,
                                 continue;
 
                         mask &= (1 << ((start + size) & 0x1F)) - 1;
-                        if (map[i] & mask) {
+                        if (i < map_size && map[i] & mask) {
                                 k = 32;
                                 for (b=0x80000000; b!=0; b>>=1, k--) {
                                         if (map[i] & b)
@@ -569,8 +571,9 @@ a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  
         i = start >> 5;
         j = (start + size) >> 5;
         mask = -(1 << (start & 0x1F));
+        map_size /= sizeof(*map); /* Convert from bytes to number of elements */
 
-        if (j >= map_size) {
+        if (j > map_size) {
                 fprintf(stderr, "internal memory limit is exceeded for %s; memory size = 0x%06X, address = 0x%06X\n", id, map_size << 5, start + size - 1);
         }
         else {
@@ -583,7 +586,7 @@ a_uint allocate_space(a_uint start, a_uint size, char *id, unsigned long *map,  
                         a += 32;
                 }
                 mask &= (1 << ((start + size) & 0x1F)) - 1;
-                if (map[i] & mask) {
+                if (i < map_size && map[i] & mask) {
                         fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
                 }
                 map[i] |= mask;

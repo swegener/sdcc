@@ -1,3 +1,8 @@
+2012-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sdas/linksrc/lkarea.c (allocate_space,find_empty_space): fixed bound
+	  checking errors on allocation bitmap (possbile fix for bug #3502626)
+
 2012-03-11 Raphael Neider <rneider AT web.de>
 
 	* device/non-free/lib/pic16/libdev/pic18f1330.c:
@@ -26,7 +31,7 @@
 	* src/SDCCmain.c:
 	  Reenable non-compliant SDCC macros (but not for --std-c89, --std-c99, --std-c11).
 	* src/z80/ralloc2.cc:
-	  More flecible handling of accumulator in multipliation and return.
+	  More flexible handling of accumulator in multiplication and return.
 
 2012-03-14 Borut Razem <borut.razem AT gmail.com>
 

@@ -7,6 +7,9 @@
 	  src\SDCCast.c, src\SDCCast.h, src\pic16\main.c:
 	  implemeted pragma config for pic16 target, solution
 	  of bug #3486890 - pic16 port config directive warning
+	* src/Makefile.in, src/sdcc.vcxproj:
+	  fixed bug #3506236: sdcc.exe unicode problem? by generating
+	  8-bit scanner
 
 2012-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -236,7 +236,7 @@ printILine (iCode * ic)
   dbuf_init (&tmpBuf, 1024);
 
   if (INLINEASM == ic->op)
-    dbuf_append (&tmpBuf, "inline", (sizeof "inline") - 1);
+    dbuf_append_str (&tmpBuf, "inline");
   else
     {
       /* stuff the temporary file with the readable icode */

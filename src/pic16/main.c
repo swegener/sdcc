@@ -163,8 +163,71 @@ enum {
   P_STACK = 1,
   P_CODE,
   P_UDATA,
-  P_LIBRARY
+  P_LIBRARY,
+  P_CONFIG
 };
+
+static char *
+check_config_string(const char *str)
+{
+  const char *begin, *p = str;
+  struct dbuf_s dbuf;
+  bool first = TRUE;
+
+  dbuf_init(&dbuf, 128);
+
+  do
+    {
+      if (first)
+        first = FALSE;
+      else
+        dbuf_append_char(&dbuf, ',');
+
+      if (',' == *p)
+        ++p;
+
+      if (isalpha(*p))
+        {
+          begin = p++;
+          while (isalnum(*p))
+            ++p;
+          dbuf_append(&dbuf, begin, p - begin);
+        }
+      else
+        goto error;
+
+      while (isspace(*p))
+        ++p;
+
+      if ('=' == *p)
+        dbuf_append_char(&dbuf, *p++);
+      else
+        goto error;
+
+      while (isspace(*p))
+        ++p;
+
+      if (isalnum(*p))
+        {
+          begin = p++;
+          while (isalnum(*p))
+            ++p;
+          dbuf_append(&dbuf, begin, p - begin);
+        }
+      else
+        goto error;
+
+      if (',' == *p)
+        ++p;
+    }
+  while ('\0' != *p);
+
+  return dbuf_detach_c_str(&dbuf);
+
+error:
+  dbuf_destroy(&dbuf);
+  return NULL;
+}
 
 static int
 do_pragma (int id, const char *name, const char *cp)
@@ -435,6 +498,44 @@ do_pragma (int id, const char *name, const char *cp)
       }
       break;
 
+    case P_CONFIG:
+      {
+        const char *str, *str_raw;
+        struct dbuf_s dbuf;
+        bool first = 1;
+
+        dbuf_init(&dbuf, 128);
+        dbuf_append_str(&dbuf, "CONFIG\t");
+
+        do
+          {
+            cp = get_pragma_token(cp, &token);
+            if (TOKEN_EOL != token.type)
+              {
+                str_raw = get_pragma_string(&token);
+                if (str = check_config_string(str_raw))
+                  {
+                    if (!first)
+                      dbuf_append_char(&dbuf, ',');
+                    else
+                      first = 0;
+                    dbuf_append_str(&dbuf, str);
+                    dbuf_free(str);
+                  }
+                else
+                  {
+                    dbuf_free(str);
+                    err = 1;
+                    break;
+                  }
+              }
+          }
+        while (TOKEN_EOL != token.type);
+
+        createConfigure(NULL, dbuf_detach_c_str(&dbuf));
+      }
+      break;
+
 #if 0
   /* This is an experimental code for #pragma inline
      and is temporarily disabled for 2.5.0 release */
@@ -465,7 +566,7 @@ do_pragma (int id, const char *name, const char *cp)
 
   get_pragma_token(cp, &token);
 
-  if (1 == err)
+  if (1 == err || token.type != TOKEN_EOL)
     werror(W_BAD_PRAGMA_ARGUMENTS, name);
 
   free_pragma_token(&token);
@@ -477,6 +578,7 @@ static struct pragma_s pragma_tbl[] = {
   { "code",    P_CODE,    0, do_pragma },
   { "udata",   P_UDATA,   0, do_pragma },
   { "library", P_LIBRARY, 0, do_pragma },
+  { "config",  P_CONFIG,  0, do_pragma },
 /*{ "inline",  P_INLINE,  0, do_pragma }, */
   { NULL,      0,         0, NULL },
   };

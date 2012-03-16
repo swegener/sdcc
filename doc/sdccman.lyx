@@ -2435,6 +2435,18 @@ reference "sub:ANSI-Compliance"
  ANSI-Compliance.
 \end_layout
 
+\begin_layout Itemize
+pragma config for pic16 target was introduced in version 3.2.0.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PIC16_Pragmas"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -45613,10 +45625,6 @@ The old format (ie.
 \end_inset
 
 The format is as follows:
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout LyX-Code
@@ -45707,7 +45715,30 @@ Example:
 \end_layout
 
 \begin_layout Description
-library instructs the linker to use a library module.
+library
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+PIC16!Pragmas!
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma library
+\end_layout
+
+\end_inset
+
+ instructs the linker to use a library module.
 \begin_inset Newline newline
 \end_inset
 
@@ -45962,8 +45993,31 @@ ignore
 \end_layout
 
 \begin_layout Description
-udata The pragma udata instructs the compiler to emit code so that linker
- will place a variable at a specific memory bank.
+udata
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+PIC16!Pragmas!
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma udata
+\end_layout
+
+\end_inset
+
+ The pragma udata instructs the compiler to emit code so that linker will
+ place a variable at a specific memory bank.
 \end_layout
 
 \begin_layout LyX-Code
@@ -46104,6 +46158,69 @@ SECTION    NAME=bank5      RAM=gpr5
 The linker will recognise the section name set in the pragma statement and
  will position the variable at the memory bank set with the RAM field at
  the SECTION line in the linker script file.
+\end_layout
+
+\begin_layout Description
+config
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+PIC16!Pragmas!
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma config
+\end_layout
+
+\end_inset
+
+ The pragma config instructs the compiler to emit config directive.
+\begin_inset Newline newline
+\end_inset
+
+The format is as follows:
+\end_layout
+
+\begin_layout LyX-Code
+#pragma config setting=value [, setting=value]
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+Multiple settings may be defined on a single line, separated by commas.
+ Settings for a single configuration byte may also be defined on separate
+ lines.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+#pragma configure CP0=OFF,OSCS=ON,OSC=LP,BOR=ON,BORV=25,WDT=ON,WDTPS=128,CCP2MUX
+=ON
+\end_layout
+
+\begin_layout LyX-Code
+#pragma configure STVR=ON 
 \end_layout
 
 \begin_layout Subsection

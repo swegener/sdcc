@@ -66,7 +66,7 @@ typedef struct ast
   /* union for special processing */
   union
   {
-    char *inlineasm;            /* pointer to inline assembler code */
+    const char *inlineasm;      /* pointer to inline assembler code */
     literalList *constlist;     /* init list for array initializer. */
     symbol *sym;                /* if block then -> symbols */
     value *args;                /* if function then args    */
@@ -201,6 +201,7 @@ ast *offsetofOp (sym_link * type, ast * snd);
 value *evalStmnt (ast *);
 ast *createRMW (ast *, unsigned, ast *);
 ast *createFunction (symbol *, ast *);
+ast *createConfigure (ast *, const char * str);
 ast *createBlock (symbol *, ast *);
 ast *createLabel (symbol *, ast *);
 ast *createCase (ast *, ast *, ast *);

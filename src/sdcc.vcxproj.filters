@@ -152,6 +152,7 @@
     <ClCompile Include="sdcclex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDCCnaddr.cc" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\support\scripts\resource.rc">
@@ -259,6 +260,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="spawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCnaddr.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

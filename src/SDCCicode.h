@@ -185,7 +185,7 @@ typedef struct iCode
 
   symbol *label;                /* for a goto statement     */
 
-  char *inlineAsm;              /* pointer to inline assembler code */
+  const char *inlineAsm;        /* pointer to inline assembler code */
   literalList *arrayInitList;   /* point to array initializer list. */
 
   int lineno;                   /* file & lineno for debug information */

@@ -1158,7 +1158,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
         {
                 if ((locIndex == 1) && tap->a_size)
                 {
-                        addr = find_empty_space(addr, tap->a_size, tap->a_id, codemap8051, sizeof (codemap6808));
+                        addr = find_empty_space(addr, tap->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
                 }
                 if ((locIndex == 2) && tap->a_size)
                 {

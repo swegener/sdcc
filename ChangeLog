@@ -1,3 +1,8 @@
+2012-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sdas/linksrc/lkarea.c (lnksect2): applied fix from Tim Schuerewegen
+	  (bug 3495316)
+
 2012-03-16 Borut Razem <borut.razem AT gmail.com>
 
 	* sdcc.sln, src\sdcc.vcxproj, src\sdcc.vcxproj.filters,

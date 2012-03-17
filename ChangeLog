@@ -1,3 +1,17 @@
+2012-03-17 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/tests/strstr.c,
+	  support/regression/tests/strcpy.c,
+	  support/regression/tests/strcmp.c,
+	  support/regression/tests/strtok.c,
+	  support/regression/tests/strncmp.c,
+	  support/regression/tests/strspn.c,
+	  support/regression/tests/strpbrk.c,
+	  support/regression/tests/string.c:
+	  merged strstr.c, strcpy.c, strcmp.c, strtok.c, strncmp.c,
+	  strspn.c, and strpbrk.c to string.c, added test for
+	  bug #3506236
+
 2012-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sdas/linksrc/lkarea.c (lnksect2): applied fix from Tim Schuerewegen
@@ -21,7 +35,7 @@
 	* sdas/linksrc/lkarea.c (allocate_space,find_empty_space): fixed bound
 	  checking errors on allocation bitmap (possbile fix for bug #3502626)
 
-2012-03-11 Raphael Neider <rneider AT web.de>
+2012-03-16 Raphael Neider <rneider AT web.de>
 
 	* device/non-free/lib/pic16/libdev/pic18f1330.c:
 	  add dummy SSPBUF symbol as required by __stream_putchar/printf

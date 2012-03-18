@@ -22,10 +22,7 @@
     <CustomBuild Include="bin_vc\sdcclib.exe" />
     <CustomBuild Include="bin_vc\sdcpp.exe" />
     <CustomBuild Include="bin_vc\sdld.exe" />
-    <CustomBuild Include="bin_vc\sdld6808.exe" />
-    <CustomBuild Include="bin_vc\sdldgb.exe" />
-    <CustomBuild Include="bin_vc\sdldz80.exe" />
-    <CustomBuild Include="bin_vc\asranlib.exe" />
     <CustomBuild Include="bin_vc\sdcdb.exe" />
+    <CustomBuild Include="bin_vc\sdranlib.exe" />
   </ItemGroup>
 </Project>

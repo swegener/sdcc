@@ -15,7 +15,8 @@
 	* config.vcxproj, src/ds390/ds390.vcxproj,
 	  src/hc08/hc08.vcxproj, src/mcs51/mcs51.vcxproj,
 	  src/pic14/pic14.vcxproj, src/pic16/pic16.vcxproj,
-	  src/sdcc.vcxproj, src/yacc.vcxproj, src/z80/z80.vcxproj:
+	  src/sdcc.vcxproj, src/yacc.vcxproj, src/z80/z80.vcxproj,
+	  all.vcxproj, all.vcxproj.filters:
 	  VS project enhancements
 	* src/SDCC.y, src/SDCCsymt.h, src/SDCCutil.c, src/SDCCutil.h,
 	  src/SDCCval.c: fixed flaws in previous commit

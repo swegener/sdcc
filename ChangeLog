@@ -1,3 +1,18 @@
+2012-03-18 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx,src/avr/gen.c, src/ds390/gen.c,
+	  src/hc08/gen.c, src/mcs51/gen.c, src/pic14/gen.c,
+	  src/pic16/device.c, src/pic16/gen.c, src/pic16/glue.c,
+	  src/pic16/pcode.c, src/SDCC.lex, src/SDCC.y, src/SDCCast.c,
+	  src/SDCCglue.c, src/SDCCsymt.h, src/SDCCutil.c,
+	  src/SDCCutil.h, src/SDCCval.c:
+	  implemented feature request #2815320 - please add asm()
+	  pseudo function as alternate
+	* sdcc.sln, src/sdcc.vcxproj, src/sdcc.vcxproj.filters,
+	  src/yacc.vcxproj:
+	  re-itroduced yacc project
+	* .version, doc/sdccman.lyx: bumped version to 3.1.4
+
 2012-03-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (aopGet, aopPut),

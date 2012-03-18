@@ -65,7 +65,7 @@ extern void printPublics (FILE * afile);
 
 void  pic16_pCodeInitRegisters (void);
 pCodeOp *pic16_popCopyReg (pCodeOpReg *pc);
-extern void pic16_pCodeConstString (char *name, char *value, unsigned length);
+extern void pic16_pCodeConstString (char *name, const char *value, unsigned length);
 
 
 /*-----------------------------------------------------------------*/
@@ -622,7 +622,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
 /* pic16_printIvalChar - generates initital value for character array */
 /*--------------------------------------------------------------------*/
 static int
-pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, char ptype, void *p)
+pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, const char *s, char ptype, void *p)
 {
   value *val;
   int remain, len, ilen;

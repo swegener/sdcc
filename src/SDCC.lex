@@ -85,7 +85,7 @@ static int checkCurrFile (const char *s);
 }
 <asm>"__endasm"        {
   count ();
-  yylval.yyinline = dbuf_c_str (&asmbuff);
+  yylval.yystr = dbuf_c_str (&asmbuff);
   BEGIN (INITIAL);
   return INLINEASM;
 }
@@ -96,6 +96,7 @@ static int checkCurrFile (const char *s);
 <asm>.                  {
   dbuf_append_char(&asmbuff, *yytext);
 }
+"asm"|"__asm__"         { count (); return ASM; }
 "__at"                  { count (); TKEYWORD (AT); }
 "auto"                  { count (); return AUTO; }
 "__bit"                 { count (); TKEYWORD (BIT); }
@@ -189,7 +190,7 @@ static int checkCurrFile (const char *s);
 {D}+{E}{FS}?            { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}*"."{D}+({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}+"."{D}*({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
-\"                      { count (); yylval.val = strVal (stringLiteral ()); return STRING_LITERAL; }
+\"                      { count (); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
 "<<="                   { count (); yylval.yyint = LEFT_ASSIGN; return LEFT_ASSIGN; }
 "+="                    { count (); yylval.yyint = ADD_ASSIGN; return ADD_ASSIGN; }
@@ -264,7 +265,7 @@ static int checkCurrFile (const char *s);
 static int
 checkCurrFile (const char *s)
 {
-  int  lNum;
+  int lNum;
   char *tptr;
 
   /* skip '#' character */
@@ -273,7 +274,7 @@ checkCurrFile (const char *s)
 
   /* get the line number */
   lNum = strtol(s, &tptr, 10);
-  if (tptr == s || !isspace((unsigned char)*tptr))
+  if (tptr == s || !isspace ((unsigned char)*tptr))
     return 0;
   s = tptr;
 
@@ -303,18 +304,14 @@ checkCurrFile (const char *s)
   else
     {
       const char *sb = s;
-      char *tmpFname;
 
       /* find the end of the file name */
       while (*s && *s != '"')
         ++s;
 
-      tmpFname = Safe_malloc(s - sb + 1);
-      memcpy(tmpFname, sb, s - sb);
-      tmpFname[s - sb] = '\0';
-
-      lexFilename = Safe_malloc(s - sb + 1);
-      copyStr(lexFilename, tmpFname);
+      lexFilename = Safe_malloc (s - sb + 1);
+      memcpy (lexFilename, sb, s - sb);
+      lexFilename[s - sb] = '\0';
     }
   filename = lexFilename;
 
@@ -373,8 +370,8 @@ check_type (void)
  * to support ANSI hex and octal escape sequences in string literals
  */
 
-static const char
-*stringLiteral (void)
+static const char *
+stringLiteral (void)
 {
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;

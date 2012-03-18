@@ -4559,6 +4559,9 @@ static void genInline (iCode *ic)
 
   Safe_free (buffer);
 
+  /* consumed; we can free it here */
+  dbuf_free (IC_INLINE (ic));
+
   _G.inLine -= (!options.asmpeep);
 }
 

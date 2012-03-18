@@ -1289,7 +1289,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
     {
       /* for each character generate an assignment */
       /* to the array element */
-      char *s = SPEC_CVAL (iexpr->etype).v_char;
+      const char *s = SPEC_CVAL (iexpr->etype).v_char;
       unsigned int i = 0;
       unsigned int symsize = getSize (type);
 

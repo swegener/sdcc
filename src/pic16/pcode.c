@@ -4444,7 +4444,7 @@ void pic16_emitDS(char *s, char ptype, void *p)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-void pic16_pCodeConstString(char *name, char *value, unsigned length)
+void pic16_pCodeConstString(char *name, const char *value, unsigned length)
 {
   pBlock *pb;
   char *item;

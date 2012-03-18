@@ -32,7 +32,7 @@
 #include "device.h"
 
 void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
-extern void pic16_pCodeConstString (char *name, char *value, unsigned length);
+extern void pic16_pCodeConstString (char *name, const char *value, unsigned length);
 
 stats_t statistics = { 0, 0, 0, 0 };
 

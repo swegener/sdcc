@@ -548,7 +548,7 @@ wrong:
 /* printChar - formats and prints a characater string with DB      */
 /*-----------------------------------------------------------------*/
 void
-printChar (struct dbuf_s *oBuf, char *s, int plen)
+printChar (struct dbuf_s *oBuf, const char *s, int plen)
 {
   int i;
   int len = plen;
@@ -935,7 +935,7 @@ printIvalStruct (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s 
 /* printIvalChar - generates initital value for character array    */
 /*-----------------------------------------------------------------*/
 int
-printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, char *s, bool check)
+printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, const char *s, bool check)
 {
   value *val;
   unsigned int size = DCL_ELEM (type);

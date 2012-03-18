@@ -1227,8 +1227,8 @@ strVal (const char *s)
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  SPEC_CVAL (val->etype).v_char = Safe_alloc (strlen (s) + 1);
-  DCL_ELEM (val->type) = copyStr (SPEC_CVAL (val->etype).v_char, s);
+  SPEC_CVAL (val->etype).v_char = copyStr (s);
+  DCL_ELEM (val->type) = strlen (s);
 
   return val;
 }

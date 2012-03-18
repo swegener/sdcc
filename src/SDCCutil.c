@@ -847,7 +847,7 @@ octalEscape (const char **str)
 }
 
 /*!
-  /fn int copyStr (char *dest, char *src)
+  /fn const char *copyStr (const char *src)
 
   Copies a source string to a dest buffer interpreting escape sequences
   and special characters
@@ -858,6 +858,7 @@ octalEscape (const char **str)
 
 */
 
+#if 0
 int
 copyStr (char *dest, const char *src)
 {
@@ -945,4 +946,115 @@ copyStr (char *dest, const char *src)
   *dest++ = '\0';
 
   return dest - OriginalDest;
+}
+#endif
+
+const char *
+copyStr (const char *src)
+{
+ const char *begin = NULL;
+ struct dbuf_s dbuf;
+
+  dbuf_init(&dbuf, 128);
+
+  while (*src)
+    {
+      if (*src == '\"')
+        {
+          if (begin)
+            {
+              /* copy what we have until now */
+              dbuf_append (&dbuf, begin, src - begin);
+              begin = NULL;
+            }
+          ++src;
+        }
+      else if (*src == '\\')
+        {
+          int c;
+
+          if (begin)
+            {
+              /* copy what we have until now */
+              dbuf_append (&dbuf, begin, src - begin);
+              begin = NULL;
+            }
+          ++src;
+          switch (*src)
+            {
+            case 'n':
+              c = '\n';
+              break;
+
+            case 't':
+              c = '\t';
+              break;
+
+            case 'v':
+              c = '\v';
+              break;
+
+            case 'b':
+              c = '\b';
+              break;
+
+            case 'r':
+              c = '\r';
+              break;
+
+            case 'f':
+              c = '\f';
+              break;
+
+            case 'a':
+              c = '\a';
+              break;
+
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+              c = octalEscape (&src);
+              --src;
+              break;
+
+            case 'x':
+              c = hexEscape (&src);
+              --src;
+              break;
+
+            case 'u':
+              c = universalEscape (&src, 4);
+              --src;
+              break;
+
+            case 'U':
+              c = universalEscape (&src, 8);
+              --src;
+              break;
+
+            case '\\':
+            case '\?':
+            case '\'':
+            case '\"':
+            default:
+              c = *src;
+              break;
+            }
+          dbuf_append_char (&dbuf, c);
+          ++src;
+        }
+      else
+        {
+          if (!begin)
+            begin = src;
+          ++src;
+        }
+    }
+
+  return dbuf_detach_c_str (&dbuf);
 }

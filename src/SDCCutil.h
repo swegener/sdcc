@@ -175,6 +175,6 @@ void free_pragma_token (struct pragma_token_s *token);
 unsigned char hexEscape (const char **src);
 unsigned char universalEscape (const char **src, unsigned int n);
 unsigned char octalEscape (const char **src);
-int copyStr (char *dest, const char *src);
+const char *copyStr (const char *src);
 
 #endif

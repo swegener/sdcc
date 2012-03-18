@@ -110,9 +110,6 @@
     <ClCompile Include="SDCCval.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sdccy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="regression\add.c">
       <Filter>Regression Test</Filter>
     </ClCompile>
@@ -152,7 +149,12 @@
     <ClCompile Include="sdcclex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDCCnaddr.cc" />
+    <ClCompile Include="SDCCy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCnaddr.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\support\scripts\resource.rc">

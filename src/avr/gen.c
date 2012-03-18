@@ -2986,12 +2986,15 @@ genInline (iCode * ic)
           break;
         }
     }
-    if (bp1 != bp)
-      emitcode (bp1, "");
+  if (bp1 != bp)
+    emitcode (bp1, "");
 
-    Safe_free (buffer);
+  Safe_free (buffer);
 
-    _G.inLine -= (!options.asmpeep);
+  /* consumed; we can free it here */
+  dbuf_free (IC_INLINE (ic));
+
+  _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/

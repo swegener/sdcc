@@ -174,7 +174,7 @@ copy bin_vc\sdld.exe bin\sdld6808.exe /y &gt; nul</Command>
       <Project>{6e94db45-345e-4697-98da-6c72237d6eca}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="src\src.vcxproj">
+    <ProjectReference Include="src\sdcc.vcxproj">
       <Project>{f9485499-151b-4886-935c-7d687c4a0549}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

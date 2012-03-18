@@ -1523,9 +1523,9 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           break;
 
         case AOP_DIR:
-          if (SPEC_SCLS (getSpec (operandType (oper))) == S_SFR && offset)
+          if ((SPEC_SCLS (getSpec (operandType (oper))) == S_SFR) && (aop->size > 1))
             {
-              dbuf_printf (&dbuf, "(%s >> %d)", aop->aopu.aop_dir, offset * 8);
+              dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
             }
           else if (offset)
             {
@@ -1664,29 +1664,27 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_DIR:
-      {
-        if (SPEC_SCLS (getSpec (operandType (result))) == S_SFR && offset)
-          {
-            dbuf_printf (&dbuf, "(%s >> %d)", aop->aopu.aop_dir, offset * 8);
-          }
-        else if (offset)
-          {
-            dbuf_printf (&dbuf, "(%s + %d)", aop->aopu.aop_dir, offset);
-          }
-        else
-          {
-            dbuf_append_str (&dbuf, aop->aopu.aop_dir);
-          }
+      if ((SPEC_SCLS (getSpec (operandType (result))) == S_SFR) && (aop->size > 1))
+        {
+          dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
+        }
+      else if (offset)
+        {
+          dbuf_printf (&dbuf, "(%s + %d)", aop->aopu.aop_dir, offset);
+        }
+      else
+        {
+          dbuf_append_str (&dbuf, aop->aopu.aop_dir);
+        }
 
-        if (!EQ (dbuf_c_str (&dbuf), s) || bvolatile)
-          {
-            emitcode ("mov", "%s,%s", dbuf_c_str (&dbuf), s);
-          }
-        if (EQ (dbuf_c_str (&dbuf), "acc"))
-          {
-            accuse = TRUE;
-          }
-      }
+      if (!EQ (dbuf_c_str (&dbuf), s) || bvolatile)
+        {
+          emitcode ("mov", "%s,%s", dbuf_c_str (&dbuf), s);
+        }
+      if (EQ (dbuf_c_str (&dbuf), "acc"))
+        {
+          accuse = TRUE;
+        }
       break;
 
     case AOP_REG:
@@ -2827,7 +2825,7 @@ genIpop (iCode * ic)
 
   aopOp (IC_LEFT (ic), ic, FALSE);
   size = AOP_SIZE (IC_LEFT (ic));
-  offset = (size - 1);
+  offset = size - 1;
   while (size--)
     {
       emitpop (aopGet (IC_LEFT (ic), offset--, FALSE, TRUE));

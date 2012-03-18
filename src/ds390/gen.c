@@ -1671,9 +1671,9 @@ aopGet (operand * oper, int offset, bool bit16, bool dname, char *saveAcc)
           break;
 
         case AOP_DIR:
-          if (SPEC_SCLS (getSpec (operandType (oper))) == S_SFR && offset)
+          if ((SPEC_SCLS (getSpec (operandType (oper))) == S_SFR) && (aop->size > 1))
             {
-              dbuf_printf (&dbuf, "(%s >> %d)", aop->aopu.aop_dir, offset * 8);
+              dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
             }
           else if (offset)
             {
@@ -1780,6 +1780,18 @@ aopPut (operand * result, const char *s, int offset)
   bool accuse = FALSE;
   asmop *aop = AOP (result);
   const char *d = NULL;
+  static struct dbuf_s dbuf = { 0 };
+
+  if (dbuf_is_initialized(&dbuf))
+    {
+      /* reuse the dynamically allocated buffer */
+      dbuf_set_length (&dbuf, 0);
+    }
+  else
+    {
+      /* first time: initialize the dynamically allocated buffer */
+      dbuf_init (&dbuf, 128);
+    }
 
   if (aop->size && offset > (aop->size - 1))
     {
@@ -1797,33 +1809,27 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_DIR:
-      {
-        struct dbuf_s dbuf;
+      if ((SPEC_SCLS (getSpec (operandType (result))) == S_SFR) && (aop->size > 1))
+        {
+          dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
+        }
+      else if (offset)
+        {
+          dbuf_printf (&dbuf, "(%s + %d)", aop->aopu.aop_dir, offset);
+        }
+      else
+        {
+          dbuf_append_str (&dbuf, aop->aopu.aop_dir);
+        }
 
-        dbuf_init (&dbuf, 128);
-        if (SPEC_SCLS (getSpec (operandType (result))) == S_SFR && offset)
-          {
-            dbuf_printf (&dbuf, "(%s >> %d)", aop->aopu.aop_dir, offset * 8);
-          }
-        else if (offset)
-          {
-            dbuf_printf (&dbuf, "(%s + %d)", aop->aopu.aop_dir, offset);
-          }
-        else
-          {
-            dbuf_append_str (&dbuf, aop->aopu.aop_dir);
-          }
-
-        if (!EQ (dbuf_c_str (&dbuf), s) || bvolatile)
-          {
-            emitcode ("mov", "%s,%s", dbuf_c_str (&dbuf), s);
-          }
-        if (EQ (dbuf_c_str (&dbuf), "acc"))
-          {
-            accuse = TRUE;
-          }
-        dbuf_destroy (&dbuf);
-      }
+      if (!EQ (dbuf_c_str (&dbuf), s) || bvolatile)
+        {
+          emitcode ("mov", "%s,%s", dbuf_c_str (&dbuf), s);
+        }
+      if (EQ (dbuf_c_str (&dbuf), "acc"))
+        {
+          accuse = TRUE;
+        }
       break;
 
     case AOP_REG:
@@ -1913,12 +1919,8 @@ aopPut (operand * result, const char *s, int offset)
       else if (EQ (s, "r0") || EQ (s, "r1") || EQ (s, "r2") || EQ (s, "r3") ||
                EQ (s, "r4") || EQ (s, "r5") || EQ (s, "r6") || EQ (s, "r7") )
         {
-          struct dbuf_s dbuf;
-
-          dbuf_init (&dbuf, 128);
           dbuf_printf (&dbuf, "a%s", s);
           emitcode ("mov", "@%s,%s", aop->aopu.aop_ptr->name, dbuf_c_str (&dbuf));
-          dbuf_destroy (&dbuf);
         }
       else
         {

@@ -12,6 +12,11 @@
 	  src/yacc.vcxproj:
 	  re-itroduced yacc project
 	* .version, doc/sdccman.lyx: bumped version to 3.1.4
+	* config.vcxproj, src/ds390/ds390.vcxproj,
+	  src/hc08/hc08.vcxproj, src/mcs51/mcs51.vcxproj,
+	  src/pic14/pic14.vcxproj, src/pic16/pic16.vcxproj,
+	  src/sdcc.vcxproj, src/yacc.vcxproj, src/z80/z80.vcxproj:
+	  VS project enhancements
 
 2012-03-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

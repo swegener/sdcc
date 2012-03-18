@@ -441,8 +441,8 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -8 -f -oSDCClex.c SDCC.lex</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SDCCy.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SDCClex.c;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Lexer</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Lexer</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Lexer: SDCClex.c</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Lexer: SDCClex.c</Message>
     </CustomBuild>
     <None Include="..\support\scripts\sdcc.ico" />
     <CustomBuild Include="SDCC.y">
@@ -451,8 +451,8 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -d -v -o SDCCy.c SDCC.y</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SDCCy.c;SDCCy.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SDCCy.c;SDCCy.h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Parsed</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Parsed</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Parser: SDCCy.c</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Parser: SDCCy.c</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

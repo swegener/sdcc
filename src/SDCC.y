@@ -1583,14 +1583,6 @@ statement
    | jump_statement
    | critical_statement
    | asm_statement
-   | INLINEASM ';'       {
-                            ast *ex;
-                            seqPointNo++;
-                            ex = newNode(INLINEASM, NULL, NULL);
-                            ex->values.inlineasm = strdup($1);
-                            seqPointNo++;
-                            $$ = ex;
-                         }
    ;
 
 critical
@@ -1919,6 +1911,16 @@ asm_statement
         seqPointNo++;
         $$ = ex;
      }
+   | INLINEASM ';'
+      {
+        ast *ex;
+
+        seqPointNo++;
+        ex = newNode(INLINEASM, NULL, NULL);
+        ex->values.inlineasm = strdup($1);
+        seqPointNo++;
+        $$ = ex;
+      }
    ;
 
 addressmod

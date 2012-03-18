@@ -963,7 +963,7 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
     }
 
     if (IS_ARRAY(my_type)) {
-        DEBUGprintf ("(array, %d items, %d byte) below\n", DCL_ELEM(my_type), size);
+        DEBUGprintf ("(array, %d items, %ud byte) below\n", (unsigned int) DCL_ELEM(my_type), size);
         assert (!list || list->type == INIT_DEEP);
         if (list) list = list->init.deep;
         for (i = 0; i < DCL_ELEM(my_type); i++) {

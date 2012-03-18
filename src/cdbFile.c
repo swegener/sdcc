@@ -479,7 +479,7 @@ cdbTypeInfo (sym_link * type)
             case IPOINTER: fprintf (cdbFilePtr, "DI,"); break;
             case PPOINTER: fprintf (cdbFilePtr, "DP,"); break;
             case EEPPOINTER: fprintf (cdbFilePtr, "DA,"); break;
-            case ARRAY: fprintf (cdbFilePtr, "DA%d,", DCL_ELEM (type)); break;
+            case ARRAY: fprintf (cdbFilePtr, "DA%ud,", (unsigned int) DCL_ELEM (type)); break;
             default: break;
             }
         }

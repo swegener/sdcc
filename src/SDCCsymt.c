@@ -3362,7 +3362,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
             case ARRAY:
               if (DCL_ELEM (type))
                 {
-                  dbuf_printf (dbuf, "[%d]", DCL_ELEM (type));
+                  dbuf_printf (dbuf, "[%ud]", (unsigned int) DCL_ELEM (type));
                 }
               else
                 {
@@ -3612,7 +3612,7 @@ printTypeChainRaw (sym_link * start, FILE * of)
             case ARRAY:
               if (DCL_ELEM (type))
                 {
-                  fprintf (of, "[%d] ", DCL_ELEM (type));
+                  fprintf (of, "[%ud] ", (unsigned int) DCL_ELEM (type));
                 }
               else
                 {

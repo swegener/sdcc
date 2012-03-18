@@ -19,6 +19,8 @@
 	  VS project enhancements
 	* src/SDCC.y, src/SDCCsymt.h, src/SDCCutil.c, src/SDCCutil.h,
 	  src/SDCCval.c: fixed flaws in previous commit
+	* src/SDCCsymt.c, src/pic14/glue.c, src/cdbFile.c:
+	  fixed printing size_t type numbers
 
 2012-03-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

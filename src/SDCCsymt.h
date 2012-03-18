@@ -215,7 +215,7 @@ DECLARATOR_TYPE;
 typedef struct declarator
 {
   DECLARATOR_TYPE dcl_type;         /* POINTER,ARRAY or FUNCTION  */
-  unsigned int num_elem;            /* # of elems if type==array, */
+  size_t num_elem;                  /* # of elems if type==array, */
   /* always 0 for flexible arrays */
   unsigned ptr_const:1;             /* pointer is constant        */
   unsigned ptr_volatile:1;          /* pointer is volatile        */

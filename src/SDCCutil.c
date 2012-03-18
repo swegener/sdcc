@@ -950,7 +950,7 @@ copyStr (char *dest, const char *src)
 #endif
 
 const char *
-copyStr (const char *src)
+copyStr (const char *src, size_t *size)
 {
  const char *begin = NULL;
  struct dbuf_s dbuf;
@@ -1054,6 +1054,13 @@ copyStr (const char *src)
             begin = src;
           ++src;
         }
+    }
+
+  if (size)
+    {
+      /* include null terminator character
+         appended by dbuf_detach_c_str() */
+      *size = dbuf_get_length (&dbuf) + 1;
     }
 
   return dbuf_detach_c_str (&dbuf);

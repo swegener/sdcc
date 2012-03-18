@@ -17,6 +17,8 @@
 	  src/pic14/pic14.vcxproj, src/pic16/pic16.vcxproj,
 	  src/sdcc.vcxproj, src/yacc.vcxproj, src/z80/z80.vcxproj:
 	  VS project enhancements
+	* src/SDCC.y, src/SDCCsymt.h, src/SDCCutil.c, src/SDCCutil.h,
+	  src/SDCCval.c: fixed flaws in previous commit
 
 2012-03-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

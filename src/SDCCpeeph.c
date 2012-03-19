@@ -913,7 +913,7 @@ operandBaseName (const char *op)
         return "de";
       if (!strcmp (op, "b") || !strcmp (op, "c") || !strcmp (op, "(bc)"))
         return "bc";
-      if (!strcmp (op, "h") || !strcmp (op, "l") || !strcmp (op, "(hl)"))
+      if (!strcmp (op, "h") || !strcmp (op, "l") || !strcmp (op, "(hl)") || !strcmp (op, "(hl+)")  || !strcmp (op, "(hl-)"))
         return "hl";
       if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || !strcmp (op, "(iy)"))
         return "iy";

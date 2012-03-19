@@ -4592,7 +4592,7 @@ genPlusIncr (iCode * ic)
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_STR && IS_ITEMP (IC_RESULT (ic)) &&
       !AOP_USESDPTR (IC_LEFT (ic)) && icount <= 5 && size <= 3 && options.model == MODEL_FLAT24)
     {
-      if (IC_RESULT (ic)->isGptr)
+      if (AOP_SIZE (IC_RESULT (ic)) == 4)
         {
           emitcode ("mov", "b,%s", aopGet (IC_LEFT (ic), 3, FALSE, FALSE, NULL));
         }

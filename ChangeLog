@@ -3,6 +3,8 @@
 	* support/regression/Makefile.in,
 	  support/regression/collate-results.py: Summarize any failures in a
 	  nicer format instead of all run together on one line
+	* src/ds390/gen.c (genPlusIncr): fix problem with dereferencing a
+	  generic pointer via a struct losing pointer type byte
 
 2012-03-18 Borut Razem <borut.razem AT gmail.com>
 

@@ -96,7 +96,7 @@ static int checkCurrFile (const char *s);
 <asm>.                  {
   dbuf_append_char(&asmbuff, *yytext);
 }
-"asm"|"__asm__"         { count (); return ASM; }
+"__asm__"               { count (); return ASM; }
 "__at"                  { count (); TKEYWORD (AT); }
 "auto"                  { count (); return AUTO; }
 "__bit"                 { count (); TKEYWORD (BIT); }

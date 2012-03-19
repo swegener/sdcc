@@ -2450,18 +2450,6 @@ reference "sub:PIC16_Pragmas"
 \begin_layout Itemize
 new inline assembler format 
 \family typewriter
-asm (
-\begin_inset Quotes sld
-\end_inset
-
-inline_assembler_code
-\begin_inset Quotes srd
-\end_inset
-
-);
-\family default
- or 
-\family typewriter
 __asm__ (inline_assembler_code
 \begin_inset Quotes srd
 \end_inset
@@ -29017,15 +29005,7 @@ __endasm;
 \end_layout
 
 \begin_layout Subsubsection
-New asm (
-\begin_inset Quotes sld
-\end_inset
-
-inline_assembler_code
-\begin_inset Quotes srd
-\end_inset
-
-) or __asm__ (
+New __asm__ (
 \begin_inset Quotes sld
 \end_inset
 
@@ -29037,7 +29017,7 @@ inline_assembler_code
 \end_layout
 
 \begin_layout Standard
-The asm or __asm__ inline assembler code format was introduced in SDCC version
+The __asm__ inline assembler code format was introduced in SDCC version
  3.2.0.
 \end_layout
 
@@ -29048,22 +29028,6 @@ Example:
 \begin_layout Verse
 
 \family typewriter
-asm (
-\begin_inset Quotes sld
-\end_inset
-
-; This is a comment
-\backslash
-nlabel:
-\backslash
-nnop
-\begin_inset Quotes srd
-\end_inset
-
-);
-\begin_inset Newline newline
-\end_inset
-
 __asm__ (
 \begin_inset Quotes sld
 \end_inset
@@ -29072,7 +29036,9 @@ __asm__ (
 \backslash
 nlabel:
 \backslash
-nnop
+n
+\backslash
+tnop
 \begin_inset Quotes srd
 \end_inset
 

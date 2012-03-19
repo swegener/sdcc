@@ -1,3 +1,8 @@
+2012-03-19 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCC.lex, doc/sdccman.lyx: removed asm() pseudo function
+	  since it is not standard-compliant
+
 2012-03-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCpeeph.c:

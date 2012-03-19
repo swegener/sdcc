@@ -232,7 +232,8 @@ $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 # Rule to summarise the results for one port after all of the tests
 # have been run.
 port-results: port-dirs $(PORT_RESULTS)
-	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | python $(srcdir)/collate-results.py`
+	echo -n Summary for \'$(PORT)\':
+	cat $(PORT_RESULTS) | python $(srcdir)/collate-results.py
 	echo
 
 port-dirs:

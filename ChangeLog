@@ -1,3 +1,9 @@
+2012-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/Makefile.in,
+	  support/regression/collate-results.py: Summarize any failures in a
+	  nicer format instead of all run together on one line
+
 2012-03-18 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx,src/avr/gen.c, src/ds390/gen.c,

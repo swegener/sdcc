@@ -15,6 +15,7 @@ tests = 0
 bytes = 0
 ticks = 0
 invalid = 0
+messagelog = []
 
 # hack for valdiag
 name = ""
@@ -39,7 +40,7 @@ for line in lines:
         tests = tests + string.atof(ntests)
         cases = cases + string.atof(ncases)
         if (string.atof(nfailures)):
-            print "Failure: %s" % name
+            messagelog.append("Failure: %s" % name)
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
     if (re.search(r'^--- Simulator:', line)):
@@ -50,9 +51,11 @@ for line in lines:
 
     # Stop at 0x000228: (106) Invalid instruction 0x00fd
     if (re.search(r'Invalid instruction', line)):
-        invalid += 1;
-        print "Invalid instruction: %s" % name
+        invalid += 1
+        messagelog.append("Invalid instruction: %s" % name)
 
 if (invalid > 0):
-    print "%d invalid instructions," % invalid,
-print "%.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks)
+    print " %d invalid instructions," % invalid,
+print " %.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks)
+for msg in messagelog:
+  print "  ",msg

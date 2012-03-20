@@ -558,9 +558,10 @@ _vemit2 (const char *szFormat, va_list ap)
       _add_line (p);
       p = nextp + 1;
     }
-  dbuf_free (buffer);
 
   _add_line (p);
+
+  dbuf_free (buffer);
 }
 
 static void

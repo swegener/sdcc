@@ -44,6 +44,7 @@
 #include "SDCCpeeph.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "dbuf_string.h"
 
 char *aopLiteral (value * val, int offset);
 char *aopLiteralLong (value * val, int offset, int size);
@@ -150,35 +151,46 @@ static void
 emitcode (char *inst, char *fmt,...)
 {
   va_list ap;
-  char lb[INITIAL_INLINEASM];
-  char *lbp = lb;
+  struct dbuf_s dbuf;
+  const char *lbp, *lb;
+
+  dbuf_init (&dbuf, INITIAL_INLINEASM);
 
   va_start (ap, fmt);
 
   if (inst && *inst)
     {
+      dbuf_append_str (&dbuf, inst);
+
       if (fmt && *fmt)
-        sprintf (lb, "%s\t", inst);
-      else
-        sprintf (lb, "%s", inst);
-      vsprintf (lb + (strlen (lb)), fmt, ap);
+        {
+          dbuf_append_char (&dbuf, '\t');
+          dbuf_tvprintf (&dbuf, fmt, ap);
+        }
     }
   else
-    vsprintf (lb, fmt, ap);
+    {
+      dbuf_tvprintf (&dbuf, fmt, ap);
+    }
 
-  while (isspace ((unsigned char)*lbp))
-    lbp++;
+  lbp = lb = dbuf_detach_c_str (&dbuf);
+
+  while (isspace ((unsigned char) *lbp))
+    {
+      lbp++;
+    }
 
   if (lbp && *lbp)
-    lineCurr = (lineCurr ?
-                connectLine (lineCurr, newLineNode (lb)) :
-                (lineHead = newLineNode (lb)));
-  lineCurr->isInline = _G.inLine;
-  lineCurr->isDebug = _G.debugLine;
-  lineCurr->ic = _G.current_iCode;
-  lineCurr->isComment = (*lbp==';');
+    {
+      lineCurr = (lineCurr ? connectLine (lineCurr, newLineNode (lb)) : (lineHead = newLineNode (lb)));
 
-  //printf("%s\n", lb);
+      lineCurr->isInline = _G.inLine;
+      lineCurr->isDebug = _G.debugLine;
+      lineCurr->ic = _G.current_iCode;
+      lineCurr->isComment = (*lbp == ';');
+    }
+  dbuf_free (lb);
+
   va_end (ap);
 }
 
@@ -8818,5 +8830,4 @@ genhc08Code (iCode * lic)
 
   /* now do the actual printing */
   printLine (lineHead, codeOutBuf);
-  return;
 }

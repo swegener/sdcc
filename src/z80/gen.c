@@ -558,10 +558,9 @@ _vemit2 (const char *szFormat, va_list ap)
       _add_line (p);
       p = nextp + 1;
     }
+  dbuf_free (buffer);
 
   _add_line (p);
-
-  Safe_free (buffer);
 }
 
 static void
@@ -10661,4 +10660,3 @@ genZ80Code (iCode *lic)
   freeTrace(&_G.lines.trace);
   freeTrace(&_G.trace.aops);
 }
-

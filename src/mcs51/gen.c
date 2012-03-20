@@ -189,14 +189,14 @@ emitcode (const char *inst, const char *fmt, ...)
       dbuf_tvprintf (&dbuf, fmt, ap);
     }
 
-  lbp = lb = dbuf_c_str (&dbuf);
+  lbp = lb = dbuf_detach_c_str (&dbuf);
 
   while (isspace ((unsigned char) *lbp))
     {
       lbp++;
     }
 
-  if (lbp)
+  if (lbp && *lbp)
     {
       rtrackUpdate (lbp);
 
@@ -207,10 +207,9 @@ emitcode (const char *inst, const char *fmt, ...)
       lineCurr->ic = _G.current_iCode;
       lineCurr->isComment = (*lbp == ';');
     }
+  dbuf_free (lb);
 
   va_end (ap);
-
-  dbuf_destroy (&dbuf);
 }
 
 static void
@@ -12292,5 +12291,4 @@ gen51Code (iCode * lic)
 
   /* now do the actual printing */
   printLine (lineHead, codeOutBuf);
-  return;
 }

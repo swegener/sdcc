@@ -1,8 +1,8 @@
 /*
   dbuf_string.c - Append formatted string to the dynamic buffer
-  version 1.2.0, February 10th, 2008
+  version 1.2.2, March 20th, 2012
 
-  Copyright (c) 2002-2008 Borut Razem
+  Copyright (c) 2002-2012 Borut Razem
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -249,16 +249,16 @@ dbuf_getline (struct dbuf_s *dbuf, FILE *infp)
  * It returns the total number of characters removed.
  */
 
-int
+size_t
 dbuf_chomp (struct dbuf_s *dbuf)
 {
   size_t i = dbuf->len;
-  int ret;
+  size_t ret;
 
-  if ('\n' == ((char *)dbuf->buf)[i - 1])
+  if (i != 0 && '\n' == ((char *)dbuf->buf)[i - 1])
     {
       --i;
-      if ('\r' == ((char *)dbuf->buf)[i - 1])
+      if (i != 0 && '\r' == ((char *)dbuf->buf)[i - 1])
         {
           --i;
         }

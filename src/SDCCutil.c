@@ -847,15 +847,14 @@ octalEscape (const char **str)
 }
 
 /*!
-  /fn const char *copyStr (const char *src)
+  /fn const char *copyStr (const char *src, size_t *size)
 
-  Copies a source string to a dest buffer interpreting escape sequences
-  and special characters
+  Copies source string to a dynamically allocated buffer interpreting
+  escape sequences and special characters
 
-  /param dest Buffer to receive the resultant string
   /param src  Buffer containing the source string with escape sequecnes
-  /return Number of characters in output string
-
+  /param size Pointer to loction where the resulting buffer length is written
+  /return Dynamically allocated resulting buffer
 */
 
 const char *
@@ -963,6 +962,13 @@ copyStr (const char *src, size_t *size)
             begin = src;
           ++src;
         }
+    }
+
+  if (begin)
+    {
+      /* copy what we have until now */
+      dbuf_append (&dbuf, begin, src - begin);
+      begin = NULL;
     }
 
   if (size)

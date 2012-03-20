@@ -23,64 +23,62 @@
   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-/*  Provides output functions that modify the output string
-    based on the input tokens and the assembler token mapping
-    specification loaded.
+/* Provides output functions that modify the output string
+   based on the input tokens and the assembler token mapping
+   specification loaded.
 
-    Note that the functions below only handle digit format modifiers.
-    eg %02X is ok, but %lu and %.4u will fail.
-*/
+   Note that the functions below only handle digit format modifiers.
+   eg %02X is ok, but %lu and %.4u will fail.
+
+   A 'token' is like !blah or %24f and is under the programmers
+   control. */
 
 #include <errno.h>
 
 #include "common.h"
 #include "dbuf_string.h"
 
-/* A 'token' is like !blah or %24f and is under the programmers
-   control. */
-
 static hTab *_h;
 
-char *
-FileBaseName (char *fileFullName)
+const char *
+FileBaseName (const char *fileFullName)
 {
-  char *p = fileFullName;
+  const char *p;
 
   if (!fileFullName)
     {
       return "unknown";
     }
 
-  while (*fileFullName)
-    {
-      if ((*fileFullName == '/') || (*fileFullName == '\\') || (*fileFullName == ':'))
-        {
-          p = fileFullName;
-          p++;
-        }
-      fileFullName++;
-    }
-  return p;
+  for (p = fileFullName + strlen (fileFullName) - 1;
+       p >= fileFullName && (*p != '/' || *p != '\\' || *p != ':');
+       --p)
+    ;
+
+  return p + 1;
 }
 
 void
 dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
 {
-  // Under Linux PPC va_list is a structure instead of a primitive type,
-  // and doesnt like being passed around.  This version turns everything
-  // into one function.
+  /*
+     Under Linux PPC va_list is a structure instead of a primitive type,
+     and doesnt like being passed around.  This version turns everything
+     into one function.
 
-  // Supports:
-  //  !tokens
-  //  %[CIFN] - special formats with no argument (ie list isnt touched)
-  //  All of the system formats
+     Supports:
+      !tokens
+      %[CIFN] - special formats with no argument (ie list isnt touched)
+      All of the system formats
 
-  // This is acheived by expanding the tokens and zero arg formats into
-  // one big format string, which is passed to the native printf.
+     This is acheived by expanding the tokens and zero arg formats into
+     one big format string, which is passed to the native printf.
+   */
   static int count;
   struct dbuf_s tmpDBuf;
   const char *noTokens;
   const char *sz = format;
+  const char *begin = NULL;
 
   dbuf_init (&tmpDBuf, INITIAL_INLINEASM);
 
@@ -94,8 +92,15 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
           const char *t;
           struct dbuf_s token;
 
+          if (begin)
+            {
+              /* copy what we have until now */
+              dbuf_append (&tmpDBuf, begin, sz - begin);
+              begin = NULL;
+            }
+
           dbuf_init (&token, 64);
-          sz++;
+          ++sz;
           while (isalpha ((unsigned char) *sz) || *sz == '*')
             {
               dbuf_append (&token, sz++, 1);
@@ -115,8 +120,17 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
         }
       else
         {
-          dbuf_append_char (&tmpDBuf, *sz++);
+          if (!begin)
+            begin = sz;
+          ++sz;
         }
+    }
+
+  if (begin)
+    {
+      /* copy what we have until now */
+      dbuf_append (&tmpDBuf, begin, sz - begin);
+      begin = NULL;
     }
 
   /* Second pass: Expand any macros that we own */
@@ -129,32 +143,39 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
     {
       if (*sz == '%')
         {
+          if (begin)
+            {
+              /* copy what we have until now */
+              dbuf_append (&tmpDBuf, begin, sz - begin);
+              begin = NULL;
+            }
+
           // See if its one that we handle.
-          sz++;
+          ++sz;
           switch (*sz)
             {
             case 'C':
               // Code segment name.
               dbuf_append_str (&tmpDBuf, CODE_NAME);
-              sz++;
+              ++sz;
               break;
 
             case 'F':
               // Source file name.
               dbuf_append_str (&tmpDBuf, fullSrcFileName);
-              sz++;
+              ++sz;
               break;
 
             case 'N':
               // Current function name.
               dbuf_append_str (&tmpDBuf, currFunc->rname);
-              sz++;
+              ++sz;
               break;
 
             case 'I':
               // Unique ID.
               dbuf_printf (&tmpDBuf, "%u", ++count);
-              sz++;
+              ++sz;
               break;
 
             default:
@@ -168,8 +189,17 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
         }
       else
         {
-          dbuf_append_char (&tmpDBuf, *sz++);
+          if (!begin)
+            begin = sz;
+          ++sz;
         }
+    }
+
+  if (begin)
+    {
+      /* copy what we have until now */
+      dbuf_append (&tmpDBuf, begin, sz - begin);
+      begin = NULL;
     }
 
   dbuf_free (noTokens);
@@ -193,7 +223,6 @@ tfprintf (FILE *fp, const char *szFormat, ...)
 {
   va_list ap;
   struct dbuf_s dbuf;
-  size_t len;
 
   dbuf_init (&dbuf, INITIAL_INLINEASM);
 
@@ -201,8 +230,7 @@ tfprintf (FILE *fp, const char *szFormat, ...)
   dbuf_tvprintf (&dbuf, szFormat, ap);
   va_end (ap);
 
-  len = dbuf_get_length (&dbuf);
-  fwrite (dbuf_get_buf (&dbuf), 1, len, fp);
+  fwrite (dbuf_get_buf (&dbuf), 1, dbuf_get_length (&dbuf), fp);
   dbuf_destroy (&dbuf);
 }
 
@@ -228,9 +256,7 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
 const char *
 printILine (iCode * ic)
 {
-  char *verbalICode;
   struct dbuf_s tmpBuf;
-  size_t len;
   iCodeTable *icTab = getTableEntry (ic->op);
 
   dbuf_init (&tmpBuf, 1024);
@@ -243,20 +269,11 @@ printILine (iCode * ic)
       icTab->iCodePrint (&tmpBuf, ic, icTab->printName);
     }
 
-  len = dbuf_get_length (&tmpBuf);
-
   /* null terminate the buffer */
-  dbuf_c_str (&tmpBuf);
-  verbalICode = dbuf_detach (&tmpBuf);
+  dbuf_chomp (&tmpBuf);
 
-  /* kill the trailing NL */
-  if (len > 0 && '\n' == verbalICode[len - 1])
-    verbalICode[--len] = '\0';
-
-  /* and throw it up */
-  return verbalICode;
+  return dbuf_detach_c_str (&tmpBuf);
 }
-
 
 /*-----------------------------------------------------------------*/
 /* skipLine - skip the line from file infp                         */
@@ -335,7 +352,7 @@ printCLine (const char *srcFile, int lineno)
              don't panic, just return the error message */
           dbuf_printf (&line, "ERROR: %s", strerror (errno));
 
-          return dbuf_c_str (&line);
+          return dbuf_detach_c_str (&line);
         }
       else
         {
@@ -363,20 +380,18 @@ printCLine (const char *srcFile, int lineno)
   /* get the line */
   if (0 != (len = dbuf_getline (&line, inFile)))
     {
-      const char *inLineString = dbuf_c_str (&line);
+      const char *inLineString;
 
       ++inLineNo;
 
       /* remove the trailing NL */
-      if (len > 0 && '\n' == inLineString[len - 1])
-        {
-          dbuf_set_length (&line, --len);
-          inLineString = dbuf_c_str (&line);
-        }
+      dbuf_chomp (&line);
+
+      inLineString = dbuf_detach_c_str (&line);
 
       /* skip leading spaces */
       while (isspace (*inLineString))
-        inLineString++;
+        ++inLineString;
 
       return inLineString;
     }
@@ -384,7 +399,7 @@ printCLine (const char *srcFile, int lineno)
 err_no_line:
   dbuf_printf (&line, "ERROR: no line number %d in file %s", lineno, srcFile);
 
-  return dbuf_c_str (&line);
+  return dbuf_detach_c_str (&line);
 }
 
 static const ASM_MAPPING _asxxxx_mapping[] = {

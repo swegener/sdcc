@@ -59,7 +59,7 @@ extern const ASM_MAPPINGS asm_xa_asm_mapping;
  */
 void asm_addTree (const ASM_MAPPINGS * pMappings);
 
-char *FileBaseName (char *fileFullName);
+const char *FileBaseName (const char *fileFullName);
 
 const char *printILine (iCode * ic);
 const char *printCLine (const char *srcFile, int lineno);

@@ -1,3 +1,14 @@
+2012-03-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/include/stdint.h,
+	  device/include/string.h,
+	  device/include/stddef.h,
+	  device/include/stdlib.h,
+	  device/include/stdio.h,
+	  device/include/time.h,
+	  device/include/errno.h:
+	  rsize_t, errno_t, constraint_handler_t, RSIZE_MAX from annex K (bounds-checking) of the C11 standard.
+
 2012-03-19 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.lex, doc/sdccman.lyx: removed asm() pseudo function

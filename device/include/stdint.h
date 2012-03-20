@@ -212,7 +212,7 @@ typedef unsigned long int       uintmax_t;
 #endif
 
 /* Limit of `size_t' type.  */
-#define SIZE_MAX               (65535)
+#define SIZE_MAX               (65535u)
 
 /* Signed.  */
 #define INT8_C(c)      c
@@ -243,6 +243,11 @@ typedef unsigned long int       uintmax_t;
 #else
 #define INTMAX_C(c)    c ## L
 #define UINTMAX_C(c)   c ## UL
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+#define RSIZE_MAX SIZE_MAX
 #endif
 
 #endif /* stdint.h */

@@ -39,6 +39,21 @@
   typedef unsigned int size_t;
 #endif
 
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __RSIZE_T_DEFINED
+#define __RSIZE_T_DEFINED
+typedef size_t rsize_t;
+#endif
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+#endif
+
 #if defined(__SDCC_mcs51) || defined(__SDCC_hc08) || defined(__SDCC_ds390) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
 #define __SDCC_BROKEN_STRING_FUNCTIONS
 #endif

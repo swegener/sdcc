@@ -1,3 +1,10 @@
+2012-03-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-92*,
+	  support/regression/tests/gcc-torture-execute-93*,
+	  support/regression/tests/gcc-torture-execute-94*:
+	  Added some more tests from the execute part of the gcc torture regression test suite.
+
 2012-03-20 Borut Razem <borut.razem AT gmail.com>
 
 	* src/mcs51/gen.c, src/SDCCasm.c, src/SDCCasm.h, src/z80/gen.c,

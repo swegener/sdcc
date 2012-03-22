@@ -1,3 +1,8 @@
+2012-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-941021-1.c:
+	  Disable test for gcc older than 5.0.
+
 2012-03-22 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: double underlined keywords,

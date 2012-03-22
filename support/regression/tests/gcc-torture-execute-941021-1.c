@@ -22,10 +22,12 @@ void f (double *pdbl, double value)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   f ((void *) 0, 55.1);
 
   if (glob_dbl != 55.1)
     ASSERT (0);
   return;
+#endif
 }
 

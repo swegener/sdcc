@@ -588,16 +588,16 @@ extern symbol *fps16x16_lteq;
 extern symbol *fps16x16_gt;
 extern symbol *fps16x16_gteq;
 
-/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED/BOTH */
-extern symbol *muldiv[3][3][4];
-/* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
-extern sym_link *multypes[3][2];
-/* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
-extern symbol *conv[2][3][2];
-/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/FLOAT, SIGNED/USIGNED */
-extern symbol *fp16x16conv[2][4][2];
-/* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-extern symbol *rlrr[2][3][2];
+/* Dims: mul/div/mod, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED/BOTH */
+extern symbol *muldiv[3][4][4];
+/* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
+extern sym_link *multypes[4][2];
+/* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */
+extern symbol *conv[2][4][2];
+/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/QWORD/FLOAT, SIGNED/USIGNED */
+extern symbol *fp16x16conv[2][5][2];
+/* Dims: shift left/shift right, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
+extern symbol *rlrr[2][4][2];
 
 #define SCHARTYPE       multypes[0][0]
 #define UCHARTYPE       multypes[0][1]
@@ -605,6 +605,8 @@ extern symbol *rlrr[2][3][2];
 #define UINTTYPE        multypes[1][1]
 #define LONGTYPE        multypes[2][0]
 #define ULONGTYPE       multypes[2][1]
+#define LONGLONGTYPE    multypes[3][0]
+#define ULONGLONGTYPE   multypes[3][1]
 
 extern sym_link *floatType;
 extern sym_link *fixed16x16Type;

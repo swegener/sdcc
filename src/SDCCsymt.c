@@ -3679,7 +3679,9 @@ printTypeChainRaw (sym_link * start, FILE * of)
           switch (SPEC_NOUN (type))
             {
             case V_INT:
-              if (IS_LONG (type))
+              if (IS_LONGLONG (type))
+                fprintf (of, "longlong-");
+              else if (IS_LONG (type))
                 fprintf (of, "long-");
               fprintf (of, "int");
               break;
@@ -3788,16 +3790,16 @@ symbol *fps16x16_lteq;
 symbol *fps16x16_gt;
 symbol *fps16x16_gteq;
 
-/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED/BOTH */
-symbol *muldiv[3][3][4];
-/* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
-sym_link *multypes[3][2];
-/* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
-symbol *conv[2][3][2];
-/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/FLOAT, SIGNED/USIGNED */
-symbol *fp16x16conv[2][4][2];
-/* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-symbol *rlrr[2][3][2];
+/* Dims: mul/div/mod, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED/BOTH */
+symbol *muldiv[3][4][4];
+/* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
+sym_link *multypes[4][2];
+/* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */
+symbol *conv[2][4][2];
+/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/QWORD/FLOAT, SIGNED/USIGNED */
+symbol *fp16x16conv[2][5][2];
+/* Dims: shift left/shift right, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
+symbol *rlrr[2][4][2];
 
 sym_link *charType;
 sym_link *floatType;
@@ -3823,6 +3825,7 @@ _mangleFunctionName (const char *in)
 /*                      's' - short                                */
 /*                      'i' - int                                  */
 /*                      'l' - long                                 */
+/*                      'L' - long long                            */
 /*                      'f' - float                                */
 /*                      'q' - fixed16x16                           */
 /*                      'v' - void                                 */
@@ -3870,6 +3873,11 @@ typeFromStr (const char *s)
           r->xclass = SPECIFIER;
           SPEC_NOUN (r) = V_INT;
           SPEC_LONG (r) = 1;
+          break;
+        case 'L':
+          r->xclass = SPECIFIER;
+          SPEC_NOUN (r) = V_INT;
+          SPEC_LONGLONG (r) = 1;
           break;
         case 'f':
           r->xclass = SPECIFIER;
@@ -3944,10 +3952,10 @@ initCSupport (void)
     "mul", "div", "mod"
   };
   const char *sbwd[] = {
-    "char", "int", "long", "fixed16x16",
+    "char", "int", "long", "longlong", "fixed16x16",
   };
   const char *fp16x16sbwd[] = {
-    "char", "int", "long", "float",
+    "char", "int", "long", "longlong", "float",
   };
   const char *ssu[] = {
     "s", "su", "us", "u"
@@ -3964,7 +3972,7 @@ initCSupport (void)
       return;
     }
 
-  for (bwd = 0; bwd < 3; bwd++)
+  for (bwd = 0; bwd < 4; bwd++)
     {
       sym_link *l = NULL;
       switch (bwd)
@@ -3977,6 +3985,9 @@ initCSupport (void)
           break;
         case 2:
           l = newLongLink ();
+          break;
+        case 3:
+          l = newLongLongLink ();
           break;
         default:
           assert (0);
@@ -4014,7 +4025,7 @@ initCSupport (void)
 
   for (tofrom = 0; tofrom < 2; tofrom++)
     {
-      for (bwd = 0; bwd < 3; bwd++)
+      for (bwd = 0; bwd < 4; bwd++)
         {
           for (su = 0; su < 2; su++)
             {
@@ -4038,7 +4049,7 @@ initCSupport (void)
 
   for (tofrom = 0; tofrom < 2; tofrom++)
     {
-      for (bwd = 0; bwd < 4; bwd++)
+      for (bwd = 0; bwd < 5; bwd++)
         {
           for (su = 0; su < 2; su++)
             {
@@ -4048,7 +4059,7 @@ initCSupport (void)
               if (tofrom)
                 {
                   dbuf_printf (&dbuf, "__fps16x162%s%s", ssu[su * 3], fp16x16sbwd[bwd]);
-                  if (bwd == 3)
+                  if (bwd == 4)
                     fp16x16conv[tofrom][bwd][su] =
                       funcOfType (dbuf_c_str (&dbuf), floatType, fixed16x16Type, 1, options.float_rent);
                   else
@@ -4058,7 +4069,7 @@ initCSupport (void)
               else
                 {
                   dbuf_printf (&dbuf, "__%s%s2fps16x16", ssu[su * 3], fp16x16sbwd[bwd]);
-                  if (bwd == 3)
+                  if (bwd == 4)
                     fp16x16conv[tofrom][bwd][su] =
                       funcOfType (dbuf_c_str (&dbuf), fixed16x16Type, floatType, 1, options.float_rent);
                   else
@@ -4073,7 +4084,7 @@ initCSupport (void)
 /*
   for (muldivmod = 0; muldivmod < 3; muldivmod++)
     {
-      for (bwd = 0; bwd < 3; bwd++)
+      for (bwd = 0; bwd < 4; bwd++)
         {
           for (su = 0; su < 2; su++)
             {
@@ -4115,7 +4126,7 @@ initCSupport (void)
         }
     }
 
-  for (bwd = 1; bwd < 3; bwd++)
+  for (bwd = 1; bwd < 4; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -4162,8 +4173,8 @@ initCSupport (void)
   muldivmod = 0;
   /* signed only */
   su = 0;
-  /* word and doubleword */
-  for (bwd = 1; bwd < 3; bwd++)
+  /* word, doubleword, and quadword */
+  for (bwd = 1; bwd < 4; bwd++)
     {
       /* mul, int/long */
       struct dbuf_s dbuf;
@@ -4179,7 +4190,7 @@ initCSupport (void)
 
   for (slsr = 0; slsr < 2; slsr++)
     {
-      for (bwd = 0; bwd < 3; bwd++)
+      for (bwd = 0; bwd < 4; bwd++)
         {
           for (su = 0; su < 2; su++)
             {

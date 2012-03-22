@@ -271,7 +271,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
   /* depending on the type */
-  for (bwd = 0; bwd < 3; bwd++)
+  for (bwd = 0; bwd < 4; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -285,7 +285,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
 
   if (compareType (type, fixed16x16Type) == 1)
     {
-      func = fp16x16conv[0][3][0];
+      func = fp16x16conv[0][4][0];
       goto found;
     }
 
@@ -374,7 +374,7 @@ cnvToFixed16x16Cast (iCode * ic, eBBlock * ebp)
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
   /* depending on the type */
-  for (bwd = 0; bwd < 3; bwd++)
+  for (bwd = 0; bwd < 4; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -472,7 +472,7 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
   remiCodeFromeBBlock (ebp, ic);
 
   /* depending on the type */
-  for (bwd = 0; bwd < 3; bwd++)
+  for (bwd = 0; bwd < 4; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -570,7 +570,7 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
   remiCodeFromeBBlock (ebp, ic);
 
   /* depending on the type */
-  for (bwd = 0; bwd < 3; bwd++)
+  for (bwd = 0; bwd < 4; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -584,7 +584,7 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
 
   if (compareType (type, floatType) == 1)
     {
-      func = fp16x16conv[1][3][0];
+      func = fp16x16conv[1][4][0];
       goto found;
     }
 
@@ -703,7 +703,7 @@ convilong (iCode * ic, eBBlock * ebp)
     }
 
   /* depending on the type */
-  for (bwd = 0; bwd < 3; bwd++)
+  for (bwd = 0; bwd < 4; bwd++)
     {
       for (su = 0; su < 2; su++)
         {
@@ -737,7 +737,7 @@ convilong (iCode * ic, eBBlock * ebp)
             }
         }
     }
-  werror (E_INVALID_OP);
+  werrorfl (filename, lineno, E_INVALID_OP, "");
   return;
 found:
   /* if int & long support routines NOT compiled as reentrant */

@@ -1,5 +1,12 @@
 2012-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c (initCSupport, typeFromStr, printTypeChainRaw),
+	  src/SDCCopt.c (cnvToFloatCast, cnvToFixed16x16Cast, cnvFromFloatCast, 
+	  cnvFromFixed16x16Cast, convilong): ongoing upgrades for long long type
+
+2012-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/hc08/gen.c (transferAopAop): fixed bug 3509707
 	* support/regression/tests/gcc-torture-execute-930603-1.c: reenabled
 

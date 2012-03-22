@@ -19817,7 +19817,7 @@ sbit
 \begin_layout Standard
 Like the bit keyword, 
 \emph on
-sfr / sfr16 / sfr32 / sbit
+__sfr / __sfr16 / __sfr32 / __sbit
 \emph default
  signify both a data-type and storage class, they are used to describe the
  
@@ -19832,13 +19832,9 @@ unction
 \emph on
 r
 \emph default
-egisters and 
+egisters and special 
 \emph on
-s
-\emph default
-pecial 
-\emph on
-bit
+__bit
 \emph default
  variables of a 8051, eg:
 \end_layout
@@ -19983,7 +19979,7 @@ Carry flag
 Special function registers which are located on an address dividable by
  8 are bit-addressable, an 
 \emph on
-sbit
+__sbit
 \emph default
  addresses a specific bit within these sfr.
 \begin_inset Newline newline
@@ -19992,11 +19988,11 @@ sbit
 16 Bit and 32 bit special function register combinations which require a
  certain access order are better not declared using 
 \emph on
-sfr16
+__sfr16
 \emph default
  or 
 \emph on
-sfr32.
+__sfr32.
 
 \emph default
  Allthough SDCC usually accesses them Least Significant Byte (LSB) first,
@@ -20526,7 +20522,7 @@ register bank (mcs51, ds390)
  of registers (register bank 0), but it is possible to specify that other
  banks of registers (keyword 
 \emph on
-using
+__using
 \emph default
  
 \emph on
@@ -21202,7 +21198,7 @@ sfr
 \begin_layout Standard
 The keyword 
 \emph on
-banked
+__banked
 \emph default
  is used to support 16 bit addresses in I/O memory e.g.:
 \end_layout
@@ -21691,7 +21687,7 @@ Absolute addressing
 \begin_layout Standard
 Data items can be assigned an absolute address with the 
 \emph on
-at
+__at
 \begin_inset Index
 status collapsed
 
@@ -22815,7 +22811,7 @@ pragma stackauto
 
  or by using the 
 \emph on
-reentrant
+__reentrant
 \begin_inset Index
 status collapsed
 
@@ -22868,7 +22864,7 @@ unsigned char foo(char i) __reentrant
 \begin_layout Standard
 Since stack space on 8051 is limited, the 
 \emph on
-reentrant
+__reentrant
 \emph default
  keyword or the 
 \emph on
@@ -23509,7 +23505,7 @@ void timer_isr (void) __interrupt (1) __using (1)
 \begin_layout Standard
 The optional number following the 
 \emph on
-interrupt
+__interrupt
 \begin_inset Index
 status collapsed
 
@@ -23578,7 +23574,7 @@ main
 .
  The optional (8051 specific) keyword 
 \emph on
-using
+__using
 \begin_inset Index
 status collapsed
 
@@ -24418,7 +24414,7 @@ n
 \begin_layout Standard
 If the interrupt service routine is defined without 
 \emph on
-using
+__using
 \begin_inset Index
 status collapsed
 
@@ -24467,7 +24463,7 @@ using (mcs51, ds390 register bank)
 \emph default
  a register bank or with register bank 0 (
 \emph on
-using
+__using
 \emph default
  0), the compiler will save the registers used by itself on the stack upon
  entry and restore them at exit, however if such an interrupt service routine
@@ -24576,7 +24572,7 @@ By default, SDCC generates code for a maskable interrupt, which uses a RETI
  To write an interrupt handler for the non-maskable interrupt, which needs
  a RETN instruction instead, add the 
 \emph on
-critical
+__critical
 \emph default
  keyword:
 \end_layout
@@ -24584,7 +24580,7 @@ critical
 \begin_layout Verse
 
 \family typewriter
-void nmi_isr (void) critical interrupt
+void nmi_isr (void) __critical __interrupt
 \begin_inset Newline newline
 \end_inset
 
@@ -24619,7 +24615,7 @@ void nmi_isr (void) critical interrupt
 However if you need to create a non-interruptable interrupt service routine
  you would also require the 
 \emph on
-critical
+__critical
 \emph default
  keyword.
  To distinguish between this and an nmi_isr you must provide an interrupt
@@ -24638,7 +24634,7 @@ Critical Functions and Critical Statements
 A special keyword may be associated with a block or a function declaring
  it as 
 \emph on
-critical
+__critical
 \emph default
 .
  SDCC will generate code to disable all interrupts
@@ -24776,7 +24772,7 @@ reentrant.
 
 The keyword 
 \emph on
-critical
+__critical
 \emph default
  may also be used to disable interrupts more locally:
 \end_layout
@@ -25724,7 +25720,7 @@ name "sub:Functions-using-private-banks"
 Some architectures have support for quickly changing register sets.
  SDCC supports this feature with the 
 \emph on
-using
+__using
 \begin_inset Index
 status collapsed
 
@@ -25804,7 +25800,7 @@ interrupt
 \begin_layout Standard
 The 
 \emph on
-using
+__using
 \emph default
  attribute will have no effect on the generated code for a 
 \emph on
@@ -25834,7 +25830,7 @@ possible exception: if a function is called ONLY from 'interrupt' functions
 \emph on
 (pending: Note, nowadays the
 \emph default
- using 
+ __using 
 \emph on
 attribute has an effect on
 \emph default
@@ -31716,7 +31712,7 @@ Naked functions
 \begin_layout Standard
 A special keyword may be associated with a function declaring it as 
 \emph on
-_naked
+__naked
 \begin_inset Index
 status collapsed
 
@@ -33738,7 +33734,7 @@ _naked
 , the caller will swap register banks around the call, if caller and callee
  use different register banks (having them defined by the 
 \family typewriter
-_using
+__using
 \family default
  modifier).
  
@@ -38835,7 +38831,11 @@ pragma exclude
 \end_inset
 
 .
- See also the related keyword _naked
+ See also the related keyword 
+\emph on
+__naked
+\emph default
+
 \begin_inset Index
 status collapsed
 
@@ -39263,7 +39263,11 @@ interrupt vector table
  table (e.g.
  for the autovector feature of the Cypress EZ-USB FX2).
  More elegantly this can be achieved by omitting the optional interrupt
- number after the interrupt keyword, see section 
+ number after the 
+\emph on
+__interrupt
+\emph default
+ keyword, see section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Interrupt-Service-Routines"
@@ -42499,11 +42503,11 @@ When writing banked software using SDCC you need to use some special keywords
 To create a function that can be called from another bank it requires the
  keyword 
 \emph on
-banked
+__banked
 \emph default
 
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 banked
@@ -42516,7 +42520,7 @@ banked
  needs it for a proper return.
  Called functions within the same bank as the caller do not need the 
 \emph on
-banked
+__banked
 \emph default
  keyword nor do functions in the common area.
  Beware: SDCC does not know or check if functions are in the same bank.
@@ -43041,9 +43045,13 @@ Interrupt Code
 \end_layout
 
 \begin_layout Standard
-For the interrupt function, use the keyword `__interrupt'
+For the interrupt function, use the keyword 
+\emph on
+__interrupt
+\emph default
+
 \begin_inset Index
-status collapsed
+status open
 
 \begin_layout Plain Layout
 PIC14!interrupt
@@ -47429,7 +47437,7 @@ PIC16
 \end_layout
 
 \begin_layout Description
-wparam
+__wparam
 \begin_inset Index
 status collapsed
 
@@ -47447,7 +47455,7 @@ PIC16!wparam
 \end_layout
 
 \begin_layout LyX-Code
-void func_wparam(int a) wparam
+void func_wparam(int a) __wparam
 \end_layout
 
 \begin_layout LyX-Code
@@ -47472,7 +47480,7 @@ void func_wparam(int a) wparam
 \end_layout
 
 \begin_layout Description
-shadowregs
+__shadowregs
 \begin_inset Index
 status collapsed
 
@@ -47487,17 +47495,17 @@ PIC16!shadowregs
  registers.
  This can be done by adding the keyword 
 \emph on
-shadowregs
+__shadowregs
 \emph default
  before the 
 \emph on
-interrupt
+__interrupt
 \emph default
  keyword in the function's header.
 \end_layout
 
 \begin_layout LyX-Code
-void isr_shadow(void) shadowregs interrupt 1
+void isr_shadow(void) __shadowregs __interrupt 1
 \end_layout
 
 \begin_layout LyX-Code
@@ -47515,7 +47523,7 @@ void isr_shadow(void) shadowregs interrupt 1
 \begin_layout Standard
 
 \emph on
-shadowregs
+__shadowregs
 \emph default
  instructs the code generator not to store/restore WREG, STATUS, BSR when
  entering/exiting the ISR.
@@ -47682,13 +47690,13 @@ PIC16!interrupt
 
  service routine (ISR) is declared using the 
 \emph on
-interrupt
+__interrupt
 \emph default
  keyword.
 \end_layout
 
 \begin_layout LyX-Code
-void isr(void) interrupt 
+void isr(void) __interrupt 
 \emph on
 n
 \end_layout
@@ -48750,7 +48758,10 @@ In order to increase performance
 \emph on
 putchar
 \emph default
- is declared in stdio.h as having its parameter in WREG (it has the wparam
+ is declared in stdio.h as having its parameter in WREG (it has the 
+\emph on
+__wparam
+\emph default
  keyword).
  In stdio.h exists the macro PUTCHAR(arg) that defines the putchar function
  in a user-friendly way.
@@ -67439,53 +67450,11 @@ status collapsed
 
 \series default
  command line options are used.
- These may include (depending on the selected processor): 'at', 'banked',
- 'bit', 'code', 'critical', 'data', 'eeprom', 'far', 'flash', 'idata', 'interrup
-t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
- 'sram', 'using', 'wparam', 'xdata', '_overlay', '_asm', '_endasm', and
- '_naked'.
- The compiler displays a warning "keyword <keyword> is deprecated, use '__<keywo
-rd>' instead" in such cases.
- The warning can be disabled by using "#pragma disable_warning 197" in the
- source file or "--disable-warning 197" command line option.
- Compliant equivalents of these keywords are always available in a form
- that begin with two underscores
-\begin_inset Index
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
- (prefix for extended keywords)
-\end_layout
-
-\end_inset
-
-, f.e.
- '__data' instead of 'data' and '__asm' instead of '_asm'.
+ These may include (depending on the selected processor): '__at', '__banked',
+ '__bit', '__code', '__critical', '__data', '__eeprom', '__far', '__flash',
+ '__idata', '__interrupt', '__near', '__nonbanked', '__pdata', '__reentrant',
+ '__sbit', '__sfr', '__shadowregs', '__sram', '__using', '__wparam', '__xdata',
+ '__overlay', '__asm', '__endasm', and '__naked'.
 \end_layout
 
 \begin_layout Itemize

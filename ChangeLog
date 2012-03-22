@@ -1,3 +1,10 @@
+2012-03-22 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx: double underlined keywords,
+	  fixed bug #3510011 - Wrong keyword
+	* src/sdcc.vcxproj, src/sdcc.vcxproj.filters:
+	  added some missing header files
+
 2012-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h,

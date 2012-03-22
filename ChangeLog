@@ -1,3 +1,8 @@
+2012-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (transferAopAop): fixed bug 3509707
+	* support/regression/tests/gcc-torture-execute-930603-1.c: reenabled
+
 2012-03-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-92*,
@@ -9,7 +14,7 @@
 
 	* src/mcs51/gen.c, src/SDCCasm.c, src/SDCCasm.h, src/z80/gen.c,
 	  src/SDCCutil.c, src/ds390/gen.c, src/hc08/gen.c:
-	  code claning, optimization, ...
+	  code cleaning, optimization, ...
 
 2012-03-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

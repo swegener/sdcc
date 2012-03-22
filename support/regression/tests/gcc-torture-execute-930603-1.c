@@ -20,7 +20,6 @@ void f ();
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_hc08
   float a, b, c;
   a = inita ();
   c = initc ();
@@ -30,7 +29,6 @@ testTortureExecute (void)
   if (a != 3.0 || b < 4.3257 || b > 4.3258 || c != 4.0)
     ASSERT (0);
   return;
-#endif
 }
 
 float inita () { return 3.0; }

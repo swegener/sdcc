@@ -1220,23 +1220,11 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   if ((dstaop->type == AOP_DIR)
       && ((srcaop->type == AOP_DIR) || (srcaop->type == AOP_LIT)) )
     {
-      if (srcaop->type == AOP_LIT)
-        {
-          unsigned long lit;
-          unsigned long bytemask;
-
-          lit = ulFromVal (srcaop->aopu.aop_lit);
-          bytemask = (lit >> (srcofs*8)) & 0xff;
-
-          if (bytemask == 0)
-            {
-              emitcode ("clr", "%s", aopAdrStr(dstaop, dstofs, FALSE));
-              return;
-            }
-        }
-
-      emitcode("mov", "%s,%s", aopAdrStr(srcaop, srcofs, FALSE),
-               aopAdrStr(dstaop, dstofs, FALSE));
+      char *src = aopAdrStr (srcaop, srcofs, FALSE);
+      if (!strcmp (src, zero))
+        emitcode ("clr", "%s", aopAdrStr (dstaop, dstofs, FALSE));
+      else
+        emitcode ("mov", "%s,%s", src, aopAdrStr (dstaop, dstofs, FALSE));
       return;
     }
 

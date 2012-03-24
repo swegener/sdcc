@@ -1,7 +1,5 @@
 # Regression test specification for the pic16 target running with gpsim
 
-CC_FOR_BUILD = $(CC)
-
 # path to gpsim
 ifdef GPSIM_PATH
   GPSIM := $(WINE) $(GPSIM_PATH)/gpsim$(EXEEXT)
@@ -55,8 +53,5 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	  echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
-
-$(CASES_DIR)/timeout: fwk/lib/timeout.c
-	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

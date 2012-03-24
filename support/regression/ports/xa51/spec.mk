@@ -37,7 +37,4 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
           echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-$(CASES_DIR)/timeout$(EXEEXT): fwk/lib/timeout.c
-	$(CC) $(CFLAGS) $< -o $@
-
 _clean:

@@ -1,5 +1,19 @@
 2012-03-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* support/regression/Makefile.in,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/ucgbz80/spec.mk,
+	  support/regression/ports/ucr2k/spec.mk,
+	  support/regression/ports/ucz180/spec.mk,
+	  support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/xa51/spec.mk: attempt to fix bug #3477347
+	  
+2012-03-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCcse.h,
 	  src/SDCCcse.c: handle possible pointer aliasing more conservatively
 	* src/z80/gen.c (genFunction): reset stack.pushed at function start too

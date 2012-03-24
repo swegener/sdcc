@@ -1,7 +1,5 @@
 # Common regression test specification for the mcs51 targets running with uCsim
 
-CC_FOR_BUILD = $(CC)
-
 # path to uCsim
 ifdef SDCC_BIN_PATH
   S51 = $(SDCC_BIN_PATH)/s51$(EXEEXT)
@@ -62,8 +60,5 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib $(PORTS_DIR)/mcs51-common/f
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
-
-$(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c
-	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

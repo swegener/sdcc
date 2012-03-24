@@ -67,7 +67,5 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-$(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c
-	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 _clean:

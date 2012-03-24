@@ -1,3 +1,9 @@
+2012-03-24 Borut Razem <borut.razem AT gmail.com>
+
+	* support/makebin/makebin.c: applied modified patch
+	  #3510671 - [makebin / gbz80] add nintendo logo info in ROM header,
+	  thanks to Noel Lemouel
+
 2012-03-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/Makefile.in,

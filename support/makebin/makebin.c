@@ -3,6 +3,7 @@
 
   Copyright (c) 2000 Michael Hope
   Copyright (c) 2010 Borut Razem
+  Copyright (c) 2012 Noel Lemouel
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -112,6 +113,21 @@ void
 gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
 {
   int i, chk;
+  static const unsigned char gb_logo[] =
+    {
+      0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b,
+      0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00, 0x0d,
+      0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e,
+      0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99,
+      0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc,
+      0xdd, 0xdc, 0x99, 0x9f, 0xbb, 0xb9, 0x33, 0x3e
+    };
+
+  /* $0104-$0133: Nintendo logo
+   * If missing, an actual Game Boy won't run the ROM.
+   */
+
+  memcpy (&rom[0x104], gb_logo, sizeof (gb_logo));
 
   /*
    * 0134-0142: Title of the game in UPPER CASE ASCII. If it

@@ -35,7 +35,7 @@ typedef struct cseDef
     operand *sym;		/* defining symbol */
     iCode *diCode;		/* defining instruction */
     bitVect *ancestors;		/* keys of the symbol's ancestors */
-    int fromGlobal:1;		/* defining symbol's value computed from a global */
+    int fromGlobal;		/* defining symbol's value computed from a global */
     int fromAddrTaken:1;	/* defining symbol's value computed from a */
 				/*   symbol whose address was taken */
   }

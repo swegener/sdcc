@@ -34,6 +34,7 @@ cseDef *
 newCseDef (operand * sym, iCode * ic)
 {
   cseDef *cdp;
+  memmap *map;
 
   assert (sym);
   cdp = Safe_alloc (sizeof (cseDef));
@@ -47,16 +48,24 @@ newCseDef (operand * sym, iCode * ic)
 
   if (ic->op!=IF && ic->op!=JUMPTABLE)
     {
-      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
+      if (ic->op != ADDRESS_OF && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
         {
           bitVectSetBit (cdp->ancestors, IC_LEFT (ic)->key);
-          cdp->fromGlobal |= isOperandGlobal (IC_LEFT (ic));
+          if (isOperandGlobal (IC_LEFT (ic)))
+            {
+              map = SPEC_OCLS (getSpec (operandType (IC_LEFT (ic))));
+              cdp->fromGlobal |= (1 << map->ptrType);
+            }
           cdp->fromAddrTaken |= OP_SYMBOL (IC_LEFT (ic))->addrtaken;
         }
       if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
         {
           bitVectSetBit (cdp->ancestors, IC_RIGHT (ic)->key);
-          cdp->fromGlobal |= isOperandGlobal (IC_RIGHT (ic));
+          if (isOperandGlobal (IC_RIGHT (ic)))
+            {
+              map = SPEC_OCLS (getSpec (operandType (IC_RIGHT (ic))));
+              cdp->fromGlobal |= (1 << map->ptrType);
+            }
           cdp->fromAddrTaken |= OP_SYMBOL (IC_RIGHT (ic))->addrtaken;
         }
     }
@@ -73,7 +82,7 @@ updateCseDefAncestors(cseDef *cdp, set * cseSet)
 
   if (ic->op!=IF && ic->op!=JUMPTABLE)
     {
-      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
+      if (ic->op != ADDRESS_OF && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
         {
           bitVectSetBit (cdp->ancestors, IC_LEFT (ic)->key);
           for (sl = cseSet; sl; sl = sl->next)
@@ -566,6 +575,23 @@ DEFSETFUNC (ifFromGlobal)
   return cdp->fromGlobal;
 }
 
+/*-------------------------------------------------------------------*/
+/* ifFromGlobalAliasableByPtr - if definition is derived from global */
+/*   that may be aliasble by a particular pointer type               */
+/*-------------------------------------------------------------------*/
+DEFSETFUNC (ifFromGlobalAliasableByPtr)
+{
+  cseDef *cdp = item;
+  V_ARG (DECLARATOR_TYPE, decl);
+
+  if (decl == GPOINTER && cdp->fromGlobal)
+    return 1;
+  else if (cdp->fromGlobal & (1 << decl))
+    return 1;
+  else
+    return 0;
+}
+
 /*-----------------------------------------------------------------*/
 /* ifDefGlobal - if definition is global                           */
 /*-----------------------------------------------------------------*/
@@ -574,6 +600,24 @@ DEFSETFUNC (ifDefGlobal)
   cseDef *cdp = item;
 
   return (isOperandGlobal (cdp->sym));
+}
+
+/*-----------------------------------------------------------------*/
+/* ifDefGlobalAliasableByPtr - if definition is global             */
+/*   and may be aliasble by a particular pointer type              */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC (ifDefGlobalAliasableByPtr)
+{
+  cseDef *cdp = item;
+  V_ARG (DECLARATOR_TYPE, decl);
+  memmap *map;
+
+  if (!isOperandGlobal (cdp->sym))
+    return 0;
+  if (decl == GPOINTER)
+    return 1;
+  map = SPEC_OCLS (getSpec (operandType (cdp->sym)));
+  return (map->ptrType == decl);
 }
 
 /*-------------------------------------------------------------------*/
@@ -597,6 +641,48 @@ DEFSETFUNC (ifAnyGetPointer)
 
   if (cdp->diCode && POINTER_GET (cdp->diCode))
     return 1;
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* ifAnyUnrestrictedGetPointer - if get pointer icode              */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC (ifAnyUnrestrictedGetPointer)
+{
+  cseDef *cdp = item;
+  V_ARG (DECLARATOR_TYPE, decl);
+
+  if (cdp->diCode && POINTER_GET (cdp->diCode))
+    {
+      sym_link *ptype;
+      ptype = operandType (IC_LEFT (cdp->diCode));
+      if (!IS_PTR_RESTRICT (ptype))
+        {
+	  if (DCL_TYPE (ptype) == decl || IS_GENPTR (ptype))
+            return 1;
+	}
+    }
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* ifAnyUnrestrictedSetPointer - if set pointer icode              */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC (ifAnyUnrestrictedSetPointer)
+{
+  cseDef *cdp = item;
+  V_ARG (DECLARATOR_TYPE, decl);
+
+  if (cdp->diCode && POINTER_SET (cdp->diCode))
+    {
+      sym_link *ptype;
+      ptype = operandType (IC_RESULT (cdp->diCode));
+      if (!IS_PTR_RESTRICT (ptype))
+        {
+	  if (DCL_TYPE (ptype) == decl || IS_GENPTR (ptype))
+            return 1;
+	}
+    }
   return 0;
 }
 
@@ -2338,6 +2424,15 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           deleteItemIf (&ptrSetSet, ifOperandsHave, IC_RESULT (ic));
           /* delete any previous definitions */
           ebb->defSet = bitVectCplAnd (ebb->defSet, OP_DEFS (IC_RESULT (ic)));
+
+         /* Until pointer tracking is complete, by conservative and delete all */
+         /* pointer accesses that might alias this symbol. */
+         if (isOperandGlobal (IC_RESULT (ic)))
+           {
+             memmap *map = SPEC_OCLS (getSpec (operandType (IC_RESULT (ic))));
+             deleteItemIf (&cseSet, ifAnyUnrestrictedGetPointer, map->ptrType);
+             deleteItemIf (&ptrSetSet, ifAnyUnrestrictedSetPointer, map->ptrType);
+           }
         }
 
       /* add the left & right to the defUse set */
@@ -2360,6 +2455,8 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (POINTER_SET (defic) &&
 		  (IS_SYMOP (IC_RESULT (ic)) || IS_OP_LITERAL (IC_RESULT (ic))))
         {
+          sym_link *ptype = operandType (IC_RESULT (ic));
+
           if (IS_SYMOP (IC_RESULT (ic)))
             {
               OP_USES (IC_RESULT (ic)) =
@@ -2378,6 +2475,20 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           deleteItemIf (&ptrSetSet, ifPointerSet, IC_RESULT (ic));
           /* add to the local pointerset set */
           addSetHead (&ptrSetSet, newCseDef (IC_RESULT (ic), ic));
+
+          /* A write via a non-restrict pointer may modify a global */
+          /* variable used by this function, so delete them */
+          /* and any derived symbols from cseSet. */
+          if (!IS_PTR_RESTRICT (ptype))
+            {
+              deleteItemIf (&cseSet, ifDefGlobalAliasableByPtr);
+              deleteItemIf (&cseSet, ifFromGlobalAliasableByPtr, DCL_TYPE(ptype));
+            }
+
+          /* This could be made more specific for better optimization, but */
+          /* for safety, delete anything this write may have modified. */
+          deleteItemIf (&cseSet, ifFromAddrTaken);
+          deleteItemIf (&cseSet, ifAnyGetPointer);
         }
       else
         {

@@ -4204,6 +4204,8 @@ genFunction (const iCode * ic)
 
   setArea (IFFUNC_NONBANKED (sym->type));
 
+  _G.stack.pushed = 0;
+
   /* PENDING: Reset the receive offset as it
      doesn't seem to get reset anywhere else.
   */

@@ -1,3 +1,8 @@
+2012-03-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (packForPush): fixed bug 3502621
+	* support/regression/tests/gcc-torture-execute-20030117-1.c: enabled test
+
 2012-03-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (isConformingBody): fixed bug #3509715

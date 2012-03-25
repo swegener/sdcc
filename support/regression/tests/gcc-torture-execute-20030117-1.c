@@ -14,7 +14,6 @@ int bar (int, int, int);
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
   if (foo (5, 10, 21) != 12)
     ASSERT (0);
 
@@ -22,7 +21,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }
 
 int foo (int x, int y, int z)

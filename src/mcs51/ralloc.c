@@ -1033,15 +1033,23 @@ deassignLRs (iCode * ic, eBBlock * ebp)
           /* if the result of this one needs registers
              and does not have it then assign it right
              away */
-          if (IC_RESULT (ic) && !(SKIP_IC2 (ic) ||      /* not a special icode */
-                                  ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || ic->op == RETURN || POINTER_SET (ic)) && (result = OP_SYMBOL (IC_RESULT (ic))) &&        /* has a result */
-              result->liveTo > ic->seq &&       /* and will live beyond this */
-              result->liveTo <= ebp->lSeq &&    /* does not go beyond this block */
-              result->liveFrom == ic->seq &&    /* does not start before here */
+          if (IC_RESULT (ic) &&
+              !( SKIP_IC2 (ic)       ||                 /* not a special icode */
+                 ic->op == JUMPTABLE ||
+                 ic->op == IFX       ||
+                 ic->op == IPUSH     ||
+                 ic->op == IPOP      ||
+                 ic->op == RETURN    ||
+                 POINTER_SET (ic)      ) &&
+              (result = OP_SYMBOL (IC_RESULT (ic))) &&  /* has a result */
+              result->liveTo > ic->seq &&               /* and will live beyond this */
+              result->liveTo <= ebp->lSeq &&            /* does not go beyond this block */
+              result->liveFrom == ic->seq &&            /* does not start before here */
               result->regType == sym->regType &&        /* same register types */
-              result->nRegs &&  /* which needs registers */
-              !result->isspilt &&       /* and does not already have them */
-              !result->remat && !bitVectBitValue (_G.regAssigned, result->key) &&
+              result->nRegs &&                          /* which needs registers */
+              !result->isspilt &&                       /* and does not already have them */
+              !result->remat &&
+              !bitVectBitValue (_G.regAssigned, result->key) &&
               /* the number of free regs + number of regs in this LR
                  can accomodate the what result Needs */
               ((nfreeRegsType (result->regType) + sym->nRegs) >= result->nRegs))
@@ -1054,7 +1062,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 
               _G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
               _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, result->key);
-
             }
 
           /* free the remaining */
@@ -1243,8 +1250,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
           deassignLRs (ic, ebbs[i]);
 
           /* some don't need registers */
-          if (SKIP_IC2 (ic) ||
-              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || (IC_RESULT (ic) && POINTER_SET (ic)))
+          if (SKIP_IC2 (ic)       ||
+              ic->op == JUMPTABLE ||
+              ic->op == IFX       ||
+              ic->op == IPUSH     ||
+              ic->op == IPOP      ||
+              (IC_RESULT (ic) && POINTER_SET (ic)))
             {
               continue;
             }
@@ -2797,7 +2808,6 @@ packRegsForAccUse (iCode * ic)
 
 accuse:
   OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2816,6 +2826,20 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
   /* must have only definition & one usage */
   if (bitVectnBitsOn (OP_DEFS (IC_LEFT (ic))) != 1 || bitVectnBitsOn (OP_USES (IC_LEFT (ic))) != 1)
     return;
+
+  if (ic->parmPush)
+    {// find Send or other Push for this func call
+      for (lic = ic->next; lic && lic->op != CALL; lic = lic->next)
+        {
+          if ((lic->op == IPUSH || lic->op == SEND) && IS_ITEMP (IC_LEFT (lic)))
+            {// and check parameter is not passed again
+              symbol * parm = OP_SYMBOL (IC_LEFT (ic));
+              symbol * other = OP_SYMBOL (IC_LEFT (lic));
+              if (other == parm)
+                return;
+            }
+        }
+    }
 
   /* find the definition */
   if (!(dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (IC_LEFT (ic))))))
@@ -2865,7 +2889,7 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
       bitVectUnSetBit (OP_SYMBOL (IC_RESULT (dic))->defs, dic->key);
     }
 
-  /* we now we know that it has one & only one def & use
+  /* now we know that it has one & only one def & use
      and the that the definition is an assignment */
   ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RIGHT (dic));
   remiCodeFromeBBlock (ebp, dic);

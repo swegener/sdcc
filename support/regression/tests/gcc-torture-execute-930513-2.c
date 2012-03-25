@@ -24,7 +24,6 @@ void eq (int a, int b)
 void
 testTortureExecute (void)
 {
-#if 0
   int i;
 
   for (i = 0; i < 4; i++)
@@ -36,6 +35,5 @@ testTortureExecute (void)
       eq (k, k);
     }
   return;
-#endif
 }
 

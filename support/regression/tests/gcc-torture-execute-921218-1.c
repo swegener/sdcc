@@ -16,10 +16,8 @@ int f()
 void
 testTortureExecute (void)
 {
-#if 0
   if (f() != (unsigned char)(0377))
     ASSERT(0);
   return;
-#endif
 }
 

@@ -2156,9 +2156,9 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       /*       function call        */
       /*----------------------------*/
     case CALL:
-      /* if local & not passed as parameter &
+      /* if local & no parameters &
          not used to find the function then ok */
-      if (sym->level && !astHasSymbol (pbody->right, sym) && !astHasSymbol (pbody->left, sym))
+      if (sym->level && !pbody->right && !astHasSymbol (pbody->left, sym))
         {
           return TRUE;
         }
@@ -3959,10 +3959,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (tree->opval.op == LEFT_OP || (tree->opval.op == RIGHT_OP && SPEC_USIGN (LETYPE (tree))))
             {
               werrorfl (tree->filename, tree->lineno, W_SHIFT_CHANGED, (tree->opval.op == LEFT_OP ? "left" : "right"));
-              tree->type = EX_VALUE;
-              tree->left = tree->right = NULL;
-              tree->opval.val = constCharVal (0);
-              TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
+	      /* Change shift op to comma op and replace the right operand with 0. */
+	      /* This preserves the left operand in case there were side-effects. */
+              tree->opval.op = ',';
+              tree->right->opval.val = constCharVal (0);
+              TETYPE (tree) = TTYPE (tree) = tree->right->opval.val->type;
               return tree;
             }
         }

@@ -1,3 +1,14 @@
+2012-03-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (isConformingBody): fixed bug #3509715
+	* support/regression/tests/gcc-torture-execute-930513-2.c: reenabled
+	* src/SDCCast.c (decorateType): fixed bug #3509713
+	* support/regression/tests/gcc-torture-execute-930429-1.c: reenabled
+	* src/SDCCicode.c (geniCodeAssign): fixed bug #3509712
+	* support/regression/tests/gcc-torture-execute-921016-1.c: reenabled
+	* src/SDCCopt.c (optimizeCastCast): fixed bug #3509711
+	* support/regression/tests/gcc-torture-execute-921218-1.c: reenabled
+
 2012-03-24 Borut Razem <borut.razem AT gmail.com>
 
 	* support/makebin/makebin.c: applied modified patch

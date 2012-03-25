@@ -3118,6 +3118,7 @@ operand *
 geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
 {
   iCode *ic;
+  sym_link *ltype;
 
   if (!left->isaddr && (!IS_ITEMP (left) || strictLval))
     {
@@ -3162,7 +3163,11 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
   ic->nosupdate = nosupdate;
   /* left could be a pointer assignment,
      return the properly casted right instead */
-  return right;
+  ltype = operandType (left);
+  if ((IS_PTR (ltype) && IS_BITVAR (ltype->next)) || IS_BITVAR (ltype))
+    return left;
+  else
+    return right;
 }
 
 /*-----------------------------------------------------------------*/

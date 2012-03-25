@@ -11,7 +11,6 @@
 void
 testTortureExecute (void)
 {
-#if 0
   int j=1081;
   struct
     {
@@ -20,6 +19,5 @@ testTortureExecute (void)
   if((l.m = j) == j)
     ASSERT(0);
   return;
-#endif
 }
 

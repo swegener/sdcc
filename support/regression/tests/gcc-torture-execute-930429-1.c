@@ -18,11 +18,9 @@ f (const char *p)
 void
 testTortureExecute (void)
 {
-#if 0
   const char *p = "";
   if (f (p) != p + 1)
     ASSERT(0);
   return;
-#endif
 }
 

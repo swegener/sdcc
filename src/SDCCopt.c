@@ -1884,6 +1884,7 @@ optimizeCastCast (eBBlock ** ebbs, int count)
   sym_link * type2;
   sym_link * type3;
   symbol * sym;
+  int size1, size2, size3;
 
   for (i = 0; i < count; i++)
     {
@@ -1898,7 +1899,12 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               /* integer type that has no loss of bits */
               if (!IS_INTEGRAL (type1) || !IS_INTEGRAL (type2))
                 continue;
-              if (getSize (type2) < getSize (type1))
+              size1 = getSize (type1);
+              size2 = getSize (type2);
+              if (size2 < size1)
+                continue;
+              /* If they are the same size, they must have the same signedness */
+              if (size2 == size1 && SPEC_USIGN (type2) != SPEC_USIGN (type1))
                 continue;
 
               /* There must be only one use of this first result */
@@ -1916,8 +1922,12 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               type3 = operandType (IC_RESULT (uic));
               if (!IS_INTEGRAL (type3))
                  continue;
-              if (getSize (type3) < getSize (type2))
+              size3 = getSize (type3);
+              if (size3 < size2)
                  continue;
+              /* If they are the same size, they must have the same signedness */
+              if (size3 == size2 && SPEC_USIGN (type3) != SPEC_USIGN (type2))
+                continue;
 
               /* The signedness between the first and last types */
               /* must match */

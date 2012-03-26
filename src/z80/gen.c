@@ -3988,6 +3988,8 @@ emitCall (const iCode *ic, bool ispcall)
       /* Todo: Check fo _Noreturn in the peephole optimizer and do not emit the inc sp here. */
       emit2 ("inc sp");
       regalloc_dry_run_cost += 1;
+      if (!regalloc_dry_run)
+        _G.stack.pushed -= ic->parmBytes;
     }
   else if (ic->parmBytes)
     {
@@ -4203,8 +4205,7 @@ genFunction (const iCode * ic)
   bool deInUse = FALSE;
 
   setArea (IFFUNC_NONBANKED (sym->type));
-
-  _G.stack.pushed = 0;
+  wassert (!_G.stack.pushed);
 
   /* PENDING: Reset the receive offset as it
      doesn't seem to get reset anywhere else.
@@ -4418,10 +4419,11 @@ genEndFunction (iCode * ic)
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
   wassert (!regalloc_dry_run);
+  wassert (!_G.stack.pushed);
 
   if (IFFUNC_ISNAKED (sym->type) || IFFUNC_ISNORETURN (sym->type))
     {
-      emitDebug (IFFUNC_ISNAKED (sym->type) ? "; naked function: no epilogue." : "; _Noreturn function: no epilogue.");
+      emitDebug (IFFUNC_ISNAKED (sym->type) ? "; naked function: No epilogue." : "; _Noreturn function: No epilogue.");
       if (!IS_STATIC(sym->etype))
         {
           struct dbuf_s dbuf;
@@ -9631,7 +9633,10 @@ genCritical (const iCode *ic)
       emit2 ("!di");
       regalloc_dry_run_cost += 2;
       //save P/O flag
-      _push (PAIR_AF);
+      if (!regalloc_dry_run) // _push unbalances _G.stack.pushed.
+        _push (PAIR_AF);
+      else
+        regalloc_dry_run_cost++;
     }
 }
 
@@ -9671,7 +9676,10 @@ genEndCritical (const iCode *ic)
   else
     {
       //restore P/O flag
-      _pop (PAIR_AF);
+      if (!regalloc_dry_run) // _pop unbalances _G.stack.pushed.
+        _pop (PAIR_AF);
+      else
+        regalloc_dry_run_cost++;
       //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
       //don't enable interrupts as they were off before
       if(!regalloc_dry_run)

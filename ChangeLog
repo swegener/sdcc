@@ -1,3 +1,7 @@
+2012-03-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCasm.c (FileBaseName): fixed bug 3511092
+
 2012-03-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-9*.c:

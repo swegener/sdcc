@@ -51,7 +51,7 @@ FileBaseName (const char *fileFullName)
     }
 
   for (p = fileFullName + strlen (fileFullName) - 1;
-       p >= fileFullName && (*p != '/' || *p != '\\' || *p != ':');
+       p >= fileFullName && (*p != '/' && *p != '\\' && *p != ':');
        --p)
     ;
 

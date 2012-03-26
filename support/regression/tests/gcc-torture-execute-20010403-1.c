@@ -43,9 +43,7 @@ void d (int x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390
   a (0, 0);
   return;
-#endif
 }
 

@@ -2727,8 +2727,9 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
   iCode *dic, *lic;
   bitVect *dbv;
   struct eBBlock * ebp=ebpp[blockno];
+  int disallowHiddenAssignment = 0;
 
-  if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
+  if ((ic->op != IPUSH && ic->op != SEND) || !IS_ITEMP (IC_LEFT (ic)))
     return;
 
   /* must have only definition & one usage */
@@ -2760,6 +2761,12 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
 
   if (IS_SYMOP(IC_RIGHT(dic)))
     {
+      if (IC_RIGHT (dic)->isvolatile)
+        return;
+
+      if (OP_SYMBOL (IC_RIGHT (dic))->addrtaken || isOperandGlobal (IC_RIGHT (dic)))
+        disallowHiddenAssignment = 1;
+
       /* make sure the right side does not have any definitions
          inbetween */
       dbv = OP_DEFS(IC_RIGHT(dic));
@@ -2767,6 +2774,8 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
         {
           if (bitVectBitValue(dbv,lic->key))
             return ;
+          if (disallowHiddenAssignment && (lic->op == CALL || lic->op == PCALL || POINTER_SET (lic)))
+            return;
         }
       /* make sure they have the same type */
       if (IS_SPEC(operandType(IC_LEFT(ic))))
@@ -3091,7 +3100,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
          -------------
          push V1
        */
-      if (ic->op == IPUSH)
+      if (ic->op == IPUSH || ic->op == SEND)
         {
           packForPush (ic, ebpp, blockno);
         }

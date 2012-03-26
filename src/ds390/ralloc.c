@@ -2881,6 +2881,7 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
   iCode *dic, *lic;
   bitVect *dbv;
   struct eBBlock *ebp = ebpp[blockno];
+  int disallowHiddenAssignment = 0;
 
   if ((ic->op != IPUSH && ic->op != SEND) || !IS_ITEMP (IC_LEFT (ic)))
     return;
@@ -2899,12 +2900,20 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
   if (dic->eBBlockNum != ic->eBBlockNum)
     return;
 
+  if (IS_OP_VOLATILE (IC_RIGHT (dic)))
+    return;
+
+  if ((IS_SYMOP (IC_RIGHT (dic)) && OP_SYMBOL (IC_RIGHT (dic))->addrtaken) || isOperandGlobal (IC_RIGHT (dic)))
+    disallowHiddenAssignment = 1;
+
   /* make sure the right side does not have any definitions
      inbetween */
   dbv = OP_DEFS (IC_RIGHT (dic));
   for (lic = ic; lic && lic != dic; lic = lic->prev)
     {
       if (bitVectBitValue (dbv, lic->key))
+        return;
+      if (disallowHiddenAssignment && (lic->op == CALL || lic->op == PCALL || POINTER_SET (lic)))
         return;
     }
   /* make sure they have the same type */
@@ -3241,7 +3250,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
         {
           packForPush (ic, ebpp, blockno);
         }
-
 
       /* pack registers for accumulator use, when the
          result of an arithmetic or bit wise operation

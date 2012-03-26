@@ -1,3 +1,12 @@
+2012-03-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (packForPush),
+	  src/ds390/ralloc.c (packForPush),
+	  src/hc08/ralloc.c (packForPush): fixed bug #3502628
+	* support/regression/tests/gcc-torture-execute-20010403-1.c: reenabled
+	* src/hc08/ralloc.c (packRegisters, packForPush): use packForPush
+	  for SEND iCodes too.
+
 2012-03-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (packForPush): fixed bug 3502621

@@ -4656,22 +4656,34 @@ genRet (const iCode *ic)
         }
       while (size--);
     }
-  else
+  else if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
     {
-      int sp_offset, fp_offset;
-      wassertl (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK, "Big return value not on stack.");
-      fp_offset = AOP (IC_LEFT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_LEFT (ic))->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-      sp_offset = fp_offset + _G.stack.pushed;
       emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed);
       emit2 ("add hl, sp");
       regalloc_dry_run_cost += 4;
       emit2 ("ex de, hl");
       regalloc_dry_run_cost += (IS_R2K ? 2 : 1);
-      emit2 ("ld hl, #%d", sp_offset);
-      emit2 ("add hl, sp");
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK)
+        {
+          int sp_offset, fp_offset;
+          fp_offset = AOP (IC_LEFT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_LEFT (ic))->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+          sp_offset = fp_offset + _G.stack.pushed;
+          emit2 ("ld hl, #%d", sp_offset);
+          emit2 ("add hl, sp");
+          regalloc_dry_run_cost += 4;
+        }
+      else
+        {
+          emit2 ("ld hl, #%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
+          regalloc_dry_run_cost += 3;
+        }
       emit2 ("ld bc, #%d", size);
       emit2 ("ldir");
-      regalloc_dry_run_cost += 9;
+      regalloc_dry_run_cost += 5;
+    }
+  else
+    {
+      wassertl (0, "Invalid return operand type.");
     }
   freeAsmop (IC_LEFT (ic), NULL, ic);
 

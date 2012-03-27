@@ -17,6 +17,11 @@ long long g(void)
   return (y);
 }
 
+long long h(void)
+{
+  return (x);
+}
+
 long long c(void)
 {
   return (12ll);
@@ -34,6 +39,8 @@ testLongLong (void)
   i = 23;
   ASSERT ((*gp)() == 24);
   ASSERT (c() == 12);
+  x = 42;
+  ASSERT (h() == x);
 #endif
 }
 

@@ -2870,7 +2870,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if (IS_AGGREGATE (sym->type->next) || IS_LONGLONG (sym->type->next))
+  if (IS_AGGREGATE (sym->type->next) || IS_LONGLONG (sym->type->next) && !TARGET_Z80_LIKE)
     {
       werror (E_FUNC_AGGR, sym->name);
       return 0;

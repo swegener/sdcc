@@ -3824,9 +3824,10 @@ _opUsesPair (operand * op, const iCode * ic, PAIR_ID pairId)
 static void
 emitCall (const iCode *ic, bool ispcall)
 {
-  bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet, SomethingReturned;
+  bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet, SomethingReturned, bigreturn;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec(dtype);
+  sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
 
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
@@ -3898,6 +3899,28 @@ emitCall (const iCode *ic, bool ispcall)
           freeAsmop (IC_LEFT (sic), NULL, sic);
         }
       _G.sendSet = NULL;
+    }
+
+  /* Return value of big type or returning struct or union. */
+  bigreturn = (getSize (ftype->next) > 4);
+  if (bigreturn)
+    {
+      PAIR_ID pair;
+      int fp_offset, sp_offset;
+      
+      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+      emitDebug(";bigreturn call");
+      wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");
+      wassert (AOP_TYPE (IC_RESULT (ic)) == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_EXSTK);
+      fp_offset = AOP (IC_RESULT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_RESULT (ic))->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      sp_offset = fp_offset + _G.stack.pushed;
+      pair = ispcall ? PAIR_IY : PAIR_HL;
+      emit2 ("ld %s,!immedword", _pairs[pair].name, sp_offset);
+      emit2 ("add %s, sp", _pairs[pair].name);
+      emit2 ("push %s", _pairs[pair].name);
+      if(!regalloc_dry_run)
+        _G.stack.pushed += 2;
+      freeAsmop (IC_RESULT (ic), NULL, ic);
     }
 
   if (ispcall)
@@ -3982,18 +4005,18 @@ emitCall (const iCode *ic, bool ispcall)
     }
 
   /* adjust the stack for parameters if required */
-  if (ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
+  if ((ic->parmBytes || bigreturn) && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
     {
       /* This is just a workaround to not confuse the peephole optimizer too much. */
       /* Todo: Check fo _Noreturn in the peephole optimizer and do not emit the inc sp here. */
       emit2 ("inc sp");
       regalloc_dry_run_cost += 1;
       if (!regalloc_dry_run)
-        _G.stack.pushed -= ic->parmBytes;
+        _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
     }
-  else if (ic->parmBytes)
+  else if (ic->parmBytes || bigreturn)
     {
-      int i = ic->parmBytes;
+      int i = ic->parmBytes + bigreturn * 2;
 
       if (!regalloc_dry_run)
         _G.stack.pushed -= i;
@@ -4048,7 +4071,7 @@ emitCall (const iCode *ic, bool ispcall)
     }
 
   /* if we need assign a result value */
-  if (SomethingReturned)
+  if (SomethingReturned && !bigreturn)
     {
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
 
@@ -4203,6 +4226,7 @@ genFunction (const iCode * ic)
 
   bool bcInUse = FALSE;
   bool deInUse = FALSE;
+  bool bigreturn;
 
   setArea (IFFUNC_NONBANKED (sym->type));
   wassert (!_G.stack.pushed);
@@ -4341,6 +4365,9 @@ genFunction (const iCode * ic)
 
   /* adjust the stack for the function */
 //  _G.stack.last = sym->stack;
+
+  bigreturn = (getSize (ftype->next) > 4);
+  _G.stack.param_offset += bigreturn * 2;
 
   stackParm = FALSE;
   for (sym = setFirstItem (istack->syms); sym;
@@ -4577,7 +4604,7 @@ genRet (const iCode *ic)
     {
       fetchPairLong (IS_GB ? PAIR_DE : PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
     }
-  else
+  else if (size <= 4)
     {
       if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
         {
@@ -4605,6 +4632,46 @@ genRet (const iCode *ic)
               offset++;
             }
         }
+    }
+  else if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
+    {
+      unsigned long lit = ulFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed);
+      emit2 ("add hl, sp");
+      emit2 ("ld a, (hl)");
+      emit2 ("inc hl");
+      emit2 ("ld h, (hl)");
+      emit2 ("ld l, a");
+      regalloc_dry_run_cost += 8;
+      do
+        {
+          emit2 ("ld (hl), !immedbyte", lit & 0xff);
+          regalloc_dry_run_cost += 2;
+          lit >>= 8;
+          if (size)
+            {
+              emit2 ("inc hl");
+              regalloc_dry_run_cost++;
+            }
+        }
+      while (size--);
+    }
+  else
+    {
+      int sp_offset, fp_offset;
+      wassertl (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK, "Big return value not on stack.");
+      fp_offset = AOP (IC_LEFT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_LEFT (ic))->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      sp_offset = fp_offset + _G.stack.pushed;
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed);
+      emit2 ("add hl, sp");
+      regalloc_dry_run_cost += 4;
+      emit2 ("ex de, hl");
+      regalloc_dry_run_cost += (IS_R2K ? 2 : 1);
+      emit2 ("ld hl, #%d", sp_offset);
+      emit2 ("add hl, sp");
+      emit2 ("ld bc, #%d", size);
+      emit2 ("ldir");
+      regalloc_dry_run_cost += 9;
     }
   freeAsmop (IC_LEFT (ic), NULL, ic);
 

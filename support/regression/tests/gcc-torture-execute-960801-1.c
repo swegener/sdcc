@@ -8,8 +8,8 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc can return long long!
-#if 0
+// Some ports do not yet support long long.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
 unsigned
 f ()
 {
@@ -38,7 +38,7 @@ g ()
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
   if (f () != (unsigned short) -1)
     ASSERT (0);
   if (g () != (unsigned short) -1)

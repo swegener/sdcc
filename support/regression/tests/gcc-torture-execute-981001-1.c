@@ -12,7 +12,7 @@
 
 unsigned long flg = 0;
 
-long sub (int n)
+long sub (int n) __reentrant
 {
   int a, b ;
 
@@ -39,7 +39,6 @@ long sub (int n)
 void
 testTortureExecute (void)
 {
-#if 0
   if (sub (30) != 832040L)
     flg |= NG;
 
@@ -47,6 +46,5 @@ testTortureExecute (void)
     ASSERT (0);
   
   return;
-#endif
 }
 

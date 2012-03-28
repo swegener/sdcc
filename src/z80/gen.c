@@ -4636,7 +4636,7 @@ genRet (const iCode *ic)
   else if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
       unsigned long lit = ulFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed);
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr ? 0 : 2));
       emit2 ("add hl, sp");
       emit2 ("ld a, (hl)");
       emit2 ("inc hl");
@@ -4658,11 +4658,12 @@ genRet (const iCode *ic)
     }
   else if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
     {
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed);
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr ? 0 : 2));
       emit2 ("add hl, sp");
-      regalloc_dry_run_cost += 4;
-      emit2 ("ex de, hl");
-      regalloc_dry_run_cost += (IS_R2K ? 2 : 1);
+      emit2 ("ld e, (hl)");
+      emit2 ("inc hl");
+      emit2 ("ld d, (hl)");
+      regalloc_dry_run_cost += 7;
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK)
         {
           int sp_offset, fp_offset;

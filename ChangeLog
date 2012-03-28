@@ -2,6 +2,8 @@
 
 	* src/z80/ralloc2.cc:
 	  Allow some use of de on gbz80.
+	* src/z80/gen.c:
+	  gbz80 >> fix.
 
 2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

@@ -7656,7 +7656,7 @@ shiftR2Left2Result (const iCode *ic, operand * left, int offl,
     }
   else
     {
-      bool use_b = (!bitVectBitValue (ic->rSurv, B_IDX) && !(AOP_TYPE (result) == AOP_REG && (AOP (result)->aopu.aop_reg[0]->rIdx == B_IDX || AOP (result)->aopu.aop_reg[1]->rIdx == B_IDX)));
+      bool use_b = (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && !(AOP_TYPE (result) == AOP_REG && (AOP (result)->aopu.aop_reg[0]->rIdx == B_IDX || AOP (result)->aopu.aop_reg[1]->rIdx == B_IDX)));
       if(!regalloc_dry_run)
         {
           emit2 ("ld %s,!immedbyte", use_b ? "b" : "a", shCount);

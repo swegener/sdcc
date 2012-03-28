@@ -1,3 +1,9 @@
+2012-03-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  More flexible use of de for gbz80.
+
 2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc:

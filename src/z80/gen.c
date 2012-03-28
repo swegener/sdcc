@@ -3080,7 +3080,7 @@ _castBoolean (const operand *right)
 }
 
 /* Shuffle src reg array into dst reg array. */
-static void regMove(short *dst, short *src, size_t n)
+static void regMove(const short *dst, const short *src, size_t n)
 {
   bool assigned[8] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
   int cached_byte = -1;
@@ -5338,7 +5338,7 @@ genPlus (iCode * ic)
               (AOP_SIZE (IC_LEFT (ic)) <= 2 &&
                AOP_SIZE (IC_RIGHT (ic)) <= 2 || size == 2))
             {
-              if (getPairId (AOP (IC_RIGHT (ic))) == PAIR_BC)
+              if (getPairId (AOP (IC_RIGHT (ic))) == PAIR_BC || getPairId (AOP (IC_RIGHT (ic))) == PAIR_DE)
                 {
                   /* Swap left and right */
                   operand *t = IC_RIGHT (ic);
@@ -5353,8 +5353,38 @@ genPlus (iCode * ic)
                 }
               else
                 {
-                  fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
-                  fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+                  if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+                    {
+                      const short dst[4] = {E_IDX, L_IDX, D_IDX, H_IDX};
+                      short src[4];
+                      if (AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX || AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == L_IDX)
+                        {
+                          src[0] = AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx;
+                          src[1] = AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx;
+                          src[2] = AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx;
+                          src[3] = AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx;
+                        }
+                      else
+                        {
+                          src[1] = AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx;
+                          src[0] = AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx;
+                          src[3] = AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx;
+                          src[2] = AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx;
+                        }
+                      regMove (dst, src, size);
+                    }
+                  else if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&
+                    (AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX ||
+                    AOP_SIZE (IC_RIGHT (ic)) == 2 && (AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == E_IDX || AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == D_IDX)))
+                    {
+                      fetchPair (PAIR_DE, AOP (IC_RIGHT (ic)));
+                      fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+                    }
+                  else
+                    {
+                      fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
+                      fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+                    }
                   emit2 ("add hl,de");
                   regalloc_dry_run_cost += 1;
                 }

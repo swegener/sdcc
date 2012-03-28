@@ -918,8 +918,6 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 template <class G_t, class I_t>
 bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
-  const iCode *ic = G[i].ic;
-
   if(!IS_GB) // Only gbz80 might need de for code generation.
     return(true);
 
@@ -931,13 +929,27 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(unused_E && unused_D)
     return(true);	// Register DE not in use.
 
+  const iCode *ic = G[i].ic;
+  const operand *left = IC_LEFT(ic);
+  const operand *right = IC_RIGHT(ic);
+  const operand *result = IC_RESULT(ic);
+
   if(ic->op == CALL || ic->op == PCALL)
     return(false);
 
-  if(ic->op == '=' || ic->op == GET_VALUE_AT_ADDRESS || ic->op == CAST)
+  if((ic->op == GET_VALUE_AT_ADDRESS || ic->op == '=' && POINTER_SET(ic)) &&
+    (getSize(operandType(result)) >= 2 || !operand_is_pair(left, a, i, G)))
     return(false);
 
-  if(ic->op == UNARYMINUS || ic->op == '+' || ic->op == '-' || ic->op == '*')
+  if((ic->op == '=' || ic->op == CAST) && getSize(operandType(result)) >= 2 &&
+     (operand_on_stack(right, a, i, G) || operand_in_reg(right, REG_L, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G)) &&
+     (operand_on_stack(result, a, i, G) || operand_in_reg(result, REG_L, ia, i, G) || operand_in_reg(result, REG_H, ia, i, G)))
+    return(false);
+
+  if(ic->op == '+' && getSize(operandType(result)) >= 2)
+    return(false);
+
+  if(ic->op == UNARYMINUS || ic->op == '-' || ic->op == '*')
     return(false);
 
   if(ic->op == '>' || ic->op == '<')

@@ -674,7 +674,24 @@ cheapestVal (value * val)
   return (val);
 }
 
-/*--------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+/* double2ul - double to unsigned long conversion                  */
+/*-----------------------------------------------------------------*/
+unsigned long
+double2ul (double val)
+{
+/*
+ * See ISO/IEC 9899, chapter 6.3.1.4 Real floating and integer:
+ * If the value of the integral part cannot be represented by the integer type, the behavior is undefined.
+ * This shows up on Mac OS X i386 platform which useus SSE unit instead of the x87 FPU for floating-point operations
+ */
+/*
+ * on Mac OS X ppc (long) 2147483648.0 equals to 2147483647, so we explicitely convert it to 0x80000000
+ * on other known platforms (long) 2147483648.0 equals to -2147483648
+ */
+  return ((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val);
+}
+ /*--------------------------------------------------------------------*/
 /* checkConstantRange - check if constant fits in numeric range of    */
 /* var type in comparisons and assignments                            */
 /*--------------------------------------------------------------------*/

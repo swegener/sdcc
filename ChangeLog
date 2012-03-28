@@ -1,3 +1,8 @@
+2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/include/stdint.h:
+	  Use long long for intmax_t where available.
+
 2012-03-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/gcc-torture-execute-981001-1.c: Revert my

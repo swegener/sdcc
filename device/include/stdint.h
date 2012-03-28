@@ -102,9 +102,13 @@ typedef unsigned long long int  uint_fast64_t;
 
 
 /* Largest integral types.  */
+#ifndef __SDCC_LONGLONG
 typedef long int                intmax_t;
 typedef unsigned long int       uintmax_t;
-
+#else
+typedef long long int           intmax_t;
+typedef unsigned long long int  uintmax_t;
+#endif
 
 /* Limits of integral types.  */
 

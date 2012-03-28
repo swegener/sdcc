@@ -38,7 +38,6 @@ extern Z80_OPTS z80_opts;
 #define OPTRALLOC_EXACT_COST 1
 #define OPTRALLOC_REMAT (OPTRALLOC_EXACT_COST && !IS_GB)
 #define OPTRALLOC_HL (!IS_GB)
-#define OPTRALLOC_A 1
 #define OPTRALLOC_IY !(IY_RESERVED || IS_GB)
 
 enum

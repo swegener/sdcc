@@ -80,12 +80,12 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
                 c += 2.0f;
 
               // Code generator cannot handle variables only partially in A.
-              if(OPTRALLOC_A && size > 1)
+              if(size > 1)
                 for(unsigned short int i = 0; i < size; i++)
                   if(byteregs[i] == REG_A)
                     c += std::numeric_limits<float>::infinity();
 
-              if(OPTRALLOC_A && byteregs[0] == REG_A)
+              if(byteregs[0] == REG_A)
                 c -= 0.4f;
               else if(OPTRALLOC_HL && byteregs[0] == REG_L)
                 c -= 0.1f;
@@ -201,12 +201,12 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
         }
 
       // Code generator cannot handle variables only partially in A.
-      if(OPTRALLOC_A && size1 > 1)
+      if(size1 > 1)
         for(unsigned short int i = 0; i < size1; i++)
           if(byteregs[i] == REG_A)
             c += std::numeric_limits<float>::infinity();
 
-      if(OPTRALLOC_A && byteregs[0] == REG_A)
+      if(byteregs[0] == REG_A)
         c -= 0.4f;
       else if(OPTRALLOC_IY && byteregs[0] == REG_IYL || byteregs[0] == REG_IYH)
         c += 0.1f;
@@ -237,7 +237,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
           size2++;
         }
 
-      if(OPTRALLOC_A && byteregs[0] == REG_A)
+      if(byteregs[0] == REG_A)
         c -= 0.4f;
       else if(OPTRALLOC_IY && byteregs[0] == REG_IYL || byteregs[0] == REG_IYH)
         c += 0.1f;
@@ -287,7 +287,7 @@ return_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
           size++;
         }
 
-      if(OPTRALLOC_A && byteregs[0] == REG_A)
+      if(byteregs[0] == REG_A)
         c -= 0.4f;
         
       if(byteregs[0] == REG_L)
@@ -342,12 +342,12 @@ call_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
         }
 
       // Code generator cannot handle variables only partially in A.
-      if(OPTRALLOC_A && size > 1)
+      if(size > 1)
         for(unsigned short int i = 0; i < size; i++)
           if(byteregs[i] == REG_A)
             c += std::numeric_limits<float>::infinity();
 
-      if(OPTRALLOC_A && byteregs[0] == REG_A)
+      if(byteregs[0] == REG_A)
         c -= 0.4f;
         
       if(byteregs[0] == REG_L)
@@ -916,6 +916,23 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 }
 
 template <class G_t, class I_t>
+bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+{
+  if(!IS_GB) // Only gbz80 might need de for code generation.
+    return(true);
+
+  const i_assignment_t &ia = a.i_assignment;
+
+  bool unused_E = (ia.registers[REG_E][1] < 0);
+  bool unused_D = (ia.registers[REG_D][1] < 0);
+
+  if(unused_E && unused_D)
+    return(true);	// Register DE not in use.
+
+  return(false);
+}
+
+template <class G_t, class I_t>
 void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   iCode *ic = G[i].ic;
@@ -949,7 +966,7 @@ void assign_operand_for_cost(operand *o, const assignment &a, unsigned short int
       var_t v = oi->second;
       if(a.global[v] >= 0)
         { 
-          if((a.global[v] != REG_A || !OPTRALLOC_A) && (a.global[v] != REG_IYL && a.global[v] != REG_IYH || !OPTRALLOC_IY))
+          if(a.global[v] != REG_A && (a.global[v] != REG_IYL && a.global[v] != REG_IYH || !OPTRALLOC_IY))
             {
               sym->regs[I[v].byte] = regsZ80 + a.global[v];
               sym->accuse = 0;
@@ -1013,10 +1030,13 @@ float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, 
   if(!inst_sane(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
-  if(OPTRALLOC_A && !Ainst_ok(a, i, G, I))
+  if(!Ainst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
   if(OPTRALLOC_HL && !HLinst_ok(a, i, G, I))
+    return(std::numeric_limits<float>::infinity());
+
+  if(!DEinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
   if(OPTRALLOC_IY && !IYinst_ok(a, i, G, I))
@@ -1155,7 +1175,7 @@ template <class G_t, class I_t>
 bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar)
 {
   // Can check for Ainst_ok() since A only contains 1-byte variables.
-  if(OPTRALLOC_A && !Ainst_ok(a, i, G, I))
+  if(!Ainst_ok(a, i, G, I))
     return(true);
 
   if(local_assignment_insane(a, I, lastvar))
@@ -1200,7 +1220,7 @@ void get_best_local_assignment_biased(assignment &a, typename boost::graph_trait
         {
           varset_t::const_iterator vi, vi_end;
           for(vi = ai->local.begin(), vi_end = ai->local.end(); vi != vi_end; ++vi)
-            if(OPTRALLOC_A && ai->global[*vi] == REG_A || OPTRALLOC_HL && (ai->global[*vi] == REG_H || ai->global[*vi] == REG_L) || OPTRALLOC_IY && (ai->global[*vi] == REG_IYH || ai->global[*vi] == REG_IYL))
+            if(ai->global[*vi] == REG_A || OPTRALLOC_HL && (ai->global[*vi] == REG_H || ai->global[*vi] == REG_L) || OPTRALLOC_IY && (ai->global[*vi] == REG_IYH || ai->global[*vi] == REG_IYL))
               goto too_risky;
           ai_best = ai;
         }
@@ -1230,7 +1250,7 @@ float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &
     !HLinst_ok(a, i, G, I))
     c += 8.0f;
 
-  if(OPTRALLOC_A && ia.registers[REG_A][1] < 0)
+  if(ia.registers[REG_A][1] < 0)
     c += 0.03f;
 
   if(OPTRALLOC_HL && ia.registers[REG_L][1] < 0)
@@ -1312,7 +1332,7 @@ void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
       symbol *sym = (symbol *)(hTabItemWithKey(liveRanges, I[v].v));
       if(winner.global[v] >= 0)
         {
-          if((winner.global[v] != REG_A || !OPTRALLOC_A) && (winner.global[v] != REG_IYL && winner.global[v] != REG_IYH || !OPTRALLOC_IY))
+          if(winner.global[v] != REG_A && (winner.global[v] != REG_IYL && winner.global[v] != REG_IYH || !OPTRALLOC_IY))
             {
               sym->regs[I[v].byte] = regsZ80 + winner.global[v];
               sym->accuse = 0;

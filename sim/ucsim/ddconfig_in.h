@@ -6,9 +6,8 @@
 /* Define to be the type of length parameter of accept (without the \*'). */
 #undef ACCEPT_SOCKLEN_T
 
-/* Define to 1 if your processor stores words with the most significant byte
-   first (like Motorola and SPARC, unlike Intel and VAX). */
-#undef BUILD_WORDS_BIGENDIAN
+/* Define if building universal (internal helper macro) */
+#undef AC_APPLE_UNIVERSAL_BUILD
 
 /* XXX */
 #undef FD_HEADER_OK
@@ -254,6 +253,18 @@
 /* XXX */
 #undef VERSIONSTR
 
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
+
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #undef YYTEXT_POINTER
@@ -264,5 +275,8 @@
 /* XXX */
 #undef _M_
 
-#include "custom.h"
+/* ucsim custom defines */
+#define DD_TRUE     1
+#define DD_FALSE    0
+#define NIL         0
 #endif /* DDCONFIG_HEADER */

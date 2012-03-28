@@ -1,3 +1,12 @@
+2012-03-28 Borut Razem <borut.razem AT gmail.com>
+
+	* configure.in, configure, sdccconf_in.h,
+	  sim/ucsim/configure.in, sim/ucsim/configure,
+	  sim/ucsim/ddconfig_in.h:
+	  use AC_C_BIGENDIAN inatead of SDCC_BUILD_BIGENDIAN
+	* support/cpp/config.in: regenerated
+	* custom_in.h, sim/ucsim/custom_in.h: removed
+
 2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/include/stdint.h:

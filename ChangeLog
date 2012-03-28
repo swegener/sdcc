@@ -1,6 +1,11 @@
 2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
+	  Better support for returning long long, now works for gbz80, too.
+
+2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
 	  Better assignment for large variables.
 	* src/z80/peep.c:
 	  Fix code size calculation bug.

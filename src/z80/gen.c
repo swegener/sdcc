@@ -3908,16 +3908,28 @@ emitCall (const iCode *ic, bool ispcall)
       PAIR_ID pair;
       int fp_offset, sp_offset;
       
+      if (ispcall && IS_GB)
+        _push (PAIR_HL);
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
       emitDebug(";bigreturn call");
       wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");
       wassert (AOP_TYPE (IC_RESULT (ic)) == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_EXSTK);
       fp_offset = AOP (IC_RESULT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_RESULT (ic))->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       sp_offset = fp_offset + _G.stack.pushed;
-      pair = ispcall ? PAIR_IY : PAIR_HL;
+      pair = (ispcall && !IS_GB) ? PAIR_IY : PAIR_HL;
       emit2 ("ld %s,!immedword", _pairs[pair].name, sp_offset);
       emit2 ("add %s, sp", _pairs[pair].name);
+      regalloc_dry_run_cost += (pair == PAIR_IY ? 6 : 4);
+      if (ispcall && IS_GB)
+        {
+          emit2 ("ld e, l");
+          emit2 ("ld d, h");
+          regalloc_dry_run_cost += 2;
+          _pop (PAIR_HL);
+          pair = PAIR_DE;
+        }
       emit2 ("push %s", _pairs[pair].name);
+      regalloc_dry_run_cost += (pair == PAIR_IY ? 2 : 1);
       if(!regalloc_dry_run)
         _G.stack.pushed += 2;
       freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -4636,7 +4648,7 @@ genRet (const iCode *ic)
   else if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
       unsigned long lit = ulFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr ? 0 : 2));
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("add hl, sp");
       emit2 ("ld a, (hl)");
       emit2 ("inc hl");
@@ -4656,9 +4668,9 @@ genRet (const iCode *ic)
         }
       while (size--);
     }
-  else if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
+  else if (!IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
     {
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr ? 0 : 2));
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("add hl, sp");
       emit2 ("ld e, (hl)");
       emit2 ("inc hl");
@@ -4684,7 +4696,21 @@ genRet (const iCode *ic)
     }
   else
     {
-      wassertl (0, "Invalid return operand type.");
+      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
+      emit2 ("add hl, sp");
+      emit2 ("ld c, (hl)");
+      emit2 ("inc hl");
+      emit2 ("ld b, (hl)");
+      regalloc_dry_run_cost += 7;
+      spillPair (PAIR_HL);
+      do
+        {
+          cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset++);
+          emit2 ("ld (bc), a");
+          emit2 ("inc bc");
+          regalloc_dry_run_cost += 2;
+        }
+      while (size--);
     }
   freeAsmop (IC_LEFT (ic), NULL, ic);
 

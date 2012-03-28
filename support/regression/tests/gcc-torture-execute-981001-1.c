@@ -6,13 +6,17 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#define REENTRANT __reentrant
+#else
+#define REENTRANT
 #endif
+
 
 #define NG   0x100L
 
 unsigned long flg = 0;
 
-long sub (int n) __reentrant
+long sub (int n) REENTRANT
 {
   int a, b ;
 

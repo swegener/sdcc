@@ -30,10 +30,8 @@ f()
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_hc08
   if (f() != 3.0)
     ASSERT(0);
   return;
-#endif
 }
 

@@ -1,3 +1,10 @@
+2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/z80.h:
+	  Enabled exact cost function for gbz80.
+	* src/z80/gen.c:
+	  Fixed a gbz80 comparison bug.
+
 2012-03-28 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCval.c, src/SDCCval.h, src/SDCCicode.c:

@@ -6648,7 +6648,7 @@ genCmpEq (iCode * ic, iCode * ifx)
   /* Swap operands if it makes the operation easier. ie if:
      1.  Left is a literal.
    */
-  if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
+  if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT || AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT && AOP_TYPE (IC_RIGHT (ic)) != AOP_REG && AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
     {
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);

@@ -35,12 +35,11 @@ extern Z80_OPTS z80_opts;
 #define IS_R2K  (z80_opts.sub == SUB_R2K)
 
 #define IY_RESERVED (z80_opts.reserveIY)
-
-#define OPTRALLOC_EXACT_COST (!IS_GB) // Todo: Implement exact cost for gbz80.
-#define OPTRALLOC_REMAT OPTRALLOC_EXACT_COST /* Enable rematerialization in the new allocator for the ports with exact cost function */
+#define OPTRALLOC_EXACT_COST 1
+#define OPTRALLOC_REMAT (OPTRALLOC_EXACT_COST && !IS_GB)
 #define OPTRALLOC_HL (!IS_GB)
 #define OPTRALLOC_A 1
-#define OPTRALLOC_IY !IY_RESERVED
+#define OPTRALLOC_IY !(IY_RESERVED || IS_GB)
 
 enum
   {

@@ -9391,6 +9391,83 @@ genAssign (const iCode *ic)
     }
   else
     {
+      if (!IS_GB && /* gbz80 doesn't have ldir */
+        (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK || AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_IY) &&
+        (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) &&
+        size >= 2)
+        {
+          /* This estiamtion is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the z80 or z180. */
+          int sizecost_n, sizecost_l, cyclecost_n, cyclecost_l;
+          const bool hl_alive = !isPairDead (PAIR_HL, ic);
+          const bool de_alive = !isPairDead (PAIR_DE, ic);
+          const bool bc_alive = !isPairDead (PAIR_BC, ic);
+          bool l_better;
+          sizecost_n = 6 * size;
+          sizecost_l = 13 + hl_alive * 2 + de_alive * 2 + bc_alive * 2 - (AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) - (AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_IY) * 2;
+          if (IS_Z180)
+            cyclecost_n = 30 * size;
+          else /* Z80 */
+            cyclecost_n = 38 * size;
+          if (IS_Z180)
+            cyclecost_l = 14 * size + 42 + hl_alive * 22 + de_alive * 22 + bc_alive * 22 - (AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) * 7 - (AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_IY) * 10;
+          else /* Z80 */
+            cyclecost_l = 21 * size + 51 + hl_alive * 20 + de_alive * 20 + bc_alive * 20 - (AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) * 11 - (AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_IY) * 15;
+          if (optimize.codeSize)
+            l_better = (sizecost_l < sizecost_n || sizecost_l == sizecost_n && cyclecost_l < cyclecost_n);
+          else
+            l_better = (cyclecost_l < cyclecost_n || cyclecost_l == cyclecost_n && sizecost_l < sizecost_n);
+          if (l_better)
+            {
+              if (hl_alive)
+                _push (PAIR_HL);
+              if (de_alive)
+                _push (PAIR_DE);
+              if (bc_alive)
+                _push (PAIR_BC);
+
+              if (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK)
+                {
+                  int fp_offset = AOP (result)->aopu.aop_stk + offset + _G.stack.offset + (AOP (result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+                  int sp_offset = fp_offset + _G.stack.pushed;
+                  emit2 ("ld hl, #%d", sp_offset);
+                  emit2 ("add hl, sp");
+                  emit2 ("ex de, hl");
+                  regalloc_dry_run_cost += 5;
+                }
+              else
+                {
+                  emit2 ("ld de, #%s", AOP (IC_RESULT (ic))->aopu.aop_dir);
+                  regalloc_dry_run_cost += 3;
+                }
+
+              if (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK)
+                {
+                  int fp_offset = AOP (right)->aopu.aop_stk + offset + _G.stack.offset + (AOP (right)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+                  int sp_offset = fp_offset + _G.stack.pushed;
+                  emit2 ("ld hl, #%d", sp_offset);
+                  emit2 ("add hl, sp");
+                  regalloc_dry_run_cost += 4;
+                }
+              else
+                {
+                  emit2 ("ld hl, #%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
+                  regalloc_dry_run_cost += 3;
+                }
+
+              emit2("ld bc, #%d", size);
+              emit2("ldir");
+              regalloc_dry_run_cost += 5;
+
+              if (bc_alive)
+                _pop (PAIR_BC);
+              if (de_alive)
+                _pop (PAIR_DE);
+              if (hl_alive)
+                _pop (PAIR_HL);
+
+              goto release;
+            }
+        }
       if (AOP_TYPE (result) == AOP_REG && AOP_TYPE (right) == AOP_REG)
         {
           // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.

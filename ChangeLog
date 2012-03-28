@@ -1,5 +1,10 @@
 2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/ralloc2.cc:
+	  Allow some use of de on gbz80.
+
+2012-03-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/ralloc2.cc,
 	  src/z80/ralloc.c,
 	  src/z80/z80.h:

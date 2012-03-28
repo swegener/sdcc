@@ -3,7 +3,7 @@
 	* configure.in, configure, sdccconf_in.h,
 	  sim/ucsim/configure.in, sim/ucsim/configure,
 	  sim/ucsim/ddconfig_in.h:
-	  use AC_C_BIGENDIAN inatead of SDCC_BUILD_BIGENDIAN
+	  use AC_C_BIGENDIAN instead of SDCC_BUILD_BIGENDIAN
 	* support/cpp/config.in: regenerated
 	* custom_in.h, sim/ucsim/custom_in.h: removed
 

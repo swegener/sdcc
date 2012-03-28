@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 AC_INIT
 AC_CONFIG_SRCDIR(.version)
-AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h custom.h:custom_in.h)
+AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
 
 AC_PROG_AWK
 

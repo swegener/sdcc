@@ -24,7 +24,9 @@ Z80_LONG = $(COMMON_LONG) \
 
 Z80_LONGLONG = $(COMMON_LONGLONG) \
   _rrulonglong_rrx_s.c \
-  _rrslonglong_rrx_s.c
+  _rrslonglong_rrx_s.c \
+  _rlulonglong_rrx_s.c \
+  _rlslonglong_rrx_s.c
 
 Z80_SDCC = $(COMMON_SDCC) \
   _itoa.c \

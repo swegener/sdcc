@@ -47,9 +47,9 @@ long long _rrslonglong_rrx_s(long long l, char s)
 		b[3] = (b[3] & 0x8000) ? 0xffff : 0x000000;
 	}
 
-	(*bottom) = ((*bottom) >> s) & 0xffff;
-	(*bottom) &= ((((*middle) >> s) & 0xffff) >> 16);
-	(*top) >>= s;
+	(*bottom) >>= s;
+	(*middle) |= (((*middle) & 0xffff0000) >> s);
+	(*top) |= (((*middle) & 0xffff0000) >> s);
 
 	return(l);
 }

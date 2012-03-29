@@ -110,3 +110,4 @@ testShiftByParam(void)
     ASSERT(ShiftLeftByParam(2)  == ({type})({vals} << 2));
     ASSERT(ShiftRightByParam(2) == ({type})({vals} >> 2));
 }
+

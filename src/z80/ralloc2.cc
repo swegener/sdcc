@@ -934,11 +934,15 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   const operand *right = IC_RIGHT(ic);
   const operand *result = IC_RESULT(ic);
 
-  if(ic->op == CALL || ic->op == PCALL)
+  const std::set<var_t> &dying = G[i].dying;
+
+  if(ic->op == PCALL)
     return(false);
 
-  if((ic->op == GET_VALUE_AT_ADDRESS || ic->op == '=' && POINTER_SET(ic)) &&
-    (getSize(operandType(result)) >= 2 || !operand_is_pair(left, a, i, G)))
+  if(ic->op == GET_VALUE_AT_ADDRESS && (getSize(operandType(result)) >= 2 || !operand_is_pair(left, a, i, G)))
+    return(false);
+
+  if (ic->op == '=' && POINTER_SET(ic) && !operand_is_pair(result, a, i, G))
     return(false);
 
   if((ic->op == '=' || ic->op == CAST) && getSize(operandType(result)) >= 2 &&

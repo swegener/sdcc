@@ -9000,7 +9000,9 @@ genPointerSet (iCode * ic)
   aopOp (right, ic, FALSE, FALSE);
 
   if (IS_GB)
-    pairId = PAIR_DE;
+    pairId = isRegOrLit (AOP (right)) ? PAIR_HL : PAIR_DE;
+  if (isPair (AOP (result)) && isPairDead(getPairId (AOP (result)), ic))
+    pairId = getPairId (AOP (result));
 
   size = AOP_SIZE (right);
 
@@ -9027,7 +9029,7 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
-  if ( getPairId( AOP (result)) == PAIR_IY && !isBitvar)
+  if (getPairId( AOP (result)) == PAIR_IY && !isBitvar)
     {
       /* Just do it */
       while (size--)
@@ -9125,7 +9127,7 @@ genPointerSet (iCode * ic)
 
       while (size--)
         {
-          if (isRegOrLit (AOP (right)) && !IS_GB)
+          if (isRegOrLit (AOP (right)) && pairId == PAIR_HL)
             {
               if (!regalloc_dry_run)
                 emit2 ("ld !*pair,%s", _pairs[pairId].name, aopGet (AOP (right), offset, FALSE));

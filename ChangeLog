@@ -1,3 +1,9 @@
+2012-03-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  More flexible use of de for gbz80.
+
 2012-03-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (initCSupport): fixed declarations for shift support functions

@@ -4211,7 +4211,7 @@ initCSupport (void)
               rlrr[slsr][bwd][su] = sym =
                 funcOfTypeVarg (_mangleFunctionName (dbuf_c_str (&dbuf)), 
                                 sbwdCodes[bwd + 4*su], 2, &params[0]);
-              FUNC_ISREENT (sym->type) = options.intlong_rent;
+              FUNC_ISREENT (sym->type) = options.intlong_rent ? 1 : 0;
               FUNC_NONBANKED (sym->type) = 1;
               dbuf_destroy (&dbuf);
             }

@@ -32,7 +32,7 @@
 
 #ifdef __SDCC_LONGLONG
 // This function is the same as the one from rrulonglong_rrx_s.c, except for the type of top.
-long long _Xrrslonglong_rrx_s(long long l, char s)
+long long _rrslonglong_rrx_s(long long l, char s)
 {
 	int32_t *top = (uint32_t *)((char *)(&l) + 4);
 	uint32_t *middle = (uint32_t *)((char *)(&l) + 2);

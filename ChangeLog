@@ -1,5 +1,12 @@
 2012-03-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCsymt.c (initCSupport),
+	  device/lib/_rrslonglong_rrx_s.c,
+	  device/lib/_rrulonglong_rrx_s.c:
+	  Fixed declarations for shift support functions.
+
+2012-03-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  More flexible use of de for gbz80.

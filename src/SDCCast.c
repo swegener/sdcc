@@ -703,7 +703,7 @@ funcOfType (const char *name, sym_link * type, sym_link * argType, int nArgs, in
 /* funcOfTypeVarg :- function of type with name and argtype        */
 /*-----------------------------------------------------------------*/
 symbol *
-funcOfTypeVarg (char *name, char *rtype, int nArgs, char **atypes)
+funcOfTypeVarg (const char *name, const char *rtype, int nArgs, const char **atypes)
 {
   symbol *sym;
   int i;

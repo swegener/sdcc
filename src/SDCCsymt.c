@@ -3963,6 +3963,11 @@ initCSupport (void)
   const char *srlrr[] = {
     "rl", "rr"
   };
+  /* type as character codes for typeFromStr() */
+  const char *sbwdCodes[] = {
+    "c",  "i",  "l",  "L",
+    "uc", "ui", "ul", "uL"
+  };
 
   int bwd, su, muldivmod, tofrom, slsr;
 
@@ -4195,12 +4200,19 @@ initCSupport (void)
           for (su = 0; su < 2; su++)
             {
               struct dbuf_s dbuf;
+              symbol *sym;
+              const char *params[2];
+
+              params[0] = sbwdCodes[bwd + 4*su];
+              params[1] = sbwdCodes[0];
 
               dbuf_init (&dbuf, 128);
               dbuf_printf (&dbuf, "_%s%s%s", srlrr[slsr], ssu[su * 3], sbwd[bwd]);
-              rlrr[slsr][bwd][su] =
-                funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[bwd][su], multypes[0][0], 2,
-                            options.intlong_rent);
+              rlrr[slsr][bwd][su] = sym =
+                funcOfTypeVarg (_mangleFunctionName (dbuf_c_str (&dbuf)), 
+                                sbwdCodes[bwd + 4*su], 2, &params[0]);
+              FUNC_ISREENT (sym->type) = options.intlong_rent;
+              FUNC_NONBANKED (sym->type) = 1;
               dbuf_destroy (&dbuf);
             }
         }
@@ -4222,7 +4234,7 @@ initBuiltIns ()
   for (i = 0; port->builtintable[i].name; i++)
     {
       sym = funcOfTypeVarg (port->builtintable[i].name, port->builtintable[i].rtype,
-                            port->builtintable[i].nParms, port->builtintable[i].parm_types);
+                            port->builtintable[i].nParms, (const char **)port->builtintable[i].parm_types);
       FUNC_ISBUILTIN (sym->type) = 1;
       FUNC_ISREENT (sym->type) = 0;     /* can never be reentrant */
     }

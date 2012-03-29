@@ -1,3 +1,10 @@
+2012-03-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (initCSupport): fixed declarations for shift support functions
+	* src/SDCCsymt.c (initBuiltIns),
+	  src/SDCCast.c (funcOfTypeVarg),
+	  src/SDCCast.h: added some const qualifiers 
+
 2012-03-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

@@ -221,7 +221,7 @@ value *constExprValue (ast *, int);
 bool constExprTree (ast *);
 int setAstFileLine (ast *, char *, int);
 symbol *funcOfType (const char *, sym_link *, sym_link *, int, int);
-symbol *funcOfTypeVarg (char *, char *, int, char **);
+symbol *funcOfTypeVarg (const char *, const char *, int, const char **);
 ast *initAggregates (symbol *, initList *, ast *);
 bool hasSEFcalls (ast *);
 void addSymToBlock (symbol *, ast *);

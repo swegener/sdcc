@@ -6,8 +6,9 @@
 	  Fixed declarations for shift support functions.
 	* device/lib/*z*/Makefile.in,
 	  device/lib/Makefile.in,
-	  device/lib/_r??longlong_rrx_s.c:
-	  Shift support for long long.
+	  device/lib/_r??longlong_rrx_s.c,
+	   device/lib/_mullonglong.c:
+	  Shift and multiplication support for long long.
 
 2012-03-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

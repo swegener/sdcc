@@ -91,6 +91,10 @@ SOURCES_LONG = $(COMMON_LONG) \
   _divulong.c \
   _mullong.c
 
+SOURCES_LONGLONG = $(COMMON_LONGLONG) \
+  _rrulonglong_rrx_s.c \
+  _rrslonglong_rrx_s.c
+
 SOURCES_SDCC = $(COMMON_SDCC) \
   _autobaud.c \
   _bp.c \
@@ -116,14 +120,15 @@ SOURCES_SDCC = $(COMMON_SDCC) \
   printfl.c \
   bpx.c
 
-SOURCES = $(SOURCES_FLOAT) $(SOURCES_INT) $(SOURCES_LONG) $(SOURCES_SDCC)
+SOURCES = $(SOURCES_FLOAT) $(SOURCES_INT) $(SOURCES_LONG) $(SOURCES_LONGLONG) $(SOURCES_SDCC)
 
 OBJECTS_FLOAT = $(SOURCES_FLOAT:%.c=$(PORT)/%.rel)
 OBJECTS_INT = $(SOURCES_INT:%.c=$(PORT)/%.rel)
 OBJECTS_LONG = $(SOURCES_LONG:%.c=$(PORT)/%.rel)
+OBJECTS_LONGLONG = $(SOURCES_LONGLONG:%.c=$(PORT)/%.rel)
 OBJECTS_SDCC = $(SOURCES_SDCC:%.c=$(PORT)/%.rel)
 
-OBJECTS = $(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_SDCC)
+OBJECTS = $(OBJECTS_FLOAT) $(OBJECTS_INT) $(OBJECTS_LONG) $(OBJECTS_LONGLONG) $(OBJECTS_SDCC)
 
 XA51_FLOAT = $(COMMON_FLOAT)
 
@@ -146,7 +151,7 @@ XA51_SDCC = $(COMMON_SDCC) \
 XA51SOURCES = $(XA51_FLOAT) $(XA51_INT) $(XA51_LONG) $(XA51_SDCC)
 XA51OBJECTS = $(XA51SOURCES:%.c=$(PORT)/%.rel)
 
-LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/libsdcc.lib
+LIB_FILES = $(PORTDIR)/libfloat.lib $(PORTDIR)/libint.lib $(PORTDIR)/liblong.lib $(PORTDIR)/liblonglong.lib $(PORTDIR)/libsdcc.lib
 
 OEXT            = .rel
 
@@ -369,6 +374,9 @@ $(PORTDIR)/libint.lib: $(OBJECTS_INT)
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
 	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 
+$(PORTDIR)/liblonglong.lib: $(OBJECTS_LONGLONG)
+	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/liblonglong.lib $(OBJECTS_LONGLONG)
+
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
 	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 
@@ -384,6 +392,9 @@ $(PORTDIR)/libint.lib: $(OBJECTS_INT)
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
 	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
 
+$(PORTDIR)/liblonglong.lib: $(OBJECTS_LONGLONG)
+	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/liblonglong.lib $(OBJECTS_LONGLONG)
+
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
 	$(top_builddir)/bin/sdar -rcS $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
 
@@ -398,6 +409,9 @@ $(PORTDIR)/libint.lib: $(OBJECTS_INT)
 
 $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
 	$(top_builddir)/bin/sdar -rc $(PORTDIR)/liblong.lib $(OBJECTS_LONG)
+
+$(PORTDIR)/liblonglong.lib: $(OBJECTS_LONGLONG)
+	$(top_builddir)/bin/sdar -rc $(PORTDIR)/liblonglong.lib $(OBJECTS_LONGLONG)
 
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
 	$(top_builddir)/bin/sdar -rc $(PORTDIR)/libsdcc.lib $(OBJECTS_SDCC)
@@ -418,6 +432,11 @@ $(PORTDIR)/liblong.lib: $(OBJECTS_LONG)
 	rm -f $(PORTDIR)/liblong.lib
 	for i in $(notdir $(basename $(OBJECTS_LONG))); do echo $$i >> $(PORTDIR)/liblong.lib; done
 	cp $(OBJECTS_LONG) $(PORTDIR)
+
+$(PORTDIR)/liblonglong.lib: $(OBJECTS_LONGLONG)
+	rm -f $(PORTDIR)/liblonglong.lib
+	for i in $(notdir $(basename $(OBJECTS_LONGLONG))); do echo $$i >> $(PORTDIR)/liblonglong.lib; done
+	cp $(OBJECTS_LONGLONG) $(PORTDIR)
 
 $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
 	rm -f $(PORTDIR)/libsdcc.lib

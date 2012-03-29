@@ -4,6 +4,9 @@
 	  device/lib/_rrslonglong_rrx_s.c,
 	  device/lib/_rrulonglong_rrx_s.c:
 	  Fixed declarations for shift support functions.
+	* device/lib/*z*/Makefile.in,
+	  device/lib/Makefile.in:
+	  Enable shift support for long long.
 
 2012-03-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

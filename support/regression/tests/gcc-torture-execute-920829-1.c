@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// Todo: Enable when sdcc supports long long.
+// Todo: Enable when sdcc supports long long constants!
 #if 0
 long long c=2863311530LL,c3=2863311530LL*3;
 #endif

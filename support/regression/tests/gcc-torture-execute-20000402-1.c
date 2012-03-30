@@ -10,7 +10,7 @@
 
 #include <limits.h>
 
-// TODO: Enable when long long support is more complete.
+// TODO: Enable when sdcc supports long long constants!
 /*#if ULONG_LONG_MAX != 18446744073709551615ull && ULONG_MAX != 18446744073709551615ull
 void
 testTortureExecute (void) { return; }

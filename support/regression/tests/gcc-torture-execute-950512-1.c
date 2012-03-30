@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long!
+// TODO: Enable when sdcc supports long long division!
 #if 0
 unsigned
 f1 (x)

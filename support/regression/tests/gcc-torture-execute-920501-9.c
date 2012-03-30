@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-// Todo: Enable when sdcc supports long long!
+// Todo: Enable when sdcc supports long long constants!
 #if 0
 long long proc1(){return 1LL;}
 long long proc2(){return 0x12345678LL;}

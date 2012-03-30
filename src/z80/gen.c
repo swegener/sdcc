@@ -4666,7 +4666,7 @@ genRet (const iCode *ic)
               regalloc_dry_run_cost++;
             }
         }
-      while (size--);
+      while (--size);
     }
   else if (!IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
     {
@@ -4710,7 +4710,7 @@ genRet (const iCode *ic)
           emit2 ("inc bc");
           regalloc_dry_run_cost += 2;
         }
-      while (size--);
+      while (--size);
     }
   freeAsmop (IC_LEFT (ic), NULL, ic);
 

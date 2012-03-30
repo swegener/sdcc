@@ -32,12 +32,12 @@
 
 #ifdef __SDCC_LONGLONG
 
-unsigned long long _rlulonglong_rrx_s(unsigned long long l, char s)
+unsigned long long _rlulonglong_rrx_s(unsigned long long l, signed char s)
 {
-	uint32_t *top = (uint32_t *)((char *)(&l) + 4);
-	uint32_t *middle = (uint32_t *)((char *)(&l) + 2);
-	uint32_t *bottom = (uint32_t *)(&l);
-	uint16_t *b = (uint16_t *)(&l);
+	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
+	uint32_t *const middle = (uint32_t *)((char *)(&l) + 2);
+	uint32_t *const bottom = (uint32_t *)(&l);
+	uint16_t *const b = (uint16_t *)(&l);
 
 	for(;s >= 16; s-= 16)
 	{
@@ -48,8 +48,8 @@ unsigned long long _rlulonglong_rrx_s(unsigned long long l, char s)
 	}
 
 	(*top) <<= s;
-	(*middle) |= (((*middle) & 0xffff) << s);
-	(*bottom) |= (((*bottom) & 0xffff) << s);
+	(*middle) |= (((*middle) & 0xfffful) << s);
+	(*bottom) |= (((*bottom) & 0xfffful) << s);
 
 	return(l);
 }

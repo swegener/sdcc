@@ -31,25 +31,25 @@
 #include <stdint.h>
 
 #ifdef __SDCC_LONGLONG
-// This function is the same as the one from rrslonglong_rrx_s.c, except for the type of top.
-unsigned long long _rrulonglong_rrx_s(unsigned long long l, char s)
+// This function is the same as the one from rrslonglong_rrx_s.c, except for the type of top, and b[3].
+unsigned long long _rrulonglong_rrx_s(unsigned long long l, signed char s)
 {
-	uint32_t *top = (uint32_t *)((char *)(&l) + 4);
-	uint32_t *middle = (uint32_t *)((char *)(&l) + 2);
-	uint32_t *bottom = (uint32_t *)(&l);
-	uint16_t *b = (uint16_t *)(&l);
+	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
+	uint32_t *const middle = (uint32_t *)((char *)(&l) + 2);
+	uint32_t *const bottom = (uint32_t *)(&l);
+	uint16_t *const b = (uint16_t *)(&l);
 
-	for(;s >= 16; s-= 16)
+	for(;s >= 16; s -= 16)
 	{
 		b[0] = b[1];
 		b[1] = b[2];
 		b[2] = b[3];
-		b[3] = (b[3] & 0x8000) ? 0xffff : 0x000000;
+		b[3] = 0x000000;
 	}
 
 	(*bottom) >>= s;
-	(*middle) |= (((*middle) & 0xffff0000) >> s);
-	(*top) |= (((*middle) & 0xffff0000) >> s);
+	(*middle) |= (((*middle) & 0xffff0000ul) >> s);
+	(*top) |= (((*middle) & 0xffff0000ul) >> s);
 
 	return(l);
 }

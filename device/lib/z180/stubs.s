@@ -57,6 +57,10 @@
         .globl	__rrslong_rrx_s
         .globl	__rlulong_rrx_s
         .globl	__rlslong_rrx_s
+        .globl	__rrulonglong_rrx_s
+        .globl	__rrslonglong_rrx_s
+        .globl	__rlulonglong_rrx_s
+        .globl	__rlslonglong_rrx_s
 
 __mullong_rrx_s::
 __mullong_rrf_s::
@@ -182,3 +186,24 @@ __rlslong_rrf_s::
         ld      a,#5
         rst     0x08
         jp	__rlslong_rrx_s
+
+__rrulonglong_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__rrulonglong_rrx_s
+
+__rrslonglong_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__rrslonglong_rrx_s
+
+__rlulonglong_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__rlulonglong_rrx_s
+
+__rlslonglong_rrf_s::
+        ld      a,#5
+        rst     0x08
+        jp	__rlslonglong_rrx_s
+

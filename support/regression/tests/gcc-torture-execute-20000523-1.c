@@ -11,7 +11,7 @@
 void
 testTortureExecute (void)
 {
-// TODO: Enable when long long support is mroe complete!
+// TODO: Enable when sdcc supports long long division!
 #if 0
   long long   x;
   int         n;

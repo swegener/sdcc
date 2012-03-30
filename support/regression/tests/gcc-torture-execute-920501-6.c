@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long.
+// TODO: Enable when sdcc supports long long constants!
 #if 0
 #include <stdio.h>
 

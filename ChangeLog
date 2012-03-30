@@ -1,3 +1,15 @@
+2012-03-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix for returning long long, fixes #3512403.
+	* device/lib/z180/stubs.s,
+	  device/lib/z80/stubs.s,
+	  device/lib/gbz80/stubs.s,
+	  support/regression/tests/longlong.c:
+	  More tests for long long.
+	* support/regression/tests/gcc-torture-execute-*.c:
+	  Made TODO comments more specific wrt. to what sdcc functionality is required for enabling the test.
+
 2012-03-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCsymt.c (initCSupport),

@@ -12,7 +12,7 @@
 void
 testTortureExecute (void)
 {
-// TODO: ENable when more ports support long long!
+// TODO: Enable when more ports support long long!
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   unsigned long long a;
   if (! (a = 0xfedcba9876543210ULL))

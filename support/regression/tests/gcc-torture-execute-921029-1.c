@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports unsigned long long!
+// TODO: Enable when sdcc supports unsigned long long constants!
 #if 0
 typedef unsigned long long ULL;
 ULL back;

@@ -35,7 +35,7 @@
 unsigned long long _rrulonglong_rrx_s(unsigned long long l, signed char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
-	uint32_t *const middle = (uint32_t *)((char *)(&l) + 2);
+	uint16_t *const middle = (uint16_t *)((char *)(&l) + 3);
 	uint32_t *const bottom = (uint32_t *)(&l);
 	uint16_t *const b = (uint16_t *)(&l);
 

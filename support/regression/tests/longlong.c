@@ -51,13 +51,13 @@ testLongLong (void)
   ASSERT (h() == x);
   ASSERT (d(12) == 12ll);
   ASSERT ((x >> 1) == 21);
-//  ASSERT ((x << 1) == 84);
+  ASSERT ((x << 1) == 84);
   ASSERT (!(x >> 17));
-//  ASSERT ((x << 17) == (42l << 17));
+//  ASSERT ((x << 17) == (42l << 17)); sdcc has broken long long constants!
   y = x;
   ASSERT (y == 42ull);
   ASSERT ((y >> 1) == 21);
-//  ASSERT ((y << 1) == 84);
+  ASSERT ((y << 1) == 84);
   ASSERT ((y >> 17) == 0);
 //  ASSERT ((y << 17) == (42ul << 17));
 //  ASSERT ((y << 16) == (42ul << 16));
@@ -78,7 +78,14 @@ testLongLong (void)
   tmp = 1;
   y = tmp;
   ASSERT (c() == 12);
-  //ASSERT ((y << 1) == (tmp <<= 1));
+  ASSERT ((y << 1) == 2);
+  ASSERT ((y << 16) == (tmp << 16));
+  ASSERT ((y << 23) == (tmp << 23));
+  y += 2;
+  y <<= 31;
+  ASSERT (c() == 12);
+  y >>= 31;
+  ASSERT (y == 3);
 #endif
 }
 

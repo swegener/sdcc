@@ -35,7 +35,7 @@
 long long _rrslonglong_rrx_s(long long l, signed char s)
 {
 	int32_t *top = (uint32_t *)((char *)(&l) + 4);
-	uint32_t *middle = (uint32_t *)((char *)(&l) + 2);
+	uint16_t *middle = (uint16_t *)((char *)(&l) + 3);
 	uint32_t *bottom = (uint32_t *)(&l);
 	uint16_t *b = (uint16_t *)(&l);
 
@@ -48,9 +48,10 @@ long long _rrslonglong_rrx_s(long long l, signed char s)
 	}
 
 	(*bottom) >>= s;
-	(*middle) |= (((*middle) & 0xffff0000) >> s);
+	(*bottom) |= ((uint32_t)((*middle) >> s) << 16);
 	(*top) |= (((*middle) & 0xffff0000) >> s);
 
 	return(l);
 }
 #endif
+

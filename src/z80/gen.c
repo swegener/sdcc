@@ -4660,7 +4660,7 @@ genRet (const iCode *ic)
           emit2 ("ld (hl), !immedbyte", lit & 0xff);
           regalloc_dry_run_cost += 2;
           lit >>= 8;
-          if (size)
+          if (size > 1)
             {
               emit2 ("inc hl");
               regalloc_dry_run_cost++;
@@ -4707,8 +4707,12 @@ genRet (const iCode *ic)
         {
           cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset++);
           emit2 ("ld (bc), a");
-          emit2 ("inc bc");
-          regalloc_dry_run_cost += 2;
+          regalloc_dry_run_cost++;
+          if (size > 1)
+            {
+              emit2 ("inc bc");
+              regalloc_dry_run_cost++;
+            }
         }
       while (--size);
     }

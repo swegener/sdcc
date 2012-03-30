@@ -155,6 +155,9 @@
     <ClCompile Include="SDCCnaddr.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDCCgen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\support\scripts\resource.rc">
@@ -280,6 +283,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDCCdebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCgen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

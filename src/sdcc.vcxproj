@@ -218,6 +218,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="SDCCgen.c" />
     <ClCompile Include="SDCCglue.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -473,6 +474,7 @@
     <ClInclude Include="SDCCdflow.h" />
     <ClInclude Include="SDCCdwarf2.h" />
     <ClInclude Include="SDCCerr.h" />
+    <ClInclude Include="SDCCgen.h" />
     <ClInclude Include="SDCCglobl.h" />
     <ClInclude Include="SDCCglue.h" />
     <ClInclude Include="SDCChasht.h" />

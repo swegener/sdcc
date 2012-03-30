@@ -67,16 +67,19 @@
 /* #undef WORDS_BIGENDIAN */
 
 /* for flex 2.5.35 and greater */
-#define YY_NO_UNISTD_H  1
+#define YY_NO_UNISTD_H    1
 
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_GBZ80
 #undef OPT_DISABLE_Z80
-#define OPT_DISABLE_AVR	1
+#define OPT_DISABLE_AVR   1
 #undef OPT_DISABLE_TININative
 #undef OPT_DISABLE_PIC14
 #undef OPT_DISABLE_PIC16
-#define OPT_DISABLE_XA51	1
+#define OPT_DISABLE_XA51  1
+
+/* Define to 1 if c supports tags in unnamed struct. */
+#define UNNAMED_STRUCT_TAG 1
 
 #endif  /* SDCC_VC_HEADER */
 

@@ -168,7 +168,7 @@ void
 emitpComment (const char *fmt, ...)
 {
   va_list ap;
-  struct dbuf_s dbuf;;
+  struct dbuf_s dbuf;
   const char *line;
 
   dbuf_init (&dbuf, INITIAL_INLINEASM);

@@ -8,8 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0
-SDCC cannot return long long yet. TODO: Enable later!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 /* Make sure that language + abi extensions in passing S interoperate.  */
 
 static long long
@@ -23,7 +22,7 @@ unsigned short s = 0xFFFF;
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   ASSERT (!(foo (s) + 1 != 0));
 #endif
 }

@@ -15,7 +15,7 @@ int a = 1;
 void
 testTortureExecute (void)
 {
-// TODO: Enable when sdcc better supports long long!
+// TODO: Enable when sdcc supports long long constants!
 #if 0
   long long s;
 

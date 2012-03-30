@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long!
+// TODO: Enable when sdcc supports struct parameters!
 #if 0
 typedef struct {
   long int p_x, p_y;
@@ -35,7 +35,6 @@ f (Point basePt, Point pt1, Point pt2)
 void
 testTortureExecute (void)
 {
-// TODO: Enable when sdcc supports long long!
 #if 0
   Point b, p1, p2;
   int answer;

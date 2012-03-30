@@ -8,11 +8,9 @@
 #pragma std_c99
 #endif
 
-// TODO. Enable when long long support is more complete!
-
 /* PR target/36362 */
 
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 int
 test (float c)
 {
@@ -23,7 +21,7 @@ test (float c)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (test (1.0f) != 0)
     ASSERT (0);
 #endif

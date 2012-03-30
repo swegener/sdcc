@@ -57,6 +57,7 @@
         .globl	__rrslong_rrx_s
         .globl	__rlulong_rrx_s
         .globl	__rlslong_rrx_s
+        .globl  __mullong_rrx_s
         .globl	__rrulonglong_rrx_s
         .globl	__rrslonglong_rrx_s
         .globl	__rlulonglong_rrx_s
@@ -186,6 +187,9 @@ __rlslong_rrf_s::
         ld      a,#5
         rst     0x08
         jp	__rlslong_rrx_s
+
+__mullonglong_rrf_s::
+        jp      __mullonglong_rrx_s
 
 __rrulonglong_rrf_s::
         ld      a,#5

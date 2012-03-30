@@ -11,7 +11,7 @@
 void
 testTortureExecute (void)
 {
-// TODO: Enable when sdcc supports long long!
+// TODO: Enable when sdcc supports long long constants!
 #if 0
   unsigned long long xx;
   unsigned long long *x = (unsigned long long *) &xx;

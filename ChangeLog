@@ -1,3 +1,12 @@
+2012-03-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z180/stubs.s,
+	  device/lib/z80/stubs.s,
+	  device/lib/gbz80/stubs.s,
+	  support/regression/tests/longlong.c,
+	  support/regression/tests/gcc-torture-execute-*.c:
+	  Made TODO comments more specific wrt. to what sdcc functionality is required for enabling the test, enabled more long long tests.
+
 2012-03-30 Borut Razem <borut.razem AT gmail.com>
 
 	* configure.in, configure, sdccconf_in.h:

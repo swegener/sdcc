@@ -8,8 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long!
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long
 signed_poly (long long sum, long x)
 {
@@ -28,9 +27,12 @@ unsigned_poly (unsigned long long sum, unsigned long x)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+// TODO: Enable when sdcc supports long long constants!
 #if 0
   if (signed_poly (2LL, -3) != -4LL)
     ASSERT (0);
+#endif
   
   if (unsigned_poly (2ULL, 3) != 8ULL)
     ASSERT (0);

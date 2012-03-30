@@ -8,8 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long!
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 unsigned int
 f1 (int diff)
 {
@@ -38,7 +37,7 @@ f4 (unsigned long long diff)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
   int i;
   for (i = 0; i <= 10; i++)
     {

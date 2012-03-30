@@ -9,7 +9,7 @@
 #endif
 
 #if 0
-TODO: Enable when long long support is more complete!
+TODO: Enable when long long support for constants is there!
 /* PR middle-end/40057 */
 
 int

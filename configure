@@ -4969,24 +4969,24 @@ done
 # Macro definitions
 # ===========================================================================
 
-# _bor_EXECUTE_IFELSE_BODY(COMMAND)
+# _sdcc_EXECUTE_IFELSE_BODY(COMMAND)
 # -----------------------
 # Shell function body for _AC_EXECUTE_IFELSE.
-# _bor_EXECUTE_IFELSE_BODY
+# _sdcc_EXECUTE_IFELSE_BODY
 
-# bor_EXECUTE_IFELSE(COMMAND[ACTION-IF-TRUE], [ACTION-IF-FALSE])
+# sdcc_EXECUTE_IFELSE(COMMAND[ACTION-IF-TRUE], [ACTION-IF-FALSE])
 # ----------------------------------------------------------------
 # Try to execute COMMAND.
-# bor_EXECUTE_IFELSE
+# sdcc_EXECUTE_IFELSE
 
 # Check whether the compiler for the current language is SunPRO.
 
 
 
-# bor_IS_VALID_OPTION macro checks if the current compiler, selected by
+# sdcc_IS_VALID_OPTION macro checks if the current compiler, selected by
 # AC_LANG, supports option specified as the 1st parameter. The test fails if
 # the compiler returns an error or in case something is writeen to stderr.
-# For example: bor_VALID_OPT(fPIC)
+# For example: sdcc_VALID_OPT(-fPIC)
 
 
 
@@ -5074,14 +5074,15 @@ fi
 $as_echo "$sdcc_cv_MM" >&6; }
 
   # This is the first time when CFLAGS are set/modified!!
-  ac_test_CFLAGS=${CFLAGS+set}
-bor_save_CFLAGS=$CFLAGS
+  arg1=`echo -ggdb | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_CFLAGS=${CFLAGS+set}
+sdcc_save_CFLAGS=$CFLAGS
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -ggdb" >&5
 $as_echo_n "checking whether C accepts -ggdb... " >&6; }
-if ${bor_cv_c_ggdb+:} false; then :
+if eval \${sdcc_cv_c_$arg1+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  bor_save_c_werror_flag=$ac_c_werror_flag
+  sdcc_save_c_werror_flag=$ac_c_werror_flag
    ac_c_werror_flag=yes
 
    CFLAGS="-ggdb"
@@ -5097,30 +5098,32 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
-  bor_cv_c_ggdb=yes
+  eval sdcc_cv_c_$arg1=yes
 else
-  bor_cv_c_ggdb=no
+  eval sdcc_cv_c_$arg1=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-   ac_c_werror_flag=$bor_save_c_werror_flag
+   ac_c_werror_flag=$sdcc_save_c_werror_flag
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_ggdb" >&5
-$as_echo "$bor_cv_c_ggdb" >&6; }
-   CFLAGS=$bor_save_CFLAGS
+eval ac_res=\$sdcc_cv_c_$arg1
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+   CFLAGS=$sdcc_save_CFLAGS
 
-  if test "$bor_cv_c_ggdb" = "yes"; then
+  if test "$sdcc_cv_c_ggdb" = "yes"; then
     CFLAGS="-ggdb ${CFLAGS}"
     CXXFLAGS="-ggdb ${CXXFLAGS}"
   fi
 
-  ac_test_CFLAGS=${CFLAGS+set}
-bor_save_CFLAGS=$CFLAGS
+  arg1=`echo -pipe | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_CFLAGS=${CFLAGS+set}
+sdcc_save_CFLAGS=$CFLAGS
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -pipe" >&5
 $as_echo_n "checking whether C accepts -pipe... " >&6; }
-if ${bor_cv_c_pipe+:} false; then :
+if eval \${sdcc_cv_c_$arg1+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  bor_save_c_werror_flag=$ac_c_werror_flag
+  sdcc_save_c_werror_flag=$ac_c_werror_flag
    ac_c_werror_flag=yes
 
    CFLAGS="-pipe"
@@ -5136,18 +5139,19 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
-  bor_cv_c_pipe=yes
+  eval sdcc_cv_c_$arg1=yes
 else
-  bor_cv_c_pipe=no
+  eval sdcc_cv_c_$arg1=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-   ac_c_werror_flag=$bor_save_c_werror_flag
+   ac_c_werror_flag=$sdcc_save_c_werror_flag
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_pipe" >&5
-$as_echo "$bor_cv_c_pipe" >&6; }
-   CFLAGS=$bor_save_CFLAGS
+eval ac_res=\$sdcc_cv_c_$arg1
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+   CFLAGS=$sdcc_save_CFLAGS
 
-  if test "$bor_cv_c_pipe" = "yes"; then
+  if test "$sdcc_cv_c_pipe" = "yes"; then
     CFLAGS="-pipe ${CFLAGS}"
     # Don't use "-pipe" on x86 Solaris g++, since src/z80/ralloc2.cc dies with:
     # Assembler: ralloc2.cc
@@ -5163,7 +5167,7 @@ $as_echo "$bor_cv_c_pipe" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
 $as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
-if ${bor_cv_c_compiler_sunpro+:} false; then :
+if ${sdcc_cv_c_compiler_sunpro+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -5181,17 +5185,16 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
-  bor_compiler_sunpro=yes
+  sdcc_cv_c_compiler_sunpro=yes
 else
-  bor_compiler_sunpro=no
+  sdcc_cv_c_compiler_sunpro=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-bor_cv_c_compiler_sunpro=$bor_compiler_sunpro
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $bor_cv_c_compiler_sunpro" >&5
-$as_echo "$bor_cv_c_compiler_sunpro" >&6; }
-  if test "$bor_cv_c_compiler_sunpro" = "yes"; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_c_compiler_sunpro" >&5
+$as_echo "$sdcc_cv_c_compiler_sunpro" >&6; }
+  if test "$sdcc_cv_c_compiler_sunpro" = "yes"; then
     C99_FLAG="-xc99"
     CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
     CXXFLAGS="-xO2 ${CXXFLAGS}"
@@ -5202,6 +5205,107 @@ fi
 
 
 
+
+
+# SDCC_C_UNNAMED_STRUCT_TAG ()
+# chech whether C compiler supports tag in unnamed struct
+# -------------------------------------------------------------------------
+
+
+
+  if test "$ac_cv_c_compiler_gnu" = "yes"; then
+    arg1=`echo -fms-extensions | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_CFLAGS=${CFLAGS+set}
+sdcc_save_CFLAGS=$CFLAGS
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -fms-extensions" >&5
+$as_echo_n "checking whether C accepts -fms-extensions... " >&6; }
+if eval \${sdcc_cv_c_$arg1+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  sdcc_save_c_werror_flag=$ac_c_werror_flag
+   ac_c_werror_flag=yes
+
+   CFLAGS="-fms-extensions"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval sdcc_cv_c_$arg1=yes
+else
+  eval sdcc_cv_c_$arg1=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   ac_c_werror_flag=$sdcc_save_c_werror_flag
+fi
+eval ac_res=\$sdcc_cv_c_$arg1
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+   CFLAGS=$sdcc_save_CFLAGS
+
+  else
+    sdcc_cv_c_fms_extensions=no
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C supports tag in unnamed struct" >&5
+$as_echo_n "checking whether C supports tag in unnamed struct... " >&6; }
+if ${sdcc_cv_c_unnamed_struct_tag+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test "$sdcc_cv_c_fms_extensions" = "yes"; then
+      CFLAGS="-fms-extensions ${CFLAGS}"
+    fi
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+struct s1 {
+  int a;
+};
+
+struct s2 {
+  struct s1;
+  int b;
+};
+
+int
+main ()
+{
+
+  struct s2 s;
+
+  s.a = 1;
+  s.b = 2;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+        sdcc_cv_c_unnamed_struct_tag=yes
+
+cat >>confdefs.h <<_ACEOF
+#define UNNAMED_STRUCT_TAG 1
+_ACEOF
+
+
+else
+
+        sdcc_cv_c_unnamed_struct_tag=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_c_unnamed_struct_tag" >&5
+$as_echo "$sdcc_cv_c_unnamed_struct_tag" >&6; }
 
 
 # Checks for typedefs, structures, and compiler characteristics.

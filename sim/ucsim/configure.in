@@ -375,36 +375,36 @@ ucsim_ACCEPT_LENGTH_T
 
 # Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN([bor_IS_SUNPRO],
+AC_DEFUN([sdcc_IS_SUNPRO],
 [AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
-  [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
+  [sdcc_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
   [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
        choke me
 #endif
 ]])],
-    [bor_compiler_sunpro=yes],
-    [bor_compiler_sunpro=no])
-bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
+    [sdcc_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=yes],
+    [sdcc_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=no])
 ])])
 
-# bor_IS_VALID_OPTION macro checks if the current compiler, selected by 
+# sdcc_IS_VALID_OPTION macro checks if the current compiler, selected by 
 # AC_LANG, supports option specified as the 1st parameter. The test fails if
 # the compiler returns an error or in case something is writeen to stderr.
-# For example: bor_VALID_OPT(fPIC)
+# For example: sdcc_VALID_OPT(-fPIC)
 
-AC_DEFUN([bor_IS_VALID_OPTION],
-[ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
-bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
-AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
-  [bor_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
+AC_DEFUN([sdcc_IS_VALID_OPTION],
+[arg1=`echo $1 | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
+sdcc_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
+AC_CACHE_CHECK(whether _AC_LANG accepts $1, sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1,
+  [sdcc_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
    ac_[]_AC_LANG_ABBREV[]_werror_flag=yes
    
-   []_AC_LANG_PREFIX[]FLAGS="-$1"
+   []_AC_LANG_PREFIX[]FLAGS="$1"
    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-     [bor_cv_[]_AC_LANG_ABBREV[]_$1=yes],
-     [bor_cv_[]_AC_LANG_ABBREV[]_$1=no])
-   ac_[]_AC_LANG_ABBREV[]_werror_flag=$bor_save_[]_AC_LANG_ABBREV[]_werror_flag])
-   []_AC_LANG_PREFIX[]FLAGS=$bor_save_[]_AC_LANG_PREFIX[]FLAGS
+     [eval sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1=yes],
+     [eval sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1=no])
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=$sdcc_save_[]_AC_LANG_ABBREV[]_werror_flag])
+   []_AC_LANG_PREFIX[]FLAGS=$sdcc_save_[]_AC_LANG_PREFIX[]FLAGS
 ])
 
 # Checking characteristics of compilers and other programs
@@ -442,8 +442,8 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
 
   # This is the first time when CFLAGS are set/modified!!
 
-  bor_IS_VALID_OPTION(ggdb)
-  bor_IS_VALID_OPTION(gstabs)
+  sdcc_IS_VALID_OPTION(-ggdb)
+  sdcc_IS_VALID_OPTION(-gstabs)
   if test "$ucsim_cv_cxx_gstabs" = "yes"; then
     gopt="-gstabs+ -g3"
   elif test "$ucsim_cv_cxx_ggdb" = "yes"; then
@@ -457,7 +457,7 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
     CXXFLAGS="$CXXFLAGS $gopt"
   fi
 
-  bor_IS_VALID_OPTION(pipe)
+  sdcc_IS_VALID_OPTION(-pipe)
   if test "$ucsim_cv_cxx_pipe" = "yes"; then
     CXXFLAGS="$CXXFLAGS -pipe"
   fi
@@ -465,8 +465,8 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
   MAKEDEP="$CXX $ucsim_cv_MM"
   WALL_FLAG="-Wall"
 else
-  bor_IS_SUNPRO
-  if test "$bor_cv_cxx_compiler_sunpro" = "yes"; then
+  sdcc_IS_SUNPRO
+  if test "$sdcc_cv_cxx_compiler_sunpro" = "yes"; then
     CXXFLAGS="-xO2 $CXXFLAGS"
     MAKEDEP="$CXX -xM1"
     WALL_FLAG=

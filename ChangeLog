@@ -1,3 +1,13 @@
+2012-03-30 Borut Razem <borut.razem AT gmail.com>
+
+	* configure.in, configure, sdccconf_in.h:
+	  added check if c supports tags in unnamed struct,
+	  fixed IS_VALID_OPTION
+	* sim/ucsim/configure.in, sim/ucsim/configure:
+	  fixed IS_VALID_OPTION
+	* sim/ucsim/aclocal.m4: regenerated
+	* src/pic14/Makefile.in: removed unneeded PORT
+
 2012-03-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

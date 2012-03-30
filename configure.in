@@ -99,62 +99,62 @@ AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 # Macro definitions
 # ===========================================================================
 
-# _bor_EXECUTE_IFELSE_BODY(COMMAND)
+# _sdcc_EXECUTE_IFELSE_BODY(COMMAND)
 # -----------------------
 # Shell function body for _AC_EXECUTE_IFELSE.
-m4_define([_bor_EXECUTE_IFELSE_BODY],
+m4_define([_sdcc_EXECUTE_IFELSE_BODY],
 [  AS_LINENO_PUSH([$[]1])
   AS_IF([_AC_DO_STDERR([$1 $2]) > conftest.out && {
-	 test ! -s conftest.err
+         test ! -s conftest.err
        }],
       [ac_retval=0],
       [ac_retval=1])
   AS_LINENO_POP
-])# _bor_EXECUTE_IFELSE_BODY
+])# _sdcc_EXECUTE_IFELSE_BODY
 
-# bor_EXECUTE_IFELSE(COMMAND[ACTION-IF-TRUE], [ACTION-IF-FALSE])
+# sdcc_EXECUTE_IFELSE(COMMAND[ACTION-IF-TRUE], [ACTION-IF-FALSE])
 # ----------------------------------------------------------------
 # Try to execute COMMAND.
-AC_DEFUN([bor_EXECUTE_IFELSE],
+AC_DEFUN([sdcc_EXECUTE_IFELSE],
 [_$0_BODY($1)
   AS_IF([test "$ac_retval" = 0],
     [$2],
     [$3])
 rm conftest.err conftest.out
-])# bor_EXECUTE_IFELSE
+])# sdcc_EXECUTE_IFELSE
 
 # Check whether the compiler for the current language is SunPRO.
 
-AC_DEFUN([bor_IS_SUNPRO],
+AC_DEFUN([sdcc_IS_SUNPRO],
 [AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
-  [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
+  [sdcc_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
   [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
        choke me
 #endif
 ]])],
-    [bor_compiler_sunpro=yes],
-    [bor_compiler_sunpro=no])
-bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
+    [sdcc_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=yes],
+    [sdcc_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=no])
 ])])
 
-# bor_IS_VALID_OPTION macro checks if the current compiler, selected by 
+# sdcc_IS_VALID_OPTION macro checks if the current compiler, selected by 
 # AC_LANG, supports option specified as the 1st parameter. The test fails if
 # the compiler returns an error or in case something is writeen to stderr.
-# For example: bor_VALID_OPT(fPIC)
+# For example: sdcc_VALID_OPT(-fPIC)
 
-AC_DEFUN([bor_IS_VALID_OPTION],
-[ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
-bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
-AC_CACHE_CHECK(whether _AC_LANG accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
-  [bor_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
+AC_DEFUN([sdcc_IS_VALID_OPTION],
+[arg1=`echo $1 | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
+sdcc_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
+AC_CACHE_CHECK(whether _AC_LANG accepts $1, sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1,
+  [sdcc_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
    ac_[]_AC_LANG_ABBREV[]_werror_flag=yes
    
-   []_AC_LANG_PREFIX[]FLAGS="-$1"
+   []_AC_LANG_PREFIX[]FLAGS="$1"
    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-     [bor_cv_[]_AC_LANG_ABBREV[]_$1=yes],
-     [bor_cv_[]_AC_LANG_ABBREV[]_$1=no])
-   ac_[]_AC_LANG_ABBREV[]_werror_flag=$bor_save_[]_AC_LANG_ABBREV[]_werror_flag])
-   []_AC_LANG_PREFIX[]FLAGS=$bor_save_[]_AC_LANG_PREFIX[]FLAGS
+     [eval sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1=yes],
+     [eval sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1=no])
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=$sdcc_save_[]_AC_LANG_ABBREV[]_werror_flag])
+   []_AC_LANG_PREFIX[]FLAGS=$sdcc_save_[]_AC_LANG_PREFIX[]FLAGS
 ])
 
 # This macro expands DIR and assigns it to RET.
@@ -381,14 +381,14 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
   rm -f _test_.*)
 
   # This is the first time when CFLAGS are set/modified!!
-  bor_IS_VALID_OPTION(ggdb)
-  if test "$bor_cv_c_ggdb" = "yes"; then
+  sdcc_IS_VALID_OPTION(-ggdb)
+  if test "$sdcc_cv_c_ggdb" = "yes"; then
     CFLAGS="-ggdb ${CFLAGS}"
     CXXFLAGS="-ggdb ${CXXFLAGS}"
   fi
 
-  bor_IS_VALID_OPTION(pipe)
-  if test "$bor_cv_c_pipe" = "yes"; then
+  sdcc_IS_VALID_OPTION(-pipe)
+  if test "$sdcc_cv_c_pipe" = "yes"; then
     CFLAGS="-pipe ${CFLAGS}"
     # Don't use "-pipe" on x86 Solaris g++, since src/z80/ralloc2.cc dies with:
     # Assembler: ralloc2.cc
@@ -402,8 +402,8 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
   C99_FLAG="--std=c99"
   MAKEDEP="$CC $sdcc_cv_MM"
 else
-  bor_IS_SUNPRO
-  if test "$bor_cv_c_compiler_sunpro" = "yes"; then
+  sdcc_IS_SUNPRO
+  if test "$sdcc_cv_c_compiler_sunpro" = "yes"; then
     C99_FLAG="-xc99"
     CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
     CXXFLAGS="-xO2 ${CXXFLAGS}"
@@ -415,6 +415,50 @@ fi
 AC_SUBST(MAKEDEP)
 AC_SUBST(WALL_FLAG)
 AC_SUBST(C99_FLAG)
+
+# SDCC_C_UNNAMED_STRUCT_TAG ()
+# chech whether C compiler supports tag in unnamed struct
+# -------------------------------------------------------------------------
+AC_DEFUN([SDCC_C_UNNAMED_STRUCT_TAG],
+[
+  if test "$ac_cv_c_compiler_gnu" = "yes"; then
+    sdcc_IS_VALID_OPTION(-fms-extensions)
+  else
+    sdcc_cv_c_fms_extensions=no
+  fi
+  AC_CACHE_CHECK(whether C supports tag in unnamed struct, sdcc_cv_c_unnamed_struct_tag,
+    if test "$sdcc_cv_c_fms_extensions" = "yes"; then
+      CFLAGS="-fms-extensions ${CFLAGS}"
+    fi
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+      [
+struct s1 {
+  int a;
+};
+
+struct s2 {
+  struct s1;
+  int b;
+};
+      ],
+      [
+  struct s2 s;
+
+  s.a = 1;
+  s.b = 2;
+      ])],
+      [
+        sdcc_cv_[]_AC_LANG_ABBREV[]_unnamed_struct_tag=yes
+        AC_DEFINE_UNQUOTED(UNNAMED_STRUCT_TAG, 1, [Define to 1 if c supports tags in unnamed struct.])
+      ],
+      [
+        sdcc_cv_[]_AC_LANG_ABBREV[]_unnamed_struct_tag=no
+      ])
+  )
+])
+
+SDCC_C_UNNAMED_STRUCT_TAG
 
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================

@@ -271,6 +271,9 @@
 /* XXX */
 #undef TYPE_WORD
 
+/* Define to 1 if c supports tags in unnamed struct. */
+#undef UNNAMED_STRUCT_TAG
+
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
 #if defined AC_APPLE_UNIVERSAL_BUILD

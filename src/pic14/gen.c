@@ -1,11 +1,12 @@
 /*-------------------------------------------------------------------------
   gen.c - source file for code generation for pic
 
-  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-         and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
-  PIC port   -  Scott Dattalo scott@dattalo.com (2000)
-    cont'd   -  Raphael Neider <rneider AT web.de> (2005)
+  PIC port   -
+  Copyright (C) 2000, Scott Dattalo scott@dattalo.com
+  Copyright (C) 2005, Raphael Neider <rneider AT web.de>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -20,15 +21,12 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
+-------------------------------------------------------------------------*/
+/*
   Notes:
   000123 mlh  Moved aopLiteral to SDCCglue.c to help the split
-      Made everything static
--------------------------------------------------------------------------*/
+              Made everything static
+*/
 
 /*
  * This is the down and dirty file with all kinds of
@@ -40,6 +38,7 @@
 #include "device.h"
 #include "gen.h"
 #include "glue.h"
+#include "dbuf_string.h"
 
 /*
  * Imports
@@ -77,8 +76,6 @@ static char **fReturn = fReturnpic14;
 
 static struct {
     short accInUse;
-    short inLine;
-    short debugLine;
     short nRegsSaved;
     set *sendSet;
 } _G;
@@ -94,8 +91,6 @@ typedef struct resolvedIfx {
                       * is generated */
 } resolvedIfx;
 
-static lineNode *lineHead = NULL;
-static lineNode *lineCurr = NULL;
 static pBlock *pb;
 
 /*-----------------------------------------------------------------*/
@@ -154,75 +149,40 @@ static void DEBUGpic14_AopTypeSign(int line_no, operand *left, operand *right, o
 
 }
 
-void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
+void
+DEBUGpic14_emitcode (char *inst,char *fmt, ...)
 {
-    va_list ap;
-    char lb[INITIAL_INLINEASM];
-    unsigned char *lbp = (unsigned char *)lb;
+  va_list ap;
 
-    if(!debug_verbose && !options.debug)
-        return;
+  if(!debug_verbose && !options.debug)
+    return;
 
-    va_start(ap,fmt);
+  va_start (ap, fmt);
+  va_emitcode (inst, fmt, ap);
+  va_end (ap);
 
-    if (inst && *inst) {
-        if (fmt && *fmt)
-            sprintf(lb,"%s\t",inst);
-        else
-            sprintf(lb,"%s",inst);
-        vsprintf(lb+(strlen(lb)),fmt,ap);
-    }  else
-        vsprintf(lb,fmt,ap);
-
-    while (isspace(*lbp)) lbp++;
-
-    if (lbp && *lbp)
-        lineCurr = (lineCurr ?
-        connectLine(lineCurr,newLineNode(lb)) :
-    (lineHead = newLineNode(lb)));
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug  = _G.debugLine;
-
-    addpCode2pBlock(pb,newpCodeCharP(lb));
-
-    va_end(ap);
+  addpCode2pBlock (pb,newpCodeCharP (genLine.lineCurr->line));
 }
 
-static void Safe_vsnprintf (char *buf, size_t size, const char *fmt, va_list ap)
+void
+emitpComment (const char *fmt, ...)
 {
-#if defined (HAVE_VSNPRINTF)
-  vsnprintf (buf, size, fmt, ap);
-#elif defined (HAVE_VSPRINTF)
-  vsprintf (buf, size, fmt, ap);
-  if (strlen (buf) >= size)
-  {
-    fprintf (stderr, "Safe_vsnprintf: buffer (size %u) has overflown\n", size);
-  }
-#elif defined (HAVE_SNPRINTF)
-  snprintf (buf, size, "vs(n)printf required");
-#elif defined (HAVE_SRINTF)
-  sprintf (buf, "vs(n)printf required");
-  if (strlen (buf) >= size)
-  {
-    fprintf (stderr, "Safe_vsnprintf: buffer (size %u) has overflown\n", size);
-  }
-#else
-  assert ( !"neither vsnprintf nor vsprintf is present -- unable to proceed" );
-#endif
-}
+  va_list ap;
+  struct dbuf_s dbuf;;
+  const char *line;
 
-void emitpComment (const char *fmt, ...)
-{
-  va_list va;
-  char buffer[4096];
+  dbuf_init (&dbuf, INITIAL_INLINEASM);
 
-  va_start (va, fmt);
-  if (pb) {
-    Safe_vsnprintf (buffer, 4096, fmt, va);
-    //fprintf (stderr, "%s\n" ,buffer);
-    addpCode2pBlock (pb, newpCodeCharP (buffer));
-  }
-  va_end (va);
+  dbuf_append_char (&dbuf, ';');
+  va_start (ap, fmt);
+  dbuf_vprintf (&dbuf, fmt, ap);
+  va_end (ap);
+
+  line = dbuf_detach_c_str (&dbuf);
+  emit_raw (line);
+  dbuf_free (line);
+
+  addpCode2pBlock (pb, newpCodeCharP (genLine.lineCurr->line));
 }
 
 void emitpLabel(int key)
@@ -256,37 +216,17 @@ static void emitpcodeNULLop(PIC_OPCODE poc)
 /*-----------------------------------------------------------------*/
 /* pic14_emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
-void pic14_emitcode (char *inst,char *fmt, ...)
+void
+pic14_emitcode (char *inst,char *fmt, ...)
 {
-    va_list ap;
-    char lb[INITIAL_INLINEASM];
-    char *lbp = lb;
+  va_list ap;
 
-    va_start(ap,fmt);
+  va_start (ap, fmt);
+  va_emitcode (inst, fmt, ap);
+  va_end (ap);
 
-    if (inst && *inst) {
-        if (fmt && *fmt)
-            sprintf(lb,"%s\t",inst);
-        else
-            sprintf(lb,"%s",inst);
-        vsprintf(lb+(strlen(lb)),fmt,ap);
-    }  else
-        vsprintf(lb,fmt,ap);
-
-    while (isspace(*lbp)) lbp++;
-
-    if (lbp && *lbp)
-        lineCurr = (lineCurr ?
-        connectLine(lineCurr,newLineNode(lb)) :
-    (lineHead = newLineNode(lb)));
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug  = _G.debugLine;
-    lineCurr->isLabel = (lbp[strlen (lbp) - 1] == ':');
-
-    if(debug_verbose)
-        addpCode2pBlock(pb,newpCodeCharP(lb));
-
-    va_end(ap);
+  if(debug_verbose)
+    addpCode2pBlock (pb,newpCodeCharP (genLine.lineCurr->line));
 }
 
 /*-----------------------------------------------------------------*/
@@ -296,9 +236,9 @@ void pic14_emitcode (char *inst,char *fmt, ...)
 void
 pic14_emitDebuggerSymbol (const char * debugSym)
 {
-    _G.debugLine = 1;
+    genLine.lineElement.isDebug = 1;
     pic14_emitcode ("", ";%s ==.", debugSym);
-    _G.debugLine = 0;
+    genLine.lineElement.isDebug = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -4507,7 +4447,8 @@ release :
 /*-----------------------------------------------------------------*/
 /* genInline - write the inline code out                           */
 /*-----------------------------------------------------------------*/
-static void genInline (iCode *ic)
+static void
+pic14_genInline (iCode *ic)
 {
   char *buffer, *bp, *bp1;
   bool inComment = FALSE;
@@ -4515,7 +4456,7 @@ static void genInline (iCode *ic)
   FENTRY;
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-  _G.inLine += (!options.asmpeep);
+  genLine.lineElement.isInline += (!options.asmpeep);
 
   buffer = bp = bp1 = Safe_strdup (IC_INLINE (ic));
 
@@ -4562,7 +4503,7 @@ static void genInline (iCode *ic)
   /* consumed; we can free it here */
   dbuf_free (IC_INLINE (ic));
 
-  _G.inLine -= (!options.asmpeep);
+  genLine.lineElement.isInline -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7015,7 +6956,6 @@ void genpic14Code (iCode *lic)
     const char *cline;
 
     FENTRY;
-    lineHead = lineCurr = NULL;
 
     pb = newpCodeChain(GcurMemmap,0,newpCodeCharP("; Starting pCode block"));
     addpBlock(pb);
@@ -7027,6 +6967,7 @@ void genpic14Code (iCode *lic)
 
 
     for (ic = lic ; ic ; ic = ic->next ) {
+        initGenLineElement ();
 
         //DEBUGpic14_emitcode(";ic","");
         //fprintf (stderr, "in ic loop\n");
@@ -7179,7 +7120,7 @@ void genpic14Code (iCode *lic)
             break;
 
         case INLINEASM:
-            genInline (ic);
+            pic14_genInline (ic);
             break;
 
         case RRC:
@@ -7264,17 +7205,18 @@ void genpic14Code (iCode *lic)
     /* now we are ready to call the
     peep hole optimizer */
     if (!options.nopeep) {
-        peepHole (&lineHead);
+        peepHole (&genLine.lineHead);
     }
     /* now do the actual printing */
-    printLine (lineHead,codeOutBuf);
+    printLine (genLine.lineHead,codeOutBuf);
 
 #ifdef PCODE_DEBUG
     DFPRINTF((stderr,"printing pBlock\n\n"));
     printpBlock(stdout,pb);
 #endif
 
-    return;
+    /* destroy the line list */
+    destroy_line_list ();
 }
 
 /* This is not safe, as a AOP_PCODE/PO_IMMEDIATE might be used both as literal

@@ -1,9 +1,27 @@
-/** @file main.c
-    ds390 specific general functions.
+/*-------------------------------------------------------------------------
+  main.h - ds390 specific general functions
 
-    Note that mlh prepended _ds390_ on the static functions.  Makes
-    it easier to set a breakpoint using the debugger.
+  Copyright (C) 2000, Kevin Vigor
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+-------------------------------------------------------------------------*/
+/*
+  Note that mlh prepended _ds390_ on the static functions.  Makes
+  it easier to set a breakpoint using the debugger.
 */
+
 #include "common.h"
 #include "main.h"
 #include "ralloc.h"
@@ -854,12 +872,12 @@ static void
 initializeAsmLineNode (lineNode *line)
 {
   if (!line->aln)
-    line->aln = asmLineNodeFromLineNode (line, 0);
-  else if (line->aln && !line->aln->initialized)
+    line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line, 0);
+  else if (line->aln && !((asmLineNode *)line->aln)->initialized)
     {
-      int currentDPS = line->aln->currentDPS;
+      int currentDPS = ((asmLineNode *)line->aln)->currentDPS;
       free(line->aln);
-      line->aln = asmLineNodeFromLineNode (line, currentDPS);
+      line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line, currentDPS);
     }
 }
 

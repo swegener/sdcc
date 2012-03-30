@@ -1,10 +1,11 @@
 /*-------------------------------------------------------------------------
   gen.c - source file for code generation for DS80C390
 
-  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-         and -  Jean-Louis VERN.jlvern@writeme.com (1999)
-  Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
-  DS390 adaptation by Kevin Vigor <kevin@vigor.nu>
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
+  Bug Fixes - Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
+  DS390 adaptation:
+  Copyright (C) 2000, Kevin Vigor <kevin@vigor.nu>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -15,14 +16,6 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 //#define D(x)
@@ -32,8 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SDCCglobl.h"
-#include "newalloc.h"
 
 #include "common.h"
 #include "main.h"
@@ -138,13 +129,10 @@ static struct
     short BInUse;
   } bu;
   short accInUse;
-  short inLine;
-  short debugLine;
   short nRegsSaved;
   short dptrInUse;
   short dptr1InUse;
   set *sendSet;
-  iCode *current_iCode;
   symbol *currentFunc;
 }
 _G;
@@ -169,9 +157,6 @@ static void saveRBank (int, iCode *, bool);
 /* A scratch register which will be used to hold
  * result bytes from operands in far space via DPTR2. */
 #define DP2_RESULT_REG  "_ap"
-
-static lineNode *lineHead = NULL;
-static lineNode *lineCurr = NULL;
 
 static unsigned char SLMask[] = { 0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
   0xE0, 0xC0, 0x80, 0x00
@@ -206,62 +191,11 @@ static int _currentDPS;         /* Current processor DPS. */
 static int _desiredDPS;         /* DPS value compiler thinks we should be using. */
 static int _lazyDPS = 0;        /* if non-zero, we are doing lazy evaluation of DPS changes. */
 
-/*-----------------------------------------------------------------*/
-/* emitcode - writes the code into a file : for now it is simple   */
-/*-----------------------------------------------------------------*/
-static void
-emitcode (const char *inst, const char *fmt, ...)
-{
-  va_list ap;
-  struct dbuf_s dbuf;
-  const char *lbp, *lb;
-
-  dbuf_init (&dbuf, INITIAL_INLINEASM);
-
-  va_start (ap, fmt);
-
-  if (inst && *inst)
-    {
-      dbuf_append_str (&dbuf, inst);
-
-      if (fmt && *fmt)
-        {
-          dbuf_append_char (&dbuf, '\t');
-          dbuf_tvprintf (&dbuf, fmt, ap);
-        }
-    }
-  else
-    {
-      dbuf_tvprintf (&dbuf, fmt, ap);
-    }
-
-  lbp = lb = dbuf_detach_c_str (&dbuf);
-
-  while (isspace ((unsigned char) *lbp))
-    {
-      lbp++;
-    }
-
-  if (lbp && *lbp)
-    {
-      lineCurr = (lineCurr ? connectLine (lineCurr, newLineNode (lb)) : (lineHead = newLineNode (lb)));
-
-      lineCurr->isInline = _G.inLine;
-      lineCurr->isDebug = _G.debugLine;
-      lineCurr->ic = _G.current_iCode;
-      lineCurr->aln = ds390newAsmLineNode (_currentDPS);
-      lineCurr->isComment = (*lbp == ';');
-    }
-  dbuf_free (lb);
-
-  va_end (ap);
-}
-
 static void
 emitLabel (symbol * tlbl)
 {
   emitcode ("", "!tlabeldef", tlbl->key + 100);
-  lineCurr->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -271,9 +205,9 @@ emitLabel (symbol * tlbl)
 void
 ds390_emitDebuggerSymbol (const char *debugSym)
 {
-  _G.debugLine = 1;
+  genLine.lineElement.isDebug = 1;
   emitcode ("", "%s ==.", debugSym);
-  _G.debugLine = 0;
+  genLine.lineElement.isDebug = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3660,7 +3594,7 @@ genFunction (iCode * ic)
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
-  lineCurr->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
   _G.currentFunc = sym;
 
@@ -3983,7 +3917,7 @@ static void
 genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  lineNode *lnp = lineCurr;
+  lineNode *lnp = genLine.lineCurr;
   bitVect *regsUsed;
   bitVect *regsUsedPrologue;
   bitVect *regsUnneeded;
@@ -8585,65 +8519,6 @@ release:
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-}
-
-/*-----------------------------------------------------------------*/
-/* genInline - write the inline code out                           */
-/*-----------------------------------------------------------------*/
-static void
-genInline (iCode * ic)
-{
-  char *buf, *bp, *bp1;
-  bool inComment = FALSE;
-
-  D (emitcode (";", "genInline"));
-
-  _G.inLine += (!options.asmpeep);
-
-  buf = bp = bp1 = Safe_strdup (IC_INLINE (ic));
-
-  /* emit each line as a code */
-  while (*bp)
-    {
-      switch (*bp)
-        {
-        case ';':
-          inComment = TRUE;
-          ++bp;
-          break;
-
-        case '\x87':
-        case '\n':
-          inComment = FALSE;
-          *bp++ = '\0';
-          emitcode (bp1, "");
-          bp1 = bp;
-          break;
-
-        default:
-          /* Add \n for labels, not dirs such as c:\mydir */
-          if (!inComment && (*bp == ':') && (isspace ((unsigned char) bp[1])))
-            {
-              ++bp;
-              *bp = '\0';
-              ++bp;
-              emitcode (bp1, "");
-              bp1 = bp;
-            }
-          else
-            ++bp;
-          break;
-        }
-    }
-  if (bp1 != bp)
-    emitcode (bp1, "");
-
-  Safe_free (buf);
-
-  /* consumed; we can free it here */
-  dbuf_free (IC_INLINE (ic));
-
-  _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -14213,7 +14088,7 @@ gen390Code (iCode * lic)
   int cln = 0;
 
   _G.currentFunc = NULL;
-  lineHead = lineCurr = NULL;
+
   dptrn[1][0] = "dpl1";
   dptrn[1][1] = "dph1";
   dptrn[1][2] = "dpx1";
@@ -14245,7 +14120,9 @@ gen390Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
-      _G.current_iCode = ic;
+      initGenLineElement ();
+
+      genLine.lineElement.ic = ic;
 
       if (ic->lineno && cln != ic->lineno)
         {
@@ -14491,8 +14368,11 @@ gen390Code (iCode * lic)
   /* now we are ready to call the
      peep hole optimizer */
   if (!options.nopeep)
-    peepHole (&lineHead);
+    peepHole (&genLine.lineHead);
 
   /* now do the actual printing */
-  printLine (lineHead, codeOutBuf);
+  printLine (genLine.lineHead, codeOutBuf);
+
+  /* destroy the line list */
+  destroy_line_list ();
 }

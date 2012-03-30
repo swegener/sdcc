@@ -1,11 +1,10 @@
 /*-------------------------------------------------------------------------
   gen.c - code generator for Z80 / Z180 / GBZ80.
 
-  Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de (2011)
-  Michael Hope <michaelh@juju.net.nz> 2000
-  Based on the mcs51 generator -
-      Sandeep Dutta . sandeep.dutta@usa.net (1998)
-   and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
+  Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
+  Copyright (C) 2011, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de)
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -89,11 +88,7 @@
 #include <ctype.h>
 
 #include "z80.h"
-#include "SDCCglobl.h"
-#include "SDCCpeeph.h"
 #include "gen.h"
-#include "SDCCglue.h"
-#include "newalloc.h"
 #include "dbuf_string.h"
 
 /* This is the down and dirty file with all kinds of kludgy & hacky
@@ -285,10 +280,6 @@ static struct
 
   struct
   {
-    lineNode *head;
-    lineNode *current;
-    int isInline;
-    int isDebug;
     allocTrace trace;
   } lines;
 
@@ -513,30 +504,6 @@ _tidyUp (char *buf)
     }
 }
 
-static lineNode *
-_newLineNode (const char *line)
-{
-  lineNode *pl;
-
-  pl = traceAlloc(&_G.lines.trace, Safe_alloc ( sizeof (lineNode)));
-  pl->line = traceAlloc(&_G.lines.trace, Safe_strdup (line));
-
-  return pl;
-}
-
-static void
-_add_line (const char *buffer)
-{
-  _G.lines.current = (_G.lines.current ?
-              connectLine (_G.lines.current, _newLineNode (buffer)) :
-              (_G.lines.head = _newLineNode (buffer)));
-
-  _G.lines.current->isInline = _G.lines.isInline;
-  _G.lines.current->isDebug = _G.lines.isDebug;
-  _G.lines.current->ic = _G.current_iCode;
-  _G.lines.current->isComment = (*buffer == ';');
-}
-
 static void
 _vemit2 (const char *szFormat, va_list ap)
 {
@@ -555,11 +522,11 @@ _vemit2 (const char *szFormat, va_list ap)
   while ((nextp = strchr (p, '\n')))
     {
       *nextp = '\0';
-      _add_line (p);
+      emit_raw (p);
       p = nextp + 1;
     }
 
-  _add_line (p);
+  emit_raw (p);
 
   dbuf_free (buffer);
 }
@@ -640,10 +607,10 @@ emit2 (const char *szFormat,...)
 void
 z80_emitDebuggerSymbol (const char * debugSym)
 {
-  _G.lines.isDebug = 1;
+  genLine.lineElement.isDebug = 1;
   emit2 ("%s !equ .", debugSym);
   emit2 ("!global", debugSym);
-  _G.lines.isDebug = 0;
+  genLine.lineElement.isDebug = 0;
 }
 
 // Todo: Handle IY (when used as AOP_HLREG or AOP_REG) correctly.
@@ -2283,14 +2250,14 @@ static void
 emitLabelNoSpill (int key)
 {
   emit2 ("!tlabeldef", key);
-  _G.lines.current->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
 }
 
 static void
 emitLabel (int key)
 {
   emit2 ("!tlabeldef", key);
-  _G.lines.current->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
   spillCached ();
 }
 
@@ -4266,11 +4233,11 @@ genFunction (const iCode * ic)
       emit2 ("!labeldef", dbuf_c_str (&dbuf));
       dbuf_detach (&dbuf);
       if(!regalloc_dry_run)
-       _G.lines.current->isLabel = 1;
+       genLine.lineCurr->isLabel = 1;
     }
   emit2 ("!functionlabeldef", sym->rname);
   if(!regalloc_dry_run)
-    _G.lines.current->isLabel = 1;
+    genLine.lineCurr->isLabel = 1;
 
   ftype = operandType (IC_LEFT (ic));
 
@@ -4471,7 +4438,7 @@ genEndFunction (iCode * ic)
           dbuf_printf (&dbuf, "%s_end", sym->rname);
           emit2 ("!labeldef", dbuf_c_str (&dbuf));
           dbuf_destroy (&dbuf);
-          _G.lines.current->isLabel = 1;
+          genLine.lineCurr->isLabel = 1;
         }
       return;
     }
@@ -4545,7 +4512,7 @@ genEndFunction (iCode * ic)
               emit2 ("jp PO,!tlabel", tlbl->key + 100);
               emit2 ("!ei");
               emit2 ("!tlabeldef", (tlbl->key + 100));
-              _G.lines.current->isLabel = 1;
+              genLine.lineCurr->isLabel = 1;
             }
         }
     }
@@ -4584,7 +4551,7 @@ genEndFunction (iCode * ic)
       dbuf_printf (&dbuf, "%s_end", sym->rname);
       emit2 ("!labeldef", dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
-      _G.lines.current->isLabel = 1;
+      genLine.lineCurr->isLabel = 1;
     }
 
   _G.flushStatics = 1;
@@ -7047,7 +7014,7 @@ genAnd (const iCode *ic, iCode * ifx)
           if (!regalloc_dry_run)
             emit2 ("!tlabeldef", tlbl->key + 100);
           regalloc_dry_run_cost += 3;
-          _G.lines.current->isLabel = 1;
+          genLine.lineCurr->isLabel = 1;
         }
       // if(left & literal)
       else
@@ -7489,70 +7456,6 @@ release:
   freeAsmop (left, NULL, ic);
   freeAsmop (right, NULL, ic);
   freeAsmop (result, NULL, ic);
-}
-
-/*-----------------------------------------------------------------*/
-/* genInline - write the inline code out                           */
-/*-----------------------------------------------------------------*/
-static void
-genInline (const iCode *ic)
-{
-  char *buffer, *bp, *bp1;
-  bool inComment = FALSE;
-
-  _G.lines.isInline += (!options.asmpeep);
-
-  buffer = bp = bp1 = Safe_strdup (IC_INLINE (ic));
-
-  /* emit each line as a code */
-  while (*bp)
-    {
-      switch (*bp)
-        {
-        case ';':
-          inComment = TRUE;
-          ++bp;
-          break;
-
-        case '\x87':
-        case '\n':
-          inComment = FALSE;
-          *bp++ = '\0';
-          /* Don't emit whitespace */
-          while(isspace(*bp1))
-            bp1++;
-          if(*bp1)
-            emit2 (bp1);
-          bp1 = bp;
-          break;
-
-        default:
-          /* Add \n for labels, not dirs such as c:\mydir */
-          if (!inComment && (*bp == ':') && (isspace((unsigned char)bp[1])))
-            {
-              ++bp;
-              *bp = '\0';
-              ++bp;
-              emit2 (bp1);
-              bp1 = bp;
-            }
-          else
-            ++bp;
-          break;
-        }
-    }
-  if (bp1 != bp)
-    {
-      while(isspace(*bp1))
-        bp1++;
-      if(*bp1)
-        emit2 (bp1);
-    }
-
-  Safe_free (buffer);
-
-  _G.lines.isInline -= (!options.asmpeep);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -9839,7 +9742,7 @@ genCritical (const iCode *ic)
       if (!regalloc_dry_run)
         {
           emit2 ("!tlabeldef", (tlbl->key + 100));
-          _G.lines.current->isLabel = 1;
+          genLine.lineCurr->isLabel = 1;
         }
       freeAsmop (IC_RESULT (ic), NULL, ic);
     }
@@ -9906,7 +9809,7 @@ genEndCritical (const iCode *ic)
           emit2 ("jp PO,!tlabel", tlbl->key + 100);
           emit2 ("!ei");
           emit2 ("!tlabeldef", (tlbl->key + 100));
-          _G.lines.current->isLabel = 1;
+          genLine.lineCurr->isLabel = 1;
         }
       regalloc_dry_run_cost += 4;
     }
@@ -10472,7 +10375,7 @@ genBuiltIn (iCode *ic)
 static void
 genZ80iCode (iCode *ic)
 {
-  _G.current_iCode = ic;
+  genLine.lineElement.ic = ic;
 
   /* if the result is marked as
      spilt and rematerializable or code for
@@ -10772,12 +10675,12 @@ dryZ80iCode (iCode *ic)
       _fTmp = _z80_return;
     }
     
-  _G.lines.head = _G.lines.current = NULL;
+  initGenLineElement ();
   _G.omitFramePtr = should_omit_frame_ptr;
   
   genZ80iCode(ic);
   
-  freeTrace(&_G.lines.trace);
+  destroy_line_list ();
   freeTrace(&_G.trace.aops);
 
   {
@@ -10827,7 +10730,7 @@ genZ80Code (iCode *lic)
       _fTmp = _z80_return;
     }
 
-  _G.lines.head = _G.lines.current = NULL;
+  initGenLineElement ();
 
   /* if debug information required */
   if (options.debug && currFunc)
@@ -10864,7 +10767,7 @@ genZ80Code (iCode *lic)
   /* now we are ready to call the
      peep hole optimizer */
   if (!options.nopeep)
-    peepHole (&_G.lines.head);
+    peepHole (&genLine.lineHead);
 
   /* This is unfortunate */
   /* now do the actual printing */
@@ -10872,7 +10775,7 @@ genZ80Code (iCode *lic)
     struct dbuf_s *buf = codeOutBuf;
     if (isInHome () && codeOutBuf == &code->oBuf)
       codeOutBuf = &home->oBuf;
-    printLine (_G.lines.head, codeOutBuf);
+    printLine (genLine.lineHead, codeOutBuf);
     if (_G.flushStatics)
       {
         flushStatics ();
@@ -10887,6 +10790,6 @@ genZ80Code (iCode *lic)
       spillPair (pairId);
   }
 
-  freeTrace(&_G.lines.trace);
+  destroy_line_list ();
   freeTrace(&_G.trace.aops);
 }

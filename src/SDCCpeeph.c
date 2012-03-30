@@ -2,25 +2,21 @@
   SDCCpeeph.c - The peep hole optimizer: for interpreting the
                 peep hole rules
 
-             Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+  Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
 #include "common.h"
@@ -1298,45 +1294,6 @@ callFuncByName (char *fname,
 }
 
 /*-----------------------------------------------------------------*/
-/* printLine - prints a line chain into a given file               */
-/*-----------------------------------------------------------------*/
-void
-printLine (lineNode * head, struct dbuf_s * oBuf)
-{
-  iCode *last_ic = NULL;
-  bool debug_iCode_tracking = (getenv("DEBUG_ICODE_TRACKING")!=NULL);
-
-  while (head)
-    {
-      if (head->ic!=last_ic)
-        {
-          last_ic = head->ic;
-          if (debug_iCode_tracking)
-            {
-              if (head->ic)
-                dbuf_printf (oBuf, "; block = %d, seq = %d\n",
-                         head->ic->block, head->ic->seq);
-              else
-                dbuf_append_str (oBuf, "; iCode lost\n");
-            }
-        }
-
-      /* don't indent comments & labels */
-      if (head->line &&
-          (head->isComment || head->isLabel)) {
-        dbuf_printf (oBuf, "%s\n", head->line);
-      } else {
-        if (head->isInline && *head->line=='#') {
-          // comment out preprocessor directives in inline asm
-          dbuf_append_char (oBuf, ';');
-        }
-        dbuf_printf (oBuf, "\t%s\n", head->line);
-      }
-      head = head->next;
-    }
-}
-
-/*-----------------------------------------------------------------*/
 /* newPeepRule - creates a new peeprule and attach it to the root  */
 /*-----------------------------------------------------------------*/
 static peepRule *
@@ -1370,38 +1327,6 @@ newPeepRule (lineNode * match,
     currRule = currRule->next = pr;
 
   return pr;
-}
-
-/*-----------------------------------------------------------------*/
-/* newLineNode - creates a new peep line                           */
-/*-----------------------------------------------------------------*/
-lineNode *
-newLineNode (const char *line)
-{
-  lineNode *pl;
-
-  pl = Safe_alloc ( sizeof (lineNode));
-  pl->line = Safe_strdup (line);
-  pl->ic = NULL;
-  return pl;
-}
-
-/*-----------------------------------------------------------------*/
-/* connectLine - connects two lines                                */
-/*-----------------------------------------------------------------*/
-lineNode *
-connectLine (lineNode * pl1, lineNode * pl2)
-{
-  if (!pl1 || !pl2)
-    {
-      fprintf (stderr, "trying to connect null line\n");
-      return NULL;
-    }
-
-  pl2->prev = pl1;
-  pl1->next = pl2;
-
-  return pl2;
 }
 
 #define SKIP_SPACE(x,y) { while (*x && (ISCHARSPACE(*x) || *x == '\n')) x++; \

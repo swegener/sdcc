@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------
   gen.c - source file for code generation for 8051
 
-  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-         and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
 
   This program is free software; you can redistribute it and/or modify it
@@ -18,15 +18,12 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
+-------------------------------------------------------------------*/
+/*
   Notes:
   000123 mlh  Moved aopLiteral to SDCCglue.c to help the split
-      Made everything static
--------------------------------------------------------------------------*/
+              Made everything static
+*/
 
 #define D(x) do if (options.verboseAsm) {x;} while(0)
 
@@ -34,11 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SDCCglobl.h"
-#include "newalloc.h"
 
 #include "common.h"
-#include "SDCCpeeph.h"
 #include "ralloc.h"
 #include "rtrack.h"
 #include "gen.h"
@@ -109,8 +103,6 @@ static struct
     short BInUse;
   } bu;
   short accInUse;
-  short inLine;
-  short debugLine;
   struct
   {
     int pushed;
@@ -122,7 +114,6 @@ static struct
     int xoffset;
   } stack;
   set *sendSet;
-  iCode *current_iCode;
   symbol *currentFunc;
 }
 _G;
@@ -144,9 +135,6 @@ extern struct dbuf_s *codeOutBuf;
 #define CLRC     emitcode ("clr","c")
 #define SETC     emitcode ("setb","c")
 
-static lineNode *lineHead = NULL;
-static lineNode *lineCurr = NULL;
-
 static unsigned char SLMask[] = { 0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
   0xE0, 0xC0, 0x80, 0x00
 };
@@ -160,63 +148,11 @@ static unsigned char SRMask[] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
 #define MSB24   2
 #define MSB32   3
 
-/*-----------------------------------------------------------------*/
-/* emitcode - writes the code into a file : for now it is simple   */
-/*-----------------------------------------------------------------*/
-void
-emitcode (const char *inst, const char *fmt, ...)
-{
-  va_list ap;
-  struct dbuf_s dbuf;
-  const char *lbp, *lb;
-
-  dbuf_init (&dbuf, INITIAL_INLINEASM);
-
-  va_start (ap, fmt);
-
-  if (inst && *inst)
-    {
-      dbuf_append_str (&dbuf, inst);
-
-      if (fmt && *fmt)
-        {
-          dbuf_append_char (&dbuf, '\t');
-          dbuf_tvprintf (&dbuf, fmt, ap);
-        }
-    }
-  else
-    {
-      dbuf_tvprintf (&dbuf, fmt, ap);
-    }
-
-  lbp = lb = dbuf_detach_c_str (&dbuf);
-
-  while (isspace ((unsigned char) *lbp))
-    {
-      lbp++;
-    }
-
-  if (lbp && *lbp)
-    {
-      rtrackUpdate (lbp);
-
-      lineCurr = (lineCurr ? connectLine (lineCurr, newLineNode (lb)) : (lineHead = newLineNode (lb)));
-
-      lineCurr->isInline = _G.inLine;
-      lineCurr->isDebug = _G.debugLine;
-      lineCurr->ic = _G.current_iCode;
-      lineCurr->isComment = (*lbp == ';');
-    }
-  dbuf_free (lb);
-
-  va_end (ap);
-}
-
 static void
 emitLabel (symbol * tlbl)
 {
   emitcode ("", "!tlabeldef", tlbl->key + 100);
-  lineCurr->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -226,9 +162,9 @@ emitLabel (symbol * tlbl)
 void
 mcs51_emitDebuggerSymbol (const char *debugSym)
 {
-  _G.debugLine = 1;
+  genLine.lineElement.isDebug = 1;
   emitcode ("", "%s ==.", debugSym);
-  _G.debugLine = 0;
+  genLine.lineElement.isDebug = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -519,7 +455,7 @@ getTempRegs (reg_info ** tempRegs, int size, iCode * ic)
   int offset;
 
   if (!ic)
-    ic = _G.current_iCode;
+    ic = genLine.lineElement.ic;
   if (!ic)
     return 0;
   if (!_G.currentFunc)
@@ -2448,7 +2384,7 @@ saveRegisters (iCode * lic)
                 emitcode ("lcall", "___sdcc_xpush_regs_r0\t;(%s)", szRegs);
               else
                 emitcode ("lcall", "___sdcc_xpush_regs\t;(%s)", szRegs);
-              lineCurr->isInline = 1;
+              genLine.lineCurr->isInline = 1;
               if (BINUSE)
                 emitpop ("b");
               _G.stack.xpushed += count;
@@ -2560,7 +2496,7 @@ unsaveRegisters (iCode * ic)
                 emitcode ("lcall", "___sdcc_xpop_regs_r0\t;(%s)", szRegs);
               else
                 emitcode ("lcall", "___sdcc_xpop_regs\t;(%s)", szRegs);
-              lineCurr->isInline = 1;
+              genLine.lineCurr->isInline = 1;
               _G.stack.xpushed -= count;
             }
           else
@@ -3590,7 +3526,7 @@ genFunction (iCode * ic)
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
-  lineCurr->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
   _G.currentFunc = sym;
 
@@ -3870,7 +3806,7 @@ genFunction (iCode * ic)
         {
           int ofs;
 
-          _G.current_iCode = ric;
+          genLine.lineElement.ic = ric;
           D (emitcode (";", "genReceive"));
           for (ofs = 0; ofs < sym->recvSize; ofs++)
             {
@@ -3885,7 +3821,7 @@ genFunction (iCode * ic)
               assert (stackAdjust >= 0);
               stackAdjust = 0;
             }
-          _G.current_iCode = ic;
+          genLine.lineElement.ic = ic;
           ric->generated = 1;
           accIsFree = 1;
         }
@@ -3895,13 +3831,13 @@ genFunction (iCode * ic)
         {
           int ofs;
 
-          _G.current_iCode = ric;
+          genLine.lineElement.ic = ric;
           D (emitcode (";", "genReceive"));
           for (ofs = 0; ofs < sym->recvSize; ofs++)
             {
               emitcode ("mov", "%s,%s", rsym->regs[ofs]->name, fReturn[ofs]);
             }
-          _G.current_iCode = ic;
+          genLine.lineElement.ic = ic;
           ric->generated = 1;
           accIsFree = 1;
         }
@@ -4021,7 +3957,7 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   bool fReentrant = (IFFUNC_ISREENT (sym->type) || options.stackAuto);
-  lineNode *lineBodyEnd = lineCurr;
+  lineNode *lineBodyEnd = genLine.lineCurr;
   lineNode *linePrologueStart = NULL;
   lineNode *lnp;
   bitVect *regsUsed;
@@ -4354,7 +4290,7 @@ genEndFunction (iCode * ic)
 
   /* Remove the unneeded push/pops */
   regsUnneeded = newBitVect (mcs51_nRegs);
-  for (lnp = lineCurr; lnp != linePrologueStart; lnp = lnp->prev)
+  for (lnp = genLine.lineCurr; lnp != linePrologueStart; lnp = lnp->prev)
     {
       if (lnp->ic)
         {
@@ -7944,65 +7880,6 @@ release:
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-}
-
-/*-----------------------------------------------------------------*/
-/* genInline - write the inline code out                           */
-/*-----------------------------------------------------------------*/
-static void
-genInline (iCode * ic)
-{
-  char *buf, *bp, *bp1;
-  bool inComment = FALSE;
-
-  D (emitcode (";", "genInline"));
-
-  _G.inLine += (!options.asmpeep);
-
-  buf = bp = bp1 = Safe_strdup (IC_INLINE (ic));
-
-  /* emit each line as a code */
-  while (*bp)
-    {
-      switch (*bp)
-        {
-        case ';':
-          inComment = TRUE;
-          ++bp;
-          break;
-
-        case '\x87':
-        case '\n':
-          inComment = FALSE;
-          *bp++ = '\0';
-          emitcode (bp1, "");
-          bp1 = bp;
-          break;
-
-        default:
-          /* Add \n for labels, not dirs such as c:\mydir */
-          if (!inComment && (*bp == ':') && (isspace ((unsigned char) bp[1])))
-            {
-              ++bp;
-              *bp = '\0';
-              ++bp;
-              emitcode (bp1, "");
-              bp1 = bp;
-            }
-          else
-            ++bp;
-          break;
-        }
-    }
-  if (bp1 != bp)
-    emitcode (bp1, "");
-
-  Safe_free (buf);
-
-  /* consumed; we can free it here */
-  dbuf_free (IC_INLINE (ic));
-
-  _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -11987,7 +11864,6 @@ gen51Code (iCode * lic)
 #endif
 
   _G.currentFunc = NULL;
-  lineHead = lineCurr = NULL;
 
   /* print the allocation information */
   if (allocInfo && currFunc)
@@ -12005,7 +11881,9 @@ gen51Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
-      _G.current_iCode = ic;
+      initGenLineElement ();
+
+      genLine.lineElement.ic = ic;
 
       if (ic->lineno && cln != ic->lineno)
         {
@@ -12282,13 +12160,16 @@ gen51Code (iCode * lic)
         }
     }
 
-  _G.current_iCode = NULL;
+  genLine.lineElement.ic = NULL;
 
   /* now we are ready to call the
      peep hole optimizer */
   if (!options.nopeep)
-    peepHole (&lineHead);
+    peepHole (&genLine.lineHead);
 
   /* now do the actual printing */
-  printLine (lineHead, codeOutBuf);
+  printLine (genLine.lineHead, codeOutBuf);
+
+  /* destroy the line list */
+  destroy_line_list ();
 }

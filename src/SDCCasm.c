@@ -1,8 +1,7 @@
 /*-------------------------------------------------------------------------
   SDCCasm.c - header file for all types of stuff to support different assemblers.
 
-
-  Written By - Michael Hope <michaelh@juju.net.nz> 2000
+  Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -17,10 +16,6 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 /* Provides output functions that modify the output string
@@ -80,9 +75,9 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
   const char *sz = format;
   const char *begin = NULL;
 
+  /* First pass: expand all of the macros */
   dbuf_init (&tmpDBuf, INITIAL_INLINEASM);
 
-  /* First pass: expand all of the macros */
   while (*sz)
     {
       if (*sz == '!')
@@ -185,6 +180,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
                 dbuf_append_char (&tmpDBuf, *sz++);
 
               dbuf_append_char (&tmpDBuf, *sz++);
+              break;
             }
         }
       else

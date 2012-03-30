@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   gen.c - source file for code generation for ATMEL AVR
 
-  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (2000)
+  Copyright (C) 2000, Sandeep Dutta . sandeep.dutta@usa.net
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -16,12 +16,6 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
-
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -234,30 +228,22 @@ static void
 emitcode (char *inst, char *fmt, ...)
 {
         va_list ap;
-        char lb[INITIAL_INLINEASM];
-        char *lbp = lb;
+        const char *lbp, *lb;
 
         va_start (ap, fmt);
 
-        if (inst && *inst) {
-                if (fmt && *fmt)
-                        sprintf (lb, "%s\t", inst);
-                else
-                        sprintf (lb, "%s", inst);
-                vsprintf (lb + (strlen (lb)), fmt, ap);
-        }
-        else
-                vsprintf (lb, fmt, ap);
+        lbp = lb = format_opcode (inst, va_list ap);
 
         while (isspace ((unsigned char)*lbp))
                 lbp++;
 
         if (lbp && *lbp)
-                lineCurr = (lineCurr ?
-                            connectLine (lineCurr, newLineNode (lb)) :
-                            (lineHead = newLineNode (lb)));
-        lineCurr->isInline = _G.inLine;
-        lineCurr->isDebug = _G.debugLine;
+          {
+            lineCurr = (lineCurr ? connectLine (lineCurr, newLineNode (lb)) : (lineHead = newLineNode (lb)));
+            lineCurr->isInline = _G.inLine;
+            lineCurr->isDebug = _G.debugLine;
+          }
+
         va_end (ap);
 }
 

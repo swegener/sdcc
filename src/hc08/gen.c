@@ -1,11 +1,11 @@
 /*-------------------------------------------------------------------------
   gen.c - source file for code generation for the 68HC08
 
-  Hacked for the 68HC08 by Erik Petrich (2003)
-  Adapted from the 8051 code generator by:
-    Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-           and -  Jean-Louis VERN.jlvern@writeme.com (1999)
-    Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
+  Bug Fixes - Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
+  Hacked for the 68HC08 -
+  Copyright (C) 2003, Erik Petrich
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -20,15 +20,10 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
 -------------------------------------------------------------------------*/
 
 /* Use the D macro for basic (unobtrusive) debugging messages */
-#define D(x) do if (options.verboseAsm) {x;} while(0)
+#define D(x) do if (options.verboseAsm) { x; } while (0)
 /* Use the DD macro for detailed debugging messages */
 #define DD(x)
 //#define DD(x) x
@@ -37,11 +32,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SDCCglobl.h"
-#include "newalloc.h"
 
 #include "common.h"
-#include "SDCCpeeph.h"
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
@@ -68,14 +60,11 @@ static struct
     short hxPushed;
     short iyPushed;
     short accInUse;
-    short inLine;
-    short debugLine;
     short nRegsSaved;
     int stackOfs;
     int stackPushes;
     short regsinuse;
     set *sendSet;
-    iCode *current_iCode;
   }
 _G;
 
@@ -121,9 +110,6 @@ static char * aopAdrStr (asmop * aop, int loffset, bool bit16);
 
 #define CLRC    emitcode("clc","")
 
-static lineNode *lineHead = NULL;
-static lineNode *lineCurr = NULL;
-
 #if 0
 static unsigned char SLMask[] =
 {0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
@@ -144,56 +130,6 @@ static unsigned char SRMask[] =
 #define AOP_OP(aop) aop->op
 
 
-/*-----------------------------------------------------------------*/
-/* emitcode - writes the code into a file : for now it is simple    */
-/*-----------------------------------------------------------------*/
-static void
-emitcode (char *inst, char *fmt,...)
-{
-  va_list ap;
-  struct dbuf_s dbuf;
-  const char *lbp, *lb;
-
-  dbuf_init (&dbuf, INITIAL_INLINEASM);
-
-  va_start (ap, fmt);
-
-  if (inst && *inst)
-    {
-      dbuf_append_str (&dbuf, inst);
-
-      if (fmt && *fmt)
-        {
-          dbuf_append_char (&dbuf, '\t');
-          dbuf_tvprintf (&dbuf, fmt, ap);
-        }
-    }
-  else
-    {
-      dbuf_tvprintf (&dbuf, fmt, ap);
-    }
-
-  lbp = lb = dbuf_detach_c_str (&dbuf);
-
-  while (isspace ((unsigned char) *lbp))
-    {
-      lbp++;
-    }
-
-  if (lbp && *lbp)
-    {
-      lineCurr = (lineCurr ? connectLine (lineCurr, newLineNode (lb)) : (lineHead = newLineNode (lb)));
-
-      lineCurr->isInline = _G.inLine;
-      lineCurr->isDebug = _G.debugLine;
-      lineCurr->ic = _G.current_iCode;
-      lineCurr->isComment = (*lbp == ';');
-    }
-  dbuf_free (lb);
-
-  va_end (ap);
-}
-
 static void
 emitBranch (char *branchop, symbol *tlbl)
 {
@@ -204,7 +140,7 @@ static void
 emitLabel (symbol *tlbl)
 {
   emitcode ("", "%05d$:", (tlbl->key +100));
-  lineCurr->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -214,9 +150,9 @@ emitLabel (symbol *tlbl)
 void
 hc08_emitDebuggerSymbol (const char * debugSym)
 {
-  _G.debugLine = 1;
+  genLine.lineElement.isDebug = 1;
   emitcode ("", "%s ==.", debugSym);
-  _G.debugLine = 0;
+  genLine.lineElement.isDebug = 0;
 }
 
 
@@ -2887,7 +2823,7 @@ genFunction (iCode * ic)
   emitcode (";", " Stack space usage: %d bytes.", sym->stack);
 
   emitcode ("", "%s:", sym->rname);
-  lineCurr->isLabel = 1;
+  genLine.lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
 
   _G.stackOfs = 0;
@@ -2934,7 +2870,7 @@ genFunction (iCode * ic)
         {
           int ofs;
 
-          _G.current_iCode = ric;
+          genLine.lineElement.ic = ric;
           D(emitcode (";     genReceive",""));
           for (ofs=0; ofs < rsymSize; ofs++)
             {
@@ -2944,7 +2880,7 @@ genFunction (iCode * ic)
                 accIsFree = 1;
               stackAdjust--;
             }
-          _G.current_iCode = ic;
+          genLine.lineElement.ic = ic;
           ric->generated = 1;
         }
       ric = (ric->prev && ric->prev->op == RECEIVE) ? ric->prev : NULL;
@@ -5386,92 +5322,95 @@ genXor (iCode * ic, iCode * ifx)
   freeAsmop (result, NULL, ic, TRUE);
 }
 
-static void
-emitinline (iCode * ic, char *inlin)
+static const char *
+expand_symbols (iCode * ic, const char *inlin)
 {
-  char buffer[512];
-  char *symname;
-  char c;
-  char *bp=buffer;
-  symbol *sym, *tempsym;
-  asmop *aop;
-  char *l;
+  const char *begin = NULL, *p = inlin;
+  bool inIdent = FALSE;
+  struct dbuf_s dbuf;
 
-  while (*inlin)
+  dbuf_init (&dbuf, 128);
+
+  while (*p)
     {
-      if (*inlin == '_')
+      if (inIdent)
         {
-          symname = ++inlin;
-          while (isalnum((unsigned char)*inlin) || (*inlin == '_'))
-            inlin++;
-          c = *inlin;
-          *inlin = '\0';
-          //printf("Found possible symbol '%s'\n",symname);
-          tempsym = newSymbol (symname, ic->level);
-          tempsym->block = ic->block;
-          sym = (symbol *) findSymWithLevel(SymbolTab,tempsym);
-          *inlin = c;
-          if (!sym)
-            {
-              *bp++ = '_';
-              inlin = symname;
-            }
+          if ('_' == *p || isalnum (*p))
+            /* in the middle of identifier */
+            ++p;
           else
             {
-              aop = aopForSym (ic, sym, FALSE);
-              l = aopAdrStr (aop, aop->size - 1, TRUE);
-              if (*l=='#')
-                l++;
-              sym->isref = 1;
-              if (sym->level && !sym->allocreq && !sym->ismyparm)
+              /* end of identifier */
+              symbol *sym, *tempsym;
+              char *symname = Safe_strndup (p + 1, p - begin - 1);
+
+              inIdent = 0;
+
+              tempsym = newSymbol (symname, ic->level);
+              tempsym->block = ic->block;
+              sym = (symbol *) findSymWithLevel (SymbolTab, tempsym);
+              if (!sym)
                 {
-                  werror (E_ID_UNDEF, sym->name);
-                  werror (W_CONTINUE,
-                          "  Add 'volatile' to the variable declaration so that it\n"
-                          "  can be referenced within inline assembly");
+                  dbuf_append (&dbuf, begin, p - begin);
                 }
-              //printf("Replacing with '%s'\n",l);
-              while (*l)
+              else
                 {
-                  *bp++ = *l++;
-                  if ((2+bp-buffer)>sizeof(buffer))
-                    goto endofline;
+                  asmop *aop = aopForSym (ic, sym, FALSE);
+                  char *l = aopAdrStr (aop, aop->size - 1, TRUE);
+
+                  if ('#' == *l)
+                    l++;
+                  sym->isref = 1;
+                  if (sym->level && !sym->allocreq && !sym->ismyparm)
+                    {
+                      werror (E_ID_UNDEF, sym->name);
+                      werror (W_CONTINUE,
+                              "  Add 'volatile' to the variable declaration so that it\n"
+                              "  can be referenced within inline assembly");
+                    }
+                  dbuf_append_str (&dbuf, l);
                 }
+              Safe_free (symname);
+              begin = p++;
             }
+        }
+      else if ('_' == *p)
+        {
+          /* begin of identifier */
+          inIdent = TRUE;
+          if (begin)
+            dbuf_append (&dbuf, begin, p - begin);
+          begin = p++;
         }
       else
         {
-          *bp++ = *inlin++;
+          if (!begin)
+            begin = p;
+          p++;
         }
-      if ((2+bp-buffer)>sizeof(buffer))
-        goto endofline;
     }
 
-endofline:
-  *bp = '\0';
+  if (begin)
+    dbuf_append (&dbuf, begin, p - begin);
 
-  if ((2+bp-buffer)>sizeof(buffer))
-    fprintf(stderr, "Inline assembly buffer overflow\n");
-
-  //printf("%s\n",buffer);
-  emitcode (buffer,"");
+  return dbuf_detach_c_str (&dbuf);
 }
-
 
 /*-----------------------------------------------------------------*/
 /* genInline - write the inline code out                           */
 /*-----------------------------------------------------------------*/
 static void
-genInline (iCode * ic)
+hc08_genInline (iCode * ic)
 {
-  char *buffer, *bp, *bp1;
+  char *buf, *bp, *begin;
+  const char *expanded;
   bool inComment = FALSE;
 
-  D(emitcode (";     genInline",""));
+  D (emitcode (";", "genInline"));
 
-  _G.inLine += (!options.asmpeep);
+  genLine.lineElement.isInline += (!options.asmpeep);
 
-  buffer = bp = bp1 = Safe_strdup (IC_INLINE(ic));
+  buf = bp = begin = Safe_strdup (IC_INLINE (ic));
 
   /* emit each line as a code */
   while (*bp)
@@ -5487,34 +5426,40 @@ genInline (iCode * ic)
         case '\n':
           inComment = FALSE;
           *bp++ = '\0';
-          emitinline (ic, bp1);
-          bp1 = bp;
+          expanded = expand_symbols (ic, begin);
+          emitcode (expanded, NULL);
+          dbuf_free (expanded);
+          begin = bp;
           break;
 
         default:
           /* Add \n for labels, not dirs such as c:\mydir */
-          if (!inComment && (*bp == ':') && (isspace((unsigned char)bp[1])))
+          if (!inComment && (*bp == ':') && (isspace ((unsigned char) bp[1])))
             {
               ++bp;
               *bp = '\0';
               ++bp;
-              emitcode (bp1, "");
-              bp1 = bp;
+              emitcode (begin, NULL);
+              begin = bp;
             }
           else
             ++bp;
           break;
         }
     }
-  if (bp1 != bp)
-    emitinline (ic, bp1);
+  if (begin != bp)
+    {
+      expanded = expand_symbols (ic, begin);
+      emitcode (expanded, NULL);
+      dbuf_free (expanded);
+    }
 
-  Safe_free (buffer);
+  Safe_free (buf);
 
   /* consumed; we can free it here */
   dbuf_free (IC_INLINE (ic));
 
-  _G.inLine -= (!options.asmpeep);
+  genLine.lineElement.isInline -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8447,8 +8392,6 @@ genhc08Code (iCode * lic)
   int clevel = 0;
   int cblock = 0;
 
-  lineHead = lineCurr = NULL;
-
   /* print the allocation information */
   if (allocInfo && currFunc)
     printAllocInfo (currFunc, codeOutBuf);
@@ -8457,12 +8400,12 @@ genhc08Code (iCode * lic)
     {
       debugFile->writeFunction (currFunc, lic);
       #if 0
-      _G.debugLine = 1;
+      genLine.lineElement.isDebug = 1;
       if (IS_STATIC (currFunc->etype))
         emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);
       else
         emitcode ("", "G$%s$0$0 ==.", currFunc->name);
-      _G.debugLine = 0;
+      genLine.lineElement.isDebug = 0;
       #endif
     }
   /* stack pointer name */
@@ -8488,8 +8431,9 @@ genhc08Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
+      initGenLineElement ();
 
-      _G.current_iCode = ic;
+      genLine.lineElement.ic = ic;
 
       if (ic->level != clevel || ic->block != cblock)
         {
@@ -8507,11 +8451,11 @@ genhc08Code (iCode * lic)
             {
               debugFile->writeCLine(ic);
               #if 0
-              _G.debugLine = 1;
+              genLine.lineElement.isDebug = 1;
               emitcode ("", "C$%s$%d$%d$%d ==.",
                         FileBaseName (ic->filename), ic->lineno,
                         ic->level, ic->block);
-              _G.debugLine = 0;
+              genLine.lineElement.isDebug = 0;
               #endif
             }
           if (!options.noCcodeInAsm) {
@@ -8545,6 +8489,8 @@ genhc08Code (iCode * lic)
         int i;
         reg_info *reg;
         symbol *sym;
+
+        initGenLineElement ();
 
         for (i=A_IDX;i<=XA_IDX;i++)
           {
@@ -8703,7 +8649,7 @@ genhc08Code (iCode * lic)
           break;
 
         case INLINEASM:
-          genInline (ic);
+          hc08_genInline (ic);
           break;
 
         case RRC:
@@ -8814,8 +8760,11 @@ genhc08Code (iCode * lic)
   /* now we are ready to call the
      peep hole optimizer */
   if (!options.nopeep)
-    peepHole (&lineHead);
+    peepHole (&genLine.lineHead);
 
   /* now do the actual printing */
-  printLine (lineHead, codeOutBuf);
+  printLine (genLine.lineHead, codeOutBuf);
+
+  /* destroy the line list */
+  destroy_line_list ();
 }

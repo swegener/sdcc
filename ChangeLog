@@ -1,3 +1,14 @@
+2012-03-30 Borut Razem <borut.razem AT gmail.com>
+
+	* src/common.h, src/Makefile.in, src/SDCCgen.c, src/SDCCgen.h,
+	  src/SDCCasm.c, src/SDCCasm.h, src/SDCCdebug.c,
+	  src/SDCCdebug.h, src/SDCCpeeph.c, src/SDCCpeeph.h,
+	  src/avr/gen.c, src/ds390/gen.c, src/ds390/gen.h,
+	  src/ds390/main.c, src/ds390/main.h, src/hc08/gen.c,
+	  src/mcs51/gen.c, src/mcs51/main.c, src/mcs51/main.h,
+	  src/pic14/gen.c, src/pic16/gen.c, src/z80/gen.c:
+	  unification of target code generation
+
 2012-03-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z180/stubs.s,

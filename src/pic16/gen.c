@@ -1,12 +1,14 @@
- /*-------------------------------------------------------------------------
- gen.c - source file for code generation for pic16
+/*-------------------------------------------------------------------------
+  gen.c - source file for code generation for pic16
 
-  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-         and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
-  PIC port   -  Scott Dattalo scott@dattalo.com (2000)
-  PIC16 port -  Martin Dubuc m.dubuc@rogers.com (2002)
-             -  Vangelis Rokas <vrokas AT users.sourceforge.net> (2003-2006)
+  PIC port   -
+  Copyright (C) 2000, Scott Dattalo scott@dattalo.com
+  PIC16 port -
+  Copyright (C) 2002, Martin Dubuc m.dubuc@rogers.com
+  Copyright (C) 2003-2006,Vangelis Rokas <vrokas AT users.sourceforge.net>
   Bug Fixes  -  Raphael Neider <rneider AT web.de> (2004,2005)
   Bug Fixes  -  Borut Razem <borut.razem AT siol.net> (2007)
   Bug Fixes  -  Mauro Giachero <maurogiachero AT users.sourceforge.net> (2008)
@@ -24,25 +26,19 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
+-------------------------------------------------------------------------*/
+/*
   Notes:
   000123 mlh    Moved aopLiteral to SDCCglue.c to help the split
                 Made everything static
--------------------------------------------------------------------------*/
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SDCCglobl.h"
-#include "newalloc.h"
 
 #include "common.h"
-#include "SDCCpeeph.h"
 #include "ralloc.h"
 #include "pcode.h"
 #include "gen.h"
@@ -50,6 +46,7 @@
 #include "device.h"
 #include "main.h"
 #include "glue.h"
+#include "dbuf_string.h"
 
 /* The PIC port(s) do not need to distinguish between POINTER and FPOINTER. */
 #define PIC_IS_DATA_PTR(x)      (IS_DATA_PTR(x) || IS_FARPTR(x))
@@ -139,9 +136,6 @@ static struct {
 
 extern struct dbuf_s *codeOutBuf;
 
-static lineNode *lineHead = NULL;
-static lineNode *lineCurr = NULL;
-
 static unsigned char   SLMask[] = {0xFF ,0xFE, 0xFC, 0xF8, 0xF0,
 0xE0, 0xC0, 0x80, 0x00};
 static unsigned char   SRMask[] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
@@ -201,69 +195,41 @@ void DEBUGpic16_pic16_AopTypeSign(int line_no, operand *left, operand *right, op
 
 }
 
-void pic16_emitpcomment (char *fmt, ...)
+void
+pic16_emitpcomment (char *fmt, ...)
 {
-    va_list ap;
-    char lb[INITIAL_INLINEASM];
-    unsigned char *lbp = (unsigned char *)lb;
+  va_list ap;
+  struct dbuf_s dbuf;
+  const char *line;
 
-    va_start(ap,fmt);
+  dbuf_init (&dbuf, INITIAL_INLINEASM);
 
-    lb[0] = ';';
-    vsprintf(lb+1,fmt,ap);
+  dbuf_append_char (&dbuf, ';');
+  va_start (ap, fmt);
+  dbuf_vprintf (&dbuf, fmt, ap);
+  va_end (ap);
 
-    while (isspace(*lbp)) lbp++;
+  line = dbuf_detach_c_str (&dbuf);
+  emit_raw (line);
+  dbuf_free (line);
 
-    if (lbp && *lbp)
-        lineCurr = (lineCurr ?
-                    connectLine(lineCurr,newLineNode(lb)) :
-                    (lineHead = newLineNode(lb)));
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug  = _G.debugLine;
-    lineCurr->isComment = 1;
-
-    pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(lb));
-    va_end(ap);
-
-//      fprintf(stderr, "%s\n", lb);
+  pic16_addpCode2pBlock (pb, pic16_newpCodeCharP (genLine.lineCurr->line));
 }
 
-void DEBUGpic16_emitcode (char *inst,char *fmt, ...)
+void
+DEBUGpic16_emitcode (char *inst,char *fmt, ...)
 {
-    va_list ap;
-    char lb[INITIAL_INLINEASM];
-    unsigned char *lbp = (unsigned char *)lb;
+  va_list ap;
 
-    if(!pic16_debug_verbose)
-      return;
+  if(!pic16_debug_verbose)
+    return;
 
-    va_start(ap,fmt);
+  va_start (ap, fmt);
+  va_emitcode (inst, fmt, ap);
+  va_end (ap);
 
-    if (inst && *inst) {
-        if (fmt && *fmt)
-            sprintf(lb,"%s\t",inst);
-        else
-            sprintf(lb,"%s",inst);
-        vsprintf(lb+(strlen(lb)),fmt,ap);
-    }  else
-        vsprintf(lb,fmt,ap);
-
-    while (isspace(*lbp)) lbp++;
-
-    if (lbp && *lbp)
-        lineCurr = (lineCurr ?
-                    connectLine(lineCurr,newLineNode(lb)) :
-                    (lineHead = newLineNode(lb)));
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug  = _G.debugLine;
-
-    pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(lb));
-    va_end(ap);
-
-//      fprintf(stderr, "%s\n", lb);
+  pic16_addpCode2pBlock (pb, pic16_newpCodeCharP(genLine.lineCurr->line));
 }
-
-
 
 void pic16_emitpLabel(int key)
 {
@@ -334,13 +300,13 @@ void pic16_emitcode (char *inst,char *fmt, ...)
     while (isspace(*lbp)) lbp++;
 
     if (lbp && *lbp)
-        lineCurr = (lineCurr ?
-                    connectLine(lineCurr,newLineNode(lb)) :
-                    (lineHead = newLineNode(lb)));
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug  = _G.debugLine;
-    lineCurr->isLabel = (lbp[strlen (lbp) - 1] == ':');
-    lineCurr->isComment = (*lbp == ';');
+        genLine.lineCurr = (genLine.lineCurr ?
+                    connectLine(genLine.lineCurr,newLineNode(lb)) :
+                    (genLine.lineHead = newLineNode(lb)));
+    genLine.lineCurr->isInline = genLine.lineElement.isInline;
+    genLine.lineCurr->isDebug  = genLine.lineElement.isDebug;
+    genLine.lineCurr->isLabel = (lbp[strlen (lbp) - 1] == ':');
+    genLine.lineCurr->isComment = (*lbp == ';');
 
 // VR    fprintf(stderr, "lb = <%s>\n", lbp);
 
@@ -359,9 +325,9 @@ void pic16_emitcode (char *inst,char *fmt, ...)
 void
 pic16_emitDebuggerSymbol (const char * debugSym)
 {
-  _G.debugLine = 1;
+  genLine.lineElement.isDebug = 1;
   pic16_emitcode (";", "%s ==.", debugSym);
-  _G.debugLine = 0;
+  genLine.lineElement.isDebug = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -6341,14 +6307,15 @@ release :
 /*-----------------------------------------------------------------*/
 /* genInline - write the inline code out                           */
 /*-----------------------------------------------------------------*/
-static void genInline (iCode *ic)
+static void
+pic16_genInline (iCode *ic)
 {
   char *buffer, *bp, *bp1;
   bool inComment = FALSE;
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-  _G.inLine += (!options.asmpeep);
+  genLine.lineElement.isInline += (!options.asmpeep);
 
   buffer = bp = bp1 = Safe_strdup (IC_INLINE (ic));
 
@@ -6460,7 +6427,7 @@ static void genInline (iCode *ic)
   /* consumed; we can free it here */
   dbuf_free (IC_INLINE (ic));
 
-  _G.inLine -= (!options.asmpeep);
+  genLine.lineElement.isInline -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -10237,8 +10204,6 @@ void genpic16Code (iCode *lic)
   iCode *ic;
   int cln = 0;
 
-    lineHead = lineCurr = NULL;
-
     pb = pic16_newpCodeChain(GcurMemmap,0,pic16_newpCodeCharP("; Starting pCode block"));
     pic16_addpBlock(pb);
 
@@ -10252,6 +10217,7 @@ void genpic16Code (iCode *lic)
 #endif
 
     for (ic = lic ; ic ; ic = ic->next ) {
+      initGenLineElement ();
 
       DEBUGpic16_emitcode(";ic ", "\t%c 0x%x\t(%s)",ic->op, ic->op, pic16_decodeOp(ic->op));
       if ( cln != ic->lineno ) {
@@ -10407,7 +10373,7 @@ void genpic16Code (iCode *lic)
           break;
 
         case INLINEASM:
-          genInline (ic);
+          pic16_genInline (ic);
           break;
 
         case RRC:
@@ -10491,15 +10457,16 @@ void genpic16Code (iCode *lic)
     /* now we are ready to call the
        peep hole optimizer */
     if (!options.nopeep)
-      peepHole (&lineHead);
+      peepHole (&genLine.lineHead);
 
     /* now do the actual printing */
-    printLine (lineHead, codeOutBuf);
+    printLine (genLine.lineHead, codeOutBuf);
 
 #ifdef PCODE_DEBUG
     DFPRINTF((stderr,"printing pBlock\n\n"));
     pic16_printpBlock(stdout,pb);
 #endif
 
-    return;
+    /* destroy the line list */
+    destroy_line_list ();
 }

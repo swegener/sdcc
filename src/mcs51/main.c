@@ -1,6 +1,25 @@
-/** @file main.c
-    mcs51 specific general functions.
+/*-------------------------------------------------------------------------
+  main.c - mcs51 specific general functions
 
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+  Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
+  Copyright (C) 2000, Michael Hope
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+-------------------------------------------------------------------*/
+/*
     Note that mlh prepended _mcs51_ on the static functions.  Makes
     it easier to set a breakpoint using the debugger.
 */
@@ -683,7 +702,7 @@ static int
 getInstructionSize (lineNode *line)
 {
   if (!line->aln)
-    line->aln = asmLineNodeFromLineNode (line);
+    line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line);
 
   return line->aln->size;
 }
@@ -692,7 +711,7 @@ static bitVect *
 getRegsRead (lineNode *line)
 {
   if (!line->aln)
-    line->aln = asmLineNodeFromLineNode (line);
+    line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line);
 
   return line->aln->regsRead;
 }
@@ -701,7 +720,7 @@ static bitVect *
 getRegsWritten (lineNode *line)
 {
   if (!line->aln)
-    line->aln = asmLineNodeFromLineNode (line);
+    line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line);
 
   return line->aln->regsWritten;
 }

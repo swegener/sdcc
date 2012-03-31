@@ -187,6 +187,13 @@ emitcode (const char *inst, const char *fmt, ...)
   va_end (ap);
 }
 
+void
+emitLabel (symbol * tlbl)
+{
+  emitcode ("", "!tlabeldef", labelKey2num (tlbl->key));
+  genLine.lineCurr->isLabel = 1;
+}
+
 /*-----------------------------------------------------------------*/
 /* genInline - write the inline code out                           */
 /*-----------------------------------------------------------------*/

@@ -20,11 +20,6 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
 -------------------------------------------------------------------------*/
 
 /*
@@ -485,22 +480,21 @@ static void
 _tidyUp (char *buf)
 {
   /* Clean up the line so that it is 'prettier' */
-  if (strchr (buf, ':'))
+  /* If it is a label - can't do anything */
+  if (!strchr (buf, ':'))
     {
-      /* Is a label - cant do anything */
-      return;
-    }
-  /* Change the first (and probably only) ' ' to a tab so
-     everything lines up.
-  */
-  while (*buf)
-    {
-      if (*buf == ' ')
+      /* Change the first (and probably only) ' ' to a tab so
+         everything lines up.
+      */
+      while (*buf)
         {
-          *buf = '\t';
-          break;
+          if (*buf == ' ')
+            {
+              *buf = '\t';
+              break;
+            }
+          buf++;
         }
-      buf++;
     }
 }
 
@@ -534,18 +528,25 @@ _vemit2 (const char *szFormat, va_list ap)
 static void
 emitDebug (const char *szFormat,...)
 {
-  if(regalloc_dry_run)
-    return;
-  if (!options.verboseAsm)
-    return;
-  if (!DISABLE_DEBUG)
+  if (!DISABLE_DEBUG && !regalloc_dry_run && options.verboseAsm)
     {
       va_list ap;
 
       va_start (ap, szFormat);
-
       _vemit2 (szFormat, ap);
+      va_end (ap);
+    }
+}
 
+static void
+emit2 (const char *szFormat,...)
+{
+  if (!regalloc_dry_run)
+    {
+      va_list ap;
+
+      va_start (ap, szFormat);
+      _vemit2 (szFormat, ap);
       va_end (ap);
     }
 }
@@ -583,21 +584,6 @@ getPairId (const asmop *aop)
         }
     }
   return PAIR_INVALID;
-}
-
-static void
-emit2 (const char *szFormat,...)
-{
-  va_list ap;
-
-  if(regalloc_dry_run)
-    return;
-
-  va_start (ap, szFormat);
-
-  _vemit2 (szFormat, ap);
-
-  va_end (ap);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2245,19 +2231,10 @@ setupPair (PAIR_ID pairId, asmop *aop, int offset)
   _G.pairs[pairId].last_type = aop->type;
 }
 
-/* Can be used for local labels where Code generation takes care of spilling */
 static void
-emitLabelNoSpill (int key)
+emitLabelSpill (symbol * tlbl)
 {
-  emit2 ("!tlabeldef", key);
-  genLine.lineCurr->isLabel = 1;
-}
-
-static void
-emitLabel (int key)
-{
-  emit2 ("!tlabeldef", key);
-  genLine.lineCurr->isLabel = 1;
+  emitLabel (tlbl);
   spillCached ();
 }
 
@@ -4509,9 +4486,9 @@ genEndFunction (iCode * ic)
               emit2 ("pop af");
               //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
               //don't enable interrupts as they were off before
-              emit2 ("jp PO,!tlabel", tlbl->key + 100);
+              emit2 ("jp PO,!tlabel", labelKey2num (tlbl->key));
               emit2 ("!ei");
-              emit2 ("!tlabeldef", (tlbl->key + 100));
+              emit2 ("!tlabeldef", labelKey2num (tlbl->key));
               genLine.lineCurr->isLabel = 1;
             }
         }
@@ -4692,7 +4669,7 @@ jumpret:
         IC_LABEL (ic->next) == returnLabel))
     {
       if(!regalloc_dry_run)
-        emit2 ("jp !tlabel", returnLabel->key + 100);
+        emit2 ("jp !tlabel", labelKey2num (returnLabel->key));
       regalloc_dry_run_cost += 3;
     }
 }
@@ -4707,7 +4684,7 @@ genLabel (const iCode *ic)
   if (IC_LABEL (ic) == entryLabel)
     return;
 
-  emitLabel (IC_LABEL (ic)->key + 100);
+  emitLabelSpill (IC_LABEL (ic));
 }
 
 /*-----------------------------------------------------------------*/
@@ -4716,7 +4693,7 @@ genLabel (const iCode *ic)
 static void
 genGoto (const iCode *ic)
 {
-  emit2 ("jp !tlabel", IC_LABEL (ic)->key + 100);
+  emit2 ("jp !tlabel", labelKey2num (IC_LABEL (ic)->key));
 }
 
 /*-----------------------------------------------------------------*/
@@ -4815,12 +4792,12 @@ genPlusIncr (const iCode *ic)
           if (size)
             {
               if(!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+                emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
               regalloc_dry_run_cost += 3;
             }
         }
       if (!regalloc_dry_run)
-        (AOP_TYPE (IC_LEFT (ic)) == AOP_HL || IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK)? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
+        (AOP_TYPE (IC_LEFT (ic)) == AOP_HL || IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK) ? emitLabelSpill (tlbl) : emitLabel (tlbl);
       else if (AOP_TYPE (IC_LEFT (ic)) == AOP_HL)
         spillCached ();
       return TRUE;
@@ -4870,9 +4847,9 @@ outBitAcc (operand * result)
     {
       if(!regalloc_dry_run)
         {
-          emit2 ("jp Z,!tlabel", tlbl->key + 100);
+          emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
           emit2 ("ld a,!one");
-          emitLabelNoSpill (tlbl->key + 100);
+          emitLabel (tlbl);
         }
       regalloc_dry_run_cost += 5;
       outAcc (result);
@@ -5762,12 +5739,12 @@ genMultOneChar (const iCode * ic)
       emit2 ("ld l,#0x00");
       emit2 ("ld d,l");
       emit2 ("ld b,#0x08");
-      emitLabelNoSpill (tlbl1->key + 100);
+      emitLabel (tlbl1);
       emit2 ("add hl,hl");
-      emit2 ("jp NC,!tlabel", tlbl2->key + 100);
+      emit2 ("jp NC,!tlabel", labelKey2num (tlbl2->key));
       emit2 ("add hl,de");
-      emitLabelNoSpill (tlbl2->key + 100);
-      emit2 ("djnz !tlabel", tlbl1->key + 100);
+      emitLabel (tlbl2);
+      emit2 ("djnz !tlabel", labelKey2num (tlbl1->key));
       regalloc_dry_run_cost += 12;
     }
   else
@@ -6060,7 +6037,7 @@ genIfxJump (iCode *ic, char *jval)
     }
   /* Z80 can do a conditional long jump */
   if(!regalloc_dry_run)
-    emit2 ("jp %s,!tlabel", inst, jlbl->key + 100);
+    emit2 ("jp %s,!tlabel", inst, labelKey2num (jlbl->key));
   regalloc_dry_run_cost += 3;
 
   /* mark the icode as generated */
@@ -6330,12 +6307,12 @@ fix:
               if (!regalloc_dry_run)
                 {
                   tlbl = newiTempLabel (NULL);
-                  emit2 ("jp PO, !tlabel", tlbl->key + 100);
+                  emit2 ("jp PO, !tlabel", labelKey2num (tlbl->key));
                   emit2 ("xor a, !immedbyte", 0x80);
                 }
               regalloc_dry_run_cost += 5;
               if (!regalloc_dry_run)
-                emitLabel (tlbl->key + 100);
+                emitLabelSpill (tlbl);
               result_in_carry = FALSE;
             }
           else /* Do it the hard way */
@@ -6349,16 +6326,16 @@ fix:
                   symbol *tlbl1 = newiTempLabel (NULL);
                   symbol *tlbl2 = newiTempLabel (NULL);
                   emit2 ("bit 7, e");
-                  emit2 ("jp Z, !tlabel", tlbl1->key + 100);
+                  emit2 ("jp Z, !tlabel", labelKey2num (tlbl1->key));
                   emit2 ("bit 7, d");
-                  emit2 ("jp NZ, !tlabel", tlbl2->key + 100);
+                  emit2 ("jp NZ, !tlabel", labelKey2num (tlbl2->key));
                   emit2 ("cp a, a");
-                  emit2 ("jp !tlabel", tlbl2->key + 100);
-                  emitLabel (tlbl1->key + 100);
+                  emit2 ("jp !tlabel", labelKey2num (tlbl2->key));
+                  emitLabelSpill (tlbl1);
                   emit2 ("bit 7, d");
-                  emit2 ("jp Z, !tlabel", tlbl2->key + 100);
+                  emit2 ("jp Z, !tlabel", labelKey2num (tlbl2->key));
                   emit2 ("scf");
-                  emitLabel (tlbl2->key + 100);
+                  emitLabelSpill (tlbl2);
                 }
               regalloc_dry_run_cost += 20;
               result_in_carry = TRUE;
@@ -6522,7 +6499,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           else
             emit3 (A_OR, ASMOP_A, ASMOP_A);
           if(!regalloc_dry_run)
-            emit2 ("jp NZ,!tlabel", lbl->key + 100);
+            emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
           regalloc_dry_run_cost += 3;
         }
       else
@@ -6535,7 +6512,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
               else
                 emit3_o (A_SUB, ASMOP_A, 0, AOP (right), offset);
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", lbl->key + 100);
+                emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
               regalloc_dry_run_cost += 3;
               offset++;
             }
@@ -6560,14 +6537,14 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
             {
               emit3 (A_OR, ASMOP_A, ASMOP_A);
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", lbl->key + 100);
+                emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
               regalloc_dry_run_cost += 3;
             }
           else
             {
               emit3_o (A_SUB, ASMOP_A, 0, AOP (right), offset);
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", lbl->key + 100);
+                emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
               regalloc_dry_run_cost += 3;
             }
           offset++;
@@ -6596,7 +6573,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           emit2 ("sub a,%s", _pairs[pair].l);
           regalloc_dry_run_cost += 1;
           if(!regalloc_dry_run)
-            emit2 ("jp NZ,!tlabel", lbl->key + 100);
+            emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
           regalloc_dry_run_cost += 3;
           offset++;
         }
@@ -6620,10 +6597,10 @@ gencjne (operand * left, operand * right, symbol * lbl)
   if (!regalloc_dry_run)
     {
       emit2 ("ld a,!one");
-      emit2 ("jp !tlabel", tlbl->key + 100);
-      emitLabel (lbl->key + 100);
+      emit2 ("jp !tlabel", labelKey2num (tlbl->key));
+      emitLabelSpill (lbl);
       emit2 ("xor a,a");
-      emitLabelNoSpill (tlbl->key + 100);
+      emitLabel (tlbl);
     }
   regalloc_dry_run_cost += 6;
   _pop (pop);
@@ -6677,10 +6654,10 @@ genCmpEq (iCode * ic, iCode * ifx)
                   regalloc_dry_run_cost += 1;
                 }
               if(!regalloc_dry_run)
-                emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
+                emit2 ("jp !tlabel", labelKey2num (IC_TRUE (ifx)->key));
               regalloc_dry_run_cost += 3;
               if(!regalloc_dry_run)
-                hl_touched ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
+                hl_touched ? emitLabelSpill (tlbl) : emitLabel (tlbl);
               else if(hl_touched)
                 spillCached();
               _pop (pop);
@@ -6695,17 +6672,17 @@ genCmpEq (iCode * ic, iCode * ifx)
                   regalloc_dry_run_cost += 1;
                 }
               if(!regalloc_dry_run)
-                emit2 ("jp !tlabel", lbl->key + 100);
+                emit2 ("jp !tlabel", labelKey2num (lbl->key));
               regalloc_dry_run_cost += 3;
               if (!regalloc_dry_run)
-                hl_touched ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
+                hl_touched ? emitLabelSpill (tlbl) : emitLabel (tlbl);
               else if (hl_touched)
                 spillCached();
               _pop (pop);
               if(!regalloc_dry_run)
                 {
-                  emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
-                  emitLabelNoSpill (lbl->key + 100);
+                  emit2 ("jp !tlabel", labelKey2num (IC_FALSE (ifx)->key));
+                  emitLabel (lbl);
                 }
               regalloc_dry_run_cost += 3;
             }
@@ -6794,11 +6771,11 @@ genAndOp (const iCode *ic)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       _toBoolean (left, TRUE);
       if (!regalloc_dry_run)
-        emit2 ("jp Z,!tlabel", tlbl->key + 100);
+        emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
       regalloc_dry_run_cost += 3;
       _toBoolean (right, FALSE);
       if (!regalloc_dry_run)
-        emitLabelNoSpill (tlbl->key + 100);
+        emitLabel (tlbl);
       outBitAcc (result);
     }
 
@@ -6833,11 +6810,11 @@ genOrOp (const iCode *ic)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       _toBoolean (left, TRUE);
       if (!regalloc_dry_run)
-        emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+        emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
       regalloc_dry_run_cost += 3;
       _toBoolean (right, FALSE);
       if (!regalloc_dry_run)
-        emitLabelNoSpill (tlbl->key + 100);
+        emitLabel (tlbl);
       outBitAcc (result);
     }
 
@@ -6875,7 +6852,7 @@ static void
 jmpTrueOrFalse (iCode * ic, symbol * tlbl)
 {
   // ugly but optimized by peephole
-  // Using emitLabel instead of emitLabelNoSpill (esp. on gbz80)
+  // Using emitLabelSpill instead of emitLabel (esp. on gbz80)
   // We could jump there from locations with different values in hl.
   // This should be changed to a more efficient solution that spills
   // only what and when necessary.
@@ -6884,10 +6861,10 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
       if(!regalloc_dry_run)
         {
           symbol *nlbl = newiTempLabel (NULL);
-          emit2 ("jp !tlabel", nlbl->key + 100);
-          emitLabel (tlbl->key + 100);
-          emit2 ("jp !tlabel", IC_TRUE (ic)->key + 100);
-          emitLabel (nlbl->key + 100);
+          emit2 ("jp !tlabel", labelKey2num (nlbl->key));
+          emitLabelSpill (tlbl);
+          emit2 ("jp !tlabel", labelKey2num (IC_TRUE (ic)->key));
+          emitLabelSpill (nlbl);
         }
       regalloc_dry_run_cost += 6;
     }
@@ -6895,8 +6872,8 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
     {
       if(!regalloc_dry_run)
         {
-          emit2 ("jp !tlabel", IC_FALSE (ic)->key + 100);
-          emitLabel (tlbl->key + 100);
+          emit2 ("jp !tlabel", labelKey2num (IC_FALSE (ic)->key));
+          emitLabelSpill (tlbl);
         }
       regalloc_dry_run_cost += 3;
     }
@@ -7001,7 +6978,7 @@ genAnd (const iCode *ic, iCode * ifx)
               if (size || ifx)  /* emit jmp only, if it is actually used */
                 {
                   if (!regalloc_dry_run)
-                    emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+                    emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
                   regalloc_dry_run_cost += 3;
                 }
             }
@@ -7012,7 +6989,7 @@ genAnd (const iCode *ic, iCode * ifx)
         {
           emit2 ("clr c");
           if (!regalloc_dry_run)
-            emit2 ("!tlabeldef", tlbl->key + 100);
+            emit2 ("!tlabeldef", labelKey2num (tlbl->key));
           regalloc_dry_run_cost += 3;
           genLine.lineCurr->isLabel = 1;
         }
@@ -7214,7 +7191,7 @@ genOr (const iCode *ic, iCode * ifx)
           if (ifx)  /* emit jmp only, if it is actually used */
             {
               if(!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+                emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
               regalloc_dry_run_cost += 3;
             }
 
@@ -7375,7 +7352,7 @@ genXor (const iCode *ic, iCode * ifx)
           emit3_o (A_XOR, ASMOP_A, 0, AOP (right), offset);
           if (ifx)      /* emit jmp only, if it is actually used * */
             if(!regalloc_dry_run)
-              emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+              emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
             regalloc_dry_run_cost += 3;
           offset++;
         }
@@ -7597,7 +7574,7 @@ shiftR2Left2Result (const iCode *ic, operand * left, int offl,
       if(!regalloc_dry_run)
         {
           emit2 ("ld %s,!immedbyte", use_b ? "b" : "a", shCount);
-          emitLabelNoSpill (tlbl->key + 100);
+          emitLabel (tlbl);
         }
       regalloc_dry_run_cost += 2;
 
@@ -7606,11 +7583,11 @@ shiftR2Left2Result (const iCode *ic, operand * left, int offl,
       if(!regalloc_dry_run)
         {
           if (use_b)
-            emit2 ("djnz !tlabel", tlbl->key + 100);
+            emit2 ("djnz !tlabel", labelKey2num (tlbl->key));
           else
             {
               emit2 ("dec a");
-              emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+              emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
             }
         }
       regalloc_dry_run_cost += use_b ? 2 : 4;
@@ -7678,8 +7655,8 @@ shiftL2Left2Result (operand * left, int offl,
             if (!regalloc_dry_run)
               {
                 emit2 ("ld a,!immedbyte+1", shCount);
-                emit2 ("jp !tlabel", tlbl1->key + 100);
-                emitLabelNoSpill (tlbl->key + 100);
+                emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
+                emitLabel (tlbl);
               }
             regalloc_dry_run_cost += 4;
           }
@@ -7694,9 +7671,9 @@ shiftL2Left2Result (operand * left, int offl,
           {
             if (!regalloc_dry_run)
               {
-                emitLabelNoSpill (tlbl1->key + 100);
+                emitLabel (tlbl1);
                 emit2 ("dec a");
-                emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+                emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
               }
             regalloc_dry_run_cost += 4;
           }
@@ -7966,8 +7943,8 @@ genLeftShift (const iCode *ic)
 
   if(!regalloc_dry_run)
     {
-      emit2 ("jp !tlabel", tlbl1->key + 100);
-      emitLabelNoSpill (tlbl->key + 100);
+      emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
+      emitLabel (tlbl);
     }
   regalloc_dry_run_cost += 3;
 
@@ -7979,9 +7956,9 @@ genLeftShift (const iCode *ic)
 
   if(!regalloc_dry_run)
     {
-      emitLabelNoSpill (tlbl1->key + 100);
+      emitLabel (tlbl1);
       emit2 ("dec a");
-      emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+      emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
     }
   regalloc_dry_run_cost += 4;
 
@@ -8221,8 +8198,8 @@ genRightShift (const iCode *ic)
 
   if(!regalloc_dry_run)
     {
-      emit2 ("jp !tlabel", tlbl1->key + 100);
-      IS_GB ? emitLabel (tlbl->key + 100) : emitLabelNoSpill (tlbl->key + 100);
+      emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
+      IS_GB ? emitLabelSpill (tlbl) : emitLabel (tlbl);
     }
   regalloc_dry_run_cost += 3;
   
@@ -8241,9 +8218,9 @@ genRightShift (const iCode *ic)
     }
   if(!regalloc_dry_run)
     {
-      IS_GB ? emitLabel (tlbl1->key + 100) : emitLabelNoSpill (tlbl1->key + 100);
+      IS_GB ? emitLabelSpill (tlbl1) : emitLabel (tlbl1);
       emit2 ("dec a");
-      emit2 ("jp NZ,!tlabel", tlbl->key + 100);
+      emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
     }
   regalloc_dry_run_cost += 4;
 
@@ -8287,9 +8264,9 @@ genUnpackBits (operand * result, int pair)
             {
               symbol *tlbl = newiTempLabel (NULL);
               emit2 ("bit %d,a", blen - 1);
-              emit2 ("jp Z,!tlabel", tlbl->key + 100);
+              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
               emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
-              emitLabelNoSpill (tlbl->key + 100);
+              emitLabel (tlbl);
             }
           regalloc_dry_run_cost += 7;
         }
@@ -8325,9 +8302,9 @@ genUnpackBits (operand * result, int pair)
             {
               symbol *tlbl = newiTempLabel (NULL);
               emit2 ("bit %d,a", blen - 1 - 8);
-              emit2 ("jp Z,!tlabel", tlbl->key + 100);
+              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
               emit2 ("or a,!immedbyte", (unsigned char) (0xff << (blen - 8)));
-              emitLabelNoSpill (tlbl->key + 100);
+              emitLabel (tlbl);
             }
           regalloc_dry_run_cost += 7;
         }
@@ -8365,9 +8342,9 @@ genUnpackBits (operand * result, int pair)
             {
               symbol *tlbl = newiTempLabel (NULL);
               emit2 ("bit %d,a", rlen - 1);
-              emit2 ("jp Z,!tlabel", tlbl->key + 100);
+              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
               emit2 ("or a,!immedbyte", (unsigned char) (0xff << rlen));
-              emitLabelNoSpill (tlbl->key + 100);
+              emitLabel (tlbl);
             }
           regalloc_dry_run_cost += 7;
         }
@@ -9082,7 +9059,7 @@ genIfx (iCode * ic, iCode * popIc)
         {
           emit2 ("bit 0,%s", aopGet (AOP (cond), 0, FALSE));
           emit2 ("jp %s,!tlabel", IC_TRUE (ic) ? "NZ" : "Z",
-            (IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key + 100);
+              labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
         }
       regalloc_dry_run_cost += (bit8_cost(AOP (cond)) + 3);
       
@@ -9537,7 +9514,7 @@ genJumpTab (const iCode *ic)
   spillPair (PAIR_HL);
   if(!regalloc_dry_run)
     {
-      emit2 ("ld hl,!immed!tlabel", jtab->key + 100);
+      emit2 ("ld hl,!immed!tlabel", labelKey2num (jtab->key));
       emit2 ("add hl,de");
       emit2 ("add hl,de");
       emit2 ("add hl,de");
@@ -9549,14 +9526,14 @@ genJumpTab (const iCode *ic)
   if(!regalloc_dry_run)
     {
       emit2 ("jp !*hl");
-      emitLabel (jtab->key + 100);
+      emitLabelSpill (jtab);
     }
   regalloc_dry_run_cost += 1;
   /* now generate the jump labels */
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
        jtab = setNextItem (IC_JTLABELS (ic)))
     if(!regalloc_dry_run)
-      emit2 ("jp !tlabel", jtab->key + 100);
+      emit2 ("jp !tlabel", labelKey2num (jtab->key));
     /*regalloc_dry_run_cost += 3 doesn't matter and might overflow cost*/
 }
 
@@ -9735,13 +9712,13 @@ genCritical (const iCode *ic)
           //disable interrupt
           emit2 ("!di");
           //parity odd <==> P/O=0 <==> interrupt enable flag IFF2=0
-          emit2 ("jp PO,!tlabel", tlbl->key + 100);
+          emit2 ("jp PO,!tlabel", labelKey2num (tlbl->key));
         }
       regalloc_dry_run_cost += 5;
       aopPut3 (AOP (IC_RESULT (ic)), 0, ASMOP_ONE, 0);
       if (!regalloc_dry_run)
         {
-          emit2 ("!tlabeldef", (tlbl->key + 100));
+          emit2 ("!tlabeldef", labelKey2num ((tlbl->key)));
           genLine.lineCurr->isLabel = 1;
         }
       freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -9788,9 +9765,9 @@ genEndCritical (const iCode *ic)
       if(!regalloc_dry_run)
         {
           //don't enable interrupts if they were off before
-          emit2 ("jp Z,!tlabel", tlbl->key + 100);
+          emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
           emit2 ("!ei");
-          emitLabel (tlbl->key + 100);
+          emitLabelSpill (tlbl);
         }
       regalloc_dry_run_cost += 4;
       freeAsmop (IC_RIGHT (ic), NULL, ic);
@@ -9806,9 +9783,9 @@ genEndCritical (const iCode *ic)
       //don't enable interrupts as they were off before
       if(!regalloc_dry_run)
         {
-          emit2 ("jp PO,!tlabel", tlbl->key + 100);
+          emit2 ("jp PO,!tlabel", labelKey2num (tlbl->key));
           emit2 ("!ei");
-          emit2 ("!tlabeldef", (tlbl->key + 100));
+          emit2 ("!tlabeldef", labelKey2num ((tlbl->key)));
           genLine.lineCurr->isLabel = 1;
         }
       regalloc_dry_run_cost += 4;

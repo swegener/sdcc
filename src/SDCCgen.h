@@ -26,6 +26,7 @@
 #include <SDCCicode.h>
 
 #define initGenLineElement()  memset (&genLine.lineElement, 0, sizeof (lineElem_t))
+#define labelKey2num(key)     ((key) + 100)
 
 /* can be inherited by each port */
 typedef struct asmLineNodeBase
@@ -83,12 +84,13 @@ extern genLine_t genLine;
 
 lineNode *newLineNode (const char *line);
 lineNode *connectLine (lineNode * pl1, lineNode * pl2);
-void printLine (lineNode *, struct dbuf_s *);
 void destroy_line_list (void);
 const char *format_opcode (const char *inst, const char *fmt, va_list ap);
 void emit_raw (const char *line);
 void va_emitcode (const char *inst, const char *fmt, va_list ap);
 void emitcode (const char *inst, const char *fmt, ...);
+void emitLabel (symbol * tlbl);
 void genInline (iCode * ic);
+void printLine (lineNode *, struct dbuf_s *);
 
 #endif

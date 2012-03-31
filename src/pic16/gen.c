@@ -236,7 +236,7 @@ void pic16_emitpLabel(int key)
   if(key>max_key)
     max_key = key;
 
-  pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(NULL,key+100+pic16_labelOffset));
+  pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(NULL, labelKey2num (key + pic16_labelOffset)));
 }
 
 void pic16_emitpLabelFORCE(int key)
@@ -244,7 +244,7 @@ void pic16_emitpLabelFORCE(int key)
   if(key>max_key)
     max_key = key;
 
-  pic16_addpCode2pBlock(pb,pic16_newpCodeLabelFORCE(NULL,key+100+pic16_labelOffset));
+  pic16_addpCode2pBlock(pb,pic16_newpCodeLabelFORCE(NULL, labelKey2num (key + pic16_labelOffset)));
 }
 
 /* gen.h defines a macro pic16_emitpcode that allows for debug information to be inserted on demand
@@ -1472,7 +1472,7 @@ pCodeOp *pic16_popGetLabel(int key)
   if(key>max_key)
     max_key = key;
 
-  return pic16_newpCodeOpLabel(NULL,key+100+pic16_labelOffset);
+  return pic16_newpCodeOpLabel(NULL, labelKey2num (key + pic16_labelOffset));
 }
 
 /*-----------------------------------------------------------------*/
@@ -1916,9 +1916,9 @@ void pic16_aopPut (asmop *aop, char *s, int offset)
                             MOVA(s);
                         }
                         pic16_emitcode("clr","c");
-                        pic16_emitcode("jz","%05d_DS_",lbl->key+100);
+                        pic16_emitcode("jz","%05d_DS_",labelKey2num (lbl->key));
                         pic16_emitcode("cpl","c");
-                        pic16_emitcode("","%05d_DS_:",lbl->key+100);
+                        pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
                         pic16_emitcode("mov","%s,c",aop->aopu.aop_dir);
                     }
         }
@@ -3407,7 +3407,7 @@ jumpret:
                 && IC_LABEL(ic->next) == returnLabel)) {
 
                 pic16_emitpcode(POC_GOTO,pic16_popGetLabel(returnLabel->key));
-                pic16_emitcode("goto","_%05d_DS_",returnLabel->key+100 + pic16_labelOffset);
+                pic16_emitcode("goto","_%05d_DS_",labelKey2num (returnLabel->key + pic16_labelOffset));
         }
 }
 
@@ -3454,7 +3454,7 @@ static void genLabel (iCode *ic)
     return ;
 
   pic16_emitpLabel(IC_LABEL(ic)->key);
-//  pic16_emitcode("","_%05d_DS_:",(IC_LABEL(ic)->key+100 + pic16_labelOffset));
+//  pic16_emitcode("","_%05d_DS_:",labelKey2num (IC_LABEL(ic)->key + pic16_labelOffset));
 }
 
 /*-----------------------------------------------------------------*/
@@ -3465,7 +3465,7 @@ static void genGoto (iCode *ic)
 {
   FENTRY;
   pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_LABEL(ic)->key));
-//  pic16_emitcode ("goto","_%05d_DS_",(IC_LABEL(ic)->key+100)+pic16_labelOffset);
+//  pic16_emitcode ("goto","_%05d_DS_",labelKey2num (IC_LABEL(ic)->key + pic16_labelOffset));
 }
 
 
@@ -3797,10 +3797,10 @@ static void genDivOneByte (operand *left,
     l =  pic16_aopGet(AOP(right),0,FALSE,FALSE);
     MOVA(l);
     lbl = newiTempLabel(NULL);
-    pic16_emitcode("jnb","acc.7,%05d_DS_",(lbl->key+100));
+    pic16_emitcode("jnb","acc.7,%05d_DS_",labelKey2num (lbl->key));
     pic16_emitcode("cpl","a");
     pic16_emitcode("inc","a");
-    pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
     pic16_emitcode("mov","b,a");
 
     /* sign adjust left side */
@@ -3808,10 +3808,10 @@ static void genDivOneByte (operand *left,
     MOVA(l);
 
     lbl = newiTempLabel(NULL);
-    pic16_emitcode("jnb","acc.7,%05d_DS_",(lbl->key+100));
+    pic16_emitcode("jnb","acc.7,%05d_DS_",labelKey2num (lbl->key));
     pic16_emitcode("cpl","a");
     pic16_emitcode("inc","a");
-    pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
 
     /* now the division */
     pic16_emitcode("div","ab");
@@ -3822,13 +3822,13 @@ static void genDivOneByte (operand *left,
     pic16_emitcode("pop","acc");
     /* if there was an over flow we don't
     adjust the sign of the result */
-    pic16_emitcode("jb","ov,%05d_DS_",(lbl->key+100));
-    pic16_emitcode("jnb","acc.7,%05d_DS_",(lbl->key+100));
+    pic16_emitcode("jb","ov,%05d_DS_",labelKey2num (lbl->key));
+    pic16_emitcode("jnb","acc.7,%05d_DS_",labelKey2num (lbl->key));
     CLRC;
     pic16_emitcode("clr","a");
     pic16_emitcode("subb","a,b");
     pic16_emitcode("mov","b,a");
-    pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
 
     /* now we are done */
     pic16_aopPut(AOP(result),"b",0);
@@ -4157,10 +4157,10 @@ static void genModOneByte (operand *left,
     MOVA(l);
 
     lbl = newiTempLabel(NULL);
-    pic16_emitcode("jnb","acc.7,%05d_DS_",(lbl->key+100));
+    pic16_emitcode("jnb","acc.7,%05d_DS_",labelKey2num (lbl->key));
     pic16_emitcode("cpl","a");
     pic16_emitcode("inc","a");
-    pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
     pic16_emitcode("mov","b,a");
 
     /* sign adjust left side */
@@ -4168,10 +4168,10 @@ static void genModOneByte (operand *left,
     MOVA(l);
 
     lbl = newiTempLabel(NULL);
-    pic16_emitcode("jnb","acc.7,%05d_DS_",(lbl->key+100));
+    pic16_emitcode("jnb","acc.7,%05d_DS_",labelKey2num (lbl->key));
     pic16_emitcode("cpl","a");
     pic16_emitcode("inc","a");
-    pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
 
     /* now the multiplication */
     pic16_emitcode("div","ab");
@@ -4181,13 +4181,13 @@ static void genModOneByte (operand *left,
     pic16_emitcode("pop","acc");
     /* if there was an over flow we don't
     adjust the sign of the result */
-    pic16_emitcode("jb","ov,%05d_DS_",(lbl->key+100));
-    pic16_emitcode("jnb","acc.7,%05d_DS_",(lbl->key+100));
+    pic16_emitcode("jb","ov,%05d_DS_",labelKey2num (lbl->key));
+    pic16_emitcode("jnb","acc.7,%05d_DS_",labelKey2num (lbl->key));
     CLRC ;
     pic16_emitcode("clr","a");
     pic16_emitcode("subb","a,b");
     pic16_emitcode("mov","b,a");
-    pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
 
     /* now we are done */
     pic16_aopPut(AOP(result),"b",0);
@@ -4263,7 +4263,7 @@ static void genIfxJump (iCode *ic, char *jval)
         }
 
         pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ic)->key));
-        pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ic)->key+100 + pic16_labelOffset);
+        pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_TRUE(ic)->key + pic16_labelOffset));
 
     }
     else {
@@ -4278,7 +4278,7 @@ static void genIfxJump (iCode *ic, char *jval)
         }
 
         pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ic)->key));
-        pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ic)->key+100 + pic16_labelOffset);
+        pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_FALSE(ic)->key + pic16_labelOffset));
 
     }
 
@@ -4298,7 +4298,7 @@ static void genIfxpCOpJump (iCode *ic, pCodeOp *jop)
       pic16_emitpcode(POC_BTFSC, jop);
 
       pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ic)->key));
-      pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ic)->key+100 + pic16_labelOffset);
+      pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_TRUE(ic)->key + pic16_labelOffset));
 
     } else {
       /* false label is present */
@@ -4306,7 +4306,7 @@ static void genIfxpCOpJump (iCode *ic, pCodeOp *jop)
       pic16_emitpcode(POC_BTFSS, jop);
 
       pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ic)->key));
-      pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ic)->key+100 + pic16_labelOffset);
+      pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_FALSE(ic)->key + pic16_labelOffset));
     }
 
 
@@ -4343,7 +4343,7 @@ static void genSkip(iCode *ifx,int status_bit)
     }
 
     pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-    // pic16_emitcode("goto","_%05d_DS_",IC_TRUE(ifx)->key+100+pic16_labelOffset);
+    // pic16_emitcode("goto","_%05d_DS_",labelKey2num (IC_TRUE(ifx)->key + pic16_labelOffset));
 
   } else {
 
@@ -4362,7 +4362,7 @@ static void genSkip(iCode *ifx,int status_bit)
       break;
     }
     pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-    // pic16_emitcode("goto","_%05d_DS_",IC_FALSE(ifx)->key+100+pic16_labelOffset);
+    // pic16_emitcode("goto","_%05d_DS_",labelKey2num (IC_FALSE(ifx)->key + pic16_labelOffset));
 
   }
 
@@ -4892,21 +4892,21 @@ static void genCmpEq (iCode *ic, iCode *ifx)
             } else {
                 symbol *lbl = newiTempLabel(NULL);
                 pic16_emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                pic16_emitcode("jb","%s,%05d_DS_",AOP(right)->aopu.aop_dir,(lbl->key+100));
+                pic16_emitcode("jb","%s,%05d_DS_",AOP(right)->aopu.aop_dir,labelKey2num (lbl->key));
                 pic16_emitcode("cpl","c");
-                pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+                pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
             }
             /* if true label then we jump if condition
             supplied is true */
             tlbl = newiTempLabel(NULL);
             if ( IC_TRUE(ifx) ) {
-                pic16_emitcode("jnc","%05d_DS_",tlbl->key+100);
-                pic16_emitcode("ljmp","%05d_DS_",IC_TRUE(ifx)->key+100);
+                pic16_emitcode("jnc","%05d_DS_",labelKey2num (tlbl->key));
+                pic16_emitcode("ljmp","%05d_DS_",labelKey2num (IC_TRUE(ifx)->key));
             } else {
-                pic16_emitcode("jc","%05d_DS_",tlbl->key+100);
-                pic16_emitcode("ljmp","%05d_DS_",IC_FALSE(ifx)->key+100);
+                pic16_emitcode("jc","%05d_DS_",labelKey2num (tlbl->key));
+                pic16_emitcode("ljmp","%05d_DS_",labelKey2num (IC_FALSE(ifx)->key));
             }
-            pic16_emitcode("","%05d_DS_:",tlbl->key+100+pic16_labelOffset);
+            pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key + pic16_labelOffset));
 
                 {
                 /* left and right are both bit variables, result is carry */
@@ -5023,11 +5023,11 @@ static void genCmpEq (iCode *ic, iCode *ifx)
             if ( IC_TRUE(ifx) ) {
               emitSKPNZ;
               pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-              // pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ifx)->key+100+pic16_labelOffset);
+              // pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_TRUE(ifx)->key + pic16_labelOffset));
             } else {
               emitSKPZ;
               pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-              // pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ifx)->key+100+pic16_labelOffset);
+              // pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_FALSE(ifx)->key + pic16_labelOffset));
             }
 
           } else {
@@ -5047,7 +5047,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
                         DEBUGpic16_emitcode (";","\tIC_TRUE emitSKPZ");
 
                   pic16_emitpcode(POC_GOTO,pic16_popGetLabel(tlbl->key));
-                  pic16_emitcode(" goto","_%05d_DS_",tlbl->key+100+pic16_labelOffset);
+                  pic16_emitcode(" goto","_%05d_DS_",labelKey2num (tlbl->key + pic16_labelOffset));
                 } else {
                   emitSKPNZ;
 
@@ -5055,7 +5055,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 
 
                   pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-                  pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ifx)->key+100+pic16_labelOffset);
+                  pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_TRUE(ifx)->key + pic16_labelOffset));
                 }
               } else {
                 emitSKPZ;
@@ -5063,13 +5063,13 @@ static void genCmpEq (iCode *ic, iCode *ifx)
                         DEBUGpic16_emitcode (";","\tnot IC_TRUE emitSKPZ");
 
                 pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-                pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ifx)->key+100+pic16_labelOffset);
+                pic16_emitcode(" goto","_%05d_DS_",labelKey2num (IC_FALSE(ifx)->key + pic16_labelOffset));
               }
               offset++;
             }
             if(s>1 && IC_TRUE(ifx)) {
               pic16_emitpLabel(tlbl->key);
-              pic16_emitcode("","_%05d_DS_:",tlbl->key+100+pic16_labelOffset);
+              pic16_emitcode("","_%05d_DS_:",labelKey2num (tlbl->key + pic16_labelOffset));
             }
           }
         }
@@ -5096,9 +5096,9 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         } else {
             symbol *lbl = newiTempLabel(NULL);
             pic16_emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-            pic16_emitcode("jb","%s,%05d_DS_",AOP(right)->aopu.aop_dir,(lbl->key+100));
+            pic16_emitcode("jb","%s,%05d_DS_",AOP(right)->aopu.aop_dir,labelKey2num (lbl->key));
             pic16_emitcode("cpl","c");
-            pic16_emitcode("","%05d_DS_:",(lbl->key+100));
+            pic16_emitcode("","%05d_DS_:",labelKey2num (lbl->key));
         }
         /* c = 1 if egal */
         if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)){
@@ -5263,9 +5263,9 @@ static void genAndOp (iCode *ic)
 /*     } else { */
 /*         tlbl = newiTempLabel(NULL); */
 /*         pic16_toBoolean(left);     */
-/*         pic16_emitcode("jz","%05d_DS_",tlbl->key+100); */
+/*         pic16_emitcode("jz","%05d_DS_",labelKey2num (tlbl->key)); */
 /*         pic16_toBoolean(right); */
-/*         pic16_emitcode("","%05d_DS_:",tlbl->key+100); */
+/*         pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key)); */
 /*         pic16_outBitAcc(result); */
 /*     } */
 
@@ -5315,9 +5315,9 @@ static void genOrOp (iCode *ic)
         tlbl = newiTempLabel(NULL);
         pic16_toBoolean(left);
         emitSKPZ;
-        pic16_emitcode("goto","%05d_DS_",tlbl->key+100+pic16_labelOffset);
+        pic16_emitcode("goto","%05d_DS_",labelKey2num (tlbl->key + pic16_labelOffset));
         pic16_toBoolean(right);
-        pic16_emitcode("","%05d_DS_:",tlbl->key+100+pic16_labelOffset);
+        pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key + pic16_labelOffset));
 
         pic16_outBitAcc(result);
     }
@@ -5355,7 +5355,7 @@ static void continueIfTrue (iCode *ic)
 {
   FENTRY;
   if(IC_TRUE(ic))
-    pic16_emitcode("ljmp","%05d_DS_",IC_TRUE(ic)->key+100);
+    pic16_emitcode("ljmp","%05d_DS_",labelKey2num (IC_TRUE(ic)->key));
   ic->generated = 1;
 }
 
@@ -5366,7 +5366,7 @@ static void jumpIfTrue (iCode *ic)
 {
   FENTRY;
   if(!IC_TRUE(ic))
-    pic16_emitcode("ljmp","%05d_DS_",IC_FALSE(ic)->key+100);
+    pic16_emitcode("ljmp","%05d_DS_",labelKey2num (IC_FALSE(ic)->key));
   ic->generated = 1;
 }
 
@@ -5379,13 +5379,13 @@ static void jmpTrueOrFalse (iCode *ic, symbol *tlbl)
   FENTRY;
   if(IC_TRUE(ic)){
     symbol *nlbl = newiTempLabel(NULL);
-      pic16_emitcode("sjmp","%05d_DS_",nlbl->key+100);
-      pic16_emitcode("","%05d_DS_:",tlbl->key+100);
-      pic16_emitcode("ljmp","%05d_DS_",IC_TRUE(ic)->key+100);
-      pic16_emitcode("","%05d_DS_:",nlbl->key+100);
+      pic16_emitcode("sjmp","%05d_DS_",labelKey2num (nlbl->key));
+      pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key));
+      pic16_emitcode("ljmp","%05d_DS_",labelKey2num (IC_TRUE(ic)->key));
+      pic16_emitcode("","%05d_DS_:",labelKey2num (nlbl->key));
   } else {
-    pic16_emitcode("ljmp","%05d_DS_",IC_FALSE(ic)->key+100);
-    pic16_emitcode("","%05d_DS_:",tlbl->key+100);
+    pic16_emitcode("ljmp","%05d_DS_",labelKey2num (IC_FALSE(ic)->key));
+    pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key));
   }
   ic->generated = 1;
 }
@@ -5650,12 +5650,12 @@ static void genAnd (iCode *ic, iCode *ifx)
         MOVA(pic16_aopGet(AOP(right),offset,FALSE,FALSE));
         pic16_emitcode("anl","a,%s",
                        pic16_aopGet(AOP(left),offset,FALSE,FALSE));
-        pic16_emitcode("jnz","%05d_DS_",tlbl->key+100);
+        pic16_emitcode("jnz","%05d_DS_",labelKey2num (tlbl->key));
         offset++;
       }
       if(size){
         CLRC;
-        pic16_emitcode("","%05d_DS_:",tlbl->key+100);
+        pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key));
         pic16_outBitC(result);
       } else if(ifx)
         jmpTrueOrFalse(ifx, tlbl);
@@ -5832,15 +5832,15 @@ static void genOr (iCode *ic, iCode *ifx)
               if(!((AOP_TYPE(result) == AOP_CRY) && ifx))
                   pic16_emitcode(";XXX setb","c");
               pic16_emitcode(";XXX jb","%s,%05d_DS_",
-                       AOP(left)->aopu.aop_dir,tlbl->key+100);
+                       AOP(left)->aopu.aop_dir,labelKey2num (tlbl->key));
               pic16_toBoolean(right);
-              pic16_emitcode(";XXX jnz","%05d_DS_",tlbl->key+100);
+              pic16_emitcode(";XXX jnz","%05d_DS_",labelKey2num (tlbl->key));
               if((AOP_TYPE(result) == AOP_CRY) && ifx){
                   jmpTrueOrFalse(ifx, tlbl);
                   goto release;
               } else {
                   CLRC;
-                  pic16_emitcode("","%05d_DS_:",tlbl->key+100);
+                  pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key));
               }
           }
       }
@@ -5923,12 +5923,12 @@ static void genOr (iCode *ic, iCode *ifx)
               MOVA(pic16_aopGet(AOP(right),offset,FALSE,FALSE));
               pic16_emitcode(";XXX orl","a,%s",
                        pic16_aopGet(AOP(left),offset,FALSE,FALSE));
-              pic16_emitcode(";XXX jnz","%05d_DS_",tlbl->key+100);
+              pic16_emitcode(";XXX jnz","%05d_DS_",labelKey2num (tlbl->key));
               offset++;
           }
           if(size){
               CLRC;
-              pic16_emitcode("","%05d_DS_:",tlbl->key+100);
+              pic16_emitcode("","%05d_DS_:",labelKey2num (tlbl->key));
               pic16_outBitC(result);
           } else if(ifx)
               jmpTrueOrFalse(ifx, tlbl);
@@ -6089,15 +6089,15 @@ static void genXor (iCode *ic, iCode *ifx)
                   if (sizer == 1)
                     // test the msb of the lsb
                     pic16_emitcode("anl", "a,#0xfe");
-                  pic16_emitcode("jnz", "%05d_DS_", tlbl->key+100);
+                  pic16_emitcode("jnz", "%05d_DS_", labelKey2num (tlbl->key));
                   sizer--;
                 }
               // val = (0,1)
               pic16_emitcode("rrc", "a");
             }
-          pic16_emitcode("jnb", "%s,%05d_DS_", AOP(left)->aopu.aop_dir, (tlbl->key + 100));
+          pic16_emitcode("jnb", "%s,%05d_DS_", AOP(left)->aopu.aop_dir, labelKey2num (tlbl->key));
           pic16_emitcode("cpl", "c");
-          pic16_emitcode("", "%05d_DS_:", (tlbl->key + 100));
+          pic16_emitcode("", "%05d_DS_:", labelKey2num (tlbl->key));
         }
       // bit = c
       // val = c
@@ -6238,13 +6238,13 @@ static void genXor (iCode *ic, iCode *ifx)
                 pic16_emitcode("xrl", "a,%s",
                                pic16_aopGet(AOP(left), offset, FALSE, FALSE));
               }
-            pic16_emitcode("jnz", "%05d_DS_", tlbl->key + 100);
+            pic16_emitcode("jnz", "%05d_DS_", labelKey2num (tlbl->key));
             offset++;
           }
         if (size)
           {
             CLRC;
-            pic16_emitcode("", "%05d_DS_:", tlbl->key + 100);
+            pic16_emitcode("", "%05d_DS_:", labelKey2num (tlbl->key));
             pic16_outBitC(result);
           }
         else if (ifx)
@@ -9497,9 +9497,9 @@ static void genJumpTab (iCode *ic)
     pic16_emitcode("add","a,%s",pic16_aopGet(AOP(IC_JTCOND(ic)),0,FALSE,FALSE));
 
     jtab = newiTempLabel(NULL);
-    pic16_emitcode("mov","dptr,#%05d_DS_",jtab->key+100);
+    pic16_emitcode("mov","dptr,#%05d_DS_",labelKey2num (jtab->key));
     pic16_emitcode("jmp","@a+dptr");
-    pic16_emitcode("","%05d_DS_:",jtab->key+100);
+    pic16_emitcode("","%05d_DS_:",labelKey2num (jtab->key));
 
 #if 0
     pic16_emitpcode(POC_MOVLW, pic16_popGetLabel(jtab->key));
@@ -9557,7 +9557,7 @@ static void genJumpTab (iCode *ic)
     /* now generate the jump labels */
     for (jtab = setFirstItem(IC_JTLABELS(ic)) ; jtab;
          jtab = setNextItem(IC_JTLABELS(ic))) {
-//        pic16_emitcode("ljmp","%05d_DS_",jtab->key+100);
+//        pic16_emitcode("ljmp","%05d_DS_",labelKey2num (jtab->key));
         pic16_emitpcode(POC_GOTO,pic16_popGetLabel(jtab->key));
 
     }

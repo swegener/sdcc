@@ -27,9 +27,7 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
-#include "../SDCCutil.h"
-#include "../SDCCglobl.h"
-#include "../SDCCsystem.h"
+
 static char _defaultRules[] =
 {
 #include "peeph.rul"

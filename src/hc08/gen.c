@@ -133,14 +133,7 @@ static unsigned char SRMask[] =
 static void
 emitBranch (char *branchop, symbol *tlbl)
 {
-  emitcode (branchop, "%05d$", (tlbl->key + 100));
-}
-
-static void
-emitLabel (symbol *tlbl)
-{
-  emitcode ("", "%05d$:", (tlbl->key +100));
-  genLine.lineCurr->isLabel = 1;
+  emitcode (branchop, "%05d$", labelKey2num (tlbl->key));
 }
 
 /*-----------------------------------------------------------------*/
@@ -2126,7 +2119,7 @@ asmopToBool (asmop *aop, bool resultInA)
         {
           symbol *tlbl = newiTempLabel (NULL);
           emitcode ("tsta", "");
-          emitcode ("bne", "%05d$", (tlbl->key + 100));
+          emitcode ("bne", "%05d$", labelKey2num (tlbl->key));
           emitcode ("tstx", "");
           emitLabel (tlbl);
         }
@@ -2189,7 +2182,7 @@ asmopToBool (asmop *aop, bool resultInA)
             {
               tlbl = newiTempLabel (NULL);
               emitcode ("tst", "%s", aopAdrStr (aop, 0, FALSE));
-              emitcode ("bne", "%05d$", (tlbl->key + 100));
+              emitcode ("bne", "%05d$", labelKey2num (tlbl->key));
               emitcode ("tst", "%s", aopAdrStr (aop, 1, FALSE));
               emitLabel (tlbl);
               break;
@@ -3076,7 +3069,7 @@ jumpret:
   if (!(ic->next && ic->next->op == LABEL &&
         IC_LABEL (ic->next) == returnLabel))
 
-    emitcode ("jmp", "%05d$", (returnLabel->key + 100));
+    emitcode ("jmp", "%05d$", labelKey2num (returnLabel->key));
 
 }
 
@@ -3114,7 +3107,7 @@ genLabel (iCode * ic)
 static void
 genGoto (iCode * ic)
 {
-  emitcode ("jmp", "%05d$", (IC_LABEL (ic)->key + 100));
+  emitcode ("jmp", "%05d$", labelKey2num (IC_LABEL (ic)->key));
 }
 
 #if 0
@@ -7110,7 +7103,7 @@ genUnpackBits (operand * result, iCode *ifx)
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("bit", "#0x%02x", 1<<(blen - 1));
-          emitcode ("beq", "%05d$", tlbl->key + 100);
+          emitcode ("beq", "%05d$", labelKey2num (tlbl->key));
           emitcode ("ora", "#0x%02x", (unsigned char) (0xff << blen));
           emitLabel (tlbl);
         }
@@ -7141,7 +7134,7 @@ genUnpackBits (operand * result, iCode *ifx)
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("bit", "#0x%02x", 1<<(rlen - 1));
-          emitcode ("beq", "%05d$", tlbl->key + 100);
+          emitcode ("beq", "%05d$", labelKey2num (tlbl->key));
           emitcode ("ora", "#0x%02x", (unsigned char) (0xff << rlen));
           emitLabel (tlbl);
         }
@@ -7213,7 +7206,7 @@ genUnpackBitsImmed (operand * left,
           loadRegFromConst (hc08_reg_a, zero);
           emitcode ("brclr", "#%d,%s,%05d$",
                     bstr, aopAdrStr (derefaop, 0, FALSE),
-                    (tlbl->key + 100));
+                    labelKey2num ((tlbl->key)));
           if (SPEC_USIGN (etype))
             rmwWithReg ("inc", hc08_reg_a);
           else
@@ -7242,7 +7235,7 @@ genUnpackBitsImmed (operand * left,
             }
           emitcode (inst, "#%d,%s,%05d$",
                     bstr, aopAdrStr (derefaop, 0, FALSE),
-                    (tlbl->key + 100));
+                    labelKey2num ((tlbl->key)));
           emitBranch ("jmp", jlbl);
           emitLabel (tlbl);
           ifx->generated = 1;
@@ -7266,7 +7259,7 @@ genUnpackBitsImmed (operand * left,
               symbol *tlbl = newiTempLabel (NULL);
 
               emitcode ("bit", "#0x%02x", 1<<(blen - 1));
-              emitcode ("beq", "%05d$", tlbl->key + 100);
+              emitcode ("beq", "%05d$", labelKey2num (tlbl->key));
               emitcode ("ora", "#0x%02x", (unsigned char) (0xff << blen));
               emitLabel (tlbl);
             }
@@ -7305,7 +7298,7 @@ genUnpackBitsImmed (operand * left,
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("bit", "#0x%02x", 1<<(rlen - 1));
-          emitcode ("beq", "%05d$", tlbl->key + 100);
+          emitcode ("beq", "%05d$", labelKey2num (tlbl->key));
           emitcode ("ora", "#0x%02x", (unsigned char) (0xff << rlen));
           emitLabel (tlbl);
         }
@@ -8041,8 +8034,8 @@ genJumpTab (iCode * ic)
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
       loadRegFromConst (hc08_reg_h, zero);
 
-      emitcode ("lda", "%05d$,x", jtabhi->key + 100);
-      emitcode ("ldx", "%05d$,x", jtablo->key + 100);
+      emitcode ("lda", "%05d$,x", labelKey2num (jtabhi->key));
+      emitcode ("ldx", "%05d$,x", labelKey2num (jtablo->key));
       transferRegReg (hc08_reg_a, hc08_reg_h, TRUE);
       emitcode ("jmp", ",x");
 
@@ -8059,9 +8052,9 @@ genJumpTab (iCode * ic)
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
       loadRegFromConst (hc08_reg_h, zero);
 
-      emitcode ("lda", "%05d$,x", jtabhi->key + 100);
+      emitcode ("lda", "%05d$,x", labelKey2num (jtabhi->key));
       emitcode ("sta", "3,s");
-      emitcode ("lda", "%05d$,x", jtablo->key + 100);
+      emitcode ("lda", "%05d$,x", labelKey2num (jtablo->key));
       emitcode ("sta", "4,s");
 
       pullReg(hc08_reg_hx);
@@ -8074,11 +8067,11 @@ genJumpTab (iCode * ic)
   emitLabel (jtablo);
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
        jtab = setNextItem (IC_JTLABELS (ic)))
-    emitcode (".db", "%05d$", jtab->key + 100);
+    emitcode (".db", "%05d$", labelKey2num (jtab->key));
   emitLabel (jtabhi);
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
        jtab = setNextItem (IC_JTLABELS (ic)))
-    emitcode (".db", ">%05d$", jtab->key + 100);
+    emitcode (".db", ">%05d$", labelKey2num (jtab->key));
 }
 
 /*-----------------------------------------------------------------*/
@@ -8243,7 +8236,7 @@ genDjnz (iCode * ic, iCode * ifx)
 
 
   emitcode ("dbnz", "%s,%05d$", aopAdrStr (AOP (IC_RESULT (ic)), 0, FALSE),
-                lbl->key + 100);
+                labelKey2num (lbl->key));
 
   emitBranch ("bra", lbl1);
   emitLabel (lbl);

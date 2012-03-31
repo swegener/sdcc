@@ -1,6 +1,23 @@
-/** @file main.c
-    hc08 specific general functions.
+/*-------------------------------------------------------------------------
+  main.h - hc08 specific general function
 
+  Copyright (C) 2003, Erik Petrich
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+-------------------------------------------------------------------------*/
+/*
     Note that mlh prepended _hc08_ on the static functions.  Makes
     it easier to set a breakpoint using the debugger.
 */
@@ -9,7 +26,6 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
-#include "../SDCCutil.h"
 
 extern char * iComments2;
 extern DEBUGFILE dwarf2DebugFile;

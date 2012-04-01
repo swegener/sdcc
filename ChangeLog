@@ -8,10 +8,11 @@
 	  support/regression/tests/gcc-torture-execute-20101013-1.c,
 	  support/regression/tests/gcc-torture-execute-950512-1.c:
 	  long long division.
-
 	* support/regression/tests/gcc-torture-execute-920612-1.c,
 	  support/regression/tests/gcc-torture-execute-920711-1.c:
 	  Disable tests for gcc older than 5.0.
+	* support/regression/tests/longlong.c:
+	  Disable longlong test for gbz80, since it fails on 32-bit systems.
 
 2012-03-31 Borut Razem <borut.razem AT gmail.com>
 

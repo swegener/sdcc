@@ -8,8 +8,9 @@
 #pragma std_c99
 #endif
 
-/* TODO: Enable once we support long long division. */
+// Todo: Enable when sdcc supports long long modulo!
 #if 0
+
 /* PR c/19606
    The C front end used to shorten the type of a division to a type
    that does not preserve the semantics of the original computation.

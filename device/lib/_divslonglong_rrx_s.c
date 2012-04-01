@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   _rrulonglong_rrx_s.c - routine for right shift of 64 bit unsigned long long
+   _divslonglong_rrx_s.c - routine for divsion of 64 bit unsigned long long
 
-   Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
+   Copyright (C) 2012, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -29,29 +29,24 @@
 #pragma std_c99
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __SDCC_LONGLONG
-// This function is the same as the one from rrulonglong_rrx_s.c, except for the type of top.
-long long _rrslonglong_rrx_s(long long l, signed char s)
+long long 
+_divslonglong_rrx_s (long long numerator, long long denominator)
 {
-	int32_t *top = (uint32_t *)((char *)(&l) + 4);
-	uint16_t *middle = (uint16_t *)((char *)(&l) + 3);
-	uint32_t *bottom = (uint32_t *)(&l);
-	uint16_t *b = (uint16_t *)(&l);
+  bool numeratorneg = (numerator < 0);
+  bool denominatorneg = (denominator < 0);
+  long long d;
 
-	for(;s >= 16; s-= 16)
-	{
-		b[0] = b[1];
-		b[1] = b[2];
-		b[2] = b[3];
-		b[3] = (b[3] & 0x8000) ? 0xffff : 0x000000;
-	}
+  if (numeratorneg)
+    numerator = -numerator;
+  if (denominatorneg)
+    denominator = -denominator;
 
-	(*bottom) >>= s;
-	(*bottom) |= ((uint32_t)((*middle) >> s) << 16);
-	(*top) |= (((*middle) & 0xffff0000) >> s);
+  d = (unsigned long long)numerator / (unsigned long long)denominator;
 
-	return(l);
+  return ((numeratorneg ^ denominatorneg) ? -d : d);
 }
 #endif
 

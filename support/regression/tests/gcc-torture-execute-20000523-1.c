@@ -11,7 +11,7 @@
 void
 testTortureExecute (void)
 {
-// TODO: Enable when sdcc supports long long division!
+// Todo: Enable when sdcc supports long long constants!
 #if 0
   long long   x;
   int         n;

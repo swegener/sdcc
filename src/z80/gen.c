@@ -3855,7 +3855,6 @@ emitCall (const iCode *ic, bool ispcall)
       if (ispcall && IS_GB)
         _push (PAIR_HL);
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-      emitDebug(";bigreturn call");
       wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");
       wassert (AOP_TYPE (IC_RESULT (ic)) == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_EXSTK);
       fp_offset = AOP (IC_RESULT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_RESULT (ic))->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
@@ -9354,6 +9353,7 @@ genAssign (const iCode *ic)
             cyclecost_l = 14 * size + 42 + hl_alive * 22 + de_alive * 22 + bc_alive * 22 - (AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) * 7 - (AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_IY) * 10;
           else /* Z80 */
             cyclecost_l = 21 * size + 51 + hl_alive * 20 + de_alive * 20 + bc_alive * 20 - (AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) * 11 - (AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_IY) * 15;
+
           if (optimize.codeSize)
             l_better = (sizecost_l < sizecost_n || sizecost_l == sizecost_n && cyclecost_l < cyclecost_n);
           else

@@ -8,8 +8,8 @@
 #pragma std_c99
 #endif
 
-#if 0
-// TODO: Enable when long long division is supported!
+// Some ports do not yet support long long
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 
 /* PR rtl-optimization/45912 */
 
@@ -24,7 +24,7 @@ static void*
 build_int_cst (void *base, long long offset)
 {
   if (offset != 4)
-    abort ();
+    ASSERT (0);
 
   return base;
 }
@@ -41,7 +41,7 @@ build_ref_for_offset (void *base, long long offset)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   void *ret = build_ref_for_offset ((void *)0, 32);
   if (ret != (void *)0)
     ASSERT (0);

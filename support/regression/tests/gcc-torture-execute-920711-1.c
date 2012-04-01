@@ -8,7 +8,18 @@
 #pragma std_c99
 #endif
 
-f(long a){return (--a > 0);}
+f(long a)
+{
+  return (--a > 0);
+}
+
 void
-testTortureExecute (void){if(f(0x80000000L)==0)ASSERT(0);return;}
+testTortureExecute (void)
+{
+#if !(defined (__GNUC__) && (__GNUC__ < 5))
+  if(f (0x80000000L) == 0)
+    ASSERT(0);
+  return;
+#endif
+}
 

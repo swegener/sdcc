@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _rrulong.c - routine for right shift of 64 bit unsigned long long
+   _rrulonglong_rrx_s.c - routine for right shift of 64 bit unsigned long long
 
    Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 

@@ -8,9 +8,10 @@
 #pragma std_c99
 #endif
 
-// Some ports do not support long long
-#if 0
-SDCC does not yet support long long division. TODO: Enable later!
+#include <string.h>
+
+// Some ports do not yet support long long
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
 
 /* PR rtl-optimization/47337 */
 
@@ -67,19 +68,19 @@ fnx (unsigned long long x, int y)
     }
 }
 
-char *volatile w = "2";
+const char *volatile w = "2";
 #endif
 
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
   int h = 0;
   unsigned int k = 0;
   int l[8];
   int i, j;
 
-  if (__builtin_strcmp (w, "1") == 0)
+  if (strcmp (w, "1") == 0)
     h = 1;
 
   for (i = 0; i < 256; i++)

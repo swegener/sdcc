@@ -1,3 +1,18 @@
+2012-04-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/Makefile.in,
+	  device/lib/*/Makefile.in,
+	  device/lib/*/stubs.s,
+	  device/lib/_divslonglong_rrx_s.c,
+	  device/lib/_rrslonglong_rrx_s.c,
+	  support/regression/tests/gcc-torture-execute-20101013-1.c,
+	  support/regression/tests/gcc-torture-execute-950512-1.c:
+	  long long division.
+
+	* support/regression/tests/gcc-torture-execute-920612-1.c,
+	  support/regression/tests/gcc-torture-execute-920711-1.c:
+	  Disable tests for gcc older than 5.0.
+
 2012-03-31 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCgen.c, src/SDCCgen.h, src/ds390/gen.c,

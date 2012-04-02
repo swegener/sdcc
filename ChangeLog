@@ -40,6 +40,9 @@
 	  support/regression/tests/gcc-torture-execute-20001112-1.c
 	  support/regression/tests/gcc-torture-execute-20101013-1.c:
 	  long long for hc08.
+	* src/z80/gen.c,
+	  support/regression/tests/gcc-torture-execute-pr47337.c:
+	  Fixed bug #3513892.
 
 2012-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -57,7 +60,7 @@
 	* support/regression/tests/longlong.c,
 	  support/regression/tests/gcc-torture-execute-960801-1.c,
 	  support/regression/tests/longlong.c:
-	  Disable long long test since they fail on 32-bit systems.
+	  Disable long long tests since they fail on 32-bit systems.
 
 2012-03-31 Borut Razem <borut.razem AT gmail.com>
 

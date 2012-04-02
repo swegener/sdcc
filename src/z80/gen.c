@@ -1982,9 +1982,8 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               emit2 ("ld h,!immedbyte", 0);
               regalloc_dry_run_cost += 3;
               break;
-            case 2:
-              // PENDING: Requires that you are only fetching two bytes.
-            case 4:
+            default:
+              wassertl (aop->size - offset > 1, "Attempted to fetch no data into HL");
               if (IS_R2K)
                 {
                   emit2 ("ld hl, 0 (hl)");
@@ -1998,9 +1997,6 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                   emit2 ("ld l,a");
                   regalloc_dry_run_cost += 4;
                 }
-              break;
-            default:
-              wassertl (0, "Attempted to fetch too much data into HL");
               break;
             }
           }

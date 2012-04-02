@@ -338,7 +338,11 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             {
               symbol *isym = (symbol *)(hTabItemWithKey(liveRanges, i));
               for (reg_t k = 0; k < isym->nRegs; k++)
-                cfg[key_to_index[ic->key]].alive.insert(sym_to_index[std::pair<int, int>(i, k)]);
+                {
+                  wassert (key_to_index.find(ic->key) != key_to_index.end());
+                  wassert (sym_to_index.find(std::pair<int, int>(i, k)) != sym_to_index.end());
+                  cfg[key_to_index[ic->key]].alive.insert(sym_to_index[std::pair<int, int>(i, k)]);
+                }
             }
         }
 

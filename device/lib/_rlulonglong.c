@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _rrulonglong_rrx_s.c - routine for right shift of 64 bit unsigned long long
+   _rlulonglong.c - routine for left shift of 64 bit unsigned long long
 
    Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 
@@ -31,27 +31,28 @@
 #include <stdint.h>
 
 #ifdef __SDCC_LONGLONG
-// This function is the same as the one from rrslonglong_rrx_s.c, except for the type of top, and b[3].
-unsigned long long _rrulonglong_rrx_s(unsigned long long l, signed char s)
+
+unsigned long long _rlulonglong(unsigned long long l, signed char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
-	uint16_t *const middle = (uint16_t *)((char *)(&l) + 3);
+	uint16_t *const middle = (uint16_t *)((char *)(&l) + 2);
 	uint32_t *const bottom = (uint32_t *)(&l);
 	uint16_t *const b = (uint16_t *)(&l);
 
-	for(;s >= 16; s -= 16)
+	for(;s >= 16; s-= 16)
 	{
-		b[0] = b[1];
-		b[1] = b[2];
-		b[2] = b[3];
-		b[3] = 0x000000;
+		b[3] = b[2];
+		b[2] = b[1];
+		b[1] = b[0];
+		b[0] = 0;
 	}
 
-	(*bottom) >>= s;
-	(*middle) |= (((*middle) & 0xffff0000ul) >> s);
-	(*top) |= (((*middle) & 0xffff0000ul) >> s);
+	(*top) <<= s;
+	(*top) |= (((uint32_t)((*middle) & 0xffffu) << s) >> 16);
+	(*bottom) <<= s;
 
 	return(l);
 }
+
 #endif
 

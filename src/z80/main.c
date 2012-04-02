@@ -648,6 +648,9 @@ _mangleSupportFunctionName (const char *original)
 {
   struct dbuf_s dbuf;
 
+  if (strstr (original, "longlong"))
+    return (original);
+
   dbuf_init (&dbuf, 128);
   dbuf_printf (&dbuf, "%s_rr%s_%s", original, options.profile ? "f" : "x", options.noRegParams ? "s" : "bds"    /* MB: but the library only has hds variants ??? */
     );

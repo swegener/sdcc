@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _mullonglong.c - routine for left shift of 64 bit long long
+   _mullonglong.c - routine for multiplication of 64 bit long long
 
    Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 
@@ -32,7 +32,7 @@
 
 #ifdef __SDCC_LONGLONG
 
-long long _mullonglong_rrx_s(long long ll, long long lr)
+long long _mullonglong(long long ll, long long lr)
 {
   unsigned long long ret = 0ull;
   unsigned char *l = (unsigned char *)(&ll);

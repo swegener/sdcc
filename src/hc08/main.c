@@ -473,7 +473,7 @@ PORT hc08_port =
   },
     /* hc08 has an 8 bit mul */
   {
-    1, -1
+    1, 5
   },
   {
     hc08_emitDebuggerSymbol,

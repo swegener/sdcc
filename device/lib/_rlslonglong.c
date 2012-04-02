@@ -1,8 +1,7 @@
 /*-------------------------------------------------------------------------
-   _divslonglong_rrx_s.c - routine for divsion of 64 bit unsigned long long
+   _rlslonglong.c - routine for left shift of 64 bit long long
 
-   Copyright (C) 1999, Jean-Louis Vern <jlvern AT gmail.com>
-   Copyright (C) 2012, Philipp Klaus Krause . pkk@spth.de
+   Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -30,36 +29,13 @@
 #pragma std_c99
 
 #include <stdint.h>
-#include <stdbool.h>
 
 #ifdef __SDCC_LONGLONG
-#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
 
-unsigned long long
-_divulonglong_rrx_s (unsigned long long x, unsigned long long y)
+long long _rlslonglong(long long l, signed char s)
 {
-  unsigned long long reste = 0L;
-  unsigned char count = 64;
-  bool c;
-
-  do
-  {
-    // reste: x <- 0;
-    c = MSB_SET(x);
-    x <<= 1;
-    reste <<= 1;
-    if (c)
-      reste |= 1L;
-
-    if (reste >= y)
-    {
-      reste -= y;
-      // x <- (result = 1)
-      x |= 1L;
-    }
-  }
-  while (--count);
-  return x;
+	return((unsigned long long)(l) << s);
 }
+
 #endif
 

@@ -1,3 +1,46 @@
+2012-04-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c
+	  src/z80/main.c
+	  src/hc08/main.c
+	  src/hc08/gen.c
+	  src/hc08/ralloc.c
+	  device/include/stdint.h
+	  device/lib/_rlslonglong.c
+	  device/lib/_divslonglong.c
+	  device/lib/z180/Makefile.in
+	  device/lib/z180/stubs.s
+	  device/lib/_mullonglong.c
+	  device/lib/_rrslonglong.c
+	  device/lib/z80/Makefile.in
+	  device/lib/z80/stubs.s
+	  device/lib/gbz80/stubs.s
+	  device/lib/gbz80/Makefile.in
+	  device/lib/_rlulonglong.c
+	  device/lib/Makefile.in
+	  device/lib/_divulonglong.c
+	  device/lib/_divslonglong_rrx_s.c
+	  device/lib/_rrslonglong_rrx_s.c
+	  device/lib/_divulonglong_rrx_s.c
+	  device/lib/_rrulonglong_rrx_s.c
+	  device/lib/_rrulonglong.c
+	  device/lib/_rlslonglong_rrx_s.c
+	  device/lib/r2k/Makefile.in
+	  device/lib/r2k/stubs.s
+	  device/lib/_rlulonglong_rrx_s.c
+	  device/lib/hc08/Makefile.in
+	  device/lib/hc08/_ret.c
+	  support/regression/tests/gcc-torture-execute-991216-1.c
+	  support/regression/tests/gcc-torture-execute-pr47337.c
+	  support/regression/tests/gcc-torture-execute-991216-2.c
+	  support/regression/tests/gcc-torture-execute-pr20187-1.c
+	  support/regression/tests/gcc-torture-execute-20000121-1.c
+	  support/regression/tests/gcc-torture-execute-960801-1.c
+	  support/regression/tests/gcc-torture-execute-930111-1.c
+	  support/regression/tests/gcc-torture-execute-20001112-1.c
+	  support/regression/tests/gcc-torture-execute-20101013-1.c:
+	  long long for hc08.
+
 2012-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/Makefile.in,

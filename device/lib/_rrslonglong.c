@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _rlslong.c - routine for left shift of 64 bit long long
+   _rrulonglong.c - routine for right shift of 64 bit unsigned long long
 
    Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 
@@ -31,11 +31,27 @@
 #include <stdint.h>
 
 #ifdef __SDCC_LONGLONG
-
-long long _rlslonglong_rrx_s(long long l, signed char s)
+// This function is the same as the one from rrulonglong_rrx_s.c, except for the type of top.
+long long _rrslonglong(long long l, signed char s)
 {
-	return((unsigned long long)(l) << s);
-}
+	int32_t *top = (uint32_t *)((char *)(&l) + 4);
+	uint16_t *middle = (uint16_t *)((char *)(&l) + 3);
+	uint32_t *bottom = (uint32_t *)(&l);
+	uint16_t *b = (uint16_t *)(&l);
 
+	for(;s >= 16; s-= 16)
+	{
+		b[0] = b[1];
+		b[1] = b[2];
+		b[2] = b[3];
+		b[3] = (b[3] & 0x8000) ? 0xffff : 0x000000;
+	}
+
+	(*bottom) >>= s;
+	(*bottom) |= ((uint32_t)((*middle) >> s) << 16);
+	(*top) |= (((*middle) & 0xffff0000) >> s);
+
+	return(l);
+}
 #endif
 

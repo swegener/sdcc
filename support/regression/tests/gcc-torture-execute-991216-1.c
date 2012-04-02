@@ -10,7 +10,7 @@
 #endif
 
 // Some ports do not support long long yet.
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 
 #define VALUE 0x123456789abcdefLL
 #define AFTER 0x55
@@ -119,7 +119,7 @@ test8 (int a, int b, int c, int d, int e, int f, int g, int h, long long value, 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   test1 (1, VALUE, AFTER);
   test2 (1, 2, VALUE, AFTER);
   test3 (1, 2, 3, VALUE, AFTER);

@@ -1818,9 +1818,9 @@ regTypeNum (eBBlock *ebbs)
                         getSize (sym->type = aggrToPtr (sym->type, FALSE)) :
                         getSize (sym->type));
 
-          if (sym->nRegs > 4)
+          if (sym->nRegs > 8)
             {
-              fprintf (stderr, "allocated more than 4 or 0 registers for type ");
+              fprintf (stderr, "allocated more than 8 registers for type ");
               printTypeChain (sym->type, stderr);
               fprintf (stderr, "\n");
             }

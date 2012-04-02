@@ -68,7 +68,7 @@ static struct
   }
 _G;
 
-static asmop *hc08_aop_pass[4];
+static asmop *hc08_aop_pass[8];
 
 extern int hc08_ptrRegReq;
 extern int hc08_nRegs;
@@ -3038,6 +3038,7 @@ genRet (iCode * ic)
 #else
   switch (size)
     {
+      case 8:
       case 4:
         /* 4 byte return: store value in the global return variable */
         offset = size-1;
@@ -3058,6 +3059,8 @@ genRet (iCode * ic)
         loadRegFromAop (hc08_reg_a, AOP (IC_LEFT (ic)), 0);
         hc08_freeReg (hc08_reg_a);
         break;
+      default:
+        wassertl (0, "Return value has invalid size.");
     }
 #endif
 
@@ -6951,6 +6954,7 @@ genRightShiftLiteral (operand * left,
           genrshFour (result, left, shCount, sign);
           break;
         default:
+          wassertl (0, "Invalid operand size in right shift.");
           break;
         }
     }
@@ -8417,10 +8421,22 @@ genhc08Code (iCode * lic)
   hc08_aop_pass[1]->aopu.aop_reg[0] = hc08_reg_x;
   hc08_aop_pass[2] = newAsmop (AOP_DIR);
   hc08_aop_pass[2]->size=1;
-  hc08_aop_pass[2]->aopu.aop_dir = "__ret2";
+  hc08_aop_pass[2]->aopu.aop_dir = "___SDCC_hc08_ret2";
   hc08_aop_pass[3] = newAsmop (AOP_DIR);
   hc08_aop_pass[3]->size=1;
-  hc08_aop_pass[3]->aopu.aop_dir = "__ret3";
+  hc08_aop_pass[3]->aopu.aop_dir = "___SDCC_hc08_ret3";
+  hc08_aop_pass[4] = newAsmop (AOP_DIR);
+  hc08_aop_pass[4]->size=1;
+  hc08_aop_pass[4]->aopu.aop_dir = "___SDCC_hc08_ret4";
+  hc08_aop_pass[5] = newAsmop (AOP_DIR);
+  hc08_aop_pass[5]->size=1;
+  hc08_aop_pass[5]->aopu.aop_dir = "___SDCC_hc08_ret5";
+  hc08_aop_pass[6] = newAsmop (AOP_DIR);
+  hc08_aop_pass[6]->size=1;
+  hc08_aop_pass[6]->aopu.aop_dir = "___SDCC_hc08_ret6";
+  hc08_aop_pass[7] = newAsmop (AOP_DIR);
+  hc08_aop_pass[7]->size=1;
+  hc08_aop_pass[7]->aopu.aop_dir = "___SDCC_hc08_ret7";
 
   for (ic = lic; ic; ic = ic->next)
     {

@@ -32,7 +32,7 @@
 
 /* Exact integral types.  */
 
-#if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_gbz80)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 #if __STDC_VERSION__ >= 199901L
 #define __SDCC_LONGLONG
 #endif

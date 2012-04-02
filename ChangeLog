@@ -41,7 +41,8 @@
 	  support/regression/tests/gcc-torture-execute-20101013-1.c:
 	  long long for hc08.
 	* src/z80/gen.c,
-	  support/regression/tests/gcc-torture-execute-pr47337.c:
+	  support/regression/tests/gcc-torture-execute-pr47337.c,
+	  support/regression/tests/gcc-torture-execute-961213-1.c:
 	  Fixed bug #3513892.
 
 2012-04-01 Philipp Klaus Krause <pkk AT spth.de>

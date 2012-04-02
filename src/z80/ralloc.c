@@ -481,10 +481,13 @@ createStackSpil (symbol * sym)
 
   sloc->isref = 1;              /* to prevent compiler warning */
 
+  wassertl (currFunc, "Local variable used outside of function.");
+
   /* if it is on the stack then update the stack */
   if (IN_STACK (sloc->etype))
     {
-      currFunc->stack += getSize (sloc->type);
+      if (currFunc)
+        currFunc->stack += getSize (sloc->type);
       _G.stackExtend += getSize (sloc->type);
     }
   else

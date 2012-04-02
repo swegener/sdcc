@@ -46,6 +46,8 @@
 	  Fixed bug #3513892.
 	* src/SDCCralloc.hpp:
 	  Additional assertions to track down #3475617.
+	* src/z80/ralloc.c:
+	  Assertion for local variables outside of functions.
 
 2012-04-01 Philipp Klaus Krause <pkk AT spth.de>
 

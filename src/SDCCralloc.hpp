@@ -265,6 +265,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
     for (ic = start_ic, i = 0, j = 0; ic; ic = ic->next, i++)
       {
         boost::add_vertex(cfg);
+        wassertl (cfg[i].alive.empty(), "Alive set non-empty upon creation.");
         key_to_index[ic->key] = i;
 
         if(ic->op == SEND && ic->builtinSEND) // Ensure that only the very first send iCode is active.
@@ -317,18 +318,35 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   // Get control flow graph from sdcc.
   for (ic = start_ic; ic; ic = ic->next)
     {
+      wassertl (key_to_index[ic->key] < boost::num_vertices(cfg), "Node not in CFG.");
+
       if (ic->op != GOTO && ic->op != RETURN && ic->op != JUMPTABLE && ic->next)
-        boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], cfg);
+        {
+          wassertl (key_to_index[ic->next->key] < boost::num_vertices(cfg), "Next node not in CFG.");
+          boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], cfg);
+        }
 
       if (ic->op == GOTO)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, ic->label)->sch->key], cfg);
+        {
+          wassertl (key_to_index[eBBWithEntryLabel(ebbi, ic->label)->sch->key] < boost::num_vertices(cfg), "GOTO target not in CFG.");
+          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, ic->label)->sch->key], cfg);
+        }
       else if (ic->op == RETURN)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, returnLabel)->sch->key], cfg);
+        {
+          wassertl (key_to_index[eBBWithEntryLabel(ebbi, returnLabel)->sch->key] < boost::num_vertices(cfg), "RETURN target not in CFG.");
+          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, returnLabel)->sch->key], cfg);
+        }
       else if (ic->op == IFX)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, IC_TRUE(ic) ? IC_TRUE(ic) : IC_FALSE(ic))->sch->key], cfg);
+        {
+          wassertl (key_to_index[eBBWithEntryLabel(ebbi, IC_TRUE(ic) ? IC_TRUE(ic) : IC_FALSE(ic))->sch->key] < boost::num_vertices(cfg), "IFX target not in CFG.");
+          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, IC_TRUE(ic) ? IC_TRUE(ic) : IC_FALSE(ic))->sch->key], cfg);
+        }
       else if (ic->op == JUMPTABLE)
         for (symbol *lbl = (symbol *)(setFirstItem (IC_JTLABELS (ic))); lbl; lbl = (symbol *)(setNextItem (IC_JTLABELS (ic))))
-          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, lbl)->sch->key], cfg);
+          {
+            wassertl (key_to_index[eBBWithEntryLabel(ebbi, lbl)->sch->key] < boost::num_vertices(cfg), "GOTO target not in CFG.");
+            boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, lbl)->sch->key], cfg);
+          }
 
       for (int i = 0; i <= operandKey; i++)
         {

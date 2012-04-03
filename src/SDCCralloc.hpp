@@ -261,6 +261,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   {
     int i;
     var_t j;
+    wassertl (!boost::num_vertices(cfg), "CFG non-empty before creation.");
     for (ic = start_ic, i = 0, j = 0; ic; ic = ic->next, i++)
       {
         boost::add_vertex(cfg);
@@ -341,6 +342,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
                 {
                   wassert (key_to_index.find(ic->key) != key_to_index.end());
                   wassert (sym_to_index.find(std::pair<int, int>(i, k)) != sym_to_index.end());
+                  wassertl (key_to_index[ic->key] < boost::num_vertices(cfg), "Node not in CFG.");
                   cfg[key_to_index[ic->key]].alive.insert(sym_to_index[std::pair<int, int>(i, k)]);
                 }
             }

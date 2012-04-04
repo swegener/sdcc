@@ -1,6 +1,7 @@
 /* Get common system includes and various definitions and declarations based
    on autoconf macros.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008,
+   2009, 2010, 2011
    Free Software Foundation, Inc.
 
 This file is part of GCC.
@@ -46,6 +47,14 @@ along with GCC; see the file COPYING3.  If not see
 #endif
 
 /* Use the unlocked open routines from libiberty.  */
+
+/* Some of these are #define on some systems, e.g. on AIX to redirect
+   the names to 64bit capable functions for LARGE_FILES support. These
+   redefs are pointless here so we can override them.  */
+
+#undef fopen 
+#undef freopen 
+
 #define fopen(PATH,MODE) fopen_unlocked(PATH,MODE)
 #define fdopen(FILDES,MODE) fdopen_unlocked(FILDES,MODE)
 #define freopen(PATH,MODE,STREAM) freopen_unlocked(PATH,MODE,STREAM)
@@ -85,6 +94,10 @@ along with GCC; see the file COPYING3.  If not see
 #  undef fputc
 #  define fputc(C, Stream) fputc_unlocked (C, Stream)
 # endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 # ifdef HAVE_CLEARERR_UNLOCKED
 #  undef clearerr
@@ -166,6 +179,10 @@ extern int fprintf_unlocked (FILE *, const char *, ...);
 #  endif
 # endif
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 /* ??? Glibc's fwrite/fread_unlocked macros cause
@@ -176,11 +193,7 @@ extern int fprintf_unlocked (FILE *, const char *, ...);
 /* There are an extraordinary number of issues with <ctype.h>.
    The last straw is that it varies with the locale.  Use libiberty's
    replacement instead.  */
-#if defined(__APPLE__) && defined(__MACH__)
-#include <libiberty/safe-ctype.h>
-#else
-#include <safe-ctype.h>
-#endif
+#include "safe-ctype.h"
 
 #include <sys/types.h>
 
@@ -188,6 +201,10 @@ extern int fprintf_unlocked (FILE *, const char *, ...);
 
 #if !defined (errno) && defined (HAVE_DECL_ERRNO) && !HAVE_DECL_ERRNO
 extern int errno;
+#endif
+
+#ifdef __cplusplus
+# include <cstring>
 #endif
 
 /* Some of glibc's string inlines cause warnings.  Plus we'd rather
@@ -314,6 +331,9 @@ extern int errno;
 #ifndef O_WRONLY
 # define O_WRONLY 1
 #endif
+#ifndef O_BINARY
+# define O_BINARY 0
+#endif
 
 /* Some systems define these in, e.g., param.h.  We undefine these names
    here to avoid the warnings.  We prefer to use our definitions since we
@@ -353,10 +373,39 @@ extern int errno;
 #define WCOREFLG 0200
 #endif
 
+#include <signal.h>
+#if !defined (SIGCHLD) && defined (SIGCLD)
+# define SIGCHLD SIGCLD
+#endif
+
+#ifdef HAVE_SYS_MMAN_H
+# include <sys/mman.h>
+#endif
+
+#ifndef MAP_FAILED
+# define MAP_FAILED ((void *)-1)
+#endif
+
+#if !defined (MAP_ANONYMOUS) && defined (MAP_ANON)
+# define MAP_ANONYMOUS MAP_ANON
+#endif
+
+#ifdef HAVE_SYS_RESOURCE_H
+# include <sys/resource.h>
+#endif
+
+#ifdef HAVE_SYS_TIMES_H
+# include <sys/times.h>
+#endif
+
 /* The HAVE_DECL_* macros are three-state, undefined, 0 or 1.  If they
    are defined to 0 then we must provide the relevant declaration
    here.  These checks will be in the undefined state while configure
    is running so be careful to test "defined (HAVE_DECL_*)".  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined (HAVE_DECL_ATOF) && !HAVE_DECL_ATOF
 extern double atof (const char *);
@@ -398,8 +447,20 @@ extern void *sbrk (int);
 extern char *strstr (const char *, const char *);
 #endif
 
+#if defined (HAVE_DECL_STPCPY) && !HAVE_DECL_STPCPY
+extern char *stpcpy (char *, const char *);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #if defined (HAVE_DECL_MALLOC) && !HAVE_DECL_MALLOC
@@ -414,16 +475,30 @@ extern void *calloc (size_t, size_t);
 extern void *realloc (void *, size_t);
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* If the system doesn't provide strsignal, we get it defined in
    libiberty but no declaration is supplied.  */
-/* Disabled since it causes errors on solaris
 #if !defined (HAVE_STRSIGNAL) \
     || (defined (HAVE_DECL_STRSIGNAL) && !HAVE_DECL_STRSIGNAL)
 # ifndef strsignal
 extern const char *strsignal (int);
 # endif
 #endif
-*/
 
 #ifdef HAVE_GETRLIMIT
 # if defined (HAVE_DECL_GETRLIMIT) && !HAVE_DECL_GETRLIMIT
@@ -455,14 +530,21 @@ extern int snprintf (char *, size_t, const char *, ...);
 extern int vsnprintf(char *, size_t, const char *, va_list);
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 /* 1 if we have C99 designated initializers.  */
 #if !defined(HAVE_DESIGNATED_INITIALIZERS)
-#  if defined(__APPLE__) && (__MACH__)
-#define HAVE_DESIGNATED_INITIALIZERS 0
-#  else
 #define HAVE_DESIGNATED_INITIALIZERS \
-  ((GCC_VERSION >= 2007) || (__STDC_VERSION__ >= 199901L))
-#  endif
+  (((GCC_VERSION >= 2007) || (__STDC_VERSION__ >= 199901L)) \
+   && !defined(__cplusplus))
+#endif
+
+#if !defined(HAVE_DESIGNATED_UNION_INITIALIZERS)
+#define HAVE_DESIGNATED_UNION_INITIALIZERS \
+  (((GCC_VERSION >= 2007) || (__STDC_VERSION__ >= 199901L)) \
+   && (!defined(__cplusplus) || (GCC_VERSION >= 4007)))
 #endif
 
 #if HAVE_SYS_STAT_H
@@ -523,6 +605,15 @@ extern int vsnprintf(char *, size_t, const char *, va_list);
 # define mkdir(a,b) mkdir(a)
 #endif
 
+#ifndef HAVE_KILL
+# define kill(p,s) raise(s)
+#endif
+
+/* Provide a way to print an address via printf.  */
+#ifndef HOST_PTR_PRINTF
+#define HOST_PTR_PRINTF "%p"
+#endif /* ! HOST_PTR_PRINTF */
+
 /* By default, colon separates directories in a path.  */
 #ifndef PATH_SEPARATOR
 #define PATH_SEPARATOR ':'
@@ -537,6 +628,11 @@ extern int vsnprintf(char *, size_t, const char *, va_list);
 # ifdef HAVE_DOS_BASED_FILE_SYSTEM
 #  define DIR_SEPARATOR_2 '\\'
 # endif
+#endif
+
+#if defined (ENABLE_PLUGIN) && defined (HAVE_DLFCN_H)
+/* If plugin support is enabled, we could use libdl.  */
+#include <dlfcn.h>
 #endif
 
 /* Get libiberty declarations.  */
@@ -559,7 +655,7 @@ extern int vsnprintf(char *, size_t, const char *, va_list);
 #endif
 
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER)  ((size_t) &((TYPE *) 0)->MEMBER)
+#define offsetof(TYPE, MEMBER)        ((size_t) &((TYPE *) 0)->MEMBER)
 #endif
 
 /* Various error reporting routines want to use __FUNCTION__.  */
@@ -583,16 +679,29 @@ extern void fancy_abort (const char *, int, const char *) ATTRIBUTE_NORETURN;
 
 /* Use gcc_assert(EXPR) to test invariants.  */
 #if ENABLE_ASSERT_CHECKING
-#define gcc_assert(EXPR)                                                \
+#define gcc_assert(EXPR)                                                 \
    ((void)(!(EXPR) ? fancy_abort (__FILE__, __LINE__, __FUNCTION__), 0 : 0))
+#elif (GCC_VERSION >= 4005)
+#define gcc_assert(EXPR)                                                 \
+  ((void)(__builtin_expect(!(EXPR), 0) ? __builtin_unreachable(), 0 : 0))
 #else
 /* Include EXPR, so that unused variable warnings do not occur.  */
 #define gcc_assert(EXPR) ((void)(0 && (EXPR)))
 #endif
 
+#ifdef ENABLE_CHECKING
+#define gcc_checking_assert(EXPR) gcc_assert (EXPR)
+#else
+#define gcc_checking_assert(EXPR) ((void)(0 && (EXPR)))
+#endif
+
 /* Use gcc_unreachable() to mark unreachable locations (like an
    unreachable default case of a switch.  Do not use gcc_assert(0).  */
+#if (GCC_VERSION >= 4005) && !ENABLE_ASSERT_CHECKING
+#define gcc_unreachable() __builtin_unreachable()
+#else
 #define gcc_unreachable() (fancy_abort (__FILE__, __LINE__, __FUNCTION__))
+#endif
 
 /* Provide a fake boolean type.  We make no attempt to use the
    C99 _Bool, as it may not be available in the bootstrap compiler,
@@ -663,101 +772,146 @@ extern void fancy_abort (const char *, int, const char *) ATTRIBUTE_NORETURN;
  #pragma GCC poison malloc realloc
 #endif
 
+/* The %m format should be used when GCC's main diagnostic functions
+   supporting %m are available, and xstrerror from libiberty
+   otherwise.  */
+#undef strerror
+ #pragma GCC poison strerror
+
 /* Old target macros that have moved to the target hooks structure.  */
- #pragma GCC poison ASM_OPEN_PAREN ASM_CLOSE_PAREN                      \
-        FUNCTION_PROLOGUE FUNCTION_EPILOGUE                             \
-        FUNCTION_END_PROLOGUE FUNCTION_BEGIN_EPILOGUE                   \
-        DECL_MACHINE_ATTRIBUTES COMP_TYPE_ATTRIBUTES INSERT_ATTRIBUTES  \
-        VALID_MACHINE_DECL_ATTRIBUTE VALID_MACHINE_TYPE_ATTRIBUTE       \
-        SET_DEFAULT_TYPE_ATTRIBUTES SET_DEFAULT_DECL_ATTRIBUTES         \
-        MERGE_MACHINE_TYPE_ATTRIBUTES MERGE_MACHINE_DECL_ATTRIBUTES     \
-        MD_INIT_BUILTINS MD_EXPAND_BUILTIN ASM_OUTPUT_CONSTRUCTOR       \
-        ASM_OUTPUT_DESTRUCTOR SIGNED_CHAR_SPEC MAX_CHAR_TYPE_SIZE       \
-        WCHAR_UNSIGNED UNIQUE_SECTION SELECT_SECTION SELECT_RTX_SECTION \
-        ENCODE_SECTION_INFO STRIP_NAME_ENCODING ASM_GLOBALIZE_LABEL     \
-        ASM_OUTPUT_MI_THUNK CONST_COSTS RTX_COSTS DEFAULT_RTX_COSTS     \
+ #pragma GCC poison ASM_OPEN_PAREN ASM_CLOSE_PAREN                        \
+        FUNCTION_PROLOGUE FUNCTION_EPILOGUE                                \
+        FUNCTION_END_PROLOGUE FUNCTION_BEGIN_EPILOGUE                        \
+        DECL_MACHINE_ATTRIBUTES COMP_TYPE_ATTRIBUTES INSERT_ATTRIBUTES        \
+        VALID_MACHINE_DECL_ATTRIBUTE VALID_MACHINE_TYPE_ATTRIBUTE        \
+        SET_DEFAULT_TYPE_ATTRIBUTES SET_DEFAULT_DECL_ATTRIBUTES                \
+        MERGE_MACHINE_TYPE_ATTRIBUTES MERGE_MACHINE_DECL_ATTRIBUTES        \
+        MD_INIT_BUILTINS MD_EXPAND_BUILTIN ASM_OUTPUT_CONSTRUCTOR        \
+        ASM_OUTPUT_DESTRUCTOR SIGNED_CHAR_SPEC MAX_CHAR_TYPE_SIZE        \
+        WCHAR_UNSIGNED UNIQUE_SECTION SELECT_SECTION SELECT_RTX_SECTION        \
+        ENCODE_SECTION_INFO STRIP_NAME_ENCODING ASM_GLOBALIZE_LABEL        \
+        ASM_OUTPUT_MI_THUNK CONST_COSTS RTX_COSTS DEFAULT_RTX_COSTS        \
         ADDRESS_COST MACHINE_DEPENDENT_REORG ASM_FILE_START ASM_FILE_END \
         ASM_SIMPLIFY_DWARF_ADDR INIT_TARGET_OPTABS INIT_SUBTARGET_OPTABS \
         INIT_GOFAST_OPTABS MULSI3_LIBCALL MULDI3_LIBCALL DIVSI3_LIBCALL \
-        DIVDI3_LIBCALL UDIVSI3_LIBCALL UDIVDI3_LIBCALL MODSI3_LIBCALL   \
+        DIVDI3_LIBCALL UDIVSI3_LIBCALL UDIVDI3_LIBCALL MODSI3_LIBCALL        \
         MODDI3_LIBCALL UMODSI3_LIBCALL UMODDI3_LIBCALL BUILD_VA_LIST_TYPE \
-        PRETEND_OUTGOING_VARARGS_NAMED STRUCT_VALUE_INCOMING_REGNUM     \
-        ASM_OUTPUT_SECTION_NAME PROMOTE_FUNCTION_ARGS                   \
-        STRUCT_VALUE_INCOMING STRICT_ARGUMENT_NAMING                    \
-        PROMOTE_FUNCTION_RETURN PROMOTE_PROTOTYPES STRUCT_VALUE_REGNUM  \
-        SETUP_INCOMING_VARARGS EXPAND_BUILTIN_SAVEREGS                  \
-        DEFAULT_SHORT_ENUMS SPLIT_COMPLEX_ARGS MD_ASM_CLOBBERS          \
-        HANDLE_PRAGMA_REDEFINE_EXTNAME HANDLE_PRAGMA_EXTERN_PREFIX      \
+        PRETEND_OUTGOING_VARARGS_NAMED STRUCT_VALUE_INCOMING_REGNUM        \
+        ASM_OUTPUT_SECTION_NAME PROMOTE_FUNCTION_ARGS PROMOTE_FUNCTION_MODE \
+        STRUCT_VALUE_INCOMING STRICT_ARGUMENT_NAMING                        \
+        PROMOTE_FUNCTION_RETURN PROMOTE_PROTOTYPES STRUCT_VALUE_REGNUM        \
+        SETUP_INCOMING_VARARGS EXPAND_BUILTIN_SAVEREGS                        \
+        DEFAULT_SHORT_ENUMS SPLIT_COMPLEX_ARGS MD_ASM_CLOBBERS                \
+        HANDLE_PRAGMA_REDEFINE_EXTNAME HANDLE_PRAGMA_EXTERN_PREFIX        \
         MUST_PASS_IN_STACK FUNCTION_ARG_PASS_BY_REFERENCE               \
-        VECTOR_MODE_SUPPORTED_P TARGET_SUPPORTS_HIDDEN                  \
-        FUNCTION_ARG_PARTIAL_NREGS ASM_OUTPUT_DWARF_DTPREL              \
-        ALLOCATE_INITIAL_VALUE
+        VECTOR_MODE_SUPPORTED_P TARGET_SUPPORTS_HIDDEN                         \
+        FUNCTION_ARG_PARTIAL_NREGS ASM_OUTPUT_DWARF_DTPREL                \
+        ALLOCATE_INITIAL_VALUE LEGITIMIZE_ADDRESS FRAME_POINTER_REQUIRED \
+        CAN_ELIMINATE TRAMPOLINE_TEMPLATE INITIALIZE_TRAMPOLINE                \
+        TRAMPOLINE_ADJUST_ADDRESS STATIC_CHAIN STATIC_CHAIN_INCOMING        \
+        RETURN_POPS_ARGS UNITS_PER_SIMD_WORD OVERRIDE_OPTIONS                \
+        OPTIMIZATION_OPTIONS CLASS_LIKELY_SPILLED_P                        \
+        USING_SJLJ_EXCEPTIONS TARGET_UNWIND_INFO                        \
+        LABEL_ALIGN_MAX_SKIP LOOP_ALIGN_MAX_SKIP                        \
+        LABEL_ALIGN_AFTER_BARRIER_MAX_SKIP JUMP_ALIGN_MAX_SKIP                 \
+        CAN_DEBUG_WITHOUT_FP UNLIKELY_EXECUTED_TEXT_SECTION_NAME        \
+        HOT_TEXT_SECTION_NAME LEGITIMATE_CONSTANT_P ALWAYS_STRIP_DOTDOT        \
+        OUTPUT_ADDR_CONST_EXTRA SMALL_REGISTER_CLASSES
+
+/* Target macros only used for code built for the target, that have
+   moved to libgcc-tm.h or have never been present elsewhere.  */
+ #pragma GCC poison DECLARE_LIBRARY_RENAMES LIBGCC2_GNU_PREFIX                \
+        MD_UNWIND_SUPPORT MD_FROB_UPDATE_CONTEXT ENABLE_EXECUTE_STACK        \
+        REG_VALUE_IN_UNWIND_CONTEXT ASSUME_EXTENDED_UNWIND_CONTEXT
 
 /* Other obsolete target macros, or macros that used to be in target
    headers and were not used, and may be obsolete or may never have
    been used.  */
- #pragma GCC poison INT_ASM_OP ASM_OUTPUT_EH_REGION_BEG CPP_PREDEFINES     \
+ #pragma GCC poison INT_ASM_OP ASM_OUTPUT_EH_REGION_BEG CPP_PREDEFINES           \
         ASM_OUTPUT_EH_REGION_END ASM_OUTPUT_LABELREF_AS_INT SMALL_STACK    \
         DOESNT_NEED_UNWINDER EH_TABLE_LOOKUP OBJC_SELECTORS_WITHOUT_LABELS \
-        OMIT_EH_TABLE EASY_DIV_EXPR IMPLICIT_FIX_EXPR                      \
-        LONGJMP_RESTORE_FROM_STACK MAX_INT_TYPE_SIZE ASM_IDENTIFY_GCC      \
-        STDC_VALUE TRAMPOLINE_ALIGN ASM_IDENTIFY_GCC_AFTER_SOURCE          \
+        OMIT_EH_TABLE EASY_DIV_EXPR IMPLICIT_FIX_EXPR                           \
+        LONGJMP_RESTORE_FROM_STACK MAX_INT_TYPE_SIZE ASM_IDENTIFY_GCC           \
+        STDC_VALUE TRAMPOLINE_ALIGN ASM_IDENTIFY_GCC_AFTER_SOURCE           \
         SLOW_ZERO_EXTEND SUBREG_REGNO_OFFSET DWARF_LINE_MIN_INSTR_LENGTH   \
-        TRADITIONAL_RETURN_FLOAT NO_BUILTIN_SIZE_TYPE                      \
+        TRADITIONAL_RETURN_FLOAT NO_BUILTIN_SIZE_TYPE                           \
         NO_BUILTIN_PTRDIFF_TYPE NO_BUILTIN_WCHAR_TYPE NO_BUILTIN_WINT_TYPE \
-        BLOCK_PROFILER BLOCK_PROFILER_CODE FUNCTION_BLOCK_PROFILER         \
-        FUNCTION_BLOCK_PROFILER_EXIT MACHINE_STATE_SAVE                    \
-        MACHINE_STATE_RESTORE SCCS_DIRECTIVE SECTION_ASM_OP BYTEORDER      \
-        ASM_OUTPUT_DEFINE_LABEL_DIFFERENCE_SYMBOL HOST_WORDS_BIG_ENDIAN    \
-        OBJC_PROLOGUE ALLOCATE_TRAMPOLINE HANDLE_PRAGMA ROUND_TYPE_SIZE    \
-        ROUND_TYPE_SIZE_UNIT CONST_SECTION_ASM_OP CRT_GET_RFIB_TEXT        \
-        DBX_LBRAC_FIRST DBX_OUTPUT_ENUM DBX_OUTPUT_SOURCE_FILENAME         \
-        DBX_WORKING_DIRECTORY INSN_CACHE_DEPTH INSN_CACHE_SIZE             \
-        INSN_CACHE_LINE_WIDTH INIT_SECTION_PREAMBLE NEED_ATEXIT ON_EXIT    \
-        EXIT_BODY OBJECT_FORMAT_ROSE MULTIBYTE_CHARS MAP_CHARACTER         \
-        LIBGCC_NEEDS_DOUBLE FINAL_PRESCAN_LABEL DEFAULT_CALLER_SAVES       \
-        LOAD_ARGS_REVERSED MAX_INTEGER_COMPUTATION_MODE                    \
-        CONVERT_HARD_REGISTER_TO_SSA_P ASM_OUTPUT_MAIN_SOURCE_FILENAME     \
-        FIRST_INSN_ADDRESS TEXT_SECTION SHARED_BSS_SECTION_ASM_OP          \
-        PROMOTED_MODE EXPAND_BUILTIN_VA_END                                \
-        LINKER_DOES_NOT_WORK_WITH_DWARF2 FUNCTION_ARG_KEEP_AS_REFERENCE    \
-        GIV_SORT_CRITERION MAX_LONG_TYPE_SIZE MAX_LONG_DOUBLE_TYPE_SIZE    \
+        BLOCK_PROFILER BLOCK_PROFILER_CODE FUNCTION_BLOCK_PROFILER           \
+        FUNCTION_BLOCK_PROFILER_EXIT MACHINE_STATE_SAVE                           \
+        MACHINE_STATE_RESTORE SCCS_DIRECTIVE SECTION_ASM_OP BYTEORDER           \
+        ASM_OUTPUT_DEFINE_LABEL_DIFFERENCE_SYMBOL HOST_WORDS_BIG_ENDIAN           \
+        OBJC_PROLOGUE ALLOCATE_TRAMPOLINE HANDLE_PRAGMA ROUND_TYPE_SIZE           \
+        ROUND_TYPE_SIZE_UNIT CONST_SECTION_ASM_OP CRT_GET_RFIB_TEXT           \
+        DBX_LBRAC_FIRST DBX_OUTPUT_ENUM DBX_OUTPUT_SOURCE_FILENAME           \
+        DBX_WORKING_DIRECTORY INSN_CACHE_DEPTH INSN_CACHE_SIZE                   \
+        INSN_CACHE_LINE_WIDTH INIT_SECTION_PREAMBLE NEED_ATEXIT ON_EXIT           \
+        EXIT_BODY OBJECT_FORMAT_ROSE MULTIBYTE_CHARS MAP_CHARACTER           \
+        LIBGCC_NEEDS_DOUBLE FINAL_PRESCAN_LABEL DEFAULT_CALLER_SAVES           \
+        LOAD_ARGS_REVERSED MAX_INTEGER_COMPUTATION_MODE                           \
+        CONVERT_HARD_REGISTER_TO_SSA_P ASM_OUTPUT_MAIN_SOURCE_FILENAME           \
+        FIRST_INSN_ADDRESS TEXT_SECTION SHARED_BSS_SECTION_ASM_OP           \
+        PROMOTED_MODE EXPAND_BUILTIN_VA_END                                   \
+        LINKER_DOES_NOT_WORK_WITH_DWARF2 FUNCTION_ARG_KEEP_AS_REFERENCE           \
+        GIV_SORT_CRITERION MAX_LONG_TYPE_SIZE MAX_LONG_DOUBLE_TYPE_SIZE           \
         MAX_WCHAR_TYPE_SIZE SHARED_SECTION_ASM_OP INTEGRATE_THRESHOLD      \
-        FINAL_REG_PARM_STACK_SPACE MAYBE_REG_PARM_STACK_SPACE              \
-        TRADITIONAL_PIPELINE_INTERFACE DFA_PIPELINE_INTERFACE              \
-        DBX_OUTPUT_STANDARD_TYPES BUILTIN_SETJMP_FRAME_VALUE               \
-        SUNOS4_SHARED_LIBRARIES PROMOTE_FOR_CALL_ONLY                      \
-        SPACE_AFTER_L_OPTION NO_RECURSIVE_FUNCTION_CSE                     \
-        DEFAULT_MAIN_RETURN TARGET_MEM_FUNCTIONS EXPAND_BUILTIN_VA_ARG     \
+        FINAL_REG_PARM_STACK_SPACE MAYBE_REG_PARM_STACK_SPACE                   \
+        TRADITIONAL_PIPELINE_INTERFACE DFA_PIPELINE_INTERFACE                   \
+        DBX_OUTPUT_STANDARD_TYPES BUILTIN_SETJMP_FRAME_VALUE                   \
+        SUNOS4_SHARED_LIBRARIES PROMOTE_FOR_CALL_ONLY                           \
+        SPACE_AFTER_L_OPTION NO_RECURSIVE_FUNCTION_CSE                           \
+        DEFAULT_MAIN_RETURN TARGET_MEM_FUNCTIONS EXPAND_BUILTIN_VA_ARG           \
         COLLECT_PARSE_FLAG DWARF2_GENERATE_TEXT_SECTION_LABEL WINNING_GDB  \
-        ASM_OUTPUT_FILENAME ASM_OUTPUT_SOURCE_LINE FILE_NAME_JOINER        \
-        GDB_INV_REF_REGPARM_STABS_LETTER DBX_MEMPARM_STABS_LETTER          \
-        PUT_SDB_SRC_FILE STABS_GCC_MARKER DBX_OUTPUT_FUNCTION_END          \
-        DBX_OUTPUT_GCC_MARKER DBX_FINISH_SYMBOL SDB_GENERATE_FAKE          \
-        NON_SAVING_SETJMP TARGET_LATE_RTL_PROLOGUE_EPILOGUE                \
+        ASM_OUTPUT_FILENAME ASM_OUTPUT_SOURCE_LINE FILE_NAME_JOINER           \
+        GDB_INV_REF_REGPARM_STABS_LETTER DBX_MEMPARM_STABS_LETTER           \
+        PUT_SDB_SRC_FILE STABS_GCC_MARKER DBX_OUTPUT_FUNCTION_END           \
+        DBX_OUTPUT_GCC_MARKER DBX_FINISH_SYMBOL SDB_GENERATE_FAKE           \
+        NON_SAVING_SETJMP TARGET_LATE_RTL_PROLOGUE_EPILOGUE                   \
         CASE_DROPS_THROUGH TARGET_BELL TARGET_BS TARGET_CR TARGET_DIGIT0   \
         TARGET_ESC TARGET_FF TARGET_NEWLINE TARGET_TAB TARGET_VT           \
-        LINK_LIBGCC_SPECIAL DONT_ACCESS_GBLS_AFTER_EPILOGUE                \
-        TARGET_OPTIONS TARGET_SWITCHES EXTRA_CC_MODES FINALIZE_PIC         \
-        PREDICATE_CODES SPECIAL_MODE_PREDICATES HOST_PTR_PRINTF            \
-        EXTRA_SECTIONS EXTRA_SECTION_FUNCTIONS READONLY_DATA_SECTION       \
+        LINK_LIBGCC_SPECIAL DONT_ACCESS_GBLS_AFTER_EPILOGUE                   \
+        TARGET_OPTIONS TARGET_SWITCHES EXTRA_CC_MODES FINALIZE_PIC           \
+        PREDICATE_CODES SPECIAL_MODE_PREDICATES        UNALIGNED_WORD_ASM_OP           \
+        EXTRA_SECTIONS EXTRA_SECTION_FUNCTIONS READONLY_DATA_SECTION           \
         TARGET_ASM_EXCEPTION_SECTION TARGET_ASM_EH_FRAME_SECTION           \
-        SMALL_ARG_MAX ASM_OUTPUT_SHARED_BSS ASM_OUTPUT_SHARED_COMMON       \
-        ASM_OUTPUT_SHARED_LOCAL UNALIGNED_WORD_ASM_OP                      \
-        ASM_MAKE_LABEL_LINKONCE
+        SMALL_ARG_MAX ASM_OUTPUT_SHARED_BSS ASM_OUTPUT_SHARED_COMMON           \
+        ASM_OUTPUT_SHARED_LOCAL ASM_MAKE_LABEL_LINKONCE                           \
+        STACK_CHECK_PROBE_INTERVAL STACK_CHECK_PROBE_LOAD                   \
+        ORDER_REGS_FOR_LOCAL_ALLOC FUNCTION_OUTGOING_VALUE                   \
+        ASM_DECLARE_CONSTANT_NAME MODIFY_TARGET_NAME SWITCHES_NEED_SPACES  \
+        SWITCH_CURTAILS_COMPILATION SWITCH_TAKES_ARG WORD_SWITCH_TAKES_ARG \
+        TARGET_OPTION_TRANSLATE_TABLE HANDLE_PRAGMA_PACK_PUSH_POP           \
+        HANDLE_SYSV_PRAGMA HANDLE_PRAGMA_WEAK CONDITIONAL_REGISTER_USAGE   \
+        FUNCTION_ARG_BOUNDARY MUST_USE_SJLJ_EXCEPTIONS US_SOFTWARE_GOFAST  \
+        USING_SVR4_H SVR4_ASM_SPEC FUNCTION_ARG FUNCTION_ARG_ADVANCE           \
+        FUNCTION_INCOMING_ARG IRA_COVER_CLASSES TARGET_VERSION                   \
+        MACHINE_TYPE TARGET_HAS_TARGETCM ASM_OUTPUT_BSS                           \
+        SETJMP_VIA_SAVE_AREA FORBIDDEN_INC_DEC_CLASSES                           \
+        PREFERRED_OUTPUT_RELOAD_CLASS SYSTEM_INCLUDE_DIR                   \
+        STANDARD_INCLUDE_DIR STANDARD_INCLUDE_COMPONENT
 
 /* Hooks that are no longer used.  */
- #pragma GCC poison LANG_HOOKS_FUNCTION_MARK LANG_HOOKS_FUNCTION_FREE   \
+ #pragma GCC poison LANG_HOOKS_FUNCTION_MARK LANG_HOOKS_FUNCTION_FREE        \
         LANG_HOOKS_MARK_TREE LANG_HOOKS_INSERT_DEFAULT_ATTRIBUTES \
         LANG_HOOKS_TREE_INLINING_ESTIMATE_NUM_INSNS \
         LANG_HOOKS_PUSHLEVEL LANG_HOOKS_SET_BLOCK \
         LANG_HOOKS_MAYBE_BUILD_CLEANUP LANG_HOOKS_UPDATE_DECL_AFTER_SAVING \
-        LANG_HOOKS_POPLEVEL LANG_HOOKS_TRUTHVALUE_CONVERSION
+        LANG_HOOKS_POPLEVEL LANG_HOOKS_TRUTHVALUE_CONVERSION \
+        TARGET_PROMOTE_FUNCTION_ARGS TARGET_PROMOTE_FUNCTION_RETURN \
+        LANG_HOOKS_MISSING_ARGUMENT LANG_HOOKS_HASH_TYPES \
+        TARGET_HANDLE_OFAST TARGET_OPTION_OPTIMIZATION \
+        TARGET_IRA_COVER_CLASSES TARGET_HELP
+
+/* Arrays that were deleted in favor of a functional interface.  */
+ #pragma GCC poison built_in_decls implicit_built_in_decls
+
+/* Hooks into libgcc2.  */
+ #pragma GCC poison LIBGCC2_DOUBLE_TYPE_SIZE LIBGCC2_WORDS_BIG_ENDIAN \
+   LIBGCC2_FLOAT_WORDS_BIG_ENDIAN
 
 /* Miscellaneous macros that are no longer used.  */
- #pragma GCC poison USE_MAPPED_LOCATION
+ #pragma GCC poison USE_MAPPED_LOCATION GET_ENVIRONMENT
 
- /* Libiberty macros that are no longer used in GCC.  */
+/* Libiberty macros that are no longer used in GCC.  */
 #undef ANSI_PROTOTYPES
 #undef PTR_CONST
 #undef LONG_DOUBLE
@@ -769,6 +923,12 @@ extern void fancy_abort (const char *, int, const char *) ATTRIBUTE_NORETURN;
  #pragma GCC poison ANSI_PROTOTYPES PTR_CONST LONG_DOUBLE VPARAMS VA_OPEN \
   VA_FIXEDARG VA_CLOSE VA_START
 #endif /* IN_GCC */
+
+/* Front ends should never have to include middle-end headers.  Enforce
+   this by poisoning the header double-include protection defines.  */
+#ifdef IN_GCC_FRONTEND
+#pragma GCC poison GCC_RTL_H GCC_EXCEPT_H GCC_EXPR_H
+#endif
 
 /* Note: not all uses of the `index' token (e.g. variable names and
    structure members) have been eliminated.  */
@@ -796,12 +956,30 @@ extern void fancy_abort (const char *, int, const char *) ATTRIBUTE_NORETURN;
    change after the fact).  Beyond these uses, most other cases of
    using this macro should be viewed with extreme caution.  */
 
+#ifdef __cplusplus
+#define CONST_CAST2(TOTYPE,FROMTYPE,X) (const_cast<TOTYPE> (X))
+#else
 #if defined(__GNUC__) && GCC_VERSION > 4000
 /* GCC 4.0.x has a bug where it may ICE on this expression,
    so does GCC 3.4.x (PR17436).  */
 #define CONST_CAST2(TOTYPE,FROMTYPE,X) ((__extension__(union {FROMTYPE _q; TOTYPE _nq;})(X))._nq)
+#elif defined(__GNUC__)
+static inline char *
+helper_const_non_const_cast (const char *p)
+{
+  union {
+    const char *const_c;
+    char *c;
+  } val;
+  val.const_c = p;
+  return val.c;
+}
+
+#define CONST_CAST2(TOTYPE,FROMTYPE,X) \
+        ((TOTYPE) helper_const_non_const_cast ((const char *) (FROMTYPE) (X)))
 #else
 #define CONST_CAST2(TOTYPE,FROMTYPE,X) ((TOTYPE)(FROMTYPE)(X))
+#endif
 #endif
 #define CONST_CAST(TYPE,X) CONST_CAST2(TYPE, const TYPE, (X))
 #define CONST_CAST_TREE(X) CONST_CAST(union tree_node *, (X))
@@ -842,6 +1020,16 @@ extern void fancy_abort (const char *, int, const char *) ATTRIBUTE_NORETURN;
 #define VALGRIND_DISCARD(x)
 #define VALGRIND_MALLOCLIKE_BLOCK(w,x,y,z)
 #define VALGRIND_FREELIKE_BLOCK(x,y)
+#endif
+
+/* In LTO -fwhole-program build we still want to keep the debug functions available
+   for debugger.  Mark them as used to prevent removal.  */
+#if (GCC_VERSION > 4000)
+#define DEBUG_FUNCTION __attribute__ ((__used__))
+#define DEBUG_VARIABLE __attribute__ ((__used__))
+#else
+#define DEBUG_FUNCTION
+#define DEBUG_VARIABLE
 #endif
 
 /* SDCC specific */

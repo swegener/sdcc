@@ -386,10 +386,12 @@
     <ClInclude Include="ansidecl.h" />
     <ClInclude Include="auto-host.h" />
     <CustomBuild Include="auto-host_vc_in.h">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy auto-host_vc_in.h auto-host.h &gt; nul</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy auto-host_vc_in.h auto-host.h &gt; nul</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) auto-host.h &gt; nul</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) auto-host.h &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">auto-host.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">auto-host.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: auto-host.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: auto-host.h</Message>
     </CustomBuild>
     <ClInclude Include="c-incpath.h" />
     <ClInclude Include="config.h" />
@@ -424,16 +426,18 @@
   <ItemGroup>
     <CustomBuild Include="sdcpp.opt">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f opt-gather.awk sdcpp.opt &gt; $(TMP)\genopts.tmp
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f opt-gather.awk %(Identity) &gt; $(TMP)\genopts.tmp
 gawk -f opt-functions.awk -f optc-gen.awk -v header_name="config.h system.h options.h" $(TMP)\genopts.tmp &gt; options.c
 gawk -f opt-functions.awk -f opth-gen.awk $(TMP)\genopts.tmp &gt; options.h
 del $(TMP)\genopts.tmp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f opt-gather.awk sdcpp.opt &gt; $(TMP)\genopts.tmp
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f opt-gather.awk %(Identity) &gt; $(TMP)\genopts.tmp
 gawk -f opt-functions.awk -f optc-gen.awk -v header_name="config.h system.h options.h" $(TMP)\genopts.tmp &gt; options.c
 gawk -f opt-functions.awk -f opth-gen.awk $(TMP)\genopts.tmp &gt; options.h
 del $(TMP)\genopts.tmp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">options.c;options.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">options.c;options.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: options.c and options.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: options.c and options.h</Message>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

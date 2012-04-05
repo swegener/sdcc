@@ -139,8 +139,8 @@ bool operand_sane(const operand *o, const assignment &a, unsigned short int i, c
   return(true);
 }
 
-template <class G_t, class I_t> static float
-default_instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+template <class G_t, class I_t>
+static float default_instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   float c = 0.0f;
 
@@ -380,8 +380,8 @@ jumptab_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t 
   return(default_operand_cost(IC_JTCOND(ic), a, i, G, I));
 }
 
-template <class I_t> void
-add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
+template <class I_t>
+static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
 {
   const iCode *ic = n.ic;
   
@@ -1201,9 +1201,9 @@ bool local_assignment_insane(const assignment &a, const I_t &I, var_t lastvar)
   return(false);
 }
 
-// For early removel of assignments that cannot be extended to valid assignments.
+// For early removal of assignments that cannot be extended to valid assignments.
 template <class G_t, class I_t>
-bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar)
+static bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar)
 {
   // Can check for Ainst_ok() since A only contains 1-byte variables.
   if(!Ainst_ok(a, i, G, I))

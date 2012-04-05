@@ -220,19 +220,19 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> cfg_
 
 // Cost function. Port-specific.
 template <class G_t, class I_t>
-float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I);
+static float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I);
 
 // For early removel of assignments that cannot be extended to valid assignments. Port-specific.
 template <class G_t, class I_t>
-bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar);
+static bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar);
 
 // Rough cost estimate. Port-specific.
 template <class G_t, class I_t>
-float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I);
+static float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I);
 
 // Avoid overwriting operands that are still needed by the result. Port-specific.
-template <class I_t> void
-add_operand_conflicts_in_node(const cfg_node &n, I_t &I);
+template <class I_t>
+static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I);
 
 inline void
 add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>, var_t> &sym_to_index)

@@ -1320,8 +1320,10 @@ float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &
 }
 
 template <class T_t, class G_t, class I_t>
-void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
+bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
 {
+  bool assignment_optimal;
+
   con2_t I2(boost::num_vertices(I));
   for(unsigned int i = 0; i < boost::num_vertices(I); i++)
     {
@@ -1336,7 +1338,7 @@ void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
 
   assignment ac;
   assignment_optimal = true;
-  tree_dec_ralloc_nodes(T, find_root(T), G, I2, ac);
+  tree_dec_ralloc_nodes(T, find_root(T), G, I2, ac, &assignment_optimal);
 
   const assignment &winner = *(T[find_root(T)].assignments.begin());
 
@@ -1398,6 +1400,8 @@ void tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
 
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
+
+  return(!assignment_optimal);
 }
 
 // Omit the frame pointer for functions with low register pressure and few parameter accesses.
@@ -1488,7 +1492,7 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   if(options.dump_graphs)
     dump_tree_decomposition(tree_decomposition);
 
-  tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+  z80_assignment_optimal = tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
 
   return(ic);
 }

@@ -4193,7 +4193,7 @@ genFunction (const iCode * ic)
   /* Create the function header */
   emit2 ("!functionheader", sym->name);
 
-  emitDebug(assignment_optimal ? "; Register assignment is optimal." : "; Register assignment might be sub-optimal.");
+  emitDebug(z80_assignment_optimal ? "; Register assignment is optimal." : "; Register assignment might be sub-optimal.");
   emitDebug("; Stack space usage: %d bytes.", sym->stack);
 
   if (!IS_STATIC(sym->etype))

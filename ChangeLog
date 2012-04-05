@@ -3,8 +3,10 @@
 	* support/regression/tests/gcc-torture-execute-20080529-1.c:
 	  Disable test for gcc older than 5.0.
 	* src/z80/ralloc2.cc,
-	  src/SDCCralloc.hpp:
-	  Make optimal allocator less z80-specific.
+	  src/SDCCralloc.hpp,
+	  src/z80/gen.h,
+	  src/z80/gen.c:
+	  Made optimal allocator less z80-specific.
 
 2012-04-04 Borut Razem <borut.razem AT gmail.com>
 

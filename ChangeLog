@@ -1,5 +1,10 @@
 2012-04-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/gcc-torture-execute-20080529-1.c:
+	  Disable test for gcc older than 5.0.
+
+2012-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCralloc.hpp:
 	  Additional assertions to track down #3475617 and #3506333.
 

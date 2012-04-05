@@ -1,6 +1,6 @@
 // Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2011
 //
-// (c) 2010-2011 Goethe-Universität Frankfurt
+// (c) 2010-2012 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -53,8 +53,11 @@ extern "C"
 #include "SDCCsymt.h"
 #include "SDCCicode.h"
 #include "SDCCBBlock.h"
+#include "SDCCopt.h"
+#include "SDCClrange.h"
+#include "SDCCy.h"
 
-#include "z80.h"
+#include "port.h"
 #include "ralloc.h"
 
 iCode *ifxForOp (operand *op, const iCode *ic); // Todo: Move this port-dependency somewhere else!
@@ -73,7 +76,7 @@ typedef short int var_t;
 typedef signed char reg_t;
 
 // Todo: Move this port-dependency somewehere else?
-#define NUM_REGS (5 + (OPTRALLOC_HL ? 2 : 0) + (OPTRALLOC_IY ? 2 : 0))
+#define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? 9 : ((TARGET_IS_GBZ80 || TARGET_IS_HC08)? 5 : 0))
 // Upper bound on NUM_REGS
 #define MAX_NUM_REGS 9
 

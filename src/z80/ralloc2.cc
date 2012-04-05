@@ -23,10 +23,11 @@
 
 #include "SDCCralloc.hpp"
 
-
 extern "C"
 {
+  #include "z80.h"
   unsigned char dryZ80iCode (iCode * ic);
+  bool z80_assignment_optimal;
   bool should_omit_frame_ptr;
 };
 

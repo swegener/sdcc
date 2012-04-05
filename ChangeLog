@@ -1,14 +1,17 @@
+2012-04-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20080529-1.c:
+	  Disable test for gcc older than 5.0.
+	* src/z80/ralloc2.cc,
+	  src/SDCCralloc.hpp:
+	  Make optimal allocator less z80-specific.
+
 2012-04-04 Borut Razem <borut.razem AT gmail.com>
 
 	* support/cpp/system.h, support/cpp/libiberty/filenames.h,
 	  support/cpp/libiberty/md5.c, support/cpp/libiberty/obstack.h:
 	  sdcpp partially synchronized with GCC CPP release version 4.7.0
 	* support/cpp/sdcpp.vcxproj: enhancements, added custom build messages
-
-2012-04-03 Philipp Klaus Krause <pkk AT spth.de>
-
-	* support/regression/tests/gcc-torture-execute-20080529-1.c:
-	  Disable test for gcc older than 5.0.
 
 2012-04-03 Philipp Klaus Krause <pkk AT spth.de>
 

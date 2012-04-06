@@ -46,22 +46,8 @@
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/graph/connected_components.hpp>
 
+#include "common.h"
 #include "SDCCtree_dec.hpp"
-
-extern "C"
-{
-#include "SDCCsymt.h"
-#include "SDCCicode.h"
-#include "SDCCBBlock.h"
-#include "SDCCopt.h"
-#include "SDCClrange.h"
-#include "SDCCy.h"
-
-#include "port.h"
-#include "ralloc.h"
-
-iCode *ifxForOp (operand *op, const iCode *ic); // Todo: Move this port-dependency somewhere else!
-}
 
 #ifdef HAVE_STX_BTREE_SET_H
 #include <stx/btree_set.h>

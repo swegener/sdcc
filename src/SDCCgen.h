@@ -82,6 +82,10 @@ typedef struct genLine_s
 
 extern genLine_t genLine;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 lineNode *newLineNode (const char *line);
 lineNode *connectLine (lineNode * pl1, lineNode * pl2);
 void destroy_line_list (void);
@@ -92,5 +96,10 @@ void emitcode (const char *inst, const char *fmt, ...);
 void emitLabel (symbol * tlbl);
 void genInline (iCode * ic);
 void printLine (lineNode *, struct dbuf_s *);
+iCode *ifxForOp (operand *op, const iCode *ic);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

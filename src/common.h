@@ -32,6 +32,12 @@
 #endif
 #endif
 
+/* C++ incompatible heared files */
+#ifdef __cplusplus
+/* TODO: the extern "C" should be moved to each header file */
+extern "C" {
+#endif
+
 #include "SDCCglobl.h"
 #include "SDCCmem.h"
 #include "SDCCast.h"
@@ -54,10 +60,16 @@
 #include "SDCCdebug.h"
 #include "SDCCutil.h"
 #include "SDCCasm.h"
-#include "SDCCgen.h"
 
 #include "port.h"
 
 #include "newalloc.h"
+
+#ifdef __cplusplus
+}
+#endif
+
+/* C++ compatible heared files */
+#include "SDCCgen.h"
 
 #endif

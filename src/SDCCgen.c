@@ -293,3 +293,30 @@ printLine (lineNode * head, struct dbuf_s *oBuf)
       head = head->next;
     }
 }
+
+/*-----------------------------------------------------------------*/
+/* ifxForOp - returns the icode containing the ifx for operand     */
+/*-----------------------------------------------------------------*/
+iCode *
+ifxForOp (operand * op, const iCode * ic)
+{
+  iCode *ifxIc;
+
+  /* if true symbol then needs to be assigned */
+  if (!IS_TRUE_SYMOP (op))
+    {
+      /* if this has register type condition and
+         while skipping ipop's (see bug 1509084),
+         the next instruction is ifx with the same operand
+         and live to of the operand is upto the ifx only then */
+      for (ifxIc = ic->next; ifxIc && ifxIc->op == IPOP; ifxIc = ifxIc->next)
+        ;
+
+      if (ifxIc && ifxIc->op == IFX &&
+        IC_COND (ifxIc)->key == op->key &&
+        OP_SYMBOL (op)->liveTo <= ifxIc->seq)
+        return ifxIc;
+    }
+
+  return NULL;
+}

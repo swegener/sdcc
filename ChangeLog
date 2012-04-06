@@ -5,6 +5,8 @@
 	  src/pic16/gen.c, src/ds390/gen.c, src/hc08/gen.c:
 	  fixed NetBSD sparc64 build, code beautification,
 	  additional unification of target code generation
+	* support/cpp/configure.in, support/cpp/configure,
+	  support/cpp/system.h: fixed sdcc configure include paths
 
 2012-04-05 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -285,7 +285,7 @@ printLine (lineNode * head, struct dbuf_s *oBuf)
         {
           if (head->isInline && *head->line == '#')
             {
-              // comment out preprocessor directives in inline asm
+              /* comment out preprocessor directives in inline asm */
               dbuf_append_char (oBuf, ';');
             }
           dbuf_printf (oBuf, "\t%s\n", head->line);

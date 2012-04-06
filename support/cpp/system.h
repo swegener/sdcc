@@ -493,14 +493,12 @@ extern "C" {
 
 /* If the system doesn't provide strsignal, we get it defined in
    libiberty but no declaration is supplied.  */
-/* Disabled since it causes errors on solaris
 #if !defined (HAVE_STRSIGNAL) \
     || (defined (HAVE_DECL_STRSIGNAL) && !HAVE_DECL_STRSIGNAL)
 # ifndef strsignal
 extern const char *strsignal (int);
 # endif
 #endif
-*/
 
 #ifdef HAVE_GETRLIMIT
 # if defined (HAVE_DECL_GETRLIMIT) && !HAVE_DECL_GETRLIMIT

@@ -216,7 +216,7 @@ AC_FUNC_MMAP_FILE
 
 # We will need to find libiberty.h and ansidecl.h
 saved_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/../include"
+CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/libiberty -I${srcdir}/libcpp/include"
 gcc_AC_CHECK_DECLS(getenv abort strsignal errno \
         malloc realloc calloc free clock, , ,[
 #include "ansidecl.h"

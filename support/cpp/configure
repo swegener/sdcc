@@ -5255,7 +5255,7 @@ fi
 
 # We will need to find libiberty.h and ansidecl.h
 saved_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/../include"
+CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/libiberty -I${srcdir}/libcpp/include"
 for ac_func in getenv abort strsignal errno \
         malloc realloc calloc free clock
 do

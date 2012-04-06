@@ -209,7 +209,7 @@ genInline (iCode * ic)
 
   buf = bp = begin = Safe_strdup (IC_INLINE (ic));
 
-  /* emit each line as a code */
+  /* Emit each line as a code */
   while (*bp)
     {
       switch (*bp)
@@ -223,6 +223,11 @@ genInline (iCode * ic)
         case '\n':
           inComment = FALSE;
           *bp++ = '\0';
+
+          /* Don't emit leading whitespaces */
+          while (isspace (*begin))
+            begin++;
+
           emitcode (begin, NULL);
           begin = bp;
           break;

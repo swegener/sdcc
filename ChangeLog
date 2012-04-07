@@ -1,3 +1,8 @@
+2012-04-07 Borut Razem <borut.razem AT gmail.com>
+
+	* src/common.h: fixed mingw32 build on derna: macros min and max
+	  should not be defined when compiled with C++
+
 2012-04-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp:

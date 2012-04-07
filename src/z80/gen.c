@@ -3975,6 +3975,7 @@ emitCall (const iCode * ic, bool ispcall)
       eInRet = bitVectBitValue (result, E_IDX);
       hInRet = bitVectBitValue (result, H_IDX);
       lInRet = bitVectBitValue (result, L_IDX);
+      freeBitVect (result);
     }
   else
     {

@@ -707,7 +707,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(true);
   if(SKIP_IC2(ic))
     return(true);
-  if(ic->op == IPUSH && input_in_H && (getSize(operandType(IC_LEFT(ic))) <= 2 || I[ia.registers[REG_L][1]].byte == 2 && I[ia.registers[REG_H][1]].byte == 3))
+  if(ic->op == IPUSH && input_in_H && (getSize(operandType(IC_LEFT(ic))) <= 2 || ia.registers[REG_L][1] > 0 && I[ia.registers[REG_L][1]].byte == 2 && ia.registers[REG_H][1] > 0 && I[ia.registers[REG_H][1]].byte == 3))
     return(true);
   if(ic->op == IPUSH && ic->next && ic->next->op == CALL)
     return(true);
@@ -935,7 +935,7 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   const operand *right = IC_RIGHT(ic);
   const operand *result = IC_RESULT(ic);
 
-  const std::set<var_t> &dying = G[i].dying;
+  //const std::set<var_t> &dying = G[i].dying;
 
   if(ic->op == PCALL)
     return(false);

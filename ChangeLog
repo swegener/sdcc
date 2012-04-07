@@ -1,3 +1,8 @@
+2012-04-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp:
+	  Additional assertion to track down #3475617 and #3506333.
+
 2012-04-06 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCgen.c, src/SDCCgen.h, src/SDCCralloc.hpp, src/common.h,

@@ -10,17 +10,29 @@
 
 #ifndef __cplusplus
 # ifndef _MSC_VER
-#  include <stdbool.h>
-#  define  TRUE  true
-#  define  FALSE false
+#   include <stdbool.h>
+#   ifndef TRUE
+#     define TRUE   true
+#   endif
+#   ifndef FALSE
+#     define FALSE  false
+#   endif
 # else
 typedef unsigned char bool;
-#  define  TRUE   1
-#  define  FALSE  0
+#   ifndef TRUE
+#     define TRUE   1
+#   endif
+#   ifndef FALSE
+#     define FALSE  0
+#   endif
 # endif
 #else
-#  define  TRUE   true
-#  define  FALSE  false
+# ifndef TRUE
+#   define TRUE     true
+# endif
+# ifndef FALSE
+#   define FALSE    false
+# endif
 #endif
 
 #include "SDCCset.h"
@@ -33,37 +45,37 @@ typedef unsigned char bool;
 #define UNIX_DIR_SEPARATOR_CHAR    '/'
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#define STRNCASECMP strnicmp
+# define STRCASECMP   stricmp
+# define STRNCASECMP  strnicmp
 #else
-#define STRCASECMP strcasecmp
-#define STRNCASECMP strncasecmp
+# define STRCASECMP   strcasecmp
+# define STRNCASECMP  strncasecmp
 #endif
 
 #if defined(__MSDOS__) || defined(_WIN32) || defined(__OS2__) || defined (__CYGWIN__)
 
-#ifndef HAVE_DOS_BASED_FILE_SYSTEM
-#define HAVE_DOS_BASED_FILE_SYSTEM 1
-#endif
+# ifndef HAVE_DOS_BASED_FILE_SYSTEM
+#   define HAVE_DOS_BASED_FILE_SYSTEM 1
+# endif
 
-#define IS_DIR_SEPARATOR(c)     ((c) == DIR_SEPARATOR_CHAR || (c) == UNIX_DIR_SEPARATOR_CHAR)
+# define IS_DIR_SEPARATOR(c)    ((c) == DIR_SEPARATOR_CHAR || (c) == UNIX_DIR_SEPARATOR_CHAR)
 /* Note that IS_ABSOLUTE_PATH accepts d:foo as well, although it is
    only semi-absolute.  This is because the users of IS_ABSOLUTE_PATH
    want to know whether to prepend the current working directory to
    a file name, which should not be done with a name like d:foo.  */
-#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]) || (((f)[0]) && ((f)[1] == ':')))
-#define FILENAME_CMP(s1, s2)    STRCASECMP(s1, s2)
+# define IS_ABSOLUTE_PATH(f)    (IS_DIR_SEPARATOR((f)[0]) || (((f)[0]) && ((f)[1] == ':')))
+# define FILENAME_CMP(s1, s2)   STRCASECMP(s1, s2)
 
 #else  /* not DOSish */
 
-#define IS_DIR_SEPARATOR(c)     ((c) == DIR_SEPARATOR_CHAR)
-#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]))
-#define FILENAME_CMP(s1, s2)    strcmp(s1, s2)
+# define IS_DIR_SEPARATOR(c)    ((c) == DIR_SEPARATOR_CHAR)
+# define IS_ABSOLUTE_PATH(f)    (IS_DIR_SEPARATOR((f)[0]))
+# define FILENAME_CMP(s1, s2)   strcmp(s1, s2)
 
 #endif /* not DOSish */
 
 #ifdef WIN32
-# define NATIVE_WIN32          1
+# define NATIVE_WIN32           1
 # ifndef __MINGW32__
 #   define  PATH_MAX  _MAX_PATH
 # endif
@@ -84,47 +96,49 @@ typedef unsigned char bool;
 
 #include <limits.h>             /* PATH_MAX                  */
 #if !defined(PATH_MAX) || (PATH_MAX < 2048)
-#  undef  PATH_MAX
-#  define PATH_MAX 2048         /* define a reasonable value */
+# undef PATH_MAX
+# define PATH_MAX     2048      /* define a reasonable value */
 #endif
 
-#define  MAX_REG_PARMS  1
+#define MAX_REG_PARMS 1
 
-#ifndef max
-#  define max(a,b) (a > b ? a : b)
-#endif
-
-#ifndef min
-#  define min(a,b) (a < b ? a : b)
-#endif
+/* C++ doesn't like min and max macros */
+#ifndef __cplusplus
+# ifndef max
+#   define max(a,b)   (a > b ? a : b)
+# endif
+# ifndef min
+#   define min(a,b)   (a < b ? a : b)
+# endif
+#endif /* __cplusplus */
 
 #ifndef THROWS
-#define THROWS
-#define THROW_NONE  0
-#define THROW_SRC   1
-#define THROW_DEST  2
-#define THROW_BOTH  3
+# define THROWS
+# define THROW_NONE  0
+# define THROW_SRC   1
+# define THROW_DEST  2
+# define THROW_BOTH  3
 #endif
 
 /* size's in bytes  */
-#define BOOLSIZE    port->s.char_size
-#define CHARSIZE    port->s.char_size
-#define SHORTSIZE   port->s.short_size
-#define INTSIZE     port->s.int_size
-#define LONGSIZE    port->s.long_size
-#define LONGLONGSIZE port->s.longlong_size
-#define PTRSIZE     port->s.ptr_size
-#define FPTRSIZE    port->s.fptr_size
-#define GPTRSIZE    port->s.gptr_size
-#define BITSIZE     port->s.bit_size
-#define FLOATSIZE   port->s.float_size
-#define MAXBASESIZE port->s.max_base_size
+#define BOOLSIZE      port->s.char_size
+#define CHARSIZE      port->s.char_size
+#define SHORTSIZE     port->s.short_size
+#define INTSIZE       port->s.int_size
+#define LONGSIZE      port->s.long_size
+#define LONGLONGSIZE  port->s.longlong_size
+#define PTRSIZE       port->s.ptr_size
+#define FPTRSIZE      port->s.fptr_size
+#define GPTRSIZE      port->s.gptr_size
+#define BITSIZE       port->s.bit_size
+#define FLOATSIZE     port->s.float_size
+#define MAXBASESIZE   port->s.max_base_size
 
-#define  SMALL_MODEL 0
-#define  LARGE_MODEL 1
+#define  SMALL_MODEL  0
+#define  LARGE_MODEL  1
 
-#define MAX_TVAR 6
-#define INITIAL_INLINEASM 4*1024
+#define MAX_TVAR      6
+#define INITIAL_INLINEASM (4 * 1024)
 #define DEFPOOLSTACK(type,size)     \
     type       *type##Pool        ; \
     type *type##FreeStack [size]  ; \
@@ -142,7 +156,7 @@ typedef unsigned char bool;
 #endif
 
 
-#define COPYTYPE(start,end,from) (end = getSpec (start = from))
+#define COPYTYPE(start,end,from)  (end = getSpec (start = from))
 
 
 /* general purpose stack related macros */

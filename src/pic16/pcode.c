@@ -1,23 +1,23 @@
 /*-------------------------------------------------------------------------
-
   pcode.c - post code generation
 
-   Written By -  Scott Dattalo scott@dattalo.com
-   Ported to PIC16 By -  Martin Dubuc m.dubuc@rogers.com
+  Copyright (C) 2000, Scott Dattalo scott@dattalo.com
+  PIC16 port:
+  Copyright (C) 2002, Martin Dubuc m.dubuc@rogers.com
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -193,6 +193,7 @@ char *dumpPicOptype(PIC_OPTYPE type);
 pCodeOp *pic16_popGetLit2(int, pCodeOp *);
 pCodeOp *pic16_popGetLit(int);
 pCodeOp *pic16_popGetWithString(char *);
+int isBanksel(pCode *pc);
 extern int inWparamList(char *s);
 
 /** data flow optimization helpers **/
@@ -431,7 +432,8 @@ pCodeInstruction pic16_pciANDFW = {
   0,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
-  (PCC_W | PCC_Z | PCC_N) // outCond
+  (PCC_W | PCC_Z | PCC_N), // outCond
+  PCI_MAGIC
 };
 
 pCodeInstruction pic16_pciBC = { // mdubuc - New

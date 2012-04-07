@@ -2,6 +2,10 @@
 
 	* src/common.h, SDCCglobal.h: fixed mingw32 build on derna:
 	  macros min and max should not be defined when compiled with C++
+	* src/pic16/device.c, src/pic16/genarith.c, src/pic16/gen.c,
+	  src/pic16/pcode.c, src/pic16/glue.c:
+	  applied patch #3515647 - Correction patch on the PIC16's branch,
+	  thanks to Molnar Karoly
 
 2012-04-07 Philipp Klaus Krause <pkk AT spth.de>
 

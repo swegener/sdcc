@@ -1,23 +1,23 @@
 /*-------------------------------------------------------------------------
-
   device.c - Accomodates subtle variations in PIC16 devices
 
-   Written By -  Scott Dattalo scott@dattalo.com
-   Ported to PIC16 By -  Martin Dubuc m.dubuc@rogers.com
+  Copyright (C) 2000, Scott Dattalo scott@dattalo.com
+  PIC16 port:
+  Copyright (C) 2002, Martin Dubuc m.dubuc@rogers.com
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -77,13 +77,13 @@ pic16_dump_equates (FILE *of, set *equs)
   if (!r)
     return;
 
-  fprintf (of, "%s", iComments2);
+  fprintf (of, "\n%s", iComments2);
   fprintf (of, ";\tEquates to used internal registers\n");
   fprintf (of, "%s", iComments2);
 
   for (; r; r = setNextItem (equs))
     {
-      fprintf (of, "%s\tequ\t0x%02x\n", r->name, r->address);
+      fprintf (of, "%s\tequ\t0x%03x\n", r->name, r->address);
     } // for
 }
 

@@ -1,25 +1,21 @@
 /*-------------------------------------------------------------------------
-
   glue.c - glues everything we have done together into one file.
-                Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
 #include "../common.h"
@@ -164,6 +160,10 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                         (sym->_isparm && !IS_REGPARM (sym->etype))) &&
                         addPublics &&
                         !IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
+
+                        checkAddSym(&publics, sym);
+                } else if (IS_AGGREGATE(sym->type) && sym->level == 0 && ! IS_STATIC(sym->etype)) {
+                        /* If a global variable is not static and will be included in the published list. */
 
                         checkAddSym(&publics, sym);
                 } else
@@ -1438,7 +1438,7 @@ void pic16_emitConfigRegs(FILE *of)
 
         for(i=0;i<=(pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart);i++)
                 if(pic16->cwInfo.crInfo[i].emit)        //mask != -1)
-                        fprintf (of, "\t__config 0x%x, 0x%02x\n",
+                        fprintf (of, "\t__config 0x%06x, 0x%02x\n",
                                 pic16->cwInfo.confAddrStart+i,
                                 (unsigned char) pic16->cwInfo.crInfo[i].value);
 }
@@ -1575,7 +1575,7 @@ pic16printPublics (FILE *afile)
         for(sym = setFirstItem (publics); sym; sym = setNextItem (publics))
           /* sanity check */
           if(!IS_STATIC(sym->etype))
-                pic16_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
+                pic16_emitSymbolIfNew(afile, "\tglobal\t%s\n", sym->rname, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1595,10 +1595,10 @@ pic16_printExterns(FILE *afile)
         fprintf(afile, "%s", iComments2);
 
         for(sym = setFirstItem(externs); sym; sym = setNextItem(externs))
-                pic16_emitSymbolIfNew(afile, "\textern %s\n", sym->rname, 1);
+                pic16_emitSymbolIfNew(afile, "\textern\t%s\n", sym->rname, 1);
 
         for(sym = setFirstItem(pic16_builtin_functions); sym; sym = setNextItem(pic16_builtin_functions))
-                pic16_emitSymbolIfNew(afile, "\textern _%s\n", sym->name, 1);
+                pic16_emitSymbolIfNew(afile, "\textern\t_%s\n", sym->name, 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1692,8 +1692,8 @@ emitStatistics(FILE *asmFile)
 {
   unsigned long isize, udsize, ramsize;
   statistics.isize = pic16_countInstructions();
-  isize = (statistics.isize >= 0) ? statistics.isize : 0;
-  udsize = (statistics.udsize >= 0) ? statistics.udsize : 0;
+  isize = (((long)statistics.isize) >= 0) ? statistics.isize : 0;
+  udsize = (((long)statistics.udsize) >= 0) ? statistics.udsize : 0;
   ramsize = pic16 ? pic16->RAMsize : 0x200;
   ramsize -= 256; /* ignore access bank and SFRs */
   if (ramsize == 0) ramsize = 64; /* prevent division by zero (below) */
@@ -1860,7 +1860,7 @@ pic16glue ()
     /* if external stack then reserve space of it */
     if(mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack ) {
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; external stack \n");
+      fprintf (asmFile, "; external stack\n");
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile,";\t.area XSEG (XDATA)\n"); /* MOF */
       fprintf (asmFile,";\t.ds 256\n");
@@ -1887,7 +1887,7 @@ pic16glue ()
     /* copy the interrupt vector table */
     if(mainf && IFFUNC_HASBODY(mainf->type)) {
       fprintf (asmFile, "\n%s", iComments2);
-      fprintf (asmFile, "; interrupt vector \n");
+      fprintf (asmFile, "; interrupt vector\n");
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&vBuf, asmFile);
     }

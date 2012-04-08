@@ -226,9 +226,11 @@ genInline (iCode * ic)
 
           /* Don't emit leading whitespaces */
           while (isspace (*begin))
-            begin++;
+            ++begin;
 
-          emitcode (begin, NULL);
+          if (*begin)
+            emitcode (begin, NULL);
+
           begin = bp;
           break;
 
@@ -248,7 +250,14 @@ genInline (iCode * ic)
         }
     }
   if (begin != bp)
-    emitcode (begin, NULL);
+    {
+      /* Don't emit leading whitespaces */
+      while (isspace (*begin))
+        ++begin;
+
+      if (*begin)
+        emitcode (begin, NULL);
+    }
 
   Safe_free (buf);
 

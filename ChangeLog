@@ -1,3 +1,9 @@
+2012-04-08 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCgen.c:
+	  don't emit leading whitespaces in inline asm, 2nd try
+	  fixed bug #3515390 - asm with leading whitespace passed to backends
+
 2012-04-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:

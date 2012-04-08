@@ -687,18 +687,33 @@ int z80instructionSize(lineNode *pl)
 {
   const char *op1start, *op2start;
 
-  op1start = strchr(pl->line, '\t');
-  if(op1start)
+  /* move to the first operand:
+   * leading spaces are already removed, skip the mnenonic */
+  for (op1start = pl->line; !isspace (*op1start); ++op1start)
+    ;
+  /* skip the spaces between mnemonic and the operand */
+  while (isspace (*op1start))
+    ++op1start;
+  if ('\0' == *op1start)
+    op1start = NULL;
+
+  if (op1start)
     {
-      op1start++;
+      /* move to the second operand:
+       * find the comma and skip the following spaces */
       op2start = strchr(op1start, ',');
-      if(op2start)
-        do
-          op2start++;
-      while(op2start && (*op2start == ' ' || *op2start == '\t'));
+      if (op2start)
+        {
+          do
+            ++op2start;
+          while (isspace (*op2start));
+
+          if ('\0' == *op2start)
+            op2start = NULL;
+        }
     }
   else
-    op2start = 0;
+    op2start = NULL;
 
   /* All ld instructions */
   if(ISINST(pl->line, "ld\t"))
@@ -880,4 +895,3 @@ int z80instructionSize(lineNode *pl)
 
   return(4);
 }
-

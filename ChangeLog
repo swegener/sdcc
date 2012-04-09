@@ -1,3 +1,9 @@
+2012-04-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/Makefile.in,
+	  support/regression/collate-results.py : another fix for bug #3477347
+	* support/regression/ports/hc08/spec.mk: increase timeout to 30 seconds
+
 2012-04-08 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCgen.c:

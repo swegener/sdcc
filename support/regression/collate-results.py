@@ -54,8 +54,11 @@ for line in lines:
         invalid += 1
         messagelog.append("Invalid instruction: %s" % name)
 
+if (len(sys.argv) > 1):
+    print "Summary for '%s':" % sys.argv[1],
 if (invalid > 0):
-    print " %d invalid instructions," % invalid,
-print " %.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks)
+    print "%d invalid instructions," % invalid,
+print "%.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks)
 for msg in messagelog:
   print "  ",msg
+print

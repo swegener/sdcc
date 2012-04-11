@@ -707,6 +707,11 @@ DEFSETFUNC (ifOperandsHave)
       IC_RIGHT (cdp->diCode)->key == op->key)
     return 1;
 
+  if (POINTER_SET (cdp->diCode) &&
+      IS_SYMOP (IC_RESULT (cdp->diCode)) &&
+      IC_RESULT (cdp->diCode)->key == op->key)
+    return 1;
+
   /* or if any of the operands are volatile */
   if (IC_LEFT (cdp->diCode) &&
       IS_OP_VOLATILE (IC_LEFT (cdp->diCode)))

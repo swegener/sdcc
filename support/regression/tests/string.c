@@ -76,6 +76,18 @@ do_teststrpbrk (void)
   ASSERT (*strpbrk ("test2", "s") == 's' );
 }
 
+/** tests for strrchr
+*/
+static void
+do_teststrrchr (void)
+{
+  const char *test = "test";
+
+  ASSERT (strrchr (test, 0) == test + 4);
+  ASSERT (strrchr (test, 't') == test + 3);
+  ASSERT (strrchr (test, 'e') == test + 1);
+}
+
 /** tests for strstr
 */
 static void 
@@ -152,6 +164,7 @@ teststr (void)
   do_teststrcpy ();
   do_teststrncmp ();
   do_teststrpbrk ();
+  do_teststrrchr ();
   do_teststrstr ();
   do_teststrspn ();
   do_teststrtok ();

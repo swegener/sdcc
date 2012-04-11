@@ -7554,8 +7554,6 @@ shiftR2Left2Result (const iCode * ic, operand * left, int offl, operand * result
 
   /*  if (AOP(result)->type == AOP_REG) { */
 
-  tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
-
   /* Left is already in result - so now do the shift */
   /* Optimizing for speed by default. */
   if (!optimize.codeSize || shCount <= 2)
@@ -7570,6 +7568,9 @@ shiftR2Left2Result (const iCode * ic, operand * left, int offl, operand * result
       bool use_b = (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX)
                     && !(AOP_TYPE (result) == AOP_REG
                          && (AOP (result)->aopu.aop_reg[0]->rIdx == B_IDX || AOP (result)->aopu.aop_reg[1]->rIdx == B_IDX)));
+
+      tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
+
       if (!regalloc_dry_run)
         {
           emit2 ("ld %s,!immedbyte", use_b ? "b" : "a", shCount);

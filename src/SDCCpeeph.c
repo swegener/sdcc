@@ -926,6 +926,8 @@ operandBaseName (const char *op)
 FBYNAME (notUsed)
 {
   const char *what;
+  bool ret;
+
   set *operands = setFromConditionArgs (cmdLine, vars);
 
   if (!operands || elementsInSet(operands) != 1)
@@ -938,11 +940,17 @@ FBYNAME (notUsed)
 
   what = setFirstItem (operands);
 
-  if (port->peep.notUsed)
-    return port->peep.notUsed (what, endPl, head);
+  if (!port->peep.notUsed)
+    {
+      fprintf (stderr, "Function notUsed not initialized in port structure\n");
+      return FALSE;
+    }
 
-  fprintf (stderr, "Function notUsed not initialized in port structure\n");
-  return FALSE;
+  ret = port->peep.notUsed (what, endPl, head);
+
+  deleteSet(&operands);
+
+  return (ret);
 }
 
 /*-----------------------------------------------------------------*/

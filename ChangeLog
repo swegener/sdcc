@@ -3,6 +3,8 @@
 	* src/SDCCicode.h,
 	  src/SDCCicode.c:
 	  Made isOperandLiteral() work on const operand *.
+	* support/regression/tests/gcc-torture-execute-920428-1.c:
+	  Reformatted test.
 
 2012-04-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

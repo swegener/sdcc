@@ -8,8 +8,19 @@
 #pragma std_c99
 #endif
 
-x(const char*s){char a[1];const char*ss=s;a[*s++]|=1;return(int)ss+1==(int)s;}
+x (const char*s)
+{
+  char a[1];
+  const char *ss = s;
+  a[*s++] |= 1;
+  return (int)ss + 1 == (int)s;
+}
 
 void
-testTortureExecute (void){if(x("")!=1)ASSERT(0);return;}
+testTortureExecute (void)
+{
+  if (x("") != 1)
+    ASSERT(0);
+  return;
+}
 

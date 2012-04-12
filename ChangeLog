@@ -1,3 +1,9 @@
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCicode.h,
+	  src/SDCCicode.c:
+	  Made isOperandLiteral() work on const operand *.
+
 2012-04-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (ifOperandsHave): fixed bug #3516746

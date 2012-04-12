@@ -313,7 +313,7 @@ iCode *iCodeFromAst (ast *);
 int isiCodeEqual (iCode *, iCode *);
 int isOperandEqual (operand *, operand *);
 iCodeTable *getTableEntry (int);
-int isOperandLiteral (operand *);
+int isOperandLiteral (const operand *);
 operand *operandOperation (operand *, operand *, int, sym_link *);
 double operandLitValue (operand *);
 operand *operandFromLit (double);

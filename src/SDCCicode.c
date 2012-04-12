@@ -893,7 +893,7 @@ isOperandVolatile (operand * op, bool chkTemp)
 /* isOperandLiteral - returns 1 if an operand contains a literal   */
 /*-----------------------------------------------------------------*/
 int
-isOperandLiteral (operand * op)
+isOperandLiteral (const operand *const op)
 {
   sym_link *opetype;
 

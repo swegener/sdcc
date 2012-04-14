@@ -1,3 +1,9 @@
+2012-04-14 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/genarith.c (pic16_genMult8XLit_n,pic16_genMult8X8_n):
+	  work around early clobbering of input operands, fixes #3515677;
+	  clean up, eliminate dead code
+
 2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCicode.h,

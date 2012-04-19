@@ -89,11 +89,21 @@ am_libsdcc_a_OBJECTS = divschar.$(OBJEXT) divuchar.$(OBJEXT) \
 	uchar2fs.$(OBJEXT) uint2fs.$(OBJEXT) ulong2fs.$(OBJEXT) \
 	gptrget1.$(OBJEXT) gptrget2.$(OBJEXT) gptrget3.$(OBJEXT) \
 	gptrget4.$(OBJEXT) gptrput1.$(OBJEXT) gptrput2.$(OBJEXT) \
-	gptrput3.$(OBJEXT) gptrput4.$(OBJEXT) divsint.$(OBJEXT) \
-	divuint.$(OBJEXT) modsint.$(OBJEXT) moduint.$(OBJEXT) \
-	mulint.$(OBJEXT) divslong.$(OBJEXT) divulong.$(OBJEXT) \
-	modslong.$(OBJEXT) modulong.$(OBJEXT) mullong.$(OBJEXT) \
-	lrrest.$(OBJEXT) lrst.$(OBJEXT) stack.$(OBJEXT)
+	gptrput3.$(OBJEXT) gptrput4.$(OBJEXT) \
+	eeprom8_gptrget1.$(OBJEXT) eeprom8_gptrget2.$(OBJEXT) \
+	eeprom8_gptrget3.$(OBJEXT) eeprom8_gptrget4.$(OBJEXT) \
+	eeprom8_gptrput1.$(OBJEXT) eeprom8_gptrput2.$(OBJEXT) \
+	eeprom8_gptrput3.$(OBJEXT) eeprom8_gptrput4.$(OBJEXT) \
+	eeprom8_write.$(OBJEXT) eeprom16_gptrget1.$(OBJEXT) \
+	eeprom16_gptrget2.$(OBJEXT) eeprom16_gptrget3.$(OBJEXT) \
+	eeprom16_gptrget4.$(OBJEXT) eeprom16_gptrput1.$(OBJEXT) \
+	eeprom16_gptrput2.$(OBJEXT) eeprom16_gptrput3.$(OBJEXT) \
+	eeprom16_gptrput4.$(OBJEXT) eeprom16_write.$(OBJEXT) \
+	divsint.$(OBJEXT) divuint.$(OBJEXT) modsint.$(OBJEXT) \
+	moduint.$(OBJEXT) mulint.$(OBJEXT) divslong.$(OBJEXT) \
+	divulong.$(OBJEXT) modslong.$(OBJEXT) modulong.$(OBJEXT) \
+	mullong.$(OBJEXT) lrrest.$(OBJEXT) lrst.$(OBJEXT) \
+	stack.$(OBJEXT)
 libsdcc_a_OBJECTS = $(am_libsdcc_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -220,7 +230,16 @@ libsdcc_a_SOURCES = char/divschar.c char/divuchar.c char/modschar.c \
 	float/uchar2fs.c float/uint2fs.c float/ulong2fs.c \
 	gptr/gptrget1.c gptr/gptrget2.c gptr/gptrget3.c \
 	gptr/gptrget4.c gptr/gptrput1.c gptr/gptrput2.c \
-	gptr/gptrput3.c gptr/gptrput4.c int/divsint.c int/divuint.c \
+	gptr/gptrput3.c gptr/gptrput4.c gptr/eeprom8_gptrget1.c \
+	gptr/eeprom8_gptrget2.c gptr/eeprom8_gptrget3.c \
+	gptr/eeprom8_gptrget4.c gptr/eeprom8_gptrput1.c \
+	gptr/eeprom8_gptrput2.c gptr/eeprom8_gptrput3.c \
+	gptr/eeprom8_gptrput4.c gptr/eeprom8_write.c \
+	gptr/eeprom16_gptrget1.c gptr/eeprom16_gptrget2.c \
+	gptr/eeprom16_gptrget3.c gptr/eeprom16_gptrget4.c \
+	gptr/eeprom16_gptrput1.c gptr/eeprom16_gptrput2.c \
+	gptr/eeprom16_gptrput3.c gptr/eeprom16_gptrput4.c \
+	gptr/eeprom16_write.c int/divsint.c int/divuint.c \
 	int/modsint.c int/moduint.c int/mulint.c long/divslong.c \
 	long/divulong.c long/modslong.c long/modulong.c long/mullong.c \
 	lregs/lrrest.c lregs/lrst.c stack/stack.S
@@ -327,6 +346,24 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/divuchar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/divuint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/divulong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget4.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput4.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget4.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput4.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps16x162schar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps16x162sfloat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps16x162sint.Po@am__quote@
@@ -1201,6 +1238,258 @@ gptrput4.obj: gptr/gptrput4.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/gptrput4.c' object='gptrput4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gptrput4.obj `if test -f 'gptr/gptrput4.c'; then $(CYGPATH_W) 'gptr/gptrput4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/gptrput4.c'; fi`
+
+eeprom8_gptrget1.o: gptr/eeprom8_gptrget1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget1.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget1.Tpo -c -o eeprom8_gptrget1.o `test -f 'gptr/eeprom8_gptrget1.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget1.Tpo $(DEPDIR)/eeprom8_gptrget1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget1.c' object='eeprom8_gptrget1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget1.o `test -f 'gptr/eeprom8_gptrget1.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget1.c
+
+eeprom8_gptrget1.obj: gptr/eeprom8_gptrget1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget1.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget1.Tpo -c -o eeprom8_gptrget1.obj `if test -f 'gptr/eeprom8_gptrget1.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget1.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget1.Tpo $(DEPDIR)/eeprom8_gptrget1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget1.c' object='eeprom8_gptrget1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget1.obj `if test -f 'gptr/eeprom8_gptrget1.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget1.c'; fi`
+
+eeprom8_gptrget2.o: gptr/eeprom8_gptrget2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget2.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget2.Tpo -c -o eeprom8_gptrget2.o `test -f 'gptr/eeprom8_gptrget2.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget2.Tpo $(DEPDIR)/eeprom8_gptrget2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget2.c' object='eeprom8_gptrget2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget2.o `test -f 'gptr/eeprom8_gptrget2.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget2.c
+
+eeprom8_gptrget2.obj: gptr/eeprom8_gptrget2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget2.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget2.Tpo -c -o eeprom8_gptrget2.obj `if test -f 'gptr/eeprom8_gptrget2.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget2.Tpo $(DEPDIR)/eeprom8_gptrget2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget2.c' object='eeprom8_gptrget2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget2.obj `if test -f 'gptr/eeprom8_gptrget2.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget2.c'; fi`
+
+eeprom8_gptrget3.o: gptr/eeprom8_gptrget3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget3.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget3.Tpo -c -o eeprom8_gptrget3.o `test -f 'gptr/eeprom8_gptrget3.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget3.Tpo $(DEPDIR)/eeprom8_gptrget3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget3.c' object='eeprom8_gptrget3.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget3.o `test -f 'gptr/eeprom8_gptrget3.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget3.c
+
+eeprom8_gptrget3.obj: gptr/eeprom8_gptrget3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget3.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget3.Tpo -c -o eeprom8_gptrget3.obj `if test -f 'gptr/eeprom8_gptrget3.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget3.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget3.Tpo $(DEPDIR)/eeprom8_gptrget3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget3.c' object='eeprom8_gptrget3.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget3.obj `if test -f 'gptr/eeprom8_gptrget3.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget3.c'; fi`
+
+eeprom8_gptrget4.o: gptr/eeprom8_gptrget4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget4.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget4.Tpo -c -o eeprom8_gptrget4.o `test -f 'gptr/eeprom8_gptrget4.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget4.Tpo $(DEPDIR)/eeprom8_gptrget4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget4.c' object='eeprom8_gptrget4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget4.o `test -f 'gptr/eeprom8_gptrget4.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrget4.c
+
+eeprom8_gptrget4.obj: gptr/eeprom8_gptrget4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrget4.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget4.Tpo -c -o eeprom8_gptrget4.obj `if test -f 'gptr/eeprom8_gptrget4.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget4.Tpo $(DEPDIR)/eeprom8_gptrget4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrget4.c' object='eeprom8_gptrget4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrget4.obj `if test -f 'gptr/eeprom8_gptrget4.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget4.c'; fi`
+
+eeprom8_gptrput1.o: gptr/eeprom8_gptrput1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput1.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput1.Tpo -c -o eeprom8_gptrput1.o `test -f 'gptr/eeprom8_gptrput1.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput1.Tpo $(DEPDIR)/eeprom8_gptrput1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput1.c' object='eeprom8_gptrput1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput1.o `test -f 'gptr/eeprom8_gptrput1.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput1.c
+
+eeprom8_gptrput1.obj: gptr/eeprom8_gptrput1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput1.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput1.Tpo -c -o eeprom8_gptrput1.obj `if test -f 'gptr/eeprom8_gptrput1.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput1.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput1.Tpo $(DEPDIR)/eeprom8_gptrput1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput1.c' object='eeprom8_gptrput1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput1.obj `if test -f 'gptr/eeprom8_gptrput1.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput1.c'; fi`
+
+eeprom8_gptrput2.o: gptr/eeprom8_gptrput2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput2.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput2.Tpo -c -o eeprom8_gptrput2.o `test -f 'gptr/eeprom8_gptrput2.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput2.Tpo $(DEPDIR)/eeprom8_gptrput2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput2.c' object='eeprom8_gptrput2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput2.o `test -f 'gptr/eeprom8_gptrput2.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput2.c
+
+eeprom8_gptrput2.obj: gptr/eeprom8_gptrput2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput2.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput2.Tpo -c -o eeprom8_gptrput2.obj `if test -f 'gptr/eeprom8_gptrput2.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput2.Tpo $(DEPDIR)/eeprom8_gptrput2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput2.c' object='eeprom8_gptrput2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput2.obj `if test -f 'gptr/eeprom8_gptrput2.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput2.c'; fi`
+
+eeprom8_gptrput3.o: gptr/eeprom8_gptrput3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput3.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput3.Tpo -c -o eeprom8_gptrput3.o `test -f 'gptr/eeprom8_gptrput3.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput3.Tpo $(DEPDIR)/eeprom8_gptrput3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput3.c' object='eeprom8_gptrput3.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput3.o `test -f 'gptr/eeprom8_gptrput3.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput3.c
+
+eeprom8_gptrput3.obj: gptr/eeprom8_gptrput3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput3.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput3.Tpo -c -o eeprom8_gptrput3.obj `if test -f 'gptr/eeprom8_gptrput3.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput3.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput3.Tpo $(DEPDIR)/eeprom8_gptrput3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput3.c' object='eeprom8_gptrput3.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput3.obj `if test -f 'gptr/eeprom8_gptrput3.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput3.c'; fi`
+
+eeprom8_gptrput4.o: gptr/eeprom8_gptrput4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput4.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput4.Tpo -c -o eeprom8_gptrput4.o `test -f 'gptr/eeprom8_gptrput4.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput4.Tpo $(DEPDIR)/eeprom8_gptrput4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput4.c' object='eeprom8_gptrput4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput4.o `test -f 'gptr/eeprom8_gptrput4.c' || echo '$(srcdir)/'`gptr/eeprom8_gptrput4.c
+
+eeprom8_gptrput4.obj: gptr/eeprom8_gptrput4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_gptrput4.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput4.Tpo -c -o eeprom8_gptrput4.obj `if test -f 'gptr/eeprom8_gptrput4.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput4.Tpo $(DEPDIR)/eeprom8_gptrput4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_gptrput4.c' object='eeprom8_gptrput4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_gptrput4.obj `if test -f 'gptr/eeprom8_gptrput4.c'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput4.c'; fi`
+
+eeprom8_write.o: gptr/eeprom8_write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_write.o -MD -MP -MF $(DEPDIR)/eeprom8_write.Tpo -c -o eeprom8_write.o `test -f 'gptr/eeprom8_write.c' || echo '$(srcdir)/'`gptr/eeprom8_write.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_write.Tpo $(DEPDIR)/eeprom8_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_write.c' object='eeprom8_write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_write.o `test -f 'gptr/eeprom8_write.c' || echo '$(srcdir)/'`gptr/eeprom8_write.c
+
+eeprom8_write.obj: gptr/eeprom8_write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom8_write.obj -MD -MP -MF $(DEPDIR)/eeprom8_write.Tpo -c -o eeprom8_write.obj `if test -f 'gptr/eeprom8_write.c'; then $(CYGPATH_W) 'gptr/eeprom8_write.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_write.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_write.Tpo $(DEPDIR)/eeprom8_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom8_write.c' object='eeprom8_write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom8_write.obj `if test -f 'gptr/eeprom8_write.c'; then $(CYGPATH_W) 'gptr/eeprom8_write.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_write.c'; fi`
+
+eeprom16_gptrget1.o: gptr/eeprom16_gptrget1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget1.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget1.Tpo -c -o eeprom16_gptrget1.o `test -f 'gptr/eeprom16_gptrget1.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget1.Tpo $(DEPDIR)/eeprom16_gptrget1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget1.c' object='eeprom16_gptrget1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget1.o `test -f 'gptr/eeprom16_gptrget1.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget1.c
+
+eeprom16_gptrget1.obj: gptr/eeprom16_gptrget1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget1.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget1.Tpo -c -o eeprom16_gptrget1.obj `if test -f 'gptr/eeprom16_gptrget1.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget1.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget1.Tpo $(DEPDIR)/eeprom16_gptrget1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget1.c' object='eeprom16_gptrget1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget1.obj `if test -f 'gptr/eeprom16_gptrget1.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget1.c'; fi`
+
+eeprom16_gptrget2.o: gptr/eeprom16_gptrget2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget2.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget2.Tpo -c -o eeprom16_gptrget2.o `test -f 'gptr/eeprom16_gptrget2.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget2.Tpo $(DEPDIR)/eeprom16_gptrget2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget2.c' object='eeprom16_gptrget2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget2.o `test -f 'gptr/eeprom16_gptrget2.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget2.c
+
+eeprom16_gptrget2.obj: gptr/eeprom16_gptrget2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget2.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget2.Tpo -c -o eeprom16_gptrget2.obj `if test -f 'gptr/eeprom16_gptrget2.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget2.Tpo $(DEPDIR)/eeprom16_gptrget2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget2.c' object='eeprom16_gptrget2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget2.obj `if test -f 'gptr/eeprom16_gptrget2.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget2.c'; fi`
+
+eeprom16_gptrget3.o: gptr/eeprom16_gptrget3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget3.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget3.Tpo -c -o eeprom16_gptrget3.o `test -f 'gptr/eeprom16_gptrget3.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget3.Tpo $(DEPDIR)/eeprom16_gptrget3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget3.c' object='eeprom16_gptrget3.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget3.o `test -f 'gptr/eeprom16_gptrget3.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget3.c
+
+eeprom16_gptrget3.obj: gptr/eeprom16_gptrget3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget3.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget3.Tpo -c -o eeprom16_gptrget3.obj `if test -f 'gptr/eeprom16_gptrget3.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget3.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget3.Tpo $(DEPDIR)/eeprom16_gptrget3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget3.c' object='eeprom16_gptrget3.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget3.obj `if test -f 'gptr/eeprom16_gptrget3.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget3.c'; fi`
+
+eeprom16_gptrget4.o: gptr/eeprom16_gptrget4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget4.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget4.Tpo -c -o eeprom16_gptrget4.o `test -f 'gptr/eeprom16_gptrget4.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget4.Tpo $(DEPDIR)/eeprom16_gptrget4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget4.c' object='eeprom16_gptrget4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget4.o `test -f 'gptr/eeprom16_gptrget4.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrget4.c
+
+eeprom16_gptrget4.obj: gptr/eeprom16_gptrget4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrget4.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget4.Tpo -c -o eeprom16_gptrget4.obj `if test -f 'gptr/eeprom16_gptrget4.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget4.Tpo $(DEPDIR)/eeprom16_gptrget4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrget4.c' object='eeprom16_gptrget4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrget4.obj `if test -f 'gptr/eeprom16_gptrget4.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget4.c'; fi`
+
+eeprom16_gptrput1.o: gptr/eeprom16_gptrput1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput1.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput1.Tpo -c -o eeprom16_gptrput1.o `test -f 'gptr/eeprom16_gptrput1.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput1.Tpo $(DEPDIR)/eeprom16_gptrput1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput1.c' object='eeprom16_gptrput1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput1.o `test -f 'gptr/eeprom16_gptrput1.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput1.c
+
+eeprom16_gptrput1.obj: gptr/eeprom16_gptrput1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput1.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput1.Tpo -c -o eeprom16_gptrput1.obj `if test -f 'gptr/eeprom16_gptrput1.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput1.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput1.Tpo $(DEPDIR)/eeprom16_gptrput1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput1.c' object='eeprom16_gptrput1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput1.obj `if test -f 'gptr/eeprom16_gptrput1.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput1.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput1.c'; fi`
+
+eeprom16_gptrput2.o: gptr/eeprom16_gptrput2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput2.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput2.Tpo -c -o eeprom16_gptrput2.o `test -f 'gptr/eeprom16_gptrput2.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput2.Tpo $(DEPDIR)/eeprom16_gptrput2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput2.c' object='eeprom16_gptrput2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput2.o `test -f 'gptr/eeprom16_gptrput2.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput2.c
+
+eeprom16_gptrput2.obj: gptr/eeprom16_gptrput2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput2.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput2.Tpo -c -o eeprom16_gptrput2.obj `if test -f 'gptr/eeprom16_gptrput2.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput2.Tpo $(DEPDIR)/eeprom16_gptrput2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput2.c' object='eeprom16_gptrput2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput2.obj `if test -f 'gptr/eeprom16_gptrput2.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput2.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput2.c'; fi`
+
+eeprom16_gptrput3.o: gptr/eeprom16_gptrput3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput3.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput3.Tpo -c -o eeprom16_gptrput3.o `test -f 'gptr/eeprom16_gptrput3.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput3.Tpo $(DEPDIR)/eeprom16_gptrput3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput3.c' object='eeprom16_gptrput3.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput3.o `test -f 'gptr/eeprom16_gptrput3.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput3.c
+
+eeprom16_gptrput3.obj: gptr/eeprom16_gptrput3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput3.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput3.Tpo -c -o eeprom16_gptrput3.obj `if test -f 'gptr/eeprom16_gptrput3.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput3.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput3.Tpo $(DEPDIR)/eeprom16_gptrput3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput3.c' object='eeprom16_gptrput3.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput3.obj `if test -f 'gptr/eeprom16_gptrput3.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput3.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput3.c'; fi`
+
+eeprom16_gptrput4.o: gptr/eeprom16_gptrput4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput4.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput4.Tpo -c -o eeprom16_gptrput4.o `test -f 'gptr/eeprom16_gptrput4.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput4.Tpo $(DEPDIR)/eeprom16_gptrput4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput4.c' object='eeprom16_gptrput4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput4.o `test -f 'gptr/eeprom16_gptrput4.c' || echo '$(srcdir)/'`gptr/eeprom16_gptrput4.c
+
+eeprom16_gptrput4.obj: gptr/eeprom16_gptrput4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_gptrput4.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput4.Tpo -c -o eeprom16_gptrput4.obj `if test -f 'gptr/eeprom16_gptrput4.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput4.Tpo $(DEPDIR)/eeprom16_gptrput4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_gptrput4.c' object='eeprom16_gptrput4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_gptrput4.obj `if test -f 'gptr/eeprom16_gptrput4.c'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput4.c'; fi`
+
+eeprom16_write.o: gptr/eeprom16_write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_write.o -MD -MP -MF $(DEPDIR)/eeprom16_write.Tpo -c -o eeprom16_write.o `test -f 'gptr/eeprom16_write.c' || echo '$(srcdir)/'`gptr/eeprom16_write.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_write.Tpo $(DEPDIR)/eeprom16_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_write.c' object='eeprom16_write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_write.o `test -f 'gptr/eeprom16_write.c' || echo '$(srcdir)/'`gptr/eeprom16_write.c
+
+eeprom16_write.obj: gptr/eeprom16_write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eeprom16_write.obj -MD -MP -MF $(DEPDIR)/eeprom16_write.Tpo -c -o eeprom16_write.obj `if test -f 'gptr/eeprom16_write.c'; then $(CYGPATH_W) 'gptr/eeprom16_write.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_write.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_write.Tpo $(DEPDIR)/eeprom16_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gptr/eeprom16_write.c' object='eeprom16_write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eeprom16_write.obj `if test -f 'gptr/eeprom16_write.c'; then $(CYGPATH_W) 'gptr/eeprom16_write.c'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_write.c'; fi`
 
 divsint.o: int/divsint.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT divsint.o -MD -MP -MF $(DEPDIR)/divsint.Tpo -c -o divsint.o `test -f 'int/divsint.c' || echo '$(srcdir)/'`int/divsint.c

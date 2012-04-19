@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   strmmssp.c - MSSP stream putchar
+   eeprom16_gptrget1.c - get 1 byte value from EEPROM via a generic pointer
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
+   Copyright (C) 2012 Raphael Neider <rneider AT web.de>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,15 +26,37 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern SSPBUF;
+/* the return value is expected to be in (FSR0H, PRODH, PRODL, WREG),
+ * therefore we choose return type void here. Generic pointer is expected
+ * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
 
-/* note that USART should already been initialized */
+extern EEADR;
+extern EEADRH;
+extern EECON1;
+extern EEDATA;
+extern FSR0L;
+extern INTCON;
+extern PRODL;
+extern TBLPTRL;
+
 void
-__stream_mssp_putchar (char c) __wparam __naked
+__eeprom16_gptrget1(void) __naked
 {
-  (void)c;
-  __asm
-    MOVWF       _SSPBUF, 0
-    RETURN
-  __endasm;
+    __asm
+        MOVFF   _INTCON, _TBLPTRL   ; save previous interupt state
+        BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
+
+        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
+        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
+
+        MOVFF   _FSR0L, _EEADR      ; address first byte
+        MOVFF   _PRODL, _EEADRH     ; high address bits
+        BSF     _EECON1, 0, 0       ; RD = 1: read EEPROM
+        MOVF    _EEDATA, 0, 0       ; W = EEPROM[adr]
+
+        BTFSC   _TBLPTRL, 7, 0      ; check previous interrupt state
+        BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts
+
+        RETURN
+    __endasm;
 }

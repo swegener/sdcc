@@ -1,8 +1,7 @@
 /*-------------------------------------------------------------------------
-   gptrput1.c - put 1 byte value at generic pointer
+   eeprom8_gptrget2.c - get 2 byte value from EEPROM via a generic pointer
 
-   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
-   Adopted for pic16 port by Vangelis Rokas, 2004 <vrokas AT otenet.gr>
+   Copyright (C) 2012 Raphael Neider <rneider AT web.de>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,47 +26,39 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* write address is expected to be in WREG:PRODL:FSR0L while
- * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
- 
-extern FSR0H;
-extern POSTINC0;
-extern PREINC1;
+/* the return value is expected to be in (FSR0H, PRODH, PRODL, WREG),
+ * therefore we choose return type void here. Generic pointer is expected
+ * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
+
+extern EEADR;
+extern EECON1;
+extern EEDATA;
+extern FSR0L;
+extern INTCON;
 extern PRODL;
-extern WREG;
-extern __eeprom_gptrput1;
+extern TBLPTRL;
 
-void _gptrput1(void) __naked
+void
+__eeprom8_gptrget2(void) __naked
 {
-  __asm
-    /* decode generic pointer MSB (in WREG) bits 6 and 7:
-     * 00 -> code (unimplemented)
-     * 01 -> EEPROM
-     * 10 -> data
-     * 11 -> data
-     *
-     * address: (WREG, PRODL, FSR0L)
-     * value: (TBLPTRH, TBLPTRL, PRODH, STACK1[+1])
-     */
-    btfss	_WREG, 7
-    bra		_lab_01_
-    
-    /* data pointer  */
-    /* FSR0L is already set up */
-    movff	_PRODL, _FSR0H
-    
-    movff	_PREINC1, _POSTINC0
-    
-    return
-    
+    __asm
+        MOVFF   _INTCON, _TBLPTRL   ; save previous interupt state
+        BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
 
-_lab_01_:
-    /* code or eeprom */
-    btfsc	_WREG, 6
-    goto        ___eeprom_gptrput1
+        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
+        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
 
-    /* code pointer, cannot write code pointers */
-    return
+        MOVFF   _FSR0L, _EEADR      ; address first byte
+        BSF     _EECON1, 0, 0       ; RD = 1
+        MOVF    _EEDATA, 0, 0       ; W = EEPROM[adr]
 
-  __endasm;
+        INCF    _EEADR, 1, 0        ; address second byte
+        BSF     _EECON1, 0, 0       ; RD = 1
+        MOVFF   _EEDATA, _PRODL     ; PRODL = EEPROM[adr+1]
+
+        BTFSC   _TBLPTRL, 7, 0      ; check previous interrupt state
+        BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts
+
+        RETURN
+    __endasm;
 }

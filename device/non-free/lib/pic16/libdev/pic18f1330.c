@@ -178,8 +178,6 @@ __sfr __at (0xFC3) ADRESL;
 
 __sfr __at (0xFC4) ADRESH;
 
-__sfr __at (0xFC9) SSPBUF; /* unimplemented */
-
 __sfr __at (0xFCD) T1CON;
 volatile __T1CONbits_t __at (0xFCD) T1CONbits;
 

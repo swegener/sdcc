@@ -76,508 +76,1255 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LIBRARIES = $(lib_LIBRARIES)
 libdev18f1220_a_AR = $(AR) $(ARFLAGS)
 libdev18f1220_a_LIBADD =
-am_libdev18f1220_a_OBJECTS = libdev18f1220_a-pic18f1220.$(OBJEXT)
+am_libdev18f1220_a_OBJECTS = libdev18f1220_a-pic18f1220.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT) \
+	libdev18f1220_a-fake_sspbuf.$(OBJEXT)
 libdev18f1220_a_OBJECTS = $(am_libdev18f1220_a_OBJECTS)
 libdev18f1230_a_AR = $(AR) $(ARFLAGS)
 libdev18f1230_a_LIBADD =
-am_libdev18f1230_a_OBJECTS = libdev18f1230_a-pic18f1230.$(OBJEXT)
+am_libdev18f1230_a_OBJECTS = libdev18f1230_a-pic18f1230.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT) \
+	libdev18f1230_a-fake_sspbuf.$(OBJEXT)
 libdev18f1230_a_OBJECTS = $(am_libdev18f1230_a_OBJECTS)
 libdev18f1320_a_AR = $(AR) $(ARFLAGS)
 libdev18f1320_a_LIBADD =
-am_libdev18f1320_a_OBJECTS = libdev18f1320_a-pic18f1320.$(OBJEXT)
+am_libdev18f1320_a_OBJECTS = libdev18f1320_a-pic18f1320.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT) \
+	libdev18f1320_a-fake_sspbuf.$(OBJEXT)
 libdev18f1320_a_OBJECTS = $(am_libdev18f1320_a_OBJECTS)
 libdev18f1330_a_AR = $(AR) $(ARFLAGS)
 libdev18f1330_a_LIBADD =
-am_libdev18f1330_a_OBJECTS = libdev18f1330_a-pic18f1330.$(OBJEXT)
+am_libdev18f1330_a_OBJECTS = libdev18f1330_a-pic18f1330.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT) \
+	libdev18f1330_a-fake_sspbuf.$(OBJEXT)
 libdev18f1330_a_OBJECTS = $(am_libdev18f1330_a_OBJECTS)
 libdev18f13k50_a_AR = $(AR) $(ARFLAGS)
 libdev18f13k50_a_LIBADD =
-am_libdev18f13k50_a_OBJECTS = libdev18f13k50_a-pic18f13k50.$(OBJEXT)
+am_libdev18f13k50_a_OBJECTS = libdev18f13k50_a-pic18f13k50.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f13k50_a_OBJECTS = $(am_libdev18f13k50_a_OBJECTS)
 libdev18f14k50_a_AR = $(AR) $(ARFLAGS)
 libdev18f14k50_a_LIBADD =
-am_libdev18f14k50_a_OBJECTS = libdev18f14k50_a-pic18f14k50.$(OBJEXT)
+am_libdev18f14k50_a_OBJECTS = libdev18f14k50_a-pic18f14k50.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f14k50_a_OBJECTS = $(am_libdev18f14k50_a_OBJECTS)
 libdev18f2220_a_AR = $(AR) $(ARFLAGS)
 libdev18f2220_a_LIBADD =
-am_libdev18f2220_a_OBJECTS = libdev18f2220_a-pic18f2220.$(OBJEXT)
+am_libdev18f2220_a_OBJECTS = libdev18f2220_a-pic18f2220.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2220_a_OBJECTS = $(am_libdev18f2220_a_OBJECTS)
 libdev18f2221_a_AR = $(AR) $(ARFLAGS)
 libdev18f2221_a_LIBADD =
-am_libdev18f2221_a_OBJECTS = libdev18f2221_a-pic18f2221.$(OBJEXT)
+am_libdev18f2221_a_OBJECTS = libdev18f2221_a-pic18f2221.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2221_a_OBJECTS = $(am_libdev18f2221_a_OBJECTS)
 libdev18f2320_a_AR = $(AR) $(ARFLAGS)
 libdev18f2320_a_LIBADD =
-am_libdev18f2320_a_OBJECTS = libdev18f2320_a-pic18f2320.$(OBJEXT)
+am_libdev18f2320_a_OBJECTS = libdev18f2320_a-pic18f2320.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2320_a_OBJECTS = $(am_libdev18f2320_a_OBJECTS)
 libdev18f2321_a_AR = $(AR) $(ARFLAGS)
 libdev18f2321_a_LIBADD =
-am_libdev18f2321_a_OBJECTS = libdev18f2321_a-pic18f2321.$(OBJEXT)
+am_libdev18f2321_a_OBJECTS = libdev18f2321_a-pic18f2321.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2321_a_OBJECTS = $(am_libdev18f2321_a_OBJECTS)
 libdev18f2331_a_AR = $(AR) $(ARFLAGS)
 libdev18f2331_a_LIBADD =
-am_libdev18f2331_a_OBJECTS = libdev18f2331_a-pic18f2331.$(OBJEXT)
+am_libdev18f2331_a_OBJECTS = libdev18f2331_a-pic18f2331.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2331_a_OBJECTS = $(am_libdev18f2331_a_OBJECTS)
 libdev18f23k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f23k20_a_LIBADD =
-am_libdev18f23k20_a_OBJECTS = libdev18f23k20_a-pic18f23k20.$(OBJEXT)
+am_libdev18f23k20_a_OBJECTS = libdev18f23k20_a-pic18f23k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f23k20_a_OBJECTS = $(am_libdev18f23k20_a_OBJECTS)
 libdev18f23k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f23k22_a_LIBADD =
-am_libdev18f23k22_a_OBJECTS = libdev18f23k22_a-pic18f23k22.$(OBJEXT)
+am_libdev18f23k22_a_OBJECTS = libdev18f23k22_a-pic18f23k22.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f23k22_a_OBJECTS = $(am_libdev18f23k22_a_OBJECTS)
 libdev18f2410_a_AR = $(AR) $(ARFLAGS)
 libdev18f2410_a_LIBADD =
-am_libdev18f2410_a_OBJECTS = libdev18f2410_a-pic18f2410.$(OBJEXT)
+am_libdev18f2410_a_OBJECTS = libdev18f2410_a-pic18f2410.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f2410_a_OBJECTS = $(am_libdev18f2410_a_OBJECTS)
 libdev18f242_a_AR = $(AR) $(ARFLAGS)
 libdev18f242_a_LIBADD =
-am_libdev18f242_a_OBJECTS = libdev18f242_a-pic18f242.$(OBJEXT)
+am_libdev18f242_a_OBJECTS = libdev18f242_a-pic18f242.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f242_a_OBJECTS = $(am_libdev18f242_a_OBJECTS)
 libdev18f2420_a_AR = $(AR) $(ARFLAGS)
 libdev18f2420_a_LIBADD =
-am_libdev18f2420_a_OBJECTS = libdev18f2420_a-pic18f2420.$(OBJEXT)
+am_libdev18f2420_a_OBJECTS = libdev18f2420_a-pic18f2420.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2420_a_OBJECTS = $(am_libdev18f2420_a_OBJECTS)
 libdev18f2423_a_AR = $(AR) $(ARFLAGS)
 libdev18f2423_a_LIBADD =
-am_libdev18f2423_a_OBJECTS = libdev18f2423_a-pic18f2423.$(OBJEXT)
+am_libdev18f2423_a_OBJECTS = libdev18f2423_a-pic18f2423.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2423_a_OBJECTS = $(am_libdev18f2423_a_OBJECTS)
 libdev18f2431_a_AR = $(AR) $(ARFLAGS)
 libdev18f2431_a_LIBADD =
-am_libdev18f2431_a_OBJECTS = libdev18f2431_a-pic18f2431.$(OBJEXT)
+am_libdev18f2431_a_OBJECTS = libdev18f2431_a-pic18f2431.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2431_a_OBJECTS = $(am_libdev18f2431_a_OBJECTS)
 libdev18f2450_a_AR = $(AR) $(ARFLAGS)
 libdev18f2450_a_LIBADD =
-am_libdev18f2450_a_OBJECTS = libdev18f2450_a-pic18f2450.$(OBJEXT)
+am_libdev18f2450_a_OBJECTS = libdev18f2450_a-pic18f2450.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f2450_a-fake_sspbuf.$(OBJEXT)
 libdev18f2450_a_OBJECTS = $(am_libdev18f2450_a_OBJECTS)
 libdev18f2455_a_AR = $(AR) $(ARFLAGS)
 libdev18f2455_a_LIBADD =
-am_libdev18f2455_a_OBJECTS = libdev18f2455_a-pic18f2455.$(OBJEXT)
+am_libdev18f2455_a_OBJECTS = libdev18f2455_a-pic18f2455.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2455_a_OBJECTS = $(am_libdev18f2455_a_OBJECTS)
 libdev18f248_a_AR = $(AR) $(ARFLAGS)
 libdev18f248_a_LIBADD =
-am_libdev18f248_a_OBJECTS = libdev18f248_a-pic18f248.$(OBJEXT)
+am_libdev18f248_a_OBJECTS = libdev18f248_a-pic18f248.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f248_a_OBJECTS = $(am_libdev18f248_a_OBJECTS)
 libdev18f2480_a_AR = $(AR) $(ARFLAGS)
 libdev18f2480_a_LIBADD =
-am_libdev18f2480_a_OBJECTS = libdev18f2480_a-pic18f2480.$(OBJEXT)
+am_libdev18f2480_a_OBJECTS = libdev18f2480_a-pic18f2480.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2480_a_OBJECTS = $(am_libdev18f2480_a_OBJECTS)
 libdev18f24j10_a_AR = $(AR) $(ARFLAGS)
 libdev18f24j10_a_LIBADD =
-am_libdev18f24j10_a_OBJECTS = libdev18f24j10_a-pic18f24j10.$(OBJEXT)
+am_libdev18f24j10_a_OBJECTS = libdev18f24j10_a-pic18f24j10.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f24j10_a_OBJECTS = $(am_libdev18f24j10_a_OBJECTS)
 libdev18f24j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f24j50_a_LIBADD =
-am_libdev18f24j50_a_OBJECTS = libdev18f24j50_a-pic18f24j50.$(OBJEXT)
+am_libdev18f24j50_a_OBJECTS = libdev18f24j50_a-pic18f24j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f24j50_a_OBJECTS = $(am_libdev18f24j50_a_OBJECTS)
 libdev18f24k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f24k20_a_LIBADD =
-am_libdev18f24k20_a_OBJECTS = libdev18f24k20_a-pic18f24k20.$(OBJEXT)
+am_libdev18f24k20_a_OBJECTS = libdev18f24k20_a-pic18f24k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f24k20_a_OBJECTS = $(am_libdev18f24k20_a_OBJECTS)
 libdev18f24k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f24k22_a_LIBADD =
-am_libdev18f24k22_a_OBJECTS = libdev18f24k22_a-pic18f24k22.$(OBJEXT)
+am_libdev18f24k22_a_OBJECTS = libdev18f24k22_a-pic18f24k22.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f24k22_a_OBJECTS = $(am_libdev18f24k22_a_OBJECTS)
 libdev18f2510_a_AR = $(AR) $(ARFLAGS)
 libdev18f2510_a_LIBADD =
-am_libdev18f2510_a_OBJECTS = libdev18f2510_a-pic18f2510.$(OBJEXT)
+am_libdev18f2510_a_OBJECTS = libdev18f2510_a-pic18f2510.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f2510_a_OBJECTS = $(am_libdev18f2510_a_OBJECTS)
 libdev18f2515_a_AR = $(AR) $(ARFLAGS)
 libdev18f2515_a_LIBADD =
-am_libdev18f2515_a_OBJECTS = libdev18f2515_a-pic18f2515.$(OBJEXT)
+am_libdev18f2515_a_OBJECTS = libdev18f2515_a-pic18f2515.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f2515_a_OBJECTS = $(am_libdev18f2515_a_OBJECTS)
 libdev18f252_a_AR = $(AR) $(ARFLAGS)
 libdev18f252_a_LIBADD =
-am_libdev18f252_a_OBJECTS = libdev18f252_a-pic18f252.$(OBJEXT)
+am_libdev18f252_a_OBJECTS = libdev18f252_a-pic18f252.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f252_a_OBJECTS = $(am_libdev18f252_a_OBJECTS)
 libdev18f2520_a_AR = $(AR) $(ARFLAGS)
 libdev18f2520_a_LIBADD =
-am_libdev18f2520_a_OBJECTS = libdev18f2520_a-pic18f2520.$(OBJEXT)
+am_libdev18f2520_a_OBJECTS = libdev18f2520_a-pic18f2520.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2520_a_OBJECTS = $(am_libdev18f2520_a_OBJECTS)
 libdev18f2523_a_AR = $(AR) $(ARFLAGS)
 libdev18f2523_a_LIBADD =
-am_libdev18f2523_a_OBJECTS = libdev18f2523_a-pic18f2523.$(OBJEXT)
+am_libdev18f2523_a_OBJECTS = libdev18f2523_a-pic18f2523.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2523_a_OBJECTS = $(am_libdev18f2523_a_OBJECTS)
 libdev18f2525_a_AR = $(AR) $(ARFLAGS)
 libdev18f2525_a_LIBADD =
-am_libdev18f2525_a_OBJECTS = libdev18f2525_a-pic18f2525.$(OBJEXT)
+am_libdev18f2525_a_OBJECTS = libdev18f2525_a-pic18f2525.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f2525_a_OBJECTS = $(am_libdev18f2525_a_OBJECTS)
 libdev18f2550_a_AR = $(AR) $(ARFLAGS)
 libdev18f2550_a_LIBADD =
-am_libdev18f2550_a_OBJECTS = libdev18f2550_a-pic18f2550.$(OBJEXT)
+am_libdev18f2550_a_OBJECTS = libdev18f2550_a-pic18f2550.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2550_a_OBJECTS = $(am_libdev18f2550_a_OBJECTS)
 libdev18f258_a_AR = $(AR) $(ARFLAGS)
 libdev18f258_a_LIBADD =
-am_libdev18f258_a_OBJECTS = libdev18f258_a-pic18f258.$(OBJEXT)
+am_libdev18f258_a_OBJECTS = libdev18f258_a-pic18f258.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f258_a_OBJECTS = $(am_libdev18f258_a_OBJECTS)
 libdev18f2580_a_AR = $(AR) $(ARFLAGS)
 libdev18f2580_a_LIBADD =
-am_libdev18f2580_a_OBJECTS = libdev18f2580_a-pic18f2580.$(OBJEXT)
+am_libdev18f2580_a_OBJECTS = libdev18f2580_a-pic18f2580.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f2580_a_OBJECTS = $(am_libdev18f2580_a_OBJECTS)
 libdev18f2585_a_AR = $(AR) $(ARFLAGS)
 libdev18f2585_a_LIBADD =
-am_libdev18f2585_a_OBJECTS = libdev18f2585_a-pic18f2585.$(OBJEXT)
+am_libdev18f2585_a_OBJECTS = libdev18f2585_a-pic18f2585.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f2585_a_OBJECTS = $(am_libdev18f2585_a_OBJECTS)
 libdev18f25j10_a_AR = $(AR) $(ARFLAGS)
 libdev18f25j10_a_LIBADD =
-am_libdev18f25j10_a_OBJECTS = libdev18f25j10_a-pic18f25j10.$(OBJEXT)
+am_libdev18f25j10_a_OBJECTS = libdev18f25j10_a-pic18f25j10.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f25j10_a_OBJECTS = $(am_libdev18f25j10_a_OBJECTS)
 libdev18f25j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f25j50_a_LIBADD =
-am_libdev18f25j50_a_OBJECTS = libdev18f25j50_a-pic18f25j50.$(OBJEXT)
+am_libdev18f25j50_a_OBJECTS = libdev18f25j50_a-pic18f25j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f25j50_a_OBJECTS = $(am_libdev18f25j50_a_OBJECTS)
 libdev18f25k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f25k20_a_LIBADD =
-am_libdev18f25k20_a_OBJECTS = libdev18f25k20_a-pic18f25k20.$(OBJEXT)
+am_libdev18f25k20_a_OBJECTS = libdev18f25k20_a-pic18f25k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f25k20_a_OBJECTS = $(am_libdev18f25k20_a_OBJECTS)
 libdev18f25k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f25k22_a_LIBADD =
-am_libdev18f25k22_a_OBJECTS = libdev18f25k22_a-pic18f25k22.$(OBJEXT)
+am_libdev18f25k22_a_OBJECTS = libdev18f25k22_a-pic18f25k22.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f25k22_a_OBJECTS = $(am_libdev18f25k22_a_OBJECTS)
 libdev18f2610_a_AR = $(AR) $(ARFLAGS)
 libdev18f2610_a_LIBADD =
-am_libdev18f2610_a_OBJECTS = libdev18f2610_a-pic18f2610.$(OBJEXT)
+am_libdev18f2610_a_OBJECTS = libdev18f2610_a-pic18f2610.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f2610_a_OBJECTS = $(am_libdev18f2610_a_OBJECTS)
 libdev18f2620_a_AR = $(AR) $(ARFLAGS)
 libdev18f2620_a_LIBADD =
-am_libdev18f2620_a_OBJECTS = libdev18f2620_a-pic18f2620.$(OBJEXT)
+am_libdev18f2620_a_OBJECTS = libdev18f2620_a-pic18f2620.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f2620_a_OBJECTS = $(am_libdev18f2620_a_OBJECTS)
 libdev18f2680_a_AR = $(AR) $(ARFLAGS)
 libdev18f2680_a_LIBADD =
-am_libdev18f2680_a_OBJECTS = libdev18f2680_a-pic18f2680.$(OBJEXT)
+am_libdev18f2680_a_OBJECTS = libdev18f2680_a-pic18f2680.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f2680_a_OBJECTS = $(am_libdev18f2680_a_OBJECTS)
 libdev18f2682_a_AR = $(AR) $(ARFLAGS)
 libdev18f2682_a_LIBADD =
-am_libdev18f2682_a_OBJECTS = libdev18f2682_a-pic18f2682.$(OBJEXT)
+am_libdev18f2682_a_OBJECTS = libdev18f2682_a-pic18f2682.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f2682_a_OBJECTS = $(am_libdev18f2682_a_OBJECTS)
 libdev18f2685_a_AR = $(AR) $(ARFLAGS)
 libdev18f2685_a_LIBADD =
-am_libdev18f2685_a_OBJECTS = libdev18f2685_a-pic18f2685.$(OBJEXT)
+am_libdev18f2685_a_OBJECTS = libdev18f2685_a-pic18f2685.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f2685_a_OBJECTS = $(am_libdev18f2685_a_OBJECTS)
 libdev18f26j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f26j50_a_LIBADD =
-am_libdev18f26j50_a_OBJECTS = libdev18f26j50_a-pic18f26j50.$(OBJEXT)
+am_libdev18f26j50_a_OBJECTS = libdev18f26j50_a-pic18f26j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f26j50_a_OBJECTS = $(am_libdev18f26j50_a_OBJECTS)
 libdev18f26k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f26k20_a_LIBADD =
-am_libdev18f26k20_a_OBJECTS = libdev18f26k20_a-pic18f26k20.$(OBJEXT)
+am_libdev18f26k20_a_OBJECTS = libdev18f26k20_a-pic18f26k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f26k20_a_OBJECTS = $(am_libdev18f26k20_a_OBJECTS)
 libdev18f26k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f26k22_a_LIBADD =
-am_libdev18f26k22_a_OBJECTS = libdev18f26k22_a-pic18f26k22.$(OBJEXT)
+am_libdev18f26k22_a_OBJECTS = libdev18f26k22_a-pic18f26k22.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f26k22_a_OBJECTS = $(am_libdev18f26k22_a_OBJECTS)
 libdev18f4220_a_AR = $(AR) $(ARFLAGS)
 libdev18f4220_a_LIBADD =
-am_libdev18f4220_a_OBJECTS = libdev18f4220_a-pic18f4220.$(OBJEXT)
+am_libdev18f4220_a_OBJECTS = libdev18f4220_a-pic18f4220.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4220_a_OBJECTS = $(am_libdev18f4220_a_OBJECTS)
 libdev18f4221_a_AR = $(AR) $(ARFLAGS)
 libdev18f4221_a_LIBADD =
-am_libdev18f4221_a_OBJECTS = libdev18f4221_a-pic18f4221.$(OBJEXT)
+am_libdev18f4221_a_OBJECTS = libdev18f4221_a-pic18f4221.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4221_a_OBJECTS = $(am_libdev18f4221_a_OBJECTS)
 libdev18f4320_a_AR = $(AR) $(ARFLAGS)
 libdev18f4320_a_LIBADD =
-am_libdev18f4320_a_OBJECTS = libdev18f4320_a-pic18f4320.$(OBJEXT)
+am_libdev18f4320_a_OBJECTS = libdev18f4320_a-pic18f4320.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4320_a_OBJECTS = $(am_libdev18f4320_a_OBJECTS)
 libdev18f4321_a_AR = $(AR) $(ARFLAGS)
 libdev18f4321_a_LIBADD =
-am_libdev18f4321_a_OBJECTS = libdev18f4321_a-pic18f4321.$(OBJEXT)
+am_libdev18f4321_a_OBJECTS = libdev18f4321_a-pic18f4321.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4321_a_OBJECTS = $(am_libdev18f4321_a_OBJECTS)
 libdev18f4331_a_AR = $(AR) $(ARFLAGS)
 libdev18f4331_a_LIBADD =
-am_libdev18f4331_a_OBJECTS = libdev18f4331_a-pic18f4331.$(OBJEXT)
+am_libdev18f4331_a_OBJECTS = libdev18f4331_a-pic18f4331.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4331_a_OBJECTS = $(am_libdev18f4331_a_OBJECTS)
 libdev18f43k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f43k20_a_LIBADD =
-am_libdev18f43k20_a_OBJECTS = libdev18f43k20_a-pic18f43k20.$(OBJEXT)
+am_libdev18f43k20_a_OBJECTS = libdev18f43k20_a-pic18f43k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f43k20_a_OBJECTS = $(am_libdev18f43k20_a_OBJECTS)
 libdev18f43k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f43k22_a_LIBADD =
-am_libdev18f43k22_a_OBJECTS = libdev18f43k22_a-pic18f43k22.$(OBJEXT)
+am_libdev18f43k22_a_OBJECTS = libdev18f43k22_a-pic18f43k22.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f43k22_a_OBJECTS = $(am_libdev18f43k22_a_OBJECTS)
 libdev18f4410_a_AR = $(AR) $(ARFLAGS)
 libdev18f4410_a_LIBADD =
-am_libdev18f4410_a_OBJECTS = libdev18f4410_a-pic18f4410.$(OBJEXT)
+am_libdev18f4410_a_OBJECTS = libdev18f4410_a-pic18f4410.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f4410_a_OBJECTS = $(am_libdev18f4410_a_OBJECTS)
 libdev18f442_a_AR = $(AR) $(ARFLAGS)
 libdev18f442_a_LIBADD =
-am_libdev18f442_a_OBJECTS = libdev18f442_a-pic18f442.$(OBJEXT)
+am_libdev18f442_a_OBJECTS = libdev18f442_a-pic18f442.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f442_a_OBJECTS = $(am_libdev18f442_a_OBJECTS)
 libdev18f4420_a_AR = $(AR) $(ARFLAGS)
 libdev18f4420_a_LIBADD =
-am_libdev18f4420_a_OBJECTS = libdev18f4420_a-pic18f4420.$(OBJEXT)
+am_libdev18f4420_a_OBJECTS = libdev18f4420_a-pic18f4420.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4420_a_OBJECTS = $(am_libdev18f4420_a_OBJECTS)
 libdev18f4423_a_AR = $(AR) $(ARFLAGS)
 libdev18f4423_a_LIBADD =
-am_libdev18f4423_a_OBJECTS = libdev18f4423_a-pic18f4423.$(OBJEXT)
+am_libdev18f4423_a_OBJECTS = libdev18f4423_a-pic18f4423.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4423_a_OBJECTS = $(am_libdev18f4423_a_OBJECTS)
 libdev18f4431_a_AR = $(AR) $(ARFLAGS)
 libdev18f4431_a_LIBADD =
-am_libdev18f4431_a_OBJECTS = libdev18f4431_a-pic18f4431.$(OBJEXT)
+am_libdev18f4431_a_OBJECTS = libdev18f4431_a-pic18f4431.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4431_a_OBJECTS = $(am_libdev18f4431_a_OBJECTS)
 libdev18f4450_a_AR = $(AR) $(ARFLAGS)
 libdev18f4450_a_LIBADD =
-am_libdev18f4450_a_OBJECTS = libdev18f4450_a-pic18f4450.$(OBJEXT)
+am_libdev18f4450_a_OBJECTS = libdev18f4450_a-pic18f4450.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f4450_a-fake_sspbuf.$(OBJEXT)
 libdev18f4450_a_OBJECTS = $(am_libdev18f4450_a_OBJECTS)
 libdev18f4455_a_AR = $(AR) $(ARFLAGS)
 libdev18f4455_a_LIBADD =
-am_libdev18f4455_a_OBJECTS = libdev18f4455_a-pic18f4455.$(OBJEXT)
+am_libdev18f4455_a_OBJECTS = libdev18f4455_a-pic18f4455.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4455_a_OBJECTS = $(am_libdev18f4455_a_OBJECTS)
 libdev18f448_a_AR = $(AR) $(ARFLAGS)
 libdev18f448_a_LIBADD =
-am_libdev18f448_a_OBJECTS = libdev18f448_a-pic18f448.$(OBJEXT)
+am_libdev18f448_a_OBJECTS = libdev18f448_a-pic18f448.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f448_a_OBJECTS = $(am_libdev18f448_a_OBJECTS)
 libdev18f4480_a_AR = $(AR) $(ARFLAGS)
 libdev18f4480_a_LIBADD =
-am_libdev18f4480_a_OBJECTS = libdev18f4480_a-pic18f4480.$(OBJEXT)
+am_libdev18f4480_a_OBJECTS = libdev18f4480_a-pic18f4480.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4480_a_OBJECTS = $(am_libdev18f4480_a_OBJECTS)
 libdev18f44j10_a_AR = $(AR) $(ARFLAGS)
 libdev18f44j10_a_LIBADD =
-am_libdev18f44j10_a_OBJECTS = libdev18f44j10_a-pic18f44j10.$(OBJEXT)
+am_libdev18f44j10_a_OBJECTS = libdev18f44j10_a-pic18f44j10.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f44j10_a_OBJECTS = $(am_libdev18f44j10_a_OBJECTS)
 libdev18f44j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f44j50_a_LIBADD =
-am_libdev18f44j50_a_OBJECTS = libdev18f44j50_a-pic18f44j50.$(OBJEXT)
+am_libdev18f44j50_a_OBJECTS = libdev18f44j50_a-pic18f44j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f44j50_a_OBJECTS = $(am_libdev18f44j50_a_OBJECTS)
 libdev18f44k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f44k20_a_LIBADD =
-am_libdev18f44k20_a_OBJECTS = libdev18f44k20_a-pic18f44k20.$(OBJEXT)
+am_libdev18f44k20_a_OBJECTS = libdev18f44k20_a-pic18f44k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f44k20_a_OBJECTS = $(am_libdev18f44k20_a_OBJECTS)
 libdev18f44k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f44k22_a_LIBADD =
-am_libdev18f44k22_a_OBJECTS = libdev18f44k22_a-pic18f44k22.$(OBJEXT)
+am_libdev18f44k22_a_OBJECTS = libdev18f44k22_a-pic18f44k22.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f44k22_a_OBJECTS = $(am_libdev18f44k22_a_OBJECTS)
 libdev18f4510_a_AR = $(AR) $(ARFLAGS)
 libdev18f4510_a_LIBADD =
-am_libdev18f4510_a_OBJECTS = libdev18f4510_a-pic18f4510.$(OBJEXT)
+am_libdev18f4510_a_OBJECTS = libdev18f4510_a-pic18f4510.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f4510_a_OBJECTS = $(am_libdev18f4510_a_OBJECTS)
 libdev18f4515_a_AR = $(AR) $(ARFLAGS)
 libdev18f4515_a_LIBADD =
-am_libdev18f4515_a_OBJECTS = libdev18f4515_a-pic18f4515.$(OBJEXT)
+am_libdev18f4515_a_OBJECTS = libdev18f4515_a-pic18f4515.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f4515_a_OBJECTS = $(am_libdev18f4515_a_OBJECTS)
 libdev18f452_a_AR = $(AR) $(ARFLAGS)
 libdev18f452_a_LIBADD =
-am_libdev18f452_a_OBJECTS = libdev18f452_a-pic18f452.$(OBJEXT)
+am_libdev18f452_a_OBJECTS = libdev18f452_a-pic18f452.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f452_a_OBJECTS = $(am_libdev18f452_a_OBJECTS)
 libdev18f4520_a_AR = $(AR) $(ARFLAGS)
 libdev18f4520_a_LIBADD =
-am_libdev18f4520_a_OBJECTS = libdev18f4520_a-pic18f4520.$(OBJEXT)
+am_libdev18f4520_a_OBJECTS = libdev18f4520_a-pic18f4520.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4520_a_OBJECTS = $(am_libdev18f4520_a_OBJECTS)
 libdev18f4523_a_AR = $(AR) $(ARFLAGS)
 libdev18f4523_a_LIBADD =
-am_libdev18f4523_a_OBJECTS = libdev18f4523_a-pic18f4523.$(OBJEXT)
+am_libdev18f4523_a_OBJECTS = libdev18f4523_a-pic18f4523.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4523_a_OBJECTS = $(am_libdev18f4523_a_OBJECTS)
 libdev18f4525_a_AR = $(AR) $(ARFLAGS)
 libdev18f4525_a_LIBADD =
-am_libdev18f4525_a_OBJECTS = libdev18f4525_a-pic18f4525.$(OBJEXT)
+am_libdev18f4525_a_OBJECTS = libdev18f4525_a-pic18f4525.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f4525_a_OBJECTS = $(am_libdev18f4525_a_OBJECTS)
 libdev18f4550_a_AR = $(AR) $(ARFLAGS)
 libdev18f4550_a_LIBADD =
-am_libdev18f4550_a_OBJECTS = libdev18f4550_a-pic18f4550.$(OBJEXT)
+am_libdev18f4550_a_OBJECTS = libdev18f4550_a-pic18f4550.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4550_a_OBJECTS = $(am_libdev18f4550_a_OBJECTS)
 libdev18f458_a_AR = $(AR) $(ARFLAGS)
 libdev18f458_a_LIBADD =
-am_libdev18f458_a_OBJECTS = libdev18f458_a-pic18f458.$(OBJEXT)
+am_libdev18f458_a_OBJECTS = libdev18f458_a-pic18f458.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f458_a_OBJECTS = $(am_libdev18f458_a_OBJECTS)
 libdev18f4580_a_AR = $(AR) $(ARFLAGS)
 libdev18f4580_a_LIBADD =
-am_libdev18f4580_a_OBJECTS = libdev18f4580_a-pic18f4580.$(OBJEXT)
+am_libdev18f4580_a_OBJECTS = libdev18f4580_a-pic18f4580.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f4580_a_OBJECTS = $(am_libdev18f4580_a_OBJECTS)
 libdev18f4585_a_AR = $(AR) $(ARFLAGS)
 libdev18f4585_a_LIBADD =
-am_libdev18f4585_a_OBJECTS = libdev18f4585_a-pic18f4585.$(OBJEXT)
+am_libdev18f4585_a_OBJECTS = libdev18f4585_a-pic18f4585.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f4585_a_OBJECTS = $(am_libdev18f4585_a_OBJECTS)
 libdev18f45j10_a_AR = $(AR) $(ARFLAGS)
 libdev18f45j10_a_LIBADD =
-am_libdev18f45j10_a_OBJECTS = libdev18f45j10_a-pic18f45j10.$(OBJEXT)
+am_libdev18f45j10_a_OBJECTS = libdev18f45j10_a-pic18f45j10.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f45j10_a_OBJECTS = $(am_libdev18f45j10_a_OBJECTS)
 libdev18f45j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f45j50_a_LIBADD =
-am_libdev18f45j50_a_OBJECTS = libdev18f45j50_a-pic18f45j50.$(OBJEXT)
+am_libdev18f45j50_a_OBJECTS = libdev18f45j50_a-pic18f45j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f45j50_a_OBJECTS = $(am_libdev18f45j50_a_OBJECTS)
 libdev18f45k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f45k20_a_LIBADD =
-am_libdev18f45k20_a_OBJECTS = libdev18f45k20_a-pic18f45k20.$(OBJEXT)
+am_libdev18f45k20_a_OBJECTS = libdev18f45k20_a-pic18f45k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f45k20_a_OBJECTS = $(am_libdev18f45k20_a_OBJECTS)
 libdev18f45k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f45k22_a_LIBADD =
-am_libdev18f45k22_a_OBJECTS = libdev18f45k22_a-pic18f45k22.$(OBJEXT)
+am_libdev18f45k22_a_OBJECTS = libdev18f45k22_a-pic18f45k22.$(OBJEXT) \
+	eeprom8_gptrget1_dispatch.$(OBJEXT) \
+	eeprom8_gptrget2_dispatch.$(OBJEXT) \
+	eeprom8_gptrget3_dispatch.$(OBJEXT) \
+	eeprom8_gptrget4_dispatch.$(OBJEXT) \
+	eeprom8_gptrput1_dispatch.$(OBJEXT) \
+	eeprom8_gptrput2_dispatch.$(OBJEXT) \
+	eeprom8_gptrput3_dispatch.$(OBJEXT) \
+	eeprom8_gptrput4_dispatch.$(OBJEXT)
 libdev18f45k22_a_OBJECTS = $(am_libdev18f45k22_a_OBJECTS)
 libdev18f4610_a_AR = $(AR) $(ARFLAGS)
 libdev18f4610_a_LIBADD =
-am_libdev18f4610_a_OBJECTS = libdev18f4610_a-pic18f4610.$(OBJEXT)
+am_libdev18f4610_a_OBJECTS = libdev18f4610_a-pic18f4610.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f4610_a_OBJECTS = $(am_libdev18f4610_a_OBJECTS)
 libdev18f4620_a_AR = $(AR) $(ARFLAGS)
 libdev18f4620_a_LIBADD =
-am_libdev18f4620_a_OBJECTS = libdev18f4620_a-pic18f4620.$(OBJEXT)
+am_libdev18f4620_a_OBJECTS = libdev18f4620_a-pic18f4620.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f4620_a_OBJECTS = $(am_libdev18f4620_a_OBJECTS)
 libdev18f4680_a_AR = $(AR) $(ARFLAGS)
 libdev18f4680_a_LIBADD =
-am_libdev18f4680_a_OBJECTS = libdev18f4680_a-pic18f4680.$(OBJEXT)
+am_libdev18f4680_a_OBJECTS = libdev18f4680_a-pic18f4680.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f4680_a_OBJECTS = $(am_libdev18f4680_a_OBJECTS)
 libdev18f4682_a_AR = $(AR) $(ARFLAGS)
 libdev18f4682_a_LIBADD =
-am_libdev18f4682_a_OBJECTS = libdev18f4682_a-pic18f4682.$(OBJEXT)
+am_libdev18f4682_a_OBJECTS = libdev18f4682_a-pic18f4682.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f4682_a_OBJECTS = $(am_libdev18f4682_a_OBJECTS)
 libdev18f4685_a_AR = $(AR) $(ARFLAGS)
 libdev18f4685_a_LIBADD =
-am_libdev18f4685_a_OBJECTS = libdev18f4685_a-pic18f4685.$(OBJEXT)
+am_libdev18f4685_a_OBJECTS = libdev18f4685_a-pic18f4685.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f4685_a_OBJECTS = $(am_libdev18f4685_a_OBJECTS)
 libdev18f46j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f46j50_a_LIBADD =
-am_libdev18f46j50_a_OBJECTS = libdev18f46j50_a-pic18f46j50.$(OBJEXT)
+am_libdev18f46j50_a_OBJECTS = libdev18f46j50_a-pic18f46j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f46j50_a_OBJECTS = $(am_libdev18f46j50_a_OBJECTS)
 libdev18f46k20_a_AR = $(AR) $(ARFLAGS)
 libdev18f46k20_a_LIBADD =
-am_libdev18f46k20_a_OBJECTS = libdev18f46k20_a-pic18f46k20.$(OBJEXT)
+am_libdev18f46k20_a_OBJECTS = libdev18f46k20_a-pic18f46k20.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f46k20_a_OBJECTS = $(am_libdev18f46k20_a_OBJECTS)
 libdev18f46k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f46k22_a_LIBADD =
-am_libdev18f46k22_a_OBJECTS = libdev18f46k22_a-pic18f46k22.$(OBJEXT)
+am_libdev18f46k22_a_OBJECTS = libdev18f46k22_a-pic18f46k22.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f46k22_a_OBJECTS = $(am_libdev18f46k22_a_OBJECTS)
 libdev18f6520_a_AR = $(AR) $(ARFLAGS)
 libdev18f6520_a_LIBADD =
-am_libdev18f6520_a_OBJECTS = libdev18f6520_a-pic18f6520.$(OBJEXT)
+am_libdev18f6520_a_OBJECTS = libdev18f6520_a-pic18f6520.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6520_a_OBJECTS = $(am_libdev18f6520_a_OBJECTS)
 libdev18f6527_a_AR = $(AR) $(ARFLAGS)
 libdev18f6527_a_LIBADD =
-am_libdev18f6527_a_OBJECTS = libdev18f6527_a-pic18f6527.$(OBJEXT)
+am_libdev18f6527_a_OBJECTS = libdev18f6527_a-pic18f6527.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6527_a_OBJECTS = $(am_libdev18f6527_a_OBJECTS)
 libdev18f6585_a_AR = $(AR) $(ARFLAGS)
 libdev18f6585_a_LIBADD =
-am_libdev18f6585_a_OBJECTS = libdev18f6585_a-pic18f6585.$(OBJEXT)
+am_libdev18f6585_a_OBJECTS = libdev18f6585_a-pic18f6585.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6585_a_OBJECTS = $(am_libdev18f6585_a_OBJECTS)
 libdev18f65j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f65j50_a_LIBADD =
-am_libdev18f65j50_a_OBJECTS = libdev18f65j50_a-pic18f65j50.$(OBJEXT)
+am_libdev18f65j50_a_OBJECTS = libdev18f65j50_a-pic18f65j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f65j50_a_OBJECTS = $(am_libdev18f65j50_a_OBJECTS)
 libdev18f6620_a_AR = $(AR) $(ARFLAGS)
 libdev18f6620_a_LIBADD =
-am_libdev18f6620_a_OBJECTS = libdev18f6620_a-pic18f6620.$(OBJEXT)
+am_libdev18f6620_a_OBJECTS = libdev18f6620_a-pic18f6620.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6620_a_OBJECTS = $(am_libdev18f6620_a_OBJECTS)
 libdev18f6622_a_AR = $(AR) $(ARFLAGS)
 libdev18f6622_a_LIBADD =
-am_libdev18f6622_a_OBJECTS = libdev18f6622_a-pic18f6622.$(OBJEXT)
+am_libdev18f6622_a_OBJECTS = libdev18f6622_a-pic18f6622.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6622_a_OBJECTS = $(am_libdev18f6622_a_OBJECTS)
 libdev18f6627_a_AR = $(AR) $(ARFLAGS)
 libdev18f6627_a_LIBADD =
-am_libdev18f6627_a_OBJECTS = libdev18f6627_a-pic18f6627.$(OBJEXT)
+am_libdev18f6627_a_OBJECTS = libdev18f6627_a-pic18f6627.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6627_a_OBJECTS = $(am_libdev18f6627_a_OBJECTS)
 libdev18f6680_a_AR = $(AR) $(ARFLAGS)
 libdev18f6680_a_LIBADD =
-am_libdev18f6680_a_OBJECTS = libdev18f6680_a-pic18f6680.$(OBJEXT)
+am_libdev18f6680_a_OBJECTS = libdev18f6680_a-pic18f6680.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6680_a_OBJECTS = $(am_libdev18f6680_a_OBJECTS)
 libdev18f66j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f66j50_a_LIBADD =
-am_libdev18f66j50_a_OBJECTS = libdev18f66j50_a-pic18f66j50.$(OBJEXT)
+am_libdev18f66j50_a_OBJECTS = libdev18f66j50_a-pic18f66j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f66j50_a_OBJECTS = $(am_libdev18f66j50_a_OBJECTS)
 libdev18f66j55_a_AR = $(AR) $(ARFLAGS)
 libdev18f66j55_a_LIBADD =
-am_libdev18f66j55_a_OBJECTS = libdev18f66j55_a-pic18f66j55.$(OBJEXT)
+am_libdev18f66j55_a_OBJECTS = libdev18f66j55_a-pic18f66j55.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f66j55_a_OBJECTS = $(am_libdev18f66j55_a_OBJECTS)
 libdev18f66j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f66j60_a_LIBADD =
-am_libdev18f66j60_a_OBJECTS = libdev18f66j60_a-pic18f66j60.$(OBJEXT)
+am_libdev18f66j60_a_OBJECTS = libdev18f66j60_a-pic18f66j60.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f66j60_a_OBJECTS = $(am_libdev18f66j60_a_OBJECTS)
 libdev18f66j65_a_AR = $(AR) $(ARFLAGS)
 libdev18f66j65_a_LIBADD =
-am_libdev18f66j65_a_OBJECTS = libdev18f66j65_a-pic18f66j65.$(OBJEXT)
+am_libdev18f66j65_a_OBJECTS = libdev18f66j65_a-pic18f66j65.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f66j65_a_OBJECTS = $(am_libdev18f66j65_a_OBJECTS)
 libdev18f6720_a_AR = $(AR) $(ARFLAGS)
 libdev18f6720_a_LIBADD =
-am_libdev18f6720_a_OBJECTS = libdev18f6720_a-pic18f6720.$(OBJEXT)
+am_libdev18f6720_a_OBJECTS = libdev18f6720_a-pic18f6720.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6720_a_OBJECTS = $(am_libdev18f6720_a_OBJECTS)
 libdev18f6722_a_AR = $(AR) $(ARFLAGS)
 libdev18f6722_a_LIBADD =
-am_libdev18f6722_a_OBJECTS = libdev18f6722_a-pic18f6722.$(OBJEXT)
+am_libdev18f6722_a_OBJECTS = libdev18f6722_a-pic18f6722.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f6722_a_OBJECTS = $(am_libdev18f6722_a_OBJECTS)
 libdev18f67j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f67j50_a_LIBADD =
-am_libdev18f67j50_a_OBJECTS = libdev18f67j50_a-pic18f67j50.$(OBJEXT)
+am_libdev18f67j50_a_OBJECTS = libdev18f67j50_a-pic18f67j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f67j50_a_OBJECTS = $(am_libdev18f67j50_a_OBJECTS)
 libdev18f67j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f67j60_a_LIBADD =
-am_libdev18f67j60_a_OBJECTS = libdev18f67j60_a-pic18f67j60.$(OBJEXT)
+am_libdev18f67j60_a_OBJECTS = libdev18f67j60_a-pic18f67j60.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f67j60_a_OBJECTS = $(am_libdev18f67j60_a_OBJECTS)
 libdev18f8520_a_AR = $(AR) $(ARFLAGS)
 libdev18f8520_a_LIBADD =
-am_libdev18f8520_a_OBJECTS = libdev18f8520_a-pic18f8520.$(OBJEXT)
+am_libdev18f8520_a_OBJECTS = libdev18f8520_a-pic18f8520.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8520_a_OBJECTS = $(am_libdev18f8520_a_OBJECTS)
 libdev18f8527_a_AR = $(AR) $(ARFLAGS)
 libdev18f8527_a_LIBADD =
-am_libdev18f8527_a_OBJECTS = libdev18f8527_a-pic18f8527.$(OBJEXT)
+am_libdev18f8527_a_OBJECTS = libdev18f8527_a-pic18f8527.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8527_a_OBJECTS = $(am_libdev18f8527_a_OBJECTS)
 libdev18f8585_a_AR = $(AR) $(ARFLAGS)
 libdev18f8585_a_LIBADD =
-am_libdev18f8585_a_OBJECTS = libdev18f8585_a-pic18f8585.$(OBJEXT)
+am_libdev18f8585_a_OBJECTS = libdev18f8585_a-pic18f8585.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8585_a_OBJECTS = $(am_libdev18f8585_a_OBJECTS)
 libdev18f85j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f85j50_a_LIBADD =
-am_libdev18f85j50_a_OBJECTS = libdev18f85j50_a-pic18f85j50.$(OBJEXT)
+am_libdev18f85j50_a_OBJECTS = libdev18f85j50_a-pic18f85j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f85j50_a_OBJECTS = $(am_libdev18f85j50_a_OBJECTS)
 libdev18f8620_a_AR = $(AR) $(ARFLAGS)
 libdev18f8620_a_LIBADD =
-am_libdev18f8620_a_OBJECTS = libdev18f8620_a-pic18f8620.$(OBJEXT)
+am_libdev18f8620_a_OBJECTS = libdev18f8620_a-pic18f8620.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8620_a_OBJECTS = $(am_libdev18f8620_a_OBJECTS)
 libdev18f8622_a_AR = $(AR) $(ARFLAGS)
 libdev18f8622_a_LIBADD =
-am_libdev18f8622_a_OBJECTS = libdev18f8622_a-pic18f8622.$(OBJEXT)
+am_libdev18f8622_a_OBJECTS = libdev18f8622_a-pic18f8622.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8622_a_OBJECTS = $(am_libdev18f8622_a_OBJECTS)
 libdev18f8627_a_AR = $(AR) $(ARFLAGS)
 libdev18f8627_a_LIBADD =
-am_libdev18f8627_a_OBJECTS = libdev18f8627_a-pic18f8627.$(OBJEXT)
+am_libdev18f8627_a_OBJECTS = libdev18f8627_a-pic18f8627.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8627_a_OBJECTS = $(am_libdev18f8627_a_OBJECTS)
 libdev18f8680_a_AR = $(AR) $(ARFLAGS)
 libdev18f8680_a_LIBADD =
-am_libdev18f8680_a_OBJECTS = libdev18f8680_a-pic18f8680.$(OBJEXT)
+am_libdev18f8680_a_OBJECTS = libdev18f8680_a-pic18f8680.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8680_a_OBJECTS = $(am_libdev18f8680_a_OBJECTS)
 libdev18f86j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f86j50_a_LIBADD =
-am_libdev18f86j50_a_OBJECTS = libdev18f86j50_a-pic18f86j50.$(OBJEXT)
+am_libdev18f86j50_a_OBJECTS = libdev18f86j50_a-pic18f86j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f86j50_a_OBJECTS = $(am_libdev18f86j50_a_OBJECTS)
 libdev18f86j55_a_AR = $(AR) $(ARFLAGS)
 libdev18f86j55_a_LIBADD =
-am_libdev18f86j55_a_OBJECTS = libdev18f86j55_a-pic18f86j55.$(OBJEXT)
+am_libdev18f86j55_a_OBJECTS = libdev18f86j55_a-pic18f86j55.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f86j55_a_OBJECTS = $(am_libdev18f86j55_a_OBJECTS)
 libdev18f86j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f86j60_a_LIBADD =
-am_libdev18f86j60_a_OBJECTS = libdev18f86j60_a-pic18f86j60.$(OBJEXT)
+am_libdev18f86j60_a_OBJECTS = libdev18f86j60_a-pic18f86j60.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f86j60_a_OBJECTS = $(am_libdev18f86j60_a_OBJECTS)
 libdev18f86j65_a_AR = $(AR) $(ARFLAGS)
 libdev18f86j65_a_LIBADD =
-am_libdev18f86j65_a_OBJECTS = libdev18f86j65_a-pic18f86j65.$(OBJEXT)
+am_libdev18f86j65_a_OBJECTS = libdev18f86j65_a-pic18f86j65.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f86j65_a_OBJECTS = $(am_libdev18f86j65_a_OBJECTS)
 libdev18f8720_a_AR = $(AR) $(ARFLAGS)
 libdev18f8720_a_LIBADD =
-am_libdev18f8720_a_OBJECTS = libdev18f8720_a-pic18f8720.$(OBJEXT)
+am_libdev18f8720_a_OBJECTS = libdev18f8720_a-pic18f8720.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8720_a_OBJECTS = $(am_libdev18f8720_a_OBJECTS)
 libdev18f8722_a_AR = $(AR) $(ARFLAGS)
 libdev18f8722_a_LIBADD =
-am_libdev18f8722_a_OBJECTS = libdev18f8722_a-pic18f8722.$(OBJEXT)
+am_libdev18f8722_a_OBJECTS = libdev18f8722_a-pic18f8722.$(OBJEXT) \
+	eeprom16_gptrget1_dispatch.$(OBJEXT) \
+	eeprom16_gptrget2_dispatch.$(OBJEXT) \
+	eeprom16_gptrget3_dispatch.$(OBJEXT) \
+	eeprom16_gptrget4_dispatch.$(OBJEXT) \
+	eeprom16_gptrput1_dispatch.$(OBJEXT) \
+	eeprom16_gptrput2_dispatch.$(OBJEXT) \
+	eeprom16_gptrput3_dispatch.$(OBJEXT) \
+	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f8722_a_OBJECTS = $(am_libdev18f8722_a_OBJECTS)
 libdev18f87j50_a_AR = $(AR) $(ARFLAGS)
 libdev18f87j50_a_LIBADD =
-am_libdev18f87j50_a_OBJECTS = libdev18f87j50_a-pic18f87j50.$(OBJEXT)
+am_libdev18f87j50_a_OBJECTS = libdev18f87j50_a-pic18f87j50.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f87j50_a_OBJECTS = $(am_libdev18f87j50_a_OBJECTS)
 libdev18f87j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f87j60_a_LIBADD =
-am_libdev18f87j60_a_OBJECTS = libdev18f87j60_a-pic18f87j60.$(OBJEXT)
+am_libdev18f87j60_a_OBJECTS = libdev18f87j60_a-pic18f87j60.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f87j60_a_OBJECTS = $(am_libdev18f87j60_a_OBJECTS)
 libdev18f96j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f96j60_a_LIBADD =
-am_libdev18f96j60_a_OBJECTS = libdev18f96j60_a-pic18f96j60.$(OBJEXT)
+am_libdev18f96j60_a_OBJECTS = libdev18f96j60_a-pic18f96j60.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f96j60_a_OBJECTS = $(am_libdev18f96j60_a_OBJECTS)
 libdev18f96j65_a_AR = $(AR) $(ARFLAGS)
 libdev18f96j65_a_LIBADD =
-am_libdev18f96j65_a_OBJECTS = libdev18f96j65_a-pic18f96j65.$(OBJEXT)
+am_libdev18f96j65_a_OBJECTS = libdev18f96j65_a-pic18f96j65.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f96j65_a_OBJECTS = $(am_libdev18f96j65_a_OBJECTS)
 libdev18f97j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f97j60_a_LIBADD =
-am_libdev18f97j60_a_OBJECTS = libdev18f97j60_a-pic18f97j60.$(OBJEXT)
+am_libdev18f97j60_a_OBJECTS = libdev18f97j60_a-pic18f97j60.$(OBJEXT) \
+	dispatch.$(OBJEXT)
 libdev18f97j60_a_OBJECTS = $(am_libdev18f97j60_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
+CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -839,255 +1586,951 @@ lib_LIBRARIES = libdev18f1220.a libdev18f1230.a libdev18f1320.a \
 	libdev18f86j65.a libdev18f8720.a libdev18f8722.a \
 	libdev18f87j50.a libdev18f87j60.a libdev18f96j60.a \
 	libdev18f96j65.a libdev18f97j60.a
-libdev18f1220_a_SOURCES = pic18f1220.c
+libdev18f1220_a_SOURCES = pic18f1220.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S fake_sspbuf.c
 libdev18f1220_a_CFLAGS = -p18f1220 $(AM_CFLAGS)
-libdev18f1230_a_SOURCES = pic18f1230.c
+libdev18f1230_a_SOURCES = pic18f1230.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S fake_sspbuf.c
 libdev18f1230_a_CFLAGS = -p18f1230 $(AM_CFLAGS)
-libdev18f1320_a_SOURCES = pic18f1320.c
+libdev18f1320_a_SOURCES = pic18f1320.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S fake_sspbuf.c
 libdev18f1320_a_CFLAGS = -p18f1320 $(AM_CFLAGS)
-libdev18f1330_a_SOURCES = pic18f1330.c
+libdev18f1330_a_SOURCES = pic18f1330.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S fake_sspbuf.c
 libdev18f1330_a_CFLAGS = -p18f1330 $(AM_CFLAGS)
-libdev18f13k50_a_SOURCES = pic18f13k50.c
+libdev18f13k50_a_SOURCES = pic18f13k50.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f13k50_a_CFLAGS = -p18f13k50 $(AM_CFLAGS)
-libdev18f14k50_a_SOURCES = pic18f14k50.c
+libdev18f14k50_a_SOURCES = pic18f14k50.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f14k50_a_CFLAGS = -p18f14k50 $(AM_CFLAGS)
-libdev18f2220_a_SOURCES = pic18f2220.c
+libdev18f2220_a_SOURCES = pic18f2220.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2220_a_CFLAGS = -p18f2220 $(AM_CFLAGS)
-libdev18f2221_a_SOURCES = pic18f2221.c
+libdev18f2221_a_SOURCES = pic18f2221.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2221_a_CFLAGS = -p18f2221 $(AM_CFLAGS)
-libdev18f2320_a_SOURCES = pic18f2320.c
+libdev18f2320_a_SOURCES = pic18f2320.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2320_a_CFLAGS = -p18f2320 $(AM_CFLAGS)
-libdev18f2321_a_SOURCES = pic18f2321.c
+libdev18f2321_a_SOURCES = pic18f2321.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2321_a_CFLAGS = -p18f2321 $(AM_CFLAGS)
-libdev18f2331_a_SOURCES = pic18f2331.c
+libdev18f2331_a_SOURCES = pic18f2331.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2331_a_CFLAGS = -p18f2331 $(AM_CFLAGS)
-libdev18f23k20_a_SOURCES = pic18f23k20.c
+libdev18f23k20_a_SOURCES = pic18f23k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f23k20_a_CFLAGS = -p18f23k20 $(AM_CFLAGS)
-libdev18f23k22_a_SOURCES = pic18f23k22.c
+libdev18f23k22_a_SOURCES = pic18f23k22.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f23k22_a_CFLAGS = -p18f23k22 $(AM_CFLAGS)
-libdev18f2410_a_SOURCES = pic18f2410.c
+libdev18f2410_a_SOURCES = pic18f2410.c gptr/dispatch.S
 libdev18f2410_a_CFLAGS = -p18f2410 $(AM_CFLAGS)
-libdev18f242_a_SOURCES = pic18f242.c
+libdev18f242_a_SOURCES = pic18f242.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f242_a_CFLAGS = -p18f242 $(AM_CFLAGS)
-libdev18f2420_a_SOURCES = pic18f2420.c
+libdev18f2420_a_SOURCES = pic18f2420.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2420_a_CFLAGS = -p18f2420 $(AM_CFLAGS)
-libdev18f2423_a_SOURCES = pic18f2423.c
+libdev18f2423_a_SOURCES = pic18f2423.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2423_a_CFLAGS = -p18f2423 $(AM_CFLAGS)
-libdev18f2431_a_SOURCES = pic18f2431.c
+libdev18f2431_a_SOURCES = pic18f2431.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2431_a_CFLAGS = -p18f2431 $(AM_CFLAGS)
-libdev18f2450_a_SOURCES = pic18f2450.c
+libdev18f2450_a_SOURCES = pic18f2450.c gptr/dispatch.S fake_sspbuf.c
 libdev18f2450_a_CFLAGS = -p18f2450 $(AM_CFLAGS)
-libdev18f2455_a_SOURCES = pic18f2455.c
+libdev18f2455_a_SOURCES = pic18f2455.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2455_a_CFLAGS = -p18f2455 $(AM_CFLAGS)
-libdev18f248_a_SOURCES = pic18f248.c
+libdev18f248_a_SOURCES = pic18f248.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f248_a_CFLAGS = -p18f248 $(AM_CFLAGS)
-libdev18f2480_a_SOURCES = pic18f2480.c
+libdev18f2480_a_SOURCES = pic18f2480.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2480_a_CFLAGS = -p18f2480 $(AM_CFLAGS)
-libdev18f24j10_a_SOURCES = pic18f24j10.c
+libdev18f24j10_a_SOURCES = pic18f24j10.c gptr/dispatch.S
 libdev18f24j10_a_CFLAGS = -p18f24j10 $(AM_CFLAGS)
-libdev18f24j50_a_SOURCES = pic18f24j50.c
+libdev18f24j50_a_SOURCES = pic18f24j50.c gptr/dispatch.S
 libdev18f24j50_a_CFLAGS = -p18f24j50 $(AM_CFLAGS)
-libdev18f24k20_a_SOURCES = pic18f24k20.c
+libdev18f24k20_a_SOURCES = pic18f24k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f24k20_a_CFLAGS = -p18f24k20 $(AM_CFLAGS)
-libdev18f24k22_a_SOURCES = pic18f24k22.c
+libdev18f24k22_a_SOURCES = pic18f24k22.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f24k22_a_CFLAGS = -p18f24k22 $(AM_CFLAGS)
-libdev18f2510_a_SOURCES = pic18f2510.c
+libdev18f2510_a_SOURCES = pic18f2510.c gptr/dispatch.S
 libdev18f2510_a_CFLAGS = -p18f2510 $(AM_CFLAGS)
-libdev18f2515_a_SOURCES = pic18f2515.c
+libdev18f2515_a_SOURCES = pic18f2515.c gptr/dispatch.S
 libdev18f2515_a_CFLAGS = -p18f2515 $(AM_CFLAGS)
-libdev18f252_a_SOURCES = pic18f252.c
+libdev18f252_a_SOURCES = pic18f252.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f252_a_CFLAGS = -p18f252 $(AM_CFLAGS)
-libdev18f2520_a_SOURCES = pic18f2520.c
+libdev18f2520_a_SOURCES = pic18f2520.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2520_a_CFLAGS = -p18f2520 $(AM_CFLAGS)
-libdev18f2523_a_SOURCES = pic18f2523.c
+libdev18f2523_a_SOURCES = pic18f2523.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2523_a_CFLAGS = -p18f2523 $(AM_CFLAGS)
-libdev18f2525_a_SOURCES = pic18f2525.c
+libdev18f2525_a_SOURCES = pic18f2525.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2525_a_CFLAGS = -p18f2525 $(AM_CFLAGS)
-libdev18f2550_a_SOURCES = pic18f2550.c
+libdev18f2550_a_SOURCES = pic18f2550.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2550_a_CFLAGS = -p18f2550 $(AM_CFLAGS)
-libdev18f258_a_SOURCES = pic18f258.c
+libdev18f258_a_SOURCES = pic18f258.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f258_a_CFLAGS = -p18f258 $(AM_CFLAGS)
-libdev18f2580_a_SOURCES = pic18f2580.c
+libdev18f2580_a_SOURCES = pic18f2580.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2580_a_CFLAGS = -p18f2580 $(AM_CFLAGS)
-libdev18f2585_a_SOURCES = pic18f2585.c
+libdev18f2585_a_SOURCES = pic18f2585.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2585_a_CFLAGS = -p18f2585 $(AM_CFLAGS)
-libdev18f25j10_a_SOURCES = pic18f25j10.c
+libdev18f25j10_a_SOURCES = pic18f25j10.c gptr/dispatch.S
 libdev18f25j10_a_CFLAGS = -p18f25j10 $(AM_CFLAGS)
-libdev18f25j50_a_SOURCES = pic18f25j50.c
+libdev18f25j50_a_SOURCES = pic18f25j50.c gptr/dispatch.S
 libdev18f25j50_a_CFLAGS = -p18f25j50 $(AM_CFLAGS)
-libdev18f25k20_a_SOURCES = pic18f25k20.c
+libdev18f25k20_a_SOURCES = pic18f25k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f25k20_a_CFLAGS = -p18f25k20 $(AM_CFLAGS)
-libdev18f25k22_a_SOURCES = pic18f25k22.c
+libdev18f25k22_a_SOURCES = pic18f25k22.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f25k22_a_CFLAGS = -p18f25k22 $(AM_CFLAGS)
-libdev18f2610_a_SOURCES = pic18f2610.c
+libdev18f2610_a_SOURCES = pic18f2610.c gptr/dispatch.S
 libdev18f2610_a_CFLAGS = -p18f2610 $(AM_CFLAGS)
-libdev18f2620_a_SOURCES = pic18f2620.c
+libdev18f2620_a_SOURCES = pic18f2620.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2620_a_CFLAGS = -p18f2620 $(AM_CFLAGS)
-libdev18f2680_a_SOURCES = pic18f2680.c
+libdev18f2680_a_SOURCES = pic18f2680.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2680_a_CFLAGS = -p18f2680 $(AM_CFLAGS)
-libdev18f2682_a_SOURCES = pic18f2682.c
+libdev18f2682_a_SOURCES = pic18f2682.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2682_a_CFLAGS = -p18f2682 $(AM_CFLAGS)
-libdev18f2685_a_SOURCES = pic18f2685.c
+libdev18f2685_a_SOURCES = pic18f2685.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2685_a_CFLAGS = -p18f2685 $(AM_CFLAGS)
-libdev18f26j50_a_SOURCES = pic18f26j50.c
+libdev18f26j50_a_SOURCES = pic18f26j50.c gptr/dispatch.S
 libdev18f26j50_a_CFLAGS = -p18f26j50 $(AM_CFLAGS)
-libdev18f26k20_a_SOURCES = pic18f26k20.c
+libdev18f26k20_a_SOURCES = pic18f26k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f26k20_a_CFLAGS = -p18f26k20 $(AM_CFLAGS)
-libdev18f26k22_a_SOURCES = pic18f26k22.c
+libdev18f26k22_a_SOURCES = pic18f26k22.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f26k22_a_CFLAGS = -p18f26k22 $(AM_CFLAGS)
-libdev18f4220_a_SOURCES = pic18f4220.c
+libdev18f4220_a_SOURCES = pic18f4220.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4220_a_CFLAGS = -p18f4220 $(AM_CFLAGS)
-libdev18f4221_a_SOURCES = pic18f4221.c
+libdev18f4221_a_SOURCES = pic18f4221.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4221_a_CFLAGS = -p18f4221 $(AM_CFLAGS)
-libdev18f4320_a_SOURCES = pic18f4320.c
+libdev18f4320_a_SOURCES = pic18f4320.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4320_a_CFLAGS = -p18f4320 $(AM_CFLAGS)
-libdev18f4321_a_SOURCES = pic18f4321.c
+libdev18f4321_a_SOURCES = pic18f4321.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4321_a_CFLAGS = -p18f4321 $(AM_CFLAGS)
-libdev18f4331_a_SOURCES = pic18f4331.c
+libdev18f4331_a_SOURCES = pic18f4331.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4331_a_CFLAGS = -p18f4331 $(AM_CFLAGS)
-libdev18f43k20_a_SOURCES = pic18f43k20.c
+libdev18f43k20_a_SOURCES = pic18f43k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f43k20_a_CFLAGS = -p18f43k20 $(AM_CFLAGS)
-libdev18f43k22_a_SOURCES = pic18f43k22.c
+libdev18f43k22_a_SOURCES = pic18f43k22.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f43k22_a_CFLAGS = -p18f43k22 $(AM_CFLAGS)
-libdev18f4410_a_SOURCES = pic18f4410.c
+libdev18f4410_a_SOURCES = pic18f4410.c gptr/dispatch.S
 libdev18f4410_a_CFLAGS = -p18f4410 $(AM_CFLAGS)
-libdev18f442_a_SOURCES = pic18f442.c
+libdev18f442_a_SOURCES = pic18f442.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f442_a_CFLAGS = -p18f442 $(AM_CFLAGS)
-libdev18f4420_a_SOURCES = pic18f4420.c
+libdev18f4420_a_SOURCES = pic18f4420.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4420_a_CFLAGS = -p18f4420 $(AM_CFLAGS)
-libdev18f4423_a_SOURCES = pic18f4423.c
+libdev18f4423_a_SOURCES = pic18f4423.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4423_a_CFLAGS = -p18f4423 $(AM_CFLAGS)
-libdev18f4431_a_SOURCES = pic18f4431.c
+libdev18f4431_a_SOURCES = pic18f4431.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4431_a_CFLAGS = -p18f4431 $(AM_CFLAGS)
-libdev18f4450_a_SOURCES = pic18f4450.c
+libdev18f4450_a_SOURCES = pic18f4450.c gptr/dispatch.S fake_sspbuf.c
 libdev18f4450_a_CFLAGS = -p18f4450 $(AM_CFLAGS)
-libdev18f4455_a_SOURCES = pic18f4455.c
+libdev18f4455_a_SOURCES = pic18f4455.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4455_a_CFLAGS = -p18f4455 $(AM_CFLAGS)
-libdev18f448_a_SOURCES = pic18f448.c
+libdev18f448_a_SOURCES = pic18f448.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f448_a_CFLAGS = -p18f448 $(AM_CFLAGS)
-libdev18f4480_a_SOURCES = pic18f4480.c
+libdev18f4480_a_SOURCES = pic18f4480.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4480_a_CFLAGS = -p18f4480 $(AM_CFLAGS)
-libdev18f44j10_a_SOURCES = pic18f44j10.c
+libdev18f44j10_a_SOURCES = pic18f44j10.c gptr/dispatch.S
 libdev18f44j10_a_CFLAGS = -p18f44j10 $(AM_CFLAGS)
-libdev18f44j50_a_SOURCES = pic18f44j50.c
+libdev18f44j50_a_SOURCES = pic18f44j50.c gptr/dispatch.S
 libdev18f44j50_a_CFLAGS = -p18f44j50 $(AM_CFLAGS)
-libdev18f44k20_a_SOURCES = pic18f44k20.c
+libdev18f44k20_a_SOURCES = pic18f44k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f44k20_a_CFLAGS = -p18f44k20 $(AM_CFLAGS)
-libdev18f44k22_a_SOURCES = pic18f44k22.c
+libdev18f44k22_a_SOURCES = pic18f44k22.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f44k22_a_CFLAGS = -p18f44k22 $(AM_CFLAGS)
-libdev18f4510_a_SOURCES = pic18f4510.c
+libdev18f4510_a_SOURCES = pic18f4510.c gptr/dispatch.S
 libdev18f4510_a_CFLAGS = -p18f4510 $(AM_CFLAGS)
-libdev18f4515_a_SOURCES = pic18f4515.c
+libdev18f4515_a_SOURCES = pic18f4515.c gptr/dispatch.S
 libdev18f4515_a_CFLAGS = -p18f4515 $(AM_CFLAGS)
-libdev18f452_a_SOURCES = pic18f452.c
+libdev18f452_a_SOURCES = pic18f452.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f452_a_CFLAGS = -p18f452 $(AM_CFLAGS)
-libdev18f4520_a_SOURCES = pic18f4520.c
+libdev18f4520_a_SOURCES = pic18f4520.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4520_a_CFLAGS = -p18f4520 $(AM_CFLAGS)
-libdev18f4523_a_SOURCES = pic18f4523.c
+libdev18f4523_a_SOURCES = pic18f4523.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4523_a_CFLAGS = -p18f4523 $(AM_CFLAGS)
-libdev18f4525_a_SOURCES = pic18f4525.c
+libdev18f4525_a_SOURCES = pic18f4525.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4525_a_CFLAGS = -p18f4525 $(AM_CFLAGS)
-libdev18f4550_a_SOURCES = pic18f4550.c
+libdev18f4550_a_SOURCES = pic18f4550.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4550_a_CFLAGS = -p18f4550 $(AM_CFLAGS)
-libdev18f458_a_SOURCES = pic18f458.c
+libdev18f458_a_SOURCES = pic18f458.c gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f458_a_CFLAGS = -p18f458 $(AM_CFLAGS)
-libdev18f4580_a_SOURCES = pic18f4580.c
+libdev18f4580_a_SOURCES = pic18f4580.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4580_a_CFLAGS = -p18f4580 $(AM_CFLAGS)
-libdev18f4585_a_SOURCES = pic18f4585.c
+libdev18f4585_a_SOURCES = pic18f4585.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4585_a_CFLAGS = -p18f4585 $(AM_CFLAGS)
-libdev18f45j10_a_SOURCES = pic18f45j10.c
+libdev18f45j10_a_SOURCES = pic18f45j10.c gptr/dispatch.S
 libdev18f45j10_a_CFLAGS = -p18f45j10 $(AM_CFLAGS)
-libdev18f45j50_a_SOURCES = pic18f45j50.c
+libdev18f45j50_a_SOURCES = pic18f45j50.c gptr/dispatch.S
 libdev18f45j50_a_CFLAGS = -p18f45j50 $(AM_CFLAGS)
-libdev18f45k20_a_SOURCES = pic18f45k20.c
+libdev18f45k20_a_SOURCES = pic18f45k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f45k20_a_CFLAGS = -p18f45k20 $(AM_CFLAGS)
-libdev18f45k22_a_SOURCES = pic18f45k22.c
+libdev18f45k22_a_SOURCES = pic18f45k22.c \
+	gptr/eeprom8_gptrget1_dispatch.S \
+	gptr/eeprom8_gptrget2_dispatch.S \
+	gptr/eeprom8_gptrget3_dispatch.S \
+	gptr/eeprom8_gptrget4_dispatch.S \
+	gptr/eeprom8_gptrput1_dispatch.S \
+	gptr/eeprom8_gptrput2_dispatch.S \
+	gptr/eeprom8_gptrput3_dispatch.S \
+	gptr/eeprom8_gptrput4_dispatch.S
 libdev18f45k22_a_CFLAGS = -p18f45k22 $(AM_CFLAGS)
-libdev18f4610_a_SOURCES = pic18f4610.c
+libdev18f4610_a_SOURCES = pic18f4610.c gptr/dispatch.S
 libdev18f4610_a_CFLAGS = -p18f4610 $(AM_CFLAGS)
-libdev18f4620_a_SOURCES = pic18f4620.c
+libdev18f4620_a_SOURCES = pic18f4620.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4620_a_CFLAGS = -p18f4620 $(AM_CFLAGS)
-libdev18f4680_a_SOURCES = pic18f4680.c
+libdev18f4680_a_SOURCES = pic18f4680.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4680_a_CFLAGS = -p18f4680 $(AM_CFLAGS)
-libdev18f4682_a_SOURCES = pic18f4682.c
+libdev18f4682_a_SOURCES = pic18f4682.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4682_a_CFLAGS = -p18f4682 $(AM_CFLAGS)
-libdev18f4685_a_SOURCES = pic18f4685.c
+libdev18f4685_a_SOURCES = pic18f4685.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4685_a_CFLAGS = -p18f4685 $(AM_CFLAGS)
-libdev18f46j50_a_SOURCES = pic18f46j50.c
+libdev18f46j50_a_SOURCES = pic18f46j50.c gptr/dispatch.S
 libdev18f46j50_a_CFLAGS = -p18f46j50 $(AM_CFLAGS)
-libdev18f46k20_a_SOURCES = pic18f46k20.c
+libdev18f46k20_a_SOURCES = pic18f46k20.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f46k20_a_CFLAGS = -p18f46k20 $(AM_CFLAGS)
-libdev18f46k22_a_SOURCES = pic18f46k22.c
+libdev18f46k22_a_SOURCES = pic18f46k22.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f46k22_a_CFLAGS = -p18f46k22 $(AM_CFLAGS)
-libdev18f6520_a_SOURCES = pic18f6520.c
+libdev18f6520_a_SOURCES = pic18f6520.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6520_a_CFLAGS = -p18f6520 $(AM_CFLAGS)
-libdev18f6527_a_SOURCES = pic18f6527.c
+libdev18f6527_a_SOURCES = pic18f6527.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6527_a_CFLAGS = -p18f6527 $(AM_CFLAGS)
-libdev18f6585_a_SOURCES = pic18f6585.c
+libdev18f6585_a_SOURCES = pic18f6585.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6585_a_CFLAGS = -p18f6585 $(AM_CFLAGS)
-libdev18f65j50_a_SOURCES = pic18f65j50.c
+libdev18f65j50_a_SOURCES = pic18f65j50.c gptr/dispatch.S
 libdev18f65j50_a_CFLAGS = -p18f65j50 $(AM_CFLAGS)
-libdev18f6620_a_SOURCES = pic18f6620.c
+libdev18f6620_a_SOURCES = pic18f6620.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6620_a_CFLAGS = -p18f6620 $(AM_CFLAGS)
-libdev18f6622_a_SOURCES = pic18f6622.c
+libdev18f6622_a_SOURCES = pic18f6622.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6622_a_CFLAGS = -p18f6622 $(AM_CFLAGS)
-libdev18f6627_a_SOURCES = pic18f6627.c
+libdev18f6627_a_SOURCES = pic18f6627.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6627_a_CFLAGS = -p18f6627 $(AM_CFLAGS)
-libdev18f6680_a_SOURCES = pic18f6680.c
+libdev18f6680_a_SOURCES = pic18f6680.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6680_a_CFLAGS = -p18f6680 $(AM_CFLAGS)
-libdev18f66j50_a_SOURCES = pic18f66j50.c
+libdev18f66j50_a_SOURCES = pic18f66j50.c gptr/dispatch.S
 libdev18f66j50_a_CFLAGS = -p18f66j50 $(AM_CFLAGS)
-libdev18f66j55_a_SOURCES = pic18f66j55.c
+libdev18f66j55_a_SOURCES = pic18f66j55.c gptr/dispatch.S
 libdev18f66j55_a_CFLAGS = -p18f66j55 $(AM_CFLAGS)
-libdev18f66j60_a_SOURCES = pic18f66j60.c
+libdev18f66j60_a_SOURCES = pic18f66j60.c gptr/dispatch.S
 libdev18f66j60_a_CFLAGS = -p18f66j60 $(AM_CFLAGS)
-libdev18f66j65_a_SOURCES = pic18f66j65.c
+libdev18f66j65_a_SOURCES = pic18f66j65.c gptr/dispatch.S
 libdev18f66j65_a_CFLAGS = -p18f66j65 $(AM_CFLAGS)
-libdev18f6720_a_SOURCES = pic18f6720.c
+libdev18f6720_a_SOURCES = pic18f6720.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6720_a_CFLAGS = -p18f6720 $(AM_CFLAGS)
-libdev18f6722_a_SOURCES = pic18f6722.c
+libdev18f6722_a_SOURCES = pic18f6722.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f6722_a_CFLAGS = -p18f6722 $(AM_CFLAGS)
-libdev18f67j50_a_SOURCES = pic18f67j50.c
+libdev18f67j50_a_SOURCES = pic18f67j50.c gptr/dispatch.S
 libdev18f67j50_a_CFLAGS = -p18f67j50 $(AM_CFLAGS)
-libdev18f67j60_a_SOURCES = pic18f67j60.c
+libdev18f67j60_a_SOURCES = pic18f67j60.c gptr/dispatch.S
 libdev18f67j60_a_CFLAGS = -p18f67j60 $(AM_CFLAGS)
-libdev18f8520_a_SOURCES = pic18f8520.c
+libdev18f8520_a_SOURCES = pic18f8520.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8520_a_CFLAGS = -p18f8520 $(AM_CFLAGS)
-libdev18f8527_a_SOURCES = pic18f8527.c
+libdev18f8527_a_SOURCES = pic18f8527.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8527_a_CFLAGS = -p18f8527 $(AM_CFLAGS)
-libdev18f8585_a_SOURCES = pic18f8585.c
+libdev18f8585_a_SOURCES = pic18f8585.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8585_a_CFLAGS = -p18f8585 $(AM_CFLAGS)
-libdev18f85j50_a_SOURCES = pic18f85j50.c
+libdev18f85j50_a_SOURCES = pic18f85j50.c gptr/dispatch.S
 libdev18f85j50_a_CFLAGS = -p18f85j50 $(AM_CFLAGS)
-libdev18f8620_a_SOURCES = pic18f8620.c
+libdev18f8620_a_SOURCES = pic18f8620.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8620_a_CFLAGS = -p18f8620 $(AM_CFLAGS)
-libdev18f8622_a_SOURCES = pic18f8622.c
+libdev18f8622_a_SOURCES = pic18f8622.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8622_a_CFLAGS = -p18f8622 $(AM_CFLAGS)
-libdev18f8627_a_SOURCES = pic18f8627.c
+libdev18f8627_a_SOURCES = pic18f8627.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8627_a_CFLAGS = -p18f8627 $(AM_CFLAGS)
-libdev18f8680_a_SOURCES = pic18f8680.c
+libdev18f8680_a_SOURCES = pic18f8680.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8680_a_CFLAGS = -p18f8680 $(AM_CFLAGS)
-libdev18f86j50_a_SOURCES = pic18f86j50.c
+libdev18f86j50_a_SOURCES = pic18f86j50.c gptr/dispatch.S
 libdev18f86j50_a_CFLAGS = -p18f86j50 $(AM_CFLAGS)
-libdev18f86j55_a_SOURCES = pic18f86j55.c
+libdev18f86j55_a_SOURCES = pic18f86j55.c gptr/dispatch.S
 libdev18f86j55_a_CFLAGS = -p18f86j55 $(AM_CFLAGS)
-libdev18f86j60_a_SOURCES = pic18f86j60.c
+libdev18f86j60_a_SOURCES = pic18f86j60.c gptr/dispatch.S
 libdev18f86j60_a_CFLAGS = -p18f86j60 $(AM_CFLAGS)
-libdev18f86j65_a_SOURCES = pic18f86j65.c
+libdev18f86j65_a_SOURCES = pic18f86j65.c gptr/dispatch.S
 libdev18f86j65_a_CFLAGS = -p18f86j65 $(AM_CFLAGS)
-libdev18f8720_a_SOURCES = pic18f8720.c
+libdev18f8720_a_SOURCES = pic18f8720.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8720_a_CFLAGS = -p18f8720 $(AM_CFLAGS)
-libdev18f8722_a_SOURCES = pic18f8722.c
+libdev18f8722_a_SOURCES = pic18f8722.c \
+	gptr/eeprom16_gptrget1_dispatch.S \
+	gptr/eeprom16_gptrget2_dispatch.S \
+	gptr/eeprom16_gptrget3_dispatch.S \
+	gptr/eeprom16_gptrget4_dispatch.S \
+	gptr/eeprom16_gptrput1_dispatch.S \
+	gptr/eeprom16_gptrput2_dispatch.S \
+	gptr/eeprom16_gptrput3_dispatch.S \
+	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f8722_a_CFLAGS = -p18f8722 $(AM_CFLAGS)
-libdev18f87j50_a_SOURCES = pic18f87j50.c
+libdev18f87j50_a_SOURCES = pic18f87j50.c gptr/dispatch.S
 libdev18f87j50_a_CFLAGS = -p18f87j50 $(AM_CFLAGS)
-libdev18f87j60_a_SOURCES = pic18f87j60.c
+libdev18f87j60_a_SOURCES = pic18f87j60.c gptr/dispatch.S
 libdev18f87j60_a_CFLAGS = -p18f87j60 $(AM_CFLAGS)
-libdev18f96j60_a_SOURCES = pic18f96j60.c
+libdev18f96j60_a_SOURCES = pic18f96j60.c gptr/dispatch.S
 libdev18f96j60_a_CFLAGS = -p18f96j60 $(AM_CFLAGS)
-libdev18f96j65_a_SOURCES = pic18f96j65.c
+libdev18f96j65_a_SOURCES = pic18f96j65.c gptr/dispatch.S
 libdev18f96j65_a_CFLAGS = -p18f96j65 $(AM_CFLAGS)
-libdev18f97j60_a_SOURCES = pic18f97j60.c
+libdev18f97j60_a_SOURCES = pic18f97j60.c gptr/dispatch.S
 libdev18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../../include/pic16 \
 	-I$(top_srcdir)/../../../non-free/include/pic16
@@ -1112,7 +2555,7 @@ AM_CCASFLAGS = -I$(top_srcdir)/../../../include/pic16 \
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
+.SUFFIXES: .S .c .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/Makefile.common $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -1682,9 +3125,30 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget1_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget2_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget3_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrget4_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput1_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput2_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput3_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom16_gptrput4_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget1_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget2_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget3_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrget4_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput1_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput2_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput3_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eeprom8_gptrput4_dispatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1220_a-fake_sspbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1220_a-pic18f1220.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1230_a-fake_sspbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1230_a-pic18f1230.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1320_a-fake_sspbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1320_a-pic18f1320.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1330_a-fake_sspbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f1330_a-pic18f1330.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f13k50_a-pic18f13k50.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f14k50_a-pic18f14k50.Po@am__quote@
@@ -1700,6 +3164,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f2423_a-pic18f2423.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f242_a-pic18f242.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f2431_a-pic18f2431.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f2450_a-fake_sspbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f2450_a-pic18f2450.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f2455_a-pic18f2455.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f2480_a-pic18f2480.Po@am__quote@
@@ -1742,6 +3207,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f4423_a-pic18f4423.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f442_a-pic18f442.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f4431_a-pic18f4431.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f4450_a-fake_sspbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f4450_a-pic18f4450.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f4455_a-pic18f4455.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f4480_a-pic18f4480.Po@am__quote@
@@ -1808,6 +3274,258 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j65_a-pic18f96j65.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f97j60_a-pic18f97j60.Po@am__quote@
 
+.S.o:
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ $<
+
+.S.obj:
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+eeprom8_gptrget1_dispatch.o: gptr/eeprom8_gptrget1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget1_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget1_dispatch.Tpo -c -o eeprom8_gptrget1_dispatch.o `test -f 'gptr/eeprom8_gptrget1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget1_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget1_dispatch.S' object='eeprom8_gptrget1_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget1_dispatch.o `test -f 'gptr/eeprom8_gptrget1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget1_dispatch.S
+
+eeprom8_gptrget1_dispatch.obj: gptr/eeprom8_gptrget1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget1_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget1_dispatch.Tpo -c -o eeprom8_gptrget1_dispatch.obj `if test -f 'gptr/eeprom8_gptrget1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget1_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget1_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget1_dispatch.S' object='eeprom8_gptrget1_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget1_dispatch.obj `if test -f 'gptr/eeprom8_gptrget1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget1_dispatch.S'; fi`
+
+eeprom8_gptrget2_dispatch.o: gptr/eeprom8_gptrget2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget2_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget2_dispatch.Tpo -c -o eeprom8_gptrget2_dispatch.o `test -f 'gptr/eeprom8_gptrget2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget2_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget2_dispatch.S' object='eeprom8_gptrget2_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget2_dispatch.o `test -f 'gptr/eeprom8_gptrget2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget2_dispatch.S
+
+eeprom8_gptrget2_dispatch.obj: gptr/eeprom8_gptrget2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget2_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget2_dispatch.Tpo -c -o eeprom8_gptrget2_dispatch.obj `if test -f 'gptr/eeprom8_gptrget2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget2_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget2_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget2_dispatch.S' object='eeprom8_gptrget2_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget2_dispatch.obj `if test -f 'gptr/eeprom8_gptrget2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget2_dispatch.S'; fi`
+
+eeprom8_gptrget3_dispatch.o: gptr/eeprom8_gptrget3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget3_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget3_dispatch.Tpo -c -o eeprom8_gptrget3_dispatch.o `test -f 'gptr/eeprom8_gptrget3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget3_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget3_dispatch.S' object='eeprom8_gptrget3_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget3_dispatch.o `test -f 'gptr/eeprom8_gptrget3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget3_dispatch.S
+
+eeprom8_gptrget3_dispatch.obj: gptr/eeprom8_gptrget3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget3_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget3_dispatch.Tpo -c -o eeprom8_gptrget3_dispatch.obj `if test -f 'gptr/eeprom8_gptrget3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget3_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget3_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget3_dispatch.S' object='eeprom8_gptrget3_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget3_dispatch.obj `if test -f 'gptr/eeprom8_gptrget3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget3_dispatch.S'; fi`
+
+eeprom8_gptrget4_dispatch.o: gptr/eeprom8_gptrget4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget4_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrget4_dispatch.Tpo -c -o eeprom8_gptrget4_dispatch.o `test -f 'gptr/eeprom8_gptrget4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget4_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget4_dispatch.S' object='eeprom8_gptrget4_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget4_dispatch.o `test -f 'gptr/eeprom8_gptrget4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrget4_dispatch.S
+
+eeprom8_gptrget4_dispatch.obj: gptr/eeprom8_gptrget4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrget4_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrget4_dispatch.Tpo -c -o eeprom8_gptrget4_dispatch.obj `if test -f 'gptr/eeprom8_gptrget4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget4_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrget4_dispatch.Tpo $(DEPDIR)/eeprom8_gptrget4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrget4_dispatch.S' object='eeprom8_gptrget4_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrget4_dispatch.obj `if test -f 'gptr/eeprom8_gptrget4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrget4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrget4_dispatch.S'; fi`
+
+eeprom8_gptrput1_dispatch.o: gptr/eeprom8_gptrput1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput1_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput1_dispatch.Tpo -c -o eeprom8_gptrput1_dispatch.o `test -f 'gptr/eeprom8_gptrput1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput1_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput1_dispatch.S' object='eeprom8_gptrput1_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput1_dispatch.o `test -f 'gptr/eeprom8_gptrput1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput1_dispatch.S
+
+eeprom8_gptrput1_dispatch.obj: gptr/eeprom8_gptrput1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput1_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput1_dispatch.Tpo -c -o eeprom8_gptrput1_dispatch.obj `if test -f 'gptr/eeprom8_gptrput1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput1_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput1_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput1_dispatch.S' object='eeprom8_gptrput1_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput1_dispatch.obj `if test -f 'gptr/eeprom8_gptrput1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput1_dispatch.S'; fi`
+
+eeprom8_gptrput2_dispatch.o: gptr/eeprom8_gptrput2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput2_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput2_dispatch.Tpo -c -o eeprom8_gptrput2_dispatch.o `test -f 'gptr/eeprom8_gptrput2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput2_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput2_dispatch.S' object='eeprom8_gptrput2_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput2_dispatch.o `test -f 'gptr/eeprom8_gptrput2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput2_dispatch.S
+
+eeprom8_gptrput2_dispatch.obj: gptr/eeprom8_gptrput2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput2_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput2_dispatch.Tpo -c -o eeprom8_gptrput2_dispatch.obj `if test -f 'gptr/eeprom8_gptrput2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput2_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput2_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput2_dispatch.S' object='eeprom8_gptrput2_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput2_dispatch.obj `if test -f 'gptr/eeprom8_gptrput2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput2_dispatch.S'; fi`
+
+eeprom8_gptrput3_dispatch.o: gptr/eeprom8_gptrput3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput3_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput3_dispatch.Tpo -c -o eeprom8_gptrput3_dispatch.o `test -f 'gptr/eeprom8_gptrput3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput3_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput3_dispatch.S' object='eeprom8_gptrput3_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput3_dispatch.o `test -f 'gptr/eeprom8_gptrput3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput3_dispatch.S
+
+eeprom8_gptrput3_dispatch.obj: gptr/eeprom8_gptrput3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput3_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput3_dispatch.Tpo -c -o eeprom8_gptrput3_dispatch.obj `if test -f 'gptr/eeprom8_gptrput3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput3_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput3_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput3_dispatch.S' object='eeprom8_gptrput3_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput3_dispatch.obj `if test -f 'gptr/eeprom8_gptrput3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput3_dispatch.S'; fi`
+
+eeprom8_gptrput4_dispatch.o: gptr/eeprom8_gptrput4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput4_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom8_gptrput4_dispatch.Tpo -c -o eeprom8_gptrput4_dispatch.o `test -f 'gptr/eeprom8_gptrput4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput4_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput4_dispatch.S' object='eeprom8_gptrput4_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput4_dispatch.o `test -f 'gptr/eeprom8_gptrput4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom8_gptrput4_dispatch.S
+
+eeprom8_gptrput4_dispatch.obj: gptr/eeprom8_gptrput4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom8_gptrput4_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom8_gptrput4_dispatch.Tpo -c -o eeprom8_gptrput4_dispatch.obj `if test -f 'gptr/eeprom8_gptrput4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput4_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom8_gptrput4_dispatch.Tpo $(DEPDIR)/eeprom8_gptrput4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom8_gptrput4_dispatch.S' object='eeprom8_gptrput4_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom8_gptrput4_dispatch.obj `if test -f 'gptr/eeprom8_gptrput4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom8_gptrput4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom8_gptrput4_dispatch.S'; fi`
+
+eeprom16_gptrget1_dispatch.o: gptr/eeprom16_gptrget1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget1_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget1_dispatch.Tpo -c -o eeprom16_gptrget1_dispatch.o `test -f 'gptr/eeprom16_gptrget1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget1_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget1_dispatch.S' object='eeprom16_gptrget1_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget1_dispatch.o `test -f 'gptr/eeprom16_gptrget1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget1_dispatch.S
+
+eeprom16_gptrget1_dispatch.obj: gptr/eeprom16_gptrget1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget1_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget1_dispatch.Tpo -c -o eeprom16_gptrget1_dispatch.obj `if test -f 'gptr/eeprom16_gptrget1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget1_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget1_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget1_dispatch.S' object='eeprom16_gptrget1_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget1_dispatch.obj `if test -f 'gptr/eeprom16_gptrget1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget1_dispatch.S'; fi`
+
+eeprom16_gptrget2_dispatch.o: gptr/eeprom16_gptrget2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget2_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget2_dispatch.Tpo -c -o eeprom16_gptrget2_dispatch.o `test -f 'gptr/eeprom16_gptrget2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget2_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget2_dispatch.S' object='eeprom16_gptrget2_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget2_dispatch.o `test -f 'gptr/eeprom16_gptrget2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget2_dispatch.S
+
+eeprom16_gptrget2_dispatch.obj: gptr/eeprom16_gptrget2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget2_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget2_dispatch.Tpo -c -o eeprom16_gptrget2_dispatch.obj `if test -f 'gptr/eeprom16_gptrget2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget2_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget2_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget2_dispatch.S' object='eeprom16_gptrget2_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget2_dispatch.obj `if test -f 'gptr/eeprom16_gptrget2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget2_dispatch.S'; fi`
+
+eeprom16_gptrget3_dispatch.o: gptr/eeprom16_gptrget3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget3_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget3_dispatch.Tpo -c -o eeprom16_gptrget3_dispatch.o `test -f 'gptr/eeprom16_gptrget3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget3_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget3_dispatch.S' object='eeprom16_gptrget3_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget3_dispatch.o `test -f 'gptr/eeprom16_gptrget3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget3_dispatch.S
+
+eeprom16_gptrget3_dispatch.obj: gptr/eeprom16_gptrget3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget3_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget3_dispatch.Tpo -c -o eeprom16_gptrget3_dispatch.obj `if test -f 'gptr/eeprom16_gptrget3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget3_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget3_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget3_dispatch.S' object='eeprom16_gptrget3_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget3_dispatch.obj `if test -f 'gptr/eeprom16_gptrget3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget3_dispatch.S'; fi`
+
+eeprom16_gptrget4_dispatch.o: gptr/eeprom16_gptrget4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget4_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrget4_dispatch.Tpo -c -o eeprom16_gptrget4_dispatch.o `test -f 'gptr/eeprom16_gptrget4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget4_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget4_dispatch.S' object='eeprom16_gptrget4_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget4_dispatch.o `test -f 'gptr/eeprom16_gptrget4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrget4_dispatch.S
+
+eeprom16_gptrget4_dispatch.obj: gptr/eeprom16_gptrget4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrget4_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrget4_dispatch.Tpo -c -o eeprom16_gptrget4_dispatch.obj `if test -f 'gptr/eeprom16_gptrget4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget4_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrget4_dispatch.Tpo $(DEPDIR)/eeprom16_gptrget4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrget4_dispatch.S' object='eeprom16_gptrget4_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrget4_dispatch.obj `if test -f 'gptr/eeprom16_gptrget4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrget4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrget4_dispatch.S'; fi`
+
+eeprom16_gptrput1_dispatch.o: gptr/eeprom16_gptrput1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput1_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput1_dispatch.Tpo -c -o eeprom16_gptrput1_dispatch.o `test -f 'gptr/eeprom16_gptrput1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput1_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput1_dispatch.S' object='eeprom16_gptrput1_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput1_dispatch.o `test -f 'gptr/eeprom16_gptrput1_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput1_dispatch.S
+
+eeprom16_gptrput1_dispatch.obj: gptr/eeprom16_gptrput1_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput1_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput1_dispatch.Tpo -c -o eeprom16_gptrput1_dispatch.obj `if test -f 'gptr/eeprom16_gptrput1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput1_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput1_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput1_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput1_dispatch.S' object='eeprom16_gptrput1_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput1_dispatch.obj `if test -f 'gptr/eeprom16_gptrput1_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput1_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput1_dispatch.S'; fi`
+
+eeprom16_gptrput2_dispatch.o: gptr/eeprom16_gptrput2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput2_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput2_dispatch.Tpo -c -o eeprom16_gptrput2_dispatch.o `test -f 'gptr/eeprom16_gptrput2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput2_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput2_dispatch.S' object='eeprom16_gptrput2_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput2_dispatch.o `test -f 'gptr/eeprom16_gptrput2_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput2_dispatch.S
+
+eeprom16_gptrput2_dispatch.obj: gptr/eeprom16_gptrput2_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput2_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput2_dispatch.Tpo -c -o eeprom16_gptrput2_dispatch.obj `if test -f 'gptr/eeprom16_gptrput2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput2_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput2_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput2_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput2_dispatch.S' object='eeprom16_gptrput2_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput2_dispatch.obj `if test -f 'gptr/eeprom16_gptrput2_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput2_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput2_dispatch.S'; fi`
+
+eeprom16_gptrput3_dispatch.o: gptr/eeprom16_gptrput3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput3_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput3_dispatch.Tpo -c -o eeprom16_gptrput3_dispatch.o `test -f 'gptr/eeprom16_gptrput3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput3_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput3_dispatch.S' object='eeprom16_gptrput3_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput3_dispatch.o `test -f 'gptr/eeprom16_gptrput3_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput3_dispatch.S
+
+eeprom16_gptrput3_dispatch.obj: gptr/eeprom16_gptrput3_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput3_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput3_dispatch.Tpo -c -o eeprom16_gptrput3_dispatch.obj `if test -f 'gptr/eeprom16_gptrput3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput3_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput3_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput3_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput3_dispatch.S' object='eeprom16_gptrput3_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput3_dispatch.obj `if test -f 'gptr/eeprom16_gptrput3_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput3_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput3_dispatch.S'; fi`
+
+eeprom16_gptrput4_dispatch.o: gptr/eeprom16_gptrput4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput4_dispatch.o -MD -MP -MF $(DEPDIR)/eeprom16_gptrput4_dispatch.Tpo -c -o eeprom16_gptrput4_dispatch.o `test -f 'gptr/eeprom16_gptrput4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput4_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput4_dispatch.S' object='eeprom16_gptrput4_dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput4_dispatch.o `test -f 'gptr/eeprom16_gptrput4_dispatch.S' || echo '$(srcdir)/'`gptr/eeprom16_gptrput4_dispatch.S
+
+eeprom16_gptrput4_dispatch.obj: gptr/eeprom16_gptrput4_dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT eeprom16_gptrput4_dispatch.obj -MD -MP -MF $(DEPDIR)/eeprom16_gptrput4_dispatch.Tpo -c -o eeprom16_gptrput4_dispatch.obj `if test -f 'gptr/eeprom16_gptrput4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput4_dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/eeprom16_gptrput4_dispatch.Tpo $(DEPDIR)/eeprom16_gptrput4_dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/eeprom16_gptrput4_dispatch.S' object='eeprom16_gptrput4_dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o eeprom16_gptrput4_dispatch.obj `if test -f 'gptr/eeprom16_gptrput4_dispatch.S'; then $(CYGPATH_W) 'gptr/eeprom16_gptrput4_dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/eeprom16_gptrput4_dispatch.S'; fi`
+
+dispatch.o: gptr/dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT dispatch.o -MD -MP -MF $(DEPDIR)/dispatch.Tpo -c -o dispatch.o `test -f 'gptr/dispatch.S' || echo '$(srcdir)/'`gptr/dispatch.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/dispatch.Tpo $(DEPDIR)/dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/dispatch.S' object='dispatch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o dispatch.o `test -f 'gptr/dispatch.S' || echo '$(srcdir)/'`gptr/dispatch.S
+
+dispatch.obj: gptr/dispatch.S
+@am__fastdepCCAS_TRUE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT dispatch.obj -MD -MP -MF $(DEPDIR)/dispatch.Tpo -c -o dispatch.obj `if test -f 'gptr/dispatch.S'; then $(CYGPATH_W) 'gptr/dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/dispatch.S'; fi`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/dispatch.Tpo $(DEPDIR)/dispatch.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='gptr/dispatch.S' object='dispatch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o dispatch.obj `if test -f 'gptr/dispatch.S'; then $(CYGPATH_W) 'gptr/dispatch.S'; else $(CYGPATH_W) '$(srcdir)/gptr/dispatch.S'; fi`
+
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
@@ -1836,6 +3554,20 @@ libdev18f1220_a-pic18f1220.obj: pic18f1220.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1220_a_CFLAGS) $(CFLAGS) -c -o libdev18f1220_a-pic18f1220.obj `if test -f 'pic18f1220.c'; then $(CYGPATH_W) 'pic18f1220.c'; else $(CYGPATH_W) '$(srcdir)/pic18f1220.c'; fi`
 
+libdev18f1220_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1220_a_CFLAGS) $(CFLAGS) -MT libdev18f1220_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f1220_a-fake_sspbuf.Tpo -c -o libdev18f1220_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1220_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1220_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1220_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1220_a_CFLAGS) $(CFLAGS) -c -o libdev18f1220_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f1220_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1220_a_CFLAGS) $(CFLAGS) -MT libdev18f1220_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f1220_a-fake_sspbuf.Tpo -c -o libdev18f1220_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1220_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1220_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1220_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1220_a_CFLAGS) $(CFLAGS) -c -o libdev18f1220_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f1230_a-pic18f1230.o: pic18f1230.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1230_a_CFLAGS) $(CFLAGS) -MT libdev18f1230_a-pic18f1230.o -MD -MP -MF $(DEPDIR)/libdev18f1230_a-pic18f1230.Tpo -c -o libdev18f1230_a-pic18f1230.o `test -f 'pic18f1230.c' || echo '$(srcdir)/'`pic18f1230.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1230_a-pic18f1230.Tpo $(DEPDIR)/libdev18f1230_a-pic18f1230.Po
@@ -1849,6 +3581,20 @@ libdev18f1230_a-pic18f1230.obj: pic18f1230.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f1230.c' object='libdev18f1230_a-pic18f1230.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1230_a_CFLAGS) $(CFLAGS) -c -o libdev18f1230_a-pic18f1230.obj `if test -f 'pic18f1230.c'; then $(CYGPATH_W) 'pic18f1230.c'; else $(CYGPATH_W) '$(srcdir)/pic18f1230.c'; fi`
+
+libdev18f1230_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1230_a_CFLAGS) $(CFLAGS) -MT libdev18f1230_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f1230_a-fake_sspbuf.Tpo -c -o libdev18f1230_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1230_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1230_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1230_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1230_a_CFLAGS) $(CFLAGS) -c -o libdev18f1230_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f1230_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1230_a_CFLAGS) $(CFLAGS) -MT libdev18f1230_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f1230_a-fake_sspbuf.Tpo -c -o libdev18f1230_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1230_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1230_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1230_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1230_a_CFLAGS) $(CFLAGS) -c -o libdev18f1230_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 libdev18f1320_a-pic18f1320.o: pic18f1320.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1320_a_CFLAGS) $(CFLAGS) -MT libdev18f1320_a-pic18f1320.o -MD -MP -MF $(DEPDIR)/libdev18f1320_a-pic18f1320.Tpo -c -o libdev18f1320_a-pic18f1320.o `test -f 'pic18f1320.c' || echo '$(srcdir)/'`pic18f1320.c
@@ -1864,6 +3610,20 @@ libdev18f1320_a-pic18f1320.obj: pic18f1320.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1320_a_CFLAGS) $(CFLAGS) -c -o libdev18f1320_a-pic18f1320.obj `if test -f 'pic18f1320.c'; then $(CYGPATH_W) 'pic18f1320.c'; else $(CYGPATH_W) '$(srcdir)/pic18f1320.c'; fi`
 
+libdev18f1320_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1320_a_CFLAGS) $(CFLAGS) -MT libdev18f1320_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f1320_a-fake_sspbuf.Tpo -c -o libdev18f1320_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1320_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1320_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1320_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1320_a_CFLAGS) $(CFLAGS) -c -o libdev18f1320_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f1320_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1320_a_CFLAGS) $(CFLAGS) -MT libdev18f1320_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f1320_a-fake_sspbuf.Tpo -c -o libdev18f1320_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1320_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1320_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1320_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1320_a_CFLAGS) $(CFLAGS) -c -o libdev18f1320_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f1330_a-pic18f1330.o: pic18f1330.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1330_a_CFLAGS) $(CFLAGS) -MT libdev18f1330_a-pic18f1330.o -MD -MP -MF $(DEPDIR)/libdev18f1330_a-pic18f1330.Tpo -c -o libdev18f1330_a-pic18f1330.o `test -f 'pic18f1330.c' || echo '$(srcdir)/'`pic18f1330.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1330_a-pic18f1330.Tpo $(DEPDIR)/libdev18f1330_a-pic18f1330.Po
@@ -1877,6 +3637,20 @@ libdev18f1330_a-pic18f1330.obj: pic18f1330.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f1330.c' object='libdev18f1330_a-pic18f1330.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1330_a_CFLAGS) $(CFLAGS) -c -o libdev18f1330_a-pic18f1330.obj `if test -f 'pic18f1330.c'; then $(CYGPATH_W) 'pic18f1330.c'; else $(CYGPATH_W) '$(srcdir)/pic18f1330.c'; fi`
+
+libdev18f1330_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1330_a_CFLAGS) $(CFLAGS) -MT libdev18f1330_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f1330_a-fake_sspbuf.Tpo -c -o libdev18f1330_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1330_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1330_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1330_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1330_a_CFLAGS) $(CFLAGS) -c -o libdev18f1330_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f1330_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1330_a_CFLAGS) $(CFLAGS) -MT libdev18f1330_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f1330_a-fake_sspbuf.Tpo -c -o libdev18f1330_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f1330_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f1330_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f1330_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f1330_a_CFLAGS) $(CFLAGS) -c -o libdev18f1330_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 libdev18f13k50_a-pic18f13k50.o: pic18f13k50.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f13k50_a_CFLAGS) $(CFLAGS) -MT libdev18f13k50_a-pic18f13k50.o -MD -MP -MF $(DEPDIR)/libdev18f13k50_a-pic18f13k50.Tpo -c -o libdev18f13k50_a-pic18f13k50.o `test -f 'pic18f13k50.c' || echo '$(srcdir)/'`pic18f13k50.c
@@ -2087,6 +3861,20 @@ libdev18f2450_a-pic18f2450.obj: pic18f2450.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f2450.c' object='libdev18f2450_a-pic18f2450.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f2450_a_CFLAGS) $(CFLAGS) -c -o libdev18f2450_a-pic18f2450.obj `if test -f 'pic18f2450.c'; then $(CYGPATH_W) 'pic18f2450.c'; else $(CYGPATH_W) '$(srcdir)/pic18f2450.c'; fi`
+
+libdev18f2450_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f2450_a_CFLAGS) $(CFLAGS) -MT libdev18f2450_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f2450_a-fake_sspbuf.Tpo -c -o libdev18f2450_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f2450_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f2450_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f2450_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f2450_a_CFLAGS) $(CFLAGS) -c -o libdev18f2450_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f2450_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f2450_a_CFLAGS) $(CFLAGS) -MT libdev18f2450_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f2450_a-fake_sspbuf.Tpo -c -o libdev18f2450_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f2450_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f2450_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f2450_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f2450_a_CFLAGS) $(CFLAGS) -c -o libdev18f2450_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 libdev18f2455_a-pic18f2455.o: pic18f2455.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f2455_a_CFLAGS) $(CFLAGS) -MT libdev18f2455_a-pic18f2455.o -MD -MP -MF $(DEPDIR)/libdev18f2455_a-pic18f2455.Tpo -c -o libdev18f2455_a-pic18f2455.o `test -f 'pic18f2455.c' || echo '$(srcdir)/'`pic18f2455.c
@@ -2675,6 +4463,20 @@ libdev18f4450_a-pic18f4450.obj: pic18f4450.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f4450.c' object='libdev18f4450_a-pic18f4450.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f4450_a_CFLAGS) $(CFLAGS) -c -o libdev18f4450_a-pic18f4450.obj `if test -f 'pic18f4450.c'; then $(CYGPATH_W) 'pic18f4450.c'; else $(CYGPATH_W) '$(srcdir)/pic18f4450.c'; fi`
+
+libdev18f4450_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f4450_a_CFLAGS) $(CFLAGS) -MT libdev18f4450_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f4450_a-fake_sspbuf.Tpo -c -o libdev18f4450_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f4450_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f4450_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f4450_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f4450_a_CFLAGS) $(CFLAGS) -c -o libdev18f4450_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f4450_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f4450_a_CFLAGS) $(CFLAGS) -MT libdev18f4450_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f4450_a-fake_sspbuf.Tpo -c -o libdev18f4450_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f4450_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f4450_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f4450_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f4450_a_CFLAGS) $(CFLAGS) -c -o libdev18f4450_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 libdev18f4455_a-pic18f4455.o: pic18f4455.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f4455_a_CFLAGS) $(CFLAGS) -MT libdev18f4455_a-pic18f4455.o -MD -MP -MF $(DEPDIR)/libdev18f4455_a-pic18f4455.Tpo -c -o libdev18f4455_a-pic18f4455.o `test -f 'pic18f4455.c' || echo '$(srcdir)/'`pic18f4455.c

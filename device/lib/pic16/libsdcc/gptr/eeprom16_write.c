@@ -1,7 +1,8 @@
 /*-------------------------------------------------------------------------
-   strmmssp.c - MSSP stream putchar
+   eeprom_write16.c - write one byte to EEPROM and wait for completion
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Adopted for pic16 port by Vangelis Rokas, 2004 <vrokas AT otenet.gr>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,15 +27,25 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern SSPBUF;
+extern char EEADR;
+extern char EEADRH;
+extern char EECON1;
+extern char EECON2;
 
-/* note that USART should already been initialized */
-void
-__stream_mssp_putchar (char c) __wparam __naked
+void __eeprom16_write(void) __naked
 {
-  (void)c;
   __asm
-    MOVWF       _SSPBUF, 0
-    RETURN
+    movlw       0x55
+    movwf       _EECON2, 0
+    movlw       0xAA
+    movwf       _EECON2, 0
+    bsf         _EECON1, 1, 0   ; WR
+
+    wait_till_done:
+    btfsc       _EECON1, 1, 0   ; WR still set?
+    bra         wait_till_done
+
+    infsnz      _EEADR, 1, 0    ; address next byte
+    incf        _EEADRH, 1, 0   ; address next byte
   __endasm;
 }

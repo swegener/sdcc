@@ -1,8 +1,7 @@
 /*-------------------------------------------------------------------------
-   gptrput1.c - put 1 byte value at generic pointer
+   eeprom16_gptrput2.c - write 2 byte value to EEPROM via a generic pointer
 
-   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
-   Adopted for pic16 port by Vangelis Rokas, 2004 <vrokas AT otenet.gr>
+   Copyright (C) 2012 Raphael Neider <rneider AT web.de>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -29,45 +28,44 @@
 
 /* write address is expected to be in WREG:PRODL:FSR0L while
  * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
- 
+
+extern EEADR;
+extern EEADRH;
+extern EECON1;
+extern EEDATA;
 extern FSR0H;
-extern POSTINC0;
+extern FSR0L;
+extern INTCON;
 extern PREINC1;
+extern PRODH;
 extern PRODL;
-extern WREG;
-extern __eeprom_gptrput1;
+extern __eeprom16_write;
 
-void _gptrput1(void) __naked
+void
+__eeprom16_gptrput2(void) __naked
 {
-  __asm
-    /* decode generic pointer MSB (in WREG) bits 6 and 7:
-     * 00 -> code (unimplemented)
-     * 01 -> EEPROM
-     * 10 -> data
-     * 11 -> data
-     *
-     * address: (WREG, PRODL, FSR0L)
-     * value: (TBLPTRH, TBLPTRL, PRODH, STACK1[+1])
-     */
-    btfss	_WREG, 7
-    bra		_lab_01_
-    
-    /* data pointer  */
-    /* FSR0L is already set up */
-    movff	_PRODL, _FSR0H
-    
-    movff	_PREINC1, _POSTINC0
-    
-    return
-    
+    __asm
+        MOVFF   _INTCON, _FSR0H     ; save previous interupt state
+        BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
 
-_lab_01_:
-    /* code or eeprom */
-    btfsc	_WREG, 6
-    goto        ___eeprom_gptrput1
+        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
+        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
+        BSF     _EECON1, 3, 0       ; WREN = 1: enable write access
 
-    /* code pointer, cannot write code pointers */
-    return
+        MOVFF   _FSR0L, _EEADR      ; address first byte
+        MOVFF   _PRODL, _EEADRH     ; high address bits
 
-  __endasm;
+        MOVFF   _PREINC1, _EEDATA   ; load first byte
+        CALL    ___eeprom16_write   ; write and address next byte
+
+        MOVFF   _PRODH, _EEDATA     ; load second byte
+        CALL    ___eeprom16_write   ; write and address next byte
+
+        BCF     _EECON1, 3, 0       ; WREN = 0: disable write access
+
+        BTFSC   _FSR0H, 7, 0        ; check previous interrupt state
+        BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts
+
+        RETURN
+    __endasm;
 }

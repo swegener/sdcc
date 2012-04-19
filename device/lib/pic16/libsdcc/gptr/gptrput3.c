@@ -27,36 +27,35 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* write address is expected to be in WREG:FSR0H:FSR0L while
+/* write address is expected to be in WREG:PRODL:FSR0L while
  * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
  
+extern FSR0H;
 extern POSTINC0;
 extern PREINC1;
-extern INDF0;
-extern FSR0L;
-extern FSR0H;
-extern WREG;
-extern TBLPTRL;
-extern TBLPTRH;
-extern TBLPTRU;
-extern TABLAT;
-extern PRODL;
 extern PRODH;
+extern PRODL;
+extern TBLPTRL;
+extern WREG;
+extern __eeprom_gptrput3;
 
 void _gptrput3(void) __naked
 {
   __asm
     /* decode generic pointer MSB (in WREG) bits 6 and 7:
      * 00 -> code (unimplemented)
-     * 01 -> EEPROM (unimplemented)
+     * 01 -> EEPROM
      * 10 -> data
-     * 11 -> unimplemented
+     * 11 -> data
+     *
+     * address: (WREG, PRODL, FSR0L)
+     * value: (TBLPTRH, TBLPTRL, PRODH, STACK1[+1])
      */
     btfss	_WREG, 7
     bra		_lab_01_
     
     /* data pointer  */
-    /* data are already in FSR0 */
+    /* FSR0L is already set up */
     movff	_PRODL, _FSR0H
     
     movff	_PREINC1, _POSTINC0
@@ -68,18 +67,11 @@ void _gptrput3(void) __naked
 
 _lab_01_:
     /* code or eeprom */
-    btfss	_WREG, 6
-    return
-    
+    btfsc	_WREG, 6
+    goto        ___eeprom_gptrput3
+
     /* code pointer, cannot write code pointers */
-    
-  
-_lab_02_:
-    /* EEPROM pointer */
+    return
 
-    /* unimplemented yet */
-
-
-  return
   __endasm;
 }

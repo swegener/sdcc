@@ -1,3 +1,36 @@
+2012-04-19 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libc/stdio/strmmssp.c:
+	  fixed use of access bank vs. BSR
+
+	* device/lib/pic16/libsdcc/gptr/eeprom{8,16}_gptr{get,put}[1234].c,
+	  device/lib/pic16/libsdcc/gptr/eeprom{8,16}_write.c:
+	  implement EEPROM read/write access
+
+	* device/lib/pic16/libsdcc/gptr/gptr{get,put}[1234].c:
+	  call EEPROM dispatchers on EEPROM accesses
+
+	* device/lib/pic16/libsdcc/Makefile.am:
+	  add gptr EEPROM accessors
+
+	* device/non-free/lib/pic16/libdev/mkmk.sh,
+	  device/non-free/lib/pic16/libdev/newdevices.txt:
+	  improved to automatically add SSPBUF workaround
+	  plus EEPROM dispatchers as required by the devices
+
+	* device/non-free/lib/pic16/libdev/pic18f1330.c,
+	  device/non-free/lib/pic16/libdev/pic18f1220.c,
+	  device/non-free/lib/pic16/libdev/pic18f4450.c:
+	  removed manual SSPBUF workaround
+
+	* device/non-free/lib/pic16/libdev/fake_sspbuf.c:
+	  provide automatic SSPBUF workaround
+
+	* device/lib/pic16/libsdcc/Makefile.in,
+	  device/non-free/lib/pic16/libdev/Makefile.am,
+	  device/non-free/lib/pic16/libdev/Makefile.in:
+	  regenerated
+
 2012-04-14 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/genarith.c (pic16_genMult8XLit_n,pic16_genMult8X8_n):

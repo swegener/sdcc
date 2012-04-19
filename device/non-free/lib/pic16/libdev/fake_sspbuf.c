@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   strmmssp.c - MSSP stream putchar
+   fake_sspbuf.c - provide fake SSPBUF on demand
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
+   Copyright (C) 2012, Raphael Neider <rneider AT web.de>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,15 +26,9 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern SSPBUF;
+/* The code in libc/stdio/strmmssp.c relies on SSPBUF residing in
+ * the access bank, so keep it there for now.
+ * Accesses to SSPBUF never conflict with accesses to TBLPTRL (0xff6),
+ * so just make SSPBUF an alias for TBLPTRL. */
 
-/* note that USART should already been initialized */
-void
-__stream_mssp_putchar (char c) __wparam __naked
-{
-  (void)c;
-  __asm
-    MOVWF       _SSPBUF, 0
-    RETURN
-  __endasm;
-}
+unsigned char __at(0xff6) SSPBUF;

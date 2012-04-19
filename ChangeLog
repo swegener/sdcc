@@ -13,6 +13,11 @@
 	* device/lib/pic16/libsdcc/Makefile.am:
 	  add gptr EEPROM accessors
 
+	* device/non-free/lib/pic16/libdev/gptr/*:
+	  dispatch EEPROM accesses to the appropriate implementations
+	  based on device capabilities (no eeprom, 8 or 16 bit EEPROM
+	  address space)
+
 	* device/non-free/lib/pic16/libdev/mkmk.sh,
 	  device/non-free/lib/pic16/libdev/newdevices.txt:
 	  improved to automatically add SSPBUF workaround

@@ -1,3 +1,8 @@
+2012-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c:
+	  Preparations for repalcing division by power of two by conditional addition and shift.
+
 2012-04-19 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libc/stdio/strmmssp.c:

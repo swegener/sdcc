@@ -13,7 +13,9 @@ RMDIR = @RMDIR@
 CPPFLAGS = -I$(srcdir)/../../../../include/pic14 -I$(srcdir)/../../../../non-free/include/pic14
 
 # add new pics source files here
-NEW_PICS_yes =
+NEW_PICS_yes = \
+    pic16f720.c \
+    pic16f721.c \
 
 PIC14_ENHANCED = \
     pic12f1822.c \
@@ -110,8 +112,6 @@ C_SRC = \
     pic16f690.c \
     pic16f716.c \
     pic16f72.c \
-    pic16f720.c \
-    pic16f721.c \
     pic16f73.c \
     pic16f737.c \
     pic16f74.c \

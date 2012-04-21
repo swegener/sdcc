@@ -5,7 +5,8 @@
 	* support/regression/tests/longlong.c,
 	  support/regression/tests/gcc-torture-execute-pr42269-2.c,
 	  support/regression/tests/gcc-torture-execute-20080529-1.c,
-	  support/regression/tests/gcc-torture-execute-950503-1.c:
+	  support/regression/tests/gcc-torture-execute-950503-1.c,
+	  support/regression/tests/float_single.c:
 	  Enable more tests for hc08.
 
 2012-04-19 Raphael Neider <rneider AT web.de>

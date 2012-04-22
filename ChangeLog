@@ -1,5 +1,10 @@
 2012-04-22 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic16/libsdcc/gptr/eeprom{8,16}_gptrput[1234].c:
+	  fix accessing EECON1.WREN
+
+2012-04-22 Raphael Neider <rneider AT web.de>
+
 	* device/non-free/lib/pic14/libdev/Makefile.in:
 	  build 16f72[01] only if --enable-new-pics is given, as the
 	  devices are not supported in the current gputils release 0.14.1

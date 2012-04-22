@@ -49,7 +49,7 @@ __eeprom16_gptrput1(void) __naked
 
         BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
         BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
-        BSF     _EECON1, 3, 0       ; WREN = 1: enable write access
+        BSF     _EECON1, 2, 0       ; WREN = 1: enable write access
 
         MOVFF   _FSR0L, _EEADR      ; address first byte
         MOVFF   _PRODL, _EEADRH     ; high address bits
@@ -57,7 +57,7 @@ __eeprom16_gptrput1(void) __naked
         MOVFF   _PREINC1, _EEDATA   ; load first byte
         CALL    ___eeprom16_write   ; write and address next byte
 
-        BCF     _EECON1, 3, 0       ; WREN = 0: disable write access
+        BCF     _EECON1, 2, 0       ; WREN = 0: disable write access
 
         BTFSC   _FSR0H, 7, 0        ; check previous interrupt state
         BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts

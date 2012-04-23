@@ -1,3 +1,11 @@
+2012-04-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCicode.c:
+	  Enable replacing division by power of two by conditional addition and shift (for hc08, z80, z180, gbz80 and r2k).
+	* src/z80/gen.c,
+	  src/mcs51/gen.c:
+	  Fortify a "/* I assume that […]" comment by an assertion that would have saved me some time.
+
 2012-04-22 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libsdcc/gptr/eeprom{8,16}_gptrput[1234].c:
@@ -16,7 +24,7 @@
 2012-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c:
-	  Preparations for repalcing division by power of two by conditional addition and shift.
+	  Preparations for replacing division by power of two by conditional addition and shift.
 	* support/regression/tests/longlong.c,
 	  support/regression/tests/gcc-torture-execute-pr42269-2.c,
 	  support/regression/tests/gcc-torture-execute-20080529-1.c,

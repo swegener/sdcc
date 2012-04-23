@@ -8960,6 +8960,8 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 #endif
 
   /* I suppose that the left size >= result size */
+  wassert (getSize (operandType (left)) >= size);
+
   if (shCount == 0)
     {
       while (size--)

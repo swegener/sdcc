@@ -2064,6 +2064,8 @@ static operand *
 geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl);
 static operand *
 geniCodeLogic (operand *left, operand *right, int op, ast *tree);
+operand *
+geniCodeRightShift (operand *left, operand *right);
 
 /*-----------------------------------------------------------------*/
 /* geniCodeDivision - gen intermediate code for division           */
@@ -2084,25 +2086,24 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
   /* if the right is a literal & power of 2
      and left is signed then make it a conditional addition
      followed by right shift */
-#if 0
+#if 1
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) && !IS_UNSIGNED (letype) && ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0) &&
-      TARGET_Z80_LIKE)
+      (TARGET_Z80_LIKE || TARGET_IS_HC08))
     {
-      operand *tmp, *cond;
+      operand *tmp;
       symbol *label = newiTempLabel (NULL);
 
       tmp = newiTempOperand (ltype, 0);
       geniCodeAssign (tmp, left, 0, 0);
 
-      cond = geniCodeLogic (tmp, operandFromLit (0), '<', 0);
-      ic = newiCodeCondition (cond, 0, label);
+      ic = newiCodeCondition (geniCodeLogic (tmp, operandFromLit (0), '<', 0), 0, label);
       ADDTOCHAIN (ic);
 
       geniCodeAssign (tmp, geniCodeAdd (tmp, operandFromLit ((1 << p2) - 1), 0, 0), 0, 0);
       geniCodeLabel (label);
-      ic = newiCode (RIGHT_OP, tmp, operandFromLit (p2));      /* right shift */
+      return (geniCodeCast (resType, geniCodeRightShift (tmp, operandFromLit (p2)), true));
     }
   /* if the right is a literal & power of 2
      and left is unsigned then make it a

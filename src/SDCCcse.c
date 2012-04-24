@@ -2323,6 +2323,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
         {
           algebraicOpts (ic, ebb);
           while (constFold (ic, cseSet));
+          while (boolCast (ic, cseSet));
         }
 
       /* if after all this it becomes an assignment to self

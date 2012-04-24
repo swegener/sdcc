@@ -1109,7 +1109,7 @@ miscOpt (eBBlock ** ebbs, int count)
             case LE_OP:
             case '>':
             case GE_OP:
-              /* Only if the the right operand is literal and left operant is unsigned */
+              /* Only if the the right operand is literal and left operand is unsigned */
               if (isOperandLiteral (IC_RIGHT (ic)) && IS_UNSIGNED (operandType (IC_LEFT (ic))))
                 {
                   unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
@@ -1950,6 +1950,54 @@ optimizeCastCast (eBBlock ** ebbs, int count)
     }
 }
 
+/* Fold pointer addition into offset of GET_VALUE_AT_ADDRESS */
+static void
+offsetFold (eBBlock **ebbs, int count)
+{
+  int i;
+  iCode *ic;
+  iCode *uic;
+
+  if (!TARGET_IS_Z80 && !TARGET_IS_Z180 && !TARGET_IS_R2K)
+    return;
+
+  for (i = 0; i < count; i++)
+    {
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          if ((ic->op == '+' || ic->op == '-') && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+            {
+              if (!IS_OP_LITERAL (IC_RIGHT (ic)))
+                continue;
+
+              /* There must be only one use of the result */
+              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+                continue;
+
+              /* This use must be a GET_VALUE_ATA_DDRESS */
+              uic = hTabItemWithKey (iCodehTab,
+                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+              if (!POINTER_GET (uic))
+                continue;
+
+              /* Historically GET_VALUE_AT_ADDRESS didn't have a right operand */
+              wassertl (IC_RIGHT (uic), "GET_VALUE_AT_ADDRESS without right operand");
+              wassertl (IS_OP_LITERAL (IC_RIGHT (uic)), "GET_VALUE_AT_ADDRESS with non-literal right operand");
+
+              if (ic->op == '+')
+                IC_RIGHT (uic) = operandFromLit (operandLitValue (IC_RIGHT (uic)) + operandLitValue (IC_RIGHT (ic)));
+              else
+                IC_RIGHT (uic) = operandFromLit (operandLitValue (IC_RIGHT (uic)) - operandLitValue (IC_RIGHT (ic)));
+
+              ic->op = '=';
+              IC_RIGHT (ic) = IC_LEFT (ic);
+              IC_LEFT (ic) = 0;
+              SET_ISADDR (IC_RESULT (ic), 0);
+            }
+        }
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* eBBlockFromiCode - creates extended basic blocks from iCode     */
 /*                    will return an array of eBBlock pointers     */
@@ -2035,6 +2083,8 @@ eBBlockFromiCode (iCode * ic)
       // compute the dataflow only
       assert(cseAllBlocks (ebbi, TRUE)==0);
     }
+
+
   /* kill dead code */
   kchange = killDeadCode (ebbi);
 
@@ -2069,6 +2119,8 @@ eBBlockFromiCode (iCode * ic)
       if (options.dump_loop)
         dumpEbbsToFileExt (DUMP_LOOPD, ebbi);
     }
+
+  offsetFold (ebbi->bbOrder, ebbi->count);
 
   /* sort it back by block number */
   //qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);

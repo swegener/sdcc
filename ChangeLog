@@ -1,5 +1,12 @@
 2012-04-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCicode.c,
+	  src/SDCCopt.c,
+	  src/z80/gen.c:
+	  GET_VALUE_AT_ADDRESS with offset for z80, z180 and r2k.
+
+2012-04-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCicode.c:
 	  Enable replacing division by power of two by conditional addition and shift (for hc08, z80, z180, gbz80 and r2k).
 	* src/z80/gen.c,

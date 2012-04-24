@@ -8380,19 +8380,47 @@ _moveFrom_tpair_ (asmop * aop, int offset, PAIR_ID pair)
     }
 }
 
+static void offsetPair (PAIR_ID pair, PAIR_ID extrapair, bool save_extrapair, int val)
+{
+  if (abs (val) < (save_extrapair ? 6 : 4) || pair != PAIR_HL && pair != PAIR_IY && pair != PAIR_IX)
+    {
+      while (val)
+        {
+          emit2 (val > 0 ? "inc %s" : "dec %s", _pairs[pair].name);
+          if (val > 0)
+            val--;
+          else
+            val++;
+          regalloc_dry_run_cost++;
+        }
+    }
+  else
+    {
+      if (save_extrapair)
+        _push (extrapair);
+      emit2 ("ld %s, !immedword", _pairs[extrapair].name, val);
+      emit2 ("add %s, %s", _pairs[pair].name, _pairs[extrapair].name);
+      regalloc_dry_run_cost += (pair == PAIR_HL ? 4 : 5);
+      if (save_extrapair)
+        _pop (extrapair);
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
 static void
-genPointerGet (const iCode * ic)
+genPointerGet (const iCode *ic)
 {
-  operand *left, *result;
-  int size, offset;
-  int pair = PAIR_HL;
+  operand *left, *right, *result;
+  int size, offset, rightval;
+  int pair = PAIR_HL, extrapair;
   sym_link *retype;
   bool pushed_de = FALSE;
+  bool rightval_in_range;
 
   left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
   retype = getSpec (operandType (result));
 
@@ -8400,10 +8428,25 @@ genPointerGet (const iCode * ic)
   aopOp (result, ic, FALSE, FALSE);
   size = AOP_SIZE (result);
 
+  /* Historically GET_VALUE_AT_ADDRESS didn't have a right operand */
+  wassertl (right, "GET_VALUE_AT_ADDRESS without right operand");
+  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "GET_VALUE_AT_ADDRESS with non-literal right operand");
+  rightval = operandLitValue (right);
+  rightval_in_range = (rightval >= -128 && rightval + size - 1 < 127);
+  if (IS_GB)
+    wassert (!rightval);
+
   if (IS_GB || IY_RESERVED && requiresHL (AOP (result)) && size > 1 && AOP_TYPE (result) != AOP_REG)
     pair = PAIR_DE;
 
-  if (isPair (AOP (left)) && size == 1 && !IS_BITVAR (retype))
+  if (AOP_TYPE (left) == AOP_IMMD && size == 1 && AOP_TYPE (result) == AOP_ACC && !IS_BITVAR (retype))
+    {
+      emit2 ("ld a, (%s)", aopGetLitWordLong (AOP (left), rightval, TRUE));
+      regalloc_dry_run_cost += 3;
+      goto release;
+    }
+
+  if (isPair (AOP (left)) && size == 1 && !IS_BITVAR (retype) && !rightval)
     {
       /* Just do it */
       if (isPtrPair (AOP (left)))
@@ -8429,11 +8472,11 @@ genPointerGet (const iCode * ic)
       goto release;
     }
 
-  if (getPairId (AOP (left)) == PAIR_IY && !IS_BITVAR (retype))
+  if (getPairId (AOP (left)) == PAIR_IY && !IS_BITVAR (retype) && rightval_in_range)
     {
       if (IS_R2K && getPairId (AOP (result)) == PAIR_HL)
         {
-          emit2 ("ld hl, 0 (iy)");
+          emit2 ("ld hl, %d (iy)", rightval);
           regalloc_dry_run_cost += 3;
           goto release;
         }
@@ -8447,7 +8490,7 @@ genPointerGet (const iCode * ic)
               struct dbuf_s dbuf;
 
               dbuf_init (&dbuf, 128);
-              dbuf_tprintf (&dbuf, "!*iyx", offset);
+              dbuf_tprintf (&dbuf, "!*iyx", rightval + offset);
               aopPut (AOP (result), dbuf_c_str (&dbuf), offset);
               dbuf_destroy (&dbuf);
             }
@@ -8458,35 +8501,51 @@ genPointerGet (const iCode * ic)
       goto release;
     }
 
+  extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
+
   /* For now we always load into temp pair */
   /* if this is rematerializable */
-  if (!IS_GB && (getPairId (AOP (left)) == PAIR_BC || getPairId (AOP (left)) == PAIR_DE) && AOP_TYPE (result) == AOP_STK
-      || getPairId (AOP (left)) == PAIR_IY && SPEC_BLEN (getSpec (operandType (result))) < 8)
+  if (!IS_GB && (getPairId (AOP (left)) == PAIR_BC || getPairId (AOP (left)) == PAIR_DE) && AOP_TYPE (result) == AOP_STK && !rightval
+      || getPairId (AOP (left)) == PAIR_IY && SPEC_BLEN (getSpec (operandType (result))) < 8 && rightval_in_range)
     pair = getPairId (AOP (left));
   else
     {
       if (pair == PAIR_DE && !isPairDead (PAIR_DE, ic))
         _push (PAIR_DE), pushed_de = TRUE;
-      fetchPair (pair, AOP (left));
+      if (AOP_TYPE(left) == AOP_IMMD)
+        {
+          emit2 ("ld %s, %s", _pairs[pair].name, aopGetLitWordLong (AOP (left), rightval, TRUE));
+          regalloc_dry_run_cost += 3;
+          rightval = 0;
+        }
+      else
+        fetchPair (pair, AOP (left));
     }
 
   /* if bit then unpack */
   if (IS_BITVAR (retype))
     {
+      offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval);
       genUnpackBits (result, pair);
+      if (rightval)
+        spillPair (pair);
+      wassert (isPairDead (pair, ic) || !rightval);
       goto release;
     }
-  else if (getPairId (AOP (result)) == PAIR_HL || size == 2 && AOP_TYPE (result) == AOP_REG
+
+
+ if (getPairId (AOP (result)) == PAIR_HL || size == 2 && AOP_TYPE (result) == AOP_REG
            && (AOP (result)->aopu.aop_reg[0] == regsZ80 + L_IDX || AOP (result)->aopu.aop_reg[0] == regsZ80 + H_IDX))
     {
       wassertl (size == 2, "HL must be of size 2");
-      if (IS_R2K && getPairId (AOP (result)) == PAIR_HL)
+      if (IS_R2K && getPairId (AOP (result)) == PAIR_HL && rightval_in_range)
         {
-          emit2 ("ld hl, 0 (hl)");
+          emit2 ("ld hl, %d (hl)", rightval);
           regalloc_dry_run_cost += 3;
         }
       else
         {
+          offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval);
           emit2 ("ld a,!*hl");
           emit2 ("inc hl");
           if (!regalloc_dry_run)
@@ -8495,8 +8554,12 @@ genPointerGet (const iCode * ic)
           cheapMove (AOP (result), 0, ASMOP_A, 0);
         }
       spillPair (PAIR_HL);
+      goto release;
     }
-  else if (pair == PAIR_HL
+
+  offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval);
+
+  if (pair == PAIR_HL
            || (!IS_GB && (getPairId (AOP (left)) == PAIR_BC || getPairId (AOP (left)) == PAIR_DE)
                && AOP_TYPE (result) == AOP_STK))
     {
@@ -8541,7 +8604,7 @@ genPointerGet (const iCode * ic)
               _moveFrom_tpair_ (AOP (result), r, pair);
 
               // No fixup since result uses HL.
-
+              spillPair (pair);
               goto release;
             }
           else if (l >= 0 && h >= 0)    // Two bytes of result somewehere in hl. Assign it last and use a for caching.
@@ -8580,7 +8643,7 @@ genPointerGet (const iCode * ic)
               cheapMove (AOP (result), r, ASMOP_A, 0);
 
               // No fixup since result uses HL.
-
+              spillPair (pair);
               goto release;
             }
         }
@@ -8604,6 +8667,8 @@ genPointerGet (const iCode * ic)
             regalloc_dry_run_cost += 1;
             _G.pairs[pair].offset--;
           }
+       else if (rightval || AOP_SIZE (result))
+         spillPair (pair);
     }
   else
     {
@@ -8632,7 +8697,10 @@ genPointerGet (const iCode * ic)
               _G.pairs[pair].offset++;
             }
         }
+      if (rightval || AOP_SIZE (result))
+         spillPair (pair);
     }
+  wassert (isPairDead (pair, ic) || !rightval);
 
 release:
   if (pushed_de)

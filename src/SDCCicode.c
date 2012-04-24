@@ -1888,7 +1888,7 @@ geniCodeRValue (operand * op, bool force)
       return op;
     }
 
-  ic = newiCode (GET_VALUE_AT_ADDRESS, op, NULL);
+  ic = newiCode (GET_VALUE_AT_ADDRESS, op, operandFromLit (0));
   if (IS_PTR (type) && op->isaddr && force)
     type = type->next;
 

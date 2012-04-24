@@ -1,5 +1,10 @@
 2012-04-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  Fix #3521024.
+
+2012-04-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCicode.c,
 	  src/SDCCopt.c,
 	  src/z80/gen.c:

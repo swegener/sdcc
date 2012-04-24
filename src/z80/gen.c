@@ -8416,7 +8416,7 @@ genPointerGet (const iCode *ic)
   int size, offset, rightval;
   int pair = PAIR_HL, extrapair;
   sym_link *retype;
-  bool pushed_de = FALSE;
+  bool pushed_pair = FALSE;
   bool rightval_in_range;
 
   left = IC_LEFT (ic);
@@ -8510,8 +8510,8 @@ genPointerGet (const iCode *ic)
     pair = getPairId (AOP (left));
   else
     {
-      if (pair == PAIR_DE && !isPairDead (PAIR_DE, ic))
-        _push (PAIR_DE), pushed_de = TRUE;
+      if (!isPairDead (pair, ic) && size > 1)
+        _push (pair), pushed_pair = TRUE;
       if (AOP_TYPE(left) == AOP_IMMD)
         {
           emit2 ("ld %s, %s", _pairs[pair].name, aopGetLitWordLong (AOP (left), rightval, TRUE));
@@ -8529,7 +8529,7 @@ genPointerGet (const iCode *ic)
       genUnpackBits (result, pair);
       if (rightval)
         spillPair (pair);
-      wassert (isPairDead (pair, ic) || !rightval);
+
       goto release;
     }
 
@@ -8700,11 +8700,10 @@ genPointerGet (const iCode *ic)
       if (rightval || AOP_SIZE (result))
          spillPair (pair);
     }
-  wassert (isPairDead (pair, ic) || !rightval);
 
 release:
-  if (pushed_de)
-    _pop (PAIR_DE);
+  if (pushed_pair)
+    _pop (pair);
 
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);

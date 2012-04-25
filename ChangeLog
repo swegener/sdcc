@@ -2,6 +2,8 @@
 
 	* src/common.h, src/ds390/main.c: include SDCCsystem.h in common.h
 	* src/SDCCmain.c: added newline at end of file
+	* src/SDCCicode.c: use TRUE instead of undefined true
+	* src/SDCCicode.h: fixed declaration of isOperandLiteral()
 
 2012-04-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

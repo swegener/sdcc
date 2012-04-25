@@ -2103,7 +2103,7 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
 
       geniCodeAssign (tmp, geniCodeAdd (tmp, operandFromLit ((1 << p2) - 1), 0, 0), 0, 0);
       geniCodeLabel (label);
-      return (geniCodeCast (resType, geniCodeRightShift (tmp, operandFromLit (p2)), true));
+      return (geniCodeCast (resType, geniCodeRightShift (tmp, operandFromLit (p2)), TRUE));
     }
   /* if the right is a literal & power of 2
      and left is unsigned then make it a

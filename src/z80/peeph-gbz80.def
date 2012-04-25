@@ -562,18 +562,6 @@ replace restart {
 }
 
 replace restart {
-	or	a,%1
-	jp	NZ,%2
-	ld	a,%3
-	or	a,a
-} by {
-	or	a,%1
-	jp	NZ,%2
-	or	a,%3
-	; peephole 49 shortened or using a (which has just been tested to be #0x00).
-}
-
-replace restart {
 	and	a,%1
 	jp	NZ,%2
 	ld	a,%3

@@ -1,3 +1,8 @@
+2012-04-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/peeph-gbz80.def:
+	  Removed peephole that resulted in invalid or operand on gbz80.
+
 2012-04-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

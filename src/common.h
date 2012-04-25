@@ -60,6 +60,7 @@ extern "C" {
 #include "SDCCdebug.h"
 #include "SDCCutil.h"
 #include "SDCCasm.h"
+#include "SDCCsystem.h"
 
 #include "port.h"
 

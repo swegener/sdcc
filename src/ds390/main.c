@@ -27,7 +27,6 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
-#include "../SDCCsystem.h"
 
 static char _defaultRules[] =
 {

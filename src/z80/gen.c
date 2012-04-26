@@ -5995,6 +5995,14 @@ genIfxJump (iCode * ic, char *jval)
           emit3 (A_OR, ASMOP_A, ASMOP_A);
           inst = "NZ";
         }
+      else if (!strcmp (jval, "z"))
+        {
+          inst = "Z";
+        }
+      else if (!strcmp (jval, "nz"))
+        {
+          inst = "NZ";
+        }
       else if (!strcmp (jval, "c"))
         {
           inst = "C";
@@ -6034,6 +6042,14 @@ genIfxJump (iCode * ic, char *jval)
       if (!strcmp (jval, "a"))
         {
           emit3 (A_OR, ASMOP_A, ASMOP_A);
+          inst = "Z";
+        }
+      else if (!strcmp (jval, "z"))
+        {
+          inst = "NZ";
+        }
+      else if (!strcmp (jval, "nz"))
+        {
           inst = "Z";
         }
       else if (!strcmp (jval, "c"))
@@ -6258,6 +6274,15 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                 }
               else
                 {
+                  if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx &&
+                    (AOP_TYPE (left) == AOP_REG || AOP_TYPE (left) == AOP_STK && !IS_GB))
+                    {
+                      if (!regalloc_dry_run)
+                        emit2 ("bit 7, %s", aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
+                      regalloc_dry_run_cost += ((AOP_TYPE (left) == AOP_REG) ? 2 : 4);
+                      genIfxJump (ifx, "nz");
+                      return;
+                    }
                   /* Just load in the top most bit */
                   cheapMove (ASMOP_A, 0, AOP (left), AOP_SIZE (left) - 1);
                   if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)

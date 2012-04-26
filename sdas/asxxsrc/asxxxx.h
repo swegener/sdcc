@@ -120,7 +120,7 @@
 #include <stdlib.h>
 #define PATH_MAX        _MAX_PATH
 #else
-#define PATH_MAX                                /* define a reasonable value */
+#define PATH_MAX        FILENAME_MAX            /* define a reasonable value */
 #endif
 #endif
 

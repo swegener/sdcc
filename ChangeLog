@@ -2,6 +2,8 @@
 
 	* support/librarian/sdcclib.c:
 	  Do not depend on PATH_MAX, fix #3521650.
+	* sdas/asxxsrc/asxxxx.h:
+	  Use FILENAME_MAX if PATH_MAX is not defined.
 
 2012-04-25 Borut Razem <borut.razem AT gmail.com>
 

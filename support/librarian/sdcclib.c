@@ -24,12 +24,11 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 #include <unistd.h>
 #endif
 
-char ProgName[PATH_MAX];
-char LibName[PATH_MAX];
-char LibNameTmp[PATH_MAX];
-char IndexName[PATH_MAX];
-char AdbName[PATH_MAX];
-char ListName[PATH_MAX];
+char ProgName[FILENAME_MAX];
+char LibName[FILENAME_MAX];
+char LibNameTmp[FILENAME_MAX];
+char IndexName[FILENAME_MAX];
+char ListName[FILENAME_MAX];
 
 char **RelName;
 int NumRelFiles=0;
@@ -183,6 +182,11 @@ void ProcLineOptions (int argc, char **argv)
                     else
                     {
                         cont_par++;
+                        if(strlen(LibName) > FILENAME_MAX - 1)
+                        {
+                            printf("ERROR: Library name too long.\n");
+                            exit(2);
+                        }
                         strcpy(LibName, argv[j]);
                     }
                 break;
@@ -200,13 +204,12 @@ void ProcLineOptions (int argc, char **argv)
                             printf("ERROR: Insufficient memory.\n");
                             exit(2);
                         }
-                        RelName[0]=(char *)malloc(PATH_MAX);
+                        RelName[0]=strdup(argv[j]);
                         if(RelName[0]==NULL)
                         {
                             printf("ERROR: Insufficient memory.\n");
                             exit(2);
                         }
-                        strcpy(RelName[0], argv[j]);
                     }
                 break;
 
@@ -219,13 +222,12 @@ void ProcLineOptions (int argc, char **argv)
                         printf("ERROR: Insufficient memory.\n");
                         exit(2);
                     }
-                    RelName[NumRelFiles-1]=(char *)malloc(PATH_MAX);
+                    RelName[NumRelFiles-1]=strdup(argv[j]);
                     if(RelName[NumRelFiles-1]==NULL)
                     {
                         printf("ERROR: Insufficient memory.\n");
                         exit(2);
                     }
-                    strcpy(RelName[NumRelFiles-1], argv[j]);
                 break;
             }
         }
@@ -251,6 +253,7 @@ void AddRel(char * RelName)
     char symname[MAXLINE+1];
     char c;
     int IsDOSStyle=0;
+    char *AdbName = 0;
 
     strcpy(LibNameTmp, LibName);
     ChangeExtension(LibNameTmp, "__L");
@@ -258,7 +261,7 @@ void AddRel(char * RelName)
     strcpy(IndexName, LibName);
     ChangeExtension(IndexName, "__I");
 
-    strcpy(AdbName, RelName);
+    AdbName = strdup (RelName);
     ChangeExtension(AdbName, "adb");
 
     lib=fopen(LibName, "r");
@@ -270,6 +273,7 @@ void AddRel(char * RelName)
         {
             printf("ERROR: Couldn't open file '%s'\n", RelName);
             if(lib!=NULL) fclose(lib);
+            free(AdbName);
             return;
         }
     }
@@ -281,6 +285,7 @@ void AddRel(char * RelName)
         printf("ERROR: Couldn't create temporary file '%s'\n", LibNameTmp);
         if(lib!=NULL) fclose(lib);
         fclose(rel);
+        free(AdbName);
         return;
     }
     fprintf(newlib, "<FILES>\n\n");
@@ -292,6 +297,7 @@ void AddRel(char * RelName)
         if(lib!=NULL) fclose(lib);
         fclose(newlib);
         fclose(rel);
+        free(AdbName);
         return;
     }
 
@@ -437,19 +443,23 @@ void AddRel(char * RelName)
 
     remove(LibNameTmp);
     remove(IndexName);
+
+    free(AdbName);
 }
 
 void ExtractRel(char * RelName)
 {
     int state=0;
+    char *AdbName = 0;
 
-    strcpy(AdbName, RelName);
+    AdbName = strdup(RelName);
     ChangeExtension(AdbName, "adb");
 
     lib=fopen(LibName, "r");
     if(lib==NULL)
     {
         printf("ERROR: Couldn't open file '%s'\n", LibName);
+        free(AdbName);
         return;
     }
 
@@ -458,6 +468,7 @@ void ExtractRel(char * RelName)
     {
         printf("ERROR: Couldn't create file '%s'\n", RelName);
         fclose(lib);
+        free(AdbName);
         return;
     }
     GetNameFromPath(RelName, ModName);
@@ -468,6 +479,7 @@ void ExtractRel(char * RelName)
         printf("ERROR: Couldn't create file '%s'\n", AdbName);
         fclose(lib);
         fclose(rel);
+        free(AdbName);
         return;
     }
 
@@ -515,6 +527,8 @@ void ExtractRel(char * RelName)
     fclose(rel);
     fclose(lib);
     fclose(adb);
+
+    free(AdbName);
 }
 
 void DumpSymbols(void)
@@ -604,8 +618,8 @@ void AddList(void)
     char *cc;
     char *as;
     char CmdLine[1024];
-    char SrcName[PATH_MAX];
-    char RelName[PATH_MAX];
+    char SrcName[FILENAME_MAX];
+    char RelName[FILENAME_MAX];
 
     list=fopen(ListName, "r");
     if(list==NULL)
@@ -621,7 +635,7 @@ void AddList(void)
     while(!feof(list))
     {
         RelName[0]=0;
-        if (fgets(RelName, PATH_MAX, list) == NULL)
+        if (fgets(RelName, FILENAME_MAX, list) == NULL)
           break;
         CleanLine(RelName);
         if(strlen(RelName)>0) //Skip empty lines
@@ -707,3 +721,4 @@ int main(int argc, char **argv)
     }
     return 0; //Success!!!
 }
+

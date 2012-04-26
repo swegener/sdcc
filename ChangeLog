@@ -1,3 +1,8 @@
+2012-04-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/librarian/sdcclib.c:
+	  Do not depend on PATH_MAX, fix #3521650.
+
 2012-04-25 Borut Razem <borut.razem AT gmail.com>
 
 	* src/common.h, src/ds390/main.c: include SDCCsystem.h in common.h

@@ -1,3 +1,6 @@
+2012-04-30 Leland Morrison <enigmalee AT sourceforge.net>
+	* sim/ucsim/app.cc:  reduced the frequency of checks for user input
+	
 2012-04-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

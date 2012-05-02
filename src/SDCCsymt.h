@@ -150,6 +150,8 @@ STORAGE_CLASS;
 #define TYPE_TARGET_UCHAR TYPE_UBYTE
 #define TYPE_TARGET_UINT  TYPE_UWORD
 #define TYPE_TARGET_ULONG TYPE_UDWORD
+#define TYPE_TARGET_LONGLONG TYPE_QWORD
+#define TYPE_TARGET_ULONGLONG TYPE_UQWORD
 
 /* specifier is the last in the type-chain */
 typedef struct specifier
@@ -181,15 +183,17 @@ typedef struct specifier
   unsigned _stack;                  /* stack offset for stacked v */
   int argreg;                       /* reg no for regparm         */
   union
-  {                                 /* Values if constant or enum */
-    TYPE_TARGET_INT v_int;          /* 2 bytes: int and char values           */
-    const char *v_char;             /*          character string              */
-    TYPE_TARGET_UINT v_uint;        /* 2 bytes: unsigned int const value      */
-    TYPE_TARGET_LONG v_long;        /* 4 bytes: long constant value           */
-    TYPE_TARGET_ULONG v_ulong;      /* 4 bytes: unsigned long constant value  */
-    double v_float;                 /*          floating point constant value */
-    TYPE_TARGET_ULONG v_fixed16x16; /* 4 bytes: fixed point constant value    */
-    struct symbol *v_enum;          /* ptr to enum_list if enum==1            */
+  {                                   /* Values if constant or enum */
+    TYPE_TARGET_INT v_int;            /* 2 bytes: int and char values            */
+    const char *v_char;               /*          character string               */
+    TYPE_TARGET_UINT v_uint;          /* 2 bytes: unsigned int const value       */
+    TYPE_TARGET_LONG v_long;          /* 4 bytes: long constant value            */
+    TYPE_TARGET_ULONG v_ulong;        /* 4 bytes: unsigned long constant value   */
+    TYPE_TARGET_LONGLONG v_longlong;  /* 8 bytes: long long constant value       */
+    TYPE_TARGET_ULONGLONG v_ulonglong;/* 8 bytes: unsigned long long const value */
+    double v_float;                   /*          floating point constant value  */
+    TYPE_TARGET_ULONG v_fixed16x16;   /* 4 bytes: fixed point constant value     */
+    struct symbol *v_enum;            /* ptr to enum_list if enum==1             */
   }
   const_val;
   struct structdef *v_struct;       /* structure pointer      */

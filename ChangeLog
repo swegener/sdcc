@@ -1,3 +1,14 @@
+2012-05-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCval.h,
+	* src/SDCCval.c (byteOfVal): new function
+	* src/z80/gen.c (aopGet, gencjneshort),
+	* src/SCCglue.c (aopLiteralLong): use byteOfVal() to access value
+	* configure.in,
+	* sdcc_vc_in.h,
+	* sdccconf_in.h: find/define appropriate 64-bit integer
+	* src/SDCCsymt.h: start of support for 64-bit literal
+
 2012-04-30 Leland Morrison <enigmalee AT sourceforge.net>
 	* sim/ucsim/app.cc:  reduced the frequency of checks for user input
 	

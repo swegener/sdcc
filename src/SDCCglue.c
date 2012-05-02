@@ -70,13 +70,7 @@ aopLiteralGptr (const char * name, value * val)
 char *
 aopLiteralLong (value * val, int offset, int size)
 {
-  union
-  {
-    float f;
-    unsigned char c[4];
-  }
-  fl;
-  unsigned long v = ulFromVal (val);
+  unsigned long v;
   struct dbuf_s dbuf;
 
   if (!val)
@@ -87,40 +81,28 @@ aopLiteralLong (value * val, int offset, int size)
 
   dbuf_init (&dbuf, 128);
 
-  /* if it is a float then it gets tricky */
-  /* otherwise it is fairly simple */
-  if (!IS_FLOAT (val->type))
+  switch (size)
     {
-      v >>= (offset * 8);
-      switch (size)
-        {
-        case 1:
-          dbuf_tprintf (&dbuf, "!immedbyte", (unsigned int) v & 0xff);
-          break;
-        case 2:
-          dbuf_tprintf (&dbuf, "!immedword", (unsigned int) v & 0xffff);
-          break;
-        case 3:
-          // we don't have a !immedword24 yet for ds390
-          dbuf_printf (&dbuf, "#0x%06X", (unsigned int) v & 0xffffff);
-          break;
-        default:
-          /* Hmm.  Too big for now. */
-          assert (0);
-        }
-      return dbuf_detach_c_str (&dbuf);
+    case 1:
+      v = byteOfVal (val, offset);
+      dbuf_tprintf (&dbuf, "!immedbyte", (unsigned int) v & 0xff);
+      break;
+    case 2:
+      v = byteOfVal (val, offset+1);
+      v = (v << 8) | byteOfVal (val, offset);
+      dbuf_tprintf (&dbuf, "!immedword", (unsigned int) v & 0xffff);
+      break;
+    case 3:
+      v = byteOfVal (val, offset+2);
+      v = (v << 8) | byteOfVal (val, offset+1);
+      v = (v << 8) | byteOfVal (val, offset);
+      // we don't have a !immedword24 yet for ds390
+      dbuf_printf (&dbuf, "#0x%06X", (unsigned int) v & 0xffffff);
+      break;
+    default:
+      /* Hmm.  Too big for now. */
+      assert (0);
     }
-
-  /* PENDING: For now size must be 1 */
-  assert (size == 1);
-
-  /* it is type float */
-  fl.f = (float) floatFromVal (val);
-#ifdef WORDS_BIGENDIAN
-  dbuf_tprintf (&dbuf, "!immedbyte", fl.c[3 - offset]);
-#else
-  dbuf_tprintf (&dbuf, "!immedbyte", fl.c[offset]);
-#endif
   return dbuf_detach_c_str (&dbuf);
 }
 

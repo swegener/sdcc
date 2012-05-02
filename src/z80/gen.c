@@ -2424,7 +2424,10 @@ aopGet (asmop * aop, int offset, bool bit16)
         {
           unsigned long v = aop->aopu.aop_simplelit;
 
-          v >>= (offset * 8);
+          if (offset >= sizeof(v))
+            v = 0;
+          else
+            v >>= (offset * 8);
           dbuf_tprintf (&dbuf, "!immedbyte", (unsigned int) v & 0xff);
         }
         break;
@@ -6563,7 +6566,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           while (size--)
             {
               cheapMove (ASMOP_A, 0, AOP (left), offset);
-              if ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0)
+              if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0)
                 emit3 (A_OR, ASMOP_A, ASMOP_A);
               else
                 emit3_o (A_SUB, ASMOP_A, 0, AOP (right), offset);
@@ -6586,7 +6589,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       while (size--)
         {
           cheapMove (ASMOP_A, 0, AOP (left), offset);
-          if (AOP_TYPE (right) == AOP_LIT && ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
+          if (AOP_TYPE (right) == AOP_LIT && byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0)
             {
               emit3 (A_OR, ASMOP_A, ASMOP_A);
               if (!regalloc_dry_run)

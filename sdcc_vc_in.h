@@ -60,9 +60,11 @@
 #define TYPE_BYTE char
 #define TYPE_WORD short
 #define TYPE_DWORD int
+#define TYPE_QWORD long long
 #define TYPE_UBYTE unsigned TYPE_BYTE
 #define TYPE_UWORD unsigned TYPE_WORD
 #define TYPE_UDWORD unsigned TYPE_DWORD
+#define TYPE_UQWORD unsigned TYPE_QWORD
 
 /* #undef WORDS_BIGENDIAN */
 

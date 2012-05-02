@@ -164,4 +164,5 @@ value *valForCastArr (struct ast *, sym_link *);
 bool convertIListToConstList (initList * src, literalList ** lList, int size);
 literalList *copyLiteralList (literalList * src);
 unsigned long double2ul (double val);
+unsigned char byteOfVal (value *, int);
 #endif

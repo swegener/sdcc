@@ -260,10 +260,16 @@
 #undef TYPE_DWORD
 
 /* XXX */
+#undef TYPE_QWORD
+
+/* XXX */
 #undef TYPE_UBYTE
 
 /* XXX */
 #undef TYPE_UDWORD
+
+/* XXX */
+#undef TYPE_UQWORD
 
 /* XXX */
 #undef TYPE_UWORD

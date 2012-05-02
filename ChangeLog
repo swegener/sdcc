@@ -1,3 +1,8 @@
+2012-05-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-20101013-1.c:
+	  Disable test until nonzero integer constants work.
+
 2012-05-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCval.h,

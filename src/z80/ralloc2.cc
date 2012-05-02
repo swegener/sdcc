@@ -490,6 +490,7 @@ template <class G_t, class I_t>
 bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
+
   const i_assignment_t &ia = a.i_assignment;
 
   const operand *left = IC_LEFT(ic);
@@ -618,7 +619,8 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
     return(true);	// Register HL not in use.
 
 #if 0
-  std::cout << "HLinst_ok: at (" << i << ", " << ic->key << ")\nL = (" << ia.registers[REG_L][0] << ", " << ia.registers[REG_L][1] << "), H = (" << ia.registers[REG_H][0] << ", " << ia.registers[REG_H][1] << ")inst " << i << ", " << ic->key << "\n";
+  if (ic->key == 40)
+    std::cout << "HLinst_ok: at (" << i << ", " << ic->key << ")\nL = (" << ia.registers[REG_L][0] << ", " << ia.registers[REG_L][1] << "), H = (" << ia.registers[REG_H][0] << ", " << ia.registers[REG_H][1] << ")inst " << i << ", " << ic->key << "\n";
 #endif
 
   const operand *left = IC_LEFT(ic);
@@ -673,16 +675,16 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(result_only_HL && ic->op == PCALL)
     return(true);
 
-  if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+  if(exstk && (operand_on_stack(result, a, i, G) + operand_on_stack(left, a, i, G) + operand_on_stack(right, a, i, G) >= 2) && (result && IS_SYMOP(result) && getSize(operandType(result)) >= 2 || !result_only_HL))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
 
-  if(ic->op == '+' && getSize(operandType(IC_RESULT(ic))) >= 2 &&
+  if(ic->op == '+' && getSize(operandType(result)) >= 2 &&
     (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || IS_TRUE_SYMOP (right))) // Might use (hl).
     return(false);
 
   if(ic->op == '+' && input_in_HL && (IS_TRUE_SYMOP (result) || operand_on_stack(result, a, i, G) && exstk)) // Might use (hl) for result.
     return(false);
-  
+
   // HL overwritten by result.
   if(result_only_HL && !POINTER_SET(ic) &&
       (ic->op == ADDRESS_OF ||
@@ -792,8 +794,8 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   const i_assignment_t &ia = a.i_assignment;
 
-  //if(ic->key == 118)
-//		std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+  /*if(ic->key == 40)
+		std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";*/
 
   bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127));
 
@@ -835,7 +837,7 @@ bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 
   if(unused_IYL && unused_IYH)
     return(true);	// Register IY not in use.
-    
+
   if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
 

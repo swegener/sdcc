@@ -2472,6 +2472,12 @@ isConstantString (const char *s)
   return (*s == '#' || *s == '$');
 }
 
+#define AOP(op) op->aop
+#define AOP_TYPE(op) AOP(op)->type
+#define AOP_SIZE(op) AOP(op)->size
+#define AOP_NEEDSACC(x) (AOP(x) && ((AOP_TYPE(x) == AOP_CRY) || (AOP_TYPE(x) == AOP_SFR)))
+#define AOP_IS_PAIRPTR(x, p) (AOP_TYPE (x) == AOP_PAIRPTR && AOP (x)->aopu.aop_pairId == p)
+
 static bool
 canAssignToPtr (const char *s)
 {
@@ -2750,7 +2756,25 @@ aopPut3 (asmop * op1, int offset1, asmop * op2, int offset2)
   unsigned char cost = regalloc_dry_run_cost;
 
   if (!regalloc_dry_run)
-    aopPut (op1, aopGet (op2, offset2, FALSE), offset1);
+    {
+      if ((op1->type == AOP_STK || op1->type == AOP_EXSTK))
+        {
+          fp_offset = op1->aopu.aop_stk + _G.stack.offset + offset1 + (op1->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+          sp_offset = fp_offset + _G.stack.pushed;
+        }
+
+      if ((op1->type == AOP_STK || op1->type == AOP_EXSTK) && !sp_offset && _G.omitFramePtr && op1->size == 1 &&
+        (op2->type == AOP_REG && (op2->aopu.aop_reg[offset2]->rIdx == B_IDX || op2->aopu.aop_reg[offset2]->rIdx == D_IDX || op2->aopu.aop_reg[offset2]->rIdx == H_IDX) ||
+        op2->type == AOP_ACC && op2->size == 1) && !offset2)
+        {
+          emit2 ("inc sp");
+          emit2 ("push %s", op2->type == AOP_ACC ? "af" : (op2->aopu.aop_reg[offset2]->rIdx == B_IDX ? "bc" : (op2->aopu.aop_reg[offset2]->rIdx == D_IDX ? "de" : "hl")));
+          emit2 ("inc sp");
+          regalloc_dry_run_cost += 4;
+        }
+      else
+        aopPut (op1, aopGet (op2, offset2, FALSE), offset1);
+    }
 
   regalloc_dry_run_cost = cost + ld_cost (op1, offset2 < op2->size ? op2 : ASMOP_ZERO);
 }
@@ -2770,18 +2794,13 @@ cheapMove (asmop * to, int to_offset, asmop * from, int from_offset)
   aopPut3 (to, to_offset, from, from_offset);
 }
 
-#define AOP(op) op->aop
-#define AOP_TYPE(op) AOP(op)->type
-#define AOP_SIZE(op) AOP(op)->size
-#define AOP_NEEDSACC(x) (AOP(x) && ((AOP_TYPE(x) == AOP_CRY) || (AOP_TYPE(x) == AOP_SFR)))
-#define AOP_IS_PAIRPTR(x, p) (AOP_TYPE (x) == AOP_PAIRPTR && AOP (x)->aopu.aop_pairId == p)
-
 static void
-commitPair (asmop * aop, PAIR_ID id, const iCode * ic, bool dont_destroy)
+commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
 {
   int fp_offset = aop->aopu.aop_stk + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
   int sp_offset = fp_offset + _G.stack.pushed;
-  /* Stack positions will change, so do not assume this is impossible in the cost function. */
+
+  /* Stack positions will change, so do not assume this is possible in the cost function. */
   if (!regalloc_dry_run && !IS_GB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset
       && ((!IS_R2K && id == PAIR_HL) || id == PAIR_IY) && !dont_destroy)
     {
@@ -2796,6 +2815,13 @@ commitPair (asmop * aop, PAIR_ID id, const iCode * ic, bool dont_destroy)
       else
         emit2 ("ld %d (ix), hl", fp_offset);    /* Relative to frame pointer. */
       regalloc_dry_run_cost += (id == PAIR_HL ? 2 : 3);
+    }
+  else if (!regalloc_dry_run && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset)
+    {
+      emit2 ("inc sp");
+      emit2 ("inc sp");
+      emit2 ("push %s", _pairs[id].name);
+      regalloc_dry_run_cost += (id == PAIR_IY ? 5 : 4);
     }
 
   /* PENDING: Verify this. */

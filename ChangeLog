@@ -1,5 +1,10 @@
 2012-05-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  More efficent storing of registers pairs to top of stack.
+
+2012-05-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/tests/gcc-torture-execute-20101013-1.c:
 	  Disable test until nonzero integer constants work.
 

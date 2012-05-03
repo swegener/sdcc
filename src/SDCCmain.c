@@ -234,7 +234,6 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
   {0,   OPTION_MAX_ALLOCS_PER_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
 
-
   {0,   NULL, NULL, "Internal debugging options"},
   {0,   "--dumpraw", &options.dump_raw, "Dump the internal structure after the initial parse"},
   {0,   "--dumpgcse", &options.dump_gcse, NULL},

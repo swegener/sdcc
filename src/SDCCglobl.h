@@ -346,7 +346,8 @@ struct options
     set *excludeRegsSet;        /* registers excluded from saving */
 /*  set *olaysSet;               * not implemented yet: overlay segments used in #pragma OVERLAY */
     int max_allocs_per_node;    /* Maximum number of allocations / combinations considered at each node in the tree-decomposition based algorithms */
-    int noOptsdccInAsm;         /* Do not emit .optsdcc in asm */
+    bool noOptsdccInAsm;        /* Do not emit .optsdcc in asm */
+    bool oldralloc;             /* Use old register allocator */
   };
 
 /* forward definition for variables accessed globally */

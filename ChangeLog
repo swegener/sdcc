@@ -1,3 +1,13 @@
+2012-05-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCmain.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc.c,
+	  src/z80/main.c,
+	  src/z80/z80.h,
+	  src/SDCCglobl.h:
+	  Made --oldralloc less port-specific.
+
 2012-05-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (aopPut3): added missing declarations

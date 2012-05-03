@@ -862,7 +862,7 @@ deassignLRs (iCode *ic, eBBlock *ebp)
           /* if the result of this one needs registers
              and does not have it then assign it right
              away */
-          if (z80_opts.oldralloc && IC_RESULT (ic) &&
+          if (options.oldralloc && IC_RESULT (ic) &&
               !(SKIP_IC2 (ic) || ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || ic->op == RETURN) &&
               IS_SYMOP (IC_RESULT (ic)) && (result = OP_SYMBOL (IC_RESULT (ic))) &&    /* has a result */
               result->liveTo > ic->seq &&       /* and will live beyond this */
@@ -1053,7 +1053,7 @@ verifyRegsAssigned (operand * op, iCode * ic)
     return;
 
   // Don't warn for new allocator , since this is not used by default (until Thoruop is implemented for spillocation compaction).
-  if (z80_opts.oldralloc)
+  if (options.oldralloc)
     werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, sym->prereqv ? sym->prereqv->name : sym->name);
   spillThis (sym);
 }
@@ -2135,7 +2135,7 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
   if (bitVectnBitsOn (OP_DEFS (op)) > 1)
     return NULL;
 
-  if (!z80_opts.oldralloc ? getSize (operandType (op)) != 2 : getSize (operandType (op)) > 2)
+  if (!options.oldralloc ? getSize (operandType (op)) != 2 : getSize (operandType (op)) > 2)
     return NULL;
 
   /* And this is the definition */
@@ -2782,14 +2782,14 @@ packRegisters (eBBlock * ebp)
          result of that operation is not on stack then we can leave the
          result of this operation in acc:b combination */
 
-      if ((z80_opts.oldralloc || !OPTRALLOC_HL) && !DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)))
+      if ((options.oldralloc || !OPTRALLOC_HL) && !DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)))
         if (!IS_GB && !IY_RESERVED)
           packRegsForHLUse3 (ic, IC_RESULT (ic), ebp);
 
-      if ((z80_opts.oldralloc || !OPTRALLOC_IY) && !DISABLE_PACK_IY && !IY_RESERVED && IS_ITEMP (IC_RESULT (ic)) && !IS_GB)
+      if ((options.oldralloc || !OPTRALLOC_IY) && !DISABLE_PACK_IY && !IY_RESERVED && IS_ITEMP (IC_RESULT (ic)) && !IS_GB)
         packRegsForIYUse (ic, IC_RESULT (ic), ebp);
 
-      if (z80_opts.oldralloc && !DISABLE_PACK_ACC && IS_ITEMP (IC_RESULT (ic)) &&
+      if (options.oldralloc && !DISABLE_PACK_ACC && IS_ITEMP (IC_RESULT (ic)) &&
           getSize (operandType (IC_RESULT (ic))) == 1)
         packRegsForAccUse2 (ic);
     }
@@ -3207,7 +3207,7 @@ void
 z80_assignRegisters (ebbIndex * ebbi)
 {
 #ifdef OLDRALLOC
-  if (z80_opts.oldralloc)
+  if (options.oldralloc)
     z80_oldralloc (ebbi);
   else
 #endif

@@ -431,7 +431,7 @@ isPairInUse (PAIR_ID id, const iCode * ic)
 static bool
 isPairDead (PAIR_ID id, const iCode * ic)
 {
-  const bitVect *r = (!z80_opts.oldralloc ? ic->rSurv :
+  const bitVect *r = (!options.oldralloc ? ic->rSurv :
                       (POINTER_SET (ic) ? ic->rMask :
                        (bitVectCplAnd (bitVectCopy (ic->rMask), z80_rUmaskForOp (IC_RESULT (ic))))));
 
@@ -3482,7 +3482,7 @@ _saveRegsForCall (const iCode * ic, int sendSetSize, bool dontsaveIY)
     {
       bool push_bc, push_de, push_hl, push_iy;
 
-      if (z80_opts.oldralloc)
+      if (options.oldralloc)
         {
           bool deInUse, bcInUse;
           bool deSending;
@@ -4396,7 +4396,7 @@ genFunction (const iCode * ic)
     }
   sym = OP_SYMBOL (IC_LEFT (ic));
 
-  _G.omitFramePtr = z80_opts.oldralloc ? (!IS_GB && options.omitFramePtr) : should_omit_frame_ptr;
+  _G.omitFramePtr = options.oldralloc ? (!IS_GB && options.omitFramePtr) : should_omit_frame_ptr;
 
   if (!IS_GB && !IY_RESERVED && !stackParm && !sym->stack)
     {
@@ -5217,7 +5217,7 @@ genPlus (iCode * ic)
       regalloc_dry_run_cost += 1;
       goto release;
     }
-  if (!z80_opts.oldralloc && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_LEFT (ic)) == AOP_REG &&
+  if (!options.oldralloc && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_LEFT (ic)) == AOP_REG &&
       AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && !bitVectBitValue (ic->rSurv, B_IDX))
     {
       if (AOP (IC_LEFT (ic))->aopu.aop_reg[1]
@@ -5236,7 +5236,7 @@ genPlus (iCode * ic)
       goto release;
     }
 
-  if (!z80_opts.oldralloc && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&
+  if (!options.oldralloc && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&
       AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && !bitVectBitValue (ic->rSurv, D_IDX))
     {
       if (AOP (IC_RIGHT (ic))->aopu.aop_reg[1]
@@ -5254,7 +5254,7 @@ genPlus (iCode * ic)
       regalloc_dry_run_cost += 1;
       goto release;
     }
-  if (!z80_opts.oldralloc && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_LEFT (ic)) == AOP_REG &&
+  if (!options.oldralloc && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_LEFT (ic)) == AOP_REG &&
       AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && !bitVectBitValue (ic->rSurv, D_IDX))
     {
       if (AOP (IC_LEFT (ic))->aopu.aop_reg[1]
@@ -5760,8 +5760,8 @@ genMultOneChar (const iCode * ic)
       _G.stack.pushedDE = TRUE;
     }
   if (IS_R2K && !isPairDead (PAIR_BC, ic) ||
-      !IS_Z180 && (!z80_opts.oldralloc && bitVectBitValue (ic->rSurv, B_IDX) ||
-                   z80_opts.oldralloc && bitVectBitValue (ic->rMask, B_IDX) && !(getPairId (AOP (IC_RESULT (ic))) == PAIR_BC)))
+      !IS_Z180 && (!options.oldralloc && bitVectBitValue (ic->rSurv, B_IDX) ||
+                   options.oldralloc && bitVectBitValue (ic->rMask, B_IDX) && !(getPairId (AOP (IC_RESULT (ic))) == PAIR_BC)))
     {
       _push (PAIR_BC);
       savedB = TRUE;

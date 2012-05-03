@@ -23,7 +23,6 @@ typedef struct
     int port_mode;
     int port_back;
     int reserveIY;
-    int oldralloc;
   }
 Z80_OPTS;
 

@@ -2754,6 +2754,8 @@ static void
 aopPut3 (asmop * op1, int offset1, asmop * op2, int offset2)
 {
   unsigned char cost = regalloc_dry_run_cost;
+  int fp_offset=0;
+  int sp_offset=0;
 
   if (!regalloc_dry_run)
     {

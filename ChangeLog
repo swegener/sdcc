@@ -1,3 +1,8 @@
+2012-05-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/ports/ucgbz80/spec.mk:
+	  Increase timeout from 20s to the 30s other ports use to get rid of NetBSD/sparc64 regression failure.
+
 2012-05-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCmain.c,

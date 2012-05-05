@@ -9,13 +9,14 @@
 #endif
 
 /* PR target/36362 */
-
+#if !(defined (__GNUC__) && __GNUC__ < 5)
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 int
 test (float c)
 {
   return !!c * 7LL == 0;
 }
+#endif
 #endif
 
 void

@@ -7,6 +7,7 @@
 #ifdef __SDCC
 #pragma std_c99
 #pragma disable_warning 147
+#pragma disable_warning 196
 #endif
 
 /* Verify that flexible arrays can be initialized from STRING_CST

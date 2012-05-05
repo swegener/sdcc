@@ -7,6 +7,7 @@
 #ifdef __SDCC
 #pragma std_c99
 #pragma disable_warning 85
+#pragma disable_warning 88
 #endif
 
 long foo(long a, long b, long c)

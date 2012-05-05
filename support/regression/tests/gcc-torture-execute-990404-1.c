@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 84
 #pragma disable_warning 85
 #endif
 
@@ -22,8 +23,8 @@ testTortureExecute (void)
     max = 0;
     for (i = 0; i < 10 ; i++) {
       if (x[i] > max) {
-	max = x[i];
-	mi = i;
+        max = x[i];
+        mi = i;
       }
     }
     if (max == 0)
@@ -36,4 +37,3 @@ testTortureExecute (void)
 
   return;
 }
-

@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 84
 #endif
 
 int k = 0;
@@ -19,16 +20,15 @@ testTortureExecute (void)
   for (i = 0; i < 2; i++)
     {
       if (k)
-	{
-	  if (j != 2)
-	    ASSERT (0);
-	}
+        {
+          if (j != 2)
+            ASSERT (0);
+        }
       else
-	{
-	  j = 2;
-	  k++;
-	}
+        {
+          j = 2;
+          k++;
+        }
     }
   return;
 }
-

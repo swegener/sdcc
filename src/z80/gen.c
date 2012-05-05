@@ -8122,8 +8122,8 @@ genrshTwo (const iCode * ic, operand * result, operand * left, int shCount, int 
 static void
 genRightShiftLiteral (operand * left, operand * right, operand * result, const iCode * ic, int sign)
 {
-  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
-  int size;
+  unsigned int shCount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
+  unsigned int size;
 
   freeAsmop (right, NULL, ic);
 
@@ -8487,7 +8487,7 @@ genPointerGet (const iCode *ic)
   /* Historically GET_VALUE_AT_ADDRESS didn't have a right operand */
   wassertl (right, "GET_VALUE_AT_ADDRESS without right operand");
   wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "GET_VALUE_AT_ADDRESS with non-literal right operand");
-  rightval = operandLitValue (right);
+  rightval = (int)operandLitValue (right);
   rightval_in_range = (rightval >= -128 && rightval + size - 1 < 127);
   if (IS_GB)
     wassert (!rightval);

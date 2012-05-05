@@ -23,7 +23,7 @@
 //
 // struct tree_dec_node
 // {
-//	std::set<unsigned int> bag;
+//  std::set<unsigned int> bag;
 // };
 // typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_node> tree_dec_t;
 //
@@ -138,8 +138,8 @@ void thorup_E(std::multimap<unsigned int, unsigned int> &M, const I_t &I)
     // Not in Thorup's paper, but without this the algorithm gives incorrect results.
     while(s.size() > 1)
     {
-    	M.insert(std::pair<unsigned int, unsigned int>(s.top().second, s.top().first));
-    	s.pop();
+        M.insert(std::pair<unsigned int, unsigned int>(s.top().second, s.top().first));
+        s.pop();
     }
 }
 
@@ -189,7 +189,7 @@ typename boost::graph_traits<T_t>::vertex_iterator find_bag(const std::set<unsig
         t_found = t;
     }
 
-  if (t_found == t_end)	// Todo: Better error handling (throw exception?)
+  if (t_found == t_end) // Todo: Better error handling (throw exception?)
     {
       std::cerr << "find_bag() failed.\n";
       std::cerr.flush();
@@ -465,5 +465,3 @@ void nicify(T_t &T)
   nicify_diffs(T, t);
   nicify_diffs_more(T, t);
 }
-
-

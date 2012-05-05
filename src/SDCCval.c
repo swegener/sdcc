@@ -1567,7 +1567,7 @@ byteOfVal (value * val, int offset)
 
   if (SPEC_NOUN (val->etype) == V_FLOAT)
     {
-      float f = SPEC_CVAL (val->etype).v_float;
+      float f = (float)SPEC_CVAL (val->etype).v_float;
 
       if (offset > 3)
         return 0;
@@ -1616,7 +1616,6 @@ byteOfVal (value * val, int offset)
   /* we are lost ! */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "byteOfVal: unknown value");
   return 0;
-  
 }
 
 

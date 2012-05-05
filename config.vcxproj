@@ -60,8 +60,8 @@
     <CustomBuild Include="sdas\linksrc\asxxxx_config.h.in">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f configure_vc.awk sdas/linksrc/asxxxx_config.h.in &gt; sdas/linksrc/asxxxx_config.h</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sdas/linksrc/asxxxx_config.h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f configure_vc.awk sdas/linksrc/asxxxx_config.h.in &gt; sdas/linksrc/asxxxx_config.h</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sdas/linksrc/asxxxx_config.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sdas/linksrc/asxxxx_config.h;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: asxxxx_config.h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: asxxxx_config.h</Message>
@@ -70,21 +70,21 @@
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f src/version.awk ChangeLog  &gt; ./src/version.h</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f src/version.awk ChangeLog  &gt; ./src/version.h</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: version.h</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: version.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./src/version.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">./src/version.h;%(Outputs)</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ChangeLog;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ChangeLog;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./src/version.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">./src/version.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: version.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: version.h</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="sdcc_vc_in.h">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f configure_vc.awk sdcc_vc_in.h &gt; sdcc_vc.h</Command>
+    <CustomBuild Include="sdcc_vc.h.in">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f configure_vc.awk sdcc_vc.h.in &gt; sdcc_vc.h</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f configure_vc.awk sdcc_vc.h.in &gt; sdcc_vc.h</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.version;configure_vc.awk;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sdcc_vc.h;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f configure_vc.awk sdcc_vc_in.h &gt; sdcc_vc.h</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.version;configure_vc.awk;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sdcc_vc.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sdcc_vc.h;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: sdcc_vc.h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: sdcc_vc.h</Message>

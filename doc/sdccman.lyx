@@ -3206,7 +3206,7 @@ the binaries can be built by cross compiling on SDCC Distributed Compile
 \begin_layout Standard
 See the examples, how to pass the Win32 settings to 'configure'.
  The other Win32 builds using VC or whatever don't use 'configure', but
- a header file sdcc_vc_in.h is the same as sdccconf.h built by 'configure'
+ a header file sdcc_vc.h.in is the same as sdccconf.h built by 'configure'
  for Win32.
 \begin_inset Newline newline
 \end_inset

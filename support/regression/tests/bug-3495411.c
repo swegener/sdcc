@@ -7,9 +7,8 @@
 #ifdef __SDCC
 #pragma std_c99
 #pragma disable_warning 85
+#pragma disable_warning 88
 #endif
-
-#ifndef __SDCC_mcs51
 
 // Type defines
 #define UCHAR	unsigned char
@@ -146,41 +145,42 @@ struct sip_lcb
 	BOOLEAN bMemCall;
 };
 
-struct sip_lcb l;
+__xdata struct sip_lcb l;
 extern SIP_LCB_HANDLE Sip_pCurLcb = &l;
 
 void line_start(PCHAR pDst) {}
 void sip_add_local_uri(BOOLEAN bIP, BOOLEAN bPort) {}
 void sip_new_token(PCHAR pDst, UCHAR iLen) {}
 void sip_add_token(PCHAR pToken, PCHAR pValue) {}
-void free(void *p) {}
-PCHAR heap_save_str(PCHAR pStr) { return ((PCHAR)42);}
+void dummy_free(void *p) {}
+PCHAR heap_save_str(PCHAR pStr) { return ((PCHAR) 42);}
 BOOLEAN Sys_bRegister;
 const UCHAR _cTokenTag[] = "";
 
 void sip_new_from()
 {
+#ifdef __SDCC_mcs51
+	UCHAR pBuf[64];
+#else
 	UCHAR pBuf[128];
+#endif
 	UCHAR pTag[MAX_TAG_LEN+1];
 
 	line_start(pBuf);
 	sip_add_local_uri(!Sys_bRegister, FALSE);
 	sip_new_token(pTag, MAX_TAG_LEN);
 	sip_add_token(_cTokenTag, pTag);
-	free(Sip_pCurLcb->pFrom);
+	dummy_free(Sip_pCurLcb->pFrom);
 	Sip_pCurLcb->pFrom = heap_save_str(pBuf);
-	free(Sip_pCurLcb->pFromTag);
+	dummy_free(Sip_pCurLcb->pFromTag);
 	Sip_pCurLcb->pFromTag = heap_save_str(pTag);
 }
-#endif
 
 void
 testBug (void)
 {
-#ifndef __SDCC_mcs51
-	l.pFrom = (PCHAR)23;
+	l.pFrom = (PCHAR) 23;
 	sip_new_from();
-	ASSERT (l.pFrom == (PCHAR)42);
-#endif
+	ASSERT (l.pFrom == (PCHAR) 42);
 }
 

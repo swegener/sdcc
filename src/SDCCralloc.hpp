@@ -188,16 +188,19 @@ struct cfg_node
   operand_map_t operands;
   std::set<var_t> alive;
   std::set<var_t> dying;
-
+#ifdef DEBUG_SEGV
   cfg_node(void);
+#endif
 };
 
+#ifdef DEBUG_SEGV
 // This only exists to track down #3506333 and #3475617.
 bool default_constructor_of_cfg_node_called;
 cfg_node::cfg_node(void)
 {
   default_constructor_of_cfg_node_called = true;
 }
+#endif
 
 struct con_node
 {
@@ -260,9 +263,13 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
     wassertl (!boost::num_vertices(cfg), "CFG non-empty before creation.");
     for (ic = start_ic, i = 0, j = 0; ic; ic = ic->next, i++)
       {
+#ifdef DEBUG_SEGV
         default_constructor_of_cfg_node_called = false;
+#endif
         boost::add_vertex(cfg);
+#ifdef DEBUG_SEGV
         wassertl (default_constructor_of_cfg_node_called, "add_vertex failed to call default constructor of cfg_node!");
+#endif
         wassertl (cfg[i].alive.empty(), "Alive set non-empty upon creation.");
         key_to_index[ic->key] = i;
 

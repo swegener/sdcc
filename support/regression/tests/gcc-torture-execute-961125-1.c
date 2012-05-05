@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 196
 #endif
 
 static char *
@@ -14,17 +15,17 @@ begfield (int tab, char *ptr, char *lim, int sword, int schar)
   if (tab)
     {
       while (ptr < lim && sword--)
-	{
-	  while (ptr < lim && *ptr != tab)
-	    ++ptr;
-	  if (ptr < lim)
-	    ++ptr;
-	}
+        {
+          while (ptr < lim && *ptr != tab)
+            ++ptr;
+          if (ptr < lim)
+            ++ptr;
+        }
     }
   else
     {
       while (1)
-	;
+        ;
     }
 
   if (ptr + schar <= lim)
@@ -42,4 +43,3 @@ testTortureExecute (void)
     ASSERT (0);
   return;
 }
-

@@ -99,7 +99,7 @@ bool assignments_naddr_locally_same(const assignment_naddr &a1, const assignment
   return(true);
 }
 
-struct cfg_node
+struct cfg_naddr_node
 {
   iCode *ic;
   naddrspaceset_t possible_naddrspaces;
@@ -113,7 +113,7 @@ struct tree_dec_naddr_node
   assignment_list_naddr_t assignments;
 };
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_node, float> cfg_t; // The edge property is the cost of subdividing he edge and inserting a bank switching instruction.
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_naddr_node, float> cfg_t; // The edge property is the cost of subdividing he edge and inserting a bank switching instruction.
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_naddr_node> tree_dec_naddr_t;
 
 // A quick-and-dirty function to get the CFG from sdcc (a simplified version of the function from SDCCralloc.hpp).

@@ -8943,8 +8943,8 @@ genlshFour (operand * result, operand * left, int shCount)
 static void
 genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * ic)
 {
-  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
-  int size;
+  unsigned int shCount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
+  unsigned int size;
 
   size = getSize (operandType (result));
 
@@ -11384,7 +11384,7 @@ genCast (iCode * ic)
       if (sameRegs (AOP (right), AOP (result)))
         goto release;
 
-      /* if they in different places then copy */
+      /* if they are in different places then copy */
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)

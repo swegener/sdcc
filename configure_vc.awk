@@ -1,6 +1,6 @@
 #!/usr/bin/awk
 
-# configure_vc.awk - Genarate sdcc_vc.h using sdcc_vc_in.h as template
+# configure_vc.awk - Genarate sdcc_vc.h using sdcc_vc.h.in as template
 #                    and insert the version number definitions from .version
 #
 # Written By - Borut Razem borut.razem@siol.net

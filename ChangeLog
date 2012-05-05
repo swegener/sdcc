@@ -1,3 +1,24 @@
+﻿2012-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* config.vcxproj,
+	* configure_vc.awk,
+	* doc/sdccman.lyx,
+	* sdcc_vc.h.in, sdcc_vc_in.h: renamed sdcc_vc_in.h to sdcc_vc.h.in
+	* src/SDCCval.c (byteOfVal),
+	* src/z80/gen.c (genLeftShiftLiteral, genPointerGet),
+	* src/mcs51/gen.c (genLeftShiftLiteral): fixed warnings
+	* src/SDCCnaddr.hpp: renamed cfg_node to cfg_naddr_node
+	* src/SDCCralloc.hpp: default_constructor_of_cfg_node_called and
+	  cfg_node constructor disabled to fix bug 3521407
+	* src/SDCCtree_dec.hpp: set svn properties
+	* support/regression/ports/mcs51-common/spec.mk: fixed SIM_TIMEOUT bug
+	* support/regression/tests/bug-3495411.c: enabled for mcs51
+	* support/regression/tests/gcc-torture-execute-20000622-1.c,
+	* support/regression/tests/gcc-torture-execute-20010924-1.c,
+	* support/regression/tests/gcc-torture-execute-961004-1.c,
+	* support/regression/tests/gcc-torture-execute-961125-1.c,
+	* support/regression/tests/gcc-torture-execute-990404-1.c: suppressed warnings
+
 2012-05-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20080529-1.c:
@@ -60,6 +81,7 @@
 	* src/SDCCsymt.h: start of support for 64-bit literal
 
 2012-04-30 Leland Morrison <enigmalee AT sourceforge.net>
+
 	* sim/ucsim/app.cc:  reduced the frequency of checks for user input
 	
 2012-04-26 Philipp Klaus Krause <pkk AT spth.de>

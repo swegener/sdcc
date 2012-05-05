@@ -311,7 +311,7 @@ operand *geniCodePtrPtrSubtract (operand *, operand *);
 void initiCode ();
 iCode *iCodeFromAst (ast *);
 int isiCodeEqual (iCode *, iCode *);
-int isOperandEqual (operand *, operand *);
+int isOperandEqual (const operand *, const operand *);
 iCodeTable *getTableEntry (int);
 int isOperandLiteral (const operand * const);
 operand *operandOperation (operand *, operand *, int, sym_link *);

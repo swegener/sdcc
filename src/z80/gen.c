@@ -360,8 +360,8 @@ z80_init_asmops (void)
   _fReturn3 = IS_GB ? _gbz80_return3 : _z80_return3;
 }
 
-extern bool regalloc_dry_run;
-unsigned char regalloc_dry_run_cost;
+static bool regalloc_dry_run;
+static unsigned char regalloc_dry_run_cost;
 
 /* WARNING: This function is dangerous to use. It works literally:
    It will return true if ic the the last use of op, even if ic might

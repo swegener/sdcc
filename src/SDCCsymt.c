@@ -960,7 +960,10 @@ newBoolLink ()
   sym_link *p;
 
   p = newLink (SPECIFIER);
-  SPEC_NOUN (p) = V_BIT;
+  if (bit)
+    SPEC_NOUN (p) = V_BIT;
+  else
+    SPEC_NOUN (p) = V_BOOL;
 
   return p;
 }

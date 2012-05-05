@@ -111,7 +111,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
 
 // Check that the operand is either fully in registers or fully in memory.
 template <class G_t, class I_t>
-bool operand_sane(const operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static bool operand_sane(const operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   if(!o || !IS_SYMOP(o))
     return(true);
@@ -153,8 +153,8 @@ static float default_instruction_cost(const assignment &a, unsigned short int i,
   return(c);
 }
 
-template <class G_t, class I_t> bool
-inst_sane(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+template <class G_t, class I_t>
+static bool inst_sane(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
 
@@ -425,7 +425,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
 
 // Return true, iff the operand is placed (partially) in r.
 template <class G_t>
-bool operand_in_reg(const operand *o, reg_t r, const i_assignment_t &ia, unsigned short int i, const G_t &G)
+static bool operand_in_reg(const operand *o, reg_t r, const i_assignment_t &ia, unsigned short int i, const G_t &G)
 {
   if(!o || !IS_SYMOP(o))
     return(false);
@@ -460,7 +460,7 @@ bool operand_on_stack(const operand *o, const assignment &a, unsigned short int 
 }
 
 template <class G_t>
-bool operand_is_pair(const operand *o, const assignment &a, unsigned short int i, const G_t &G)
+static bool operand_is_pair(const operand *o, const assignment &a, unsigned short int i, const G_t &G)
 {
   if(!o || !IS_SYMOP(o))
     return(false);
@@ -487,7 +487,7 @@ bool operand_is_pair(const operand *o, const assignment &a, unsigned short int i
 }
 
 template <class G_t, class I_t>
-bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
 
@@ -600,7 +600,7 @@ bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t
 }
 
 template <class G_t, class I_t>
-bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
 
@@ -695,7 +695,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
        ic->op == CAST))
     return(true);
 
-  if(IC_RESULT(ic) && IS_SYMOP(result) && isOperandInDirSpace(IC_RESULT(ic)))
+  if(result && IS_SYMOP(result) && isOperandInDirSpace(IC_RESULT(ic)))
     return(false);
 
   if((input_in_HL || !result_only_HL) && left && IS_SYMOP(left) && isOperandInDirSpace(IC_LEFT(ic)))
@@ -784,7 +784,7 @@ bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 }
 
 template <class G_t, class I_t>
-bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
 
@@ -966,7 +966,7 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
 }
 
 template <class G_t, class I_t>
-void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   iCode *ic = G[i].ic;
   
@@ -980,7 +980,7 @@ void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G,
 }
 
 template<class G_t>
-void unset_surviving_regs(unsigned short int i, const G_t &G)
+static void unset_surviving_regs(unsigned short int i, const G_t &G)
 {
   iCode *ic = G[i].ic;
   
@@ -988,7 +988,7 @@ void unset_surviving_regs(unsigned short int i, const G_t &G)
 }
 
 template <class G_t, class I_t>
-void assign_operand_for_cost(operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static void assign_operand_for_cost(operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   if(!o || !IS_SYMOP(o))
     return;
@@ -1032,7 +1032,7 @@ void assign_operand_for_cost(operand *o, const assignment &a, unsigned short int
 }
 
 template <class G_t, class I_t>
-void assign_operands_for_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static void assign_operands_for_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
   
@@ -1055,10 +1055,12 @@ void assign_operands_for_cost(const assignment &a, unsigned short int i, const G
 
 // Cost function.
 template <class G_t, class I_t>
-float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   iCode *ic = G[i].ic;
   float c;
+
+  wassert (TARGET_Z80_LIKE);
 
   if(!inst_sane(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
@@ -1241,8 +1243,9 @@ static bool assignment_hopeless(const assignment &a, unsigned short int i, const
   return(false);
 }
 
+// Increase chance of finding good compatible assignments at join nodes.
 template <class T_t>
-void get_best_local_assignment_biased(assignment &a, typename boost::graph_traits<T_t>::vertex_descriptor t, const T_t &T)
+static void get_best_local_assignment_biased(assignment &a, typename boost::graph_traits<T_t>::vertex_descriptor t, const T_t &T)
 {
   const assignment_list_t &alist = T[t].assignments;
 
@@ -1269,7 +1272,7 @@ too_risky:
 }
 
 template <class G_t, class I_t>
-float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const i_assignment_t &ia = a.i_assignment;
     
@@ -1321,8 +1324,19 @@ float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &
   return(c);
 }
 
+// Code for another ic is generated when generating this one. Mark the other as generated.
+static void extra_ic_generated(const iCode *ic)
+{
+  if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)
+    {
+      iCode *ifx;
+      if (ifx = ifxForOp (IC_RESULT (ic), ic))
+      ifx->generated = 1;
+    }
+}
+
 template <class T_t, class G_t, class I_t>
-bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
+static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
 {
   bool assignment_optimal;
 
@@ -1494,7 +1508,7 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   if(options.dump_graphs)
     dump_tree_decomposition(tree_decomposition);
 
-  z80_assignment_optimal = tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+  z80_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
 
   return(ic);
 }

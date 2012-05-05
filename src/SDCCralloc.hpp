@@ -60,7 +60,7 @@ typedef short int var_t;
 typedef signed char reg_t;
 
 // Todo: Move this port-dependency somewehere else?
-#define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? 9 : ((TARGET_IS_GBZ80 || TARGET_IS_HC08)? 5 : 0))
+#define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? 9 : (TARGET_IS_GBZ80 ? 5 : (TARGET_IS_HC08 ? 3 : 0)))
 // Upper bound on NUM_REGS
 #define MAX_NUM_REGS 9
 
@@ -188,6 +188,7 @@ struct cfg_node
   operand_map_t operands;
   std::set<var_t> alive;
   std::set<var_t> dying;
+
 #ifdef DEBUG_SEGV
   cfg_node(void);
 #endif
@@ -232,6 +233,13 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 template <class I_t>
 static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I);
 
+// Port-specific
+template <class T_t>
+static void get_best_local_assignment_biased(assignment &a, typename boost::graph_traits<T_t>::vertex_descriptor t, const T_t &T);
+
+// Code for anotehr ic is generated when generating this one. Mark the other as generated. Port-specific.
+static void extra_ic_generated(const iCode *ic);
+
 inline void
 add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>, var_t> &sym_to_index)
 {
@@ -267,6 +275,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
         default_constructor_of_cfg_node_called = false;
 #endif
         boost::add_vertex(cfg);
+
 #ifdef DEBUG_SEGV
         wassertl (default_constructor_of_cfg_node_called, "add_vertex failed to call default constructor of cfg_node!");
 #endif
@@ -280,12 +289,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             getBuiltinParms(ic, &nbi_parms, bi_parms);
           }
 
-        if(ic->op == '>' || ic->op == '<' || ic->op == EQ_OP || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)
-          {
-            iCode *ifx;
-            if (ifx = ifxForOp (IC_RESULT (ic), ic))
-              ifx->generated = 1;
-          }
+        extra_ic_generated(ic);
 
         cfg[i].ic = ic;
 
@@ -552,7 +556,7 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
 }
 
 template <class G_t, class I_t>
-void assignments_introduce_variable(assignment_list_t &alist, unsigned short int i, short int v, const G_t &G, const I_t &I)
+static void assignments_introduce_variable(assignment_list_t &alist, unsigned short int i, short int v, const G_t &G, const I_t &I)
 {
   assignment_list_t::iterator ai;
   bool a_initialized;
@@ -628,7 +632,7 @@ float compability_cost(const assignment& a, const assignment& ac, const I_t &I)
 // Ensure that we never get more than options.max_allocs_per_node assignments at a single node of the tree decomposition.
 // Tries to drop the worst ones first (but never drop the empty assignment, as it's the only one guaranteed to be always valid).
 template <class G_t, class I_t>
-void drop_worst_assignments(assignment_list_t &alist, unsigned short int i, const G_t &G, const I_t &I, const assignment& ac, bool *const assignment_optimal)
+static void drop_worst_assignments(assignment_list_t &alist, unsigned short int i, const G_t &G, const I_t &I, const assignment& ac, bool *const assignment_optimal)
 {
   unsigned int n;
   size_t alist_size;
@@ -663,7 +667,7 @@ void drop_worst_assignments(assignment_list_t &alist, unsigned short int i, cons
 
 // Handle Leaf nodes in the nice tree decomposition
 template <class T_t, class G_t, class I_t>
-void tree_dec_ralloc_leaf(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I)
+static void tree_dec_ralloc_leaf(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I)
 {
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Leaf (" << t << "):\n"; std::cout.flush();
@@ -688,7 +692,7 @@ void tree_dec_ralloc_leaf(T_t &T, typename boost::graph_traits<T_t>::vertex_desc
 
 // Handle introduce nodes in the nice tree decomposition
 template <class T_t, class G_t, class I_t>
-void tree_dec_ralloc_introduce(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I, const assignment& ac, bool *const assignment_optimal)
+static void tree_dec_ralloc_introduce(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I, const assignment& ac, bool *const assignment_optimal)
 {
   typedef typename boost::graph_traits<T_t>::adjacency_iterator adjacency_iter_t;
   adjacency_iter_t c, c_end;
@@ -757,7 +761,7 @@ static bool assignments_locally_same(const assignment &a1, const assignment &a2)
 
 // Handle forget nodes in the nice tree decomposition
 template <class T_t, class G_t, class I_t>
-void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I)
+static void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I)
 {
   typedef typename boost::graph_traits<T_t>::adjacency_iterator adjacency_iter_t;
   adjacency_iter_t c, c_end;
@@ -836,7 +840,7 @@ void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
 
 // Handle join nodes in the nice tree decomposition
 template <class T_t, class G_t, class I_t>
-void tree_dec_ralloc_join(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I)
+static void tree_dec_ralloc_join(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, const G_t &G, const I_t &I)
 {
   typedef typename boost::graph_traits<T_t>::adjacency_iterator adjacency_iter_t;
   adjacency_iter_t c, c_end, c2, c3;
@@ -914,9 +918,6 @@ void get_best_local_assignment(assignment &a, typename boost::graph_traits<T_t>:
 	
   a = *ai_best;
 }
-
-template <class T_t>
-void get_best_local_assignment_biased(assignment &a, typename boost::graph_traits<T_t>::vertex_descriptor t, const T_t &T);
 
 // Handle nodes in the tree decomposition, by detecting their type and calling the appropriate function. Recurses.
 template <class T_t, class G_t, class I_t>

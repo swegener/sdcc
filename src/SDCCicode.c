@@ -799,8 +799,10 @@ newiTempOperand (sym_link * type, char throwType)
 /* operandType - returns the type chain for an operand             */
 /*-----------------------------------------------------------------*/
 sym_link *
-operandType (const operand * op)
+operandType (const operand *op)
 {
+  wassert (op);
+
   /* depending on type of operand */
   switch (op->type)
     {
@@ -1394,7 +1396,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
 /* isOperandEqual - compares two operand & return 1 if they are =  */
 /*-----------------------------------------------------------------*/
 int
-isOperandEqual (operand * left, operand * right)
+isOperandEqual (const operand * left, const operand * right)
 {
   /* if the pointers are equal then they are equal */
   if (left == right)

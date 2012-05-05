@@ -30,8 +30,8 @@
 enum
   {
     A_IDX,
-    H_IDX,
     X_IDX,
+    H_IDX,
     HX_IDX,
     XA_IDX,
     CND_IDX,
@@ -53,7 +53,8 @@ typedef struct reg_info
     short mask;			/* bitmask for pair allocation */
     struct asmop *aop;		/* last operand */
     int aopofs;			/* last operand offset */
-    unsigned isFree:1;		/* is currently unassigned  */
+    unsigned isFree:1;		/* is currently unassigned */
+    unsigned isDead:1;      /* does not need to survive current instruction */
   }
 reg_info;
 extern reg_info regshc08[];
@@ -69,5 +70,7 @@ void hc08_useReg (reg_info * reg);
 void hc08_freeReg (reg_info * reg);
 void hc08_dirtyReg (reg_info * reg, bool freereg);
 bitVect *hc08_rUmaskForOp (operand * op);
+
+iCode *hc08_ralloc2_cc(ebbIndex *ebbi);
 
 #endif

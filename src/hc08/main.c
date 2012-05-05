@@ -121,13 +121,20 @@ _hc08_parseOptions (int *pargc, char **argv, int *i)
       return TRUE;
     }
 
+  if (!strcmp (argv[*i], "--oldralloc"))
+    {
+      options.oldralloc = TRUE;
+      return TRUE;
+    }
+
   return FALSE;
 }
 
 static OPTION _hc08_options[] =
   {
-    {  0,   "--out-fmt-elf", NULL, "Output executable in ELF format" },
-    {  0, NULL }
+    {0, "--out-fmt-elf", NULL, "Output executable in ELF format" },
+    {0, "--oldralloc", NULL, "Use old register allocator"},
+    {0, NULL }
   };
 
 static void
@@ -302,8 +309,6 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 {
     operand *result = IC_RESULT(ic);
     sym_link *result_type = operandType(result);
-
-    return 0; /* disable CSE */
 
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;

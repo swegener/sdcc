@@ -43,6 +43,12 @@
 
 2012-05-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/hc08/main.c,
+	  src/hc08/ralloc.c:
+	  Revive old register allocator for --oldralloc.
+
+2012-05-03 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCmain.c,
 	  src/z80/gen.c,
 	  src/z80/ralloc.c,
@@ -54,6 +60,11 @@
 2012-05-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (aopPut3): added missing declarations
+
+2012-05-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  Remove obsolete genPointerGetSetOfs().
 
 2012-05-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -96,6 +107,19 @@
 	* sdas/asxxsrc/asxxxx.h:
 	  Use FILENAME_MAX if PATH_MAX is not defined.
 
+2012-04-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Optimize access to h/hx on top of stack. Compute
+	  cost of SEND.
+	* src/hc08/ralloc2.cc: Compute cost of SEND. Support xa and ax
+	  with GETBYTE and GETWORD.
+
+2012-04-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Rewrite genSend to fix problem with register
+	  clobbering. Allow use of tsx with function return values.
+	* src/hc08/ralloc.c: Removed unneed constraint on stack operands
+
 2012-04-25 Borut Razem <borut.razem AT gmail.com>
 
 	* src/common.h, src/ds390/main.c: include SDCCsystem.h in common.h
@@ -113,12 +137,30 @@
 	* src/z80/gen.c:
 	  Fix #3521024.
 
+2012-04-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Fixed bug with cpx use. Optimize stack adjustments
+	  of +/-1. Use mov #0 instead of clr with volatile operands to avoid
+	  read side effect. Avoid using x as stack frame base unless it saves
+	  clock cycles.
+
 2012-04-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCicode.c,
 	  src/SDCCopt.c,
 	  src/z80/gen.c:
 	  GET_VALUE_AT_ADDRESS with offset for z80, z180 and r2k.
+
+2012-04-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Index stack frame via x instead of sp when convenient
+
+2012-04-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Use msb to lsb order in assignment for compatibility
+	  with hardware hardware registers. Expanded use of cpx and ldhx
+	  instructions. Removed some old unused code. Fixed a stack bug in
+	  genPlusIncr.
 
 2012-04-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -127,6 +169,11 @@
 	* src/z80/gen.c,
 	  src/mcs51/gen.c:
 	  Fortify a "/* I assume that […]" comment by an assertion that would have saved me some time.
+
+2012-04-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/main.c:
+	  Enable CSE for an approx. 0.1-0.2% code size reduction.
 
 2012-04-22 Raphael Neider <rneider AT web.de>
 
@@ -153,6 +200,24 @@
 	  support/regression/tests/gcc-torture-execute-950503-1.c,
 	  support/regression/tests/float_single.c:
 	  Enable more tests for hc08.
+
+2012-04-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: fix bugs in genRLC, genRRC, and genJumpTab; support large stack
+	  offsets in rmwWithAop; optimized asmopToBool
+	* src/hc08/ralloc.c: fix bug in findAssignToSym
+
+2012-04-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Allow some use of ax.
+
+2012-04-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Remove accuse.
 
 2012-04-19 Raphael Neider <rneider AT web.de>
 
@@ -192,19 +257,187 @@
 	  device/non-free/lib/pic16/libdev/Makefile.in:
 	  regenerated
 
+2012-04-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Made hc08 code generation more robust wrt. surviving registers and register operands.
+
+2012-04-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: rewrite genCast for register source/results
+
+2012-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Fixes for the cost function (reducing code size and exposing code generation issues).
+
+2012-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Made hc08 code generation more robust wrt. surviving registers and register operands.
+
+2012-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  Preparations for removing accuse.
+
+2012-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Fix xa to hx assignment.
+
+2012-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc:
+	  Fix assignment of nRegs and regs for accuse symbols.
+
+2012-04-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: fixed div/mod sign ext. to work with register result
+
+2012-04-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Made hc08 code generation more robust wrt. surviving registers and register operands.
+
+2012-04-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Made hc08 code generation more robust wrt. surviving registers and register operands.
+
+2012-04-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Handling of pointer access in new allocator.
+
+2012-04-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/SDCCicode.c,
+	  src/SDCCicode.h,
+	  src/z80/ralloc2.cc,
+	  src/hc08/gen.h,
+	  src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Improve hc08 cost function.
+
+2012-04-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Made hc08 code generation more robust wrt. surviving registers and register operands.
+
 2012-04-14 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/genarith.c (pic16_genMult8XLit_n,pic16_genMult8X8_n):
 	  work around early clobbering of input operands, fixes #3515677;
 	  clean up, eliminate dead code
 
+2012-04-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: fix isDead status for register H
+
+2012-04-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Made hc08 code generation more robust wrt. surviving registers and register operands.
+
+2012-04-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc.h,
+	  src/hc08/ralloc2.cc,
+	  src/hc08/gen.c,
+	  src/z80/ralloc2.cc:
+	  Introduce isDead for hc08 registers.
+
+2012-04-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (asmOp): always keep pointer to operand in asmop
+	* src/hc08/ralloc2.cc (instruction_cost): reenable !, IFX, and CAST
+
+2012-04-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (newBoolLink): return bool instead of bit if no
+	  bit memory.
+	* src/hc08/gen.c: Fixed no register assigned to iTemp for IFX.
+	  Guarded more instances of emitLabel for dry run
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  Fix genPointerGet with postincrement and result in h.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-920428-1.c:
+	  Reformatted test.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  Fix handling of isFree for register operands.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  More flexible use of A in cast.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc2.cc:
+	  Fix checking of XA and reenable use of assignment.
+	* src/hc08/gen.c:
+	  Additional debugging output.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCset.c:
+	  Additional assertion.
+	* src/hc08/ralloc.c:
+	  Avoid buffer overflow.
+	* src/hc08/ralloc2.cc:
+	  Do not use assignment for now.
+
 2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCicode.h,
 	  src/SDCCicode.c:
 	  Made isOperandLiteral() work on const operand *.
-	* support/regression/tests/gcc-torture-execute-920428-1.c:
-	  Reformatted test.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/ralloc.c:
+	  Cleanup.
+	* src/hc08/gen.c:
+	  Made genDjnz() more flexible.
+	* src/hc08/ralloc2.cc:
+	  Disallow X, A for now.
+
+2012-04-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc,
+	  src/hc08/ralloc2.cc:
+	  Make optimal register allocator less port-specific.
+
+2012-04-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/gen.c,
+	  src/hc08/ralloc2.cc,
+	  src/hc08/gen.c,
+	  src/hc08/ralloc.c,
+	  src/SDCCicode.c:
+	  Optimal register allocator for hc08 working partially.
 
 2012-04-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -217,6 +450,21 @@
 	* src/z80/gen.c,
 	  src/SDCCpeeph.c:
 	  Fixed memory leaks.
+
+2012-04-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc.c,
+	  src/hc08/ralloc.c,
+	  src/hc08/gen.c:
+	  Enable new allocator as dummy, spilling everything.
+
+2012-04-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc.c,
+	  src/hc08/ralloc2.cc,
+	  src/hc08/ralloc.c:
+	  Preparations for optimal register allocation for hc08.
 
 2012-04-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

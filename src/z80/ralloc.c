@@ -1052,7 +1052,7 @@ verifyRegsAssigned (operand * op, iCode * ic)
   if (sym->regs[0])
     return;
 
-  // Don't warn for new allocator , since this is not used by default (until Thoruop is implemented for spillocation compaction).
+  // Don't warn for new allocator, since this is not used by default (until Thoruop is implemented for spillocation compaction).
   if (options.oldralloc)
     werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, sym->prereqv ? sym->prereqv->name : sym->name);
   spillThis (sym);
@@ -2958,7 +2958,7 @@ serialRegMark (eBBlock ** ebbs, int count)
     }
 }
 
-void
+static void
 RegFix (eBBlock ** ebbs, int count)
 {
   int i;

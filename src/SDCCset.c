@@ -154,6 +154,9 @@ addSet (set ** list, void *item)
 {
   set *lp;
 
+  if (!list)
+    werror (E_INTERNAL_ERROR,__FILE__,__LINE__, "Invalid set.");
+
   /* item added to the tail of the list */
 
   /* if the list is empty */

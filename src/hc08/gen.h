@@ -94,4 +94,8 @@ void hc08_emitDebuggerSymbol (const char *);
 extern unsigned fReturnSizeHC08;
 //extern char **fReturn;
 
+iCode *hasInchc08 (const operand *op, const iCode *ic, int osize);
+extern bool hc08_assignment_optimal;
+
 #endif
+

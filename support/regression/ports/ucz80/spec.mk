@@ -61,7 +61,7 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
 $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 	cat < $(srcdir)/fwk/lib/fwk.lib > $@
 
-# run simulator with 10 seconds timeout
+# run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
 	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \

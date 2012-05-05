@@ -1,3 +1,15 @@
+2012-05-05 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/ucgbz80/spec.mk,
+	  support/regression/ports/ucr2k/spec.mk,
+	  support/regression/ports/ucz180/spec.mk,
+	  support/regression/ports/ucz80/spec.mk: use SIM_TIMEOUT
+
 2012-05-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/ports/ucgbz80/spec.mk:
@@ -6324,7 +6336,8 @@
 	* support/regression/tests/bug3037889.c:
 	  testBug3037889() renamed to Bug3037889()
 	  so that the function is compiled but not executed
-	* src/pic/ralloc.c: fixed gcc warnings: statement with no effect
+	* src/pic/ralloc.c:
+	  fixed bug #3038483: running make of revision 5905 produces warnings
 
 2010-08-13 Borut Razem <borut.razem AT siol.net>
 

@@ -1,5 +1,8 @@
 # Common regression test specification for the mcs51 targets running with uCsim
 
+# simulation timeout in seconds
+SIM_TIMEOUT = 30
+
 # path to uCsim
 ifdef SDCC_BIN_PATH
   S51 = $(SDCC_BIN_PATH)/s51$(EXEEXT)
@@ -53,10 +56,10 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib $(PORTS_DIR)/mcs51-common/f
 	cat < $(srcdir)/fwk/lib/fwk.lib > $@
 	cat < $(PORTS_DIR)/mcs51-common/fwk.lib >> $@
 
-# run simulator with 30 seconds timeout
+# run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 30 $(EMU) -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51-common/uCsim.cmd > $(@:.out=.sim) \
+	-$(CASES_DIR)/timeout SIM_TIMEOUT $(EMU) -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51-common/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true

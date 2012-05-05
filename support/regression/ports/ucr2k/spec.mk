@@ -1,5 +1,8 @@
 # Regression test specification for the z80 target running with uCsim
 
+# simulation timeout in seconds
+SIM_TIMEOUT = 10
+
 EMU_PORT_FLAG=-tr2k
 
 # path to uCsim
@@ -60,10 +63,10 @@ $(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
 $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 	cat < $(srcdir)/fwk/lib/fwk.lib > $@
 
-# run simulator with 10 seconds timeout
+# run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 10 $(EMU) $(EMU_PORT_FLAG) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
+	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true

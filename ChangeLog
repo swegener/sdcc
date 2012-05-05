@@ -1,5 +1,28 @@
 ﻿2012-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* support/regression/tests/gcc-torture-execute-pr44555.c: test was not
+	  disabled for gcc 4.4.3, now it is for all 4.x.x < 4.6.0
+
+2012-05-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c,
+	* src/SDCCicode.h,
+	* src/SDCCralloc.hpp,
+	* src/SDCCset.c,
+	* src/SDCCsymt.c,
+	* src/hc08/gen.c,
+	* src/hc08/gen.h,
+	* src/hc08/main.c,
+	* src/hc08/ralloc.c,
+	* src/hc08/ralloc.h,
+	* src/hc08/ralloc2.cc,
+	* src/yacc.vcxproj,
+	* src/z80/gen.c,
+	* src/z80/ralloc.c,
+	* src/z80/ralloc2.cc: Merged optralloc-hc08 branch
+
+2012-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* config.vcxproj,
 	* configure_vc.awk,
 	* doc/sdccman.lyx,

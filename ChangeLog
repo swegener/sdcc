@@ -1,4 +1,9 @@
-﻿2012-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+2012-05-06 Borut Razem <borut.razem AT gmail.com>
+
+	* .version, doc/sdccman.lyx: bumped version to 3.1.5
+	* ChangeLog: removed unicode BOM
+
+2012-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/gcc-torture-execute-pr44555.c: test was not
 	  disabled for gcc 4.4.3, now it is for all 4.x.x < 4.6.0

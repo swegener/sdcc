@@ -2273,6 +2273,8 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       return rs;
 
     case AOP_DIR:
+      if (regalloc_dry_run)
+        return "*dry";
       if (offset)
         sprintf (s, "*(%s + %d)", aop->aopu.aop_dir, offset);
       else
@@ -2282,6 +2284,8 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       return rs;
 
     case AOP_EXT:
+      if (regalloc_dry_run)
+        return "dry";
       if (offset)
         sprintf (s, "(%s + %d)", aop->aopu.aop_dir, offset);
       else

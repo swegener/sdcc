@@ -1322,19 +1322,19 @@ install-exec-local: install-binPROGRAMS $(bin_PROGRAMS) $(noinst_PROGRAMS)
 	    $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p$(EXEEXT) $(DESTDIR)$(bindir)/`echo $$p|sed -e 's/-new//' -e 's/cxxfilt/$(DEMANGLER_NAME)/'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	  else :; fi; \
 	done
-	$(mkinstalldirs) $(DESTDIR)$(tooldir)/bin
-	for i in $(TOOL_PROGS); do \
-	  if [ -f $$i$(EXEEXT) ]; then \
-	    j=`echo $$i | sed -e 's/-new//'`; \
-	    k=`echo $$j | sed '$(transform)'`; \
-	    if [ "$(bindir)/$$k" != "$(tooldir)/bin/$$j" ]; then \
-	      rm -f $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT); \
-	      ln $(DESTDIR)$(bindir)/$$k$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT) >/dev/null 2>/dev/null \
-		|| $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) $$i$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT); \
-	    fi; \
-	  else true; \
-	  fi; \
-	done
+####	$(mkinstalldirs) $(DESTDIR)$(tooldir)/bin
+####	for i in $(TOOL_PROGS); do \
+####	  if [ -f $$i$(EXEEXT) ]; then \
+####	    j=`echo $$i | sed -e 's/-new//'`; \
+####	    k=`echo $$j | sed '$(transform)'`; \
+####	    if [ "$(bindir)/$$k" != "$(tooldir)/bin/$$j" ]; then \
+####	      rm -f $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT); \
+####	      ln $(DESTDIR)$(bindir)/$$k$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT) >/dev/null 2>/dev/null \
+####		|| $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) $$i$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT); \
+####	    fi; \
+####	  else true; \
+####	  fi; \
+####	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

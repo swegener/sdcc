@@ -1,3 +1,8 @@
+2012-05-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/ports/ds390/spec.mk:
+	  Increase timeout from 40 to 60, since ds390 simulation on NetBSD is slow.
+
 2012-05-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (aopAdrStr): handle incompletely initialized

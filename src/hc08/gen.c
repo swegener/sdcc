@@ -2051,7 +2051,13 @@ aopOp (operand *op, iCode * ic, bool result)
 
        if (regalloc_dry_run)     // Todo: Handle dummy iTemp correctly
         {
-          sym->aop = op->aop = aop = newAsmop (AOP_DIR); // TODO: STACK vs. IMMD depending on options!
+          if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))
+            {
+              sym->aop = op->aop = aop = newAsmop (AOP_SOF);
+              aop->aopu.aop_stk = 8; /* bogus stack offset, high enough to prevent optimization */
+            }
+          else
+            sym->aop = op->aop = aop = newAsmop (AOP_DIR);
           aop->size = getSize (sym->type);
           aop->op = op;
           return;

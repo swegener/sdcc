@@ -1,3 +1,8 @@
+2012-05-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (aopOp): Handle spill location correctly even
+	  though it is not actually allocated during dry run
+
 2012-05-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/ports/ds390/spec.mk:

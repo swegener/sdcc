@@ -1258,7 +1258,6 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
 {
   bool needpula = FALSE;
   reg_info *reg = NULL;
-  int regIdx;
   bool keepreg = FALSE;
   bool afree;
 
@@ -1312,13 +1311,11 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
 
   if (dstaop->type == AOP_REG)
     {
-      regIdx = dstaop->aopu.aop_reg[dstofs]->rIdx;
       reg = dstaop->aopu.aop_reg[dstofs];
       keepreg = TRUE;
     }
   else if ((srcaop->type == AOP_REG) && (srcaop->aopu.aop_reg[srcofs]))
     {
-      regIdx = srcaop->aopu.aop_reg[srcofs]->rIdx;
       reg = srcaop->aopu.aop_reg[srcofs];
       keepreg = TRUE;
     }
@@ -2809,11 +2806,6 @@ static void
 unsaveRegisters (iCode *ic)
 {
   int i;
-  bitVect *rsave;
-
-  /* restore the registers in use at this time but skip the
-     ones for the result */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask), hc08_rUmaskForOp (IC_RESULT (ic)));
 
   for (i = H_IDX; i >= A_IDX; i--)
     {

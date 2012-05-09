@@ -3131,10 +3131,6 @@ serialRegMark (eBBlock ** ebbs, int count)
           if (IC_RESULT (ic))
             {
               symbol *sym = OP_SYMBOL (IC_RESULT (ic));
-              bitVect *spillable;
-              int willCS;
-              int j;
-              int ptrRegSet = 0;
 
               /* Make sure any spill location is definitely allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
@@ -3162,13 +3158,8 @@ serialRegMark (eBBlock ** ebbs, int count)
                   spillThis (sym);
                   continue;
                 }
-              /* if trying to allocate this will cause
-                 a spill and there is nothing to spill
-                 or this one is rematerializable then
-                 spill this one */
-              willCS = willCauseSpill (sym->nRegs, sym->regType);
-              spillable = computeSpillable (ic);
-              if (sym->remat /*|| (willCS && bitVectIsZero (spillable))*/)
+
+              if (sym->remat)
                 {
                   spillThis (sym);
                   continue;

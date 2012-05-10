@@ -1,3 +1,17 @@
+2012-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/hc08/gen.h,
+	* src/hc08/gen.c (aopName): compile conditionally,
+	  (assignResultValue): MSVC has no true/false,
+	  (hasInchc08): fixed warning,
+	  (genReceive): declarations first
+	* src/hc08/ralloc.c: include dbuf_string.h,
+	  (createStackSpil): removed unused slocBuffer
+	* src/hc08/hc08.vcxproj.filters,
+	* src/hc08/hc08.vcxproj: added ralloc2.cc and boost include dir
+	* src/z80/gen.c (genCmp): fixed uninitialised warning
+	* src/SDCCicode.h: cosmetics
+
 2012-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,

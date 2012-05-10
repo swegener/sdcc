@@ -26,6 +26,7 @@
 #include "common.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "dbuf_string.h"
 
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
@@ -535,8 +536,6 @@ createStackSpil (symbol * sym)
   symbol *sloc = NULL;
   struct dbuf_s dbuf;
   int useXstack, model;
-
-  char slocBuffer[30];
 
   /* first go try and find a free one that is already
      existing on the stack */

@@ -23,6 +23,9 @@
     <ClCompile Include="ralloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ralloc2.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gen.h">

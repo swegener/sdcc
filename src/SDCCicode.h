@@ -73,28 +73,28 @@ OPTYPE;
 /* typedef for operand */
 typedef struct operand
 {
-  OPTYPE type;                  /* type of operand */
-  unsigned int isaddr:1;        /* is an address   */
-  unsigned int aggr2ptr:2;      /* 1: must change aggregate to pointer to aggregate */
+  OPTYPE type;                      /* type of operand */
+  unsigned int isaddr:1;            /* is an address   */
+  unsigned int aggr2ptr:2;          /* 1: must change aggregate to pointer to aggregate */
   /* 2: aggregate has been changed to pointer to aggregate */
-  unsigned int isvolatile:1;    /* is a volatile operand */
-  unsigned int isGlobal:1;      /* is a global operand */
-  unsigned int isPtr:1;         /* is assigned a pointer */
-  unsigned int isGptr:1;        /* is a generic pointer  */
-  unsigned int isParm:1;        /* is a parameter        */
-  unsigned int isLiteral:1;     /* operand is literal    */
+  unsigned int isvolatile:1;        /* is a volatile operand */
+  unsigned int isGlobal:1;          /* is a global operand */
+  unsigned int isPtr:1;             /* is assigned a pointer */
+  unsigned int isGptr:1;            /* is a generic pointer  */
+  unsigned int isParm:1;            /* is a parameter        */
+  unsigned int isLiteral:1;         /* operand is literal    */
 
   int key;
   union
   {
-    struct symbol *symOperand;  /* operand is of type symbol */
-    struct value *valOperand;   /* operand is of type value  */
-    struct sym_link *typeOperand;       /* operand is of type typechain */
+    struct symbol *symOperand;      /* operand is of type symbol */
+    struct value *valOperand;       /* operand is of type value  */
+    struct sym_link *typeOperand;   /* operand is of type typechain */
   }
   svt;
 
-  bitVect *usesDefs;            /* which definitions are used by this */
-  struct asmop *aop;            /* asm op for this operand */
+  bitVect *usesDefs;                /* which definitions are used by this */
+  struct asmop *aop;                /* asm op for this operand */
 }
 operand;
 

@@ -6390,16 +6390,14 @@ fix:
         {
           if (!IS_GB)           /* Directly check for overflow, can't be done on GBZ80 */
             {
-              symbol *tlbl;
               if (!regalloc_dry_run)
                 {
-                  tlbl = newiTempLabel (NULL);
+                  symbol *tlbl = newiTempLabel (NULL);
                   emit2 ("jp PO, !tlabel", labelKey2num (tlbl->key));
                   emit2 ("xor a, !immedbyte", 0x80);
+                  emitLabelSpill (tlbl);
                 }
               regalloc_dry_run_cost += 5;
-              if (!regalloc_dry_run)
-                emitLabelSpill (tlbl);
               result_in_carry = FALSE;
             }
           else                  /* Do it the hard way */

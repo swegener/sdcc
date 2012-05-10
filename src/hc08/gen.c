@@ -78,7 +78,6 @@ extern struct dbuf_s *codeOutBuf;
 //static void saveRBank (int, iCode *, bool);
 static bool operandsEqu (operand * op1, operand * op2);
 static void loadRegFromConst (reg_info * reg, char *c);
-static char *aopName (asmop * aop);
 static asmop *newAsmop (short type);
 static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 #define RESULTONSTACK(x) \

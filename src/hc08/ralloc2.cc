@@ -429,6 +429,16 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   if(!AXinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
+#if 0
+  std::cout << "Calculating at cost at ic " << ic->key << " for: ";
+  for(unsigned int i = 0; i < boost::num_vertices(I); i++)
+  {
+  	std::cout << "(" << i << ", " << int(a.global[i]) << ") ";
+  }
+  std::cout << "\n";
+  std::cout.flush();
+#endif
+
   switch(ic->op)
     {
     // Register assignment doesn't matter for these:

@@ -1,3 +1,9 @@
+2012-05-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/hc08/ralloc2.cc:
+	  Added some debug info code.
+
 2012-05-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/hc08/gen.c,

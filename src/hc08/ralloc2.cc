@@ -439,6 +439,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   std::cout.flush();
 #endif
 
+  if(ic->generated)
+    return(0.0f);
+
   switch(ic->op)
     {
     // Register assignment doesn't matter for these:

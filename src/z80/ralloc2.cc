@@ -1077,6 +1077,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   if(OPTRALLOC_IY && !IYinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
+  if(ic->generated)
+    return(0.0f);
+
   if(OPTRALLOC_EXACT_COST)
     {
       switch(ic->op)

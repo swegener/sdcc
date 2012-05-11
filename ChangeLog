@@ -1,3 +1,9 @@
+2012-05-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/hc08/ralloc2.c:
+	  Bypass dry run for generatedm ic.
+
 2012-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/hc08/gen.h,

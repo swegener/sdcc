@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (pobjcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -14,12 +14,12 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-  
+
   UCSIM is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with UCSIM; see the file COPYING.  If not, write to the Free
   Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -95,7 +95,7 @@ public:
 public:
   cl_event(enum event what_event);
   virtual ~cl_event(void);
-  
+
   bool is_handled(void) { return(handled); }
   virtual void handle(void) { handled= DD_TRUE; }
 };
@@ -121,7 +121,12 @@ public:
   cl_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_list(void);
 
-	  void	   *at(t_index index);
+  inline  void	   *at(t_index index)
+  {
+    if (index < 0 || index >= count)
+      error(1, index);
+    return (Items[index]);
+  }
   class cl_base *object_at(t_index index);
   virtual t_index  index_of(void *item);
   virtual bool     index_of(void *item, t_index *idx);
@@ -169,7 +174,7 @@ public:
 public:
   cl_sorted_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_sorted_list(void);
-  
+
   virtual bool	   search(const void *key, t_index& index);
   virtual t_index  index_of(void *item);
   virtual t_index  add(void *item);
@@ -191,7 +196,7 @@ class cl_strings: public cl_sorted_list
 public:
   cl_strings(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_strings(void);
-  
+
 private:
   virtual int	   compare(const void *key1, const void *key2);
   virtual void	   free_item(void *item);
@@ -210,7 +215,7 @@ class cl_ustrings: public cl_strings
 public:
   cl_ustrings(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_ustrings(void);
-  
+
 private:
   virtual int	   compare(const void *key1, const void *key2);
   virtual bool	   search(const void *key, t_index &index);

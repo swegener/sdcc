@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (pobj.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -42,7 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 									    *
 */
 
-/* 
+/*
  * Initializing the object
  */
 
@@ -54,7 +54,7 @@ cl_base::cl_base(void)
 }
 
 
-/* 
+/*
  * Destructing the object: calling hte virtual Done method
  */
 
@@ -261,7 +261,7 @@ cl_event::~cl_event(void)
 									    *
 */
 
-/* 
+/*
  * Initializing a collection
  */
 
@@ -277,7 +277,7 @@ cl_list::cl_list(t_index alimit, t_index adelta, const char *aname):
 }
 
 
-/* 
+/*
  * Disposing object's variables
  */
 
@@ -292,14 +292,14 @@ cl_list::~cl_list(void)
  * Get indexed item from the collection
  */
 
-void *
+/*void *
 cl_list::at(t_index index)
 {
   if (index < 0 ||
       index >= count)
     error(1, index);
   return(Items[index]);
-}
+}*/
 
 class cl_base *
 cl_list::object_at(t_index index)
@@ -316,7 +316,7 @@ cl_list::operator[](t_index index)
   if (index < 0 ||
       index >= count)
     error(1, 0);
-  return(Items[index]);  
+  return(Items[index]);
 }*/
 
 
@@ -359,7 +359,7 @@ cl_list::disconn(void *item)
 }
 
 
-/* 
+/*
  * Deleting all the items from the collection but not disposing them
  */
 
@@ -426,7 +426,7 @@ cl_list::add_at(t_index index, void *item)
 }
 
 
-/* 
+/*
  * Put a new item to the collection. This function replaces an existing
  * item with a new one but it does not delete or dispose the old item!
  */
@@ -440,21 +440,21 @@ cl_list::put_at(t_index index, void *item)
 }
 
 
-/* 
+/*
  * Action taken when an error occure
  */
 
 void
 cl_list::error(t_index code, t_index info)
 {
-  fprintf(stderr, 
+  fprintf(stderr,
 	  "Collection index error. Code= %d, Info= %d.\n",
 	  code, info);
   exit(code);
 }
 
 
-/* 
+/*
  * Iterator method. This function calls 'Test' using every items as Test's
  * argument until Test returns TRUE.
  */
@@ -470,7 +470,7 @@ cl_list::first_that(match_func test, const void *arg)
 }
 
 
-/* 
+/*
  * Iterator method. This function calls 'Action' using every items as
  * Action's argument.
  */
@@ -483,7 +483,7 @@ cl_list::for_each(iterator_func action, void *arg)
 }
 
 
-/* 
+/*
  * Disposing an item.
  */
 
@@ -494,7 +494,7 @@ cl_list::free_item(void *item)
 }
 
 
-/* 
+/*
  * Get the number of collected items.
  */
 
@@ -525,7 +525,7 @@ cl_list::top(void)
 }
 
 
-/* 
+/*
  * Returning the index of an item.
  */
 
@@ -566,7 +566,7 @@ cl_list::next(void *item)
 }
 
 
-/* 
+/*
  * Inserting a new item to the collection.
  */
 
@@ -597,7 +597,7 @@ cl_list::push(void *item)
 }
 
 
-/* 
+/*
  * Iterator method. This function calls 'Test' using every items
  * (in reversed order) as Test's argument until Test returns TRUE.
  */
@@ -673,7 +673,7 @@ cl_list::set_limit(t_index alimit)
 									    *
 */
 
-/* 
+/*
  * Initilizing the sorted collection
  */
 
@@ -687,7 +687,7 @@ cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, const char *aname
 cl_sorted_list::~cl_sorted_list(void) {}
 
 
-/* 
+/*
  * Get the address of the key field in an item.
  */
 
@@ -698,7 +698,7 @@ cl_sorted_list::key_of(void *item)
 }
 
 
-/* 
+/*
  * Get index of an item.
  */
 
@@ -751,7 +751,7 @@ cl_sorted_list::search(const void *key, t_index &index)
   t_index l  = 0;
   t_index h  = count - 1;
   bool    res= DD_FALSE;
-  
+
   while (l <= h)
     {
       t_index i= (l + h) >> 1;
@@ -780,7 +780,7 @@ cl_sorted_list::search(const void *key, t_index &index)
 									    *
 */
 
-/* 
+/*
  * Initilizing the string collection
  */
 
@@ -794,7 +794,7 @@ cl_strings::cl_strings(t_index alimit, t_index adelta, const char *aname):
 cl_strings::~cl_strings(void) {}
 
 
-/* 
+/*
  * Comapare two string from the collection
  */
 
@@ -805,7 +805,7 @@ cl_strings::compare(const void *key1, const void *key2)
 }
 
 
-/* 
+/*
  * Deallocate string item of the collection
  */
 
@@ -846,7 +846,7 @@ cl_ustrings::compare(const void *key1, const void *key2)
 }
 
 
-/* 
+/*
  * Searching an item using linear search.
  */
 

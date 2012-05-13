@@ -74,6 +74,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define DPX     0x93 /* Data Pointer HHigh byte */
 #define DPX1    0x95 /* Data Pointer HHigh byte */
 #define ESP     0x9b /* Extended Stack Pointer */
+#define AP      0x9c /* Address Page */
 #define ACON    0x9d /* */
 #define P5      0xa1
 #define P5CNT   0xa2 /* */

@@ -10823,19 +10823,20 @@ genCodePointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 static void
 genGenPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 {
-  int size, offset;
+  int size, offset, dopi;
   bool pushedB;
   sym_link *retype = getSpec (operandType (result));
   sym_link *letype = getSpec (operandType (left));
 
   D (emitcode (";", "genGenPointerGet"));
 
-  aopOp (left, ic, FALSE, (IS_OP_RUONLY (left) ? FALSE : TRUE));
+  aopOp (left, ic, FALSE, FALSE);
+
   pushedB = pushB ();
-  loadDptrFromOperand (left, TRUE);
+  dopi = loadDptrFromOperand (left, TRUE);
 
   /* so dptr-b now contains the address */
-  aopOp (result, ic, FALSE, TRUE);
+  aopOp (result, ic, FALSE, (AOP_INDPTRn (left) ? FALSE : TRUE));
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
@@ -10869,14 +10870,14 @@ genGenPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
               aopPut (result, "a", offset++);
             }
 
-          if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
+          if (size || (dopi && pi && AOP_TYPE (left) != AOP_IMMD))
             {
               emitcode ("inc", "dptr");
             }
         }
     }
 
-  if (pi && AOP_TYPE (left) != AOP_IMMD)
+  if (dopi && pi && AOP_TYPE (left) != AOP_IMMD)
     {
       _startLazyDPSEvaluation ();
 
@@ -10894,9 +10895,8 @@ genGenPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
 
       pi->generated = 1;
     }
-  else if (OP_SYMBOL (left)->ruonly && AOP_SIZE (result) > 1 && (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth))
+  else if (IS_OP_RUONLY (left) && AOP_SIZE (result) > 1 && (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth))
     {
-
       size = AOP_SIZE (result) - 1;
       while (size--)
         emitcode ("lcall", "__decdptr");
@@ -11438,20 +11438,19 @@ genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 static void
 genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
-  int size, offset;
+  int size, offset, dopi;
   bool pushedB;
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
   D (emitcode (";", "genGenPointerSet"));
 
-  aopOp (result, ic, FALSE, IS_OP_RUONLY (result) ? FALSE : TRUE);
-
+  aopOp (result, ic, FALSE, FALSE);
   pushedB = pushB ();
-  loadDptrFromOperand (result, TRUE);
+  dopi = loadDptrFromOperand (result, TRUE);
 
   /* so dptr-b now contains the address */
-  aopOp (right, ic, FALSE, TRUE);
+  aopOp (right, ic, FALSE, (AOP_INDPTRn (result) ? FALSE : TRUE));
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
@@ -11492,7 +11491,7 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
               emitcode ("lcall", "__gptrput");
             }
 
-          if (size || (pi && AOP_TYPE (result) != AOP_IMMD))
+          if (size || (dopi && pi && AOP_TYPE (result) != AOP_IMMD))
             {
               emitcode ("inc", "dptr");
             }
@@ -11500,7 +11499,7 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
       _endLazyDPSEvaluation ();
     }
 
-  if (pi && AOP_TYPE (result) != AOP_IMMD)
+  if (dopi && pi && AOP_TYPE (result) != AOP_IMMD)
     {
       _startLazyDPSEvaluation ();
 
@@ -11519,7 +11518,7 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 
       pi->generated = 1;
     }
-  else if (IS_SYMOP (result) && OP_SYMBOL (result)->ruonly && AOP_SIZE (right) > 1 &&
+  else if (IS_SYMOP (result) && IS_OP_RUONLY (result) && AOP_SIZE (right) > 1 &&
            (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth))
     {
       size = AOP_SIZE (right) - 1;

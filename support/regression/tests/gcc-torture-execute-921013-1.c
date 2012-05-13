@@ -16,16 +16,14 @@ void f(int *d, float *x, float *y,int n)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390
-  int r[4];
+  int r[4]={2,2,2,2};
   float a[]={5,1,3,5};
   float b[]={2,4,3,0};
-  int i;
-  f(r,a,b,4);
-  for(i=0;i<4;i++)
-    if((a[i]==b[i])!=r[i])
-      ASSERT(0);
-  return;
-#endif
-}
 
+  f(r,a,b,4);
+  ASSERT ((a[0]==b[0]) == r[0]);
+  ASSERT ((a[1]==b[1]) == r[1]);
+  ASSERT ((a[2]==b[2]) == r[2]);
+  ASSERT ((a[3]==b[3]) == r[3]);
+  return;
+}

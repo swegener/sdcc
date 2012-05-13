@@ -1,8 +1,20 @@
+2012-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sim/ucsim/pobj.cc,
+	* sim/ucsim/pobjcl.h: made cl_list::at inline
+	* sim/ucsim/s51.src/regs51.h: added AP
+	* sim/ucsim/s51.src/uc390.cc (inst_inc_dptr): fixed sel bug,
+	  (disass): show inc/dec dptr,
+	  (print_regs): show DPTR0, DPTR1 and AP	
+	* src/ds390/gen.c (genGenPointerGet, genGenPointerSet): fixed bug 3509705
+	* support/regression/compact-results.py: align results
+	* support/regression/tests/gcc-torture-execute-921013-1.c: enabled tests
+
 2012-05-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,
 	  src/hc08/ralloc2.c:
-	  Bypass dry run for generatedm ic.
+	  Bypass dry run for generated ic.
 
 2012-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 

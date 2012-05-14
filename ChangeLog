@@ -1,3 +1,8 @@
+2012-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: correct some dry run costs, update genDivOneByte()
+	  and genModOneByte() to handle all register operand posibilities
+
 2012-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sim/ucsim/pobj.cc,

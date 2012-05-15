@@ -19,9 +19,9 @@ testTortureExecute (void)
       unsigned long int z = 0;
 
       do {
-	z -= 0x00004000;
+	z -= 0x000040000;
 	i++;
-	if (i > 0x00040000)
+	if (i > 0x0004000)
 	  ASSERT (0);
       } while (z > 0);
       return;
@@ -31,9 +31,9 @@ testTortureExecute (void)
       unsigned int z = 0;
 
       do {
-	z -= 0x00004000;
+	z -= 0x000040000;
 	i++;
-	if (i > 0x00040000)
+	if (i > 0x0004000)
 	  ASSERT (0);
       } while (z > 0);
       return;
@@ -41,4 +41,3 @@ testTortureExecute (void)
   else
     return;
 }
-

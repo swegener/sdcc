@@ -1,3 +1,13 @@
+2012-05-14 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sim/ucsim/stypes.h,
+	* sim/ucsim/globals.cc: add R3KA (rabbit 3000A) processor type
+	* sim/ucsim/z80.src/r2k.cc,
+	* sim/ucsim/z80.src/simz80.cc: added initialization code for R3KA support
+	* sim/ucsim/z80.src/r2kcl.h,
+	* sim/ucsim/z80.src/inst_ed_r2k.cc: support for r3ka instructions
+	* sim/ucsim/z80.src/inst_ed.cc: change to allow overloading of inst_ed_
+	
 2012-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: correct some dry run costs, update genDivOneByte()

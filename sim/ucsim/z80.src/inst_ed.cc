@@ -34,39 +34,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "z80mac.h"
 
 
-int
-cl_z80::inst_ed_(t_mem code)
+int  cl_z80::inst_ed_(t_mem code)
 {
-  switch(code) {
-  }
-  return(resGO);
-}
-
-/******** start ED codes *****************/
-int
-cl_z80::inst_ed(void)
-{
-  t_mem code;
   unsigned short tw;
-
-  if (fetch(&code))
-    return(resBREAKPOINT);
-
-  switch (code)
-  {
+  
+  switch(code)
+    {
 #if 0
     case 0x40: // IN B,(C)
-    return(resGO);
+      return(resGO);
     case 0x41: // OUT (C),B
-    return(resGO);
+      return(resGO);
 #endif
     case 0x42: // SBC HL,BC
       sbc_HL_wordreg(regs.BC);
-    return(resGO);
+      return(resGO);
     case 0x43: // LD (nnnn),BC
       tw = fetch2();
       store2(tw, regs.BC);
-    return(resGO);
+      return(resGO);
     case 0x44: // NEG
       regs.F &= ~(BIT_ALL);  /* clear these */
       if (regs.A != 0)    regs.F |= BIT_C;
@@ -76,156 +62,156 @@ cl_z80::inst_ed(void)
       regs.F |= BIT_N; /* not addition */
       if (regs.A == 0)    regs.F |= BIT_Z;
       if (regs.A & 0x80)  regs.F |= BIT_S;
-    return(resGO);
+      return(resGO);
     case 0x45: // RETN (return from non-maskable interrupt)
       pop2(PC);
-    return(resGO);
+      return(resGO);
 #if 0
     case 0x46: // IM 0
       /* interrupt device puts opcode on data bus */
-    return(resGO);
+      return(resGO);
 #endif
     case 0x47: // LD IV,A
       regs.iv = regs.A;
-    return(resGO);
+      return(resGO);
 
     case 0x48: // IN C,(C)
-    return(resGO);
+      return(resGO);
     case 0x49: // OUT (C),C
-    return(resGO);
+      return(resGO);
 
     case 0x4A: // ADC HL,BC
       adc_HL_wordreg(regs.BC);
-    return(resGO);
+      return(resGO);
     case 0x4B: // LD BC,(nnnn)
       tw = fetch2();
       regs.BC = get2(tw);
-    return(resGO);
-	case 0x4C: // MLT BC
+      return(resGO);
+    case 0x4C: // MLT BC
       if(type != CPU_Z180)
         return(resINV_INST);
       regs.BC = (unsigned long)(regs.bc.h) * (unsigned long)(regs.bc.l);
-    return(resGO);
+      return(resGO);
     case 0x4D: // RETI (return from interrupt)
       pop2(PC);
-    return(resGO);
+      return(resGO);
     case 0x4F: // LD R,A
       /* Load "refresh" register(whats that?) */
-    return(resGO);
+      return(resGO);
 
     case 0x50: // IN D,(C)
-    return(resGO);
+      return(resGO);
     case 0x51: // OUT (C),D
-    return(resGO);
+      return(resGO);
 
     case 0x52: // SBC HL,DE
       sbc_HL_wordreg(regs.DE);
-    return(resGO);
+      return(resGO);
     case 0x53: // LD (nnnn),DE
       tw = fetch2();
       store2(tw, regs.DE);
-    return(resGO);
+      return(resGO);
 #if 0
     case 0x56: // IM 1
-    return(resGO);
+      return(resGO);
 #endif
     case 0x57: // LD A,IV
       regs.A = regs.iv;
-    return(resGO);
+      return(resGO);
 
     case 0x58: // IN E,(C)
-    return(resGO);
+      return(resGO);
     case 0x59: // OUT (C),E
-    return(resGO);
+      return(resGO);
 
     case 0x5A: // ADC HL,DE
       adc_HL_wordreg(regs.DE);
-    return(resGO);
+      return(resGO);
     case 0x5B: // LD DE,(nnnn)
       tw = fetch2();
       regs.DE = get2(tw);
-    return(resGO);
+      return(resGO);
     case 0x5C: // MLT DE
       if(type != CPU_Z180)
         return(resINV_INST);
       regs.DE = (unsigned long)(regs.de.h) * (unsigned long)(regs.de.l);
-    return(resGO);
+      return(resGO);
 #if 0
     case 0x5E: // IM 2
-    return(resGO);
+      return(resGO);
     case 0x5F: // LD A,R
-    return(resGO);
+      return(resGO);
     case 0x60: // IN H,(C)
-    return(resGO);
+      return(resGO);
     case 0x61: // OUT (C),H
-    return(resGO);
+      return(resGO);
 #endif
     case 0x62: // SBC HL,HL
       sbc_HL_wordreg(regs.HL);
-    return(resGO);
+      return(resGO);
     case 0x63: // LD (nnnn),HL opcode 22 does the same faster
       tw = fetch2();
       store2(tw, regs.HL);
-    return(resGO);
+      return(resGO);
 
 #if 0
     case 0x67: // RRD
-    return(resGO);
+      return(resGO);
 #endif
     case 0x68: // IN L,(C)
-    return(resGO);
+      return(resGO);
     case 0x69: // OUT (C),L
-    return(resGO);
+      return(resGO);
 
     case 0x6A: // ADC HL,HL
       adc_HL_wordreg(regs.HL);
-    return(resGO);
+      return(resGO);
     case 0x6B: // LD HL,(nnnn) opcode 2A does the same faster
       tw = fetch2();
       regs.HL = get2(tw);
-    return(resGO);
+      return(resGO);
     case 0x6C: // MLT HL
       if(type != CPU_Z180)
         return(resINV_INST);
       regs.HL = (unsigned long)(regs.hl.h) * (unsigned long)(regs.hl.l);
-    return(resGO);
+      return(resGO);
 #if 0
     case 0x6F: // RLD
       /* rotate 1 bcd digit left between ACC and memory location */
-    return(resGO);
+      return(resGO);
 #endif
 
     case 0x70: // IN (C)  set flags only (TSTI)
-    return(resGO);
+      return(resGO);
     case 0x71: //  OUT (C),0
-    return(resGO);
+      return(resGO);
 
     case 0x72: // SBC HL,SP
       sbc_HL_wordreg(regs.SP);
-    return(resGO);
+      return(resGO);
     case 0x73: // LD (nnnn),SP
       tw = fetch2();
       store2(tw, regs.SP);
-    return(resGO);
+      return(resGO);
 
     case 0x78: // IN A,(C)
-    return(resGO);
+      return(resGO);
     case 0x79: // OUT (C),A
-    return(resGO);
+      return(resGO);
 
     case 0x7A: // ADC HL,SP
       adc_HL_wordreg(regs.SP);
-    return(resGO);
+      return(resGO);
     case 0x7B: // LD SP,(nnnn)
       tw = fetch2();
       regs.SP = get2(tw);
-    return(resGO);
+      return(resGO);
 
     case 0x7C: // MLT SP
       //if(type != CPU_Z180)
-        return(resINV_INST);
+      return(resINV_INST);
       //regs.SP = (unsigned long)(regs.sp.h) * (unsigned long)(regs.sp.l);
-    return(resGO);
+      return(resGO);
     case 0xA0: // LDI
       // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
       regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
@@ -234,7 +220,7 @@ cl_z80::inst_ed(void)
       ++regs.DE;
       --regs.BC;
       if (regs.BC != 0) regs.F |= BIT_P;
-    return(resGO);
+      return(resGO);
     case 0xA1: // CPI
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
       {
@@ -245,12 +231,12 @@ cl_z80::inst_ed(void)
         --regs.BC;
         if (regs.BC != 0) regs.F |= BIT_P;
       }
-    return(resGO);
+      return(resGO);
 
     case 0xA2: // INI
-    return(resGO);
+      return(resGO);
     case 0xA3: // OUTI
-    return(resGO);
+      return(resGO);
 
     case 0xA8: // LDD
       // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
@@ -260,7 +246,7 @@ cl_z80::inst_ed(void)
       --regs.DE;
       --regs.BC;
       if (regs.BC != 0) regs.F |= BIT_P;
-    return(resGO);
+      return(resGO);
     case 0xA9: // CPD
 /* fixme: checkme, compare to other emul. */
 
@@ -272,12 +258,12 @@ cl_z80::inst_ed(void)
       --regs.BC;
       if (regs.BC != 0) regs.F |= BIT_P;
 
-    return(resGO);
+      return(resGO);
 
     case 0xAA: // IND
-    return(resGO);
+      return(resGO);
     case 0xAB: // OUTD
-    return(resGO);
+      return(resGO);
 
     case 0xB0: // LDIR
       // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
@@ -288,7 +274,7 @@ cl_z80::inst_ed(void)
         ++regs.DE;
         --regs.BC;
       } while (regs.BC != 0);
-    return(resGO);
+      return(resGO);
 
     case 0xB1: // CPIR
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
@@ -310,12 +296,12 @@ cl_z80::inst_ed(void)
       if(regs.BC != 0)
         regs.F |= BIT_P;
 
-    return(resGO);
+      return(resGO);
 #if 0
     case 0xB2: // INIR
-    return(resGO);
+      return(resGO);
     case 0xB3: // OTIR
-    return(resGO);
+      return(resGO);
 #endif
     case 0xB8: // LDDR
       // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
@@ -326,7 +312,7 @@ cl_z80::inst_ed(void)
         --regs.DE;
         --regs.BC;
       } while (regs.BC != 0);
-    return(resGO);
+      return(resGO);
     case 0xB9: // CPDR
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
       regs.F &= ~(BIT_ALL);  /* clear these */
@@ -338,19 +324,30 @@ cl_z80::inst_ed(void)
         --regs.HL;
         --regs.BC;
       } while (regs.BC != 0);
-    return(resGO);
+      return(resGO);
 #if 0
     case 0xBA: // INDR
-    return(resGO);
+      return(resGO);
     case 0xBB: // OTDR
-    return(resGO);
+      return(resGO);
 #endif
 
     default:
-    return(resINV_INST);
-  }
+      return(resINV_INST);
+    }
+  
+  return(resGO);
+}
 
-  return(resINV_INST);
+/******** start ED codes *****************/
+int  cl_z80::inst_ed(void)
+{
+  t_mem code;
+
+  if (fetch(&code))
+    return(resBREAKPOINT);
+  
+  return inst_ed_(code);
 }
 
 /* End of z80.src/inst_ed.cc */

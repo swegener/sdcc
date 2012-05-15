@@ -25,6 +25,7 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
+#include <stdint.h>
 
 #include "ddconfig.h"
 
@@ -33,26 +34,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "z80mac.h"
 
 
-int
-cl_r2k::inst_ed_(t_mem code)
+int  cl_r2k::inst_ed_(t_mem code)
 {
-  switch(code) {
-  }
-  return(resGO);
-}
-
-/******** start ED codes *****************/
-int
-cl_r2k::inst_ed(void)
-{
-  t_mem code;
   unsigned short tw;
-
-  if (fetch(&code))
-    return(resBREAKPOINT);
-
-  switch (code)
-  {
+  
+  switch(code)
+    {
   case 0x41:
     regs.aBC = regs.DE;
     break;
@@ -243,23 +230,29 @@ cl_r2k::inst_ed(void)
   case 0xB0: // LDIR
     // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
     regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
-    do {
-      store1(regs.DE, get1(regs.HL));
-      ++regs.HL;
-      ++regs.DE;
-      --regs.BC;
-    } while (regs.BC != 0);
+    
+    tw = get1(regs.HL);
+    store1(regs.DE, tw);
+    ++regs.HL;
+    ++regs.DE;
+    --regs.BC;
+    
+    if (regs.BC != 0)
+      PC = ins_start;
     return(resGO);
     
   case 0xB8: // LDDR
     // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
     regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
-    do {
-      store1(regs.DE, get1(regs.HL));
-      --regs.HL;
-      --regs.DE;
-      --regs.BC;
-    } while (regs.BC != 0);
+    
+    tw = get1(regs.HL);
+    store1(regs.DE, tw);
+    --regs.HL;
+    --regs.DE;
+    --regs.BC;
+    
+    if (regs.BC != 0)
+      PC = ins_start;
     return(resGO);
     
   case 0xEA: // CALL (HL)
@@ -270,7 +263,174 @@ cl_r2k::inst_ed(void)
   
   default:
     return(resINV_INST);
-  }
+    }
   
   return(resGO);
 }
+
+int  cl_r3ka::inst_ed_(t_mem code)
+{
+  TYPE_UBYTE  tb;
+  
+  switch(code)
+    {
+    case  0x66:  // PUSH SU
+      push1(SU);
+      return(resGO);
+      
+    case  0x6E:  // POP  SU
+      SU = get1(regs.SP);
+      regs.SP++;
+      return(resGO);
+      
+    case  0x6F:  // SETUSR
+      SU = ((SU << 2) & 0xFC) | 0x01;
+      return(resGO);
+      
+    case  0x7D:  // SURES
+      SU = ((SU >> 2) & 0x3F) | ((SU << 6) & 0xC0);
+      return(resGO);
+      
+    case  0x7F:  // RDMODE
+      regs.F &= ~(BIT_C);
+      if (SU & 0x01)
+        regs.F |= BIT_C;
+      return(resGO);
+      
+    case  0x90:  // LDISR
+      // repeat (cnt=BC) { (DE) <= (HL++) }  /* normally has io prefix */
+      /* TODO: fix IOI/IOE behavior */
+      tb = get1(regs.HL);
+      store1( regs.DE, tb );
+      regs.HL++;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+      
+    case  0x98:  // LDDSR
+      /* TODO: fix IOI/IOE behavior */
+      // repeat (cnt=BC) { (DE) <= (HL--) }  /* normally has io prefix */
+      tb = get1(regs.HL);
+      store1( regs.DE, tb );
+      regs.HL--;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+
+    case  0xC0:  // UMA
+      // repeat while BC != 0:
+      // {CF:DE':(HL)} <= (IX) + [(IY)*DE + DE' + CF];
+      // BC--; IX++; IY++; HL++;
+      {
+        uint32_t  tmp;
+        
+        /* scale a sum for operand pointed to by IY */
+        tmp  = get1(regs.IY);
+        tmp *= regs.DE;
+        tmp += regs.aDE;
+        tmp += (regs.F & BIT_C) ? 1 : 0;
+        
+        /* simple add for operand pointed to by IX */
+        tmp += get1(regs.IX);
+        
+        /* store the result(s) */
+        store1( regs.HL, tmp & 0xFF );
+        regs.aDE = ((tmp >> 8) & 0xFFFF);
+        regs.F &= ~(BIT_C);
+        regs.F |= (tmp >> 24) ? BIT_C : 0;
+      }
+      
+      regs.IX++;
+      regs.IY++;
+      regs.HL++;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+      
+    case  0xC8:  // UMS
+      // repeat while BC != 0:
+      // {CF:DE':(HL)} <= (IX) - [(IY)*DE + DE' + CF];
+      // BC--; IX++; IY++; HL++;
+      {
+        uint32_t  tmp;
+        
+        /* scale a sum for operand pointed to by IY */
+        tmp  = get1(regs.IY);
+        tmp *= regs.DE;
+        tmp += regs.aDE;
+        tmp += (regs.F & BIT_C) ? 1 : 0;
+        
+        /* subtract above from operand pointed to by IX */
+        tmp = get1(regs.IX) - tmp;
+        
+        /* store the result(s) */
+        store1( regs.HL, tmp & 0xFF );
+        regs.aDE = ((tmp >> 8) & 0xFFFF);
+        regs.F &= ~(BIT_C);
+        regs.F |= (tmp >> 24) ? BIT_C : 0;
+      }
+      
+      regs.IX++;
+      regs.IY++;
+      regs.HL++;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+
+    case  0xD0:  // LSIDR
+      /* TODO: fix IOI/IOE behavior */
+      // repeat (cnt=BC) { (DE++) <= (HL) }  /* normally has io prefix */
+      tb = get1( regs.HL );
+      store1( regs.DE, tb );
+      regs.DE++;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+      
+    case 0xD8:   // LSDDR
+      /* TODO: fix IOI/IOE behavior */
+      // repeat (cnt=BC) { (DE--) <= (HL) }  /* normally has io prefix */
+      tb = get1( regs.HL );
+      store1( regs.DE, tb );
+      regs.DE--;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+      
+    case  0xF0:  // LSIR
+      /* TODO: fix IOI/IOE behavior */
+      //  repeat (cnt=BC) { (DE++) <= (HL++) }
+      tb = get1( regs.HL );
+      store1( regs.DE, tb );
+      regs.DE++;
+      regs.HL++;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+      
+    case  0xF8:  // LSDR
+      /* TODO: fix IOI/IOE behavior */
+      //  repeat (cnt=BC) { (DE--) <= (HL--) }
+      tb = get1( regs.HL );
+      store1( regs.DE, tb );
+      regs.DE--;
+      regs.HL--;
+      regs.BC--;
+      if (regs.BC)
+        PC = ins_start;
+      return(resGO);
+      
+    default:
+      return cl_r2k::inst_ed_(code);
+    }
+}
+
+//IDET        system mode violation interrupt if in user mode
+

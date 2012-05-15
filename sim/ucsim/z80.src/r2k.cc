@@ -66,6 +66,12 @@ cl_r2k::cl_r2k(int Itype, int Itech, class cl_sim *asim):
   type= Itype;
 }
 
+cl_r3ka::cl_r3ka(int Itype, int Itech, class cl_sim *asim):
+  cl_r2k(Itype, Itech, asim)
+{
+  SU = 0;
+}
+
 int
 cl_r2k::init(void)
 {
@@ -89,6 +95,11 @@ cl_r2k::id_string(void)
   return("rabbit 2000");
 }
 
+const char *
+cl_r3ka::id_string(void)
+{
+  return("rabbit 3000A");
+}
 
 /*
  * Making elements of the controller
@@ -436,7 +447,9 @@ int
 cl_r2k::exec_inst(void)
 {
   t_mem code;
-
+  
+  ins_start = PC;
+  
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);
@@ -451,6 +464,11 @@ cl_r2k::exec_inst(void)
     tick(1);
   }
   
+  return exec_code( code );
+}
+
+int cl_r2k::exec_code(t_mem code)
+{
   switch (code)
     {
     case 0x00: return(inst_nop(code));
@@ -465,7 +483,6 @@ cl_r2k::exec_inst(void)
     case 0x0b: case 0x0d: return(inst_dec(code));
     case 0x0c: return(inst_inc(code));
     case 0x0f: return(inst_rrca(code));
-
 
     case 0x10: return(inst_djnz(code));
     case 0x11: case 0x12: case 0x16: return(inst_ld(code));
@@ -642,5 +659,17 @@ cl_r2k::exec_inst(void)
   return(resINV_INST);
 }
 
+int cl_r3ka::exec_code(t_mem code)
+{
+  if (code == 0x5B)
+    {
+      // IDET
+      // if (EDMR && (SU & 0x01))
+      //  system violation interrupt...
+      ;
+    }
+  
+  return cl_r2k::exec_code(code);
+}
 
 /* End of z80.src/z80.cc */

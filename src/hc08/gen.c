@@ -5430,6 +5430,7 @@ genAnd (iCode * ic, iCode * ifx)
           if (!regalloc_dry_run)
             emitLabel (tlbl);
         }
+      ifx->generated = TRUE;
       goto release;
     }
 

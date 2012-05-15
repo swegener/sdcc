@@ -1,3 +1,7 @@
+2012-05-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genAnd): added forgotten ifx->generated = TRUE
+
 2012-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/gcc-torture-execute-961017-2.c: use less loops to

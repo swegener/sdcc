@@ -457,7 +457,7 @@ cl_r2k::exec_inst(void)
   /* handling for IOI and IOE prefixes */
   mmu.io_flag = 0;
   if ((code == 0xd3) || (code == 0xdb)) {
-    mmu.io_flag = (code == 0xdb) ? IOI : IOE;
+    mmu.io_flag = (code == 0xd3) ? IOI : IOE;
     
     if (fetch(&code))
       return(resBREAKPOINT);

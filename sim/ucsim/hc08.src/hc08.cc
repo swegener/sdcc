@@ -500,6 +500,7 @@ cl_hc08::exec_inst(void)
         case 0xd: return(inst_nop(code, false));
         case 0xe:
           code = fetch();
+          tick(1);
           switch ((code >> 4) & 0xf) {
             case 0x6:
               switch (code & 0xf) {

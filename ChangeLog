@@ -1,3 +1,10 @@
+2012-05-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/hc08.src/hc08.cc,
+	* sim/ucsim/hc08.src/inst.cc: Fixed simulation of brset/brclr. Keep
+	  track of instruction cycle times.
+	* src/hc08/gen.c (genAnd): Use brset/brclr where possible
+
 2012-05-14 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sim/ucsim/stypes.h,

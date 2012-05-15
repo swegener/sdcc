@@ -5365,6 +5365,7 @@ genAnd (iCode * ic, iCode * ifx)
   int size, offset = 0;
   unsigned long lit = 0L;
   unsigned long litinv;
+  int bitpos;
   unsigned char bytemask;
   bool needpulla = FALSE;
   bool earlystore = FALSE;
@@ -5403,6 +5404,34 @@ genAnd (iCode * ic, iCode * ifx)
     lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
+
+  if (ifx && AOP_TYPE (result) == AOP_CRY && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_DIR && (bitpos = isLiteralBit (lit) - 1) >= 0)
+    {
+      symbol *tlbl = NULL;
+      if (!regalloc_dry_run)
+        tlbl = newiTempLabel (NULL);
+      if (IC_TRUE (ifx))
+        {
+          if (!regalloc_dry_run)
+            emitcode ("brclr", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, FALSE), labelKey2num ((tlbl->key)));
+          regalloc_dry_run_cost += 3;
+          emitBranch ("jmp", IC_TRUE (ifx));
+          if (!regalloc_dry_run)
+            emitLabel (tlbl);
+          if (IC_FALSE (ifx))
+            emitBranch ("jmp", IC_FALSE (ifx));
+        }
+      else
+        {
+          if (!regalloc_dry_run)
+            emitcode ("brset", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, FALSE), labelKey2num ((tlbl->key)));
+          regalloc_dry_run_cost += 3;
+          emitBranch ("jmp", IC_FALSE (ifx));
+          if (!regalloc_dry_run)
+            emitLabel (tlbl);
+        }
+      goto release;
+    }
 
   if (AOP_TYPE (result) == AOP_CRY && size > 1 && (isOperandVolatile (left, FALSE) || isOperandVolatile (right, FALSE)))
     {
@@ -5490,7 +5519,7 @@ genAnd (iCode * ic, iCode * ifx)
       litinv = (~lit) & (((unsigned int) 0xffffffff) >> (8 * (4 - size)));
       if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && (AOP_TYPE (left) == AOP_DIR) && isLiteralBit (litinv))
         {
-          int bitpos = isLiteralBit (litinv) - 1;
+          bitpos = isLiteralBit (litinv) - 1;
           emitcode ("bclr", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, FALSE));
           regalloc_dry_run_cost += 2;
           goto release;

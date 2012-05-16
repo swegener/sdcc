@@ -20,7 +20,7 @@
 #       o Provides the emulators
 #   * The gbdk-lib package from gbdk.
 #       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib
-#       o Proviles mul, div, and include files for the z80 tests.
+#       o Provides mul, div, and include files for the z80 tests.
 #   * python 1.5 or above
 #   * uCsim for the mcs51 port
 #
@@ -68,7 +68,7 @@ GENERATE_CASES = $(srcdir)/generate-cases.py
 # Each directory under ports/ is used as a port name.  Each port is tested.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out .svn xa51 z80 gbz80 pic16 pic14 mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out .svn xa51 rrz80 rrgbz80 pic16 pic14 mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out .svn mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
@@ -85,15 +85,15 @@ test-ports:
 	$(MAKE) test-common
 	for i in $(ALL_PORTS); do $(MAKE) make_library test-port PORT=$$i; done
 
-# Helper rule for testing the z80 port only
-test-z80:
+# Helper rule for testing the z80 port only (use rrz80 simulator)
+test-rrz80:
 	$(MAKE) test-common
-	$(MAKE) test-port PORT=z80
+	$(MAKE) test-port PORT=rrz80
 
-# Helper rule for testing the z80 port only
-test-gbz80:
+# Helper rule for testing the z80 port only (use rrgb simulator)
+test-rrgbz80:
 	$(MAKE) test-common
-	$(MAKE) test-port PORT=gbz80
+	$(MAKE) test-port PORT=rrgbz80
 
 # Helper rule for testing the mcs51 port only
 test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-stack-auto test-mcs51-xstack-auto
@@ -126,6 +126,9 @@ test-mcs51-xstack-auto:
 test-ds390:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ds390
+
+# Helper rule for testing the z80 related ports only
+test-z80: test-ucz80 test-ucz180 test-ucgbz80 test-ucr2k
 
 # Helper rule for testing the z80 port only(use ucSim simulator)
 test-ucz80:

@@ -1,3 +1,12 @@
+2012-05-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/Makefile.in: renamed test-z80 and test-gbz80 to test-rr...
+	* support/regression/ports/gbz80,
+	* support/regression/ports/rrgbz80: renamed to rrgbz80
+	* support/regression/ports/z80,
+	* support/regression/ports/rrz80: renamed to rrz80
+	* support/regression/tests/gcc-torture-execute-921013-1.c: disabled for xstack
+
 2012-05-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genAnd): added forgotten ifx->generated = TRUE

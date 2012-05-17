@@ -5371,7 +5371,7 @@ genAnd (iCode * ic, iCode * ifx)
   int size, offset = 0;
   unsigned long lit = 0L;
   unsigned long litinv;
-  int bitpos;
+  int bitpos = -1;
   unsigned char bytemask;
   bool needpulla = FALSE;
   bool earlystore = FALSE;

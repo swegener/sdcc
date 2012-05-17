@@ -1,3 +1,11 @@
+2012-05-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Use non-destructive bit tests when possible
+	  (rfe #3526285). Fixed loss of association between generated
+	  assembly and iCodes.
+	* src/hc08/peeph.def: Additional rules for conditional branches and
+	  to remove unused labels.
+
 2012-05-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/Makefile.in: renamed test-z80 and test-gbz80 to test-rr...

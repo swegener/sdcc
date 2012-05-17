@@ -34,7 +34,7 @@ replace {
 	; Peephole 2a	- eliminated jmp
 	bcc	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	bcc	%1
@@ -44,7 +44,7 @@ replace {
 	; Peephole 2b	- eliminated jmp
 	bcs	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	beq	%1
@@ -54,7 +54,7 @@ replace {
 	; Peephole 2c	- eliminated jmp
 	bne	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	bne	%1
@@ -64,7 +64,7 @@ replace {
 	; Peephole 2d	- eliminated jmp
 	beq	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	brclr	%3,%2,%1
@@ -74,7 +74,7 @@ replace {
 	; Peephole 2e	- eliminated jmp
 	brset	%3,%2,%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	brset	%3,%2,%1
@@ -84,67 +84,87 @@ replace {
 	; Peephole 2f	- eliminated jmp
 	brclr	%3,%2,%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	bls	%1
 	jmp	%5
 %1:
 } by {
-	; Peephole 2g	- eliminated bra
+	; Peephole 2g	- eliminated jmp
 	bhi	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	bhi	%1
 	jmp	%5
 %1:
 } by {
-	; Peephole 2h	- eliminated bra
+	; Peephole 2h	- eliminated jmp
 	bls	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	ble	%1
 	jmp	%5
 %1:
 } by {
-	; Peephole 2i	- eliminated bra
+	; Peephole 2i	- eliminated jmp
 	bgt	%5
 %1:
+} if labelInRange(), labelRefCountChange(%1 -1)
 
-} if labelInRange
 replace {
 	bgt	%1
 	jmp	%5
 %1:
 } by {
-	; Peephole 2j	- eliminated bra
+	; Peephole 2j	- eliminated jmp
 	ble	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	bge	%1
 	jmp	%5
 %1:
 } by {
-	; Peephole 2k	- eliminated bra
+	; Peephole 2k	- eliminated jmp
 	blt	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	blt	%1
 	jmp	%5
 %1:
 } by {
-	; Peephole 2l	- eliminated bra
+	; Peephole 2l	- eliminated jmp
 	bge	%5
 %1:
-} if labelInRange
+} if labelInRange(), labelRefCountChange(%1 -1)
+
+replace {
+	bmi     %1
+	jmp     %5
+%1:
+} by {
+	; Peephole 2m   - eliminated jmp
+	bpl     %5
+%1:
+} if labelInRange(), labelRefCountChange(%1 -1)
+
+replace {
+	bpl     %1
+	jmp     %5
+%1:
+} by {
+	; Peephole 2n   - eliminated jmp
+	bmi     %5
+%1:
+} if labelInRange(), labelRefCountChange(%1 -1)
 
 replace {
 	jmp	%5
@@ -317,3 +337,57 @@ replace restart {
 //	sta	%1
 //} if notVolatile %1
 
+replace {
+        bne     %1
+%1:
+} by {
+        ; Peephole 9a   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+        beq     %1
+%1:
+} by {
+        ; Peephole 9b   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+        bra     %1
+%1:
+} by {
+        ; Peephole 9c   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+	cmp	#%2
+	beq	%1
+} by {
+	; Peephole 10a   - combined cmp/beq
+	cbeqa	#%2,%1
+}
+
+replace {
+	cmp	*%2
+	beq	%1
+} by {
+	; Peephole 10b   - combined cmp/beq
+	cbeq	*%2,%1
+}
+
+replace {
+	cmp	%2,s
+	beq	%1
+} by {
+	; Peephole 10c   - combined cmp/beq
+	cbeq	%2,s,%1
+}
+
+// should be one of the last peepholes
+replace{
+%1:
+} by {
+	; Peephole 500    removed redundant label %1
+} if labelRefCount(%1 0)

@@ -1393,7 +1393,8 @@ accopWithMisc (char *accop, char *param)
 {
   emitcode (accop, "%s", param);
   regalloc_dry_run_cost += ((!param[0] || !strcmp(param, ",x")) ? 1 : ((param[0]=='#' || param[0]=='*') ? 2 : 3));
-  hc08_dirtyReg (hc08_reg_a, FALSE);
+  if (strcmp (accop, "bit") && strcmp (accop, "cmp") && strcmp (accop, "cpx"))
+    hc08_dirtyReg (hc08_reg_a, FALSE);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1431,7 +1432,8 @@ accopWithAop (char *accop, asmop *aop, int loffset)
       regalloc_dry_run_cost += 3;
     }
 
-  hc08_dirtyReg (hc08_reg_a, FALSE);
+  if (strcmp (accop, "bit") && strcmp (accop, "cmp") && strcmp (accop, "cpx"))
+    hc08_dirtyReg (hc08_reg_a, FALSE);
 }
 
 
@@ -4716,6 +4718,8 @@ genIfxJump (iCode * ic, char *jval)
         inst = "beq";
       else if (!strcmp (jval, "c"))
         inst = "bcc";
+      else if (!strcmp (jval, "n"))
+        inst = "bpl";
       else
         inst = "bge";
     }
@@ -4727,6 +4731,8 @@ genIfxJump (iCode * ic, char *jval)
         inst = "bne";
       else if (!strcmp (jval, "c"))
         inst = "bcs";
+      else if (!strcmp (jval, "n"))
+        inst = "bmi";
       else
         inst = "blt";
     }
@@ -5400,12 +5406,21 @@ genAnd (iCode * ic, iCode * ifx)
       left = tmp;
     }
 
-  if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
-
   size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
 
-  if (ifx && AOP_TYPE (result) == AOP_CRY && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_DIR && (bitpos = isLiteralBit (lit) - 1) >= 0)
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      if (size == 1)
+        lit &= 0xff;
+      else if (size == 2)
+        lit &= 0xffff;
+      else if (size == 4)
+        lit &= 0xffffffff;
+      bitpos = isLiteralBit (lit) - 1;
+    }
+
+  if (ifx && AOP_TYPE (result) == AOP_CRY && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_DIR && bitpos >= 0)
     {
       symbol *tlbl = NULL;
       if (!regalloc_dry_run)
@@ -5464,6 +5479,26 @@ genAnd (iCode * ic, iCode * ifx)
       goto release;
     }
 
+  if (AOP_TYPE (result) == AOP_CRY && AOP_TYPE (right) == AOP_LIT)
+    {
+      if (bitpos >= 0 && (bitpos & 7) == 7)
+        {
+          rmwWithAop ("tst", AOP (left), bitpos >> 3);
+          genIfxJump (ifx, "n");
+          goto release;
+        }
+    }
+
+  if (AOP_TYPE (result) == AOP_CRY && size == 1 && (IS_AOP_A (AOP (left)) || IS_AOP_A (AOP (right))))
+    {
+      if (IS_AOP_A (AOP (left)))
+        accopWithAop ("bit", AOP (right), 0);
+      else
+        accopWithAop ("bit", AOP (left), 0);
+      genIfxJump (ifx, "a");
+      goto release;
+    }
+
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl = NULL;
@@ -5492,7 +5527,7 @@ genAnd (iCode * ic, iCode * ifx)
           else
             {
               loadRegFromAop (hc08_reg_a, AOP (left), offset);
-              accopWithAop ("and", AOP (right), offset);
+              accopWithAop ("bit", AOP (right), offset);
               hc08_freeReg (hc08_reg_a);
               if (size)
                 {
@@ -9300,6 +9335,7 @@ genhc08iCode (iCode *ic)
     reg_info *reg;
 
     initGenLineElement ();
+    genLine.lineElement.ic = ic;
 
     for (i = A_IDX; i <= XA_IDX; i++)
       {

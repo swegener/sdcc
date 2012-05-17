@@ -1,3 +1,8 @@
+2012-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug3521024.c:
+	  Regression test for bug #3521024.
+
 2012-05-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: Use non-destructive bit tests when possible

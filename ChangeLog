@@ -11,10 +11,15 @@
 	  support/regression/tests/gcc-torture-execute-991112-1.c,
 	  support/regression/tests/gcc-torture-execute-921208-1.c,
 	  support/regression/tests/bug3379723.c,
-	  support/regression/tests/gcc-torture-execute-930702-1.c:
+	  support/regression/tests/gcc-torture-execute-930702-1.c,
+	  support/regression/tests/float_single.c,
+	  support/regression/tests/gcc-torture-execute-20000412-2.c,
+	  support/regression/tests/gcc-torture-execute-20080529-1.c,
 	  Regression testing for s08 port.
 	* device/include/stdarg.h:
 	  Fix variable arguments for s08.
+	* device/lib/_mullong.c:
+	  Fix long multiplication for s08.
 
 2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
 

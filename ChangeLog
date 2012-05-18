@@ -1,3 +1,7 @@
+2012-05-17 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sim/ucsim/hc08/hc08.cc: Fix for opcodes 0xAE, 0xBE, and 0xCE op-decode
+
 2012-05-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug3521024.c:
@@ -45,7 +49,7 @@
 	* sim/ucsim/z80.src/r2kcl.h,
 	* sim/ucsim/z80.src/inst_ed_r2k.cc: support for r3ka instructions
 	* sim/ucsim/z80.src/inst_ed.cc: change to allow overloading of inst_ed_
-	
+
 2012-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: correct some dry run costs, update genDivOneByte()

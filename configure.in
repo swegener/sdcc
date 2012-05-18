@@ -784,7 +784,8 @@ rm -f ports.all ports.build
 AC_DO_PORT(mcs51, mcs51, MCS51, [Excludes the Intel mcs51 port])
 AC_DO_PORT(z80,   z80,   Z80,   [Excludes the z80 port])
 AC_DO_PORT(z180,  z80,   Z180,  [Excludes the z180 port])
-AC_DO_PORT(r2k,   z80,   R2K,  [Excludes the r2k port])
+AC_DO_PORT(r2k,   z80,   R2K,   [Excludes the r2k port])
+AC_DO_PORT(r3ka,  z80,   R3KA,  [Excludes the r3ka port])
 AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(ds390, ds390, DS390, [Excludes the DS390 port])
 AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])
@@ -881,7 +882,7 @@ fi
 
 test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_GBZ80 = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile])
 fi
 
@@ -896,9 +897,10 @@ if test $OPT_DISABLE_GBZ80 = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/gbz80/Makefile])
 fi
 
-if test $OPT_DISABLE_R2K = 0; then
+if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0; then
   AC_CONFIG_FILES([sdas/asrab/Makefile])
-  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/r2k/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/r2k/Makefile
+                                                       device/lib/r3ka/Makefile])
 fi
 
 test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile device/non-free/lib/Makefile])
@@ -962,7 +964,6 @@ sdcc ${VERSION} is now configured for
     avr                 ${enable_avr_port}
     ds390               ${enable_ds390_port}
     ds400               ${enable_ds400_port}
-    gbz80               ${enable_gbz80_port}
     hc08                ${enable_hc08_port}
     mcs51               ${enable_mcs51_port}
     pic14               ${enable_pic14_port}
@@ -971,6 +972,8 @@ sdcc ${VERSION} is now configured for
     z80                 ${enable_z80_port}
     z180                ${enable_z180_port}
     r2k                 ${enable_r2k_port}
+    r3ka                ${enable_r3ka_port}
+    gbz80               ${enable_gbz80_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}

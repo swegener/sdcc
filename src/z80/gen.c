@@ -1956,9 +1956,9 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
         {
           /* Do nothing */
         }
-      /* Getting the parameter by a pop / push sequence is cheaper when we have a free pair (except for r2k, which has an even cheaper sp-relative load).
+      /* Getting the parameter by a pop / push sequence is cheaper when we have a free pair (except for the Rabbit, which has an even cheaper sp-relative load).
          Stack allocation can change after register allocation, so assume this optimization is not possible for the allcoator's cost function. */
-      else if (!regalloc_dry_run && !IS_R2K && aop->size - offset >= 2 &&
+      else if (!regalloc_dry_run && !IS_RAB && aop->size - offset >= 2 &&
                (aop->type == AOP_STK || aop->type == AOP_EXSTK)
                && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) +
                    _G.stack.pushed) == 2 && ic && (pairId != PAIR_BC && isPairDead (PAIR_BC, ic) || pairId != PAIR_DE
@@ -1971,7 +1971,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
           _push (extrapair);
         }
       /* Todo: Use even cheaper ex hl, (sp) and ex iy, (sp) when possible. */
-      else if (!regalloc_dry_run && (!IS_R2K || pairId == PAIR_BC || pairId == PAIR_DE) && aop->size - offset >= 2 &&
+      else if (!regalloc_dry_run && (!IS_RAB || pairId == PAIR_BC || pairId == PAIR_DE) && aop->size - offset >= 2 &&
                (aop->type == AOP_STK || aop->type == AOP_EXSTK)
                && (aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) +
                    _G.stack.pushed) == 0)
@@ -1993,7 +1993,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
               break;
             default:
               wassertl (aop->size - offset > 1, "Attempted to fetch no data into HL");
-              if (IS_R2K)
+              if (IS_RAB)
                 {
                   emit2 ("ld hl, 0 (hl)");
                   regalloc_dry_run_cost += 3;
@@ -2024,7 +2024,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
         }
       else if (pairId == PAIR_IY)
         {
-          if (isPair (aop) && IS_R2K && getPairId (aop) == PAIR_HL)
+          if (isPair (aop) && IS_RAB && getPairId (aop) == PAIR_HL)
             {
               emit2 ("ld iy, hl");
               regalloc_dry_run_cost += 2;
@@ -2049,7 +2049,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
                 }
               regalloc_dry_run_cost += ld_cost (ASMOP_L, aop) + ld_cost (ASMOP_H, aop);
 
-              if (IS_R2K && id == PAIR_HL)
+              if (IS_RAB && id == PAIR_HL)
                 {
                   emit2 ("ld iy, hl");
                   regalloc_dry_run_cost += 2;
@@ -2075,7 +2075,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
           /* The Rabbit has the ld hl, n (sp) and ld hl, n (ix) instructions. */
           int fp_offset = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
           int sp_offset = fp_offset + _G.stack.pushed;
-          if (IS_R2K && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK)
+          if (IS_RAB && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK)
               && (pairId == PAIR_HL || pairId == PAIR_IY || pairId == PAIR_DE) && (abs (fp_offset) <= 127 && pairId == PAIR_HL
                   && aop->type == AOP_STK
                   || abs (sp_offset) <= 127))
@@ -2323,7 +2323,7 @@ aopGet (asmop * aop, int offset, bool bit16)
               regalloc_dry_run_cost += 2;
               dbuf_append_char (&dbuf, 'a');
             }
-          else if (IS_R2K)
+          else if (IS_RAB)
             {
               emit2 ("ioi");
               emit2 ("ld a,(%s)", aop->aopu.aop_dir);
@@ -2543,7 +2543,7 @@ aopPut (asmop * aop, const char *s, int offset)
             emit2 ("ld a,%s", s);
           emit2 ("ldh (%s+%d),a", aop->aopu.aop_dir, offset);
         }
-      else if (IS_R2K)
+      else if (IS_RAB)
         {
           if (strcmp (s, "a"))
             emit2 ("ld a,%s", s);
@@ -2804,12 +2804,12 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
 
   /* Stack positions will change, so do not assume this is possible in the cost function. */
   if (!regalloc_dry_run && !IS_GB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset
-      && ((!IS_R2K && id == PAIR_HL) || id == PAIR_IY) && !dont_destroy)
+      && ((!IS_RAB && id == PAIR_HL) || id == PAIR_IY) && !dont_destroy)
     {
       emit2 ("ex (sp), %s", _pairs[id].name);
-      regalloc_dry_run_cost += ((id == PAIR_IY || IS_R2K) ? 2 : 1);
+      regalloc_dry_run_cost += ((id == PAIR_IY || IS_RAB) ? 2 : 1);
     }
-  else if (IS_R2K && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
+  else if (IS_RAB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
            (id == PAIR_HL && abs (fp_offset) <= 127 && aop->type == AOP_STK || abs (sp_offset) <= 127))
     {
       if (abs (sp_offset) <= 127)
@@ -4042,14 +4042,14 @@ emitCall (const iCode * ic, bool ispcall)
       else
         {
           spillCached ();
-          if ((IS_R2K ? i > 127 * 4 - 1 : i > (optimize.codeSize ? 8 : 5)) && !SomethingReturned)
+          if ((IS_RAB ? i > 127 * 4 - 1 : i > (optimize.codeSize ? 8 : 5)) && !SomethingReturned)
             {
               emit2 ("ld hl,!immedword", i);
               emit2 ("add hl,sp");
               emit2 ("ld sp,hl");
               regalloc_dry_run_cost += 5;
             }
-          else if (IS_R2K ? i > 127 * 4 - 1 : i > 8)
+          else if (IS_RAB ? i > 127 * 4 - 1 : i > 8)
             {
               emit2 ("ld iy,!immedword", i);
               emit2 ("add iy,sp");
@@ -4061,7 +4061,7 @@ emitCall (const iCode * ic, bool ispcall)
 
               while (i > 1)
                 {
-                  if (IS_R2K && (!optimize.codeSize || i > 2))
+                  if (IS_RAB && (!optimize.codeSize || i > 2))
                     {
                       int d = (i < 127 ? i : 127);
                       emit2 ("add sp, #%d", d);
@@ -4286,7 +4286,7 @@ genFunction (const iCode * ic)
      then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
-      if (IS_R2K)
+      if (IS_RAB)
         emit2 ("push ip");
 
       /* If critical function then turn interrupts off */
@@ -4304,7 +4304,7 @@ genFunction (const iCode * ic)
          If critical function then turn interrupts off */
       if (IFFUNC_ISCRITICAL (sym->type))
         {
-          if (IS_GB || IS_R2K)
+          if (IS_GB || IS_RAB)
             {
               emit2 ("!di");
             }
@@ -4413,14 +4413,14 @@ genFunction (const iCode * ic)
     emit2 ("!enterx", sym->stack);
   else if (sym->stack)
     {
-      if ((optimize.codeSize && sym->stack <= 8) || sym->stack <= 4 || IS_R2K && sym->stack <= 254)
+      if ((optimize.codeSize && sym->stack <= 8) || sym->stack <= 4 || IS_RAB && sym->stack <= 254)
         {
           int stack = sym->stack;
           if (!_G.omitFramePtr)
             emit2 ("!enter");
           while (stack > 1)
             {
-              if (IS_R2K && (!optimize.codeSize || stack > 2))
+              if (IS_RAB && (!optimize.codeSize || stack > 2))
                 {
                   int d = (stack < 127 ? -stack : -127);
                   emit2 ("add sp, #%d", d);
@@ -4536,7 +4536,7 @@ genEndFunction (iCode * ic)
         {
           if (IS_GB)
             emit2 ("!ei");
-          else if (IS_R2K)
+          else if (IS_RAB)
             emit2 ("ipres");
           else
             {
@@ -4563,7 +4563,7 @@ genEndFunction (iCode * ic)
       /* "critical interrupt" is used to imply NMI handler */
       if (!IS_GB && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC)
         emit2 ("retn");
-      else if (IS_R2K && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC)
+      else if (IS_RAB && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC)
         {
           // ISR exit sequence that works on the rabbit 4000
           emit2 ("pop ip");
@@ -5759,7 +5759,7 @@ genMultOneChar (const iCode * ic)
       _push (PAIR_DE);
       _G.stack.pushedDE = TRUE;
     }
-  if (IS_R2K && !isPairDead (PAIR_BC, ic) ||
+  if (IS_RAB && !isPairDead (PAIR_BC, ic) ||
       !IS_Z180 && (!options.oldralloc && bitVectBitValue (ic->rSurv, B_IDX) ||
                    options.oldralloc && bitVectBitValue (ic->rMask, B_IDX) && !(getPairId (AOP (IC_RESULT (ic))) == PAIR_BC)))
     {
@@ -5787,7 +5787,7 @@ genMultOneChar (const iCode * ic)
       emit2 ("mlt hl");
       regalloc_dry_run_cost += 3;
     }
-  else if (IS_R2K)
+  else if (IS_RAB)
     {
       emit2 ("ld c, h");
       emit2 ("ld d, #0x00");
@@ -7065,7 +7065,7 @@ genAnd (const iCode * ic, iCode * ifx)
       goto release;
     }
 
-  if (IS_R2K && isPair (AOP (result)) &&
+  if (IS_RAB && isPair (AOP (result)) &&
       (getPairId (AOP (result)) == PAIR_HL && isPair (AOP (right)) && getPairId (AOP (right)) == PAIR_DE ||
        getPairId (AOP (result)) == PAIR_HL && isPair (AOP (left)) && getPairId (AOP (left)) == PAIR_DE ||
        isPair (AOP (left)) && getPairId (AOP (left)) == PAIR_IY && getPairId (AOP (result)) == PAIR_IY && isPair (AOP (right))
@@ -7572,7 +7572,7 @@ shiftR2Left2Result (const iCode * ic, operand * left, int offl, operand * result
   int size = 2;
   symbol *tlbl;
 
-  if (IS_R2K && !is_signed && shCount >= 2 && isPairDead (PAIR_HL, ic) &&
+  if (IS_RAB && !is_signed && shCount >= 2 && isPairDead (PAIR_HL, ic) &&
       ((isPair (AOP (left)) && getPairId (AOP (left)) == PAIR_HL || isPair (AOP (result))
         && getPairId (AOP (result)) == PAIR_HL) && isPairDead (PAIR_DE, ic) || isPair (AOP (left))
        && getPairId (AOP (left)) == PAIR_DE))
@@ -8528,7 +8528,7 @@ genPointerGet (const iCode *ic)
 
   if (getPairId (AOP (left)) == PAIR_IY && !IS_BITVAR (retype) && rightval_in_range)
     {
-      if (IS_R2K && getPairId (AOP (result)) == PAIR_HL)
+      if (IS_RAB && getPairId (AOP (result)) == PAIR_HL)
         {
           emit2 ("ld hl, %d (iy)", rightval);
           regalloc_dry_run_cost += 3;
@@ -8592,7 +8592,7 @@ genPointerGet (const iCode *ic)
            && (AOP (result)->aopu.aop_reg[0] == regsZ80 + L_IDX || AOP (result)->aopu.aop_reg[0] == regsZ80 + H_IDX))
     {
       wassertl (size == 2, "HL must be of size 2");
-      if (IS_R2K && getPairId (AOP (result)) == PAIR_HL && rightval_in_range)
+      if (IS_RAB && getPairId (AOP (result)) == PAIR_HL && rightval_in_range)
         {
           emit2 ("ld hl, %d (hl)", rightval);
           regalloc_dry_run_cost += 3;
@@ -9818,7 +9818,7 @@ genCritical (const iCode * ic)
 {
   symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
 
-  if (IS_GB || IS_R2K)
+  if (IS_GB || IS_RAB)
     {
       emit2 ("!di");
       regalloc_dry_run_cost += 1;
@@ -9875,7 +9875,7 @@ genEndCritical (const iCode * ic)
       emit2 ("!ei");
       regalloc_dry_run_cost += 1;
     }
-  else if (IS_R2K)
+  else if (IS_RAB)
     {
       emit2 ("ipres");
       regalloc_dry_run_cost += 1;

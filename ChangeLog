@@ -1,3 +1,21 @@
+2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdarg.h,
+	  device/include/string.h,
+	  device/include/setjmp.h,
+	  device/lib/Makefile.in,
+	  configure.in,
+	  src/SDCCopt.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/z80.h,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  sim/ucsim/aclocal.m4,
+	  sim/ucsim/configure,
+	  device/lib/r3ka:
+	  Dummy (behaves as Rabbit 2000/3000) Rabbit 3000A port.
+
 2012-05-17 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sim/ucsim/hc08/hc08.cc: Fix for opcodes 0xAE, 0xBE, and 0xCE op-decode

@@ -6,7 +6,12 @@
 	  Fix building of s08 lib.
 	* support/regression/Makefile.in,
 	  support/regression/ports/s08,
-	  support/regression/fwk/include/testfwk.h:
+	  support/regression/fwk/include/testfwk.h,
+	  support/regression/tests/gcc-torture-execute-func-ptr-1.c,
+	  support/regression/tests/gcc-torture-execute-991112-1.c,
+	  support/regression/tests/gcc-torture-execute-921208-1.c,
+	  support/regression/tests/bug3379723.c,
+	  support/regression/tests/gcc-torture-execute-930702-1.c:
 	  Regression testing for s08 port.
 	* device/include/stdarg.h:
 	  Fix variable arguments for s08.

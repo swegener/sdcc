@@ -9,7 +9,7 @@
 #pragma disable_warning 93
 #endif
 
-#if !defined(__SDCC_hc08)
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
 double
 f(double x)
 {
@@ -26,7 +26,7 @@ Int(double (*f)(double), double a)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08)
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   if (Int(&f,2.0) != 4.0)
     ASSERT(0);
   return;

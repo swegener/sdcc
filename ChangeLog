@@ -15,6 +15,11 @@
 	  support/regression/tests/float_single.c,
 	  support/regression/tests/gcc-torture-execute-20000412-2.c,
 	  support/regression/tests/gcc-torture-execute-20080529-1.c,
+	  support/regression/tests/gcc-torture-execute-20030209-1.c,
+	  support/regression/tests/gcc-torture-execute-950915-1.c,
+	  support/regression/tests/bug1723128.c,
+	  support/regression/tests/gcc-torture-execute-20001221-1.c,
+	  support/regression/tests/gcc-torture-execute-20030307-1.c:
 	  Regression testing for s08 port.
 	* device/include/stdarg.h:
 	  Fix variable arguments for s08.

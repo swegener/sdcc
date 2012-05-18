@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long int a = 100000;
 long int b = 21475;
 
@@ -22,7 +22,7 @@ f ()
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (f () < 0)
     ASSERT (0);
   return;

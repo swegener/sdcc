@@ -9,7 +9,7 @@
 #pragma disable_warning 85
 #endif
 // TODO: Enable when all ports support long long!
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 
 /* PR optimization/8726 */
 /* Originator: Paul Eggert <eggert@twinsun.com> */
@@ -32,7 +32,7 @@ int fcntl_lock(int fd, int op, long long offset, long long count, int type)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (vfswrap_lock (0, 1, 2, 3, 4, 5) != 5)
     ASSERT (0);
 

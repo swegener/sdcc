@@ -155,6 +155,11 @@ test-hc08:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=hc08
 
+# Helper rule for testing the s08 port only(use ucSim simulator)
+test-s08:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=s08
+
 # Helper rule for testing the xa51 port only(use ucSim simulator)
 test-xa51:
 	$(MAKE) test-common

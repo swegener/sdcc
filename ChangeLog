@@ -1,5 +1,15 @@
 2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/lib/r3ka/Makefile.in:
+	  Fix building of r3ka lib.
+	* device/lib/s08/Makefile.in:
+	  Fix building of s08 lib.
+	* support/regression/Makefile.in,
+	  support/regression/ports/s08:
+	  Regression testing for s08 port.
+
+2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
+
 	* configure.in,
 	  src/SDCCicode.c,
 	  src/SDCCsymt.c,

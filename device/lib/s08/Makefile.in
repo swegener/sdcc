@@ -1,4 +1,4 @@
-# libc/hc08 Makefile
+# libc/s08 Makefile
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
@@ -6,11 +6,11 @@ top_builddir = @top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mhc08
+SCC = $(top_builddir)/bin/sdcc -ms08
 SAS = $(top_builddir)/bin/sdas6808
 
 # override PORTDIR defined by super (parent) makefile
-override PORTDIR = ../build/hc08
+override PORTDIR = ../build/s08
 
 include $(srcdir)/../incl.mk
 
@@ -48,7 +48,7 @@ HC08OBJECTS = $(patsubst %.c,%.rel,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08
 
 OBJ = _ret.rel _divuint.rel _divulong.rel _mulint.rel _mullong.rel
 
-LIB = hc08.lib
+LIB = s08.lib
 CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff

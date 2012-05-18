@@ -1,4 +1,4 @@
-# libc/r2k Makefile
+# libc/r3ka Makefile
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
@@ -6,11 +6,11 @@ top_builddir = @top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mr2k
+SCC = $(top_builddir)/bin/sdcc -mr3ka
 SAS = $(top_builddir)/bin/sdasrab
 
 # override PORTDIR defined by super (parent) makefile
-override PORTDIR = ../build/r2k
+override PORTDIR = ../build/r3ka
 
 include $(srcdir)/../incl.mk
 
@@ -46,7 +46,7 @@ OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel m
       putchar.rel shift.rel stubs.rel crt0_rle.rel heap.rel fstubs.rel memmove.rel abs.rel crtcall.rel \
       setjmp.rel
 
-LIB = r2k.lib
+LIB = r3ka.lib
 CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff

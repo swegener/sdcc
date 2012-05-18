@@ -22,7 +22,7 @@
 #    define ABSADDRSPACE __xdata
 #    define ABSADDR 0x8000
 #  endif
-#  if defined(SDCC_hc08) || defined(__SDCC_hc08)
+#  if defined(SDCC_hc08) || defined(__SDCC_s08)
 #    define ABSADDRSPACE __xdata
 #    define ABSADDR 0x7f00
 #  endif

@@ -1854,7 +1854,7 @@ glue (void)
         fprintf (asmFile, " --parms-in-bank1");
       fprintf (asmFile, "\n");
     }
-  else if ((TARGET_Z80_LIKE || TARGET_IS_HC08) && !options.noOptsdccInAsm)
+  else if ((TARGET_Z80_LIKE || TARGET_HC08_LIKE) && !options.noOptsdccInAsm)
     {
       fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
     }

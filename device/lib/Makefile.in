@@ -61,6 +61,7 @@ OPT_DISABLE_AVR   = @OPT_DISABLE_AVR@
 OPT_DISABLE_DS390 = @OPT_DISABLE_DS390@
 OPT_DISABLE_DS400 = @OPT_DISABLE_DS400@
 OPT_DISABLE_HC08  = @OPT_DISABLE_HC08@
+OPT_DISABLE_S08   = @OPT_DISABLE_S08@
 OPT_DISABLE_MCS51 = @OPT_DISABLE_MCS51@
 OPT_DISABLE_PIC14 = @OPT_DISABLE_PIC14@
 OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
@@ -173,6 +174,10 @@ endif
 
 ifeq ($(OPT_DISABLE_HC08), 0)
 TARGETS        += model-hc08
+endif
+
+ifeq ($(OPT_DISABLE_S08), 0)
+TARGETS        += model-s08
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)
@@ -321,6 +326,11 @@ objects-z80:
 model-hc08:
 	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
+	fi
+
+model-s08:
+	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) MODELFLAGS="-ms08" PORT=s08 objects-hc08; \
 	fi
 
 objects-hc08:
@@ -477,11 +487,11 @@ install: all installdirs
 	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
 	$(CP_U) -r $(MODELS) $(srcdir)/mcs51 $(srcdir)/ds390 $(srcdir)/ds400 \
 	                     $(srcdir)/z80 $(srcdir)/z180 $(srcdir)/r2k $(srcdir)/r3ka $(srcdir)/gbz80 \
-                         $(srcdir)/hc08 \
+                         $(srcdir)/hc08 $(srcdir)/s08 \
 	                     $(srcdir)/pic14 $(srcdir)/pic16 $(srcdir)/*.c $(sdcc_libdir)/src
-	$(CP_U) -r $(MODELS) mcs51 ds390 ds400 z80 z180 r2k r3ka gbz80 hc08 $(sdcc_libdir)/src
+	$(CP_U) -r $(MODELS) mcs51 ds390 ds400 z80 z180 r2k r3ka gbz80 hc08 s08 $(sdcc_libdir)/src
 
-	for src in $(MODELS) ds390 ds400 z80 z180 r2k r3ka gbz80 hc08 pic14 pic16; do \
+	for src in $(MODELS) ds390 ds400 z80 z180 r2k r3ka gbz80 hc08 s08 pic14 pic16; do \
 	  find $(sdcc_libdir)/src/$$src -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'autom4te.cache' -o \
@@ -517,7 +527,7 @@ installdirs:
 	for model in $(MODELS); do \
 	  mkdir -p $(sdcc_libdir)/$$model; \
 	done
-	for libdir in small-stack-auto ds390 ds400 hc08 pic16 pic14; do \
+	for libdir in small-stack-auto ds390 ds400 hc08 s08 pic16 pic14; do \
 	  mkdir -p $(sdcc_libdir)/$$libdir; \
 	done
 	mkdir -p $(sdcc_libdir)/src

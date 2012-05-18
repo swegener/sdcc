@@ -695,7 +695,7 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   if ((SPEC_SHORT (src) || SPEC_LONG (src) || SPEC_LONGLONG (src)) &&
     (SPEC_SHORT (dest) || SPEC_LONG (dest) || SPEC_LONGLONG (dest)))
     {
-      if (!(options.std_c99 && SPEC_LONG (src) && SPEC_LONG (dest) && (TARGET_Z80_LIKE || TARGET_IS_HC08))) /* C99 has long long */
+      if (!(options.std_c99 && SPEC_LONG (src) && SPEC_LONG (dest) && (TARGET_Z80_LIKE || TARGET_HC08_LIKE))) /* C99 has long long */
         werror (E_SHORTLONG, name);
     }
 
@@ -2186,7 +2186,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   switch (resultType)
     {
     case RESULT_TYPE_IFX:
-      if (TARGET_IS_HC08)
+      if (TARGET_HC08_LIKE)
         break;
       //fallthrough
     case RESULT_TYPE_BIT:
@@ -2873,7 +2873,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if (IS_AGGREGATE (sym->type->next) || IS_LONGLONG (sym->type->next) && !(TARGET_Z80_LIKE || TARGET_IS_HC08))
+  if (IS_AGGREGATE (sym->type->next) || IS_LONGLONG (sym->type->next) && !(TARGET_Z80_LIKE || TARGET_HC08_LIKE))
     {
       werror (E_FUNC_AGGR, sym->name);
       return 0;

@@ -1,5 +1,20 @@
 2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
 
+	* configure.in,
+	  src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  src/SDCCglue.c,
+	  src/hc08/main.c,
+	  src/SDCCpeeph.c,
+	  src/hc08/hc08.h,
+	  device/lib/Makefile.in,
+	  device/lib/s08:
+	  Dummy (behaves as HC08) S08 port.
+
+2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/include/stdarg.h,
 	  device/include/string.h,
 	  device/include/setjmp.h,

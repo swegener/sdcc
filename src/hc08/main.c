@@ -22,6 +22,7 @@
     it easier to set a breakpoint using the debugger.
 */
 #include "common.h"
+#include "hc08.h"
 #include "main.h"
 #include "ralloc.h"
 #include "gen.h"
@@ -31,10 +32,17 @@ extern char * iComments2;
 extern DEBUGFILE dwarf2DebugFile;
 extern int dwarf2FinalizeFile(FILE *);
 
-static char _defaultRules[] =
+static char _hc08_defaultRules[] =
 {
 #include "peeph.rul"
 };
+
+static char _s08_defaultRules[] =
+{
+#include "peeph.rul"
+};
+
+HC08_OPTS hc08_opts;
 
 /* list of key words used by msc51 */
 static char *_hc08_keywords[] =
@@ -74,6 +82,14 @@ static int regParmFlg = 0;      /* determine if we can register a parameter */
 static void
 _hc08_init (void)
 {
+  hc08_opts.sub = SUB_HC08;
+  asm_addTree (&asm_asxxxx_mapping);
+}
+
+static void
+_s08_init (void)
+{
+  hc08_opts.sub = SUB_S08;
   asm_addTree (&asm_asxxxx_mapping);
 }
 
@@ -434,7 +450,7 @@ PORT hc08_port =
     _libs,                      /* libs */
   },
   {                             /* Peephole optimizer */
-    _defaultRules
+    _hc08_defaultRules
   },
   {
         /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
@@ -539,3 +555,142 @@ PORT hc08_port =
   1,                            /* globals & local static allowed */
   PORT_MAGIC
 };
+
+PORT s08_port =
+{
+  TARGET_ID_HC08,
+  "s08",
+  "S08",                        /* Target name */
+  NULL,                         /* Processor name */
+  {
+    glue,
+    FALSE,                      /* Emit glue around main */
+    MODEL_SMALL | MODEL_LARGE,
+    MODEL_LARGE,
+    NULL,                       /* model == target */
+  },
+  {
+    _asmCmd,
+    NULL,
+    "-plosgffwc",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm",
+    NULL                        /* no do_assemble function */
+  },
+  {                             /* Linker */
+    _linkCmd,
+    NULL,
+    NULL,
+    ".rel",
+    1,
+    NULL,                       /* crt */
+    _libs,                      /* libs */
+  },
+  {                             /* Peephole optimizer */
+    _s08_defaultRules
+  },
+  {
+        /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+    1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4
+  },
+  /* tags for generic pointers */
+  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  {
+    "XSEG",
+    "STACK",
+    "CSEG    (CODE)",
+    "DSEG    (PAG)",
+    NULL, /* "ISEG" */
+    NULL, /* "PSEG" */
+    "XSEG",
+    NULL, /* "BSEG" */
+    "RSEG    (ABS)",
+    "GSINIT  (CODE)",
+    "OSEG    (PAG, OVR)",
+    "GSFINAL (CODE)",
+    "HOME    (CODE)",
+    "XISEG",              // initialized xdata
+    "XINIT",              // a code copy of xiseg
+    "CONST   (CODE)",     // const_name - const data (code or not)
+    "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
+    "XABS    (ABS)",      // xabs_name - absolute xdata
+    "IABS    (ABS)",      // iabs_name - absolute data
+    NULL,
+    NULL,
+    1
+  },
+  { _hc08_genExtraAreas,
+    NULL },
+  {
+    -1,         /* direction (-1 = stack grows down) */
+    0,          /* bank_overhead (switch between register banks) */
+    4,          /* isr_overhead */
+    2,          /* call_overhead */
+    0,          /* reent_overhead */
+    0           /* banked_overhead (switch between code banks) */
+  },
+    /* hc08 has an 8 bit mul */
+  {
+    1, 5
+  },
+  {
+    hc08_emitDebuggerSymbol,
+    {
+      hc08_dwarfRegNum,
+      NULL,
+      NULL,
+      4,                        /* addressSize */
+      14,                       /* regNumRet */
+      15,                       /* regNumSP */
+      -1,                       /* regNumBP */
+      1,                        /* offsetSP */
+    },
+  },
+  {
+    256,        /* maxCount */
+    2,          /* sizeofElement */
+    {8,16,32},  /* sizeofMatchJump[] */
+    {8,16,32},  /* sizeofRangeCompare[] */
+    5,          /* sizeofSubtract */
+    10,         /* sizeofDispatch */
+  },
+  "_",
+  _s08_init,
+  _hc08_parseOptions,
+  _hc08_options,
+  NULL,
+  _hc08_finaliseOptions,
+  _hc08_setDefaultOptions,
+  hc08_assignRegisters,
+  _hc08_getRegName,
+  _hc08_keywords,
+  _hc08_genAssemblerPreamble,
+  _hc08_genAssemblerEnd,        /* no genAssemblerEnd */
+  _hc08_genIVT,
+  _hc08_genXINIT,
+  NULL,                         /* genInitStartup */
+  _hc08_reset_regparm,
+  _hc08_regparm,
+  NULL,                         /* process_pragma */
+  NULL,                         /* getMangledFunctionName */
+  NULL,                         /* hasNativeMulFor */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
+  TRUE,                         /* use_dw_for_init */
+  FALSE,                        /* little_endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
+  FALSE,                        /* No array initializer support. */
+  cseCostEstimation,
+  NULL,                         /* no builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
+  PORT_MAGIC
+};
+

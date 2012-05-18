@@ -5,8 +5,11 @@
 	* device/lib/s08/Makefile.in:
 	  Fix building of s08 lib.
 	* support/regression/Makefile.in,
-	  support/regression/ports/s08:
+	  support/regression/ports/s08,
+	  support/regression/fwk/include/testfwk.h:
 	  Regression testing for s08 port.
+	* device/include/stdarg.h:
+	  Fix variable arguments for s08.
 
 2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
 

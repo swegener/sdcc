@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#ifdef SDCC_hc08
+#if 0
 #define CAST(x)	(x ? true : false)
 #else
 #define CAST(x)	(x)

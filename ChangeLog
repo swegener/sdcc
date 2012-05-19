@@ -1,3 +1,8 @@
+2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug3223041.c:
+	  Do not handle hc08 as special case.
+
 2012-05-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/r3ka/Makefile.in:

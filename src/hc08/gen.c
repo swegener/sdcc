@@ -2855,7 +2855,7 @@ unsaveRegisters (iCode *ic)
 /* pushSide -                                                      */
 /*-----------------------------------------------------------------*/
 static void
-pushSide (operand * oper, int size, iCode * ic)
+pushSide (operand *oper, int size, iCode *ic)
 {
   int offset = 0;
   bool xIsFree = hc08_reg_x->isFree;
@@ -2865,8 +2865,13 @@ pushSide (operand * oper, int size, iCode * ic)
 
   while (size--)
     {
-      loadRegFromAop (hc08_reg_a, AOP (oper), offset++);
-      pushReg (hc08_reg_a, TRUE);
+      if (AOP_TYPE (oper) == AOP_REG)
+        pushReg (AOP (oper)->aopu.aop_reg[offset++], TRUE);
+      else
+        {
+          loadRegFromAop (hc08_reg_a, AOP (oper), offset++);
+          pushReg (hc08_reg_a, TRUE);
+        }
     }
 
   freeAsmop (oper, NULL, ic, TRUE);

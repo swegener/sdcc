@@ -489,7 +489,8 @@ cl_hc08::exec_inst(void)
         case 0x2:
         case 0x3: return(inst_condbranch(code, false));
         case 0x4:
-        case 0x5:
+        case 0x5: return(inst_transfer(code, false));
+        case 0x6: return(inst_sthx(code, false));
         case 0x7:
         case 0xf: return(inst_transfer(code, false));
         case 0x8:

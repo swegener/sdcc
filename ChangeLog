@@ -1,5 +1,12 @@
 2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
 
+	* sim/ucsim/hc08.src/hc08.cc:
+	  Fix sthx with ext operand on s08.
+	* src/hc08/gen.c:
+	  Use ldhx, cphx and sthx with ext operands for s08 in places where we use them for hc08 with imm operands.
+
+2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
+
 	* sdas/as6808/m08mch.c,
 	  sdas/as6808/m6808.h,
 	  sdas/as6808/m08pst.c,

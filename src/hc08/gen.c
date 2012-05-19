@@ -34,6 +34,7 @@
 #include <ctype.h>
 
 #include "common.h"
+#include "hc08.h"
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
@@ -796,12 +797,12 @@ forceload:
         break;
       else if (IS_AOP_XA (aop))
         transferRegReg (hc08_reg_xa, hc08_reg_hx, FALSE);
-      else if ((aop->type == AOP_DIR))
+      else if (aop->type == AOP_DIR || IS_S08 && aop->type == AOP_EXT)
         {
           if (aop->size > (loffset + 1))
             {
               emitcode ("ldhx", "%s", aopAdrStr (aop, loffset + 1, TRUE));
-              regalloc_dry_run_cost += 2;
+              regalloc_dry_run_cost += (aop->type == AOP_DIR ? 2 : 3);
             }
           else
             {
@@ -994,10 +995,10 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         }
       break;
     case HX_IDX:
-      if ((aop->type == AOP_DIR))
+      if (aop->type == AOP_DIR || IS_S08 && aop->type == AOP_EXT)
         {
           emitcode ("sthx", "%s", aopAdrStr (aop, loffset + 1, TRUE));
-          regalloc_dry_run_cost += 2;
+          regalloc_dry_run_cost += (aop->type == AOP_DIR ? 2 : 3);;
         }
       else if (IS_AOP_XA (aop))
         transferRegReg (reg, hc08_reg_xa, FALSE);
@@ -4932,7 +4933,7 @@ genCmp (iCode * ic, iCode * ifx)
     }
   else if ((size == 2)
       && ((AOP_TYPE (left) == AOP_DIR || IS_AOP_HX (AOP (left))) && (AOP_SIZE (left) == 2))
-      && ((AOP_TYPE (right) == AOP_LIT) || ((AOP_TYPE (right) == AOP_DIR) && (AOP_SIZE (right) == 2))) && (hc08_reg_h->isDead && hc08_reg_x->isDead || IS_AOP_HX (AOP (left))))
+      && ((AOP_TYPE (right) == AOP_LIT) || ((AOP_TYPE (right) == AOP_DIR || IS_S08 && AOP_TYPE (right) == AOP_EXT) && (AOP_SIZE (right) == 2))) && (hc08_reg_h->isDead && hc08_reg_x->isDead || IS_AOP_HX (AOP (left))))
     {
       loadRegFromAop (hc08_reg_hx, AOP (left), 0);
       emitcode ("cphx", "%s", aopAdrStr (AOP (right), 1, TRUE));
@@ -5090,7 +5091,7 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
 
   if ((size == 2)
       && ((AOP_TYPE (left) == AOP_DIR || IS_AOP_HX (AOP (left))) && (AOP_SIZE (left) == 2))
-      && ((AOP_TYPE (right) == AOP_LIT) || ((AOP_TYPE (right) == AOP_DIR) && (AOP_SIZE (right) == 2))) && hc08_reg_h->isDead && hc08_reg_x->isDead)
+      && ((AOP_TYPE (right) == AOP_LIT) || ((AOP_TYPE (right) == AOP_DIR || IS_S08 && AOP_TYPE (right) == AOP_EXT) && (AOP_SIZE (right) == 2))) && hc08_reg_h->isDead && hc08_reg_x->isDead)
     {
       loadRegFromAop (hc08_reg_hx, AOP (left), 0);
       emitcode ("cphx", "%s", aopAdrStr (AOP (right), 1, TRUE));

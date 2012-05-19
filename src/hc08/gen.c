@@ -817,12 +817,8 @@ forceload:
         }
       else
         {
-          bool needpula;
-          needpula = pushRegIfUsed (hc08_reg_a);
-          loadRegFromAop (hc08_reg_a, aop, loffset + 1);
+          loadRegFromAop (hc08_reg_h, aop, loffset + 1);
           loadRegFromAop (hc08_reg_x, aop, loffset);
-          transferRegReg (hc08_reg_a, hc08_reg_h, TRUE);
-          pullOrFreeReg (hc08_reg_a, needpula);
         }
       break;
     case XA_IDX:
@@ -3615,9 +3611,8 @@ genPlusIncr (iCode * ic)
 
   DD (emitcode ("", "; IS_AOP_HX = %d", IS_AOP_HX (AOP (left))));
 
-  // TODO: Use aix for 8-bit operands in x.
-  if ((IS_AOP_HX (AOP (left)) || ((AOP_TYPE (left) == AOP_DIR) &&
-    (IS_AOP_HX (AOP (result)) || AOP_TYPE (result) == AOP_DIR))) &&
+  if ((IS_AOP_HX (AOP (left)) || IS_AOP_HX (AOP (result)) ||
+    ((AOP_TYPE (left) == AOP_DIR || IS_S08 && AOP_TYPE (left) == AOP_EXT) && (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))) &&
     (icount >= -128) && (icount <= 127) && (size == 2))
     {
       needpulx = pushRegIfSurv (hc08_reg_x);
@@ -3629,6 +3624,20 @@ genPlusIncr (iCode * ic)
       storeRegToAop (hc08_reg_hx, AOP (result), 0);
       pullOrFreeReg (hc08_reg_h, needpulh);
       pullOrFreeReg (hc08_reg_x, needpulx);
+      return TRUE;
+    }
+  if (size == 1 && (IS_AOP_X (AOP (result)) && (!IS_AOP_A (AOP (left)) || hc08_reg_h->isDead) || IS_AOP_X (AOP (left)) && !IS_AOP_A (AOP (result)) && hc08_reg_x->isDead && hc08_reg_h->isDead))
+    {
+      while (icount < -128)
+        icount += 256;
+      while (icount > 127)
+        icount -= 256;
+      needpulh = pushRegIfSurv (hc08_reg_h);
+      loadRegFromAop (hc08_reg_x, AOP (left), 0);
+      emitcode ("aix", "#%d", icount);
+      regalloc_dry_run_cost += 2;
+      storeRegToAop (hc08_reg_x, AOP (result), 0);
+      pullOrFreeReg (hc08_reg_h, needpulh);
       return TRUE;
     }
 

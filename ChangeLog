@@ -1,5 +1,16 @@
 2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
 
+	* sdas/as6808/m08mch.c,
+	  sdas/as6808/m6808.h,
+	  sdas/as6808/m08pst.c,
+	  src/SDCCralloc.hpp,
+	  src/SDCCglue.c,
+	  src/hc08/main.c,
+	  src/hc08/ralloc2.cc:
+	  Asm for s08.
+
+2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/bug3223041.c:
 	  Do not handle hc08 as special case.
 

@@ -60,7 +60,7 @@ typedef short int var_t;
 typedef signed char reg_t;
 
 // Todo: Move this port-dependency somewehere else?
-#define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? 9 : (TARGET_IS_GBZ80 ? 5 : (TARGET_IS_HC08 ? 3 : 0)))
+#define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? 9 : (TARGET_IS_GBZ80 ? 5 : ((TARGET_IS_HC08 || TARGET_IS_S08) ? 3 : 0)))
 // Upper bound on NUM_REGS
 #define MAX_NUM_REGS 9
 

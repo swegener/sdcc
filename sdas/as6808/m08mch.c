@@ -25,6 +25,8 @@
 #include "asxxxx.h"
 #include "m6808.h"
 
+int allow_cs08_code;
+
 char	*cpu	= "Motorola 68HC(S)08";
 int	hilo	= 1;
 char	*dsft	= "asm";
@@ -242,21 +244,91 @@ struct mne *mp;
 		break;
 
 	case S_TYPHX:
+// Code below from Gary Osborne (gary@s-4.com)
+// G.O.
+// This block of code was copied from a later version of the asxxxx assembler
+// distribution.  The later version supports the cs08.  The SDCC version of
+// the assembler did not.  The cs08 ldhx, sthx, and cphx instructions allow
+// more addressing modes than the hc08.  That is the only difference in the
+// instruction sets.
+
+// The new asxxxx assemblers have other nice features that could be retrofitted
+// one day, but we can limp along without them for a few years yet.  They
+// are less important when the primary user writes in C.  It would probably
+// be easier to customize the new asxxxx files rather than try to upgrade
+// the SDCC version.
+
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
 			if (op == 0x25)
-				aerr();
+			aerr();
 			outab(op);
 			outrw(&e1, 0);
 			break;
 		}
-		if (t1 == S_DIR || t1 == S_EXT) {
+		if (allow_cs08_code) {
+			if (t1 == S_EXT) {
+				switch (op) {
+					default:
+					case 0x25:  outab(0x96);   break;
+					case 0x45:  outab(0x32);   break;
+					case 0x65:  outab(0x3E);   break;
+				}
+				outrw(&e1, 0);
+				break;
+			}
+			if ((t1 == S_SP1) || (t1 == S_SP2)) {
+				outab(0x9E);
+				switch (op) {
+				default:
+				case 0x25:  outab(0xFF);   break;
+				case 0x45:  outab(0xFE);   break;
+				case 0x65:  outab(0xF3);   break;
+				}
+				outrb(&e1, R3_USGN);
+				// The SDCC version of outrb() is not fully compatible.  Work around it.
+				// Not an asxxxx error.
+				if (t1==S_SP2) {      // ldhx 0x100,s etc should show error tag
+					aerr();
+				}
+				break;
+			}
+			if ((t1 == S_IX) && (op == 0x45)) {
+				outab(0x9E);
+				outab(0xAE);
+				break;
+			}
+			if ((t1 == S_IX1) && (op == 0x45)) {
+				outab(0x9E);
+				outab(0xCE);
+				outrb(&e1, R3_USGN);
+				break;
+			}
+			if ((t1 == S_IX2) && (op == 0x45)) {
+				outab(0x9E);
+				outab(0xBE);
+				outrw(&e1, 0);
+				break;
+			}
+		} else {
+			if (t1 == S_EXT) {
+				t1 = S_DIR;
+				// The SDCC version of outrb() is not fully compatible.  Work around it.
+				// Not an asxxxx error, at least not in the newer versions.
+				if (e1.e_addr > 0xFF) {
+					err('d');
+				}
+			}
+		}
+		if (t1 == S_DIR) {
 			outab(op | 0x10);
 			outrb(&e1, R3_PAG0);
 			break;
 		}
 		aerr();
 		break;
+
+// end G.O.
 
 	case S_CBEQ:
 		t1 = addr(&e1);
@@ -410,6 +482,10 @@ struct mne *mp;
 			}
 		}
 		aerr();
+		break;
+
+	case X_CS08:
+		++allow_cs08_code;
 		break;
 
 	default:

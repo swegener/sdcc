@@ -558,7 +558,7 @@ PORT hc08_port =
 
 PORT s08_port =
 {
-  TARGET_ID_HC08,
+  TARGET_ID_S08,
   "s08",
   "S08",                        /* Target name */
   NULL,                         /* Processor name */

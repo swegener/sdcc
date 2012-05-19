@@ -1809,6 +1809,8 @@ glue (void)
 
   if (TARGET_IS_Z180)
     fprintf (asmFile, "\t.hd64\n");
+  if (TARGET_IS_S08)
+    fprintf (asmFile, "\t.cs08\n");
 
   /* print module name */
   tfprintf (asmFile, "\t!module\n", moduleName);

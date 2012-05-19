@@ -211,5 +211,10 @@ struct	mne	mne[] = {
     {	NULL,	"sei",		S_INH,		0,	0x9B	},
     {	NULL,	"rsp",		S_INH,		0,	0x9C	},
     {	NULL,	"nop",		S_INH,		0,	0x9D	},
-    {	NULL,	"txa",		S_INH,		S_EOL,	0x9F	}
+    {	NULL,	"txa",		S_INH,		0,	0x9F},
+
+	/* S08/CS08/HCS08/68HCS08 */
+
+    {	NULL,	".cs08",	X_CS08,		S_EOL,	0 }
 };
+

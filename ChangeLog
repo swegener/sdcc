@@ -2,6 +2,10 @@
 
 	* src/hc08/gen.c:
 	  Improve addition for hc08 and s08.
+	* src/z80/main.c:
+	  Fix name of r3ka library.
+	* src/hc08/main.c:
+	  Fix name of s08 library.
 
 2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
 

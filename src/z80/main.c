@@ -1175,7 +1175,7 @@ PORT r3ka_port = {
    ".rel",
    1,
    _crt,                        /* crt */
-   _libs_r2k,                   /* libs */
+   _libs_r3ka,                  /* libs */
    },
   {                             /* Peephole optimizer */
    _r2k_defaultRules,

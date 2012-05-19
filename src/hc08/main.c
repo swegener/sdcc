@@ -415,7 +415,8 @@ static const char *_asmCmd[] =
   "sdas6808", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
 };
 
-static const char * const _libs[] = { "hc08", NULL, };
+static const char * const _libs_hc08[] = { "hc08", NULL, };
+static const char * const _libs_s08[] = { "s08", NULL, };
 
 /* Globals */
 PORT hc08_port =
@@ -447,7 +448,7 @@ PORT hc08_port =
     ".rel",
     1,
     NULL,                       /* crt */
-    _libs,                      /* libs */
+    _libs_hc08,                 /* libs */
   },
   {                             /* Peephole optimizer */
     _hc08_defaultRules
@@ -585,7 +586,7 @@ PORT s08_port =
     ".rel",
     1,
     NULL,                       /* crt */
-    _libs,                      /* libs */
+    _libs_s08,                  /* libs */
   },
   {                             /* Peephole optimizer */
     _s08_defaultRules

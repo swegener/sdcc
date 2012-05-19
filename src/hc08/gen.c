@@ -7739,6 +7739,7 @@ genUnpackBits (operand * result, iCode * ifx)
   sym_link *etype;              /* bitfield type information */
   int blen;                     /* bitfield length */
   int bstr;                     /* bitfield starting bit within byte */
+  bool needpulla = FALSE;
 
   D (emitcode (";     genUnpackBits", ""));
 
@@ -7746,6 +7747,8 @@ genUnpackBits (operand * result, iCode * ifx)
   rsize = getSize (operandType (result));
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
+
+  needpulla = pushRegIfSurv (hc08_reg_a);
 
   if (ifx && blen <= 8)
     {
@@ -7757,6 +7760,7 @@ genUnpackBits (operand * result, iCode * ifx)
           emitcode ("and", "#0x%02x", (((unsigned char) - 1) >> (8 - blen)) << bstr);
           regalloc_dry_run_cost += 2;
         }
+      pullOrFreeReg (hc08_reg_a, needpulla);
       genIfxJump (ifx, "a");
       return;
     }
@@ -7847,6 +7851,7 @@ finish:
             storeRegToAop (hc08_reg_a, AOP (result), offset++);
         }
     }
+  pullOrFreeReg (hc08_reg_a, needpulla);
 }
 
 
@@ -7866,6 +7871,7 @@ genUnpackBitsImmed (operand * left, operand * result, iCode * ic, iCode * ifx)
   asmop *derefaop;
   bool delayed_a = FALSE;
   bool assigned_a = FALSE;
+  bool needpulla = FALSE;
 
   D (emitcode (";     genUnpackBitsImmed", ""));
 
@@ -7880,6 +7886,8 @@ genUnpackBitsImmed (operand * left, operand * result, iCode * ic, iCode * ifx)
   rsize = getSize (operandType (result));
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
+
+  needpulla = pushRegIfSurv (hc08_reg_a);
 
   /* if the bitfield is a single bit in the direct page */
   if (blen == 1 && derefaop->type == AOP_DIR)
@@ -8061,6 +8069,8 @@ finish:
     }
   if (delayed_a)
     pullReg (hc08_reg_a);
+
+  pullOrFreeReg (hc08_reg_a, needpulla);
 }
 
 
@@ -8113,10 +8123,11 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
   bool postH = FALSE;
   bool postX = FALSE;
   bool postA = FALSE;
+  bool needpulla = FALSE;
 
   D (emitcode (";     genPointerGet", ""));
 
-  if (getSize (operandType (result)) > 1)
+  if ((size = getSize (operandType (result))) > 1)
     ifx = NULL;
 
   aopOp (left, ic, FALSE);
@@ -8159,13 +8170,32 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
   /* if bit then unpack */
   if (IS_BITVAR (retype))
     genUnpackBits (result, ifx);
+  else if (!pi && !ifx && size == 2 && IS_S08 && (IS_AOP_HX (AOP (result)) || AOP_TYPE (result) == AOP_IMMD || AOP_TYPE (result) == AOP_EXT)) /* Todo: Use this for bigger sizes, too */
+    {
+      emitcode ("ldhx", ",x");
+      regalloc_dry_run_cost += 2;
+      storeRegToAop (hc08_reg_hx, AOP (result), 0);
+    }
+  else if (!pi && !ifx && size == 1 && (IS_AOP_X (AOP (result)) || hc08_reg_x->isDead && !hc08_reg_a->isDead))
+    {
+      emitcode ("ldx", ",x");
+      regalloc_dry_run_cost++;
+      storeRegToAop (hc08_reg_x, AOP (result), 0);
+    }
   else
     {
-      size = AOP_SIZE (result);
       offset = size - 1;
 
       while (size--)
         {
+          if (!size && !pi && !ifx && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset] == hc08_reg_x)
+            {
+              emitcode ("ldx", ",x");
+              regalloc_dry_run_cost++;
+              continue;
+            }
+          if (!needpulla)
+            needpulla = pushRegIfSurv (hc08_reg_a);
           accopWithMisc ("lda", ",x");
           if (size || pi)
             {
@@ -8212,12 +8242,12 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
   if (postH)
     pullReg (hc08_reg_h);
 
+  pullOrFreeReg (hc08_reg_a, needpulla);
+
   if (ifx && !ifx->generated)
     {
       genIfxJump (ifx, "a");
     }
-
-D (emitcode (";     done", ""));
 }
 
 /*-----------------------------------------------------------------*/

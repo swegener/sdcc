@@ -246,7 +246,7 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(ic->op == IPUSH && (unused_A || dying_A || left_in_A || operand_in_reg(left, REG_H, ia, i, G) || left_in_X))
     return(true);
 
-  if(ic->op == GET_VALUE_AT_ADDRESS && (unused_A || dying_A) && (unused_X || dying_X) && (unused_H || dying_H))
+  if(ic->op == GET_VALUE_AT_ADDRESS && (unused_X || dying_X) && (unused_H || dying_H))
 	return(true);
 
   if(ic->op == '=' && POINTER_SET(ic) && (unused_A || dying_A) && !operand_in_reg(right, REG_H, ia, i, G) && !operand_in_reg(right, REG_X, ia, i, G))

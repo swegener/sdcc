@@ -1,3 +1,9 @@
+2012-05-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/hc08/gen.c,
+	  src/hc08/ralloc2.cc:
+	  Improved code for GET_VALUE_AT_ADDRESS.
+
 2012-05-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/hc08/gen.c:

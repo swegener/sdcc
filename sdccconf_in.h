@@ -137,6 +137,12 @@
 #undef OPT_DISABLE_R2K
 
 /* XXX */
+#undef OPT_DISABLE_R3KA
+
+/* XXX */
+#undef OPT_DISABLE_S08
+
+/* XXX */
 #undef OPT_DISABLE_SDBINUTILS
 
 /* XXX */
@@ -225,6 +231,9 @@
 
 /* The size of `long', as computed by sizeof. */
 #undef SIZEOF_LONG
+
+/* The size of `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
 
 /* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT

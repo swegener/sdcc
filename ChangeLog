@@ -1,3 +1,8 @@
+2012-05-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/hc08/gen.c:
+	  Emit cost information only when --fverbose-asm is used.
+
 2012-05-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: Fixed yet more problems with registers possibly
@@ -13,7 +18,7 @@
 2012-05-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdccconf_in.h:
-	  Regenerated, so buildings with r3ka port disabled now works.
+	  Regenerated, so building with r3ka port disabled works now.
 
 2012-05-20 Philipp Klaus Krause <pkk AT spth.de>
 

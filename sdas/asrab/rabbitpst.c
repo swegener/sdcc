@@ -161,14 +161,31 @@ struct  mne     mne[] = {
     { NULL,     "lret",         S_INH2,         0,      0x45 },
     /* { NULL,  "rld",          S_INH2,         0,      0x6F }, */
     /* { NULL,  "rrd",          S_INH2,         S_EOL,  0x67 } */
-
-    { NULL,     ".r4k",         X_R4K_MODE,     0,      0 },
+    
     { NULL,     "mul",          S_INH1,         0,      0xF7 },
+    
+    { NULL,     ".r3k",         X_R3K_MODE,     0,      0 },
+    { NULL,     "idet",         R3K_INH1,       0,      0x5B },
+    { NULL,     "lddsr",        R3K_INH2,       0,      0x98 },
+    { NULL,     "ldisr",        R3K_INH2,       0,      0x90 },
+    { NULL,     "lsddr",        R3K_INH2,       0,      0xD8 },
+    { NULL,     "lsdr",         R3K_INH2,       0,      0xF8 },
+    { NULL,     "lsidr",        R3K_INH2,       0,      0xD0 },
+    { NULL,     "lsir",         R3K_INH2,       0,      0xF0 },
+    { NULL,     "rdmode",       R3K_INH2,       0,      0x7F },
+    { NULL,     "setusr",       R3K_INH2,       0,      0x6F },
+    { NULL,     "sures",        R3K_INH2,       0,      0x7D },
+    { NULL,     "uma",          R3K_INH2,       0,      0xC0 },
+    { NULL,     "ums",          R3K_INH2,       0,      0xC8 },
+    
+    { NULL,     ".r4k",         X_R4K_MODE,     0,      0 },
     { NULL,     "jre",          X_JRE,          0,      0xA3 },
     { NULL,     "clr",          X_CLR,          0,      0xBF },
     { NULL,     "ljp",          X_LJP,          0,      0xC7 },
     { NULL,     "lcall",        X_LCALL,        0,      0xCF },
     { NULL,     "lret",         S_INH2,         0,      0x45 },
     { NULL,     "bool",         X_BOOL,         0,      0xCC },
+    { NULL,     "syscall",      R4K_INH2,       0,      0x75 },
+    { NULL,     "sysret",       R4K_INH2,       0,      0x83 },
     { NULL,     "mulu",         X_R4K_MULU,     S_EOL,  0xA7 }
 };

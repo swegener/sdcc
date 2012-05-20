@@ -178,11 +178,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define X_LCALL      98
 #define X_BOOL       99
 
-#define X_R4K_MODE  101
+#define X_R3K_MODE  101
+#define R3K_INH1    102
+#define R3K_INH2    103
+
+#define X_R4K_MODE  105
 /* the remaining instructions are only on Rabbit 4000: */
-#define X_R4K_MULU  102   
-#define X_JRE       103
-#define X_CLR       104
+#define X_R4K_MULU  106   
+#define X_JRE       107
+#define X_CLR       108
+#define R4K_INH2    109
 
 #define BCDE_PG   0xDD
 #define JKHL_PG   0xFD
@@ -221,7 +226,7 @@ extern  int             srch(char *str);
         /* rabbitmch.c */
 extern  int             genop(int pop, int op, struct expr *esp, int f);
 extern  int             gixiy(int v);
-extern  VOID            machine(struct mne *mp);
+extern  VOID            machine(struct mne * const mp);
 extern  int             mchpcr(struct expr *esp);
 extern  VOID            minit(void);
 

@@ -1,3 +1,11 @@
+2012-05-20 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* src/sdas/asrab/rabbitpst.c: Added mnemonics for rabbit 3000A
+	* src/sdas/asrab/rabbitmch.c: Added .r3k flag and rabbit 3000A
+	  instructions, changed much of the indentation to make gnu style,
+	  and update two functions declarations from K&R style
+	* src/sdas/asrab/rabbit.h: Added constants for rabbit 3000 support
+
 2012-05-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/hc08/gen.c:

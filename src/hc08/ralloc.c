@@ -1704,10 +1704,9 @@ createRegMask (eBBlock ** ebbs, int count)
 /* rematStr - returns the rematerialized string for a remat var    */
 /*-----------------------------------------------------------------*/
 static char *
-rematStr (symbol * sym)
+rematStr (symbol * sym, int offset)
 {
   iCode *ic = sym->rematiCode;
-  int offset = 0;
 
   while (1)
     {
@@ -1806,7 +1805,10 @@ regTypeNum (eBBlock *ebbs)
             {
               if (ptrPseudoSymSafe (sym, ic))
                 {
-                  ptrPseudoSymConvert (sym, ic, rematStr (OP_SYMBOL (IC_LEFT (ic))));
+                  int rightval = 0;
+                  if (IC_RIGHT (ic))
+                    rightval = (int)operandLitValue (IC_RIGHT (ic));
+                  ptrPseudoSymConvert (sym, ic, rematStr (OP_SYMBOL (IC_LEFT (ic)), rightval));
                   continue;
                 }
 
@@ -2148,10 +2150,8 @@ findAssignToSym (operand * op, iCode * ic)
      and eliminate the use of iTempAA, freeing up its register for
      other uses.
   */
-
   for (dic = ic->prev; dic; dic = dic->prev)
     {
-      /* if definition by assignment */
       if (dic->op == '=' &&
           !POINTER_SET (dic) &&
           IC_RESULT (dic)->key == op->key
@@ -2172,7 +2172,6 @@ findAssignToSym (operand * op, iCode * ic)
 
   if (!dic)
     return NULL;   /* didn't find any assignment to op */
-
   /* we are interested only if defined in far space */
   /* or in stack space in case of + & - */
 
@@ -2890,13 +2889,16 @@ packRegisters (eBBlock ** ebpp, int blockno)
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
           OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
         }
-
       /* mark the pointer usages */
       if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)))
         OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
       if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic)))
         OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
+
+      /* reduce for support function calls */
+      if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
+        packRegsForSupport (ic, ebp);
 
       /* if the condition of an if instruction
          is defined in the previous instruction and
@@ -2912,10 +2914,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
           OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
           continue;
         }
-
-      /* reduce for support function calls */
-      if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
-        packRegsForSupport (ic, ebp);
 
       /* pack for PUSH
          iTempNN := (some variable in farspace) V1

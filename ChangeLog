@@ -1,3 +1,15 @@
+2012-05-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Fixed yet more problems with registers possibly
+	  clobbered in division/modulus. Optimized GET_VALUE_AT_ADDRESS
+	  including handling non-zero right operand.
+	* src/hc08/ralloc.c: Allow packRegsForSupport() to optimize
+	  conditions computed for IFX. Handle non-zero right operand
+	  for GET_VALUE_AT_ADDRESS when generating pseudo symbol.
+	* src/SDCCopt.c: Let GET_VALUE_AT_ADDRESS have non-zero right
+	  operand for HC08-like ports. Fix def/use info on operands
+	  converted to integer support function calls.
+
 2012-05-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdccconf_in.h:

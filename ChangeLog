@@ -1,5 +1,11 @@
 2012-05-20 Leland Morrison <enigmalee AT sourceforge.net>
 
+	* support/regression/Makefile.in, support/regression/ports/ucr3ka/*,
+	  support/regression/fwk/include/testfwk.h: added test-ucr3ka to
+	  run regression tests on the rabbit 3000A port
+
+2012-05-20 Leland Morrison <enigmalee AT sourceforge.net>
+
 	* device/include/sdcc-lib.h, device/include/math.h: Added conditional
 	  for rabbit 3000
 	* devince/include/asm/r3ka/features.h: Added to allow customizations

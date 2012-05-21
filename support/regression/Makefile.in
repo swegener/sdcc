@@ -150,6 +150,11 @@ test-ucr2k:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucr2k
 
+# Helper rule for testing the r3k port only(use ucSim simulator)
+test-ucr3ka:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=ucr3ka
+
 # Helper rule for testing the hc08 port only(use ucSim simulator)
 test-hc08:
 	$(MAKE) test-common

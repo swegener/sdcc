@@ -1,5 +1,12 @@
 2012-05-20 Leland Morrison <enigmalee AT sourceforge.net>
 
+	* device/include/sdcc-lib.h, device/include/math.h: Added conditional
+	  for rabbit 3000
+	* devince/include/asm/r3ka/features.h: Added to allow customizations
+	  for -mr3ka
+
+2012-05-20 Leland Morrison <enigmalee AT sourceforge.net>
+
 	* src/sdas/asrab/rabbitpst.c: Added mnemonics for rabbit 3000A
 	* src/sdas/asrab/rabbitmch.c: Added .r3k flag and rabbit 3000A
 	  instructions, changed much of the indentation to make gnu style,

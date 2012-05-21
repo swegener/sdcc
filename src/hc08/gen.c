@@ -766,7 +766,7 @@ forceload:
         }
       if (aop->type == AOP_REG && loffset < aop->size)
         transferRegReg (aop->aopu.aop_reg[loffset], hc08_reg_h, TRUE);
-      else if (loffset - 1 >= 0 && (aop->type == AOP_LIT || aop->type == AOP_IMMD || IS_S08 && aop->type == AOP_EXT)) /* TODO: Allow loffset - 1 */
+      else if ((loffset - 1 >= 0 || aop->type == AOP_LIT) && (aop->type == AOP_LIT || aop->type == AOP_IMMD || IS_S08 && aop->type == AOP_EXT)) /* TODO: Allow negative loffset - 1 */
         {
           bool pushedx = FALSE;
           if (!hc08_reg_x->isFree)
@@ -774,7 +774,13 @@ forceload:
               pushReg (hc08_reg_x, TRUE);
               pushedx = TRUE;
             }
-          loadRegFromAop (hc08_reg_hx, aop, loffset - 1);
+          if (aop->type == AOP_LIT && loffset == 0) /* Workaround for other things not supporting negative offsets */
+            {
+              emitcode ("ldhx", "#0x%04x", ulFromVal (aop->aopu.aop_lit) << 8);
+              regalloc_dry_run_cost += 3;
+            }
+          else
+            loadRegFromAop (hc08_reg_hx, aop, loffset - 1);
           pullOrFreeReg (hc08_reg_x, pushedx);
         }
       else if (hc08_reg_a->isFree)

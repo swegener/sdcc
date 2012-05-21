@@ -1,5 +1,10 @@
 2012-05-21 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/hc08/gen.c:
+	  More efficient loading of H and HX for hc08 and s08.
+
+2012-05-21 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/setjmp.c:
 	  Enable test for r3ka.
 	* support/regression/tests/gcc-torture-execute-pr28982a.c,

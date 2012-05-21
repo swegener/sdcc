@@ -766,6 +766,17 @@ forceload:
         }
       if (aop->type == AOP_REG && loffset < aop->size)
         transferRegReg (aop->aopu.aop_reg[loffset], hc08_reg_h, TRUE);
+      else if (loffset - 1 >= 0 && (aop->type == AOP_LIT || aop->type == AOP_IMMD || IS_S08 && aop->type == AOP_EXT)) /* TODO: Allow loffset - 1 */
+        {
+          bool pushedx = FALSE;
+          if (!hc08_reg_x->isFree)
+            {
+              pushReg (hc08_reg_x, TRUE);
+              pushedx = TRUE;
+            }
+          loadRegFromAop (hc08_reg_hx, aop, loffset - 1);
+          pullOrFreeReg (hc08_reg_x, pushedx);
+        }
       else if (hc08_reg_a->isFree)
         {
           loadRegFromAop (hc08_reg_a, aop, loffset);
@@ -806,8 +817,8 @@ forceload:
             }
           else
             {
-              loadRegFromAop (hc08_reg_x, aop, loffset);
               loadRegFromConst (hc08_reg_h, zero);
+              loadRegFromAop (hc08_reg_x, aop, loffset);
             }
         }
       else if ((aop->type == AOP_LIT) || (aop->type == AOP_IMMD))
@@ -2399,6 +2410,7 @@ aopDerefAop (asmop * aop, int offset)
 /*-----------------------------------------------------------------*/
 /* aopAdrStr - for referencing the address of the aop              */
 /*-----------------------------------------------------------------*/
+/* loffset seems to have a weird meaning here. It seems to be nonzero in some places where one would expect an offset ot be zero */
 static char *
 aopAdrStr (asmop * aop, int loffset, bool bit16)
 {
@@ -2466,7 +2478,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 
     case AOP_LIT:
       if (bit16)
-        return aopLiteralLong (aop->aopu.aop_lit, /*loffset */ 0, 2);
+        return aopLiteralLong (aop->aopu.aop_lit, /*loffset */ 0, 2); /* And here seems ot be a workaround for the weird loffset */
       else
         return aopLiteral (aop->aopu.aop_lit, loffset);
 
@@ -8239,13 +8251,16 @@ genDataPointerGet (operand * left, operand * right, operand * result, iCode * ic
   freeAsmop (left, NULL, ic, TRUE);
   derefaop->size = size;
 
-  while (size--)
-    {
-      if (!ifx)
-        transferAopAop (derefaop, size, AOP (result), size);
-      else
-        loadRegFromAop (hc08_reg_a, derefaop, size);
-    }
+  if (IS_AOP_HX (AOP (result)))
+    loadRegFromAop (hc08_reg_hx, derefaop, 0);
+  else
+    while (size--)
+      {
+        if (!ifx)
+          transferAopAop (derefaop, size, AOP (result), size);
+        else
+          loadRegFromAop (hc08_reg_a, derefaop, size);
+      }
 
   freeAsmop (NULL, derefaop, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
@@ -9157,6 +9172,12 @@ genCast (iCode * ic)
   /* to make sure the registers are not overwritten prematurely. */
   if (AOP_SIZE (result) == 2 && AOP (result)->type == AOP_REG)
     {
+      if (IS_AOP_HX (AOP (result)) && (AOP_SIZE (right) == 2 || !signExtend))
+        {
+          loadRegFromAop (hc08_reg_hx, AOP (right), 0);
+          goto release;
+        }
+
       if (AOP_SIZE (right) == 1)
         {
           transferAopAop (AOP (right), 0, AOP (result), 0);

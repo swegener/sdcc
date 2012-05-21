@@ -1,3 +1,8 @@
+2012-05-21 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* SDCCpeeph.c, peep.c: Fixed so that R2K instructions are
+	  recognized for -mr3ka target by the peephole optimizer.
+
 2012-05-20 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* support/regression/Makefile.in, support/regression/ports/ucr3ka/*,

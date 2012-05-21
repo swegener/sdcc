@@ -728,9 +728,9 @@ int z80instructionSize(lineNode *pl)
          strncmp(op2start, "hl", 2) && strncmp(op2start, "a", 2))
         return(4);
 
-      if(IS_R2K && !strncmp(op1start, "hl", 2) && (argCont(op2start, "(hl)") || argCont(op2start, "(iy)")))
+      if(IS_RAB && !strncmp(op1start, "hl", 2) && (argCont(op2start, "(hl)") || argCont(op2start, "(iy)")))
         return(4);
-      if(IS_R2K && !strncmp(op1start, "hl", 2) && (argCont(op2start, "(sp)") || argCont(op2start, "(ix)")))
+      if(IS_RAB && !strncmp(op1start, "hl", 2) && (argCont(op2start, "(sp)") || argCont(op2start, "(ix)")))
         return(3);
 
       /* These 4 are the only remaining cases of 3 byte long ld instructions. */
@@ -766,7 +766,7 @@ int z80instructionSize(lineNode *pl)
           fprintf(stderr, "Warning: z80instructionSize() failed to parse line node %s\n", pl->line);
           return(4);
         }
-      if(argCont(op1start, "(sp)") && (IS_R2K || !strncmp(op2start, "ix", 2) || !strncmp(op2start, "iy", 2)))
+      if(argCont(op1start, "(sp)") && (IS_RAB || !strncmp(op2start, "ix", 2) || !strncmp(op2start, "iy", 2)))
         return(2);
       return(1);
     }
@@ -780,7 +780,7 @@ int z80instructionSize(lineNode *pl)
     }
 
   /* 16 bit add / subtract / and */
-  if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc") || IS_R2K && ISINST(pl->line, "and")) && !strncmp(op1start, "hl", 2))
+  if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc") || IS_RAB && ISINST(pl->line, "and")) && !strncmp(op1start, "hl", 2))
     {
       if(ISINST(pl->line, "add") || ISINST(pl->line, "and"))
         return(1);
@@ -789,9 +789,10 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "add") && (!strncmp(op1start, "ix", 2) || !strncmp(op1start, "iy", 2)))
     return(2);
 
-  if(IS_R2K && ISINST(pl->line, "add") && !strncmp(op1start, "sp", 2))
+  /* signed 8 bit adjustment to stack pointer */
+  if( (IS_RAB) && ISINST(pl->line, "add") && !strncmp(op1start, "sp", 2))
     return(2);
-
+  
   /* 8 bit arithmetic, two operands */
   if(op2start &&  op1start[0] == 'a' && (ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sub") || ISINST(pl->line, "sbc") || ISINST(pl->line, "cp") || ISINST(pl->line, "and") || ISINST(pl->line, "or") || ISINST(pl->line, "xor")))
     {
@@ -845,7 +846,7 @@ int z80instructionSize(lineNode *pl)
       return(3);
     }
 
-  if (TARGET_IS_R2K &&
+  if (IS_RAB &&
       (ISINST(pl->line, "ipset3") || ISINST(pl->line, "ipset2") ||
        ISINST(pl->line, "ipset1") || ISINST(pl->line, "ipset0") ||
        ISINST(pl->line, "ipres")))
@@ -880,10 +881,22 @@ int z80instructionSize(lineNode *pl)
 
   if(IS_Z180 && ISINST(pl->line, "mlt"))
     return(2);
-
-  if(IS_R2K && ISINST(pl->line, "mul"))
+  
+  if(IS_RAB && ISINST(pl->line, "mul"))
     return(1);
-
+  
+  if(IS_RAB && 
+     ( ISINST(pl->line, "lddr") ||
+       ISINST(pl->line, "ldir") )
+     )
+    return(2);
+  
+  if(IS_R3KA &&
+     ( ISINST(pl->line, "uma") ||
+       ISINST(pl->line, "ums") )
+     )
+    return(2);
+  
   if(ISINST(pl->line, ".db"))
     {
       int i, j;

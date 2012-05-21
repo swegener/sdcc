@@ -914,9 +914,9 @@ operandBaseName (const char *op)
         return "bc";
       if (!strcmp (op, "h") || !strcmp (op, "l") || !strcmp (op, "(hl)") || !strcmp (op, "(hl+)")  || !strcmp (op, "(hl-)"))
         return "hl";
-      if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || !strcmp (op, "(iy)"))
+      if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || strstr (op, "iy"))
         return "iy";
-      if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || !strcmp (op, "(ix)"))
+      if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || strstr (op, "ix"))
         return "ix";
     }
 

@@ -6,6 +6,8 @@
 	  support/regression/tests/gcc-torture-execute-20010224-1.c,
 	  support/regression/tests/gcc-torture-execute-20030408-1.c:
 	  Disable tests for r3ka.
+	* support/regression/Makefile.in:
+	  Add ucr3ka target to z80 target.
 
 2012-05-21 Leland Morrison <enigmalee AT sourceforge.net>
 

@@ -884,17 +884,16 @@ int z80instructionSize(lineNode *pl)
   
   if(IS_RAB && ISINST(pl->line, "mul"))
     return(1);
-  
-  if(IS_RAB && 
-     ( ISINST(pl->line, "lddr") ||
-       ISINST(pl->line, "ldir") )
-     )
+
+  if(ISINST(pl->line, "lddr") || ISINST(pl->line, "ldir"))
+    return(2);
+
+  if(IS_R3KA &&
+    (ISINST(pl->line, "lddsr") || ISINST(pl->line, "ldisr") ||
+    ISINST(pl->line, "lsdr") || ISINST(pl->line, "lsir") || ISINST(pl->line, "lsddr") || ISINST(pl->line, "lsidr")))
     return(2);
   
-  if(IS_R3KA &&
-     ( ISINST(pl->line, "uma") ||
-       ISINST(pl->line, "ums") )
-     )
+  if(IS_R3KA && (ISINST(pl->line, "uma") || ISINST(pl->line, "ums")))
     return(2);
   
   if(ISINST(pl->line, ".db"))

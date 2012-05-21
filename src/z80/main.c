@@ -1150,7 +1150,7 @@ PORT r2k_port = {
 };
 
 PORT r3ka_port = {
-  TARGET_ID_R2K,
+  TARGET_ID_R3KA,
   "r3ka",
   "Rabbit 3000A",               /* Target name */
   NULL,                         /* Processor name */

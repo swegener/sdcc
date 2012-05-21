@@ -9042,14 +9042,27 @@ genAssign (iCode * ic)
     }
 
   /* general case */
-  /* Copy in msb to lsb order, since some multi-byte hardware registers */
+  /* Copy in msb tot lsb order, since some multi-byte hardware registers */
   /* expect this order. */
   size = AOP_SIZE (result);
   offset = size - 1;
-  while (size--)
+  while (size)
     {
-      transferAopAop (AOP (right), offset, AOP (result), offset);
-      offset--;
+      if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead && (offset - 1 == 0)/* TODO: Allow other offsets */ &&
+        (AOP_TYPE (right) == AOP_IMMD || AOP_TYPE (right) == AOP_LIT ||IS_S08 && AOP_TYPE (right) == AOP_EXT) &&
+        (AOP_TYPE (result) == AOP_IMMD || IS_S08 && AOP_TYPE (result) == AOP_EXT))
+        {
+          loadRegFromAop (hc08_reg_hx, AOP (right), offset - 1);/* loadregfromaop is broken for offsets != 0 */
+          storeRegToAop (hc08_reg_hx, AOP (result), offset - 1);
+          offset -= 2;
+          size -= 2;
+        }
+      else
+        {
+          transferAopAop (AOP (right), offset, AOP (result), offset);
+          offset--;
+          size--;
+        }
     }
 
 release:
@@ -9252,11 +9265,24 @@ genCast (iCode * ic)
         {
           loadRegFromAop (hc08_reg_a, AOP (right), offset);
           storeRegToAop (hc08_reg_a, AOP (result), offset);
+          offset++;
+          size--;
+        }
+      else if ((size > 2 || size >= 2 && !signExtend) && hc08_reg_h->isDead && hc08_reg_x->isDead && /* TODO: Allow other offsets! */ offset == 0 &&
+        (AOP_TYPE (right) == AOP_IMMD || IS_S08 && AOP_TYPE (right) == AOP_EXT) &&
+        (AOP_TYPE (result) == AOP_IMMD || IS_S08 && AOP_TYPE (result) == AOP_EXT))
+        {
+          loadRegFromAop (hc08_reg_hx, AOP (right), offset); /* Broken for offsets other than 0! */
+          storeRegToAop (hc08_reg_hx, AOP (result), offset);
+          offset += 2;
+          size -= 2;
         }
       else
-        transferAopAop (AOP (right), offset, AOP (result), offset);
-      offset++;
-      size--;
+        {
+          transferAopAop (AOP (right), offset, AOP (result), offset);
+          offset++;
+          size--;
+        }
     }
 
   size = AOP_SIZE (result) - offset;

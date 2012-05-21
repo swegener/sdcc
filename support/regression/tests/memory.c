@@ -6,6 +6,7 @@
 
 unsigned char destination[4];
 const unsigned char source[4] = {0, 1, 2, 3};
+int c;
 
 void testmemory(void)
 {
@@ -15,6 +16,11 @@ void testmemory(void)
   ASSERT(source[0] == 0);
 
   /* Test memset() */
+  c = 8;
+  memset(destination, c, one);
+  ASSERT(destination[0] == 8);
+  memset(destination, c, 3);
+  ASSERT(destination[2] == 8);
   destination[3] = 23;
   memset(destination, 42, 3);
   ASSERT(destination[0] == 42);

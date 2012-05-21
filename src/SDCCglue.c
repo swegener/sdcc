@@ -1807,10 +1807,12 @@ glue (void)
   /* initial comments */
   initialComments (asmFile);
 
-  if (TARGET_IS_Z180)
-    fprintf (asmFile, "\t.hd64\n");
   if (TARGET_IS_S08)
     fprintf (asmFile, "\t.cs08\n");
+  else if (TARGET_IS_Z180)
+    fprintf (asmFile, "\t.hd64\n");
+  else if (TARGET_IS_R3KA)
+    fprintf (asmFile, "\t.r3k\n");
 
   /* print module name */
   tfprintf (asmFile, "\t!module\n", moduleName);

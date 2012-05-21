@@ -10390,6 +10390,8 @@ genBuiltInMemset (const iCode * ic, int nParams, operand ** pparams)
 {
   operand *dst, *c, *n;
   bool direct_c;
+  bool indirect_c;
+  bool preinc = FALSE;
 
   wassertl (nParams == 3, "Built-in memset() must have three parameters");
 
@@ -10409,22 +10411,37 @@ genBuiltInMemset (const iCode * ic, int nParams, operand ** pparams)
 
   direct_c = (AOP_TYPE (c) == AOP_LIT || AOP_TYPE (c) == AOP_REG && AOP (c)->aopu.aop_reg[1]->rIdx != H_IDX
               && AOP (c)->aopu.aop_reg[1]->rIdx != L_IDX);
+  indirect_c = IS_R3KA && ulFromVal (AOP (n)->aopu.aop_lit) > 1 && AOP_TYPE (c) == AOP_IY;
 
-  if (!direct_c)
-    cheapMove (ASMOP_A, 0, AOP (c), 0);
-  fetchPair (PAIR_HL, AOP (dst));
-  if (!regalloc_dry_run)
-    emit2 ("ld (hl), %s", aopGet (direct_c ? AOP (c) : ASMOP_A, 0, FALSE));
-  regalloc_dry_run_cost += (direct_c && AOP_TYPE (c) == AOP_LIT) ? 2 : 1;
-  if (ulFromVal (AOP (n)->aopu.aop_lit) <= 1)
-    goto done;
+  if (indirect_c)
+    {
+      fetchPair (PAIR_DE, AOP (dst));
+      emit2 ("ld hl, #%s", AOP (c)->aopu.aop_dir);
+      regalloc_dry_run_cost += 3;
+    }
+  else
+    {
+      if (!direct_c)
+        cheapMove (ASMOP_A, 0, AOP (c), 0);
+      fetchPair (PAIR_HL, AOP (dst));
+      if (!regalloc_dry_run)
+        emit2 ("ld (hl), %s", aopGet (direct_c ? AOP (c) : ASMOP_A, 0, FALSE));
+      regalloc_dry_run_cost += (direct_c && AOP_TYPE (c) == AOP_LIT) ? 2 : 1;
+      if (ulFromVal (AOP (n)->aopu.aop_lit) <= 1)
+        goto done;
 
-  emit2 ("ld e, l");
-  emit2 ("ld d, h");
-  emit2 ("inc de");
-  regalloc_dry_run_cost += 3;
-  emit2 ("ld bc, #%d", ulFromVal (AOP (n)->aopu.aop_lit) - 1);
-  emit2 ("ldir");
+      emit2 ("ld e, l");
+      emit2 ("ld d, h");
+      regalloc_dry_run_cost += 2;
+      if (!IS_R3KA || !optimize.codeSize)
+        {
+          emit2 ("inc de");
+          regalloc_dry_run_cost++;
+          preinc = TRUE;
+        }
+    }
+  emit2 ("ld bc, #%d", ulFromVal (AOP (n)->aopu.aop_lit) - preinc);
+  emit2 (IS_R3KA ? "lsidr" : "ldir");
   regalloc_dry_run_cost += 5;
 
 done:

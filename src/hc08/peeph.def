@@ -300,14 +300,14 @@ replace {
 } by {
 	; Peephole 6a  - replaced jmp to rts with rts
 	rts
-} if labelIsReturnOnly
+} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 replace {
 	bra	%5
 } by {
 	; Peephole 6b  - replaced jmp to rts with rts
 	rts
-} if labelIsReturnOnly
+} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 replace restart {
 	psha
@@ -391,3 +391,12 @@ replace{
 } by {
 	; Peephole 500    removed redundant label %1
 } if labelRefCount(%1 0)
+
+replace{
+	jsr	%1
+	rts
+} by {
+	; Peephole 501 did tail call optimization.
+	jmp	%1
+}
+

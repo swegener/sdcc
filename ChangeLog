@@ -1,3 +1,12 @@
+2012-05-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/setjmp.c:
+	  Enable test for r3ka.
+	* support/regression/tests/gcc-torture-execute-pr28982a.c,
+	  support/regression/tests/gcc-torture-execute-20010224-1.c,
+	  support/regression/tests/gcc-torture-execute-20030408-1.c:
+	  Disable tests for r3ka.
+
 2012-05-21 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* SDCCpeeph.c, peep.c: Fixed so that R2K instructions are

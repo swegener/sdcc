@@ -61,7 +61,7 @@ int test4 ()
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_z80) && !defined (__SDCC_z180) && !defined (__SDCC_r2k) && !defined (__SDCC_gbz80) && !defined (__SDCC_mcs51)
+#if !defined (__SDCC_z80) && !defined (__SDCC_z180) && !defined (__SDCC_r2k) && !defined (__SDCC_r3ka) && !defined (__SDCC_gbz80) && !defined (__SDCC_mcs51)
   test1 (); test2 (); test4 ();
   return;
 #endif

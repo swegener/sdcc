@@ -43,7 +43,7 @@ int16_t logadd (int16_t *a, int16_t *b)
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_z80) && !defined (__SDCC_z180) && !defined (__SDCC_r2k) && !defined (__SDCC_gbz80)
+#if !defined (__SDCC_z80) && !defined (__SDCC_z180) && !defined (__SDCC_r2k) && !defined (__SDCC_r3ka) && !defined (__SDCC_gbz80)
   int i;
 
   ba_compute_psd (0);

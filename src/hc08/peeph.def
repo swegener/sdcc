@@ -300,14 +300,14 @@ replace {
 } by {
 	; Peephole 6a  - replaced jmp to rts with rts
 	rts
-} if optimizeReturn(), optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 replace {
 	bra	%5
 } by {
 	; Peephole 6b  - replaced jmp to rts with rts
 	rts
-} if if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
 
 replace restart {
 	psha

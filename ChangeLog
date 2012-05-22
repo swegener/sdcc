@@ -1,3 +1,8 @@
+2012-05-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/hc08/peeph.def:
+	  Allow disabling of tail-call and jump to return optimization.
+
 2012-05-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: Fixed inconsistent offsets for 16-bit register

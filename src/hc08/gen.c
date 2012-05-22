@@ -596,8 +596,6 @@ aopName (asmop * aop)
       return buf;
     case AOP_STK:
       return "STK";
-    case AOP_STR:
-      return "STR";
     default:
       sprintf (buf, "?%d", aop->type);
       return buf;
@@ -609,6 +607,7 @@ aopName (asmop * aop)
 
 /*--------------------------------------------------------------------------*/
 /* loadRegFromAop - Load register reg from logical offset loffset of aop.   */
+/*                  For multi-byte registers, loffset is of the lsb reg.    */
 /*--------------------------------------------------------------------------*/
 static void
 loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
@@ -766,7 +765,7 @@ forceload:
         }
       if (aop->type == AOP_REG && loffset < aop->size)
         transferRegReg (aop->aopu.aop_reg[loffset], hc08_reg_h, TRUE);
-      else if ((loffset - 1 >= 0 || aop->type == AOP_LIT) && (aop->type == AOP_LIT || aop->type == AOP_IMMD || IS_S08 && aop->type == AOP_EXT)) /* TODO: Allow negative loffset - 1 */
+      else if (!(aop->op && isOperandVolatile (aop->op, FALSE)) &&  (loffset - 1 >= 0 || aop->type == AOP_LIT) && (aop->type == AOP_LIT || aop->type == AOP_IMMD || IS_S08 && aop->type == AOP_EXT)) /* TODO: Allow negative loffset - 1 */
         {
           bool pushedx = FALSE;
           if (!hc08_reg_x->isFree)
@@ -816,12 +815,12 @@ forceload:
         transferRegReg (hc08_reg_xa, hc08_reg_hx, FALSE);
       else if (aop->type == AOP_DIR || IS_S08 && aop->type == AOP_EXT)
         {
-          if (aop->size > (loffset + 1))
+          if (aop->size >= (loffset + 2))
             {
-              emitcode ("ldhx", "%s", aopAdrStr (aop, loffset + 1, TRUE));
+              emitcode ("ldhx", "%s", aopAdrStr (aop, loffset, TRUE));
               regalloc_dry_run_cost += (aop->type == AOP_DIR ? 2 : 3);
             }
-          else
+          else 
             {
               loadRegFromConst (hc08_reg_h, zero);
               loadRegFromAop (hc08_reg_x, aop, loffset);
@@ -917,6 +916,7 @@ forceStackedAop (asmop * aop, bool copyOrig)
 
 /*--------------------------------------------------------------------------*/
 /* storeRegToAop - Store register reg to logical offset loffset of aop.     */
+/*                 For multi-byte registers, loffset is of the lsb reg.     */
 /*--------------------------------------------------------------------------*/
 static void
 storeRegToAop (reg_info *reg, asmop * aop, int loffset)
@@ -947,15 +947,6 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
   if (aop->stacked && aop->stk_aop[loffset])
     {
       storeRegToAop (reg, aop->stk_aop[loffset], 0);
-      return;
-    }
-
-  if (aop->type == AOP_STR)
-    {
-      if (loffset == 0)
-        transferRegReg (reg, hc08_reg_x, FALSE);
-      else if (loffset == 1)
-        transferRegReg (reg, hc08_reg_h, FALSE);
       return;
     }
 
@@ -1011,7 +1002,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
     case HX_IDX:
       if (aop->type == AOP_DIR || IS_S08 && aop->type == AOP_EXT)
         {
-          emitcode ("sthx", "%s", aopAdrStr (aop, loffset + 1, TRUE));
+          emitcode ("sthx", "%s", aopAdrStr (aop, loffset, TRUE));
           regalloc_dry_run_cost += (aop->type == AOP_DIR ? 2 : 3);;
         }
       else if (IS_AOP_XA (aop))
@@ -2205,21 +2196,7 @@ aopOp (operand *op, iCode * ic, bool result)
           return;
         }
 
-//      printf("checking ruonly\n");
-#if 1
-      if (sym->ruonly)
-        {
-          unsigned i;
-
-          sym->aop = op->aop = aop = newAsmop (AOP_STR);
-          aop->size = getSize (sym->type);
-          for (i = 0; i < fReturnSizeHC08; i++)
-            aop->aopu.aop_str[i] = fReturn2[i];
-          aop->op = op;
-          aop->isaddr = op->isaddr;
-          return;
-        }
-#endif
+       wassertl (!sym->ruonly, "sym->ruonly not supported");
 
        if (regalloc_dry_run)     // Todo: Handle dummy iTemp correctly
         {
@@ -2422,13 +2399,13 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 {
   char *s = buffer;
   char *rs;
-  int offset = aop->size - 1 - loffset;
+  int offset = aop->size - 1 - loffset - (bit16 ? 1 : 0);
 
   /* offset is greater than
      size then zero */
   if (loffset > (aop->size - 1) && aop->type != AOP_LIT)
     return zero;
-
+  
   /* depending on type */
   switch (aop->type)
     {
@@ -2436,17 +2413,9 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       return zero;
 
     case AOP_IMMD:
-      if (aop->aopu.aop_immd.from_cast_remat && (loffset == (aop->size - 1)))
+      if (loffset)
         {
-          sprintf (s, "%s", aop->aopu.aop_immd.aop_immd2);
-        }
-      else if (bit16)
-        {
-          sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
-        }
-      else if (loffset)
-        {
-          if (loffset != 1)
+          if (loffset > 1)
             sprintf (s, "#(%s >> %d)", aop->aopu.aop_immd.aop_immd1, loffset * 8);
           else
             sprintf (s, "#>%s", aop->aopu.aop_immd.aop_immd1);
@@ -2484,13 +2453,9 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 
     case AOP_LIT:
       if (bit16)
-        return aopLiteralLong (aop->aopu.aop_lit, /*loffset */ 0, 2); /* And here seems ot be a workaround for the weird loffset */
+        return aopLiteralLong (aop->aopu.aop_lit, loffset, 2);
       else
         return aopLiteral (aop->aopu.aop_lit, loffset);
-
-    case AOP_STR:
-      aop->coff = offset;
-      return aop->aopu.aop_str[loffset];
 
     case AOP_SOF:
       if (!regalloc_dry_run && hc08_reg_hx->aop == &tsxaop)
@@ -5099,7 +5064,7 @@ genCmp (iCode * ic, iCode * ifx)
       && ((AOP_TYPE (right) == AOP_LIT) || ((AOP_TYPE (right) == AOP_DIR || IS_S08 && AOP_TYPE (right) == AOP_EXT) && (AOP_SIZE (right) == 2))) && (hc08_reg_h->isDead && hc08_reg_x->isDead || IS_AOP_HX (AOP (left))))
     {
       loadRegFromAop (hc08_reg_hx, AOP (left), 0);
-      emitcode ("cphx", "%s", aopAdrStr (AOP (right), 1, TRUE));
+      emitcode ("cphx", "%s", aopAdrStr (AOP (right), 0, TRUE));
       regalloc_dry_run_cost += (AOP_TYPE (right) == AOP_DIR ? 2 : 3);
       hc08_freeReg (hc08_reg_hx);
     }
@@ -5257,7 +5222,7 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
       && ((AOP_TYPE (right) == AOP_LIT) || ((AOP_TYPE (right) == AOP_DIR || IS_S08 && AOP_TYPE (right) == AOP_EXT) && (AOP_SIZE (right) == 2))) && hc08_reg_h->isDead && hc08_reg_x->isDead)
     {
       loadRegFromAop (hc08_reg_hx, AOP (left), 0);
-      emitcode ("cphx", "%s", aopAdrStr (AOP (right), 1, TRUE));
+      emitcode ("cphx", "%s", aopAdrStr (AOP (right), 0, TRUE));
       regalloc_dry_run_cost += (AOP_TYPE (right) == AOP_DIR ? 2 : 3);
       hc08_freeReg (hc08_reg_hx);
     }
@@ -8346,7 +8311,7 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
   /* if bit then unpack */
   if (IS_BITVAR (retype))
     genUnpackBits (result, rightval, ifx);
-  else if (!pi && !ifx && size == 2 && IS_S08 && (IS_AOP_HX (AOP (result)) || AOP_TYPE (result) == AOP_IMMD || AOP_TYPE (result) == AOP_EXT)) /* Todo: Use this for bigger sizes, too */
+  else if (!pi && !ifx && size == 2 && IS_S08 && (IS_AOP_HX (AOP (result)) || AOP_TYPE (result) == AOP_EXT)) /* Todo: Use this for bigger sizes, too */
     {
       loadRegIndexed (hc08_reg_hx, rightval, NULL);
       storeRegToAop (hc08_reg_hx, AOP (result), 0);
@@ -9048,11 +9013,11 @@ genAssign (iCode * ic)
   offset = size - 1;
   while (size)
     {
-      if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead && (offset - 1 == 0)/* TODO: Allow other offsets */ &&
+      if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
         (AOP_TYPE (right) == AOP_IMMD || AOP_TYPE (right) == AOP_LIT ||IS_S08 && AOP_TYPE (right) == AOP_EXT) &&
-        (AOP_TYPE (result) == AOP_IMMD || IS_S08 && AOP_TYPE (result) == AOP_EXT))
+        (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
         {
-          loadRegFromAop (hc08_reg_hx, AOP (right), offset - 1);/* loadregfromaop is broken for offsets != 0 */
+          loadRegFromAop (hc08_reg_hx, AOP (right), offset - 1);
           storeRegToAop (hc08_reg_hx, AOP (result), offset - 1);
           offset -= 2;
           size -= 2;
@@ -9268,11 +9233,11 @@ genCast (iCode * ic)
           offset++;
           size--;
         }
-      else if ((size > 2 || size >= 2 && !signExtend) && hc08_reg_h->isDead && hc08_reg_x->isDead && /* TODO: Allow other offsets! */ offset == 0 &&
+      else if ((size > 2 || size >= 2 && !signExtend) && hc08_reg_h->isDead && hc08_reg_x->isDead && 
         (AOP_TYPE (right) == AOP_IMMD || IS_S08 && AOP_TYPE (right) == AOP_EXT) &&
-        (AOP_TYPE (result) == AOP_IMMD || IS_S08 && AOP_TYPE (result) == AOP_EXT))
+        (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
         {
-          loadRegFromAop (hc08_reg_hx, AOP (right), offset); /* Broken for offsets other than 0! */
+          loadRegFromAop (hc08_reg_hx, AOP (right), offset);
           storeRegToAop (hc08_reg_hx, AOP (result), offset);
           offset += 2;
           size -= 2;

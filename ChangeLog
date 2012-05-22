@@ -1,3 +1,9 @@
+2012-05-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Fixed inconsistent offsets for 16-bit register
+	  accesses. Removed broken and unused AOP_STR type. Prohibit loading
+	  h via hx from volatile operands.
+
 2012-05-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/memory.c,

@@ -1,9 +1,14 @@
+2012-05-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Preparations for further pointer offset
+	   optimizations
+
 2012-05-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/hc08/peeph.def:
 	  Allow disabling of tail-call and jump to return optimization.
 
-2012-05-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2012-05-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: Fixed inconsistent offsets for 16-bit register
 	  accesses. Removed broken and unused AOP_STR type. Prohibit loading

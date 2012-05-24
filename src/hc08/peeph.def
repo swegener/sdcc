@@ -166,7 +166,7 @@ replace {
 %1:
 } if labelInRange(), labelRefCountChange(%1 -1)
 
-replace {
+replace restart {
 	jmp	%5
 } by {
 	; Peephole 3	- shortened jmp to bra
@@ -353,11 +353,21 @@ replace {
 %1:
 } if labelRefCountChange(%1 -1)
 
-replace {
+replace restart {
         bra     %1
 %1:
 } by {
         ; Peephole 9c   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	bra     %1
+%2:
+%1:
+} by {
+	; Peephole 9d   - eliminated branch
+%2:
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -386,13 +396,13 @@ replace {
 }
 
 // should be one of the last peepholes
-replace{
+replace restart {
 %1:
 } by {
 	; Peephole 500    removed redundant label %1
 } if labelRefCount(%1 0)
 
-replace{
+replace restart {
 	jsr	%1
 	rts
 } by {

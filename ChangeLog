@@ -1,3 +1,8 @@
+2012-05-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/peeph.def:
+	  Impürove elimination of branches.
+
 2012-05-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: added r3ka and s08 to installer

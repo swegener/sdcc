@@ -866,9 +866,11 @@ replace restart {
 
 replace restart {
 	jp	%1
+%2:
 %1:
 } by {
    ; peephole 65a eliminated jump.
+%2:
 %1:
 } if labelRefCountChange(%1 -1)
 

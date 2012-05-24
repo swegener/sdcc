@@ -524,6 +524,21 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       break;
     }
 
+  // bit instructions do not disturb a.
+  if(!IS_GB && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) && (IS_OP_LITERAL(left) && IS_TRUE_SYMOP (IC_RIGHT(ic)) || IS_OP_LITERAL(right) && IS_TRUE_SYMOP (left)))
+    {
+      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
+      for(int i = 0; i < getSize(operandType(result)); i++)
+        {
+          unsigned char byte = (ulFromVal (OP_VALUE (litop)) >> (i * 8) & 0xff);
+          if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
+            goto nobit;
+        }
+      //std::cout << "Bit: Accepting at " << i << ", " << ic->key << "(" << int(ic->op) << ")\n";
+      return(true);
+    }
+  nobit:
+
   if(!result_in_A && !input_in_A)
     {
       // Variable in A is not used by this instruction
@@ -548,20 +563,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       //if(i == 15) std::cout << "Not Used: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
       return(false);
     }
-
-  // bit instructions do not distrub a.
-  if(!IS_GB && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) && (IS_OP_LITERAL(left) && IS_TRUE_SYMOP (IC_RIGHT(ic)) || IS_OP_LITERAL(right) && IS_TRUE_SYMOP (IC_LEFT(ic))))
-    {
-      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
-      for(int i = 0; i < getSize(operandType(result)); i++)
-        {
-          unsigned char byte = (ulFromVal (OP_VALUE (litop)) >> (i * 8) & 0xff);
-          if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
-            goto nobit;
-        }
-      return(true);
-    }
-  nobit:
 
   // Last use of operand in A.
   const std::set<var_t> &dying = G[i].dying;
@@ -1081,6 +1082,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   if(!inst_sane(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
+  if(ic->generated)
+    return(0.0f);
+
   if(!Ainst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
@@ -1092,9 +1096,6 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
 
   if(OPTRALLOC_IY && !IYinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
-
-  if(ic->generated)
-    return(0.0f);
 
   if(OPTRALLOC_EXACT_COST)
     {
@@ -1229,7 +1230,7 @@ template <class G_t, class I_t>
 static bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar)
 {
   // Can check for Ainst_ok() since A only contains 1-byte variables.
-  if(!Ainst_ok(a, i, G, I))
+  if(!G[i].ic->generated && !Ainst_ok(a, i, G, I))
     return(true);
 
   if(local_assignment_insane(a, I, lastvar))

@@ -7014,12 +7014,16 @@ genAnd (const iCode * ic, iCode * ifx)
           emit2 ("scf");
           regalloc_dry_run_cost += 1;
         }
+      /*else if(AOP_TYPE (left) == AOP_IY && !IS_GB && isLiteralBit (lit & 0xff) >= 0)
+        {
+          emit2 ("bit %d, %s", isLiteralBit (bytelit), aopGet (AOP (left), offset, FALSE));
+        }*/
       while (sizel--)
         {
           if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
             {
               if (isLiteralBit (bytelit) >= 0 && ifx
-                  && (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_ACC || AOP_TYPE (left) == AOP_REG
+                  && (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_ACC || AOP_TYPE (left) == AOP_IY || AOP_TYPE (left) == AOP_REG
                       && AOP (left)->aopu.aop_reg[0]->rIdx != IYL_IDX))
                 {
                   if (!regalloc_dry_run)

@@ -493,7 +493,9 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   const i_assignment_t &ia = a.i_assignment;
 
-  const operand *left = IC_LEFT(ic);
+  const operand *const left = IC_LEFT(ic);
+  const operand *const right = IC_RIGHT(ic);
+  const operand *const result = IC_RESULT(ic);
 
   if(ia.registers[REG_A][1] < 0)
     return(true);	// Register A not in use.
@@ -518,19 +520,19 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       input_in_A = operand_in_reg(IC_JTCOND(ic), REG_A, ia, i, G);
       break;
     default:
-      input_in_A = operand_in_reg(IC_LEFT(ic), REG_A, ia, i, G) || operand_in_reg(IC_RIGHT(ic), REG_A, ia, i, G);
+      input_in_A = operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(right, REG_A, ia, i, G);
       break;
     }
 
   if(!result_in_A && !input_in_A)
     {
       // Variable in A is not used by this instruction
-      if(ic->op == '+' && IS_ITEMP (IC_LEFT (ic)) && IS_ITEMP (IC_RESULT (ic)) && IS_OP_LITERAL (IC_RIGHT (ic)) &&
-          ulFromVal (OP_VALUE (IC_RIGHT (ic))) == 1 &&
-          OP_KEY (IC_RESULT (ic)) == OP_KEY (IC_LEFT (ic)))
+      if(ic->op == '+' && IS_ITEMP (IC_LEFT(ic)) && IS_ITEMP (IC_RESULT(ic)) && IS_OP_LITERAL (right) &&
+          ulFromVal (OP_VALUE (IC_RIGHT(ic))) == 1 &&
+          OP_KEY (IC_RESULT(ic)) == OP_KEY (IC_LEFT(ic)))
         return(true);
 
-      if((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) && isOperandEqual(IC_RESULT(ic), IC_RIGHT(ic)))
+      if((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) && isOperandEqual(result,right))
         return(true);
 
       if(ic->op == GOTO || ic->op == LABEL)
@@ -547,13 +549,27 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       return(false);
     }
 
+  // bit instructions do not distrub a.
+  if(!IS_GB && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) && (IS_OP_LITERAL(left) && IS_TRUE_SYMOP (IC_RIGHT(ic)) || IS_OP_LITERAL(right) && IS_TRUE_SYMOP (IC_LEFT(ic))))
+    {
+      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
+      for(int i = 0; i < getSize(operandType(result)); i++)
+        {
+          unsigned char byte = (ulFromVal (OP_VALUE (litop)) >> (i * 8) & 0xff);
+          if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
+            goto nobit;
+        }
+      return(true);
+    }
+  nobit:
+
   // Last use of operand in A.
   const std::set<var_t> &dying = G[i].dying;
   if(input_in_A && (result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end()))
     {
       if(ic->op != IFX &&
         ic->op != RETURN &&
-        !((ic->op == RIGHT_OP || ic->op == LEFT_OP) && (IS_OP_LITERAL(IC_RIGHT(ic)) || operand_in_reg(IC_RIGHT(ic), REG_A, ia, i, G))) &&
+        !((ic->op == RIGHT_OP || ic->op == LEFT_OP) && (IS_OP_LITERAL(right) || operand_in_reg(right, REG_A, ia, i, G))) &&
         !((ic->op == '=' || ic->op == CAST) && !(IY_RESERVED && POINTER_SET(ic))) &&
         !IS_BITWISE_OP (ic) &&
         !(ic->op == '~') &&
@@ -578,7 +594,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       !POINTER_GET(ic) &&
       ic->op != '+' &&
       ic->op != '-' &&
-      (ic->op != '*' || !IS_OP_LITERAL(IC_LEFT(ic)) && !IS_OP_LITERAL(IC_RIGHT(ic))) &&
+      (ic->op != '*' || !IS_OP_LITERAL(IC_LEFT(ic)) && !IS_OP_LITERAL(right)) &&
       !IS_BITWISE_OP(ic) &&
       ic->op != '=' &&
       ic->op != EQ_OP &&
@@ -588,7 +604,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       ic->op != CALL &&
       ic->op != PCALL &&
       ic->op != GETHBIT &&
-      !((ic->op == LEFT_OP || ic->op == RIGHT_OP) && IS_OP_LITERAL(IC_RIGHT(ic))))
+      !((ic->op == LEFT_OP || ic->op == RIGHT_OP) && IS_OP_LITERAL(right)))
     {
       //std::cout << "First use: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
       return(false);

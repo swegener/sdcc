@@ -3,6 +3,7 @@
 	* support/scripts/sdcc.nsi: added r3ka and s08 to installer
 	* support/sdbinutils/binutils/configure.in,
 	* support/sdbinutils/binutils/configure: fix bug #3527589
+	* src/SDCCcse.c (newCseDef): fix bug #3528899
 
 2012-05-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -46,7 +46,7 @@ newCseDef (operand * sym, iCode * ic)
   cdp->fromGlobal = 0;
   cdp->fromAddrTaken = 0;
 
-  if (ic->op!=IF && ic->op!=JUMPTABLE)
+  if (ic->op != IF && ic->op != JUMPTABLE)
     {
       if (ic->op != ADDRESS_OF && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
         {
@@ -54,7 +54,8 @@ newCseDef (operand * sym, iCode * ic)
           if (isOperandGlobal (IC_LEFT (ic)))
             {
               map = SPEC_OCLS (getSpec (operandType (IC_LEFT (ic))));
-              cdp->fromGlobal |= (1 << map->ptrType);
+              if (map)
+                cdp->fromGlobal |= (1 << map->ptrType);
             }
           cdp->fromAddrTaken |= OP_SYMBOL (IC_LEFT (ic))->addrtaken;
         }
@@ -64,7 +65,8 @@ newCseDef (operand * sym, iCode * ic)
           if (isOperandGlobal (IC_RIGHT (ic)))
             {
               map = SPEC_OCLS (getSpec (operandType (IC_RIGHT (ic))));
-              cdp->fromGlobal |= (1 << map->ptrType);
+              if (map)
+                cdp->fromGlobal |= (1 << map->ptrType);
             }
           cdp->fromAddrTaken |= OP_SYMBOL (IC_RIGHT (ic))->addrtaken;
         }

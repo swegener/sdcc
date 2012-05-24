@@ -756,7 +756,15 @@ replace restart {
 	; peephole 65 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
-// A peephole that makes the code longer. Let's hope it's worth it in speed gain and furhter optimization potential.
+replace restart {
+	jp	%1
+%1:
+} by {
+   ; peephole 65a eliminated jump.
+%1:
+} if labelRefCountChange(%1 -1)
+
+// A peephole that makes the code longer. Let's hope it's worth it in speed gain and further optimization potential.
 replace restart {
 	ld	a,#0x00
 %1:

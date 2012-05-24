@@ -1,3 +1,7 @@
+2012-05-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/scripts/sdcc.nsi: added r3ka and s08 to installer
+
 2012-05-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: Preparations for further pointer offset

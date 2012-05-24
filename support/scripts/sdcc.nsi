@@ -594,7 +594,7 @@ ${Section} "SDCC library sources" SEC21
 #  File "${DEV_ROOT}\lib\src\z180\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\r3ka"
-  File "${DEV_ROOT}\lib\src\r3k\*.s"
+  File "${DEV_ROOT}\lib\src\r3ka\*.s"
 #  File "${DEV_ROOT}\lib\src\r3ka\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\hc08"

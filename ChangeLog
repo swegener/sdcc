@@ -1,3 +1,7 @@
+2012-05-25 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx: corrected #pragma configure to #pragma config
+
 2012-05-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/hc08/gen.c (genPointerSet): fixed warning
@@ -1340,11 +1344,11 @@
 
 2012-03-16 Borut Razem <borut.razem AT gmail.com>
 
-	* sdcc.sln, src\sdcc.vcxproj, src\sdcc.vcxproj.filters,
-	  src\yacc.vcxproj:
+	* sdcc.sln, src/sdcc.vcxproj, src/sdcc.vcxproj.filters,
+	  src/yacc.vcxproj:
 	  project src renamed to sdcc, removed project yacc
-	* doc\sdccman.lyx, src\SDCCasm.c, src\SDCCicode.h,
-	  src\SDCCast.c, src\SDCCast.h, src\pic16\main.c:
+	* doc/sdccman.lyx, src/SDCCasm.c, src/SDCCicode.h,
+	  src/SDCCast.c, src/SDCCast.h, src/pic16/main.c:
 	  implemeted pragma config for pic16 target, solution
 	  of bug #3486890 - pic16 port config directive warning
 	* src/Makefile.in, src/sdcc.vcxproj:

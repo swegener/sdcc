@@ -46434,12 +46434,12 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-#pragma configure CP0=OFF,OSCS=ON,OSC=LP,BOR=ON,BORV=25,WDT=ON,WDTPS=128,CCP2MUX
+#pragma config CP0=OFF,OSCS=ON,OSC=LP,BOR=ON,BORV=25,WDT=ON,WDTPS=128,CCP2MUX
 =ON
 \end_layout
 
 \begin_layout LyX-Code
-#pragma configure STVR=ON 
+#pragma config STVR=ON 
 \end_layout
 
 \begin_layout Subsection

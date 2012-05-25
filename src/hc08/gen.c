@@ -8893,13 +8893,13 @@ genPointerSet (iCode * ic, iCode * pi)
   loadRegFromAop (hc08_reg_hx, AOP (result), 0);
   /* so hx now contains the address */
   aopOp (right, ic, FALSE);
+  size = AOP_SIZE (right);
 
   /* if bit then unpack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
     genPackBits ((IS_BITVAR (retype) ? retype : letype), right);
   else
     {
-      size = AOP_SIZE (right);
       offset = size;
 
       while (offset--)

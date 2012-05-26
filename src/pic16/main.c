@@ -167,68 +167,6 @@ enum {
   P_CONFIG
 };
 
-static char *
-check_config_string(const char *str)
-{
-  const char *begin, *p = str;
-  struct dbuf_s dbuf;
-  bool first = TRUE;
-
-  dbuf_init(&dbuf, 128);
-
-  do
-    {
-      if (first)
-        first = FALSE;
-      else
-        dbuf_append_char(&dbuf, ',');
-
-      if (',' == *p)
-        ++p;
-
-      if (isalpha(*p))
-        {
-          begin = p++;
-          while (isalnum(*p))
-            ++p;
-          dbuf_append(&dbuf, begin, p - begin);
-        }
-      else
-        goto error;
-
-      while (isspace(*p))
-        ++p;
-
-      if ('=' == *p)
-        dbuf_append_char(&dbuf, *p++);
-      else
-        goto error;
-
-      while (isspace(*p))
-        ++p;
-
-      if (isalnum(*p))
-        {
-          begin = p++;
-          while (isalnum(*p))
-            ++p;
-          dbuf_append(&dbuf, begin, p - begin);
-        }
-      else
-        goto error;
-
-      if (',' == *p)
-        ++p;
-    }
-  while ('\0' != *p);
-
-  return dbuf_detach_c_str(&dbuf);
-
-error:
-  dbuf_destroy(&dbuf);
-  return NULL;
-}
-
 static int
 do_pragma (int id, const char *name, const char *cp)
 {
@@ -247,7 +185,7 @@ do_pragma (int id, const char *name, const char *cp)
         reg_info *reg;
         symbol *sym;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_INT != token.type)
           {
             err = 1;
@@ -255,7 +193,7 @@ do_pragma (int id, const char *name, const char *cp)
           }
         stackPos = token.val.int_val;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_INT != token.type)
           {
             err = 1;
@@ -263,7 +201,7 @@ do_pragma (int id, const char *name, const char *cp)
           }
         stackLen = token.val.int_val;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_EOL != token.type)
           {
             err = 1;
@@ -272,7 +210,7 @@ do_pragma (int id, const char *name, const char *cp)
 
         if (stackLen < 1) {
           stackLen = 64;
-          fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
+          fprintf (stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
                   filename, lineno, stackLen, stackLen);
         }
 
@@ -301,19 +239,19 @@ do_pragma (int id, const char *name, const char *cp)
           }
         }
 
-        reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
-        addSet(&pic16_fix_udata, reg);
+        reg = newReg (REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
+        addSet (&pic16_fix_udata, reg);
 
-        reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
-        addSet(&pic16_fix_udata, reg);
+        reg = newReg (REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
+        addSet (&pic16_fix_udata, reg);
 
-        sym = newSymbol("stack", 0);
-        sprintf(sym->rname, "_%s", sym->name);
-        addSet(&publics, sym);
+        sym = newSymbol ("stack", 0);
+        sprintf (sym->rname, "_%s", sym->name);
+        addSet (&publics, sym);
 
-        sym = newSymbol("stack_end", 0);
-        sprintf(sym->rname, "_%s", sym->name);
-        addSet(&publics, sym);
+        sym = newSymbol ("stack_end", 0);
+        sprintf (sym->rname, "_%s", sym->name);
+        addSet (&publics, sym);
 
         initsfpnt = 1;    // force glue() to initialize stack/frame pointers */
       }
@@ -324,14 +262,14 @@ do_pragma (int id, const char *name, const char *cp)
       {
         absSym *absS;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_STR != token.type)
           goto code_err;
 
-        absS = Safe_calloc(1, sizeof(absSym));
-        sprintf(absS->name, "_%s", get_pragma_string(&token));
+        absS = Safe_calloc (1, sizeof (absSym));
+        sprintf (absS->name, "_%s", get_pragma_string (&token));
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_INT != token.type)
           {
           code_err:
@@ -341,7 +279,7 @@ do_pragma (int id, const char *name, const char *cp)
           }
         absS->address = token.val.int_val;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_EOL != token.type)
           {
             err = 1;
@@ -350,11 +288,11 @@ do_pragma (int id, const char *name, const char *cp)
 
         if ((absS->address % 2) != 0) {
           absS->address--;
-          fprintf(stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
-                  filename, lineno, absS->address);
+          fprintf (stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
+                   filename, lineno, absS->address);
         }
 
-        addSet(&absSymSet, absS);
+        addSet (&absSymSet, absS);
 //      fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
 //        __FILE__, __LINE__, symname, absS->address);
       }
@@ -370,18 +308,18 @@ do_pragma (int id, const char *name, const char *cp)
         sectName *snam;
         int found = 0;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_STR == token.type)
-          sectname = Safe_strdup(get_pragma_string(&token));
+          sectname = Safe_strdup (get_pragma_string (&token));
         else
           {
             err = 1;
             break;
           }
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_STR == token.type)
-          symname = get_pragma_string(&token);
+          symname = get_pragma_string (&token);
         else
           {
             //fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno);
@@ -391,24 +329,24 @@ do_pragma (int id, const char *name, const char *cp)
 
         while (symname)
           {
-            ssym = Safe_calloc(1, sizeof(sectSym));
-            ssym->name = Safe_calloc(1, strlen(symname) + 2);
-            sprintf(ssym->name, "%s%s", port->fun_prefix, symname);
+            ssym = Safe_calloc (1, sizeof (sectSym));
+            ssym->name = Safe_calloc (1, strlen (symname) + 2);
+            sprintf (ssym->name, "%s%s", port->fun_prefix, symname);
             ssym->reg = NULL;
 
-            addSet(&sectSyms, ssym);
+            addSet (&sectSyms, ssym);
 
-            nsym = newSymbol((char *)symname, 0);
+            nsym = newSymbol ((char *)symname, 0);
             strcpy(nsym->rname, ssym->name);
 
 #if 0
-            checkAddSym(&publics, nsym);
+            checkAddSym (&publics, nsym);
 #endif
 
             found = 0;
-            for (snam = setFirstItem(sectNames);snam;snam=setNextItem(sectNames))
+            for (snam = setFirstItem (sectNames); snam; snam = setNextItem (sectNames))
               {
-                if (!strcmp(sectname, snam->name))
+                if (!strcmp (sectname, snam->name))
                   {
                     found=1;
                     break;
@@ -417,23 +355,23 @@ do_pragma (int id, const char *name, const char *cp)
 
             if(!found)
               {
-                snam = Safe_calloc(1, sizeof(sectName));
-                snam->name = Safe_strdup(sectname);
+                snam = Safe_calloc (1, sizeof (sectName));
+                snam->name = Safe_strdup (sectname);
                 snam->regsSet = NULL;
 
-                addSet(&sectNames, snam);
+                addSet (&sectNames, snam);
               }
 
             ssym->section = snam;
 
 #if 0
-            fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
-               ssym->name, snam->name, snam);
+            fprintf (stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
+                     ssym->name, snam->name, snam);
 #endif
 
-            cp = get_pragma_token(cp, &token);
+            cp = get_pragma_token (cp, &token);
             if (TOKEN_STR == token.type)
-              symname = get_pragma_string(&token);
+              symname = get_pragma_string (&token);
             else if (TOKEN_EOL == token.type)
               symname = NULL;
             else
@@ -443,7 +381,7 @@ do_pragma (int id, const char *name, const char *cp)
               }
           }
 
-          Safe_free(sectname);
+          Safe_free (sectname);
       }
       break;
 
@@ -452,10 +390,10 @@ do_pragma (int id, const char *name, const char *cp)
       {
         const char *lmodule;
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_EOL != token.type)
           {
-            lmodule = get_pragma_string(&token);
+            lmodule = get_pragma_string (&token);
 
             /* lmodule can be:
              * c    link the C library
@@ -464,22 +402,22 @@ do_pragma (int id, const char *name, const char *cp)
              * debug    link the debug libary
              * anything else, will link as-is */
 
-            if(!strcmp(lmodule, "c"))
+            if(!strcmp (lmodule, "c"))
               libflags.want_libc = 1;
-            else if(!strcmp(lmodule, "math"))
+            else if(!strcmp (lmodule, "math"))
               libflags.want_libm = 1;
-            else if(!strcmp(lmodule, "io"))
+            else if(!strcmp (lmodule, "io"))
               libflags.want_libio = 1;
-            else if(!strcmp(lmodule, "debug"))
+            else if(!strcmp (lmodule, "debug"))
               libflags.want_libdebug = 1;
-            else if(!strcmp(lmodule, "ignore"))
+            else if(!strcmp (lmodule, "ignore"))
               libflags.ignore = 1;
             else
               {
                 if(!libflags.ignore)
                   {
-                    fprintf(stderr, "link library %s\n", lmodule);
-                    addSetHead(&libFilesSet, (char *)lmodule);
+                    fprintf (stderr, "link library %s\n", lmodule);
+                    addSetHead (&libFilesSet, (char *)lmodule);
                   }
               }
           }
@@ -489,7 +427,7 @@ do_pragma (int id, const char *name, const char *cp)
             break;
           }
 
-        cp = get_pragma_token(cp, &token);
+        cp = get_pragma_token (cp, &token);
         if (TOKEN_EOL != token.type)
           {
             err = 1;
@@ -500,39 +438,75 @@ do_pragma (int id, const char *name, const char *cp)
 
     case P_CONFIG:
       {
-        const char *str, *str_raw;
+        const char *begin;
         struct dbuf_s dbuf;
-        bool first = 1;
+        bool first = TRUE;
 
-        dbuf_init(&dbuf, 128);
-        dbuf_append_str(&dbuf, "CONFIG\t");
+        token.type = TOKEN_EOL; /* just to make the final error test happy */
+
+        dbuf_init (&dbuf, 128);
+        dbuf_append_str (&dbuf, "CONFIG\t");
 
         do
           {
-            cp = get_pragma_token(cp, &token);
-            if (TOKEN_EOL != token.type)
+            if (first)
+              first = FALSE;
+            else
               {
-                str_raw = get_pragma_string(&token);
-                if (str = check_config_string(str_raw))
-                  {
-                    if (!first)
-                      dbuf_append_char(&dbuf, ',');
-                    else
-                      first = 0;
-                    dbuf_append_str(&dbuf, str);
-                    dbuf_free(str);
-                  }
+                if (',' == *cp)
+                  ++cp;
                 else
-                  {
-                    dbuf_free(str);
-                    err = 1;
-                    break;
-                  }
-              }
-          }
-        while (TOKEN_EOL != token.type);
+                  goto error;
 
-        createConfigure(NULL, dbuf_detach_c_str(&dbuf));
+                dbuf_append_char (&dbuf, ',');
+              }
+
+
+            while (isspace (*cp))
+              ++cp;
+
+            if (isalpha (*cp))
+              {
+                begin = cp++;
+                while (isalnum (*cp))
+                  ++cp;
+                dbuf_append (&dbuf, begin, cp - begin);
+              }
+            else
+              goto error;
+
+            while (isspace (*cp))
+              ++cp;
+
+            if ('=' == *cp)
+              dbuf_append_char (&dbuf, *cp++);
+            else
+              goto error;
+
+            while (isspace (*cp))
+              ++cp;
+
+            if (isalnum (*cp))
+              {
+                begin = cp++;
+                while (isalnum (*cp))
+                  ++cp;
+                dbuf_append (&dbuf, begin, cp - begin);
+              }
+            else
+              goto error;
+
+            while (isspace (*cp))
+              ++cp;
+          }
+        while ('\0' != *cp);
+
+        createConfigure(NULL, dbuf_detach_c_str (&dbuf));
+        break;
+
+      error:
+        dbuf_destroy(&dbuf);
+        err = 1;
       }
       break;
 
@@ -541,20 +515,22 @@ do_pragma (int id, const char *name, const char *cp)
      and is temporarily disabled for 2.5.0 release */
     case P_INLINE:
       {
-        char *tmp = strtok((char *)NULL, WHITECOMMA);
+        char *tmp = strtok ((char *)NULL, WHITECOMMA);
 
-        while(tmp) {
-          addSet(&asmInlineMap, Safe_strdup( tmp ));
-          tmp = strtok((char *)NULL, WHITECOMMA);
-        }
-
-        {
-          char *s;
-
-          for(s = setFirstItem(asmInlineMap); s ; s = setNextItem(asmInlineMap)) {
-            debugf("inline asm: `%s'\n", s);
+        while (tmp)
+          {
+            addSet (&asmInlineMap, Safe_strdup ( tmp ));
+            tmp = strtok ((char *)NULL, WHITECOMMA);
           }
-        }
+
+          {
+            char *s;
+
+            for (s = setFirstItem (asmInlineMap); s ; s = setNextItem (asmInlineMap))
+              {
+                debugf ("inline asm: `%s'\n", s);
+              }
+          }
       }
       break;
 #endif  /* 0 */
@@ -564,12 +540,12 @@ do_pragma (int id, const char *name, const char *cp)
       break;
   }
 
-  get_pragma_token(cp, &token);
+  get_pragma_token (cp, &token);
 
   if (1 == err || token.type != TOKEN_EOL)
-    werror(W_BAD_PRAGMA_ARGUMENTS, name);
+    werror (W_BAD_PRAGMA_ARGUMENTS, name);
 
-  free_pragma_token(&token);
+  free_pragma_token (&token);
   return processed;
 }
 

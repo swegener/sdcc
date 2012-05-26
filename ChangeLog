@@ -1,3 +1,7 @@
+2012-05-26 Borut Razem <borut.razem AT gmail.com>
+
+	* src/pic16/main.c: allow space characters in #pragma config
+
 2012-05-25 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: corrected #pragma configure to #pragma config

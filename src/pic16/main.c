@@ -465,10 +465,10 @@ do_pragma (int id, const char *name, const char *cp)
             while (isspace (*cp))
               ++cp;
 
-            if (isalpha (*cp))
+            if (*cp == '_' || isalpha (*cp))
               {
                 begin = cp++;
-                while (isalnum (*cp))
+                while (*cp == '_' || isalnum (*cp))
                   ++cp;
                 dbuf_append (&dbuf, begin, cp - begin);
               }
@@ -486,10 +486,10 @@ do_pragma (int id, const char *name, const char *cp)
             while (isspace (*cp))
               ++cp;
 
-            if (isalnum (*cp))
+            if (*cp == '_' || isalnum (*cp))
               {
                 begin = cp++;
-                while (isalnum (*cp))
+                while (*cp == '_' || isalnum (*cp))
                   ++cp;
                 dbuf_append (&dbuf, begin, cp - begin);
               }

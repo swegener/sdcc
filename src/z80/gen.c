@@ -2107,6 +2107,15 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
               emit2 ("ld %s,a", _pairs[pairId].h);
               regalloc_dry_run_cost += 1;
             }
+          /* The Rabbit's cast to bool is a cheap way of zeroing h (similar to xor a, a for a for the Z80). */
+          else if (pairId == PAIR_HL && IS_RAB && aop->size - offset == 1 && !(aop->type == AOP_REG && (aop->aopu.aop_reg[offset]->rIdx == L_IDX || aop->aopu.aop_reg[offset]->rIdx == H_IDX)))
+            {
+              emit2 ("bool hl");
+              regalloc_dry_run_cost++;
+              if (!regalloc_dry_run)
+                emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
+              regalloc_dry_run_cost += ld_cost (ASMOP_L, aop);
+            }
           else
             {
               if (!regalloc_dry_run)

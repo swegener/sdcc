@@ -1,3 +1,8 @@
+2012-05-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use Rabbit's cast to bool instruction for zeroing h.
+
 2012-05-28 Borut Razem <borut.razem AT gmail.com>
 
 	* src/pic16/main.c: allow underscore characters in #pragma config
@@ -561,7 +566,7 @@
 	  Enable replacing division by power of two by conditional addition and shift (for hc08, z80, z180, gbz80 and r2k).
 	* src/z80/gen.c,
 	  src/mcs51/gen.c:
-	  Fortify a "/* I assume that […]" comment by an assertion that would have saved me some time.
+	  Fortify a "/* I assume that [\85]" comment by an assertion that would have saved me some time.
 
 2012-04-20 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -6820,7 +6825,7 @@
 2010-09-18 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/cmd.c:
-	  fixed warning: suggest explicit braces to avoid ambiguous ‘else’
+	  fixed warning: suggest explicit braces to avoid ambiguous \91else\92
 
 2010-09-18 Philipp Klaus Krause <pkk AT spth.de>
 

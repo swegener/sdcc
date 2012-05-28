@@ -1,7 +1,10 @@
 2012-05-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Use Rabbit's cast to bool instruction for zeroing h.
+	  Use Rabbit's cast to bool instruction for zeroing h,
+	  more efficient loading of pairs in shifts.
+	* src/z80/peep.c:
+	  Handle bool in instruction size calculations.
 
 2012-05-28 Borut Razem <borut.razem AT gmail.com>
 

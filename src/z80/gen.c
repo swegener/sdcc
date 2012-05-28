@@ -7580,7 +7580,7 @@ emitRsh2 (asmop * aop, int size, int is_signed)
 /* shiftR2Left2Result - shift right two bytes from left to result  */
 /*-----------------------------------------------------------------*/
 static void
-shiftR2Left2Result (const iCode * ic, operand * left, int offl, operand * result, int offr, int shCount, int is_signed)
+shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, int offr, int shCount, int is_signed)
 {
   int size = 2;
   symbol *tlbl;
@@ -7613,8 +7613,13 @@ shiftR2Left2Result (const iCode * ic, operand * left, int offl, operand * result
       return;
     }
 
-  movLeft2Result (left, offl, result, offr, 0);
-  movLeft2Result (left, offl + 1, result, offr + 1, 0);
+  if (isPair (AOP (result)) && !offr)
+    fetchPairLong (getPairId (AOP (result)), AOP(left), ic, offl);
+  else
+    {
+      movLeft2Result (left, offl, result, offr, 0);
+      movLeft2Result (left, offl + 1, result, offr + 1, 0);
+    }
 
   if (shCount == 0)
     return;
@@ -7665,12 +7670,14 @@ shiftR2Left2Result (const iCode * ic, operand * left, int offl, operand * result
 /* shiftL2Left2Result - shift left two bytes from left to result   */
 /*-----------------------------------------------------------------*/
 static void
-shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int shCount)
+shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCount, const iCode *ic)
 {
   if (sameRegs (AOP (result), AOP (left)) && ((offl + MSB16) == offr))
     {
       wassert (0);
     }
+  else if (isPair (AOP (result)) && !offr)
+    fetchPairLong (getPairId (AOP (result)), AOP(left), ic, offl);
   else
     {
       /* Copy left into result */
@@ -7843,7 +7850,7 @@ shiftL1Left2Result (operand * left, int offl, operand * result, int offr, int sh
 /* genlshTwo - left shift two bytes by known amount                */
 /*-----------------------------------------------------------------*/
 static void
-genlshTwo (operand * result, operand * left, int shCount)
+genlshTwo (operand *result, operand *left, int shCount, const iCode *ic)
 {
   int size = AOP_SIZE (result);
 
@@ -7879,7 +7886,7 @@ genlshTwo (operand * result, operand * left, int shCount)
         }
       else
         {
-          shiftL2Left2Result (left, LSB, result, LSB, shCount);
+          shiftL2Left2Result (left, LSB, result, LSB, shCount, ic);
         }
     }
 }
@@ -7897,7 +7904,7 @@ genlshOne (operand * result, operand * left, int shCount)
 /* genLeftShiftLiteral - left shifting by known count              */
 /*-----------------------------------------------------------------*/
 static void
-genLeftShiftLiteral (operand * left, operand * right, operand * result, const iCode * ic)
+genLeftShiftLiteral (operand * left, operand * right, operand * result, const iCode *ic)
 {
   int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   int size;
@@ -7924,7 +7931,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, const iC
           genlshOne (result, left, shCount);
           break;
         case 2:
-          genlshTwo (result, left, shCount);
+          genlshTwo (result, left, shCount, ic);
           break;
         case 4:
           wassertl (0, "Shifting of longs is currently unsupported");

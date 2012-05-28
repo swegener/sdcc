@@ -895,6 +895,9 @@ int z80instructionSize(lineNode *pl)
   
   if(IS_R3KA && (ISINST(pl->line, "uma") || ISINST(pl->line, "ums")))
     return(2);
+
+  if(IS_RAB && ISINST(pl->line, "bool"))
+    return(!strncmp(op1start, "hl", 2) ? 1 : 2);
   
   if(ISINST(pl->line, ".db"))
     {

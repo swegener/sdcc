@@ -1,5 +1,10 @@
 2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  Fix for surviving pair in bitfield write.
+
+2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c,
 	  src/hc08/gen.c:
 	  Added assertions to debug rematerialization issues.

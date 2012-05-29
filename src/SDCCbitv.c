@@ -97,6 +97,7 @@ bitVectSetBit (bitVect * bvp, int pos)
   int byteSize;
   int offset;
 
+  assert (pos>=0);
   /* if set is null then allocate it */
   if (!bvp)
     bvp = newBitVect (bitVectDefault);	/* allocate for twice the size */
@@ -119,6 +120,7 @@ bitVectUnSetBit (const bitVect *bvp, int pos)
   int byteSize;
   int offset;
 
+  assert (pos>=0);
   if (!bvp)
     return;
 
@@ -140,6 +142,7 @@ bitVectBitValue (const bitVect *bvp, int pos)
   int byteSize;
   int offset;
 
+  assert (pos>=0);
   if (!bvp)
     return 0;
 

@@ -61,7 +61,7 @@ _G;
 /* Shared with gen.c */
 int hc08_ptrRegReq;             /* one byte pointer register required */
 
-/* 8051 registers */
+/* 6808 registers */
 reg_info regshc08[] =
 {
 
@@ -2789,6 +2789,44 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
   hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
 }
 
+/*------------------------------------------------------------------*/
+/* moveSendToCall - move SEND to immediately precede its CALL/PCALL */
+/*------------------------------------------------------------------*/
+static iCode *
+moveSendToCall (iCode *sic, eBBlock *ebp)
+{
+  iCode * prev = sic->prev;
+  iCode * sic2 = NULL;
+  iCode * cic;
+  
+  /* Go find the CALL/PCALL */
+  cic = sic;
+  while (cic && cic->op != CALL && cic->op != PCALL)
+    cic = cic->next;
+  if (!cic)
+    return sic;
+
+  /* Is there a second SEND? If so, we'll need to move it too. */
+  if (sic->next->op == SEND)
+    sic2 = sic->next;
+  
+  /* relocate the SEND(s) */
+  remiCodeFromeBBlock (ebp, sic);
+  addiCodeToeBBlock (ebp, sic, cic);
+  if (sic2)
+    {
+      remiCodeFromeBBlock (ebp, sic2);
+      addiCodeToeBBlock (ebp, sic2, cic);
+    }
+
+  /* Return the iCode to continue processing at. */
+  if (prev)
+    return prev->next;
+  else
+    return ebp->sch;
+}
+
+
 /*-----------------------------------------------------------------*/
 /* packRegisters - does some transformations to reduce register    */
 /*                   pressure                                      */
@@ -2820,7 +2858,14 @@ packRegisters (eBBlock ** ebpp, int blockno)
   for (ic = ebp->sch; ic; ic = ic->next)
     {
       //packRegsForLiteral (ic);
-
+      
+      /* move SEND to immediately precede its CALL/PCALL */
+      if (ic->op == SEND && ic->next &&
+          ic->next->op != CALL & ic->next->op != PCALL)
+        {
+          ic = moveSendToCall (ic, ebp);
+        }
+      
       /* if this is an itemp & result of an address of a true sym
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&

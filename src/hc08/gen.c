@@ -3253,8 +3253,8 @@ genSend (set *sendSet)
       if (send1->argreg > send2->argreg)
         {
           iCode * sic = send1;
-          send2 = send1;
-          send1 = sic;
+          send1 = send2;
+          send2 = sic;
         }
       aopOp (IC_LEFT (send1), send1, FALSE);
       aopOp (IC_LEFT (send2), send2, FALSE);

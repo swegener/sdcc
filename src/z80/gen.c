@@ -6619,6 +6619,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
            AOP_TYPE (right) == AOP_IY ||
            AOP_TYPE (right) == AOP_STK ||
            AOP_TYPE (right) == AOP_EXSTK ||
+           AOP_TYPE (right) == AOP_IMMD ||
            AOP_IS_PAIRPTR (right, PAIR_HL) || AOP_IS_PAIRPTR (right, PAIR_IX) || AOP_IS_PAIRPTR (right, PAIR_IY))
     {
       while (size--)

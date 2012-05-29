@@ -1279,6 +1279,8 @@ aopForRemat (symbol * sym)
   int val = 0;
   struct dbuf_s dbuf;
 
+  wassert(ic);
+
   for (;;)
     {
       if (ic->op == '+')

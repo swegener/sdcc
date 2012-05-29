@@ -1,3 +1,9 @@
+2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  src/hc08/gen.c:
+	  Added assertions to debug rematerialization issues.
+
 2012-05-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c (moveSendToCall, packRegisters): move SEND iCodes

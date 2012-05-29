@@ -1999,6 +1999,12 @@ aopForRemat (symbol * sym)
   int ptr_type = 0;
   int val = 0;
 
+  if (!ic)
+    {
+      fprintf (stderr, "Symbol %s to be rematerialized, but has no rematiCode.\n", sym->name);
+      wassert (0);
+    }
+
   for (;;)
     {
       if (ic->op == '+')

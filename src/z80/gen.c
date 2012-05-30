@@ -9434,7 +9434,7 @@ genAssign (const iCode * ic)
           offset++;
         }
     }
-  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead(PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
+  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead (PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
     {
       /* Special case.  Load into a and d, then load out. */
       cheapMove (ASMOP_A, 0, AOP (right), 0);
@@ -9442,7 +9442,7 @@ genAssign (const iCode * ic)
       cheapMove (AOP (result), 0, ASMOP_A, 0);
       cheapMove (AOP (result), 1, ASMOP_E, 0);
     }
-  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead(PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
+  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead (PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
     {
       /* Special case - simple memcpy */
       if (!regalloc_dry_run)

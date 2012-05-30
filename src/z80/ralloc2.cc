@@ -539,10 +539,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     }
   nobit:
 
+  const std::set<var_t> &dying = G[i].dying;
+
   if(ic->op == GET_VALUE_AT_ADDRESS)
-    return(!IS_BITVAR(getSpec(operandType (result))));
+    return(result_in_A || !IS_BITVAR(getSpec(operandType (result))));
   if(ic->op == '=' && POINTER_SET (ic))
-    return(!(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
+    return(dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end() || !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
 
   if(1)
     {
@@ -575,7 +577,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     }
 
   // Last use of operand in A.
-  const std::set<var_t> &dying = G[i].dying;
   if(input_in_A && (result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end()))
     {
       if(ic->op != IFX &&

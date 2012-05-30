@@ -1,5 +1,12 @@
 2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix handling of carry in 16-bit shift rotate instructions.
+	* src/z80/gen.c:
+	  Better 16 bit signed comparison for z80 related (except gbz80).
+
+2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c:
 	  Allow result of GET_VALUE_AT_ADDRESS in A for z80-related ports.
 

@@ -597,6 +597,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       ic->op != '-' &&
       (ic->op != '*' || !IS_OP_LITERAL(IC_LEFT(ic)) && !IS_OP_LITERAL(right)) &&
       !IS_BITWISE_OP(ic) &&
+      ic->op != GET_VALUE_AT_ADDRESS &&
       ic->op != '=' &&
       ic->op != EQ_OP &&
       ic->op != '<' &&

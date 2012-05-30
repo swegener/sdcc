@@ -1,6 +1,11 @@
 2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
+	  Allow result of GET_VALUE_AT_ADDRESS in A for z80-related ports.
+
+2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
 	  Improve storing of literals to stack for Rabbits.
 
 2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>

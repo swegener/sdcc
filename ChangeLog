@@ -1,5 +1,12 @@
 2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/ralloc.h,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  More flexible handling of a during pointer access in z80-related ports.
+
+2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/peeph-r2k.def:
 	  Fix invalid stack-relative increment.
 	* src/z80/gen.c:

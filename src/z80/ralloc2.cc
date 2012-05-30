@@ -539,7 +539,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     }
   nobit:
 
-  if(!result_in_A && !input_in_A)
+  if(ic->op == GET_VALUE_AT_ADDRESS)
+    return(!IS_BITVAR(getSpec(operandType (result))));
+  if(ic->op == '=' && POINTER_SET (ic))
+    return(!(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
+
+  if(1)
     {
       // Variable in A is not used by this instruction
       if(ic->op == '+' && IS_ITEMP (IC_LEFT(ic)) && IS_ITEMP (IC_RESULT(ic)) && IS_OP_LITERAL (right) &&
@@ -547,21 +552,26 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
           OP_KEY (IC_RESULT(ic)) == OP_KEY (IC_LEFT(ic)))
         return(true);
 
-      if((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) && isOperandEqual(result,right))
+      if((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) && isOperandEqual (result, right))
+        return(true);
+
+      if((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) && !(ic->op == CAST && IS_BOOL (operandType (result))) &&
+        (operand_in_reg(right, REG_A, ia, i, G) || operand_in_reg(right, REG_B, ia, i, G) || operand_in_reg(right, REG_C, ia, i, G) || operand_in_reg(right, REG_D, ia, i, G) || operand_in_reg(right, REG_E, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)) &&
+        (operand_in_reg(right, REG_A, ia, i, G) || operand_in_reg(result, REG_B, ia, i, G) || operand_in_reg(result, REG_C, ia, i, G) || operand_in_reg(result, REG_D, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)))
         return(true);
 
       if(ic->op == GOTO || ic->op == LABEL)
         return(true);
 
       if(ic->op == IPUSH && getSize(operandType(IC_LEFT(ic))) <= 2 &&
-        (operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_B, ia, i, G))||
+        (operand_in_reg(left, REG_A, ia, i, G) ||
+        operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_B, ia, i, G)) ||
         operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_D, ia, i, G)) ||
         operand_in_reg(left, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_H, ia, i, G)) ||
         operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
         return(true);
-
-      //if(i == 15) std::cout << "Not Used: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
-      return(false);
+      if(!result_in_A && !input_in_A)
+        return(false);
     }
 
   // Last use of operand in A.

@@ -8520,6 +8520,8 @@ genPointerGet (const iCode *ic)
   int pair = PAIR_HL, extrapair;
   sym_link *retype;
   bool pushed_pair = FALSE;
+  bool pushed_a = FALSE;
+  bool surviving_a = !options.oldralloc && bitVectBitValue (ic->rSurv, A_IDX);
   bool rightval_in_range;
 
   left = IC_LEFT (ic);
@@ -8567,6 +8569,8 @@ genPointerGet (const iCode *ic)
         }
       else
         {
+          if (surviving_a && !pushed_a)
+            _push (PAIR_AF), pushed_a = TRUE;
           emit2 ("ld a,!*pair", getPairName (AOP (left)));
           regalloc_dry_run_cost += (getPairId (AOP (left)) == PAIR_IY ? 3 : 1);
           cheapMove (AOP (result), 0, ASMOP_A, 0);
@@ -8648,6 +8652,8 @@ genPointerGet (const iCode *ic)
         }
       else
         {
+          if (surviving_a && !pushed_a)
+            _push (PAIR_AF), pushed_a = TRUE;
           offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval);
           emit2 ("ld a,!*hl");
           emit2 ("inc hl");
@@ -8732,6 +8738,8 @@ genPointerGet (const iCode *ic)
                   emit2 ("dec %s", _pairs[pair].name);
                   regalloc_dry_run_cost += 1;
                 }
+              if (surviving_a && !pushed_a)
+                _push (PAIR_AF), pushed_a = TRUE;
               _moveFrom_tpair_ (ASMOP_A, 0, pair);
 
               r = (l < h ? l : h);
@@ -8780,6 +8788,9 @@ genPointerGet (const iCode *ic)
 
       while (size--)
         {
+          if (surviving_a && !pushed_a)
+            _push (PAIR_AF), pushed_a = TRUE;
+
           /* PENDING: make this better */
           if (!IS_GB && (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HLREG))
             {
@@ -8805,6 +8816,8 @@ genPointerGet (const iCode *ic)
     }
 
 release:
+  if (pushed_a)
+    _pop (PAIR_AF);
   if (pushed_pair)
     _pop (pair);
 
@@ -9045,6 +9058,8 @@ genPointerSet (iCode * ic)
   bool isBitvar;
   sym_link *retype;
   sym_link *letype;
+  bool pushed_a = FALSE;
+  bool surviving_a = !options.oldralloc && bitVectBitValue (ic->rSurv, A_IDX);
 
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
@@ -9077,6 +9092,8 @@ genPointerSet (iCode * ic)
         }
       else
         {
+          if (surviving_a && !pushed_a)
+            _push (PAIR_AF), pushed_a = TRUE;
           cheapMove (ASMOP_A, 0, AOP (right), 0);
           emit2 ("ld !*pair,a", pair);
           regalloc_dry_run_cost += (getPairId (AOP (result)) != PAIR_IY ? 1 : 3);
@@ -9117,6 +9134,8 @@ genPointerSet (iCode * ic)
             }
           else
             {
+              if (surviving_a && !pushed_a)
+                _push (PAIR_AF), pushed_a = TRUE;
               cheapMove (ASMOP_A, 0, AOP (right), offset);
               emit2 ("ld !*pair,a", _pairs[PAIR_HL].name);
               regalloc_dry_run_cost += 1;
@@ -9188,6 +9207,8 @@ genPointerSet (iCode * ic)
             }
           else
             {
+              if (surviving_a && !pushed_a)
+                _push (PAIR_AF), pushed_a = TRUE;
               cheapMove (ASMOP_A, 0, AOP (right), offset);
               emit2 ("ld !*pair,a", _pairs[pairId].name);
               regalloc_dry_run_cost += 1;
@@ -9202,6 +9223,9 @@ genPointerSet (iCode * ic)
         }
     }
 release:
+  if (pushed_a)
+    _pop (PAIR_AF);
+
   freeAsmop (right, NULL, ic);
   freeAsmop (result, NULL, ic);
 }

@@ -1,5 +1,12 @@
 2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/peeph-r2k.def:
+	  Fix invalid stack-relative increment.
+	* src/z80/gen.c:
+	  More efficient handling of 16-bit stores to stack.
+
+2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* sim/ucsim/z80.src/inst_r2k.cc:
 	  Fix handling of carry in 16-bit shift rotate instructions.
 	* src/z80/gen.c:

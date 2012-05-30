@@ -9390,6 +9390,10 @@ genAssign (const iCode * ic)
       fetchPair (PAIR_HL, AOP (right));
       commitPair (AOP (result), PAIR_HL, ic, FALSE);
     }
+  else if (size == 2 && getPairId (AOP (right)) != PAIR_INVALID && AOP_TYPE (result) != AOP_REG)
+    {
+      commitPair (AOP (result), getPairId (AOP (right)), ic, TRUE);
+    }
   else if (getPairId (AOP (right)) == PAIR_IY)
     {
       while (size--)

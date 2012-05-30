@@ -1,3 +1,8 @@
+2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix multibyte global to global assignment on gbz80 with de alive.
+
 2012-05-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc2.cc (operand_sane): fixed erroneous rejection of

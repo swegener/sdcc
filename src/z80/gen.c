@@ -9434,7 +9434,7 @@ genAssign (const iCode * ic)
           offset++;
         }
     }
-  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && (IS_GB /*|| IY_RESERVED */ ))
+  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead(PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
     {
       /* Special case.  Load into a and d, then load out. */
       cheapMove (ASMOP_A, 0, AOP (right), 0);
@@ -9442,7 +9442,7 @@ genAssign (const iCode * ic)
       cheapMove (AOP (result), 0, ASMOP_A, 0);
       cheapMove (AOP (result), 1, ASMOP_E, 0);
     }
-  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && (IS_GB /*|| IY_RESERVED */ ))
+  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead(PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
     {
       /* Special case - simple memcpy */
       if (!regalloc_dry_run)
@@ -9476,7 +9476,7 @@ genAssign (const iCode * ic)
            || AOP_TYPE (result) == AOP_IY) && (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK
                || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) && size >= 2)
         {
-          /* This estiamtion is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the z80 or z180. */
+          /* This estimation is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the z80 or z180. */
           int sizecost_n, sizecost_l, cyclecost_n, cyclecost_l;
           const bool hl_alive = !isPairDead (PAIR_HL, ic);
           const bool de_alive = !isPairDead (PAIR_DE, ic);

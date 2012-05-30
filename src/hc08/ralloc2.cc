@@ -107,8 +107,15 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
   if(oi == oi_end)
     return(true);
 
+  // Go to the second byte. If the operand is only a single byte, it cannot be
+  // an unsupported register combination or split between register and memory.
+  oi2 = oi;
+  oi2++;
+  if (oi2 == oi_end)
+    return(true);
+  
   // Register combinations code generation cannot handle yet (AH, XH, HA).
-  if(a.local.find(oi->second) != a.local.end() && a.local.find((oi2 = oi, ++oi2)->second) != a.local.end())
+  if(a.local.find(oi->second) != a.local.end() && a.local.find(oi2->second) != a.local.end())
     {
       const reg_t l = a.global[oi->second];
       const reg_t h = a.global[oi2->second];

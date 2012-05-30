@@ -1,3 +1,9 @@
+2012-05-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc2.cc (operand_sane): fixed erroneous rejection of
+	  single byte operand register assignment due to out of bounds
+	  dereference
+
 2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

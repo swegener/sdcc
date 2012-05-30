@@ -9092,7 +9092,7 @@ genPointerSet (iCode * ic)
         }
       else
         {
-          if (surviving_a && !pushed_a)
+          if (surviving_a && !pushed_a && AOP_TYPE (right) != AOP_ACC)
             _push (PAIR_AF), pushed_a = TRUE;
           cheapMove (ASMOP_A, 0, AOP (right), 0);
           emit2 ("ld !*pair,a", pair);
@@ -9134,7 +9134,7 @@ genPointerSet (iCode * ic)
             }
           else
             {
-              if (surviving_a && !pushed_a)
+              if (surviving_a && !pushed_a && (AOP_TYPE (right) != AOP_ACC || offset))
                 _push (PAIR_AF), pushed_a = TRUE;
               cheapMove (ASMOP_A, 0, AOP (right), offset);
               emit2 ("ld !*pair,a", _pairs[PAIR_HL].name);
@@ -9207,7 +9207,7 @@ genPointerSet (iCode * ic)
             }
           else
             {
-              if (surviving_a && !pushed_a)
+              if (surviving_a && !pushed_a && (AOP_TYPE (right) != AOP_ACC || offset))
                 _push (PAIR_AF), pushed_a = TRUE;
               cheapMove (ASMOP_A, 0, AOP (right), offset);
               emit2 ("ld !*pair,a", _pairs[pairId].name);

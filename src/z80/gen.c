@@ -9760,6 +9760,8 @@ genCast (const iCode * ic)
   sym_link *rtype = operandType (IC_RIGHT (ic));
   operand *right = IC_RIGHT (ic);
   int size, offset;
+  bool surviving_a = !options.oldralloc && bitVectBitValue (ic->rSurv, A_IDX);
+  bool pushed_a = FALSE;
 
   /* if they are equivalent then do nothing */
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
@@ -9810,6 +9812,8 @@ genCast (const iCode * ic)
     }
   else
     {
+      if (surviving_a && !pushed_a)
+        _push (PAIR_AF), pushed_a = TRUE;
       /* we need to extend the sign :{ */
       cheapMove (ASMOP_A, 0, AOP (right), AOP_SIZE (right) - 1);
       emit3 (A_RLA, 0, 0);
@@ -9819,6 +9823,8 @@ genCast (const iCode * ic)
     }
 
 release:
+  if (pushed_a)
+    _pop (PAIR_AF);
   freeAsmop (right, NULL, ic);
   freeAsmop (result, NULL, ic);
 }

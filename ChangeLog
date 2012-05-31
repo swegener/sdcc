@@ -1,5 +1,10 @@
 2012-05-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  Fix handling of a in casts, bug #3531118.
+
+2012-05-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* doc/sdccman.lyx:
 	  Updated manual (mostly r3ka and s08 port).
 

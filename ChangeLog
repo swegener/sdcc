@@ -1,4 +1,8 @@
-2012-05-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2012-05-31 Borut Razem <borut.razem AT gmail.com>
+
+	* debugger/mcs51/cmd.c: fixed bug #3530998 - source code bug..
+
+2012-05-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h: handle up to 8 registers per symbol for long long
 	  support

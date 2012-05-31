@@ -1,3 +1,8 @@
+2012-05-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h: handle up to 8 registers per symbol for long long
+	  support
+
 2012-05-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc.h,

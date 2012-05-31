@@ -1078,7 +1078,7 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
         {
           if (!cctxt->func->mod)
             {
-              if (!applyToSet (functions, funcWithName, "main"))
+              if (!applyToSet (functions, funcWithName, "main", &func))
                 {
                   fprintf (stderr, "Function \"main\" not defined.\n");
                 }
@@ -3336,7 +3336,7 @@ int cmdClrUserBp (char *s, context *cctxt)
         {
           if (!cctxt->func->mod)
             {
-              if (!applyToSet(functions,funcWithName,"main"))
+              if (!applyToSet (functions, funcWithName, "main", &func))
                   fprintf(stderr,"Function \"main\" not defined.\n");
               else
                   clearBPatModLine(func->mod,line);

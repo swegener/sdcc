@@ -1,3 +1,8 @@
+2012-05-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* doc/sdccman.lyx:
+	  Updated manual (mostly r3ka and s08 port).
+
 2012-05-31 Borut Razem <borut.razem AT gmail.com>
 
 	* debugger/mcs51/cmd.c: fixed bug #3530998 - source code bug..

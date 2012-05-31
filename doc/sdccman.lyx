@@ -1,4 +1,4 @@
-#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+#LyX 2.0.3 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -65,8 +65,6 @@
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
 \end_header
 
 \begin_body
@@ -206,13 +204,14 @@ status collapsed
 
 \end_inset
 
-, etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 and
- Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000
+, etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 based
+ (hc08, s08) and Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000,
+ Rabbit 3000A
 \begin_inset Index
 status collapsed
 
 \begin_layout Plain Layout
-Z80, Z180, GBZ80, Rabbit 2000/3000 CPU
+Z80, Z180, GBZ80, Rabbit 2000/3000, Rabbit 3000A CPU
 \end_layout
 
 \end_inset
@@ -253,7 +252,7 @@ rollers and underlying hardware effectively.
 Warning: Large parts of this manual apply to the mc51 port only
 \emph default
 .
- Further information on the z80, z180, r2k and gbz80 ports and standard
+ Further information on the z80, z180, r2k, r3ka and gbz80 ports and standard
  compliance can be found in the sdcc wiki 
 \begin_inset Flex URL
 status collapsed
@@ -633,7 +632,8 @@ long long
 status collapsed
 
 \begin_layout Plain Layout
-only supported in the z80, z180, r2k and gbz80 ports as of sdcc 3.1.0
+only supported in the hc08, s08, z80, z180, r2k, r3ka and gbz80 ports as
+ of sdcc 3.2.0
 \end_layout
 
 \end_inset
@@ -2869,7 +2869,7 @@ status collapsed
 
 \end_inset
 
--disable-gbz80-port Excludes the GameBoy gbz80 port
+-disable-z80-port Excludes the z80 port
 \end_layout
 
 \begin_layout List
@@ -2887,7 +2887,61 @@ status collapsed
 
 \end_inset
 
--disable-z80-port Excludes the z80 port
+-disable-z180-port Excludes the z180 port
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-r2k-port Excludes the r2k port
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-r3ka-port Excludes the r3ka port
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-gbz80-port Excludes the GameBoy gbz80 port
 \end_layout
 
 \begin_layout List
@@ -2942,6 +2996,24 @@ status collapsed
 \end_inset
 
 -disable-hc08-port Excludes the HC08 port
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-s08-port Excludes the S08 port
 \end_layout
 
 \begin_layout List
@@ -10523,12 +10595,42 @@ status collapsed
 
 
 \series default
- Generate code for the Freescale/Motorola HC08
+ Generate code for the Freescale/Motorola HC08 (aks 68HC08) 
 \begin_inset Index
 status collapsed
 
 \begin_layout Plain Layout
 HC08
+\end_layout
+
+\end_inset
+
+ family of processors.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-ms08
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-ms08
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the Freescale/Motorola S08 (aks 68HCS08, HCS08, CS08)
+ 
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+S08
 \end_layout
 
 \end_inset
@@ -10611,6 +10713,25 @@ status collapsed
 
 \series default
  Generate code for the Rabbit 2000 / Rabbit 3000 family of processors.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-mr3ka
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-mr3ka
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the Rabbit 3000A family of processors.
 \end_layout
 
 \begin_layout List
@@ -12250,7 +12371,7 @@ HC08
 
 \end_inset
 
- processors)
+ and S08 processors)
 \end_layout
 
 \begin_layout List
@@ -15106,6 +15227,57 @@ status collapsed
 \end_inset
 
  Frame pointer will be omitted when the function uses no local variables.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+max-allocs-per-node
+\series default
+
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-max-allocs-per-node
+\end_layout
+
+\end_inset
+
+ Setting this to a high value will result in increased compilation time
+ and more optimized code being generated.
+ Setting it to lower valeus speed up compilation, but does not optimize
+ as much.
+ The default value is 3000.
+ This option currently only affects the hc08, s08, z80, z180, r2k, r3ka
+ and gbz80 ports.
 \end_layout
 
 \begin_layout Subsection
@@ -21459,7 +21631,7 @@ in/out
 \end_layout
 
 \begin_layout Subsection
-HC08 Storage Class
+HC08/S08 Storage Class
 \begin_inset Index
 status collapsed
 
@@ -21604,7 +21776,7 @@ Named address spaces
 SDCC supports named address spaces.
  See the Embedded C standard for more information on them.
  So far SDCC only supports them for bank-switching.
- You need to have a function that witches to the desired memory bank and
+ You need to have a function that switches to the desired memory bank and
  declare a corresponding named address space:
 \end_layout
 
@@ -42644,7 +42816,7 @@ ftp://ftp.dalsemi.com/pub/tini/ds80c400/c_libraries/sdcc/index.html
 \end_layout
 
 \begin_layout Section
-The Z80, Z180, Rabbit 2000/3000 and GBZ80 ports
+The Z80, Z180, Rabbit 2000/3000, Rabbit 3000A and GBZ80 ports
 \end_layout
 
 \begin_layout Standard
@@ -42658,7 +42830,8 @@ Z80
 
 \end_inset
 
-, Z180, Rabbit 2000/3000 and the Nintendo GameBoy's Z80-like gbz80
+, Z180, Rabbit 2000/3000, Rabbit 3000A and LR35902, the Nintendo GameBoy's
+ Z80-like gbz80
 \begin_inset Index
 status collapsed
 
@@ -42669,7 +42842,7 @@ gbz80 (GameBoy Z80)
 \end_inset
 
 .
- The Z80 port is passed through the same 
+ These ports passed through the same 
 \emph on
 regressions tests
 \begin_inset Index
@@ -42728,8 +42901,22 @@ Z80!return value
  HLDE (four bytes).
 \end_layout
 
+\begin_layout Standard
+When enabling optimizations using --opt-code size and a sufficiently high
+ value for --max-allocs-per-node sdcc typically generates much better code
+ for these architectures than any other compiler.
+ A comparison of compilers for these architecture can be found at 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://sourceforge.net/apps/trac/sdcc/wiki/z80%20code%20size"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
-The HC08 port
+The HC08 and S08 ports
 \end_layout
 
 \begin_layout Standard
@@ -42743,16 +42930,20 @@ HC08
 
 \end_inset
 
- family has been added in October 2003, and is still undergoing some basic
- development.
- The code generator is complete, but the register allocation is still quite
- unoptimized.
- Some of the SDCC's standard C library functions have embedded non-HC08
- inline assembly and so are not yet usable.
+ and S08 does not yet generated code as compact as that generated by some
+ non-free compilers.
+ A comparison of compilers for these architecture can be found at 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://sourceforge.net/apps/trac/sdcc/wiki/hc08%20code%20size"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-The HC08 port passes the regression test suite (see section 
+The HC08 and S08 ports pass the regression test suite (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Quality-control"
@@ -46434,8 +46625,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-#pragma config CP0=OFF,OSCS=ON,OSC=LP,BOR=ON,BORV=25,WDT=ON,WDTPS=128,CCP2MUX
-=ON
+#pragma config CP0=OFF,OSCS=ON,OSC=LP,BOR=ON,BORV=25,WDT=ON,WDTPS=128,CCP2MUX=ON
 \end_layout
 
 \begin_layout LyX-Code
@@ -67981,8 +68171,8 @@ This is an excerpt from an article published in Circuit Cellar Magazine
 August 2000
 \series default
 .
- It's a little outdated (the compiler is much more efficient now and user/develo
-per friendly), but pretty well exposes the guts of it all.
+ It's outdated (the compiler is much more efficient now and user/developer
+ friendly), but pretty well exposes the guts of it all.
 \shape default
 
 \begin_inset Newline newline

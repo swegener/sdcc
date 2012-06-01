@@ -1,3 +1,8 @@
+2012-06-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Always use 16-bit addition when an operand and the result are in hl.
+
 2012-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: Preparations for further pointer offset

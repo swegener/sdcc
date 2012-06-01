@@ -5123,6 +5123,22 @@ genPlus (iCode * ic)
           regalloc_dry_run_cost += 1;
           goto release;
         }
+      else if (left == PAIR_HL && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)))
+        {
+          PAIR_ID pair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
+          fetchPair (pair, AOP (IC_RIGHT (ic)));
+          emit2 ("add hl,%s", _pairs[pair].name);
+          regalloc_dry_run_cost += 1;
+          goto release;
+        }
+      else if (right == PAIR_HL && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)))
+        {
+          PAIR_ID pair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
+          fetchPair (pair, AOP (IC_LEFT (ic)));
+          emit2 ("add hl,%s", _pairs[pair].name);
+          regalloc_dry_run_cost += 1;
+          goto release;
+        }
       else
         {
           /* Can't do it */

@@ -10,7 +10,7 @@ To install:
     cd ~
     mkdir tmp
     cd tmp
-    tar xjf path/to/binary/kit/sdcc-3.1.0-i386-unknown-linux2.5.tar.bz2
+    tar xjf path/to/binary/kit/sdcc-3.2.0-i386-unknown-linux2.5.tar.bz2
 
 * Change to the sdcc directory and copy all files to /usr/local
     cd sdcc
@@ -30,7 +30,7 @@ This should return sdcc's version number.
 
 Even if the default search paths look into /usr/local, sdcc is fully
 relocatable. Try `sdcc --print-search-dirs` if you have problems with header
-or library files. See sdccman.[txt|pdf|html] for more detailed information.
+or library files. See sdccman.pdf for more detailed information.
 
 
 For Windows 9X/NT/2000/XP users:
@@ -39,7 +39,7 @@ To install:
 
 * If you would like to keep a copy of your previous version,
   rename the directory where it's installed first
-* Run sdcc-3.1.0-setup.exe
+* Run sdcc-3.2.0-setup.exe
 
 By default this will install sdcc binaries into: C:\Program Files\SDCC\bin\
 header files into:                               C:\Program Files\SDCC\include\
@@ -54,8 +54,8 @@ You can test the install by opening a DOS box and entering:
 This should return sdcc's version number.
 
 sdcc for win32 is fully relocatable. Try `sdcc --print-search-dirs` if you
-have problems with header or library files. See sdccman.[txt|pdf|html] for
-more detailed information.
+have problems with header or library files. See sdccman.pdf for more
+detailed information.
 
 
 For Mac OS X users:
@@ -67,7 +67,7 @@ To install:
     cd ~
     mkdir tmp
     cd tmp
-    tar xjf path/to/binary/kit/sdcc-3.1.0-universal-apple-macosx.tar.bz2
+    tar xjf path/to/binary/kit/sdcc-3.2.0-universal-apple-macosx.tar.bz2
 
 * Change to the sdcc directory and copy all files to /Developer/sdcc
     cp -r sdcc /Developer/sdcc
@@ -86,4 +86,4 @@ This should return sdcc's version number.
 
 Even if the default search paths look into /usr/local, sdcc is fully
 relocatable. Try `sdcc --print-search-dirs` if you have problems with header
-or library files. See sdccman.[txt|pdf|html] for more detailed information.
+or library files. See sdccman.pdf for more detailed information.

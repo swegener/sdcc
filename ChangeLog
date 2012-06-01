@@ -1,5 +1,11 @@
 2012-06-01 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Shift optimization.
+
+2012-06-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Always use 16-bit addition when an operand and the result are in hl.
 

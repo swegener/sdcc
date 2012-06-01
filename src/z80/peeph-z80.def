@@ -224,6 +224,19 @@ replace restart {
 }
 
 replace restart {
+	ld	iy, #%1
+	ld	%2, %3 (iy)
+	srl	%2
+	bit %4, %3 (iy)
+} by {
+	ld	hl, #%1 + %3
+	; peephole 21c used hl instead of iy.
+	ld	%2, (hl)
+	srl %2
+	bit %4, (hl)
+} if notUsed('iy'), notUsed('hl')
+
+replace restart {
 	ld	%1,(hl)
 	ld	a,%2 (%3)
 	sub	a,%1

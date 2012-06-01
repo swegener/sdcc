@@ -1572,7 +1572,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
           if (!offset)
             emitcode ("lda", "(%s),x");
           else
-            emitcode ("lda", "(%s+%d),x", offset);
+            emitcode ("lda", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
         }
       else if (offset)
@@ -1596,7 +1596,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
           if (!offset)
             emitcode ("ldx", "(%s),x");
           else
-            emitcode ("ldx", "(%s+%d),x", offset);
+            emitcode ("ldx", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
         }
       else if (offset)
@@ -1636,7 +1636,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
           if (!offset)
             emitcode ("ldhx", "(%s),x");
           else
-            emitcode ("ldhx", "(%s+%d),x", offset);
+            emitcode ("ldhx", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 4;
         }
       else if (offset)
@@ -1691,7 +1691,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           if (!offset)
             emitcode ("sta", "(%s),x");
           else
-            emitcode ("sta", "(%s+%d),x", offset);
+            emitcode ("sta", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
         }
       else if (offset)
@@ -1714,7 +1714,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           if (!offset)
             emitcode ("stx", "(%s),x");
           else
-            emitcode ("stx", "(%s+%d),x", offset);
+            emitcode ("stx", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
         }
       else if (offset)
@@ -2254,6 +2254,8 @@ aopOp (operand *op, iCode * ic, bool result)
      d) conditional
      e) can be a return use only */
 
+  if (!IS_SYMOP (op))
+    piCode (ic, NULL);
   sym = OP_SYMBOL (op);
 
 //  printf("checking conditional\n");
@@ -2870,6 +2872,31 @@ genCpl (iCode * ic)
       goto release;
     }
 
+  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG && AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+    {
+      while (size--)
+        {
+          if ((reg = AOP (IC_RESULT (ic))->aopu.aop_reg[offset]) != hc08_reg_h)
+            {
+              transferAopAop (AOP (IC_LEFT (ic)), offset, AOP (IC_RESULT (ic)), offset);
+              rmwWithReg ("com", reg);
+            }
+          else
+            {
+              if ((reg = AOP (IC_LEFT (ic))->aopu.aop_reg[offset]) == hc08_reg_h)
+                reg = hc08_reg_a->isDead ? hc08_reg_a : hc08_reg_x;
+              needpullreg = pushRegIfSurv (reg);
+              loadRegFromAop (reg, AOP (IC_LEFT (ic)), offset);
+              rmwWithReg ("com", reg);
+              storeRegToAop (reg, AOP (IC_RESULT (ic)), offset);
+              if (needpullreg)
+                pullReg (reg);
+            }
+          offset++;
+        }
+      goto release;
+    }
+
   reg = (hc08_reg_a->isDead && !(AOP_TYPE (IC_RESULT (ic)) == AOP_REG && AOP (IC_RESULT (ic))->aopu.aop_reg[0] == hc08_reg_a) ? hc08_reg_a : hc08_reg_x);
 
   needpullreg = pushRegIfSurv (reg);
@@ -2958,41 +2985,81 @@ genUminus (iCode * ic)
 
   if (size == 1)
     {
-      if (!IS_AOP_A (AOP (IC_LEFT (ic))))
-        needpula = pushRegIfUsed (hc08_reg_a);
-      else
-        needpula = FALSE;
+      needpula = pushRegIfSurv (hc08_reg_a);
       loadRegFromAop (hc08_reg_a, AOP (IC_LEFT (ic)), 0);
-      emitcode ("nega", "");
-      regalloc_dry_run_cost++;
+      rmwWithReg ("neg", hc08_reg_a);
       hc08_freeReg (hc08_reg_a);
       storeRegToFullAop (hc08_reg_a, AOP (IC_RESULT (ic)), SPEC_USIGN (operandType (IC_LEFT (ic))));
       pullOrFreeReg (hc08_reg_a, needpula);
+      goto release;
     }
-  else
-    {
-      if (IS_AOP_XA (AOP (IC_RESULT (ic))))
-        result = forceStackedAop (AOP (IC_RESULT (ic)), FALSE);
-      else
-        result = AOP (IC_RESULT (ic));
 
-      needpula = pushRegIfUsed (hc08_reg_a);
-      sub = "sub";
-      while (size--)
+  /* If either left or result are in registers, handle this carefully to     */
+  /* avoid prematurely overwriting register values. The 1 byte case was      */
+  /* handled above and there aren't enough registers to handle 4 byte values */
+  /* so this case only needs to deal with 2 byte values. */
+  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG || AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+    {
+      reg_info *result0 = NULL;
+      reg_info *left0 = NULL;
+      reg_info *left1 = NULL;
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+        {
+          left0 = AOP (IC_LEFT (ic))->aopu.aop_reg[0];
+          left1 = AOP (IC_LEFT (ic))->aopu.aop_reg[1];
+        }
+      if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+        {
+          result0 = AOP (IC_RESULT (ic))->aopu.aop_reg[0];
+        }
+      needpula = pushRegIfSurv (hc08_reg_a);
+      if (left1 == hc08_reg_a)
+        pushReg (left1, TRUE);
+
+      if (left0 == hc08_reg_a)
+        rmwWithReg ("neg", hc08_reg_a);
+      else
         {
           loadRegFromConst (hc08_reg_a, zero);
-          accopWithAop (sub, AOP (IC_LEFT (ic)), offset);
-          storeRegToAop (hc08_reg_a, result, offset++);
-          sub = "sbc";
+          accopWithAop ("sub", AOP (IC_LEFT (ic)), 0);
         }
-      storeRegSignToUpperAop (hc08_reg_a, result, offset, SPEC_USIGN (operandType (IC_LEFT (ic))));
+      if (result0 == hc08_reg_a || (result0 && result0 == left1))
+        pushReg (hc08_reg_a, TRUE);
+      else
+        storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), 0);
+      loadRegFromConst (hc08_reg_a, zero);
+      if (left1 == hc08_reg_a)
+        {
+          emitcode ("sbc","%d,s", (result0 == hc08_reg_a || (result0 && result0 == left1)) ? 2 : 1);
+          regalloc_dry_run_cost += 3;
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+        }
+      else
+        {
+          accopWithAop ("sbc", AOP (IC_LEFT (ic)), 1);
+        }
+      storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), 1);
+      if (result0 == hc08_reg_a || (result0 && result0 == left1))
+        pullReg (result0);
+      if (left1 == hc08_reg_a)
+        pullNull (1);
       pullOrFreeReg (hc08_reg_a, needpula);
-
-      if (IS_AOP_XA (AOP (IC_RESULT (ic))))
-        freeAsmop (NULL, result, ic, TRUE);
+      goto release;
     }
 
+  result = AOP (IC_RESULT (ic));
 
+  needpula = pushRegIfSurv (hc08_reg_a);
+  sub = "sub";
+  while (size--)
+    {
+      loadRegFromConst (hc08_reg_a, zero);
+      accopWithAop (sub, AOP (IC_LEFT (ic)), offset);
+      storeRegToAop (hc08_reg_a, result, offset++);
+      sub = "sbc";
+    }
+  storeRegSignToUpperAop (hc08_reg_a, result, offset, SPEC_USIGN (operandType (IC_LEFT (ic))));
+  pullOrFreeReg (hc08_reg_a, needpula);
 
 release:
   /* release the aops */
@@ -5621,7 +5688,7 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
   /* if right is accumulator & left is not then exchange them */
-  if (AOP_TYPE (right) == AOP_REG && AOP_TYPE (left) != AOP_REG)
+  if (AOP_TYPE (right) == AOP_REG && ! IS_AOP_A (AOP (left)))
     {
       operand *tmp = right;
       right = left;
@@ -5867,7 +5934,7 @@ genOr (iCode * ic, iCode * ifx)
     }
 
   /* if left is accumulator & right is not then exchange them */
-  if (AOP_TYPE (right) == AOP_REG && AOP_TYPE (left) != AOP_REG)
+  if (AOP_TYPE (right) == AOP_REG && !IS_AOP_A (AOP (left)))
     {
       operand *tmp = right;
       right = left;
@@ -6051,7 +6118,7 @@ genXor (iCode * ic, iCode * ifx)
     }
 
   /* if left is accumulator & right is not then exchange them */
-  if (AOP_TYPE (right) == AOP_REG && AOP_TYPE (left) != AOP_REG)
+  if (AOP_TYPE (right) == AOP_REG && !IS_AOP_A (AOP (left)))
     {
       operand *tmp = right;
       right = left;
@@ -6063,8 +6130,6 @@ genXor (iCode * ic, iCode * ifx)
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl;
-      // this can just happen, if ifx has been optimized away
-      // wassertl (ifx, "AOP_CPY result without ifx");
 
       tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
       size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
@@ -6092,11 +6157,13 @@ genXor (iCode * ic, iCode * ifx)
                */
               if (!regalloc_dry_run)
                 emitLabel (tlbl);
+              pullOrFreeReg (hc08_reg_a, needpulla);
               if (ifx)
                 genIfxJump (ifx, "a");
             }
           offset++;
         }
+      goto release;
     }
 
   size = AOP_SIZE (result);
@@ -6124,7 +6191,7 @@ genXor (iCode * ic, iCode * ifx)
 
   pullOrFreeReg (hc08_reg_a, needpulla);
 
-//release:
+release:
 
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -8038,7 +8105,10 @@ genUnpackBits (operand * result, operand * right, iCode * ifx)
   for (rlen = blen; rlen >= 8; rlen -= 8)
     {
       loadRegIndexed (hc08_reg_a, litOffset, rematOffset);
-      storeRegToAop (hc08_reg_a, AOP (result), offset);
+      if (rlen > 8 && AOP_TYPE (result) == AOP_REG)
+        pushReg (hc08_reg_a, TRUE);
+      else
+        storeRegToAop (hc08_reg_a, AOP (result), offset);
       offset++;
       if (rlen > 8)
         {
@@ -8066,6 +8136,10 @@ genUnpackBits (operand * result, operand * right, iCode * ifx)
             emitLabel (tlbl);
         }
       storeRegToAop (hc08_reg_a, AOP (result), offset++);
+    }
+  if (blen > 8 && AOP_TYPE (result) == AOP_REG)
+    {
+      pullReg (AOP (result)->aopu.aop_reg[0]);
     }
 
 finish:
@@ -8507,7 +8581,7 @@ release:
 /* genPackBits - generates code for packed bit storage             */
 /*-----------------------------------------------------------------*/
 static void
-genPackBits (sym_link * etype, operand * right)
+genPackBits (operand * left, sym_link * etype, operand * right)
 {
   int offset = 0;               /* source byte offset */
   int rlen = 0;                 /* remaining bitfield length */
@@ -8515,10 +8589,12 @@ genPackBits (sym_link * etype, operand * right)
   int bstr;                     /* bitfield starting bit within byte */
   int litval;                   /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
-  int leftval = 0;
+  int litOffset = 0;
+  char *rematOffset = NULL;
 
   D (emitcode (";     genPackBits", ""));
 
+  decodePointerOffset (left, &litOffset, &rematOffset);
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
@@ -8535,7 +8611,7 @@ genPackBits (sym_link * etype, operand * right)
           litval <<= bstr;
           litval &= (~mask) & 0xff;
 
-          loadRegIndexed (hc08_reg_a, leftval, NULL);
+          loadRegIndexed (hc08_reg_a, litOffset, rematOffset);
           if ((mask | litval) != 0xff)
             {
               emitcode ("and", "#0x%02x", mask);
@@ -8547,7 +8623,7 @@ genPackBits (sym_link * etype, operand * right)
               regalloc_dry_run_cost += 2;
             }
           hc08_dirtyReg (hc08_reg_a, FALSE);
-          storeRegIndexed (hc08_reg_a, leftval, NULL);
+          storeRegIndexed (hc08_reg_a, litOffset, rematOffset);
 
           hc08_freeReg (hc08_reg_a);
           return;
@@ -8563,11 +8639,11 @@ genPackBits (sym_link * etype, operand * right)
       hc08_dirtyReg (hc08_reg_a, FALSE);
       pushReg (hc08_reg_a, TRUE);
 
-      loadRegIndexed (hc08_reg_a, leftval, NULL);
+      loadRegIndexed (hc08_reg_a, litOffset, rematOffset);
       emitcode ("and", "#0x%02x", mask);
       emitcode ("ora", "1,s");
       regalloc_dry_run_cost += 5;
-      storeRegIndexed (hc08_reg_a, leftval, NULL);
+      storeRegIndexed (hc08_reg_a, litOffset, rematOffset);
       pullReg (hc08_reg_a);
 
       hc08_freeReg (hc08_reg_a);
@@ -8578,16 +8654,16 @@ genPackBits (sym_link * etype, operand * right)
   /* all except the partial byte at the end                 */
   for (rlen = blen; rlen >= 8; rlen -= 8)
     {
-      if (!leftval && AOP (right)->type == AOP_DIR)
+      if (!litOffset && !rematOffset && AOP (right)->type == AOP_DIR)
         {
           emitcode ("mov", "%s,x+", aopAdrStr (AOP (right), offset, FALSE));
           regalloc_dry_run_cost += 2;
-          leftval--;
+          litOffset--;
         }
       else
         {
           loadRegFromAop (hc08_reg_a, AOP (right), offset);
-          storeRegIndexed (hc08_reg_a, leftval+offset, NULL);
+          storeRegIndexed (hc08_reg_a, litOffset+offset, rematOffset);
         }
       offset++;
     }
@@ -8604,7 +8680,7 @@ genPackBits (sym_link * etype, operand * right)
           litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
           litval >>= (blen - rlen);
           litval &= (~mask) & 0xff;
-          loadRegIndexed (hc08_reg_a, leftval+offset, NULL);
+          loadRegIndexed (hc08_reg_a, litOffset+offset, rematOffset);
           if ((mask | litval) != 0xff)
             {
               emitcode ("and", "#0x%02x", mask);
@@ -8616,7 +8692,7 @@ genPackBits (sym_link * etype, operand * right)
               regalloc_dry_run_cost += 2;
             }
           hc08_dirtyReg (hc08_reg_a, FALSE);
-          storeRegIndexed (hc08_reg_a, leftval+offset, NULL);
+          storeRegIndexed (hc08_reg_a, litOffset+offset, rematOffset);
           hc08_freeReg (hc08_reg_a);
           return;
         }
@@ -8629,11 +8705,11 @@ genPackBits (sym_link * etype, operand * right)
       hc08_dirtyReg (hc08_reg_a, FALSE);
       pushReg (hc08_reg_a, TRUE);
 
-      loadRegIndexed(hc08_reg_a, leftval+offset, NULL);
+      loadRegIndexed(hc08_reg_a, litOffset+offset, rematOffset);
       emitcode ("and", "#0x%02x", mask);
       emitcode ("ora", "1,s");
       regalloc_dry_run_cost += 5;
-      storeRegIndexed (hc08_reg_a, leftval+offset, NULL);
+      storeRegIndexed (hc08_reg_a, litOffset+offset, rematOffset);
       pullReg (hc08_reg_a);
     }
 
@@ -8644,7 +8720,7 @@ genPackBits (sym_link * etype, operand * right)
 /* genPackBitsImmed - generates code for packed bit storage        */
 /*-----------------------------------------------------------------*/
 static void
-genPackBitsImmed (operand * result, sym_link * etype, operand * right, iCode * ic)
+genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * right, iCode * ic)
 {
   asmop *derefaop;
   int size;
@@ -8655,7 +8731,8 @@ genPackBitsImmed (operand * result, sym_link * etype, operand * right, iCode * i
   int litval;                   /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
   bool needpulla;
-  int leftval=0;
+  int litOffset = 0;
+  char *rematOffset = NULL;
 
   D (emitcode (";     genPackBitsImmed", ""));
 
@@ -8664,8 +8741,10 @@ genPackBitsImmed (operand * result, sym_link * etype, operand * right, iCode * i
 
   aopOp (right, ic, FALSE);
   size = AOP_SIZE (right);
+  decodePointerOffset (left, &litOffset, &rematOffset);
+  wassert (!rematOffset);
 
-  derefaop = aopDerefAop (AOP (result), leftval);
+  derefaop = aopDerefAop (AOP (result), litOffset);
   freeAsmop (result, NULL, ic, TRUE);
   derefaop->size = size;
 
@@ -8825,18 +8904,21 @@ release:
 /* genDataPointerSet - remat pointer to data space                 */
 /*-----------------------------------------------------------------*/
 static void
-genDataPointerSet (operand * right, operand * result, iCode * ic)
+genDataPointerSet (operand * left, operand * right, operand * result, iCode * ic)
 {
   int size;
   asmop *derefaop;
-  int leftval = 0;
+  int litOffset = 0;
+  char *rematOffset = NULL;
 
   D (emitcode (";     genDataPointerSet", ""));
 
   aopOp (right, ic, FALSE);
   size = AOP_SIZE (right);
+  decodePointerOffset (left, &litOffset, &rematOffset);
+  wassert (!rematOffset);
 
-  derefaop = aopDerefAop (AOP (result), leftval);
+  derefaop = aopDerefAop (AOP (result), litOffset);
   freeAsmop (result, NULL, ic, TRUE);
   derefaop->size = size;
 
@@ -8856,6 +8938,7 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
 static void
 genPointerSet (iCode * ic, iCode * pi)
 {
+  operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
   int size, offset;
@@ -8863,7 +8946,8 @@ genPointerSet (iCode * ic, iCode * pi)
   sym_link *letype = getSpec (operandType (result));
   bool needpullx = FALSE;
   bool needpullh = FALSE;
-  int leftval = 0;
+  int litOffset = 0;
+  char *rematOffset = NULL;
 
   D (emitcode (";     genPointerSet", ""));
 
@@ -8874,12 +8958,12 @@ genPointerSet (iCode * ic, iCode * pi)
     {
       if (!IS_BITVAR (retype) && !IS_BITVAR (letype))
         {
-          genDataPointerSet (right, result, ic);
+          genDataPointerSet (left, right, result, ic);
           return;
         }
       else
         {
-          genPackBitsImmed (result, (IS_BITVAR (retype) ? retype : letype), right, ic);
+          genPackBitsImmed (result, left, (IS_BITVAR (retype) ? retype : letype), right, ic);
           return;
         }
     }
@@ -8903,15 +8987,16 @@ genPointerSet (iCode * ic, iCode * pi)
 
   /* if bit then unpack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
-    genPackBits ((IS_BITVAR (retype) ? retype : letype), right);
+    genPackBits (left, (IS_BITVAR (retype) ? retype : letype), right);
   else
     {
+      decodePointerOffset (left, &litOffset, &rematOffset);
       offset = size;
 
       while (offset--)
         {
           loadRegFromAop (hc08_reg_a, AOP (right), offset);
-          storeRegIndexed (hc08_reg_a, leftval + size - offset - 1, NULL);
+          storeRegIndexed (hc08_reg_a, litOffset + size - offset - 1, rematOffset);
           hc08_freeReg (hc08_reg_a);
         }
     }

@@ -1,3 +1,10 @@
+2012-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Preparations for further pointer offset
+	  optimizations. Bug fixes for certain register assignment cases
+	  in complement, unary minus, bitwise operators, and bitfield
+	  unpacking.
+
 2012-05-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

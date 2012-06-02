@@ -32,13 +32,9 @@
 #include <signal.h>
 #include "common.h"
 #include <ctype.h>
-#include "newalloc.h"
 #include "dbuf_string.h"
 #include "SDCCerr.h"
-#include "SDCCsystem.h"
 #include "SDCCmacro.h"
-#include "SDCCutil.h"
-#include "SDCCdebug.h"
 #include "SDCCargs.h"
 
 #ifdef _WIN32
@@ -2106,23 +2102,6 @@ preProcess (char **envp)
         {
           addSet (&preArgvSet, Safe_strdup ("-DSDCC_{port}"));
           addSet (&preArgvSet, Safe_strdup ("-D__{port}"));
-        }
-
-      if (port && port->processor && TARGET_IS_PIC14)
-        {
-          struct dbuf_s dbuf;
-
-          dbuf_init (&dbuf, 512);        
-          dbuf_printf (&dbuf, "-D__SDCC_PROCESSOR=\"%s\"", port->processor);
-          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
-        }
-      if (options.std_sdcc && port && port->processor && TARGET_IS_PIC14)
-        {
-          struct dbuf_s dbuf;
-
-          dbuf_init (&dbuf, 512);        
-          dbuf_printf (&dbuf, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
-          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
         }
 
       /* Optinal C features not (yet) supported by sdcc */

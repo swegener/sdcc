@@ -25,11 +25,11 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
-#include "SDCCsystem.h"
+#include "dbuf_string.h"
+
 #include "main.h"
 #include "ralloc.h"
 #include "device.h"
-#include "SDCCutil.h"
 #include "glue.h"
 #include "pcode.h"
 #include "SDCCargs.h"
@@ -793,6 +793,8 @@ _pic16_linkEdit (void)
 static void
 _pic16_finaliseOptions (void)
 {
+  struct dbuf_s dbuf;
+
   port->mem.default_local_map = data;
   port->mem.default_globl_map = data;
 
@@ -810,22 +812,44 @@ _pic16_finaliseOptions (void)
   options.intlong_rent = 1;
 #endif
 
-  setMainValue("mcu", pic16->name[2] );
-  addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+  dbuf_init (&dbuf, 128);
 
-  setMainValue("mcu1", pic16->name[1] );
-  addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
+  if (options.std_sdcc)
+    {
+      dbuf_append (&dbuf, "-D", sizeof ("-D") - 1);
+      dbuf_append_str (&dbuf, pic16->name[2]);
+      addSet (&preArgvSet, Safe_strdup (dbuf_c_str (&dbuf)));
+    }
 
+  dbuf_set_length (&dbuf, 0);
+  dbuf_append (&dbuf, "-D__", sizeof ("-D__") - 1);
+  dbuf_append_str (&dbuf, pic16->name[1]);
+  addSet (&preArgvSet, Safe_strdup (dbuf_c_str (&dbuf)));
+
+    {
+      char *upperProc, *p1, *p2;
+      int len;
+
+      dbuf_set_length (&dbuf, 0);
+      len = strlen (port->processor);
+      upperProc = Safe_malloc (len);
+      for (p1 = port->processor, p2 = upperProc; *p1; ++p1, ++p2)
+        {
+          *p2 = toupper (*p1);
+        }
+      dbuf_append (&dbuf, "-D__SDCC_PIC", sizeof ("-D__SDCC_PIC") - 1);
+      dbuf_append (&dbuf, upperProc, len);
+      addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+    }
   if (!pic16_options.nodefaultlibs)
     {
-      char devlib[512];
-
       /* now add the library for the device */
-      sprintf(devlib, "libdev%s.lib", pic16->name[1]);   /* e.g., libdev18f452.lib */
-      addSet(&libFilesSet, Safe_strdup(devlib));
+      dbuf_set_length (&dbuf, 0);
+      dbuf_printf (&dbuf, "libdev%s.lib", pic16->name[1]);   /* e.g., libdev18f452.lib */
+      addSet (&libFilesSet, Safe_strdup (dbuf_c_str (&dbuf)));
 
       /* add the internal SDCC library */
-      addSet(&libFilesSet, Safe_strdup( "libsdcc.lib" ));
+      addSet (&libFilesSet, Safe_strdup ("libsdcc.lib" ));
     }
 
   if (alt_asm && alt_asm[0] != '\0')
@@ -846,29 +870,42 @@ _pic16_finaliseOptions (void)
 
   if (options.model == MODEL_SMALL)
     {
-      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_SMALL"));
+      addSet (&asmOptionsSet, Safe_strdup ("-DSDCC_MODEL_SMALL"));
     }
   else if (options.model == MODEL_LARGE)
     {
-      char buf[128];
+      char *s;
 
-      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_LARGE"));
+      addSet (&asmOptionsSet, Safe_strdup ("-DSDCC_MODEL_LARGE"));
 
-      sprintf(buf, "-D%s -D__%s", pic16->name[2], pic16->name[1]);
-      *(strrchr(buf, 'f')) = 'F';
-      addSet(&asmOptionsSet, Safe_strdup(buf));
+      dbuf_printf (&dbuf, "-D%s -D__%s", pic16->name[2], pic16->name[1]);
+      s = Safe_strdup (dbuf_c_str (&dbuf));
+      *(strrchr (s, 'f')) = 'F';
+      addSet (&asmOptionsSet, s);
     }
 
   if (STACK_MODEL_LARGE)
     {
-      addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
-      addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
+      if (options.std_sdcc)
+        {
+          addSet (&preArgvSet, Safe_strdup ("-DSTACK_MODEL_LARGE"));
+          addSet (&asmOptionsSet, Safe_strdup ("-DSTACK_MODEL_LARGE"));
+        }
+        addSet (&preArgvSet, Safe_strdup ("-D__STACK_MODEL_LARGE"));
+        addSet (&asmOptionsSet, Safe_strdup ("-D__STACK_MODEL_LARGE"));
     }
   else
     {
-      addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
-      addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
+      if (options.std_sdcc)
+        {
+          addSet (&preArgvSet, Safe_strdup ("-DSTACK_MODEL_SMALL"));
+          addSet (&asmOptionsSet, Safe_strdup ("-DSTACK_MODEL_SMALL"));
+        }
+      addSet (&preArgvSet, Safe_strdup ("-D__STACK_MODEL_SMALL"));
+      addSet (&asmOptionsSet, Safe_strdup ("-D__STACK_MODEL_SMALL"));
     }
+
+  dbuf_destroy (&dbuf);
 }
 
 
@@ -1192,7 +1229,7 @@ PORT pic16_port =
   TARGET_ID_PIC16,
   "pic16",
   "MCU PIC16",      /* Target name */
-  "p18f452",        /* Processor */
+  "18f452",        /* Processor */
   {
     pic16glue,
     TRUE,           /* Emit glue around main */

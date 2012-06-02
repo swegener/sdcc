@@ -1,3 +1,14 @@
+2012-06-02 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCmain.c, src/pic14/main.c, src/pic16/main.c,
+	  support/scripts/pic14fam-h-gen.pl,
+	  applied modified patch
+	  #3531337 - The pic14 port, automatically creates the -DpicXXX,
+	  thanks to Molnar Karoly
+	* support/scripts/pic16fam-h-gen.pl: modified for __SDCC_PICXXX
+	* device/non-free/include/pic14/pic14fam.h,
+	  device/non-free/include/pic16/pic16fam.h: (re)generated
+
 2012-06-01 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/README.txt, doc/INSTALL.txt: updated for SDCC 3.2.0 release

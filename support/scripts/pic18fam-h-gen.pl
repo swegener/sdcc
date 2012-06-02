@@ -36,6 +36,8 @@
 
 use strict;
 
+my $head = '__SDCC_PIC';
+
 my %families = ();
 my %adc = ();
 my %usart = ();
@@ -45,7 +47,7 @@ while (<DATA>) {
     chomp;
     s/\s*#.*$//;                # remove comments
     s/\s*//g;                   # strip whitespace
-    next if (/^\s*$/);          # ignore empty lines
+    next if (/^\s*$/);         # ignore empty lines
 
     my $line = $_;
 
@@ -60,8 +62,7 @@ while (<DATA>) {
 
     # extract family members
     my @arr = split(/,/, $memberlist);
-    @arr = map { lc($_); } @arr;
-    @arr = sort @arr;
+    @arr = sort(map { uc($_); } @arr);
     $families{$id} = \@arr;
 
     # ADC style per device family
@@ -101,7 +102,7 @@ EOT
 my $pp = "#if   ";
 for my $id (sort keys %families) {
     my $list = $families{$id};
-    my $memb = "defined(pic" . join(") \\\n    || defined(pic", @$list) . ")";
+    my $memb = "defined($head" . join(") \\\n    || defined($head", @$list) . ")";
     print FH <<EOT
 ${pp} ${memb}
 #define __SDCC_PIC16_FAMILY ${id}

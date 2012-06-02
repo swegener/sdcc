@@ -5,7 +5,7 @@
     it easier to set a breakpoint using the debugger.
 */
 #include "common.h"
-#include "SDCCsystem.h"
+#include "dbuf_string.h"
 #include "SDCCmacro.h"
 
 #include "device.h"
@@ -113,7 +113,7 @@ _pic14_regparm (sym_link * l, bool reentrant)
   can pass only the first parameter in a register */
   //if (regParmFlg)
   //  return 0;
-  
+
   regParmFlg++;// = 1;
   return 1;
 }
@@ -130,10 +130,39 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 static void
 _pic14_finaliseOptions (void)
 {
+  struct dbuf_s dbuf;
+
   pCodeInitRegisters();
-  
+
   port->mem.default_local_map = data;
   port->mem.default_globl_map = data;
+
+  dbuf_init (&dbuf, 512);
+  dbuf_printf (&dbuf, "-D__SDCC_PROCESSOR=\"%s\"", port->processor);
+  addSet (&preArgvSet, Safe_strdup (dbuf_detach_c_str (&dbuf)));
+
+  if (options.std_sdcc)
+    {
+      dbuf_set_length (&dbuf, 0);
+      dbuf_printf (&dbuf, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
+      addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+    }
+
+    {
+      char *upperProc, *p1, *p2;
+      int len;
+
+      dbuf_set_length (&dbuf, 0);
+      len = strlen (port->processor);
+      upperProc = Safe_malloc (len);
+      for (p1 = port->processor, p2 = upperProc; *p1; ++p1, ++p2)
+        {
+          *p2 = toupper (*p1);
+        }
+      dbuf_append (&dbuf, "-D__SDCC_PIC", sizeof ("-D__SDCC_PIC") - 1);
+      dbuf_append (&dbuf, upperProc, len);
+      addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+    }
 }
 
 static void
@@ -153,13 +182,13 @@ static void
 _pic14_genAssemblerPreamble (FILE * of)
 {
   char * name = processor_base_name();
-  
+
   if(!name) {
-    
+
     name = "16f877";
     fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
   }
-  
+
   fprintf (of, "\tlist\tp=%s\n",name);
   fprintf (of, "\tradix dec\n");
   fprintf (of, "\tinclude \"p%s.inc\"\n",name);
@@ -180,11 +209,11 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   {
     return FALSE;
   }
-  
+
   /* multiply chars in-place */
   if (getSize(left) == 1 && getSize(right) == 1)
     return TRUE;
-  
+
   /* use library functions for more complex maths */
   return FALSE;
 }
@@ -226,7 +255,7 @@ _pic14_do_link (void)
   set *tSet = NULL;
   int ret;
   char * procName;
-  
+
   /*
    * link command format:
    * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
@@ -244,7 +273,7 @@ _pic14_do_link (void)
 
   joinStrSet (appendStrSet (libDirsSet, "-I\"", "\""));
   shash_add (&linkValues, "sysincdirs", joinStrSet (appendStrSet (libDirsSet, "-I\"", "\"")));
-  
+
   shash_add (&linkValues, "lflags", joinStrSet (linkOptionsSet));
 
   shash_add (&linkValues, "outfile", fullDstFileName ? fullDstFileName : dstFileName);
@@ -303,8 +332,8 @@ PORT pic_port =
   {
     _asmCmd,
     NULL,
-    "-g",	    /* options with --debug */
-    NULL,	    /* options without --debug */
+    "-g",           /* options with --debug */
+    NULL,           /* options without --debug */
     //"-plosgffc",  /* Options with debug */
     //"-plosgff",   /* Options without debug */
     0,
@@ -344,7 +373,7 @@ PORT pic_port =
     "GSINIT  (CODE)",
     "udata_ovr",
     "GSFINAL (CODE)",
-    "HOME	 (CODE)",
+    "HOME        (CODE)",
     NULL, // xidata
     NULL, // xinit
     "CONST   (CODE)",   // const_name - const data (code or not)

@@ -1,7 +1,7 @@
 /*
  * pic18fam.h - PIC16 families
  *
- * This file is has been generated using support/scripts/pic18fam-h-gen.pl .
+ * This file is has been generated using pic18fam-h-gen.pl .
  */
 #ifndef __SDCC_PIC18FAM_H__
 #define __SDCC_PIC18FAM_H__ 1
@@ -11,181 +11,181 @@
  */
 #undef  __SDCC_PIC16_FAMILY
 
-#if    defined(pic18f242) \
-    || defined(pic18f252) \
-    || defined(pic18f442) \
-    || defined(pic18f452)
+#if    defined(__SDCC_PIC18F242) \
+    || defined(__SDCC_PIC18F252) \
+    || defined(__SDCC_PIC18F442) \
+    || defined(__SDCC_PIC18F452)
 #define __SDCC_PIC16_FAMILY 1802420
 
-#elif  defined(pic18f248) \
-    || defined(pic18f258) \
-    || defined(pic18f448) \
-    || defined(pic18f458)
+#elif  defined(__SDCC_PIC18F248) \
+    || defined(__SDCC_PIC18F258) \
+    || defined(__SDCC_PIC18F448) \
+    || defined(__SDCC_PIC18F458)
 #define __SDCC_PIC16_FAMILY 1802480
 
-#elif  defined(pic18f1220) \
-    || defined(pic18f1320)
+#elif  defined(__SDCC_PIC18F1220) \
+    || defined(__SDCC_PIC18F1320)
 #define __SDCC_PIC16_FAMILY 1812200
 
-#elif  defined(pic18f1230) \
-    || defined(pic18f1330)
+#elif  defined(__SDCC_PIC18F1230) \
+    || defined(__SDCC_PIC18F1330)
 #define __SDCC_PIC16_FAMILY 1812300
 
-#elif  defined(pic18f13k50) \
-    || defined(pic18f14k50)
+#elif  defined(__SDCC_PIC18F13K50) \
+    || defined(__SDCC_PIC18F14K50)
 #define __SDCC_PIC16_FAMILY 1813502
 
-#elif  defined(pic18f2220) \
-    || defined(pic18f2320) \
-    || defined(pic18f4220) \
-    || defined(pic18f4320)
+#elif  defined(__SDCC_PIC18F2220) \
+    || defined(__SDCC_PIC18F2320) \
+    || defined(__SDCC_PIC18F4220) \
+    || defined(__SDCC_PIC18F4320)
 #define __SDCC_PIC16_FAMILY 1822200
 
-#elif  defined(pic18f2221) \
-    || defined(pic18f2321) \
-    || defined(pic18f4221) \
-    || defined(pic18f4321)
+#elif  defined(__SDCC_PIC18F2221) \
+    || defined(__SDCC_PIC18F2321) \
+    || defined(__SDCC_PIC18F4221) \
+    || defined(__SDCC_PIC18F4321)
 #define __SDCC_PIC16_FAMILY 1822210
 
-#elif  defined(pic18f23k20) \
-    || defined(pic18f24k20) \
-    || defined(pic18f25k20) \
-    || defined(pic18f26k20) \
-    || defined(pic18f43k20) \
-    || defined(pic18f44k20) \
-    || defined(pic18f45k20) \
-    || defined(pic18f46k20)
+#elif  defined(__SDCC_PIC18F23K20) \
+    || defined(__SDCC_PIC18F24K20) \
+    || defined(__SDCC_PIC18F25K20) \
+    || defined(__SDCC_PIC18F26K20) \
+    || defined(__SDCC_PIC18F43K20) \
+    || defined(__SDCC_PIC18F44K20) \
+    || defined(__SDCC_PIC18F45K20) \
+    || defined(__SDCC_PIC18F46K20)
 #define __SDCC_PIC16_FAMILY 1823202
 
-#elif  defined(pic18f23k22) \
-    || defined(pic18f24k22) \
-    || defined(pic18f25k22) \
-    || defined(pic18f26k22) \
-    || defined(pic18f43k22) \
-    || defined(pic18f44k22) \
-    || defined(pic18f45k22) \
-    || defined(pic18f46k22)
+#elif  defined(__SDCC_PIC18F23K22) \
+    || defined(__SDCC_PIC18F24K22) \
+    || defined(__SDCC_PIC18F25K22) \
+    || defined(__SDCC_PIC18F26K22) \
+    || defined(__SDCC_PIC18F43K22) \
+    || defined(__SDCC_PIC18F44K22) \
+    || defined(__SDCC_PIC18F45K22) \
+    || defined(__SDCC_PIC18F46K22)
 #define __SDCC_PIC16_FAMILY 1823222
 
-#elif  defined(pic18f2331) \
-    || defined(pic18f2431) \
-    || defined(pic18f4331) \
-    || defined(pic18f4431)
+#elif  defined(__SDCC_PIC18F2331) \
+    || defined(__SDCC_PIC18F2431) \
+    || defined(__SDCC_PIC18F4331) \
+    || defined(__SDCC_PIC18F4431)
 #define __SDCC_PIC16_FAMILY 1823310
 
-#elif  defined(pic18f2410) \
-    || defined(pic18f2510) \
-    || defined(pic18f2515) \
-    || defined(pic18f2610) \
-    || defined(pic18f4410) \
-    || defined(pic18f4510) \
-    || defined(pic18f4515) \
-    || defined(pic18f4610)
+#elif  defined(__SDCC_PIC18F2410) \
+    || defined(__SDCC_PIC18F2510) \
+    || defined(__SDCC_PIC18F2515) \
+    || defined(__SDCC_PIC18F2610) \
+    || defined(__SDCC_PIC18F4410) \
+    || defined(__SDCC_PIC18F4510) \
+    || defined(__SDCC_PIC18F4515) \
+    || defined(__SDCC_PIC18F4610)
 #define __SDCC_PIC16_FAMILY 1824100
 
-#elif  defined(pic18f24j10) \
-    || defined(pic18f25j10) \
-    || defined(pic18f44j10) \
-    || defined(pic18f45j10)
+#elif  defined(__SDCC_PIC18F24J10) \
+    || defined(__SDCC_PIC18F25J10) \
+    || defined(__SDCC_PIC18F44J10) \
+    || defined(__SDCC_PIC18F45J10)
 #define __SDCC_PIC16_FAMILY 1824101
 
-#elif  defined(pic18f2420) \
-    || defined(pic18f2520) \
-    || defined(pic18f4420) \
-    || defined(pic18f4520)
+#elif  defined(__SDCC_PIC18F2420) \
+    || defined(__SDCC_PIC18F2520) \
+    || defined(__SDCC_PIC18F4420) \
+    || defined(__SDCC_PIC18F4520)
 #define __SDCC_PIC16_FAMILY 1824200
 
-#elif  defined(pic18f2423) \
-    || defined(pic18f2523) \
-    || defined(pic18f4423) \
-    || defined(pic18f4523)
+#elif  defined(__SDCC_PIC18F2423) \
+    || defined(__SDCC_PIC18F2523) \
+    || defined(__SDCC_PIC18F4423) \
+    || defined(__SDCC_PIC18F4523)
 #define __SDCC_PIC16_FAMILY 1824230
 
-#elif  defined(pic18f2450) \
-    || defined(pic18f4450)
+#elif  defined(__SDCC_PIC18F2450) \
+    || defined(__SDCC_PIC18F4450)
 #define __SDCC_PIC16_FAMILY 1824500
 
-#elif  defined(pic18f24j50) \
-    || defined(pic18f25j50) \
-    || defined(pic18f26j50) \
-    || defined(pic18f44j50) \
-    || defined(pic18f45j50) \
-    || defined(pic18f46j50)
+#elif  defined(__SDCC_PIC18F24J50) \
+    || defined(__SDCC_PIC18F25J50) \
+    || defined(__SDCC_PIC18F26J50) \
+    || defined(__SDCC_PIC18F44J50) \
+    || defined(__SDCC_PIC18F45J50) \
+    || defined(__SDCC_PIC18F46J50)
 #define __SDCC_PIC16_FAMILY 1824501
 
-#elif  defined(pic18f2455) \
-    || defined(pic18f2550) \
-    || defined(pic18f4455) \
-    || defined(pic18f4550)
+#elif  defined(__SDCC_PIC18F2455) \
+    || defined(__SDCC_PIC18F2550) \
+    || defined(__SDCC_PIC18F4455) \
+    || defined(__SDCC_PIC18F4550)
 #define __SDCC_PIC16_FAMILY 1824550
 
-#elif  defined(pic18f2480) \
-    || defined(pic18f2580) \
-    || defined(pic18f4480) \
-    || defined(pic18f4580)
+#elif  defined(__SDCC_PIC18F2480) \
+    || defined(__SDCC_PIC18F2580) \
+    || defined(__SDCC_PIC18F4480) \
+    || defined(__SDCC_PIC18F4580)
 #define __SDCC_PIC16_FAMILY 1824800
 
-#elif  defined(pic18f2525) \
-    || defined(pic18f2620) \
-    || defined(pic18f4525) \
-    || defined(pic18f4620)
+#elif  defined(__SDCC_PIC18F2525) \
+    || defined(__SDCC_PIC18F2620) \
+    || defined(__SDCC_PIC18F4525) \
+    || defined(__SDCC_PIC18F4620)
 #define __SDCC_PIC16_FAMILY 1825250
 
-#elif  defined(pic18f2585) \
-    || defined(pic18f2680) \
-    || defined(pic18f4585) \
-    || defined(pic18f4680)
+#elif  defined(__SDCC_PIC18F2585) \
+    || defined(__SDCC_PIC18F2680) \
+    || defined(__SDCC_PIC18F4585) \
+    || defined(__SDCC_PIC18F4680)
 #define __SDCC_PIC16_FAMILY 1825850
 
-#elif  defined(pic18f2682) \
-    || defined(pic18f2685) \
-    || defined(pic18f4682) \
-    || defined(pic18f4685)
+#elif  defined(__SDCC_PIC18F2682) \
+    || defined(__SDCC_PIC18F2685) \
+    || defined(__SDCC_PIC18F4682) \
+    || defined(__SDCC_PIC18F4685)
 #define __SDCC_PIC16_FAMILY 1826820
 
-#elif  defined(pic18f6520) \
-    || defined(pic18f6620) \
-    || defined(pic18f6720) \
-    || defined(pic18f8520) \
-    || defined(pic18f8620) \
-    || defined(pic18f8720)
+#elif  defined(__SDCC_PIC18F6520) \
+    || defined(__SDCC_PIC18F6620) \
+    || defined(__SDCC_PIC18F6720) \
+    || defined(__SDCC_PIC18F8520) \
+    || defined(__SDCC_PIC18F8620) \
+    || defined(__SDCC_PIC18F8720)
 #define __SDCC_PIC16_FAMILY 1865200
 
-#elif  defined(pic18f6527) \
-    || defined(pic18f6622) \
-    || defined(pic18f6627) \
-    || defined(pic18f6722) \
-    || defined(pic18f8527) \
-    || defined(pic18f8622) \
-    || defined(pic18f8627) \
-    || defined(pic18f8722)
+#elif  defined(__SDCC_PIC18F6527) \
+    || defined(__SDCC_PIC18F6622) \
+    || defined(__SDCC_PIC18F6627) \
+    || defined(__SDCC_PIC18F6722) \
+    || defined(__SDCC_PIC18F8527) \
+    || defined(__SDCC_PIC18F8622) \
+    || defined(__SDCC_PIC18F8627) \
+    || defined(__SDCC_PIC18F8722)
 #define __SDCC_PIC16_FAMILY 1865270
 
-#elif  defined(pic18f65j50) \
-    || defined(pic18f66j50) \
-    || defined(pic18f66j55) \
-    || defined(pic18f67j50) \
-    || defined(pic18f85j50) \
-    || defined(pic18f86j50) \
-    || defined(pic18f86j55) \
-    || defined(pic18f87j50)
+#elif  defined(__SDCC_PIC18F65J50) \
+    || defined(__SDCC_PIC18F66J50) \
+    || defined(__SDCC_PIC18F66J55) \
+    || defined(__SDCC_PIC18F67J50) \
+    || defined(__SDCC_PIC18F85J50) \
+    || defined(__SDCC_PIC18F86J50) \
+    || defined(__SDCC_PIC18F86J55) \
+    || defined(__SDCC_PIC18F87J50)
 #define __SDCC_PIC16_FAMILY 1865501
 
-#elif  defined(pic18f6585) \
-    || defined(pic18f6680) \
-    || defined(pic18f8585) \
-    || defined(pic18f8680)
+#elif  defined(__SDCC_PIC18F6585) \
+    || defined(__SDCC_PIC18F6680) \
+    || defined(__SDCC_PIC18F8585) \
+    || defined(__SDCC_PIC18F8680)
 #define __SDCC_PIC16_FAMILY 1865850
 
-#elif  defined(pic18f66j60) \
-    || defined(pic18f66j65) \
-    || defined(pic18f67j60) \
-    || defined(pic18f86j60) \
-    || defined(pic18f86j65) \
-    || defined(pic18f87j60) \
-    || defined(pic18f96j60) \
-    || defined(pic18f96j65) \
-    || defined(pic18f97j60)
+#elif  defined(__SDCC_PIC18F66J60) \
+    || defined(__SDCC_PIC18F66J65) \
+    || defined(__SDCC_PIC18F67J60) \
+    || defined(__SDCC_PIC18F86J60) \
+    || defined(__SDCC_PIC18F86J65) \
+    || defined(__SDCC_PIC18F87J60) \
+    || defined(__SDCC_PIC18F96J60) \
+    || defined(__SDCC_PIC18F96J65) \
+    || defined(__SDCC_PIC18F97J60)
 #define __SDCC_PIC16_FAMILY 1866601
 
 #else

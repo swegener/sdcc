@@ -1,3 +1,11 @@
+2012-06-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.c, src/SDCCerr.h: added W_STRING_CANNOT_BE_TERMINATED
+	  src/SDCCast.c (createIvalCharPtr): fixed #3007799: generate different warning
+	  for initializer strings that fit in buffer without terminating '\0'. Accordding
+	  C99 $6.7.8:14 this is allowed. With --less-pedantic no warning is generated.
+	  Modified version of patch by Jan Waclawek.
+
 2012-06-02 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCmain.c, src/pic14/main.c, src/pic16/main.c,

@@ -476,6 +476,8 @@ struct
      "return in _Noreturn function", 0},
   { E_STRUCT_REDEF, ERROR_LEVEL_ERROR,
      "struct/union '%s' redefined", 0 },
+  { W_STRING_CANNOT_BE_TERMINATED, ERROR_LEVEL_PEDANTIC,
+    "string '%s'cannot be terminated within array", 0 },
 };
 
 /*

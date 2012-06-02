@@ -237,6 +237,7 @@ enum {
   E_AUTO_ADDRSPACE              = 208, /* named address space for auto var */
   W_NORETURNRETURN              = 209, /* return in _noreturn function */
   E_STRUCT_REDEF                = 210, /* struct or union tag redefined */
+  W_STRING_CANNOT_BE_TERMINATED = 211, /* string cannot be terminated within array */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

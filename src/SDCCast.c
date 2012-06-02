@@ -1300,7 +1300,13 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
             {
               char *name = (IS_AST_SYM_VALUE (sym)) ? AST_SYMBOL (sym)->name : "";
 
-              werrorfl (iexpr->filename, iexpr->lineno, W_EXCESS_INITIALIZERS, "string", name);
+              if (options.std_c99 && s[symsize] == '\0' && size == symsize + 1)
+                { 
+                  if (!options.lessPedantic)
+                    werrorfl (iexpr->filename, iexpr->lineno, W_STRING_CANNOT_BE_TERMINATED, name);
+                }
+              else
+                werrorfl (iexpr->filename, iexpr->lineno, W_EXCESS_INITIALIZERS, "string", name);
             }
           size = symsize;
         }

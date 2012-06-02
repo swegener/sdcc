@@ -403,7 +403,7 @@ extern PORT z180_port;
 #if !OPT_DISABLE_R2K
 extern PORT r2k_port;  /* Rabbit 2000/3000 */
 #endif
-#if !OPT_DISABLE_R2K
+#if !OPT_DISABLE_R3KA
 extern PORT r3ka_port; /* Rabbit 3000A */
 #endif
 #if !OPT_DISABLE_GBZ80

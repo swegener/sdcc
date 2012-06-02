@@ -1,5 +1,10 @@
 2012-06-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/port.h:
+	  Fixed bug #3531540.
+
+2012-06-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCerr.c, src/SDCCerr.h: added W_STRING_CANNOT_BE_TERMINATED
 	  src/SDCCast.c (createIvalCharPtr): fixed #3007799: generate different warning
 	  for initializer strings that fit in buffer without terminating '\0'. Accordding

@@ -3368,12 +3368,14 @@ genUminus (const iCode * ic)
       goto remaining;
     }
 
-  _clearCarry ();
+  emit3 (A_XOR, ASMOP_A, ASMOP_A); /* Clear accumulator - for first byte. */
   while (size--)
     {
-      emit3 (A_LD, ASMOP_A, ASMOP_ZERO);
-      emit3_o ((IS_GB && !offset) ? A_SUB : A_SBC, ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
-      cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
+      emit3_o (offset ? A_SBC : A_SUB, ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+      _G.preserveCarry = (size ? 1 : 0);
+      cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0); /* Uses add iy, sp for AOP_EXSTK when omitting frame pointer, potentially destroying carry flag. */
+      if (size)
+        emit3 (A_LD, ASMOP_A, ASMOP_ZERO); /* Clear accumulator, but not carry - for subsequent bytes. */
     }
 
 remaining:
@@ -4839,7 +4841,7 @@ genPlusIncr (const iCode * ic)
       return TRUE;
     }
 
-  if (!IS_GB && isLitWord (AOP (IC_LEFT (ic))) && size == 2)
+  if (!IS_GB && isLitWord (AOP (IC_LEFT (ic))) && size == 2 && isPairDead (PAIR_HL, ic))
     {
       fetchLitPair (PAIR_HL, AOP (IC_LEFT (ic)), icount);
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
@@ -6369,7 +6371,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
 
           if (sign)             /* Map signed operands to unsigned ones. This pre-subtraction workaroud to lack of signed comparison is cheaper than the post-subtraction one at fix. */
             {
-              if (size == 2 && !IS_GB && isPairDead (PAIR_HL, ic) && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && (getPairId (AOP (left)) == PAIR_HL || IS_RAB && (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_EXSTK)))
+              if (size == 2 && !(IS_GB || !ifx && requiresHL(AOP(result)) && AOP_TYPE (result) != AOP_REG) && isPairDead (PAIR_HL, ic) && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && (getPairId (AOP (left)) == PAIR_HL || IS_RAB && (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_EXSTK)))
                 {
                   PAIR_ID litpair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
                   fetchPair (PAIR_HL, AOP (left));

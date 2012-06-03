@@ -814,7 +814,11 @@ _pic16_finaliseOptions (void)
 
   dbuf_init (&dbuf, 128);
 
+/*
+ * deprecated in sdcc 3.2.0
+ * TODO: should be obsoleted in sdcc 3.3.0 or later
   if (options.std_sdcc)
+ */
     {
       dbuf_append (&dbuf, "-D", sizeof ("-D") - 1);
       dbuf_append_str (&dbuf, pic16->name[2]);
@@ -874,19 +878,27 @@ _pic16_finaliseOptions (void)
     }
   else if (options.model == MODEL_LARGE)
     {
-      char *s;
+      char *s, *p;
 
       addSet (&asmOptionsSet, Safe_strdup ("-DSDCC_MODEL_LARGE"));
 
       dbuf_printf (&dbuf, "-D%s -D__%s", pic16->name[2], pic16->name[1]);
       s = Safe_strdup (dbuf_c_str (&dbuf));
-      *(strrchr (s, 'f')) = 'F';
+      /* TODO: borut - why only the first 'f' is converted to upper case?
+       * What if there is an other letter instead 'f'?
+       */
+      if (NULL != (p = strrchr (s, 'f')))
+        *p = 'F';
       addSet (&asmOptionsSet, s);
     }
 
   if (STACK_MODEL_LARGE)
     {
+/*
+ * deprecated in sdcc 3.2.0
+ * TODO: should be obsoleted in sdcc 3.3.0 or later
       if (options.std_sdcc)
+ */
         {
           addSet (&preArgvSet, Safe_strdup ("-DSTACK_MODEL_LARGE"));
           addSet (&asmOptionsSet, Safe_strdup ("-DSTACK_MODEL_LARGE"));
@@ -896,7 +908,11 @@ _pic16_finaliseOptions (void)
     }
   else
     {
+/*
+ * deprecated in sdcc 3.2.0
+ * TODO: should be obsoleted in sdcc 3.3.0 or later
       if (options.std_sdcc)
+ */
         {
           addSet (&preArgvSet, Safe_strdup ("-DSTACK_MODEL_SMALL"));
           addSet (&asmOptionsSet, Safe_strdup ("-DSTACK_MODEL_SMALL"));

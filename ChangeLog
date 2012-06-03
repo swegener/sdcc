@@ -1,3 +1,10 @@
+2012-06-03 Borut Razem <borut.razem AT gmail.com>
+
+	* src/pic14/main.c, src/pic16/main.c: re-enabled deprecated
+	  macros not starting with double underscore characters in
+	  combination with --std-cXX
+	* device/include/pic16/pic18fregs.h: modified for __SDCC_PICXXX
+
 2012-06-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

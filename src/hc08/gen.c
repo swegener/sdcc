@@ -1570,7 +1570,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
       if (rematOfs)
         {
           if (!offset)
-            emitcode ("lda", "(%s),x");
+            emitcode ("lda", "(%s),x", rematOfs);
           else
             emitcode ("lda", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
@@ -1594,7 +1594,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
       if (rematOfs)
         {
           if (!offset)
-            emitcode ("ldx", "(%s),x");
+            emitcode ("ldx", "(%s),x", rematOfs);
           else
             emitcode ("ldx", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
@@ -1634,7 +1634,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
       else if (rematOfs)
         {
           if (!offset)
-            emitcode ("ldhx", "(%s),x");
+            emitcode ("ldhx", "(%s),x", rematOfs);
           else
             emitcode ("ldhx", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 4;
@@ -1689,7 +1689,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
       if (rematOfs)
         {
           if (!offset)
-            emitcode ("sta", "(%s),x");
+            emitcode ("sta", "(%s),x", rematOfs);
           else
             emitcode ("sta", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;
@@ -1712,7 +1712,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
       if (rematOfs)
         {
           if (!offset)
-            emitcode ("stx", "(%s),x");
+            emitcode ("stx", "(%s),x", rematOfs);
           else
             emitcode ("stx", "(%s+%d),x", rematOfs, offset);
           regalloc_dry_run_cost += 3;

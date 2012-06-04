@@ -1,3 +1,8 @@
+2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Disallow use of hl over comparison when there is an extended stack operand. Partial fix for bug #3531660.
+
 2012-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (loadRegIndex, storeRegIndexed): added missing

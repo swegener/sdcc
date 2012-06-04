@@ -706,6 +706,8 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   if(exstk && (operand_on_stack(result, a, i, G) + operand_on_stack(left, a, i, G) + operand_on_stack(right, a, i, G) >= 2) && (result && IS_SYMOP(result) && getSize(operandType(result)) >= 2 || !result_only_HL))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
+  if(exstk && (operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) && ic->op == '>' || ic->op == '<')
+    return(false);
 
   if(ic->op == '+' && getSize(operandType(result)) >= 2 &&
     (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || IS_TRUE_SYMOP (right))) // Might use (hl).

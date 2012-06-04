@@ -5477,9 +5477,9 @@ genPlus (iCode * ic)
         }
       else
         emit3_o (A_ADC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
-      if (size != 0 &&
-          (requiresHL (AOP (IC_RIGHT (ic))) && !AOP_TYPE (IC_RIGHT (ic)) == AOP_REG || requiresHL (AOP (IC_LEFT (ic)))
-           && !AOP_TYPE (IC_LEFT (ic)) == AOP_REG) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG
+      if (size &&
+          (requiresHL (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_RIGHT (ic)) != AOP_REG || requiresHL (AOP (IC_LEFT (ic)))
+           && AOP_TYPE (IC_LEFT (ic)) != AOP_REG) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG
           && (AOP (IC_RESULT (ic))->aopu.aop_reg[offset]->rIdx == L_IDX
               || AOP (IC_RESULT (ic))->aopu.aop_reg[offset]->rIdx == H_IDX))
         {

@@ -1,5 +1,10 @@
 2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  Fix corner case in addition with extended stack right operand and low result byte in hl.
+
+2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/ralloc2.cc:
 	  Disallow use of hl over comparison when there is an extended stack operand. Partial fix for bug #3531660.
 	* src/z80/gen.c:

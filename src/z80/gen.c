@@ -8693,6 +8693,10 @@ genPointerGet (const iCode *ic)
       size = AOP_SIZE (result);
       offset = 0;
 
+      /* might use ld a,(hl) followed by ld d (iy),a */
+      if ((AOP_TYPE (result) == AOP_EXSTK || AOP_TYPE (result) == AOP_STK) && surviving_a && !pushed_a)
+        _push (PAIR_AF), pushed_a = TRUE;
+
       if (size >= 2 && pair == PAIR_HL && AOP_TYPE (result) == AOP_REG)
         {
           int i, l = -10, h = -10, r;

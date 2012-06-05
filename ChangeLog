@@ -3,6 +3,11 @@
 	* support/sdbinutils/libiberty/makefile.in:
 	  excluded pex*.c files from build since pex-unix.c doesn't
 	  compile on cygwim mingw and they are not needed by sdbinutils
+	* doc/sdccman.lyx: compiler macro definitions not starting with
+	  double underscore characters are deprecated if --std-cXX
+	  command line option is defined;
+	  new compiler macros for processor definition were introduced
+	  for pic14 and pic16 targets
 
 2012-06-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

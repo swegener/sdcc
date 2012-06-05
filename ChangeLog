@@ -1,4 +1,10 @@
-2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-06-05 Borut Razem <borut.razem AT gmail.com>
+
+	* support/sdbinutils/libiberty/makefile.in:
+	  excluded pex*.c files from build since pex-unix.c doesn't
+	  compile on cygwim mingw and they are not needed by sdbinutils
+
+2012-06-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc:
 	  Disallow surviving hl in addition with extended stack operands.

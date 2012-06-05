@@ -2781,6 +2781,8 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
         }
       bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
     }
+  if (IS_ITEMP (IC_RIGHT (dic)))
+    OP_USES (IC_RIGHT (dic)) = bitVectSetBit (OP_USES (IC_RIGHT (dic)), ic->key);
 
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */

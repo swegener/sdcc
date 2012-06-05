@@ -2828,6 +2828,8 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
   if (bitVectnBitsOn (OP_DEFS (IC_LEFT (ic))) != 1 || bitVectnBitsOn (OP_USES (IC_LEFT (ic))) != 1)
     return;
 
+  /* The changes in SDCCopt.c #7741 should correct the use info, making */
+  /* this extra test redundant. */
   if (ic->parmPush)
     {// find Send or other Push for this func call
       for (lic = ic->next; lic && lic->op != CALL; lic = lic->next)
@@ -2897,6 +2899,8 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
         }
       bitVectUnSetBit (OP_SYMBOL (IC_RESULT (dic))->defs, dic->key);
     }
+  if (IS_ITEMP (IC_RIGHT (dic)))
+    OP_USES (IC_RIGHT (dic)) = bitVectSetBit (OP_USES (IC_RIGHT (dic)), ic->key);
 
   /* now we know that it has one & only one def & use
      and the that the definition is an assignment */

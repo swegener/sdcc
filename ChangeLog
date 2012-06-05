@@ -1,3 +1,11 @@
+2012-06-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (packForPush),
+	* src/ds390/ralloc.c (packForPush),
+	* src/hc08/ralloc.c (packForPush),
+	* src/pic14/ralloc.c (packForPush),
+	* src/pic16/ralloc.c (packForPush): fixed bug #3527285
+
 2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

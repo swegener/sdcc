@@ -2938,6 +2938,8 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
       if (IS_ITEMP (IC_RIGHT (dic)))
         bitVectSetBit (lic->rlive, IC_RIGHT (dic)->key);
     }
+  if (IS_ITEMP (IC_RIGHT (dic)))
+    OP_USES (IC_RIGHT (dic)) = bitVectSetBit (OP_USES (IC_RIGHT (dic)), ic->key);
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
   IC_LEFT (ic) = IC_RIGHT (dic);

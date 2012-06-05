@@ -763,6 +763,9 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(ic->op == LEFT_OP && isOperandLiteral(IC_RIGHT(ic)))
     return(true);
 
+  if(exstk && !result_only_HL && (operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G) || operand_on_stack(result, a, i, G)) && ic->op == '+')
+    return(false);
+
   if((!POINTER_SET(ic) && !POINTER_GET(ic) && (
         (ic->op == '=' ||
          ic->op == CAST ||
@@ -780,7 +783,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if((ic->op == '<' || ic->op == '>') && (IS_ITEMP(left) || IS_OP_LITERAL(left) || IS_ITEMP(right) || IS_OP_LITERAL(right)))	// Todo: Fix for large stack.
     return(true);
     
-  if(IS_VALOP(right) && ic->op == EQ_OP)
+  if(ic->op == EQ_OP && IS_VALOP(right))
     return(true);
 
   if(ic->op == CALL)

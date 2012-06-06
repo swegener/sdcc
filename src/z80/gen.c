@@ -9207,7 +9207,7 @@ genPointerSet (iCode * ic)
         fetchPair (pairId, AOP (result));
     }
   /* so hl now contains the address */
-  freeAsmop (result, NULL, ic);
+  /*freeAsmop (result, NULL, ic);*/
 
   /* if bit then unpack */
   if (isBitvar)
@@ -9242,6 +9242,17 @@ genPointerSet (iCode * ic)
               _G.pairs[pairId].offset++;
             }
           offset++;
+        }
+      /* Restore operand partially in HL. */
+      if (!isPairDead (pairId, ic))
+        {
+          while(offset-- > 1)
+            {
+              emit2 ("dec %s", _pairs[pairId].name);
+              regalloc_dry_run_cost += 1;
+              _G.pairs[pairId].offset--;
+            }
+          commitPair (AOP (result), pairId, ic, FALSE);
         }
     }
 release:

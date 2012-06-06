@@ -1,3 +1,8 @@
+2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix POINTER_SET with surviving result partially in hl. Partial fix for bug #3531660.
+
 2012-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_autobaud.c: cosmetics
@@ -21,7 +26,7 @@
 2012-06-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc:
-	  Disallow surviving hl in addition with extended stack operands.
+	  Disallow surviving hl in addition with extended stack operands. Partial fix for bug #3531660.
 
 2012-06-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -34,7 +39,7 @@
 2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
-	  Fix corner case in addition with extended stack right operand and low result byte in hl.
+	  Fix corner case in addition with extended stack right operand and low result byte in hl. Partial fix for bug #3531660.
 
 2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -58,7 +63,7 @@
 2012-06-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Fix handling of extended stack operands in 16-bit unary minus and signed comparison.
+	  Fix handling of extended stack operands in 16-bit unary minus and signed comparison. Partial fix for bug #3531660.
 
 2012-06-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

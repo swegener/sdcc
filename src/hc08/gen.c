@@ -118,6 +118,12 @@ static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
          && ((x)->aopu.aop_reg[0] == hc08_reg_h) \
          && ((x)->size == 1) )
 
+#define IS_AOP_WITH_A(x) \
+        (((x)->type == AOP_REG) \
+         && (((x)->aopu.aop_reg[0] == hc08_reg_a) \
+            || ((x)->aopu.aop_reg[1] == hc08_reg_a)))
+
+
 #define CLRC    emitcode("clc","")
 
 #if 0
@@ -3991,12 +3997,13 @@ genPlus (iCode * ic)
   aopOp (IC_RESULT (ic), ic, TRUE);
 
   /* we want registers on the left and literals on the right */
-  if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT) || (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG))
+  if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT) || (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && !IS_AOP_WITH_A (AOP (IC_LEFT (ic)))))
     {
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
     }
+
 
 
   /* if I can do an increment instead
@@ -5688,7 +5695,7 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
   /* if right is accumulator & left is not then exchange them */
-  if (AOP_TYPE (right) == AOP_REG && ! IS_AOP_A (AOP (left)))
+  if (AOP_TYPE (right) == AOP_REG && ! IS_AOP_WITH_A (AOP (left)))
     {
       operand *tmp = right;
       right = left;
@@ -5934,7 +5941,7 @@ genOr (iCode * ic, iCode * ifx)
     }
 
   /* if left is accumulator & right is not then exchange them */
-  if (AOP_TYPE (right) == AOP_REG && !IS_AOP_A (AOP (left)))
+  if (AOP_TYPE (right) == AOP_REG && !IS_AOP_WITH_A (AOP (left)))
     {
       operand *tmp = right;
       right = left;
@@ -6118,7 +6125,7 @@ genXor (iCode * ic, iCode * ifx)
     }
 
   /* if left is accumulator & right is not then exchange them */
-  if (AOP_TYPE (right) == AOP_REG && !IS_AOP_A (AOP (left)))
+  if (AOP_TYPE (right) == AOP_REG && !IS_AOP_WITH_A (AOP (left)))
     {
       operand *tmp = right;
       right = left;
@@ -9351,7 +9358,7 @@ genCast (iCode * ic)
   /* to make sure the registers are not overwritten prematurely. */
   if (AOP_SIZE (result) == 2 && AOP (result)->type == AOP_REG)
     {
-      if (IS_AOP_HX (AOP (result)) && (AOP_SIZE (right) == 2 || !signExtend))
+      if (IS_AOP_HX (AOP (result)) && (AOP_SIZE (right) == 2))
         {
           loadRegFromAop (hc08_reg_hx, AOP (right), 0);
           goto release;

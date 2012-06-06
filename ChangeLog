@@ -1,3 +1,7 @@
+2012-06-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Fixed bug #3531544. Fixed cast from h to hx.
+
 2012-06-05 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/libiberty/makefile.in:

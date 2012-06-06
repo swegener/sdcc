@@ -1,6 +1,11 @@
 2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
+	  Fix 16-Bit addition for interleaved pairs. Partial fix for bug #3531660.
+
+2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
 	  Fix POINTER_SET with surviving result partially in hl. Partial fix for bug #3531660.
 
 2012-06-06 Maarten Brock <sourceforge.brock AT dse.nl>

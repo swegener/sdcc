@@ -5147,6 +5147,41 @@ genPlus (iCode * ic)
         }
     }
 
+  /* Addition of interleaved pairs */
+  if (getPairId (AOP (IC_RESULT (ic))) == PAIR_HL && AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_SIZE (IC_LEFT (ic)) >= 2 && AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_SIZE (IC_RIGHT (ic)) >= 2)
+    {
+      if (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == L_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == H_IDX)
+        {
+          if (AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx == D_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX)
+            {
+              emit2 ("add hl, de");
+              regalloc_dry_run_cost += 1;
+              goto release;
+            }
+          else if (AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx == B_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX)
+            {
+              emit2 ("add hl, bc");
+              regalloc_dry_run_cost += 1;
+              goto release;
+            }
+        }
+      else if (AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx == H_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == L_IDX)
+        {
+           if (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == D_IDX)
+            {
+              emit2 ("add hl, de");
+              regalloc_dry_run_cost += 1;
+              goto release;
+            }
+          else if (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX && AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == B_IDX)
+            {
+              emit2 ("add hl, bc");
+              regalloc_dry_run_cost += 1;
+              goto release;
+            }
+        }
+    }
+
   if (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY)
     {
       bool save_pair = FALSE;

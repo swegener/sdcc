@@ -45,10 +45,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef __SDCC_ds390
-/* just for the SP */
-#include <8051.h>
-#endif
 
 static __data char radix ;
 static __bit  long_flag = 0;
@@ -60,7 +56,7 @@ static __data long val;
 /* This great loop fails with the ds390 port (2003-01-13).
 
    At the beginning resp. end of the loop the compiler inserts a "push ar2"
-   resp. "pop ar2", which badly interfers with the push/pop in the source.
+   resp. "pop ar2", which badly interferes with the push/pop in the source.
 
    Library functions should be rock solid and portable. There's an _ltoa in
    the library, so let's use it and don't reinvent the wheel.
@@ -69,6 +65,9 @@ static __data long val;
 */
 
 #if NICE_LIFO_IMPLEMENTATION_BUT_NOT_PORTABLE
+/* just for the SP */
+#include <8051.h>
+
 static __data volatile char ch;
 static __bit sign;
 
@@ -85,12 +84,12 @@ static void pval(void)
         }
         else { sign = 0; lval = val;}
 
-	if (!long_flag) {
-	  lval &= 0x0000ffff;
-	}
+        if (!long_flag) {
+          lval &= 0x0000ffff;
+        }
         if (char_flag) {
-	  lval &= 0x000000ff;
-	}
+          lval &= 0x000000ff;
+        }
 
         do
         {
@@ -101,7 +100,7 @@ static void pval(void)
                 __asm push _ch __endasm;
                 lval /= radix;
 #  else
-		// This only looks more efficient, but isn't. see the .map
+                // This only looks more efficient, but isn't. see the .map
                 ch = (lval % radix) + '0';
                 if (ch>'9') ch+=7;
                 __asm push _ch __endasm;

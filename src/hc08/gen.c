@@ -2826,6 +2826,80 @@ asmopToBool (asmop *aop, bool resultInA)
 }
 
 /*-----------------------------------------------------------------*/
+/* genCopy - Copy the value from one operand to another            */
+/*           The caller is responsible for aopOp and freeAsmop     */
+/*-----------------------------------------------------------------*/
+static void
+genCopy (operand * result, operand * source)
+{
+  int size;
+  int offset = 0;
+
+  /* if they are the same and not volatile */
+  if (operandsEqu (result, source) && !isOperandVolatile (result, FALSE) &&
+      !isOperandVolatile (source, FALSE))
+    return;
+
+  /* if they are the same registers */
+  if (sameRegs (AOP (source), AOP (result)))
+    return;
+
+  if (IS_AOP_HX (AOP (result)))
+    {
+      loadRegFromAop (hc08_reg_hx, AOP (source), 0);
+      return;
+    }
+
+  /* If the result and right are 2 bytes and both in registers, we have to be careful */
+  /* to make sure the registers are not overwritten prematurely. */
+  if (AOP_SIZE (result) == 2 && AOP (result)->type == AOP_REG && AOP (source)->type == AOP_REG)
+    {
+      if (AOP (result)->aopu.aop_reg[0] == AOP (source)->aopu.aop_reg[1] &&
+          AOP (result)->aopu.aop_reg[1] == AOP (source)->aopu.aop_reg[0])
+        {
+          pushReg (AOP (source)->aopu.aop_reg[1], TRUE);
+          transferAopAop (AOP (source), 0, AOP (result), 0);
+          pullReg (AOP (result)->aopu.aop_reg[1]);
+        }
+      else if (AOP (result)->aopu.aop_reg[0] == AOP (source)->aopu.aop_reg[1])
+        {
+          transferAopAop (AOP (source), 1, AOP (result), 1);
+          transferAopAop (AOP (source), 0, AOP (result), 0);
+        }
+      else
+        {
+          transferAopAop (AOP (source), 0, AOP (result), 0);
+          transferAopAop (AOP (source), 1, AOP (result), 1);
+        }
+      return;
+    }
+
+  /* general case */
+  /* Copy in msb tot lsb order, since some multi-byte hardware registers */
+  /* expect this order. */
+  size = AOP_SIZE (result);
+  offset = size - 1;
+  while (size)
+    {
+      if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
+        (AOP_TYPE (source) == AOP_IMMD || AOP_TYPE (source) == AOP_LIT ||IS_S08 && AOP_TYPE (source) == AOP_EXT) &&
+        (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
+        {
+          loadRegFromAop (hc08_reg_hx, AOP (source), offset - 1);
+          storeRegToAop (hc08_reg_hx, AOP (result), offset - 1);
+          offset -= 2;
+          size -= 2;
+        }
+      else
+        {
+          transferAopAop (AOP (source), offset, AOP (result), offset);
+          offset--;
+          size--;
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
 /*-----------------------------------------------------------------*/
 static void
@@ -7448,8 +7522,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 
   if (shCount == 0)
     {
-      while (size--)
-        transferAopAop (AOP (left), size, AOP (result), size);
+      genCopy (result, left);
     }
   else if (shCount >= (size * 8))
     {
@@ -7832,9 +7905,7 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
   /* I suppose that the left size >= result size */
   if (shCount == 0)
     {
-      size = getDataSize (result);
-      while (size--)
-        transferAopAop (AOP (left), size, AOP (result), size);
+      genCopy (result, left);
     }
   else if (shCount >= (size * 8))
     {
@@ -9164,75 +9235,17 @@ static void
 genAssign (iCode * ic)
 {
   operand *result, *right;
-  int size;
-  int offset = 0;
-//  unsigned long lit = 0L;
 
   D (emitcode (";     genAssign", ""));
 
   result = IC_RESULT (ic);
   right = IC_RIGHT (ic);
-
-  /* if they are the same */
-  if (operandsEqu (result, right))
-    {
-      return;
-    }
-
+  
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
-  /* if they are the same registers */
-  if (sameRegs (AOP (right), AOP (result)))
-    goto release;
+  genCopy (result, right);
 
-  if (IS_AOP_HX (AOP (result)))
-    {
-      loadRegFromAop (hc08_reg_hx, AOP (right), 0);
-      goto release;
-    }
-
-  /* If the result and right are 2 bytes and both in registers, we have to be careful */
-  /* to make sure the registers are not overwritten prematurely. */
-  if (AOP_SIZE (result) == 2 && AOP (result)->type == AOP_REG && AOP (result)->type == AOP_REG)
-    {
-      if (AOP (result)->aopu.aop_reg[0] == AOP (right)->aopu.aop_reg[1])
-        {
-          transferAopAop (AOP (right), 1, AOP (result), 1);
-          transferAopAop (AOP (right), 0, AOP (result), 0);
-        }
-      else
-        {
-          transferAopAop (AOP (right), 0, AOP (result), 0);
-          transferAopAop (AOP (right), 1, AOP (result), 1);
-        }
-    }
-
-  /* general case */
-  /* Copy in msb tot lsb order, since some multi-byte hardware registers */
-  /* expect this order. */
-  size = AOP_SIZE (result);
-  offset = size - 1;
-  while (size)
-    {
-      if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
-        (AOP_TYPE (right) == AOP_IMMD || AOP_TYPE (right) == AOP_LIT ||IS_S08 && AOP_TYPE (right) == AOP_EXT) &&
-        (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
-        {
-          loadRegFromAop (hc08_reg_hx, AOP (right), offset - 1);
-          storeRegToAop (hc08_reg_hx, AOP (result), offset - 1);
-          offset -= 2;
-          size -= 2;
-        }
-      else
-        {
-          transferAopAop (AOP (right), offset, AOP (result), offset);
-          offset--;
-          size--;
-        }
-    }
-
-release:
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }

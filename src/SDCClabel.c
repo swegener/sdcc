@@ -101,10 +101,7 @@ labelGotoNext (iCode * ic)
 static void
 deleteIfx (iCode * loop, int key)
 {
-  if (!options.lessPedantic)
-    {
-      werrorfl (loop->filename, loop->lineno, W_CONTROL_FLOW);
-    }
+  werrorfl (loop->filename, loop->lineno, W_CONTROL_FLOW);
   hTabDeleteItem (&labelRef, key, loop, DELETE_ITEM, NULL);
 
   /* If the condition was volatile, convert IFX to */

@@ -140,8 +140,7 @@ bool uselessDecl = TRUE;
 file
    : /* empty */
         {
-          if (!options.lessPedantic)
-              werror(W_EMPTY_SOURCE_FILE);
+          werror(W_EMPTY_SOURCE_FILE);
         }
    | program
    ;

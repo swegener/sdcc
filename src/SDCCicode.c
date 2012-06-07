@@ -2890,8 +2890,7 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
         {
         case CCR_ALWAYS_TRUE:
         case CCR_ALWAYS_FALSE:
-          if (!options.lessPedantic)
-            werror (W_COMP_RANGE, "true resp. false");
+          werror (W_COMP_RANGE, "true resp. false");
           return operandFromLit (ccr_result == CCR_ALWAYS_TRUE ? 1 : 0);
         default:
           break;
@@ -3029,11 +3028,11 @@ geniCodeLogicAndOr (ast * tree, int lvl)
 /* geniCodeUnary - for a generic unary operation                   */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeUnary (operand * op, int oper)
+geniCodeUnary (operand * op, int oper, sym_link * resType)
 {
   iCode *ic = newiCode (oper, op, NULL);
 
-  IC_RESULT (ic) = newiTempOperand (operandType (op), 0);
+  IC_RESULT (ic) = newiTempOperand (resType, 0);
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
 }
@@ -3042,11 +3041,11 @@ geniCodeUnary (operand * op, int oper)
 /* geniCodeBinary - for a generic binary operation                 */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeBinary (operand * left, operand * right, int oper)
+geniCodeBinary (operand * left, operand * right, int oper, sym_link * resType)
 {
   iCode *ic = newiCode (oper, left, right);
 
-  IC_RESULT (ic) = newiTempOperand (operandType (left), 0);
+  IC_RESULT (ic) = newiTempOperand (resType, 0);
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
 }
@@ -3125,7 +3124,7 @@ checkTypes (operand * left, operand * right)
       werror (W_LIT_OVERFLOW);
     }
 
-  if (always_cast || compareType (ltype, rtype) < 0)
+  if (always_cast || compareType (ltype, rtype) == -1)
     right = geniCodeCast (ltype, right, TRUE);
   checkPtrQualifiers (ltype, rtype);
   return right;
@@ -4225,30 +4224,26 @@ ast2iCode (ast * tree, int lvl)
     case RRC:
     case RLC:
     case SWAP:
-      return geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
+      return geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op, tree->ftype);
 
     case '!':
     case GETHBIT:
       {
-        operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
-        if (!IS_BOOLEAN (operandType (op)))
-          setOperandType (op, UCHARTYPE);
+        operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op, tree->ftype);
         return op;
       }
     case GETABIT:
       {
         operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
                                       geniCodeRValue (right, FALSE),
-                                      tree->opval.op);
-        if (!IS_BOOLEAN (operandType (op)))
-          setOperandType (op, UCHARTYPE);
+                                      tree->opval.op, tree->ftype);
         return op;
       }
     case GETBYTE:
       {
         operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
                                       geniCodeRValue (right, FALSE),
-                                      tree->opval.op);
+                                      tree->opval.op, tree->ftype);
         setOperandType (op, UCHARTYPE);
         return op;
       }
@@ -4256,7 +4251,7 @@ ast2iCode (ast * tree, int lvl)
       {
         operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
                                       geniCodeRValue (right, FALSE),
-                                      tree->opval.op);
+                                      tree->opval.op, tree->ftype);
         setOperandType (op, UINTTYPE);
         return op;
       }

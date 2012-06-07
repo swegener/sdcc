@@ -1919,8 +1919,8 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               /* integer type that has no loss of bits */
               if (!IS_INTEGRAL (type1) || !IS_INTEGRAL (type2))
                 continue;
-              size1 = getSize (type1);
-              size2 = getSize (type2);
+              size1 = bitsForType (type1);
+              size2 = bitsForType (type2);
               if (size2 < size1)
                 continue;
               /* If they are the same size, they must have the same signedness */
@@ -1942,7 +1942,7 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               type3 = operandType (IC_RESULT (uic));
               if (!IS_INTEGRAL (type3))
                  continue;
-              size3 = getSize (type3);
+              size3 = bitsForType (type3);
               if (size3 < size2)
                  continue;
               /* If they are the same size, they must have the same signedness */

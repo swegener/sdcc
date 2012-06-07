@@ -117,16 +117,16 @@ extern const operand *validateOpTypeConst (const operand * op,
 #define OP_TYPE(op)          validateOpType(op, "OP_TYPE", #op, TYPE, __FILE__, __LINE__)->svt.typeOperand
 
 /* definition for intermediate code */
-#define IC_RESULT(x) (x)->ulrrcnd.lrr.result
-#define IC_LEFT(x)   (x)->ulrrcnd.lrr.left
-#define IC_RIGHT(x)  (x)->ulrrcnd.lrr.right
-#define IC_COND(x)   (x)->ulrrcnd.cnd.condition
-#define IC_TRUE(x)   (x)->ulrrcnd.cnd.trueLabel
-#define IC_FALSE(x)  (x)->ulrrcnd.cnd.falseLabel
-#define IC_LABEL(x)  (x)->label
-#define IC_JTCOND(x) (x)->ulrrcnd.jmpTab.condition
-#define IC_JTLABELS(x) (x)->ulrrcnd.jmpTab.labels
-#define IC_INLINE(x) (x)->inlineAsm
+#define IC_RESULT(x)     (x)->ulrrcnd.lrr.result
+#define IC_LEFT(x)       (x)->ulrrcnd.lrr.left
+#define IC_RIGHT(x)      (x)->ulrrcnd.lrr.right
+#define IC_COND(x)       (x)->ulrrcnd.cnd.condition
+#define IC_TRUE(x)       (x)->ulrrcnd.cnd.trueLabel
+#define IC_FALSE(x)      (x)->ulrrcnd.cnd.falseLabel
+#define IC_LABEL(x)      (x)->label
+#define IC_JTCOND(x)     (x)->ulrrcnd.jmpTab.condition
+#define IC_JTLABELS(x)   (x)->ulrrcnd.jmpTab.labels
+#define IC_INLINE(x)     (x)->inlineAsm
 #define IC_ARRAYILIST(x) (x)->arrayInitList
 
 typedef struct iCode

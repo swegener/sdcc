@@ -239,9 +239,9 @@ typedef enum
 
 typedef struct sym_link
 {
-  SYM_LINK_CLASS xclass;            /* DECLARATOR or SPECIFIER    */
-  unsigned tdef:1;                  /* current link created by    */
-  /* typedef if this flag is set */
+  SYM_LINK_CLASS xclass;            /* DECLARATOR or SPECIFIER     */
+  unsigned tdef:1;                  /* current link created by     */
+                                    /* typedef if this flag is set */
   union
   {
     specifier s;                    /* if CLASS == SPECIFIER      */
@@ -530,12 +530,12 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_CHAR(x)       (IS_SPEC(x) && x->select.s.noun == V_CHAR)
 #define IS_EXTERN(x)     (IS_SPEC(x) && x->select.s.b_extern)
 #define IS_VOLATILE(x)   (isVolatile (x))
-#define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
-                                         x->select.s.noun == V_BOOL || \
-                                         x->select.s.noun == V_CHAR || \
-                                         x->select.s.noun == V_BITFIELD || \
+#define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT       || \
+                                         x->select.s.noun == V_BOOL      || \
+                                         x->select.s.noun == V_CHAR      || \
+                                         x->select.s.noun == V_BITFIELD  || \
                                          x->select.s.noun == V_BBITFIELD || \
-                                         x->select.s.noun == V_BIT ||  \
+                                         x->select.s.noun == V_BIT       || \
                                          x->select.s.noun == V_SBIT ))
 #define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
                                          x->select.s.noun == V_BBITFIELD ))

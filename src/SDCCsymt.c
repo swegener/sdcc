@@ -1110,7 +1110,6 @@ bitsForType (sym_link * p)
 
   if (IS_SPEC (p))
     {                           /* if this is the specifier then */
-
       switch (SPEC_NOUN (p))
         {                       /* depending on the specifier type */
         case V_INT:
@@ -1156,7 +1155,6 @@ bitsForType (sym_link * p)
       return (FPTRSIZE * 8);
     case GPOINTER:
       return (GPTRSIZE * 8);
-
     default:
       return 0;
     }
@@ -2433,7 +2431,7 @@ comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
   if (res == 1)
     return bMustCast ? -1 : 1;
   else if (res == -2)
-    return -2;
+    return bMustCast ? -1 : -2;
   else
     return 0;
 }

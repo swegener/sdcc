@@ -1,3 +1,8 @@
+2012-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c:
+	  Fix handling of --fomit-frame-pointer for z180, rk and r3ka port.
+
 2012-06-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genAssign): no assignment for ruonly to ruonly
@@ -26,12 +31,12 @@
 
 	* src/hc08/gen.c: fixed bugs #3531546 and #3531545
 
-2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-06-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Fix 16-Bit addition for interleaved pairs. Partial fix for bug #3531660.
 
-2012-06-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-06-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Fix POINTER_SET with surviving result partially in hl. Partial fix for bug #3531660.

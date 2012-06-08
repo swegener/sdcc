@@ -599,7 +599,7 @@ _setValues (void)
 
   /* For the old register allocator (with the new one we decide to omit the frame pointer for each function individually) */
   if (!IS_GB && options.omitFramePtr)
-    z80_port.stack.call_overhead = 2;
+    port->stack.call_overhead = 2;
 }
 
 static void

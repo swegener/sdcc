@@ -73,6 +73,8 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       bitVectUnSetBit (OP_USES (left), ic->key);
   if (IS_SYMOP (right))
       bitVectUnSetBit (OP_USES (right), ic->key);
+  if (IS_SYMOP (IC_RESULT (ic)))
+      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   if (IS_FLOAT (operandType (right)))
     {
@@ -228,7 +230,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
   bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-  OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), newic->key);
+  OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
   newic->filename = filename;
   newic->lineno = lineno;
   newic->parmBytes += bytesPushed;
@@ -270,6 +272,11 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
   ip = ic->next;
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
+  if (IS_SYMOP (IC_RIGHT (ic)))
+      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+  if (IS_SYMOP (IC_RESULT (ic)))
+      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
     {
@@ -309,6 +316,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
   else
     {
@@ -327,6 +336,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
 
   /* make the call */
@@ -355,6 +366,8 @@ found:
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
   newic->lineno = linenno;
+  if (IS_SYMOP (IC_RESULT (ic)))
+    OP_DEFS (IC_RESULT (ic)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
 }
 
 /*----------------------------------------------------------------------*/
@@ -373,6 +386,11 @@ cnvToFixed16x16Cast (iCode * ic, eBBlock * ebp)
   ip = ic->next;
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
+  if (IS_SYMOP (IC_RIGHT (ic)))
+      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+  if (IS_SYMOP (IC_RESULT (ic)))
+      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
     {
@@ -405,6 +423,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
   else
     {
@@ -423,6 +443,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = linenno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
 
   /* make the call */
@@ -451,6 +473,8 @@ found:
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
   newic->lineno = linenno;
+  if (IS_SYMOP (IC_RESULT (ic)))
+    OP_DEFS (IC_RESULT (ic)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
 }
 
 /*-----------------------------------------------------------------*/
@@ -470,6 +494,10 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
   ip = ic->next;
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
+  if (IS_SYMOP (IC_RIGHT (ic)))
+      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+  if (IS_SYMOP (IC_RESULT (ic)))
+      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
@@ -503,6 +531,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
   else
     {
@@ -521,6 +551,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
 
   /* make the call */
@@ -549,6 +581,8 @@ found:
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
   newic->lineno = lineno;
+  if (IS_SYMOP (IC_RESULT (ic)))
+    OP_DEFS (IC_RESULT (ic)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -568,6 +602,10 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
   ip = ic->next;
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
+  if (IS_SYMOP (IC_RIGHT (ic)))
+      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+  if (IS_SYMOP (IC_RESULT (ic)))
+      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
@@ -608,6 +646,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
   else
     {
@@ -626,6 +666,8 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->filename = filename;
       newic->lineno = lineno;
+      if (IS_SYMOP (IC_RIGHT (ic)))
+          OP_USES (IC_RIGHT (ic)) = bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
     }
 
   /* make the call */
@@ -654,6 +696,8 @@ found:
   addiCodeToeBBlock (ebp, newic, ip);
   newic->filename = filename;
   newic->lineno = lineno;
+  if (IS_SYMOP (IC_RESULT (ic)))
+    OP_DEFS (IC_RESULT (ic)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
 }
 
 extern operand *geniCodeRValue (operand *, bool);
@@ -833,7 +877,7 @@ found:
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
   bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-  OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), newic->key);
+  OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
   newic->filename = filename;
   newic->lineno = lineno;
   newic->parmBytes+=bytesPushed; // to clear the stack after the call

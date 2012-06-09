@@ -439,6 +439,7 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
     {
       ic->filename = ip->filename;
       ic->lineno = ip->lineno;
+      ic->eBBlockNum = ip->eBBlockNum;
       ic->prev = ip->prev;
       ip->prev = ic;
       ic->next = ip;

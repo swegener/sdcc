@@ -3009,18 +3009,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
           OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
         }
-#if 1
-      if (ic->op == '=' &&
-          !POINTER_SET (ic) &&
-          IS_ITEMP (IC_RESULT (ic)) &&
-          IS_VALOP (IC_RIGHT (ic)) &&
-          bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
-        {
-          OP_SYMBOL (IC_RESULT (ic))->remat = 1;
-          OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
-          OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-        }
-#endif
+
       /* if straight assignment then carry remat flag if
          this is the only definition */
       if (ic->op == '=' &&

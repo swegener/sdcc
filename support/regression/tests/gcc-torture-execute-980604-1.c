@@ -18,7 +18,6 @@ int d = 0;
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
   double e;
   double f;
   double g;
@@ -29,6 +28,5 @@ testTortureExecute (void)
   if (e)
     ASSERT (0);
   return;
-#endif
 }
 

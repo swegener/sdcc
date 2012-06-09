@@ -1,3 +1,12 @@
+2012-06-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c: fixed several missing def/use problems including 
+	  bug #3511517
+	* src/SDCCBBlock.c (addiCodeToeBBlock): fixed bug #3511516
+	* src/hc08/ralloc.c (packRegisters): fixed bug #3531045
+	* support/regression/tests/gcc-torture-execute-980604-1.c: reenabled
+	* support/regression/tests/gcc-torture-execute-980205.c: reenabled
+
 2012-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c:

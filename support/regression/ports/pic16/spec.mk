@@ -15,10 +15,10 @@ ifndef SDCC_BIN_PATH
     SDCCFLAGS += --nostdinc -I$(top_srcdir)/device/include/pic16 -I$(top_srcdir)/device/non-free/include/pic16 -I$(top_srcdir)
     LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/pic16 -L$(top_builddir)/device/non-free/lib/build/pic16
   else
-    SDCCFLAGS += --non-free
+    SDCCFLAGS += --use-non-free
   endif
 else
-  SDCCFLAGS += --non-free
+  SDCCFLAGS += --use-non-free
 endif
 
 ifdef CROSSCOMPILING

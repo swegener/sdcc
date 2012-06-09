@@ -1,3 +1,9 @@
+2012-06-09 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/pic14/spec.mk,
+	  support/regression/ports/pic16/spec.mk: 
+	  fixed pic -> pic14, --non-free -> --use-non-free
+
 2012-06-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:

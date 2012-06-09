@@ -710,7 +710,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(false);
 
   if(ic->op == '+' && getSize(operandType(result)) >= 2 &&
-    (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || IS_TRUE_SYMOP (right))) // Might use (hl).
+    (IS_TRUE_SYMOP (result) || IS_TRUE_SYMOP (left) || exstk && operand_on_stack(left, a, i, G) || IS_TRUE_SYMOP (right) || exstk && operand_on_stack(right, a, i, G))) // Might use (hl).
     return(false);
 
   if(ic->op == '+' && input_in_HL && (IS_TRUE_SYMOP (result) || operand_on_stack(result, a, i, G) && exstk)) // Might use (hl) for result.

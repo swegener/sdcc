@@ -2,6 +2,8 @@
 
 	* src/z80/ralloc2.cc:
 	  Disallow source operand in h or l for >= 16-bit addition that also has a source operand on extended stack. Final part of fix for bug #3531660.
+	* support/regression/tests/bug3531687.c:
+	  Regression test for bug #3531687.
 
 2012-06-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

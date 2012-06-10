@@ -6,8 +6,6 @@
 
 #include <testfwk.h>
 
-#pragma std_c99
-
 int f(char a, char flag)
 {
   if (a == (flag ? 1 : 0))
@@ -15,17 +13,8 @@ int f(char a, char flag)
   return 1;
 }
 
-_Bool g(char a, _Bool b)
-{
-	return (a > b);
-}
-
 void
 testBug(void)
 {
-#if 0
   ASSERT(f(2, 1));
-  ASSERT(g(2, 1));
-#endif
 }
-

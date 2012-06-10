@@ -1491,6 +1491,29 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               return;
             }
         }
+      /* if XOR then check if one of them is a zero or one */
+      /* if yes turn it into assignment or invert */
+      if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
+          IS_BOOLEAN (operandType (IC_LEFT (ic))) &&
+          IS_BOOLEAN (operandType (IC_RESULT (ic)))
+         )
+        {
+          double litval = operandLitValue (IC_RIGHT (ic));
+          if (litval == 1.0)
+            {
+              ic->op = '!';
+              IC_RIGHT (ic) = NULL;
+              return;
+            }
+          else
+            {
+              ic->op = '=';
+              IC_RIGHT (ic) = operandFromLit (1);
+              IC_LEFT (ic) = NULL;
+              SET_RESULT_RIGHT (ic);
+              return;
+            }
+        }
       break;
     }
 

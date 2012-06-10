@@ -109,6 +109,7 @@ CCR_RESULT;
 value *newValue (void);
 value *constVal (const char *);
 value *constCharVal (unsigned char);
+value *constBoolVal (bool v);
 value *reverseVal (value *);
 value *reverseValWithType (value *);
 value *copyValue (value *);

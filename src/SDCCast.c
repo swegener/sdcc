@@ -3045,10 +3045,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       /*  bitwise and               */
       /*----------------------------*/
-    case '&':                   /* can be unary   */
-      /* if right is NULL then unary operation  */
+    case '&':                  /* can be unary */
+      /* if right is NULL then unary operation */
       if (tree->right)          /* not a unary operation */
         {
+          ast *otree;
+
           if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
             {
               werrorfl (tree->filename, tree->lineno, E_BITWISE_OP);
@@ -3097,41 +3099,36 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 }
             }
 
+          /* if ANDing boolean with literal then reduce literal LSB to boolean */
+          if (IS_LITERAL (RTYPE (tree)) && IS_BOOLEAN (LTYPE (tree)))
+            {
+              unsigned long litval = AST_ULONG_VALUE (tree->right);
+              tree->right = decorateType (newAst_VALUE (constBoolVal (litval & 1)), resultType);
+            }
+
           /* see if this is a GETHBIT operation if yes
              then return that */
-          {
-            ast *otree = optimizeGetHbit (tree, resultType);
-
-            if (otree != tree)
-              return decorateType (otree, RESULT_TYPE_NONE);
-          }
+          otree = optimizeGetHbit (tree, resultType);
+          if (otree != tree)
+            return decorateType (otree, RESULT_TYPE_NONE);
 
           /* see if this is a GETABIT operation if yes
              then return that */
-          {
-            ast *otree = optimizeGetAbit (tree, resultType);
-
-            if (otree != tree)
-              return decorateType (otree, RESULT_TYPE_NONE);
-          }
+          otree = optimizeGetAbit (tree, resultType);
+          if (otree != tree)
+            return decorateType (otree, RESULT_TYPE_NONE);
 
           /* see if this is a GETBYTE operation if yes
              then return that */
-          {
-            ast *otree = optimizeGetByte (tree, resultType);
-
-            if (otree != tree)
-              return decorateType (otree, RESULT_TYPE_NONE);
-          }
+          otree = optimizeGetByte (tree, resultType);
+          if (otree != tree)
+            return decorateType (otree, RESULT_TYPE_NONE);
 
           /* see if this is a GETWORD operation if yes
              then return that */
-          {
-            ast *otree = optimizeGetWord (tree, resultType);
-
-            if (otree != tree)
-              return decorateType (otree, RESULT_TYPE_NONE);
-          }
+          otree = optimizeGetWord (tree, resultType);
+          if (otree != tree)
+            return decorateType (otree, RESULT_TYPE_NONE);
 
           LRVAL (tree) = RRVAL (tree) = 1;
 
@@ -3262,6 +3259,17 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               decorateType (parent, resultType);
             }
         }
+
+      /* if ORing boolean with literal then reduce literal to boolean */
+      if (IS_LITERAL (RTYPE (tree)) &&
+          IS_BOOLEAN (LTYPE (tree)) &&
+          IS_INTEGRAL (RTYPE (tree)) &&
+          resultType == RESULT_TYPE_BIT)
+        {
+          unsigned long litval = AST_ULONG_VALUE (tree->right);
+          tree->right = decorateType (newAst_VALUE (constBoolVal (litval != 0)), resultType);
+        }
+
       /* fall through */
 
       /*------------------------------------------------------------------*/
@@ -3313,6 +3321,27 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               tree->right = tTree;
               /* both operands in litTree are literal now */
               decorateType (parent, resultType);
+            }
+        }
+
+      /* if XORing boolean with literal then reduce literal to boolean */
+      if (IS_LITERAL (RTYPE (tree)) &&
+          IS_BOOLEAN (LTYPE (tree)) &&
+          IS_INTEGRAL (RTYPE (tree)) &&
+          resultType == RESULT_TYPE_BIT &&
+          tree->opval.op == '^')   /* the same source is used by 'bitwise or' */
+        {
+          unsigned long litval = AST_ULONG_VALUE (tree->right);
+          if (litval == 0 || litval == 1)
+            {
+              tree->right = decorateType (newAst_VALUE (constBoolVal (litval != 0)), resultType);
+            }
+          else
+            {
+              tree->opval.op = '|';
+              tree->right = newAst_VALUE (constBoolVal (1));
+              tree->decorated = 0;
+              return decorateType (tree, resultType);
             }
         }
 
@@ -5615,13 +5644,13 @@ optimizeGetAbit (ast * tree, RESULT_TYPE resultType)
   if (!expr && (resultType == RESULT_TYPE_BIT))
     {
       int p2 = isBitAndPow2 (tree);
-      if (p2 >= 0)
+      if (p2 >= 0 && !IS_BOOLEAN (TTYPE (tree->left)))
         {
           expr = tree->left;
           count = newAst_VALUE (valueFromLit (p2));
         }
     }
-  if (!expr || IS_BOOLEAN (TTYPE (expr)))
+  if (!expr)
     return tree;
 
   /* make sure the port supports GETABIT */

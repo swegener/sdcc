@@ -210,8 +210,6 @@ copyLiteralList (literalList * src)
   return head;
 }
 
-
-
 /*------------------------------------------------------------------*/
 /* copyIlist - copy initializer list                                */
 /*------------------------------------------------------------------*/
@@ -669,8 +667,15 @@ cheapestVal (value * val)
      reduce it the other way */
   if (SPEC_CVAL (val->type).v_int >= 0)
     {
+      /* 'bool' promotes to 'signed int' too */
+      if (SPEC_CVAL (val->type).v_int <= 1)
+        {
+          SPEC_NOUN (val->type) = (bit) ? V_BIT : V_BOOL;
+        }
+
       SPEC_USIGN (val->type) = 1;
     }
+
   return (val);
 }
 
@@ -691,7 +696,8 @@ double2ul (double val)
  */
   return ((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val);
 }
- /*--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------*/
 /* checkConstantRange - check if constant fits in numeric range of    */
 /* var type in comparisons and assignments                            */
 /*--------------------------------------------------------------------*/
@@ -1202,6 +1208,9 @@ constVal (const char *s)
   return val;
 }
 
+/*-----------------------------------------------------------------*/
+/* constCharVal - converts a CHAR constant to value                */
+/*-----------------------------------------------------------------*/
 value *
 constCharVal (unsigned char v)
 {
@@ -1222,6 +1231,25 @@ constCharVal (unsigned char v)
     {
       SPEC_CVAL (val->type).v_int = (signed char) v;
     }
+
+  return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* constBoolVal - converts a BOOL constant to value                */
+/*-----------------------------------------------------------------*/
+value *
+constBoolVal (bool v)
+{
+  value *val = newValue ();     /* alloc space for value   */
+
+  val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
+  SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CONST (val->type) = 1;
+
+  SPEC_NOUN (val->type) = (bit) ? V_BIT : V_BOOL;
+
+  SPEC_CVAL (val->type).v_uint = (unsigned int) v;
 
   return val;
 }
@@ -2013,7 +2041,7 @@ valShift (value * lval, value * rval, int lr)
 }
 
 /*------------------------------------------------------------------*/
-/* valCompare- Compares two literal                                 */
+/* valCompare - Compares two literal                                */
 /*------------------------------------------------------------------*/
 value *
 valCompare (value * lval, value * rval, int ctype)

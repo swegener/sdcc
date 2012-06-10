@@ -1,3 +1,16 @@
+2012-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (decorateType, &/|/^): optimize bool with literal,
+	  (optimizeGetAbit): prevent memory leak
+	* src/SDCCcse.c (algebraicOpts): optimize bool XOR literal
+	* src/SDCCsymt.c (computeType): also remove const from result,
+	  fixed bug 3531687 by removing wrong CHAR = ? 1 : 0 optimization to BOOL
+	* src/SDCCval.h,
+	* src/SDCCval.c (constBoolVal): new function
+	  (cheapestVal): added BOOL for 0 or 1,
+	* support/regression/tests/bug3531687.c: enabled test, removed unrelated
+	  and already covered test
+
 2012-06-09 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/ports/pic14/spec.mk,
@@ -7,7 +20,8 @@
 2012-06-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:
-	  Disallow source operand in h or l for >= 16-bit addition that also has a source operand on extended stack. Final part of fix for bug #3531660.
+	  Disallow source operand in h or l for >= 16-bit addition that also has a
+	  source operand on extended stack. Final part of fix for bug #3531660.
 	* support/regression/tests/bug3531687.c:
 	  Regression test for bug #3531687.
 

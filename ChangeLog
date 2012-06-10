@@ -10,6 +10,7 @@
 	  (cheapestVal): added BOOL for 0 or 1,
 	* support/regression/tests/bug3531687.c: enabled test, removed unrelated
 	  and already covered test
+	* support/regression/tests/getbyte.c: new, added
 
 2012-06-09 Borut Razem <borut.razem AT gmail.com>
 

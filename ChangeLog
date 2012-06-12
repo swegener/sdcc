@@ -1,3 +1,8 @@
+2012-06-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCicode.c:
+	  Fix debug output for GET_VALUE_AT_ADDRESS right operand.
+
 2012-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (decorateType, &/|/^): optimize bool with literal,

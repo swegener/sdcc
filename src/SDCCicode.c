@@ -285,6 +285,11 @@ PRINTFUNC (picGetValueAtAddr)
   dbuf_append_str (dbuf, " = ");
   dbuf_append_str (dbuf, "@[");
   dbuf_printOperand (IC_LEFT (ic), dbuf);
+  if (IC_RIGHT (ic))
+    {
+      dbuf_append_str (dbuf, " + ");
+      dbuf_printOperand (IC_RIGHT (ic), dbuf);
+    }
   dbuf_append_str (dbuf, "]\n");
 }
 

@@ -486,21 +486,29 @@ struct mne *mp;
 		break;
 
 	case X_TST:
-		t1 = addr(&e1);
-		if (t1 == S_R8) {
+		t2 = addr(&e2);
+		if (more())
+                  {
+                    if ((t2 != S_R8) || (e2.e_addr != A))
+                      ++t1;
+                    comma(1);
+                    clrexpr(&e2);
+                    t2 = addr(&e2);
+                  }
+		if (t2 == S_R8) {
 			outab(0xED);
-			outab(op | (e1.e_addr<<3));
+			outab(op | (e2.e_addr<<3));
 			break;
 		}
-		if (t1 == S_IDHL) {
+		if (t2 == S_IDHL) {
 			outab(0xED);
 			outab(0x34);
 			break;
 		}
-		if (t1 == S_IMMED) {
+		if (t2 == S_IMMED) {
 			outab(0xED);
 			outab(0x64);
-			outrb(&e1, 0);
+			outrb(&e2, 0);
 			break;
 		}
 		aerr();

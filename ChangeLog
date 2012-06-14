@@ -1,3 +1,8 @@
+2012-06-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  Fix cost calculation for branches.
+
 2012-06-13 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sdas/asz80/z80mch.c:  Allow the tst instruction for z180/.hd64 to

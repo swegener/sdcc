@@ -158,7 +158,7 @@ emitBranch (char *branchop, symbol * tlbl)
 {
   if (!regalloc_dry_run)
     emitcode (branchop, "%05d$", labelKey2num (tlbl->key));
-  regalloc_dry_run_cost += 2; /* Todo: brclr is more expensive */
+  regalloc_dry_run_cost += (!strcmp(branchop, "jmp") || !strcmp(branchop, "brclr") || !strcmp(branchop, "brset") ? 3 : 2);
 }
 
 /*-----------------------------------------------------------------*/

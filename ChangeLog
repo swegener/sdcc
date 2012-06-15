@@ -1,3 +1,8 @@
+2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+ 	* support/regression/tests/and_survive.c:
+	  Test non-destructive and, regression test for #3534833.
+
 2012-06-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/hc08/gen.c:

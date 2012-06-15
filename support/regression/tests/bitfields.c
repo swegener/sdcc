@@ -431,6 +431,7 @@ struct
 
 /* test case for const struct with bitfields */
 
+#ifndef __SDCC_pic16 // TODO: enable when the pic16 ports supports bitfields of size greater than 8 bits!
 const struct
 {
   unsigned int a : 4;
@@ -442,6 +443,7 @@ const struct
   unsigned int f : 2;
   unsigned int g;
 } cs = { 1, 2, 345, 6, 2, 1, 54321};
+#endif
 
 #if defined(PORT_HOST) && (defined(__x86_64__) || defined(__i386__)) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
 /* Workaround to fix the (cs.f == 1) test failure, which appeared in svn build 6665, when -O2 gcc option was included.
@@ -454,6 +456,7 @@ const struct
 void
 testCS(void)
 {
+#ifndef __SDCC_pic16 // TODO: enable when the pic16 ports supports bitfields of size greater than 8 bits!
   ASSERT(cs.a == 1);
   ASSERT(cs.b == 2);
   ASSERT(cs.c == 345);
@@ -461,6 +464,7 @@ testCS(void)
   ASSERT(cs.e == 2);
   ASSERT(cs.f == 1);
   ASSERT(cs.g == 54321U);
+#endif
 }
 #if defined(PORT_HOST) && defined(__sun) && defined(__i386__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 6)
 #pragma GCC pop_options

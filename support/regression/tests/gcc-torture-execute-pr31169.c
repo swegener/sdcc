@@ -11,6 +11,7 @@
 #define HOST_WIDE_INT long
 #define HOST_BITS_PER_WIDE_INT (sizeof(long)*8)
 
+#ifndef __SDCC_pic16 // TODO: enable when the pic16 ports supports bitfields of size greater than 8 bits!
 struct tree_type
 {
   unsigned int precision : 9;
@@ -48,14 +49,17 @@ sign_bit_p (struct tree_type *t, HOST_WIDE_INT val_hi, unsigned HOST_WIDE_INT va
 
   return 0;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pic16 // TODO: enable when the pic16 ports supports bitfields of size greater than 8 bits!
   struct tree_type t;
   t.precision = 1;
   if (!sign_bit_p (&t, 0, -1))
     ASSERT (0);
   return;
+#endif
 }
 

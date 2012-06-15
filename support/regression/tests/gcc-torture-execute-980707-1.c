@@ -9,40 +9,45 @@
 #pragma disable_warning 85
 #endif
 
-#ifndef __SDCC_mcs51
 #include <stdlib.h>
 #include <string.h>
 
 char **
 buildargv (char *input)
 {
+#ifndef __SDCC_mcs51
   static char *arglist[256];
+#else
+  static char *arglist[8];
+#endif
   int numargs = 0;
 
   while (1)
     {
       while (*input == ' ')
-	input++;
+	    input++;
       if (*input == 0)
-	break;
+	    break;
       arglist [numargs++] = input;
       while (*input != ' ' && *input != 0)
-	input++;
+	    input++;
       if (*input == 0)
-	break;
+	    break;
       *(input++) = 0;
     }
   arglist [numargs] = NULL;
   return arglist;
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
   char **args;
+#ifndef __SDCC_mcs51
   char input[256];
+#else
+  char input[8];
+#endif
   int i;
 
   strcpy(input, " a b");
@@ -56,6 +61,5 @@ testTortureExecute (void)
     ASSERT (0);
   
   return;
-#endif
 }
 

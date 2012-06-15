@@ -3161,7 +3161,7 @@ genNot (const iCode * ic)
   else if (IS_BOOL (operandType (left)))
     {
       cheapMove (ASMOP_A, 0, AOP (left), 0);
-      emit2 ("xor a,#0x01");
+      emit2 ("xor a, !immedbyte", 0x01);
       regalloc_dry_run_cost += 2;
       cheapMove (AOP (result), 0, ASMOP_A, 0);
       goto release;
@@ -5375,7 +5375,7 @@ genPlus (iCode * ic)
       && (!bitVectBitValue (ic->rSurv, C_IDX) || !bitVectBitValue (ic->rSurv, E_IDX)))
     {
       PAIR_ID pair = bitVectBitValue (ic->rSurv, C_IDX) ? PAIR_DE : PAIR_BC;
-      emit2 ("ld %s, #0x%X", _pairs[pair].l, ((unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) & 0xff);
+      emit2 ("ld %s, !immedbyte", _pairs[pair].l, ((unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) & 0xff);
       emit2 ("add hl, %s", _pairs[pair].name);
       regalloc_dry_run_cost += 3;
       goto release;
@@ -5854,7 +5854,7 @@ genMultOneChar (const iCode * ic)
   else if (IS_RAB)
     {
       emit2 ("ld c, h");
-      emit2 ("ld d, #0x00");
+      emit2 ("ld d, !immedbyte", 0x00);
       emit2 ("ld b, d");
       emit2 ("mul");
       emit2 ("ld l, c");
@@ -5865,9 +5865,9 @@ genMultOneChar (const iCode * ic)
     {
       tlbl1 = newiTempLabel (NULL);
       tlbl2 = newiTempLabel (NULL);
-      emit2 ("ld l,#0x00");
-      emit2 ("ld d,l");
-      emit2 ("ld b,#0x08");
+      emit2 ("ld l, !immedbyte", 0x00);
+      emit2 ("ld d, l");
+      emit2 ("ld b, !immedbyte", 0x08);
       emitLabel (tlbl1);
       emit2 ("add hl,hl");
       emit2 ("jp NC,!tlabel", labelKey2num (tlbl2->key));
@@ -6410,7 +6410,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                 {
                   PAIR_ID litpair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
                   fetchPair (PAIR_HL, AOP (left));
-                  emit2 ("ld %s, #0x%X", _pairs[litpair].name, (lit ^ 0x8000u) & 0xffffu);
+                  emit2 ("ld %s, !immedbyte", _pairs[litpair].name, (lit ^ 0x8000u) & 0xffffu);
                   regalloc_dry_run_cost += 3;
                   emit2 ("add hl, hl");
                   emit2 ("ccf");
@@ -6435,10 +6435,10 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               cheapMove (ASMOP_A, 0, AOP (left), offset);
               if (size == 1)
                 {
-                  emit2 ("xor a, #0x80");
+                  emit2 ("xor a, !immedbyte", 0x80);
                   regalloc_dry_run_cost += 2;
                 }
-              emit2 ("sub a, #0x%X", ((lit >> (offset * 8)) & 0xff) ^ (size == 1 ? 0x80 : 0x00));
+              emit2 ("sub a, !immedbyte", ((lit >> (offset * 8)) & 0xff) ^ (size == 1 ? 0x80 : 0x00));
               regalloc_dry_run_cost += 2;
               size--;
               offset++;
@@ -6454,7 +6454,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                       regalloc_dry_run_cost += 3;
                     }
                   /* Subtract through, propagating the carry */
-                  emit2 ("sbc a, #0x%X", ((lit >> (offset++ * 8)) & 0xff) ^ (size ? 0x00 : 0x80));
+                  emit2 ("sbc a, !immedbyte", ((lit >> (offset++ * 8)) & 0xff) ^ (size ? 0x00 : 0x80));
                   regalloc_dry_run_cost += 2;
                 }
               result_in_carry = TRUE;

@@ -1,5 +1,10 @@
 2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  Implement #3512989.
+
+2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/ports/pic14/support.c:
 	  Fix for renamed __asm.
 	* support/regression/tests/gcc-torture-execute-pr31169.c,

@@ -1,5 +1,10 @@
 2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* support/regression/ports/pic14/support.c:
+	  Fix for renamed __asm.
+
+2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
  	* support/regression/tests/and_survive.c:
 	  Test non-destructive and, regression test for #3534833.
 	* support/regression/tests/gcc-torture-execute-980707-1.c:

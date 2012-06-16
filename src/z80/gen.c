@@ -10603,7 +10603,7 @@ genBuiltInMemset (const iCode * ic, int nParams, operand ** pparams)
           preinc = TRUE;
         }
     }
-  emit2 ("ld bc, #%d", ulFromVal (AOP (n)->aopu.aop_lit) - preinc);
+  emit2 ("ld bc, !immedword", ulFromVal (AOP (n)->aopu.aop_lit) - preinc);
   emit2 (IS_R3KA ? "lsidr" : "ldir");
   regalloc_dry_run_cost += 5;
 

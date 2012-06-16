@@ -8,7 +8,7 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       3.1.0
+Version:       3.2.0
 Release:       2
 Source:        %{name}-src-%{version}.tar.gz
 URL:           http://sdcc.sourceforge.net/
@@ -16,10 +16,14 @@ Packager:      Bernhard Held <bernhard AT bernhardheld.de>
 BuildRoot:     %{_tmppath}/%{name}-%{version}-build
 
 %description
-SDCC is a C compiler for 8051 class and similar microcontrollers.
-The package includes the compiler, assemblers and linkers, a device
-simulator and a core library. The processors supported (to a varying
-degree) include the 8051, ds390, z80, hc08, and PIC.
+SDCC is a free open source, retargettable, optimizing ANSI C compiler
+suite that targets a growing list of processors including the Intel
+MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
+(formerly Dallas) DS80C390 variants, Freescale (formerly Motorola)
+HC08 based (hc08, s08) and Zilog Z80 based MCUs (z80, z180, gbz80,
+Rabbit 2000/3000, Rabbit 3000A). Work is in progress on supporting
+the Microchip PIC16 and PIC18 targets. It can be retargeted for other
+microprocessors.
 
 %package common
 License:       GPL, LGPL
@@ -28,10 +32,14 @@ Summary:       Libraries and Header Files for the SDCC C compiler
 Requires:      sdcc
 
 %description common
-SDCC is a C compiler for 8051 class and similar microcontrollers.
-The package includes the compiler, assemblers and linkers, a device
-simulator and a core library. The processors supported (to a varying
-degree) include the 8051, ds390, z80, hc08, and PIC.
+SDCC is a free open source, retargettable, optimizing ANSI C compiler
+suite that targets a growing list of processors including the Intel
+MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
+(formerly Dallas) DS80C390 variants, Freescale (formerly Motorola)
+HC08 based (hc08, s08) and Zilog Z80 based MCUs (z80, z180, gbz80,
+Rabbit 2000/3000, Rabbit 3000A). Work is in progress on supporting
+the Microchip PIC16 and PIC18 targets. It can be retargeted for other
+microprocessors.
 
 %package doc
 License:       GPL
@@ -39,10 +47,14 @@ Group:         Applications/Engineering
 Summary:       Documentation for the SDCC C compiler
 
 %description doc
-SDCC is a C compiler for 8051 class and similar microcontrollers.
-The package includes the compiler, assemblers and linkers, a device
-simulator and a core library. The processors supported (to a varying
-degree) include the 8051, ds390, z80, hc08, and PIC.
+SDCC is a free open source, retargettable, optimizing ANSI C compiler
+suite that targets a growing list of processors including the Intel
+MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
+(formerly Dallas) DS80C390 variants, Freescale (formerly Motorola)
+HC08 based (hc08, s08) and Zilog Z80 based MCUs (z80, z180, gbz80,
+Rabbit 2000/3000, Rabbit 3000A). Work is in progress on supporting
+the Microchip PIC16 and PIC18 targets. It can be retargeted for other
+microprocessors.
 
 %prep
 %setup -n sdcc
@@ -80,6 +92,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_defaultdocdir}
 
 %changelog
+* Fri Jun 12 2012 - borut.razem AT siol.net
+- version updated to 3.2.0
 * Sat Oct 08 2010 - borut.razem AT siol.net
 - added non-free include and lib directories
 - version updated to 3.1.0

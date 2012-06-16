@@ -490,7 +490,7 @@ struct mne *mp;
 		if (more())
                   {
                     if ((t2 != S_R8) || (e2.e_addr != A))
-                      ++t1;
+                      aerr();
                     comma(1);
                     clrexpr(&e2);
                     t2 = addr(&e2);

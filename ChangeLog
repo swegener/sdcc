@@ -1,3 +1,8 @@
+2012-06-16 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sdas/asz80/z80mch.c: Change to report error for invalid operands
+	  to z180 tst instruction.
+
 2012-06-09 Borut Razem <borut.razem AT gmail.com>
 
 	* .version, sdcc.spec, doc/sdccman.lyx:

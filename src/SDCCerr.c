@@ -478,6 +478,8 @@ struct
      "struct/union '%s' redefined", 0 },
   { W_STRING_CANNOT_BE_TERMINATED, ERROR_LEVEL_PEDANTIC,
     "string '%s'cannot be terminated within array", 0 },
+  { W_LONGLONG_LITERAL, ERROR_LEVEL_WARNING,
+    "support for long long literals is incomplete", 0 },
 };
 
 /*

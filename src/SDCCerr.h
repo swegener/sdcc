@@ -238,6 +238,7 @@ enum {
   W_NORETURNRETURN              = 209, /* return in _noreturn function */
   E_STRUCT_REDEF                = 210, /* struct or union tag redefined */
   W_STRING_CANNOT_BE_TERMINATED = 211, /* string cannot be terminated within array */
+  W_LONGLONG_LITERAL            = 212, /* long long literal */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

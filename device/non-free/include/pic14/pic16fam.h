@@ -63,8 +63,6 @@
       defined(__SDCC_PIC16F628) || \
       defined(__SDCC_PIC16F628A) || \
       defined(__SDCC_PIC16F648A) || \
-      defined(__SDCC_PIC16F688) || \
-      defined(__SDCC_PIC16F722) || \
       defined(__SDCC_PIC16F87)
 #define __SDCC_ADC_STYLE      0
 
@@ -104,7 +102,8 @@
 #define __SDCC_ADC_STYLE      1606161
 
 #elif defined(__SDCC_PIC16F676) || \
-      defined(__SDCC_PIC16F684)
+      defined(__SDCC_PIC16F684) || \
+      defined(__SDCC_PIC16F688)
 #define __SDCC_ADC_STYLE      1606761
 
 #elif defined(__SDCC_PIC16F685) || \
@@ -290,7 +289,6 @@
       defined(__SDCC_PIC16F685) || \
       defined(__SDCC_PIC16F716) || \
       defined(__SDCC_PIC16F72) || \
-      defined(__SDCC_PIC16F721) || \
       defined(__SDCC_PIC16F785) || \
       defined(__SDCC_PIC16F818) || \
       defined(__SDCC_PIC16F819) || \
@@ -336,7 +334,7 @@
 #define __SDCC_USART_STYLE    1606882
 
 #elif defined(__SDCC_PIC16F720) || \
-      defined(__SDCC_PIC16F722)
+      defined(__SDCC_PIC16F721)
 #define __SDCC_USART_STYLE    1607202
 
 #elif defined(__SDCC_PIC16C773) || \
@@ -446,7 +444,6 @@
       defined(__SDCC_PIC16F685) || \
       defined(__SDCC_PIC16F688) || \
       defined(__SDCC_PIC16F716) || \
-      defined(__SDCC_PIC16F722) || \
       defined(__SDCC_PIC16F785) || \
       defined(__SDCC_PIC16F870) || \
       defined(__SDCC_PIC16F871) || \

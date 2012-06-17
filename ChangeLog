@@ -2,6 +2,12 @@
 
 	* support/scripts/sdcc.nsi:
 	  added removal of include\asm\r3ka\*.h
+	* device/non-free/include/pic14/pic16fam.h,
+	  support/scripts/pic16fam-h-gen.pl:
+	  applied patch #3531531 - The pic16fam-h-gen correction,
+	  thanks to Molnar Karoly
+	* support/scripts/repack_release.sh:
+	  remove unneeded directories produced by sdbinutils
 
 2012-06-17 Philipp Klaus Krause <pkk AT spth.de>
 

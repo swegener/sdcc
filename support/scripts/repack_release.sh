@@ -1,3 +1,5 @@
+#! /bin/bash
+
 #
 # repack_release.sh
 #
@@ -49,8 +51,13 @@ function usage()
 
   tar -xjvf $bin_pkg || fatal_error "Can't unpack $bin_pkg!"
   
+  # remove unneeded directories produced by sdbinutils
+  rm -rf ./sdcc/include
+  rm -rf ./sdcc/lib
+
   rm -rf ./sdcc/share/doc
   rm -rf ./sdcc/share/sdcc/doc
+
   tar -xjvf $doc_pkg -C ./sdcc/share/sdcc || fatal_error "Can't unpack $doc_pkg!"
   cp ./sdcc/share/sdcc/doc/INSTALL.txt ./sdcc
   cp ./sdcc/share/sdcc/doc/README.txt ./sdcc

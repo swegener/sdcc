@@ -986,6 +986,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\asm\z80\*.h"
   Delete "$INSTDIR\include\asm\z180\*.h"
   Delete "$INSTDIR\include\asm\r2k\*.h"
+  Delete "$INSTDIR\include\asm\r3ka\*.h"
   Delete "$INSTDIR\include\asm\pic16\*.h"
   Delete "$INSTDIR\include\asm\pic14\*.h"
   Delete "$INSTDIR\include\asm\mcs51\*.h"

@@ -2829,10 +2829,11 @@ moveSendToCall (iCode *sic, eBBlock *ebp)
 }
 
 
-/*------------------------------------------------------------------*/
-/* packPointerOp - see if we can move an offset from addition iCode */
-/*                 to the pointer iCode to used indexed addr mode   */
-/*------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
+/* packPointerOp - see if we can move an offset from addition iCode    */
+/*                 to the pointer iCode to used indexed addr mode      */
+/* The z80-related ports do a similar thing in SDCCopt.c, offsetFold() */
+/*---------------------------------------------------------------------*/
 static void
 packPointerOp (iCode * ic, eBBlock ** ebpp)
 {

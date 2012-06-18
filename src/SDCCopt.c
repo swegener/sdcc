@@ -2014,7 +2014,8 @@ optimizeCastCast (eBBlock ** ebbs, int count)
     }
 }
 
-/* Fold pointer addition into offset of GET_VALUE_AT_ADDRESS */
+/* Fold pointer addition into offset of GET_VALUE_AT_ADDRESS.                  */
+/* The hc08-related ports do a similar thing in hc08/ralloc.c, packPointerOp() */
 static void
 offsetFold (eBBlock **ebbs, int count)
 {

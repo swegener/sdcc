@@ -1,3 +1,9 @@
+2012-06-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  src/hc08/ralloc.c:
+	  Document relation between offsetFold() and packPointerOp().
+
 2012-06-18 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx, device/include/pic14/pic14devices.txt,

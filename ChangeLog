@@ -1,3 +1,17 @@
+2012-06-18 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx, device/include/pic14/pic14devices.txt,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/include/pic14/pic16f883.h,
+	  device/non-free/include/pic14/pic16f884.h,
+	  device/non-free/include/pic14/pic16f882.h,
+	  device/non-free/lib/pic14/libdev/pic16f884.c,
+	  device/non-free/lib/pic14/libdev/pic16f882.c,
+	  device/non-free/lib/pic14/libdev/pic16f883.c:
+	  applied patch #3531530 - new CPU support (pic16f882, 883, 884),
+	  thanks to Molnar Karoly
+
 2012-06-17 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi:

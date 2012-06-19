@@ -1,3 +1,9 @@
+2012-06-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Minor peephole fix.
+
 2012-06-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c,

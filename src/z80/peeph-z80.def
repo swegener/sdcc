@@ -139,7 +139,6 @@ replace restart {
 	ld	%2 (%3), %7
 } if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4)
 
-// Broken= What if %1 == h and %5 == (hl)? Real bug on r2k, thus removed there.
 replace restart {
 	ld	%1, %2 (%3)
 	ld	%4, %5
@@ -148,7 +147,7 @@ replace restart {
 	ld	%7, %2 (%3)
 	; peephole 15 loaded %2 (%3) into %7 directly instead of going through %1.
 	ld	%4, %5
-} if canAssign(%7 %2 %3), notVolatile(%1), notUsed(%1), notSame(%1 %5), notSame(%7 %4), notSame(%4 '(hl)' '(de)' '(bc)'), notSame(%5 '(hl)' '(de)' '(bc)')
+} if canAssign(%7 %2 %3), notVolatile(%1), notUsed(%1), notSame(%1 %5), notSame(%7 %4), notSame(%7 %5), notSame(%4 '(hl)' '(de)' '(bc)'), notSame(%5 '(hl)' '(de)' '(bc)' '(iy)')
 
 replace restart {
 	ld	%1,#%2

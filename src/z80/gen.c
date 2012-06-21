@@ -2819,6 +2819,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
     {
       emit2 ("ex (sp), %s", _pairs[id].name);
       regalloc_dry_run_cost += ((id == PAIR_IY || IS_RAB) ? 2 : 1);
+      spillPair (id);
     }
   else if (IS_RAB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
            (id == PAIR_HL && abs (fp_offset) <= 127 && aop->type == AOP_STK || abs (sp_offset) <= 127))

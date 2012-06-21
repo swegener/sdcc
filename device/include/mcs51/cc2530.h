@@ -292,7 +292,7 @@ SFRX(OBSSEL4,    0x6247); // Observation output control register 4
 SFRX(OBSSEL5,    0x6248); // Observation output control register 5
 SFRX(CHVER,      0x6249); // Chip version
 SFRX(CHIPID,     0x624A); // Chip identification
-SFRX(TR0,        0x624B); // Test register 0
+SFRX(TESTREG0,   0x624B); // Test register 0, cannot use TR0 name from the datasheet due to TR0 (TCON.4) redefinition
 SFRX(DBGDATA,    0x6260); // Debug interface write data
 SFRX(SRCRC,      0x6262); // Sleep reset CRC
 SFRX(BATTMON,    0x6264); // Battery monitor

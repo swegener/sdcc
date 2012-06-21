@@ -1,3 +1,8 @@
+2012-06-20 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix flags for rl de, rr d, rr hl (merged by Philipp Klaus Krause from smallopts branch).
+
 2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

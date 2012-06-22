@@ -59,8 +59,14 @@
 typedef short int var_t;
 typedef signed char reg_t;
 
+#ifndef THIS_IS_THE_Z80_PORT_OR_WHATEVER
 // Todo: Move this port-dependency somewehere else? Don't forget to adjust A_IDX in z80/ralloc.c when changing this for a z80-related port!
 #define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? 9 : (TARGET_IS_GBZ80 ? 5 : ((TARGET_IS_HC08 || TARGET_IS_S08) ? 3 : 0)))
+#else
+bool iy_reserved(void);
+#define NUM_REGS ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT) ? (iy_reserved() ? 7 : 9) : (TARGET_IS_GBZ80 ? 5 : ((TARGET_IS_HC08 || TARGET_IS_S08) ? 3 : 0)))
+#endif
+
 // Upper bound on NUM_REGS
 #define MAX_NUM_REGS 9
 

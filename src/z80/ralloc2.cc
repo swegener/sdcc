@@ -21,6 +21,8 @@
 //#define DEBUG_RALLOC_DEC // Uncomment to get debug messages while doing register allocation on the tree decomposition.
 //#define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
 
+#define THIS_IS_THE_Z80_PORT_OR_WHATEVER
+
 #include "SDCCralloc.hpp"
 
 extern "C"
@@ -30,6 +32,12 @@ extern "C"
   bool z80_assignment_optimal;
   bool should_omit_frame_ptr;
 };
+
+bool
+iy_reserved(void)
+{
+  return(IY_RESERVED);
+}
 
 #define REG_C 0
 #define REG_B 1

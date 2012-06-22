@@ -52,7 +52,7 @@ enum
   CND_IDX
 };
 
-#define A_IDX (IS_GB ? 4 : 8)
+#define A_IDX (IS_GB ? 4 : (IY_RESERVED ? 6 : 8))
 
 enum
 {

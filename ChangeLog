@@ -1,3 +1,10 @@
+2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.c,
+	  src/z80/ralloc.h:
+	  Ugly hack to fix bug #3536902.
+
 2012-06-20 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sim/ucsim/z80.src/inst_r2k.cc:

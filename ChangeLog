@@ -58,6 +58,9 @@
 	  thanks to Molnar Karoly
 	* device/non-free/include/pic14/recreate.sh:
 	  generate NO_LEGACY_NAMES block if exists in the old version
+	* src/pic14/genarith.c: applied patch
+	  #3521376 - "pic14 incorrect asm op code",
+	  thanks to Raphael Neider
 
 2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
 

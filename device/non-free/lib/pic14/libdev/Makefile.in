@@ -15,10 +15,7 @@ CPPFLAGS = -I$(srcdir)/../../../../include/pic14 -I$(srcdir)/../../../../non-fre
 # add new pics source files here
 NEW_PICS_yes = \
     pic16f720.c \
-    pic16f721.c \
-    pic16f882.c \
-    pic16f883.c \
-    pic16f884.c
+    pic16f721.c
 
 PIC14_ENHANCED = \
     pic12f1822.c \
@@ -118,6 +115,7 @@ C_SRC = \
     pic16f73.c \
     pic16f737.c \
     pic16f74.c \
+    pic16f747.c \
     pic16f76.c \
     pic16f767.c \
     pic16f77.c \
@@ -140,12 +138,16 @@ C_SRC = \
     pic16f877.c \
     pic16f877a.c \
     pic16f88.c \
+    pic16f882.c \
+    pic16f883.c \
+    pic16f884.c \
     pic16f886.c \
     pic16f887.c \
     pic16f913.c \
     pic16f914.c \
     pic16f916.c \
     pic16f917.c \
+    pic16f946.c \
     pic16hv616.c \
     $(PIC14_ENHANCED) \
     $(NEW_PICS_@HAVE_NEW_PICS@)

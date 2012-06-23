@@ -1,3 +1,64 @@
+2012-06-21 Borut Razem <borut.razem AT gmail.com>
+
+	* device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/lib/pic14/libdev/pic16c782.c,
+	  device/non-free/lib/pic14/libdev/pic16f676.c,
+	  device/non-free/lib/pic14/libdev/pic16f1782.c,
+	  device/non-free/lib/pic14/libdev/pic16c770.c,
+	  device/non-free/lib/pic14/libdev/pic16f716.c,
+	  device/non-free/lib/pic14/libdev/pic16f1503.c,
+	  device/non-free/lib/pic14/libdev/pic16f1507.c,
+	  device/non-free/lib/pic14/libdev/pic16f1783.c,
+	  device/non-free/lib/pic14/libdev/pic16c771.c,
+	  device/non-free/lib/pic14/libdev/pic16c925.c,
+	  device/non-free/lib/pic14/libdev/pic16f1508.c,
+	  device/non-free/lib/pic14/libdev/pic16f1823.c,
+	  device/non-free/lib/pic14/libdev/pic16c432.c,
+	  device/non-free/lib/pic14/libdev/pic16c717.c,
+	  device/non-free/lib/pic14/libdev/pic16c781.c,
+	  device/non-free/lib/pic14/libdev/pic12f675.c,
+	  device/non-free/lib/pic14/libdev/pic16c926.c,
+	  device/non-free/lib/pic14/libdev/pic16f1509.c,
+	  device/non-free/lib/pic14/libdev/pic12f629.c,
+	  device/non-free/lib/pic14/libdev/pic16f684.c,
+	  device/non-free/lib/pic14/libdev/pic16f688.c,
+	  device/non-free/lib/pic14/libdev/pic16f630.c,
+	  device/non-free/lib/pic14/libdev/pic16f747.c,
+	  device/non-free/lib/pic14/libdev/pic16c946.c,
+	  device/non-free/include/pic14/pic16c782.h,
+	  device/non-free/include/pic14/pic16f676.h,
+	  device/non-free/include/pic14/pic16f1509.h,
+	  device/non-free/include/pic14/pic16c770.h,
+	  device/non-free/include/pic14/pic16f716.h,
+	  device/non-free/include/pic14/pic16f1782.h,
+	  device/non-free/include/pic14/pic16c771.h,
+	  device/non-free/include/pic14/pic16c925.h,
+	  device/non-free/include/pic14/pic16f1503.h,
+	  device/non-free/include/pic14/pic16f1507.h,
+	  device/non-free/include/pic14/pic16f1783.h,
+	  device/non-free/include/pic14/pic16c432.h,
+	  device/non-free/include/pic14/pic16c717.h,
+	  device/non-free/include/pic14/pic16c781.h,
+	  device/non-free/include/pic14/pic12f675.h,
+	  device/non-free/include/pic14/pic16c926.h,
+	  device/non-free/include/pic14/pic16f1508.h,
+	  device/non-free/include/pic14/pic16f1823.h,
+	  device/non-free/include/pic14/pic12f629.h,
+	  device/non-free/include/pic14/pic16f684.h,
+	  device/non-free/include/pic14/pic16f688.h,
+	  device/non-free/include/pic14/pic16f630.h:
+	  device/non-free/include/pic14/pic16f747.h:
+	  device/non-free/include/pic14/pic16c946.h:
+	  applied modified patch
+	  #3536909 - "Pic14 device and header upgrade.",
+	  thanks to Molnar Karoly
+	* support/scripts/inc2h.pl: applied modified patch
+	  #3536022 - "Error in the inc2h.pl program.",
+	  thanks to Molnar Karoly
+	* device/non-free/include/pic14/recreate.sh:
+	  generate NO_LEGACY_NAMES block if exists in the old version
+
 2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,
@@ -5,7 +66,7 @@
 	  src/z80/ralloc.h:
 	  Ugly hack to fix bug #3536902.
 
-2012-06-20 Leland Morrison <enigmalee AT sourceforge.net>
+2012-06-21 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sim/ucsim/z80.src/inst_r2k.cc:
 	  Fix flags for rl de, rr d, rr hl (merged by Philipp Klaus Krause from smallopts branch).

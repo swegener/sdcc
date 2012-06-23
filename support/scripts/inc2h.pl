@@ -91,8 +91,8 @@ sub fixname {
     $name =~ s/OPTION(_REG)?/OPTION_REG/ig;
     # often declared as LCDDATn, but bits defined for LCDDATAn, 0 <= n <= 10
     $name =~ s/LCDDAT([^A])/LCDDATA$1/ig;
-    # LCDSE2 is missing in some headers, but LCDSE3 is declared...
-    $name =~ s/LCDSE3/LCDSE2/ig;
+#    # LCDSE2 is missing in some headers, but LCDSE3 is declared...
+#    $name =~ s/LCDSE3/LCDSE2/ig;
     # XXX: should this be named LININTF or LINPRT?
     $name =~ s/LININTF/LINPRT/ig;
     # FIXME: duplicate declarations for n in {0,1,2}
@@ -130,6 +130,20 @@ sub contained {
         return 1 if ($name eq $item); 
     }
     return 0;
+}
+
+# trim right and expand tabs
+sub trim_and_expand ($)
+{
+    my $line = shift;
+
+    # remove trailing spaces
+    $line =~ s/[ \t]+$//;
+    # expand tabs to spaces
+    while ($line =~ s/\t+/' ' x (length($&) * 8 - length($`) % 8)/e) {
+      # spin in empty loop until substitution finally fails
+    }
+    return $line;
 }
 
 
@@ -234,8 +248,8 @@ while (<DATA>) {
 
 #       if ($type =~ /(SHAREBANK)|(DATABANK)/i) {
 #           $ram{"p$processor"} .=
-#               sprintf("#pragma memmap %7s %7s RAM 0x000\t// $name\n",
-#                       $start, $end);
+#               trim_and_expand(sprintf("#pragma memmap %7s %7s RAM 0x000\t// $name\n",
+#                       $start, $end));
 #       }
 #      } elsif (/^SECTION\s+NAME=(\S+)\s+ROM=(\S+)\s+/) {
 #      }
@@ -286,11 +300,12 @@ open(HEADER, "<$includeFile")
     || die "$programName: Error: Cannot open include file $includeFile ($!)\n";
 
 while (<HEADER>) {
-    
+    my $line = '';
+
     if (/^;-+ Register Files/i) {
         $defaultType = 'sfr';
         s/;/\/\//;
-        $body .= "$_";
+        $line .= "$_";
     } elsif (/^;-+\s*(\S+)\s+Bits/i || /^;-+\s*(\S+)\s+-+/i) {
         # The second case is usually bits, but the word Bits is missing
         # also accept "UIE/UIR Bits"
@@ -305,22 +320,22 @@ while (<HEADER>) {
             }
         }
         s/;/\/\//;
-        $body .= "$_";
+        $line .= "$_";
     } elsif (/^;=+/i) {
         $defaultType = '';
         s/;/\/\//;
-        $body .= "$_";
+        $line .= "$_";
     } elsif (/^\s*;/) {
         #
         # Convert ASM comments to C style.
         #
-        $body .= "//$'";
+        $line .= "//$'";
     } elsif (/^\s*IFNDEF\s+__(\S+)/) {
         #
         # Processor type.
         #
         $processor = $1;
-        $body .= "//$_";
+        $line .= "//$_";
     } elsif (/^\s*(\S+)\s+EQU\s+H'(.+)'/) {
         #
         # Useful bit of information.
@@ -352,18 +367,18 @@ while (<HEADER>) {
             #
             # A special function register.
             #
-#           $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
+#           $pragmas .= trim_and_expand(sprintf("#pragma memmap %s_ADDR %s_ADDR "
 #                               . "SFR %s\t// %s\n",
-#                               $name, $name, $bitmask, $name);
+#                               $name, $name, $bitmask, $name));
             $name = fixname($name);
             if (defined $addr{"p$processor", "$name"}) {
-                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
+                $addresses .= trim_and_expand(sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"}));
             } else {
-                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
+                $addresses .= trim_and_expand(sprintf("#define %s_ADDR\t0x%s\n", $name, $value));
             }
-            $body .= sprintf("extern __sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
+            $line .= sprintf("extern __sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
             $c_head .= sprintf("__sfr  __at %-30s $name;\n", "(${name}_ADDR)");
-            $addr{"p$processor", "$name"} = "0x$value";
+            $addr{"p$processor", "$name"} = $value;
             $sfrs{$name}=1;
         } elsif ($type eq 'volatile') {
             #
@@ -371,15 +386,15 @@ while (<HEADER>) {
             # direct program manipulation.
             #
             $name = fixname($name);
-#           $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
+#           $pragmas .= trim_and_expand(sprintf("#pragma memmap %s_ADDR %s_ADDR "
 #                               . "SFR %s\t// %s\n",
-#                               $name, $name, $bitmask, $name);
-            $body .= sprintf("extern __data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
+#                               $name, $name, $bitmask, $name));
+            $line .= sprintf("extern __data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
             $c_head .= sprintf("__data __at %-30s $name;\n", "(${name}_ADDR) volatile char");
             if (defined $addr{"p$processor", "$name"}) {
-                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
+                $addresses .= trim_and_expand(sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"}));
             } else {
-                $addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
+                $addresses .= trim_and_expand(sprintf("#define %s_ADDR\t0x%s\n", $name, $value));
             }
         } elsif ($type =~ /^bits/) {
             my ($junk, $register) = split(/\s/, $type);
@@ -416,14 +431,14 @@ while (<HEADER>) {
                 #
                 # A known symbol.
                 #
-                $body .= sprintf("#define %-20s 0x%s$rest\n", $name, $value);
+                $line .= sprintf("#define %-20s 0x%s$rest\n", $name, $value);
             } else {
                 #
                 # A symbol that isn't defined in the data
                 # section at the end of the file.  Let's 
                 # add a comment so that we can add it later.
                 #
-                $body .= sprintf("#define %-20s 0x%s$rest\n",
+                $line .= sprintf("#define %-20s 0x%s$rest\n",
                                  $name, $value);
             }
         }
@@ -431,7 +446,7 @@ while (<HEADER>) {
         #
         # Blank line.
         #
-        $body .= "\n";
+        $line .= "\n";
     } elsif (/__MAXRAM\s+H'([0-9a-fA-F]+)'/) {
         my $maxram .= "//\n// Memory organization.\n//\n";
         if (!defined $ram{"p$processor"}) {
@@ -440,13 +455,14 @@ while (<HEADER>) {
         $pragmas = $maxram
             . $ram{"p$processor"} . "\n"
                 . $pragmas;
-        $body .= "// $_";
+        $line .= "// $_";
     } else {
         #
         # Anything else we'll just comment out.
         #
-        $body .= "// $_";
+        $line .= "// $_";
     }
+    $body .= trim_and_expand($line);
 }
 $header .= <<EOT;
 //
@@ -455,24 +471,24 @@ $header .= <<EOT;
 //
 // This header file was automatically generated by:
 //
-//\t$programName
+// $programName
 //
-//\tCopyright (c) 2002, Kevin L. Pauba, All Rights Reserved
+// Copyright (c) 2002, Kevin L. Pauba, All Rights Reserved
 //
-//\tSDCC is licensed under the GNU Public license (GPL) v2. Note that
-//\tthis license covers the code to the compiler and other executables,
-//\tbut explicitly does not cover any code or objects generated by sdcc.
+// SDCC is licensed under the GNU Public license (GPL) v2. Note that
+// this license covers the code to the compiler and other executables,
+// but explicitly does not cover any code or objects generated by sdcc.
 //
-//\tFor pic device libraries and header files which are derived from
-//\tMicrochip header (.inc) and linker script (.lkr) files Microchip
-//\trequires that "The header files should state that they are only to be
-//\tused with authentic Microchip devices" which makes them incompatible
-//\twith the GPL. Pic device libraries and header files are located at
-//\tnon-free/lib and non-free/include directories respectively.
-//\tSdcc should be run with the --use-non-free command line option in
-//\torder to include non-free header files and libraries.
+// For pic device libraries and header files which are derived from
+// Microchip header (.inc) and linker script (.lkr) files Microchip
+// requires that "The header files should state that they are only to be
+// used with authentic Microchip devices" which makes them incompatible
+// with the GPL. Pic device libraries and header files are located at
+// non-free/lib and non-free/include directories respectively.
+// Sdcc should be run with the --use-non-free command line option in
+// order to include non-free header files and libraries.
 //
-//\tSee http://sdcc.sourceforge.net/ for the latest information on sdcc.
+// See http://sdcc.sourceforge.net/ for the latest information on sdcc.
 //
 // 
 #ifndef P${processor}_H
@@ -485,9 +501,9 @@ EOT
 
 $c_head .= <<EOT;
 
-// 
+//
 // bitfield definitions
-// 
+//
 EOT
 
 # Add PORT* and TRIS* bit entries

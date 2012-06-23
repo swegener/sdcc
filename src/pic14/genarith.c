@@ -277,7 +277,38 @@ static void genAddLit (iCode *ic, int lit)
         size = pic14_getDataSize(result);
         if (size > pic14_getDataSize(left))
                 size = pic14_getDataSize(left);
-        
+
+        /*
+         * Fix accessing libsdcc/<*>/idata.c:_cinit in __code space.
+         */
+        if (AOP_PCODE == AOP_TYPE(IC_LEFT(ic)))
+          {
+            unsigned u;
+            if (debug_verbose)
+              {
+                printf("%s:%u: CHECK: using address of '%s' instead of contents\n",
+                       ic->filename, ic->lineno,
+                       popGetAddr(AOP(IC_LEFT(ic)), 0, lit & 0xff)->name);
+              } // if
+            for (u = 0; u < size; ++u)
+              {
+                emitpcode(POC_MOVLW, popGetAddr(AOP(IC_LEFT(ic)), u, lit));
+                emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)), u));
+              } // for
+
+            if (size < pic14_getDataSize(result))
+              {
+                for (u = size; u < pic14_getDataSize(result); ++u)
+                  {
+                    /* XXX: Might fail for u >= size?!? */
+                    emitpcode(POC_MOVLW, popGetAddr(AOP(IC_LEFT(ic)), u, lit));
+                    emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)), u));
+                  } // for
+              } // if
+
+            goto out;
+          } // if
+
         if(same) {
                 
                 /* Handle special cases first */
@@ -466,7 +497,6 @@ static void genAddLit (iCode *ic, int lit)
                         switch(lit & 0xff) {
                         case 0:
                                 emitpcode(POC_MOVFW, popGet(AOP(left),0));
-                                emitMOVWF(result, 0);
                                 emitMOVWF(result,0);
                                 break;
                         case 1:
@@ -530,6 +560,7 @@ static void genAddLit (iCode *ic, int lit)
                 }
         }
 
+out:
         size = pic14_getDataSize(result);
         if (size > pic14_getDataSize(left))
                 size = pic14_getDataSize(left);

@@ -156,23 +156,23 @@ function upload()
 
   raw_ver=$(expr $ver : '\([0-9]*\.[0-9]*\.[0-9]*\)')
 
-#  echo uploading ul/sdcc-src-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
-#  rsync -e ssh ul/sdcc-src-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
+  echo uploading ul/sdcc-src-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
+  rsync -e ssh ul/sdcc-src-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
 
-#  echo uploading ul/sdcc-doc-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
-#  rsync -e ssh ul/sdcc-doc-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  echo uploading ul/sdcc-doc-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  rsync -e ssh ul/sdcc-doc-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
 
   echo uploading ul/sdcc-doc-${ver}.zip  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
   rsync -e ssh ul/sdcc-doc-${ver}.zip  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
 
-#  echo uploading ul/sdcc-${ver}-setup.exe sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
-#  rsync -e ssh ul/sdcc-${ver}-setup.exe sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
+  echo uploading ul/sdcc-${ver}-setup.exe sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
+  rsync -e ssh ul/sdcc-${ver}-setup.exe sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
 
-#  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
-#  rsync -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
+  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
+  rsync -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
 
-#  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
-#  rsync -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
+  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
+  rsync -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
 }
 
 

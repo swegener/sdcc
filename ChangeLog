@@ -1,3 +1,9 @@
+2012-06-25 Borut Razem <borut.razem AT gmail.com>
+
+	* src/regression/Makefile:
+	  applied patch #3537593 - pic16 regression patch,
+	  thanks to Don Wooton
+
 2012-06-24 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/repack_release.sh: updated

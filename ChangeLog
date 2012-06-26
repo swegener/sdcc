@@ -1,3 +1,8 @@
+2012-06-26 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCC.lex, src/SDCCerr.c, src/SDCCerr.h:
+	  unescape file names from preprocessor
+
 2012-06-25 Borut Razem <borut.razem AT gmail.com>
 
 	* src/regression/Makefile:

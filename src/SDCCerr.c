@@ -480,35 +480,36 @@ struct
     "string '%s'cannot be terminated within array", 0 },
   { W_LONGLONG_LITERAL, ERROR_LEVEL_WARNING,
     "support for long long literals is incomplete", 0 },
+  { S_SYNTAX_ERROR, ERROR_LEVEL_SYNTAX_ERROR,
+    "token -> '%s' ; column %d", 0 },
 };
 
-/*
--------------------------------------------------------------------------------
-SetErrorOut - Set the error output file
-
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * SetErrorOut - Set the error output file
+ * -------------------------------------------------------------------------------
+ */
 FILE *
 SetErrorOut (FILE *NewErrorOut)
 {
-  _SDCCERRG.out = NewErrorOut ;
+  _SDCCERRG.out = NewErrorOut;
 
-  return NewErrorOut ;
+  return NewErrorOut;
 }
 
+/* -------------------------------------------------------------------------------
+ * setErrorLogLevel - Set the error log level:
+ *                    which level has to be treated as an error
+ * -------------------------------------------------------------------------------
+ */
 void setErrorLogLevel (ERROR_LOG_LEVEL level)
 {
   _SDCCERRG.logLevel = level;
 }
 
-/*
--------------------------------------------------------------------------------
-vwerror - Output a standard error message with variable number of arguments
-
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * vwerror - Output a standard error message with variable number of arguments
+ * -------------------------------------------------------------------------------
+ */
 int
 vwerror (int errNum, va_list marker)
 {
@@ -532,7 +533,7 @@ vwerror (int errNum, va_list marker)
 
   if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!ErrTab[errNum].disabled))
     {
-      if (ErrTab[errNum].errType == ERROR_LEVEL_ERROR || _SDCCERRG.werror)
+      if (ErrTab[errNum].errType >= ERROR_LEVEL_ERROR || _SDCCERRG.werror)
         fatalError++;
 
       if (filename && lineno)
@@ -553,6 +554,10 @@ vwerror (int errNum, va_list marker)
 
       switch (ErrTab[errNum].errType)
         {
+        case ERROR_LEVEL_SYNTAX_ERROR:
+          fprintf (_SDCCERRG.out, "syntax error: ");
+          break;
+
         case ERROR_LEVEL_ERROR:
           fprintf (_SDCCERRG.out, "error %d: ", errNum);
           break;
@@ -584,13 +589,10 @@ vwerror (int errNum, va_list marker)
     }
 }
 
-/*
--------------------------------------------------------------------------------
-werror - Output a standard error message with variable number of arguments
-
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * werror - Output a standard error message with variable number of arguments
+ * -------------------------------------------------------------------------------
+ */
 int
 werror (int errNum, ...)
 {
@@ -602,14 +604,11 @@ werror (int errNum, ...)
   return ret;
 }
 
-/*
--------------------------------------------------------------------------------
-werrorfl - Output a standard error message with variable number of arguments.
-           Use a specified filename and line number instead of the default.
-
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * werrorfl - Output a standard error message with variable number of arguments.
+ *            Use a specified filename and line number instead of the default.
+ * -------------------------------------------------------------------------------
+ */
 int
 werrorfl (char *newFilename, int newLineno, int errNum, ...)
 {
@@ -630,13 +629,11 @@ werrorfl (char *newFilename, int newLineno, int errNum, ...)
   return ret;
 }
 
-
-/*
--------------------------------------------------------------------------------
-fatal - Output a standard error message with variable number of arguments and
-        call exit()
--------------------------------------------------------------------------------
-*/
+/* -------------------------------------------------------------------------------
+ * fatal - Output a standard error message with variable number of arguments and
+ *         call exit()
+ * -------------------------------------------------------------------------------
+ */
 void
 fatal (int exitCode, int errNum, ...)
 {
@@ -648,24 +645,20 @@ fatal (int exitCode, int errNum, ...)
   exit (exitCode);
 }
 
-/*
--------------------------------------------------------------------------------
-style - Change the output error style to MSVC
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * style - Change the output error style to MSVC
+ * -------------------------------------------------------------------------------
+ */
 void
 MSVC_style (int style)
 {
   _SDCCERRG.style = style;
 }
 
-/*
--------------------------------------------------------------------------------
-disabled - Disable output of specified warning
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * disabled - Disable output of specified warning
+ * -------------------------------------------------------------------------------
+ */
 void
 setWarningDisabled (int errNum)
 {
@@ -673,12 +666,10 @@ setWarningDisabled (int errNum)
     ErrTab[errNum].disabled = 1;
 }
 
-/*
--------------------------------------------------------------------------------
-Set the flag to treat warnings as errors
--------------------------------------------------------------------------------
-*/
-
+/* -------------------------------------------------------------------------------
+ * Set the flag to treat warnings as errors
+ * -------------------------------------------------------------------------------
+ */
 void
 setWError (int flag)
 {

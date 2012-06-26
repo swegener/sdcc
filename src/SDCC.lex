@@ -69,7 +69,7 @@ static void count_char (int);
 static int process_pragma (const char *);
 static int check_type (void);
 static int isTargetKeyword (const char *s);
-static int checkCurrFile (const char *s);
+static void checkCurrFile (const char *s);
 %}
 
 %x asm
@@ -262,7 +262,7 @@ static int checkCurrFile (const char *s);
 #define yytext_ptr yytext
 #endif
 
-static int
+static void
 checkCurrFile (const char *s)
 {
   int lNum;
@@ -270,12 +270,12 @@ checkCurrFile (const char *s)
 
   /* skip '#' character */
   if (*s++ != '#')
-    return 0;
+    return;
 
   /* get the line number */
-  lNum = strtol(s, &tptr, 10);
-  if (tptr == s || !isspace ((unsigned char)*tptr))
-    return 0;
+  lNum = strtol (s, &tptr, 10);
+  if (tptr == s || !isspace ((unsigned char) *tptr))
+    return;
   s = tptr;
 
   /* adjust the line number */
@@ -285,37 +285,44 @@ checkCurrFile (const char *s)
   while (*s != '"' && *s)
     ++s;
 
-  if (!*s)
+  if (*s)
     {
-      /* no file name: return */
-      return 0;
-    }
+      /* there is a file name */
+      const char *sb;
+      struct dbuf_s dbuf;
 
-  /* skip the double quote */
-  ++s;
+      dbuf_init (&dbuf, 128);
 
-  /* get the file name and see if it is different from current one.
-     in c1mode fullSrcFileName is NULL */
-  if (fullSrcFileName &&
-    strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0 && fullSrcFileName[strlen(fullSrcFileName) - 1] == '"')
-    {
-      lexFilename = (char *) fullSrcFileName;
-    }
-  else
-    {
-      const char *sb = s;
+      /* skip the double quote */
+      sb = ++s;
 
-      /* find the end of the file name */
+      /* preprocessor emits escaped file names
+       * (e.g. double backslashes on MSDOS-ish file systems),
+       * so we have to unescape it */
       while (*s && *s != '"')
-        ++s;
+        {
+          if (*s == '\\')
+            {
+              /* append chars before backslash */
+              dbuf_append (&dbuf, sb, s - sb);
+              if (*++s)
+                {
+                  /* append char after backslash */
+                  dbuf_append (&dbuf, ++s, 1);
+                  sb = ++s;
+                }
+            }
+          else
+            ++s;
+        }
+      dbuf_append (&dbuf, sb, s - sb);
 
-      lexFilename = Safe_malloc (s - sb + 1);
-      memcpy (lexFilename, sb, s - sb);
-      lexFilename[s - sb] = '\0';
+      /* free the old lexFilename if defined */
+      if (lexFilename)
+        Safe_free (lexFilename);
+
+      filename = lexFilename = dbuf_detach_c_str (&dbuf);
     }
-  filename = lexFilename;
-
-  return 0;
 }
 
 static void
@@ -1124,13 +1131,7 @@ yyerror (char *s)
 {
   fflush(stdout);
 
-  if(options.vc_err_style)
-    fprintf(stderr, "\n%s(%d) : %s: token -> '%s' ; column %d\n",
-      lexFilename, lexLineno, s, yytext, column);
-  else
-    fprintf(stderr, "\n%s:%d: %s: token -> '%s' ; column %d\n",
-      lexFilename, lexLineno, s ,yytext, column);
-  fatalError++;
+  werror (S_SYNTAX_ERROR, yytext, column);
 
   return 0;
 }

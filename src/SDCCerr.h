@@ -239,6 +239,7 @@ enum {
   E_STRUCT_REDEF                = 210, /* struct or union tag redefined */
   W_STRING_CANNOT_BE_TERMINATED = 211, /* string cannot be terminated within array */
   W_LONGLONG_LITERAL            = 212, /* long long literal */
+  S_SYNTAX_ERROR                = 213, /* syntax error */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */
@@ -270,7 +271,9 @@ enum _ERROR_LOG_LEVEL {
   /** Most warnings. */
   ERROR_LEVEL_WARNING,
   /** Errors only. */
-  ERROR_LEVEL_ERROR
+  ERROR_LEVEL_ERROR,
+  /** Syntax error only. */
+  ERROR_LEVEL_SYNTAX_ERROR
 };
 
 typedef enum _ERROR_LOG_LEVEL ERROR_LOG_LEVEL;

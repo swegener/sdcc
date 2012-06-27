@@ -1,3 +1,7 @@
+2012-06-27 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCC.lex: unescape file names from preprocessor, 2nd try
+
 2012-06-26 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.lex, src/SDCCerr.c, src/SDCCerr.h:

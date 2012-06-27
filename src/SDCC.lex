@@ -308,7 +308,7 @@ checkCurrFile (const char *s)
               if (*++s)
                 {
                   /* append char after backslash */
-                  dbuf_append (&dbuf, ++s, 1);
+                  dbuf_append (&dbuf, s, 1);
                   sb = ++s;
                 }
             }

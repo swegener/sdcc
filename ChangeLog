@@ -1,6 +1,7 @@
 2012-06-27 Borut Razem <borut.razem AT gmail.com>
 
-	* src/SDCC.lex: unescape file names from preprocessor, 2nd try
+	* src/SDCC.lex:
+	  unescape file names from preprocessor, 2nd and 3rd try
 	* device/non-free/lib/pic16/libdev/Makefile.am,
 	  device/non-free/lib/pic16/libdev/Makefile.in,
 	  device/non-free/lib/pic14/libdev/Makefile.in:

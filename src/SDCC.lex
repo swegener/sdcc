@@ -317,9 +317,10 @@ checkCurrFile (const char *s)
         }
       dbuf_append (&dbuf, sb, s - sb);
 
-      /* free the old lexFilename if defined */
-      if (lexFilename)
-        Safe_free (lexFilename);
+      /* DON'T free the file name referenced by lexFilename
+       * since it will be dereferenced in the future at least
+       * by function printCLine(), see struct iCode members
+       * filename in SDCCicode.c */
 
       filename = lexFilename = dbuf_detach_c_str (&dbuf);
     }

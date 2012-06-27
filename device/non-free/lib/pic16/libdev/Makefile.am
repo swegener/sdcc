@@ -151,9 +151,7 @@ libdev18f23k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f23k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f23k20_a_CFLAGS = -p18f23k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f23k22.a
-endif HAVE_NEW_PICS
 libdev18f23k22_a_SOURCES = pic18f23k22.c
 libdev18f23k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
 libdev18f23k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
@@ -282,9 +280,7 @@ libdev18f24k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f24k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f24k20_a_CFLAGS = -p18f24k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f24k22.a
-endif HAVE_NEW_PICS
 libdev18f24k22_a_SOURCES = pic18f24k22.c
 libdev18f24k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
 libdev18f24k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
@@ -424,9 +420,7 @@ libdev18f25k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f25k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f25k20_a_CFLAGS = -p18f25k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f25k22.a
-endif HAVE_NEW_PICS
 libdev18f25k22_a_SOURCES = pic18f25k22.c
 libdev18f25k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
 libdev18f25k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
@@ -508,9 +502,7 @@ libdev18f26k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f26k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f26k20_a_CFLAGS = -p18f26k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f26k22.a
-endif HAVE_NEW_PICS
 libdev18f26k22_a_SOURCES = pic18f26k22.c
 libdev18f26k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
 libdev18f26k22_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
@@ -594,9 +586,7 @@ libdev18f43k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f43k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f43k20_a_CFLAGS = -p18f43k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f43k22.a
-endif HAVE_NEW_PICS
 libdev18f43k22_a_SOURCES = pic18f43k22.c
 libdev18f43k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
 libdev18f43k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
@@ -725,9 +715,7 @@ libdev18f44k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f44k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f44k20_a_CFLAGS = -p18f44k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f44k22.a
-endif HAVE_NEW_PICS
 libdev18f44k22_a_SOURCES = pic18f44k22.c
 libdev18f44k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
 libdev18f44k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
@@ -867,9 +855,7 @@ libdev18f45k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f45k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f45k20_a_CFLAGS = -p18f45k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f45k22.a
-endif HAVE_NEW_PICS
 libdev18f45k22_a_SOURCES = pic18f45k22.c
 libdev18f45k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
 libdev18f45k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
@@ -951,9 +937,7 @@ libdev18f46k20_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f46k20_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f46k20_a_CFLAGS = -p18f46k20 $(AM_CFLAGS)
 
-if HAVE_NEW_PICS
 lib_LIBRARIES += libdev18f46k22.a
-endif HAVE_NEW_PICS
 libdev18f46k22_a_SOURCES = pic18f46k22.c
 libdev18f46k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
 libdev18f46k22_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S

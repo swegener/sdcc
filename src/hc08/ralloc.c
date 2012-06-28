@@ -2993,7 +2993,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
       
       /* move SEND to immediately precede its CALL/PCALL */
       if (ic->op == SEND && ic->next &&
-          ic->next->op != CALL & ic->next->op != PCALL)
+          ic->next->op != CALL && ic->next->op != PCALL)
         {
           ic = moveSendToCall (ic, ebp);
         }

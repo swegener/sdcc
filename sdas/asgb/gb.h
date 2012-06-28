@@ -154,9 +154,7 @@ extern	int		srch(char *str);
 
 	/* gbmch.c */
 extern	int		genop(int pop, int op, struct expr *esp, int f);
-extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
-extern	VOID		minit(void);
 
 #else
 	/* gbadr.c */
@@ -167,7 +165,5 @@ extern	int		srch();
 
 	/* gbmch.c */
 extern	int		genop();
-extern	VOID		machine() ;
 extern	int		mchpcr();
-extern	VOID		minit();
 #endif

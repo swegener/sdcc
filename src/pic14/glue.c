@@ -142,7 +142,7 @@ pic14_constructAbsMap (struct dbuf_s *oBuf, struct dbuf_s *gloBuf)
   symbol *sym;
   set *aliases;
   int addr, min=-1, max=-1;
-  int size;
+  unsigned int size;
 
   for (i=0; maps[i] != NULL; i++)
   {
@@ -916,7 +916,7 @@ static void
 emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *list)
 {
     symbol *sym;
-    int size, i;
+    int size;
     long lit;
     unsigned char *str;
 
@@ -963,6 +963,8 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
     }
 
     if (IS_ARRAY(my_type)) {
+        size_t i;
+
         DEBUGprintf ("(array, %d items, %ud byte) below\n", (unsigned int) DCL_ELEM(my_type), size);
         assert (!list || list->type == INIT_DEEP);
         if (list) list = list->init.deep;

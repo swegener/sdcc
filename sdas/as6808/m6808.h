@@ -126,10 +126,8 @@ extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* m08mch.c */
-extern	VOID		machine(struct mne *mp);
 extern	int		chkindx(struct expr *exp);
 extern	int		mchpcr(struct expr *esp);
-extern	VOID		minit(void);
 
 #else
 
@@ -141,10 +139,8 @@ extern	int		any();
 extern	int		srch();
 
 	/* m08mch.c */
-extern	VOID		machine();
 extern	int		chkindx();
 extern	int		mchpcr();
-extern	VOID		minit();
 
 #endif
 

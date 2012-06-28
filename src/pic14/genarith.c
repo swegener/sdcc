@@ -260,17 +260,15 @@ static void emitMOVWF(operand *reg, int offset)
 
 static void genAddLit (iCode *ic, int lit)
 {
-        
-        int size,same;
+        int size, same;
         int lo;
-        
+
         operand *result;
         operand *left;
-        
+
         FENTRY;
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-        
-        
+
         left = IC_LEFT(ic);
         result = IC_RESULT(ic);
         same = pic14_sameRegs(AOP(left), AOP(result));
@@ -283,7 +281,7 @@ static void genAddLit (iCode *ic, int lit)
          */
         if (AOP_PCODE == AOP_TYPE(IC_LEFT(ic)))
           {
-            unsigned u;
+            int u;
             if (debug_verbose)
               {
                 printf("%s:%u: CHECK: using address of '%s' instead of contents\n",

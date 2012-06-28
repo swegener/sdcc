@@ -139,9 +139,7 @@ extern  int             srch(char *str);
 extern  int             reg(void);
 
         /* i51mch.c */
-extern  VOID            machine(struct mne *mp);
 extern  int             mchpcr(struct expr *esp);
-extern  VOID            minit(void);
 
 #else
 
@@ -154,8 +152,6 @@ extern  int             srch();
 extern  int             reg();
 
         /* i51mch.c */
-extern  VOID            machine();
 extern  int             mchpcr();
-extern  VOID            minit();
 
 #endif

@@ -1,3 +1,25 @@
+2012-06-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.sln,
+	* sdas/asrab/asrab.vcxproj: renamed output to sdasrab
+	* all.vcxproj: added sdasrab.exe and sdldrab.exe
+	* src/sdcc.vcxproj: removed parsing SDCC.y
+	* src/yacc.vcxproj: cosmetics
+	* sdas/as6808/m6808.h,
+	* sdas/as8051/i8051.h,
+	* sdas/asgb/gb.h,
+	* sdas/asrab/rabbit.h,
+	* sdas/asz80/z80.h: removed (conflicting) prototypes for machine and minit
+	* src/hc08/ralloc.c (packRegisters): fixed bug indicated by a warning
+	* src/pic14/gen.c (genDataPointerGet, genConstPointerGet),
+	* src/pic14/genarith.c (genAddLit),
+	* src/pic14/glue.c (pic14_constructAbsMap, emitInitVal)
+	* src/pic16/device.h (PIC16_device),
+	* src/pic16/gen.c (pic16_storeForReturn, genAnd, genXor, genAssign),
+	* src/pic16/glue.c (pic16_printIvalType, pic16_printIvalChar,
+	  pic16_printIvalBitFields, pic16_printIvalUnion),
+	* src/z80/ralloc2.cc (iy_reserved, Ainst_ok, omit_frame_ptr): fixed warnings
+
 2012-06-27 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.lex:

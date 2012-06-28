@@ -63,8 +63,8 @@ typedef struct {
 typedef struct PIC16_device {
   char *name[PROCESSOR_NAMES];  /* aliases for the processor name */
   /* RAMsize *must* be the first item to copy for 'using' */
-  int RAMsize;                  /* size of Data RAM - VR 031120 */
-  int acsSplitOfs;              /* access bank split offset */
+  unsigned int RAMsize;         /* size of Data RAM - VR 031120 */
+  unsigned int acsSplitOfs;     /* access bank split offset */
   configWordsInfo_t cwInfo;     /* configuration words info */
   idBytesInfo_t idInfo;         /* ID Locations info */
   /* next *must* be the first field NOT being copied via 'using' */

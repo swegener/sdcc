@@ -36,7 +36,7 @@ extern "C"
 bool
 iy_reserved(void)
 {
-  return(IY_RESERVED);
+  return(bool)(IY_RESERVED);
 }
 
 #define REG_C 0
@@ -536,7 +536,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   if(!IS_GB && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) && (IS_OP_LITERAL(left) && IS_TRUE_SYMOP (IC_RIGHT(ic)) || IS_OP_LITERAL(right) && IS_TRUE_SYMOP (left)))
     {
       operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
-      for(int i = 0; i < getSize(operandType(result)); i++)
+      for(unsigned int i = 0; i < getSize(operandType(result)); i++)
         {
           unsigned char byte = (ulFromVal (OP_VALUE (litop)) >> (i * 8) & 0xff);
           if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
@@ -1478,7 +1478,7 @@ static bool omit_frame_ptr(const G_t &G)
   signed char omitcost = -16;
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     {
-      if(G[i].alive.size() > NUM_REGS - 4)
+      if((int)G[i].alive.size() > NUM_REGS - 4)
         return(false);
 
       const iCode *const ic = G[i].ic;

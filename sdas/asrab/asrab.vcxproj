@@ -37,6 +37,7 @@
     <ProjectGuid>{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>asrab</RootNamespace>
+    <ProjectName>sdasrab</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

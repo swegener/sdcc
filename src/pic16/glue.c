@@ -613,7 +613,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
     val = valCastLiteral(type, floatFromVal(val));
   }
 
-  for (i = 0; i < getSize (type); i++) {
+  for (i = 0; i < (int)getSize (type); i++) {
     pic16_emitDB(pic16aopLiteral(val, i), ptype, p);
   } // for
 }
@@ -625,7 +625,8 @@ static int
 pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, const char *s, char ptype, void *p)
 {
   value *val;
-  int remain, len, ilen;
+  int len;
+  size_t remain, ilen;
 
   if(!p)
     return 0;
@@ -781,7 +782,7 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
   unsigned long ival = 0;
   int size = 0;
   int bit_start = 0;
-  unsigned long i;
+  int i;
 
 
 #if DEBUG_PRINTIVAL
@@ -886,7 +887,7 @@ pic16_printIvalUnion (symbol * sym, sym_link * type,
 {
   //symbol *sflds;
   initList *iloop = NULL;
-  int size;
+  unsigned int size;
   symbol *sflds = NULL;
 
 #if DEBUG_PRINTIVAL

@@ -5855,7 +5855,8 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
 static void
 genDataPointerGet (operand * left, operand * result, iCode * ic)
 {
-  int size, offset = 0;
+  unsigned int size;
+  int offset = 0;
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
@@ -6087,7 +6088,7 @@ genConstPointerGet (operand * left, operand * result, iCode * ic)
 
   {
     char *func[] = { NULL, "__gptrget1", "__gptrget2", "__gptrget3", "__gptrget4" };
-    int size = min (getSize (OP_SYM_ETYPE (left)), AOP_SIZE (result));
+    int size = min ((int)getSize (OP_SYM_ETYPE (left)), AOP_SIZE (result));
     assert (size > 0 && size <= 4);
 
     mov2w_op (left, 0);

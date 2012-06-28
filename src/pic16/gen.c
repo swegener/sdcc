@@ -3683,7 +3683,7 @@ pic16_storeForReturn (iCode * ic, /*operand *op, */ int offset, pCodeOp * dest)
           } info;
 
           /* take care if literal is a float */
-          info.lit_float = floatFromVal (AOP (op)->aopu.aop_lit);
+          info.lit_float = (float)floatFromVal (AOP (op)->aopu.aop_lit);
           lit = info.lit_int;
         }
     }
@@ -6043,7 +6043,7 @@ genAnd (iCode * ic, iCode * ifx)
 
       for (sizel = AOP_SIZE (left); sizel--; ++offset, lit >>= 8)
         {
-          unsigned char bytelit = lit;
+          unsigned char bytelit = lit & 0xFF;
 
           if (bytelit != 0)
             {
@@ -6788,7 +6788,7 @@ genXor (iCode * ic, iCode * ifx)
 
       for (sizel = AOP_SIZE (left); sizel--; ++offset, lit >>= 8)
         {
-          unsigned char bytelit = lit;
+          unsigned char bytelit = lit & 0xFF;
 
           switch (bytelit)
             {
@@ -10381,7 +10381,7 @@ genAssign (iCode * ic)
           else
             {
               /* take care if literal is a float */
-              info.lit_float = floatFromVal (AOP (right)->aopu.aop_lit);
+              info.lit_float = (float)floatFromVal (AOP (right)->aopu.aop_lit);
               lit = info.lit_int;
             }
         }
@@ -10433,7 +10433,7 @@ genAssign (iCode * ic)
         }
 
       /* must fetch 3 bytes for pointers (was OP_SYM_ETYPE before) */
-      size = min (getSize (OP_SYM_TYPE (right)), AOP_SIZE (result));
+      size = min ((int)getSize (OP_SYM_TYPE (right)), AOP_SIZE (result));
       while (size--)
         {
           pic16_emitpcodeNULLop (POC_TBLRD_POSTINC);

@@ -172,9 +172,7 @@ extern	int		srch(char *str);
 	/* z80mch.c */
 extern	int		genop(int pop, int op, struct expr *esp, int f);
 extern	int		gixiy(int v);
-extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
-extern	VOID		minit(void);
 
 #else
 
@@ -187,9 +185,7 @@ extern	int		srch();
 	/* z80mch.c */
 extern	int		genop();
 extern	int		gixiy();
-extern	VOID		machine();
 extern	int		mchpcr();
-extern	VOID		minit();
 
 #endif
 

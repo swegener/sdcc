@@ -690,7 +690,7 @@ int z80instructionSize(lineNode *pl)
   /* move to the first operand:
    * leading spaces are already removed, skip the mnenonic */
   for (op1start = pl->line; *op1start && !isspace (*op1start); ++op1start);
-    ;
+
   /* skip the spaces between mnemonic and the operand */
   while (isspace (*op1start))
     ++op1start;

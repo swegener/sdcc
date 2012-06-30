@@ -1,3 +1,9 @@
+2012-06-30 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/sdcc.nsi:
+	  fixed 'Installer suggest "C:\Program Files\SDCC" instead of
+	  "C:\Program Files (x86)\SDCC"' problem
+
 2012-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/peep.c:

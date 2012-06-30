@@ -291,8 +291,13 @@ ${Function} .onInit
   ${DebugMsg} "Pre INSTDIR = $INSTDIR"
 
   ${If} ${RunningX64}
+  !ifdef WIN64
     StrCpy $INSTDIR "$PROGRAMFILES64\${PRODUCT_NAME}"
     SetRegView 64
+  !else
+    StrCpy $INSTDIR "$PROGRAMFILES\${PRODUCT_NAME}"
+    SetRegView 32
+  !endif
   ${Else}
   !ifdef WIN64
     MessageBox MB_OK|MB_ICONSTOP \
@@ -341,7 +346,11 @@ ${Function} un.onInit
   ${DebugMsg} "Pre INSTDIR = $INSTDIR"
 
   ${If} ${RunningX64}
+  !ifdef WIN64
     SetRegView 64
+  !else
+    SetRegView 32
+  !endif
   ${Endif}
 
   Push $R0

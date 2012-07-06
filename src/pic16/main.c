@@ -501,6 +501,7 @@ do_pragma (int id, const char *name, const char *cp)
           }
         while ('\0' != *cp);
 
+        dbuf_append_str (&dbuf, "\n\tcode");
         createConfigure(NULL, dbuf_detach_c_str (&dbuf));
         break;
 

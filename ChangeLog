@@ -1,3 +1,8 @@
+2012-07-07 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/repack_release.sh:
+	  updated, added -dl, -r and -ul command line options
+
 2012-07-06 Borut Razem <borut.razem AT gmail.com>
 
 	* src/pic16/main.c: bug patched with sdcc-3.2.0-config_fix.diff

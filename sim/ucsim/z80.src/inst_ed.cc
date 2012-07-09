@@ -34,12 +34,50 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "z80mac.h"
 
 
+#define tst_A_bytereg(br) {                                \
+   ubtmp = regs.A & (br);                                  \
+   regs.F &= ~(BIT_ALL);  /* clear these */                \
+   regs.F |= BIT_A;                                        \
+   if (ubtmp == 0)    regs.F |= BIT_Z;                     \
+   if (ubtmp & 0x80)  regs.F |= BIT_S;                     \
+   if (parity(ubtmp)) regs.F |= BIT_P;                     \
+}
+
+
 int  cl_z80::inst_ed_(t_mem code)
 {
   unsigned short tw;
+  TYPE_UBYTE     ubtmp;
+  
+  if (code < 0x40)
+    {
+      if (type != CPU_Z180)
+        return resINV_INST;
+      
+      switch ( code & 0x07 )
+        {
+        case 0:  //  IN0
+          ubtmp = fetch1( );
+          reg_g_store( (code >> 3) & 0x07, in_byte( ubtmp ) );
+          return resGO;
+          
+        case 1:  // OUT0
+          ubtmp = fetch1( );
+          out_byte( ubtmp, reg_g_read( (code >> 3) & 0x07 ) );
+          return resGO;
+          
+        case 4:  // TST
+          tst_A_bytereg(reg_g_read( (code >> 3) & 0x07 ));
+          return resGO;
+          
+        default:
+          return resINV_INST;
+        }
+    }
   
   switch(code)
     {
+
 #if 0
     case 0x40: // IN B,(C)
       return(resGO);
@@ -152,6 +190,12 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x63: // LD (nnnn),HL opcode 22 does the same faster
       tw = fetch2();
       store2(tw, regs.HL);
+      return(resGO);
+    case 0x64:
+      if (type != CPU_Z180)
+        return(resINV_INST);
+      ubtmp = fetch();      // TST A,n
+      tst_A_bytereg(ubtmp);
       return(resGO);
 
 #if 0

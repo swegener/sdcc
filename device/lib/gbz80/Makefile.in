@@ -23,10 +23,6 @@ Z80_LONG = $(COMMON_LONG) \
   _mullong.c
 
 Z80_LONGLONG = $(COMMON_LONGLONG) \
-  _rrulonglong.c \
-  _rrslonglong.c \
-  _rlulonglong.c \
-  _rlslonglong.c \
   _mullonglong.c \
   _divslonglong.c \
   _divulonglong.c
@@ -37,6 +33,7 @@ Z80_SDCC = $(COMMON_SDCC) \
   _startup.c \
   sprintf.c \
   vprintf.c \
+  _strcpy.c \
   _strlen.c \
   _memmove.c
 
@@ -44,7 +41,7 @@ Z80SOURCES = $(addprefix ../,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG)
 Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 
 OBJ = div.rel mul.rel \
-      putchar.rel shift.rel stubs.rel crt0_rle.rel heap.rel fstubs.rel crtcall.rel
+      putchar.rel stubs.rel crt0_rle.rel heap.rel fstubs.rel crtcall.rel
 
 LIB = gbz80.lib
 CC = $(SCC)

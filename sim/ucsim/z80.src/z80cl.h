@@ -77,7 +77,12 @@ public:
   virtual TYPE_UWORD  fetch2( void );
   virtual t_mem       peek1 ( void );
   
+  virtual TYPE_UBYTE   in_byte( TYPE_UWORD ioaddr );
+  virtual void        out_byte( TYPE_UWORD ioaddr, TYPE_UBYTE io_val );
+  
   //virtual t_mem fetch(void);
+  virtual TYPE_UBYTE  reg_g_read ( t_mem g );
+  virtual void        reg_g_store( t_mem g, TYPE_UBYTE new_val );
 
 #include "instcl.h"
 };

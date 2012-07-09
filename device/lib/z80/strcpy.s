@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  putchar.s
+;  strcpy.s
 ;
-;  Copyright (C) 2001, Michael Hope
+;  Copyright (C) 2012, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,78 +26,23 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        ;;
-__rrulong_rrx_s::
-        ld      hl,#2+4
-        add     hl,sp
+	.area   _CODE
 
-        ld      a,(hl)
-        or      a,a
-	pop     bc
-	pop     hl
-	pop     de
-	push    de
-	push    hl
-	push    bc
-        ret     Z
-        ld      b,a
-        ld      a,e
-1$:
-        srl     d
-        rra
-        rr	h
-        rr      l
+	.globl _strcpy
 
-        djnz    1$
-        ld      e,a
-        ret
+_strcpy:
+	pop	bc
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	push	bc
+	push	de
+	xor	a, a
+loop:
+	cp	a, (hl)
+	ldi
+	jr	NZ, loop
+	pop	hl
+	ret
 
-__rrslong_rrx_s::
-        ld      hl,#2+4
-        add     hl,sp
-
-        ld      a,(hl)
-        or      a,a
-	pop     bc
-	pop     hl
-	pop     de
-	push    de
-	push    hl
-	push    bc
-        ret     Z
-        ld      b,a
-        ld      a,e
-2$:
-        sra     d
-        rra
-        rr	h
-        rr      l
-
-        djnz    2$
-        ld      e,a
-        ret
-
-__rlslong_rrx_s::
-__rlulong_rrx_s::
-        ld      hl,#2+4
-        add     hl,sp
-
-        ld      a,(hl)
-        or      a,a
-	pop     bc
-	pop     hl
-	pop     de
-	push    de
-	push    hl
-	push    bc
-        ret     Z
-        ld      b,a
-        ld      a,e
-3$:
-        add     hl,hl
-        rla
-        rl	d
-
-        djnz    3$
-        ld      e,a
-        ret

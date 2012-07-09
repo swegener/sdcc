@@ -1,7 +1,31 @@
+2012-07-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Merged the smallopts branch.
+
 2012-07-09 Borut Razem <borut.razem AT gmail.com>
 
 	* Small Device C Compiler 3.2.0 released
 	* .version, doc/sdccman.lyx: changed sdcc version to 3.2.1
+
+2012-07-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve code generation for multiplication by literal.
+
+2012-07-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug in built-in strchr().
+	* device/lib/Makefile.in:
+	  Fix building of strcpy() for mcs51.
+
+2012-07-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug in stack restoration for built-in functions.
+	* device/lib/_strchr.c,
+	  device/lib/_strncpy.c:
+	  Fix conflict between built-in and non built-in functions.
 
 2012-07-07 Borut Razem <borut.razem AT gmail.com>
 
@@ -20,10 +44,19 @@
 	  fixed 'Installer suggest "C:\Program Files\SDCC" instead of
 	  "C:\Program Files (x86)\SDCC"' problem
 
-2012-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2012-07-04 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/peep.c:
-	  Fix out-of-array read.
+	* src/z80/gen.c:
+	  Fix for operand handling in built-in memset().
+	* src/SDCCopt.c:
+	  Convert zero-length built-in memcpy(), strncpy(), memset()
+	  back to ensure any volatiles are read. Fixes #3538725.
+
+2012-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Fix stack adjustment after call and omission of frame pointer for --reserve-regs-iy.
 
 2012-06-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -47,19 +80,129 @@
 	  pic16_printIvalBitFields, pic16_printIvalUnion),
 	* src/z80/ralloc2.cc (iy_reserved, Ainst_ok, omit_frame_ptr): fixed warnings
 
+2012-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  device/include/string.h:
+	  Built-in strncpy().
+
+2012-06-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/hc08/ralloc2.cc,
+	  device/include/string.h:
+	  Built-in strchr().
+	* src/z80/peep.c:
+	  Fix out-of-array read.
+
 2012-06-27 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.lex:
-	  unescape file names from preprocessor, 2nd and 3rd try
+	  unescape file names from preprocessor, 3rd try
 	* device/non-free/lib/pic16/libdev/Makefile.am,
 	  device/non-free/lib/pic16/libdev/Makefile.in,
 	  device/non-free/lib/pic14/libdev/Makefile.in:
 	  gputils supports all devices supported by SDCC
 
+2012-06-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c,
+	  src/z80/gen.c:
+	  Built-in strcpy().
+
+2012-06-27 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/lib/z180/Makefile.in,
+	  device/lib/incl.mk,
+	  device/lib/r3ka/Makefile.in,
+	  device/lib/gbz80/Makefile.in,
+	  device/lib/s08/Makefile.in,
+	  device/lib/r2k/Makefile.in,
+	  device/lib/hc08/Makefile.in,
+	  device/lib/z180/strcpy.s
+	  device/lib/r3ka/strcpy.s
+	  device/lib/z80/strcpy.s
+	  device/lib/r2k/strcpy.s:
+	  Use ldi for strcpy().
+
+2012-06-27 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCC.lex:
+	  unescape file names from preprocessor, 2nd try
+
 2012-06-26 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCC.lex, src/SDCCerr.c, src/SDCCerr.h:
 	  unescape file names from preprocessor
+
+2012-06-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Use xor to zero the accumulator in a few more places.
+
+2012-06-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve memset() for small sizes, RFE #3537534.
+
+2012-06-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Improve handling of hl in additions with on-stack param operands.
+
+2012-06-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/lib/z180/shift.s,
+	  device/lib/r3ka/shift.s,
+	  device/lib/z80/shift.s,
+	  device/lib/gbz80/shift.s,
+	  device/lib/r2k/shift.s,
+	  src/port.h,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  device/lib/z180/Makefile.in,
+	  device/lib/z180/stubs.s,
+	  device/lib/r3ka/Makefile.in,
+	  device/lib/r3ka/stubs.s,
+	  device/lib/z80/Makefile.in,
+	  device/lib/z80/stubs.s,
+	  device/lib/gbz80/stubs.s,
+	  device/lib/gbz80/Makefile.in,
+	  device/lib/r2k/Makefile.in,
+	  device/lib/r2k/stubs.s:
+	  Code generation instead of support calls for all shifts.
+
+2012-06-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Better cost estimation for loading parameters into pairs,
+	  more efficient loading from stack into iy for Rabbits.
+
+2012-06-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Use dec r and inc a in comparison for equality.
+
+2012-06-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Use 16-bit sbc in subtraction and comparison.
+
+2012-06-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve handling of pointers to long and long long.
+
+2012-06-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Minor addition improvement,
+	  refactoring of pair test code.
 
 2012-06-25 Borut Razem <borut.razem AT gmail.com>
 
@@ -144,6 +287,23 @@
 2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,
+	  src/port.h,
+	  src/xa51/main.c,
+	  src/mcs51/main.c,
+	  src/ds390/main.c,
+	  src/pic14/main.c,
+	  src/pic16/main.c,
+	  src/z80/main.c,
+	  src/z80/ralloc2.cc,
+	  src/hc08/main.c,
+	  src/hc08/ralloc2.cc:
+	  Nice fix for bug #3536902.
+	* src/z80/gen.c:
+	  More efficient built-in memcpy() for small copies.
+
+2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
 	  src/z80/ralloc2.c,
 	  src/z80/ralloc.h:
 	  Ugly hack to fix bug #3536902.
@@ -162,11 +322,50 @@
 
 	* device/include/mcs51/cc2530.h: renamed TR0 to TESTREG0
 
+2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use destructive increment in comparison for equality with #0xff,
+	  more efficient assignment of 16-byte values,
+	  fix spilling of comitted pair after ex (sp), dd.
+
+2012-06-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Enable use of rl de in destructive and.
+
+2012-06-20 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sim/ucsim/z80.src/inst_r2k.cc:
+	  Fix flags for rl de, rr d, rr hl.
+
+2012-06-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve destructive and.
+
 2012-06-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def,
 	  src/z80/peeph-r2k.def:
 	  Minor peephole fix.
+
+2012-06-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  More efficient assignment for global variables.
+
+2012-06-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug in & 0x8000 with ifx for unsigned int.
+
+2012-06-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Refactor code for setup for built-in memcpy(),
+	  use ex de, hl in register move,
+	  use cp instead of xor for clearing the carry flag.
 
 2012-06-18 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -188,6 +387,20 @@
 	  applied patch #3531530 - new CPU support (pic16f882, 883, 884),
 	  thanks to Molnar Karoly
 
+2012-06-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Some more peepholes that help when framepointer is omitted.
+	* src/z80/peep.c:
+	  Handle cpl, ldir, di, ei, out, in, mul and bool in read analysis.
+
+2012-06-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improve shifts by non-literal.
+
 2012-06-17 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi:
@@ -205,6 +418,11 @@
 	  src/SDCCerr.c,
 	  src/SDCCval.c:
 	  Warn when encountering long long literals.
+
+2012-06-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve destructive and.
 
 2012-06-16 Leland Morrison <enigmalee AT sourceforge.net>
 
@@ -230,7 +448,12 @@
 	  support/regression/tests/gcc-torture-execute-20100316-1.c,
 	  support/regression/tests/gcc-torture-execute-pr38422.c,
 	  support/regression/tests/gcc-torture-execute-921016-1.c:
-	  Disable tests that use bitfields of size greater than 8 bits, which is not yet supproted by the pic16 port.
+	  Disable tests that use bitfields of size greater than 8 bits, which is not yet supported by the pic16 port.
+
+2012-06-15 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sim/ucsim/z80.src/z80cl.h, z80.cc, inst_ed.cc:
+	  Added in0, out0, and tst instructions for z180 support.
 
 2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -244,10 +467,53 @@
 	* src/hc08/gen.c:
 	  Fix cost calculation for branches.
 
+2012-06-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/hc08/gen.c:
+	  Improve storing of hx in assignment.
+
+2012-06-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix for 16-bit addition to avoid generating invalid add hl, iy.
+
+2012-06-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve multiplication for Rabbits.
+
 2012-06-13 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sdas/asz80/z80mch.c:  Allow the tst instruction for z180/.hd64 to
 	  use the two operand form (tst a,X) (fixes bug #3534833)
+
+2012-06-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve one-byte shifts, use fix of #3534833 in non-destructive and.
+
+2012-06-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve right shift.
+
+2012-06-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve 16-bit addition with operand in hl and result in iy.
+
+2012-06-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improvements to left shift by literal.
+
+2012-06-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/peep.c:
+	  Improvements to non-destructive and, including #3526286.
 
 2012-06-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

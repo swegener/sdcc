@@ -28,6 +28,8 @@
 
 #include "string.h"
 
+#undef strchr /* Avoid conflict with builtin strchr() in Z80 and some related ports */
+
 #ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 char * strchr (
 	const char * string,

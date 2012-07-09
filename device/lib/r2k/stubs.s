@@ -53,10 +53,6 @@
         .globl  __moduschar_rrx_s
         .globl  __moduint_rrx_s
         .globl  __modsint_rrx_s
-        .globl	__rrulong_rrx_s
-        .globl	__rrslong_rrx_s
-        .globl	__rlulong_rrx_s
-        .globl	__rlslong_rrx_s
 
 __mullong_rrx_s::
 __mullong_rrf_s::
@@ -162,24 +158,4 @@ __moduint_rrf_s::
         ld      a,#5
         rst     #0x28
         jp	__moduint_rrx_s
-
-__rrulong_rrf_s::
-        ld      a,#5
-        rst     #0x28
-        jp	__rrulong_rrx_s
-
-__rrslong_rrf_s::
-        ld      a,#5
-        rst     #0x28
-        jp	__rrslong_rrx_s
-
-__rlulong_rrf_s::
-        ld      a,#5
-        rst     #0x28
-        jp	__rlulong_rrx_s
-
-__rlslong_rrf_s::
-        ld      a,#5
-        rst     #0x28
-        jp	__rlslong_rrx_s
 

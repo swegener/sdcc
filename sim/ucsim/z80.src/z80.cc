@@ -662,4 +662,49 @@ t_mem       cl_z80::peek1 ( void ) {
   return rom->read(PC);
 }
 
+TYPE_UBYTE  cl_z80:: in_byte( TYPE_UWORD ioaddr )
+{
+  return 0;
+}
+
+void        cl_z80::out_byte( TYPE_UWORD ioaddr, TYPE_UBYTE io_val )
+{
+  return;
+}
+
+TYPE_UBYTE  cl_z80::reg_g_read ( t_mem g )
+{
+  switch( g )
+    {
+    case 0:  return regs.bc.h;
+    case 1:  return regs.bc.l;
+    case 2:  return regs.de.h;
+    case 3:  return regs.de.l;
+    case 4:  return regs.hl.h;
+    case 5:  return regs.hl.l;
+    case 6:  return get1( regs.HL );
+    case 7:  return regs.A;
+    default:
+      return 0xffU;
+    }
+}
+
+void        cl_z80::reg_g_store( t_mem g, TYPE_UBYTE new_val )
+{
+  switch( g )
+    {
+    case 0:  regs.bc.h = new_val;  break;  /* write to b */
+    case 1:  regs.bc.l = new_val;  break;  /* write to c */
+    case 2:  regs.de.h = new_val;  break;  /* write to d */
+    case 3:  regs.de.l = new_val;  break;  /* write to e */
+    case 4:  regs.hl.h = new_val;  break;  /* write to h */
+    case 5:  regs.hl.l = new_val;  break;  /* write to l */
+    case 6:  /* write to (hl) */
+      store1( regs.HL, new_val );
+      break;
+
+    case 7:  regs.A    = new_val;  break;  /* write to a */
+    }
+}
+
 /* End of z80.src/z80.cc */

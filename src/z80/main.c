@@ -116,6 +116,9 @@ extern PORT r2k_port;
 
 static builtins _z80_builtins[] = {
   {"__builtin_memcpy", "vg*", 3, {"vg*", "vg*", "ui"}},
+  {"__builtin_strcpy", "cg*", 2, {"cg*", "cg*"}},
+  {"__builtin_strncpy", "cg*", 3, {"cg*", "cg*", "ui"}},
+  {"__builtin_strchr", "cg*", 2, {"cg*", "i"}},
   {"__builtin_memset", "vg*", 3, {"vg*", "i", "ui"}},
   {NULL, NULL, 0, {NULL}}
 };
@@ -610,6 +613,9 @@ _finaliseOptions (void)
   if (_G.asmType == ASM_TYPE_ASXXXX && IS_GB)
     asm_addTree (&_asxxxx_gb);
 
+  if (IY_RESERVED)
+    port->num_regs -= 2;
+
   _setValues ();
 }
 
@@ -849,7 +855,7 @@ PORT z80_port = {
    -1, 0, 0, 4, 0, 2},
   /* Z80 has no native mul/div commands */
   {
-   0, 2},
+   0, -1},
   {
    z80_emitDebuggerSymbol},
   {
@@ -897,7 +903,8 @@ PORT z80_port = {
   _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
-  1,                            /* globals & local static allowed */
+  1,                            /* globals & local statics allowed */
+  9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
 
@@ -973,7 +980,7 @@ PORT z180_port = {
    -1, 0, 0, 4, 0, 2},
   /* Z80 has no native mul/div commands */
   {
-   0, 2},
+   0, -1},
   {
    z80_emitDebuggerSymbol},
   {
@@ -1021,7 +1028,8 @@ PORT z180_port = {
   _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
-  1,                            /* globals & local static allowed */
+  1,                            /* globals & local statics allowed */
+  9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
 
@@ -1097,7 +1105,7 @@ PORT r2k_port = {
    -1, 0, 0, 4, 0, 2},
   /* Z80 has no native mul/div commands */
   {
-   0, 2},
+   0, -1},
   {
    z80_emitDebuggerSymbol},
   {
@@ -1145,7 +1153,8 @@ PORT r2k_port = {
   _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
-  1,                            /* globals & local static allowed */
+  1,                            /* globals & local statics allowed */
+  9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
 
@@ -1221,7 +1230,7 @@ PORT r3ka_port = {
    -1, 0, 0, 4, 0, 2},
   /* Z80 has no native mul/div commands */
   {
-   0, 2},
+   0, -1},
   {
    z80_emitDebuggerSymbol},
   {
@@ -1269,7 +1278,8 @@ PORT r3ka_port = {
   _z80_builtins,                /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
-  1,                            /* globals & local static allowed */
+  1,                            /* globals & local statics allowed */
+  9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
 
@@ -1347,7 +1357,7 @@ PORT gbz80_port = {
    -1, 0, 0, 2, 0, 4},
   /* gbZ80 has no native mul/div commands */
   {
-   0, 2},
+   0, -1},
   {
    z80_emitDebuggerSymbol},
   {
@@ -1395,7 +1405,8 @@ PORT gbz80_port = {
   NULL,                         /* no builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
-  1,                            /* globals & local static allowed */
+  1,                            /* globals & local statics allowed */
+  5,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
 

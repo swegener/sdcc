@@ -71,7 +71,6 @@ COMMON_SDCC = \
   _strcat.c \
   _strchr.c \
   _strcmp.c \
-  _strcpy.c \
   _strcspn.c \
   _strncat.c \
   _strncmp.c \

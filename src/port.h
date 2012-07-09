@@ -252,6 +252,7 @@ typedef struct
         mul/div operation the processor can do natively
         Eg if the processor has an 8 bit mul, native below is 2 */
     unsigned muldiv;
+    /** Size of the biggest shift the port can handle. -1 if port can handle shifts of arbitrary size. */
     unsigned shift;
   }
   support;
@@ -383,6 +384,8 @@ typedef struct
   int unqualified_pointer;      /* unqualified pointers type is  */
   int reset_labelKey;           /* reset Label no 1 at the start of a function */
   int globals_allowed;          /* global & static locals not allowed ?  0 ONLY TININative */
+
+  int num_regs;                /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
 #define PORT_MAGIC 0xAC32
   /** Used at runtime to detect if this structure has been completly filled in. */
   int magic;

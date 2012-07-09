@@ -2849,6 +2849,11 @@ genCopy (operand * result, operand * source)
       loadRegFromAop (hc08_reg_hx, AOP (source), 0);
       return;
     }
+  if (IS_AOP_HX (AOP (source)))
+    {
+      storeRegToAop (hc08_reg_hx, AOP (result), 0);
+      return;
+    }
 
   /* If the result and right are 2 bytes and both in registers, we have to be careful */
   /* to make sure the registers are not overwritten prematurely. */

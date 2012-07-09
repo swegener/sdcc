@@ -38,6 +38,7 @@ HC08_SDCC = $(COMMON_SDCC) \
   _spx.c \
   _startup.c \
   _strlen.c \
+  _strcpy.c \
   _memmove.c \
   _heap.c \
   sprintf.c \

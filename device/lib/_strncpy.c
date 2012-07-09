@@ -28,6 +28,8 @@
 
 #include "string.h"
 
+#undef strncpy /* Avoid conflict with builtin strncpy() in Z80 and some related ports */
+
 char *strncpy (
 	char * d,
 	const char * s,

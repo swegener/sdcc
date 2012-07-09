@@ -1,3 +1,8 @@
+2012-07-09 Borut Razem <borut.razem AT gmail.com>
+
+	* Small Device C Compiler 3.2.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.2.1
+
 2012-07-07 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/repack_release.sh:

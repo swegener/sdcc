@@ -234,6 +234,8 @@ struct optimize
     int noLoopReverse;
     int codeSpeed;
     int codeSize;
+    int lospre;
+    int lospre_unsafe_read;
   };
 
 /** Build model.

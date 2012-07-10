@@ -1553,6 +1553,8 @@ aopOp (operand * op, const iCode * ic, bool result, bool requires_a)
   for (i = 0; i < sym->nRegs; i++)
     {
       wassertl (sym->regs[i], "Symbol in register, but no register assigned.");
+      if(!sym->regs[i])
+        fprintf(stderr, "Symbol %s at ic %d.\n", sym->name, ic->key);
       aop->aopu.aop_reg[i] = sym->regs[i];
     }
 }
@@ -9890,7 +9892,9 @@ genIfx (iCode * ic, iCode * popIc)
 static void
 genAddrOf (const iCode * ic)
 {
-  symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  symbol *sym;
+  wassert (IS_TRUE_SYMOP (IC_LEFT (ic)));
+  sym = OP_SYMBOL (IC_LEFT (ic));
 
   aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
 
@@ -11868,7 +11872,7 @@ genZ80Code (iCode * lic)
         }
       regalloc_dry_run_cost = 0;
       genZ80iCode (ic);
-      emitDebug("; iCode %d total cost: %d", ic->key, (int)(regalloc_dry_run_cost));
+      /*emitDebug("; iCode %d total cost: %d", ic->key, (int)(regalloc_dry_run_cost));*/
     }
 
 

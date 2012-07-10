@@ -148,6 +148,8 @@ char buffer[PATH_MAX * 2];
 #define OPTION_NO_OPTSDCC_IN_ASM "--no-optsdcc-in-asm"
 #define OPTION_DUMP_GRAPHS      "--dump-graphs"
 #define OPTION_MAX_ALLOCS_PER_NODE  "--max-allocs-per-node"
+#define OPTION_NO_LOSPRE        "--nolospre"
+#define OPTION_LOSPRE_UNSAFE_READ "--lospre-unsafe-read"
 
 static const OPTION optionsTable[] = {
   {0,   NULL, NULL, "General options"},
@@ -229,6 +231,8 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_OPT_CODE_SPEED, NULL, "Optimize for code speed rather than size"},
   {0,   OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
   {0,   OPTION_MAX_ALLOCS_PER_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
+  {0,   OPTION_NO_LOSPRE, NULL, "Disable lospre"},
+  {0,   OPTION_LOSPRE_UNSAFE_READ, NULL, "Allow unsafe reads in lospre"},
 
   {0,   NULL, NULL, "Internal debugging options"},
   {0,   "--dumpraw", &options.dump_raw, "Dump the internal structure after the initial parse"},
@@ -610,6 +614,8 @@ setDefaultOptions (void)
   optimize.loopInvariant = 1;
   optimize.loopInduction = 1;
   options.max_allocs_per_node = 3000;
+  optimize.lospre = 1;
+  optimize.lospre_unsafe_read = 0;
 
   /* now for the ports */
   port->setDefaultOptions ();
@@ -1080,6 +1086,18 @@ parseCmdLine (int argc, char **argv)
             {
               optimize.codeSpeed = 0;
               optimize.codeSize = 1;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_NO_LOSPRE) == 0)
+            {
+              optimize.lospre = 0;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_LOSPRE_UNSAFE_READ) == 0)
+            {
+              optimize.lospre_unsafe_read = 1;
               continue;
             }
 

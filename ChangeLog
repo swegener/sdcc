@@ -1,3 +1,13 @@
+2012-07-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* Merged the lospre branch.
+
+2012-07-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  src/hc08/gen.c:
+	  Disable cost function debugging output.
+
 2012-07-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* Merged the smallopts branch.
@@ -6,6 +16,11 @@
 
 	* Small Device C Compiler 3.2.0 released
 	* .version, doc/sdccman.lyx: changed sdcc version to 3.2.1
+
+2012-07-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c:
+	  Disable lospre for ports unrelated to z80 or hc08.
 
 2012-07-07 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -32,11 +47,46 @@
 	* support/scripts/repack_release.sh:
 	  updated, added -dl, -r and -ul command line options
 
+2012-07-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c,
+	  src/SDCClospre.cc,
+	  src/SDCCglobl.h:
+	  Provide option to allow unsafe reads in lospre.
+
+2012-07-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Safety in lospre.
+
+2012-07-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Preparations for safety in lospre.
+
+2012-07-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Preparations for safety.
+
+2012-07-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  Fix for out-of-memory handling in lospre.
+
 2012-07-06 Borut Razem <borut.razem AT gmail.com>
 
 	* src/pic16/main.c: bug patched with sdcc-3.2.0-config_fix.diff
 	  #3539804 - #pragma config and certain string constants,
 	  thanks to Herbert Potzl
+
+2012-07-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.cc:
+	  Preparations for safety in lospre.
 
 2012-06-30 Borut Razem <borut.razem AT gmail.com>
 
@@ -457,6 +507,13 @@
 
 2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCClospre.hpp:
+	  Fix lospre nonforward-substitution of POINTER_SET.
+	* src/SDCClospre.cc:
+	  Improve handling of invalidation at POINTER_SET.
+
+2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
  	* support/regression/tests/and_survive.c:
 	  Test non-destructive and, regression test for #3534833.
 	* support/regression/tests/gcc-torture-execute-980707-1.c:
@@ -517,8 +574,31 @@
 
 2012-06-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCmain.c,
+	  src/SDCCopt.c,
+	  src/SDCCglobl.h:
+	  Implement --nolospre option for disabling lospre.
+
+2012-06-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCicode.c:
 	  Fix debug output for GET_VALUE_AT_ADDRESS right operand.
+
+2012-06-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  Fix handling of IFX in forward substitution.
+
+2012-06-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.cc:
+	  Disable lospre of assignments with iTemp source.
+
+2012-06-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Reorganize forward substitution code, lospre for GET_VALUE_AT_ADDRESS.
 
 2012-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -703,6 +783,21 @@
 
 2012-06-01 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCClospre.cc,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCClospre.hpp:
+	  Relax lospre type checking.
+
+2012-06-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.cc:
+	  Disable lospre for literla assignments (can be reenabled once ports can rematerialize this).
+	* src/SDCClospre.hpp:
+	  Improve handling of volatile.
+
+2012-06-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Always use 16-bit addition when an operand and the result are in hl.
 
@@ -722,6 +817,13 @@
 
 	* doc/sdccman.lyx:
 	  Updated manual (mostly r3ka and s08 port).
+
+2012-05-31 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  Fix handling of invalidating iCodes in lospre.
+	* src/SDCClospre.cc:
+	  Fix multiround-lospre.
 
 2012-05-31 Borut Razem <borut.razem AT gmail.com>
 
@@ -781,6 +883,11 @@
 
 2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCClospre.hpp:
+	  Fix for handling global variables over calls in lospre.
+
+2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c,
 	  src/hc08/gen.c:
 	  Added assertions to debug rematerialization issues.
@@ -790,6 +897,17 @@
 	* src/hc08/ralloc.c (moveSendToCall, packRegisters): move SEND iCodes
 	  to immediately precede their CALL/PCALL for better live range info.
 	* src/hc08/gen.c (genSend): fixed bug swapping SEND iCode order.
+
+2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  Fix invalid memory access bug.
+
+2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/z80/gen.c:
+	  Fix handling of ADDRESS_OF in lospre forward assignment.
 
 2012-05-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -816,6 +934,18 @@
 
 	* src/pic16/main.c: allow underscore characters in #pragma config
 
+2012-05-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Improve handling of results of substituted instructions in lospre.
+
+2012-05-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Fix handling of --max-allocs-per-node in lospre.
+
 2012-05-26 Borut Razem <borut.razem AT gmail.com>
 
 	* src/pic16/main.c: allow space characters in #pragma config
@@ -824,13 +954,32 @@
 
 	* doc/sdccman.lyx: corrected #pragma configure to #pragma config
 
+2012-05-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  Improve handling of --max-allocs-per-node in lospre.
+
 2012-05-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/hc08/gen.c (genPointerSet): fixed warning
 
+2012-05-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCicode.h,
+	  src/SDCCicode.c,
+	  src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Fixes for handling of globals and volatile in lospre.
+
 2012-05-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: fix my typo in r3ka path
+
+2012-05-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  lospre.
 
 2012-05-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -847,8 +996,22 @@
 
 2012-05-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Preparations for lospre.
+
+2012-05-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/hc08/peeph.def:
 	  Improve elimination of branches.
+
+2012-05-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Preparations for lospre.
+	* src/z80/gen.c:
+	  More verbose debugging for variables that are not in registers, but should be.
 
 2012-05-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -856,6 +1019,12 @@
 	* support/sdbinutils/binutils/configure.in,
 	* support/sdbinutils/binutils/configure: fix bug #3527589
 	* src/SDCCcse.c (newCseDef): fix bug #3528899
+
+2012-05-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Preparations for lospre.
 
 2012-05-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -1110,6 +1279,17 @@
 	* sim/ucsim/z80.src/inst_ed_r2k.cc: support for r3ka instructions
 	* sim/ucsim/z80.src/inst_ed.cc: change to allow overloading of inst_ed_
 
+2012-05-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Early preparations for lospre.
+
+2012-05-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  Early preparations for lospre.
+
 2012-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: correct some dry run costs, update genDivOneByte()
@@ -1126,6 +1306,19 @@
 	* src/ds390/gen.c (genGenPointerGet, genGenPointerSet): fixed bug 3509705
 	* support/regression/compact-results.py: align results
 	* support/regression/tests/gcc-torture-execute-921013-1.c: enabled tests
+
+2012-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Early preparations for lospre.
+
+2012-05-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCopt.c,
+	  src/SDCCopt.c,
+	  src/SDCClospre.cc,
+	  Preparations for finding lospre optimization candidates.
 
 2012-05-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -1153,6 +1346,15 @@
 	  src/hc08/ralloc2.cc:
 	  Added some debug info code.
 
+2012-05-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCCralloc.hpp,
+	  src/SDCCnaddr.cc,
+	  src/SDCCnaddr.hpp,
+	  src/SDCClospre.cc:
+	  Declare some data types for lospre.
+	
 2012-05-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/hc08/gen.c,

@@ -10164,8 +10164,8 @@ genhc08Code (iCode *lic)
 
       regalloc_dry_run_cost = 0;
       genhc08iCode(ic);
-      if (options.verboseAsm)
-        emitcode (";", "iCode %d (key %d) total cost: %d\n", ic->seq, ic->key, (int) regalloc_dry_run_cost);
+      /*if (options.verboseAsm)
+        emitcode (";", "iCode %d (key %d) total cost: %d\n", ic->seq, ic->key, (int) regalloc_dry_run_cost);*/
 
       if (!hc08_reg_a->isFree)
         DD (emitcode ("", "; forgot to free a"));

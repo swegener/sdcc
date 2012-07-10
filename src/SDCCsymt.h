@@ -663,6 +663,7 @@ sym_link *newBoolLink ();
 sym_link *newVoidLink ();
 int compareType (sym_link *, sym_link *);
 int compareTypeExact (sym_link *, sym_link *, int);
+int compareTypeInexact (sym_link *, sym_link *);
 int checkFunction (symbol *, symbol *);
 void cleanUpLevel (bucket **, int);
 void cleanUpBlock (bucket **, int);

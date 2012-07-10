@@ -2731,6 +2731,34 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
   return 1;
 }
 
+/*---------------------------------------------------------------------------*/
+/* compareTypeExact - will do type check return 1 if representation is same. */
+/* Useful for redundancy elimination.                                        */
+/*---------------------------------------------------------------------------*/
+int
+compareTypeInexact (sym_link *dest, sym_link *src)
+{
+  if (!dest && !src)
+    return 1;
+
+  if (dest && !src)
+    return 0;
+
+  if (src && !dest)
+    return 0;
+
+  if (IS_BITFIELD (dest) != IS_BITFIELD (src))
+    return 0;
+
+  if (IS_BITFIELD (dest) && IS_BITFIELD (src) && (SPEC_BLEN (dest) != SPEC_BLEN (src) || SPEC_BSTR (dest) != SPEC_BSTR (src)))
+    return 0;
+
+  if (getSize (dest) != getSize (src))
+    return 0;
+
+  return 1;
+}
+
 /*------------------------------------------------------------------*/
 /* inCalleeSaveList - return 1 if found in callee save list         */
 /*------------------------------------------------------------------*/

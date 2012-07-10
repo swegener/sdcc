@@ -48,9 +48,9 @@ extern "C"
 typedef short int naddrspace_t; // Named address spaces. -1: Undefined, Others: see map.
 
 #ifdef HAVE_STX_BTREE_SET_H
-typedef stx::btree_set<naddrspace_t> naddrspaceset_t; // Faster than std::set
+typedef stx::btree_set<unsigned short int> naddrspaceset_t; // Faster than std::set
 #else
-typedef std::set<naddrspace_t> naddrspaceset_t;
+typedef std::set<unsigned short int> naddrspaceset_t;
 #endif
 
 struct assignment_naddr
@@ -113,44 +113,8 @@ struct tree_dec_naddr_node
   assignment_list_naddr_t assignments;
 };
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_naddr_node, float> cfg_t; // The edge property is the cost of subdividing he edge and inserting a bank switching instruction.
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_naddr_node, float> cfg_t; // The edge property is the cost of subdividing the edge and inserting a bank switching instruction.
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_naddr_node> tree_dec_naddr_t;
-
-// A quick-and-dirty function to get the CFG from sdcc (a simplified version of the function from SDCCralloc.hpp).
-void
-create_cfg_naddr(cfg_t &cfg, iCode *start_ic, ebbIndex *ebbi)
-{
-  iCode *ic;
-
-  std::map<int, unsigned int> key_to_index;
-  {
-    int i;
-
-    for (ic = start_ic, i = 0; ic; ic = ic->next, i++)
-      {
-        boost::add_vertex(cfg);
-        key_to_index[ic->key] = i;
-        cfg[i].ic = ic;
-      }
-  }
-
-  // Get control flow graph from sdcc.
-  for (ic = start_ic; ic; ic = ic->next)
-    {
-      if (ic->op != GOTO && ic->op != RETURN && ic->op != JUMPTABLE && ic->next)
-        boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], 3.0f, cfg);
-
-      if (ic->op == GOTO)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, ic->label)->sch->key], 6.0f, cfg);
-      else if (ic->op == RETURN)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, returnLabel)->sch->key], 6.0f, cfg);
-      else if (ic->op == IFX)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, IC_TRUE(ic) ? IC_TRUE(ic) : IC_FALSE(ic))->sch->key], 6.0f, cfg);
-      else if (ic->op == JUMPTABLE)
-        for (symbol *lbl = (symbol *)(setFirstItem (IC_JTLABELS (ic))); lbl; lbl = (symbol *)(setNextItem (IC_JTLABELS (ic))))
-          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, lbl)->sch->key], 6.0f, cfg);
-    }
-}
 
 // Annotate nodes of the control flow graph with the set of possible named address spaces active there.
 void annotate_cfg_naddr(cfg_t &cfg, std::map<naddrspace_t, const symbol *> &addrspaces)
@@ -435,7 +399,7 @@ int tree_dec_naddrswitch_nodes(T_t &T, typename boost::graph_traits<T_t>::vertex
 }
 
 template <class G_t>
-void implement_assignment(const assignment_naddr &a, const G_t &G, const std::map<naddrspace_t, const symbol *> addrspaces)
+static void implement_naddr_assignment(const assignment_naddr &a, const G_t &G, const std::map<naddrspace_t, const symbol *> addrspaces)
 {
   typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_t;
   typedef typename boost::graph_traits<G_t>::edge_iterator ei_t;
@@ -479,7 +443,7 @@ int tree_dec_address_switch(T_t &T, const G_t &G, const std::map<naddrspace_t, c
   std::cout.flush();
 #endif
 
-  implement_assignment(winner, G, addrspaces);
+  implement_naddr_assignment(winner, G, addrspaces);
 
   return(0);
 }

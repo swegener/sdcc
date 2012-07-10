@@ -2200,6 +2200,19 @@ eBBlockFromiCode (iCode * ic)
 
   offsetFold (ebbi->bbOrder, ebbi->count);
 
+  /* lospre */
+  adjustIChain (ebbi->bbOrder, ebbi->count);
+  ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+  if (optimize.lospre && (TARGET_Z80_LIKE || TARGET_HC08_LIKE)) /* Todo: enable for other ports. */
+    lospre (ic, ebbi);
+  /* Break down again and redo some steps to not confuse live range analysis. */
+  ebbi = iCodeBreakDown (ic);
+  computeControlFlow (ebbi);
+  loops = createLoopRegions (ebbi);
+  computeDataFlow (ebbi);
+
+  killDeadCode (ebbi);
+
   /* sort it back by block number */
   //qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
 
@@ -2210,9 +2223,9 @@ eBBlockFromiCode (iCode * ic)
      other support routines, since we can assume that there is no
      bank switching happening in those other support routines
      (but assume that it can happen in other functions) */
-  adjustIChain(ebbi->bbOrder, ebbi->count);
+  adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
-  if(switchAddressSpacesOptimally (ic, ebbi))
+  if (switchAddressSpacesOptimally (ic, ebbi))
     switchAddressSpaces (ic); /* Fallback. Very unlikely to be triggered, unless --max-allocs-per-node is set to very small values or very weird control-flow graphs */
 
   /* Break down again and redo some steps to not confuse live range analysis. */
@@ -2276,3 +2289,4 @@ eBBlockFromiCode (iCode * ic)
 
   return NULL;
 }
+

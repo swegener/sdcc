@@ -1,3 +1,8 @@
+2012-07-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fixed comment.
+
 2012-07-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* Merged the lospre branch.

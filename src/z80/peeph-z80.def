@@ -219,7 +219,7 @@ replace restart {
 } by {
 	srl	%1 (%2)
 	ld	a, %1 (%2)
-	; peephole 21b shifted in (hl) instead of a.
+	; peephole 21b shifted in (%2) instead of a.
 }
 
 replace restart {

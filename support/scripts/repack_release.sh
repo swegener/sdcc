@@ -30,6 +30,7 @@
 # Example:
 # ./repack_release.sh -dl -pr -ul 20090314 5413 2.9.0-rc1
 
+
 function fatal_error()
 {
   echo "repack_release: $1" 1>&2
@@ -97,7 +98,7 @@ function unpack()
     fatal_error "Directory sdcc already exists!"
   fi
 
-  tar -xjvf $bin_pkg || fatal_error "Can't unpack $bin_pkg!"
+  tar -xjvf ${bin_pkg} || fatal_error "Can't unpack $bin_pkg!"
   
   # remove unneeded directories produced by sdbinutils
   rm -rf ./sdcc/include
@@ -106,7 +107,7 @@ function unpack()
   rm -rf ./sdcc/share/doc
   rm -rf ./sdcc/share/sdcc/doc
 
-  tar -xjvf $doc_pkg -C ./sdcc/share/sdcc || fatal_error "Can't unpack $doc_pkg!"
+  tar -xjvf ${doc_pkg} -C ./sdcc/share/sdcc || fatal_error "Can't unpack $doc_pkg!"
 }
 
 
@@ -119,8 +120,22 @@ function pack()
 
   mkdir -p ul
 
-  tar -cjvf ul/sdcc-${ver}-${arch}.tar.bz2 sdcc || fatal_error "Can't pack ul/sdcc-${ver}-${arch}.tar.bz2!"
-  mv sdcc ${arch}
+  mv sdcc sdcc-${ver}
+  tar -cjvf ul/sdcc-${ver}-${arch}.tar.bz2 sdcc-${ver} || fatal_error "Can't pack ul/sdcc-${ver}-${arch}.tar.bz2!"
+  mv sdcc-${ver} ${arch}
+}
+
+
+function repack_src()
+{
+  local date=$1 revision=$2 ver=$3
+
+  ( \
+  tar -xjvf dl/sdcc-src-${date}-${revision}.tar.bz2 && \
+  mv sdcc sdcc-${ver} && \
+  tar -cjvf ul/sdcc-src-${ver}.tar.bz2 sdcc-${ver} && \
+  mv sdcc-${ver} sdcc-src-${ver} \
+  ) || fatal_error "Can't repack the source package!"
 }
 
 
@@ -223,7 +238,7 @@ function upload()
     usage
   fi
 
-  test -z "$has_opts" && dl=1 && pr=1 $$ ul=1
+  test -z "$has_opts" && dl=1 && pr=1 && ul=1
 
   date=$1
   revision=$2
@@ -231,24 +246,24 @@ function upload()
 
   mkdir -p ul
 
-  test -n "$dl" &&  download $date $revision
+  test -n "$dl" &&  download ${date} ${revision}
 
   if [ -n "$pr" ]
   then
-    cp dl/sdcc-src-${date}-${revision}.tar.bz2 ul/sdcc-src-${ver}.tar.bz2
+    repack_src ${date} ${revision} ${ver}
     cp dl/sdcc-doc-${date}-${revision}.tar.bz2 ul/sdcc-doc-${ver}.tar.bz2
     cp dl/sdcc-doc-${date}-${revision}.zip ul/sdcc-doc-${ver}.zip
 
     for arch in i386-unknown-linux2.5 universal-apple-macosx
     do
       unpack dl/sdcc-snapshot-${arch}-${date}-${revision}.tar.bz2 dl/sdcc-doc-${date}-${revision}.tar.bz2
-      pack $arch $ver
+      pack ${arch} ${ver}
     done
 
-    repack_win $date $revision $ver
+    repack_win ${date} ${revision} ${ver}
   fi
 
-  test -n "$ul" && upload $ver
+  test -n "$ul" && upload ${ver}
 
   exit 0
 }

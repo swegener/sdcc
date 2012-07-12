@@ -1,3 +1,10 @@
+2012-07-12 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCerr.c, src/SDCCerr.h, src/pic16/main.c, src/pic16/main.h,
+	  src/pic16/glue.c, src/pic16/device.h, src/SDCCast.c, src/SDCCast.h,
+	  doc/sdccman.lyx: properly fixed bug
+	  #3539804 - pragma config and certain string constants
+
 2012-07-11 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/repack_release.sh: implemented feature request

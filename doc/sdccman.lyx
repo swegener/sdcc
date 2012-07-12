@@ -48490,7 +48490,32 @@ Configuration Bits
 \end_layout
 
 \begin_layout Standard
-Configuration bits (also known as fuses) can be configured using `
+Configuration bits (also known as fuses) can be configured using one of
+ two methods:
+\end_layout
+
+\begin_layout Itemize
+using #pragma config (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PIC16_Pragmas"
+
+\end_inset
+
+), which is a preferred method for the new code.
+ Example:
+\end_layout
+
+\begin_layout LyX-Code
+#pragma config CP0=OFF,OSCS=ON,OSC=LP,BOR=ON,BORV=25,WDT=ON,WDTPS=128,CCP2MUX=ON
+\end_layout
+
+\begin_layout LyX-Code
+#pragma config STVR=ON
+\end_layout
+
+\begin_layout Itemize
+using `
 \family typewriter
 __code
 \family default
@@ -48499,6 +48524,7 @@ __code
 __at
 \family default
 ' modifiers.
+ This method is deprecated.
  Possible options should be ANDed and can be found in your processor header
  file.
  Example for PIC18F2550:
@@ -48538,6 +48564,18 @@ static __code char __at(__CONFIG2L) configword2l = [...];
 \end_inset
 
 //More configuration words
+\end_layout
+
+\begin_layout Standard
+Mixing both methods is not allowed and throws an error message 
+\begin_inset Quotes sld
+\end_inset
+
+mixing __CONFIG and CONFIG directives
+\begin_inset Quotes srd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -49811,10 +49849,20 @@ Extended Instruction Set
 \begin_layout Standard
 The PIC16 port emits code which is incompatible with the extended instruction
  set available with many newer devices.
- Make sure to always explicitly disable it, usually using
+ Make sure to always explicitly disable it, usually using:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+#pragma config XINST=OFF
 \end_layout
 
 \begin_layout Standard
+or deprecated:
+\end_layout
+
+\begin_layout Itemize
 
 \family typewriter
 static __code char __at(__CONFIG4L) conf4l = /* more flags & */ _XINST_OFF_4L;

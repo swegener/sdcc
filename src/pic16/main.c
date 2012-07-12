@@ -91,6 +91,7 @@ void pic16_assignRegisters (ebbIndex *);
 static int regParmFlg = 0;  /* determine if we can register a parameter */
 
 pic16_options_t pic16_options;
+pic16_config_options_t *pic16_config_options;
 
 extern set *includeDirsSet;
 extern set *dataDirsSet;
@@ -501,8 +502,23 @@ do_pragma (int id, const char *name, const char *cp)
           }
         while ('\0' != *cp);
 
-        dbuf_append_str (&dbuf, "\n\tcode");
-        createConfigure(NULL, dbuf_detach_c_str (&dbuf));
+        /* append to the config options list */
+        if (!pic16_config_options)
+          {
+            pic16_config_options = malloc (sizeof (pic16_config_options_t));
+            memset (pic16_config_options, 0, sizeof (pic16_config_options_t));
+            pic16_config_options->config_str = dbuf_detach_c_str (&dbuf);
+          }
+        else
+          {
+            pic16_config_options_t *p;
+
+            for (p = pic16_config_options; p->next; p = p->next)
+              ;
+            p->next = malloc (sizeof (pic16_config_options_t));
+            memset (p->next, 0, sizeof (pic16_config_options_t));
+            p->next->config_str = dbuf_detach_c_str (&dbuf);
+          }
         break;
 
       error:
@@ -978,24 +994,26 @@ _pic16_genAssemblerPreamble (FILE * of)
 {
   char *name = pic16_processor_base_name();
 
-    if(!name) {
-        name = "p18f452";
-        fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
+  if (!name)
+    {
+      name = "p18f452";
+      fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
     }
 
-    fprintf (of, "\tlist\tp=%s\n",&name[1]);
-    if (pic16_mplab_comp) {
+  fprintf (of, "\tlist\tp=%s\n", &name[1]);
+  fprintf (of, "\tradix\tdec\n");
+
+  if (pic16_mplab_comp)
+    {
       // provide ACCESS macro used during SFR accesses
       fprintf (of, "\tinclude <p%s.inc>\n", &name[1]);
     }
 
-    if(!pic16_options.omit_configw) {
-        pic16_emitConfigRegs(of);
-        fprintf(of, "\n");
-        pic16_emitIDRegs(of);
-    }
-
-  fprintf (of, "\tradix dec\n");
+  if(!pic16_options.omit_configw) {
+    pic16_emitConfigRegs(of);
+    fprintf(of, "\n");
+    pic16_emitIDRegs(of);
+  }
 }
 
 /* Generate interrupt vector table. */

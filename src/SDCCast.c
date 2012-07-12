@@ -6762,36 +6762,6 @@ skipall:
   return NULL;
 }
 
-/*-----------------------------------------------------------------*/
-/* createConfigure - This is the key node that calls the iCode for */
-/*                  generating the code for a pic16 cofigure. Note */
-/*                  code is generated function by function, later  */
-/*                  when add inter-procedural analysis this will   */
-/*                  change                                         */
-/*-----------------------------------------------------------------*/
-ast *
-createConfigure (ast * body, const char * str)
-{
-  ast *ex;
-
-  ex = newNode (INLINEASM, NULL, NULL);
-  ex->values.inlineasm = str;
-  ex->decorated = 1;
-
-  if (options.dump_tree)
-    PA (ex);
-
-  if (!fatalError)
-    {
-      /* create the node & generate intermediate code */
-      GcurMemmap = code;
-      codeOutBuf = &code->oBuf;
-      eBBlockFromiCode (iCodeFromAst (ex));
-    }
-
-  return NULL;
-}
-
 #define INDENT(x,f) do { fprintf (f, "%s:%d:", tree->filename, tree->lineno); fprintf (f, "%*s", (x) & 0xff, ""); } while (0)
 /*-----------------------------------------------------------------*/
 /* ast_print : prints the ast (for debugging purposes)             */

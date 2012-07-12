@@ -482,6 +482,8 @@ struct
     "support for long long literals is incomplete", 0 },
   { S_SYNTAX_ERROR, ERROR_LEVEL_SYNTAX_ERROR,
     "token -> '%s' ; column %d", 0 },
+  { E_MIXING_CONFIG, ERROR_LEVEL_ERROR,
+    "mixing __CONFIG and CONFIG directives", 0 },
 };
 
 /* -------------------------------------------------------------------------------

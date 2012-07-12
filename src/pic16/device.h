@@ -124,6 +124,13 @@ typedef struct {
 
 extern stats_t statistics;
 
+typedef struct pic16_config_options_s {
+  char *config_str;
+  struct pic16_config_options_s *next;
+} pic16_config_options_t;
+
+extern pic16_config_options_t *pic16_config_options;
+
 /****************************************/
 void pic16_assignConfigWordValue(int address, unsigned int value);
 void pic16_assignIdByteValue(int address, char value);

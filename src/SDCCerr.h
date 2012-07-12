@@ -240,6 +240,7 @@ enum {
   W_STRING_CANNOT_BE_TERMINATED = 211, /* string cannot be terminated within array */
   W_LONGLONG_LITERAL            = 212, /* long long literal */
   S_SYNTAX_ERROR                = 213, /* syntax error */
+  E_MIXING_CONFIG               = 214, /* mixing __CONFIG and CONFIG directives */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

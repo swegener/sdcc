@@ -1433,26 +1433,44 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sn
 /*-----------------------------------------------------------------*/
 /* pic16_emitConfigRegs - emits the configuration registers              */
 /*-----------------------------------------------------------------*/
-void pic16_emitConfigRegs(FILE *of)
+void pic16_emitConfigRegs (FILE *of)
 {
   int i;
 
-        for(i=0;i<=(pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart);i++)
-                if(pic16->cwInfo.crInfo[i].emit)        //mask != -1)
-                        fprintf (of, "\t__config 0x%06x, 0x%02x\n",
-                                pic16->cwInfo.confAddrStart+i,
-                                (unsigned char) pic16->cwInfo.crInfo[i].value);
+  if (pic16_config_options)
+    {
+      pic16_config_options_t *p;
+
+      /* check if mixing config directives */
+      for (i = 0; i <= (pic16->cwInfo.confAddrEnd - pic16->cwInfo.confAddrStart); ++i)
+        if (pic16->cwInfo.crInfo[i].emit)
+          {
+            werror (E_MIXING_CONFIG);
+            break;
+          }
+
+      /* emit new config directives */
+      for (p = pic16_config_options; p; p = p->next)
+        fprintf (of, "\t%s\n", p->config_str);
+    }
+
+  /* emit old __config directives */
+  for (i = 0; i <= (pic16->cwInfo.confAddrEnd - pic16->cwInfo.confAddrStart); ++i)
+    if (pic16->cwInfo.crInfo[i].emit)        //mask != -1)
+      fprintf (of, "\t__config 0x%06x, 0x%02x\n",
+      pic16->cwInfo.confAddrStart + i,
+      (unsigned char) pic16->cwInfo.crInfo[i].value);
 }
 
-void pic16_emitIDRegs(FILE *of)
+void pic16_emitIDRegs (FILE *of)
 {
   int i;
 
-        for(i=0;i<=(pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart);i++)
-                if(pic16->idInfo.irInfo[i].emit)
-                        fprintf (of, "\t__idlocs 0x%06x, 0x%02x\n",
-                                pic16->idInfo.idAddrStart+i,
-                                (unsigned char) pic16->idInfo.irInfo[i].value);
+  for (i=0; i <= (pic16->idInfo.idAddrEnd - pic16->idInfo.idAddrStart); i++)
+    if (pic16->idInfo.irInfo[i].emit)
+      fprintf (of, "\t__idlocs 0x%06x, 0x%02x\n",
+      pic16->idInfo.idAddrStart + i,
+      (unsigned char) pic16->idInfo.irInfo[i].value);
 }
 
 

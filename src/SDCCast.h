@@ -201,7 +201,6 @@ ast *offsetofOp (sym_link * type, ast * snd);
 value *evalStmnt (ast *);
 ast *createRMW (ast *, unsigned, ast *);
 ast *createFunction (symbol *, ast *);
-ast *createConfigure (ast *, const char * str);
 ast *createBlock (symbol *, ast *);
 ast *createLabel (symbol *, ast *);
 ast *createCase (ast *, ast *, ast *);

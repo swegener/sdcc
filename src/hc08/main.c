@@ -406,13 +406,13 @@ hc08_dwarfRegNum (const struct reg_info *reg)
 */
 static const char *_linkCmd[] =
 {
-  "sdld6808", "-nf", "\"$1\"", NULL
+  "sdld6808", "-nf", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "sdas6808", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "sdas6808", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char * const _libs_hc08[] = { "hc08", NULL, };

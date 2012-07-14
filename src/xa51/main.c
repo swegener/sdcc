@@ -223,13 +223,13 @@ oclsExpense (struct memmap *oclass)
 */
 static const char *_linkCmd[] =
 {
-  "xa_link", "", "\"$1\"", NULL
+  "xa_link", "", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_rasm", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "xa_rasm", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char * const _libs[] = { STD_XA51_LIB, NULL, };

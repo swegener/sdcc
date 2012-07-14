@@ -771,13 +771,13 @@ get_model (void)
 */
 static const char *_linkCmd[] =
 {
-  "sdld", "-nf", "\"$1\"", NULL
+  "sdld", "-nf", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "sdas8051", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "sdas8051", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char * const _libs[] = { "mcs51", STD_LIB, STD_INT_LIB, STD_LONG_LIB, STD_FP_LIB, NULL, };

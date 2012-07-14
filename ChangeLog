@@ -1,3 +1,11 @@
+2012-07-15 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCmain.c, src/SDCCutil.c, src/SDCCutil.h, src/SDCCsystem.c,
+	  src/mcs51/main.c, src/ds390/main.c, src/z80/main.c, src/hc08/main.c,
+	  src/pic14/main.c, src/pic16/main.c, src/avr/main.c, src/xa51/main.c:
+	  properly quoted file names when transferred to preprocessor,
+	  assembler and linker
+
 2012-07-12 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCerr.c, src/SDCCerr.h, src/pic16/main.c, src/pic16/main.h,

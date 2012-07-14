@@ -69,64 +69,166 @@ char *
 shell_escape (const char *str)
 {
 #ifdef _WIN32
+  /* see http://www.autohotkey.net/~deleyd/parameters/parameters.htm */
+
   struct dbuf_s dbuf;
-  bool in_quote = FALSE;
+  int backshl = 0;
+  const char *begin = s;
+  char backslbuf[16];
+  char *backslp;
 
   dbuf_init (&dbuf, 128);
 
-  while (*str)
+  /* opening double quotes */
+  dbuf_append_char(&dbuf, '"');
+  while (*s)
     {
-      switch (*str)
+      if (NULL == begin)
+        begin = s;
+
+      if ('\\' == *s)
+          ++backshl;
+      else
         {
-        case '\\':
-        case '"':
-          if (in_quote)
+          if ('"' == *s)
             {
-              dbuf_append_char (&dbuf, '"');
-              in_quote = FALSE;
-            }
-          dbuf_append_char (&dbuf, '\\');
-          dbuf_append_char (&dbuf, *str);
-          break;
+              /* append the remaining characters */
+              if (s > begin)
+                dbuf_append (&dbuf, begin, s - begin);
 
-        case ' ':
-        case '%':
-          if (!in_quote)
-            {
-              dbuf_append_char (&dbuf, '"');
-              in_quote = TRUE;
-            }
-          dbuf_append_char (&dbuf, *str);
-          break;
+              /* append additional beckslash */
+              ++backshl;
 
-        default:
-          if (in_quote)
-            {
-              dbuf_append_char (&dbuf, '"');
-              in_quote = FALSE;
+              /* special handling if last chars before double quote are backslashes */
+              backslp = backslbuf;
+              while (backshl--)
+                {
+                  *backslp++ = '\\';
+                  if (sizeof (backslbuf) == backslp - backslbuf)
+                    {
+                      dbuf_append (&dbuf, backslbuf, sizeof (backslbuf));
+                      backslp = backslbuf;
+                    }
+                }
+              if (backslp > backslbuf)
+                dbuf_append (&dbuf, backslbuf, backslp - backslbuf);
+
+              begin = s;
             }
-          dbuf_append_char (&dbuf, *str);
+          else if ('%' == *s)
+            {
+              /* diseble env. variable expansion */
+              /* append the remaining characters */
+              if (begin && s > begin)
+                dbuf_append (&dbuf, begin, s - begin);
+
+              /* special handling if last chars before double quote are backslashes */
+              backslp = backslbuf;
+              while (backshl--)
+                {
+                  *backslp++ = '\\';
+                  if (sizeof (backslbuf) == backslp - backslbuf)
+                    {
+                      dbuf_append (&dbuf, backslbuf, sizeof (backslbuf));
+                      backslp = backslbuf;
+                    }
+                }
+              if (backslp > backslbuf)
+                dbuf_append (&dbuf, backslbuf, backslp - backslbuf);
+
+              /* closing doube quotes */
+              backslbuf[0] = '"';
+              backslbuf[1] = *s;
+              /* re opening double quotes */
+              backslbuf[2] = '"';
+              dbuf_append (&dbuf, backslbuf, 3);
+              begin = NULL;
+            }
+          backshl = 0;
         }
-
-      ++str;
+      ++s;
     }
+  /* append the remaining characters */
+  if (begin && s > begin)
+    dbuf_append (&dbuf, begin, s - begin);
 
-  if (in_quote)
-    dbuf_append_char (&dbuf, '"');
+  /* special handling if last chars before double quote are backslashes */
+  backslp = backslbuf;
+  while (backshl--)
+    {
+      *backslp++ = '\\';
+      if (sizeof (backslbuf) == backslp - backslbuf)
+        {
+          dbuf_append (&dbuf, backslbuf, sizeof (backslbuf));
+          backslp = backslbuf;
+        }
+    }
+  if (backslp > backslbuf)
+    dbuf_append (&dbuf, backslbuf, backslp - backslbuf);
+
+  /* closing doube quotes */
+  dbuf_append_char (&dbuf, '"');
 
   return dbuf_detach_c_str (&dbuf);
+}
 #else
   struct dbuf_s dbuf;
+  const char *s = str;
+  const char *begin = str;
 
   dbuf_init (&dbuf, 128);
 
-  while (*str)
+  while (*s)
     {
-      if (strchr ("\\\"'$ ", *str))
-        dbuf_append_char (&dbuf, '\\');
-      dbuf_append_char (&dbuf, *str);
-      ++str;
+      switch (*s)
+        {
+        case ' ': case '\t': case '\n':         /* IFS white space */
+        case '\'': case '"': case '\\':         /* quoting chars */
+        case '|': case '&': case ';':           /* shell metacharacters */
+        case '(': case ')': case '<': case '>':
+        case '!': case '{': case '}':           /* reserved words */
+        case '*': case '[': case '?': case ']': /* globbing chars */
+        case '^':
+        case '$': case '`':                      /* expansion chars */
+        case ',':                                 /* brace expansion */
+          /* flush */
+          if (s > begin)
+            dbuf_append (&dbuf, begin, s - begin);
+
+          dbuf_append_char (&dbuf, '\\');
+          begin = s;
+          break;
+
+        case '~':                               /* tilde expansion */
+          if (s == str || s[-1] == '=' || s[-1] == ':')
+            {
+              /* flush */
+              if (s > begin)
+                dbuf_append (&dbuf, begin, s - begin);
+
+              dbuf_append_char (&dbuf, '\\');
+              begin = s;
+            }
+          break;
+
+        case '#':                               /* comment char */
+            {
+              /* flush */
+              if (s > begin)
+                dbuf_append (&dbuf, begin, s - begin);
+
+              dbuf_append_char (&dbuf, '\\');
+              begin = s;
+            }
+          /* FALLTHROUGH */
+        default:
+          break;
+        }
+      ++s;
     }
+  /* flush */
+  if (s > begin)
+    dbuf_append (&dbuf, begin, s - begin);
 
   return dbuf_detach_c_str (&dbuf);
 #endif
@@ -146,11 +248,11 @@ fputStrSet (FILE * fp, set * list)
     }
 }
 
-/** Prepend / append given strings to each item of string set. The result is in a
-    new string set.
+/** Prepend / append / process given strings to each item of string set.
+    The result is in a new string set.
 */
 set *
-appendStrSet (set * list, const char *pre, const char *post)
+processStrSet (set * list, const char *pre, const char *post, char *(func)(const char *))
 {
   set *new_list = NULL;
   const char *item;
@@ -160,30 +262,23 @@ appendStrSet (set * list, const char *pre, const char *post)
     {
       dbuf_init (&dbuf, PATH_MAX);
 
-      if (pre != NULL)
+      if (pre)
         dbuf_append_str (&dbuf, pre);
-      dbuf_append_str (&dbuf, item);
-      if (post != NULL)
+
+      if (func)
+        {
+          char *s = func (item);
+          
+          dbuf_append_str (&dbuf, s);
+          Safe_free (s);
+        }
+      else
+        dbuf_append_str (&dbuf, item);
+
+      if (post)
         dbuf_append_str (&dbuf, post);
 
       addSet (&new_list, dbuf_detach_c_str (&dbuf));
-    }
-
-  return new_list;
-}
-
-/** shell escape each item of string set. The result is in a
-    new string set.
-*/
-set *
-shellEscapeStrSet (set * list)
-{
-  set *new_list = NULL;
-  const char *item;
-
-  for (item = setFirstItem (list); item != NULL; item = setNextItem (list))
-    {
-      addSet (&new_list, shell_escape (item));
     }
 
   return new_list;

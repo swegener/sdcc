@@ -740,41 +740,56 @@ extern set *asmOptionsSet;
 static void
 _pic16_linkEdit (void)
 {
-  hTab *linkValues = NULL;
-  char lfrm[1024];
-  char *lcmd;
-  char temp[PATH_MAX];
-  set *tSet = NULL;
-  int ret;
-
   /*
    * link command format:
    * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
    *
    */
-  sprintf (lfrm, "{linker} {incdirs} {lflags} -w -r -o \"{outfile}\" \"{user_ofile}\" {ofiles} {spec_ofiles} {libs}");
+#define LFRM  "{linker} {incdirs} {lflags} -w -r -o {outfile} {user_ofile} {ofiles} {spec_ofiles} {libs}"
+  hTab *linkValues = NULL;
+  char *lcmd;
+  set *tSet = NULL;
+  int ret;
 
   shash_add (&linkValues, "linker", pic16_linkCmd[0]);
 
   mergeSets (&tSet, libPathsSet);
   mergeSets (&tSet, libDirsSet);
 
-  shash_add (&linkValues, "incdirs", joinStrSet (appendStrSet(tSet, "-I\"", "\"")));
+  shash_add (&linkValues, "incdirs", joinStrSet (processStrSet(tSet, "-I", NULL, shell_escape)));
   shash_add (&linkValues, "lflags", joinStrSet (linkOptionsSet));
 
-  shash_add (&linkValues, "outfile", fullDstFileName ? fullDstFileName : dstFileName);
+  {
+    char *s = shell_escape (fullDstFileName ? fullDstFileName : dstFileName);
+
+    shash_add (&linkValues, "outfile", s);
+    Safe_free (s);
+  }
 
   if (fullSrcFileName)
     {
-      SNPRINTF (temp, sizeof (temp), "%s.o", fullDstFileName ? fullDstFileName : dstFileName);
-//    addSetHead (&relFilesSet, Safe_strdup (temp));
-      shash_add (&linkValues, "user_ofile", temp);
+      struct dbuf_s dbuf;
+      char *s;
+
+      dbuf_init (&dbuf, 128);
+
+      dbuf_append_str (&dbuf, fullDstFileName ? fullDstFileName : dstFileName);
+      dbuf_append (&dbuf, ".o", 2);
+      s = shell_escape (dbuf_c_str (&dbuf));
+      dbuf_destroy (&dbuf);
+      shash_add (&linkValues, "user_ofile", s);
+      Safe_free (s);
     }
 
   if (!pic16_options.no_crt)
-    shash_add (&linkValues, "spec_ofiles", pic16_options.crt_name);
+    {
+      char *s = shell_escape (pic16_options.crt_name);
 
-  shash_add (&linkValues, "ofiles", joinStrSet (appendStrSet (relFilesSet, "\"", "\"")));
+      shash_add (&linkValues, "spec_ofiles", s);
+      Safe_free (s);
+    }
+
+  shash_add (&linkValues, "ofiles", joinStrSet (processStrSet (relFilesSet, NULL, NULL, shell_escape)));
 
   if (!libflags.ignore)
     {
@@ -786,20 +801,25 @@ _pic16_linkEdit (void)
 
       if (libflags.want_libio)
         {
-          SNPRINTF (temp, sizeof (temp), "libio%s.lib", pic16->name[1]);   /* build libio18f452.lib name */
-          addSet (&libFilesSet, Safe_strdup (temp));
+          /* build libio18f452.lib name */
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 128);
+
+          dbuf_append (&dbuf, "libio", sizeof ("libio") - 1);
+          dbuf_append_str (&dbuf, pic16->name[1]);
+          dbuf_append (&dbuf, ".lib", sizeof (".lib") - 1);
+          addSet (&libFilesSet, dbuf_detach_c_str (&dbuf));
         }
 
       if (libflags.want_libdebug)
         addSet(&libFilesSet, Safe_strdup ("libdebug.lib"));
     }
 
-  shash_add (&linkValues, "libs", joinStrSet (appendStrSet (libFilesSet, "\"", "\"")));
+  shash_add (&linkValues, "libs", joinStrSet (processStrSet (libFilesSet, NULL, NULL, shell_escape)));
 
-  lcmd = msprintf(linkValues, lfrm);
-
+  lcmd = msprintf(linkValues, LFRM);
   ret = sdcc_system (lcmd);
-
   Safe_free (lcmd);
 
   if (ret)
@@ -1244,7 +1264,7 @@ oclsExpense (struct memmap *oclass)
 */
 const char *pic16_linkCmd[] =
 {
-  "gplink", "$l", "-w", "-r", "-o \"$2\"", "\"$1\"","$3", NULL
+  "gplink", "$l", "-w", "-r", "-o", "$2", "$1","$3", NULL
 };
 
 /** $1 is always the basename.
@@ -1255,7 +1275,7 @@ const char *pic16_linkCmd[] =
 */
 const char *pic16_asmCmd[] =
 {
-  "gpasm", "$l", "$3", "-o", "\"$2\"", "-c", "\"$1.asm\"", NULL
+  "gpasm", "$l", "$3", "-o", "$2", "-c", "$1.asm", NULL
 };
 
 /* Globals */

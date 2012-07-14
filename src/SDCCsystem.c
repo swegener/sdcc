@@ -261,12 +261,13 @@ static const char *
 merge_command (const char *command, const char *params)
 {
   struct dbuf_s dbuf;
+  char *s = shell_escape (command);
 
-  /* allocate extra space for 2x'"', ' ' and '\0' */
-  dbuf_init (&dbuf, strlen (command) + strlen (params) + 4);
-  dbuf_append (&dbuf, "\"", 1);
-  dbuf_append_str (&dbuf, command);
-  dbuf_append (&dbuf, "\" ", 2);
+  /* allocate extra space for ' ' and '\0' */
+  dbuf_init (&dbuf, strlen (command) + strlen (params) + 2);
+
+  dbuf_append_str (&dbuf, s);
+  dbuf_append (&dbuf, " ", 1);
   dbuf_append_str (&dbuf, params);
 
   return dbuf_detach_c_str (&dbuf);

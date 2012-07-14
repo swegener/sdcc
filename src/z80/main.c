@@ -374,11 +374,11 @@ _process_pragma (const char *s)
 }
 
 static const char *_gbz80_rgbasmCmd[] = {
-  "rgbasm", "-o\"$1.rel\"", "\"$1.asm\"", NULL
+  "rgbasm", "-o$1.rel", "$1.asm", NULL
 };
 
 static const char *_gbz80_rgblinkCmd[] = {
-  "xlink", "-tg", "-n\"$1.sym\"", "-m\"$1.map\"", "-zFF", "\"$1.lnk\"", NULL
+  "xlink", "-tg", "-n$1.sym", "-m$1.map", "-zFF", "$1.lnk", NULL
 };
 
 static void
@@ -755,24 +755,24 @@ oclsExpense (struct memmap *oclass)
 */
 
 static const char *_z80LinkCmd[] = {
-  "sdldz80", "-nf", "\"$1\"", NULL
+  "sdldz80", "-nf", "$1", NULL
 };
 
 static const char *_gbLinkCmd[] = {
-  "sdldgb", "-nf", "\"$1\"", NULL
+  "sdldgb", "-nf", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_z80AsmCmd[] = {
-  "sdasz80", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "sdasz80", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char *_gbAsmCmd[] = {
-  "sdasgb", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "sdasgb", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char *_r2kAsmCmd[] = {
-  "sdasrab", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "sdasrab", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char *const _crt[] = { "crt0.rel", NULL, };

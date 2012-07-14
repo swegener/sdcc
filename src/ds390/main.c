@@ -934,13 +934,13 @@ get_model (void)
 */
 static const char *_linkCmd[] =
 {
-  "sdld", "-nf", "\"$1\"", NULL
+  "sdld", "-nf", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "sdas8051", "$l", "$3", "\"$2\"", "\"$1.asm\"", NULL
+  "sdas8051", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char * const _libs_ds390[] = { STD_DS390_LIB, NULL, };

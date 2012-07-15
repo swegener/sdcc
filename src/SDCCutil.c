@@ -154,7 +154,6 @@ shell_escape (const char *str)
 
   /* special handling if last chars before double quote are backslashes */
   backslp = backslbuf;
-  while (backshl--)
     {
       *backslp++ = '\\';
       if (sizeof (backslbuf) == backslp - backslbuf)
@@ -170,7 +169,6 @@ shell_escape (const char *str)
   dbuf_append_char (&dbuf, '"');
 
   return dbuf_detach_c_str (&dbuf);
-}
 #else
   struct dbuf_s dbuf;
   const char *s = str;

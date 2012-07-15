@@ -158,6 +158,9 @@
     <ClCompile Include="SDCCgen.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDCClospre.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\support\scripts\resource.rc">
@@ -291,12 +294,12 @@
     <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SDCClospre.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="SDCC.lex">
-      <Filter>Custom Build</Filter>
-    </CustomBuild>
-    <CustomBuild Include="SDCC.y">
       <Filter>Custom Build</Filter>
     </CustomBuild>
   </ItemGroup>

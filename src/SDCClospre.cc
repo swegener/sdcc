@@ -312,7 +312,7 @@ lospre (iCode *sic, ebbIndex *ebbi)
           if (safety && tree_dec_safety (tree_decomposition, control_flow_graph, ic) < 0)
             continue;
 
-          change += (tree_dec_lospre (tree_decomposition, control_flow_graph, ic) > 0);
+          change |= (tree_dec_lospre (tree_decomposition, control_flow_graph, ic) > 0);
         }
     }
 }

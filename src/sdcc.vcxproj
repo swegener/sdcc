@@ -255,6 +255,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="SDCClospre.cc" />
     <ClCompile Include="SDCClrange.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -474,6 +475,7 @@
     <ClInclude Include="SDCCicode.h" />
     <ClInclude Include="SDCClabel.h" />
     <ClInclude Include="SDCCloop.h" />
+    <ClInclude Include="SDCClospre.hpp" />
     <ClInclude Include="SDCClrange.h" />
     <ClInclude Include="SDCCmacro.h" />
     <ClInclude Include="SDCCmem.h" />

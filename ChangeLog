@@ -7,11 +7,13 @@
 	* src/sdcc.vcxproj.filters,
 	* src/sdcc.vcxproj: removed SDCC.y dependency from lexing
 	  added version.h to Header Files
+	  added SDCClospre.cc and SDCClospre.hpp
 	* config.vcxproj,
 	* src/yacc.vcxproj: updated all custom build commands and dependencies
 	* src/SDCCast.c (decorateType, '='): fixed lost linenumber in bug 3540054
 	* src/SDCCsymt.c (dbuf_printTypeChain): removed 'd'
 	* sdas/asrab/rabbitmch.c (machine): removed const to fix prototype conflict
+	* src/SDCClospre.cc (lospre): fixed warning
 
 2012-07-15 Borut Razem <borut.razem AT gmail.com>
 

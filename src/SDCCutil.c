@@ -73,7 +73,7 @@ shell_escape (const char *str)
 
   struct dbuf_s dbuf;
   int backshl = 0;
-  const char *begin = s;
+  const char *begin = str;
   char backslbuf[16];
   char *backslp;
 
@@ -81,20 +81,20 @@ shell_escape (const char *str)
 
   /* opening double quotes */
   dbuf_append_char(&dbuf, '"');
-  while (*s)
+  while (*str)
     {
       if (NULL == begin)
-        begin = s;
+        begin = str;
 
-      if ('\\' == *s)
+      if ('\\' == *str)
           ++backshl;
       else
         {
-          if ('"' == *s)
+          if ('"' == *str)
             {
               /* append the remaining characters */
-              if (s > begin)
-                dbuf_append (&dbuf, begin, s - begin);
+              if (str > begin)
+                dbuf_append (&dbuf, begin, str - begin);
 
               /* append additional beckslash */
               ++backshl;
@@ -113,14 +113,14 @@ shell_escape (const char *str)
               if (backslp > backslbuf)
                 dbuf_append (&dbuf, backslbuf, backslp - backslbuf);
 
-              begin = s;
+              begin = str;
             }
-          else if ('%' == *s)
+          else if ('%' == *str)
             {
               /* diseble env. variable expansion */
               /* append the remaining characters */
-              if (begin && s > begin)
-                dbuf_append (&dbuf, begin, s - begin);
+              if (begin && str > begin)
+                dbuf_append (&dbuf, begin, str - begin);
 
               /* special handling if last chars before double quote are backslashes */
               backslp = backslbuf;
@@ -138,7 +138,7 @@ shell_escape (const char *str)
 
               /* closing doube quotes */
               backslbuf[0] = '"';
-              backslbuf[1] = *s;
+              backslbuf[1] = *str;
               /* re opening double quotes */
               backslbuf[2] = '"';
               dbuf_append (&dbuf, backslbuf, 3);
@@ -146,11 +146,11 @@ shell_escape (const char *str)
             }
           backshl = 0;
         }
-      ++s;
+      ++str;
     }
   /* append the remaining characters */
-  if (begin && s > begin)
-    dbuf_append (&dbuf, begin, s - begin);
+  if (begin && str > begin)
+    dbuf_append (&dbuf, begin, str - begin);
 
   /* special handling if last chars before double quote are backslashes */
   backslp = backslbuf;

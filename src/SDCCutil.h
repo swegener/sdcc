@@ -46,7 +46,7 @@ void fputStrSet (FILE * fp, set * list);
 /** Prepend / append given strings to each item of string set. The result is in a
  *  new string set.
  */
-set *processStrSet (set * list, const char *pre, const char *post, char *(file) (const char *));
+set *processStrSet (set * list, const char *pre, const char *post, char *(*file) (const char *));
 
 /** Given a set returns a string containing all of the strings seperated
  *  by spaces. The returned string is on the heap.

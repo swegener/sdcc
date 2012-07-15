@@ -250,7 +250,7 @@ fputStrSet (FILE * fp, set * list)
     The result is in a new string set.
 */
 set *
-processStrSet (set * list, const char *pre, const char *post, char *(func)(const char *))
+processStrSet (set * list, const char *pre, const char *post, char *(*func)(const char *))
 {
   set *new_list = NULL;
   const char *item;

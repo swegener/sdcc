@@ -14,6 +14,8 @@
 	* src/SDCCsymt.c (dbuf_printTypeChain): removed 'd'
 	* sdas/asrab/rabbitmch.c (machine): removed const to fix prototype conflict
 	* src/SDCClospre.cc (lospre): fixed warning
+	* src/SDCCutil.h,
+	* src/SDCCutil.c (processStrSet): fix warning by using explicit function ptr
 
 2012-07-15 Borut Razem <borut.razem AT gmail.com>
 

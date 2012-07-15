@@ -4824,7 +4824,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
           else
             {
-              werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "assignment", " ");
+              int lineno = tree->lineno ? tree->lineno : tree->left->lineno ? tree->left->lineno : tree->right->lineno;
+              werrorfl (tree->filename, lineno, E_TYPE_MISMATCH, "assignment", " ");
               printFromToType (RTYPE (tree), LTYPE (tree));
             }
         }

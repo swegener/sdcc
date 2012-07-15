@@ -24,5 +24,6 @@
     <CustomBuild Include="bin_vc\sdld.exe" />
     <CustomBuild Include="bin_vc\sdcdb.exe" />
     <CustomBuild Include="bin_vc\sdranlib.exe" />
+    <CustomBuild Include="bin_vc\sdasrab.exe" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,18 @@
+2012-07-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.sln: sdcdb depends on config
+	* all.vcxproj: excluded copy to bin\ from debug build as it seems to mess up
+	  the dependencies
+	* all.vcxproj.filters: added sdasrab.exe
+	* src/sdcc.vcxproj.filters,
+	* src/sdcc.vcxproj: removed SDCC.y dependency from lexing
+	  added version.h to Header Files
+	* config.vcxproj,
+	* src/yacc.vcxproj: updated all custom build commands and dependencies
+	* src/SDCCast.c (decorateType, '='): fixed lost linenumber in bug 3540054
+	* src/SDCCsymt.c (dbuf_printTypeChain): removed 'd'
+	* sdas/asrab/rabbitmch.c (machine): removed const to fix prototype conflict
+
 2012-07-15 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCmain.c, src/SDCCutil.c, src/SDCCutil.h, src/SDCCsystem.c,
@@ -295,7 +310,6 @@
 
 	* src/mcs51/gen.c (genLeftShiftLiteral): commented out wassert to work
 	  around bug 3537338
-
 
 2012-06-21 Borut Razem <borut.razem AT gmail.com>
 

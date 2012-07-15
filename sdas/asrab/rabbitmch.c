@@ -36,7 +36,7 @@ int     r4k_mode;
 /*
  * Process a machine op.
  */
-VOID  machine(struct mne * const mp)
+VOID  machine(struct mne * mp)
 {
   int op, t1, t2;
   struct expr e1, e2;

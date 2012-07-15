@@ -3380,7 +3380,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
             case ARRAY:
               if (DCL_ELEM (type))
                 {
-                  dbuf_printf (dbuf, "[%ud]", (unsigned int) DCL_ELEM (type));
+                  dbuf_printf (dbuf, "[%u]", (unsigned int) DCL_ELEM (type));
                 }
               else
                 {

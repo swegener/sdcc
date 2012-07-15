@@ -65,6 +65,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdranlib.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdcdb.exe">
       <FileType>Document</FileType>
@@ -74,6 +75,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcdb.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <None Include="ChangeLog" />
     <CustomBuild Include="bin_vc\makebin.exe">
@@ -84,6 +86,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\makebin.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\packihx.exe">
       <FileType>Document</FileType>
@@ -93,6 +96,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\packihx.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdas6808.exe">
       <FileType>Document</FileType>
@@ -102,6 +106,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdas6808.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdas8051.exe">
       <FileType>Document</FileType>
@@ -111,6 +116,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdas8051.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdasgb.exe">
       <FileType>Document</FileType>
@@ -120,6 +126,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdasgb.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdasrab.exe">
       <FileType>Document</FileType>
@@ -129,6 +136,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdasrab.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdasz80.exe">
       <FileType>Document</FileType>
@@ -138,6 +146,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdasz80.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdcc.exe">
       <FileType>Document</FileType>
@@ -147,6 +156,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcc.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdcclib.exe">
       <FileType>Document</FileType>
@@ -156,6 +166,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcclib.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdcpp.exe">
       <FileType>Document</FileType>
@@ -165,6 +176,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcpp.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="bin_vc\sdld.exe">
       <FileType>Document</FileType>
@@ -182,6 +194,7 @@ copy %(Identity) bin\sdldgb.exe /y &gt; nul
 copy %(Identity) bin\sdld6808.exe /y &gt; nul</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdld.exe;bin\sdldz80.exe;bin\sdldrab.exe;bin\sdldgb.exe;bin\sdld6808.exe;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

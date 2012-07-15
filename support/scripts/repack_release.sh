@@ -40,7 +40,7 @@ function fatal_error()
 
 function usage()
 {
-  echo "Usage: repack_release.sh [-h] [--help] [-dl] [-ul] <date> <revision> <version>" 1>&2
+  echo "Usage: repack_release.sh [-h] [--help] [-dl] [-pr] [-ul] <date> <revision> <version>" 1>&2
   echo "Repack sdcc Linux, Mac OS X and Windows snapshot build source," 1>&2
   echo "binary and doc packages into a sdcc release package." 1>&2
   echo "Options:" 1>&2

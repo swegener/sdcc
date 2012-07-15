@@ -5,6 +5,7 @@
 	  src/pic14/main.c, src/pic16/main.c, src/avr/main.c, src/xa51/main.c:
 	  properly quoted file names when transferred to preprocessor,
 	  assembler and linker
+	* support/scripts/repack_release.sh: added -pr to usage
 
 2012-07-12 Borut Razem <borut.razem AT gmail.com>
 

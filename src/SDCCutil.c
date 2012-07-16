@@ -154,6 +154,7 @@ shell_escape (const char *str)
 
   /* special handling if last chars before double quote are backslashes */
   backslp = backslbuf;
+  while (backshl--)
     {
       *backslp++ = '\\';
       if (sizeof (backslbuf) == backslp - backslbuf)

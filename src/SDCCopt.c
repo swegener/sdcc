@@ -2200,6 +2200,8 @@ eBBlockFromiCode (iCode * ic)
 
   offsetFold (ebbi->bbOrder, ebbi->count);
 
+  /* Temporarily disable lospre; it's broken for MacOS X and NetBSD hosts on the DCF */
+#if 0
   /* lospre */
   adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
@@ -2212,6 +2214,7 @@ eBBlockFromiCode (iCode * ic)
   computeDataFlow (ebbi);
 
   killDeadCode (ebbi);
+#endif
 
   /* sort it back by block number */
   //qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);

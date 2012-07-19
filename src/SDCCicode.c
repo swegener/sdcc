@@ -2037,8 +2037,9 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
   /* code generated for 1 byte * 1 byte literal = 2 bytes result is more
      efficient in most cases than 2 bytes result = 2 bytes << literal
      if port has 1 byte muldiv */
-  if ((p2 > 0) && !IS_FLOAT (letype) && !IS_FIXED (letype) && !((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype)) && (port->support.muldiv == 1)) && strcmp (port->target, "pic16") != 0        /* don't shift for pic */
-      && strcmp (port->target, "pic14") != 0)
+  if ((p2 > 0) && !IS_FLOAT (letype) && !IS_FIXED (letype) &&
+      !((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype)) && (port->support.muldiv == 1)) &&
+      !TARGET_PIC_LIKE)      /* don't shift for pic */
     {
       if ((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype)))
         {
@@ -2210,7 +2211,7 @@ geniCodeSubtract (operand * left, operand * right, RESULT_TYPE resultType)
   sym_link *resType;
   LRTYPE;
 
-  /* if they both pointers then */
+  /* if they are both pointers then */
   if ((IS_PTR (ltype) || IS_ARRAY (ltype)) && (IS_PTR (rtype) || IS_ARRAY (rtype)))
     return geniCodePtrPtrSubtract (left, right);
 
@@ -2278,10 +2279,13 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
       // there is no need to multiply with 1
       if (nBytes != 1)
         {
+          unsigned int ptrSize = getArraySizePtr (left);
           size = operandFromLit (nBytes);
           SPEC_USIGN (getSpec (operandType (size))) = 1;
           indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
-          right = geniCodeMultiply (right, size, resultType);
+          if (!indexUnsigned && ptrSize > INTSIZE)
+            SPEC_LONG (getSpec (operandType (size))) = 1;
+          right = geniCodeMultiply (right, size, (ptrSize >= INTSIZE) ? RESULT_TYPE_INT : RESULT_TYPE_CHAR);
           /* Even if right is a 'unsigned char',
              the result will be a 'signed int' due to the promotion rules.
              It doesn't make sense when accessing arrays, so let's fix it here: */
@@ -3628,7 +3632,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 
   /* the criteria for creating a jump table is */
   /* all integer numbers between the maximum & minimum must */
-  /* be present , the maximum value should not exceed 255 */
+  /* be present, the maximum value should not exceed 255 */
   /* If not all integer numbers are present the algorithm */
   /* inserts jumps to the default label for the missing numbers */
   /* and decides later whether it is worth it */

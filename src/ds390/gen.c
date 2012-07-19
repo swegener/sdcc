@@ -4856,7 +4856,7 @@ genPlus (iCode * ic)
   D (emitcode (";", "genPlus"));
 
   /* special cases :- */
-  if (IS_OP_RUONLY (IC_LEFT (ic)) && isOperandLiteral (IC_RIGHT (ic)) && OP_SYMBOL (IC_RESULT (ic))->ruonly)
+  if (IS_OP_RUONLY (IC_LEFT (ic)) && isOperandLiteral (IC_RIGHT (ic)) && IS_OP_RUONLY (IC_RESULT (ic)))
     {
       aopOp (IC_RIGHT (ic), ic, TRUE, FALSE);
       size = (int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
@@ -4909,8 +4909,7 @@ genPlus (iCode * ic)
           D (emitcode (";", "Swapped plus args."));
         }
 
-      /* if both left & right are in bit
-         space */
+      /* if both left & right are in bit space */
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY && AOP_TYPE (IC_RIGHT (ic)) == AOP_CRY)
         {
           genPlusBits (ic);
@@ -5390,7 +5389,7 @@ static void
 genMultOneByte (operand * left, operand * right, operand * result, iCode * ic)
 {
   symbol *lbl;
-  int size;
+  int size, offset = 0;
   bool runtimeSign, compiletimeSign;
   bool lUnsigned, rUnsigned, pushedB;
 
@@ -5435,17 +5434,20 @@ genMultOneByte (operand * left, operand * right, operand * result, iCode * ic)
       aopOp (result, ic, TRUE, FALSE);
       size = AOP_SIZE (result);
 
-      if (size < 1 || size > 2)
+      if (size < 1)
         {
           /* this should never happen */
           fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", size, __FILE__, lineno);
           exit (EXIT_FAILURE);
         }
 
-      aopPut (result, "a", 0);
+      aopPut (result, "a", offset++);
       _G.accInUse--;
-      if (size == 2)
-        aopPut (result, "b", 1);
+      if (size != 1)
+        aopPut (result, "b", offset++);
+
+      while (size-- > 2)
+        aopPut (result, zero, offset++);
 
       popB (pushedB);
       return;
@@ -5496,7 +5498,7 @@ genMultOneByte (operand * left, operand * right, operand * result, iCode * ic)
       if (compiletimeSign)
         emitcode ("setb", "F0");        /* set sign flag */
       else
-        emitcode ("clr", "F0"); /* reset sign flag */
+        emitcode ("clr", "F0");         /* reset sign flag */
     }
 
   /* save the signs of the operands */
@@ -5556,7 +5558,7 @@ genMultOneByte (operand * left, operand * right, operand * result, iCode * ic)
   aopOp (result, ic, TRUE, FALSE);
   size = AOP_SIZE (result);
 
-  if (size < 1 || size > 2)
+  if (size < 1)
     {
       /* this should never happen */
       fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", size, __FILE__, lineno);
@@ -5569,7 +5571,7 @@ genMultOneByte (operand * left, operand * right, operand * result, iCode * ic)
       if (runtimeSign)
         emitcode ("jnb", "F0,!tlabel", labelKey2num (lbl->key));
       emitcode ("cpl", "a");    /* lsb 2's complement */
-      if (size != 2)
+      if (size == 1)
         emitcode ("inc", "a");  /* inc doesn't set carry flag */
       else
         {
@@ -5581,10 +5583,20 @@ genMultOneByte (operand * left, operand * right, operand * result, iCode * ic)
         }
       emitLabel (lbl);
     }
-  aopPut (result, "a", 0);
+  aopPut (result, "a", offset++);
   _G.accInUse--;
-  if (size == 2)
-    aopPut (result, "b", 1);
+  if (size != 1)
+    aopPut (result, "b", offset++);
+
+  if (size > 2)
+    {
+      emitcode ("mov", "c,b.7");
+      emitcode ("subb", "a,acc");
+      _G.accInUse++;
+      while (size-- > 2)
+        aopPut (result, "a", offset++);
+      _G.accInUse--;
+    }
 
   popB (pushedB);
 }
@@ -10691,7 +10703,6 @@ genFarPointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
   else if ((IS_OP_RUONLY (left) || AOP_INDPTRn (left)) &&
            AOP_SIZE (result) > 1 && IS_SYMOP (left) && (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth))
     {
-
       size = AOP_SIZE (result) - 1;
       if (AOP_INDPTRn (left))
         {
@@ -10796,10 +10807,9 @@ genCodePointerGet (operand * left, operand * result, iCode * ic, iCode * pi)
       pi->generated = 1;
     }
   else if (IS_SYMOP (left) &&
-           (OP_SYMBOL (left)->ruonly || AOP_INDPTRn (left)) &&
+           (IS_OP_RUONLY (left) || AOP_INDPTRn (left)) &&
            AOP_SIZE (result) > 1 && (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth))
     {
-
       size = AOP_SIZE (result) - 1;
       if (AOP_INDPTRn (left))
         {
@@ -11412,10 +11422,10 @@ genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
       pi->generated = 1;
     }
   else if (IS_SYMOP (result) &&
-           (OP_SYMBOL (result)->ruonly || AOP_INDPTRn (result)) &&
-           AOP_SIZE (right) > 1 && (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth))
+           (IS_OP_RUONLY (result) || AOP_INDPTRn (result)) &&
+           (AOP_SIZE (right) > 1) &&
+           (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth))
     {
-
       size = AOP_SIZE (right) - 1;
       if (AOP_INDPTRn (result))
         {

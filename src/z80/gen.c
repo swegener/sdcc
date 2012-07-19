@@ -8329,6 +8329,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, const iC
   size = getSize (operandType (result));
 
   /* I suppose that the left size >= result size */
+  wassert (getSize (operandType (left)) >= size);
 
   if (shCount >= (size * 8))
     {

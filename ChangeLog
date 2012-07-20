@@ -1,3 +1,9 @@
+2012-07-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClospre.hpp (implement_lospre_assignment): explicitly ignore
+	  vertices created from newly split edges
+	* src/SDCCopt.c (eBBlockFromiCode): reenable lospre
+
 2012-07-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (geniCodeAdd): fixed bug 3537338

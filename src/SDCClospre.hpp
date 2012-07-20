@@ -660,6 +660,8 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
       if(!G[*v].uses)
         continue;
       typename boost::graph_traits<G_t>::in_edge_iterator e = in_edges(*v, G).first;
+      if (a.global.size() <= *v)
+        continue;
       if(!(a.global[*v] && !G[*v].invalidates || boost::source(*e, G) < a.global.size() && a.global[boost::source(*e, G)]))
         continue;
 #ifdef DEBUG_LOSPRE

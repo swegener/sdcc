@@ -2343,13 +2343,13 @@ getResultTypeFromType (sym_link * type)
 {
   /* type = getSpec (type); */
   if (IS_BOOLEAN (type))
-    return RESULT_TYPE_BIT;
+    return RESULT_TYPE_BOOL;
   if (IS_BITFIELD (type))
     {
       int blen = SPEC_BLEN (type);
 
       if (blen <= 1)
-        return RESULT_TYPE_BIT;
+        return RESULT_TYPE_BOOL;
       if (blen <= 8)
         return RESULT_TYPE_CHAR;
       return RESULT_TYPE_INT;
@@ -2381,7 +2381,7 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
       newLink = newIntLink ();
       upCasted = TRUE;
       break;
-    case RESULT_TYPE_BIT:
+    case RESULT_TYPE_BOOL:
       if (!promote ||
           /* already an int */
           bitsForType (tree->etype) >= 16 ||
@@ -2836,7 +2836,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
        upon tree->opval.op, if resultType can be propagated */
     resultTypeProp = resultTypePropagate (tree, resultType);
 
-    if ((tree->opval.op == '?') && (resultTypeProp != RESULT_TYPE_BIT))
+    if ((tree->opval.op == '?') && (resultTypeProp != RESULT_TYPE_BOOL))
       dtl = decorateType (tree->left, RESULT_TYPE_IFX);
     else
       dtl = decorateType (tree->left, resultTypeProp);
@@ -3264,7 +3264,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_LITERAL (RTYPE (tree)) &&
           IS_BOOLEAN (LTYPE (tree)) &&
           IS_INTEGRAL (RTYPE (tree)) &&
-          resultType == RESULT_TYPE_BIT)
+          resultType == RESULT_TYPE_BOOL)
         {
           unsigned long litval = AST_ULONG_VALUE (tree->right);
           tree->right = decorateType (newAst_VALUE (constBoolVal (litval != 0)), resultType);
@@ -3328,7 +3328,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_LITERAL (RTYPE (tree)) &&
           IS_BOOLEAN (LTYPE (tree)) &&
           IS_INTEGRAL (RTYPE (tree)) &&
-          resultType == RESULT_TYPE_BIT &&
+          resultType == RESULT_TYPE_BOOL &&
           tree->opval.op == '^')   /* the same source is used by 'bitwise or' */
         {
           unsigned long litval = AST_ULONG_VALUE (tree->right);
@@ -3846,7 +3846,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return addCast (tree, resultTypeProp, TRUE);
         }
 
-      if (resultType == RESULT_TYPE_BIT && IS_UNSIGNED (tree->left->etype) && getSize (tree->left->etype) < INTSIZE)
+      if (resultType == RESULT_TYPE_BOOL && IS_UNSIGNED (tree->left->etype) && getSize (tree->left->etype) < INTSIZE)
         {
           /* promotion rules are responsible for this strange result:
              bit -> int -> ~int -> bit
@@ -3879,7 +3879,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if left is another '!' */
       if (IS_AST_NOT_OPER (tree->left))
         {
-          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT))
+          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BOOL))
             {
               /* replace double '!!X' by 'X' */
               return tree->left->left;
@@ -3904,7 +3904,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return tree;
         }
       LRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink () : newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3920,7 +3920,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
     case GETHBIT:
     case GETABIT:
-      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink () : newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
       return tree;
 
     case GETBYTE:
@@ -4259,7 +4259,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return tree;
         }
       LRVAL (tree) = RRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink () : newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -4349,7 +4349,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (tree->opval.op == '>' &&
           SPEC_USIGN (LETYPE (tree)) && IS_LITERAL (RTYPE (tree)) && ((int) ulFromVal (valFromType (RETYPE (tree)))) == 0)
         {
-          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT))
+          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BOOL))
             {
               /* the parent is an ifx: */
               /* if (unsigned value) */
@@ -4370,7 +4370,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* 'ifx (0 == op)' -> 'ifx (!(op))' */
       if (IS_LITERAL (LETYPE (tree)) &&
           floatFromVal (valFromType (LTYPE (tree))) == 0 &&
-          tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BIT))
+          tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
         {
           tree->opval.op = '!';
           tree->left = tree->right;
@@ -4382,7 +4382,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* 'ifx (op == 0)' -> 'ifx (!(op))' */
       if (IS_LITERAL (RETYPE (tree)) &&
           floatFromVal (valFromType (RTYPE (tree))) == 0 &&
-          tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BIT))
+          tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
         {
           tree->opval.op = '!';
           tree->right = NULL;
@@ -4438,7 +4438,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = (resultType == RESULT_TYPE_BIT) ? newBoolLink () : newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultType == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
 
       /* condition transformations */
       {
@@ -4623,7 +4623,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       tree->right = decorateType (tree->right, resultTypeProp);
 
       if (IS_AST_LIT_VALUE (tree->right->left) && IS_AST_LIT_VALUE (tree->right->right) &&
-          ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT)))
+          ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BOOL)))
         {
           double valTrue = AST_FLOAT_VALUE (tree->right->left);
           double valFalse = AST_FLOAT_VALUE (tree->right->right);
@@ -5608,7 +5608,7 @@ optimizeGetHbit (ast * tree, RESULT_TYPE resultType)
           ((bit = AST_ULONG_VALUE (tree->left->right)) != (msb = (bitsForType (TTYPE (expr)) - 1))))
         expr = NULL;
     }
-  if (!expr && (resultType == RESULT_TYPE_BIT))
+  if (!expr && (resultType == RESULT_TYPE_BOOL))
     {
       int bit = isBitAndPow2 (tree);
       expr = tree->left;
@@ -5642,7 +5642,7 @@ optimizeGetAbit (ast * tree, RESULT_TYPE resultType)
         expr = NULL;
       count = tree->left->right;
     }
-  if (!expr && (resultType == RESULT_TYPE_BIT))
+  if (!expr && (resultType == RESULT_TYPE_BOOL))
     {
       int p2 = isBitAndPow2 (tree);
       if (p2 >= 0 && !IS_BOOLEAN (TTYPE (tree->left)))

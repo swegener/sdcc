@@ -5,6 +5,9 @@
 */
 
 #include <testfwk.h>
+#include <stdbool.h>
+
+#pragma std_c99
 
 int f(char a, char flag)
 {
@@ -13,8 +16,14 @@ int f(char a, char flag)
   return 1;
 }
 
+bool g(char a, bool b)
+{
+  return (a > b);
+}
+
 void
 testBug(void)
 {
   ASSERT(f(2, 1));
+  ASSERT(g(2, 1));
 }

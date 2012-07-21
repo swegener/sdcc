@@ -1,3 +1,13 @@
+2012-07-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmem.c (allocGlobal, allocLocal): added check if bit space exists
+	* src/SDCCsymt.c (computeType): fixed bug 3531687
+	* src/SDCCast.c,
+	* src/SDCCicode.c,
+	* src/SDCCsymt.h: renamed RESULT_TYPE_BIT to RESULT_TYPE_BOOL
+	* support/regression/tests/bug3531687.c: reinserted char > bool test
+	* support/regression/tests/bug3537338.c: use _STATMEM for more coverage
+
 2012-07-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClospre.hpp (implement_lospre_assignment): explicitly ignore

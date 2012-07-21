@@ -4,8 +4,14 @@
 
 #include <testfwk.h>
 
-__xdata int globals[3] = {1, 2, 3};
-int __xdata * ptr = &globals[1];
+#if defined (__SDCC)
+ #include <sdcc-lib.h> /* just to get _AUTOMEM or _STATMEM */
+#else
+ #define _STATMEM
+#endif
+
+int globals[3] = {1, 2, 3};
+int _STATMEM * ptr = &globals[1];
 
 int get_signed(signed char index)
 {

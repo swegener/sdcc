@@ -1854,8 +1854,8 @@ checkSClass (symbol * sym, int isProto)
   /* arrays & pointers cannot be defined for bits   */
   /* SBITS or SFRs or BIT                           */
   if ((IS_ARRAY (sym->type) || IS_PTR (sym->type)) &&
-      (SPEC_NOUN (sym->etype) == V_BIT ||
-       SPEC_NOUN (sym->etype) == V_SBIT || SPEC_NOUN (sym->etype) == V_BITFIELD || SPEC_NOUN (sym->etype) == V_BBITFIELD ||
+      (SPEC_NOUN (sym->etype) == V_BIT      || SPEC_NOUN (sym->etype) == V_SBIT      ||
+       SPEC_NOUN (sym->etype) == V_BITFIELD || SPEC_NOUN (sym->etype) == V_BBITFIELD ||
        SPEC_SCLS (sym->etype) == S_SFR))
     {
       /* find out if this is the return type of a function */
@@ -2148,6 +2148,16 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   else if (IS_FLOAT (etype1) && IS_FIXED16X16 (etype2))
     rType = newFloatLink ();
 
+  /* if only one of them is a bool variable then the other one prevails */
+  else if (IS_BOOLEAN (etype1) && !IS_BOOLEAN (etype2))
+    {
+      rType = copyLinkChain (type2);
+    }
+  else if (IS_BOOLEAN (etype2) && !IS_BOOLEAN (etype1))
+    {
+      rType = copyLinkChain (type1);
+    }
+
   /* if both are bitvars choose the larger one */
   else if (IS_BITVAR (etype1) && IS_BITVAR (etype2))
     rType = SPEC_BLEN (etype1) >= SPEC_BLEN (etype2) ? copyLinkChain (type1) : copyLinkChain (type2);
@@ -2167,7 +2177,8 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
       if (getSize (etype2) > 1)
         SPEC_NOUN (getSpec (rType)) = V_INT;
     }
-  else if (getSize (type1) > getSize (type2))
+
+  else if (bitsForType (type1) > bitsForType (type2))
     rType = copyLinkChain (type1);
   else
     rType = copyLinkChain (type2);
@@ -2190,7 +2201,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
       if (TARGET_HC08_LIKE)
         break;
       //fallthrough
-    case RESULT_TYPE_BIT:
+    case RESULT_TYPE_BOOL:
       if (op == ':')
         {
           SPEC_NOUN (reType) = V_BIT;

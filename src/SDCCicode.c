@@ -2295,7 +2295,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
       resType = copyLinkChain (ltype);
     }
   else
-    {                           // make them the same size
+    { // make them the same size
       resType = usualBinaryConversions (&left, &right, resultType, '+');
     }
 
@@ -2948,7 +2948,7 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
         }
     }
 
-  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_BIT, 0);
+  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_BOOL, op);
 
   ic = newiCode (op, left, right);
   /* store 0 or 1 in result */

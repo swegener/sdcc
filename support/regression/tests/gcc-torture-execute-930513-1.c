@@ -3,13 +3,9 @@
  */
 
 #include <testfwk.h>
-
-#ifdef __SDCC
-#pragma std_c99
-#endif
-
 #include <stdio.h>
-char buf[2];
+
+char buf[12];
 
 void f (int (*fp)(char *, const char *, ...))
 {
@@ -19,11 +15,7 @@ void f (int (*fp)(char *, const char *, ...))
 void
 testTortureExecute (void)
 {
-#if 0
   f (&sprintf);
-  if (buf[0] != '5' || buf[1] != 0)
-    ASSERT (0);
-  return;
-#endif
+  ASSERT ((buf[0] == '<' && buf[1] == 'N') ||   // "<NO FLOAT>""
+          (buf[0] == '5' && buf[1] == 0));      // "5"
 }
-

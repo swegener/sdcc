@@ -7,6 +7,8 @@
 	* src/SDCCsymt.h: renamed RESULT_TYPE_BIT to RESULT_TYPE_BOOL
 	* support/regression/tests/bug3531687.c: reinserted char > bool test
 	* support/regression/tests/bug3537338.c: use _STATMEM for more coverage
+	* support/regression/tests/gcc-torture-execute-930513-1.c: modified to
+	  accept "<NO FLOAT>" and prevent buffer overrun
 
 2012-07-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -1,3 +1,8 @@
+2012-07-21 Borut Razem <borut.razem AT gmail.com>
+
+	* src/pic14/main.c: fixed bug
+	  #3546732 - "pic16f1507lib: No such file or directory"
+
 2012-07-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmem.c (allocGlobal, allocLocal): added check if bit space exists

@@ -314,7 +314,7 @@ _pic14_do_link (void)
       dbuf_init (&dbuf, 128);
       dbuf_append (&dbuf, "pic", sizeof ("pic") - 1);
       dbuf_append_str (&dbuf, procName);
-      dbuf_append (&dbuf, "lib", sizeof ("lib") - 1);
+      dbuf_append (&dbuf, ".lib", sizeof (".lib") - 1);
       addSet (&libFilesSet, dbuf_detach_c_str (&dbuf));
     }
 

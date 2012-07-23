@@ -2284,7 +2284,10 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
           SPEC_USIGN (getSpec (operandType (size))) = 1;
           indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
           if (!indexUnsigned && ptrSize > INTSIZE)
-            SPEC_LONG (getSpec (operandType (size))) = 1;
+            {
+              SPEC_LONG (getSpec (operandType (size))) = 1;
+              SPEC_CVAL (getSpec (operandType (size))).v_ulong = nBytes;
+            }
           right = geniCodeMultiply (right, size, (ptrSize >= INTSIZE) ? RESULT_TYPE_INT : RESULT_TYPE_CHAR);
           /* Even if right is a 'unsigned char',
              the result will be a 'signed int' due to the promotion rules.

@@ -1,3 +1,8 @@
+2012-07-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeAdd): made fix for bug 3537338 endian
+	  agnostic
+
 2012-07-21 Borut Razem <borut.razem AT gmail.com>
 
 	* src/pic14/main.c: fixed bug

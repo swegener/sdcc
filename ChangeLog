@@ -1,3 +1,29 @@
+2012-08-01 Borut Razem <borut.razem AT gmail.com>
+
+	* device/non-free/include/pic14/pic12f752.h,
+	  device/non-free/include/pic14/pic16f1784.h,
+	  device/non-free/include/pic14/pic10f322.h,
+	  device/non-free/include/pic14/pic16f1454.h,
+	  device/non-free/include/pic14/pic16f1786.h,
+	  device/non-free/include/pic14/pic12f1501.h,
+	  device/non-free/include/pic14/pic10f320.h,
+	  device/non-free/include/pic14/pic16f1787.h,
+	  device/non-free/lib/pic14/libdev/pic16f1787.c,
+	  device/non-free/lib/pic14/libdev/pic10f320.c,
+	  device/non-free/lib/pic14/libdev/pic16f1784.c,
+	  device/non-free/lib/pic14/libdev/pic12f752.c,
+	  device/non-free/lib/pic14/libdev/pic16f1454.c,
+	  device/non-free/lib/pic14/libdev/pic10f322.c,
+	  device/non-free/lib/pic14/libdev/pic16f1786.c,
+	  device/non-free/lib/pic14/libdev/pic12f1501.c,
+	  support/scripts/pic16fam-h-gen.pl,
+	  device/include/pic14/pic14devices.txt,
+	  device/non-free/include/pic14/pic16fam.h,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/Makefile.in:
+	  applied patch #3553108 - "New devices to pic14 series and pic16fam-h-gen.pl update",
+	  thanks to Molnar Karoly
+
 2012-08-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/z80.h,

@@ -1,3 +1,10 @@
+2012-08-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/z80.h,
+	  src/z80/ralloc2.cc,
+	  src/z80/main.c:
+	  Provide --fno-omit-frame-pointer option for not omitting frame pointer.
+
 2012-07-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeAdd): made fix for bug 3537338 endian

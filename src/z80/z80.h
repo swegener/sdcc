@@ -24,6 +24,7 @@ typedef struct
     int port_mode;
     int port_back;
     int reserveIY;
+    int noOmitFramePtr;
   }
 Z80_OPTS;
 

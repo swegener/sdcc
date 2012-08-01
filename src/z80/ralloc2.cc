@@ -1493,7 +1493,7 @@ static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
 template <class G_t>
 static bool omit_frame_ptr(const G_t &G)
 {
-  if(IS_GB || IY_RESERVED)
+  if(IS_GB || IY_RESERVED || z80_opts.noOmitFramePtr)
     return(false);
 
   if(options.omitFramePtr)

@@ -39,6 +39,7 @@
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
 #define OPTION_RESERVE_IY      "--reserve-regs-iy"
 #define OPTION_OLDRALLOC       "--oldralloc"
+#define OPTION_FRAMEPOINTER    "--fno-omit-frame-pointer"
 
 static char _z80_defaultRules[] = {
 #include "peeph.rul"
@@ -66,6 +67,7 @@ static OPTION _z80_options[] = {
   {0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
   {0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY (incompatible with --fomit-frame-pointer)"},
   {0, OPTION_OLDRALLOC,       &options.oldralloc, "Use old register allocator"},
+  {0, OPTION_FRAMEPOINTER,    &z80_opts.noOmitFramePtr, "Do not omit frame pointer"},
   {0, NULL}
 };
 

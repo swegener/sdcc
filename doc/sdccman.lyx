@@ -43032,7 +43032,11 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-12F: 629, 635, 675, 683
+10F: 320, 322
+\end_layout
+
+\begin_layout Standard
+12F: 629, 635, 675, 683, 752, 1501
 \end_layout
 
 \begin_layout Standard
@@ -43093,8 +43097,8 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-16F: 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1516, 1517, 1518, 1519, 1526,
- 1527, 1782, 1783
+16F: 1454, 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1516, 1517, 1518, 1519,
+ 1526, 1527, 1782, 1783, 1784, 1786, 1787
 \end_layout
 
 \begin_layout Standard

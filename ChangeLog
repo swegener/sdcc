@@ -1,3 +1,54 @@
+2012-08-03 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/pic16fam-h-gen.pl,
+	  device/include/pic14/pic14devices.txt,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/include/pic14/pic16fam.h,
+	  doc/sdccman.lyx: updated,
+	  device/non-free/include/pic14/pic16f723a.h,
+	  device/non-free/include/pic14/pic16f1512.h,
+	  device/non-free/include/pic14/pic16f723.h,
+	  device/non-free/include/pic14/pic16f727.h,
+	  device/non-free/include/pic14/pic12f617.h,
+	  device/non-free/include/pic14/pic16f1513.h,
+	  device/non-free/include/pic14/pic12f609.h,
+	  device/non-free/include/pic14/pic16f724.h,
+	  device/non-free/include/pic14/pic16f707.h,
+	  device/non-free/include/pic14/pic12lf1552.h,
+	  device/non-free/include/pic14/pic16f610.h,
+	  device/non-free/include/pic14/pic16f631.h,
+	  device/non-free/include/pic14/pic16f677.h,
+	  device/non-free/include/pic14/pic16f722a.h,
+	  device/non-free/include/pic14/pic12f615.h,
+	  device/non-free/include/pic14/pic16f722.h,
+	  device/non-free/include/pic14/pic16f726.h,
+	  device/non-free/lib/pic14/libdev/pic16f723.c,
+	  device/non-free/lib/pic14/libdev/pic16f727.c,
+	  device/non-free/lib/pic14/libdev/pic12f617.c,
+	  device/non-free/lib/pic14/libdev/pic16f1513.c,
+	  device/non-free/lib/pic14/libdev/pic12f609.c,
+	  device/non-free/lib/pic14/libdev/pic16f724.c,
+	  device/non-free/lib/pic14/libdev/pic16f707.c,
+	  device/non-free/lib/pic14/libdev/pic12lf1552.c,
+	  device/non-free/lib/pic14/libdev/pic16f610.c,
+	  device/non-free/lib/pic14/libdev/pic16f631.c,
+	  device/non-free/lib/pic14/libdev/pic16f677.c,
+	  device/non-free/lib/pic14/libdev/pic16f722a.c,
+	  device/non-free/lib/pic14/libdev/pic12f615.c,
+	  device/non-free/lib/pic14/libdev/pic16f722.c,
+	  device/non-free/lib/pic14/libdev/pic16f726.c,
+	  device/non-free/lib/pic14/libdev/pic16f723a.c,
+	  device/non-free/lib/pic14/libdev/pic16f1512.c: added,
+	  applied patch #3553952 - "New devices to pic14 series and pic16fam-h-gen.pl update II."
+	  thanks to Molnar Karoly
+	* device/non-free/include/pic14/pic16f1516.h,
+	  device/non-free/include/pic14/pic16f1517.h,
+	  device/non-free/include/pic14/pic16f1518.h,
+	  device/non-free/include/pic14/pic16f1519.h:
+	  applied patch #3553938 - "pic16f151[6-9].h unnecessary ANSC[01] bits"
+	  thanks to Molnar Karoly
+
 2012-08-01 Borut Razem <borut.razem AT gmail.com>
 
 	* device/non-free/include/pic14/pic12f752.h,

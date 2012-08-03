@@ -43036,7 +43036,7 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-12F: 629, 635, 675, 683, 752, 1501
+12F: 609, 615, 617, 629, 635, 675, 683, 752, 1501
 \end_layout
 
 \begin_layout Standard
@@ -43065,12 +43065,13 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-16F: 616, 627, 627a, 628, 628a, 630, 636, 639, 648, 648a, 676, 684, 685,
- 687, 688, 689, 690
+16F: 610, 616, 627, 627a, 628, 628a, 630, 631, 636, 639, 648, 648a, 676,
+ 677,684, 685, 687, 688, 689, 690
 \end_layout
 
 \begin_layout Standard
-16F: 716, 72, 720, 721, 73, 737, 74, 747, 76, 767, 77, 777, 785
+16F: 707, 716, 72, 720, 721, 722, 722a, 723, 723a, 724, 726, 727, 73, 737,
+ 74, 747, 76, 767, 77, 777, 785
 \end_layout
 
 \begin_layout Standard
@@ -43097,8 +43098,12 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-16F: 1454, 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1516, 1517, 1518, 1519,
- 1526, 1527, 1782, 1783, 1784, 1786, 1787
+12LF: 1552
+\end_layout
+
+\begin_layout Standard
+16F: 1454, 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1512, 1513, 1516, 1517,
+ 1518, 1519, 1526, 1527, 1782, 1783, 1784, 1786, 1787
 \end_layout
 
 \begin_layout Standard

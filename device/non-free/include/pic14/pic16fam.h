@@ -14,6 +14,7 @@
 #if   defined(__SDCC_PIC12F1501) || \
       defined(__SDCC_PIC12F1822) || \
       defined(__SDCC_PIC12F1840) || \
+      defined(__SDCC_PIC12LF1552) || \
       defined(__SDCC_PIC16F1454) || \
       defined(__SDCC_PIC16F1455) || \
       defined(__SDCC_PIC16F1458) || \
@@ -22,6 +23,8 @@
       defined(__SDCC_PIC16F1507) || \
       defined(__SDCC_PIC16F1508) || \
       defined(__SDCC_PIC16F1509) || \
+      defined(__SDCC_PIC16F1512) || \
+      defined(__SDCC_PIC16F1513) || \
       defined(__SDCC_PIC16F1516) || \
       defined(__SDCC_PIC16F1517) || \
       defined(__SDCC_PIC16F1518) || \
@@ -63,8 +66,10 @@
  */
 #undef  __SDCC_ADC_STYLE
 
-#if   defined(__SDCC_PIC12F629) || \
+#if   defined(__SDCC_PIC12F609) || \
+      defined(__SDCC_PIC12F629) || \
       defined(__SDCC_PIC12F635) || \
+      defined(__SDCC_PIC12LF1552) || \
       defined(__SDCC_PIC16C62) || \
       defined(__SDCC_PIC16C63A) || \
       defined(__SDCC_PIC16C65B) || \
@@ -81,11 +86,13 @@
       defined(__SDCC_PIC16F84) || \
       defined(__SDCC_PIC16F84A) || \
       defined(__SDCC_PIC16F87) || \
+      defined(__SDCC_PIC16F610) || \
       defined(__SDCC_PIC16F627) || \
       defined(__SDCC_PIC16F627A) || \
       defined(__SDCC_PIC16F628) || \
       defined(__SDCC_PIC16F628A) || \
       defined(__SDCC_PIC16F630) || \
+      defined(__SDCC_PIC16F631) || \
       defined(__SDCC_PIC16F636) || \
       defined(__SDCC_PIC16F639) || \
       defined(__SDCC_PIC16F648A) || \
@@ -96,6 +103,10 @@
 #elif defined(__SDCC_PIC10F320) || \
       defined(__SDCC_PIC10F322)
 #define __SDCC_ADC_STYLE      1003201
+
+#elif defined(__SDCC_PIC12F615) || \
+      defined(__SDCC_PIC12F617)
+#define __SDCC_ADC_STYLE      1206151
 
 #elif defined(__SDCC_PIC12F675) || \
       defined(__SDCC_PIC12F683)
@@ -143,11 +154,15 @@
       defined(__SDCC_PIC16F688)
 #define __SDCC_ADC_STYLE      1606761
 
-#elif defined(__SDCC_PIC16F685) || \
+#elif defined(__SDCC_PIC16F677) || \
+      defined(__SDCC_PIC16F685) || \
       defined(__SDCC_PIC16F687) || \
       defined(__SDCC_PIC16F689) || \
       defined(__SDCC_PIC16F690)
-#define __SDCC_ADC_STYLE      1606851
+#define __SDCC_ADC_STYLE      1606771
+
+#elif defined(__SDCC_PIC16F707)
+#define __SDCC_ADC_STYLE      1607071
 
 #elif defined(__SDCC_PIC16C715)
 #define __SDCC_ADC_STYLE      1607151
@@ -163,6 +178,17 @@
 #elif defined(__SDCC_PIC16F720) || \
       defined(__SDCC_PIC16F721)
 #define __SDCC_ADC_STYLE      1607201
+
+#elif defined(__SDCC_PIC16F722) || \
+      defined(__SDCC_PIC16F722A) || \
+      defined(__SDCC_PIC16F723) || \
+      defined(__SDCC_PIC16F723A) || \
+      defined(__SDCC_PIC16F726)
+#define __SDCC_ADC_STYLE      1607221
+
+#elif defined(__SDCC_PIC16F724) || \
+      defined(__SDCC_PIC16F727)
+#define __SDCC_ADC_STYLE      1607241
 
 #elif defined(__SDCC_PIC16F737) || \
       defined(__SDCC_PIC16F767)
@@ -244,9 +270,11 @@
       defined(__SDCC_PIC16F1509)
 #define __SDCC_ADC_STYLE      1615071
 
-#elif defined(__SDCC_PIC16F1516) || \
+#elif defined(__SDCC_PIC16F1512) || \
+      defined(__SDCC_PIC16F1513) || \
+      defined(__SDCC_PIC16F1516) || \
       defined(__SDCC_PIC16F1518)
-#define __SDCC_ADC_STYLE      1615161
+#define __SDCC_ADC_STYLE      1615121
 
 #elif defined(__SDCC_PIC16F1517) || \
       defined(__SDCC_PIC16F1519)
@@ -314,9 +342,11 @@
  */
 #undef  __SDCC_PWM_STYLE
 
-#if   defined(__SDCC_PIC12F629) || \
+#if   defined(__SDCC_PIC12F609) || \
+      defined(__SDCC_PIC12F629) || \
       defined(__SDCC_PIC12F635) || \
       defined(__SDCC_PIC12F675) || \
+      defined(__SDCC_PIC12LF1552) || \
       defined(__SDCC_PIC16C71) || \
       defined(__SDCC_PIC16C432) || \
       defined(__SDCC_PIC16C433) || \
@@ -336,10 +366,13 @@
       defined(__SDCC_PIC16C782) || \
       defined(__SDCC_PIC16F84) || \
       defined(__SDCC_PIC16F84A) || \
+      defined(__SDCC_PIC16F610) || \
       defined(__SDCC_PIC16F630) || \
+      defined(__SDCC_PIC16F631) || \
       defined(__SDCC_PIC16F636) || \
       defined(__SDCC_PIC16F639) || \
       defined(__SDCC_PIC16F676) || \
+      defined(__SDCC_PIC16F677) || \
       defined(__SDCC_PIC16F687) || \
       defined(__SDCC_PIC16F688) || \
       defined(__SDCC_PIC16F689) || \
@@ -354,6 +387,10 @@
 #elif defined(__SDCC_PIC10F320) || \
       defined(__SDCC_PIC10F322)
 #define __SDCC_PWM_STYLE      1003202
+
+#elif defined(__SDCC_PIC12F615) || \
+      defined(__SDCC_PIC12F617)
+#define __SDCC_PWM_STYLE      1206152
 
 #elif defined(__SDCC_PIC12F683)
 #define __SDCC_PWM_STYLE      1206832
@@ -420,6 +457,9 @@
       defined(__SDCC_PIC16F690)
 #define __SDCC_PWM_STYLE      1606852
 
+#elif defined(__SDCC_PIC16F707)
+#define __SDCC_PWM_STYLE      1607072
+
 #elif defined(__SDCC_PIC16C717) || \
       defined(__SDCC_PIC16C770) || \
       defined(__SDCC_PIC16C771) || \
@@ -431,6 +471,15 @@
       defined(__SDCC_PIC16F913) || \
       defined(__SDCC_PIC16F916)
 #define __SDCC_PWM_STYLE      1607202
+
+#elif defined(__SDCC_PIC16F722) || \
+      defined(__SDCC_PIC16F722A) || \
+      defined(__SDCC_PIC16F723) || \
+      defined(__SDCC_PIC16F723A) || \
+      defined(__SDCC_PIC16F724) || \
+      defined(__SDCC_PIC16F726) || \
+      defined(__SDCC_PIC16F727)
+#define __SDCC_PWM_STYLE      1607222
 
 #elif defined(__SDCC_PIC16F737) || \
       defined(__SDCC_PIC16F747) || \
@@ -470,11 +519,13 @@
       defined(__SDCC_PIC16F1509)
 #define __SDCC_PWM_STYLE      1615032
 
-#elif defined(__SDCC_PIC16F1516) || \
+#elif defined(__SDCC_PIC16F1512) || \
+      defined(__SDCC_PIC16F1513) || \
+      defined(__SDCC_PIC16F1516) || \
       defined(__SDCC_PIC16F1517) || \
       defined(__SDCC_PIC16F1518) || \
       defined(__SDCC_PIC16F1519)
-#define __SDCC_PWM_STYLE      1615162
+#define __SDCC_PWM_STYLE      1615122
 
 #elif defined(__SDCC_PIC16F1526) || \
       defined(__SDCC_PIC16F1527)
@@ -535,12 +586,16 @@
 
 #if   defined(__SDCC_PIC10F320) || \
       defined(__SDCC_PIC10F322) || \
+      defined(__SDCC_PIC12F609) || \
+      defined(__SDCC_PIC12F615) || \
+      defined(__SDCC_PIC12F617) || \
       defined(__SDCC_PIC12F629) || \
       defined(__SDCC_PIC12F635) || \
       defined(__SDCC_PIC12F675) || \
       defined(__SDCC_PIC12F683) || \
       defined(__SDCC_PIC12F752) || \
       defined(__SDCC_PIC12F1501) || \
+      defined(__SDCC_PIC12LF1552) || \
       defined(__SDCC_PIC16C71) || \
       defined(__SDCC_PIC16C432) || \
       defined(__SDCC_PIC16C433) || \
@@ -562,12 +617,14 @@
       defined(__SDCC_PIC16C782) || \
       defined(__SDCC_PIC16F84) || \
       defined(__SDCC_PIC16F84A) || \
+      defined(__SDCC_PIC16F610) || \
       defined(__SDCC_PIC16F616) || \
       defined(__SDCC_PIC16F627) || \
       defined(__SDCC_PIC16F627A) || \
       defined(__SDCC_PIC16F628) || \
       defined(__SDCC_PIC16F628A) || \
       defined(__SDCC_PIC16F630) || \
+      defined(__SDCC_PIC16F631) || \
       defined(__SDCC_PIC16F636) || \
       defined(__SDCC_PIC16F639) || \
       defined(__SDCC_PIC16F648A) || \
@@ -618,10 +675,14 @@
       defined(__SDCC_PIC16F819)
 #define __SDCC_SSP_STYLE      1600873
 
-#elif defined(__SDCC_PIC16F687) || \
+#elif defined(__SDCC_PIC16F677) || \
+      defined(__SDCC_PIC16F687) || \
       defined(__SDCC_PIC16F689) || \
       defined(__SDCC_PIC16F690)
-#define __SDCC_SSP_STYLE      1606873
+#define __SDCC_SSP_STYLE      1606773
+
+#elif defined(__SDCC_PIC16F707)
+#define __SDCC_SSP_STYLE      1607073
 
 #elif defined(__SDCC_PIC16C717) || \
       defined(__SDCC_PIC16C770) || \
@@ -631,6 +692,15 @@
 #elif defined(__SDCC_PIC16F720) || \
       defined(__SDCC_PIC16F721)
 #define __SDCC_SSP_STYLE      1607203
+
+#elif defined(__SDCC_PIC16F722) || \
+      defined(__SDCC_PIC16F722A) || \
+      defined(__SDCC_PIC16F723) || \
+      defined(__SDCC_PIC16F723A) || \
+      defined(__SDCC_PIC16F724) || \
+      defined(__SDCC_PIC16F726) || \
+      defined(__SDCC_PIC16F727)
+#define __SDCC_SSP_STYLE      1607223
 
 #elif defined(__SDCC_PIC16F737) || \
       defined(__SDCC_PIC16F747) || \
@@ -685,11 +755,13 @@
       defined(__SDCC_PIC16F1509)
 #define __SDCC_SSP_STYLE      1615083
 
-#elif defined(__SDCC_PIC16F1516) || \
+#elif defined(__SDCC_PIC16F1512) || \
+      defined(__SDCC_PIC16F1513) || \
+      defined(__SDCC_PIC16F1516) || \
       defined(__SDCC_PIC16F1517) || \
       defined(__SDCC_PIC16F1518) || \
       defined(__SDCC_PIC16F1519)
-#define __SDCC_SSP_STYLE      1615163
+#define __SDCC_SSP_STYLE      1615123
 
 #elif defined(__SDCC_PIC16F1526) || \
       defined(__SDCC_PIC16F1527)
@@ -744,12 +816,16 @@
 
 #if   defined(__SDCC_PIC10F320) || \
       defined(__SDCC_PIC10F322) || \
+      defined(__SDCC_PIC12F609) || \
+      defined(__SDCC_PIC12F615) || \
+      defined(__SDCC_PIC12F617) || \
       defined(__SDCC_PIC12F629) || \
       defined(__SDCC_PIC12F635) || \
       defined(__SDCC_PIC12F675) || \
       defined(__SDCC_PIC12F683) || \
       defined(__SDCC_PIC12F752) || \
       defined(__SDCC_PIC12F1501) || \
+      defined(__SDCC_PIC12LF1552) || \
       defined(__SDCC_PIC16C62) || \
       defined(__SDCC_PIC16C71) || \
       defined(__SDCC_PIC16C72) || \
@@ -777,11 +853,14 @@
       defined(__SDCC_PIC16F72) || \
       defined(__SDCC_PIC16F84) || \
       defined(__SDCC_PIC16F84A) || \
+      defined(__SDCC_PIC16F610) || \
       defined(__SDCC_PIC16F616) || \
       defined(__SDCC_PIC16F630) || \
+      defined(__SDCC_PIC16F631) || \
       defined(__SDCC_PIC16F636) || \
       defined(__SDCC_PIC16F639) || \
       defined(__SDCC_PIC16F676) || \
+      defined(__SDCC_PIC16F677) || \
       defined(__SDCC_PIC16F684) || \
       defined(__SDCC_PIC16F685) || \
       defined(__SDCC_PIC16F716) || \
@@ -832,12 +911,22 @@
 #elif defined(__SDCC_PIC16F688)
 #define __SDCC_USART_STYLE    1606884
 
+#elif defined(__SDCC_PIC16F707)
+#define __SDCC_USART_STYLE    1607074
+
 #elif defined(__SDCC_PIC16F720) || \
       defined(__SDCC_PIC16F721)
 #define __SDCC_USART_STYLE    1607204
 
 #elif defined(__SDCC_PIC16C773) || \
       defined(__SDCC_PIC16C774) || \
+      defined(__SDCC_PIC16F722) || \
+      defined(__SDCC_PIC16F722A) || \
+      defined(__SDCC_PIC16F723) || \
+      defined(__SDCC_PIC16F723A) || \
+      defined(__SDCC_PIC16F724) || \
+      defined(__SDCC_PIC16F726) || \
+      defined(__SDCC_PIC16F727) || \
       defined(__SDCC_PIC16F737) || \
       defined(__SDCC_PIC16F747) || \
       defined(__SDCC_PIC16F767) || \
@@ -877,11 +966,13 @@
       defined(__SDCC_PIC16F1509)
 #define __SDCC_USART_STYLE    1615084
 
-#elif defined(__SDCC_PIC16F1516) || \
+#elif defined(__SDCC_PIC16F1512) || \
+      defined(__SDCC_PIC16F1513) || \
+      defined(__SDCC_PIC16F1516) || \
       defined(__SDCC_PIC16F1517) || \
       defined(__SDCC_PIC16F1518) || \
       defined(__SDCC_PIC16F1519)
-#define __SDCC_USART_STYLE    1615164
+#define __SDCC_USART_STYLE    1615124
 
 #elif defined(__SDCC_PIC16F1526) || \
       defined(__SDCC_PIC16F1527)

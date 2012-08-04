@@ -1,3 +1,9 @@
+2012-08-04 Borut Razem <borut.razem AT gmail.com>
+	* device/include/pic14/pic14devices.txt:
+	  applied patch minor-pic12lf1552-error.diff from
+	  #3553952 - "New devices to pic14 series and pic16fam-h-gen.pl update II."
+	  thanks to Molnar Karoly
+
 2012-08-03 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/pic16fam-h-gen.pl,

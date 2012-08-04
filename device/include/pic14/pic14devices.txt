@@ -1539,7 +1539,7 @@ processor 16f1527, 16lf1527
         memmap          0x20 0x6f 0x000
         memmap          0x70 0x7f 0xf80
 
-processor 16lf1552
+processor 12lf1552
         program         2K
         data            1536
         eeprom          0

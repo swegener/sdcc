@@ -7514,6 +7514,14 @@ genAnd (const iCode * ic, iCode * ifx)
                       aopPut3 (AOP (result), offset, ASMOP_ZERO, 0);
                       continue;
                     }
+                  else if (isLiteralBit (~bytelit & 0xffu) >= 0 && AOP_TYPE (result) == AOP_REG)
+                    {
+                      cheapMove (AOP (result), offset, AOP (left), offset);
+                      if (!regalloc_dry_run)
+                        emit2 ("res %d, %s", isLiteralBit (~bytelit & 0xffu), aopGet (AOP (result), offset, FALSE));
+                      regalloc_dry_run_cost += 2;
+                      continue;
+                    }
                 }
               // faster than result <- left, anl result,right
               // and better if result is SFR

@@ -1,3 +1,8 @@
+2012-08-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Improve code generation for and with result in register and bit complement operand.
+
 2012-08-04 Borut Razem <borut.razem AT gmail.com>
 	* device/include/pic14/pic14devices.txt:
 	  applied patch minor-pic12lf1552-error.diff from

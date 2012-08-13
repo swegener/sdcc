@@ -1,3 +1,8 @@
+2012-08-13 Borut Razem <borut.razem AT gmail.com>
+	* support/regression/tests/bitvars.c,
+	  support/regression/tests/funsigned-char.c:
+	  fixed for gcc hosts with unsigned char (ARM architecture)
+
 2012-08-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

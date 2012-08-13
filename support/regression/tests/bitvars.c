@@ -46,7 +46,7 @@ testBits(void)
 #if !(defined(__SUNPRO_C) && defined(__i386))
 /* this test fails on Solaris i386 SunPro C compiler with -xO2 option;
    it pass without -xO2 option !? */
-#if defined TYPE_char && !defined __SDCC_CHAR_UNSIGNED
+#if defined TYPE_char && !defined __SDCC_CHAR_UNSIGNED && !defined __CHAR_UNSIGNED__
   ASSERT (complement (~_ff, 0));
 #else
   ASSERT (complement (~_ff, 1));
@@ -55,7 +55,7 @@ testBits(void)
 
 #if defined TYPE_bool
   ASSERT (complement (~_ffff, 1));
-#elif defined TYPE_char && !defined __SDCC_CHAR_UNSIGNED
+#elif defined TYPE_char && !defined __SDCC_CHAR_UNSIGNED && !defined __CHAR_UNSIGNED__
   ASSERT (complement (~_ffff, 0));
 #else
   if (sizeof({type}) < sizeof(int))
@@ -66,4 +66,3 @@ testBits(void)
 
 #endif //__bool_true_false_are_defined
 }
-

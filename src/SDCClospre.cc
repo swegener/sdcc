@@ -191,7 +191,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   if (eic->op == GET_VALUE_AT_ADDRESS && !optimize.lospre_unsafe_read)
     safety_required = true;
 
-  // The division rutines for z80-like ports and the hc08's hardware division just give an undefined result
+  // The division routines for z80-like ports and the hc08's hardware division just give an undefined result
   // for division by zero, but there are no harmful side effects. I don't know about the other ports.
   if ((eic->op == '/' || eic->op == '%') && !TARGET_Z80_LIKE && !TARGET_HC08_LIKE)
     safety_required = true;

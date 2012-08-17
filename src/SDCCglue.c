@@ -1,25 +1,21 @@
 /*-------------------------------------------------------------------------
-
   SDCCglue.c - glues everything we have done together into one file.
-                Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  Copyright (C) 1998 Sandeep Dutta . sandeep.dutta@usa.net
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
 #include "common.h"
@@ -543,7 +539,7 @@ printChar (struct dbuf_s *oBuf, const char *s, int plen)
       i = 60;
       while (i && pplen < plen)
         {
-          if (*s < ' ' || *s == '\"' || *s == '\\')
+          if (!isprint((unsigned char) *s) || *s == '\"' || *s == '\\')
             {
               *p = '\0';
               if (p != buf)
@@ -875,23 +871,23 @@ printIvalStruct (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s 
       int size;
       /* skip past holes, print value */
       while (iloop && iloop->type == INIT_HOLE)
-	{
-	  iloop = iloop->next;
-	  sflds = sflds->next;
-	}
+        {
+          iloop = iloop->next;
+          sflds = sflds->next;
+        }
       printIval (sym, sflds->type, iloop, oBuf, 1);
       /* pad out with zeros if necessary */
       size = getSize(type) - getSize(sflds->type);
       for ( ; size > 0 ; size-- )
-	{
-	  dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
-	}
+        {
+          dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
+        }
       /* advance past holes to find out if there were excess initializers */
       do
-	{
-	  iloop = iloop ? iloop->next : NULL;
-	  sflds = sflds->next;
-	}
+        {
+          iloop = iloop ? iloop->next : NULL;
+          sflds = sflds->next;
+        }
       while (iloop && iloop->type == INIT_HOLE);
     }
   else
@@ -1344,15 +1340,15 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf,
   if (ilist && ilist->type == INIT_HOLE)
     {
       if (IS_AGGREGATE (type))
-	{
-	  ilist = newiList(INIT_DEEP, NULL); /* init w/ {} */
-	}
+        {
+          ilist = newiList(INIT_DEEP, NULL); /* init w/ {} */
+        }
       else
-	{
-	  ast *ast = newAst_VALUE (constVal("0"));
-	  ast = decorateType (ast, RESULT_TYPE_NONE);
-	  ilist = newiList(INIT_NODE, ast);
-	}
+        {
+          ast *ast = newAst_VALUE (constVal("0"));
+          ast = decorateType (ast, RESULT_TYPE_NONE);
+          ilist = newiList(INIT_NODE, ast);
+        }
     }
 
   /* if structure then    */

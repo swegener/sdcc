@@ -1,24 +1,21 @@
 /*-------------------------------------------------------------------------
-   SDCCsymt.h - Header file for Symbols table related structures and MACRO's.
-   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
+  SDCCsymt.h - Header file for Symbols table related structures and MACRO's.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  Copyright (C) 1998 Sandeep Dutta . sandeep.dutta@usa.net
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
 #ifndef  SDCCSYMT_H
@@ -359,7 +356,7 @@ typedef struct symbol
     struct set *itmpStack;          /* symbols spilt @ this stack location */
   }
   usl;
-  char bitVar;                      /* if bitVar != 0: this is a bit variable, bitVar is the size in bits */
+  signed char bitVar;               /* if bitVar != 0: this is a bit variable, bitVar is the size in bits */
   char bitUnnamed:1;                /* unnamed bit variable */
   unsigned offset;                  /* offset from top if struct */
 

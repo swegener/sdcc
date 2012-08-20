@@ -1,8 +1,17 @@
+2012-08-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (aopPtrForSym): added warning for memory space overflow,
+	  see bug 3509704
+	  (freeForBranchAsmop, freeForBranchAsmops): need extra ic parameter
+	  (aopPut, genFarPointerSet): partial fix for bug 3534523
+
 2012-08-17 Borut Razem <borut.razem AT gmail.com>
+
 	* src/SDCCasm.c, SDCCsymt.h: fixed failing regression tests if
 	  sdcc compiled on ARM architecture where default "char" is "unsigned char"
 
 2012-08-13 Borut Razem <borut.razem AT gmail.com>
+
 	* support/regression/tests/bitvars.c,
 	  support/regression/tests/funsigned-char.c:
 	  fixed for gcc hosts with unsigned char (ARM architecture)
@@ -13,6 +22,7 @@
 	  Improve code generation for and with result in register and bit complement operand.
 
 2012-08-04 Borut Razem <borut.razem AT gmail.com>
+
 	* device/include/pic14/pic14devices.txt:
 	  applied patch minor-pic12lf1552-error.diff from
 	  #3553952 - "New devices to pic14 series and pic16fam-h-gen.pl update II."

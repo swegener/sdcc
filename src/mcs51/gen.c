@@ -1161,7 +1161,6 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
           _G.r0Pushed--;
         }
     }
-    break;
 
 dealloc:
   /* all other cases just dealloc */

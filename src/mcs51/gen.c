@@ -1160,6 +1160,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
           emitpop ("ar0");
           _G.r0Pushed--;
         }
+	  break;
     }
 
 dealloc:

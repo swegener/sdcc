@@ -847,7 +847,7 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "rlc") || ISINST(pl->line, "rl") || ISINST(pl->line, "rrc") || ISINST(pl->line, "rr") || ISINST(pl->line, "sla") || ISINST(pl->line, "sra") || ISINST(pl->line, "srl"))
     {
       if(argCont(op1start, "(ix)") || argCont(op1start, "(iy)"))
-        return(3);
+        return(4);
       return(2);
     }
 
@@ -941,3 +941,4 @@ int z80instructionSize(lineNode *pl)
 
   return(4);
 }
+

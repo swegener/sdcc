@@ -1,3 +1,8 @@
+2012-08-25 Borut Razem <borut.razem AT gmail.com>
+
+	* src/mcs51/gen.c:
+	  fixed muldiv regression test failures on ARM architecture
+
 2012-08-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,

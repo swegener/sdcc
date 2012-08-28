@@ -1,3 +1,9 @@
+2012-08-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Fix for handling of parameters in the z80-related ports.
+
 2012-08-27 Borut Razem <borut.razem AT gmail.com>
 
 	* src/ds390/gen.c:

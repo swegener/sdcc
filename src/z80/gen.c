@@ -3766,6 +3766,7 @@ genIpush (const iCode * ic)
         {
           if (AOP (IC_LEFT (ic))->type == AOP_IY)
             {
+              wassertl (!bitVectBitValue (ic->rSurv, A_IDX), "Loading from address destroys A, which must survive.");
               emit2 ("ld a,(%s)", aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE));
               emit2 ("push af");
               regalloc_dry_run_cost += 4;
@@ -3783,12 +3784,18 @@ genIpush (const iCode * ic)
                   emit2 ("push de");
                   regalloc_dry_run_cost += 1;
                 }
+              else if (AOP (IC_LEFT (ic))->type == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[offset]->rIdx == H_IDX)
+                {
+                  emit2 ("push hl");
+                  regalloc_dry_run_cost += 1;
+                }
               else
                 {
                   if (!regalloc_dry_run && !strcmp (aopGet (AOP (IC_LEFT (ic)), offset, FALSE), "h"))   // todo: More exact cost!
                     emit2 ("push hl");
                   else
                     {
+                      wassertl (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC || !bitVectBitValue (ic->rSurv, A_IDX), "Push operand destroys A, which must survive.");
                       if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT && byteOfVal (AOP (IC_LEFT (ic))->aopu.aop_lit, offset) == 0x00)
                         emit3 (A_XOR, ASMOP_A, ASMOP_A);
                       else

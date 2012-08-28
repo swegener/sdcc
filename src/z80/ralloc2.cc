@@ -600,9 +600,9 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
       if(ic->op == IPUSH && getSize(operandType(IC_LEFT(ic))) <= 2 &&
         (operand_in_reg(left, REG_A, ia, i, G) ||
-        operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_B, ia, i, G)) ||
-        operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_D, ia, i, G)) ||
-        operand_in_reg(left, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_H, ia, i, G)) ||
+        operand_in_reg(left, REG_B, ia, i, G) && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0) ||
+        operand_in_reg(left, REG_D, ia, i, G) && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0) ||
+        operand_in_reg(left, REG_H, ia, i, G) && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0) ||
         operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
         return(true);
       if(!result_in_A && !input_in_A)

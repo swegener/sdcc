@@ -627,7 +627,7 @@ template <class T_t, class G_t>
 static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G, const iCode *ic) // Assignment has to be passed as a copy (not reference), since the transformations on the tree-decomposition will invalidate it otherwise.
 {
   operand *tmpop;
-  unsigned substituted = 0;
+  unsigned substituted = 0, split = 0;
 
   typedef typename boost::graph_traits<G_t>::edge_iterator edge_iter_t;
   typedef typename boost::graph_traits<G_t>::edge_descriptor edge_desc_t;
@@ -651,7 +651,11 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
 #endif
 
   for(typename std::set<edge_desc_t>::iterator i = calculation_edges.begin(); i != calculation_edges.end(); ++i)
+  {
     split_edge(T, G, *i, ic, tmpop);
+    split++;
+  }
+
   typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iter_t;
   vertex_iter_t v, v_end;
 
@@ -698,6 +702,9 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
 
   if(substituted <= 1) // Todo: Remove this warning when optimization for speed instead of code size is implemented!
     std::cout << "Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did not substitute multiple calculations.\n"; std::cout.flush();
+
+  if(substituted <= split) // Todo: Remove this warning when optimization for speed instead of code size is implemented!
+    std::cout << "Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did substitute only " << substituted << " calculations, while introducing "<< split << ".\n"; std::cout.flush();
 
   return(1);
 }

@@ -1,3 +1,10 @@
+2012-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCClospre.hpp:
+	  More verbose lospre debug output.
+	* support/regression/tests/bug3564104.c:
+	  Regression test for #3564104.
+
 2012-08-28 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc,

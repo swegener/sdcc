@@ -644,6 +644,7 @@ struct  area
 /* sdld specific */
         char    *a_image;       /* Something for hc08/lkelf */
         char    *a_used;        /* Something for hc08/lkelf */
+        a_uint  a_imagesize;    /* Something for hc08/lkelf */
 /* end sdld specific */
 };
 

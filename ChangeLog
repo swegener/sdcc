@@ -1,3 +1,10 @@
+2012-09-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lkarea.c,
+	* sdas/linksrc/lkelf.c,
+	* src/hc08/gen.c: Fixed bug #3536431
+
 2012-09-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCClospre.hpp:

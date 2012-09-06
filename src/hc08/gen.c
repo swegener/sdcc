@@ -307,7 +307,8 @@ updateCFA (void)
   if (!currFunc)
     return;
 
-  debugFile->writeFrameAddress (NULL, hc08_reg_sp, 1 + _G.stackOfs + _G.stackPushes);
+  if (options.debug)
+    debugFile->writeFrameAddress (NULL, hc08_reg_sp, 1 + _G.stackOfs + _G.stackPushes);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -3662,7 +3663,8 @@ genFunction (iCode * ic)
 
   _G.stackOfs = 0;
   _G.stackPushes = 0;
-  debugFile->writeFrameAddress (NULL, hc08_reg_sp, 0);
+  if (options.debug)
+    debugFile->writeFrameAddress (NULL, hc08_reg_sp, 0);
 
   if (IFFUNC_ISNAKED (ftype))
     {
@@ -3925,7 +3927,8 @@ genLabel (iCode * ic)
   if (IC_LABEL (ic) == entryLabel)
     return;
 
-  debugFile->writeLabel (IC_LABEL (ic), ic);
+  if (options.debug)
+    debugFile->writeLabel (IC_LABEL (ic), ic);
 
   emitLabel (IC_LABEL (ic));
 
@@ -10085,7 +10088,8 @@ genhc08Code (iCode *lic)
   else
     spname = "sp";
 
-  debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
+  if (options.debug)
+    debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
   hc08_aop_pass[0] = newAsmop (AOP_REG);
   hc08_aop_pass[0]->size = 1;
@@ -10179,7 +10183,8 @@ genhc08Code (iCode *lic)
         DD (emitcode ("", "; forgot to free xa"));
     }
 
-  debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
+  if (options.debug)
+    debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
 
   /* now we are ready to call the

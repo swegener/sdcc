@@ -480,14 +480,14 @@ elfGenerateAbs (struct area *ap, listHeader * segments, listHeader * sections)
     {
       /* Find the start of a contiguously */
       /* used region within this area */
-      while (ofs < ap->a_size && !ap->a_used[ofs])
+      while (ofs < ap->a_imagesize && !ap->a_used[ofs])
         ofs++;
-      if (ofs >= ap->a_size)
+      if (ofs >= ap->a_imagesize)
         return;
 
       /* Find the end of the region */
       addr = ap->a_addr + ofs;
-      while (ofs < ap->a_size && ap->a_used[ofs])
+      while (ofs < ap->a_imagesize && ap->a_used[ofs])
         ofs++;
       size = ap->a_addr + ofs - addr;
 
@@ -736,9 +736,13 @@ elf (int i)
       /* If this area doesn't have an image buffer, create one */
       if (!ap->a_image)
         {
-          ap->a_image = new (ap->a_size);
           if (ap->a_flag & A3_ABS)
-            ap->a_used = new (ap->a_size);
+            ap->a_imagesize = ap->a_addr + ap->a_size;
+          else
+            ap->a_imagesize = ap->a_size;
+          ap->a_image = new (ap->a_imagesize);
+          if (ap->a_flag & A3_ABS)
+            ap->a_used = new (ap->a_imagesize);
         }
 
       /* Copy the data into the image buffer */
@@ -746,6 +750,33 @@ elf (int i)
         {
           if (rtflg[i])
             {
+              if (address-ap->a_addr >= ap->a_imagesize)
+                {
+                  a_uint newsize;
+
+                  if (ap->a_flag & A3_ABS)
+                    {
+                      newsize = ap->a_imagesize;
+                      while (address-ap->a_addr >= newsize)
+                        newsize = (newsize & ~4095)+4096;
+                      ap->a_image = (char *) realloc (ap->a_image, newsize);
+                      ap->a_used = (char *) realloc (ap->a_used, newsize);
+                      if (!ap->a_image || !ap->a_used)
+                        {
+                          fprintf (stderr, "Out of space!\n");
+                          lkexit (ER_FATAL);
+                        }
+                      memset (ap->a_image+ap->a_imagesize, 0, newsize-ap->a_imagesize);
+                      memset (ap->a_used+ap->a_imagesize, 0, newsize-ap->a_imagesize);
+                      ap->a_imagesize = newsize;
+                    }
+                  else
+                    {
+                      fprintf (stderr, "Unexpected area %s overflow. Address = 0x%x but allocated range is 0x%x - 0x%x\n",
+                               ap->a_id, address, ap->a_addr, ap->a_addr+ap->a_imagesize-1);
+                      lkexit (ER_FATAL);
+                    }
+                }
               ap->a_image[address-ap->a_addr] = rtval[i];
               if (ap->a_used)
                 ap->a_used[address-ap->a_addr] = 1;

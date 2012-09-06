@@ -654,12 +654,12 @@ lnksect(struct area *tap)
                 /*
                  * Concatenated sections
                  */
-                if (TARGET_IS_6808 && tap->a_size) {
+                if (TARGET_IS_6808 && tap->a_size && !(ap->a_flag & A_NOLOAD)) {
                         addr = find_empty_space(addr, tap->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
                 }
                 while (taxp) {
                         /* find next unused address now */
-                        if (TARGET_IS_6808 && taxp->a_size) {
+                        if (TARGET_IS_6808 && taxp->a_size && !(ap->a_flag & A_NOLOAD)) {
                                 addr = find_empty_space(addr, taxp->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
                                 allocate_space(addr, taxp->a_size, tap->a_id, codemap6808, sizeof (codemap6808));
                         }

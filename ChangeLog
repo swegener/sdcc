@@ -1,3 +1,7 @@
+2012-09-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (operandOperation): fixed bug #3537139
+
 2012-09-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sdas/linksrc/aslink.h,

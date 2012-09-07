@@ -1269,12 +1269,14 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
          sense here. Shifting by a negative number is impossible. */
       if (IS_UNSIGNED (let))
         /* unsigned: logic shift right */
-        retval = operandFromLit ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) >>
-                                 (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)));
+        retval = operandFromValue (valCastLiteral (type,
+                                                   ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) >>
+                                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)))));
       else
         /* signed: arithmetic shift right */
-        retval = operandFromLit ((TYPE_TARGET_LONG) operandLitValue (left) >>
-                                 (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)));
+        retval = operandFromValue (valCastLiteral (type,
+                                                   ((TYPE_TARGET_LONG) operandLitValue (left) >>
+                                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)))));
       break;
     case EQ_OP:
       if (IS_FLOAT (let) || IS_FLOAT (ret))

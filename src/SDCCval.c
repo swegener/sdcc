@@ -670,10 +670,17 @@ cheapestVal (value * val)
       /* 'bool' promotes to 'signed int' too */
       if (SPEC_CVAL (val->type).v_int <= 1)
         {
-          SPEC_NOUN (val->type) = (bit) ? V_BIT : V_BOOL;
+          /* Do not use V_BIT here because in some contexts it also */
+          /* implies a storage class. */
+          SPEC_NOUN (val->type) = V_BOOL;
         }
-
-      SPEC_USIGN (val->type) = 1;
+      else
+        {
+          /* Boolean types are intrinsically unsigned, so only */
+          /* set the USIGN flag for char types to avoid triggering */
+          /* type checking errors/warnings. */
+          SPEC_USIGN (val->type) = 1;
+        }
     }
 
   return (val);

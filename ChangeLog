@@ -1,3 +1,8 @@
+2012-09-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCval.c (cheapestVal): fixed bug #3563977
+	* support/regression/tests/enum.c: tests added for bug #3563977
+
 2012-09-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (operandOperation): fixed bug #3537139

@@ -103,7 +103,7 @@
 /* XXX */
 #undef NON_FREE_LIB_DIR_SUFFIX
 
-/* XXX */
+/* Define to 1 to disable the AVR port */
 #undef OPT_DISABLE_AVR
 
 /* XXX */
@@ -157,7 +157,7 @@
 /* XXX */
 #undef OPT_DISABLE_UCSIM
 
-/* XXX */
+/* Define to 1 to disable the XA51 port */
 #undef OPT_DISABLE_XA51
 
 /* XXX */
@@ -258,9 +258,6 @@
 
 /* XXX */
 #undef STD_LONG_LIB
-
-/* XXX */
-#undef STD_XA51_LIB
 
 /* XXX */
 #undef TYPE_BYTE

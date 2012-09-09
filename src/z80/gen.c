@@ -1792,7 +1792,7 @@ requiresHL (const asmop * aop)
 }
 
 static void
-fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
+fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
 {
   const char *pair = _pairs[pairId].name;
   char *l = Safe_strdup (aopGetLitWordLong (left, offset, FALSE));
@@ -1828,8 +1828,14 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
                       adjustPair (pair, &_G.pairs[pairId].offset, offset);
                       goto adjusted;
                     }
+                  /* This was good for pointer accesses, but caused bugs when iy is used for other things. Disable for now.
                   if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
                     {
+                      goto adjusted;
+                    }*/
+                  if (pairId == PAIR_IY && abs (_G.pairs[pairId].offset - offset) < 1)
+                    {
+                      adjustPair (pair, &_G.pairs[pairId].offset, offset);
                       goto adjusted;
                     }
                 }

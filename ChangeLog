@@ -1,6 +1,12 @@
 2012-09-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,
+	  support/regression/tests/bug3565757.c:
+	  Fixed bug #3565757.
+
+2012-09-09 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
 	  support/regression/tests/bug3559997.c:
 	  Fixed bug #3559997.
 

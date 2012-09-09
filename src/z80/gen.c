@@ -9132,6 +9132,8 @@ genPointerGet (const iCode *ic)
     {
       int fp_offset, sp_offset;
 
+      if(!isPairDead (PAIR_HL, ic))
+        _push (PAIR_HL);
       if(!isPairDead (PAIR_DE, ic))
         _push (PAIR_DE);
       if(!isPairDead (PAIR_BC, ic))
@@ -9161,6 +9163,9 @@ genPointerGet (const iCode *ic)
         _pop (PAIR_BC);
       if(!isPairDead (PAIR_DE, ic))
         _pop (PAIR_DE);
+      if(!isPairDead (PAIR_HL, ic))
+        _pop (PAIR_HL);
+
       goto release;
     }
 

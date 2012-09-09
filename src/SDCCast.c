@@ -6477,6 +6477,7 @@ expandInlineFuncs (ast * tree, ast * block)
               /* {{inline_function_code}}, retsym                         */
 
               retsym = inlineTempVar (func->type->next, block->level);
+              SPEC_SCLS (retsym->etype) = S_FIXED;
               inlineAddDecl (retsym, block, TRUE, TRUE);
             }
 

@@ -1805,7 +1805,7 @@ checkSClass (symbol * sym, int isProto)
       t = sym->type;
       while (t && t->next != sym->etype)
         t = t->next;
-      if (t->next != sym->etype || !IS_FUNC (t))
+      if (!t || t->next != sym->etype || !IS_FUNC (t))
         {
           werror (E_BITVAR_STORAGE, sym->name);
           SPEC_SCLS (sym->etype) = S_FIXED;

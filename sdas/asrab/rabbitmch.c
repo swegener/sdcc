@@ -866,7 +866,7 @@ VOID  machine(struct mne * mp)
           aerr();
         outab(v2);
       } else {
-        outrb(&e2, R3_PCR);
+        outrb(&e2, R_PCR);
       }
       if (e2.e_mode != S_USER)
         rerr();
@@ -1055,7 +1055,7 @@ VOID  machine(struct mne * mp)
         outab( (v2 & 0xFF) );
         outab( (v2 >> 8) );
       } else {
-        outrb(&e2, R3_PCR);
+        outrb(&e2, R_PCR);
       }
       if (e2.e_mode != S_USER)
         rerr();

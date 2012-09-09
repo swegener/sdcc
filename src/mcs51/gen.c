@@ -1075,6 +1075,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 {
   asmop *aop;
   int sz;
+  symbol *sym;
 
   if (!op)
     aop = aaop;
@@ -1129,7 +1130,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 
     case AOP_STK:
       sz = aop->size;
-      symbol *sym = aop->aopu.aop_sym;
+      sym = aop->aopu.aop_sym;
       bitVectUnSetBit (ic->rUsed, R0_IDX);
       bitVectUnSetBit (ic->rUsed, R1_IDX);
 

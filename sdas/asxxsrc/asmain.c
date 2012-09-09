@@ -433,7 +433,7 @@ main(int argc, char *argv[])
                         err('i');
         }
         if (oflag)
-                outchk(ASXXXX_HUGE, ASXXXX_HUGE);  /* Flush */
+                outchk(ASXHUGE, ASXHUGE);  /* Flush */
         if (sflag) {
                 lstsym(tfp);
         } else
@@ -858,9 +858,9 @@ loop:
                         clrexpr(&e1);
                         expr(&e1, 0);
                         if (mp->m_type == S_BYTE) {
-                                outrb(&e1, R3_NORM);
+                                outrb(&e1, R_NORM);
                         } else {
-                                outrw(&e1, R3_NORM);
+                                outrw(&e1, R_NORM);
                         }
                 } while ((c = getnb()) == ',');
                 unget(c);
@@ -968,7 +968,7 @@ loop:
         case S_BLK:
                 clrexpr(&e1);
                 expr(&e1, 0);
-                outchk(ASXXXX_HUGE,ASXXXX_HUGE);
+                outchk(ASXHUGE,ASXHUGE);
                 dot.s_addr += e1.e_addr*mp->m_valu;
                 lmode = BLIST;
                 break;
@@ -1031,7 +1031,7 @@ loop:
         case S_DAREA:
                 getid(id, -1);
                 uaf = 0;
-                uf  = A3_CON|A3_REL;
+                uf  = A_CON|A_REL;
                 if ((c = getnb()) == '(') {
                         do {
                                 getid(opt, -1);
@@ -1061,17 +1061,17 @@ loop:
                         /* end sdas specific */
                         ap->a_size = 0;
                         ap->a_fuzz = 0;
-                        ap->a_flag = uaf ? uf : (A3_CON|A3_REL);
+                        ap->a_flag = uaf ? uf : (A_CON|A_REL);
                         areap = ap;
                 }
                 newdot(ap);
                 lmode = SLIST;
-                if (dot.s_area->a_flag & A3_ABS)
+                if (dot.s_area->a_flag & A_ABS)
                         abs_ap = ap;
                 break;
 
         case S_ORG:
-                if (dot.s_area->a_flag & A3_ABS) {
+                if (dot.s_area->a_flag & A_ABS) {
                         char buf[NCPS];
 
                         laddr = absexpr();
@@ -1336,13 +1336,13 @@ newdot(struct area *nap)
         /* fprintf (stderr, "%s dot.s_area->a_size: %d dot.s_addr: %d\n",
                 oap->a_id, dot.s_area->a_size, dot.s_addr); */
         oap->a_fuzz = fuzz;
-        if (oap->a_flag & A3_OVR) {
+        if (oap->a_flag & A_OVR) {
                 // the size of an overlay is the biggest size encountered
                 if (oap->a_size < dot.s_addr) {
                         oap->a_size = dot.s_addr;
                 }
         }
-        else if (oap->a_flag & A3_ABS) {
+        else if (oap->a_flag & A_ABS) {
                 oap->a_addr = dot.s_org;
                 oap->a_size += dot.s_addr - dot.s_org;
                 dot.s_addr = dot.s_org = 0;
@@ -1351,12 +1351,12 @@ newdot(struct area *nap)
                 oap->a_addr = 0;
                 oap->a_size = dot.s_addr;
         }
-        if (nap->a_flag & A3_OVR) {
+        if (nap->a_flag & A_OVR) {
                 // a new overlay starts at 0, no fuzz
                 dot.s_addr = 0;
                 fuzz = 0;
         }
-        else if (nap->a_flag & A3_ABS) {
+        else if (nap->a_flag & A_ABS) {
                 // a new absolute starts at org, no fuzz
                 dot.s_addr = dot.s_org;
                 fuzz = 0;

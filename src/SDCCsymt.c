@@ -101,8 +101,6 @@ initSymt (void)
 
   for (i = 0; i < 256; i++)
     SymbolTab[i] = StructTab[i] = (void *) NULL;
-
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -252,6 +250,9 @@ findSymWithLevel (bucket ** stab, symbol * sym)
 {
   bucket *bp;
 
+  if (!sym)
+    return sym;
+
   bp = stab[hashKey (sym->name)];
 
   /**
@@ -294,6 +295,9 @@ void *
 findSymWithBlock (bucket ** stab, symbol * sym, int block)
 {
   bucket *bp;
+
+  if (!sym)
+    return sym;
 
   bp = stab[hashKey (sym->name)];
   while (bp)
@@ -1256,13 +1260,13 @@ reverseLink (sym_link * type)
 void
 addSymChain (symbol ** symHead)
 {
-  symbol *sym = *symHead;
+  symbol *sym;
   symbol *csym = NULL;
   symbol **symPtrPtr;
   int error = 0;
   int elemsFromIval = 0;
 
-  for (; sym != NULL; sym = sym->next)
+  for (sym = *symHead; sym != NULL; sym = sym->next)
     {
       changePointer (sym->type);
       checkTypeSanity (sym->etype, sym->name);
@@ -3860,6 +3864,7 @@ _mangleFunctionName (const char *in)
 /*                      'v' - void                                 */
 /*                      '*' - pointer - default (GPOINTER)         */
 /* modifiers -          'u' - unsigned                             */
+/*                      'C' - const                                */
 /* pointer modifiers -  'g' - generic                              */
 /*                      'x' - xdata                                */
 /*                      'p' - code                                 */
@@ -3874,12 +3879,16 @@ typeFromStr (const char *s)
 {
   sym_link *r = newLink (DECLARATOR);
   int usign = 0;
+  int constant = 0;
 
   do
     {
       sym_link *nr;
       switch (*s)
         {
+        case 'C':
+          constant = 1;
+          break;
         case 'u':
           usign = 1;
           s++;
@@ -3964,6 +3973,11 @@ typeFromStr (const char *s)
         {
           SPEC_USIGN (r) = 1;
           usign = 0;
+        }
+      if (IS_SPEC (r) && constant)
+        {
+          SPEC_CONST (r) = 1;
+          constant = 0;
         }
       s++;
     }

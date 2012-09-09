@@ -353,9 +353,9 @@ write_rmode(int r)
  *      is loaded into the txt and rel buffers.
  *
  *      local variables:
- *		int	m		signed value mask
- *		int	n		unsigned value mask
- *					symbol/area reference number
+ *              int     m               signed value mask
+ *              int     n               unsigned value mask
+ *                                      symbol/area reference number
  *              int *   relp            pointer to rel array
  *              int *   txtp            pointer to txt array
  *
@@ -385,13 +385,13 @@ outrb(struct expr *esp, int r)
                          * const byte to the T line and don't
                          * generate any relocation info.
                          */
-			n = (a_uint) ~0x000000FF;		/* 1 byte  */
-			/*
-			 * Page0 Range Check
-			 */
-			if (((r & (R3_SGND | R3_USGN | R3_PAG0 | R3_PAG | R3_PCR)) == R3_PAG0) &&
-			   ((n & esp->e_addr) != 0))
-				err('d');
+                        n = (a_uint) ~0x000000FF;               /* 1 byte  */
+                        /*
+                         * Page0 Range Check
+                         */
+                        if (((r & (R_SGND | R_USGN | R_PAG0 | R_PAG | R_PCR)) == R_PAG0) &&
+                           ((n & esp->e_addr) != 0))
+                                err('d');
 
                         out_lb(lobyte(esp->e_addr),0);
                         if (oflag) {
@@ -400,8 +400,8 @@ outrb(struct expr *esp, int r)
                         }
                 } else {
                         if (!is_sdas() || !is_sdas_target_8051_like()) {
-                                r |= R3_BYTE | R3_BYTX | esp->e_rlcf;
-                                if (r & R3_MSB) {
+                                r |= R_BYTE | R_BYTX | esp->e_rlcf;
+                                if (r & R_MSB) {
                                         out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
                                 } else {
                                         out_lb(lobyte(esp->e_addr),r|R_RELOC);
@@ -411,7 +411,7 @@ outrb(struct expr *esp, int r)
                                         out_tw(esp->e_addr);
                                         if (esp->e_flag) {
                                                 n = esp->e_base.e_sp->s_ref;
-                                                r |= R3_SYM;
+                                                r |= R_SYM;
                                         } else {
                                                 n = esp->e_base.e_ap->a_ref;
                                         }
@@ -425,11 +425,11 @@ outrb(struct expr *esp, int r)
                                  * info.
                                  *
                                  * We generate a 24 bit address. The linker will
-                                 * select a single byte based on whether R3_MSB or
+                                 * select a single byte based on whether R_MSB or
                                  * R_HIB is set.
                                  */
                                 /* 24 bit mode. */
-                                r |= R3_BYTE | R_BYT3 | esp->e_rlcf;
+                                r |= R_BYTE | R_BYT3 | esp->e_rlcf;
                                 if (r & R_HIB)
                                 {
                                     /* Probably should mark this differently in the
@@ -437,7 +437,7 @@ outrb(struct expr *esp, int r)
                                      */
                                     out_lb(byte3(esp->e_addr),r|R_RELOC|R_HIGH);
                                 }
-                                else if (r & R3_MSB) {
+                                else if (r & R_MSB) {
                                     out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
                                 } else {
                                     out_lb(lobyte(esp->e_addr),r|R_RELOC);
@@ -447,7 +447,7 @@ outrb(struct expr *esp, int r)
                                     out_t24(esp->e_addr);
                                     if (esp->e_flag) {
                                             n = esp->e_base.e_sp->s_ref;
-                                            r |= R3_SYM;
+                                            r |= R_SYM;
                                     } else {
                                             n = esp->e_base.e_ap->a_ref;
                                     }
@@ -514,10 +514,10 @@ outrw(struct expr *esp, int r)
                                 out_tw(esp->e_addr);
                         }
                 } else {
-                        r |= R3_WORD | esp->e_rlcf;
-                        if (r & R3_BYTX) {
+                        r |= R_WORD | esp->e_rlcf;
+                        if (r & R_BYTX) {
                                 rerr();
-                                if (r & R3_MSB) {
+                                if (r & R_MSB) {
                                         out_lw(hibyte(esp->e_addr),r|R_RELOC);
                                 } else {
                                         out_lw(lobyte(esp->e_addr),r|R_RELOC);
@@ -531,7 +531,7 @@ outrw(struct expr *esp, int r)
                                         out_tw(esp->e_addr);
                                         if (esp->e_flag) {
                                                 n = esp->e_base.e_sp->s_ref;
-                                                r |= R3_SYM;
+                                                r |= R_SYM;
                                         } else {
                                                 n = esp->e_base.e_ap->a_ref;
                                         }
@@ -543,7 +543,7 @@ outrw(struct expr *esp, int r)
                                         out_tw(esp->e_addr);
                                         if (esp->e_flag) {
                                                 n = esp->e_base.e_sp->s_ref;
-                                                r |= R3_SYM;
+                                                r |= R_SYM;
                                         } else {
                                                 n = esp->e_base.e_ap->a_ref;
                                         }
@@ -616,11 +616,11 @@ outr24(struct expr *esp, int r)
                         }
                 } else {
                         /* This is a symbol. */
-                        r |= R3_WORD | esp->e_rlcf;
-                        if (r & R3_BYTX) {
+                        r |= R_WORD | esp->e_rlcf;
+                        if (r & R_BYTX) {
                                 /* I have no idea what this case is. */
                                 rerr();
-                                if (r & R3_MSB) {
+                                if (r & R_MSB) {
                                         out_lw(hibyte(esp->e_addr),r|R_RELOC);
                                 } else {
                                         out_lw(lobyte(esp->e_addr),r|R_RELOC);
@@ -633,12 +633,12 @@ outr24(struct expr *esp, int r)
                                 out_t24(esp->e_addr);
                                 if (esp->e_flag) {
                                         n = esp->e_base.e_sp->s_ref;
-                                        r |= R3_SYM;
+                                        r |= R_SYM;
                                 } else {
                                         n = esp->e_base.e_ap->a_ref;
                                 }
 
-                                if (r & R3_BYTE)
+                                if (r & R_BYTE)
                                 {
                                     /* If this occurs, we cannot properly
                                      * code the relocation data with the
@@ -697,14 +697,14 @@ outdp(register struct area *carea, register struct expr *esp)
         register int n, r;
 
         if (oflag && pass==2) {
-                outchk(ASXXXX_HUGE,ASXXXX_HUGE);
+                outchk(ASXHUGE,ASXHUGE);
                 out_tw(carea->a_ref);
                 out_tw(esp->e_addr);
                 if (esp->e_flag || esp->e_base.e_ap!=NULL) {
-                        r = R3_WORD;
+                        r = R_WORD;
                         if (esp->e_flag) {
                                 n = esp->e_base.e_sp->s_ref;
-                                r |= R3_SYM;
+                                r |= R_SYM;
                         } else {
                                 n = esp->e_base.e_ap->a_ref;
                         }
@@ -817,7 +817,7 @@ outchk(int nt, int nr)
         if (txtp == txt) {
                 out_tw(dot.s_addr);
                 if ((ap = dot.s_area) != NULL) {
-                        write_rmode(R3_WORD|R3_AREA);
+                        write_rmode(R_WORD|R_AREA);
                         *relp++ = 0;
                         out_rw(ap->a_ref);
                 }
@@ -1460,7 +1460,7 @@ outr11(register struct expr *esp, int op, int r)
                          * byte output: relocatable word, followed
                          * by op-code.  Linker will combine them.
                          */
-                        r |= R3_WORD | esp->e_rlcf;
+                        r |= R_WORD | esp->e_rlcf;
                         n = ((esp->e_addr & 0x0700) >> 3) | op;
                         n = (n << 8) | (esp->e_addr & 0xFF);
                         out_lw(n,r|R_RELOC);
@@ -1471,7 +1471,7 @@ outr11(register struct expr *esp, int op, int r)
 
                                 if (esp->e_flag) {
                                         n = esp->e_base.e_sp->s_ref;
-                                        r |= R3_SYM;
+                                        r |= R_SYM;
                                 } else {
                                         n = esp->e_base.e_ap->a_ref;
                                 }
@@ -1500,7 +1500,7 @@ outr11(register struct expr *esp, int op, int r)
                                  * by op-code.  Linker will combine them.
                                  * Listing shows only the address.
                                  */
-                                r |= R3_WORD | esp->e_rlcf;
+                                r |= R_WORD | esp->e_rlcf;
                                 out_lw(esp->e_addr,r|R_RELOC);
                                 if (oflag) {
                                         outchk(3, 5);
@@ -1509,7 +1509,7 @@ outr11(register struct expr *esp, int op, int r)
 
                                         if (esp->e_flag) {
                                                 n = esp->e_base.e_sp->s_ref;
-                                                r |= R3_SYM;
+                                                r |= R_SYM;
                                         } else {
                                                 n = esp->e_base.e_ap->a_ref;
                                         }
@@ -1584,7 +1584,7 @@ outr19(struct expr * esp, int op, int r)
                          * by op-code.  Linker will combine them.
                          * Listing shows only the address.
                          */
-                        r |= R3_WORD | esp->e_rlcf;
+                        r |= R_WORD | esp->e_rlcf;
                         out_l24(esp->e_addr,r|R_RELOC);
                         if (oflag) {
                                 outchk(4, 5);
@@ -1593,7 +1593,7 @@ outr19(struct expr * esp, int op, int r)
 
                                 if (esp->e_flag) {
                                         n = esp->e_base.e_sp->s_ref;
-                                        r |= R3_SYM;
+                                        r |= R_SYM;
                                 } else {
                                         n = esp->e_base.e_ap->a_ref;
                                 }

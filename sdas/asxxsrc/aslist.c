@@ -132,7 +132,7 @@ list(void)
                 return;
         }
         if (lmode == ALIST) {
-                outchk(ASXXXX_HUGE,ASXXXX_HUGE);
+                outchk(ASXHUGE,ASXHUGE);
         }
 
         /*
@@ -426,11 +426,11 @@ list2(int t)
          */
         if (fflag >= 2) {
                 if (t & R_RELOC) {
-                        if (t & (R3_PAG0|R3_PAG)) {
+                        if (t & (R_PAG0|R_PAG)) {
                                 c = '*';
-                        } else if (t & R3_USGN) {
+                        } else if (t & R_USGN) {
                                 c = 'u';
-                        } else if (t & R3_PCR) {
+                        } else if (t & R_PCR) {
                                 c = 'p';
                         } else {
                                 c = 'r';

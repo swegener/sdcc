@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *  Copyright (C) 1989-2012  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,17 +23,17 @@
  *
  *   With enhancements from
  *
- *	John L. Hartman	(JLH)
- *	jhartman at compuserve dot com
+ *      John L. Hartman (JLH)
+ *      jhartman at compuserve dot com
  *
- *	Bill McKinnon (BM)
- *	w_mckinnon at conknet dot com
+ *      Bill McKinnon (BM)
+ *      w_mckinnon at conknet dot com
  *
- *	Boisy G. Petri (BGP)
- *	boisy at boisypitre dot com
+ *      Boisy G. Petri (BGP)
+ *      boisy at boisypitre dot com
  *
- *	Mike McCarty
- *	mike dot mccarty at sbcglobal dot net
+ *      Mike McCarty
+ *      mike dot mccarty at sbcglobal dot net
  */
 
 /*
@@ -67,7 +67,56 @@
 #include <setjmp.h>
 #include <string.h>
 
+/*
+ * Local Definitions
+ */
+
 #define VERSION "V02.00 + NoICE + SDCC mods + Flat24"
+#define COPYRIGHT "2012"
+
+/*
+ * To include NoICE Debugging set non-zero
+ */
+#define NOICE   1
+
+/*
+ * To include SDCC Debugging set non-zero
+ */
+#define SDCDB   1
+
+
+/*
+ * The assembler requires certain variables to have
+ * at least 32 bits to allow correct address processing.
+ *
+ * The type INT32 is defined so that compiler dependent
+ * variable sizes may be specified in one place.
+ *
+ * LONGINT is defined when INT32 is 'long' to
+ * select the 'l' forms for format strings
+ * and constants.
+ */
+
+/* Turbo C++ 3.0 for DOS */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef  __TURBOC__
+#define         INT32   long
+#define         LONGINT
+#endif
+
+/* Symantec C++ V6.x/V7.x for DOS (not DOSX) */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef  __SC__
+#define         INT32   long
+#define         LONGINT
+#endif
+
+/* The DEFAULT is 'int' is 32 bits */
+#ifndef INT32
+#define         INT32   int
+#endif
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #include <unistd.h>
@@ -117,7 +166,6 @@
 #include <limits.h>
 #ifndef PATH_MAX                                /* POSIX, but not required      */
 #if defined(_MSC_VER) || defined(__BORLANDC__)  /* Microsoft C or Borland C*/
-#include <stdlib.h>
 #define PATH_MAX        _MAX_PATH
 #else
 #define PATH_MAX        FILENAME_MAX            /* define a reasonable value */
@@ -125,7 +173,6 @@
 #endif
 
 #ifdef _WIN32           /* WIN32 native */
-
 #  define NATIVE_WIN32          1
 #  ifdef __MINGW32__    /* GCC MINGW32 depends on configure */
 #    include "../../sdccconf.h"
@@ -133,8 +180,7 @@
 #    include "../../sdcc_vc.h"
 #    define PATH_MAX    _MAX_PATH
 #  endif
-
-#else                   /* Assume Un*x style system */
+#else                   /* Assume *nix style system */
 #  include "../../sdccconf.h"
 #endif
 
@@ -153,7 +199,7 @@
 #define RTTERM      ')'         /* Right expression delimeter */
 
 #define NCPS        80          /* Characters per symbol */
-#define ASXXXX_HUGE 1000        /* A huge number */
+#define ASXHUGE     1000        /* A huge number */
 #define NERR        3           /* Errors per line */
 #define NINPUT      1024        /* Input buffer size */
 #define NCODE       128         /* Listing code buffer size */
@@ -211,7 +257,7 @@ struct  area
         int     a_flag;                 /* Area flags */
 /* sdas specific */
         a_uint  a_addr;         /* Area address */
-/* ebd sdas specific */
+/* end sdas specific */
 };
 
 /*
@@ -226,12 +272,12 @@ struct  area
  *      +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define A3_CON   0000            /* Concatenating */
-#define A3_OVR   0004            /* Overlaying */
-#define A3_REL   0000            /* Relocatable */
-#define A3_ABS   0010            /* absolute */
-#define A3_NOPAG 0000            /* Non-Paged */
-#define A3_PAG   0020            /* Paged */
+#define A_CON   0000            /* Concatenating */
+#define A_OVR   0004            /* Overlaying */
+#define A_REL   0000            /* Relocatable */
+#define A_ABS   0010            /* absolute */
+#define A_NOPAG 0000            /* Non-Paged */
+#define A_PAG   0020            /* Paged */
 
 /* sdas specific */
 /* Additional flags for 8051 address spaces */
@@ -257,33 +303,33 @@ struct  area
  *      +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define R3_WORD  0x00            /* 16 bit */
-#define R3_BYTE  0x01            /*  8 bit */
+#define R_BYTE  0x01            /*  8 bit */
+#define R_WORD  0x00            /* 16 bit */
 
-#define R3_AREA  0x00            /* Base type */
-#define R3_SYM   0x02
+#define R_AREA  0x00            /* Base type */
+#define R_SYM   0x02
 
-#define R3_NORM  0x00            /* PC adjust */
-#define R3_PCR   0x04
+#define R_NORM  0x00            /* PC adjust */
+#define R_PCR   0x04
 
-#define R3_BYT1  0x00            /* Byte count for R3_BYTE = 1 */
-#define R3_BYTX  0x08            /* Byte count for R3_BYTE = 2 */
+#define R_BYT1  0x00            /* Byte count for R_BYTE = 1 */
+#define R_BYTX  0x08            /* Byte count for R_BYTE = 2 */
 
-#define R3_SGND  0x00            /* Signed Byte */
-#define R3_USGN  0x10            /* Unsigned Byte */
+#define R_SGND  0x00            /* Signed Byte */
+#define R_USGN  0x10            /* Unsigned Byte */
 
-#define R3_NOPAG 0x00            /* Page Mode */
-#define R3_PAG0  0x20            /* Page '0' */
-#define R3_PAG   0x40            /* Page 'nnn' */
+#define R_NOPAG 0x00            /* Page Mode */
+#define R_PAG0  0x20            /* Page '0' */
+#define R_PAG   0x40            /* Page 'nnn' */
 
-#define R3_LSB   0x00            /* low byte */
-#define R3_MSB   0x80            /* high byte */
+#define R_LSB   0x00            /* low byte */
+#define R_MSB   0x80            /* high byte */
 
-#define R_BYT3  0x100           /* if R3_BYTE is set, this is a
+#define R_BYT3  0x100           /* if R_BYTE is set, this is a
                                  * 3 byte address, of which
                                  * the linker must select one byte.
                                  */
-#define R_HIB   0x200           /* If R3_BYTE & R_BYT3 are set, linker
+#define R_HIB   0x200           /* If R_BYTE & R_BYT3 are set, linker
                                  * will select byte 3 of the relocated
                                  * 24 bit address.
                                  */
@@ -292,10 +338,10 @@ struct  area
                                  * space to bit-addressable space.
                                  */
 
-#define R_J11           (R3_WORD|R3_BYTX)          /* JLH: 11 bit JMP and CALL (8051) */
-#define R_J19           (R3_WORD|R3_BYTX|R3_MSB)   /* 19 bit JMP/CALL (DS80C390)      */
-#define R_C24           (R3_WORD|R3_BYT1|R3_MSB)   /* 24 bit address (DS80C390)       */
-#define R_J19_MASK      (R3_BYTE|R3_BYTX|R3_MSB)
+#define R_J11           (R_WORD|R_BYTX)          /* JLH: 11 bit JMP and CALL (8051) */
+#define R_J19           (R_WORD|R_BYTX|R_MSB)   /* 19 bit JMP/CALL (DS80C390)      */
+#define R_C24           (R_WORD|R_BYT1|R_MSB)   /* 24 bit address (DS80C390)       */
+#define R_J19_MASK      (R_BYTE|R_BYTX|R_MSB)
 
 #define IS_R_J19(x)     (((x) & R_J19_MASK) == R_J19)
 #define IS_R_J11(x)     (((x) & R_J19_MASK) == R_J11)
@@ -426,8 +472,8 @@ struct  sym
 struct  tsym
 {
         struct  tsym *t_lnk;    /* Link to next */
-	a_uint	t_num;		/* 0-65535$      for a 16-bit int */
-				/* 0-4294967295$ for a 32-bit int */
+        a_uint  t_num;          /* 0-65535$      for a 16-bit int */
+                                /* 0-4294967295$ for a 32-bit int */
         int t_flg;              /* flags */
         struct  area *t_area;   /* Area */
         a_uint  t_addr;         /* Address */
@@ -445,14 +491,14 @@ extern  jmp_buf jump_env;       /*      compiler dependent structure
 extern  int     inpfil;         /*      count of assembler
                                  *      input files specified
                                  */
-extern  int     incfil;         /*      current file handle index
-                                 *      for include files
-                                 */
 extern  int     cfile;          /*      current file handle index
                                  *      of input assembly files
                                  */
 extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                                  *      zero for false conditional case
+                                 */
+extern  int     incfil;         /*      current file handle index
+                                 *      for include files
                                  */
 extern  int     tlevel;         /*      current conditional level
                                  */
@@ -493,8 +539,10 @@ extern  int     fflag;          /*      -f(f), relocations flagged flag
                                  */
 extern  int     gflag;          /*      -g, make undefined symbols global flag
                                  */
+#if NOICE
 extern  int     jflag;          /*      -j, generate debug information flag
                                  */
+#endif
 
 extern  int     lflag;          /*      -l, generate listing flag
                                  */
@@ -665,86 +713,86 @@ extern  char *          strncpy();
 #ifdef  OTHERSYSTEM
 
 /* asmain.c */
-extern	FILE *		afile(char *fn, char *ft, int wf);
-extern	VOID		asexit(int i);
-extern	VOID		asmbl(void);
-extern	VOID		newdot(struct area *nap);
-extern	VOID		phase(struct area *ap, a_uint a);
-extern	VOID		usage(int n);
+extern  FILE *          afile(char *fn, char *ft, int wf);
+extern  VOID            asexit(int i);
+extern  VOID            asmbl(void);
+extern  VOID            newdot(struct area *nap);
+extern  VOID            phase(struct area *ap, a_uint a);
+extern  VOID            usage(int n);
 
 /* aslex.c */
 extern  int             comma(int flag);
-extern	char		endline(void);
-extern	int		get(void);
-extern	VOID		getid(char *id, int c);
-extern	int		getmap(int d);
-extern	int		getnb(void);
-extern	VOID		getst(char *id, int c);
-extern	int		more(void);
-extern	int		nxtline(void);
-extern	VOID		unget(int c);
+extern  char            endline(void);
+extern  int             get(void);
+extern  VOID            getid(char *id, int c);
+extern  int             getmap(int d);
+extern  int             getnb(void);
+extern  VOID            getst(char *id, int c);
+extern  int             more(void);
+extern  int             nxtline(void);
+extern  VOID            unget(int c);
 
 /* assym.c */
-extern	VOID		allglob(void);
-extern	struct	area *	alookup(char *id);
-extern	int		hash(const char *p, int flag);
-extern	struct	sym *	lookup(const char *id);
-extern	struct	mne *	mlookup(char *id);
-extern	VOID *		new(unsigned int n);
+extern  VOID            allglob(void);
+extern  struct  area *  alookup(char *id);
+extern  int             hash(const char *p, int flag);
+extern  struct  sym *   lookup(const char *id);
+extern  struct  mne *   mlookup(char *id);
+extern  VOID *          new(unsigned int n);
 extern  char *          strsto(const char *str);
-extern	int		symeq(const char *p1, const char *p2, int flag);
-extern	VOID		syminit(void);
-extern	VOID		symglob(void);
+extern  int             symeq(const char *p1, const char *p2, int flag);
+extern  VOID            syminit(void);
+extern  VOID            symglob(void);
 
 /* assubr.c */
-extern	VOID		aerr(void);
-extern	VOID		diag(void);
-extern	VOID		err(int c);
-extern	char *		geterr(int c);
-extern	VOID		qerr(void);
-extern	VOID		rerr(void);
+extern  VOID            aerr(void);
+extern  VOID            diag(void);
+extern  VOID            err(int c);
+extern  char *          geterr(int c);
+extern  VOID            qerr(void);
+extern  VOID            rerr(void);
 /* sdas specific */
 extern  VOID            warnBanner(void);
 /* end sdas specific */
 
 /* asexpr.c */
-extern	VOID		abscheck(struct expr *esp);
-extern	a_uint		absexpr(void);
-extern	VOID		clrexpr(struct expr *esp);
-extern	int		digit(int c, int r);
-extern	VOID		expr(struct expr *esp, int n);
-extern	int		is_abs(struct expr *esp);
-extern	int		oprio(int c);
-extern	VOID		term(struct expr *esp);
+extern  VOID            abscheck(struct expr *esp);
+extern  a_uint          absexpr(void);
+extern  VOID            clrexpr(struct expr *esp);
+extern  int             digit(int c, int r);
+extern  VOID            expr(struct expr *esp, int n);
+extern  int             is_abs(struct expr *esp);
+extern  int             oprio(int c);
+extern  VOID            term(struct expr *esp);
 
 /* asdbg */
 extern  VOID            DefineNoICE_Line(void);
 extern  VOID            DefineSDCC_Line(void);
 
 /* aslist.c */
-extern	VOID		list(void);
-extern	VOID		list1(char *wp, int *wpt, int nb, int f);
-extern	VOID		list2(int t);
-extern	VOID		lstsym(FILE *fp);
-extern	VOID		slew(FILE *fp, int flag);
+extern  VOID            list(void);
+extern  VOID            list1(char *wp, int *wpt, int nb, int f);
+extern  VOID            list2(int t);
+extern  VOID            lstsym(FILE *fp);
+extern  VOID            slew(FILE *fp, int flag);
 
 /* asout.c */
-extern	int		lobyte(a_uint v);
-extern	int		hibyte(a_uint v);
-extern	VOID		outab(int v);
-extern	VOID		out(char *p, int n);
-extern	VOID		outarea(struct area *ap);
-extern	VOID		outall(void);
-extern	VOID		outdot(void);
-extern	VOID		outbuf(char *s);
-extern	VOID		outchk(int nt, int nr);
-extern	VOID		outgsd(void);
-extern	VOID		outsym(struct sym *sp);
-extern	VOID		outrb(struct expr *esp, int r);
+extern  int             lobyte(a_uint v);
+extern  int             hibyte(a_uint v);
+extern  VOID            outab(int v);
+extern  VOID            out(char *p, int n);
+extern  VOID            outarea(struct area *ap);
+extern  VOID            outall(void);
+extern  VOID            outdot(void);
+extern  VOID            outbuf(char *s);
+extern  VOID            outchk(int nt, int nr);
+extern  VOID            outgsd(void);
+extern  VOID            outsym(struct sym *sp);
+extern  VOID            outrb(struct expr *esp, int r);
 extern  VOID            outrw(struct expr *esp, int r);
-extern	VOID		out_lb(a_uint v, int t);
-extern	VOID		out_lw(a_uint v, int t);
-extern	VOID		out_rw(a_uint v);
+extern  VOID            out_lb(a_uint v, int t);
+extern  VOID            out_lw(a_uint v, int t);
+extern  VOID            out_rw(a_uint v);
 extern  VOID            out_tw(a_uint n);
 /* sdas specific */
 extern  int             byte3(int);
@@ -759,9 +807,9 @@ extern  VOID            outdp(struct area *, struct expr *);
 /* Machine dependent variables */
 
 extern  int             hilo;
-extern	char *		cpu;
-extern	char *		dsft;
-extern	struct	mne	mne[];
+extern  char *          cpu;
+extern  char *          dsft;
+extern  struct  mne     mne[];
 
 /* Machine dependent functions */
 
@@ -889,4 +937,3 @@ extern  int as_strcmpi();
 extern  int as_strncmpi();
 /* end sdas specific */
 #endif
-

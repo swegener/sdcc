@@ -1805,7 +1805,7 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
 
   if (isPtr (pair))
     {
-      if (pairId == PAIR_HL || pairId == PAIR_IY)
+      if (pairId == PAIR_HL)
         {
           if (pairId == PAIR_HL && base[0] == '0')      // Ugly workaround
             {
@@ -1824,16 +1824,6 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
               if (!regalloc_dry_run && _G.pairs[pairId].base && !strcmp (_G.pairs[pairId].base, base))  // Todo: Exact cost.
                 {
                   if (pairId == PAIR_HL && abs (_G.pairs[pairId].offset - offset) < 3)
-                    {
-                      adjustPair (pair, &_G.pairs[pairId].offset, offset);
-                      goto adjusted;
-                    }
-                  /* This was good for pointer accesses, but caused bugs when iy is used for other things. Disable for now.
-                  if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
-                    {
-                      goto adjusted;
-                    }*/
-                  if (pairId == PAIR_IY && abs (_G.pairs[pairId].offset - offset) < 1)
                     {
                       adjustPair (pair, &_G.pairs[pairId].offset, offset);
                       goto adjusted;

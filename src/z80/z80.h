@@ -39,7 +39,6 @@ extern Z80_OPTS z80_opts;
 
 #define IY_RESERVED (z80_opts.reserveIY)
 
-#define OPTRALLOC_REMAT (!IS_GB)
 #define OPTRALLOC_HL (!IS_GB)
 #define OPTRALLOC_IY !(IY_RESERVED || IS_GB)
 

@@ -1,3 +1,11 @@
+2012-09-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fixed bug #3566191 by disabling register tracking for iy.
+	* src/z80/z80.h,
+	  src/z80/ralloc.c:
+	  Enabled rematerialization by register allocation for gbz80.
+
 2012-09-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/inline.c: added test for bug #3564755

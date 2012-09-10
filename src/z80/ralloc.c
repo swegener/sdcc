@@ -2935,14 +2935,6 @@ serialRegMark (eBBlock ** ebbs, int count)
                   continue;
                 }
 
-              /* Rematerialization should be handled by the new allocator instead, but too inefficient when using an inexact cost function */
-              if (!OPTRALLOC_REMAT && sym->remat)
-                {
-                  D (D_ALLOC, ("serialRegAssign: \"remat spill\"\n"));
-                  spillThis (sym);
-                  continue;
-                }
-
               if (max_alloc_bytes >= sym->nRegs)
                 {
                   sym->for_newralloc = 1;

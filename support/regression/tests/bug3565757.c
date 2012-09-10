@@ -19,7 +19,9 @@ struct edge_t
 	uint_fast8_t v[2];
 	edge_index_t prev;
 	edge_index_t next;
+#ifndef __SDCC_WEIRD_BOOL
 	bool in_stix;
+#endif
 };
 
 struct edge_t edges[4];

@@ -165,6 +165,38 @@ inline char inlined_function (void)
 extern char (*inlined_function_pointer) (void);
 #endif
 
+/*--------------
+    bug 3564755
+*/
+
+static char a_3564755;
+static char b_3564755;
+
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390)
+#define BIT_T __bit
+#else
+#define BIT_T char
+#endif
+
+static inline BIT_T
+condition_func()
+{
+  return (a_3564755 == b_3564755);
+}
+
+void
+bug_3564755 (void)
+{
+  a_3564755 = 1;
+  b_3564755 = 250;
+  
+  while (!condition_func()) /* inlined function returning bit caused segfault */
+    {
+      b_3564755 += 1;
+    }
+  ASSERT(a_3564755 == b_3564755);  
+}    
+
 /*--------------*/
 
 void
@@ -178,4 +210,5 @@ testInline (void)
   bug_1717305 ();
   bug_1767885 ();
   bug_1864577 ();
+  bug_3564755 ();
 }

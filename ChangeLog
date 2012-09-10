@@ -3,6 +3,7 @@
 	* support/regression/tests/inline.c: added test for bug #3564755
 	* support/regression/tests/bug3565757.c: temporarily disabled bool
 	  in struct
+	* src/SDCCast.c: fixed bugs #3566114 and #3539508 
 
 2012-09-09 Borut Razem <borut.razem AT gmail.com>
 

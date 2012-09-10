@@ -3678,6 +3678,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->right = addCast (tree->right, resultTypeProp, TRUE);
           TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op));
         }
+      if (IS_LITERAL (TETYPE (tree)))
+        {
+          if (TTYPE (tree) == LTYPE (tree))
+            TETYPE (tree) = getSpec (TTYPE (tree) = copyLinkChain (TTYPE (tree)));
+          SPEC_SCLS (TETYPE (tree)) = 0;
+        }
 
       return tree;
 
@@ -3772,6 +3778,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->right = addCast (tree->right, resultTypeProp, TRUE);
 
           TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op));
+        }
+      if (IS_LITERAL (TETYPE (tree)))
+        {
+          if (TTYPE (tree) == LTYPE (tree))
+            TETYPE (tree) = getSpec (TTYPE (tree) = copyLinkChain (TTYPE (tree)));
+          SPEC_SCLS (TETYPE (tree)) = 0;
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;

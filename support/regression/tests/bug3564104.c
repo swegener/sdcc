@@ -1,16 +1,19 @@
 /*
-   bugWHATEVER.c
+   bug3564104.c
 */
 
 #include <testfwk.h>
 
 #include <stdint.h>
 
+#ifdef __SDCC
+#pragma disable_warning 127
+#endif
+
 uintptr_t array[4];
 
 int i;
 
-#if 0
 void g(const void *p)
 {
 	array[i++] = (uintptr_t)(p);
@@ -30,11 +33,9 @@ void f2(uintptr_t base, const char *message)
 		g((const void *)(tmp));
 	}
 }
-#endif
 
 void testBug(void)
 {
-#if 0
 	char a[] = {10, 20, 30, 40, 0};
 
 	i = 0;
@@ -52,6 +53,5 @@ void testBug(void)
 	ASSERT(array[1] == 20 * 8);
 	ASSERT(array[2] == 30 * 8);
 	ASSERT(array[3] == 40 * 8);
-#endif
 }
 

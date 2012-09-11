@@ -1,6 +1,7 @@
 2012-09-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (computeType): fixed bug #3564104
+	* support/regression/tests/bug3564104: reenabled test
 
 2012-09-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

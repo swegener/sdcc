@@ -2224,6 +2224,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
     case RESULT_TYPE_INT:
     case RESULT_TYPE_NONE:
     case RESULT_TYPE_OTHER:
+    case RESULT_TYPE_GPTR:
       if (!IS_SPEC (rType))
         {
           return rType;

@@ -340,6 +340,7 @@ void setOperandType (operand *, sym_link *);
 bool isOperandInFarSpace (operand *);
 bool isOperandInPagedSpace (operand *);
 bool isOperandInDirSpace (operand *);
+bool isOperandInBitSpace (operand *);
 bool isOperandInCodeSpace (operand *);
 operand *opFromOpWithDU (operand *, bitVect *, bitVect *);
 iCode *copyiCode (iCode *);

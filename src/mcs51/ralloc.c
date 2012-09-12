@@ -2449,6 +2449,8 @@ static iCode *
 packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 {
   iCode *dic, *sic;
+  sym_link *type;
+  int usingCarry=0;
 
   /* if returning a literal then do nothing */
   if (!IS_ITEMP (op))
@@ -2460,8 +2462,10 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   /* only upto 2 bytes since we cannot predict
      the usage of b, & acc */
-  if (getSize (operandType (op)) > (fReturnSizeMCS51 - 2))
+  type = operandType (op);
+  if (getSize (type) > (fReturnSizeMCS51 - 2))
     return NULL;
+  usingCarry = IS_BIT(type);
 
   if (ic->op != RETURN && ic->op != SEND && !POINTER_SET (ic) && !POINTER_GET (ic))
     return NULL;
@@ -2596,6 +2600,19 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
       if (isOperandOnStack (IC_LEFT (dic)) || isOperandOnStack (IC_RIGHT (dic)) || isOperandOnStack (IC_RESULT (dic)))
         {
           return NULL;
+        }
+      if (usingCarry)
+        {
+          if (isOperandInBitSpace (IC_LEFT (dic)) ||
+              isOperandInBitSpace (IC_RIGHT (dic)) ||
+              isOperandInBitSpace (IC_RESULT (dic)))
+            {
+              return NULL;
+            }
+          if (dic->op != SEND || dic->op != IPUSH || dic->op != '=')
+            {
+              return NULL;
+            }
         }
     }
 

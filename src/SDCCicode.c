@@ -1002,6 +1002,34 @@ isOperandInDirSpace (operand * op)
   return (IN_DIRSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
 }
 
+/*-----------------------------------------------------------------*/
+/* isOperandInBitSpace - will return true if operand is in bitSpace */
+/*-----------------------------------------------------------------*/
+bool
+isOperandInBitSpace (operand * op)
+{
+  sym_link *etype;
+
+  if (!op)
+    return FALSE;
+
+  if (!IS_SYMOP (op))
+    return FALSE;
+
+  if (!IS_TRUE_SYMOP (op))
+    {
+      if (SPIL_LOC (op))
+        etype = SPIL_LOC (op)->etype;
+      else
+        return FALSE;
+    }
+  else
+    {
+      etype = getSpec (operandType (op));
+    }
+  return (IN_BITSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
+}
+
 /*--------------------------------------------------------------------*/
 /* isOperandInCodeSpace - will return true if operand is in codeSpace */
 /*--------------------------------------------------------------------*/

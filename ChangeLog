@@ -1,7 +1,13 @@
+2012-09-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.h,
+	* src/SDCCicode.c (isOperandInBitSpace): new function
+	* src/mcs51/ralloc.c (packRegsForOneuse): fixed bug #3564969
+
 2012-09-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (computeType): fixed bug #3564104
-	* support/regression/tests/bug3564104: reenabled test
+	* support/regression/tests/bug3564104.c: reenabled test
 
 2012-09-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

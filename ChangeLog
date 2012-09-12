@@ -1,3 +1,8 @@
+2012-09-12 Leland Morrison <enigmalee AT sourceforge.net>
+
+	* sdas/asz80/z80.h, sdas/asz80/z80pst.c, sdas/asz80/z80mch.c,
+	* sdas/asz80/z80adr.c: added support for undocument z80 instructions
+	
 2012-09-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.h,

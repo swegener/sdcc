@@ -106,6 +106,7 @@ struct  mne     mne[] = {
     { NULL,     "rrc",          S_RL,           0,      0x08 },
     { NULL,     "sla",          S_RL,           0,      0x20 },
     { NULL,     "sra",          S_RL,           0,      0x28 },
+    { NULL,     "sll",          S_RL_UNDOCD,    0,      0x30 },
     { NULL,     "srl",          S_RL,           0,      0x38 },
 
     { NULL,     "rst",          S_RST,          0,      0xC7 },
@@ -147,6 +148,8 @@ struct  mne     mne[] = {
     { NULL,     "retn",         S_INH2,         0,      0x45 },
     { NULL,     "rld",          S_INH2,         0,      0x6F },
     { NULL,     "rrd",          S_INH2,         0,      0x67 },
+
+    { NULL,	".allow_undocumented", X_UNDOCD,	0,	0 },
 
         /* 64180 */
 

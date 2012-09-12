@@ -93,6 +93,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	S_R16X	34
 #define	S_CND	35
 #define	S_FLAG	36
+#define S_R8U1  37
+#define S_R8U2  38
 
 /*
  * Indexing modes
@@ -135,6 +137,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #define	S_SUB	81
 #define	S_SBC	82
 
+#define S_RL_UNDOCD  85
+#define X_UNDOCD 89
+
 /*
  * HD64180 Instructions
  */
@@ -154,6 +159,9 @@ struct adsym
 
 extern	struct	adsym	R8[];
 extern	struct	adsym	R8X[];
+extern	struct	adsym	R8U1[];
+extern	struct	adsym	R8U2[];
+
 extern	struct	adsym	R16[];
 extern	struct	adsym	R16X[];
 extern	struct	adsym	CND[];

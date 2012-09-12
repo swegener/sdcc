@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
 int     hd64;
+int	allow_undoc;
 
 /*
  * Process a machine op.
@@ -118,19 +119,23 @@ struct mne *mp;
                         aerr();
                 break;
 
-        case S_RL:
-                t1 = 0;
-                t2 = addr(&e2);
-                if (more()) {
-                        if ((t2 != S_R8) || (e2.e_addr != A))
-                                ++t1;
-                        comma(1);
-                        clrexpr(&e2);
-                        t2 = addr(&e2);
-                }
-                if (genop(0xCB, op, &e2, 0) || t1)
-                        aerr();
-                break;
+        case S_RL_UNDOCD:
+          if (!allow_undoc)
+            aerr( );
+          
+	case S_RL:
+		t1 = 0;
+		t2 = addr(&e2);
+		if (more()) {
+			if ((t2 != S_R8) || (e2.e_addr != A))
+				++t1;
+			comma(1);
+			clrexpr(&e2);
+			t2 = addr(&e2);
+		}
+		if (genop(0xCB, op, &e2, 0) || t1)
+			aerr();
+		break;
 
         case S_AND:
         case S_SUB:
@@ -143,9 +148,19 @@ struct mne *mp;
                         clrexpr(&e2);
                         t2 = addr(&e2);
                 }
+                
+                if ((!t1) && allow_undoc && ((t2 == S_R8U1) || (t2 == S_R8U2)))
+                  {
+                    /* undocumented instruction: and/sub  a,ixh|ixl|iyh|iyl */
+                    outab( ((t2 == S_R8U1) ? 0xDD : 0xFD ) );
+                    outab( op + e2.e_addr );
+                    break;
+                  }
+                
                 if (genop(0, op, &e2, 1) || t1)
                         aerr();
                 break;
+
 
         case S_ADD:
         case S_ADC:
@@ -157,11 +172,28 @@ struct mne *mp;
                         t2 = addr(&e2);
                 }
                 if (t2 == 0) {
+                  if (allow_undoc && ((t1 == S_R8U1) || (t1 == S_R8U2)))
+                    {
+                      /* undocumented instruction: add/adc/sbc  a,ixh|ixl|iyh|iyl */
+                      outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
+                      outab( op + e1.e_addr );
+                      break;
+                    }
+                  
                         if (genop(0, op, &e1, 1))
                                 aerr();
                         break;
                 }
                 if ((t1 == S_R8) && (e1.e_addr == A)) {
+                  
+                  if (allow_undoc && ((t2 == S_R8U1) || (t2 == S_R8U2)))
+                    {
+                      /* undocumented instruction: add/adc/sbc  a,ixh|ixl|iyh|iyl */
+                      outab( ((t2 == S_R8U1) ? 0xDD : 0xFD ) );
+                      outab( op + e2.e_addr );
+                      break;
+                    }
+
                         if (genop(0, op, &e2, 1))
                                 aerr();
                         break;
@@ -203,6 +235,7 @@ struct mne *mp;
                 aerr();
                 break;
 
+
         case S_LD:
                 t1 = addr(&e1);
                 comma(1);
@@ -217,6 +250,17 @@ struct mne *mp;
                                 break;
                         }
                 }
+                
+                if (allow_undoc &&
+                    ((t1 == S_R8U1) || (t1 == S_R8U2)) &&
+                    (t2 == S_IMMED))
+                  {
+                    outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
+                    outab((e1.e_addr<<3) | 0x06);
+                    outrb(&e2,0);
+                    break;                    
+                  }
+                
                 v1 = (int) e1.e_addr;
                 v2 = (int) e2.e_addr;
                 if ((t1 == S_R16) && (t2 == S_IMMED)) {
@@ -296,6 +340,34 @@ struct mne *mp;
                                 break;
                         }
                 }
+                
+                if ( (t1 == S_R8) &&
+                     allow_undoc &&
+                     ((t2 == S_R8U1) || (t2 == S_R8U2)) )
+                  {
+                    outab( ((t2 == S_R8U1) ? 0xDD : 0xFD ) );
+                    outab( (e1.e_addr << 3) | (0x40 + e2.e_addr) );
+                    break;                    
+                  }
+                if ( allow_undoc &&
+                     ((t1 == S_R8U1) || (t1 == S_R8U2)) &&
+                     (t2 == S_R8) )
+                  {
+                    if ( (e2.e_addr == H) || (e2.e_addr == L) )
+                      aerr();
+                    
+                    outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
+                    outab( (e1.e_addr << 3) | (0x40 + e2.e_addr) );
+                    break;                    
+                  }
+                if ( allow_undoc &&
+                     ((t1 == S_R8U1) &&  (t2 == S_R8U1)) || ((t1 == S_R8U2) &&  (t2 == S_R8U2)) )
+                  {
+                    outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
+                    outab( (e1.e_addr << 3) | (0x40 + e2.e_addr) );
+                    break;                    
+                  }
+                
                 aerr();
                 break;
 
@@ -359,35 +431,42 @@ struct mne *mp;
 
         case S_DEC:
         case S_INC:
-                t1 = addr(&e1);
-                v1 = (int) e1.e_addr;
-                if (t1 == S_R8) {
-                        outab(op|(v1<<3));
-                        break;
-                }
-                if (t1 == S_IDHL) {
-                        outab(op|0x30);
-                        break;
-                }
-                if (t1 != gixiy(t1)) {
-                        outab(op|0x30);
-                        outrb(&e1,0);
-                        break;
-                }
-                if (t1 == S_R16) {
-                        v1 = gixiy(v1);
-                        if (rf == S_INC) {
-                                outab(0x03|(v1<<4));
-                                break;
-                        }
-                        if (rf == S_DEC) {
-                                outab(0x0B|(v1<<4));
-                                break;
-                        }
-                }
-                aerr();
-                break;
-
+          t1 = addr(&e1);
+          v1 = (int) e1.e_addr;
+          if (t1 == S_R8) {
+            outab(op|(v1<<3));
+            break;
+          }
+          if (t1 == S_IDHL) {
+            outab(op|0x30);
+            break;
+          }
+          if (t1 != gixiy(t1)) {
+            outab(op|0x30);
+            outrb(&e1,0);
+            break;
+          }
+          if (t1 == S_R16) {
+            v1 = gixiy(v1);
+            if (rf == S_INC) {
+              outab(0x03|(v1<<4));
+              break;
+            }
+            if (rf == S_DEC) {
+              outab(0x0B|(v1<<4));
+              break;
+            }
+          }
+          if ((t1 == S_R8U1)||(t1 == S_R8U2))
+            {
+              outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
+              outab(op|(v1<<3));
+              break;
+            }
+          
+          aerr();
+          break;
+          
         case S_DJNZ:
         case S_JR:
                 if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
@@ -444,6 +523,10 @@ struct mne *mp;
                         break;
                 }
                 aerr();
+                break;
+
+        case X_UNDOCD:
+                ++allow_undoc;
                 break;
 
         case X_HD64:
@@ -630,4 +713,5 @@ VOID
 minit()
 {
         hd64 = 0;
+        allow_undoc = 0;
 }

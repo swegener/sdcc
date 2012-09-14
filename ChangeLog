@@ -1,8 +1,15 @@
+2012-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as8051/i51mch.c,
+	* sdas/as8051/i8051.h,
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asxxxx.h: another small step towards ASxxxx v5
+
 2012-09-12 Leland Morrison <enigmalee AT sourceforge.net>
 
 	* sdas/asz80/z80.h, sdas/asz80/z80pst.c, sdas/asz80/z80mch.c,
 	* sdas/asz80/z80adr.c: added support for undocument z80 instructions
-	
+
 2012-09-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.h,

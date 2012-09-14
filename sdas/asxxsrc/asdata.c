@@ -1,26 +1,36 @@
-/* asdata.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* asdata.c */
 
 /*
- * 28-Oct-97 JLH:
- *           - change s_id from [NCPS] to pointer (comment)
- *  2-Nov-97 JLH:
- *           - add jflag for debug control
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *
+ *      John L. Hartman (JLH)
+ *      jhartman@compuserve.com
+ *
+ *      Bill McKinnon (BM)
+ *      w_mckinnon@conknet.com
+ *
+ *      Mike McCarty
+ *      mike dot mccarty at sbcglobal dot net
  */
 
 #include <stdio.h>
@@ -59,7 +69,6 @@ int     ifcnd[MAXIF+1]; /*      array of IF statement condition
 int     iflvl[MAXIF+1]; /*      array of IF-ELSE-ENDIF flevel
                          *      values indexed by tlevel
                          */
-
 char    afn[FILSPC];            /*      afile temporary file name
                                  */
 char    srcfn[MAXFIL][FILSPC];  /*      array of source file names
@@ -70,7 +79,6 @@ char    incfn[MAXINC][FILSPC];  /*      array of include file names
                                  */
 int     incline[MAXINC];        /*      include line number
                                  */
-
 int     radix;          /*      current number conversion radix:
                          *      2 (binary), 8 (octal), 10 (decimal),
                          *      16 (hexadecimal)
@@ -84,25 +92,29 @@ int     lop;            /*      current line number on page
                          */
 int     pass;           /*      assembler pass number
                          */
-int     lflag;          /*      -l, generate listing flag
+int     aflag;          /*      -a, make all symbols global flag
+                         */
+int     cflag;          /*      -c, generate sdcdb debug info
+                         */
+int     fflag;          /*      -f(f), relocations flagged flag
                          */
 int     gflag;          /*      -g, make undefined symbols global flag
                          */
-int     aflag;          /*      -a, make all symbols global flag
+int     jflag;          /*      -j, generate debug information flag
+                         */
+int     lflag;          /*      -l, generate listing flag
                          */
 int     oflag;          /*      -o, generate relocatable output flag
                          */
-int     sflag;          /*      -s, generate symbol table flag
-                         */
 int     pflag;          /*      -p, enable listing pagination
+                         */
+int     sflag;          /*      -s, generate symbol table flag
                          */
 int     wflag;          /*      -w, enable wide listing format
                          */
-int     zflag;          /*      -z, disable symbol case sensitivity
-                         */
 int     xflag;          /*      -x, listing radix flag
                          */
-int     fflag;          /*      -f(f), relocations flagged flag
+int     zflag;          /*      -z, disable symbol case sensitivity
                          */
 a_uint  laddr;          /*      address of current assembler line
                          *      or value of .if argument
@@ -134,6 +146,8 @@ int     *cpt;           /*      pointer to assembler relocation type
 int     cbt[NCODE];     /*      array of assembler relocation types
                          *      describing the data in cb[]
                          */
+int     opcycles;       /*      opcode execution cycles
+                         */
 char    tb[NTITL];      /*      Title string buffer
                          */
 char    stb[NSBTL];     /*      Subtitle string buffer
@@ -142,14 +156,10 @@ char    stb[NSBTL];     /*      Subtitle string buffer
 char    symtbl[] = { "Symbol Table" };
 char    aretbl[] = { "Area Table" };
 
-char    module[NCPS];   /*      module name string
+char    module[NCPS+2]; /*      module name string
                          */
 /* sdas specific */
 int     org_cnt;        /*      .org directive counter
-                         */
-int     cflag;          /*      -c, generate sdcdb debug info
-                         */
-int     jflag;          /*      -j, generate debug information flag
                          */
 char    *optsdcc;       /*      sdcc compile options
                          */
@@ -227,11 +237,11 @@ struct  sym *symhash[NHASH];    /*      array of pointers to NHASH
  *      is a linked list of areas.  The initial default area
  *      is "_CODE" defined here, the next area structure
  *      will be linked to this structure through the structure
- *      element 'struct area *a_ep'.  The structure contains the
+ *      element 'struct area *a_ap'.  The structure contains the
  *      area name, area reference number ("_CODE" is 0) determined
  *      by the order of .area directives, area size determined
  *      from the total code and/or data in an area, area fuzz is
- *      an variable used to track pass to pass changes in the
+ *      a variable used to track pass to pass changes in the
  *      area size caused by variable length instruction formats,
  *      and area flags which specify the area's relocation type.
  *
@@ -264,8 +274,8 @@ FILE    *ifp[MAXINC];   /*      array of include-file file handles
                          */
 
 /*
- *      array of character types, one per
- *      ASCII character
+ *      an array of character types,
+ *      one per ASCII character
  */
 unsigned char   ctype[128] = {
 /*NUL*/ ILL,    ILL,    ILL,    ILL,    ILL,    ILL,    ILL,    ILL,

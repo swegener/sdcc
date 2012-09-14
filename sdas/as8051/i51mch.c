@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- *  Copyright (C) 1998-2009  Alan R. Baldwin
+ *  Copyright (C) 1998-2011  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@
  *      jhartman at compuserve dot com
  *      noice at noicedebugger dot com
  *
+ *  Benny Kim (2011/07/21)
+ *  bennykim at coreriver dot com
+ *  Fixed bugs in relative address with "."
  */
 
 #include "asxxxx.h"
@@ -36,17 +39,55 @@ char    *cpu    = "Intel 8051";
 char    *dsft   = "asm";
 
 /*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 8051 Cycle Count
+ *
+ *	opcycles = i51pg1[opcode]
+ */
+static char i51pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  12,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*10*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*20*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*30*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*40*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*50*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*60*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*70*/  24,24,24,24,12,24,12,12,12,12,12,12,12,12,12,12,
+/*80*/  24,24,24,24,48,24,24,24,24,24,24,24,24,24,24,24,
+/*90*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*A0*/  24,24,12,24,48,UN,24,24,24,24,24,24,24,24,24,24,
+/*B0*/  24,24,12,12,24,24,24,24,24,24,24,24,24,24,24,24,
+/*C0*/  24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*D0*/  24,24,12,12,12,24,12,12,24,24,24,24,24,24,24,24,
+/*E0*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*F0*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12
+};
+
+/*
  * Process machine ops.
  */
 VOID
 machine(struct mne *mp)
 {
-        unsigned op;
+        a_uint op;
         int t, t1, v1;
-        struct expr e, e1;
+        struct expr e, e1, e2;
 
         clrexpr(&e);
         clrexpr(&e1);
+        clrexpr(&e2);
 
         op = mp->m_valu;
         switch (mp->m_type) {
@@ -56,12 +97,11 @@ machine(struct mne *mp)
                 break;
 
         case S_JMP11:
-                /* ACALL or AJMP. In Flat24 mode, this is a
+                /*
+                 * ACALL or AJMP. In Flat24 mode, this is a
                  * 19 bit destination; in 8051 mode, this is a
                  * 11 bit destination.
-                 *
-                 * The opcode is merged with the address in a
-                 * hack-o-matic fashion by the linker.
+                 * Top 3 bits become the MSBs of the op-code.
                 */
                 expr(&e, 0);
                 if (flat24Mode) {
@@ -421,7 +461,7 @@ machine(struct mne *mp)
                 }
                 break;
 
-        case S_BITBR:
+        case S_BITBR:   /* JB, JBC, JNB bit,rel */
                 /* Branch on bit set/clear */
                 t = addr(&e);
                 if ((t != S_DIR) && (t != S_EXT))
@@ -429,8 +469,10 @@ machine(struct mne *mp)
                 /* sdcc svn rev #4994: fixed bug 1865114 */
                 comma(1);
                 expr(&e1, 0);
+
                 outab(op);
                 outrb(&e, R_PAG0);
+
                 if (mchpcr(&e1)) {
                         v1 = (int) (e1.e_addr - dot.s_addr - 1);
                         /* sdcc svn rev #602: Fix some path problems */
@@ -444,11 +486,12 @@ machine(struct mne *mp)
                         rerr();
                 break;
 
-        case S_BR:
+        case S_BR:   /* JC, JNC, JZ, JNZ */
                 /* Relative branch */
                 /* sdcc svn rev #4994: fixed bug 1865114 */
                 expr(&e1, 0);
                 outab(op);
+
                 if (mchpcr(&e1)) {
                         v1 = (int) (e1.e_addr - dot.s_addr - 1);
                         /* sdcc svn rev #602: Fix some path problems */
@@ -467,6 +510,11 @@ machine(struct mne *mp)
                 t = addr(&e);
                 comma(1);
                 t1 = addr(&e1);
+
+                /* Benny */
+                comma(1);
+                expr(&e2, 0);
+
                 switch (t) {
                 case S_A:
                         if (t1 == S_IMMED) {
@@ -501,19 +549,16 @@ machine(struct mne *mp)
                 }
 
                 /* branch destination */
-                comma(1);
-                clrexpr(&e1);
-                expr(&e1, 0);
-                if (mchpcr(&e1)) {
-                        v1 = (int) (e1.e_addr - dot.s_addr - 1);
+                if (mchpcr(&e2)) {
+                        v1 = (int) (e2.e_addr - dot.s_addr - 1);
                         /* sdcc svn rev #602: Fix some path problems */
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
                 } else {
-                        outrb(&e1, R_PCR);
+                        outrb(&e2, R_PCR);
                 }
-                if (e1.e_mode != S_USER)
+                if (e2.e_mode != S_USER)
                         rerr();
                 break;
 
@@ -523,8 +568,8 @@ machine(struct mne *mp)
                 /* sdcc svn rev #4994: fixed bug 1865114 */
                 comma(1);
                 expr(&e1, 0);
-                switch (t) {
 
+                switch (t) {
                 case S_DIR:
                 case S_EXT:
                         outab(op + 5);
@@ -674,6 +719,10 @@ machine(struct mne *mp)
         /* direct */
         case S_DIRECT:
                 t = addr(&e);
+                if (t == S_A) {
+                        e.e_addr = 0xE0;
+                        e.e_mode = S_DIR;
+                } else
                 if ((t != S_DIR) && (t != S_EXT)) {
                         aerr();
                         break;
@@ -700,7 +749,12 @@ machine(struct mne *mp)
                 break;
 
         default:
+                opcycles = OPCY_ERR;
                 err('o');
+                break;
+        }
+        if (opcycles == OPCY_NONE) {
+                opcycles = i51pg1[cb[0] & 0xFF];
         }
 }
 
@@ -744,6 +798,11 @@ minit(void)
         char *p;
 
         /*
+         * Byte Order
+         */
+        hilo = 1;
+
+        /*
          * First time only:
          *      add the pre-defined symbols to the table
          *      as local symbols.
@@ -768,6 +827,7 @@ minit(void)
                                 if (sp->s_type == S_NEW) {
                                         sp->s_addr = pd->value;
                                         sp->s_type = S_USER;
+                                        sp->s_flag = S_LCL | S_ASG;
                                 }
                         }
                         pd++;

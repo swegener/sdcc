@@ -165,11 +165,11 @@
  */
 #include <limits.h>
 #ifndef PATH_MAX                                /* POSIX, but not required      */
-#if defined(_MSC_VER) || defined(__BORLANDC__)  /* Microsoft C or Borland C*/
-#define PATH_MAX        _MAX_PATH
-#else
-#define PATH_MAX        FILENAME_MAX            /* define a reasonable value */
-#endif
+#  if defined(_MSC_VER) || defined(__BORLANDC__)  /* Microsoft C or Borland C*/
+#    define PATH_MAX        _MAX_PATH
+#  else
+#    define PATH_MAX        FILENAME_MAX            /* define a reasonable value */
+#  endif
 #endif
 
 #ifdef _WIN32           /* WIN32 native */
@@ -219,6 +219,12 @@
 #define BLIST       3           /* Address only with allocation */
 #define CLIST       4           /* Code */
 #define ELIST       5           /* Equate only */
+
+/*
+ * OPCY_NONE bit set signifies no opcode cycles set.
+ */
+#define OPCY_NONE       ((char) 0x80)   /* Opcode Cycle Count Not Set */
+#define OPCY_MASK       ((char) 0x7F)   /* Opcode Cycle Count MASK */
 
 /*
  * Internal Definitions
@@ -418,10 +424,10 @@ struct  sym
 
 #define S_EOL           010     /* End mark for ___pst files */
 
-#define S_GBL           01      /* Global */
-#define S_ASG           02      /* Assigned */
-#define S_MDF           04      /* Mult. def */
-
+#define S_LCL           001     /* Local Variable */
+#define S_GBL           002     /* Global Variable */
+#define S_ASG           004     /* Assigned Value */
+#define S_MDF           010     /* Multiple Definition */
 
 #define S_NEW           0       /* New Name (External) */
 #define S_USER          1       /* User Name (Assigned) */
@@ -602,6 +608,8 @@ extern  int     *cpt;           /*      pointer to assembler relocation type
 extern  int     cbt[NCODE];     /*      array of assembler relocation types
                                  *      describing the data in cb[]
                                  */
+extern  int     opcycles;       /*      opcode execution cycles
+                                 */
 extern  char    tb[NTITL];      /*      Title string buffer
                                  */
 extern  char    stb[NSBTL];     /*      Subtitle string buffer
@@ -610,7 +618,7 @@ extern  char    symtbl[];       /*      string "Symbol Table"
                                  */
 extern  char    aretbl[];       /*      string "Area Table"
                                  */
-extern  char    module[NCPS];   /*      module name string
+extern  char    module[NCPS+2]; /*      module name string
                                  */
 extern  FILE    *lfp;           /*      list output file handle
                                  */

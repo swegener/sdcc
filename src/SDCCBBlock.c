@@ -337,9 +337,17 @@ iCode2eBBlock (iCode * ic)
   /* if this is a function call */
   if (ic->op == CALL || ic->op == PCALL)
     {
+      sym_link *type = operandType (IC_LEFT (ic));
       ebb->hasFcall = 1;
       if (currFunc)
         FUNC_HASFCALL (currFunc->type) = 1;
+      if (IS_FUNCPTR (type))
+        type = type->next;
+      if (type && FUNC_ISNORETURN (type))
+        {
+          ebb->ech = ebb->sch;
+          return ebb;
+        }
     }
 
   if ((ic->next && ic->next->op == LABEL) || !ic->next)
@@ -358,9 +366,14 @@ iCode2eBBlock (iCode * ic)
       /* if this is a function call */
       if (loop->op == CALL || loop->op == PCALL)
         {
+          sym_link *type = operandType (IC_LEFT (loop));
           ebb->hasFcall = 1;
           if (currFunc)
             FUNC_HASFCALL (currFunc->type) = 1;
+          if (IS_FUNCPTR (type))
+            type = type->next;
+          if (type && FUNC_ISNORETURN (type))
+            break;
         }
 
       /* if the next one is a label */

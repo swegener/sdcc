@@ -1,3 +1,8 @@
+2012-09-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCBBlock.c (iCode2eBBlock),
+	* src/SDCCcflow.c (eBBSuccessors): fixed bug #3564649
+
 2012-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as8051/i51mch.c,

@@ -126,7 +126,17 @@ eBBSuccessors (ebbIndex * ebbi)
 
 	  if (ebbs[i]->ech)
 	    {
-	      if (ebbs[i]->ech->op != GOTO &&
+              bool foundNoReturn = FALSE;
+              if (ebbs[i]->ech->op == CALL || ebbs[i]->ech->op == PCALL)
+                {
+                  sym_link *type = operandType (IC_LEFT (ebbs[i]->ech));
+                  if (IS_FUNCPTR (type))
+                    type = type->next;
+                  if (type && FUNC_ISNORETURN (type))
+                    foundNoReturn = TRUE;
+                }
+	      if (!foundNoReturn &&
+                 ebbs[i]->ech->op != GOTO &&
 		  ebbs[i]->ech->op != RETURN &&
 		  ebbs[i]->ech->op != JUMPTABLE)
 		{

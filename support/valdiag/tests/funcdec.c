@@ -21,7 +21,7 @@ void foo(int a) {a; }	/* ERROR */
 #endif
 
 #if defined(SDCC) && !(defined(__z80) || defined(__gbz80))
-#define REENTRANT reentrant
+#define REENTRANT __reentrant
 #define HAS_REENTRANT 1
 #else
 #define REENTRANT

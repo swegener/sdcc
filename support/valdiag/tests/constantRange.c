@@ -135,7 +135,9 @@ void foo(void)
 }
 #endif
 
-#ifdef TEST3
+/* This test has been disabled. I don't think that signed/unsigned bool */
+/* is a valid type. -- EEP */
+#ifdef TEST3_DISABLED
 #include <stdbool.h>
 
 void foo(void)

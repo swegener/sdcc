@@ -41,12 +41,11 @@ clean-port:
 	rm -rf $(PORT_BUILD_DIR)
 
 $(PORT_RESULTS_DIR)/%.out: $(TESTS_DIR)/%.c
-	echo Processing $<
-	python $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* > $@
+	python $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* $(srcdir)/../../device/include > $@
+	cat $@ | python $(srcdir)/../regression/compact-results.py
 
 port-results: port-dirs $(PORT_RESULTS)
-	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | \
-	python $(srcdir)/../regression/collate-results.py`
+	cat $(PORT_RESULTS) | 	python $(srcdir)/../regression/collate-results.py $(PORT)
 
 port-dirs:
 	mkdir -p $(PORT_RESULTS_DIR)

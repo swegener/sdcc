@@ -1,3 +1,13 @@
+2012-09-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/valdiag/tests/tentdecl.c,
+	* support/valdiag/tests/primtypes.c,
+	* support/valdiag/tests/constantRange.c,
+	* support/valdiag/tests/funcdec.c,
+	* support/valdiag/tests/overflow.c,
+	* support/valdiag/Makefile.in,
+	* support/valdiag/valdiag.py: update to work with current SDCC version
+
 2012-09-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCBBlock.c (iCode2eBBlock),

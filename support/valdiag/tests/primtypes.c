@@ -79,7 +79,7 @@ unsigned double a;		/* ERROR */
 #endif
 
 #ifdef TESTbit
-bit a;			/* ERROR(__z80||__gbz80||__hc08||PORT_HOST) */
+__bit a;			/* ERROR(__z80||__gbz80||__hc08||PORT_HOST) */
 #endif
 
 #ifdef TESTsu1

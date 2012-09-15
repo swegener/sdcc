@@ -61,12 +61,18 @@ int a=1;	/* IGNORE */
 int a=1;	/* ERROR */
 #endif
 
+#if defined(__SDCC)
+#define AT(x) __at x
+#else
+#define AT(x)
+#endif
+
 #if defined(__z80) || defined(__gbz80)
 #define XDATA
 #define DATA
 #else
-#define XDATA xdata
-#define DATA data
+#define XDATA __xdata
+#define DATA __data
 #endif
 
 #ifdef TEST9
@@ -113,7 +119,7 @@ XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 
 #ifdef TEST10
 #if defined(SDCC) && !(defined(__z80) || defined(__gbz80))
-extern volatile XDATA at 0 int a; /* IGNORE */
+extern volatile XDATA AT(0) int a; /* IGNORE */
 volatile XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif

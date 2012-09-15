@@ -25,8 +25,8 @@ void foo(void)
   i = uc << 16;		/* WARNING(SDCC) */
 
   l = l  << 31;
-  l = l  << 32;		/* WARNING */
-  l = ul << 32;		/* WARNING */
+  l = l  << 32;		/* WARNING(SDCC) */ /* IGNORE(GCC) */
+  l = ul << 32;		/* WARNING(SDCC) */ /* IGNORE(GCC) */
 }
 #endif
 
@@ -43,15 +43,19 @@ void foo(void)
   i = 1  >>  8;		/* WARN___(SDCC) */
 #endif
 
-  i = i  >> 40;		/* WARNING(GCC)  */
+#if 0
+  i = i  >> 40;		/* WARN___(GCC)  */
+#endif
 
   i = u  >> 15;
   i = u  >> 16;		/* WARNING(SDCC) */
 
-  i = l  >> 40;		/* WARNING(GCC)  */
+#if 0
+  i = l  >> 40;		/* WARN___(GCC)  */
+#endif
 
   i = ul >> 31;
-  i = ul >> 32;		/* WARNING       */
+  i = ul >> 32;		/* WARNING(SDCC) */ /* IGNORE(GCC) */
 }
 #endif
 

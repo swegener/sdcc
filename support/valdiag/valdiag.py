@@ -46,6 +46,7 @@ sdcc = {
     "CCFLAGS":"-c -m{port}",
     "CCDEF":"-D",
     "CCOUTPUT":"-o",
+    "CCINCLUDEDIR":"-I",
     "C89":"--std-sdcc89",
     "C99":"--std-sdcc99",
     "defined": {
@@ -112,7 +113,7 @@ testmodes = {
         "port":"pic16"
     }
 }
-    
+
 
 def evalQualifier(expr):
     global macrodefs
@@ -135,7 +136,7 @@ def evalQualifier(expr):
     expr = string.replace(expr,"||"," or ");
     expr = string.replace(expr,"!"," not ");
     return eval(expr)
-    
+
 def expandPyExpr(expr):
     tokens = re.split("({|})", expr)
     for tokenindex in range(1,len(tokens)):
@@ -145,7 +146,7 @@ def expandPyExpr(expr):
             tokens[tokenindex+1]=""
     expandedExpr = string.join(tokens,"")
     return expandedExpr
-    
+
 def addDefines(deflist):
     for define in deflist.keys():
         expandeddef = expandPyExpr(define)
@@ -156,17 +157,17 @@ def parseInputfile(inputfilename):
     testcases = {}
     testname = ""
     linenumber = 1
-    
+
     # Find the test cases and tests in this file
     for line in inputfile.readlines():
-        
+
         # See if a new testcase is being defined
         p = string.find(line, "TEST")
         if p>=0:
             testname = string.split(line[p:])[0]
             if not testcases.has_key(testname):
                 testcases[testname] = {}
-        
+
         # See if a new test is being defined
         for testtype in ["ERROR", "WARNING", "IGNORE"]:
             p = string.find(line, testtype);
@@ -183,9 +184,9 @@ def parseInputfile(inputfilename):
                     if not linenumber in testcases[testname]:
                         testcases[testname][linenumber]=[]
                     testcases[testname][linenumber].append(testtype)
-        
+
         linenumber = linenumber + 1
-    
+
     inputfile.close()
     return testcases
 
@@ -193,11 +194,11 @@ def parseResults(output):
     results = {}
     for line in output:
         print line,
-        
+
         if string.count(line, "SIGSEG"):
             results[0] = ["FAULT", string.strip(line)]
             continue
-        
+
         # look for something of the form:
         #   filename:line:message
         msg = string.split(line,":",2)
@@ -205,7 +206,7 @@ def parseResults(output):
         if msg[0]!=inputfilename: continue
         if len(msg[1])==0: continue
         if not msg[1][0] in string.digits: continue
-        
+
         # it's in the right form; parse it
         linenumber = int(msg[1])
         msgtype = "UNKNOWN"
@@ -214,9 +215,9 @@ def parseResults(output):
             msgtype = "ERROR"
         if string.count(uppermsg,"WARNING"):
             msgtype = "WARNING"
-	msgtext = string.strip(msg[2])
+        msgtext = string.strip(msg[2])
         ignore = 0
-	for ignoreExpr in ignoreExprList:
+        for ignoreExpr in ignoreExprList:
            if re.search(ignoreExpr,msgtext)!=None:
                ignore = 1
         if not ignore:
@@ -229,11 +230,11 @@ def showUsage():
     for testmodename in testmodes.keys():
         print "   %s" % testmodename
     sys.exit(1)
-      
-# Start here         
+
+# Start here
 if len(sys.argv)<3:
     showUsage()
-    
+
 testmodename = sys.argv[1]
 if not testmodename in testmodes:
     print "Unknown test mode '%s'" % testmodename
@@ -249,6 +250,9 @@ if "flags" in testmode:
 if len(sys.argv)>=4:
     if "CCOUTPUT" in compilermode:
         ccflags = string.join([ccflags,expandPyExpr(compilermode["CCOUTPUT"]),sys.argv[3]])
+if len(sys.argv)>=5:
+    if "CCINCLUDEDIR" in compilermode:
+        ccflags = string.join([ccflags,expandPyExpr(compilermode["CCINCLUDEDIR"]),sys.argv[4]])
 if "defined" in compilermode:
     addDefines(compilermode["defined"])
 if "defined" in testmode:
@@ -259,6 +263,8 @@ else:
     ignoreExprList = []
 
 inputfilename = sys.argv[2]
+inputfilenameshort = os.path.basename(inputfilename)
+
 try:
     testcases = parseInputfile(inputfilename)
 except IOError:
@@ -269,7 +275,10 @@ casecount = len(testcases.keys())
 testcount = 0
 failurecount = 0
 
+print "--- Running: %s " % inputfilenameshort
 for testname in testcases.keys():
+    if string.find(testname,"DISABLED"):
+      continue
     ccdef = compilermode["CCDEF"]+testname
     if testname[-3:] == "C89":
         ccstd = compilermode["C89"]
@@ -283,9 +292,9 @@ for testname in testcases.keys():
     spawn = popen2.Popen4(cmd)
     spawn.wait()
     output = spawn.fromchild.readlines()
-    
+
     results = parseResults(output)
-    
+
     if len(testcases[testname])==0:
         testcount = testcount + 1 #implicit test for no errors
 

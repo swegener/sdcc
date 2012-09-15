@@ -1,3 +1,10 @@
+2012-09-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  More efficient stack pointer restoration.
+	* support/regression/tests/bug3564649.c:
+	  Regression test for bug #3564649.
+
 2012-09-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/valdiag/tests/tentdecl.c,

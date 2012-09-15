@@ -4482,23 +4482,43 @@ genEndFunction (iCode * ic)
     }
 
   /* PENDING: calleeSave */
-  if (!IS_GB && _G.omitFramePtr)
+  if (_G.stack.offset <= 1 ||
+    _G.stack.offset <= 2 && !IS_GB && optimize.codeSize ||
+    _G.stack.offset <= 7 && !IS_GB && _G.omitFramePtr ||
+    _G.stack.offset <= 14 && !IS_GB && _G.omitFramePtr && optimize.codeSize ||
+    _G.stack.offset <= 127 && IS_RAB ||
+    _G.stack.offset <= 763 && IS_RAB && _G.omitFramePtr)
     {
-      if (_G.stack.offset)
-        emit2 ("!ldaspsp", _G.stack.offset);
+      int stack = _G.stack.offset;
+
+      while (stack > 1)
+        {
+          if (IS_RAB && (!optimize.codeSize || stack > 2))
+            {
+              int d = (stack < 127 ? stack : 127);
+              emit2 ("add sp, #%d", d);
+              stack -= d;
+            }
+          else
+            {
+              emit2 ("pop af");
+              stack -= 2;
+            }
+        }
+      if (stack)
+        emit2 ("inc sp");
+
+      if(!IS_GB && !_G.omitFramePtr)
+        emit2 ("pop ix");
     }
+  else if (!IS_GB && _G.omitFramePtr)
+    emit2 ("!ldaspsp", _G.stack.offset);
   else if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
-    {
-      emit2 ("!leavexl", _G.stack.offset);
-    }
+    emit2 ("!leavexl", _G.stack.offset);
   else if (_G.stack.offset)
-    {
-      emit2 ("!leavex", _G.stack.offset);
-    }
+    emit2 ("!leavex", _G.stack.offset);
   else
-    {
-      emit2 ("!leave");
-    }
+    emit2 ("!leave");
 
   if (_G.calleeSaves.pushedDE)
     {

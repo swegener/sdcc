@@ -1,3 +1,10 @@
+2012-09-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCglue.c (emitRegularMap, printIvalType, printIvalBitFields),
+	* src/SDCCast.c (constExprValue): fixed bug #3560781 and related
+	* support/regression/tests/bug3564649.c: ensure noreturn function
+	  does not return
+
 2012-09-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

@@ -1764,7 +1764,7 @@ constExprValue (ast * cexpr, int check)
         }
 
       if (check)
-        werror (E_CONST_EXPECTED, "found expression");
+        werrorfl (cexpr->filename, cexpr->lineno, E_CONST_EXPECTED, "found expression");
 
       return NULL;
     }
@@ -2333,6 +2333,22 @@ searchLitOp (ast * tree, ast ** parent, const char *ops)
         }
     }
   return NULL;
+}
+
+const char *
+getResultTypeName (RESULT_TYPE resultType)
+{
+  switch (resultType)
+  {
+    case RESULT_TYPE_NONE: return "RESULT_TYPE_NONE";
+    case RESULT_TYPE_BOOL: return "RESULT_TYPE_BOOL";
+    case RESULT_TYPE_CHAR: return "RESULT_TYPE_CHAR";
+    case RESULT_TYPE_INT: return "RESULT_TYPE_INT";
+    case RESULT_TYPE_OTHER: return "RESULT_TYPE_OTHER";
+    case RESULT_TYPE_IFX: return "RESULT_TYPE_IFX";
+    case RESULT_TYPE_GPTR: return "RESULT_TYPE_GPTR";
+  }
+  return "invalid result type";
 }
 
 /*-----------------------------------------------------------------*/

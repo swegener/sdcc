@@ -268,7 +268,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   // check if this is not a constant expression
                   if (!constExprTree (ival))
                     {
-                      werror (E_CONST_EXPECTED, "found expression");
+                      werrorfl (ival->filename, ival->lineno, E_CONST_EXPECTED, "found expression");
                       // but try to do it anyway
                     }
                   allocInfo = 0;
@@ -680,6 +680,11 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
       // assuming a warning has been thrown
       val = constCharVal (0);
     }
+  if (val->etype && SPEC_SCLS (val->etype) != S_LITERAL)
+    {
+      werrorfl (ilist->filename, ilist->lineno, E_CONST_EXPECTED);
+      val = constCharVal (0);
+    }
 
   /* check if the literal value is within bounds */
   if (checkConstantRange (type, val->etype, '=', FALSE) == CCR_OVL)
@@ -799,6 +804,11 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
           /* not an unnamed bit-field structure member */
           value *val = list2val (lilist);
 
+          if (val && val->etype && SPEC_SCLS (val->etype) != S_LITERAL)
+            {
+              werrorfl (lilist->filename, lilist->lineno, E_CONST_EXPECTED);
+              val = constCharVal (0);
+            }
           if (size)
             {
               if (bit_length > 8)

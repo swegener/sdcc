@@ -4,7 +4,9 @@
 
 #include <testfwk.h>
 
-#pragma disable_warning 85
+#ifdef __SDCC
+  #pragma disable_warning 85
+#endif
 
 void g(void *p)
 {
@@ -12,6 +14,7 @@ void g(void *p)
 
 _Noreturn void e(void)
 {
+  while (1) {}
 }
 
 void f(int i)

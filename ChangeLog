@@ -1,3 +1,8 @@
+2012-09-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-20030209-1.c:
+	  Reduced array size, reenabled test.
+
 2012-09-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglue.c (emitRegularMap, printIvalType, printIvalBitFields),

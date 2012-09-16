@@ -2,6 +2,8 @@
 
 	* support/regression/tests/gcc-torture-execute-20030209-1.c:
 	  Reduced array size, reenabled test.
+	* support/regression/tests/gcc-torture-execute-991016-1.c:
+	  Enabled test for targets that support long long, since returning long long was implemented some time ago.
 
 2012-09-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

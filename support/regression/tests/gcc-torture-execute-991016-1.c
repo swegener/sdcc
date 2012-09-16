@@ -12,8 +12,7 @@
    mode but have different alias sets.  DOIT tries to get gcse to
    invalidly hoist one of the values out of the loop.  */
 
-#if 0
-//long long is not supported for some targets, and on the targets that support long long, this test crashes sdcc.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 typedef int T0;
 typedef long T1;
 typedef long long T2;
@@ -54,7 +53,7 @@ doit(int sel, int n, void *p)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   T0 v0; T1 v1; T2 v2;
 
   v0 = 1; doit(0, 5, &v0);

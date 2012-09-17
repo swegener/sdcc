@@ -1,3 +1,7 @@
+2012-09-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/ralloc2.cc (inst_sane): fixed bug #3558402
+
 2012-09-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/bug3564649.c:

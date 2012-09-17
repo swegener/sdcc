@@ -158,6 +158,10 @@ static bool inst_sane(const assignment &a, unsigned short int i, const G_t &G, c
 {
   const iCode *ic = G[i].ic;
 
+  // for a sequence of built-in SENDs, all of the SENDs must be sane
+  if (ic->op == SEND && ic->builtinSEND && ic->next->op == SEND && !inst_sane(a, *(adjacent_vertices(i, G).first), G, I))
+    return(false);
+
   return(operand_sane(IC_RESULT(ic), a, i, G, I) && operand_sane(IC_LEFT(ic), a, i, G, I) && operand_sane(IC_RIGHT(ic), a, i, G, I));
 }
 

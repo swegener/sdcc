@@ -800,7 +800,7 @@ PORT z80_port = {
   {                             /* Assembler */
    _z80AsmCmd,
    NULL,
-   "-plosgffwc",                /* Options with debug */
+   "-plosgffwy",                /* Options with debug */
    "-plosgffw",                 /* Options without debug */
    0,
    ".asm"},
@@ -925,7 +925,7 @@ PORT z180_port = {
   {                             /* Assembler */
    _z80AsmCmd,
    NULL,
-   "-plosgffwc",                /* Options with debug */
+   "-plosgffwy",                /* Options with debug */
    "-plosgffw",                 /* Options without debug */
    0,
    ".asm"},
@@ -1050,7 +1050,7 @@ PORT r2k_port = {
   {                             /* Assembler */
    _r2kAsmCmd,
    NULL,
-   "-plosgffwc",                /* Options with debug */
+   "-plosgffwy",                /* Options with debug */
    "-plosgffw",                 /* Options without debug */
    0,
    ".asm"},
@@ -1175,7 +1175,7 @@ PORT r3ka_port = {
   {                             /* Assembler */
    _r2kAsmCmd,
    NULL,
-   "-plosgffwc",                /* Options with debug */
+   "-plosgffwy",                /* Options with debug */
    "-plosgffw",                 /* Options without debug */
    0,
    ".asm"},
@@ -1301,7 +1301,7 @@ PORT gbz80_port = {
   {                             /* Assembler */
    _gbAsmCmd,
    NULL,
-   "-plosgffwc",                /* Options with debug */
+   "-plosgffwy",                /* Options with debug */
    "-plosgffw",                 /* Options without debug */
    0,
    ".asm",

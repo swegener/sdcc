@@ -435,7 +435,7 @@ PORT hc08_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffwc",               /* Options with debug */
+    "-plosgffwy",               /* Options with debug */
     "-plosgffw",                /* Options without debug */
     0,
     ".asm",
@@ -574,7 +574,7 @@ PORT s08_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffwc",               /* Options with debug */
+    "-plosgffwy",               /* Options with debug */
     "-plosgffw",                /* Options without debug */
     0,
     ".asm",

@@ -799,7 +799,7 @@ PORT mcs51_port =
   {                             /* Assembler */
     _asmCmd,
     NULL,
-    "-plosgffwc",               /* Options with debug */
+    "-plosgffwy",               /* Options with debug */
     "-plosgffw",                /* Options without debug */
     0,
     ".asm",

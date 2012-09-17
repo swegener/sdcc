@@ -1293,6 +1293,12 @@ loop:   if (tfp == NULL)
                 }
         }
         /*
+         * Fix 'u' if [nn], cycles, is specified
+         */
+        if (rb[a + (s*u) - 1] == CYCNT_END) {
+                u -= 1;
+        }
+        /*
          * Output text line when updates finished
          */
         if (++gcntr == u) {

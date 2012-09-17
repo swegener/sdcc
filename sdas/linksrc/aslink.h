@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *  Copyright (C) 1989-2012  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
  */
 
 #define VERSION "V03.00 + NoICE + sdld"
+#define	COPYRIGHT "2012"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -214,6 +215,12 @@
  * is 16.  It should not be changed.
  */
 #define NTXT    16              /* T values */
+
+/*
+ * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
+ */
+#define CYCNT_BGN       '['     /* Cycle count begin delimiter */
+#define CYCNT_END       ']'     /* Cycle count end   delimiter */
 
 /*
  * Internal ASxxxx Version Variable
@@ -1091,7 +1098,7 @@ extern  int     sflag;          /*      JCF: Memory usage output flag
                                  */
 extern  int     packflag;       /*      Pack data memory flag
                                  */
-extern  int     stacksize;      /*      Pack data memory flag
+extern  int     stacksize;      /*      Stack size
                                  */
 extern int      rflag;          /*      Extended linear address record flag.
                                 */

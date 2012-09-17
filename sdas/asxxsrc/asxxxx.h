@@ -164,8 +164,8 @@
  * PATH_MAX
  */
 #include <limits.h>
-#ifndef PATH_MAX                                /* POSIX, but not required      */
-#  if defined(_MSC_VER) || defined(__BORLANDC__)  /* Microsoft C or Borland C*/
+#ifndef PATH_MAX                                    /* POSIX, but not required */
+#  if defined(_MSC_VER) || defined(__BORLANDC__)    /* Microsoft C or Borland C */
 #    define PATH_MAX        _MAX_PATH
 #  else
 #    define PATH_MAX        FILENAME_MAX            /* define a reasonable value */
@@ -219,6 +219,37 @@
 #define BLIST       3           /* Address only with allocation */
 #define CLIST       4           /* Code */
 #define ELIST       5           /* Equate only */
+
+#define LIST_ERR        0x0001  /* Error Code(s) */
+#define LIST_LOC        0x0002  /* Location */
+#define LIST_BIN        0x0004  /* Generated Binary Value(s)*/
+#define LIST_EQT        0x0008  /* Assembler Equate Value */
+#define LIST_CYC        0x0010  /* Opcode Cycles */
+#define LIST_LIN        0x0020  /* Line Numbers */
+#define LIST_SRC        0x0040  /* Assembler Source Code */
+
+#define LIST_PAG        0x0080  /* Assembler Pagination */
+#define LIST_LST        0x0100  /* .LIST/.NLIST Listing */
+
+#define LIST_MD	        0x0200  /* Macro Definition */
+#define LIST_ME	        0x0400  /* Macro Expansion */
+#define LIST_MEB        0x0800  /* Macro Expansion Binary */
+
+#define LIST_BITS       0x0FFF  /* LIST  Flags Mask */
+
+#define LIST_NONE       0x0000  /* NLIST Flags Mask */
+#define LIST_ASM        0x007F  /* LIST  Flags Mask for Assembler Line */
+#define LIST_NORM       0x03FF  /* LIST  Flags Mask */
+
+#define LIST_NOT        0x1000  /* Force Complement of Listing Mode */
+
+#define LIST_TORF       0x8000  /* IF-ENDIF Conditional Overide Flag */
+
+/*
+ * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
+ */
+#define CYCNT_BGN       '['     /* Cycle count begin delimiter */
+#define CYCNT_END       ']'     /* Cycle count end   delimiter */
 
 /*
  * OPCY_NONE bit set signifies no opcode cycles set.
@@ -541,6 +572,8 @@ extern  int     pass;           /*      assembler pass number
                                  */
 extern  int     aflag;          /*      -a, make all symbols global flag
                                  */
+extern  int     cflag;          /*      -c, disable cycle counts in listing flag
+                                 */
 extern  int     fflag;          /*      -f(f), relocations flagged flag
                                  */
 extern  int     gflag;          /*      -g, make undefined symbols global flag
@@ -562,6 +595,12 @@ extern  int     wflag;          /*      -w, enable wide listing format
                                  */
 extern  int     xflag;          /*      -x, listing radix flag
                                  */
+
+#if SDCDB
+extern  int     yflag;          /*      -y, enable SDCC Debug Symbols
+                                 */
+#endif
+
 extern  int     zflag;          /*      -z, disable symbol case sensitivity
                                  */
 extern  a_uint  laddr;          /*      address of current assembler line,
@@ -640,8 +679,6 @@ extern  char    ccase[128];     /*      an array of characters which
 extern  int     asfatal;        /*      ASxxxx fatal error counter
                                  */
 extern  int     org_cnt;        /*      .org directive counter
-                                 */
-extern  int     cflag;          /*      -c, generate sdcdb debug information
                                  */
 extern  char    *optsdcc;       /*      sdcc compile options
                                  */
@@ -779,7 +816,7 @@ extern  VOID            DefineSDCC_Line(void);
 
 /* aslist.c */
 extern  VOID            list(void);
-extern  VOID            list1(char *wp, int *wpt, int nb, int f);
+extern  VOID            list1(char *wp, int *wpt, int nb, int n, int f, int g);
 extern  VOID            list2(int t);
 extern  VOID            lstsym(FILE *fp);
 extern  VOID            slew(FILE *fp, int flag);

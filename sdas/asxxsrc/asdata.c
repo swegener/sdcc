@@ -94,7 +94,7 @@ int     pass;           /*      assembler pass number
                          */
 int     aflag;          /*      -a, make all symbols global flag
                          */
-int     cflag;          /*      -c, generate sdcdb debug info
+int     cflag;          /*      -c, disable cycle counts in listing flag
                          */
 int     fflag;          /*      -f(f), relocations flagged flag
                          */
@@ -113,6 +113,8 @@ int     sflag;          /*      -s, generate symbol table flag
 int     wflag;          /*      -w, enable wide listing format
                          */
 int     xflag;          /*      -x, listing radix flag
+                         */
+int     yflag;          /*      -y, enable SDCC Debug Symbols
                          */
 int     zflag;          /*      -z, disable symbol case sensitivity
                          */

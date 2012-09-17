@@ -1,3 +1,16 @@
+2012-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asexpr.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asxxxx.h,
+	* sdas/linksrc/aslink.h,
+	* sdas/linksrc/lklist.c,
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/z80/main.c: again a small step towards ASxxxx v5
+
 2012-09-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/ralloc2.cc (inst_sane): fixed bug #3558402

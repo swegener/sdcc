@@ -252,7 +252,7 @@ main(int argc, char *argv[])
                         if (inpfil >= 0)
                                 usage(ER_FATAL);
                         ++p;
-                        while ((c = *p++) != 0)
+                        while ((c = *p++) != 0) {
                                 switch(c) {
 
                                 case 'a':
@@ -262,7 +262,7 @@ main(int argc, char *argv[])
 
                                 case 'c':
                                 case 'C':
-                                        ++cflag;
+                                        cflag = 1;      /* Cycle counts in listing */
                                         break;
 
                                 case 'g':
@@ -277,11 +277,20 @@ main(int argc, char *argv[])
                                                 ++p;
                                         break;
 
-                                case 'j':                       /* JLH: debug info */
+#if NOICE
+                                case 'j':                       /* NoICE Debug  JLH */
                                 case 'J':
                                         ++jflag;
                                         ++oflag;                /* force object */
                                         break;
+#endif
+
+#if SDCDB
+                                case 'y':                       /* SDCC Debug */
+                                case 'Y':
+                                        ++yflag;
+                                        break;
+#endif
 
                                 case 'l':
                                 case 'L':
@@ -336,6 +345,7 @@ main(int argc, char *argv[])
                                 default:
                                         usage(ER_FATAL);
                                 }
+                        }
                 } else {
                         if (++inpfil == MAXFIL) {
                                 fprintf(stderr, "too many input files\n");
@@ -410,7 +420,6 @@ main(int argc, char *argv[])
                         ep = eb;
                         ip = ib;
 
-                        /* sdas specific */
                         /* JLH: if line begins with ";!", then
                          * pass this comment on to the output file
                          */
@@ -419,7 +428,6 @@ main(int argc, char *argv[])
                         {
                                 fprintf(ofp, "%s\n", ip );
                         }
-                        /* end sdas specific */
 
                         if (setjmp(jump_env) == 0)
                                 asmbl();
@@ -567,7 +575,7 @@ asexit(int i)
  *              int     getnb()         aslex.c
  *              VOID    getst()         aslex.c
  *              sym *   lookup()        assym.c
- *              VOID    machin()        ___mch.c
+ *              VOID    machine()       ___mch.c
  *              mne *   mlookup()       assym.c
  *              int     more()          aslex.c
  *              VOID *  new()           assym.c
@@ -607,9 +615,10 @@ asmbl(void)
         lmode = SLIST;
 loop:
         if ((c=endline()) == 0) { return; }
+
         /*
          * If the first character is a digit then assume
-         * a local symbol is being specified.  The symbol
+         * a reusable symbol is being specified.  The symbol
          * must end with $: to be valid.
          *      pass 0:
          *              Construct a tsym structure at the first
@@ -632,6 +641,7 @@ loop:
                 }
                 if (c != '$' || get() != ':')
                         qerr();
+
                 tp = symp->s_tsym;
                 if (pass == 0) {
                         while (tp) {
@@ -690,7 +700,7 @@ loop:
         c = getnb();
         /*
          * If the next character is a : then a label is being processed.
-         * A double :: defines a global label.  If this is new label
+         * A double :: defines a global label.  If this is a new label
          * then create a symbol structure.
          *      pass 0:
          *              Flag multiply defined labels.
@@ -711,10 +721,11 @@ loop:
                 symp = lookup(id);
                 if (symp == &dot)
                         err('.');
-                if (pass == 0)
+                if (pass == 0) {
                         if ((symp->s_type != S_NEW) &&
-                           ((symp->s_flag & S_ASG) == 0))
+                            ((symp->s_flag & S_ASG) == 0))
                                 symp->s_flag |= S_MDF;
+                }
                 if (pass != 2) {
                         fuzz = symp->s_addr - dot.s_addr;
                         symp->s_type = S_USER;
@@ -772,9 +783,11 @@ loop:
         }
         unget(c);
         lmode = flevel ? SLIST : CLIST;
-        if ((mp = mlookup(id)) == NULL) {
-                if (!flevel)
+        mp = mlookup(id);
+        if (mp == NULL) {
+                if (!flevel) {
                         err('o');
+                }
                 return;
         }
         /*
@@ -792,7 +805,7 @@ loop:
                         ++tlevel;
                         ifcnd[tlevel] = n;
                         iflvl[tlevel] = flevel;
-                        if (n == 0) {
+                        if (!n) {
                                 ++flevel;
                         }
                 } else {
@@ -1191,21 +1204,33 @@ loop:
         /* end sdas hc08 specific */
 
         /*
-         * If not an assembler directive then go to
-         * the machine dependent function which handles
-         * all the assembler mnemonics.
+         * If not an assembler directive then go to the
+         * machine dependent function
+         * which handles all the assembler mnemonics.
          */
         default:
                 machine(mp);
-                /* sdas hc08 specific */
-                /* if cdb information then generate the line info */
-                if (cflag && (pass == 1))
-                        DefineSDCC_Line();
 
-                /* JLH: if -j, generate a line number symbol */
-                if (jflag && (pass == 1))
+#if NOICE
+                /*
+                 * NoICE	JLH
+                 * if -j, generate a line number symbol
+                 */
+                if (jflag && (pass == 1)) {
                         DefineNoICE_Line();
-                /* end sdas hc08 specific */
+                }
+#endif
+
+#if SDCDB
+                /*
+                 * SDCC Debug Information
+                 * if cdb information then generate the line info
+                 */
+                if (yflag && (pass == 1)) {
+                        DefineSDCC_Line();
+                }
+#endif
+
         }
 
         if (is_sdas()) {
@@ -1406,14 +1431,19 @@ char *usetxt[] = {
         "  -d   Decimal listing",
         "  -q   Octal   listing",
         "  -x   Hex     listing (default)",
-        "  -j   Add line number and debug information to file", /* JLH */
         "  -g   Undefined symbols made global",
         "  -a   All user symbols made global",
-        "  -l   Create list   output file1[lst]",
-        "  -o   Create object output file1[rel]",
-        "  -s   Create symbol output file1[sym]",
-        "  -c   Generate sdcdb debug information",
-        "  -p   Disable listing pagination",
+        "  -c   Disable instruction cycle count in listing",
+#if NOICE
+        "  -j   Enable NoICE Debug Symbols",
+#endif
+#if SDCDB
+        "  -y   Enable SDCC  Debug Symbols",
+#endif
+        "  -l   Create list   file/outfile[.lst]",
+        "  -o   Create object file/outfile[.rel]",
+        "  -s   Create symbol file/outfile[.sym]",
+        "  -p   Disable automatic listing pagination",
         "  -w   Wide listing format for symbol table",
         "  -z   Enable case sensitivity for symbols",
         "  -f   Flag relocatable references by  `   in listing file",
@@ -1422,10 +1452,12 @@ char *usetxt[] = {
         "       search path.  This option may be used more than once.",
         "       Directories are searched in the order given.",
         "",
-        0
+        NULL
 };
 
-/*)Function     VOID    usage()
+/*)Function     VOID    usage(n)
+ *
+ *              int     n               exit code
  *
  *      The function usage() outputs to the stderr device the
  *      assembler name and version and a list of valid assembler options.
@@ -1451,9 +1483,9 @@ usage(int n)
 {
         char **dp;
 
-        /* sdas specific */
         fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
-        /* end sdas specific */
+        fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
+        fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
         for (dp = usetxt; *dp; dp++)
                 fprintf(stderr, "%s\n", *dp);
         asexit(n);

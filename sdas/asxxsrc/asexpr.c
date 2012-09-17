@@ -1,24 +1,32 @@
-/* asexpr.c
+/* asexpr.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
+/*
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *
+ *	Bill McKinnon (BM)
+ *	w_mckinnon at conknet dot com
+ */
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "sdas.h"
 #include "asxxxx.h"
 
@@ -87,9 +95,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 VOID
-expr(register struct expr *esp, int n)
+expr(struct expr *esp, int n)
 {
-        register int c, p;
+        int c, p;
         struct area *ap;
         struct expr re;
 
@@ -300,7 +308,7 @@ absexpr(void)
  *              int     c               current character
  *              char    id[]            symbol name
  *              char *  jp              pointer to assembler-source text
- *              int     n               constant evaluation running sum
+ *              a_uint  n               constant evaluation running sum
  *              int     r               current evaluation radix
  *              sym *   sp              pointer to a sym structure
  *              tsym *  tp              pointer to a tsym structure
@@ -332,14 +340,15 @@ absexpr(void)
  */
 
 VOID
-term(register struct expr *esp)
+term(struct expr *esp)
 {
-        register int c, n;
-        register const char *jp;
+        int c;
+        const char *jp;
         char id[NCPS];
         struct sym  *sp;
         struct tsym *tp;
         int r, v;
+        a_uint n;
 
         r = radix;
         c = getnb();
@@ -374,19 +383,21 @@ term(register struct expr *esp)
         if (c == '\'') {
                 esp->e_mode = S_USER;
                 esp->e_addr = getmap(-1)&0377;
+                /* MB: accept a closing ' */
                 c = get();
                 if (c != '\'') { unget(c); }
                 return;
         }
         if (c == '\"') {
                 esp->e_mode = S_USER;
-                if (hilo) {
+                if ((int) hilo) {
                     esp->e_addr  = (getmap(-1)&0377)<<8;
                     esp->e_addr |= (getmap(-1)&0377);
                 } else {
                     esp->e_addr  = (getmap(-1)&0377);
                     esp->e_addr |= (getmap(-1)&0377)<<8;
                 }
+                /* MB: accept a closing " */
                 c = get();
                 if (c != '\"') { unget(c); }
                 return;
@@ -395,7 +406,7 @@ term(register struct expr *esp)
                 expr(esp, 100);
                 if (is_abs (esp)) {
                         /*
-                         * evaluate msb/lsb directly
+                         * evaluate byte selection directly
                          */
                         if (c == '>')
                                 esp->e_addr >>= 8;
@@ -403,7 +414,7 @@ term(register struct expr *esp)
                         return;
                 } else {
                         /*
-                         * let linker perform msb/lsb, lsb is default
+                         * let linker perform byte selection
                          */
                         esp->e_rlcf |= R_BYTX;
                         if (c == '>')
@@ -412,7 +423,7 @@ term(register struct expr *esp)
                 }
         }
         /*
-         * Evaluate digit sequences as local symbols
+         * Evaluate digit sequences as reusable symbols
          * if followed by a '$' or as constants.
          */
         if (ctype[c] & DIGIT) {
@@ -573,7 +584,7 @@ term(register struct expr *esp)
  */
 
 int
-digit(register int c, register int r)
+digit(int c, int r)
 {
         if (r == 16) {
                 if (ctype[c] & RAD16) {
@@ -627,7 +638,7 @@ digit(register int c, register int r)
  */
 
 VOID
-abscheck(register struct expr *esp)
+abscheck(struct expr *esp)
 {
         if (esp->e_flag || esp->e_base.e_ap) {
                 esp->e_flag = 0;
@@ -662,7 +673,7 @@ abscheck(register struct expr *esp)
  */
 
 int
-is_abs (register struct expr *esp)
+is_abs (struct expr *esp)
 {
         if (esp->e_flag || esp->e_base.e_ap) {
                 return(0);
@@ -691,7 +702,7 @@ is_abs (register struct expr *esp)
  */
 
 int
-oprio(register int c)
+oprio(int c)
 {
         if (c == '*' || c == '/' || c == '%')
                 return (10);
@@ -730,7 +741,7 @@ oprio(register int c)
  */
 
 VOID
-clrexpr(register struct expr *esp)
+clrexpr(struct expr *esp)
 {
         esp->e_mode = 0;
         esp->e_flag = 0;

@@ -5,8 +5,7 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-  #pragma disable_warning 85
-#endif
+#pragma disable_warning 85
 
 void g(void *p)
 {
@@ -28,6 +27,7 @@ void f(int i)
 
 	g(p); /* False "may be used before initialization" warning occoured here. */
 }
+#endif
 
 void testBug(void)
 {

@@ -1,3 +1,8 @@
+2012-09-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/pic16/glue.c (pic16_initPointer): fixed pointer initialization
+	from address of struct/union
+
 2012-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asxxsrc/asdata.c,

@@ -418,26 +418,38 @@ pic16_initPointer (initList * ilist, sym_link *toType)
   /* pointers can be initialized with address of
      a variable or address of an array element */
   if (IS_AST_OP (expr) && expr->opval.op == '&') {
+
+    /* AST nodes for symbols of type struct or union may be missing type */
+    /* due to the abuse of the sym->implicit flag, so get the type */
+    /* directly from the symbol if it's missing in the node. */
+    sym_link *etype = expr->left->etype;
+    sym_link *ftype = expr->left->ftype;
+    if (!etype && IS_AST_SYM_VALUE(expr->left))
+      {
+        etype = expr->left->opval.val->sym->etype;
+        ftype = expr->left->opval.val->sym->type;
+      }
+
     /* address of symbol */
-    if (IS_AST_SYM_VALUE (expr->left) && expr->left->etype) {
+    if (IS_AST_SYM_VALUE (expr->left) && etype) {
       val = AST_VALUE (expr->left);
       val->type = newLink (DECLARATOR);
-      if(SPEC_SCLS (expr->left->etype) == S_CODE) {
+      if(SPEC_SCLS (etype) == S_CODE) {
         DCL_TYPE (val->type) = CPOINTER;
         CodePtrPointsToConst (val->type);
       }
-      else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
+      else if (SPEC_SCLS (etype) == S_XDATA)
         DCL_TYPE (val->type) = FPOINTER;
-      else if (SPEC_SCLS (expr->left->etype) == S_XSTACK)
+      else if (SPEC_SCLS (etype) == S_XSTACK)
         DCL_TYPE (val->type) = PPOINTER;
-      else if (SPEC_SCLS (expr->left->etype) == S_IDATA)
+      else if (SPEC_SCLS (etype) == S_IDATA)
         DCL_TYPE (val->type) = IPOINTER;
-      else if (SPEC_SCLS (expr->left->etype) == S_EEPROM)
+      else if (SPEC_SCLS (etype) == S_EEPROM)
         DCL_TYPE (val->type) = EEPPOINTER;
       else
         DCL_TYPE (val->type) = POINTER;
 
-      val->type->next = expr->left->ftype;
+      val->type->next = ftype;
       val->etype = getSpec (val->type);
       return val;
     }

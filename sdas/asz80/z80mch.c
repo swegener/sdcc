@@ -1,20 +1,22 @@
-/* z80mch.c
+/* z80mch.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-1995 Alan R. Baldwin
+ *  721 Berkeley St., Kent, Ohio 44240
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 3, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /*
  * Extensions: P. Felber
@@ -23,8 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "asxxxx.h"
 #include "z80.h"
 
+int	hilo	= 0;
+char	*cpu	= "Zilog Z80 / Hitachi HD64180";
+char	*dsft	= "asm";
+
 char    imtab[3] = { 0x46, 0x56, 0x5E };
-int     hd64;
+int     mchtyp;
 int	allow_undoc;
 
 /*
@@ -42,7 +48,7 @@ struct mne *mp;
         clrexpr(&e2);
         op = (int) mp->m_valu;
         rf = mp->m_type;
-        if (!hd64 && rf>X_HD64)
+        if (!mchtyp && rf>X_HD64)
                 rf = 0;
         switch (rf) {
 
@@ -161,7 +167,6 @@ struct mne *mp;
                         aerr();
                 break;
 
-
         case S_ADD:
         case S_ADC:
         case S_SBC:
@@ -234,7 +239,6 @@ struct mne *mp;
                 }
                 aerr();
                 break;
-
 
         case S_LD:
                 t1 = addr(&e1);
@@ -340,7 +344,7 @@ struct mne *mp;
                                 break;
                         }
                 }
-                
+
                 if ( (t1 == S_R8) &&
                      allow_undoc &&
                      ((t2 == S_R8U1) || (t2 == S_R8U2)) )
@@ -370,9 +374,6 @@ struct mne *mp;
                 
                 aerr();
                 break;
-
-
-
 
         case S_EX:
                 t1 = addr(&e1);
@@ -431,45 +432,43 @@ struct mne *mp;
 
         case S_DEC:
         case S_INC:
-          t1 = addr(&e1);
-          v1 = (int) e1.e_addr;
-          if (t1 == S_R8) {
-            outab(op|(v1<<3));
-            break;
-          }
-          if (t1 == S_IDHL) {
-            outab(op|0x30);
-            break;
-          }
-          if (t1 != gixiy(t1)) {
-            outab(op|0x30);
-            outrb(&e1,0);
-            break;
-          }
-          if (t1 == S_R16) {
-            v1 = gixiy(v1);
-            if (rf == S_INC) {
-              outab(0x03|(v1<<4));
-              break;
-            }
-            if (rf == S_DEC) {
-              outab(0x0B|(v1<<4));
-              break;
-            }
-          }
-          if ((t1 == S_R8U1)||(t1 == S_R8U2))
-            {
-              outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
-              outab(op|(v1<<3));
-              break;
-            }
-          
-          aerr();
-          break;
+                t1 = addr(&e1);
+                v1 = (int) e1.e_addr;
+                if (t1 == S_R8) {
+                        outab(op|(v1<<3));
+                        break;
+                }
+                if (t1 == S_IDHL) {
+                        outab(op|0x30);
+                        break;
+                }
+                if (t1 != gixiy(t1)) {
+                        outab(op|0x30);
+                        outrb(&e1,0);
+                        break;
+                }
+                if (t1 == S_R16) {
+                        v1 = gixiy(v1);
+                        if (rf == S_INC) {
+                                outab(0x03|(v1<<4));
+                                break;
+                        }
+                        if (rf == S_DEC) {
+                                outab(0x0B|(v1<<4));
+                                break;
+                        }
+                }
+                if ((t1 == S_R8U1)||(t1 == S_R8U2)) {
+                        outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
+                        outab(op|(v1<<3));
+                        break;
+                }
+                aerr();
+                break;
           
         case S_DJNZ:
         case S_JR:
-                if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
+                if (rf != S_DJNZ && (v1 = admode(CND)) != 0) {
                         if ((v1 &= 0xFF) <= 0x03) {
                                 op += (v1+1)<<3;
                         } else {
@@ -530,7 +529,7 @@ struct mne *mp;
                 break;
 
         case X_HD64:
-                ++hd64;
+                ++mchtyp;
                 break;
 
         case X_INH2:
@@ -625,6 +624,7 @@ struct expr *esp;
 int f;
 {
         int t1;
+
         if ((t1 = esp->e_mode) == S_R8) {
                 if (pop)
                         outab(pop);
@@ -712,6 +712,6 @@ struct expr *esp;
 VOID
 minit()
 {
-        hd64 = 0;
+        mchtyp = 0;
         allow_undoc = 0;
 }

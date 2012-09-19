@@ -1,3 +1,14 @@
+2012-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asz80/Makefile.in,
+	* sdas/asz80/as_z80.vcxproj,
+	* sdas/asz80/as_z80.vcxproj.filters,
+	* sdas/asz80/z80ext.c: removed z80ext.c
+	* sdas/as8051/i51mch.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asz80/z80.h,
+	* sdas/asz80/z80mch.c: small step towards ASxxxx v5
+
 2012-09-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/pic16/glue.c (pic16_initPointer): fixed pointer initialization

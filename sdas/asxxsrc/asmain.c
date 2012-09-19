@@ -205,17 +205,17 @@ search_path_fopen(const char *filename, const char *mode)
  *              VOID    asexit()        asmain.c
  *              VOID    diag()          assubr.c
  *              VOID    err()           assubr.c
- *              int     fprintf()       c-library
- *              int     nxtline()       aslex.c
+ *              int     fprintf()       c_library
  *              VOID    list()          aslist.c
  *              VOID    lstsym()        aslist.c
  *              VOID    minit()         ___mch.c
  *              VOID    newdot()        asmain.c
+ *              int     nxtline()       aslex.c
  *              VOID    outbuf()        asout.c
  *              VOID    outchk()        asout.c
  *              VOID    outgsd()        asout.c
- *              int     rewind()        c-library
- *              int     setjmp()        c-library
+ *              int     rewind()        c_library
+ *              int     setjmp()        c_library
  *              VOID    symglob()       assym.c
  *              VOID    syminit()       assym.c
  *              VOID    usage()         asmain.c
@@ -429,6 +429,7 @@ main(int argc, char *argv[])
                                 fprintf(ofp, "%s\n", ip );
                         }
 
+                        opcycles = OPCY_NONE;
                         if (setjmp(jump_env) == 0)
                                 asmbl();
                         if (pass == 2) {
@@ -437,8 +438,11 @@ main(int argc, char *argv[])
                         }
                 }
                 newdot(dot.s_area); /* Flush area info */
-                if (flevel || tlevel)
-                        err('i');
+        }
+        if (flevel || tlevel) {
+                err('i');
+                fprintf(stderr, "?ASxxxx-Error-<i> at end of assembly\n");
+                fprintf(stderr, "              %s\n", geterr('i'));
         }
         if (oflag)
                 outchk(ASXHUGE, ASXHUGE);  /* Flush */
@@ -470,8 +474,8 @@ main(int argc, char *argv[])
  *              FILE *  sfp[]           array of assembler-source file handles
  *
  *      functions called:
- *              int     fclose()        c-library
- *              VOID    exit()          c-library
+ *              int     fclose()        c_library
+ *              VOID    exit()          c_library
  *
  *      side effects:
  *              All files closed. Program terminates.
@@ -568,7 +572,7 @@ asexit(int i)
  *              char    endline()       aslex.c
  *              VOID    err()           assubr.c
  *              VOID    expr()          asexpr.c
- *              FILE *  fopen()         c-library
+ *              FILE *  fopen()         c_library
  *              int     get()           aslex.c
  *              VOID    getid()         aslex.c
  *              int     getmap()        aslex.c
@@ -587,8 +591,8 @@ asexit(int i)
  *              VOID    outrw()         asout.c
  *              VOID    phase()         asmain.c
  *              VOID    qerr()          assubr.c
- *              char *  strcpy()        c-library
- *              char *  strncpy()       c-library
+ *              char *  strcpy()        c_library
+ *              char *  strncpy()       c_library
  *              char *  strsto()        assym.c
  *              VOID    unget()         aslex.c
  */

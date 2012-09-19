@@ -527,7 +527,7 @@ machine(struct mne *mp)
                         }
                         else
                                 aerr();
-                break;
+                        break;
 
                 case S_AT_R:
                         outab(op + 6 + e.e_addr);

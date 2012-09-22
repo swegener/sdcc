@@ -106,7 +106,7 @@ int     lflag;          /*      -l, generate listing flag
                          */
 int     oflag;          /*      -o, generate relocatable output flag
                          */
-int     pflag;          /*      -p, enable listing pagination
+int     pflag;          /*      -p, disable listing pagination
                          */
 int     sflag;          /*      -s, generate symbol table flag
                          */

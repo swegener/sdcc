@@ -1,3 +1,11 @@
+2012-09-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asdbg.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asxxxx.h: next small step towards ASxxxx v5
+
 2012-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asz80/Makefile.in,

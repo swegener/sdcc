@@ -180,7 +180,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int jflag               -j, generate debug info flag
  * end sdas specific
  *              int     page            current page number
- *              int     pflag           enable listing pagination
+ *              int     pflag           disable listing pagination
  *              int     pass            assembler pass number
  *              int     radix           current number conversion radix:
  *                                      2 (binary), 8 (octal), 10 (decimal),
@@ -245,7 +245,6 @@ main(int argc, char *argv[])
         if (!is_sdas())
                 fprintf(stdout, "\n");
         inpfil = -1;
-        pflag = 1;
         for (i=1; i<argc; ++i) {
                 p = argv[i];
                 if (*p == '-') {
@@ -309,7 +308,7 @@ main(int argc, char *argv[])
 
                                 case 'p':
                                 case 'P':
-                                        pflag = 0;
+                                        ++pflag;
                                         break;
 
                                 case 'w':

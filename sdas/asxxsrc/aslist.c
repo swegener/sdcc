@@ -57,6 +57,7 @@
  *              int     nb              computed number of assembled bytes
  *              int     nl              number of bytes listed on this line
  *              int     listing         listing enable flags
+ *              int     paging          computed paging enable flag
  *              int *   wp              pointer to the assembled data bytes
  *              int *   wpt             pointer to the data byte mode
  *
@@ -95,7 +96,7 @@ list(void)
         int *wpt;
         int n, nb, nl;
         a_uint l_addr;
-        int listing;
+        int listing, paging;
 
         /*
          * Internal Listing
@@ -104,6 +105,11 @@ list(void)
 
         if (lfp == NULL || lmode == NLIST)
                 return;
+
+	/*
+	 * Paging Control
+	 */
+	paging = !pflag ? 1 : 0;
 
         /*
          * Get Correct Line Number
@@ -124,7 +130,7 @@ list(void)
         /*
          * Move to next line.
          */
-        slew(lfp, pflag);
+        slew(lfp, paging);
 
         /*
          * Output a maximum of NERR error codes with listing.
@@ -197,7 +203,7 @@ list(void)
                 while ((nb -= nl) > 0) {
                         wp += nl;
                         wpt += nl;
-                        slew(lfp, 0);
+                        slew(lfp, paging);
                         fprintf(lfp, frmt, "");
                         list1(wp, wpt, nb, nl, 0, listing);
                         putc('\n', lfp);
@@ -257,7 +263,7 @@ list(void)
                 while ((nb -= nl) > 0) {
                         wp += nl;
                         wpt += nl;
-                        slew(lfp, 0);
+                        slew(lfp, paging);
                         fprintf(lfp, frmt, "");
                         list1(wp, wpt, nb, nl, 0, listing);
                         putc('\n', lfp);
@@ -319,7 +325,7 @@ list(void)
                         wp += nl;
                         wpt += nl;
 
-                        slew(lfp, 0);
+                        slew(lfp, paging);
                         fprintf(lfp, frmt, "");
                         list1(wp, wpt, nb, nl, 0, listing);
                         putc('\n', lfp);

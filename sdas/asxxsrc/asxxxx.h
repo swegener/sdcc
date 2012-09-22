@@ -211,7 +211,7 @@
 #define MAXFIL      6           /* Maximum command line input files */
 #define MAXINC      6           /* Maximum nesting of include files */
 #define MAXIF       10          /* Maximum nesting of if/else/endif */
-#define FILSPC      256         /* Chars. in filespec */
+#define FILSPC      PATH_MAX    /* Chars. in filespec */
 
 #define NLIST       0           /* No listing */
 #define SLIST       1           /* Source only */
@@ -343,37 +343,43 @@ struct  area
 #define R_BYTE  0x01            /*  8 bit */
 #define R_WORD  0x00            /* 16 bit */
 
-#define R_AREA  0x00            /* Base type */
-#define R_SYM   0x02
-
-#define R_NORM  0x00            /* PC adjust */
-#define R_PCR   0x04
-
 #define R_BYT1  0x00            /* Byte count for R_BYTE = 1 */
 #define R_BYTX  0x08            /* Byte count for R_BYTE = 2 */
-
-#define R_SGND  0x00            /* Signed Byte */
-#define R_USGN  0x10            /* Unsigned Byte */
-
-#define R_NOPAG 0x00            /* Page Mode */
-#define R_PAG0  0x20            /* Page '0' */
-#define R_PAG   0x40            /* Page 'nnn' */
-
-#define R_LSB   0x00            /* low byte */
-#define R_MSB   0x80            /* high byte */
-
-#define R_BYT3  0x100           /* if R_BYTE is set, this is a
-                                 * 3 byte address, of which
-                                 * the linker must select one byte.
-                                 */
 #define R_HIB   0x200           /* If R_BYTE & R_BYT3 are set, linker
                                  * will select byte 3 of the relocated
                                  * 24 bit address.
                                  */
 
+#define R_SGND  0x00            /* Signed Byte */
+#define R_USGN  0x10            /* Unsigned Byte */
+
+#define R_LSB   0x00            /* low byte */
+#define R_MSB   0x80            /* high byte */
+
 #define R_BIT   0x400           /* Linker will convert from byte-addressable
                                  * space to bit-addressable space.
                                  */
+
+
+#define R_AREA  0x00            /* Base type */
+#define R_SYM   0x02
+
+/*
+ * Note:  The PAGE modes and PCR modes are mutually exclusive !!!
+ *
+ *
+ * Paging Modes:
+ */
+
+#define R_NOPAG 0x00            /* Page Mode */
+#define R_PAG0  0x20            /* Page '0' */
+#define R_PAG   0x40            /* Page 'nnn' */
+
+/*
+ * PCR Modes:
+ */
+
+#define R_PCR   0x04
 
 #define R_J11           (R_WORD|R_BYTX)          /* JLH: 11 bit JMP and CALL (8051) */
 #define R_J19           (R_WORD|R_BYTX|R_MSB)   /* 19 bit JMP/CALL (DS80C390)      */
@@ -383,6 +389,12 @@ struct  area
 #define IS_R_J19(x)     (((x) & R_J19_MASK) == R_J19)
 #define IS_R_J11(x)     (((x) & R_J19_MASK) == R_J11)
 #define IS_C24(x)       (((x) & R_J19_MASK) == R_C24)
+
+/*
+ * Basic Relocation Modes
+ */
+
+#define R_NORM  0x0000          /* PC adjust */
 
 #define R_ESCAPE_MASK   0xf0    /* Used to escape relocation modes
                                                                  * greater than 0xff in the .rel
@@ -394,6 +406,10 @@ struct  area
  */
 
 #define R_HIGH  0040000         /* High Byte */
+#define R_BYT3  0x100           /* if R_BYTE is set, this is a
+                                 * 3 byte address, of which
+                                 * the linker must select one byte.
+                                 */
 #define R_RELOC 0100000         /* Relocation */
 
 #define R_DEF   00              /* Global def. */
@@ -466,28 +482,29 @@ struct  sym
                                 /* unused slot */
                                 /* unused slot */
 
-#define S_BYTE          5       /* .byte */
-#define S_WORD          6       /* .word */
-#define S_ASCII         7       /* .ascii */
-#define S_ASCIZ         8       /* .asciz */
-#define S_BLK           9       /* .blkb or .blkw */
-#define S_INCL          10      /* .include */
-#define S_DAREA         11      /* .area */
-#define S_ATYP          12      /* .area type */
-#define S_AREA          13      /* .area name */
-#define S_GLOBL         14      /* .globl */
 #define S_PAGE          15      /* .page */
 #define S_TITLE         16      /* .title */
 #define S_SBTL          17      /* .sbttl */
+#define S_MODUL         25      /* .module */
+#define S_INCL          10      /* .include */
+#define S_AREA          13      /* .area name */
+#define S_ATYP          12      /* .area type */
+#define S_ORG           24      /* .org */
+#define S_RADIX         23      /* .radix */
+#define S_GLOBL         14      /* .globl */
 #define S_IF            18      /* .if */
 #define S_ELSE          19      /* .else */
 #define S_ENDIF         20      /* .endif */
+#define S_BLK           9       /* .blkb or .blkw */
+#define S_ASCII         7       /* .ascii */
+#define S_ASCIS         26      /* .ascis */
+#define S_ASCIZ         8       /* .asciz */
 #define S_EVEN          21      /* .even */
 #define S_ODD           22      /* .odd */
-#define S_RADIX         23      /* .radix */
-#define S_ORG           24      /* .org */
-#define S_MODUL         25      /* .module */
-#define S_ASCIS         26      /* .ascis */
+#define S_BYTE          5       /* .byte */
+#define S_WORD          6       /* .word */
+#define S_DAREA         11      /* .area */
+
 /* sdas specific */
 #define S_FLAT24        27      /* .flat24 */
 #define S_FLOAT         28      /* .df */
@@ -517,6 +534,53 @@ struct  tsym
 };
 
 /*
+ * Definitions for Character Types
+ */
+#define SPACE   '\000'
+#define ETC     '\000'
+#define LETTER  '\001'
+#define DIGIT   '\002'
+#define BINOP   '\004'
+#define RAD2    '\010'
+#define RAD8    '\020'
+#define RAD10   '\040'
+#define RAD16   '\100'
+#define ILL     '\200'
+
+#define DGT2    (DIGIT|RAD16|RAD10|RAD8|RAD2)
+#define DGT8    (DIGIT|RAD16|RAD10|RAD8)
+#define DGT10   (DIGIT|RAD16|RAD10)
+#define LTR16   (LETTER|RAD16)
+
+/*
+ *      The expr structure is used to return the evaluation
+ *      of an expression.  The structure supports three valid
+ *      cases:
+ *      (1)     The expression evaluates to a constant,
+ *              mode = S_USER, flag = 0, addr contains the
+ *              constant, and base = NULL.
+ *      (2)     The expression evaluates to a defined symbol
+ *              plus or minus a constant, mode = S_USER,
+ *              flag = 0, addr contains the constant, and
+ *              base = pointer to area symbol.
+ *      (3)     The expression evaluates to a external
+ *              global symbol plus or minus a constant,
+ *              mode = S_NEW, flag = 1, addr contains the
+ *              constant, and base = pointer to symbol.
+ */
+struct  expr
+{
+        char    e_mode;         /* Address mode */
+        char    e_flag;         /* Symbol flag */
+        a_uint  e_addr;         /* Address */
+        union   {
+                struct area *e_ap;
+                struct sym  *e_sp;
+        } e_base;               /* Rel. base */
+        int     e_rlcf;         /* Rel. flags */
+};
+
+/*
  *      External Definitions for all Global Variables
  */
 
@@ -531,11 +595,11 @@ extern  int     inpfil;         /*      count of assembler
 extern  int     cfile;          /*      current file handle index
                                  *      of input assembly files
                                  */
-extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
-                                 *      zero for false conditional case
-                                 */
 extern  int     incfil;         /*      current file handle index
                                  *      for include files
+                                 */
+extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
+                                 *      zero for false conditional case
                                  */
 extern  int     tlevel;         /*      current conditional level
                                  */
@@ -545,7 +609,7 @@ extern  int     ifcnd[MAXIF+1]; /*      array of IF statement condition
 extern  int     iflvl[MAXIF+1]; /*      array of IF-ELSE-ENDIF flevel
                                  *      values indexed by tlevel
                                  */
-extern  char    afn[FILSPC];    /*      afile() temporary filespec
+extern  char    afn[FILSPC];    /*      current input file specification
                                  */
 extern  char
         srcfn[MAXFIL][FILSPC];  /*      array of source file names
@@ -587,7 +651,7 @@ extern  int     lflag;          /*      -l, generate listing flag
                                  */
 extern  int     oflag;          /*      -o, generate relocatable output flag
                                  */
-extern  int     pflag;          /*      -p, enable listing pagination
+extern  int     pflag;          /*      -p, disable listing pagination
                                  */
 extern  int     sflag;          /*      -s, generate symbol table flag
                                  */
@@ -612,9 +676,9 @@ extern  a_uint  fuzz;           /*      tracks pass to pass changes in the
                                  */
 extern  int     lmode;          /*      listing mode
                                  */
-extern  struct  area    area[]; /*      array of 1 area
+extern  struct  area    *areap; /*      pointer to an area structure
                                  */
-extern  struct  area *areap;    /*      pointer to an area structure
+extern  struct  area    area[]; /*      array of 1 area
                                  */
 extern  struct  sym     sym[];  /*      array of 1 symbol
                                  */
@@ -687,53 +751,6 @@ extern  int     flat24Mode;     /*      non-zero if we are using DS390 24 bit
                                  */
 /*end sdas specific */
 
-/*
- * Definitions for Character Types
- */
-#define SPACE   0000
-#define ETC     0000
-#define LETTER  0001
-#define DIGIT   0002
-#define BINOP   0004
-#define RAD2    0010
-#define RAD8    0020
-#define RAD10   0040
-#define RAD16   0100
-#define ILL     0200
-
-#define DGT2    DIGIT|RAD16|RAD10|RAD8|RAD2
-#define DGT8    DIGIT|RAD16|RAD10|RAD8
-#define DGT10   DIGIT|RAD16|RAD10
-#define LTR16   LETTER|RAD16
-
-/*
- *      The exp structure is used to return the evaluation
- *      of an expression.  The structure supports three valid
- *      cases:
- *      (1)     The expression evaluates to a constant,
- *              mode = S_USER, flag = 0, addr contains the
- *              constant, and base = NULL.
- *      (2)     The expression evaluates to a defined symbol
- *              plus or minus a constant, mode = S_USER,
- *              flag = 0, addr contains the constant, and
- *              base = pointer to area symbol.
- *      (3)     The expression evaluates to a external
- *              global symbol plus or minus a constant,
- *              mode = S_NEW, flag = 1, addr contains the
- *              constant, and base = pointer to symbol.
- */
-struct  expr
-{
-        char    e_mode;         /* Address mode */
-        char    e_flag;         /* Symbol flag */
-        a_uint  e_addr;         /* Address */
-        union   {
-                struct area *e_ap;
-                struct sym  *e_sp;
-        } e_base;               /* Rel. base */
-        int     e_rlcf;         /* Rel. flags */
-};
-
 /* C Library functions */
 /* for reference only
 extern  VOID            exit();
@@ -741,6 +758,7 @@ extern  int             fclose();
 extern  char *          fgets();
 extern  FILE *          fopen();
 extern  int             fprintf();
+extern  VOID            free();
 extern  VOID            longjmp();
 extern  VOID *          malloc();
 extern  int             printf();
@@ -751,6 +769,7 @@ extern  int             strcmp();
 extern  char *          strcpy();
 extern  int             strlen();
 extern  char *          strncpy();
+extern  char *          strrchr();
 */
 
 /* Machine independent functions */
@@ -783,7 +802,7 @@ extern  struct  area *  alookup(char *id);
 extern  int             hash(const char *p, int flag);
 extern  struct  sym *   lookup(const char *id);
 extern  struct  mne *   mlookup(char *id);
-extern  VOID *          new(unsigned int n);
+extern  char *          new(unsigned int n);
 extern  char *          strsto(const char *str);
 extern  int             symeq(const char *p1, const char *p2, int flag);
 extern  VOID            syminit(void);
@@ -811,6 +830,7 @@ extern  int             oprio(int c);
 extern  VOID            term(struct expr *esp);
 
 /* asdbg */
+extern  char *          BaseFileName(int fileNumber, int spacesToUnderscores);
 extern  VOID            DefineNoICE_Line(void);
 extern  VOID            DefineSDCC_Line(void);
 
@@ -824,7 +844,6 @@ extern  VOID            slew(FILE *fp, int flag);
 /* asout.c */
 extern  int             lobyte(a_uint v);
 extern  int             hibyte(a_uint v);
-extern  VOID            outab(int v);
 extern  VOID            out(char *p, int n);
 extern  VOID            outarea(struct area *ap);
 extern  VOID            outall(void);
@@ -833,6 +852,7 @@ extern  VOID            outbuf(char *s);
 extern  VOID            outchk(int nt, int nr);
 extern  VOID            outgsd(void);
 extern  VOID            outsym(struct sym *sp);
+extern  VOID            outab(int v);
 extern  VOID            outrb(struct expr *esp, int r);
 extern  VOID            outrw(struct expr *esp, int r);
 extern  VOID            out_lb(a_uint v, int t);
@@ -882,10 +902,10 @@ extern  VOID            usage();
 /* aslex.c */
 extern  int             comma();
 extern  char            endline();
-extern  char            get();
+extern  int             get();
 extern  VOID            getid();
 extern  int             getmap();
-extern  char            getnb();
+extern  int             getnb();
 extern  VOID            getst();
 extern  int             more();
 extern  int             nxtline();
@@ -898,7 +918,7 @@ extern  struct  area *  alookup();
 extern  int             hash();
 extern  struct  sym *   lookup();
 extern  struct  mne *   mlookup();
-extern  VOID *          new();
+extern  char *          new();
 extern  char *          strsto();
 extern  int             symeq();
 extern  VOID            syminit();
@@ -926,6 +946,7 @@ extern  int             oprio();
 extern  VOID            term();
 
 /* asdbg */
+extern  char *          BaseFileName();
 extern  VOID            DefineNoICE_Line();
 extern  VOID            DefineSDCC_Line();
 
@@ -967,10 +988,11 @@ extern  VOID            out_tw();
 
 /* Machine dependent variables */
 
+extern  int             hilo;
 extern  char *          cpu;
 extern  char *          dsft;
-extern  int             hilo;
 extern  struct  mne     mne[];
+
 /* Machine dependent functions */
 
 extern  VOID            machine();

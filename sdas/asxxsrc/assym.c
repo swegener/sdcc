@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              int     hash()
  *              sym *   lookup()
  *              mne *   mlookup()
- *              VOID *  new()
+ *              char *  new()
  *              char *  strsto()
  *              int     symeq()
  *              VOID    syminit()
@@ -237,7 +237,7 @@ mlookup(char *id)
  *
  *      functions called:
  *              int     hash()          assym.c
- *              VOID *  new()           assym.c
+ *              char *  new()           assym.c
  *              char *  strsto()        assym.c
  *              int     symeq()         assym.c
  *
@@ -468,7 +468,7 @@ hash(const char *p, int flag)
  *              none
  *
  *      functions called:
- *              VOID *  new()           assym.c
+ *              char *  new()           assym.c
  *              char *  strncpy()       c_library
  *
  *      side effects:
@@ -519,7 +519,7 @@ strsto(const char *str)
         return(p);
 }
 
-/*)Function     VOID *  new(n)
+/*)Function     char *  new(n)
  *
  *              unsigned int    n       allocation size in bytes
  *
@@ -543,7 +543,7 @@ strsto(const char *str)
  *              the assembly is terminated.
  */
 
-VOID *
+char *
 new(unsigned int n)
 {
         VOID *p;

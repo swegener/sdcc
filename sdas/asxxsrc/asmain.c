@@ -581,7 +581,7 @@ asexit(int i)
  *              VOID    machine()       ___mch.c
  *              mne *   mlookup()       assym.c
  *              int     more()          aslex.c
- *              VOID *  new()           assym.c
+ *              char *  new()           assym.c
  *              VOID    newdot()        asmain.c
  *              VOID    outall()        asout.c
  *              VOID    outab()         asout.c

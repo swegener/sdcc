@@ -264,11 +264,21 @@
 #define dca     area[0]         /* Dca, default code area */
 
 
-/* NB: for Flat24 extentions to work, a_uint must be at least 24
- * bits. This is checked at runtime when the .flat24 directive
- * is processed.
+/*
+ *      The defined type 'a_uint' is used for all address and
+ *      unsigned variable value calculations.  Its size is
+ *      required to be at least 32-bits to allow upto
+ *      32-bit addressing or 32-bit value manipulation.
  */
-typedef unsigned int a_uint;
+typedef unsigned INT32 a_uint;
+
+/*
+ *      The defined type 'v_sint' is used for address and
+ *      variable value calculations requiring a sign.
+ *      Its size is required to be at least 32-bits to allow
+ *      upto 32-bit addressing or 32-bit value manipulation.
+ */
+typedef signed INT32 v_sint;
 
 /*
  *      The area structure contains the parameter values for a
@@ -717,6 +727,8 @@ extern  char    tb[NTITL];      /*      Title string buffer
                                  */
 extern  char    stb[NSBTL];     /*      Subtitle string buffer
                                  */
+extern  char    erb[NINPUT+4];  /*      Error string buffer
+                                 */
 extern  char    symtbl[];       /*      string "Symbol Table"
                                  */
 extern  char    aretbl[];       /*      string "Area Table"
@@ -780,6 +792,7 @@ extern  char *          strrchr();
 extern  FILE *          afile(char *fn, char *ft, int wf);
 extern  VOID            asexit(int i);
 extern  VOID            asmbl(void);
+extern  int             intsiz(void);
 extern  VOID            newdot(struct area *nap);
 extern  VOID            phase(struct area *ap, a_uint a);
 extern  VOID            usage(int n);
@@ -894,6 +907,7 @@ extern  int as_strncmpi(const char *s1, const char *s2, size_t n);
 extern  FILE *          afile();
 extern  VOID            asexit();
 extern  VOID            asmbl();
+extern  int             intsiz();
 extern  int             main();
 extern  VOID            newdot();
 extern  VOID            phase();

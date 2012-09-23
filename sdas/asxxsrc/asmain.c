@@ -1,30 +1,40 @@
-/* asmain.c
-
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* asmain.c */
 
 /*
- * 29-Oct-97 JLH pass ";!" comments to output file
+ *  Copyright (C) 1989-2012  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *
+ *   With enhancements from
+ *
+ *	John L. Hartman	(JLH)
+ *	jhartman at compuserve dot com
+ *
+ *	Boisy G. Pitre (BGP)
+ *	boisy at boisypitre dot com
+ *
+ *	Mike McCarty
+ *	mike dot mccarty at sbcglobal dot net
  */
 
 #include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include <math.h>
 #include "sdas.h"
 #include "asxxxx.h"
@@ -40,6 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              VOID    asexit(n)
  *              VOID    asmbl()
  *              FILE *  afile(fn, ft, wf)
+ *              int     intsiz()
  *              VOID    newdot(nap)
  *              VOID    phase(ap, a)
  *              VOID    usage()
@@ -236,6 +247,11 @@ main(int argc, char *argv[])
         char *q = NULL;
         int c, i;
         struct area *ap;
+
+        if (intsiz() < 4) {
+                fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\n");
+                exit(ER_FATAL);
+        }
 
         /* sdas specific */
         /* sdas initialization */
@@ -453,6 +469,29 @@ main(int argc, char *argv[])
         }
         asexit(aserr ? ER_ERROR : ER_NONE);
         return(0);
+}
+
+/*)Function     int     intsiz()
+ *
+ *      The function intsiz() returns the size of INT32
+ *
+ *      local variables:
+ *              none
+ *
+ *      global variables:
+ *              none
+ *
+ *      functions called:
+ *              none
+ *
+ *      side effects:
+ *              none
+ */
+
+int
+intsiz(void)
+{
+        return(sizeof(INT32));
 }
 
 /*)Function     VOID    asexit(i)

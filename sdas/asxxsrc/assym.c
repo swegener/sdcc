@@ -1,20 +1,31 @@
-/* assym.c
+/* assym.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *
+ *	John L. Hartman	(JLH)
+ *	jhartman at compuserve dot com
+ */
 
 /*
  * 10-Nov-07 borutr:
@@ -30,10 +41,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *             - replace symeq() call in mlookup with strcmpi
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-#include <stdlib.h>
 #include "asxxxx.h"
 
 /*)Module       assym.c
@@ -160,7 +167,7 @@ syminit(void)
 struct area *
 alookup(char *id)
 {
-        register struct area *ap;
+        struct area *ap;
 
         ap = areap;
         while (ap) {
@@ -275,8 +282,9 @@ lookup(const char *id)
 /*)Function     VOID    symglob()
  *
  *      The function symglob() will mark all symbols of
- *      type S_NEW as global.  Called at the beginning of pass 1
- *      if the assembly option -g was specified.
+ *      type S_NEW as global.  Called at
+ *      the beginning of pass 1 if the assembly
+ *      option -g was specified.
  *
  *      local variables:
  *              sym *   sp              pointer to a sym structure
@@ -312,8 +320,9 @@ symglob(void)
 /*)Function     VOID    allglob()
  *
  *      The function allglob() will mark all symbols of
- *      type S_USER as global.  Called at the beginning of pass 1
- *      if the assembly option -a was specified.
+ *      type S_USER as global.  Called at
+ *      the beginning of pass 1 if the assembly
+ *      option -a was specified.
  *
  *      local variables:
  *              sym *   sp              pointer to a sym structure
@@ -412,7 +421,6 @@ symeq(const char *p1, const char *p2, int flag)
  *
  *      local variables:
  *              int     h               accumulated character sum
- *              int     n               loop counter
  *
  *      global variables:
  *              char    ccase[]         an array of characters which
@@ -459,8 +467,8 @@ hash(const char *p, int flag)
  *              jhartman at compuserve dot com
  *
  *      local variables:
- *              int     l               string length + 1
  *              int     bytes           bytes remaining in buffer area
+ *              int     len             string length + 1
  *              char *  p               pointer to head of copied string
  *              char *  pnext           next location in buffer area
  *
@@ -470,6 +478,7 @@ hash(const char *p, int flag)
  *      functions called:
  *              char *  new()           assym.c
  *              char *  strncpy()       c_library
+ *		int *	strlen()	c_library
  *
  *      side effects:
  *              Space allocated for string, string copied
@@ -479,10 +488,11 @@ hash(const char *p, int flag)
 /*
  * To avoid wasting memory headers on small allocations, we
  * allocate a big chunk and parcel it out as required.
- * These static variables remember our hunk
+ * These static variables remember our hunk.
  */
 
 #define STR_SPC 1024
+
 static  char *  pnext = NULL;
 static  int     bytes = 0;
 

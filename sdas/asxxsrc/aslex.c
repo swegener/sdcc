@@ -1,20 +1,27 @@
-/* aslex.c
+/* aslex.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ */
 
 /*
  * 28-Oct-97 JLH bug in getst(): sign extend on ~(SPACE|ILL)
@@ -25,9 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * Extensions: P. Felber, M. Hope
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "dbuf_string.h"
 #include "asxxxx.h"
 
@@ -37,15 +41,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *      analysis routines for the assembler.
  *
  *      aslex.c contains the following functions:
+ *              int     comma()
  *              char    endline()
- *              char    get()
+ *              int     get()
  *              VOID    getid()
- *              int     nxtline()
  *              int     getmap()
- *              char    getnb()
+ *              int     getnb()
  *              VOID    getst()
  *              int     more()
- *              VOID    unget(c)
+ *              int     nxtline()
+ *              VOID    unget()
  *
  *      aslex.c contains no local/static variables
  */
@@ -146,8 +151,8 @@ getid(char *id, int c)
  *                                      being processed.
  *
  *      called functions:
- *              char    get()           aslex.c
- *              char    getnb()         aslex.c
+ *              int     get()           aslex.c
+ *              int     getnb()         aslex.c
  *              VOID    unget()         aslex.c
  *
  *      side effects:
@@ -159,7 +164,7 @@ getid(char *id, int c)
 VOID
 getst(char *id, int c)
 {
-        register char *p;
+        char *p;
 
         if (c < 0) {
                 c = getnb();
@@ -175,7 +180,7 @@ getst(char *id, int c)
         *p++ = 0;
 }
 
-/*)Function     char    getnb()
+/*)Function     int     getnb()
  *
  *      The function getnb() scans the current assembler-source
  *      text line returning the first character not a SPACE or TAB.
@@ -188,7 +193,7 @@ getst(char *id, int c)
  *              none
  *
  *      called functions:
- *              char    get()           aslex.c
+ *              int     get()           aslex.c
  *
  *      side effects:
  *              use of get() updates the global pointer ip, the position
@@ -205,7 +210,7 @@ getnb(void)
         return (c);
 }
 
-/*)Function     char    get()
+/*)Function     int     get()
  *
  *      The function get() returns the next character in the
  *      assembler-source text line, at the end of the line a
@@ -297,7 +302,7 @@ unget(int c)
  *              none
  *
  *      called functions:
- *              char    get()           aslex.c
+ *              int     get()           aslex.c
  *
  *      side effects:
  *              use of get() updates the global pointer ip the position
@@ -307,7 +312,7 @@ unget(int c)
 int
 getmap(int d)
 {
-        register int c, n, v;
+        int c, n, v;
 
         if ((c=get()) == '\0')
                 qerr();
@@ -353,6 +358,11 @@ getmap(int d)
                         }
                         unget(c);
                         c = v;
+                        break;
+
+                default:
+                        unget(c);
+                        c = '\\';
                         break;
                 }
         }
@@ -527,7 +537,7 @@ loop:
  *              none
  *
  *      called functions:
- *              char    getnb()         aslex.c
+ *              int     getnb()         aslex.c
  *              VOID    unget()         aslex.c
  *
  *      side effects:
@@ -538,7 +548,7 @@ loop:
 int
 more(void)
 {
-        register int c;
+        int c;
 
         c = getnb();
         unget(c);
@@ -560,7 +570,7 @@ more(void)
  *              none
  *
  *      called functions:
- *              char    getnb()         aslex.c
+ *              int     getnb()         aslex.c
  *
  *      side effects:
  *              use of getnb() updates the global pointer ip the
@@ -570,7 +580,7 @@ more(void)
 char
 endline(void)
 {
-        register int c;
+        int c;
 
         c = getnb();
         return( (c == '\0' || c == ';') ? 0 : c );

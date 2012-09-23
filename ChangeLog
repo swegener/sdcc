@@ -4,7 +4,10 @@
 	* sdas/asxxsrc/asdbg.c,
 	* sdas/asxxsrc/aslist.c,
 	* sdas/asxxsrc/asmain.c,
-	* sdas/asxxsrc/asxxxx.h: next small step towards ASxxxx v5
+	* sdas/asxxsrc/assym.c,
+	* sdas/asxxsrc/aslex.c,
+	* sdas/asxxsrc/assubr.c,
+	* sdas/asxxsrc/asxxxx.h: next small steps towards ASxxxx v5
 
 2012-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

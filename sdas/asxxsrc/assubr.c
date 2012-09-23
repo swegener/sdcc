@@ -1,24 +1,27 @@
-/* assubr.c
+/* assubr.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
+/*
+ *  Copyright (C) 1989-2010 Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "sdas.h"
 #include "asxxxx.h"
 
@@ -33,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              VOID    err()
  *              VOID    qerr()
  *              VOID    rerr()
+ *              char *  geterr()
  *
  *      assubr.c contains the local array of *error[]
  */
@@ -50,6 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *              char *  p               pointer to the error array
  *
  *      global variables:
+ *              int     aserr           error counter
  *              char    eb[]            array of generated error codes
  *
  *      functions called:
@@ -61,10 +66,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 VOID
-err(register int c)
+err(int c)
 {
-        register char *p;
+        char *p;
 
+        aserr++;
         p = eb;
         while (p < ep)
                 if (*p++ == c)
@@ -107,7 +113,7 @@ err(register int c)
 VOID
 diag()
 {
-        register char *p,*errstr;
+        char *p,*errstr;
 
         if (eb != ep) {
                 p = eb;
@@ -128,7 +134,9 @@ diag()
                 }
                 while (p < ep) {
                         if ((errstr = geterr(*p++)) != NULL) {
-                                if (is_sdas()) {
+                                if (!is_sdas()) {
+                                        fprintf(stderr, "              %s\n", errstr);
+                                } else {
                                         /* Modified to conform to gcc error standard, M. Hope, 7 Feb 98. */
                                         if (incfil >= 0) {
                                                 fprintf(stderr, "%s:", incfn[incfil]);
@@ -139,12 +147,9 @@ diag()
                                                 fprintf(stderr, "%d: Error:", srcline[cfile]);
                                         }
                                         fprintf(stderr, " %s\n", errstr);
-                                } else {
-                                        fprintf(stderr, "              %s\n", errstr);
                                 }
                         }
                 }
-                ++aserr;
         }
 }
 
@@ -258,8 +263,8 @@ char *errors[] = {
         "<u> undefined symbol encountered during assembly",
         NULL
 };
-        
-/*)Function:    char    *getarr(c)
+
+/*)Function:    char    *geterr(c)
  *
  *              int     c               the error code character
  *
@@ -272,6 +277,7 @@ char *errors[] = {
  *      global variables:
  *              char    *errors[]       array of pointers to the
  *                                      error strings
+ *              char    erb[]           Error string buffer
  *
  *      functions called:
  *              none
@@ -284,12 +290,13 @@ char *
 geterr(c)
 int c;
 {
-        int     i;
+        int i;
 
         for (i=0; errors[i]!=NULL; i++) {
                 if (c == errors[i][1]) {
                         return(errors[i]);
                 }
         }
-        return(NULL);
+        sprintf(erb, "<e> %.*s", (int) (sizeof(erb)-5), ib);
+        return(erb);
 }

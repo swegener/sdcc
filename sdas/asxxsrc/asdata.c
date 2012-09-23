@@ -154,6 +154,8 @@ char    tb[NTITL];      /*      Title string buffer
                          */
 char    stb[NSBTL];     /*      Subtitle string buffer
                          */
+char    erb[NINPUT+4];  /*      Error string buffer
+                         */
 
 char    symtbl[] = { "Symbol Table" };
 char    aretbl[] = { "Area Table" };

@@ -1,3 +1,10 @@
+2012-09-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodePostInc/Dec, geniCodePreInc/Dec):
+	fixed bug #3511511
+	* support/regression/tests/gcc-tortute-execute-950426-1.c:
+	re-enabled
+
 2012-09-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asxxsrc/asdata.c,

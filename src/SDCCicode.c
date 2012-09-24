@@ -2528,7 +2528,7 @@ geniCodePostInc (operand * op)
   operand *rOp;
   sym_link *optype = operandType (op);
   operand *result;
-  operand *rv = (IS_ITEMP (op) ? geniCodeRValue (op, (IS_PTR (optype) ? TRUE : FALSE)) : op);
+  operand *rv = (IS_ITEMP (op) ? geniCodeRValue (op, (!op->aggr2ptr && IS_PTR (optype)) ? TRUE : FALSE) : op);
   sym_link *rvtype = operandType (rv);
   int size = 0;
 
@@ -2576,7 +2576,7 @@ geniCodePreInc (operand * op, bool lvalue)
 {
   iCode *ic;
   sym_link *optype = operandType (op);
-  operand *rop = (IS_ITEMP (op) ? geniCodeRValue (op, (IS_PTR (optype) ? TRUE : FALSE)) : op);
+  operand *rop = (IS_ITEMP (op) ? geniCodeRValue (op, ((!op->aggr2ptr && IS_PTR (optype)) ? TRUE : FALSE)) : op);
   sym_link *roptype = operandType (rop);
   operand *result;
   int size = 0;
@@ -2618,7 +2618,7 @@ geniCodePostDec (operand * op)
   operand *rOp;
   sym_link *optype = operandType (op);
   operand *result;
-  operand *rv = (IS_ITEMP (op) ? geniCodeRValue (op, (IS_PTR (optype) ? TRUE : FALSE)) : op);
+  operand *rv = (IS_ITEMP (op) ? geniCodeRValue (op, ((!op->aggr2ptr && IS_PTR (optype)) ? TRUE : FALSE)) : op);
   sym_link *rvtype = operandType (rv);
   int size = 0;
 
@@ -2666,7 +2666,7 @@ geniCodePreDec (operand * op, bool lvalue)
 {
   iCode *ic;
   sym_link *optype = operandType (op);
-  operand *rop = (IS_ITEMP (op) ? geniCodeRValue (op, (IS_PTR (optype) ? TRUE : FALSE)) : op);
+  operand *rop = (IS_ITEMP (op) ? geniCodeRValue (op, ((!op->aggr2ptr && IS_PTR (optype)) ? TRUE : FALSE)) : op);
   sym_link *roptype = operandType (rop);
   operand *result;
   int size = 0;

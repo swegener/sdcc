@@ -46,7 +46,7 @@
  *      assembler parsing code.
  *
  *      asmain.c contains the following functions:
- *              int             main(argc, argv)
+ *              int     main(argc, argv)
  *              VOID    asexit(n)
  *              VOID    asmbl()
  *              FILE *  afile(fn, ft, wf)
@@ -841,43 +841,46 @@ loop:
          */
         switch (mp->m_type) {
 
-        case S_IF:
-                n = absexpr();
-                if (tlevel < MAXIF) {
-                        ++tlevel;
-                        ifcnd[tlevel] = n;
-                        iflvl[tlevel] = flevel;
-                        if (!n) {
-                                ++flevel;
-                        }
-                } else {
-                        err('i');
-                }
-                lmode = ELIST;
-                laddr = n;
-                return;
-
-        case S_ELSE:
-                if (ifcnd[tlevel]) {
-                        if (++flevel > (iflvl[tlevel]+1)) {
+        case S_CONDITIONAL:
+                switch (mp->m_valu) {
+                case O_IF:
+                        n = absexpr();
+                        if (tlevel < MAXIF) {
+                                ++tlevel;
+                                ifcnd[tlevel] = n;
+                                iflvl[tlevel] = flevel;
+                                if (!n) {
+                                        ++flevel;
+                                }
+                        } else {
                                 err('i');
                         }
-                } else {
-                        if (--flevel < iflvl[tlevel]) {
+                        lmode = ELIST;
+                        laddr = n;
+                        return;
+
+                case O_ELSE:
+                        if (ifcnd[tlevel]) {
+                                if (++flevel > (iflvl[tlevel]+1)) {
+                                        err('i');
+                                }
+                        } else {
+                                if (--flevel < iflvl[tlevel]) {
+                                        err('i');
+                                }
+                        }
+                        lmode = SLIST;
+                        return;
+
+                case O_ENDIF:
+                        if (tlevel) {
+                                flevel = iflvl[tlevel--];
+                        } else {
                                 err('i');
                         }
+                        lmode = SLIST;
+                        return;
                 }
-                lmode = SLIST;
-                return;
-
-        case S_ENDIF:
-                if (tlevel) {
-                        flevel = iflvl[tlevel--];
-                } else {
-                        err('i');
-                }
-                lmode = SLIST;
-                return;
 
         case S_PAGE:
                 lop = NLPP;
@@ -907,18 +910,24 @@ loop:
                 lmode = ALIST;
                 break;
 
-        case S_BYTE:
-        case S_WORD:
-                do {
-                        clrexpr(&e1);
-                        expr(&e1, 0);
-                        if (mp->m_type == S_BYTE) {
-                                outrb(&e1, R_NORM);
-                        } else {
-                                outrw(&e1, R_NORM);
-                        }
-                } while ((c = getnb()) == ',');
-                unget(c);
+        case S_DATA:
+                switch (mp->m_valu) {
+                case O_1BYTE:
+                case O_2BYTE:
+                        do {
+                                clrexpr(&e1);
+                                expr(&e1, 0);
+                                if (mp->m_valu == O_1BYTE) {
+                                        outrb(&e1, R_NORM);
+                                } else {
+                                        outrw(&e1, R_NORM);
+                                }
+                        } while ((c = getnb()) == ',');
+                        unget(c);
+                        break;
+                default:
+                        break;
+                }
                 break;
 
         /* sdas z80 specific */
@@ -996,27 +1005,33 @@ loop:
                 break;
         /* end sdas hc08 specific */
 
-        case S_ASCII:
-        case S_ASCIZ:
-                if ((d = getnb()) == '\0')
-                        qerr();
-                while ((c = getmap(d)) >= 0)
-                        outab(c);
-                if (mp->m_type == S_ASCIZ)
-                        outab(0);
-                break;
-
-        case S_ASCIS:
-                if ((d = getnb()) == '\0')
-                        qerr();
-                c = getmap(d);
-                while (c >= 0) {
-                        if ((n = getmap(d)) >= 0) {
+        case S_ASCIX:
+                switch(mp->m_valu) {
+                case O_ASCII:
+                case O_ASCIZ:
+                        if ((d = getnb()) == '\0')
+                                qerr();
+                        while ((c = getmap(d)) >= 0)
                                 outab(c);
-                        } else {
-                                outab(c | 0x80);
+                        if (mp->m_valu == O_ASCIZ)
+                                outab(0);
+                        break;
+
+                case O_ASCIS:
+                        if ((d = getnb()) == '\0')
+                                qerr();
+                        c = getmap(d);
+                        while (c >= 0) {
+                                if ((n = getmap(d)) >= 0) {
+                                        outab(c);
+                                } else {
+                                        outab(c | 0x80);
+                                }
+                                c = n;
                         }
-                        c = n;
+                        break;
+                default:
+                        break;
                 }
                 break;
 
@@ -1028,30 +1043,37 @@ loop:
                 lmode = BLIST;
                 break;
 
-        case S_TITLE:
-                p = tb;
-                if ((c = getnb()) != 0) {
-                        do {
-                                if (p < &tb[NTITL-1])
-                                        *p++ = c;
-                        } while ((c = get()) != 0);
-                }
-                *p = 0;
-                unget(c);
-                lmode = SLIST;
-                break;
+        case S_HEADER:
+                switch(mp->m_valu) {
+                case O_TITLE:
+                        p = tb;
+                        if ((c = getnb()) != 0) {
+                                do {
+                                        if (p < &tb[NTITL-1])
+                                                *p++ = c;
+                                } while ((c = get()) != 0);
+                        }
+                        *p = 0;
+                        unget(c);
+                        lmode = SLIST;
+                        break;
 
-        case S_SBTL:
-                p = stb;
-                if ((c = getnb()) != 0) {
-                        do {
-                                if (p < &stb[NSBTL-1])
-                                        *p++ = c;
-                        } while ((c = get()) != 0);
+                case O_SBTTL:
+                        p = stb;
+                        if ((c = getnb()) != 0) {
+                                do {
+                                        if (p < &stb[NSBTL-1])
+                                                *p++ = c;
+                                } while ((c = get()) != 0);
+                        }
+                        *p = 0;
+                        unget(c);
+                        lmode = SLIST;
+                        break;
+
+                default:
+                        break;
                 }
-                *p = 0;
-                unget(c);
-                lmode = SLIST;
                 break;
 
         case S_MODUL:

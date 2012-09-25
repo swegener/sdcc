@@ -1,3 +1,21 @@
+2012-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asrab/rabbitext.c: removed
+	* sdas/asrab/rabbit.h,    sdas/asrab/rab.h,
+	* sdas/asrab/rabbitadr.c, sdas/asrab/rabadr.c,
+	* sdas/asrab/rabbitmch.c, sdas/asrab/rabmch.c,
+	* sdas/asrab/rabbitpst.c, sdas/asrab/rabpst.c: renamed
+	* sdas/asrab/asrab.vcxproj,
+	* sdas/asrab/asrab.vcxproj.filters,
+	* sdas/asrab/Makefile.in: updated
+	* sdas/as6808/m08pst.c,
+	* sdas/as8051/i51pst.c,
+	* sdas/asgb/gbpst.c,
+	* sdas/asrab/rabpst.c,
+	* sdas/asz80/z80pst.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asxxxx.h: next small steps towards ASxxxx v5
+
 2012-09-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodePostInc/Dec, geniCodePreInc/Dec):

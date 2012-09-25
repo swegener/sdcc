@@ -24,7 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  */
 
 #include "asxxxx.h"
-#include "rabbit.h"
+#include "rab.h"
+
+int     hilo    = 0;
+char    *cpu    = "Rabbit 2000/4000";
+char    *dsft   = "asm";
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
 int     hd64;

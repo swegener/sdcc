@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -24,14 +24,13 @@
     <ClCompile Include="..\asxxsrc\assym.c" />
     <ClCompile Include="..\asxxsrc\sdas.c" />
     <ClCompile Include="..\asxxsrc\strcmpi.c" />
-    <ClCompile Include="rabbitadr.c" />
-    <ClCompile Include="rabbitext.c" />
-    <ClCompile Include="rabbitmch.c" />
-    <ClCompile Include="rabbitpst.c" />
+    <ClCompile Include="rabadr.c" />
+    <ClCompile Include="rabmch.c" />
+    <ClCompile Include="rabpst.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\asxxsrc\asxxxx.h" />
-    <ClInclude Include="rabbit.h" />
+    <ClInclude Include="rab.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}</ProjectGuid>

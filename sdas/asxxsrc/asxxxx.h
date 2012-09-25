@@ -479,7 +479,7 @@ struct  sym
 /* end sdas specific */
 };
 
-#define S_EOL           010     /* End mark for ___pst files */
+#define S_EOL           040     /* End mark for ___pst files */
 
 #define S_LCL           001     /* Local Variable */
 #define S_GBL           002     /* Global Variable */
@@ -488,32 +488,35 @@ struct  sym
 
 #define S_NEW           0       /* New Name (External) */
 #define S_USER          1       /* User Name (Assigned) */
-                                /* unused slot */
-                                /* unused slot */
-                                /* unused slot */
-
-#define S_PAGE          15      /* .page */
-#define S_TITLE         16      /* .title */
-#define S_SBTL          17      /* .sbttl */
-#define S_MODUL         25      /* .module */
-#define S_INCL          10      /* .include */
-#define S_AREA          13      /* .area name */
-#define S_ATYP          12      /* .area type */
-#define S_ORG           24      /* .org */
-#define S_RADIX         23      /* .radix */
-#define S_GLOBL         14      /* .globl */
-#define S_IF            18      /* .if */
-#define S_ELSE          19      /* .else */
-#define S_ENDIF         20      /* .endif */
-#define S_BLK           9       /* .blkb or .blkw */
-#define S_ASCII         7       /* .ascii */
-#define S_ASCIS         26      /* .ascis */
-#define S_ASCIZ         8       /* .asciz */
+#define S_SPARE         2       /* Spare Definition */
+#define S_PAGE          3       /* .page */
+#define S_HEADER        4       /* .title, .sbttl */
+#define   O_TITLE    0          /* .title */
+#define   O_SBTTL    1          /* .sbttl */
+#define S_MODUL         5       /* .module */
+#define S_INCL          6       /* .include */
+#define S_AREA          7       /* .area */
+#define S_ATYP          8       /* .area type */
+#define S_ORG           11      /* .org */
+#define S_RADIX         12      /* .radix */
+#define S_GLOBL         13      /* .globl */
+#define S_CONDITIONAL   15      /* .if, .else, .endif */
+#define   O_IF        0         /* .if */
+#define   O_ELSE      40        /* .else */
+#define   O_ENDIF     41        /* .endif */
+#define S_DATA          18      /* .byte, .word, .3byte, .4byte, .db, .dw, .fcb, .fdb */
+#define   O_1BYTE    1          /* .byte, .db, .fcb */
+#define   O_2BYTE    2          /* .word, .dw, .fdb */
+#define   O_3BYTE    3          /* .3byte */
+#define   O_4BYTE    4          /* .4byte */
+#define S_BLK           19      /* .blkb or .blkw */
+#define	S_ASCIX		20	/* .ascii, .ascis, .asciz, .str, .strs, .strz */
+#define	  O_ASCII    0		/* .ascii */
+#define	  O_ASCIS    1		/* .ascis */
+#define	  O_ASCIZ    2		/* .asciz */
 #define S_EVEN          21      /* .even */
 #define S_ODD           22      /* .odd */
-#define S_BYTE          5       /* .byte */
-#define S_WORD          6       /* .word */
-#define S_DAREA         11      /* .area */
+#define S_DAREA         24      /* .area */
 
 /* sdas specific */
 #define S_FLAT24        27      /* .flat24 */

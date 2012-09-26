@@ -1,3 +1,7 @@
+2012-09-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): fixed bug #3467508
+
 2012-09-26 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/cinc2h.pl: added,

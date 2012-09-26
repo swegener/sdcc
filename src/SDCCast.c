@@ -4218,6 +4218,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           else
             {
               unsigned long gpVal = 0;
+              int size = getSize(LTYPE (tree));
+              unsigned long mask = (size >= sizeof(long)) ? 0xffffffff : (1ul << (size * 8)) - 1;
+              unsigned long pVal = ulFromVal (valFromType (RTYPE (tree))) & mask;
 
               /* if casting literal specific pointer to generic pointer */
               if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
@@ -4230,13 +4233,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                     {
                       gpVal = pointerTypeToGPByte (DCL_TYPE (RTYPE (tree)), NULL, NULL);
                       gpVal <<= getSize (RTYPE (tree)) * 8;
-                      gpVal &= (1 << (getSize (LTYPE (tree)) * 8)) - 1;
+                      gpVal &= mask;
                     }
                 }
               checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
               LRVAL (tree) = 1;
               tree->type = EX_VALUE;
-              tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | ulFromVal (valFromType (RTYPE (tree))));
+              tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | pVal);
               TTYPE (tree) = tree->opval.val->type;
               tree->left = NULL;
               tree->right = NULL;

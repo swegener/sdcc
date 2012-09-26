@@ -1,3 +1,8 @@
+2012-09-26 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/cinc2h.pl: added,
+	  thanks to Molnar Karoly
+
 2012-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asrab/rabbitext.c: removed

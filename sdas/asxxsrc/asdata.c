@@ -61,6 +61,8 @@ int     cfile;          /*      current file handle index
 int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                          *      zero for false conditional case
                          */
+int     ftflevel;       /*      IIFF-IIFT-IIFTF FLAG
+                         */
 int     tlevel;         /*      current conditional level
                          */
 int     ifcnd[MAXIF+1]; /*      array of IF statement condition

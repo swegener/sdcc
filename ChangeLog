@@ -1,3 +1,14 @@
+2012-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/m08pst.c,
+	* sdas/as8051/i51pst.c,
+	* sdas/asgb/gbpst.c,
+	* sdas/asrab/rabpst.c,
+	* sdas/asz80/z80pst.c,
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asxxxx.h: next step to ASxxxx v5
+
 2012-09-27 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/inc2h.pl, support/scripts/cinc2h.pl,

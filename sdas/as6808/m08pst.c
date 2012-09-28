@@ -25,6 +25,9 @@
 #include "asxxxx.h"
 #include "m6808.h"
 
+/*
+ * Mnemonic Structure
+ */
 struct  mne     mne[] = {
 
         /* machine */
@@ -37,8 +40,9 @@ struct  mne     mne[] = {
     {   NULL,   "OVR",          S_ATYP,         0,      A_OVR   },
     {   NULL,   "REL",          S_ATYP,         0,      A_REL   },
     {   NULL,   "ABS",          S_ATYP,         0,      A_ABS   },
-    {   NULL,   "NOPAG",        S_ATYP,         0,      A_NOPAG},
+    {   NULL,   "NOPAG",        S_ATYP,         0,      A_NOPAG },
     {   NULL,   "PAG",          S_ATYP,         0,      A_PAG   },
+
     {   NULL,   "CODE",         S_ATYP,         0,      A_CODE  },
     {   NULL,   "DATA",         S_ATYP,         0,      A_DATA  },
     {   NULL,   "LOAD",         S_ATYP,         0,      A_LOAD  },
@@ -49,32 +53,75 @@ struct  mne     mne[] = {
     {   NULL,   ".sbttl",       S_HEADER,       0,      O_SBTTL },
     {   NULL,   ".module",      S_MODUL,        0,      0       },
     {   NULL,   ".include",     S_INCL,         0,      0       },
-    {   NULL,   ".area",        S_DAREA,        0,      0       },
+    {   NULL,   ".area",        S_AREA,         0,      0       },
     {   NULL,   ".org",         S_ORG,          0,      0       },
     {   NULL,   ".radix",       S_RADIX,        0,      0       },
     {   NULL,   ".globl",       S_GLOBL,        0,      0       },
     {   NULL,   ".if",          S_CONDITIONAL,  0,      O_IF    },
+    {   NULL,   ".iff",         S_CONDITIONAL,  0,      O_IFF   },
+    {   NULL,   ".ift",         S_CONDITIONAL,  0,      O_IFT   },
+    {   NULL,   ".iftf",        S_CONDITIONAL,  0,      O_IFTF  },
+    {   NULL,   ".ifgt",        S_CONDITIONAL,  0,      O_IFGT  },
+    {   NULL,   ".iflt",        S_CONDITIONAL,  0,      O_IFLT  },
+    {   NULL,   ".ifge",        S_CONDITIONAL,  0,      O_IFGE  },
+    {   NULL,   ".ifle",        S_CONDITIONAL,  0,      O_IFLE  },
+    {   NULL,   ".ifeq",        S_CONDITIONAL,  0,      O_IFEQ  },
+    {   NULL,   ".ifne",        S_CONDITIONAL,  0,      O_IFNE  },
+    {   NULL,   ".iif",         S_CONDITIONAL,  0,      O_IIF   },
+    {   NULL,   ".iiff",        S_CONDITIONAL,  0,      O_IIFF  },
+    {   NULL,   ".iift",        S_CONDITIONAL,  0,      O_IIFT  },
+    {   NULL,   ".iiftf",       S_CONDITIONAL,  0,      O_IIFTF },
+    {   NULL,   ".iifgt",       S_CONDITIONAL,  0,      O_IIFGT },
+    {   NULL,   ".iiflt",       S_CONDITIONAL,  0,      O_IIFLT },
+    {   NULL,   ".iifge",       S_CONDITIONAL,  0,      O_IIFGE },
+    {   NULL,   ".iifle",       S_CONDITIONAL,  0,      O_IIFLE },
+    {   NULL,   ".iifeq",       S_CONDITIONAL,  0,      O_IIFEQ },
+    {   NULL,   ".iifne",       S_CONDITIONAL,  0,      O_IIFNE },
     {   NULL,   ".else",        S_CONDITIONAL,  0,      O_ELSE  },
     {   NULL,   ".endif",       S_CONDITIONAL,  0,      O_ENDIF },
     {   NULL,   ".uleb128",     S_ULEB128,      0,      0       },
     {   NULL,   ".sleb128",     S_SLEB128,      0,      0       },
+    {   NULL,   ".equ",         S_EQU,          0,      O_EQU   },
+    {   NULL,   ".gblequ",      S_EQU,          0,      O_GBLEQU},
+    {   NULL,   ".lclequ",      S_EQU,          0,      O_LCLEQU},
     {   NULL,   ".byte",        S_DATA,         0,      O_1BYTE },
     {   NULL,   ".db",          S_DATA,         0,      O_1BYTE },
+    {   NULL,   ".fcb",         S_DATA,         0,      O_1BYTE },
     {   NULL,   ".word",        S_DATA,         0,      O_2BYTE },
     {   NULL,   ".dw",          S_DATA,         0,      O_2BYTE },
-    {   NULL,   ".blkb",        S_BLK,          0,      1       },
-    {   NULL,   ".ds",          S_BLK,          0,      1       },
-    {   NULL,   ".blkw",        S_BLK,          0,      2       },
+    {   NULL,   ".fdb",         S_DATA,         0,      O_2BYTE },
+/*    { NULL,   ".3byte",       S_DATA,         0,      O_3BYTE },      */
+/*    { NULL,   ".triple",      S_DATA,         0,      O_3BYTE },      */
+/*    { NULL,   ".4byte",       S_DATA,         0,      O_4BYTE },      */
+/*    { NULL,   ".quad",        S_DATA,         0,      O_4BYTE },      */
+    {   NULL,   ".blkb",        S_BLK,          0,      O_1BYTE },
+    {   NULL,   ".ds",          S_BLK,          0,      O_1BYTE },
+    {   NULL,   ".rmb",         S_BLK,          0,      O_1BYTE },
+    {   NULL,   ".rs",          S_BLK,          0,      O_1BYTE },
+    {   NULL,   ".blkw",        S_BLK,          0,      O_2BYTE },
+/*    { NULL,   ".blk3",        S_BLK,          0,      O_3BYTE },      */
+/*    { NULL,   ".blk4",        S_BLK,          0,      O_4BYTE },      */
     {   NULL,   ".ascii",       S_ASCIX,        0,      O_ASCII },
     {   NULL,   ".ascis",       S_ASCIX,        0,      O_ASCIS },
     {   NULL,   ".asciz",       S_ASCIX,        0,      O_ASCIZ },
-    {   NULL,   ".even",        S_EVEN,         0,      0       },
-    {   NULL,   ".odd",         S_ODD,          0,      0       },
+    {   NULL,   ".str",         S_ASCIX,        0,      O_ASCII },
+    {   NULL,   ".strs",        S_ASCIX,        0,      O_ASCIS },
+    {   NULL,   ".strz",        S_ASCIX,        0,      O_ASCIZ },
+    {   NULL,   ".fcc",         S_ASCIX,        0,      O_ASCII },
+    {   NULL,   ".even",        S_BOUNDARY,     0,      O_EVEN  },
+    {   NULL,   ".odd",         S_BOUNDARY,     0,      O_ODD   },
+    {   NULL,   ".bndry",       S_BOUNDARY,     0,      O_BNDRY },
 /* sdas specific */
     {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0       },
 /* end sdas specific */
 //    { NULL,   ".assume",      S_ERROR,        0,      0       },
 //    { NULL,   ".error",       S_ERROR,        0,      1       },
+
+        /* Machines */
+
+        /* S08/CS08/HCS08/68HCS08 */
+
+    {   NULL,   ".cs08",        X_CS08,         0,      0 },
 
         /* 68HC08 */
 
@@ -211,9 +258,5 @@ struct  mne     mne[] = {
     {   NULL,   "sei",          S_INH,          0,      0x9B    },
     {   NULL,   "rsp",          S_INH,          0,      0x9C    },
     {   NULL,   "nop",          S_INH,          0,      0x9D    },
-    {   NULL,   "txa",          S_INH,          0,      0x9F},
-
-        /* S08/CS08/HCS08/68HCS08 */
-
-    {   NULL,   ".cs08",        X_CS08,         S_EOL,  0 }
+    {   NULL,   "txa",          S_INH,          S_EOL,  0x9F    }
 };

@@ -231,8 +231,8 @@
 #define LIST_PAG        0x0080  /* Assembler Pagination */
 #define LIST_LST        0x0100  /* .LIST/.NLIST Listing */
 
-#define LIST_MD	        0x0200  /* Macro Definition */
-#define LIST_ME	        0x0400  /* Macro Expansion */
+#define LIST_MD         0x0200  /* Macro Definition */
+#define LIST_ME         0x0400  /* Macro Expansion */
 #define LIST_MEB        0x0800  /* Macro Expansion Binary */
 
 #define LIST_BITS       0x0FFF  /* LIST  Flags Mask */
@@ -501,22 +501,48 @@ struct  sym
 #define S_RADIX         12      /* .radix */
 #define S_GLOBL         13      /* .globl */
 #define S_CONDITIONAL   15      /* .if, .else, .endif */
-#define   O_IF        0         /* .if */
-#define   O_ELSE      40        /* .else */
-#define   O_ENDIF     41        /* .endif */
+#define   O_IF       0          /* .if */
+#define   O_IFF      1          /* .iff */
+#define   O_IFT      2          /* .ift */
+#define   O_IFTF     3          /* .iftf */
+#define   O_IFGT     6          /* .ifgt (BGP) */
+#define   O_IFLT     7          /* .iflt (BGP) */
+#define   O_IFGE     8          /* .ifge (BGP) */
+#define   O_IFLE     9          /* .ifle (BGP) */
+#define   O_IFEQ     10         /* .ifeq (BGP) */
+#define   O_IFNE     11         /* .ifne (BGP) */
+#define   O_IFEND    20         /* end of .if conditionals */
+#define   O_IIF      20         /* .iif */
+#define   O_IIFF     21         /* .iiff */
+#define   O_IIFT     22         /* .iift */
+#define   O_IIFTF    23         /* .iiftf */
+#define   O_IIFGT    26         /* .iifgt */
+#define   O_IIFLT    27         /* .iiflt */
+#define   O_IIFGE    28         /* .iifge */
+#define   O_IIFLE    29         /* .iifle */
+#define   O_IIFEQ    30         /* .iifeq */
+#define   O_IIFNE    31         /* .iifne */
+#define   O_IIFEND   40         /* end of .iif conditionals */
+#define   O_ELSE     40         /* .else */
+#define   O_ENDIF    41         /* .endif */
+#define S_EQU           17      /* .equ, .gblequ, .lclequ */
+#define   O_EQU      0          /* .equ */
+#define   O_GBLEQU   1          /* .gblequ */
+#define   O_LCLEQU   2          /* .lclequ */
 #define S_DATA          18      /* .byte, .word, .3byte, .4byte, .db, .dw, .fcb, .fdb */
 #define   O_1BYTE    1          /* .byte, .db, .fcb */
 #define   O_2BYTE    2          /* .word, .dw, .fdb */
 #define   O_3BYTE    3          /* .3byte */
 #define   O_4BYTE    4          /* .4byte */
 #define S_BLK           19      /* .blkb or .blkw */
-#define	S_ASCIX		20	/* .ascii, .ascis, .asciz, .str, .strs, .strz */
-#define	  O_ASCII    0		/* .ascii */
-#define	  O_ASCIS    1		/* .ascis */
-#define	  O_ASCIZ    2		/* .asciz */
-#define S_EVEN          21      /* .even */
-#define S_ODD           22      /* .odd */
-#define S_DAREA         24      /* .area */
+#define S_ASCIX         20      /* .ascii, .ascis, .asciz, .str, .strs, .strz */
+#define   O_ASCII    0          /* .ascii */
+#define   O_ASCIS    1          /* .ascis */
+#define   O_ASCIZ    2          /* .asciz */
+#define S_BOUNDARY      22      /* .even, .odd */
+#define   O_EVEN     0          /* .even */
+#define   O_ODD      1          /* .odd */
+#define   O_BNDRY    2          /* .bndry */
 
 /* sdas specific */
 #define S_FLAT24        27      /* .flat24 */
@@ -613,6 +639,8 @@ extern  int     incfil;         /*      current file handle index
                                  */
 extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                                  *      zero for false conditional case
+                                 */
+extern  int     ftflevel;       /*      IIFF-IIFT-IIFTF FLAG
                                  */
 extern  int     tlevel;         /*      current conditional level
                                  */
@@ -795,6 +823,7 @@ extern  char *          strrchr();
 extern  FILE *          afile(char *fn, char *ft, int wf);
 extern  VOID            asexit(int i);
 extern  VOID            asmbl(void);
+extern  VOID            equate(char *id,struct expr *e1,a_uint equtype);
 extern  int             intsiz(void);
 extern  VOID            newdot(struct area *nap);
 extern  VOID            phase(struct area *ap, a_uint a);

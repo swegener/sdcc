@@ -24,14 +24,14 @@
  *
  *   With enhancements from
  *
- *	John L. Hartman	(JLH)
- *	jhartman at compuserve dot com
+ *      John L. Hartman (JLH)
+ *      jhartman at compuserve dot com
  *
- *	Boisy G. Pitre (BGP)
- *	boisy at boisypitre dot com
+ *      Boisy G. Pitre (BGP)
+ *      boisy at boisypitre dot com
  *
- *	Mike McCarty
- *	mike dot mccarty at sbcglobal dot net
+ *      Mike McCarty
+ *      mike dot mccarty at sbcglobal dot net
  */
 
 #include <errno.h>
@@ -49,6 +49,7 @@
  *              int     main(argc, argv)
  *              VOID    asexit(n)
  *              VOID    asmbl()
+ *              VOID    equate()
  *              FILE *  afile(fn, ft, wf)
  *              int     intsiz()
  *              VOID    newdot(nap)
@@ -405,7 +406,6 @@ main(int argc, char *argv[])
                 ifcnd[0] = 0;
                 iflvl[0] = 0;
                 radix = 10;
-                srcline[0] = 0;
                 page = 0;
                 /* sdas specific */
                 org_cnt = 0;
@@ -414,6 +414,7 @@ main(int argc, char *argv[])
                 lop  = NLPP;
                 cfile = 0;
                 incfil = -1;
+                srcline[0] = 0;
                 for (i = 0; i <= inpfil; i++)
                         rewind(sfp[i]);
                 ap = areap;
@@ -555,6 +556,7 @@ asexit(int i)
  *
  *      local variables:
  *              mne *   mp              pointer to a mne structure
+ *              mne *   xp              pointer to a mne structure
  *              sym *   sp              pointer to a sym structure
  *              tsym *  tp              pointer to a tsym structure
  *              int     c               character from assembler-source
@@ -566,9 +568,11 @@ asexit(int i)
  *              char    fn[]            filename string
  *              char *  p               pointer into a string
  *              int     d               temporary value
- *              int     n               temporary value
  *              int     uaf             user area options flag
  *              int     uf              area options
+ *              a_uint  n               temporary value
+ *              a_uint  v               temporary value
+ *              int     m_type          mnemonic type
  *
  *      global variables:
  *              area *  areap           pointer to an area structure
@@ -576,6 +580,7 @@ asexit(int i)
  *                                      ASCII character
  *              int     flevel          IF-ELSE-ENDIF flag will be non
  *                                      zero for false conditional case
+ *              int     ftflevel;       IIFF-IIFT-IIFTF FLAG
  *              a_uint  fuzz            tracks pass to pass changes in the
  *                                      address of symbols caused by
  *                                      variable length instruction formats
@@ -608,6 +613,7 @@ asexit(int i)
  *              VOID    clrexpr()       asexpr.c
  *              int     digit()         asexpr.c
  *              char    endline()       aslex.c
+ *              VOID    equate()        asmain.c
  *              VOID    err()           assubr.c
  *              VOID    expr()          asexpr.c
  *              FILE *  fopen()         c_library
@@ -638,23 +644,35 @@ asexit(int i)
 VOID
 asmbl(void)
 {
-        struct mne *mp;
+        struct mne *mp, *xp;
         struct sym *sp;
         struct tsym *tp;
         int c;
         struct area  *ap;
         struct expr e1;
         char id[NCPS];
+        int  equtype;
         char opt[NCPS];
         char fn[FILSPC+FILSPC];
         char *p;
-        int d, n, uaf, uf;
+        int d, uaf, uf;
+        a_uint n, v;
         /* sdas specific */
         static struct area *abs_ap; /* pointer to current absolute area structure */
         /* end sdas specific */
+        int m_type;
 
         laddr = dot.s_addr;
         lmode = SLIST;
+
+        /*
+         * Check iiff-iift-iiftf processing
+         */
+        if (ftflevel != 0) {
+                flevel = ftflevel - 1;
+                ftflevel = 0;
+        }
+
 loop:
         if ((c=endline()) == 0) { return; }
 
@@ -762,22 +780,18 @@ loop:
                 }
                 symp = lookup(id);
                 if (symp == &dot)
-                        err('.');
+                        qerr();
                 if (pass == 0) {
-                        if ((symp->s_type != S_NEW) &&
-                            ((symp->s_flag & S_ASG) == 0))
+                        if ((symp->s_type != S_NEW) && ((symp->s_flag & S_ASG) == 0))
                                 symp->s_flag |= S_MDF;
                 }
-                if (pass != 2) {
-                        fuzz = symp->s_addr - dot.s_addr;
-                        symp->s_type = S_USER;
-                        symp->s_area = dot.s_area;
-                        symp->s_addr = dot.s_addr;
-                } else {
-                        if (symp->s_flag & S_MDF)
-                                err('m');
-                        phase(symp->s_area, symp->s_addr);
-                }
+                if (symp->s_flag & S_MDF)
+                        err('m');
+                symp->s_type = S_USER;
+                phase(symp->s_area, symp->s_addr);
+                fuzz = symp->s_addr - dot.s_addr;
+                symp->s_area = dot.s_area;
+                symp->s_addr = dot.s_addr;
                 if (c) {
                         symp->s_flag |= S_GBL;
                 }
@@ -786,45 +800,33 @@ loop:
         }
         /*
          * If the next character is a = then an equate is being processed.
-         * A double == defines a global equate.  If this is new variable
-         * then create a symbol structure.
+         *
+         * Syntax:
+         *    [labels] sym =  value   defines an equate.
+         *    [labels] sym == value   defines a global equate.
+         *    [labels] sym =: value   defines an internal machine equate.
+         * If this is a new variable then create a symbol structure.
          */
         if (c == '=') {
                 if (flevel)
                         return;
-                if ((c = get()) != '=') {
-                        unget(c);
-                        c = 0;
+                switch (c = get()) {
+                    case '=':   equtype = O_GBLEQU;                     break;
+                    case ':':   equtype = O_LCLEQU;                     break;
+                    default:    equtype = O_EQU;        unget(c);       break;
                 }
-                clrexpr(&e1);
-                expr(&e1, 0);
-                sp = lookup(id);
-                if (sp == &dot) {
-                        outall();
-                        if (e1.e_flag || e1.e_base.e_ap != dot.s_area) {
-                                err('.');
-                        } else {
-                                sp->s_area = e1.e_base.e_ap;
-                                sp->s_addr = laddr = e1.e_addr;
-                        }
-                } else {
-                        if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
-                                err('m');
-                        }
-                        sp->s_area = e1.e_base.e_ap;
-                        sp->s_addr = e1.e_addr;
-                }
-                sp->s_type = S_USER;
-                sp->s_flag |= S_ASG;
-                if (c) {
-                        sp->s_flag |= S_GBL;
-                }
-                laddr = sp->s_addr;
-                lmode = ELIST;
+                equate(id, &e1, equtype);
                 goto loop;
         }
         unget(c);
+        /*
+         * Completed scan for labels , equates, and symbols.
+         */
         lmode = flevel ? SLIST : CLIST;
+        /*
+         * An assembler directive or mnemonic is
+         * required to continue processing line.
+         */
         mp = mlookup(id);
         if (mp == NULL) {
                 if (!flevel) {
@@ -836,39 +838,261 @@ loop:
          * If we have gotten this far then we have found an
          * assembler directive or an assembler mnemonic.
          *
-         * Check for .if, .else, .endif, and .page directives
-         * which are not controlled by the conditional flags
+         * Check for .if[], .iif[], .else, .endif,
+         * and .page directives.
          */
-        switch (mp->m_type) {
+        m_type = (mp != NULL) ? mp->m_type : ~0;
+
+        switch (m_type) {
 
         case S_CONDITIONAL:
-                switch (mp->m_valu) {
-                case O_IF:
-                        n = absexpr();
-                        if (tlevel < MAXIF) {
-                                ++tlevel;
-                                ifcnd[tlevel] = n;
-                                iflvl[tlevel] = flevel;
-                                if (!n) {
-                                        ++flevel;
+                /*
+                 * BGP - .ifeq, .ifne, .ifgt, .iflt, .ifge, .ifle
+                 */
+                if (mp->m_valu < O_IFEND) {
+                        if (mp->m_valu == O_IF) {
+                                /*
+                                 * Process conditionals of the form
+                                 *
+                                 *      .if     cnd(,)  arg1 (, arg2)
+                                 *
+                                 * where cnd is one of the following:
+                                 *
+                                 *      eq      ne
+                                 *      gt      lt      ge      le
+                                 *      def     ndef
+                                 *      b       nb      idn     dif
+                                 *      t       f       tf
+                                 */
+                                p = ip;
+                                strcpy(id,".if");
+                                getid(&id[3],getnb());
+                                xp = mlookup(id);
+                                if ((xp != NULL) &&
+                                    (xp->m_type == S_CONDITIONAL) &&
+                                    (xp->m_valu != O_IF)) {
+                                        mp = xp;
+                                        comma(0);
+                                } else {
+                                        ip = p;
                                 }
-                        } else {
-                                err('i');
                         }
-                        lmode = ELIST;
-                        laddr = n;
-                        return;
+                        if (flevel) {
+                                n = 0;
+                        } else {
+                                switch (mp->m_valu) {
+                                case O_IF:
+                                case O_IFNE:    /* .if ne,.... */
+                                case O_IFEQ:    /* .if eq,.... */
+                                case O_IFGT:    /* .if gt,.... */
+                                case O_IFLT:    /* .if lt,.... */
+                                case O_IFGE:    /* .if ge,.... */
+                                case O_IFLE:    /* .if le,.... */
+                                        n = absexpr();
+                                        switch (mp->m_valu) {
+                                        default:
+                                        case O_IF:
+                                        case O_IFNE:    n = (((v_sint) n) != 0);        break;
+                                        case O_IFEQ:    n = (((v_sint) n) == 0);        break;
+                                        case O_IFGT:    n = (((v_sint) n) >  0);        break;
+                                        case O_IFLT:    n = (((v_sint) n) <  0);        break;
+                                        case O_IFGE:    n = (((v_sint) n) >= 0);        break;
+                                        case O_IFLE:    n = (((v_sint) n) <= 0);        break;
+                                        }
+                                        break;
 
-                case O_ELSE:
-                        if (ifcnd[tlevel]) {
-                                if (++flevel > (iflvl[tlevel]+1)) {
-                                        err('i');
-                                }
-                        } else {
-                                if (--flevel < iflvl[tlevel]) {
-                                        err('i');
+                                case O_IFF:     /* .if f */
+                                case O_IFT:     /* .if t */
+                                case O_IFTF:    /* .if tf */
+                                        n = 0;
+                                        break;
+
+                                default:
+                                        n = 0;
+                                        qerr();
+                                        break;
                                 }
                         }
+                        switch (mp->m_valu) {
+                        default:
+                                if (tlevel < MAXIF) {
+                                        ++tlevel;
+                                        ifcnd[tlevel] = (int) n;
+                                        iflvl[tlevel] = flevel;
+                                        if (!n) {
+                                                ++flevel;
+                                        }
+                                } else {
+                                        err('i');
+                                }
+                                if (!iflvl[tlevel]) {
+                                        lmode = ELIST;
+                                        laddr = n;
+                                } else {
+                                        lmode = SLIST;
+                                }
+                                break;
+
+                        case O_IFF:     /* .if f */
+                        case O_IFT:     /* .if t */
+                        case O_IFTF:    /* .if tf */
+                                if (tlevel == 0) {
+                                        err('i');
+                                        lmode = SLIST;
+                                        break;
+                                }
+                                if (iflvl[tlevel] == 0) {
+                                        if (ifcnd[tlevel]) {
+                                                switch (mp->m_valu) {
+                                                default:
+                                                case O_IFF:     flevel = 1;     break;
+                                                case O_IFT:     flevel = 0;     break;
+                                                case O_IFTF:    flevel = 0;     break;
+                                                }
+                                        } else {
+                                                switch (mp->m_valu) {
+                                                default:
+                                                case O_IFF:     flevel = 0;     break;
+                                                case O_IFT:     flevel = 1;     break;
+                                                case O_IFTF:    flevel = 0;     break;
+                                                }
+                                        }
+                                        lmode = ELIST;
+                                        laddr = flevel ? 0 : 1;
+                                } else {
+                                        lmode = SLIST;
+                                }
+                                break;
+                        }
+                        return;
+                } else
+                if (mp->m_valu < O_IIFEND) {
+                        if (mp->m_valu == O_IIF) {
+                                /*
+                                 * Process conditionals of the form
+                                 *
+                                 *      .iif    cnd(,)  arg1 (, arg2)
+                                 *
+                                 * where cnd is one of the following:
+                                 *
+                                 *      eq      ne
+                                 *      gt      lt      ge      le
+                                 *      def     ndef
+                                 *      b       nb      idn     dif
+                                 *      t       f       tf
+                                 */
+                                p = ip;
+                                strcpy(id,".iif");
+                                getid(&id[4],getnb());
+                                xp = mlookup(id);
+                                if ((xp != NULL) &&
+                                    (xp->m_type == S_CONDITIONAL) &&
+                                    (xp->m_valu != O_IIF)) {
+                                        mp = xp;
+                                        comma(0);
+                                } else {
+                                        ip = p;
+                                }
+                        }
+                        switch (mp->m_valu) {
+                        case O_IIFF:    /* .iif f */
+                        case O_IIFT:    /* .iif t */
+                        case O_IIFTF:   /* .iif tf */
+                                if (tlevel == 0) {
+                                        err('i');
+                                        lmode = SLIST;
+                                        return;
+                                }
+                                if (iflvl[tlevel] == 0) {
+                                        ftflevel = flevel + 1;
+                                        if (ifcnd[tlevel] != 0) {
+                                                switch (mp->m_valu) {
+                                                default:
+                                                case O_IIFF:    flevel = 1;     break;
+                                                case O_IIFT:    flevel = 0;     break;
+                                                case O_IIFTF:   flevel = 0;     break;
+                                                }
+                                        } else {
+                                                switch (mp->m_valu) {
+                                                default:
+                                                case O_IIFF:    flevel = 0;     break;
+                                                case O_IIFT:    flevel = 1;     break;
+                                                case O_IIFTF:   flevel = 0;     break;
+                                                }
+                                        }
+                                }
+                                n = flevel ? 0 : 1;
+                                /*
+                                 * Skip trailing ','
+                                 */
+                                comma(0);
+                                lmode = SLIST;
+                                if (n) {
+                                        goto loop;
+                                }
+                                return;
+
+                        default:
+                                if (flevel) {
+                                        return;
+                                }
+                                break;
+                        }
+                        switch (mp->m_valu) {
+                        case O_IIF:
+                        case O_IIFNE:   /* .iif ne,.... */
+                        case O_IIFEQ:   /* .iif eq,.... */
+                        case O_IIFGT:   /* .iif gt,.... */
+                        case O_IIFLT:   /* .iif lt,.... */
+                        case O_IIFGE:   /* .iif ge,.... */
+                        case O_IIFLE:   /* .iif le,.... */
+                                n = absexpr();
+                                switch (mp->m_valu) {
+                                default:
+                                case O_IIF:
+                                case O_IIFNE:   n = (((v_sint) n) != 0);        break;
+                                case O_IIFEQ:   n = (((v_sint) n) == 0);        break;
+                                case O_IIFGT:   n = (((v_sint) n) >  0);        break;
+                                case O_IIFLT:   n = (((v_sint) n) <  0);        break;
+                                case O_IIFGE:   n = (((v_sint) n) >= 0);        break;
+                                case O_IIFLE:   n = (((v_sint) n) <= 0);        break;
+                                }
+                                break;
+
+                        default:
+                                n = 0;
+                                qerr();
+                                break;
+                        }
+                        /*
+                         * Skip trailing ','
+                         */
+                        comma(0);
+                        lmode = SLIST;
+                        if (n) {
+                                goto loop;
+                        }
+                        return;
+                }
+
+                switch (mp->m_valu) {
+                case O_ELSE:
+                        if (tlevel != 0) {
+                                if (ifcnd[tlevel]) {
+                                        flevel = iflvl[tlevel] + 1;
+                                        ifcnd[tlevel] = 0;
+                                } else {
+                                        flevel = iflvl[tlevel];
+                                        ifcnd[tlevel] = 1;
+                                }
+                                if (!iflvl[tlevel]) {
+                                        lmode = ELIST;
+                                        laddr = ifcnd[tlevel];
+                                        return;
+                                }
+                        } else {
+                                        err('i');
+                                }
                         lmode = SLIST;
                         return;
 
@@ -880,11 +1104,16 @@ loop:
                         }
                         lmode = SLIST;
                         return;
+
+                default:
+                        break;
                 }
+                qerr();
+                break;
 
         case S_PAGE:
-                lop = NLPP;
                 lmode = NLIST;
+                lop = NLPP;
                 return;
 
         default:
@@ -897,19 +1126,6 @@ loop:
          * process the assembler directives here.
          */
         switch (mp->m_type) {
-
-        case S_EVEN:
-                outall();
-                laddr = dot.s_addr = (dot.s_addr + 1) & ~1;
-                lmode = ALIST;
-                break;
-
-        case S_ODD:
-                outall();
-                laddr = dot.s_addr |= 1;
-                lmode = ALIST;
-                break;
-
         case S_DATA:
                 switch (mp->m_valu) {
                 case O_1BYTE:
@@ -1005,36 +1221,6 @@ loop:
                 break;
         /* end sdas hc08 specific */
 
-        case S_ASCIX:
-                switch(mp->m_valu) {
-                case O_ASCII:
-                case O_ASCIZ:
-                        if ((d = getnb()) == '\0')
-                                qerr();
-                        while ((c = getmap(d)) >= 0)
-                                outab(c);
-                        if (mp->m_valu == O_ASCIZ)
-                                outab(0);
-                        break;
-
-                case O_ASCIS:
-                        if ((d = getnb()) == '\0')
-                                qerr();
-                        c = getmap(d);
-                        while (c >= 0) {
-                                if ((n = getmap(d)) >= 0) {
-                                        outab(c);
-                                } else {
-                                        outab(c | 0x80);
-                                }
-                                c = n;
-                        }
-                        break;
-                default:
-                        break;
-                }
-                break;
-
         case S_BLK:
                 clrexpr(&e1);
                 expr(&e1, 0);
@@ -1105,7 +1291,7 @@ loop:
                 lmode = SLIST;
                 break;
 
-        case S_DAREA:
+        case S_AREA:
                 getid(id, -1);
                 uaf = 0;
                 uf  = A_CON|A_REL;
@@ -1168,6 +1354,66 @@ loop:
                         dot.s_addr = dot.s_org = laddr;
                 } else {
                         err('o');
+                }
+                break;
+
+        case S_ASCIX:
+                switch(mp->m_valu) {
+                case O_ASCII:
+                case O_ASCIZ:
+                        if ((d = getnb()) == '\0')
+                                qerr();
+                        while ((c = getmap(d)) >= 0)
+                                outab(c);
+                        if (mp->m_valu == O_ASCIZ)
+                                outab(0);
+                        break;
+
+                case O_ASCIS:
+                        if ((d = getnb()) == '\0')
+                                qerr();
+                        c = getmap(d);
+                        while (c >= 0) {
+                                if ((n = getmap(d)) >= 0) {
+                                        outab(c);
+                                } else {
+                                        outab(c | 0x80);
+                                }
+                                c = n;
+                        }
+                        break;
+                default:
+                        break;
+                }
+                break;
+
+        case S_BOUNDARY:
+                switch(mp->m_valu) {
+                case O_EVEN:
+                        outall();
+                        laddr = dot.s_addr = (dot.s_addr + 1) & ~1;
+                        lmode = ALIST;
+                        break;
+
+                case O_ODD:
+                        outall();
+                        laddr = dot.s_addr |= 1;
+                        lmode = ALIST;
+                        break;
+
+                case O_BNDRY:
+                        v = absexpr();
+                        n = dot.s_addr % v;
+                        if (n != 0) {
+                                dot.s_addr += (v - n);
+                        }
+                        outall();
+                        laddr = dot.s_addr;
+                        lmode = ALIST;
+                        break;
+
+                default:
+                        break;
                 }
                 break;
 
@@ -1277,7 +1523,7 @@ loop:
 
 #if NOICE
                 /*
-                 * NoICE	JLH
+                 * NoICE        JLH
                  * if -j, generate a line number symbol
                  */
                 if (jflag && (pass == 1)) {
@@ -1305,6 +1551,79 @@ loop:
         else {
                 goto loop;
         }
+}
+
+/*)Function     VOID    equate(id,e1,equtype)
+ *
+ *              char *          id              ident to equate
+ *              struct expr *   e1              value of equate
+ *              a_uint          equtype         equate type (O_EQU,O_LCLEQU,O_GBLEQU)
+ *
+ *      The function equate() installs an equate of a
+ *      given type.
+ *
+ *      equate has no return value
+ *
+ *      local variables:
+ *              struct sym *    sp      symbol being equated
+ *
+ *      global variables:
+ *              lmode                   set to ELIST
+ *
+ *      functions called:
+ *              VOID    clrexpr()       asexpr.c
+ *              VOID    expr()          asexpr.c
+ *              VOID    err()           assubr.c
+ *              sym  *  lookup()        assym.c
+ *              VOID    outall()        asout.c
+ *
+ *      side effects:
+ *              A new symbol may be created.
+ *              Symbol parameters are updated.
+ */
+
+VOID
+equate(char *id, struct expr *e1, a_uint equtype)
+{
+        struct sym *sp;
+
+        clrexpr(e1);
+        expr(e1, 0);
+
+        sp = lookup(id);
+
+        if (sp == &dot) {
+                outall();
+                if (e1->e_flag || e1->e_base.e_ap != dot.s_area)
+                        err('.');
+        } else {
+                switch(equtype) {
+                case O_EQU:
+                default:
+                        break;
+
+                case O_GBLEQU:
+                        sp->s_flag &= ~S_LCL;
+                        sp->s_flag |=  S_GBL;
+                        break;
+
+                case O_LCLEQU:
+                        sp->s_flag &= ~S_GBL;
+                        sp->s_flag |=  S_LCL;
+                        break;
+                }
+
+                if (e1->e_flag && (e1->e_base.e_sp->s_type == S_NEW)) {
+                        rerr();
+                } else {
+                        sp->s_area = e1->e_base.e_ap;
+                }
+                sp->s_flag |= S_ASG;
+                sp->s_type = S_USER;
+        }
+
+        sp->s_addr = laddr = e1->e_addr;
+        lmode = ELIST;
 }
 
 /*)Function     FILE *  afile(fn, ft, wf)

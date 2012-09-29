@@ -481,6 +481,8 @@ PORT hc08_port =
     "IABS    (ABS)",      // iabs_name - absolute data
     NULL,
     NULL,
+    NULL,
+    NULL,
     1
   },
   { _hc08_genExtraAreas,
@@ -618,6 +620,8 @@ PORT s08_port =
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
     "XABS    (ABS)",      // xabs_name - absolute xdata
     "IABS    (ABS)",      // iabs_name - absolute data
+    NULL,
+    NULL,
     NULL,
     NULL,
     1

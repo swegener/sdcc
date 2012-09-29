@@ -1011,6 +1011,8 @@ PORT ds390_port =
     "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
     "IABS    (ABS,DATA)",       // iabs_name - absolute idata/data
+    0,
+    0,
     NULL,
     NULL,
     1
@@ -1353,6 +1355,8 @@ PORT tininative_port =
     "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
     "IABS    (ABS,DATA)",       // iabs_name - absolute idata/data
+    0,
+    0,
     NULL,
     NULL,
     1
@@ -1614,6 +1618,8 @@ PORT ds400_port =
     "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
     "IABS    (ABS,DATA)",       // iabs_name - absolute idata/data
+    0,
+    0,
     NULL,
     NULL,
     1

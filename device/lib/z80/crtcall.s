@@ -26,7 +26,7 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        .area   _CODE
+	.area   _CODE
 
 	.globl __sdcc_call_hl
 
@@ -34,3 +34,4 @@
 
 __sdcc_call_hl:
 	jp	(hl)
+

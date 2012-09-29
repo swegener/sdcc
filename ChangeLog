@@ -1,3 +1,27 @@
+2012-09-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/lib/r2k/crt0.s,
+	  device/lib/z180/crt0.s,
+	  device/lib/r3ka/crt0.s,
+	  device/lib/z80/crt0.s,
+	  device/lib/z80/crtcall.s,
+	  src/hc08/main.c,
+	  src/SDCCglue.c,
+	  src/port.h,
+	  src/SDCCmem.c,
+	  src/SDCCmem.h,
+	  src/ds390/main.c,
+	  src/z80/main.c,
+	  src/mcs51/main.c,
+	  src/pic14/main.c,
+	  src/pic16/main.c:
+	  Most of RFE #3565759.
+	* device/lib/r2k/Makefile.in,
+	  device/lib/z180/Makefile.in,
+	  device/lib/r3ka/Makefile.in,
+	  device/lib/z80/Makefile.in:
+	  Removed obsolete RLE initialization support.
+
 2012-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/m08pst.c,

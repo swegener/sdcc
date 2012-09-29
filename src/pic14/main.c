@@ -393,6 +393,8 @@ PORT pic_port =
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",  // xabs_name - absolute xdata
     "IABS    (ABS,DATA)", // iabs_name - absolute data
+    0,
+    0,
     NULL,
     NULL,
     1        // code is read only

@@ -205,15 +205,16 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          it is a global variable */
       if (sym->ival && sym->level == 0)
         {
-          if ((SPEC_OCLS (sym->etype) == xidata) && !SPEC_ABSA (sym->etype))
+          if ((SPEC_OCLS (sym->etype) == xidata || SPEC_OCLS (sym->etype) == initialized) && !SPEC_ABSA (sym->etype))
             {
               sym_link *t;
-              /* create a new "XINIT (CODE)" symbol, that will be emited later
+              /* create a new "XINIT (CODE)" symbol, that will be emitted later
                  in the static seg */
               newSym = copySymbol (sym);
-              SPEC_OCLS (newSym->etype) = xinit;
+              SPEC_OCLS (newSym->etype) = (SPEC_OCLS (sym->etype) == xidata) ? xinit : initializer;
               SNPRINTF (newSym->name, sizeof (newSym->name), "__xinit_%s", sym->name);
               SNPRINTF (newSym->rname, sizeof (newSym->rname), "__xinit_%s", sym->rname);
+
               /* find the first non-array link */
               t = newSym->type;
               while (IS_ARRAY (t))
@@ -226,7 +227,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               resolveIvalSym (newSym->ival, newSym->type);
 
               // add it to the "XINIT (CODE)" segment
-              addSet (&xinit->syms, newSym);
+              addSet ((SPEC_OCLS (sym->etype) == xidata) ? &xinit->syms : &initializer->syms, newSym);
 
               if (!SPEC_ABSA (sym->etype))
                 {
@@ -1438,7 +1439,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf,
 /* emitStaticSeg - emitcode for the static segment                 */
 /*-----------------------------------------------------------------*/
 void
-emitStaticSeg (memmap * map, struct dbuf_s *oBuf)
+emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
 {
   symbol *sym;
 
@@ -1490,7 +1491,7 @@ emitStaticSeg (memmap * map, struct dbuf_s *oBuf)
               dbuf_printf (oBuf, "%s:\n", sym->rname);
               ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
-              printIval (sym, sym->type, sym->ival, oBuf, map != xinit);
+              printIval (sym, sym->type, sym->ival, oBuf, (map != xinit && map != initializer));
               --noAlloc;
               /* if sym is a simple string and sym->ival is a string,
                  WE don't need it anymore */
@@ -1537,6 +1538,7 @@ emitMaps (void)
   /* no special considerations for the following
      data, idata & bit & xdata */
   emitRegularMap (data, TRUE, TRUE);
+  emitRegularMap (initialized, TRUE, TRUE);
   for (nm = namedspacemaps; nm; nm = nm->next)
     emitRegularMap (nm->map, TRUE, TRUE);
   emitRegularMap (idata, TRUE, TRUE);
@@ -1564,6 +1566,11 @@ emitMaps (void)
     {
       dbuf_tprintf (&code->oBuf, "\t!area\n", xinit->sname);
       emitStaticSeg (xinit, &code->oBuf);
+    }
+  if (initializer)
+    {
+      dbuf_tprintf (&code->oBuf, "\t!area\n", initializer->sname);
+      emitStaticSeg (initializer, &code->oBuf);
     }
   dbuf_tprintf (&code->oBuf, "\t!area\n", c_abs->sname);
   emitStaticSeg (c_abs, &code->oBuf);
@@ -1937,6 +1944,15 @@ glue (void)
   fprintf (asmFile, ";%s ram data\n", mcs51_like ? " internal" : "");
   fprintf (asmFile, "%s", iComments2);
   dbuf_write_and_destroy (&data->oBuf, asmFile);
+
+  /* copy the intialized segment */
+  if (initialized)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, ";%s ram data\n", mcs51_like ? " internal" : "");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&initialized->oBuf, asmFile);
+    }
 
   /* copy segments for named address spaces */
   for (nm = namedspacemaps; nm; nm = nm->next)

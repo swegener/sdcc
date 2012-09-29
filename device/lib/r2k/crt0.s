@@ -69,10 +69,10 @@ init:
 
 	.area	_DATA
 	.area	_BSEG
-        .area   _BSS
-        .area   _HEAP
+	.area   _BSS
+	.area   _HEAP
 
-        .area   _CODE
+	.area   _CODE
 __clock::
 	ld	a,#2
         rst     #0x28
@@ -81,13 +81,22 @@ __clock::
 _exit::
 	;; Exit - special code to the emulator
 	ld	a,#0
-        rst     #0x28
+	rst     #0x28
 1$:
 	;halt		; opcode for halt used for 'altd' on rabbit processors
 	jr	1$
 
-        .area   _GSINIT
+	.area   _GSINIT
 gsinit::
+	ld	bc, #l__INITIALIZER
+	ld	a, b
+	or	a, c
+	jr	Z, gsinit_next
+	ld	de, #s__INITIALIZED
+	ld	hl, #s__INITIALIZER
+	ldir
+gsinit_next:
 
-        .area   _GSFINAL
-        ret
+	.area   _GSFINAL
+	ret
+

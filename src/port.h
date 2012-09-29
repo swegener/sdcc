@@ -214,6 +214,8 @@ typedef struct
     const char *const cabs_name;        // const absolute data (code or not)
     const char *const xabs_name;        // absolute xdata/pdata
     const char *const iabs_name;        // absolute idata/data
+    const char *const initialized_name; // Initialized global (and static local) variables.
+    const char *const initializer_name; // A code copy of initialized_name (to be copied for fast initialization).
     struct memmap *default_local_map;   // default location for auto vars
     struct memmap *default_globl_map;   // default location for globl vars
     int code_ro;                /* code space read-only 1=yes */

@@ -30,6 +30,8 @@ memmap *xstack = NULL;          /* xternal stack data          */
 memmap *istack = NULL;          /* internal stack              */
 memmap *code = NULL;            /* code segment                */
 memmap *data = NULL;            /* internal data upto 128      */
+memmap *initialized = NULL;     /* initialized data, such as initialized, nonzero globals or local statics. */
+memmap *initializer = NULL;     /* a copz of the values for the initialized data from initialized in code space */
 memmap *pdata = NULL;           /* paged external data         */
 memmap *xdata = NULL;           /* external data               */
 memmap *xidata = NULL;          /* the initialized xdata       */
@@ -191,6 +193,9 @@ initMem ()
      POINTER-TYPE   -   POINTER
    */
   data = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME, 'E', POINTER);
+
+  initialized = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, INITIALIZED_NAME, 'E', POINTER);
+  initializer = allocMap (0, 0, 0, 1, 0, 1, options.code_loc, INITIALIZER_NAME, 'C', CPOINTER);
 
   /* Absolute internal storage segment ;
      SFRSPACE       -   NO

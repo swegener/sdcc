@@ -194,7 +194,7 @@ typedef struct
     const char *const istack_name;
     /*
      * The following 2 items can't be const pointers
-     * due to ugly implementation in z80 target;
+     * due to ugly implementation in gbz80 target;
      * this should be fixed in src/z80/main.c (borutr)
      */
     const char *code_name;

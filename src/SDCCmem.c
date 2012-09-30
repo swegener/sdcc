@@ -441,10 +441,15 @@ defaultOClass (symbol *sym)
         }
       break;
     case S_DATA:
-      /* absolute initialized global */
+      /* Absolute initialized global */
       if (sym->ival && SPEC_ABSA (sym->etype))
         {
-          SPEC_OCLS(sym->etype) = d_abs;
+          SPEC_OCLS (sym->etype) = d_abs;
+        }
+      /* Other initialized global */
+      else if (sym->ival && port->mem.initialized_name && sym->level == 0)
+        {
+          SPEC_OCLS (sym->etype) = initialized;
         }
       else
         {
@@ -561,7 +566,7 @@ allocGlobal (symbol * sym)
   /* if it is fixed, then allocate depending on the */
   /* current memory model, same for automatics      */
   if (SPEC_SCLS (sym->etype) == S_FIXED ||
-      (TARGET_IS_PIC16 && (SPEC_SCLS (sym->etype) == S_REGISTER) && (sym->level==0)) ||
+      (TARGET_IS_PIC16 && (SPEC_SCLS (sym->etype) == S_REGISTER) && (sym->level == 0)) ||
       SPEC_SCLS (sym->etype) == S_AUTO)
     {
       if (port->mem.default_globl_map != xdata)
@@ -570,6 +575,10 @@ allocGlobal (symbol * sym)
             {
               /* absolute initialized global */
               SPEC_OCLS (sym->etype) = x_abs;
+            }
+          else if (sym->ival && sym->level == 0 && port->mem.initialized_name)
+            {
+              SPEC_OCLS (sym->etype) = initialized;
             }
           else
             {

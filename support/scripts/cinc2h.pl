@@ -1461,7 +1461,7 @@ sub print_to_header_file()
     {
     $text = '#ifndef NO_ADDR_DEFINES';
 
-    Outl("//\n//\tRegister Addresses\n//\n$section\n\n$text\n");
+    Outl("//\n//      Register Addresses\n//\n$section\n\n$text\n");
 
     foreach (sort { $a->{ADDRESS} <=> $b->{ADDRESS} } @registers)
       {
@@ -1474,7 +1474,7 @@ sub print_to_header_file()
     Outl("\n#endif // $text");
     }
 
-  Outl("\n$section\n//\n//\tRegister Definitions\n//\n$section\n");
+  Outl("\n$section\n//\n//      Register Definitions\n//\n$section\n");
   set_bit_prefix();
   print_all_registers();
   print_configuration_words();

@@ -74,19 +74,8 @@ usart_open (unsigned char config, sdcc_spbrg_t spbrg) __wparam
     }
 
   /* TX interrupts */
-#if defined(pic18f66j60) || defined(pic18f66j65) || \
-  defined(pic18f67j60) || defined(pic18f86j60) || \
-  defined(pic18f86j65) || defined(pic18f87j60) || \
-  defined(pic18f96j60) || defined(pic18f96j65) || \
-  defined(pic18f97j60)
-
-  PIR1bits.TXIF_PIR1 = 0;
-
-#else   /* all other devices */
 
   PIR1bits.TXIF = 0;
-
-#endif
 
   if (config & 0x40)
     PIE1bits.RCIE = 1;
@@ -96,25 +85,10 @@ usart_open (unsigned char config, sdcc_spbrg_t spbrg) __wparam
   /* RX interrupts */
   PIR1bits.RCIF = 0;
 
-#if defined(pic18f66j60) || defined(pic18f66j65) || \
-  defined(pic18f67j60) || defined(pic18f86j60) || \
-  defined(pic18f86j65) || defined(pic18f87j60) || \
-  defined(pic18f96j60) || defined(pic18f96j65) || \
-  defined(pic18f97j60)
-
-  if (config & 0x80)
-    PIE1bits.TXIE_PIE1 = 1;
-  else
-    PIE1bits.TXIE_PIE1 = 0;
-
-#else   /* all other devices */
-
   if (config & 0x80)
     PIE1bits.TXIE = 1;
   else
     PIE1bits.TXIE = 0;
-
-#endif
 
 #if !__SDCC_NO_SPBRGH
   SPBRGH = (spbrg >> 8);

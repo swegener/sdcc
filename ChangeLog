@@ -3,6 +3,13 @@
 	* support/scripts/cinc2h.pl:
 	  applied patch #3572693: Correction of cinc2h.pl
 	  thanks to Molnar Karoly
+	* device/non-free/include/pic14/*.h,
+	  device/non-free/lib/pic14/libdev/*.c,
+	  device/non-free/include/pic16/*.h,
+	  device/non-free/lib/pic16/libdev/*.c,
+	  device/lib/pic16/libio/usart/uopen.c: applied patch #3571327 -
+	  Regenerate the DEVICE.[ch] files with the cinc2h.pl program.
+	  thanks to Molnar Karoly
 
 2012-09-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

@@ -1,3 +1,9 @@
+2012-10-01 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/cinc2h.pl:
+	  applied patch #3572693: Correction of cinc2h.pl
+	  thanks to Molnar Karoly
+
 2012-09-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/lib/r2k/crt0.s,

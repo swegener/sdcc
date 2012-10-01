@@ -2,7 +2,7 @@
 
 =back
 
-   Copyright (C) 2012, Molnár Károly <proton7@freemail.hu>
+   Copyright (C) 2012, Molnar Karoly <proton7@freemail.hu>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -114,9 +114,10 @@ use constant ST_CONFIG_DEF => 5;
 use constant ST_DEVID_DEF  => 6;
 use constant ST_IDLOC_DEF  => 7;
 
-use constant DIST_BITSIZE => 32;
-use constant DIST_DEFSIZE => 32;
-use constant DIST_COMSIZE => 32;
+use constant DIST_ADDRSIZE => 32;
+use constant DIST_BITSIZE  => 32;
+use constant DIST_DEFSIZE  => 32;
+use constant DIST_COMSIZE  => 32;
 
 my $PROGRAM = 'cinc2h.pl';
 my $time_str = '';
@@ -268,8 +269,8 @@ my $out_path = './';
 my $out_handler;
 
 my $device_registers = '';
-my $full_bitdefs = '';
-my $legacy_names = '';
+my $full_bitdefs     = '';
+my $legacy_names     = '';
 
 ################################################################################
 ################################################################################
@@ -1183,19 +1184,26 @@ sub print_all_registers()
   my $fields;
   my @field_names;
   my ($bit_struct_num, $field_struct_num, $all_struct_num);
-  my ($alias, $i, $text, $type);
+  my ($alias, $i, $r, $text, $type, $v);
 
-  foreach (@registers)
+  $v = @registers;
+  for ($r = 0; $r < $v;)
     {
-    my ($name, $addr, $bits) = ($_->{NAME}, $_->{ADDRESS}, $_->{BITNAMES});
+    my $reg = $registers[$r];
+    ++$r;
+
+    my ($name, $addr, $bits) = ($reg->{NAME}, $reg->{ADDRESS}, $reg->{BITNAMES});
 
     if ($addr >= 0)
       {
-      bitfield_filtration($_) if ($create_bitfields);
+      bitfield_filtration($reg) if ($create_bitfields);
 
       $text = sprintf("__at(0x%04X)", $addr);
-      $device_registers .= "$text __sfr $name;\n";
+        #
+        # The sdcc handles it badly, if two different size variable is overlapped. :-(
+        #
       create_pseudo_register($name, $addr) if ($create_pseudo_registers);
+      $device_registers .= "$text __sfr $name;\n";
 
       $alias = $register_aliases{$name};
       $alias = undef if (defined($alias) && defined($reg_refs_by_names{$alias}));
@@ -1210,7 +1218,7 @@ sub print_all_registers()
 
         if ($create_bitfields)
           {
-          $fields = $_->{BITFIELDS};
+          $fields = $reg->{BITFIELDS};
           @field_names = sort {$fields->{$a}->{ADDRESSES}->[0] <=> $fields->{$b}->{ADDRESSES}->[0]} keys(%{$fields});
           $field_struct_num = @field_names;
           $all_struct_num = $bit_struct_num + $field_struct_num - 1;
@@ -1257,7 +1265,7 @@ sub print_all_registers()
         Outl("\nextern $text volatile $type $name$btail;");
         Outl("\n#define $alias$btail $name$btail") if (defined($alias));
         Outl();
-        print_local_bitdefs($_);
+        print_local_bitdefs($reg);
         Outl("\n$section\n");
 
         $device_registers .= "$text volatile $type $name$btail;\n";
@@ -1268,17 +1276,17 @@ sub print_all_registers()
         Outl("#define $alias $name") if (defined($alias));
         }
 
-      $device_registers .= "\n";
+      $device_registers .= "\n" if ($r < $v);
       } # if ($addr >= 0)
     elsif (defined($bits) && @{$bits})
       {
         # This is a register which can not be achieved directly, but the bits has name.
 
       Outl("\n$section\n//", (' ' x 8), "$name Bits\n");
-      print_local_bitdefs($_);
+      print_local_bitdefs($reg);
       Outl("\n$section\n");
       }
-    } # foreach (@registers)
+    } # for ($r = 0; $r < $v;)
   }
 
 #-------------------------------------------------------------------------------
@@ -1371,7 +1379,7 @@ sub print_license($)
  * This $_[0] of the $mcu MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnár Károly <proton7\@freemail.hu> 2012.
+ * created by Molnar Karoly <proton7\@freemail.hu> 2012.
  *
  * This file is generated automatically by the $PROGRAM${time_str}.
  *
@@ -1440,12 +1448,33 @@ sub make_pic14_dependent_defs()
 
 sub print_to_header_file()
   {
+  my $text;
+
   print_license('declarations');
   Outl("#ifndef __${mcu}_H__\n#define __${mcu}_H__\n\n$section");
+
 #  Outl(align("#define W", DIST_DEFSIZE), '0x00');
 # The 'F' conflicts with the 'F' bit of ECANCON register in the PIC18F2480 MCU.
 #  Outl(align("#define F", DIST_DEFSIZE), "0x01\n\n$section");
-  Outl("//\n//\tRegister Definitions\n//\n$section\n");
+
+  if (! $is_pic16)
+    {
+    $text = '#ifndef NO_ADDR_DEFINES';
+
+    Outl("//\n//\tRegister Addresses\n//\n$section\n\n$text\n");
+
+    foreach (sort { $a->{ADDRESS} <=> $b->{ADDRESS} } @registers)
+      {
+      my ($name, $address) = ($_->{NAME}, $_->{ADDRESS});
+      my $str = sprintf('0x%04X', $address);
+
+      Outl(align("#define ${name}_ADDR", DIST_ADDRSIZE), $str);
+      }
+
+    Outl("\n#endif // $text");
+    }
+
+  Outl("\n$section\n//\n//\tRegister Definitions\n//\n$section\n");
   set_bit_prefix();
   print_all_registers();
   print_configuration_words();
@@ -1453,8 +1482,6 @@ sub print_to_header_file()
 
   if (! $is_pic16)
     {
-    my $text;
-
     make_pic14_dependent_defs();
     Outl("$section\n");
 
@@ -1482,7 +1509,7 @@ sub print_to_device_file()
   {
   print_license('definitions');
   Outl("#include <$header_name>\n\n$section\n");
-  Outl($device_registers) if ($device_registers ne '');
+  Out($device_registers) if ($device_registers ne '');
   }
 
 #-------------------------------------------------------------------------------

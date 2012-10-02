@@ -218,6 +218,9 @@
 	  device/non-free/lib/pic16/libdev/pic18f8723.c:
 	  applied patch #3573506 - Support of new PIC18Fxxx devices
 	  thanks to Molnar Karoly
+	* device/include/pic16/pic18fregs.h:
+	  applied patch #3573796 - Correction the bug of pic18fregs.h
+	  thanks to Molnar Karoly
 
 2012-09-30 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

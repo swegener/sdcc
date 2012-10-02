@@ -705,7 +705,7 @@
   #define __CONCAT(a, b)        __CONCAT2(a, b)
 #endif
 
-#define __CONFIG(address, value) 
+#define __CONFIG(address, value) \
     static const __code unsigned char __at(address) __CONCAT(_conf, __LINE__) = (value)
 
 #define Nop()                   __asm nop __endasm

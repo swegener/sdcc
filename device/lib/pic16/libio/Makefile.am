@@ -43,6 +43,10 @@ libio18f1330_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f1330_a_SOURCES += usart/usartd.c
 libio18f1330_a_CFLAGS = -p18f1330 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f13k22.a
+libio18f13k22_a_SOURCES = dummy.c
+libio18f13k22_a_CFLAGS = -p18f13k22 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f13k50.a
 libio18f13k50_a_SOURCES = dummy.c
 libio18f13k50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -57,6 +61,10 @@ libio18f13k50_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f13k50_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f13k50_a_SOURCES += usart/usartd.c
 libio18f13k50_a_CFLAGS = -p18f13k50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f14k22.a
+libio18f14k22_a_SOURCES = dummy.c
+libio18f14k22_a_CFLAGS = -p18f14k22 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f14k50.a
 libio18f14k50_a_SOURCES = dummy.c
@@ -239,6 +247,10 @@ libio18f2431_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f2431_a_SOURCES += usart/usartd.c
 libio18f2431_a_CFLAGS = -p18f2431 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f2439.a
+libio18f2439_a_SOURCES = dummy.c
+libio18f2439_a_CFLAGS = -p18f2439 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f2450.a
 libio18f2450_a_SOURCES = dummy.c
 libio18f2450_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -263,6 +275,10 @@ libio18f2455_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f2455_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f2455_a_SOURCES += usart/usartd.c
 libio18f2455_a_CFLAGS = -p18f2455 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f2458.a
+libio18f2458_a_SOURCES = dummy.c
+libio18f2458_a_CFLAGS = -p18f2458 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f248.a
 libio18f248_a_SOURCES = dummy.c
@@ -309,6 +325,10 @@ libio18f24j10_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f24j10_a_SOURCES += usart/usartd.c
 libio18f24j10_a_CFLAGS = -p18f24j10 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f24j11.a
+libio18f24j11_a_SOURCES = dummy.c
+libio18f24j11_a_CFLAGS = -p18f24j11 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f24j50.a
 libio18f24j50_a_SOURCES = dummy.c
 libio18f24j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -353,6 +373,10 @@ libio18f24k22_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f24k22_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f24k22_a_SOURCES += usart/usartd.c
 libio18f24k22_a_CFLAGS = -p18f24k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f24k50.a
+libio18f24k50_a_SOURCES = dummy.c
+libio18f24k50_a_CFLAGS = -p18f24k50 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f2510.a
 libio18f2510_a_SOURCES = dummy.c
@@ -444,6 +468,10 @@ libio18f2525_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f2525_a_SOURCES += usart/usartd.c
 libio18f2525_a_CFLAGS = -p18f2525 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f2539.a
+libio18f2539_a_SOURCES = dummy.c
+libio18f2539_a_CFLAGS = -p18f2539 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f2550.a
 libio18f2550_a_SOURCES = dummy.c
 libio18f2550_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -458,6 +486,10 @@ libio18f2550_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f2550_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f2550_a_SOURCES += usart/usartd.c
 libio18f2550_a_CFLAGS = -p18f2550 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f2553.a
+libio18f2553_a_SOURCES = dummy.c
+libio18f2553_a_CFLAGS = -p18f2553 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f258.a
 libio18f258_a_SOURCES = dummy.c
@@ -519,6 +551,10 @@ libio18f25j10_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f25j10_a_SOURCES += usart/usartd.c
 libio18f25j10_a_CFLAGS = -p18f25j10 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f25j11.a
+libio18f25j11_a_SOURCES = dummy.c
+libio18f25j11_a_CFLAGS = -p18f25j11 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f25j50.a
 libio18f25j50_a_SOURCES = dummy.c
 libio18f25j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -563,6 +599,14 @@ libio18f25k22_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f25k22_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f25k22_a_SOURCES += usart/usartd.c
 libio18f25k22_a_CFLAGS = -p18f25k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f25k50.a
+libio18f25k50_a_SOURCES = dummy.c
+libio18f25k50_a_CFLAGS = -p18f25k50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f25k80.a
+libio18f25k80_a_SOURCES = dummy.c
+libio18f25k80_a_CFLAGS = -p18f25k80 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f2610.a
 libio18f2610_a_SOURCES = dummy.c
@@ -639,6 +683,14 @@ libio18f2685_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f2685_a_SOURCES += usart/usartd.c
 libio18f2685_a_CFLAGS = -p18f2685 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f26j11.a
+libio18f26j11_a_SOURCES = dummy.c
+libio18f26j11_a_CFLAGS = -p18f26j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f26j13.a
+libio18f26j13_a_SOURCES = dummy.c
+libio18f26j13_a_CFLAGS = -p18f26j13 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f26j50.a
 libio18f26j50_a_SOURCES = dummy.c
 libio18f26j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -653,6 +705,10 @@ libio18f26j50_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f26j50_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f26j50_a_SOURCES += usart/usartd.c
 libio18f26j50_a_CFLAGS = -p18f26j50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f26j53.a
+libio18f26j53_a_SOURCES = dummy.c
+libio18f26j53_a_CFLAGS = -p18f26j53 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f26k20.a
 libio18f26k20_a_SOURCES = dummy.c
@@ -683,6 +739,18 @@ libio18f26k22_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f26k22_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f26k22_a_SOURCES += usart/usartd.c
 libio18f26k22_a_CFLAGS = -p18f26k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f26k80.a
+libio18f26k80_a_SOURCES = dummy.c
+libio18f26k80_a_CFLAGS = -p18f26k80 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f27j13.a
+libio18f27j13_a_SOURCES = dummy.c
+libio18f27j13_a_CFLAGS = -p18f27j13 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f27j53.a
+libio18f27j53_a_SOURCES = dummy.c
+libio18f27j53_a_CFLAGS = -p18f27j53 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f4220.a
 libio18f4220_a_SOURCES = dummy.c
@@ -850,6 +918,10 @@ libio18f4431_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f4431_a_SOURCES += usart/usartd.c
 libio18f4431_a_CFLAGS = -p18f4431 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f4439.a
+libio18f4439_a_SOURCES = dummy.c
+libio18f4439_a_CFLAGS = -p18f4439 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f4450.a
 libio18f4450_a_SOURCES = dummy.c
 libio18f4450_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -874,6 +946,10 @@ libio18f4455_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f4455_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f4455_a_SOURCES += usart/usartd.c
 libio18f4455_a_CFLAGS = -p18f4455 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f4458.a
+libio18f4458_a_SOURCES = dummy.c
+libio18f4458_a_CFLAGS = -p18f4458 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f448.a
 libio18f448_a_SOURCES = dummy.c
@@ -919,6 +995,10 @@ libio18f44j10_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f44j10_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f44j10_a_SOURCES += usart/usartd.c
 libio18f44j10_a_CFLAGS = -p18f44j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f44j11.a
+libio18f44j11_a_SOURCES = dummy.c
+libio18f44j11_a_CFLAGS = -p18f44j11 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f44j50.a
 libio18f44j50_a_SOURCES = dummy.c
@@ -1055,6 +1135,10 @@ libio18f4525_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f4525_a_SOURCES += usart/usartd.c
 libio18f4525_a_CFLAGS = -p18f4525 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f4539.a
+libio18f4539_a_SOURCES = dummy.c
+libio18f4539_a_CFLAGS = -p18f4539 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f4550.a
 libio18f4550_a_SOURCES = dummy.c
 libio18f4550_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1069,6 +1153,10 @@ libio18f4550_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f4550_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f4550_a_SOURCES += usart/usartd.c
 libio18f4550_a_CFLAGS = -p18f4550 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f4553.a
+libio18f4553_a_SOURCES = dummy.c
+libio18f4553_a_CFLAGS = -p18f4553 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f458.a
 libio18f458_a_SOURCES = dummy.c
@@ -1130,6 +1218,10 @@ libio18f45j10_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f45j10_a_SOURCES += usart/usartd.c
 libio18f45j10_a_CFLAGS = -p18f45j10 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f45j11.a
+libio18f45j11_a_SOURCES = dummy.c
+libio18f45j11_a_CFLAGS = -p18f45j11 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f45j50.a
 libio18f45j50_a_SOURCES = dummy.c
 libio18f45j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1174,6 +1266,14 @@ libio18f45k22_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f45k22_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f45k22_a_SOURCES += usart/usartd.c
 libio18f45k22_a_CFLAGS = -p18f45k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f45k50.a
+libio18f45k50_a_SOURCES = dummy.c
+libio18f45k50_a_CFLAGS = -p18f45k50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f45k80.a
+libio18f45k80_a_SOURCES = dummy.c
+libio18f45k80_a_CFLAGS = -p18f45k80 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f4610.a
 libio18f4610_a_SOURCES = dummy.c
@@ -1250,6 +1350,14 @@ libio18f4685_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f4685_a_SOURCES += usart/usartd.c
 libio18f4685_a_CFLAGS = -p18f4685 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f46j11.a
+libio18f46j11_a_SOURCES = dummy.c
+libio18f46j11_a_CFLAGS = -p18f46j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f46j13.a
+libio18f46j13_a_SOURCES = dummy.c
+libio18f46j13_a_CFLAGS = -p18f46j13 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f46j50.a
 libio18f46j50_a_SOURCES = dummy.c
 libio18f46j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1264,6 +1372,10 @@ libio18f46j50_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f46j50_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f46j50_a_SOURCES += usart/usartd.c
 libio18f46j50_a_CFLAGS = -p18f46j50 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f46j53.a
+libio18f46j53_a_SOURCES = dummy.c
+libio18f46j53_a_CFLAGS = -p18f46j53 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f46k20.a
 libio18f46k20_a_SOURCES = dummy.c
@@ -1295,6 +1407,58 @@ libio18f46k22_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f46k22_a_SOURCES += usart/usartd.c
 libio18f46k22_a_CFLAGS = -p18f46k22 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f46k80.a
+libio18f46k80_a_SOURCES = dummy.c
+libio18f46k80_a_CFLAGS = -p18f46k80 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f47j13.a
+libio18f47j13_a_SOURCES = dummy.c
+libio18f47j13_a_CFLAGS = -p18f47j13 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f47j53.a
+libio18f47j53_a_SOURCES = dummy.c
+libio18f47j53_a_CFLAGS = -p18f47j53 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6310.a
+libio18f6310_a_SOURCES = dummy.c
+libio18f6310_a_CFLAGS = -p18f6310 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6390.a
+libio18f6390_a_SOURCES = dummy.c
+libio18f6390_a_CFLAGS = -p18f6390 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6393.a
+libio18f6393_a_SOURCES = dummy.c
+libio18f6393_a_CFLAGS = -p18f6393 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f63j11.a
+libio18f63j11_a_SOURCES = dummy.c
+libio18f63j11_a_CFLAGS = -p18f63j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f63j90.a
+libio18f63j90_a_SOURCES = dummy.c
+libio18f63j90_a_CFLAGS = -p18f63j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6410.a
+libio18f6410_a_SOURCES = dummy.c
+libio18f6410_a_CFLAGS = -p18f6410 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6490.a
+libio18f6490_a_SOURCES = dummy.c
+libio18f6490_a_CFLAGS = -p18f6490 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6493.a
+libio18f6493_a_SOURCES = dummy.c
+libio18f6493_a_CFLAGS = -p18f6493 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f64j11.a
+libio18f64j11_a_SOURCES = dummy.c
+libio18f64j11_a_CFLAGS = -p18f64j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f64j90.a
+libio18f64j90_a_SOURCES = dummy.c
+libio18f64j90_a_CFLAGS = -p18f64j90 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f6520.a
 libio18f6520_a_SOURCES = dummy.c
 libio18f6520_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1309,6 +1473,10 @@ libio18f6520_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f6520_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f6520_a_SOURCES += usart/usartd.c
 libio18f6520_a_CFLAGS = -p18f6520 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6525.a
+libio18f6525_a_SOURCES = dummy.c
+libio18f6525_a_CFLAGS = -p18f6525 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f6527.a
 libio18f6527_a_SOURCES = dummy.c
@@ -1340,6 +1508,18 @@ libio18f6585_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f6585_a_SOURCES += usart/usartd.c
 libio18f6585_a_CFLAGS = -p18f6585 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f65j10.a
+libio18f65j10_a_SOURCES = dummy.c
+libio18f65j10_a_CFLAGS = -p18f65j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f65j11.a
+libio18f65j11_a_SOURCES = dummy.c
+libio18f65j11_a_CFLAGS = -p18f65j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f65j15.a
+libio18f65j15_a_SOURCES = dummy.c
+libio18f65j15_a_CFLAGS = -p18f65j15 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f65j50.a
 libio18f65j50_a_SOURCES = dummy.c
 libio18f65j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1355,6 +1535,22 @@ libio18f65j50_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f65j50_a_SOURCES += usart/usartd.c
 libio18f65j50_a_CFLAGS = -p18f65j50 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f65j90.a
+libio18f65j90_a_SOURCES = dummy.c
+libio18f65j90_a_CFLAGS = -p18f65j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f65k22.a
+libio18f65k22_a_SOURCES = dummy.c
+libio18f65k22_a_CFLAGS = -p18f65k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f65k80.a
+libio18f65k80_a_SOURCES = dummy.c
+libio18f65k80_a_CFLAGS = -p18f65k80 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f65k90.a
+libio18f65k90_a_SOURCES = dummy.c
+libio18f65k90_a_CFLAGS = -p18f65k90 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f6620.a
 libio18f6620_a_SOURCES = dummy.c
 libio18f6620_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1369,6 +1565,10 @@ libio18f6620_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f6620_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f6620_a_SOURCES += usart/usartd.c
 libio18f6620_a_CFLAGS = -p18f6620 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6621.a
+libio18f6621_a_SOURCES = dummy.c
+libio18f6621_a_CFLAGS = -p18f6621 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f6622.a
 libio18f6622_a_SOURCES = dummy.c
@@ -1400,6 +1600,10 @@ libio18f6627_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f6627_a_SOURCES += usart/usartd.c
 libio18f6627_a_CFLAGS = -p18f6627 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f6628.a
+libio18f6628_a_SOURCES = dummy.c
+libio18f6628_a_CFLAGS = -p18f6628 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f6680.a
 libio18f6680_a_SOURCES = dummy.c
 libio18f6680_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1414,6 +1618,22 @@ libio18f6680_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f6680_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f6680_a_SOURCES += usart/usartd.c
 libio18f6680_a_CFLAGS = -p18f6680 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66j10.a
+libio18f66j10_a_SOURCES = dummy.c
+libio18f66j10_a_CFLAGS = -p18f66j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66j11.a
+libio18f66j11_a_SOURCES = dummy.c
+libio18f66j11_a_CFLAGS = -p18f66j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66j15.a
+libio18f66j15_a_SOURCES = dummy.c
+libio18f66j15_a_CFLAGS = -p18f66j15 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66j16.a
+libio18f66j16_a_SOURCES = dummy.c
+libio18f66j16_a_CFLAGS = -p18f66j16 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f66j50.a
 libio18f66j50_a_SOURCES = dummy.c
@@ -1475,6 +1695,26 @@ libio18f66j65_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f66j65_a_SOURCES += usart/usartd.c
 libio18f66j65_a_CFLAGS = -p18f66j65 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f66j90.a
+libio18f66j90_a_SOURCES = dummy.c
+libio18f66j90_a_CFLAGS = -p18f66j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66j93.a
+libio18f66j93_a_SOURCES = dummy.c
+libio18f66j93_a_CFLAGS = -p18f66j93 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66k22.a
+libio18f66k22_a_SOURCES = dummy.c
+libio18f66k22_a_CFLAGS = -p18f66k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66k80.a
+libio18f66k80_a_SOURCES = dummy.c
+libio18f66k80_a_CFLAGS = -p18f66k80 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66k90.a
+libio18f66k90_a_SOURCES = dummy.c
+libio18f66k90_a_CFLAGS = -p18f66k90 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f6720.a
 libio18f6720_a_SOURCES = dummy.c
 libio18f6720_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1504,6 +1744,18 @@ libio18f6722_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f6722_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f6722_a_SOURCES += usart/usartd.c
 libio18f6722_a_CFLAGS = -p18f6722 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f6723.a
+libio18f6723_a_SOURCES = dummy.c
+libio18f6723_a_CFLAGS = -p18f6723 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f67j10.a
+libio18f67j10_a_SOURCES = dummy.c
+libio18f67j10_a_CFLAGS = -p18f67j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f67j11.a
+libio18f67j11_a_SOURCES = dummy.c
+libio18f67j11_a_CFLAGS = -p18f67j11 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f67j50.a
 libio18f67j50_a_SOURCES = dummy.c
@@ -1535,6 +1787,62 @@ libio18f67j60_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f67j60_a_SOURCES += usart/usartd.c
 libio18f67j60_a_CFLAGS = -p18f67j60 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f67j90.a
+libio18f67j90_a_SOURCES = dummy.c
+libio18f67j90_a_CFLAGS = -p18f67j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f67j93.a
+libio18f67j93_a_SOURCES = dummy.c
+libio18f67j93_a_CFLAGS = -p18f67j93 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f67k22.a
+libio18f67k22_a_SOURCES = dummy.c
+libio18f67k22_a_CFLAGS = -p18f67k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f67k90.a
+libio18f67k90_a_SOURCES = dummy.c
+libio18f67k90_a_CFLAGS = -p18f67k90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8310.a
+libio18f8310_a_SOURCES = dummy.c
+libio18f8310_a_CFLAGS = -p18f8310 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8390.a
+libio18f8390_a_SOURCES = dummy.c
+libio18f8390_a_CFLAGS = -p18f8390 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8393.a
+libio18f8393_a_SOURCES = dummy.c
+libio18f8393_a_CFLAGS = -p18f8393 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f83j11.a
+libio18f83j11_a_SOURCES = dummy.c
+libio18f83j11_a_CFLAGS = -p18f83j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f83j90.a
+libio18f83j90_a_SOURCES = dummy.c
+libio18f83j90_a_CFLAGS = -p18f83j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8410.a
+libio18f8410_a_SOURCES = dummy.c
+libio18f8410_a_CFLAGS = -p18f8410 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8490.a
+libio18f8490_a_SOURCES = dummy.c
+libio18f8490_a_CFLAGS = -p18f8490 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8493.a
+libio18f8493_a_SOURCES = dummy.c
+libio18f8493_a_CFLAGS = -p18f8493 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f84j11.a
+libio18f84j11_a_SOURCES = dummy.c
+libio18f84j11_a_CFLAGS = -p18f84j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f84j90.a
+libio18f84j90_a_SOURCES = dummy.c
+libio18f84j90_a_CFLAGS = -p18f84j90 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f8520.a
 libio18f8520_a_SOURCES = dummy.c
 libio18f8520_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1549,6 +1857,10 @@ libio18f8520_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f8520_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f8520_a_SOURCES += usart/usartd.c
 libio18f8520_a_CFLAGS = -p18f8520 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8525.a
+libio18f8525_a_SOURCES = dummy.c
+libio18f8525_a_CFLAGS = -p18f8525 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f8527.a
 libio18f8527_a_SOURCES = dummy.c
@@ -1580,6 +1892,18 @@ libio18f8585_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f8585_a_SOURCES += usart/usartd.c
 libio18f8585_a_CFLAGS = -p18f8585 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f85j10.a
+libio18f85j10_a_SOURCES = dummy.c
+libio18f85j10_a_CFLAGS = -p18f85j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f85j11.a
+libio18f85j11_a_SOURCES = dummy.c
+libio18f85j11_a_CFLAGS = -p18f85j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f85j15.a
+libio18f85j15_a_SOURCES = dummy.c
+libio18f85j15_a_CFLAGS = -p18f85j15 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f85j50.a
 libio18f85j50_a_SOURCES = dummy.c
 libio18f85j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1595,6 +1919,18 @@ libio18f85j50_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f85j50_a_SOURCES += usart/usartd.c
 libio18f85j50_a_CFLAGS = -p18f85j50 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f85j90.a
+libio18f85j90_a_SOURCES = dummy.c
+libio18f85j90_a_CFLAGS = -p18f85j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f85k22.a
+libio18f85k22_a_SOURCES = dummy.c
+libio18f85k22_a_CFLAGS = -p18f85k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f85k90.a
+libio18f85k90_a_SOURCES = dummy.c
+libio18f85k90_a_CFLAGS = -p18f85k90 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f8620.a
 libio18f8620_a_SOURCES = dummy.c
 libio18f8620_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1609,6 +1945,10 @@ libio18f8620_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f8620_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f8620_a_SOURCES += usart/usartd.c
 libio18f8620_a_CFLAGS = -p18f8620 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f8621.a
+libio18f8621_a_SOURCES = dummy.c
+libio18f8621_a_CFLAGS = -p18f8621 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f8622.a
 libio18f8622_a_SOURCES = dummy.c
@@ -1640,6 +1980,10 @@ libio18f8627_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f8627_a_SOURCES += usart/usartd.c
 libio18f8627_a_CFLAGS = -p18f8627 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f8628.a
+libio18f8628_a_SOURCES = dummy.c
+libio18f8628_a_CFLAGS = -p18f8628 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f8680.a
 libio18f8680_a_SOURCES = dummy.c
 libio18f8680_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1654,6 +1998,22 @@ libio18f8680_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f8680_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f8680_a_SOURCES += usart/usartd.c
 libio18f8680_a_CFLAGS = -p18f8680 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j10.a
+libio18f86j10_a_SOURCES = dummy.c
+libio18f86j10_a_CFLAGS = -p18f86j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j11.a
+libio18f86j11_a_SOURCES = dummy.c
+libio18f86j11_a_CFLAGS = -p18f86j11 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j15.a
+libio18f86j15_a_SOURCES = dummy.c
+libio18f86j15_a_CFLAGS = -p18f86j15 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j16.a
+libio18f86j16_a_SOURCES = dummy.c
+libio18f86j16_a_CFLAGS = -p18f86j16 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f86j50.a
 libio18f86j50_a_SOURCES = dummy.c
@@ -1715,6 +2075,26 @@ libio18f86j65_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f86j65_a_SOURCES += usart/usartd.c
 libio18f86j65_a_CFLAGS = -p18f86j65 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f86j72.a
+libio18f86j72_a_SOURCES = dummy.c
+libio18f86j72_a_CFLAGS = -p18f86j72 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j90.a
+libio18f86j90_a_SOURCES = dummy.c
+libio18f86j90_a_CFLAGS = -p18f86j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j93.a
+libio18f86j93_a_SOURCES = dummy.c
+libio18f86j93_a_CFLAGS = -p18f86j93 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86k22.a
+libio18f86k22_a_SOURCES = dummy.c
+libio18f86k22_a_CFLAGS = -p18f86k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86k90.a
+libio18f86k90_a_SOURCES = dummy.c
+libio18f86k90_a_CFLAGS = -p18f86k90 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f8720.a
 libio18f8720_a_SOURCES = dummy.c
 libio18f8720_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1745,6 +2125,18 @@ libio18f8722_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f8722_a_SOURCES += usart/usartd.c
 libio18f8722_a_CFLAGS = -p18f8722 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f8723.a
+libio18f8723_a_SOURCES = dummy.c
+libio18f8723_a_CFLAGS = -p18f8723 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87j10.a
+libio18f87j10_a_SOURCES = dummy.c
+libio18f87j10_a_CFLAGS = -p18f87j10 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87j11.a
+libio18f87j11_a_SOURCES = dummy.c
+libio18f87j11_a_CFLAGS = -p18f87j11 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f87j50.a
 libio18f87j50_a_SOURCES = dummy.c
 libio18f87j50_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -1774,6 +2166,26 @@ libio18f87j60_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f87j60_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f87j60_a_SOURCES += usart/usartd.c
 libio18f87j60_a_CFLAGS = -p18f87j60 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87j72.a
+libio18f87j72_a_SOURCES = dummy.c
+libio18f87j72_a_CFLAGS = -p18f87j72 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87j90.a
+libio18f87j90_a_SOURCES = dummy.c
+libio18f87j90_a_CFLAGS = -p18f87j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87j93.a
+libio18f87j93_a_SOURCES = dummy.c
+libio18f87j93_a_CFLAGS = -p18f87j93 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87k22.a
+libio18f87k22_a_SOURCES = dummy.c
+libio18f87k22_a_CFLAGS = -p18f87k22 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f87k90.a
+libio18f87k90_a_SOURCES = dummy.c
+libio18f87k90_a_CFLAGS = -p18f87k90 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f96j60.a
 libio18f96j60_a_SOURCES = dummy.c

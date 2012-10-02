@@ -479,8 +479,8 @@ PORT hc08_port =
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
     "XABS    (ABS)",      // xabs_name - absolute xdata
     "IABS    (ABS)",      // iabs_name - absolute data
-    NULL,
-    NULL,
+    NULL,                 // name of segment for initialized variables
+    NULL,                 // name of segment for copies of initialized variables in code space
     NULL,
     NULL,
     1
@@ -620,8 +620,8 @@ PORT s08_port =
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
     "XABS    (ABS)",      // xabs_name - absolute xdata
     "IABS    (ABS)",      // iabs_name - absolute data
-    NULL,
-    NULL,
+    NULL,                 // name of segment for initialized variables
+    NULL,                 // name of segment for copies of initialized variables in code space
     NULL,
     NULL,
     1

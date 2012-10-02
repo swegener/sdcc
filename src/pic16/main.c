@@ -1354,8 +1354,8 @@ PORT pic16_port =
     "CABS    (ABS,CODE)",   // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",  // xabs_name - absolute xdata
     "IABS    (ABS,DATA)",   // iabs_name - absolute data
-    0,
-    0,
+    NULL,                   // name of segment for initialized variables
+    NULL,                   // name of segment for copies of initialized variables in code space
     NULL,                   // default location for auto vars
     NULL,                   // default location for global vars
     1                       // code is read only 1=yes

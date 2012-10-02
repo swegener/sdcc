@@ -1358,8 +1358,8 @@ PORT gbz80_port = {
    "CABS (ABS)",                /* cabs_name */
    "DABS (ABS)",                /* xabs_name */
    NULL,                        /* iabs_name */
-   0,
-   0,
+   NULL,                        /* name of segment for initialized variables */
+   NULL,                        /* name of segment for copies of initialized variables in code space */
    NULL,
    NULL,
    1                            /* CODE is read-only */

@@ -258,6 +258,17 @@
 #define OPCY_MASK       ((char) 0x7F)   /* Opcode Cycle Count MASK */
 
 /*
+ * NTXT must be defined to have the same value in
+ * the ASxxxx assemblers and ASLink.
+ *
+ * The R Line coding allows only 4-bits for coding
+ * the T Line index.  The MAXIMUM value for NTXT
+ * is 16.  It should not be changed.
+ */
+#define NTXT    16              /* Maximum T Line Values */
+#define NREL    16              /* Maximum R Line Values */
+
+/*
  * Internal Definitions
  */
 #define dot     sym[0]          /* Dot, current loc */
@@ -500,7 +511,7 @@ struct  sym
 #define S_ORG           11      /* .org */
 #define S_RADIX         12      /* .radix */
 #define S_GLOBL         13      /* .globl */
-#define S_CONDITIONAL   15      /* .if, .else, .endif */
+#define S_CONDITIONAL   15      /* .if, .iif, .else, .endif, ... */
 #define   O_IF       0          /* .if */
 #define   O_IFF      1          /* .iff */
 #define   O_IFT      2          /* .ift */
@@ -677,6 +688,8 @@ extern  int     pass;           /*      assembler pass number
                                  */
 extern  int     aflag;          /*      -a, make all symbols global flag
                                  */
+extern  int     bflag;          /*      -b(b), listing mode flag
+                                 */
 extern  int     cflag;          /*      -c, disable cycle counts in listing flag
                                  */
 extern  int     fflag;          /*      -f(f), relocations flagged flag
@@ -717,6 +730,14 @@ extern  a_uint  fuzz;           /*      tracks pass to pass changes in the
                                  */
 extern  int     lmode;          /*      listing mode
                                  */
+extern  char    txt[NTXT];      /*      T Line Values
+                                 */
+extern  char    rel[NREL];      /*      R Line Values
+                                 */
+extern  char    *txtp;          /*      Pointer to T Line Values
+                                 */
+extern  char    *relp;          /*      Pointer to R Line Values
+                                 */
 extern  struct  area    *areap; /*      pointer to an area structure
                                  */
 extern  struct  area    area[]; /*      array of 1 area
@@ -739,7 +760,12 @@ extern  char    eb[NERR];       /*      array of generated error codes
 extern  char    *ip;            /*      pointer into the assembler-source
                                  *      text line in ib[]
                                  */
-extern  char    *ib;            /*      assembler-source text line
+extern  char    *ib;            /*      assembler-source text line for processing
+                                 */
+extern  char    *ic;            /*      assembler-source text line for listing
+                                 */
+extern  char    *il;            /*      pointer to the assembler-source
+                                 *      text line to be listed
                                  */
 extern  char    *cp;            /*      pointer to assembler output
                                  *      array cb[]
@@ -872,6 +898,7 @@ extern  int             digit(int c, int r);
 extern  VOID            expr(struct expr *esp, int n);
 extern  int             is_abs(struct expr *esp);
 extern  int             oprio(int c);
+extern  a_uint          rngchk(a_uint n);
 extern  VOID            term(struct expr *esp);
 
 /* asdbg */

@@ -1,3 +1,14 @@
+2012-10-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asdbg.c,
+	* sdas/asxxsrc/asexpr.c,
+	* sdas/asxxsrc/aslex.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asout.c,
+	* sdas/asxxsrc/asxxxx.h: another step to ASxxxx v5
+
 2012-10-03 Borut Razem <borut.razem AT gmail.com>
 
 	* device/non-free/lib/pic16/libdev/mkmk.sh: 

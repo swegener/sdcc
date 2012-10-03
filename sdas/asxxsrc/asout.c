@@ -215,14 +215,6 @@
  *              int *   txtp            pointer to txt array
  */
 
-#define  NTXT   16
-#define  NREL   16
-
-char     txt[NTXT];
-char     rel[NREL];
-
-char    *txtp = &txt[0];
-char    *relp = &rel[0];
 
 /*)Function     VOID    outab(b)
  *
@@ -496,7 +488,7 @@ outrb(struct expr *esp, int r)
 VOID
 outrw(struct expr *esp, int r)
 {
-        register int n;
+        int n;
 
         if (pass == 2) {
                 if (is_sdas() && is_sdas_target_8051_like() && esp->e_addr > 0xffff) {
@@ -604,7 +596,7 @@ outrw(struct expr *esp, int r)
 VOID
 outr24(struct expr *esp, int r)
 {
-        register int n;
+        int n;
 
         if (pass == 2) {
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
@@ -692,9 +684,9 @@ outr24(struct expr *esp, int r)
  */
 
 VOID
-outdp(register struct area *carea, register struct expr *esp)
+outdp(struct area *carea, struct expr *esp)
 {
-        register int n, r;
+        int n, r;
 
         if (oflag && pass==2) {
                 outchk(ASXHUGE,ASXHUGE);
@@ -809,7 +801,7 @@ outdot(void)
 VOID
 outchk(int nt, int nr)
 {
-        register struct area *ap;
+        struct area *ap;
 
         if (txtp+nt > &txt[NTXT] || relp+nr > &rel[NREL]) {
                 outbuf("R");
@@ -909,9 +901,9 @@ outbuf(char *s)
 VOID
 outgsd(void)
 {
-        register struct area *ap;
-        register struct sym  *sp;
-        register int i, j;
+        struct area *ap;
+        struct sym  *sp;
+        int i, j;
         char *ptr;
         int narea, nglob, rn;
 
@@ -1025,9 +1017,9 @@ outgsd(void)
  */
 
 VOID
-outarea(register struct area *ap)
+outarea(struct area *ap)
 {
-        register char *ptr;
+        char *ptr;
 
         fprintf(ofp, "A ");
         ptr = &ap->a_id[0];
@@ -1074,9 +1066,9 @@ outarea(register struct area *ap)
  */
 
 VOID
-outsym(register struct sym *sp)
+outsym(struct sym *sp)
 {
-        register char *ptr;
+        char *ptr;
 
         fprintf(ofp, "S ");
         ptr = &sp->s_id[0];     /* JLH */
@@ -1437,9 +1429,9 @@ hibyte(a_uint v)
  *              The current assembly address is incremented by 2.
  */
 VOID
-outr11(register struct expr *esp, int op, int r)
+outr11(struct expr *esp, int op, int r)
 {
-        register int n;
+        int n;
 
         if (pass == 2) {
                 if (!is_sdas() || !is_sdas_target_8051_like()) {
@@ -1561,7 +1553,7 @@ byte3(int n)
 VOID
 outr19(struct expr * esp, int op, int r)
 {
-        register int n;
+        int n;
 
         if (pass == 2) {
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {

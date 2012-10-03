@@ -58,8 +58,9 @@
  *              int     nl              number of bytes listed on this line
  *              int     listing         listing enable flags
  *              int     paging          computed paging enable flag
- *              int *   wp              pointer to the assembled data bytes
+ *              char *  wp              pointer to the assembled data bytes
  *              int *   wpt             pointer to the data byte mode
+ *              char *  frmt            pointer to format string
  *
  *      global variables:
  *              int     cb[]            array of assembler output values
@@ -71,7 +72,7 @@
  *              char    eb[]            array of generated error codes
  *              char *  ep              pointer into error list
  *                                      array eb[]
- *              char    ib[]            assembler-source text line
+ *              char *  il              pointer to assembler-source listing line
  *              a_uint  laddr           address of current assembler line,
  *                                      equate, or value of .if argument
  *              FILE *  lfp             list output file handle
@@ -101,15 +102,24 @@ list(void)
         /*
          * Internal Listing
          */
-        listing = LIST_BIN | LIST_CYC;
+        listing = LIST_ERR | LIST_LOC | LIST_EQT | LIST_LIN | LIST_SRC | LIST_BIN | LIST_CYC;
 
         if (lfp == NULL || lmode == NLIST)
                 return;
 
-	/*
-	 * Paging Control
-	 */
-	paging = !pflag ? 1 : 0;
+        /*
+         * Paging Control
+         */
+        paging = !pflag ? 1 : 0;
+
+        /*
+         * ALIST/BLIST Output Processing
+         */
+        if (lmode == ALIST) {
+                outchk(ASXHUGE,ASXHUGE);
+        }
+
+
 
         /*
          * Get Correct Line Number
@@ -133,198 +143,203 @@ list(void)
         slew(lfp, paging);
 
         /*
-         * Output a maximum of NERR error codes with listing.
+         * LIST_ERR - Output a maximum of NERR error codes with listing.
          */
-        while (ep < &eb[NERR])
-                *ep++ = ' ';
-        fprintf(lfp, "%.2s", eb);
+        if (listing & LIST_ERR) {
+                while (ep < &eb[NERR])
+                        *ep++ = ' ';
+                fprintf(lfp, "%.2s", eb);
+        } else {
+                fprintf(lfp, "  ");
+        }
 
         /*
-         * Source listing only option.
+         * SLIST
+         * Source listing Option.
          */
         if (lmode == SLIST) {
-                fprintf(lfp, "%24s%5u %s\n", "", line, ib);
+                if (listing & LIST_LOC) {
+                        frmt = "%24s%5u %s\n";
+                        fprintf(lfp, frmt, "", line, il);
+                } else {
+                        frmt = "%29s %s\n";
+                        fprintf(lfp, frmt, "", il);
+                }
                 return;
         }
-        if (lmode == ALIST) {
-                outchk(ASXHUGE,ASXHUGE);
+
+        /*
+         * Truncate (int) to N-Bytes
+         */
+        l_addr = laddr;
+
+        /*
+         * ELIST
+         * Equate Listing Option
+         */
+        if (lmode == ELIST) {
+                if (listing & LIST_EQT) {
+                        switch (xflag) {
+                        default:
+                        case 0:         /* HEX */
+                                frmt = "%19s%04X";
+                                break;
+
+                        case 1:         /* OCTAL */
+                                frmt = "%17s%06o";
+                                break;
+
+                        case 2:         /* DECIMAL */
+                                frmt = "%18s%05u ";
+                                break;
+                        }
+                        fprintf(lfp, frmt, "", l_addr);
+                } else {
+                        frmt = "%23s";
+                        fprintf(lfp, frmt, "");
+                }
+                if ((listing & LIST_LIN) && (listing & LIST_SRC)) {
+                        fprintf(lfp, " %5u %s\n", line, il);
+                } else
+                if (listing & LIST_LIN) {
+                        fprintf(lfp, " %5u\n", line);
+                } else
+                if (listing & LIST_SRC) {
+                        fprintf(lfp, " %5s %s\n", "", il);
+                } else {
+                        fprintf(lfp, "\n");
+                }
+                return;
         }
 
         /*
-         * HEX output Option.
+         * LIST_LOC - Location Address
          */
-        if (xflag == 0) {               /* HEX */
-                /*
-                 * Truncate (int) to N-Bytes
-                 */
-                l_addr = laddr;
+        if (listing & LIST_LOC) {
+                switch (xflag) {
+                default:
+                case 0:         /* HEX */
+                        frmt = " %04X";
+                        break;
 
-                /*
-                 * Equate only
-                 */
-                if (lmode == ELIST) {
-                        fprintf(lfp, "%18s%04X", "", l_addr);
-                        fprintf(lfp, "  %5u %s\n", line, ib);
-                        return;
+                case 1:         /* OCTAL */
+                        frmt = " %06o";
+                        break;
+
+                case 2:         /* DECIMAL */
+                        frmt = "  %05u";
+                        break;
                 }
+                fprintf(lfp, frmt, l_addr);
+        } else {
+                frmt = "%5s";
+                fprintf(lfp, frmt, "");
+        }
 
-                /*
-                 * Address (with allocation)
-                 */
-                fprintf(lfp, " %04X", l_addr);
-                if (lmode == ALIST || lmode == BLIST) {
-                        fprintf(lfp, "%19s%5u %s\n", "", line, ib);
+        if (lmode == ALIST || lmode == BLIST) {
+                if (listing & LIST_LIN) {
+                        switch (xflag) {
+                        default:
+                        case 0:         /* HEX */
+                                frmt = "%19s%5u %s\n";
+                                break;
+
+                        case 1:         /* OCTAL */
+                                frmt = "%17s%5u %s\n";
+                                break;
+
+                        case 2:         /* DECIMAL */
+                                frmt = "%17s%5u %s\n";
+                                break;
+                        }
+                        fprintf(lfp, frmt, "", line, il);
                         outdot();
-                        return;
+                } else {
+                        switch (xflag) {
+                        default:
+                        case 0:         /* HEX */
+                                frmt = "%19s%5s %s\n";
+                                break;
+
+                        case 1:         /* OCTAL */
+                                frmt = "%17s%5s %s\n";
+                                break;
+
+                        case 2:         /* DECIMAL */
+                                frmt = "%17s%5s %s\n";
+                                break;
+                        }
+                        fprintf(lfp, frmt, "", "", il);
                 }
-                /*
-                 * Format
-                 */
+                return;
+        }
+
+        /*
+         * LIST_BIN - Binary Listing Option
+         * LIST_CYC - Opcode Cycles Option
+         * LIST_LIN - Line Number Option
+         * LIST_SRC - Source Listing Option
+         */
+        if (!(listing & (LIST_BIN | LIST_CYC | LIST_LIN | LIST_SRC))) {
+                fprintf(lfp, "\n");
+                return;
+        }
+
+        /*
+         * Format
+         */
+        switch (xflag) {
+        default:
+        case 0:         /* HEX */
                 n = 6; frmt = "%7s";
+                break;
 
-                wp = cb;
-                wpt = cbt;
-                nb = (int) (cp - cb);
-
-                /*
-                 * If we list cycles, decrease max. bytes on first line.
-                 */
-                nl = (!cflag && !(opcycles & OPCY_NONE) ) ? (n-1) : n;
-
-                /*
-                 * First line of output for this source line with data.
-                 */
-                list1(wp, wpt, nb, nl, 1, listing);
-                fprintf(lfp, "%5u %s\n", line, ib);
-
-                /*
-                 * Subsequent lines of output if more data.
-                 */
-                while ((nb -= nl) > 0) {
-                        wp += nl;
-                        wpt += nl;
-                        slew(lfp, paging);
-                        fprintf(lfp, frmt, "");
-                        list1(wp, wpt, nb, nl, 0, listing);
-                        putc('\n', lfp);
-                }
-        } else
-        /*
-         * OCTAL output Option.
-         */
-        if (xflag == 1) {               /* OCTAL */
-                /*
-                 * Truncate (int) to N-Bytes
-                 */
-                l_addr = laddr;
-
-                /*
-                 * ELIST
-                 * Equate Listing Option
-                 */
-                if (lmode == ELIST) {
-                        fprintf(lfp, "%16s%06o", "", l_addr);
-                        fprintf(lfp, "  %5u %s\n", line, ib);
-                        return;
-                }
-
-                /*
-                 * Address (with allocation)
-                 */
-                fprintf(lfp, " %06o", l_addr);
-                if (lmode == ALIST || lmode == BLIST) {
-                        fprintf(lfp, "%17s%5u %s\n", "", line, ib);
-                        outdot();
-                        return;
-                }
-                /*
-                 * Format
-                 */
+        case 1:         /* OCTAL */
                 n = 4; frmt = "%9s";
+                break;
 
-                wp = cb;
-                wpt = cbt;
-                nb = (int) (cp - cb);
-
-                /*
-                 * If we list cycles, decrease max. bytes on first line.
-                 */
-                nl = (!cflag && !(opcycles & OPCY_NONE) ) ? (n-1) : n;
-
-                /*
-                 * First line of output for this source line with data.
-                 */
-                list1(wp, wpt, nb, nl, 1, listing);
-                fprintf(lfp, "%5u %s\n", line, ib);
-
-                /*
-                 * Subsequent lines of output if more data.
-                 */
-                while ((nb -= nl) > 0) {
-                        wp += nl;
-                        wpt += nl;
-                        slew(lfp, paging);
-                        fprintf(lfp, frmt, "");
-                        list1(wp, wpt, nb, nl, 0, listing);
-                        putc('\n', lfp);
-                }
-        } else
-        /*
-         * DECIMAL output Option.
-         */
-        if (xflag == 2) {               /* DECIMAL */
-                /*
-                 * Truncate (int) to N-Bytes
-                 */
-                l_addr = laddr;
-
-                /*
-                 * Equate only
-                 */
-                if (lmode == ELIST) {
-                        fprintf(lfp, "%16s%05u", "", l_addr);
-                        fprintf(lfp, "   %5u %s\n", line, ib);
-                        return;
-                }
-
-                /*
-                 * Address (with allocation)
-                 */
-                fprintf(lfp, "  %05u", l_addr);
-                if (lmode == ALIST || lmode == BLIST) {
-                        fprintf(lfp, "%17s%5u %s\n", "", line, ib);
-                        outdot();
-                        return;
-                }
-
-                /*
-                 * Format
-                 */
+        case 2:         /* DECIMAL */
                 n = 4; frmt = "%9s";
+                break;
+        }
 
-                wp = cb;
-                wpt = cbt;
-                nb = (int) (cp - cb);
+        wp = cb;
+        wpt = cbt;
+        nb = (int) (cp - cb);
 
-                /*
-                 * If we list cycles, decrease max. bytes on first line.
-                 */
-                nl = (!cflag && !(opcycles & OPCY_NONE) ) ? (n-1) : n;
+        /*
+         * If we list cycles, decrease max. bytes on first line.
+         */
+        nl = (!cflag && !(opcycles & OPCY_NONE) && (listing & LIST_CYC)) ? (n-1) : n;
 
-                /*
-                 * First line of output for this source line with data.
-                 */
+        /*
+         * First line of output for this source line with data.
+         */
+        if (listing & (LIST_LIN | LIST_SRC)) {
                 list1(wp, wpt, nb, nl, 1, listing);
-                fprintf(lfp, "%5u %s\n", line, ib);
+                if ((listing & LIST_LIN) && (listing & LIST_SRC)) {
+                        fprintf(lfp, "%5u %s", line, il);
+                } else
+                if (listing & LIST_LIN) {
+                        fprintf(lfp, "%5u", line);
+                } else
+                if (listing & LIST_SRC) {
+                        fprintf(lfp, "%5s %s", "", il);
+                }
+        } else {
+                list1(wp, wpt, nb, nl, listing & LIST_CYC, listing);
+        }
+        fprintf(lfp, "\n");
 
-                /*
-                 * Subsequent lines of output if more data.
-                 */
+        /*
+         * Subsequent lines of output if more data.
+         */
+        if (listing & LIST_BIN) {
                 while ((nb - nl) > 0) {
                         nb -= nl;
                         wp += nl;
                         wpt += nl;
-
+                        nl = n;
                         slew(lfp, paging);
                         fprintf(lfp, frmt, "");
                         list1(wp, wpt, nb, nl, 0, listing);
@@ -576,6 +591,7 @@ static int _cmpSym(const void *p1, const void *p2)
  *              VOID    slew()          aslist.c
  *              int     strcmp()        c_library
  *              char *  strcpy()        c_library
+ *              char *  new()           assym.c
  *
  *      side effects:
  *              Symbol and area tables output.
@@ -624,7 +640,7 @@ lstsym(FILE *fp)
          * Allocate space for an array of pointers to symbols
          * and load array.
          */
-        p = (struct sym **) malloc (sizeof((struct sym *) sp)*nmsym);
+        p = (struct sym **) new (sizeof((struct sym *) sp)*nmsym);
         if (p == NULL) {
                 fprintf(fp, "Insufficient space to build Symbol Table.\n");
                 return;

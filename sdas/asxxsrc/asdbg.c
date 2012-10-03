@@ -1,7 +1,7 @@
 /* asdbg.c */
 
 /*
- *  Copyright (C) 2003-2009 Alan R. Baldwin
+ *  Copyright (C) 2003-2009  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -206,7 +206,7 @@ BaseFileName (int fileNumber, int spacesToUnderscores)
                 /*
                  * Dump a FILE command with full path and extension
                  */
-                fprintf (ofp, ";!FILE %s\n", p1);
+                fprintf(ofp, ";!FILE %s\n", p1);
 
                 /*
                  * The name starts after the last
@@ -216,10 +216,10 @@ BaseFileName (int fileNumber, int spacesToUnderscores)
                  * and ends at the last
                  * separator 'FSEPX'
                  */
-                if ((p2 = strrchr (p1,  '\\')) != NULL) p1 = ++p2;
-                if ((p2 = strrchr (p1,   '/')) != NULL) p1 = ++p2;
-                if ((p2 = strrchr (p1,   ':')) != NULL) p1 = ++p2;
-                if ((p2 = strrchr (p1, FSEPX)) != NULL) *p2 = 0;
+                if ((p2 = strrchr(p1,  '\\')) != NULL)  p1 = ++p2;
+                if ((p2 = strrchr(p1,   '/')) != NULL)  p1 = ++p2;
+                if ((p2 = strrchr(p1,   ':')) != NULL)  p1 = ++p2;
+                if ((p2 = strrchr(p1, FSEPX)) != NULL) *p2 = 0;
                 strcpy(baseName, p1);
 
                 if (spacesToUnderscores) {
@@ -229,6 +229,6 @@ BaseFileName (int fileNumber, int spacesToUnderscores)
                                         *p1 = '_';
                 }
         }
-        return (baseName);
+        return(baseName);
 }
 #endif

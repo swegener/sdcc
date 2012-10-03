@@ -154,6 +154,7 @@ getid(char *id, int c)
  *              int     get()           aslex.c
  *              int     getnb()         aslex.c
  *              VOID    unget()         aslex.c
+ *              VOID    qerr()          assubr.c
  *
  *      side effects:
  *              use of getnb(), get(), and unget() updates the
@@ -303,6 +304,7 @@ unget(int c)
  *
  *      called functions:
  *              int     get()           aslex.c
+ *              VOID    qerr()          assubr.c
  *
  *      side effects:
  *              use of get() updates the global pointer ip the position
@@ -420,16 +422,20 @@ comma(int flag)
  *      lines of text are read from the include file (or nested
  *      include file) until the end of the include file is found.
  *      The input text line is transferred into the global string
- *      ib[] and converted to a NULL terminated string.  The function
+ *      ib[] and converted to a NULL terminated string.  The string
+ *      is then copied into the global string ic[] which is used
+ *      for internal processing by the assembler.  The function
  *      nxtline() returns a (1) after succesfully reading
  *      a line, or a (0) if all files have been read.
  *
  *      local variables:
- *              int     i               string length
+ *              int     len             string length
  *
  *      global variables:
- *              char    ib[]            string buffer containing
- *                                      assembler-source text line
+ *              char *  ib              string buffer containing
+ *                                      assembler-source text line for processing
+ *              char *  ic              string buffer containing
+ *                                      assembler-source text line for listing
  *              char    ifp[]           array of file handles for
  *                                      include files
  *              int     incfil          index for ifp[] specifies
@@ -449,6 +455,7 @@ comma(int flag)
  *              int     dbuf_set_length()
  *              int     dbuf_getline()
  *              const char * dbuf_c_str()
+ *              int     dbuf_append_str()
  *              int     fclose()        c-library
  *              char *  fgets()         c-library
  *              int     strlen()        c-library
@@ -464,22 +471,27 @@ comma(int flag)
 int
 nxtline(void)
 {
-  static struct dbuf_s dbuf;
+  static struct dbuf_s dbuf_ib;
+  static struct dbuf_s dbuf_ic;
   static char dbufInitialized = 0;
   size_t len;
 
   if (!dbufInitialized)
     {
-      dbuf_init (&dbuf, 1024);
+      dbuf_init (&dbuf_ib, 1024);
+      dbuf_init (&dbuf_ic, 1024);
       dbufInitialized = 1;
     }
   else
-    dbuf_set_length (&dbuf, 0);
+    {
+      dbuf_set_length (&dbuf_ib, 0);
+      dbuf_set_length (&dbuf_ic, 0);
+    }
 
 loop:
   if (incfil >= 0)
     {
-      if ((len = dbuf_getline (&dbuf, ifp[incfil])) == 0)
+      if ((len = dbuf_getline (&dbuf_ib, ifp[incfil])) == 0)
         {
           fclose (ifp[incfil]);
           ifp[incfil--] = NULL;
@@ -493,7 +505,7 @@ loop:
     }
   else
     {
-      if ((len = dbuf_getline (&dbuf, sfp[cfile])) == 0)
+      if ((len = dbuf_getline (&dbuf_ib, sfp[cfile])) == 0)
         {
           if (++cfile <= inpfil)
             {
@@ -507,7 +519,7 @@ loop:
           ++srcline[cfile];
         }
     }
-  ib = (char *)dbuf_c_str (&dbuf);
+  ib = (char *)dbuf_c_str (&dbuf_ib);
 
   /* remove the trailing NL */
   if (len > 0 && '\n' == ib[len - 1])
@@ -515,11 +527,13 @@ loop:
       --len;
       if (len > 0 && '\r' == ib[len - 1])
         --len;
-      dbuf_set_length (&dbuf, len);
-      ib = (char *)dbuf_c_str (&dbuf);
+      dbuf_set_length (&dbuf_ib, len);
+      ib = (char *)dbuf_c_str (&dbuf_ib);
     }
 
-  return 1;
+  dbuf_append_str (&dbuf_ic, ib);
+  ic = (char *)dbuf_c_str (&dbuf_ic);
+  return(1);
 }
 
 /*)Function     int     more()

@@ -3,8 +3,8 @@
 /*
  *  Copyright (C) 1989-2010  Alan R. Baldwin
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
@@ -96,6 +96,8 @@ int     pass;           /*      assembler pass number
                          */
 int     aflag;          /*      -a, make all symbols global flag
                          */
+int     bflag;          /*      -b(b), listing modes flag
+                         */
 int     cflag;          /*      -c, disable cycle counts in listing flag
                          */
 int     fflag;          /*      -f(f), relocations flagged flag
@@ -137,7 +139,12 @@ char    eb[NERR];       /*      array of generated error codes
 char    *ip;            /*      pointer into the assembler-source
                          *      text line in ib[]
                          */
-char    *ib;            /*      assembler-source text line
+char    *ib;            /*      assembler-source text line for processing
+                         */
+char    *ic;            /*      assembler-source text line for listing
+                         */
+char    *il;            /*      pointer to the assembler-source
+                         *      text line to be listed
                          */
 char    *cp;            /*      pointer to assembler output
                          *      array cb[]
@@ -274,6 +281,14 @@ FILE    *ofp;           /*      relocation output file handle
                          */
 FILE    *tfp;           /*      symbol table output file handle
                          */
+char	txt[NTXT];	/*	T Line Values
+			 */
+char	rel[NREL];	/*	R Line Values
+			 */
+char	*txtp = &txt[0];/*	Pointer to T Line Values
+			 */
+char	*relp = &rel[0];/*	Pointer to R Line Values
+			 */
 FILE    *sfp[MAXFIL];   /*      array of assembler-source file handles
                          */
 FILE    *ifp[MAXINC];   /*      array of include-file file handles

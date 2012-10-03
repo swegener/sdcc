@@ -30,7 +30,7 @@ HERE
 
     echo "libdev18f${arch}_a_SOURCES = pic18f${arch}.c";
 
-    sdcc -mpic16 -p18f${arch} --use-non-free -o pic18f${arch}.inc -E pic18f${arch}.c;
+    sdcc -mpic16 -p18f${arch} --nostdinc -I../../../../include/pic16 -I../../../include/pic16 -o pic18f${arch}.inc -E pic18f${arch}.c;
     if grep '\bEEADRH\b' pic18f${arch}.inc >/dev/null 2>&1; then
         # 16 bit EEPROM address space
         for i in get put; do

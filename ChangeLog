@@ -1,3 +1,8 @@
+2012-10-03 Borut Razem <borut.razem AT gmail.com>
+
+	* device/non-free/lib/pic16/libdev/mkmk.sh: 
+	  applied patch #3574102 - Modification of device/non-free/lib/pic16/libdev/mkmk.sh
+
 2012-10-02 Borut Razem <borut.razem AT gmail.com>
 
 	* device/include/pic16/pic18fregs.h,

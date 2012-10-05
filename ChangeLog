@@ -6,6 +6,8 @@
 	  thanks to Molnar Karoly
 	* support/scripts/optimize_pic16devices.pl:
 	  renamed from zip-pic16devices.pl
+	* support/scripts/inc2h-pic16.pl, support/scripts/inc2h.pl:
+	  removed, functionaly replaced by cinc2h.pl
 
 2012-10-03 Maarten Brock <sourceforge.brock AT dse.nl>
 

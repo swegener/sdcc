@@ -21,8 +21,8 @@
 
 ================================================================================
 
-    This program compress or uncompress the pic16devices.txt file.
-    For more explanation: zip-pic16devices.pl -h
+    This program optimizes or unoptimizes the pic16devices.txt file.
+    For more explanation: optimize_pic16devices.pl -h
 
 =cut
 
@@ -38,8 +38,8 @@ my $verbose = 0;
 my $file = '';
 
 use constant OP_NULL       => 0;
-use constant OP_COMPRESS   => 1;
-use constant OP_UNCOMPRESS => 2;
+use constant OP_OPTIMIZE   => 1;
+use constant OP_UNOPTIMIZE => 2;
 
 my $operation = OP_NULL;
 
@@ -345,9 +345,9 @@ sub print_device($)
   my $ancestor = undef;
   my ($ac, $i, $ref);
 
-  if ($operation == OP_COMPRESS)
+  if ($operation == OP_OPTIMIZE)
     {
-        # Compressed writing is required.
+        # Optinized writing is required.
 
     for ($i = 0; $i < @device_names; ++$i)
       {
@@ -567,13 +567,13 @@ Usage: $PROGRAM <option> path/to/pic16devices.txt > output.txt
 
     Options are:
 
-        -c or --compress
+        -o or --optimize
 
             If a MCU features matches with an earlier listed MCU features,
             then use the "using" keyword and with this method significantly
             reduces the file size.
 
-        -u or --uncompress
+        -u or --unoptimize
 
             Unlocks the "using" keywords and instead displays the original
             content.
@@ -606,9 +606,9 @@ for (my $i = 0; $i < @ARGV; )
 
   given ($opt)
     {
-    when (/^-(c|-compress)$/o)   { $operation = OP_COMPRESS; }
+    when (/^-(c|-optimize)$/o)   { $operation = OP_OPTIMIZE; }
 
-    when (/^-(u|-uncompress)$/o) { $operation = OP_UNCOMPRESS; }
+    when (/^-(u|-unoptimize)$/o) { $operation = OP_UNOPTIMIZE; }
 
     when (/^-(v|-verbose)$/o)
       {

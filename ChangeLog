@@ -4,6 +4,8 @@
 	  device/include/pic16/pic16devices.txt:
 	  applied patch #3574556 - Compressed pic16devices.txt file,
 	  thanks to Molnar Karoly
+	* support/scripts/optimize_pic16devices.pl:
+	  renamed from zip-pic16devices.pl
 
 2012-10-03 Maarten Brock <sourceforge.brock AT dse.nl>
 

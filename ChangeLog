@@ -1,3 +1,10 @@
+2012-10-05 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/zip-pic16devices.pl,
+	  device/include/pic16/pic16devices.txt:
+	  applied patch #3574556 - Compressed pic16devices.txt file,
+	  thanks to Molnar Karoly
+
 2012-10-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asxxsrc/asdata.c,

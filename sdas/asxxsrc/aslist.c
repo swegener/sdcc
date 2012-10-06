@@ -78,6 +78,8 @@
  *              FILE *  lfp             list output file handle
  *              int     line            current assembler source line number
  *              int     lmode           listing mode
+ *              int     lnlist          LIST-NLIST state
+ *              int     uflag           -u, disable .list/.nlist processing
  *              int     xflag           -x, listing radix flag
  *
  *      functions called:
@@ -89,6 +91,76 @@
  *      side effects:
  *              Listing or symbol output updated.
  */
+
+/* The Output Formats, No Cycle Count
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx xx LLLLL *************   HEX(16)
+ee 000000 ooo ooo ooo ooo LLLLL *************   OCTAL(16)
+ee  DDDDD ddd ddd ddd ddd LLLLL *************   DECIMAL(16)
+                     XXXX
+                   OOOOOO
+                    DDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+     |       |                  |     | |
+ee    XXXXXX xx xx xx xx xx xx xx LLLLL *********       HEX(24)
+ee   OO000000 ooo ooo ooo ooo ooo LLLLL *********       OCTAL(24)
+ee   DDDDDDDD ddd ddd ddd ddd ddd LLLLL *********       DECIMAL(24)
+                           XXXXXX
+                         OOOOOOOO
+                         DDDDDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+  |          |                  |     | |
+ee  XXXXXXXX xx xx xx xx xx xx xx LLLLL *********       HEX(32)
+eeOOOOO000000 ooo ooo ooo ooo ooo LLLLL *********       OCTAL(32)
+ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********       DECIMAL(32)
+                         XXXXXXXX
+                      OOOOOOOOOOO
+                       DDDDDDDDDD
+*/
+
+/* The Output Formats,  With Cycle Count [nn]
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx[nn]LLLLL *************   HEX(16)
+ee 000000 ooo ooo ooo [nn]LLLLL *************   OCTAL(16)
+ee  DDDDD ddd ddd ddd [nn]LLLLL *************   DECIMAL(16)
+                     XXXX
+                   OOOOOO
+                    DDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+     |       |                  |     | |
+ee    XXXXXX xx xx xx xx xx xx[nn]LLLLL *********       HEX(24)
+ee   OO000000 ooo ooo ooo ooo [nn]LLLLL *********       OCTAL(24)
+ee   DDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********       DECIMAL(24)
+                           XXXXXX
+                         OOOOOOOO
+                         DDDDDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+  |          |                  |     | |
+ee  XXXXXXXX xx xx xx xx xx xx[nn]LLLLL *********       HEX(32)
+eeOOOOO000000 ooo ooo ooo ooo [nn]LLLLL *********       OCTAL(32)
+ee DDDDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********       DECIMAL(32)
+                         XXXXXXXX
+                      OOOOOOOOOOO
+                       DDDDDDDDDD
+*/
 
 VOID
 list(void)
@@ -102,15 +174,39 @@ list(void)
         /*
          * Internal Listing
          */
-        listing = LIST_ERR | LIST_LOC | LIST_EQT | LIST_LIN | LIST_SRC | LIST_BIN | LIST_CYC;
+        listing = lnlist;
 
-        if (lfp == NULL || lmode == NLIST)
-                return;
+        /*
+         * Listing Control Override
+         */
+        if (uflag) {
+                listing = LIST_BITS;
+                if (lmode == NLIST) {
+                        lmode = SLIST;
+                }
+        }
 
         /*
          * Paging Control
          */
-        paging = !pflag ? 1 : 0;
+        paging = !pflag && ((lnlist & LIST_PAG) || (uflag == 1)) ? 1 : 0;
+
+        /*
+         * ALIST/BLIST Output Processing
+         */
+        if (lmode == ALIST) {
+                outchk(ASXHUGE,ASXHUGE);
+        }
+        if (lmode == ALIST || lmode == BLIST) {
+                outdot();
+        }
+
+        /*
+         * Check NO-LIST Conditions
+         */
+        if ((lfp == NULL) || (lmode == NLIST)) {
+                return;
+        }
 
         /*
          * ALIST/BLIST Output Processing
@@ -124,18 +220,7 @@ list(void)
         /*
          * Get Correct Line Number
          */
-        if (incfil >= 0) {
-                line = incline[incfil];
-                if (line == 0) {
-                        if (incfil > 0) {
-                                line = incline[incfil-1];
-                        } else {
-                                line = srcline[cfile];
-                        }
-                }
-        } else {
-                line = srcline[cfile];
-        }
+        line = srcline;
 
         /*
          * Move to next line.
@@ -236,6 +321,9 @@ list(void)
                 fprintf(lfp, frmt, "");
         }
 
+        /*
+         * ALIST/BLIST Listing Options
+         */
         if (lmode == ALIST || lmode == BLIST) {
                 if (listing & LIST_LIN) {
                         switch (xflag) {
@@ -253,7 +341,6 @@ list(void)
                                 break;
                         }
                         fprintf(lfp, frmt, "", line, il);
-                        outdot();
                 } else {
                         switch (xflag) {
                         default:
@@ -577,11 +664,13 @@ static int _cmpSym(const void *p1, const void *p2)
  *              area *  areap           pointer to an area structure
  *              char    aretbl[]        string "Area Table"
  *              sym     dot             defined as sym[0]
+ *              int     lnlist          LIST-NLIST state
  *              char    stb[]           Subtitle string buffer
  *              sym * symhash[]         array of pointers to NHASH
  *                                      linked symbol lists
  *              char    symtbl[]        string "Symbol Table"
  *              FILE *  tfp             symbol table output file handle
+ *              int     uflag           LIST-NLIST override flag
  *              int     wflag           -w, wide listing flag
  *              int     xflag           -x, listing radix flag
  *
@@ -617,7 +706,7 @@ lstsym(FILE *fp)
                 page = 0;
                 paging = 1;
         } else {
-                paging = !pflag ? 1 : 0;
+                paging = !pflag && ((lnlist & LIST_PAG) || (uflag == 1)) ? 1 : 0;
         }
         slew(fp, 1);
 

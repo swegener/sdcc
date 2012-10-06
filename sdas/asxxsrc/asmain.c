@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <math.h>
 #include "sdas.h"
+#include "dbuf_string.h"
 #include "asxxxx.h"
 
 /*)Module       asmain.c
@@ -81,6 +82,44 @@ search_path_append(const char *dir)
 }
 
 /**
+ * The create_temp_path function is used to build a temporary file path
+ * by concatenating dir and filename. If len >= 0 then only the left
+ * substring of dir with length len is used to build the file path.
+ *
+ * @param dir
+ *              The directory part of the path.
+ * @param len
+ *              < 0:  use the whole dir as the directory part of the path.
+ *              >= 0: the length of dir to use as the directory part of the path.
+ * @param filename
+ *              The filename to be appended to the directory part of the path.
+ * @returns
+ *              The constructed path.
+ */
+static const char *
+create_temp_path(const char * dir, int len, const char * filename)
+{
+        static struct dbuf_s dbuf;
+        const char * path;
+
+        if (!dbuf_is_initialized(&dbuf))
+                dbuf_init (&dbuf, 1024);
+
+        dbuf_set_length(&dbuf, 0);
+        dbuf_append_str(&dbuf, dir);
+        if (len >= 0)
+                dbuf_set_length(&dbuf, len);
+        path = dbuf_c_str(&dbuf);
+        if ((path[strlen(path) - 1] != '/') &&
+            (path[strlen(path) - 1] != DIR_SEPARATOR_CHAR)) {
+                dbuf_append_char(&dbuf, DIR_SEPARATOR_CHAR);
+        }
+        dbuf_append_str(&dbuf, filename);
+        path = dbuf_c_str(&dbuf);
+        return path;
+}
+
+/**
  * The search_path_fopen function is used to open the named file.  If
  * the file isn't in the current directory, the search path is then used
  * to build a series of possible file names, and attempts to open them.
@@ -103,16 +142,16 @@ search_path_fopen(const char *filename, const char *mode)
         fp = fopen(filename, mode);
         if (fp != NULL || filename[0] == '/' || filename[0] == '\\')
                 return fp;
-        for (j = 0; j < search_path_length; ++j) {
-                char path[2000];
 
-                strncpy(path, search_path[j], sizeof(path));
-                if ((path[strlen(path) - 1] != '/') &&
-                        (path[strlen(path) - 1] != DIR_SEPARATOR_CHAR)) {
-                        strncat(path, DIR_SEPARATOR_STRING, sizeof(path) - strlen(path));
-                }
-                strncat(path, filename, sizeof(path) - strlen(path));
-                fp = fopen(path, mode);
+        /*
+         * Try the path of the file opening the include file
+         */
+        fp = fopen(create_temp_path(afn, afp, filename), mode);
+        if (fp != NULL)
+                return fp;
+
+        for (j = 0; j < search_path_length; ++j) {
+                fp = fopen(create_temp_path(search_path[j], -1, filename), mode);
                 if (fp != NULL)
                         return fp;
         }
@@ -151,14 +190,16 @@ search_path_fopen(const char *filename, const char *mode)
  *      global variables:
  *              int     aflag           -a, make all symbols global flag
  *              char    afn[]           afile() constructed filespec
+ *              int     afp             afile constructed path length
  *              area *  areap           pointer to an area structure
+ *              asmf *  asmc            pointer to current assembler file structure
+ *              int     asmline         assembler source file line number
+ *              asmf *  asmp            pointer to first assembler file structure
  *              int     aserr           assembler error counter
  *              int     bflag           -b(b), listing mode flag
  *              int     cb[]            array of assembler output values
  *              int     cbt[]           array of assembler relocation types
  *                                      describing the data in cb[]
- *              int     cfile           current file handle index
- *                                      of input assembly files
  *              int *   cp              pointer to assembler output array cb[]
  *              int *   cpt             pointer to assembler relocation type
  *                                      output array cbt[]
@@ -175,8 +216,6 @@ search_path_fopen(const char *filename, const char *mode)
  *                                      assembler-source text line for processing
  *              char    ic[]            string buffer containing
  *                                      assembler-source text line for listing
- *              int     inpfil          count of assembler
- *                                      input files specified
  *              int     ifcnd[]         array of IF statement condition
  *                                      values (0 = FALSE) indexed by tlevel
  *              int     iflvl[]         array of IF-ELSE-ENDIF flevel
@@ -190,6 +229,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     lflag           -l, generate listing flag
  *              int     line            current assembler source
  *                                      line number
+ *              int     lnlist          current LIST-NLIST state
  *              int     lop             current line number on page
  *              int     oflag           -o, generate relocatable output flag
  *              int     jflag           -j, generate debug info flag
@@ -200,18 +240,17 @@ search_path_fopen(const char *filename, const char *mode)
  *                                      2 (binary), 8 (octal), 10 (decimal),
  *                                      16 (hexadecimal)
  *              int     sflag           -s, generate symbol table flag
- *              char    srcfn[][]       array of source file names
- *              int     srcline[]       current source file line
+ *              int     srcline         current source line number
  *              char    stb[]           Subtitle string buffer
  *              sym *   symp            pointer to a symbol structure
  *              int     tlevel          current conditional level
+ *              int     uflag           -u, disable .list/.nlist processing
  *              int     wflag           -w, enable wide listing format
  *              int     xflag           -x, listing radix flag
  *              int     zflag           -z, disable symbol case sensitivity
  *              FILE *  lfp             list output file handle
  *              FILE *  ofp             relocation output file handle
  *              FILE *  tfp             symbol table output file handle
- *              FILE *  sfp[]           array of assembler-source file handles
  *
  *      called functions:
  *              FILE *  afile()         asmain.c
@@ -242,14 +281,14 @@ search_path_fopen(const char *filename, const char *mode)
  */
 
 /* sdas specific */
-char relFile[128];
+char relFile[FILSPC];
 /* end sdas specific */
 
 int
 main(int argc, char *argv[])
 {
         char *p = NULL;
-        char *q = NULL;
+        char *q;
         int c, i;
         struct area *ap;
 
@@ -265,11 +304,13 @@ main(int argc, char *argv[])
 
         if (!is_sdas())
                 fprintf(stdout, "\n");
-        inpfil = -1;
+        q = NULL;
+        asmc = NULL;
+        asmp = NULL;
         for (i=1; i<argc; ++i) {
                 p = argv[i];
                 if (*p == '-') {
-                        if (inpfil >= 0)
+                        if (asmc != NULL)
                                 usage(ER_FATAL);
                         ++p;
                         while ((c = *p++) != 0) {
@@ -337,6 +378,11 @@ main(int argc, char *argv[])
                                         ++pflag;
                                         break;
 
+                                case 'u':
+                                case 'U':
+                                        ++uflag;
+                                        break;
+
                                 case 'w':
                                 case 'W':
                                         ++wflag;
@@ -372,38 +418,49 @@ main(int argc, char *argv[])
                                 }
                         }
                 } else {
-                        if (++inpfil == MAXFIL) {
-                                fprintf(stderr, "too many input files\n");
-                                asexit(ER_FATAL);
-                        }
-                        if (inpfil == 0) {
+                        if (asmc == NULL) {
                                 q = p;
                                 if (++i < argc) {
                                         p = argv[i];
                                         if (*p == '-')
                                                 usage(ER_FATAL);
                                 }
+                                asmp = (struct asmf *)
+                                                new (sizeof (struct asmf));
+                                asmc = asmp;
+                        } else {
+                                asmc->next = (struct asmf *)
+                                                new (sizeof (struct asmf));
+                                asmc = asmc->next;
                         }
-                        sfp[inpfil] = afile(p, "", 0);
-                        strcpy(srcfn[inpfil],afn);
+                        asmc->next = NULL;
+                        asmc->objtyp = T_ASM;
+                        asmc->line = 0;
+                        asmc->flevel = 0;
+                        asmc->tlevel = 0;
+                        asmc->lnlist = LIST_NORM;
+                        asmc->fp = afile(p, "", 0);
+                        strcpy(asmc->afn,afn);
+                        asmc->afp = afp;
                 }
         }
-        if (inpfil < 0)
+        if (asmp == NULL)
                 usage(ER_WARNING);
         if (lflag)
                 lfp = afile(q, "lst", 1);
+        /* sdas specific */
         if (oflag) {
                 ofp = afile(q, (is_sdas() && p != q) ? "" : "rel", 1);
-                /* sdas specific */
                 // save the file name if we have to delete it on error
                 strcpy(relFile,afn);
-                /* end sdas specific */
         }
+        /* end sdas specific */
         if (sflag)
                 tfp = afile(q, "sym", 1);
         syminit();
         for (pass=0; pass<3; ++pass) {
                 aserr = 0;
+                /* ib/ic are dynamically allocated */
                 if (bflag != 0) {
                         il = ib;
                 } else {
@@ -417,6 +474,7 @@ main(int argc, char *argv[])
                         outgsd();
                 flevel = 0;
                 tlevel = 0;
+                lnlist = LIST_NORM;
                 ifcnd[0] = 0;
                 iflvl[0] = 0;
                 radix = 10;
@@ -426,11 +484,20 @@ main(int argc, char *argv[])
                 /* end sdas specific */
                 stb[0] = 0;
                 lop  = NLPP;
-                cfile = 0;
-                incfil = -1;
-                srcline[0] = 0;
-                for (i = 0; i <= inpfil; i++)
-                        rewind(sfp[i]);
+                incfil = 0;
+                maxinc = 0;
+                srcline = 0;
+                asmline = 0;
+                incline = 0;
+                asmc = asmp;
+                while (asmc) {
+                        if (asmc->fp)
+                                rewind(asmc->fp);
+                        asmc = asmc->next;
+                }
+                asmc = asmp;
+                strcpy(afn, asmc->afn);
+                afp = asmc->afp;
                 ap = areap;
                 while (ap) {
                         ap->a_fuzz = 0;
@@ -518,11 +585,11 @@ intsiz(void)
  *              int     j               loop counter
  *
  *      global variables:
- *              FILE *  ifp[]           array of include-file file handles
+ *              asmf *  asmc            pointer to current assembler file structure
+ *              asmf *  asmp            pointer to first assembler file structure
  *              FILE *  lfp             list output file handle
  *              FILE *  ofp             relocation output file handle
  *              FILE *  tfp             symbol table output file handle
- *              FILE *  sfp[]           array of assembler-source file handles
  *
  *      functions called:
  *              int     fclose()        c_library
@@ -535,18 +602,23 @@ intsiz(void)
 VOID
 asexit(int i)
 {
-        int j;
-
         if (lfp != NULL) fclose(lfp);
         if (ofp != NULL) fclose(ofp);
         if (tfp != NULL) fclose(tfp);
 
-        for (j=0; j<MAXFIL && sfp[j] != NULL; j++) {
-                fclose(sfp[j]);
+        while (asmc != NULL) {
+                if ((asmc->objtyp == T_INCL) && (asmc->fp != NULL)) {
+                        fclose(asmc->fp);
+                }
+                asmc = asmc->next;
         }
 
-        for (j=0; j<MAXINC && ifp[j] != NULL; j++) {
-                fclose(ifp[j]);
+        asmc = asmp;
+        while (asmc != NULL) {
+                if ((asmc->objtyp == T_ASM) && (asmc->fp != NULL)) {
+                        fclose(asmc->fp);
+                }
+                asmc = asmc->next;
         }
         /* sdas specific */
         if (i) {
@@ -584,6 +656,8 @@ asexit(int i)
  *              int     uf              area options
  *              a_uint  n               temporary value
  *              a_uint  v               temporary value
+ *              int     flags           temporary flag
+ *              FILE *  fp              include file handle
  *              int     m_type          mnemonic type
  *
  *      global variables:
@@ -593,6 +667,7 @@ asexit(int i)
  *              int     flevel          IF-ELSE-ENDIF flag will be non
  *                                      zero for false conditional case
  *              int     ftflevel;       IIFF-IIFT-IIFTF FLAG
+ *              int     lnlist          current LIST-NLIST state
  *              a_uint  fuzz            tracks pass to pass changes in the
  *                                      address of symbols caused by
  *                                      variable length instruction formats
@@ -600,11 +675,8 @@ asexit(int i)
  *                                      values (0 = FALSE) indexed by tlevel
  *              int     iflvl[]         array of IF-ELSE-ENDIF flevel
  *                                      values indexed by tlevel
- *              FILE *  ifp[]           array of include-file file handles
- *              char    incfn[][]       array of include file names
- *              int     incline[]       current include file line
- *              int     incfil          current file handle index
- *                                      for include files
+ *              int     incline         current include file line
+ *              int     incfil          current include file count
  *              a_uint  laddr           address of current assembler line
  *                                      or value of .if argument
  *              int     lmode           listing mode
@@ -672,10 +744,12 @@ asmbl(void)
         char *p;
         int d, uaf, uf;
         a_uint n, v;
+        int flags;
+        FILE * fp;
+        int m_type;
         /* sdas specific */
         static struct area *abs_ap; /* pointer to current absolute area structure */
         /* end sdas specific */
-        int m_type;
 
         laddr = dot.s_addr;
         lmode = SLIST;
@@ -877,7 +951,7 @@ loop:
          * assembler directive or an assembler mnemonic.
          *
          * Check for .if[], .iif[], .else, .endif,
-         * and .page directives.
+         * .list, .nlist, and .page directives.
          */
         m_type = (mp != NULL) ? mp->m_type : ~0;
 
@@ -1149,6 +1223,76 @@ loop:
                 qerr();
                 break;
 
+        case S_LISTING:
+                flags = 0;
+                while ((c=endline()) != 0) {
+                        if (c == ',') {
+                                c = getnb();
+                        }
+                        if (c == '(') {
+                                do {
+                                        if ((c = getnb()) == '!') {
+                                                flags |= LIST_NOT;
+                                        } else {
+                                                unget(c);
+                                                getid(id, -1);
+                                                if (symeq(id, "err", 1)) { flags |= LIST_ERR; } else
+                                                if (symeq(id, "loc", 1)) { flags |= LIST_LOC; } else
+                                                if (symeq(id, "bin", 1)) { flags |= LIST_BIN; } else
+                                                if (symeq(id, "eqt", 1)) { flags |= LIST_EQT; } else
+                                                if (symeq(id, "cyc", 1)) { flags |= LIST_CYC; } else
+                                                if (symeq(id, "lin", 1)) { flags |= LIST_LIN; } else
+                                                if (symeq(id, "src", 1)) { flags |= LIST_SRC; } else
+                                                if (symeq(id, "pag", 1)) { flags |= LIST_PAG; } else
+                                                if (symeq(id, "lst", 1)) { flags |= LIST_LST; } else
+                                                if (symeq(id, "md" , 1)) { flags |= LIST_MD;  } else
+                                                if (symeq(id, "me" , 1)) { flags |= LIST_ME;  } else
+                                                if (symeq(id, "meb", 1)) { flags |= LIST_MEB; } else {
+                                                        err('u');
+                                                }
+                                        }
+                                        c = endline();
+                                } while (c == ',') ;
+                                if (c != ')') {
+                                        qerr();
+                                }
+                        } else {
+                                unget(c);
+                                if (absexpr()) {
+                                        flags |=  LIST_TORF;
+                                } else {
+                                        flags &= ~LIST_TORF;
+                                }
+                        }
+                }
+                if (!(flags & LIST_TORF) && flevel) {
+                        return;
+                }
+                if (flags & ~LIST_TORF) {
+                        if (flags & LIST_NOT) {
+                                switch(mp->m_valu) {
+                                case O_LIST:    lnlist = LIST_NONE;     break;
+                                case O_NLIST:   lnlist = LIST_NORM;     break;
+                                default:                                break;
+                                }
+                        }
+                        if (flags & LIST_BITS) {
+                                switch(mp->m_valu) {
+                                case O_LIST:    lnlist |=  (flags & LIST_BITS); break;
+                                case O_NLIST:   lnlist &= ~(flags & LIST_BITS); break;
+                                default:                                        break;
+                                }
+                        }
+                } else {
+                        switch(mp->m_valu) {
+                        case O_LIST:    lnlist = LIST_NORM;     break;
+                        case O_NLIST:   lnlist = LIST_NONE;     break;
+                        default:                                break;
+                        }
+                }
+                lmode = (lnlist & LIST_LST) ? SLIST : NLIST;
+                return;
+
         case S_PAGE:
                 lmode = NLIST;
                 if (more()) {
@@ -1219,26 +1363,35 @@ loop:
                 break;
 
         case S_INCL:
-                d = getnb();
-                p = fn;
-                while ((c = get()) != d) {
-                        if (p < &fn[FILSPC-1]) {
-                                *p++ = c;
-                        } else {
-                                break;
-                        }
+                lmode = SLIST;
+                if (incfil > maxinc) {
+                        maxinc = incfil;
                 }
-                *p = 0;
-                if (++incfil == MAXINC ||
-                   (ifp[incfil] = search_path_fopen(fn, "r")) == NULL) {
+                /*
+                 * Copy the .include file specification
+                 */
+                getdstr(fn, FILSPC + FILSPC);
+                /*
+                 * Open File
+                 */
+                if ((fp = search_path_fopen(fn, "r")) == NULL) {
                         --incfil;
                         err('i');
                 } else {
-                        lop = NLPP;
-                        incline[incfil] = 0;
-                        strcpy(incfn[incfil],fn);
+                        asmi = (struct asmf *) new (sizeof (struct asmf));
+                        asmi->next = asmc;
+                        asmi->objtyp = T_INCL;
+                        asmi->line = srcline;
+                        asmi->flevel = flevel;
+                        asmi->tlevel = tlevel;
+                        asmi->lnlist = lnlist;
+                        asmi->fp = fp;
+                        asmi->afp = afptmp;
+                        strcpy(asmi->afn,afntmp);
+                        if (lnlist & LIST_PAG) {
+                                lop = NLPP;
+                        }
                 }
-                lmode = SLIST;
                 break;
 
         /* sdas specific */
@@ -1258,7 +1411,8 @@ loop:
                                 mp = mlookup(opt);
                                 if (mp && mp->m_type == S_ATYP) {
                                         ++uaf;
-                                        uf |= mp->m_valu;
+                                        v = mp->m_valu;
+                                        uf |= (int) v;
                                 } else {
                                         err('u');
                                 }
@@ -1359,6 +1513,28 @@ loop:
                         sp->s_flag |=  S_GBL;
                 } while (comma(0));
                 lmode = SLIST;
+                break;
+
+        case S_LOCAL:
+                do {
+                        getid(id, -1);
+                        sp = lookup(id);
+                        sp->s_flag &= ~S_GBL;
+                        sp->s_flag |=  S_LCL;
+                } while (comma(0));
+                lmode = SLIST;
+                break;
+
+        case S_EQU:
+                /*
+                 * Syntax:
+                 *     [labels] .equ    sym, value   defines an equate
+                 *     [labels] .glbequ sym, value   defines a global equate
+                 *     [labels] .lclequ sym, value   defines a local equate
+                 */
+                getid(id, -1);
+                comma(1);
+                equate(id, &e1, mp->m_valu);
                 break;
 
         case S_DATA:
@@ -1570,25 +1746,31 @@ loop:
         default:
                 machine(mp);
 
-#if NOICE
                 /*
-                 * NoICE        JLH
-                 * if -j, generate a line number symbol
+                 * Include Files and Macros are not Debugged
                  */
-                if (jflag && (pass == 1)) {
-                        DefineNoICE_Line();
-                }
+                if (asmc->objtyp == T_ASM) {
+
+#if NOICE
+                        /*
+                         * NoICE        JLH
+                         * if -j, generate a line number symbol
+                         */
+                        if (jflag && (pass == 1)) {
+                                DefineNoICE_Line();
+                        }
 #endif
 
 #if SDCDB
-                /*
-                 * SDCC Debug Information
-                 * if cdb information then generate the line info
-                 */
-                if (yflag && (pass == 1)) {
-                        DefineSDCC_Line();
-                }
+                        /*
+                         * SDCC Debug Information
+                         * if cdb information then generate the line info
+                         */
+                        if (yflag && (pass == 1)) {
+                                DefineSDCC_Line();
+                        }
 #endif
+                }
 
                 break;
         }
@@ -1684,6 +1866,54 @@ equate(char *id, struct expr *e1, a_uint equtype)
  *              int     wf              read(0)/write(1) flag
  *
  *      The function afile() opens a file for reading or writing.
+ *
+ *      afile() returns a file handle for the opened file or aborts
+ *      the assembler on an open error.
+ *
+ *      local variables:
+ *              FILE *  fp              file handle for opened file
+ *
+ *      global variables:
+ *              char    afn[]           afile() constructed filespec
+ *              int     afp             afile() constructed path length
+ *              char    afntmp[]        afilex() constructed filespec
+ *              int     afptmp          afilex() constructed path length
+ *
+ *      functions called:
+ *              VOID    asexit()        asmain.c
+ *              VOID    afilex()        asmain.c
+ *              FILE *  fopen()         c_library
+ *              int     fprintf()       c_library
+ *              char *  strcpy()        c_library
+ *
+ *      side effects:
+ *              File is opened for read or write.
+ */
+
+FILE *
+afile(char *fn, char *ft, int wf)
+{
+        FILE *fp;
+
+        afilex(fn, ft);
+
+        if ((fp = fopen(afntmp, wf?"w":"r")) == NULL) {
+            fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afntmp);
+                asexit(ER_FATAL);
+        }
+
+        strcpy(afn, afntmp);
+        afp = afptmp;
+
+        return (fp);
+}
+
+/*)Function     VOID    afilex(fn, ft)
+ *
+ *              char *  fn              file specification string
+ *              char *  ft              file type string
+ *
+ *      The function afilex() processes the file specification string:
  *              (1)     If the file type specification string ft
  *                      is not NULL then a file specification is
  *                      constructed with the file path\name in fn
@@ -1694,67 +1924,116 @@ equate(char *id, struct expr *e1, a_uint equtype)
  *                      a file type then the default source file
  *                      type dsft is appended to the file specification.
  *
- *      afile() returns a file handle for the opened file or aborts
- *      the assembler on an open error.
+ *      afilex() aborts the assembler on a file specification length error.
  *
  *      local variables:
  *              int     c               character value
- *              FILE *  fp              file handle for opened file
- *              char *  p2              pointer to filespec string fb
- *              char *  p3              pointer to filetype string ft
+ *              char *  p1              pointer into filespec string afntmp
+ *              char *  p2              pointer to filetype string ft
  *
  *      global variables:
- *              char    afn[]           afile() constructed filespec
+ *              char    afntmp[]        afilex() constructed filespec
+ *              int     afptmp          afilex() constructed path length
  *              char    dsft[]          default assembler file type string
- *              char    afn[]           constructed file specification string
  *
  *      functions called:
  *              VOID    asexit()        asmain.c
- *              FILE *  fopen()         c_library
+ *              int     fndidx()        asmain.c
  *              int     fprintf()       c_library
+ *              char *  strcpy()        c_library
+ *              int     strlen()        c_library
  *
  *      side effects:
- *              File is opened for read or write.
+ *              File specification string may be modified.
  */
 
-FILE *
-afile(char *fn, char *ft, int wf)
+VOID
+afilex(char *fn, char *ft)
 {
-        char *p2, *p3;
+        char *p1, *p2;
         int c;
-        FILE *fp;
 
-        p2 = afn;
-        p3 = ft;
+        if (strlen(fn) > (FILSPC-7)) {
+                fprintf(stderr, "?ASxxxx-Error-<filspc to long> : \"%s\"\n", fn);
+                asexit(ER_FATAL);
+        }
 
-        strcpy (afn, fn);
-        p2 = strrchr (afn, FSEPX);              // search last '.'
-        if (!p2)
-                p2 = afn + strlen (afn);
-        if (p2 > &afn[PATH_MAX-4])              // truncate filename, if it's too long
-                p2 = &afn[PATH_MAX-4];
-        *p2++ = FSEPX;
+        /*
+         * Save the File Name Index
+         */
+        strcpy(afntmp, fn);
+        afptmp = fndidx(afntmp);
+
+        /*
+         * Skip to File Extension separator
+         */
+        p1 = strrchr(&afntmp[afptmp], FSEPX);
+
+        /*
+         * Copy File Extension
+         */
+        p2 = ft;
 
         // choose a file-extension
-        if (*p3 == 0) {                         // extension supplied?
-                p3 = strrchr (fn, FSEPX);       // no: extension in fn?
-                if (p3)
-                        ++p3;
-                else
-                        p3 = dsft;              // no: default extension
+        if (*p2 == 0) {
+                // no extension supplied
+                if (p1 == NULL) {
+                        // no extension in fn: use default extension
+                        p2 = dsft;
+                } else {
+                        p2 = strrchr(&fn[afptmp], FSEPX) + 1;
+                }
         }
+        if (p1 == NULL) {
+                p1 = &afntmp[strlen(afntmp)];
+        }
+        *p1++ = FSEPX;
+        while ((c = *p2++) != 0) {
+                if (p1 < &afntmp[FILSPC-1])
+                        *p1++ = c;
+        }
+        *p1++ = 0;
+}
 
-        while ((c = *p3++) != 0) {              // strncpy
-                if (p2 < &afn[PATH_MAX-1])
-                        *p2++ = c;
-        }
-        *p2++ = 0;
+/*)Function     int     fndidx(str)
+ *
+ *              char *  str             file specification string
+ *
+ *      The function fndidx() scans the file specification string
+ *      to find the index to the file name.  If the file
+ *      specification contains a 'path' then the index will
+ *      be non zero.
+ *
+ *      fndidx() returns the index value.
+ *
+ *      local variables:
+ *              char *  p1              temporary pointer
+ *              char *  p2              temporary pointer
+ *
+ *      global variables:
+ *              none
+ *
+ *      functions called:
+ *              char *  strrchr()       c_library
+ *
+ *      side effects:
+ *              none
+ */
 
-        if ((fp = fopen(afn, wf?"w":"r")) == NULL) {
-                fprintf(stderr, "%s: cannot %s.\n", afn, wf?"create":"open");
-                asexit(1);
-        }
-        return (fp);
+int
+fndidx(char *str)
+{
+        char *p1, *p2;
+
+        /*
+         * Skip Path Delimiters
+         */
+        p1 = str;
+        if ((p2 = strrchr(p1,  ':')) != NULL) { p1 = p2 + 1; }
+        if ((p2 = strrchr(p1,  '/')) != NULL) { p1 = p2 + 1; }
+        if ((p2 = strrchr(p1, '\\')) != NULL) { p1 = p2 + 1; }
+
+        return((int) (p1 - str));
 }
 
 /*)Function     VOID    newdot(nap)
@@ -1879,6 +2158,7 @@ char *usetxt[] = {
         "  -o   Create object file/outfile[.rel]",
         "  -s   Create symbol file/outfile[.sym]",
         "  -p   Disable automatic listing pagination",
+        "  -u   Disable .list/.nlist processing",
         "  -w   Wide listing format for symbol table",
         "  -z   Enable case sensitivity for symbols",
         "  -f   Flag relocatable references by  `   in listing file",

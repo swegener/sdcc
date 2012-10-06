@@ -70,6 +70,7 @@
  *              struct sym *    pSym    pointer to the created symbol structure
  *
  *      global variables:
+ *              asmf *  asmc            pointer to current assembler file structure
  *              int     srcline         array of source file line numbers
  *              a_uint  laddr           current assembler address
  *              area    dot.s_area      pointer to the current area
@@ -94,7 +95,7 @@ DefineSDCC_Line (void)
          * Symbol is A$FILE$nnn
          */
         dbuf_init (&dbuf, NCPS);
-        dbuf_printf (&dbuf, "A$%s$%u", BaseFileName (cfile, 1), srcline[cfile]);
+        dbuf_printf (&dbuf, "A$%s$%u", BaseFileName (asmc, 1), srcline);
 
         pSym = lookup (dbuf_c_str (&dbuf));
         dbuf_destroy (&dbuf);
@@ -119,7 +120,7 @@ DefineSDCC_Line (void)
  *              struct sym *    pSym    pointer to the created symbol structure
  *
  *      global variables:
- *              int     cfile           current source file number
+ *              asmf *  asmc            pointer to current assembler file structure
  *              int     srcline         array of source file line numbers
  *              a_uint  laddr           current assembler address
  *              area    dot.s_area      pointer to the current area
@@ -144,7 +145,7 @@ DefineNoICE_Line (void)
          * Symbol is FILE.nnn
          */
         dbuf_init (&dbuf, NCPS);
-        dbuf_printf (&dbuf, "%s.%u", BaseFileName (cfile, 0), srcline[cfile]);
+        dbuf_printf (&dbuf, "%s.%u", BaseFileName (asmc, 0), srcline);
 
         pSym = lookup (dbuf_c_str (&dbuf));
         dbuf_destroy (&dbuf);
@@ -157,14 +158,14 @@ DefineNoICE_Line (void)
 #endif
 
 
-/*)Function     char *  BaseFileName(fileNumber, spacesToUnderscores)
+/*)Function     char *  BaseFileName(currFile, spacesToUnderscores)
  *
  *      The function BaseFileName() is called to extract
  *      the file name from a string containing a path,
  *      filename, and extension. If spacesToUnderscores != 0
  *      then spaces are converted to underscores
  *
- *              fileNumber              is a pointer to the
+ *              currFile                is a pointer to the
  *                                      current assembler object
  *              spacesToUnderscores
  *
@@ -189,18 +190,18 @@ DefineNoICE_Line (void)
  */
 
 #if (NOICE || SDCDB)
-char *
-BaseFileName (int fileNumber, int spacesToUnderscores)
-{
-        static int prevFile = -1;
-        static char baseName[FILSPC];
+static  struct  asmf *  prevFile = NULL;
+static  char    baseName[FILSPC];
 
+char *
+BaseFileName (struct asmf * currFile, int spacesToUnderscores)
+{
         char *p1, *p2;
 
-        if (fileNumber != prevFile) {
-                prevFile = fileNumber;
+        if (currFile != prevFile) {
+                prevFile = currFile;
 
-                strcpy(baseName, srcfn[prevFile]);
+                strcpy(baseName, afn);
                 p1 = baseName;
 
                 /*

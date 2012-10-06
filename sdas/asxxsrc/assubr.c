@@ -1,7 +1,7 @@
 /* assubr.c */
 
 /*
- *  Copyright (C) 1989-2010 Alan R. Baldwin
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -92,19 +92,16 @@ err(int c)
  *              char *  p               pointer to error code array eb[]
  *
  *      global variables:
- *              int     cfile           current source file index
  *              char    eb[]            array of generated error codes
  *              char *  ep              pointer into error list
- *              int     incfile         current include file index
- *              char    incfn[]         array of include file names
- *              int     incline[]       array of include line numbers
- *              char    srcfn[]         array of source file names
- *              int     srcline[]       array of source line numbers
+ *              int     incline         include file line number
+ *              char    afn[]           afile() constructed filespec
  *              FILE *  stderr          c_library
  *
  *      functions called:
  *              int     fprintf()       c_library
  *              char *  geterr()        assubr.c
+ *              int     getlnm()        assubr.c
  *
  *      side effects:
  *              none
@@ -123,13 +120,8 @@ diag()
                                 fprintf(stderr, "%c", *p++);
                         }
                         fprintf(stderr, "> in line ");
-                        if (incfil >= 0) {
-                                fprintf(stderr, "%d", incline[incfil]);
-                                fprintf(stderr, " of %s\n", incfn[incfil]);
-                        } else {
-                                fprintf(stderr, "%d", srcline[cfile]);
-                                fprintf(stderr, " of %s\n", srcfn[cfile]);
-                        }
+                        fprintf(stderr, "%d", getlnm());
+                        fprintf(stderr, " of %s\n", afn);
                         p = eb;
                 }
                 while (p < ep) {
@@ -138,14 +130,8 @@ diag()
                                         fprintf(stderr, "              %s\n", errstr);
                                 } else {
                                         /* Modified to conform to gcc error standard, M. Hope, 7 Feb 98. */
-                                        if (incfil >= 0) {
-                                                fprintf(stderr, "%s:", incfn[incfil]);
-                                                fprintf(stderr, "%d: Error:", incline[incfil]);
-                                        }
-                                        else {
-                                                fprintf(stderr, "%s:", srcfn[cfile]);
-                                                fprintf(stderr, "%d: Error:", srcline[cfile]);
-                                        }
+                                        fprintf(stderr, "%s:", afn);
+                                        fprintf(stderr, "%d: Error:", getlnm());
                                         fprintf(stderr, " %s\n", errstr);
                                 }
                         }
@@ -168,16 +154,12 @@ diag()
  *              none
  *
  *      global variables:
- *              int     cfile           current source file index
- *              int     incfile         current include file index
- *              char    incfn[]         array of include file names
- *              int     incline[]       array of include line numbers
- *              char    srcfn[]         array of source file names
- *              int     srcline[]       array of source line numbers
+ *              char    afn[]           afile() constructed filespec
  *              FILE *  stderr          c_library
  *
  *      functions called:
  *              int     fprintf()       c_library
+ *              int     getlnm()        assubr.c
  *
  *      side effects:
  *              none
@@ -186,13 +168,8 @@ VOID
 warnBanner(void)
 {
         fprintf(stderr, "?ASxxxx-Warning in line ");
-        if (incfil >= 0) {
-                fprintf(stderr, "%d", incline[incfil]);
-                fprintf(stderr, " of %s\n", incfn[incfil]);
-        } else {
-                fprintf(stderr, "%d", srcline[cfile]);
-                fprintf(stderr, " of %s\n", srcfn[cfile]);
-        }
+        fprintf(stderr, "%d", getlnm());
+        fprintf(stderr, " of %s\n", afn);
         fprintf(stderr, "               ");
 }       
 /* end sdas specific */

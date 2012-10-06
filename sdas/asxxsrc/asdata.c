@@ -49,14 +49,44 @@ int     aserr;          /*      ASxxxx error counter
 jmp_buf jump_env;       /*      compiler dependent structure
                          *      used by setjmp() and longjmp()
                          */
-int     inpfil;         /*      count of assembler
-                         *      input files specified
+
+/*
+ *      The asmf structure contains the information
+ *      pertaining to an assembler source file/macro.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next object in the linked list
+ *      objtyp  specifies the object type - T_ASM, T_INCL, T_MACRO
+ *      line    is the saved line number of the parent object
+ *      fp      is the source FILE handle
+ *      afp     is the file path length (excludes the files name.ext)
+ *      afn[]   is the assembler/include file path/name.ext
+ *
+ *      struct  asmf
+ *      {
+ *              struct  asmf *next;     Link to Next Object
+ *              int     objtyp;         Object Type
+ *              int     line;           Saved Line Counter
+ *              int     flevel;         saved flevel
+ *              int     tlevel;         saved tlevel
+ *              int     lnlist;         saved lnlist
+ *              FILE *  fp;             FILE Handle
+ *              int     afp;            File Path Length
+ *              char    afn[FILSPC];    File Name
+ *      };
+ */
+struct  asmf    *asmp;  /*      The pointer to the first assembler
+                         *      source file structure of a linked list
                          */
-int     incfil;         /*      current file handle index
-                         *      for include files
+struct  asmf    *asmc;  /*      Pointer to the current
+                         *      source input structure
                          */
-int     cfile;          /*      current file handle index
-                         *      of input assembly files
+struct  asmf    *asmi;  /*      Queued pointer to an include file
+                         *      source input structure
+                         */
+int     incfil;         /*      include file nesting counter
+                         */
+int     maxinc;         /*      maximum include file nesting encountered
                          */
 int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                          *      zero for false conditional case
@@ -65,22 +95,28 @@ int     ftflevel;       /*      IIFF-IIFT-IIFTF FLAG
                          */
 int     tlevel;         /*      current conditional level
                          */
+int     lnlist;         /*      LIST-NLIST options
+                         */
 int     ifcnd[MAXIF+1]; /*      array of IF statement condition
                          *      values (0 = FALSE) indexed by tlevel
                          */
 int     iflvl[MAXIF+1]; /*      array of IF-ELSE-ENDIF flevel
                          *      values indexed by tlevel
                          */
-char    afn[FILSPC];            /*      afile temporary file name
-                                 */
-char    srcfn[MAXFIL][FILSPC];  /*      array of source file names
-                                 */
-int     srcline[MAXFIL];        /*      source line number
-                                 */
-char    incfn[MAXINC][FILSPC];  /*      array of include file names
-                                 */
-int     incline[MAXINC];        /*      include line number
-                                 */
+char    afn[FILSPC];    /*      current input file specification
+                         */
+int     afp;            /*      current input file path length
+                         */
+char    afntmp[FILSPC]; /*      temporary input file specification
+                         */
+int     afptmp;         /*      temporary input file path length
+                         */
+int     srcline;        /*      current source line number
+                         */
+int     asmline;        /*      current assembler file line number
+                         */
+int     incline;        /*      current include file line number
+                         */
 int     radix;          /*      current number conversion radix:
                          *      2 (binary), 8 (octal), 10 (decimal),
                          *      16 (hexadecimal)
@@ -113,6 +149,8 @@ int     oflag;          /*      -o, generate relocatable output flag
 int     pflag;          /*      -p, disable listing pagination
                          */
 int     sflag;          /*      -s, generate symbol table flag
+                         */
+int     uflag;          /*      -u, disable .list/.nlist processing flag
                          */
 int     wflag;          /*      -w, enable wide listing format
                          */
@@ -289,10 +327,6 @@ char	*txtp = &txt[0];/*	Pointer to T Line Values
 			 */
 char	*relp = &rel[0];/*	Pointer to R Line Values
 			 */
-FILE    *sfp[MAXFIL];   /*      array of assembler-source file handles
-                         */
-FILE    *ifp[MAXINC];   /*      array of include-file file handles
-                         */
 
 /*
  *      an array of character types,

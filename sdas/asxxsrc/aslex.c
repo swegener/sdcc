@@ -44,9 +44,12 @@
  *              int     comma()
  *              char    endline()
  *              int     get()
+ *              int     getdstr()
+ *              int     getdlm()
  *              VOID    getid()
  *              int     getmap()
  *              int     getnb()
+ *              int     getlnm()
  *              VOID    getst()
  *              int     more()
  *              int     nxtline()
@@ -179,6 +182,105 @@ getst(char *id, int c)
         } while (ctype[c=get()] & ~(SPACE|ILL) & 0xFF);
         unget(c);
         *p++ = 0;
+}
+
+/*)Function     int     getdstr(str, slen)
+ *
+ *              char *  str             character array to return string in
+ *              int     slen            charater array length
+ *
+ *      The function getdstr() returns the character string
+ *      within delimiters.  If no delimiting character
+ *      is found a 'q' error is generated.
+ *
+ *      local variables:
+ *              int     c               current character from
+ *                                      assembler-source text line
+ *              int     d               the delimiting character
+ *
+ *      global variables:
+ *              none
+ *
+ *      called functions:
+ *              int     get()           aslex.c
+ *              int     getdlm()        aslex.c
+ *              VOID    qerr()          assubr.c
+ *
+ *      side effects:
+ *              Returns the character string delimited by the
+ *              character returned from getdlm().  SPACEs and
+ *              TABs before the delimited string are skipped.
+ *              A 'q' error is generated if no delimited string
+ *              is found or the input line terminates unexpectedly.
+ */
+
+VOID
+getdstr(str, slen)
+char * str;
+int slen;
+{
+        char *p;
+        int c, d;
+
+        d = getdlm();
+
+        p = str;
+        while ((c = get()) != d) {
+                if (c == '\0') {
+                        qerr();
+                }
+                if (p < &str[slen-1]) {
+                        *p++ = c;
+                } else {
+                        break;
+                }
+        }
+        *p = 0;
+}
+
+/*)Function     int     getdlm()
+ *
+ *      The function getdlm() returns the delimiter character
+ *      or if the end of the line is encountered a 'q' error
+ *      is generated.
+ *
+ *      local variables:
+ *              int     c               current character from
+ *                                      assembler-source text line
+ *
+ *      global variables:
+ *              none
+ *
+ *      called functions:
+ *              int     get()           aslex.c
+ *              int     getnb()         aslex.c
+ *              int     more()          aslex.c
+ *              VOID    qerr()          assubr.c
+ *
+ *      side effects:
+ *              scans ip to the first non 'SPACE' or 'TAB' character
+ *              and returns that character or the first character
+ *              following a ^ character as the delimiting character.
+ *              The end of the text line or the begining of a
+ *              comment returns causes a 'q' error.
+ */
+
+int
+getdlm()
+{
+        int c;
+
+        if (more()) {
+                if ((c = getnb()) == '^') {
+                        c = get();
+                }
+        } else {
+                c = '\0';
+        }
+        if (c == '\0') {
+                qerr();
+        }
+        return (c);
 }
 
 /*)Function     int     getnb()
@@ -442,6 +544,7 @@ comma(int flag)
  *                                      active include file
  *              int     incline[]       array of include file
  *                                      line numbers
+ *              int     lnlist          LIST-NLIST state
  *              char    sfp[]           array of file handles for
  *                                      assembler source files
  *              int     cfile           index for sfp[] specifies
@@ -449,6 +552,7 @@ comma(int flag)
  *              int     srcline[]       array of source file
  *                                      line numbers
  *              int     inpfil          maximum input file index
+ *              int     uflag           -u, disable .list/.nlist processing
  *
  *      called functions:
  *              int     dbuf_init()
@@ -471,69 +575,137 @@ comma(int flag)
 int
 nxtline(void)
 {
-  static struct dbuf_s dbuf_ib;
-  static struct dbuf_s dbuf_ic;
-  static char dbufInitialized = 0;
-  size_t len;
+        static struct dbuf_s dbuf_ib;
+        static struct dbuf_s dbuf_ic;
+        size_t len;
 
-  if (!dbufInitialized)
-    {
-      dbuf_init (&dbuf_ib, 1024);
-      dbuf_init (&dbuf_ic, 1024);
-      dbufInitialized = 1;
-    }
-  else
-    {
-      dbuf_set_length (&dbuf_ib, 0);
-      dbuf_set_length (&dbuf_ic, 0);
-    }
+        if (!dbuf_is_initialized (&dbuf_ib))
+                dbuf_init (&dbuf_ib, 1024);
+        if (!dbuf_is_initialized (&dbuf_ic))
+                dbuf_init (&dbuf_ic, 1024);
+        dbuf_set_length (&dbuf_ib, 0);
+        dbuf_set_length (&dbuf_ic, 0);
 
-loop:
-  if (incfil >= 0)
-    {
-      if ((len = dbuf_getline (&dbuf_ib, ifp[incfil])) == 0)
-        {
-          fclose (ifp[incfil]);
-          ifp[incfil--] = NULL;
-          lop = NLPP;
-          goto loop;
-        }
-      else
-        {
-          ++incline[incfil];
-        }
-    }
-  else
-    {
-      if ((len = dbuf_getline (&dbuf_ib, sfp[cfile])) == 0)
-        {
-          if (++cfile <= inpfil)
-            {
-              srcline[cfile] = 0;
-              goto loop;
-            }
-          return 0;
-        }
-      else
-        {
-          ++srcline[cfile];
-        }
-    }
-  ib = (char *)dbuf_c_str (&dbuf_ib);
+loop:   if (asmc == NULL) return(0);
 
-  /* remove the trailing NL */
-  if (len > 0 && '\n' == ib[len - 1])
-    {
-      --len;
-      if (len > 0 && '\r' == ib[len - 1])
-        --len;
-      dbuf_set_length (&dbuf_ib, len);
-      ib = (char *)dbuf_c_str (&dbuf_ib);
-    }
+        /*
+         * Insert Include File
+         */
+        if (asmi != NULL) {
+                asmc = asmi;
+                asmi = NULL;
+                incline = 0;
+        }
+        switch(asmc->objtyp) {
+        case T_ASM:
+                if ((len = dbuf_getline (&dbuf_ib, asmc->fp)) == 0) {
+                        if ((asmc->flevel != flevel) || (asmc->tlevel != tlevel)) {
+                                err('i');
+                                fprintf(stderr, "?ASxxxx-Error-<i> at end of assembler file\n");
+                                fprintf(stderr, "              %s\n", geterr('i'));
+                        }
+                        flevel = asmc->flevel;
+                        tlevel = asmc->tlevel;
+                        lnlist = asmc->lnlist;
+                        asmc = asmc->next;
+                        if (asmc != NULL) {
+                                asmline = 0;
+                        }
+                        if ((lnlist & LIST_PAG) || (uflag == 1)) {
+                                lop = NLPP;
+                        }
+                        goto loop;
+                } else {
+                        if (asmline++ == 0) {
+                                strcpy(afn, asmc->afn);
+                                afp = asmc->afp;
+                        }
+                        srcline = asmline;
+                }
+                break;
 
-  dbuf_append_str (&dbuf_ic, ib);
-  ic = (char *)dbuf_c_str (&dbuf_ic);
-  return(1);
+        case T_INCL:
+                if ((len = dbuf_getline (&dbuf_ib, asmc->fp)) == 0) {
+                        fclose(asmc->fp);
+                        incfil -= 1;
+                        if ((asmc->flevel != flevel) || (asmc->tlevel != tlevel)) {
+                                err('i');
+                                fprintf(stderr, "?ASxxxx-Error-<i> at end of include file\n");
+                                fprintf(stderr, "              %s\n", geterr('i'));
+                        }
+                        srcline = asmc->line;
+                        flevel = asmc->flevel;
+                        tlevel = asmc->tlevel;
+                        lnlist = asmc->lnlist;
+                        asmc = asmc->next;
+                        switch (asmc->objtyp) {
+                        default:
+                        case T_ASM:     asmline = srcline;      break;
+                        case T_INCL:    incline = srcline;      break;
+                        }
+                        strcpy(afn, asmc->afn);
+                        afp = asmc->afp;
+                        if ((lnlist & LIST_PAG) || (uflag == 1)) {
+                                lop = NLPP;
+                        }
+                        goto loop;
+                } else {
+                        if (incline++ == 0) {
+                                strcpy(afn, asmc->afn);
+                                afp = asmc->afp;
+                        }
+                        srcline = incline;
+                }
+                break;
+
+        default:
+                fprintf(stderr, "?ASxxxx-Internal-nxtline(objtyp)-Error.\n\n");
+                asexit(ER_FATAL);
+                break;
+        }
+        ib = (char *)dbuf_c_str (&dbuf_ib);
+
+        /* remove the trailing NL */
+        if (len > 0 && '\n' == ib[len - 1])
+          {
+            --len;
+            if (len > 0 && '\r' == ib[len - 1])
+              --len;
+            dbuf_set_length (&dbuf_ib, len);
+            ib = (char *)dbuf_c_str (&dbuf_ib);
+          }
+
+        dbuf_append_str (&dbuf_ic, ib);
+        ic = (char *)dbuf_c_str (&dbuf_ic);
+        return(1);
+}
+
+
+/*)Function:    int     getlnm()
+ *
+ *      The function getlnm() returns the line number of the
+ *      originating assembler or include file.
+ *
+ *      local variables:
+ *              struct asmf     *asmt   temporary pointer to the processing structure
+ *
+ *      global variables:
+ *              struct asmf     *asmc   pointer to the current input processing structure
+ *              int             asmline line number in current assembler file
+ *              int             line    line number
+ *
+ *      functions called:
+ *              none
+ *
+ *      side effects:
+ *              Sets line to the source file line number.
+ */
+
+int
+getlnm()
+{
+        line = srcline;
+        return(line);
 }
 
 /*)Function     int     more()

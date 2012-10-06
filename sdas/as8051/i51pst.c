@@ -41,12 +41,12 @@ struct  mne     mne[] = {
         /* system */
 
 
-    {   NULL,   "CON",          S_ATYP,         0,      A_CON  },
-    {   NULL,   "OVR",          S_ATYP,         0,      A_OVR  },
-    {   NULL,   "REL",          S_ATYP,         0,      A_REL  },
-    {   NULL,   "ABS",          S_ATYP,         0,      A_ABS  },
+    {   NULL,   "CON",          S_ATYP,         0,      A_CON   },
+    {   NULL,   "OVR",          S_ATYP,         0,      A_OVR   },
+    {   NULL,   "REL",          S_ATYP,         0,      A_REL   },
+    {   NULL,   "ABS",          S_ATYP,         0,      A_ABS   },
     {   NULL,   "NOPAG",        S_ATYP,         0,      A_NOPAG },
-    {   NULL,   "PAG",          S_ATYP,         0,      A_PAG  },
+    {   NULL,   "PAG",          S_ATYP,         0,      A_PAG   },
 
     {   NULL,   "CODE",         S_ATYP,         0,      A_CODE  },
     {   NULL,   "DATA",         S_ATYP,         0,      A_DATA  },
@@ -62,6 +62,7 @@ struct  mne     mne[] = {
     {   NULL,   ".org",         S_ORG,          0,      0       },
     {   NULL,   ".radix",       S_RADIX,        0,      0       },
     {   NULL,   ".globl",       S_GLOBL,        0,      0       },
+    {   NULL,   ".local",       S_LOCAL,        0,      0       },
     {   NULL,   ".if",          S_CONDITIONAL,  0,      O_IF    },
     {   NULL,   ".iff",         S_CONDITIONAL,  0,      O_IFF   },
     {   NULL,   ".ift",         S_CONDITIONAL,  0,      O_IFT   },
@@ -84,6 +85,8 @@ struct  mne     mne[] = {
     {   NULL,   ".iifne",       S_CONDITIONAL,  0,      O_IIFNE },
     {   NULL,   ".else",        S_CONDITIONAL,  0,      O_ELSE  },
     {   NULL,   ".endif",       S_CONDITIONAL,  0,      O_ENDIF },
+    {   NULL,   ".list",        S_LISTING,      0,      O_LIST  },
+    {   NULL,   ".nlist",       S_LISTING,      0,      O_NLIST },
     {   NULL,   ".equ",         S_EQU,          0,      O_EQU   },
     {   NULL,   ".gblequ",      S_EQU,          0,      O_GBLEQU},
     {   NULL,   ".lclequ",      S_EQU,          0,      O_LCLEQU},

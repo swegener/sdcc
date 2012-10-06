@@ -208,8 +208,6 @@
 #define NHASH       (1 << 6)    /* Buckets in hash table */
 #define HMASK       (NHASH - 1) /* Hash mask */
 #define NLPP        60          /* Lines per page */
-#define MAXFIL      6           /* Maximum command line input files */
-#define MAXINC      6           /* Maximum nesting of include files */
 #define MAXIF       10          /* Maximum nesting of if/else/endif */
 #define FILSPC      PATH_MAX    /* Chars. in filespec */
 
@@ -244,6 +242,9 @@
 #define LIST_NOT        0x1000  /* Force Complement of Listing Mode */
 
 #define LIST_TORF       0x8000  /* IF-ENDIF Conditional Overide Flag */
+
+#define T_ASM   0               /* Assembler Source File */
+#define T_INCL  1               /* Assembler Include File */
 
 /*
  * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
@@ -511,6 +512,7 @@ struct  sym
 #define S_ORG           11      /* .org */
 #define S_RADIX         12      /* .radix */
 #define S_GLOBL         13      /* .globl */
+#define S_LOCAL         14      /* .local */
 #define S_CONDITIONAL   15      /* .if, .iif, .else, .endif, ... */
 #define   O_IF       0          /* .if */
 #define   O_IFF      1          /* .iff */
@@ -536,6 +538,9 @@ struct  sym
 #define   O_IIFEND   40         /* end of .iif conditionals */
 #define   O_ELSE     40         /* .else */
 #define   O_ENDIF    41         /* .endif */
+#define S_LISTING       16      /* .nlist, .list */
+#define   O_LIST     0          /* .list */
+#define   O_NLIST    1          /* .nlist */
 #define S_EQU           17      /* .equ, .gblequ, .lclequ */
 #define   O_EQU      0          /* .equ */
 #define   O_GBLEQU   1          /* .gblequ */
@@ -631,6 +636,34 @@ struct  expr
 };
 
 /*
+ *      The asmf structure contains the information
+ *      pertaining to an assembler source file/macro.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next object in the linked list
+ *      objtyp  specifies the object type - T_ASM, T_INCL, T_MACRO
+ *      line    is the saved line number of the parent object
+ *      flevel  is the saved flevel of the parent object
+ *      tlevel  is the saved tlevel of the parent object
+ *      lnlist  is the saved lnlist of the parent object
+ *      fp      is the source FILE handle
+ *      afp     is the file path length (excludes the files name.ext)
+ *      afn[]   is the assembler/include file path/name.ext
+ */
+struct  asmf
+{
+        struct  asmf *next;     /* Link to Next Object */
+        int     objtyp;         /* Object Type */
+        int     line;           /* Saved Line Counter */
+        int     flevel;         /* saved flevel */
+        int     tlevel;         /* saved tlevel */
+        int     lnlist;         /* saved lnlist */
+        FILE *  fp;             /* FILE Handle */
+        int     afp;            /* File Path Length */
+        char    afn[FILSPC];    /* File Name */
+};
+
+/*
  *      External Definitions for all Global Variables
  */
 
@@ -639,14 +672,18 @@ extern  int     aserr;          /*      ASxxxx error counter
 extern  jmp_buf jump_env;       /*      compiler dependent structure
                                  *      used by setjmp() and longjmp()
                                  */
-extern  int     inpfil;         /*      count of assembler
-                                 *      input files specified
+extern  struct  asmf    *asmp;  /*      The pointer to the first assembler
+                                 *      source file structure of a linked list
                                  */
-extern  int     cfile;          /*      current file handle index
-                                 *      of input assembly files
+extern  struct  asmf    *asmc;  /*      Pointer to the current
+                                 *      source input structure
                                  */
-extern  int     incfil;         /*      current file handle index
-                                 *      for include files
+extern  struct  asmf    *asmi;  /*      Queued pointer to an include file
+                                 *      source input structure
+                                 */
+extern  int     incfil;         /*      include file nesting counter
+                                 */
+extern  int     maxinc;         /*      maximum include file nesting encountered
                                  */
 extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                                  *      zero for false conditional case
@@ -654,6 +691,8 @@ extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
 extern  int     ftflevel;       /*      IIFF-IIFT-IIFTF FLAG
                                  */
 extern  int     tlevel;         /*      current conditional level
+                                 */
+extern  int     lnlist;         /*      LIST-NLIST options
                                  */
 extern  int     ifcnd[MAXIF+1]; /*      array of IF statement condition
                                  *      values (0 = FALSE) indexed by tlevel
@@ -663,16 +702,17 @@ extern  int     iflvl[MAXIF+1]; /*      array of IF-ELSE-ENDIF flevel
                                  */
 extern  char    afn[FILSPC];    /*      current input file specification
                                  */
-extern  char
-        srcfn[MAXFIL][FILSPC];  /*      array of source file names
+extern  int     afp;            /*      current input file path length
                                  */
-extern  int srcline[MAXFIL];    /*      current source file line
+extern  char    afntmp[FILSPC]; /*      temporary input file specification
                                  */
-extern  char
-        incfn[MAXINC][FILSPC];  /*      array of include file names
+extern  int     afptmp;         /*      temporary input file path length
                                  */
-extern  int
-        incline[MAXINC];        /*      current include file line
+extern  int     srcline;        /*      current source line number
+                                 */
+extern  int     asmline;        /*      current assembler file line number
+                                 */
+extern  int     incline;        /*      current include file line number
                                  */
 extern  int     radix;          /*      current number conversion radix:
                                  *      2 (binary), 8 (octal), 10 (decimal),
@@ -708,6 +748,8 @@ extern  int     oflag;          /*      -o, generate relocatable output flag
 extern  int     pflag;          /*      -p, disable listing pagination
                                  */
 extern  int     sflag;          /*      -s, generate symbol table flag
+                                 */
+extern  int     uflag;          /*      -u, disable .list/.nlist processing flag
                                  */
 extern  int     wflag;          /*      -w, enable wide listing format
                                  */
@@ -798,10 +840,6 @@ extern  FILE    *ofp;           /*      relocation output file handle
                                  */
 extern  FILE    *tfp;           /*      symbol table output file handle
                                  */
-extern  FILE    *sfp[MAXFIL];   /*      array of assembler-source file handles
-                                 */
-extern  FILE    *ifp[MAXINC];   /*      array of include-file file handles
-                                 */
 extern  unsigned char ctype[128]; /*    array of character types, one per
                                  *      ASCII character
                                  */
@@ -847,9 +885,11 @@ extern  char *          strrchr();
 
 /* asmain.c */
 extern  FILE *          afile(char *fn, char *ft, int wf);
+extern  VOID            afilex(char *fn, char *ft);
 extern  VOID            asexit(int i);
 extern  VOID            asmbl(void);
 extern  VOID            equate(char *id,struct expr *e1,a_uint equtype);
+extern  int             fndidx(char *str);
 extern  int             intsiz(void);
 extern  VOID            newdot(struct area *nap);
 extern  VOID            phase(struct area *ap, a_uint a);
@@ -859,9 +899,12 @@ extern  VOID            usage(int n);
 extern  int             comma(int flag);
 extern  char            endline(void);
 extern  int             get(void);
+extern  int             getdlm(void);
+extern  VOID            getdstr(char *str, int slen);
 extern  VOID            getid(char *id, int c);
 extern  int             getmap(int d);
 extern  int             getnb(void);
+extern  int             getlnm(void);
 extern  VOID            getst(char *id, int c);
 extern  int             more(void);
 extern  int             nxtline(void);
@@ -902,7 +945,7 @@ extern  a_uint          rngchk(a_uint n);
 extern  VOID            term(struct expr *esp);
 
 /* asdbg */
-extern  char *          BaseFileName(int fileNumber, int spacesToUnderscores);
+extern  char *          BaseFileName(struct asmf *currFile, int spacesToUnderscores);
 extern  VOID            DefineNoICE_Line(void);
 extern  VOID            DefineSDCC_Line(void);
 
@@ -964,8 +1007,11 @@ extern  int as_strncmpi(const char *s1, const char *s2, size_t n);
 
 /* asmain.c */
 extern  FILE *          afile();
+extern  VOID            afilex();
 extern  VOID            asexit();
 extern  VOID            asmbl();
+extern  VOID            equate();
+extern  int             fndidx();
 extern  int             intsiz();
 extern  int             main();
 extern  VOID            newdot();
@@ -976,9 +1022,12 @@ extern  VOID            usage();
 extern  int             comma();
 extern  char            endline();
 extern  int             get();
+extern  int             getdlm();
+extern  VOID            getdstr();
 extern  VOID            getid();
 extern  int             getmap();
 extern  int             getnb();
+extern  int             getlnm();
 extern  VOID            getst();
 extern  int             more();
 extern  int             nxtline();

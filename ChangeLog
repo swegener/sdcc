@@ -2,6 +2,10 @@
 
 	* support/scripts/optimize_pic16devices.pl:
 	  updated with the latest version from Molnar Karoly
+	* support/scripts/pic14-header-parser.pl,
+	  support/scripts/pic16-header-parser.pl: applied patch #3567006 -
+	  New support/scripts/pic1[46]-header-parser.pl,
+	  thanks to Molnar Karoly
 
 2012-10-05 Borut Razem <borut.razem AT gmail.com>
 

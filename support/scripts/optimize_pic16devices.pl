@@ -59,7 +59,7 @@ my @device_names = ();
                   },
         CONFIG => {
                   FIRST => 0,
-                  LAST  => 0
+                  LAST  => 0,
                   WORDS => [
                              {
                              ADDRESS  => 0,
@@ -74,7 +74,7 @@ my @device_names = ();
                   },
         ID     => {
                   FIRST => 0,
-                  LAST  => 0
+                  LAST  => 0,
                   WORDS => [
                              {
                              ADDRESS  => 0,
@@ -411,6 +411,7 @@ sub read_pic16devices_txt($)
   my $in = Open($File, 'read_pic16devices_txt');
   my $header = TRUE;
   my $device = undef;
+  my ($first, $last, $txt);
 
   Log("Reads the $File file.", 4);
 
@@ -490,9 +491,28 @@ sub read_pic16devices_txt($)
         {
         die "Device not exists." if (! defined($device));
 
+        ($first, $last) = (str2int($1), str2int($2));
         Log("configrange: $1 $2", 7);
-        $device->{CONFIG}->{FIRST} = str2int($1);
-        $device->{CONFIG}->{LAST}  = str2int($2);
+
+        if (defined($device->{CONFIG}->{FIRST}))
+          {
+          Log("The configrange already exists in the \"$device->{NAME}\".", 0);
+
+          if ($device->{CONFIG}->{FIRST} != $first || $device->{CONFIG}->{LAST} != $last)
+            {
+            Log("  In addition the previous values different from the new values.", 0);
+            Log(sprintf("  previous: 0x%06X - 0x%06X, new: 0x%06X - 0x%06X",
+                         $device->{CONFIG}->{FIRST}, $device->{CONFIG}->{LAST},
+                         $first, $last), 0);
+            }
+
+        # The previous values invalid.
+
+          $device->{CONFIG}->{WORDS} = [];
+          }
+
+        $device->{CONFIG}->{FIRST} = $first;
+        $device->{CONFIG}->{LAST}  = $last;
         }
 
       when (/^\s*configword\s+(\w+)\s+(\w+)\s+(\w+)(?:\s+(\w+))?$/io)

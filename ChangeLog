@@ -1,3 +1,8 @@
+2012-10-06 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/optimize_pic16devices.pl:
+	  updated with the latest version from Molnar Karoly
+
 2012-10-05 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/zip-pic16devices.pl,

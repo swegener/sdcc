@@ -1,3 +1,11 @@
+2012-10-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genPagedPointerGet): fixed bug #3527222
+	* support/regression/tests/gcc-torture-execute-921013-1.c: reenabled
+	* src/mcs51/gen.c (genCast),
+	* src/ds390/gen.c (genCast): fixed bug3467508 regression test failures
+	* support/regression/tests/bug3467508.c: reenabled for mcs51 and ds390
+
 2012-10-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asgb/asgb.vcxproj,

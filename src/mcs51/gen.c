@@ -324,6 +324,44 @@ popReg (int index, bool bits_popped)
   return bits_popped;
 }
 
+#if 0
+/*-----------------------------------------------------------------*/
+/* showR0R1status - helper for debugging getFreePtr failures       */
+/*-----------------------------------------------------------------*/
+static void
+showR0R1status(iCode * ic)
+{
+  bool r0iu, r1iu;
+  bool r0ou, r1ou;
+
+  r0iu = bitVectBitValue (ic->rUsed, R0_IDX);
+  r1iu = bitVectBitValue (ic->rUsed, R1_IDX);
+  printf ("ic->rUsed = [");
+  if (r0iu)
+    if (r1iu)
+      printf("r0,r1");
+    else
+      printf("r0");
+  else
+    if (r1iu)
+      printf("r1");
+  printf("] ");
+  
+  r0ou = bitVectBitValue (ic->rMask, R0_IDX);
+  r1ou = bitVectBitValue (ic->rMask, R1_IDX);
+  printf ("ic->rMask = [");
+  if (r0ou)
+    if (r1ou)
+      printf("r0,r1");
+    else
+      printf("r0");
+  else
+    if (r1ou)
+      printf("r1");
+  printf("]\n");
+}
+#endif
+
 /*-----------------------------------------------------------------*/
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed */
 /*-----------------------------------------------------------------*/
@@ -10036,8 +10074,6 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
 
   aopOp (left, ic, FALSE);
 
-  aopOp (result, ic, FALSE);
-
   /* if the value is already in a pointer register
      then don't need anything more */
   if (!AOP_INPREG (AOP (left)))
@@ -10052,6 +10088,8 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
     {
       rname = aopGet (left, 0, FALSE, FALSE);
     }
+
+  aopOp (result, ic, TRUE);
 
   /* if bitfield then unpack the bits */
   if (IS_BITFIELD (retype))
@@ -10082,13 +10120,12 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
     {
       if (pi)
         aopPut (left, rname, 0);
-      freeAsmop (NULL, aop, ic, TRUE);
     }
   else
     {
       /* we did not allocate which means left
          already in a pointer register, then
-         if size > 0 && this could be used again
+         if size > 1 && this could be used again
          we have to point it back to where it
          belongs */
       if ((AOP_SIZE (result) > 1 && !OP_SYMBOL (left)->remat && (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) && !pi)
@@ -10099,14 +10136,19 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
         }
     }
 
-  if (ifx && !ifx->generated)
-    {
-      genIfxJump (ifx, ifxCond, left, NULL, result, ic->next);
-    }
-
   /* done */
   freeAsmop (result, NULL, ic, TRUE);
+  if (aop)
+    {
+      freeAsmop (NULL, aop, ic, TRUE);
+    }
   freeAsmop (left, NULL, ic, TRUE);
+
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, ifxCond, NULL, NULL, NULL, ic->next);
+    }
+
   if (pi)
     pi->generated = 1;
 }
@@ -10839,7 +10881,7 @@ genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
     {
       /* we did not allocate which means left
          already in a pointer register, then
-         if size > 0 && this could be used again
+         if size > 1 && this could be used again
          we have to point it back to where it
          belongs */
       if (AOP_SIZE (right) > 1 && !OP_SYMBOL (result)->remat && (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth) && !pi)
@@ -11410,7 +11452,7 @@ genCast (iCode * ic)
     }
 
   /* if the either is of type pointer */
-  if (IS_PTR (ctype) || IS_PTR (rtype))
+  if ((IS_PTR (ctype) || IS_PTR (rtype)) && !IS_INTEGRAL (rtype))
     {
       int p_type;
       sym_link *type = operandType (right);

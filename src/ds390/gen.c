@@ -12133,7 +12133,7 @@ genCast (iCode * ic)
     }
 
   /* if the result is of type pointer */
-  if (IS_PTR (ctype))
+  if (IS_PTR (ctype) && !IS_INTEGRAL (rtype))
     {
       int p_type;
       sym_link *type = operandType (right);

@@ -8,11 +8,7 @@
 
 void testBug(void)
 {
-#ifndef __SDCC_mcs51
-#ifndef __SDCC_ds390
 	volatile int i = -1;
 	ASSERT((void *)(i) == (void *)(-1));
-#endif
-#endif
 }
 

@@ -1,3 +1,20 @@
+2012-10-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asgb/asgb.vcxproj,
+	* sdas/asgb/asgb.vcxproj.filters,
+	* sdas/asgb/Makefile.in,
+	* sdas/asgb/gbext.c: removed gbext.c
+	* sdas/as8051/i51mch.c,
+	* sdas/as8051/i8051.h,
+	* sdas/asgb/gbadr.c,
+	* sdas/asgb/gbmch.c,
+	* sdas/asrab/rabadr.c,
+	* sdas/asz80/z80adr.c,
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asout.c,
+	* sdas/asxxsrc/asxxxx.h: and yet another step towards ASxxxx v5
+
 2012-10-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/m08pst.c,

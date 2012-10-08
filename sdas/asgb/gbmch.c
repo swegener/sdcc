@@ -1,29 +1,40 @@
-/* z80mch.c
+/* gbmch.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
 /*
  * Extensions: P. Felber
  */
 
-#include <stdio.h>
-#include <setjmp.h>
+/* Gameboy mods by Roger Ivie (ivie at cc dot usu dot edu); see gb.h for more info 
+ */
+
 #include "asxxxx.h"
 #include "gb.h"
+
+int     hilo    = 0;
+char    *cpu    = "GameBoy Z80-like CPU";
+char    *dsft   = "asm";
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
 
@@ -137,7 +148,6 @@ struct mne *mp;
                         aerr();
                 break;
 
-        case S_ADD:
         case S_ADC:
         case S_SBC:
                 t1 = addr(&e1);
@@ -156,18 +166,39 @@ struct mne *mp;
                                 aerr();
                         break;
                 }
+                aerr();
+                break;
+
+        case S_ADD:
+                t1 = addr(&e1);
+                t2 = 0;
+                if (more()) {
+                        comma(1);
+                        t2 = addr(&e2);
+                }
+                if (t2 == 0) {
+                        if (genop(0, op, &e1, 1))
+                                aerr();
+                        break;
+                }
+                if ((t1 == S_R8) && (e1.e_addr == A)) {
+                        if (genop(0, op, &e2, 1))
+                                aerr();
+                        break;
+                }
                 if ((t1 == S_R16) && (t2 == S_R16)) {
-                        v1 = e1.e_addr;
-                        v2 = e2.e_addr;
-                        if ((v1 == HL) && (v2 <= SP) && (rf == S_ADD)) {
-                                outab(0x09 | (v2<<4));
+                        op = 0x09;
+                        v1 = (int) e1.e_addr;
+                        v2 = (int) e2.e_addr;
+                        if ((v1 == HL) && (v2 <= SP)) {
+                                outab(op | (v2 << 4));
                                 break;
                         }
                 }
                 /*
                  * 0xE8 : ADD SP,#n
                  */
-                if ((rf == S_ADD) && (t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_IMMED)) {
+                if ((t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_IMMED)) {
                         outab(0xE8);
                         outrb(&e2,0);
                         break;
@@ -179,20 +210,23 @@ struct mne *mp;
                 t1 = addr(&e1);
                 comma(1);
                 t2 = addr(&e2);
+
                 if (t1 == S_R8) {
-                        v1 = op | e1.e_addr<<3;
-                        if (genop(0, v1, &e2, 0) == 0)
+                        v1 = (int) (e1.e_addr<<3);
+                        if (genop(0, op | v1, &e2, 0) == 0)
                                 break;
                         if (t2 == S_IMMED) {
-                                outab((e1.e_addr<<3) | 0x06);
+                                outab(v1 | 0x06);
                                 outrb(&e2,0);
                                 break;
                         }
                 }
+
                 v1 = (int) e1.e_addr;
                 v2 = (int) e2.e_addr;
+
                 if ((t1 == S_R16) && (t2 == S_IMMED)) {
-                        outab(0x01|(v1<<4));
+                        outab(0x01 | (v1<<4));
                         outrw(&e2, 0);
                         break;
                 }
@@ -285,38 +319,6 @@ struct mne *mp;
                 break;
 
 
-        case S_LDH:     /* 0xE0 */
-                /*
-                 * 0xE0 : LDH (n),A = LD ($FF00+n),A
-                 * 0xE2 : LDH (C),A = LD ($FF00+C),A
-                 * 0xF0 : LDH A,(n) = LD A,($FF00+n)
-                 * 0xF2 : LDH A,(C) = LD A,($FF00+C)
-                 */
-                t1 = addr(&e1);
-                comma(1);
-                t2 = addr(&e2);
-                if ((t1 == S_INDM) && (t2 == S_R8) && (e2.e_addr == A)) {
-                        outab(0xE0);
-                        outrb(&e1, 0);
-                        break;
-                }
-                if ((t1 == S_IDC) && (t2 == S_R8) && (e2.e_addr == A)) {
-                        outab(0xE2);
-                        break;
-                }
-                if ((t2 == S_INDM) && (t1 == S_R8) && (e1.e_addr == A)) {
-                        outab(0xF0);
-                        outrb(&e2, 0);
-                        break;
-                }
-                if ((t2 == S_IDC) && (t1 == S_R8) && (e1.e_addr == A)) {
-                        outab(0xF2);
-                        break;
-                }
-                aerr();
-                break;
-
-
         case S_LDA:     /* 0xE8 */
                 /*
                  * 0xE8 : LDA SP,#n(SP)
@@ -337,7 +339,6 @@ struct mne *mp;
                 }
                 aerr();
                 break;
-
 
         case S_LDHL:    /* 0xF8 */
                 /*
@@ -380,8 +381,8 @@ struct mne *mp;
                 break;
 
         case S_JR:
-                if ((v1 = admode(CND)) != 0) {
-                        if ((v1 &= 0xFF) <= 0x18) {
+                if ((v1 = admode(CND)) != 0 ) {
+                        if ((v1 &= 0xFF) <= 0x03) {
                                 op += (v1+1)<<3;
                         } else {
                                 aerr();
@@ -436,8 +437,44 @@ struct mne *mp;
                 aerr();
                 break;
 
+        case S_LDH:
+                /*
+                 * 0xE0 : LDH (n),A = LD ($FF00+n),A
+                 * 0xE2 : LDH (C),A = LD ($FF00+C),A
+                 * 0xF0 : LDH A,(n) = LD A,($FF00+n)
+                 * 0xF2 : LDH A,(C) = LD A,($FF00+C)
+                 */
+
+                t1 = addr(&e1);
+                comma(1);
+                t2 = addr(&e2);
+                v1 = (int) e1.e_addr;
+                v2 = (int) e2.e_addr;
+
+                if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
+                        outab(0xF0);
+                        outrb(&e2, 0);
+                        break;
+                }
+                if ((t2 == S_R8) && (v2 == A) && (t1 == S_INDM)) {
+                        outab(0xE0);
+                        outrb(&e1, 0);
+                        break;
+                }
+                if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDC)) {
+                        outab(0xF2);
+                        break;
+                }
+                if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDC)) {
+                        outab(0xE2);
+                        break;
+                }
+                aerr();
+                break;
+
         default:
                 err('o');
+                break;
         }
 }
 
@@ -463,17 +500,6 @@ int f;
                 if (pop)
                         outab(pop);
                 outab(op|0x06);
-                return(0);
-        }
-        if (t1 == S_IDHL) {
-                if (pop) {
-                        outab(pop);
-                        outrb(esp,0);
-                        outab(op|0x06);
-                } else {
-                        outab(op|0x06);
-                        outrb(esp,0);
-                }
                 return(0);
         }
         if ((t1 == S_IMMED) && (f)) {
@@ -517,4 +543,8 @@ struct expr *esp;
 VOID
 minit()
 {
+        /*
+         * Byte Order
+         */
+        hilo = 0;
 }

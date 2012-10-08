@@ -215,8 +215,6 @@ list(void)
                 outchk(ASXHUGE,ASXHUGE);
         }
 
-
-
         /*
          * Get Correct Line Number
          */
@@ -563,12 +561,14 @@ list2(int t)
          */
         if (fflag >= 2) {
                 if (t & R_RELOC) {
-                        if (t & (R_PAG0|R_PAG)) {
-                                c = '*';
-                        } else if (t & R_USGN) {
-                                c = 'u';
-                        } else if (t & R_PCR) {
+                        if (t & R_PCR) {
                                 c = 'p';
+                        } else
+                        if (t & (R_PAG0|R_PAGN)) {
+                                c = '*';
+                        } else
+                        if (t & R_USGN) {
+                                c = 'u';
                         } else {
                                 c = 'r';
                         }

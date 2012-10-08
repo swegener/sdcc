@@ -1,27 +1,31 @@
-/* z80adr.c
+/* z80adr.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
 
 /*
  * Extensions: P. Felber
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "z80.h"
 
@@ -65,7 +69,7 @@ struct expr *esp;
                         mode = S_R16X;
                         aerr();
                 } else {
-			mode = S_INDM;
+                        mode = S_INDM;
                         expr(esp, 0);
                         esp->e_mode = mode;
                 }
@@ -73,8 +77,9 @@ struct expr *esp;
                         esp->e_mode = (mode + indx)&0xFF;
                         esp->e_base.e_ap = NULL;
                 }
-                if ((c = getnb()) != RTIND)
+                if ((c = getnb()) != RTIND) {
                         qerr();
+                }
         } else {
                 unget(c);
                 if ((indx = admode(R8)) != 0) {
@@ -95,7 +100,7 @@ struct expr *esp;
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
                 } else {
-			mode = S_USER;
+                        mode = S_USER;
                         expr(esp, 0);
                         esp->e_mode = mode;
                 }
@@ -137,7 +142,7 @@ struct adsym *sp;
         unget(getnb());
 
         i = 0;
-	while ( *(ptr = &sp[i].a_str[0]) ) {
+        while ( *(ptr = &sp[i].a_str[0]) ) {
                 if (srch(ptr)) {
                         return(sp[i].a_val);
                 }
@@ -158,12 +163,12 @@ char *str;
         ptr = ip;
 
         while (*ptr && *str) {
-                if (ccase[*ptr  & 0x007F] != ccase[*str & 0x007F])
+                if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
                         break;
                 ptr++;
                 str++;
         }
-        if (ccase[*ptr  & 0x007F] == ccase[*str  & 0x007F]) {
+        if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
                 ip = ptr;
                 return(1);
         }
@@ -194,51 +199,50 @@ char    c, *str;
  */
 
 struct  adsym   R8[] = {
-    { "b",      B|0400 },
-    { "c",      C|0400 },
-    { "d",      D|0400 },
-    { "e",      E|0400 },
-    { "h",      H|0400 },
-    { "l",      L|0400 },
-    { "a",      A|0400 },
-    { "",       0000 }
+    {   "b",    B|0400  },
+    {   "c",    C|0400  },
+    {   "d",    D|0400  },
+    {   "e",    E|0400  },
+    {   "h",    H|0400  },
+    {   "l",    L|0400  },
+    {   "a",    A|0400  },
+    {   "",     0000    }
 };
 
 struct  adsym   R8X[] = {
-    { "i",      I|0400 },
-    { "r",      R|0400 },
-    { "",       0000 }
+    {   "i",    I|0400  },
+    {   "r",    R|0400  },
+    {   "",     0000    }
 };
 
-
-/* Undocument instructions for 0xDD prefix H->IX high, L->IX low */
+/* Undocumented instructions for 0xDD prefix H->IX high, L->IX low */
 struct  adsym   R8U1[] = {
-  { "ixh",  H|0400 },
-  { "ixl",  L|0400 },
-  { "",       0000 }
+  {   "ixh",  H|0400  },
+  {   "ixl",  L|0400  },
+  {   "",     0000    }
 };
 
-/* Undocument instructions for 0xFD prefix H->IY high, L->IY low */
+/* Undocumented instructions for 0xFD prefix H->IY high, L->IY low */
 struct  adsym   R8U2[] = {
-  { "iyh",  H|0400 },
-  { "iyl",  L|0400 },
-  { "",       0000 }
+  {   "iyh",  H|0400  },
+  {   "iyl",  L|0400  },
+  {   "",     0000    }
 };
 
 struct  adsym   R16[] = {
-    { "bc",     BC|0400 },
-    { "de",     DE|0400 },
-    { "hl",     HL|0400 },
-    { "sp",     SP|0400 },
-    { "ix",     IX|0400 },
-    { "iy",     IY|0400 },
-    { "",       0000 }
+    {   "bc",   BC|0400 },
+    {   "de",   DE|0400 },
+    {   "hl",   HL|0400 },
+    {   "sp",   SP|0400 },
+    {   "ix",   IX|0400 },
+    {   "iy",   IY|0400 },
+    {   "",     0000    }
 };
 
 struct  adsym   R16X[] = {
-    { "af'",    AF|0400 },	/* af' must be first !!! */
-    { "af",     AF|0400 },
-    { "",       0000 }
+    {   "af'",  AF|0400 },      /* af' must be first !!! */
+    {   "af",   AF|0400 },
+    {   "",     0000    }
 };
 
 /*
@@ -246,13 +250,13 @@ struct  adsym   R16X[] = {
  */
 
 struct  adsym   CND[] = {
-    { "NZ",     NZ|0400 },
-    { "Z",      Z |0400 },
-    { "NC",     NC|0400 },
-    { "C",      CS|0400 },
-    { "PO",     PO|0400 },
-    { "PE",     PE|0400 },
-    { "P",      P |0400 },
-    { "M",      M |0400 },
-    { "",       0000 }
+    {   "NZ",   NZ|0400 },
+    {   "Z",    Z |0400 },
+    {   "NC",   NC|0400 },
+    {   "C",    CS|0400 },
+    {   "PO",   PO|0400 },
+    {   "PE",   PE|0400 },
+    {   "P",    P |0400 },
+    {   "M",    M |0400 },
+    {   "",     0000    }
 };

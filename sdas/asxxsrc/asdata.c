@@ -272,8 +272,8 @@ struct  mne     *mnehash[NHASH];
  *      };
  */
 struct  sym     sym[] = {
-    {NULL,      NULL,   ".",            S_USER, 0,                      NULL,   0,      0,      0},
-    {NULL,      NULL,   ".__.ABS.",     S_USER, S_ASG|S_GBL|S_EOL,      NULL,   0,      0,      0}
+    {   NULL,   NULL,   ".",        S_USER, 0,                  NULL,   0,  0,  0},
+    {   NULL,   NULL,   ".__.ABS.", S_USER, S_ASG|S_GBL|S_EOL,  NULL,   0,  0,  0}
 };
 
 struct  sym     *symp;          /*      pointer to a symbol structure
@@ -319,14 +319,14 @@ FILE    *ofp;           /*      relocation output file handle
                          */
 FILE    *tfp;           /*      symbol table output file handle
                          */
-char	txt[NTXT];	/*	T Line Values
-			 */
-char	rel[NREL];	/*	R Line Values
-			 */
-char	*txtp = &txt[0];/*	Pointer to T Line Values
-			 */
-char	*relp = &rel[0];/*	Pointer to R Line Values
-			 */
+char    txt[NTXT];      /*      T Line Values
+                         */
+char    rel[NREL];      /*      R Line Values
+                         */
+char    *txtp = &txt[0];/*      Pointer to T Line Values
+                         */
+char    *relp = &rel[0];/*      Pointer to R Line Values
+                         */
 
 /*
  *      an array of character types,

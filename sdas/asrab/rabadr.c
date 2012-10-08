@@ -1,20 +1,33 @@
-/* z80adr.c
+/* rabadr.c */
 
-   Copyright (C) 1989-1995 Alan R. Baldwin
-   721 Berkeley St., Kent, Ohio 44240
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ * 
+ * ported to the Rabbit2000 by
+ * Ulrich Raich and Razaq Ijoduola
+ * PS Division
+ * CERN
+ * CH-1211 Geneva-23
+ * email: Ulrich dot Raich at cern dot ch
+ */
 
 /*
  * Extensions: P. Felber
@@ -23,8 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  *   and rabbit 4000 instruction sets (2011)
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "rab.h"
 
@@ -70,9 +81,6 @@ struct expr *esp;
                 if ((indx = admode(R8)) != 0) {
                         mode = S_INDB;
                 } else
-                if ((indx = admode(R16)) != 0) {
-                        mode = S_INDR;
-                } else
                 if ((indx = admode(R8X)) != 0) {
                         mode = S_R8X;
                         aerr();
@@ -80,6 +88,9 @@ struct expr *esp;
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
                         aerr();
+                } else
+                if ((indx = admode(R16)) != 0) {
+                        mode = S_INDR;
                 } else {
                         mode = S_INDM;
                         expr(esp, 0);
@@ -92,8 +103,9 @@ struct expr *esp;
                 /* ljm comment -
                  *   flag an error if the closing paren is absent
                  */
-                if ((c = getnb()) != RTIND)
+                if ((c = getnb()) != RTIND) {
                         qerr();
+                }
         } else {
                 unget(c);
           /* ljm -
@@ -111,14 +123,14 @@ struct expr *esp;
                 if ((indx = admode(R8)) != 0) {
                         mode = S_R8;
                 } else
-                if ((indx = admode(R16)) != 0) {
-                        mode = S_R16;
-                } else
                 if ((indx = admode(R8X)) != 0) {
                         mode = S_R8X;
                 } else
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
+                } else
+                if ((indx = admode(R16)) != 0) {
+                        mode = S_R16;
                 } else
                 if ((indx = admode(R32_JKHL)) != 0) {
                         mode = S_R32_JKHL;
@@ -139,14 +151,14 @@ struct expr *esp;
                         esp->e_base.e_ap = NULL;
                 }
                 if ((c = getnb()) == LFIND) {
-                  indx=admode(R16);
-                  if ((indx&0xFF)==IX || (indx&0xFF)==IY ||
-                      (indx&0xFF)==SP)
-                  {
-                    esp->e_mode = S_INDR + (indx&0xFF);
-                  } else if ( (indx&0xFF)==HL ) {
-                    esp->e_mode = S_IDHL_OFFSET;
-                  } else {
+                        indx = admode(R16);
+                        if ((indx&0xFF)==IX || (indx&0xFF)==IY ||
+                            (indx&0xFF)==SP)
+                        {
+                          esp->e_mode = S_INDR + (indx&0xFF);
+                        } else if ( (indx&0xFF)==HL ) {
+                          esp->e_mode = S_IDHL_OFFSET;
+                        } else {
                                 aerr();
                         }
                         if ((c = getnb()) != RTIND)
@@ -196,21 +208,22 @@ char *str;
         ptr = ip;
 
         while (*ptr && *str) {
-                if (ccase[*ptr  & 0x007F] != ccase[*str & 0x007F])
+                if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
                         break;
                 ptr++;
                 str++;
         }
-        if (ccase[*ptr  & 0x007F] == ccase[*str  & 0x007F]) {
+        if (ccase[*ptr & 0x007F] == ccase[*str  & 0x007F]) {
                 ip = ptr;
                 return(1);
         }
 
-        if (!*str)
+        if (!*str) {
                 if (any(*ptr," \t\n,);")) {
                         ip = ptr;
                         return(1);
                 }
+        }
         return(0);
 }
 
@@ -232,56 +245,56 @@ char    c, *str;
  */
 
 struct  adsym   R8[] = {
-    { "b",      B|0400 },
-    { "c",      C|0400 },
-    { "d",      D|0400 },
-    { "e",      E|0400 },
-    { "h",      H|0400 },
-    { "l",      L|0400 },
-    { "a",      A|0400 },
-    { "",       0000 }
+    {   "b",    B|0400  },
+    {   "c",    C|0400  },
+    {   "d",    D|0400  },
+    {   "e",    E|0400  },
+    {   "h",    H|0400  },
+    {   "l",    L|0400  },
+    {   "a",    A|0400  },
+    {   "",     0000    }
 };
 
 struct  adsym   R8X[] = {
-    { "iir",    IIR|0400 },
-    { "eir",    EIR|0400 },
-    { "",       0000 }
+    {   "eir",  EIR|0400},
+    {   "iir",  IIR|0400},
+    {   "",     0000    }
 };
 
 struct  adsym   R8IP[] = {
-    { "ip",     IP|0400 },
-    { "",       0000 }
+    {   "ip",   IP|0400 },
+    {   "",     0000    }
 };
 
 struct  adsym   R16[] = {
-    { "bc",     BC|0400 },
-    { "de",     DE|0400 },
-    { "hl",     HL|0400 },
-    { "sp",     SP|0400 },
-    { "ix",     IX|0400 },
-    { "iy",     IY|0400 },
-    { "",       0000 }
+    {   "bc",   BC|0400 },
+    {   "de",   DE|0400 },
+    {   "hl",   HL|0400 },
+    {   "sp",   SP|0400 },
+    {   "ix",   IX|0400 },
+    {   "iy",   IY|0400 },
+    {   "",     0000    }
 };
 
 struct  adsym   R16X[] = {
-    { "af'",    AF|0400 },      /* af' must be first !!! */
-    { "af",     AF|0400 },
-    { "",       0000 }
+    {   "af'",  AF|0400 },      /* af' must be first !!! */
+    {   "af",   AF|0400 },
+    {   "",     0000    }
 };
 
 struct  adsym   R32_BCDE[] = {
-  { "bcde",     BCDE|0400 },
-  { "",         0000 }
+  {   "bcde",   BCDE|0400 },
+  {   "",       0000      }
 };
 
 struct  adsym   R32_JKHL[] = {
-  { "jkhl",     JKHL|0400 },
-  { "",         0000 }
+  {   "jkhl",   JKHL|0400 },
+  {   "",       0000      }
 };
 
 struct  adsym   RXPC[] = {
-  { "xpc",      1|0400 },
-  { "",         0000 }
+  {   "xpc",    1|0400  },
+  {   "",       0000    }
 };
 
 /*
@@ -289,26 +302,25 @@ struct  adsym   RXPC[] = {
  */
 
 struct  adsym   CND[] = {
-    { "NZ",     NZ|0400 },
-    { "Z",      Z |0400 },
-    { "NC",     NC|0400 },
-    { "C",      CS|0400 },
-    { "PO",     PO|0400 },
-    { "PE",     PE|0400 },
-    { "P",      P |0400 },
-    { "M",      M |0400 },
-    { "",       0000 }
+    {   "NZ",   NZ|0400 },
+    {   "Z",    Z |0400 },
+    {   "NC",   NC|0400 },
+    {   "C",    CS|0400 },
+    {   "PO",   PO|0400 },
+    {   "PE",   PE|0400 },
+    {   "P",    P |0400 },
+    {   "M",    M |0400 },
+    {   "",     0000    }
 };
 
 struct  adsym   ALT_CND[] = {
-  { "GT",     CC_GT|0400 },
-  { "GTU",    CC_GTU|0400 },
-  { "LT",     CC_LT|0400 },
-  { "V",      CC_V |0400 },
-  { "NZ",     CC_NZ|0400 },
-  { "Z",      CC_Z |0400 },
-  { "NC",     CC_NC|0400 },
-  { "C",      CC_C |0400 },
-  
-  { "",       0000 }
+    {   "GT",   CC_GT|0400  },
+    {   "GTU",  CC_GTU|0400 },
+    {   "LT",   CC_LT|0400  },
+    {   "V",    CC_V |0400  },
+    {   "NZ",   CC_NZ|0400  },
+    {   "Z",    CC_Z |0400  },
+    {   "NC",   CC_NC|0400  },
+    {   "C",    CC_C |0400  },
+    {   "",     0000        }
 };

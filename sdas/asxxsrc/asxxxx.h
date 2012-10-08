@@ -393,9 +393,10 @@ struct  area
  * Paging Modes:
  */
 
-#define R_NOPAG 0x00            /* Page Mode */
-#define R_PAG0  0x20            /* Page '0' */
-#define R_PAG   0x40            /* Page 'nnn' */
+#define R_NOPAG 0x0000          /* Page Mode */
+#define R_PAG0  0x0020          /* Page '0' */
+#define R_PAGN  0x0040          /* Page 'nnn' */
+#define R_PAGX  0x0060          /* Page 'x', Extended Relocation Mode */
 
 /*
  * PCR Modes:
@@ -959,29 +960,36 @@ extern  VOID            slew(FILE *fp, int flag);
 /* asout.c */
 extern  int             lobyte(a_uint v);
 extern  int             hibyte(a_uint v);
+extern  int             thrdbyte(a_uint v);
+extern  int             frthbyte(a_uint v);
 extern  VOID            out(char *p, int n);
 extern  VOID            outarea(struct area *ap);
+extern  VOID            outdp(struct area *, struct expr *);
 extern  VOID            outall(void);
 extern  VOID            outdot(void);
 extern  VOID            outbuf(char *s);
 extern  VOID            outchk(int nt, int nr);
 extern  VOID            outgsd(void);
 extern  VOID            outsym(struct sym *sp);
-extern  VOID            outab(int v);
+extern  VOID            outab(a_uint v);
+extern  VOID            outaw(a_uint v);
+extern  VOID            outa3b(a_uint v);
+extern  VOID            outa4b(a_uint v);
+extern  VOID            outaxb(int i, a_uint v);
+extern  VOID            outatxb(int i, a_uint v);
 extern  VOID            outrb(struct expr *esp, int r);
 extern  VOID            outrw(struct expr *esp, int r);
 extern  VOID            out_lb(a_uint v, int t);
 extern  VOID            out_lw(a_uint v, int t);
+extern  VOID            out_l3b(a_uint v, int t);
+extern  VOID            out_l4b(a_uint v, int t);
+extern  VOID            out_lxb(int i, a_uint v, int t);
 extern  VOID            out_rw(a_uint v);
-extern  VOID            out_tw(a_uint n);
+extern  VOID            out_txb(int i, a_uint v);
 /* sdas specific */
-extern  int             byte3(int);
 extern  VOID            outr11();       /* JLH */
 extern  VOID            outr24(struct expr *, int);
-extern  VOID            out_l24(int, int);
-extern  VOID            out_t24(int);
 extern  VOID            outr19(struct expr *, int, int);
-extern  VOID            outdp(struct area *, struct expr *);
 /* end sdas specific */
 
 /* Machine dependent variables */
@@ -1082,6 +1090,8 @@ extern  VOID            slew();
 /* asout.c */
 extern  int             lobyte();
 extern  int             hibyte();
+extern  int             thrdbyte();
+extern  int             frthbyte();
 extern  VOID            out();
 extern  VOID            outarea();
 extern  VOID            outdp();
@@ -1093,14 +1103,15 @@ extern  VOID            outgsd();
 extern  VOID            outsym();
 extern  VOID            outab();
 extern  VOID            outaw();
+extern  VOID            outa3b();
+extern  VOID            outa4b();
+extern  VOID            outaxb();
+extern  VOID            outatxb();
 extern  VOID            outrb();
 extern  VOID            outrw();
 /* sdas specific */
-extern  int             byte3();
 extern  VOID            outr11();       /* JLH */
 extern  VOID            outr24();
-extern  VOID            out_l24();
-extern  VOID            out_t24();
 extern  VOID            outr19(t);
 /* end sdas specific */
 extern  VOID            out_lb();

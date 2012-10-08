@@ -41,18 +41,18 @@ char    *dsft   = "asm";
 /*
  * Opcode Cycle Definitions
  */
-#define	OPCY_SDP	((char) (0xFF))
-#define	OPCY_ERR	((char) (0xFE))
+#define OPCY_SDP        ((char) (0xFF))
+#define OPCY_ERR        ((char) (0xFE))
 
-/*	OPCY_NONE	((char) (0x80))	*/
-/*	OPCY_MASK	((char) (0x7F))	*/
+/*      OPCY_NONE       ((char) (0x80)) */
+/*      OPCY_MASK       ((char) (0x7F)) */
 
-#define	UN	((char) (OPCY_NONE | 0x00))
+#define UN      ((char) (OPCY_NONE | 0x00))
 
 /*
  * 8051 Cycle Count
  *
- *	opcycles = i51pg1[opcode]
+ *      opcycles = i51pg1[opcode]
  */
 static char i51pg1[256] = {
 /*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
@@ -486,7 +486,7 @@ machine(struct mne *mp)
                         rerr();
                 break;
 
-        case S_BR:   /* JC, JNC, JZ, JNZ */
+        case S_BR:  /* JC, JNC, JZ, JNZ */
                 /* Relative branch */
                 /* sdcc svn rev #4994: fixed bug 1865114 */
                 expr(&e1, 0);
@@ -634,7 +634,7 @@ machine(struct mne *mp)
                         case S_AT_DP:
                                 outab(0xE0);
                                 break;
-                                
+
                         case S_AT_R:
                                 outab(0xE2 + e1.e_addr);
                                 break;

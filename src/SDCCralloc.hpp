@@ -413,7 +413,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   for (var_t i = boost::num_vertices(con) - 1; i >= 0; i--)
     {
       cfg_sym_t cfg2;
-      boost::copy_graph(cfg, cfg2);
+      boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
       for (int j = boost::num_vertices(cfg) - 1; j >= 0; j--)
         {
           if (cfg[j].alive.find(i) == cfg[j].alive.end())
@@ -430,7 +430,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 #endif
           // Non-connected CFGs shouldn't exist either. Another problem with dead code eliminarion.
           cfg_sym_t cfg2;
-          boost::copy_graph(cfg, cfg2);
+          boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
           std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
           boost::connected_components(cfg2, &component[0]);
 

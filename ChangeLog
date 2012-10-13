@@ -1,3 +1,9 @@
+2012-10-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp:
+	  Fixed bug #3566360.
+
 2012-10-08 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/include/opcode/ia64.h: added since build

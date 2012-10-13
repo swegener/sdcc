@@ -32,11 +32,22 @@
 #include "asxxxx.h"
 #include "gb.h"
 
-int     hilo    = 0;
 char    *cpu    = "GameBoy Z80-like CPU";
 char    *dsft   = "asm";
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define OPCY_SDP        ((char) (0xFF))
+#define OPCY_ERR        ((char) (0xFE))
+
+/*      OPCY_NONE       ((char) (0x80)) */
+/*      OPCY_MASK       ((char) (0x7F)) */
+
+#define UN      ((char) (OPCY_NONE | 0x00))
+#define P2      ((char) (OPCY_NONE | 0x01))
 
 /*
  * Process a machine op.

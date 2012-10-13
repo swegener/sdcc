@@ -174,23 +174,10 @@ char *str;
         }
 
         if (!*str)
-                if (any(*ptr," \t\n,);")) {
+                if (!(ctype[*ptr & 0x007F] & LTR16)) {
                         ip = ptr;
                         return(1);
                 }
-        return(0);
-}
-
-/*
- *      any --- does str contain c?
- */
-int
-any(c,str)
-char    c, *str;
-{
-        while (*str)
-                if(*str++ == c)
-                        return(1);
         return(0);
 }
 

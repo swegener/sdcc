@@ -124,6 +124,33 @@ struct  mne     mne[] = {
     {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0       },
 /* end sdas specific */
 
+        /* Macro Processor */
+
+    {   NULL,   ".macro",       S_MACRO,        0,      O_MACRO },
+    {   NULL,   ".endm",        S_MACRO,        0,      O_ENDM  },
+    {   NULL,   ".mexit",       S_MACRO,        0,      O_MEXIT },
+
+    {   NULL,   ".narg",        S_MACRO,        0,      O_NARG  },
+    {   NULL,   ".nchr",        S_MACRO,        0,      O_NCHR  },
+    {   NULL,   ".ntyp",        S_MACRO,        0,      O_NTYP  },
+
+    {   NULL,   ".irp",         S_MACRO,        0,      O_IRP   },
+    {   NULL,   ".irpc",        S_MACRO,        0,      O_IRPC  },
+    {   NULL,   ".rept",        S_MACRO,        0,      O_REPT  },
+
+    {   NULL,   ".nval",        S_MACRO,        0,      O_NVAL  },
+
+    {   NULL,   ".mdelete",     S_MACRO,        0,      O_MDEL  },
+
+        /* Machines */
+
+    {   NULL,   ".r4k",         S_CPU,          0,      X_R4K   },
+    {   NULL,   ".r3k",         S_CPU,          0,      X_R2K   },
+    {   NULL,   ".r2k",         S_CPU,          0,      X_R2K   },
+    {   NULL,   ".hd64",        S_CPU,          0,      X_HD64  },
+    {   NULL,   ".z180",        S_CPU,          0,      X_HD64  },
+    {   NULL,   ".z80",         S_CPU,          0,      X_Z80   },
+
         /* rabbit (warning: derived from "z80 / hd64180") */
 
     {   NULL,   "ld",           S_LD,           0,      0x40    },
@@ -143,21 +170,22 @@ struct  mne     mne[] = {
 
     {   NULL,   "add",          S_ADD,          0,      0x80    },
     {   NULL,   "adc",          S_ADC,          0,      0x88    },
-    {   NULL,   "sub",          S_SUB,          0,      0x90    },
     {   NULL,   "sbc",          S_SBC,          0,      0x98    },
 
     {   NULL,   "and",          S_AND,          0,      0xA0    },
-    {   NULL,   "cp",           S_AND,          0,      0xB8    },
     {   NULL,   "or",           S_AND,          0,      0xB0    },
+    {   NULL,   "sub",          S_SUB,          0,      0x90    },
     {   NULL,   "xor",          S_AND,          0,      0xA8    },
+    {   NULL,   "cp",           S_AND,          0,      0xB8    },
 
     {   NULL,   "ex",           S_EX,           0,      0xE3    },
 
     {   NULL,   "push",         S_PUSH,         0,      0xC5    },
     {   NULL,   "pop",          S_PUSH,         0,      0xC1    },
 
-/*    { NULL,   "in",           S_IN,           0,      0xDB    }, */
-/*    { NULL,   "o      S_OUT,          0,      0xD3    }, */
+/*  {   NULL,   "in",           S_IN,           0,      0xDB    }, */
+/*  {   NULL,   "out",          S_OUT,          0,      0xD3    }, */
+
     {   NULL,   "ioi",          S_IN,           0,      0xD3    },
     {   NULL,   "ioe",          S_OUT,          0,      0xDB    },
 
@@ -171,13 +199,13 @@ struct  mne     mne[] = {
 
     {   NULL,   "rst",          S_RST,          0,      0xC7    },
 
-/*    { NULL,   "im",           S_IM,           0,      0xED    }, */
+/*  {   NULL,   "im",           S_IM,           0,      0xED    }, */
 
     {   NULL,   "ccf",          S_INH1,         0,      0x3F    },
     {   NULL,   "cpl",          S_INH1,         0,      0x2F    },
-/*    { NULL,   "daa",          S_INH1,         0,      0x27    }, */
-/*    { NULL,   "di",           S_INH1,         0,      0xF3    }, */
-/*    { NULL,   "ei",           S_INH1,         0,      0xFB    }, */
+/*  {   NULL,   "daa",          S_INH1,         0,      0x27    }, */
+/*  {   NULL,   "di",           S_INH1,         0,      0xF3    }, */
+/*  {   NULL,   "ei",           S_INH1,         0,      0xFB    }, */
     {   NULL,   "ipset0",       S_INH2,         0,      0x46    },
     {   NULL,   "ipset1",       S_INH2,         0,      0x56    },
     {   NULL,   "ipset2",       S_INH2,         0,      0x4E    },
@@ -186,7 +214,7 @@ struct  mne     mne[] = {
     {   NULL,   "exx",          S_INH1,         0,      0xD9    },
     {   NULL,   "nop",          S_INH1,         0,      0x00    },
 
-/*    { NULL,   "halt",         S_INH1,         0,      0x76    }, */
+/*  {   NULL,   "halt",         S_INH1,         0,      0x76    }, */
     {   NULL,   "altd",         S_INH1,         0,      0x76    },
 
     {   NULL,   "rla",          S_INH1,         0,      0x17    },
@@ -195,32 +223,31 @@ struct  mne     mne[] = {
     {   NULL,   "rrca",         S_INH1,         0,      0x0F    },
     {   NULL,   "scf",          S_INH1,         0,      0x37    },
 
-/*    { NULL,   "cpd",          S_INH2,         0,      0xA9    }, */
-/*    { NULL,   "cpdr",         S_INH2,         0,      0xB9    }, */
-/*    { NULL,   "cpi",          S_INH2,         0,      0xA1    }, */
-/*    { NULL,   "cpir",         S_INH2,         0,      0xB1    }, */
-/*    { NULL,   "ind",          S_INH2,         0,      0xAA    }, */
-/*    { NULL,   "indr",         S_INH2,         0,      0xBA    }, */
-/*    { NULL,   "ini",          S_INH2,         0,      0xA2    }, */
-/*    { NULL,   "inir",         S_INH2,         0,      0xB2    }, */
+/*  {   NULL,   "cpd",          S_INH2,         0,      0xA9    }, */
+/*  {   NULL,   "cpdr",         S_INH2,         0,      0xB9    }, */
+/*  {   NULL,   "cpi",          S_INH2,         0,      0xA1    }, */
+/*  {   NULL,   "cpir",         S_INH2,         0,      0xB1    }, */
+/*  {   NULL,   "ind",          S_INH2,         0,      0xAA    }, */
+/*  {   NULL,   "indr",         S_INH2,         0,      0xBA    }, */
+/*  {   NULL,   "ini",          S_INH2,         0,      0xA2    }, */
+/*  {   NULL,   "inir",         S_INH2,         0,      0xB2    }, */
     {   NULL,   "ldd",          S_INH2,         0,      0xA8    },
     {   NULL,   "lddr",         S_INH2,         0,      0xB8    },
     {   NULL,   "ldi",          S_INH2,         0,      0xA0    },
     {   NULL,   "ldir",         S_INH2,         0,      0xB0    },
     {   NULL,   "neg",          S_NEG,          0,      0x44    },
-/*    { NULL,   "outd",         S_INH2,         0,      0xAB    }, */
-/*    { NULL,   "otdr",         S_INH2,         0,      0xBB    }, */
-/*    { NULL,   "outi",         S_INH2,         0,      0xA3    }, */
-/*    { NULL,   "otir",         S_INH2,         0,      0xB3    }, */
+/*  {   NULL,   "outd",         S_INH2,         0,      0xAB    }, */
+/*  {   NULL,   "otdr",         S_INH2,         0,      0xBB    }, */
+/*  {   NULL,   "outi",         S_INH2,         0,      0xA3    }, */
+/*  {   NULL,   "otir",         S_INH2,         0,      0xB3    }, */
     {   NULL,   "reti",         S_INH2,         0,      0x4D    },
-/*    { NULL,   "retn",         S_INH2,         0,      0x45    },*/
+/*  {   NULL,   "retn",         S_INH2,         0,      0x45    }, */
     {   NULL,   "lret",         S_INH2,         0,      0x45    },
-/*    { NULL,   "rld",          S_INH2,         0,      0x6F    }, */
-/*    { NULL,   "rrd",          S_INH2,         S_EOL,  0x67    } */
-    
+/*  {   NULL,   "rld",          S_INH2,         0,      0x6F    }, */
+/*  {   NULL,   "rrd",          S_INH2,         S_EOL,  0x67    } */
+
     {   NULL,   "mul",          S_INH1,         0,      0xF7    },
-    
-    {   NULL,   ".r3k",         X_R3K_MODE,     0,      0       },
+
     {   NULL,   "idet",         R3K_INH1,       0,      0x5B    },
     {   NULL,   "lddsr",        R3K_INH2,       0,      0x98    },
     {   NULL,   "ldisr",        R3K_INH2,       0,      0x90    },
@@ -233,8 +260,7 @@ struct  mne     mne[] = {
     {   NULL,   "sures",        R3K_INH2,       0,      0x7D    },
     {   NULL,   "uma",          R3K_INH2,       0,      0xC0    },
     {   NULL,   "ums",          R3K_INH2,       0,      0xC8    },
-    
-    {   NULL,   ".r4k",         X_R4K_MODE,     0,      0       },
+
     {   NULL,   "jre",          X_JRE,          0,      0xA3    },
     {   NULL,   "clr",          X_CLR,          0,      0xBF    },
     {   NULL,   "ljp",          X_LJP,          0,      0xC7    },

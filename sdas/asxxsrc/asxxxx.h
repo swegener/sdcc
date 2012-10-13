@@ -245,6 +245,7 @@
 
 #define T_ASM   0               /* Assembler Source File */
 #define T_INCL  1               /* Assembler Include File */
+#define T_MACRO 2               /* Assembler Macro */
 
 /*
  * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
@@ -275,6 +276,8 @@
 #define dot     sym[0]          /* Dot, current loc */
 #define dca     area[0]         /* Dca, default code area */
 
+#define hilo    sym[3].s_addr   /* hilo, byte order flag */
+#define mls     sym[4]          /* Mls, Macro local symbol */
 
 /*
  *      The defined type 'a_uint' is used for all address and
@@ -560,13 +563,28 @@ struct  sym
 #define   O_EVEN     0          /* .even */
 #define   O_ODD      1          /* .odd */
 #define   O_BNDRY    2          /* .bndry */
+#define S_MACRO         28      /* .macro, .endm, .mexit, ... */
+#define   O_MACRO    0          /* .macro */
+#define   O_ENDM     1          /* .endm */
+#define   O_MEXIT    2          /* .mexit */
+#define   O_NCHR     3          /* .nchr */
+#define   O_NARG     4          /* .narg */
+#define   O_NTYP     5          /* .ntyp */
+#define   O_IRP      6          /* .irp */
+#define   O_IRPC     7          /* .irpc */
+#define   O_REPT     8          /* .rept */
+#define   O_NVAL     9          /* .nval */
+#define   O_MDEL     10         /* .mdelete */
+#define   O_CHECK    255        /* Building/Exiting a Macro Check */
+
+#define S_DIREOL        30      /* Assembler Directive End Of List */
 
 /* sdas specific */
-#define S_FLAT24        27      /* .flat24 */
-#define S_FLOAT         28      /* .df */
-#define S_ULEB128       29      /* .uleb128 */
-#define S_SLEB128       30      /* .sleb128 */
-#define S_OPTSDCC       31      /* .optsdcc */
+#define S_FLAT24        31      /* .flat24 */
+#define S_FLOAT         32      /* .df */
+#define S_ULEB128       33      /* .uleb128 */
+#define S_SLEB128       34      /* .sleb128 */
+#define S_OPTSDCC       35      /* .optsdcc */
 /* end sdas specific */
 
 /*
@@ -584,7 +602,7 @@ struct  tsym
         struct  tsym *t_lnk;    /* Link to next */
         a_uint  t_num;          /* 0-65535$      for a 16-bit int */
                                 /* 0-4294967295$ for a 32-bit int */
-        int t_flg;              /* flags */
+        int     t_flg;          /* flags */
         struct  area *t_area;   /* Area */
         a_uint  t_addr;         /* Address */
 };
@@ -665,6 +683,114 @@ struct  asmf
 };
 
 /*
+ *      The macrofp structure masquerades as a FILE Handle
+ *      for inclusion in an asmf structure.  This structure
+ *      contains the reference to the macro to be inserted
+ *      into the assembler stream and information to 
+ *      restore the assembler state at macro completion.
+ *
+ * The Parameters:
+ *      np      is a pointer to the macro definition
+ *      lstptr  is a pointer to the next macro line
+ *      rptcnt  is the macro repeat counter
+ *      rptidx  is the current repeat count
+ *      flevel  is the saved assembler flevel
+ *      tlevel  is the saved assembler tlevel
+ *      lnlist  is the saved assembler lnlist
+ *      npexit  non zero if an .mexit is encountered
+ */
+struct  macrofp {
+        struct mcrdef * np;             /* pointer to macro definition */
+        struct strlst * lstptr;         /* pointer to next line of macro */
+        int             rptcnt;         /* repeat counter */
+        int             rptidx;         /* repeat index */
+        int             flevel;         /* saved flevel */
+        int             tlevel;         /* saved tlevel */
+        int             lnlist;         /* saved lnlist */
+        int             npexit;         /* .mexit called */
+};
+
+/*
+ *      The mcrdef structure contains the
+ *      information about a macro definition.
+ *
+ *      When the macro is defined the definition
+ *      arguments are packed into a linked list of
+ *      strings beginning with bgnarg and ending with
+ *      endarg. The number of args is placed in narg.
+ *
+ *      When the macro is invoked the expansion
+ *      argument strings are placed into a linked
+ *      list of strings beginning with bgnxrg and
+ *      ending with endxrg. The number of expansion
+ *      arguments is placed in xarg.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next macro definition structure
+ *      name    is a pointer to the macro name string
+ *      bgnlst  is a pointer to the first text line of the macro
+ *      endlst  is a pointer to the last  text line of the macro
+ *      type    is the macro type - .macro, .irp, .irpc, or .rept
+ *      rptcnt  is the repeat count for the macro
+ *      nest    is the macro nesting counter
+ *      narg    is the number of macro definition arguments
+ *      bgnarg  is a pointer to the first definition argument string
+ *      endarg  is a pointer to the last  definition argument string
+ *      xarg    is the number of expansion arguments at macro invocation
+ *      bgnxrg  is a pointer to the first expansion argument string
+ *      endxrg  is a pointer to the last  expansion argument string
+ */
+struct  mcrdef {
+        struct mcrdef * next;           /* link to next macro definition */
+        char *          name;           /* pointer to the macro name */
+        struct strlst * bgnlst;         /* link to first text line of macro */
+        struct strlst * endlst;         /* link to last text line of macro */
+        int             type;           /* macro type */
+        int             rptcnt;         /* repeat counter */
+        int             nest;           /* macro nesting counter */
+        int             narg;           /* number of macro defintion arguments */
+        struct strlst * bgnarg;         /* link to first macro defintion argument */
+        struct strlst * endarg;         /* link to last macro definition argument */
+        int             xarg;           /* number of macro expansion arguments */
+        struct strlst * bgnxrg;         /* link to first macro expansion argument */
+        struct strlst * endxrg;         /* link to last macro xpansion argument */
+};
+
+/*
+ *      The strlst structure is a linked list of strings.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next string.
+ *      text    is a pointer to a text string.
+ */
+struct  strlst {
+        struct strlst * next;           /* pointer to next string */
+        char *          text;           /* pointer to string text */
+};
+
+/*
+ *      The memlnk structure is a linked list
+ *      of memory allocations.
+ *
+ *      The function new() uses the memlnk structure
+ *      to create a linked list of allocated memory
+ *      that can be traversed by asfree() to release
+ *      the allocated memory.
+ *
+ *      The function mhunk() uses the memlnk structure
+ *      to create a linked list of allocated memory
+ *      that can be reused.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next memlnk structure.
+ *      ptr     is a pointer to the allocated memory.
+ */
+struct  memlnk {
+        struct memlnk * next;           /* link to next memlnk */
+        VOID *          ptr;            /* pointer to allocated memory */
+};
+
+/*
  *      External Definitions for all Global Variables
  */
 
@@ -682,9 +808,26 @@ extern  struct  asmf    *asmc;  /*      Pointer to the current
 extern  struct  asmf    *asmi;  /*      Queued pointer to an include file
                                  *      source input structure
                                  */
+extern  struct  asmf    *asmq;  /*      Queued pointer to a macro
+                                 *      source input structure
+                                 */
+extern  struct mcrdef * mcrlst; /*      link to list of defined macros
+                                 */
+extern  struct mcrdef * mcrp;   /*      link to list of defined macros
+                                 */
+extern  struct memlnk * pmcrmem;/*      First Macro Memory Allocation Structure
+                                 */
+extern  struct memlnk * mcrmem; /*      Macro Memory Allocation Structure
+                                 */
+extern  int     mcrblk;         /*      Macro data blocks allocated
+                                 */
 extern  int     incfil;         /*      include file nesting counter
                                  */
 extern  int     maxinc;         /*      maximum include file nesting encountered
+                                 */
+extern  int     mcrfil;         /*      macro nesting counter
+                                 */
+extern  int     maxmcr;         /*      maximum macro nesting emcountered
                                  */
 extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                                  *      zero for false conditional case
@@ -714,6 +857,8 @@ extern  int     srcline;        /*      current source line number
 extern  int     asmline;        /*      current assembler file line number
                                  */
 extern  int     incline;        /*      current include file line number
+                                 */
+extern  int     mcrline;        /*      current macro line number
                                  */
 extern  int     radix;          /*      current number conversion radix:
                                  *      2 (binary), 8 (octal), 10 (decimal),
@@ -807,9 +952,6 @@ extern  char    *ib;            /*      assembler-source text line for processin
                                  */
 extern  char    *ic;            /*      assembler-source text line for listing
                                  */
-extern  char    *il;            /*      pointer to the assembler-source
-                                 *      text line to be listed
-                                 */
 extern  char    *cp;            /*      pointer to assembler output
                                  *      array cb[]
                                  */
@@ -895,6 +1037,22 @@ extern  int             intsiz(void);
 extern  VOID            newdot(struct area *nap);
 extern  VOID            phase(struct area *ap, a_uint a);
 extern  VOID            usage(int n);
+
+/* asmcro.c */
+extern  char *          fgetm(char *ptr, int len, FILE *fp);
+extern  VOID            getdarg(struct mcrdef *np);
+extern  VOID            getxarg(struct mcrdef *np);
+extern  VOID            getxstr(char *id);
+extern  VOID            macro(struct mcrdef * np);
+extern  VOID            macroscn(struct macrofp *nfp);
+extern  int             macrosub(char *id, struct macrofp *nfp);
+extern  VOID            mcrinit(void);
+extern  int             mcrprc(int code);
+extern  VOID *          mhunk(void);
+extern  char *          mstring(char *str);
+extern  char *          mstruct(int n);
+extern  struct mcrdef * newdef(int code, char *id);
+extern  struct mcrdef * nlookup(char *id);
 
 /* aslex.c */
 extern  int             comma(int flag);
@@ -994,7 +1152,6 @@ extern  VOID            outr19(struct expr *, int, int);
 
 /* Machine dependent variables */
 
-extern  int             hilo;
 extern  char *          cpu;
 extern  char *          dsft;
 extern  struct  mne     mne[];

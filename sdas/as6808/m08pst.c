@@ -119,12 +119,31 @@ struct  mne     mne[] = {
 /* end sdas specific */
 //    { NULL,   ".assume",      S_ERROR,        0,      0       },
 //    { NULL,   ".error",       S_ERROR,        0,      1       },
+        /* Macro Processor */
+
+    {   NULL,   ".macro",       S_MACRO,        0,      O_MACRO },
+    {   NULL,   ".endm",        S_MACRO,        0,      O_ENDM  },
+    {   NULL,   ".mexit",       S_MACRO,        0,      O_MEXIT },
+
+    {   NULL,   ".narg",        S_MACRO,        0,      O_NARG  },
+    {   NULL,   ".nchr",        S_MACRO,        0,      O_NCHR  },
+    {   NULL,   ".ntyp",        S_MACRO,        0,      O_NTYP  },
+
+    {   NULL,   ".irp",         S_MACRO,        0,      O_IRP   },
+    {   NULL,   ".irpc",        S_MACRO,        0,      O_IRPC  },
+    {   NULL,   ".rept",        S_MACRO,        0,      O_REPT  },
+
+    {   NULL,   ".nval",        S_MACRO,        0,      O_NVAL  },
+
+    {   NULL,   ".mdelete",     S_MACRO,        0,      O_MDEL  },
 
         /* Machines */
 
-        /* S08/CS08/HCS08/68HCS08 */
-
-    {   NULL,   ".cs08",        X_CS08,         0,      0 },
+    {   NULL,   ".hc08",        S_CPU,          0,      X_HC08  },
+    {   NULL,   ".hcs08",       S_CPU,          0,      X_HCS08 },
+    {   NULL,   ".cs08",        S_CPU,          0,      X_HCS08 },
+    {   NULL,   ".6805",        S_CPU,          0,      X_6805  },
+    {   NULL,   ".hc05",        S_CPU,          0,      X_HC05  },
 
         /* 68HC08 */
 
@@ -199,10 +218,10 @@ struct  mne     mne[] = {
     {   NULL,   "bms",          S_BRA,          0,      0x2D    },
     {   NULL,   "bil",          S_BRA,          0,      0x2E    },
     {   NULL,   "bih",          S_BRA,          0,      0x2F    },
-    {   NULL,   "bge",          S_BRA,          0,      0x90    },
-    {   NULL,   "blt",          S_BRA,          0,      0x91    },
-    {   NULL,   "bgt",          S_BRA,          0,      0x92    },
-    {   NULL,   "ble",          S_BRA,          0,      0x93    },
+    {   NULL,   "bge",          S_BRA8,         0,      0x90    },
+    {   NULL,   "blt",          S_BRA8,         0,      0x91    },
+    {   NULL,   "bgt",          S_BRA8,         0,      0x92    },
+    {   NULL,   "ble",          S_BRA8,         0,      0x93    },
     {   NULL,   "bsr",          S_BRA,          0,      0xAD    },
 
     {   NULL,   "nega",         S_INH,          0,      0x40    },
@@ -220,7 +239,7 @@ struct  mne     mne[] = {
     {   NULL,   "clra",         S_INH,          0,      0x4F    },
 
     {   NULL,   "negx",         S_INH,          0,      0x50    },
-    {   NULL,   "div",          S_INH,          0,      0x52    },
+    {   NULL,   "div",          S_INH8,         0,      0x52    },
     {   NULL,   "comx",         S_INH,          0,      0x53    },
     {   NULL,   "lsrx",         S_INH,          0,      0x54    },
     {   NULL,   "rorx",         S_INH,          0,      0x56    },
@@ -233,27 +252,28 @@ struct  mne     mne[] = {
     {   NULL,   "tstx",         S_INH,          0,      0x5D    },
     {   NULL,   "clrx",         S_INH,          0,      0x5F    },
 
-    {   NULL,   "nsa",          S_INH,          0,      0x62    },
+    {   NULL,   "nsa",          S_INH8,         0,      0x62    },
 
-    {   NULL,   "daa",          S_INH,          0,      0x72    },
+    {   NULL,   "daa",          S_INH8,         0,      0x72    },
 
     {   NULL,   "rti",          S_INH,          0,      0x80    },
     {   NULL,   "rts",          S_INH,          0,      0x81    },
+    {   NULL,   "bgnd",         S_INH8S,        0,      0x82    },
     {   NULL,   "swi",          S_INH,          0,      0x83    },
-    {   NULL,   "tap",          S_INH,          0,      0x84    },
-    {   NULL,   "tpa",          S_INH,          0,      0x85    },
-    {   NULL,   "pula",         S_INH,          0,      0x86    },
-    {   NULL,   "psha",         S_INH,          0,      0x87    },
-    {   NULL,   "pulx",         S_INH,          0,      0x88    },
-    {   NULL,   "pshx",         S_INH,          0,      0x89    },
-    {   NULL,   "pulh",         S_INH,          0,      0x8A    },
-    {   NULL,   "pshh",         S_INH,          0,      0x8B    },
-    {   NULL,   "clrh",         S_INH,          0,      0x8C    },
+    {   NULL,   "tap",          S_INH8,         0,      0x84    },
+    {   NULL,   "tpa",          S_INH8,         0,      0x85    },
+    {   NULL,   "pula",         S_INH8,         0,      0x86    },
+    {   NULL,   "psha",         S_INH8,         0,      0x87    },
+    {   NULL,   "pulx",         S_INH8,         0,      0x88    },
+    {   NULL,   "pshx",         S_INH8,         0,      0x89    },
+    {   NULL,   "pulh",         S_INH8,         0,      0x8A    },
+    {   NULL,   "pshh",         S_INH8,         0,      0x8B    },
+    {   NULL,   "clrh",         S_INH8,         0,      0x8C    },
     {   NULL,   "stop",         S_INH,          0,      0x8E    },
     {   NULL,   "wait",         S_INH,          0,      0x8F    },
 
-    {   NULL,   "txs",          S_INH,          0,      0x94    },
-    {   NULL,   "tsx",          S_INH,          0,      0x95    },
+    {   NULL,   "txs",          S_INH8,         0,      0x94    },
+    {   NULL,   "tsx",          S_INH8,         0,      0x95    },
     {   NULL,   "tax",          S_INH,          0,      0x97    },
     {   NULL,   "clc",          S_INH,          0,      0x98    },
     {   NULL,   "sec",          S_INH,          0,      0x99    },

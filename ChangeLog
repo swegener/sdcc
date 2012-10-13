@@ -1,3 +1,33 @@
+2012-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/m08mch.c,
+	* sdas/as6808/m08pst.c,
+	* sdas/as6808/m6808.h,
+	* sdas/as6808/Makefile.in,
+	* sdas/as8051/i51mch.c,
+	* sdas/as8051/i51pst.c,
+	* sdas/as8051/Makefile.in,
+	* sdas/asgb/gb.h,
+	* sdas/asgb/gbadr.c,
+	* sdas/asgb/gbmch.c,
+	* sdas/asgb/Makefile.in,
+	* sdas/asrab/Makefile.in,
+	* sdas/asrab/rab.h,
+	* sdas/asrab/rabadr.c,
+	* sdas/asrab/rabmch.c,
+	* sdas/asrab/rabpst.c,
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asexpr.c,
+	* sdas/asxxsrc/aslex.c,
+	* sdas/asxxsrc/aslist.c,
+	* sdas/asxxsrc/asmain.c,
+	* sdas/asxxsrc/asxxxx.h,
+	* sdas/asz80/Makefile.in,
+	* sdas/asz80/z80.h,
+	* sdas/asz80/z80adr.c,
+	* sdas/asz80/z80mch.c,
+	* sdas/asz80/z80pst.c: added ASxxxx v5 macro support
+
 2012-10-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCtree_dec.hpp,

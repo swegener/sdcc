@@ -90,9 +90,8 @@ struct  mne     mne[] = {
     {   NULL,   ".equ",         S_EQU,          0,      O_EQU   },
     {   NULL,   ".gblequ",      S_EQU,          0,      O_GBLEQU},
     {   NULL,   ".lclequ",      S_EQU,          0,      O_LCLEQU},
-
-    {   NULL,   ".flat24",      S_FLAT24,       0,      0       },
 /* sdas specific */
+    {   NULL,   ".flat24",      S_FLAT24,       0,      0       },
     {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0       },
 /* end sdas specific */
     {   NULL,   ".byte",        S_DATA,         0,      O_1BYTE },
@@ -122,6 +121,24 @@ struct  mne     mne[] = {
     {   NULL,   ".even",        S_BOUNDARY,     0,      O_EVEN  },
     {   NULL,   ".odd",         S_BOUNDARY,     0,      O_ODD   },
     {   NULL,   ".bndry",       S_BOUNDARY,     0,      O_BNDRY },
+
+        /* Macro Processor */
+
+    {   NULL,   ".macro",       S_MACRO,        0,      O_MACRO },
+    {   NULL,   ".endm",        S_MACRO,        0,      O_ENDM  },
+    {   NULL,   ".mexit",       S_MACRO,        0,      O_MEXIT },
+
+    {   NULL,   ".narg",        S_MACRO,        0,      O_NARG  },
+    {   NULL,   ".nchr",        S_MACRO,        0,      O_NCHR  },
+    {   NULL,   ".ntyp",        S_MACRO,        0,      O_NTYP  },
+
+    {   NULL,   ".irp",         S_MACRO,        0,      O_IRP   },
+    {   NULL,   ".irpc",        S_MACRO,        0,      O_IRPC  },
+    {   NULL,   ".rept",        S_MACRO,        0,      O_REPT  },
+
+    {   NULL,   ".nval",        S_MACRO,        0,      O_NVAL  },
+
+    {   NULL,   ".mdelete",     S_MACRO,        0,      O_MDEL  },
 
         /* machine */
 

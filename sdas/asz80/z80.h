@@ -143,8 +143,19 @@
 #define	S_SUB	81
 #define	S_SBC	82
 
+/*
+ * CPU Types
+ */
+#define	S_CPU	83
+
 #define S_RL_UNDOCD  85
 #define X_UNDOCD 89
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_Z80	0
+#define	X_HD64	1
 
 /*
  * HD64180 Instructions
@@ -155,7 +166,6 @@
 #define	X_MLT	93
 #define	X_TST	94
 #define	X_TSTIO	95
-#define	X_HD64	96
 
 struct adsym
 {
@@ -179,7 +189,6 @@ extern	struct	adsym	CND[];
 	/* z80adr.c */
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(char c, char *str);
 extern	int		srch(char *str);
 
 	/* z80mch.c */
@@ -194,7 +203,6 @@ extern	VOID		minit(void);
 	/* z80adr.c */
 extern	int		addr();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 	/* z80mch.c */

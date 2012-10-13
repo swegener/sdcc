@@ -46,7 +46,7 @@ UTILSRC = dbuf.c dbuf_string.c
 UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
 
 ASXXLIB = $(srcdir)/../asxxsrc
-ASXXLIBSRC = asdbg.c asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c assubr.c assym.c sdas.c strcmpi.c
+ASXXLIBSRC = asdbg.c asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c assubr.c assym.c asmcro.c sdas.c strcmpi.c
 ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
 
 SRC = rabpst.c rabmch.c rabadr.c

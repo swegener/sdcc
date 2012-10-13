@@ -518,7 +518,7 @@ comma(int flag)
 /*)Function     int     nxtline()
  *
  *      The function nxtline() reads a line of assembler-source text
- *      from an assembly source text file or an include file.
+ *      from an assembly source text file, include file, or macro.
  *      Lines of text are processed from assembler-source files until
  *      all files have been read.  If an include file is opened then
  *      lines of text are read from the include file (or nested
@@ -532,26 +532,24 @@ comma(int flag)
  *
  *      local variables:
  *              int     len             string length
+ *              struct asmf     *asmt   temporary pointer to the processing structure
  *
  *      global variables:
+ *              char    afn[]           afile() constructed filespec
+ *              int     afp             afile constructed path length
+ *              asmf *  asmc            pointer to current assembler file structure
+ *              asmf *  asmi            pointer to a queued include file structure
+ *              asmf *  asmq            pointer to a queued macro structure
  *              char *  ib              string buffer containing
  *                                      assembler-source text line for processing
  *              char *  ic              string buffer containing
  *                                      assembler-source text line for listing
- *              char    ifp[]           array of file handles for
- *                                      include files
- *              int     incfil          index for ifp[] specifies
- *                                      active include file
- *              int     incline[]       array of include file
- *                                      line numbers
+ *              int     asmline         source file line number
+ *              int     incfil          current include file count
+ *              int     incline         include file line number
  *              int     lnlist          LIST-NLIST state
- *              char    sfp[]           array of file handles for
- *                                      assembler source files
- *              int     cfile           index for sfp[] specifies
- *                                      active source file
- *              int     srcline[]       array of source file
- *                                      line numbers
- *              int     inpfil          maximum input file index
+ *              int     mcrline         macro line number
+ *              int     srcline         current source line number
  *              int     uflag           -u, disable .list/.nlist processing
  *
  *      called functions:
@@ -561,15 +559,89 @@ comma(int flag)
  *              const char * dbuf_c_str()
  *              int     dbuf_append_str()
  *              int     fclose()        c-library
- *              char *  fgets()         c-library
- *              int     strlen()        c-library
+ *              char *  fgetm()         asmcro.c
+ *              char *  strcpy()        c_library
  *
  *      side effects:
  *              include file will be closed at detection of end of file.
  *              the next sequential source file may be selected.
- *              the global file indexes incfil or cfile may be changed.
- *              The respective source line or include line counter
- *              will be updated.
+ *              The current file specification afn[] and the path
+ *              length afp may be changed.
+ *              The respective line counter will be updated.
+ *
+ * --------------------------------------------------------------
+ *
+ * How the assembler sequences the command line assembler
+ * source files, include files, and macros is shown in a
+ * simplified manner in the following.
+ *
+ *      main[asmain] sequences the command line files by creating
+ *      a linked list of asmf structures, one for each file.
+ *
+ *      asmf structures:
+ *                   -------------       -------------               -------------
+ *                  | File 1      |     | File 2      |             | File N      |
+ *       ------     |       ------|     |       ------|             |       ------|      
+ *      | asmp | -->|      | next | --> |      | next | --> ... --> |      | NULL |
+ *       ------      -------------       -------------               -------------
+ *
+ *      At the beginning of each assembler pass set asmc = asmp
+ *      and process the files in sequence.
+ *
+ *      If the source file invokes the .include directive to process a
+ *      file then a new asmf structure is prepended to the asmc structure
+ *      currently being processed.  At the end of the include file the
+ *      processing resumes at the point the asmc structure was interrupted.
+ *      This is shown in the following:
+ *
+ *                   ------------- 
+ *                  | Incl File 1 |
+ *                  |       ------|
+ *                  |      | next |
+ *                   ------------- 
+ *                             |
+ *      asmf structures:       |
+ *                             V
+ *                   -------------       -------------               -------------
+ *                  | File 1      |     | File 2      |             | File N      |
+ *       ------     |       ------|     |       ------|             |       ------|      
+ *      | asmp | -->|      | next | --> |      | next | --> ... --> |      | NULL |
+ *       ------      -------------       -------------               -------------
+ *
+ *      At the .include point link the asmi structure to asmc
+ *      and then set asmc = asmi (the include file asmf structure).
+ *
+ *      If a source file invokes a macro then a new asmf structure is
+ *      prepended to the asmc structure currently being processed.  At the
+ *      end of the macro the processing resumes at the point the asmc
+ *      structure was interrupted.
+ *      This is shown in the following:
+ *
+ *                   -------------       -------------
+ *                  | Incl File 1 |     |    Macro    |
+ *                  |       ------|     |       ------|
+ *                  |      | next |     |      | next |
+ *                   -------------       -------------
+ *                             |                   |
+ *      asmf structures:       |                   |
+ *                             V                   V
+ *                   -------------       -------------               -------------
+ *                  | File 1      |     | File 2      |             | File N      |
+ *       ------     |       ------|     |       ------|             |       ------|      
+ *      | asmp | -->|      | next | --> |      | next | --> ... --> |      | NULL |
+ *       ------      -------------       -------------               -------------
+ *
+ *      At the macro point link the asmq structure to asmc
+ *      and then set asmc = asmq (the macro asmf structure).
+ *
+ *      Note that both include files and macros can be nested.
+ *      Macros may be invoked within include files and include
+ *      files can be invoked within macros.
+ *
+ *      Include files are opened, read, and closed on each pass
+ *      of the assembler.
+ *
+ *      Macros are recreated during each pass of the assembler.
  */
 
 int
@@ -578,6 +650,7 @@ nxtline(void)
         static struct dbuf_s dbuf_ib;
         static struct dbuf_s dbuf_ic;
         size_t len;
+        struct asmf *asmt;
 
         if (!dbuf_is_initialized (&dbuf_ib))
                 dbuf_init (&dbuf_ib, 1024);
@@ -596,6 +669,15 @@ loop:   if (asmc == NULL) return(0);
                 asmi = NULL;
                 incline = 0;
         }
+        /*
+         * Insert Queued Macro
+         */
+        if (asmq != NULL) {
+                asmc = asmq;
+                asmq = NULL;
+                mcrline = 0;
+        }
+
         switch(asmc->objtyp) {
         case T_ASM:
                 if ((len = dbuf_getline (&dbuf_ib, asmc->fp)) == 0) {
@@ -642,9 +724,20 @@ loop:   if (asmc == NULL) return(0);
                         default:
                         case T_ASM:     asmline = srcline;      break;
                         case T_INCL:    incline = srcline;      break;
+                        case T_MACRO:   mcrline = srcline;      break;
                         }
-                        strcpy(afn, asmc->afn);
-                        afp = asmc->afp;
+                        /*
+                         * Scan for parent file
+                         */
+                        asmt = asmc;
+                        while (asmt != NULL) {
+                                if (asmt->objtyp != T_MACRO) {
+                                        strcpy(afn, asmt->afn);
+                                        afp = asmt->afp;
+                                        break;
+                                }
+                                asmt = asmt->next;
+                        }
                         if ((lnlist & LIST_PAG) || (uflag == 1)) {
                                 lop = NLPP;
                         }
@@ -655,6 +748,29 @@ loop:   if (asmc == NULL) return(0);
                                 afp = asmc->afp;
                         }
                         srcline = incline;
+                }
+                break;
+
+        case T_MACRO:
+                if (fgetm(ib, dbuf_ib.alloc, asmc->fp) == NULL) {
+                        mcrfil -= 1;
+                        srcline = asmc->line;
+                        flevel = asmc->flevel;
+                        tlevel = asmc->tlevel;
+                        lnlist = asmc->lnlist;
+                        asmc = asmc->next;
+                        switch (asmc->objtyp) {
+                        default:
+                        case T_ASM:     asmline = srcline;      break;
+                        case T_INCL:    incline = srcline;      break;
+                        case T_MACRO:   mcrline = srcline;      break;
+                        }
+                        goto loop;
+                } else {
+                        if (mcrline++ == 0) {
+                                ;
+                        }
+                        srcline = mcrline;
                 }
                 break;
 
@@ -704,7 +820,19 @@ loop:   if (asmc == NULL) return(0);
 int
 getlnm()
 {
+        struct asmf *asmt;
+
         line = srcline;
+        if (asmc->objtyp == T_MACRO) {
+                asmt = asmc->next;
+                while (asmt != NULL) {
+                        switch (asmt->objtyp) {
+                        case T_ASM:     return(line = asmline);
+                        case T_INCL:    return(line = asmt->line);
+                        default:        asmt = asmt->next;              break;
+                        }
+                }
+        }
         return(line);
 }
 

@@ -52,6 +52,7 @@
  *              VOID    asmbl()
  *              VOID    equate()
  *              FILE *  afile(fn, ft, wf)
+ *              int     fndidx(str)
  *              int     intsiz()
  *              VOID    newdot(nap)
  *              VOID    phase(ap, a)
@@ -212,16 +213,16 @@ search_path_fopen(const char *filename, const char *mode)
  *                                      address of symbols caused by
  *                                      variable length instruction formats
  *              int     gflag           -g, make undefined symbols global flag
- *              char    ib[]            string buffer containing
+ *              char  * ib              string buffer containing
  *                                      assembler-source text line for processing
- *              char    ic[]            string buffer containing
+ *              char  * ic              string buffer containing
  *                                      assembler-source text line for listing
  *              int     ifcnd[]         array of IF statement condition
  *                                      values (0 = FALSE) indexed by tlevel
  *              int     iflvl[]         array of IF-ELSE-ENDIF flevel
  *                                      values indexed by tlevel
- *              int     incfil          current file handle index
- *                                      for include files
+ *              int     incfil          current include file count
+ *              int     incline         include source file line number
  *              char *  ip              pointer into the assembler-source
  *                                      text line in ib[]
  *              jmp_buf jump_env        compiler dependent structure
@@ -231,6 +232,7 @@ search_path_fopen(const char *filename, const char *mode)
  *                                      line number
  *              int     lnlist          current LIST-NLIST state
  *              int     lop             current line number on page
+ *              int     maxinc          maximum include file nesting counter
  *              int     oflag           -o, generate relocatable output flag
  *              int     jflag           -j, generate debug info flag
  *              int     page            current page number
@@ -262,7 +264,9 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     int32siz()      asmain.c
  *              VOID    list()          aslist.c
  *              VOID    lstsym()        aslist.c
+ *              VOID    mcrinit()       asmcro.c
  *              VOID    minit()         ___mch.c
+ *              char *  new()           assym.c
  *              VOID    newdot()        asmain.c
  *              int     nxtline()       aslex.c
  *              VOID    outbuf()        asout.c
@@ -460,12 +464,6 @@ main(int argc, char *argv[])
         syminit();
         for (pass=0; pass<3; ++pass) {
                 aserr = 0;
-                /* ib/ic are dynamically allocated */
-                if (bflag != 0) {
-                        il = ib;
-                } else {
-                        il = ic;
-                }
                 if (gflag && pass == 1)
                         symglob();
                 if (aflag && pass == 1)
@@ -510,6 +508,7 @@ main(int argc, char *argv[])
                 outbuf("I");
                 outchk(0,0);
                 symp = &dot;
+                mcrinit();
                 minit();
                 while (nxtline()) {
                         cp = cb;
@@ -635,12 +634,13 @@ asexit(int i)
  *      The function asmbl() scans the assembler-source text for
  *      (1) labels, global labels, equates, global equates, and local
  *      symbols, (2) .if, .else, .endif, and .page directives,
- *      (3) machine independent assembler directives, and (4) machine
- *      dependent mnemonics.
+ *      (3) machine independent assembler directives, (4) macros and
+ *      macro definitions, and (5) machine dependent mnemonics.
  *
  *      local variables:
  *              mne *   mp              pointer to a mne structure
  *              mne *   xp              pointer to a mne structure
+ *              mcrdef *np              pointer to a macro definition structure
  *              sym *   sp              pointer to a sym structure
  *              tsym *  tp              pointer to a tsym structure
  *              int     c               character from assembler-source
@@ -707,10 +707,14 @@ asexit(int i)
  *              int     getmap()        aslex.c
  *              int     getnb()         aslex.c
  *              VOID    getst()         aslex.c
+ *              VOID    getxstr()       asmcro.c
  *              sym *   lookup()        assym.c
  *              VOID    machine()       ___mch.c
+ *              int     macro()         asmcro.c
+ *              int     mcrprc()        asmcro.c
  *              mne *   mlookup()       assym.c
  *              int     more()          aslex.c
+ *              mcrdef *nlookup()       asmcro.c
  *              char *  new()           assym.c
  *              VOID    newdot()        asmain.c
  *              VOID    outall()        asout.c
@@ -730,6 +734,7 @@ VOID
 asmbl(void)
 {
         struct mne *mp, *xp;
+        struct mcrdef *np;
         struct sym *sp;
         struct tsym *tp;
         int c;
@@ -760,6 +765,14 @@ asmbl(void)
         if (ftflevel != 0) {
                 flevel = ftflevel - 1;
                 ftflevel = 0;
+        }
+
+        /*
+         * Check if Building a Macro
+         * Check if Exiting  a Macro
+         */
+        if (mcrprc(O_CHECK) != 0) {
+                return;
         }
 
 loop:
@@ -916,7 +929,7 @@ loop:
          *     [labels] sym .glbequ value   defines a global equate
          *     [labels] sym .lclequ value   defines a local equate
          */
-        if (mlookup(id) == NULL) {
+        if ((mlookup(id) == NULL) && (nlookup(id) == NULL)) {
                 if (flevel)
                         return;
                 /*
@@ -936,11 +949,12 @@ loop:
          */
         lmode = flevel ? SLIST : CLIST;
         /*
-         * An assembler directive or mnemonic is
+         * An assembler directive, mnemonic, or macro is
          * required to continue processing line.
          */
         mp = mlookup(id);
-        if (mp == NULL) {
+        np = nlookup(id);
+        if ((mp == NULL) && (np == NULL)) {
                 if (!flevel) {
                         err('o');
                 }
@@ -948,7 +962,8 @@ loop:
         }
         /*
          * If we have gotten this far then we have found an
-         * assembler directive or an assembler mnemonic.
+         * assembler directive an assembler mnemonic or
+         * an assembler macro.
          *
          * Check for .if[], .iif[], .else, .endif,
          * .list, .nlist, and .page directives.
@@ -1738,13 +1753,25 @@ loop:
                 break;
         /* end sdas hc08 specific */
 
+        case S_MACRO:
+                lmode = SLIST;
+                mcrprc((int) mp->m_valu);
+                return;
+
         /*
          * If not an assembler directive then go to the
-         * machine dependent function
+         * macro function or machine dependent function
          * which handles all the assembler mnemonics.
+         *
+         * MACRO Definitions take precedence
+         * over machine specific mmnemonics.
          */
         default:
-                machine(mp);
+                if (np != NULL) {
+                        macro(np);
+                } else {
+                        machine(mp);
+                }
 
                 /*
                  * Include Files and Macros are not Debugged
@@ -1899,7 +1926,7 @@ afile(char *fn, char *ft, int wf)
 
         if ((fp = fopen(afntmp, wf?"w":"r")) == NULL) {
             fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afntmp);
-                asexit(ER_FATAL);
+            asexit(ER_FATAL);
         }
 
         strcpy(afn, afntmp);

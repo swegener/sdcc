@@ -61,10 +61,6 @@ struct expr *esp;
                 if ((indx = admode(R16)) != 0) {
                         mode = S_INDR;
                 } else
-                if ((indx = admode(R8X)) != 0) {
-                        mode = S_R8X;
-                        aerr();
-                } else
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
                         aerr();
@@ -86,9 +82,6 @@ struct expr *esp;
                 } else
                 if ((indx = admode(R16)) != 0) {
                         mode = S_R16;
-                } else
-                if ((indx = admode(R8X)) != 0) {
-                        mode = S_R8X;
                 } else
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
@@ -199,12 +192,6 @@ struct  adsym   R8[] = {
     {   "h",    H|0400  },
     {   "l",    L|0400  },
     {   "a",    A|0400  },
-    {   "",     0000    }
-};
-
-struct  adsym   R8X[] = {
-    {   "i",    I|0400  },
-    {   "r",    R|0400  },
     {   "",     0000    }
 };
 

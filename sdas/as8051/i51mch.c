@@ -34,7 +34,6 @@
 #include "asxxxx.h"
 #include "i8051.h"
 
-int     hilo    = 1;
 char    *cpu    = "Intel 8051";
 char    *dsft   = "asm";
 

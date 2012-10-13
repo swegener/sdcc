@@ -33,9 +33,6 @@
  *      mike dot mccarty at sbcglobal dot net
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "asxxxx.h"
 
 /*)Module       asdata.c
@@ -84,9 +81,96 @@ struct  asmf    *asmc;  /*      Pointer to the current
 struct  asmf    *asmi;  /*      Queued pointer to an include file
                          *      source input structure
                          */
+struct  asmf    *asmq;  /*      Queued pointer to a macro
+                         *      source input structure
+                         */
+
+/*
+ *      The mcrdef structure contains the
+ *      information about a macro definition.
+ *
+ *      When the macro is defined the definition
+ *      arguments are packed into a linked list of
+ *      strings beginning with bgnarg and ending with
+ *      endarg. The number of args is placed in narg.
+ *
+ *      When the macro is invoked the expansion
+ *      argument strings are placed into a linked
+ *      list of strings beginning with bgnxrg and
+ *      ending with endxrg. The number of expansion
+ *      arguments is placed in xarg.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next macro definition structure
+ *      name    is a pointer to the macro name string
+ *      bgnlst  is a pointer to the first text line of the macro
+ *      endlst  is a pointer to the last  text line of the macro
+ *      type    is the macro type - .macro, .irp, .irpc, or .rept
+ *      rptcnt  is the repeat count for the macro
+ *      nest    is the macro nesting counter
+ *      narg    is the number of macro definition arguments
+ *      bgnarg  is a pointer to the first definition argument string
+ *      endarg  is a pointer to the last  definition argument string
+ *      xarg    is the number of expansion arguments at macro invocation
+ *      bgnxrg  is a pointer to the first expansion argument string
+ *      endxrg  is a pointer to the last  expansion argument string
+ *
+ *      struct  mcrdef {
+ *              struct mcrdef * next;           link to next macro definition
+ *              char *          name;           pointer to the macro name
+ *              struct strlst * bgnlst;         link to first text line of macro
+ *              struct strlst * endlst;         link to last text line of macro
+ *              int             type;           macro type
+ *              int             rptcnt;         repeat counter
+ *              int             nest;           macro nesting counter
+ *              int             narg;           number of macro defintion arguments
+ *              struct strlst * bgnarg;         link to first macro defintion argument
+ *              struct strlst * endarg;         link to last macro definition argument
+ *              int             xarg;           number of macro expansion arguments
+ *              struct strlst * bgnxrg;         link to first macro expansion argument
+ *              struct strlst * endxrg;         link to last macro xpansion argument
+ *      };
+ */
+struct mcrdef * mcrlst; /*      link to list of defined macros
+                         */
+struct mcrdef * mcrp;   /*      link to list of defined macros
+                         */
+
+/*
+ *      The memlnk structure is a linked list
+ *      of memory allocations.
+ *
+ *      The function new() uses the memlnk structure
+ *      to create a linked list of allocated memory
+ *      that can be traversed by asfree() to release
+ *      the allocated memory.
+ *
+ *      The function mhunk() uses the memlnk structure
+ *      to create a linked list of allocated memory
+ *      that can be reused.
+ *
+ * The Parameters:
+ *      next    is a pointer to the next memlnk structure.
+ *      ptr     is a pointer to the allocated memory.
+ *
+ *      struct  memlnk {
+ *              struct memlnk * next;           link to next memlnk
+ *              VOID *          ptr;            pointer to allocated memory
+ *      };
+ */
+struct memlnk * pmcrmem;/*      First Macro Memory Allocation Structure
+                         */
+struct memlnk * mcrmem; /*      Macro Memory Allocation Structure
+                         */
+int     mcrblk;         /*      new data blocks allocated
+                         */
 int     incfil;         /*      include file nesting counter
                          */
 int     maxinc;         /*      maximum include file nesting encountered
+                         */
+int     mcrfil;         /*      macro nesting counter
+                         */
+int     maxmcr;         /*      maximum macro nesting encountered
                          */
 int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                          *      zero for false conditional case
@@ -116,6 +200,8 @@ int     srcline;        /*      current source line number
 int     asmline;        /*      current assembler file line number
                          */
 int     incline;        /*      current include file line number
+                         */
+int     mcrline;        /*      current macro line number
                          */
 int     radix;          /*      current number conversion radix:
                          *      2 (binary), 8 (octal), 10 (decimal),
@@ -180,9 +266,6 @@ char    *ip;            /*      pointer into the assembler-source
 char    *ib;            /*      assembler-source text line for processing
                          */
 char    *ic;            /*      assembler-source text line for listing
-                         */
-char    *il;            /*      pointer to the assembler-source
-                         *      text line to be listed
                          */
 char    *cp;            /*      pointer to assembler output
                          *      array cb[]
@@ -272,8 +355,11 @@ struct  mne     *mnehash[NHASH];
  *      };
  */
 struct  sym     sym[] = {
-    {   NULL,   NULL,   ".",        S_USER, 0,                  NULL,   0,  0,  0},
-    {   NULL,   NULL,   ".__.ABS.", S_USER, S_ASG|S_GBL|S_EOL,  NULL,   0,  0,  0}
+    {   NULL,   NULL,   ".",        S_USER, 0,                  NULL,   0,  0,  0 },
+    {   NULL,   NULL,   ".__.ABS.", S_USER, S_ASG|S_GBL,        NULL,   0,  0,  0 },
+    {   NULL,   NULL,   ".__.CPU.", S_USER, S_ASG|S_LCL,        NULL,   0,  0,  0 },
+    {   NULL,   NULL,   ".__.H$L.", S_USER, S_ASG|S_LCL,        NULL,   0,  0,  0 },
+    {   NULL,   NULL,   ".__.$$$.", S_USER, S_ASG|S_LCL|S_EOL,  NULL,   0,  0,  0 }
 };
 
 struct  sym     *symp;          /*      pointer to a symbol structure

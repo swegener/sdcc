@@ -82,6 +82,7 @@
  *              VOID    abscheck()      asexpr.c
  *              VOID    clrexpr()       asexpr.c
  *              VOID    expr()          asexpr.c
+ *              int     get()           aslex.c
  *              int     getnb()         aslex.c
  *              int     oprio()         asexpr.c
  *              VOID    qerr()          assubr.c

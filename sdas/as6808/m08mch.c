@@ -25,11 +25,180 @@
 #include "asxxxx.h"
 #include "m6808.h"
 
-int allow_cs08_code;
-
 char    *cpu    = "Motorola 68HC(S)08";
-int     hilo    = 1;
 char    *dsft   = "asm";
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define OPCY_SDP        ((char) (0xFF))
+#define OPCY_ERR        ((char) (0xFE))
+#define OPCY_CPU        ((char) (0xFD))
+
+
+/*      OPCY_NONE       ((char) (0x80)) */
+/*      OPCY_MASK       ((char) (0x7F)) */
+
+#define UN      ((char) (OPCY_NONE | 0x00))
+#define P2      ((char) (OPCY_NONE | 0x01))
+
+
+/*
+ * 6805 Cycles
+ */
+
+static char m05cyc[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*10*/   7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+/*20*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6,UN, 6,
+/*40*/   4,UN,UN, 4, 4,UN, 4, 4, 4, 4, 4,UN, 4, 4,UN, 4,
+/*50*/   4,UN,UN, 4, 4,UN, 4, 4, 4, 4, 4,UN, 4, 4,UN, 4,
+/*60*/   7,UN,UN, 7, 7,UN, 7, 7, 7, 7, 7,UN, 7, 7,UN, 7,
+/*70*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6,UN, 6,
+/*80*/   9, 6,UN,11,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 2, 2,
+/*90*/  UN,UN,UN,UN,UN,UN,UN, 2, 2, 2, 2, 2, 2, 2,UN, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 2,UN, 2, 2, 2, 2,UN, 8, 2,UN,
+/*B0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5,
+/*C0*/   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
+/*D0*/   6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 5, 9, 6, 7,
+/*E0*/   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
+/*F0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5
+};
+
+
+/*
+ * 146805 CMOS Cycles
+ */
+
+static char mcmcyc[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*10*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*20*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   5,UN,UN, 5, 5,UN, 5, 5, 5, 5, 5,UN, 5, 4,UN, 5,
+/*40*/   3,UN,UN, 3, 3,UN, 3, 3, 3, 3, 3,UN, 3, 3,UN, 3,
+/*50*/   3,UN,UN, 3, 3,UN, 3, 3, 3, 3, 3,UN, 3, 3,UN, 3,
+/*60*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 5,UN, 6,
+/*70*/   5,UN,UN, 5, 5,UN, 5, 5, 5, 5, 5,UN, 5, 4,UN, 5,
+/*80*/   9, 6,UN,10,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 2, 2,
+/*90*/  UN,UN,UN,UN,UN,UN,UN, 2, 2, 2, 2, 2, 2, 2,UN, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 2,UN, 2, 2, 2, 2,UN, 6, 2,UN,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4,
+/*C0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
+/*D0*/   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 7, 5, 6,
+/*E0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
+/*F0*/   3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4
+};
+
+
+/*
+ * 68HC08 Cycles
+ */
+
+static char  m08pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*10*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*20*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   4, 5,UN, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 3,UN, 3,
+/*40*/   1, 4, 5, 1, 1, 3, 1, 1, 1, 1, 1, 3, 1, 1, 5, 1,
+/*50*/   1, 4, 7, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 4, 1,
+/*60*/   4, 5, 3, 4, 4, 3, 4, 4, 4, 4, 4, 5, 4, 3, 4, 3,
+/*70*/   3, 4, 2, 3, 3, 4, 3, 3, 3, 3, 3, 4, 3, 2, 4, 2,
+/*80*/   7, 4,UN, 9, 2, 1, 2, 2, 2, 2, 2, 2, 1,UN, 1, 1,
+/*90*/   3, 3, 3, 3, 2, 2,UN, 1, 1, 1, 2, 2, 1, 1,P2, 1,
+/*A0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,UN, 4, 2, 2,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 4, 3, 3,
+/*C0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 5, 4, 4,
+/*D0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4,
+/*E0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 3,
+/*F0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2
+};
+
+static char  m08pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/   5, 6,UN, 5, 5,UN, 5, 5, 5, 5, 5, 6, 5, 4,UN, 4,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,UN,UN, 5, 5,
+/*E0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,UN,UN, 4, 4,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char *m08Page[2] = {
+    m08pg1, m08pg2
+};
+
+
+/*
+ * 68HCS08 Cycles
+ */
+
+static char  s08pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*10*/   5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*20*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 7, 5, 4, 6, 5,
+/*40*/   1, 4, 5, 1, 1, 3, 1, 1, 1, 1, 1, 4, 1, 1, 6, 1,
+/*50*/   1, 4, 6, 1, 1, 4, 1, 1, 1, 1, 1, 4, 1, 1, 5, 1,
+/*60*/   5, 5, 1, 5, 5, 3, 5, 5, 5, 5, 5, 7, 5, 4, 4, 5,
+/*70*/   4, 5, 1, 4, 4, 5, 4, 4, 4, 4, 4, 6, 4, 3, 5, 4,
+/*80*/   9, 6, 5,11, 1, 1, 3, 2, 3, 2, 3, 2, 1,UN, 2, 2,
+/*90*/   3, 3, 3, 3, 2, 2, 5, 1, 1, 1, 1, 1, 1, 1,P2, 1,
+/*A0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,UN, 5, 2, 2,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 3,
+/*C0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4,
+/*D0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4,
+/*E0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 3,
+/*F0*/   3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 5, 3, 2
+};
+
+static char  s08pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/   6, 6,UN, 6, 6,UN, 6, 6, 6, 6, 6, 8, 6, 5,UN, 6,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*D0*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,UN,UN, 5, 5,
+/*E0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,UN,UN, 4, 4,
+/*F0*/  UN,UN,UN, 6,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 5, 5
+};
+
+static char *s08Page[2] = {
+    s08pg1, s08pg2
+};
+
+
+static int mchtyp;
+
 
 /*
  * Process a machine op.
@@ -53,6 +222,7 @@ struct mne *mp;
         switch (type) {
 
         case S_SDP:
+                opcycles = OPCY_SDP;
                 espa = NULL;
                 if (more()) {
                         expr(&e1, 0);
@@ -79,10 +249,35 @@ struct mne *mp;
                 lmode = SLIST;
                 break;
 
+        case S_CPU:
+                opcycles = OPCY_CPU;
+                mchtyp = op;
+                sym[2].s_addr = op;
+                lmode = SLIST;
+                break;
+
+        case S_INH8S:
+                if (mchtyp != X_HCS08) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                } /* Fall Through */
+        case S_INH8:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                } /* Fall Through */
         case S_INH:
                 outab(op);
                 break;
 
+        case S_BRA8:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                } /* Fall Through */
         case S_BRA:
                 expr(&e1, 0);
                 outab(op);
@@ -127,10 +322,12 @@ struct mne *mp;
                 if (t1 == S_SP1 || t1 == S_SP2) {
                         if (chkindx(&e1))
                                 aerr();
-                        outab(0x9e);
-                        outab(op+0x30);
-                        outrb(&e1, R_USGN);
-                        break;
+                        if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
+                                outab(0x9e);
+                                outab(op+0x30);
+                                outrb(&e1, R_USGN);
+                                break;
+                        }
                 }
                 aerr();
                 break;
@@ -170,20 +367,24 @@ struct mne *mp;
                         break;
                 }
                 if (t1 == S_SP1) {
-                        if (op == 0xAC || op == 0xAD)
-                                aerr();
-                        outab(0x9e);
-                        outab(op+0x40);
-                        outrb(&e1, R_USGN);
-                        break;
+                        if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
+                                if (op == 0xAC || op == 0xAD)
+                                        aerr();
+                                outab(0x9e);
+                                outab(op+0x40);
+                                outrb(&e1, R_USGN);
+                                break;
+                        }
                 }
                 if (t1 == S_SP2) {
-                        if (op == 0xAC || op == 0xAD)
-                                aerr();
-                        outab(0x9e);
-                        outab(op+0x30);
-                        outrw(&e1, 0);
-                        break;
+                        if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
+                                if (op == 0xAC || op == 0xAD)
+                                        aerr();
+                                outab(0x9e);
+                                outab(op+0x30);
+                                outrw(&e1, 0);
+                                break;
+                        }
                 }
                 aerr();
                 break;
@@ -227,6 +428,11 @@ struct mne *mp;
                 break;
 
         case S_TYPAI:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 t1 = addr(&e1);
                 if (t1 == S_IMMED) {
                         outab(op);
@@ -244,35 +450,26 @@ struct mne *mp;
                 break;
 
         case S_TYPHX:
-// Code below from Gary Osborne (gary@s-4.com)
-// G.O.
-// This block of code was copied from a later version of the asxxxx assembler
-// distribution.  The later version supports the cs08.  The SDCC version of
-// the assembler did not.  The cs08 ldhx, sthx, and cphx instructions allow
-// more addressing modes than the hc08.  That is the only difference in the
-// instruction sets.
-
-// The new asxxxx assemblers have other nice features that could be retrofitted
-// one day, but we can limp along without them for a few years yet.  They
-// are less important when the primary user writes in C.  It would probably
-// be easier to customize the new asxxxx files rather than try to upgrade
-// the SDCC version.
-
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 t1 = addr(&e1);
                 if (t1 == S_IMMED) {
                         if (op == 0x25)
-                        aerr();
+                                aerr();
                         outab(op);
                         outrw(&e1, 0);
                         break;
                 }
-                if (allow_cs08_code) {
+                if (mchtyp == X_HCS08) {
                         if (t1 == S_EXT) {
                                 switch (op) {
-                                        default:
-                                        case 0x25:  outab(0x96);   break;
-                                        case 0x45:  outab(0x32);   break;
-                                        case 0x65:  outab(0x3E);   break;
+                                default:
+                                case 0x25:      outab(0x96);    break;
+                                case 0x45:      outab(0x32);    break;
+                                case 0x65:      outab(0x3E);    break;
                                 }
                                 outrw(&e1, 0);
                                 break;
@@ -281,9 +478,9 @@ struct mne *mp;
                                 outab(0x9E);
                                 switch (op) {
                                 default:
-                                case 0x25:  outab(0xFF);   break;
-                                case 0x45:  outab(0xFE);   break;
-                                case 0x65:  outab(0xF3);   break;
+                                case 0x25:      outab(0xFF);    break;
+                                case 0x45:      outab(0xFE);    break;
+                                case 0x65:      outab(0xF3);    break;
                                 }
                                 outrb(&e1, R_USGN);
                                 // The SDCC version of outrb() is not fully compatible.  Work around it.
@@ -328,9 +525,12 @@ struct mne *mp;
                 aerr();
                 break;
 
-// end G.O.
-
         case S_CBEQ:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 t1 = addr(&e1);
                 comma(1);
                 expr(&e2, 0);
@@ -374,6 +574,11 @@ struct mne *mp;
                 break;
 
         case S_CQAX:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 t1 = addr(&e1);
                 if (t1 != S_IMMED)
                         aerr();
@@ -394,6 +599,11 @@ struct mne *mp;
                 break;
 
         case S_DBNZ:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 t1 = addr(&e1);
                 comma(1);
                 expr(&e2, 0);
@@ -433,6 +643,11 @@ struct mne *mp;
                 break;
 
         case S_DZAX:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 expr(&e1, 0);
                 outab(op);
                 if (mchpcr(&e1)) {
@@ -448,6 +663,11 @@ struct mne *mp;
                 break;
 
         case S_MOV:
+                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+                        opcycles = OPCY_ERR;
+                        err('o');
+                        break;
+                }
                 t1 = addr(&e1);
                 if (t1 == S_IX1P || t1 == S_IX2P) {
                         if (chkindx(&e1))
@@ -484,13 +704,34 @@ struct mne *mp;
                 aerr();
                 break;
 
-        case X_CS08:
-                ++allow_cs08_code;
-                break;
 
         default:
+                opcycles = OPCY_ERR;
                 err('o');
                 break;
+        }
+
+        if (opcycles == OPCY_NONE) {
+                switch (mchtyp) {
+                case X_HC08:            /* 68HC08 */
+                        opcycles = m08pg1[cb[0] & 0xFF];
+                        if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+                                opcycles = m08Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+                        }
+                        break;
+                case X_HCS08:           /* 68HCS08 */
+                        opcycles = s08pg1[cb[0] & 0xFF];
+                        if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+                                opcycles = s08Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+                        }
+                        break;
+                case X_6805:            /* 6805 */
+                        opcycles = m05cyc[cb[0] & 0xFF];
+                        break;
+                case X_HC05:            /* 146805 */
+                        opcycles = mcmcyc[cb[0] & 0xFF];
+                        break;
+                }
         }
 }
 
@@ -545,4 +786,8 @@ minit()
          */
         hilo = 1;
 
+        if (pass == 0) {
+                mchtyp = X_HC08;
+                sym[2].s_addr = X_HC08;
+        }
 }

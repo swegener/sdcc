@@ -52,6 +52,7 @@
  *      as hexadecimal, decimal, or octal.
  * 
  *      local variables:
+ *              char *  il              pointer to assembler-source listing line
  *              int     l_addr          laddr (int) truncated to 2-bytes
  *              int     n               number of bytes listed per line
  *              int     nb              computed number of assembled bytes
@@ -63,6 +64,7 @@
  *              char *  frmt            pointer to format string
  *
  *      global variables:
+ *              int     bflag           -b(b), listing mode flag
  *              int     cb[]            array of assembler output values
  *              int     cbt[]           array of assembler relocation types
  *                                      describing the data in cb[]
@@ -72,13 +74,17 @@
  *              char    eb[]            array of generated error codes
  *              char *  ep              pointer into error list
  *                                      array eb[]
- *              char *  il              pointer to assembler-source listing line
+ *              char  * ib              string buffer containing
+ *                                      assembler-source text line for processing
+ *              char  * ic              string buffer containing
+ *                                      assembler-source text line for listing
  *              a_uint  laddr           address of current assembler line,
  *                                      equate, or value of .if argument
  *              FILE *  lfp             list output file handle
  *              int     line            current assembler source line number
  *              int     lmode           listing mode
  *              int     lnlist          LIST-NLIST state
+ *              int     srcline         source file line number
  *              int     uflag           -u, disable .list/.nlist processing
  *              int     xflag           -x, listing radix flag
  *
@@ -170,6 +176,14 @@ list(void)
         int n, nb, nl;
         a_uint l_addr;
         int listing, paging;
+        const char *il;
+
+        /* ib/ic are dynamically allocated */
+        if (bflag != 0) {
+                il = ib;
+        } else {
+                il = ic;
+        }
 
         /*
          * Internal Listing

@@ -1,3 +1,8 @@
+2012-10-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/include/mcs51/lint.h:
+	  Fixed bug #3577318.
+
 2012-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/as6808/m08mch.c,

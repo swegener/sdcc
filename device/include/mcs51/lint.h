@@ -30,7 +30,7 @@
 #ifndef _LINT_H
 #define _LINT_H
 
-  #if !defined(SDCC_mcs51)
+  #if !defined(__SDCC_mcs51)
 
     #define __data
     #define __near

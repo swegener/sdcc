@@ -473,3 +473,4 @@ void nicify(T_t &T)
   nicify_diffs(T, t);
   nicify_diffs_more(T, t);
 }
+

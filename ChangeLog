@@ -1,3 +1,8 @@
+2012-10-16 Borut Razem <borut.razem AT gmail.com>
+
+	* support/sdbinutils/opcodes/ia64-opc.h:
+	  fixed bug #3577586 - missing binutils headers on ia64
+
 2012-10-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/include/mcs51/lint.h:

@@ -2,7 +2,7 @@
 
 =back
 
-   Copyright (C) 2012, Molnar Karoly <proton7@freemail.hu>
+   Copyright (C) 2012, Molnar Karoly <molnarkaroly@users.sf.net>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -99,6 +99,7 @@
 use strict;
 use warnings;
 use 5.12.0;                     # when (regex)
+use File::Path 'make_path';
 use feature 'switch';           # Starting from 5.10.1.
 use POSIX qw(strftime);
 
@@ -130,17 +131,20 @@ my $gpproc_path;
 my $name_filter = qr/10l?f\d+[a-z]*|1[26]((c(e|r)?)|hv)\d+[a-z]*|1[268]l?f\d+([a-z]*|[a-z]+\d+[a-z]*)/;
 my $header_name_filter = 'p${name_filter}.inc';
 
+my $p14_out_path = 'pic14';
+my $p16_out_path = 'pic16';
+
 my $mcu;
 my $short_mcu_name;
-my $is_pic16 = FALSE;
-my $conf_size = 4;
+my $is_pic16   = FALSE;
+my $conf_size  = 4;
 my $caddr_size = 4;
-my $conf_head = '_';
-my $verbose = 0;
-my $create_bitfields = FALSE;
-my $create_pseudo_registers = FALSE;
+my $conf_head  = '_';
+my $verbose    = 0;
+
+my $create_bitfields  = FALSE;
 my $emit_legacy_names = FALSE;
-my $no_timestamp = FALSE;
+my $no_timestamp      = FALSE;
 
 my $section = '//' . ('=' x 78);
 my $btail = 'bits';
@@ -153,24 +157,6 @@ my $btype_t = "${btail}_t";
 my %correction_of_names =
   (
   OPTION => 'OPTION_REG'
-  );
-
-#-----------------------------------------------
-
-        # The TMRx register pairs require special handling (different the reading and
-        # writing sequence) so they can not be adding to the list.
-
-my %pseudo_pairs =
-  (
-  FSR0L      => 'FSR0H',
-  FSR1L      => 'FSR1H',
-  FSR2L      => 'FSR2H',
-  FSR0L_SHAD => 'FSR0H_SHAD',
-  FSR1L_SHAD => 'FSR1H_SHAD',
-  PRODL      => 'PRODH',
-  ADRESL     => 'ADRESH',
-  EEADRL     => 'EEADRH',
-  EEADATL    => 'EEDATH'
   );
 
         # At some processors there is such register name, that is different
@@ -291,7 +277,7 @@ sub param_exist($$)
 
 #-------------------------------------------------------------------------------
 
-sub str2dec($)
+sub str2int($)
   {
   my $Str = $_[0];
 
@@ -299,7 +285,7 @@ sub str2dec($)
   return hex($1)   if ($Str =~ /^0x([[:xdigit:]]+)$/io);
   return int($Str) if ($Str =~ /^-?\d+$/o);
 
-  die "str2dec(): This string not integer: \"$Str\"";
+  die "str2int(): This string not integer: \"$Str\"";
   }
 
 #-------------------------------------------------------------------------------
@@ -708,7 +694,7 @@ sub read_content_from_header($)
         # PORTC     EQU  H'0007'
         #
 
-          add_register($1, str2dec($2));
+          add_register($1, str2int($2));
           }
         } # when (ST_REG_ADDR)
 
@@ -751,7 +737,7 @@ sub read_content_from_header($)
         # VR2       EQU  H'0002'
         #
 
-          push(@{$array[str2dec($2)]}, $1);
+          push(@{$array[str2int($2)]}, $1);
           }
         } # when (ST_REG1_DEF)
 
@@ -805,7 +791,7 @@ sub read_content_from_header($)
           add_conf_options(\@queue, \@array);
 
           Log("DEVID: $line", 6);
-          push(@devids, { NAME => $1, ADDRESS => str2dec($2) });
+          push(@devids, { NAME => $1, ADDRESS => str2int($2) });
           $state = ST_DEVID_DEF;
           }
         elsif ($line =~ /^_(IDLOC\d*)\s+EQU\s+([\w']+)$/io)  #'
@@ -813,13 +799,13 @@ sub read_content_from_header($)
           add_conf_options(\@queue, \@array);
 
           Log("IDLOC: $line", 6);
-          push(@idlocs, { NAME => $1, ADDRESS => str2dec($2) });
+          push(@idlocs, { NAME => $1, ADDRESS => str2int($2) });
           $state = ST_IDLOC_DEF;
           }
         elsif ($line =~ /^_(CONFIG\d*\w*)\s+EQU\s+([\w']+)$/io)  #'
           {
           Log("CONFIG: $line", 6);
-          add_conf_word(uc($1), str2dec($2));
+          add_conf_word(uc($1), str2int($2));
           }
         elsif ($line =~ /^;\s*-+\s*(Config\d*\w*)\s+Options\s*-+$/io)
           {
@@ -842,7 +828,7 @@ sub read_content_from_header($)
           }
         elsif ($line =~ /^(\w+)\s+EQU\s+([\w']+)(.+)?$/io)  #'
           {
-          my ($name, $value) = ($1, str2dec($2));
+          my ($name, $value) = ($1, str2int($2));
           my $expl = '';
 
           if (defined($3))
@@ -863,13 +849,13 @@ sub read_content_from_header($)
         if ($line =~ /^_(IDLOC\d*)\s+EQU\s+([\w']+)$/io)  #'
           {
           Log("IDLOC: $line", 6);
-          push(@idlocs, { NAME => $1, ADDRESS => str2dec($2) });
+          push(@idlocs, { NAME => $1, ADDRESS => str2int($2) });
           $state = ST_IDLOC_DEF;
           }
         elsif ($line =~ /^_(DEVID\d*)\s+EQU\s+([\w']+)$/io)  #'
           {
           Log("DEVID: $line", 6);
-          push(@devids, { NAME => $1, ADDRESS => str2dec($2) });
+          push(@devids, { NAME => $1, ADDRESS => str2int($2) });
           }
         }
 
@@ -880,7 +866,7 @@ sub read_content_from_header($)
         if ($line =~ /^_(IDLOC\d*)\s+EQU\s+([\w']+)$/io)  #'
           {
           Log("IDLOC: $line", 6);
-          push(@idlocs, { NAME => $1, ADDRESS => str2dec($2) });
+          push(@idlocs, { NAME => $1, ADDRESS => str2int($2) });
           }
         }
       } # given ($state)
@@ -928,8 +914,8 @@ sub extract_config_area($$)
 
       if ($short_mcu_name eq $name)
         {
-        ${$Conf_start} = str2dec($c_start);
-        ${$Conf_end}   = str2dec($c_end);
+        ${$Conf_start} = str2int($c_start);
+        ${$Conf_end}   = str2int($c_end);
         last;
         }
       }
@@ -1024,9 +1010,7 @@ sub print_bits($$$)
     {
     my $array = $Bits->[$i];
     my $str;
-    my $bit = '';
-
-    $bit = " $str" if (defined($array) && defined($str = $array->[$Index]));
+    my $bit = (defined($array) && defined($str = $array->[$Index])) ? " $str" : '';
 
     Outl(align("${al}unsigned$bit", DIST_BITSIZE), ': 1;');
     }
@@ -1140,39 +1124,13 @@ sub bitfield_filtration($)
 sub print_bitfield($$$)
   {
   my ($Name, $Group, $Align) = @_;
-  my ($addr, $width) = ($Group->{ADDRESSES}->[0],  $Group->{WIDTH});
+  my ($addr, $width) = ($Group->{ADDRESSES}->[0], $Group->{WIDTH});
   my $al = ' ' x $Align;
 
   Outl(align("${al}unsigned", DIST_BITSIZE), ": $addr;") if ($addr > 0);
   Outl(align("${al}unsigned $Name", DIST_BITSIZE), ": $width;");
   $width = 8 - ($addr + $width);
   Outl(align("${al}unsigned", DIST_BITSIZE), ": $width;") if ($width > 0);
-  }
-
-#-------------------------------------------------------------------------------
-
-        # Some registers are in pairs. For example: FSR0L and FSR0H
-        # If these are, by address next to each other there are and
-        # address of 'H' marked is higher, then will want to create
-        # a 16-bit pseudo-register. This register is of course there
-        # is in the lower address.
-
-sub create_pseudo_register($$)
-  {
-  my ($Register, $Address) = @_;
-  my $pair_h = $pseudo_pairs{$Register};
-  my ($reg, $text);
-
-  if (defined($pair_h) &&
-      defined($reg = $reg_refs_by_names{$pair_h}) &&
-      $reg->{ADDRESS} == ($Address + 1))
-    {
-    $Register =~ s/L$//io;              # ADRESL, FSRxL, etc
-    $Register =~ s/L_(\w+)$/_$1/io;     # FSRxL_SHAD
-    $text = sprintf("__at(0x%04X)", $Address);
-    Outl("extern $text volatile unsigned short w$Register;");
-    $device_registers .= "$text volatile unsigned short w$Register;\n";
-    }
   }
 
 #-------------------------------------------------------------------------------
@@ -1199,10 +1157,6 @@ sub print_all_registers()
       bitfield_filtration($reg) if ($create_bitfields);
 
       $text = sprintf("__at(0x%04X)", $addr);
-        #
-        # The sdcc handles it badly, if two different size variable is overlapped. :-(
-        #
-      create_pseudo_register($name, $addr) if ($create_pseudo_registers);
       $device_registers .= "$text __sfr $name;\n";
 
       $alias = $register_aliases{$name};
@@ -1440,6 +1394,8 @@ sub make_pic14_dependent_defs()
 
     $full_bitdefs .= "\n";
     }
+
+  $legacy_names .= "\n";
   }
 
 #-------------------------------------------------------------------------------
@@ -1453,15 +1409,11 @@ sub print_to_header_file()
   print_license('declarations');
   Outl("#ifndef __${mcu}_H__\n#define __${mcu}_H__\n\n$section");
 
-#  Outl(align("#define W", DIST_DEFSIZE), '0x00');
-# The 'F' conflicts with the 'F' bit of ECANCON register in the PIC18F2480 MCU.
-#  Outl(align("#define F", DIST_DEFSIZE), "0x01\n\n$section");
-
   if (! $is_pic16)
     {
     $text = '#ifndef NO_ADDR_DEFINES';
 
-    Outl("//\n//      Register Addresses\n//\n$section\n\n$text\n");
+    Outl("//\n//\tRegister Addresses\n//\n$section\n\n$text\n");
 
     foreach (sort { $a->{ADDRESS} <=> $b->{ADDRESS} } @registers)
       {
@@ -1474,7 +1426,7 @@ sub print_to_header_file()
     Outl("\n#endif // $text");
     }
 
-  Outl("\n$section\n//\n//      Register Definitions\n//\n$section\n");
+  Outl("\n$section\n//\n//\tRegister Definitions\n//\n$section\n");
   set_bit_prefix();
   print_all_registers();
   print_configuration_words();
@@ -1488,17 +1440,17 @@ sub print_to_header_file()
     if ($full_bitdefs ne '')
       {
       $text = '#ifndef NO_BIT_DEFINES';
-      Outl("$text\n\n", $full_bitdefs, "#endif // $text");
+      Outl("$text\n\n", $full_bitdefs, "#endif // $text\n");
       }
 
     if ($emit_legacy_names)
       {
       $text = '#ifndef NO_LEGACY_NAMES';
-      Outl("\n$text\n\n", $legacy_names, "\n#endif // $text");
+      Outl("$text\n\n", $legacy_names, "#endif // $text\n");
       }
     }
 
-  Outl("\n#endif // #ifndef __${mcu}_H__");
+  Outl("#endif // #ifndef __${mcu}_H__");
   }
 
 #-------------------------------------------------------------------------------
@@ -1552,14 +1504,6 @@ Usage: $PROGRAM [options]
             These may be useful, to merge during a common field name: CVR
             The compiler helps handle these bit fields. (default: no)
 
-        -cp or --create-pseudo-registers
-
-            Create pseudo registers. Some registers are in pairs.
-            For example: FSR0L and FSR0H
-            If these are, by address next to each other there are and address of 'H'
-            marked is higher, then will want to create a 16-bit pseudo-register.
-            This register is of course there is in the lower address. (default: no)
-
         -e or --emit-legacy-names
 
             Creates the legacy names also. (default: no)
@@ -1572,7 +1516,7 @@ Usage: $PROGRAM [options]
 
             This text.
 
-    For example: $PROGRAM -p 12f1840 -cb -cp
+    For example: $PROGRAM -p 12f1840 -cb
 EOT
 ;
   }
@@ -1632,11 +1576,6 @@ for (my $i = 0; $i < @ARGV; )
       $create_bitfields = TRUE;
       }
 
-    when (/^-(cp|-create-pseudo-registers)$/o)
-      {
-      $create_pseudo_registers = TRUE;
-      }
-
     when (/^-(e|-emit-legacy-names)$/o)
       {
       $emit_legacy_names = TRUE;
@@ -1663,7 +1602,8 @@ die "This directory - $gputils_path - not exist!" if (! -d $gputils_path);
 $gp_header_path = "$gputils_path/header" if ($gp_header_path eq '');    # The default value.
 $gpproc_path    = "$gputils_path/libgputils/$gpprocessor_c";
 
-$mcu =~ s/^p(ic)?//io;
+$mcu = lc($mcu);
+$mcu =~ s/^p(ic)?//o;
 
 if ($mcu =~ /^18/)
   {
@@ -1673,7 +1613,6 @@ if ($mcu =~ /^18/)
   $conf_head  = '__';
   }
 
-$mcu = lc($mcu);
 $short_mcu_name = $mcu;
 my $fname = "p${mcu}.inc";
 
@@ -1687,18 +1626,37 @@ read_content_from_header("$gp_header_path/$fname");
 
 $time_str = strftime(', %F %T UTC', gmtime) if (! $no_timestamp);
 
-        # Create the pic1xxxx.h file.
+        # Creates the directory structure.
 
-my $fpath = "$out_path/$header_name";
+my $path = ($is_pic16) ? "$out_path/$p16_out_path" : "$out_path/$p14_out_path";
+my $head_dir = "$path/header";
+
+if (! -e $head_dir)
+  {
+  Log("Creates the \"$head_dir\" dir.", 4);
+  make_path($head_dir) || die "Could not create the \"$head_dir\" dir!";
+  }
+
+my $dev_dir = "$path/device";
+
+if (! -e $dev_dir)
+  {
+  Log("Creates the \"$dev_dir\" dir.", 4);
+  make_path($dev_dir) || die "Could not create the \"$dev_dir\" dir!";
+  }
+
+        # Creates the pic1xxxx.h file.
+
+my $fpath = "$head_dir/$header_name";
 open($out_handler, '>', $fpath) || die "Could not create the \"$fpath\" file!\n";
-Log("Create the $header_name", 1);
+Log("Creates the $header_name", 1);
 print_to_header_file();
 close($out_handler);
 
-        # Create the pic1xxxx.c file.
+        # Creates the pic1xxxx.c file.
 
-$fpath = "$out_path/$device_name";
+$fpath = "$dev_dir/$device_name";
 open($out_handler, '>', $fpath) || die "Could not create the \"$fpath\" file!\n";
-Log("Create the $device_name", 1);
+Log("Creates the $device_name", 1);
 print_to_device_file();
 close($out_handler);

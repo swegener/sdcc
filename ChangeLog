@@ -1,4 +1,9 @@
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+        * support/scripts/cinc2h.pl: Comfortable version.
+          Writes to the separate directory (device and header) the *.C and
+          *.H files. Removed the --create-pseudo-registers option.
+
+2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/include/pic16/usart.h:
 	  Simplification the definition of __SDCC_NO_SPBRGH.
 	  Thanks to Diego Herranz.

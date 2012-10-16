@@ -1945,7 +1945,7 @@ glue (void)
   fprintf (asmFile, "%s", iComments2);
   dbuf_write_and_destroy (&data->oBuf, asmFile);
 
-  /* copy the intialized segment */
+  /* copy the initialized segment */
   if (initialized)
     {
       fprintf (asmFile, "%s", iComments2);

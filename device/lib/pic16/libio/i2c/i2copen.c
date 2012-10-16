@@ -56,7 +56,7 @@ void i2c_open(unsigned char mode, unsigned char slew, unsigned char addr_brd)
 #else	/* all other devices */
 
   TRISCbits.TRISC3 = 1;
-  TRISCbits.TRISC2 = 1;
+  TRISCbits.TRISC4 = 1;
 
 #endif
 

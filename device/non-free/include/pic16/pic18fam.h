@@ -1,7 +1,7 @@
 /*
  * pic18fam.h - PIC16 families
  *
- * This file is has been generated using pic18fam-h-gen.pl .
+ * This file is has been generated using ./pic18fam-h-gen.pl .
  */
 #ifndef __SDCC_PIC18FAM_H__
 #define __SDCC_PIC18FAM_H__ 1
@@ -261,8 +261,7 @@
 
 #elif  (__SDCC_PIC16_FAMILY == 1802420) \
     || (__SDCC_PIC16_FAMILY == 1802480) \
-    || (__SDCC_PIC16_FAMILY == 1822200) \
-    || (__SDCC_PIC16_FAMILY == 1865850)
+    || (__SDCC_PIC16_FAMILY == 1822200)
 #define __SDCC_USART_STYLE  1822200
 
 #elif  (__SDCC_PIC16_FAMILY == 1822210) \
@@ -291,6 +290,9 @@
 
 #elif  (__SDCC_PIC16_FAMILY == 1865200)
 #define __SDCC_USART_STYLE  1865200
+
+#elif  (__SDCC_PIC16_FAMILY == 1865850)
+#define __SDCC_USART_STYLE  1865850
 
 #else
 #warning No (E)USART style associated with the target device. Please update your pic16/pic18fam.h manually and/or inform the maintainer.

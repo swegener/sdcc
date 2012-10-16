@@ -179,7 +179,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_WERROR, NULL, "Treat the warnings as errors"},
   {0,   OPTION_DEBUG, NULL, "Enable debugging symbol output"},
   {0,   "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
-  {0,   OPTION_STD_C89, NULL, "Use C89 standard (sligthly incomplete)"},
+  {0,   OPTION_STD_C89, NULL, "Use C89 standard (slightly incomplete)"},
   {0,   OPTION_STD_SDCC89, NULL, "Use C89 standard with SDCC extensions (default)"},
   {0,   OPTION_STD_C99, NULL, "Use C99 standard (incomplete)"},
   {0,   OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions"},

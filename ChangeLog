@@ -54,7 +54,18 @@
 	  support/regression/tests/gcc-torture-execute-20020819-1.c,
 	  support/regression/tests/gcc-torture-execute-20021120-3.c,
 	  support/regression/tests/gcc-torture-execute-20021219-1.c,
-	  support/regression/tests/gcc-torture-execute-20020328-1.c:
+	  support/regression/tests/gcc-torture-execute-20020328-1.c,
+	  support/regression/tests/gcc-torture-execute-20060929-1.c,
+	  support/regression/tests/gcc-torture-execute-20060412-1.c,
+	  support/regression/tests/gcc-torture-execute-20060930-1.c,
+	  support/regression/tests/gcc-torture-execute-20060930-2.c,
+	  support/regression/tests/gcc-torture-execute-20060905-1.c,
+	  upport/regression/tests/gcc-torture-execute-20060110-1.c,
+	  support/regression/tests/gcc-torture-execute-20060127-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-2.c,
+	  support/regression/tests/gcc-torture-execute-20060102-1.c,
+	  support/regression/tests/gcc-torture-execute-20061101-2.c,
+	  support/regression/tests/gcc-torture-execute-20060910-1.c:
 	  More tests from gcc.
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>

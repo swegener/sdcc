@@ -122,11 +122,8 @@
 #warning The target device is not supported by the SDCC PIC16 USART library.
 #endif
 
-#if    (__SDCC_PIC16_FAMILY == 1822200) \
-    || (__SDCC_PIC16_FAMILY == 1802420) \
-    || (__SDCC_PIC16_FAMILY == 1802480) \
-    || (__SDCC_PIC16_FAMILY == 1865200) \
-    || (__SDCC_PIC16_FAMILY == 1865850)
+#if (__SDCC_USART_STYLE == 1822200) || \
+    (__SDCC_USART_STYLE == 1865200)
 #define __SDCC_NO_SPBRGH        1
 #endif  /* device lacks SPBRGH */
 

@@ -1,4 +1,9 @@
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/include/pic16/usart.h:
+	  Simplification the definition of __SDCC_NO_SPBRGH.
+	  Thanks to Diego Herranz.
+
+2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/pic18fam-h-gen.pl,
 	  device/non-free/include/pic16/pic18fam.h:
 	  Repaired the wrong classification of "__SDCC_PIC16_FAMILY 1865850"

@@ -43031,12 +43031,21 @@ PIC14
 Currently supported devices include:
 \end_layout
 
+\begin_layout Plain Layout
+\begin_inset VSpace defskip
+\end_inset
+\end_layout
+
 \begin_layout Standard
 10F: 320, 322
 \end_layout
 
 \begin_layout Standard
-12F: 609, 615, 617, 629, 635, 675, 683, 752, 1501
+10LF: 320, 322
+\end_layout
+
+\begin_layout Standard
+12F: 609, 615, 617, 629, 635, 675, 683, 752
 \end_layout
 
 \begin_layout Standard
@@ -43075,6 +43084,10 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
+16LF: 707, 720, 721, 722, 722a, 723, 723a, 724, 726, 727
+\end_layout
+
+\begin_layout Standard
 16F: 818, 819, 84, 84a, 87, 870, 871, 872, 873, 873a, 874, 874a, 876, 876a,
  877, 877a, 88, 882, 883, 884, 886, 887
 \end_layout
@@ -43084,7 +43097,12 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-16HV: 616, 785
+16HV: 610, 616, 785
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset VSpace defskip
+\end_inset
 \end_layout
 
 \begin_layout Standard
@@ -43093,12 +43111,17 @@ Currently supported devices include:
 Supported devices with enhanced cores:
 \end_layout
 
-\begin_layout Standard
-12F: 1822, 1840
+\begin_layout Plain Layout
+\begin_inset VSpace defskip
+\end_inset
 \end_layout
 
 \begin_layout Standard
-12LF: 1552
+12F: 1501, 1822, 1840
+\end_layout
+
+\begin_layout Standard
+12LF: 1501, 1552, 1822, 1840
 \end_layout
 
 \begin_layout Standard
@@ -43107,7 +43130,16 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-16F: 1823, 1824, 1825, 1826, 1827, 1828, 1829
+16LF: 1454, 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1512, 1513, 1516,
+ 1517, 1518, 1519, 1526, 1527, 1782, 1783, 1784, 1786, 1787
+\end_layout
+
+\begin_layout Standard
+16F: 1823, 1824, 1825, 1826, 1827, 1828, 1829, 1847
+\end_layout
+
+\begin_layout Standard
+16LF: 1823, 1824, 1825, 1826, 1827, 1828, 1829, 1847
 \end_layout
 
 \begin_layout Standard
@@ -43116,6 +43148,11 @@ Supported devices with enhanced cores:
 
 \begin_layout Standard
 16LF: 1902, 1903, 1904, 1906, 1907
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset VSpace defskip
+\end_inset
 \end_layout
 
 \begin_layout Standard
@@ -44373,74 +44410,166 @@ PIC
 ; devices supported by the port include:
 \end_layout
 
-\begin_layout Standard
-18F: 242, 248, 252, 258, 442, 448, 452, 458
+\begin_layout Plain Layout
+\begin_inset VSpace defskip
+\end_inset
 \end_layout
 
 \begin_layout Standard
-18F: 1220, 1230, 1320, 1330, 13k50, 14k50
+18f13k22 18f13k50 18f14k22 18f14k50 18f23k20 18f23k22
 \end_layout
 
 \begin_layout Standard
-18F: 2220, 2221, 2320, 2321, 2331, 23k20, 23k22
+18f24j10 18f24j11 18f24j50 18f24k20 18f24k22 18f24k50
 \end_layout
 
 \begin_layout Standard
-18F: 2410, 2420, 2423, 2431, 2450, 2455, 2480, 24j10, 24j50, 24k20, 24k22
+18f25j10 18f25j11 18f25j50 18f25k20 18f25k22 18f25k50
 \end_layout
 
 \begin_layout Standard
-18F: 2510, 2515, 2520, 2523, 2525, 2550, 2580, 2585, 25j10, 25j50, 25k20,
- 25k22
+18f25k80 18f26j11 18f26j13 18f26j50 18f26j53 18f26k20
 \end_layout
 
 \begin_layout Standard
-18F: 2610, 2620, 2680, 2682, 2685, 26j50, 26k20 26k22
+18f26k22 18f26k80 18f27j13 18f27j53 18f43k20 18f43k22
 \end_layout
 
 \begin_layout Standard
-18F: 4220, 4221, 4320, 4321, 4331, 43k20, 43k22
+18f44j10 18f44j11 18f44j50 18f44k20 18f44k22 18f45j10
 \end_layout
 
 \begin_layout Standard
-18F: 4410, 4420, 4423, 4431, 4450, 4455, 4480, 44j10, 44j50, 44k20, 44k22
+18f45j11 18f45j50 18f45k20 18f45k22 18f45k50 18f45k80
 \end_layout
 
 \begin_layout Standard
-18F: 4510, 4515, 4520, 4523, 4525, 4550, 4580, 4585, 45j10, 45j50, 45k20,
- 45k22
+18f46j11 18f46j13 18f46j50 18f46j53 18f46k20 18f46k22
 \end_layout
 
 \begin_layout Standard
-18F: 4610, 4620, 4680, 4682, 4685, 46j50, 46k20, 46k22
+18f46k80 18f47j13 18f47j53 18f63j11 18f63j90 18f64j11
 \end_layout
 
 \begin_layout Standard
-18F: 6520, 6527, 6585, 65j50
+18f64j90 18f65j10 18f65j11 18f65j15 18f65j50 18f65j90
 \end_layout
 
 \begin_layout Standard
-18F: 6620, 6622, 6627, 6680, 66j50, 66j55, 66j60, 66j65
+18f65k22 18f65k80 18f65k90 18f66j10 18f66j11 18f66j15
 \end_layout
 
 \begin_layout Standard
-18F: 6720, 6722, 67j50, 67j60
+18f66j16 18f66j50 18f66j55 18f66j60 18f66j65 18f66j90
 \end_layout
 
 \begin_layout Standard
-18F: 8520, 8527, 8585, 85j50
+18f66j93 18f66k22 18f66k80 18f66k90 18f67j10 18f67j11
 \end_layout
 
 \begin_layout Standard
-18F: 8620, 8622, 8627, 8680, 86j50, 86j55, 86j60, 86j65
+18f67j50 18f67j60 18f67j90 18f67j93 18f67k22 18f67k90
 \end_layout
 
 \begin_layout Standard
-18F: 8720, 8722, 87j50, 87j60
+18f83j11 18f83j90 18f84j11 18f84j90 18f85j10 18f85j11
 \end_layout
 
 \begin_layout Standard
-18F: 96j60, 96j65, 97j60
+18f85j15 18f85j50 18f85j90 18f85k22 18f85k90 18f86j10
+\end_layout
+
+\begin_layout Standard
+18f86j11 18f86j15 18f86j16 18f86j50 18f86j55 18f86j60
+\end_layout
+
+\begin_layout Standard
+18f86j65 18f86j72 18f86j90 18f86j93 18f86k22 18f86k90
+\end_layout
+
+\begin_layout Standard
+18f87j10 18f87j11 18f87j50 18f87j60 18f87j72 18f87j90
+\end_layout
+
+\begin_layout Standard
+18f87j93 18f87k22 18f87k90 18f96j60 18f96j65 18f97j60
+\end_layout
+
+\begin_layout Standard
+18f242 18f248 18f252 18f258 18f442 18f448
+\end_layout
+
+\begin_layout Standard
+18f452 18f458 18f1220 18f1230 18f1320 18f1330
+\end_layout
+
+\begin_layout Standard
+18f2220 18f2221 18f2320 18f2321 18f2331 18f2410
+\end_layout
+
+\begin_layout Standard
+18f2420 18f2423 18f2431 18f2439 18f2450 18f2455
+\end_layout
+
+\begin_layout Standard
+18f2458 18f2480 18f2510 18f2515 18f2520 18f2523
+\end_layout
+
+\begin_layout Standard
+18f2525 18f2539 18f2550 18f2553 18f2580 18f2585
+\end_layout
+
+\begin_layout Standard
+18f2610 18f2620 18f2680 18f2682 18f2685 18f4220
+\end_layout
+
+\begin_layout Standard
+18f4221 18f4320 18f4321 18f4331 18f4410 18f4420
+\end_layout
+
+\begin_layout Standard
+18f4423 18f4431 18f4439 18f4450 18f4455 18f4458
+\end_layout
+
+\begin_layout Standard
+18f4480 18f4510 18f4515 18f4520 18f4523 18f4525
+\end_layout
+
+\begin_layout Standard
+18f4539 18f4550 18f4553 18f4580 18f4585 18f4610
+\end_layout
+
+\begin_layout Standard
+18f4620 18f4680 18f4682 18f4685 18f6310 18f6390
+\end_layout
+
+\begin_layout Standard
+18f6393 18f6410 18f6490 18f6493 18f6520 18f6525
+\end_layout
+
+\begin_layout Standard
+18f6527 18f6585 18f6620 18f6621 18f6622 18f6627
+\end_layout
+
+\begin_layout Standard
+18f6628 18f6680 18f6720 18f6722 18f6723 18f8310
+\end_layout
+
+\begin_layout Standard
+18f8390 18f8393 18f8410 18f8490 18f8493 18f8520
+\end_layout
+
+\begin_layout Standard
+18f8525 18f8527 18f8585 18f8620 18f8621 18f8622
+\end_layout
+
+\begin_layout Standard
+18f8627 18f8628 18f8680 18f8720 18f8722 18f8723
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset VSpace defskip
+\end_inset
 \end_layout
 
 \begin_layout Standard

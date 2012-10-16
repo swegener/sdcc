@@ -1,3 +1,10 @@
+2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/include/pic16/usart.h: Supplement to "USART styles".
+	* device/lib/pic16/libio/usart/uopen.c:
+	  Use the (__SDCC_USART_STYLE == 1865850) condition.
+        * doc/README.txt:
+          New line at the end of the "Authors and interested persons" section.
+
 2012-10-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-20020213-1.c,

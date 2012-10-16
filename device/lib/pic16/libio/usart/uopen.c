@@ -118,7 +118,8 @@ usart_open (unsigned char config, sdcc_spbrg_t spbrg) __wparam
   /* Configure RX/TX pins. */
   TRISCbits.TRISC6 = 0;
   TRISCbits.TRISC7 = 1;
-#elif (__SDCC_USART_STYLE == 1822210)
+#elif (__SDCC_USART_STYLE == 1822210) \
+   || (__SDCC_USART_STYLE == 1865850)
   /* Configure RX/TX pins. */
   TRISCbits.TRISC6 = 1;
   TRISCbits.TRISC7 = 1;

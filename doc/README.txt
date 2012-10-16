@@ -99,6 +99,7 @@ Authors and interested persons:
 * Klaus Flittner       <klaus_flittner AT gmx.de>
 * Philipp Klaus Krause <pkk AT spth.de>
 * Leland Morrison      <enigmalee.AT.sourceforget.net>
+* Molnar Karoly        <molnarkaroly AT users.sf.net>
 
 SDCC includes code from:
 * Alan Baldwin <baldwin AT shop-pdp.kent.edu>

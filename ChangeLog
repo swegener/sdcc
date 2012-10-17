@@ -3,6 +3,9 @@
 	* src/z80/gen.c,
 	  support/regression/tests/gcc-torture-execute-20060930-2.c:
 	  Fixed bug #3577673.
+	* support/regression/tests/gcc-torture-execute-20060127-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-2.c:
+	  Note that these are affected by lack of support for long long literals.
 
 2012-10-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

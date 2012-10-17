@@ -11005,7 +11005,7 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
       regalloc_dry_run_cost += 4;
       if (!isPairDead (PAIR_BC, ic)) /* Restore bc. */
         {
-          emit2 ("dec bc");
+          emit2 ("inc bc");
           regalloc_dry_run_cost++;
         }
     }

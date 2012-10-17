@@ -33,10 +33,8 @@ bar (void *p, struct S *q)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_z80) && !defined(__SDCC_z180)
   t.t = &t;
   if (bar (&s, &s) != (void *) &t)
     ASSERT (0);
   return;
-#endif
 }

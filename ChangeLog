@@ -1,5 +1,11 @@
 2012-10-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c,
+	  support/regression/tests/gcc-torture-execute-20060930-2.c:
+	  Fixed bug #3577673.
+
+2012-10-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* support/regression/tests/gcc-torture-execute-20041210-1.c,
 	  support/regression/tests/gcc-torture-execute-20050218-1.c,
 	  support/regression/tests/gcc-torture-execute-20051110-1.c,

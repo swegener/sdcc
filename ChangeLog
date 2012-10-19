@@ -1,3 +1,9 @@
+2012-10-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20060929-1.c,
+	  support/regression/tests/gcc-torture-execute-20070201-1.c:
+	  Disable tests on gcc older than 5.0.
+
 2012-10-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,

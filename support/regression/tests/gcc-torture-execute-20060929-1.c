@@ -33,6 +33,7 @@ baz (int **p, int *q)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 5))
   int i = 42, j = 0;
   int *p = &i;
   foo (&p, &j);
@@ -49,4 +50,5 @@ testTortureExecute (void)
   if (p - 1 != &i || j != 0 || i != 0)
     ASSERT (0);
   return;
+#endif
 }

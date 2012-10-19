@@ -22,8 +22,10 @@ foo (char *buf, char *p)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 5))
   char buf[6];
   if (foo (buf, &buf[2]) != &buf[3])
     ASSERT (0);
   return;
+#endif
 }

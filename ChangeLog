@@ -1,3 +1,8 @@
+2012-10-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-20050613-1.c:
+	  Disable a test for mcs51, where it fails for stack-auto.
+
 2012-10-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20060929-1.c,

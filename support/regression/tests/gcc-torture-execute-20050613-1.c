@@ -30,8 +30,8 @@ testTortureExecute (void)
   struct D d = { .a.j = 5 };
 #ifndef __SDCC_mcs51
   foo (&b.a);
-#endif
   foo (&c.a);
   foo (&d.a);
+#endif
   return;
 }

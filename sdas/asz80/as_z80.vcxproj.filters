@@ -59,6 +59,9 @@
     <ClCompile Include="z80pst.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\asxxsrc\asmcro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\asxxsrc\asxxxx.h">

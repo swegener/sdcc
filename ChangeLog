@@ -1,3 +1,20 @@
+2012-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6808/as_hc08.vcxproj,
+	* sdas/as6808/as_hc08.vcxproj.filters,
+	* sdas/as8051/asx8051.vcxproj,
+	* sdas/as8051/asx8051.vcxproj.filters,
+	* sdas/asgb/asgb.vcxproj,
+	* sdas/asgb/asgb.vcxproj.filters,
+	* sdas/asrab/asrab.vcxproj,
+	* sdas/asrab/asrab.vcxproj.filters,
+	* sdas/asz80/as_z80.vcxproj,
+	* sdas/asz80/as_z80.vcxproj.filters: added asmcro.c
+	* sdas/as6808/m08mch.c,
+	* sdas/as6808/m6808.h,
+	* sdas/asxxsrc/asxxxx.h: outdp, chkindx synced with ASxxxx v5
+	* device/lib/_gptrput.c: lock up on code write
+
 2012-10-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/ports/ds390/spec.mk,
@@ -106,10 +123,12 @@
 	  of the gcc torture stest uite to regression tests.
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
         * device/lib/pic16/libio/i2c/i2copen.c:
           Bugfix: TRISCbits.TRISC2 --> TRISCbits.TRISC4
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/include/pic16/usart.h: Supplement to "USART styles".
 	* device/lib/pic16/libio/usart/uopen.c:
 	  Use the (__SDCC_USART_STYLE == 1865850) condition.
@@ -187,22 +206,26 @@
 	  More tests from gcc.
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
-        * support/scripts/cinc2h.pl: Comfortable version.
-          Writes to the separate directory (device and header) the *.C and
-          *.H files. Removed the --create-pseudo-registers option.
+
+	* support/scripts/cinc2h.pl: Comfortable version.
+	  Writes to the separate directory (device and header) the *.C and
+	  *.H files. Removed the --create-pseudo-registers option.
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/include/pic16/usart.h:
 	  Simplification the definition of __SDCC_NO_SPBRGH.
 	  Thanks to Diego Herranz.
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/pic18fam-h-gen.pl,
 	  device/non-free/include/pic16/pic18fam.h:
 	  Repaired the wrong classification of "__SDCC_PIC16_FAMILY 1865850"
 	  in the (E)USART style.
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* doc/sdccman.lyx: Added the new pic processors.
 
 2012-10-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
@@ -244,6 +267,7 @@
 	* sdas/asxxsrc/aslist.c,
 	* sdas/asxxsrc/asmain.c,
 	* sdas/asxxsrc/asxxxx.h,
+	* sdas/asxxsrc/asmcro.c,
 	* sdas/asz80/Makefile.in,
 	* sdas/asz80/z80.h,
 	* sdas/asz80/z80adr.c,

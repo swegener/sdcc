@@ -1122,7 +1122,7 @@ extern  int             thrdbyte(a_uint v);
 extern  int             frthbyte(a_uint v);
 extern  VOID            out(char *p, int n);
 extern  VOID            outarea(struct area *ap);
-extern  VOID            outdp(struct area *, struct expr *);
+extern  VOID            outdp(struct area *carea, struct expr *esp, int r);
 extern  VOID            outall(void);
 extern  VOID            outdot(void);
 extern  VOID            outbuf(char *s);

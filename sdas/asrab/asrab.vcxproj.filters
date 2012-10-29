@@ -59,12 +59,27 @@
     <ClCompile Include="..\..\support\util\dbuf_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\asxxsrc\asmcro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\asxxsrc\asxxxx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\support\util\dbuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\support\util\dbuf_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\asxxsrc\sdas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdcc_vc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

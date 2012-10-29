@@ -242,9 +242,9 @@ struct mne *mp;
                         }
                 }
                 if (espa) {
-                        outdp(espa, &e1);
+                        outdp(espa, &e1, 0);
                 } else {
-                        outdp(dot.s_area, &e1);
+                        outdp(dot.s_area, &e1, 0);
                 }
                 lmode = SLIST;
                 break;
@@ -313,15 +313,11 @@ struct mne *mp;
                         break;
                 }
                 if (t1 == S_IX1 || t1 == S_IX2) {
-                        if (chkindx(&e1))
-                                aerr();
                         outab(op+0x30);
                         outrb(&e1, R_USGN);
                         break;
                 }
                 if (t1 == S_SP1 || t1 == S_SP2) {
-                        if (chkindx(&e1))
-                                aerr();
                         if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
                                 outab(0x9e);
                                 outab(op+0x30);
@@ -483,11 +479,6 @@ struct mne *mp;
                                 case 0x65:      outab(0xF3);    break;
                                 }
                                 outrb(&e1, R_USGN);
-                                // The SDCC version of outrb() is not fully compatible.  Work around it.
-                                // Not an asxxxx error.
-                                if (t1==S_SP2) {      // ldhx 0x100,s etc should show error tag
-                                        aerr();
-                                }
                                 break;
                         }
                         if ((t1 == S_IX) && (op == 0x45)) {
@@ -510,11 +501,6 @@ struct mne *mp;
                 } else {
                         if (t1 == S_EXT) {
                                 t1 = S_DIR;
-                                // The SDCC version of outrb() is not fully compatible.  Work around it.
-                                // Not an asxxxx error, at least not in the newer versions.
-                                if (e1.e_addr > 0xFF) {
-                                        err('d');
-                                }
                         }
                 }
                 if (t1 == S_DIR) {
@@ -546,14 +532,10 @@ struct mne *mp;
                         outab(op+0x40);
                 } else
                 if (t1 == S_IX1P || t1 == S_IX2P) {
-                        if (chkindx(&e1))
-                                aerr();
                         outab(op+0x30);
                         outrb(&e1, R_USGN);
                 } else
                 if (t1 == S_SP1 || t1 == S_SP2) {
-                        if (chkindx(&e1))
-                                aerr();
                         outab(0x9E);
                         outab(op+0x30);
                         outrb(&e1, R_USGN);
@@ -615,14 +597,10 @@ struct mne *mp;
                         outab(op+0x40);
                 } else
                 if (t1 == S_IX1 || t1 == S_IX2) {
-                        if (chkindx(&e1))
-                                aerr();
                         outab(op+0x30);
                         outrb(&e1, R_USGN);
                 } else
                 if (t1 == S_SP1 || t1 == S_SP2) {
-                        if (chkindx(&e1))
-                                aerr();
                         outab(0x9E);
                         outab(op+0x30);
                         outrb(&e1, R_USGN);
@@ -670,8 +648,6 @@ struct mne *mp;
                 }
                 t1 = addr(&e1);
                 if (t1 == S_IX1P || t1 == S_IX2P) {
-                        if (chkindx(&e1))
-                                aerr();
                         outab(op+0x10);
                         outrb(&e1, R_PAG0);
                         break;
@@ -733,21 +709,6 @@ struct mne *mp;
                         break;
                 }
         }
-}
-
-/*
- * Check index byte
- */
-int
-chkindx(exp)
-struct expr *exp;
-{
-        if (exp->e_flag == 0 && exp->e_base.e_ap == NULL) {
-                if (exp->e_addr & ~0xFF) {
-                        return(1);
-                }
-        }
-        return(0);
 }
 
 /*

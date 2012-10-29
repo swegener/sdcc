@@ -1,3 +1,13 @@
+2012-10-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk:
+	  Slightly increase timeouts.
+	* support/regression/tests/gcc-torture-execute-20051104-1.c,
+	  support/regression/tests/gcc-torture-execute-950426-1.c,
+	  support/regression/tests/gcc-torture-execute-20021204-1.c:
+	  Disable warning on assigning string literal to non-const pointer.
+
 2012-10-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20070724-1.c:

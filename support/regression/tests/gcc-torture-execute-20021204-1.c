@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 196
 #endif
 
 /* This test was miscompiled when using sibling call optimization,

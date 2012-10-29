@@ -5,7 +5,7 @@
 CC_FOR_BUILD = $(CC)
 
 # simulation timeout in seconds
-SIM_TIMEOUT = 60
+SIM_TIMEOUT = 80
 
 # path to uCsim
 ifdef SDCC_BIN_PATH

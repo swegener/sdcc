@@ -747,9 +747,9 @@ outr24(struct expr *esp, int r)
  */
 
 VOID
-outdp(struct area *carea, struct expr *esp)
+outdp(struct area *carea, struct expr *esp, int r)
 {
-        int n, r;
+        int n;
 
         if (oflag && pass==2) {
                 outchk(ASXHUGE, ASXHUGE);

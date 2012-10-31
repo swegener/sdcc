@@ -717,17 +717,17 @@ outr24(struct expr *esp, int r)
 }
 /* end sdas specific */
 
-/*)Function     VOID    outdp(carea, esp)
+/*)Function     VOID    outdp(carea, esp, r)
  *
  *              area *  carea           pointer to current area structure
  *              expr *  esp             pointer to expr structure
+ *              int     r               optional PAGX relocation coding
  *
  *      The function outdp() flushes the output buffer and
  *      outputs paging information to the .REL file.
  *
  *      local variables:
  *              int     n               symbol/area reference number
- *              int     r               relocation mode
  *
  *      global variables:
  *              int     oflag           -o, generate relocatable output flag
@@ -749,19 +749,24 @@ outr24(struct expr *esp, int r)
 VOID
 outdp(struct area *carea, struct expr *esp, int r)
 {
-        int n;
+        a_uint n;
 
         if (oflag && pass==2) {
                 outchk(ASXHUGE, ASXHUGE);
                 out_txb(2, carea->a_ref);
                 out_txb(2, esp->e_addr);
                 if (esp->e_flag || esp->e_base.e_ap!=NULL) {
-                        r = R_WORD;
+                        if (esp->e_base.e_ap == NULL) {
+                                n = area[1].a_ref;
+                                r |= R_AREA;
+                                fprintf(stderr, "?ASxxxx-OUTDP-NULL-POINTER error.\n\n");
+                        } else
                         if (esp->e_flag) {
                                 n = esp->e_base.e_sp->s_ref;
                                 r |= R_SYM;
                         } else {
                                 n = esp->e_base.e_ap->a_ref;
+                                r |= R_AREA;
                         }
                         write_rmode(r);
                         *relp++ = txtp - txt - 2;

@@ -1,3 +1,7 @@
+2012-10-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asxxxsrc/asout.c (outdp): oops, forgot to commit this
+
 2012-10-30 Erik Petrich <epetrich AT ivorytower.norman.ok.s>
 
 	* sdas/asxxxsrc/asout.c (outdp): fix to match prototype

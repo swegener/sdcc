@@ -1,7 +1,7 @@
 2012-11-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
-	  Fix long left shift for result in a permutation of left registers.
+	  Fix long shifts for result in a permutation of operand registers.
 
 2012-10-31 Maarten Brock <sourceforge.brock AT dse.nl>
 

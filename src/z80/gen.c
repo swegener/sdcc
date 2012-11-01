@@ -3045,13 +3045,14 @@ _castBoolean (const operand * right)
 
 /* Shuffle src reg array into dst reg array. */
 static void
-regMove (const short *dst, const short *src, size_t n)
+regMove (const short *dst, const short *src, size_t n, bool preserve_a)
 {
   bool assigned[8] = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE };
   int cached_byte = -1;
   size_t size = n;
   int ex[4] = {-1, -1, -1, -1};
   size_t i;
+  bool pushed_a = FALSE;
 
   wassert (n < 6);
 
@@ -3130,6 +3131,11 @@ skip_byte:
           break;
 
       wassertl (i != n, "regMove error: Trying to cache non-existant byte in accumulator.");
+      if (preserve_a && !pushed_a)
+        {
+          _push (PAIR_AF);
+          pushed_a = TRUE;
+        }
       cheapMove (ASMOP_A, 0, asmopregs[src[i]], 0);
       size--;
       assigned[i] = TRUE;
@@ -3138,6 +3144,9 @@ skip_byte:
 
   if (cached_byte != -1)
     cheapMove (asmopregs[dst[cached_byte]], 0, ASMOP_A, 0);
+
+  if (pushed_a)
+    _pop (PAIR_AF);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3428,7 +3437,7 @@ assignResultValue (operand * oper)
               oparray[i] = AOP (oper)->aopu.aop_reg[i]->rIdx;
             }
 
-          regMove (oparray, retarray, size);
+          regMove (oparray, retarray, size, FALSE);
         }
       else
         while (size--)
@@ -4659,7 +4668,7 @@ genRet (const iCode * ic)
               oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
             }
 
-          regMove (retarray, oparray, AOP_SIZE (IC_LEFT (ic)));
+          regMove (retarray, oparray, AOP_SIZE (IC_LEFT (ic)), FALSE);
         }
       else
         {
@@ -5478,7 +5487,7 @@ genPlus (iCode * ic)
                           src[3] = AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx;
                           src[2] = AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx;
                         }
-                      regMove (dst, src, size);
+                      regMove (dst, src, size, FALSE);
                     }
                   else if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&
                            (AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX
@@ -8398,7 +8407,7 @@ genLeftShift (const iCode * ic)
   symbol *tlbl = 0, *tlbl1 = 0;
   operand *left, *right, *result;
   int countreg;
-  bool shift_by_one;
+  bool shift_by_lit, shift_by_one, shift_by_zero;
 
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
@@ -8416,42 +8425,38 @@ genLeftShift (const iCode * ic)
     }
 
   /* Useful for the case of shifting a size > 2 value by a literal */
-  shift_by_one = (AOP_TYPE (right) == AOP_LIT && ulFromVal (AOP (right)->aopu.aop_lit) == 1);
+  shift_by_lit = AOP_TYPE (right) == AOP_LIT;
+  shift_by_one = (shift_by_lit && ulFromVal (AOP (right)->aopu.aop_lit) == 1);
+  shift_by_zero = (shift_by_lit && ulFromVal (AOP (right)->aopu.aop_lit) == 0);
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
 
-  if (!shift_by_one)
-    {
-      if (AOP_TYPE (right) == AOP_REG && !bitVectBitValue (ic->rSurv, AOP (right)->aopu.aop_reg[0]->rIdx) && AOP (right)->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
-        (AOP_TYPE (result) != AOP_REG ||
-        AOP (result)->aopu.aop_reg[0]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
-        (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
-        (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
-        (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx)))))
-        countreg = AOP (right)->aopu.aop_reg[0]->rIdx;
-      else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
-        (AOP_TYPE (result) != AOP_REG ||
-        AOP (result)->aopu.aop_reg[0]->rIdx != B_IDX &&
-        (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != B_IDX &&
-        (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != B_IDX &&
-        (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != B_IDX)))))
-        countreg = B_IDX;
-      else
-        countreg = A_IDX;
+  if (AOP_TYPE (right) == AOP_REG && !bitVectBitValue (ic->rSurv, AOP (right)->aopu.aop_reg[0]->rIdx) && AOP (right)->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
+    (AOP_TYPE (result) != AOP_REG ||
+    AOP (result)->aopu.aop_reg[0]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
+    (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
+    (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
+    (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx)))))
+    countreg = AOP (right)->aopu.aop_reg[0]->rIdx;
+  else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
+    (AOP_TYPE (result) != AOP_REG ||
+    AOP (result)->aopu.aop_reg[0]->rIdx != B_IDX &&
+    (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != B_IDX &&
+    (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != B_IDX &&
+    (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != B_IDX)))))
+    countreg = B_IDX;
+  else
+    countreg = A_IDX;
 
-      cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
-      emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
-      regalloc_dry_run_cost += 1;
-      freeAsmop (right, NULL);
-    }
+  if (!shift_by_lit)
+    cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
 
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
     _push (PAIR_AF);
 
   /* now move the left to the result if they are not the
      same */
-
   if (!sameRegs (AOP (left), AOP (result)))
     {
       size = AOP_SIZE (result);
@@ -8465,7 +8470,7 @@ genLeftShift (const iCode * ic)
               dst[offset] = AOP (result)->aopu.aop_reg[offset]->rIdx;
               offset++;
             }
-          regMove (dst, src, AOP_SIZE (result));
+          regMove (dst, src, AOP_SIZE (result), TRUE);
         }
       else
         {
@@ -8488,15 +8493,20 @@ genLeftShift (const iCode * ic)
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
     _pop (PAIR_AF);
 
-  if (!shift_by_one)
+  if (shift_by_zero)
+    goto end;
+  if (shift_by_lit)
+    cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
+  else
     {
+      emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
+      regalloc_dry_run_cost += 1;
       if (!regalloc_dry_run)
-        {
-          emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
-          emitLabel (tlbl);
-        }
+        emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
       regalloc_dry_run_cost += 3;
     }
+  if (!shift_by_one && !regalloc_dry_run)
+    emitLabel (tlbl);
 
   if (requiresHL (AOP (result)))
     spillPair (PAIR_HL);
@@ -8542,7 +8552,9 @@ genLeftShift (const iCode * ic)
         }
     }
 
+end:
   freeAsmop (left, NULL);
+  freeAsmop (right, NULL);
   freeAsmop (result, NULL);
 }
 
@@ -8731,6 +8743,7 @@ genRightShift (const iCode * ic)
   int size, offset, first = 1;
   bool is_signed;
   int countreg;
+  bool shift_by_lit, shift_by_one, shift_by_zero;
 
   symbol *tlbl = 0, *tlbl1 = 0;
 
@@ -8755,6 +8768,11 @@ genRightShift (const iCode * ic)
       return;
     }
 
+  /* Useful for the case of shifting a size > 2 value by a literal */
+  shift_by_lit = AOP_TYPE (right) == AOP_LIT;
+  shift_by_one = (shift_by_lit && ulFromVal (AOP (right)->aopu.aop_lit) == 1);
+  shift_by_zero = (shift_by_lit && ulFromVal (AOP (right)->aopu.aop_lit) == 0);
+
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
 
@@ -8775,10 +8793,8 @@ genRightShift (const iCode * ic)
   else
     countreg = A_IDX;
 
-  cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
-  emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
-  regalloc_dry_run_cost += 1;
-  freeAsmop (right, NULL);
+  if (!shift_by_lit)
+    cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
 
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
     _push (PAIR_AF);
@@ -8787,13 +8803,26 @@ genRightShift (const iCode * ic)
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
-
       size = AOP_SIZE (result);
       offset = 0;
-      while (size--)
+      if (AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) == AOP_REG)
         {
-          cheapMove (AOP (result), offset, AOP (left), offset);
-          offset++;
+          short src[8], dst[8];
+          while (size--)
+            {
+              src[offset] = AOP (left)->aopu.aop_reg[offset]->rIdx;
+              dst[offset] = AOP (result)->aopu.aop_reg[offset]->rIdx;
+              offset++;
+            }
+          regMove (dst, src, AOP_SIZE (result), TRUE);
+        }
+      else
+        {
+          while (size--)
+            {
+              cheapMove (AOP (result), offset, AOP (left), offset);
+              offset++;
+            }
         }
     }
 
@@ -8808,12 +8837,20 @@ genRightShift (const iCode * ic)
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
     _pop (PAIR_AF);
 
-  if (!regalloc_dry_run)
+  if (shift_by_zero)
+    goto end;
+  else if (shift_by_lit)
+    cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
+  else
     {
-      emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
-      IS_GB ? emitLabelSpill (tlbl) : emitLabel (tlbl);
+      emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
+      regalloc_dry_run_cost += 1;
+      if (!regalloc_dry_run)
+        emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
+      regalloc_dry_run_cost += 3;
     }
-  regalloc_dry_run_cost += 3;
+  if (!shift_by_one && !regalloc_dry_run)
+    IS_GB ? emitLabelSpill (tlbl) : emitLabel (tlbl);
 
   if (requiresHL (AOP (result)))
     spillPair (PAIR_HL);
@@ -8844,24 +8881,29 @@ genRightShift (const iCode * ic)
           size--, offset--;
         }
     }
-  
-  if (!regalloc_dry_run)
-    emitLabel (tlbl1);
-  if (!IS_GB && countreg == B_IDX)
+
+  if (!shift_by_one)
     {
       if (!regalloc_dry_run)
-        emit2 ("djnz !tlabel", labelKey2num (tlbl->key));
-      regalloc_dry_run_cost += 2;
-    }
-  else
-    {
-      emit2 ("dec %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
-      if (!regalloc_dry_run)
-        emit2 ("jr NZ,!tlabel", labelKey2num (tlbl->key));
-      regalloc_dry_run_cost += 3;
+        emitLabel (tlbl1);
+      if (!IS_GB && countreg == B_IDX)
+        {
+          if (!regalloc_dry_run)
+            emit2 ("djnz !tlabel", labelKey2num (tlbl->key));
+          regalloc_dry_run_cost += 2;
+        }
+      else
+        {
+          emit2 ("dec %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
+          if (!regalloc_dry_run)
+            emit2 ("jr NZ,!tlabel", labelKey2num (tlbl->key));
+          regalloc_dry_run_cost += 3;
+        }
     }
 
+end:
   freeAsmop (left, NULL);
+  freeAsmop (right, NULL);
   freeAsmop (result, NULL);
 }
 
@@ -10942,7 +10984,7 @@ setupForMemcpy (const iCode *ic, const operand *to, const operand *from)
       oparray[2] = AOP (from)->aopu.aop_reg[0]->rIdx;
       oparray[3] = AOP (from)->aopu.aop_reg[1]->rIdx;
 
-      regMove (larray, oparray, 4);
+      regMove (larray, oparray, 4, FALSE);
     }
   else
     {
@@ -11071,7 +11113,7 @@ setupForMemset (const iCode *ic, const operand *dst, const operand *c, bool dire
       oparray[1] = AOP (dst)->aopu.aop_reg[0]->rIdx;
       oparray[2] = AOP (dst)->aopu.aop_reg[1]->rIdx;
 
-      regMove (larray, oparray, 3);
+      regMove (larray, oparray, 3, FALSE);
     }
   else
     {
